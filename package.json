@@ -44,7 +44,8 @@
     "version": "changeset version && bun update",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "publish": "bun run validate && changeset publish"
+    "publish:package": "bun run scripts/publish.ts",
+    "release": "bun run validate && bun run scripts/release.ts"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",
