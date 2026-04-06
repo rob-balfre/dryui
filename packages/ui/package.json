@@ -436,11 +436,6 @@
       "svelte": "./src/multi-select-combobox/index.ts",
       "default": "./src/multi-select-combobox/index.ts"
     },
-    "./navbar": {
-      "types": "./src/navbar/index.ts",
-      "svelte": "./src/navbar/index.ts",
-      "default": "./src/navbar/index.ts"
-    },
     "./navigation-menu": {
       "types": "./src/navigation-menu/index.ts",
       "svelte": "./src/navigation-menu/index.ts",
@@ -1180,11 +1175,6 @@
         "types": "./dist/multi-select-combobox/index.d.ts",
         "svelte": "./dist/multi-select-combobox/index.js",
         "default": "./dist/multi-select-combobox/index.js"
-      },
-      "./navbar": {
-        "types": "./dist/navbar/index.d.ts",
-        "svelte": "./dist/navbar/index.js",
-        "default": "./dist/navbar/index.js"
       },
       "./navigation-menu": {
         "types": "./dist/navigation-menu/index.d.ts",
