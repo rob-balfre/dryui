@@ -1,0 +1,27 @@
+export interface RichTextEditorContext {
+	readonly isBold: boolean;
+	readonly isItalic: boolean;
+	readonly isUnderline: boolean;
+	readonly isStrikethrough: boolean;
+	readonly isOrderedList: boolean;
+	readonly isUnorderedList: boolean;
+	readonly currentHeading: string | null;
+	readonly currentLink: string | null;
+	readonly html: string;
+	readonly readonly: boolean;
+	contentEl: HTMLDivElement | null;
+	execCommand: (command: string, value?: string) => void;
+	toggleBold: () => void;
+	toggleItalic: () => void;
+	toggleUnderline: () => void;
+	toggleStrikethrough: () => void;
+	toggleOrderedList: () => void;
+	toggleUnorderedList: () => void;
+	setHeading: (level: 'h1' | 'h2' | 'h3' | 'p') => void;
+	insertLink: (url: string) => void;
+	removeLink: () => void;
+	getContent: () => string;
+	updateState: () => void;
+}
+export declare function setRichTextEditorCtx(ctx: RichTextEditorContext): RichTextEditorContext;
+export declare function getRichTextEditorCtx(): RichTextEditorContext;

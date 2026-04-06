@@ -1,0 +1,36 @@
+{
+  "name": "@dryui/cli",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "dryui": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node"
+  },
+  "dependencies": {
+    "@dryui/feedback-server": "workspace:*",
+    "@dryui/mcp": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
+  }
+}

@@ -1,0 +1,363 @@
+:root {
+	/* ─── Neutral ─────────────────────────────────────────────────── */
+	--dry-color-text-strong: hsla(230, 100%, 7%, 0.9);
+	--dry-color-text-weak: hsla(230, 100%, 10%, 0.65);
+	--dry-color-icon: hsla(230, 100%, 15%, 0.7);
+	--dry-color-stroke-strong: hsla(230, 100%, 15%, 0.45);
+	--dry-color-stroke-weak: hsla(230, 100%, 20%, 0.1);
+	--dry-color-fill: hsla(230, 100%, 25%, 0.04);
+	--dry-color-fill-hover: hsla(230, 100%, 25%, 0.04);
+	--dry-color-fill-active: hsla(230, 100%, 25%, 0.12);
+
+	/* ─── Brand (hue 230) ─────────────────────────────────────────── */
+	--dry-color-brand: hsl(230, 64%, 57%);
+	--dry-color-text-brand: hsl(230, 64%, 57%);
+	--dry-color-fill-brand: hsl(230, 64%, 57%);
+	--dry-color-fill-brand-hover: hsl(230, 64%, 49%);
+	--dry-color-fill-brand-active: hsl(230, 64%, 43%);
+	--dry-color-fill-brand-weak: hsla(230, 100%, 67%, 0.05);
+	--dry-color-stroke-brand: hsla(230, 64%, 57%, 0.5);
+	--dry-color-stroke-brand-strong: hsla(230, 64%, 57%, 0.8);
+	--dry-color-stroke-brand-weak: hsla(230, 64%, 57%, 0.2);
+	--dry-color-on-brand: #ffffff;
+	--dry-color-focus-ring: hsla(230, 64%, 57%, 0.4);
+
+	/* ─── Backgrounds ─────────────────────────────────────────────── */
+	--dry-color-bg-base: #ffffff;
+	--dry-color-bg-raised: #f8f9fa;
+	--dry-color-bg-overlay: #f1f3f5;
+
+	/* ─── Semantic parity extensions ──────────────────────────────── */
+	--dry-color-text-disabled: var(--dry-color-stroke-weak);
+	--dry-color-text-inverse: hsla(0, 0%, 100%, 1);
+	--dry-color-text-inverse-weak: hsla(0, 0%, 100%, 0.78);
+	--dry-color-text-inverse-disabled: hsla(0, 0%, 100%, 0.12);
+
+	--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
+	--dry-color-icon-disabled: var(--dry-color-stroke-weak);
+	--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
+	--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
+	--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
+	--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
+
+	--dry-color-stroke-focus: var(--dry-color-brand);
+	--dry-color-stroke-selected: var(--dry-color-brand);
+	--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
+	--dry-color-stroke-inverse: hsla(0, 0%, 100%, 0.6);
+	--dry-color-stroke-inverse-weak: hsla(0, 0%, 100%, 0.12);
+
+	--dry-color-fill-strong: var(--dry-color-text-strong);
+	--dry-color-fill-weak: var(--dry-color-fill);
+	--dry-color-fill-weaker: hsla(230, 100%, 25%, 0.02);
+	--dry-color-fill-selected: var(--dry-color-fill-brand);
+	--dry-color-fill-disabled: var(--dry-color-stroke-weak);
+	--dry-color-fill-overlay: var(--dry-color-stroke-strong);
+	--dry-color-fill-inverse: var(--dry-color-text-inverse);
+	--dry-color-fill-inverse-weak: hsla(0, 0%, 100%, 0.06);
+	--dry-color-fill-inverse-hover: var(--dry-color-fill-inverse-weak);
+	--dry-color-fill-inverse-active: hsla(0, 0%, 100%, 0.12);
+	--dry-color-fill-inverse-disabled: #ffffff1f;
+	--dry-color-fill-white: #ffffff;
+	--dry-color-fill-yellow: #fec62e;
+
+	--dry-color-bg-sunken: #f5f6fa;
+	--dry-color-bg-alternate: var(--dry-color-bg-sunken);
+	--dry-color-bg-brand: var(--dry-color-fill-brand);
+	--dry-color-bg-inverse: hsl(233, 18%, 9%);
+
+	/* ─── Component: Toggle ───────────────────────────────────────── */
+	--dry-toggle-track-bg: rgba(0, 21, 128, 0.04);
+	--dry-toggle-track-stroke: rgba(0, 13, 77, 0.45);
+	--dry-toggle-selected-bg: #4c64d9;
+	--dry-toggle-selected-stroke: #4c64d9;
+	--dry-toggle-thumb-bg: #ffffff;
+	--dry-toggle-hover-bg: rgba(0, 21, 128, 0.04);
+	--dry-toggle-press-bg: rgba(0, 17, 102, 0.1);
+	--dry-toggle-disabled-fill: rgba(0, 17, 102, 0.1);
+	--dry-toggle-disabled-stroke: rgba(0, 17, 102, 0.1);
+	--dry-toggle-focus-ring: #4c64d9;
+	--dry-toggle-label-color: rgba(0, 6, 38, 0.9);
+	--dry-toggle-label-disabled-color: rgba(0, 17, 102, 0.1);
+
+	/* ─── Status: Error (hue 0) ───────────────────────────────────── */
+	--dry-color-text-error: hsl(0, 70%, 35%);
+	--dry-color-fill-error: hsl(0, 70%, 50%);
+	--dry-color-fill-error-hover: hsl(0, 70%, 42%);
+	--dry-color-fill-error-weak: hsla(0, 70%, 50%, 0.1);
+	--dry-color-stroke-error: hsl(0, 50%, 70%);
+	--dry-color-stroke-error-strong: hsla(0, 70%, 50%, 0.8);
+	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+	--dry-color-on-error: #ffffff;
+
+	/* ─── Status: Warning (hue 40) ────────────────────────────────── */
+	--dry-color-text-warning: hsl(40, 80%, 30%);
+	--dry-color-fill-warning: hsl(40, 80%, 50%);
+	--dry-color-fill-warning-hover: hsl(40, 80%, 42%);
+	--dry-color-fill-warning-weak: hsla(40, 80%, 50%, 0.1);
+	--dry-color-stroke-warning: hsl(40, 60%, 65%);
+	--dry-color-stroke-warning-strong: hsla(40, 80%, 50%, 0.8);
+	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+	--dry-color-on-warning: hsl(40, 80%, 15%);
+
+	/* ─── Status: Success (hue 145) ───────────────────────────────── */
+	--dry-color-text-success: hsl(145, 60%, 30%);
+	--dry-color-fill-success: hsl(145, 60%, 45%);
+	--dry-color-fill-success-hover: hsl(145, 60%, 37%);
+	--dry-color-fill-success-weak: hsla(145, 60%, 45%, 0.1);
+	--dry-color-stroke-success: hsl(145, 50%, 65%);
+	--dry-color-stroke-success-strong: hsla(145, 60%, 45%, 0.8);
+	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+	--dry-color-on-success: #ffffff;
+
+	/* ─── Status: Info (hue 210) ──────────────────────────────────── */
+	--dry-color-text-info: hsl(210, 70%, 35%);
+	--dry-color-fill-info: hsl(210, 70%, 50%);
+	--dry-color-fill-info-hover: hsl(210, 70%, 42%);
+	--dry-color-fill-info-weak: hsla(210, 70%, 50%, 0.1);
+	--dry-color-stroke-info: hsl(210, 50%, 70%);
+	--dry-color-stroke-info-strong: hsla(210, 70%, 50%, 0.8);
+	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+	--dry-color-on-info: #ffffff;
+
+	/* ─── Semantic shadows ────────────────────────────────────────── */
+	--dry-shadow-raised: 0 1px 3px hsla(230, 20%, 20%, 0.08), 0 1px 2px hsla(230, 20%, 20%, 0.06);
+	--dry-shadow-overlay: 0 8px 24px hsla(230, 20%, 20%, 0.12), 0 2px 8px hsla(230, 20%, 20%, 0.08);
+	--dry-shadow-sunken: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+
+	/* ─── Overlay backdrops ───────────────────────────────────────── */
+	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.4);
+	--dry-color-overlay-backdrop-strong: hsla(0, 0%, 0%, 0.6);
+
+	/* ─── Spacing — 4px base unit ─────────────────────────────────── */
+	--dry-space-0_5: 0.125rem;
+	--dry-space-1: 0.25rem;
+	--dry-space-1_5: 0.375rem;
+	--dry-space-2: 0.5rem;
+	--dry-space-2_5: 0.625rem;
+	--dry-space-3: 0.75rem;
+	--dry-space-3_5: 0.875rem;
+	--dry-space-4: 1rem;
+	--dry-space-5: 1.25rem;
+	--dry-space-6: 1.5rem;
+	--dry-space-7: 1.75rem;
+	--dry-space-8: 2rem;
+	--dry-space-9: 2.25rem;
+	--dry-space-10: 2.5rem;
+	--dry-space-11: 2.75rem;
+	--dry-space-12: 3rem;
+	--dry-space-14: 3.5rem;
+	--dry-space-16: 4rem;
+	--dry-space-20: 5rem;
+	--dry-space-24: 6rem;
+	--dry-space-32: 8rem;
+	--dry-space-40: 2.5rem;
+	--dry-space-56: 3.5rem;
+	--dry-space-64: 4rem;
+	--dry-space-80: 5rem;
+	--dry-space-96: 6rem;
+	--dry-space-128: 8rem;
+	--dry-space-192: 12rem;
+	--dry-space-256: 16rem;
+
+	/* ─── Radius ──────────────────────────────────────────────────── */
+	--dry-radius-sm: 4px;
+	--dry-radius-md: 8px;
+	--dry-radius-lg: 8px;
+	--dry-radius-xl: 12px;
+	--dry-radius-2xl: 16px;
+	--dry-radius-full: 9999px;
+
+	/* ─── Typography ──────────────────────────────────────────────── */
+	--dry-font-sans:
+		ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		'Helvetica Neue', Arial, sans-serif;
+	--dry-font-mono:
+		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
+		monospace;
+
+	/* Practical UI-style named scale tokens */
+	--dry-type-display-size: 3.5rem;
+	--dry-type-display-leading: 4rem;
+	--dry-type-heading-1-size: 2.5rem;
+	--dry-type-heading-1-leading: 3rem;
+	--dry-type-heading-2-size: 2rem;
+	--dry-type-heading-2-leading: 2.5rem;
+	--dry-type-heading-3-size: 1.5rem;
+	--dry-type-heading-3-leading: 2rem;
+	--dry-type-heading-4-size: 1.25rem;
+	--dry-type-heading-4-leading: 1.75rem;
+	--dry-type-small-size: 1rem;
+	--dry-type-small-leading: 1.5rem;
+	--dry-type-tiny-size: 0.875rem;
+	--dry-type-tiny-leading: 1.25rem;
+	--dry-type-xs-size: 0.625rem;
+	--dry-type-2xs-size: 0.5625rem;
+
+	/* Semantic UI typography aliases derived from the Practical UI scale */
+	--dry-type-ui-caption-size: calc(var(--dry-type-tiny-size) * 0.8571428571);
+	--dry-type-ui-caption-leading: calc(var(--dry-type-tiny-leading) * 0.8);
+	--dry-type-ui-control-size: var(--dry-type-tiny-size);
+	--dry-type-ui-control-leading: var(--dry-type-tiny-leading);
+	--dry-type-ui-body-size: var(--dry-type-small-size);
+	--dry-type-ui-body-leading: var(--dry-type-small-leading);
+	--dry-type-ui-body-strong-size: calc(
+		(var(--dry-type-small-size) + var(--dry-type-heading-4-size)) / 2
+	);
+	--dry-type-ui-body-strong-leading: var(--dry-type-small-leading);
+	--dry-type-ui-title-size: var(--dry-type-heading-4-size);
+	--dry-type-ui-title-leading: var(--dry-type-heading-4-leading);
+	--dry-type-ui-title-strong-size: calc(
+		(var(--dry-type-heading-4-size) + var(--dry-type-heading-3-size)) / 2
+	);
+	--dry-type-ui-title-strong-leading: var(--dry-type-heading-4-leading);
+	--dry-type-ui-section-size: var(--dry-type-heading-3-size);
+	--dry-type-ui-section-leading: var(--dry-type-heading-3-leading);
+	--dry-type-ui-section-strong-size: calc(
+		(var(--dry-type-heading-3-size) + var(--dry-type-heading-2-size)) / 2
+	);
+	--dry-type-ui-section-strong-leading: calc(
+		(var(--dry-type-heading-3-leading) + var(--dry-type-heading-2-leading)) / 2
+	);
+	--dry-type-ui-display-size: calc(
+		(var(--dry-type-heading-2-size) + var(--dry-type-heading-1-size)) / 2
+	);
+	--dry-type-ui-display-leading: calc(
+		(var(--dry-type-heading-2-leading) + var(--dry-type-heading-1-leading)) / 2
+	);
+
+	/* Legacy text ladder kept as a compatibility bridge onto the named scale */
+	--dry-text-xs-size: var(--dry-type-ui-caption-size);
+	--dry-text-xs-leading: var(--dry-type-ui-caption-leading);
+	--dry-text-xs-tracking: 0.02em;
+	--dry-text-sm-size: var(--dry-type-ui-control-size);
+	--dry-text-sm-leading: var(--dry-type-ui-control-leading);
+	--dry-text-sm-tracking: 0.01em;
+	--dry-text-base-size: var(--dry-type-ui-body-strong-size);
+	--dry-text-base-leading: var(--dry-type-ui-body-strong-leading);
+	--dry-text-lg-size: var(--dry-type-ui-title-size);
+	--dry-text-lg-leading: var(--dry-type-ui-title-leading);
+	--dry-text-xl-size: var(--dry-type-ui-title-strong-size);
+	--dry-text-xl-leading: var(--dry-type-ui-title-strong-leading);
+	--dry-text-2xl-size: var(--dry-type-ui-section-size);
+	--dry-text-2xl-leading: var(--dry-type-ui-section-leading);
+	--dry-text-2xl-tracking: -0.01em;
+	--dry-text-3xl-size: var(--dry-type-ui-section-strong-size);
+	--dry-text-3xl-leading: var(--dry-type-ui-section-strong-leading);
+	--dry-text-4xl-size: var(--dry-type-ui-display-size);
+	--dry-text-4xl-leading: var(--dry-type-ui-display-leading);
+
+	/* ─── Motion ──────────────────────────────────────────────────── */
+	--dry-duration-instant: 0ms;
+	--dry-duration-fast: 120ms;
+	--dry-duration-normal: 220ms;
+	--dry-duration-slow: 360ms;
+	--dry-duration-xslow: 560ms;
+	--dry-duration-entrance: 480ms;
+
+	--dry-ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+	--dry-ease-in: cubic-bezier(0.4, 0, 1, 1);
+	--dry-ease-out: cubic-bezier(0, 0, 0.2, 1);
+	--dry-ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+	--dry-ease-spring-soft: cubic-bezier(0.22, 1, 0.36, 1);
+	--dry-ease-spring-snappy: cubic-bezier(0.16, 1, 0.3, 1);
+	--dry-ease-spring: var(--dry-ease-spring-soft);
+
+	--dry-motion-distance-xs: 0.25rem;
+	--dry-motion-distance-sm: 0.75rem;
+	--dry-motion-distance-md: 1.5rem;
+	--dry-motion-distance-lg: 2.5rem;
+
+	--dry-motion-opacity-enter: 0;
+	--dry-motion-blur-enter: 16px;
+	--dry-motion-scale-enter: 0.96;
+
+	/* ─── Glass surface ───────────────────────────────────────────── */
+	--dry-glass-blur: 12px;
+	--dry-glass-tint: var(--dry-color-bg-raised);
+	--dry-glass-opacity: 72%;
+
+	/* ─── Glow ────────────────────────────────────────────────────── */
+	--dry-glow-color: var(--dry-color-fill-brand);
+	--dry-glow-blur: 24px;
+	--dry-glow-spread: 48px;
+
+	/* ─── Typography extras ───────────────────────────────────────── */
+	--dry-tracking-tight: -0.025em;
+	--dry-tracking-normal: 0;
+
+	/* ─── Utility shadows (fixed dark ink for depth across themes) ── */
+	--dry-shadow-sm: 0 1px 2px 0 color-mix(in srgb, #020617 12%, transparent);
+	--dry-shadow-md:
+		0 4px 6px -1px color-mix(in srgb, #020617 18%, transparent),
+		0 2px 4px -2px color-mix(in srgb, #020617 14%, transparent);
+	--dry-shadow-lg:
+		0 10px 15px -3px color-mix(in srgb, #020617 24%, transparent),
+		0 4px 6px -4px color-mix(in srgb, #020617 18%, transparent);
+	--dry-shadow-xl:
+		0 20px 25px -5px color-mix(in srgb, #020617 30%, transparent),
+		0 8px 10px -6px color-mix(in srgb, #020617 22%, transparent);
+
+	/* ─── Layers ──────────────────────────────────────────────────── */
+	--dry-layer-overlay: 50;
+	--dry-layer-tour-overlay: 60;
+	--dry-layer-tour-spotlight: 61;
+	--dry-layer-tour-tooltip: 62;
+
+	/* ─── Scrollbar ───────────────────────────────────────────────── */
+	--dry-scrollbar-thumb: var(--dry-color-stroke-weak);
+	--dry-scrollbar-thumb-hover: var(--dry-color-stroke-strong);
+	--dry-scrollbar-track: transparent;
+	--dry-scrollbar-width: 8px;
+}
+
+:where([data-dry-type-mode='desktop']) {
+	--dry-type-display-size: 3.5rem;
+	--dry-type-display-leading: 4rem;
+	--dry-type-heading-1-size: 2.5rem;
+	--dry-type-heading-1-leading: 3rem;
+	--dry-type-heading-2-size: 2rem;
+	--dry-type-heading-2-leading: 2.5rem;
+	--dry-type-heading-3-size: 1.5rem;
+	--dry-type-heading-3-leading: 2rem;
+	--dry-type-heading-4-size: 1.25rem;
+	--dry-type-heading-4-leading: 1.75rem;
+	--dry-type-small-size: 1rem;
+	--dry-type-small-leading: 1.5rem;
+	--dry-type-tiny-size: 0.875rem;
+	--dry-type-tiny-leading: 1.25rem;
+}
+
+:where([data-dry-type-mode='mobile']) {
+	--dry-type-display-size: 2.5rem;
+	--dry-type-display-leading: 3rem;
+	--dry-type-heading-1-size: 2.25rem;
+	--dry-type-heading-1-leading: 2.75rem;
+	--dry-type-heading-2-size: 1.75rem;
+	--dry-type-heading-2-leading: 2.25rem;
+	--dry-type-heading-3-size: 1.5rem;
+	--dry-type-heading-3-leading: 2rem;
+	--dry-type-heading-4-size: 1.25rem;
+	--dry-type-heading-4-leading: 1.75rem;
+	--dry-type-small-size: 1rem;
+	--dry-type-small-leading: 1.5rem;
+	--dry-type-tiny-size: 0.875rem;
+	--dry-type-tiny-leading: 1.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root {
+		--dry-duration-instant: 0ms;
+		--dry-duration-fast: 0ms;
+		--dry-duration-normal: 0ms;
+		--dry-duration-slow: 0ms;
+		--dry-duration-xslow: 0ms;
+		--dry-duration-entrance: 0ms;
+		--dry-motion-distance-xs: 0px;
+		--dry-motion-distance-sm: 0px;
+		--dry-motion-distance-md: 0px;
+		--dry-motion-distance-lg: 0px;
+		--dry-motion-opacity-enter: 1;
+		--dry-motion-blur-enter: 0px;
+		--dry-motion-scale-enter: 1;
+	}
+}

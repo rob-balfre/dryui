@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" role="img" aria-labelledby="title desc">
+  <title id="title">Mountain landscape illustration</title>
+  <desc id="desc">A sunrise landscape with layered mountains, a lake, and pine trees.</desc>
+  <defs>
+    <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#1f3764"/>
+      <stop offset="0.55" stop-color="#f18a5b"/>
+      <stop offset="1" stop-color="#f8d9a4"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#5aa7c2"/>
+      <stop offset="1" stop-color="#264e66"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="640" fill="url(#sky)"/>
+  <circle cx="706" cy="146" r="54" fill="#ffe7b0"/>
+  <path d="M0 356 146 218l78 78 90-120 114 124 82-68 84 74 88-102 278 152v284H0Z" fill="#425c73"/>
+  <path d="M0 392 132 320l90 68 118-140 130 126 112-94 102 78 276 34v248H0Z" fill="#314859"/>
+  <path d="M0 444c80-10 160-22 240-22 112 0 216 26 326 26 130 0 258-42 394-64v256H0Z" fill="url(#water)"/>
+  <path d="M0 520c122 16 244 28 368 28 190 0 384-30 592-74v166H0Z" fill="#1d3847" opacity="0.45"/>
+  <path d="M106 466 132 412l26 54Zm42 0 28-66 28 66Zm474 14 30-74 30 74Zm50 0 28-62 28 62Zm64 0 24-52 24 52Z" fill="#1c2a22"/>
+</svg>

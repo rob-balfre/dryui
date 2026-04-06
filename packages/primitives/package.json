@@ -1,0 +1,1551 @@
+{
+  "name": "@dryui/primitives",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/primitives"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "svelte": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./accordion": {
+      "types": "./src/accordion/index.ts",
+      "svelte": "./src/accordion/index.ts",
+      "default": "./src/accordion/index.ts"
+    },
+    "./adjust": {
+      "types": "./src/adjust/index.ts",
+      "svelte": "./src/adjust/index.ts",
+      "default": "./src/adjust/index.ts"
+    },
+    "./affix-group": {
+      "types": "./src/affix-group/index.ts",
+      "svelte": "./src/affix-group/index.ts",
+      "default": "./src/affix-group/index.ts"
+    },
+    "./alert": {
+      "types": "./src/alert/index.ts",
+      "svelte": "./src/alert/index.ts",
+      "default": "./src/alert/index.ts"
+    },
+    "./alert-dialog": {
+      "types": "./src/alert-dialog/index.ts",
+      "svelte": "./src/alert-dialog/index.ts",
+      "default": "./src/alert-dialog/index.ts"
+    },
+    "./app-frame": {
+      "types": "./src/app-frame/index.ts",
+      "svelte": "./src/app-frame/index.ts",
+      "default": "./src/app-frame/index.ts"
+    },
+    "./aspect-ratio": {
+      "types": "./src/aspect-ratio/index.ts",
+      "svelte": "./src/aspect-ratio/index.ts",
+      "default": "./src/aspect-ratio/index.ts"
+    },
+    "./aurora": {
+      "types": "./src/aurora/index.ts",
+      "svelte": "./src/aurora/index.ts",
+      "default": "./src/aurora/index.ts"
+    },
+    "./avatar": {
+      "types": "./src/avatar/index.ts",
+      "svelte": "./src/avatar/index.ts",
+      "default": "./src/avatar/index.ts"
+    },
+    "./avatar-group": {
+      "types": "./src/avatar-group/index.ts",
+      "svelte": "./src/avatar-group/index.ts",
+      "default": "./src/avatar-group/index.ts"
+    },
+    "./backdrop": {
+      "types": "./src/backdrop/index.ts",
+      "svelte": "./src/backdrop/index.ts",
+      "default": "./src/backdrop/index.ts"
+    },
+    "./badge": {
+      "types": "./src/badge/index.ts",
+      "svelte": "./src/badge/index.ts",
+      "default": "./src/badge/index.ts"
+    },
+    "./beam": {
+      "types": "./src/beam/index.ts",
+      "svelte": "./src/beam/index.ts",
+      "default": "./src/beam/index.ts"
+    },
+    "./breadcrumb": {
+      "types": "./src/breadcrumb/index.ts",
+      "svelte": "./src/breadcrumb/index.ts",
+      "default": "./src/breadcrumb/index.ts"
+    },
+    "./button": {
+      "types": "./src/button/index.ts",
+      "svelte": "./src/button/index.ts",
+      "default": "./src/button/index.ts"
+    },
+    "./button-group": {
+      "types": "./src/button-group/index.ts",
+      "svelte": "./src/button-group/index.ts",
+      "default": "./src/button-group/index.ts"
+    },
+    "./calendar": {
+      "types": "./src/calendar/index.ts",
+      "svelte": "./src/calendar/index.ts",
+      "default": "./src/calendar/index.ts"
+    },
+    "./card": {
+      "types": "./src/card/index.ts",
+      "svelte": "./src/card/index.ts",
+      "default": "./src/card/index.ts"
+    },
+    "./carousel": {
+      "types": "./src/carousel/index.ts",
+      "svelte": "./src/carousel/index.ts",
+      "default": "./src/carousel/index.ts"
+    },
+    "./chart": {
+      "types": "./src/chart/index.ts",
+      "svelte": "./src/chart/index.ts",
+      "default": "./src/chart/index.ts"
+    },
+    "./chat-message": {
+      "types": "./src/chat-message/index.ts",
+      "svelte": "./src/chat-message/index.ts",
+      "default": "./src/chat-message/index.ts"
+    },
+    "./checkbox": {
+      "types": "./src/checkbox/index.ts",
+      "svelte": "./src/checkbox/index.ts",
+      "default": "./src/checkbox/index.ts"
+    },
+    "./chip": {
+      "types": "./src/chip/index.ts",
+      "svelte": "./src/chip/index.ts",
+      "default": "./src/chip/index.ts"
+    },
+    "./chip-group": {
+      "types": "./src/chip-group/index.ts",
+      "svelte": "./src/chip-group/index.ts",
+      "default": "./src/chip-group/index.ts"
+    },
+    "./chromatic-aberration": {
+      "types": "./src/chromatic-aberration/index.ts",
+      "svelte": "./src/chromatic-aberration/index.ts",
+      "default": "./src/chromatic-aberration/index.ts"
+    },
+    "./chromatic-shift": {
+      "types": "./src/chromatic-shift/index.ts",
+      "svelte": "./src/chromatic-shift/index.ts",
+      "default": "./src/chromatic-shift/index.ts"
+    },
+    "./clipboard": {
+      "types": "./src/clipboard/index.ts",
+      "svelte": "./src/clipboard/index.ts",
+      "default": "./src/clipboard/index.ts"
+    },
+    "./code-block": {
+      "types": "./src/code-block/index.ts",
+      "svelte": "./src/code-block/index.ts",
+      "default": "./src/code-block/index.ts"
+    },
+    "./collapsible": {
+      "types": "./src/collapsible/index.ts",
+      "svelte": "./src/collapsible/index.ts",
+      "default": "./src/collapsible/index.ts"
+    },
+    "./color-picker": {
+      "types": "./src/color-picker/index.ts",
+      "svelte": "./src/color-picker/index.ts",
+      "default": "./src/color-picker/index.ts"
+    },
+    "./combobox": {
+      "types": "./src/combobox/index.ts",
+      "svelte": "./src/combobox/index.ts",
+      "default": "./src/combobox/index.ts"
+    },
+    "./command-palette": {
+      "types": "./src/command-palette/index.ts",
+      "svelte": "./src/command-palette/index.ts",
+      "default": "./src/command-palette/index.ts"
+    },
+    "./container": {
+      "types": "./src/container/index.ts",
+      "svelte": "./src/container/index.ts",
+      "default": "./src/container/index.ts"
+    },
+    "./context-menu": {
+      "types": "./src/context-menu/index.ts",
+      "svelte": "./src/context-menu/index.ts",
+      "default": "./src/context-menu/index.ts"
+    },
+    "./country-select": {
+      "types": "./src/country-select/index.ts",
+      "svelte": "./src/country-select/index.ts",
+      "default": "./src/country-select/index.ts"
+    },
+    "./data-grid": {
+      "types": "./src/data-grid/index.ts",
+      "svelte": "./src/data-grid/index.ts",
+      "default": "./src/data-grid/index.ts"
+    },
+    "./date-field": {
+      "types": "./src/date-field/index.ts",
+      "svelte": "./src/date-field/index.ts",
+      "default": "./src/date-field/index.ts"
+    },
+    "./date-picker": {
+      "types": "./src/date-picker/index.ts",
+      "svelte": "./src/date-picker/index.ts",
+      "default": "./src/date-picker/index.ts"
+    },
+    "./date-range-picker": {
+      "types": "./src/date-range-picker/index.ts",
+      "svelte": "./src/date-range-picker/index.ts",
+      "default": "./src/date-range-picker/index.ts"
+    },
+    "./date-time-input": {
+      "types": "./src/date-time-input/index.ts",
+      "svelte": "./src/date-time-input/index.ts",
+      "default": "./src/date-time-input/index.ts"
+    },
+    "./dialog": {
+      "types": "./src/dialog/index.ts",
+      "svelte": "./src/dialog/index.ts",
+      "default": "./src/dialog/index.ts"
+    },
+    "./displacement": {
+      "types": "./src/displacement/index.ts",
+      "svelte": "./src/displacement/index.ts",
+      "default": "./src/displacement/index.ts"
+    },
+    "./drag-and-drop": {
+      "types": "./src/drag-and-drop/index.ts",
+      "svelte": "./src/drag-and-drop/index.ts",
+      "default": "./src/drag-and-drop/index.ts"
+    },
+    "./drawer": {
+      "types": "./src/drawer/index.ts",
+      "svelte": "./src/drawer/index.ts",
+      "default": "./src/drawer/index.ts"
+    },
+    "./dropdown-menu": {
+      "types": "./src/dropdown-menu/index.ts",
+      "svelte": "./src/dropdown-menu/index.ts",
+      "default": "./src/dropdown-menu/index.ts"
+    },
+    "./empty-state": {
+      "types": "./src/empty-state/index.ts",
+      "svelte": "./src/empty-state/index.ts",
+      "default": "./src/empty-state/index.ts"
+    },
+    "./field": {
+      "types": "./src/field/index.ts",
+      "svelte": "./src/field/index.ts",
+      "default": "./src/field/index.ts"
+    },
+    "./file-select": {
+      "types": "./src/file-select/index.ts",
+      "svelte": "./src/file-select/index.ts",
+      "default": "./src/file-select/index.ts"
+    },
+    "./file-upload": {
+      "types": "./src/file-upload/index.ts",
+      "svelte": "./src/file-upload/index.ts",
+      "default": "./src/file-upload/index.ts"
+    },
+    "./flex": {
+      "types": "./src/flex/index.ts",
+      "svelte": "./src/flex/index.ts",
+      "default": "./src/flex/index.ts"
+    },
+    "./flip-card": {
+      "types": "./src/flip-card/index.ts",
+      "svelte": "./src/flip-card/index.ts",
+      "default": "./src/flip-card/index.ts"
+    },
+    "./float-button": {
+      "types": "./src/float-button/index.ts",
+      "svelte": "./src/float-button/index.ts",
+      "default": "./src/float-button/index.ts"
+    },
+    "./focus-trap": {
+      "types": "./src/focus-trap/index.ts",
+      "svelte": "./src/focus-trap/index.ts",
+      "default": "./src/focus-trap/index.ts"
+    },
+    "./footer": {
+      "types": "./src/footer/index.ts",
+      "svelte": "./src/footer/index.ts",
+      "default": "./src/footer/index.ts"
+    },
+    "./format-bytes": {
+      "types": "./src/format-bytes/index.ts",
+      "svelte": "./src/format-bytes/index.ts",
+      "default": "./src/format-bytes/index.ts"
+    },
+    "./format-date": {
+      "types": "./src/format-date/index.ts",
+      "svelte": "./src/format-date/index.ts",
+      "default": "./src/format-date/index.ts"
+    },
+    "./format-number": {
+      "types": "./src/format-number/index.ts",
+      "svelte": "./src/format-number/index.ts",
+      "default": "./src/format-number/index.ts"
+    },
+    "./gauge": {
+      "types": "./src/gauge/index.ts",
+      "svelte": "./src/gauge/index.ts",
+      "default": "./src/gauge/index.ts"
+    },
+    "./glass": {
+      "types": "./src/glass/index.ts",
+      "svelte": "./src/glass/index.ts",
+      "default": "./src/glass/index.ts"
+    },
+    "./glow": {
+      "types": "./src/glow/index.ts",
+      "svelte": "./src/glow/index.ts",
+      "default": "./src/glow/index.ts"
+    },
+    "./god-rays": {
+      "types": "./src/god-rays/index.ts",
+      "svelte": "./src/god-rays/index.ts",
+      "default": "./src/god-rays/index.ts"
+    },
+    "./gradient-mesh": {
+      "types": "./src/gradient-mesh/index.ts",
+      "svelte": "./src/gradient-mesh/index.ts",
+      "default": "./src/gradient-mesh/index.ts"
+    },
+    "./grid": {
+      "types": "./src/grid/index.ts",
+      "svelte": "./src/grid/index.ts",
+      "default": "./src/grid/index.ts"
+    },
+    "./hero": {
+      "types": "./src/hero/index.ts",
+      "svelte": "./src/hero/index.ts",
+      "default": "./src/hero/index.ts"
+    },
+    "./hotkey": {
+      "types": "./src/hotkey/index.ts",
+      "svelte": "./src/hotkey/index.ts",
+      "default": "./src/hotkey/index.ts"
+    },
+    "./hover-card": {
+      "types": "./src/hover-card/index.ts",
+      "svelte": "./src/hover-card/index.ts",
+      "default": "./src/hover-card/index.ts"
+    },
+    "./icon": {
+      "types": "./src/icon/index.ts",
+      "svelte": "./src/icon/index.ts",
+      "default": "./src/icon/index.ts"
+    },
+    "./image": {
+      "types": "./src/image/index.ts",
+      "svelte": "./src/image/index.ts",
+      "default": "./src/image/index.ts"
+    },
+    "./image-comparison": {
+      "types": "./src/image-comparison/index.ts",
+      "svelte": "./src/image-comparison/index.ts",
+      "default": "./src/image-comparison/index.ts"
+    },
+    "./infinite-scroll": {
+      "types": "./src/infinite-scroll/index.ts",
+      "svelte": "./src/infinite-scroll/index.ts",
+      "default": "./src/infinite-scroll/index.ts"
+    },
+    "./input": {
+      "types": "./src/input/index.ts",
+      "svelte": "./src/input/index.ts",
+      "default": "./src/input/index.ts"
+    },
+    "./kbd": {
+      "types": "./src/kbd/index.ts",
+      "svelte": "./src/kbd/index.ts",
+      "default": "./src/kbd/index.ts"
+    },
+    "./label": {
+      "types": "./src/label/index.ts",
+      "svelte": "./src/label/index.ts",
+      "default": "./src/label/index.ts"
+    },
+    "./link": {
+      "types": "./src/link/index.ts",
+      "svelte": "./src/link/index.ts",
+      "default": "./src/link/index.ts"
+    },
+    "./link-preview": {
+      "types": "./src/link-preview/index.ts",
+      "svelte": "./src/link-preview/index.ts",
+      "default": "./src/link-preview/index.ts"
+    },
+    "./list": {
+      "types": "./src/list/index.ts",
+      "svelte": "./src/list/index.ts",
+      "default": "./src/list/index.ts"
+    },
+    "./listbox": {
+      "types": "./src/listbox/index.ts",
+      "svelte": "./src/listbox/index.ts",
+      "default": "./src/listbox/index.ts"
+    },
+    "./logo-cloud": {
+      "types": "./src/logo-cloud/index.ts",
+      "svelte": "./src/logo-cloud/index.ts",
+      "default": "./src/logo-cloud/index.ts"
+    },
+    "./map": {
+      "types": "./src/map/index.ts",
+      "svelte": "./src/map/index.ts",
+      "default": "./src/map/index.ts"
+    },
+    "./markdown-renderer": {
+      "types": "./src/markdown-renderer/index.ts",
+      "svelte": "./src/markdown-renderer/index.ts",
+      "default": "./src/markdown-renderer/index.ts"
+    },
+    "./marquee": {
+      "types": "./src/marquee/index.ts",
+      "svelte": "./src/marquee/index.ts",
+      "default": "./src/marquee/index.ts"
+    },
+    "./mask-reveal": {
+      "types": "./src/mask-reveal/index.ts",
+      "svelte": "./src/mask-reveal/index.ts",
+      "default": "./src/mask-reveal/index.ts"
+    },
+    "./mega-menu": {
+      "types": "./src/mega-menu/index.ts",
+      "svelte": "./src/mega-menu/index.ts",
+      "default": "./src/mega-menu/index.ts"
+    },
+    "./menubar": {
+      "types": "./src/menubar/index.ts",
+      "svelte": "./src/menubar/index.ts",
+      "default": "./src/menubar/index.ts"
+    },
+    "./multi-select-combobox": {
+      "types": "./src/multi-select-combobox/index.ts",
+      "svelte": "./src/multi-select-combobox/index.ts",
+      "default": "./src/multi-select-combobox/index.ts"
+    },
+    "./navbar": {
+      "types": "./src/navbar/index.ts",
+      "svelte": "./src/navbar/index.ts",
+      "default": "./src/navbar/index.ts"
+    },
+    "./navigation-menu": {
+      "types": "./src/navigation-menu/index.ts",
+      "svelte": "./src/navigation-menu/index.ts",
+      "default": "./src/navigation-menu/index.ts"
+    },
+    "./noise": {
+      "types": "./src/noise/index.ts",
+      "svelte": "./src/noise/index.ts",
+      "default": "./src/noise/index.ts"
+    },
+    "./notification-center": {
+      "types": "./src/notification-center/index.ts",
+      "svelte": "./src/notification-center/index.ts",
+      "default": "./src/notification-center/index.ts"
+    },
+    "./number-input": {
+      "types": "./src/number-input/index.ts",
+      "svelte": "./src/number-input/index.ts",
+      "default": "./src/number-input/index.ts"
+    },
+    "./page-header": {
+      "types": "./src/page-header/index.ts",
+      "svelte": "./src/page-header/index.ts",
+      "default": "./src/page-header/index.ts"
+    },
+    "./pagination": {
+      "types": "./src/pagination/index.ts",
+      "svelte": "./src/pagination/index.ts",
+      "default": "./src/pagination/index.ts"
+    },
+    "./phone-input": {
+      "types": "./src/phone-input/index.ts",
+      "svelte": "./src/phone-input/index.ts",
+      "default": "./src/phone-input/index.ts"
+    },
+    "./pin-input": {
+      "types": "./src/pin-input/index.ts",
+      "svelte": "./src/pin-input/index.ts",
+      "default": "./src/pin-input/index.ts"
+    },
+    "./popover": {
+      "types": "./src/popover/index.ts",
+      "svelte": "./src/popover/index.ts",
+      "default": "./src/popover/index.ts"
+    },
+    "./portal": {
+      "types": "./src/portal/index.ts",
+      "svelte": "./src/portal/index.ts",
+      "default": "./src/portal/index.ts"
+    },
+    "./progress": {
+      "types": "./src/progress/index.ts",
+      "svelte": "./src/progress/index.ts",
+      "default": "./src/progress/index.ts"
+    },
+    "./progress-ring": {
+      "types": "./src/progress-ring/index.ts",
+      "svelte": "./src/progress-ring/index.ts",
+      "default": "./src/progress-ring/index.ts"
+    },
+    "./prompt-input": {
+      "types": "./src/prompt-input/index.ts",
+      "svelte": "./src/prompt-input/index.ts",
+      "default": "./src/prompt-input/index.ts"
+    },
+    "./qr-code": {
+      "types": "./src/qr-code/index.ts",
+      "svelte": "./src/qr-code/index.ts",
+      "default": "./src/qr-code/index.ts"
+    },
+    "./radio-group": {
+      "types": "./src/radio-group/index.ts",
+      "svelte": "./src/radio-group/index.ts",
+      "default": "./src/radio-group/index.ts"
+    },
+    "./range-calendar": {
+      "types": "./src/range-calendar/index.ts",
+      "svelte": "./src/range-calendar/index.ts",
+      "default": "./src/range-calendar/index.ts"
+    },
+    "./rating": {
+      "types": "./src/rating/index.ts",
+      "svelte": "./src/rating/index.ts",
+      "default": "./src/rating/index.ts"
+    },
+    "./relative-time": {
+      "types": "./src/relative-time/index.ts",
+      "svelte": "./src/relative-time/index.ts",
+      "default": "./src/relative-time/index.ts"
+    },
+    "./reveal": {
+      "types": "./src/reveal/index.ts",
+      "svelte": "./src/reveal/index.ts",
+      "default": "./src/reveal/index.ts"
+    },
+    "./rich-text-editor": {
+      "types": "./src/rich-text-editor/index.ts",
+      "svelte": "./src/rich-text-editor/index.ts",
+      "default": "./src/rich-text-editor/index.ts"
+    },
+    "./scroll-area": {
+      "types": "./src/scroll-area/index.ts",
+      "svelte": "./src/scroll-area/index.ts",
+      "default": "./src/scroll-area/index.ts"
+    },
+    "./scroll-to-top": {
+      "types": "./src/scroll-to-top/index.ts",
+      "svelte": "./src/scroll-to-top/index.ts",
+      "default": "./src/scroll-to-top/index.ts"
+    },
+    "./segmented-control": {
+      "types": "./src/segmented-control/index.ts",
+      "svelte": "./src/segmented-control/index.ts",
+      "default": "./src/segmented-control/index.ts"
+    },
+    "./select": {
+      "types": "./src/select/index.ts",
+      "svelte": "./src/select/index.ts",
+      "default": "./src/select/index.ts"
+    },
+    "./selectable-tile-group": {
+      "types": "./src/selectable-tile-group/index.ts",
+      "svelte": "./src/selectable-tile-group/index.ts",
+      "default": "./src/selectable-tile-group/index.ts"
+    },
+    "./separator": {
+      "types": "./src/separator/index.ts",
+      "svelte": "./src/separator/index.ts",
+      "default": "./src/separator/index.ts"
+    },
+    "./shader-canvas": {
+      "types": "./src/shader-canvas/index.ts",
+      "svelte": "./src/shader-canvas/index.ts",
+      "default": "./src/shader-canvas/index.ts"
+    },
+    "./sidebar": {
+      "types": "./src/sidebar/index.ts",
+      "svelte": "./src/sidebar/index.ts",
+      "default": "./src/sidebar/index.ts"
+    },
+    "./skeleton": {
+      "types": "./src/skeleton/index.ts",
+      "svelte": "./src/skeleton/index.ts",
+      "default": "./src/skeleton/index.ts"
+    },
+    "./slider": {
+      "types": "./src/slider/index.ts",
+      "svelte": "./src/slider/index.ts",
+      "default": "./src/slider/index.ts"
+    },
+    "./spacer": {
+      "types": "./src/spacer/index.ts",
+      "svelte": "./src/spacer/index.ts",
+      "default": "./src/spacer/index.ts"
+    },
+    "./sparkline": {
+      "types": "./src/sparkline/index.ts",
+      "svelte": "./src/sparkline/index.ts",
+      "default": "./src/sparkline/index.ts"
+    },
+    "./spinner": {
+      "types": "./src/spinner/index.ts",
+      "svelte": "./src/spinner/index.ts",
+      "default": "./src/spinner/index.ts"
+    },
+    "./splitter": {
+      "types": "./src/splitter/index.ts",
+      "svelte": "./src/splitter/index.ts",
+      "default": "./src/splitter/index.ts"
+    },
+    "./spotlight": {
+      "types": "./src/spotlight/index.ts",
+      "svelte": "./src/spotlight/index.ts",
+      "default": "./src/spotlight/index.ts"
+    },
+    "./stack": {
+      "types": "./src/stack/index.ts",
+      "svelte": "./src/stack/index.ts",
+      "default": "./src/stack/index.ts"
+    },
+    "./stat-card": {
+      "types": "./src/stat-card/index.ts",
+      "svelte": "./src/stat-card/index.ts",
+      "default": "./src/stat-card/index.ts"
+    },
+    "./stepper": {
+      "types": "./src/stepper/index.ts",
+      "svelte": "./src/stepper/index.ts",
+      "default": "./src/stepper/index.ts"
+    },
+    "./surface": {
+      "types": "./src/surface/index.ts",
+      "svelte": "./src/surface/index.ts",
+      "default": "./src/surface/index.ts"
+    },
+    "./svg": {
+      "types": "./src/svg/index.ts",
+      "svelte": "./src/svg/index.ts",
+      "default": "./src/svg/index.ts"
+    },
+    "./table": {
+      "types": "./src/table/index.ts",
+      "svelte": "./src/table/index.ts",
+      "default": "./src/table/index.ts"
+    },
+    "./table-of-contents": {
+      "types": "./src/table-of-contents/index.ts",
+      "svelte": "./src/table-of-contents/index.ts",
+      "default": "./src/table-of-contents/index.ts"
+    },
+    "./tabs": {
+      "types": "./src/tabs/index.ts",
+      "svelte": "./src/tabs/index.ts",
+      "default": "./src/tabs/index.ts"
+    },
+    "./tag": {
+      "types": "./src/tag/index.ts",
+      "svelte": "./src/tag/index.ts",
+      "default": "./src/tag/index.ts"
+    },
+    "./tags-input": {
+      "types": "./src/tags-input/index.ts",
+      "svelte": "./src/tags-input/index.ts",
+      "default": "./src/tags-input/index.ts"
+    },
+    "./textarea": {
+      "types": "./src/textarea/index.ts",
+      "svelte": "./src/textarea/index.ts",
+      "default": "./src/textarea/index.ts"
+    },
+    "./time-input": {
+      "types": "./src/time-input/index.ts",
+      "svelte": "./src/time-input/index.ts",
+      "default": "./src/time-input/index.ts"
+    },
+    "./timeline": {
+      "types": "./src/timeline/index.ts",
+      "svelte": "./src/timeline/index.ts",
+      "default": "./src/timeline/index.ts"
+    },
+    "./toast": {
+      "types": "./src/toast/index.ts",
+      "svelte": "./src/toast/index.ts",
+      "default": "./src/toast/index.ts"
+    },
+    "./toggle": {
+      "types": "./src/toggle/index.ts",
+      "svelte": "./src/toggle/index.ts",
+      "default": "./src/toggle/index.ts"
+    },
+    "./toggle-group": {
+      "types": "./src/toggle-group/index.ts",
+      "svelte": "./src/toggle-group/index.ts",
+      "default": "./src/toggle-group/index.ts"
+    },
+    "./toolbar": {
+      "types": "./src/toolbar/index.ts",
+      "svelte": "./src/toolbar/index.ts",
+      "default": "./src/toolbar/index.ts"
+    },
+    "./tooltip": {
+      "types": "./src/tooltip/index.ts",
+      "svelte": "./src/tooltip/index.ts",
+      "default": "./src/tooltip/index.ts"
+    },
+    "./tour": {
+      "types": "./src/tour/index.ts",
+      "svelte": "./src/tour/index.ts",
+      "default": "./src/tour/index.ts"
+    },
+    "./transfer": {
+      "types": "./src/transfer/index.ts",
+      "svelte": "./src/transfer/index.ts",
+      "default": "./src/transfer/index.ts"
+    },
+    "./tree": {
+      "types": "./src/tree/index.ts",
+      "svelte": "./src/tree/index.ts",
+      "default": "./src/tree/index.ts"
+    },
+    "./typography": {
+      "types": "./src/typography/index.ts",
+      "svelte": "./src/typography/index.ts",
+      "default": "./src/typography/index.ts"
+    },
+    "./use-theme-override": {
+      "types": "./src/use-theme-override/index.ts",
+      "svelte": "./src/use-theme-override/index.ts",
+      "default": "./src/use-theme-override/index.ts"
+    },
+    "./user": {
+      "types": "./src/user/index.ts",
+      "svelte": "./src/user/index.ts",
+      "default": "./src/user/index.ts"
+    },
+    "./video-embed": {
+      "types": "./src/video-embed/index.ts",
+      "svelte": "./src/video-embed/index.ts",
+      "default": "./src/video-embed/index.ts"
+    },
+    "./virtual-list": {
+      "types": "./src/virtual-list/index.ts",
+      "svelte": "./src/virtual-list/index.ts",
+      "default": "./src/virtual-list/index.ts"
+    },
+    "./visually-hidden": {
+      "types": "./src/visually-hidden/index.ts",
+      "svelte": "./src/visually-hidden/index.ts",
+      "default": "./src/visually-hidden/index.ts"
+    },
+    "./wave-divider": {
+      "types": "./src/wave-divider/index.ts",
+      "svelte": "./src/wave-divider/index.ts",
+      "default": "./src/wave-divider/index.ts"
+    },
+    "./internal/motion": {
+      "types": "./src/internal/motion.ts",
+      "default": "./src/internal/motion.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "svelte": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "svelte": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./accordion": {
+        "types": "./dist/accordion/index.d.ts",
+        "svelte": "./dist/accordion/index.js",
+        "default": "./dist/accordion/index.js"
+      },
+      "./adjust": {
+        "types": "./dist/adjust/index.d.ts",
+        "svelte": "./dist/adjust/index.js",
+        "default": "./dist/adjust/index.js"
+      },
+      "./affix-group": {
+        "types": "./dist/affix-group/index.d.ts",
+        "svelte": "./dist/affix-group/index.js",
+        "default": "./dist/affix-group/index.js"
+      },
+      "./alert": {
+        "types": "./dist/alert/index.d.ts",
+        "svelte": "./dist/alert/index.js",
+        "default": "./dist/alert/index.js"
+      },
+      "./alert-dialog": {
+        "types": "./dist/alert-dialog/index.d.ts",
+        "svelte": "./dist/alert-dialog/index.js",
+        "default": "./dist/alert-dialog/index.js"
+      },
+      "./app-frame": {
+        "types": "./dist/app-frame/index.d.ts",
+        "svelte": "./dist/app-frame/index.js",
+        "default": "./dist/app-frame/index.js"
+      },
+      "./aspect-ratio": {
+        "types": "./dist/aspect-ratio/index.d.ts",
+        "svelte": "./dist/aspect-ratio/index.js",
+        "default": "./dist/aspect-ratio/index.js"
+      },
+      "./aurora": {
+        "types": "./dist/aurora/index.d.ts",
+        "svelte": "./dist/aurora/index.js",
+        "default": "./dist/aurora/index.js"
+      },
+      "./avatar": {
+        "types": "./dist/avatar/index.d.ts",
+        "svelte": "./dist/avatar/index.js",
+        "default": "./dist/avatar/index.js"
+      },
+      "./avatar-group": {
+        "types": "./dist/avatar-group/index.d.ts",
+        "svelte": "./dist/avatar-group/index.js",
+        "default": "./dist/avatar-group/index.js"
+      },
+      "./backdrop": {
+        "types": "./dist/backdrop/index.d.ts",
+        "svelte": "./dist/backdrop/index.js",
+        "default": "./dist/backdrop/index.js"
+      },
+      "./badge": {
+        "types": "./dist/badge/index.d.ts",
+        "svelte": "./dist/badge/index.js",
+        "default": "./dist/badge/index.js"
+      },
+      "./beam": {
+        "types": "./dist/beam/index.d.ts",
+        "svelte": "./dist/beam/index.js",
+        "default": "./dist/beam/index.js"
+      },
+      "./breadcrumb": {
+        "types": "./dist/breadcrumb/index.d.ts",
+        "svelte": "./dist/breadcrumb/index.js",
+        "default": "./dist/breadcrumb/index.js"
+      },
+      "./button": {
+        "types": "./dist/button/index.d.ts",
+        "svelte": "./dist/button/index.js",
+        "default": "./dist/button/index.js"
+      },
+      "./button-group": {
+        "types": "./dist/button-group/index.d.ts",
+        "svelte": "./dist/button-group/index.js",
+        "default": "./dist/button-group/index.js"
+      },
+      "./calendar": {
+        "types": "./dist/calendar/index.d.ts",
+        "svelte": "./dist/calendar/index.js",
+        "default": "./dist/calendar/index.js"
+      },
+      "./card": {
+        "types": "./dist/card/index.d.ts",
+        "svelte": "./dist/card/index.js",
+        "default": "./dist/card/index.js"
+      },
+      "./carousel": {
+        "types": "./dist/carousel/index.d.ts",
+        "svelte": "./dist/carousel/index.js",
+        "default": "./dist/carousel/index.js"
+      },
+      "./chart": {
+        "types": "./dist/chart/index.d.ts",
+        "svelte": "./dist/chart/index.js",
+        "default": "./dist/chart/index.js"
+      },
+      "./chat-message": {
+        "types": "./dist/chat-message/index.d.ts",
+        "svelte": "./dist/chat-message/index.js",
+        "default": "./dist/chat-message/index.js"
+      },
+      "./checkbox": {
+        "types": "./dist/checkbox/index.d.ts",
+        "svelte": "./dist/checkbox/index.js",
+        "default": "./dist/checkbox/index.js"
+      },
+      "./chip": {
+        "types": "./dist/chip/index.d.ts",
+        "svelte": "./dist/chip/index.js",
+        "default": "./dist/chip/index.js"
+      },
+      "./chip-group": {
+        "types": "./dist/chip-group/index.d.ts",
+        "svelte": "./dist/chip-group/index.js",
+        "default": "./dist/chip-group/index.js"
+      },
+      "./chromatic-aberration": {
+        "types": "./dist/chromatic-aberration/index.d.ts",
+        "svelte": "./dist/chromatic-aberration/index.js",
+        "default": "./dist/chromatic-aberration/index.js"
+      },
+      "./chromatic-shift": {
+        "types": "./dist/chromatic-shift/index.d.ts",
+        "svelte": "./dist/chromatic-shift/index.js",
+        "default": "./dist/chromatic-shift/index.js"
+      },
+      "./clipboard": {
+        "types": "./dist/clipboard/index.d.ts",
+        "svelte": "./dist/clipboard/index.js",
+        "default": "./dist/clipboard/index.js"
+      },
+      "./code-block": {
+        "types": "./dist/code-block/index.d.ts",
+        "svelte": "./dist/code-block/index.js",
+        "default": "./dist/code-block/index.js"
+      },
+      "./collapsible": {
+        "types": "./dist/collapsible/index.d.ts",
+        "svelte": "./dist/collapsible/index.js",
+        "default": "./dist/collapsible/index.js"
+      },
+      "./color-picker": {
+        "types": "./dist/color-picker/index.d.ts",
+        "svelte": "./dist/color-picker/index.js",
+        "default": "./dist/color-picker/index.js"
+      },
+      "./combobox": {
+        "types": "./dist/combobox/index.d.ts",
+        "svelte": "./dist/combobox/index.js",
+        "default": "./dist/combobox/index.js"
+      },
+      "./command-palette": {
+        "types": "./dist/command-palette/index.d.ts",
+        "svelte": "./dist/command-palette/index.js",
+        "default": "./dist/command-palette/index.js"
+      },
+      "./container": {
+        "types": "./dist/container/index.d.ts",
+        "svelte": "./dist/container/index.js",
+        "default": "./dist/container/index.js"
+      },
+      "./context-menu": {
+        "types": "./dist/context-menu/index.d.ts",
+        "svelte": "./dist/context-menu/index.js",
+        "default": "./dist/context-menu/index.js"
+      },
+      "./country-select": {
+        "types": "./dist/country-select/index.d.ts",
+        "svelte": "./dist/country-select/index.js",
+        "default": "./dist/country-select/index.js"
+      },
+      "./data-grid": {
+        "types": "./dist/data-grid/index.d.ts",
+        "svelte": "./dist/data-grid/index.js",
+        "default": "./dist/data-grid/index.js"
+      },
+      "./date-field": {
+        "types": "./dist/date-field/index.d.ts",
+        "svelte": "./dist/date-field/index.js",
+        "default": "./dist/date-field/index.js"
+      },
+      "./date-picker": {
+        "types": "./dist/date-picker/index.d.ts",
+        "svelte": "./dist/date-picker/index.js",
+        "default": "./dist/date-picker/index.js"
+      },
+      "./date-range-picker": {
+        "types": "./dist/date-range-picker/index.d.ts",
+        "svelte": "./dist/date-range-picker/index.js",
+        "default": "./dist/date-range-picker/index.js"
+      },
+      "./date-time-input": {
+        "types": "./dist/date-time-input/index.d.ts",
+        "svelte": "./dist/date-time-input/index.js",
+        "default": "./dist/date-time-input/index.js"
+      },
+      "./dialog": {
+        "types": "./dist/dialog/index.d.ts",
+        "svelte": "./dist/dialog/index.js",
+        "default": "./dist/dialog/index.js"
+      },
+      "./displacement": {
+        "types": "./dist/displacement/index.d.ts",
+        "svelte": "./dist/displacement/index.js",
+        "default": "./dist/displacement/index.js"
+      },
+      "./drag-and-drop": {
+        "types": "./dist/drag-and-drop/index.d.ts",
+        "svelte": "./dist/drag-and-drop/index.js",
+        "default": "./dist/drag-and-drop/index.js"
+      },
+      "./drawer": {
+        "types": "./dist/drawer/index.d.ts",
+        "svelte": "./dist/drawer/index.js",
+        "default": "./dist/drawer/index.js"
+      },
+      "./dropdown-menu": {
+        "types": "./dist/dropdown-menu/index.d.ts",
+        "svelte": "./dist/dropdown-menu/index.js",
+        "default": "./dist/dropdown-menu/index.js"
+      },
+      "./empty-state": {
+        "types": "./dist/empty-state/index.d.ts",
+        "svelte": "./dist/empty-state/index.js",
+        "default": "./dist/empty-state/index.js"
+      },
+      "./field": {
+        "types": "./dist/field/index.d.ts",
+        "svelte": "./dist/field/index.js",
+        "default": "./dist/field/index.js"
+      },
+      "./file-select": {
+        "types": "./dist/file-select/index.d.ts",
+        "svelte": "./dist/file-select/index.js",
+        "default": "./dist/file-select/index.js"
+      },
+      "./file-upload": {
+        "types": "./dist/file-upload/index.d.ts",
+        "svelte": "./dist/file-upload/index.js",
+        "default": "./dist/file-upload/index.js"
+      },
+      "./flex": {
+        "types": "./dist/flex/index.d.ts",
+        "svelte": "./dist/flex/index.js",
+        "default": "./dist/flex/index.js"
+      },
+      "./flip-card": {
+        "types": "./dist/flip-card/index.d.ts",
+        "svelte": "./dist/flip-card/index.js",
+        "default": "./dist/flip-card/index.js"
+      },
+      "./float-button": {
+        "types": "./dist/float-button/index.d.ts",
+        "svelte": "./dist/float-button/index.js",
+        "default": "./dist/float-button/index.js"
+      },
+      "./focus-trap": {
+        "types": "./dist/focus-trap/index.d.ts",
+        "svelte": "./dist/focus-trap/index.js",
+        "default": "./dist/focus-trap/index.js"
+      },
+      "./footer": {
+        "types": "./dist/footer/index.d.ts",
+        "svelte": "./dist/footer/index.js",
+        "default": "./dist/footer/index.js"
+      },
+      "./format-bytes": {
+        "types": "./dist/format-bytes/index.d.ts",
+        "svelte": "./dist/format-bytes/index.js",
+        "default": "./dist/format-bytes/index.js"
+      },
+      "./format-date": {
+        "types": "./dist/format-date/index.d.ts",
+        "svelte": "./dist/format-date/index.js",
+        "default": "./dist/format-date/index.js"
+      },
+      "./format-number": {
+        "types": "./dist/format-number/index.d.ts",
+        "svelte": "./dist/format-number/index.js",
+        "default": "./dist/format-number/index.js"
+      },
+      "./gauge": {
+        "types": "./dist/gauge/index.d.ts",
+        "svelte": "./dist/gauge/index.js",
+        "default": "./dist/gauge/index.js"
+      },
+      "./glass": {
+        "types": "./dist/glass/index.d.ts",
+        "svelte": "./dist/glass/index.js",
+        "default": "./dist/glass/index.js"
+      },
+      "./glow": {
+        "types": "./dist/glow/index.d.ts",
+        "svelte": "./dist/glow/index.js",
+        "default": "./dist/glow/index.js"
+      },
+      "./god-rays": {
+        "types": "./dist/god-rays/index.d.ts",
+        "svelte": "./dist/god-rays/index.js",
+        "default": "./dist/god-rays/index.js"
+      },
+      "./gradient-mesh": {
+        "types": "./dist/gradient-mesh/index.d.ts",
+        "svelte": "./dist/gradient-mesh/index.js",
+        "default": "./dist/gradient-mesh/index.js"
+      },
+      "./grid": {
+        "types": "./dist/grid/index.d.ts",
+        "svelte": "./dist/grid/index.js",
+        "default": "./dist/grid/index.js"
+      },
+      "./hero": {
+        "types": "./dist/hero/index.d.ts",
+        "svelte": "./dist/hero/index.js",
+        "default": "./dist/hero/index.js"
+      },
+      "./hotkey": {
+        "types": "./dist/hotkey/index.d.ts",
+        "svelte": "./dist/hotkey/index.js",
+        "default": "./dist/hotkey/index.js"
+      },
+      "./hover-card": {
+        "types": "./dist/hover-card/index.d.ts",
+        "svelte": "./dist/hover-card/index.js",
+        "default": "./dist/hover-card/index.js"
+      },
+      "./icon": {
+        "types": "./dist/icon/index.d.ts",
+        "svelte": "./dist/icon/index.js",
+        "default": "./dist/icon/index.js"
+      },
+      "./image": {
+        "types": "./dist/image/index.d.ts",
+        "svelte": "./dist/image/index.js",
+        "default": "./dist/image/index.js"
+      },
+      "./image-comparison": {
+        "types": "./dist/image-comparison/index.d.ts",
+        "svelte": "./dist/image-comparison/index.js",
+        "default": "./dist/image-comparison/index.js"
+      },
+      "./infinite-scroll": {
+        "types": "./dist/infinite-scroll/index.d.ts",
+        "svelte": "./dist/infinite-scroll/index.js",
+        "default": "./dist/infinite-scroll/index.js"
+      },
+      "./input": {
+        "types": "./dist/input/index.d.ts",
+        "svelte": "./dist/input/index.js",
+        "default": "./dist/input/index.js"
+      },
+      "./kbd": {
+        "types": "./dist/kbd/index.d.ts",
+        "svelte": "./dist/kbd/index.js",
+        "default": "./dist/kbd/index.js"
+      },
+      "./label": {
+        "types": "./dist/label/index.d.ts",
+        "svelte": "./dist/label/index.js",
+        "default": "./dist/label/index.js"
+      },
+      "./link": {
+        "types": "./dist/link/index.d.ts",
+        "svelte": "./dist/link/index.js",
+        "default": "./dist/link/index.js"
+      },
+      "./link-preview": {
+        "types": "./dist/link-preview/index.d.ts",
+        "svelte": "./dist/link-preview/index.js",
+        "default": "./dist/link-preview/index.js"
+      },
+      "./list": {
+        "types": "./dist/list/index.d.ts",
+        "svelte": "./dist/list/index.js",
+        "default": "./dist/list/index.js"
+      },
+      "./listbox": {
+        "types": "./dist/listbox/index.d.ts",
+        "svelte": "./dist/listbox/index.js",
+        "default": "./dist/listbox/index.js"
+      },
+      "./logo-cloud": {
+        "types": "./dist/logo-cloud/index.d.ts",
+        "svelte": "./dist/logo-cloud/index.js",
+        "default": "./dist/logo-cloud/index.js"
+      },
+      "./map": {
+        "types": "./dist/map/index.d.ts",
+        "svelte": "./dist/map/index.js",
+        "default": "./dist/map/index.js"
+      },
+      "./markdown-renderer": {
+        "types": "./dist/markdown-renderer/index.d.ts",
+        "svelte": "./dist/markdown-renderer/index.js",
+        "default": "./dist/markdown-renderer/index.js"
+      },
+      "./marquee": {
+        "types": "./dist/marquee/index.d.ts",
+        "svelte": "./dist/marquee/index.js",
+        "default": "./dist/marquee/index.js"
+      },
+      "./mask-reveal": {
+        "types": "./dist/mask-reveal/index.d.ts",
+        "svelte": "./dist/mask-reveal/index.js",
+        "default": "./dist/mask-reveal/index.js"
+      },
+      "./mega-menu": {
+        "types": "./dist/mega-menu/index.d.ts",
+        "svelte": "./dist/mega-menu/index.js",
+        "default": "./dist/mega-menu/index.js"
+      },
+      "./menubar": {
+        "types": "./dist/menubar/index.d.ts",
+        "svelte": "./dist/menubar/index.js",
+        "default": "./dist/menubar/index.js"
+      },
+      "./multi-select-combobox": {
+        "types": "./dist/multi-select-combobox/index.d.ts",
+        "svelte": "./dist/multi-select-combobox/index.js",
+        "default": "./dist/multi-select-combobox/index.js"
+      },
+      "./navbar": {
+        "types": "./dist/navbar/index.d.ts",
+        "svelte": "./dist/navbar/index.js",
+        "default": "./dist/navbar/index.js"
+      },
+      "./navigation-menu": {
+        "types": "./dist/navigation-menu/index.d.ts",
+        "svelte": "./dist/navigation-menu/index.js",
+        "default": "./dist/navigation-menu/index.js"
+      },
+      "./noise": {
+        "types": "./dist/noise/index.d.ts",
+        "svelte": "./dist/noise/index.js",
+        "default": "./dist/noise/index.js"
+      },
+      "./notification-center": {
+        "types": "./dist/notification-center/index.d.ts",
+        "svelte": "./dist/notification-center/index.js",
+        "default": "./dist/notification-center/index.js"
+      },
+      "./number-input": {
+        "types": "./dist/number-input/index.d.ts",
+        "svelte": "./dist/number-input/index.js",
+        "default": "./dist/number-input/index.js"
+      },
+      "./page-header": {
+        "types": "./dist/page-header/index.d.ts",
+        "svelte": "./dist/page-header/index.js",
+        "default": "./dist/page-header/index.js"
+      },
+      "./pagination": {
+        "types": "./dist/pagination/index.d.ts",
+        "svelte": "./dist/pagination/index.js",
+        "default": "./dist/pagination/index.js"
+      },
+      "./phone-input": {
+        "types": "./dist/phone-input/index.d.ts",
+        "svelte": "./dist/phone-input/index.js",
+        "default": "./dist/phone-input/index.js"
+      },
+      "./pin-input": {
+        "types": "./dist/pin-input/index.d.ts",
+        "svelte": "./dist/pin-input/index.js",
+        "default": "./dist/pin-input/index.js"
+      },
+      "./popover": {
+        "types": "./dist/popover/index.d.ts",
+        "svelte": "./dist/popover/index.js",
+        "default": "./dist/popover/index.js"
+      },
+      "./portal": {
+        "types": "./dist/portal/index.d.ts",
+        "svelte": "./dist/portal/index.js",
+        "default": "./dist/portal/index.js"
+      },
+      "./progress": {
+        "types": "./dist/progress/index.d.ts",
+        "svelte": "./dist/progress/index.js",
+        "default": "./dist/progress/index.js"
+      },
+      "./progress-ring": {
+        "types": "./dist/progress-ring/index.d.ts",
+        "svelte": "./dist/progress-ring/index.js",
+        "default": "./dist/progress-ring/index.js"
+      },
+      "./prompt-input": {
+        "types": "./dist/prompt-input/index.d.ts",
+        "svelte": "./dist/prompt-input/index.js",
+        "default": "./dist/prompt-input/index.js"
+      },
+      "./qr-code": {
+        "types": "./dist/qr-code/index.d.ts",
+        "svelte": "./dist/qr-code/index.js",
+        "default": "./dist/qr-code/index.js"
+      },
+      "./radio-group": {
+        "types": "./dist/radio-group/index.d.ts",
+        "svelte": "./dist/radio-group/index.js",
+        "default": "./dist/radio-group/index.js"
+      },
+      "./range-calendar": {
+        "types": "./dist/range-calendar/index.d.ts",
+        "svelte": "./dist/range-calendar/index.js",
+        "default": "./dist/range-calendar/index.js"
+      },
+      "./rating": {
+        "types": "./dist/rating/index.d.ts",
+        "svelte": "./dist/rating/index.js",
+        "default": "./dist/rating/index.js"
+      },
+      "./relative-time": {
+        "types": "./dist/relative-time/index.d.ts",
+        "svelte": "./dist/relative-time/index.js",
+        "default": "./dist/relative-time/index.js"
+      },
+      "./reveal": {
+        "types": "./dist/reveal/index.d.ts",
+        "svelte": "./dist/reveal/index.js",
+        "default": "./dist/reveal/index.js"
+      },
+      "./rich-text-editor": {
+        "types": "./dist/rich-text-editor/index.d.ts",
+        "svelte": "./dist/rich-text-editor/index.js",
+        "default": "./dist/rich-text-editor/index.js"
+      },
+      "./scroll-area": {
+        "types": "./dist/scroll-area/index.d.ts",
+        "svelte": "./dist/scroll-area/index.js",
+        "default": "./dist/scroll-area/index.js"
+      },
+      "./scroll-to-top": {
+        "types": "./dist/scroll-to-top/index.d.ts",
+        "svelte": "./dist/scroll-to-top/index.js",
+        "default": "./dist/scroll-to-top/index.js"
+      },
+      "./segmented-control": {
+        "types": "./dist/segmented-control/index.d.ts",
+        "svelte": "./dist/segmented-control/index.js",
+        "default": "./dist/segmented-control/index.js"
+      },
+      "./select": {
+        "types": "./dist/select/index.d.ts",
+        "svelte": "./dist/select/index.js",
+        "default": "./dist/select/index.js"
+      },
+      "./selectable-tile-group": {
+        "types": "./dist/selectable-tile-group/index.d.ts",
+        "svelte": "./dist/selectable-tile-group/index.js",
+        "default": "./dist/selectable-tile-group/index.js"
+      },
+      "./separator": {
+        "types": "./dist/separator/index.d.ts",
+        "svelte": "./dist/separator/index.js",
+        "default": "./dist/separator/index.js"
+      },
+      "./shader-canvas": {
+        "types": "./dist/shader-canvas/index.d.ts",
+        "svelte": "./dist/shader-canvas/index.js",
+        "default": "./dist/shader-canvas/index.js"
+      },
+      "./sidebar": {
+        "types": "./dist/sidebar/index.d.ts",
+        "svelte": "./dist/sidebar/index.js",
+        "default": "./dist/sidebar/index.js"
+      },
+      "./skeleton": {
+        "types": "./dist/skeleton/index.d.ts",
+        "svelte": "./dist/skeleton/index.js",
+        "default": "./dist/skeleton/index.js"
+      },
+      "./slider": {
+        "types": "./dist/slider/index.d.ts",
+        "svelte": "./dist/slider/index.js",
+        "default": "./dist/slider/index.js"
+      },
+      "./spacer": {
+        "types": "./dist/spacer/index.d.ts",
+        "svelte": "./dist/spacer/index.js",
+        "default": "./dist/spacer/index.js"
+      },
+      "./sparkline": {
+        "types": "./dist/sparkline/index.d.ts",
+        "svelte": "./dist/sparkline/index.js",
+        "default": "./dist/sparkline/index.js"
+      },
+      "./spinner": {
+        "types": "./dist/spinner/index.d.ts",
+        "svelte": "./dist/spinner/index.js",
+        "default": "./dist/spinner/index.js"
+      },
+      "./splitter": {
+        "types": "./dist/splitter/index.d.ts",
+        "svelte": "./dist/splitter/index.js",
+        "default": "./dist/splitter/index.js"
+      },
+      "./spotlight": {
+        "types": "./dist/spotlight/index.d.ts",
+        "svelte": "./dist/spotlight/index.js",
+        "default": "./dist/spotlight/index.js"
+      },
+      "./stack": {
+        "types": "./dist/stack/index.d.ts",
+        "svelte": "./dist/stack/index.js",
+        "default": "./dist/stack/index.js"
+      },
+      "./stat-card": {
+        "types": "./dist/stat-card/index.d.ts",
+        "svelte": "./dist/stat-card/index.js",
+        "default": "./dist/stat-card/index.js"
+      },
+      "./stepper": {
+        "types": "./dist/stepper/index.d.ts",
+        "svelte": "./dist/stepper/index.js",
+        "default": "./dist/stepper/index.js"
+      },
+      "./surface": {
+        "types": "./dist/surface/index.d.ts",
+        "svelte": "./dist/surface/index.js",
+        "default": "./dist/surface/index.js"
+      },
+      "./svg": {
+        "types": "./dist/svg/index.d.ts",
+        "svelte": "./dist/svg/index.js",
+        "default": "./dist/svg/index.js"
+      },
+      "./table": {
+        "types": "./dist/table/index.d.ts",
+        "svelte": "./dist/table/index.js",
+        "default": "./dist/table/index.js"
+      },
+      "./table-of-contents": {
+        "types": "./dist/table-of-contents/index.d.ts",
+        "svelte": "./dist/table-of-contents/index.js",
+        "default": "./dist/table-of-contents/index.js"
+      },
+      "./tabs": {
+        "types": "./dist/tabs/index.d.ts",
+        "svelte": "./dist/tabs/index.js",
+        "default": "./dist/tabs/index.js"
+      },
+      "./tag": {
+        "types": "./dist/tag/index.d.ts",
+        "svelte": "./dist/tag/index.js",
+        "default": "./dist/tag/index.js"
+      },
+      "./tags-input": {
+        "types": "./dist/tags-input/index.d.ts",
+        "svelte": "./dist/tags-input/index.js",
+        "default": "./dist/tags-input/index.js"
+      },
+      "./textarea": {
+        "types": "./dist/textarea/index.d.ts",
+        "svelte": "./dist/textarea/index.js",
+        "default": "./dist/textarea/index.js"
+      },
+      "./time-input": {
+        "types": "./dist/time-input/index.d.ts",
+        "svelte": "./dist/time-input/index.js",
+        "default": "./dist/time-input/index.js"
+      },
+      "./timeline": {
+        "types": "./dist/timeline/index.d.ts",
+        "svelte": "./dist/timeline/index.js",
+        "default": "./dist/timeline/index.js"
+      },
+      "./toast": {
+        "types": "./dist/toast/index.d.ts",
+        "svelte": "./dist/toast/index.js",
+        "default": "./dist/toast/index.js"
+      },
+      "./toggle": {
+        "types": "./dist/toggle/index.d.ts",
+        "svelte": "./dist/toggle/index.js",
+        "default": "./dist/toggle/index.js"
+      },
+      "./toggle-group": {
+        "types": "./dist/toggle-group/index.d.ts",
+        "svelte": "./dist/toggle-group/index.js",
+        "default": "./dist/toggle-group/index.js"
+      },
+      "./toolbar": {
+        "types": "./dist/toolbar/index.d.ts",
+        "svelte": "./dist/toolbar/index.js",
+        "default": "./dist/toolbar/index.js"
+      },
+      "./tooltip": {
+        "types": "./dist/tooltip/index.d.ts",
+        "svelte": "./dist/tooltip/index.js",
+        "default": "./dist/tooltip/index.js"
+      },
+      "./tour": {
+        "types": "./dist/tour/index.d.ts",
+        "svelte": "./dist/tour/index.js",
+        "default": "./dist/tour/index.js"
+      },
+      "./transfer": {
+        "types": "./dist/transfer/index.d.ts",
+        "svelte": "./dist/transfer/index.js",
+        "default": "./dist/transfer/index.js"
+      },
+      "./tree": {
+        "types": "./dist/tree/index.d.ts",
+        "svelte": "./dist/tree/index.js",
+        "default": "./dist/tree/index.js"
+      },
+      "./typography": {
+        "types": "./dist/typography/index.d.ts",
+        "svelte": "./dist/typography/index.js",
+        "default": "./dist/typography/index.js"
+      },
+      "./use-theme-override": {
+        "types": "./dist/use-theme-override/index.d.ts",
+        "svelte": "./dist/use-theme-override/index.js",
+        "default": "./dist/use-theme-override/index.js"
+      },
+      "./user": {
+        "types": "./dist/user/index.d.ts",
+        "svelte": "./dist/user/index.js",
+        "default": "./dist/user/index.js"
+      },
+      "./video-embed": {
+        "types": "./dist/video-embed/index.d.ts",
+        "svelte": "./dist/video-embed/index.js",
+        "default": "./dist/video-embed/index.js"
+      },
+      "./virtual-list": {
+        "types": "./dist/virtual-list/index.d.ts",
+        "svelte": "./dist/virtual-list/index.js",
+        "default": "./dist/virtual-list/index.js"
+      },
+      "./visually-hidden": {
+        "types": "./dist/visually-hidden/index.d.ts",
+        "svelte": "./dist/visually-hidden/index.js",
+        "default": "./dist/visually-hidden/index.js"
+      },
+      "./wave-divider": {
+        "types": "./dist/wave-divider/index.d.ts",
+        "svelte": "./dist/wave-divider/index.js",
+        "default": "./dist/wave-divider/index.js"
+      },
+      "./internal/motion": {
+        "types": "./dist/internal/motion.d.ts",
+        "default": "./dist/internal/motion.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "svelte-package -i src",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "peerDependencies": {
+    "svelte": "^5.55.1"
+  },
+  "devDependencies": {
+    "svelte": "^5.55.1",
+    "@sveltejs/package": "^2.5.7",
+    "svelte-check": "^4.4.5",
+    "typescript": "^6.0.2"
+  }
+}

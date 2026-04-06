@@ -1,0 +1,33 @@
+{
+  "name": "@dryui/lint",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/lint"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "svelte": "^5.0.0",
+    "typescript": "^6.0.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

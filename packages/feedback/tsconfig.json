@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "@dryui/primitives": ["../primitives/src/index.ts"],
+      "@dryui/ui": ["../ui/src/index.ts"],
+      "@dryui/feedback": ["./src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte"]
+}

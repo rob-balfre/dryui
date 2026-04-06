@@ -1,0 +1,72 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import { generateFormId } from '../utils/form-control.svelte.js';
+	import { setLinkPreviewCtx } from './context.svelte.js';
+
+	interface Props {
+		open?: boolean;
+		openDelay?: number;
+		closeDelay?: number;
+		children: Snippet;
+	}
+
+	let { open = $bindable(false), openDelay = 700, closeDelay = 300, children }: Props = $props();
+
+	const triggerId = generateFormId('link-preview-trigger');
+	const contentId = generateFormId('link-preview-content');
+
+	let openTimeout: ReturnType<typeof setTimeout>;
+	let closeTimeout: ReturnType<typeof setTimeout>;
+
+	function show() {
+		clearTimeout(closeTimeout);
+		openTimeout = setTimeout(() => {
+			open = true;
+		}, openDelay);
+	}
+
+	function close() {
+		clearTimeout(openTimeout);
+		closeTimeout = setTimeout(() => {
+			open = false;
+		}, closeDelay);
+	}
+
+	function showImmediate() {
+		clearTimeout(closeTimeout);
+		clearTimeout(openTimeout);
+		open = true;
+	}
+
+	function closeImmediate() {
+		clearTimeout(closeTimeout);
+		clearTimeout(openTimeout);
+		open = false;
+	}
+
+	$effect(() => {
+		return () => {
+			clearTimeout(openTimeout);
+			clearTimeout(closeTimeout);
+		};
+	});
+
+	setLinkPreviewCtx({
+		get open() {
+			return open;
+		},
+		get triggerId() {
+			return triggerId;
+		},
+		get contentId() {
+			return contentId;
+		},
+		triggerEl: null,
+		show,
+		close,
+		showImmediate,
+		closeImmediate
+	});
+</script>
+
+{@render children()}

@@ -1,0 +1,584 @@
+# dryui
+
+> 189 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+
+## Packages
+
+- @dryui/primitives: Headless, unstyled components
+- @dryui/ui: Styled components with CSS variables and theme system
+- @dryui/mcp: MCP server for lookup, source retrieval, composition guidance, project planning, review, and theme diagnosis
+- @dryui/cli: CLI for detect, install, project-aware add, lookup, source retrieval, composition guidance, and validation
+
+## AI Surface
+
+- MCP tools: info, get, list, compose, review, diagnose, detect_project, plan_install, plan_add
+- CLI commands: init, detect, install, add (project-aware), get, info, list, compose, review, diagnose
+
+## Installation
+
+```
+bun add @dryui/ui
+```
+
+## Theme Setup
+
+```html
+<!-- In your root layout or app entry -->
+<link rel="stylesheet" href="@dryui/ui/themes/default.css" />
+<link rel="stylesheet" href="@dryui/ui/themes/dark.css" />
+```
+
+```html
+<!-- Preferred default: follow the browser/OS theme -->
+<html class="theme-auto" />
+```
+
+Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides. If you build a theme toggle, persist the explicit override and keep system mode as the fallback.
+
+## Components
+
+### Category: Action
+
+### Button
+Interactive button with variant and size styling.
+Import: @dryui/ui
+Props: variant ('solid' | 'outline' | 'ghost' | 'soft') | size ('sm' | 'md' | 'lg') | disabled (boolean) | type ('button' | 'submit' | 'reset')
+Example: <Button>Content</Button>
+
+### Toggle
+Pressable toggle button.
+Import: @dryui/ui
+Props: pressed (boolean), bindable | variant ('outline' | 'ghost') | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <Toggle>Content</Toggle>
+
+### ToggleGroup
+Group of toggle buttons with single/multiple selection.
+Import: @dryui/ui
+Parts: Root, Item
+Props: Root: type ('single' | 'multiple') | value (string[]), bindable | disabled (boolean) | orientation ('horizontal' | 'vertical') | size ('sm' | 'md' | 'lg') | Item: value (string), required | disabled (boolean)
+Example: <ToggleGroup.Root>
+
+### Clipboard
+Copy text to clipboard with native Clipboard API.
+Import: @dryui/ui
+Props: value (string), required | timeout (number)
+Example: <Clipboard>Content</Clipboard>
+
+### ScrollToTop
+Button that scrolls to top of page or container.
+Import: @dryui/ui
+Props: threshold (number) | target (HTMLElement) | behavior (ScrollBehavior) | position ('bottom-right' | 'bottom-left' | 'bottom-center') | class (string)
+Example: <ScrollToTop>Content</ScrollToTop>
+
+### FloatButton
+Floating action button with expandable actions.
+Import: @dryui/ui
+Parts: Root, Trigger, Action
+Props: Root: open (boolean), bindable | position ('bottom-right' | 'bottom-left') | Trigger: size ('sm' | 'md' | 'lg')
+Example: <FloatButton.Root>
+
+### Category: Input
+
+### Input
+Text input with size variants.
+Import: @dryui/ui
+Props: value (string), bindable | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <Input>Content</Input>
+
+### Textarea
+Multi-line text input.
+Import: @dryui/ui
+Props: value (string), bindable | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <Textarea>Content</Textarea>
+
+### NumberInput
+Numeric input with increment/decrement controls.
+Import: @dryui/ui
+Props: value (number), bindable | min (number) | max (number) | step (number) | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <NumberInput>Content</NumberInput>
+
+### Checkbox
+Boolean toggle input with indeterminate state.
+Import: @dryui/ui
+Props: checked (boolean), bindable | indeterminate (boolean) | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <Checkbox>Content</Checkbox>
+
+### Switch
+Toggle switch for boolean values.
+Import: @dryui/ui
+Props: checked (boolean), bindable | size ('sm' | 'md' | 'lg') | disabled (boolean)
+Example: <Switch>Content</Switch>
+
+### RadioGroup
+Single selection from multiple options.
+Import: @dryui/ui
+Parts: Root, Item
+Props: Root: value (string), bindable | name (string) | disabled (boolean) | required (boolean) | orientation ('horizontal' | 'vertical') | Item: value (string), required | disabled (boolean)
+Example: <RadioGroup.Root>
+
+### Slider
+Range input slider with thumb control.
+Import: @dryui/ui
+Props: value (number), bindable | min (number) | max (number) | step (number) | size ('sm' | 'md' | 'lg') | disabled (boolean) | orientation ('horizontal' | 'vertical')
+Example: <Slider>Content</Slider>
+
+### PinInput
+Segmented input for PIN/OTP codes.
+Import: @dryui/ui
+Props: value (string), bindable | length (number) | mask (boolean) | type ('numeric' | 'alphanumeric') | placeholder (string) | disabled (boolean) | oncomplete ((value: string) => void) | size ('sm' | 'md' | 'lg')
+Example: <PinInput>Content</PinInput>
+
+### Rating
+Star rating input with half-star support.
+Import: @dryui/ui
+Props: value (number), bindable | max (number) | disabled (boolean) | readonly (boolean) | allowHalf (boolean) | onValueChange ((value: number) => void) | size ('sm' | 'md' | 'lg')
+Example: <Rating>Content</Rating>
+
+### TagsInput
+Input for managing a list of tags.
+Import: @dryui/ui
+Parts: Root, Input, Tag, TagDelete, List
+Props: Root: value (string[]), bindable | maxTags (number) | allowDuplicates (boolean) | disabled (boolean) | size ('sm' | 'md' | 'lg') | onValueChange ((value: string[]) => void) | Input: placeholder (string) | Tag: index (number), required | value (string), required, bindable | TagDelete: index (number), required | value (string)
+Example: <TagsInput.Root>
+
+### FileUpload
+File selection with drag-and-drop dropzone.
+Import: @dryui/ui
+Parts: Root, Dropzone, Trigger, List, Item, ItemDelete
+Props: Root: files (File[]), bindable | accept (string) | multiple (boolean) | maxSize (number) | maxFiles (number) | disabled (boolean) | onFilesChange ((files: File[]) => void) | class (string) | Dropzone: size ('sm' | 'md' | 'lg') | Trigger: size ('sm' | 'md' | 'lg') | List: size ('sm' | 'md' | 'lg') | Item: file (File), required | index (number), required | size ('sm' | 'md' | 'lg') | ItemDelete: index (number), required
+Example: <FileUpload.Root>
+
+### ColorPicker
+Color selection with area, hue/alpha sliders, and eyedropper.
+Import: @dryui/ui
+Parts: Root, Area, HueSlider, AlphaSlider, Input, Swatch, EyeDropper
+Props: Root: value (string), bindable | alpha (number), bindable | disabled (boolean) | Area: width (number) | height (number) | Input: format ('hex' | 'rgb' | 'hsl') | Swatch: color (string)
+Example: <ColorPicker.Root>
+
+### Transfer
+Dual-list transfer component for moving items between lists.
+Import: @dryui/ui
+Parts: Root, List, Item, Actions
+Props: Root: sourceItems (TransferItemType[]), required, bindable | targetItems (TransferItemType[]), bindable | onChange ((source: TransferItemType[], target: TransferItemType[]) => void) | List: type ('source' | 'target'), required | title (string) | filterable (boolean) | content (Snippet<[{ items: TransferItemType[] }]>) | Item: key (string), required | type ('source' | 'target'), required | disabled (boolean) | Actions: moveToTarget (() => void), required | moveToSource (() => void), required | moveAllToTarget (() => void), required | moveAllToSource (() => void), required | canMoveToTarget (boolean), required | canMoveToSource (boolean), required
+Example: <Transfer.Root>
+
+### RichTextEditor
+Basic rich text editor with formatting toolbar.
+Import: @dryui/ui
+Parts: Root, Toolbar, Content
+Props: Root: value (string), bindable | placeholder (string) | readonly (boolean)
+Example: <RichTextEditor.Root>
+
+### Category: Form
+
+### Label
+Form label with size variants.
+Import: @dryui/ui
+Props: size ('sm' | 'md' | 'lg')
+Example: <Label>Content</Label>
+
+### Field
+Form field wrapper with label, description, and error.
+Import: @dryui/ui
+Parts: Root, Description, Error
+Props: Root: error (string) | required (boolean) | disabled (boolean)
+Example: <Field.Root>
+
+### Select
+Dropdown select with searchable options.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Item, Value
+Props: Root: open (boolean), bindable | value (string), bindable | disabled (boolean) | Content: offset (number) | Item: value (string), required | disabled (boolean) | Value: placeholder (string)
+Example: <Select.Root>
+
+### Combobox
+Text input with filterable dropdown suggestions.
+Import: @dryui/ui
+Parts: Root, Input, Content, Item, Empty
+Props: Root: open (boolean), bindable | value (string), bindable | disabled (boolean) | Input: placeholder (string) | size ('sm' | 'md' | 'lg') | Content: offset (number) | Item: value (string), required | index (number), required | disabled (boolean)
+Example: <Combobox.Root>
+
+### DatePicker
+Date selection with calendar popup and locale support.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Calendar
+Props: Root: open (boolean), bindable | value (Date | null), bindable | locale (string) | min (Date | null) | max (Date | null) | disabled (boolean) | Trigger: size ('sm' | 'md' | 'lg') | placeholder (string) | Content: offset (number)
+Example: <DatePicker.Root>
+
+### Category: Layout
+
+### Container
+Centered content container with max-width.
+Import: @dryui/ui
+Props: size ('sm' | 'md' | 'lg' | 'xl' | 'full') | padding (boolean)
+Example: <Container>Content</Container>
+
+### Stack
+Vertical or horizontal stack layout.
+Import: @dryui/ui
+Props: direction ('vertical' | 'horizontal') | gap ('sm' | 'md' | 'lg' | 'xl') | align ('start' | 'center' | 'end' | 'stretch')
+Example: <Stack>Content</Stack>
+
+### Grid
+CSS grid layout with column control.
+Import: @dryui/ui
+Props: columns (1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12) | gap ('sm' | 'md' | 'lg' | 'xl') | align ('start' | 'center' | 'end' | 'stretch')
+Example: <Grid>Content</Grid>
+
+### Flex
+Flexbox layout container.
+Import: @dryui/ui
+Props: direction ('row' | 'column' | 'row-reverse' | 'column-reverse') | wrap ('nowrap' | 'wrap' | 'wrap-reverse') | gap ('sm' | 'md' | 'lg' | 'xl') | justify ('start' | 'center' | 'end' | 'between' | 'around' | 'evenly') | align ('start' | 'center' | 'end' | 'stretch' | 'baseline')
+Example: <Flex>Content</Flex>
+
+### Separator
+Visual divider between content.
+Import: @dryui/ui
+Props: orientation ('horizontal' | 'vertical') | decorative (boolean)
+Example: <Separator>Content</Separator>
+
+### Spacer
+Empty space component for spacing.
+Import: @dryui/ui
+Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl') | axis ('vertical' | 'horizontal')
+Example: <Spacer>Content</Spacer>
+
+### AspectRatio
+Constrains child content to a specific aspect ratio.
+Import: @dryui/ui
+Props: ratio (number)
+Example: <AspectRatio>Content</AspectRatio>
+
+### ScrollArea
+Custom scrollable area with styled scrollbars.
+Import: @dryui/ui
+Props: orientation ('vertical' | 'horizontal' | 'both')
+Example: <ScrollArea>Content</ScrollArea>
+
+### Splitter
+Resizable split panels with drag handle.
+Import: @dryui/ui
+Parts: Root, Panel, Handle
+Props: Root: orientation ('horizontal' | 'vertical') | sizes (number[]) | Panel: index (number), required | Handle: index (number), required
+Example: <Splitter.Root>
+
+### Category: Navigation
+
+### Tabs
+Tabbed content navigation.
+Import: @dryui/ui
+Parts: Root, List, Trigger, Content
+Props: Root: value (string) | orientation ('horizontal' | 'vertical') | activationMode ('automatic' | 'manual') | Trigger: value (string), required | disabled (boolean) | size ('sm' | 'md' | 'lg') | Content: value (string), required
+Example: <Tabs.Root>
+
+### Breadcrumb
+Navigation trail showing page hierarchy.
+Import: @dryui/ui
+Parts: Root, List, Item, Link, Separator
+Props: Link: href (string) | current (boolean)
+Example: <Breadcrumb.Root>
+
+### Pagination
+Page navigation with previous/next and page links.
+Import: @dryui/ui
+Parts: Root, Content, Item, Previous, Next, Link, Ellipsis
+Props: Root: page (number) | totalPages (number), required | Link: page (number), required
+Example: <Pagination.Root>
+
+### Stepper
+Step-by-step progress indicator.
+Import: @dryui/ui
+Parts: Root, List, Step, Separator
+Props: Root: activeStep (number) | orientation ('horizontal' | 'vertical') | Step: step (number), required | Separator: step (number), required
+Example: <Stepper.Root>
+
+### Toolbar
+Horizontal button group for actions.
+Import: @dryui/ui
+Parts: Root, Button, Separator, Link
+Props: Root: orientation ('horizontal' | 'vertical') | Button: disabled (boolean) | Link: href (string), required
+Example: <Toolbar.Root>
+
+### Category: Overlay
+
+### Dialog
+Modal dialog using native dialog element.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Close
+Props: Root: open (boolean)
+Example: <Dialog.Root>
+
+### AlertDialog
+Modal dialog requiring user confirmation.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Action, Cancel
+Props: Root: open (boolean)
+Example: <AlertDialog.Root>
+
+### Drawer
+Slide-in panel from any edge.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Close
+Props: Root: open (boolean) | side ('top' | 'right' | 'bottom' | 'left')
+Example: <Drawer.Root>
+
+### Popover
+Floating content panel anchored to a trigger.
+Import: @dryui/ui
+Parts: Root, Trigger, Content
+Props: Root: open (boolean), bindable | Content: offset (number)
+Example: <Popover.Root>
+
+### Tooltip
+Hover/focus popup with descriptive text.
+Import: @dryui/ui
+Parts: Root, Trigger, Content
+Props: Root: openDelay (number) | closeDelay (number) | Content: offset (number)
+Example: <Tooltip.Root>
+
+### DropdownMenu
+Trigger-activated dropdown with menu items.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Item, Separator, Group, Label
+Props: Root: open (boolean) | Content: offset (number) | Item: disabled (boolean)
+Example: <DropdownMenu.Root>
+
+### ContextMenu
+Right-click menu with actions.
+Import: @dryui/ui
+Parts: Root, Trigger, Content, Item, Separator, Group, Label
+Props: Root: open (boolean) | Item: disabled (boolean)
+Example: <ContextMenu.Root>
+
+### CommandPalette
+Searchable command menu dialog.
+Import: @dryui/ui
+Parts: Root, Input, List, Group, Item, Empty, Separator
+Props: Root: open (boolean) | Input: placeholder (string) | Group: heading (string) | Item: value (string), required | disabled (boolean) | onSelect (() => void)
+Example: <CommandPalette.Root>
+
+### Tour
+Step-by-step guided tour overlay with spotlight.
+Import: @dryui/ui
+Parts: Root, Tooltip
+Props: Root: steps (TourStep[]), required | active (boolean), bindable | onComplete (() => void) | onSkip (() => void)
+Example: <Tour.Root>
+
+### Category: Display
+
+### Card
+Contained content surface with header/content/footer sections.
+Import: @dryui/ui
+Parts: Root, Header, Content, Footer
+Example: <Card.Root>
+
+### Accordion
+Collapsible content sections, single or multiple mode.
+Import: @dryui/ui
+Parts: Root, Item, Trigger, Content
+Props: Root: type ('single' | 'multiple') | value (string[]) | orientation ('horizontal' | 'vertical') | Item: value (string), required | disabled (boolean)
+Example: <Accordion.Root>
+
+### Collapsible
+Expandable/collapsible content panel.
+Import: @dryui/ui
+Parts: Root, Trigger, Content
+Props: Root: open (boolean) | disabled (boolean)
+Example: <Collapsible.Root>
+
+### Table
+Data table with header, body, footer sections.
+Import: @dryui/ui
+Parts: Root, Header, Body, Footer, Row, Head, Cell, Caption
+Props: Head: scope ('col' | 'row')
+Example: <Table.Root>
+
+### Avatar
+User profile image with fallback initials.
+Import: @dryui/ui
+Props: src (string) | alt (string) | fallback (string) | size ('sm' | 'md' | 'lg') | shape ('circle' | 'square')
+Example: <Avatar>Content</Avatar>
+
+### Badge
+Small status indicator label.
+Import: @dryui/ui
+Props: variant ('solid' | 'outline' | 'soft') | color ('gray' | 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'orange') | size ('sm' | 'md')
+Example: <Badge>Content</Badge>
+
+### Tag
+Dismissible tag/chip label.
+Import: @dryui/ui
+Props: variant ('solid' | 'outline' | 'soft') | color ('gray' | 'blue' | 'red' | 'green' | 'yellow' | 'purple' | 'orange') | size ('sm' | 'md') | dismissible (boolean) | onDismiss (() => void)
+Example: <Tag>Content</Tag>
+
+### EmptyState
+Placeholder for empty content areas.
+Import: @dryui/ui
+Parts: Root, Icon, Title, Description, Action
+Example: <EmptyState.Root>
+
+### Marquee
+Scrolling text/content ticker with CSS animations.
+Import: @dryui/ui
+Props: speed (number) | direction ('left' | 'right' | 'up' | 'down') | pauseOnHover (boolean) | gap (string)
+Example: <Marquee>Content</Marquee>
+
+### QRCode
+QR code generator using Canvas 2D API.
+Import: @dryui/ui
+Props: value (string), required | size (number) | errorCorrection ('L' | 'M' | 'Q' | 'H') | fgColor (string) | bgColor (string)
+Example: <QRCode>Content</QRCode>
+
+### CodeBlock
+Code display with optional line numbers and copy button.
+Import: @dryui/ui
+Props: code (string), required | language (string) | showLineNumbers (boolean) | showCopyButton (boolean)
+Example: <CodeBlock>Content</CodeBlock>
+
+### MarkdownRenderer
+Renders markdown text as styled HTML.
+Import: @dryui/ui
+Props: content (string), required | sanitize (boolean)
+Example: <MarkdownRenderer>Content</MarkdownRenderer>
+
+### VirtualList
+Renders only visible items from large lists for performance.
+Import: @dryui/ui
+Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number)
+Example: <VirtualList>Content</VirtualList>
+
+### InfiniteScroll
+Loads more content when user scrolls near bottom.
+Import: @dryui/ui
+Props: onLoadMore (() => void | Promise<void>), required | hasMore (boolean) | loading (boolean) | rootMargin (string) | loadingIndicator (Snippet) | endMessage (Snippet)
+Example: <InfiniteScroll>Content</InfiniteScroll>
+
+### DataGrid
+Enhanced table with sorting, filtering, and pagination.
+Import: @dryui/ui
+Parts: Root, Table, Header, Column, Body, Row, Cell, Pagination
+Props: Root: items (T[]), required | pageSize (number) | striped (boolean) | Column: key (string), required | sortable (boolean) | filterable (boolean) | header (Snippet) | Pagination: page (number), required | totalPages (number), required | totalItems (number), required | pageSize (number), required | canPrevious (boolean), required | canNext (boolean), required | previous (() => void), required | next (() => void), required | goto ((page: number) => void), required
+Example: <DataGrid.Root>
+
+### Category: Feedback
+
+### Alert
+Contextual feedback message with variant styling.
+Import: @dryui/ui
+Parts: Root, Icon, Title, Description, Close
+Props: Root: variant (AlertVariant) | dismissible (boolean) | onDismiss (() => void)
+Example: <Alert.Root>
+
+### Toast
+Temporary notification message.
+Import: @dryui/ui
+Parts: Provider, Root, Title, Description, Close
+Props: Provider: position ('top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center') | Root: id (string), required | variant ('info' | 'success' | 'warning' | 'error')
+Example: <Toast.Root>
+
+### Progress
+Progress bar indicator.
+Import: @dryui/ui
+Props: value (number) | max (number) | size ('sm' | 'md' | 'lg') | color ('blue' | 'green' | 'red' | 'yellow')
+Example: <Progress>Content</Progress>
+
+### Skeleton
+Loading placeholder animation.
+Import: @dryui/ui
+Props: variant ('text' | 'circular' | 'rectangular') | width (string) | height (string)
+Example: <Skeleton>Content</Skeleton>
+
+### Spinner
+Loading spinner animation.
+Import: @dryui/ui
+Props: size ('sm' | 'md' | 'lg') | color ('primary' | 'current') | label (string)
+Example: <Spinner>Content</Spinner>
+
+### Category: Interaction
+
+### DragAndDrop
+Reorderable list with drag and keyboard support.
+Import: @dryui/ui
+Parts: Root, Item, Handle
+Props: Root: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal') | Item: index (number), required | Handle: index (number), required
+Example: <DragAndDrop.Root>
+
+### Category: Utility
+
+### Portal
+Renders children into a different DOM location.
+Import: @dryui/ui
+Props: target (string | HTMLElement) | disabled (boolean)
+Example: <Portal>Content</Portal>
+
+### VisuallyHidden
+Hides content visually but keeps it accessible to screen readers.
+Import: @dryui/ui
+Example: <VisuallyHidden>Content</VisuallyHidden>
+
+### FocusTrap
+Traps keyboard focus within a container element.
+Import: @dryui/ui
+Props: active (boolean) | initialFocus (string) | returnFocus (boolean)
+Example: <FocusTrap>Content</FocusTrap>
+
+### Hotkey
+Keyboard shortcut handler with modifier support.
+Import: @dryui/ui
+Example: <Hotkey>Content</Hotkey>
+
+## CSS Variables
+
+All components support CSS variable theming. Override at the :root level or component level:
+
+```css
+:root {
+  --dry-btn-radius: 8px;
+  --dry-btn-bg: #6366f1;
+}
+```
+
+## CLI
+
+Use the CLI for deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation:
+
+Current command surface: init, detect, install, add (project-aware), get, info, list, compose, review, diagnose.
+
+```bash
+bun run --filter '@dryui/cli' build
+node packages/cli/dist/index.js detect
+node packages/cli/dist/index.js install
+node packages/cli/dist/index.js add --project Card
+node packages/cli/dist/index.js info <component>
+node packages/cli/dist/index.js list --category layout
+node packages/cli/dist/index.js get "Checkout Forms"
+node packages/cli/dist/index.js compose "date input"
+node packages/cli/dist/index.js review src/routes/+page.svelte
+node packages/cli/dist/index.js diagnose src/app.css
+```
+
+## MCP Server
+
+dryui ships an MCP server for AI-agent integration:
+
+```json
+{
+  "mcpServers": {
+    "dryui": {
+      "command": "bunx",
+      "args": ["@dryui/mcp"]
+    }
+  }
+}
+```
+
+Available MCP tools:
+- info: Inspect component APIs, props, parts, CSS variables, and examples
+- get: Retrieve copyable source for a composed output
+- list: Discover components and source-owned catalog entries
+- compose: Get composition guidance for the right components and patterns
+- review: Review Svelte components for DryUI spec compliance and best practices
+- diagnose: Diagnose theme CSS for missing tokens, contrast issues, and value errors
+- detect_project: Detect DryUI readiness in a Svelte or SvelteKit project
+- plan_install: Build a non-mutating install checklist for a project
+- plan_add: Build a non-mutating project-aware adoption plan for a component or composed output

@@ -1,0 +1,27 @@
+{
+  "name": "@dryui/launcher",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bunx --bun vite dev --port 4200",
+    "dev:server": "bun server/index.ts",
+    "build": "vite build",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@dryui/primitives": "workspace:*",
+    "@dryui/theme-wizard": "workspace:*",
+    "@dryui/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@dryui/lint": "workspace:*",
+    "@types/node": "^25.5.0",
+    "@sveltejs/adapter-node": "^5.5.4",
+    "@sveltejs/kit": "^2.55.0",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "svelte-check": "^4.4.5",
+    "svelte": "^5.55.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  }
+}

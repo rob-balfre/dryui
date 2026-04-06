@@ -1,0 +1,10 @@
+import { createContext } from '../utils/create-context.js';
+
+export interface FileSelectContext {
+	readonly value: string | null;
+	readonly loading: boolean;
+	readonly disabled: boolean;
+	request: () => void;
+	clear: () => void;
+}
+export const [setFileSelectCtx, getFileSelectCtx] = createContext<FileSelectContext>('file-select');

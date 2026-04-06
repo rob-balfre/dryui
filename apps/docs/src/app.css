@@ -1,0 +1,58 @@
+@import '@dryui/ui/themes/default.css';
+@import '@dryui/ui/themes/dark.css';
+@import 'mapbox-gl/dist/mapbox-gl.css';
+
+:root {
+	--docs-z-sticky-label: 1;
+	--docs-z-mobile-header: 10;
+	--docs-z-overlay: 20;
+	--docs-demo-frame-height-sm: 120px;
+	--docs-demo-frame-height-lg: 200px;
+	--docs-code-font-size: 0.9em;
+	--docs-code-padding: 0.1em 0.35em;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-family: var(--dry-font-sans);
+	color: var(--dry-color-text-strong);
+	background: var(--dry-color-bg-base);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	margin: 0;
+	min-height: 100dvh;
+}
+
+code {
+	font-family: var(--dry-font-mono);
+	font-size: var(--docs-code-font-size);
+	background: var(--dry-color-bg-raised);
+	padding: var(--docs-code-padding);
+	border-radius: var(--dry-radius-sm);
+}
+
+/* Vertical spacing utilities (grid-based) */
+.stack-xl {
+	display: grid;
+	gap: var(--dry-space-8);
+}
+.stack-lg {
+	display: grid;
+	gap: var(--dry-space-6);
+}
+.stack-md {
+	display: grid;
+	gap: var(--dry-space-4);
+}
+.stack-sm {
+	display: grid;
+	gap: var(--dry-space-2);
+}

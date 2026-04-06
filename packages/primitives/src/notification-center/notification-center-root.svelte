@@ -1,0 +1,57 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import { generateFormId } from '../utils/form-control.svelte.js';
+	import { setNotificationCenterCtx, type NotificationItem } from './context.svelte.js';
+
+	interface Props {
+		items?: NotificationItem[];
+		open?: boolean;
+		children: Snippet;
+	}
+
+	let { items = $bindable([]), open = $bindable(false), children }: Props = $props();
+
+	const triggerId = generateFormId('nc-trigger');
+	const panelId = generateFormId('nc-panel');
+
+	const unreadCount = $derived(items.filter((item) => !item.read).length);
+
+	setNotificationCenterCtx({
+		get items() {
+			return items;
+		},
+		get unreadCount() {
+			return unreadCount;
+		},
+		get open() {
+			return open;
+		},
+		get triggerId() {
+			return triggerId;
+		},
+		get panelId() {
+			return panelId;
+		},
+		triggerEl: null,
+		markAllRead() {
+			items = items.map((item) => ({ ...item, read: true }));
+		},
+		markRead(id: string) {
+			items = items.map((item) => (item.id === id ? { ...item, read: true } : item));
+		},
+		remove(id: string) {
+			items = items.filter((item) => item.id !== id);
+		},
+		toggle() {
+			open = !open;
+		},
+		show() {
+			open = true;
+		},
+		close() {
+			open = false;
+		}
+	});
+</script>
+
+{@render children()}

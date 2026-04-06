@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" class="theme-auto">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<script>
+			(() => {
+				const root = document.documentElement;
+
+				try {
+					const storedTheme = window.localStorage.getItem('dryui-wizard-theme');
+					const explicitTheme =
+						storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : null;
+
+					if (!explicitTheme && storedTheme !== null) {
+						window.localStorage.removeItem('dryui-wizard-theme');
+					}
+
+					root.classList.toggle('theme-auto', explicitTheme === null);
+
+					if (explicitTheme) {
+						root.dataset.theme = explicitTheme;
+					} else {
+						delete root.dataset.theme;
+					}
+				} catch {
+					delete root.dataset.theme;
+					root.classList.add('theme-auto');
+				}
+			})();
+		</script>
+		<title>dryui wizard</title>
+		<meta
+			name="description"
+			content="A CLI-driven wizard for composing DryUI components into page-level layouts."
+		/>
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div id="app">%sveltekit.body%</div>
+	</body>
+</html>

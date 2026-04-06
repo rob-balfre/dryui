@@ -1,0 +1,73 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
+	import { getSelectableTileGroupCtx } from './context.svelte.js';
+
+	interface Props extends Omit<HTMLButtonAttributes, 'value'> {
+		value: string;
+		disabled?: boolean;
+		children: Snippet;
+	}
+
+	let { value, disabled = false, children, class: className, ...rest }: Props = $props();
+
+	const ctx = getSelectableTileGroupCtx();
+	const isDisabled = $derived(disabled || ctx.disabled);
+	const isSelected = $derived(ctx.isSelected(value));
+
+	function moveFocus(current: HTMLButtonElement, direction: -1 | 1) {
+		const group = current.closest('[role="radiogroup"]');
+		if (!(group instanceof HTMLElement)) return;
+
+		const items = Array.from(
+			group.querySelectorAll<HTMLButtonElement>('[role="radio"]:not([disabled])')
+		);
+		const index = items.indexOf(current);
+		if (index === -1) return;
+
+		const target = items[(index + direction + items.length) % items.length];
+		target?.focus();
+		const nextValue = target?.dataset.value;
+		if (nextValue) ctx.select(nextValue);
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (isDisabled || !(event.currentTarget instanceof HTMLButtonElement)) return;
+
+		const isHorizontal = ctx.orientation === 'horizontal';
+		if (
+			(isHorizontal && event.key === 'ArrowRight') ||
+			(!isHorizontal && event.key === 'ArrowDown')
+		) {
+			event.preventDefault();
+			moveFocus(event.currentTarget, 1);
+		}
+		if ((isHorizontal && event.key === 'ArrowLeft') || (!isHorizontal && event.key === 'ArrowUp')) {
+			event.preventDefault();
+			moveFocus(event.currentTarget, -1);
+		}
+		if (event.key === ' ' || event.key === 'Enter') {
+			event.preventDefault();
+			ctx.select(value);
+		}
+	}
+</script>
+
+<button
+	type="button"
+	role="radio"
+	aria-checked={isSelected}
+	disabled={isDisabled}
+	data-state={isSelected ? 'checked' : 'unchecked'}
+	data-disabled={isDisabled || undefined}
+	data-value={value}
+	tabindex={isSelected ? 0 : -1}
+	class={className}
+	onclick={() => {
+		if (!isDisabled) ctx.select(value);
+	}}
+	onkeydown={handleKeydown}
+	{...rest}
+>
+	{@render children()}
+</button>

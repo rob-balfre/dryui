@@ -1,0 +1,65 @@
+{
+  "name": "@dryui/feedback",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/feedback"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.js",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "svelte": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "svelte": "./dist/index.js",
+        "default": "./dist/index.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "generate-layout-library": "node ./scripts/generate-layout-library.mjs",
+    "build": "bun run generate-layout-library && svelte-package -i src",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*",
+    "@dryui/mcp": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.55.1",
+    "lucide-svelte": ">=1.0.1"
+  },
+  "peerDependenciesMeta": {
+    "lucide-svelte": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "svelte": "^5.55.1",
+    "@sveltejs/package": "^2.5.7",
+    "svelte-check": "^4.4.5",
+    "typescript": "^6.0.2"
+  }
+}

@@ -1,0 +1,123 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
+	import { getDragAndDropCtx } from './context.svelte.js';
+
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+		index: number;
+		children: Snippet<[{ isDragging: boolean; isOver: boolean }]>;
+	}
+
+	let { index, children, class: className, ...rest }: Props = $props();
+
+	const ctx = getDragAndDropCtx();
+
+	let itemIsDragging = $derived(ctx.draggedIndex === index);
+	let isOver = $derived(ctx.overIndex === index && ctx.isDragging && ctx.draggedIndex !== index);
+
+	let grabbing = $state(false);
+
+	function handlePointerDown(e: PointerEvent) {
+		// Only start drag if there's no handle registered (drag from whole item)
+		if (!ctx.hasHandle) {
+			e.preventDefault();
+			ctx.startDrag(index, e);
+			grabbing = true;
+		}
+	}
+
+	function handlePointerUp() {
+		grabbing = false;
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		if (e.key === ' ' || e.key === 'Enter') {
+			e.preventDefault();
+			if (ctx.isDragging && ctx.draggedIndex === index) {
+				ctx.endDrag();
+			}
+		}
+
+		const upKey = ctx.orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+		const downKey = ctx.orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
+
+		if (e.key === upKey) {
+			e.preventDefault();
+			ctx.moveItem(index, 'up');
+		}
+
+		if (e.key === downKey) {
+			e.preventDefault();
+			ctx.moveItem(index, 'down');
+		}
+
+		if (e.key === 'Escape') {
+			e.preventDefault();
+			ctx.cancelDrag();
+		}
+	}
+</script>
+
+<div
+	role="option"
+	tabindex="0"
+	aria-roledescription="sortable"
+	aria-label="Item {index + 1}, press Space to grab, arrow keys to move"
+	data-dnd-item
+	data-index={index}
+	data-dragging={itemIsDragging ? '' : undefined}
+	data-over={isOver ? '' : undefined}
+	onpointerdown={handlePointerDown}
+	onpointerup={handlePointerUp}
+	onkeydown={handleKeydown}
+	{...rest}
+	class={className}
+>
+	{@render children({ isDragging: itemIsDragging, isOver })}
+</div>
+
+<style>
+	[data-dnd-item] {
+		position: relative;
+		display: grid;
+		grid-template-columns: var(--dry-dnd-item-columns, 1fr);
+		align-items: center;
+		gap: var(--dry-dnd-item-gap, var(--dry-space-2));
+		background: var(--dry-dnd-item-bg, var(--dry-color-bg-base));
+		border: 1px solid var(--dry-dnd-item-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-dnd-item-radius, var(--dry-radius-md));
+		padding: var(--dry-dnd-item-padding, var(--dry-space-3));
+		box-shadow: var(--dry-dnd-item-shadow, var(--dry-shadow-sm));
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-default),
+			transform var(--dry-duration-fast) var(--dry-ease-default),
+			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
+		user-select: none;
+		touch-action: none;
+	}
+
+	[data-dnd-item]:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: 2px;
+	}
+
+	[data-dnd-item][data-dragging] {
+		opacity: var(--dry-dnd-drag-opacity, 0.5);
+		transform: scale(var(--dry-dnd-drag-scale, 1.02));
+		box-shadow: var(--dry-dnd-drag-shadow, var(--dry-shadow-lg));
+		z-index: var(--dry-dnd-drag-z-index, var(--dry-layer-overlay));
+	}
+
+	[data-dnd-item][data-over]::before {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: calc(
+			-1 * (var(--dry-dnd-gap, var(--dry-space-2)) / 2 + var(--dry-dnd-indicator-size, 2px) / 2)
+		);
+		height: var(--dry-dnd-indicator-size, 2px);
+		background: var(--dry-dnd-indicator-color, var(--dry-color-fill-brand));
+		border-radius: var(--dry-dnd-indicator-size, 2px);
+	}
+</style>

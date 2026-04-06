@@ -1,0 +1,69 @@
+@import '@dryui/ui/themes/default.css';
+@import '@dryui/ui/themes/dark.css';
+
+:root {
+	--wizard-shell-shadow: 0 28px 90px rgba(10, 14, 28, 0.24);
+	--wizard-accent-a: color-mix(in srgb, var(--dry-color-primary) 22%, transparent);
+	--wizard-accent-b: color-mix(in srgb, var(--dry-color-border) 34%, transparent);
+	--wizard-accent-c: color-mix(in srgb, var(--dry-color-surface-raised) 76%, transparent);
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-family: var(--dry-font-sans);
+	color: var(--dry-color-text);
+	background:
+		radial-gradient(circle at 14% 18%, var(--wizard-accent-a), transparent 28%),
+		radial-gradient(circle at 86% 8%, var(--wizard-accent-b), transparent 26%),
+		radial-gradient(circle at 60% 100%, var(--wizard-accent-c), transparent 32%),
+		linear-gradient(
+			180deg,
+			var(--dry-color-bg),
+			color-mix(in srgb, var(--dry-color-bg) 84%, #08111b 16%)
+		);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+body {
+	margin: 0;
+	min-height: 100dvh;
+}
+
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	background:
+		linear-gradient(135deg, rgba(255, 255, 255, 0.02), transparent 36%),
+		radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.05), transparent 44%);
+	opacity: 0.8;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+}
+
+a {
+	color: inherit;
+}
+
+code,
+pre {
+	font-family: var(--dry-font-mono);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+}

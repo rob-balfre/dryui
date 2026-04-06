@@ -1,0 +1,183 @@
+<script lang="ts">
+	import type { HTMLInputAttributes } from 'svelte/elements';
+	import { getFormControlCtx } from '@dryui/primitives';
+
+	interface Props extends Omit<HTMLInputAttributes, 'size'> {
+		value?: string;
+		size?: 'sm' | 'md' | 'lg';
+		variant?: 'default' | 'ghost';
+		disabled?: boolean;
+	}
+
+	let {
+		value = $bindable(''),
+		size = 'md',
+		variant = 'default',
+		class: className,
+		disabled = false,
+		type,
+		...rest
+	}: Props = $props();
+
+	const ctx = getFormControlCtx();
+	const isDisabled = $derived(disabled || ctx?.disabled || false);
+</script>
+
+<span class="wrapper">
+	<input
+		{...type != null ? { type } : {}}
+		bind:value
+		id={ctx?.id}
+		disabled={isDisabled}
+		required={ctx?.required || undefined}
+		aria-describedby={ctx?.describedBy}
+		aria-invalid={ctx?.hasError || undefined}
+		aria-errormessage={ctx?.errorMessageId}
+		data-disabled={isDisabled || undefined}
+		data-size={size}
+		data-variant={variant !== 'default' ? variant : undefined}
+		class={className}
+		{...rest}
+	/>
+</span>
+
+<style>
+	.wrapper {
+		container-type: inline-size;
+		display: grid;
+	}
+
+	input {
+		padding: var(--dry-input-padding-y, var(--dry-space-2))
+			var(--dry-input-padding-x, var(--dry-space-3));
+		font-size: var(--dry-input-font-size, var(--dry-type-small-size));
+		line-height: var(--dry-type-small-leading);
+		font-family: var(--dry-font-sans);
+		color: var(--dry-input-color, var(--dry-color-text-strong));
+		background: var(--dry-input-bg, var(--dry-control-bg, var(--dry-color-bg-raised)));
+		border: 1px solid
+			var(--dry-input-border, var(--dry-control-border, var(--dry-color-stroke-strong)));
+		border-radius: var(--dry-input-radius, var(--dry-control-radius, var(--dry-radius-md)));
+		transition:
+			border-color var(--dry-duration-fast) var(--dry-ease-default),
+			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
+		box-sizing: border-box;
+		appearance: none;
+
+		&::placeholder {
+			color: var(--dry-color-text-weak);
+		}
+
+		&:hover:not([data-disabled]) {
+			border-color: var(--dry-color-stroke-strong);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--dry-color-focus-ring);
+			outline-offset: -1px;
+			border-color: var(--dry-color-stroke-focus);
+			box-shadow: 0 0 0 1px var(--dry-color-stroke-focus);
+		}
+
+		&[data-disabled] {
+			--dry-input-bg: var(--dry-color-bg-sunken);
+			--dry-input-border: var(--dry-color-stroke-disabled);
+			--dry-input-color: var(--dry-color-text-disabled);
+			cursor: not-allowed;
+		}
+
+		&[aria-invalid='true'],
+		&[data-invalid] {
+			--dry-input-bg: color-mix(
+				in srgb,
+				var(--dry-color-fill-error-weak) 70%,
+				var(--dry-color-bg-raised)
+			);
+			--dry-input-border: var(--dry-color-stroke-error);
+		}
+
+		&[aria-invalid='true']:hover:not([data-disabled]),
+		&[data-invalid]:hover:not([data-disabled]) {
+			border-color: var(--dry-color-stroke-error-strong);
+		}
+
+		&[aria-invalid='true']:focus-visible,
+		&[data-invalid]:focus-visible {
+			outline-color: var(--dry-color-fill-error);
+			border-color: var(--dry-color-stroke-error);
+		}
+	}
+
+	input[data-size='sm'] {
+		--dry-input-padding-x: var(--dry-space-2);
+		--dry-input-padding-y: var(--dry-space-1);
+		--dry-input-font-size: var(--dry-type-tiny-size);
+		line-height: var(--dry-type-tiny-leading);
+	}
+
+	input[data-size='md'] {
+		--dry-input-padding-x: var(--dry-space-3);
+		--dry-input-padding-y: var(--dry-space-2);
+		--dry-input-font-size: var(--dry-type-small-size);
+		line-height: var(--dry-type-small-leading);
+	}
+
+	input[data-size='lg'] {
+		--dry-input-padding-x: var(--dry-space-4);
+		--dry-input-padding-y: var(--dry-space-2_5);
+		--dry-input-font-size: var(--dry-type-heading-4-size);
+		line-height: var(--dry-type-heading-4-leading);
+	}
+
+	/* ── Ghost variant ─────────────────────────────────────────────────────── */
+
+	input[data-variant='ghost'] {
+		--dry-input-bg: transparent;
+		--dry-input-border: transparent;
+		background: transparent;
+		border-color: transparent;
+	}
+
+	input[data-variant='ghost']:hover:not(:disabled) {
+		border-color: transparent;
+	}
+
+	input[data-variant='ghost']:focus-visible {
+		border-color: transparent;
+		outline: none;
+		box-shadow: none;
+	}
+
+	/* ── File input styling ────────────────────────────────────────────────── */
+
+	input[type='file'] {
+		cursor: pointer;
+		padding-top: var(--dry-space-1_5);
+		padding-bottom: var(--dry-space-1_5);
+
+		&::file-selector-button {
+			font-family: var(--dry-font-sans);
+			font-size: var(--dry-type-tiny-size);
+			font-weight: 500;
+			color: var(--dry-color-text-strong);
+			background: var(--dry-color-fill-weak);
+			border: 1px solid var(--dry-color-stroke-weak);
+			border-radius: var(--dry-radius-full);
+			padding: var(--dry-space-1) var(--dry-space-3);
+			margin-right: var(--dry-space-3);
+			cursor: pointer;
+			transition: background var(--dry-duration-fast) var(--dry-ease-default);
+		}
+
+		&::file-selector-button:hover {
+			background: var(--dry-color-fill-hover);
+		}
+	}
+
+	/* Container query: collapse padding in very narrow containers */
+	@container (max-width: 200px) {
+		input {
+			--dry-input-padding-x: var(--dry-space-2);
+		}
+	}
+</style>

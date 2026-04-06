@@ -1,0 +1,33 @@
+.demoFrame {
+	position: relative;
+	contain: paint;
+}
+
+.demoFrameSm {
+	min-height: var(--docs-demo-frame-height-sm);
+}
+
+.demoFrameLg {
+	min-height: var(--docs-demo-frame-height-lg);
+}
+
+.overlayCard {
+	position: fixed;
+	inset-block-end: var(--dry-space-8);
+	inset-inline-end: var(--dry-space-8);
+	z-index: var(--docs-z-overlay);
+	padding: var(--dry-space-4);
+	background: var(--dry-color-bg-raised);
+	border: 1px solid var(--dry-color-stroke-weak);
+	border-radius: var(--dry-radius-md);
+	box-shadow: var(--dry-shadow-lg);
+}
+
+.fillWidthControl {
+	width: 100%;
+	justify-content: space-between;
+}
+
+.flexGrow {
+	flex: 1;
+}

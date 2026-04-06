@@ -1,0 +1,281 @@
+[data-theme='dark'] {
+	/* ─── Neutral ─────────────────────────────────────────────────── */
+	--dry-color-text-strong: hsla(0, 0%, 100%, 1);
+	--dry-color-text-weak: hsla(0, 0%, 100%, 0.78);
+	--dry-color-icon: hsla(0, 0%, 100%, 0.85);
+	--dry-color-stroke-strong: hsla(0, 0%, 100%, 0.6);
+	--dry-color-stroke-weak: hsla(0, 0%, 100%, 0.12);
+	--dry-color-fill: hsla(0, 0%, 100%, 0.06);
+	--dry-color-fill-hover: hsla(0, 0%, 100%, 0.1);
+	--dry-color-fill-active: hsla(0, 0%, 100%, 0.14);
+
+	/* ─── Brand dark overrides ────────────────────────────────────── */
+	--dry-color-brand: hsl(230, 100%, 82%);
+	--dry-color-text-brand: hsl(230, 100%, 82%);
+	--dry-color-fill-brand: hsl(230, 100%, 82%);
+	--dry-color-fill-brand-hover: hsl(230, 100%, 75%);
+	--dry-color-fill-brand-active: hsl(230, 100%, 70%);
+	--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
+	--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
+	--dry-color-stroke-brand-strong: hsla(230, 100%, 82%, 0.8);
+	--dry-color-stroke-brand-weak: hsla(230, 100%, 82%, 0.2);
+	--dry-color-on-brand: hsl(233, 18%, 9%);
+	--dry-color-focus-ring: hsla(230, 100%, 82%, 0.4);
+
+	/* ─── Backgrounds ─────────────────────────────────────────────── */
+	--dry-color-bg-base: hsl(233, 18%, 9%);
+	--dry-color-bg-raised: hsl(233, 13%, 13%);
+	--dry-color-bg-overlay: hsl(234, 11%, 18%);
+
+	/* ─── Semantic parity extensions ──────────────────────────────── */
+	--dry-color-text-disabled: var(--dry-color-stroke-weak);
+	--dry-color-text-inverse: hsla(230, 100%, 15%, 0.9);
+	--dry-color-text-inverse-weak: hsla(230, 100%, 20%, 0.65);
+	--dry-color-text-inverse-disabled: hsla(230, 100%, 20%, 0.1);
+
+	--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
+	--dry-color-icon-disabled: var(--dry-color-stroke-weak);
+	--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
+	--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
+	--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
+	--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
+
+	--dry-color-stroke-focus: var(--dry-color-brand);
+	--dry-color-stroke-selected: var(--dry-color-brand);
+	--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
+	--dry-color-stroke-inverse: hsla(230, 100%, 20%, 0.45);
+	--dry-color-stroke-inverse-weak: hsla(230, 100%, 20%, 0.1);
+
+	--dry-color-fill-strong: var(--dry-color-text-strong);
+	--dry-color-fill-weak: var(--dry-color-fill);
+	--dry-color-fill-weaker: hsla(0, 0%, 100%, 0.03);
+	--dry-color-fill-selected: var(--dry-color-fill-brand);
+	--dry-color-fill-disabled: var(--dry-color-stroke-weak);
+	--dry-color-fill-overlay: var(--dry-color-stroke-strong);
+	--dry-color-fill-inverse: var(--dry-color-text-inverse);
+	--dry-color-fill-inverse-hover: hsla(230, 100%, 25%, 0.04);
+	--dry-color-fill-inverse-active: hsla(230, 100%, 20%, 0.1);
+	--dry-color-fill-inverse-weak: hsla(230, 100%, 25%, 0.04);
+	--dry-color-fill-inverse-disabled: hsla(230, 100%, 20%, 0.1);
+	--dry-color-fill-white: #ffffff;
+	--dry-color-fill-yellow: #fec62e;
+
+	--dry-color-bg-sunken: #000000;
+	--dry-color-bg-alternate: var(--dry-color-bg-sunken);
+	--dry-color-bg-brand: var(--dry-color-fill-brand);
+	--dry-color-bg-inverse: #ffffff;
+
+	/* ─── Component: Toggle ───────────────────────────────────────── */
+	--dry-toggle-track-bg: #ffffff0f;
+	--dry-toggle-track-stroke: #ffffff99;
+	--dry-toggle-selected-bg: #a3b2ff;
+	--dry-toggle-selected-stroke: #a3b2ff;
+	--dry-toggle-thumb-bg: #292b33;
+	--dry-toggle-hover-bg: #ffffff0f;
+	--dry-toggle-press-bg: #ffffff1f;
+	--dry-toggle-disabled-fill: #ffffff1f;
+	--dry-toggle-disabled-stroke: #ffffff1f;
+	--dry-toggle-focus-ring: #a3b2ff;
+	--dry-toggle-label-color: var(--dry-color-text-strong);
+	--dry-toggle-label-disabled-color: #ffffff1f;
+
+	/* ─── Status: Error ───────────────────────────────────────────── */
+	--dry-color-text-error: hsl(0, 60%, 70%);
+	--dry-color-fill-error: hsl(0, 65%, 55%);
+	--dry-color-fill-error-hover: hsl(0, 65%, 48%);
+	--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
+	--dry-color-stroke-error: hsl(0, 45%, 55%);
+	--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
+	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+	--dry-color-on-error: #ffffff;
+
+	/* ─── Status: Warning ─────────────────────────────────────────── */
+	--dry-color-text-warning: hsl(40, 80%, 65%);
+	--dry-color-fill-warning: hsl(40, 75%, 52%);
+	--dry-color-fill-warning-hover: hsl(40, 75%, 45%);
+	--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
+	--dry-color-stroke-warning: hsl(40, 55%, 55%);
+	--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
+	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+	--dry-color-on-warning: hsl(40, 80%, 15%);
+
+	/* ─── Status: Success ─────────────────────────────────────────── */
+	--dry-color-text-success: hsl(145, 55%, 65%);
+	--dry-color-fill-success: hsl(145, 55%, 48%);
+	--dry-color-fill-success-hover: hsl(145, 55%, 40%);
+	--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
+	--dry-color-stroke-success: hsl(145, 45%, 55%);
+	--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
+	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+	--dry-color-on-success: #ffffff;
+
+	/* ─── Status: Info ────────────────────────────────────────────── */
+	--dry-color-text-info: hsl(210, 65%, 70%);
+	--dry-color-fill-info: hsl(210, 65%, 55%);
+	--dry-color-fill-info-hover: hsl(210, 65%, 47%);
+	--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
+	--dry-color-stroke-info: hsl(210, 45%, 55%);
+	--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
+	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+	--dry-color-on-info: #ffffff;
+
+	/* ─── Semantic shadows ────────────────────────────────────────── */
+	--dry-shadow-raised: 0 1px 3px hsla(230, 30%, 5%, 0.4), 0 1px 2px hsla(230, 30%, 5%, 0.3);
+	--dry-shadow-overlay: 0 8px 24px hsla(230, 30%, 5%, 0.5), 0 2px 8px hsla(230, 30%, 5%, 0.4);
+	--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
+
+	/* ─── Overlay backdrops ───────────────────────────────────────── */
+	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
+	--dry-color-overlay-backdrop-strong: hsla(0, 0%, 0%, 0.75);
+
+	/* ─── Scrollbar ───────────────────────────────────────────────── */
+	--dry-scrollbar-thumb: var(--dry-color-stroke-weak);
+	--dry-scrollbar-thumb-hover: var(--dry-color-stroke-strong);
+
+	/* ─── Glass surface ───────────────────────────────────────────── */
+	--dry-glass-tint: var(--dry-color-bg-raised);
+	--dry-glass-opacity: 64%;
+}
+
+.theme-auto {
+	@media (prefers-color-scheme: dark) {
+		& {
+			/* ─── Neutral ─────────────────────────────────────────────────── */
+			--dry-color-text-strong: hsla(0, 0%, 100%, 1);
+			--dry-color-text-weak: hsla(0, 0%, 100%, 0.78);
+			--dry-color-icon: hsla(0, 0%, 100%, 0.85);
+			--dry-color-stroke-strong: hsla(0, 0%, 100%, 0.6);
+			--dry-color-stroke-weak: hsla(0, 0%, 100%, 0.12);
+			--dry-color-fill: hsla(0, 0%, 100%, 0.06);
+			--dry-color-fill-hover: hsla(0, 0%, 100%, 0.1);
+			--dry-color-fill-active: hsla(0, 0%, 100%, 0.14);
+
+			/* ─── Brand dark overrides ────────────────────────────────────── */
+			--dry-color-brand: hsl(230, 100%, 82%);
+			--dry-color-text-brand: hsl(230, 100%, 82%);
+			--dry-color-fill-brand: hsl(230, 100%, 82%);
+			--dry-color-fill-brand-hover: hsl(230, 100%, 75%);
+			--dry-color-fill-brand-active: hsl(230, 100%, 70%);
+			--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
+			--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
+			--dry-color-stroke-brand-strong: hsla(230, 100%, 82%, 0.8);
+			--dry-color-stroke-brand-weak: hsla(230, 100%, 82%, 0.2);
+			--dry-color-on-brand: hsl(233, 18%, 9%);
+			--dry-color-focus-ring: hsla(230, 100%, 82%, 0.4);
+
+			/* ─── Backgrounds ─────────────────────────────────────────────── */
+			--dry-color-bg-base: hsl(233, 18%, 9%);
+			--dry-color-bg-raised: hsl(233, 13%, 13%);
+			--dry-color-bg-overlay: hsl(234, 11%, 18%);
+
+			/* ─── Semantic parity extensions ──────────────────────────────── */
+			--dry-color-text-disabled: var(--dry-color-stroke-weak);
+			--dry-color-text-inverse: hsla(230, 100%, 7%, 0.9);
+			--dry-color-text-inverse-weak: hsla(230, 100%, 10%, 0.65);
+			--dry-color-text-inverse-disabled: hsla(230, 100%, 20%, 0.1);
+
+			--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
+			--dry-color-icon-disabled: var(--dry-color-stroke-weak);
+			--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
+			--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
+			--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
+			--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
+
+			--dry-color-stroke-focus: var(--dry-color-brand);
+			--dry-color-stroke-selected: var(--dry-color-brand);
+			--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
+			--dry-color-stroke-inverse: hsla(230, 100%, 15%, 0.45);
+			--dry-color-stroke-inverse-weak: hsla(230, 100%, 20%, 0.1);
+
+			--dry-color-fill-strong: var(--dry-color-text-strong);
+			--dry-color-fill-weak: var(--dry-color-fill);
+			--dry-color-fill-weaker: hsla(0, 0%, 100%, 0.03);
+			--dry-color-fill-selected: var(--dry-color-fill-brand);
+			--dry-color-fill-disabled: var(--dry-color-stroke-weak);
+			--dry-color-fill-overlay: var(--dry-color-stroke-strong);
+			--dry-color-fill-inverse: var(--dry-color-text-inverse);
+			--dry-color-fill-inverse-hover: hsla(230, 100%, 25%, 0.04);
+			--dry-color-fill-inverse-active: hsla(230, 100%, 20%, 0.1);
+			--dry-color-fill-inverse-weak: hsla(230, 100%, 25%, 0.04);
+			--dry-color-fill-inverse-disabled: hsla(230, 100%, 20%, 0.1);
+			--dry-color-fill-white: #ffffff;
+			--dry-color-fill-yellow: #fec62e;
+
+			--dry-color-bg-sunken: #000000;
+			--dry-color-bg-alternate: var(--dry-color-bg-sunken);
+			--dry-color-bg-brand: var(--dry-color-fill-brand);
+			--dry-color-bg-inverse: #ffffff;
+
+			/* ─── Component: Toggle ───────────────────────────────────────── */
+			--dry-toggle-track-bg: #ffffff0f;
+			--dry-toggle-track-stroke: #ffffff99;
+			--dry-toggle-selected-bg: #a3b2ff;
+			--dry-toggle-selected-stroke: #a3b2ff;
+			--dry-toggle-thumb-bg: #292b33;
+			--dry-toggle-hover-bg: #ffffff0f;
+			--dry-toggle-press-bg: #ffffff1f;
+			--dry-toggle-disabled-fill: #ffffff1f;
+			--dry-toggle-disabled-stroke: #ffffff1f;
+			--dry-toggle-focus-ring: #a3b2ff;
+			--dry-toggle-label-color: var(--dry-color-text-strong);
+			--dry-toggle-label-disabled-color: #ffffff1f;
+
+			/* ─── Status: Error ───────────────────────────────────────────── */
+			--dry-color-text-error: hsl(0, 60%, 70%);
+			--dry-color-fill-error: hsl(0, 65%, 55%);
+			--dry-color-fill-error-hover: hsl(0, 65%, 48%);
+			--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
+			--dry-color-stroke-error: hsl(0, 45%, 55%);
+			--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
+			--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+			--dry-color-on-error: #ffffff;
+
+			/* ─── Status: Warning ─────────────────────────────────────────── */
+			--dry-color-text-warning: hsl(40, 80%, 65%);
+			--dry-color-fill-warning: hsl(40, 75%, 52%);
+			--dry-color-fill-warning-hover: hsl(40, 75%, 45%);
+			--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
+			--dry-color-stroke-warning: hsl(40, 55%, 55%);
+			--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
+			--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+			--dry-color-on-warning: hsl(40, 80%, 15%);
+
+			/* ─── Status: Success ─────────────────────────────────────────── */
+			--dry-color-text-success: hsl(145, 55%, 65%);
+			--dry-color-fill-success: hsl(145, 55%, 48%);
+			--dry-color-fill-success-hover: hsl(145, 55%, 40%);
+			--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
+			--dry-color-stroke-success: hsl(145, 45%, 55%);
+			--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
+			--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+			--dry-color-on-success: #ffffff;
+
+			/* ─── Status: Info ────────────────────────────────────────────── */
+			--dry-color-text-info: hsl(210, 65%, 70%);
+			--dry-color-fill-info: hsl(210, 65%, 55%);
+			--dry-color-fill-info-hover: hsl(210, 65%, 47%);
+			--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
+			--dry-color-stroke-info: hsl(210, 45%, 55%);
+			--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
+			--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+			--dry-color-on-info: #ffffff;
+
+			/* ─── Semantic shadows ────────────────────────────────────────── */
+			--dry-shadow-raised: 0 1px 3px hsla(230, 30%, 5%, 0.4), 0 1px 2px hsla(230, 30%, 5%, 0.3);
+			--dry-shadow-overlay: 0 8px 24px hsla(230, 30%, 5%, 0.5), 0 2px 8px hsla(230, 30%, 5%, 0.4);
+			--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
+
+			/* ─── Overlay backdrops ───────────────────────────────────────── */
+			--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
+			--dry-color-overlay-backdrop-strong: hsla(0, 0%, 0%, 0.75);
+
+			/* ─── Scrollbar ───────────────────────────────────────────────── */
+			--dry-scrollbar-thumb: var(--dry-color-stroke-weak);
+			--dry-scrollbar-thumb-hover: var(--dry-color-stroke-strong);
+
+			/* ─── Glass surface ───────────────────────────────────────────── */
+			--dry-glass-tint: var(--dry-color-bg-raised);
+			--dry-glass-opacity: 64%;
+		}
+	}
+}

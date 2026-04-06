@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "@dryui/primitives": ["../primitives/src/index.ts"],
+      "@dryui/primitives/virtual-list": ["../primitives/src/virtual-list/index.ts"],
+      "@dryui/primitives/infinite-scroll": ["../primitives/src/infinite-scroll/index.ts"],
+      "@dryui/primitives/rich-text-editor": ["../primitives/src/rich-text-editor/index.ts"],
+      "@dryui/primitives/tour": ["../primitives/src/tour/index.ts"],
+      "@dryui/primitives/marquee": ["../primitives/src/marquee/index.ts"],
+      "@dryui/primitives/qr-code": ["../primitives/src/qr-code/index.ts"],
+      "@dryui/primitives/code-block": ["../primitives/src/code-block/index.ts"],
+      "@dryui/primitives/markdown-renderer": ["../primitives/src/markdown-renderer/index.ts"],
+      "@dryui/ui": ["./src/index.ts"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte"]
+}

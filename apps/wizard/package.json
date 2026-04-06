@@ -1,0 +1,22 @@
+{
+  "name": "@dryui/wizard-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "bunx svelte-check --tsconfig ./tsconfig.json"
+  },
+  "dependencies": {
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@dryui/lint": "workspace:*",
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.55.0",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "svelte": "^5.55.1",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.3"
+  }
+}

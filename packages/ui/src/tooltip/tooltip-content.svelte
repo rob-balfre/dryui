@@ -1,0 +1,115 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
+	import { createAnchorPosition, type Placement } from '@dryui/primitives';
+	import { getTooltipCtx } from './context.svelte.js';
+
+	interface Props extends HTMLAttributes<HTMLDivElement> {
+		placement?: Placement;
+		offset?: number;
+		children: Snippet;
+	}
+
+	let {
+		placement = 'top',
+		offset = 8,
+		class: className,
+		children,
+		style,
+		...rest
+	}: Props = $props();
+
+	const ctx = getTooltipCtx();
+
+	let contentEl = $state<HTMLDivElement>();
+
+	const anchor = createAnchorPosition(
+		() => ctx.triggerEl,
+		() => contentEl ?? null,
+		{
+			get placement() {
+				return placement;
+			},
+			get offset() {
+				return offset;
+			}
+		}
+	);
+
+	$effect(() => {
+		if (!contentEl) return;
+
+		contentEl.style.cssText = typeof style === 'string' ? style : '';
+		const positionStyles = anchor.styles;
+		for (const [key, value] of Object.entries(positionStyles)) {
+			contentEl.style.setProperty(key, value);
+		}
+	});
+
+	$effect(() => {
+		if (!contentEl) return;
+
+		if (ctx.open && !contentEl.matches(':popover-open')) {
+			contentEl.showPopover();
+		} else if (!ctx.open && contentEl.matches(':popover-open')) {
+			contentEl.hidePopover();
+		}
+	});
+</script>
+
+<div
+	bind:this={contentEl}
+	id={ctx.contentId}
+	role="tooltip"
+	popover="manual"
+	data-tooltip-content
+	data-state={ctx.open ? 'open' : 'closed'}
+	class={className}
+	{...rest}
+>
+	{@render children()}
+</div>
+
+<style>
+	[data-tooltip-content] {
+		/* Reset UA popover defaults */
+		inset: unset;
+		margin: 0;
+
+		background: var(--dry-tooltip-bg, var(--dry-color-bg-inverse));
+		color: var(--dry-tooltip-color, var(--dry-color-text-inverse));
+		border: 1px solid var(--dry-tooltip-border, var(--dry-color-stroke-inverse-weak));
+		border-radius: var(--dry-tooltip-radius, var(--dry-overlay-radius, var(--dry-radius-xl)));
+		display: grid;
+		grid-template-columns: minmax(0, min(28ch, calc(100vw - var(--dry-space-8))));
+		padding: var(--dry-tooltip-padding-y, var(--dry-space-6))
+			var(--dry-tooltip-padding-x, var(--dry-space-8));
+		font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
+		line-height: var(--dry-type-tiny-leading, var(--dry-text-xs-leading));
+		white-space: normal;
+		overflow-wrap: anywhere;
+		pointer-events: none;
+		box-shadow: var(--dry-tooltip-shadow, var(--dry-overlay-shadow, var(--dry-shadow-overlay)));
+
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-emphasized),
+			transform var(--dry-duration-fast) var(--dry-ease-emphasized);
+	}
+
+	[data-tooltip-content]:not(:popover-open) {
+		display: none;
+	}
+
+	[data-tooltip-content]:popover-open {
+		display: grid;
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	@starting-style {
+		[data-tooltip-content]:popover-open {
+			opacity: 0;
+			transform: translateY(calc(var(--dry-motion-distance-xs) * 0.5));
+		}
+	}
+</style>

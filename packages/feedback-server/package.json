@@ -1,0 +1,52 @@
+{
+  "name": "@dryui/feedback-server",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/feedback-server"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./mcp": {
+      "types": "./dist/mcp.d.ts",
+      "default": "./dist/mcp.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "files": [
+    "dist",
+    "hooks"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && bunx tsc -p tsconfig.build.json",
+    "check": "bunx tsc -p tsconfig.json --noEmit",
+    "test": "bun test tests/**/*.test.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
+  }
+}

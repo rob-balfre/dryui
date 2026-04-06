@@ -1,0 +1,56 @@
+{
+  "name": "@dryui/theme-wizard",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/theme-wizard"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "svelte": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "svelte": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./engine": {
+      "types": "./src/engine/index.ts",
+      "default": "./src/engine/index.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "svelte-package -i src",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  },
+  "peerDependencies": {
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*",
+    "lucide-svelte": ">=1.0.1",
+    "svelte": "^5.55.1"
+  },
+  "devDependencies": {
+    "@dryui/lint": "workspace:*",
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*",
+    "lucide-svelte": "^1.0.1",
+    "svelte": "^5.55.1",
+    "@sveltejs/package": "^2.5.7",
+    "svelte-check": "^4.4.5",
+    "bun-types": "^1.3.11",
+    "typescript": "^6.0.2"
+  }
+}

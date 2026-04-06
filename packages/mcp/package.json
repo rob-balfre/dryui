@@ -1,0 +1,94 @@
+{
+  "name": "@dryui/mcp",
+  "version": "0.0.1",
+  "author": "Rob Balfre",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rob-balfre/dryui.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/rob-balfre/dryui#readme",
+  "bugs": {
+    "url": "https://github.com/rob-balfre/dryui/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "dryui-mcp": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./architecture": {
+      "bun": "./src/architecture.ts",
+      "types": "./dist/architecture.d.ts",
+      "default": "./dist/architecture.js"
+    },
+    "./reviewer": {
+      "bun": "./src/reviewer.ts",
+      "types": "./dist/reviewer.d.ts",
+      "default": "./dist/reviewer.js"
+    },
+    "./theme-checker": {
+      "bun": "./src/theme-checker.ts",
+      "types": "./dist/theme-checker.d.ts",
+      "default": "./dist/theme-checker.js"
+    },
+    "./project-planner": {
+      "bun": "./src/project-planner.ts",
+      "types": "./dist/project-planner.d.ts",
+      "default": "./dist/project-planner.js"
+    },
+    "./workspace-audit": {
+      "bun": "./src/workspace-audit.ts",
+      "types": "./dist/workspace-audit.d.ts",
+      "default": "./dist/workspace-audit.js"
+    },
+    "./contract.v1.json": "./dist/contract.v1.json",
+    "./contract.v1.schema.json": "./dist/contract.v1.schema.json",
+    "./spec": "./dist/spec.json",
+    "./architecture.json": "./dist/architecture.json",
+    "./composition-data": {
+      "bun": "./src/composition-data.ts",
+      "types": "./dist/composition-data.d.ts",
+      "default": "./dist/composition-data.js"
+    },
+    "./spec-types": {
+      "bun": "./src/spec-types.ts",
+      "types": "./dist/spec-types.d.ts",
+      "default": "./dist/spec-types.js"
+    },
+    "./spec-formatters": {
+      "bun": "./src/spec-formatters.ts",
+      "types": "./dist/spec-formatters.d.ts",
+      "default": "./dist/spec-formatters.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "generate-spec": "bun src/generate-spec.ts",
+    "generate-architecture": "bun src/generate-architecture.ts",
+    "generate-contract": "bun src/generate-contract.ts",
+    "generate-llms": "bun src/generate-llms-txt.ts",
+    "check:contract": "bun src/check-contract.ts",
+    "check": "bun run check:contract",
+    "build": "bun run generate-spec && bun run generate-architecture && bun run generate-contract && bun run generate-llms && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts --outdir dist --root src --target node && bunx tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^6.0.2"
+  }
+}

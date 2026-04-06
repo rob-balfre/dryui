@@ -1,0 +1,8 @@
+import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
+interface Props extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+declare const DropdownMenuTrigger: import('svelte').Component<Props, {}, ''>;
+type DropdownMenuTrigger = ReturnType<typeof DropdownMenuTrigger>;
+export default DropdownMenuTrigger;
