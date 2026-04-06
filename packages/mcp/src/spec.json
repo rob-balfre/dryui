@@ -4064,7 +4064,8 @@
             "value": {
               "type": "string",
               "required": false,
-              "description": "Current controlled or bindable value."
+              "description": "Current controlled or bindable value.",
+              "default": "''"
             }
           },
           "forwardedProps": {

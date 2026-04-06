@@ -342,7 +342,7 @@ Parts:
 - InputGroup.Prefix
   Props: none
 - InputGroup.Input
-  Props: value (string), Current controlled or bindable value.
+  Props: value (string), Current controlled or bindable value., default ''
   Native props: Forwards <input> attributes via rest props.
 - InputGroup.Suffix
   Props: none

@@ -15,10 +15,14 @@ describe('docs component route contract', () => {
 		expect(data.sourceUrl).toContain('packages/ui/src/button');
 		expect(data.related?.component).toBe('Button');
 		expect(data.a11y.length).toBeGreaterThan(0);
-		expect(data.dataAttributes[0]).toMatchObject({
-			name: 'data-disabled',
-			description: expect.any(String)
-		});
+		expect(data.dataAttributes).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					name: 'data-disabled',
+					description: expect.any(String)
+				})
+			])
+		);
 	});
 
 	it('returns structured styling hooks for stateful components', async () => {

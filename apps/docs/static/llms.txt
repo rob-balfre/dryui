@@ -181,7 +181,7 @@ Compound input wrapper that combines prefixes, suffixes, separators, select slot
 Import: @dryui/ui
 Subpath import: @dryui/ui/input-group
 Parts: Root, Prefix, Input, Suffix, Separator, Action, Select
-Props: Input: value (string), Current controlled or bindable value. | Select: value (string), Current controlled or bindable value., default '' | children (Snippet), Content rendered inside the component.
+Props: Input: value (string), Current controlled or bindable value., default '' | Select: value (string), Current controlled or bindable value., default '' | children (Snippet), Content rendered inside the component.
 Data attributes: data-affix-group | data-disabled (Present when the component or part is disabled.) | data-input-group-action | data-input-group-caret | data-input-group-input | data-input-group-inputWrap | data-input-group-prefix | data-input-group-root | data-input-group-select | data-input-group-selectWrap | data-input-group-separator | data-input-group-suffix | data-invalid (Present when the current field value is invalid.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size
 Example: <InputGroup.Root>
 

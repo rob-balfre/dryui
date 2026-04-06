@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "0.0.1"
+    "version": "0.0.7"
   },
   "counts": {
     "components": 144,
@@ -4208,7 +4208,8 @@
             "value": {
               "type": "string",
               "required": false,
-              "description": "Current controlled or bindable value."
+              "description": "Current controlled or bindable value.",
+              "default": "''"
             }
           },
           "forwardedProps": {

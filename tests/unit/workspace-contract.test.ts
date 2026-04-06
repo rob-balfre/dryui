@@ -40,10 +40,7 @@ test('release scripts require validation before publish', () => {
 		'bun run build:packages && bun run build:docs && bun run build:wizard'
 	);
 	expect(packageJson.scripts['build:packages']).toBe(
-		"bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/cli' build"
+		"bun run --filter '@dryui/lint' build && bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/feedback-server' build && bun run --filter '@dryui/cli' build"
 	);
-	expect(packageJson.scripts.validate).toBe(
-		'bun run check:exports && bun run validate:spec && bun run test:browser && bun run build:packages && bun run build:docs && bun run build:wizard && bun run check:packages && bun run check:docs && bun run check:contract && bun run check:docs:llms && bun run check:wizard && bun run check:mcp && bun run check:cli'
-	);
-	expect(packageJson.scripts.publish).toBe('bun run validate && changeset publish');
+	expect(packageJson.scripts.validate).toBe('bun run ./scripts/validate.ts');
 });

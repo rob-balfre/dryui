@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'bun:test';
-import { writeFile, rm } from 'node:fs/promises';
+import { writeFile, rm, mkdir } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { compileModule } from 'svelte/compiler';
@@ -62,11 +62,9 @@ beforeAll(async () => {
 	const { js } = compileModule(transpiled, {
 		filename: 'apps/launcher/src/lib/launcher-state.svelte.ts'
 	});
-	compiledModulePath = join(
-		process.cwd(),
-		'tmp',
-		`dryui-launcher-state-${crypto.randomUUID()}.mjs`
-	);
+	const tmpDir = join(process.cwd(), 'tmp');
+	await mkdir(tmpDir, { recursive: true });
+	compiledModulePath = join(tmpDir, `dryui-launcher-state-${crypto.randomUUID()}.mjs`);
 	await writeFile(compiledModulePath, js.code, 'utf8');
 	({ launcherState } = (await import(
 		pathToFileURL(compiledModulePath).href
