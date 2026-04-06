@@ -11,6 +11,7 @@
 </script>
 
 <span
+	data-fs-value
 	data-placeholder={!ctx.value || undefined}
 	data-loading={ctx.loading || undefined}
 	{...rest}

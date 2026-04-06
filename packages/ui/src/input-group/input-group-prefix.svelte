@@ -23,3 +23,16 @@
 >
 	{@render children()}
 </span>
+
+<style>
+	[data-input-group-prefix] {
+		display: inline-grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0 var(--dry-input-group-padding-x);
+		color: var(--dry-input-group-muted);
+		white-space: nowrap;
+	}
+</style>

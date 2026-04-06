@@ -203,15 +203,17 @@
 	});
 </script>
 
-<div bind:this={containerEl} class={className} data-part="map-root" {...rest}>
-	{#if error}
+{#if error}
+	<div class={className} data-part="map-root" {...rest}>
 		<div data-part="map-error" class="map-error">
 			{error}
 		</div>
+	</div>
+{:else}
+	<div bind:this={containerEl} class={className} data-part="map-root" {...rest}></div>
+	{#if children}
+		{@render children()}
 	{/if}
-</div>
-{#if children && !error}
-	{@render children()}
 {/if}
 
 <style>

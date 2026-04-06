@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getTransferCtx, type TransferItem } from './context.svelte.js';
+	import { Checkbox } from '../checkbox/index.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		type: 'source' | 'target';
@@ -67,12 +68,12 @@
 		{#if title}
 			<div data-transfer-list-header>
 				<label data-transfer-select-all>
-					<input
-						type="checkbox"
+					<Checkbox
 						checked={allSelected}
 						indeterminate={selectedCount > 0 && !allSelected}
 						onchange={toggleAll}
 						aria-label="Select all {type} items"
+						size="sm"
 					/>
 					<span>{title}</span>
 				</label>
@@ -96,11 +97,11 @@
 						aria-selected={selectedSet.has(item.key)}
 						aria-disabled={item.disabled ?? false}
 					>
-						<input
-							type="checkbox"
+						<Checkbox
 							checked={selectedSet.has(item.key)}
 							disabled={item.disabled}
 							onchange={() => toggleItem(item.key)}
+							size="sm"
 						/>
 						{item.label}
 					</label>
@@ -134,15 +135,9 @@
 	[data-part='list'] [data-transfer-select-all] {
 		display: grid;
 		grid-auto-flow: column;
-		grid-auto-columns: 16px max-content;
+		grid-auto-columns: max-content max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
-		cursor: pointer;
-	}
-
-	[data-part='list'] [data-transfer-select-all] input[type='checkbox'] {
-		accent-color: var(--dry-color-fill-selected);
-		height: 16px;
 		cursor: pointer;
 	}
 
@@ -160,7 +155,7 @@
 	[data-part='list'] [data-transfer-item] {
 		display: grid;
 		grid-auto-flow: column;
-		grid-auto-columns: 16px max-content;
+		grid-auto-columns: max-content max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
 		padding: var(--dry-space-2) var(--dry-transfer-padding, var(--dry-space-3));
@@ -185,12 +180,6 @@
 		background: var(--dry-color-bg-sunken);
 		color: var(--dry-color-text-disabled);
 		cursor: not-allowed;
-	}
-
-	[data-part='list'] [data-transfer-item] input[type='checkbox'] {
-		accent-color: var(--dry-color-fill-selected);
-		height: 16px;
-		cursor: inherit;
 	}
 
 	[data-part='filter'] {

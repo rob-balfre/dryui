@@ -336,7 +336,156 @@
 </RichTextEditorPrimitive.Toolbar>
 
 <style>
+	[data-part='toolbar'] {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
+		align-items: center;
+		gap: var(--dry-space-1);
+		padding: var(--dry-space-1) var(--dry-space-2);
+		background: var(--dry-rte-toolbar-bg);
+		border-bottom: 1px solid var(--dry-rte-border);
+	}
+
+	[data-part='toolbarGroup'] {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-0_5);
+	}
+
+	[data-part='separator'] {
+		height: var(--dry-space-5);
+		border-inline-start: 1px solid var(--dry-rte-border);
+		margin: 0 var(--dry-space-1);
+	}
+
+	[data-part='button'] {
+		display: inline-grid;
+		place-items: center;
+		height: var(--dry-rte-button-size);
+		aspect-ratio: 1;
+		padding: 0;
+		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
+		font-family: var(--dry-font-sans);
+		font-weight: 600;
+		color: var(--dry-color-text-strong);
+		background: transparent;
+		border: none;
+		border-radius: var(--dry-radius-md);
+		cursor: pointer;
+		transition:
+			background var(--dry-duration-fast) var(--dry-ease-default),
+			color var(--dry-duration-fast) var(--dry-ease-default);
+		line-height: 1;
+	}
+
+	[data-part='button']:hover {
+		background: var(--dry-color-bg-raised);
+	}
+
+	[data-part='button']:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: -2px;
+	}
+
+	[data-part='button'][data-active='true'] {
+		background: var(--dry-color-fill-brand);
+		color: var(--dry-color-on-brand);
+	}
+
+	[data-part='button'][data-active='true']:hover {
+		background: var(--dry-color-fill-brand-hover);
+	}
+
+	[data-part='buttonItalic'] {
+		font-style: italic;
+	}
+
+	[data-part='buttonUnderline'] {
+		text-decoration: underline;
+	}
+
+	[data-part='buttonStrikethrough'] {
+		text-decoration: line-through;
+	}
+
 	.toolbarGroupRelative {
 		position: relative;
+	}
+
+	/* Link input popover */
+	[data-part='linkPopover'] {
+		display: grid;
+		grid-template-columns: minmax(12rem, max-content) max-content max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding: var(--dry-space-2);
+		background: var(--dry-color-bg-overlay);
+		border: 1px solid var(--dry-rte-border);
+		border-radius: var(--dry-radius-md);
+		box-shadow: var(--dry-shadow-md);
+		position: absolute;
+		z-index: var(--dry-rte-popover-z-index);
+	}
+
+	[data-part='linkInput'] {
+		font-family: var(--dry-font-sans);
+		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
+		padding: var(--dry-space-1) var(--dry-space-2);
+		border: 1px solid var(--dry-rte-border);
+		border-radius: var(--dry-radius-sm);
+		outline: none;
+		background: var(--dry-rte-content-bg);
+		color: var(--dry-color-text-strong);
+	}
+
+	[data-part='linkInput']:focus {
+		border-color: var(--dry-color-focus-ring);
+		box-shadow: 0 0 0 1px var(--dry-color-focus-ring);
+	}
+
+	[data-part='linkApply'] {
+		display: inline-grid;
+		place-items: center;
+		padding: var(--dry-space-1) var(--dry-space-2);
+		font-family: var(--dry-font-sans);
+		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
+		background: var(--dry-color-fill-brand);
+		color: var(--dry-color-on-brand);
+		border: none;
+		border-radius: var(--dry-radius-sm);
+		cursor: pointer;
+	}
+
+	[data-part='linkApply']:hover {
+		opacity: 0.9;
+	}
+
+	[data-part='linkApply']:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: 2px;
+	}
+
+	[data-part='linkCancel'] {
+		display: inline-grid;
+		place-items: center;
+		padding: var(--dry-space-1) var(--dry-space-2);
+		font-family: var(--dry-font-sans);
+		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
+		background: transparent;
+		color: var(--dry-color-text-weak);
+		border: 1px solid var(--dry-rte-border);
+		border-radius: var(--dry-radius-sm);
+		cursor: pointer;
+	}
+
+	[data-part='linkCancel']:hover {
+		color: var(--dry-color-text-strong);
+	}
+
+	[data-part='linkCancel']:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: 2px;
 	}
 </style>

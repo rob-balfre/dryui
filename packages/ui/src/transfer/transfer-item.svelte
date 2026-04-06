@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getTransferCtx } from './context.svelte.js';
+	import { Checkbox } from '../checkbox/index.js';
 
 	interface Props extends HTMLAttributes<HTMLLabelElement> {
 		key: string;
@@ -32,6 +33,6 @@
 	aria-disabled={disabled}
 	{...rest}
 >
-	<input type="checkbox" checked={isSelected} {disabled} onchange={toggle} />
+	<Checkbox checked={isSelected} {disabled} onchange={toggle} size="sm" />
 	{@render children()}
 </label>

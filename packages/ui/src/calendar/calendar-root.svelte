@@ -132,7 +132,7 @@
 		--dry-calendar-today-color: var(--dry-color-fill-brand);
 		--dry-calendar-outside-color: var(--dry-color-text-weak);
 
-		display: grid;
+		display: inline-grid;
 		box-sizing: border-box;
 		padding: var(--dry-calendar-padding);
 		background: var(--dry-calendar-bg);

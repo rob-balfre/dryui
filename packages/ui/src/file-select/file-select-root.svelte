@@ -71,9 +71,10 @@
 	});
 </script>
 
-{@render children()}
+<div data-file-select data-disabled={disabled || undefined}>
+	{@render children()}
+</div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-file-select] {
 		container-type: inline-size;

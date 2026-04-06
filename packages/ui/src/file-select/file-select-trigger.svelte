@@ -16,8 +16,10 @@
 	type="button"
 	onclick={ctx.request}
 	disabled={ctx.disabled || ctx.loading || undefined}
+	data-fs-trigger
 	data-loading={ctx.loading || undefined}
 	data-disabled={ctx.disabled || undefined}
+	data-size={size}
 	{...rest}
 	class={className}
 >

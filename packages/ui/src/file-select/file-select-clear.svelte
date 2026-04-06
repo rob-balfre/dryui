@@ -18,6 +18,7 @@
 		type="button"
 		onclick={ctx.clear}
 		aria-label="Clear selection"
+		data-fs-clear
 		data-disabled={ctx.disabled || undefined}
 		{...rest}
 	>

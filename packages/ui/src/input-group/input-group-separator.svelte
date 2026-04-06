@@ -19,3 +19,10 @@
 	data-input-group-separator
 	class={className}
 ></span>
+
+<style>
+	[data-input-group-separator] {
+		align-self: stretch;
+		border-inline-start: 1px solid var(--dry-input-group-separator);
+	}
+</style>

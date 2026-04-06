@@ -1,12 +1,14 @@
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { getFormControlCtx } from '@dryui/primitives';
 
-	interface Props extends Omit<HTMLInputAttributes, 'size'> {
+	interface Props extends Omit<HTMLInputAttributes, 'size' | 'children'> {
 		checked?: boolean;
 		indeterminate?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		disabled?: boolean;
+		children?: Snippet | undefined;
 	}
 
 	let {
@@ -14,6 +16,7 @@
 		indeterminate = false,
 		size = 'md',
 		disabled = false,
+		children,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -32,26 +35,77 @@
 	});
 </script>
 
-<span class="wrapper">
-	<input
-		bind:this={inputEl}
-		type="checkbox"
-		bind:checked
-		id={ctx?.id}
-		disabled={isDisabled}
-		required={ctx?.required || undefined}
-		aria-describedby={ctx?.describedBy}
-		aria-invalid={ctx?.hasError || undefined}
-		aria-errormessage={ctx?.errorMessageId}
+{#if children}
+	<label
+		class="checkbox-label"
 		data-disabled={isDisabled || undefined}
-		data-state={dataState}
 		data-size={size}
-		class={className}
-		{...rest}
-	/>
-</span>
+	>
+		<span class="wrapper">
+			<input
+				bind:this={inputEl}
+				type="checkbox"
+				bind:checked
+				id={ctx?.id}
+				disabled={isDisabled}
+				required={ctx?.required || undefined}
+				aria-describedby={ctx?.describedBy}
+				aria-invalid={ctx?.hasError || undefined}
+				aria-errormessage={ctx?.errorMessageId}
+				data-disabled={isDisabled || undefined}
+				data-state={dataState}
+				data-size={size}
+				class={className}
+				{...rest}
+			/>
+		</span>
+		<span class="checkbox-text">{@render children()}</span>
+	</label>
+{:else}
+	<span class="wrapper">
+		<input
+			bind:this={inputEl}
+			type="checkbox"
+			bind:checked
+			id={ctx?.id}
+			disabled={isDisabled}
+			required={ctx?.required || undefined}
+			aria-describedby={ctx?.describedBy}
+			aria-invalid={ctx?.hasError || undefined}
+			aria-errormessage={ctx?.errorMessageId}
+			data-disabled={isDisabled || undefined}
+			data-state={dataState}
+			data-size={size}
+			class={className}
+			{...rest}
+		/>
+	</span>
+{/if}
 
 <style>
+	.checkbox-label {
+		display: grid;
+		grid-template-columns: max-content 1fr;
+		align-items: center;
+		gap: var(--dry-space-3);
+		cursor: pointer;
+	}
+
+	.checkbox-label[data-disabled] {
+		cursor: not-allowed;
+	}
+
+	.checkbox-text {
+		font-size: var(--dry-text-sm-size);
+		line-height: var(--dry-text-sm-line);
+		color: var(--dry-color-text-strong);
+		user-select: none;
+	}
+
+	.checkbox-label[data-disabled] .checkbox-text {
+		color: var(--dry-color-text-disabled);
+	}
+
 	.wrapper {
 		display: inline-grid;
 		grid-template-columns: minmax(48px, max-content);

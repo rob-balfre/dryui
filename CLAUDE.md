@@ -166,8 +166,8 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 - **`data-*` attributes for variants** — use `data-variant`, `data-size`, `data-color` etc. instead of CSS module class selection
 - **Svelte custom properties for consumer overrides** — expose `--dry-*` CSS vars that consumers can pass as component props (`<Button --dry-btn-bg="red" />`)
 - **UI components render elements directly** — import only context/utility functions from `@dryui/primitives`, never primitive components
-- **No `width: 100%`** — grid children stretch to fill their cell by default; `width: 100%` is redundant and causes overflow when padding/borders are present. Fix the grid track or alignment instead
-- **Enforced by `@dryui/lint`** — a Svelte preprocessor runs on every `.svelte` file during dev and build, warns on violations. Load the `dryui-css` skill for full rules
+- **No `width`/`inline-size` properties** — do not use `width`, `min-width`, `max-width`, `inline-size`, or their min/max variants in scoped styles. Grid children are sized by their track; use `grid-template-columns`/`grid-template-rows` instead. Enforced by `@dryui/lint` (`dryui/no-width`) — build will fail on violations
+- **Enforced by `@dryui/lint`** — a Svelte preprocessor runs on every `.svelte` file during dev and build, **errors break the build**. Always run `bun run --filter '@dryui/ui' build` to verify before claiming a fix. Load the `dryui-css` skill for full rules
 
 ## Gotchas
 

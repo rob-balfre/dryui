@@ -69,7 +69,7 @@
 		--dry-option-swatch-muted: var(--dry-color-text-weak);
 
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
+		grid-template-columns: 1.5rem minmax(0, 1fr);
 		align-items: center;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-3);

@@ -172,6 +172,7 @@
 
 		container-type: inline-size;
 		display: grid;
+		grid-template-columns: var(--dry-color-picker-area-width);
 		gap: var(--dry-space-3);
 	}
 

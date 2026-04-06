@@ -279,8 +279,7 @@
 	[data-country-select-wrapper] [data-part='trigger'] {
 		all: unset;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: var(--dry-space-2, 0.5rem);
 		padding: var(--dry-space-2, 0.5rem) var(--dry-space-3, 0.75rem);
@@ -309,7 +308,6 @@
 
 	[data-country-select-wrapper] [data-part='dial-code'] {
 		color: var(--dry-color-text-weak, #64748b);
-		margin-left: auto;
 	}
 
 	[data-country-select-wrapper] [data-part='placeholder'] {
@@ -322,6 +320,7 @@
 		left: 0;
 		right: 0;
 		z-index: 50;
+		display: grid;
 		margin-top: var(--dry-space-1, 0.25rem);
 		background: var(--dry-color-bg-raised, #ffffff);
 		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
@@ -343,8 +342,7 @@
 	[data-country-select-wrapper] [data-part='option'] {
 		all: unset;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: var(--dry-space-2, 0.5rem);
 		padding: var(--dry-space-2, 0.5rem) var(--dry-space-3, 0.75rem);

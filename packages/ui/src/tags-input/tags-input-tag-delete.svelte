@@ -35,7 +35,7 @@
 	[data-part='tagDelete'] {
 		display: inline-grid;
 		place-items: center;
-		height: 16px;
+		height: var(--dry-space-4);
 		aspect-ratio: 1;
 		padding: 0;
 		border: none;
@@ -50,7 +50,7 @@
 
 		&::after {
 			content: '\00d7';
-			font-size: 14px;
+			font-size: 1em;
 			line-height: 1;
 			font-weight: 400;
 		}

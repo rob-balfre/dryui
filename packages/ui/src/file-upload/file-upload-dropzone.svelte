@@ -58,6 +58,8 @@
 <div
 	role="button"
 	tabindex={ctx.disabled ? undefined : 0}
+	data-fu-dropzone
+	data-size={size}
 	data-dragging={ctx.isDragging || undefined}
 	data-disabled={ctx.disabled || undefined}
 	class={className}

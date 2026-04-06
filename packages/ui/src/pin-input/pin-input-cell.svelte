@@ -48,7 +48,6 @@
 <style>
 	[data-pin-input-cell] {
 		display: grid;
-		grid-template-columns: 1px;
 		place-items: center;
 		aspect-ratio: 1;
 		height: var(--dry-pin-size);
@@ -96,7 +95,7 @@
 
 	[data-pin-input-caret] {
 		height: 60%;
-		background: var(--dry-pin-caret-color);
+		border-inline-start: 2px solid var(--dry-pin-caret-color);
 		animation: caret-blink 1.25s ease-out infinite;
 	}
 

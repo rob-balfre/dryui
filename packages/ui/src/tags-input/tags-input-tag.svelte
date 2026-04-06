@@ -35,7 +35,7 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
-		padding: 4px var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
+		padding: var(--dry-space-1) var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent);
 		color: var(--dry-color-fill-brand);
 		border-radius: var(--dry-radius-full);
