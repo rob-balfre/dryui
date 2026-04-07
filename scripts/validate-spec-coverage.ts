@@ -4,8 +4,10 @@
  * Checks that every UI component directory is:
  *   1. Registered in COMPONENT_META (packages/mcp/src/generate-spec.ts)
  *   2. Exported from the public barrel (packages/ui/src/index.ts)
+ *   3. If compound, listed in the SKILL.md compound component list
  *
- * Also flags entries in COMPONENT_META that have no matching directory.
+ * Also flags entries in COMPONENT_META that have no matching directory,
+ * and compound components in SKILL.md that don't exist in spec.json.
  *
  * Usage:  bun run scripts/validate-spec-coverage.ts
  * Exit 0 = all clean, Exit 1 = mismatches found.
@@ -21,6 +23,8 @@ const repoRoot = resolve(import.meta.dir, '..');
 const uiSrcDir = resolve(repoRoot, 'packages/ui/src');
 const generateSpecPath = resolve(repoRoot, 'packages/mcp/src/generate-spec.ts');
 const indexPath = resolve(repoRoot, 'packages/ui/src/index.ts');
+const specJsonPath = resolve(repoRoot, 'packages/mcp/src/spec.json');
+const skillMdPath = resolve(repoRoot, 'packages/ui/skills/dryui/SKILL.md');
 
 // Directories that live in packages/ui/src/ but are not components.
 const IGNORED_DIRS = new Set(['themes', 'internal', 'utils']);
@@ -148,13 +152,48 @@ function sorted(s: Set<string>): string[] {
 }
 
 // ---------------------------------------------------------------------------
+// 4. Extract compound component names from spec.json
+// ---------------------------------------------------------------------------
+
+async function getSpecCompounds(): Promise<Set<string>> {
+	const spec = JSON.parse(await Bun.file(specJsonPath).text());
+	const names = new Set<string>();
+	for (const [name, def] of Object.entries(spec.components as Record<string, { compound?: boolean }>)) {
+		if (def.compound) names.add(name);
+	}
+	return names;
+}
+
+// ---------------------------------------------------------------------------
+// 5. Extract compound component names from SKILL.md
+//
+//    The line looks like:
+//      Compound components include Accordion, Alert, ... and Transfer.
+// ---------------------------------------------------------------------------
+
+async function getSkillCompounds(): Promise<Set<string>> {
+	const src = await Bun.file(skillMdPath).text();
+	const match = src.match(/Compound components include ([^.]+)\./);
+	if (!match) return new Set();
+	return new Set(
+		match[1]
+			.replace(/ and /g, ', ')
+			.split(',')
+			.map((s) => s.trim())
+			.filter(Boolean)
+	);
+}
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
-const [componentDirs, metaNames, exportedDirs] = await Promise.all([
+const [componentDirs, metaNames, exportedDirs, specCompounds, skillCompounds] = await Promise.all([
 	getComponentDirs(),
 	getMetaComponents(),
-	getExportedDirs()
+	getExportedDirs(),
+	getSpecCompounds(),
+	getSkillCompounds()
 ]);
 
 // Build a kebab-case set from COMPONENT_META PascalCase names
@@ -216,6 +255,40 @@ if (missingDir.size > 0) {
 	);
 }
 
+// --- Compound components in spec.json but NOT in SKILL.md ---
+const missingFromSkill = new Set<string>();
+for (const name of specCompounds) {
+	if (!skillCompounds.has(name)) {
+		missingFromSkill.add(name);
+	}
+}
+if (missingFromSkill.size > 0) {
+	errors.push(
+		`Compound components in spec.json but MISSING from the SKILL.md compound list:\n` +
+			sorted(missingFromSkill)
+				.map((n) => `  - ${n}`)
+				.join('\n') +
+			`\n  Update the "Compound components include ..." sentence in packages/ui/skills/dryui/SKILL.md`
+	);
+}
+
+// --- Compound components in SKILL.md but NOT in spec.json ---
+const ghostInSkill = new Set<string>();
+for (const name of skillCompounds) {
+	if (!specCompounds.has(name)) {
+		ghostInSkill.add(name);
+	}
+}
+if (ghostInSkill.size > 0) {
+	errors.push(
+		`Components listed as compound in SKILL.md but NOT compound (or missing) in spec.json:\n` +
+			sorted(ghostInSkill)
+				.map((n) => `  - ${n}`)
+				.join('\n') +
+			`\n  Remove from the "Compound components include ..." sentence in packages/ui/skills/dryui/SKILL.md`
+	);
+}
+
 // ---------------------------------------------------------------------------
 // Report
 // ---------------------------------------------------------------------------
@@ -227,13 +300,13 @@ if (errors.length > 0) {
 		console.error('');
 	}
 	console.error(
-		'Fix the issues above so every component is registered in COMPONENT_META and exported from index.ts.\n'
+		'Fix the issues above so every component is registered in COMPONENT_META, exported from index.ts, and compound components are listed in SKILL.md.\n'
 	);
 	process.exit(1);
 } else {
 	const count = componentDirs.size;
 	console.log(
-		`Spec coverage OK — ${count} component directories, all registered in COMPONENT_META and exported from index.ts.`
+		`Spec coverage OK — ${count} component directories, all registered in COMPONENT_META, exported from index.ts. ${specCompounds.size} compound components match SKILL.md.`
 	);
 	process.exit(0);
 }

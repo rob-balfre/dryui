@@ -65,7 +65,7 @@ The output should show `"status": "ready"`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Card, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, and Transfer. See `rules/compound-components.md` for parts lists.
+Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionSwatchGroup, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree, and Typography. See `rules/compound-components.md` for parts lists.
 
 ### Rule 2: Always import a theme
 

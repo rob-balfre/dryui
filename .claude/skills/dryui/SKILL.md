@@ -65,7 +65,7 @@ The output should show `"status": "ready"`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Card, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, and Transfer. See `rules/compound-components.md` for parts lists.
+Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionSwatchGroup, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree, and Typography. See `rules/compound-components.md` for parts lists.
 
 ### Rule 2: Always import a theme
 
@@ -108,17 +108,20 @@ Bindable props vary by component:
 
 Select and Combobox support both `bind:value` and `bind:open`. ColorPicker also exposes `bind:alpha`. Transfer uses `bind:sourceItems` and `bind:targetItems`.
 
-### Rule 4: Use layout components instead of manual CSS
+### Rule 4: Use CSS grid for layout, Container for width
 
 ```svelte
 <!-- Incorrect -->
 <div style="display: flex; gap: 1rem;">...</div>
 
-<!-- Correct -->
-<Flex gap="md">...</Flex>
+<!-- Correct — raw CSS grid in scoped <style> -->
+<div class="layout">...</div>
+<style>
+  .layout { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
-Layout components: Stack, Flex, Grid, Container, Spacer. See `rules/composition.md`.
+Use `display: grid` with `--dry-space-*` tokens for layout. Use `Container` for constrained content width. Use `@container` queries for responsive sizing — never `@media` for layout breakpoints. Do not use inline styles.
 
 ### Rule 5: Wrap form inputs in Field.Root
 
