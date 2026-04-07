@@ -18,9 +18,29 @@ Key facts:
 
 ## Quick Start (new SvelteKit project)
 
-1. `bun add @dryui/ui`
-2. Add `class="theme-auto"` to `<html>` in `src/app.html`
-3. In your root layout (`src/routes/+layout.svelte`):
+Run the install planner — it detects the project and returns a tailored
+step-by-step plan:
+
+```
+npx -y @dryui/cli install --json
+```
+
+Execute each `"pending"` step in the returned JSON (install package, edit/create
+files). Then verify:
+
+```
+npx -y @dryui/cli detect --json
+```
+
+The output should show `"status": "ready"`.
+
+### Manual setup (if you prefer)
+
+1. `bun add @dryui/ui` (or npm/pnpm/yarn equivalent)
+2. In `src/app.html`, add `class="theme-auto"` to the `<html>` tag (preserving
+   existing attributes like `lang="en"`)
+3. In your root layout (`src/routes/+layout.svelte`), add theme imports to the
+   existing `<script>` block — do not create a second `<script>`:
    ```svelte
    <script>
    	import '@dryui/ui/themes/default.css';
@@ -28,7 +48,7 @@ Key facts:
    </script>
    ```
 4. Import `app.css` AFTER theme CSS if you have custom styles
-5. (Optional) Override semantic tokens in `app.css` — use the layered token system documented in `rules/theming.md` rather than the old 18-token list. Start with the current surface, text, stroke, fill, and brand tokens such as `--dry-color-bg-base`, `--dry-color-bg-raised`, `--dry-color-text-strong`, `--dry-color-text-weak`, `--dry-color-fill-brand`, `--dry-color-fill`, `--dry-color-stroke-weak`, and their `on-*` / state variants.
+5. (Optional) Override semantic tokens in `app.css` — use the layered token system documented in `rules/theming.md`
 
 > **Local dev:** If `@dryui/ui` is not on npm, link from the monorepo:
 > `cd /path/to/dryui/packages/ui && bun link && cd /your/project && bun link @dryui/ui`

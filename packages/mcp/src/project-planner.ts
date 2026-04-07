@@ -203,12 +203,23 @@ function installCommand(packageManager: DryuiPackageManager): string {
 	}
 }
 
+function buildThemeImportLines(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
+	return `  import '${spec.themeImports.default}';\n  import '${spec.themeImports.dark}';`;
+}
+
 function buildThemeImportSnippet(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
+	return ['<script>', buildThemeImportLines(spec), '</script>'].join('\n');
+}
+
+function buildRootLayoutSnippet(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
 	return [
-		'<script lang="ts">',
-		`  import '${spec.themeImports.default}';`,
-		`  import '${spec.themeImports.dark}';`,
-		'</script>'
+		'<script>',
+		buildThemeImportLines(spec),
+		'',
+		'  let { children } = $props();',
+		'</script>',
+		'',
+		'{@render children()}'
 	].join('\n');
 }
 
@@ -343,7 +354,8 @@ export function planInstall(spec: ProjectPlannerSpec, inputPath?: string): Insta
 				kind: 'edit-file',
 				status: 'pending',
 				title: 'Add theme imports to app.css',
-				description: 'Ensure the app-level stylesheet imports both default and dark DryUI themes.',
+				description:
+					'Prepend the two @import lines from the snippet to the TOP of the existing src/app.css file, before any other CSS rules. Do not create a second file.',
 				path: detection.files.appCss,
 				snippet: buildThemeImportCssSnippet(spec)
 			});
@@ -353,16 +365,18 @@ export function planInstall(spec: ProjectPlannerSpec, inputPath?: string): Insta
 				kind: 'create-file',
 				status: 'pending',
 				title: 'Create root layout with theme imports',
-				description: 'Create src/routes/+layout.svelte and add the required DryUI theme imports.',
+				description:
+					'Create the file at the path below with the snippet as its full content. The file must include {@render children()} or pages will not render.',
 				...(path ? { path } : {}),
-				snippet: buildThemeImportSnippet(spec)
+				snippet: buildRootLayoutSnippet(spec)
 			});
 		} else {
 			steps.push({
 				kind: 'edit-file',
 				status: 'pending',
 				title: 'Add theme imports to the root layout',
-				description: 'Ensure the root layout imports both default and dark DryUI themes.',
+				description:
+					'Add the two import lines from the snippet into the EXISTING <script> block in this file. Do not create a second <script> block. If no <script> block exists, add one at the top of the file.',
 				path: detection.files.rootLayout,
 				snippet: buildThemeImportSnippet(spec)
 			});
@@ -381,9 +395,10 @@ export function planInstall(spec: ProjectPlannerSpec, inputPath?: string): Insta
 			kind: 'edit-file',
 			status: 'pending',
 			title: 'Set html theme mode to auto',
-			description: 'Add class="theme-auto" to the html element in src/app.html.',
+			description:
+				'In src/app.html, find the opening <html> tag (e.g. <html lang="en">) and add class="theme-auto" to it, preserving any existing attributes. Result should be like <html lang="en" class="theme-auto">. Do NOT add a second <html> element.',
 			path: detection.files.appHtml,
-			snippet: '<html class="theme-auto">'
+			snippet: '<html lang="en" class="theme-auto">'
 		});
 	}
 

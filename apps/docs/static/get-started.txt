@@ -6,33 +6,65 @@ and execute a tailored install plan.
 ## Step 1 — Run the install planner
 
 ```
-npx @dryui/cli install --json
+npx -y @dryui/cli install --json
 ```
 
-This detects the project's framework, package manager, theme state, and returns
-a JSON install plan. The response is an object with:
+The command prints a single JSON object to stdout and exits. If the exit code
+is non-zero, an error message is printed to stderr.
 
-- `detection` — project info (framework, packageManager, files, dependencies, theme state)
+The JSON has two top-level fields:
+
+- `detection` — project info (framework, packageManager, files, dependencies,
+  theme state)
 - `steps` — ordered array of actions to execute
 
 Each step has:
+
 - `kind`: `"install-package"` | `"edit-file"` | `"create-file"` | `"note"` | `"blocked"`
-- `status`: `"pending"` | `"done"` | `"blocked"`
+- `status`: `"pending"` | `"done"` | `"info"` | `"blocked"`
 - `title` and `description`
-- `command` (for install-package steps) — run this shell command
-- `path` and `snippet` (for edit-file / create-file steps) — apply the snippet to the file
+- `command` (for install-package steps) — the shell command to run
+- `path` and `snippet` (for edit-file / create-file steps)
 
 Execute each `"pending"` step in order:
-- `install-package` → run the `command` (e.g. `npm install @dryui/ui`)
-- `create-file` → create the file at `path` with the `snippet` as content
-- `edit-file` → add or merge the `snippet` into the existing file at `path`
-- `note` / `blocked` → read the `description` for guidance
+
+- `install-package` → Run the shell command in the `command` field from the
+  project root directory.
+
+- `create-file` → Create the file at `path` with the `snippet` as its full
+  content. Create any intermediate directories if they don't exist.
+
+- `edit-file` → Modify the existing file at `path` according to the
+  `description`. The `snippet` shows the content to add or the target state.
+  Read the `description` carefully — it specifies WHERE and HOW to apply the
+  snippet (e.g., "prepend to the top" or "add to the existing <script> block").
+  Do NOT blindly append or create duplicate elements.
+
+- `note` / `info` → Read the `description` for guidance. No file changes needed.
+
+- `blocked` → The step cannot proceed. Read the `description` to understand why
+  and resolve the blocker before continuing.
 
 If all steps have `status: "done"`, the project is already set up.
 
-## Step 2 — Set up the MCP server (recommended)
+## Step 2 — Verify the setup
 
-Add the DryUI MCP server to the project's `.mcp.json`:
+After executing all steps, confirm the setup succeeded:
+
+```
+npx -y @dryui/cli detect --json
+```
+
+The output should show `"status": "ready"`. If it shows `"partial"`, review
+the `theme` and `dependencies` fields to identify what is still missing and
+re-run Step 1.
+
+## Step 3 — Set up the MCP server (recommended)
+
+The DryUI MCP server provides tools for component lookup, composition guidance,
+code review, theme diagnosis, and workspace health checks.
+
+### Claude Code or generic MCP client (`.mcp.json` in project root)
 
 ```json
 {
@@ -46,18 +78,77 @@ Add the DryUI MCP server to the project's `.mcp.json`:
 }
 ```
 
-This gives you tools for component lookup, composition guidance, code review,
-theme diagnosis, and workspace health checks.
+### Cursor (`.cursor/mcp.json`)
 
-## Step 3 — Use components
+```json
+{
+  "mcpServers": {
+    "dryui": {
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    }
+  }
+}
+```
+
+### VS Code Copilot (`settings.json`)
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "dryui": {
+        "command": "npx",
+        "args": ["-y", "@dryui/mcp"]
+      }
+    }
+  }
+}
+```
+
+### Codex (`.codex/config.toml`)
+
+```toml
+[mcp_servers.dryui]
+command = "npx"
+args = ["-y", "@dryui/mcp"]
+```
+
+If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
+
+## Step 4 — Use components
 
 ```svelte
 <script>
   import { Button } from '@dryui/ui';
 </script>
 
-<Button>Click me</Button>
+<Button variant="solid">Click me</Button>
 ```
+
+Before building any UI, look up the component API first:
+
+```
+npx -y @dryui/cli info Button
+npx -y @dryui/cli compose "login form"
+```
+
+## CLI tools (when MCP is not available)
+
+If MCP is not available in your environment, use the CLI directly:
+
+```
+npx -y @dryui/cli info <component>      # Full API reference for a component
+npx -y @dryui/cli list                   # All available components
+npx -y @dryui/cli compose "query"        # Composition guidance for a UI task
+npx -y @dryui/cli add --project <name>   # Project-aware component adoption plan
+npx -y @dryui/cli review <file.svelte>   # Validate a Svelte file for spec compliance
+npx -y @dryui/cli doctor                 # Workspace health check
+```
+
+Always look up a component with `info` before using it for the first time.
+Compound components (Card, Field, Accordion, etc.) require `.Root` syntax —
+e.g. `<Card.Root>` not `<Card>`.
 
 ## Full API reference
 

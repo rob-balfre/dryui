@@ -1,5 +1,15 @@
 # @dryui/primitives
 
+## 0.1.5
+
+### Patch Changes
+
+- fix: republish with correct exports (publishConfig swap was missing in v0.1.4)
+
+  The previous publish shipped package.json exports pointing to ./src/ instead of ./dist/,
+  causing Vite 7+ to fail with "Failed to resolve entry for package". This republish
+  ensures the publishConfig.exports swap is applied correctly.
+
 ## 0.1.4
 
 ### Patch Changes

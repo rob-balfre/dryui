@@ -1,6 +1,6 @@
 {
   "name": "@dryui/ui",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -1502,7 +1502,7 @@
     "thumbnail:create": "bun scripts/create-thumbnail.ts"
   },
   "dependencies": {
-    "@dryui/primitives": "^0.1.4"
+    "@dryui/primitives": "^0.1.5"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"

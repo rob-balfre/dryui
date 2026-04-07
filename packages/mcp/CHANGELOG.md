@@ -1,5 +1,15 @@
 # @dryui/mcp
 
+## 0.1.3
+
+### Patch Changes
+
+- fix(mcp): improve install plan snippets for LLM reliability
+  - Root layout create-file step now includes `{@render children()}` so pages render
+  - Edit-file descriptions are prescriptive: specify where to insert and how to merge
+  - app.html snippet includes example with preserved lang attribute
+  - Theme import snippet tells LLMs to add to existing `<script>` block, not create a duplicate
+
 ## 0.1.2
 
 ### Patch Changes

@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "0.1.4"
+    "version": "0.1.5"
   },
   "counts": {
     "components": 144,
@@ -22341,7 +22341,7 @@
       },
       "simple-content-page": {
         "name": "simple-content-page",
-        "description": "Clean content page with constrained width and vertical rhythm. Use Container for max-width and Stack for vertical spacing. Suitable for blog posts, documentation, settings pages.",
+        "description": "Clean content page with constrained width and vertical rhythm. Use Container for max-width and CSS grid for vertical spacing. Suitable for blog posts, documentation, settings pages.",
         "tags": [
           "page",
           "content",
