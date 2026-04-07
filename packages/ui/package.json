@@ -748,8 +748,8 @@
     },
     "./*/*": null,
     "./internal/*": null,
-    "./themes/dark.css": "./src/themes/dark.css",
-    "./themes/default.css": "./src/themes/default.css"
+    "./themes/dark.css": "./dist/themes/dark.css",
+    "./themes/default.css": "./dist/themes/default.css"
   },
   "publishConfig": {
     "access": "public",
