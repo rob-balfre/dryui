@@ -98,7 +98,6 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-radio-group-root] {
 		display: grid;

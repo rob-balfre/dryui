@@ -88,7 +88,6 @@
 	</Container>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.page {
 		--home-panel-bg: color-mix(in srgb, var(--dry-color-bg-raised) 84%, transparent);

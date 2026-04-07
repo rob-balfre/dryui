@@ -8,6 +8,7 @@ Instructions for all AI coding agents working in this repository.
 - **No `display: flex`** — use `display: grid` for all layout.
 - **No inline styles** — no `style="..."` or `style:` directives.
 - **No `!important`**, no `:global()`, no CSS modules.
+- **No `<!-- svelte-ignore css_unused_selector -->`** — fix the root cause instead. Ensure DOM elements are rendered directly in the component that styles them.
 
 ## Verification
 

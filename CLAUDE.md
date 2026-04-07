@@ -167,6 +167,7 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 - **Svelte custom properties for consumer overrides** — expose `--dry-*` CSS vars that consumers can pass as component props (`<Button --dry-btn-bg="red" />`)
 - **UI components render elements directly** — import only context/utility functions from `@dryui/primitives`, never primitive components
 - **No `width`/`inline-size` properties** — do not use `width`, `min-width`, `max-width`, `inline-size`, or their min/max variants in scoped styles. Grid children are sized by their track; use `grid-template-columns`/`grid-template-rows` instead. Enforced by `@dryui/lint` (`dryui/no-width`) — build will fail on violations
+- **Never use `<!-- svelte-ignore css_unused_selector -->`** — this suppresses real bugs where scoped styles can't reach their targets. Fix the root cause: ensure the DOM element is rendered directly in the same component as the `<style>` block, not delegated to a child/primitives component
 - **Enforced by `@dryui/lint`** — a Svelte preprocessor runs on every `.svelte` file during dev and build, **errors break the build**. Always run `bun run --filter '@dryui/ui' build` to verify before claiming a fix. Load the `dryui-css` skill for full rules
 
 ## Gotchas

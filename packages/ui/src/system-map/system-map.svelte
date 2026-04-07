@@ -674,7 +674,6 @@
 	{/if}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-system-map] {
 		--dry-system-map-bg: var(--dry-color-bg-raised);

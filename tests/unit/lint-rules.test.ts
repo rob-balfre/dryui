@@ -129,6 +129,48 @@ describe('checkMarkup', () => {
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(0);
 	});
+
+	test('flags svelte-ignore css_unused_selector comment', () => {
+		const code = `<!-- svelte-ignore css_unused_selector -->
+<style>
+  .foo { color: red; }
+</style>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-css-ignore');
+		expect(violations[0]!.line).toBe(1);
+	});
+
+	test('flags svelte-ignore css_unused_selector with extra whitespace', () => {
+		const violations = checkMarkup('<!--  svelte-ignore  css_unused_selector  -->');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-css-ignore');
+	});
+
+	test('flags multiple svelte-ignore css_unused_selector comments', () => {
+		const code = `<!-- svelte-ignore css_unused_selector -->
+<div>content</div>
+<!-- svelte-ignore css_unused_selector -->`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(2);
+		expect(violations[0]!.rule).toBe('dryui/no-css-ignore');
+		expect(violations[1]!.rule).toBe('dryui/no-css-ignore');
+	});
+
+	test('does not flag other svelte-ignore comments', () => {
+		const violations = checkMarkup('<!-- svelte-ignore a11y-click-events-have-key-events -->');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag svelte-ignore css_unused_selector inside script block', () => {
+		const code = `<script>
+  // <!-- svelte-ignore css_unused_selector -->
+  const x = '<!-- svelte-ignore css_unused_selector -->';
+</script>
+<div>clean</div>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
 });
 
 describe('checkStyle', () => {

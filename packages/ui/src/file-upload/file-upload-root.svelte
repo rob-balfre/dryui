@@ -134,7 +134,6 @@
 
 {@render children()}
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.file-upload-hidden-input {
 		display: none;

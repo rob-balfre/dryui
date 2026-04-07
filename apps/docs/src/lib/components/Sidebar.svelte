@@ -60,8 +60,13 @@
 </script>
 
 <div class="docs-sidebar">
-	<Sidebar.Root aria-label="Main navigation">
-		<Sidebar.Content>
+	<Sidebar.Root
+		aria-label="Main navigation"
+		--dry-sidebar-radius="0"
+		--dry-sidebar-shadow="none"
+		--dry-sidebar-width="100%"
+	>
+		<Sidebar.Content --dry-sidebar-content-scrollbar-gutter="stable">
 			<div {@attach scrollActiveItem(currentPath)} class="scroll-root">
 				<Sidebar.Group>
 					{#each staticLinks as link (link.href)}
@@ -107,8 +112,6 @@
 <style>
 	.docs-sidebar {
 		height: 100%;
-		--dry-sidebar-radius: 0;
-		--dry-sidebar-shadow: none;
 	}
 
 	.scroll-root {

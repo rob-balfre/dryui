@@ -248,9 +248,4 @@
 	.stat-card-trend[data-direction='down'] {
 		color: var(--dry-color-text-error);
 	}
-
-	.stat-card-trend[data-direction='neutral'] {
-		color: var(--dry-color-text-weak);
-	}
-
 </style>

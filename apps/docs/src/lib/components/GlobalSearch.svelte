@@ -74,7 +74,6 @@
 	</CommandPalette.Root>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.search-trigger {
 		container-type: inline-size;

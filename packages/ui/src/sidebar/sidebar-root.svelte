@@ -55,7 +55,7 @@
 		grid-template-columns: var(--dry-sidebar-width, 320px);
 		grid-template-rows: auto 1fr auto;
 		height: 100%;
-		overflow: hidden;
+		overflow: var(--dry-sidebar-overflow, hidden);
 		background: var(--dry-sidebar-bg, var(--dry-chrome-bg, var(--dry-color-bg-raised)));
 		font-family: var(--dry-font-sans);
 	}

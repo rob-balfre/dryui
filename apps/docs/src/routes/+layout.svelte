@@ -178,6 +178,7 @@
 	}
 
 	.docs-shell {
+		--docs-sidebar-width: 16rem;
 		display: grid;
 		grid-template-areas: 'header' 'nav' 'content';
 		grid-template-columns: minmax(0, 1fr);
@@ -238,7 +239,7 @@
 	.docs-nav {
 		grid-area: nav;
 		display: none;
-		overflow-y: auto;
+		overflow: hidden;
 		position: sticky;
 		top: 0;
 		height: 100dvh;
@@ -274,14 +275,15 @@
 
 		.docs-shell {
 			grid-template-areas: 'header header' 'nav content';
-			grid-template-columns: 16rem minmax(0, 1fr);
+			grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr);
 			grid-template-rows: auto 1fr;
 		}
 	}
 
 	@container (min-width: 64rem) {
 		.docs-shell {
-			grid-template-columns: 18rem minmax(0, 1fr);
+			--docs-sidebar-width: 18rem;
+			grid-template-columns: var(--docs-sidebar-width) minmax(0, 1fr);
 		}
 	}
 

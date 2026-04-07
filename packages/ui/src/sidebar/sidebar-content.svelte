@@ -21,27 +21,20 @@
 		gap: var(--dry-sidebar-content-gap, var(--dry-space-3));
 		padding: var(--dry-sidebar-content-padding);
 		min-height: 0;
-		overflow: auto;
-		scrollbar-width: thin;
-		scrollbar-color: transparent transparent;
+		overflow: var(--dry-sidebar-content-overflow, auto);
+		scrollbar-gutter: var(--dry-sidebar-content-scrollbar-gutter, auto);
+		scrollbar-width: var(--dry-sidebar-content-scrollbar-width, thin);
+		scrollbar-color: var(--dry-scrollbar-thumb) transparent;
 		transition: scrollbar-color var(--dry-duration-normal) var(--dry-ease-emphasized);
 
-		&:hover {
-			scrollbar-color: var(--dry-scrollbar-thumb) var(--dry-scrollbar-track);
-		}
-
-		&::-webkit-scrollbar {
-			height: 6px;
-		}
 		&::-webkit-scrollbar-track {
 			background: transparent;
 		}
 		&::-webkit-scrollbar-thumb {
-			background: transparent;
-			border-radius: var(--dry-radius-full);
-		}
-		&:hover::-webkit-scrollbar-thumb {
 			background: var(--dry-scrollbar-thumb);
+			border: 0;
+			background-clip: border-box;
+			border-radius: var(--dry-radius-full);
 		}
 		&::-webkit-scrollbar-thumb:hover {
 			background: var(--dry-scrollbar-thumb-hover);

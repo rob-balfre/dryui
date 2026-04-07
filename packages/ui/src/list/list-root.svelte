@@ -38,7 +38,6 @@
 	{@render children()}
 </ul>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-list-root] {
 		--dry-list-gap: var(--dry-space-1);

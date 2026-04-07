@@ -13,7 +13,6 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-dialog-footer] {
 		--dry-section-padding: var(--dry-dialog-padding);

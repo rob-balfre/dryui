@@ -90,7 +90,6 @@
 	{/snippet}
 </Configurator>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.tabs-preview {
 		display: grid;

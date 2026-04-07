@@ -140,7 +140,6 @@
 	</Card.Root>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.header-stack {
 		display: grid;

@@ -15,7 +15,6 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-multi-select-group] [data-part='group-label'] {
 		padding: var(--dry-space-1_5) var(--dry-space-2);

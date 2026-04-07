@@ -62,7 +62,7 @@
 	.corner-grid {
 		display: grid;
 		grid-template-columns: repeat(4, minmax(0, 1fr));
-		gap: var(--dry-space-3);
+		gap: var(--dry-space-4);
 	}
 
 	.corner-option {
@@ -107,11 +107,13 @@
 		gap: var(--dry-space-4);
 	}
 
-	@container (max-width: 36rem) {
+	@container (max-width: 40rem) {
 		.corner-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
+	}
 
+	@container (max-width: 30rem) {
 		.density-control {
 			grid-template-columns: 1fr;
 		}

@@ -110,7 +110,6 @@
 	</ShaderCanvasPrimitive>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-shader-canvas-root] {
 		display: grid;

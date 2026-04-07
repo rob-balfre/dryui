@@ -15,7 +15,6 @@
 
 <VirtualListPrimitive {...rest} data-virtual-list />
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-virtual-list] {
 		--dry-virtual-list-scrollbar-width: 8px;

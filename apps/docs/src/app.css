@@ -39,6 +39,37 @@ code {
 	border-radius: var(--dry-radius-sm);
 }
 
+/* Global scrollbar styling so docs-level overflow containers match the theme */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--dry-scrollbar-thumb) var(--dry-scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+	width: var(--dry-scrollbar-width);
+	height: var(--dry-scrollbar-width);
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--dry-scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+	background: var(--dry-scrollbar-thumb);
+	background-clip: content-box;
+	border: 2px solid transparent;
+	border-radius: var(--dry-radius-full);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background: var(--dry-scrollbar-thumb-hover);
+	background-clip: content-box;
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
 /* Vertical spacing utilities (grid-based) */
 .stack-xl {
 	display: grid;

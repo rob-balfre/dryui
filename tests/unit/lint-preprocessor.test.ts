@@ -90,6 +90,29 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
+	test('markup hook warns on svelte-ignore css_unused_selector', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
+		const pp = dryuiLint();
+		pp.markup!({
+			content: '<!-- svelte-ignore css_unused_selector -->\n<div>hi</div>',
+			filename: 'test.svelte'
+		});
+		expect(spy).toHaveBeenCalled();
+		const msg = spy.mock.calls[0]![0] as string;
+		expect(msg).toContain('dryui/no-css-ignore');
+		spy.mockRestore();
+	});
+
+	test('strict mode throws on svelte-ignore css_unused_selector', () => {
+		const pp = dryuiLint({ strict: true });
+		expect(() => {
+			pp.markup!({
+				content: '<!-- svelte-ignore css_unused_selector -->\n<div>hi</div>',
+				filename: 'test.svelte'
+			});
+		}).toThrow('dryui/no-css-ignore');
+	});
+
 	test('hooks return undefined (no code transformation)', () => {
 		const pp = dryuiLint();
 		const scriptResult = pp.script!({

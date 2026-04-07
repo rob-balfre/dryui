@@ -68,15 +68,15 @@
 </script>
 
 <section class="brand-section">
-	<div class="picker-and-swatches">
-		<div class="picker-wrap">
-			<ColorPicker.Root bind:value={pickerHex} areaHeight={160}>
-				<ColorPicker.Area />
-				<ColorPicker.HueSlider />
-				<ColorPicker.Input format="hex" />
-			</ColorPicker.Root>
-		</div>
+	<div class="picker-wrap">
+		<ColorPicker.Root bind:value={pickerHex} areaHeight={160}>
+			<ColorPicker.Area />
+			<ColorPicker.HueSlider />
+			<ColorPicker.Input format="hex" />
+		</ColorPicker.Root>
+	</div>
 
+	<div class="swatch-and-presets">
 		<div class="swatch-strip" use:bg={activeTokens['--dry-color-bg-base'] ?? '#ffffff'}>
 			{#each themeSwatches as swatch (swatch.label)}
 				<div class="swatch-col">
@@ -85,42 +85,42 @@
 				</div>
 			{/each}
 		</div>
-	</div>
 
-	<div class="presets">
-		{#each PRESETS as preset, i (preset.name)}
-			{@const presetTheme = PRESET_THEMES[i] ?? PRESET_THEMES[0]!}
-			{@const presetTokens = isDark ? presetTheme.dark : presetTheme.light}
-			<button
-				class="preset-btn"
-				data-selected={brand.h === preset.brandInput.h &&
-					brand.s === preset.brandInput.s &&
-					brand.b === preset.brandInput.b
-					? ''
-					: undefined}
-				onclick={() => selectPreset(preset)}
-			>
-				<div class="preset-thumb">
-					{#each SWATCH_TOKENS as { key } (key)}
-						<div class="preset-swatch" use:bg={presetTokens[key] ?? ''}></div>
-					{/each}
-				</div>
-				<Text as="span" size="xs" color="muted">{preset.name.toLowerCase()}</Text>
-			</button>
-		{/each}
+		<div class="presets">
+			{#each PRESETS as preset, i (preset.name)}
+				{@const presetTheme = PRESET_THEMES[i] ?? PRESET_THEMES[0]!}
+				{@const presetTokens = isDark ? presetTheme.dark : presetTheme.light}
+				<button
+					class="preset-btn"
+					data-selected={brand.h === preset.brandInput.h &&
+						brand.s === preset.brandInput.s &&
+						brand.b === preset.brandInput.b
+						? ''
+						: undefined}
+					onclick={() => selectPreset(preset)}
+				>
+					<div class="preset-thumb">
+						{#each SWATCH_TOKENS as { key } (key)}
+							<div class="preset-swatch" use:bg={presetTokens[key] ?? ''}></div>
+						{/each}
+					</div>
+					<Text as="span" size="xs" color="muted">{preset.name.toLowerCase()}</Text>
+				</button>
+			{/each}
+		</div>
 	</div>
 </section>
 
 <style>
 	.brand-section {
 		display: grid;
-		gap: var(--dry-space-6);
+		gap: var(--dry-space-5);
 		container-type: inline-size;
 	}
 
-	.picker-and-swatches {
+	.swatch-and-presets {
 		display: grid;
-		gap: var(--dry-space-5);
+		gap: var(--dry-space-4);
 	}
 
 	.swatch-strip {
@@ -191,10 +191,9 @@
 		height: 100%;
 	}
 
-	/* Wide: picker and swatches side-by-side */
-	@container (min-width: 48rem) {
-		.picker-and-swatches {
-			grid-template-columns: 1fr 1fr;
+	@container (min-width: 40rem) {
+		.brand-section {
+			grid-template-columns: auto minmax(0, 1fr);
 			align-items: end;
 		}
 
@@ -203,7 +202,6 @@
 		}
 	}
 
-	/* Narrow: compact swatches, presets in fewer columns */
 	@container (max-width: 30rem) {
 		.swatch {
 			min-height: 2rem;

@@ -151,7 +151,6 @@
 
 {@render children()}
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-drp-root] {
 		display: contents;

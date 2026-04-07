@@ -27,6 +27,8 @@ const FLEX_PROPS_RE =
 
 const COMPONENT_CLASS_RE = /<([A-Z][a-zA-Z0-9.]*)[^>]*?\bclass\s*=/gs;
 
+const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
+
 const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:/gm;
 
 const MEDIA_QUERY_RE = /@media\s+[^{]+\{/g;
@@ -102,6 +104,15 @@ export function checkMarkup(content: string): Violation[] {
 		violations.push({
 			rule: 'dryui/no-component-class',
 			message: `Do not pass class= to <${comp}>. Svelte components ignore class attributes. Use --dry-* CSS custom properties for styling overrides.`,
+			line: getLine(markup, match.index)
+		});
+	}
+
+	for (const match of markup.matchAll(CSS_IGNORE_RE)) {
+		violations.push({
+			rule: 'dryui/no-css-ignore',
+			message:
+				'Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.',
 			line: getLine(markup, match.index)
 		});
 	}

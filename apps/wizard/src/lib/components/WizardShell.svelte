@@ -97,7 +97,6 @@
 	</main>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.wizard-shell {
 		min-height: 100dvh;

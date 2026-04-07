@@ -94,7 +94,6 @@
 	</Alert.Root>
 {/if}
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.options-stack {
 		display: grid;

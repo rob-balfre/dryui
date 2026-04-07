@@ -28,7 +28,6 @@
 	</main>
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.view-layout {
 		min-height: 100dvh;

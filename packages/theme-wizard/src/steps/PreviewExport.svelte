@@ -73,7 +73,7 @@
 <style>
 	.preview-section {
 		display: grid;
-		gap: var(--dry-space-4);
+		gap: var(--dry-space-5);
 		container-type: inline-size;
 	}
 

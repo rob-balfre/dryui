@@ -26,7 +26,6 @@
 	{/if}
 </button>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-sidebar-trigger] {
 		display: grid;

@@ -25,7 +25,6 @@
 	</Collapsible.Content>
 </Collapsible.Root>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	.disclosure-trigger {
 		margin-bottom: var(--dry-space-3);
