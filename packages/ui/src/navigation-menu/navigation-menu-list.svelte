@@ -13,7 +13,6 @@
 	{@render children()}
 </ul>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-nav-menu-list] {
 		--dry-nav-menu-bg: var(--dry-color-bg-raised);
@@ -46,7 +45,4 @@
 		box-shadow: var(--dry-nav-menu-shadow);
 	}
 
-	[data-nav-menu-list] > :is(li) {
-		position: relative;
-	}
 </style>

@@ -30,3 +30,9 @@
 <li>
 	{@render children()}
 </li>
+
+<style>
+	li {
+		position: relative;
+	}
+</style>
