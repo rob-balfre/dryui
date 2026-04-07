@@ -210,7 +210,6 @@
 	{/if}
 {/if}
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-map-root] {
 		--dry-map-radius: var(--dry-radius-lg, 0.5rem);
@@ -252,11 +251,6 @@
 		box-shadow: var(--dry-shadow-lg);
 		padding: var(--dry-space-4, 1rem);
 		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
-	}
-
-	[data-theme='dark'] [data-map-popup] [data-map-mapboxgl]-popup-content,
-	[data-theme='dark'] [data-map-popup] [data-map-maplibregl]-popup-content {
-		background: var(--dry-color-bg-raised, #1e1e2e);
 	}
 
 	[data-part='map-error'] {
