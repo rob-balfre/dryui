@@ -25,7 +25,7 @@
 		{#if children}
 			{@render children()}
 		{:else}
-			✕
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 		{/if}
 	</button>
 {/if}
@@ -47,15 +47,9 @@
 			background var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-fs-clear]::before {
-		content: '';
-		display: block;
+	[data-fs-clear] svg {
 		height: 0.875rem;
 		aspect-ratio: 1;
-		background: currentColor;
-		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
-		mask-size: contain;
-		mask-repeat: no-repeat;
 	}
 
 	[data-fs-clear]:hover {

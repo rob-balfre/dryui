@@ -82,6 +82,7 @@
 		);
 
 		container-type: inline-size;
+		justify-self: stretch;
 		border: 1px solid var(--dry-dialog-border);
 		border-radius: var(--dry-dialog-radius, var(--dry-overlay-radius, var(--dry-radius-2xl)));
 		background: var(--dry-dialog-bg, var(--dry-overlay-bg, var(--dry-color-bg-overlay)));

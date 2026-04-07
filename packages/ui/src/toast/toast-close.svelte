@@ -26,6 +26,10 @@
 
 <style>
 	[data-part='close'] {
+		position: absolute;
+		top: var(--dry-space-4);
+		right: var(--dry-space-4);
+		z-index: 1;
 		cursor: pointer;
 		background: none;
 		border: none;

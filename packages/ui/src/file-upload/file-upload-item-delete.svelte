@@ -23,6 +23,7 @@
 	type="button"
 	disabled={ctx.disabled}
 	data-disabled={ctx.disabled || undefined}
+	data-fu-item-delete
 	aria-label="Remove file"
 	onclick={handleClick}
 	{...rest}
@@ -30,6 +31,8 @@
 >
 	{#if children}
 		{@render children()}
+	{:else}
+		<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
 	{/if}
 </button>
 
@@ -50,15 +53,9 @@
 			background var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-fu-item-delete]::before {
-		content: '';
-		display: block;
+	[data-fu-item-delete] svg {
 		height: 1rem;
 		aspect-ratio: 1;
-		background: currentColor;
-		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E");
-		mask-size: contain;
-		mask-repeat: no-repeat;
 	}
 
 	[data-fu-item-delete]:hover:not([data-disabled]) {

@@ -62,6 +62,8 @@
 
 <style>
 	[data-part='input'] {
+		display: inline-grid;
+		vertical-align: middle;
 		border: none;
 		outline: none;
 		background: transparent;
@@ -69,6 +71,7 @@
 		font-size: var(--dry-tags-input-font-size, var(--dry-type-small-size, var(--dry-text-sm-size)));
 		color: var(--dry-color-text-strong);
 		padding: 0;
+		margin-block: calc(var(--dry-tags-input-gap, var(--dry-space-1_5)) / 2);
 		line-height: var(--dry-type-small-leading, var(--dry-text-sm-leading));
 
 		&::placeholder {

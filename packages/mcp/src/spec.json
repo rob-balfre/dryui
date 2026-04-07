@@ -883,6 +883,13 @@
         ]
       },
       "cssVars": {
+        "--dry-btn-accent": "Accent",
+        "--dry-btn-accent-active": "Accent Active",
+        "--dry-btn-accent-fg": "Accent Fg",
+        "--dry-btn-accent-hover": "Accent Hover",
+        "--dry-btn-accent-stroke": "Accent Stroke",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-on-accent": "On Accent",
         "--dry-dialog-bg": "Background color",
         "--dry-dialog-border": "Border color",
         "--dry-dialog-max-width": "Maximum width",
@@ -1923,6 +1930,9 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-indicator"
+        },
+        {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
           "values": [
@@ -2047,6 +2057,9 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-indicator"
         },
         {
           "name": "data-state",
@@ -2441,8 +2454,7 @@
         ]
       },
       "cssVars": {
-        "--dry-field-gap": "Gap spacing",
-        "--dry-field-label-order": "Label Order"
+        "--dry-field-gap": "Gap spacing"
       },
       "dataAttributes": [
         {
@@ -3202,6 +3214,9 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-indicator"
         },
         {
           "name": "data-invalid",
@@ -4287,9 +4302,6 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-option-swatch-group-content"
         },
         {
           "name": "data-option-swatch-group-item"
@@ -7836,11 +7848,11 @@
         "tree": [
           "Timeline.Root",
           "  Timeline.Item",
-          "  Timeline.Icon",
-          "  Timeline.Content",
-          "  Timeline.Title",
-          "  Timeline.Description",
-          "  Timeline.Time"
+          "    Timeline.Icon",
+          "    Timeline.Content",
+          "      Timeline.Title",
+          "      Timeline.Description",
+          "      Timeline.Time"
         ]
       },
       "cssVars": {
@@ -7877,7 +7889,7 @@
           "name": "data-part"
         }
       ],
-      "example": "<Timeline.Root>\n  <Timeline.Item>...</Timeline.Item>\n  <Timeline.Icon>...</Timeline.Icon>\n  <Timeline.Content>...</Timeline.Content>\n  <Timeline.Title>...</Timeline.Title>\n  <Timeline.Description>...</Timeline.Description>\n  <Timeline.Time>...</Timeline.Time>\n</Timeline.Root>"
+      "example": "<Timeline.Root>\n  <Timeline.Item>\n    <Timeline.Icon />\n    <Timeline.Content>\n      <Timeline.Title>Event title</Timeline.Title>\n      <Timeline.Description>Event description</Timeline.Description>\n      <Timeline.Time>2 hours ago</Timeline.Time>\n    </Timeline.Content>\n  </Timeline.Item>\n</Timeline.Root>"
     },
     "Typography": {
       "import": "@dryui/ui",
@@ -9547,6 +9559,7 @@
         ]
       },
       "cssVars": {
+        "--dry-calendar-grid-gap": "Grid Gap",
         "--dry-dp-bg": "Background color",
         "--dry-dp-border": "Border color",
         "--dry-dp-font-size": "Font size",
@@ -9555,7 +9568,31 @@
       },
       "dataAttributes": [
         {
+          "name": "data-calendar-cell"
+        },
+        {
+          "name": "data-calendar-columnheader"
+        },
+        {
           "name": "data-calendar-day"
+        },
+        {
+          "name": "data-calendar-day-button"
+        },
+        {
+          "name": "data-calendar-header"
+        },
+        {
+          "name": "data-calendar-heading"
+        },
+        {
+          "name": "data-calendar-nav"
+        },
+        {
+          "name": "data-calendar-panel"
+        },
+        {
+          "name": "data-calendar-row"
         },
         {
           "name": "data-disabled",
@@ -9569,6 +9606,9 @@
         },
         {
           "name": "data-dp-trigger"
+        },
+        {
+          "name": "data-indicator"
         },
         {
           "name": "data-invalid",
@@ -10023,7 +10063,31 @@
       "cssVars": {},
       "dataAttributes": [
         {
+          "name": "data-calendar-cell"
+        },
+        {
+          "name": "data-calendar-columnheader"
+        },
+        {
           "name": "data-calendar-day"
+        },
+        {
+          "name": "data-calendar-day-button"
+        },
+        {
+          "name": "data-calendar-header"
+        },
+        {
+          "name": "data-calendar-heading"
+        },
+        {
+          "name": "data-calendar-nav"
+        },
+        {
+          "name": "data-calendar-panel"
+        },
+        {
+          "name": "data-calendar-row"
         },
         {
           "name": "data-disabled",
@@ -10043,6 +10107,9 @@
         },
         {
           "name": "data-in-range"
+        },
+        {
+          "name": "data-indicator"
         },
         {
           "name": "data-outside-month"
@@ -10556,8 +10623,14 @@
         "--dry-range-calendar-day-hover-bg": "Calendar Day Hover Bg",
         "--dry-range-calendar-day-radius": "Calendar Day Radius",
         "--dry-range-calendar-day-size": "Calendar Day Size",
+        "--dry-range-calendar-heading-color": "Calendar Heading Color",
+        "--dry-range-calendar-nav-bg": "Calendar Nav Bg",
+        "--dry-range-calendar-nav-border": "Calendar Nav Border",
+        "--dry-range-calendar-nav-color": "Calendar Nav Color",
         "--dry-range-calendar-outside-color": "Calendar Outside Color",
         "--dry-range-calendar-padding": "Calendar Padding",
+        "--dry-range-calendar-panel-bg": "Calendar Panel Bg",
+        "--dry-range-calendar-panel-border": "Calendar Panel Border",
         "--dry-range-calendar-radius": "Calendar Radius",
         "--dry-range-calendar-range-bg": "Calendar Range Bg",
         "--dry-range-calendar-selected-bg": "Calendar Selected Bg",
@@ -10568,10 +10641,31 @@
       },
       "dataAttributes": [
         {
+          "name": "data-calendar-cell"
+        },
+        {
+          "name": "data-calendar-columnheader"
+        },
+        {
           "name": "data-calendar-day"
         },
         {
+          "name": "data-calendar-day-button"
+        },
+        {
           "name": "data-calendar-header"
+        },
+        {
+          "name": "data-calendar-heading"
+        },
+        {
+          "name": "data-calendar-nav"
+        },
+        {
+          "name": "data-calendar-panel"
+        },
+        {
+          "name": "data-calendar-row"
         },
         {
           "name": "data-disabled",
@@ -10941,6 +11035,7 @@
       },
       "cssVars": {
         "--dry-tags-input-font-size": "Input Font Size",
+        "--dry-tags-input-gap": "Input Gap",
         "--dry-tags-input-tag-font-size": "Input Tag Font Size",
         "--dry-tags-input-tag-padding-x": "Input Tag Padding X"
       },
@@ -12396,6 +12491,7 @@
         "--dry-fab-color": "Text color",
         "--dry-fab-gap": "Gap spacing",
         "--dry-fab-offset": "Offset",
+        "--dry-fab-position": "Position",
         "--dry-fab-shadow": "Box shadow",
         "--dry-fab-z-index": "Z Index"
       },
@@ -16779,7 +16875,7 @@
     },
     "SystemMap": {
       "import": "@dryui/ui",
-      "description": "Layered architecture diagram for DolphinGraph nodes, relationships, and audit signals",
+      "description": "Layered architecture diagram that visualizes component nodes, relationships, and dependency layers",
       "category": "display",
       "tags": [
         "diagram",
@@ -16850,92 +16946,40 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
-      "cssVars": {
-        "--dry-system-map-bg": "Map Bg",
-        "--dry-system-map-border": "Map Border",
-        "--dry-system-map-shadow": "Map Shadow",
-        "--dry-system-map-surface": "Map Surface",
-        "--dry-system-map-text": "Map Text",
-        "--dry-system-map-text-muted": "Map Text Muted"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
-          "name": "data-canvas-shell"
+          "name": "data-connector"
         },
         {
-          "name": "data-dashed"
+          "name": "data-connector-label"
         },
         {
-          "name": "data-edge-label"
+          "name": "data-connector-line"
         },
         {
-          "name": "data-empty-hint"
+          "name": "data-edge-row"
         },
         {
-          "name": "data-empty-label"
+          "name": "data-empty"
         },
         {
-          "name": "data-eyebrow"
+          "name": "data-focused"
         },
         {
-          "name": "data-group-label"
+          "name": "data-node"
         },
         {
-          "name": "data-header"
+          "name": "data-node-helper"
         },
         {
-          "name": "data-header-badges"
+          "name": "data-node-name"
         },
         {
-          "name": "data-header-text"
-        },
-        {
-          "name": "data-lane-meta"
-        },
-        {
-          "name": "data-lane-title"
-        },
-        {
-          "name": "data-legend"
-        },
-        {
-          "name": "data-legend-item"
-        },
-        {
-          "name": "data-legend-items"
-        },
-        {
-          "name": "data-legend-section"
-        },
-        {
-          "name": "data-line-swatch"
-        },
-        {
-          "name": "data-map-title"
-        },
-        {
-          "name": "data-node-description"
-        },
-        {
-          "name": "data-node-label"
-        },
-        {
-          "name": "data-node-meta"
-        },
-        {
-          "name": "data-summary"
-        },
-        {
-          "name": "data-svg"
-        },
-        {
-          "name": "data-swatch"
+          "name": "data-orphans"
         },
         {
           "name": "data-system-map"
-        },
-        {
-          "name": "data-thumbnail-object"
         }
       ],
       "example": "<SystemMap>Content</SystemMap>"
@@ -17391,8 +17435,7 @@
         },
         "blendMode": {
           "type": "BlendMode",
-          "required": false,
-          "default": "'screen'"
+          "required": false
         },
         "children": {
           "type": "Snippet",

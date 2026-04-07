@@ -82,8 +82,10 @@
 <style>
 	[data-dg-pagination] {
 		display: grid;
-		grid-template-columns: max-content 1fr max-content;
+		grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+		grid-template-areas: 'prev info next';
 		align-items: center;
+		column-gap: var(--dry-data-grid-pagination-gap);
 		padding: var(--dry-space-3) var(--dry-data-grid-padding-x);
 		border-top: 1px solid var(--dry-data-grid-border);
 		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
@@ -122,18 +124,34 @@
 		outline-offset: 2px;
 	}
 
+	[data-dg-pagination] button[data-pagination-prev] {
+		grid-area: prev;
+		justify-self: start;
+	}
+
+	[data-dg-pagination] button[data-pagination-next] {
+		grid-area: next;
+		justify-self: end;
+	}
+
 	[data-dg-pagination] button:disabled {
 		opacity: 0.4;
 		cursor: not-allowed;
 	}
 
 	[data-dg-pagination] [data-pagination-info] {
+		grid-area: info;
+		justify-self: center;
+		text-align: center;
 		font-variant-numeric: tabular-nums;
 	}
 
 	@container (max-width: 400px) {
 		[data-dg-pagination] {
-			grid-template-columns: 1fr;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			grid-template-areas:
+				'info info'
+				'prev next';
 			gap: var(--dry-space-2);
 		}
 	}

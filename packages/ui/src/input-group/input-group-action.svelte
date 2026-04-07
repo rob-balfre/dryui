@@ -21,6 +21,7 @@
 	data-size={ctx.size}
 	data-disabled={isDisabled || undefined}
 	data-invalid={ctx.invalid || undefined}
+	data-orientation={ctx.orientation}
 	{...rest}
 	data-input-group-action
 	class={className}
@@ -45,6 +46,10 @@
 		font: inherit;
 		font-size: var(--dry-input-group-font-size);
 		transition: background-color 160ms ease;
+	}
+
+	[data-input-group-action][data-orientation='horizontal'] {
+		grid-column: 5;
 	}
 
 	[data-input-group-action]:hover:not(:disabled) {

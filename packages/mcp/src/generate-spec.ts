@@ -747,7 +747,7 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 	},
 	SystemMap: {
 		description:
-			'Layered architecture diagram for DolphinGraph nodes, relationships, and audit signals',
+			'Layered architecture diagram that visualizes component nodes, relationships, and dependency layers',
 		category: 'display',
 		tags: ['diagram', 'graph', 'architecture', 'system', 'map']
 	},
@@ -1620,6 +1620,8 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 		'<Breadcrumb.Root>\n  <Breadcrumb.List>\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href="/">Home</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href="/docs">Docs</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link current>Current</Breadcrumb.Link>\n    </Breadcrumb.Item>\n  </Breadcrumb.List>\n</Breadcrumb.Root>',
 	Stepper:
 		'<Stepper.Root bind:activeStep={activeStep}>\n  <Stepper.List>\n    <Stepper.Step step={0}>Account</Stepper.Step>\n    <Stepper.Separator step={0} />\n    <Stepper.Step step={1}>Profile</Stepper.Step>\n    <Stepper.Separator step={1} />\n    <Stepper.Step step={2}>Review</Stepper.Step>\n  </Stepper.List>\n</Stepper.Root>',
+	Timeline:
+		'<Timeline.Root>\n  <Timeline.Item>\n    <Timeline.Icon />\n    <Timeline.Content>\n      <Timeline.Title>Event title</Timeline.Title>\n      <Timeline.Description>Event description</Timeline.Description>\n      <Timeline.Time>2 hours ago</Timeline.Time>\n    </Timeline.Content>\n  </Timeline.Item>\n</Timeline.Root>',
 	CountrySelect: '<CountrySelect bind:value={country} placeholder="Select country" />',
 	DateTimeInput: '<DateTimeInput bind:value={appointmentDate} name="appointment" />',
 	FlipCard:

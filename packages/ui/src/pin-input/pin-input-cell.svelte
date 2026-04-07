@@ -60,7 +60,10 @@
 		position: relative;
 		user-select: none;
 		border: var(--dry-pin-cell-border, 2px solid var(--dry-pin-border));
-		border-bottom: var(--dry-pin-cell-border-bottom, none);
+		border-bottom: var(
+			--dry-pin-cell-border-bottom,
+			var(--dry-pin-cell-border, 2px solid var(--dry-pin-border))
+		);
 		border-radius: var(--dry-pin-cell-radius, var(--dry-pin-radius));
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),

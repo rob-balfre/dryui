@@ -124,7 +124,7 @@ Structure:
   FloatButton.Root
     FloatButton.Trigger
     FloatButton.Action
-CSS variables: --dry-fab-action-bg, --dry-fab-action-border, --dry-fab-action-color, --dry-fab-action-shadow, --dry-fab-action-size, --dry-fab-bg, --dry-fab-color, --dry-fab-gap, --dry-fab-offset, --dry-fab-shadow, --dry-fab-z-index
+CSS variables: --dry-fab-action-bg, --dry-fab-action-border, --dry-fab-action-color, --dry-fab-action-shadow, --dry-fab-action-size, --dry-fab-bg, --dry-fab-color, --dry-fab-gap, --dry-fab-offset, --dry-fab-position, --dry-fab-shadow, --dry-fab-z-index
 Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-size | data-state
 Accessibility: none
 Example:
@@ -402,7 +402,7 @@ Structure:
     OptionSwatchGroup.Label
     OptionSwatchGroup.Meta
 CSS variables: --dry-option-swatch-bg, --dry-option-swatch-border, --dry-option-swatch-border-selected, --dry-option-swatch-chip, --dry-option-swatch-muted, --dry-option-swatch-text
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-content | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-unavailable | data-value
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-unavailable | data-value
 Accessibility: none
 Example:
 ```svelte
@@ -551,7 +551,7 @@ Structure:
     TagsInput.Tag
     TagsInput.TagDelete
     TagsInput.List
-CSS variables: --dry-tags-input-font-size, --dry-tags-input-tag-font-size, --dry-tags-input-tag-padding-x
+CSS variables: --dry-tags-input-font-size, --dry-tags-input-gap, --dry-tags-input-tag-font-size, --dry-tags-input-tag-padding-x
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-index | data-part | data-size
 Accessibility: none
 Example:
@@ -893,7 +893,7 @@ Parts:
   Native props: Forwards <p> attributes via rest props.
 Structure:
   Field.Root
-CSS variables: --dry-field-gap, --dry-field-label-order
+CSS variables: --dry-field-gap
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
 Accessibility: none
 Example:
@@ -973,7 +973,7 @@ Structure:
     Select.Content
       Select.Item
 CSS variables: --dry-select-bg, --dry-select-border, --dry-select-color, --dry-select-font-size, --dry-select-padding-x, --dry-select-padding-y
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-trigger-wrap | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-trigger-wrap | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example:
 ```svelte
@@ -1185,8 +1185,8 @@ Structure:
     DatePicker.Trigger
     DatePicker.Content
       DatePicker.Calendar
-CSS variables: --dry-dp-bg, --dry-dp-border, --dry-dp-font-size, --dry-dp-padding-x, --dry-dp-padding-y
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-dp-trigger | data-invalid (Present when the current field value is invalid.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-size | data-state | data-today
+CSS variables: --dry-calendar-grid-gap, --dry-dp-bg, --dry-dp-border, --dry-dp-font-size, --dry-dp-padding-x, --dry-dp-padding-y
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-dp-trigger | data-indicator | data-invalid (Present when the current field value is invalid.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-size | data-state | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1274,7 +1274,7 @@ Structure:
     DateRangePicker.Calendar
     DateRangePicker.Preset
 CSS variables: none
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-indicator | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1303,8 +1303,8 @@ Parts:
 Structure:
   RangeCalendar.Root
     RangeCalendar.Grid
-CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
+CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-heading-color, --dry-range-calendar-nav-bg, --dry-range-calendar-nav-border, --dry-range-calendar-nav-color, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-panel-bg, --dry-range-calendar-panel-border, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -2053,7 +2053,7 @@ Structure:
     AlertDialog.Footer
     AlertDialog.Action
     AlertDialog.Cancel
-CSS variables: --dry-dialog-bg, --dry-dialog-border, --dry-dialog-max-width, --dry-dialog-padding, --dry-dialog-radius, --dry-dialog-shadow, --dry-section-border, --dry-section-padding
+CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-border, --dry-btn-on-accent, --dry-dialog-bg, --dry-dialog-border, --dry-dialog-max-width, --dry-dialog-padding, --dry-dialog-radius, --dry-dialog-shadow, --dry-section-border, --dry-section-padding
 Data attributes: data-alert-dialog-action | data-alert-dialog-body | data-alert-dialog-cancel | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-trigger | data-state
 Accessibility: none
 Example:
@@ -2564,7 +2564,7 @@ Structure:
       Accordion.Trigger
       Accordion.Content
 CSS variables: none
-Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-accordion-trigger | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
+Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-accordion-trigger | data-disabled (Present when the component or part is disabled.) | data-indicator | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
 Accessibility: Use descriptive trigger text so the hidden content is understandable before expansion. | Keep each trigger paired with its matching content so keyboard and screen-reader relationships stay intact.
 Example:
 ```svelte
@@ -2602,7 +2602,7 @@ Structure:
     Collapsible.Trigger
     Collapsible.Content
 CSS variables: none
-Data attributes: data-collapsible-content | data-collapsible-content-inner | data-collapsible-trigger | data-disabled (Present when the component or part is disabled.) | data-state (Reflects whether the collapsible content is expanded or collapsed., values open, closed)
+Data attributes: data-collapsible-content | data-collapsible-content-inner | data-collapsible-trigger | data-disabled (Present when the component or part is disabled.) | data-indicator | data-state (Reflects whether the collapsible content is expanded or collapsed., values open, closed)
 Accessibility: none
 Example:
 ```svelte
@@ -2925,23 +2925,25 @@ Parts:
 Structure:
   Timeline.Root
     Timeline.Item
-    Timeline.Icon
-    Timeline.Content
-    Timeline.Title
-    Timeline.Description
-    Timeline.Time
+      Timeline.Icon
+      Timeline.Content
+        Timeline.Title
+        Timeline.Description
+        Timeline.Time
 CSS variables: --dry-timeline-content-gap, --dry-timeline-dot-color, --dry-timeline-dot-size, --dry-timeline-gap, --dry-timeline-item-columns, --dry-timeline-item-gap, --dry-timeline-item-min-w, --dry-timeline-item-pl, --dry-timeline-item-pt, --dry-timeline-line-bottom, --dry-timeline-line-color, --dry-timeline-line-h, --dry-timeline-line-left, --dry-timeline-line-right, --dry-timeline-line-top, --dry-timeline-line-w
 Data attributes: data-level | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Accessibility: none
 Example:
 ```svelte
 <Timeline.Root>
-  <Timeline.Item>...</Timeline.Item>
-  <Timeline.Icon>...</Timeline.Icon>
-  <Timeline.Content>...</Timeline.Content>
-  <Timeline.Title>...</Timeline.Title>
-  <Timeline.Description>...</Timeline.Description>
-  <Timeline.Time>...</Timeline.Time>
+  <Timeline.Item>
+    <Timeline.Icon />
+    <Timeline.Content>
+      <Timeline.Title>Event title</Timeline.Title>
+      <Timeline.Description>Event description</Timeline.Description>
+      <Timeline.Time>2 hours ago</Timeline.Time>
+    </Timeline.Content>
+  </Timeline.Item>
 </Timeline.Root>
 ```
 
@@ -3572,8 +3574,8 @@ Root import: import { SystemMap } from '@dryui/ui'
 Subpath import: import { SystemMap } from '@dryui/ui/system-map'
 Props: graph (DolphinGraph), required | focusId (string | null), default null | layerFilter (readonly DolphinLayer[]) | kindFilter (readonly DolphinNodeKind[]) | edgeFilter (readonly DolphinEdgeType[]) | packageFilter (readonly DolphinPackage[]) | visibilityFilter (readonly DolphinVisibility[]) | categoryFilter (readonly string[]) | showLegend (boolean), default true | showThumbnails (boolean), default true | showEdgeLabels (boolean), default false
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-system-map-bg, --dry-system-map-border, --dry-system-map-shadow, --dry-system-map-surface, --dry-system-map-text, --dry-system-map-text-muted
-Data attributes: data-canvas-shell | data-dashed | data-edge-label | data-empty-hint | data-empty-label | data-eyebrow | data-group-label | data-header | data-header-badges | data-header-text | data-lane-meta | data-lane-title | data-legend | data-legend-item | data-legend-items | data-legend-section | data-line-swatch | data-map-title | data-node-description | data-node-label | data-node-meta | data-summary | data-svg | data-swatch | data-system-map | data-thumbnail-object
+CSS variables: none
+Data attributes: data-connector | data-connector-label | data-connector-line | data-edge-row | data-empty | data-focused | data-node | data-node-helper | data-node-name | data-orphans | data-system-map
 Accessibility: none
 Example:
 ```svelte
@@ -3997,7 +3999,7 @@ Tags: beam, light, streak, shimmer, effect
 Kind: simple
 Root import: import { Beam } from '@dryui/ui'
 Subpath import: import { Beam } from '@dryui/ui/beam'
-Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode), default 'screen' | children (Snippet), Content rendered inside the component.
+Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-beam | data-beam-layer

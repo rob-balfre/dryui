@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getDateFieldCtx, type DateSegmentType } from './context.svelte.js';
-	import { onMount } from 'svelte';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		type: DateSegmentType;
@@ -10,13 +9,6 @@
 	let { type, class: className, ...rest }: Props = $props();
 
 	const ctx = getDateFieldCtx();
-
-	let el: HTMLSpanElement;
-
-	onMount(() => {
-		ctx.registerSegment(type, el);
-		return () => ctx.unregisterSegment(type);
-	});
 
 	const segmentData = $derived(ctx.segments.find((s) => s.type === type));
 
@@ -34,6 +26,15 @@
 
 	let inputBuffer = '';
 	let bufferTimeout: ReturnType<typeof setTimeout>;
+
+	function registerSegment(node: HTMLSpanElement) {
+		ctx.registerSegment(type, node);
+		return {
+			destroy() {
+				ctx.unregisterSegment(type);
+			}
+		};
+	}
 
 	function increment() {
 		const current = segmentData?.value ?? minValue - 1;
@@ -111,7 +112,7 @@
 </script>
 
 <span
-	bind:this={el}
+	{@attach registerSegment}
 	role="spinbutton"
 	tabindex={ctx.disabled ? undefined : 0}
 	aria-label={type}
@@ -119,6 +120,7 @@
 	aria-valuemax={maxValue}
 	aria-valuenow={segmentData?.value ?? undefined}
 	aria-valuetext={displayValue}
+	data-df-segment
 	data-segment={type}
 	data-placeholder={segmentData?.value === null ? '' : undefined}
 	data-disabled={ctx.disabled || undefined}

@@ -29,15 +29,14 @@
 	</div>
 
 	{#if target}
-		<div class="preview-button">
-			<ScrollToTop {target} threshold={80} />
-		</div>
+		<ScrollToTop {target} threshold={80} />
 	{/if}
 </div>
 
 <style>
 	.preview-frame {
 		position: relative;
+		contain: paint;
 		height: 14rem;
 		overflow: hidden;
 		border: 1px solid var(--dry-color-stroke-weak);
@@ -56,12 +55,6 @@
 		gap: var(--dry-space-3);
 		min-height: 24rem;
 		padding-right: var(--dry-space-10);
-	}
-
-	.preview-button {
-		position: absolute;
-		bottom: var(--dry-space-4);
-		right: var(--dry-space-4);
 	}
 
 	p {

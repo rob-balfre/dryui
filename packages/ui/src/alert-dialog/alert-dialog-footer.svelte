@@ -22,7 +22,8 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		gap: var(--dry-space-2);
-		justify-self: end;
+		gap: var(--dry-space-4);
+		justify-content: start;
+		justify-items: start;
 	}
 </style>

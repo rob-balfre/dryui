@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { setDateFieldCtx, getLocaleFormat, type DateSegmentType } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -12,6 +13,12 @@
 		disabled?: boolean;
 		size?: 'sm' | 'md' | 'lg';
 		children: Snippet;
+	}
+
+	interface SegmentValues {
+		month: number | null;
+		day: number | null;
+		year: number | null;
 	}
 
 	let {
@@ -27,36 +34,60 @@
 		...rest
 	}: Props = $props();
 
-	let month = $state<number | null>(value ? value.getMonth() + 1 : null);
-	let day = $state<number | null>(value ? value.getDate() : null);
-	let year = $state<number | null>(value ? value.getFullYear() : null);
+	let draftValues = $state<SegmentValues | null>(null);
 
-	// Sync from value prop
-	$effect(() => {
-		if (value) {
-			month = value.getMonth() + 1;
-			day = value.getDate();
-			year = value.getFullYear();
+	function getSegmentValues(date: Date | null): SegmentValues {
+		if (!date) {
+			return { month: null, day: null, year: null };
 		}
-	});
 
-	function tryBuildDate() {
-		if (month !== null && day !== null && year !== null && year >= 1000) {
-			const d = new Date(year, month - 1, day);
-			if (d.getMonth() === month - 1 && d.getDate() === day) {
+		return {
+			month: date.getMonth() + 1,
+			day: date.getDate(),
+			year: date.getFullYear()
+		};
+	}
+
+	function commitSegments(nextValues: SegmentValues) {
+		if (
+			nextValues.month !== null &&
+			nextValues.day !== null &&
+			nextValues.year !== null &&
+			nextValues.year >= 1000
+		) {
+			const d = new Date(nextValues.year, nextValues.month - 1, nextValues.day);
+			if (d.getMonth() === nextValues.month - 1 && d.getDate() === nextValues.day) {
 				value = d;
+				draftValues = null;
+				return;
 			}
 		}
+
+		draftValues = nextValues;
 	}
 
 	const localeFormat = $derived(getLocaleFormat(locale));
+	const committedValues = $derived(getSegmentValues(value));
+	const activeValues = $derived(draftValues ?? committedValues);
 
 	const segments = $derived(
 		localeFormat.order.map((type) => ({
 			type,
-			value: type === 'month' ? month : type === 'day' ? day : year
+			value:
+				type === 'month'
+					? activeValues.month
+					: type === 'day'
+						? activeValues.day
+						: activeValues.year
 		}))
 	);
+
+	function focusPreferredSegment() {
+		const targetType =
+			segments.find((segment) => segment.value === null)?.type ?? localeFormat.order[0];
+		if (!targetType) return;
+		segmentElements.get(targetType)?.focus();
+	}
 
 	function serializeDateValue(date: Date | null): string {
 		if (!date) return '';
@@ -69,7 +100,7 @@
 	}
 
 	// Segment element registry for index-based navigation
-	const segmentElements = new Map<DateSegmentType, HTMLElement>();
+	const segmentElements = new SvelteMap<DateSegmentType, HTMLElement>();
 
 	setDateFieldCtx({
 		get value() {
@@ -97,10 +128,11 @@
 			return segments;
 		},
 		updateSegment(type: DateSegmentType, val: number) {
-			if (type === 'month') month = val;
-			else if (type === 'day') day = val;
-			else if (type === 'year') year = val;
-			tryBuildDate();
+			commitSegments({
+				month: type === 'month' ? val : activeValues.month,
+				day: type === 'day' ? val : activeValues.day,
+				year: type === 'year' ? val : activeValues.year
+			});
 		},
 		registerSegment(type: DateSegmentType, el: HTMLElement) {
 			segmentElements.set(type, el);
@@ -119,12 +151,26 @@
 			}
 		}
 	});
+
+	function handleMousedown(event: MouseEvent) {
+		if (disabled) return;
+		const target = event.target;
+		if (!(target instanceof HTMLElement)) return;
+		if (target.closest('[data-df-segment]')) return;
+
+		event.preventDefault();
+		focusPreferredSegment();
+	}
 </script>
 
 <div
 	role="group"
 	aria-label="Date"
+	data-df-wrapper
+	data-df-root
+	data-size={size}
 	data-disabled={disabled || undefined}
+	onmousedown={handleMousedown}
 	{...rest}
 	class={className}
 >

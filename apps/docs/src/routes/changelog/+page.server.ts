@@ -145,79 +145,53 @@ function readPendingChangesets(): PendingChangeset[] {
 		.filter((changeset) => changeset.body.length > 0);
 }
 
-function formatPackageLine(pkg: WorkspacePackage, description?: string): string {
-	return description
-		? `- \`${pkg.name}\` \`${pkg.version}\` - ${description}`
-		: `- \`${pkg.name}\` \`${pkg.version}\``;
+interface CorePackageInfo extends WorkspacePackage {
+	description: string;
 }
 
-function buildContent(): string {
+interface CategoryCount {
+	label: string;
+	count: number;
+}
+
+interface ChangelogData {
+	corePackages: CorePackageInfo[];
+	companionPackages: WorkspacePackage[];
+	uiExportCount: number;
+	primitivesExportCount: number;
+	specComponentCount: number;
+	categories: CategoryCount[];
+	svelteVersion: string;
+	pendingChangesets: PendingChangeset[];
+}
+
+function buildData(): ChangelogData {
 	const rootPackage = readJson<PackageJson>('package.json');
 	const uiPackage = readJson<PackageJson>('packages/ui/package.json');
 	const primitivesPackage = readJson<PackageJson>('packages/primitives/package.json');
 	const spec = readJson<McpSpec>('packages/mcp/src/spec.json');
 	const packages = readWorkspacePackages();
 	const pendingChangesets = readPendingChangesets();
-	const corePackages = packages.filter((pkg) => pkg.name in CORE_PACKAGE_DESCRIPTIONS);
-	const companionPackages = packages.filter((pkg) => !(pkg.name in CORE_PACKAGE_DESCRIPTIONS));
 	const categoryCounts = new Map<string, number>();
 
 	for (const component of Object.values(spec.components)) {
 		categoryCounts.set(component.category, (categoryCounts.get(component.category) ?? 0) + 1);
 	}
 
-	const categoryLines = CATEGORY_ORDER.filter((category) => categoryCounts.has(category)).map(
-		(category) => `- ${CATEGORY_LABELS[category]}: \`${categoryCounts.get(category)}\``
-	);
-
-	const pendingLines =
-		pendingChangesets.length > 0
-			? pendingChangesets.flatMap((changeset) => [
-					`### \`${changeset.name}\``,
-					'',
-					changeset.body,
-					''
-				])
-			: ['- No unreleased changesets are currently checked into `.changeset/`.'];
-
-	return [
-		'# Changelog',
-		'',
-		'This page is generated from the current repo state so versions, component counts, and pending release notes stay aligned with the codebase.',
-		'',
-		'## Current packages',
-		'',
-		'### Core',
-		'',
-		...corePackages.map((pkg) => formatPackageLine(pkg, CORE_PACKAGE_DESCRIPTIONS[pkg.name])),
-		'',
-		'### Companion workspaces',
-		'',
-		...companionPackages.map((pkg) => formatPackageLine(pkg)),
-		'',
-		'## Current UI surface',
-		'',
-		`- \`@dryui/ui\` currently exposes \`${countExportedEntries(uiPackage.exports)}\` documented component entries.`,
-		`- \`@dryui/primitives\` currently exposes \`${countExportedEntries(primitivesPackage.exports)}\` primitive entries.`,
-		`- The shared MCP spec currently tracks \`${Object.keys(spec.components).length}\` UI components for agent lookup.`,
-		'',
-		'### UI categories',
-		'',
-		...categoryLines,
-		'',
-		'## Current defaults',
-		'',
-		`- Svelte \`${rootPackage.devDependencies?.svelte ?? 'unknown'}\` in the workspace.`,
-		'- `theme-auto` remains the default app/docs theme mode.',
-		'- `@dryui/lint` enforces grid-only layout rules and bans inline styles/flexbox in scoped component CSS.',
-		'- MCP and CLI surfaces stay aligned around planning, lookup, validation, diagnosis, and workspace audit workflows.',
-		'',
-		'## Pending changesets',
-		'',
-		...pendingLines
-	].join('\n');
+	return {
+		corePackages: packages
+			.filter((pkg) => pkg.name in CORE_PACKAGE_DESCRIPTIONS)
+			.map((pkg) => ({ ...pkg, description: CORE_PACKAGE_DESCRIPTIONS[pkg.name]! })),
+		companionPackages: packages.filter((pkg) => !(pkg.name in CORE_PACKAGE_DESCRIPTIONS)),
+		uiExportCount: countExportedEntries(uiPackage.exports),
+		primitivesExportCount: countExportedEntries(primitivesPackage.exports),
+		specComponentCount: Object.keys(spec.components).length,
+		categories: CATEGORY_ORDER.filter((category) => categoryCounts.has(category)).map(
+			(category) => ({ label: CATEGORY_LABELS[category]!, count: categoryCounts.get(category)! })
+		),
+		svelteVersion: rootPackage.devDependencies?.svelte ?? 'unknown',
+		pendingChangesets
+	};
 }
 
-export const load: PageServerLoad = () => ({
-	content: buildContent()
-});
+export const load: PageServerLoad = () => buildData();

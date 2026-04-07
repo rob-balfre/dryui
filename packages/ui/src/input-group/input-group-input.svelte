@@ -16,6 +16,7 @@
 	data-size={ctx.size}
 	data-disabled={ctx.disabled || undefined}
 	data-invalid={ctx.invalid || undefined}
+	data-orientation={ctx.orientation}
 	data-input-group-inputWrap
 >
 	<input
@@ -30,9 +31,12 @@
 <style>
 	[data-input-group-inputWrap] {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: minmax(0, 1fr);
+		grid-template-columns: minmax(0, 1fr);
 		align-items: center;
+	}
+
+	[data-input-group-inputWrap][data-orientation='horizontal'] {
+		grid-column: 2;
 	}
 
 	[data-input-group-input] {
@@ -44,6 +48,7 @@
 		line-height: 1.4;
 		padding: var(--dry-input-group-padding-y) var(--dry-input-group-padding-x);
 		outline: none;
+		box-sizing: border-box;
 	}
 
 	[data-input-group-input]::placeholder {

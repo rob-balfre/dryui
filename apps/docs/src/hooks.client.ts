@@ -1,7 +1,7 @@
 import mapboxgl from 'mapbox-gl';
-import { env } from '$env/dynamic/public';
+import { PUBLIC_MAPBOX_TOKEN } from '$env/static/public';
 
-const mapboxToken = env['PUBLIC_MAPBOX_TOKEN'];
+const mapboxToken = PUBLIC_MAPBOX_TOKEN;
 
 if (mapboxToken) {
 	mapboxgl.accessToken = mapboxToken;

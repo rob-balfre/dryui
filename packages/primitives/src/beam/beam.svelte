@@ -19,7 +19,7 @@
 		angle = 45,
 		speed = 3,
 		intensity = 70,
-		blendMode = 'screen',
+		blendMode,
 		children,
 		class: className,
 		style,
@@ -31,26 +31,33 @@
 	const gradientString = $derived(
 		`linear-gradient(${angle}deg, transparent 0%, transparent calc(50% - ${width}px), ${color} 50%, transparent calc(50% + ${width}px), transparent 100%)`
 	);
+	const rootStyle = $derived.by(() => {
+		const declarations = [
+			style,
+			`--dry-beam-speed: ${speedValue}`,
+			`--dry-beam-intensity: ${clampedIntensity}`,
+			`--dry-beam-width: ${width}px`,
+			blendMode ? `--dry-beam-blend: ${blendMode}` : null
+		].filter(Boolean);
+		return declarations.join('; ');
+	});
+	const layerStyle = $derived(`background: ${gradientString};`);
 
 	function applyRootStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-beam-speed', speedValue);
-			node.style.setProperty('--dry-beam-intensity', clampedIntensity);
-			node.style.setProperty('--dry-beam-blend', blendMode);
-			node.style.setProperty('--dry-beam-width', `${width}px`);
+			node.style.cssText = rootStyle;
 		});
 	}
 
 	function applyLayerStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('background', gradientString);
+			node.style.cssText = layerStyle;
 		});
 	}
 </script>
 
-<div class={['beam', className]} {...rest} use:applyRootStyles>
-	<div class="beam-layer" use:applyLayerStyles></div>
+<div class={['beam', className]} {...rest} {@attach applyRootStyles}>
+	<div class="beam-layer" {@attach applyLayerStyles}></div>
 	{#if children}
 		{@render children()}
 	{/if}
@@ -65,5 +72,26 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
+		background-size: 300% 300%;
+		opacity: calc(var(--dry-beam-intensity, 70) / 100);
+		mix-blend-mode: var(--dry-beam-blend, var(--dry-beam-default-blend, multiply));
+		filter: blur(calc(var(--dry-beam-width, 2px) * 2));
+		animation: beam-sweep var(--dry-beam-speed, 3s) ease-in-out infinite;
+	}
+
+	@keyframes beam-sweep {
+		0% {
+			background-position: -50% -50%;
+		}
+		100% {
+			background-position: 150% 150%;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.beam-layer {
+			animation: none;
+			background-position: 50% 50%;
+		}
 	}
 </style>

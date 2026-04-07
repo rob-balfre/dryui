@@ -65,8 +65,6 @@
 		--dry-input-group-separator: color-mix(in srgb, var(--dry-input-group-border) 80%, transparent);
 
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		align-items: stretch;
 		min-height: 3rem;
 		border: 1px solid var(--dry-input-group-border);
@@ -74,6 +72,16 @@
 		background: var(--dry-input-group-bg);
 		color: var(--dry-input-group-color);
 		overflow: hidden;
+	}
+
+	[data-input-group-root][data-orientation='horizontal'] {
+		grid-template-columns:
+			max-content
+			minmax(0, 1fr)
+			max-content
+			max-content
+			max-content
+			max-content;
 	}
 
 	[data-input-group-root]:focus-within {

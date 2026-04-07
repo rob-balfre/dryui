@@ -84,15 +84,12 @@
 	}
 
 	[data-part='root'] {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
-		gap: var(--dry-space-1_5);
+		display: block;
 		padding: var(--dry-space-2);
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);
 		min-height: 44px;
-		align-items: center;
 		box-sizing: border-box;
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
@@ -123,7 +120,7 @@
 	[data-size='sm'] {
 		padding: var(--dry-space-1) var(--dry-space-1_5);
 		min-height: 32px;
-		gap: var(--dry-space-1);
+		--dry-tags-input-gap: var(--dry-space-1);
 		--dry-tags-input-tag-padding-x: var(--dry-space-1_5);
 		--dry-tags-input-tag-font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
 		--dry-tags-input-font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
@@ -132,21 +129,15 @@
 	[data-size='md'] {
 		padding: var(--dry-space-2);
 		min-height: 44px;
-		gap: var(--dry-space-1_5);
+		--dry-tags-input-gap: var(--dry-space-1_5);
 	}
 
 	[data-size='lg'] {
 		padding: var(--dry-space-2_5);
 		min-height: 52px;
-		gap: var(--dry-space-2);
+		--dry-tags-input-gap: var(--dry-space-2);
 		--dry-tags-input-tag-padding-x: var(--dry-space-2_5);
 		--dry-tags-input-tag-font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		--dry-tags-input-font-size: var(--dry-type-small-size, var(--dry-text-base-size));
-	}
-
-	@container (max-width: 200px) {
-		[data-part='root'] {
-			grid-template-columns: 1fr;
-		}
 	}
 </style>

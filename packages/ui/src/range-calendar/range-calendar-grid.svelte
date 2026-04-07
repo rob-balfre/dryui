@@ -8,6 +8,13 @@
 		isDateInRange,
 		formatDate
 	} from '@dryui/primitives';
+	import {
+		generateWeekdayLabels,
+		splitIntoWeeks,
+		getDayISOString,
+		handleCalendarKeydown,
+		focusCalendarDay
+	} from '../internal/calendar-grid-utils.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -15,7 +22,7 @@
 
 	const ctx = getRangeCalendarCtx();
 
-	let gridEl = $state<HTMLDivElement>();
+	let gridEl = $state<HTMLDivElement | undefined>();
 
 	const weekdayLabels = $derived(generateWeekdayLabels(ctx.locale, ctx.weekStartDay));
 
@@ -29,28 +36,6 @@
 	);
 
 	const weeks = $derived(splitIntoWeeks(calendarDays));
-
-	function generateWeekdayLabels(locale: string, weekStartDay: number): string[] {
-		const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
-		const labels: string[] = [];
-		for (let i = 0; i < 7; i++) {
-			const d = new Date(2024, 0, 7 + ((i + weekStartDay) % 7));
-			labels.push(formatter.format(d));
-		}
-		return labels;
-	}
-
-	function splitIntoWeeks(days: Date[]): Date[][] {
-		const result: Date[][] = [];
-		for (let i = 0; i < days.length; i += 7) {
-			result.push(days.slice(i, i + 7));
-		}
-		return result;
-	}
-
-	function getDayISOString(day: Date): string {
-		return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
-	}
 
 	function isInRange(day: Date): boolean {
 		const start = ctx.startDate;
@@ -83,72 +68,71 @@
 	}
 
 	function handleDayKeydown(e: KeyboardEvent, day: Date) {
-		const { key } = e;
-		let newDate: Date | null = null;
-
-		if (key === 'ArrowLeft') {
-			e.preventDefault();
-			newDate = new Date(day);
-			newDate.setDate(newDate.getDate() - 1);
-		} else if (key === 'ArrowRight') {
-			e.preventDefault();
-			newDate = new Date(day);
-			newDate.setDate(newDate.getDate() + 1);
-		} else if (key === 'ArrowUp') {
-			e.preventDefault();
-			newDate = new Date(day);
-			newDate.setDate(newDate.getDate() - 7);
-		} else if (key === 'ArrowDown') {
-			e.preventDefault();
-			newDate = new Date(day);
-			newDate.setDate(newDate.getDate() + 7);
-		} else if (key === 'Enter' || key === ' ') {
-			e.preventDefault();
-			if (isDateInRange(day, ctx.min, ctx.max)) ctx.selectDate(day);
-			return;
-		} else return;
-
-		if (newDate) {
-			ctx.setFocusedDate(newDate);
-			requestAnimationFrame(() => {
-				const isoStr = getDayISOString(newDate!);
-				const btn = gridEl?.querySelector(`[data-calendar-day="${isoStr}"]`) as HTMLButtonElement;
-				btn?.focus();
-			});
+		const result = handleCalendarKeydown(e, day, {
+			onSelect: (date) => {
+				if (isDateInRange(date, ctx.min, ctx.max)) {
+					ctx.selectDate(date);
+				}
+			},
+			onEscape: () => {},
+			setFocusedDate: (date) => ctx.setFocusedDate(date),
+			weekStartDay: ctx.weekStartDay,
+			min: ctx.min,
+			max: ctx.max
+		});
+		if (result?.type === 'navigate') {
+			requestAnimationFrame(() => focusCalendarDay(gridEl, result.newDate));
 		}
 	}
 
 	function isDayDisabled(day: Date): boolean {
 		return !isDateInRange(day, ctx.min, ctx.max);
 	}
+
+	function captureGrid(node: HTMLDivElement) {
+		gridEl = node;
+
+		return {
+			destroy() {
+				if (gridEl === node) {
+					gridEl = undefined;
+				}
+			}
+		};
+	}
 </script>
 
-<div bind:this={gridEl} data-range-calendar-grid class={className} {...rest}>
-	<div role="group" aria-label={monthYearLabel}>
+<div {@attach captureGrid} data-range-calendar-grid class={className} {...rest}>
+	<div data-calendar-panel role="group" aria-label={monthYearLabel}>
 		<div data-calendar-header>
-			<button type="button" aria-label="Previous month" onclick={() => ctx.prevMonth()}>
+			<button
+				type="button"
+				data-calendar-nav
+				aria-label="Previous month"
+				onclick={() => ctx.prevMonth()}
+			>
 				&#8249;
 			</button>
-			<span aria-live="polite" aria-atomic="true">
+			<span data-calendar-heading aria-live="polite" aria-atomic="true">
 				{monthYearLabel}
 			</span>
-			<button type="button" aria-label="Next month" onclick={() => ctx.nextMonth()}>
+			<button type="button" data-calendar-nav aria-label="Next month" onclick={() => ctx.nextMonth()}>
 				&#8250;
 			</button>
 		</div>
 
 		<div role="grid" aria-label={monthYearLabel}>
-			<div role="row">
-				{#each weekdayLabels as label}
-					<div role="columnheader" aria-label={label}>
+			<div data-calendar-row role="row">
+				{#each weekdayLabels as label (label)}
+					<div data-calendar-columnheader role="columnheader" aria-label={label}>
 						<span aria-hidden="true">{label}</span>
 					</div>
 				{/each}
 			</div>
 
-			{#each weeks as week}
-				<div role="row">
-					{#each week as day}
+			{#each weeks as week (week[0]?.getTime() ?? 0)}
+				<div data-calendar-row role="row">
+					{#each week as day (day.getTime())}
 						{@const isCurrent = day.getMonth() === ctx.viewMonth}
 						{@const inRange = isInRange(day)}
 						{@const rangeStart = isRangeStart(day)}
@@ -157,15 +141,24 @@
 						{@const disabled = isDayDisabled(day)}
 						{@const focused = isSameDay(day, ctx.focusedDate)}
 						{@const isoStr = getDayISOString(day)}
-						<div role="gridcell" aria-selected={inRange || undefined}>
+						<div
+							data-calendar-cell
+							data-in-range={inRange ? '' : undefined}
+							data-range-start={rangeStart ? '' : undefined}
+							data-range-end={rangeEnd ? '' : undefined}
+						>
 							<button
+								role="gridcell"
 								type="button"
+								data-calendar-day-button
 								tabindex={focused ? 0 : -1}
 								aria-label={formatDate(day, ctx.locale, {
 									year: 'numeric',
 									month: 'long',
 									day: 'numeric'
 								})}
+								aria-current={today ? 'date' : undefined}
+								aria-selected={inRange || undefined}
 								aria-disabled={disabled}
 								data-calendar-day={isoStr}
 								data-today={today ? '' : undefined}
@@ -193,139 +186,184 @@
 	[data-range-calendar-grid] {
 		display: grid;
 		gap: var(--dry-space-2);
+		user-select: none;
+		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-sans);
+	}
 
-		[role='group'] {
-			display: grid;
-			gap: var(--dry-space-2);
-		}
+	[data-range-calendar-grid] [data-calendar-panel] {
+		display: grid;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-3);
+		background: var(--dry-range-calendar-panel-bg, var(--dry-color-bg-overlay));
+		border: 1px solid var(--dry-range-calendar-panel-border, var(--dry-color-stroke-weak));
+		border-radius: calc(var(--dry-range-calendar-radius, var(--dry-radius-lg)) - var(--dry-space-1));
+	}
 
-		[role='group'] > div:first-child {
-			display: grid;
-			grid-template-columns: auto 1fr auto;
-			align-items: center;
-			gap: var(--dry-space-2);
-		}
+	[data-range-calendar-grid] [data-calendar-header] {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding-block-end: var(--dry-space-1);
+		border-block-end: 1px solid
+			color-mix(
+				in srgb,
+				var(--dry-range-calendar-panel-border, var(--dry-color-stroke-weak)) 70%,
+				transparent
+			);
+	}
 
-		[role='group'] > div:first-child button {
-			display: inline-grid;
-			place-items: center;
-			height: var(--dry-space-8);
-			aspect-ratio: 1;
-			border: 1px solid transparent;
-			border-radius: var(--dry-range-calendar-day-radius);
-			background: transparent;
-			color: var(--dry-color-text-strong);
-			cursor: pointer;
-			transition:
-				background var(--dry-duration-fast) var(--dry-ease-default),
-				border-color var(--dry-duration-fast) var(--dry-ease-default);
-		}
+	[data-range-calendar-grid] [data-calendar-nav] {
+		display: inline-grid;
+		place-items: center;
+		height: var(--dry-space-8);
+		aspect-ratio: 1;
+		border: 1px solid var(--dry-range-calendar-nav-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+		background: var(--dry-range-calendar-nav-bg, var(--dry-color-bg-raised));
+		color: var(--dry-range-calendar-nav-color, var(--dry-color-text-weak));
+		cursor: pointer;
+		transition:
+			background var(--dry-duration-fast) var(--dry-ease-default),
+			border-color var(--dry-duration-fast) var(--dry-ease-default),
+			color var(--dry-duration-fast) var(--dry-ease-default);
+	}
 
-		[role='group'] > div:first-child button:hover:not([disabled]) {
-			background: var(--dry-range-calendar-day-hover-bg);
-			border-color: var(--dry-color-stroke-strong);
-		}
+	[data-range-calendar-grid] [data-calendar-nav]:hover:not([disabled]) {
+		background: var(--dry-range-calendar-day-hover-bg, var(--dry-color-fill-hover));
+		border-color: var(--dry-color-stroke-strong);
+		color: var(--dry-color-text-strong);
+	}
 
-		[role='group'] > div:first-child button:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
-			outline-offset: 1px;
-		}
+	[data-range-calendar-grid] [data-calendar-nav]:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: 1px;
+	}
 
-		[role='group'] > div:first-child span {
-			font-size: var(--dry-type-small-size, var(--dry-type-small-size));
-			font-weight: 600;
-			letter-spacing: -0.01em;
-		}
+	[data-range-calendar-grid] [data-calendar-heading] {
+		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
+		font-weight: 700;
+		letter-spacing: -0.02em;
+		color: var(--dry-range-calendar-heading-color, var(--dry-color-text-strong));
+	}
 
-		[role='grid'] {
-			display: grid;
-			gap: 1px;
-		}
+	[data-range-calendar-grid] [role='grid'] {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
 
-		[role='row'] {
-			display: grid;
-			grid-template-columns: repeat(7, minmax(0, 1fr));
-			gap: 1px;
-		}
+	[data-range-calendar-grid] [data-calendar-row] {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		gap: var(--dry-space-1);
+	}
 
-		[role='columnheader'] {
-			display: grid;
-			place-items: center;
-			min-height: var(--dry-space-8);
-			font-size: var(--dry-type-tiny-size, var(--dry-type-tiny-size));
-			color: var(--dry-range-calendar-outside-color);
-			text-transform: uppercase;
-			letter-spacing: 0.04em;
-		}
+	[data-range-calendar-grid] [data-calendar-columnheader] {
+		display: grid;
+		place-items: center;
+		min-height: var(--dry-space-7);
+		font-size: calc(var(--dry-type-tiny-size, var(--dry-type-tiny-size)) * 0.92);
+		color: var(--dry-range-calendar-outside-color, var(--dry-color-text-weak));
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
 
-		[role='gridcell'] {
-			display: grid;
-			place-items: center;
-		}
+	[data-range-calendar-grid] [data-calendar-cell] {
+		display: grid;
+		grid-template-columns: var(--dry-range-calendar-day-size, 2.5rem);
+		place-items: center;
+		padding-block: var(--dry-space-0_5);
+		border-radius: 0;
+	}
 
-		[role='gridcell'] button {
-			display: inline-grid;
-			place-items: center;
-			min-height: var(--dry-range-calendar-day-size);
-			aspect-ratio: 1;
-			border: none;
-			border-radius: var(--dry-range-calendar-day-radius);
-			background: transparent;
-			color: var(--dry-color-text-strong);
-			font: inherit;
-			font-size: var(--dry-type-small-size, var(--dry-type-small-size));
-			font-variant-numeric: tabular-nums;
-			cursor: pointer;
-			transition:
-				background var(--dry-duration-fast) var(--dry-ease-default),
-				color var(--dry-duration-fast) var(--dry-ease-default);
-		}
+	[data-range-calendar-grid] [data-calendar-cell][data-in-range] {
+		background: var(
+			--dry-range-calendar-range-bg,
+			color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent)
+		);
+	}
 
-		[role='gridcell'] button:hover:not([data-disabled]) {
-			background: var(--dry-range-calendar-day-hover-bg);
-		}
+	[data-range-calendar-grid] [data-calendar-cell][data-range-start][data-in-range] {
+		border-start-start-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+		border-end-start-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+	}
 
-		[role='gridcell'] button:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
-			outline-offset: 1px;
-		}
+	[data-range-calendar-grid] [data-calendar-cell][data-range-end][data-in-range] {
+		border-start-end-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+		border-end-end-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+	}
 
-		[role='gridcell'] button[data-today]:not([data-range-start]):not([data-range-end]) {
-			color: var(--dry-range-calendar-today-color);
-			font-weight: 600;
-		}
+	[data-range-calendar-grid] [data-calendar-cell][data-range-start][data-range-end] {
+		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+	}
 
-		[role='gridcell'] button[data-range-start],
-		[role='gridcell'] button[data-range-end] {
-			background: var(--dry-range-calendar-selected-bg);
-			color: var(--dry-range-calendar-selected-color);
-			font-weight: 600;
-		}
+	[data-range-calendar-grid] [data-calendar-day-button] {
+		display: inline-grid;
+		place-items: center;
+		min-height: var(--dry-range-calendar-day-size, 2.5rem);
+		padding: 0;
+		aspect-ratio: 1;
+		border: 1px solid transparent;
+		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+		background: transparent;
+		color: var(--dry-color-text-strong);
+		font: inherit;
+		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
+		font-variant-numeric: tabular-nums;
+		font-weight: 500;
+		cursor: pointer;
+		transition:
+			background var(--dry-duration-fast) var(--dry-ease-default),
+			border-color var(--dry-duration-fast) var(--dry-ease-default),
+			color var(--dry-duration-fast) var(--dry-ease-default);
+	}
 
-		[role='gridcell'] button[data-range-start]:hover:not([data-disabled]),
-		[role='gridcell'] button[data-range-end]:hover:not([data-disabled]) {
-			background: var(--dry-range-calendar-selected-hover-bg);
-		}
+	[data-range-calendar-grid]
+		[data-calendar-day-button]:hover:not([data-disabled]):not([data-range-start]):not(
+			[data-range-end]
+		) {
+		background: var(--dry-range-calendar-day-hover-bg, var(--dry-color-fill-hover));
+	}
 
-		[role='gridcell'] button[data-in-range] {
-			background: var(--dry-range-calendar-range-bg);
-			border-radius: 0;
-		}
+	[data-range-calendar-grid] [data-calendar-day-button]:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: 1px;
+	}
 
-		[role='gridcell'] button[data-range-start],
-		[role='gridcell'] button[data-range-end] {
-			border-radius: var(--dry-range-calendar-day-radius);
-		}
+	[data-range-calendar-grid]
+		[data-calendar-day-button][data-today]:not([data-range-start]):not([data-range-end]) {
+		border-color: color-mix(
+			in srgb,
+			var(--dry-range-calendar-today-color, var(--dry-color-text-brand)) 24%,
+			transparent
+		);
+		color: var(--dry-range-calendar-today-color, var(--dry-color-text-brand));
+		font-weight: 600;
+	}
 
-		[role='gridcell'] button[data-outside-month] {
-			color: var(--dry-range-calendar-outside-color);
-			opacity: 0.6;
-		}
+	[data-range-calendar-grid] [data-calendar-day-button][data-range-start],
+	[data-range-calendar-grid] [data-calendar-day-button][data-range-end] {
+		background: var(--dry-range-calendar-selected-bg, var(--dry-color-fill-brand));
+		color: var(--dry-range-calendar-selected-color, var(--dry-color-on-brand));
+		font-weight: 700;
+	}
 
-		[role='gridcell'] button[data-disabled] {
-			cursor: not-allowed;
-			opacity: 0.4;
-			pointer-events: none;
-		}
+	[data-range-calendar-grid]
+		[data-calendar-day-button][data-range-start]:hover:not([data-disabled]),
+	[data-range-calendar-grid]
+		[data-calendar-day-button][data-range-end]:hover:not([data-disabled]) {
+		background: var(--dry-range-calendar-selected-hover-bg, var(--dry-color-fill-brand-hover));
+	}
+
+	[data-range-calendar-grid] [data-calendar-day-button][data-outside-month] {
+		color: var(--dry-range-calendar-outside-color, var(--dry-color-text-weak));
+		opacity: 0.55;
+	}
+
+	[data-range-calendar-grid] [data-calendar-day-button][data-disabled] {
+		cursor: not-allowed;
+		opacity: 0.35;
+		pointer-events: none;
 	}
 </style>

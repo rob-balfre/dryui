@@ -214,6 +214,7 @@
 		--dry-data-grid-sort-color: var(--dry-color-fill-brand);
 		--dry-data-grid-pagination-gap: var(--dry-space-2);
 
+		display: grid;
 		container-type: inline-size;
 		overflow-x: auto;
 	}

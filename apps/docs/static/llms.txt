@@ -191,7 +191,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/option-swatch-group
 Parts: Root, Item, Swatch, Label, Meta
 Props: Swatch: color (string), Semantic color or tone applied to the component. | shape ('circle' | 'rounded'), accepted circle, rounded, default 'circle' | children (Snippet), Content rendered inside the component.
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-content | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-unavailable | data-value
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-unavailable | data-value
 Example: <OptionSwatchGroup.Root>
 
 ### Listbox
@@ -356,7 +356,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/select
 Parts: Root, Trigger, Content, Item, Value
 Props: Root: open (boolean), Controls whether the select menu is currently expanded., default false, bindable | value (string), Bindable selected value for the current option set., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-trigger-wrap | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-trigger-wrap | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example: <Select.Root bind:value={selected} bind:open={selectOpen} name="selection">
 
@@ -402,7 +402,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-picker
 Parts: Root, Trigger, Content, Calendar
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement (Placement) | offset (number) | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-dp-trigger | data-invalid (Present when the current field value is invalid.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-size | data-state | data-today
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-dp-trigger | data-indicator | data-invalid (Present when the current field value is invalid.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-size | data-state | data-today
 Example: <DatePicker.Root bind:value={departureDate} name="departureDate">
 
 ### Calendar
@@ -420,7 +420,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered., default 'Select date range' | children (Snippet | undefined), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-indicator | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Example: <DateRangePicker.Root>
 
 ### RangeCalendar
@@ -429,7 +429,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/range-calendar
 Parts: Root, Grid
 Props: Root: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
+Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-day-button | data-calendar-header | data-calendar-heading | data-calendar-nav | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
 Example: <RangeCalendar.Root>
 
 ### Category: Layout
@@ -737,7 +737,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/accordion
 Parts: Root, Item, Trigger, Content
 Props: Root: type ('single' | 'multiple'), Accordion behavior mode for single or multiple expanded items., accepted single, multiple, default 'single' | value (string[]), Current controlled or bindable value., default [] | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'vertical' | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required
-Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-accordion-trigger | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
+Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-accordion-trigger | data-disabled (Present when the component or part is disabled.) | data-indicator | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
 Accessibility: Use descriptive trigger text so the hidden content is understandable before expansion. | Keep each trigger paired with its matching content so keyboard and screen-reader relationships stay intact.
 Example: <Accordion.Root>
 
@@ -747,7 +747,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/collapsible
 Parts: Root, Trigger, Content
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required
-Data attributes: data-collapsible-content | data-collapsible-content-inner | data-collapsible-trigger | data-disabled (Present when the component or part is disabled.) | data-state (Reflects whether the collapsible content is expanded or collapsed., values open, closed)
+Data attributes: data-collapsible-content | data-collapsible-content-inner | data-collapsible-trigger | data-disabled (Present when the component or part is disabled.) | data-indicator | data-state (Reflects whether the collapsible content is expanded or collapsed., values open, closed)
 Example: <Collapsible.Root>
 
 ### Table
@@ -1050,11 +1050,11 @@ Data attributes: data-map-root | data-part
 Example: <Map.Root center={[-122.4, 37.8]} zoom={12}>
 
 ### SystemMap
-Layered architecture diagram for DolphinGraph nodes, relationships, and audit signals.
+Layered architecture diagram that visualizes component nodes, relationships, and dependency layers.
 Import: @dryui/ui
 Subpath import: @dryui/ui/system-map
 Props: graph (DolphinGraph), required | focusId (string | null), default null | layerFilter (readonly DolphinLayer[]) | kindFilter (readonly DolphinNodeKind[]) | edgeFilter (readonly DolphinEdgeType[]) | packageFilter (readonly DolphinPackage[]) | visibilityFilter (readonly DolphinVisibility[]) | categoryFilter (readonly string[]) | showLegend (boolean), default true | showThumbnails (boolean), default true | showEdgeLabels (boolean), default false
-Data attributes: data-canvas-shell | data-dashed | data-edge-label | data-empty-hint | data-empty-label | data-eyebrow | data-group-label | data-header | data-header-badges | data-header-text | data-lane-meta | data-lane-title | data-legend | data-legend-item | data-legend-items | data-legend-section | data-line-swatch | data-map-title | data-node-description | data-node-label | data-node-meta | data-summary | data-svg | data-swatch | data-system-map | data-thumbnail-object
+Data attributes: data-connector | data-connector-label | data-connector-line | data-edge-row | data-empty | data-focused | data-node | data-node-helper | data-node-name | data-orphans | data-system-map
 Example: <SystemMap>Content</SystemMap>
 
 ### StarRating
@@ -1234,7 +1234,7 @@ Example: <Adjust>Content</Adjust>
 Animated linear light streak surface for directional highlights and shimmer accents.
 Import: @dryui/ui
 Subpath import: @dryui/ui/beam
-Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode), default 'screen' | children (Snippet), Content rendered inside the component.
+Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Data attributes: data-beam | data-beam-layer
 Example: <Beam>Content</Beam>
 

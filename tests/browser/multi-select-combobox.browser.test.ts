@@ -61,6 +61,19 @@ function clickOption(text: string) {
 	return item;
 }
 
+function clickRemoveButton(label: string) {
+	const button = document.querySelector<HTMLButtonElement>(
+		`button[aria-label="Remove selection: ${label}"]`
+	);
+
+	if (!button) {
+		throw new Error(`Missing remove button for: ${label}`);
+	}
+
+	button.click();
+	flushSync();
+}
+
 function getHiddenValues(name = 'assignees') {
 	return Array.from(
 		document.querySelectorAll<HTMLInputElement>(`input[type="hidden"][name="${name}"]`)
@@ -95,6 +108,18 @@ describe('MultiSelectCombobox', () => {
 
 		expect(getHiddenValues()).toEqual([]);
 		expect(document.querySelector('[data-testid="value"]')?.textContent).toBe('');
+	});
+
+	it('removes a selected value when the token remove button is clicked', () => {
+		renderHarness();
+
+		clickOption('Maya Chen');
+		clickOption('Jordan Lee');
+
+		clickRemoveButton('Maya Chen');
+
+		expect(getHiddenValues()).toEqual(['jordan']);
+		expect(document.querySelector('[data-testid="value"]')?.textContent).toBe('jordan');
 	});
 
 	it('enforces maxSelections and disables additional options', () => {

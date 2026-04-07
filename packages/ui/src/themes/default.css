@@ -87,6 +87,9 @@ code, pre, kbd, samp {
 	--dry-toggle-label-color: rgba(0, 6, 38, 0.9);
 	--dry-toggle-label-disabled-color: rgba(0, 17, 102, 0.1);
 
+	/* ─── Component: Beam ─────────────────────────────────────────── */
+	--dry-beam-default-blend: multiply;
+
 	/* ─── Status: Error (hue 0) ───────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 70%, 35%);
 	--dry-color-fill-error: hsl(0, 70%, 50%);

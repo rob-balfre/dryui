@@ -17,6 +17,7 @@
 	data-size={ctx.size}
 	data-disabled={ctx.disabled || undefined}
 	data-invalid={ctx.invalid || undefined}
+	data-orientation={ctx.orientation}
 	{...rest}
 	data-input-group-suffix
 	class={className}
@@ -34,5 +35,9 @@
 		padding: 0 var(--dry-input-group-padding-x);
 		color: var(--dry-input-group-muted);
 		white-space: nowrap;
+	}
+
+	[data-input-group-suffix][data-orientation='horizontal'] {
+		grid-column: 3;
 	}
 </style>

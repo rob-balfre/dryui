@@ -1,6 +1,6 @@
 {
   "schema": "DolphinGraph",
-  "generatedAt": "2026-04-07T05:46:32.964Z",
+  "generatedAt": "2026-04-07T07:18:45.736Z",
   "packageVersion": "0.1.3",
   "summary": {
     "componentNodes": 292,
@@ -15159,7 +15159,7 @@
       "package": "ui",
       "layer": "ui-composite",
       "category": "display",
-      "description": "Layered architecture diagram for DolphinGraph nodes, relationships, and audit signals",
+      "description": "Layered architecture diagram that visualizes component nodes, relationships, and dependency layers",
       "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/system-map/index.ts",
       "publicImport": "@dryui/ui",

@@ -21,20 +21,15 @@
 		...rest
 	}: Props = $props();
 
-	let containerEl = $state<HTMLDivElement>();
 	let dragging = $state(false);
 
-	function setContainer(node: HTMLDivElement) {
-		containerEl = node;
-		return {
-			destroy() {
-				if (containerEl === node) containerEl = undefined;
-			}
-		};
+	function syncStyles(node: HTMLElement) {
+		$effect(() => {
+			node.style.cssText = `${style ? `${style}; ` : ''}--dry-image-comparison-position: ${position}%`;
+		});
 	}
 
-	function updatePosition(clientX: number, clientY: number) {
-		if (!containerEl) return;
+	function updatePosition(clientX: number, clientY: number, containerEl: HTMLElement) {
 		const rect = containerEl.getBoundingClientRect();
 		let pct: number;
 		if (orientation === 'horizontal') {
@@ -47,13 +42,16 @@
 
 	function onPointerDown(e: PointerEvent) {
 		dragging = true;
-		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-		updatePosition(e.clientX, e.clientY);
+		const handleEl = e.currentTarget as HTMLElement;
+		handleEl.setPointerCapture(e.pointerId);
+		const containerEl = handleEl.closest<HTMLElement>('[data-image-comparison]');
+		if (!containerEl) return;
+		updatePosition(e.clientX, e.clientY, containerEl);
 	}
 
 	function onPointerMove(e: PointerEvent) {
 		if (!dragging) return;
-		updatePosition(e.clientX, e.clientY);
+		updatePosition(e.clientX, e.clientY, e.currentTarget as HTMLElement);
 	}
 
 	function onPointerUp() {
@@ -70,13 +68,6 @@
 			position = Math.min(position + step, 100);
 		}
 	}
-
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-image-comparison-position', `${position}%`);
-		});
-	}
 </script>
 
 {#snippet defaultHandle()}
@@ -92,7 +83,7 @@
 {/snippet}
 
 <div
-	{@attach setContainer}
+	{@attach syncStyles}
 	class={className}
 	data-image-comparison
 	data-orientation={orientation}
@@ -100,7 +91,6 @@
 	onpointermove={onPointerMove}
 	onpointerup={onPointerUp}
 	{...rest}
-	use:applyStyles
 >
 	<div data-part="after" data-ic-layer>
 		{@render after()}
@@ -141,6 +131,8 @@
 		--dry-image-comparison-handle-z-index: 1;
 
 		position: relative;
+		display: grid;
+		height: 100%;
 		overflow: hidden;
 		border-radius: var(--dry-image-comparison-radius);
 		user-select: none;
@@ -148,8 +140,8 @@
 	}
 
 	[data-ic-layer] {
-		position: absolute;
-		inset: 0;
+		grid-area: 1 / 1;
+		min-height: 0;
 	}
 
 	[data-image-comparison][data-orientation='horizontal'] [data-ic-layer-before] {

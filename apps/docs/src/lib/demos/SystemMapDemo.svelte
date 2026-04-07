@@ -4,22 +4,22 @@
 
 	const graph: SystemMapGraph = {
 		schema: 'DolphinGraph',
-		generatedAt: '2026-04-04T00:00:00.000Z',
-		packageVersion: '0.0.1',
+		generatedAt: '2026-04-07T00:00:00.000Z',
+		packageVersion: '0.1.3',
 		summary: {
-			componentNodes: 3,
+			componentNodes: 4,
 			partNodes: 0,
 			catalogNodes: 0,
 			clusterNodes: 0,
-			primitiveComponents: 1,
+			primitiveComponents: 2,
 			uiComponents: 2,
-			uiWrappers: 1,
-			uiComposites: 1,
-			rootBarrelComponents: 3,
+			uiWrappers: 2,
+			uiComposites: 0,
+			rootBarrelComponents: 4,
 			subpathOnlyComponents: 0,
-			compoundComponents: 1,
-			wrapEdges: 1,
-			composeEdges: 1,
+			compoundComponents: 2,
+			wrapEdges: 2,
+			composeEdges: 0,
 			docsEdges: 0,
 			relatedEdges: 0,
 			mismatches: 0,
@@ -35,50 +35,67 @@
 				package: 'primitives',
 				layer: 'primitive',
 				category: 'Forms',
-				description: 'Primitive text input control.',
+				description: 'Single-line text entry primitive.',
+				visibility: 'root+subpath',
 				tags: ['forms'],
 				compound: false,
 				parts: []
 			},
 			{
-				id: 'ui:InputGroup',
-				name: 'InputGroup',
-				label: 'InputGroup',
+				id: 'primitives:Popover',
+				name: 'Popover',
+				label: 'Popover',
+				kind: 'component',
+				package: 'primitives',
+				layer: 'primitive',
+				category: 'Overlay',
+				description: 'Anchored floating surface.',
+				visibility: 'root+subpath',
+				tags: ['overlay'],
+				compound: false,
+				parts: []
+			},
+			{
+				id: 'ui:Combobox',
+				name: 'Combobox',
+				label: 'Combobox',
 				kind: 'component',
 				package: 'ui',
 				layer: 'ui-wrapper',
 				category: 'Forms',
-				description: 'Affixed input shell for pricing and search.',
-				tags: ['forms', 'compound'],
+				description: 'Searchable select with filtering.',
+				visibility: 'root+subpath',
+				tags: ['forms'],
 				compound: true,
-				parts: ['InputGroup.Input', 'InputGroup.Action']
+				parts: ['Combobox.Input', 'Combobox.Content']
 			},
 			{
-				id: 'ui:CommerceHeader',
-				name: 'CommerceHeader',
-				label: 'CommerceHeader',
+				id: 'ui:DropdownMenu',
+				name: 'DropdownMenu',
+				label: 'DropdownMenu',
 				kind: 'component',
 				package: 'ui',
-				layer: 'ui-composite',
+				layer: 'ui-wrapper',
 				category: 'Navigation',
-				description: 'Storefront header with search and utility actions.',
-				tags: ['navigation', 'commerce'],
+				description: 'Popover-based action menu.',
+				visibility: 'root+subpath',
+				tags: ['navigation'],
 				compound: true,
-				parts: ['CommerceHeader.Brand', 'CommerceHeader.Search', 'CommerceHeader.Actions']
+				parts: ['DropdownMenu.Trigger', 'DropdownMenu.Content']
 			}
 		],
 		edges: [
 			{
-				id: 'wraps:ui:InputGroup:primitives:Input',
+				id: 'wraps:ui:Combobox:primitives:Input',
 				type: 'wraps',
-				from: 'ui:InputGroup',
+				from: 'ui:Combobox',
 				to: 'primitives:Input'
 			},
 			{
-				id: 'composes:ui:CommerceHeader:ui:InputGroup',
-				type: 'composes',
-				from: 'ui:CommerceHeader',
-				to: 'ui:InputGroup'
+				id: 'wraps:ui:DropdownMenu:primitives:Popover',
+				type: 'wraps',
+				from: 'ui:DropdownMenu',
+				to: 'primitives:Popover'
 			}
 		],
 		clusters: [],
@@ -100,4 +117,4 @@
 	};
 </script>
 
-<SystemMap {graph} focusId="ui:CommerceHeader" showThumbnails={false} />
+<SystemMap {graph} showLegend={false} showThumbnails={false} />

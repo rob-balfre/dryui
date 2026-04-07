@@ -15,10 +15,19 @@
 
 	let buttonEl = $state<HTMLButtonElement>();
 
-	$effect(() => {
-		if (!buttonEl) return;
-		ctx.triggerEl = buttonEl;
-	});
+	function bindTrigger(node: HTMLButtonElement) {
+		buttonEl = node;
+		ctx.triggerEl = node;
+
+		return () => {
+			if (buttonEl === node) {
+				buttonEl = undefined;
+			}
+			if (ctx.triggerEl === node) {
+				ctx.triggerEl = null;
+			}
+		};
+	}
 
 	const formatOpts: Intl.DateTimeFormatOptions = {
 		year: 'numeric',
@@ -38,7 +47,7 @@
 </script>
 
 <button
-	bind:this={buttonEl}
+	{@attach bindTrigger}
 	id={ctx.triggerId}
 	type="button"
 	aria-haspopup="dialog"
@@ -46,6 +55,7 @@
 	aria-controls={ctx.contentId}
 	data-state={ctx.open ? 'open' : 'closed'}
 	data-disabled={ctx.disabled ? '' : undefined}
+	data-drp-trigger
 	disabled={ctx.disabled}
 	popovertarget={ctx.contentId}
 	class={className}
@@ -58,6 +68,7 @@
 			{displayText || placeholder}
 		</span>
 	{/if}
+	<svg data-indicator xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2" ry="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
 </button>
 
 <style>
@@ -83,14 +94,9 @@
 			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-drp-trigger]::after {
-		content: '';
-		aspect-ratio: 1;
+	[data-drp-trigger] [data-indicator] {
 		height: 1rem;
-		background: currentColor;
-		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='17' rx='2' ry='2'/%3E%3Cpath d='M16 2v4M8 2v4M3 10h18'/%3E%3C/svg%3E");
-		mask-size: contain;
-		mask-repeat: no-repeat;
+		aspect-ratio: 1;
 		opacity: 0.75;
 	}
 

@@ -58,4 +58,16 @@ describe('overlay surfaces', () => {
 			expect(getComputedStyle(dialog).color).toBe(semanticText);
 		}
 	);
+
+	it('keeps the dialog panel stretched across the dialog track', () => {
+		const dialog = mountOverlay('dialog');
+		const panel = dialog.querySelector<HTMLElement>('[data-dialog-panel]');
+
+		expect(panel).toBeTruthy();
+
+		const dialogWidth = dialog.getBoundingClientRect().width;
+		const panelWidth = panel?.getBoundingClientRect().width ?? 0;
+
+		expect(panelWidth).toBeGreaterThan(dialogWidth * 0.5);
+	});
 });

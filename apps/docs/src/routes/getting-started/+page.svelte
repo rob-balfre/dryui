@@ -11,6 +11,7 @@
 		Text,
 		Link
 	} from '@dryui/ui';
+	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
 	import { homeIntroPrompt } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
@@ -77,12 +78,10 @@
 
 <Container>
 	<div class="page-stack">
-		<header class="page-header">
-			<Heading level={1}>Getting Started</Heading>
-			<Text size="lg" color="secondary"
-				>Install dryui and render your first component in under a minute.</Text
-			>
-		</header>
+		<DocsPageHeader
+			title="Getting Started"
+			description="Install dryui and render your first component in under a minute."
+		/>
 
 		<!-- AI prompt -->
 		<section>
@@ -283,8 +282,4 @@
 		justify-content: start;
 	}
 
-	.page-header {
-		padding-top: var(--dry-space-4);
-		padding-bottom: var(--dry-space-2);
-	}
 </style>

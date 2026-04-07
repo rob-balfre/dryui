@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 	import { DateField } from '@dryui/ui';
 
-	let date = $state('');
+	let date = $state<Date | null>(null);
 </script>
 
 <DateField.Root bind:value={date} name="date">

@@ -66,8 +66,10 @@
 		--dry-flip-card-front-transform: rotateY(0deg);
 		--dry-flip-card-back-transform: rotateY(180deg);
 
+		display: grid;
 		perspective: var(--dry-flip-card-perspective);
 		position: relative;
+		transform-style: preserve-3d;
 	}
 
 	[data-flip-card][data-direction='horizontal'][data-flipped] {

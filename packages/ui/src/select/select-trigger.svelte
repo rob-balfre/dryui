@@ -78,6 +78,7 @@
 <div bind:this={wrapperEl} data-select-trigger-wrap>
 	<button type="button" data-select-trigger data-size={size} class={className} {...rest}>
 		{@render children()}
+		<svg data-indicator xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
 	</button>
 </div>
 
@@ -97,6 +98,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1.5rem;
 		align-items: center;
+		gap: var(--dry-space-2);
 		padding: var(--dry-select-padding-y) var(--dry-select-padding-x);
 		font-size: var(--dry-select-font-size);
 		line-height: var(--dry-type-small-leading);
@@ -114,20 +116,15 @@
 			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-select-trigger]::after {
-		content: '';
+	[data-select-trigger] [data-indicator] {
 		height: 1em;
 		aspect-ratio: 1;
 		place-self: center;
-		background: currentColor;
-		mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-		mask-size: contain;
-		mask-repeat: no-repeat;
-		mask-position: center;
+		opacity: 0.5;
 		transition: transform var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-select-trigger][data-state='open']::after {
+	[data-select-trigger][data-state='open'] [data-indicator] {
 		transform: rotate(180deg);
 	}
 

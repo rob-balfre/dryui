@@ -19,6 +19,7 @@
 	data-size={ctx.size}
 	data-disabled={ctx.disabled || undefined}
 	data-invalid={ctx.invalid || undefined}
+	data-orientation={ctx.orientation}
 >
 	<select bind:value class={className} data-input-group-select {...rest}>
 		{@render children?.()}
@@ -29,6 +30,10 @@
 <style>
 	[data-input-group-selectWrap] {
 		position: relative;
+	}
+
+	[data-input-group-selectWrap][data-orientation='horizontal'] {
+		grid-column: 6;
 	}
 
 	[data-input-group-select] {

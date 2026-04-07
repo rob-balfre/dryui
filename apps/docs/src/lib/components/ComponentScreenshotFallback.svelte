@@ -24,7 +24,7 @@
 
 {#if name === 'Adjust'}
 	<div class="stage stage-soft">
-		<Adjust brightness={1.02} contrast={1.08} saturate={1.28}>
+		<Adjust brightness={102} contrast={108} saturate={128}>
 			<Card.Root>
 				<Card.Content>
 					<div class="copy-stack">

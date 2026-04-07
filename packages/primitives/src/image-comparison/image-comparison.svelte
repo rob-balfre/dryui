@@ -21,20 +21,15 @@
 		...rest
 	}: Props = $props();
 
-	let containerEl = $state<HTMLDivElement>();
 	let dragging = $state(false);
 
-	function setContainer(node: HTMLDivElement) {
-		containerEl = node;
-		return {
-			destroy() {
-				if (containerEl === node) containerEl = undefined;
-			}
-		};
+	function syncStyles(node: HTMLElement) {
+		$effect(() => {
+			node.style.cssText = `${style ? `${style}; ` : ''}--dry-image-comparison-position: ${position}%`;
+		});
 	}
 
-	function updatePosition(clientX: number, clientY: number) {
-		if (!containerEl) return;
+	function updatePosition(clientX: number, clientY: number, containerEl: HTMLElement) {
 		const rect = containerEl.getBoundingClientRect();
 		let pct: number;
 		if (orientation === 'horizontal') {
@@ -47,13 +42,16 @@
 
 	function onPointerDown(e: PointerEvent) {
 		dragging = true;
-		(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-		updatePosition(e.clientX, e.clientY);
+		const handleEl = e.currentTarget as HTMLElement;
+		handleEl.setPointerCapture(e.pointerId);
+		const containerEl = handleEl.closest<HTMLElement>('.root');
+		if (!containerEl) return;
+		updatePosition(e.clientX, e.clientY, containerEl);
 	}
 
 	function onPointerMove(e: PointerEvent) {
 		if (!dragging) return;
-		updatePosition(e.clientX, e.clientY);
+		updatePosition(e.clientX, e.clientY, e.currentTarget as HTMLElement);
 	}
 
 	function onPointerUp() {
@@ -70,24 +68,16 @@
 			position = Math.min(position + step, 100);
 		}
 	}
-
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-image-comparison-position', `${position}%`);
-		});
-	}
 </script>
 
 <div
-	{@attach setContainer}
+	{@attach syncStyles}
 	data-orientation={orientation}
 	data-dragging={dragging || undefined}
 	class={['root', className]}
 	onpointermove={onPointerMove}
 	onpointerup={onPointerUp}
 	{...rest}
-	use:applyStyles
 >
 	<div data-part="after" class="layer">
 		{@render after()}
@@ -119,6 +109,8 @@
 	.root {
 		--dry-image-comparison-handle-z-index: 1;
 		position: relative;
+		display: grid;
+		height: 100%;
 		overflow: hidden;
 		touch-action: none;
 		user-select: none;
@@ -130,8 +122,8 @@
 	}
 
 	.layer {
-		position: absolute;
-		inset: 0;
+		grid-area: 1 / 1;
+		min-height: 0;
 	}
 
 	.root[data-orientation='horizontal'] .before {
@@ -144,9 +136,8 @@
 
 	.handle {
 		position: absolute;
-		display: flex;
-		align-items: center;
-		justify-content: center;
+		display: grid;
+		place-items: center;
 		z-index: var(--dry-image-comparison-handle-z-index);
 	}
 

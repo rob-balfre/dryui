@@ -17,6 +17,7 @@
 <style>
 	[data-part='action'] {
 		all: unset;
+		justify-self: start;
 		cursor: pointer;
 		font-size: var(--dry-type-small-size);
 		font-weight: 600;

@@ -33,9 +33,12 @@
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
+		vertical-align: middle;
 		align-items: center;
 		gap: var(--dry-space-1);
 		padding: var(--dry-space-1) var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
+		margin-inline-end: var(--dry-tags-input-gap, var(--dry-space-1_5));
+		margin-block: calc(var(--dry-tags-input-gap, var(--dry-space-1_5)) / 2);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent);
 		color: var(--dry-color-fill-brand);
 		border-radius: var(--dry-radius-full);

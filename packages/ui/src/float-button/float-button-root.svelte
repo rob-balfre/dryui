@@ -35,9 +35,10 @@
 	[data-float-button] {
 		--dry-fab-offset: var(--dry-space-6);
 		--dry-fab-gap: var(--dry-space-3);
+		--dry-fab-position: fixed;
 		--dry-fab-z-index: var(--dry-layer-overlay);
 
-		position: fixed;
+		position: var(--dry-fab-position);
 		z-index: var(--dry-fab-z-index);
 		display: grid;
 		justify-items: center;

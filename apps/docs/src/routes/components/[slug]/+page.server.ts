@@ -156,18 +156,31 @@ function normalizeCompositionKey(name: string): string {
 	return name.toLowerCase().replace(/[^a-z0-9]+/g, '');
 }
 
+function collectExampleImports(example: string): string[] {
+	const seen = new Set<string>();
+
+	for (const match of example.matchAll(/<([A-Z][A-Za-z0-9]*)(?:\.[A-Z][A-Za-z0-9]*)?/g)) {
+		const componentName = match[1];
+		if (componentName) seen.add(componentName);
+	}
+
+	return [...seen];
+}
+
 function buildQuickStartCode(name: string, component: ComponentSpec, hasRootPart: boolean): string {
+	const example = hasRootPart ? component.example : stripRootWrapper(name, component.example);
 	const lines: string[] = ['<script lang="ts">'];
+	const importNames = [name, ...collectExampleImports(example).filter((item) => item !== name)];
 
 	if (component.import === '@dryui/ui') {
 		lines.push(`  import '${fullSpec.themeImports.default}';`);
 		lines.push(`  import '${fullSpec.themeImports.dark}';`);
 	}
 
-	lines.push(`  import { ${name} } from '${component.import}';`);
+	lines.push(`  import { ${importNames.join(', ')} } from '${component.import}';`);
 	lines.push('</script>');
 	lines.push('');
-	lines.push(hasRootPart ? component.example : stripRootWrapper(name, component.example));
+	lines.push(example);
 
 	return lines.join('\n');
 }

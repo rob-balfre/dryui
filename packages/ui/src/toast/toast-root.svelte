@@ -35,7 +35,7 @@
 
 	function applyProgressStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('--progress-width', `${progress}%`);
+			node.style.cssText = `--progress-width: ${progress}%`;
 		});
 	}
 </script>
@@ -67,11 +67,11 @@
 		border-radius: var(--dry-radius-lg);
 		box-shadow: var(--dry-shadow-lg);
 		padding: var(--dry-space-4);
+		padding-right: calc(var(--dry-space-4) + var(--dry-space-12) + var(--dry-space-2));
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		align-items: flex-start;
-		gap: var(--dry-space-3);
+		grid-template-columns: minmax(0, 1fr);
+		align-items: start;
+		gap: var(--dry-space-2);
 		animation: slideIn var(--dry-duration-normal) var(--dry-ease-out);
 
 		&[data-variant='info'] {
@@ -100,11 +100,6 @@
 			--dry-toast-bg: var(--dry-color-fill-error-weak);
 			--dry-toast-border: var(--dry-color-stroke-error);
 			--dry-toast-action-hover-bg: var(--dry-color-fill-error-weak);
-		}
-
-		@container (max-width: 300px) {
-			grid-auto-flow: row;
-			grid-auto-columns: initial;
 		}
 	}
 

@@ -19,31 +19,11 @@
 	}
 
 	let { class: className, position = 'bottom-right', children, ...rest }: Props = $props();
-
-	let popoverEl = $state<HTMLDivElement>();
-
-	$effect(() => {
-		if (!popoverEl) return;
-
-		if (toastStore.toasts.length > 0) {
-			try {
-				popoverEl.showPopover();
-			} catch {
-				// Already showing
-			}
-		} else {
-			try {
-				popoverEl.hidePopover();
-			} catch {
-				// Already hidden
-			}
-		}
-	});
+	const visible = $derived(Boolean(children) || toastStore.toasts.length > 0);
 </script>
 
 <div
-	bind:this={popoverEl}
-	popover="manual"
+	hidden={!visible}
 	role="region"
 	aria-label="Notifications"
 	data-part="provider"
@@ -82,6 +62,8 @@
 
 <style>
 	[data-part='provider'] {
+		position: fixed;
+		z-index: var(--dry-layer-overlay);
 		display: grid;
 		grid-template-columns: minmax(0, min(420px, calc(100vw - var(--dry-space-8))));
 		gap: var(--dry-space-3);
@@ -91,10 +73,6 @@
 		background: transparent;
 		overflow: visible;
 		container-type: inline-size;
-
-		&:not(:popover-open) {
-			display: none;
-		}
 
 		&[data-position='top-right'] {
 			inset: var(--dry-space-4) var(--dry-space-4) auto auto;
@@ -125,6 +103,7 @@
 
 	[data-part='content'] {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--dry-space-1);
 	}
 </style>

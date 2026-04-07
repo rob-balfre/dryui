@@ -26,6 +26,7 @@
 	{...rest}
 >
 	{@render children()}
+	<svg data-indicator xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
 </button>
 
 <style>
@@ -33,6 +34,7 @@
 		display: grid;
 		grid-template-columns: 1fr 1rem;
 		align-items: center;
+		gap: var(--dry-space-2);
 		padding: var(--dry-space-4);
 		background: none;
 		border: none;
@@ -65,17 +67,14 @@
 			cursor: not-allowed;
 		}
 
-		&[data-state='open']::after {
+		&[data-state='open'] [data-indicator] {
 			transform: rotate(180deg);
 		}
 
-		&::after {
-			content: '';
+		& [data-indicator] {
 			height: 1rem;
 			aspect-ratio: 1;
-			background: currentColor;
-			mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-			mask-size: contain;
+			opacity: 0.5;
 			transition: transform var(--dry-duration-fast) var(--dry-ease-default);
 		}
 	}

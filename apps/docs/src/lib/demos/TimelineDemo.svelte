@@ -4,6 +4,7 @@
 
 <Timeline.Root>
 	<Timeline.Item>
+		<Timeline.Icon />
 		<Timeline.Content>
 			<Timeline.Title>Deployment started</Timeline.Title>
 			<Timeline.Description>Pipeline triggered by main branch push.</Timeline.Description>
@@ -11,6 +12,7 @@
 		</Timeline.Content>
 	</Timeline.Item>
 	<Timeline.Item>
+		<Timeline.Icon />
 		<Timeline.Content>
 			<Timeline.Title>Tests passed</Timeline.Title>
 			<Timeline.Description>All 142 tests passed.</Timeline.Description>

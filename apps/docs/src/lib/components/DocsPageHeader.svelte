@@ -44,7 +44,7 @@
 
 <style>
 	.page-header {
-		padding-top: var(--dry-space-4);
+		padding-top: var(--dry-space-10);
 	}
 
 	.page-header-content {
