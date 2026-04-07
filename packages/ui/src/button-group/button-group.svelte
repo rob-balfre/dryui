@@ -28,7 +28,6 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-button-group] {
 		--dry-button-group-radius: var(--dry-radius-md);
@@ -65,8 +64,8 @@
 
 		& > :where(button, a):hover,
 		& > :where(button, a):focus-visible,
-		& > :where(span):has(:hover) > :where(button, a),
-		& > :where(span):has(:focus-visible) > :where(button, a) {
+		& > :where(span):hover > :where(button, a),
+		& > :where(span):focus-within > :where(button, a) {
 			z-index: var(--dry-button-group-hover-z-index);
 			position: relative;
 		}
@@ -97,8 +96,8 @@
 
 		& > :where(button, a):hover,
 		& > :where(button, a):focus-visible,
-		& > :where(span):has(:hover) > :where(button, a),
-		& > :where(span):has(:focus-visible) > :where(button, a) {
+		& > :where(span):hover > :where(button, a),
+		& > :where(span):focus-within > :where(button, a) {
 			z-index: var(--dry-button-group-hover-z-index);
 			position: relative;
 		}
