@@ -2435,7 +2435,9 @@
         ]
       },
       "cssVars": {
-        "--dry-field-gap": "Gap spacing"
+        "--dry-field-content-order": "Content Order",
+        "--dry-field-gap": "Gap spacing",
+        "--dry-field-label-order": "Label Order"
       },
       "dataAttributes": [
         {
@@ -4710,7 +4712,11 @@
       "cssVars": {
         "--dry-tabs-font-size": "Font size",
         "--dry-tabs-padding-x": "Horizontal padding",
-        "--dry-tabs-padding-y": "Vertical padding"
+        "--dry-tabs-padding-y": "Vertical padding",
+        "--dry-tabs-trigger-active-border-bottom-color": "Trigger Active Border Bottom Color",
+        "--dry-tabs-trigger-active-border-right-color": "Trigger Active Border Right Color",
+        "--dry-tabs-trigger-border-bottom": "Trigger Border Bottom",
+        "--dry-tabs-trigger-border-right": "Trigger Border Right"
       },
       "dataAttributes": [
         {
@@ -4741,6 +4747,9 @@
         },
         {
           "name": "data-tabs-list"
+        },
+        {
+          "name": "data-tabs-root"
         },
         {
           "name": "data-tabs-trigger"
@@ -10586,9 +10595,6 @@
           "description": "Present when the current item is selected."
         },
         {
-          "name": "data-theme"
-        },
-        {
           "name": "data-today"
         }
       ],
@@ -12400,16 +12406,10 @@
           "name": "data-float-button"
         },
         {
-          "name": "data-float-button-action-wrapper"
+          "name": "data-float-button-action"
         },
         {
           "name": "data-float-button-trigger"
-        },
-        {
-          "name": "data-float-button-trigger-wrapper"
-        },
-        {
-          "name": "data-float-button-wrapper"
         },
         {
           "name": "data-position"
@@ -15759,7 +15759,9 @@
         ]
       },
       "cssVars": {
+        "--dry-flip-card-back-transform": "Card Back Transform",
         "--dry-flip-card-duration": "Card Duration",
+        "--dry-flip-card-front-transform": "Card Front Transform",
         "--dry-flip-card-perspective": "Card Perspective"
       },
       "dataAttributes": [
@@ -16362,9 +16364,6 @@
           "name": "data-state"
         },
         {
-          "name": "data-theme"
-        },
-        {
           "name": "data-variant"
         }
       ],
@@ -16774,9 +16773,6 @@
         },
         {
           "name": "data-part"
-        },
-        {
-          "name": "data-theme"
         }
       ],
       "example": "<Map.Root center={[-122.4, 37.8]} zoom={12}>\n  <Map.Marker position={[-122.4, 37.8]}>\n    <Map.Popup>San Francisco</Map.Popup>\n  </Map.Marker>\n  <Map.Controls navigation fullscreen />\n</Map.Root>"

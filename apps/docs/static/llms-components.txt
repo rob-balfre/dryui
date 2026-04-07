@@ -125,7 +125,7 @@ Structure:
     FloatButton.Trigger
     FloatButton.Action
 CSS variables: --dry-fab-action-bg, --dry-fab-action-border, --dry-fab-action-color, --dry-fab-action-shadow, --dry-fab-action-size, --dry-fab-bg, --dry-fab-color, --dry-fab-gap, --dry-fab-offset, --dry-fab-shadow, --dry-fab-z-index
-Data attributes: data-float-button | data-float-button-action-wrapper | data-float-button-trigger | data-float-button-trigger-wrapper | data-float-button-wrapper | data-position | data-size | data-state
+Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-size | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -893,7 +893,7 @@ Parts:
   Native props: Forwards <p> attributes via rest props.
 Structure:
   Field.Root
-CSS variables: --dry-field-gap
+CSS variables: --dry-field-content-order, --dry-field-gap, --dry-field-label-order
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
 Accessibility: none
 Example:
@@ -1304,7 +1304,7 @@ Structure:
   RangeCalendar.Root
     RangeCalendar.Grid
 CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-theme | data-today
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1503,8 +1503,8 @@ Structure:
     Tabs.List
       Tabs.Trigger
     Tabs.Content
-CSS variables: --dry-tabs-font-size, --dry-tabs-padding-x, --dry-tabs-padding-y
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-trigger
+CSS variables: --dry-tabs-font-size, --dry-tabs-padding-x, --dry-tabs-padding-y, --dry-tabs-trigger-active-border-bottom-color, --dry-tabs-trigger-active-border-right-color, --dry-tabs-trigger-border-bottom, --dry-tabs-trigger-border-right
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example:
 ```svelte
@@ -2477,7 +2477,7 @@ Structure:
       NotificationCenter.Group
         NotificationCenter.Item
 CSS variables: --dry-nc-item-padding, --dry-nc-panel-width, --dry-nc-unread-bg
-Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-theme | data-variant
+Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-variant
 Accessibility: none
 Example:
 ```svelte
@@ -3498,7 +3498,7 @@ Structure:
   FlipCard.Root
     FlipCard.Front
     FlipCard.Back
-CSS variables: --dry-flip-card-duration, --dry-flip-card-perspective
+CSS variables: --dry-flip-card-back-transform, --dry-flip-card-duration, --dry-flip-card-front-transform, --dry-flip-card-perspective
 Data attributes: data-direction | data-flip-card | data-flip-card-back | data-flip-card-front | data-flipped | data-part | data-trigger
 Accessibility: none
 Example:
@@ -3551,7 +3551,7 @@ Structure:
       Map.Popup
     Map.Controls
 CSS variables: --dry-map-border, --dry-map-radius
-Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part | data-theme
+Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part
 Accessibility: none
 Example:
 ```svelte

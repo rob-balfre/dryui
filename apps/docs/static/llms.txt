@@ -87,7 +87,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/float-button
 Parts: Root, Trigger, Action
 Props: Root: position ('bottom-right' | 'bottom-left'), accepted bottom-right, bottom-left, default 'bottom-right' | open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required | Action: children (Snippet), Content rendered inside the component., required
-Data attributes: data-float-button | data-float-button-action-wrapper | data-float-button-trigger | data-float-button-trigger-wrapper | data-float-button-wrapper | data-position | data-size | data-state
+Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-size | data-state
 Example: <FloatButton.Root>
 
 ### ButtonGroup
@@ -429,7 +429,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/range-calendar
 Parts: Root, Grid
 Props: Root: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-theme | data-today
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-today
 Example: <RangeCalendar.Root>
 
 ### Category: Layout
@@ -507,7 +507,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/tabs
 Parts: Root, List, Trigger, Content
 Props: Root: value (string), Bindable current tab value for controlled tab interfaces., default '' | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | activationMode ('automatic' | 'manual'), accepted automatic, manual, default 'automatic' | children (Snippet), Content rendered inside the component., required | List: children (Snippet), Content rendered inside the component., required | Trigger: value (string), Tab identifier that activates the matching content panel., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required | Content: value (string), Current controlled or bindable value., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-trigger
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example: <Tabs.Root bind:value={activeTab}>
 
@@ -717,7 +717,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/notification-center
 Parts: Root, Trigger, Panel, Item, Group
 Props: Root: items (import('./context.svelte.js').NotificationItem[]), default $bindable<NotificationItem[]>([]), bindable | open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet<[{ unreadCount: number }]>), Content rendered inside the component., required | Panel: placement (Placement), default 'bottom-end' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | read (boolean), default false | timestamp (Date) | variant ('info' | 'warning' | 'critical'), Visual style preset for the component., accepted info, warning, critical | action (Snippet) | children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-theme | data-variant
+Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-variant
 Example: <NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>
 
 ### Category: Display
@@ -1046,7 +1046,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/map
 Parts: Root, Marker, Popup, Layer, Controls
 Props: Root: center (LngLat), default [0 | zoom (number), default 2 | minZoom (number) | maxZoom (number) | mapStyle (string) | createMap ((container: HTMLDivElement, options: MapOptions) => MapInstance) | children (Snippet), Content rendered inside the component. | Marker: position (LngLat), required | color (string), Semantic color or tone applied to the component. | children (Snippet), Content rendered inside the component. | class (string) | Popup: maxWidth (string), default '20rem' | closeButton (boolean), default true | closeOnClick (boolean), default true | children (Snippet), Content rendered inside the component., required | class (string) | Layer: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | type ('heatmap' | 'polygon' | 'fill' | 'circle' | 'line'), HTML type attribute or component-specific type selector., accepted heatmap, polygon, fill, circle, line, required | data (GeoJsonData), required | color (string), Semantic color or tone applied to the component. | opacity (number) | Controls: position ('top-left' | 'top-right' | 'bottom-left' | 'bottom-right'), accepted top-left, top-right, bottom-left, bottom-right, default 'top-right' | navigation (boolean), default false | fullscreen (boolean), default false | children (Snippet), Content rendered inside the component.
-Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part | data-theme
+Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part
 Example: <Map.Root center={[-122.4, 37.8]} zoom={12}>
 
 ### SystemMap
