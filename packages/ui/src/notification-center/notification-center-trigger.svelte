@@ -40,6 +40,7 @@
 
 <style>
 	[data-notification-center-trigger] {
+		position: relative;
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;

@@ -87,3 +87,37 @@
 >
 	{@render children()}
 </div>
+
+<style>
+	[data-notification-center-panel] {
+		/* Reset UA popover defaults */
+		inset: unset;
+		margin: 0;
+
+		display: grid;
+		grid-template-columns: var(--dry-nc-panel-width, 24rem);
+		max-height: 28rem;
+		overflow-y: auto;
+		background: var(--dry-color-bg-raised, #ffffff);
+		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
+		border-radius: var(--dry-radius-lg, 0.5rem);
+		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+		padding: 0;
+
+		&:popover-open {
+			opacity: 1;
+			transform: scale(1);
+		}
+
+		@starting-style {
+			&:popover-open {
+				opacity: 0;
+				transform: scale(0.95);
+			}
+		}
+
+		transition:
+			opacity var(--dry-duration-fast, 150ms) var(--dry-ease-out, ease-out),
+			transform var(--dry-duration-fast, 150ms) var(--dry-ease-out, ease-out);
+	}
+</style>
