@@ -24,15 +24,13 @@
 	const ctx = getFormControlCtx();
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
 
-	let inputEl: HTMLInputElement | undefined = $state();
-
 	let dataState = $derived(indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked');
 
-	$effect(() => {
-		if (inputEl) {
-			inputEl.indeterminate = indeterminate;
-		}
-	});
+	function applyIndeterminate(node: HTMLInputElement) {
+		$effect(() => {
+			node.indeterminate = indeterminate;
+		});
+	}
 </script>
 
 {#if children}
@@ -43,7 +41,7 @@
 	>
 		<span class="wrapper">
 			<input
-				bind:this={inputEl}
+				{@attach applyIndeterminate}
 				type="checkbox"
 				bind:checked
 				id={ctx?.id}
@@ -64,7 +62,7 @@
 {:else}
 	<span class="wrapper">
 		<input
-			bind:this={inputEl}
+			{@attach applyIndeterminate}
 			type="checkbox"
 			bind:checked
 			id={ctx?.id}
@@ -154,7 +152,10 @@
 				aspect-ratio: 35 / 60;
 				border: solid var(--dry-checkbox-check-color);
 				border-width: 0 2px 2px 0;
-				transform: rotate(45deg) scale(1) translateY(-10%);
+				margin-left: calc(var(--dry-checkbox-size) * 0.52);
+				margin-top: calc(var(--dry-checkbox-size) * -0.18);
+				transform: rotate(45deg) scale(1);
+				transform-origin: center;
 				animation: checkScale var(--dry-duration-fast) var(--dry-ease-spring);
 			}
 		}
@@ -231,10 +232,10 @@
 
 	@keyframes checkScale {
 		from {
-			transform: rotate(45deg) scale(0) translateY(-10%);
+			transform: rotate(45deg) scale(0);
 		}
 		to {
-			transform: rotate(45deg) scale(1) translateY(-10%);
+			transform: rotate(45deg) scale(1);
 		}
 	}
 
