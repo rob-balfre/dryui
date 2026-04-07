@@ -1,5 +1,14 @@
 # @dryui/ui
 
+## 0.1.3
+
+### Patch Changes
+
+- Improve button-group with context-based orientation, enhance rich-text-editor with placeholder and data attributes, refine virtual-list defaults, and clean up stale data attributes from map, file-upload, date-range-picker, and range-calendar components.
+
+- Updated dependencies []:
+  - @dryui/primitives@0.1.3
+
 ## 0.1.2
 
 ### Patch Changes
