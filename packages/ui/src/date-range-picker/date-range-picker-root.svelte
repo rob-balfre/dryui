@@ -150,9 +150,3 @@
 </script>
 
 {@render children()}
-
-<style>
-	[data-drp-root] {
-		display: contents;
-	}
-</style>

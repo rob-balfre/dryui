@@ -45,7 +45,7 @@
 	}}
 	{...rest}
 >
-	{@render children()}
+	<span data-tabs-trigger-content>{@render children()}</span>
 </button>
 
 <style>
@@ -118,8 +118,11 @@
 		--dry-tabs-font-size: var(--dry-type-heading-4-size, var(--dry-text-base-size));
 	}
 
-	[data-tabs-trigger] :is(svg) {
-		height: 1em;
-		aspect-ratio: 1;
+	[data-tabs-trigger-content] {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: var(--dry-space-1_5);
 	}
+
 </style>

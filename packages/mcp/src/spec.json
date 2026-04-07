@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.1.2",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -172,6 +172,12 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-group-orientation"
+        },
+        {
+          "name": "data-in-group"
         },
         {
           "name": "data-size"
@@ -4752,6 +4758,9 @@
         },
         {
           "name": "data-tabs-trigger"
+        },
+        {
+          "name": "data-tabs-trigger-content"
         }
       ],
       "example": "<Tabs.Root bind:value={activeTab}>\n  <Tabs.List>\n    <Tabs.Trigger value=\"one\">Tab 1</Tabs.Trigger>\n    <Tabs.Trigger value=\"two\">Tab 2</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value=\"one\">First panel</Tabs.Content>\n  <Tabs.Content value=\"two\">Second panel</Tabs.Content>\n</Tabs.Root>"
@@ -10030,9 +10039,6 @@
           "name": "data-drp-preset"
         },
         {
-          "name": "data-drp-root"
-        },
-        {
           "name": "data-drp-trigger"
         },
         {
@@ -10588,10 +10594,6 @@
         },
         {
           "name": "data-range-start"
-        },
-        {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
         },
         {
           "name": "data-today"
@@ -11204,9 +11206,6 @@
         },
         {
           "name": "data-dragging"
-        },
-        {
-          "name": "data-file-upload"
         },
         {
           "name": "data-fu-dropzone"
@@ -12786,7 +12785,8 @@
         },
         "overscan": {
           "type": "number",
-          "required": false
+          "required": false,
+          "default": "5"
         },
         "children": {
           "type": "Snippet<[{ item: T; index: number; style: string }]>",
@@ -13825,7 +13825,8 @@
             "placeholder": {
               "type": "string",
               "required": false,
-              "description": "Hint text shown when no value is selected or entered."
+              "description": "Hint text shown when no value is selected or entered.",
+              "default": "''"
             },
             "readonly": {
               "type": "boolean",
@@ -13912,7 +13913,19 @@
           "name": "data-part"
         },
         {
+          "name": "data-placeholder"
+        },
+        {
           "name": "data-readonly"
+        },
+        {
+          "name": "data-rte-content"
+        },
+        {
+          "name": "data-rte-root"
+        },
+        {
+          "name": "data-rte-toolbar"
         }
       ],
       "example": "<RichTextEditor.Root>\n  <RichTextEditor.Toolbar>...</RichTextEditor.Toolbar>\n  <RichTextEditor.Content>...</RichTextEditor.Content>\n</RichTextEditor.Root>"
@@ -16755,18 +16768,6 @@
         "--dry-map-radius": "Border radius"
       },
       "dataAttributes": [
-        {
-          "name": "data-map-mapboxgl"
-        },
-        {
-          "name": "data-map-maplibregl"
-        },
-        {
-          "name": "data-map-marker"
-        },
-        {
-          "name": "data-map-popup"
-        },
         {
           "name": "data-map-root"
         },

@@ -223,36 +223,6 @@
 		height: 400px;
 	}
 
-	[data-map-root] [data-map-mapboxgl]-canvas,
-	[data-map-root] [data-map-maplibregl]-canvas {
-		border-radius: var(--dry-map-radius);
-	}
-
-	[data-map-marker] {
-		cursor: pointer;
-	}
-
-	[data-map-marker] [data-part='marker-content'] {
-		background: var(--dry-color-bg-raised, #ffffff);
-		border-radius: var(--dry-radius-md, 0.375rem);
-		box-shadow: var(--dry-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-		padding: var(--dry-space-2, 0.5rem);
-	}
-
-	[data-map-popup] {
-		display: grid;
-		grid-template-columns: minmax(0, 20rem);
-	}
-
-	[data-map-popup] [data-map-mapboxgl]-popup-content,
-	[data-map-popup] [data-map-maplibregl]-popup-content {
-		background: var(--dry-color-bg-raised, #ffffff);
-		border-radius: var(--dry-radius-lg, 0.5rem);
-		box-shadow: var(--dry-shadow-lg);
-		padding: var(--dry-space-4, 1rem);
-		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
-	}
-
 	[data-part='map-error'] {
 		display: grid;
 		place-items: center;

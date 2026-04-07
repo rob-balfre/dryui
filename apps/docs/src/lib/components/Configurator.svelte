@@ -206,13 +206,4 @@
 		line-height: 1.5;
 	}
 
-	.preview-panel p {
-		margin: 0;
-		color: var(--dry-color-text-weak);
-	}
-
-	.preview-panel code {
-		font-family: var(--dry-font-mono);
-		font-size: var(--dry-text-sm-size);
-	}
 </style>

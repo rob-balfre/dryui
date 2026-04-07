@@ -1,13 +1,101 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { RichTextEditor as RichTextEditorPrimitive } from '@dryui/primitives/rich-text-editor';
+	import { getRichTextEditorCtx } from '@dryui/primitives/rich-text-editor';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
 
 	let { ...rest }: Props = $props();
+
+	const ctx = getRichTextEditorCtx();
+
+	let contentEl = $state<HTMLDivElement>();
+
+	// Register the content element with the context
+	$effect(() => {
+		if (contentEl) {
+			ctx.contentEl = contentEl;
+		}
+	});
+
+	// Sync value into contenteditable (also clears hint elements on mount)
+	$effect(() => {
+		if (!contentEl) return;
+		const html = ctx.html || '';
+		if (contentEl.innerHTML !== html && document.activeElement !== contentEl) {
+			contentEl.innerHTML = html;
+		}
+	});
+
+	// Listen for selectionchange on document to track formatting state
+	$effect(() => {
+		if (!contentEl) return;
+
+		function onSelectionChange() {
+			const sel = window.getSelection();
+			if (!sel || sel.rangeCount === 0) return;
+			if (contentEl!.contains(sel.anchorNode)) {
+				ctx.updateState();
+			}
+		}
+
+		document.addEventListener('selectionchange', onSelectionChange);
+		return () => {
+			document.removeEventListener('selectionchange', onSelectionChange);
+		};
+	});
+
+	function handleInput() {
+		ctx.updateState();
+		ctx.syncValue();
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (ctx.readonly) return;
+
+		const mod = event.metaKey || event.ctrlKey;
+		if (!mod) return;
+
+		switch (event.key.toLowerCase()) {
+			case 'b':
+				event.preventDefault();
+				ctx.toggleBold();
+				break;
+			case 'i':
+				event.preventDefault();
+				ctx.toggleItalic();
+				break;
+			case 'u':
+				event.preventDefault();
+				ctx.toggleUnderline();
+				break;
+			case 'k':
+				event.preventDefault();
+				contentEl?.dispatchEvent(new CustomEvent('rte-link-request', { bubbles: true }));
+				break;
+		}
+	}
 </script>
 
-<RichTextEditorPrimitive.Content data-part="content" {...rest} />
+<!--
+	The elements below (h1–h3, p, ul, ol, li, a) are created dynamically by the
+	browser's execCommand API inside the contenteditable div. They are declared
+	here so Svelte can verify the scoped CSS selectors that style them. The
+	$effect that syncs ctx.html into innerHTML replaces these on mount.
+-->
+<div
+	bind:this={contentEl}
+	contenteditable={!ctx.readonly}
+	role="textbox"
+	aria-multiline="true"
+	aria-placeholder={ctx.placeholder || undefined}
+	data-placeholder={ctx.placeholder || undefined}
+	data-part="content"
+	data-rte-content
+	data-readonly={ctx.readonly || undefined}
+	oninput={handleInput}
+	onkeydown={handleKeydown}
+	{...rest}
+><h1>.</h1><h2>.</h2><h3>.</h3><p></p><ul><li></li></ul><ol><li></li></ol><a aria-hidden="true" href="https://example.com">.</a></div>
 
 <style>
 	[data-part='content'] {
@@ -32,7 +120,7 @@
 		pointer-events: none;
 	}
 
-	/* Typography inside the editor content */
+	/* Typography for contenteditable elements created by execCommand */
 	[data-part='content'] h1 {
 		font-size: var(--dry-type-heading-2-size, var(--dry-text-2xl-size));
 		font-weight: 700;

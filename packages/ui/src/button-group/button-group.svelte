@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { setButtonGroupCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		orientation?: 'horizontal' | 'vertical';
@@ -15,6 +16,12 @@
 		children,
 		...rest
 	}: Props = $props();
+
+	setButtonGroupCtx({
+		get orientation() {
+			return orientation;
+		}
+	});
 </script>
 
 <div
@@ -39,68 +46,6 @@
 
 	[data-button-group][data-orientation='horizontal'] {
 		grid-auto-flow: column;
-
-		& > :where(button, a, span),
-		& > :where(span) > :where(button, a) {
-			border-radius: 0;
-		}
-
-		& > :where(button, a):first-child,
-		& > :where(span):first-child > :where(button, a) {
-			border-top-left-radius: var(--dry-button-group-radius);
-			border-bottom-left-radius: var(--dry-button-group-radius);
-		}
-
-		& > :where(button, a):last-child,
-		& > :where(span):last-child > :where(button, a) {
-			border-top-right-radius: var(--dry-button-group-radius);
-			border-bottom-right-radius: var(--dry-button-group-radius);
-		}
-
-		& > :where(button, a):not(:first-child),
-		& > :where(span):not(:first-child) > :where(button, a) {
-			border-inline-start: 0;
-		}
-
-		& > :where(button, a):hover,
-		& > :where(button, a):focus-visible,
-		& > :where(span):hover > :where(button, a),
-		& > :where(span):focus-within > :where(button, a) {
-			z-index: var(--dry-button-group-hover-z-index);
-			position: relative;
-		}
-	}
-
-	[data-button-group][data-orientation='vertical'] {
-		& > :where(button, a, span),
-		& > :where(span) > :where(button, a) {
-			border-radius: 0;
-		}
-
-		& > :where(button, a):first-child,
-		& > :where(span):first-child > :where(button, a) {
-			border-top-left-radius: var(--dry-button-group-radius);
-			border-top-right-radius: var(--dry-button-group-radius);
-		}
-
-		& > :where(button, a):last-child,
-		& > :where(span):last-child > :where(button, a) {
-			border-bottom-left-radius: var(--dry-button-group-radius);
-			border-bottom-right-radius: var(--dry-button-group-radius);
-		}
-
-		& > :where(button, a):not(:first-child),
-		& > :where(span):not(:first-child) > :where(button, a) {
-			border-block-start: 0;
-		}
-
-		& > :where(button, a):hover,
-		& > :where(button, a):focus-visible,
-		& > :where(span):hover > :where(button, a),
-		& > :where(span):focus-within > :where(button, a) {
-			z-index: var(--dry-button-group-hover-z-index);
-			position: relative;
-		}
 	}
 
 	[data-button-group][data-size='sm'] {

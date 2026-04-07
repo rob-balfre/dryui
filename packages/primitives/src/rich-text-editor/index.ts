@@ -37,6 +37,9 @@ export interface RichTextEditorToolbarProps extends Omit<
 
 export interface RichTextEditorContentProps extends HTMLAttributes<HTMLDivElement> {}
 
+export { setRichTextEditorCtx, getRichTextEditorCtx } from './context.svelte.js';
+export type { RichTextEditorContext } from './context.svelte.js';
+
 import RichTextEditorRoot from './rich-text-editor-root.svelte';
 import RichTextEditorToolbar from './rich-text-editor-toolbar.svelte';
 import RichTextEditorContent from './rich-text-editor-content.svelte';

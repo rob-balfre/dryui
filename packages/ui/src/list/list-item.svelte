@@ -47,3 +47,45 @@
 >
 	{@render children()}
 </li>
+
+<style>
+	[data-list-item] {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: start;
+		gap: var(--dry-list-item-gap);
+		padding: var(--dry-list-item-padding);
+		border-radius: var(--dry-list-item-radius);
+		transition:
+			background var(--dry-duration-fast) var(--dry-ease-default),
+			color var(--dry-duration-fast) var(--dry-ease-default);
+	}
+
+	[data-list-item][data-interactive='true'] {
+		cursor: pointer;
+	}
+
+	[data-list-item][data-interactive='true']:hover,
+	[data-list-item][data-interactive='true']:focus-visible {
+		background: var(--dry-list-item-hover-bg);
+	}
+
+	[data-list-item][data-interactive='true']:active {
+		background: var(--dry-list-item-active-bg);
+	}
+
+	[data-list-item][data-interactive='true']:focus-visible {
+		outline: 2px solid var(--dry-color-focus-ring);
+		outline-offset: -2px;
+	}
+
+	[data-list-item][data-disabled='true'] {
+		opacity: 0.5;
+		cursor: not-allowed;
+		pointer-events: none;
+	}
+
+	[data-list-item][data-dense='true'] {
+		--dry-list-item-padding: var(--dry-space-1_5) var(--dry-space-2);
+	}
+</style>

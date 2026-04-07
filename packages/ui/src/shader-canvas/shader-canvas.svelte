@@ -118,7 +118,4 @@
 		border-radius: inherit;
 	}
 
-	[data-shader-canvas] {
-		height: 100%;
-	}
 </style>

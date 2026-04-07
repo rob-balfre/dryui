@@ -27,7 +27,7 @@
 		letter-spacing: 0.05em;
 	}
 
-	[data-combobox-group] + [data-combobox-group] {
+	[data-combobox-group]:not(:first-of-type) {
 		border-top: 1px solid var(--dry-color-stroke-weak);
 		margin-top: var(--dry-space-1);
 		padding-top: var(--dry-space-1);

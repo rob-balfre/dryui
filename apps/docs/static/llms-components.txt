@@ -18,7 +18,7 @@ Subpath import: import { Button } from '@dryui/ui/button'
 Props: variant ('solid' | 'outline' | 'ghost' | 'soft' | 'secondary' | 'link' | 'bare'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger'), Semantic tone for primary or destructive button actions., accepted primary, danger, default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <button> attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg
-Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-size | data-variant
+Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example:
 ```svelte
@@ -597,7 +597,7 @@ Structure:
     FileUpload.Item
     FileUpload.ItemDelete
 CSS variables: --dry-fu-bg, --dry-fu-border, --dry-fu-font-size, --dry-fu-min-height, --dry-fu-padding
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-file-upload | data-fu-dropzone | data-fu-item | data-fu-item-delete | data-fu-item-name | data-fu-item-size | data-fu-list | data-fu-trigger | data-index | data-size
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-fu-dropzone | data-fu-item | data-fu-item-delete | data-fu-item-name | data-fu-item-size | data-fu-list | data-fu-trigger | data-index | data-size
 Accessibility: none
 Example:
 ```svelte
@@ -765,7 +765,7 @@ Root import: import { RichTextEditor } from '@dryui/ui'
 Subpath import: import { RichTextEditor } from '@dryui/ui/rich-text-editor'
 Parts:
 - RichTextEditor.Root
-  Props: value (string), Current controlled or bindable value., default '', bindable | placeholder (string), Hint text shown when no value is selected or entered. | readonly (boolean) | children (Snippet), Content rendered inside the component., required
+  Props: value (string), Current controlled or bindable value., default '', bindable | placeholder (string), Hint text shown when no value is selected or entered., default '' | readonly (boolean) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - RichTextEditor.Toolbar
   Props: children (Snippet<[ToolbarSnippetParams]>), Content rendered inside the component., required
@@ -778,7 +778,7 @@ Structure:
     RichTextEditor.Toolbar
     RichTextEditor.Content
 CSS variables: --dry-rte-border, --dry-rte-button-size, --dry-rte-content-bg, --dry-rte-padding, --dry-rte-popover-z-index, --dry-rte-radius, --dry-rte-toolbar-bg
-Data attributes: data-active (Present on the active item or current target within the component.) | data-format | data-part | data-readonly
+Data attributes: data-active (Present on the active item or current target within the component.) | data-format | data-part | data-placeholder | data-readonly | data-rte-content | data-rte-root | data-rte-toolbar
 Accessibility: none
 Example:
 ```svelte
@@ -1274,7 +1274,7 @@ Structure:
     DateRangePicker.Calendar
     DateRangePicker.Preset
 CSS variables: none
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-root | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1304,7 +1304,7 @@ Structure:
   RangeCalendar.Root
     RangeCalendar.Grid
 CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-today
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1504,7 +1504,7 @@ Structure:
       Tabs.Trigger
     Tabs.Content
 CSS variables: --dry-tabs-font-size, --dry-tabs-padding-x, --dry-tabs-padding-y, --dry-tabs-trigger-active-border-bottom-color, --dry-tabs-trigger-active-border-right-color, --dry-tabs-trigger-border-bottom, --dry-tabs-trigger-border-right
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger | data-tabs-trigger-content
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example:
 ```svelte
@@ -3167,7 +3167,7 @@ Tags: virtual, list, scroll, performance, large
 Kind: simple
 Root import: import { VirtualList } from '@dryui/ui'
 Subpath import: import { VirtualList } from '@dryui/ui/virtual-list'
-Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number) | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
+Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number), default 5 | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-virtual-list-scrollbar-radius, --dry-virtual-list-scrollbar-thumb, --dry-virtual-list-scrollbar-thumb-hover, --dry-virtual-list-scrollbar-track, --dry-virtual-list-scrollbar-width
 Data attributes: data-virtual-list
@@ -3551,7 +3551,7 @@ Structure:
       Map.Popup
     Map.Controls
 CSS variables: --dry-map-border, --dry-map-radius
-Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part
+Data attributes: data-map-root | data-part
 Accessibility: none
 Example:
 ```svelte

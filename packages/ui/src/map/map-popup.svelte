@@ -61,3 +61,10 @@
 <div bind:this={contentEl} data-part="popup-content">
 	{@render children()}
 </div>
+
+<style>
+	[data-part='popup-content'] {
+		display: grid;
+		grid-template-columns: minmax(0, 20rem);
+	}
+</style>

@@ -44,7 +44,7 @@ Interactive button or link-styled action for submissions and calls to action.
 Import: @dryui/ui
 Subpath import: @dryui/ui/button
 Props: variant ('solid' | 'outline' | 'ghost' | 'soft' | 'secondary' | 'link' | 'bare'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger'), Semantic tone for primary or destructive button actions., accepted primary, danger, default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
-Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-size | data-variant
+Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example: <Button variant="solid" onclick={handleClick}>Save</Button>
 
@@ -243,7 +243,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/file-upload
 Parts: Root, Dropzone, Trigger, List, Item, ItemDelete
 Props: Root: files (File[]), default [], bindable | accept (string | undefined), default '' | multiple (boolean | undefined), default false | maxSize (number | undefined), default 0 | maxFiles (number | undefined), default 0 | disabled (boolean | undefined), Prevents interaction and applies disabled styling., default false | onFilesChange (((files: File[]) => void) | undefined) | children (Snippet), Content rendered inside the component., required | Dropzone: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required | List: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet<[{ file: File; index: number }]>), Content rendered inside the component., required | Item: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component. | file (File), required | index (number), required | ItemDelete: index (number), required | children (Snippet | undefined), Content rendered inside the component.
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-file-upload | data-fu-dropzone | data-fu-item | data-fu-item-delete | data-fu-item-name | data-fu-item-size | data-fu-list | data-fu-trigger | data-index | data-size
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-fu-dropzone | data-fu-item | data-fu-item-delete | data-fu-item-name | data-fu-item-size | data-fu-list | data-fu-trigger | data-index | data-size
 Example: <FileUpload.Root>
 
 ### FileSelect
@@ -286,8 +286,8 @@ Basic rich text editor with formatting toolbar.
 Import: @dryui/ui
 Subpath import: @dryui/ui/rich-text-editor
 Parts: Root, Toolbar, Content
-Props: Root: value (string), Current controlled or bindable value., default '', bindable | placeholder (string), Hint text shown when no value is selected or entered. | readonly (boolean) | children (Snippet), Content rendered inside the component., required | Toolbar: children (Snippet<[ToolbarSnippetParams]>), Content rendered inside the component., required
-Data attributes: data-active (Present on the active item or current target within the component.) | data-format | data-part | data-readonly
+Props: Root: value (string), Current controlled or bindable value., default '', bindable | placeholder (string), Hint text shown when no value is selected or entered., default '' | readonly (boolean) | children (Snippet), Content rendered inside the component., required | Toolbar: children (Snippet<[ToolbarSnippetParams]>), Content rendered inside the component., required
+Data attributes: data-active (Present on the active item or current target within the component.) | data-format | data-part | data-placeholder | data-readonly | data-rte-content | data-rte-root | data-rte-toolbar
 Example: <RichTextEditor.Root>
 
 ### PhoneInput
@@ -420,7 +420,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered., default 'Select date range' | children (Snippet | undefined), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-root | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-drp-preset | data-drp-trigger | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Example: <DateRangePicker.Root>
 
 ### RangeCalendar
@@ -429,7 +429,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/range-calendar
 Parts: Root, Grid
 Props: Root: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-today
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
 Example: <RangeCalendar.Root>
 
 ### Category: Layout
@@ -507,7 +507,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/tabs
 Parts: Root, List, Trigger, Content
 Props: Root: value (string), Bindable current tab value for controlled tab interfaces., default '' | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | activationMode ('automatic' | 'manual'), accepted automatic, manual, default 'automatic' | children (Snippet), Content rendered inside the component., required | List: children (Snippet), Content rendered inside the component., required | Trigger: value (string), Tab identifier that activates the matching content panel., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required | Content: value (string), Current controlled or bindable value., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root | data-tabs-trigger | data-tabs-trigger-content
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example: <Tabs.Root bind:value={activeTab}>
 
@@ -928,7 +928,7 @@ Example: <MarkdownRenderer>Content</MarkdownRenderer>
 Renders only visible items from large lists for performance.
 Import: @dryui/ui
 Subpath import: @dryui/ui/virtual-list
-Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number) | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
+Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number), default 5 | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
 Data attributes: data-virtual-list
 Example: <VirtualList>Content</VirtualList>
 
@@ -1046,7 +1046,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/map
 Parts: Root, Marker, Popup, Layer, Controls
 Props: Root: center (LngLat), default [0 | zoom (number), default 2 | minZoom (number) | maxZoom (number) | mapStyle (string) | createMap ((container: HTMLDivElement, options: MapOptions) => MapInstance) | children (Snippet), Content rendered inside the component. | Marker: position (LngLat), required | color (string), Semantic color or tone applied to the component. | children (Snippet), Content rendered inside the component. | class (string) | Popup: maxWidth (string), default '20rem' | closeButton (boolean), default true | closeOnClick (boolean), default true | children (Snippet), Content rendered inside the component., required | class (string) | Layer: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | type ('heatmap' | 'polygon' | 'fill' | 'circle' | 'line'), HTML type attribute or component-specific type selector., accepted heatmap, polygon, fill, circle, line, required | data (GeoJsonData), required | color (string), Semantic color or tone applied to the component. | opacity (number) | Controls: position ('top-left' | 'top-right' | 'bottom-left' | 'bottom-right'), accepted top-left, top-right, bottom-left, bottom-right, default 'top-right' | navigation (boolean), default false | fullscreen (boolean), default false | children (Snippet), Content rendered inside the component.
-Data attributes: data-map-mapboxgl | data-map-maplibregl | data-map-marker | data-map-popup | data-map-root | data-part
+Data attributes: data-map-root | data-part
 Example: <Map.Root center={[-122.4, 37.8]} zoom={12}>
 
 ### SystemMap

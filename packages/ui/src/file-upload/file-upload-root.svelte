@@ -142,8 +142,4 @@
 		overflow: hidden;
 	}
 
-	[data-file-upload] {
-		container-type: inline-size;
-		display: grid;
-	}
 </style>

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import { getButtonGroupCtx } from '../button-group/context.svelte.js';
+
+	const groupCtx = getButtonGroupCtx();
 
 	interface Props extends HTMLButtonAttributes {
 		variant?: 'solid' | 'outline' | 'ghost' | 'soft' | 'secondary' | 'link' | 'bare';
@@ -47,7 +50,7 @@
 	}
 </script>
 
-<span class="wrapper">
+<span class="wrapper" data-in-group={groupCtx ? '' : undefined} data-group-orientation={groupCtx?.orientation}>
 	{#if href !== undefined}
 		<a
 			{...rest as AnchorRest}
@@ -356,5 +359,52 @@
 		height: var(--dry-space-12);
 		--dry-btn-radius: var(--dry-radius-lg);
 		--dry-btn-font-size: var(--dry-type-heading-4-size, var(--dry-text-base-size));
+	}
+
+	/* ── Button-group integration ─────────────────────────────────────── */
+
+	.wrapper[data-in-group] :is(a, button) {
+		border-radius: 0;
+	}
+
+	/* Horizontal: first child gets left radii */
+	.wrapper[data-in-group][data-group-orientation='horizontal']:first-child :is(a, button) {
+		border-top-left-radius: var(--dry-button-group-radius);
+		border-bottom-left-radius: var(--dry-button-group-radius);
+	}
+
+	/* Horizontal: last child gets right radii */
+	.wrapper[data-in-group][data-group-orientation='horizontal']:last-child :is(a, button) {
+		border-top-right-radius: var(--dry-button-group-radius);
+		border-bottom-right-radius: var(--dry-button-group-radius);
+	}
+
+	/* Horizontal: non-first child removes inline-start border */
+	.wrapper[data-in-group][data-group-orientation='horizontal']:not(:first-child) :is(a, button) {
+		border-inline-start: 0;
+	}
+
+	/* Vertical: first child gets top radii */
+	.wrapper[data-in-group][data-group-orientation='vertical']:first-child :is(a, button) {
+		border-top-left-radius: var(--dry-button-group-radius);
+		border-top-right-radius: var(--dry-button-group-radius);
+	}
+
+	/* Vertical: last child gets bottom radii */
+	.wrapper[data-in-group][data-group-orientation='vertical']:last-child :is(a, button) {
+		border-bottom-left-radius: var(--dry-button-group-radius);
+		border-bottom-right-radius: var(--dry-button-group-radius);
+	}
+
+	/* Vertical: non-first child removes block-start border */
+	.wrapper[data-in-group][data-group-orientation='vertical']:not(:first-child) :is(a, button) {
+		border-block-start: 0;
+	}
+
+	/* Hover/focus z-index for grouped buttons */
+	.wrapper[data-in-group]:hover :is(a, button),
+	.wrapper[data-in-group]:focus-within :is(a, button) {
+		z-index: var(--dry-button-group-hover-z-index);
+		position: relative;
 	}
 </style>

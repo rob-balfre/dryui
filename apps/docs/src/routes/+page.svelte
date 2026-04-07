@@ -169,10 +169,6 @@
 		color: var(--dry-color-text-strong);
 	}
 
-	.flow-node svg {
-		color: var(--dry-color-text-weak);
-	}
-
 	.flow-label {
 		font-size: var(--dry-text-sm);
 		font-weight: 500;

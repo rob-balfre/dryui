@@ -157,9 +157,8 @@
 						{@const disabled = isDayDisabled(day)}
 						{@const focused = isSameDay(day, ctx.focusedDate)}
 						{@const isoStr = getDayISOString(day)}
-						<div>
+						<div role="gridcell" aria-selected={inRange || undefined}>
 							<button
-								role="gridcell"
 								type="button"
 								tabindex={focused ? 0 : -1}
 								aria-label={formatDate(day, ctx.locale, {
@@ -167,7 +166,6 @@
 									month: 'long',
 									day: 'numeric'
 								})}
-								aria-selected={inRange || undefined}
 								aria-disabled={disabled}
 								data-calendar-day={isoStr}
 								data-today={today ? '' : undefined}
@@ -292,18 +290,20 @@
 			outline-offset: 1px;
 		}
 
-		[role='gridcell'] button[data-today]:not([data-selected]) {
+		[role='gridcell'] button[data-today]:not([data-range-start]):not([data-range-end]) {
 			color: var(--dry-range-calendar-today-color);
 			font-weight: 600;
 		}
 
-		[role='gridcell'] button[data-selected] {
+		[role='gridcell'] button[data-range-start],
+		[role='gridcell'] button[data-range-end] {
 			background: var(--dry-range-calendar-selected-bg);
 			color: var(--dry-range-calendar-selected-color);
 			font-weight: 600;
 		}
 
-		[role='gridcell'] button[data-selected]:hover:not([data-disabled]) {
+		[role='gridcell'] button[data-range-start]:hover:not([data-disabled]),
+		[role='gridcell'] button[data-range-end]:hover:not([data-disabled]) {
 			background: var(--dry-range-calendar-selected-hover-bg);
 		}
 

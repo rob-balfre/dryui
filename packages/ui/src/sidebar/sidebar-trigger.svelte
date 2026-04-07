@@ -17,6 +17,7 @@
 	aria-label="Toggle sidebar"
 	aria-expanded={!ctx.collapsed}
 	data-sidebar-trigger
+	data-side={ctx.side}
 	class={className}
 	onclick={() => ctx.toggle()}
 	{...rest}
@@ -65,11 +66,11 @@
 		transform: rotate(180deg);
 	}
 
-	[data-side='right'] [data-sidebar-trigger]::before {
+	[data-sidebar-trigger][data-side='right']::before {
 		transform: rotate(180deg);
 	}
 
-	[data-side='right'] [data-sidebar-trigger][aria-expanded='true']::before {
+	[data-sidebar-trigger][data-side='right'][aria-expanded='true']::before {
 		transform: none;
 	}
 </style>
