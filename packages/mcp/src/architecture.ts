@@ -175,7 +175,6 @@ export interface DolphinSummary {
 
 export interface DolphinGraph {
 	schema: 'DolphinGraph';
-	generatedAt: string;
 	packageVersion: string;
 	summary: DolphinSummary;
 	nodes: DolphinNode[];
@@ -626,8 +625,6 @@ export function buildArchitectureReport(graph: DolphinGraph): string {
 	return [
 		'# DryUI Architecture Audit',
 		'',
-		`Generated from \`DolphinGraph\` on ${graph.generatedAt}.`,
-		'',
 		'## Metrics',
 		'',
 		'| Metric | Count |',
@@ -1033,7 +1030,6 @@ export async function buildDolphinGraph(): Promise<DolphinGraph> {
 
 	return {
 		schema: 'DolphinGraph',
-		generatedAt: new Date().toISOString(),
 		packageVersion: spec.version,
 		summary,
 		nodes: sortedNodes,
