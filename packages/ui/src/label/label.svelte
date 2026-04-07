@@ -35,6 +35,7 @@
 		--dry-label-leading: var(--dry-type-small-leading, var(--dry-type-small-leading));
 		--dry-label-weight: 500;
 
+		order: var(--dry-field-label-order, unset);
 		display: inline-block;
 		font-family: var(--dry-font-sans);
 		font-size: var(--dry-label-font-size);

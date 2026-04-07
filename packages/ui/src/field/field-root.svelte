@@ -73,10 +73,11 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-field] {
 		--dry-field-gap: var(--dry-space-1_5);
+		--dry-field-label-order: 1;
+		--dry-field-content-order: 4;
 		display: grid;
 		gap: var(--dry-field-gap);
 
@@ -86,14 +87,6 @@
 
 		&[data-error] {
 			--dry-field-gap: var(--dry-space-1);
-		}
-
-		& > :where(:not(label)) {
-			order: 4;
-		}
-
-		& > :where(label) {
-			order: 1;
 		}
 	}
 </style>
