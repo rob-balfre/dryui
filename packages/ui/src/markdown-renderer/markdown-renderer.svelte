@@ -53,7 +53,6 @@
 	{@render renderNodes(nodes)}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-markdown-renderer-root] {
 		/* Component tokens (Tier 3) — use semantic tokens so dark mode works */
@@ -79,140 +78,142 @@
 		color: var(--dry-markdown-color);
 	}
 
-	/* ── Headings ─────────────────────────────────────────────────────────────── */
+	[data-markdown-renderer-root] :global {
+		/* ── Headings ─────────────────────────────────────────────────────────────── */
 
-	[data-markdown-renderer-root] h1,
-	[data-markdown-renderer-root] h2,
-	[data-markdown-renderer-root] h3,
-	[data-markdown-renderer-root] h4,
-	[data-markdown-renderer-root] h5,
-	[data-markdown-renderer-root] h6 {
-		color: var(--dry-markdown-heading-color);
-		font-weight: 600;
-		line-height: 1.25;
-		margin-top: 1.5em;
-		margin-bottom: 0.5em;
-	}
-
-	[data-markdown-renderer-root] h1 {
-		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
-		margin-top: 0;
-	}
-
-	[data-markdown-renderer-root] h2 {
-		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
-		padding-bottom: 0.25em;
-		border-bottom: 1px solid var(--dry-markdown-hr-color);
-	}
-
-	[data-markdown-renderer-root] h3 {
-		font-size: var(--dry-type-heading-3-size, var(--dry-type-heading-3-size));
-	}
-
-	[data-markdown-renderer-root] h4 {
-		font-size: var(--dry-type-heading-4-size, var(--dry-type-heading-4-size));
-	}
-
-	[data-markdown-renderer-root] h5 {
-		font-size: var(--dry-markdown-font-size);
-	}
-
-	[data-markdown-renderer-root] h6 {
-		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
-		color: var(--dry-color-text-weak);
-	}
-
-	/* ── Paragraph ────────────────────────────────────────────────────────────── */
-
-	[data-markdown-renderer-root] p {
-		margin-top: 0;
-		margin-bottom: 1em;
-	}
-
-	/* ── Links ────────────────────────────────────────────────────────────────── */
-
-	[data-markdown-renderer-root] a {
-		color: var(--dry-markdown-link-color);
-		text-decoration: underline;
-		text-underline-offset: 2px;
-
-		&:hover {
-			color: var(--dry-markdown-link-hover-color);
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+			color: var(--dry-markdown-heading-color);
+			font-weight: 600;
+			line-height: 1.25;
+			margin-top: 1.5em;
+			margin-bottom: 0.5em;
 		}
-	}
 
-	/* ── Images ───────────────────────────────────────────────────────────────── */
+		h1 {
+			font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+			margin-top: 0;
+		}
 
-	[data-markdown-renderer-root] img {
-		height: auto;
-		border-radius: var(--dry-radius-md);
-		margin-top: 0.5em;
-		margin-bottom: 0.5em;
-	}
+		h2 {
+			font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+			padding-bottom: 0.25em;
+			border-bottom: 1px solid var(--dry-markdown-hr-color);
+		}
 
-	/* ── Lists ────────────────────────────────────────────────────────────────── */
+		h3 {
+			font-size: var(--dry-type-heading-3-size, var(--dry-type-heading-3-size));
+		}
 
-	[data-markdown-renderer-root] ul,
-	[data-markdown-renderer-root] ol {
-		margin-top: 0;
-		margin-bottom: 1em;
-		padding-left: 1.5em;
-	}
+		h4 {
+			font-size: var(--dry-type-heading-4-size, var(--dry-type-heading-4-size));
+		}
 
-	[data-markdown-renderer-root] li {
-		margin-bottom: 0.25em;
-	}
+		h5 {
+			font-size: var(--dry-markdown-font-size);
+		}
 
-	[data-markdown-renderer-root] ul {
-		list-style-type: disc;
-	}
+		h6 {
+			font-size: var(--dry-type-small-size, var(--dry-type-small-size));
+			color: var(--dry-color-text-weak);
+		}
 
-	[data-markdown-renderer-root] ol {
-		list-style-type: decimal;
-	}
+		/* ── Paragraph ────────────────────────────────────────────────────────────── */
 
-	/* ── Blockquotes ──────────────────────────────────────────────────────────── */
+		p {
+			margin-top: 0;
+			margin-bottom: 1em;
+		}
 
-	[data-markdown-renderer-root] blockquote {
-		margin: 0 0 1em 0;
-		padding: var(--dry-space-2) var(--dry-space-4);
-		border-left: 3px solid var(--dry-markdown-blockquote-border);
-		color: var(--dry-markdown-blockquote-color);
-	}
+		/* ── Links ────────────────────────────────────────────────────────────────── */
 
-	[data-markdown-renderer-root] blockquote p:last-child {
-		margin-bottom: 0;
-	}
+		a {
+			color: var(--dry-markdown-link-color);
+			text-decoration: underline;
+			text-underline-offset: 2px;
 
-	/* ── Inline code ──────────────────────────────────────────────────────────── */
+			&:hover {
+				color: var(--dry-markdown-link-hover-color);
+			}
+		}
 
-	[data-markdown-renderer-root] code {
-		font-family: var(--dry-font-mono);
-		font-size: 0.875em;
-		padding: 0.125em 0.375em;
-		background: var(--dry-markdown-code-bg);
-		color: var(--dry-markdown-code-color);
-		border: 1px solid var(--dry-markdown-code-border);
-		border-radius: var(--dry-radius-sm);
-	}
+		/* ── Images ───────────────────────────────────────────────────────────────── */
 
-	/* Reset inline code styles inside CodeBlock */
-	[data-markdown-renderer-root] [data-code-block] code {
-		padding: 0;
-		background: none;
-		color: inherit;
-		border: none;
-		border-radius: 0;
-	}
+		img {
+			height: auto;
+			border-radius: var(--dry-radius-md);
+			margin-top: 0.5em;
+			margin-bottom: 0.5em;
+		}
 
-	/* ── Strong & Em ──────────────────────────────────────────────────────────── */
+		/* ── Lists ────────────────────────────────────────────────────────────────── */
 
-	[data-markdown-renderer-root] strong {
-		font-weight: 600;
-		color: var(--dry-markdown-heading-color);
-	}
+		ul,
+		ol {
+			margin-top: 0;
+			margin-bottom: 1em;
+			padding-left: 1.5em;
+		}
 
-	[data-markdown-renderer-root] em {
-		font-style: italic;
+		li {
+			margin-bottom: 0.25em;
+		}
+
+		ul {
+			list-style-type: disc;
+		}
+
+		ol {
+			list-style-type: decimal;
+		}
+
+		/* ── Blockquotes ──────────────────────────────────────────────────────────── */
+
+		blockquote {
+			margin: 0 0 1em 0;
+			padding: var(--dry-space-2) var(--dry-space-4);
+			border-left: 3px solid var(--dry-markdown-blockquote-border);
+			color: var(--dry-markdown-blockquote-color);
+		}
+
+		blockquote p:last-child {
+			margin-bottom: 0;
+		}
+
+		/* ── Inline code ──────────────────────────────────────────────────────────── */
+
+		code {
+			font-family: var(--dry-font-mono);
+			font-size: 0.875em;
+			padding: 0.125em 0.375em;
+			background: var(--dry-markdown-code-bg);
+			color: var(--dry-markdown-code-color);
+			border: 1px solid var(--dry-markdown-code-border);
+			border-radius: var(--dry-radius-sm);
+		}
+
+		/* Reset inline code styles inside CodeBlock */
+		[data-code-block] code {
+			padding: 0;
+			background: none;
+			color: inherit;
+			border: none;
+			border-radius: 0;
+		}
+
+		/* ── Strong & Em ──────────────────────────────────────────────────────────── */
+
+		strong {
+			font-weight: 600;
+			color: var(--dry-markdown-heading-color);
+		}
+
+		em {
+			font-style: italic;
+		}
 	}
 </style>
