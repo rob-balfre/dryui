@@ -1,8 +1,15 @@
 # DryUI — Get Started
 
-Install @dryui/ui and set up theming in the current project.
+Zero-dependency Svelte 5 component library. Install the package, apply two setup
+steps, and start using components.
 
-## Step 1: Install the component library
+## Step 1: Install
+
+```
+npx @dryui/cli init
+```
+
+Or manually:
 
 ```
 npm install @dryui/ui
@@ -17,9 +24,9 @@ npm install @dryui/ui
 </script>
 ```
 
-## Step 3: Set the document to automatic light/dark theming
+## Step 3: Enable automatic light/dark theming
 
-In your `app.html` (SvelteKit) or root HTML file:
+In your `app.html` (SvelteKit) or root HTML file, add the `theme-auto` class:
 
 ```html
 <html class="theme-auto">
@@ -35,13 +42,19 @@ In your `app.html` (SvelteKit) or root HTML file:
 <Button>Click me</Button>
 ```
 
-## Optional: Install the CLI
+## CLI (optional)
 
 ```
 npm install -g @dryui/cli
 ```
 
-Then use `dryui list` to see all components, `dryui info <component>` for API details, and `dryui compose <query>` for composition guidance.
+Useful commands:
+
+- `dryui list` — list all available components
+- `dryui info <component>` — show a component's full API reference
+- `dryui compose <query>` — get composition guidance for a UI pattern
+- `dryui review <file.svelte>` — validate a Svelte file against the DryUI spec
+- `dryui doctor` — inspect workspace health
 
 ## Full reference
 
