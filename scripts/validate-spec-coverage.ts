@@ -174,7 +174,12 @@ async function getSpecCompounds(): Promise<Set<string>> {
 async function getSkillCompounds(): Promise<Set<string>> {
 	const src = await Bun.file(skillMdPath).text();
 	const match = src.match(/Compound components include ([^.]+)\./);
-	if (!match) return new Set();
+	if (!match) {
+		throw new Error(
+			'Could not find "Compound components include ..." sentence in SKILL.md. ' +
+				'The validate:spec check requires this exact phrasing.'
+		);
+	}
 	return new Set(
 		match[1]
 			.replace(/ and /g, ', ')
