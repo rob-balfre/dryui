@@ -36,10 +36,15 @@ bun run build                  # Build all @dryui/* packages
 bun run test                   # Run unit + browser tests
 bun run test:unit              # Bun test runner (tests/unit/)
 bun run test:browser           # Vitest + Playwright (tests/browser/)
-bun run check                  # Type-check all packages
+bun run check                  # Exports + type-check + contracts + docs:llms + lint violations
 bun run check:lint             # Run CSS lint rule tests
 bun run validate               # parallel pipeline: lint + build + check + test (CI gate, supports --no-test)
 bun run changeset              # Create a changeset for release
+bun run format                 # Format all files (Prettier)
+bun run format:check           # Check formatting without writing
+bun run sync:exports           # Regenerate package.json exports maps
+bun run sync:skills            # Sync skill files to ~/.claude/skills/
+bun run validate:spec          # Check spec.json coverage against components
 bun run screenshots:components # Generate component screenshots to tmp/ (manual, not in CI)
 ```
 
@@ -126,7 +131,7 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 - Unit tests: Bun test runner with happy-dom (`tests/unit/`)
 - Browser tests: Vitest + Playwright chromium (`tests/browser/`)
 - MCP reviewer tests: `packages/mcp/src/reviewer.test.ts`
-- CI: GitHub Actions runs `bun run validate` on push to main and all PRs
+- CI: GitHub Actions builds docs and deploys to Cloudflare Pages on push to main (`ci.yml`). No PR validation workflow — run `bun run validate` locally before pushing
 
 ## Deployment
 
@@ -178,3 +183,4 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 - The ui package scoped styles reference --dry-\* vars — components render unstyled without a theme import
 - @dryui/docs is excluded from changesets (not published)
 - Every new component must have a corresponding SVG thumbnail — run `bun run thumbnail:create <Name>` when adding a component
+- Docs build requires `PUBLIC_MAPBOX_TOKEN` env var — CI sets it from secrets; locally, export it or expect map-related features to fail

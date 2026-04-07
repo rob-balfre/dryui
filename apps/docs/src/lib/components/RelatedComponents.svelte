@@ -102,20 +102,22 @@
 		<div class="anti-patterns-grid">
 			{#each related.antiPatterns as antiPattern (`${antiPattern.pattern}-${antiPattern.fix}`)}
 				<DocsCallout variant="warning">
-					<Badge variant="outline" color="orange" size="sm">Avoid</Badge>
-					<Text><code>{antiPattern.pattern}</code></Text>
-					<Text color="secondary">{antiPattern.reason}</Text>
-					<Text>
-						Use
-						{#if hrefFor(antiPattern.fix)}
-							<Link href={hrefFor(antiPattern.fix) ?? undefined} underline="always"
-								>{antiPattern.fix}</Link
-							>
-						{:else}
-							<code>{antiPattern.fix}</code>
-						{/if}
-						instead.
-					</Text>
+					<div class="stack-sm">
+						<Badge variant="outline" color="orange" size="sm">Avoid</Badge>
+						<Text><code>{antiPattern.pattern}</code></Text>
+						<Text color="secondary">{antiPattern.reason}</Text>
+						<Text>
+							Use
+							{#if hrefFor(antiPattern.fix)}
+								<Link href={hrefFor(antiPattern.fix) ?? undefined} underline="always"
+									>{antiPattern.fix}</Link
+								>
+							{:else}
+								<code>{antiPattern.fix}</code>
+							{/if}
+							instead.
+						</Text>
+					</div>
 				</DocsCallout>
 			{/each}
 		</div>

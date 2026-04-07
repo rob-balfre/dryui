@@ -9,10 +9,6 @@
       "type": "stdio",
       "command": "bun",
       "args": ["run", "packages/feedback-server/dist/mcp.js"]
-    },
-    "figma-desktop": {
-      "type": "http",
-      "url": "http://127.0.0.1:3845/mcp"
     }
   }
 }
