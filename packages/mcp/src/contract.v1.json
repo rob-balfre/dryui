@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "0.0.7"
+    "version": "0.1.1"
   },
   "counts": {
     "components": 144,
@@ -2579,7 +2579,6 @@
         ]
       },
       "cssVars": {
-        "--dry-field-content-order": "Content Order",
         "--dry-field-gap": "Gap spacing",
         "--dry-field-label-order": "Label Order"
       },

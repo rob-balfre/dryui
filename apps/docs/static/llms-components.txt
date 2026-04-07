@@ -893,7 +893,7 @@ Parts:
   Native props: Forwards <p> attributes via rest props.
 Structure:
   Field.Root
-CSS variables: --dry-field-content-order, --dry-field-gap, --dry-field-label-order
+CSS variables: --dry-field-gap, --dry-field-label-order
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
 Accessibility: none
 Example:

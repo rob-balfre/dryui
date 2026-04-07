@@ -1,7 +1,7 @@
 {
   "schema": "DolphinGraph",
-  "generatedAt": "2026-04-07T01:18:18.495Z",
-  "packageVersion": "0.0.7",
+  "generatedAt": "2026-04-07T04:30:30.280Z",
+  "packageVersion": "0.1.1",
   "summary": {
     "componentNodes": 292,
     "partNodes": 662,

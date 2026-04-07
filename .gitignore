@@ -11,6 +11,7 @@ apps/docs/build
 .codex-artifacts/
 .cursor/
 .env
+.npmrc
 practical-ui/
 .worktrees/
 graphify-out/

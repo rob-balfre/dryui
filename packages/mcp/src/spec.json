@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7",
+  "version": "0.1.1",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -2435,7 +2435,6 @@
         ]
       },
       "cssVars": {
-        "--dry-field-content-order": "Content Order",
         "--dry-field-gap": "Gap spacing",
         "--dry-field-label-order": "Label Order"
       },
