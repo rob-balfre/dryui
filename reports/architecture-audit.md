@@ -1,6 +1,6 @@
 # DryUI Architecture Audit
 
-Generated from `DolphinGraph` on 2026-04-07T07:18:45.736Z.
+Generated from `DolphinGraph` on 2026-04-07T20:40:38.783Z.
 
 ## Metrics
 

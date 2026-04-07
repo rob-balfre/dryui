@@ -1,7 +1,7 @@
 {
   "schema": "DolphinGraph",
-  "generatedAt": "2026-04-07T07:18:45.736Z",
-  "packageVersion": "0.1.3",
+  "generatedAt": "2026-04-07T20:40:38.783Z",
+  "packageVersion": "0.1.4",
   "summary": {
     "componentNodes": 292,
     "partNodes": 662,
@@ -15,7 +15,7 @@
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
-    "composeEdges": 12,
+    "composeEdges": 10,
     "docsEdges": 0,
     "relatedEdges": 303,
     "mismatches": 23,
@@ -15174,7 +15174,7 @@
       "parts": [],
       "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 3
+      "componentImportCount": 1
     },
     {
       "id": "ui:Table",
@@ -16579,18 +16579,6 @@
       "type": "composes",
       "from": "ui:MarkdownRenderer",
       "to": "ui:Separator"
-    },
-    {
-      "id": "composes:ui:SystemMap:ui:Badge:",
-      "type": "composes",
-      "from": "ui:SystemMap",
-      "to": "ui:Badge"
-    },
-    {
-      "id": "composes:ui:SystemMap:ui:Svg:",
-      "type": "composes",
-      "from": "ui:SystemMap",
-      "to": "ui:Svg"
     },
     {
       "id": "composes:ui:SystemMap:ui:Text:",
