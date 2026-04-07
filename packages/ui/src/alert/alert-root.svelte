@@ -48,7 +48,6 @@
 	</div>
 {/if}
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-alert] {
 		--dry-alert-bg: var(--dry-color-fill-info-weak);
@@ -64,9 +63,9 @@
 
 		container-type: inline-size;
 		display: grid;
-		grid-template-columns: 1fr;
+		grid-template-columns: auto 1fr auto;
 		align-items: start;
-		column-gap: var(--dry-alert-gap, var(--dry-space-3));
+		column-gap: 0;
 		row-gap: var(--dry-space-1);
 		padding: var(--dry-alert-padding, var(--dry-space-6));
 		background: var(--dry-alert-bg);
@@ -106,26 +105,11 @@
 		--dry-alert-icon-color: var(--dry-color-fill-error);
 	}
 
-	/* ── Grid modifiers ────────────────────────────────────────────────────────── */
-
-	[data-alert]:has([data-alert-icon]) {
-		grid-template-columns: auto 1fr;
-	}
-
-	[data-alert]:has([data-alert-close]) {
-		grid-template-columns: 1fr auto;
-	}
-
-	[data-alert]:has([data-alert-icon]):has([data-alert-close]) {
-		grid-template-columns: auto 1fr auto;
-	}
-
 	/* ── Responsive ────────────────────────────────────────────────────────────── */
 
 	@container (max-width: 640px) {
 		[data-alert] {
 			padding: var(--dry-alert-padding, var(--dry-space-3));
-			column-gap: var(--dry-alert-gap, var(--dry-space-2));
 		}
 	}
 </style>

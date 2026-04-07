@@ -21,5 +21,6 @@
 		display: grid;
 		align-items: center;
 		margin-top: var(--dry-space-0_5);
+		padding-inline-end: var(--dry-alert-gap, var(--dry-space-3));
 	}
 </style>
