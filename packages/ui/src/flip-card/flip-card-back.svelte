@@ -25,5 +25,10 @@
 <style>
 	[data-flip-card-back] {
 		z-index: 1;
+		backface-visibility: hidden;
+		transition: transform var(--dry-flip-card-duration, 0.6s) ease;
+		position: absolute;
+		inset: 0;
+		transform: var(--dry-flip-card-back-transform, rotateY(180deg));
 	}
 </style>

@@ -59,53 +59,29 @@
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-flip-card] {
 		--dry-flip-card-duration: 0.6s;
 		--dry-flip-card-perspective: 1000px;
+		--dry-flip-card-front-transform: rotateY(0deg);
+		--dry-flip-card-back-transform: rotateY(180deg);
 
 		perspective: var(--dry-flip-card-perspective);
 		position: relative;
 	}
 
-	[data-flip-card] > :where([data-part='front']),
-	[data-flip-card] > :where([data-part='back']) {
-		backface-visibility: hidden;
-		transition: transform var(--dry-flip-card-duration) ease;
-		position: absolute;
-		inset: 0;
+	[data-flip-card][data-direction='horizontal'][data-flipped] {
+		--dry-flip-card-front-transform: rotateY(180deg);
+		--dry-flip-card-back-transform: rotateY(360deg);
 	}
 
-	[data-flip-card] > :where([data-part='front']) {
-		transform: rotateY(0deg);
+	[data-flip-card][data-direction='vertical'] {
+		--dry-flip-card-front-transform: rotateX(0deg);
+		--dry-flip-card-back-transform: rotateX(180deg);
 	}
 
-	[data-flip-card] > :where([data-part='back']) {
-		transform: rotateY(180deg);
-	}
-
-	[data-flip-card][data-direction='horizontal'][data-flipped] > :where([data-part='front']) {
-		transform: rotateY(180deg);
-	}
-
-	[data-flip-card][data-direction='horizontal'][data-flipped] > :where([data-part='back']) {
-		transform: rotateY(360deg);
-	}
-
-	[data-flip-card][data-direction='vertical'] > :where([data-part='front']) {
-		transform: rotateX(0deg);
-	}
-
-	[data-flip-card][data-direction='vertical'] > :where([data-part='back']) {
-		transform: rotateX(180deg);
-	}
-
-	[data-flip-card][data-direction='vertical'][data-flipped] > :where([data-part='front']) {
-		transform: rotateX(180deg);
-	}
-
-	[data-flip-card][data-direction='vertical'][data-flipped] > :where([data-part='back']) {
-		transform: rotateX(360deg);
+	[data-flip-card][data-direction='vertical'][data-flipped] {
+		--dry-flip-card-front-transform: rotateX(180deg);
+		--dry-flip-card-back-transform: rotateX(360deg);
 	}
 </style>
