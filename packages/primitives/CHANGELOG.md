@@ -1,5 +1,11 @@
 # @dryui/primitives
 
+## 0.1.4
+
+### Patch Changes
+
+- Update components with improved scoped styles, @attach migration, and new theme tokens. Add browser tests for date-field, field, image-comparison, and input-group.
+
 ## 0.1.3
 
 ### Patch Changes
