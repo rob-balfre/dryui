@@ -25,72 +25,28 @@
 <svg class="chromatic-aberration-svg" width="0" height="0" aria-hidden="true">
 	<defs>
 		<filter id={filterId} color-interpolation-filters="sRGB">
-			<feOffset in="SourceGraphic" dx={offsetX} dy={offsetY} result="lightRed" />
+			<feOffset in="SourceGraphic" dx={offsetX} dy={offsetY} result="red" />
 			<feColorMatrix
-				in="lightRed"
+				in="red"
 				type="matrix"
 				values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
-				result="lightRedOnly"
+				result="redOnly"
 			/>
-			<feOffset in="SourceGraphic" dx={-offsetX} dy={-offsetY} result="lightBlue" />
+			<feOffset in="SourceGraphic" dx={-offsetX} dy={-offsetY} result="blue" />
 			<feColorMatrix
-				in="lightBlue"
+				in="blue"
 				type="matrix"
 				values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
-				result="lightBlueOnly"
+				result="blueOnly"
 			/>
 			<feColorMatrix
 				in="SourceGraphic"
 				type="matrix"
 				values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
-				result="lightGreenOnly"
+				result="greenOnly"
 			/>
-			<feBlend in="lightRedOnly" in2="lightGreenOnly" mode="screen" result="lightRG" />
-			<feBlend in="lightRG" in2="lightBlueOnly" mode="screen" result="lightSplit" />
-			<feColorMatrix
-				in="SourceGraphic"
-				type="matrix"
-				values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0"
-				result="darkSource"
-			/>
-			<feOffset in="darkSource" dx={offsetX} dy={offsetY} result="darkRed" />
-			<feColorMatrix
-				in="darkRed"
-				type="matrix"
-				values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"
-				result="darkRedOnly"
-			/>
-			<feOffset in="darkSource" dx={-offsetX} dy={-offsetY} result="darkBlue" />
-			<feColorMatrix
-				in="darkBlue"
-				type="matrix"
-				values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0"
-				result="darkBlueOnly"
-			/>
-			<feColorMatrix
-				in="darkSource"
-				type="matrix"
-				values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0"
-				result="darkGreenOnly"
-			/>
-			<feBlend in="darkRedOnly" in2="darkGreenOnly" mode="screen" result="darkRG" />
-			<feBlend in="darkRG" in2="darkBlueOnly" mode="screen" result="darkSplitInverted" />
-			<feColorMatrix
-				in="darkSplitInverted"
-				type="matrix"
-				values="-1 0 0 0 1  0 -1 0 0 1  0 0 -1 0 1  0 0 0 1 0"
-				result="darkSplit"
-			/>
-			<feColorMatrix in="SourceGraphic" type="luminanceToAlpha" result="lightMask" />
-			<feComponentTransfer in="lightMask" result="darkMask">
-				<feFuncA type="table" tableValues="1 0" />
-			</feComponentTransfer>
-			<feComposite in="lightSplit" in2="lightMask" operator="in" result="lightApplied" />
-			<feComposite in="darkSplit" in2="darkMask" operator="in" result="darkApplied" />
-			<feMerge>
-				<feMergeNode in="lightApplied" />
-				<feMergeNode in="darkApplied" />
-			</feMerge>
+			<feBlend in="redOnly" in2="greenOnly" mode="screen" result="rg" />
+			<feBlend in="rg" in2="blueOnly" mode="screen" />
 		</filter>
 	</defs>
 </svg>

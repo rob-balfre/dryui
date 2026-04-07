@@ -281,11 +281,12 @@ export function detectProject(
 		rootLayout && importsAppCss(rootLayout) ? [rootLayout, appCss] : [rootLayout];
 	const defaultImported = hasAnyImport(themeImportFiles, spec.themeImports.default);
 	const darkImported = hasAnyImport(themeImportFiles, spec.themeImports.dark);
+	const themeAuto = appHtml ? hasThemeAuto(appHtml) : false;
 	const stepsNeeded =
 		Number(!dependencyNames.has('@dryui/ui')) +
 		Number(!defaultImported) +
 		Number(!darkImported) +
-		Number(!(appHtml && hasThemeAuto(appHtml)));
+		Number(!themeAuto);
 	const warnings: string[] = [];
 
 	if (!packageJsonPath) warnings.push('No package.json found above the provided path.');
@@ -312,7 +313,7 @@ export function detectProject(
 		theme: {
 			defaultImported,
 			darkImported,
-			themeAuto: hasThemeAuto(appHtml)
+			themeAuto
 		},
 		warnings
 	};
@@ -398,7 +399,7 @@ export function planInstall(spec: ProjectPlannerSpec, inputPath?: string): Insta
 			description:
 				'In src/app.html, find the opening <html> tag (e.g. <html lang="en">) and add class="theme-auto" to it, preserving any existing attributes. Result should be like <html lang="en" class="theme-auto">. Do NOT add a second <html> element.',
 			path: detection.files.appHtml,
-			snippet: '<html lang="en" class="theme-auto">'
+			snippet: 'class="theme-auto"'
 		});
 	}
 
