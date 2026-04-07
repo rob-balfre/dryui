@@ -17,11 +17,15 @@
 	[data-sidebar-header] {
 		grid-row: 1;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		align-items: center;
-		gap: var(--dry-space-2);
-		padding: var(--dry-space-3) var(--dry-space-6);
+		grid-template-columns: minmax(0, 1fr);
+		align-content: start;
+		justify-items: start;
+		gap: var(--dry-sidebar-header-gap, var(--dry-space-1));
+		padding: var(--dry-sidebar-header-padding, var(--dry-space-5) var(--dry-space-6) var(--dry-space-4));
 		border-bottom: 1px solid var(--dry-sidebar-border, var(--dry-color-stroke-weak));
+		color: var(--dry-sidebar-header-color, var(--dry-color-text-strong));
+		font-size: var(--dry-sidebar-header-size, var(--dry-text-base-size, 1rem));
+		font-weight: var(--dry-sidebar-header-weight, 600);
+		line-height: var(--dry-sidebar-header-line-height, 1.2);
 	}
 </style>
