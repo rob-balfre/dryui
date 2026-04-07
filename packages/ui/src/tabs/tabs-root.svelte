@@ -38,6 +38,22 @@
 	});
 </script>
 
-<div data-orientation={orientation} class={className} {...rest}>
+<div data-tabs-root data-orientation={orientation} class={className} {...rest}>
 	{@render children()}
 </div>
+
+<style>
+	[data-tabs-root] {
+		--dry-tabs-trigger-border-bottom: 4px solid transparent;
+		--dry-tabs-trigger-border-right: none;
+		--dry-tabs-trigger-active-border-bottom-color: var(--dry-color-stroke-selected);
+		--dry-tabs-trigger-active-border-right-color: transparent;
+	}
+
+	[data-tabs-root][data-orientation='vertical'] {
+		--dry-tabs-trigger-border-bottom: none;
+		--dry-tabs-trigger-border-right: 4px solid transparent;
+		--dry-tabs-trigger-active-border-bottom-color: transparent;
+		--dry-tabs-trigger-active-border-right-color: var(--dry-color-stroke-selected);
+	}
+</style>

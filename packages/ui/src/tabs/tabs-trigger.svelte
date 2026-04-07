@@ -48,7 +48,6 @@
 	{@render children()}
 </button>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
 	[data-tabs-trigger] {
 		--dry-tabs-padding-x: var(--dry-space-4);
@@ -65,7 +64,8 @@
 		color: var(--dry-color-text-weak);
 		background: transparent;
 		border: none;
-		border-bottom: 4px solid transparent;
+		border-bottom: var(--dry-tabs-trigger-border-bottom, 4px solid transparent);
+		border-right: var(--dry-tabs-trigger-border-right, none);
 		cursor: pointer;
 		white-space: nowrap;
 		transition:
@@ -85,22 +85,13 @@
 
 	[data-tabs-trigger][data-state='active'] {
 		color: var(--dry-color-text-brand);
-		border-bottom-color: var(--dry-color-stroke-selected);
+		border-bottom-color: var(--dry-tabs-trigger-active-border-bottom-color, var(--dry-color-stroke-selected));
+		border-right-color: var(--dry-tabs-trigger-active-border-right-color, transparent);
 		font-weight: 600;
 	}
 
 	[data-tabs-trigger]:active:not([data-disabled]):not([data-state='active']) {
 		transform: translateY(1px);
-	}
-
-	[data-orientation='vertical'] [data-tabs-trigger] {
-		border-bottom: none;
-		border-right: 4px solid transparent;
-	}
-
-	[data-orientation='vertical'] [data-tabs-trigger][data-state='active'] {
-		border-right-color: var(--dry-color-stroke-selected);
-		border-bottom-color: transparent;
 	}
 
 	[data-tabs-trigger][data-disabled] {
