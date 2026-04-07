@@ -1,28 +1,14 @@
 # DryUI — Get Started
 
-Install the CLI and set up DryUI in the current project.
+Install @dryui/ui and set up theming in the current project.
 
-## Step 1: Install the CLI
-
-```
-npm install -g @dryui/cli
-```
-
-## Step 2: Install the component library
+## Step 1: Install the component library
 
 ```
 npm install @dryui/ui
 ```
 
-## Step 3: Run the setup checklist
-
-```
-dryui init
-```
-
-This prints the setup steps. Follow them:
-
-1. Import the theme CSS in your root layout:
+## Step 2: Import theme CSS in your root layout
 
 ```svelte
 <script>
@@ -31,7 +17,9 @@ This prints the setup steps. Follow them:
 </script>
 ```
 
-2. Set the document to automatic light/dark theming:
+## Step 3: Set the document to automatic light/dark theming
+
+In your `app.html` (SvelteKit) or root HTML file:
 
 ```html
 <html class="theme-auto">
@@ -47,9 +35,13 @@ This prints the setup steps. Follow them:
 <Button>Click me</Button>
 ```
 
-Run `dryui list` to see all available components.
-Run `dryui info <component>` for any component's API reference.
-Run `dryui compose <query>` for composition guidance.
+## Optional: Install the CLI
+
+```
+npm install -g @dryui/cli
+```
+
+Then use `dryui list` to see all components, `dryui info <component>` for API details, and `dryui compose <query>` for composition guidance.
 
 ## Full reference
 
