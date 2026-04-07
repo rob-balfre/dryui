@@ -1,5 +1,11 @@
 # @dryui/wizard
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix workspace:\* dependencies that broke npm installs
+
 ## 0.0.2
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @dryui/ui
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix workspace:\* dependencies that broke npm installs
+
 ## 0.1.0
 
 ### Minor Changes

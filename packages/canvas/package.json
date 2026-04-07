@@ -42,14 +42,14 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@dryui/primitives": "workspace:*",
-    "@dryui/ui": "workspace:*"
+    "@dryui/primitives": "^0.1.0",
+    "@dryui/ui": "^0.1.1"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"
   },
   "devDependencies": {
-    "@dryui/mcp": "workspace:*",
+    "@dryui/mcp": "^0.1.0",
     "@sveltejs/package": "^2.5.7",
     "svelte": "^5.55.1",
     "svelte-check": "^4.4.5",

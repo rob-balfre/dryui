@@ -1,5 +1,14 @@
 # @dryui/theme-wizard
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix workspace:\* dependencies that broke npm installs
+
+- Updated dependencies []:
+  - @dryui/ui@0.1.1
+
 ## 1.0.0
 
 ### Patch Changes

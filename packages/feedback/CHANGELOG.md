@@ -1,5 +1,14 @@
 # @dryui/feedback
 
+## 0.0.3
+
+### Patch Changes
+
+- Fix workspace:\* dependencies that broke npm installs
+
+- Updated dependencies []:
+  - @dryui/ui@0.1.1
+
 ## 0.0.2
 
 ### Patch Changes
