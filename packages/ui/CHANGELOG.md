@@ -1,5 +1,11 @@
 # @dryui/ui
 
+## 0.1.2
+
+### Patch Changes
+
+- Fix theme CSS exports pointing to src/ instead of dist/, causing unresolved imports on fresh installs
+
 ## 0.1.1
 
 ### Patch Changes
