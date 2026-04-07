@@ -154,9 +154,7 @@
 			</nav>
 
 			<main class="docs-content">
-				<Container size="full" padding={false}>
-					{@render routeChildren?.()}
-				</Container>
+				{@render routeChildren?.()}
 				<footer class="docs-footer">
 					<small class="docs-footer-copyright">{publishedLabel}</small>
 				</footer>
@@ -251,6 +249,8 @@
 		grid-area: content;
 		display: grid;
 		grid-template-rows: 1fr auto;
+		grid-template-columns: minmax(0, 1fr);
+		container-type: inline-size;
 	}
 
 	@container (min-width: 60rem) {
