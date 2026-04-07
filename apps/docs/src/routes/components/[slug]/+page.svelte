@@ -11,7 +11,7 @@
 	import { getComponentDemo } from '$lib/demos/index';
 	let { data }: PageProps = $props();
 	let name = $derived(data.name);
-	let demoPromise = $derived(getComponentDemo(name));
+	let DemoComponent = $derived(getComponentDemo(name));
 	let hasRootPart = $derived(data.hasRootPart);
 	let parts = $derived(data.parts ? Object.entries(data.parts) : []);
 	let partNames = $derived(data.parts ? Object.keys(data.parts) : []);
@@ -28,12 +28,10 @@
 			<div class="stack-xl">
 				<DocsPageHeader title={name} description={data.description} />
 
-				{#if demoPromise}
-					{#await demoPromise then DemoComponent}
-						<div class="demo-surface">
-							<DemoComponent />
-						</div>
-					{/await}
+				{#if DemoComponent}
+					<div class="demo-surface">
+						<DemoComponent />
+					</div>
 				{/if}
 
 				<div class="stack-lg">
