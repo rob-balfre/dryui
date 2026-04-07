@@ -1,6 +1,7 @@
 node_modules
 dist
 .svelte-kit
+.wrangler
 build
 apps/docs/build
 .DS_Store
@@ -18,6 +19,7 @@ graphify-out/
 .superpowers/
 .vitest-attachments/
 tests/playwright/snapshots/
+tests/playwright/test-results/
 tmp-*.png
 benchmarks/visual-checks/playwright/snapshots/
 benchmarks/visual-checks/playwright/test-results/
