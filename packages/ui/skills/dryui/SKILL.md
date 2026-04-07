@@ -108,17 +108,20 @@ Bindable props vary by component:
 
 Select and Combobox support both `bind:value` and `bind:open`. ColorPicker also exposes `bind:alpha`. Transfer uses `bind:sourceItems` and `bind:targetItems`.
 
-### Rule 4: Use layout components instead of manual CSS
+### Rule 4: Use CSS grid for layout, Container for width
 
 ```svelte
 <!-- Incorrect -->
 <div style="display: flex; gap: 1rem;">...</div>
 
-<!-- Correct -->
-<Flex gap="md">...</Flex>
+<!-- Correct — raw CSS grid in scoped <style> -->
+<div class="layout">...</div>
+<style>
+  .layout { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
-Layout components: Stack, Flex, Grid, Container, Spacer. See `rules/composition.md`.
+Use `display: grid` with `--dry-space-*` tokens for layout. Use `Container` for constrained content width. Use `@container` queries for responsive sizing — never `@media` for layout breakpoints. Do not use inline styles.
 
 ### Rule 5: Wrap form inputs in Field.Root
 

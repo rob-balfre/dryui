@@ -59,8 +59,8 @@ const SERVER_INSTRUCTIONS = [
 	'1. SET UP THE APP SHELL FIRST: Run `compose "app shell"` to get the root layout template.',
 	'   Your +layout.svelte must import the theme CSS, and app.html needs <html class="theme-auto">.',
 	'',
-	'2. PAGE LAYOUT: Use PageHeader.Root + Container + Stack for page structure.',
-	'   This gives you a header, constrained content width, and vertical rhythm.',
+	'2. PAGE LAYOUT: Use CSS grid for layout — not flexbox. Use Container for constrained content',
+	'   width. Use `@container` queries for responsive sizing (never `@media` for layout).',
 	'',
 	'3. CORRECT CSS TOKENS: Background is --dry-color-bg-base (not --dry-color-bg).',
 	'   Text is --dry-color-text-strong (not --dry-color-text). See compose "app shell" for the full reset.',
@@ -72,10 +72,9 @@ const SERVER_INSTRUCTIONS = [
 	'   the compose tool are instructions for YOU, not content for the page. Never render them as',
 	'   visible text in the UI. Only use the code snippets from compose output.',
 	'',
-	'6. USE DRYUI LAYOUT COMPONENTS, NOT CUSTOM CSS: Grid instead of `display: grid`, Flex instead',
-	'   of `display: flex`, Stack instead of vertical flex. Use Field.Root + Label for form fields,',
-	'   Button instead of raw `<button>`. Never write custom CSS for layout, spacing, or form',
-	'   structure when a DryUI component exists.'
+	'6. USE DRYUI COMPONENTS FOR UI ELEMENTS: Use Field.Root + Label for form fields, Button instead',
+	'   of raw `<button>`, Separator instead of `<hr>`. Always call `info` or `compose` to check',
+	'   if a DryUI component exists before writing raw HTML.'
 ].join('\n');
 
 const server = new McpServer(
