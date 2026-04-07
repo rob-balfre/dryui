@@ -1,38 +1,55 @@
-# DryUI — Get Started
+# DryUI — Agent Install Instructions
 
-Zero-dependency Svelte 5 component library. Install the package, apply two setup
-steps, and start using components.
+Zero-dependency Svelte 5 component library. Use the CLI to detect the project
+and execute a tailored install plan.
 
-## Step 1: Install
-
-```
-npx @dryui/cli init
-```
-
-Or manually:
+## Step 1 — Run the install planner
 
 ```
-npm install @dryui/ui
+npx @dryui/cli install --json
 ```
 
-## Step 2: Import theme CSS in your root layout
+This detects the project's framework, package manager, theme state, and returns
+a JSON install plan. The response is an object with:
 
-```svelte
-<script>
-  import '@dryui/ui/themes/default.css';
-  import '@dryui/ui/themes/dark.css';
-</script>
+- `detection` — project info (framework, packageManager, files, dependencies, theme state)
+- `steps` — ordered array of actions to execute
+
+Each step has:
+- `kind`: `"install-package"` | `"edit-file"` | `"create-file"` | `"note"` | `"blocked"`
+- `status`: `"pending"` | `"done"` | `"blocked"`
+- `title` and `description`
+- `command` (for install-package steps) — run this shell command
+- `path` and `snippet` (for edit-file / create-file steps) — apply the snippet to the file
+
+Execute each `"pending"` step in order:
+- `install-package` → run the `command` (e.g. `npm install @dryui/ui`)
+- `create-file` → create the file at `path` with the `snippet` as content
+- `edit-file` → add or merge the `snippet` into the existing file at `path`
+- `note` / `blocked` → read the `description` for guidance
+
+If all steps have `status: "done"`, the project is already set up.
+
+## Step 2 — Set up the MCP server (recommended)
+
+Add the DryUI MCP server to the project's `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "dryui": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    }
+  }
+}
 ```
 
-## Step 3: Enable automatic light/dark theming
+This gives you tools for component lookup, composition guidance, code review,
+theme diagnosis, and workspace health checks.
 
-In your `app.html` (SvelteKit) or root HTML file, add the `theme-auto` class:
-
-```html
-<html class="theme-auto">
-```
-
-## Step 4: Use components
+## Step 3 — Use components
 
 ```svelte
 <script>
@@ -42,20 +59,7 @@ In your `app.html` (SvelteKit) or root HTML file, add the `theme-auto` class:
 <Button>Click me</Button>
 ```
 
-## CLI (optional)
+## Full API reference
 
-```
-npm install -g @dryui/cli
-```
-
-Useful commands:
-
-- `dryui list` — list all available components
-- `dryui info <component>` — show a component's full API reference
-- `dryui compose <query>` — get composition guidance for a UI pattern
-- `dryui review <file.svelte>` — validate a Svelte file against the DryUI spec
-- `dryui doctor` — inspect workspace health
-
-## Full reference
-
-See https://dryui.dev/llms.txt for the complete component API reference.
+See https://dryui.dev/llms.txt for the complete component catalog, props,
+theming tokens, and usage examples.
