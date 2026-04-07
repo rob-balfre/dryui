@@ -4664,7 +4664,7 @@ body { margin: 0; min-height: 100dvh; }
 	{
 		name: 'simple-content-page',
 		description:
-			'Clean content page with constrained width and vertical rhythm. Use Container for max-width and Stack for vertical spacing. Suitable for blog posts, documentation, settings pages.',
+			'Clean content page with constrained width and vertical rhythm. Use Container for max-width and CSS grid for vertical spacing. Suitable for blog posts, documentation, settings pages.',
 		tags: ['page', 'content', 'simple', 'blog', 'docs', 'article', 'clean', 'minimal'],
 		components: ['Container'],
 		snippet: `<!-- Simple content page — Container constrains width, grid provides rhythm -->
