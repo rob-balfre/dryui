@@ -18,6 +18,7 @@
 	aria-expanded={ctx.open}
 	data-state={ctx.open ? 'open' : 'closed'}
 	data-float-button-trigger
+	data-size={size}
 	class={className}
 	onclick={() => ctx.toggle()}
 	{...rest}
@@ -25,13 +26,8 @@
 	{@render children()}
 </button>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
-	[data-float-button-trigger-wrapper] {
-		display: contents;
-	}
-
-	[data-float-button-trigger-wrapper] :where(button) {
+	[data-float-button-trigger] {
 		--dry-fab-bg: var(--dry-color-fill-brand);
 		--dry-fab-color: var(--dry-color-on-brand);
 		--dry-fab-shadow: var(--dry-shadow-lg);
@@ -73,17 +69,17 @@
 		}
 	}
 
-	[data-float-button-trigger-wrapper][data-size='sm'] :where(button) {
+	[data-float-button-trigger][data-size='sm'] {
 		height: 44px;
 		aspect-ratio: 1;
 	}
 
-	[data-float-button-trigger-wrapper][data-size='md'] :where(button) {
+	[data-float-button-trigger][data-size='md'] {
 		height: 52px;
 		aspect-ratio: 1;
 	}
 
-	[data-float-button-trigger-wrapper][data-size='lg'] :where(button) {
+	[data-float-button-trigger][data-size='lg'] {
 		height: 60px;
 		aspect-ratio: 1;
 	}

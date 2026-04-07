@@ -27,17 +27,12 @@
 	});
 </script>
 
-<div data-state={open ? 'open' : 'closed'} {...rest} class={className}>
+<div data-float-button data-position={position} data-state={open ? 'open' : 'closed'} {...rest} class={className}>
 	{@render children()}
 </div>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
-	[data-float-button-wrapper] {
-		display: contents;
-	}
-
-	[data-float-button-wrapper] :where([data-float-button]) {
+	[data-float-button] {
 		--dry-fab-offset: var(--dry-space-6);
 		--dry-fab-gap: var(--dry-space-3);
 		--dry-fab-z-index: var(--dry-layer-overlay);
@@ -49,12 +44,12 @@
 		gap: var(--dry-fab-gap);
 	}
 
-	[data-float-button-wrapper][data-position='bottom-right'] :where([data-float-button]) {
+	[data-float-button][data-position='bottom-right'] {
 		bottom: var(--dry-fab-offset);
 		right: var(--dry-fab-offset);
 	}
 
-	[data-float-button-wrapper][data-position='bottom-left'] :where([data-float-button]) {
+	[data-float-button][data-position='bottom-left'] {
 		bottom: var(--dry-fab-offset);
 		left: var(--dry-fab-offset);
 	}

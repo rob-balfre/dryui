@@ -14,6 +14,7 @@
 
 <button
 	type="button"
+	data-float-button-action
 	data-state={ctx.open ? 'open' : 'closed'}
 	tabindex={ctx.open ? 0 : -1}
 	{...rest}
@@ -22,13 +23,8 @@
 	{@render children()}
 </button>
 
-<!-- svelte-ignore css_unused_selector -->
 <style>
-	[data-float-button-action-wrapper] {
-		display: contents;
-	}
-
-	[data-float-button-action-wrapper] :where(button) {
+	[data-float-button-action] {
 		--dry-fab-action-bg: var(--dry-color-bg-overlay);
 		--dry-fab-action-color: var(--dry-color-text-strong);
 		--dry-fab-action-border: var(--dry-color-stroke-weak);
