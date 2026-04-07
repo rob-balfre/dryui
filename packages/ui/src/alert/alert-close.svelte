@@ -32,12 +32,12 @@
 		grid-column: -2 / -1;
 		grid-row: 1 / 3;
 		align-self: start;
-		padding-inline-start: var(--dry-alert-gap, var(--dry-space-3));
 		display: grid;
 		place-items: center;
 		height: var(--dry-space-11);
 		aspect-ratio: 1;
-		padding: 0;
+		padding-block: 0;
+		padding-inline: var(--dry-alert-gap, var(--dry-space-3)) 0;
 		border: none;
 		border-radius: var(--dry-radius-sm);
 		background: transparent;
