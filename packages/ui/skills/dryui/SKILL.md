@@ -104,7 +104,15 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 ## Quick Start
 
-Run the install planner — it detects the project and returns a tailored step-by-step plan:
+**1. Install this skill** — you're reading it, so it's already loaded. This is the most important step.
+
+**2. Add the MCP server** for live API lookup and code validation:
+
+- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@rob-balfre/dryui` (installs skill + MCP in one step)
+- Codex: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`
+- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
+
+**3. Run the install planner** — it detects your project and returns a tailored step-by-step plan:
 
 ```
 npx -y @dryui/cli install --toon

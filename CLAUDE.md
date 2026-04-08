@@ -105,6 +105,25 @@ Two-tier system: semantic → component.
 
 Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
+### Quick setup
+
+```bash
+# Claude Code (plugin — installs skill + MCP server)
+claude plugin marketplace add rob-balfre/dryui
+claude plugin install dryui@rob-balfre/dryui
+
+# Codex (skill + MCP)
+$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
+codex mcp add dryui -- npx -y @dryui/mcp
+
+# Copilot / Cursor / Windsurf (skill + MCP config)
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
+# Then add MCP config — see apps/docs/src/lib/ai-setup.ts for per-tool formats
+
+# Zed (MCP only — no skill support yet, reads AGENTS.md for conventions)
+# Add to ~/.config/zed/settings.json under "context_servers"
+```
+
 Two MCP servers are configured:
 - **dryui** — component lookup, composition, validation, theme checks, workspace audit
 - **dryui-feedback** — feedback annotation and review (`packages/feedback-server/dist/mcp.js`)

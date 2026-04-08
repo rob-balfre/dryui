@@ -71,7 +71,7 @@
 				client.
 			</Text>
 
-			<Tabs.Root value="codex">
+			<Tabs.Root value="claude-code">
 				<Tabs.List>
 					{#each aiAgentSetups as agent (agent.id)}
 						<Tabs.Trigger value={agent.id}>{agent.label}</Tabs.Trigger>
@@ -91,8 +91,15 @@
 								</div>
 							{/if}
 
+							{#if agent.quickSetup}
+								<div class="stack-sm">
+									<Heading level={4}>{agent.quickSetup.title}</Heading>
+									<CodeBlock code={agent.quickSetup.code} language="bash" />
+								</div>
+							{/if}
+
 							<div class="stack-sm">
-								<Heading level={4}>MCP config</Heading>
+								<Heading level={4}>{agent.quickSetup ? 'Manual config' : 'MCP config'}</Heading>
 								<Text size="sm" color="muted">{agent.mcp.note}</Text>
 								<CodeBlock code={agent.mcp.code} language={agent.mcp.language} />
 							</div>

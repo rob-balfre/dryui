@@ -1,0 +1,15 @@
+{
+  "name": "dryui",
+  "version": "0.2.0",
+  "description": "DryUI component library — conventions, lookup, validation, and composition guidance for Svelte 5",
+  "author": {
+    "name": "Rob Balfre",
+    "url": "https://github.com/rob-balfre"
+  },
+  "repository": "https://github.com/rob-balfre/dryui",
+  "homepage": "https://dryui.dev",
+  "license": "MIT",
+  "keywords": ["svelte", "components", "ui", "dryui", "svelte5"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

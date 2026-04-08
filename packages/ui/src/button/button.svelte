@@ -115,6 +115,7 @@
 
 		display: inline-grid;
 		grid-auto-flow: column;
+		justify-content: center;
 		place-items: center;
 		gap: var(--dry-space-2);
 		padding: var(--dry-btn-padding-y) var(--dry-btn-padding-x);
