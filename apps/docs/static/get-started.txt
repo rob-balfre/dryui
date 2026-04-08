@@ -47,7 +47,7 @@ Execute each `"pending"` step in order:
 
 If all steps have `status: "done"`, the project is already set up.
 
-## Step 2 — Verify the setup
+## Step 2 — Verify the setup and start the dev server
 
 After executing all steps, confirm the setup succeeded:
 
@@ -59,9 +59,7 @@ The output should show `"status": "ready"`. If it shows `"partial"`, review
 the `theme` and `dependencies` fields to identify what is still missing and
 re-run Step 1.
 
-## Step 3 — Start the dev server
-
-Run the project's dev server to confirm everything works:
+Once the status is `"ready"`, start the dev server:
 
 ```
 npm run dev
@@ -69,7 +67,7 @@ npm run dev
 
 (Or the equivalent for your package manager: `bun run dev`, `pnpm dev`, `yarn dev`.)
 
-## Step 4 — Set up the MCP server (recommended)
+## Step 3 — Set up the MCP server (recommended)
 
 The DryUI MCP server provides tools for component lookup, composition guidance,
 code review, theme diagnosis, and workspace health checks.
@@ -126,7 +124,7 @@ args = ["-y", "@dryui/mcp"]
 
 If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
 
-## Step 5 — Read the component reference
+## Step 4 — Read the component reference
 
 Before building any UI, read the full component catalog:
 
@@ -145,7 +143,7 @@ Key rules from the reference:
 - All layout uses CSS grid — not flexbox
 - Use `--dry-*` CSS variables for theming — not hardcoded colors
 
-## Step 6 — Use components
+## Step 5 — Use components
 
 ```svelte
 <script>
