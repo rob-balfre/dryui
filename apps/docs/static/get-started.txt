@@ -47,25 +47,27 @@ Execute each `"pending"` step in order:
 
 If all steps have `status: "done"`, the project is already set up.
 
-## Step 2 — Verify the setup and start the dev server
+## Step 2 — Verify readiness and start the dev server
 
-After executing all steps, confirm the setup succeeded:
+After executing all steps, verify:
 
 ```
 npx -y @dryui/cli detect --json
 ```
 
-The output should show `"status": "ready"`. If it shows `"partial"`, review
-the `theme` and `dependencies` fields to identify what is still missing and
-re-run Step 1.
+- `"status": "ready"` → proceed below
+- `"status": "partial"` → review the `theme` and `dependencies` fields, fix
+  what is missing, re-run Step 1
 
-Once the status is `"ready"`, start the dev server:
+**Do NOT open `src/app.html` or any source file directly.** Source files
+render without styles, scripts, or routing. Always start the dev server and
+use the localhost URL it prints (typically `http://localhost:5173`).
 
-```
-npm run dev
-```
+Start the dev server using the `packageManager` from the Step 1 detection
+output (e.g. `npm run dev`, `bun run dev`, `pnpm dev`, `yarn dev`).
 
-(Or the equivalent for your package manager: `bun run dev`, `pnpm dev`, `yarn dev`.)
+In Claude Code: use `preview_start` with the dev command, then
+`preview_screenshot` to confirm styles are applied.
 
 ## Step 3 — Set up the MCP server (recommended)
 
