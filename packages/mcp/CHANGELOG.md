@@ -1,5 +1,16 @@
 # @dryui/mcp
 
+## 0.2.1
+
+### Patch Changes
+
+- Native plugin/skill install for all major AI coding tools
+  - Claude Code plugin: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@rob-balfre/dryui`
+  - Codex: `$skill-installer install` with MCP dependency in agents/openai.yaml
+  - Copilot/Cursor/Windsurf: `npx degit` for Agent Skills + MCP config
+  - Zed: AGENTS.md + MCP config
+  - Updated docs tools page with 6 agent tabs
+
 ## 0.2.0
 
 ### Minor Changes
