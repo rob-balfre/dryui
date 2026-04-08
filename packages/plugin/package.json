@@ -1,0 +1,6 @@
+{
+  "name": "@dryui/plugin",
+  "version": "0.2.0",
+  "private": true,
+  "description": "DryUI Claude Code plugin — bundles skill and MCP server"
+}

@@ -75,9 +75,8 @@
 	data-time-input-wrapper
 	data-disabled={isDisabled || undefined}
 	id={ctx?.id}
-	aria-describedby={ctx?.describedBy}
+	aria-describedby={[ctx?.describedBy, ctx?.hasError ? ctx?.errorMessageId : undefined].filter(Boolean).join(' ') || undefined}
 	aria-invalid={ctx?.hasError || undefined}
-	aria-errormessage={ctx?.errorMessageId}
 	class={className}
 >
 	<Select.Root bind:value={hourStr} disabled={isDisabled}>
