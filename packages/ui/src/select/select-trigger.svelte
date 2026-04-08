@@ -99,6 +99,7 @@
 		grid-template-columns: 1fr 1.5rem;
 		align-items: center;
 		gap: var(--dry-space-2);
+		min-height: var(--dry-space-12);
 		padding: var(--dry-select-padding-y) var(--dry-select-padding-x);
 		font-size: var(--dry-select-font-size);
 		line-height: var(--dry-type-small-leading);
@@ -171,6 +172,7 @@
 		--dry-select-padding-x: var(--dry-space-2);
 		--dry-select-padding-y: var(--dry-space-1);
 		--dry-select-font-size: var(--dry-type-tiny-size);
+		min-height: var(--dry-space-8);
 		line-height: var(--dry-type-tiny-leading);
 	}
 

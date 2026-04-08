@@ -512,10 +512,10 @@ Tags: time, input, form, clock
 Kind: simple
 Root import: import { TimeInput } from '@dryui/ui'
 Subpath import: import { TimeInput } from '@dryui/ui/time-input'
-Props: value (string), Current controlled or bindable value., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | step (number), Step interval used when incrementing numeric values.
+Props: value (string), Current controlled or bindable value., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | step (number), Step interval used when incrementing numeric values. | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | name (string), Field name used during native form submission. | class (string)
 Native props: Forwards <input> attributes via rest props.
-CSS variables: --dry-time-input-bg, --dry-time-input-border, --dry-time-input-color, --dry-time-input-font-size, --dry-time-input-padding-x, --dry-time-input-padding-y, --dry-time-input-radius
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-time-input | data-time-input-wrapper
+CSS variables: none
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-placeholder | data-time-display | data-time-input-wrapper | data-time-separator
 Accessibility: none
 Example:
 ```svelte

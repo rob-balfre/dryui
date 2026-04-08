@@ -3,7 +3,7 @@
 </script>
 
 <DateRangePicker.Root>
-	<DateRangePicker.Trigger>Pick date range</DateRangePicker.Trigger>
+	<DateRangePicker.Trigger placeholder="Pick date range" />
 	<DateRangePicker.Content>
 		<DateRangePicker.Calendar />
 	</DateRangePicker.Content>

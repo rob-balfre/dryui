@@ -1,9 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { DateField } from '../date-field/index.js';
+	import { DatePicker } from '../date-picker/index.js';
 	import { TimeInput } from '../time-input/index.js';
-
-	type DateSegmentType = 'month' | 'day' | 'year';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: Date;
@@ -27,28 +25,12 @@
 		...rest
 	}: Props = $props();
 
-	function getSegmentOrder(loc: string): DateSegmentType[] {
-		const formatter = new Intl.DateTimeFormat(loc, {
-			year: 'numeric',
-			month: '2-digit',
-			day: '2-digit'
-		});
-		const parts = formatter.formatToParts(new Date(2000, 0, 1));
-		const order: DateSegmentType[] = [];
-		for (const part of parts) {
-			if (part.type === 'month') order.push('month');
-			else if (part.type === 'day') order.push('day');
-			else if (part.type === 'year') order.push('year');
-		}
-		return order.length === 3 ? order : ['month', 'day', 'year'];
+	function toTimeString(d: Date): string {
+		return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 	}
 
-	const segmentOrder = $derived(getSegmentOrder(locale));
-
 	let dateValue = $state<Date | null>(value);
-	let timeValue = $state(
-		String(value.getHours()).padStart(2, '0') + ':' + String(value.getMinutes()).padStart(2, '0')
-	);
+	let timeValue = $state(toTimeString(value));
 
 	let updating = false;
 
@@ -57,8 +39,7 @@
 		const v = value;
 		if (v) {
 			dateValue = new Date(v.getFullYear(), v.getMonth(), v.getDate());
-			timeValue =
-				String(v.getHours()).padStart(2, '0') + ':' + String(v.getMinutes()).padStart(2, '0');
+			timeValue = toTimeString(v);
 		}
 	});
 
@@ -93,18 +74,16 @@
 
 <div data-date-time-input class={className} {...rest}>
 	<div data-part="date-section">
-		<DateField.Root bind:value={dateValue} {locale} {disabled} {size}>
-			{#each segmentOrder as segmentType, i}
-				{#if i > 0}
-					<DateField.Separator />
-				{/if}
-				<DateField.Segment type={segmentType} />
-			{/each}
-		</DateField.Root>
+		<DatePicker.Root bind:value={dateValue} {locale} {disabled} min={min ?? null} max={max ?? null}>
+			<DatePicker.Trigger {size} />
+			<DatePicker.Content>
+				<DatePicker.Calendar />
+			</DatePicker.Content>
+		</DatePicker.Root>
 	</div>
 
 	<div data-part="time-section">
-		<TimeInput bind:value={timeValue} {disabled} />
+		<TimeInput bind:value={timeValue} {disabled} {size} />
 	</div>
 
 	{#if name}

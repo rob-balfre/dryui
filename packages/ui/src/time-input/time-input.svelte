@@ -1,97 +1,141 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { getFormControlCtx } from '@dryui/primitives';
-	import type { TimeInputProps } from './index.js';
+	import { Select } from '../select/index.js';
+
+	interface Props {
+		value?: string;
+		disabled?: boolean;
+		step?: number;
+		size?: 'sm' | 'md' | 'lg';
+		name?: string;
+		class?: string;
+	}
 
 	let {
 		value = $bindable(''),
 		disabled = false,
 		step,
-		class: className,
-		...rest
-	}: TimeInputProps = $props();
+		size = 'md',
+		name,
+		class: className
+	}: Props = $props();
 
 	const ctx = getFormControlCtx();
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
+
+	let hourStr = $state('');
+	let minuteStr = $state('');
+	let updating = false;
+
+	// Parse incoming value into hour/minute (only reacts to value changes)
+	$effect(() => {
+		if (updating) return;
+		const parts = value.split(':');
+		const h = parts[0] ?? '';
+		const m = parts[1] ?? '';
+		untrack(() => {
+			if (h !== hourStr) hourStr = h;
+			if (m !== minuteStr) minuteStr = m;
+		});
+	});
+
+	// Reconstruct value when selects change (only reacts to hourStr/minuteStr)
+	$effect(() => {
+		const h = hourStr;
+		const m = minuteStr;
+		if (h && m) {
+			const newVal = `${h}:${m}`;
+			untrack(() => {
+				if (newVal !== value) {
+					updating = true;
+					value = newVal;
+					updating = false;
+				}
+			});
+		}
+	});
+
+	// Generate hour options 00-23
+	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+
+	// Generate minute options based on step
+	const minutes = $derived.by(() => {
+		const stepMinutes = step && step >= 60 ? Math.floor(step / 60) : 1;
+		const count = Math.floor(60 / stepMinutes);
+		return Array.from({ length: count }, (_, i) =>
+			String(i * stepMinutes).padStart(2, '0')
+		);
+	});
 </script>
 
-<span data-time-input-wrapper>
-	<input
-		type="time"
-		bind:value
-		{step}
-		id={ctx?.id}
-		disabled={isDisabled}
-		required={ctx?.required || undefined}
-		aria-describedby={ctx?.describedBy}
-		aria-invalid={ctx?.hasError || undefined}
-		aria-errormessage={ctx?.errorMessageId}
-		data-time-input
-		data-disabled={isDisabled || undefined}
-		class={className}
-		{...rest}
-	/>
-</span>
+<div
+	role="group"
+	aria-label="Time"
+	data-time-input-wrapper
+	data-disabled={isDisabled || undefined}
+	id={ctx?.id}
+	aria-describedby={ctx?.describedBy}
+	aria-invalid={ctx?.hasError || undefined}
+	aria-errormessage={ctx?.errorMessageId}
+	class={className}
+>
+	<Select.Root bind:value={hourStr} disabled={isDisabled}>
+		<Select.Trigger {size} aria-label="Hour">
+			<span data-time-display data-placeholder={!hourStr ? '' : undefined}>
+				{hourStr || 'HH'}
+			</span>
+		</Select.Trigger>
+		<Select.Content>
+			{#each hours as h (h)}
+				<Select.Item value={h}>{h}</Select.Item>
+			{/each}
+		</Select.Content>
+	</Select.Root>
+
+	<span data-time-separator>:</span>
+
+	<Select.Root bind:value={minuteStr} disabled={isDisabled}>
+		<Select.Trigger {size} aria-label="Minute">
+			<span data-time-display data-placeholder={!minuteStr ? '' : undefined}>
+				{minuteStr || 'MM'}
+			</span>
+		</Select.Trigger>
+		<Select.Content>
+			{#each minutes as m (m)}
+				<Select.Item value={m}>{m}</Select.Item>
+			{/each}
+		</Select.Content>
+	</Select.Root>
+
+	{#if name}
+		<input type="hidden" {name} {value} disabled={isDisabled || undefined} />
+	{/if}
+</div>
 
 <style>
 	[data-time-input-wrapper] {
-		container-type: inline-size;
-		display: grid;
+		display: inline-grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-1);
 	}
 
-	[data-time-input] {
-		--dry-time-input-bg: var(--dry-color-bg-raised);
-		--dry-time-input-border: var(--dry-color-stroke-strong);
-		--dry-time-input-color: var(--dry-color-text-strong);
-		--dry-time-input-radius: var(--dry-radius-md);
-		--dry-time-input-padding-x: var(--dry-space-3);
-		--dry-time-input-padding-y: var(--dry-space-2);
-		--dry-time-input-font-size: var(--dry-type-small-size);
+	[data-time-display][data-placeholder] {
+		color: var(--dry-color-text-weak);
+	}
 
-		padding: var(--dry-time-input-padding-y) var(--dry-time-input-padding-x);
-		border: 1px solid var(--dry-time-input-border);
-		border-radius: var(--dry-time-input-radius);
-		background: var(--dry-time-input-bg);
-		color: var(--dry-time-input-color);
+	[data-time-separator] {
 		font-family: var(--dry-font-sans);
-		font-size: var(--dry-time-input-font-size);
-		line-height: var(--dry-type-small-leading);
-		box-sizing: border-box;
-		appearance: none;
-		transition:
-			border-color var(--dry-duration-fast) var(--dry-ease-default),
-			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
-
-		&::-webkit-calendar-picker-indicator {
-			opacity: 0.7;
-			cursor: pointer;
-			filter: none;
-		}
-
-		&:hover:not([data-disabled]) {
-			border-color: var(--dry-color-stroke-strong);
-		}
-
-		&:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
-			outline-offset: -1px;
-			border-color: var(--dry-color-focus-ring);
-		}
-
-		&[data-disabled] {
-			opacity: 0.55;
-			cursor: not-allowed;
-		}
+		font-size: var(--dry-type-small-size);
+		color: var(--dry-color-text-strong);
+		font-weight: 600;
+		line-height: 1;
 	}
 
-	[data-time-input]::-webkit-datetime-edit-hour-field,
-	[data-time-input]::-webkit-datetime-edit-minute-field,
-	[data-time-input]::-webkit-datetime-edit-ampm-field {
-		padding: 0;
-	}
-
-	@container (max-width: 200px) {
-		[data-time-input] {
-			--dry-time-input-padding-x: var(--dry-space-2);
-		}
+	[data-time-input-wrapper][data-disabled] {
+		opacity: 0.55;
+		pointer-events: none;
 	}
 </style>

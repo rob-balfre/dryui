@@ -142,7 +142,7 @@
 			color var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-df-segment]:focus-visible {
+	[data-df-segment]:focus {
 		outline: 2px solid var(--dry-color-stroke-focus);
 		outline-offset: -1px;
 		background: var(--dry-color-fill-brand-weak);

@@ -160,7 +160,6 @@
 <style>
 	[data-dp-calendar] {
 		--dry-calendar-grid-gap: 1px;
-		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-2);
 		user-select: none;

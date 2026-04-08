@@ -176,7 +176,13 @@
 						{@const inRange = isInSelectedRange(day) || isInPreviewRange(day)}
 						{@const rangeStart = isRangeStart(day)}
 						{@const rangeEnd = isRangeEnd(day)}
-						<div role="gridcell" data-calendar-cell>
+						<div
+							role="gridcell"
+							data-calendar-cell
+							data-in-range={inRange ? '' : undefined}
+							data-range-start={rangeStart ? '' : undefined}
+							data-range-end={rangeEnd ? '' : undefined}
+						>
 							<button
 								type="button"
 								tabindex={focused ? 0 : -1}
@@ -279,7 +285,6 @@
 	[data-drp-calendar] [data-calendar-row] {
 		display: grid;
 		grid-template-columns: repeat(7, minmax(0, 1fr));
-		gap: 1px;
 	}
 
 	[data-drp-calendar] [data-calendar-columnheader] {
@@ -296,6 +301,29 @@
 		display: grid;
 		place-items: center;
 	}
+
+	/* ── Cell-level range band (seamless, fills entire grid track) ── */
+
+	[data-drp-calendar] [data-calendar-cell][data-in-range],
+	[data-drp-calendar] [data-calendar-cell][data-range-start],
+	[data-drp-calendar] [data-calendar-cell][data-range-end] {
+		background: var(
+			--dry-range-calendar-range-bg,
+			color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent)
+		);
+	}
+
+	[data-drp-calendar] [data-calendar-cell][data-range-start] {
+		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md)) 0 0
+			var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+	}
+
+	[data-drp-calendar] [data-calendar-cell][data-range-end] {
+		border-radius: 0 var(--dry-range-calendar-day-radius, var(--dry-radius-md))
+			var(--dry-range-calendar-day-radius, var(--dry-radius-md)) 0;
+	}
+
+	/* ── Day button base ── */
 
 	[data-drp-calendar] [data-calendar-day-button] {
 		display: inline-grid;
@@ -330,31 +358,6 @@
 		font-weight: 600;
 	}
 
-	[data-drp-calendar] [data-calendar-day-button][data-range-start],
-	[data-drp-calendar] [data-calendar-day-button][data-range-end] {
-		background: var(--dry-range-calendar-selected-bg, var(--dry-color-fill-brand));
-		color: var(--dry-range-calendar-selected-color, var(--dry-color-on-brand));
-		font-weight: 600;
-	}
-
-	[data-drp-calendar] [data-calendar-day-button][data-range-start]:hover:not([data-disabled]),
-	[data-drp-calendar] [data-calendar-day-button][data-range-end]:hover:not([data-disabled]) {
-		background: var(--dry-range-calendar-selected-hover-bg, var(--dry-color-fill-brand-hover));
-	}
-
-	[data-drp-calendar] [data-calendar-day-button][data-in-range] {
-		background: var(
-			--dry-range-calendar-range-bg,
-			color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent)
-		);
-		border-radius: 0;
-	}
-
-	[data-drp-calendar] [data-calendar-day-button][data-range-start],
-	[data-drp-calendar] [data-calendar-day-button][data-range-end] {
-		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
-	}
-
 	[data-drp-calendar] [data-calendar-day-button][data-outside-month] {
 		color: var(--dry-range-calendar-outside-color, var(--dry-color-text-weak));
 		opacity: 0.6;
@@ -364,5 +367,20 @@
 		cursor: not-allowed;
 		opacity: 0.4;
 		pointer-events: none;
+	}
+
+	/* ── Range endpoints (last to win specificity over in-range/outside) ── */
+
+	[data-drp-calendar] [data-calendar-day-button][data-range-start],
+	[data-drp-calendar] [data-calendar-day-button][data-range-end] {
+		background: var(--dry-range-calendar-selected-bg, var(--dry-color-fill-brand));
+		color: var(--dry-range-calendar-selected-color, var(--dry-color-on-brand));
+		font-weight: 600;
+		border-radius: var(--dry-range-calendar-day-radius, var(--dry-radius-md));
+	}
+
+	[data-drp-calendar] [data-calendar-day-button][data-range-start]:hover:not([data-disabled]),
+	[data-drp-calendar] [data-calendar-day-button][data-range-end]:hover:not([data-disabled]) {
+		background: var(--dry-range-calendar-selected-hover-bg, var(--dry-color-fill-brand-hover));
 	}
 </style>

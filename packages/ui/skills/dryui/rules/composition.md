@@ -1,143 +1,109 @@
 # Composition
 
-## Layout Components
+## Layout with CSS Grid
 
-DryUI provides five layout primitives. Use them instead of manual CSS.
+All layout uses raw `display: grid` in scoped `<style>` blocks with `--dry-space-*` tokens. No flexbox, no inline styles, no layout components (Stack, Flex, Grid, Spacer).
 
-### Stack (vertical layout)
-
-Stacks children vertically with consistent gap.
+### Vertical stack
 
 ```svelte
-<!-- Incorrect -->
-<div style="display: flex; flex-direction: column; gap: 1rem;">
-	<p>First</p>
-	<p>Second</p>
+<div class="stack">
+  <p>First</p>
+  <p>Second</p>
 </div>
 
-<!-- Correct -->
-<Stack gap="md">
-	<p>First</p>
-	<p>Second</p>
-</Stack>
+<style>
+  .stack { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
-Gap values: `"sm"`, `"md"`, `"lg"`, `"xl"`
-
-### Flex (horizontal layout)
-
-Flexible row layout with alignment controls.
+### Horizontal row
 
 ```svelte
-<!-- Incorrect -->
-<div style="display: flex; justify-content: space-between; align-items: center;">
-	<span>Label</span>
-	<Button>Action</Button>
+<div class="row">
+  <span>Label</span>
+  <Button>Action</Button>
 </div>
 
-<!-- Correct -->
-<Flex justify="between" align="center">
-	<span>Label</span>
-	<Button>Action</Button>
-</Flex>
+<style>
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: var(--dry-space-4);
+  }
+</style>
 ```
 
-Props: `gap`, `justify` (start, center, end, between, around, evenly), `align` (start, center, end, stretch, baseline), `wrap` (boolean)
-
-### Grid (CSS grid)
-
-Grid layout configured entirely via `--dry-grid-*` CSS custom properties.
+### Responsive columns with @container
 
 ```svelte
-<!-- Incorrect -->
-<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-	<div>A</div>
-	<div>B</div>
-	<div>C</div>
+<div class="grid-container">
+  <div class="grid">
+    <div>A</div>
+    <div>B</div>
+    <div>C</div>
+  </div>
 </div>
 
-<!-- Correct -->
-<Grid --dry-grid-columns="repeat(3, 1fr)" --dry-grid-gap="var(--dry-space-6)">
-	<div>A</div>
-	<div>B</div>
-	<div>C</div>
-</Grid>
+<style>
+  .grid-container { container-type: inline-size; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--dry-space-6);
+  }
+  @container (min-width: 40rem) {
+    .grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
 ```
 
-For 2D layouts with named areas, use Grid.Area:
+### Centered max-width content
+
+Use `Container` (simple component, no `.Root`) for constrained content width:
 
 ```svelte
-<Grid
-	--dry-grid-areas="'header header' 'nav content'"
-	--dry-grid-columns="16rem 1fr"
-	--dry-grid-rows="auto 1fr"
-	--dry-grid-gap="var(--dry-space-4)"
->
-	<Grid.Area --dry-grid-area="header">...</Grid.Area>
-	<Grid.Area --dry-grid-area="nav">...</Grid.Area>
-	<Grid.Area --dry-grid-area="content">...</Grid.Area>
-</Grid>
-```
-
-### Container (centered max-width)
-
-Centers content with a max-width constraint.
-
-```svelte
-<!-- Incorrect -->
-<div style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
-	<h1>Page Title</h1>
-</div>
-
-<!-- Correct -->
 <Container>
-	<h1>Page Title</h1>
+  <h1>Page Title</h1>
 </Container>
-```
-
-### Spacer (flexible space)
-
-Fills available space between flex/stack items.
-
-```svelte
-<Flex align="center">
-	<h2>Title</h2>
-	<Spacer />
-	<Button>Action</Button>
-</Flex>
 ```
 
 ## Form Composition
 
 ### Basic form
 
-Wrap each input in Field.Root, stack them vertically, and put everything in a Card.
+Wrap each input in Field.Root, stack them with grid, put everything in a Card.
 
 ```svelte
 <script>
-	import '@dryui/ui/themes/default.css';
-	import { Card, Stack, Field, Label, Input, Button } from '@dryui/ui';
+  import '@dryui/ui/themes/default.css';
+  import { Card, Field, Label, Input, Button } from '@dryui/ui';
 
-	let name = $state('');
-	let email = $state('');
+  let name = $state('');
+  let email = $state('');
 </script>
 
 <Card.Root>
-	<Card.Header>Contact Info</Card.Header>
-	<Card.Content>
-		<Stack gap="md">
-			<Field.Root>
-				<Label>Name</Label>
-				<Input bind:value={name} />
-			</Field.Root>
-			<Field.Root>
-				<Label>Email</Label>
-				<Input type="email" bind:value={email} />
-			</Field.Root>
-			<Button type="submit" variant="solid">Save</Button>
-		</Stack>
-	</Card.Content>
+  <Card.Header>Contact Info</Card.Header>
+  <Card.Content>
+    <form class="form-stack">
+      <Field.Root>
+        <Label>Name</Label>
+        <Input bind:value={name} />
+      </Field.Root>
+      <Field.Root>
+        <Label>Email</Label>
+        <Input type="email" bind:value={email} />
+      </Field.Root>
+      <Button type="submit" variant="solid">Save contact</Button>
+    </form>
+  </Card.Content>
 </Card.Root>
+
+<style>
+  .form-stack { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
 ### Form with validation
@@ -146,16 +112,16 @@ Use Field.Error to show validation messages.
 
 ```svelte
 <script>
-	let email = $state('');
-	let error = $derived(email && !email.includes('@') ? 'Please enter a valid email' : '');
+  let email = $state('');
+  let error = $derived(email && !email.includes('@') ? 'Please enter a valid email' : '');
 </script>
 
 <Field.Root>
-	<Label>Email</Label>
-	<Input type="email" bind:value={email} />
-	{#if error}
-		<Field.Error>{error}</Field.Error>
-	{/if}
+  <Label>Email</Label>
+  <Input type="email" bind:value={email} />
+  {#if error}
+    <Field.Error>{error}</Field.Error>
+  {/if}
 </Field.Root>
 ```
 
@@ -163,45 +129,55 @@ Use Field.Error to show validation messages.
 
 ```svelte
 <script>
-	let name = $state('');
-	let bio = $state('');
-	let country = $state('');
-	let agreed = $state(false);
+  let name = $state('');
+  let bio = $state('');
+  let country = $state('');
+  let agreed = $state(false);
 </script>
 
-<Stack gap="md">
-	<Field.Root>
-		<Label>Name</Label>
-		<Input bind:value={name} />
-	</Field.Root>
+<form class="form-stack">
+  <Field.Root>
+    <Label>Name</Label>
+    <Input bind:value={name} />
+  </Field.Root>
 
-	<Field.Root>
-		<Label>Bio</Label>
-		<Textarea bind:value={bio} />
-	</Field.Root>
+  <Field.Root>
+    <Label>Bio</Label>
+    <Textarea bind:value={bio} />
+  </Field.Root>
 
-	<Field.Root>
-		<Label>Country</Label>
-		<Select.Root bind:value={country}>
-			<Select.Trigger>
-				<Select.Value placeholder="Select country..." />
-			</Select.Trigger>
-			<Select.Content>
-				<Select.Item value="us">United States</Select.Item>
-				<Select.Item value="uk">United Kingdom</Select.Item>
-			</Select.Content>
-		</Select.Root>
-	</Field.Root>
+  <Field.Root>
+    <Label>Country</Label>
+    <Select.Root bind:value={country}>
+      <Select.Trigger>
+        <Select.Value placeholder="Select country..." />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="us">United States</Select.Item>
+        <Select.Item value="uk">United Kingdom</Select.Item>
+      </Select.Content>
+    </Select.Root>
+  </Field.Root>
 
-	<Field.Root>
-		<Flex align="center" gap="sm">
-			<Checkbox bind:checked={agreed} />
-			<Label>I agree to the terms</Label>
-		</Flex>
-	</Field.Root>
+  <Field.Root>
+    <div class="checkbox-row">
+      <Checkbox bind:checked={agreed} />
+      <Label>I agree to the terms</Label>
+    </div>
+  </Field.Root>
 
-	<Button type="submit" variant="solid">Submit</Button>
-</Stack>
+  <Button type="submit" variant="solid">Submit form</Button>
+</form>
+
+<style>
+  .form-stack { display: grid; gap: var(--dry-space-4); }
+  .checkbox-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: var(--dry-space-2);
+  }
+</style>
 ```
 
 ## Page Patterns
@@ -209,161 +185,177 @@ Use Field.Error to show validation messages.
 ### Page with sidebar
 
 ```svelte
-<Flex gap="lg">
-	<nav style="width: 240px;">
-		<Stack gap="sm">
-			<Button variant="ghost">Dashboard</Button>
-			<Button variant="ghost">Settings</Button>
-			<Button variant="ghost">Profile</Button>
-		</Stack>
-	</nav>
-	<main style="flex: 1;">
-		<Stack gap="lg">
-			<h1>Dashboard</h1>
-			<p>Main content here.</p>
-		</Stack>
-	</main>
-</Flex>
+<div class="page-with-sidebar">
+  <nav class="sidebar">
+    <Button variant="ghost">Dashboard</Button>
+    <Button variant="ghost">Settings</Button>
+    <Button variant="ghost">Profile</Button>
+  </nav>
+  <main class="content">
+    <h1>Dashboard</h1>
+    <p>Main content here.</p>
+  </main>
+</div>
+
+<style>
+  .page-with-sidebar {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: var(--dry-space-6);
+  }
+  .sidebar { display: grid; gap: var(--dry-space-2); align-content: start; }
+  .content { display: grid; gap: var(--dry-space-6); align-content: start; }
+</style>
 ```
 
 ### Card grid
 
 ```svelte
-<Grid --dry-grid-columns="repeat(3, 1fr)" --dry-grid-gap="var(--dry-space-6)">
-	{#each items as item (item.id)}
-		<Card.Root>
-			<Card.Header>{item.title}</Card.Header>
-			<Card.Content>
-				<p>{item.description}</p>
-			</Card.Content>
-			<Card.Footer>
-				<Button variant="outline">View</Button>
-			</Card.Footer>
-		</Card.Root>
-	{/each}
-</Grid>
+<div class="card-grid-container">
+  <div class="card-grid">
+    {#each items as item (item.id)}
+      <Card.Root>
+        <Card.Header>{item.title}</Card.Header>
+        <Card.Content>
+          <p>{item.description}</p>
+        </Card.Content>
+        <Card.Footer>
+          <Button variant="outline">View details</Button>
+        </Card.Footer>
+      </Card.Root>
+    {/each}
+  </div>
+</div>
+
+<style>
+  .card-grid-container { container-type: inline-size; }
+  .card-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--dry-space-6);
+  }
+  @container (min-width: 40rem) {
+    .card-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
 ```
 
 ### Settings page with tabs
 
 ```svelte
 <script>
-	let activeTab = $state('general');
-	let displayName = $state('');
+  let activeTab = $state('general');
+  let displayName = $state('');
 </script>
 
 <Container>
-	<Stack gap="xl">
-		<h1>Settings</h1>
-		<Tabs.Root bind:value={activeTab}>
-			<Tabs.List>
-				<Tabs.Trigger value="general">General</Tabs.Trigger>
-				<Tabs.Trigger value="security">Security</Tabs.Trigger>
-				<Tabs.Trigger value="notifications">Notifications</Tabs.Trigger>
-			</Tabs.List>
-			<Tabs.Content value="general">
-				<Card.Root>
-					<Card.Content>
-						<Stack gap="md">
-							<Field.Root>
-								<Label>Display Name</Label>
-								<Input bind:value={displayName} />
-							</Field.Root>
-							<Button variant="solid">Save</Button>
-						</Stack>
-					</Card.Content>
-				</Card.Root>
-			</Tabs.Content>
-			<Tabs.Content value="security">
-				<!-- Security settings -->
-			</Tabs.Content>
-		</Tabs.Root>
-	</Stack>
+  <div class="settings-stack">
+    <h1>Settings</h1>
+    <Tabs.Root bind:value={activeTab}>
+      <Tabs.List>
+        <Tabs.Trigger value="general">General</Tabs.Trigger>
+        <Tabs.Trigger value="security">Security</Tabs.Trigger>
+        <Tabs.Trigger value="notifications">Notifications</Tabs.Trigger>
+      </Tabs.List>
+      <Tabs.Content value="general">
+        <Card.Root>
+          <Card.Content>
+            <form class="form-stack">
+              <Field.Root>
+                <Label>Display Name</Label>
+                <Input bind:value={displayName} />
+              </Field.Root>
+              <Button type="submit" variant="solid">Save settings</Button>
+            </form>
+          </Card.Content>
+        </Card.Root>
+      </Tabs.Content>
+      <Tabs.Content value="security">
+        <!-- Security settings -->
+      </Tabs.Content>
+    </Tabs.Root>
+  </div>
 </Container>
+
+<style>
+  .settings-stack { display: grid; gap: var(--dry-space-8); }
+  .form-stack { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
 ### Data table page
 
 ```svelte
 <Container>
-	<Stack gap="lg">
-		<Flex justify="between" align="center">
-			<h1>Users</h1>
-			<Button variant="solid">Add User</Button>
-		</Flex>
-		<Table.Root>
-			<Table.Header>
-				<Table.Row>
-					<Table.Head>Name</Table.Head>
-					<Table.Head>Email</Table.Head>
-					<Table.Head>Role</Table.Head>
-				</Table.Row>
-			</Table.Header>
-			<Table.Body>
-				{#each users as user (user.id)}
-					<Table.Row>
-						<Table.Cell>{user.name}</Table.Cell>
-						<Table.Cell>{user.email}</Table.Cell>
-						<Table.Cell>
-							<Badge variant="soft">{user.role}</Badge>
-						</Table.Cell>
-					</Table.Row>
-				{/each}
-			</Table.Body>
-		</Table.Root>
-	</Stack>
+  <div class="page-stack">
+    <div class="page-header">
+      <h1>Users</h1>
+      <Button variant="solid">Add user</Button>
+    </div>
+    <Table.Root>
+      <Table.Header>
+        <Table.Row>
+          <Table.Head>Name</Table.Head>
+          <Table.Head>Email</Table.Head>
+          <Table.Head>Role</Table.Head>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {#each users as user (user.id)}
+          <Table.Row>
+            <Table.Cell>{user.name}</Table.Cell>
+            <Table.Cell>{user.email}</Table.Cell>
+            <Table.Cell>
+              <Badge variant="soft">{user.role}</Badge>
+            </Table.Cell>
+          </Table.Row>
+        {/each}
+      </Table.Body>
+    </Table.Root>
+  </div>
 </Container>
+
+<style>
+  .page-stack { display: grid; gap: var(--dry-space-6); }
+  .page-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+</style>
 ```
 
 ## Anti-Patterns
 
-### Nesting layout components unnecessarily
+### Using flexbox or inline styles
 
 ```svelte
-<!-- Incorrect: redundant nesting -->
-<Stack gap="md">
-	<Stack gap="sm">
-		<p>One item</p>
-	</Stack>
-</Stack>
+<!-- Wrong: flexbox -->
+<div style="display: flex; gap: 1rem;">...</div>
 
-<!-- Correct: flat when possible -->
-<Stack gap="md">
-	<p>One item</p>
-</Stack>
-```
+<!-- Wrong: inline styles -->
+<div style="max-width: 1200px; margin: 0 auto;">...</div>
 
-### Using div wrappers instead of layout components
+<!-- Right: scoped grid -->
+<div class="layout">...</div>
+<Container>...</Container>
 
-```svelte
-<!-- Incorrect: manual div wrappers -->
-<div class="flex items-center justify-between">
-	<h2>Title</h2>
-	<button>Action</button>
-</div>
-
-<!-- Correct: use DryUI layout -->
-<Flex justify="between" align="center">
-	<h2>Title</h2>
-	<Button>Action</Button>
-</Flex>
+<style>
+  .layout { display: grid; gap: var(--dry-space-4); }
+</style>
 ```
 
 ### Forgetting Card.Root in form layouts
 
 ```svelte
-<!-- Incorrect: bare Card -->
+<!-- Wrong: bare Card -->
 <Card>
-	<Card.Content>
-		<Stack gap="md">...</Stack>
-	</Card.Content>
+  <Card.Content>...</Card.Content>
 </Card>
 
-<!-- Correct: Card.Root -->
+<!-- Right: Card.Root -->
 <Card.Root>
-	<Card.Content>
-		<Stack gap="md">...</Stack>
-	</Card.Content>
+  <Card.Content>...</Card.Content>
 </Card.Root>
 ```
 
@@ -371,37 +363,34 @@ Use Field.Error to show validation messages.
 
 Before using any component, call `compose` to get the correct component and usage snippet. This table is a quick reference — `compose` has full snippets and anti-patterns.
 
-| UI Need           | Use This                               | NOT This                                |
-| ----------------- | -------------------------------------- | --------------------------------------- |
-| Date picker       | `DatePicker.Root`                      | `<Input type="date">`                   |
-| Date range        | `DateRangePicker.Root`                 | Two `<Input type="date">`               |
-| Time input        | `TimeInput`                            | `<Input type="time">`                   |
-| Dropdown select   | `Select.Root`                          | `<select>`                              |
-| Searchable select | `Combobox.Root`                        | `<input>` + custom dropdown             |
-| Modal dialog      | `Dialog.Root`                          | `<dialog>` or manual overlay            |
-| Confirmation      | `AlertDialog.Root`                     | `window.confirm()`                      |
-| Side panel        | `Drawer.Root`                          | Fixed-position div                      |
-| Data table        | `Table.Root`                           | `<table>`                               |
-| Person image      | `Avatar`                               | Emoji or bare `<img>`                   |
-| Content image     | `Image`                                | Bare `<img>`                            |
-| Multi-step flow   | `Stepper.Root`                         | Manual step divs                        |
-| Progress bar      | `Progress`                             | CSS-only bar                            |
-| Inline chart      | `Sparkline`                            | Manual SVG                              |
-| Full chart        | `Chart.Root`                           | External chart library                  |
-| Vertical layout   | `Stack`                                | `display: flex; flex-direction: column` |
-| Horizontal layout | `Flex`                                 | `display: flex`                         |
-| Grid layout       | `Grid`                                 | `display: grid`                         |
-| Max-width wrapper | `Container`                            | `max-width` + `margin: 0 auto`          |
-| Form field        | `Field.Root` + `Label` + Input         | `<label>` + `<input>`                   |
-| Status indicator  | `Badge`                                | Colored `<span>`                        |
-| Loading state     | `Skeleton` or `Spinner`                | Text "Loading..."                       |
-| Empty state       | `EmptyState.Root`                      | Custom empty div                        |
-| Notifications     | `Toast`                                | Alert div                               |
-| Keyboard shortcut | `Kbd`                                  | `<code>`                                |
-| Code display      | `CodeBlock`                            | `<pre><code>`                           |
-| File upload       | `FileUpload.Root`                      | `<input type="file">`                   |
-| Color picker      | `ColorPicker.Root`                     | `<input type="color">`                  |
-| Collapsible       | `Accordion.Root` or `Collapsible.Root` | Manual toggle with if/else              |
+| UI Need           | Use This                               | NOT This                    |
+| ----------------- | -------------------------------------- | --------------------------- |
+| Date picker       | `DatePicker.Root`                      | `<input type="date">`       |
+| Date range        | `DateRangePicker.Root`                 | Two `<input type="date">`   |
+| Time input        | `TimeInput`                            | `<input type="time">`       |
+| Dropdown select   | `Select.Root`                          | `<select>`                  |
+| Searchable select | `Combobox.Root`                        | `<input>` + custom dropdown |
+| Modal dialog      | `Dialog.Root`                          | `<dialog>` or manual overlay|
+| Confirmation      | `AlertDialog.Root`                     | `window.confirm()`          |
+| Side panel        | `Drawer.Root`                          | Fixed-position div          |
+| Data table        | `Table.Root`                           | `<table>`                   |
+| Person image      | `Avatar`                               | Emoji or bare `<img>`       |
+| Content image     | `Image`                                | Bare `<img>`                |
+| Multi-step flow   | `Stepper.Root`                         | Manual step divs            |
+| Progress bar      | `Progress`                             | CSS-only bar                |
+| Inline chart      | `Sparkline`                            | Manual SVG                  |
+| Full chart        | `Chart.Root`                           | External chart library      |
+| Max-width wrapper | `Container`                            | `max-width` + `margin: auto`|
+| Form field        | `Field.Root` + `Label` + Input         | `<label>` + `<input>`       |
+| Status indicator  | `Badge`                                | Colored `<span>`            |
+| Loading state     | `Skeleton` or `Spinner`                | Text "Loading..."           |
+| Empty state       | `EmptyState.Root`                      | Custom empty div            |
+| Notifications     | `Toast`                                | Alert div                   |
+| Keyboard shortcut | `Kbd`                                  | `<code>`                    |
+| Code display      | `CodeBlock`                            | `<pre><code>`               |
+| File upload       | `FileUpload.Root`                      | `<input type="file">`       |
+| Color picker      | `ColorPicker.Root`                     | `<input type="color">`      |
+| Collapsible       | `Accordion.Root` or `Collapsible.Root` | Manual toggle with if/else  |
 
 ## Composition Recipes
 
@@ -419,7 +408,7 @@ Call `compose` with any recipe name to get a full working snippet.
 | `sidebar-layout`          | Page with sidebar nav     | Grid, Sidebar, PageHeader              |
 | `dashboard-page`          | Full dashboard layout     | Grid, Sidebar, StatCard, Chart, Table  |
 | `user-profile-card`       | User info card            | Card, Avatar, Text, Badge, Button      |
-| `notification-list`       | Notification feed         | Stack, Card, Avatar, Text, Badge       |
+| `notification-list`       | Notification feed         | Card, Avatar, Text, Badge              |
 | `command-bar`             | Command palette trigger   | CommandPalette, Hotkey                 |
 | `file-upload-form`        | File upload with progress | Card, FileUpload, Progress, Button     |
-| `pricing-table`           | Pricing comparison        | Grid, Card, Text, Button, Badge        |
+| `pricing-table`           | Pricing comparison        | Card, Text, Button, Badge              |

@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "0.1.5"
+    "version": "0.1.6"
   },
   "counts": {
     "components": 144,
@@ -10962,6 +10962,26 @@
           "type": "number",
           "required": false,
           "description": "Step interval used when incrementing numeric values."
+        },
+        "size": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Size preset affecting density, spacing, or typography.",
+          "default": "'md'"
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "description": "Field name used during native form submission."
+        },
+        "class": {
+          "type": "string",
+          "required": false
         }
       },
       "forwardedProps": {
@@ -10975,25 +10995,23 @@
         ],
         "note": "Forwards <input> attributes via rest props."
       },
-      "cssVars": {
-        "--dry-time-input-bg": "Input Bg",
-        "--dry-time-input-border": "Input Border",
-        "--dry-time-input-color": "Input Color",
-        "--dry-time-input-font-size": "Input Font Size",
-        "--dry-time-input-padding-x": "Input Padding X",
-        "--dry-time-input-padding-y": "Input Padding Y",
-        "--dry-time-input-radius": "Input Radius"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
         },
         {
-          "name": "data-time-input"
+          "name": "data-placeholder"
+        },
+        {
+          "name": "data-time-display"
         },
         {
           "name": "data-time-input-wrapper"
+        },
+        {
+          "name": "data-time-separator"
         }
       ],
       "example": "<TimeInput>Content</TimeInput>"

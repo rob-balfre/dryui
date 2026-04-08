@@ -188,7 +188,6 @@
 
 <style>
 	[data-df-wrapper] {
-		container-type: inline-size;
 		display: grid;
 	}
 

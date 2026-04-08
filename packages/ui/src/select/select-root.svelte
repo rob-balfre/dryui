@@ -68,7 +68,6 @@
 
 <style>
 	[data-select-wrapper] {
-		container-type: inline-size;
 		display: grid;
 	}
 </style>

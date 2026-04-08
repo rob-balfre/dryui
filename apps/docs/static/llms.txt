@@ -224,8 +224,8 @@ Example: <Rating bind:value={score} />
 Native time input with form control integration.
 Import: @dryui/ui
 Subpath import: @dryui/ui/time-input
-Props: value (string), Current controlled or bindable value., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | step (number), Step interval used when incrementing numeric values.
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-time-input | data-time-input-wrapper
+Props: value (string), Current controlled or bindable value., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | step (number), Step interval used when incrementing numeric values. | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | name (string), Field name used during native form submission. | class (string)
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-placeholder | data-time-display | data-time-input-wrapper | data-time-separator
 Example: <TimeInput>Content</TimeInput>
 
 ### TagsInput
