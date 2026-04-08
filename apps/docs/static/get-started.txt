@@ -59,7 +59,17 @@ The output should show `"status": "ready"`. If it shows `"partial"`, review
 the `theme` and `dependencies` fields to identify what is still missing and
 re-run Step 1.
 
-## Step 3 — Set up the MCP server (recommended)
+## Step 3 — Start the dev server
+
+Run the project's dev server to confirm everything works:
+
+```
+npm run dev
+```
+
+(Or the equivalent for your package manager: `bun run dev`, `pnpm dev`, `yarn dev`.)
+
+## Step 4 — Set up the MCP server (recommended)
 
 The DryUI MCP server provides tools for component lookup, composition guidance,
 code review, theme diagnosis, and workspace health checks.
@@ -116,7 +126,7 @@ args = ["-y", "@dryui/mcp"]
 
 If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
 
-## Step 4 — Use components
+## Step 5 — Use components
 
 ```svelte
 <script>
