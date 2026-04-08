@@ -104,13 +104,21 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 ## Quick Start
 
-Run the install planner — it detects the project and returns a tailored step-by-step plan:
+**1. Install this skill** — you're reading it, so it's already loaded. This is the most important step.
+
+**2. Add the MCP server** for live API lookup and code validation:
+
+- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@rob-balfre/dryui` (installs skill + MCP in one step)
+- Codex: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`
+- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
+
+**3. Run the install planner** — it detects your project and returns a tailored step-by-step plan:
 
 ```
-npx -y @dryui/cli install --json
+npx -y @dryui/cli install --toon
 ```
 
-Execute each `"pending"` step. Then verify: `npx -y @dryui/cli detect --json` — output should show `"status": "ready"`.
+Execute each `"pending"` step. Then verify: `npx -y @dryui/cli detect --toon` — output should show `project: ready`.
 
 ### Manual setup
 
@@ -149,16 +157,18 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### CLI fallback
 
+All commands support `--toon` for token-optimized agent output and `--full` to disable truncation.
+
 ```bash
-bunx @dryui/cli info <component>     # Look up component API
-bunx @dryui/cli compose "date input" # Composition guidance
-bunx @dryui/cli detect [path]        # Check project setup
-bunx @dryui/cli install [path]       # Print install plan
-bunx @dryui/cli review <file.svelte> # Validate component
-bunx @dryui/cli diagnose <file.css>  # Validate theme CSS
-bunx @dryui/cli doctor [path]        # Audit workspace
-bunx @dryui/cli lint [path]          # Deterministic findings
-bunx @dryui/cli list [--category]    # List components
+bunx @dryui/cli info <component> --toon  # Look up component API
+bunx @dryui/cli compose "date input" --toon  # Composition guidance
+bunx @dryui/cli detect [path] --toon     # Check project setup
+bunx @dryui/cli install [path] --toon    # Print install plan
+bunx @dryui/cli review <file.svelte> --toon  # Validate component
+bunx @dryui/cli diagnose <file.css> --toon   # Validate theme CSS
+bunx @dryui/cli doctor [path] --toon     # Audit workspace
+bunx @dryui/cli lint [path] --toon       # Deterministic findings
+bunx @dryui/cli list --toon              # List components
 ```
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
