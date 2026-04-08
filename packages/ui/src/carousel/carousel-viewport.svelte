@@ -49,7 +49,7 @@
 
 		display: grid;
 		grid-auto-flow: column;
-		grid-auto-columns: minmax(0, var(--dry-carousel-slide-size));
+		grid-auto-columns: var(--dry-carousel-slide-size);
 		overflow: auto;
 		scroll-snap-type: x mandatory;
 		gap: var(--dry-carousel-gap);

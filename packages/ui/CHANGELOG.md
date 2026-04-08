@@ -1,5 +1,13 @@
 # @dryui/ui
 
+## 0.1.6
+
+### Patch Changes
+
+- fix(carousel): slides now fill full viewport width
+
+  `grid-auto-columns` was using `minmax(0, 100%)` which allowed columns to shrink to content size, causing all slides to appear side-by-side. Changed to `100%` so each slide is always exactly the container's full width.
+
 ## 0.1.5
 
 ### Patch Changes
