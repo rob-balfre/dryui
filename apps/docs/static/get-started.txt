@@ -126,7 +126,26 @@ args = ["-y", "@dryui/mcp"]
 
 If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
 
-## Step 5 — Use components
+## Step 5 — Read the component reference
+
+Before building any UI, read the full component catalog:
+
+```
+https://dryui.dev/llms.txt
+```
+
+This file contains every component's props, parts, CSS variables, data
+attributes, accessibility notes, and usage examples. Fetch and read it
+so you know what components are available and how to use them correctly.
+
+Key rules from the reference:
+
+- Compound components (Card, Field, Accordion, etc.) require `.Root` syntax —
+  e.g. `<Card.Root>` not `<Card>`
+- All layout uses CSS grid — not flexbox
+- Use `--dry-*` CSS variables for theming — not hardcoded colors
+
+## Step 6 — Use components
 
 ```svelte
 <script>
@@ -136,7 +155,7 @@ If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
 <Button variant="solid">Click me</Button>
 ```
 
-Before building any UI, look up the component API first:
+Use the CLI or MCP tools to look up components as you build:
 
 ```
 npx -y @dryui/cli info Button
@@ -155,12 +174,3 @@ npx -y @dryui/cli add --project <name>   # Project-aware component adoption plan
 npx -y @dryui/cli review <file.svelte>   # Validate a Svelte file for spec compliance
 npx -y @dryui/cli doctor                 # Workspace health check
 ```
-
-Always look up a component with `info` before using it for the first time.
-Compound components (Card, Field, Accordion, etc.) require `.Root` syntax —
-e.g. `<Card.Root>` not `<Card>`.
-
-## Full API reference
-
-See https://dryui.dev/llms.txt for the complete component catalog, props,
-theming tokens, and usage examples.
