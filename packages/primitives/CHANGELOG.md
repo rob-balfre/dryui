@@ -1,5 +1,18 @@
 # @dryui/primitives
 
+## 0.1.7
+
+### Patch Changes
+
+- [`2a73f9d`](https://github.com/rob-balfre/dryui/commit/2a73f9d6344c596f0f678417b6ce4ed1b9d95e01) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix backdrop centering and notification center panel positioning
+  - Backdrop: use align-items instead of place-items so children can control their own inline sizing
+  - NotificationCenter: use popovertarget on trigger instead of manual toggle handler
+  - NotificationCenter panel: nudge into viewport when anchor positioning overflows
+  - NotificationCenter panel: responsive width via min(), hide when not popover-open
+  - NotificationCenter: replace hardcoded color fallbacks with theme tokens
+  - NotificationCenter: use color-mix for unread item background
+  - NotificationCenter trigger: add cursor pointer
+
 ## 0.1.5
 
 ### Patch Changes
