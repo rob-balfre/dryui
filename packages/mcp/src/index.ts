@@ -13,13 +13,27 @@ import {
 import { scanWorkspace, type WorkspaceAuditSpec } from './workspace-audit.js';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import type { ComponentDef } from './spec-types.js';
+import type { ComponentDef, CompositionComponentDef, CompositionRecipeDef } from './spec-types.js';
 import {
 	findComponent,
 	formatCompound,
-	formatSimple,
-	pad
+	formatSimple
 } from './spec-formatters.js';
+import {
+	searchComposition,
+	formatCompositionResult
+} from './composition-search.js';
+import {
+	toonComponent,
+	toonComponentList,
+	toonComposition,
+	toonReviewResult,
+	toonDiagnoseResult,
+	toonWorkspaceReport,
+	toonProjectDetection,
+	toonInstallPlan,
+	toonAddPlan
+} from './toon.js';
 
 const require = createRequire(import.meta.url);
 const _pkg: unknown = require('../package.json');
@@ -31,6 +45,10 @@ type RuntimeSpec = ProjectPlannerSpec &
 	WorkspaceAuditSpec &
 	Record<string, unknown> & {
 		components: Record<string, ReviewComponentDef>;
+		composition?: {
+			readonly components: Record<string, CompositionComponentDef>;
+			readonly recipes: Record<string, CompositionRecipeDef>;
+		};
 	};
 
 function loadRuntimeSpec(): RuntimeSpec {
@@ -55,6 +73,9 @@ function toolError(e: unknown) {
 
 const SERVER_INSTRUCTIONS = [
 	'DryUI is a zero-dependency Svelte 5 component library. Follow these rules:',
+	'',
+	'OUTPUT FORMAT: All tool responses use TOON (token-optimized) format. Each response ends with',
+	'  `next[]` suggesting logical next commands. Empty results show `issues[0]: clean` or similar.',
 	'',
 	'1. SET UP THE APP SHELL FIRST: Run `compose "app shell"` to get the root layout template.',
 	'   Your +layout.svelte must import the theme CSS, and app.html needs <html class="theme-auto">.',
@@ -92,11 +113,11 @@ const REVIEW_DESC = [
 	'- **Errors:** Bare compound components (<Card> instead of <Card.Root>), unknown components, invalid props/parts, missing required props\n',
 	'- **Warnings:** Orphaned compound parts, missing accessible labels, Avatar without alt/fallback, missing theme CSS import when DryUI components are used\n',
 	'- **Suggestions:** Manual flex/grid where DryUI layout components apply, hardcoded colors, raw <hr> instead of <Separator>\n\n',
-	'Output: JSON with issues array and summary. When projectCss is provided, theme diagnosis results are included.\n\n',
+	'Output: TOON format with issues, hasBlockers/autoFixable aggregates, and next-step suggestions. When projectCss is provided, theme diagnosis results are appended.\n\n',
 	'Example:\n\n',
 	'```svelte\n<script>\n  import { Card, Badge } from \'@dryui/ui\';\n</script>\n\n<Card>\n  <Card.Header>Status</Card.Header>\n  <Card.Content>\n    <Badge variant="solid">Active</Badge>\n  </Card.Content>\n</Card>\n<hr />\n```\n\n',
 	'Output:\n\n',
-	'```json\n{\n  "issues": [\n    {\n      "severity": "error",\n      "code": "bare-compound",\n      "message": "Card is a compound component — use <Card.Root> instead of <Card>",\n      "line": 5\n    },\n    {\n      "severity": "suggestion",\n      "code": "prefer-separator",\n      "message": "Use <Separator /> instead of raw <hr>",\n      "line": 11\n    }\n  ],\n  "summary": "1 error, 0 warnings, 1 suggestion"\n}\n```'
+	'```\nissues[2]{severity,line,code,message}:\n  error,5,bare-compound,Card is a compound component — use <Card.Root> instead of <Card>\n  suggestion,11,prefer-separator,Use <Separator /> instead of raw <hr>\nhasBlockers: true | autoFixable: 0\n1 error, 0 warnings, 1 suggestion\n```'
 ].join('\n');
 
 const DIAGNOSE_DESC = [
@@ -110,7 +131,7 @@ const DIAGNOSE_DESC = [
 	'- Before generating DryUI components for a brownfield project with custom --dry-* overrides\n',
 	'- After a user reports visual issues (washed-out cards, invisible text, no elevation)\n',
 	'- To validate a custom theme before shipping\n\n',
-	'Output: JSON with variables summary, issues array (severity + code + variable + message + fix), and summary string.\n\n',
+	'Output: TOON format with token coverage percentage, issues, and next-step suggestions.\n\n',
 	'Example:\n\n',
 	'```css\n:root {\n  --dry-color-surface-raised: rgba(217,158,100,0.07);\n  --dry-color-text: #f0e4d6;\n  --dry-color-bg: #16131a;\n}\n```\n\n',
 	'Output includes: warning "transparent-surface" for surface-raised (alpha 0.07), error "missing-token" for undefined required tokens.\n'
@@ -134,16 +155,14 @@ server.tool(
 			const spec = getSpec();
 			const parts: Array<{ type: 'text'; text: string }> = [];
 			const result = reviewComponent(code, spec, filename);
-			parts.push({ type: 'text', text: JSON.stringify(result, null, 2) });
+			parts.push({ type: 'text', text: toonReviewResult(result) });
 
 			if (projectCss) {
 				const diagnosis = diagnoseTheme(projectCss, spec);
 				if (diagnosis.issues.length > 0) {
 					parts.push({
 						type: 'text',
-						text:
-							'\n\n--- THEME DIAGNOSIS ---\nThe project CSS has issues that will affect how DryUI components render:\n\n' +
-							JSON.stringify(diagnosis, null, 2)
+						text: '\n--- THEME DIAGNOSIS ---\n' + toonDiagnoseResult(diagnosis)
 					});
 				}
 			}
@@ -178,7 +197,7 @@ server.tool(
 				};
 			}
 			const result = diagnoseTheme(content, getSpec());
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonDiagnoseResult(result) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -188,7 +207,7 @@ server.tool(
 const DETECT_PROJECT_DESC = [
 	'Detect DryUI adoption readiness in a Svelte or SvelteKit project.\n\n',
 	'Input: Optional cwd or project path.\n',
-	'Output: JSON describing framework, package manager, DryUI dependencies, theme imports, theme-auto status, key file paths, and warnings.\n\n',
+	'Output: TOON format with project status, framework, deps, theme state, and next-step suggestions.\n\n',
 	'Use this before planning installation or project-aware component adoption.'
 ].join('');
 
@@ -201,7 +220,7 @@ server.tool(
 	async ({ cwd }) => {
 		try {
 			const result = detectProject(getSpec(), cwd);
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonProjectDetection(result) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -211,7 +230,7 @@ server.tool(
 const PLAN_INSTALL_DESC = [
 	'Create a plan-first DryUI install checklist for a Svelte or SvelteKit project.\n\n',
 	'Input: Optional cwd or project path.\n',
-	'Output: JSON with project detection plus ordered install steps. The result never mutates files.\n\n',
+	'Output: TOON format with project detection plus ordered install steps. The result never mutates files.\n\n',
 	'Use this to prepare a repo for DryUI before inserting components.'
 ].join('');
 
@@ -224,7 +243,7 @@ server.tool(
 	async ({ cwd }) => {
 		try {
 			const result = planInstall(getSpec(), cwd);
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonInstallPlan(result) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -234,7 +253,7 @@ server.tool(
 const PLAN_ADD_DESC = [
 	'Create a plan-first DryUI component or composed-output adoption plan for a project.\n\n',
 	'Input: Component/composed-output name plus optional cwd, target file path, subpath flag, and withTheme flag.\n',
-	'Output: JSON with install prerequisites, chosen import/source, target suggestions, and next steps. The result never mutates files.\n\n',
+	'Output: TOON format with install prerequisites, chosen import/source, target suggestions, and next steps. The result never mutates files.\n\n',
 	'Use this when an agent needs project-aware adoption guidance without editing the repo directly.'
 ].join('');
 
@@ -263,7 +282,7 @@ server.tool(
 				...(withTheme !== undefined ? { withTheme } : {})
 			} satisfies PlanAddOptions;
 			const result = planAdd(getSpec(), name, options);
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonAddPlan(result) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -279,7 +298,7 @@ const MAX_SEVERITY_SCHEMA = z
 const DOCTOR_DESC = [
 	'Audit a DryUI workspace and return a structured health report.\n\n',
 	'Input: Optional cwd/path plus include/exclude globs, maxSeverity, and changed-only filtering.\n',
-	'Output: JSON WorkspaceReport with detected projects, ordered findings, summary counts, and scan warnings.\n\n',
+	'Output: TOON format with top-rule aggregate, findings (capped at 50, use --full for all), and next-step suggestions.\n\n',
 	'Use this for repo-wide health summaries across Svelte files, theme CSS, and project setup.'
 ].join('');
 
@@ -305,7 +324,7 @@ server.tool(
 				...(maxSeverity ? { maxSeverity } : {}),
 				...(changed !== undefined ? { changed } : {})
 			});
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonWorkspaceReport(result, { title: 'doctor', command: 'doctor' }) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -315,7 +334,7 @@ server.tool(
 const LINT_DESC = [
 	'Lint a DryUI workspace and return deterministic workspace findings.\n\n',
 	'Input: Optional cwd/path plus include/exclude globs, maxSeverity, and changed-only filtering.\n',
-	'Output: JSON WorkspaceReport with sorted findings that can be consumed by scripts or agents.\n\n',
+	'Output: TOON format with sorted findings (capped at 50) and next-step suggestions.\n\n',
 	'Use this when you need machine-oriented DryUI audit output for CI or automation.'
 ].join('');
 
@@ -341,7 +360,7 @@ server.tool(
 				...(maxSeverity ? { maxSeverity } : {}),
 				...(changed !== undefined ? { changed } : {})
 			});
-			return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] };
+			return { content: [{ type: 'text', text: toonWorkspaceReport(result, { title: 'lint', command: 'lint' }) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -359,10 +378,7 @@ function getComponents(): Record<string, ComponentDef> {
 const INFO_DESC = [
 	'Look up the full API reference for a DryUI component.\n\n',
 	'Input: Component name (case-insensitive, e.g. "Button", "card").\n',
-	'Output: Formatted text showing name, description, category, tags, import statement, ',
-	'whether it is compound or simple, root and subpath imports when available, all props ',
-	'(with type, accepted values when known, required, bindable, default, and notes), native/rest-prop forwarding, ',
-	'compound structure guidance, CSS variables, data attributes, and example code.\n\n',
+	'Output: TOON format with props, structure, CSS vars, data attributes, truncated example, and next-step suggestions.\n\n',
 	'Use this tool to understand what the component supports before generating code.'
 ].join('');
 
@@ -389,8 +405,7 @@ server.tool(
 				};
 			}
 			const { name: canonical, def } = result;
-			const output = def.compound ? formatCompound(canonical, def) : formatSimple(canonical, def);
-			return { content: [{ type: 'text', text: output }] };
+			return { content: [{ type: 'text', text: toonComponent(canonical, def) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -402,7 +417,7 @@ server.tool(
 const LIST_DESC = [
 	'List available DryUI components.\n\n',
 	'Input: Optional category name to filter results.\n',
-	'Output: Components grouped by category.\n\n',
+	'Output: TOON format with components listed as name, category, compound, description.\n\n',
 	'Use this tool to discover which components are available before looking up details with the info tool.'
 ].join('');
 
@@ -415,40 +430,7 @@ server.tool(
 	async ({ category }) => {
 		try {
 			const components = getComponents();
-			const entries = Object.entries(components);
-			const groups: Record<string, Array<{ name: string; description: string }>> = {};
-			for (const [name, def] of entries) {
-				const cat = def.category;
-				if (category && cat.toLowerCase() !== category.toLowerCase()) continue;
-				(groups[cat] ??= []).push({ name, description: def.description });
-			}
-
-			if (Object.keys(groups).length === 0) {
-				const allCats = [...new Set(entries.map(([, d]) => d.category))].sort();
-				return {
-					content: [
-						{
-							type: 'text',
-							text: `No components found for category: "${category}"\n\nAvailable categories:\n  ${allCats.join(', ')}`
-						}
-					],
-					isError: true
-				};
-			}
-
-			const lines: string[] = [];
-			const sortedCats = Object.keys(groups).sort();
-			for (const cat of sortedCats) {
-				const items = groups[cat] ?? [];
-				lines.push(`${cat.toUpperCase()}`);
-				const maxNameLen = Math.max(...items.map((c) => c.name.length));
-				for (const item of items) {
-					lines.push(`  ${pad(item.name, maxNameLen + 2)}${item.description}`);
-				}
-				lines.push('');
-			}
-
-			return { content: [{ type: 'text', text: lines.join('\n').trimEnd() }] };
+			return { content: [{ type: 'text', text: toonComponentList(components, category) }] };
 		} catch (e) {
 			return toolError(e);
 		}
@@ -459,7 +441,7 @@ server.tool(
 
 const COMPOSE_DESC = [
 	'Look up composition guidance for building UIs with DryUI.\n\n',
-	'Returns ranked component alternatives with code snippets, anti-patterns to avoid, and full composition recipes.\n',
+	'Returns ranked component alternatives with truncated code snippets, anti-patterns to avoid, and composition recipes in TOON format.\n',
 	'Call this BEFORE writing any DryUI layout to ensure correct component selection.\n\n',
 	'Input: Short keywords describing what you want to build. Use 1-3 words — component names, pattern names, or UI concepts.\n',
 	'Good: "search form", "date input", "hotel card", "dashboard", "checkout", "travel booking"\n',
@@ -468,249 +450,11 @@ const COMPOSE_DESC = [
 	'Output: Ranked alternatives with snippets, anti-patterns, and matching recipes.'
 ].join('');
 
-type CompositionComponent = {
-	component: string;
-	useWhen: string;
-	alternatives: Array<{ rank: number; component: string; useWhen: string; snippet: string }>;
-	antiPatterns: Array<{ pattern: string; reason: string; fix: string }>;
-	combinesWith: string[];
-};
-
-type CompositionRecipe = {
-	name: string;
-	description: string;
-	tags: string[];
-	components: string[];
-	snippet: string;
-};
-
-type CompositionSpec = {
-	components: Record<string, CompositionComponent>;
-	recipes: Record<string, CompositionRecipe>;
-};
-
-const STOP_WORDS = new Set([
-	'a',
-	'an',
-	'the',
-	'and',
-	'or',
-	'but',
-	'in',
-	'on',
-	'at',
-	'to',
-	'for',
-	'of',
-	'with',
-	'by',
-	'from',
-	'is',
-	'it',
-	'that',
-	'this',
-	'as',
-	'be',
-	'are',
-	'was',
-	'were',
-	'been',
-	'has',
-	'have',
-	'had',
-	'do',
-	'does',
-	'did',
-	'will',
-	'would',
-	'could',
-	'should',
-	'may',
-	'might',
-	'can',
-	'i',
-	'me',
-	'my',
-	'we',
-	'our',
-	'you',
-	'your',
-	'need',
-	'want',
-	'like',
-	'create',
-	'make',
-	'build',
-	'add',
-	'using',
-	'use',
-	'show',
-	'display'
-]);
-
-function tokenize(text: string): string[] {
-	return text
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, ' ')
-		.split(/\s+/)
-		.filter((w) => w.length > 1 && !STOP_WORDS.has(w));
-}
-
-function scoreText(tokens: string[], text: string): number {
-	const lower = text.toLowerCase();
-	return tokens.reduce((score, t) => score + (lower.includes(t) ? 1 : 0), 0);
-}
-
 function findComposition(query: string) {
-	const compositionData = getSpec().composition as CompositionSpec | undefined;
-	if (!compositionData)
-		return {
-			componentMatches: [] as CompositionComponent[],
-			recipeMatches: [] as CompositionRecipe[]
-		};
-
-	const q = query.toLowerCase();
-	const tokens = tokenize(query);
-
-	// Try exact substring first (original behavior for precise queries)
-	const exactComponentMatches: CompositionComponent[] = [];
-	const exactRecipeMatches: CompositionRecipe[] = [];
-
-	for (const comp of Object.values(compositionData.components)) {
-		if (
-			comp.component.toLowerCase().includes(q) ||
-			comp.useWhen.toLowerCase().includes(q) ||
-			comp.alternatives.some(
-				(a) => a.component.toLowerCase().includes(q) || a.useWhen.toLowerCase().includes(q)
-			) ||
-			comp.antiPatterns.some((ap) => ap.pattern.toLowerCase().includes(q))
-		) {
-			exactComponentMatches.push(comp);
-		}
-	}
-
-	for (const recipe of Object.values(compositionData.recipes)) {
-		if (
-			recipe.name.toLowerCase().includes(q) ||
-			recipe.description.toLowerCase().includes(q) ||
-			recipe.tags.some((t) => t.toLowerCase().includes(q)) ||
-			recipe.components.some((c) => c.toLowerCase().includes(q))
-		) {
-			exactRecipeMatches.push(recipe);
-		}
-	}
-
-	// If exact matching found results, return them
-	if (exactComponentMatches.length || exactRecipeMatches.length) {
-		return { componentMatches: exactComponentMatches, recipeMatches: exactRecipeMatches };
-	}
-
-	// Fall back to token-based scoring
-	if (!tokens.length)
-		return {
-			componentMatches: [] as CompositionComponent[],
-			recipeMatches: [] as CompositionRecipe[]
-		};
-
-	const scoredComponents: Array<{ comp: CompositionComponent; score: number }> = [];
-	for (const comp of Object.values(compositionData.components)) {
-		const corpus = [
-			comp.component,
-			comp.useWhen,
-			...comp.alternatives.flatMap((a) => [a.component, a.useWhen]),
-			...comp.antiPatterns.map((ap) => ap.pattern),
-			...comp.combinesWith
-		].join(' ');
-		const score = scoreText(tokens, corpus);
-		if (score > 0) scoredComponents.push({ comp, score });
-	}
-
-	const scoredRecipes: Array<{ recipe: CompositionRecipe; score: number }> = [];
-	for (const recipe of Object.values(compositionData.recipes)) {
-		const corpus = [recipe.name, recipe.description, ...recipe.tags, ...recipe.components].join(
-			' '
-		);
-		const score = scoreText(tokens, corpus);
-		if (score > 0) scoredRecipes.push({ recipe, score });
-	}
-
-	// Sort by score descending, take top results
-	scoredComponents.sort((a, b) => b.score - a.score);
-	scoredRecipes.sort((a, b) => b.score - a.score);
-
-	const minScore = Math.max(1, Math.floor(tokens.length * 0.3));
-	return {
-		componentMatches: scoredComponents
-			.filter((s) => s.score >= minScore)
-			.slice(0, 10)
-			.map((s) => s.comp),
-		recipeMatches: scoredRecipes
-			.filter((s) => s.score >= minScore)
-			.slice(0, 5)
-			.map((s) => s.recipe)
-	};
+	const compositionData = getSpec().composition;
+	if (!compositionData) return { componentMatches: [], recipeMatches: [] };
+	return searchComposition(compositionData, query);
 }
-
-function formatCompositionResult(results: {
-	componentMatches: CompositionComponent[];
-	recipeMatches: CompositionRecipe[];
-}): string {
-	const lines: string[] = [];
-
-	for (const comp of results.componentMatches) {
-		lines.push(`── ${comp.component} ──────────────────────────────`);
-		lines.push(`[DEV GUIDANCE — do not render as page content]`);
-		lines.push(`Use: ${comp.component} — ${comp.useWhen}`);
-		lines.push('');
-
-		for (const alt of comp.alternatives) {
-			lines.push(`  ${alt.rank}. ${alt.component} (${alt.useWhen})`);
-			lines.push(
-				alt.snippet
-					.split('\n')
-					.map((l) => `     ${l}`)
-					.join('\n')
-			);
-			lines.push('');
-		}
-
-		for (const ap of comp.antiPatterns) {
-			lines.push(`⚠ Anti-pattern: ${ap.pattern}`);
-			lines.push(`  Why: ${ap.reason}`);
-			lines.push(`  Use ${ap.fix} instead`);
-			lines.push('');
-		}
-
-		if (comp.combinesWith.length) {
-			lines.push(`Combines with: ${comp.combinesWith.join(', ')}`);
-		}
-		lines.push('');
-	}
-
-	for (const recipe of results.recipeMatches) {
-		lines.push(`── Recipe: ${recipe.name} ──────────────────────────────`);
-		lines.push(`[DEV GUIDANCE — do not render as page content]`);
-		lines.push(recipe.description);
-		lines.push(`Components: ${recipe.components.join(', ')}`);
-		lines.push('');
-		lines.push(`[CODE — use this in your Svelte file]`);
-		lines.push(recipe.snippet);
-		lines.push('');
-	}
-
-	return lines.join('\n');
-}
-
-const COMPOSE_PREAMBLE = [
-	"\u26A0 SETUP: Your root +layout.svelte must import '@dryui/ui/themes/default.css'",
-	'  and \'@dryui/ui/themes/dark.css\'. app.html needs <html class="theme-auto">.',
-	'  If not set up yet, run: compose "app shell"',
-	'',
-	'\u26A0 THIS OUTPUT IS DEVELOPER GUIDANCE — do NOT render recipe names, descriptions,',
-	'  or component lists as visible page content. Only use the code snippets.',
-	'',
-	''
-].join('\n');
 
 server.tool(
 	'compose',
@@ -731,7 +475,7 @@ server.tool(
 					content: [
 						{
 							type: 'text',
-							text: `No composition guidance found for "${query}".\n\nTry:\n- A component name (e.g. "DatePicker", "Avatar")\n- A UI concept (e.g. "date input", "image placeholder")\n- A pattern name (e.g. "search-form", "dashboard-page")`
+							text: `matches[0]: none for "${query}"\nTry: component name (DatePicker, Avatar), UI concept (date input), or pattern (search-form)`
 						}
 					]
 				};
@@ -741,7 +485,7 @@ server.tool(
 				content: [
 					{
 						type: 'text',
-						text: COMPOSE_PREAMBLE + formatCompositionResult(results)
+						text: toonComposition(results)
 					}
 				]
 			};
@@ -894,7 +638,7 @@ server.registerPrompt(
 					role: 'user',
 					content: { type: 'text', text: 'Plan the DryUI installation for this project.' }
 				},
-				{ role: 'assistant', content: { type: 'text', text: JSON.stringify(result, null, 2) } }
+				{ role: 'assistant', content: { type: 'text', text: toonInstallPlan(result) } }
 			]
 		};
 	}
@@ -923,7 +667,7 @@ server.registerPrompt(
 					role: 'user',
 					content: { type: 'text', text: `Plan how to add ${name} to this project.` }
 				},
-				{ role: 'assistant', content: { type: 'text', text: JSON.stringify(result, null, 2) } }
+				{ role: 'assistant', content: { type: 'text', text: toonAddPlan(result) } }
 			]
 		};
 	}

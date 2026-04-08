@@ -116,12 +116,25 @@ DryUI MCP tools:
 - CLI: `bunx @dryui/cli detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint`
 - Skill: `packages/ui/skills/dryui/SKILL.md` (install to ~/.claude/skills/)
 
+### Output Format — TOON (Token-Optimized Output)
+
+MCP tool output uses TOON format by default — a compact, agent-optimized notation (~40% fewer tokens than JSON). Format: `resource[count]{fields}: value1,value2,...`
+
+- MCP tools: TOON is the default for all tools (info, list, compose, review, diagnose, doctor, lint, detect_project, plan_install, plan_add)
+- CLI: plain text by default; add `--toon` for TOON output, `--json` for JSON (where supported)
+- `--full` disables truncation (compose snippets, workspace findings, component examples are truncated by default in TOON mode)
+- Every TOON response includes `next[]` contextual help suggesting logical next commands
+- Pre-computed aggregates: `hasBlockers`, `autoFixable` (review), `coverage` (diagnose), `top-rule` (workspace)
+- Definitive empty states: `issues[0]: clean`, `findings[0]: clean` (not ambiguous empty output)
+- Structured errors: `error[1]{code,message}: not-found,"Unknown component"` with suggestions
+
 ### Composition Data
 
 Single source of truth: `packages/mcp/src/composition-data.ts`
 
 - Defines per-component composition rules (alternatives, anti-patterns, combinesWith)
 - Defines cross-component recipes (named patterns with full snippets)
+- Search logic: `packages/mcp/src/composition-search.ts` (shared between MCP and CLI)
 - Consumed by: spec.json, `compose` MCP tool, `compose` CLI command, dryui skill
 - When adding new components or changing component APIs, update composition-data.ts
 - Run `bun run --filter '@dryui/mcp' build` after changes to regenerate spec.json

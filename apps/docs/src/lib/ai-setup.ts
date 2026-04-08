@@ -73,17 +73,17 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 
 const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	init: 'dryui init',
-	detect: 'dryui detect .',
-	install: 'dryui install .',
+	detect: 'dryui detect --toon .',
+	install: 'dryui install --toon .',
 	add: 'dryui add --project --target src/routes/+page.svelte Card',
 	get: 'dryui get "Checkout Forms"',
-	info: 'dryui info card',
-	list: 'dryui list --category layout',
-	compose: 'dryui compose "date input"',
-	review: 'dryui review src/routes/+page.svelte',
-	diagnose: 'dryui diagnose src/app.css',
-	doctor: 'dryui doctor --changed',
-	lint: 'dryui lint --json --max-severity warning'
+	info: 'dryui info card --toon',
+	list: 'dryui list --toon --category layout',
+	compose: 'dryui compose "date input" --toon',
+	review: 'dryui review --toon src/routes/+page.svelte',
+	diagnose: 'dryui diagnose --toon src/app.css',
+	doctor: 'dryui doctor --toon --changed',
+	lint: 'dryui lint --toon --max-severity warning'
 };
 
 export const dryuiMcpTools: readonly AiSurfaceCard[] = aiSurface.tools.map((tool) => ({

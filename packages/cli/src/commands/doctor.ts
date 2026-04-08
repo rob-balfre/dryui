@@ -3,8 +3,9 @@
 import { buildWorkspaceReport } from '../../../mcp/src/workspace-audit.js';
 import type { Spec } from './types.js';
 import { formatWorkspaceReport } from '../format.js';
+import { toonWorkspaceReport } from '@dryui/mcp/toon';
 import { parseWorkspaceArgs } from './workspace-args.js';
-import { runCommand } from '../run.js';
+import { runCommand, type OutputMode } from '../run.js';
 
 export function getDoctor(
 	inputPath: string | undefined,
@@ -14,6 +15,8 @@ export function getDoctor(
 		exclude?: readonly string[];
 		maxSeverity?: 'error' | 'warning' | 'info';
 		changed?: boolean;
+		toon?: boolean;
+		full?: boolean;
 	} = {}
 ): { output: string; error: string | null; exitCode: number } {
 	try {
@@ -24,6 +27,15 @@ export function getDoctor(
 			...(options.maxSeverity ? { maxSeverity: options.maxSeverity } : {}),
 			...(options.changed === undefined ? {} : { changed: options.changed })
 		});
+
+		if (options.toon) {
+			return {
+				output: toonWorkspaceReport(report, { title: 'doctor', command: 'doctor', full: options.full }),
+				error: null,
+				exitCode: 0
+			};
+		}
+
 		return {
 			output: formatWorkspaceReport(report, {
 				title: 'DryUI workspace doctor',
@@ -45,13 +57,18 @@ export function getDoctor(
 export function runDoctor(args: string[], spec: Spec): void {
 	if (args[0] === '--help') {
 		console.log(
-			'Usage: dryui doctor [path] [--include <glob>] [--exclude <glob>] [--max-severity <level>] [--changed]'
+			'Usage: dryui doctor [path] [--toon] [--full] [--include <glob>] [--exclude <glob>] [--max-severity <level>] [--changed]'
 		);
 		console.log('');
 		console.log('Inspect workspace health with human-readable findings.');
+		console.log('');
+		console.log('Options:');
+		console.log('  --toon    Output in TOON format (token-optimized for agents)');
+		console.log('  --full    Show all findings (disables truncation at 50)');
 		process.exit(0);
 	}
 
 	const { path, options } = parseWorkspaceArgs(args);
-	runCommand(getDoctor(path, spec, options));
+	const mode: OutputMode = options.toon ? 'toon' : 'text';
+	runCommand(getDoctor(path, spec, options), mode);
 }

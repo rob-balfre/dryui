@@ -8,6 +8,8 @@ export interface WorkspaceOptions {
 	readonly maxSeverity?: WorkspaceSeverity;
 	readonly changed?: boolean;
 	readonly json?: boolean;
+	readonly toon?: boolean;
+	readonly full?: boolean;
 }
 
 /**
@@ -22,6 +24,8 @@ export function parseWorkspaceArgs(args: string[]): {
 	const exclude: string[] = [];
 	let path: string | undefined;
 	let json = false;
+	let toon = false;
+	let full = false;
 	let changed = false;
 	let maxSeverity: WorkspaceSeverity = 'info';
 
@@ -31,6 +35,16 @@ export function parseWorkspaceArgs(args: string[]): {
 
 		if (arg === '--json') {
 			json = true;
+			continue;
+		}
+
+		if (arg === '--toon') {
+			toon = true;
+			continue;
+		}
+
+		if (arg === '--full') {
+			full = true;
 			continue;
 		}
 
@@ -63,5 +77,5 @@ export function parseWorkspaceArgs(args: string[]): {
 		if (!path) path = arg;
 	}
 
-	return { path, options: { json, include, exclude, maxSeverity, changed } };
+	return { path, options: { json, toon, full, include, exclude, maxSeverity, changed } };
 }

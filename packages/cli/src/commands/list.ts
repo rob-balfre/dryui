@@ -2,7 +2,8 @@
 
 import type { Spec } from './types.js';
 import { pad } from '../format.js';
-import { runCommand } from '../run.js';
+import { toonComponentList } from '@dryui/mcp/toon';
+import { runCommand, type OutputMode } from '../run.js';
 
 interface ListOptions {
 	category?: string | null;
@@ -49,8 +50,16 @@ export function groupByCategory(spec: Spec): Map<string, { name: string; descrip
 export function getList(
 	category: string | null,
 	spec: Spec,
-	options: ListOptions = {}
+	options?: { toon?: boolean }
 ): { output: string; error: string | null; exitCode: number } {
+	if (options?.toon) {
+		return {
+			output: toonComponentList(spec.components, category ?? undefined),
+			error: null,
+			exitCode: 0
+		};
+	}
+
 	const sections: string[] = [];
 	const validCategories = getCategories(spec);
 
@@ -88,12 +97,13 @@ export function getList(
 
 export function runList(args: string[], spec: Spec): void {
 	if (args[0] === '--help') {
-		console.log('Usage: dryui list [--category <category>]');
+		console.log('Usage: dryui list [--category <category>] [--toon]');
 		console.log('');
 		console.log('List DryUI components.');
 		console.log('');
 		console.log('Options:');
 		console.log('  --category <cat>  Filter by category');
+		console.log('  --toon            Output in TOON format (token-optimized for agents)');
 		console.log('');
 		console.log('Categories:');
 		const cats = getCategories(spec);
@@ -101,6 +111,7 @@ export function runList(args: string[], spec: Spec): void {
 		process.exit(0);
 	}
 
+	const toon = args.includes('--toon');
 	let filterCategory: string | null = null;
 
 	// Parse --category flag
@@ -114,5 +125,6 @@ export function runList(args: string[], spec: Spec): void {
 		filterCategory = catValue.toLowerCase();
 	}
 
-	runCommand(getList(filterCategory, spec));
+	const mode: OutputMode = toon ? 'toon' : 'text';
+	runCommand(getList(filterCategory, spec, { toon }), mode);
 }

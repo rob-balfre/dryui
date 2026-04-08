@@ -1299,26 +1299,28 @@ All components support CSS variable theming. Override at the :root level or comp
 
 ## CLI
 
-Use the CLI for deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation:
+Use the CLI for deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation.
+
+All commands support `--toon` for token-optimized agent output and `--full` to disable truncation. Most also accept `--json`.
 
 Current command surface: init, detect, install, add, get, info, list, compose, review, diagnose, doctor, lint.
 
 ```
-bun run --filter '@dryui/cli' build
-node packages/cli/dist/index.js detect <project-path>
-node packages/cli/dist/index.js install <project-path>
-node packages/cli/dist/index.js add --project <project-path> Card
-node packages/cli/dist/index.js info <component>
-node packages/cli/dist/index.js list --category layout
-node packages/cli/dist/index.js get "Checkout Forms"
-node packages/cli/dist/index.js compose "date input"
-node packages/cli/dist/index.js review src/routes/+page.svelte
-node packages/cli/dist/index.js diagnose src/app.css
+bunx @dryui/cli detect --toon <project-path>
+bunx @dryui/cli install --toon <project-path>
+bunx @dryui/cli add --project --target <file> Card
+bunx @dryui/cli info <component> --toon
+bunx @dryui/cli list --toon --category layout
+bunx @dryui/cli compose "date input" --toon
+bunx @dryui/cli review --toon src/routes/+page.svelte
+bunx @dryui/cli diagnose --toon src/app.css
+bunx @dryui/cli doctor --toon --changed
+bunx @dryui/cli lint --toon --max-severity warning
 ```
 
 ## MCP Server
 
-dryui ships an MCP server for AI-agent integration:
+dryui ships an MCP server for AI-agent integration. All tool output uses TOON (token-optimized) format with contextual next-step suggestions.
 
 ```json
 {

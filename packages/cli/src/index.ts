@@ -3,6 +3,8 @@
 
 import pkg from '../package.json';
 import spec from '../../mcp/src/spec.json';
+import { detectProject } from '../../mcp/src/project-planner.js';
+import { toonProjectDetection } from '@dryui/mcp/toon';
 import { runAdd } from './commands/add.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
@@ -22,35 +24,58 @@ const USAGE = `Usage: dryui <command> [options]
 
 Commands:
   init                          Print setup snippets for a new DryUI app
-  detect [--json] [path]        Detect DryUI project setup
-  install [--json] [path]       Print a project install plan
+  detect [--json] [--toon] [path]
+                                Detect DryUI project setup
+  install [--json] [--toon] [path]
+                                Print a project install plan
   add <component>               Print a copyable starter snippet for a component
-  info <component>              Show component API reference
-  list [--category <cat>]       List all components
-  compose <query>               Look up composition guidance
-  review [--json] <file.svelte> Validate a Svelte file against DryUI spec
-  diagnose [--json] <file.css>  Validate theme CSS
-  doctor [path] [--include <glob>] [--exclude <glob>] [--changed]
+  info <component> [--toon]     Show component API reference
+  list [--category <cat>] [--toon]
+                                List all components
+  compose <query> [--toon]      Look up composition guidance
+  review [--json] [--toon] <file.svelte>
+                                Validate a Svelte file against DryUI spec
+  diagnose [--json] [--toon] <file.css>
+                                Validate theme CSS
+  doctor [path] [--toon] [--include <glob>] [--exclude <glob>] [--changed]
                                 Inspect workspace health
-  lint [path] [--json] [--include <glob>] [--exclude <glob>] [--max-severity <level>] [--changed]
+  lint [path] [--json] [--toon] [--include <glob>] [--exclude <glob>] [--changed]
                                 Print deterministic workspace findings
   feedback <subcommand>         Start or inspect the feedback server
 
 Options:
   --help                  Show help for a command
-  --version               Show version`;
+  --version               Show version
+  --toon                  Token-optimized output for AI agents (per-command)
+  --full                  Disable truncation (use with --toon)`;
 
 function main(): void {
 	const args = process.argv.slice(2);
 	const command = args[0];
 
-	if (!command || command === '--help' || command === '-h') {
+	if (command === '--version' || command === '-v') {
+		console.log(VERSION);
+		process.exit(0);
+	}
+
+	if (command === '--help' || command === '-h') {
 		console.log(USAGE);
 		process.exit(0);
 	}
 
-	if (command === '--version' || command === '-v') {
-		console.log(VERSION);
+	// Content-first: no-arg shows project status if in a DryUI project, otherwise USAGE
+	if (!command) {
+		try {
+			const detection = detectProject(spec, undefined);
+			if (detection.status === 'ready' || detection.status === 'partial') {
+				console.log(`dryui v${VERSION}\n`);
+				console.log(toonProjectDetection(detection));
+				process.exit(0);
+			}
+		} catch {
+			// Not in a project — fall through to USAGE
+		}
+		console.log(USAGE);
 		process.exit(0);
 	}
 

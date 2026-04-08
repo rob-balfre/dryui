@@ -113,7 +113,7 @@
 			<DocsSectionIntro
 				id="cli"
 				title="CLI commands"
-				description="Run via bunx in any project. All commands support --help and most accept --json."
+				description="Run via bunx in any project. All commands support --help, --toon (token-optimized agent output), and --full (disable truncation). Most also accept --json."
 			/>
 
 			<Card.Root>
@@ -153,7 +153,7 @@
 			<DocsSectionIntro
 				id="mcp"
 				title="MCP tools"
-				description="The MCP server exposes these tools to any connected AI agent."
+				description="The MCP server exposes these tools to any connected AI agent. All output uses TOON (token-optimized) format with contextual next-step suggestions."
 			/>
 
 			<div class="item-grid">

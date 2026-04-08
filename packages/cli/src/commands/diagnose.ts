@@ -1,10 +1,11 @@
 // dryui diagnose <file.css> — Validate theme CSS against DryUI spec
 
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { diagnoseTheme } from '../../../mcp/src/theme-checker.js';
 import type { Spec } from './types.js';
 import { severityLabel } from '../format.js';
-import { runCommand } from '../run.js';
+import { toonDiagnoseResult } from '@dryui/mcp/toon';
+import { runCommand, fileNotFound, type OutputMode } from '../run.js';
 
 /**
  * Get the diagnose output for a file path.
@@ -13,14 +14,21 @@ import { runCommand } from '../run.js';
 export function getDiagnose(
 	filePath: string,
 	spec: Spec,
-	options?: { json?: boolean }
+	options?: { json?: boolean; toon?: boolean }
 ): { output: string; error: string | null; exitCode: number } {
-	if (!existsSync(filePath)) {
-		return { output: '', error: `File not found: ${filePath}`, exitCode: 1 };
-	}
+	const missing = fileNotFound(filePath, options?.toon);
+	if (missing) return missing;
 
 	const css = readFileSync(filePath, 'utf-8');
 	const result = diagnoseTheme(css, spec);
+
+	if (options?.toon) {
+		return {
+			output: toonDiagnoseResult(result),
+			error: null,
+			exitCode: result.issues.some((i) => i.severity === 'error') ? 1 : 0
+		};
+	}
 
 	if (options?.json) {
 		return {
@@ -60,23 +68,26 @@ export function getDiagnose(
 
 export function runDiagnose(args: string[], spec: Spec): void {
 	if (args.length === 0 || args[0] === '--help') {
-		console.log('Usage: dryui diagnose [--json] <file.css>');
+		console.log('Usage: dryui diagnose [--json] [--toon] <file.css>');
 		console.log('');
 		console.log('Validate theme CSS for missing tokens, value errors,');
 		console.log('contrast issues, and component token problems.');
 		console.log('');
 		console.log('Options:');
 		console.log('  --json    Output raw JSON instead of formatted text');
+		console.log('  --toon    Output in TOON format (token-optimized for agents)');
 		process.exit(args[0] === '--help' ? 0 : 1);
 	}
 
 	const jsonMode = args.includes('--json');
-	const fileArgs = args.filter((a) => a !== '--json');
+	const toon = args.includes('--toon');
+	const fileArgs = args.filter((a) => !a.startsWith('--'));
 	const filePath = fileArgs[0];
 	if (!filePath) {
 		console.error('Error: missing file path');
 		process.exit(1);
 	}
 
-	runCommand(getDiagnose(filePath, spec, { json: jsonMode }));
+	const mode: OutputMode = toon ? 'toon' : jsonMode ? 'json' : 'text';
+	runCommand(getDiagnose(filePath, spec, { json: jsonMode, toon }), mode);
 }
