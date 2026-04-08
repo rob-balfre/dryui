@@ -13,7 +13,9 @@ permissions:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Pin to 22.04 — ubuntu-24.04 has documented CI performance regressions
+    # https://github.com/actions/runner-images/issues/11790
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     env:
       PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
@@ -29,6 +31,13 @@ jobs:
         uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.10
+
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: bun-${{ runner.os }}-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
@@ -46,4 +55,5 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
+          packageManager: bun
           command: pages deploy .svelte-kit/cloudflare --project-name=dryui-docs
