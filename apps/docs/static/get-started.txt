@@ -1,5 +1,9 @@
 # DryUI — Agent Install Instructions
 
+> Execute every step below in order. Do not summarize, paraphrase, or
+> explain the steps — run each command, create each file, and edit each
+> file as instructed. Skip nothing.
+
 Zero-dependency Svelte 5 component library. Use the CLI to detect the project
 and execute a tailored install plan.
 
@@ -59,15 +63,17 @@ npx -y @dryui/cli detect --json
 - `"status": "partial"` → review the `theme` and `dependencies` fields, fix
   what is missing, re-run Step 1
 
-**Do NOT open `src/app.html` or any source file directly.** Source files
-render without styles, scripts, or routing. Always start the dev server and
-use the localhost URL it prints (typically `http://localhost:5173`).
+**Do NOT open, preview, or screenshot `src/app.html` or any source file
+directly — they render blank without the dev server.** If your editor
+automatically opens a file preview after an edit, ignore it completely.
+The ONLY way to verify the app is through the dev server URL.
 
 Start the dev server using the `packageManager` from the Step 1 detection
 output (e.g. `npm run dev`, `bun run dev`, `pnpm dev`, `yarn dev`).
+Then open `http://localhost:5173` (or whatever port the dev server prints).
 
-In Claude Code: use `preview_start` with the dev command, then
-`preview_screenshot` to confirm styles are applied.
+In Claude Code: use `preview_start` with the dev command, then navigate to
+the localhost URL it prints before taking any screenshots.
 
 ## Step 3 — Set up the MCP server (recommended)
 
