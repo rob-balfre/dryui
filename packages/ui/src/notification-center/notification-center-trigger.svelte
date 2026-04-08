@@ -19,20 +19,17 @@
 		}
 	});
 
-	function handleClick(e: MouseEvent & { currentTarget: HTMLButtonElement }) {
-		ctx.toggle();
-		if (onclick) (onclick as (e: MouseEvent & { currentTarget: HTMLButtonElement }) => void)(e);
-	}
 </script>
 
 <button
 	bind:this={el}
 	id={ctx.triggerId}
+	popovertarget={ctx.panelId}
 	aria-expanded={ctx.open}
 	aria-haspopup="dialog"
 	data-notification-center-trigger
 	class={className}
-	onclick={handleClick}
+	{onclick}
 	{...rest}
 >
 	{@render children({ unreadCount: ctx.unreadCount })}
@@ -53,6 +50,7 @@
 		color: var(--dry-color-text-strong);
 		box-shadow: var(--dry-shadow-sm);
 		font: inherit;
+		cursor: pointer;
 	}
 
 	[data-notification-center-trigger]:focus-visible {

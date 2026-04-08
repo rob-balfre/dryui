@@ -33,7 +33,7 @@
 		inset: 0;
 		z-index: var(--dry-layer-overlay);
 		display: grid;
-		place-items: center;
+		align-items: center;
 		padding: var(--dry-backdrop-padding);
 		background: var(--dry-backdrop-bg);
 		backdrop-filter: blur(var(--dry-backdrop-blur));

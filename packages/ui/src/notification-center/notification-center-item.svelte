@@ -43,6 +43,7 @@
 <style>
 	[data-notification-center-item] {
 		padding: var(--dry-nc-item-padding, 0.75rem);
+		color: var(--dry-color-text-strong);
 		border-bottom: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
 		transition: background var(--dry-duration-fast, 100ms) ease;
 	}
@@ -52,7 +53,7 @@
 	}
 
 	[data-notification-center-item][data-state='unread'] {
-		background: var(--dry-nc-unread-bg, #eff6ff);
+		background: var(--dry-nc-unread-bg);
 	}
 
 	[data-notification-center-item][data-variant='warning'] {

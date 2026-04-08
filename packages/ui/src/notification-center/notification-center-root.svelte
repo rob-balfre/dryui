@@ -66,7 +66,7 @@
 	[data-notification-center-root] {
 		--dry-nc-panel-width: 24rem;
 		--dry-nc-item-padding: var(--dry-space-3, 0.75rem);
-		--dry-nc-unread-bg: var(--dry-color-fill-brand-weak);
+		--dry-nc-unread-bg: color-mix(in srgb, var(--dry-color-fill-brand) 12%, transparent);
 
 		position: relative;
 		display: inline-grid;

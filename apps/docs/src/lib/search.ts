@@ -69,16 +69,10 @@ const docsPages: SearchItem[] = [
 		keywords: ['theme', 'grids', 'grid', 'layout', 'columns', 'gutter', 'margin', 'practical ui']
 	},
 	{
-		label: 'CLI',
-		href: '/cli',
-		description: 'Command-line reference for DryUI tooling.',
-		keywords: ['commands', 'tooling', 'terminal']
-	},
-	{
-		label: 'MCP Server',
-		href: '/mcp',
-		description: 'MCP server docs for reviewer, diagnose, and compose tools.',
-		keywords: ['model context protocol', 'review', 'diagnose', 'compose']
+		label: 'Tools',
+		href: '/tools',
+		description: 'CLI commands and MCP server setup for DryUI tooling.',
+		keywords: ['cli', 'mcp', 'commands', 'tooling', 'terminal', 'model context protocol', 'review', 'diagnose', 'compose']
 	},
 	{
 		label: 'Changelog',

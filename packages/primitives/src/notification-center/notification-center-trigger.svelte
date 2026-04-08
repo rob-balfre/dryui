@@ -19,10 +19,6 @@
 		}
 	});
 
-	function handleClick(e: MouseEvent & { currentTarget: HTMLButtonElement }) {
-		ctx.toggle();
-		if (onclick) (onclick as (e: MouseEvent & { currentTarget: HTMLButtonElement }) => void)(e);
-	}
 </script>
 
 <button
@@ -31,7 +27,7 @@
 	popovertarget={ctx.panelId}
 	aria-expanded={ctx.open}
 	aria-haspopup="dialog"
-	onclick={handleClick}
+	{onclick}
 	{...rest}
 >
 	{@render children({ unreadCount: ctx.unreadCount })}

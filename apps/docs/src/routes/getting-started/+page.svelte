@@ -181,10 +181,8 @@
 				<Alert.Root variant="info">
 					<Alert.Title>Editor-specific setup</Alert.Title>
 					<Alert.Description>
-						See the <Link href={withBase('/mcp')} underline="always">MCP Server</Link> page for Cursor,
-						Codex, and other editor configs. The <Link href={withBase('/cli')} underline="always"
-							>CLI</Link
-						> provides the same tools from the terminal.
+						See the <Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI
+						commands, MCP setup, and editor-specific configs.
 					</Alert.Description>
 				</Alert.Root>
 			</div>

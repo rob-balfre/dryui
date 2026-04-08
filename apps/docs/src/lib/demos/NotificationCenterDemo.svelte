@@ -6,7 +6,7 @@
 		{ id: '2', variant: 'info' as const, read: false },
 		{ id: '3', variant: 'warning' as const, read: true }
 	]);
-	let panelOpen = $state(true);
+	let panelOpen = $state(false);
 </script>
 
 <div class="demo">
@@ -38,6 +38,6 @@
 	.demo {
 		display: grid;
 		justify-items: end;
-		min-height: 18rem;
+		min-height: 4rem;
 	}
 </style>

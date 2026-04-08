@@ -10,14 +10,16 @@
 </div>
 
 <Backdrop {open} onclick={() => (open = false)}>
-	<Card.Root onclick={(event) => event.stopPropagation()}>
-		<Card.Content>
-			<div class="backdrop-card-copy">
-				<Text>Content rendered over a backdrop overlay layer.</Text>
-				<Button onclick={() => (open = false)}>Close preview</Button>
-			</div>
-		</Card.Content>
-	</Card.Root>
+	<div class="backdrop-dialog" onclick={(event) => event.stopPropagation()}>
+		<Card.Root>
+			<Card.Content>
+				<div class="backdrop-card-copy">
+					<Text>Content rendered over a backdrop overlay layer.</Text>
+					<Button onclick={() => (open = false)}>Close preview</Button>
+				</div>
+			</Card.Content>
+		</Card.Root>
+	</div>
 </Backdrop>
 
 <style>
@@ -25,6 +27,12 @@
 		display: grid;
 		justify-items: start;
 		gap: var(--dry-space-3);
+	}
+
+	.backdrop-dialog {
+		display: grid;
+		grid-template-columns: min(28rem, 100%);
+		justify-content: center;
 	}
 
 	.backdrop-card-copy {

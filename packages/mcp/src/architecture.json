@@ -1,6 +1,6 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "0.1.5",
+  "packageVersion": "0.1.6",
   "summary": {
     "componentNodes": 292,
     "partNodes": 662,
@@ -14,12 +14,12 @@
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
-    "composeEdges": 10,
+    "composeEdges": 11,
     "docsEdges": 0,
     "relatedEdges": 303,
     "mismatches": 23,
     "primitivePartComponents": 0,
-    "thinWrappers": 65
+    "thinWrappers": 64
   },
   "nodes": [
     {
@@ -15676,7 +15676,7 @@
       "parts": [],
       "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 1
     },
     {
       "id": "ui:Timeline",
@@ -16550,10 +16550,10 @@
       "to": "primitives:TimeInput"
     },
     {
-      "id": "composes:ui:DateTimeInput:ui:DateField:",
+      "id": "composes:ui:DateTimeInput:ui:DatePicker:",
       "type": "composes",
       "from": "ui:DateTimeInput",
-      "to": "ui:DateField"
+      "to": "ui:DatePicker"
     },
     {
       "id": "composes:ui:DateTimeInput:ui:TimeInput:",
@@ -16590,6 +16590,12 @@
       "type": "composes",
       "from": "ui:Tag",
       "to": "ui:Badge"
+    },
+    {
+      "id": "composes:ui:TimeInput:ui:Select:",
+      "type": "composes",
+      "from": "ui:TimeInput",
+      "to": "ui:Select"
     },
     {
       "id": "composes:ui:Transfer:ui:Checkbox:",
@@ -24359,7 +24365,6 @@
       "Spotlight",
       "Svg",
       "Textarea",
-      "TimeInput",
       "Toggle",
       "Tour",
       "VideoEmbed",

@@ -11,7 +11,7 @@
 | Compound parts | 662 |
 | Mismatch count | 23 |
 | PrimitivePart components | 0 |
-| Thin wrapper count | 65 |
+| Thin wrapper count | 64 |
 
 ## Package Overview
 
@@ -48,7 +48,7 @@ No findings in this bucket.
 ## Structural Signals
 
 - `PrimitivePart` appears in 0 UI components: none.
-- Thin wrapper candidates: `Adjust`, `AspectRatio`, `Aurora`, `Avatar`, `Backdrop`, `Badge`, `Beam`, `Button`, `ButtonGroup`, `Checkbox`, `Chip`, `ChromaticAberration`, `ChromaticShift`, `Clipboard`, `Container`, `CountrySelect`, `Displacement`, `FocusTrap`, `FormatBytes`, `FormatDate`, `FormatNumber`, `Gauge`, `Glass`, `Glow`, `GodRays`, `GradientMesh`, `Hotkey`, `Icon`, `Image`, `ImageComparison`, `Input`, `Kbd`, `Label`, `Link`, `Marquee`, `MaskReveal`, `Noise`, `NumberInput`, `PhoneInput`, `Portal`, `Progress`, `ProgressRing`, `PromptInput`, `QRCode`, `Rating`, `RelativeTime`, `Reveal`, `ScrollArea`, `ScrollToTop`, `Separator`, `ShaderCanvas`, `Skeleton`, `Slider`, `Spacer`, `Sparkline`, `Spinner`, `Spotlight`, `Svg`, `Textarea`, `TimeInput`, `Toggle`, `Tour`, `VideoEmbed`, `VirtualList`, `VisuallyHidden`.
+- Thin wrapper candidates: `Adjust`, `AspectRatio`, `Aurora`, `Avatar`, `Backdrop`, `Badge`, `Beam`, `Button`, `ButtonGroup`, `Checkbox`, `Chip`, `ChromaticAberration`, `ChromaticShift`, `Clipboard`, `Container`, `CountrySelect`, `Displacement`, `FocusTrap`, `FormatBytes`, `FormatDate`, `FormatNumber`, `Gauge`, `Glass`, `Glow`, `GodRays`, `GradientMesh`, `Hotkey`, `Icon`, `Image`, `ImageComparison`, `Input`, `Kbd`, `Label`, `Link`, `Marquee`, `MaskReveal`, `Noise`, `NumberInput`, `PhoneInput`, `Portal`, `Progress`, `ProgressRing`, `PromptInput`, `QRCode`, `Rating`, `RelativeTime`, `Reveal`, `ScrollArea`, `ScrollToTop`, `Separator`, `ShaderCanvas`, `Skeleton`, `Slider`, `Spacer`, `Sparkline`, `Spinner`, `Spotlight`, `Svg`, `Textarea`, `Toggle`, `Tour`, `VideoEmbed`, `VirtualList`, `VisuallyHidden`.
 - UI subpath-only exports: none.
 - Primitive subpath-only exports: `UseThemeOverride`.
 - UI exports missing spec metadata: none.

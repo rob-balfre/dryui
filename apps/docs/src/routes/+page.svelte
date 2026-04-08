@@ -163,7 +163,7 @@
 
 	.flow-node {
 		display: grid;
-		grid-template-columns: auto auto;
+		grid-template-columns: 1.25rem auto;
 		align-items: center;
 		gap: var(--dry-space-2);
 		color: var(--dry-color-text-strong);
@@ -182,15 +182,12 @@
 
 	@container (max-width: 40rem) {
 		.flow {
-			grid-template-columns: auto auto 1fr;
-			justify-content: start;
+			grid-template-columns: 1fr;
+			gap: var(--dry-space-3);
 		}
 
 		.flow-arrow {
-			rotate: 90deg;
-			grid-column: 1 / -1;
-			justify-self: start;
-			margin-inline-start: var(--dry-space-2);
+			display: none;
 		}
 	}
 

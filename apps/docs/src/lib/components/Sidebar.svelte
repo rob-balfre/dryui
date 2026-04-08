@@ -5,8 +5,7 @@
 		Home,
 		Rocket,
 		Palette,
-		Terminal,
-		Cpu,
+		Wrench,
 		FileText,
 		LayoutGrid,
 		Grid3x3
@@ -52,8 +51,7 @@
 		{ label: 'Home', href: withBase('/'), icon: Home },
 		{ label: 'Getting Started', href: withBase('/getting-started'), icon: Rocket },
 		{ label: 'Theme Wizard', href: withBase('/theme-wizard'), icon: Palette },
-		{ label: 'CLI', href: withBase('/cli'), icon: Terminal },
-		{ label: 'MCP Server', href: withBase('/mcp'), icon: Cpu },
+		{ label: 'Tools', href: withBase('/tools'), icon: Wrench },
 		{ label: 'Changelog', href: withBase('/changelog'), icon: FileText },
 		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid3x3 }
 	];
