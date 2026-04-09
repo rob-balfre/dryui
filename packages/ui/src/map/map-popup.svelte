@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 	import { getMapCtx, getMarkerCtx } from './context.svelte.js';
 	import type { MapPopupInstance, PopupOptions } from '@dryui/primitives';
 
@@ -29,9 +29,10 @@
 	$effect(() => {
 		if (!mapCtx.loaded || !mapCtx.map || !mapCtx.lib || !markerCtx.marker || !contentEl) return;
 
-		if (popupInstance) {
-			popupInstance.remove();
-			popupInstance = null;
+		// Remove previous popup without tracking popupInstance as a dependency
+		const prev = untrack(() => popupInstance);
+		if (prev) {
+			prev.remove();
 		}
 
 		try {

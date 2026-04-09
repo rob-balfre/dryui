@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { getMapCtx, setMarkerCtx } from './context.svelte.js';
-	import { onDestroy } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 	import type { LngLat, MapMarkerInstance, MarkerOptions } from './types.js';
 
 	interface Props {
@@ -30,10 +30,10 @@
 	$effect(() => {
 		if (!ctx.loaded || !ctx.map || !ctx.lib) return;
 
-		// Remove previous marker if it exists
-		if (markerInstance) {
-			markerInstance.remove();
-			markerInstance = null;
+		// Remove previous marker without tracking markerInstance as a dependency
+		const prev = untrack(() => markerInstance);
+		if (prev) {
+			prev.remove();
 		}
 
 		const opts: MarkerOptions = {};
