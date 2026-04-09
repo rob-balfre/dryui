@@ -1,5 +1,14 @@
 # @dryui/ui
 
+## 0.1.10
+
+### Patch Changes
+
+- Republish with correct dist/ exports (prepack hook now runs during publish)
+
+- Updated dependencies []:
+  - @dryui/primitives@0.1.10
+
 ## 0.1.9
 
 ### Patch Changes
