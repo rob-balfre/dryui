@@ -7,6 +7,7 @@ export const DEFAULT_FEEDBACK_HOST = '127.0.0.1';
 export const DEFAULT_FEEDBACK_URL = `http://localhost:${DEFAULT_FEEDBACK_PORT}`;
 export const DEFAULT_STORE_DIR = join(homedir(), '.dryui-feedback');
 export const DEFAULT_STORE_PATH = join(DEFAULT_STORE_DIR, 'store.db');
+export const SCREENSHOTS_DIR = join(DEFAULT_STORE_DIR, 'screenshots');
 export const DEFAULT_CONFIG_PATH = join(DEFAULT_STORE_DIR, 'server.json');
 export const KEEPALIVE_INTERVAL_MS = 15_000;
 

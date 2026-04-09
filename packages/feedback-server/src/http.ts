@@ -7,8 +7,10 @@ import type {
 	Annotation,
 	CreateAnnotationInput,
 	CreateSessionInput,
+	CreateSubmissionInput,
 	PendingResponse,
 	SSEEvent,
+	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
@@ -266,6 +268,37 @@ export function startFeedbackHttpServer(
 					store.saveDrawings(drawingsUrl, body);
 					bus.emit(sessionEvent('drawings.updated', drawingsUrl, { url: drawingsUrl }));
 					return new Response(null, { status: 204, headers: CORS_HEADERS });
+				} catch {
+					return errorResponse(400, 'Invalid JSON');
+				}
+			}
+
+			if (pathname === '/submissions' && request.method === 'POST') {
+				try {
+					const body = await readJson<CreateSubmissionInput>(request);
+					if (!body.url || !body.image) return errorResponse(400, 'Missing url or image');
+					const submission = store.createSubmission(body);
+					bus.emit(sessionEvent('submission.created', submission.url, submission));
+					return json(submission, 201);
+				} catch {
+					return errorResponse(400, 'Invalid JSON');
+				}
+			}
+
+			if (pathname === '/submissions' && request.method === 'GET') {
+				const submissions = store.getPendingSubmissions();
+				return json({ count: submissions.length, submissions });
+			}
+
+			const submissionMatch = pathname.match(/^\/submissions\/([^/]+)$/);
+			if (submissionMatch && request.method === 'PATCH') {
+				const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
+				try {
+					const body = await readJson<{ status: SubmissionStatus }>(request);
+					const submission = store.updateSubmissionStatus(submissionId, body.status);
+					if (!submission) return errorResponse(404, 'Not found');
+					bus.emit(sessionEvent('submission.updated', submission.url, submission));
+					return json(submission);
 				} catch {
 					return errorResponse(400, 'Invalid JSON');
 				}

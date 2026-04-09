@@ -1,16 +1,19 @@
-import { mkdirSync, existsSync } from 'node:fs';
+import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
-import { DEFAULT_STORE_DIR, DEFAULT_STORE_PATH } from './config.js';
+import { DEFAULT_STORE_DIR, DEFAULT_STORE_PATH, SCREENSHOTS_DIR } from './config.js';
 import type {
 	Annotation,
 	AnnotationKind,
 	AnnotationStatus,
 	CreateAnnotationInput,
 	CreateSessionInput,
+	CreateSubmissionInput,
 	Session,
 	SessionStatus,
 	SessionWithAnnotations,
+	Submission,
+	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
@@ -59,6 +62,16 @@ interface AnnotationRow {
 	kind: AnnotationKind | null;
 	color: Annotation['color'] | null;
 	extra: string | null;
+}
+
+interface SubmissionRow {
+	id: string;
+	url: string;
+	screenshot_path: string;
+	drawings: string;
+	viewport: string | null;
+	status: string;
+	created_at: string;
 }
 
 interface TableColumnRow {
@@ -144,6 +157,18 @@ function toAnnotation(row: AnnotationRow): Annotation {
 	};
 }
 
+function toSubmission(row: SubmissionRow): Submission {
+	return {
+		id: row.id,
+		url: row.url,
+		screenshotPath: row.screenshot_path,
+		drawings: parseJson<unknown[]>(row.drawings) ?? [],
+		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
+		status: row.status as SubmissionStatus,
+		createdAt: row.created_at
+	};
+}
+
 function toDbBoolean(value: boolean | undefined): number | null {
 	if (value === undefined) return null;
 	return value ? 1 : 0;
@@ -221,6 +246,17 @@ export class FeedbackStore {
         data TEXT NOT NULL DEFAULT '[]',
         updated_at TEXT NOT NULL
       );
+
+      CREATE TABLE IF NOT EXISTS submissions (
+        id TEXT PRIMARY KEY,
+        url TEXT NOT NULL,
+        screenshot_path TEXT NOT NULL,
+        drawings TEXT NOT NULL DEFAULT '[]',
+        viewport TEXT,
+        status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
     `);
 
 		ensureColumn(this.db, 'annotations', 'resolution_note', 'TEXT');
@@ -494,5 +530,61 @@ export class FeedbackStore {
 		this.db
 			.query(`INSERT OR REPLACE INTO drawings (url, data, updated_at) VALUES (?, ?, ?)`)
 			.run(url, JSON.stringify(drawings), createTimestamp());
+	}
+
+	createSubmission(input: CreateSubmissionInput): Submission {
+		const id = randomUUID();
+		const screenshotPath = `${SCREENSHOTS_DIR}/${id}.png`;
+
+		if (!existsSync(SCREENSHOTS_DIR)) {
+			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+		}
+		writeFileSync(screenshotPath, Buffer.from(input.image, 'base64'));
+
+		const now = createTimestamp();
+		this.db
+			.query(
+				`INSERT INTO submissions (id, url, screenshot_path, drawings, viewport, status, created_at)
+				 VALUES (?, ?, ?, ?, ?, 'pending', ?)`
+			)
+			.run(
+				id,
+				input.url,
+				screenshotPath,
+				JSON.stringify(input.drawings),
+				input.viewport ? JSON.stringify(input.viewport) : null,
+				now
+			);
+
+		return {
+			id,
+			url: input.url,
+			screenshotPath,
+			drawings: input.drawings,
+			viewport: input.viewport ?? null,
+			status: 'pending',
+			createdAt: now
+		};
+	}
+
+	getSubmission(id: string): Submission | null {
+		const row = this.db.query<SubmissionRow>('SELECT * FROM submissions WHERE id = ?').get(id);
+		return row ? toSubmission(row) : null;
+	}
+
+	getPendingSubmissions(): Submission[] {
+		const rows = this.db
+			.query<SubmissionRow>(
+				"SELECT * FROM submissions WHERE status = 'pending' ORDER BY created_at ASC"
+			)
+			.all();
+		return rows.map(toSubmission);
+	}
+
+	updateSubmissionStatus(id: string, status: SubmissionStatus): Submission | null {
+		const existing = this.getSubmission(id);
+		if (!existing) return null;
+		this.db.query('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
+		return { ...existing, status };
 	}
 }

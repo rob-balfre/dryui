@@ -12,6 +12,8 @@ type FeedbackToolClient = Pick<
 	| 'getAllPending'
 	| 'updateAnnotation'
 	| 'addThreadMessage'
+	| 'getPendingSubmissions'
+	| 'resolveSubmission'
 >;
 
 type ToolRegistrar = Pick<McpServer, 'tool'>;
@@ -147,6 +149,70 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			const annotation = await client.addThreadMessage(annotationId, message, 'agent');
 			return {
 				content: [{ type: 'text', text: `Replied\n\n${formatAnnotation(annotation)}` }]
+			};
+		}
+	);
+
+	server.tool(
+		'feedback_get_submissions',
+		'Poll for pending feedback submissions. Returns screenshot file paths and drawing data.',
+		{
+			timeoutSeconds: z
+				.number()
+				.int()
+				.min(1)
+				.max(60)
+				.optional()
+				.describe('Max seconds to wait (default 30)'),
+			pollIntervalSeconds: z
+				.number()
+				.int()
+				.min(1)
+				.max(10)
+				.optional()
+				.describe('Polling interval in seconds (default 3)')
+		},
+		async ({ timeoutSeconds = 30, pollIntervalSeconds = 3 }) => {
+			const startedAt = Date.now();
+
+			while (Date.now() - startedAt < timeoutSeconds * 1000) {
+				const result = await client.getPendingSubmissions();
+
+				if (result.count > 0) {
+					return {
+						content: [
+							{
+								type: 'text',
+								text: JSON.stringify({ timedOut: false, ...result }, null, 2)
+							}
+						]
+					};
+				}
+
+				await new Promise((resolve) => setTimeout(resolve, pollIntervalSeconds * 1000));
+			}
+
+			return {
+				content: [
+					{
+						type: 'text',
+						text: JSON.stringify({ timedOut: true, count: 0, submissions: [] }, null, 2)
+					}
+				]
+			};
+		}
+	);
+
+	server.tool(
+		'feedback_resolve_submission',
+		'Mark a feedback submission as resolved after acting on it.',
+		{
+			submissionId: z.string().describe('Submission ID to resolve')
+		},
+		async ({ submissionId }) => {
+			await client.resolveSubmission(submissionId);
+			return {
+				content: [{ type: 'text', text: `Submission ${submissionId} resolved.` }]
 			};
 		}
 	);

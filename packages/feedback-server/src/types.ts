@@ -128,3 +128,22 @@ export interface CreateAnnotationInput extends Omit<
 }
 
 export interface UpdateAnnotationInput extends Partial<Omit<Annotation, 'id' | 'sessionId'>> {}
+
+export type SubmissionStatus = 'pending' | 'resolved';
+
+export interface Submission {
+	id: string;
+	url: string;
+	screenshotPath: string;
+	drawings: unknown[];
+	viewport: { width: number; height: number } | null;
+	status: SubmissionStatus;
+	createdAt: string;
+}
+
+export interface CreateSubmissionInput {
+	url: string;
+	image: string;
+	drawings: unknown[];
+	viewport?: { width: number; height: number };
+}

@@ -4,7 +4,14 @@ import {
 	DEFAULT_FEEDBACK_URL,
 	readFeedbackServerConfig
 } from './config.js';
-import type { Annotation, PendingResponse, Session, SessionWithAnnotations } from './types.js';
+import type {
+	Annotation,
+	CreateSubmissionInput,
+	PendingResponse,
+	Session,
+	SessionWithAnnotations,
+	Submission
+} from './types.js';
 
 function trimTrailingSlash(value: string): string {
 	return value.replace(/\/$/, '');
@@ -99,6 +106,34 @@ export class FeedbackHttpClient {
 			method: 'PUT',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(drawings)
+		});
+		if (!response.ok) {
+			const body = await response.text();
+			throw new Error(`HTTP ${response.status}: ${body}`);
+		}
+	}
+
+	async submitFeedback(input: CreateSubmissionInput): Promise<Submission> {
+		return parseJson<Submission>(
+			await fetch(`${this.baseUrl}/submissions`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(input)
+			})
+		);
+	}
+
+	async getPendingSubmissions(): Promise<{ count: number; submissions: Submission[] }> {
+		return parseJson<{ count: number; submissions: Submission[] }>(
+			await fetch(`${this.baseUrl}/submissions`)
+		);
+	}
+
+	async resolveSubmission(id: string): Promise<void> {
+		const response = await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
 		});
 		if (!response.ok) {
 			const body = await response.text();

@@ -1,16 +1,18 @@
 <script lang="ts">
-	import { Pencil, Eraser, MoveUpRight, Type, Move } from 'lucide-svelte';
+	import { Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
 	import type { Tool } from '../types.js';
 
 	interface Props {
 		active: boolean;
 		tool: Tool;
 		hasDrawings: boolean;
+		submitting: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
+		onsubmit: () => void;
 	}
 
-	let { active, tool, hasDrawings, ontoggle, ontoolchange }: Props = $props();
+	let { active, tool, hasDrawings, submitting, ontoggle, ontoolchange, onsubmit }: Props = $props();
 
 	let shellEl: HTMLDivElement | undefined = $state();
 	let dragging = $state(false);
@@ -111,6 +113,15 @@
 		>
 			<Eraser size={18} />
 		</button>
+
+		<button
+			class="tool-btn submit-btn"
+			onclick={onsubmit}
+			disabled={submitting}
+			aria-label={submitting ? 'Sending...' : 'Send feedback'}
+		>
+			<Send size={18} />
+		</button>
 	{/if}
 </div>
 
@@ -166,5 +177,19 @@
 
 	.tool-btn[data-active]:hover {
 		background: hsl(25 100% 62%);
+	}
+
+	.submit-btn {
+		color: hsl(145 70% 50%);
+	}
+
+	.submit-btn:hover {
+		background: hsl(145 70% 25%);
+		color: hsl(145 70% 70%);
+	}
+
+	.submit-btn:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
 	}
 </style>

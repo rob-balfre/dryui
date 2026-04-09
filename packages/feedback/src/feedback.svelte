@@ -27,6 +27,7 @@
 	let svgEl: SVGSVGElement | undefined = $state();
 	let justCommitted = false;
 	let saveVersion = $state(0);
+	let submitting = $state(false);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
@@ -313,6 +314,71 @@
 			: ''
 	);
 
+	// --- Screenshot + Submit ---
+
+	async function captureScreenshot(): Promise<string> {
+		if (!svgEl) throw new Error('No SVG element');
+		const clone = svgEl.cloneNode(true) as SVGSVGElement;
+		const w = window.innerWidth;
+		const h = window.innerHeight;
+		clone.setAttribute('width', String(w));
+		clone.setAttribute('height', String(h));
+		clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+		const svgString = new XMLSerializer().serializeToString(clone);
+		const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+		const url = URL.createObjectURL(blob);
+		try {
+			const img = new Image();
+			img.width = w;
+			img.height = h;
+			await new Promise<void>((resolve, reject) => {
+				img.onload = () => resolve();
+				img.onerror = reject;
+				img.src = url;
+			});
+			const canvas = document.createElement('canvas');
+			canvas.width = w;
+			canvas.height = h;
+			const ctx = canvas.getContext('2d')!;
+			ctx.drawImage(img, 0, 0);
+			return new Promise<string>((resolve) => {
+				canvas.toBlob((b) => {
+					const reader = new FileReader();
+					reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+					reader.readAsDataURL(b!);
+				}, 'image/png');
+			});
+		} finally {
+			URL.revokeObjectURL(url);
+		}
+	}
+
+	async function handleSubmit() {
+		if (!serverUrl || submitting) return;
+		submitting = true;
+		try {
+			const image = await captureScreenshot();
+			await fetch(`${serverUrl}/submissions`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					url: location.href,
+					image,
+					drawings: drawings.map((d) => ({ ...d })),
+					viewport: { width: window.innerWidth, height: window.innerHeight }
+				})
+			});
+			drawings = [];
+			saveVersion++;
+			active = false;
+		} catch (e) {
+			console.error('Failed to submit feedback:', e);
+		} finally {
+			submitting = false;
+		}
+	}
+
 	// --- Persistence ---
 
 	let lastSavedVersion = 0;
@@ -481,7 +547,15 @@
 			</div>
 		{/if}
 
-		<Toolbar {active} {tool} {hasDrawings} ontoggle={toggle} ontoolchange={setTool} />
+		<Toolbar
+			{active}
+			{tool}
+			{hasDrawings}
+			{submitting}
+			ontoggle={toggle}
+			ontoolchange={setTool}
+			onsubmit={handleSubmit}
+		/>
 	</div>
 </Portal>
 
