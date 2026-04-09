@@ -133,7 +133,8 @@ DryUI MCP tools:
 - composition and project planning (`compose`, `detect_project`, `plan_install`, `plan_add`)
 - validation, theme checks, and workspace audit (`review`, `diagnose`, `doctor`, `lint`)
 - CLI: `bunx @dryui/cli detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint`
-- Skill: `packages/ui/skills/dryui/SKILL.md` (install to ~/.claude/skills/)
+- Skill: `packages/ui/skills/dryui/SKILL.md`
+- Plugin: `packages/plugin/` (Claude Code plugin bundling skill + MCP)
 
 ### Output Format — TOON (Token-Optimized Output)
 

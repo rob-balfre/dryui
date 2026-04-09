@@ -87,93 +87,72 @@ Accordion, Alert, Alert Dialog, App Bar, Aspect Ratio, Avatar, Backdrop, Badge, 
 
 ## AI Integration
 
-The `@dryui/mcp` package provides a [Model Context Protocol](https://modelcontextprotocol.io/) server that lets AI agents look up component APIs, retrieve composed-output source, plan installs and project-aware adds, generate composition guidance, validate components, diagnose theme issues, and audit workspaces. The docs site keeps the current tool and prompt inventory in sync with shared AI-surface data.
+DryUI ships two things for AI agents: a **skill** that teaches conventions (compound components, theming, CSS rules, accessibility) and an **MCP server** for live component lookup, code validation, and composition guidance. The skill is the most important part — without it, agents guess APIs and make structural mistakes.
 
-A standalone CLI (`@dryui/cli`) mirrors the same planning, lookup, validation, and audit workflows from the terminal, plus `init` for setup snippets.
+### Claude Code
 
-DryUI also ships a **skill** (`packages/ui/skills/dryui/`) that teaches AI agents _when_ to use the MCP and _how_ to use it effectively. Tools that support skills should install both the MCP server and the skill for best results.
-
-### Core setup
-
-#### Codex
-
-From a clone of this repo, link the DryUI skill into Codex:
+Install the plugin (bundles both skill + MCP server):
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-ln -sfn "$(pwd)/packages/ui/skills/dryui" "${CODEX_HOME:-$HOME/.codex}/skills/dryui"
+claude plugin marketplace add rob-balfre/dryui
+claude plugin install dryui@rob-balfre/dryui
 ```
 
-Then add the MCP server to your project's `.mcp.json`:
+### Codex
+
+Install the skill, then add the MCP server:
+
+```bash
+$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
+codex mcp add dryui -- npx -y @dryui/mcp
+```
+
+### VS Code / Copilot
+
+Copy the skill and add the MCP server config:
+
+```bash
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui
+```
+
+Add to `.vscode/mcp.json` (note: root key is `"servers"`, not `"mcpServers"`):
 
 ```json
 {
-	"mcpServers": {
+	"servers": {
 		"dryui": {
 			"type": "stdio",
 			"command": "npx",
-			"args": ["@dryui/mcp"]
+			"args": ["-y", "@dryui/mcp"]
 		}
 	}
 }
 ```
 
-Restart Codex after linking the skill. Use the skill for DryUI conventions and the MCP server for planning, lookup, validation, and audit tooling.
-
-#### Claude Code
-
-From a clone of this repo, optionally link the DryUI skill into your project-local Claude Code skills folder:
+### Cursor
 
 ```bash
-mkdir -p .claude/skills
-ln -sfn "$(pwd)/packages/ui/skills/dryui" .claude/skills/dryui
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
 ```
 
-Then add the MCP server to your project's `.mcp.json`:
-
-```json
-{
-	"mcpServers": {
-		"dryui": {
-			"type": "stdio",
-			"command": "npx",
-			"args": ["@dryui/mcp"]
-		}
-	}
-}
-```
-
-The skill is optional but recommended when you want Claude Code to follow DryUI conventions before reaching for MCP tools.
-
-#### Cursor
-
-Cursor uses MCP configuration only. Add the server to `.cursor/mcp.json` in your project root:
+Add to `.cursor/mcp.json`:
 
 ```json
 {
 	"mcpServers": {
 		"dryui": {
 			"command": "npx",
-			"args": ["@dryui/mcp"]
+			"args": ["-y", "@dryui/mcp"]
 		}
 	}
 }
 ```
 
-The bundled DryUI skill does not apply to Cursor.
-
-### Additional MCP clients
-
-If you use another MCP client, keep the same `npx @dryui/mcp` command and adapt the config shape to that client.
-
-#### Claude Code global skill install
+### Windsurf
 
 ```bash
-mkdir -p ~/.claude/skills
-ln -sfn "$(pwd)/packages/ui/skills/dryui" ~/.claude/skills/dryui
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
 ```
-
-#### Windsurf
 
 Add to `~/.codeium/windsurf/mcp_config.json`:
 
@@ -182,31 +161,15 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 	"mcpServers": {
 		"dryui": {
 			"command": "npx",
-			"args": ["@dryui/mcp"]
+			"args": ["-y", "@dryui/mcp"]
 		}
 	}
 }
 ```
 
-#### VS Code (Copilot)
+### Zed
 
-Add to `.vscode/mcp.json` in your project root:
-
-```json
-{
-	"servers": {
-		"dryui": {
-			"type": "stdio",
-			"command": "npx",
-			"args": ["@dryui/mcp"]
-		}
-	}
-}
-```
-
-#### Zed
-
-Add to your Zed settings (`~/.config/zed/settings.json`):
+Zed does not yet support Agent Skills. It reads `AGENTS.md` for conventions automatically. Add the MCP server to `~/.config/zed/settings.json`:
 
 ```json
 {
@@ -214,12 +177,16 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 		"dryui": {
 			"command": {
 				"path": "npx",
-				"args": ["@dryui/mcp"]
+				"args": ["-y", "@dryui/mcp"]
 			}
 		}
 	}
 }
 ```
+
+### Other MCP clients
+
+Use `npx -y @dryui/mcp` as the server command and adapt the config shape to your client.
 
 ### From Source
 
