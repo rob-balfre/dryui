@@ -17,9 +17,9 @@
 				node.style.removeProperty('width');
 			}
 			if (height) {
-				node.style.setProperty('height', height);
+				node.style.setProperty('--_h', height);
 			} else {
-				node.style.removeProperty('height');
+				node.style.removeProperty('--_h');
 			}
 		});
 	}
@@ -59,6 +59,9 @@
 		background-size: 200% 100%;
 		animation: skeleton-shimmer 1.5s ease-in-out infinite;
 		border-radius: var(--dry-skeleton-radius);
+		/* width set via @attach inline style (lint bans width in CSS);
+		   --_h set by @attach when height prop is provided,
+		   overriding variant defaults via the var() fallback chain */
 	}
 
 	@keyframes skeleton-shimmer {
@@ -81,17 +84,17 @@
 
 	div[data-variant='text'] {
 		--dry-skeleton-radius: var(--dry-radius-md);
-		height: var(--dry-text-base-leading);
+		height: var(--_h, var(--dry-text-base-leading));
 	}
 
 	div[data-variant='circular'] {
 		--dry-skeleton-radius: var(--dry-radius-full);
 		aspect-ratio: 1;
-		height: var(--dry-space-10);
+		height: var(--_h, var(--dry-space-10));
 	}
 
 	div[data-variant='rectangular'] {
 		--dry-skeleton-radius: var(--dry-radius-sm);
-		height: var(--dry-space-16);
+		height: var(--_h, var(--dry-space-16));
 	}
 </style>

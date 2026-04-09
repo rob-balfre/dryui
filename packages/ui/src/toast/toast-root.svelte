@@ -35,7 +35,7 @@
 
 	function applyProgressStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.cssText = `--progress-width: ${progress}%`;
+			node.style.setProperty('--progress-width', `${progress}%`);
 		});
 	}
 </script>

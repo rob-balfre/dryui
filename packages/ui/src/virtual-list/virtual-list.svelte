@@ -146,15 +146,12 @@
 	function applyContainerStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('position', 'relative');
-			node.style.setProperty('overflow-y', 'auto');
 		});
 	}
 
 	function applyInnerStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('height', `${totalHeight}px`);
-			node.style.setProperty('position', 'relative');
+			node.style.setProperty('--_inner-height', `${totalHeight}px`);
 		});
 	}
 
@@ -191,7 +188,7 @@
 	data-virtual-list
 	{...rest}
 >
-	<div use:applyInnerStyles>
+	<div data-virtual-list-inner use:applyInnerStyles>
 		{#each visibleItems as entry (entry.index)}
 			{@render children(entry)}
 		{/each}
@@ -200,6 +197,8 @@
 
 <style>
 	[data-virtual-list] {
+		position: relative;
+		overflow-y: auto;
 		height: 100%;
 		--dry-virtual-list-scrollbar-width: 8px;
 		--dry-virtual-list-scrollbar-track: var(--dry-color-bg-raised, transparent);
@@ -231,5 +230,10 @@
 
 	[data-virtual-list]::-webkit-scrollbar-thumb:hover {
 		background: var(--dry-virtual-list-scrollbar-thumb-hover);
+	}
+
+	[data-virtual-list-inner] {
+		position: relative;
+		height: var(--_inner-height, 0px);
 	}
 </style>

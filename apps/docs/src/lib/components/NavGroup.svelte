@@ -15,11 +15,6 @@
 	const depth = getContext<number>('navgroup-depth') ?? 0;
 	setContext('navgroup-depth', depth + 1);
 
-	const indent = `calc(var(--dry-space-3) + ${16 * (depth + 1)}px + ${depth + 1} * var(--dry-space-2))`;
-
-	function applyIndent(node: HTMLElement) {
-		node.style.setProperty('--dry-sidebar-item-padding-x', indent);
-	}
 </script>
 
 <div class="group">
@@ -36,7 +31,7 @@
 		{/if}
 	</button>
 	<div class="content" class:open>
-		<div class="inner" {@attach applyIndent}>
+		<div class="inner" data-depth={depth}>
 			{@render children()}
 		</div>
 	</div>
@@ -155,6 +150,18 @@
 		overflow: hidden;
 		display: grid;
 		gap: var(--dry-sidebar-group-gap, var(--dry-space-1));
+	}
+
+	.inner[data-depth='0'] {
+		--dry-sidebar-item-padding-x: calc(var(--dry-space-3) + 16px + var(--dry-space-2));
+	}
+
+	.inner[data-depth='1'] {
+		--dry-sidebar-item-padding-x: calc(var(--dry-space-3) + 32px + 2 * var(--dry-space-2));
+	}
+
+	.inner[data-depth='2'] {
+		--dry-sidebar-item-padding-x: calc(var(--dry-space-3) + 48px + 3 * var(--dry-space-2));
 	}
 
 	@media (prefers-reduced-motion: reduce) {

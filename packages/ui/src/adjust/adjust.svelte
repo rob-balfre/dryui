@@ -48,8 +48,8 @@
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('filter', filterString ?? '');
-			node.style.setProperty('mix-blend-mode', blendMode ?? '');
+			node.style.setProperty('--_filter', filterString ?? 'none');
+			node.style.setProperty('--_blend', blendMode ?? 'normal');
 		});
 	}
 </script>
@@ -61,5 +61,7 @@
 <style>
 	[data-adjust] {
 		border-radius: inherit;
+		filter: var(--_filter, none);
+		mix-blend-mode: var(--_blend, normal);
 	}
 </style>

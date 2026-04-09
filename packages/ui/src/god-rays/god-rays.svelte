@@ -57,6 +57,9 @@
 		});
 	}
 
+	// Flash-on-load: background is a computed conic-gradient with a dynamic number of stops
+	// based on rayCount, so no static CSS default is possible. The layer is invisible without
+	// its gradient anyway (transparent), so no visible flash occurs.
 	function applyLayerStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.setProperty('background', gradientString);
@@ -79,6 +82,13 @@
 
 <style>
 	[data-god-rays] {
+		--dry-rays-color: rgba(255, 255, 255, 0.15);
+		--dry-rays-cx: 50%;
+		--dry-rays-cy: 0%;
+		--dry-rays-intensity: 60;
+		--dry-rays-blend: screen;
+		--dry-rays-speed: 0s;
+
 		position: relative;
 		overflow: hidden;
 		border-radius: inherit;

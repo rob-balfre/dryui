@@ -60,17 +60,9 @@
 		});
 	}
 
-	function applyTrackStyles(node: HTMLElement) {
+	function applyFlowDirection(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
-			node.style.setProperty('gap', 'var(--marquee-gap)');
-		});
-	}
-
-	function applyContentStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
-			node.style.setProperty('gap', 'var(--marquee-gap)');
+			node.style.setProperty('--_flow', isVertical ? 'row' : 'column');
 		});
 	}
 </script>
@@ -85,11 +77,11 @@
 	use:applyRootStyles
 	{...rest}
 >
-	<div data-marquee-track use:applyTrackStyles>
-		<div data-marquee-content bind:this={contentEl} use:applyContentStyles>
+	<div data-marquee-track use:applyFlowDirection>
+		<div data-marquee-content bind:this={contentEl} use:applyFlowDirection>
 			{@render children()}
 		</div>
-		<div data-marquee-content aria-hidden="true" use:applyContentStyles>
+		<div data-marquee-content aria-hidden="true" use:applyFlowDirection>
 			{@render children()}
 		</div>
 	</div>
@@ -107,6 +99,8 @@
 
 	[data-marquee-track] {
 		display: grid;
+		grid-auto-flow: var(--_flow, column);
+		gap: var(--marquee-gap, 1rem);
 		animation-duration: var(--dry-marquee-speed);
 		animation-timing-function: linear;
 		animation-iteration-count: infinite;
@@ -115,6 +109,8 @@
 
 	[data-marquee-content] {
 		display: grid;
+		grid-auto-flow: var(--_flow, column);
+		gap: var(--marquee-gap, 1rem);
 	}
 
 	[data-marquee][data-direction='left'] [data-marquee-track],

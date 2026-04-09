@@ -69,6 +69,9 @@
 		return () => mql.removeEventListener('change', handler);
 	});
 
+	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),
+	// so no CSS default is possible — the ID isn't known until mount. The SVG <filter> element
+	// is in the same template, so the @attach sets it immediately on first paint.
 	function applyFilterStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';

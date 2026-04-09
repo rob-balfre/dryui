@@ -116,8 +116,11 @@
 		$effect(() => {
 			node.style.cssText = style || '';
 			if (customPalette?.[0]) node.style.setProperty('--dry-aurora-color-1', customPalette[0]);
+			else node.style.removeProperty('--dry-aurora-color-1');
 			if (customPalette?.[1]) node.style.setProperty('--dry-aurora-color-2', customPalette[1]);
+			else node.style.removeProperty('--dry-aurora-color-2');
 			if (customPalette?.[2]) node.style.setProperty('--dry-aurora-color-3', customPalette[2]);
+			else node.style.removeProperty('--dry-aurora-color-3');
 			node.style.setProperty('--dry-aurora-duration', speedDuration);
 			node.style.setProperty(
 				'--dry-aurora-intensity',
@@ -129,8 +132,11 @@
 
 	function applyBackdropStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('mix-blend-mode', blendMode ?? '');
-			node.style.setProperty('opacity', layerOpacity != null ? String(layerOpacity) : '');
+			if (blendMode) node.style.setProperty('--_aurora-backdrop-blend', blendMode);
+			else node.style.removeProperty('--_aurora-backdrop-blend');
+			if (layerOpacity != null)
+				node.style.setProperty('--_aurora-backdrop-opacity', String(layerOpacity));
+			else node.style.removeProperty('--_aurora-backdrop-opacity');
 		});
 	}
 </script>
@@ -163,6 +169,8 @@
 		--dry-aurora-angle: 0deg;
 		--dry-aurora-shift: 0%;
 		--dry-aurora-duration: 18s;
+		--dry-aurora-intensity: 80;
+		--dry-aurora-waviness: 50;
 		--dry-aurora-surface: linear-gradient(
 			145deg,
 			color-mix(in srgb, var(--dry-color-bg-base) 84%, var(--dry-color-bg-overlay)),
@@ -215,6 +223,8 @@
 		overflow: hidden;
 		border-radius: inherit;
 		z-index: 0;
+		mix-blend-mode: var(--_aurora-backdrop-blend, normal);
+		opacity: var(--_aurora-backdrop-opacity, 1);
 	}
 
 	[data-aurora-layer] {

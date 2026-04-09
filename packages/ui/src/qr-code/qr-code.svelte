@@ -89,7 +89,7 @@
 		--dry-qr-padding: var(--dry-space-3);
 		--dry-qr-radius: var(--dry-radius-lg);
 		--dry-qr-border: var(--dry-color-stroke-weak);
-		--dry-qr-bg: var(--dry-color-bg-overlay);
+		--dry-qr-bg: #fff;
 		--dry-qr-size: 200px;
 
 		display: inline-grid;

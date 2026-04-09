@@ -70,9 +70,9 @@
 	function setAspectRatio(node: HTMLDivElement) {
 		$effect(() => {
 			if (aspectRatio) {
-				node.style.setProperty('aspect-ratio', aspectRatio);
+				node.style.setProperty('--_ratio', aspectRatio);
 			} else {
-				node.style.removeProperty('aspect-ratio');
+				node.style.removeProperty('--_ratio');
 			}
 		});
 	}
@@ -116,6 +116,7 @@
 		position: relative;
 		overflow: hidden;
 		border-radius: inherit;
+		aspect-ratio: var(--_ratio);
 	}
 
 </style>

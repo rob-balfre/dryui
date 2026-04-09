@@ -130,6 +130,7 @@
 			node.style.setProperty('--dry-spotlight-x', x);
 			node.style.setProperty('--dry-spotlight-y', y);
 			if (blendMode) node.style.setProperty('--dry-spotlight-blend', blendMode);
+			else node.style.removeProperty('--dry-spotlight-blend');
 		});
 	}
 </script>
@@ -154,6 +155,12 @@
 
 <style>
 	[data-spotlight] {
+		--dry-spotlight-radius: 260px;
+		--dry-spotlight-intensity: 26%;
+		--dry-spotlight-color: rgba(59, 130, 246, 0.28);
+		--dry-spotlight-x: 50%;
+		--dry-spotlight-y: 50%;
+
 		position: relative;
 		isolation: isolate;
 		overflow: hidden;

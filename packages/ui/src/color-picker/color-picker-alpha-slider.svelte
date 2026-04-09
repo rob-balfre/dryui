@@ -20,7 +20,7 @@
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('--dry-alpha-rgb', rgbStr);
+			node.style.setProperty('--_alpha-rgb', rgbStr);
 		});
 	}
 </script>
@@ -53,6 +53,7 @@
 	}
 
 	[data-cp-slider] {
+		--dry-alpha-rgb: var(--_alpha-rgb, 255, 0, 0);
 		--dry-slider-track-height: var(--dry-color-picker-slider-track-height);
 		--dry-slider-thumb-size: var(--dry-color-picker-slider-thumb-size);
 

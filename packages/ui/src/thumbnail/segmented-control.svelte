@@ -74,8 +74,8 @@
 <style>
 	[data-thumbnail] {
 		display: inline-grid;
-		width: var(--thumbnail-w);
-		height: var(--thumbnail-h);
+		width: var(--thumbnail-w, 80px);
+		height: var(--thumbnail-h, 53px);
 	}
 
 	[data-thumbnail][data-size='sm'] {

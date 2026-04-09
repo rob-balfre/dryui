@@ -25,7 +25,8 @@
 
 	function syncStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.cssText = `${style ? `${style}; ` : ''}--dry-image-comparison-position: ${position}%`;
+			node.style.cssText = style || '';
+			node.style.setProperty('--dry-image-comparison-position', `${position}%`);
 		});
 	}
 
@@ -120,6 +121,7 @@
 
 <style>
 	[data-image-comparison] {
+		--dry-image-comparison-position: 50%;
 		--dry-image-comparison-handle-width: 2px;
 		--dry-image-comparison-handle-color: var(--dry-color-bg-overlay);
 		--dry-image-comparison-arrow-color: var(--dry-color-text-strong);

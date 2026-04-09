@@ -19,8 +19,11 @@ const styleRe = /<style[^>]*>([\s\S]*?)<\/style>/gi;
 let totalViolations = 0;
 const glob = new Glob('**/*.svelte');
 
+/** Paths excluded from width-lint: thumbnails use fixed-dimension SVG containers */
+const SKIP_PATHS = ['thumbnail/'];
+
 for await (const path of glob.scan(SCAN_DIR)) {
-	if (path.startsWith('thumbnail/')) continue;
+	if (SKIP_PATHS.some((p) => path.startsWith(p))) continue;
 	const filePath = `${SCAN_DIR}/${path}`;
 	const content = await Bun.file(filePath).text();
 

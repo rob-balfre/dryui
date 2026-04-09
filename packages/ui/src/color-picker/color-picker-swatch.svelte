@@ -36,8 +36,8 @@
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('--dry-swatch-color', displayColor);
-			node.style.setProperty('--dry-swatch-opacity', String(displayAlpha));
+			node.style.setProperty('--_swatch-color', displayColor);
+			node.style.setProperty('--_swatch-opacity', String(displayAlpha));
 		});
 	}
 </script>
@@ -58,6 +58,9 @@
 
 <style>
 	[data-cp-swatch] {
+		--dry-swatch-color: var(--_swatch-color, #ff0000);
+		--dry-swatch-opacity: var(--_swatch-opacity, 1);
+
 		height: var(--dry-color-picker-swatch-size);
 		aspect-ratio: 1;
 		border-radius: var(--dry-radius-md);
@@ -84,7 +87,7 @@
 		position: absolute;
 		inset: 0;
 		background: var(--dry-swatch-color);
-		opacity: var(--dry-swatch-opacity, 1);
+		opacity: var(--dry-swatch-opacity);
 		border-radius: inherit;
 	}
 

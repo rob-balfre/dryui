@@ -109,11 +109,11 @@
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('--dry-color-picker-area-width', `${width}px`);
-			node.style.setProperty('--dry-color-picker-area-height', `${height}px`);
-			node.style.setProperty('--dry-color-picker-indicator-left', `${indicatorX}px`);
-			node.style.setProperty('--dry-color-picker-indicator-top', `${indicatorY}px`);
-			node.style.setProperty('--dry-color-picker-indicator-color', ctx.hex);
+			node.style.setProperty('--_area-w', `${width}px`);
+			node.style.setProperty('--_area-h', `${height}px`);
+			node.style.setProperty('--_ind-left', `${indicatorX}px`);
+			node.style.setProperty('--_ind-top', `${indicatorY}px`);
+			node.style.setProperty('--_ind-color', ctx.hex);
 		});
 	}
 </script>
@@ -137,6 +137,12 @@
 
 <style>
 	[data-cp-area] {
+		--dry-color-picker-area-width: var(--_area-w, 200px);
+		--dry-color-picker-area-height: var(--_area-h, 150px);
+		--dry-color-picker-indicator-left: var(--_ind-left, 0px);
+		--dry-color-picker-indicator-top: var(--_ind-top, 0px);
+		--dry-color-picker-indicator-color: var(--_ind-color, #ff0000);
+
 		position: relative;
 		display: grid;
 		grid-template-columns: var(--dry-color-picker-area-width);

@@ -31,13 +31,13 @@
 
 	function setTrackBg(node: HTMLDivElement) {
 		$effect(() => {
-			node.style.setProperty('background', `linear-gradient(to right, transparent, ${color})`);
+			node.style.setProperty('--_track-bg', `linear-gradient(to right, transparent, ${color})`);
 		});
 	}
 
 	function setSwatchBg(node: HTMLDivElement) {
 		$effect(() => {
-			node.style.setProperty('background', swatchColor);
+			node.style.setProperty('--_swatch-bg', swatchColor);
 		});
 	}
 </script>
@@ -96,6 +96,7 @@
 		position: absolute;
 		inset: 0;
 		border-radius: var(--dry-radius-full);
+		background: var(--_track-bg, linear-gradient(to right, transparent, hsl(230, 65%, 55%)));
 	}
 
 	[data-alpha-slider-input] {
@@ -148,6 +149,7 @@
 	[data-alpha-slider-swatch] {
 		position: absolute;
 		inset: 0;
+		background: var(--_swatch-bg, hsl(230, 65%, 55%));
 	}
 
 	[data-alpha-slider-value-label] {

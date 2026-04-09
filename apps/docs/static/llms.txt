@@ -929,7 +929,7 @@ Renders only visible items from large lists for performance.
 Import: @dryui/ui
 Subpath import: @dryui/ui/virtual-list
 Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number), default 5 | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
-Data attributes: data-virtual-list
+Data attributes: data-virtual-list | data-virtual-list-inner
 Example: <VirtualList>Content</VirtualList>
 
 ### InfiniteScroll

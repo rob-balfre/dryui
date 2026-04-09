@@ -66,7 +66,7 @@
 			if (delayValue) node.style.setProperty('--dry-reveal-delay', delayValue);
 			if (durationValue) node.style.setProperty('--dry-reveal-duration', durationValue);
 			if (distanceValue) node.style.setProperty('--dry-reveal-distance', distanceValue);
-			node.style.setProperty('mix-blend-mode', blendMode ?? '');
+			node.style.setProperty('--_blend-mode', blendMode ?? 'normal');
 		});
 	}
 
@@ -137,8 +137,10 @@
 		--dry-reveal-offset-y: 0px;
 		--dry-reveal-mask-top: 0%;
 		--dry-reveal-mask-radius: 0px;
+		--_blend-mode: normal;
 
 		display: block;
+		mix-blend-mode: var(--_blend-mode);
 		opacity: var(--dry-reveal-hidden-opacity);
 		transform: translate3d(0, var(--dry-reveal-offset-y), 0) scale(var(--dry-reveal-hidden-scale));
 		filter: blur(var(--dry-reveal-hidden-blur));

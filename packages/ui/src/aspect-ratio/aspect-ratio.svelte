@@ -11,7 +11,7 @@
 
 	function applyRatio(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('aspect-ratio', String(ratio));
+			node.style.setProperty('--_ratio', String(ratio));
 		});
 	}
 </script>
@@ -23,5 +23,6 @@
 <style>
 	div {
 		overflow: hidden;
+		aspect-ratio: var(--_ratio, 16 / 9);
 	}
 </style>

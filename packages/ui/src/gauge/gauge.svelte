@@ -61,8 +61,8 @@
 
 	function applyFillStroke(node: SVGElement) {
 		$effect(() => {
-			if (thresholdColor) node.style.setProperty('stroke', thresholdColor);
-			else node.style.removeProperty('stroke');
+			if (thresholdColor) node.style.setProperty('--_gauge-fill-stroke', thresholdColor);
+			else node.style.removeProperty('--_gauge-fill-stroke');
 		});
 	}
 </script>
@@ -115,7 +115,7 @@
 
 	[data-gauge] [data-part='fill'] {
 		fill: none;
-		stroke: var(--dry-gauge-fill-color);
+		stroke: var(--_gauge-fill-stroke, var(--dry-gauge-fill-color));
 		stroke-width: var(--dry-gauge-stroke-width);
 		stroke-linecap: round;
 		transition: d var(--dry-duration-normal, 0.3s) var(--dry-ease-default, ease);

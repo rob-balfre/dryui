@@ -59,7 +59,7 @@
 
 	function applyAspectRatio(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('aspect-ratio', aspectRatio);
+			node.style.setProperty('--_ratio', aspectRatio);
 		});
 	}
 </script>
@@ -129,6 +129,7 @@
 		overflow: hidden;
 		border-radius: var(--dry-video-embed-radius);
 		background: var(--dry-color-fill, #0f0f0f);
+		aspect-ratio: var(--_ratio, 16/9);
 	}
 
 	[data-video-embed] [data-part='media'] {

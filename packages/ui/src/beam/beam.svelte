@@ -28,36 +28,23 @@
 
 	const clampedIntensity = $derived(`${Math.max(0, Math.min(100, intensity))}`);
 	const speedValue = $derived(`${Math.max(0, speed)}s`);
-	const gradientString = $derived(
-		`linear-gradient(${angle}deg, transparent 0%, transparent calc(50% - ${width}px), ${color} 50%, transparent calc(50% + ${width}px), transparent 100%)`
-	);
-	const rootStyle = $derived.by(() => {
-		const declarations = [
-			style,
-			`--dry-beam-speed: ${speedValue}`,
-			`--dry-beam-intensity: ${clampedIntensity}`,
-			`--dry-beam-width: ${width}px`,
-			blendMode ? `--dry-beam-blend: ${blendMode}` : null
-		].filter(Boolean);
-		return declarations.join('; ');
-	});
-	const layerStyle = $derived(`background-image: ${gradientString};`);
 
 	function applyRootStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.cssText = rootStyle;
-		});
-	}
-
-	function applyLayerStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = layerStyle;
+			node.style.cssText = style || '';
+			node.style.setProperty('--dry-beam-color', color);
+			node.style.setProperty('--dry-beam-angle', `${angle}deg`);
+			node.style.setProperty('--dry-beam-speed', speedValue);
+			node.style.setProperty('--dry-beam-intensity', clampedIntensity);
+			node.style.setProperty('--dry-beam-width', `${width}px`);
+			if (blendMode) node.style.setProperty('--dry-beam-blend', blendMode);
+			else node.style.removeProperty('--dry-beam-blend');
 		});
 	}
 </script>
 
 <div data-beam class={className} {...rest} {@attach applyRootStyles}>
-	<div data-beam-layer {@attach applyLayerStyles}></div>
+	<div data-beam-layer></div>
 	{#if children}
 		{@render children()}
 	{/if}
@@ -65,6 +52,12 @@
 
 <style>
 	[data-beam] {
+		--dry-beam-color: var(--dry-color-fill-brand);
+		--dry-beam-angle: 45deg;
+		--dry-beam-speed: 3s;
+		--dry-beam-intensity: 70;
+		--dry-beam-width: 2px;
+
 		position: relative;
 		overflow: hidden;
 		border-radius: inherit;
@@ -74,6 +67,14 @@
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
+		background-image: linear-gradient(
+			var(--dry-beam-angle, 45deg),
+			transparent 0%,
+			transparent calc(50% - var(--dry-beam-width, 2px)),
+			var(--dry-beam-color, var(--dry-color-fill-brand)) 50%,
+			transparent calc(50% + var(--dry-beam-width, 2px)),
+			transparent 100%
+		);
 		background-size: 300% 300%;
 		opacity: calc(var(--dry-beam-intensity, 70) / 100);
 		mix-blend-mode: var(--dry-beam-blend, var(--dry-beam-default-blend, multiply));

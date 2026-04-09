@@ -61,7 +61,7 @@
 			const segment = getSegment();
 			const widthPct = max > 0 ? Math.min(Math.max((segment.value / max) * 100, 0), 100) : 0;
 			node.style.setProperty('width', `${widthPct}%`);
-			node.style.setProperty('background-color', segment.color);
+			node.style.setProperty('--_segment-bg', segment.color);
 		});
 	}
 
@@ -75,9 +75,11 @@
 		$effect(() => {
 			const threshold = getThreshold();
 			const leftPct = max > 0 ? Math.min(Math.max((threshold.value / max) * 100, 0), 100) : 0;
-			node.style.setProperty('left', `${leftPct}%`);
+			node.style.setProperty('--_threshold-left', `${leftPct}%`);
 			if (threshold.color) {
-				node.style.setProperty('border-inline-start-color', threshold.color);
+				node.style.setProperty('--_threshold-color', threshold.color);
+			} else {
+				node.style.removeProperty('--_threshold-color');
 			}
 		});
 	}
@@ -236,6 +238,7 @@
 	}
 
 	[data-part='segment'] {
+		background-color: var(--_segment-bg, var(--dry-progress-bar));
 		height: 100%;
 		transition: width var(--dry-duration-slow, 300ms) ease;
 	}
@@ -260,7 +263,8 @@
 		position: absolute;
 		top: -4px;
 		bottom: -4px;
-		border-inline-start: 2px solid var(--dry-color-text-strong, #1a1a2e);
+		left: var(--_threshold-left, 0%);
+		border-inline-start: 2px solid var(--_threshold-color, var(--dry-color-text-strong, #1a1a2e));
 		opacity: 0.3;
 		z-index: 1;
 	}

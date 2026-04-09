@@ -16,6 +16,9 @@
 	const offsetX = $derived(Math.round(offset * Math.cos((angle * Math.PI) / 180)));
 	const offsetY = $derived(Math.round(offset * Math.sin((angle * Math.PI) / 180)));
 
+	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),
+	// so no CSS default is possible — the ID isn't known until mount. The SVG <filter> element
+	// is in the same template, so the @attach sets it immediately on first paint.
 	function applyFilterStyles(node: HTMLElement) {
 		node.style.cssText = style || '';
 		node.style.setProperty('filter', `url(#${filterId})`);

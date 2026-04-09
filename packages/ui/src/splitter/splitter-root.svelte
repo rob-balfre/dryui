@@ -33,11 +33,11 @@
 	function applyGridTemplate(node: HTMLElement) {
 		$effect(() => {
 			if (orientation === 'vertical') {
-				node.style.gridTemplateColumns = '';
-				node.style.gridTemplateRows = trackTemplate;
+				node.style.removeProperty('--_splitter-columns');
+				node.style.setProperty('--_splitter-rows', trackTemplate);
 			} else {
-				node.style.gridTemplateRows = '';
-				node.style.gridTemplateColumns = trackTemplate;
+				node.style.removeProperty('--_splitter-rows');
+				node.style.setProperty('--_splitter-columns', trackTemplate);
 			}
 		});
 	}
@@ -113,6 +113,7 @@
 	[data-part='root'] {
 		display: grid;
 		grid-auto-flow: column;
+		grid-template-columns: var(--_splitter-columns, 1fr max-content 1fr);
 		height: 100%;
 		min-height: 0;
 		align-items: stretch;
@@ -120,5 +121,7 @@
 
 	[data-part='root'][data-orientation='vertical'] {
 		grid-auto-flow: row;
+		grid-template-columns: initial;
+		grid-template-rows: var(--_splitter-rows, 1fr max-content 1fr);
 	}
 </style>

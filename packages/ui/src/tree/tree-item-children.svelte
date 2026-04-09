@@ -16,8 +16,7 @@
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('display', 'grid');
-			node.style.setProperty('grid-template-rows', open ? '1fr' : '0fr');
+			node.style.setProperty('--_rows', open ? '1fr' : '0fr');
 		});
 	}
 </script>
@@ -42,6 +41,8 @@
 	}
 
 	[data-part='children'] {
+		display: grid;
+		grid-template-rows: var(--_rows, 0fr);
 		padding-left: var(--dry-tree-indent, var(--dry-space-4));
 		transition: grid-template-rows var(--dry-duration-normal, 200ms) var(--dry-ease-default, ease);
 	}

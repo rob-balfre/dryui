@@ -83,7 +83,7 @@
 				var(--dry-color-fill-selected),
 				var(--dry-color-fill-selected)
 			);
-			background-size: var(--dry-slider-progress) 100%;
+			background-size: var(--dry-slider-progress, 50%) 100%;
 			background-repeat: no-repeat;
 		}
 

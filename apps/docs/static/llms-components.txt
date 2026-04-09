@@ -687,7 +687,7 @@ Structure:
     ColorPicker.Swatch
     ColorPicker.EyeDropper
     ColorPicker.ChannelInput
-CSS variables: --dry-color-picker-area-height, --dry-color-picker-area-width, --dry-color-picker-grid-dark, --dry-color-picker-grid-light, --dry-color-picker-grid-size, --dry-color-picker-indicator-border, --dry-color-picker-indicator-shadow, --dry-color-picker-indicator-size, --dry-color-picker-slider-thumb-bg, --dry-color-picker-slider-thumb-border, --dry-color-picker-slider-thumb-shadow, --dry-color-picker-slider-thumb-shadow-hover, --dry-color-picker-slider-thumb-size, --dry-color-picker-slider-track-height, --dry-color-picker-surface-hover, --dry-color-picker-swatch-size, --dry-color-picker-width, --dry-slider-thumb-size, --dry-slider-track-height
+CSS variables: --dry-alpha-rgb, --dry-color-picker-area-height, --dry-color-picker-area-width, --dry-color-picker-grid-dark, --dry-color-picker-grid-light, --dry-color-picker-grid-size, --dry-color-picker-indicator-border, --dry-color-picker-indicator-color, --dry-color-picker-indicator-left, --dry-color-picker-indicator-shadow, --dry-color-picker-indicator-size, --dry-color-picker-indicator-top, --dry-color-picker-slider-thumb-bg, --dry-color-picker-slider-thumb-border, --dry-color-picker-slider-thumb-shadow, --dry-color-picker-slider-thumb-shadow-hover, --dry-color-picker-slider-thumb-size, --dry-color-picker-slider-track-height, --dry-color-picker-surface-hover, --dry-color-picker-swatch-size, --dry-color-picker-width, --dry-slider-thumb-size, --dry-slider-track-height, --dry-swatch-color, --dry-swatch-opacity
 Data attributes: data-channel | data-color-picker | data-cp-area | data-cp-area-canvas | data-cp-area-indicator | data-cp-eyedropper | data-cp-input | data-cp-slider | data-cp-slider-wrapper | data-cp-swatch | data-disabled (Present when the component or part is disabled.) | data-format | data-interactive
 Accessibility: none
 Example:
@@ -1443,7 +1443,7 @@ Root import: import { Aurora } from '@dryui/ui'
 Subpath import: import { Aurora } from '@dryui/ui/aurora'
 Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-shift, --dry-aurora-surface
+CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
 Accessibility: none
 Example:
@@ -3082,7 +3082,7 @@ Root import: import { Spotlight } from '@dryui/ui'
 Subpath import: import { Spotlight } from '@dryui/ui/spotlight'
 Props: radius (number), default 260 | intensity (number), default 26 | color (string), Semantic color or tone applied to the component., default 'rgba(59 | followPointer (boolean), default true | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
-CSS variables: none
+CSS variables: --dry-spotlight-color, --dry-spotlight-intensity, --dry-spotlight-radius, --dry-spotlight-x, --dry-spotlight-y
 Data attributes: data-active (Present on the active item or current target within the component.) | data-follow-pointer | data-spotlight | data-static
 Accessibility: none
 Example:
@@ -3172,7 +3172,7 @@ Subpath import: import { VirtualList } from '@dryui/ui/virtual-list'
 Props: items (T[]), required | itemHeight (number | ((index: number) => number)), required | overscan (number), default 5 | children (Snippet<[{ item: T; index: number; style: string }]>), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-virtual-list-scrollbar-radius, --dry-virtual-list-scrollbar-thumb, --dry-virtual-list-scrollbar-thumb-hover, --dry-virtual-list-scrollbar-track, --dry-virtual-list-scrollbar-width
-Data attributes: data-virtual-list
+Data attributes: data-virtual-list | data-virtual-list-inner
 Accessibility: none
 Example:
 ```svelte
@@ -3385,7 +3385,7 @@ Root import: import { ImageComparison } from '@dryui/ui'
 Subpath import: import { ImageComparison } from '@dryui/ui/image-comparison'
 Props: position (number), default 50, bindable | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | before (Snippet), required | after (Snippet), required | handle (Snippet)
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-image-comparison-arrow-color, --dry-image-comparison-arrow-width, --dry-image-comparison-arrow-width-wide, --dry-image-comparison-grip-z-index, --dry-image-comparison-handle-color, --dry-image-comparison-handle-shadow, --dry-image-comparison-handle-width, --dry-image-comparison-handle-z-index, --dry-image-comparison-radius
+CSS variables: --dry-image-comparison-arrow-color, --dry-image-comparison-arrow-width, --dry-image-comparison-arrow-width-wide, --dry-image-comparison-grip-z-index, --dry-image-comparison-handle-color, --dry-image-comparison-handle-shadow, --dry-image-comparison-handle-width, --dry-image-comparison-handle-z-index, --dry-image-comparison-position, --dry-image-comparison-radius
 Data attributes: data-dragging | data-ic-grip | data-ic-grip-arrow | data-ic-grip-arrow-end | data-ic-grip-arrow-start | data-ic-grip-arrows | data-ic-handle | data-ic-handle-line | data-ic-handle-wrapper | data-ic-layer | data-ic-layer-before | data-image-comparison | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Accessibility: none
 Example:
@@ -4001,7 +4001,7 @@ Root import: import { Beam } from '@dryui/ui'
 Subpath import: import { Beam } from '@dryui/ui/beam'
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: none
+CSS variables: --dry-beam-angle, --dry-beam-color, --dry-beam-intensity, --dry-beam-speed, --dry-beam-width
 Data attributes: data-beam | data-beam-layer
 Accessibility: none
 Example:
@@ -4035,7 +4035,7 @@ Root import: import { GodRays } from '@dryui/ui'
 Subpath import: import { GodRays } from '@dryui/ui/god-rays'
 Props: color (string), Semantic color or tone applied to the component. | rayCount (number) | intensity (number) | center ({ x: number; y: number }) | speed (number) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: none
+CSS variables: --dry-rays-blend, --dry-rays-color, --dry-rays-cx, --dry-rays-cy, --dry-rays-intensity, --dry-rays-speed
 Data attributes: data-animated | data-god-rays | data-god-rays-layer
 Accessibility: none
 Example:
