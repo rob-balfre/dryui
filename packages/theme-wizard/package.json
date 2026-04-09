@@ -43,7 +43,7 @@
     "svelte": "^5.55.1"
   },
   "devDependencies": {
-    "@dryui/lint": "^0.0.1",
+    "@dryui/lint": "^0.1.0",
     "@dryui/primitives": "^0.1.3",
     "@dryui/ui": "^0.1.3",
     "lucide-svelte": "^1.0.1",
