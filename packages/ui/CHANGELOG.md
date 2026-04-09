@@ -1,5 +1,18 @@
 # @dryui/ui
 
+## 0.1.9
+
+### Patch Changes
+
+- [`c0445e0`](https://github.com/rob-balfre/dryui/commit/c0445e0132440576293d851f3020a91bad3126f7) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix published package exports pointing to src/ instead of dist/
+
+  npm publish was shipping package.json with exports pointing to `./src/` paths,
+  but only `dist/` was included in the package. Added prepack/postpack scripts
+  that rewrite exports to `./dist/` paths before publishing and restore afterward.
+
+- Updated dependencies [[`c0445e0`](https://github.com/rob-balfre/dryui/commit/c0445e0132440576293d851f3020a91bad3126f7)]:
+  - @dryui/primitives@0.1.9
+
 ## 0.1.8
 
 ### Patch Changes

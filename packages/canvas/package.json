@@ -42,8 +42,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@dryui/primitives": "^0.1.7",
-    "@dryui/ui": "^0.1.8"
+    "@dryui/primitives": "^0.1.9",
+    "@dryui/ui": "^0.1.9"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"
