@@ -143,7 +143,7 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		quickSetup: {
 			title: 'Install the plugin (skill + MCP server)',
 			code: `claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@rob-balfre/dryui`
+claude plugin install dryui@dryui`
 		},
 		mcp: {
 			path: '.mcp.json',

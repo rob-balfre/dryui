@@ -9,7 +9,7 @@ Install the DryUI skill (conventions) and MCP server (live tools) for your AI co
 ```bash
 # Claude Code — plugin installs both skill + MCP
 claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@rob-balfre/dryui
+claude plugin install dryui@dryui
 
 # Codex — skill from GitHub + MCP server
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui

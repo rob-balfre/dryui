@@ -79,7 +79,7 @@ for component lookup, composition guidance, code review, and workspace health.
 
 ```bash
 claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@rob-balfre/dryui
+claude plugin install dryui@dryui
 ```
 
 ### Codex (skill + MCP)

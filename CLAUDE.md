@@ -110,7 +110,7 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 ```bash
 # Claude Code (plugin — installs skill + MCP server)
 claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@rob-balfre/dryui
+claude plugin install dryui@dryui
 
 # Codex (skill + MCP)
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui

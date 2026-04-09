@@ -95,7 +95,7 @@ Install the plugin (bundles both skill + MCP server):
 
 ```bash
 claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@rob-balfre/dryui
+claude plugin install dryui@dryui
 ```
 
 ### Codex
