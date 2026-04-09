@@ -215,6 +215,12 @@ export class FeedbackStore {
 
       CREATE INDEX IF NOT EXISTS idx_annotations_session ON annotations(session_id);
       CREATE INDEX IF NOT EXISTS idx_annotations_status ON annotations(status);
+
+      CREATE TABLE IF NOT EXISTS drawings (
+        url TEXT PRIMARY KEY,
+        data TEXT NOT NULL DEFAULT '[]',
+        updated_at TEXT NOT NULL
+      );
     `);
 
 		ensureColumn(this.db, 'annotations', 'resolution_note', 'TEXT');
@@ -477,5 +483,16 @@ export class FeedbackStore {
 		});
 
 		return this.updateAnnotation(id, { thread });
+	}
+
+	getDrawings(url: string): unknown[] {
+		const row = this.db.query<{ data: string }>('SELECT data FROM drawings WHERE url = ?').get(url);
+		return row ? (parseJson<unknown[]>(row.data) ?? []) : [];
+	}
+
+	saveDrawings(url: string, drawings: unknown[]): void {
+		this.db
+			.query(`INSERT OR REPLACE INTO drawings (url, data, updated_at) VALUES (?, ?, ?)`)
+			.run(url, JSON.stringify(drawings), createTimestamp());
 	}
 }

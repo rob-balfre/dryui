@@ -88,6 +88,24 @@ export class FeedbackHttpClient {
 		);
 	}
 
+	async getDrawings(url: string): Promise<unknown[]> {
+		return parseJson<unknown[]>(
+			await fetch(`${this.baseUrl}/drawings?url=${encodeURIComponent(url)}`)
+		);
+	}
+
+	async saveDrawings(url: string, drawings: unknown[]): Promise<void> {
+		const response = await fetch(`${this.baseUrl}/drawings?url=${encodeURIComponent(url)}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(drawings)
+		});
+		if (!response.ok) {
+			const body = await response.text();
+			throw new Error(`HTTP ${response.status}: ${body}`);
+		}
+	}
+
 	async health(): Promise<{ status: string }> {
 		return parseJson<{ status: string }>(await fetch(`${this.baseUrl}/health`));
 	}

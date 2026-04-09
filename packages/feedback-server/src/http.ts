@@ -15,7 +15,7 @@ import type {
 
 const CORS_HEADERS: Record<string, string> = {
 	'Access-Control-Allow-Origin': '*',
-	'Access-Control-Allow-Methods': 'GET, POST, PATCH, DELETE, OPTIONS',
+	'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type'
 };
 
@@ -250,6 +250,25 @@ export function startFeedbackHttpServer(
 						return domainMatches(store.getSessionUrl(event.sessionId), domain);
 					}
 				});
+			}
+
+			if (pathname === '/drawings' && request.method === 'GET') {
+				const drawingsUrl = url.searchParams.get('url');
+				if (!drawingsUrl) return errorResponse(400, 'Missing url parameter');
+				return json(store.getDrawings(drawingsUrl));
+			}
+
+			if (pathname === '/drawings' && request.method === 'PUT') {
+				const drawingsUrl = url.searchParams.get('url');
+				if (!drawingsUrl) return errorResponse(400, 'Missing url parameter');
+				try {
+					const body = await readJson<unknown[]>(request);
+					store.saveDrawings(drawingsUrl, body);
+					bus.emit(sessionEvent('drawings.updated', drawingsUrl, { url: drawingsUrl }));
+					return new Response(null, { status: 204, headers: CORS_HEADERS });
+				} catch {
+					return errorResponse(400, 'Invalid JSON');
+				}
 			}
 
 			const annotationMatch = pathname.match(/^\/annotations\/([^/]+)$/);
