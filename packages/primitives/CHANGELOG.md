@@ -1,5 +1,11 @@
 # @dryui/primitives
 
+## 0.1.13
+
+### Patch Changes
+
+- [`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fixed effect loop in map marker and popup components by using `untrack()` when reading previous instances during cleanup.
+
 ## 0.1.12
 
 ### Patch Changes

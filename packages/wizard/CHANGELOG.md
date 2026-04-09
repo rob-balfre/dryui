@@ -1,5 +1,12 @@
 # @dryui/wizard
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b)]:
+  - @dryui/mcp@0.3.0
+
 ## 0.0.4
 
 ### Patch Changes

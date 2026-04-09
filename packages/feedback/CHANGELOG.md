@@ -1,5 +1,14 @@
 # @dryui/feedback
 
+## 0.0.5
+
+### Patch Changes
+
+- Updated dependencies [[`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b), [`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b)]:
+  - @dryui/mcp@0.3.0
+  - @dryui/primitives@0.1.13
+  - @dryui/ui@0.1.13
+
 ## 0.0.4
 
 ### Patch Changes

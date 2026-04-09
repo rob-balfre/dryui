@@ -1,5 +1,16 @@
 # @dryui/cli
 
+## 0.3.0
+
+### Minor Changes
+
+- [`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Enhanced `dryui init` to bootstrap SvelteKit + DryUI projects from scratch. Works for greenfield, brownfield, and existing SvelteKit projects. The MCP `plan_install` tool now returns scaffold steps instead of blocking for unsupported projects.
+
+### Patch Changes
+
+- Updated dependencies [[`1d85a8b`](https://github.com/rob-balfre/dryui/commit/1d85a8b0ecec8242d97b686edf697765591bfd7b)]:
+  - @dryui/mcp@0.3.0
+
 ## 0.2.0
 
 ### Minor Changes
