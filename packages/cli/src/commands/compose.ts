@@ -48,13 +48,13 @@ export function getCompose(
 
 	if (options?.toon) {
 		return {
-			output: toonComposition(results, { full: options?.full }),
+			output: toonComposition(results, spec.components, { full: options?.full }),
 			error: null,
 			exitCode: 0
 		};
 	}
 
-	const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(results);
+	const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(results, spec.components);
 	return { output: output.trimEnd(), error: null, exitCode: 0 };
 }
 

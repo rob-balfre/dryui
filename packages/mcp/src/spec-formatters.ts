@@ -35,6 +35,54 @@ export function getSubpathImport(name: string, def: ComponentDef): string | null
 	return `import { ${name} } from '${def.import}/${componentDir(name)}'`;
 }
 
+export function componentKind(def: ComponentDef): 'simple' | 'compound' | 'namespaced' {
+	if (!def.compound) return 'simple';
+	return def.parts?.Root ? 'compound' : 'namespaced';
+}
+
+export function getRequiredParts(name: string, def: ComponentDef): string[] {
+	if (!def.compound) return [];
+
+	const required = new Set<string>();
+
+	for (const node of def.structure?.tree ?? []) {
+		const match = node.trim().match(new RegExp(`^${name}\\.([A-Za-z0-9]+)$`));
+		if (match?.[1]) {
+			required.add(match[1]);
+		}
+	}
+
+	if (required.size > 0) {
+		return [...required];
+	}
+
+	if (def.parts?.Root) {
+		return ['Root'];
+	}
+
+	return Object.keys(def.parts ?? {});
+}
+
+export function getBindableProps(def: ComponentDef): string[] {
+	const bindables = new Set<string>();
+
+	for (const [propName, propDef] of Object.entries(def.props ?? {})) {
+		if (propDef.bindable) {
+			bindables.add(propName);
+		}
+	}
+
+	for (const [partName, partDef] of Object.entries(def.parts ?? {})) {
+		for (const [propName, propDef] of Object.entries(partDef.props ?? {})) {
+			if (propDef.bindable) {
+				bindables.add(`${partName}.${propName}`);
+			}
+		}
+	}
+
+	return [...bindables];
+}
+
 export function findComponent(
 	query: string,
 	components: Record<string, ComponentDef>
@@ -134,17 +182,19 @@ export function formatStructure(name: string, def: ComponentDef): string[] {
 
 export function formatCompound(name: string, def: ComponentDef): string {
 	const lines: string[] = [];
+	const requiredParts = getRequiredParts(name, def);
+	const bindables = getBindableProps(def);
 	lines.push(`${name} — ${def.description}`);
 	lines.push(`Category: ${def.category} | Tags: ${def.tags.join(', ')}`);
 	lines.push(`Root import: import { ${name} } from '${def.import}'`);
 	const subpath = getSubpathImport(name, def);
 	if (subpath) lines.push(`Subpath import: ${subpath}`);
-	const hasRoot = Boolean(def.parts?.Root);
-	lines.push(
-		hasRoot
-			? `Compound: yes (use ${name}.Root, not ${name})`
-			: `Namespace: yes (parts are used directly; no ${name}.Root wrapper)`
-	);
+	const kind = componentKind(def);
+	const hasRoot = kind === 'compound';
+	lines.push(`Kind: ${kind}`);
+	lines.push(`Required parts: ${requiredParts.length ? requiredParts.join(', ') : 'none'}`);
+	lines.push(`Bindable props: ${bindables.length ? bindables.join(', ') : 'none'}`);
+	lines.push(hasRoot ? `Use ${name}.Root, not ${name}` : `Use parts directly; there is no ${name}.Root wrapper`);
 	if (hasRoot) {
 		lines.push('');
 		lines.push('Required structure:');
@@ -171,7 +221,7 @@ export function formatCompound(name: string, def: ComponentDef): string {
 	lines.push(...formatA11yNotes(def.a11y));
 	if (def.example) {
 		lines.push('');
-		lines.push('Example:');
+		lines.push('Canonical usage:');
 		lines.push(indent(def.example, 2));
 	}
 	return lines.join('\n');
@@ -179,11 +229,15 @@ export function formatCompound(name: string, def: ComponentDef): string {
 
 export function formatSimple(name: string, def: ComponentDef): string {
 	const lines: string[] = [];
+	const bindables = getBindableProps(def);
 	lines.push(`${name} — ${def.description}`);
 	lines.push(`Category: ${def.category} | Tags: ${def.tags.join(', ')}`);
 	lines.push(`Root import: import { ${name} } from '${def.import}'`);
 	const subpath = getSubpathImport(name, def);
 	if (subpath) lines.push(`Subpath import: ${subpath}`);
+	lines.push(`Kind: ${componentKind(def)}`);
+	lines.push('Required parts: none');
+	lines.push(`Bindable props: ${bindables.length ? bindables.join(', ') : 'none'}`);
 	lines.push('');
 	lines.push('Props:');
 	if (def.props && Object.keys(def.props).length > 0) {
@@ -209,9 +263,8 @@ export function formatSimple(name: string, def: ComponentDef): string {
 	lines.push(...formatA11yNotes(def.a11y));
 	if (def.example) {
 		lines.push('');
-		lines.push('Example:');
+		lines.push('Canonical usage:');
 		lines.push(indent(def.example, 2));
 	}
 	return lines.join('\n');
 }
-

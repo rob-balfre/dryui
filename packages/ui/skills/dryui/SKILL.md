@@ -31,6 +31,8 @@ Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`.
 <!-- Right --> <Card.Root>content</Card.Root>
 ```
 
+Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionSwatchGroup, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree and Typography.
+
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the full list and parts reference.
 
 ## 3. Let the Theme Do Its Job
@@ -152,6 +154,13 @@ Always verify with `info`, but these are the most common mistakes:
 ## Tools
 
 Use these to look up APIs, discover components, plan setup, and validate code.
+
+### Recommended workflow
+
+1. `compose` or `info` before writing components so you confirm kind, required parts, bindables, and canonical usage.
+2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
+3. `review` or `doctor` after implementation to catch composition drift, layout violations, and accessibility regressions.
+4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
 ### MCP tools (preferred)
 

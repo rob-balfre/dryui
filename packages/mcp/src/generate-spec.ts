@@ -893,25 +893,10 @@ const PROP_NOTES: Record<string, string> = {
 		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
 	'DatePicker.Root.name':
 		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
-	'Flex.align': 'Maps to align-items.',
-	'Flex.direction': 'Maps to flex-direction.',
-	'Flex.gap': 'Uses DryUI spacing scale tokens, not raw CSS units.',
-	'Flex.justify': 'Maps to justify-content.',
-	'Flex.wrap': 'Maps to flex-wrap.',
-	'Grid.breakpoints':
-		'Container-query overrides applied to the inner grid element. Each breakpoint pairs a when clause with CSS custom properties to override.',
-	'Grid.name':
-		'Optional container name used for generated @container rules when you need to reference this Grid explicitly.',
-	'Grid.vars':
-		'Applies CSS custom properties to the inner grid element. Use this when building the variable map in script instead of writing --dry-grid-* attributes inline.',
 	'NumberInput.size':
 		'Adjusts input density and its default maximum width for compact counter-style fields.',
 	'Select.Root.name':
 		'Adds a hidden input so the selected value participates in native form submission.',
-	'Stack.align': 'Maps to align-items for the stack container.',
-	'Stack.direction':
-		'Controls whether items stack vertically or horizontally. Also accepts row and column aliases.',
-	'Stack.gap': 'Uses DryUI spacing scale tokens, not raw CSS units.',
 	'Stepper.Root.activeStep': 'Bindable current step index for controlled multi-step flows.',
 	'Text.color':
 		'Use muted or secondary for supporting copy without reaching for inline color styles.',
@@ -971,12 +956,6 @@ const PROP_DESCRIPTIONS: Record<string, string> = {
 	'Dialog.Content.children': 'Main dialog surface content rendered inside the modal.',
 	'Dialog.Root.open': 'Controls whether the dialog is currently shown.',
 	'Dialog.Trigger.children': 'Interactive element that opens the dialog.',
-	'Grid.breakpoints':
-		'List of container-query rules that override --dry-grid-* variables when the Grid container matches the supplied condition.',
-	'Grid.name':
-		'Optional container name assigned to the Grid when you need named @container queries.',
-	'Grid.vars':
-		'CSS custom properties applied to the inner grid node, typically used for --dry-grid-columns, --dry-grid-gap, and related layout variables.',
 	'Input.size': 'Input density preset for compact, default, or spacious form layouts.',
 	'Input.type': 'Native input type such as text, email, password, or search.',
 	'Input.value': 'Bindable text value for controlled input usage.',

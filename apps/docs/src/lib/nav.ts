@@ -87,6 +87,7 @@ export const categories: NavCategory[] = [
 			ui('QRCode'),
 			ui('RelativeTime'),
 			ui('Sparkline'),
+			ui('Tag'),
 			ui('Table'),
 			ui('Text'),
 			ui('Timeline'),
@@ -114,9 +115,11 @@ export const categories: NavCategory[] = [
 	{
 		label: 'Input',
 		items: [
+			ui('AlphaSlider'),
 			ui('Checkbox'),
 			ui('ColorPicker'),
 			ui('CountrySelect'),
+			ui('DropZone'),
 			ui('FileSelect'),
 			ui('FileUpload'),
 			ui('Input'),
@@ -130,6 +133,7 @@ export const categories: NavCategory[] = [
 			ui('Rating'),
 			ui('RichTextEditor'),
 			ui('Slider'),
+			ui('StarRating'),
 			ui('TagsInput'),
 			ui('Textarea'),
 			ui('Transfer')

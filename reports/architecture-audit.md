@@ -4,12 +4,12 @@
 
 | Metric | Count |
 | --- | ---: |
-| Primitive component nodes | 148 |
+| Primitive component nodes | 145 |
 | UI component nodes | 144 |
 | UI wrappers | 130 |
 | UI composites | 14 |
 | Compound parts | 662 |
-| Mismatch count | 23 |
+| Mismatch count | 16 |
 | PrimitivePart components | 0 |
 | Thin wrapper count | 64 |
 
@@ -17,7 +17,7 @@
 
 ```mermaid
 flowchart LR
-  p_root["Primitives root: 148"]
+  p_root["Primitives root: 145"]
   u_wrap["UI wrappers: 130"]
   u_comp["UI composites: 14"]
   audit["Audit clusters: 0"]
@@ -52,35 +52,27 @@ No findings in this bucket.
 - UI subpath-only exports: none.
 - Primitive subpath-only exports: `UseThemeOverride`.
 - UI exports missing spec metadata: none.
-- Primitive exports missing spec metadata: `AffixGroup`, `AppFrame`, `AvatarGroup`, `ChatMessage`, `EmptyState`, `Flex`, `Footer`, `Grid`, `Hero`, `LogoCloud`, `PageHeader`, `SelectableTileGroup`, `Stack`, `StatCard`, `Surface`, `User`, `UseThemeOverride`, `WaveDivider`.
-- Docs nav missing components: `AlphaSlider`, `DropZone`, `StarRating`, `Tag`.
+- Primitive exports missing spec metadata: `AffixGroup`, `AppFrame`, `AvatarGroup`, `ChatMessage`, `EmptyState`, `Footer`, `Hero`, `LogoCloud`, `PageHeader`, `SelectableTileGroup`, `StatCard`, `Surface`, `User`, `UseThemeOverride`, `WaveDivider`.
+- Docs nav missing components: none.
 - Docs nav orphan entries: none.
 
 ## Mismatch Summary
 
-- `docs-nav-missing` in `docs`: 4
-- `spec-missing` in `primitives`: 18
+- `spec-missing` in `primitives`: 15
 - `subpath-only-export` in `primitives`: 1
 
 ## Priority Mismatches
 
-- `docs-nav-missing` on `AlphaSlider` in `docs` (packages/ui/src/alpha-slider/index.ts): Public UI export is missing from the docs component navigation.
-- `docs-nav-missing` on `DropZone` in `docs` (packages/ui/src/drop-zone/index.ts): Public UI export is missing from the docs component navigation.
-- `docs-nav-missing` on `StarRating` in `docs` (packages/ui/src/star-rating/index.ts): Public UI export is missing from the docs component navigation.
-- `docs-nav-missing` on `Tag` in `docs` (packages/ui/src/tag/index.ts): Public UI export is missing from the docs component navigation.
 - `spec-missing` on `AffixGroup` in `primitives` (packages/primitives/src/affix-group/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `AppFrame` in `primitives` (packages/primitives/src/app-frame/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `AvatarGroup` in `primitives` (packages/primitives/src/avatar-group/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `ChatMessage` in `primitives` (packages/primitives/src/chat-message/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `EmptyState` in `primitives` (packages/primitives/src/empty-state/index.ts): Public export exists without generated spec metadata.
-- `spec-missing` on `Flex` in `primitives` (packages/primitives/src/flex/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `Footer` in `primitives` (packages/primitives/src/footer/index.ts): Public export exists without generated spec metadata.
-- `spec-missing` on `Grid` in `primitives` (packages/primitives/src/grid/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `Hero` in `primitives` (packages/primitives/src/hero/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `LogoCloud` in `primitives` (packages/primitives/src/logo-cloud/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `PageHeader` in `primitives` (packages/primitives/src/page-header/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `SelectableTileGroup` in `primitives` (packages/primitives/src/selectable-tile-group/index.ts): Public export exists without generated spec metadata.
-- `spec-missing` on `Stack` in `primitives` (packages/primitives/src/stack/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `StatCard` in `primitives` (packages/primitives/src/stat-card/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `Surface` in `primitives` (packages/primitives/src/surface/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `User` in `primitives` (packages/primitives/src/user/index.ts): Public export exists without generated spec metadata.

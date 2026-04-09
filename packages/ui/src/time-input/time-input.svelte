@@ -1,7 +1,11 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import { getFormControlCtx } from '@dryui/primitives';
 	import { Select } from '../select/index.js';
+
+	type TimeParts = {
+		hour: string;
+		minute: string;
+	};
 
 	interface Props {
 		value?: string;
@@ -23,38 +27,43 @@
 
 	const ctx = getFormControlCtx();
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
+	const hasError = $derived(ctx?.hasError || false);
+	const describedBy = $derived(ctx?.describedBy);
+	const errorMessageId = $derived(ctx?.hasError ? ctx?.errorMessageId : undefined);
 
-	let hourStr = $state('');
-	let minuteStr = $state('');
-	let updating = false;
+	function parseTime(nextValue: string): TimeParts {
+		const [hour = '', minute = ''] = nextValue.split(':');
+		return { hour, minute };
+	}
 
-	// Parse incoming value into hour/minute (only reacts to value changes)
-	$effect(() => {
-		if (updating) return;
-		const parts = value.split(':');
-		const h = parts[0] ?? '';
-		const m = parts[1] ?? '';
-		untrack(() => {
-			if (h !== hourStr) hourStr = h;
-			if (m !== minuteStr) minuteStr = m;
-		});
-	});
+	let draftHour = $state('');
+	let draftMinute = $state('');
 
-	// Reconstruct value when selects change (only reacts to hourStr/minuteStr)
-	$effect(() => {
-		const h = hourStr;
-		const m = minuteStr;
-		if (h && m) {
-			const newVal = `${h}:${m}`;
-			untrack(() => {
-				if (newVal !== value) {
-					updating = true;
-					value = newVal;
-					updating = false;
-				}
-			});
+	const parsedValue = $derived.by(() => parseTime(value));
+	const hourStr = $derived(value ? parsedValue.hour : draftHour);
+	const minuteStr = $derived(value ? parsedValue.minute : draftMinute);
+
+	function setTime(nextHour: string, nextMinute: string) {
+		draftHour = nextHour;
+		draftMinute = nextMinute;
+
+		if (nextHour && nextMinute) {
+			value = `${nextHour}:${nextMinute}`;
+			draftHour = '';
+			draftMinute = '';
+			return;
 		}
-	});
+
+		value = '';
+	}
+
+	function setHour(nextHour: string) {
+		setTime(nextHour, minuteStr);
+	}
+
+	function setMinute(nextMinute: string) {
+		setTime(hourStr, nextMinute);
+	}
 
 	// Generate hour options 00-23
 	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
@@ -75,12 +84,17 @@
 	data-time-input-wrapper
 	data-disabled={isDisabled || undefined}
 	id={ctx?.id}
-	aria-describedby={[ctx?.describedBy, ctx?.hasError ? ctx?.errorMessageId : undefined].filter(Boolean).join(' ') || undefined}
-	aria-invalid={ctx?.hasError || undefined}
+	aria-describedby={describedBy}
 	class={className}
 >
-	<Select.Root bind:value={hourStr} disabled={isDisabled}>
-		<Select.Trigger {size} aria-label="Hour">
+	<Select.Root bind:value={() => hourStr, setHour} disabled={isDisabled}>
+		<Select.Trigger
+			{size}
+			aria-label="Hour"
+			aria-describedby={describedBy}
+			aria-invalid={hasError || undefined}
+			aria-errormessage={errorMessageId}
+		>
 			<span data-time-display data-placeholder={!hourStr ? '' : undefined}>
 				{hourStr || 'HH'}
 			</span>
@@ -94,8 +108,14 @@
 
 	<span data-time-separator>:</span>
 
-	<Select.Root bind:value={minuteStr} disabled={isDisabled}>
-		<Select.Trigger {size} aria-label="Minute">
+	<Select.Root bind:value={() => minuteStr, setMinute} disabled={isDisabled}>
+		<Select.Trigger
+			{size}
+			aria-label="Minute"
+			aria-describedby={describedBy}
+			aria-invalid={hasError || undefined}
+			aria-errormessage={errorMessageId}
+		>
 			<span data-time-display data-placeholder={!minuteStr ? '' : undefined}>
 				{minuteStr || 'MM'}
 			</span>

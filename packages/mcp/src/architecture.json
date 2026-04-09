@@ -1,23 +1,23 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "0.1.12",
+  "packageVersion": "0.1.11",
   "summary": {
-    "componentNodes": 292,
+    "componentNodes": 289,
     "partNodes": 662,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 148,
+    "primitiveComponents": 145,
     "uiComponents": 144,
     "uiWrappers": 130,
     "uiComposites": 14,
-    "rootBarrelComponents": 291,
+    "rootBarrelComponents": 288,
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
     "composeEdges": 11,
     "docsEdges": 0,
     "relatedEdges": 303,
-    "mismatches": 23,
+    "mismatches": 16,
     "primitivePartComponents": 0,
     "thinWrappers": 64
   },
@@ -3422,25 +3422,6 @@
       "parts": []
     },
     {
-      "id": "primitives:Flex",
-      "name": "Flex",
-      "label": "Flex",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "uncategorized",
-      "description": "Flex is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/primitives/src/flex/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 2,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
       "id": "primitives:FlipCard",
       "name": "FlipCard",
       "label": "FlipCard",
@@ -3890,25 +3871,6 @@
       "compound": false,
       "parts": [],
       "sourceFileCount": 2,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "primitives:Grid",
-      "name": "Grid",
-      "label": "Grid",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "uncategorized",
-      "description": "Grid is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/primitives/src/grid/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -6834,25 +6796,6 @@
         "surface",
         "motion"
       ],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 2,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "primitives:Stack",
-      "name": "Stack",
-      "label": "Stack",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "uncategorized",
-      "description": "Stack is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/primitives/src/stack/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [],
       "compound": false,
       "parts": [],
       "sourceFileCount": 2,
@@ -24142,34 +24085,6 @@
   "clusters": [],
   "mismatches": [
     {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "AlphaSlider",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/alpha-slider/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "DropZone",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/drop-zone/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "StarRating",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/star-rating/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "Tag",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/tag/index.ts"
-    },
-    {
       "kind": "spec-missing",
       "package": "primitives",
       "component": "AffixGroup",
@@ -24207,23 +24122,9 @@
     {
       "kind": "spec-missing",
       "package": "primitives",
-      "component": "Flex",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/primitives/src/flex/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "primitives",
       "component": "Footer",
       "detail": "Public export exists without generated spec metadata.",
       "sourcePath": "packages/primitives/src/footer/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "primitives",
-      "component": "Grid",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/primitives/src/grid/index.ts"
     },
     {
       "kind": "spec-missing",
@@ -24252,13 +24153,6 @@
       "component": "SelectableTileGroup",
       "detail": "Public export exists without generated spec metadata.",
       "sourcePath": "packages/primitives/src/selectable-tile-group/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "primitives",
-      "component": "Stack",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/primitives/src/stack/index.ts"
     },
     {
       "kind": "spec-missing",
@@ -24382,30 +24276,22 @@
       "AvatarGroup",
       "ChatMessage",
       "EmptyState",
-      "Flex",
       "Footer",
-      "Grid",
       "Hero",
       "LogoCloud",
       "PageHeader",
       "SelectableTileGroup",
-      "Stack",
       "StatCard",
       "Surface",
       "User",
       "UseThemeOverride",
       "WaveDivider"
     ],
-    "docsNavMissing": [
-      "AlphaSlider",
-      "DropZone",
-      "StarRating",
-      "Tag"
-    ],
+    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 148\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 14\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 14\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

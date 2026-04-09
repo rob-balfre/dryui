@@ -367,25 +367,22 @@ describe('Structural (warnings)', () => {
 });
 
 describe('Dogfooding Warnings', () => {
-	test('warns on custom CSS grid layout', () => {
+	test('does not warn on custom CSS grid layout', () => {
 		const code = `<div class="grid-wrapper">content</div>
 <style>
   .grid-wrapper { display: grid; grid-template-columns: 1fr 1fr; }
 </style>`;
 		const result = reviewComponent(code, mockSpec);
-		const issue = result.issues.find((i) => i.code === 'use-grid-component');
-		expect(issue).toBeDefined();
-		expect(issue!.severity).toBe('warning');
-		expect(issue!.message).toContain('<Grid>');
+		expect(result.issues.some((i) => i.code === 'use-grid-component')).toBe(false);
 	});
 
-	test('warns on display:grid without space', () => {
+	test('does not warn on display:grid without space', () => {
 		const code = `<div class="g">content</div>
 <style>
   .g { display:grid; }
 </style>`;
 		const result = reviewComponent(code, mockSpec);
-		expect(result.issues.some((i) => i.code === 'use-grid-component')).toBe(true);
+		expect(result.issues.some((i) => i.code === 'use-grid-component')).toBe(false);
 	});
 
 	test('warns on custom CSS flex layout', () => {
@@ -394,11 +391,11 @@ describe('Dogfooding Warnings', () => {
   .row { display: flex; gap: 8px; }
 </style>`;
 		const result = reviewComponent(code, mockSpec);
-		const issue = result.issues.find((i) => i.code === 'use-flex-component');
+		const issue = result.issues.find((i) => i.code === 'prefer-grid-layout');
 		expect(issue).toBeDefined();
 		expect(issue!.severity).toBe('warning');
-		expect(issue!.message).toContain('<Flex>');
-		expect(issue!.message).toContain('<Stack>');
+		expect(issue!.message).toContain('scoped CSS grid');
+		expect(issue!.fix).toBe('display: grid');
 	});
 
 	test('warns on class="field" custom field markup', () => {
@@ -479,8 +476,7 @@ describe('Dogfooding Warnings', () => {
 </Card.Root>`;
 		const result = reviewComponent(code, mockSpec);
 		const dogfoodCodes = [
-			'use-grid-component',
-			'use-flex-component',
+			'prefer-grid-layout',
 			'use-field-component',
 			'use-button-component',
 			'use-container-component'
@@ -490,7 +486,7 @@ describe('Dogfooding Warnings', () => {
 });
 
 describe('Style Suggestions', () => {
-	test('suggests Flex/Stack for manual flex', () => {
+	test('does not add a second flex suggestion for manual flex', () => {
 		const code = `<script>
   import { Button } from '@dryui/ui';
 </script>
@@ -499,9 +495,9 @@ describe('Style Suggestions', () => {
   .row { display: flex; gap: 8px; }
 </style>`;
 		const result = reviewComponent(code, mockSpec);
-		expect(
-			result.issues.some((i) => i.severity === 'suggestion' && i.message.includes('flex'))
-		).toBe(true);
+		expect(result.issues.some((i) => i.severity === 'suggestion' && i.message.includes('flex'))).toBe(
+			false
+		);
 	});
 
 	test('suggests Separator for raw hr', () => {

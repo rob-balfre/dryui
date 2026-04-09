@@ -53,7 +53,8 @@
 		{ label: 'Theme Wizard', href: withBase('/theme-wizard'), icon: Palette },
 		{ label: 'Tools', href: withBase('/tools'), icon: Wrench },
 		{ label: 'Changelog', href: withBase('/changelog'), icon: FileText },
-		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid3x3 }
+		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid3x3 },
+		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: FileText }
 	];
 </script>
 

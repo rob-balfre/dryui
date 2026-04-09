@@ -2,10 +2,12 @@
 // Used by both @dryui/mcp (tool + prompt handlers) and @dryui/cli (compose command).
 
 import type {
+	ComponentDef,
 	CompositionComponentDef,
 	CompositionRecipeDef,
 	Spec
 } from './spec-types.js';
+import { componentKind, getBindableProps, getRequiredParts } from './spec-formatters.js';
 
 export interface CompositionSearchResult {
 	readonly componentMatches: readonly CompositionComponentDef[];
@@ -122,7 +124,10 @@ export function searchComposition(
  * Format composition search results as human-readable text.
  * Used by MCP prompts and CLI text mode.
  */
-export function formatCompositionResult(results: CompositionSearchResult): string {
+export function formatCompositionResult(
+	results: CompositionSearchResult,
+	components: Record<string, ComponentDef>
+): string {
 	const lines: string[] = [];
 
 	for (const comp of results.componentMatches) {
@@ -133,6 +138,21 @@ export function formatCompositionResult(results: CompositionSearchResult): strin
 
 		for (const alt of comp.alternatives) {
 			lines.push(`  ${alt.rank}. ${alt.component} (${alt.useWhen})`);
+			const spec = components[alt.component];
+			if (spec) {
+				const requiredParts = getRequiredParts(alt.component, spec);
+				const bindables = getBindableProps(spec);
+				lines.push(
+					`     API: ${componentKind(spec)} | Required parts: ${requiredParts.length ? requiredParts.join(', ') : 'none'} | Bindables: ${bindables.length ? bindables.join(', ') : 'none'}`
+				);
+				lines.push('     Canonical usage:');
+				lines.push(
+					spec.example
+						.split('\n')
+						.map((line) => `       ${line}`)
+						.join('\n')
+				);
+			}
 			lines.push(
 				alt.snippet
 					.split('\n')

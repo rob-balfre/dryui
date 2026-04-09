@@ -47,11 +47,10 @@
 	const isDisabled = $derived(disabled || formCtx?.disabled || false);
 	const hasError = $derived(formCtx?.hasError || false);
 
-	let inputEl: HTMLInputElement | undefined = $state();
+	let inputEl: HTMLInputElement | undefined;
 	let isFocused = $state(false);
 	let mirrorSelectionStart = $state<number | null>(null);
 	let mirrorSelectionEnd = $state<number | null>(null);
-	let completeFired = $state(false);
 
 	const validationRegex = $derived(pattern ?? (type === 'numeric' ? /^\d+$/ : /^[a-zA-Z0-9]+$/));
 
@@ -98,24 +97,28 @@
 		mirrorSelectionEnd = inputEl.selectionEnd;
 	}
 
-	$effect(() => {
-		const handler = () => {
-			if (document.activeElement === inputEl) {
-				syncSelection();
+	function captureInput(node: HTMLInputElement) {
+		inputEl = node;
+		return () => {
+			if (inputEl === node) {
+				inputEl = undefined;
 			}
 		};
-		document.addEventListener('selectionchange', handler);
-		return () => document.removeEventListener('selectionchange', handler);
-	});
+	}
 
-	$effect(() => {
-		if (value.length < length) {
-			completeFired = false;
+	function maybeFireComplete(previousValue: string, nextValue: string) {
+		if (nextValue.length !== length) return;
+		if (previousValue.length === length && previousValue === nextValue) return;
+
+		oncomplete?.(nextValue);
+		if (blurOnComplete) {
+			inputEl?.blur();
 		}
-	});
+	}
 
 	function handleInput(e: Event) {
 		const input = e.target as HTMLInputElement;
+		const previousValue = value;
 		let newValue = input.value;
 
 		newValue = newValue
@@ -126,18 +129,12 @@
 		newValue = newValue.slice(0, length);
 		value = newValue;
 		syncSelection();
-
-		if (newValue.length === length && !completeFired) {
-			completeFired = true;
-			oncomplete?.(newValue);
-			if (blurOnComplete) {
-				inputEl?.blur();
-			}
-		}
+		maybeFireComplete(previousValue, newValue);
 	}
 
 	function handlePaste(e: ClipboardEvent) {
 		e.preventDefault();
+		const previousValue = value;
 		let pasted = e.clipboardData?.getData('text') ?? '';
 		if (pasteTransformer) {
 			pasted = pasteTransformer(pasted);
@@ -166,13 +163,7 @@
 			syncSelection();
 		});
 
-		if (newValue.length === length && !completeFired) {
-			completeFired = true;
-			oncomplete?.(newValue);
-			if (blurOnComplete) {
-				inputEl?.blur();
-			}
-		}
+		maybeFireComplete(previousValue, newValue);
 	}
 
 	function handleFocus() {
@@ -212,13 +203,10 @@
 	const sizeAttr = $derived(`data-pin-input-${size}`);
 </script>
 
-<!-- svelte-ignore a11y_role_supports_aria_props -->
 <div
 	role="group"
 	aria-label="PIN input"
 	aria-describedby={formCtx?.describedBy}
-	aria-invalid={hasError || undefined}
-	aria-errormessage={formCtx?.errorMessageId}
 	data-pin-input-root
 	data-disabled={isDisabled || undefined}
 	data-error={hasError || undefined}
@@ -230,7 +218,7 @@
 	{...rest}
 >
 	<input
-		bind:this={inputEl}
+		{@attach captureInput}
 		type="text"
 		inputmode={type === 'numeric' ? 'numeric' : 'text'}
 		autocomplete="one-time-code"
@@ -238,6 +226,9 @@
 		{value}
 		id={formCtx?.id}
 		aria-label="PIN input"
+		aria-describedby={formCtx?.describedBy}
+		aria-invalid={hasError || undefined}
+		aria-errormessage={formCtx?.errorMessageId}
 		aria-required={formCtx?.required || undefined}
 		disabled={isDisabled}
 		spellcheck={false}
@@ -247,6 +238,8 @@
 		onfocus={handleFocus}
 		onblur={handleBlur}
 		onkeydown={handleKeydown}
+		onkeyup={syncSelection}
+		onselect={syncSelection}
 	/>
 
 	{#if userChildren}

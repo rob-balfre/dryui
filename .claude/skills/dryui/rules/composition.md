@@ -402,13 +402,62 @@ Call `compose` with any recipe name to get a full working snippet.
 | `data-table-with-actions` | Table with header actions | Table, Badge, Avatar, Button           |
 | `checkout-flow`           | Multi-step checkout       | Stepper, Card, Field, RadioGroup       |
 | `hotel-listing-card`      | Product/listing card      | Card, Image, Badge, Button, Text       |
-| `stat-card-grid`          | KPI dashboard cards       | Grid, StatCard, Chart, Sparkline       |
+| `stat-card-grid`          | KPI dashboard cards       | StatCard, Chart, Sparkline, Container  |
 | `settings-page`           | Settings with tabs        | Tabs, Card, Field, Input, Select       |
 | `form-with-validation`    | Form with error handling  | Card, Field, Label, Input, Field.Error |
-| `sidebar-layout`          | Page with sidebar nav     | Grid, Sidebar, PageHeader              |
-| `dashboard-page`          | Full dashboard layout     | Grid, Sidebar, StatCard, Chart, Table  |
+| `sidebar-layout`          | Page with sidebar nav     | Sidebar, PageHeader, Container         |
+| `dashboard-page`          | Full dashboard layout     | Sidebar, StatCard, Chart, Table        |
 | `user-profile-card`       | User info card            | Card, Avatar, Text, Badge, Button      |
 | `notification-list`       | Notification feed         | Card, Avatar, Text, Badge              |
 | `command-bar`             | Command palette trigger   | CommandPalette, Hotkey                 |
 | `file-upload-form`        | File upload with progress | Card, FileUpload, Progress, Button     |
 | `pricing-table`           | Pricing comparison        | Card, Text, Button, Badge              |
+
+## State-heavy form flows
+
+DryUI is a presentation and accessibility system, not a workflow engine. For dependent-field planners, approvals, and booking-style state machines:
+
+- Normalize route/session state in script before rendering DryUI inputs.
+- Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
+- Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
+- Run `compose` or `info` before introducing a new field shape, then run `review` or `doctor` after the flow is wired.
+
+```svelte
+<script lang="ts">
+  let country = $state('');
+  let airport = $state('');
+
+  const airportOptions = $derived(getAirports(country));
+
+  $effect(() => {
+    if (!airportOptions.some((option) => option.value === airport)) {
+      airport = '';
+    }
+  });
+</script>
+
+<div class="planner">
+  <Field.Root>
+    <Label>Country</Label>
+    <Select.Root bind:value={country}>
+      <Select.Trigger><Select.Value placeholder="Choose country" /></Select.Trigger>
+      <Select.Content>{/* items */}</Select.Content>
+    </Select.Root>
+  </Field.Root>
+
+  <Field.Root>
+    <Label>Airport</Label>
+    <Select.Root bind:value={airport} disabled={!country}>
+      <Select.Trigger><Select.Value placeholder="Choose airport" /></Select.Trigger>
+      <Select.Content>{/* filtered items */}</Select.Content>
+    </Select.Root>
+  </Field.Root>
+</div>
+
+<style>
+  .planner {
+    display: grid;
+    gap: var(--dry-space-4);
+  }
+</style>
+```

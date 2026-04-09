@@ -268,17 +268,19 @@ export const GENERATED_LAYOUT_LIBRARY = [
 			{
 				section: 'Content',
 				type: 'grid',
-				label: 'Grid',
-				description: 'CSS grid layout with uniform column control',
+				label: 'CSS Grid Layout',
+				description:
+					'Scoped CSS grid layout for repeated cards, columns, and responsive sections.',
 				sourceKind: 'component',
-				sourceId: 'Grid',
-				sourceName: 'Grid',
+				sourceId: 'Container',
+				sourceName: 'Container',
 				sourceLabel: 'Component',
 				sourceImport: '@dryui/ui',
 				routePath: null,
-				tags: ['layout', 'grid', 'columns', 'responsive', 'cards'],
-				structure: '`<Grid />`',
-				guidance: 'CSS grid layout with uniform column control'
+				tags: ['layout', 'grid', 'columns', 'responsive', 'cards', 'container'],
+				structure: '`<Container><div class="grid">...</div></Container>`',
+				guidance:
+					'Use scoped CSS grid for columns or repeated cards. Wrap with Container only when the layout needs constrained width.'
 			},
 			{
 				section: 'Content',

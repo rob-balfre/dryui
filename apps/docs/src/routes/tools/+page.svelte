@@ -5,6 +5,7 @@
 		CodeBlock,
 		Badge,
 		Heading,
+		Link,
 		Separator,
 		Tabs,
 		Text
@@ -13,6 +14,7 @@
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import DocsSectionIntro from '$lib/components/DocsSectionIntro.svelte';
 	import DocsCallout from '$lib/components/DocsCallout.svelte';
+	import { withBase } from '$lib/utils';
 
 	const setupCommands = ['init', 'detect', 'install'];
 	const discoveryCommands = ['list', 'info', 'compose', 'add', 'get'];
@@ -115,6 +117,47 @@
 
 		<Separator />
 
+		<div class="stack-lg">
+			<DocsSectionIntro
+				id="workflow"
+				title="Recommended workflow"
+				description="The stable path is lookup first, implementation second, validation third."
+			/>
+
+			<div class="item-grid">
+				<Card.Root>
+					<Card.Content>
+						<div class="stack-sm">
+							<Text size="lg" weight="medium">Lookup first</Text>
+							<Text size="sm" color="secondary">
+								Run <code>compose</code> or <code>info</code> before writing a component so you confirm
+								simple vs compound shape, required parts, bindables, and canonical usage.
+							</Text>
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<Card.Root>
+					<Card.Content>
+						<div class="stack-sm">
+							<Text size="lg" weight="medium">Validate after implementation</Text>
+							<Text size="sm" color="secondary">
+								Run <code>review</code> on the changed component or <code>doctor</code> on the workspace to catch
+								layout drift, accessibility issues, and stale guesses early.
+							</Text>
+						</div>
+					</Card.Content>
+				</Card.Root>
+			</div>
+
+			<DocsCallout title="Migration workflow" variant="info">
+				See the <Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the layout
+				baseline and the dependent-field planner pattern.
+			</DocsCallout>
+		</div>
+
+		<Separator />
+
 		<!-- CLI usage -->
 		<div class="stack-lg">
 			<DocsSectionIntro
@@ -129,7 +172,7 @@
 				</Card.Content>
 			</Card.Root>
 
-			{#each groups as group}
+			{#each groups as group (group.label)}
 				<div class="stack-md">
 					<Text size="lg" weight="medium">{group.label}</Text>
 					<div class="item-grid">

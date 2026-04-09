@@ -2997,7 +2997,7 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		antiPatterns: [
 			{
-				pattern: 'Flex with buttons for toolbar',
+				pattern: 'Manual toolbar row with buttons',
 				reason: 'Toolbar provides ARIA toolbar role and keyboard arrow navigation',
 				fix: 'Toolbar'
 			}
@@ -4413,7 +4413,7 @@ export const componentCompositions: ComponentComposition[] = [
 				pattern: 'multiple inputs inside one AffixGroup.Root',
 				reason:
 					'The group is designed for one primary field with attached accessories, not a form grid',
-				fix: 'Use separate groups or a full layout component'
+				fix: 'Use separate groups or a scoped CSS grid wrapper'
 			}
 		],
 		combinesWith: ['Field.Root', 'Label', 'Button']
@@ -4894,7 +4894,7 @@ export const compositionRecipes: CompositionRecipe[] = [
 	{
 		name: 'search-form',
 		description:
-			'Horizontal search bar pattern: fields in a responsive Grid inside a Card. Adjust the column count to match your field count.',
+			'Horizontal search bar pattern: fields in a responsive CSS grid inside a Card. Adjust the column count to match your field count.',
 		tags: ['search', 'form', 'filter', 'horizontal'],
 		components: ['Card', 'Field', 'Label', 'Input', 'Button'],
 		snippet: `<!-- Pattern: horizontal form in a Card. Adjust columns to match field count. -->

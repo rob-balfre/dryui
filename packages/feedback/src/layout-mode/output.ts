@@ -257,7 +257,7 @@ function formatSuggestedImplementation(placements: readonly DesignPlacement[]): 
 			['card', 'productCard', 'testimonial', 'feature', 'pricing'].includes(placement.type)
 		) {
 			output +=
-				'  - Layout: use `Grid` or `Stack` to manage repeated items instead of manual absolute positioning.\n';
+				'  - Layout: use a scoped CSS grid with tokenized gaps to manage repeated items instead of manual absolute positioning.\n';
 		}
 	}
 
@@ -270,18 +270,18 @@ function formatSuggestedImplementation(placements: readonly DesignPlacement[]): 
 }
 
 function formatLayoutPrimitiveSuggestions(placements: readonly DesignPlacement[]): string {
-	let output = '\n### DryUI Layout Primitives\n';
+	let output = '\n### DryUI Layout Guidance\n';
 	const cards = placements.filter(
 		(placement) => placement.type === 'card' || placement.type === 'productCard'
 	);
 	const sidebar = placements.find((placement) => placement.type === 'sidebar');
 
 	if (sidebar) {
-		output += `- Use \`<Sidebar>\` or \`<Grid>\` for the rail-plus-content split. Equivalent CSS: \`grid-template-columns: ${Math.round(sidebar.width)}px 1fr;\`\n`;
+		output += `- Use CSS grid for the rail-plus-content split. Equivalent CSS: \`grid-template-columns: ${Math.round(sidebar.width)}px 1fr;\`\n`;
 	}
 
 	if (cards.length > 1 && cards[0]) {
-		output += `- Use \`<Grid>\` for repeated card tiles instead of manual card coordinates. Equivalent CSS: \`grid-template-columns: repeat(${cards.length}, ${Math.round(cards[0].width)}px); gap: 16px;\`\n`;
+		output += `- Use a scoped CSS grid for repeated card tiles instead of manual card coordinates. Equivalent CSS: \`grid-template-columns: repeat(${cards.length}, ${Math.round(cards[0].width)}px); gap: 16px;\`\n`;
 	}
 
 	if (placements.some((placement) => placement.type === 'navigation')) {
@@ -289,7 +289,7 @@ function formatLayoutPrimitiveSuggestions(placements: readonly DesignPlacement[]
 			'- Use a sticky `<nav>` for top-of-page chrome. Equivalent CSS: `position: sticky; top: 0; z-index: 50;`\n';
 	}
 
-	return output === '\n### DryUI Layout Primitives\n' ? '' : output;
+	return output === '\n### DryUI Layout Guidance\n' ? '' : output;
 }
 
 function formatParentContext(selector: string): string | null {
@@ -309,18 +309,18 @@ function formatParentDryUIHint(selector: string): string | null {
 	if (!context) return null;
 
 	if (context.parentDisplay === 'grid') {
-		return 'DryUI: prefer `Grid` so the section order is expressed in layout, not raw offsets.';
+		return 'DryUI: keep the section in scoped CSS grid so layout order lives in CSS, not raw offsets.';
 	}
 
 	if (context.parentDisplay === 'flex' && context.flexDirection === 'column') {
-		return 'DryUI: prefer `Stack` for vertical section ordering and spacing instead of manual y-offset changes.';
+		return 'DryUI: replace flex-column positioning with CSS grid rows and tokenized gaps instead of manual y-offset changes.';
 	}
 
 	if (context.parentDisplay === 'flex') {
-		return 'DryUI: prefer `Flex` for row alignment before reaching for manual x/y adjustments.';
+		return 'DryUI: replace flex-row positioning with CSS grid columns before reaching for manual x/y adjustments.';
 	}
 
-	return 'DryUI: consider `Container`, `Stack`, or a catalog block wrapper before hard-coding the section position.';
+	return 'DryUI: consider `Container` or a catalog block wrapper before hard-coding the section position.';
 }
 
 function getRearrangeChanges(state: RearrangeState, detailLevel: OutputDetail): RearrangeChange[] {
@@ -641,7 +641,7 @@ function formatCompositionHints(placements: DesignPlacement[]): string {
 		const typeCounts = new Map<string, number>();
 		for (const item of row.items) typeCounts.set(item.type, (typeCounts.get(item.type) ?? 0) + 1);
 		for (const [type, count] of typeCounts) {
-			if (count >= 3) hints.push(`${count}× **${type}** in a row — wrap with \`<Grid>\``);
+			if (count >= 3) hints.push(`${count}× **${type}** in a row — wrap with a scoped CSS grid`);
 		}
 	}
 	if (hints.length === 0) return '';
@@ -650,12 +650,12 @@ function formatCompositionHints(placements: DesignPlacement[]): string {
 	return out;
 }
 
-const LAYOUT_PRIMITIVES_FOOTER = `### DryUI layout primitives
+const LAYOUT_PRIMITIVES_FOOTER = `### DryUI layout baseline
 
-- \`<Stack>\` — vertical flex column with consistent gap
-- \`<Flex>\` — horizontal flex row with alignment control
-- \`<Grid>\` — responsive grid for repeated items or two-column layouts
-- \`<Container>\` — centered max-width content wrapper
+- \`<Container>\` — centered max-width content wrapper when a page needs constrained width
+- Scoped \`display: grid\` — default layout system for repeated items, rails, and page sections
+- \`@container\` — responsive layout queries tied to the component container instead of viewport media queries
+- \`--dry-space-*\` — spacing tokens for gaps and internal layout rhythm
 `;
 
 function routeFilePath(route: string): string {

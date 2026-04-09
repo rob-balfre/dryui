@@ -1,6 +1,6 @@
 {
   "name": "@dryui/primitives",
-  "version": "0.1.13",
+  "version": "0.1.10",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -266,11 +266,6 @@
       "svelte": "./src/file-upload/index.ts",
       "default": "./src/file-upload/index.ts"
     },
-    "./flex": {
-      "types": "./src/flex/index.ts",
-      "svelte": "./src/flex/index.ts",
-      "default": "./src/flex/index.ts"
-    },
     "./flip-card": {
       "types": "./src/flip-card/index.ts",
       "svelte": "./src/flip-card/index.ts",
@@ -330,11 +325,6 @@
       "types": "./src/gradient-mesh/index.ts",
       "svelte": "./src/gradient-mesh/index.ts",
       "default": "./src/gradient-mesh/index.ts"
-    },
-    "./grid": {
-      "types": "./src/grid/index.ts",
-      "svelte": "./src/grid/index.ts",
-      "default": "./src/grid/index.ts"
     },
     "./hero": {
       "types": "./src/hero/index.ts",
@@ -621,11 +611,6 @@
       "svelte": "./src/spotlight/index.ts",
       "default": "./src/spotlight/index.ts"
     },
-    "./stack": {
-      "types": "./src/stack/index.ts",
-      "svelte": "./src/stack/index.ts",
-      "default": "./src/stack/index.ts"
-    },
     "./stat-card": {
       "types": "./src/stat-card/index.ts",
       "svelte": "./src/stat-card/index.ts",
@@ -762,8 +747,8 @@
       "default": "./src/wave-divider/index.ts"
     },
     "./internal/motion": {
-      "types": "./dist/internal/motion.d.ts",
-      "default": "./dist/internal/motion.js"
+      "types": "./src/internal/motion.d.ts",
+      "default": "./src/internal/motion.ts"
     }
   },
   "publishConfig": {
@@ -1021,11 +1006,6 @@
         "svelte": "./dist/file-upload/index.js",
         "default": "./dist/file-upload/index.js"
       },
-      "./flex": {
-        "types": "./dist/flex/index.d.ts",
-        "svelte": "./dist/flex/index.js",
-        "default": "./dist/flex/index.js"
-      },
       "./flip-card": {
         "types": "./dist/flip-card/index.d.ts",
         "svelte": "./dist/flip-card/index.js",
@@ -1085,11 +1065,6 @@
         "types": "./dist/gradient-mesh/index.d.ts",
         "svelte": "./dist/gradient-mesh/index.js",
         "default": "./dist/gradient-mesh/index.js"
-      },
-      "./grid": {
-        "types": "./dist/grid/index.d.ts",
-        "svelte": "./dist/grid/index.js",
-        "default": "./dist/grid/index.js"
       },
       "./hero": {
         "types": "./dist/hero/index.d.ts",
@@ -1375,11 +1350,6 @@
         "types": "./dist/spotlight/index.d.ts",
         "svelte": "./dist/spotlight/index.js",
         "default": "./dist/spotlight/index.js"
-      },
-      "./stack": {
-        "types": "./dist/stack/index.d.ts",
-        "svelte": "./dist/stack/index.js",
-        "default": "./dist/stack/index.js"
       },
       "./stat-card": {
         "types": "./dist/stat-card/index.d.ts",

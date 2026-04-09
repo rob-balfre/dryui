@@ -542,35 +542,18 @@ function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
 	return issues;
 }
 
-function checkCustomGridLayout(styles: string, code: string): Issue[] {
-	const issues: Issue[] = [];
-	if (/display:\s*grid/.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
-		const localLine = findLineInBlock(styles, /display:\s*grid/);
-		issues.push({
-			severity: 'warning',
-			code: 'use-grid-component',
-			line: styleLineToFileLine(localLine, startLine),
-			message:
-				"Use DryUI's <Grid> component instead of custom CSS grid. Grid provides responsive columns, gap tokens, and breakpoint handling.",
-			fix: '<Grid --dry-grid-columns="repeat(2, 1fr)" --dry-grid-gap="var(--dry-space-4)">'
-		});
-	}
-	return issues;
-}
-
 function checkCustomFlexLayout(styles: string, code: string): Issue[] {
 	const issues: Issue[] = [];
-	if (/display:\s*flex/.test(styles)) {
+	if (/display:\s*(?:inline-)?flex/.test(styles)) {
 		const startLine = getStyleBlockStartLine(code);
-		const localLine = findLineInBlock(styles, /display:\s*flex/);
+		const localLine = findLineInBlock(styles, /display:\s*(?:inline-)?flex/);
 		issues.push({
 			severity: 'warning',
-			code: 'use-flex-component',
+			code: 'prefer-grid-layout',
 			line: styleLineToFileLine(localLine, startLine),
 			message:
-				"Use DryUI's <Flex> or <Stack> component instead of custom CSS flexbox. These provide gap, alignment, and responsive behavior with theme tokens.",
-			fix: '<Flex> or <Stack>'
+				'Use scoped CSS grid instead of flexbox. DryUI layout standard is raw grid with --dry-space-* gaps, Container for constrained width, and @container queries for responsiveness.',
+			fix: 'display: grid'
 		});
 	}
 	return issues;
@@ -684,39 +667,6 @@ function findLineInBlock(block: string, regex: RegExp): number {
 	return 1;
 }
 
-function checkManualFlex(styles: string, code: string): Issue[] {
-	const issues: Issue[] = [];
-	if (/display:\s*flex/.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
-		const localLine = findLineInBlock(styles, /display:\s*flex/);
-		issues.push({
-			severity: 'suggestion',
-			code: 'prefer-layout',
-			line: styleLineToFileLine(localLine, startLine),
-			message: 'Manual `display: flex` detected \u2014 consider using <Flex> or <Stack> instead',
-			fix: '<Flex> or <Stack>'
-		});
-	}
-	return issues;
-}
-
-function checkManualGrid(styles: string, code: string): Issue[] {
-	const issues: Issue[] = [];
-	if (/display:\s*grid/.test(styles) && /grid-template-columns/.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
-		const localLine = findLineInBlock(styles, /display:\s*grid/);
-		issues.push({
-			severity: 'suggestion',
-			code: 'prefer-layout',
-			line: styleLineToFileLine(localLine, startLine),
-			message:
-				'Manual CSS grid detected \u2014 consider using <Grid --dry-grid-columns="repeat(2, 1fr)"> instead',
-			fix: '<Grid --dry-grid-columns="repeat(2, 1fr)" --dry-grid-gap="var(--dry-space-4)">'
-		});
-	}
-	return issues;
-}
-
 function checkHardcodedColors(styles: string, code: string): Issue[] {
 	const issues: Issue[] = [];
 	const colorRegex = /(?:^|;)\s*(?:color|background(?:-color)?)\s*:\s*(?!.*var\s*\()/m;
@@ -820,15 +770,12 @@ export function reviewComponent(
 	issues.push(...checkCustomFieldMarkup(code));
 	issues.push(...checkRawStyledButton(code));
 	if (styles) {
-		issues.push(...checkCustomGridLayout(styles, code));
 		issues.push(...checkCustomFlexLayout(styles, code));
 		issues.push(...checkCustomMaxWidthCentering(styles, code));
 	}
 
 	// Phase 4: Style suggestions
 	if (styles) {
-		issues.push(...checkManualFlex(styles, code));
-		issues.push(...checkManualGrid(styles, code));
 		issues.push(...checkHardcodedColors(styles, code));
 		issues.push(...checkManualCentering(styles, code));
 		issues.push(...checkCustomThemeOverrides(styles, code));

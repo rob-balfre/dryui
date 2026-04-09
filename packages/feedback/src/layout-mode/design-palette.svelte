@@ -183,54 +183,6 @@
 		searchQuery = '';
 		queueScrollFadeSync();
 	}
-
-	function applyWireframeToggleStyle(node: HTMLElement) {
-		$effect(() => {
-			if (blankCanvas) {
-				node.style.setProperty('background', '#f97316');
-				node.style.setProperty('border-color', '#f97316');
-				node.style.setProperty('color', 'white');
-				node.style.removeProperty('border-style');
-			} else {
-				node.style.removeProperty('background');
-				node.style.removeProperty('border-color');
-				node.style.removeProperty('color');
-				node.style.setProperty('border-style', 'dashed');
-			}
-		});
-	}
-
-	function applyWireframePromptReveal(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('grid-template-rows', blankCanvas ? '1fr' : '0fr');
-			node.style.setProperty('opacity', blankCanvas ? '1' : '0');
-		});
-	}
-
-	function applyPaletteItemStyle(node: HTMLElement, item: { type: LayoutModeComponentType }) {
-		$effect(() => {
-			const selected = value === item.type;
-			if (selected) {
-				node.style.setProperty(
-					'border-color',
-					blankCanvas ? '#f97316' : 'var(--dry-color-fill-brand, #7c3aed)'
-				);
-			} else {
-				node.style.removeProperty('border-color');
-			}
-		});
-	}
-
-	function applyPreviewBackground(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty(
-				'background',
-				blankCanvas
-					? 'rgba(249, 115, 22, 0.08)'
-					: 'color-mix(in srgb, var(--dry-color-fill-brand, #7c3aed) 6%, transparent)'
-			);
-		});
-	}
 </script>
 
 {#if open}
@@ -258,8 +210,8 @@
 
 					<Input
 						bind:value={searchQuery}
-						placeholder="Search components"
-						aria-label="Search layout components"
+						placeholder="Search patterns"
+						aria-label="Search layout patterns"
 						oninput={handleSearchInput}
 					/>
 				</div>
@@ -273,7 +225,6 @@
 						variant={blankCanvas ? 'solid' : 'outline'}
 						size="sm"
 						onclick={toggleWireframe}
-						{@attach applyWireframeToggleStyle}
 					>
 						<span class="icon-wrap" aria-hidden="true">
 							<svg viewBox="0 0 14 14" width="14" height="14" fill="none">
@@ -304,7 +255,7 @@
 				<div
 					class="wireframe-prompt-wrap"
 					data-layout-wireframe-prompt-wrap
-					{@attach applyWireframePromptReveal}
+					data-expanded={blankCanvas || undefined}
 				>
 					<div class="wireframe-prompt-inner">
 						<Textarea
@@ -354,7 +305,6 @@
 														size="sm"
 														class="palette-item-button"
 														aria-pressed={value === item.type}
-														{@attach (node) => applyPaletteItemStyle(node, item)}
 														onmousedown={(event) => {
 															if (event.button !== 0) return;
 															onDragStart?.(item.type, event);
@@ -366,7 +316,6 @@
 																class="item-preview"
 																data-layout-palette-item-preview
 																aria-hidden="true"
-																{@attach applyPreviewBackground}
 															>
 																<span {@attach mountPreview(item.type)}></span>
 															</span>
@@ -451,6 +400,7 @@
 		inset-block-end: 4.75rem;
 		z-index: 100002;
 		pointer-events: auto;
+		--palette-card-border-color: var(--dry-card-border, rgba(15, 23, 42, 0.08));
 	}
 
 	@media (max-width: 720px) {
@@ -466,13 +416,17 @@
 		grid-template-columns: minmax(0, min(22rem, calc(100vw - 1.5rem)));
 		max-block-size: min(72vh, 44rem);
 		overflow: hidden;
-		border-color: var(--dry-card-border, rgba(15, 23, 42, 0.08));
+		border-color: var(--palette-card-border-color);
 		box-shadow: 0 28px 64px
 			color-mix(in srgb, var(--dry-color-bg-overlay, #0f172a) 14%, transparent);
 	}
 
-	.layout-palette-shell[data-blank-canvas] .palette-card {
-		border-color: color-mix(in srgb, #f97316 24%, var(--dry-card-border, rgba(15, 23, 42, 0.08)));
+	.layout-palette-shell[data-blank-canvas] {
+		--palette-card-border-color: color-mix(
+			in srgb,
+			#f97316 24%,
+			var(--dry-card-border, rgba(15, 23, 42, 0.08))
+		);
 	}
 
 	.palette-card-header {
@@ -509,9 +463,16 @@
 
 	.wireframe-prompt-wrap {
 		display: grid;
+		grid-template-rows: 0fr;
+		opacity: 0;
 		transition:
 			grid-template-rows 160ms ease,
 			opacity 120ms ease;
+	}
+
+	.wireframe-prompt-wrap[data-expanded] {
+		grid-template-rows: 1fr;
+		opacity: 1;
 	}
 
 	.wireframe-prompt-inner {
@@ -564,9 +525,6 @@
 		padding: 0 0.5rem 0.125rem;
 	}
 
-	.section-trigger-flex {
-	}
-
 	.section-item-stack {
 		padding-block-start: 0.35rem;
 	}
@@ -588,6 +546,11 @@
 		block-size: 1.125rem;
 		border-radius: 0.3rem;
 		overflow: hidden;
+		background: color-mix(in srgb, var(--dry-color-fill-brand, #7c3aed) 6%, transparent);
+	}
+
+	.layout-palette-shell[data-blank-canvas] .item-preview {
+		background: rgba(249, 115, 22, 0.08);
 	}
 
 	.item-meta {

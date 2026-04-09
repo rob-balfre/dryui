@@ -241,19 +241,10 @@ export type {
 	SelectableTileGroupMetaProps
 } from './selectable-tile-group/index.js';
 
-// Phase 4 — Layout Primitives
+// Phase 4 — Layout Utilities
 
 export { Container } from './container/index.js';
 export type { ContainerProps } from './container/index.js';
-
-export { Stack } from './stack/index.js';
-export type { StackProps } from './stack/index.js';
-
-export { Grid } from './grid/index.js';
-export type { GridProps } from './grid/index.js';
-
-export { Flex } from './flex/index.js';
-export type { FlexProps } from './flex/index.js';
 
 export { Separator } from './separator/index.js';
 export type { SeparatorProps } from './separator/index.js';

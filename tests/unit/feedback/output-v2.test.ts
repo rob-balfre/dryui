@@ -18,7 +18,7 @@ const mockCatalog: CatalogEntry[] = [
 		structure: 'Card.Root\n  Card.Header\n  Card.Body\n  Card.Footer',
 		alternatives: [],
 		antiPatterns: [],
-		combinesWith: ['Grid', 'Stack']
+		combinesWith: ['Container']
 	},
 	{
 		name: 'Button',
@@ -194,7 +194,7 @@ describe('generateSketchBrief', () => {
 		expect(brief).toContain('Card.Root');
 	});
 
-	test('composition hint: suggests Grid for 3+ same components in a row', async () => {
+	test('composition hint: suggests scoped CSS grid for 3+ same components in a row', async () => {
 		const brief = await generateSketchBrief({
 			placements: [
 				makePlacement({ type: 'card', x: 0, y: 100, width: 300, height: 200 }),
@@ -204,7 +204,7 @@ describe('generateSketchBrief', () => {
 			route: '/page',
 			canvasWidth: 1280
 		});
-		expect(brief).toContain('Grid');
+		expect(brief).toContain('scoped CSS grid');
 	});
 
 	test('no composition hint for only 2 same components in a row', async () => {
@@ -216,21 +216,20 @@ describe('generateSketchBrief', () => {
 			route: '/page',
 			canvasWidth: 1280
 		});
-		// Should NOT have a Grid composition hint (only 2 cards, not 3+)
-		// The brief may still mention Grid from structure, but not as a composition hint
+		// Should NOT have a scoped CSS grid composition hint (only 2 cards, not 3+)
 		const hintSection = brief.split('### Composition hints')[1] ?? '';
-		expect(hintSection).not.toMatch(/3\+ .* → Grid/);
+		expect(hintSection).not.toContain('scoped CSS grid');
 	});
 
-	test('includes DryUI layout primitives footer', async () => {
+	test('includes DryUI layout baseline footer', async () => {
 		const brief = await generateSketchBrief({
 			placements: [makePlacement({ type: 'navigation' })],
 			route: '/page',
 			canvasWidth: 1280
 		});
-		expect(brief).toContain('Stack');
-		expect(brief).toContain('Grid');
-		expect(brief).toContain('Flex');
+		expect(brief).toContain('DryUI layout baseline');
+		expect(brief).toContain('Container');
+		expect(brief).toContain('@container');
 	});
 
 	test('groups items within 40px vertically as same row', async () => {

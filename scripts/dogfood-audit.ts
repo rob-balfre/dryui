@@ -61,11 +61,18 @@ const INPUT_TYPE_MAP: Record<string, string> = {
 	file: 'FileUpload'
 };
 
-/** CSS property patterns in <style> blocks → DryUI layout component. */
+/** CSS property patterns in <style> blocks → DryUI layout guidance. */
 const CSS_LAYOUT_RULES = [
-	{ pattern: /display\s*:\s*flex/g, suggestion: 'Flex or Stack', label: 'display: flex' },
-	{ pattern: /display\s*:\s*inline-flex/g, suggestion: 'Flex', label: 'display: inline-flex' },
-	{ pattern: /display\s*:\s*grid/g, suggestion: 'Grid', label: 'display: grid' }
+	{
+		pattern: /display\s*:\s*flex/g,
+		suggestion: 'Scoped CSS grid layout',
+		label: 'display: flex'
+	},
+	{
+		pattern: /display\s*:\s*inline-flex/g,
+		suggestion: 'Scoped CSS grid layout',
+		label: 'display: inline-flex'
+	}
 ];
 
 /** CSS anti-patterns from CLAUDE.md. */

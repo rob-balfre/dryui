@@ -166,6 +166,27 @@
 
 		<Separator />
 
+		<section>
+			<div class="stack-lg">
+				<Heading level={2}>Agent workflow</Heading>
+				<Text size="lg" color="secondary">
+					Before writing DryUI code, call <code>compose</code> or <code>info</code>. After implementation,
+					run <code>review</code> or <code>doctor</code>. That keeps component shape and validation in sync.
+				</Text>
+
+				<Alert.Root variant="info">
+					<Alert.Title>Start with lookup, not memory</Alert.Title>
+					<Alert.Description>
+						Use the <Link href={withBase('/tools')} underline="always">Tools</Link> page for command details and the
+						<Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the route-level workflow
+						and state-heavy planner pattern.
+					</Alert.Description>
+				</Alert.Root>
+			</div>
+		</section>
+
+		<Separator />
+
 		<!-- 4. AI setup -->
 		<section>
 			<div class="stack-lg">

@@ -87,7 +87,8 @@ const SERVER_INSTRUCTIONS = [
 	'   Text is --dry-color-text-strong (not --dry-color-text). See compose "app shell" for the full reset.',
 	'',
 	'4. COMPOUND COMPONENTS: Most components use compound syntax (e.g. Card.Root + Card.Content,',
-	'   not <Card title="...">). Always call `info <Component>` to check the API before using one.',
+	'   not <Card title="...">). Always call `info <Component>` or `compose "<query>"` first to',
+	'   confirm kind, required parts, bindables, and canonical usage before writing code.',
 	'',
 	'5. COMPOSE OUTPUT IS DEVELOPER GUIDANCE: Recipe names, descriptions, and component lists from',
 	'   the compose tool are instructions for YOU, not content for the page. Never render them as',
@@ -112,7 +113,7 @@ const REVIEW_DESC = [
 	'Checks:\n',
 	'- **Errors:** Bare compound components (<Card> instead of <Card.Root>), unknown components, invalid props/parts, missing required props\n',
 	'- **Warnings:** Orphaned compound parts, missing accessible labels, Avatar without alt/fallback, missing theme CSS import when DryUI components are used\n',
-	'- **Suggestions:** Manual flex/grid where DryUI layout components apply, hardcoded colors, raw <hr> instead of <Separator>\n\n',
+	'- **Suggestions:** Hardcoded colors, raw <hr> instead of <Separator>, and custom layout code that ignores the CSS-grid baseline\n\n',
 	'Output: TOON format with issues, hasBlockers/autoFixable aggregates, and next-step suggestions. When projectCss is provided, theme diagnosis results are appended.\n\n',
 	'Example:\n\n',
 	'```svelte\n<script>\n  import { Card, Badge } from \'@dryui/ui\';\n</script>\n\n<Card>\n  <Card.Header>Status</Card.Header>\n  <Card.Content>\n    <Badge variant="solid">Active</Badge>\n  </Card.Content>\n</Card>\n<hr />\n```\n\n',
@@ -441,7 +442,7 @@ server.tool(
 
 const COMPOSE_DESC = [
 	'Look up composition guidance for building UIs with DryUI.\n\n',
-	'Returns ranked component alternatives with truncated code snippets, anti-patterns to avoid, and composition recipes in TOON format.\n',
+	'Returns ranked component alternatives with component-shape metadata, truncated code snippets, anti-patterns to avoid, and composition recipes in TOON format.\n',
 	'Call this BEFORE writing any DryUI layout to ensure correct component selection.\n\n',
 	'Input: Short keywords describing what you want to build. Use 1-3 words — component names, pattern names, or UI concepts.\n',
 	'Good: "search form", "date input", "hotel card", "dashboard", "checkout", "travel booking"\n',
@@ -485,7 +486,7 @@ server.tool(
 				content: [
 					{
 						type: 'text',
-						text: toonComposition(results)
+						text: toonComposition(results, getComponents())
 					}
 				]
 			};
@@ -512,7 +513,7 @@ server.registerPrompt(
 		const results = findComposition(query);
 		const text =
 			results.componentMatches.length || results.recipeMatches.length
-				? formatCompositionResult(results)
+				? formatCompositionResult(results, getComponents())
 				: `No composition guidance found for "${query}". Try a component name, UI concept, or pattern name.`;
 
 		return {

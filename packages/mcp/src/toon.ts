@@ -12,6 +12,7 @@ import type {
 	AddPlan,
 	ProjectPlanStep
 } from './project-planner.js';
+import { componentKind, getBindableProps, getRequiredParts } from './spec-formatters.js';
 
 // ── Utilities ──────────────────────────────────────────────
 
@@ -147,13 +148,17 @@ export function formatHelp(hints: string[]): string {
 export function toonComponent(name: string, def: ComponentDef, opts?: { full?: boolean | undefined }): string {
 	const full = opts?.full ?? false;
 	const lines: string[] = [];
+	const bindables = getBindableProps(def);
+	const requiredParts = getRequiredParts(name, def);
 
 	// Header
 	lines.push(
 		`${name} -- ${def.description}`,
 		`category: ${def.category} | tags: ${def.tags.join(',')}`,
 		`import: import { ${name} } from '${def.import}'`,
-		`compound: ${def.compound}`
+		`kind: ${componentKind(def)}`,
+		`required-parts: ${requiredParts.length ? requiredParts.join(',') : 'none'}`,
+		`bindables: ${bindables.length ? bindables.join(',') : 'none'}`
 	);
 
 	// Structure
@@ -223,7 +228,7 @@ export function toonComponent(name: string, def: ComponentDef, opts?: { full?: b
 	// Example
 	if (def.example) {
 		const example = full ? def.example : truncate(def.example, 400, `use add ${name} for full snippet`);
-		lines.push('', 'example:', example);
+		lines.push('', 'canonical:', example);
 	}
 
 	// Contextual help
@@ -280,6 +285,7 @@ export function toonComponentList(
 
 export function toonComposition(
 	results: { componentMatches: readonly CompositionComponentDef[]; recipeMatches: readonly CompositionRecipeDef[] },
+	components: Record<string, ComponentDef>,
 	opts?: { full?: boolean | undefined }
 ): string {
 	const full = opts?.full ?? false;
@@ -299,6 +305,24 @@ export function toonComposition(
 				? alt.snippet
 				: truncate(alt.snippet, 500, `use info ${alt.component} for full snippet`);
 			lines.push(`  ${alt.rank}. ${alt.component} (${alt.useWhen})`);
+			const spec = components[alt.component];
+			if (spec) {
+				const requiredParts = getRequiredParts(alt.component, spec);
+				const bindables = getBindableProps(spec);
+				lines.push(
+					`     kind: ${componentKind(spec)} | required-parts: ${requiredParts.length ? requiredParts.join(',') : 'none'} | bindables: ${bindables.length ? bindables.join(',') : 'none'}`
+				);
+				const canonical = full
+					? spec.example
+					: truncate(spec.example, 240, `use info ${alt.component} for the canonical example`);
+				lines.push('     canonical:');
+				lines.push(
+					canonical
+						.split('\n')
+						.map((line) => `       ${line}`)
+						.join('\n')
+				);
+			}
 			lines.push(
 				snippet
 					.split('\n')

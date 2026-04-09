@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { flushSync, mount, unmount } from 'svelte';
+import CompositeInputsHarness from './fixtures/composite-inputs-harness.svelte';
 import PrimitivesRemediationDataGridHarness from './fixtures/primitives-remediation-data-grid-harness.svelte';
 import PrimitivesRemediationMenuHarness from './fixtures/primitives-remediation-menu-harness.svelte';
 import PrimitivesRemediationOverlayHarness from './fixtures/primitives-remediation-overlay-harness.svelte';
@@ -128,6 +129,48 @@ describe('primitives remediation', () => {
 		flushSync();
 
 		expect(popoverButton.getAttribute('aria-expanded')).toBe('false');
+	});
+
+	it('keeps composite input error semantics on the interactive controls only', () => {
+		render(CompositeInputsHarness);
+
+		const timeGroup = document.querySelector<HTMLElement>('[data-time-input-wrapper]');
+		const timeDescription = document.querySelector<HTMLElement>('[data-testid="time-description"]');
+		const timeError = document.querySelector<HTMLElement>('[data-testid="time-error"]');
+		const timeTriggers = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[data-time-input-wrapper] [data-select-trigger]')
+		);
+		const pinGroup = document.querySelector<HTMLElement>('[data-pin-input-root]');
+		const pinInput = document.querySelector<HTMLInputElement>('[data-pin-input-hidden]');
+		const pinDescription = document.querySelector<HTMLElement>('[data-testid="pin-description"]');
+		const pinError = document.querySelector<HTMLElement>('[data-testid="pin-error"]');
+
+		if (
+			!timeGroup ||
+			!timeDescription ||
+			!timeError ||
+			timeTriggers.length !== 2 ||
+			!pinGroup ||
+			!pinInput ||
+			!pinDescription ||
+			!pinError
+		) {
+			throw new Error('Expected composite input harness elements');
+		}
+
+		expect(timeGroup.getAttribute('aria-invalid')).toBeNull();
+		expect(timeGroup.getAttribute('aria-errormessage')).toBeNull();
+		for (const trigger of timeTriggers) {
+			expect(trigger.getAttribute('aria-invalid')).toBe('true');
+			expect(trigger.getAttribute('aria-errormessage')).toBe(timeError.id);
+			expect(trigger.getAttribute('aria-describedby')).toBe(timeDescription.id);
+		}
+
+		expect(pinGroup.getAttribute('aria-invalid')).toBeNull();
+		expect(pinGroup.getAttribute('aria-errormessage')).toBeNull();
+		expect(pinInput.getAttribute('aria-invalid')).toBe('true');
+		expect(pinInput.getAttribute('aria-errormessage')).toBe(pinError.id);
+		expect(pinInput.getAttribute('aria-describedby')).toBe(pinDescription.id);
 	});
 
 	it('exposes disabled semantics for menu items and disabled select triggers', () => {

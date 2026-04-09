@@ -100,9 +100,12 @@ const SEEDS = [
 		label: 'Table',
 		keywords: ['table', 'data table']
 	}),
-	component('grid', 'Content', 'Grid', {
-		label: 'Grid',
-		keywords: ['grid', 'columns', 'cards']
+	component('grid', 'Content', 'Container', {
+		label: 'CSS Grid Layout',
+		keywords: ['grid', 'columns', 'cards', 'container'],
+		structure: '`<Container><div class="grid">...</div></Container>`',
+		guidance:
+			'Use scoped CSS grid for columns or repeated cards. Wrap with Container only when the layout needs constrained width.'
 	}),
 	component('list', 'Content', 'List', {
 		label: 'List',
