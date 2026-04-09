@@ -153,6 +153,7 @@
 		max-height: 24rem;
 		display: grid;
 		grid-template-columns: minmax(0, min(var(--dry-cmd-max-width), 90vw));
+		grid-template-rows: auto minmax(0, 1fr);
 
 		transition:
 			opacity var(--dry-duration-normal) var(--dry-ease-spring-soft),

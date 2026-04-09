@@ -26,6 +26,7 @@
 <style>
 	[data-command-palette-list] {
 		overflow-y: auto;
+		overscroll-behavior: contain;
 		padding: var(--dry-space-1);
 		min-height: 0;
 		scrollbar-width: thin;
