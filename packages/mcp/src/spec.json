@@ -1,5 +1,5 @@
 {
-  "version": "0.1.11",
+  "version": "0.1.13",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -11711,14 +11711,18 @@
         ]
       },
       "cssVars": {
+        "--dry-alpha-rgb": "Rgb",
         "--dry-color-picker-area-height": "Picker Area Height",
         "--dry-color-picker-area-width": "Picker Area Width",
         "--dry-color-picker-grid-dark": "Picker Grid Dark",
         "--dry-color-picker-grid-light": "Picker Grid Light",
         "--dry-color-picker-grid-size": "Picker Grid Size",
         "--dry-color-picker-indicator-border": "Picker Indicator Border",
+        "--dry-color-picker-indicator-color": "Picker Indicator Color",
+        "--dry-color-picker-indicator-left": "Picker Indicator Left",
         "--dry-color-picker-indicator-shadow": "Picker Indicator Shadow",
         "--dry-color-picker-indicator-size": "Picker Indicator Size",
+        "--dry-color-picker-indicator-top": "Picker Indicator Top",
         "--dry-color-picker-slider-thumb-bg": "Picker Slider Thumb Bg",
         "--dry-color-picker-slider-thumb-border": "Picker Slider Thumb Border",
         "--dry-color-picker-slider-thumb-shadow": "Picker Slider Thumb Shadow",
@@ -11729,7 +11733,9 @@
         "--dry-color-picker-swatch-size": "Picker Swatch Size",
         "--dry-color-picker-width": "Picker Width",
         "--dry-slider-thumb-size": "Thumb size",
-        "--dry-slider-track-height": "Track height"
+        "--dry-slider-track-height": "Track height",
+        "--dry-swatch-color": "Text color",
+        "--dry-swatch-opacity": "Opacity"
       },
       "dataAttributes": [
         {
@@ -12193,7 +12199,13 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
-      "cssVars": {},
+      "cssVars": {
+        "--dry-spotlight-color": "Text color",
+        "--dry-spotlight-intensity": "Intensity",
+        "--dry-spotlight-radius": "Border radius",
+        "--dry-spotlight-x": "X",
+        "--dry-spotlight-y": "Y"
+      },
       "dataAttributes": [
         {
           "name": "data-active",
@@ -12280,8 +12292,10 @@
         "--dry-aurora-color-2": "Color 2",
         "--dry-aurora-color-3": "Color 3",
         "--dry-aurora-duration": "Duration",
+        "--dry-aurora-intensity": "Intensity",
         "--dry-aurora-shift": "Shift",
-        "--dry-aurora-surface": "Surface"
+        "--dry-aurora-surface": "Surface",
+        "--dry-aurora-waviness": "Waviness"
       },
       "dataAttributes": [
         {
@@ -12932,6 +12946,9 @@
       "dataAttributes": [
         {
           "name": "data-virtual-list"
+        },
+        {
+          "name": "data-virtual-list-inner"
         }
       ],
       "example": "<VirtualList>Content</VirtualList>"
@@ -15191,6 +15208,7 @@
         "--dry-image-comparison-handle-shadow": "Comparison Handle Shadow",
         "--dry-image-comparison-handle-width": "Comparison Handle Width",
         "--dry-image-comparison-handle-z-index": "Comparison Handle Z Index",
+        "--dry-image-comparison-position": "Comparison Position",
         "--dry-image-comparison-radius": "Comparison Radius"
       },
       "dataAttributes": [
@@ -17472,7 +17490,13 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
-      "cssVars": {},
+      "cssVars": {
+        "--dry-beam-angle": "Angle",
+        "--dry-beam-color": "Text color",
+        "--dry-beam-intensity": "Intensity",
+        "--dry-beam-speed": "Speed",
+        "--dry-beam-width": "Width"
+      },
       "dataAttributes": [
         {
           "name": "data-beam"
@@ -17591,7 +17615,14 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
-      "cssVars": {},
+      "cssVars": {
+        "--dry-rays-blend": "Blend",
+        "--dry-rays-color": "Text color",
+        "--dry-rays-cx": "Cx",
+        "--dry-rays-cy": "Cy",
+        "--dry-rays-intensity": "Intensity",
+        "--dry-rays-speed": "Speed"
+      },
       "dataAttributes": [
         {
           "name": "data-animated"

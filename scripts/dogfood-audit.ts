@@ -241,9 +241,9 @@ function scanStyles(regions: SvelteRegions): Finding[] {
 			const line = lines[i];
 
 			for (const rule of CSS_LAYOUT_RULES) {
-				const regex = new RegExp(rule.pattern.source, 'g');
+				rule.pattern.lastIndex = 0;
 				let match: RegExpExecArray | null;
-				while ((match = regex.exec(line)) !== null) {
+				while ((match = rule.pattern.exec(line)) !== null) {
 					findings.push({
 						line: i + 1,
 						category: 'css',
@@ -255,9 +255,9 @@ function scanStyles(regions: SvelteRegions): Finding[] {
 			}
 
 			for (const rule of CSS_ANTIPATTERN_RULES) {
-				const regex = new RegExp(rule.pattern.source, 'g');
+				rule.pattern.lastIndex = 0;
 				let match: RegExpExecArray | null;
-				while ((match = regex.exec(line)) !== null) {
+				while ((match = rule.pattern.exec(line)) !== null) {
 					findings.push({
 						line: i + 1,
 						category: 'css-antipattern',

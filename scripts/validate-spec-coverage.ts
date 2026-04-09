@@ -322,9 +322,12 @@ if (bannedStillPublic.length > 0) {
 	);
 }
 
-for (const check of BANNED_GUIDANCE_CHECKS) {
-	const source = await Bun.file(check.path).text();
-	const stalePatterns = check.patterns.filter((pattern) => source.includes(pattern));
+const guidanceSources = await Promise.all(
+	BANNED_GUIDANCE_CHECKS.map((check) => Bun.file(check.path).text())
+);
+for (let i = 0; i < BANNED_GUIDANCE_CHECKS.length; i++) {
+	const check = BANNED_GUIDANCE_CHECKS[i];
+	const stalePatterns = check.patterns.filter((pattern) => guidanceSources[i].includes(pattern));
 	if (stalePatterns.length > 0) {
 		errors.push(
 			`Guidance file still references removed layout primitives: ${check.path.replace(repoRoot + '/', '')}\n` +

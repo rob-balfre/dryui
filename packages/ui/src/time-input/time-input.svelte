@@ -65,10 +65,8 @@
 		setTime(hourStr, nextMinute);
 	}
 
-	// Generate hour options 00-23
 	const hours = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
 
-	// Generate minute options based on step
 	const minutes = $derived.by(() => {
 		const stepMinutes = step && step >= 60 ? Math.floor(step / 60) : 1;
 		const count = Math.floor(60 / stepMinutes);
@@ -84,7 +82,6 @@
 	data-time-input-wrapper
 	data-disabled={isDisabled || undefined}
 	id={ctx?.id}
-	aria-describedby={describedBy}
 	class={className}
 >
 	<Select.Root bind:value={() => hourStr, setHour} disabled={isDisabled}>

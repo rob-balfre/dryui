@@ -45,7 +45,6 @@
 	let mirrorSelectionStart = $state<number | null>(null);
 	let mirrorSelectionEnd = $state<number | null>(null);
 
-	// Build validation regex from type or pattern prop
 	const validationRegex = $derived(pattern ?? (type === 'numeric' ? /^\d+$/ : /^[a-zA-Z0-9]+$/));
 
 	// Compute cells from value

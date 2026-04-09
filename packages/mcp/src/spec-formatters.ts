@@ -44,9 +44,10 @@ export function getRequiredParts(name: string, def: ComponentDef): string[] {
 	if (!def.compound) return [];
 
 	const required = new Set<string>();
+	const partRe = new RegExp(`^${name}\\.([A-Za-z0-9]+)$`);
 
 	for (const node of def.structure?.tree ?? []) {
-		const match = node.trim().match(new RegExp(`^${name}\\.([A-Za-z0-9]+)$`));
+		const match = node.trim().match(partRe);
 		if (match?.[1]) {
 			required.add(match[1]);
 		}
