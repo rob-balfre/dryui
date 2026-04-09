@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { Pencil, Eraser, MoveUpRight, Type, Move } from 'lucide-svelte';
-
-	type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
+	import type { Tool } from '../types.js';
 
 	interface Props {
 		active: boolean;
@@ -117,6 +116,8 @@
 
 <style>
 	.toolbar {
+		--accent: hsl(25 100% 55%);
+
 		position: fixed;
 		right: 24px;
 		bottom: 24px;
@@ -158,7 +159,7 @@
 	}
 
 	.tool-btn[data-active] {
-		background: hsl(25 100% 55%);
+		background: var(--accent);
 		color: white;
 		box-shadow: 0 0 8px hsl(25 100% 55% / 0.5);
 	}

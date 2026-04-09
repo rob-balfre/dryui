@@ -2,18 +2,18 @@
 	import { Portal } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { Check } from 'lucide-svelte';
-	import type { Arrow, Drawing, FeedbackProps, Point, Stroke, TextLabel } from './types.js';
+	import type { Arrow, Drawing, FeedbackProps, Point, Stroke, TextLabel, Tool } from './types.js';
 	import Toolbar from './components/toolbar.svelte';
 
+	const ACCENT = 'hsl(25 100% 55%)';
+
 	let {
-		color = 'hsl(25 100% 55%)',
+		color = ACCENT,
 		strokeWidth = 3,
 		shortcut = '$mod+m',
 		serverUrl,
 		class: className
 	}: FeedbackProps = $props();
-
-	type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
 	let active = $state(false);
 	let tool: Tool = $state('pencil');
@@ -26,6 +26,7 @@
 	let moving: { drawingId: string; lastPoint: Point } | null = $state(null);
 	let svgEl: SVGSVGElement | undefined = $state();
 	let justCommitted = false;
+	let saveVersion = $state(0);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
@@ -65,6 +66,7 @@
 		}
 		textInput = null;
 		justCommitted = true;
+		saveVersion++;
 		setTimeout(() => (justCommitted = false), 0);
 	}
 
@@ -166,7 +168,9 @@
 	}
 
 	function eraseAt(x: number, y: number) {
+		const before = drawings.length;
 		drawings = drawings.filter((d) => !drawingNearPoint(d, x, y));
+		if (drawings.length !== before) saveVersion++;
 	}
 
 	// --- Move ---
@@ -274,6 +278,7 @@
 		if (tool === 'pencil' && currentStroke) {
 			if (currentStroke.points.length > 1) {
 				drawings = [...drawings, currentStroke];
+				saveVersion++;
 			}
 			currentStroke = null;
 		} else if (tool === 'arrow' && currentArrow) {
@@ -281,10 +286,12 @@
 			const dy = currentArrow.end.y - currentArrow.start.y;
 			if (Math.hypot(dx, dy) > 5) {
 				drawings = [...drawings, currentArrow];
+				saveVersion++;
 			}
 			currentArrow = null;
-		} else if (tool === 'move') {
+		} else if (tool === 'move' && moving) {
 			moving = null;
+			saveVersion++;
 		} else if (tool === 'eraser') {
 			erasing = false;
 		}
@@ -308,7 +315,7 @@
 
 	// --- Persistence ---
 
-	let loaded = false;
+	let lastSavedVersion = 0;
 	let saveTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function pageUrl(): string {
@@ -321,26 +328,28 @@
 			.then((r) => r.json())
 			.then((data: Drawing[]) => {
 				if (data.length) drawings = data;
-				loaded = true;
+				lastSavedVersion = saveVersion;
 			})
 			.catch(() => {
-				loaded = true;
+				lastSavedVersion = saveVersion;
 			});
 	});
 
 	$effect(() => {
-		// Access drawings to track changes
-		const snapshot = JSON.stringify(drawings);
-		if (!serverUrl || !loaded) return;
+		const v = saveVersion;
+		if (!serverUrl || v === lastSavedVersion) return;
 
 		clearTimeout(saveTimer);
 		saveTimer = setTimeout(() => {
+			lastSavedVersion = v;
 			fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`, {
 				method: 'PUT',
 				headers: { 'Content-Type': 'application/json' },
-				body: snapshot
+				body: JSON.stringify(drawings)
 			}).catch(() => {});
 		}, 500);
+
+		return () => clearTimeout(saveTimer);
 	});
 </script>
 
@@ -478,6 +487,8 @@
 
 <style>
 	.feedback-root {
+		--accent: hsl(25 100% 55%);
+
 		position: fixed;
 		inset: 0;
 		z-index: 9998;
@@ -530,7 +541,7 @@
 		z-index: 10001;
 		display: grid;
 		grid-template-columns: 1fr auto;
-		border: 2px solid hsl(25 100% 55%);
+		border: 2px solid var(--accent);
 		border-radius: 6px;
 		background: hsl(225 15% 12% / 0.95);
 		box-shadow: 0 0 8px hsl(25 100% 55% / 0.5);
@@ -542,7 +553,7 @@
 		padding: 4px 8px;
 		border: none;
 		background: transparent;
-		color: hsl(25 100% 55%);
+		color: var(--accent);
 		font-size: 16px;
 		font-weight: 600;
 		font-family:
@@ -564,7 +575,7 @@
 		border: none;
 		border-left: 1px solid hsl(25 100% 55% / 0.3);
 		background: hsl(25 100% 55% / 0.15);
-		color: hsl(25 100% 55%);
+		color: var(--accent);
 		cursor: pointer;
 	}
 

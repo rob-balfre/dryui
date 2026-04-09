@@ -31,6 +31,8 @@ export interface TextLabel {
 
 export type Drawing = Stroke | Arrow | TextLabel;
 
+export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
+
 export interface FeedbackProps {
 	color?: string;
 	strokeWidth?: number;
