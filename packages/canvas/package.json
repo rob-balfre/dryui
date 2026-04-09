@@ -43,13 +43,13 @@
   },
   "dependencies": {
     "@dryui/primitives": "^0.1.10",
-    "@dryui/ui": "^0.1.10"
+    "@dryui/ui": "^0.1.11"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"
   },
   "devDependencies": {
-    "@dryui/mcp": "^0.2.1",
+    "@dryui/mcp": "^0.2.2",
     "@sveltejs/package": "^2.5.7",
     "svelte": "^5.55.1",
     "svelte-check": "^4.4.5",

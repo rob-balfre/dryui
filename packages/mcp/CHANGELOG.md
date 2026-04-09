@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 0.2.2
+
+### Patch Changes
+
+- Add base CSS resets to default theme — importing default.css now sets box-sizing, margin, background, color, and min-height automatically. No separate reset CSS needed.
+
 ## 0.2.1
 
 ### Patch Changes
