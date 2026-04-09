@@ -1,6 +1,6 @@
 {
   "name": "@dryui/wizard",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -50,7 +50,7 @@
     "check": "bunx tsc -p ./tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@dryui/mcp": "^0.3.0"
+    "@dryui/mcp": "^0.4.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
