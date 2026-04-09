@@ -4552,20 +4552,9 @@ export const compositionRecipes: CompositionRecipe[] = [
   </body>
 </html>
 
-<!-- 2. src/app.css — global reset with DryUI tokens -->
+<!-- 2. src/app.css — import themes (resets are built in) -->
 @import '@dryui/ui/themes/default.css';
 @import '@dryui/ui/themes/dark.css';
-
-*, *::before, *::after { box-sizing: border-box; margin: 0; }
-
-html {
-  font-family: var(--dry-font-sans);
-  color: var(--dry-color-text-strong);
-  background: var(--dry-color-bg-base);
-  -webkit-font-smoothing: antialiased;
-}
-
-body { margin: 0; min-height: 100dvh; }
 
 <!-- 3. src/routes/+layout.svelte — root layout -->
 <script>
