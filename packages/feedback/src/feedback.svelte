@@ -239,6 +239,7 @@
 				color,
 				width: strokeWidth
 			};
+			// end = arrowhead stays at click point; drag moves the tail (start)
 		} else if (tool === 'move') {
 			const hit = findDrawingAt(e.clientX, e.clientY);
 			if (hit) {
@@ -256,7 +257,7 @@
 			currentStroke.points = [...currentStroke.points, { x: e.clientX, y: e.clientY }];
 		} else if (tool === 'arrow' && currentArrow) {
 			e.preventDefault();
-			currentArrow.end = { x: e.clientX, y: e.clientY };
+			currentArrow.start = { x: e.clientX, y: e.clientY };
 		} else if (tool === 'move' && moving) {
 			e.preventDefault();
 			const dx = e.clientX - moving.lastPoint.x;
