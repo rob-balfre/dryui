@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@dryui/primitives": "^0.2.0",
-    "@dryui/ui": "^0.2.0"
+    "@dryui/ui": "^0.2.1"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"

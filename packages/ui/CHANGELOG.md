@@ -1,5 +1,11 @@
 # @dryui/ui
 
+## 0.2.1
+
+### Patch Changes
+
+- [`05aee9b`](https://github.com/rob-balfre/dryui/commit/05aee9b834136baa38fc1428a544953fc48816aa) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix CommandPalette scroll-through — results list now scrolls internally instead of scrolling the page behind the dialog
+
 ## 0.2.0
 
 ### Minor Changes
