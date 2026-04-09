@@ -10,17 +10,11 @@ and execute a tailored install plan.
 ## Step 1 — Run the install planner
 
 ```
-npx -y @dryui/cli install --json
+npx -y @dryui/cli install --toon
 ```
 
-The command prints a single JSON object to stdout and exits. If the exit code
-is non-zero, an error message is printed to stderr.
-
-The JSON has two top-level fields:
-
-- `detection` — project info (framework, packageManager, files, dependencies,
-  theme state)
-- `steps` — ordered array of actions to execute
+The command prints a TOON-formatted project detection and ordered install steps.
+If the exit code is non-zero, an error message is printed.
 
 Each step has:
 
@@ -56,12 +50,12 @@ If all steps have `status: "done"`, the project is already set up.
 After executing all steps, verify:
 
 ```
-npx -y @dryui/cli detect --json
+npx -y @dryui/cli detect --toon
 ```
 
-- `"status": "ready"` → proceed below
-- `"status": "partial"` → review the `theme` and `dependencies` fields, fix
-  what is missing, re-run Step 1
+- `project: ready` → proceed below
+- `project: partial` → review deps and theme fields, fix what is missing,
+  re-run Step 1
 
 **Do NOT open, preview, or screenshot `src/app.html` or any source file
 directly — they render blank without the dev server.** If your editor
@@ -75,16 +69,37 @@ Then open `http://localhost:5173` (or whatever port the dev server prints).
 In Claude Code: use `preview_start` with the dev command, then navigate to
 the localhost URL it prints before taking any screenshots.
 
-## Step 3 — Set up the MCP server (recommended)
+## Step 3 — Install the skill and MCP server
 
-The DryUI MCP server provides tools for component lookup, composition guidance,
-code review, theme diagnosis, and workspace health checks.
+The DryUI skill teaches your agent the conventions (compound components,
+theming, CSS grid rules, accessibility). The MCP server provides live tools
+for component lookup, composition guidance, code review, and workspace health.
 
-### Claude Code or generic MCP client (`.mcp.json` in project root)
+### Claude Code (plugin — installs both)
+
+```bash
+claude plugin marketplace add rob-balfre/dryui
+claude plugin install dryui@rob-balfre/dryui
+```
+
+### Codex (skill + MCP)
+
+```bash
+$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
+codex mcp add dryui -- npx -y @dryui/mcp
+```
+
+### VS Code / Copilot (skill + MCP config)
+
+```bash
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui
+```
+
+Add to `.vscode/mcp.json` (note: root key is `"servers"`, not `"mcpServers"`):
 
 ```json
 {
-  "mcpServers": {
+  "servers": {
     "dryui": {
       "type": "stdio",
       "command": "npx",
@@ -94,7 +109,13 @@ code review, theme diagnosis, and workspace health checks.
 }
 ```
 
-### Cursor (`.cursor/mcp.json`)
+### Cursor (skill + MCP config)
+
+```bash
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
+```
+
+Add to `.cursor/mcp.json`:
 
 ```json
 {
@@ -107,14 +128,35 @@ code review, theme diagnosis, and workspace health checks.
 }
 ```
 
-### VS Code Copilot (`settings.json`)
+### Windsurf (skill + MCP config)
+
+```bash
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
+```
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ```json
 {
-  "mcp": {
-    "servers": {
-      "dryui": {
-        "command": "npx",
+  "mcpServers": {
+    "dryui": {
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    }
+  }
+}
+```
+
+### Zed (MCP only — no skill support yet)
+
+Add to `~/.config/zed/settings.json`:
+
+```json
+{
+  "context_servers": {
+    "dryui": {
+      "command": {
+        "path": "npx",
         "args": ["-y", "@dryui/mcp"]
       }
     }
@@ -122,15 +164,9 @@ code review, theme diagnosis, and workspace health checks.
 }
 ```
 
-### Codex (`.codex/config.toml`)
+### Other MCP clients
 
-```toml
-[mcp_servers.dryui]
-command = "npx"
-args = ["-y", "@dryui/mcp"]
-```
-
-If your editor is not listed, use `npx -y @dryui/mcp` with stdio transport.
+Use `npx -y @dryui/mcp` with stdio transport.
 
 ## Step 4 — Read the component reference
 
@@ -161,22 +197,23 @@ Key rules from the reference:
 <Button variant="solid">Click me</Button>
 ```
 
-Use the CLI or MCP tools to look up components as you build:
+Use the MCP tools or CLI to look up components as you build:
 
 ```
-npx -y @dryui/cli info Button
-npx -y @dryui/cli compose "login form"
+npx -y @dryui/cli info Button --toon
+npx -y @dryui/cli compose "login form" --toon
 ```
 
 ## CLI tools (when MCP is not available)
 
-If MCP is not available in your environment, use the CLI directly:
+All commands support `--toon` for token-optimized agent output and `--full`
+to disable truncation.
 
 ```
-npx -y @dryui/cli info <component>      # Full API reference for a component
-npx -y @dryui/cli list                   # All available components
-npx -y @dryui/cli compose "query"        # Composition guidance for a UI task
-npx -y @dryui/cli add --project <name>   # Project-aware component adoption plan
-npx -y @dryui/cli review <file.svelte>   # Validate a Svelte file for spec compliance
-npx -y @dryui/cli doctor                 # Workspace health check
+npx -y @dryui/cli info <component> --toon    # Full API reference
+npx -y @dryui/cli list --toon                # All available components
+npx -y @dryui/cli compose "query" --toon     # Composition guidance
+npx -y @dryui/cli add --project <name>       # Project-aware adoption plan
+npx -y @dryui/cli review <file.svelte> --toon  # Validate for spec compliance
+npx -y @dryui/cli doctor --toon              # Workspace health check
 ```

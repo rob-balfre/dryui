@@ -369,20 +369,18 @@ bunx @dryui/cli doctor --toon --changed
 bunx @dryui/cli lint --toon --max-severity warning
 \`\`\`
 
-## MCP Server
+## MCP Server & Skill
 
-dryui ships an MCP server for AI-agent integration. All tool output uses TOON (token-optimized) format with contextual next-step suggestions.
+dryui ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
 
-\`\`\`json
-{
-  "mcpServers": {
-    "dryui": {
-      "command": "bunx",
-      "args": ["@dryui/mcp"]
-    }
-  }
-}
-\`\`\`
+### Install
+
+- **Claude Code**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@rob-balfre/dryui\` (plugin bundles skill + MCP)
+- **Codex**: \`$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui\` then \`codex mcp add dryui -- npx -y @dryui/mcp\`
+- **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui\` + add MCP config
+- **Zed**: MCP only (reads AGENTS.md for conventions)
+
+MCP config for tools that need it manually: \`"command": "npx", "args": ["-y", "@dryui/mcp"]\` — root key varies by tool (mcpServers for Cursor/Windsurf, servers for Copilot, context_servers for Zed).
 
 Available MCP tools:
 ${ai.tools.map((tool) => `- ${tool.name}: ${tool.description}`).join('\n')}`);
