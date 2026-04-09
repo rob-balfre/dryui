@@ -343,11 +343,15 @@
 			const ctx = canvas.getContext('2d')!;
 			ctx.drawImage(img, 0, 0);
 			return new Promise<string>((resolve) => {
-				canvas.toBlob((b) => {
-					const reader = new FileReader();
-					reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-					reader.readAsDataURL(b!);
-				}, 'image/png');
+				canvas.toBlob(
+					(b) => {
+						const reader = new FileReader();
+						reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
+						reader.readAsDataURL(b!);
+					},
+					'image/webp',
+					0.8
+				);
 			});
 		} finally {
 			URL.revokeObjectURL(url);

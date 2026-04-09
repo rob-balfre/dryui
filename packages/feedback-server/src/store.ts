@@ -534,7 +534,7 @@ export class FeedbackStore {
 
 	createSubmission(input: CreateSubmissionInput): Submission {
 		const id = randomUUID();
-		const screenshotPath = `${SCREENSHOTS_DIR}/${id}.png`;
+		const screenshotPath = `${SCREENSHOTS_DIR}/${id}.webp`;
 
 		if (!existsSync(SCREENSHOTS_DIR)) {
 			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
