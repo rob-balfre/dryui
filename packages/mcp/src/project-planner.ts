@@ -6,6 +6,7 @@ export type DryuiPackageManager = 'bun' | 'pnpm' | 'npm' | 'yarn' | 'unknown';
 export type DryuiProjectStatus = 'ready' | 'partial' | 'unsupported';
 export type DryuiPlanStepKind =
 	| 'install-package'
+	| 'run-command'
 	| 'edit-file'
 	| 'create-file'
 	| 'note'
@@ -141,6 +142,15 @@ function detectPackageManager(root: string | null): DryuiPackageManager {
 	if (lockfilePath.endsWith('package-lock.json')) return 'npm';
 	if (lockfilePath.endsWith('yarn.lock')) return 'yarn';
 	return 'unknown';
+}
+
+export function detectPackageManagerFromEnv(): DryuiPackageManager {
+	const ua = process.env.npm_config_user_agent ?? '';
+	if (ua.startsWith('bun/')) return 'bun';
+	if (ua.startsWith('pnpm/')) return 'pnpm';
+	if (ua.startsWith('yarn/')) return 'yarn';
+	if (ua.startsWith('npm/')) return 'npm';
+	return 'npm';
 }
 
 function readPackageJson(packageJsonPath: string | null): PackageJsonShape | null {
@@ -319,20 +329,260 @@ export function detectProject(
 	};
 }
 
-export function planInstall(spec: ProjectPlannerSpec, inputPath?: string): InstallPlan {
+// ── Scaffold templates ────────────────────────────────────
+
+const SCAFFOLD_PACKAGE_JSON = `{
+  "name": "my-dryui-app",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
+}
+`;
+
+const SCAFFOLD_SVELTE_CONFIG = `import adapter from '@sveltejs/adapter-auto';
+
+export default {
+  kit: {
+    adapter: adapter(),
+  },
+};
+`;
+
+const SCAFFOLD_VITE_CONFIG = `import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [sveltekit()],
+});
+`;
+
+const SCAFFOLD_TSCONFIG = `{
+  "extends": "./.svelte-kit/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "target": "ES2020"
+  }
+}
+`;
+
+const SCAFFOLD_APP_HTML = `<!doctype html>
+<html lang="en" class="theme-auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="/favicon.svg" />
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="hover">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+`;
+
+const SCAFFOLD_APP_CSS = `/* Global reset with DryUI tokens */
+*,
+*::before,
+*::after {
+\tbox-sizing: border-box;
+\tmargin: 0;
+}
+
+html {
+\tfont-family: var(--dry-font-sans);
+\tcolor: var(--dry-color-text-strong);
+\tbackground: var(--dry-color-bg-base);
+\t-webkit-font-smoothing: antialiased;
+}
+
+body {
+\tmargin: 0;
+\tmin-height: 100dvh;
+}
+`;
+
+function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
+	return `<script>
+  import '../app.css';
+  import '${spec.themeImports.default}';
+  import '${spec.themeImports.dark}';
+
+  let { children } = $props();
+</script>
+
+{@render children()}
+`;
+}
+
+const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
+\timport { Container, Heading, Text } from '@dryui/ui';
+</script>
+
+<svelte:head>
+\t<title>My App</title>
+</svelte:head>
+
+<div class="starter">
+\t<Container size="md">
+\t\t<Heading level={1}>Hello, World</Heading>
+\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
+\t</Container>
+</div>
+
+<style>
+\t.starter {
+\t\tpadding-block: var(--dry-space-16);
+\t\tdisplay: grid;
+\t\tgap: var(--dry-space-4);
+\t}
+</style>
+`;
+
+const SCAFFOLD_FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="18" fill="#16171f"/>
+  <rect x="10" y="10" width="44" height="44" rx="14" fill="#eef2ff"/>
+  <path d="M20 20h10v24H20z" fill="#1f2937"/>
+  <path d="M34 20h10c4.418 0 8 3.582 8 8v0c0 4.418-3.582 8-8 8h-4v8h-6V20z" fill="#4f46e5"/>
+  <circle cx="44" cy="28" r="4" fill="#f59e0b"/>
+</svg>
+`;
+
+interface ScaffoldFile {
+	readonly relativePath: string;
+	readonly content: string;
+	readonly description: string;
+}
+
+function getScaffoldFiles(spec: Pick<ProjectPlannerSpec, 'themeImports'>): ScaffoldFile[] {
+	return [
+		{
+			relativePath: 'package.json',
+			content: SCAFFOLD_PACKAGE_JSON,
+			description: 'Project manifest with SvelteKit scripts'
+		},
+		{
+			relativePath: 'svelte.config.js',
+			content: SCAFFOLD_SVELTE_CONFIG,
+			description: 'SvelteKit configuration with adapter-auto'
+		},
+		{
+			relativePath: 'vite.config.ts',
+			content: SCAFFOLD_VITE_CONFIG,
+			description: 'Vite configuration with SvelteKit plugin'
+		},
+		{
+			relativePath: 'tsconfig.json',
+			content: SCAFFOLD_TSCONFIG,
+			description: 'TypeScript configuration'
+		},
+		{
+			relativePath: 'src/app.html',
+			content: SCAFFOLD_APP_HTML,
+			description: 'HTML shell with theme-auto class'
+		},
+		{
+			relativePath: 'src/app.css',
+			content: SCAFFOLD_APP_CSS,
+			description: 'Foundation CSS reset with DryUI tokens'
+		},
+		{
+			relativePath: 'src/routes/+layout.svelte',
+			content: buildScaffoldRootLayout(spec),
+			description: 'Root layout with theme imports'
+		},
+		{
+			relativePath: 'src/routes/+page.svelte',
+			content: SCAFFOLD_STARTER_PAGE,
+			description: 'Starter page with DryUI components'
+		},
+		{
+			relativePath: 'static/favicon.svg',
+			content: SCAFFOLD_FAVICON,
+			description: 'DryUI project favicon'
+		}
+	];
+}
+
+function scaffoldCommand(packageManager: DryuiPackageManager): string {
+	const deps = 'svelte @sveltejs/kit @sveltejs/vite-plugin-svelte @sveltejs/adapter-auto vite';
+	switch (packageManager) {
+		case 'bun':
+			return `bun add -d ${deps}`;
+		case 'pnpm':
+			return `pnpm add -D ${deps}`;
+		case 'yarn':
+			return `yarn add -D ${deps}`;
+		default:
+			return `npm install -D ${deps}`;
+	}
+}
+
+function buildScaffoldSteps(
+	spec: ProjectPlannerSpec,
+	root: string,
+	packageManager: DryuiPackageManager,
+	hasPackageJson: boolean
+): ProjectPlanStep[] {
+	const steps: ProjectPlanStep[] = [];
+	const files = getScaffoldFiles(spec);
+
+	for (const file of files) {
+		if (file.relativePath === 'package.json' && hasPackageJson) continue;
+		steps.push({
+			kind: 'create-file',
+			status: 'pending',
+			title: `Create ${file.relativePath}`,
+			description: file.description,
+			path: resolve(root, file.relativePath),
+			snippet: file.content
+		});
+	}
+
+	steps.push({
+		kind: 'run-command',
+		status: 'pending',
+		title: 'Install SvelteKit dependencies',
+		description: 'Install Svelte, SvelteKit, Vite, and adapter-auto as dev dependencies.',
+		command: scaffoldCommand(packageManager)
+	});
+
+	steps.push({
+		kind: 'install-package',
+		status: 'pending',
+		title: 'Install @dryui/ui',
+		description: 'Add the styled DryUI package to the project.',
+		command: installCommand(packageManager)
+	});
+
+	return steps;
+}
+
+export interface PlanInstallOptions {
+	readonly packageManager?: DryuiPackageManager;
+}
+
+export function planInstall(
+	spec: ProjectPlannerSpec,
+	inputPath?: string,
+	options?: PlanInstallOptions
+): InstallPlan {
 	const detection = detectProject(spec, inputPath);
 	const steps: ProjectPlanStep[] = [];
 
 	if (detection.status === 'unsupported') {
-		steps.push({
-			kind: 'blocked',
-			status: 'blocked',
-			title: 'Project detection incomplete',
-			description:
-				detection.warnings.join(' ') ||
-				'DryUI install planning requires a Svelte or SvelteKit project with a package.json.'
-		});
-		return { detection, steps };
+		const root = detection.root ?? detection.inputPath;
+		const pm =
+			options?.packageManager ??
+			(detection.packageManager !== 'unknown' ? detection.packageManager : detectPackageManagerFromEnv());
+		const scaffoldSteps = buildScaffoldSteps(
+			spec,
+			root,
+			pm,
+			Boolean(detection.packageJsonPath)
+		);
+		return { detection, steps: scaffoldSteps };
 	}
 
 	if (!detection.dependencies.ui) {

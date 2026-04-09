@@ -537,15 +537,19 @@ export function toonProjectDetection(detection: ProjectDetection): string {
 
 // ── Install plan ───────────────────────────────────────────
 
-function toonStep(step: ProjectPlanStep, index: number): string {
+function toonStep(step: ProjectPlanStep, index: number, showSnippets = false): string {
 	const parts = [`${index + 1}. [${step.status}] ${step.title}: ${step.description}`];
 	if (step.command) parts.push(`   cmd: ${step.command}`);
 	if (step.path) parts.push(`   file: ${step.path}`);
+	if (showSnippets && step.snippet && step.kind === 'create-file') {
+		parts.push(`   ---\n${step.snippet}   ---`);
+	}
 	return parts.join('\n');
 }
 
 export function toonInstallPlan(plan: InstallPlan): string {
 	const lines: string[] = [];
+	const isScaffold = plan.detection.status === 'unsupported' && plan.steps.some((s) => s.kind === 'create-file');
 
 	lines.push(toonProjectDetection(plan.detection));
 	lines.push('');
@@ -553,9 +557,10 @@ export function toonInstallPlan(plan: InstallPlan): string {
 	if (plan.steps.length === 0) {
 		lines.push('steps[0]: none needed');
 	} else {
-		lines.push(header('steps', plan.steps.length, ['status', 'title', 'description']));
+		const label = isScaffold ? 'scaffold-steps' : 'steps';
+		lines.push(header(label, plan.steps.length, ['status', 'title', 'description']));
 		for (const [i, step] of plan.steps.entries()) {
-			lines.push(toonStep(step, i));
+			lines.push(toonStep(step, i, isScaffold));
 		}
 	}
 

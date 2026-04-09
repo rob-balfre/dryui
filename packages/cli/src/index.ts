@@ -23,7 +23,8 @@ const VERSION = pkg.version;
 const USAGE = `Usage: dryui <command> [options]
 
 Commands:
-  init                          Print setup snippets for a new DryUI app
+  init [path] [--pm bun|npm|pnpm|yarn]
+                                Bootstrap a SvelteKit + DryUI project
   detect [--json] [--toon] [path]
                                 Detect DryUI project setup
   install [--json] [--toon] [path]

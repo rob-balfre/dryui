@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'bun:test';
 import { getAdd } from '../commands/add.js';
-import { getInit } from '../commands/init.js';
 
 const mockSpec = {
 	themeImports: {
@@ -43,15 +42,5 @@ describe('getAdd', () => {
 		const { error, exitCode } = getAdd('Nonexistent', mockSpec);
 		expect(exitCode).toBe(1);
 		expect(error).toContain('Unknown component: "Nonexistent"');
-	});
-});
-
-describe('getInit', () => {
-	test('prints theme, html, and Vite setup snippets', () => {
-		const { output, exitCode } = getInit(mockSpec);
-		expect(exitCode).toBe(0);
-		expect(output).toContain("import '@dryui/ui/themes/default.css';");
-		expect(output).toContain('<html class="theme-auto">');
-		expect(output).toContain('preserveSymlinks: true');
 	});
 });
