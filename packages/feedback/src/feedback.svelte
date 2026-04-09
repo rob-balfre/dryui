@@ -342,17 +342,10 @@
 			canvas.height = h;
 			const ctx = canvas.getContext('2d')!;
 			ctx.drawImage(img, 0, 0);
-			return new Promise<string>((resolve) => {
-				canvas.toBlob(
-					(b) => {
-						const reader = new FileReader();
-						reader.onloadend = () => resolve((reader.result as string).split(',')[1]);
-						reader.readAsDataURL(b!);
-					},
-					'image/webp',
-					0.8
-				);
-			});
+			const dataUrl = canvas.toDataURL('image/webp', 0.8);
+			canvas.width = 0;
+			canvas.height = 0;
+			return dataUrl.split(',')[1];
 		} finally {
 			URL.revokeObjectURL(url);
 		}
@@ -369,7 +362,7 @@
 				body: JSON.stringify({
 					url: location.href,
 					image,
-					drawings: drawings.map((d) => ({ ...d })),
+					drawings,
 					viewport: { width: window.innerWidth, height: window.innerHeight }
 				})
 			});

@@ -266,6 +266,10 @@ export class FeedbackStore {
 			'color',
 			"TEXT CHECK(color IN ('brand', 'info', 'success', 'warning', 'error', 'neutral'))"
 		);
+
+		if (!existsSync(SCREENSHOTS_DIR)) {
+			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
+		}
 	}
 
 	close(): void {
@@ -535,10 +539,6 @@ export class FeedbackStore {
 	createSubmission(input: CreateSubmissionInput): Submission {
 		const id = randomUUID();
 		const screenshotPath = `${SCREENSHOTS_DIR}/${id}.webp`;
-
-		if (!existsSync(SCREENSHOTS_DIR)) {
-			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-		}
 		writeFileSync(screenshotPath, Buffer.from(input.image, 'base64'));
 
 		const now = createTimestamp();

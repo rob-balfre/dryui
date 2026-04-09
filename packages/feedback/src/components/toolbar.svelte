@@ -116,8 +116,8 @@
 
 		<button
 			class="tool-btn submit-btn"
+			data-submitting={submitting || undefined}
 			onclick={onsubmit}
-			disabled={submitting}
 			aria-label={submitting ? 'Sending...' : 'Send feedback'}
 		>
 			<Send size={18} />
@@ -188,8 +188,7 @@
 		color: hsl(145 70% 70%);
 	}
 
-	.submit-btn:disabled {
+	.submit-btn[data-submitting] {
 		opacity: 0.5;
-		cursor: not-allowed;
 	}
 </style>

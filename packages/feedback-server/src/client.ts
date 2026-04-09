@@ -36,11 +36,15 @@ export function resolveFeedbackBaseUrl(input?: string): string {
 	return DEFAULT_FEEDBACK_URL;
 }
 
-async function parseJson<T>(response: Response): Promise<T> {
+async function ensureOk(response: Response): Promise<void> {
 	if (!response.ok) {
 		const body = await response.text();
 		throw new Error(`HTTP ${response.status}: ${body}`);
 	}
+}
+
+async function parseJson<T>(response: Response): Promise<T> {
+	await ensureOk(response);
 	return response.json() as Promise<T>;
 }
 
@@ -102,15 +106,13 @@ export class FeedbackHttpClient {
 	}
 
 	async saveDrawings(url: string, drawings: unknown[]): Promise<void> {
-		const response = await fetch(`${this.baseUrl}/drawings?url=${encodeURIComponent(url)}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(drawings)
-		});
-		if (!response.ok) {
-			const body = await response.text();
-			throw new Error(`HTTP ${response.status}: ${body}`);
-		}
+		await ensureOk(
+			await fetch(`${this.baseUrl}/drawings?url=${encodeURIComponent(url)}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(drawings)
+			})
+		);
 	}
 
 	async submitFeedback(input: CreateSubmissionInput): Promise<Submission> {
@@ -130,15 +132,13 @@ export class FeedbackHttpClient {
 	}
 
 	async resolveSubmission(id: string): Promise<void> {
-		const response = await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}`, {
-			method: 'PATCH',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ status: 'resolved' })
-		});
-		if (!response.ok) {
-			const body = await response.text();
-			throw new Error(`HTTP ${response.status}: ${body}`);
-		}
+		await ensureOk(
+			await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ status: 'resolved' })
+			})
+		);
 	}
 
 	async health(): Promise<{ status: string }> {
