@@ -68,7 +68,10 @@ export function getInfoBatch(
 	spec: Spec,
 	options?: { toon?: boolean; full?: boolean }
 ): { output: string; error: string | null; exitCode: number } {
-	const names = query.split(',').map((n) => n.trim()).filter(Boolean);
+	const names = query
+		.split(',')
+		.map((n) => n.trim())
+		.filter(Boolean);
 
 	// Single name: delegate to getInfo for backward compatibility
 	if (names.length <= 1) {

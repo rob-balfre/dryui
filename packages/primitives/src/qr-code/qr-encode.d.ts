@@ -11,7 +11,7 @@
  */
 export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 export interface QRCodeOptions {
-    errorCorrection?: ErrorCorrectionLevel;
+	errorCorrection?: ErrorCorrectionLevel;
 }
 /**
  * Encode a string to a QR code matrix.

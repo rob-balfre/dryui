@@ -93,8 +93,8 @@
 				<button
 					class="preset-btn"
 					data-selected={brand.h === preset.brandInput.h &&
-						brand.s === preset.brandInput.s &&
-						brand.b === preset.brandInput.b
+					brand.s === preset.brandInput.s &&
+					brand.b === preset.brandInput.b
 						? ''
 						: undefined}
 					onclick={() => selectPreset(preset)}

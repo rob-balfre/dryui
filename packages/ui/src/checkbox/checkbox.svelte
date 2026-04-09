@@ -34,11 +34,7 @@
 </script>
 
 {#if children}
-	<label
-		class="checkbox-label"
-		data-disabled={isDisabled || undefined}
-		data-size={size}
-	>
+	<label class="checkbox-label" data-disabled={isDisabled || undefined} data-size={size}>
 		<span class="wrapper">
 			<input
 				{@attach applyIndeterminate}

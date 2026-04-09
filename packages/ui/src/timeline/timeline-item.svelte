@@ -38,6 +38,7 @@
 		bottom: var(--dry-timeline-line-bottom, calc(var(--dry-space-1) * -1));
 		right: var(--dry-timeline-line-right, auto);
 		height: var(--dry-timeline-line-h, auto);
-		border-left: var(--dry-timeline-line-w, 1px) solid var(--dry-timeline-line-color, var(--dry-color-stroke-weak));
+		border-left: var(--dry-timeline-line-w, 1px) solid
+			var(--dry-timeline-line-color, var(--dry-color-stroke-weak));
 	}
 </style>

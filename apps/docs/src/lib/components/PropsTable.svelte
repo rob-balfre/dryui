@@ -63,9 +63,7 @@
 							{/each}
 						</div>
 					{:else}
-						<Text as="span" color="secondary" size="sm"
-							><span class="mono">{def.type}</span></Text
-						>
+						<Text as="span" color="secondary" size="sm"><span class="mono">{def.type}</span></Text>
 					{/if}
 					{#if def.note}
 						<Text as="span" size="xs" color="muted">{def.note}</Text>
@@ -81,9 +79,7 @@
 			</Table.Cell>
 			<Table.Cell>
 				{#if def.default !== undefined}
-					<Text as="span" color="secondary" size="sm"
-						><span class="mono">{def.default}</span></Text
-					>
+					<Text as="span" color="secondary" size="sm"><span class="mono">{def.default}</span></Text>
 				{:else}
 					<Text as="span" color="muted">—</Text>
 				{/if}

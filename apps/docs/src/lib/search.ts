@@ -15,7 +15,9 @@ export interface SearchSection {
 // entries pointing to deleted routes are automatically filtered out.
 const routeModules = import.meta.glob('/src/routes/**/+page.svelte');
 const validRoutes = new Set(
-	Object.keys(routeModules).map((p) => p.replace('/src/routes', '').replace('/+page.svelte', '') || '/')
+	Object.keys(routeModules).map(
+		(p) => p.replace('/src/routes', '').replace('/+page.svelte', '') || '/'
+	)
 );
 
 const allDocsPages: SearchItem[] = [
@@ -47,7 +49,17 @@ const allDocsPages: SearchItem[] = [
 		label: 'Tools',
 		href: '/tools',
 		description: 'CLI commands and MCP server setup for DryUI tooling.',
-		keywords: ['cli', 'mcp', 'commands', 'tooling', 'terminal', 'model context protocol', 'review', 'diagnose', 'compose']
+		keywords: [
+			'cli',
+			'mcp',
+			'commands',
+			'tooling',
+			'terminal',
+			'model context protocol',
+			'review',
+			'diagnose',
+			'compose'
+		]
 	},
 	{
 		label: 'Changelog',

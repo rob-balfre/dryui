@@ -57,11 +57,7 @@
 		</div>
 	</div>
 
-	<div
-		class="preview-scene"
-		data-mode={mode}
-		{@attach attachThemeTokens(tokens)}
-	>
+	<div class="preview-scene" data-mode={mode} {@attach attachThemeTokens(tokens)}>
 		{#if preview}
 			{@render preview()}
 		{:else}

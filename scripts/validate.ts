@@ -116,7 +116,7 @@ await parallel(
 	run(
 		'check:docs:llms',
 		'git diff --exit-code -- apps/docs/static/llms.txt apps/docs/static/llms-components.txt'
-	),
+	)
 );
 
 // ── Summary ─────────────────────────────────────────────────────────────────

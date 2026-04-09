@@ -138,7 +138,9 @@ describe('primitives remediation', () => {
 		const timeDescription = document.querySelector<HTMLElement>('[data-testid="time-description"]');
 		const timeError = document.querySelector<HTMLElement>('[data-testid="time-error"]');
 		const timeTriggers = Array.from(
-			document.querySelectorAll<HTMLButtonElement>('[data-time-input-wrapper] [data-select-trigger]')
+			document.querySelectorAll<HTMLButtonElement>(
+				'[data-time-input-wrapper] [data-select-trigger]'
+			)
 		);
 		const pinGroup = document.querySelector<HTMLElement>('[data-pin-input-root]');
 		const pinInput = document.querySelector<HTMLInputElement>('[data-pin-input-hidden]');

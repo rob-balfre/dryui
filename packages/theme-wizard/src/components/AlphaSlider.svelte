@@ -10,4 +10,4 @@
 	let { value = $bindable(50), color = 'hsl(230, 65%, 55%)', onchange }: Props = $props();
 </script>
 
-<AlphaSlider bind:value {color} {...(onchange ? { onchange } : {})} />
+<AlphaSlider bind:value {color} {...onchange ? { onchange } : {}} />

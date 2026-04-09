@@ -123,7 +123,8 @@ function countExportedEntries(exports: ExportMap | undefined): number {
 	}
 
 	return Object.keys(exports).filter(
-		(key) => key !== '.' && !key.includes('*') && !key.endsWith('.css') && !key.startsWith('./internal/')
+		(key) =>
+			key !== '.' && !key.includes('*') && !key.endsWith('.css') && !key.startsWith('./internal/')
 	).length;
 }
 

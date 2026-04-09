@@ -195,7 +195,11 @@ export function formatCompound(name: string, def: ComponentDef): string {
 	lines.push(`Kind: ${kind}`);
 	lines.push(`Required parts: ${requiredParts.length ? requiredParts.join(', ') : 'none'}`);
 	lines.push(`Bindable props: ${bindables.length ? bindables.join(', ') : 'none'}`);
-	lines.push(hasRoot ? `Use ${name}.Root, not ${name}` : `Use parts directly; there is no ${name}.Root wrapper`);
+	lines.push(
+		hasRoot
+			? `Use ${name}.Root, not ${name}`
+			: `Use parts directly; there is no ${name}.Root wrapper`
+	);
 	if (hasRoot) {
 		lines.push('');
 		lines.push('Required structure:');

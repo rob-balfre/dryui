@@ -225,18 +225,6 @@ export type {
 	MenubarSeparatorProps,
 	MenubarLabelProps
 } from './menubar/index.js';
-export { AppFrame } from './app-frame/index.js';
-export type { AppFrameProps } from './app-frame/index.js';
-export { PageHeader } from './page-header/index.js';
-export type {
-	PageHeaderRootProps,
-	PageHeaderContentProps,
-	PageHeaderActionsProps,
-	PageHeaderEyebrowProps,
-	PageHeaderTitleProps,
-	PageHeaderDescriptionProps,
-	PageHeaderMetaProps
-} from './page-header/index.js';
 export { NavigationMenu } from './navigation-menu/index.js';
 export type {
 	NavigationMenuRootProps,
@@ -287,8 +275,6 @@ export type {
 } from './table/index.js';
 export { Avatar } from './avatar/index.js';
 export type { AvatarProps } from './avatar/index.js';
-export { AvatarGroup } from './avatar-group/index.js';
-export type { AvatarGroupProps } from './avatar-group/index.js';
 export { Badge } from './badge/index.js';
 export type { BadgeProps, BadgeColor } from './badge/index.js';
 export { Chart } from './chart/index.js';
@@ -304,8 +290,6 @@ export type {
 	ChartXAxisProps,
 	ChartYAxisProps
 } from './chart/index.js';
-export { ChatMessage } from './chat-message/index.js';
-export type { ChatMessageProps } from './chat-message/index.js';
 export { ChatThread } from './chat-thread/index.js';
 export type { ChatThreadProps } from './chat-thread/index.js';
 export { TypingIndicator } from './typing-indicator/index.js';
@@ -330,8 +314,6 @@ export type {
 	ListItemTextProps,
 	ListSubheaderProps
 } from './list/index.js';
-export { TokenPreview } from './token-preview/index.js';
-export type { TokenPreviewProps } from './token-preview/index.js';
 export { Timeline } from './timeline/index.js';
 export type {
 	TimelineRootProps,
@@ -360,19 +342,6 @@ export type {
 	DescriptionListTermProps,
 	DescriptionListDescriptionProps
 } from './description-list/index.js';
-export { FeatureSplitSection } from './feature-split-section/index.js';
-export type {
-	FeatureSplitSectionRootProps,
-	FeatureSplitSectionContentProps,
-	FeatureSplitSectionKickerProps,
-	FeatureSplitSectionHeadingProps,
-	FeatureSplitSectionBodyProps,
-	FeatureSplitSectionActionsProps,
-	FeatureSplitSectionMediaProps,
-	FeatureSplitSectionFeaturesProps
-} from './feature-split-section/index.js';
-export { User } from './user/index.js';
-export type { UserProps, UserAvatarConfig, UserChipConfig, UserChipColor } from './user/index.js';
 export { Alert } from './alert/index.js';
 export type {
 	AlertVariant,
@@ -398,39 +367,6 @@ export { Skeleton } from './skeleton/index.js';
 export type { SkeletonProps } from './skeleton/index.js';
 export { Spinner } from './spinner/index.js';
 export type { SpinnerProps } from './spinner/index.js';
-export { EmptyState } from './empty-state/index.js';
-export type {
-	EmptyStateRootProps,
-	EmptyStateIconProps,
-	EmptyStateTitleProps,
-	EmptyStateDescriptionProps,
-	EmptyStateActionProps
-} from './empty-state/index.js';
-export { Hero } from './hero/index.js';
-export type {
-	HeroRootProps,
-	HeroHeadingProps,
-	HeroSubheadingProps,
-	HeroActionsProps
-} from './hero/index.js';
-export { CommerceHeader } from './commerce-header/index.js';
-export type {
-	CommerceHeaderRootProps,
-	CommerceHeaderUtilityRowProps,
-	CommerceHeaderBrandProps,
-	CommerceHeaderSearchProps,
-	CommerceHeaderActionsProps,
-	CommerceHeaderCategoryNavProps,
-	CommerceHeaderPromoStripProps
-} from './commerce-header/index.js';
-export { PromoMosaic } from './promo-mosaic/index.js';
-export type {
-	PromoMosaicRootProps,
-	PromoMosaicHeroTileProps,
-	PromoMosaicTileProps,
-	PromoMosaicOverlayProps,
-	PromoMosaicActionsProps
-} from './promo-mosaic/index.js';
 export { Combobox } from './combobox/index.js';
 export type {
 	ComboboxRootProps,
@@ -472,6 +408,8 @@ export type {
 } from './date-range-picker/index.js';
 export { Listbox } from './listbox/index.js';
 export type { ListboxRootProps, ListboxItemProps } from './listbox/index.js';
+export { LogoMark } from './logo-mark/index.js';
+export type { LogoMarkProps } from './logo-mark/index.js';
 export { PinInput } from './pin-input/index.js';
 export type {
 	PinInputRootProps,
@@ -627,13 +565,6 @@ export type {
 } from './hover-card/index.js';
 export { ProgressRing } from './progress-ring/index.js';
 export type { ProgressRingProps } from './progress-ring/index.js';
-export { StatCard } from './stat-card/index.js';
-export type {
-	StatCardRootProps,
-	StatCardLabelProps,
-	StatCardValueProps,
-	StatCardTrendProps
-} from './stat-card/index.js';
 export { RelativeTime } from './relative-time/index.js';
 export type { RelativeTimeProps } from './relative-time/index.js';
 export { Tree } from './tree/index.js';
@@ -653,10 +584,6 @@ export type {
 	FlipCardFrontProps,
 	FlipCardBackProps
 } from './flip-card/index.js';
-export { LogoCloud } from './logo-cloud/index.js';
-export type { LogoCloudRootProps, LogoCloudItemProps } from './logo-cloud/index.js';
-export { WaveDivider } from './wave-divider/index.js';
-export type { WaveDividerProps } from './wave-divider/index.js';
 export { VideoEmbed } from './video-embed/index.js';
 export type { VideoEmbedProps } from './video-embed/index.js';
 export { PhoneInput } from './phone-input/index.js';
@@ -682,13 +609,6 @@ export type {
 	MegaMenuColumnProps,
 	MegaMenuLinkProps
 } from './mega-menu/index.js';
-export { SeatMap } from './seat-map/index.js';
-export type {
-	SeatMapRootProps,
-	SeatMapRowProps,
-	SeatMapSeatProps,
-	SeatMapLegendProps
-} from './seat-map/index.js';
 export { Map } from './map/index.js';
 export type {
 	MapRootProps,
@@ -708,37 +628,6 @@ export type {
 	PopupOptions,
 	GeoJsonData
 } from './map/index.js';
-export { AddOnSelector } from './add-on-selector/index.js';
-export { AmenityGrid } from './amenity-grid/index.js';
-export { BookingConfirmation } from './booking-confirmation/index.js';
-export { ComparisonTable } from './comparison-table/index.js';
-export { CurrencySelector } from './currency-selector/index.js';
-export type { CurrencyOption } from './currency-selector/index.js';
-export { FareClassPicker } from './fare-class-picker/index.js';
-export { FilterSidebar } from './filter-sidebar/index.js';
-export { FlexibleDatesGrid } from './flexible-dates-grid/index.js';
-export { FlightTimeline } from './flight-timeline/index.js';
-export { GuestRoomSelector } from './guest-room-selector/index.js';
-export { HotelGallery } from './hotel-gallery/index.js';
-export { ItineraryTimeline } from './itinerary-timeline/index.js';
-export { LocationAutocomplete } from './location-autocomplete/index.js';
-export { LoyaltyPointsDisplay } from './loyalty-points-display/index.js';
-export { MapListToggle } from './map-list-toggle/index.js';
-export { MultiCitySearchForm } from './multi-city-search-form/index.js';
-export type { MultiCityLeg } from './multi-city-search-form/index.js';
-export { PassengerClassSelector } from './passenger-class-selector/index.js';
-export { PaymentCardInput } from './payment-card-input/index.js';
-export { PriceCalendar } from './price-calendar/index.js';
-export { PriceSummaryPanel } from './price-summary-panel/index.js';
-export { PromoCodeInput } from './promo-code-input/index.js';
-export { RecentSearches } from './recent-searches/index.js';
-export { ResultCardCar } from './result-card-car/index.js';
-export { ResultCardFlight } from './result-card-flight/index.js';
-export { ResultCardHotel } from './result-card-hotel/index.js';
-export { ReviewCard } from './review-card/index.js';
-export { RoomTypePicker } from './room-type-picker/index.js';
-export { RouteMap } from './route-map/index.js';
-export { SearchFormTabs } from './search-form-tabs/index.js';
 export { SystemMap } from './system-map/index.js';
 export type {
 	DolphinCluster,
@@ -763,21 +652,12 @@ export type {
 	SystemMapNodeKind,
 	SystemMapVisibility
 } from './system-map/index.js';
-export { SortBar } from './sort-bar/index.js';
-export { TripCard } from './trip-card/index.js';
-export { TrustBadges } from './trust-badges/index.js';
 export { ChromaticShift } from './chromatic-shift/index.js';
 export type { ChromaticShiftProps } from './chromatic-shift/index.js';
 export { ChromaticAberration } from './chromatic-aberration/index.js';
 export type { ChromaticAberrationProps } from './chromatic-aberration/index.js';
 export { Displacement } from './displacement/index.js';
 export type { DisplacementProps } from './displacement/index.js';
-export { GlassSurface } from './glass-surface/index.js';
-export type {
-	GlassSurfaceProps,
-	GlassSurfaceBlur,
-	GlassSurfaceTint
-} from './glass-surface/index.js';
 export { Glow } from './glow/index.js';
 export type { GlowProps } from './glow/index.js';
 export { Adjust } from './adjust/index.js';
@@ -790,10 +670,6 @@ export { Glass } from './glass/index.js';
 export type { GlassProps } from './glass/index.js';
 export { GodRays } from './god-rays/index.js';
 export type { GodRaysProps } from './god-rays/index.js';
-export { Surface } from './surface/index.js';
-export type { SurfaceProps } from './surface/index.js';
-export { SwatchStrip } from './swatch-strip/index.js';
-export type { SwatchStripProps } from './swatch-strip/index.js';
 export { GradientMesh } from './gradient-mesh/index.js';
 export type { GradientMeshProps } from './gradient-mesh/index.js';
 export { Halftone } from './halftone/index.js';
@@ -805,13 +681,9 @@ export type { ShaderCanvasProps, ShaderCanvasPreset } from './shader-canvas/inde
 export { Svg } from './svg/index.js';
 export type { SvgProps } from './svg/index.js';
 export { Thumbnail } from './thumbnail/index.js';
-export { Footer } from './footer/index.js';
-export type {
-	FooterRootProps,
-	FooterBrandProps,
-	FooterLinksProps,
-	FooterLinkGroupProps,
-	FooterCopyrightProps
-} from './footer/index.js';
+export { StarRating } from './star-rating/index.js';
+export type { StarRatingRootProps } from './star-rating/index.js';
+export { Tag } from './tag/index.js';
+export type { TagProps, TagColor } from './tag/index.js';
 export { useThemeOverride } from './themes/use-theme-override.svelte.js';
 export type { ThemeTokenMap } from './themes/use-theme-override.svelte.js';

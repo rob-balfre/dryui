@@ -1,14 +1,5 @@
 <script lang="ts">
-	import {
-		Accordion,
-		Badge,
-		Button,
-		Card,
-		Input,
-		ScrollArea,
-		Text,
-		Textarea
-	} from '@dryui/ui';
+	import { Accordion, Badge, Button, Card, Input, ScrollArea, Text, Textarea } from '@dryui/ui';
 	import { renderPlacementSkeleton } from './placement-skeleton.js';
 	import { COMPONENT_REGISTRY, type CanvasPurpose, type LayoutModeComponentType } from './types.js';
 

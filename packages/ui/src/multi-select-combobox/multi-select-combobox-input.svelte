@@ -157,5 +157,4 @@
 	[data-multi-select-input]:disabled {
 		cursor: not-allowed;
 	}
-
 </style>

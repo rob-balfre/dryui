@@ -20,8 +20,7 @@
 				<div class="title-stack">
 					<Text as="p" size="lg" weight="semibold">Settings</Text>
 					<Text as="p" size="sm" color="secondary">
-						Keep notifications, review flow, and privacy defaults aligned for the whole
-						workspace.
+						Keep notifications, review flow, and privacy defaults aligned for the whole workspace.
 					</Text>
 				</div>
 			</div>

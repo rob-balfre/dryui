@@ -125,10 +125,12 @@ npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
 ```
 
 Two MCP servers are configured:
+
 - **dryui** — component lookup, composition, validation, theme checks, workspace audit
 - **dryui-feedback** — feedback annotation and review (`packages/feedback-server/dist/mcp.js`)
 
 DryUI MCP tools:
+
 - lookup and source browsing (`info`, `get`, `list`)
 - composition and project planning (`compose`, `detect_project`, `plan_install`, `plan_add`)
 - validation, theme checks, and workspace audit (`review`, `diagnose`, `doctor`, `lint`)

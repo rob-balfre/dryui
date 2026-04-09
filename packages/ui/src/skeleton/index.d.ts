@@ -1,5 +1,5 @@
-import type { SkeletonProps as PrimitiveSkeletonProps } from '@dryui/primitives';
-export interface SkeletonProps extends PrimitiveSkeletonProps {
+import type { HTMLAttributes } from 'svelte/elements';
+export interface SkeletonProps extends HTMLAttributes<HTMLDivElement> {
 	variant?: 'text' | 'circular' | 'rectangular';
 	width?: string;
 	height?: string;

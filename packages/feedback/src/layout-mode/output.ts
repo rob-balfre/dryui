@@ -277,18 +277,26 @@ function formatLayoutPrimitiveSuggestions(placements: readonly DesignPlacement[]
 	const sidebar = placements.find((placement) => placement.type === 'sidebar');
 
 	if (sidebar) {
-		suggestions.push(`- Use CSS grid for the rail-plus-content split. Equivalent CSS: \`grid-template-columns: ${Math.round(sidebar.width)}px 1fr;\``);
+		suggestions.push(
+			`- Use CSS grid for the rail-plus-content split. Equivalent CSS: \`grid-template-columns: ${Math.round(sidebar.width)}px 1fr;\``
+		);
 	}
 
 	if (cards.length > 1 && cards[0]) {
-		suggestions.push(`- Use a scoped CSS grid for repeated card tiles instead of manual card coordinates. Equivalent CSS: \`grid-template-columns: repeat(${cards.length}, ${Math.round(cards[0].width)}px); gap: 16px;\``);
+		suggestions.push(
+			`- Use a scoped CSS grid for repeated card tiles instead of manual card coordinates. Equivalent CSS: \`grid-template-columns: repeat(${cards.length}, ${Math.round(cards[0].width)}px); gap: 16px;\``
+		);
 	}
 
 	if (placements.some((placement) => placement.type === 'navigation')) {
-		suggestions.push('- Use a sticky `<nav>` for top-of-page chrome. Equivalent CSS: `position: sticky; top: 0; z-index: 50;`');
+		suggestions.push(
+			'- Use a sticky `<nav>` for top-of-page chrome. Equivalent CSS: `position: sticky; top: 0; z-index: 50;`'
+		);
 	}
 
-	return suggestions.length > 0 ? '\n### DryUI Layout Guidance\n' + suggestions.join('\n') + '\n' : '';
+	return suggestions.length > 0
+		? '\n### DryUI Layout Guidance\n' + suggestions.join('\n') + '\n'
+		: '';
 }
 
 function formatParentContext(selector: string): string | null {

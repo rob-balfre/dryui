@@ -85,7 +85,10 @@
 
 	[data-tabs-trigger][data-state='active'] {
 		color: var(--dry-color-text-brand);
-		border-bottom-color: var(--dry-tabs-trigger-active-border-bottom-color, var(--dry-color-stroke-selected));
+		border-bottom-color: var(
+			--dry-tabs-trigger-active-border-bottom-color,
+			var(--dry-color-stroke-selected)
+		);
 		border-right-color: var(--dry-tabs-trigger-active-border-right-color, transparent);
 		font-weight: 600;
 	}
@@ -124,5 +127,4 @@
 		align-items: center;
 		gap: var(--dry-space-1_5);
 	}
-
 </style>

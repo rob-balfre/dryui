@@ -1078,7 +1078,7 @@ export const componentCompositions: ComponentComposition[] = [
     </Sidebar.Group>
   </Sidebar.Content>
 </Sidebar.Root>`
-			},
+			}
 		],
 		antiPatterns: [
 			{
@@ -1089,7 +1089,6 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		combinesWith: []
 	},
-
 
 	// ── Feedback ─────────────────────────────────────────────────────────────
 
@@ -1157,7 +1156,6 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		combinesWith: ['Table.Cell', 'Card.Content', 'Avatar']
 	},
-
 
 	{
 		component: 'Skeleton',
@@ -1577,7 +1575,7 @@ export const componentCompositions: ComponentComposition[] = [
     <Button>Action</Button>
   </Card.Footer>
 </Card.Root>`
-			},
+			}
 		],
 		antiPatterns: [
 			{
@@ -2812,9 +2810,7 @@ export const componentCompositions: ComponentComposition[] = [
 		combinesWith: ['Card.Content', 'ScrollArea']
 	},
 
-
 	// ── Navigation (missing) ──────────────────────────────────────────────
-
 
 	{
 		component: 'NavigationMenu',
@@ -2854,7 +2850,7 @@ export const componentCompositions: ComponentComposition[] = [
     </MegaMenu.Column>
   </MegaMenu.Content>
 </MegaMenu.Root>`
-			},
+			}
 		],
 		antiPatterns: [
 			{
@@ -2943,7 +2939,6 @@ export const componentCompositions: ComponentComposition[] = [
 		antiPatterns: [],
 		combinesWith: ['Kbd', 'Separator']
 	},
-
 
 	{
 		component: 'TableOfContents',
@@ -3211,8 +3206,6 @@ export const componentCompositions: ComponentComposition[] = [
 
 	// ── Display / Data (missing) ──────────────────────────────────────────
 
-
-
 	{
 		component: 'Image',
 		useWhen: 'Display an image with loading states and fallback',
@@ -3397,7 +3390,6 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		combinesWith: ['Card.Content', 'ScrollArea', 'Avatar']
 	},
-
 
 	{
 		component: 'Timeline',
@@ -3587,7 +3579,6 @@ export const componentCompositions: ComponentComposition[] = [
 		combinesWith: ['Text', 'Badge']
 	},
 
-
 	{
 		component: 'QRCode',
 		useWhen: 'Generate a QR code using Canvas 2D API',
@@ -3776,7 +3767,6 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		combinesWith: ['List', 'ScrollArea']
 	},
-
 
 	{
 		component: 'ChatThread',
@@ -4248,7 +4238,6 @@ export const componentCompositions: ComponentComposition[] = [
 		combinesWith: ['Card', 'Aurora']
 	},
 
-
 	{
 		component: 'GodRays',
 		useWhen:
@@ -4345,7 +4334,6 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		combinesWith: ['Card']
 	},
-
 
 	{
 		component: 'Adjust',
@@ -4522,8 +4510,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		combinesWith: ['Field.Root', 'Label', 'Text']
-	},
-
+	}
 ];
 
 // ---------------------------------------------------------------------------
@@ -4718,7 +4705,6 @@ export const compositionRecipes: CompositionRecipe[] = [
   .auth-fields { display: grid; gap: var(--dry-space-4); }
 </style>`
 	},
-
 
 	{
 		name: 'hero-background',
@@ -5549,7 +5535,6 @@ export const compositionRecipes: CompositionRecipe[] = [
 </style>`
 	},
 
-
 	{
 		name: 'data-table-with-toolbar',
 		description:
@@ -5611,16 +5596,9 @@ export const compositionRecipes: CompositionRecipe[] = [
 
 	{
 		name: 'notification-center',
-		description:
-			'Notification center with grouped notifications, read states, and actions.',
+		description: 'Notification center with grouped notifications, read states, and actions.',
 		tags: ['notification', 'header', 'alerts', 'activity'],
-		components: [
-			'NotificationCenter',
-			'Button',
-			'Badge',
-			'Text',
-			'Separator'
-		],
+		components: ['NotificationCenter', 'Button', 'Badge', 'Text', 'Separator'],
 		snippet: `<script>
   import { NotificationCenter, Button, Badge, Text, Separator } from '@dryui/ui';
 </script>
@@ -5664,7 +5642,6 @@ export const compositionRecipes: CompositionRecipe[] = [
   .notif-text { display: grid; gap: var(--dry-space-1); }
 </style>`
 	},
-
 
 	{
 		name: 'surface-composition',
@@ -5893,6 +5870,5 @@ export const compositionRecipes: CompositionRecipe[] = [
     }
   }
 </style>`
-	},
-
+	}
 ];

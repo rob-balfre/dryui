@@ -269,8 +269,7 @@ export const GENERATED_LAYOUT_LIBRARY = [
 				section: 'Content',
 				type: 'grid',
 				label: 'CSS Grid Layout',
-				description:
-					'Scoped CSS grid layout for repeated cards, columns, and responsive sections.',
+				description: 'Scoped CSS grid layout for repeated cards, columns, and responsive sections.',
 				sourceKind: 'component',
 				sourceId: 'Container',
 				sourceName: 'Container',

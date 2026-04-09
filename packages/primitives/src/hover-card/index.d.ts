@@ -2,24 +2,24 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { Placement } from '../utils/anchor-position.svelte.js';
 export interface HoverCardRootProps {
-    openDelay?: number;
-    closeDelay?: number;
-    children: Snippet;
+	openDelay?: number;
+	closeDelay?: number;
+	children: Snippet;
 }
 export interface HoverCardTriggerProps extends HTMLAttributes<HTMLAnchorElement> {
-    href?: string;
-    children: Snippet;
+	href?: string;
+	children: Snippet;
 }
 export interface HoverCardContentProps extends HTMLAttributes<HTMLDivElement> {
-    placement?: Placement;
-    offset?: number;
-    children: Snippet;
+	placement?: Placement;
+	offset?: number;
+	children: Snippet;
 }
 import HoverCardRoot from './hover-card-root.svelte';
 import HoverCardTrigger from './hover-card-trigger.svelte';
 import HoverCardContent from './hover-card-content.svelte';
 export declare const HoverCard: {
-    Root: typeof HoverCardRoot;
-    Trigger: typeof HoverCardTrigger;
-    Content: typeof HoverCardContent;
+	Root: typeof HoverCardRoot;
+	Trigger: typeof HoverCardTrigger;
+	Content: typeof HoverCardContent;
 };

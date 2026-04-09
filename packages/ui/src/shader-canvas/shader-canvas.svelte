@@ -118,5 +118,4 @@
 		border-radius: inherit;
 		aspect-ratio: var(--_ratio);
 	}
-
 </style>

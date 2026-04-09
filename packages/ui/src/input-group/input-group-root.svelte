@@ -105,5 +105,4 @@
 	[data-input-group-root][data-size='lg'] {
 		min-height: 3.5rem;
 	}
-
 </style>

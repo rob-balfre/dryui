@@ -575,13 +575,10 @@ export function planInstall(
 		const root = detection.root ?? detection.inputPath;
 		const pm =
 			options?.packageManager ??
-			(detection.packageManager !== 'unknown' ? detection.packageManager : detectPackageManagerFromEnv());
-		const scaffoldSteps = buildScaffoldSteps(
-			spec,
-			root,
-			pm,
-			Boolean(detection.packageJsonPath)
-		);
+			(detection.packageManager !== 'unknown'
+				? detection.packageManager
+				: detectPackageManagerFromEnv());
+		const scaffoldSteps = buildScaffoldSteps(spec, root, pm, Boolean(detection.packageJsonPath));
 		return { detection, steps: scaffoldSteps };
 	}
 

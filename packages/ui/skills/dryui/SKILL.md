@@ -27,8 +27,10 @@ The test: can you point to an `info` or `compose` call for every component in yo
 Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound; verify with `info`.
 
 ```svelte
-<!-- Wrong --> <Card>content</Card>
-<!-- Right --> <Card.Root>content</Card.Root>
+<!-- Wrong -->
+<Card>content</Card>
+<!-- Right -->
+<Card.Root>content</Card.Root>
 ```
 
 Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionSwatchGroup, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree and Typography.
@@ -47,10 +49,16 @@ The test: every compound component in your markup uses `.Root`, and its parts ar
 
 ```css
 /* Wrong */
-.card { background: #6366f1; color: white; }
+.card {
+	background: #6366f1;
+	color: white;
+}
 
 /* Right */
-.card { background: var(--dry-color-fill-brand); color: var(--dry-color-text-strong); }
+.card {
+	background: var(--dry-color-fill-brand);
+	color: var(--dry-color-text-strong);
+}
 ```
 
 The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero inline styles?
@@ -66,8 +74,12 @@ The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero i
 
 ```svelte
 <div class="layout">...</div>
+
 <style>
-  .layout { display: grid; gap: var(--dry-space-4); }
+	.layout {
+		display: grid;
+		gap: var(--dry-space-4);
+	}
 </style>
 ```
 
@@ -89,8 +101,8 @@ The test: grep your output for `display: flex`, `style=`, `@media` — all shoul
 
 <!-- Right -->
 <Field.Root>
-  <Label>Email</Label>
-  <Input bind:value={email} />
+	<Label>Email</Label>
+	<Input bind:value={email} />
 </Field.Root>
 ```
 
@@ -136,8 +148,8 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 3. In root layout (`src/routes/+layout.svelte`), import themes:
    ```svelte
    <script>
-     import '@dryui/ui/themes/default.css';
-     import '@dryui/ui/themes/dark.css';
+   	import '@dryui/ui/themes/default.css';
+   	import '@dryui/ui/themes/dark.css';
    </script>
    ```
 4. Import `app.css` AFTER theme CSS if you have custom styles
@@ -164,12 +176,12 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### MCP tools (preferred)
 
-| Workflow | Tools |
-|----------|-------|
-| Project setup | `detect_project`, `plan_install`, `plan_add` |
-| Lookup & composition | `info`, `get`, `list`, `compose` |
-| Validation | `review`, `diagnose` |
-| Audit | `doctor`, `lint` |
+| Workflow             | Tools                                        |
+| -------------------- | -------------------------------------------- |
+| Project setup        | `detect_project`, `plan_install`, `plan_add` |
+| Lookup & composition | `info`, `get`, `list`, `compose`             |
+| Validation           | `review`, `diagnose`                         |
+| Audit                | `doctor`, `lint`                             |
 
 ### CLI fallback
 

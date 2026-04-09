@@ -2,16 +2,16 @@
 
 ## Metrics
 
-| Metric | Count |
-| --- | ---: |
-| Primitive component nodes | 145 |
-| UI component nodes | 145 |
-| UI wrappers | 130 |
-| UI composites | 15 |
-| Compound parts | 662 |
-| Mismatch count | 16 |
-| PrimitivePart components | 0 |
-| Thin wrapper count | 64 |
+| Metric                    | Count |
+| ------------------------- | ----: |
+| Primitive component nodes |   145 |
+| UI component nodes        |   145 |
+| UI wrappers               |   130 |
+| UI composites             |    15 |
+| Compound parts            |   662 |
+| Mismatch count            |    16 |
+| PrimitivePart components  |     0 |
+| Thin wrapper count        |    64 |
 
 ## Package Overview
 

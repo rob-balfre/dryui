@@ -1,12 +1,6 @@
 <script lang="ts">
 	import { Sidebar } from '@dryui/ui';
-	import {
-		FolderKanban,
-		LayoutDashboard,
-		LifeBuoy,
-		ListTodo,
-		Settings2
-	} from 'lucide-svelte';
+	import { FolderKanban, LayoutDashboard, LifeBuoy, ListTodo, Settings2 } from 'lucide-svelte';
 </script>
 
 <div class="demo-layout">

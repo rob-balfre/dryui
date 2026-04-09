@@ -63,7 +63,10 @@
 		z-index: var(--dry-layer-tour-tooltip);
 		pointer-events: auto;
 		display: grid;
-		grid-template-columns: minmax(16rem, min(var(--dry-tour-tooltip-max-width), calc(100vw - var(--dry-space-4))));
+		grid-template-columns: minmax(
+			16rem,
+			min(var(--dry-tour-tooltip-max-width), calc(100vw - var(--dry-space-4)))
+		);
 		background: var(--dry-tour-tooltip-bg);
 		color: var(--dry-color-text-strong);
 		border: 1px solid var(--dry-color-stroke-weak);

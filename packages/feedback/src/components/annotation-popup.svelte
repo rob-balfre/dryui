@@ -418,8 +418,12 @@
 														role={message.role === 'human' ? 'user' : 'assistant'}
 													>
 														<div class="chat-message-header">
-															<span class="chat-message-name">{message.role === 'human' ? 'You' : 'Agent'}</span>
-															<span class="chat-message-timestamp">{formatThreadTimestamp(message.timestamp)}</span>
+															<span class="chat-message-name"
+																>{message.role === 'human' ? 'You' : 'Agent'}</span
+															>
+															<span class="chat-message-timestamp"
+																>{formatThreadTimestamp(message.timestamp)}</span
+															>
 														</div>
 														<div class="chat-message-body">{message.content}</div>
 													</div>

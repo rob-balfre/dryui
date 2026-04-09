@@ -95,7 +95,15 @@
 	oninput={handleInput}
 	onkeydown={handleKeydown}
 	{...rest}
-><h1>.</h1><h2>.</h2><h3>.</h3><p></p><ul><li></li></ul><ol><li></li></ol><a aria-hidden="true" href="https://example.com">.</a></div>
+>
+	<h1>.</h1>
+	<h2>.</h2>
+	<h3>.</h3>
+	<p></p>
+	<ul><li></li></ul>
+	<ol><li></li></ol>
+	<a aria-hidden="true" href="https://example.com">.</a>
+</div>
 
 <style>
 	[data-part='content'] {

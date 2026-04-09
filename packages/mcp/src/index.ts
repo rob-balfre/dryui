@@ -14,15 +14,8 @@ import { scanWorkspace, type WorkspaceAuditSpec } from './workspace-audit.js';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import type { ComponentDef, CompositionComponentDef, CompositionRecipeDef } from './spec-types.js';
-import {
-	findComponent,
-	formatCompound,
-	formatSimple
-} from './spec-formatters.js';
-import {
-	searchComposition,
-	formatCompositionResult
-} from './composition-search.js';
+import { findComponent, formatCompound, formatSimple } from './spec-formatters.js';
+import { searchComposition, formatCompositionResult } from './composition-search.js';
 import {
 	toonComponent,
 	toonComponentList,
@@ -327,7 +320,14 @@ server.tool(
 				...(maxSeverity ? { maxSeverity } : {}),
 				...(changed !== undefined ? { changed } : {})
 			});
-			return { content: [{ type: 'text', text: toonWorkspaceReport(result, { title: 'doctor', command: 'doctor' }) }] };
+			return {
+				content: [
+					{
+						type: 'text',
+						text: toonWorkspaceReport(result, { title: 'doctor', command: 'doctor' })
+					}
+				]
+			};
 		} catch (e) {
 			return toolError(e);
 		}
@@ -363,7 +363,11 @@ server.tool(
 				...(maxSeverity ? { maxSeverity } : {}),
 				...(changed !== undefined ? { changed } : {})
 			});
-			return { content: [{ type: 'text', text: toonWorkspaceReport(result, { title: 'lint', command: 'lint' }) }] };
+			return {
+				content: [
+					{ type: 'text', text: toonWorkspaceReport(result, { title: 'lint', command: 'lint' }) }
+				]
+			};
 		} catch (e) {
 			return toolError(e);
 		}
@@ -389,12 +393,19 @@ server.tool(
 	'info',
 	INFO_DESC,
 	{
-		name: z.string().describe('Component name (case-insensitive). Comma-separated for batch lookup (e.g. "Button,Card,Select")')
+		name: z
+			.string()
+			.describe(
+				'Component name (case-insensitive). Comma-separated for batch lookup (e.g. "Button,Card,Select")'
+			)
 	},
 	async ({ name }) => {
 		try {
 			const components = getComponents();
-			const names = name.split(',').map((n) => n.trim()).filter(Boolean);
+			const names = name
+				.split(',')
+				.map((n) => n.trim())
+				.filter(Boolean);
 
 			if (names.length === 1) {
 				// Single component lookup (original behavior)
@@ -482,7 +493,9 @@ server.tool(
 		category: z
 			.string()
 			.optional()
-			.describe('Filter by category name (e.g. "color", "space", "radius", "shadow", "font", "type")')
+			.describe(
+				'Filter by category name (e.g. "color", "space", "radius", "shadow", "font", "type")'
+			)
 	},
 	async ({ category }) => {
 		try {

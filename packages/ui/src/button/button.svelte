@@ -50,7 +50,11 @@
 	}
 </script>
 
-<span class="wrapper" data-in-group={groupCtx ? '' : undefined} data-group-orientation={groupCtx?.orientation}>
+<span
+	class="wrapper"
+	data-in-group={groupCtx ? '' : undefined}
+	data-group-orientation={groupCtx?.orientation}
+>
 	{#if href !== undefined}
 		<a
 			{...rest as AnchorRest}

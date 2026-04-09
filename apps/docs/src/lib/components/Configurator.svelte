@@ -205,5 +205,4 @@
 		font-size: var(--dry-text-sm-size);
 		line-height: 1.5;
 	}
-
 </style>

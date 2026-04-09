@@ -1,15 +1,7 @@
 <script lang="ts">
 	import { Sidebar } from '@dryui/ui';
 	import type { Attachment } from 'svelte/attachments';
-	import {
-		Home,
-		Rocket,
-		Palette,
-		Wrench,
-		FileText,
-		LayoutGrid,
-		Grid3x3
-	} from 'lucide-svelte';
+	import { Home, Rocket, Palette, Wrench, FileText, LayoutGrid, Grid3x3 } from 'lucide-svelte';
 	import { categories, toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
 	import NavGroup from './NavGroup.svelte';

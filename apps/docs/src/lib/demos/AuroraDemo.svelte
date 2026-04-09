@@ -16,8 +16,8 @@
 						<div class="hero-copy">
 							<h3 class="hero-title">Ambient background effect</h3>
 							<Text color="secondary">
-								Layered gradients drift when the browser can animate custom properties, then
-								fall back to a static surface when it cannot.
+								Layered gradients drift when the browser can animate custom properties, then fall
+								back to a static surface when it cannot.
 							</Text>
 						</div>
 					</div>
@@ -56,7 +56,11 @@
 
 		<div class="mini-aurora">
 			<Aurora
-				palette={['rgba(56, 189, 248, 0.52)', 'rgba(16, 185, 129, 0.44)', 'rgba(59, 130, 246, 0.46)']}
+				palette={[
+					'rgba(56, 189, 248, 0.52)',
+					'rgba(16, 185, 129, 0.44)',
+					'rgba(59, 130, 246, 0.46)'
+				]}
 				speed={0.8}
 				intensity={76}
 				waviness={64}

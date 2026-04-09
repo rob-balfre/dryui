@@ -1,12 +1,6 @@
 import { aiSurface } from '../../../../packages/mcp/src/ai-surface.js';
 
-export type AiAgentId =
-	| 'claude-code'
-	| 'codex'
-	| 'cursor'
-	| 'copilot'
-	| 'windsurf'
-	| 'zed';
+export type AiAgentId = 'claude-code' | 'codex' | 'cursor' | 'copilot' | 'windsurf' | 'zed';
 
 export interface AiSurfaceCard {
 	readonly name: string;
@@ -180,7 +174,8 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			code: codexConfig,
 			language: 'toml'
 		},
-		followUp: 'Restart Codex after installation. The skill teaches conventions, the MCP server provides live tools.'
+		followUp:
+			'Restart Codex after installation. The skill teaches conventions, the MCP server provides live tools.'
 	},
 	{
 		id: 'copilot',
@@ -217,8 +212,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			code: mcpServersConfig,
 			language: 'json'
 		},
-		followUp:
-			'The skill loads automatically when Cursor determines DryUI is relevant to the task.'
+		followUp: 'The skill loads automatically when Cursor determines DryUI is relevant to the task.'
 	},
 	{
 		id: 'windsurf',
@@ -236,8 +230,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			code: mcpServersConfig,
 			language: 'json'
 		},
-		followUp:
-			'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 11 tools.'
+		followUp: 'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 11 tools.'
 	},
 	{
 		id: 'zed',

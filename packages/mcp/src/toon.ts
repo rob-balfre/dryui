@@ -2,16 +2,16 @@
 // AXI-inspired format: ~40% fewer tokens than JSON for agent consumption.
 // Format: resource[count]{fields}: value1,value2,...
 
-import type { ComponentDef, CompositionComponentDef, CompositionRecipeDef, Spec } from './spec-types.js';
+import type {
+	ComponentDef,
+	CompositionComponentDef,
+	CompositionRecipeDef,
+	Spec
+} from './spec-types.js';
 import type { ReviewResult } from './reviewer.js';
 import type { DiagnoseResult } from './theme-checker.js';
 import type { WorkspaceReport, WorkspaceFinding } from './workspace-audit.js';
-import type {
-	ProjectDetection,
-	InstallPlan,
-	AddPlan,
-	ProjectPlanStep
-} from './project-planner.js';
+import type { ProjectDetection, InstallPlan, AddPlan, ProjectPlanStep } from './project-planner.js';
 import type { TokenResult } from './tokens.js';
 import { componentKind, getBindableProps, getRequiredParts } from './spec-formatters.js';
 
@@ -152,7 +152,11 @@ export function formatHelp(hints: string[]): string {
 
 // ── Component info ─────────────────────────────────────────
 
-export function toonComponent(name: string, def: ComponentDef, opts?: { full?: boolean | undefined }): string {
+export function toonComponent(
+	name: string,
+	def: ComponentDef,
+	opts?: { full?: boolean | undefined }
+): string {
 	const full = opts?.full ?? false;
 	const lines: string[] = [];
 	const bindables = getBindableProps(def);
@@ -201,12 +205,7 @@ export function toonComponent(name: string, def: ComponentDef, opts?: { full?: b
 			lines.push('', header('props', propEntries.length, ['name', 'type', 'required', 'default']));
 			for (const [propName, propDef] of propEntries) {
 				lines.push(
-					row(
-						propName,
-						propDef.type,
-						propDef.required ? 'yes' : 'no',
-						propDef.default ?? '-'
-					)
+					row(propName, propDef.type, propDef.required ? 'yes' : 'no', propDef.default ?? '-')
 				);
 			}
 		}
@@ -223,10 +222,7 @@ export function toonComponent(name: string, def: ComponentDef, opts?: { full?: b
 
 	// Data Attributes
 	if (def.dataAttributes.length > 0) {
-		lines.push(
-			'',
-			header('data-attrs', def.dataAttributes.length, ['name', 'values'])
-		);
+		lines.push('', header('data-attrs', def.dataAttributes.length, ['name', 'values']));
 		for (const attr of def.dataAttributes) {
 			lines.push(row(attr.name, attr.values?.join('|') ?? '-'));
 		}
@@ -234,7 +230,9 @@ export function toonComponent(name: string, def: ComponentDef, opts?: { full?: b
 
 	// Example
 	if (def.example) {
-		const example = full ? def.example : truncate(def.example, 400, `use add ${name} for full snippet`);
+		const example = full
+			? def.example
+			: truncate(def.example, 400, `use add ${name} for full snippet`);
 		lines.push('', 'canonical:', example);
 	}
 
@@ -270,7 +268,9 @@ export function toonComponentList(
 		(groups[cat] ??= []).push(entry);
 	}
 
-	const lines: string[] = [header('components', filtered.length, ['name', 'category', 'compound', 'description'])];
+	const lines: string[] = [
+		header('components', filtered.length, ['name', 'category', 'compound', 'description'])
+	];
 	const sortedCats = Object.keys(groups).sort();
 	for (const cat of sortedCats) {
 		const items = groups[cat] ?? [];
@@ -291,7 +291,10 @@ export function toonComponentList(
 // ── Composition ────────────────────────────────────────────
 
 export function toonComposition(
-	results: { componentMatches: readonly CompositionComponentDef[]; recipeMatches: readonly CompositionRecipeDef[] },
+	results: {
+		componentMatches: readonly CompositionComponentDef[];
+		recipeMatches: readonly CompositionRecipeDef[];
+	},
 	components: Record<string, ComponentDef>,
 	opts?: { full?: boolean | undefined }
 ): string {
@@ -368,9 +371,10 @@ export function toonComposition(
 	}
 
 	// Contextual help
-	const firstComponent = results.componentMatches[0]?.alternatives[0]?.component
-		?? results.recipeMatches[0]?.components[0]
-		?? undefined;
+	const firstComponent =
+		results.componentMatches[0]?.alternatives[0]?.component ??
+		results.recipeMatches[0]?.components[0] ??
+		undefined;
 	const ctx: HelpContext = { command: 'compose' };
 	if (firstComponent) ctx.componentName = firstComponent;
 	const help = buildContextualHelp(ctx);
@@ -466,7 +470,11 @@ const MAX_FINDINGS_DEFAULT = 50;
 
 export function toonWorkspaceReport(
 	report: WorkspaceReport,
-	opts?: { title?: string | undefined; command?: 'doctor' | 'lint' | undefined; full?: boolean | undefined }
+	opts?: {
+		title?: string | undefined;
+		command?: 'doctor' | 'lint' | undefined;
+		full?: boolean | undefined;
+	}
 ): string {
 	const full = opts?.full ?? false;
 	const title = opts?.title ?? 'workspace';
@@ -490,9 +498,7 @@ export function toonWorkspaceReport(
 	if (report.findings.length === 0) {
 		lines.push('findings[0]: clean');
 	} else {
-		const findings = full
-			? report.findings
-			: report.findings.slice(0, MAX_FINDINGS_DEFAULT);
+		const findings = full ? report.findings : report.findings.slice(0, MAX_FINDINGS_DEFAULT);
 		const truncated = !full && report.findings.length > MAX_FINDINGS_DEFAULT;
 
 		lines.push(
@@ -502,7 +508,9 @@ export function toonWorkspaceReport(
 			lines.push(row(f.severity, f.ruleId, f.file, f.line ?? '-', f.message));
 			if (f.suggestedFixes.length > 0) {
 				for (const fix of f.suggestedFixes) {
-					lines.push(`    fix: ${fix.description}${fix.replacement ? ` -> ${fix.replacement}` : ''}`);
+					lines.push(
+						`    fix: ${fix.description}${fix.replacement ? ` -> ${fix.replacement}` : ''}`
+					);
 				}
 			}
 		}
@@ -580,7 +588,8 @@ function toonStep(step: ProjectPlanStep, index: number, showSnippets = false): s
 
 export function toonInstallPlan(plan: InstallPlan): string {
 	const lines: string[] = [];
-	const isScaffold = plan.detection.status === 'unsupported' && plan.steps.some((s) => s.kind === 'create-file');
+	const isScaffold =
+		plan.detection.status === 'unsupported' && plan.steps.some((s) => s.kind === 'create-file');
 
 	lines.push(toonProjectDetection(plan.detection));
 	lines.push('');
@@ -609,7 +618,7 @@ export function toonInstallPlan(plan: InstallPlan): string {
 export function toonAddPlan(plan: AddPlan): string {
 	const lines: string[] = [];
 
-	lines.push(`add: ${plan.name} | target: ${plan.target ?? '(choose)'}` );
+	lines.push(`add: ${plan.name} | target: ${plan.target ?? '(choose)'}`);
 	if (plan.importStatement) {
 		lines.push(`import: ${plan.importStatement}`);
 	}
@@ -656,7 +665,9 @@ export function toonTokens(result: TokenResult, category?: string): string {
 	} else {
 		// Summary line with category counts
 		const countParts: string[] = [];
-		for (const [cat, count] of Object.entries(result.counts).sort(([a], [b]) => a.localeCompare(b))) {
+		for (const [cat, count] of Object.entries(result.counts).sort(([a], [b]) =>
+			a.localeCompare(b)
+		)) {
 			countParts.push(`${cat}:${count}`);
 		}
 		lines.push(`total: ${result.total} | ${countParts.join(', ')}`);

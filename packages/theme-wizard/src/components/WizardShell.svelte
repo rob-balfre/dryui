@@ -37,7 +37,7 @@
 	<header class="wizard-header">
 		<div class="wizard-header-inner">
 			<Text size="lg" weight="semibold">Theme Wizard</Text>
-			<StepIndicator currentStep={step} {...(onstep ? { onstep } : {})} />
+			<StepIndicator currentStep={step} {...onstep ? { onstep } : {}} />
 		</div>
 	</header>
 

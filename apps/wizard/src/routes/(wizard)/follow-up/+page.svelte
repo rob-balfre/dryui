@@ -45,7 +45,9 @@
 
 			<div class="empty-state">
 				<h3 class="empty-state-title">Waiting for a question</h3>
-				<p class="empty-state-description">The browser will render the next Claude follow-up here once the server sends it.</p>
+				<p class="empty-state-description">
+					The browser will render the next Claude follow-up here once the server sends it.
+				</p>
 			</div>
 		{/if}
 

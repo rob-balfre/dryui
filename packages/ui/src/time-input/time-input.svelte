@@ -70,9 +70,7 @@
 	const minutes = $derived.by(() => {
 		const stepMinutes = step && step >= 60 ? Math.floor(step / 60) : 1;
 		const count = Math.floor(60 / stepMinutes);
-		return Array.from({ length: count }, (_, i) =>
-			String(i * stepMinutes).padStart(2, '0')
-		);
+		return Array.from({ length: count }, (_, i) => String(i * stepMinutes).padStart(2, '0'));
 	});
 </script>
 

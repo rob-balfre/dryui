@@ -13,13 +13,7 @@
 	const display = $derived(separator ?? ctx.separator);
 </script>
 
-<span
-	aria-hidden="true"
-	data-df-separator
-	data-separator=""
-	{...rest}
-	class={className}
->
+<span aria-hidden="true" data-df-separator data-separator="" {...rest} class={className}>
 	{display}
 </span>
 

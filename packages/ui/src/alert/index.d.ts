@@ -1,5 +1,5 @@
+export type { AlertVariant } from './context.svelte.js';
 export type {
-	AlertVariant,
 	AlertRootProps,
 	AlertIconProps,
 	AlertTitleProps,

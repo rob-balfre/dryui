@@ -78,7 +78,10 @@ export function runCompose(args: string[], spec: Spec): void {
 
 	const toon = args.includes('--toon');
 	const full = args.includes('--full');
-	const query = args.filter((a) => !a.startsWith('--')).join(' ').trim();
+	const query = args
+		.filter((a) => !a.startsWith('--'))
+		.join(' ')
+		.trim();
 	const mode: OutputMode = toon ? 'toon' : 'text';
 	runCommand(getCompose(query, spec, { toon, full }), mode);
 }

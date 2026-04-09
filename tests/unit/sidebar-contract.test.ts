@@ -4,13 +4,11 @@ import { describe, expect, mock, test } from 'bun:test';
 // evaluate the module without hitting Svelte 5 $state runes.
 mock.module('@dryui/theme-wizard', () => import('@dryui/theme-wizard/engine'));
 
-const { computeSidebarContract, contrastBetween, serializeCustomProperties } = await import(
-	'../../apps/docs/src/lib/theme-wizard/sidebar-contract.js'
-);
+const { computeSidebarContract, contrastBetween, serializeCustomProperties } =
+	await import('../../apps/docs/src/lib/theme-wizard/sidebar-contract.js');
 const { generateTheme, PRESETS } = await import('@dryui/theme-wizard/engine');
-const { DEFAULT_DOCS_THEME_TOKENS } = await import(
-	'../../apps/docs/src/lib/theme-wizard/docs-theme.js'
-);
+const { DEFAULT_DOCS_THEME_TOKENS } =
+	await import('../../apps/docs/src/lib/theme-wizard/docs-theme.js');
 
 const theme = generateTheme(PRESETS[0]!.brandInput);
 

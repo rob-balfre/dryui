@@ -16,7 +16,7 @@ const mockSpec: ProjectPlannerSpec = {
 			import: '@dryui/ui',
 			example: '<Card.Root>\n  <Card.Content>Body</Card.Content>\n</Card.Root>'
 		}
-	},
+	}
 };
 
 function createProject(files: Record<string, string>): string {

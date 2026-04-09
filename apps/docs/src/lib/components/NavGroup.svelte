@@ -14,7 +14,6 @@
 
 	const depth = getContext<number>('navgroup-depth') ?? 0;
 	setContext('navgroup-depth', depth + 1);
-
 </script>
 
 <div class="group">

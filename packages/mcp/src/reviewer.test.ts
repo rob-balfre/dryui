@@ -581,9 +581,9 @@ describe('Style Suggestions', () => {
   .row { display: flex; gap: 8px; }
 </style>`;
 		const result = reviewComponent(code, mockSpec);
-		expect(result.issues.some((i) => i.severity === 'suggestion' && i.message.includes('flex'))).toBe(
-			false
-		);
+		expect(
+			result.issues.some((i) => i.severity === 'suggestion' && i.message.includes('flex'))
+		).toBe(false);
 	});
 
 	test('suggests Separator for raw hr', () => {

@@ -42,7 +42,9 @@ describe('DateField', () => {
 		const target = setup();
 		const root = target.querySelector('[data-testid="root"]') as HTMLDivElement;
 		const month = target.querySelector('[data-testid="segment-month"]') as HTMLSpanElement;
-		const separator = target.querySelector('[data-testid="separator-month-day"]') as HTMLSpanElement;
+		const separator = target.querySelector(
+			'[data-testid="separator-month-day"]'
+		) as HTMLSpanElement;
 
 		expect(root.hasAttribute('data-df-wrapper')).toBe(true);
 		expect(root.hasAttribute('data-df-root')).toBe(true);

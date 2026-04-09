@@ -87,10 +87,7 @@
 					sessionStorage.removeItem(THEME_WIZARD_OVERRIDES_STORAGE_KEY);
 					return;
 				}
-				sessionStorage.setItem(
-					THEME_WIZARD_OVERRIDES_STORAGE_KEY,
-					JSON.stringify({ light, dark })
-				);
+				sessionStorage.setItem(THEME_WIZARD_OVERRIDES_STORAGE_KEY, JSON.stringify({ light, dark }));
 			} catch {
 				// Ignore storage access failures.
 			}
@@ -202,7 +199,6 @@
 		gap: var(--dry-space-3);
 		padding-inline: var(--dry-space-4);
 	}
-
 
 	.docs-brand {
 		grid-area: brand;

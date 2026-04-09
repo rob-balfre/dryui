@@ -116,7 +116,12 @@
 			<span data-calendar-heading aria-live="polite" aria-atomic="true">
 				{monthYearLabel}
 			</span>
-			<button type="button" data-calendar-nav aria-label="Next month" onclick={() => ctx.nextMonth()}>
+			<button
+				type="button"
+				data-calendar-nav
+				aria-label="Next month"
+				onclick={() => ctx.nextMonth()}
+			>
 				&#8250;
 			</button>
 		</div>
@@ -197,7 +202,9 @@
 		padding: var(--dry-space-3);
 		background: var(--dry-range-calendar-panel-bg, var(--dry-color-bg-overlay));
 		border: 1px solid var(--dry-range-calendar-panel-border, var(--dry-color-stroke-weak));
-		border-radius: calc(var(--dry-range-calendar-radius, var(--dry-radius-lg)) - var(--dry-space-1));
+		border-radius: calc(
+			var(--dry-range-calendar-radius, var(--dry-radius-lg)) - var(--dry-space-1)
+		);
 	}
 
 	[data-range-calendar-grid] [data-calendar-header] {
@@ -351,8 +358,7 @@
 
 	[data-range-calendar-grid]
 		[data-calendar-day-button][data-range-start]:hover:not([data-disabled]),
-	[data-range-calendar-grid]
-		[data-calendar-day-button][data-range-end]:hover:not([data-disabled]) {
+	[data-range-calendar-grid] [data-calendar-day-button][data-range-end]:hover:not([data-disabled]) {
 		background: var(--dry-range-calendar-selected-hover-bg, var(--dry-color-fill-brand-hover));
 	}
 

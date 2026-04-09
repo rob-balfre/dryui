@@ -78,7 +78,9 @@
 
 	[data-number-input-wrapper] div {
 		display: inline-grid;
-		grid-template-columns: var(--dry-number-input-btn-width) minmax(3ch, max-content) var(--dry-number-input-btn-width);
+		grid-template-columns: var(--dry-number-input-btn-width) minmax(3ch, max-content) var(
+				--dry-number-input-btn-width
+			);
 		align-items: stretch;
 	}
 

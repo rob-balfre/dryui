@@ -57,7 +57,11 @@ async function swapForPublish(dir: string): Promise<boolean> {
 	const backupPath = resolve(dir, 'package.json.release-backup');
 	const pkg = await readPkg(dir);
 
-	const needsSwap = !!(pkg.publishConfig?.exports || pkg.publishConfig?.svelte || pkg.publishConfig?.types);
+	const needsSwap = !!(
+		pkg.publishConfig?.exports ||
+		pkg.publishConfig?.svelte ||
+		pkg.publishConfig?.types
+	);
 	const hasWorkspaceDeps = Object.values(pkg.dependencies || {}).some((v) =>
 		String(v).startsWith('workspace:')
 	);
@@ -122,7 +126,10 @@ async function main() {
 		const otpEnv = otp ? `NPM_CONFIG_OTP=${otp}` : '';
 		const cmd = `${otpEnv} bunx changeset publish`.trim();
 		console.log(`\nPublishing...`);
-		execSync(cmd, { stdio: 'inherit', env: { ...process.env, ...(otp ? { NPM_CONFIG_OTP: otp } : {}) } });
+		execSync(cmd, {
+			stdio: 'inherit',
+			env: { ...process.env, ...(otp ? { NPM_CONFIG_OTP: otp } : {}) }
+		});
 	} finally {
 		// Step 4: Always restore
 		await restoreAll();

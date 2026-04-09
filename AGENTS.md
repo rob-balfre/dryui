@@ -21,12 +21,12 @@ npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
 
 For MCP server config, each tool uses a different file and root key:
 
-| Tool | Config file | Root key |
-|------|------------|----------|
-| Cursor | `.cursor/mcp.json` | `mcpServers` |
-| VS Code / Copilot | `.vscode/mcp.json` | `servers` |
-| Windsurf | `~/.codeium/windsurf/mcp_config.json` | `mcpServers` |
-| Zed | `~/.config/zed/settings.json` | `context_servers` |
+| Tool              | Config file                           | Root key          |
+| ----------------- | ------------------------------------- | ----------------- |
+| Cursor            | `.cursor/mcp.json`                    | `mcpServers`      |
+| VS Code / Copilot | `.vscode/mcp.json`                    | `servers`         |
+| Windsurf          | `~/.codeium/windsurf/mcp_config.json` | `mcpServers`      |
+| Zed               | `~/.config/zed/settings.json`         | `context_servers` |
 
 All tools use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the server entry.
 

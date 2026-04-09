@@ -35,7 +35,9 @@
 							{#if selectedComponents('sidebar').length === 0}
 								<div class="empty-state">
 									<h3 class="empty-state-title">Nothing in sidebar</h3>
-									<p class="empty-state-description">Assign components to see the navigation column populate.</p>
+									<p class="empty-state-description">
+										Assign components to see the navigation column populate.
+									</p>
 								</div>
 							{/if}
 						</div>
@@ -162,7 +164,9 @@
 {:else}
 	<div class="empty-state">
 		<h3 class="empty-state-title">Choose a layout first</h3>
-		<p class="empty-state-description">Step 3 needs a selected layout and component catalog before the live preview can render.</p>
+		<p class="empty-state-description">
+			Step 3 needs a selected layout and component catalog before the live preview can render.
+		</p>
 	</div>
 {/if}
 

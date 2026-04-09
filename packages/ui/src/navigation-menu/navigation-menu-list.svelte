@@ -44,5 +44,4 @@
 		border-radius: var(--dry-nav-menu-radius);
 		box-shadow: var(--dry-nav-menu-shadow);
 	}
-
 </style>

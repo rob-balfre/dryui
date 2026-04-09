@@ -5,7 +5,9 @@
 <div class="preview-frame">
 	<div class="preview-copy">
 		<p>Keep the primary action pinned while related actions expand from the same corner.</p>
-		<p>The docs preview contains the button inside this surface so it does not bleed into the page.</p>
+		<p>
+			The docs preview contains the button inside this surface so it does not bleed into the page.
+		</p>
 	</div>
 
 	<FloatButton.Root>

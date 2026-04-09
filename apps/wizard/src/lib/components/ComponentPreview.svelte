@@ -138,7 +138,9 @@
 			<Badge variant="solid" color="gray">0</Badge>
 		</div>
 		<h3 class="empty-state-title">No components selected</h3>
-		<p class="empty-state-description">Choose at least one block for this region to see a populated preview.</p>
+		<p class="empty-state-description">
+			Choose at least one block for this region to see a populated preview.
+		</p>
 		<div class="empty-state-action">
 			<Button size="sm" variant="outline">Browse components</Button>
 		</div>

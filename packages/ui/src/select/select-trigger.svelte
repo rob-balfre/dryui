@@ -78,7 +78,15 @@
 <div bind:this={wrapperEl} data-select-trigger-wrap>
 	<button type="button" data-select-trigger data-size={size} class={className} {...rest}>
 		{@render children()}
-		<svg data-indicator xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+		<svg
+			data-indicator
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg
+		>
 	</button>
 </div>
 

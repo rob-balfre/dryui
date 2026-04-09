@@ -15,12 +15,62 @@ export interface CompositionSearchResult {
 }
 
 const STOP_WORDS = new Set([
-	'a', 'an', 'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of',
-	'with', 'by', 'from', 'is', 'it', 'that', 'this', 'as', 'be', 'are', 'was',
-	'were', 'been', 'has', 'have', 'had', 'do', 'does', 'did', 'will', 'would',
-	'could', 'should', 'may', 'might', 'can', 'i', 'me', 'my', 'we', 'our',
-	'you', 'your', 'need', 'want', 'like', 'create', 'make', 'build', 'add',
-	'using', 'use', 'show', 'display'
+	'a',
+	'an',
+	'the',
+	'and',
+	'or',
+	'but',
+	'in',
+	'on',
+	'at',
+	'to',
+	'for',
+	'of',
+	'with',
+	'by',
+	'from',
+	'is',
+	'it',
+	'that',
+	'this',
+	'as',
+	'be',
+	'are',
+	'was',
+	'were',
+	'been',
+	'has',
+	'have',
+	'had',
+	'do',
+	'does',
+	'did',
+	'will',
+	'would',
+	'could',
+	'should',
+	'may',
+	'might',
+	'can',
+	'i',
+	'me',
+	'my',
+	'we',
+	'our',
+	'you',
+	'your',
+	'need',
+	'want',
+	'like',
+	'create',
+	'make',
+	'build',
+	'add',
+	'using',
+	'use',
+	'show',
+	'display'
 ]);
 
 function tokenize(text: string): string[] {
@@ -99,7 +149,9 @@ export function searchComposition(
 
 	const scoredRecipes: Array<{ recipe: CompositionRecipeDef; score: number }> = [];
 	for (const recipe of Object.values(composition.recipes)) {
-		const corpus = [recipe.name, recipe.description, ...recipe.tags, ...recipe.components].join(' ');
+		const corpus = [recipe.name, recipe.description, ...recipe.tags, ...recipe.components].join(
+			' '
+		);
 		const score = scoreText(tokens, corpus);
 		if (score > 0) scoredRecipes.push({ recipe, score });
 	}

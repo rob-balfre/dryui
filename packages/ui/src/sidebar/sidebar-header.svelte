@@ -21,7 +21,10 @@
 		align-content: start;
 		justify-items: start;
 		gap: var(--dry-sidebar-header-gap, var(--dry-space-1));
-		padding: var(--dry-sidebar-header-padding, var(--dry-space-5) var(--dry-space-6) var(--dry-space-4));
+		padding: var(
+			--dry-sidebar-header-padding,
+			var(--dry-space-5) var(--dry-space-6) var(--dry-space-4)
+		);
 		border-bottom: 1px solid var(--dry-sidebar-border, var(--dry-color-stroke-weak));
 		color: var(--dry-sidebar-header-color, var(--dry-color-text-strong));
 		font-size: var(--dry-sidebar-header-size, var(--dry-text-base-size, 1rem));

@@ -65,5 +65,4 @@
 	[data-list-root][data-disable-padding='true'] {
 		--dry-list-padding: 0;
 	}
-
 </style>

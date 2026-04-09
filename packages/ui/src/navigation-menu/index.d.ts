@@ -1,11 +1,24 @@
-export type {
-	NavigationMenuRootProps,
-	NavigationMenuListProps,
-	NavigationMenuItemProps,
-	NavigationMenuTriggerProps,
-	NavigationMenuContentProps,
-	NavigationMenuLinkProps
-} from '@dryui/primitives';
+import type { Snippet } from 'svelte';
+import type { HTMLAttributes, HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
+export interface NavigationMenuRootProps extends HTMLAttributes<HTMLElement> {
+	children: Snippet;
+}
+export interface NavigationMenuListProps extends HTMLAttributes<HTMLUListElement> {
+	children: Snippet;
+}
+export interface NavigationMenuItemProps {
+	children: Snippet;
+}
+export interface NavigationMenuTriggerProps extends HTMLButtonAttributes {
+	children: Snippet;
+}
+export interface NavigationMenuContentProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface NavigationMenuLinkProps extends HTMLAnchorAttributes {
+	active?: boolean;
+	children: Snippet;
+}
 import NavigationMenuRoot from './navigation-menu-root.svelte';
 import NavigationMenuList from './navigation-menu-list.svelte';
 import NavigationMenuItem from './navigation-menu-item.svelte';

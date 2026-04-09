@@ -11,9 +11,7 @@ const configurators = Object.fromEntries(
 			const match = path.match(/\/([A-Za-z0-9]+)Configurator\.svelte$/);
 			return match ? [match[1], loader] : null;
 		})
-		.filter(
-			(entry): entry is [string, () => Promise<{ default: Component }>] => entry !== null
-		)
+		.filter((entry): entry is [string, () => Promise<{ default: Component }>] => entry !== null)
 );
 
 export function getComponentConfigurator(name: string): Promise<Component> | null {

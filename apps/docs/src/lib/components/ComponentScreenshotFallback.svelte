@@ -175,7 +175,11 @@
 		isolation: isolate;
 		overflow: hidden;
 		border-radius: var(--dry-radius-xl);
-		background: linear-gradient(145deg, color-mix(in srgb, var(--dry-color-fill-brand) 14%, var(--dry-color-bg-base)), var(--dry-color-bg-base));
+		background: linear-gradient(
+			145deg,
+			color-mix(in srgb, var(--dry-color-fill-brand) 14%, var(--dry-color-bg-base)),
+			var(--dry-color-bg-base)
+		);
 	}
 
 	.surface-stage {

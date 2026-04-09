@@ -161,7 +161,12 @@ interface RecipeStyle {
 	activeIndicatorColor: string;
 }
 
-function resolveRecipeStyle(tokens: TokenMap, mode: ThemeMode, recipe: SidebarRecipeId, surface: string): RecipeStyle {
+function resolveRecipeStyle(
+	tokens: TokenMap,
+	mode: ThemeMode,
+	recipe: SidebarRecipeId,
+	surface: string
+): RecipeStyle {
 	if (recipe === 'current') {
 		const activeFg = requireToken(tokens, '--dry-color-fill-brand');
 		return {

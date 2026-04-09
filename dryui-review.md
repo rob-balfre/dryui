@@ -40,12 +40,12 @@ Select requires 5 nested components for a basic dropdown:
 
 ```svelte
 <Select.Root bind:value={x}>
-  <Select.Trigger>
-    <Select.Value placeholder="Choose..." />
-  </Select.Trigger>
-  <Select.Content>
-    <Select.Item value="a">Option A</Select.Item>
-  </Select.Content>
+	<Select.Trigger>
+		<Select.Value placeholder="Choose..." />
+	</Select.Trigger>
+	<Select.Content>
+		<Select.Item value="a">Option A</Select.Item>
+	</Select.Content>
 </Select.Root>
 ```
 

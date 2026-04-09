@@ -19,7 +19,9 @@ export function fileNotFound(filePath: string, toon?: boolean): CommandResult | 
 	if (existsSync(filePath)) return null;
 	return {
 		output: '',
-		error: toon ? toonError('not-found', `File not found: ${filePath}`) : `File not found: ${filePath}`,
+		error: toon
+			? toonError('not-found', `File not found: ${filePath}`)
+			: `File not found: ${filePath}`,
 		exitCode: 1
 	};
 }

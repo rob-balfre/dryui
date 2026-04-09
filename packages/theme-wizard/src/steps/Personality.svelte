@@ -12,22 +12,22 @@
 		{
 			value: 'minimal',
 			name: 'Minimal',
-			description: 'Flat, transparent, content-forward',
+			description: 'Flat, transparent, content-forward'
 		},
 		{
 			value: 'clean',
 			name: 'Clean',
-			description: 'Subtle separation, gentle edges',
+			description: 'Subtle separation, gentle edges'
 		},
 		{
 			value: 'structured',
 			name: 'Structured',
-			description: 'Clear regions, visible cards',
+			description: 'Clear regions, visible cards'
 		},
 		{
 			value: 'rich',
 			name: 'Rich',
-			description: 'Elevated surfaces, deep layering',
+			description: 'Elevated surfaces, deep layering'
 		}
 	];
 

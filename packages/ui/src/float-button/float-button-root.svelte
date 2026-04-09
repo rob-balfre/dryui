@@ -27,7 +27,13 @@
 	});
 </script>
 
-<div data-float-button data-position={position} data-state={open ? 'open' : 'closed'} {...rest} class={className}>
+<div
+	data-float-button
+	data-position={position}
+	data-state={open ? 'open' : 'closed'}
+	{...rest}
+	class={className}
+>
 	{@render children()}
 </div>
 

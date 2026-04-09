@@ -71,11 +71,7 @@ describe('detectSvelteMetadata', () => {
 		const wrapper = document.createElement('div');
 		const button = document.createElement('button');
 
-		attachMeta(
-			page,
-			'/workspace/app/node_modules/svelte/src/internal/client/render.js',
-			1
-		);
+		attachMeta(page, '/workspace/app/node_modules/svelte/src/internal/client/render.js', 1);
 		attachMeta(wrapper, '/workspace/app/src/lib/ButtonGroup.svelte', 9);
 		attachMeta(button, '/workspace/app/src/lib/ButtonGroup.svelte', 22);
 

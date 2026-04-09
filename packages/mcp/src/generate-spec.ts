@@ -422,8 +422,7 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		tags: ['listbox', 'select', 'option', 'keyboard']
 	},
 	LogoMark: {
-		description:
-			'Brand mark, status indicator, or category badge with image or fallback text',
+		description: 'Brand mark, status indicator, or category badge with image or fallback text',
 		category: 'display',
 		tags: ['logo', 'mark', 'brand', 'indicator', 'badge', 'icon']
 	},

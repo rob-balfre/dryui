@@ -113,7 +113,10 @@
 		}
 
 		display: grid;
-		grid-template-columns: min(var(--dry-nc-panel-width, 24rem), calc(100dvw - var(--dry-space-4, 1rem) * 2));
+		grid-template-columns: min(
+			var(--dry-nc-panel-width, 24rem),
+			calc(100dvw - var(--dry-space-4, 1rem) * 2)
+		);
 		max-height: 28rem;
 		overflow-y: auto;
 		background: var(--dry-color-bg-overlay, #f1f3f5);

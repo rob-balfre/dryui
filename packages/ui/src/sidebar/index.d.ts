@@ -1,13 +1,32 @@
-export type {
-	SidebarRootProps,
-	SidebarHeaderProps,
-	SidebarContentProps,
-	SidebarFooterProps,
-	SidebarGroupProps,
-	SidebarGroupLabelProps,
-	SidebarItemProps,
-	SidebarTriggerProps
-} from '@dryui/primitives';
+import type { Snippet } from 'svelte';
+import type { HTMLAttributes, HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
+export interface SidebarRootProps extends HTMLAttributes<HTMLElement> {
+	collapsed?: boolean;
+	side?: 'left' | 'right';
+	children: Snippet;
+}
+export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface SidebarContentProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface SidebarGroupProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface SidebarGroupLabelProps extends HTMLAttributes<HTMLDivElement> {
+	children: Snippet;
+}
+export interface SidebarItemProps extends HTMLAnchorAttributes {
+	active?: boolean;
+	children: Snippet;
+}
+export interface SidebarTriggerProps extends HTMLButtonAttributes {
+	children?: Snippet;
+}
 import SidebarRoot from './sidebar-root.svelte';
 import SidebarHeader from './sidebar-header.svelte';
 import SidebarContent from './sidebar-content.svelte';

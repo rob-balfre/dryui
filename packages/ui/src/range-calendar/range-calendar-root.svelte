@@ -133,11 +133,7 @@
 		--dry-range-calendar-selected-bg: var(--dry-color-fill-brand);
 		--dry-range-calendar-selected-color: var(--dry-color-on-brand);
 		--dry-range-calendar-selected-hover-bg: var(--dry-color-fill-brand-hover);
-		--dry-range-calendar-range-bg: color-mix(
-			in srgb,
-			var(--dry-color-fill-brand) 14%,
-			transparent
-		);
+		--dry-range-calendar-range-bg: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
 		--dry-range-calendar-today-color: var(--dry-color-text-brand);
 		--dry-range-calendar-outside-color: var(--dry-color-text-weak);
 

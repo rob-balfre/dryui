@@ -2,23 +2,23 @@ import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 import type { Placement } from '../utils/anchor-position.svelte.js';
 export interface TooltipRootProps {
-    openDelay?: number;
-    closeDelay?: number;
-    children: Snippet;
+	openDelay?: number;
+	closeDelay?: number;
+	children: Snippet;
 }
 export interface TooltipTriggerProps extends HTMLAttributes<HTMLSpanElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface TooltipContentProps extends HTMLAttributes<HTMLDivElement> {
-    placement?: Placement;
-    offset?: number;
-    children: Snippet;
+	placement?: Placement;
+	offset?: number;
+	children: Snippet;
 }
 import TooltipRoot from './tooltip-root.svelte';
 import TooltipTrigger from './tooltip-trigger.svelte';
 import TooltipContent from './tooltip-content.svelte';
 export declare const Tooltip: {
-    Root: typeof TooltipRoot;
-    Trigger: typeof TooltipTrigger;
-    Content: typeof TooltipContent;
+	Root: typeof TooltipRoot;
+	Trigger: typeof TooltipTrigger;
+	Content: typeof TooltipContent;
 };

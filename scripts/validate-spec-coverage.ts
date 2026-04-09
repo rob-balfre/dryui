@@ -40,7 +40,11 @@ const BANNED_GUIDANCE_CHECKS = [
 	},
 	{
 		path: resolve(repoRoot, 'packages/mcp/src/composition-data.ts'),
-		patterns: ['responsive Grid inside a Card', 'full layout component', 'Flex with buttons for toolbar']
+		patterns: [
+			'responsive Grid inside a Card',
+			'full layout component',
+			'Flex with buttons for toolbar'
+		]
 	},
 	{
 		path: resolve(repoRoot, 'packages/feedback/src/layout-mode/output.ts'),
@@ -153,7 +157,9 @@ async function getDocsNavComponents(): Promise<Set<string>> {
 async function getSpecCompounds(): Promise<Set<string>> {
 	const spec = JSON.parse(await Bun.file(specJsonPath).text());
 	const names = new Set<string>();
-	for (const [name, def] of Object.entries(spec.components as Record<string, { compound?: boolean }>)) {
+	for (const [name, def] of Object.entries(
+		spec.components as Record<string, { compound?: boolean }>
+	)) {
 		if (def.compound) {
 			names.add(name);
 		}
@@ -248,7 +254,10 @@ if (missingFromIndex.size > 0) {
 	errors.push(
 		`Components with a directory in packages/ui/src/ but NOT exported from packages/ui/src/index.ts:\n` +
 			sorted(missingFromIndex)
-				.map((dir) => `  - ${dir}  (add export { ${toPascal(dir)} } from './${dir}/index.js'; to index.ts)`)
+				.map(
+					(dir) =>
+						`  - ${dir}  (add export { ${toPascal(dir)} } from './${dir}/index.js'; to index.ts)`
+				)
 				.join('\n')
 	);
 }
@@ -278,7 +287,9 @@ for (const name of specCompounds) {
 if (missingFromSkill.size > 0) {
 	errors.push(
 		`Compound components in spec.json but MISSING from the SKILL.md compound list:\n` +
-			sorted(missingFromSkill).map((name) => `  - ${name}`).join('\n') +
+			sorted(missingFromSkill)
+				.map((name) => `  - ${name}`)
+				.join('\n') +
 			`\n  Update the "Compound components include ..." sentence in packages/ui/skills/dryui/SKILL.md`
 	);
 }
@@ -292,7 +303,9 @@ for (const name of skillCompounds) {
 if (ghostInSkill.size > 0) {
 	errors.push(
 		`Components listed as compound in SKILL.md but NOT compound (or missing) in spec.json:\n` +
-			sorted(ghostInSkill).map((name) => `  - ${name}`).join('\n') +
+			sorted(ghostInSkill)
+				.map((name) => `  - ${name}`)
+				.join('\n') +
 			`\n  Remove from the "Compound components include ..." sentence in packages/ui/skills/dryui/SKILL.md`
 	);
 }

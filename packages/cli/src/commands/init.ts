@@ -91,7 +91,11 @@ function executeEditFile(step: ProjectPlanStep): void {
 		const scriptMatch = content.match(/<script[^>]*>/);
 		if (scriptMatch) {
 			const insertPos = (scriptMatch.index ?? 0) + scriptMatch[0].length;
-			const updated = content.slice(0, insertPos) + '\n' + step.snippet.replace(/<\/?script>/g, '') + content.slice(insertPos);
+			const updated =
+				content.slice(0, insertPos) +
+				'\n' +
+				step.snippet.replace(/<\/?script>/g, '') +
+				content.slice(insertPos);
 			writeFileSync(step.path, updated, 'utf-8');
 		} else {
 			writeFileSync(step.path, step.snippet + '\n\n' + content, 'utf-8');
@@ -124,7 +128,12 @@ export function runInit(args: string[], spec: Spec): void {
 	const plan = planInstall(spec, targetPath, { packageManager });
 
 	const firstStep = plan.steps[0];
-	if (plan.steps.length === 1 && firstStep && firstStep.kind === 'note' && firstStep.status === 'done') {
+	if (
+		plan.steps.length === 1 &&
+		firstStep &&
+		firstStep.kind === 'note' &&
+		firstStep.status === 'done'
+	) {
 		log('');
 		log('  DryUI is already set up in this project.');
 		log('');
@@ -165,10 +174,13 @@ export function runInit(args: string[], spec: Spec): void {
 
 	const cwdIsTarget = resolve(process.cwd()) === resolve(targetPath);
 	const devCommand =
-		packageManager === 'bun' ? 'bun run dev' :
-		packageManager === 'pnpm' ? 'pnpm run dev' :
-		packageManager === 'yarn' ? 'yarn dev' :
-		'npm run dev';
+		packageManager === 'bun'
+			? 'bun run dev'
+			: packageManager === 'pnpm'
+				? 'pnpm run dev'
+				: packageManager === 'yarn'
+					? 'yarn dev'
+					: 'npm run dev';
 
 	log('');
 	log('  Done! Your DryUI project is ready.');

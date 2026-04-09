@@ -52,10 +52,7 @@
 		<section class="wizard-section">
 			<Heading level={2}>Preview</Heading>
 			<Text color="secondary">See your theme on real components, then export.</Text>
-			<PreviewExport
-				mode={themeMode}
-				onmodechange={(m) => setThemePreference(m)}
-			>
+			<PreviewExport mode={themeMode} onmodechange={(m) => setThemePreference(m)}>
 				{#snippet preview()}
 					<PreviewComponents />
 				{/snippet}

@@ -69,8 +69,7 @@
 
 			<Text size="lg" weight="medium">Agent setup</Text>
 			<Text size="sm" color="muted">
-				Each setup uses the same <code>@dryui/mcp</code> package. The config file path varies by
-				client.
+				Each setup uses the same <code>@dryui/mcp</code> package. The config file path varies by client.
 			</Text>
 
 			<Tabs.Root value="claude-code">
@@ -142,8 +141,8 @@
 						<div class="stack-sm">
 							<Text size="lg" weight="medium">Validate after implementation</Text>
 							<Text size="sm" color="secondary">
-								Run <code>review</code> on the changed component or <code>doctor</code> on the workspace to catch
-								layout drift, accessibility issues, and stale guesses early.
+								Run <code>review</code> on the changed component or <code>doctor</code> on the workspace
+								to catch layout drift, accessibility issues, and stale guesses early.
 							</Text>
 						</div>
 					</Card.Content>
@@ -151,8 +150,8 @@
 			</div>
 
 			<DocsCallout title="Migration workflow" variant="info">
-				See the <Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the layout
-				baseline and the dependent-field planner pattern.
+				See the <Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for
+				the layout baseline and the dependent-field planner pattern.
 			</DocsCallout>
 		</div>
 
@@ -220,8 +219,8 @@
 			</div>
 
 			<DocsCallout title="Works with any MCP client" variant="success">
-				Any agent that supports the Model Context Protocol can connect to <code>@dryui/mcp</code> —
-				Claude Code, Codex, Cursor, and others.
+				Any agent that supports the Model Context Protocol can connect to <code>@dryui/mcp</code> — Claude
+				Code, Codex, Cursor, and others.
 			</DocsCallout>
 		</div>
 	</div>

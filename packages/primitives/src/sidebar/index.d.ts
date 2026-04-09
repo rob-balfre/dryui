@@ -1,31 +1,31 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes, HTMLAnchorAttributes } from 'svelte/elements';
 export interface SidebarRootProps extends HTMLAttributes<HTMLElement> {
-    collapsed?: boolean;
-    side?: 'left' | 'right';
-    children: Snippet;
+	collapsed?: boolean;
+	side?: 'left' | 'right';
+	children: Snippet;
 }
 export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface SidebarContentProps extends HTMLAttributes<HTMLDivElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface SidebarGroupProps extends HTMLAttributes<HTMLDivElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface SidebarGroupLabelProps extends HTMLAttributes<HTMLDivElement> {
-    children: Snippet;
+	children: Snippet;
 }
 export interface SidebarItemProps extends HTMLAnchorAttributes {
-    active?: boolean;
-    children: Snippet;
+	active?: boolean;
+	children: Snippet;
 }
 export interface SidebarTriggerProps extends HTMLButtonAttributes {
-    children?: Snippet;
+	children?: Snippet;
 }
 import SidebarRoot from './sidebar-root.svelte';
 import SidebarHeader from './sidebar-header.svelte';
@@ -36,12 +36,12 @@ import SidebarGroupLabel from './sidebar-group-label.svelte';
 import SidebarItem from './sidebar-item.svelte';
 import SidebarTrigger from './sidebar-trigger.svelte';
 export declare const Sidebar: {
-    Root: typeof SidebarRoot;
-    Header: typeof SidebarHeader;
-    Content: typeof SidebarContent;
-    Footer: typeof SidebarFooter;
-    Group: typeof SidebarGroup;
-    GroupLabel: typeof SidebarGroupLabel;
-    Item: typeof SidebarItem;
-    Trigger: typeof SidebarTrigger;
+	Root: typeof SidebarRoot;
+	Header: typeof SidebarHeader;
+	Content: typeof SidebarContent;
+	Footer: typeof SidebarFooter;
+	Group: typeof SidebarGroup;
+	GroupLabel: typeof SidebarGroupLabel;
+	Item: typeof SidebarItem;
+	Trigger: typeof SidebarTrigger;
 };

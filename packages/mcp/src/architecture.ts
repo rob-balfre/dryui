@@ -75,12 +75,7 @@ const CLUSTER_DEFINITIONS: ClusterDefinition[] = [
 ];
 
 export type DolphinNodeKind = 'component' | 'part' | 'cluster';
-export type DolphinLayer =
-	| 'primitive'
-	| 'ui-wrapper'
-	| 'ui-composite'
-	| 'part'
-	| 'cluster';
+export type DolphinLayer = 'primitive' | 'ui-wrapper' | 'ui-composite' | 'part' | 'cluster';
 export type DolphinVisibility = 'root' | 'subpath-only' | 'root+subpath';
 export type DolphinEdgeType =
 	| 'wraps'

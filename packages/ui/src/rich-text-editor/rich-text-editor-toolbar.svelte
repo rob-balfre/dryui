@@ -381,8 +381,7 @@
 						closeLinkInput();
 					}}>Apply</button
 				>
-				<button type="button" data-part="linkCancel" onclick={() => closeLinkInput()}
-					>Cancel</button
+				<button type="button" data-part="linkCancel" onclick={() => closeLinkInput()}>Cancel</button
 				>
 			</div>
 		{/if}

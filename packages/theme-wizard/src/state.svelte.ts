@@ -629,7 +629,13 @@ export function getAllTokens(mode: 'light' | 'dark' = 'light'): Record<string, s
 	const shadowTokens = shadows[m];
 	const personalityTokens = getPersonalityTokens();
 	const typographyTokens = getTypographyTokens();
-	return { ...colorTokens, ...shapeTokens, ...shadowTokens, ...personalityTokens, ...typographyTokens };
+	return {
+		...colorTokens,
+		...shapeTokens,
+		...shadowTokens,
+		...personalityTokens,
+		...typographyTokens
+	};
 }
 
 /** Return only tokens that the user has changed from defaults. */
@@ -677,5 +683,11 @@ function computeDefaultAllTokens(mode: 'light' | 'dark'): Record<string, string>
 		DEFAULTS.typography.scale
 	);
 
-	return { ...colorTokens, ...shapeTokens, ...shadowTokens, ...personalityTokens, ...typographyTokens };
+	return {
+		...colorTokens,
+		...shapeTokens,
+		...shadowTokens,
+		...personalityTokens,
+		...typographyTokens
+	};
 }

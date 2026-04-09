@@ -30,7 +30,11 @@ export function getDoctor(
 
 		if (options.toon) {
 			return {
-				output: toonWorkspaceReport(report, { title: 'doctor', command: 'doctor', full: options.full }),
+				output: toonWorkspaceReport(report, {
+					title: 'doctor',
+					command: 'doctor',
+					full: options.full
+				}),
 				error: null,
 				exitCode: 0
 			};

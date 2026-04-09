@@ -9,7 +9,10 @@ async function openComponentRoute(page: Page, slug: string) {
 	await waitForHydration(page);
 	// Trigger listeners for the docs demos are wired in client effects.
 	await page.waitForTimeout(900);
-	expect(response?.ok(), `expected /components/${slug} to return a successful response`).toBeTruthy();
+	expect(
+		response?.ok(),
+		`expected /components/${slug} to return a successful response`
+	).toBeTruthy();
 }
 
 async function getBox(locator: Locator, message: string) {
@@ -117,9 +120,10 @@ test('drawer demo opens on the right edge and closes with escape', async ({ page
 	const viewport = page.viewportSize();
 
 	expect(viewport, 'expected the page viewport to be available').not.toBeNull();
-	expect(panelBox.x, 'expected the right-side drawer to live in the right half of the viewport').toBeGreaterThan(
-		(viewport?.width ?? 0) / 2
-	);
+	expect(
+		panelBox.x,
+		'expected the right-side drawer to live in the right half of the viewport'
+	).toBeGreaterThan((viewport?.width ?? 0) / 2);
 	expect(
 		Math.abs(panelBox.x + panelBox.width - (viewport?.width ?? 0)),
 		'expected the right-side drawer to align to the viewport edge'
@@ -153,7 +157,9 @@ test('command palette demo filters visible options', async ({ page }) => {
 	await expect(palette).toBeHidden();
 });
 
-test('context menu demo opens on right click and supports keyboard focus movement', async ({ page }) => {
+test('context menu demo opens on right click and supports keyboard focus movement', async ({
+	page
+}) => {
 	await openComponentRoute(page, 'context-menu');
 
 	const trigger = page.getByText('Right-click here');
@@ -228,7 +234,9 @@ test('notification center demo opens the panel without hydration issues', async 
 
 	await expect(panel).toBeVisible();
 	await expect(panel).toHaveScreenshot('docs-overlay-notification-center-open.png');
-	await expect(page.locator('[data-notification-center-item][data-state=\"unread\"]')).toHaveCount(2);
+	await expect(page.locator('[data-notification-center-item][data-state=\"unread\"]')).toHaveCount(
+		2
+	);
 
 	await page.keyboard.press('Escape');
 	await expect(panel).toBeHidden();

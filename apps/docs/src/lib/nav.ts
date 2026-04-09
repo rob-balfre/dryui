@@ -220,7 +220,7 @@ export const categories: NavCategory[] = [
 	{
 		label: 'Tools',
 		items: [ui('SystemMap'), ui('Thumbnail')]
-	},
+	}
 ];
 
 export function toSlug(name: string): string {

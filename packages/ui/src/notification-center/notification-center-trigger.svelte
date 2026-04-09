@@ -18,7 +18,6 @@
 			ctx.triggerEl = el;
 		}
 	});
-
 </script>
 
 <button

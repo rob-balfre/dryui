@@ -6,7 +6,11 @@ import { formatProjectDetection } from './project-planner.js';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { runCommand, type OutputMode } from '../run.js';
 
-function parseDetectArgs(args: string[]): { json: boolean; toon: boolean; path: string | undefined } {
+function parseDetectArgs(args: string[]): {
+	json: boolean;
+	toon: boolean;
+	path: string | undefined;
+} {
 	let json = false;
 	let toon = false;
 	let path: string | undefined;

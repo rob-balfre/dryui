@@ -8,8 +8,8 @@
 	<Accordion.Item value="features">
 		<Accordion.Trigger>Features</Accordion.Trigger>
 		<Accordion.Content>
-			Zero-dependency components built on native browser APIs with full keyboard navigation and
-			ARIA support.
+			Zero-dependency components built on native browser APIs with full keyboard navigation and ARIA
+			support.
 		</Accordion.Content>
 	</Accordion.Item>
 

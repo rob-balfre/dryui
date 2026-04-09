@@ -67,14 +67,22 @@ function parseFrontmatter(content: string): { meta: Record<string, string>; body
 		const idx = line.indexOf(':');
 		if (idx > 0) {
 			const key = line.slice(0, idx).trim();
-			const val = line.slice(idx + 1).trim().replace(/^['"]|['"]$/g, '');
+			const val = line
+				.slice(idx + 1)
+				.trim()
+				.replace(/^['"]|['"]$/g, '');
 			meta[key] = val;
 		}
 	}
 	return { meta, body: match[2] };
 }
 
-function toMdc(opts: { description: string; body: string; globs?: string; alwaysApply?: boolean }): string {
+function toMdc(opts: {
+	description: string;
+	body: string;
+	globs?: string;
+	alwaysApply?: boolean;
+}): string {
 	const lines = ['---'];
 	lines.push(`description: ${opts.description}`);
 	lines.push(`globs: ${opts.globs ?? ''}`);
@@ -118,15 +126,10 @@ async function syncSkillToCursor(skillDir: string, skillName: string, dest: stri
 			const raw = await Bun.file(join(rulesDir, entry.name)).text();
 			const ruleName = basename(entry.name, '.md');
 			const heading = firstHeading(raw);
-			const desc = heading
-				? `${skillName}: ${heading}`
-				: `${skillName} ${ruleName} rules`;
+			const desc = heading ? `${skillName}: ${heading}` : `${skillName} ${ruleName} rules`;
 			const filename = `${skillName}-${ruleName}.mdc`;
 			expected.add(filename);
-			await Bun.write(
-				join(dest, filename),
-				toMdc({ description: desc, body: raw })
-			);
+			await Bun.write(join(dest, filename), toMdc({ description: desc, body: raw }));
 		}
 	}
 
@@ -150,7 +153,9 @@ if (await exists(packageSkills)) {
 	await removeStale(packageSkills, codexDest);
 	await copyDir(packageSkills, codexDest);
 	await syncSkillToCursor(packageSkills, 'dryui', cursorRules);
-	console.log('synced packages/ui/skills/dryui → .claude/skills/ + .codex/skills/ + .cursor/rules/');
+	console.log(
+		'synced packages/ui/skills/dryui → .claude/skills/ + .codex/skills/ + .cursor/rules/'
+	);
 }
 
 // 2. Sync each skill in skills/ → .claude/skills/<name>/ + .codex/skills/<name>/ + .cursor/rules/*.mdc
