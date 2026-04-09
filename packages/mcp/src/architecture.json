@@ -2,21 +2,21 @@
   "schema": "DolphinGraph",
   "packageVersion": "0.1.13",
   "summary": {
-    "componentNodes": 289,
+    "componentNodes": 290,
     "partNodes": 662,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
-    "uiComponents": 144,
+    "uiComponents": 145,
     "uiWrappers": 130,
-    "uiComposites": 14,
-    "rootBarrelComponents": 288,
+    "uiComposites": 15,
+    "rootBarrelComponents": 289,
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
     "composeEdges": 11,
     "docsEdges": 0,
-    "relatedEdges": 303,
+    "relatedEdges": 305,
     "mismatches": 16,
     "primitivePartComponents": 0,
     "thinWrappers": 64
@@ -12770,6 +12770,32 @@
       "parts": []
     },
     {
+      "id": "ui:LogoMark",
+      "name": "LogoMark",
+      "label": "LogoMark",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Brand mark, status indicator, or category badge with image or fallback text",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/logo-mark/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "logo",
+        "mark",
+        "brand",
+        "indicator",
+        "badge",
+        "icon"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:Map",
       "name": "Map",
       "label": "Map",
@@ -21412,10 +21438,24 @@
       "label": "combines_with"
     },
     {
+      "id": "related:ui:Card:ui:Badge:combines_with",
+      "type": "related",
+      "from": "ui:Card",
+      "to": "ui:Badge",
+      "label": "combines_with"
+    },
+    {
       "id": "related:ui:Card:ui:Container:combines_with",
       "type": "related",
       "from": "ui:Card",
       "to": "ui:Container",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:Card:ui:Text:combines_with",
+      "type": "related",
+      "from": "ui:Card",
+      "to": "ui:Text",
       "label": "combines_with"
     },
     {
@@ -24291,7 +24331,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 14\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 15\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

@@ -6,7 +6,12 @@ export interface SelectRootProps {
     value?: string;
     disabled?: boolean;
     name?: string;
-    children: Snippet;
+    options?: Array<string | {
+        value: string;
+        label: string;
+    }>;
+    placeholder?: string;
+    children?: Snippet;
 }
 export interface SelectTriggerProps extends HTMLAttributes<HTMLDivElement> {
     children: Snippet;

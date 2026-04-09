@@ -1,6 +1,6 @@
 # dryui component reference
 
-> Machine-readable component import, props, styling hook, and example index for 144 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 145 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -953,7 +953,7 @@ Root import: import { Select } from '@dryui/ui'
 Subpath import: import { Select } from '@dryui/ui/select'
 Parts:
 - Select.Root
-  Props: open (boolean), Controls whether the select menu is currently expanded., default false, bindable | value (string), Bindable selected value for the current option set., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required
+  Props: open (boolean), Controls whether the select menu is currently expanded., default false, bindable | value (string), Bindable selected value for the current option set., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | options (Array<string | { value: string; label: string }>) | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component.
 - Select.Trigger
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
@@ -3050,6 +3050,23 @@ Example:
     <DescriptionList.Description>Reviewing launch checklist</DescriptionList.Description>
   </DescriptionList.Item>
 </DescriptionList.Root>
+```
+
+## LogoMark
+Package: @dryui/ui
+Category: display
+Tags: logo, mark, brand, indicator, badge, icon
+Kind: simple
+Root import: import { LogoMark } from '@dryui/ui'
+Subpath import: import { LogoMark } from '@dryui/ui/logo-mark'
+Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('square' | 'rounded' | 'circle'), accepted square, rounded, circle, default 'rounded' | color ('brand' | 'neutral' | 'error' | 'warning' | 'success' | 'info'), Semantic color or tone applied to the component., accepted brand, neutral, error, warning, success, info, default 'neutral'
+Native props: Forwards <span> attributes via rest props.
+CSS variables: --dry-logo-mark-bg, --dry-logo-mark-color, --dry-logo-mark-font-size, --dry-logo-mark-radius, --dry-logo-mark-size
+Data attributes: data-color | data-logo-mark | data-shape | data-size
+Accessibility: none
+Example:
+```svelte
+<LogoMark>Content</LogoMark>
 ```
 
 ## Reveal

@@ -16,6 +16,7 @@ import { runDiagnose } from './commands/diagnose.js';
 import { runCompose } from './commands/compose.js';
 import { runDoctor } from './commands/doctor.js';
 import { runLint } from './commands/lint.js';
+import { runTokens } from './commands/tokens.js';
 import { runFeedback } from './commands/feedback.js';
 
 const VERSION = pkg.version;
@@ -42,6 +43,8 @@ Commands:
                                 Inspect workspace health
   lint [path] [--json] [--toon] [--include <glob>] [--exclude <glob>] [--changed]
                                 Print deterministic workspace findings
+  tokens [--category <cat>] [--toon]
+                                List --dry-* CSS design tokens
   feedback <subcommand>         Start or inspect the feedback server
 
 Options:
@@ -115,6 +118,9 @@ function main(): void {
 			break;
 		case 'compose':
 			runCompose(commandArgs, spec);
+			break;
+		case 'tokens':
+			runTokens(commandArgs);
 			break;
 		case 'feedback':
 			void runFeedback(commandArgs);

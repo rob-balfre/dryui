@@ -21,7 +21,7 @@ export function findComponent(spec: Spec, query: string) {
 }
 
 /**
- * Get the info output for a component query.
+ * Get the info output for a single component query.
  * Returns { output, error, exitCode }.
  */
 export function getInfo(
@@ -59,11 +59,49 @@ export function getInfo(
 	return { output, error: null, exitCode: 0 };
 }
 
+/**
+ * Get info output for multiple comma-separated component names.
+ * Returns results for found components and errors for unknown ones.
+ */
+export function getInfoBatch(
+	query: string,
+	spec: Spec,
+	options?: { toon?: boolean; full?: boolean }
+): { output: string; error: string | null; exitCode: number } {
+	const names = query.split(',').map((n) => n.trim()).filter(Boolean);
+
+	// Single name: delegate to getInfo for backward compatibility
+	if (names.length <= 1) {
+		return getInfo(names[0] ?? query, spec, options);
+	}
+
+	const parts: string[] = [];
+	let hasError = false;
+
+	for (const name of names) {
+		const result = getInfo(name, spec, options);
+		if (result.error) {
+			hasError = true;
+			parts.push(result.error);
+		} else {
+			parts.push(result.output);
+		}
+	}
+
+	const separator = options?.toon ? '\n---\n' : '\n\n---\n\n';
+	return {
+		output: parts.join(separator),
+		error: null,
+		exitCode: hasError ? 1 : 0
+	};
+}
+
 export function runInfo(args: string[], spec: Spec): void {
 	if (args.length === 0 || args[0] === '--help') {
-		console.log('Usage: dryui info <component> [--toon] [--full]');
+		console.log('Usage: dryui info <component>[,<component>,...] [--toon] [--full]');
 		console.log('');
-		console.log('Show API reference for a DryUI component or composed output.');
+		console.log('Show API reference for one or more DryUI components.');
+		console.log('Comma-separated names are supported for batch lookup.');
 		console.log('');
 		console.log('Options:');
 		console.log('  --toon    Output in TOON format (token-optimized for agents)');
@@ -71,7 +109,8 @@ export function runInfo(args: string[], spec: Spec): void {
 		console.log('');
 		console.log('Examples:');
 		console.log('  dryui info Button');
-		console.log('  dryui info card      # case-insensitive');
+		console.log('  dryui info card              # case-insensitive');
+		console.log('  dryui info Button,Card,Select # batch lookup');
 		console.log('  dryui info Button --toon');
 		process.exit(args[0] === '--help' ? 0 : 1);
 	}
@@ -84,5 +123,5 @@ export function runInfo(args: string[], spec: Spec): void {
 		process.exit(1);
 	}
 	const mode: OutputMode = toon ? 'toon' : 'text';
-	runCommand(getInfo(query, spec, { toon, full }), mode);
+	runCommand(getInfoBatch(query, spec, { toon, full }), mode);
 }

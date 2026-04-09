@@ -32,8 +32,10 @@ import {
 	toonWorkspaceReport,
 	toonProjectDetection,
 	toonInstallPlan,
-	toonAddPlan
+	toonAddPlan,
+	toonTokens
 } from './toon.js';
+import { extractTokens, getTokenCategories } from './tokens.js';
 
 const require = createRequire(import.meta.url);
 const _pkg: unknown = require('../package.json');
@@ -378,7 +380,7 @@ function getComponents(): Record<string, ComponentDef> {
 
 const INFO_DESC = [
 	'Look up the full API reference for a DryUI component.\n\n',
-	'Input: Component name (case-insensitive, e.g. "Button", "card").\n',
+	'Input: Component name (case-insensitive, e.g. "Button", "card"). Accepts comma-separated names for batch lookup (e.g. "Button,Card,Select").\n',
 	'Output: TOON format with props, structure, CSS vars, data attributes, truncated example, and next-step suggestions.\n\n',
 	'Use this tool to understand what the component supports before generating code.'
 ].join('');
@@ -387,26 +389,52 @@ server.tool(
 	'info',
 	INFO_DESC,
 	{
-		name: z.string().describe('Component name (case-insensitive)')
+		name: z.string().describe('Component name (case-insensitive). Comma-separated for batch lookup (e.g. "Button,Card,Select")')
 	},
 	async ({ name }) => {
 		try {
 			const components = getComponents();
-			const result = findComponent(name, components);
-			if (!result) {
-				const available = Object.keys(components).sort();
-				return {
-					content: [
-						{
-							type: 'text',
-							text: `Unknown component: "${name}"\n\nAvailable components:\n  ${available.join(', ')}`
-						}
-					],
-					isError: true
-				};
+			const names = name.split(',').map((n) => n.trim()).filter(Boolean);
+
+			if (names.length === 1) {
+				// Single component lookup (original behavior)
+				const result = findComponent(names[0]!, components);
+				if (!result) {
+					const available = Object.keys(components).sort();
+					return {
+						content: [
+							{
+								type: 'text',
+								text: `Unknown component: "${names[0]}"\n\nAvailable components:\n  ${available.join(', ')}`
+							}
+						],
+						isError: true
+					};
+				}
+				const { name: canonical, def } = result;
+				return { content: [{ type: 'text', text: toonComponent(canonical, def) }] };
 			}
-			const { name: canonical, def } = result;
-			return { content: [{ type: 'text', text: toonComponent(canonical, def) }] };
+
+			// Batch lookup
+			const parts: string[] = [];
+			let hasErrors = false;
+
+			for (const query of names) {
+				const result = findComponent(query, components);
+				if (!result) {
+					hasErrors = true;
+					const available = Object.keys(components).sort();
+					parts.push(`error: Unknown component "${query}"\n  available: ${available.join(', ')}`);
+				} else {
+					const { name: canonical, def } = result;
+					parts.push(toonComponent(canonical, def));
+				}
+			}
+
+			return {
+				content: [{ type: 'text', text: parts.join('\n---\n') }],
+				...(hasErrors ? { isError: true } : {})
+			};
 		} catch (e) {
 			return toolError(e);
 		}
@@ -432,6 +460,46 @@ server.tool(
 		try {
 			const components = getComponents();
 			return { content: [{ type: 'text', text: toonComponentList(components, category) }] };
+		} catch (e) {
+			return toolError(e);
+		}
+	}
+);
+
+// tokens tool
+
+const TOKENS_DESC = [
+	'List available DryUI --dry-* CSS design tokens from the theme files.\n\n',
+	'Input: Optional category name to filter results.\n',
+	'Output: TOON format with tokens listed as name, category, light value, dark value.\n\n',
+	'Use this tool to discover which CSS custom properties are available for theming and overrides.'
+].join('');
+
+server.tool(
+	'tokens',
+	TOKENS_DESC,
+	{
+		category: z
+			.string()
+			.optional()
+			.describe('Filter by category name (e.g. "color", "space", "radius", "shadow", "font", "type")')
+	},
+	async ({ category }) => {
+		try {
+			const result = extractTokens(category ?? undefined);
+			if (result.tokens.length === 0 && category) {
+				const available = getTokenCategories();
+				return {
+					content: [
+						{
+							type: 'text',
+							text: `tokens[0]: no matches for category "${category}"\navailable categories: ${available.join(', ')}`
+						}
+					],
+					isError: true
+				};
+			}
+			return { content: [{ type: 'text', text: toonTokens(result, category ?? undefined) }] };
 		} catch (e) {
 			return toolError(e);
 		}

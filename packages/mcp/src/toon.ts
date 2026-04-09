@@ -12,6 +12,7 @@ import type {
 	AddPlan,
 	ProjectPlanStep
 } from './project-planner.js';
+import type { TokenResult } from './tokens.js';
 import { componentKind, getBindableProps, getRequiredParts } from './spec-formatters.js';
 
 // ── Utilities ──────────────────────────────────────────────
@@ -51,7 +52,8 @@ export type HelpCommand =
 	| 'doctor'
 	| 'lint'
 	| 'detect'
-	| 'install';
+	| 'install'
+	| 'tokens';
 
 export type HelpContext = {
 	command: HelpCommand;
@@ -127,6 +129,11 @@ export function buildContextualHelp(ctx: HelpContext): string[] {
 
 		case 'install':
 			hints.push('detect -- verify project after completing steps');
+			break;
+
+		case 'tokens':
+			hints.push('tokens --category color -- filter to color tokens');
+			hints.push('diagnose <file.css> -- validate theme overrides');
 			break;
 	}
 
@@ -630,6 +637,40 @@ export function toonAddPlan(plan: AddPlan): string {
 		for (const w of plan.warnings) {
 			lines.push('  ' + w);
 		}
+	}
+
+	return lines.join('\n');
+}
+
+// ── Token list ────────────────────────────────────────────
+
+export function toonTokens(result: TokenResult, category?: string): string {
+	const lines: string[] = [];
+
+	if (result.tokens.length === 0) {
+		if (category) {
+			lines.push(`tokens[0]: no matches for category "${category}"`);
+		} else {
+			lines.push('tokens[0]: none found');
+		}
+	} else {
+		// Summary line with category counts
+		const countParts: string[] = [];
+		for (const [cat, count] of Object.entries(result.counts).sort(([a], [b]) => a.localeCompare(b))) {
+			countParts.push(`${cat}:${count}`);
+		}
+		lines.push(`total: ${result.total} | ${countParts.join(', ')}`);
+
+		lines.push('', header('tokens', result.tokens.length, ['name', 'category', 'light', 'dark']));
+		for (const token of result.tokens) {
+			lines.push(row(token.name, token.category, token.light, token.dark));
+		}
+	}
+
+	// Contextual help
+	const help = buildContextualHelp({ command: 'tokens' });
+	if (help.length > 0) {
+		lines.push('', formatHelp(help));
 	}
 
 	return lines.join('\n');

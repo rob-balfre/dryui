@@ -5,9 +5,9 @@
 | Metric | Count |
 | --- | ---: |
 | Primitive component nodes | 145 |
-| UI component nodes | 144 |
+| UI component nodes | 145 |
 | UI wrappers | 130 |
-| UI composites | 14 |
+| UI composites | 15 |
 | Compound parts | 662 |
 | Mismatch count | 16 |
 | PrimitivePart components | 0 |
@@ -19,7 +19,7 @@
 flowchart LR
   p_root["Primitives root: 145"]
   u_wrap["UI wrappers: 130"]
-  u_comp["UI composites: 14"]
+  u_comp["UI composites: 15"]
   audit["Audit clusters: 0"]
   p_root -->|wraps| u_wrap
   u_wrap -->|feeds| u_comp

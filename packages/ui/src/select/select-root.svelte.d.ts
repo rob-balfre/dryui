@@ -5,7 +5,9 @@ interface Props {
 	disabled?: boolean;
 	name?: string;
 	class?: string;
-	children: Snippet;
+	options?: Array<string | { value: string; label: string }>;
+	placeholder?: string;
+	children?: Snippet;
 }
 declare const SelectRoot: import('svelte').Component<Props, {}, 'value' | 'open'>;
 type SelectRoot = ReturnType<typeof SelectRoot>;

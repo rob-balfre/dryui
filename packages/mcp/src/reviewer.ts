@@ -542,9 +542,84 @@ function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
 	return issues;
 }
 
+/**
+ * Detect whether a CSS style block contains complex layout patterns that
+ * indicate intentional, non-trivial layout work where a simple
+ * "use grid instead" suggestion would be unhelpful.
+ *
+ * Suppression triggers:
+ * - grid-template-columns with >3 track values
+ * - grid-template-areas (named template areas)
+ * - Complex track functions: minmax(), repeat() with auto-fill/auto-fit, subgrid
+ * - fr units mixed with fixed units in 4+ tracks
+ * - Complex flex patterns: flex-wrap + order, or flex-basis with calc()
+ */
+function isComplexLayoutContext(styles: string): boolean {
+	// Named template areas — always complex
+	if (/grid-template-areas\s*:/.test(styles)) return true;
+
+	// subgrid keyword
+	if (/\bsubgrid\b/.test(styles)) return true;
+
+	// minmax() in grid tracks
+	if (/grid-template-columns\s*:[^;]*minmax\s*\(/.test(styles)) return true;
+
+	// repeat() with auto-fill or auto-fit
+	if (/grid-template-columns\s*:[^;]*repeat\s*\(\s*auto-(?:fill|fit)/.test(styles)) return true;
+
+	// Count track values in grid-template-columns
+	const gtcMatch = styles.match(/grid-template-columns\s*:\s*([^;]+)/);
+	if (gtcMatch) {
+		const trackValue = (gtcMatch[1] ?? '').trim();
+		// Split on whitespace, but respect parenthesised groups like minmax(...) or repeat(...)
+		const tracks = splitTrackValues(trackValue);
+		if (tracks.length > 3) return true;
+	}
+
+	// Complex flex: flex-wrap combined with order, or flex-basis with calc()
+	if (/flex-wrap\s*:/.test(styles) && /\border\s*:/.test(styles)) return true;
+	if (/flex-basis\s*:[^;]*calc\s*\(/.test(styles)) return true;
+
+	return false;
+}
+
+/**
+ * Split a grid-template-columns value into individual track tokens,
+ * respecting parenthesised groups (e.g. minmax(200px, 1fr) is one token).
+ */
+function splitTrackValues(value: string): string[] {
+	const tracks: string[] = [];
+	let current = '';
+	let depth = 0;
+
+	for (let i = 0; i < value.length; i++) {
+		const ch = value[i]!;
+		if (ch === '(') {
+			depth++;
+			current += ch;
+		} else if (ch === ')') {
+			depth--;
+			current += ch;
+		} else if (/\s/.test(ch) && depth === 0) {
+			const trimmed = current.trim();
+			if (trimmed) tracks.push(trimmed);
+			current = '';
+		} else {
+			current += ch;
+		}
+	}
+	const last = current.trim();
+	if (last) tracks.push(last);
+
+	return tracks;
+}
+
 function checkCustomFlexLayout(styles: string, code: string): Issue[] {
 	const issues: Issue[] = [];
 	if (/display:\s*(?:inline-)?flex/.test(styles)) {
+		// Suppress for complex layout contexts where "use grid" is not helpful
+		if (isComplexLayoutContext(styles)) return issues;
+
 		const startLine = getStyleBlockStartLine(code);
 		const localLine = findLineInBlock(styles, /display:\s*(?:inline-)?flex/);
 		issues.push({

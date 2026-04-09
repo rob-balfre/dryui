@@ -186,10 +186,9 @@ describe('checkStyle', () => {
 		expect(violations[0]!.rule).toBe('dryui/no-flex');
 	});
 
-	test('flags display: inline-flex', () => {
+	test('allows display: inline-flex', () => {
 		const violations = checkStyle('.foo { display: inline-flex; }');
-		expect(violations).toHaveLength(1);
-		expect(violations[0]!.rule).toBe('dryui/no-flex');
+		expect(violations).toHaveLength(0);
 	});
 
 	test('flags flex-direction', () => {
@@ -342,6 +341,16 @@ describe('checkStyle', () => {
 
 	test('allows @container queries', () => {
 		const violations = checkStyle('@container (max-width: 36rem) { .foo { --columns: 1fr; } }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows display: flex with dryui-allow flex comment', () => {
+		const violations = checkStyle('/* dryui-allow flex */\n.foo { display: flex; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows flex-direction with dryui-allow flex comment', () => {
+		const violations = checkStyle('/* dryui-allow flex */\nflex-direction: row;');
 		expect(violations).toHaveLength(0);
 	});
 });

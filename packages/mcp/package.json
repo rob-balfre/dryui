@@ -76,6 +76,11 @@
       "bun": "./src/composition-search.ts",
       "types": "./dist/composition-search.d.ts",
       "default": "./dist/composition-search.js"
+    },
+    "./tokens": {
+      "bun": "./src/tokens.ts",
+      "types": "./dist/tokens.d.ts",
+      "default": "./dist/tokens.js"
     }
   },
   "files": [
@@ -91,7 +96,7 @@
     "generate-llms": "bun src/generate-llms-txt.ts",
     "check:contract": "bun src/check-contract.ts",
     "check": "bun run check:contract",
-    "build": "bun run generate-spec && bun run generate-architecture && bun run generate-contract && bun run generate-llms && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && bunx tsc -p tsconfig.build.json"
+    "build": "bun run generate-spec && bun run generate-architecture && bun run generate-contract && bun run generate-llms && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts src/tokens.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && bunx tsc -p tsconfig.build.json"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

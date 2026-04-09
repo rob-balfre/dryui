@@ -1,6 +1,6 @@
 # dryui
 
-> 144 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> 145 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
 
 ## Packages
 
@@ -355,7 +355,7 @@ Closed dropdown select for choosing one option from a fixed list.
 Import: @dryui/ui
 Subpath import: @dryui/ui/select
 Parts: Root, Trigger, Content, Item, Value
-Props: Root: open (boolean), Controls whether the select menu is currently expanded., default false, bindable | value (string), Bindable selected value for the current option set., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
+Props: Root: open (boolean), Controls whether the select menu is currently expanded., default false, bindable | value (string), Bindable selected value for the current option set., default '', bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | options (Array<string | { value: string; label: string }>) | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component. | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-trigger-wrap | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example: <Select.Root bind:value={selected} bind:open={selectOpen} name="selection">
@@ -875,6 +875,14 @@ Parts: Root, Item, Term, Description
 Props: Root: children (Snippet), Content rendered inside the component., required | Item: children (Snippet), Content rendered inside the component., required | Term: children (Snippet), Content rendered inside the component., required | Description: children (Snippet), Content rendered inside the component., required
 Data attributes: data-description-list | data-description-list-dd | data-description-list-item | data-description-list-term
 Example: <DescriptionList.Root>
+
+### LogoMark
+Brand mark, status indicator, or category badge with image or fallback text.
+Import: @dryui/ui
+Subpath import: @dryui/ui/logo-mark
+Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('square' | 'rounded' | 'circle'), accepted square, rounded, circle, default 'rounded' | color ('brand' | 'neutral' | 'error' | 'warning' | 'success' | 'info'), Semantic color or tone applied to the component., accepted brand, neutral, error, warning, success, info, default 'neutral'
+Data attributes: data-color | data-logo-mark | data-shape | data-size
+Example: <LogoMark>Content</LogoMark>
 
 ### Reveal
 IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks.

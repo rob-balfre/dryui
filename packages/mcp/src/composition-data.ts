@@ -1591,7 +1591,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Card.Root'
 			}
 		],
-		combinesWith: ['Container']
+		combinesWith: ['Container', 'Badge', 'Text', 'subgrid aligned-card-list']
 	},
 
 	// ── Overlay / Dialog (missing) ──────────────────────────────────────────
@@ -5757,5 +5757,142 @@ export const compositionRecipes: CompositionRecipe[] = [
 </Field.Root>`
 	},
 
+	{
+		name: 'aligned-card-list',
+		description:
+			'Vertically stacked rows that look like cards but share column alignment using CSS subgrid. Use for flight results, product comparisons, pricing tables, or any list where columns must align across rows.',
+		tags: [
+			'card',
+			'list',
+			'align',
+			'column',
+			'table',
+			'row',
+			'subgrid',
+			'e-commerce',
+			'travel',
+			'flight',
+			'product',
+			'dashboard',
+			'comparison',
+			'pricing'
+		],
+		components: ['Card', 'Badge', 'Text'],
+		snippet: `<!-- Aligned card list — parent grid defines shared columns,
+     each Card.Root uses subgrid to inherit the tracks.
+     Columns stay aligned across all rows without a <table>. -->
+<script>
+  import { Card, Badge, Text } from '@dryui/ui';
+
+  const flights = [
+    { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },
+    { airline: 'Pacific Wings', route: 'SFO → JFK', depart: '10:40', arrive: '21:10', duration: '7h 30m', stops: '1 stop', price: '$194' },
+    { airline: 'Coastal Jet', route: 'SFO → JFK', depart: '14:20', arrive: '22:50', duration: '5h 30m', stops: 'Nonstop', price: '$312' },
+  ];
+</script>
+
+<div class="flight-list">
+  <!-- Column headers share the same grid tracks as rows -->
+  <div class="flight-list-header">
+    <Text as="span" size="sm" color="muted">Airline</Text>
+    <Text as="span" size="sm" color="muted">Route</Text>
+    <Text as="span" size="sm" color="muted">Depart</Text>
+    <Text as="span" size="sm" color="muted">Arrive</Text>
+    <Text as="span" size="sm" color="muted">Duration</Text>
+    <Text as="span" size="sm" color="muted">Price</Text>
+  </div>
+
+  {#each flights as flight (flight.airline + flight.depart)}
+    <Card.Root variant="interactive">
+      <Card.Content noPadding>
+        <div class="flight-row">
+          <div class="flight-cell">
+            <Text as="span" weight="medium">{flight.airline}</Text>
+          </div>
+          <div class="flight-cell">
+            <Text as="span" font="mono">{flight.route}</Text>
+          </div>
+          <div class="flight-cell">
+            <Text as="span" weight="semibold">{flight.depart}</Text>
+          </div>
+          <div class="flight-cell">
+            <Text as="span" weight="semibold">{flight.arrive}</Text>
+          </div>
+          <div class="flight-cell">
+            <Text as="span" size="sm" color="secondary">{flight.duration}</Text>
+            <Badge variant="soft" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>
+          </div>
+          <div class="flight-cell">
+            <Text as="span" weight="bold">{flight.price}</Text>
+          </div>
+        </div>
+      </Card.Content>
+    </Card.Root>
+  {/each}
+</div>
+
+<style>
+  /* Parent grid defines the shared column tracks */
+  .flight-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto auto 1fr auto;
+    gap: var(--dry-space-2);
+  }
+
+  /* Header spans all columns and inherits tracks via subgrid */
+  .flight-list-header {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    padding: 0 var(--dry-space-4) var(--dry-space-2);
+  }
+
+  /* :global() is required here — subgrid must reach Card's internal
+     elements which live in a child component scope. */
+  .flight-list :global([data-card]) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  .flight-list :global([data-card-content]) {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+  }
+
+  /* Row inside the card inherits tracks */
+  .flight-row {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    align-items: center;
+    padding: var(--dry-space-3) var(--dry-space-4);
+  }
+
+  /* Each cell aligns to its parent track */
+  .flight-cell {
+    display: grid;
+    gap: var(--dry-space-1);
+    align-content: center;
+  }
+
+  /* Responsive: collapse to stacked layout on narrow containers */
+  @container (max-width: 640px) {
+    .flight-list {
+      grid-template-columns: 1fr;
+    }
+
+    .flight-list-header {
+      display: none;
+    }
+
+    .flight-row {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--dry-space-2);
+    }
+  }
+</style>`
+	},
 
 ];

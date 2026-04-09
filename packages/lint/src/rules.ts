@@ -20,7 +20,7 @@ const INLINE_STYLE_RE = /\bstyle\s*=/g;
 
 const STYLE_DIRECTIVE_RE = /\bstyle:\w+/g;
 
-const FLEX_DISPLAY_RE = /display\s*:\s*(?:inline-)?flex/g;
+const FLEX_DISPLAY_RE = /display\s*:\s*flex(?![a-z-])/g;
 
 const FLEX_PROPS_RE =
 	/(?:^|[;\s{])(?:flex-direction|flex-wrap|flex-grow|flex-shrink|flex-basis|flex)\s*:/gm;
@@ -122,10 +122,27 @@ export function checkMarkup(content: string): Violation[] {
 	return violations;
 }
 
+function hasAllowComment(
+	lines: string[],
+	content: string,
+	matchIndex: number,
+	keyword: string
+): boolean {
+	// Skip leading non-alpha chars (regex may capture a delimiter on the prior line)
+	let idx = matchIndex;
+	while (idx < content.length && /[^a-zA-Z]/.test(content[idx]!)) idx++;
+	const declLine = getLine(content, idx);
+	if (declLine <= 1) return false;
+	const prevLine = lines[declLine - 2] ?? '';
+	return prevLine.includes(`dryui-allow ${keyword}`);
+}
+
 export function checkStyle(content: string): Violation[] {
 	const violations: Violation[] = [];
+	const lines = content.split('\n');
 
 	for (const match of content.matchAll(FLEX_DISPLAY_RE)) {
+		if (hasAllowComment(lines, content, match.index, 'flex')) continue;
 		violations.push({
 			rule: 'dryui/no-flex',
 			message: 'Do not use display: flex. Use display: grid instead.',
@@ -134,6 +151,7 @@ export function checkStyle(content: string): Violation[] {
 	}
 
 	for (const match of content.matchAll(FLEX_PROPS_RE)) {
+		if (hasAllowComment(lines, content, match.index, 'flex')) continue;
 		const prop = match[0].trim().replace(/;/, '').split(':')[0]!.trim();
 		violations.push({
 			rule: 'dryui/no-flex',

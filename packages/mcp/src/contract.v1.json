@@ -6,9 +6,9 @@
     "version": "0.1.13"
   },
   "counts": {
-    "components": 144,
+    "components": 145,
     "compositionComponents": 131,
-    "compositionRecipes": 30,
+    "compositionRecipes": 31,
     "tools": 11,
     "prompts": 8,
     "cliCommands": 12
@@ -3224,9 +3224,18 @@
               "description": "Field name used during native form submission.",
               "note": "Adds a hidden input so the selected value participates in native form submission."
             },
+            "options": {
+              "type": "Array<string | { value: string; label: string }>",
+              "required": false
+            },
+            "placeholder": {
+              "type": "string",
+              "required": false,
+              "description": "Hint text shown when no value is selected or entered."
+            },
             "children": {
               "type": "Snippet",
-              "required": true,
+              "required": false,
               "description": "Content rendered inside the component."
             }
           }
@@ -10405,6 +10414,105 @@
         }
       ],
       "example": "<Listbox.Root>\n  <Listbox.Item>...</Listbox.Item>\n</Listbox.Root>"
+    },
+    "LogoMark": {
+      "import": "@dryui/ui",
+      "description": "Brand mark, status indicator, or category badge with image or fallback text",
+      "category": "display",
+      "tags": [
+        "logo",
+        "mark",
+        "brand",
+        "indicator",
+        "badge",
+        "icon"
+      ],
+      "compound": false,
+      "props": {
+        "src": {
+          "type": "string",
+          "required": false,
+          "description": "Source URL for image, video, or other media content."
+        },
+        "alt": {
+          "type": "string",
+          "required": false,
+          "description": "Accessible alternative text announced when the media itself is not visible.",
+          "default": "''"
+        },
+        "fallback": {
+          "type": "string",
+          "required": false
+        },
+        "size": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Size preset affecting density, spacing, or typography.",
+          "default": "'md'"
+        },
+        "shape": {
+          "type": "'square' | 'rounded' | 'circle'",
+          "required": false,
+          "acceptedValues": [
+            "square",
+            "rounded",
+            "circle"
+          ],
+          "default": "'rounded'"
+        },
+        "color": {
+          "type": "'brand' | 'neutral' | 'error' | 'warning' | 'success' | 'info'",
+          "required": false,
+          "acceptedValues": [
+            "brand",
+            "neutral",
+            "error",
+            "warning",
+            "success",
+            "info"
+          ],
+          "description": "Semantic color or tone applied to the component.",
+          "default": "'neutral'"
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLSpanElement>",
+        "via": "rest",
+        "element": "span",
+        "examples": [
+          "id",
+          "style",
+          "aria-label"
+        ],
+        "note": "Forwards <span> attributes via rest props."
+      },
+      "cssVars": {
+        "--dry-logo-mark-bg": "Mark Bg",
+        "--dry-logo-mark-color": "Mark Color",
+        "--dry-logo-mark-font-size": "Mark Font Size",
+        "--dry-logo-mark-radius": "Mark Radius",
+        "--dry-logo-mark-size": "Mark Size"
+      },
+      "dataAttributes": [
+        {
+          "name": "data-color"
+        },
+        {
+          "name": "data-logo-mark"
+        },
+        {
+          "name": "data-shape"
+        },
+        {
+          "name": "data-size"
+        }
+      ],
+      "example": "<LogoMark>Content</LogoMark>"
     },
     "PinInput": {
       "import": "@dryui/ui",
@@ -19677,7 +19785,10 @@
           }
         ],
         "combinesWith": [
-          "Container"
+          "Container",
+          "Badge",
+          "Text",
+          "subgrid aligned-card-list"
         ]
       },
       "alertdialog": {
@@ -22891,6 +23002,32 @@
           "Text"
         ],
         "snippet": "<script>\n  import { OptionSwatchGroup, Field, Label, Text } from '@dryui/ui';\n\n  let color = $state('sage');\n</script>\n\n<Field.Root>\n  <Label>Color</Label>\n  <OptionSwatchGroup.Root bind:value={color}>\n    <OptionSwatchGroup.Item value=\"sage\">\n      <OptionSwatchGroup.Swatch color=\"#7da174\" />\n      <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>\n      <OptionSwatchGroup.Meta>Soft matte finish</OptionSwatchGroup.Meta>\n    </OptionSwatchGroup.Item>\n  </OptionSwatchGroup.Root>\n  <Text size=\"sm\" color=\"secondary\">Choose the finish that matches the product photo.</Text>\n</Field.Root>"
+      },
+      "aligned-card-list": {
+        "name": "aligned-card-list",
+        "description": "Vertically stacked rows that look like cards but share column alignment using CSS subgrid. Use for flight results, product comparisons, pricing tables, or any list where columns must align across rows.",
+        "tags": [
+          "card",
+          "list",
+          "align",
+          "column",
+          "table",
+          "row",
+          "subgrid",
+          "e-commerce",
+          "travel",
+          "flight",
+          "product",
+          "dashboard",
+          "comparison",
+          "pricing"
+        ],
+        "components": [
+          "Card",
+          "Badge",
+          "Text"
+        ],
+        "snippet": "<!-- Aligned card list — parent grid defines shared columns,\n     each Card.Root uses subgrid to inherit the tracks.\n     Columns stay aligned across all rows without a <table>. -->\n<script>\n  import { Card, Badge, Text } from '@dryui/ui';\n\n  const flights = [\n    { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },\n    { airline: 'Pacific Wings', route: 'SFO → JFK', depart: '10:40', arrive: '21:10', duration: '7h 30m', stops: '1 stop', price: '$194' },\n    { airline: 'Coastal Jet', route: 'SFO → JFK', depart: '14:20', arrive: '22:50', duration: '5h 30m', stops: 'Nonstop', price: '$312' },\n  ];\n</script>\n\n<div class=\"flight-list\">\n  <!-- Column headers share the same grid tracks as rows -->\n  <div class=\"flight-list-header\">\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Airline</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Route</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Depart</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Arrive</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Duration</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Price</Text>\n  </div>\n\n  {#each flights as flight (flight.airline + flight.depart)}\n    <Card.Root variant=\"interactive\">\n      <Card.Content noPadding>\n        <div class=\"flight-row\">\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"medium\">{flight.airline}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" font=\"mono\">{flight.route}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.depart}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.arrive}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" size=\"sm\" color=\"secondary\">{flight.duration}</Text>\n            <Badge variant=\"soft\" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"bold\">{flight.price}</Text>\n          </div>\n        </div>\n      </Card.Content>\n    </Card.Root>\n  {/each}\n</div>\n\n<style>\n  /* Parent grid defines the shared column tracks */\n  .flight-list {\n    display: grid;\n    grid-template-columns: 1fr 1fr auto auto 1fr auto;\n    gap: var(--dry-space-2);\n  }\n\n  /* Header spans all columns and inherits tracks via subgrid */\n  .flight-list-header {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    padding: 0 var(--dry-space-4) var(--dry-space-2);\n  }\n\n  /* :global() is required here — subgrid must reach Card's internal\n     elements which live in a child component scope. */\n  .flight-list :global([data-card]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  .flight-list :global([data-card-content]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  /* Row inside the card inherits tracks */\n  .flight-row {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    align-items: center;\n    padding: var(--dry-space-3) var(--dry-space-4);\n  }\n\n  /* Each cell aligns to its parent track */\n  .flight-cell {\n    display: grid;\n    gap: var(--dry-space-1);\n    align-content: center;\n  }\n\n  /* Responsive: collapse to stacked layout on narrow containers */\n  @container (max-width: 640px) {\n    .flight-list {\n      grid-template-columns: 1fr;\n    }\n\n    .flight-list-header {\n      display: none;\n    }\n\n    .flight-row {\n      grid-template-columns: 1fr 1fr;\n      gap: var(--dry-space-2);\n    }\n  }\n</style>"
       }
     }
   }

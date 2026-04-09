@@ -81,6 +81,7 @@ export const categories: NavCategory[] = [
 			ui('Kbd'),
 			ui('LinkPreview'),
 			ui('List'),
+			ui('LogoMark'),
 			ui('Map'),
 			ui('MarkdownRenderer'),
 			ui('Marquee'),

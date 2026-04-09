@@ -488,6 +488,9 @@ export type {
 export { Listbox } from './listbox/index.js';
 export type { ListboxRootProps, ListboxItemProps } from './listbox/index.js';
 
+export { LogoMark } from './logo-mark/index.js';
+export type { LogoMarkProps } from './logo-mark/index.js';
+
 export { PinInput } from './pin-input/index.js';
 export type {
 	PinInputRootProps,

@@ -11,7 +11,14 @@ export interface SearchSection {
 	items: SearchItem[];
 }
 
-const docsPages: SearchItem[] = [
+// Build-time route discovery — Vite resolves this at compile time so stale
+// entries pointing to deleted routes are automatically filtered out.
+const routeModules = import.meta.glob('/src/routes/**/+page.svelte');
+const validRoutes = new Set(
+	Object.keys(routeModules).map((p) => p.replace('/src/routes', '').replace('/+page.svelte', '') || '/')
+);
+
+const allDocsPages: SearchItem[] = [
 	{
 		label: 'Home',
 		href: '/',
@@ -37,38 +44,6 @@ const docsPages: SearchItem[] = [
 		keywords: ['tokens', 'palette', 'theme editor']
 	},
 	{
-		label: 'Theme Lab',
-		href: '/theme-lab',
-		description: 'Compare sidebar active-state recipes with simple token and contrast checks.',
-		keywords: ['theme', 'contrast', 'sidebar', 'active state', 'tokens']
-	},
-	{
-		label: 'Theme Lab / Colour',
-		href: '/theme-lab/colour',
-		description: 'Audit the Practical UI colour rules against generated DryUI tokens and previews.',
-		keywords: ['theme', 'colour', 'color', 'practical ui', 'figma', 'tokens', 'contrast']
-	},
-	{
-		label: 'Theme Lab / Elevation',
-		href: '/theme-lab/elevation',
-		description: 'Verify the Practical UI elevation stack against DryUI surface and shadow tokens.',
-		keywords: ['theme', 'elevation', 'shadows', 'surfaces', 'practical ui', 'figma', 'depth']
-	},
-	{
-		label: 'Theme Lab / Typography',
-		href: '/theme-lab/typography',
-		description:
-			'Preview the Practical UI typography scale, mode switching, and typeface override workflow in DryUI.',
-		keywords: ['theme', 'typography', 'practical ui', 'type scale', 'desktop', 'mobile', 'font']
-	},
-	{
-		label: 'Theme Lab / Grids',
-		href: '/theme-lab/grids',
-		description:
-			'Audit the Practical UI desktop, tablet, and mobile grid rules against DryUI spacing and layout conventions.',
-		keywords: ['theme', 'grids', 'grid', 'layout', 'columns', 'gutter', 'margin', 'practical ui']
-	},
-	{
 		label: 'Tools',
 		href: '/tools',
 		description: 'CLI commands and MCP server setup for DryUI tooling.',
@@ -81,6 +56,8 @@ const docsPages: SearchItem[] = [
 		keywords: ['releases', 'updates', 'versions']
 	}
 ];
+
+const docsPages = allDocsPages.filter((page) => validRoutes.has(page.href));
 
 function getComponentItems(): SearchItem[] {
 	return categories.flatMap((category) =>

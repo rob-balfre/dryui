@@ -2,6 +2,12 @@
 	import type { Snippet } from 'svelte';
 	import { generateFormId } from '@dryui/primitives';
 	import { setSelectCtx } from './context.svelte.js';
+	import SelectTrigger from './select-trigger.svelte';
+	import SelectValue from './select-value.svelte';
+	import SelectContent from './select-content.svelte';
+	import SelectItem from './select-item.svelte';
+
+	type SelectOption = { value: string; label: string };
 
 	interface Props {
 		open?: boolean;
@@ -9,7 +15,9 @@
 		disabled?: boolean;
 		name?: string;
 		class?: string;
-		children: Snippet;
+		options?: Array<string | SelectOption>;
+		placeholder?: string;
+		children?: Snippet;
 	}
 
 	let {
@@ -18,8 +26,14 @@
 		disabled = false,
 		name,
 		class: className,
+		options,
+		placeholder,
 		children
 	}: Props = $props();
+
+	const normalizedOptions = $derived(
+		options?.map((opt) => (typeof opt === 'string' ? { value: opt, label: opt } : opt))
+	);
 
 	const triggerId = generateFormId('select-trigger');
 	const contentId = generateFormId('select-content');
@@ -59,7 +73,18 @@
 </script>
 
 <div data-select-wrapper class={className}>
-	{@render children()}
+	{#if normalizedOptions && !children}
+		<SelectTrigger>
+			<SelectValue {placeholder} />
+		</SelectTrigger>
+		<SelectContent>
+			{#each normalizedOptions as opt (opt.value)}
+				<SelectItem value={opt.value}>{opt.label}</SelectItem>
+			{/each}
+		</SelectContent>
+	{:else if children}
+		{@render children()}
+	{/if}
 
 	{#if name}
 		<input type="hidden" {name} {value} disabled={disabled || undefined} />

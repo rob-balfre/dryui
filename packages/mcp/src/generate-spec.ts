@@ -421,6 +421,12 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		category: 'input',
 		tags: ['listbox', 'select', 'option', 'keyboard']
 	},
+	LogoMark: {
+		description:
+			'Brand mark, status indicator, or category badge with image or fallback text',
+		category: 'display',
+		tags: ['logo', 'mark', 'brand', 'indicator', 'badge', 'icon']
+	},
 	Map: {
 		description: 'Interactive map container with markers, popups, layers, and controls',
 		category: 'display',

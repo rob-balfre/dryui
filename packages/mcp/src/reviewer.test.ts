@@ -398,6 +398,92 @@ describe('Dogfooding Warnings', () => {
 		expect(issue!.fix).toBe('display: grid');
 	});
 
+	test('suppresses flex warning when grid-template-columns has >3 tracks', () => {
+		const code = `<div class="table">content</div>
+<style>
+  .table {
+    display: flex;
+    grid-template-columns: auto 11rem 6rem 1fr 7rem 7rem 7rem;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
+	test('suppresses flex warning when grid-template-areas is present', () => {
+		const code = `<div class="layout">content</div>
+<style>
+  .layout {
+    display: flex;
+    grid-template-areas: "header header" "sidebar main";
+    grid-template-columns: 200px 1fr;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
+	test('suppresses flex warning when minmax() is used in grid tracks', () => {
+		const code = `<div class="grid">content</div>
+<style>
+  .grid {
+    display: flex;
+    grid-template-columns: minmax(200px, 1fr) 2fr;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
+	test('suppresses flex warning when repeat(auto-fill/auto-fit) is used', () => {
+		const code = `<div class="cards">content</div>
+<style>
+  .cards {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
+	test('suppresses flex warning when subgrid is used', () => {
+		const code = `<div class="nested">content</div>
+<style>
+  .nested {
+    display: flex;
+    grid-template-columns: subgrid;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
+	test('still warns on flex with simple grid (2 columns)', () => {
+		const code = `<div class="row">content</div>
+<style>
+  .row {
+    display: flex;
+    grid-template-columns: 1fr 1fr;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(true);
+	});
+
+	test('suppresses flex warning for complex flex with wrap + order', () => {
+		const code = `<div class="complex">content</div>
+<style>
+  .complex {
+    display: flex;
+    flex-wrap: wrap;
+    order: 2;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'prefer-grid-layout')).toBe(false);
+	});
+
 	test('warns on class="field" custom field markup', () => {
 		const code = `<div class="field">
   <label>Name</label>
