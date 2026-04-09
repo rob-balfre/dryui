@@ -285,6 +285,25 @@ describe('checkStyle', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags :global() selector', () => {
+		const violations = checkStyle('.fare-header :global(span) { text-align: center; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-global');
+	});
+
+	test('flags :global() with class selector', () => {
+		const violations = checkStyle(':global(.active) { color: red; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-global');
+	});
+
+	test('flags multiple :global() usages', () => {
+		const violations = checkStyle(
+			'.a :global(span) { color: red; }\n.b :global(.foo) { color: blue; }'
+		);
+		expect(violations).toHaveLength(2);
+	});
+
 	test('flags @media for sizing', () => {
 		const violations = checkStyle('@media (max-width: 768px) { .foo { color: red; } }');
 		expect(violations).toHaveLength(1);

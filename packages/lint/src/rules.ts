@@ -31,6 +31,8 @@ const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
 
 const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:/gm;
 
+const GLOBAL_SELECTOR_RE = /:global\s*\(/g;
+
 const MEDIA_QUERY_RE = /@media\s+[^{]+\{/g;
 const ALLOWED_MEDIA_RE = /prefers-reduced-motion|prefers-color-scheme/;
 
@@ -145,6 +147,15 @@ export function checkStyle(content: string): Violation[] {
 			rule: 'dryui/no-width',
 			message:
 				'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead.',
+			line: getLine(content, match.index)
+		});
+	}
+
+	for (const match of content.matchAll(GLOBAL_SELECTOR_RE)) {
+		violations.push({
+			rule: 'dryui/no-global',
+			message:
+				'Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.',
 			line: getLine(content, match.index)
 		});
 	}
