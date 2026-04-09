@@ -79,9 +79,9 @@
 			--dry-stepper-indicator-size: 0.875rem;
 		}
 
-		/* Child internals need a narrow-screen override to keep labels readable. */
-		.wizard-stepper :global([data-part='step']) {
-			font-size: 0.75rem;
+		/* Narrow-screen override for step label font size via CSS custom property. */
+		.wizard-stepper {
+			--dry-type-small-size: 0.75rem;
 		}
 	}
 </style>

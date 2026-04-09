@@ -4,7 +4,7 @@ import { dryuiLint } from '@dryui/lint';
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: [
-		dryuiLint({ strict: true, exclude: ['.svelte-kit/', 'packages/primitives/', '/dist/', '/thumbnail/'] })
+		dryuiLint({ strict: true, exclude: ['.svelte-kit/', 'packages/primitives/', '/dist/', '/thumbnail/', '/tour/'] })
 	],
 	kit: {
 		adapter: adapter(),

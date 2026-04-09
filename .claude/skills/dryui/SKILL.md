@@ -114,13 +114,20 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 - Codex: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
-**3. Run the install planner** — it detects your project and returns a tailored step-by-step plan:
+**3. Bootstrap the project** — `init` detects your project state and applies whatever is missing:
 
 ```
-npx -y @dryui/cli install --toon
+npx -y @dryui/cli init
 ```
 
-Execute each `"pending"` step. Then verify: `npx -y @dryui/cli detect --toon` — output should show `project: ready`.
+**New project from scratch?** Pass a directory name to scaffold SvelteKit + DryUI in one step:
+
+```
+npx -y @dryui/cli init my-app
+cd my-app && npm run dev
+```
+
+This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. Verify: `npx -y @dryui/cli detect --toon` — output should show `project: ready`.
 
 ### Manual setup
 
@@ -169,6 +176,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 All commands support `--toon` for token-optimized agent output and `--full` to disable truncation.
 
 ```bash
+bunx @dryui/cli init [path] [--pm bun]   # Bootstrap SvelteKit + DryUI project
 bunx @dryui/cli info <component> --toon  # Look up component API
 bunx @dryui/cli compose "date input" --toon  # Composition guidance
 bunx @dryui/cli detect [path] --toon     # Check project setup

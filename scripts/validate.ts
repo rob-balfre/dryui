@@ -79,7 +79,8 @@ const phase3Tasks: Promise<TaskResult>[] = [
 			'(bun src/generate-architecture.ts & bun src/generate-contract.ts & bun src/generate-llms-txt.ts & wait)',
 			'mkdir -p dist',
 			'cp src/spec.json src/architecture.json src/contract.v1.json src/contract.v1.schema.json dist/',
-			'bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts --outdir dist --root src --target node',
+			'bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts --outdir dist --root src --target node',
+			"printf '#!/usr/bin/env node\\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js",
 			'bunx tsc -p tsconfig.build.json'
 		].join(' && '),
 		pkg('mcp')
