@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 0.4.1
+
+### Patch Changes
+
+- [`738ffe7`](https://github.com/rob-balfre/dryui/commit/738ffe709a6addd735fb921ce7e518cf7ef1f91f) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix Feedback Hotkey handler prop and MCP binary execute permissions
+
 ## 0.4.0
 
 ### Minor Changes
