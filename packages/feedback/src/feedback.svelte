@@ -318,38 +318,63 @@
 	// --- Screenshot + Submit ---
 
 	async function captureScreenshot(): Promise<string> {
-		if (!svgEl) throw new Error('No SVG element');
-		const clone = svgEl.cloneNode(true) as SVGSVGElement;
 		const w = window.innerWidth;
 		const h = window.innerHeight;
-		clone.setAttribute('width', String(w));
-		clone.setAttribute('height', String(h));
-		clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
 
-		const svgString = new XMLSerializer().serializeToString(clone);
-		const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
-		const url = URL.createObjectURL(blob);
-		try {
-			const img = new Image();
-			img.width = w;
-			img.height = h;
-			await new Promise<void>((resolve, reject) => {
-				img.onload = () => resolve();
-				img.onerror = reject;
-				img.src = url;
-			});
-			const canvas = document.createElement('canvas');
-			canvas.width = w;
-			canvas.height = h;
-			const ctx = canvas.getContext('2d')!;
-			ctx.drawImage(img, 0, 0);
-			const dataUrl = canvas.toDataURL('image/webp', 0.8);
-			canvas.width = 0;
-			canvas.height = 0;
-			return dataUrl.split(',')[1];
-		} finally {
-			URL.revokeObjectURL(url);
+		// Capture the current tab via Screen Capture API
+		const stream = await navigator.mediaDevices.getDisplayMedia({
+			video: { displaySurface: 'browser' },
+			preferCurrentTab: true
+		} as DisplayMediaStreamOptions);
+
+		const video = document.createElement('video');
+		video.srcObject = stream;
+		video.muted = true;
+		await video.play();
+
+		// Wait one frame for the video to render
+		await new Promise((r) => requestAnimationFrame(r));
+
+		const canvas = document.createElement('canvas');
+		canvas.width = w;
+		canvas.height = h;
+		const ctx = canvas.getContext('2d')!;
+
+		// Draw the page capture
+		ctx.drawImage(video, 0, 0, w, h);
+
+		// Stop the stream immediately
+		stream.getTracks().forEach((t) => t.stop());
+		video.srcObject = null;
+
+		// Composite SVG drawings on top
+		if (svgEl) {
+			const clone = svgEl.cloneNode(true) as SVGSVGElement;
+			clone.setAttribute('width', String(w));
+			clone.setAttribute('height', String(h));
+			clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+			const svgString = new XMLSerializer().serializeToString(clone);
+			const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+			const url = URL.createObjectURL(blob);
+			try {
+				const img = new Image();
+				img.width = w;
+				img.height = h;
+				await new Promise<void>((resolve, reject) => {
+					img.onload = () => resolve();
+					img.onerror = reject;
+					img.src = url;
+				});
+				ctx.drawImage(img, 0, 0);
+			} finally {
+				URL.revokeObjectURL(url);
+			}
 		}
+
+		const dataUrl = canvas.toDataURL('image/webp', 0.8);
+		canvas.width = 0;
+		canvas.height = 0;
+		return dataUrl.split(',')[1];
 	}
 
 	async function handleSubmit() {
