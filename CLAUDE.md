@@ -112,9 +112,14 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui
 
-# Codex (skill + MCP)
+# Codex (public/manual install)
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
 codex mcp add dryui -- npx -y @dryui/mcp
+
+# Codex (repo-local plugin when working in this repository)
+codex
+/plugins
+# Install DryUI from the "DryUI Local" marketplace exposed by .agents/plugins/marketplace.json
 
 # Copilot / Cursor / Windsurf (skill + MCP config)
 npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
@@ -136,7 +141,7 @@ DryUI MCP tools:
 - validation, theme checks, and workspace audit (`review`, `diagnose`, `doctor`, `lint`)
 - CLI: `bunx @dryui/cli detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint`
 - Skill: `packages/ui/skills/dryui/SKILL.md`
-- Plugin: `packages/plugin/` (Claude Code plugin bundling skill + MCP)
+- Plugin: `packages/plugin/` (Claude Code plugin + Codex local plugin bundling `dryui`, `init`, `live-feedback`, and MCP)
 
 ### Output Format — TOON (Token-Optimized Output)
 

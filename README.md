@@ -100,12 +100,26 @@ claude plugin install dryui@dryui
 
 ### Codex
 
-Install the skill, then add the MCP server:
+Codex now supports plugins, but DryUI is not in a public Codex marketplace yet. Today there are two install paths.
+
+Public install in any repo:
 
 ```bash
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
 codex mcp add dryui -- npx -y @dryui/mcp
 ```
+
+Repo-local plugin when you are working inside this repository:
+
+1. Restart Codex so it picks up `.agents/plugins/marketplace.json`.
+2. Run `codex`, then `/plugins`.
+3. Open the `DryUI Local` marketplace and install `DryUI` from `./packages/plugin`.
+
+The repo-local plugin bundles three skills:
+
+- `dryui` for component conventions and composition checks
+- `init` for bootstrapping DryUI in a new or existing SvelteKit project
+- `live-feedback` for the feedback workflow
 
 ### VS Code / Copilot
 

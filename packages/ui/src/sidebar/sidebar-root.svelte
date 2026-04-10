@@ -49,7 +49,7 @@
 <style>
 	[data-sidebar] {
 		--dry-sidebar-item-padding-x: var(--dry-space-6);
-		--dry-sidebar-content-padding: 0;
+		--dry-sidebar-content-padding: 0px;
 
 		display: grid;
 		grid-template-columns: var(--dry-sidebar-width, 320px);

@@ -1333,7 +1333,7 @@ dryui ships an MCP server (live tools) and a skill (conventions). All MCP output
 ### Install
 
 - **Claude Code**: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin bundles skill + MCP)
-- **Codex**: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`
+- **Codex**: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`
 - **Copilot / Cursor / Windsurf**: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config
 - **Zed**: MCP only (reads AGENTS.md for conventions)
 

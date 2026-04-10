@@ -1,7 +1,7 @@
 {
   "name": "dryui",
   "version": "0.2.0",
-  "description": "DryUI component library — conventions, lookup, validation, and composition guidance for Svelte 5",
+  "description": "DryUI component library — Svelte guidance, bootstrap, live feedback, and MCP tools",
   "author": {
     "name": "Rob Balfre",
     "url": "https://github.com/rob-balfre"

@@ -11,9 +11,14 @@ Install the DryUI skill (conventions) and MCP server (live tools) for your AI co
 claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui
 
-# Codex — skill from GitHub + MCP server
+# Codex — public/manual install
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
 codex mcp add dryui -- npx -y @dryui/mcp
+
+# Codex — repo-local plugin when working in this repository
+codex
+/plugins
+# Install DryUI from the "DryUI Local" marketplace exposed by .agents/plugins/marketplace.json
 
 # Copilot / Cursor / Windsurf — copy skill + add MCP config
 npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui

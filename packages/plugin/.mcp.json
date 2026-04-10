@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "dryui": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "@dryui/mcp"]
     }

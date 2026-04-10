@@ -123,7 +123,7 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 **2. Add the MCP server** for live API lookup and code validation:
 
 - Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (installs skill + MCP in one step)
-- Codex: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`
+- Codex: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo itself, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`.
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
 **3. Bootstrap the project** — `init` detects your project state and applies whatever is missing:

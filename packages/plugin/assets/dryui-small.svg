@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="DryUI icon">
+  <rect width="64" height="64" rx="16" fill="#0f1720" />
+  <path d="M18 18h8l8 14 8-14h8L38 46h-12z" fill="#32BCD4" />
+  <circle cx="46" cy="44" r="6" fill="#f3fbff" />
+</svg>

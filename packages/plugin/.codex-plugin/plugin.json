@@ -1,0 +1,35 @@
+{
+  "name": "dryui",
+  "version": "0.2.0",
+  "description": "DryUI component library — conventions, lookup, validation, and composition guidance for Svelte 5",
+  "author": {
+    "name": "Rob Balfre",
+    "email": "rob@dryui.dev",
+    "url": "https://github.com/rob-balfre"
+  },
+  "repository": "https://github.com/rob-balfre/dryui",
+  "homepage": "https://dryui.dev",
+  "license": "MIT",
+  "keywords": ["svelte", "components", "ui", "dryui", "svelte5", "mcp", "codex"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "DryUI",
+    "shortDescription": "Svelte 5 component guidance and live lookup tools",
+    "longDescription": "Bundles DryUI's Svelte component guidance, project bootstrap workflow, live feedback skill, and MCP server so Codex can build and review Svelte workspaces without guessing component shape.",
+    "developerName": "Rob Balfre",
+    "category": "Developer Tools",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://dryui.dev",
+    "privacyPolicyURL": "https://dryui.dev/privacy.html",
+    "termsOfServiceURL": "https://dryui.dev/terms.html",
+    "defaultPrompt": [
+      "Bootstrap DryUI in a new or existing SvelteKit app.",
+      "Implement a DryUI settings page without guessing APIs.",
+      "Review this Svelte file for DryUI composition mistakes."
+    ],
+    "brandColor": "#32BCD4",
+    "composerIcon": "./assets/dryui-small.svg",
+    "logo": "./assets/dryui-logo.svg"
+  }
+}
