@@ -1,5 +1,11 @@
 # @dryui/ui
 
+## 0.2.2
+
+### Patch Changes
+
+- Fix sidebar content padding using `0px` instead of `0` for CSS custom property compatibility
+
 ## 0.2.1
 
 ### Patch Changes
