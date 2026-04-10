@@ -28,6 +28,7 @@
 	let justCommitted = false;
 	let saveVersion = $state(0);
 	let submitting = $state(false);
+	let sent = $state(false);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
@@ -366,12 +367,16 @@
 					viewport: { width: window.innerWidth, height: window.innerHeight }
 				})
 			});
-			drawings = [];
-			saveVersion++;
-			active = false;
+			submitting = false;
+			sent = true;
+			setTimeout(() => {
+				sent = false;
+				drawings = [];
+				saveVersion++;
+				active = false;
+			}, 1500);
 		} catch (e) {
 			console.error('Failed to submit feedback:', e);
-		} finally {
 			submitting = false;
 		}
 	}
@@ -547,8 +552,9 @@
 		<Toolbar
 			{active}
 			{tool}
-			{hasDrawings}
+			hasDrawings={hasDrawings || sent}
 			{submitting}
+			{sent}
 			ontoggle={toggle}
 			ontoolchange={setTool}
 			onsubmit={handleSubmit}

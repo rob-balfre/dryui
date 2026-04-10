@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
+	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
 	import type { Tool } from '../types.js';
 
 	interface Props {
@@ -7,12 +7,14 @@
 		tool: Tool;
 		hasDrawings: boolean;
 		submitting: boolean;
+		sent: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 	}
 
-	let { active, tool, hasDrawings, submitting, ontoggle, ontoolchange, onsubmit }: Props = $props();
+	let { active, tool, hasDrawings, submitting, sent, ontoggle, ontoolchange, onsubmit }: Props =
+		$props();
 
 	let shellEl: HTMLDivElement | undefined = $state();
 	let dragging = $state(false);
@@ -117,10 +119,17 @@
 		<button
 			class="tool-btn submit-btn"
 			data-submitting={submitting || undefined}
+			data-sent={sent || undefined}
 			onclick={onsubmit}
-			aria-label={submitting ? 'Sending...' : 'Send feedback'}
+			aria-label={sent ? 'Sent!' : submitting ? 'Sending...' : 'Send feedback'}
 		>
-			<Send size={18} />
+			{#if sent}
+				<Check size={16} />
+				<span class="submit-label">Sent!</span>
+			{:else}
+				<Send size={16} />
+				<span class="submit-label">{submitting ? 'Sending...' : 'Send feedback'}</span>
+			{/if}
 		</button>
 	{/if}
 </div>
@@ -180,6 +189,9 @@
 	}
 
 	.submit-btn {
+		grid-template-columns: auto auto;
+		gap: 4px;
+		padding-inline-end: 10px;
 		color: hsl(145 70% 50%);
 	}
 
@@ -190,5 +202,20 @@
 
 	.submit-btn[data-submitting] {
 		opacity: 0.5;
+	}
+
+	.submit-btn[data-sent] {
+		background: hsl(145 70% 25%);
+		color: hsl(145 70% 70%);
+	}
+
+	.submit-label {
+		font-size: 12px;
+		font-weight: 600;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		white-space: nowrap;
 	}
 </style>
