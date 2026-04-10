@@ -509,8 +509,7 @@
 							fill={drawing.color}
 							font-size={drawing.fontSize}
 							font-family="system-ui, -apple-system, sans-serif"
-							font-weight="600"
-							filter="url(#glow)">{drawing.text}</text
+							font-weight="600">{drawing.text}</text
 						>
 					{/if}
 				{/each}
