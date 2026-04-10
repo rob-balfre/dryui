@@ -1,24 +1,26 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 export interface CalendarRootProps extends HTMLAttributes<HTMLDivElement> {
-	value?: Date | null;
-	locale?: string;
-	min?: Date | null;
-	max?: Date | null;
-	disabled?: boolean;
-	children: Snippet;
+    value?: Date | null;
+    locale?: string;
+    min?: Date | null;
+    max?: Date | null;
+    disabled?: boolean;
+    children: Snippet;
 }
 export interface CalendarHeaderProps extends HTMLAttributes<HTMLDivElement> {
-	children?: Snippet;
+    children?: Snippet;
 }
-export interface CalendarGridProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CalendarGridProps extends HTMLAttributes<HTMLDivElement> {
+}
 export interface CalendarPrevProps extends HTMLButtonAttributes {
-	children?: Snippet;
+    children?: Snippet;
 }
 export interface CalendarNextProps extends HTMLButtonAttributes {
-	children?: Snippet;
+    children?: Snippet;
 }
-export interface CalendarHeadingProps extends HTMLAttributes<HTMLSpanElement> {}
+export interface CalendarHeadingProps extends HTMLAttributes<HTMLSpanElement> {
+}
 export { default as CalendarRoot } from './calendar-root.svelte';
 export { default as CalendarHeader } from './calendar-header.svelte';
 export { default as CalendarGrid } from './calendar-grid.svelte';
@@ -32,10 +34,10 @@ import CalendarPrev from './calendar-prev.svelte';
 import CalendarNext from './calendar-next.svelte';
 import CalendarHeading from './calendar-heading.svelte';
 export declare const Calendar: {
-	Root: typeof CalendarRoot;
-	Header: typeof CalendarHeader;
-	Grid: typeof CalendarGrid;
-	Prev: typeof CalendarPrev;
-	Next: typeof CalendarNext;
-	Heading: typeof CalendarHeading;
+    Root: typeof CalendarRoot;
+    Header: typeof CalendarHeader;
+    Grid: typeof CalendarGrid;
+    Prev: typeof CalendarPrev;
+    Next: typeof CalendarNext;
+    Heading: typeof CalendarHeading;
 };

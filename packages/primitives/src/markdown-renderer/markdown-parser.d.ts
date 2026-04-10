@@ -16,38 +16,31 @@
  *  - Paragraphs (double newline separated)
  */
 export interface ParseOptions {
-	sanitize?: boolean;
+    sanitize?: boolean;
 }
-export type MarkdownNode =
-	| {
-			type: 'heading';
-			level: 1 | 2 | 3 | 4 | 5 | 6;
-			content: string;
-	  }
-	| {
-			type: 'paragraph';
-			content: string;
-	  }
-	| {
-			type: 'code-block';
-			language: string;
-			code: string;
-	  }
-	| {
-			type: 'blockquote';
-			children: MarkdownNode[];
-	  }
-	| {
-			type: 'unordered-list';
-			items: string[];
-	  }
-	| {
-			type: 'ordered-list';
-			items: string[];
-	  }
-	| {
-			type: 'hr';
-	  };
+export type MarkdownNode = {
+    type: 'heading';
+    level: 1 | 2 | 3 | 4 | 5 | 6;
+    content: string;
+} | {
+    type: 'paragraph';
+    content: string;
+} | {
+    type: 'code-block';
+    language: string;
+    code: string;
+} | {
+    type: 'blockquote';
+    children: MarkdownNode[];
+} | {
+    type: 'unordered-list';
+    items: string[];
+} | {
+    type: 'ordered-list';
+    items: string[];
+} | {
+    type: 'hr';
+};
 /**
  * Parse a markdown string into an AST (array of block nodes).
  */

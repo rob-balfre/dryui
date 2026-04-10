@@ -7,11 +7,7 @@ export declare function getWeekStartDay(locale: string): number;
 export declare function isSameDay(a: Date, b: Date): boolean;
 export declare function isToday(date: Date): boolean;
 export declare function isDateInRange(date: Date, min?: Date | null, max?: Date | null): boolean;
-export declare function formatDate(
-	date: Date,
-	locale: string,
-	options?: Intl.DateTimeFormatOptions
-): string;
+export declare function formatDate(date: Date, locale: string, options?: Intl.DateTimeFormatOptions): string;
 /**
  * Returns an array of exactly 42 Date objects representing the 6-week calendar
  * grid for the given month. Days before and after the target month are padded
