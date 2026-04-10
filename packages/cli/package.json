@@ -1,6 +1,6 @@
 {
   "name": "@dryui/cli",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -26,7 +26,7 @@
     "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node"
   },
   "dependencies": {
-    "@dryui/feedback-server": "^0.1.0",
+    "@dryui/feedback-server": "^0.2.0",
     "@dryui/mcp": "^0.4.0"
   },
   "devDependencies": {
