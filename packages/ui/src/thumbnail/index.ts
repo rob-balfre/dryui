@@ -177,6 +177,11 @@ import ThumbnailPromoMosaic from './promo-mosaic.svelte';
 import ThumbnailCommerceHeader from './commerce-header.svelte';
 import ThumbnailDropZone from './drop-zone.svelte';
 import ThumbnailAlphaSlider from './alpha-slider.svelte';
+import ThumbnailFlowDiagram from './flow-diagram.svelte';
+import ThumbnailLayerDiagram from './layer-diagram.svelte';
+import ThumbnailCycleDiagram from './cycle-diagram.svelte';
+import ThumbnailArchitectureDiagram from './architecture-diagram.svelte';
+import ThumbnailNodeGraph from './node-graph.svelte';
 
 export interface ThumbnailProps {
 	name?: string;
@@ -362,7 +367,12 @@ export const thumbnailMap: Record<string, Component<any>> = {
 	PromoMosaic: ThumbnailPromoMosaic,
 	CommerceHeader: ThumbnailCommerceHeader,
 	DropZone: ThumbnailDropZone,
-	AlphaSlider: ThumbnailAlphaSlider
+	AlphaSlider: ThumbnailAlphaSlider,
+  'FlowDiagram': ThumbnailFlowDiagram,
+  'LayerDiagram': ThumbnailLayerDiagram,
+  'CycleDiagram': ThumbnailCycleDiagram,
+  'ArchitectureDiagram': ThumbnailArchitectureDiagram,
+  'NodeGraph': ThumbnailNodeGraph,
 };
 
 export const Thumbnail = Object.assign(ThumbnailRoot, {
