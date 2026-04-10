@@ -1,15 +1,7 @@
-export type {
-	DrawerRootProps,
-	DrawerTriggerProps,
-	DrawerContentProps,
-	DrawerOverlayProps,
-	DrawerHeaderProps,
-	DrawerFooterProps,
-	DrawerCloseProps
-} from '@dryui/primitives';
+export type { DrawerRootProps, DrawerTriggerProps, DrawerContentProps, DrawerOverlayProps, DrawerHeaderProps, DrawerFooterProps, DrawerCloseProps } from '@dryui/primitives';
 import type { DrawerBodyProps as PrimitiveDrawerBodyProps } from '@dryui/primitives';
 export interface DrawerBodyProps extends PrimitiveDrawerBodyProps {
-	padding?: boolean;
+    padding?: boolean;
 }
 import DrawerRoot from './drawer-root.svelte';
 import DrawerTrigger from './drawer-trigger.svelte';
@@ -20,12 +12,12 @@ import DrawerBody from './drawer-body.svelte';
 import DrawerFooter from './drawer-footer.svelte';
 import DrawerClose from './drawer-close.svelte';
 export declare const Drawer: {
-	Root: typeof DrawerRoot;
-	Trigger: typeof DrawerTrigger;
-	Content: typeof DrawerContent;
-	Overlay: typeof DrawerOverlay;
-	Header: typeof DrawerHeader;
-	Body: typeof DrawerBody;
-	Footer: typeof DrawerFooter;
-	Close: typeof DrawerClose;
+    Root: typeof DrawerRoot;
+    Trigger: typeof DrawerTrigger;
+    Content: typeof DrawerContent;
+    Overlay: typeof DrawerOverlay;
+    Header: typeof DrawerHeader;
+    Body: typeof DrawerBody;
+    Footer: typeof DrawerFooter;
+    Close: typeof DrawerClose;
 };

@@ -3,7 +3,7 @@ import SplitterRoot from './splitter-root.svelte';
 import SplitterPanel from './splitter-panel.svelte';
 import SplitterHandle from './splitter-handle.svelte';
 export declare const Splitter: {
-	Root: typeof SplitterRoot;
-	Panel: typeof SplitterPanel;
-	Handle: typeof SplitterHandle;
+    Root: typeof SplitterRoot;
+    Panel: typeof SplitterPanel;
+    Handle: typeof SplitterHandle;
 };

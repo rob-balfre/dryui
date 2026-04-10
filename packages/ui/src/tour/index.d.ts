@@ -2,6 +2,6 @@ export type { TourStep, TourRootProps, TourTooltipProps } from '@dryui/primitive
 import TourRoot from './tour-root.svelte';
 import TourTooltip from './tour-tooltip.svelte';
 export declare const Tour: {
-	Root: typeof TourRoot;
-	Tooltip: typeof TourTooltip;
+    Root: typeof TourRoot;
+    Tooltip: typeof TourTooltip;
 };
