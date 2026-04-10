@@ -171,7 +171,18 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 - Unit tests: Bun test runner with happy-dom (`tests/unit/`)
 - Browser tests: Vitest + Playwright chromium (`tests/browser/`)
 - MCP reviewer tests: `packages/mcp/src/reviewer.test.ts`
-- CI: GitHub Actions builds docs and deploys to Cloudflare Pages on push to main (`ci.yml`). No PR validation workflow — run `bun run validate` locally before pushing
+- CI: GitHub Actions builds docs and deploys to Cloudflare Pages on push to main. No PR validation workflow — run `bun run validate` locally before pushing
+
+## Releasing
+
+Automated via GitHub Actions (`.github/workflows/release.yml`) using `changesets/action@v1`:
+
+1. Push changesets to `main` → CI opens/updates a "Version Packages" PR
+2. Merge that PR → CI publishes to npm and creates GitHub Releases
+
+Manual local release: `bun run release` (validate → version → build → publish)
+
+Secrets required: `NPM_TOKEN` (repo Actions secret, already configured)
 
 ## Deployment
 

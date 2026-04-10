@@ -305,6 +305,16 @@ bun src/generate-llms-txt.ts
 
 DRYui's design language is heavily influenced by [Practical UI](https://www.practical-ui.com/) by [Adham Dannaway](https://x.com/AdhamDannaway). The book's principles around spacing, colour, typography, hierarchy, and accessibility have shaped how every component looks and behaves out of the box. If you care about building interfaces that just _work_, it's well worth a read.
 
+## Releasing
+
+Releases are automated with [Changesets](https://github.com/changesets/changesets) and GitHub Actions:
+
+1. Create a changeset: `bun run changeset`
+2. Push to `main` — CI opens a "Version Packages" PR with bumped versions and changelogs
+3. Merge that PR — CI publishes to npm and creates GitHub Releases
+
+For a manual local release: `bun run release`
+
 ## License
 
 MIT

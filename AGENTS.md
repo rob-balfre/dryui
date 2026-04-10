@@ -43,6 +43,16 @@ All tools use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the server en
 - **No `!important`**, no `:global()`, no CSS modules.
 - **No `<!-- svelte-ignore css_unused_selector -->`** — fix the root cause instead. Ensure DOM elements are rendered directly in the component that styles them.
 
+## Releasing
+
+Automated via `.github/workflows/release.yml` (changesets/action):
+
+1. Add a changeset: `bun run changeset`
+2. Push to `main` → CI opens a "Version Packages" PR
+3. Merge that PR → CI publishes to npm + creates GitHub Releases
+
+Manual: `bun run release` (validate → version → build → publish)
+
 ## Verification
 
 Always run `bun run --filter '@dryui/ui' build` after editing `.svelte` files in `packages/ui/`. The lint preprocessor runs during build and will reject violations.
