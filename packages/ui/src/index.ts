@@ -847,3 +847,29 @@ export type { TagProps, TagColor } from './tag/index.js';
 
 export { useThemeOverride } from './themes/use-theme-override.svelte.js';
 export type { ThemeTokenMap } from './themes/use-theme-override.svelte.js';
+
+export { FlowDiagram } from './flow-diagram/index.js';
+export type { FlowDiagramRootProps, FlowDiagramNodeProps } from './flow-diagram/index.js';
+
+export { LayerDiagram } from './layer-diagram/index.js';
+export type { LayerDiagramRootProps, LayerDiagramLayerProps } from './layer-diagram/index.js';
+
+export { CycleDiagram } from './cycle-diagram/index.js';
+export type { CycleDiagramRootProps, CycleDiagramPhaseProps } from './cycle-diagram/index.js';
+
+export { ArchitectureDiagram } from './architecture-diagram/index.js';
+export type {
+	ArchitectureDiagramRootProps,
+	ArchitectureDiagramCenterProps,
+	ArchitectureDiagramGroupProps,
+	ArchitectureDiagramItemProps
+} from './architecture-diagram/index.js';
+
+export { NodeGraph } from './node-graph/index.js';
+export type {
+	GraphNodeDef,
+	NodeGraphRootProps,
+	NodeGraphNodeProps,
+	NodeGraphEdgeProps,
+	NodeGraphClusterProps
+} from './node-graph/index.js';
