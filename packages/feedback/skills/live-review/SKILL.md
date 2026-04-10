@@ -1,5 +1,5 @@
 ---
-name: feedback
+name: live-review
 description: 'Open the app for visual feedback, wait for annotations, and act on them.'
 ---
 

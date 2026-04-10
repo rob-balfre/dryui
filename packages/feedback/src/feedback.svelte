@@ -446,7 +446,7 @@
 	});
 </script>
 
-<Hotkey keys={shortcut} onpress={toggle} />
+<Hotkey keys={shortcut} handler={toggle} />
 
 <Portal>
 	<div class="feedback-root {className ?? ''}" data-dryui-feedback>
