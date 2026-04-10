@@ -2,16 +2,16 @@
 
 ## Metrics
 
-| Metric                    | Count |
-| ------------------------- | ----: |
-| Primitive component nodes |   145 |
-| UI component nodes        |   145 |
-| UI wrappers               |   130 |
-| UI composites             |    15 |
-| Compound parts            |   662 |
-| Mismatch count            |    16 |
-| PrimitivePart components  |     0 |
-| Thin wrapper count        |    64 |
+| Metric | Count |
+| --- | ---: |
+| Primitive component nodes | 145 |
+| UI component nodes | 150 |
+| UI wrappers | 130 |
+| UI composites | 20 |
+| Compound parts | 676 |
+| Mismatch count | 26 |
+| PrimitivePart components | 0 |
+| Thin wrapper count | 64 |
 
 ## Package Overview
 
@@ -19,7 +19,7 @@
 flowchart LR
   p_root["Primitives root: 145"]
   u_wrap["UI wrappers: 130"]
-  u_comp["UI composites: 15"]
+  u_comp["UI composites: 20"]
   audit["Audit clusters: 0"]
   p_root -->|wraps| u_wrap
   u_wrap -->|feeds| u_comp
@@ -51,18 +51,25 @@ No findings in this bucket.
 - Thin wrapper candidates: `Adjust`, `AspectRatio`, `Aurora`, `Avatar`, `Backdrop`, `Badge`, `Beam`, `Button`, `ButtonGroup`, `Checkbox`, `Chip`, `ChromaticAberration`, `ChromaticShift`, `Clipboard`, `Container`, `CountrySelect`, `Displacement`, `FocusTrap`, `FormatBytes`, `FormatDate`, `FormatNumber`, `Gauge`, `Glass`, `Glow`, `GodRays`, `GradientMesh`, `Hotkey`, `Icon`, `Image`, `ImageComparison`, `Input`, `Kbd`, `Label`, `Link`, `Marquee`, `MaskReveal`, `Noise`, `NumberInput`, `PhoneInput`, `Portal`, `Progress`, `ProgressRing`, `PromptInput`, `QRCode`, `Rating`, `RelativeTime`, `Reveal`, `ScrollArea`, `ScrollToTop`, `Separator`, `ShaderCanvas`, `Skeleton`, `Slider`, `Spacer`, `Sparkline`, `Spinner`, `Spotlight`, `Svg`, `Textarea`, `Toggle`, `Tour`, `VideoEmbed`, `VirtualList`, `VisuallyHidden`.
 - UI subpath-only exports: none.
 - Primitive subpath-only exports: `UseThemeOverride`.
-- UI exports missing spec metadata: none.
+- UI exports missing spec metadata: `ArchitectureDiagram`, `CycleDiagram`, `FlowDiagram`, `LayerDiagram`, `NodeGraph`.
 - Primitive exports missing spec metadata: `AffixGroup`, `AppFrame`, `AvatarGroup`, `ChatMessage`, `EmptyState`, `Footer`, `Hero`, `LogoCloud`, `PageHeader`, `SelectableTileGroup`, `StatCard`, `Surface`, `User`, `UseThemeOverride`, `WaveDivider`.
-- Docs nav missing components: none.
+- Docs nav missing components: `ArchitectureDiagram`, `CycleDiagram`, `FlowDiagram`, `LayerDiagram`, `NodeGraph`.
 - Docs nav orphan entries: none.
 
 ## Mismatch Summary
 
+- `docs-nav-missing` in `docs`: 5
 - `spec-missing` in `primitives`: 15
 - `subpath-only-export` in `primitives`: 1
+- `spec-missing` in `ui`: 5
 
 ## Priority Mismatches
 
+- `docs-nav-missing` on `ArchitectureDiagram` in `docs` (packages/ui/src/architecture-diagram/index.ts): Public UI export is missing from the docs component navigation.
+- `docs-nav-missing` on `CycleDiagram` in `docs` (packages/ui/src/cycle-diagram/index.ts): Public UI export is missing from the docs component navigation.
+- `docs-nav-missing` on `FlowDiagram` in `docs` (packages/ui/src/flow-diagram/index.ts): Public UI export is missing from the docs component navigation.
+- `docs-nav-missing` on `LayerDiagram` in `docs` (packages/ui/src/layer-diagram/index.ts): Public UI export is missing from the docs component navigation.
+- `docs-nav-missing` on `NodeGraph` in `docs` (packages/ui/src/node-graph/index.ts): Public UI export is missing from the docs component navigation.
 - `spec-missing` on `AffixGroup` in `primitives` (packages/primitives/src/affix-group/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `AppFrame` in `primitives` (packages/primitives/src/app-frame/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `AvatarGroup` in `primitives` (packages/primitives/src/avatar-group/index.ts): Public export exists without generated spec metadata.
@@ -78,3 +85,8 @@ No findings in this bucket.
 - `spec-missing` on `User` in `primitives` (packages/primitives/src/user/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `UseThemeOverride` in `primitives` (packages/primitives/src/use-theme-override/index.ts): Public export exists without generated spec metadata.
 - `spec-missing` on `WaveDivider` in `primitives` (packages/primitives/src/wave-divider/index.ts): Public export exists without generated spec metadata.
+- `spec-missing` on `ArchitectureDiagram` in `ui` (packages/ui/src/architecture-diagram/index.ts): Public export exists without generated spec metadata.
+- `spec-missing` on `CycleDiagram` in `ui` (packages/ui/src/cycle-diagram/index.ts): Public export exists without generated spec metadata.
+- `spec-missing` on `FlowDiagram` in `ui` (packages/ui/src/flow-diagram/index.ts): Public export exists without generated spec metadata.
+- `spec-missing` on `LayerDiagram` in `ui` (packages/ui/src/layer-diagram/index.ts): Public export exists without generated spec metadata.
+- `spec-missing` on `NodeGraph` in `ui` (packages/ui/src/node-graph/index.ts): Public export exists without generated spec metadata.
