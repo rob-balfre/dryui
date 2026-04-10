@@ -1,5 +1,11 @@
 # @dryui/feedback
 
+## 0.1.2
+
+### Patch Changes
+
+- [`162ff30`](https://github.com/rob-balfre/dryui/commit/162ff30eb00abe01d3952f3376ed787bd97f9533) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Rename live-review skill to live-feedback and fix submission polling instructions
+
 ## 0.1.1
 
 ### Patch Changes
