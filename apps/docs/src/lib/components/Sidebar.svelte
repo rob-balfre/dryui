@@ -1,7 +1,15 @@
 <script lang="ts">
 	import { Sidebar } from '@dryui/ui';
-	import type { Attachment } from 'svelte/attachments';
-	import { Home, Rocket, Palette, Wrench, FileText, LayoutGrid, Grid3x3 } from 'lucide-svelte';
+	import {
+		Blocks,
+		BookOpenText,
+		GitCompareArrows,
+		Grid2x2Check,
+		History,
+		House,
+		ToolCase,
+		WandSparkles
+	} from 'lucide-svelte';
 	import { categories, toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
 	import NavGroup from './NavGroup.svelte';
@@ -14,6 +22,8 @@
 	let { currentPath, onnavigate }: Props = $props();
 	const totalComponents = categories.reduce((sum, c) => sum + c.items.length, 0);
 
+	let scrollRoot = $state<HTMLDivElement>();
+
 	function isComponentsActive(): boolean {
 		return currentPath.includes('/components/');
 	}
@@ -24,29 +34,29 @@
 		);
 	}
 
-	function scrollActiveItem(_path: string): Attachment<HTMLDivElement> {
-		return (node) => {
-			let frame = requestAnimationFrame(() => {
-				const active = node.querySelector('[data-active]');
-				if (active instanceof HTMLElement) {
-					active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-				}
-			});
+	$effect(() => {
+		if (!scrollRoot || !currentPath) return;
 
-			return () => {
-				cancelAnimationFrame(frame);
-			};
+		const frame = requestAnimationFrame(() => {
+			const active = scrollRoot.querySelector('[data-active]');
+			if (active instanceof HTMLElement) {
+				active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+			}
+		});
+
+		return () => {
+			cancelAnimationFrame(frame);
 		};
-	}
+	});
 
-	const staticLinks: { label: string; href: string; icon: typeof Home }[] = [
-		{ label: 'Home', href: withBase('/'), icon: Home },
-		{ label: 'Getting Started', href: withBase('/getting-started'), icon: Rocket },
-		{ label: 'Theme Wizard', href: withBase('/theme-wizard'), icon: Palette },
-		{ label: 'Tools', href: withBase('/tools'), icon: Wrench },
-		{ label: 'Changelog', href: withBase('/changelog'), icon: FileText },
-		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid3x3 },
-		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: FileText }
+	const staticLinks: { label: string; href: string; icon: typeof House }[] = [
+		{ label: 'Home', href: withBase('/'), icon: House },
+		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
+		{ label: 'Theme Wizard', href: withBase('/theme-wizard'), icon: WandSparkles },
+		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
+		{ label: 'Changelog', href: withBase('/changelog'), icon: History },
+		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
+		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: GitCompareArrows }
 	];
 </script>
 
@@ -58,7 +68,7 @@
 		--dry-sidebar-width="100%"
 	>
 		<Sidebar.Content --dry-sidebar-content-scrollbar-gutter="stable">
-			<div {@attach scrollActiveItem(currentPath)} class="scroll-root">
+			<div bind:this={scrollRoot} class="scroll-root">
 				<Sidebar.Group>
 					{#each staticLinks as link (link.href)}
 						<Sidebar.Item
@@ -73,7 +83,7 @@
 					{/each}
 
 					<NavGroup label="Components" count={totalComponents} open={isComponentsActive()}>
-						{#snippet icon()}<LayoutGrid size={16} aria-hidden="true" />{/snippet}
+						{#snippet icon()}<Blocks size={16} aria-hidden="true" />{/snippet}
 						{#each categories as category (category.label)}
 							<NavGroup
 								label={category.label}

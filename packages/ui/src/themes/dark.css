@@ -122,10 +122,31 @@
 	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
 	--dry-color-on-info: #ffffff;
 
+	/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
+	--dry-color-accent: hsl(25, 85%, 68%);
+	--dry-color-text-accent: hsl(25, 85%, 68%);
+	--dry-color-fill-accent: hsl(25, 85%, 68%);
+	--dry-color-fill-accent-hover: hsl(25, 85%, 60%);
+	--dry-color-fill-accent-active: hsl(25, 85%, 55%);
+	--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
+	--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
+	--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
+	--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
+	--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
+	--dry-color-on-accent: hsl(233, 18%, 9%);
+
+	/* ─── Extended surface depth ──────────────────────────────────── */
+	--dry-color-bg-elevated: hsl(234, 9%, 22%);
+	--dry-color-bg-floating: hsl(234, 8%, 26%);
+
 	/* ─── Semantic shadows ────────────────────────────────────────── */
 	--dry-shadow-raised: 0 1px 3px hsla(230, 30%, 5%, 0.4), 0 1px 2px hsla(230, 30%, 5%, 0.3);
 	--dry-shadow-overlay: 0 8px 24px hsla(230, 30%, 5%, 0.5), 0 2px 8px hsla(230, 30%, 5%, 0.4);
 	--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
+
+	/* ─── Tinted shadows ──────────────────────────────────────────── */
+	--dry-shadow-brand: 0 4px 14px hsla(230, 100%, 82%, 0.15), 0 2px 6px hsla(230, 100%, 82%, 0.1);
+	--dry-shadow-accent: 0 4px 14px hsla(25, 85%, 68%, 0.15), 0 2px 6px hsla(25, 85%, 68%, 0.1);
 
 	/* ─── Overlay backdrops ───────────────────────────────────────── */
 	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
@@ -138,6 +159,26 @@
 	/* ─── Glass surface ───────────────────────────────────────────── */
 	--dry-glass-tint: var(--dry-color-bg-raised);
 	--dry-glass-opacity: 64%;
+	--dry-glass-saturation: 120%;
+	--dry-glass-border: hsla(0, 0%, 100%, 0.06);
+	--dry-glass-border-strong: hsla(0, 0%, 100%, 0.12);
+
+	/* ─── Glow extensions ─────────────────────────────────────────── */
+	--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 100%, 82%, 0.2);
+	--dry-glow-ring-accent: 0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 85%, 68%, 0.2);
+	--dry-glow-ambient: hsla(230, 100%, 82%, 0.04);
+	--dry-glow-ambient-accent: hsla(25, 85%, 68%, 0.04);
+
+	/* ─── Gradient palette ────────────────────────────────────────── */
+	--dry-gradient-warm: linear-gradient(135deg, hsl(25, 85%, 68%) 0%, hsl(350, 65%, 62%) 50%, hsl(280, 55%, 58%) 100%);
+	--dry-gradient-cool: linear-gradient(135deg, hsl(210, 75%, 65%) 0%, hsl(250, 65%, 60%) 50%, hsl(280, 45%, 55%) 100%);
+	--dry-gradient-sunset: linear-gradient(135deg, hsl(40, 90%, 65%) 0%, hsl(15, 85%, 62%) 40%, hsl(340, 70%, 58%) 100%);
+	--dry-gradient-ocean: linear-gradient(135deg, hsl(195, 75%, 55%) 0%, hsl(220, 80%, 60%) 50%, hsl(250, 65%, 62%) 100%);
+	--dry-gradient-surface: linear-gradient(180deg, var(--dry-color-bg-base) 0%, var(--dry-color-bg-raised) 100%);
+
+	/* ─── Grain / noise texture ───────────────────────────────────── */
+	--dry-grain-opacity: 0.06;
+	--dry-grain-blend: soft-light;
 }
 
 .theme-auto {
@@ -266,10 +307,31 @@
 			--dry-color-icon-info: var(--dry-color-stroke-info-strong);
 			--dry-color-on-info: #ffffff;
 
+			/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
+			--dry-color-accent: hsl(25, 85%, 68%);
+			--dry-color-text-accent: hsl(25, 85%, 68%);
+			--dry-color-fill-accent: hsl(25, 85%, 68%);
+			--dry-color-fill-accent-hover: hsl(25, 85%, 60%);
+			--dry-color-fill-accent-active: hsl(25, 85%, 55%);
+			--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
+			--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
+			--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
+			--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
+			--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
+			--dry-color-on-accent: hsl(233, 18%, 9%);
+
+			/* ─── Extended surface depth ──────────────────────────────────── */
+			--dry-color-bg-elevated: hsl(234, 9%, 22%);
+			--dry-color-bg-floating: hsl(234, 8%, 26%);
+
 			/* ─── Semantic shadows ────────────────────────────────────────── */
 			--dry-shadow-raised: 0 1px 3px hsla(230, 30%, 5%, 0.4), 0 1px 2px hsla(230, 30%, 5%, 0.3);
 			--dry-shadow-overlay: 0 8px 24px hsla(230, 30%, 5%, 0.5), 0 2px 8px hsla(230, 30%, 5%, 0.4);
 			--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
+
+			/* ─── Tinted shadows ──────────────────────────────────────────── */
+			--dry-shadow-brand: 0 4px 14px hsla(230, 100%, 82%, 0.15), 0 2px 6px hsla(230, 100%, 82%, 0.1);
+			--dry-shadow-accent: 0 4px 14px hsla(25, 85%, 68%, 0.15), 0 2px 6px hsla(25, 85%, 68%, 0.1);
 
 			/* ─── Overlay backdrops ───────────────────────────────────────── */
 			--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
@@ -282,6 +344,26 @@
 			/* ─── Glass surface ───────────────────────────────────────────── */
 			--dry-glass-tint: var(--dry-color-bg-raised);
 			--dry-glass-opacity: 64%;
+			--dry-glass-saturation: 120%;
+			--dry-glass-border: hsla(0, 0%, 100%, 0.06);
+			--dry-glass-border-strong: hsla(0, 0%, 100%, 0.12);
+
+			/* ─── Glow extensions ─────────────────────────────────────────── */
+			--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 100%, 82%, 0.2);
+			--dry-glow-ring-accent: 0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 85%, 68%, 0.2);
+			--dry-glow-ambient: hsla(230, 100%, 82%, 0.04);
+			--dry-glow-ambient-accent: hsla(25, 85%, 68%, 0.04);
+
+			/* ─── Gradient palette ────────────────────────────────────────── */
+			--dry-gradient-warm: linear-gradient(135deg, hsl(25, 85%, 68%) 0%, hsl(350, 65%, 62%) 50%, hsl(280, 55%, 58%) 100%);
+			--dry-gradient-cool: linear-gradient(135deg, hsl(210, 75%, 65%) 0%, hsl(250, 65%, 60%) 50%, hsl(280, 45%, 55%) 100%);
+			--dry-gradient-sunset: linear-gradient(135deg, hsl(40, 90%, 65%) 0%, hsl(15, 85%, 62%) 40%, hsl(340, 70%, 58%) 100%);
+			--dry-gradient-ocean: linear-gradient(135deg, hsl(195, 75%, 55%) 0%, hsl(220, 80%, 60%) 50%, hsl(250, 65%, 62%) 100%);
+			--dry-gradient-surface: linear-gradient(180deg, var(--dry-color-bg-base) 0%, var(--dry-color-bg-raised) 100%);
+
+			/* ─── Grain / noise texture ───────────────────────────────────── */
+			--dry-grain-opacity: 0.06;
+			--dry-grain-blend: soft-light;
 		}
 	}
 }

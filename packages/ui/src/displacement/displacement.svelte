@@ -21,8 +21,11 @@
 	}: Props = $props();
 
 	const filterId = `dry-displacement-${Math.random().toString(36).slice(2, 8)}`;
+	let element = $state<HTMLElement | null>(null);
 	let seed = $state(1);
 	let prefersReducedMotion = $state(false);
+	let documentVisible = $state(true);
+	let inViewport = $state(true);
 
 	const baseFrequency = $derived.by(() => {
 		if (turbulence === 'gentle') return '0.015';
@@ -31,7 +34,16 @@
 	});
 
 	const scaleValue = $derived(`${Math.max(0, scale)}`);
-	const shouldAnimate = $derived(animated && !prefersReducedMotion);
+	const shouldAnimate = $derived(animated && !prefersReducedMotion && documentVisible && inViewport);
+
+	function captureElement(node: HTMLElement) {
+		element = node;
+		return {
+			destroy() {
+				if (element === node) element = null;
+			}
+		};
+	}
 
 	onMount(() => {
 		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -40,6 +52,11 @@
 			prefersReducedMotion = e.matches;
 		};
 		mql.addEventListener('change', handler);
+		documentVisible = !document.hidden;
+		const handleVisibilityChange = () => {
+			documentVisible = !document.hidden;
+		};
+		document.addEventListener('visibilitychange', handleVisibilityChange);
 
 		let frameId: number | undefined;
 		let lastTime = 0;
@@ -66,7 +83,23 @@
 			};
 		});
 
-		return () => mql.removeEventListener('change', handler);
+		$effect(() => {
+			if (!element || typeof IntersectionObserver === 'undefined') return;
+
+			const observer = new IntersectionObserver((entries) => {
+				const entry = entries[0];
+				inViewport = entry?.isIntersecting ?? true;
+			});
+
+			observer.observe(element);
+
+			return () => observer.disconnect();
+		});
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			mql.removeEventListener('change', handler);
+		};
 	});
 
 	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),
@@ -96,13 +129,14 @@
 </svg>
 
 <div
+	{@attach captureElement}
+	{@attach applyFilterStyles}
 	data-displacement
 	class={className}
 	data-turbulence={turbulence}
 	data-animated={shouldAnimate || undefined}
 	data-reduced-motion={prefersReducedMotion || undefined}
 	{...rest}
-	use:applyFilterStyles
 >
 	{#if childSnippet}
 		{@render childSnippet()}

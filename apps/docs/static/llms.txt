@@ -487,7 +487,7 @@ Example: <Splitter.Root>
 Ambient gradient surface with browser-native animated color fields and static fallback.
 Import: @dryui/ui
 Subpath import: @dryui/ui/aurora
-Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
+Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | motion (AuroraMotion), default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
 Example: <Aurora palette="ocean">
 

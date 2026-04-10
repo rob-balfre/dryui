@@ -148,10 +148,31 @@ samp {
 	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
 	--dry-color-on-info: #ffffff;
 
+	/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
+	--dry-color-accent: hsl(25, 90%, 58%);
+	--dry-color-text-accent: hsl(25, 80%, 38%);
+	--dry-color-fill-accent: hsl(25, 90%, 58%);
+	--dry-color-fill-accent-hover: hsl(25, 90%, 50%);
+	--dry-color-fill-accent-active: hsl(25, 90%, 44%);
+	--dry-color-fill-accent-weak: hsla(25, 90%, 58%, 0.08);
+	--dry-color-stroke-accent: hsla(25, 90%, 58%, 0.5);
+	--dry-color-stroke-accent-strong: hsla(25, 90%, 58%, 0.8);
+	--dry-color-stroke-accent-weak: hsla(25, 90%, 58%, 0.2);
+	--dry-color-icon-accent: hsla(25, 90%, 58%, 0.8);
+	--dry-color-on-accent: #ffffff;
+
+	/* ─── Extended surface depth ──────────────────────────────────── */
+	--dry-color-bg-elevated: #eceef2;
+	--dry-color-bg-floating: #ffffff;
+
 	/* ─── Semantic shadows ────────────────────────────────────────── */
 	--dry-shadow-raised: 0 1px 3px hsla(230, 20%, 20%, 0.08), 0 1px 2px hsla(230, 20%, 20%, 0.06);
 	--dry-shadow-overlay: 0 8px 24px hsla(230, 20%, 20%, 0.12), 0 2px 8px hsla(230, 20%, 20%, 0.08);
 	--dry-shadow-sunken: inset 0 1px 4px rgba(0, 0, 0, 0.08);
+
+	/* ─── Tinted shadows ──────────────────────────────────────────── */
+	--dry-shadow-brand: 0 4px 14px hsla(230, 64%, 57%, 0.2), 0 2px 6px hsla(230, 64%, 57%, 0.12);
+	--dry-shadow-accent: 0 4px 14px hsla(25, 90%, 58%, 0.2), 0 2px 6px hsla(25, 90%, 58%, 0.12);
 
 	/* ─── Overlay backdrops ───────────────────────────────────────── */
 	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.4);
@@ -189,6 +210,7 @@ samp {
 	--dry-space-256: 16rem;
 
 	/* ─── Radius ──────────────────────────────────────────────────── */
+	--dry-radius-none: 0;
 	--dry-radius-sm: 4px;
 	--dry-radius-md: 8px;
 	--dry-radius-lg: 8px;
@@ -203,6 +225,14 @@ samp {
 	--dry-font-mono:
 		ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New',
 		monospace;
+	--dry-font-display: var(--dry-font-sans);
+
+	/* ─── Font weights ────────────────────────────────────────────── */
+	--dry-font-weight-light: 300;
+	--dry-font-weight-normal: 400;
+	--dry-font-weight-medium: 500;
+	--dry-font-weight-semibold: 600;
+	--dry-font-weight-bold: 700;
 
 	/* Practical UI-style named scale tokens */
 	--dry-type-display-size: 3.5rem;
@@ -304,15 +334,36 @@ samp {
 	--dry-glass-blur: 12px;
 	--dry-glass-tint: var(--dry-color-bg-raised);
 	--dry-glass-opacity: 72%;
+	--dry-glass-saturation: 180%;
+	--dry-glass-border: hsla(0, 0%, 100%, 0.08);
+	--dry-glass-border-strong: hsla(0, 0%, 100%, 0.15);
 
 	/* ─── Glow ────────────────────────────────────────────────────── */
 	--dry-glow-color: var(--dry-color-fill-brand);
 	--dry-glow-blur: 24px;
 	--dry-glow-spread: 48px;
+	--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 64%, 57%, 0.25);
+	--dry-glow-ring-accent: 0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 90%, 58%, 0.25);
+	--dry-glow-ambient: hsla(230, 64%, 57%, 0.06);
+	--dry-glow-ambient-accent: hsla(25, 90%, 58%, 0.06);
+
+	/* ─── Gradient palette ────────────────────────────────────────── */
+	--dry-gradient-warm: linear-gradient(135deg, hsl(25, 90%, 65%) 0%, hsl(350, 70%, 60%) 50%, hsl(280, 60%, 55%) 100%);
+	--dry-gradient-cool: linear-gradient(135deg, hsl(210, 80%, 60%) 0%, hsl(250, 70%, 55%) 50%, hsl(280, 50%, 50%) 100%);
+	--dry-gradient-sunset: linear-gradient(135deg, hsl(40, 95%, 60%) 0%, hsl(15, 90%, 58%) 40%, hsl(340, 75%, 55%) 100%);
+	--dry-gradient-ocean: linear-gradient(135deg, hsl(195, 80%, 50%) 0%, hsl(220, 85%, 55%) 50%, hsl(250, 70%, 60%) 100%);
+	--dry-gradient-surface: linear-gradient(180deg, var(--dry-color-bg-base) 0%, var(--dry-color-bg-raised) 100%);
+
+	/* ─── Grain / noise texture ───────────────────────────────────── */
+	--dry-grain-opacity: 0.04;
+	--dry-grain-size: 0.65;
+	--dry-grain-blend: overlay;
 
 	/* ─── Typography extras ───────────────────────────────────────── */
 	--dry-tracking-tight: -0.025em;
 	--dry-tracking-normal: 0;
+	--dry-tracking-wide: 0.05em;
+	--dry-tracking-wider: 0.1em;
 
 	/* ─── Utility shadows (fixed dark ink for depth across themes) ── */
 	--dry-shadow-sm: 0 1px 2px 0 color-mix(in srgb, #020617 12%, transparent);

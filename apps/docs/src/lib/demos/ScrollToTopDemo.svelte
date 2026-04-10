@@ -3,20 +3,15 @@
 
 	let target = $state<HTMLDivElement | undefined>();
 
-	function bindPreview(node: HTMLDivElement) {
-		target = node;
-		node.scrollTop = 160;
-
-		return () => {
-			if (target === node) {
-				target = undefined;
-			}
-		};
-	}
+	$effect(() => {
+		if (target) {
+			target.scrollTop = 160;
+		}
+	});
 </script>
 
 <div class="preview-frame">
-	<div class="preview-scroll" {@attach bindPreview}>
+	<div class="preview-scroll" bind:this={target}>
 		<div class="preview-copy">
 			<p>Scroll the trip brief to reveal the floating return action.</p>
 			<p>

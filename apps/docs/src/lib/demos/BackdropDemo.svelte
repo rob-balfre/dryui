@@ -2,6 +2,16 @@
 	import { Backdrop, Button, Card, Text } from '@dryui/ui';
 
 	let open = $state(false);
+
+	function closeBackdrop() {
+		open = false;
+	}
+
+	function handleBackdropKeyDown(event: KeyboardEvent) {
+		if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Escape') return;
+		event.preventDefault();
+		closeBackdrop();
+	}
 </script>
 
 <div class="backdrop-demo">
@@ -9,13 +19,27 @@
 	<Text color="secondary">Open the preview to verify the backdrop blur and dismissal.</Text>
 </div>
 
-<Backdrop {open} onclick={() => (open = false)}>
-	<div class="backdrop-dialog" onclick={(event) => event.stopPropagation()}>
+<Backdrop
+	{open}
+	role="button"
+	tabindex={0}
+	aria-label="Dismiss backdrop preview"
+	onclick={closeBackdrop}
+	onkeydown={handleBackdropKeyDown}
+>
+	<div
+		class="backdrop-dialog"
+		role="dialog"
+		aria-modal="true"
+		tabindex={-1}
+		onclick={(event) => event.stopPropagation()}
+		onkeydown={(event) => event.stopPropagation()}
+	>
 		<Card.Root>
 			<Card.Content>
 				<div class="backdrop-card-copy">
 					<Text>Content rendered over a backdrop overlay layer.</Text>
-					<Button onclick={() => (open = false)}>Close preview</Button>
+					<Button onclick={closeBackdrop}>Close preview</Button>
 				</div>
 			</Card.Content>
 		</Card.Root>

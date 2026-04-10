@@ -17,11 +17,12 @@
 	[data-sidebar-footer] {
 		grid-row: 3;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		align-items: center;
+		grid-template-columns: minmax(0, 1fr);
+		align-content: start;
+		justify-items: stretch;
 		gap: var(--dry-space-2);
-		padding: var(--dry-space-3) var(--dry-space-6);
+		padding-block: var(--dry-sidebar-footer-padding-y, var(--dry-space-3));
+		padding-inline: var(--dry-sidebar-content-padding, 0px);
 		border-top: 1px solid var(--dry-sidebar-border);
 	}
 </style>

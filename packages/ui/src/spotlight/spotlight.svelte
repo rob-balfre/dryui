@@ -35,6 +35,9 @@
 	let y = $state('50%');
 	let active = $state(false);
 	let prefersReducedMotion = $state(false);
+	let pointerFrame = $state<number | null>(null);
+	let pendingX = '50%';
+	let pendingY = '50%';
 
 	function captureElement(node: HTMLDivElement) {
 		element = node;
@@ -46,6 +49,9 @@
 	}
 
 	function centerSpotlight() {
+		cancelQueuedPointerPosition();
+		pendingX = '50%';
+		pendingY = '50%';
 		x = '50%';
 		y = '50%';
 	}
@@ -57,8 +63,30 @@
 	function updateFromClientPoint(clientX: number, clientY: number) {
 		if (!element) return;
 		const rect = element.getBoundingClientRect();
-		x = `${clientX - rect.left}px`;
-		y = `${clientY - rect.top}px`;
+		queuePointerPosition(`${clientX - rect.left}px`, `${clientY - rect.top}px`);
+	}
+
+	function flushPointerPosition() {
+		pointerFrame = null;
+		x = pendingX;
+		y = pendingY;
+	}
+
+	function queuePointerPosition(nextX: string, nextY: string) {
+		pendingX = nextX;
+		pendingY = nextY;
+
+		if (pointerFrame !== null) return;
+
+		pointerFrame = requestAnimationFrame(() => {
+			flushPointerPosition();
+		});
+	}
+
+	function cancelQueuedPointerPosition() {
+		if (pointerFrame === null) return;
+		cancelAnimationFrame(pointerFrame);
+		pointerFrame = null;
 	}
 
 	function handlePointerEnter(event: PointerEvent) {
@@ -101,11 +129,16 @@
 			initialValue: '50%'
 		});
 
-		return observeReducedMotionPreference((matches) => {
+		const stopMotionObserver = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 			active = matches || !followPointer;
 			centerSpotlight();
 		});
+
+		return () => {
+			cancelQueuedPointerPosition();
+			stopMotionObserver();
+		};
 	});
 
 	const radiusValue = $derived(`${Math.max(0, radius)}px`);
@@ -137,6 +170,7 @@
 
 <div
 	{@attach captureElement}
+	{@attach applyStyles}
 	class={className}
 	data-spotlight
 	data-active={active || undefined}
@@ -147,7 +181,6 @@
 	onpointerleave={handlePointerLeave}
 	onfocusin={handleFocusIn}
 	onfocusout={handleFocusOut}
-	use:applyStyles
 	{...rest}
 >
 	{@render children()}
@@ -221,6 +254,11 @@
 			transform var(--dry-duration-normal, 200ms) var(--dry-ease-out, ease),
 			--dry-spotlight-x 60ms ease-out,
 			--dry-spotlight-y 60ms ease-out;
+	}
+
+	[data-spotlight][data-active]::before,
+	[data-spotlight][data-static]::before,
+	[data-spotlight][data-follow-pointer]::before {
 		will-change: opacity, transform;
 	}
 

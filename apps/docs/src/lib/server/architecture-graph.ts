@@ -1,4 +1,4 @@
-import type { DolphinEdge, DolphinGraph, DolphinNode } from '@dryui/mcp/architecture';
+import type { DolphinEdge, DolphinGraph, DolphinNode } from '@dryui/ui';
 import architectureGraph from '../../../../../packages/mcp/src/architecture.json';
 import type {
 	ArchitectureFocusData,
@@ -96,7 +96,13 @@ function degreeForNode(graph: DolphinGraph, nodeId: string): number {
 }
 
 export async function loadArchitectureGraph(): Promise<ArchitectureGraphData> {
-	graphPromise ??= Promise.resolve(architectureGraph as ArchitectureGraphData);
+	graphPromise ??= Promise.resolve({
+		generatedAt:
+			'generatedAt' in architectureGraph && typeof architectureGraph.generatedAt === 'string'
+				? architectureGraph.generatedAt
+				: '',
+		...(architectureGraph as Omit<ArchitectureGraphData, 'generatedAt'>)
+	});
 	return graphPromise;
 }
 

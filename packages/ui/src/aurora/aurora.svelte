@@ -7,6 +7,7 @@
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		palette?: 'sunrise' | 'ocean' | 'forest' | 'cosmic' | readonly [string, string, string];
 		speed?: 'slow' | 'normal' | 'fast' | number;
+		motion?: 'auto' | 'never';
 		intensity?: number;
 		waviness?: number;
 		colorSpace?: 'srgb' | 'oklch' | 'oklab';
@@ -18,6 +19,7 @@
 	let {
 		palette = 'cosmic',
 		speed = 'normal',
+		motion = 'auto',
 		intensity = 80,
 		waviness = 50,
 		colorSpace = 'srgb',
@@ -29,8 +31,19 @@
 		...rest
 	}: Props = $props();
 
+	let rootNode = $state<HTMLElement | null>(null);
 	let prefersReducedMotion = $state(false);
-	let animated = $state(false);
+	let supportsAnimation = $state(false);
+	let documentVisible = $state(true);
+	let inViewport = $state(true);
+	let animated = $derived.by(
+		() =>
+			motion !== 'never' &&
+			supportsAnimation &&
+			!prefersReducedMotion &&
+			documentVisible &&
+			inViewport
+	);
 
 	const speedDuration = $derived.by(() => {
 		if (typeof speed === 'number' && Number.isFinite(speed) && speed > 0) {
@@ -51,6 +64,8 @@
 			observeReducedMotionPreference,
 			getReducedMotionPreference
 		} = await_motion();
+
+		supportsAnimation = supportsPropertyRegistration();
 		registerPropertyOnce({
 			name: '--dry-aurora-angle',
 			syntax: '<angle>',
@@ -64,20 +79,38 @@
 			initialValue: '0%'
 		});
 
+		documentVisible = document.visibilityState === 'visible';
+		const handleVisibilityChange = () => {
+			documentVisible = document.visibilityState === 'visible';
+		};
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
 		const updateAnimatedState = (matches: boolean) => {
 			prefersReducedMotion = matches;
-			animated = !matches && supportsPropertyRegistration();
 		};
-
 		const stopMotionObserver = observeReducedMotionPreference(updateAnimatedState);
+		let stopViewportObserver = () => {};
 
-		if (!supportsPropertyRegistration() || getReducedMotionPreference()) {
-			animated = false;
-			return stopMotionObserver;
+		if (rootNode && 'IntersectionObserver' in window) {
+			const observer = new IntersectionObserver(
+				([entry]) => {
+					inViewport = entry?.isIntersecting ?? true;
+				},
+				{ threshold: 0.12 }
+			);
+			observer.observe(rootNode);
+			stopViewportObserver = () => observer.disconnect();
 		}
 
-		animated = true;
-		return stopMotionObserver;
+		if (!supportsAnimation || getReducedMotionPreference()) {
+			inViewport = true;
+		}
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			stopMotionObserver();
+			stopViewportObserver();
+		};
 	});
 
 	function await_motion() {
@@ -130,6 +163,15 @@
 		});
 	}
 
+	function captureRoot(node: HTMLElement) {
+		rootNode = node;
+		return () => {
+			if (rootNode === node) {
+				rootNode = null;
+			}
+		};
+	}
+
 	function applyBackdropStyles(node: HTMLElement) {
 		$effect(() => {
 			if (blendMode) node.style.setProperty('--_aurora-backdrop-blend', blendMode);
@@ -142,6 +184,8 @@
 </script>
 
 <div
+	{@attach captureRoot}
+	{@attach applyRootStyles}
 	data-aurora
 	class={className}
 	data-palette={paletteName}
@@ -149,9 +193,8 @@
 	data-reduced-motion={prefersReducedMotion || undefined}
 	data-color-space={colorSpace}
 	{...rest}
-	use:applyRootStyles
 >
-	<div data-aurora-backdrop aria-hidden="true" use:applyBackdropStyles>
+	<div {@attach applyBackdropStyles} data-aurora-backdrop aria-hidden="true">
 		<span data-aurora-layer data-layer="one"></span>
 		<span data-aurora-layer data-layer="two"></span>
 		<span data-aurora-layer data-layer="three"></span>
@@ -235,7 +278,6 @@
 		transform: translate3d(var(--dry-aurora-shift), 0, 0) rotate(var(--dry-aurora-angle));
 		transform-origin: center;
 		mix-blend-mode: screen;
-		will-change: transform, opacity;
 	}
 
 	[data-aurora-layer][data-layer='one'] {
@@ -257,6 +299,10 @@
 			radial-gradient(ellipse 60% 30% at 58% 78%, var(--dry-aurora-color-3) 0, transparent 64%),
 			radial-gradient(ellipse 48% 38% at 25% 42%, var(--dry-aurora-color-3) 0, transparent 54%);
 		filter: blur(calc(52px * (0.5 + var(--dry-aurora-waviness, 50) / 100)));
+	}
+
+	[data-aurora][data-animated] [data-aurora-layer] {
+		will-change: transform, opacity;
 	}
 
 	[data-aurora][data-animated] [data-aurora-layer][data-layer='one'] {
@@ -295,6 +341,7 @@
 	}
 
 	[data-aurora][data-animated] [data-aurora-backdrop]::after {
+		will-change: opacity, transform;
 		animation: aurora-glow calc(var(--dry-aurora-duration) * 1.8) ease-in-out infinite alternate;
 	}
 

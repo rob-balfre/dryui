@@ -50,9 +50,12 @@
 	let hasWebGL = $state(true);
 	let compileError = $state(false);
 	let prefersReducedMotion = $state(false);
+	let documentVisible = $state(true);
+	let inViewport = $state(true);
 	let mouseX = 0;
 	let mouseY = 0;
 
+	const MAX_RENDER_BUFFER_EDGE = 2048;
 	const effectivePixelRatio = $derived(Math.min(Math.max(1, pixelRatio), 2));
 	const showFallback = $derived(!hasWebGL || compileError);
 
@@ -91,6 +94,12 @@
 			prefersReducedMotion = true;
 		}
 
+		documentVisible = !document.hidden;
+		const handleVisibilityChange = () => {
+			documentVisible = !document.hidden;
+		};
+		document.addEventListener('visibilitychange', handleVisibilityChange);
+
 		// Initialize shader program
 		$effect(() => {
 			if (!canvasEl) return;
@@ -124,8 +133,27 @@
 				if (!entry || !canvasEl) return;
 				const { width, height } = entry.contentRect;
 				const dpr = effectivePixelRatio;
-				canvasEl.width = Math.floor(width * dpr);
-				canvasEl.height = Math.floor(height * dpr);
+				const nextWidth = Math.max(1, Math.floor(width * dpr));
+				const nextHeight = Math.max(1, Math.floor(height * dpr));
+				const maxEdge = Math.max(nextWidth, nextHeight);
+				const scale =
+					maxEdge > MAX_RENDER_BUFFER_EDGE ? MAX_RENDER_BUFFER_EDGE / maxEdge : 1;
+
+				canvasEl.width = Math.max(1, Math.floor(nextWidth * scale));
+				canvasEl.height = Math.max(1, Math.floor(nextHeight * scale));
+			});
+
+			observer.observe(containerEl);
+
+			return () => observer.disconnect();
+		});
+
+		$effect(() => {
+			if (!containerEl || typeof IntersectionObserver === 'undefined') return;
+
+			const observer = new IntersectionObserver((entries) => {
+				const entry = entries[0];
+				inViewport = entry?.isIntersecting ?? true;
 			});
 
 			observer.observe(containerEl);
@@ -142,19 +170,13 @@
 			let startTime = performance.now();
 			let lastFrameTime = 0;
 			const fpsInterval = fps !== undefined && fps > 0 ? 1000 / fps : 0;
+			const shouldLoop = !paused && !prefersReducedMotion && fps !== 0 && documentVisible && inViewport;
 
-			function render(time: number) {
-				if (paused && !prefersReducedMotion) {
-					frameId = requestAnimationFrame(render);
-					return;
-				}
-
+			function draw(time: number) {
+				if (!documentVisible || !inViewport) return;
 				// FPS limiting
 				if (fpsInterval > 0) {
 					if (time - lastFrameTime < fpsInterval) {
-						if (!prefersReducedMotion) {
-							frameId = requestAnimationFrame(render);
-						}
 						return;
 					}
 					lastFrameTime = time;
@@ -205,16 +227,20 @@
 				}
 
 				gl.drawArrays(gl.TRIANGLES, 0, 6);
+			}
 
-				// Reduced motion: render one frame, stop
-				if (prefersReducedMotion || fps === 0) {
-					return;
-				}
+			function render(time: number) {
+				draw(time);
+
+				if (!shouldLoop) return;
 
 				frameId = requestAnimationFrame(render);
 			}
 
-			frameId = requestAnimationFrame(render);
+			draw(performance.now());
+			if (shouldLoop) {
+				frameId = requestAnimationFrame(render);
+			}
 
 			return () => {
 				if (frameId !== undefined) {
@@ -223,7 +249,10 @@
 			};
 		});
 
-		return stopMotionObserver;
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			stopMotionObserver();
+		};
 	});
 </script>
 

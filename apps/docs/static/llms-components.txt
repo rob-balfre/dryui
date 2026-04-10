@@ -1441,7 +1441,7 @@ Tags: background, gradient, ambient, shader-like, hero
 Kind: simple
 Root import: import { Aurora } from '@dryui/ui'
 Subpath import: import { Aurora } from '@dryui/ui/aurora'
-Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
+Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | motion (AuroraMotion), default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion

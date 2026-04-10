@@ -179,7 +179,7 @@ export type { RevealProps } from './reveal/index.js';
 export { Spotlight } from './spotlight/index.js';
 export type { SpotlightProps } from './spotlight/index.js';
 export { Aurora } from './aurora/index.js';
-export type { AuroraProps, AuroraPalette, AuroraSpeed } from './aurora/index.js';
+export type { AuroraProps, AuroraPalette, AuroraSpeed, AuroraMotion } from './aurora/index.js';
 export { Noise } from './noise/index.js';
 export type { NoiseProps, NoiseBlendMode } from './noise/index.js';
 export type { BlendMode } from './aurora/index.js';

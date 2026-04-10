@@ -21,6 +21,8 @@
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-base);
+		content-visibility: auto;
+		contain-intrinsic-size: 24rem;
 	}
 
 	.preview-frame.is-scrollable {

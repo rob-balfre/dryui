@@ -12498,6 +12498,11 @@
           "required": false,
           "default": "'normal'"
         },
+        "motion": {
+          "type": "AuroraMotion",
+          "required": false,
+          "default": "'auto'"
+        },
         "intensity": {
           "type": "number",
           "required": false,

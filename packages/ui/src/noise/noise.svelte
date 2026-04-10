@@ -50,7 +50,7 @@
 	data-reduced-motion={prefersReducedMotion || undefined}
 	data-grain={grain}
 	{...rest}
-	use:applyStyles
+	{@attach applyStyles}
 >
 	<span data-noise-texture aria-hidden="true"></span>
 
@@ -91,10 +91,10 @@
 		background-image: var(--dry-noise-pattern);
 		background-size: 256px 256px;
 		background-repeat: repeat;
-		will-change: transform;
 	}
 
 	[data-noise][data-animated] [data-noise-texture] {
+		will-change: transform;
 		animation: noise-drift 1.6s steps(6) infinite;
 	}
 

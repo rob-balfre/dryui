@@ -50,7 +50,7 @@ void main() {
   float t = u_time * 0.3;
   vec3 color = vec3(0.02, 0.02, 0.06);
 
-  for (int i = 0; i < 60; i++) {
+  for (int i = 0; i < 36; i++) {
     float fi = float(i);
     vec2 pos = vec2(
       hash(vec2(fi, 0.0)),

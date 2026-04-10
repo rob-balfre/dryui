@@ -15,7 +15,7 @@
 {/snippet}
 
 <div class="comparison">
-	<ImageComparison before={beforeScene} after={afterScene} />
+	<ImageComparison before={beforeScene as any} after={afterScene as any} />
 </div>
 
 <style>

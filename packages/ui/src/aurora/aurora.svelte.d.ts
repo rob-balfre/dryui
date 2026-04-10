@@ -4,6 +4,7 @@ import type { BlendMode } from '@dryui/primitives/aurora';
 interface Props extends HTMLAttributes<HTMLDivElement> {
 	palette?: 'sunrise' | 'ocean' | 'forest' | 'cosmic' | readonly [string, string, string];
 	speed?: 'slow' | 'normal' | 'fast' | number;
+	motion?: 'auto' | 'never';
 	intensity?: number;
 	waviness?: number;
 	colorSpace?: 'srgb' | 'oklch' | 'oklab';

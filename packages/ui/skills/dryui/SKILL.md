@@ -212,6 +212,7 @@ Read these when you need deeper guidance:
 - **`rules/accessibility.md`** — Field.Root, ARIA, focus management, pre-ship checklist
 - **`rules/svelte.md`** — Runes, snippets, native browser APIs, styling rules
 - **`rules/design.md`** — Minimal code, no premature abstraction, naming conventions
+- **`rules/visual-effects-performance.md`** — Tiered budgets and implementation rules for shader, blur, glass, and pointer-reactive effects
 - **`rules/native-web-transitions.md`** — View Transition API, scroll animations, reduced-motion
 
 ---

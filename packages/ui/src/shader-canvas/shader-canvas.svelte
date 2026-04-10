@@ -66,6 +66,7 @@
 	});
 
 	const mergedUniforms = $derived({ ...themeUniforms, ...uniforms });
+	const effectiveFps = $derived(fps ?? 30);
 
 	function setAspectRatio(node: HTMLDivElement) {
 		$effect(() => {
@@ -101,7 +102,9 @@
 		bind:paused
 		data-shader-canvas
 		{...Object.fromEntries(
-			Object.entries({ vertexShader, pixelRatio, fps, fallback }).filter(([, v]) => v !== undefined)
+			Object.entries({ vertexShader, pixelRatio, fps: effectiveFps, fallback }).filter(
+				([, v]) => v !== undefined
+			)
 		)}
 	>
 		{#if childSnippet}

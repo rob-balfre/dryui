@@ -1,6 +1,6 @@
-import type { DolphinEdgeType, DolphinGraph, DolphinNodeKind } from '@dryui/mcp/architecture';
+import type { DolphinEdgeType, DolphinNodeKind, SystemMapGraph } from '@dryui/ui';
 
-export type ArchitectureGraphData = DolphinGraph;
+export type ArchitectureGraphData = SystemMapGraph;
 
 export interface ArchitectureFocusItem {
 	id: string;

@@ -32,6 +32,9 @@
 	let animated = $state(false);
 	let pointerX = $state('50%');
 	let pointerY = $state('50%');
+	let pointerFrame = $state<number | null>(null);
+	let pendingPointerX = '50%';
+	let pendingPointerY = '50%';
 
 	function captureElement(node: HTMLDivElement) {
 		element = node;
@@ -51,14 +54,42 @@
 		return '12s';
 	});
 
+	function flushPointerPosition() {
+		pointerFrame = null;
+		pointerX = pendingPointerX;
+		pointerY = pendingPointerY;
+	}
+
+	function queuePointerPosition(nextX: string, nextY: string) {
+		pendingPointerX = nextX;
+		pendingPointerY = nextY;
+
+		if (pointerFrame !== null) return;
+
+		pointerFrame = requestAnimationFrame(() => {
+			flushPointerPosition();
+		});
+	}
+
+	function cancelQueuedPointerPosition() {
+		if (pointerFrame === null) return;
+		cancelAnimationFrame(pointerFrame);
+		pointerFrame = null;
+	}
+
 	function handlePointerMove(event: PointerEvent) {
 		if (!interactive || prefersReducedMotion || !element || !supportsPointerTracking()) return;
 		const rect = element.getBoundingClientRect();
-		pointerX = `${(((event.clientX - rect.left) / rect.width) * 100).toFixed(1)}%`;
-		pointerY = `${(((event.clientY - rect.top) / rect.height) * 100).toFixed(1)}%`;
+		queuePointerPosition(
+			`${(((event.clientX - rect.left) / rect.width) * 100).toFixed(1)}%`,
+			`${(((event.clientY - rect.top) / rect.height) * 100).toFixed(1)}%`
+		);
 	}
 
 	function handlePointerLeave() {
+		cancelQueuedPointerPosition();
+		pendingPointerX = '50%';
+		pendingPointerY = '50%';
 		pointerX = '50%';
 		pointerY = '50%';
 	}
@@ -98,11 +129,17 @@
 
 		if (!supportsPropertyRegistration() || getReducedMotionPreference()) {
 			animated = false;
-			return stopMotionObserver;
+			return () => {
+				cancelQueuedPointerPosition();
+				stopMotionObserver();
+			};
 		}
 
 		animated = true;
-		return stopMotionObserver;
+		return () => {
+			cancelQueuedPointerPosition();
+			stopMotionObserver();
+		};
 	});
 
 	function applyStyles(node: HTMLElement) {
@@ -121,6 +158,7 @@
 
 <div
 	{@attach captureElement}
+	{@attach applyStyles}
 	class={className}
 	data-gradient-mesh
 	data-animated={animated || undefined}
@@ -129,7 +167,6 @@
 	onpointermove={interactive ? handlePointerMove : undefined}
 	onpointerleave={interactive ? handlePointerLeave : undefined}
 	{...rest}
-	use:applyStyles
 >
 	{#if childSnippet}
 		<div data-gradient-mesh-content>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Attachment } from 'svelte/attachments';
 	import { Badge, Card, Heading, Text } from '@dryui/ui';
 	import DashboardPreview from '$lib/previews/DashboardPreview.svelte';
 	import DataTablePreview from '$lib/previews/DataTablePreview.svelte';
@@ -12,7 +11,7 @@
 		{ label: 'Theme', value: 'default auto' }
 	] as const;
 
-	const forceLightTheme: Attachment = () => {
+	$effect(() => {
 		const root = document.documentElement;
 		const previousClasses = themeClasses.filter((themeClass) =>
 			root.classList.contains(themeClass)
@@ -25,10 +24,10 @@
 			root.classList.remove(...themeClasses);
 			root.classList.add(...previousClasses);
 		};
-	};
+	});
 </script>
 
-<div class="scene-shell" {@attach forceLightTheme}>
+<div class="scene-shell">
 	<div class="scene-stack" data-benchmark-root data-testid="visual-benchmark-root">
 		<header class="scene-header">
 			<div class="scene-copy">

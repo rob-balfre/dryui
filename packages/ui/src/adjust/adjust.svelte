@@ -54,7 +54,7 @@
 	}
 </script>
 
-<div data-adjust class={className} use:applyStyles {...rest}>
+<div {@attach applyStyles} data-adjust class={className} {...rest}>
 	{@render children()}
 </div>
 
