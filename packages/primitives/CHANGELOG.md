@@ -1,5 +1,11 @@
 # @dryui/primitives
 
+## 0.3.0
+
+### Minor Changes
+
+- [`533de8c`](https://github.com/rob-balfre/dryui/commit/533de8cbb1b8414122c2f0c4406ecd67694e3aa4) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add DragAndDrop.Group component for nested sortable groups. Enhance Diagram with tree, radial, and Sankey layout engines plus interactive pan/zoom and edge routing.
+
 ## 0.2.0
 
 ### Minor Changes
