@@ -43,7 +43,9 @@
 						This one should read instantly: hue rotation remaps the palette while brightness,
 						contrast, and saturation push the result harder.
 					</Text>
-					<p class="value-note">`brightness(1.28) contrast(1.45) saturate(2.3) hue-rotate(160deg)`</p>
+					<p class="value-note">
+						`brightness(1.28) contrast(1.45) saturate(2.3) hue-rotate(160deg)`
+					</p>
 				</div>
 			</div>
 		</Adjust>
@@ -79,12 +81,11 @@
 		padding: var(--dry-space-6);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 78%, transparent);
 		border-radius: var(--dry-radius-xl);
-		background:
-			linear-gradient(
-				145deg,
-				color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
-				color-mix(in srgb, var(--dry-color-bg-overlay) 94%, transparent)
-			);
+		background: linear-gradient(
+			145deg,
+			color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
+			color-mix(in srgb, var(--dry-color-bg-overlay) 94%, transparent)
+		);
 	}
 
 	.demo-shell::before {
@@ -92,9 +93,17 @@
 		position: absolute;
 		inset: -20%;
 		background:
-			radial-gradient(circle at 16% 22%, rgba(251, 146, 60, 0.2) 0, transparent 26%),
-			radial-gradient(circle at 78% 18%, rgba(45, 212, 191, 0.22) 0, transparent 28%),
-			radial-gradient(circle at 56% 82%, rgba(168, 85, 247, 0.18) 0, transparent 24%);
+			linear-gradient(
+				118deg,
+				rgba(251, 146, 60, 0.16) 0 14%,
+				transparent 14% 28%,
+				rgba(45, 212, 191, 0.16) 28% 44%,
+				transparent 44% 60%,
+				rgba(167, 139, 250, 0.14) 60% 76%,
+				transparent 76% 100%
+			),
+			repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.028) 0 1px, transparent 1px 3.25rem);
+		opacity: 0.9;
 	}
 
 	.comparison-grid,
@@ -119,12 +128,11 @@
 		padding: var(--dry-space-5);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 72%, transparent);
 		border-radius: var(--dry-radius-xl);
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--dry-color-bg-overlay) 74%, transparent),
-				color-mix(in srgb, var(--dry-color-bg-base) 82%, transparent)
-			);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--dry-color-bg-overlay) 74%, transparent),
+			color-mix(in srgb, var(--dry-color-bg-base) 82%, transparent)
+		);
 		box-shadow: 0 18px 42px color-mix(in srgb, black 18%, transparent);
 	}
 
@@ -147,9 +155,17 @@
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 72%, transparent);
 		border-radius: var(--dry-radius-lg);
 		background:
-			radial-gradient(circle at 18% 18%, rgba(251, 146, 60, 0.72) 0, transparent 24%),
-			radial-gradient(circle at 78% 22%, rgba(45, 212, 191, 0.68) 0, transparent 28%),
-			radial-gradient(circle at 56% 80%, rgba(167, 139, 250, 0.64) 0, transparent 24%),
+			linear-gradient(
+				122deg,
+				rgba(251, 146, 60, 0.9) 0 18%,
+				rgba(244, 114, 182, 0.42) 18% 32%,
+				rgba(45, 212, 191, 0.82) 32% 54%,
+				rgba(14, 165, 233, 0.4) 54% 68%,
+				rgba(167, 139, 250, 0.8) 68% 84%,
+				rgba(99, 102, 241, 0.34) 84% 100%
+			),
+			linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0, transparent 46%),
+			repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 1px, transparent 1px 2.75rem),
 			linear-gradient(
 				145deg,
 				color-mix(in srgb, var(--dry-color-bg-overlay) 78%, transparent),
@@ -188,12 +204,11 @@
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-3);
 		border-radius: var(--dry-radius-lg);
-		background:
-			linear-gradient(
-				135deg,
-				color-mix(in srgb, white 5%, transparent),
-				color-mix(in srgb, black 16%, transparent)
-			);
+		background: linear-gradient(
+			135deg,
+			color-mix(in srgb, white 5%, transparent),
+			color-mix(in srgb, black 16%, transparent)
+		);
 	}
 
 	.hero-chip {

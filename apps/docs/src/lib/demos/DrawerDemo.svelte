@@ -115,10 +115,8 @@
 		</Drawer.Body>
 
 		<Drawer.Footer>
-			<div class="footer-actions">
-				<Button variant="secondary" onclick={() => (drawerOpen = false)}>Cancel</Button>
-				<Button variant="solid" onclick={() => (drawerOpen = false)}>Save changes</Button>
-			</div>
+			<Button variant="secondary" onclick={() => (drawerOpen = false)}>Cancel</Button>
+			<Button variant="solid" onclick={() => (drawerOpen = false)}>Save changes</Button>
 		</Drawer.Footer>
 	</Drawer.Content>
 </Drawer.Root>
@@ -165,8 +163,7 @@
 		align-items: start;
 	}
 
-	.summary-grid,
-	.footer-actions {
+	.summary-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: var(--dry-space-3);

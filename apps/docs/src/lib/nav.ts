@@ -100,6 +100,10 @@ export const categories: NavCategory[] = [
 		]
 	},
 	{
+		label: 'Diagrams',
+		items: [ui('Diagram')]
+	},
+	{
 		label: 'Action',
 		items: [
 			ui('Button'),

@@ -343,16 +343,41 @@ samp {
 	--dry-glow-blur: 24px;
 	--dry-glow-spread: 48px;
 	--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 64%, 57%, 0.25);
-	--dry-glow-ring-accent: 0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 90%, 58%, 0.25);
+	--dry-glow-ring-accent:
+		0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 90%, 58%, 0.25);
 	--dry-glow-ambient: hsla(230, 64%, 57%, 0.06);
 	--dry-glow-ambient-accent: hsla(25, 90%, 58%, 0.06);
 
 	/* ─── Gradient palette ────────────────────────────────────────── */
-	--dry-gradient-warm: linear-gradient(135deg, hsl(25, 90%, 65%) 0%, hsl(350, 70%, 60%) 50%, hsl(280, 60%, 55%) 100%);
-	--dry-gradient-cool: linear-gradient(135deg, hsl(210, 80%, 60%) 0%, hsl(250, 70%, 55%) 50%, hsl(280, 50%, 50%) 100%);
-	--dry-gradient-sunset: linear-gradient(135deg, hsl(40, 95%, 60%) 0%, hsl(15, 90%, 58%) 40%, hsl(340, 75%, 55%) 100%);
-	--dry-gradient-ocean: linear-gradient(135deg, hsl(195, 80%, 50%) 0%, hsl(220, 85%, 55%) 50%, hsl(250, 70%, 60%) 100%);
-	--dry-gradient-surface: linear-gradient(180deg, var(--dry-color-bg-base) 0%, var(--dry-color-bg-raised) 100%);
+	--dry-gradient-warm: linear-gradient(
+		135deg,
+		hsl(25, 90%, 65%) 0%,
+		hsl(350, 70%, 60%) 50%,
+		hsl(280, 60%, 55%) 100%
+	);
+	--dry-gradient-cool: linear-gradient(
+		135deg,
+		hsl(210, 80%, 60%) 0%,
+		hsl(250, 70%, 55%) 50%,
+		hsl(280, 50%, 50%) 100%
+	);
+	--dry-gradient-sunset: linear-gradient(
+		135deg,
+		hsl(40, 95%, 60%) 0%,
+		hsl(15, 90%, 58%) 40%,
+		hsl(340, 75%, 55%) 100%
+	);
+	--dry-gradient-ocean: linear-gradient(
+		135deg,
+		hsl(195, 80%, 50%) 0%,
+		hsl(220, 85%, 55%) 50%,
+		hsl(250, 70%, 60%) 100%
+	);
+	--dry-gradient-surface: linear-gradient(
+		180deg,
+		var(--dry-color-bg-base) 0%,
+		var(--dry-color-bg-raised) 100%
+	);
 
 	/* ─── Grain / noise texture ───────────────────────────────────── */
 	--dry-grain-opacity: 0.04;

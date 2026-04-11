@@ -1,6 +1,6 @@
 # dryui component reference
 
-> Machine-readable component import, props, styling hook, and example index for 145 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 146 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -3636,6 +3636,22 @@ Accessibility: none
 Example:
 ```svelte
 <Tag>Content</Tag>
+```
+
+## Diagram
+Package: @dryui/ui
+Category: display
+Tags: diagram, graph, flow, architecture, network, sequence, visualization
+Kind: simple
+Root import: import { Diagram } from '@dryui/ui'
+Subpath import: import { Diagram } from '@dryui/ui/diagram'
+Props: none
+CSS variables: none
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-part | data-state | data-variant
+Accessibility: none
+Example:
+```svelte
+<Diagram>Content</Diagram>
 ```
 
 ### feedback

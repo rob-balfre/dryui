@@ -101,9 +101,7 @@
 			}
 		}
 
-		const itemElements = Array.from(
-			rootElement.querySelectorAll<HTMLElement>('[data-dnd-item]')
-		);
+		const itemElements = Array.from(rootElement.querySelectorAll<HTMLElement>('[data-dnd-item]'));
 		const pointerPos = orientation === 'vertical' ? pointerY : pointerX;
 		let closestIndex = draggedIndex;
 		let closestDist = Infinity;
@@ -113,9 +111,7 @@
 			if (!el) continue;
 			const rect = el.getBoundingClientRect();
 			const center =
-				orientation === 'vertical'
-					? rect.top + rect.height / 2
-					: rect.left + rect.width / 2;
+				orientation === 'vertical' ? rect.top + rect.height / 2 : rect.left + rect.width / 2;
 			const dist = Math.abs(pointerPos - center);
 			if (dist < closestDist) {
 				closestDist = dist;
@@ -186,9 +182,7 @@
 			isPending = false;
 			isDragging = true;
 			createPreview();
-			announce(
-				`Grabbed item at position ${(draggedIndex ?? 0) + 1}. Use arrow keys to move.`
-			);
+			announce(`Grabbed item at position ${(draggedIndex ?? 0) + 1}. Use arrow keys to move.`);
 		}
 
 		if (isDragging) {
@@ -289,9 +283,7 @@
 		},
 		moveItem(fromIndex: number, direction: 'up' | 'down') {
 			const toIndex =
-				direction === 'up'
-					? Math.max(0, fromIndex - 1)
-					: Math.min(items.length - 1, fromIndex + 1);
+				direction === 'up' ? Math.max(0, fromIndex - 1) : Math.min(items.length - 1, fromIndex + 1);
 			if (fromIndex !== toIndex) {
 				reorder(fromIndex, toIndex);
 				announce(`Item moved to position ${toIndex + 1} of ${items.length}`);

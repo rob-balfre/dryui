@@ -1,6 +1,6 @@
 # dryui
 
-> 145 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> 146 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
 
 ## Packages
 
@@ -1081,6 +1081,13 @@ Subpath import: @dryui/ui/tag
 Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (TagColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
 Example: <Tag>Content</Tag>
+
+### Diagram
+Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations.
+Import: @dryui/ui
+Subpath import: @dryui/ui/diagram
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-part | data-state | data-variant
+Example: <Diagram>Content</Diagram>
 
 ### Category: Feedback
 

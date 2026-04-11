@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "0.2.2",
   "summary": {
-    "componentNodes": 295,
-    "partNodes": 676,
+    "componentNodes": 291,
+    "partNodes": 662,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
-    "uiComponents": 150,
+    "uiComponents": 146,
     "uiWrappers": 130,
-    "uiComposites": 20,
-    "rootBarrelComponents": 294,
+    "uiComposites": 16,
+    "rootBarrelComponents": 290,
     "subpathOnlyComponents": 1,
-    "compoundComponents": 140,
+    "compoundComponents": 135,
     "wrapEdges": 130,
     "composeEdges": 11,
     "docsEdges": 0,
     "relatedEdges": 305,
-    "mismatches": 26,
+    "mismatches": 16,
     "primitivePartComponents": 0,
     "thinWrappers": 64
   },
@@ -8727,82 +8727,6 @@
       "componentImportCount": 0
     },
     {
-      "id": "ui:ArchitectureDiagram",
-      "name": "ArchitectureDiagram",
-      "label": "ArchitectureDiagram",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "uncategorized",
-      "description": "ArchitectureDiagram is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/architecture-diagram/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Center",
-        "Group",
-        "Item"
-      ],
-      "sourceFileCount": 6,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:ArchitectureDiagram.Center",
-      "name": "ArchitectureDiagram.Center",
-      "label": "Center",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Center part for ArchitectureDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:ArchitectureDiagram.Group",
-      "name": "ArchitectureDiagram.Group",
-      "label": "Group",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Group part for ArchitectureDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:ArchitectureDiagram.Item",
-      "name": "ArchitectureDiagram.Item",
-      "label": "Item",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Item part for ArchitectureDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:ArchitectureDiagram.Root",
-      "name": "ArchitectureDiagram.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Root part for ArchitectureDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
       "id": "ui:AspectRatio",
       "name": "AspectRatio",
       "label": "AspectRatio",
@@ -10400,54 +10324,6 @@
       "componentImportCount": 0
     },
     {
-      "id": "ui:CycleDiagram",
-      "name": "CycleDiagram",
-      "label": "CycleDiagram",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "uncategorized",
-      "description": "CycleDiagram is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/cycle-diagram/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Phase"
-      ],
-      "sourceFileCount": 4,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:CycleDiagram.Phase",
-      "name": "CycleDiagram.Phase",
-      "label": "Phase",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Phase part for CycleDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:CycleDiagram.Root",
-      "name": "CycleDiagram.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Root part for CycleDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
       "id": "ui:DataGrid",
       "name": "DataGrid",
       "label": "DataGrid",
@@ -10997,6 +10873,33 @@
       "tags": [],
       "compound": false,
       "parts": []
+    },
+    {
+      "id": "ui:Diagram",
+      "name": "Diagram",
+      "label": "Diagram",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/diagram/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "diagram",
+        "graph",
+        "flow",
+        "architecture",
+        "network",
+        "sequence",
+        "visualization"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 5,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
     },
     {
       "id": "ui:Dialog",
@@ -11994,54 +11897,6 @@
       "parts": []
     },
     {
-      "id": "ui:FlowDiagram",
-      "name": "FlowDiagram",
-      "label": "FlowDiagram",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "uncategorized",
-      "description": "FlowDiagram is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/flow-diagram/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Node"
-      ],
-      "sourceFileCount": 4,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:FlowDiagram.Node",
-      "name": "FlowDiagram.Node",
-      "label": "Node",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Node part for FlowDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:FlowDiagram.Root",
-      "name": "FlowDiagram.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Root part for FlowDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
       "id": "ui:FocusTrap",
       "name": "FocusTrap",
       "label": "FocusTrap",
@@ -12701,54 +12556,6 @@
       "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
-    },
-    {
-      "id": "ui:LayerDiagram",
-      "name": "LayerDiagram",
-      "label": "LayerDiagram",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "uncategorized",
-      "description": "LayerDiagram is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/layer-diagram/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Layer"
-      ],
-      "sourceFileCount": 3,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:LayerDiagram.Layer",
-      "name": "LayerDiagram.Layer",
-      "label": "Layer",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Layer part for LayerDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:LayerDiagram.Root",
-      "name": "LayerDiagram.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Root part for LayerDiagram.",
-      "tags": [],
-      "compound": false,
-      "parts": []
     },
     {
       "id": "ui:Link",
@@ -13679,82 +13486,6 @@
       "layer": "part",
       "category": "navigation",
       "description": "Trigger part for NavigationMenu.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:NodeGraph",
-      "name": "NodeGraph",
-      "label": "NodeGraph",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "uncategorized",
-      "description": "NodeGraph is exported publicly but is missing generated spec metadata.",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/node-graph/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Node",
-        "Edge",
-        "Cluster"
-      ],
-      "sourceFileCount": 6,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:NodeGraph.Cluster",
-      "name": "NodeGraph.Cluster",
-      "label": "Cluster",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Cluster part for NodeGraph.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:NodeGraph.Edge",
-      "name": "NodeGraph.Edge",
-      "label": "Edge",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Edge part for NodeGraph.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:NodeGraph.Node",
-      "name": "NodeGraph.Node",
-      "label": "Node",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Node part for NodeGraph.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:NodeGraph.Root",
-      "name": "NodeGraph.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "uncategorized",
-      "description": "Root part for NodeGraph.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -15915,7 +15646,7 @@
       ],
       "compound": false,
       "parts": [],
-      "sourceFileCount": 190,
+      "sourceFileCount": 186,
       "primitivePartUsageCount": 0,
       "componentImportCount": 1
     },
@@ -19375,34 +19106,6 @@
       "label": "Trigger"
     },
     {
-      "id": "compound_part:ui:ArchitectureDiagram:ui:ArchitectureDiagram.Center:Center",
-      "type": "compound_part",
-      "from": "ui:ArchitectureDiagram",
-      "to": "ui:ArchitectureDiagram.Center",
-      "label": "Center"
-    },
-    {
-      "id": "compound_part:ui:ArchitectureDiagram:ui:ArchitectureDiagram.Group:Group",
-      "type": "compound_part",
-      "from": "ui:ArchitectureDiagram",
-      "to": "ui:ArchitectureDiagram.Group",
-      "label": "Group"
-    },
-    {
-      "id": "compound_part:ui:ArchitectureDiagram:ui:ArchitectureDiagram.Item:Item",
-      "type": "compound_part",
-      "from": "ui:ArchitectureDiagram",
-      "to": "ui:ArchitectureDiagram.Item",
-      "label": "Item"
-    },
-    {
-      "id": "compound_part:ui:ArchitectureDiagram:ui:ArchitectureDiagram.Root:Root",
-      "type": "compound_part",
-      "from": "ui:ArchitectureDiagram",
-      "to": "ui:ArchitectureDiagram.Root",
-      "label": "Root"
-    },
-    {
       "id": "compound_part:ui:Breadcrumb:ui:Breadcrumb.Item:Item",
       "type": "compound_part",
       "from": "ui:Breadcrumb",
@@ -19849,20 +19552,6 @@
       "from": "ui:ContextMenu",
       "to": "ui:ContextMenu.Trigger",
       "label": "Trigger"
-    },
-    {
-      "id": "compound_part:ui:CycleDiagram:ui:CycleDiagram.Phase:Phase",
-      "type": "compound_part",
-      "from": "ui:CycleDiagram",
-      "to": "ui:CycleDiagram.Phase",
-      "label": "Phase"
-    },
-    {
-      "id": "compound_part:ui:CycleDiagram:ui:CycleDiagram.Root:Root",
-      "type": "compound_part",
-      "from": "ui:CycleDiagram",
-      "to": "ui:CycleDiagram.Root",
-      "label": "Root"
     },
     {
       "id": "compound_part:ui:DataGrid:ui:DataGrid.Body:Body",
@@ -20404,20 +20093,6 @@
       "label": "Trigger"
     },
     {
-      "id": "compound_part:ui:FlowDiagram:ui:FlowDiagram.Node:Node",
-      "type": "compound_part",
-      "from": "ui:FlowDiagram",
-      "to": "ui:FlowDiagram.Node",
-      "label": "Node"
-    },
-    {
-      "id": "compound_part:ui:FlowDiagram:ui:FlowDiagram.Root:Root",
-      "type": "compound_part",
-      "from": "ui:FlowDiagram",
-      "to": "ui:FlowDiagram.Root",
-      "label": "Root"
-    },
-    {
       "id": "compound_part:ui:HoverCard:ui:HoverCard.Content:Content",
       "type": "compound_part",
       "from": "ui:HoverCard",
@@ -20486,20 +20161,6 @@
       "from": "ui:InputGroup",
       "to": "ui:InputGroup.Suffix",
       "label": "Suffix"
-    },
-    {
-      "id": "compound_part:ui:LayerDiagram:ui:LayerDiagram.Layer:Layer",
-      "type": "compound_part",
-      "from": "ui:LayerDiagram",
-      "to": "ui:LayerDiagram.Layer",
-      "label": "Layer"
-    },
-    {
-      "id": "compound_part:ui:LayerDiagram:ui:LayerDiagram.Root:Root",
-      "type": "compound_part",
-      "from": "ui:LayerDiagram",
-      "to": "ui:LayerDiagram.Root",
-      "label": "Root"
     },
     {
       "id": "compound_part:ui:LinkPreview:ui:LinkPreview.Content:Content",
@@ -20801,34 +20462,6 @@
       "from": "ui:NavigationMenu",
       "to": "ui:NavigationMenu.Trigger",
       "label": "Trigger"
-    },
-    {
-      "id": "compound_part:ui:NodeGraph:ui:NodeGraph.Cluster:Cluster",
-      "type": "compound_part",
-      "from": "ui:NodeGraph",
-      "to": "ui:NodeGraph.Cluster",
-      "label": "Cluster"
-    },
-    {
-      "id": "compound_part:ui:NodeGraph:ui:NodeGraph.Edge:Edge",
-      "type": "compound_part",
-      "from": "ui:NodeGraph",
-      "to": "ui:NodeGraph.Edge",
-      "label": "Edge"
-    },
-    {
-      "id": "compound_part:ui:NodeGraph:ui:NodeGraph.Node:Node",
-      "type": "compound_part",
-      "from": "ui:NodeGraph",
-      "to": "ui:NodeGraph.Node",
-      "label": "Node"
-    },
-    {
-      "id": "compound_part:ui:NodeGraph:ui:NodeGraph.Root:Root",
-      "type": "compound_part",
-      "from": "ui:NodeGraph",
-      "to": "ui:NodeGraph.Root",
-      "label": "Root"
     },
     {
       "id": "compound_part:ui:NotificationCenter:ui:NotificationCenter.Group:Group",
@@ -24519,41 +24152,6 @@
   "clusters": [],
   "mismatches": [
     {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "ArchitectureDiagram",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/architecture-diagram/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "CycleDiagram",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/cycle-diagram/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "FlowDiagram",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/flow-diagram/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "LayerDiagram",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/layer-diagram/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "NodeGraph",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/node-graph/index.ts"
-    },
-    {
       "kind": "spec-missing",
       "package": "primitives",
       "component": "AffixGroup",
@@ -24659,41 +24257,6 @@
       "sourcePath": "packages/primitives/src/wave-divider/index.ts"
     },
     {
-      "kind": "spec-missing",
-      "package": "ui",
-      "component": "ArchitectureDiagram",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/ui/src/architecture-diagram/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "ui",
-      "component": "CycleDiagram",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/ui/src/cycle-diagram/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "ui",
-      "component": "FlowDiagram",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/ui/src/flow-diagram/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "ui",
-      "component": "LayerDiagram",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/ui/src/layer-diagram/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "ui",
-      "component": "NodeGraph",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/ui/src/node-graph/index.ts"
-    },
-    {
       "kind": "subpath-only-export",
       "package": "primitives",
       "component": "UseThemeOverride",
@@ -24773,13 +24336,7 @@
     "subpathOnlyPrimitives": [
       "UseThemeOverride"
     ],
-    "specMissingUi": [
-      "ArchitectureDiagram",
-      "CycleDiagram",
-      "FlowDiagram",
-      "LayerDiagram",
-      "NodeGraph"
-    ],
+    "specMissingUi": [],
     "specMissingPrimitives": [
       "AffixGroup",
       "AppFrame",
@@ -24797,17 +24354,11 @@
       "UseThemeOverride",
       "WaveDivider"
     ],
-    "docsNavMissing": [
-      "ArchitectureDiagram",
-      "CycleDiagram",
-      "FlowDiagram",
-      "LayerDiagram",
-      "NodeGraph"
-    ],
+    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 20\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

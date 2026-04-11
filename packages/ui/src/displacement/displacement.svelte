@@ -34,7 +34,9 @@
 	});
 
 	const scaleValue = $derived(`${Math.max(0, scale)}`);
-	const shouldAnimate = $derived(animated && !prefersReducedMotion && documentVisible && inViewport);
+	const shouldAnimate = $derived(
+		animated && !prefersReducedMotion && documentVisible && inViewport
+	);
 
 	function captureElement(node: HTMLElement) {
 		element = node;

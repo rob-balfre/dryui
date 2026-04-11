@@ -292,9 +292,7 @@
 		},
 		moveItem(fromIndex: number, direction: 'up' | 'down') {
 			const toIndex =
-				direction === 'up'
-					? Math.max(0, fromIndex - 1)
-					: Math.min(items.length - 1, fromIndex + 1);
+				direction === 'up' ? Math.max(0, fromIndex - 1) : Math.min(items.length - 1, fromIndex + 1);
 			if (fromIndex !== toIndex) {
 				reorder(fromIndex, toIndex);
 				announce(`Item moved to position ${toIndex + 1} of ${items.length}`);

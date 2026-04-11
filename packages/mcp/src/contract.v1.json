@@ -6,7 +6,7 @@
     "version": "0.2.2"
   },
   "counts": {
-    "components": 145,
+    "components": 146,
     "compositionComponents": 131,
     "compositionRecipes": 31,
     "tools": 11,
@@ -18468,6 +18468,47 @@
         }
       ],
       "example": "<Tag>Content</Tag>"
+    },
+    "Diagram": {
+      "import": "@dryui/ui",
+      "description": "Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations",
+      "category": "display",
+      "tags": [
+        "diagram",
+        "graph",
+        "flow",
+        "architecture",
+        "network",
+        "sequence",
+        "visualization"
+      ],
+      "compound": false,
+      "props": {},
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-color"
+        },
+        {
+          "name": "data-dashed"
+        },
+        {
+          "name": "data-diagram"
+        },
+        {
+          "name": "data-diagram-container"
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-state"
+        },
+        {
+          "name": "data-variant"
+        }
+      ],
+      "example": "<Diagram>Content</Diagram>"
     }
   },
   "composition": {

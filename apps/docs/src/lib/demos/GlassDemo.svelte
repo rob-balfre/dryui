@@ -15,8 +15,8 @@
 					<div class="glass-copy">
 						<h3 class="glass-title">Frosted glass effect</h3>
 						<Text color="secondary">
-							Blur, tint, and saturation only read clearly when the surface sits over layered
-							color and detail.
+							Blur, tint, and saturation only read clearly when the surface sits over layered color
+							and detail.
 						</Text>
 					</div>
 
@@ -41,12 +41,11 @@
 		padding: var(--dry-space-6);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 78%, transparent);
 		border-radius: var(--dry-radius-xl);
-		background:
-			linear-gradient(
-				145deg,
-				color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
-				color-mix(in srgb, var(--dry-color-bg-overlay) 94%, transparent)
-			);
+		background: linear-gradient(
+			145deg,
+			color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
+			color-mix(in srgb, var(--dry-color-bg-overlay) 94%, transparent)
+		);
 		isolation: isolate;
 	}
 
@@ -58,11 +57,7 @@
 			radial-gradient(circle at 16% 18%, rgba(251, 146, 60, 0.62) 0, transparent 24%),
 			radial-gradient(circle at 82% 22%, rgba(56, 189, 248, 0.58) 0, transparent 28%),
 			radial-gradient(circle at 52% 78%, rgba(168, 85, 247, 0.42) 0, transparent 24%),
-			repeating-linear-gradient(
-				120deg,
-				rgba(255, 255, 255, 0.08) 0 1rem,
-				transparent 1rem 2.35rem
-			);
+			repeating-linear-gradient(120deg, rgba(255, 255, 255, 0.08) 0 1rem, transparent 1rem 2.35rem);
 		transform: scale(1.04);
 	}
 

@@ -1,0 +1,142 @@
+/*
+ * Midnight — Dark Glass
+ *
+ * Inspired by: the "New thread" glassmorphic menus, Cyrizon Saturn rings,
+ * frosted dark surfaces with inset glow borders, soft rose accents,
+ * ambient light bleeding through translucent layers.
+ *
+ * Deep dark base, frosted glass cards, rose accent, layered depth.
+ * Dark-only theme.
+ * Use with: <html class="theme-midnight"> or <html data-theme="midnight">
+ */
+
+[data-theme='midnight'],
+.theme-midnight {
+	/* ─── Brand — soft lavender ───────────────────────────────────── */
+	--dry-color-brand: hsl(250, 70%, 75%);
+	--dry-color-text-brand: hsl(250, 70%, 75%);
+	--dry-color-fill-brand: hsl(250, 70%, 75%);
+	--dry-color-fill-brand-hover: hsl(250, 70%, 67%);
+	--dry-color-fill-brand-active: hsl(250, 70%, 62%);
+	--dry-color-fill-brand-weak: hsla(250, 70%, 75%, 0.08);
+	--dry-color-stroke-brand: hsla(250, 70%, 75%, 0.45);
+	--dry-color-stroke-brand-strong: hsla(250, 70%, 75%, 0.75);
+	--dry-color-stroke-brand-weak: hsla(250, 70%, 75%, 0.18);
+	--dry-color-on-brand: hsl(250, 30%, 8%);
+	--dry-color-focus-ring: hsla(250, 70%, 75%, 0.35);
+
+	/* ─── Accent — soft rose (the avatar ring glow) ───────────────── */
+	--dry-color-accent: hsl(350, 60%, 70%);
+	--dry-color-text-accent: hsl(350, 60%, 70%);
+	--dry-color-fill-accent: hsl(350, 60%, 70%);
+	--dry-color-fill-accent-hover: hsl(350, 60%, 62%);
+	--dry-color-fill-accent-active: hsl(350, 60%, 56%);
+	--dry-color-fill-accent-weak: hsla(350, 60%, 70%, 0.08);
+	--dry-color-stroke-accent: hsla(350, 60%, 70%, 0.45);
+	--dry-color-stroke-accent-strong: hsla(350, 60%, 70%, 0.75);
+	--dry-color-stroke-accent-weak: hsla(350, 60%, 70%, 0.18);
+	--dry-color-icon-accent: hsla(350, 60%, 70%, 0.75);
+	--dry-color-on-accent: hsl(350, 20%, 8%);
+
+	/* ─── Backgrounds — deep layered dark ─────────────────────────── */
+	--dry-color-bg-base: hsl(240, 20%, 6%);
+	--dry-color-bg-raised: hsl(240, 15%, 10%);
+	--dry-color-bg-overlay: hsl(240, 12%, 14%);
+	--dry-color-bg-elevated: hsl(240, 10%, 18%);
+	--dry-color-bg-floating: hsl(240, 8%, 22%);
+	--dry-color-bg-sunken: hsl(240, 22%, 4%);
+	--dry-color-bg-brand: var(--dry-color-fill-brand);
+	--dry-color-bg-inverse: hsl(240, 10%, 95%);
+
+	/* ─── Neutrals — cool silver white ────────────────────────────── */
+	--dry-color-text-strong: hsla(240, 20%, 98%, 1);
+	--dry-color-text-weak: hsla(240, 15%, 90%, 0.7);
+	--dry-color-icon: hsla(240, 15%, 88%, 0.78);
+	--dry-color-stroke-strong: hsla(240, 15%, 85%, 0.5);
+	--dry-color-stroke-weak: hsla(240, 15%, 80%, 0.1);
+	--dry-color-fill: hsla(240, 15%, 85%, 0.05);
+	--dry-color-fill-hover: hsla(240, 15%, 85%, 0.08);
+	--dry-color-fill-active: hsla(240, 15%, 85%, 0.13);
+
+	/* ─── Shadows — deep midnight ─────────────────────────────────── */
+	--dry-shadow-raised: 0 1px 4px hsla(240, 40%, 3%, 0.5), 0 1px 2px hsla(240, 40%, 3%, 0.4);
+	--dry-shadow-overlay: 0 8px 32px hsla(240, 40%, 3%, 0.6), 0 2px 8px hsla(240, 40%, 3%, 0.45);
+	--dry-shadow-sunken: inset 0 1px 4px hsla(240, 40%, 3%, 0.4);
+	--dry-shadow-brand: 0 4px 20px hsla(250, 70%, 75%, 0.12), 0 2px 8px hsla(250, 70%, 75%, 0.08);
+	--dry-shadow-accent: 0 4px 20px hsla(350, 60%, 70%, 0.12), 0 2px 8px hsla(350, 60%, 70%, 0.08);
+
+	/* ─── Glass — the hero feature of this theme ──────────────────── */
+	--dry-glass-blur: 16px;
+	--dry-glass-tint: hsla(240, 15%, 10%, 0.65);
+	--dry-glass-opacity: 58%;
+	--dry-glass-saturation: 150%;
+	--dry-glass-border: hsla(240, 20%, 90%, 0.06);
+	--dry-glass-border-strong: hsla(240, 20%, 90%, 0.12);
+
+	/* ─── Glow — ethereal halos ───────────────────────────────────── */
+	--dry-glow-color: var(--dry-color-fill-brand);
+	--dry-glow-blur: 32px;
+	--dry-glow-spread: 64px;
+	--dry-glow-ring: 0 0 0 1px hsla(250, 70%, 75%, 0.2), 0 0 20px 4px hsla(250, 70%, 75%, 0.1);
+	--dry-glow-ring-accent: 0 0 0 1px hsla(350, 60%, 70%, 0.2), 0 0 20px 4px hsla(350, 60%, 70%, 0.1);
+	--dry-glow-ambient: hsla(250, 70%, 75%, 0.03);
+	--dry-glow-ambient-accent: hsla(350, 60%, 70%, 0.03);
+
+	/* ─── Gradient palette — cool ethereal ────────────────────────── */
+	--dry-gradient-warm: linear-gradient(
+		135deg,
+		hsl(350, 55%, 65%) 0%,
+		hsl(280, 50%, 60%) 50%,
+		hsl(250, 60%, 65%) 100%
+	);
+	--dry-gradient-cool: linear-gradient(
+		135deg,
+		hsl(220, 70%, 65%) 0%,
+		hsl(260, 60%, 60%) 50%,
+		hsl(290, 40%, 58%) 100%
+	);
+	--dry-gradient-sunset: linear-gradient(
+		135deg,
+		hsl(350, 65%, 68%) 0%,
+		hsl(310, 50%, 58%) 40%,
+		hsl(260, 55%, 55%) 100%
+	);
+	--dry-gradient-ocean: linear-gradient(
+		135deg,
+		hsl(210, 65%, 60%) 0%,
+		hsl(240, 60%, 58%) 50%,
+		hsl(270, 50%, 55%) 100%
+	);
+	--dry-gradient-surface: linear-gradient(180deg, hsl(240, 20%, 6%) 0%, hsl(240, 15%, 10%) 100%);
+
+	/* ─── Grain — subtle texture ──────────────────────────────────── */
+	--dry-grain-opacity: 0.05;
+	--dry-grain-blend: soft-light;
+
+	/* ─── Motion — slightly slower, dreamier ──────────────────────── */
+	--dry-duration-normal: 260ms;
+	--dry-duration-slow: 420ms;
+	--dry-ease-spring: var(--dry-ease-spring-soft);
+
+	/* ─── Beam blend ──────────────────────────────────────────────── */
+	--dry-beam-default-blend: screen;
+
+	/* ─── Overlay backdrops ───────────────────────────────────────── */
+	--dry-color-overlay-backdrop: hsla(240, 30%, 3%, 0.65);
+	--dry-color-overlay-backdrop-strong: hsla(240, 30%, 3%, 0.8);
+
+	/* ─── Radius — generous, pill-like ────────────────────────────── */
+	--dry-radius-lg: 12px;
+	--dry-radius-xl: 16px;
+	--dry-radius-2xl: 24px;
+
+	/* ─── Toggle — midnight themed ────────────────────────────────── */
+	--dry-toggle-track-bg: hsla(240, 15%, 85%, 0.06);
+	--dry-toggle-track-stroke: hsla(240, 15%, 85%, 0.5);
+	--dry-toggle-selected-bg: hsl(350, 60%, 70%);
+	--dry-toggle-selected-stroke: hsl(350, 60%, 70%);
+	--dry-toggle-thumb-bg: hsl(240, 20%, 8%);
+	--dry-toggle-hover-bg: hsla(240, 15%, 85%, 0.08);
+	--dry-toggle-press-bg: hsla(240, 15%, 85%, 0.12);
+	--dry-toggle-focus-ring: hsl(350, 60%, 70%);
+}

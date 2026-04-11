@@ -791,6 +791,12 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		description: 'Compact preview tile used for component catalogs, galleries, and pickers',
 		category: 'utility',
 		tags: ['thumbnail', 'preview', 'catalog', 'gallery']
+	},
+	Diagram: {
+		description:
+			'Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations',
+		category: 'display',
+		tags: ['diagram', 'graph', 'flow', 'architecture', 'network', 'sequence', 'visualization']
 	}
 };
 

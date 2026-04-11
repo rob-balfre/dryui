@@ -20,7 +20,7 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		justify-items: end;
+		justify-content: end;
 		gap: var(--dry-space-2);
 	}
 </style>

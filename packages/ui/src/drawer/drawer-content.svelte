@@ -108,7 +108,8 @@
 		box-shadow: var(--dry-drawer-shadow, var(--dry-shadow-overlay));
 		padding: 0;
 		display: grid;
-		overflow: auto;
+		grid-template-rows: max-content minmax(0, 1fr) max-content;
+		overflow: hidden;
 
 		transition:
 			transform var(--dry-duration-slow) var(--dry-ease-spring-snappy),

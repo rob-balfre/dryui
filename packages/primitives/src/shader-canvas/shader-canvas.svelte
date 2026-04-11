@@ -136,8 +136,7 @@
 				const nextWidth = Math.max(1, Math.floor(width * dpr));
 				const nextHeight = Math.max(1, Math.floor(height * dpr));
 				const maxEdge = Math.max(nextWidth, nextHeight);
-				const scale =
-					maxEdge > MAX_RENDER_BUFFER_EDGE ? MAX_RENDER_BUFFER_EDGE / maxEdge : 1;
+				const scale = maxEdge > MAX_RENDER_BUFFER_EDGE ? MAX_RENDER_BUFFER_EDGE / maxEdge : 1;
 
 				canvasEl.width = Math.max(1, Math.floor(nextWidth * scale));
 				canvasEl.height = Math.max(1, Math.floor(nextHeight * scale));
@@ -170,7 +169,8 @@
 			let startTime = performance.now();
 			let lastFrameTime = 0;
 			const fpsInterval = fps !== undefined && fps > 0 ? 1000 / fps : 0;
-			const shouldLoop = !paused && !prefersReducedMotion && fps !== 0 && documentVisible && inViewport;
+			const shouldLoop =
+				!paused && !prefersReducedMotion && fps !== 0 && documentVisible && inViewport;
 
 			function draw(time: number) {
 				if (!documentVisible || !inViewport) return;

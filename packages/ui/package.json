@@ -46,11 +46,6 @@
       "svelte": "./src/alpha-slider/index.ts",
       "default": "./src/alpha-slider/index.ts"
     },
-    "./architecture-diagram": {
-      "types": "./src/architecture-diagram/index.ts",
-      "svelte": "./src/architecture-diagram/index.ts",
-      "default": "./src/architecture-diagram/index.ts"
-    },
     "./aspect-ratio": {
       "types": "./src/aspect-ratio/index.ts",
       "svelte": "./src/aspect-ratio/index.ts",
@@ -191,11 +186,6 @@
       "svelte": "./src/country-select/index.ts",
       "default": "./src/country-select/index.ts"
     },
-    "./cycle-diagram": {
-      "types": "./src/cycle-diagram/index.ts",
-      "svelte": "./src/cycle-diagram/index.ts",
-      "default": "./src/cycle-diagram/index.ts"
-    },
     "./data-grid": {
       "types": "./src/data-grid/index.ts",
       "svelte": "./src/data-grid/index.ts",
@@ -225,6 +215,11 @@
       "types": "./src/description-list/index.ts",
       "svelte": "./src/description-list/index.ts",
       "default": "./src/description-list/index.ts"
+    },
+    "./diagram": {
+      "types": "./src/diagram/index.ts",
+      "svelte": "./src/diagram/index.ts",
+      "default": "./src/diagram/index.ts"
     },
     "./dialog": {
       "types": "./src/dialog/index.ts",
@@ -285,11 +280,6 @@
       "types": "./src/float-button/index.ts",
       "svelte": "./src/float-button/index.ts",
       "default": "./src/float-button/index.ts"
-    },
-    "./flow-diagram": {
-      "types": "./src/flow-diagram/index.ts",
-      "svelte": "./src/flow-diagram/index.ts",
-      "default": "./src/flow-diagram/index.ts"
     },
     "./focus-trap": {
       "types": "./src/focus-trap/index.ts",
@@ -396,11 +386,6 @@
       "svelte": "./src/label/index.ts",
       "default": "./src/label/index.ts"
     },
-    "./layer-diagram": {
-      "types": "./src/layer-diagram/index.ts",
-      "svelte": "./src/layer-diagram/index.ts",
-      "default": "./src/layer-diagram/index.ts"
-    },
     "./link": {
       "types": "./src/link/index.ts",
       "svelte": "./src/link/index.ts",
@@ -465,11 +450,6 @@
       "types": "./src/navigation-menu/index.ts",
       "svelte": "./src/navigation-menu/index.ts",
       "default": "./src/navigation-menu/index.ts"
-    },
-    "./node-graph": {
-      "types": "./src/node-graph/index.ts",
-      "svelte": "./src/node-graph/index.ts",
-      "default": "./src/node-graph/index.ts"
     },
     "./noise": {
       "types": "./src/noise/index.ts",
@@ -816,11 +796,6 @@
         "svelte": "./dist/alpha-slider/index.js",
         "default": "./dist/alpha-slider/index.js"
       },
-      "./architecture-diagram": {
-        "types": "./dist/architecture-diagram/index.d.ts",
-        "svelte": "./dist/architecture-diagram/index.js",
-        "default": "./dist/architecture-diagram/index.js"
-      },
       "./aspect-ratio": {
         "types": "./dist/aspect-ratio/index.d.ts",
         "svelte": "./dist/aspect-ratio/index.js",
@@ -961,11 +936,6 @@
         "svelte": "./dist/country-select/index.js",
         "default": "./dist/country-select/index.js"
       },
-      "./cycle-diagram": {
-        "types": "./dist/cycle-diagram/index.d.ts",
-        "svelte": "./dist/cycle-diagram/index.js",
-        "default": "./dist/cycle-diagram/index.js"
-      },
       "./data-grid": {
         "types": "./dist/data-grid/index.d.ts",
         "svelte": "./dist/data-grid/index.js",
@@ -995,6 +965,11 @@
         "types": "./dist/description-list/index.d.ts",
         "svelte": "./dist/description-list/index.js",
         "default": "./dist/description-list/index.js"
+      },
+      "./diagram": {
+        "types": "./dist/diagram/index.d.ts",
+        "svelte": "./dist/diagram/index.js",
+        "default": "./dist/diagram/index.js"
       },
       "./dialog": {
         "types": "./dist/dialog/index.d.ts",
@@ -1055,11 +1030,6 @@
         "types": "./dist/float-button/index.d.ts",
         "svelte": "./dist/float-button/index.js",
         "default": "./dist/float-button/index.js"
-      },
-      "./flow-diagram": {
-        "types": "./dist/flow-diagram/index.d.ts",
-        "svelte": "./dist/flow-diagram/index.js",
-        "default": "./dist/flow-diagram/index.js"
       },
       "./focus-trap": {
         "types": "./dist/focus-trap/index.d.ts",
@@ -1166,11 +1136,6 @@
         "svelte": "./dist/label/index.js",
         "default": "./dist/label/index.js"
       },
-      "./layer-diagram": {
-        "types": "./dist/layer-diagram/index.d.ts",
-        "svelte": "./dist/layer-diagram/index.js",
-        "default": "./dist/layer-diagram/index.js"
-      },
       "./link": {
         "types": "./dist/link/index.d.ts",
         "svelte": "./dist/link/index.js",
@@ -1235,11 +1200,6 @@
         "types": "./dist/navigation-menu/index.d.ts",
         "svelte": "./dist/navigation-menu/index.js",
         "default": "./dist/navigation-menu/index.js"
-      },
-      "./node-graph": {
-        "types": "./dist/node-graph/index.d.ts",
-        "svelte": "./dist/node-graph/index.js",
-        "default": "./dist/node-graph/index.js"
       },
       "./noise": {
         "types": "./dist/noise/index.d.ts",

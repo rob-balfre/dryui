@@ -33,8 +33,8 @@
 							<div class="hero-copy">
 								<h3 class="hero-title">Ambient background effect</h3>
 								<Text color="secondary">
-									Layered gradients drift when the browser can animate custom properties, then
-									fall back to a static surface when it cannot.
+									Layered gradients drift when the browser can animate custom properties, then fall
+									back to a static surface when it cannot.
 								</Text>
 								<Text color="secondary" size="sm">
 									Docs keep motion opt-in here so the visual stays visible without spinning up the
@@ -134,36 +134,33 @@
 		padding: var(--dry-space-5);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 68%, transparent);
 		border-radius: var(--dry-radius-xl);
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--dry-color-bg-overlay) 62%, transparent),
-				color-mix(in srgb, var(--dry-color-bg-base) 74%, transparent)
-			);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--dry-color-bg-overlay) 62%, transparent),
+			color-mix(in srgb, var(--dry-color-bg-base) 74%, transparent)
+		);
 		box-shadow: 0 18px 40px color-mix(in srgb, var(--dry-color-text-strong) 8%, transparent);
 	}
 
 	.mini-shell {
 		min-block-size: 11rem;
 		align-content: end;
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--dry-color-bg-overlay) 68%, transparent),
-				color-mix(in srgb, var(--dry-color-bg-base) 76%, transparent)
-			);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--dry-color-bg-overlay) 68%, transparent),
+			color-mix(in srgb, var(--dry-color-bg-base) 76%, transparent)
+		);
 		box-shadow: 0 18px 40px color-mix(in srgb, var(--dry-color-text-strong) 8%, transparent);
 	}
 
 	.mini-card {
 		position: absolute;
 		inset: 0;
-		background:
-			linear-gradient(
-				145deg,
-				color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
-				color-mix(in srgb, var(--dry-color-bg-overlay) 92%, transparent)
-			);
+		background: linear-gradient(
+			145deg,
+			color-mix(in srgb, var(--dry-color-bg-base) 82%, var(--dry-color-bg-overlay)),
+			color-mix(in srgb, var(--dry-color-bg-overlay) 92%, transparent)
+		);
 	}
 
 	.mini-card::before,
@@ -267,12 +264,11 @@
 		padding: var(--dry-space-4);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
 		border-radius: var(--dry-radius-lg);
-		background:
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--dry-color-bg-overlay) 52%, transparent),
-				color-mix(in srgb, var(--dry-color-bg-base) 68%, transparent)
-			);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--dry-color-bg-overlay) 52%, transparent),
+			color-mix(in srgb, var(--dry-color-bg-base) 68%, transparent)
+		);
 		box-shadow: 0 14px 32px color-mix(in srgb, var(--dry-color-text-strong) 6%, transparent);
 	}
 
