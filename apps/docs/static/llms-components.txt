@@ -3812,7 +3812,7 @@ Structure:
     DragAndDrop.Item
     DragAndDrop.Handle
 CSS variables: none
-Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-root | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
+Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
 Accessibility: none
 Example:
 ```svelte

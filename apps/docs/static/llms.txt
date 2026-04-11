@@ -1143,7 +1143,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/drag-and-drop
 Parts: Root, Item, Handle
 Props: Root: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | children (Snippet), Content rendered inside the component., required | Item: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required | Handle: index (number), required | children (Snippet | undefined), Content rendered inside the component.
-Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-root | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
+Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
 Example: <DragAndDrop.Root>
 
 ### Category: Utility
