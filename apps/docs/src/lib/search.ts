@@ -43,7 +43,15 @@ const allDocsPages: SearchItem[] = [
 		label: 'Theme Wizard',
 		href: '/theme-wizard',
 		description: 'Build and export DryUI semantic token themes.',
-		keywords: ['tokens', 'palette', 'theme editor']
+		keywords: [
+			'tokens',
+			'palette',
+			'theme editor',
+			'preset themes',
+			'aurora',
+			'midnight',
+			'terminal'
+		]
 	},
 	{
 		label: 'Tools',

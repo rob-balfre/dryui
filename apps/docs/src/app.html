@@ -7,7 +7,7 @@
 		<script>
 			(() => {
 				const root = document.documentElement;
-				const wizardOverridesStorageKey = 'dryui-docs-theme-overrides';
+				const wizardStateStorageKey = 'dryui-theme-wizard';
 
 				try {
 					const storedTheme = window.localStorage.getItem('dryui-docs-theme');
@@ -30,23 +30,24 @@
 						return;
 					}
 
-					const storedOverrides = window.sessionStorage.getItem(wizardOverridesStorageKey);
-					if (!storedOverrides) {
+					const storedWizardState = window.sessionStorage.getItem(wizardStateStorageKey);
+					if (!storedWizardState) {
 						return;
 					}
 
-					const parsedOverrides = JSON.parse(storedOverrides);
+					const parsedWizardState = JSON.parse(storedWizardState);
 					const isDarkMode =
 						explicitTheme === 'dark' ||
 						(explicitTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-					const activeOverrides = isDarkMode ? parsedOverrides?.dark : parsedOverrides?.light;
+					const activeTokens = isDarkMode
+						? parsedWizardState?.tokens?.dark
+						: parsedWizardState?.tokens?.light;
 
-					if (!activeOverrides || typeof activeOverrides !== 'object') {
-						window.sessionStorage.removeItem(wizardOverridesStorageKey);
+					if (!activeTokens || typeof activeTokens !== 'object') {
 						return;
 					}
 
-					for (const [property, value] of Object.entries(activeOverrides)) {
+					for (const [property, value] of Object.entries(activeTokens)) {
 						if (typeof value === 'string') {
 							root.style.setProperty(property, value);
 						}

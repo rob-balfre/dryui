@@ -24,6 +24,12 @@
 			for (const [name, value] of Object.entries(tokens)) {
 				node.style.setProperty(name, value);
 			}
+
+			return () => {
+				for (const name of Object.keys(tokens)) {
+					node.style.removeProperty(name);
+				}
+			};
 		};
 	}
 

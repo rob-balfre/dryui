@@ -30,12 +30,4 @@ describe('DolphinGraph', () => {
 		expect(graph.summary.mismatches).toBe(0);
 		expect(graph.mismatches).toEqual([]);
 	});
-
-	test('does not model Thumbnail as a compound component', () => {
-		const thumbnail = graph.nodes.find((node) => node.id === 'ui:Thumbnail');
-
-		expect(thumbnail).toBeDefined();
-		expect(thumbnail?.compound).toBe(false);
-		expect(thumbnail?.parts).toEqual([]);
-	});
 });

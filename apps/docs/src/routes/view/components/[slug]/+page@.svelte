@@ -14,14 +14,14 @@
 	let hasConfigurator = $derived(configuratorPromise !== null);
 	let previewMode = $derived.by(() => {
 		if (hasConfigurator) return 'live';
-		return hasCustomComponentScreenshotPreview(data.name) ? 'custom' : 'thumbnail';
+		return hasCustomComponentScreenshotPreview(data.name) ? 'custom' : 'fallback';
 	});
 	let previewBadgeLabel = $derived(
 		previewMode === 'live'
 			? 'Live preview'
 			: previewMode === 'custom'
 				? 'Custom preview'
-				: 'Thumbnail preview'
+				: 'Fallback preview'
 	);
 </script>
 

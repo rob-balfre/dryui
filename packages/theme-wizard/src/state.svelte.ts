@@ -80,6 +80,10 @@ function persistState(): void {
 					shape,
 					shadows
 				} = wizardState;
+				const tokens = {
+					light: getAllTokens('light'),
+					dark: getAllTokens('dark')
+				};
 				sessionStorage.setItem(
 					STORAGE_KEY,
 					JSON.stringify({
@@ -90,7 +94,8 @@ function persistState(): void {
 						darkBgOverrides,
 						typography,
 						shape,
-						shadows
+						shadows,
+						tokens
 					})
 				);
 			} catch {
@@ -151,6 +156,15 @@ export function setNeutralMode(mode: NeutralMode): void {
 	persistState();
 }
 
+function resetStyleStateToDefaults(): void {
+	wizardState.neutralMode = DEFAULTS.neutralMode;
+	wizardState.statusHues = { ...DEFAULTS.statusHues };
+	wizardState.darkBgOverrides = { ...DEFAULTS.darkBgOverrides };
+	wizardState.typography = { ...DEFAULTS.typography };
+	wizardState.shape = { ...DEFAULTS.shape };
+	wizardState.shadows = { ...DEFAULTS.shadows };
+}
+
 /** Set the personality (chrome level) and apply cross-step defaults. */
 function applyPersonalityDefaults(p: Personality): void {
 	wizardState.personality = p;
@@ -173,6 +187,7 @@ function applyPersonalityDefaults(p: Personality): void {
 
 /** Set the personality (chrome level) and apply cross-step defaults. */
 export function setPersonality(p: Personality): void {
+	resetStyleStateToDefaults();
 	applyPersonalityDefaults(p);
 	persistState();
 }
@@ -240,16 +255,11 @@ export function setTypeScale(scale: TypeScale): void {
 
 /** Reset all wizard state to defaults. */
 export function resetToDefaults(): void {
-	wizardState.currentStep = 1;
-	wizardState.personality = 'structured';
-	wizardState.brandHsb = { h: 230, s: 65, b: 85 };
-	wizardState.neutralMode = 'monochromatic';
-	wizardState.statusHues = { error: 0, warning: 40, success: 145, info: 210 };
-	wizardState.darkBgOverrides = {};
-	wizardState.fastTrack = false;
-	wizardState.typography = { fontPreset: 'System', scale: 'default' };
-	wizardState.shape = { radiusPreset: 'soft', radiusScale: 1, density: 'default' };
-	wizardState.shadows = { preset: 'elevated', intensity: 1, tintBrand: true };
+	wizardState.currentStep = DEFAULTS.currentStep;
+	wizardState.personality = DEFAULTS.personality;
+	wizardState.brandHsb = { ...DEFAULTS.brandHsb };
+	resetStyleStateToDefaults();
+	wizardState.fastTrack = DEFAULTS.fastTrack;
 	if (typeof sessionStorage !== 'undefined') {
 		sessionStorage.removeItem(STORAGE_KEY);
 	}
@@ -259,15 +269,13 @@ export function resetToDefaults(): void {
 export function applyRecipe(recipe: WizardRecipe): void {
 	wizardState.currentStep = DEFAULTS.currentStep;
 	wizardState.brandHsb = { ...recipe.brand };
+	resetStyleStateToDefaults();
 	wizardState.neutralMode = recipe.neutralMode ?? DEFAULTS.neutralMode;
 	wizardState.statusHues = { ...DEFAULTS.statusHues, ...recipe.statusHues };
-	wizardState.darkBgOverrides = { ...DEFAULTS.darkBgOverrides };
 	wizardState.fastTrack = false;
 	wizardState.typography = recipe.typography
 		? { ...recipe.typography }
 		: { ...DEFAULTS.typography };
-	wizardState.shape = { ...DEFAULTS.shape };
-	wizardState.shadows = { ...DEFAULTS.shadows };
 
 	applyPersonalityDefaults(recipe.personality ?? DEFAULTS.personality);
 

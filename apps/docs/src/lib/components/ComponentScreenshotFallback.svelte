@@ -9,17 +9,14 @@
 		GodRays,
 		Heading,
 		QRCode,
-		Text,
-		Thumbnail
+		Text
 	} from '@dryui/ui';
-	import { resolveComponentThumbnailName } from '$lib/component-screenshots';
 
 	interface Props {
 		name: string;
 	}
 
 	let { name }: Props = $props();
-	let thumbnailName = $derived(resolveComponentThumbnailName(name));
 </script>
 
 {#if name === 'Adjust'}
@@ -91,18 +88,15 @@
 			</div>
 		</div>
 	</div>
-{:else if name === 'Thumbnail'}
-	<div class="stage stage-soft stage-thumbnail">
-		<div class="thumbnail-grid">
-			<Thumbnail.Root name="Button" size={220} />
-			<Thumbnail.Root name="Card" size={220} />
-			<Thumbnail.Root name="Tabs" size={220} />
-			<Thumbnail.Root name="Chart" size={220} />
-		</div>
-	</div>
 {:else}
 	<div class="stage stage-soft">
-		<Thumbnail.Root name={thumbnailName} size={720} />
+		<div class="effect-card">
+			<Badge variant="soft" color="gray" size="sm">Fallback preview</Badge>
+			<Heading level={3}>{name}</Heading>
+			<Text size="sm" color="secondary">
+				Live docs preview is not configured for this component yet.
+			</Text>
+		</div>
 	</div>
 {/if}
 
@@ -197,23 +191,5 @@
 				transparent 40%
 			),
 			linear-gradient(180deg, #ffffff, color-mix(in srgb, var(--dry-color-bg-base) 94%, white));
-	}
-
-	.stage-thumbnail {
-		grid-template-columns: minmax(0, 62rem);
-	}
-
-	.thumbnail-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: var(--dry-space-6);
-		justify-items: center;
-		align-items: center;
-	}
-
-	@container (max-width: 48rem) {
-		.thumbnail-grid {
-			grid-template-columns: 1fr;
-		}
 	}
 </style>

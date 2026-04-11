@@ -18,7 +18,6 @@ export interface LayoutPreset {
 	id: string;
 	name: string;
 	description: string;
-	thumbnail: string;
 	components: string[];
 	regions: string[];
 	snippet: string;
@@ -220,10 +219,6 @@ export const categories: NavCategory[] = [
 	{
 		label: 'Utility',
 		items: [ui('FocusTrap'), ui('Hotkey'), ui('Portal'), ui('Svg'), ui('VisuallyHidden')]
-	},
-	{
-		label: 'Tools',
-		items: [ui('SystemMap'), ui('Thumbnail')]
 	}
 ];
 

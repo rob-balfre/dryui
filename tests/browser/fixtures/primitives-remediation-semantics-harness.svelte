@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Card } from '../../../packages/primitives/src/card/index.js';
+	import { Breadcrumb } from '../../../packages/primitives/src/breadcrumb/index.js';
 	import { Field } from '../../../packages/primitives/src/field/index.js';
 	import { Input } from '../../../packages/primitives/src/input/index.js';
 	import { Label } from '../../../packages/primitives/src/label/index.js';
 	import { Link } from '../../../packages/primitives/src/link/index.js';
-	import { Navbar } from '../../../packages/primitives/src/navbar/index.js';
 	import { NavigationMenu } from '../../../packages/primitives/src/navigation-menu/index.js';
 	import { Toast } from '../../../packages/primitives/src/toast/index.js';
 
@@ -53,7 +53,7 @@
 	</NavigationMenu.List>
 </NavigationMenu.Root>
 
-<Navbar.Item active data-testid="navbar-item">Home</Navbar.Item>
+<Breadcrumb.Link current data-testid="navbar-item">Home</Breadcrumb.Link>
 
 <Toast.Root id="toast-info" variant="info" data-testid="toast-info">Saved</Toast.Root>
 <Toast.Root id="toast-error" variant="error" data-testid="toast-error">Failed</Toast.Root>

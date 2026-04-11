@@ -11,9 +11,6 @@ const typographyIndex = await Bun.file(
 const primitiveTypographyIndex = await Bun.file(
 	new URL('../../../packages/primitives/src/typography/index.ts', import.meta.url)
 ).text();
-const thumbnailIndex = await Bun.file(
-	new URL('../../../packages/ui/src/thumbnail/index.ts', import.meta.url)
-).text();
 
 describe('generate-spec typography parsing', () => {
 	test('captures primitive typography heading props and accepted values', () => {
@@ -37,12 +34,5 @@ describe('generate-spec typography parsing', () => {
 
 		expect(example).toContain('<Typography.Heading');
 		expect(example).not.toContain('.Root');
-	});
-
-	test('does not treat Thumbnail preset entries as compound parts', () => {
-		const parts = parseCompoundParts(thumbnailIndex, 'Thumbnail');
-
-		expect(parts).toBeNull();
-		expect(generateExample('Thumbnail', false)).toBe('<Thumbnail name="Button" size={160} />');
 	});
 });

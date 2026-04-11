@@ -99,7 +99,7 @@ describe('motion surfaces', () => {
 		expect(surface.hasAttribute('data-visible')).toBe(false);
 	});
 
-	it('updates spotlight coordinates from pointer movement', () => {
+	it('updates spotlight coordinates from pointer movement', async () => {
 		const target = render('spotlight');
 		const surface = target.querySelector('[data-testid="spotlight"]');
 
@@ -115,6 +115,7 @@ describe('motion surfaces', () => {
 		surface.dispatchEvent(
 			new PointerEvent('pointermove', { clientX: 70, clientY: 90, bubbles: true })
 		);
+		await new Promise((resolve) => requestAnimationFrame(() => resolve(undefined)));
 		flushSync();
 
 		const inlineStyle = surface.getAttribute('style') ?? '';

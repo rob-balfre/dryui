@@ -3,7 +3,7 @@
 	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
 	import { Text } from '@dryui/ui/text';
 	import { Button } from '@dryui/ui/button';
-	import { getOverrideTokens, wizardState } from '../state.svelte.js';
+	import { getAllTokens, wizardState } from '../state.svelte.js';
 	import StepIndicator from './StepIndicator.svelte';
 
 	interface Props {
@@ -30,7 +30,7 @@
 		onstep
 	}: Props = $props();
 
-	useThemeOverride(() => getOverrideTokens());
+	useThemeOverride(() => getAllTokens());
 </script>
 
 <div class="wizard-shell">

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { Badge, Card, CodeBlock, Container, Heading, Link, Text, Thumbnail } from '@dryui/ui';
+	import { Badge, Card, CodeBlock, Container, Heading, Link, Text } from '@dryui/ui';
 	import { componentLinkResolver } from '$lib/component-links';
 	import { toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
@@ -28,10 +28,6 @@
 			</div>
 			<Heading level={1}>{preset.name}</Heading>
 			<Text size="lg" color="secondary">{preset.description}</Text>
-		</div>
-
-		<div class="thumbnail-center">
-			<Thumbnail.Root name={preset.thumbnail} size={360} />
 		</div>
 
 		<Card.Root>
@@ -79,9 +75,5 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
 		gap: var(--dry-space-2);
-	}
-	.thumbnail-center {
-		display: grid;
-		justify-items: center;
 	}
 </style>

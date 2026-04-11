@@ -1,5 +1,4 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { componentCompositions, compositionRecipes } from './composition-data';
@@ -750,12 +749,6 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		category: 'utility',
 		tags: ['a11y', 'screen-reader', 'hidden', 'accessible']
 	},
-	SystemMap: {
-		description:
-			'Layered architecture diagram that visualizes component nodes, relationships, and dependency layers',
-		category: 'display',
-		tags: ['diagram', 'graph', 'architecture', 'system', 'map']
-	},
 	InputGroup: {
 		description:
 			'Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions',
@@ -786,11 +779,6 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		description: 'Small labeled tag element with color and variant support',
 		category: 'display',
 		tags: ['tag', 'label', 'chip', 'badge', 'category']
-	},
-	Thumbnail: {
-		description: 'Compact preview tile used for component catalogs, galleries, and pickers',
-		category: 'utility',
-		tags: ['thumbnail', 'preview', 'catalog', 'gallery']
 	},
 	Diagram: {
 		description:
@@ -867,7 +855,8 @@ const ELEMENT_NAME_MAP: Record<string, string> = {
 	HTMLTableRowElement: 'tr',
 	HTMLTableSectionElement: 'tbody',
 	HTMLTimeElement: 'time',
-	HTMLUListElement: 'ul'
+	HTMLUListElement: 'ul',
+	SVGSVGElement: 'svg'
 };
 
 const FORWARDED_PROP_EXAMPLES: Record<string, string[]> = {
@@ -974,7 +963,6 @@ const PROP_DESCRIPTIONS: Record<string, string> = {
 	'Select.Root.value': 'Bindable selected value for the current option set.',
 	'Tabs.Root.value': 'Bindable current tab value for controlled tab interfaces.',
 	'Tabs.Trigger.value': 'Tab identifier that activates the matching content panel.',
-	'Thumbnail.name': 'Lookup key for the thumbnail preset rendered by the root component.',
 	'Typography.Heading.level': 'Heading level used to render semantic h1 through h6 output.',
 	'Typography.Text.as': 'Text element to render for inline, block, or paragraph copy.'
 };
@@ -1247,11 +1235,16 @@ function tagNameForBaseType(baseType: string): string | undefined {
 		return ELEMENT_NAME_MAP[htmlAttributesMatch[1]];
 	}
 
+	const svgAttributesMatch = baseType.match(/SVGAttributes<(\w+)>/);
+	if (svgAttributesMatch?.[1] && ELEMENT_NAME_MAP[svgAttributesMatch[1]]) {
+		return ELEMENT_NAME_MAP[svgAttributesMatch[1]];
+	}
+
 	return undefined;
 }
 
 function describeForwardedProps(baseType: string | null): ForwardedPropsShape | null {
-	if (!baseType || !baseType.includes('HTML')) return null;
+	if (!baseType || !(baseType.includes('HTML') || baseType.includes('SVG'))) return null;
 
 	let normalized = baseType.trim();
 	let omitted: string[] = [];
@@ -1266,7 +1259,7 @@ function describeForwardedProps(baseType: string | null): ForwardedPropsShape | 
 
 	const element = tagNameForBaseType(normalized);
 	const examples = element ? (FORWARDED_PROP_EXAMPLES[element] ?? []) : [];
-	const target = element ? `<${element}>` : 'native HTML';
+	const target = element ? `<${element}>` : baseType.includes('SVG') ? 'native SVG' : 'native HTML';
 
 	return {
 		baseType: baseType.trim(),
@@ -1629,7 +1622,6 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	Sparkline: '<Sparkline data={[5, 10, 3, 8, 12, 7]} width={120} height={30} />',
 	VideoEmbed:
 		'<VideoEmbed src="https://youtube.com/watch?v=dQw4w9WgXcQ" provider="youtube" title="Video title" />',
-	Thumbnail: '<Thumbnail name="Button" size={160} />',
 	// Travel Booking Components
 	AddOnSelector:
 		'<AddOnSelector.Root bind:selected={addOns}>\n  <AddOnSelector.Item value="baggage" maxQuantity={3}>\n    <AddOnSelector.ItemLabel>Extra Baggage</AddOnSelector.ItemLabel>\n    <AddOnSelector.ItemPrice>$25/bag</AddOnSelector.ItemPrice>\n  </AddOnSelector.Item>\n</AddOnSelector.Root>',
@@ -1724,24 +1716,6 @@ function generateExample(name: string, compound: boolean, parts?: string[]): str
 
 async function readText(filePath: string): Promise<string> {
 	return readFile(filePath, 'utf8');
-}
-
-function getThumbnailNames(): string[] {
-	const thumbnailDir = resolve(__dirname, '../../ui/src/thumbnail');
-	try {
-		const files = readdirSync(thumbnailDir);
-		return files
-			.filter((f) => f.endsWith('.svelte') && f !== 'root.svelte')
-			.map((f) => f.replace('.svelte', ''))
-			.map((kebab) =>
-				kebab
-					.split('-')
-					.map((w) => w[0]!.toUpperCase() + w.slice(1))
-					.join('')
-			);
-	} catch {
-		return [];
-	}
 }
 
 async function main(): Promise<void> {
@@ -2033,8 +2007,7 @@ async function main(): Promise<void> {
 			),
 			recipes: Object.fromEntries(compositionRecipes.map((r) => [r.name, r]))
 		},
-		ai: aiSurface,
-		thumbnails: getThumbnailNames()
+		ai: aiSurface
 	};
 
 	await writeFile(outPath, JSON.stringify(spec, null, 2));

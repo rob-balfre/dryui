@@ -47,6 +47,7 @@ export function useThemeOverride(getTokens: () => ThemeTokenMap): void {
 			for (const k in previous) {
 				el.style.removeProperty(k);
 			}
+			previous = {};
 		};
 	});
 }

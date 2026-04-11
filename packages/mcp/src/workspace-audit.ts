@@ -86,12 +86,7 @@ const DEFAULT_EXCLUDED_SEGMENTS = new Set([
 	'test',
 	'tests'
 ]);
-const DEFAULT_EXCLUDED_PATHS = new Set([
-	'apps/studio',
-	'packages/canvas',
-	'packages/hand-tracking',
-	'packages/studio-server'
-]);
+const DEFAULT_EXCLUDED_PATHS = new Set<string>();
 const MAX_SEVERITY: Record<WorkspaceSeverity, number> = { info: 0, warning: 1, error: 2 };
 
 function normalizePath(path: string): string {

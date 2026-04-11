@@ -43,7 +43,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, 72rem);
 		justify-content: center;
-		align-content: center;
+		align-content: start;
 		padding-block: clamp(var(--dry-space-8), 8vw, var(--dry-space-12));
 	}
 

@@ -1,7 +1,8 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
-	import { applyRecipe, decodeRecipe, getOverrideTokens } from '@dryui/theme-wizard';
+	import { applyRecipe, decodeRecipe, getAllTokens } from '@dryui/theme-wizard';
 	import { Badge, Button, Container, Drawer, Heading, Link } from '@dryui/ui';
 	import { Menu } from 'lucide-svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
@@ -13,11 +14,13 @@
 	import { withBase } from '$lib/utils';
 	import '../app.css';
 
-	const THEME_WIZARD_OVERRIDES_STORAGE_KEY = 'dryui-docs-theme-overrides';
-
 	let { children: routeChildren } = $props();
 	let mobileNavOpen = $state(false);
-	let lastAppliedRecipe = $state<string | null>(null);
+	let lastAppliedRecipe: string | null = null;
+
+	function isThemeWizardPath(pathname: string): boolean {
+		return pathname.startsWith('/theme-wizard') || pathname.startsWith(withBase('/theme-wizard'));
+	}
 
 	function getRelativeTime(iso: string): string {
 		const diff = Date.now() - new Date(iso).getTime();
@@ -45,23 +48,22 @@
 		page.url.pathname.startsWith('/view/') || page.url.pathname.startsWith(withBase('/view/'))
 	);
 	let themeMode = $derived(isDarkTheme() ? 'dark' : 'light');
-	let lightThemeWizardOverrides = $derived.by(() => getOverrideTokens('light'));
-	let darkThemeWizardOverrides = $derived.by(() => getOverrideTokens('dark'));
-	let activeThemeWizardOverrides = $derived(
-		themeMode === 'dark' ? darkThemeWizardOverrides : lightThemeWizardOverrides
+	let lightThemeWizardTokens = $derived.by(() => getAllTokens('light'));
+	let darkThemeWizardTokens = $derived.by(() => getAllTokens('dark'));
+	let activeThemeWizardTokens = $derived(
+		themeMode === 'dark' ? darkThemeWizardTokens : lightThemeWizardTokens
 	);
-	let isThemeWizardRoute = $derived(
-		page.url.pathname.startsWith('/theme-wizard') ||
-			page.url.pathname.startsWith(withBase('/theme-wizard'))
-	);
-	let recipeParam = $derived(page.url.searchParams.get('t'));
+	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
 
-	useThemeOverride(() => (isThemeWizardRoute ? activeThemeWizardOverrides : {}));
+	useThemeOverride(() => (isThemeWizardRoute ? activeThemeWizardTokens : {}));
 
-	$effect(() => {
-		if (!isThemeWizardRoute) return;
+	afterNavigate(() => {
+		if (!isThemeWizardPath(page.url.pathname)) {
+			lastAppliedRecipe = null;
+			return;
+		}
 
-		const recipe = recipeParam;
+		const recipe = page.url.searchParams.get('t');
 		if (!recipe) {
 			lastAppliedRecipe = null;
 			return;
@@ -75,25 +77,6 @@
 		} catch {
 			// Ignore malformed recipe URLs and leave the current in-memory state alone.
 		}
-	});
-
-	$effect(() => {
-		const light = lightThemeWizardOverrides;
-		const dark = darkThemeWizardOverrides;
-
-		const timer = setTimeout(() => {
-			try {
-				if (Object.keys(light).length === 0 && Object.keys(dark).length === 0) {
-					sessionStorage.removeItem(THEME_WIZARD_OVERRIDES_STORAGE_KEY);
-					return;
-				}
-				sessionStorage.setItem(THEME_WIZARD_OVERRIDES_STORAGE_KEY, JSON.stringify({ light, dark }));
-			} catch {
-				// Ignore storage access failures.
-			}
-		}, 300);
-
-		return () => clearTimeout(timer);
 	});
 </script>
 

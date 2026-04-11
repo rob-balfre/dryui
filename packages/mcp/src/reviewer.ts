@@ -500,29 +500,6 @@ function findTagOffset(
 	return -1;
 }
 
-function checkMissingThumbnail(
-	imports: Set<string>,
-	spec: { components: Record<string, ComponentDef>; thumbnails?: string[] }
-): Issue[] {
-	if (!spec.thumbnails) return [];
-	const issues: Issue[] = [];
-	const thumbnailSet = new Set(spec.thumbnails);
-
-	for (const name of imports) {
-		if (!spec.components[name]) continue;
-		if (!thumbnailSet.has(name)) {
-			issues.push({
-				severity: 'warning',
-				code: 'missing-thumbnail',
-				line: 1,
-				message: `Component '${name}' has no SVG thumbnail — run 'bun run thumbnail:create ${name}'`,
-				fix: null
-			});
-		}
-	}
-	return issues;
-}
-
 function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
 	const issues: Issue[] = [];
 	for (const tag of tags) {
@@ -822,7 +799,7 @@ function checkRawHr(code: string): Issue[] {
 
 export function reviewComponent(
 	code: string,
-	spec: { components: Record<string, ComponentDef>; thumbnails?: string[] },
+	spec: { components: Record<string, ComponentDef> },
 	filename?: string
 ): ReviewResult {
 	const imports = extractImports(code);
@@ -841,7 +818,6 @@ export function reviewComponent(
 	issues.push(...checkOrphanedPart(tags, spec));
 	issues.push(...checkMissingLabel(tags, code));
 	issues.push(...checkImageWithoutAlt(tags));
-	issues.push(...checkMissingThumbnail(imports, spec));
 	issues.push(...checkCustomFieldMarkup(code));
 	issues.push(...checkRawStyledButton(code));
 	if (styles) {

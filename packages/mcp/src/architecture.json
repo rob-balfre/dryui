@@ -2,15 +2,15 @@
   "schema": "DolphinGraph",
   "packageVersion": "0.2.2",
   "summary": {
-    "componentNodes": 291,
-    "partNodes": 662,
+    "componentNodes": 290,
+    "partNodes": 663,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
-    "uiComponents": 146,
+    "uiComponents": 145,
     "uiWrappers": 130,
-    "uiComposites": 16,
-    "rootBarrelComponents": 290,
+    "uiComposites": 15,
+    "rootBarrelComponents": 289,
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
@@ -11087,11 +11087,25 @@
       "parts": [
         "Root",
         "Item",
-        "Handle"
+        "Handle",
+        "Group"
       ],
-      "sourceFileCount": 5,
+      "sourceFileCount": 7,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
+    },
+    {
+      "id": "ui:DragAndDrop.Group",
+      "name": "DragAndDrop.Group",
+      "label": "Group",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "interaction",
+      "description": "Group part for DragAndDrop.",
+      "tags": [],
+      "compound": false,
+      "parts": []
     },
     {
       "id": "ui:DragAndDrop.Handle",
@@ -15627,30 +15641,6 @@
       "componentImportCount": 0
     },
     {
-      "id": "ui:Thumbnail",
-      "name": "Thumbnail",
-      "label": "Thumbnail",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "utility",
-      "description": "Compact preview tile used for component catalogs, galleries, and pickers",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/thumbnail/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [
-        "thumbnail",
-        "preview",
-        "catalog",
-        "gallery"
-      ],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 186,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 1
-    },
-    {
       "id": "ui:TimeInput",
       "name": "TimeInput",
       "label": "TimeInput",
@@ -19804,6 +19794,13 @@
       "from": "ui:Dialog",
       "to": "ui:Dialog.Trigger",
       "label": "Trigger"
+    },
+    {
+      "id": "compound_part:ui:DragAndDrop:ui:DragAndDrop.Group:Group",
+      "type": "compound_part",
+      "from": "ui:DragAndDrop",
+      "to": "ui:DragAndDrop.Group",
+      "label": "Group"
     },
     {
       "id": "compound_part:ui:DragAndDrop:ui:DragAndDrop.Handle:Handle",
@@ -24358,7 +24355,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 15\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

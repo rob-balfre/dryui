@@ -4485,7 +4485,7 @@ export const componentCompositions: ComponentComposition[] = [
 			{
 				rank: 1,
 				component: 'OptionSwatchGroup',
-				useWhen: 'Product options or visual selections benefit from thumbnails or color chips',
+				useWhen: 'Product options or visual selections benefit from swatches or color chips',
 				snippet: `<OptionSwatchGroup.Root bind:value={color}>
   <OptionSwatchGroup.Item value="sage">
     <OptionSwatchGroup.Swatch color="#7da174" />

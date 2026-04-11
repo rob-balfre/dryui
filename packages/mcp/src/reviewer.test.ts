@@ -692,61 +692,6 @@ describe('Nested brace handling', () => {
 	});
 });
 
-describe('Thumbnail check (warning)', () => {
-	test('warns when component has no thumbnail', () => {
-		const code = `
-<script>
-  import { Button } from '@dryui/ui';
-</script>
-<Button>Click</Button>`;
-
-		const specWithThumbnails = {
-			components: {
-				...mockSpec.components
-			},
-			thumbnails: ['Card', 'Alert']
-		};
-
-		const result = reviewComponent(code, specWithThumbnails);
-		const issue = result.issues.find((i) => i.code === 'missing-thumbnail');
-		expect(issue).toBeDefined();
-		expect(issue!.severity).toBe('warning');
-		expect(issue!.message).toContain('Button');
-		expect(issue!.message).toContain('thumbnail:create');
-	});
-
-	test('no warning when component has thumbnail', () => {
-		const code = `
-<script>
-  import { Button } from '@dryui/ui';
-</script>
-<Button>Click</Button>`;
-
-		const specWithThumbnails = {
-			components: {
-				...mockSpec.components
-			},
-			thumbnails: ['Button', 'Card']
-		};
-
-		const result = reviewComponent(code, specWithThumbnails);
-		const issue = result.issues.find((i) => i.code === 'missing-thumbnail');
-		expect(issue).toBeUndefined();
-	});
-
-	test('no warning when thumbnails list not provided', () => {
-		const code = `
-<script>
-  import { Button } from '@dryui/ui';
-</script>
-<Button>Click</Button>`;
-
-		const result = reviewComponent(code, mockSpec);
-		const issue = result.issues.find((i) => i.code === 'missing-thumbnail');
-		expect(issue).toBeUndefined();
-	});
-});
-
 describe('Issue code property', () => {
 	test('every issue has a code property', () => {
 		const code = `<script>
