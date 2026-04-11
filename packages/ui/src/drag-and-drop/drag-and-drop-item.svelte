@@ -66,6 +66,7 @@
 	data-dnd-item
 	data-index={index}
 	data-dragging={itemIsDragging ? '' : undefined}
+	data-drag-active={ctx.isDragging ? '' : undefined}
 	data-over={isOver ? '' : undefined}
 	onpointerdown={handlePointerDown}
 	onpointerup={handlePointerUp}
@@ -102,10 +103,9 @@
 	}
 
 	[data-dnd-item][data-dragging] {
-		opacity: var(--dry-dnd-drag-opacity, 0.5);
-		transform: scale(var(--dry-dnd-drag-scale, 1.02));
-		box-shadow: var(--dry-dnd-drag-shadow, var(--dry-shadow-lg));
-		z-index: var(--dry-dnd-drag-z-index, var(--dry-layer-overlay));
+		opacity: var(--dry-dnd-placeholder-opacity, 0.3);
+		border-style: dashed;
+		box-shadow: none;
 	}
 
 	[data-dnd-item][data-over]::before {

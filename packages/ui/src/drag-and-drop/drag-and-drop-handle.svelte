@@ -16,6 +16,7 @@
 	ctx.registerHandle();
 
 	function handlePointerDown(e: PointerEvent) {
+		if (e.button !== 0) return;
 		e.preventDefault();
 		e.stopPropagation();
 		ctx.startDrag(index, e);
@@ -34,6 +35,7 @@
 	tabindex="0"
 	aria-roledescription="drag handle"
 	aria-label="Drag to reorder"
+	aria-pressed={ctx.isDragging && ctx.draggedIndex === index ? 'true' : undefined}
 	data-dnd-handle
 	data-dragging={ctx.isDragging && ctx.draggedIndex === index ? '' : undefined}
 	onpointerdown={handlePointerDown}
