@@ -20,16 +20,12 @@
 
 	let rootElement: HTMLDivElement | undefined = $state();
 
-	// Drag threshold — prevents accidental drags on touch devices
 	let isPending = $state(false);
 	let startX = 0;
 	let startY = 0;
 	let pointerX = 0;
 	let pointerY = 0;
-	let offsetX = 0;
-	let offsetY = 0;
 
-	// Floating drag preview
 	let previewEl: HTMLElement | null = null;
 	let rafId: number | null = null;
 
@@ -55,8 +51,6 @@
 		if (!draggedEl) return;
 
 		const rect = draggedEl.getBoundingClientRect();
-		offsetX = startX - rect.left;
-		offsetY = startY - rect.top;
 
 		const clone = draggedEl.cloneNode(true) as HTMLElement;
 		clone.setAttribute('data-dnd-preview', '');
@@ -93,7 +87,6 @@
 	function updateOverIndex() {
 		if (draggedIndex === null || !rootElement) return;
 
-		// Use elementsFromPoint for precise hit detection
 		const els = document.elementsFromPoint(pointerX, pointerY);
 
 		for (const el of els) {
@@ -101,13 +94,12 @@
 			if (item && rootElement.contains(item)) {
 				const idx = parseInt(item.getAttribute('data-index') || '', 10);
 				if (!isNaN(idx)) {
-					overIndex = idx;
+					if (overIndex !== idx) overIndex = idx;
 					return;
 				}
 			}
 		}
 
-		// Fallback: closest item by center distance
 		const itemElements = Array.from(
 			rootElement.querySelectorAll<HTMLElement>('[data-dnd-item]')
 		);
@@ -130,7 +122,7 @@
 			}
 		}
 
-		overIndex = closestIndex;
+		if (overIndex !== closestIndex) overIndex = closestIndex;
 	}
 
 	function autoScroll() {
@@ -188,7 +180,7 @@
 		if (isPending && !isDragging) {
 			const dx = e.clientX - startX;
 			const dy = e.clientY - startY;
-			if (Math.sqrt(dx * dx + dy * dy) < DRAG_THRESHOLD) return;
+			if (dx * dx + dy * dy < DRAG_THRESHOLD * DRAG_THRESHOLD) return;
 
 			isPending = false;
 			isDragging = true;
