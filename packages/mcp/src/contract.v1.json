@@ -13876,7 +13876,13 @@
           "name": "data-dnd-item"
         },
         {
+          "name": "data-dnd-preview"
+        },
+        {
           "name": "data-dnd-root"
+        },
+        {
+          "name": "data-drag-active"
         },
         {
           "name": "data-dragging"
