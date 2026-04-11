@@ -1,6 +1,6 @@
 {
   "name": "@dryui/theme-wizard",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -37,15 +37,15 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "peerDependencies": {
-    "@dryui/primitives": "^0.2.0",
-    "@dryui/ui": "^0.2.0",
+    "@dryui/primitives": "^0.3.0",
+    "@dryui/ui": "^0.3.0",
     "lucide-svelte": ">=1.0.1",
     "svelte": "^5.55.1"
   },
   "devDependencies": {
     "@dryui/lint": "^0.2.0",
-    "@dryui/primitives": "^0.2.0",
-    "@dryui/ui": "^0.2.0",
+    "@dryui/primitives": "^0.3.0",
+    "@dryui/ui": "^0.3.0",
     "lucide-svelte": "^1.0.1",
     "svelte": "^5.55.3",
     "@sveltejs/package": "^2.5.7",
