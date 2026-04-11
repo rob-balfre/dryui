@@ -77,11 +77,14 @@
 			'pointer-events: none',
 			'will-change: transform',
 			'z-index: 9999',
+			'opacity: 0.9',
+			'box-shadow: var(--dry-shadow-lg)',
 			'transition: none'
 		].join(';');
 
-		rootElement.appendChild(clone);
+		document.body.appendChild(clone);
 		previewEl = clone;
+		updatePreviewPosition();
 	}
 
 	function updatePreviewPosition() {
@@ -356,10 +359,5 @@
 
 	[data-dnd-root][data-dragging] {
 		cursor: grabbing;
-	}
-
-	[data-dnd-preview] {
-		opacity: var(--dry-dnd-preview-opacity, 0.9);
-		box-shadow: var(--dry-dnd-preview-shadow, var(--dry-shadow-lg));
 	}
 </style>

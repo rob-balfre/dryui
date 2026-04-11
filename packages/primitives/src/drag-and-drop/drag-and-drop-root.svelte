@@ -73,8 +73,9 @@
 			'transition: none'
 		].join(';');
 
-		rootElement.appendChild(clone);
+		document.body.appendChild(clone);
 		previewEl = clone;
+		updatePreviewPosition();
 	}
 
 	function updatePreviewPosition() {
