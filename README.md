@@ -83,7 +83,7 @@ import { MarkdownRenderer } from '@dryui/primitives/markdown-renderer';
 
 ## Components
 
-Accordion, Alert, Alert Dialog, App Bar, Aspect Ratio, Avatar, Backdrop, Badge, Breadcrumb, Button, Button Group, Calendar, Card, Carousel, Chart, Chat Message, Checkbox, Circular Progress, Clipboard, Code Block, Collapsible, Color Picker, Combobox, Command Palette, Container, Context Menu, Data Grid, Date Field, Date Picker, Date Range Picker, Dialog, Drag and Drop, Drawer, Dropdown Menu, Empty State, Field, File Upload, Flex, Float Button, Focus Trap, Format Bytes, Format Date, Format Number, Grid, Hotkey, Hover Card, Image, Image Comparison, Infinite Scroll, Input, Kbd, Label, Link, Link Preview, List, Listbox, Markdown Renderer, Marquee, Menubar, Navigation Menu, Number Input, Pagination, Pin Input, Popover, Portal, Progress, Progress Ring, Prompt Input, QR Code, Radio Group, Range Calendar, Rating, Relative Time, Rich Text Editor, Scroll Area, Scroll To Top, Select, Separator, Sidebar, Skeleton, Slider, Spacer, Spinner, Splitter, Stack, Stepper, Switch, Table, Table Of Contents, Tabs, Tag, Tags Input, Textarea, Time Input, Timeline, Toast, Toggle, Toggle Group, Toolbar, Tooltip, Tour, Transfer, Tree, Typography, Virtual List, Visually Hidden
+Accordion, Adjust, Alert, Alert Dialog, Alpha Slider, Aspect Ratio, Aurora, Avatar, Backdrop, Badge, Beam, Breadcrumb, Button, Button Group, Calendar, Card, Carousel, Chart, Chat Thread, Checkbox, Chip, Chip Group, Chromatic Aberration, Chromatic Shift, Clipboard, Code Block, Collapsible, Color Picker, Combobox, Command Palette, Container, Context Menu, Country Select, Data Grid, Date Field, Date Picker, Date Range Picker, Date Time Input, Description List, Diagram, Dialog, Displacement, Drag and Drop, Drawer, Drop Zone, Dropdown Menu, Field, Fieldset, File Select, File Upload, Flip Card, Float Button, Focus Trap, Format Bytes, Format Date, Format Number, Gauge, Glass, Glow, God Rays, Gradient Mesh, Halftone, Heading, Hotkey, Hover Card, Icon, Image, Image Comparison, Infinite Scroll, Input, Input Group, Kbd, Label, Link, Link Preview, List, Listbox, Logo Mark, Map, Markdown Renderer, Marquee, Mask Reveal, Mega Menu, Menubar, Multi Select Combobox, Navigation Menu, Noise, Notification Center, Number Input, Option Swatch Group, Pagination, Phone Input, Pin Input, Popover, Portal, Progress, Progress Ring, Prompt Input, QR Code, Radio Group, Range Calendar, Rating, Relative Time, Reveal, Rich Text Editor, Scroll Area, Scroll To Top, Segmented Control, Select, Separator, Shader Canvas, Sidebar, Skeleton, Slider, Spacer, Sparkline, Spinner, Splitter, Spotlight, Star Rating, Stepper, Svg, Table, Table Of Contents, Tabs, Tag, Tags Input, Text, Textarea, Time Input, Timeline, Toast, Toggle, Toggle Group, Toolbar, Tooltip, Tour, Transfer, Tree, Typing Indicator, Typography, Video Embed, Virtual List, Visually Hidden
 
 ## AI Integration
 
@@ -253,19 +253,22 @@ bun run screenshots:components
 
 ```
 packages/
-  primitives/   # @dryui/primitives — headless components
-  ui/           # @dryui/ui — styled components
-  mcp/          # @dryui/mcp — MCP server + spec generator
-  cli/          # @dryui/cli — CLI tool
-  lint/         # @dryui/lint — CSS lint preprocessor
+  primitives/       # @dryui/primitives — headless components
+  ui/               # @dryui/ui — styled components
+  mcp/              # @dryui/mcp — MCP server + spec generator
+  cli/              # @dryui/cli — CLI tool
+  lint/             # @dryui/lint — CSS lint preprocessor
+  feedback/         # @dryui/feedback — feedback annotation UI
+  feedback-server/  # @dryui/feedback-server — feedback MCP backend
+  theme-wizard/     # @dryui/theme-wizard — theme generation library
+  plugin/           # @dryui/plugin — Claude Code + Codex plugin
 
 apps/
-  docs/         # Documentation site (SvelteKit)
-  playground/   # Interactive playground (SvelteKit)
+  docs/             # Documentation site (SvelteKit)
 
 tests/
-  unit/         # Bun test + happy-dom
-  browser/      # Vitest + Playwright
+  unit/             # Bun test + happy-dom
+  browser/          # Vitest + Playwright
 ```
 
 ### Publishing

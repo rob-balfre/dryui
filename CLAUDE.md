@@ -12,6 +12,7 @@ Bun monorepo: zero-dependency Svelte 5 components built on native browser APIs.
 - `packages/feedback` — @dryui/feedback: feedback annotation UI components
 - `packages/feedback-server` — @dryui/feedback-server: feedback MCP server backend
 - `packages/theme-wizard` — @dryui/theme-wizard: theme generation library (brand color → full theme)
+- `packages/plugin` — @dryui/plugin: Claude Code + Codex plugin (bundles skill, MCP server, and feedback)
 - `apps/docs` — Documentation site (SvelteKit, static adapter)
 
 ## Commands
