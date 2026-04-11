@@ -1,7 +1,14 @@
 <script>
 	import { DragAndDrop } from '@dryui/ui';
 
-	let items = $state(['Organize workspace', 'Review pull requests', 'Update documentation']);
+	let items = $state([
+		'Design system audit',
+		'Review pull requests',
+		'Update documentation',
+		'Write release notes',
+		'Fix accessibility issues',
+		'Deploy to staging'
+	]);
 </script>
 
 <div class="demo">
