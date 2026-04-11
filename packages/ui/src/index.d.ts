@@ -256,8 +256,6 @@ export { MegaMenu } from './mega-menu/index.js';
 export type { MegaMenuRootProps, MegaMenuItemProps, MegaMenuTriggerProps, MegaMenuPanelProps, MegaMenuColumnProps, MegaMenuLinkProps } from './mega-menu/index.js';
 export { Map } from './map/index.js';
 export type { MapRootProps, MapMarkerProps, MapPopupProps, MapLayerProps, MapControlsProps, LngLat, MapInstance, MapLibrary, MapMarkerInstance, MapPopupInstance, MapOptions, MapControl, MapSource, MarkerOptions, PopupOptions, GeoJsonData } from './map/index.js';
-export { SystemMap } from './system-map/index.js';
-export type { DolphinCluster, DolphinEdge, DolphinEdgeType, DolphinGraph, DolphinLayer, DolphinMismatch, DolphinMismatchKind, DolphinNode, DolphinNodeKind, DolphinPackage, DolphinSignals, DolphinSummary, DolphinVisibility, SystemMapProps, SystemMapEdge, SystemMapEdgeKind, SystemMapGraph, SystemMapLayer, SystemMapNode, SystemMapNodeKind, SystemMapVisibility } from './system-map/index.js';
 export { ChromaticShift } from './chromatic-shift/index.js';
 export type { ChromaticShiftProps } from './chromatic-shift/index.js';
 export { ChromaticAberration } from './chromatic-aberration/index.js';
@@ -286,7 +284,6 @@ export { ShaderCanvas, PRESETS as SHADER_PRESETS } from './shader-canvas/index.j
 export type { ShaderCanvasProps, ShaderCanvasPreset } from './shader-canvas/index.js';
 export { Svg } from './svg/index.js';
 export type { SvgProps } from './svg/index.js';
-export { Thumbnail } from './thumbnail/index.js';
 export { StarRating } from './star-rating/index.js';
 export type { StarRatingRootProps } from './star-rating/index.js';
 export { Tag } from './tag/index.js';

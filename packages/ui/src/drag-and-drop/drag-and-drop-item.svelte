@@ -13,7 +13,10 @@
 	const ctx = getDragAndDropCtx();
 
 	let itemIsDragging = $derived(ctx.draggedIndex === index);
-	let isOver = $derived(ctx.overIndex === index && ctx.isDragging && ctx.draggedIndex !== index);
+	let isOver = $derived(
+		(ctx.overIndex === index && ctx.isDragging && ctx.draggedIndex !== index) ||
+			ctx.foreignOverIndex === index
+	);
 
 	let grabbing = $state(false);
 
@@ -103,12 +106,20 @@
 	}
 
 	[data-dnd-item][data-dragging] {
-		opacity: var(--dry-dnd-placeholder-opacity, 0.3);
-		border-style: dashed;
+		background: var(--dry-color-bg-sunken);
+		border-color: transparent;
 		box-shadow: none;
 	}
 
-	[data-dnd-item][data-over]::before {
+	[data-dnd-item][data-dragging]::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: inherit;
+		border-radius: inherit;
+	}
+
+	[data-dnd-item]::before {
 		content: '';
 		position: absolute;
 		left: 0;
@@ -119,5 +130,13 @@
 		height: var(--dry-dnd-indicator-size, 2px);
 		background: var(--dry-dnd-indicator-color, var(--dry-color-fill-brand));
 		border-radius: var(--dry-dnd-indicator-size, 2px);
+		opacity: 0;
+		transition: opacity var(--dry-duration-fast) var(--dry-ease-default);
+		pointer-events: none;
+	}
+
+	[data-dnd-item][data-over]::before {
+		opacity: 1;
+		transition: none;
 	}
 </style>

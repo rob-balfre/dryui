@@ -768,31 +768,6 @@ export type {
 	GeoJsonData
 } from './map/index.js';
 
-export { SystemMap } from './system-map/index.js';
-export type {
-	DolphinCluster,
-	DolphinEdge,
-	DolphinEdgeType,
-	DolphinGraph,
-	DolphinLayer,
-	DolphinMismatch,
-	DolphinMismatchKind,
-	DolphinNode,
-	DolphinNodeKind,
-	DolphinPackage,
-	DolphinSignals,
-	DolphinSummary,
-	DolphinVisibility,
-	SystemMapProps,
-	SystemMapEdge,
-	SystemMapEdgeKind,
-	SystemMapGraph,
-	SystemMapLayer,
-	SystemMapNode,
-	SystemMapNodeKind,
-	SystemMapVisibility
-} from './system-map/index.js';
-
 // Animation & Visual Effects
 
 export { ChromaticShift } from './chromatic-shift/index.js';
@@ -836,8 +811,6 @@ export type { ShaderCanvasProps, ShaderCanvasPreset } from './shader-canvas/inde
 
 export { Svg } from './svg/index.js';
 export type { SvgProps } from './svg/index.js';
-
-export { Thumbnail } from './thumbnail/index.js';
 
 export { StarRating } from './star-rating/index.js';
 export type { StarRatingRootProps } from './star-rating/index.js';

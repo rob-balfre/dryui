@@ -114,6 +114,99 @@
 						x={lane.lineX}
 						y={lane.headerY + 20}>{lane.label}</text
 					>
+					<text data-part="swimlane-footer" data-color={lane.color} x={lane.lineX} y={lane.footerY}
+						>{lane.label}</text
+					>
+				{/each}
+			</g>
+		{/if}
+
+		<!-- Layer: Lifelines -->
+		{#if layout.lifelines.length > 0}
+			<g data-part="lifelines">
+				{#each layout.lifelines as lifeline (lifeline.id)}
+					<g data-part="lifeline" data-color={lifeline.color}>
+						<rect
+							data-part="lifeline-box"
+							x={lifeline.x - 60}
+							y={lifeline.topY}
+							width={120}
+							height={36}
+							rx="4"
+						/>
+						<text data-part="lifeline-label" x={lifeline.x} y={lifeline.topY + 22}
+							>{lifeline.label}</text
+						>
+						<path
+							data-part="lifeline-line"
+							d="M {lifeline.x} {lifeline.topY + 36} L {lifeline.x} {lifeline.bottomY - 36}"
+						/>
+						<rect
+							data-part="lifeline-box"
+							x={lifeline.x - 60}
+							y={lifeline.bottomY - 36}
+							width={120}
+							height={36}
+							rx="4"
+						/>
+						<text data-part="lifeline-label" x={lifeline.x} y={lifeline.bottomY - 14}
+							>{lifeline.label}</text
+						>
+					</g>
+				{/each}
+			</g>
+		{/if}
+
+		<!-- Layer: Fragments -->
+		{#if layout.positionedFragments.length > 0}
+			<g data-part="fragments">
+				{#each layout.positionedFragments as frag (frag.id)}
+					<g data-part="fragment" data-color={frag.color}>
+						<rect
+							data-part="fragment-box"
+							x={frag.x}
+							y={frag.y}
+							width={frag.width}
+							height={frag.height}
+							rx="4"
+							data-dashed={frag.dashed || undefined}
+						/>
+						<rect data-part="fragment-tag" x={frag.x} y={frag.y} width={80} height={20} rx="4" />
+						<text data-part="fragment-label" x={frag.x + 8} y={frag.y + 14}
+							>{frag.label}{frag.condition ? ` [${frag.condition}]` : ''}</text
+						>
+					</g>
+				{/each}
+			</g>
+		{/if}
+
+		<!-- Layer: Messages -->
+		{#if layout.messages.length > 0}
+			<g data-part="messages">
+				{#each layout.messages as msg, index (`msg-${index}`)}
+					{@const markerEnd =
+						msg.arrow === 'end' || msg.arrow === 'both'
+							? `url(#dry-diagram-${uid}-arrow-${msg.color})`
+							: undefined}
+					<g data-part="message" data-color={msg.color}>
+						{#if msg.isSelf}
+							<path
+								data-part="message-line"
+								d="M {msg.x1} {msg.y} L {msg.x1 + 30} {msg.y} L {msg.x1 + 30} {msg.y +
+									24} L {msg.x1} {msg.y + 24}"
+								marker-end={markerEnd}
+								data-dashed={msg.dashed || undefined}
+							/>
+						{:else}
+							<path
+								data-part="message-line"
+								d="M {msg.x1} {msg.y} L {msg.x2} {msg.y}"
+								marker-end={markerEnd}
+								data-dashed={msg.dashed || undefined}
+							/>
+						{/if}
+						<text data-part="message-label" x={msg.labelX} y={msg.labelY}>{msg.label}</text>
+					</g>
 				{/each}
 			</g>
 		{/if}
@@ -129,6 +222,7 @@
 					edge.arrow === 'start' || edge.arrow === 'both'
 						? `url(#dry-diagram-${uid}-arrow-${edge.color})`
 						: undefined}
+				{@const isSelfLoop = edge.from === edge.to}
 				<g data-part="edge" data-color={edge.color}>
 					<path
 						data-part="edge-path"
@@ -138,7 +232,12 @@
 						data-dashed={edge.dashed || undefined}
 					/>
 					{#if edge.label}
-						<text data-part="edge-label" x={edge.labelX} y={edge.labelY + 3}>{edge.label}</text>
+						<text
+							data-part="edge-label"
+							data-self-loop={isSelfLoop || undefined}
+							x={isSelfLoop ? edge.labelX + 24 : edge.labelX}
+							y={edge.labelY + 3}>{edge.label}</text
+						>
 					{/if}
 				</g>
 			{/each}
@@ -171,7 +270,10 @@
 						/>
 					{/if}
 					<foreignObject x="0" y="0" width={node.width} height={node.height}>
-						<div data-part="node-content">
+						<div data-part="node-content" data-has-description={node.description ? '' : undefined}>
+							{#if node.icon}
+								<span data-part="node-icon">{node.icon}</span>
+							{/if}
 							<span data-part="node-label">{node.label}</span>
 							{#if node.description}
 								<span data-part="node-description">{node.description}</span>
@@ -198,6 +300,8 @@
 	[data-diagram-container] {
 		display: grid;
 		min-height: 120px;
+		max-block-size: var(--dry-diagram-max-height, none);
+		overflow: auto;
 	}
 
 	/* ── SVG root ───────────────────────────────────── */
@@ -284,13 +388,25 @@
 		white-space: nowrap;
 	}
 
+	[data-part='node-icon'] {
+		font-size: 16px;
+		line-height: 1;
+		text-align: center;
+	}
+
 	[data-part='node-description'] {
 		font-family: var(--dry-font-mono);
-		font-size: 9px;
+		font-size: 11px;
 		font-weight: 400;
 		color: var(--_text-muted);
 		text-align: center;
-		line-height: 1.2;
+		line-height: 1.3;
+	}
+
+	[data-part='node-content'][data-has-description] {
+		padding: 10px 24px;
+		text-align: left;
+		place-items: start;
 	}
 
 	/* ── Node variant: outlined ──────────────────── */
@@ -376,6 +492,10 @@
 		text-anchor: middle;
 	}
 
+	[data-part='edge-label'][data-self-loop] {
+		text-anchor: start;
+	}
+
 	/* ── Clusters ───────────────────────────────────── */
 	[data-part='cluster-box'] {
 		fill: var(--_cluster-bg);
@@ -445,6 +565,16 @@
 		letter-spacing: 0.1em;
 	}
 
+	[data-part='swimlane-footer'] {
+		font-family: var(--dry-font-mono);
+		font-size: 10px;
+		font-weight: 700;
+		fill: var(--_text-muted);
+		text-anchor: middle;
+		text-transform: uppercase;
+		letter-spacing: 0.1em;
+	}
+
 	/* ── Annotations ────────────────────────────────── */
 	[data-part='annotation'] {
 		font-family: var(--dry-font-mono);
@@ -466,5 +596,174 @@
 	}
 	[data-part='annotation'][data-color='info'] {
 		fill: var(--dry-color-text-info);
+	}
+
+	/* ── Lifelines ──────────────────────────────────── */
+	[data-part='lifeline-box'] {
+		fill: var(--_node-bg);
+		stroke: var(--_node-border);
+		stroke-width: 2;
+	}
+
+	[data-part='lifeline-label'] {
+		font-family: var(--dry-font-mono);
+		font-size: 11px;
+		font-weight: 700;
+		fill: var(--_node-color);
+		text-anchor: middle;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	[data-part='lifeline-line'] {
+		fill: none;
+		stroke: var(--_edge-color);
+		stroke-width: 1;
+		stroke-dasharray: 4 3;
+	}
+
+	[data-part='lifeline'][data-color='brand'] {
+		--_node-border: var(--dry-color-stroke-brand);
+		--_node-color: var(--dry-color-text-brand);
+	}
+	[data-part='lifeline'][data-color='success'] {
+		--_node-border: var(--dry-color-stroke-success);
+		--_node-color: var(--dry-color-text-success);
+	}
+	[data-part='lifeline'][data-color='warning'] {
+		--_node-border: var(--dry-color-stroke-warning);
+		--_node-color: var(--dry-color-text-warning);
+	}
+	[data-part='lifeline'][data-color='error'] {
+		--_node-border: var(--dry-color-stroke-error);
+		--_node-color: var(--dry-color-text-error);
+	}
+	[data-part='lifeline'][data-color='info'] {
+		--_node-border: var(--dry-color-stroke-info);
+		--_node-color: var(--dry-color-text-info);
+	}
+
+	/* ── Messages ───────────────────────────────────── */
+	[data-part='message-line'] {
+		fill: none;
+		stroke: var(--_edge-color);
+		stroke-width: 1.5;
+		stroke-linecap: round;
+	}
+	[data-part='message-line'][data-dashed] {
+		stroke-dasharray: 6 3;
+	}
+
+	[data-part='message-label'] {
+		font-family: var(--dry-font-mono);
+		font-size: 11px;
+		font-weight: 400;
+		fill: var(--_node-color);
+		text-anchor: middle;
+	}
+
+	[data-part='message'][data-color='brand'] [data-part='message-line'] {
+		stroke: var(--dry-color-stroke-brand);
+	}
+	[data-part='message'][data-color='success'] [data-part='message-line'] {
+		stroke: var(--dry-color-stroke-success);
+	}
+	[data-part='message'][data-color='warning'] [data-part='message-line'] {
+		stroke: var(--dry-color-stroke-warning);
+	}
+	[data-part='message'][data-color='error'] [data-part='message-line'] {
+		stroke: var(--dry-color-stroke-error);
+	}
+	[data-part='message'][data-color='info'] [data-part='message-line'] {
+		stroke: var(--dry-color-stroke-info);
+	}
+
+	[data-part='message'][data-color='brand'] [data-part='message-label'] {
+		fill: var(--dry-color-text-brand);
+	}
+	[data-part='message'][data-color='success'] [data-part='message-label'] {
+		fill: var(--dry-color-text-success);
+	}
+	[data-part='message'][data-color='warning'] [data-part='message-label'] {
+		fill: var(--dry-color-text-warning);
+	}
+	[data-part='message'][data-color='error'] [data-part='message-label'] {
+		fill: var(--dry-color-text-error);
+	}
+	[data-part='message'][data-color='info'] [data-part='message-label'] {
+		fill: var(--dry-color-text-info);
+	}
+
+	/* ── Fragments ──────────────────────────────────── */
+	[data-part='fragment-box'] {
+		fill: transparent;
+		stroke: var(--_cluster-border);
+		stroke-width: 1.5;
+	}
+	[data-part='fragment-box'][data-dashed] {
+		stroke-dasharray: 4 2;
+	}
+
+	[data-part='fragment-tag'] {
+		fill: var(--_cluster-bg);
+		stroke: var(--_cluster-border);
+		stroke-width: 1;
+	}
+
+	[data-part='fragment-label'] {
+		font-family: var(--dry-font-mono);
+		font-size: 10px;
+		font-weight: 700;
+		fill: var(--_text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.06em;
+	}
+
+	[data-part='fragment'][data-color='brand'] [data-part='fragment-box'] {
+		stroke: var(--dry-color-stroke-brand);
+	}
+	[data-part='fragment'][data-color='brand'] [data-part='fragment-tag'] {
+		stroke: var(--dry-color-stroke-brand);
+	}
+	[data-part='fragment'][data-color='success'] [data-part='fragment-box'] {
+		stroke: var(--dry-color-stroke-success);
+	}
+	[data-part='fragment'][data-color='success'] [data-part='fragment-tag'] {
+		stroke: var(--dry-color-stroke-success);
+	}
+	[data-part='fragment'][data-color='warning'] [data-part='fragment-box'] {
+		stroke: var(--dry-color-stroke-warning);
+	}
+	[data-part='fragment'][data-color='warning'] [data-part='fragment-tag'] {
+		stroke: var(--dry-color-stroke-warning);
+	}
+	[data-part='fragment'][data-color='error'] [data-part='fragment-box'] {
+		stroke: var(--dry-color-stroke-error);
+	}
+	[data-part='fragment'][data-color='error'] [data-part='fragment-tag'] {
+		stroke: var(--dry-color-stroke-error);
+	}
+	[data-part='fragment'][data-color='info'] [data-part='fragment-box'] {
+		stroke: var(--dry-color-stroke-info);
+	}
+	[data-part='fragment'][data-color='info'] [data-part='fragment-tag'] {
+		stroke: var(--dry-color-stroke-info);
+	}
+
+	/* ── Lifeline color overrides for lifeline-line ── */
+	[data-part='lifeline'][data-color='brand'] [data-part='lifeline-line'] {
+		stroke: var(--dry-color-stroke-brand);
+	}
+	[data-part='lifeline'][data-color='success'] [data-part='lifeline-line'] {
+		stroke: var(--dry-color-stroke-success);
+	}
+	[data-part='lifeline'][data-color='warning'] [data-part='lifeline-line'] {
+		stroke: var(--dry-color-stroke-warning);
+	}
+	[data-part='lifeline'][data-color='error'] [data-part='lifeline-line'] {
+		stroke: var(--dry-color-stroke-error);
+	}
+	[data-part='lifeline'][data-color='info'] [data-part='lifeline-line'] {
+		stroke: var(--dry-color-stroke-info);
 	}
 </style>

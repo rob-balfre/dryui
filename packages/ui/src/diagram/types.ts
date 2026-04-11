@@ -5,6 +5,7 @@ export interface DiagramNode {
 	id: string;
 	label: string;
 	description?: string;
+	icon?: string;
 	variant?: 'default' | 'filled' | 'outlined' | 'pill';
 	color?: DiagramColor;
 	state?: 'default' | 'active' | 'complete' | 'blocked';
@@ -36,6 +37,24 @@ export interface DiagramAnnotation {
 	color?: DiagramColor;
 }
 
+export interface DiagramMessage {
+	from: string;
+	to: string;
+	label: string;
+	dashed?: boolean;
+	color?: DiagramColor;
+	arrow?: 'end' | 'start' | 'both' | 'none';
+}
+
+export interface DiagramFragment {
+	id: string;
+	label: string;
+	condition?: string;
+	messages: number[];
+	color?: DiagramColor;
+	dashed?: boolean;
+}
+
 export interface DiagramSwimlane {
 	id: string;
 	label: string;
@@ -57,8 +76,10 @@ export interface DiagramConfig {
 	clusters?: DiagramCluster[];
 	annotations?: DiagramAnnotation[];
 	direction?: DiagramDirection;
-	layout?: 'layered' | 'swimlane';
+	layout?: 'layered' | 'swimlane' | 'sequence';
 	swimlanes?: DiagramSwimlane[];
+	messages?: DiagramMessage[];
+	fragments?: DiagramFragment[];
 	regions?: DiagramRegion[];
 	spacing?: {
 		nodeGap?: number;
@@ -76,6 +97,7 @@ export interface PositionedNode {
 	height: number;
 	label: string;
 	description?: string;
+	icon?: string;
 	variant: string;
 	color: DiagramColor;
 	state: string;
@@ -110,6 +132,7 @@ export interface PositionedSwimlane {
 	x: number;
 	lineX: number;
 	headerY: number;
+	footerY: number;
 	lineY1: number;
 	lineY2: number;
 	color: DiagramColor;
@@ -133,6 +156,42 @@ export interface PositionedAnnotation {
 	color: DiagramColor;
 }
 
+export interface PositionedMessage {
+	from: string;
+	to: string;
+	label: string;
+	x1: number;
+	y: number;
+	x2: number;
+	labelX: number;
+	labelY: number;
+	arrow: string;
+	dashed: boolean;
+	color: DiagramColor;
+	isSelf: boolean;
+}
+
+export interface PositionedFragment {
+	id: string;
+	label: string;
+	condition?: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	color: DiagramColor;
+	dashed: boolean;
+}
+
+export interface PositionedLifeline {
+	id: string;
+	label: string;
+	x: number;
+	topY: number;
+	bottomY: number;
+	color: DiagramColor;
+}
+
 export interface LayoutResult {
 	nodes: PositionedNode[];
 	edges: PositionedEdge[];
@@ -140,5 +199,8 @@ export interface LayoutResult {
 	swimlanes: PositionedSwimlane[];
 	regions: PositionedRegion[];
 	annotations: PositionedAnnotation[];
+	messages: PositionedMessage[];
+	lifelines: PositionedLifeline[];
+	positionedFragments: PositionedFragment[];
 	viewBox: { width: number; height: number };
 }

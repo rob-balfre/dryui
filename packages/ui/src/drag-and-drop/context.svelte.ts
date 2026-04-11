@@ -6,6 +6,7 @@ export interface DragAndDropContext {
 	readonly isDragging: boolean;
 	readonly orientation: 'vertical' | 'horizontal';
 	readonly hasHandle: boolean;
+	readonly foreignOverIndex: number | null;
 	registerHandle: () => void;
 	startDrag: (index: number, event: PointerEvent) => void;
 	handleDragOver: (index: number) => void;

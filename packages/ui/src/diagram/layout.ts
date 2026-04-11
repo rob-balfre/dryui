@@ -7,6 +7,9 @@ import type {
 	PositionedSwimlane,
 	PositionedRegion,
 	PositionedAnnotation,
+	PositionedMessage,
+	PositionedLifeline,
+	PositionedFragment,
 	LayoutResult
 } from './types.js';
 import { computeEdgePaths, emptyEdge } from './edge-routing.js';
@@ -15,7 +18,7 @@ const DEFAULT_NODE_GAP = 28;
 const DEFAULT_LAYER_GAP = 56;
 const DEFAULT_CLUSTER_PADDING = 32;
 const DEFAULT_NODE_HEIGHT = 44;
-const DESC_NODE_HEIGHT = 64;
+const DESC_NODE_HEIGHT = 80;
 const MIN_NODE_WIDTH = 140;
 const CHAR_WIDTH = 8.5;
 const NODE_PADDING_X = 48;
@@ -25,7 +28,7 @@ const MARGIN = 40;
 
 function estimateNodeWidth(label: string, description?: string): number {
 	const labelWidth = label.length * CHAR_WIDTH + NODE_PADDING_X;
-	const descWidth = description ? description.length * 5.5 + NODE_PADDING_X : 0;
+	const descWidth = description ? description.length * 6.5 + NODE_PADDING_X + 16 : 0;
 	return Math.max(MIN_NODE_WIDTH, labelWidth, descWidth);
 }
 
@@ -129,12 +132,13 @@ function assignLayers(order: string[], adjacencyOut: Map<string, string[]>): Map
 	return layer;
 }
 
-// ── Within-Layer Ordering (barycenter, 2 sweeps) ───────────
+// ── Within-Layer Ordering (barycenter, 2 sweeps, cluster-aware) ───────────
 
 function orderWithinLayers(
 	layers: string[][],
 	adjacencyOut: Map<string, string[]>,
-	adjacencyIn: Map<string, string[]>
+	adjacencyIn: Map<string, string[]>,
+	clusterMap?: Map<string, string>
 ): string[][] {
 	const posInLayer = new Map<string, number>();
 
@@ -185,17 +189,102 @@ function orderWithinLayers(
 		}
 	}
 
+	// Cluster-aware grouping: after barycenter ordering, group cluster members together
+	// and push non-clustered nodes to the edges
+	if (clusterMap && clusterMap.size > 0) {
+		for (let i = 0; i < layers.length; i++) {
+			layers[i] = groupByCluster(layers[i], clusterMap, adjacencyIn, adjacencyOut, posInLayer);
+			for (let j = 0; j < layers[i].length; j++) {
+				posInLayer.set(layers[i][j], j);
+			}
+		}
+	}
+
 	return layers;
 }
 
+/** Group nodes in a layer so cluster members are adjacent, non-clustered nodes at edges */
+function groupByCluster(
+	layer: string[],
+	clusterMap: Map<string, string>,
+	adjacencyIn: Map<string, string[]>,
+	adjacencyOut: Map<string, string[]>,
+	posInLayer: Map<string, number>
+): string[] {
+	if (layer.length <= 1) return layer;
+
+	// Separate into cluster groups and non-clustered nodes
+	const clusterGroups = new Map<string, string[]>();
+	const nonClustered: string[] = [];
+
+	for (const nodeId of layer) {
+		const clusterId = clusterMap.get(nodeId);
+		if (clusterId) {
+			if (!clusterGroups.has(clusterId)) clusterGroups.set(clusterId, []);
+			clusterGroups.get(clusterId)!.push(nodeId);
+		} else {
+			nonClustered.push(nodeId);
+		}
+	}
+
+	// If no clusters in this layer, nothing to reorder
+	if (clusterGroups.size === 0) return layer;
+	// If no non-clustered nodes, just keep cluster groups in barycenter order
+	if (nonClustered.length === 0) {
+		// Order cluster groups by average barycenter position of their members
+		const groups = [...clusterGroups.entries()].map(([cid, nodes]) => {
+			const avgPos = nodes.reduce((s, n) => s + (posInLayer.get(n) ?? 0), 0) / nodes.length;
+			return { cid, nodes, avgPos };
+		});
+		groups.sort((a, b) => a.avgPos - b.avgPos);
+		return groups.flatMap((g) => g.nodes);
+	}
+
+	// Compute average barycenter position for each cluster group
+	const groupEntries = [...clusterGroups.entries()].map(([cid, nodes]) => {
+		const avgPos = nodes.reduce((s, n) => s + (posInLayer.get(n) ?? 0), 0) / nodes.length;
+		return { cid, nodes, avgPos };
+	});
+	groupEntries.sort((a, b) => a.avgPos - b.avgPos);
+
+	// Compute average connected position for non-clustered nodes to decide
+	// whether they go before or after the cluster groups
+	const allClusterPositions = groupEntries.flatMap((g) =>
+		g.nodes.map((n) => posInLayer.get(n) ?? 0)
+	);
+	const clusterCenter = allClusterPositions.reduce((a, b) => a + b, 0) / allClusterPositions.length;
+
+	// Split non-clustered into before/after based on their barycenter relative to cluster center
+	const before: string[] = [];
+	const after: string[] = [];
+	for (const nodeId of nonClustered) {
+		const pos = posInLayer.get(nodeId) ?? 0;
+		if (pos <= clusterCenter) {
+			before.push(nodeId);
+		} else {
+			after.push(nodeId);
+		}
+	}
+	// If all ended up on one side, that's fine — just keep them there
+	// If none on either side, push all to the end
+	if (before.length === 0 && after.length === 0) {
+		after.push(...nonClustered);
+	}
+
+	return [...before, ...groupEntries.flatMap((g) => g.nodes), ...after];
+}
+
 // ── Coordinate Assignment ──────────────────────────────────
+
+const CLUSTER_GROUP_GAP = 40;
 
 function assignCoordinates(
 	layers: string[][],
 	nodeDims: Map<string, { w: number; h: number }>,
 	direction: DiagramDirection,
 	nodeGap: number,
-	layerGap: number
+	layerGap: number,
+	clusterMap?: Map<string, string>
 ): Map<string, { x: number; y: number }> {
 	const positions = new Map<string, { x: number; y: number }>();
 	const horizontal = isHorizontal(direction);
@@ -212,7 +301,7 @@ function assignCoordinates(
 		layerSizes.push(maxSize);
 	}
 
-	// Find max cross-axis extent per layer for centering
+	// Find max cross-axis extent per layer for centering (including cluster group gaps)
 	const layerCrossExtents: number[] = [];
 	for (const layer of layers) {
 		let total = 0;
@@ -221,6 +310,10 @@ function assignCoordinates(
 			total += horizontal ? dims.h : dims.w;
 		}
 		total += (layer.length - 1) * nodeGap;
+		// Add extra gap at cluster/non-cluster boundaries
+		if (clusterMap && clusterMap.size > 0) {
+			total += countClusterBoundaries(layer, clusterMap) * CLUSTER_GROUP_GAP;
+		}
 		layerCrossExtents.push(total);
 	}
 	const maxCrossExtent = Math.max(...layerCrossExtents);
@@ -238,9 +331,23 @@ function assignCoordinates(
 		const crossExtent = layerCrossExtents[reversed ? layerOrder.length - 1 - li : li];
 		let crossOffset = MARGIN + (maxCrossExtent - crossExtent) / 2;
 
-		for (const id of layer) {
+		for (let ni = 0; ni < layer.length; ni++) {
+			const id = layer[ni];
 			const dims = nodeDims.get(id)!;
 			const primaryOffset = reversed ? (horizontal ? layerSize - dims.w : layerSize - dims.h) : 0;
+
+			// Add extra gap at cluster/non-cluster boundary
+			if (ni > 0 && clusterMap && clusterMap.size > 0) {
+				const prevCluster = clusterMap.get(layer[ni - 1]);
+				const currCluster = clusterMap.get(id);
+				if (
+					prevCluster !== currCluster &&
+					(prevCluster !== undefined || currCluster !== undefined)
+				) {
+					crossOffset += CLUSTER_GROUP_GAP;
+				}
+			}
+
 			if (horizontal) {
 				positions.set(id, {
 					x: layerOffset + primaryOffset,
@@ -260,6 +367,19 @@ function assignCoordinates(
 	}
 
 	return positions;
+}
+
+/** Count how many cluster/non-cluster boundaries exist in a layer ordering */
+function countClusterBoundaries(layer: string[], clusterMap: Map<string, string>): number {
+	let count = 0;
+	for (let i = 1; i < layer.length; i++) {
+		const prevCluster = clusterMap.get(layer[i - 1]);
+		const currCluster = clusterMap.get(layer[i]);
+		if (prevCluster !== currCluster && (prevCluster !== undefined || currCluster !== undefined)) {
+			count++;
+		}
+	}
+	return count;
 }
 
 // ── Cluster Bounds ─────────────────────────────────────────
@@ -319,6 +439,10 @@ function computeClusterBounds(
 
 // ── Annotations ────────────────────────────────────────────
 
+const ANNOTATION_CHAR_WIDTH = 6;
+const ANNOTATION_HEIGHT = 14;
+const ANNOTATION_COLLISION_PAD = 20;
+
 function resolveAnnotations(
 	config: DiagramConfig,
 	positions: Map<string, { x: number; y: number }>,
@@ -326,7 +450,7 @@ function resolveAnnotations(
 ): PositionedAnnotation[] {
 	if (!config.annotations) return [];
 
-	return config.annotations.map((ann) => {
+	const resolved: PositionedAnnotation[] = config.annotations.map((ann) => {
 		let x: number, y: number;
 
 		if (typeof ann.anchor === 'string') {
@@ -351,6 +475,53 @@ function resolveAnnotations(
 			color: ann.color || 'neutral'
 		};
 	});
+
+	// Collision avoidance: check annotations against nodes and other annotations
+	for (let i = 0; i < resolved.length; i++) {
+		const ann = resolved[i];
+		const annW = ann.text.length * ANNOTATION_CHAR_WIDTH;
+		const annH = ANNOTATION_HEIGHT;
+
+		// Check against all nodes — shift upward if overlapping
+		let shifted = true;
+		let maxIter = 10; // prevent infinite loop
+		while (shifted && maxIter-- > 0) {
+			shifted = false;
+			for (const [nodeId, pos] of positions) {
+				const dims = nodeDims.get(nodeId);
+				if (!dims) continue;
+				// Check overlap with padding
+				if (
+					ann.x + annW > pos.x - ANNOTATION_COLLISION_PAD &&
+					ann.x < pos.x + dims.w + ANNOTATION_COLLISION_PAD &&
+					ann.y + annH > pos.y - ANNOTATION_COLLISION_PAD &&
+					ann.y < pos.y + dims.h + ANNOTATION_COLLISION_PAD
+				) {
+					// Shift annotation above the node
+					ann.y = pos.y - ANNOTATION_COLLISION_PAD - annH;
+					shifted = true;
+				}
+			}
+		}
+
+		// Check against previously placed annotations
+		for (let j = 0; j < i; j++) {
+			const other = resolved[j];
+			const otherW = other.text.length * ANNOTATION_CHAR_WIDTH;
+			const otherH = ANNOTATION_HEIGHT;
+			if (
+				ann.x + annW > other.x - ANNOTATION_COLLISION_PAD &&
+				ann.x < other.x + otherW + ANNOTATION_COLLISION_PAD &&
+				ann.y + annH > other.y - ANNOTATION_COLLISION_PAD &&
+				ann.y < other.y + otherH + ANNOTATION_COLLISION_PAD
+			) {
+				// Shift this annotation above the other
+				ann.y = other.y - ANNOTATION_COLLISION_PAD - annH;
+			}
+		}
+	}
+
+	return resolved;
 }
 
 // ── Layered Layout (main entry) ────────────────────────────
@@ -363,6 +534,9 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 
 	const nodeIds = config.nodes.map((n) => n.id);
 	const nodeDims = buildNodeDims(config.nodes);
+
+	// Build cluster membership map: nodeId -> clusterId
+	const clusterMap = buildClusterMap(config);
 
 	// Build graph and sort
 	const graph = buildGraph(nodeIds, config.edges);
@@ -377,11 +551,23 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 		layers[layerMap.get(id)!].push(id);
 	}
 
-	// Order within layers
-	const orderedLayers = orderWithinLayers(layers, graph.adjacencyOut, graph.adjacencyIn);
+	// Order within layers (cluster-aware)
+	const orderedLayers = orderWithinLayers(
+		layers,
+		graph.adjacencyOut,
+		graph.adjacencyIn,
+		clusterMap
+	);
 
-	// Assign coordinates
-	const positions = assignCoordinates(orderedLayers, nodeDims, direction, nodeGap, layerGap);
+	// Assign coordinates (cluster-aware gaps)
+	const positions = assignCoordinates(
+		orderedLayers,
+		nodeDims,
+		direction,
+		nodeGap,
+		layerGap,
+		clusterMap
+	);
 
 	// Build positioned nodes
 	const positionedNodes = buildPositionedNodes(config.nodes, positions, nodeDims);
@@ -395,16 +581,64 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	// Compute annotations
 	const annotations = resolveAnnotations(config, positions, nodeDims);
 
-	// Compute viewBox
-	let maxX = 0,
-		maxY = 0;
+	// Compute viewBox with full bounds coverage
+	let minX = Infinity,
+		minY = Infinity,
+		maxX = -Infinity,
+		maxY = -Infinity;
+
+	// Include all node bounds
 	for (const n of positionedNodes) {
+		minX = Math.min(minX, n.x);
+		minY = Math.min(minY, n.y);
 		maxX = Math.max(maxX, n.x + n.width);
 		maxY = Math.max(maxY, n.y + n.height);
 	}
+
+	// Include all cluster bounds
 	for (const c of clusters) {
+		minX = Math.min(minX, c.x);
+		minY = Math.min(minY, c.y);
 		maxX = Math.max(maxX, c.x + c.width);
 		maxY = Math.max(maxY, c.y + c.height);
+	}
+
+	// Include annotation positions (estimated text width)
+	for (const ann of annotations) {
+		const annW = ann.text.length * ANNOTATION_CHAR_WIDTH;
+		minX = Math.min(minX, ann.x);
+		minY = Math.min(minY, ann.y - ANNOTATION_HEIGHT);
+		maxX = Math.max(maxX, ann.x + annW);
+		maxY = Math.max(maxY, ann.y);
+	}
+
+	// Include edge label positions (estimated text width)
+	for (const e of positionedEdges) {
+		if (e.label) {
+			const labelW = e.label.length * 5;
+			minX = Math.min(minX, e.labelX - labelW / 2);
+			minY = Math.min(minY, e.labelY - 7);
+			maxX = Math.max(maxX, e.labelX + labelW / 2);
+			maxY = Math.max(maxY, e.labelY + 7);
+		}
+	}
+
+	// Handle empty diagram
+	if (minX === Infinity) {
+		minX = 0;
+		minY = 0;
+		maxX = MARGIN * 2;
+		maxY = MARGIN * 2;
+	}
+
+	// Shift everything so all coordinates are non-negative
+	const shiftX = minX < 0 ? -minX + MARGIN : 0;
+	const shiftY = minY < 0 ? -minY + MARGIN : 0;
+
+	if (shiftX > 0 || shiftY > 0) {
+		shiftAllPositions(positionedNodes, clusters, annotations, positionedEdges, shiftX, shiftY);
+		maxX += shiftX;
+		maxY += shiftY;
 	}
 
 	return {
@@ -414,6 +648,9 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 		swimlanes: [],
 		regions: [],
 		annotations,
+		messages: [],
+		lifelines: [],
+		positionedFragments: [],
 		viewBox: { width: maxX + MARGIN, height: maxY + MARGIN }
 	};
 }
@@ -424,15 +661,32 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	const nodeGap = config.spacing?.nodeGap ?? 32;
 	const lanes = config.swimlanes || [];
 	const nodeDims = buildNodeDims(config.nodes);
+	const headerHeight = 50;
 
 	// Assign lanes
-	const laneWidth = 180;
-	const headerHeight = 50;
 	const laneMap = new Map<string, number>();
 	for (let i = 0; i < lanes.length; i++) {
 		for (const nid of lanes[i].nodes) {
 			laneMap.set(nid, i);
 		}
+	}
+
+	// Compute dynamic lane widths: max(180, widest node in lane + 40)
+	const laneWidths: number[] = lanes.map((lane) => {
+		let maxW = 0;
+		for (const nid of lane.nodes) {
+			const dims = nodeDims.get(nid);
+			if (dims) maxW = Math.max(maxW, dims.w);
+		}
+		return Math.max(180, maxW + 40);
+	});
+
+	// Compute lane start X offsets
+	const laneStartX: number[] = [];
+	let laneX = MARGIN;
+	for (let i = 0; i < laneWidths.length; i++) {
+		laneStartX.push(laneX);
+		laneX += laneWidths[i];
 	}
 
 	// Topological order for Y positions
@@ -446,13 +700,15 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	for (const id of graph.order) {
 		const laneIdx = laneMap.get(id) ?? 0;
 		const dims = nodeDims.get(id)!;
-		const x = MARGIN + laneIdx * laneWidth + (laneWidth - dims.w) / 2;
+		const lw = laneWidths[laneIdx] ?? 180;
+		const startX = laneStartX[laneIdx] ?? MARGIN;
+		const x = startX + (lw - dims.w) / 2;
 		positions.set(id, { x, y: currentY });
 		currentY += dims.h + nodeGap;
 	}
 
 	const totalHeight = currentY + MARGIN;
-	const totalWidth = MARGIN * 2 + lanes.length * laneWidth;
+	const totalWidth = MARGIN + laneX;
 
 	const positionedNodes = buildPositionedNodes(config.nodes, positions, nodeDims);
 
@@ -460,9 +716,10 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	const positionedSwimlanes: PositionedSwimlane[] = lanes.map((lane, i) => ({
 		id: lane.id,
 		label: lane.label,
-		x: MARGIN + i * laneWidth,
-		lineX: MARGIN + i * laneWidth + laneWidth / 2,
+		x: laneStartX[i],
+		lineX: laneStartX[i] + laneWidths[i] / 2,
 		headerY: MARGIN,
+		footerY: totalHeight - MARGIN,
 		lineY1: MARGIN + headerHeight,
 		lineY2: totalHeight - MARGIN,
 		color: lane.color || 'neutral'
@@ -474,7 +731,7 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 		positions,
 		nodeDims,
 		laneMap,
-		laneWidth
+		laneWidths[0] ?? 180
 	);
 
 	// Regions
@@ -512,11 +769,13 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 		}
 
 		const pad = 16;
+		const regionX = laneStartX[minLane] - pad;
+		let regionEndX = laneStartX[maxLane] + laneWidths[maxLane] + pad;
 		return {
 			id: region.id,
-			x: MARGIN + minLane * laneWidth - pad,
+			x: regionX,
 			y: minY - pad - 20,
-			width: (maxLane - minLane + 1) * laneWidth + pad * 2,
+			width: regionEndX - regionX,
 			height: maxY - minY + pad * 2 + 20,
 			label: region.label,
 			color: region.color || 'neutral',
@@ -527,6 +786,86 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	// Annotations
 	const annotations = resolveAnnotations(config, positions, nodeDims);
 
+	// Compute viewBox with full bounds coverage
+	let minX = Infinity,
+		minY = Infinity,
+		maxViewX = -Infinity,
+		maxViewY = -Infinity;
+
+	for (const n of positionedNodes) {
+		minX = Math.min(minX, n.x);
+		minY = Math.min(minY, n.y);
+		maxViewX = Math.max(maxViewX, n.x + n.width);
+		maxViewY = Math.max(maxViewY, n.y + n.height);
+	}
+
+	// Include swimlane headers
+	for (let si = 0; si < positionedSwimlanes.length; si++) {
+		const sl = positionedSwimlanes[si];
+		minX = Math.min(minX, sl.x);
+		minY = Math.min(minY, sl.headerY);
+		maxViewX = Math.max(maxViewX, sl.x + (laneWidths[si] ?? 180));
+		maxViewY = Math.max(maxViewY, sl.lineY2);
+	}
+
+	// Include annotation positions
+	for (const ann of annotations) {
+		const annW = ann.text.length * ANNOTATION_CHAR_WIDTH;
+		minX = Math.min(minX, ann.x);
+		minY = Math.min(minY, ann.y - ANNOTATION_HEIGHT);
+		maxViewX = Math.max(maxViewX, ann.x + annW);
+		maxViewY = Math.max(maxViewY, ann.y);
+	}
+
+	// Include edge labels
+	for (const e of positionedEdges) {
+		if (e.label) {
+			const labelW = e.label.length * 5;
+			minX = Math.min(minX, e.labelX - labelW / 2);
+			minY = Math.min(minY, e.labelY - 7);
+			maxViewX = Math.max(maxViewX, e.labelX + labelW / 2);
+			maxViewY = Math.max(maxViewY, e.labelY + 7);
+		}
+	}
+
+	// Include regions
+	for (const r of positionedRegions) {
+		minX = Math.min(minX, r.x);
+		minY = Math.min(minY, r.y);
+		maxViewX = Math.max(maxViewX, r.x + r.width);
+		maxViewY = Math.max(maxViewY, r.y + r.height);
+	}
+
+	// Handle empty diagram
+	if (minX === Infinity) {
+		minX = 0;
+		minY = 0;
+		maxViewX = totalWidth;
+		maxViewY = totalHeight;
+	}
+
+	// Shift everything so all coordinates are non-negative
+	const shiftX = minX < 0 ? -minX + MARGIN : 0;
+	const shiftY = minY < 0 ? -minY + MARGIN : 0;
+
+	if (shiftX > 0 || shiftY > 0) {
+		shiftAllPositions(positionedNodes, [], annotations, positionedEdges, shiftX, shiftY);
+		// Also shift swimlanes and regions
+		for (const sl of positionedSwimlanes) {
+			sl.x += shiftX;
+			sl.lineX += shiftX;
+			sl.headerY += shiftY;
+			sl.lineY1 += shiftY;
+			sl.lineY2 += shiftY;
+		}
+		for (const r of positionedRegions) {
+			r.x += shiftX;
+			r.y += shiftY;
+		}
+		maxViewX += shiftX;
+		maxViewY += shiftY;
+	}
+
 	return {
 		nodes: positionedNodes,
 		edges: positionedEdges,
@@ -534,11 +873,75 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 		swimlanes: positionedSwimlanes,
 		regions: positionedRegions,
 		annotations,
-		viewBox: { width: totalWidth, height: totalHeight }
+		messages: [],
+		lifelines: [],
+		positionedFragments: [],
+		viewBox: {
+			width: Math.max(totalWidth, maxViewX + MARGIN),
+			height: Math.max(totalHeight, maxViewY + MARGIN)
+		}
 	};
 }
 
 // ── Shared Helpers ─────────────────────────────────────────
+
+/** Build a map from nodeId -> clusterId for cluster-aware ordering */
+function buildClusterMap(config: DiagramConfig): Map<string, string> {
+	const map = new Map<string, string>();
+	if (!config.clusters) return map;
+	for (const cluster of config.clusters) {
+		for (const nodeId of cluster.nodes) {
+			map.set(nodeId, cluster.id);
+		}
+	}
+	return map;
+}
+
+/** Shift all positioned elements by (dx, dy) to ensure non-negative coordinates */
+function shiftAllPositions(
+	nodes: PositionedNode[],
+	clusters: PositionedCluster[],
+	annotations: PositionedAnnotation[],
+	edges: PositionedEdge[],
+	dx: number,
+	dy: number
+): void {
+	for (const n of nodes) {
+		n.x += dx;
+		n.y += dy;
+	}
+	for (const c of clusters) {
+		c.x += dx;
+		c.y += dy;
+	}
+	for (const a of annotations) {
+		a.x += dx;
+		a.y += dy;
+	}
+	for (const e of edges) {
+		e.labelX += dx;
+		e.labelY += dy;
+		// Shift SVG path coordinates
+		e.path = shiftSvgPath(e.path, dx, dy);
+	}
+}
+
+/** Shift all absolute coordinates in an SVG path string by (dx, dy) */
+function shiftSvgPath(path: string, dx: number, dy: number): string {
+	// Match SVG path commands and their coordinate pairs
+	// This handles M, L, C, Q, S, T commands with absolute coords
+	return path.replace(
+		/([MLCSQT])\s*([-\d.]+)\s+([-\d.]+)/gi,
+		(_match, cmd: string, x: string, y: string) => {
+			const upper = cmd.toUpperCase();
+			// Only shift absolute commands (uppercase)
+			if (cmd === upper) {
+				return `${cmd} ${parseFloat(x) + dx} ${parseFloat(y) + dy}`;
+			}
+			return `${cmd} ${x} ${y}`;
+		}
+	);
+}
 
 function buildNodeDims(nodes: DiagramConfig['nodes']): Map<string, { w: number; h: number }> {
 	const dims = new Map<string, { w: number; h: number }>();
@@ -566,6 +969,7 @@ function buildPositionedNodes(
 			height: dims.h,
 			label: node.label,
 			description: node.description,
+			icon: node.icon,
 			variant: node.variant || 'default',
 			color: node.color || 'neutral',
 			state: node.state || 'default'
@@ -633,7 +1037,179 @@ function computeSwimEdgePaths(
 
 // ── Public API ─────────────────────────────────────────────
 
+// ── Sequence Layout ───────────────────────────────────────
+
+const SEQ_ACTOR_GAP = 180;
+const SEQ_MESSAGE_GAP = 40;
+const SEQ_ACTOR_BOX_HEIGHT = 36;
+const SEQ_TOP_MARGIN = 40;
+const SEQ_SELF_LOOP_WIDTH = 30;
+const SEQ_SELF_LOOP_HEIGHT = 24;
+const SEQ_FRAGMENT_PAD_X = 20;
+const SEQ_FRAGMENT_PAD_Y = 16;
+const SEQ_FRAGMENT_TAG_HEIGHT = 20;
+
+function layoutSequence(config: DiagramConfig): LayoutResult {
+	const actors = config.nodes;
+	const messages = config.messages || [];
+	const fragments = config.fragments || [];
+
+	// Position actors evenly across the x-axis
+	const actorXMap = new Map<string, number>();
+	const actorColorMap = new Map<string, string>();
+	for (let i = 0; i < actors.length; i++) {
+		const x = MARGIN + i * SEQ_ACTOR_GAP + SEQ_ACTOR_GAP / 2;
+		actorXMap.set(actors[i].id, x);
+		actorColorMap.set(actors[i].id, actors[i].color || 'neutral');
+	}
+
+	// Compute message Y positions (increment per message)
+	const messageStartY = SEQ_TOP_MARGIN + SEQ_ACTOR_BOX_HEIGHT + 30;
+	const messageYPositions: number[] = [];
+	let currentY = messageStartY;
+	for (let i = 0; i < messages.length; i++) {
+		messageYPositions.push(currentY);
+		const isSelf = messages[i].from === messages[i].to;
+		currentY += isSelf ? SEQ_MESSAGE_GAP + SEQ_SELF_LOOP_HEIGHT : SEQ_MESSAGE_GAP;
+	}
+
+	// Bottom of the diagram
+	const bottomY = currentY + 30 + SEQ_ACTOR_BOX_HEIGHT;
+	const totalHeight = bottomY + MARGIN;
+	const totalWidth = MARGIN * 2 + actors.length * SEQ_ACTOR_GAP;
+
+	// Build lifelines
+	const lifelines: PositionedLifeline[] = actors.map((actor) => ({
+		id: actor.id,
+		label: actor.label,
+		x: actorXMap.get(actor.id)!,
+		topY: SEQ_TOP_MARGIN,
+		bottomY: bottomY,
+		color: (actor.color || 'neutral') as PositionedLifeline['color']
+	}));
+
+	// Build positioned messages
+	const positionedMessages: PositionedMessage[] = messages.map((msg, i) => {
+		const fromX = actorXMap.get(msg.from) ?? 0;
+		const toX = actorXMap.get(msg.to) ?? 0;
+		const y = messageYPositions[i];
+		const isSelf = msg.from === msg.to;
+
+		let labelX: number;
+		let labelY: number;
+
+		if (isSelf) {
+			labelX = fromX + SEQ_SELF_LOOP_WIDTH + 8;
+			labelY = y + SEQ_SELF_LOOP_HEIGHT / 2;
+		} else {
+			labelX = (fromX + toX) / 2;
+			labelY = y - 8;
+		}
+
+		return {
+			from: msg.from,
+			to: msg.to,
+			label: msg.label,
+			x1: fromX,
+			y,
+			x2: toX,
+			labelX,
+			labelY,
+			arrow: msg.arrow || 'end',
+			dashed: msg.dashed || false,
+			color: (msg.color || 'neutral') as PositionedMessage['color'],
+			isSelf
+		};
+	});
+
+	// Build positioned fragments
+	const positionedFragments: PositionedFragment[] = fragments.map((frag) => {
+		if (frag.messages.length === 0) {
+			return {
+				id: frag.id,
+				label: frag.label,
+				condition: frag.condition,
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+				color: (frag.color || 'neutral') as PositionedFragment['color'],
+				dashed: frag.dashed ?? false
+			};
+		}
+
+		// Find bounds from contained messages
+		let minX = Infinity;
+		let maxX = -Infinity;
+		let minY = Infinity;
+		let maxY = -Infinity;
+
+		for (const msgIdx of frag.messages) {
+			if (msgIdx < 0 || msgIdx >= positionedMessages.length) continue;
+			const msg = positionedMessages[msgIdx];
+			const leftX = Math.min(msg.x1, msg.x2);
+			const rightX = msg.isSelf ? msg.x1 + SEQ_SELF_LOOP_WIDTH : Math.max(msg.x1, msg.x2);
+			minX = Math.min(minX, leftX);
+			maxX = Math.max(maxX, rightX);
+			minY = Math.min(minY, msg.y);
+			maxY = Math.max(maxY, msg.isSelf ? msg.y + SEQ_SELF_LOOP_HEIGHT : msg.y);
+		}
+
+		if (minX === Infinity) {
+			return {
+				id: frag.id,
+				label: frag.label,
+				condition: frag.condition,
+				x: 0,
+				y: 0,
+				width: 0,
+				height: 0,
+				color: (frag.color || 'neutral') as PositionedFragment['color'],
+				dashed: frag.dashed ?? false
+			};
+		}
+
+		return {
+			id: frag.id,
+			label: frag.label,
+			condition: frag.condition,
+			x: minX - SEQ_FRAGMENT_PAD_X,
+			y: minY - SEQ_FRAGMENT_PAD_Y - SEQ_FRAGMENT_TAG_HEIGHT,
+			width: maxX - minX + SEQ_FRAGMENT_PAD_X * 2,
+			height: maxY - minY + SEQ_FRAGMENT_PAD_Y * 2 + SEQ_FRAGMENT_TAG_HEIGHT,
+			color: (frag.color || 'neutral') as PositionedFragment['color'],
+			dashed: frag.dashed ?? false
+		};
+	});
+
+	// Annotations
+	const positions = new Map<string, { x: number; y: number }>();
+	const nodeDims = new Map<string, { w: number; h: number }>();
+	for (const actor of actors) {
+		const x = actorXMap.get(actor.id)!;
+		positions.set(actor.id, { x: x - 60, y: SEQ_TOP_MARGIN });
+		nodeDims.set(actor.id, { w: 120, h: SEQ_ACTOR_BOX_HEIGHT });
+	}
+	const annotations = resolveAnnotations(config, positions, nodeDims);
+
+	return {
+		nodes: [],
+		edges: [],
+		clusters: [],
+		swimlanes: [],
+		regions: [],
+		annotations,
+		messages: positionedMessages,
+		lifelines,
+		positionedFragments,
+		viewBox: { width: totalWidth, height: totalHeight }
+	};
+}
+
+// ── Public API ─────────────────────────────────────────────
+
 export function computeLayout(config: DiagramConfig): LayoutResult {
+	if (config.layout === 'sequence') return layoutSequence(config);
 	if (config.layout === 'swimlane') {
 		return layoutSwimlane(config);
 	}
