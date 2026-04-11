@@ -14,8 +14,6 @@
       "@dryui/primitives/virtual-list": ["./packages/primitives/src/virtual-list/index.ts"],
       "@dryui/primitives/infinite-scroll": ["./packages/primitives/src/infinite-scroll/index.ts"],
       "@dryui/ui": ["./packages/ui/src/index.ts"],
-      "@dryui/canvas": ["./packages/canvas/src/index.ts"],
-      "@dryui/hand-tracking": ["./packages/hand-tracking/src/index.ts"],
       "@dryui/mcp": ["./packages/mcp/src/index.ts"],
       "@dryui/mcp/architecture": ["./packages/mcp/src/architecture.ts"],
       "@dryui/mcp/architecture.json": ["./packages/mcp/src/architecture.json"],
@@ -26,24 +24,18 @@
       "@dryui/mcp/spec-types": ["./packages/mcp/src/spec-types.ts"],
       "@dryui/mcp/spec-formatters": ["./packages/mcp/src/spec-formatters.ts"],
       "@dryui/feedback-server": ["./packages/feedback-server/src/index.ts"],
-      "@dryui/studio-server": ["./packages/studio-server/src/index.ts"],
-      "@dryui/studio-server/command-parser": ["./packages/studio-server/src/command-parser.ts"],
       "@dryui/theme-wizard": ["./packages/theme-wizard/src/index.ts"],
       "@dryui/theme-wizard/engine": ["./packages/theme-wizard/src/engine/index.ts"],
       "@dryui/lint": ["./packages/lint/src/index.ts"]
     }
   },
   "references": [
-    { "path": "./packages/canvas" },
     { "path": "./packages/feedback" },
     { "path": "./packages/feedback-server" },
     { "path": "./packages/cli" },
-    { "path": "./packages/hand-tracking" },
-    { "path": "./packages/wizard" },
     { "path": "./packages/primitives" },
     { "path": "./packages/ui" },
     { "path": "./packages/mcp" },
-    { "path": "./packages/studio-server" },
     { "path": "./packages/theme-wizard" },
     { "path": "./packages/lint" }
   ]

@@ -631,11 +631,6 @@
       "svelte": "./src/svg/index.ts",
       "default": "./src/svg/index.ts"
     },
-    "./system-map": {
-      "types": "./src/system-map/index.ts",
-      "svelte": "./src/system-map/index.ts",
-      "default": "./src/system-map/index.ts"
-    },
     "./table": {
       "types": "./src/table/index.ts",
       "svelte": "./src/table/index.ts",
@@ -670,11 +665,6 @@
       "types": "./src/textarea/index.ts",
       "svelte": "./src/textarea/index.ts",
       "default": "./src/textarea/index.ts"
-    },
-    "./thumbnail": {
-      "types": "./src/thumbnail/index.ts",
-      "svelte": "./src/thumbnail/index.ts",
-      "default": "./src/thumbnail/index.ts"
     },
     "./time-input": {
       "types": "./src/time-input/index.ts",
@@ -758,8 +748,11 @@
     },
     "./*/*": null,
     "./internal/*": null,
+    "./themes/aurora.css": "./dist/themes/aurora.css",
     "./themes/dark.css": "./dist/themes/dark.css",
-    "./themes/default.css": "./dist/themes/default.css"
+    "./themes/default.css": "./dist/themes/default.css",
+    "./themes/midnight.css": "./dist/themes/midnight.css",
+    "./themes/terminal.css": "./dist/themes/terminal.css"
   },
   "publishConfig": {
     "access": "public",
@@ -1381,11 +1374,6 @@
         "svelte": "./dist/svg/index.js",
         "default": "./dist/svg/index.js"
       },
-      "./system-map": {
-        "types": "./dist/system-map/index.d.ts",
-        "svelte": "./dist/system-map/index.js",
-        "default": "./dist/system-map/index.js"
-      },
       "./table": {
         "types": "./dist/table/index.d.ts",
         "svelte": "./dist/table/index.js",
@@ -1420,11 +1408,6 @@
         "types": "./dist/textarea/index.d.ts",
         "svelte": "./dist/textarea/index.js",
         "default": "./dist/textarea/index.js"
-      },
-      "./thumbnail": {
-        "types": "./dist/thumbnail/index.d.ts",
-        "svelte": "./dist/thumbnail/index.js",
-        "default": "./dist/thumbnail/index.js"
       },
       "./time-input": {
         "types": "./dist/time-input/index.d.ts",
@@ -1508,8 +1491,11 @@
       },
       "./*/*": null,
       "./internal/*": null,
+      "./themes/aurora.css": "./dist/themes/aurora.css",
       "./themes/dark.css": "./dist/themes/dark.css",
-      "./themes/default.css": "./dist/themes/default.css"
+      "./themes/default.css": "./dist/themes/default.css",
+      "./themes/midnight.css": "./dist/themes/midnight.css",
+      "./themes/terminal.css": "./dist/themes/terminal.css"
     }
   },
   "files": [
@@ -1520,8 +1506,7 @@
     "build": "svelte-package -i src",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "prepack": "bun ../../scripts/prepack-exports.ts",
-    "postpack": "bun ../../scripts/postpack-exports.ts",
-    "thumbnail:create": "bun scripts/create-thumbnail.ts"
+    "postpack": "bun ../../scripts/postpack-exports.ts"
   },
   "dependencies": {
     "@dryui/primitives": "^0.2.0"
@@ -1530,7 +1515,7 @@
     "svelte": "^5.55.1"
   },
   "devDependencies": {
-    "svelte": "^5.55.1",
+    "svelte": "^5.55.3",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",
     "typescript": "^6.0.2"

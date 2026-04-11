@@ -29,8 +29,7 @@ const PUBLISHABLE_PACKAGES = [
 	'packages/lint',
 	'packages/feedback',
 	'packages/feedback-server',
-	'packages/theme-wizard',
-	'packages/wizard'
+	'packages/theme-wizard'
 ];
 
 type PackageJson = Record<string, unknown> & {

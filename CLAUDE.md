@@ -12,21 +12,7 @@ Bun monorepo: zero-dependency Svelte 5 components built on native browser APIs.
 - `packages/feedback` — @dryui/feedback: feedback annotation UI components
 - `packages/feedback-server` — @dryui/feedback-server: feedback MCP server backend
 - `packages/theme-wizard` — @dryui/theme-wizard: theme generation library (brand color → full theme)
-- `packages/wizard` — @dryui/wizard: multi-step wizard component
 - `apps/docs` — Documentation site (SvelteKit, static adapter)
-- `apps/wizard` — @dryui/wizard-app: standalone wizard app (SvelteKit)
-
-### Experimental (do not touch)
-
-These packages are experimental and excluded from `build`, `check`, `validate`, and CI. Do not modify, build, or include them in any work unless explicitly asked:
-
-- `apps/studio` — @dryui/studio: visual design studio (SvelteKit + Vite)
-- `apps/launcher` — @dryui/launcher: dev launcher app
-- `packages/studio-server` — @dryui/studio-server: studio backend (WebSocket, PTY, sessions)
-- `packages/canvas` — @dryui/canvas: canvas/drawing components
-- `packages/hand-tracking` — @dryui/hand-tracking: hand tracking input
-
-Individual scripts still exist for manual use: `build:studio`, `dev:studio`, `check:studio`, `check:studio-server`.
 
 ## Commands
 
@@ -66,7 +52,7 @@ primitives (headless) → ui (styled, scoped Svelte styles) → mcp (spec genera
 
 ## Dogfooding — USE DryUI Components
 
-**Hard rule: All UI in this repo (docs app, playground, wizard, examples, tools) MUST use DryUI components from `@dryui/ui`.** Never write raw `<button>`, `<input>`, `<div class="card">` when a DryUI component exists for that purpose.
+**Hard rule: All UI in this repo (docs app, playground, examples, tools) MUST use DryUI components from `@dryui/ui`.** Never write raw `<button>`, `<input>`, `<div class="card">` when a DryUI component exists for that purpose.
 
 Use:
 
@@ -233,5 +219,4 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 - MCP build runs `generate-spec` first to produce spec.json from component metadata
 - The ui package scoped styles reference --dry-\* vars — components render unstyled without a theme import
 - @dryui/docs is excluded from changesets (not published)
-- Every new component must have a corresponding SVG thumbnail — run `bun run thumbnail:create <Name>` when adding a component
 - Docs build requires `PUBLIC_MAPBOX_TOKEN` env var — CI sets it from secrets; locally, export it or expect map-related features to fail

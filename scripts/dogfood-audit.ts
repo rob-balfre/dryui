@@ -22,11 +22,7 @@ const EXCLUDE_PATTERNS = [
 	/\.svelte-kit/,
 	/\/dist\//,
 	/packages\/ui\/src\//,
-	/packages\/primitives\/src\//,
-	/packages\/canvas\//,
-	/packages\/hand-tracking\//,
-	/packages\/studio-server\//,
-	/apps\/studio\//
+	/packages\/primitives\/src\//
 ];
 
 /** Raw HTML tag → suggested DryUI component. */

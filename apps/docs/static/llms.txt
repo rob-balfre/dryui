@@ -1,6 +1,6 @@
 # dryui
 
-> 146 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> 144 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
 
 ## Packages
 
@@ -1057,14 +1057,6 @@ Props: Root: center (LngLat), default [0 | zoom (number), default 2 | minZoom (n
 Data attributes: data-map-root | data-part
 Example: <Map.Root center={[-122.4, 37.8]} zoom={12}>
 
-### SystemMap
-Layered architecture diagram that visualizes component nodes, relationships, and dependency layers.
-Import: @dryui/ui
-Subpath import: @dryui/ui/system-map
-Props: graph (DolphinGraph), required | focusId (string | null), default null | layerFilter (readonly DolphinLayer[]) | kindFilter (readonly DolphinNodeKind[]) | edgeFilter (readonly DolphinEdgeType[]) | packageFilter (readonly DolphinPackage[]) | visibilityFilter (readonly DolphinVisibility[]) | categoryFilter (readonly string[]) | showLegend (boolean), default true | showThumbnails (boolean), default true | showEdgeLabels (boolean), default false
-Data attributes: data-connector | data-connector-label | data-connector-line | data-edge-row | data-empty | data-focused | data-node | data-node-helper | data-node-name | data-orphans | data-system-map
-Example: <SystemMap>Content</SystemMap>
-
 ### StarRating
 Read-only star rating display with filled and outlined variants.
 Import: @dryui/ui
@@ -1086,7 +1078,8 @@ Example: <Tag>Content</Tag>
 Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations.
 Import: @dryui/ui
 Subpath import: @dryui/ui/diagram
-Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-part | data-state | data-variant
+Props: config (DiagramConfig), required | width (number) | height (number)
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-has-description | data-part | data-self-loop | data-state | data-variant
 Example: <Diagram>Content</Diagram>
 
 ### Category: Feedback
@@ -1148,9 +1141,9 @@ Example: <ProgressRing>Content</ProgressRing>
 Reorderable list with drag and keyboard support.
 Import: @dryui/ui
 Subpath import: @dryui/ui/drag-and-drop
-Parts: Root, Item, Handle
+Parts: Root, Item, Handle, Group
 Props: Root: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | children (Snippet), Content rendered inside the component., required | Item: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required | Handle: index (number), required | children (Snippet | undefined), Content rendered inside the component.
-Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
+Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over | data-over-end
 Example: <DragAndDrop.Root>
 
 ### Category: Utility
@@ -1194,14 +1187,6 @@ Subpath import: @dryui/ui/svg
 Props: children (Snippet), Content rendered inside the component. | viewBox (string)
 Data attributes: none
 Example: <Svg>Content</Svg>
-
-### Thumbnail
-Compact preview tile used for component catalogs, galleries, and pickers.
-Import: @dryui/ui
-Subpath import: @dryui/ui/thumbnail
-Props: name (string), Lookup key for the thumbnail preset rendered by the root component. | size ('sm' | 'md' | 'lg' | number), Size preset affecting density, spacing, or typography., default 'md' | class (string) | children (Snippet), Content rendered inside the component.
-Data attributes: data-grid | data-size | data-thumbnail
-Example: <Thumbnail name="Button" size={160} />
 
 ### Category: Visual
 

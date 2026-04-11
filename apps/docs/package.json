@@ -20,11 +20,11 @@
     "@dryui/lint": "workspace:*",
     "@sveltejs/adapter-cloudflare": "^7.2.8",
     "@sveltejs/adapter-static": "^3.0.10",
-    "@sveltejs/kit": "^2.56.1",
+    "@sveltejs/kit": "^2.57.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/mapbox-gl": "^3.5.0",
-    "svelte": "^5.55.1",
-    "vite": "^8.0.5",
-    "wrangler": "^4.80.0"
+    "svelte": "^5.55.3",
+    "vite": "^8.0.8",
+    "wrangler": "^4.81.1"
   }
 }

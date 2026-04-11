@@ -1,12 +1,8 @@
 import { $ } from 'bun';
 
 const root = new URL('../', import.meta.url);
-const excludedSegments = [
-	'/tests/unit/canvas/',
-	'/tests/unit/hand-tracking/',
-	'/tests/unit/studio/',
-	'/tests/unit/studio-server/'
-];
+const excludedSegments: string[] = [];
+const bunTestArgs = process.argv.slice(2);
 
 await $`bun run --filter '@dryui/mcp' generate-spec`.cwd(root.pathname);
 
@@ -33,7 +29,7 @@ if (files.length === 0) {
 	throw new Error('No unit tests matched the supported test suite.');
 }
 
-const proc = Bun.spawn(['bun', 'test', ...files], {
+const proc = Bun.spawn(['bun', 'test', ...bunTestArgs, ...files], {
 	cwd: root.pathname,
 	stdin: 'inherit',
 	stdout: 'inherit',

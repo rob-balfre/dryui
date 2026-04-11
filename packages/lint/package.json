@@ -24,7 +24,7 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "svelte": "^5.0.0",
+    "svelte": "^5.55.3",
     "typescript": "^6.0.2"
   },
   "publishConfig": {

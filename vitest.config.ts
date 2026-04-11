@@ -58,29 +58,11 @@ export default defineConfig({
 				find: '@dryui/feedback-server',
 				replacement: resolve(__dirname, 'packages/feedback-server/src/index.ts')
 			},
-			{ find: '@dryui/canvas', replacement: resolve(__dirname, 'packages/canvas/src/index.ts') },
-			{
-				find: '@dryui/hand-tracking',
-				replacement: resolve(__dirname, 'packages/hand-tracking/src/index.ts')
-			},
-			{ find: /^@dryui\/mcp$/, replacement: resolve(__dirname, 'packages/mcp/src/index.ts') },
-			{
-				find: '@dryui/studio-server',
-				replacement: resolve(__dirname, 'packages/studio-server/src/index.ts')
-			},
-			{
-				find: '@dryui/studio-server/command-parser',
-				replacement: resolve(__dirname, 'packages/studio-server/src/command-parser.ts')
-			},
-			{
-				find: '@dryui/studio-server/protocol',
-				replacement: resolve(__dirname, 'packages/studio-server/src/protocol.ts')
-			}
+			{ find: /^@dryui\/mcp$/, replacement: resolve(__dirname, 'packages/mcp/src/index.ts') }
 		]
 	},
 	test: {
 		include: ['tests/browser/**/*.browser.test.ts'],
-		exclude: ['tests/browser/launcher-cli-card.browser.test.ts'],
 		browser: {
 			enabled: true,
 			headless: true,

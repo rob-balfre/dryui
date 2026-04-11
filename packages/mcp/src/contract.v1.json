@@ -6,7 +6,7 @@
     "version": "0.2.2"
   },
   "counts": {
-    "components": 146,
+    "components": 144,
     "compositionComponents": 131,
     "compositionRecipes": 31,
     "tools": 11,
@@ -7044,6 +7044,12 @@
               "required": true,
               "description": "Content rendered inside the component."
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGSVGElement>",
+            "via": "rest",
+            "element": "svg",
+            "note": "Forwards <svg> attributes via rest props."
           }
         },
         "Bars": {
@@ -7057,6 +7063,14 @@
               "type": "(event: { label: string; value: number; index: number }) => void",
               "required": false
             }
+          },
+          "forwardedProps": {
+            "baseType": "Omit<SVGAttributes<SVGGElement>, 'onclick'>",
+            "via": "rest",
+            "omitted": [
+              "onclick"
+            ],
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "Line": {
@@ -7082,6 +7096,11 @@
               "description": "Semantic color or tone applied to the component.",
               "default": "'currentColor'"
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "Area": {
@@ -7107,6 +7126,11 @@
               "description": "Semantic color or tone applied to the component.",
               "default": "'currentColor'"
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "Donut": {
@@ -7130,6 +7154,14 @@
               "type": "(event: { label: string; value: number; index: number }) => void",
               "required": false
             }
+          },
+          "forwardedProps": {
+            "baseType": "Omit<SVGAttributes<SVGGElement>, 'onclick'>",
+            "via": "rest",
+            "omitted": [
+              "onclick"
+            ],
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "StackedBar": {
@@ -7143,6 +7175,11 @@
               "required": false,
               "default": "2"
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "HorizontalBar": {
@@ -7152,10 +7189,20 @@
               "required": false,
               "default": "2"
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
           }
         },
         "XAxis": {
-          "props": {}
+          "props": {},
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
+          }
         },
         "YAxis": {
           "props": {
@@ -7163,6 +7210,11 @@
               "type": "number",
               "required": false
             }
+          },
+          "forwardedProps": {
+            "baseType": "SVGAttributes<SVGGElement>",
+            "via": "rest",
+            "note": "Forwards native SVG attributes via rest props."
           }
         }
       },
@@ -9100,6 +9152,12 @@
           "description": "Visible label text shown for the control or item.",
           "default": "'Loading'"
         }
+      },
+      "forwardedProps": {
+        "baseType": "SVGAttributes<SVGSVGElement>",
+        "via": "rest",
+        "element": "svg",
+        "note": "Forwards <svg> attributes via rest props."
       },
       "cssVars": {
         "--dry-spinner-color": "Text color",
@@ -13855,13 +13913,17 @@
             ],
             "note": "Forwards <div> attributes via rest props."
           }
+        },
+        "Group": {
+          "props": {}
         }
       },
       "structure": {
         "tree": [
           "DragAndDrop.Root",
           "  DragAndDrop.Item",
-          "  DragAndDrop.Handle"
+          "  DragAndDrop.Handle",
+          "  DragAndDrop.Group"
         ]
       },
       "cssVars": {},
@@ -13900,9 +13962,12 @@
         },
         {
           "name": "data-over"
+        },
+        {
+          "name": "data-over-end"
         }
       ],
-      "example": "<DragAndDrop.Root>\n  <DragAndDrop.Item>...</DragAndDrop.Item>\n  <DragAndDrop.Handle>...</DragAndDrop.Handle>\n</DragAndDrop.Root>"
+      "example": "<DragAndDrop.Root>\n  <DragAndDrop.Item>...</DragAndDrop.Item>\n  <DragAndDrop.Handle>...</DragAndDrop.Handle>\n  <DragAndDrop.Group>...</DragAndDrop.Group>\n</DragAndDrop.Root>"
     },
     "DropZone": {
       "import": "@dryui/ui",
@@ -15977,6 +16042,12 @@
           "description": "Content rendered inside the component."
         }
       },
+      "forwardedProps": {
+        "baseType": "SVGAttributes<SVGSVGElement>",
+        "via": "rest",
+        "element": "svg",
+        "note": "Forwards <svg> attributes via rest props."
+      },
       "cssVars": {
         "--dry-gauge-fill-color": "Fill Color",
         "--dry-gauge-size": "Size",
@@ -16045,6 +16116,15 @@
           "required": false,
           "default": "false"
         }
+      },
+      "forwardedProps": {
+        "baseType": "Omit<SVGAttributes<SVGSVGElement>, 'fill'>",
+        "via": "rest",
+        "element": "svg",
+        "omitted": [
+          "fill"
+        ],
+        "note": "Forwards <svg> attributes via rest props."
       },
       "cssVars": {
         "--dry-sparkline-color": "Text color",
@@ -17172,117 +17252,6 @@
       ],
       "example": "<Map.Root center={[-122.4, 37.8]} zoom={12}>\n  <Map.Marker position={[-122.4, 37.8]}>\n    <Map.Popup>San Francisco</Map.Popup>\n  </Map.Marker>\n  <Map.Controls navigation fullscreen />\n</Map.Root>"
     },
-    "SystemMap": {
-      "import": "@dryui/ui",
-      "description": "Layered architecture diagram that visualizes component nodes, relationships, and dependency layers",
-      "category": "display",
-      "tags": [
-        "diagram",
-        "graph",
-        "architecture",
-        "system",
-        "map"
-      ],
-      "compound": false,
-      "props": {
-        "graph": {
-          "type": "DolphinGraph",
-          "required": true
-        },
-        "focusId": {
-          "type": "string | null",
-          "required": false,
-          "default": "null"
-        },
-        "layerFilter": {
-          "type": "readonly DolphinLayer[]",
-          "required": false
-        },
-        "kindFilter": {
-          "type": "readonly DolphinNodeKind[]",
-          "required": false
-        },
-        "edgeFilter": {
-          "type": "readonly DolphinEdgeType[]",
-          "required": false
-        },
-        "packageFilter": {
-          "type": "readonly DolphinPackage[]",
-          "required": false
-        },
-        "visibilityFilter": {
-          "type": "readonly DolphinVisibility[]",
-          "required": false
-        },
-        "categoryFilter": {
-          "type": "readonly string[]",
-          "required": false
-        },
-        "showLegend": {
-          "type": "boolean",
-          "required": false,
-          "default": "true"
-        },
-        "showThumbnails": {
-          "type": "boolean",
-          "required": false,
-          "default": "true"
-        },
-        "showEdgeLabels": {
-          "type": "boolean",
-          "required": false,
-          "default": "false"
-        }
-      },
-      "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLDivElement>",
-        "via": "rest",
-        "element": "div",
-        "examples": [
-          "id",
-          "style",
-          "role"
-        ],
-        "note": "Forwards <div> attributes via rest props."
-      },
-      "cssVars": {},
-      "dataAttributes": [
-        {
-          "name": "data-connector"
-        },
-        {
-          "name": "data-connector-label"
-        },
-        {
-          "name": "data-connector-line"
-        },
-        {
-          "name": "data-edge-row"
-        },
-        {
-          "name": "data-empty"
-        },
-        {
-          "name": "data-focused"
-        },
-        {
-          "name": "data-node"
-        },
-        {
-          "name": "data-node-helper"
-        },
-        {
-          "name": "data-node-name"
-        },
-        {
-          "name": "data-orphans"
-        },
-        {
-          "name": "data-system-map"
-        }
-      ],
-      "example": "<SystemMap>Content</SystemMap>"
-    },
     "ChromaticShift": {
       "import": "@dryui/ui",
       "description": "RGB channel separation effect with hover and animation triggers",
@@ -18238,56 +18207,15 @@
           "required": false
         }
       },
+      "forwardedProps": {
+        "baseType": "SVGAttributes<SVGSVGElement>",
+        "via": "rest",
+        "element": "svg",
+        "note": "Forwards <svg> attributes via rest props."
+      },
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Svg>Content</Svg>"
-    },
-    "Thumbnail": {
-      "import": "@dryui/ui",
-      "description": "Compact preview tile used for component catalogs, galleries, and pickers",
-      "category": "utility",
-      "tags": [
-        "thumbnail",
-        "preview",
-        "catalog",
-        "gallery"
-      ],
-      "compound": false,
-      "props": {
-        "name": {
-          "type": "string",
-          "required": false,
-          "description": "Lookup key for the thumbnail preset rendered by the root component."
-        },
-        "size": {
-          "type": "'sm' | 'md' | 'lg' | number",
-          "required": false,
-          "description": "Size preset affecting density, spacing, or typography.",
-          "default": "'md'"
-        },
-        "class": {
-          "type": "string",
-          "required": false
-        },
-        "children": {
-          "type": "Snippet",
-          "required": false,
-          "description": "Content rendered inside the component."
-        }
-      },
-      "cssVars": {},
-      "dataAttributes": [
-        {
-          "name": "data-grid"
-        },
-        {
-          "name": "data-size"
-        },
-        {
-          "name": "data-thumbnail"
-        }
-      ],
-      "example": "<Thumbnail name=\"Button\" size={160} />"
     },
     "StarRating": {
       "import": "@dryui/ui",
@@ -18483,7 +18411,26 @@
         "visualization"
       ],
       "compound": false,
-      "props": {},
+      "props": {
+        "config": {
+          "type": "DiagramConfig",
+          "required": true
+        },
+        "width": {
+          "type": "number",
+          "required": false
+        },
+        "height": {
+          "type": "number",
+          "required": false
+        }
+      },
+      "forwardedProps": {
+        "baseType": "SVGAttributes<SVGSVGElement>",
+        "via": "rest",
+        "element": "svg",
+        "note": "Forwards <svg> attributes via rest props."
+      },
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18499,7 +18446,13 @@
           "name": "data-diagram-container"
         },
         {
+          "name": "data-has-description"
+        },
+        {
           "name": "data-part"
+        },
+        {
+          "name": "data-self-loop"
         },
         {
           "name": "data-state"
@@ -22474,7 +22427,7 @@
           {
             "rank": 1,
             "component": "OptionSwatchGroup",
-            "useWhen": "Product options or visual selections benefit from thumbnails or color chips",
+            "useWhen": "Product options or visual selections benefit from swatches or color chips",
             "snippet": "<OptionSwatchGroup.Root bind:value={color}>\n  <OptionSwatchGroup.Item value=\"sage\">\n    <OptionSwatchGroup.Swatch color=\"#7da174\" />\n    <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>\n  </OptionSwatchGroup.Item>\n</OptionSwatchGroup.Root>"
           },
           {

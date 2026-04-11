@@ -1,9 +1,0 @@
-{
-  "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "paths": {
-      "@dryui/hand-tracking": ["./src/index.ts"]
-    }
-  },
-  "include": ["src/**/*.ts", "src/**/*.svelte"]
-}

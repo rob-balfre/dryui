@@ -22,10 +22,9 @@ bun run test
 ## Adding a Component
 
 1. Create the component in `packages/primitives` (headless) and/or `packages/ui` (styled)
-2. Generate a thumbnail: `bun run thumbnail:create <Name>`
-3. Update composition data: `packages/mcp/src/composition-data.ts`
-4. Rebuild MCP spec: `bun run --filter '@dryui/mcp' build`
-5. Add tests in `tests/unit/` and/or `tests/browser/`
+2. Update composition data: `packages/mcp/src/composition-data.ts`
+3. Rebuild MCP spec: `bun run --filter '@dryui/mcp' build`
+4. Add tests in `tests/unit/` and/or `tests/browser/`
 
 ## CSS Rules
 

@@ -1,6 +1,6 @@
 # dryui component reference
 
-> Machine-readable component import, props, styling hook, and example index for 146 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 144 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -2717,22 +2717,31 @@ Subpath import: import { Chart } from '@dryui/ui/chart'
 Parts:
 - Chart.Root
   Props: data (import('@dryui/primitives').ChartDataPoint[]), required | width (number) | height (number) | padding ({ top?: number; right?: number; bottom?: number; left?: number }) | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <svg> attributes via rest props.
 - Chart.Bars
   Props: radius (number), default 2 | onclick ((event: { label: string; value: number; index: number }) => void)
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.Line
   Props: strokeWidth (number), default 2 | showDots (boolean), default true | dotRadius (number), default 3 | color (string), Semantic color or tone applied to the component., default 'currentColor'
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.Area
   Props: strokeWidth (number), default 2 | showDots (boolean), default false | dotRadius (number), default 3 | color (string), Semantic color or tone applied to the component., default 'currentColor'
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.Donut
   Props: innerRadius (number), default 60 | outerRadius (number), default 80 | label (Snippet<[{ total: number }]>), Visible label text shown for the control or item. | onclick ((event: { label: string; value: number; index: number }) => void)
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.StackedBar
   Props: stackedData (import('@dryui/primitives').ChartStackedDataPoint[]), required | radius (number), default 2
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.HorizontalBar
   Props: radius (number), default 2
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.XAxis
   Props: none
+  Native props: Forwards native SVG attributes via rest props.
 - Chart.YAxis
   Props: ticks (number)
+  Native props: Forwards native SVG attributes via rest props.
 Structure:
   Chart.Root
     Chart.Bars
@@ -3472,6 +3481,7 @@ Kind: simple
 Root import: import { Gauge } from '@dryui/ui'
 Subpath import: import { Gauge } from '@dryui/ui/gauge'
 Props: value (number), Current controlled or bindable value., required | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | startAngle (number), default -135 | endAngle (number), default 135 | thresholds ({ value: number; color: string }[]) | label (Snippet<[{ value: number; percentage: number }]>), Visible label text shown for the control or item. | children (Snippet), Content rendered inside the component.
+Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-gauge-fill-color, --dry-gauge-size, --dry-gauge-stroke-width, --dry-gauge-track-color
 Data attributes: data-gauge | data-gauge-label | data-part
 Accessibility: none
@@ -3488,6 +3498,7 @@ Kind: simple
 Root import: import { Sparkline } from '@dryui/ui'
 Subpath import: import { Sparkline } from '@dryui/ui/sparkline'
 Props: data (number[]), required | width (number), default 100 | height (number), default 32 | color (string), Semantic color or tone applied to the component., default 'currentColor' | filled (boolean), default false | strokeWidth (number), default 2 | highlightLast (boolean), default false
+Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-sparkline-color, --dry-sparkline-fill-opacity
 Data attributes: data-part | data-sparkline
 Accessibility: none
@@ -3582,23 +3593,6 @@ Example:
 </Map.Root>
 ```
 
-## SystemMap
-Package: @dryui/ui
-Category: display
-Tags: diagram, graph, architecture, system, map
-Kind: simple
-Root import: import { SystemMap } from '@dryui/ui'
-Subpath import: import { SystemMap } from '@dryui/ui/system-map'
-Props: graph (DolphinGraph), required | focusId (string | null), default null | layerFilter (readonly DolphinLayer[]) | kindFilter (readonly DolphinNodeKind[]) | edgeFilter (readonly DolphinEdgeType[]) | packageFilter (readonly DolphinPackage[]) | visibilityFilter (readonly DolphinVisibility[]) | categoryFilter (readonly string[]) | showLegend (boolean), default true | showThumbnails (boolean), default true | showEdgeLabels (boolean), default false
-Native props: Forwards <div> attributes via rest props.
-CSS variables: none
-Data attributes: data-connector | data-connector-label | data-connector-line | data-edge-row | data-empty | data-focused | data-node | data-node-helper | data-node-name | data-orphans | data-system-map
-Accessibility: none
-Example:
-```svelte
-<SystemMap>Content</SystemMap>
-```
-
 ## StarRating
 Package: @dryui/ui
 Category: display
@@ -3645,9 +3639,10 @@ Tags: diagram, graph, flow, architecture, network, sequence, visualization
 Kind: simple
 Root import: import { Diagram } from '@dryui/ui'
 Subpath import: import { Diagram } from '@dryui/ui/diagram'
-Props: none
+Props: config (DiagramConfig), required | width (number) | height (number)
+Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
-Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-part | data-state | data-variant
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-has-description | data-part | data-self-loop | data-state | data-variant
 Accessibility: none
 Example:
 ```svelte
@@ -3779,6 +3774,7 @@ Kind: simple
 Root import: import { Spinner } from '@dryui/ui'
 Subpath import: import { Spinner } from '@dryui/ui/spinner'
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | color ('primary' | 'current'), Semantic color or tone applied to the component., accepted primary, current, default 'primary' | label (string), Visible label text shown for the control or item., default 'Loading'
+Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-spinner-color, --dry-spinner-size, --dry-spinner-width
 Data attributes: data-color | data-size
 Accessibility: none
@@ -3823,18 +3819,22 @@ Parts:
 - DragAndDrop.Handle
   Props: index (number), required | children (Snippet | undefined), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
+- DragAndDrop.Group
+  Props: none
 Structure:
   DragAndDrop.Root
     DragAndDrop.Item
     DragAndDrop.Handle
+    DragAndDrop.Group
 CSS variables: none
-Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over
+Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over | data-over-end
 Accessibility: none
 Example:
 ```svelte
 <DragAndDrop.Root>
   <DragAndDrop.Item>...</DragAndDrop.Item>
   <DragAndDrop.Handle>...</DragAndDrop.Handle>
+  <DragAndDrop.Group>...</DragAndDrop.Group>
 </DragAndDrop.Root>
 ```
 
@@ -3914,28 +3914,13 @@ Kind: simple
 Root import: import { Svg } from '@dryui/ui'
 Subpath import: import { Svg } from '@dryui/ui/svg'
 Props: children (Snippet), Content rendered inside the component. | viewBox (string)
+Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
 Data attributes: none
 Accessibility: none
 Example:
 ```svelte
 <Svg>Content</Svg>
-```
-
-## Thumbnail
-Package: @dryui/ui
-Category: utility
-Tags: thumbnail, preview, catalog, gallery
-Kind: simple
-Root import: import { Thumbnail } from '@dryui/ui'
-Subpath import: import { Thumbnail } from '@dryui/ui/thumbnail'
-Props: name (string), Lookup key for the thumbnail preset rendered by the root component. | size ('sm' | 'md' | 'lg' | number), Size preset affecting density, spacing, or typography., default 'md' | class (string) | children (Snippet), Content rendered inside the component.
-CSS variables: none
-Data attributes: data-grid | data-size | data-thumbnail
-Accessibility: none
-Example:
-```svelte
-<Thumbnail name="Button" size={160} />
 ```
 
 ### visual
