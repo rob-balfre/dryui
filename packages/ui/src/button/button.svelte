@@ -497,7 +497,7 @@
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
-		height: var(--dry-space-12);
+		height: var(--dry-space-8);
 		--_dry-btn-radius: var(--dry-btn-radius, var(--dry-radius-sm));
 		--_dry-btn-font-size: var(
 			--dry-btn-font-size,
@@ -509,7 +509,7 @@
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
-		height: var(--dry-space-12);
+		height: var(--dry-space-14);
 		--_dry-btn-radius: var(--dry-btn-radius, var(--dry-radius-lg));
 		--_dry-btn-font-size: var(
 			--dry-btn-font-size,

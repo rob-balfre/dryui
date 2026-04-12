@@ -240,8 +240,15 @@
 	}
 
 	[data-multi-select-root] {
+		/* auto-fit requires a fixed-size min for the column track; 48px is the
+		   smallest comfortable width for a short token like "Vue ×". auto-fit
+		   collapses trailing empty tracks so tokens pack tightly from the
+		   start edge. The original min-content → max-content fell back to
+		   single-column because max-content isn't a <fixed-size> under the
+		   auto-fill/auto-fit spec. */
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
+		grid-template-columns: repeat(auto-fit, minmax(48px, max-content));
+		justify-content: start;
 		gap: var(--dry-space-1_5);
 		padding: var(--dry-space-2);
 		border: 1px solid var(--dry-color-stroke-strong);
