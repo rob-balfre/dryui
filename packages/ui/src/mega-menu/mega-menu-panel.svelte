@@ -78,7 +78,7 @@
 		inset: unset;
 		margin: 0;
 		z-index: var(--dry-layer-overlay, 50);
-		background: var(--dry-color-bg-overlay, white);
+		background: var(--dry-mega-menu-panel-bg, var(--dry-color-bg-overlay, white));
 		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
 		border-radius: var(--dry-radius-lg, 0.5rem);
 		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));

@@ -6,9 +6,10 @@
 		ColorPicker,
 		Container,
 		MegaMenu,
+		OptionPicker,
+		OptionSwatchGroup,
 		Slider,
 		Text,
-		ToggleGroup,
 		VisuallyHidden
 	} from '@dryui/ui';
 	import {
@@ -33,7 +34,9 @@
 		PRESETS,
 		RECIPE_PRESETS,
 		FONT_STACKS,
-		bg
+		bg,
+		type BrandInput,
+		type RecipePreset
 	} from '@dryui/theme-wizard';
 	import {
 		Sparkles,
@@ -69,23 +72,21 @@
 		}
 	}
 
-	function syncSingleToggleSelection<T extends string>(
-		selection: string[],
-		current: T,
-		apply: (value: T) => void
-	) {
-		const next = selection[0];
-		if (next && next !== current) {
-			apply(next as T);
-		}
-	}
-
 	function attachPresetVars(color: string, font: string) {
 		return (node: HTMLElement) => {
 			node.style.setProperty('--_preset-color', color);
 			node.style.setProperty('--_preset-font', font);
 			return () => {
 				node.style.removeProperty('--_preset-color');
+				node.style.removeProperty('--_preset-font');
+			};
+		};
+	}
+
+	function attachFontVar(font: string) {
+		return (node: HTMLElement) => {
+			node.style.setProperty('--_preset-font', font);
+			return () => {
 				node.style.removeProperty('--_preset-font');
 			};
 		};
@@ -102,6 +103,47 @@
 				}
 			};
 		};
+	}
+
+	function isSameBrand(current: BrandInput, candidate: BrandInput): boolean {
+		return current.h === candidate.h && current.s === candidate.s && current.b === candidate.b;
+	}
+
+	function isSelectedPreset(preset: RecipePreset): boolean {
+		return (
+			isSameBrand(wizardState.brandHsb, preset.recipe.brand) &&
+			wizardState.personality === preset.recipe.personality &&
+			wizardState.typography.fontPreset === preset.recipe.typography.fontPreset &&
+			wizardState.typography.scale === preset.recipe.typography.scale &&
+			wizardState.shape.radiusPreset === preset.recipe.shape.radiusPreset &&
+			wizardState.shape.radiusScale === preset.recipe.shape.radiusScale &&
+			wizardState.shape.density === preset.recipe.shape.density &&
+			wizardState.shadows.preset === preset.recipe.shadows.preset &&
+			wizardState.shadows.intensity === preset.recipe.shadows.intensity &&
+			wizardState.shadows.tintBrand === preset.recipe.shadows.tintBrand
+		);
+	}
+
+	function getSelectedRecipePresetName(): string {
+		return RECIPE_PRESETS.find((preset) => isSelectedPreset(preset))?.name ?? '';
+	}
+
+	function applyRecipePresetName(name: string) {
+		const preset = RECIPE_PRESETS.find((candidate) => candidate.name === name);
+		if (preset) applyRecipe(preset.recipe);
+	}
+
+	function getSelectedBrandPresetName(): string {
+		return (
+			PRESETS.find((preset) => isSameBrand(wizardState.brandHsb, preset.brandInput))?.name ?? ''
+		);
+	}
+
+	function applyBrandPresetName(name: string) {
+		const preset = PRESETS.find((candidate) => candidate.name === name);
+		if (preset) {
+			setBrandHsb(preset.brandInput.h, preset.brandInput.s, preset.brandInput.b);
+		}
 	}
 
 	let adjustBrightness = $state(100);
@@ -180,6 +222,28 @@
 		['Dashboard', 'Terminal', 'Ember'].includes(p.name)
 	);
 	const editorialPresets = RECIPE_PRESETS.filter((p) => ['Editorial', 'Playful'].includes(p.name));
+	const TYPE_SCALE_OPTIONS = [
+		['compact', 'Compact'],
+		['default', 'Default'],
+		['spacious', 'Spacious']
+	] as const;
+	const PERSONALITY_OPTIONS = [
+		{ value: 'minimal', label: 'Minimal' },
+		{ value: 'clean', label: 'Clean' },
+		{ value: 'structured', label: 'Structured' },
+		{ value: 'rich', label: 'Rich' }
+	] as const;
+	const RADIUS_OPTIONS = [
+		{ value: 'sharp', label: 'Sharp' },
+		{ value: 'soft', label: 'Soft' },
+		{ value: 'rounded', label: 'Rounded' },
+		{ value: 'pill', label: 'Pill' }
+	] as const;
+	const DENSITY_OPTIONS = [
+		{ value: 'compact', label: 'Compact' },
+		{ value: 'default', label: 'Default' },
+		{ value: 'spacious', label: 'Spacious' }
+	] as const;
 </script>
 
 <svelte:head>
@@ -200,61 +264,76 @@
 						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" /> Preset</MegaMenu.Trigger>
 						<MegaMenu.Panel>
 							<MegaMenu.Column title="Starting points">
-								{#each startingPresets as preset (preset.name)}
-									{@const hex = brandHsbToHex(preset.recipe.brand)}
-									{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-									<MegaMenu.Link
-										onclick={() => applyRecipe(preset.recipe)}
-										{@attach attachPresetVars(hex, font)}
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 									>
-										{#snippet icon()}<span
-												class="preset-thumb"
-												use:bg={hex}
-												data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-												><span class="preset-thumb-text">Ag</span></span
-											>{/snippet}
-										{#snippet description()}{preset.description}{/snippet}
-										{preset.name}
-									</MegaMenu.Link>
-								{/each}
+										{#each startingPresets as preset (preset.name)}
+											{@const hex = brandHsbToHex(preset.recipe.brand)}
+											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+											<OptionPicker.Item value={preset.name}>
+												<OptionPicker.Preview
+													variant="preset"
+													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+													{@attach attachPresetVars(hex, font)}
+												>
+													<span class="preset-thumb-text">Ag</span>
+												</OptionPicker.Preview>
+												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Technical">
-								{#each technicalPresets as preset (preset.name)}
-									{@const hex = brandHsbToHex(preset.recipe.brand)}
-									{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-									<MegaMenu.Link
-										onclick={() => applyRecipe(preset.recipe)}
-										{@attach attachPresetVars(hex, font)}
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 									>
-										{#snippet icon()}<span
-												class="preset-thumb"
-												use:bg={hex}
-												data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-												><span class="preset-thumb-text">Ag</span></span
-											>{/snippet}
-										{#snippet description()}{preset.description}{/snippet}
-										{preset.name}
-									</MegaMenu.Link>
-								{/each}
+										{#each technicalPresets as preset (preset.name)}
+											{@const hex = brandHsbToHex(preset.recipe.brand)}
+											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+											<OptionPicker.Item value={preset.name}>
+												<OptionPicker.Preview
+													variant="preset"
+													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+													{@attach attachPresetVars(hex, font)}
+												>
+													<span class="preset-thumb-text">Ag</span>
+												</OptionPicker.Preview>
+												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Editorial">
-								{#each editorialPresets as preset (preset.name)}
-									{@const hex = brandHsbToHex(preset.recipe.brand)}
-									{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-									<MegaMenu.Link
-										onclick={() => applyRecipe(preset.recipe)}
-										{@attach attachPresetVars(hex, font)}
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 									>
-										{#snippet icon()}<span
-												class="preset-thumb"
-												use:bg={hex}
-												data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-												><span class="preset-thumb-text">Ag</span></span
-											>{/snippet}
-										{#snippet description()}{preset.description}{/snippet}
-										{preset.name}
-									</MegaMenu.Link>
-								{/each}
+										{#each editorialPresets as preset (preset.name)}
+											{@const hex = brandHsbToHex(preset.recipe.brand)}
+											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+											<OptionPicker.Item value={preset.name}>
+												<OptionPicker.Preview
+													variant="preset"
+													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+													{@attach attachPresetVars(hex, font)}
+												>
+													<span class="preset-thumb-text">Ag</span>
+												</OptionPicker.Preview>
+												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
 					</MegaMenu.Item>
@@ -273,20 +352,23 @@
 								</ColorPicker.Root>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Presets">
-								<div class="color-presets-grid">
-									{#each PRESETS as preset (preset.name)}
-										<Button
-											variant="ghost"
-											size="sm"
-											title={preset.name}
-											onclick={() =>
-												setBrandHsb(preset.brandInput.h, preset.brandInput.s, preset.brandInput.b)}
-										>
-											<span class="color-swatch-dot" use:bg={brandHsbToHex(preset.brandInput)}
-											></span>
-											<VisuallyHidden>{preset.name}</VisuallyHidden>
-										</Button>
-									{/each}
+								<div class="wizard-option-scope wizard-color-options">
+									<OptionSwatchGroup.Root
+										columns={2}
+										bind:value={getSelectedBrandPresetName, applyBrandPresetName}
+									>
+										{#each PRESETS as preset (preset.name)}
+											<OptionSwatchGroup.Item
+												value={preset.name}
+												size="compact"
+												title={preset.name}
+												aria-label={preset.name}
+											>
+												<OptionSwatchGroup.Swatch color={brandHsbToHex(preset.brandInput)} />
+												<VisuallyHidden>{preset.name}</VisuallyHidden>
+											</OptionSwatchGroup.Item>
+										{/each}
+									</OptionSwatchGroup.Root>
 								</div>
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
@@ -296,51 +378,35 @@
 						<MegaMenu.Trigger><Type size={14} aria-hidden="true" /> Typography</MegaMenu.Trigger>
 						<MegaMenu.Panel>
 							<MegaMenu.Column title="Font family">
-								<ToggleGroup.Root
-									type="single"
-									size="sm"
-									bind:value={
-										() => [wizardState.typography.fontPreset],
-										(selection) =>
-											syncSingleToggleSelection(
-												selection,
-												wizardState.typography.fontPreset,
-												setFontPreset
-											)
-									}
-									orientation="horizontal"
-								>
-									{#each Object.entries(FONT_STACKS) as [name, stack] (name)}
-										<ToggleGroup.Item value={name}>
-											<span class="font-sample" {@attach attachPresetVars('', stack)}>
-												<span class="font-sample-glyph">Ag</span>
-												<span class="font-sample-name">{name}</span>
-											</span>
-										</ToggleGroup.Item>
-									{/each}
-								</ToggleGroup.Root>
+								<div class="wizard-option-scope wizard-option-grid wizard-font-options">
+									<OptionPicker.Root
+										columns={2}
+										bind:value={() => wizardState.typography.fontPreset, setFontPreset}
+									>
+										{#each Object.entries(FONT_STACKS) as [name, stack] (name)}
+											<OptionPicker.Item value={name} layout="stacked" size="visual">
+												<OptionPicker.Preview variant="font" {@attach attachFontVar(stack)}>
+													<span class="font-preview-glyph">Ag</span>
+												</OptionPicker.Preview>
+												<OptionPicker.Label>{name}</OptionPicker.Label>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Type scale">
-								<ToggleGroup.Root
-									type="single"
-									size="sm"
-									bind:value={
-										() => [wizardState.typography.scale],
-										(selection) =>
-											syncSingleToggleSelection(
-												selection,
-												wizardState.typography.scale,
-												setTypeScale
-											)
-									}
-									orientation="vertical"
-								>
-									{#each [['compact', 'Compact'], ['default', 'Default'], ['spacious', 'Spacious']] as const as [val, label] (val)}
-										<ToggleGroup.Item value={val}>
-											{label}
-										</ToggleGroup.Item>
-									{/each}
-								</ToggleGroup.Root>
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={() => wizardState.typography.scale, setTypeScale}
+									>
+										{#each TYPE_SCALE_OPTIONS as [value, label] (value)}
+											<OptionPicker.Item {value} size="compact">
+												<OptionPicker.Label>{label}</OptionPicker.Label>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
 					</MegaMenu.Item>
@@ -349,65 +415,47 @@
 						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" /> Shape</MegaMenu.Trigger>
 						<MegaMenu.Panel>
 							<MegaMenu.Column title="Style">
-								<ToggleGroup.Root
-									type="single"
-									size="sm"
-									bind:value={
-										() => [wizardState.personality],
-										(selection) =>
-											syncSingleToggleSelection(selection, wizardState.personality, setPersonality)
-									}
-									orientation="vertical"
-								>
-									{#each [{ value: 'minimal', label: 'Minimal' }, { value: 'clean', label: 'Clean' }, { value: 'structured', label: 'Structured' }, { value: 'rich', label: 'Rich' }] as opt (opt.value)}
-										<ToggleGroup.Item value={opt.value}>
-											{opt.label}
-										</ToggleGroup.Item>
-									{/each}
-								</ToggleGroup.Root>
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={() => wizardState.personality, setPersonality}
+									>
+										{#each PERSONALITY_OPTIONS as opt (opt.value)}
+											<OptionPicker.Item value={opt.value} size="compact">
+												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Corners">
-								<ToggleGroup.Root
-									type="single"
-									size="sm"
-									bind:value={
-										() => [wizardState.shape.radiusPreset],
-										(selection) =>
-											syncSingleToggleSelection(
-												selection,
-												wizardState.shape.radiusPreset,
-												setRadiusPreset
-											)
-									}
-									orientation="horizontal"
-								>
-									{#each [{ value: 'sharp', label: 'Sharp' }, { value: 'soft', label: 'Soft' }, { value: 'rounded', label: 'Rounded' }, { value: 'pill', label: 'Pill' }] as opt (opt.value)}
-										<ToggleGroup.Item value={opt.value}>
-											<span class="corner-toggle">
-												<span class="corner-hint" data-shape={opt.value}></span>
-												<span class="corner-label">{opt.label}</span>
-											</span>
-										</ToggleGroup.Item>
-									{/each}
-								</ToggleGroup.Root>
+								<div class="wizard-option-scope wizard-option-grid wizard-corner-options">
+									<OptionPicker.Root
+										columns={2}
+										bind:value={() => wizardState.shape.radiusPreset, setRadiusPreset}
+									>
+										{#each RADIUS_OPTIONS as opt (opt.value)}
+											<OptionPicker.Item value={opt.value} layout="stacked" size="visual">
+												<OptionPicker.Preview variant="shape" data-shape={opt.value} />
+												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Spacing">
-								<ToggleGroup.Root
-									type="single"
-									size="sm"
-									bind:value={
-										() => [wizardState.shape.density],
-										(selection) =>
-											syncSingleToggleSelection(selection, wizardState.shape.density, setDensity)
-									}
-									orientation="vertical"
-								>
-									{#each [{ value: 'compact', label: 'Compact' }, { value: 'default', label: 'Default' }, { value: 'spacious', label: 'Spacious' }] as opt (opt.value)}
-										<ToggleGroup.Item value={opt.value}>
-											{opt.label}
-										</ToggleGroup.Item>
-									{/each}
-								</ToggleGroup.Root>
+								<div class="wizard-option-scope wizard-option-list">
+									<OptionPicker.Root
+										orientation="vertical"
+										bind:value={() => wizardState.shape.density, setDensity}
+									>
+										{#each DENSITY_OPTIONS as opt (opt.value)}
+											<OptionPicker.Item value={opt.value} size="compact">
+												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+											</OptionPicker.Item>
+										{/each}
+									</OptionPicker.Root>
+								</div>
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
 					</MegaMenu.Item>
@@ -440,7 +488,11 @@
 										<Text size="xs" color="muted">{adjustHueRotate}°</Text>
 									</div>
 									{#if hasAdjustments}
-										<Button variant="ghost" size="sm" onclick={resetAdjust}>Reset filters</Button>
+										<div class="wizard-action-scope">
+											<Button variant="secondary" size="sm" onclick={resetAdjust}>
+												Reset filters
+											</Button>
+										</div>
 									{/if}
 								</div>
 							</MegaMenu.Column>
@@ -493,18 +545,24 @@
 			</div>
 
 			<div class="bar-actions">
-				<Button
-					variant="ghost"
-					size="sm"
-					onclick={() => {
-						resetToDefaults();
-						resetAdjust();
-					}}>Reset</Button
-				>
-				<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
-				<Button variant="outline" size="sm" onclick={handleCopyCss}>
-					{copyFeedback || 'Copy CSS'}
-				</Button>
+				<div class="wizard-action-scope">
+					<Button
+						variant="secondary"
+						size="sm"
+						onclick={() => {
+							resetToDefaults();
+							resetAdjust();
+						}}>Reset</Button
+					>
+				</div>
+				<div class="wizard-action-scope wizard-action-scope-primary">
+					<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
+				</div>
+				<div class="wizard-action-scope">
+					<Button variant="secondary" size="sm" onclick={handleCopyCss}>
+						{copyFeedback || 'Copy CSS'}
+					</Button>
+				</div>
 			</div>
 		</div>
 
@@ -523,6 +581,32 @@
 
 <style>
 	.wizard-page {
+		--wizard-accent-bg: color-mix(
+			in srgb,
+			var(--dry-color-fill-brand) 38%,
+			var(--dry-color-bg-base) 62%
+		);
+		--wizard-accent-bg-hover: color-mix(
+			in srgb,
+			var(--dry-color-fill-brand) 46%,
+			var(--dry-color-bg-base) 54%
+		);
+		--wizard-accent-bg-active: color-mix(
+			in srgb,
+			var(--dry-color-fill-brand) 54%,
+			var(--dry-color-bg-base) 46%
+		);
+		--wizard-accent-border: color-mix(
+			in srgb,
+			var(--dry-color-fill-brand) 68%,
+			var(--dry-color-stroke-strong) 32%
+		);
+		--wizard-accent-weak: color-mix(
+			in srgb,
+			var(--dry-color-fill-brand) 12%,
+			var(--dry-color-bg-raised) 88%
+		);
+		--wizard-accent-fg: var(--dry-color-text-strong);
 		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-6);
@@ -535,13 +619,28 @@
 		align-items: center;
 		gap: var(--dry-space-4);
 		padding: var(--dry-space-2) var(--dry-space-3);
-		border: 1px solid var(--dry-color-stroke-weak);
+		border: 1px solid
+			color-mix(in srgb, var(--dry-color-stroke-weak) 76%, var(--dry-color-fill-brand) 24%);
 		border-radius: var(--dry-radius-lg);
-		background: var(--dry-color-bg-raised);
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 94%, var(--dry-color-fill-brand) 6%);
 	}
 
 	.menu-area {
 		display: grid;
+		--dry-mega-menu-panel-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 94%,
+			var(--dry-color-fill-brand) 6%
+		);
+		--dry-color-fill-brand: var(--wizard-accent-bg);
+		--dry-color-fill-brand-hover: var(--wizard-accent-bg-hover);
+		--dry-color-fill-brand-active: var(--wizard-accent-bg-active);
+		--dry-color-on-brand: var(--wizard-accent-fg);
+		--dry-color-text-brand: var(--wizard-accent-fg);
+		--dry-color-stroke-selected: var(--wizard-accent-border);
+		--dry-btn-trigger-open-bg: var(--wizard-accent-weak);
+		--dry-btn-trigger-open-color: var(--wizard-accent-fg);
+		--dry-btn-trigger-open-border: var(--wizard-accent-border);
 	}
 
 	.bar-actions {
@@ -552,32 +651,72 @@
 		gap: var(--dry-space-2);
 	}
 
-	/* ─── Preset items ────────────────────────────────────────────────────── */
-
-	.preset-thumb {
+	.wizard-action-scope {
 		display: grid;
-		place-items: center;
-		block-size: 2.5rem;
-		aspect-ratio: 1;
-		border-radius: var(--dry-radius-sm);
-		transition: border-radius var(--dry-duration-fast, 100ms) ease;
+		--dry-btn-accent: var(--wizard-accent-bg);
+		--dry-btn-accent-hover: var(--wizard-accent-bg-hover);
+		--dry-btn-accent-active: var(--wizard-accent-bg-active);
+		--dry-btn-accent-stroke: var(--wizard-accent-border);
+		--dry-btn-accent-fg: var(--wizard-accent-fg);
+		--dry-btn-accent-weak: var(--wizard-accent-weak);
+		--dry-btn-on-accent: var(--wizard-accent-fg);
 	}
 
-	.preset-thumb[data-shape='sharp'] {
-		border-radius: 2px;
+	.wizard-option-scope {
+		display: grid;
+		--dry-color-fill: var(--wizard-accent-weak);
+		--dry-color-fill-brand: var(--wizard-accent-bg);
+		--dry-color-fill-brand-hover: var(--wizard-accent-bg-hover);
+		--dry-color-fill-brand-active: var(--wizard-accent-bg-active);
+		--dry-color-on-brand: var(--wizard-accent-fg);
+		--dry-color-stroke-selected: var(--wizard-accent-border);
+		--dry-option-picker-selected-bg: color-mix(
+			in srgb,
+			var(--wizard-accent-bg) 12%,
+			var(--dry-color-bg-raised) 88%
+		);
+		--dry-option-picker-selected-bg-hover: color-mix(
+			in srgb,
+			var(--wizard-accent-bg) 16%,
+			var(--dry-color-bg-raised) 84%
+		);
+		--dry-option-picker-selected-border: color-mix(
+			in srgb,
+			var(--wizard-accent-border) 84%,
+			var(--dry-color-stroke-weak) 16%
+		);
+		--dry-option-swatch-group-selected-bg: color-mix(
+			in srgb,
+			var(--wizard-accent-bg) 10%,
+			var(--dry-color-bg-raised) 90%
+		);
+		--dry-option-swatch-group-selected-bg-hover: color-mix(
+			in srgb,
+			var(--wizard-accent-bg) 14%,
+			var(--dry-color-bg-raised) 86%
+		);
+		--dry-option-swatch-group-selected-border: color-mix(
+			in srgb,
+			var(--wizard-accent-border) 84%,
+			var(--dry-color-stroke-weak) 16%
+		);
 	}
 
-	.preset-thumb[data-shape='soft'] {
-		border-radius: 6px;
+	.wizard-option-grid {
+		--dry-option-picker-gap: var(--dry-space-2_5);
 	}
 
-	.preset-thumb[data-shape='rounded'] {
-		border-radius: 10px;
+	.wizard-option-list {
+		--dry-option-picker-gap: var(--dry-space-2);
 	}
 
-	.preset-thumb[data-shape='pill'] {
-		border-radius: 9999px;
+	.wizard-font-options,
+	.wizard-corner-options {
+		--dry-option-picker-gap: var(--dry-space-2);
+		--dry-option-picker-visual-min-block-size: 5rem;
 	}
+
+	/* ─── Preset items ────────────────────────────────────────────────────── */
 
 	.preset-thumb-text {
 		font-family: var(--_preset-font, inherit);
@@ -590,62 +729,14 @@
 
 	/* ─── Font samples ───────────────────────────────────────────────────── */
 
-	.font-sample {
-		display: grid;
-		gap: var(--dry-space-1);
-		text-align: center;
-	}
-
-	.font-sample-glyph {
+	.font-preview-glyph {
 		font-family: var(--_preset-font, inherit);
 		font-size: 1.75rem;
 		line-height: 1;
 		color: var(--dry-color-text-strong);
 	}
 
-	.font-sample-name {
-		font-size: var(--dry-text-xs-size, 0.75rem);
-		color: var(--dry-color-text-weak);
-	}
-
 	/* ─── Corner toggle ──────────────────────────────────────────────────── */
-
-	.corner-toggle {
-		display: grid;
-		gap: var(--dry-space-1);
-		justify-items: center;
-		text-align: center;
-	}
-
-	.corner-hint {
-		display: block;
-		block-size: 2rem;
-		aspect-ratio: 1;
-		border: 2px solid var(--dry-color-stroke-strong);
-		background: var(--dry-color-bg-base);
-		transition: border-radius var(--dry-duration-fast, 100ms) ease;
-	}
-
-	.corner-hint[data-shape='sharp'] {
-		border-radius: 2px;
-	}
-
-	.corner-hint[data-shape='soft'] {
-		border-radius: 8px;
-	}
-
-	.corner-hint[data-shape='rounded'] {
-		border-radius: 16px;
-	}
-
-	.corner-hint[data-shape='pill'] {
-		border-radius: 9999px;
-	}
-
-	.corner-label {
-		font-size: var(--dry-text-xs-size, 0.75rem);
-		color: var(--dry-color-text-weak);
-	}
 
 	/* ─── Adjust controls ────────────────────────────────────────────────── */
 
@@ -663,17 +754,14 @@
 
 	/* ─── Color presets grid ──────────────────────────────────────────────── */
 
-	.color-presets-grid {
-		display: grid;
-		grid-template-columns: repeat(4, max-content);
-		gap: var(--dry-space-2);
-	}
-
-	.color-swatch-dot {
-		display: block;
-		block-size: 1.5rem;
-		aspect-ratio: 1;
-		border-radius: var(--dry-radius-full, 9999px);
+	.wizard-color-options {
+		--dry-option-swatch-group-gap: var(--dry-space-1_5, var(--dry-space-2));
+		--dry-option-swatch-group-padding-x: var(--dry-space-0_5);
+		--dry-option-swatch-group-padding-y: var(--dry-space-0_5);
+		--dry-option-swatch-group-compact-padding: var(--dry-space-0_5);
+		--dry-option-swatch-group-min-block-size: 0;
+		--dry-option-swatch-group-radius: var(--dry-radius-full, 9999px);
+		--dry-option-swatch-group-swatch-size: 1.75rem;
 	}
 
 	.contrast-result {

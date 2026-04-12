@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.4.1",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -142,7 +142,10 @@
         "--dry-btn-radius": "Border radius",
         "--dry-btn-soft-active-bg": "Soft Active Bg",
         "--dry-btn-soft-bg": "Soft Bg",
-        "--dry-btn-soft-hover-bg": "Soft Hover Bg"
+        "--dry-btn-soft-hover-bg": "Soft Hover Bg",
+        "--dry-btn-trigger-open-bg": "Trigger Open Bg",
+        "--dry-btn-trigger-open-border": "Trigger Open Border",
+        "--dry-btn-trigger-open-color": "Trigger Open Color"
       },
       "dataAttributes": [
         {
@@ -4173,10 +4176,35 @@
       "compound": true,
       "parts": {
         "Root": {
-          "props": {}
+          "props": {
+            "columns": {
+              "type": "1 | 2 | 3 | 4",
+              "required": false,
+              "acceptedValues": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          }
         },
         "Item": {
-          "props": {}
+          "props": {
+            "size": {
+              "type": "'default' | 'compact'",
+              "required": false,
+              "acceptedValues": [
+                "default",
+                "compact"
+              ],
+              "description": "Size preset affecting density, spacing, or typography."
+            },
+            "unavailable": {
+              "type": "boolean",
+              "required": false
+            }
+          }
         },
         "Swatch": {
           "props": {
@@ -4229,9 +4257,22 @@
         ]
       },
       "cssVars": {
-        "--dry-option-swatch-chip": "Swatch Chip"
+        "--dry-btn-align": "Align",
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color",
+        "--dry-btn-justify": "Justify",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
+        "--dry-option-swatch-chip": "Swatch Chip",
+        "--dry-option-swatch-group-swatch-border": "Swatch Group Swatch Border"
       },
       "dataAttributes": [
+        {
+          "name": "data-columns"
+        },
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
@@ -4266,6 +4307,13 @@
           "name": "data-part"
         },
         {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
+        },
+        {
+          "name": "data-size"
+        },
+        {
           "name": "data-state"
         },
         {
@@ -4276,6 +4324,223 @@
         }
       ],
       "example": "<OptionSwatchGroup.Root>\n  <OptionSwatchGroup.Item>...</OptionSwatchGroup.Item>\n  <OptionSwatchGroup.Swatch>...</OptionSwatchGroup.Swatch>\n  <OptionSwatchGroup.Label>...</OptionSwatchGroup.Label>\n  <OptionSwatchGroup.Meta>...</OptionSwatchGroup.Meta>\n</OptionSwatchGroup.Root>"
+    },
+    "OptionPicker": {
+      "import": "@dryui/ui",
+      "description": "Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices",
+      "category": "input",
+      "tags": [
+        "picker",
+        "selection",
+        "options",
+        "tiles",
+        "preset",
+        "preview"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "columns": {
+              "type": "1 | 2 | 3 | 4",
+              "required": false,
+              "acceptedValues": [
+                "1",
+                "2",
+                "3",
+                "4"
+              ]
+            }
+          }
+        },
+        "Item": {
+          "props": {
+            "layout": {
+              "type": "'inline' | 'stacked'",
+              "required": false,
+              "acceptedValues": [
+                "inline",
+                "stacked"
+              ],
+              "default": "'inline'"
+            },
+            "size": {
+              "type": "'default' | 'compact' | 'visual'",
+              "required": false,
+              "acceptedValues": [
+                "default",
+                "compact",
+                "visual"
+              ],
+              "description": "Size preset affecting density, spacing, or typography.",
+              "default": "'default'"
+            },
+            "unavailable": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          }
+        },
+        "Preview": {
+          "props": {
+            "color": {
+              "type": "string",
+              "required": false,
+              "description": "Semantic color or tone applied to the component."
+            },
+            "shape": {
+              "type": "'circle' | 'rounded' | 'square' | 'pill'",
+              "required": false,
+              "acceptedValues": [
+                "circle",
+                "rounded",
+                "square",
+                "pill"
+              ],
+              "default": "'rounded'"
+            },
+            "variant": {
+              "type": "'default' | 'preset' | 'font' | 'shape'",
+              "required": false,
+              "acceptedValues": [
+                "default",
+                "preset",
+                "font",
+                "shape"
+              ],
+              "description": "Visual style preset for the component.",
+              "default": "'default'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
+        },
+        "Label": {
+          "props": {}
+        },
+        "Description": {
+          "props": {}
+        },
+        "Meta": {
+          "props": {}
+        }
+      },
+      "structure": {
+        "tree": [
+          "OptionPicker.Root",
+          "  OptionPicker.Item",
+          "  OptionPicker.Preview",
+          "  OptionPicker.Label",
+          "  OptionPicker.Description",
+          "  OptionPicker.Meta"
+        ]
+      },
+      "cssVars": {
+        "--dry-btn-align": "Align",
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color",
+        "--dry-btn-justify": "Justify",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
+        "--dry-option-picker-description-column": "Picker Description Column",
+        "--dry-option-picker-description-row": "Picker Description Row",
+        "--dry-option-picker-label-column": "Picker Label Column",
+        "--dry-option-picker-label-row": "Picker Label Row",
+        "--dry-option-picker-meta-column": "Picker Meta Column",
+        "--dry-option-picker-meta-row": "Picker Meta Row",
+        "--dry-option-picker-preview-bg": "Picker Preview Bg",
+        "--dry-option-picker-preview-border": "Picker Preview Border",
+        "--dry-option-picker-preview-color": "Picker Preview Color",
+        "--dry-option-picker-preview-column": "Picker Preview Column",
+        "--dry-option-picker-preview-radius": "Picker Preview Radius",
+        "--dry-option-picker-preview-row": "Picker Preview Row",
+        "--dry-option-picker-preview-size": "Picker Preview Size"
+      },
+      "dataAttributes": [
+        {
+          "name": "data-columns"
+        },
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-layout"
+        },
+        {
+          "name": "data-option-picker-description"
+        },
+        {
+          "name": "data-option-picker-item"
+        },
+        {
+          "name": "data-option-picker-label"
+        },
+        {
+          "name": "data-option-picker-meta"
+        },
+        {
+          "name": "data-option-picker-preview"
+        },
+        {
+          "name": "data-option-picker-preview-shape"
+        },
+        {
+          "name": "data-option-picker-root"
+        },
+        {
+          "name": "data-orientation",
+          "description": "Reflects the current horizontal or vertical orientation.",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
+        },
+        {
+          "name": "data-shape"
+        },
+        {
+          "name": "data-size"
+        },
+        {
+          "name": "data-state"
+        },
+        {
+          "name": "data-unavailable"
+        },
+        {
+          "name": "data-value"
+        },
+        {
+          "name": "data-variant"
+        }
+      ],
+      "example": "<OptionPicker.Root>\n  <OptionPicker.Item>...</OptionPicker.Item>\n  <OptionPicker.Preview>...</OptionPicker.Preview>\n  <OptionPicker.Label>...</OptionPicker.Label>\n  <OptionPicker.Description>...</OptionPicker.Description>\n  <OptionPicker.Meta>...</OptionPicker.Meta>\n</OptionPicker.Root>"
     },
     "Container": {
       "import": "@dryui/ui",
@@ -16613,6 +16878,10 @@
         },
         {
           "name": "data-part"
+        },
+        {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
         },
         {
           "name": "data-state"

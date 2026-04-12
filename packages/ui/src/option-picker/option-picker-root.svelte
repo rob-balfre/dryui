@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { setSelectableTileGroupCtx } from './context.svelte.js';
+	import { setSelectableTileGroupCtx } from '../option-swatch-group/context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: string;
@@ -46,7 +46,7 @@
 	data-orientation={orientation}
 	data-disabled={disabled || undefined}
 	data-columns={columns}
-	data-option-swatch-group-root
+	data-option-picker-root
 	class={className}
 	{...rest}
 >
@@ -54,28 +54,29 @@
 </div>
 
 <style>
-	[data-option-swatch-group-root] {
+	[data-option-picker-root] {
 		display: grid;
 		grid-template-columns: repeat(
 			auto-fit,
-			minmax(var(--dry-option-swatch-group-min-column, 4rem), max-content)
+			minmax(var(--dry-option-picker-min-column, 10rem), 1fr)
 		);
-		gap: var(--dry-option-swatch-group-gap, var(--dry-space-3));
+		gap: var(--dry-option-picker-gap, var(--dry-space-3));
+		align-items: stretch;
 	}
 
-	[data-option-swatch-group-root][data-orientation='vertical'] {
+	[data-option-picker-root][data-orientation='vertical'] {
 		grid-template-columns: 1fr;
 	}
 
-	[data-option-swatch-group-root][data-columns='2'] {
-		grid-template-columns: repeat(2, max-content);
+	[data-option-picker-root][data-columns='2'] {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 
-	[data-option-swatch-group-root][data-columns='3'] {
-		grid-template-columns: repeat(3, max-content);
+	[data-option-picker-root][data-columns='3'] {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 	}
 
-	[data-option-swatch-group-root][data-columns='4'] {
-		grid-template-columns: repeat(4, max-content);
+	[data-option-picker-root][data-columns='4'] {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 	}
 </style>

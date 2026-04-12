@@ -351,8 +351,12 @@
 		}
 
 		&[aria-expanded='true'] {
-			--_dry-btn-bg: var(--dry-btn-bg, var(--dry-color-fill));
-			--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-brand));
+			--_dry-btn-bg: var(--dry-btn-trigger-open-bg, var(--dry-btn-bg, var(--dry-color-fill)));
+			--_dry-btn-color: var(
+				--dry-btn-trigger-open-color,
+				var(--dry-btn-color, var(--dry-color-text-brand))
+			);
+			--_dry-btn-border: var(--dry-btn-trigger-open-border, var(--dry-btn-border, transparent));
 		}
 	}
 

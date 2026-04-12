@@ -199,6 +199,16 @@ export type {
 	OptionSwatchGroupMetaProps
 } from './option-swatch-group/index.js';
 
+export { OptionPicker } from './option-picker/index.js';
+export type {
+	OptionPickerRootProps,
+	OptionPickerItemProps,
+	OptionPickerPreviewProps,
+	OptionPickerLabelProps,
+	OptionPickerDescriptionProps,
+	OptionPickerMetaProps
+} from './option-picker/index.js';
+
 // Phase 4 — Layout Primitives
 
 export { Container } from './container/index.js';

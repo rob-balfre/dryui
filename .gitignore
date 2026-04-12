@@ -32,6 +32,8 @@ benchmarks/visual-checks/chromedp/diff.png
 tests/browser/__screenshots__/visual-benchmark.browser.test.ts/
 tmp/
 test-projects/
+theme-inspo/
+diagram-samples/
 
 # Auto-generated .d.ts emitted into package src/ dirs when svelte-package
 # walks workspace paths (the real published .d.ts files live in dist/).

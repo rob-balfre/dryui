@@ -2,13 +2,14 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
-	import { getSelectableTileGroupCtx } from './context.svelte.js';
+	import { getSelectableTileGroupCtx } from '../option-swatch-group/context.svelte.js';
 
 	interface Props extends Omit<HTMLButtonAttributes, 'value'> {
 		value: string;
 		disabled?: boolean;
 		unavailable?: boolean;
-		size?: 'default' | 'compact';
+		layout?: 'inline' | 'stacked';
+		size?: 'default' | 'compact' | 'visual';
 		children: Snippet;
 	}
 
@@ -16,6 +17,7 @@
 		value,
 		disabled = false,
 		unavailable = false,
+		layout = 'inline',
 		size = 'default',
 		children,
 		...rest
@@ -65,6 +67,7 @@
 
 <span
 	class="root"
+	data-layout={layout}
 	data-size={size !== 'default' ? size : undefined}
 	data-state={isSelected ? 'checked' : 'unchecked'}
 	data-selected={isSelected ? '' : undefined}
@@ -77,7 +80,7 @@
 		role="radio"
 		aria-checked={isSelected}
 		disabled={isDisabled}
-		data-option-swatch-group-item
+		data-option-picker-item
 		data-state={isSelected ? 'checked' : 'unchecked'}
 		data-selected={isSelected ? '' : undefined}
 		data-unavailable={unavailable || undefined}
@@ -97,24 +100,24 @@
 
 <style>
 	.root {
-		--_swatch-item-selected-bg: var(
-			--dry-option-swatch-group-selected-bg,
+		--_option-picker-selected-bg: var(
+			--dry-option-picker-selected-bg,
 			color-mix(in srgb, var(--dry-color-fill-selected) 12%, var(--dry-color-bg-raised) 88%)
 		);
-		--_swatch-item-selected-bg-hover: var(
-			--dry-option-swatch-group-selected-bg-hover,
+		--_option-picker-selected-bg-hover: var(
+			--dry-option-picker-selected-bg-hover,
 			color-mix(in srgb, var(--dry-color-fill-selected) 16%, var(--dry-color-bg-raised) 84%)
 		);
-		--_swatch-item-selected-border: var(
-			--dry-option-swatch-group-selected-border,
+		--_option-picker-selected-border: var(
+			--dry-option-picker-selected-border,
 			var(--dry-color-stroke-selected)
 		);
 
 		display: grid;
-		background: var(--dry-option-swatch-group-bg, var(--dry-color-bg-base));
-		border: 1px solid var(--dry-option-swatch-group-border, var(--dry-color-stroke-weak));
-		border-radius: var(--dry-option-swatch-group-radius, var(--dry-radius-lg));
-		box-shadow: var(--dry-option-swatch-group-shadow, none);
+		background: var(--dry-option-picker-bg, var(--dry-color-bg-base));
+		border: 1px solid var(--dry-option-picker-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-option-picker-radius, var(--dry-radius-lg));
+		box-shadow: var(--dry-option-picker-shadow, none);
 		transition:
 			background var(--dry-duration-fast, 100ms) ease,
 			border-color var(--dry-duration-fast, 100ms) ease,
@@ -123,13 +126,24 @@
 
 		--dry-btn-bg: transparent;
 		--dry-btn-border: transparent;
-		--dry-btn-color: var(--dry-option-swatch-group-color, var(--dry-color-text-strong));
+		--dry-btn-color: var(--dry-option-picker-color, var(--dry-color-text-strong));
 		--dry-btn-padding-x: 0;
 		--dry-btn-padding-y: 0;
-		--dry-btn-radius: var(--dry-option-swatch-group-radius, var(--dry-radius-lg));
+		--dry-btn-radius: var(--dry-option-picker-radius, var(--dry-radius-lg));
 		--dry-btn-justify: stretch;
 		--dry-btn-align: stretch;
 		--dry-btn-min-height: 0;
+
+		--dry-option-picker-preview-size: 2.25rem;
+		--dry-option-picker-preview-radius: var(--dry-radius-md);
+		--dry-option-picker-preview-column: 1;
+		--dry-option-picker-preview-row: 1 / span 3;
+		--dry-option-picker-label-column: 2;
+		--dry-option-picker-label-row: 1;
+		--dry-option-picker-description-column: 2;
+		--dry-option-picker-description-row: 2;
+		--dry-option-picker-meta-column: 2;
+		--dry-option-picker-meta-row: 3;
 	}
 
 	.root:hover:not([data-disabled]) {
@@ -139,18 +153,18 @@
 			var(--dry-color-stroke-weak) 28%
 		);
 		background: var(
-			--dry-option-swatch-group-bg-hover,
+			--dry-option-picker-bg-hover,
 			color-mix(in srgb, var(--dry-color-bg-raised) 92%, var(--dry-color-fill-selected) 8%)
 		);
 	}
 
 	.root[data-state='checked'] {
-		border-color: var(--_swatch-item-selected-border);
-		background: var(--_swatch-item-selected-bg);
+		border-color: var(--_option-picker-selected-border);
+		background: var(--_option-picker-selected-bg);
 	}
 
 	.root[data-state='checked']:hover:not([data-disabled]) {
-		background: var(--_swatch-item-selected-bg-hover);
+		background: var(--_option-picker-selected-bg-hover);
 	}
 
 	.root:focus-within {
@@ -163,47 +177,34 @@
 		grid-template-columns: auto minmax(0, 1fr);
 		align-items: center;
 		justify-items: start;
-		gap: var(--dry-option-swatch-group-item-gap, var(--dry-space-2_5));
-		padding: var(--dry-option-swatch-group-padding-y, var(--dry-space-2))
-			var(--dry-option-swatch-group-padding-x, var(--dry-space-2_5));
-		min-block-size: var(--dry-option-swatch-group-min-block-size, 3rem);
+		gap: var(--dry-option-picker-item-gap, var(--dry-space-3));
+		padding: var(--dry-option-picker-padding-y, var(--dry-space-3))
+			var(--dry-option-picker-padding-x, var(--dry-space-3));
+		min-block-size: var(--dry-option-picker-min-block-size, 3.5rem);
 		text-align: left;
 	}
 
-	.root[data-size='compact'] .content {
-		grid-template-columns: auto;
+	.root[data-layout='stacked'] .content {
+		grid-template-columns: 1fr;
 		justify-items: center;
-		gap: 0;
-		min-block-size: 0;
-		padding: var(--dry-option-swatch-group-compact-padding, var(--dry-space-0_5));
+		text-align: center;
+		--dry-option-picker-preview-size: 3rem;
+		--dry-option-picker-preview-column: 1;
+		--dry-option-picker-preview-row: 1;
+		--dry-option-picker-label-column: 1;
+		--dry-option-picker-label-row: 2;
+		--dry-option-picker-description-column: 1;
+		--dry-option-picker-description-row: 3;
+		--dry-option-picker-meta-column: 1;
+		--dry-option-picker-meta-row: 4;
 	}
 
-	.root[data-size='compact'] {
-		background: transparent;
-		border-color: transparent;
-		border-radius: 999px;
-		box-shadow: none;
+	.root[data-size='compact'] .content {
+		min-block-size: 2.75rem;
 	}
 
-	.root[data-size='compact']:hover:not([data-disabled]) {
-		background: color-mix(in srgb, var(--dry-color-fill-selected) 6%, transparent);
-		border-color: transparent;
-	}
-
-	.root[data-size='compact'][data-state='checked'] {
-		--dry-option-swatch-group-swatch-border: color-mix(
-			in srgb,
-			var(--_swatch-item-selected-border) 34%,
-			var(--dry-color-stroke-weak) 66%
-		);
-
-		background: color-mix(in srgb, var(--dry-color-fill-selected) 6%, transparent);
-		border-color: transparent;
-		box-shadow: 0 0 0 1px var(--_swatch-item-selected-border);
-	}
-
-	.root[data-size='compact'][data-state='checked']:hover:not([data-disabled]) {
-		background: color-mix(in srgb, var(--dry-color-fill-selected) 8%, transparent);
+	.root[data-size='visual'] .content {
+		min-block-size: var(--dry-option-picker-visual-min-block-size, 5.5rem);
 	}
 
 	.root[data-disabled] {

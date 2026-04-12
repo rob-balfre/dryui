@@ -1,6 +1,6 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "0.3.0",
+  "packageVersion": "0.4.0",
   "summary": {
     "componentNodes": 289,
     "partNodes": 663,
@@ -9045,7 +9045,7 @@
         "Next",
         "Heading"
       ],
-      "sourceFileCount": 8,
+      "sourceFileCount": 9,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -9237,7 +9237,7 @@
         "Dots",
         "Thumbnails"
       ],
-      "sourceFileCount": 9,
+      "sourceFileCount": 10,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -13774,7 +13774,7 @@
         "Link",
         "Ellipsis"
       ],
-      "sourceFileCount": 9,
+      "sourceFileCount": 10,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },

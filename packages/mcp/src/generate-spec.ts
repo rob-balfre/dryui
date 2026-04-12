@@ -760,6 +760,12 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		category: 'input',
 		tags: ['swatch', 'selection', 'options', 'tiles', 'product']
 	},
+	OptionPicker: {
+		description:
+			'Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices',
+		category: 'input',
+		tags: ['picker', 'selection', 'options', 'tiles', 'preset', 'preview']
+	},
 	AlphaSlider: {
 		description: 'Slider for selecting alpha/opacity values in color pickers',
 		category: 'input',

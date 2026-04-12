@@ -143,7 +143,7 @@
 	</div>
 {/snippet}
 
-{#if isFullWidthRoute}
+{#if isFullWidthRoute || isThemeWizardRoute}
 	{@render routeChildren?.()}
 {:else}
 	{@render docsShell()}
@@ -152,7 +152,8 @@
 <style>
 	.docs-shell-frame {
 		container-type: inline-size;
-		min-height: 100dvh;
+		height: 100dvh;
+		overflow: hidden;
 	}
 
 	.docs-shell {
@@ -161,7 +162,8 @@
 		grid-template-areas: 'header' 'nav' 'content';
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: auto auto 1fr;
-		min-height: 100dvh;
+		height: 100%;
+		min-height: 0;
 	}
 
 	.docs-header {
@@ -217,9 +219,8 @@
 		grid-area: nav;
 		display: none;
 		overflow: hidden;
-		position: sticky;
-		top: 0;
-		height: 100dvh;
+		height: 100%;
+		min-height: 0;
 		background: var(--dry-sidebar-bg, transparent);
 		border-inline-end: 1px solid var(--dry-sidebar-border, transparent);
 	}
@@ -230,6 +231,8 @@
 		grid-template-rows: 1fr auto;
 		grid-template-columns: minmax(0, 1fr);
 		container-type: inline-size;
+		min-height: 0;
+		overflow: auto;
 	}
 
 	@container (min-width: 60rem) {
