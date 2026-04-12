@@ -44,6 +44,19 @@ jobs:
 
       - run: bun run build:packages
 
+      - name: Debug NPM_TOKEN (length only, token value is masked)
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "NPM_TOKEN length: ${#NPM_TOKEN}"
+          echo "NPM_TOKEN prefix (first 4 chars): ${NPM_TOKEN:0:4}"
+          echo "Tail byte hex dump (last 3 bytes):"
+          printf '%s' "$NPM_TOKEN" | tail -c 3 | xxd || true
+          # Directly test publish auth by hitting npm whoami with the token
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > /tmp/test-npmrc
+          NPM_CONFIG_USERCONFIG=/tmp/test-npmrc npm whoami --registry=https://registry.npmjs.org || true
+          rm /tmp/test-npmrc
+
       - uses: changesets/action@v1
         with:
           version: bun run version
