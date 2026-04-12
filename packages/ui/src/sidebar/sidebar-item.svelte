@@ -18,8 +18,7 @@
 	[data-sidebar-item] {
 		position: relative;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: max-content minmax(0, 1fr) max-content;
 		align-items: center;
 		gap: var(--dry-space-3);
 		min-height: var(--dry-sidebar-item-height, var(--dry-space-12));

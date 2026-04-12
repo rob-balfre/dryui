@@ -1,6 +1,6 @@
 # dryui component reference
 
-> Machine-readable component import, props, styling hook, and example index for 144 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 145 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -17,7 +17,7 @@ Root import: import { Button } from '@dryui/ui'
 Subpath import: import { Button } from '@dryui/ui/button'
 Props: variant (ButtonVariant), Button treatment from solid primary actions to ghost and inline link styles., default 'solid' | size (ButtonSize), Button density preset, including icon-only sizing variants., default 'md' | color (ButtonColor), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <button> attributes via rest props.
-CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg
+CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg, --dry-btn-trigger-open-bg, --dry-btn-trigger-open-border, --dry-btn-trigger-open-color
 Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example:
@@ -385,9 +385,9 @@ Root import: import { OptionSwatchGroup } from '@dryui/ui'
 Subpath import: import { OptionSwatchGroup } from '@dryui/ui/option-swatch-group'
 Parts:
 - OptionSwatchGroup.Root
-  Props: none
+  Props: columns (1 | 2 | 3 | 4), accepted 1, 2, 3, 4
 - OptionSwatchGroup.Item
-  Props: none
+  Props: size ('default' | 'compact'), Size preset affecting density, spacing, or typography., accepted default, compact | unavailable (boolean)
 - OptionSwatchGroup.Swatch
   Props: color (string), Semantic color or tone applied to the component. | shape ('circle' | 'rounded'), accepted circle, rounded, default 'circle' | children (Snippet), Content rendered inside the component.
   Native props: Forwards <span> attributes via rest props.
@@ -401,8 +401,8 @@ Structure:
     OptionSwatchGroup.Swatch
     OptionSwatchGroup.Label
     OptionSwatchGroup.Meta
-CSS variables: --dry-option-swatch-chip
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-unavailable | data-value
+CSS variables: --dry-btn-align, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-option-swatch-chip, --dry-option-swatch-group-swatch-border
+Data attributes: data-columns | data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-selected (Present when the current item is selected.) | data-size | data-state | data-unavailable | data-value
 Accessibility: none
 Example:
 ```svelte
@@ -412,6 +412,48 @@ Example:
   <OptionSwatchGroup.Label>...</OptionSwatchGroup.Label>
   <OptionSwatchGroup.Meta>...</OptionSwatchGroup.Meta>
 </OptionSwatchGroup.Root>
+```
+
+## OptionPicker
+Package: @dryui/ui
+Category: input
+Tags: picker, selection, options, tiles, preset, preview
+Kind: compound
+Root import: import { OptionPicker } from '@dryui/ui'
+Subpath import: import { OptionPicker } from '@dryui/ui/option-picker'
+Parts:
+- OptionPicker.Root
+  Props: columns (1 | 2 | 3 | 4), accepted 1, 2, 3, 4
+- OptionPicker.Item
+  Props: layout ('inline' | 'stacked'), accepted inline, stacked, default 'inline' | size ('default' | 'compact' | 'visual'), Size preset affecting density, spacing, or typography., accepted default, compact, visual, default 'default' | unavailable (boolean), default false
+- OptionPicker.Preview
+  Props: color (string), Semantic color or tone applied to the component. | shape ('circle' | 'rounded' | 'square' | 'pill'), accepted circle, rounded, square, pill, default 'rounded' | variant ('default' | 'preset' | 'font' | 'shape'), Visual style preset for the component., accepted default, preset, font, shape, default 'default' | children (Snippet), Content rendered inside the component.
+  Native props: Forwards <span> attributes via rest props.
+- OptionPicker.Label
+  Props: none
+- OptionPicker.Description
+  Props: none
+- OptionPicker.Meta
+  Props: none
+Structure:
+  OptionPicker.Root
+    OptionPicker.Item
+    OptionPicker.Preview
+    OptionPicker.Label
+    OptionPicker.Description
+    OptionPicker.Meta
+CSS variables: --dry-btn-align, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-option-picker-description-column, --dry-option-picker-description-row, --dry-option-picker-label-column, --dry-option-picker-label-row, --dry-option-picker-meta-column, --dry-option-picker-meta-row, --dry-option-picker-preview-bg, --dry-option-picker-preview-border, --dry-option-picker-preview-color, --dry-option-picker-preview-column, --dry-option-picker-preview-radius, --dry-option-picker-preview-row, --dry-option-picker-preview-size
+Data attributes: data-columns | data-disabled (Present when the component or part is disabled.) | data-layout | data-option-picker-description | data-option-picker-item | data-option-picker-label | data-option-picker-meta | data-option-picker-preview | data-option-picker-preview-shape | data-option-picker-root | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-selected (Present when the current item is selected.) | data-shape | data-size | data-state | data-unavailable | data-value | data-variant
+Accessibility: none
+Example:
+```svelte
+<OptionPicker.Root>
+  <OptionPicker.Item>...</OptionPicker.Item>
+  <OptionPicker.Preview>...</OptionPicker.Preview>
+  <OptionPicker.Label>...</OptionPicker.Label>
+  <OptionPicker.Description>...</OptionPicker.Description>
+  <OptionPicker.Meta>...</OptionPicker.Meta>
+</OptionPicker.Root>
 ```
 
 ## Listbox
@@ -1935,7 +1977,7 @@ Structure:
       MegaMenu.Column
         MegaMenu.Link
 CSS variables: none
-Data attributes: data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-state
+Data attributes: data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
 Accessibility: none
 Example:
 ```svelte
