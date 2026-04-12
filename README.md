@@ -318,6 +318,19 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 
 For a manual local release: `bun run release`
 
+### npm auth gotcha
+
+A gitignored project-level `.npmrc` at the repo root holds the publish token and takes precedence over `~/.npmrc` when `bun run publish:packages` runs from inside the repo. The GitHub Actions `NPM_TOKEN` secret must match _that_ token, not the one in your user-level `~/.npmrc` — they're usually different (the project one is a classic Publish token with write scope; the user one is often a granular read token without publish rights).
+
+To rotate the CI secret to match the project token:
+
+```bash
+awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
+  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
+```
+
+Use `printf` (no trailing newline) and pipe via stdin — never paste tokens through GitHub's web UI, which can introduce invisible whitespace that npm's registry rejects as 401 and reports as 404.
+
 ## License
 
 MIT

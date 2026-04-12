@@ -171,6 +171,25 @@ Manual local release: `bun run release` (validate → version → build → publ
 
 Secrets required: `NPM_TOKEN` (repo Actions secret, already configured)
 
+### npm auth gotcha — READ BEFORE ROTATING TOKENS
+
+A gitignored **project-level `.npmrc` at the repo root** holds the publish token (`npm_R8uE...` at time of writing — a classic Publish token). This file takes precedence over `~/.npmrc` whenever publish commands run from inside the repo (`bun run publish:packages`, `bun run release`, etc.).
+
+**The GitHub Actions `NPM_TOKEN` secret must match `./.npmrc`, NOT `~/.npmrc`.** They are usually different tokens with different scopes. The user-level token is often a granular read token that can't publish; the project-level token is the one with `@dryui/*` write permission.
+
+To rotate the CI secret to match the current project token:
+
+```bash
+awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
+  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
+```
+
+Rules:
+
+- Use `printf` / `awk ... printf` (no trailing newline). A trailing `\n` becomes URL-encoded in the Bearer header and npm returns 401, which it reports as a misleading 404 on `PUT /<pkg>`.
+- Pipe via stdin to `gh secret set`. **Never paste tokens into GitHub's web UI** — it silently injects whitespace that triggers the same 401→404 pattern.
+- The npm CLI reports 404 "package not in registry" on publish auth failures to avoid leaking package existence. Always verify the package exists on npmjs.com before assuming the 404 is real — if the package IS there, the 404 means auth is wrong.
+
 ## Deployment
 
 Docs site deploys to Cloudflare Pages (`dryui-docs` project).

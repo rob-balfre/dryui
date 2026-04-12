@@ -53,6 +53,19 @@ Automated via `.github/workflows/release.yml` (changesets/action):
 
 Manual: `bun run release` (validate → version → build → publish)
 
+### npm auth gotcha
+
+There's a gitignored **project-level `.npmrc` at the repo root** that holds the publish token. It takes precedence over `~/.npmrc` when any publish command runs from inside the repo. The GitHub Actions `NPM_TOKEN` secret must match `./.npmrc`, not `~/.npmrc` — they're usually different tokens.
+
+To rotate the CI secret:
+
+```bash
+awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
+  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
+```
+
+Never paste tokens through the GitHub web UI — invisible whitespace causes npm to return 401, which it reports as a misleading 404 on publish. Always pipe via stdin with `printf` / `awk printf` so there's no trailing newline.
+
 ## Verification
 
 Always run `bun run --filter '@dryui/ui' build` after editing `.svelte` files in `packages/ui/`. The lint preprocessor runs during build and will reject violations.
