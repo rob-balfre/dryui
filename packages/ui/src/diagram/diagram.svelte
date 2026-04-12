@@ -265,7 +265,7 @@
 							data-part="node-texture"
 							width={node.width}
 							height={node.height}
-							rx={node.variant === 'pill' ? node.height / 2 : 16}
+							rx={16}
 							fill="url(#dry-diagram-{uid}-dots)"
 						/>
 					{/if}

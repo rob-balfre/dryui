@@ -144,59 +144,52 @@ function orderWithinLayers(
 
 	// Initialize positions
 	for (const layer of layers) {
-		for (let i = 0; i < layer.length; i++) {
-			posInLayer.set(layer[i], i);
-		}
+		layer.forEach((id, i) => posInLayer.set(id, i));
+	}
+
+	function resortLayer(layer: string[], neighbors: Map<string, string[]>): string[] {
+		const sorted = layer.map((nodeId) => {
+			const adj = neighbors.get(nodeId) ?? [];
+			const positions = adj
+				.map((p) => posInLayer.get(p))
+				.filter((p): p is number => p !== undefined);
+			const barycenter =
+				positions.length > 0
+					? positions.reduce((a, b) => a + b, 0) / positions.length
+					: (posInLayer.get(nodeId) ?? 0);
+			return { id: nodeId, bary: barycenter };
+		});
+		sorted.sort((a, b) => a.bary - b.bary);
+		return sorted.map((s) => s.id);
 	}
 
 	// Down sweep
 	for (let i = 1; i < layers.length; i++) {
-		const sorted = layers[i].map((nodeId) => {
-			const preds = adjacencyIn.get(nodeId) || [];
-			const positions = preds
-				.map((p) => posInLayer.get(p))
-				.filter((p) => p !== undefined) as number[];
-			const barycenter =
-				positions.length > 0
-					? positions.reduce((a, b) => a + b, 0) / positions.length
-					: (posInLayer.get(nodeId) ?? 0);
-			return { id: nodeId, bary: barycenter };
-		});
-		sorted.sort((a, b) => a.bary - b.bary);
-		layers[i] = sorted.map((s) => s.id);
-		for (let j = 0; j < layers[i].length; j++) {
-			posInLayer.set(layers[i][j], j);
-		}
+		const next = resortLayer(layers[i]!, adjacencyIn);
+		layers[i] = next;
+		next.forEach((id, j) => posInLayer.set(id, j));
 	}
 
 	// Up sweep
 	for (let i = layers.length - 2; i >= 0; i--) {
-		const sorted = layers[i].map((nodeId) => {
-			const succs = adjacencyOut.get(nodeId) || [];
-			const positions = succs
-				.map((s) => posInLayer.get(s))
-				.filter((p) => p !== undefined) as number[];
-			const barycenter =
-				positions.length > 0
-					? positions.reduce((a, b) => a + b, 0) / positions.length
-					: (posInLayer.get(nodeId) ?? 0);
-			return { id: nodeId, bary: barycenter };
-		});
-		sorted.sort((a, b) => a.bary - b.bary);
-		layers[i] = sorted.map((s) => s.id);
-		for (let j = 0; j < layers[i].length; j++) {
-			posInLayer.set(layers[i][j], j);
-		}
+		const next = resortLayer(layers[i]!, adjacencyOut);
+		layers[i] = next;
+		next.forEach((id, j) => posInLayer.set(id, j));
 	}
 
 	// Cluster-aware grouping: after barycenter ordering, group cluster members together
 	// and push non-clustered nodes to the edges
 	if (clusterMap && clusterMap.size > 0) {
 		for (let i = 0; i < layers.length; i++) {
-			layers[i] = groupByCluster(layers[i], clusterMap, adjacencyIn, adjacencyOut, posInLayer);
-			for (let j = 0; j < layers[i].length; j++) {
-				posInLayer.set(layers[i][j], j);
-			}
+			const regrouped = groupByCluster(
+				layers[i]!,
+				clusterMap,
+				adjacencyIn,
+				adjacencyOut,
+				posInLayer
+			);
+			layers[i] = regrouped;
+			regrouped.forEach((id, j) => posInLayer.set(id, j));
 		}
 	}
 
@@ -324,21 +317,21 @@ function assignCoordinates(
 	const sizeOrder = reversed ? [...layerSizes].reverse() : layerSizes;
 
 	for (let li = 0; li < layerOrder.length; li++) {
-		const layer = layerOrder[li];
-		const layerSize = sizeOrder[li];
+		const layer = layerOrder[li]!;
+		const layerSize = sizeOrder[li]!;
 
 		// Center this layer's nodes
-		const crossExtent = layerCrossExtents[reversed ? layerOrder.length - 1 - li : li];
+		const crossExtent = layerCrossExtents[reversed ? layerOrder.length - 1 - li : li] ?? 0;
 		let crossOffset = MARGIN + (maxCrossExtent - crossExtent) / 2;
 
 		for (let ni = 0; ni < layer.length; ni++) {
-			const id = layer[ni];
+			const id = layer[ni]!;
 			const dims = nodeDims.get(id)!;
 			const primaryOffset = reversed ? (horizontal ? layerSize - dims.w : layerSize - dims.h) : 0;
 
 			// Add extra gap at cluster/non-cluster boundary
 			if (ni > 0 && clusterMap && clusterMap.size > 0) {
-				const prevCluster = clusterMap.get(layer[ni - 1]);
+				const prevCluster = clusterMap.get(layer[ni - 1]!);
 				const currCluster = clusterMap.get(id);
 				if (
 					prevCluster !== currCluster &&
@@ -373,8 +366,8 @@ function assignCoordinates(
 function countClusterBoundaries(layer: string[], clusterMap: Map<string, string>): number {
 	let count = 0;
 	for (let i = 1; i < layer.length; i++) {
-		const prevCluster = clusterMap.get(layer[i - 1]);
-		const currCluster = clusterMap.get(layer[i]);
+		const prevCluster = clusterMap.get(layer[i - 1]!);
+		const currCluster = clusterMap.get(layer[i]!);
 		if (prevCluster !== currCluster && (prevCluster !== undefined || currCluster !== undefined)) {
 			count++;
 		}
@@ -478,7 +471,7 @@ function resolveAnnotations(
 
 	// Collision avoidance: check annotations against nodes and other annotations
 	for (let i = 0; i < resolved.length; i++) {
-		const ann = resolved[i];
+		const ann = resolved[i]!;
 		const annW = ann.text.length * ANNOTATION_CHAR_WIDTH;
 		const annH = ANNOTATION_HEIGHT;
 
@@ -506,7 +499,7 @@ function resolveAnnotations(
 
 		// Check against previously placed annotations
 		for (let j = 0; j < i; j++) {
-			const other = resolved[j];
+			const other = resolved[j]!;
 			const otherW = other.text.length * ANNOTATION_CHAR_WIDTH;
 			const otherH = ANNOTATION_HEIGHT;
 			if (
@@ -548,7 +541,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	const maxLayer = Math.max(0, ...layerMap.values());
 	const layers: string[][] = Array.from({ length: maxLayer + 1 }, () => []);
 	for (const id of graph.order) {
-		layers[layerMap.get(id)!].push(id);
+		layers[layerMap.get(id)!]!.push(id);
 	}
 
 	// Order within layers (cluster-aware)
@@ -666,7 +659,7 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	// Assign lanes
 	const laneMap = new Map<string, number>();
 	for (let i = 0; i < lanes.length; i++) {
-		for (const nid of lanes[i].nodes) {
+		for (const nid of lanes[i]!.nodes) {
 			laneMap.set(nid, i);
 		}
 	}
@@ -686,7 +679,7 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	let laneX = MARGIN;
 	for (let i = 0; i < laneWidths.length; i++) {
 		laneStartX.push(laneX);
-		laneX += laneWidths[i];
+		laneX += laneWidths[i]!;
 	}
 
 	// Topological order for Y positions
@@ -716,8 +709,8 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 	const positionedSwimlanes: PositionedSwimlane[] = lanes.map((lane, i) => ({
 		id: lane.id,
 		label: lane.label,
-		x: laneStartX[i],
-		lineX: laneStartX[i] + laneWidths[i] / 2,
+		x: laneStartX[i]!,
+		lineX: laneStartX[i]! + laneWidths[i]! / 2,
 		headerY: MARGIN,
 		footerY: totalHeight - MARGIN,
 		lineY1: MARGIN + headerHeight,
@@ -769,8 +762,8 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 		}
 
 		const pad = 16;
-		const regionX = laneStartX[minLane] - pad;
-		let regionEndX = laneStartX[maxLane] + laneWidths[maxLane] + pad;
+		const regionX = laneStartX[minLane]! - pad;
+		let regionEndX = laneStartX[maxLane]! + laneWidths[maxLane]! + pad;
 		return {
 			id: region.id,
 			x: regionX,
@@ -801,7 +794,7 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 
 	// Include swimlane headers
 	for (let si = 0; si < positionedSwimlanes.length; si++) {
-		const sl = positionedSwimlanes[si];
+		const sl = positionedSwimlanes[si]!;
 		minX = Math.min(minX, sl.x);
 		minY = Math.min(minY, sl.headerY);
 		maxViewX = Math.max(maxViewX, sl.x + (laneWidths[si] ?? 180));
@@ -1058,9 +1051,10 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 	const actorXMap = new Map<string, number>();
 	const actorColorMap = new Map<string, string>();
 	for (let i = 0; i < actors.length; i++) {
+		const actor = actors[i]!;
 		const x = MARGIN + i * SEQ_ACTOR_GAP + SEQ_ACTOR_GAP / 2;
-		actorXMap.set(actors[i].id, x);
-		actorColorMap.set(actors[i].id, actors[i].color || 'neutral');
+		actorXMap.set(actor.id, x);
+		actorColorMap.set(actor.id, actor.color || 'neutral');
 	}
 
 	// Compute message Y positions (increment per message)
@@ -1068,8 +1062,9 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 	const messageYPositions: number[] = [];
 	let currentY = messageStartY;
 	for (let i = 0; i < messages.length; i++) {
+		const msg = messages[i]!;
 		messageYPositions.push(currentY);
-		const isSelf = messages[i].from === messages[i].to;
+		const isSelf = msg.from === msg.to;
 		currentY += isSelf ? SEQ_MESSAGE_GAP + SEQ_SELF_LOOP_HEIGHT : SEQ_MESSAGE_GAP;
 	}
 
@@ -1092,7 +1087,7 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 	const positionedMessages: PositionedMessage[] = messages.map((msg, i) => {
 		const fromX = actorXMap.get(msg.from) ?? 0;
 		const toX = actorXMap.get(msg.to) ?? 0;
-		const y = messageYPositions[i];
+		const y = messageYPositions[i] ?? messageStartY;
 		const isSelf = msg.from === msg.to;
 
 		let labelX: number;
@@ -1146,7 +1141,7 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 
 		for (const msgIdx of frag.messages) {
 			if (msgIdx < 0 || msgIdx >= positionedMessages.length) continue;
-			const msg = positionedMessages[msgIdx];
+			const msg = positionedMessages[msgIdx]!;
 			const leftX = Math.min(msg.x1, msg.x2);
 			const rightX = msg.isSelf ? msg.x1 + SEQ_SELF_LOOP_WIDTH : Math.max(msg.x1, msg.x2);
 			minX = Math.min(minX, leftX);

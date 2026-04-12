@@ -285,7 +285,10 @@ function buildVerticalBusPoints(endpoints: Endpoints, busY: number): Point[] {
 
 function buildPathFromCollapsed(collapsed: Point[]): string {
 	if (collapsed.length === 0) return '';
-	if (collapsed.length === 1) return `M ${collapsed[0].x} ${collapsed[0].y}`;
+	if (collapsed.length === 1) {
+		const p = collapsed[0]!;
+		return `M ${p.x} ${p.y}`;
+	}
 
 	return collapsed
 		.map((point, index) => (index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`))
@@ -327,8 +330,8 @@ function getMidpointFromCollapsed(collapsed: Point[]): Point {
 	const segments: Array<{ from: Point; to: Point; length: number }> = [];
 
 	for (let index = 1; index < collapsed.length; index += 1) {
-		const from = collapsed[index - 1];
-		const to = collapsed[index];
+		const from = collapsed[index - 1]!;
+		const to = collapsed[index]!;
 		const length = Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
 
 		if (length === 0) continue;
