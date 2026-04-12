@@ -1,5 +1,12 @@
 # @dryui/cli
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [[`fa63bd3`](https://github.com/rob-balfre/dryui/commit/fa63bd3e027637b0b9e41f07fd52eaa1d4fafadf)]:
+  - @dryui/mcp@0.5.0
+
 ## 0.4.1
 
 ### Patch Changes
