@@ -1,5 +1,3 @@
-import path from 'node:path';
-
 export interface Violation {
 	rule: string;
 	message: string;
@@ -258,7 +256,14 @@ function stripBlocks(content: string): string {
 
 function getParentDir(filename?: string): string {
 	if (!filename) return '';
-	return path.basename(path.dirname(filename)).toLowerCase();
+	// Parent dir = last segment of the parent path. Platform-agnostic and
+	// avoids a node:path import so this module works in browser/bun contexts.
+	const normalized = filename.replace(/\\/g, '/');
+	const lastSlash = normalized.lastIndexOf('/');
+	if (lastSlash === -1) return '';
+	const parent = normalized.slice(0, lastSlash);
+	const prevSlash = parent.lastIndexOf('/');
+	return parent.slice(prevSlash + 1).toLowerCase();
 }
 
 function createNativeElementMessage(rule: NativeElementRule): string {
