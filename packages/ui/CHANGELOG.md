@@ -1,5 +1,14 @@
 # @dryui/ui
 
+## 0.5.2
+
+### Patch Changes
+
+- [`1d519e3`](https://github.com/rob-balfre/dryui/commit/1d519e3c7287f569f9ae69e7c464b34ac49dff9b) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix `Select.Trigger` content alignment — when the trigger stretches to fill its container, the value label now sits at the inline-start and the chevron indicator at the inline-end, instead of both being center-grouped. Implemented by wrapping the trigger `Button` in a grid root that sets `--dry-btn-justify: space-between` and `--dry-btn-align: center`.
+
+- Updated dependencies [[`1d519e3`](https://github.com/rob-balfre/dryui/commit/1d519e3c7287f569f9ae69e7c464b34ac49dff9b)]:
+  - @dryui/primitives@0.5.2
+
 ## 0.5.1
 
 ### Patch Changes
