@@ -235,7 +235,7 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 ## Gotchas
 
 - Browser tests require Playwright installed (`bunx playwright install chromium`)
-- @dryui/primitives and @dryui/ui versions are linked via changesets — release together
+- @dryui/primitives and @dryui/ui are a `fixed` changesets group — they always share a version, and bumping one forces the other to bump too. Do not switch to `linked`: `linked` only enforces equal versions when both packages happen to be bumped in the same release and will silently let primitives fall behind if a changeset lists only `@dryui/ui`
 - MCP build runs `generate-spec` first to produce spec.json from component metadata
 - The ui package scoped styles reference --dry-\* vars — components render unstyled without a theme import
 - @dryui/docs is excluded from changesets (not published)
