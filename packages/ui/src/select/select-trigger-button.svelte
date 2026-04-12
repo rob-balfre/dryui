@@ -14,34 +14,42 @@
 	const ctx = getSelectCtx();
 </script>
 
-<Button
-	variant="outline"
-	{size}
-	type="button"
-	id={ctx.triggerId}
-	popovertarget={ctx.contentId}
-	aria-haspopup="listbox"
-	aria-expanded={ctx.open}
-	aria-controls={ctx.open ? ctx.contentId : undefined}
-	data-state={ctx.open ? 'open' : 'closed'}
-	data-select-trigger
-	disabled={ctx.disabled}
-	ref={(el) => (ctx.triggerEl = el)}
-	{...rest}
->
-	{@render children()}
-	<svg
-		data-indicator
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg
+<span class="root">
+	<Button
+		variant="outline"
+		{size}
+		type="button"
+		id={ctx.triggerId}
+		popovertarget={ctx.contentId}
+		aria-haspopup="listbox"
+		aria-expanded={ctx.open}
+		aria-controls={ctx.open ? ctx.contentId : undefined}
+		data-state={ctx.open ? 'open' : 'closed'}
+		data-select-trigger
+		disabled={ctx.disabled}
+		ref={(el) => (ctx.triggerEl = el)}
+		{...rest}
 	>
-</Button>
+		{@render children()}
+		<svg
+			data-indicator
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg
+		>
+	</Button>
+</span>
 
 <style>
+	.root {
+		display: grid;
+		--dry-btn-justify: space-between;
+		--dry-btn-align: center;
+	}
+
 	svg[data-indicator] {
 		height: 1em;
 		aspect-ratio: 1;

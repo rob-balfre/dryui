@@ -1014,7 +1014,7 @@ Structure:
       Select.Value
     Select.Content
       Select.Item
-CSS variables: --dry-select-item-radius
+CSS variables: --dry-btn-align, --dry-btn-justify, --dry-select-item-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example:
