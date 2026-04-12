@@ -34,7 +34,7 @@ for await (const path of glob.scan(SCAN_DIR)) {
 	}
 
 	// Check markup (the function strips script/style internally)
-	violations.push(...checkMarkup(content));
+	violations.push(...checkMarkup(content, filePath));
 
 	// Check style blocks
 	for (const match of content.matchAll(styleRe)) {

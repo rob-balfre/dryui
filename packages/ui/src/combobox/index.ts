@@ -18,7 +18,7 @@ export interface ComboboxGroupProps extends HTMLAttributes<HTMLDivElement> {
 	children: Snippet;
 }
 
-import ComboboxRoot from './combobox-root.svelte';
+import ComboboxRoot from './combobox-input-root.svelte';
 import ComboboxInput from './combobox-input.svelte';
 import ComboboxContent from './combobox-content.svelte';
 import ComboboxItem from './combobox-item.svelte';

@@ -9,7 +9,7 @@ export type {
 
 import MegaMenuRoot from './mega-menu-root.svelte';
 import MegaMenuItem from './mega-menu-item.svelte';
-import MegaMenuTrigger from './mega-menu-trigger.svelte';
+import MegaMenuTrigger from './mega-menu-button-trigger.svelte';
 import MegaMenuPanel from './mega-menu-panel.svelte';
 import MegaMenuColumn from './mega-menu-column.svelte';
 import MegaMenuLink from './mega-menu-link.svelte';

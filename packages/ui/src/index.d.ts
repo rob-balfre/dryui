@@ -290,3 +290,5 @@ export { Tag } from './tag/index.js';
 export type { TagProps, TagColor } from './tag/index.js';
 export { useThemeOverride } from './themes/use-theme-override.svelte.js';
 export type { ThemeTokenMap } from './themes/use-theme-override.svelte.js';
+export { Diagram } from './diagram/index.js';
+export type { DiagramConfig, DiagramNode, DiagramEdge, DiagramCluster, DiagramAnnotation, DiagramSwimlane, DiagramRegion, DiagramColor, DiagramDirection } from './diagram/index.js';

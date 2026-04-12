@@ -1,20 +1,20 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "0.2.2",
+  "packageVersion": "0.3.0",
   "summary": {
-    "componentNodes": 290,
+    "componentNodes": 289,
     "partNodes": 663,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
-    "uiComponents": 145,
+    "uiComponents": 144,
     "uiWrappers": 130,
-    "uiComposites": 15,
-    "rootBarrelComponents": 289,
+    "uiComposites": 14,
+    "rootBarrelComponents": 288,
     "subpathOnlyComponents": 1,
     "compoundComponents": 135,
     "wrapEdges": 130,
-    "composeEdges": 11,
+    "composeEdges": 10,
     "docsEdges": 0,
     "relatedEdges": 305,
     "mismatches": 16,
@@ -15161,31 +15161,6 @@
       "componentImportCount": 0
     },
     {
-      "id": "ui:SystemMap",
-      "name": "SystemMap",
-      "label": "SystemMap",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-composite",
-      "category": "display",
-      "description": "Layered architecture diagram that visualizes component nodes, relationships, and dependency layers",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/system-map/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [
-        "diagram",
-        "graph",
-        "architecture",
-        "system",
-        "map"
-      ],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 3,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 1
-    },
-    {
       "id": "ui:Table",
       "name": "Table",
       "label": "Table",
@@ -16564,12 +16539,6 @@
       "type": "composes",
       "from": "ui:MarkdownRenderer",
       "to": "ui:Separator"
-    },
-    {
-      "id": "composes:ui:SystemMap:ui:Text:",
-      "type": "composes",
-      "from": "ui:SystemMap",
-      "to": "ui:Text"
     },
     {
       "id": "composes:ui:Tag:ui:Badge:",
@@ -24355,7 +24324,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 15\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 14\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

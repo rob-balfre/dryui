@@ -12,9 +12,9 @@ export interface FileSelectTriggerProps extends PrimitiveFileSelectTriggerProps 
 export interface FileSelectClearProps extends PrimitiveFileSelectClearProps {}
 
 import FileSelectRoot from './file-select-root.svelte';
-import FileSelectTrigger from './file-select-trigger.svelte';
+import FileSelectTrigger from './file-select-button-trigger.svelte';
 import FileSelectValue from './file-select-value.svelte';
-import FileSelectClear from './file-select-clear.svelte';
+import FileSelectClear from './file-select-button-clear.svelte';
 
 export const FileSelect: {
 	Root: typeof FileSelectRoot;

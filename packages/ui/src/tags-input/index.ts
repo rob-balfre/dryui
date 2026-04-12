@@ -14,7 +14,7 @@ export interface TagsInputRootProps extends PrimitiveTagsInputRootProps {
 import Root from './tags-input-root.svelte';
 import Input from './tags-input-input.svelte';
 import TagItem from './tags-input-tag.svelte';
-import TagDelete from './tags-input-tag-delete.svelte';
+import TagDelete from './tags-input-tag-delete-button.svelte';
 import List from './tags-input-list.svelte';
 
 export const TagsInput: {

@@ -6,8 +6,8 @@ import AlertDialogOverlay from './alert-dialog-overlay.svelte';
 import AlertDialogHeader from './alert-dialog-header.svelte';
 import AlertDialogBody from './alert-dialog-body.svelte';
 import AlertDialogFooter from './alert-dialog-footer.svelte';
-import AlertDialogAction from './alert-dialog-action.svelte';
-import AlertDialogCancel from './alert-dialog-cancel.svelte';
+import AlertDialogAction from './alert-dialog-button-action.svelte';
+import AlertDialogCancel from './alert-dialog-button-cancel.svelte';
 export declare const AlertDialog: {
     Root: typeof AlertDialogRoot;
     Trigger: typeof AlertDialogTrigger;

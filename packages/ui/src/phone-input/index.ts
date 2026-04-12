@@ -6,4 +6,4 @@ export interface PhoneInputProps extends PrimitivePhoneInputProps {
 	size?: 'sm' | 'md' | 'lg';
 }
 
-export { default as PhoneInput } from './phone-input.svelte';
+export { default as PhoneInput } from './phone-input-select.svelte';

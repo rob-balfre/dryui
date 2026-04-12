@@ -8,7 +8,7 @@ export type {
 } from '@dryui/primitives';
 
 import NotificationCenterRoot from './notification-center-root.svelte';
-import NotificationCenterTrigger from './notification-center-trigger.svelte';
+import NotificationCenterTrigger from './notification-center-trigger-button.svelte';
 import NotificationCenterPanel from './notification-center-panel.svelte';
 import NotificationCenterItem from './notification-center-item.svelte';
 import NotificationCenterGroup from './notification-center-group.svelte';

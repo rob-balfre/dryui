@@ -1,5 +1,5 @@
 export type { CommandPaletteRootProps, CommandPaletteInputProps, CommandPaletteListProps, CommandPaletteGroupProps, CommandPaletteItemProps, CommandPaletteEmptyProps, CommandPaletteSeparatorProps } from '@dryui/primitives';
-import CommandPaletteRoot from './command-palette-root.svelte';
+import CommandPaletteRoot from './command-palette-dialog-root.svelte';
 import CommandPaletteInput from './command-palette-input.svelte';
 import CommandPaletteList from './command-palette-list.svelte';
 import CommandPaletteGroup from './command-palette-group.svelte';

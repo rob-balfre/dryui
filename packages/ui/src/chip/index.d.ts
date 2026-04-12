@@ -17,4 +17,4 @@ export interface ChipBaseProps {
     children: Snippet;
 }
 export type ChipProps = ChipBaseProps & Omit<HTMLButtonAttributes, 'type' | 'disabled' | 'onclick' | 'children'> & Omit<HTMLAnchorAttributes, 'href' | 'rel' | 'target' | 'download' | 'type' | 'onclick' | 'children'>;
-export { default as Chip } from './chip.svelte';
+export { default as Chip } from './chip-button.svelte';

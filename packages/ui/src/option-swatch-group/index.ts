@@ -13,7 +13,7 @@ export interface OptionSwatchGroupSwatchProps extends HTMLAttributes<HTMLSpanEle
 }
 
 import OptionSwatchGroupRoot from './option-swatch-group-root.svelte';
-import OptionSwatchGroupItem from './option-swatch-group-item.svelte';
+import OptionSwatchGroupItem from './option-swatch-group-item-button.svelte';
 import OptionSwatchGroupSwatch from './option-swatch-group-swatch.svelte';
 import OptionSwatchGroupLabel from './option-swatch-group-label.svelte';
 import OptionSwatchGroupMeta from './option-swatch-group-meta.svelte';

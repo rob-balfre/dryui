@@ -43,7 +43,7 @@ import SidebarFooter from './sidebar-footer.svelte';
 import SidebarGroup from './sidebar-group.svelte';
 import SidebarGroupLabel from './sidebar-group-label.svelte';
 import SidebarItem from './sidebar-item.svelte';
-import SidebarTrigger from './sidebar-trigger.svelte';
+import SidebarTrigger from './sidebar-trigger-button.svelte';
 
 export const Sidebar: {
 	Root: typeof SidebarRoot;

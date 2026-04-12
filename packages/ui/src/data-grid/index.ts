@@ -36,15 +36,15 @@ export interface DataGridExpandTriggerProps extends HTMLAttributes<HTMLButtonEle
 import DataGridRoot from './data-grid-root.svelte';
 import DataGridTable from './data-grid-table.svelte';
 import DataGridHeader from './data-grid-header.svelte';
-import DataGridColumn from './data-grid-column.svelte';
+import DataGridColumn from './data-grid-button-input-column.svelte';
 import DataGridBody from './data-grid-body.svelte';
 import DataGridRow from './data-grid-row.svelte';
 import DataGridCell from './data-grid-cell.svelte';
-import DataGridPagination from './data-grid-pagination.svelte';
-import DataGridSelectAll from './data-grid-select-all.svelte';
-import DataGridSelectCell from './data-grid-select-cell.svelte';
+import DataGridPagination from './data-grid-button-pagination.svelte';
+import DataGridSelectAll from './data-grid-input-select-all.svelte';
+import DataGridSelectCell from './data-grid-input-select-cell.svelte';
 import DataGridExpandableRow from './data-grid-expandable-row.svelte';
-import DataGridExpandTrigger from './data-grid-expand-trigger.svelte';
+import DataGridExpandTrigger from './data-grid-button-expand-trigger.svelte';
 
 export const DataGrid: {
 	Root: typeof DataGridRoot;

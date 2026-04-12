@@ -6,4 +6,4 @@ export interface ToggleProps extends PrimitiveToggleProps {
 	icon?: Snippet;
 }
 
-export { default as Toggle } from './toggle.svelte';
+export { default as Toggle } from './toggle-button.svelte';

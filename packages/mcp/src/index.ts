@@ -106,14 +106,13 @@ const REVIEW_DESC = [
 	'BEFORE CALLING THIS TOOL: Search the project for CSS files containing --dry-color- or --dry- variable overrides (e.g., global.css, app.css, theme files, layout files). If found, read that CSS and pass it as the `projectCss` parameter. This auto-diagnoses contrast, transparency, and missing token issues alongside the component review.\n\n',
 	'Input: Raw Svelte component source code as a string.\n',
 	'Checks:\n',
-	'- **Errors:** Bare compound components (<Card> instead of <Card.Root>), unknown components, invalid props/parts, missing required props\n',
-	'- **Warnings:** Orphaned compound parts, missing accessible labels, Avatar without alt/fallback, missing theme CSS import when DryUI components are used\n',
-	'- **Suggestions:** Hardcoded colors, raw <hr> instead of <Separator>, and custom layout code that ignores the CSS-grid baseline\n\n',
+	'- **Errors:** Bare compound components (<Card> instead of <Card.Root>), unknown components, invalid props/parts, missing required props, orphaned compound parts, missing accessible labels, Avatar without alt/fallback, raw `<hr>` instead of `<Separator />`, raw styled buttons instead of `<Button>`, custom field markup instead of `<Field.Root>`, custom max-width centering instead of `<Container>`, and custom layout code that ignores the CSS-grid baseline\n',
+	'- **Suggestions:** Hardcoded colors, manual centering patterns, and custom `--dry-*` overrides that should be diagnosed separately\n\n',
 	'Output: TOON format with issues, hasBlockers/autoFixable aggregates, and next-step suggestions. When projectCss is provided, theme diagnosis results are appended.\n\n',
 	'Example:\n\n',
 	'```svelte\n<script>\n  import { Card, Badge } from \'@dryui/ui\';\n</script>\n\n<Card>\n  <Card.Header>Status</Card.Header>\n  <Card.Content>\n    <Badge variant="solid">Active</Badge>\n  </Card.Content>\n</Card>\n<hr />\n```\n\n',
 	'Output:\n\n',
-	'```\nissues[2]{severity,line,code,message}:\n  error,5,bare-compound,Card is a compound component — use <Card.Root> instead of <Card>\n  suggestion,11,prefer-separator,Use <Separator /> instead of raw <hr>\nhasBlockers: true | autoFixable: 0\n1 error, 0 warnings, 1 suggestion\n```'
+	'```\nissues[2]{severity,line,code,message}:\n  error,5,bare-compound,Card is a compound component — use <Card.Root> instead of <Card>\n  error,11,prefer-separator,Raw <hr> element — use <Separator /> for consistent styling\nhasBlockers: true | autoFixable: 2\n2 errors, 0 warnings, 0 suggestions\n```'
 ].join('\n');
 
 const DIAGNOSE_DESC = [

@@ -4,7 +4,7 @@ export type { DateFieldSegmentProps, DateFieldSeparatorProps } from '@dryui/prim
 export interface DateFieldRootProps extends PrimitiveDateFieldRootProps {
     size?: 'sm' | 'md' | 'lg';
 }
-import DateFieldRoot from './date-field-root.svelte';
+import DateFieldRoot from './date-field-input-root.svelte';
 import DateFieldSegment from './date-field-segment.svelte';
 import DateFieldSeparator from './date-field-separator.svelte';
 export declare const DateField: {

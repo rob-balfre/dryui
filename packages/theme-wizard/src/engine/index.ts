@@ -65,5 +65,5 @@ export type { DecodedTheme, WizardRecipe } from './url-codec.js';
 export { generatePalette, textToBrand } from './palette.js';
 export type { PaletteResult } from './palette.js';
 
-export { PRESETS } from './presets.js';
-export type { Preset } from './presets.js';
+export { PRESETS, RECIPE_PRESETS } from './presets.js';
+export type { Preset, RecipePreset } from './presets.js';

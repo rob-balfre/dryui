@@ -1,7 +1,7 @@
 export type { RadioGroupRootProps, RadioGroupItemProps } from '@dryui/primitives';
 
 import RadioGroupRoot from './radio-group.svelte';
-import RadioGroupItem from './radio-group-item.svelte';
+import RadioGroupItem from './radio-group-item-input.svelte';
 
 export const RadioGroup: {
 	Root: typeof RadioGroupRoot;

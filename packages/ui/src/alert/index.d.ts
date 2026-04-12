@@ -4,7 +4,7 @@ import AlertRoot from './alert-root.svelte';
 import AlertIcon from './alert-icon.svelte';
 import AlertTitle from './alert-title.svelte';
 import AlertDescription from './alert-description.svelte';
-import AlertClose from './alert-close.svelte';
+import AlertClose from './alert-button-close.svelte';
 export declare const Alert: {
     Root: typeof AlertRoot;
     Icon: typeof AlertIcon;

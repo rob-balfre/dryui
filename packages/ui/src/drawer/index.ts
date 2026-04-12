@@ -15,7 +15,7 @@ export interface DrawerBodyProps extends PrimitiveDrawerBodyProps {
 
 import DrawerRoot from './drawer-root.svelte';
 import DrawerTrigger from './drawer-trigger.svelte';
-import DrawerContent from './drawer-content.svelte';
+import DrawerContent from './drawer-dialog-content.svelte';
 import DrawerOverlay from './drawer-overlay.svelte';
 import DrawerHeader from './drawer-header.svelte';
 import DrawerBody from './drawer-body.svelte';

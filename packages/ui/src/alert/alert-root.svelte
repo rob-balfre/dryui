@@ -63,14 +63,13 @@
 
 		container-type: inline-size;
 		display: grid;
-		grid-template-columns: auto 1fr auto;
+		grid-template-columns: auto minmax(0, 1fr) auto;
 		align-items: start;
 		column-gap: 0;
 		row-gap: var(--dry-space-1);
 		padding: var(--dry-alert-padding, var(--dry-space-6));
 		background: var(--dry-alert-bg);
 		border: 1px solid var(--dry-alert-border);
-		border-left: 4px solid var(--dry-alert-icon-color);
 		border-radius: var(--dry-alert-radius, var(--dry-surface-radius, var(--dry-radius-lg)));
 		color: var(--dry-alert-color, var(--dry-color-text-strong));
 		font-family: var(--dry-font-sans);

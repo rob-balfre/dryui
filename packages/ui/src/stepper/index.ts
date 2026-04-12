@@ -7,7 +7,7 @@ export type {
 
 import StepperRoot from './stepper-root.svelte';
 import StepperList from './stepper-list.svelte';
-import StepperStep from './stepper-step.svelte';
+import StepperStep from './stepper-step-button.svelte';
 import StepperSeparator from './stepper-separator.svelte';
 
 export const Stepper: {

@@ -6,4 +6,4 @@ export interface AlphaSliderProps {
     step?: number;
     onchange?: (value: number) => void;
 }
-export { default as AlphaSlider } from './alpha-slider.svelte';
+export { default as AlphaSlider } from './alpha-slider-input.svelte';

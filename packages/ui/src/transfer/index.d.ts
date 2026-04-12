@@ -8,9 +8,9 @@ export interface TransferListProps extends PrimitiveTransferListProps {
     }]>;
 }
 import TransferRoot from './transfer-root.svelte';
-import TransferList from './transfer-list.svelte';
+import TransferList from './transfer-list-input.svelte';
 import TransferItem from './transfer-item.svelte';
-import TransferActions from './transfer-actions.svelte';
+import TransferActions from './transfer-actions-button.svelte';
 export declare const Transfer: {
     Root: typeof TransferRoot;
     List: typeof TransferList;

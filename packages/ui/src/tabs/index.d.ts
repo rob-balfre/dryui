@@ -22,7 +22,7 @@ export interface TabsContentProps extends HTMLAttributes<HTMLDivElement> {
 }
 import TabsRoot from './tabs-root.svelte';
 import TabsList from './tabs-list.svelte';
-import TabsTrigger from './tabs-trigger.svelte';
+import TabsTrigger from './tabs-trigger-button.svelte';
 import TabsContent from './tabs-content.svelte';
 export declare const Tabs: {
     Root: typeof TabsRoot;

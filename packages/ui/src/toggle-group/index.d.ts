@@ -4,7 +4,7 @@ export interface ToggleGroupRootProps extends PrimitiveToggleGroupRootProps {
     size?: 'sm' | 'md' | 'lg';
 }
 import ToggleGroupRoot from './toggle-group-root.svelte';
-import ToggleGroupItem from './toggle-group-item.svelte';
+import ToggleGroupItem from './toggle-group-item-button.svelte';
 export declare const ToggleGroup: {
     Root: typeof ToggleGroupRoot;
     Item: typeof ToggleGroupItem;

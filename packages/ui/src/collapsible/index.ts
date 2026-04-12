@@ -16,7 +16,7 @@ export interface CollapsibleContentProps extends HTMLAttributes<HTMLDivElement> 
 }
 
 import CollapsibleRoot from './collapsible-root.svelte';
-import CollapsibleTrigger from './collapsible-trigger.svelte';
+import CollapsibleTrigger from './collapsible-button-trigger.svelte';
 import CollapsibleContent from './collapsible-content.svelte';
 
 export const Collapsible: {

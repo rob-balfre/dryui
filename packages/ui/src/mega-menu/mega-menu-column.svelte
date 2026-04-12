@@ -18,12 +18,17 @@
 </div>
 
 <style>
+	[data-mega-menu-column] {
+		display: grid;
+		gap: var(--dry-space-2, 0.5rem);
+	}
+
 	[data-mega-menu-column] [data-part='column-title'] {
 		font-size: var(--dry-type-ui-caption-size, var(--dry-text-xs-size, 0.75rem));
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		color: var(--dry-color-text-weak, #64748b);
-		margin-bottom: var(--dry-space-3, 0.75rem);
+		padding-bottom: var(--dry-space-1, 0.25rem);
 	}
 </style>

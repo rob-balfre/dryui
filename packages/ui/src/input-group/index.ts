@@ -23,7 +23,7 @@ import InputGroupPrefix from './input-group-prefix.svelte';
 import InputGroupInput from './input-group-input.svelte';
 import InputGroupSuffix from './input-group-suffix.svelte';
 import InputGroupSeparator from './input-group-separator.svelte';
-import InputGroupAction from './input-group-action.svelte';
+import InputGroupAction from './input-group-action-button.svelte';
 import InputGroupSelect from './input-group-select.svelte';
 
 export const InputGroup: {

@@ -1,5 +1,5 @@
 {
-  "version": "0.2.2",
+  "version": "0.3.0",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -21,41 +21,20 @@
       "compound": false,
       "props": {
         "variant": {
-          "type": "'solid' | 'outline' | 'ghost' | 'soft' | 'secondary' | 'link' | 'bare'",
+          "type": "ButtonVariant",
           "required": false,
-          "acceptedValues": [
-            "solid",
-            "outline",
-            "ghost",
-            "soft",
-            "secondary",
-            "link",
-            "bare"
-          ],
           "description": "Button treatment from solid primary actions to ghost and inline link styles.",
           "default": "'solid'"
         },
         "size": {
-          "type": "'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'",
+          "type": "ButtonSize",
           "required": false,
-          "acceptedValues": [
-            "sm",
-            "md",
-            "lg",
-            "icon",
-            "icon-sm",
-            "icon-lg"
-          ],
           "description": "Button density preset, including icon-only sizing variants.",
           "default": "'md'"
         },
         "color": {
-          "type": "'primary' | 'danger'",
+          "type": "ButtonColor",
           "required": false,
-          "acceptedValues": [
-            "primary",
-            "danger"
-          ],
           "description": "Semantic tone for primary or destructive button actions.",
           "default": "'primary'"
         },
@@ -883,13 +862,6 @@
         ]
       },
       "cssVars": {
-        "--dry-btn-accent": "Accent",
-        "--dry-btn-accent-active": "Accent Active",
-        "--dry-btn-accent-fg": "Accent Fg",
-        "--dry-btn-accent-hover": "Accent Hover",
-        "--dry-btn-accent-stroke": "Accent Stroke",
-        "--dry-btn-border": "Border color",
-        "--dry-btn-on-accent": "On Accent",
         "--dry-dialog-bg": "Background color",
         "--dry-dialog-border": "Border color",
         "--dry-dialog-max-width": "Maximum width",
@@ -901,13 +873,7 @@
       },
       "dataAttributes": [
         {
-          "name": "data-alert-dialog-action"
-        },
-        {
           "name": "data-alert-dialog-body"
-        },
-        {
-          "name": "data-alert-dialog-cancel"
         },
         {
           "name": "data-alert-dialog-content"
@@ -1923,9 +1889,6 @@
           "name": "data-accordion-item"
         },
         {
-          "name": "data-accordion-trigger"
-        },
-        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
         },
@@ -2052,9 +2015,6 @@
           "name": "data-collapsible-content-inner"
         },
         {
-          "name": "data-collapsible-trigger"
-        },
-        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
         },
@@ -2090,8 +2050,7 @@
             "open": {
               "type": "boolean",
               "required": false,
-              "description": "Whether the overlay or disclosure is currently open.",
-              "default": "false"
+              "description": "Whether the overlay or disclosure is currently open."
             },
             "children": {
               "type": "Snippet",
@@ -2703,9 +2662,7 @@
         "note": "Forwards <div> attributes via rest props."
       },
       "cssVars": {
-        "--dry-prompt-input-action-bg": "Input Action Bg",
-        "--dry-prompt-input-action-color": "Input Action Color",
-        "--dry-prompt-input-action-radius": "Input Action Radius",
+        "--dry-btn-radius": "Border radius",
         "--dry-prompt-input-bg": "Input Bg",
         "--dry-prompt-input-border": "Input Border",
         "--dry-prompt-input-color": "Input Color",
@@ -2724,9 +2681,6 @@
         },
         {
           "name": "data-prompt-input"
-        },
-        {
-          "name": "data-prompt-submit"
         },
         {
           "name": "data-prompt-submit-label"
@@ -2809,10 +2763,7 @@
         "--dry-input-font-size": "Font size",
         "--dry-input-padding-x": "Horizontal padding",
         "--dry-input-padding-y": "Vertical padding",
-        "--dry-input-radius": "Border radius",
-        "--dry-number-input-btn-width": "Input Btn Width",
-        "--dry-number-input-focus-z-index": "Input Focus Z Index",
-        "--dry-number-input-max-width": "Input Max Width"
+        "--dry-input-radius": "Border radius"
       },
       "dataAttributes": [
         {
@@ -2981,8 +2932,7 @@
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "children": {
               "type": "Snippet | undefined",
@@ -3058,21 +3008,18 @@
               "type": "boolean",
               "required": false,
               "description": "Controls whether the select menu is currently expanded.",
-              "default": "false",
               "bindable": true
             },
             "value": {
               "type": "string",
               "required": false,
               "description": "Bindable selected value for the current option set.",
-              "default": "''",
               "bindable": true
             },
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "name": {
               "type": "string",
@@ -3211,14 +3158,7 @@
       "a11y": [
         "Provide surrounding field context and a name when the selected value needs to submit with a form."
       ],
-      "cssVars": {
-        "--dry-select-bg": "Background color",
-        "--dry-select-border": "Border color",
-        "--dry-select-color": "Text color",
-        "--dry-select-font-size": "Font size",
-        "--dry-select-padding-x": "Horizontal padding",
-        "--dry-select-padding-y": "Vertical padding"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-disabled",
@@ -3226,10 +3166,6 @@
         },
         {
           "name": "data-indicator"
-        },
-        {
-          "name": "data-invalid",
-          "description": "Present when the current field value is invalid."
         },
         {
           "name": "data-placeholder"
@@ -3244,16 +3180,10 @@
           "name": "data-select-trigger"
         },
         {
-          "name": "data-select-trigger-wrap"
-        },
-        {
           "name": "data-select-value"
         },
         {
           "name": "data-select-wrapper"
-        },
-        {
-          "name": "data-size"
         },
         {
           "name": "data-state",
@@ -3290,25 +3220,21 @@
             "value": {
               "type": "string[]",
               "required": false,
-              "description": "Current controlled or bindable value.",
-              "default": "[]"
+              "description": "Current controlled or bindable value."
             },
             "query": {
               "type": "string",
-              "required": false,
-              "default": "''"
+              "required": false
             },
             "open": {
               "type": "boolean",
               "required": false,
-              "description": "Whether the overlay or disclosure is currently open.",
-              "default": "false"
+              "description": "Whether the overlay or disclosure is currently open."
             },
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "name": {
               "type": "string",
@@ -3317,8 +3243,7 @@
             },
             "maxSelections": {
               "type": "number",
-              "required": false,
-              "default": "0"
+              "required": false
             },
             "onvaluechange": {
               "type": "(value: string[]) => void",
@@ -3609,9 +3534,6 @@
           "name": "data-multi-select-selection-list"
         },
         {
-          "name": "data-multi-select-selection-remove"
-        },
-        {
           "name": "data-multi-select-wrapper"
         },
         {
@@ -3698,8 +3620,7 @@
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "children": {
               "type": "Snippet",
@@ -3910,7 +3831,13 @@
         ],
         "note": "Forwards <button> attributes via rest props."
       },
-      "cssVars": {},
+      "cssVars": {
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius"
+      },
       "dataAttributes": [
         {
           "name": "data-disabled",
@@ -4011,8 +3938,7 @@
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "children": {
               "type": "Snippet",
@@ -4047,10 +3973,6 @@
         "--dry-tg-radius": "Border radius"
       },
       "dataAttributes": [
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
         {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
@@ -4300,12 +4222,7 @@
         ]
       },
       "cssVars": {
-        "--dry-option-swatch-bg": "Swatch Bg",
-        "--dry-option-swatch-border": "Swatch Border",
-        "--dry-option-swatch-border-selected": "Swatch Border Selected",
-        "--dry-option-swatch-chip": "Swatch Chip",
-        "--dry-option-swatch-muted": "Swatch Muted",
-        "--dry-option-swatch-text": "Swatch Text"
+        "--dry-option-swatch-chip": "Swatch Chip"
       },
       "dataAttributes": [
         {
@@ -4664,8 +4581,7 @@
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "size": {
               "type": "'sm' | 'md' | 'lg'",
@@ -4675,8 +4591,7 @@
                 "md",
                 "lg"
               ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "default": "'md'"
+              "description": "Size preset affecting density, spacing, or typography."
             },
             "children": {
               "type": "Snippet",
@@ -4736,9 +4651,6 @@
         "Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring."
       ],
       "cssVars": {
-        "--dry-tabs-font-size": "Font size",
-        "--dry-tabs-padding-x": "Horizontal padding",
-        "--dry-tabs-padding-y": "Vertical padding",
         "--dry-tabs-trigger-active-border-bottom-color": "Trigger Active Border Bottom Color",
         "--dry-tabs-trigger-active-border-right-color": "Trigger Active Border Right Color",
         "--dry-tabs-trigger-border-bottom": "Trigger Border Bottom",
@@ -4746,19 +4658,12 @@
       },
       "dataAttributes": [
         {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
-        {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
           "values": [
             "horizontal",
             "vertical"
           ]
-        },
-        {
-          "name": "data-size"
         },
         {
           "name": "data-state",
@@ -4776,12 +4681,6 @@
         },
         {
           "name": "data-tabs-root"
-        },
-        {
-          "name": "data-tabs-trigger"
-        },
-        {
-          "name": "data-tabs-trigger-content"
         }
       ],
       "example": "<Tabs.Root bind:value={activeTab}>\n  <Tabs.List>\n    <Tabs.Trigger value=\"one\">Tab 1</Tabs.Trigger>\n    <Tabs.Trigger value=\"two\">Tab 2</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value=\"one\">First panel</Tabs.Content>\n  <Tabs.Content value=\"two\">Second panel</Tabs.Content>\n</Tabs.Root>"
@@ -5118,9 +5017,6 @@
       "cssVars": {},
       "dataAttributes": [
         {
-          "name": "data-pagination-button"
-        },
-        {
           "name": "data-pagination-content"
         },
         {
@@ -5211,13 +5107,11 @@
             },
             "clickable": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "error": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "onclick": {
               "type": "(index: number) => void",
@@ -5413,10 +5307,6 @@
       },
       "cssVars": {},
       "dataAttributes": [
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
         {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
@@ -8586,10 +8476,10 @@
           "name": "data-alert"
         },
         {
-          "name": "data-alert-close"
+          "name": "data-alert-description"
         },
         {
-          "name": "data-alert-description"
+          "name": "data-alert-direct-child"
         },
         {
           "name": "data-alert-icon"
@@ -8794,6 +8684,9 @@
         },
         {
           "name": "data-removing"
+        },
+        {
+          "name": "data-toast-action"
         },
         {
           "name": "data-toast-id"
@@ -9051,21 +8944,18 @@
               "type": "boolean",
               "required": false,
               "description": "Whether the overlay or disclosure is currently open.",
-              "default": "false",
               "bindable": true
             },
             "value": {
               "type": "string",
               "required": false,
               "description": "Current controlled or bindable value.",
-              "default": "''",
               "bindable": true
             },
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "name": {
               "type": "string",
@@ -9322,14 +9212,12 @@
                 "md",
                 "lg"
               ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "default": "'md'"
+              "description": "Size preset affecting density, spacing, or typography."
             },
             "value": {
               "type": "Date | null",
               "required": false,
               "description": "Current controlled or bindable value.",
-              "default": "$bindable<Date | null>(null)",
               "bindable": true
             },
             "name": {
@@ -9340,26 +9228,22 @@
             },
             "locale": {
               "type": "string",
-              "required": false,
-              "default": "'en-US'"
+              "required": false
             },
             "min": {
               "type": "Date | null",
               "required": false,
-              "description": "Minimum allowed value.",
-              "default": "null"
+              "description": "Minimum allowed value."
             },
             "max": {
               "type": "Date | null",
               "required": false,
-              "description": "Maximum allowed value.",
-              "default": "null"
+              "description": "Maximum allowed value."
             },
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "children": {
               "type": "Snippet",
@@ -9625,14 +9509,7 @@
           "    DatePicker.Calendar"
         ]
       },
-      "cssVars": {
-        "--dry-calendar-grid-gap": "Grid Gap",
-        "--dry-dp-bg": "Background color",
-        "--dry-dp-border": "Border color",
-        "--dry-dp-font-size": "Font size",
-        "--dry-dp-padding-x": "Horizontal padding",
-        "--dry-dp-padding-y": "Vertical padding"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-calendar-cell"
@@ -9644,16 +9521,10 @@
           "name": "data-calendar-day"
         },
         {
-          "name": "data-calendar-day-button"
-        },
-        {
           "name": "data-calendar-header"
         },
         {
           "name": "data-calendar-heading"
-        },
-        {
-          "name": "data-calendar-nav"
         },
         {
           "name": "data-calendar-panel"
@@ -9672,16 +9543,6 @@
           "name": "data-dp-content"
         },
         {
-          "name": "data-dp-trigger"
-        },
-        {
-          "name": "data-indicator"
-        },
-        {
-          "name": "data-invalid",
-          "description": "Present when the current field value is invalid."
-        },
-        {
           "name": "data-outside-month"
         },
         {
@@ -9690,9 +9551,6 @@
         {
           "name": "data-selected",
           "description": "Present when the current item is selected."
-        },
-        {
-          "name": "data-size"
         },
         {
           "name": "data-state"
@@ -9898,9 +9756,6 @@
           "name": "data-calendar-day"
         },
         {
-          "name": "data-calendar-day-button"
-        },
-        {
           "name": "data-calendar-grid"
         },
         {
@@ -9910,9 +9765,6 @@
           "name": "data-calendar-heading"
         },
         {
-          "name": "data-calendar-nav"
-        },
-        {
           "name": "data-calendar-row"
         },
         {
@@ -9920,16 +9772,7 @@
           "description": "Present when the component or part is disabled."
         },
         {
-          "name": "data-in-range"
-        },
-        {
           "name": "data-outside-month"
-        },
-        {
-          "name": "data-range-end"
-        },
-        {
-          "name": "data-range-start"
         },
         {
           "name": "data-selected",
@@ -10010,8 +9853,7 @@
             "placeholder": {
               "type": "string",
               "required": false,
-              "description": "Hint text shown when no value is selected or entered.",
-              "default": "'Select date range'"
+              "description": "Hint text shown when no value is selected or entered."
             },
             "children": {
               "type": "Snippet | undefined",
@@ -10139,16 +9981,10 @@
           "name": "data-calendar-day"
         },
         {
-          "name": "data-calendar-day-button"
-        },
-        {
           "name": "data-calendar-header"
         },
         {
           "name": "data-calendar-heading"
-        },
-        {
-          "name": "data-calendar-nav"
         },
         {
           "name": "data-calendar-panel"
@@ -10167,16 +10003,7 @@
           "name": "data-drp-content"
         },
         {
-          "name": "data-drp-preset"
-        },
-        {
-          "name": "data-drp-trigger"
-        },
-        {
           "name": "data-in-range"
-        },
-        {
-          "name": "data-indicator"
         },
         {
           "name": "data-outside-month"
@@ -10816,26 +10643,16 @@
           "name": "data-calendar-day"
         },
         {
-          "name": "data-calendar-day-button"
-        },
-        {
           "name": "data-calendar-header"
         },
         {
           "name": "data-calendar-heading"
         },
         {
-          "name": "data-calendar-nav"
-        },
-        {
           "name": "data-calendar-panel"
         },
         {
           "name": "data-calendar-row"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
         },
         {
           "name": "data-in-range"
@@ -10931,8 +10748,6 @@
         "note": "Forwards <div> attributes via rest props."
       },
       "cssVars": {
-        "--dry-rating-selected-color": "Selected Color",
-        "--dry-rating-unselected-color": "Unselected Color",
         "--dry-star-size": "Size"
       },
       "dataAttributes": [
@@ -11171,8 +10986,7 @@
             "value": {
               "type": "string | undefined",
               "required": false,
-              "description": "Current controlled or bindable value.",
-              "default": "''"
+              "description": "Current controlled or bindable value."
             }
           },
           "forwardedProps": {
@@ -11258,34 +11072,28 @@
             "files": {
               "type": "File[]",
               "required": false,
-              "default": "[]",
               "bindable": true
             },
             "accept": {
               "type": "string | undefined",
-              "required": false,
-              "default": "''"
+              "required": false
             },
             "multiple": {
               "type": "boolean | undefined",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "maxSize": {
               "type": "number | undefined",
-              "required": false,
-              "default": "0"
+              "required": false
             },
             "maxFiles": {
               "type": "number | undefined",
-              "required": false,
-              "default": "0"
+              "required": false
             },
             "disabled": {
               "type": "boolean | undefined",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "onFilesChange": {
               "type": "((files: File[]) => void) | undefined",
@@ -11339,8 +11147,7 @@
                 "md",
                 "lg"
               ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "default": "'md'"
+              "description": "Size preset affecting density, spacing, or typography."
             },
             "children": {
               "type": "Snippet",
@@ -11493,9 +11300,6 @@
           "name": "data-fu-item"
         },
         {
-          "name": "data-fu-item-delete"
-        },
-        {
           "name": "data-fu-item-name"
         },
         {
@@ -11503,9 +11307,6 @@
         },
         {
           "name": "data-fu-list"
-        },
-        {
-          "name": "data-fu-trigger"
         },
         {
           "name": "data-index"
@@ -11569,8 +11370,7 @@
                 "md",
                 "lg"
               ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "default": "'md'"
+              "description": "Size preset affecting density, spacing, or typography."
             },
             "children": {
               "type": "Snippet",
@@ -11653,12 +11453,6 @@
           "name": "data-file-select"
         },
         {
-          "name": "data-fs-clear"
-        },
-        {
-          "name": "data-fs-trigger"
-        },
-        {
           "name": "data-fs-value"
         },
         {
@@ -11666,9 +11460,6 @@
         },
         {
           "name": "data-placeholder"
-        },
-        {
-          "name": "data-size"
         }
       ],
       "example": "<FileSelect.Root>\n  <FileSelect.Trigger>...</FileSelect.Trigger>\n  <FileSelect.Value>...</FileSelect.Value>\n  <FileSelect.Clear>...</FileSelect.Clear>\n</FileSelect.Root>"
@@ -11918,9 +11709,6 @@
         },
         {
           "name": "data-cp-area-indicator"
-        },
-        {
-          "name": "data-cp-eyedropper"
         },
         {
           "name": "data-cp-input"
@@ -12194,25 +11982,10 @@
           "description": "Content rendered inside the component."
         }
       },
-      "cssVars": {
-        "--dry-scroll-to-top-bg": "To Top Bg",
-        "--dry-scroll-to-top-border": "To Top Border",
-        "--dry-scroll-to-top-color": "To Top Color",
-        "--dry-scroll-to-top-offset": "To Top Offset",
-        "--dry-scroll-to-top-radius": "To Top Radius",
-        "--dry-scroll-to-top-shadow": "To Top Shadow",
-        "--dry-scroll-to-top-size": "To Top Size",
-        "--dry-scroll-to-top-z-index": "To Top Z Index"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
-          "name": "data-icon"
-        },
-        {
           "name": "data-position"
-        },
-        {
-          "name": "data-scroll-to-top"
         },
         {
           "name": "data-visible"
@@ -12685,17 +12458,9 @@
         ]
       },
       "cssVars": {
-        "--dry-fab-action-bg": "Action Bg",
-        "--dry-fab-action-border": "Action Border",
-        "--dry-fab-action-color": "Action Color",
-        "--dry-fab-action-shadow": "Action Shadow",
-        "--dry-fab-action-size": "Action Size",
-        "--dry-fab-bg": "Background color",
-        "--dry-fab-color": "Text color",
         "--dry-fab-gap": "Gap spacing",
         "--dry-fab-offset": "Offset",
         "--dry-fab-position": "Position",
-        "--dry-fab-shadow": "Box shadow",
         "--dry-fab-z-index": "Z Index"
       },
       "dataAttributes": [
@@ -12710,9 +12475,6 @@
         },
         {
           "name": "data-position"
-        },
-        {
-          "name": "data-size"
         },
         {
           "name": "data-state"
@@ -12947,7 +12709,6 @@
         "--dry-code-border": "Border color",
         "--dry-code-color": "Text color",
         "--dry-code-copy-color": "Copy Color",
-        "--dry-code-copy-hover-bg": "Copy Hover Bg",
         "--dry-code-copy-hover-color": "Copy Hover Color",
         "--dry-code-font-size": "Font size",
         "--dry-code-header-bg": "Header Bg",
@@ -13313,23 +13074,19 @@
             },
             "sortable": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "filterable": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "pinned": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "resizable": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "header": {
               "type": "Snippet",
@@ -13596,9 +13353,6 @@
           "name": "data-dg-column"
         },
         {
-          "name": "data-dg-expand"
-        },
-        {
           "name": "data-dg-header"
         },
         {
@@ -13621,12 +13375,6 @@
         },
         {
           "name": "data-pagination-info"
-        },
-        {
-          "name": "data-pagination-next"
-        },
-        {
-          "name": "data-pagination-prev"
         },
         {
           "name": "data-part"
@@ -13924,8 +13672,7 @@
           "props": {
             "filterable": {
               "type": "boolean",
-              "required": false,
-              "default": "false"
+              "required": false
             },
             "content": {
               "type": "Snippet<[{ items: TransferItemType[] }]>",
@@ -14090,18 +13837,6 @@
         },
         {
           "name": "data-transfer-list-header"
-        },
-        {
-          "name": "data-transfer-move-all-source"
-        },
-        {
-          "name": "data-transfer-move-all-target"
-        },
-        {
-          "name": "data-transfer-move-source"
-        },
-        {
-          "name": "data-transfer-move-target"
         },
         {
           "name": "data-transfer-root"
@@ -14326,29 +14061,10 @@
           "  Tour.Tooltip"
         ]
       },
-      "cssVars": {
-        "--dry-tour-arrow-size": "Arrow Size",
-        "--dry-tour-overlay-color": "Overlay Color",
-        "--dry-tour-spotlight-padding": "Spotlight Padding",
-        "--dry-tour-spotlight-radius": "Spotlight Radius",
-        "--dry-tour-spotlight-ring": "Spotlight Ring",
-        "--dry-tour-tooltip-bg": "Tooltip Bg",
-        "--dry-tour-tooltip-max-width": "Tooltip Max Width",
-        "--dry-tour-tooltip-radius": "Tooltip Radius",
-        "--dry-tour-tooltip-shadow": "Tooltip Shadow"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-part"
-        },
-        {
-          "name": "data-placement"
-        },
-        {
-          "name": "data-tour-overlay"
-        },
-        {
-          "name": "data-tour-spotlight"
         }
       ],
       "example": "<Tour.Root>\n  <Tour.Tooltip>...</Tour.Tooltip>\n</Tour.Root>"
@@ -14577,28 +14293,26 @@
         "note": "Forwards native HTML attributes via rest props."
       },
       "cssVars": {
-        "--dry-chip-bg": "Background color",
-        "--dry-chip-border": "Border color",
-        "--dry-chip-color": "Text color",
-        "--dry-chip-default-bg": "Default Bg",
-        "--dry-chip-default-color": "Default Color",
-        "--dry-chip-font-size": "Font size",
-        "--dry-chip-padding-x": "Horizontal padding",
-        "--dry-chip-padding-y": "Vertical padding",
-        "--dry-chip-radius": "Border radius",
-        "--dry-chip-selected-bg": "Selected Bg",
-        "--dry-chip-selected-border": "Selected Border",
-        "--dry-chip-selected-color": "Selected Color"
+        "--dry-btn-accent": "Accent",
+        "--dry-btn-accent-fg": "Accent Fg",
+        "--dry-btn-accent-stroke": "Accent Stroke",
+        "--dry-btn-accent-weak": "Accent Weak",
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color"
       },
       "dataAttributes": [
         {
-          "name": "data-chip"
+          "name": "data-chip-color"
         },
         {
-          "name": "data-chip-wrapper"
+          "name": "data-chip-selected"
         },
         {
-          "name": "data-color"
+          "name": "data-chip-size"
+        },
+        {
+          "name": "data-chip-variant"
         },
         {
           "name": "data-disabled",
@@ -14607,12 +14321,6 @@
         {
           "name": "data-selected",
           "description": "Present when the current item is selected."
-        },
-        {
-          "name": "data-size"
-        },
-        {
-          "name": "data-variant"
         }
       ],
       "example": "<Chip variant=\"soft\" color=\"blue\">Policy friendly</Chip>"
@@ -14702,8 +14410,7 @@
             "disabled": {
               "type": "boolean",
               "required": false,
-              "description": "Prevents interaction and applies disabled styling.",
-              "default": "false"
+              "description": "Prevents interaction and applies disabled styling."
             },
             "children": {
               "type": "Snippet",
@@ -14731,32 +14438,13 @@
         ]
       },
       "cssVars": {
-        "--dry-chip-bg": "Background color",
-        "--dry-chip-border": "Border color",
-        "--dry-chip-color": "Text color",
-        "--dry-chip-default-bg": "Default Bg",
-        "--dry-chip-default-color": "Default Color",
-        "--dry-chip-font-size": "Font size",
         "--dry-chip-group-font-size": "Group Font Size",
         "--dry-chip-group-padding-x": "Group Padding X",
-        "--dry-chip-group-padding-y": "Group Padding Y",
-        "--dry-chip-padding-x": "Horizontal padding",
-        "--dry-chip-padding-y": "Vertical padding",
-        "--dry-chip-radius": "Border radius"
+        "--dry-chip-group-padding-y": "Group Padding Y"
       },
       "dataAttributes": [
         {
           "name": "data-chip-group"
-        },
-        {
-          "name": "data-chip-item"
-        },
-        {
-          "name": "data-color"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
         },
         {
           "name": "data-orientation",
@@ -14768,12 +14456,6 @@
         },
         {
           "name": "data-size"
-        },
-        {
-          "name": "data-state"
-        },
-        {
-          "name": "data-variant"
         }
       ],
       "example": "<ChipGroup.Root type=\"multiple\" bind:value={selectedFilters}>\n  <ChipGroup.Item value=\"direct\">Direct</ChipGroup.Item>\n  <ChipGroup.Item value=\"flexible\">Flexible</ChipGroup.Item>\n  <ChipGroup.Item value=\"wifi\">Wi-fi</ChipGroup.Item>\n</ChipGroup.Root>"
@@ -14934,8 +14616,7 @@
                 "bottom",
                 "left",
                 "right"
-              ],
-              "default": "'bottom'"
+              ]
             },
             "children": {
               "type": "Snippet<[{ index: number; isActive: boolean; scrollTo: (index: number) => void }]>",
@@ -14972,10 +14653,6 @@
       },
       "cssVars": {
         "--dry-carousel-gap": "Gap spacing",
-        "--dry-carousel-indicator-active-color": "Indicator Active Color",
-        "--dry-carousel-indicator-color": "Indicator Color",
-        "--dry-carousel-indicator-size": "Indicator Size",
-        "--dry-carousel-nav-size": "Nav Size",
         "--dry-carousel-slide-size": "Slide Size"
       },
       "dataAttributes": [
@@ -14985,9 +14662,6 @@
         },
         {
           "name": "data-carousel-dots"
-        },
-        {
-          "name": "data-carousel-nav"
         },
         {
           "name": "data-carousel-root"
@@ -15008,9 +14682,6 @@
             "horizontal",
             "vertical"
           ]
-        },
-        {
-          "name": "data-part"
         },
         {
           "name": "data-position"
@@ -16877,10 +16548,6 @@
       },
       "cssVars": {},
       "dataAttributes": [
-        {
-          "name": "data-active",
-          "description": "Present on the active item or current target within the component."
-        },
         {
           "name": "data-full-width"
         },

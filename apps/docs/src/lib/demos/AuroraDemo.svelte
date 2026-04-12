@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Aurora, Badge, Text } from '@dryui/ui';
+	import { Aurora, Badge, Button, Text } from '@dryui/ui';
 
 	let previewMotionEnabled = $state(false);
 </script>
@@ -20,14 +20,16 @@
 							<div class="hero-meta">
 								<Badge variant="outline" color="gray">Ocean</Badge>
 								<p class="hero-kicker">Browser-native ambience</p>
-								<button
-									type="button"
-									class="preview-toggle"
-									aria-pressed={previewMotionEnabled}
-									onclick={() => (previewMotionEnabled = !previewMotionEnabled)}
-								>
-									{previewMotionEnabled ? 'Pause preview' : 'Animate preview'}
-								</button>
+								<div class="preview-toggle" data-pressed={previewMotionEnabled}>
+									<Button
+										type="button"
+										variant="bare"
+										aria-pressed={previewMotionEnabled}
+										onclick={() => (previewMotionEnabled = !previewMotionEnabled)}
+									>
+										{previewMotionEnabled ? 'Pause preview' : 'Animate preview'}
+									</Button>
+								</div>
 							</div>
 
 							<div class="hero-copy">
@@ -238,6 +240,8 @@
 	}
 
 	.preview-toggle {
+		display: grid;
+		justify-items: start;
 		padding: 0.45rem 0.8rem;
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 78%, transparent);
 		border-radius: 999px;
@@ -249,7 +253,7 @@
 		cursor: pointer;
 	}
 
-	.preview-toggle[aria-pressed='true'] {
+	.preview-toggle[data-pressed='true'] {
 		background: color-mix(in srgb, var(--dry-color-primary) 18%, var(--dry-color-bg-overlay));
 		border-color: color-mix(in srgb, var(--dry-color-primary) 40%, transparent);
 	}

@@ -1,6 +1,9 @@
 // Re-export all engine functions and types
 export * from './engine/index.js';
 
+// Re-export actions
+export { bg } from './actions.js';
+
 // Re-export state (Svelte 5 runes)
 export {
 	wizardState,

@@ -1,6 +1,6 @@
 export type { SelectRootProps, SelectTriggerProps, SelectContentProps, SelectItemProps, SelectValueProps } from '@dryui/primitives';
-import SelectRoot from './select-root.svelte';
-import SelectTrigger from './select-trigger.svelte';
+import SelectRoot from './select-root-input.svelte';
+import SelectTrigger from './select-trigger-button.svelte';
 import SelectContent from './select-content.svelte';
 import SelectItem from './select-item.svelte';
 import SelectValue from './select-value.svelte';

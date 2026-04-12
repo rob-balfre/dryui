@@ -10,12 +10,13 @@ interface CalendarKeydownOptions {
 type CalendarKeydownResult = { type: 'navigate'; newDate: Date } | null;
 
 export function generateWeekdayLabels(locale: string, weekStartDay: number): string[] {
+	const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
 	const labels: string[] = [];
 	for (let i = 0; i < 7; i++) {
 		const dayIndex = (weekStartDay + i) % 7;
 		// Jan 7 2024 = Sunday (getDay() === 0)
 		const d = new Date(2024, 0, 7 + dayIndex);
-		labels.push(new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(d));
+		labels.push(formatter.format(d));
 	}
 	return labels;
 }

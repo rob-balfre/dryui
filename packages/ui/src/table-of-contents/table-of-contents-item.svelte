@@ -38,11 +38,14 @@
 		display: block;
 		padding: var(--dry-toc-item-padding-y, var(--dry-space-1_5))
 			var(--dry-toc-item-padding-x, var(--dry-space-2));
+		border-inline-start: 2px solid transparent;
 		border-radius: var(--dry-radius-md);
+		box-sizing: border-box;
 		color: inherit;
 		text-decoration: none;
 		transition:
 			background var(--dry-duration-fast) var(--dry-ease-default),
+			border-color var(--dry-duration-fast) var(--dry-ease-default),
 			color var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
@@ -56,8 +59,10 @@
 
 	[data-part='item'][data-active] > a {
 		background: var(--dry-color-fill-brand-weak);
+		border-end-start-radius: 0;
+		border-inline-start-color: var(--dry-color-stroke-selected);
+		border-start-start-radius: 0;
 		color: var(--dry-toc-active-color, var(--dry-color-text-brand));
-		box-shadow: inset 2px 0 0 var(--dry-color-stroke-selected);
 		font-weight: 600;
 	}
 

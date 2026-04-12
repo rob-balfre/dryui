@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@dryui/ui';
 	import type { Snippet } from 'svelte';
 	import { getContext, setContext } from 'svelte';
 
@@ -17,18 +18,20 @@
 </script>
 
 <div class="group">
-	<button type="button" class="trigger" aria-expanded={open} onclick={() => (open = !open)}>
-		<span class="icon-slot">
-			{#if icon}
-				<span class="icon">{@render icon()}</span>
+	<Button type="button" variant="ghost" aria-expanded={open} onclick={() => (open = !open)}>
+		<span class="trigger-content">
+			<span class="icon-slot">
+				{#if icon}
+					<span class="icon">{@render icon()}</span>
+				{/if}
+				<span class="chevron" class:open></span>
+			</span>
+			<span class="label">{label}</span>
+			{#if count != null}
+				<span class="count">{count}</span>
 			{/if}
-			<span class="chevron" class:open></span>
 		</span>
-		{label}
-		{#if count != null}
-			<span class="count">{count}</span>
-		{/if}
-	</button>
+	</Button>
 	<div class="content" class:open>
 		<div class="inner" data-depth={depth}>
 			{@render children()}
@@ -39,37 +42,21 @@
 <style>
 	.group {
 		display: grid;
+		--dry-btn-accent-fg: var(--dry-color-text-strong);
+		--dry-btn-accent-weak: var(--dry-color-fill-hover);
+		--dry-btn-ghost-underline: transparent;
+		--dry-btn-padding-x: var(--dry-sidebar-item-padding-x, var(--dry-space-3));
+		--dry-btn-padding-y: var(--dry-sidebar-item-padding-y, var(--dry-space-2));
+		--dry-btn-radius: 0;
+		--dry-btn-font-size: var(--dry-text-sm-size, 0.875rem);
 	}
 
-	.trigger {
-		all: unset;
+	.trigger-content {
 		display: grid;
 		grid-template-columns: auto 1fr auto;
 		align-items: center;
 		gap: var(--dry-space-2);
-		min-height: var(--dry-sidebar-item-height, var(--dry-space-12));
-		padding-block: var(--dry-sidebar-item-padding-y, var(--dry-space-2));
-		padding-inline-start: var(--dry-sidebar-item-padding-x, var(--dry-space-3));
-		padding-inline-end: var(--dry-space-3);
-		border-radius: 0;
-		box-sizing: border-box;
-		font-size: var(--dry-text-sm-size, 0.875rem);
-		font-weight: 500;
-		font-family: var(--dry-font-sans);
-		color: var(--dry-color-text-strong);
-		cursor: pointer;
-		transition:
-			background var(--dry-duration-fast) var(--dry-ease-default),
-			color var(--dry-duration-fast) var(--dry-ease-default);
-	}
-
-	.trigger:hover {
-		background: var(--dry-color-fill-hover);
-	}
-
-	.trigger:focus-visible {
-		outline: 2px solid var(--dry-color-focus-ring);
-		outline-offset: 2px;
+		justify-self: stretch;
 	}
 
 	.icon-slot {
@@ -86,6 +73,10 @@
 		display: inline-grid;
 		grid-auto-flow: column;
 		transition: opacity var(--dry-duration-fast) var(--dry-ease-default);
+	}
+
+	.label {
+		justify-self: start;
 	}
 
 	.chevron {
@@ -120,11 +111,11 @@
 	}
 
 	/* Has icon — swap on hover */
-	.trigger:hover .icon {
+	.group:hover .icon {
 		opacity: 0;
 	}
 
-	.trigger:hover .chevron {
+	.group:hover .chevron {
 		opacity: 1;
 	}
 

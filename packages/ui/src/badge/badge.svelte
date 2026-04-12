@@ -53,6 +53,7 @@
 <style>
 	[data-wrapper] {
 		display: inline-grid;
+		justify-self: start;
 	}
 
 	[data-badge] {

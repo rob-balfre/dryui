@@ -9,4 +9,4 @@ export interface TagProps extends PrimitiveTagProps {
 	size?: 'sm' | 'md';
 }
 
-export { default as Tag } from './tag.svelte';
+export { default as Tag } from './tag-button.svelte';

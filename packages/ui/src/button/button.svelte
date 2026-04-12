@@ -6,7 +6,19 @@
 	const groupCtx = getButtonGroupCtx();
 
 	interface Props extends HTMLButtonAttributes {
-		variant?: 'solid' | 'outline' | 'ghost' | 'soft' | 'secondary' | 'link' | 'bare';
+		variant?:
+			| 'solid'
+			| 'outline'
+			| 'ghost'
+			| 'soft'
+			| 'secondary'
+			| 'link'
+			| 'bare'
+			| 'trigger'
+			| 'nav'
+			| 'tab'
+			| 'toggle'
+			| 'pill';
 		size?: 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 		color?: 'primary' | 'danger';
 		disabled?: boolean;
@@ -15,6 +27,8 @@
 		target?: string;
 		download?: boolean | string;
 		type?: 'button' | 'submit' | 'reset';
+		/** Callback invoked with the rendered `<button>` or `<a>` element on mount, `null` on destroy. */
+		ref?: (el: HTMLButtonElement | HTMLAnchorElement | null) => void;
 		children: Snippet;
 	}
 
@@ -35,6 +49,7 @@
 		type = 'button',
 		onclick,
 		class: className,
+		ref,
 		children,
 		...rest
 	}: Props = $props();
@@ -48,13 +63,14 @@
 
 		(onclick as ((event: MouseEvent) => void) | undefined)?.(event);
 	}
+
+	function attachRef(node: HTMLButtonElement | HTMLAnchorElement) {
+		ref?.(node);
+		return () => ref?.(null);
+	}
 </script>
 
-<span
-	class="wrapper"
-	data-in-group={groupCtx ? '' : undefined}
-	data-group-orientation={groupCtx?.orientation}
->
+{#snippet element()}
 	{#if href !== undefined}
 		<a
 			{...rest as AnchorRest}
@@ -70,6 +86,7 @@
 			data-color={color}
 			class={className}
 			onclick={handleLinkClick}
+			{@attach attachRef}
 		>
 			{@render children()}
 		</a>
@@ -84,11 +101,20 @@
 			class={className}
 			{onclick}
 			{...rest}
+			{@attach attachRef}
 		>
 			{@render children()}
 		</button>
 	{/if}
-</span>
+{/snippet}
+
+{#if groupCtx}
+	<span class="wrapper" data-in-group="" data-group-orientation={groupCtx.orientation}>
+		{@render element()}
+	</span>
+{:else}
+	{@render element()}
+{/if}
 
 <style>
 	.wrapper {
@@ -290,6 +316,98 @@
 		&:active:not([data-disabled]) {
 			--dry-btn-color: var(--dry-btn-accent-active);
 			text-decoration-color: color-mix(in srgb, var(--dry-btn-accent-stroke) 90%, transparent);
+		}
+	}
+
+	:is(a, button)[data-variant='trigger'] {
+		--dry-btn-bg: transparent;
+		--dry-btn-color: var(--dry-color-text-strong);
+		--dry-btn-border: transparent;
+
+		&:hover:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill);
+		}
+
+		&:active:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill-hover);
+		}
+
+		&[aria-expanded='true'] {
+			--dry-btn-bg: var(--dry-color-fill);
+			--dry-btn-color: var(--dry-color-text-brand);
+		}
+	}
+
+	:is(a, button)[data-variant='nav'] {
+		--dry-btn-bg: var(--dry-color-bg-raised);
+		--dry-btn-color: var(--dry-color-text-strong);
+		--dry-btn-border: var(--dry-color-stroke-weak);
+		border-radius: 9999px;
+		aspect-ratio: 1;
+		padding: 0;
+
+		&:hover:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill);
+			--dry-btn-border: var(--dry-color-stroke-strong);
+		}
+
+		&:active:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill-hover);
+		}
+	}
+
+	:is(a, button)[data-variant='tab'] {
+		--dry-btn-bg: transparent;
+		--dry-btn-color: var(--dry-color-text-weak);
+		--dry-btn-border: transparent;
+		border-bottom: 4px solid transparent;
+		border-radius: 0;
+		transition:
+			color var(--dry-duration-fast) var(--dry-ease-default),
+			border-color var(--dry-duration-fast) var(--dry-ease-default),
+			background var(--dry-duration-fast) var(--dry-ease-default);
+
+		&:hover:not([data-disabled]) {
+			--dry-btn-color: var(--dry-color-text-strong);
+		}
+
+		&[aria-selected='true'] {
+			--dry-btn-color: var(--dry-color-text-brand);
+			border-bottom-color: var(--dry-color-stroke-selected);
+			font-weight: 600;
+		}
+	}
+
+	:is(a, button)[data-variant='toggle'] {
+		--dry-btn-bg: transparent;
+		--dry-btn-color: var(--dry-color-text-weak);
+		--dry-btn-border: transparent;
+
+		&:hover:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill);
+			--dry-btn-color: var(--dry-color-text-strong);
+		}
+
+		&[aria-pressed='true'] {
+			--dry-btn-bg: var(--dry-color-fill-brand);
+			--dry-btn-color: var(--dry-color-on-brand);
+		}
+	}
+
+	:is(a, button)[data-variant='pill'] {
+		--dry-btn-bg: transparent;
+		--dry-btn-color: var(--dry-color-text-weak);
+		--dry-btn-border: transparent;
+		border-radius: 9999px;
+
+		&:hover:not([data-disabled]) {
+			--dry-btn-bg: var(--dry-color-fill-hover);
+			--dry-btn-border: var(--dry-color-stroke-strong);
+		}
+
+		&[aria-current='page'],
+		&[aria-pressed='true'] {
+			--dry-btn-border: var(--dry-color-stroke-strong);
 		}
 	}
 

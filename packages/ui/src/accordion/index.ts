@@ -25,7 +25,7 @@ export interface AccordionContentProps extends HTMLAttributes<HTMLDivElement> {
 
 import AccordionRoot from './accordion-root.svelte';
 import AccordionItem from './accordion-item.svelte';
-import AccordionTrigger from './accordion-trigger.svelte';
+import AccordionTrigger from './accordion-button-trigger.svelte';
 import AccordionContent from './accordion-content.svelte';
 
 export const Accordion: {

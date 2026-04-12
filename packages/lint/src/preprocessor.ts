@@ -44,7 +44,7 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 		markup({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, exclude)) return;
-			const violations = checkMarkup(content);
+			const violations = checkMarkup(content, f);
 			report(f, violations, strict);
 		},
 

@@ -5,7 +5,7 @@
 	import ToastRoot from './toast-root.svelte';
 	import ToastTitle from './toast-title.svelte';
 	import ToastDescription from './toast-description.svelte';
-	import ToastClose from './toast-close.svelte';
+	import ToastClose from './toast-close-button.svelte';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		position?:

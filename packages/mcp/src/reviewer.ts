@@ -420,7 +420,7 @@ function checkMissingRequiredProp(
 	return issues;
 }
 
-// Phase 3: Structural Checks (severity: "warning")
+// Phase 3: Structural Checks (severity: "error")
 
 function checkOrphanedPart(
 	tags: TagInfo[],
@@ -437,7 +437,7 @@ function checkOrphanedPart(
 		if (!def?.compound || !def.parts?.Root) continue;
 		if (!allNames.has(`${root}.Root`)) {
 			issues.push({
-				severity: 'warning',
+				severity: 'error',
 				code: 'orphaned-part',
 				line: tag.line,
 				message: `<${tag.name}> used without <${root}.Root> in the template`,
@@ -473,7 +473,7 @@ function checkMissingLabel(tags: TagInfo[], code: string): Issue[] {
 
 		if (!wrappedByField) {
 			issues.push({
-				severity: 'warning',
+				severity: 'error',
 				code: 'missing-label',
 				line: tag.line,
 				message: `<${tag.name}> may be missing an accessible label \u2014 add aria-label or wrap in <Field.Root> with <Label>`,
@@ -508,7 +508,7 @@ function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
 		const hasFallback = tag.props.includes('fallback');
 		if (!hasAlt && !hasFallback) {
 			issues.push({
-				severity: 'warning',
+				severity: 'error',
 				code: 'missing-alt',
 				line: tag.line,
 				message: '<Avatar> is missing "alt" and "fallback" props for accessibility',
@@ -600,7 +600,7 @@ function checkCustomFlexLayout(styles: string, code: string): Issue[] {
 		const startLine = getStyleBlockStartLine(code);
 		const localLine = findLineInBlock(styles, /display:\s*(?:inline-)?flex/);
 		issues.push({
-			severity: 'warning',
+			severity: 'error',
 			code: 'prefer-grid-layout',
 			line: styleLineToFileLine(localLine, startLine),
 			message:
@@ -627,7 +627,7 @@ function checkCustomFieldMarkup(code: string): Issue[] {
 	while ((match = fieldClassRegex.exec(template)) !== null) {
 		const line = lineAtOffset(lineOffsets, match.index);
 		issues.push({
-			severity: 'warning',
+			severity: 'error',
 			code: 'use-field-component',
 			line,
 			message:
@@ -642,7 +642,7 @@ function checkCustomFieldMarkup(code: string): Issue[] {
 	while ((match = manualFieldRegex.exec(template)) !== null) {
 		const line = lineAtOffset(lineOffsets, match.index);
 		issues.push({
-			severity: 'warning',
+			severity: 'error',
 			code: 'use-field-component',
 			line,
 			message:
@@ -668,7 +668,7 @@ function checkRawStyledButton(code: string): Issue[] {
 	while ((match = rawBtnRegex.exec(template)) !== null) {
 		const line = lineAtOffset(lineOffsets, match.index);
 		issues.push({
-			severity: 'warning',
+			severity: 'error',
 			code: 'use-button-component',
 			line,
 			message:
@@ -685,7 +685,7 @@ function checkCustomMaxWidthCentering(styles: string, code: string): Issue[] {
 		const startLine = getStyleBlockStartLine(code);
 		const localLine = findLineInBlock(styles, /max-width/);
 		issues.push({
-			severity: 'warning',
+			severity: 'error',
 			code: 'use-container-component',
 			line: styleLineToFileLine(localLine, startLine),
 			message: "Use DryUI's <Container> component instead of custom max-width + margin centering.",
@@ -785,10 +785,10 @@ function checkRawHr(code: string): Issue[] {
 	while ((match = hrRegex.exec(template)) !== null) {
 		const line = lineAtOffset(lineOffsets, match.index);
 		issues.push({
-			severity: 'suggestion',
+			severity: 'error',
 			code: 'prefer-separator',
 			line,
-			message: 'Raw <hr> element \u2014 consider using <Separator /> for consistent styling',
+			message: 'Raw <hr> element \u2014 use <Separator /> for consistent styling',
 			fix: '<Separator />'
 		});
 	}

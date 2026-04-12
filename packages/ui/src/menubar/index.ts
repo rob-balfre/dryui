@@ -10,7 +10,7 @@ export type {
 
 import MenubarRoot from './menubar-root.svelte';
 import MenubarMenu from './menubar-menu.svelte';
-import MenubarTrigger from './menubar-trigger.svelte';
+import MenubarTrigger from './menubar-button-trigger.svelte';
 import MenubarContent from './menubar-content.svelte';
 import MenubarItem from './menubar-item.svelte';
 import MenubarSeparator from './menubar-separator.svelte';

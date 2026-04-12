@@ -5,4 +5,4 @@ export interface ScrollToTopProps extends Omit<PrimitiveScrollToTopProps, 'child
 	class?: string;
 }
 
-export { default as ScrollToTop } from './scroll-to-top.svelte';
+export { default as ScrollToTop } from './scroll-to-top-button.svelte';

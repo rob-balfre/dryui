@@ -34,9 +34,8 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		align-items: flex-start;
+		align-items: start;
 		gap: var(--dry-space-3, 0.75rem);
-		padding: var(--dry-space-2, 0.5rem) var(--dry-space-3, 0.75rem);
 		border-radius: var(--dry-radius-md, 0.375rem);
 		text-decoration: none;
 		color: inherit;

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@dryui/ui';
 	import { ColorPicker } from '@dryui/ui/color-picker';
 	import { Text } from '@dryui/ui/text';
 	import { setBrandHsb, getDerivedTheme, wizardState } from '../state.svelte.js';
@@ -10,17 +11,11 @@
 		hsbToHsl,
 		hslToHex
 	} from '../engine/index.js';
-	import type { BrandInput } from '../engine/index.js';
 	import { bg } from '../actions';
 
 	let { mode = 'light' }: { mode?: 'light' | 'dark' } = $props();
 
 	let isDark = $derived(mode === 'dark');
-	let brand = $state<BrandInput>({ ...wizardState.brandHsb });
-
-	$effect(() => {
-		setBrandHsb(brand.h, brand.s, brand.b);
-	});
 
 	const SWATCH_TOKENS = [
 		{ key: '--dry-color-fill', label: 'Fill' },
@@ -44,32 +39,34 @@
 	);
 
 	let pickerColor = $derived.by(() => {
-		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
+		const hsl = hsbToHsl(
+			wizardState.brandHsb.h,
+			wizardState.brandHsb.s / 100,
+			wizardState.brandHsb.b / 100
+		);
 		return hslToHex(hsl.h, hsl.s, hsl.l);
 	});
 
-	let pickerHex = $state('');
-
-	$effect(() => {
-		pickerHex = pickerColor;
-	});
-
-	$effect(() => {
-		if (pickerHex && pickerHex !== pickerColor) {
-			const hsl = hexToHsl(pickerHex);
+	const pickerModel = {
+		get hex() {
+			return pickerColor;
+		},
+		set hex(value: string) {
+			if (!value || value === pickerColor) return;
+			const hsl = hexToHsl(value);
 			const hsb = hslToHsb(hsl.h, hsl.s, hsl.l);
-			brand = { h: hsb.h, s: Math.round(hsb.s * 100), b: Math.round(hsb.b * 100) };
+			setBrandHsb(hsb.h, Math.round(hsb.s * 100), Math.round(hsb.b * 100));
 		}
-	});
+	};
 
 	function selectPreset(preset: (typeof PRESETS)[number]) {
-		brand = preset.brandInput;
+		setBrandHsb(preset.brandInput.h, preset.brandInput.s, preset.brandInput.b);
 	}
 </script>
 
 <section class="brand-section">
 	<div class="picker-wrap">
-		<ColorPicker.Root bind:value={pickerHex} areaHeight={160}>
+		<ColorPicker.Root bind:value={pickerModel.hex} areaHeight={160}>
 			<ColorPicker.Area />
 			<ColorPicker.HueSlider />
 			<ColorPicker.Input format="hex" />
@@ -90,22 +87,23 @@
 			{#each PRESETS as preset, i (preset.name)}
 				{@const presetTheme = PRESET_THEMES[i] ?? PRESET_THEMES[0]!}
 				{@const presetTokens = isDark ? presetTheme.dark : presetTheme.light}
-				<button
-					class="preset-btn"
-					data-selected={brand.h === preset.brandInput.h &&
-					brand.s === preset.brandInput.s &&
-					brand.b === preset.brandInput.b
-						? ''
-						: undefined}
-					onclick={() => selectPreset(preset)}
-				>
-					<div class="preset-thumb">
-						{#each SWATCH_TOKENS as { key } (key)}
-							<div class="preset-swatch" use:bg={presetTokens[key] ?? ''}></div>
-						{/each}
+				<Button type="button" variant="bare" onclick={() => selectPreset(preset)}>
+					<div
+						class="preset-btn"
+						data-selected={wizardState.brandHsb.h === preset.brandInput.h &&
+						wizardState.brandHsb.s === preset.brandInput.s &&
+						wizardState.brandHsb.b === preset.brandInput.b
+							? ''
+							: undefined}
+					>
+						<div class="preset-thumb">
+							{#each SWATCH_TOKENS as { key } (key)}
+								<div class="preset-swatch" use:bg={presetTokens[key] ?? ''}></div>
+							{/each}
+						</div>
+						<Text as="span" size="xs" color="muted">{preset.name.toLowerCase()}</Text>
 					</div>
-					<Text as="span" size="xs" color="muted">{preset.name.toLowerCase()}</Text>
-				</button>
+				</Button>
 			{/each}
 		</div>
 	</div>

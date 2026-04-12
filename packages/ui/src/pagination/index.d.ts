@@ -2,9 +2,9 @@ export type { PaginationRootProps, PaginationContentProps, PaginationItemProps, 
 import PaginationRoot from './pagination-root.svelte';
 import PaginationContent from './pagination-content.svelte';
 import PaginationItem from './pagination-item.svelte';
-import PaginationPrevious from './pagination-previous.svelte';
-import PaginationNext from './pagination-next.svelte';
-import PaginationLink from './pagination-link.svelte';
+import PaginationPrevious from './pagination-previous-button.svelte';
+import PaginationNext from './pagination-next-button.svelte';
+import PaginationLink from './pagination-link-button.svelte';
 import PaginationEllipsis from './pagination-ellipsis.svelte';
 export declare const Pagination: {
     Root: typeof PaginationRoot;

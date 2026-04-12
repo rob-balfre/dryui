@@ -17,11 +17,11 @@ export interface ColorPickerRootProps extends PrimitiveColorPickerRootProps {
 
 import ColorPickerRoot from './color-picker-root.svelte';
 import ColorPickerArea from './color-picker-area.svelte';
-import ColorPickerHueSlider from './color-picker-hue-slider.svelte';
-import ColorPickerAlphaSlider from './color-picker-alpha-slider.svelte';
+import ColorPickerHueSlider from './color-picker-input-hue-slider.svelte';
+import ColorPickerAlphaSlider from './color-picker-input-alpha-slider.svelte';
 import ColorPickerInput from './color-picker-input.svelte';
 import ColorPickerSwatch from './color-picker-swatch.svelte';
-import ColorPickerEyeDropper from './color-picker-eyedropper.svelte';
+import ColorPickerEyeDropper from './color-picker-button-eyedropper.svelte';
 import ColorPickerChannelInput from './color-picker-channel-input.svelte';
 
 export const ColorPicker: {

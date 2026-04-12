@@ -7,7 +7,7 @@ export interface ChipGroupRootProps extends PrimitiveChipGroupRootProps {
 }
 
 import ChipGroupRoot from './chip-group-root.svelte';
-import ChipGroupItem from './chip-group-item.svelte';
+import ChipGroupItem from './chip-group-button-item.svelte';
 
 export const ChipGroup: {
 	Root: typeof ChipGroupRoot;

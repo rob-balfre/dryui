@@ -3,10 +3,10 @@ export type { DatePickerRootProps, DatePickerContentProps, DatePickerCalendarPro
 export interface DatePickerTriggerProps extends PrimitiveDatePickerTriggerProps {
     size?: 'sm' | 'md' | 'lg';
 }
-import DatePickerRoot from './datepicker-root.svelte';
-import DatePickerTrigger from './datepicker-trigger.svelte';
+import DatePickerRoot from './datepicker-input-root.svelte';
+import DatePickerTrigger from './datepicker-button-trigger.svelte';
 import DatePickerContent from './datepicker-content.svelte';
-import DatePickerCalendar from './datepicker-calendar.svelte';
+import DatePickerCalendar from './datepicker-button-calendar.svelte';
 export declare const DatePicker: {
     Root: typeof DatePickerRoot;
     Trigger: typeof DatePickerTrigger;

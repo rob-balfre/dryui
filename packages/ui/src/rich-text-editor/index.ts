@@ -5,7 +5,7 @@ export type { RichTextEditorRootProps, RichTextEditorContentProps } from '@dryui
 export interface RichTextEditorToolbarProps extends HTMLAttributes<HTMLDivElement> {}
 
 import RichTextEditorRoot from './rich-text-editor-root.svelte';
-import RichTextEditorToolbar from './rich-text-editor-toolbar.svelte';
+import RichTextEditorToolbar from './rich-text-editor-toolbar-button-input.svelte';
 import RichTextEditorContent from './rich-text-editor-content.svelte';
 
 export const RichTextEditor: {

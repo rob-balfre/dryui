@@ -26,4 +26,4 @@ export type ChipProps = ChipBaseProps &
 		'href' | 'rel' | 'target' | 'download' | 'type' | 'onclick' | 'children'
 	>;
 
-export { default as Chip } from './chip.svelte';
+export { default as Chip } from './chip-button.svelte';

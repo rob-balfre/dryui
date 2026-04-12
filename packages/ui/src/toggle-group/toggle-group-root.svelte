@@ -23,6 +23,8 @@
 		...rest
 	}: Props = $props();
 
+	const selectedSet = $derived(new Set(value));
+
 	setToggleGroupCtx({
 		get type() {
 			return type;
@@ -35,9 +37,9 @@
 		},
 		toggle(itemValue: string) {
 			if (type === 'single') {
-				value = value.includes(itemValue) ? [] : [itemValue];
+				value = selectedSet.has(itemValue) ? [] : [itemValue];
 			} else {
-				value = value.includes(itemValue)
+				value = selectedSet.has(itemValue)
 					? value.filter((v) => v !== itemValue)
 					: [...value, itemValue];
 			}
@@ -46,7 +48,7 @@
 			return orientation;
 		},
 		isSelected(itemValue: string) {
-			return value.includes(itemValue);
+			return selectedSet.has(itemValue);
 		}
 	});
 </script>

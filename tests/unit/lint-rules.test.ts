@@ -130,6 +130,95 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags raw native element when file is not in canonical directory', () => {
+		const violations = checkMarkup(
+			'<button type="button">click</button>',
+			'src/mega-menu/mega-menu-trigger.svelte'
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-native-element');
+		expect(violations[0]!.message).toContain('<Button>');
+	});
+
+	test('flags raw button even when filename contains "button" but dir does not match', () => {
+		const violations = checkMarkup(
+			'<button type="button">click</button>',
+			'src/toolbar/toolbar-button.svelte'
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-native-element');
+	});
+
+	test('allows raw native element when file is in canonical directory', () => {
+		const violations = checkMarkup(
+			'<button type="button">click</button>',
+			'src/button/button.svelte'
+		);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags raw button in non-canonical directories even if input-like', () => {
+		const violations = checkMarkup(
+			'<button type="button">−</button>',
+			'src/number-input/number-input.svelte'
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-native-element');
+	});
+
+	test('allows raw dialog when file is in dialog directory', () => {
+		const violations = checkMarkup('<dialog open></dialog>', 'src/dialog/dialog-content.svelte');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags raw separator candidate when file is not in separator directory', () => {
+		const violations = checkMarkup('<hr />', 'src/layout/section-divider.svelte');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-native-element');
+		expect(violations[0]!.message).toContain('<Separator />');
+	});
+
+	test('error message references canonical directory not filename', () => {
+		const violations = checkMarkup('<button>x</button>', 'src/toast/toast-action.svelte');
+		expect(violations[0]!.message).toContain('canonical component directory');
+	});
+
+	test('flags raw table outside table/data-grid directories', () => {
+		const violations = checkMarkup('<table></table>', 'src/report/report-view.svelte');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.message).toContain('<Table>');
+	});
+
+	test('allows raw table in data-grid directory', () => {
+		const violations = checkMarkup('<table></table>', 'src/data-grid/data-grid-table.svelte');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags raw textarea outside textarea/prompt-input directories', () => {
+		const violations = checkMarkup('<textarea></textarea>', 'src/form/form-message.svelte');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.message).toContain('<Textarea>');
+	});
+
+	test('allows raw textarea in prompt-input directory', () => {
+		const violations = checkMarkup('<textarea></textarea>', 'src/prompt-input/prompt-input.svelte');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags raw select outside select/input-group/phone-input', () => {
+		const violations = checkMarkup('<select></select>', 'src/filter/filter-panel.svelte');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.message).toContain('<Select>');
+	});
+
+	test('allows raw select in phone-input directory', () => {
+		const violations = checkMarkup(
+			'<select></select>',
+			'src/phone-input/phone-input-country.svelte'
+		);
+		expect(violations).toHaveLength(0);
+	});
+
 	test('flags svelte-ignore css_unused_selector comment', () => {
 		const code = `<!-- svelte-ignore css_unused_selector -->
 <style>
@@ -281,6 +370,17 @@ describe('checkStyle', () => {
 
 	test('allows custom property --dry-width', () => {
 		const violations = checkStyle('.foo { --dry-width: 100%; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags all: unset', () => {
+		const violations = checkStyle('.foo { all: unset; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-all-unset');
+	});
+
+	test('allows other all property values', () => {
+		const violations = checkStyle('.foo { all: inherit; }');
 		expect(violations).toHaveLength(0);
 	});
 
