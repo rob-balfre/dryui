@@ -48,6 +48,16 @@ function getSemanticTextColor() {
 	return color;
 }
 
+function getResolvedRadius(value: string) {
+	const probe = document.createElement('div');
+	probe.style.borderTopLeftRadius = value;
+	document.body.append(probe);
+
+	const radius = parseFloat(getComputedStyle(probe).borderTopLeftRadius);
+	probe.remove();
+	return radius;
+}
+
 describe('overlay surfaces', () => {
 	it.each(['alert-dialog', 'dialog', 'drawer', 'command-palette'] as const)(
 		'uses semantic text color for %s in dark mode',
@@ -69,5 +79,18 @@ describe('overlay surfaces', () => {
 		const panelWidth = panel?.getBoundingClientRect().width ?? 0;
 
 		expect(panelWidth).toBeGreaterThan(dialogWidth * 0.5);
+	});
+
+	it('caps command palette item radius when pill tokens are active', () => {
+		document.documentElement.style.setProperty('--dry-radius-sm', '9999px');
+		document.documentElement.style.setProperty('--dry-control-radius', '9999px');
+
+		const dialog = mountOverlay('command-palette');
+		const item = dialog.querySelector<HTMLElement>('[data-command-palette-item]');
+
+		expect(item).toBeTruthy();
+		expect(parseFloat(getComputedStyle(item!).borderTopLeftRadius)).toBe(
+			getResolvedRadius('var(--dry-space-4)')
+		);
 	});
 });

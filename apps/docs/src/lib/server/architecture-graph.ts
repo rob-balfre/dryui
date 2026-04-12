@@ -1,4 +1,4 @@
-import type { DolphinEdge, DolphinGraph, DolphinNode } from '@dryui/ui';
+import type { DolphinEdge, DolphinGraph, DolphinNode } from '@dryui/mcp/architecture';
 import architectureGraph from '../../../../../packages/mcp/src/architecture.json';
 import type {
 	ArchitectureFocusData,

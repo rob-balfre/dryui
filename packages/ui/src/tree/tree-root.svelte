@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { SvelteSet } from 'svelte/reactivity';
 	import { setTreeCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -17,8 +18,11 @@
 		...rest
 	}: Props = $props();
 
-	// svelte-ignore state_referenced_locally
-	let expandedItems = $state(new Set<string>(defaultExpanded));
+	function createExpandedItems() {
+		return new SvelteSet<string>(defaultExpanded);
+	}
+
+	let expandedItems = createExpandedItems();
 
 	setTreeCtx({
 		get expandedItems() {
@@ -28,18 +32,14 @@
 			return selectedItem;
 		},
 		toggleItem(id) {
-			const newSet = new Set(expandedItems);
-			if (newSet.has(id)) newSet.delete(id);
-			else newSet.add(id);
-			expandedItems = newSet;
+			if (expandedItems.has(id)) expandedItems.delete(id);
+			else expandedItems.add(id);
 		},
 		expandItem(id) {
-			expandedItems = new Set([...expandedItems, id]);
+			expandedItems.add(id);
 		},
 		collapseItem(id) {
-			const s = new Set(expandedItems);
-			s.delete(id);
-			expandedItems = s;
+			expandedItems.delete(id);
 		},
 		selectItem(id) {
 			selectedItem = id;
@@ -101,9 +101,7 @@
 				if (itemId) {
 					const hasChildren = currentItem.querySelector('[role="group"]');
 					if (hasChildren && !expandedItems.has(itemId)) {
-						const newSet = new Set(expandedItems);
-						newSet.add(itemId);
-						expandedItems = newSet;
+						expandedItems.add(itemId);
 					} else if (hasChildren && expandedItems.has(itemId)) {
 						const firstChild = currentItem.querySelector('[role="group"] > [role="treeitem"]');
 						if (firstChild) {
@@ -117,9 +115,7 @@
 			case 'ArrowLeft': {
 				e.preventDefault();
 				if (itemId && expandedItems.has(itemId)) {
-					const s = new Set(expandedItems);
-					s.delete(itemId);
-					expandedItems = s;
+					expandedItems.delete(itemId);
 				} else {
 					const parentGroup = currentItem.parentElement?.closest('[role="treeitem"]');
 					if (parentGroup) {
@@ -159,7 +155,10 @@
 	[data-part='root'] {
 		--dry-tree-indent: var(--dry-space-4);
 		--dry-tree-item-padding: var(--dry-space-1) var(--dry-space-2);
-		--dry-tree-item-radius: var(--dry-radius-md);
+		--dry-tree-item-radius: min(
+			var(--dry-control-radius, var(--dry-radius-md)),
+			var(--dry-space-4)
+		);
 		--dry-tree-item-hover-bg: var(--dry-color-fill);
 		--dry-tree-item-selected-bg: var(--dry-color-fill-brand-weak);
 		--dry-tree-item-selected-color: var(--dry-color-text-brand);

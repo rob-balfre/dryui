@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { HTMLAttributes, HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
 export interface MegaMenuRootProps extends HTMLAttributes<HTMLElement> {
 	children: Snippet;
@@ -23,7 +23,12 @@ export interface MegaMenuColumnProps extends HTMLAttributes<HTMLDivElement> {
 	children: Snippet;
 }
 
-export interface MegaMenuLinkProps extends HTMLAnchorAttributes {
+export interface MegaMenuLinkProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+	href?: string;
+	rel?: string;
+	target?: string;
+	download?: boolean | string;
+	type?: 'button' | 'submit' | 'reset';
 	icon?: Snippet;
 	description?: Snippet;
 	children: Snippet;

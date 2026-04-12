@@ -415,7 +415,7 @@ export type {
 	PinInputGroupProps,
 	PinInputCellProps,
 	PinInputSeparatorProps,
-	PinInputCell
+	PinInputCellState
 } from './pin-input/index.js';
 
 export { Rating } from './rating/index.js';

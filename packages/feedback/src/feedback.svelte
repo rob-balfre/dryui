@@ -16,7 +16,7 @@
 	}: FeedbackProps = $props();
 
 	let active = $state(false);
-	let tool: Tool = $state('pencil');
+	let tool = $state<Tool>('pencil');
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
@@ -86,18 +86,18 @@
 
 	function pointsToPath(points: Point[]): string {
 		if (points.length === 0) return '';
-		if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+		if (points.length === 1) return `M ${points[0]!.x} ${points[0]!.y}`;
 		if (points.length === 2)
-			return `M ${points[0].x} ${points[0].y} L ${points[1].x} ${points[1].y}`;
+			return `M ${points[0]!.x} ${points[0]!.y} L ${points[1]!.x} ${points[1]!.y}`;
 
 		const tension = 0.3;
-		let d = `M ${points[0].x} ${points[0].y}`;
+		let d = `M ${points[0]!.x} ${points[0]!.y}`;
 
 		for (let i = 0; i < points.length - 1; i++) {
-			const p0 = points[Math.max(0, i - 1)];
-			const p1 = points[i];
-			const p2 = points[i + 1];
-			const p3 = points[Math.min(points.length - 1, i + 2)];
+			const p0 = points[Math.max(0, i - 1)]!;
+			const p1 = points[i]!;
+			const p2 = points[i + 1]!;
+			const p3 = points[Math.min(points.length - 1, i + 2)]!;
 
 			const cp1x = p1.x + (p2.x - p0.x) * tension;
 			const cp1y = p1.y + (p2.y - p0.y) * tension;
@@ -149,7 +149,7 @@
 		if (drawing.kind === 'freehand') {
 			const pt = { x: px, y: py };
 			for (let i = 0; i < drawing.points.length - 1; i++) {
-				if (distToSegment(pt, drawing.points[i], drawing.points[i + 1]) < threshold) return true;
+				if (distToSegment(pt, drawing.points[i]!, drawing.points[i + 1]!) < threshold) return true;
 			}
 		} else if (drawing.kind === 'arrow') {
 			if (distToSegment({ x: px, y: py }, drawing.start, drawing.end) < threshold) return true;
@@ -179,7 +179,8 @@
 
 	function findDrawingAt(x: number, y: number): Drawing | null {
 		for (let i = drawings.length - 1; i >= 0; i--) {
-			if (drawingNearPoint(drawings[i], x, y)) return drawings[i];
+			const d = drawings[i]!;
+			if (drawingNearPoint(d, x, y)) return d;
 		}
 		return null;
 	}
@@ -374,7 +375,7 @@
 		const dataUrl = canvas.toDataURL('image/webp', 0.8);
 		canvas.width = 0;
 		canvas.height = 0;
-		return dataUrl.split(',')[1];
+		return dataUrl.split(',')[1]!;
 	}
 
 	async function handleSubmit() {

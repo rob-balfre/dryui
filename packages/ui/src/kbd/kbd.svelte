@@ -10,10 +10,13 @@
 	let { class: className, keys, children, ...rest }: Props = $props();
 </script>
 
-<kbd class={className} {...rest}>
+<kbd class={['root', className]} {...rest}>
 	{#if keys}
-		{#each keys as key, i}
-			<kbd>{key}</kbd>{#if i < keys.length - 1}<span>+</span>{/if}
+		{#each keys as key, i (`${i}:${key}`)}
+			<span class="key">{key}</span>{#if i < keys.length - 1}<span
+					class="separator"
+					aria-hidden="true">+</span
+				>{/if}
 		{/each}
 	{:else if children}
 		{@render children()}
@@ -21,7 +24,7 @@
 </kbd>
 
 <style>
-	kbd {
+	.root {
 		--dry-kbd-bg: var(--dry-color-bg-overlay);
 		--dry-kbd-border: var(--dry-color-stroke-weak);
 		--dry-kbd-radius: var(--dry-radius-md);
@@ -47,15 +50,7 @@
 		white-space: nowrap;
 	}
 
-	kbd kbd {
-		padding: 0;
-		margin: 0;
-		border: 0;
-		background: transparent;
-		font: inherit;
-	}
-
-	kbd span {
+	.separator {
 		color: var(--dry-color-text-weak);
 	}
 </style>

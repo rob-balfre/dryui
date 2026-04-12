@@ -7,9 +7,9 @@
 		children: Snippet;
 	}
 
-	let { active = false, class: className, children, ...rest }: Props = $props();
+	let { href, active = false, class: className, children, ...rest }: Props = $props();
 </script>
 
-<a data-active={active || undefined} class={className} {...rest}>
+<a {href} data-active={active || undefined} class={className} {...rest}>
 	{@render children()}
 </a>

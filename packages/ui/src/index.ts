@@ -497,7 +497,7 @@ export type {
 	PinInputGroupProps,
 	PinInputCellProps,
 	PinInputSeparatorProps,
-	PinInputCell
+	PinInputCellState
 } from './pin-input/index.js';
 
 export { RangeCalendar } from './range-calendar/index.js';

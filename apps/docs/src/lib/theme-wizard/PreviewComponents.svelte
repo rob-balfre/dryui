@@ -22,21 +22,33 @@
 
 <div class="preview-root">
 	<div class="stat-row">
-		<div role="group" class="stat-card">
-			<div class="stat-card-label">Active users</div>
-			<div class="stat-card-value">12,450</div>
-			<div class="stat-card-trend" data-direction="up">↑ +8.3% this week</div>
-		</div>
-		<div role="group" class="stat-card">
-			<div class="stat-card-label">Requests</div>
-			<div class="stat-card-value">98,201</div>
-			<div class="stat-card-trend" data-direction="up">↑ +2.1%</div>
-		</div>
-		<div role="group" class="stat-card">
-			<div class="stat-card-label">Error rate</div>
-			<div class="stat-card-value">0.4%</div>
-			<div class="stat-card-trend" data-direction="down">↓ -0.1%</div>
-		</div>
+		<Card.Root role="group" size="sm">
+			<Card.Content>
+				<div class="stat-card-body">
+					<div class="stat-card-label">Active users</div>
+					<div class="stat-card-value">12,450</div>
+					<div class="stat-card-trend" data-direction="up">↑ +8.3% this week</div>
+				</div>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root role="group" size="sm">
+			<Card.Content>
+				<div class="stat-card-body">
+					<div class="stat-card-label">Requests</div>
+					<div class="stat-card-value">98,201</div>
+					<div class="stat-card-trend" data-direction="up">↑ +2.1%</div>
+				</div>
+			</Card.Content>
+		</Card.Root>
+		<Card.Root role="group" size="sm">
+			<Card.Content>
+				<div class="stat-card-body">
+					<div class="stat-card-label">Error rate</div>
+					<div class="stat-card-value">0.4%</div>
+					<div class="stat-card-trend" data-direction="down">↓ -0.1%</div>
+				</div>
+			</Card.Content>
+		</Card.Root>
 	</div>
 
 	<div class="main-grid">
@@ -215,13 +227,9 @@
 			grid-template-columns: repeat(2, max-content);
 		}
 	}
-	.stat-card {
+	.stat-card-body {
 		display: grid;
 		gap: var(--dry-space-1);
-		padding: var(--dry-space-4);
-		background: var(--dry-color-bg-raised);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-md);
 	}
 
 	.stat-card-label {

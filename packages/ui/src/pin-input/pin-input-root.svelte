@@ -3,7 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getFormControlCtx } from '@dryui/primitives';
 	import { setPinInputCtx } from './context.svelte.js';
-	import type { PinInputCell } from './context.svelte.js';
+	import type { PinInputCellState } from './context.svelte.js';
 	import PinInputGroup from './pin-input-group.svelte';
 	import PinInputCellStyled from './pin-input-cell.svelte';
 
@@ -21,7 +21,7 @@
 		name?: string;
 		size?: 'sm' | 'md' | 'lg';
 		variant?: 'outline' | 'flushed';
-		children?: Snippet<[{ cells: PinInputCell[] }]>;
+		children?: Snippet<[{ cells: PinInputCellState[] }]>;
 	}
 
 	let {
@@ -54,8 +54,8 @@
 
 	const validationRegex = $derived(pattern ?? (type === 'numeric' ? /^\d+$/ : /^[a-zA-Z0-9]+$/));
 
-	const cells: PinInputCell[] = $derived.by(() => {
-		const result: PinInputCell[] = [];
+	const cells: PinInputCellState[] = $derived.by(() => {
+		const result: PinInputCellState[] = [];
 		for (let i = 0; i < length; i++) {
 			const char = value[i] ?? null;
 			const isActive =

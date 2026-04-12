@@ -7,10 +7,10 @@
 		children: Snippet;
 	}
 
-	let { active = false, class: className, children, ...rest }: Props = $props();
+	let { href, active = false, class: className, children, ...rest }: Props = $props();
 </script>
 
-<a data-active={active || undefined} data-nav-menu-link class={className} {...rest}>
+<a {href} data-active={active || undefined} data-nav-menu-link class={className} {...rest}>
 	{@render children()}
 </a>
 

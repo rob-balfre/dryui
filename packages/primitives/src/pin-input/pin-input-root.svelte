@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getFormControlCtx } from '../utils/form-control.svelte.js';
-	import { setPinInputCtx, type PinInputCell } from './context.svelte.js';
+	import { setPinInputCtx, type PinInputCellState } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
 		value?: string;
@@ -16,7 +16,7 @@
 		pasteTransformer?: (text: string) => string;
 		blurOnComplete?: boolean;
 		name?: string;
-		children?: Snippet<[{ cells: PinInputCell[] }]>;
+		children?: Snippet<[{ cells: PinInputCellState[] }]>;
 	}
 
 	let {
@@ -48,8 +48,8 @@
 	const validationRegex = $derived(pattern ?? (type === 'numeric' ? /^\d+$/ : /^[a-zA-Z0-9]+$/));
 
 	// Compute cells from value
-	const cells: PinInputCell[] = $derived.by(() => {
-		const result: PinInputCell[] = [];
+	const cells: PinInputCellState[] = $derived.by(() => {
+		const result: PinInputCellState[] = [];
 		for (let i = 0; i < length; i++) {
 			const char = value[i] ?? null;
 			const isActive =

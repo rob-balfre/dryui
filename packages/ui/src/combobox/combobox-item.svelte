@@ -28,17 +28,9 @@
 	const isSelected = $derived(ctx.value === value);
 	const isHighlighted = $derived(ctx.activeIndex === index);
 
-	let el = $state<HTMLDivElement>();
-
-	$effect(() => {
-		if (isHighlighted && el) {
-			el.scrollIntoView({ block: 'nearest' });
-		}
-	});
-
 	function handleClick(e: MouseEvent & { currentTarget: HTMLDivElement }) {
 		if (disabled) return;
-		const text = el?.textContent?.trim() ?? '';
+		const text = e.currentTarget.textContent?.trim() ?? '';
 		ctx.select(value, text);
 		ctx.close();
 		ctx.inputEl?.focus();
@@ -49,17 +41,21 @@
 		if (disabled) return;
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			const text = el?.textContent?.trim() ?? '';
+			const text = e.currentTarget.textContent?.trim() ?? '';
 			ctx.select(value, text);
 			ctx.close();
 			ctx.inputEl?.focus();
 		}
 		if (onkeydown) (onkeydown as (e: KeyboardEvent & { currentTarget: HTMLDivElement }) => void)(e);
 	}
+
+	function keepHighlightedItemVisible(node: HTMLDivElement) {
+		node.scrollIntoView({ block: 'nearest' });
+	}
 </script>
 
 <div
-	bind:this={el}
+	{@attach isHighlighted && keepHighlightedItemVisible}
 	role="option"
 	id={`${ctx.contentId}-item-${index}`}
 	tabindex={disabled ? undefined : -1}
@@ -82,12 +78,17 @@
 
 <style>
 	[data-combobox-item] {
+		--dry-combobox-item-radius: min(
+			var(--dry-control-radius, var(--dry-radius-sm)),
+			var(--dry-space-4)
+		);
+
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
 		padding: var(--dry-space-2) var(--dry-space-3);
-		border-radius: var(--dry-radius-sm);
+		border-radius: var(--dry-combobox-item-radius);
 		font-size: var(--dry-type-small-size);
 		cursor: pointer;
 		user-select: none;

@@ -12,8 +12,11 @@
 
 <kbd {...rest}>
 	{#if keys}
-		{#each keys as key, i}
-			<kbd>{key}</kbd>{#if i < keys.length - 1}<span>+</span>{/if}
+		{#each keys as key, i (`${i}:${key}`)}
+			<span class="key">{key}</span>{#if i < keys.length - 1}<span
+					class="separator"
+					aria-hidden="true">+</span
+				>{/if}
 		{/each}
 	{:else if children}
 		{@render children()}

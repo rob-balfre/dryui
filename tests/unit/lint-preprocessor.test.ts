@@ -39,6 +39,19 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
+	test('markup hook warns on anchor without href', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
+		const pp = dryuiLint();
+		pp.markup!({
+			content: '<a onclick={handleClick}>Apply preset</a>',
+			filename: 'test.svelte'
+		});
+		expect(spy).toHaveBeenCalled();
+		const msg = spy.mock.calls[0]![0] as string;
+		expect(msg).toContain('dryui/no-anchor-without-href');
+		spy.mockRestore();
+	});
+
 	test('style hook warns on display: flex', () => {
 		const spy = spyOn(console, 'warn').mockImplementation(() => {});
 		const pp = dryuiLint();

@@ -1,6 +1,6 @@
 import { createContext } from '../utils/create-context.js';
 
-export interface PinInputCell {
+export interface PinInputCellState {
 	readonly char: string | null;
 	readonly isActive: boolean;
 	readonly hasFakeCaret: boolean;
@@ -8,7 +8,7 @@ export interface PinInputCell {
 }
 
 export interface PinInputContext {
-	readonly cells: PinInputCell[];
+	readonly cells: PinInputCellState[];
 	readonly value: string;
 	readonly disabled: boolean;
 	readonly hasError: boolean;
