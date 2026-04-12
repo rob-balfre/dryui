@@ -16,9 +16,9 @@ export type ButtonVariant =
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 
-export type ButtonColor = 'primary' | 'danger';
+export type ButtonColor = 'primary' | 'danger' | (string & {}) | null;
 
-export interface ButtonProps extends PrimitiveButtonProps {
+export interface ButtonProps extends Omit<PrimitiveButtonProps, 'color'> {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	color?: ButtonColor;

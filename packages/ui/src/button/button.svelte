@@ -5,7 +5,11 @@
 
 	const groupCtx = getButtonGroupCtx();
 
-	interface Props extends HTMLButtonAttributes {
+	// Props that consumers commonly narrow (forcing us to accept their widened spreads).
+	// Extend HTMLButtonAttributes but replace color with a friendlier union. disabled/type
+	// are left as HTMLButtonAttributes' own (boolean | null | undefined, etc.) so consumers
+	// spreading `...rest: HTMLButtonAttributes` into Button type-check.
+	interface Props extends Omit<HTMLButtonAttributes, 'color'> {
 		variant?:
 			| 'solid'
 			| 'outline'
@@ -20,13 +24,12 @@
 			| 'toggle'
 			| 'pill';
 		size?: 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
-		color?: 'primary' | 'danger';
-		disabled?: boolean;
+		// Autocomplete still suggests the canonical values via the literal union.
+		color?: 'primary' | 'danger' | (string & {}) | null;
 		href?: string;
 		rel?: string;
 		target?: string;
 		download?: boolean | string;
-		type?: 'button' | 'submit' | 'reset';
 		/** Callback invoked with the rendered `<button>` or `<a>` element on mount, `null` on destroy. */
 		ref?: (el: HTMLButtonElement | HTMLAnchorElement | null) => void;
 		children: Snippet;
