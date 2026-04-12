@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "@dryui/primitives": "^0.4.0",
-    "@dryui/ui": "^0.4.0"
+    "@dryui/ui": "^0.5.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.1",
