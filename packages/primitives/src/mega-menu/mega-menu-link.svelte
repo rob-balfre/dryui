@@ -1,17 +1,33 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAnchorAttributes } from 'svelte/elements';
+	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLAnchorAttributes {
+	interface Props extends Omit<HTMLAnchorAttributes, 'children' | 'type'> {
+		href?: string;
+		rel?: string;
+		target?: string;
+		download?: boolean | string;
+		type?: 'button' | 'submit' | 'reset';
 		icon?: Snippet;
 		description?: Snippet;
 		children: Snippet;
 	}
 
-	let { icon, description, class: className, children, ...rest }: Props = $props();
+	let {
+		href,
+		rel,
+		target,
+		download,
+		type = 'button',
+		icon,
+		description,
+		class: className,
+		children,
+		...rest
+	}: Props = $props();
 </script>
 
-<a class={className} {...rest}>
+{#snippet body()}
 	{#if icon}
 		<span data-part="link-icon">
 			{@render icon()}
@@ -27,4 +43,14 @@
 			</span>
 		{/if}
 	</span>
-</a>
+{/snippet}
+
+{#if href !== undefined}
+	<a {href} {rel} {target} {download} class={className} {...rest}>
+		{@render body()}
+	</a>
+{:else}
+	<button {type} class={className} {...rest as HTMLButtonAttributes}>
+		{@render body()}
+	</button>
+{/if}

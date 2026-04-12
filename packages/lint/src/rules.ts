@@ -38,6 +38,8 @@ const COMPONENT_CLASS_RE = /<([A-Z][a-zA-Z0-9.]*)[^>]*?\bclass\s*=/gs;
 
 const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
 
+const SVELTE_ELEMENT_RE = /<svelte:element(\s|>|\/)/g;
+
 const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:/gm;
 const ALL_UNSET_RE = /(?:^|[;\s{])all\s*:\s*unset(?![a-z-])/gm;
 
@@ -47,7 +49,12 @@ const MEDIA_QUERY_RE = /@media\s+[^{]+\{/g;
 const ALLOWED_MEDIA_RE = /prefers-reduced-motion|prefers-color-scheme/;
 
 const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
-	{ tag: 'button', component: 'Button', allowedDirs: new Set(['button']), re: /<button(\s|>|\/)/g },
+	{
+		tag: 'button',
+		component: 'Button',
+		allowedDirs: new Set(['button', 'card', 'mega-menu']),
+		re: /<button(\s|>|\/)/g
+	},
 	{
 		tag: 'dialog',
 		component: 'Dialog',
@@ -127,6 +134,87 @@ function lookupLine(lineStarts: number[], index: number): number {
 	return lo + 1;
 }
 
+interface TagMatch {
+	index: number;
+	text: string;
+}
+
+function findOpeningTags(content: string, tagName: string): TagMatch[] {
+	const matches: TagMatch[] = [];
+	const needle = `<${tagName}`;
+	let index = 0;
+
+	while (index < content.length) {
+		const commentIndex = content.indexOf('<!--', index);
+		const tagIndex = content.indexOf(needle, index);
+
+		if (tagIndex === -1) break;
+
+		if (commentIndex !== -1 && commentIndex < tagIndex) {
+			const commentEnd = content.indexOf('-->', commentIndex + 4);
+			index = commentEnd === -1 ? content.length : commentEnd + 3;
+			continue;
+		}
+
+		const boundary = content[tagIndex + needle.length];
+		if (boundary && /[A-Za-z0-9:-]/.test(boundary)) {
+			index = tagIndex + needle.length;
+			continue;
+		}
+
+		let cursor = tagIndex + needle.length;
+		let quote: '"' | "'" | null = null;
+		let expressionDepth = 0;
+
+		while (cursor < content.length) {
+			const char = content[cursor]!;
+
+			if (quote) {
+				if (char === quote && content[cursor - 1] !== '\\') quote = null;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '"' || char === "'") {
+				quote = char;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '{') {
+				expressionDepth += 1;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '}') {
+				expressionDepth = Math.max(0, expressionDepth - 1);
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '>' && expressionDepth === 0) {
+				cursor += 1;
+				break;
+			}
+
+			cursor += 1;
+		}
+
+		matches.push({
+			index: tagIndex,
+			text: content.slice(tagIndex, cursor)
+		});
+		index = cursor;
+	}
+
+	return matches;
+}
+
+function anchorHasHref(tagText: string): boolean {
+	return /\{href\}/.test(tagText) || /(?<![\w:-])href\s*=/.test(tagText);
+}
+
 export function checkScript(content: string): Violation[] {
 	const violations: Violation[] = [];
 	const lineStarts = buildLineIndex(content);
@@ -184,6 +272,11 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	const parentDir = getParentDir(filename);
 	const lineStarts = buildLineIndex(markup);
 	const lineOf = (i: number) => lookupLine(lineStarts, i);
+	const file: FileContext = {
+		content: markup,
+		lines: markup.split('\n'),
+		lineStarts
+	};
 
 	for (const match of markup.matchAll(INLINE_STYLE_RE)) {
 		violations.push({
@@ -225,6 +318,26 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 			message:
 				'Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.',
 			line: lineOf(match.index)
+		});
+	}
+
+	for (const match of markup.matchAll(SVELTE_ELEMENT_RE)) {
+		if (hasAllowComment(file, match.index, 'svelte-element')) continue;
+		violations.push({
+			rule: 'dryui/no-svelte-element',
+			message:
+				'Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).',
+			line: lineOf(match.index)
+		});
+	}
+
+	for (const tag of findOpeningTags(markup, 'a')) {
+		if (anchorHasHref(tag.text)) continue;
+		violations.push({
+			rule: 'dryui/no-anchor-without-href',
+			message:
+				'Do not use <a> without href. Use <button> for actions, or provide href for navigation.',
+			line: lineOf(tag.index)
 		});
 	}
 

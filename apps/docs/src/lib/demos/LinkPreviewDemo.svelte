@@ -3,7 +3,7 @@
 </script>
 
 <LinkPreview.Root>
-	<LinkPreview.Trigger>Hover this link</LinkPreview.Trigger>
+	<LinkPreview.Trigger href="https://dryui.dev">Hover this link</LinkPreview.Trigger>
 	<LinkPreview.Content>
 		<p>Preview content for the linked page.</p>
 	</LinkPreview.Content>

@@ -12,6 +12,7 @@
 	let tag = $derived(`h${level}` as const);
 </script>
 
+<!-- dryui-allow svelte-element: polymorphic h1–h6 heading share the same UA styles and semantic family -->
 <svelte:element this={tag} data-page-header-title data-level={level} {...rest}>
 	{@render children()}
 </svelte:element>

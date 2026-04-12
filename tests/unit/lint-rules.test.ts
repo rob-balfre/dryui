@@ -130,10 +130,32 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags raw anchor without href', () => {
+		const violations = checkMarkup('<a onclick={handleClick}>Apply preset</a>');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-anchor-without-href');
+		expect(violations[0]!.message).toContain('Use <button> for actions');
+	});
+
+	test('allows raw anchor with href expression', () => {
+		const violations = checkMarkup('<a href={destination}>Open docs</a>');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows raw anchor with href shorthand', () => {
+		const violations = checkMarkup('<a {href}>Open docs</a>');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag anchor markup inside comments', () => {
+		const violations = checkMarkup('<!-- <a onclick={noop}>Ignore me</a> -->');
+		expect(violations).toHaveLength(0);
+	});
+
 	test('flags raw native element when file is not in canonical directory', () => {
 		const violations = checkMarkup(
 			'<button type="button">click</button>',
-			'src/mega-menu/mega-menu-trigger.svelte'
+			'src/avatar/avatar.svelte'
 		);
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-raw-native-element');
@@ -255,6 +277,44 @@ describe('checkMarkup', () => {
 		const code = `<script>
   // <!-- svelte-ignore css_unused_selector -->
   const x = '<!-- svelte-ignore css_unused_selector -->';
+</script>
+<div>clean</div>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags <svelte:element> with dynamic tag', () => {
+		const violations = checkMarkup('<svelte:element this={as}>content</svelte:element>');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-svelte-element');
+		expect(violations[0]!.message).toContain('<svelte:element');
+	});
+
+	test('flags self-closing <svelte:element>', () => {
+		const violations = checkMarkup('<svelte:element this={tag} />');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-svelte-element');
+	});
+
+	test('flags multiple <svelte:element> occurrences', () => {
+		const code = `<svelte:element this={a}>x</svelte:element>
+<svelte:element this={b}>y</svelte:element>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(2);
+		expect(violations[0]!.rule).toBe('dryui/no-svelte-element');
+		expect(violations[1]!.rule).toBe('dryui/no-svelte-element');
+	});
+
+	test('allows <svelte:element> with dryui-allow comment', () => {
+		const code = `<!-- dryui-allow svelte-element: h1–h6 share UA styles -->
+<svelte:element this={tag}>heading</svelte:element>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag <svelte:element> inside script string', () => {
+		const code = `<script>
+  const s = '<svelte:element this={x}>';
 </script>
 <div>clean</div>`;
 		const violations = checkMarkup(code);

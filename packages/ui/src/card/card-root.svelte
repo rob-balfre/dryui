@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLAttributes<HTMLElement> {
-		as?: 'div' | 'a' | 'button';
+		as?: 'div' | 'button';
 		selected?: boolean;
 		disabled?: boolean;
 		orientation?: 'vertical' | 'horizontal';
@@ -25,20 +25,37 @@
 	}: Props = $props();
 </script>
 
-<svelte:element
-	this={as}
-	class={className}
-	data-card
-	data-selected={selected ? '' : undefined}
-	data-orientation={orientation}
-	data-variant={variant !== 'default' ? variant : undefined}
-	data-size={size !== 'default' ? size : undefined}
-	data-disabled={disabled ? '' : undefined}
-	aria-disabled={disabled || undefined}
-	{...rest}
->
-	{@render children()}
-</svelte:element>
+{#if as === 'button'}
+	<button
+		class={className}
+		data-card
+		data-selected={selected ? '' : undefined}
+		data-orientation={orientation}
+		data-variant={variant !== 'default' ? variant : undefined}
+		data-size={size !== 'default' ? size : undefined}
+		data-disabled={disabled ? '' : undefined}
+		{disabled}
+		aria-disabled={disabled || undefined}
+		type="button"
+		{...rest as HTMLButtonAttributes}
+	>
+		{@render children()}
+	</button>
+{:else}
+	<div
+		class={className}
+		data-card
+		data-selected={selected ? '' : undefined}
+		data-orientation={orientation}
+		data-variant={variant !== 'default' ? variant : undefined}
+		data-size={size !== 'default' ? size : undefined}
+		data-disabled={disabled ? '' : undefined}
+		aria-disabled={disabled || undefined}
+		{...rest}
+	>
+		{@render children()}
+	</div>
+{/if}
 
 <style>
 	[data-card] {
@@ -73,35 +90,33 @@
 			var(--dry-card-shadow, var(--dry-surface-shadow, var(--dry-shadow-raised)));
 	}
 
-	/* ── Clickable card (button or link) ───────────────────────────────────── */
+	/* ── Clickable card (button) ───────────────────────────────────────────── */
 
-	[data-card]:is(a, button) {
-		cursor: pointer;
-		text-decoration: none;
+	button[data-card] {
+		appearance: none;
+		border: none;
+		padding: 0;
+		font: inherit;
 		color: inherit;
 		text-align: inherit;
+		cursor: pointer;
 		transition:
 			box-shadow var(--dry-duration-normal, 200ms) ease,
 			transform var(--dry-duration-fast, 100ms) ease;
 	}
 
-	[data-card]:is(a, button):hover {
+	button[data-card]:hover {
 		box-shadow: var(--dry-shadow-md, 0 4px 6px -1px rgb(15 23 42 / 0.1));
 		border-color: var(--dry-color-stroke-strong);
 	}
 
-	[data-card]:is(a, button):active {
+	button[data-card]:active {
 		transform: scale(0.99);
 	}
 
-	[data-card]:is(a, button):focus-visible {
+	button[data-card]:focus-visible {
 		outline: 2px solid var(--dry-color-focus-ring);
 		outline-offset: 2px;
-	}
-
-	[data-card]:is(button) {
-		border: none;
-		font: inherit;
 	}
 
 	[data-card][data-disabled] {

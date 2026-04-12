@@ -3,11 +3,12 @@
 	import type { HTMLAnchorAttributes } from 'svelte/elements';
 	import { getLinkPreviewCtx } from './context.svelte.js';
 
-	interface Props extends HTMLAnchorAttributes {
+	interface Props extends Omit<HTMLAnchorAttributes, 'href'> {
+		href: string;
 		children: Snippet;
 	}
 
-	let { class: className, children, ...rest }: Props = $props();
+	let { href, class: className, children, ...rest }: Props = $props();
 
 	const ctx = getLinkPreviewCtx();
 
@@ -22,6 +23,7 @@
 
 <a
 	bind:this={anchorEl}
+	{href}
 	id={ctx.triggerId}
 	data-link-preview-trigger
 	aria-describedby={ctx.open ? ctx.contentId : undefined}

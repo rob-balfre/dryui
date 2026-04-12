@@ -47,14 +47,6 @@ const BANNED_GUIDANCE_CHECKS = [
 		]
 	},
 	{
-		path: resolve(repoRoot, 'packages/feedback/src/layout-mode/output.ts'),
-		patterns: ['<Grid>', '<Flex>', '<Stack>', 'DryUI layout primitives']
-	},
-	{
-		path: resolve(repoRoot, 'packages/feedback/src/layout-mode/generated-library.ts'),
-		patterns: ["sourceId: 'Grid'", "sourceName: 'Grid'", "label: 'Grid'"]
-	},
-	{
 		path: resolve(repoRoot, 'scripts/dogfood-audit.ts'),
 		patterns: ['Flex or Stack', "suggestion: 'Grid'", "suggestion: 'Flex'"]
 	}

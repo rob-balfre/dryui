@@ -2356,6 +2356,7 @@
       "cssVars": {
         "--dry-cmd-bg": "Background color",
         "--dry-cmd-border": "Border color",
+        "--dry-cmd-item-radius": "Item Radius",
         "--dry-cmd-max-width": "Maximum width",
         "--dry-cmd-radius": "Border radius",
         "--dry-cmd-shadow": "Box shadow"
@@ -3302,7 +3303,9 @@
       "a11y": [
         "Provide surrounding field context and a name when the selected value needs to submit with a form."
       ],
-      "cssVars": {},
+      "cssVars": {
+        "--dry-select-item-radius": "Item Radius"
+      },
       "dataAttributes": [
         {
           "name": "data-disabled",
@@ -3641,7 +3644,9 @@
           "    MultiSelectCombobox.Item"
         ]
       },
-      "cssVars": {},
+      "cssVars": {
+        "--dry-multi-select-item-radius": "Select Item Radius"
+      },
       "dataAttributes": [
         {
           "name": "data-disabled",
@@ -3978,6 +3983,8 @@
       "cssVars": {
         "--dry-btn-bg": "Background color",
         "--dry-btn-border": "Border color",
+        "--dry-btn-justify": "Justify",
+        "--dry-btn-min-height": "Minimum height",
         "--dry-btn-padding-x": "Horizontal padding",
         "--dry-btn-padding-y": "Vertical padding",
         "--dry-btn-radius": "Border radius"
@@ -9283,6 +9290,7 @@
         "--dry-combobox-border": "Border color",
         "--dry-combobox-color": "Text color",
         "--dry-combobox-font-size": "Font size",
+        "--dry-combobox-item-radius": "Item Radius",
         "--dry-combobox-padding-x": "Horizontal padding",
         "--dry-combobox-padding-y": "Vertical padding"
       },
@@ -16653,6 +16661,37 @@
         },
         "Link": {
           "props": {
+            "href": {
+              "type": "string",
+              "required": false,
+              "description": "Destination URL when the component renders as a link."
+            },
+            "rel": {
+              "type": "string",
+              "required": false,
+              "description": "Relationship between the current document and the linked resource."
+            },
+            "target": {
+              "type": "string",
+              "required": false,
+              "description": "Browsing context used for link navigation."
+            },
+            "download": {
+              "type": "boolean | string",
+              "required": false,
+              "description": "Requests download behavior when the component renders as a link."
+            },
+            "type": {
+              "type": "'button' | 'submit' | 'reset'",
+              "required": false,
+              "acceptedValues": [
+                "button",
+                "submit",
+                "reset"
+              ],
+              "description": "HTML type attribute or component-specific type selector.",
+              "default": "'button'"
+            },
             "icon": {
               "type": "Snippet",
               "required": false
@@ -16669,15 +16708,18 @@
             }
           },
           "forwardedProps": {
-            "baseType": "HTMLAnchorAttributes",
+            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'children'>",
             "via": "rest",
-            "element": "a",
+            "element": "element",
             "examples": [
-              "href",
-              "target",
-              "rel"
+              "id",
+              "class",
+              "aria-label"
             ],
-            "note": "Forwards <a> attributes via rest props."
+            "omitted": [
+              "children"
+            ],
+            "note": "Forwards <element> attributes via rest props."
           }
         }
       },

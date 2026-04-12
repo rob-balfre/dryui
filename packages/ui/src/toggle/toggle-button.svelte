@@ -97,6 +97,8 @@
 		--dry-btn-radius: var(--_track-w);
 		--dry-btn-padding-x: 0;
 		--dry-btn-padding-y: 0;
+		--dry-btn-justify: start;
+		--dry-btn-min-height: var(--_track-h);
 	}
 
 	.root[data-state='on'] {
@@ -173,7 +175,7 @@
 		--_track-w: 48px;
 		--_track-h: 24px;
 		--_thumb-size: 24px;
-		--_thumb-travel: 24px;
+		--_thumb-travel: calc(48px - 24px - 2px);
 		--_gap: var(--dry-space-2);
 		--_label-size: var(--dry-type-tiny-size);
 		--_label-leading: var(--dry-type-tiny-leading);
@@ -183,7 +185,7 @@
 		--_track-w: 64px;
 		--_track-h: 32px;
 		--_thumb-size: 32px;
-		--_thumb-travel: 32px;
+		--_thumb-travel: calc(64px - 32px - 2px);
 		--_gap: var(--dry-space-3);
 		--_label-size: var(--dry-type-small-size);
 		--_label-leading: var(--dry-type-small-leading);

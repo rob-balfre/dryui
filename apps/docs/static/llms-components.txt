@@ -35,7 +35,7 @@ Root import: import { Toggle } from '@dryui/ui'
 Subpath import: import { Toggle } from '@dryui/ui/toggle'
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | icon (Snippet) | pressed (boolean), default false, bindable | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <button> attributes via rest props.
-CSS variables: --dry-btn-bg, --dry-btn-border, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius
+CSS variables: --dry-btn-bg, --dry-btn-border, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-size | data-state
 Accessibility: none
 Example:
@@ -972,7 +972,7 @@ Structure:
       Select.Value
     Select.Content
       Select.Item
-CSS variables: none
+CSS variables: --dry-select-item-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example:
@@ -1031,7 +1031,7 @@ Structure:
     MultiSelectCombobox.Input
     MultiSelectCombobox.Content
       MultiSelectCombobox.Item
-CSS variables: none
+CSS variables: --dry-multi-select-item-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-empty | data-highlighted | data-multi-select-content | data-multi-select-empty | data-multi-select-group | data-multi-select-input | data-multi-select-item | data-multi-select-root | data-multi-select-selection-item | data-multi-select-selection-list | data-multi-select-wrapper | data-part | data-selected (Present when the current item is selected.) | data-state | data-text-value | data-value
 Accessibility: none
 Example:
@@ -1112,7 +1112,7 @@ Structure:
     Combobox.Input
     Combobox.Content
       Combobox.Item
-CSS variables: --dry-combobox-bg, --dry-combobox-border, --dry-combobox-color, --dry-combobox-font-size, --dry-combobox-padding-x, --dry-combobox-padding-y
+CSS variables: --dry-combobox-bg, --dry-combobox-border, --dry-combobox-color, --dry-combobox-font-size, --dry-combobox-item-radius, --dry-combobox-padding-x, --dry-combobox-padding-y
 Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
 Accessibility: none
 Example:
@@ -1926,8 +1926,8 @@ Parts:
   Props: title (string), Primary heading or label text. | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - MegaMenu.Link
-  Props: icon (Snippet) | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <a> attributes via rest props.
+  Props: href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | icon (Snippet) | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
 Structure:
   MegaMenu.Root
     MegaMenu.Trigger
@@ -2327,7 +2327,7 @@ Structure:
     CommandPalette.Item
     CommandPalette.Empty
     CommandPalette.Separator
-CSS variables: --dry-cmd-bg, --dry-cmd-border, --dry-cmd-max-width, --dry-cmd-radius, --dry-cmd-shadow
+CSS variables: --dry-cmd-bg, --dry-cmd-border, --dry-cmd-item-radius, --dry-cmd-max-width, --dry-cmd-radius, --dry-cmd-shadow
 Data attributes: data-active (Present on the active item or current target within the component.) | data-command-palette-empty | data-command-palette-group | data-command-palette-group-heading | data-command-palette-input | data-command-palette-item | data-command-palette-list | data-command-palette-root | data-command-palette-separator | data-disabled (Present when the component or part is disabled.) | data-state (Reflects whether the command palette dialog is open or closed., values open, closed) | data-value
 Accessibility: none
 Example:

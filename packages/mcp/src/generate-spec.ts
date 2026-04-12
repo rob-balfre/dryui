@@ -1847,19 +1847,22 @@ async function main(): Promise<void> {
 
 		for (const entry of entries) {
 			if (!entry.isFile()) continue;
+			if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
 			const source = await readText(join(dirPath, entry.name));
 
-			if (entry.name.endsWith('.module.css') || entry.name.endsWith('.svelte')) {
-				for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
-					const varName = match[1];
-					if (varName) cssVars[varName] = cssVarDescription(varName);
-				}
+			for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
+				const varName = match[1];
+				if (varName) cssVars[varName] = cssVarDescription(varName);
+			}
+			// Private-alias fallback pattern `--_dry-btn-bg: var(--dry-btn-bg, <fallback>)`
+			// — the first var() argument is the consumer-facing override point.
+			for (const match of source.matchAll(/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)/gm)) {
+				const varName = match[1];
+				if (varName) cssVars[varName] = cssVarDescription(varName);
 			}
 
-			if (entry.name.endsWith('.module.css') || entry.name.endsWith('.svelte')) {
-				for (const attr of collectDataAttributes(source)) {
-					dataAttributes.add(attr);
-				}
+			for (const attr of collectDataAttributes(source)) {
+				dataAttributes.add(attr);
 			}
 		}
 
