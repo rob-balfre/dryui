@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { getPinInputCtx, type PinInputCell } from './context.svelte.js';
+	import { getPinInputCtx, type PinInputCellState } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-		cell: PinInputCell;
+		cell: PinInputCellState;
 		children?: Snippet<[{ char: string | null; isActive: boolean; hasFakeCaret: boolean }]>;
 	}
 

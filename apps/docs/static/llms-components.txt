@@ -450,13 +450,13 @@ Root import: import { PinInput } from '@dryui/ui'
 Subpath import: import { PinInput } from '@dryui/ui/pin-input'
 Parts:
 - PinInput.Root
-  Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant ('outline' | 'flushed'), Visual style preset for the component., accepted outline, flushed, default 'outline' | value (string), Current controlled or bindable value., default '', bindable | length (number), default 4 | mask (boolean), default false | type ('numeric' | 'alphanumeric'), HTML type attribute or component-specific type selector., accepted numeric, alphanumeric, default 'numeric' | pattern (RegExp) | placeholder (string), Hint text shown when no value is selected or entered., default '○' | disabled (boolean), Prevents interaction and applies disabled styling., default false | oncomplete ((value: string) => void) | pasteTransformer ((text: string) => string) | blurOnComplete (boolean), default false | name (string), Field name used during native form submission. | children (Snippet<[{ cells: PinInputCellType[] }]>), Content rendered inside the component.
+  Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant ('outline' | 'flushed'), Visual style preset for the component., accepted outline, flushed, default 'outline' | value (string), Current controlled or bindable value., default '', bindable | length (number), default 4 | mask (boolean), default false | type ('numeric' | 'alphanumeric'), HTML type attribute or component-specific type selector., accepted numeric, alphanumeric, default 'numeric' | pattern (RegExp) | placeholder (string), Hint text shown when no value is selected or entered., default '○' | disabled (boolean), Prevents interaction and applies disabled styling., default false | oncomplete ((value: string) => void) | pasteTransformer ((text: string) => string) | blurOnComplete (boolean), default false | name (string), Field name used during native form submission. | children (Snippet<[{ cells: PinInputCellState[] }]>), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - PinInput.Group
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - PinInput.Cell
-  Props: cell (PinInputCellType), required | children (Snippet<[{ char: string | null; isActive: boolean; hasFakeCaret: boolean }]>), Content rendered inside the component.
+  Props: cell (PinInputCellState), required | children (Snippet<[{ char: string | null; isActive: boolean; hasFakeCaret: boolean }]>), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - PinInput.Separator
   Props: children (Snippet), Content rendered inside the component.

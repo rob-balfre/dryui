@@ -44,7 +44,10 @@
 	[data-listbox-item] {
 		--dry-listbox-item-padding-x: var(--dry-space-3);
 		--dry-listbox-item-padding-y: var(--dry-space-2);
-		--dry-listbox-item-radius: var(--dry-radius-md);
+		--dry-listbox-item-radius: min(
+			var(--dry-control-radius, var(--dry-radius-md)),
+			var(--dry-space-4)
+		);
 		--dry-listbox-item-hover-bg: var(--dry-color-fill-hover);
 		--dry-listbox-item-selected-bg: var(--dry-color-fill-selected);
 		--dry-listbox-item-selected-color: var(--dry-color-on-brand);

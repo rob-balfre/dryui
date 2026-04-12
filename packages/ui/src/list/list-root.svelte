@@ -45,7 +45,10 @@
 		--dry-list-color: var(--dry-color-text-strong);
 		--dry-list-item-padding: var(--dry-space-2_5) var(--dry-space-3);
 		--dry-list-item-gap: var(--dry-space-3);
-		--dry-list-item-radius: var(--dry-radius-md);
+		--dry-list-item-radius: min(
+			var(--dry-control-radius, var(--dry-radius-md)),
+			var(--dry-space-4)
+		);
 		--dry-list-item-hover-bg: color-mix(in srgb, var(--dry-color-fill-brand) 8%, transparent);
 		--dry-list-item-active-bg: color-mix(in srgb, var(--dry-color-fill-brand) 12%, transparent);
 		--dry-list-item-icon-color: var(--dry-color-icon-weak, var(--dry-color-text-weak));

@@ -3,10 +3,10 @@ import type {
 	PinInputGroupProps,
 	PinInputCellProps,
 	PinInputSeparatorProps,
-	PinInputCell
+	PinInputCellState
 } from '@dryui/primitives';
 
-export type { PinInputGroupProps, PinInputCellProps, PinInputSeparatorProps, PinInputCell };
+export type { PinInputGroupProps, PinInputCellProps, PinInputSeparatorProps, PinInputCellState };
 
 export interface PinInputRootProps extends PrimitivePinInputRootProps {
 	size?: 'sm' | 'md' | 'lg';
@@ -15,17 +15,17 @@ export interface PinInputRootProps extends PrimitivePinInputRootProps {
 
 import PinInputRoot from './pin-input-root.svelte';
 import PinInputGroup from './pin-input-group.svelte';
-import PinInputCellComponent from './pin-input-cell.svelte';
+import PinInputCell from './pin-input-cell.svelte';
 import PinInputSeparator from './pin-input-separator.svelte';
 
 export const PinInput: {
 	Root: typeof PinInputRoot;
 	Group: typeof PinInputGroup;
-	Cell: typeof PinInputCellComponent;
+	Cell: typeof PinInputCell;
 	Separator: typeof PinInputSeparator;
 } = {
 	Root: PinInputRoot,
 	Group: PinInputGroup,
-	Cell: PinInputCellComponent,
+	Cell: PinInputCell,
 	Separator: PinInputSeparator
 };

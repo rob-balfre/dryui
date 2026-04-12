@@ -35,13 +35,6 @@
 		FONT_STACKS,
 		bg
 	} from '@dryui/theme-wizard';
-	import type {
-		FontPreset,
-		TypeScale,
-		Personality,
-		RadiusPreset,
-		Density
-	} from '@dryui/theme-wizard';
 	import {
 		Sparkles,
 		Palette,
@@ -58,25 +51,13 @@
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
 
-	let pickerHex = $state(
-		(() => {
-			const { h, s, b } = wizardState.brandHsb;
-			const hsl = hsbToHsl(h, s / 100, b / 100);
-			return hslToHex(hsl.h, hsl.s, hsl.l);
-		})()
-	);
+	function brandHsbToHex(brand: { h: number; s: number; b: number }): string {
+		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
+		return hslToHex(hsl.h, hsl.s, hsl.l);
+	}
 
-	$effect(() => {
-		const { h, s, b } = wizardState.brandHsb;
-		const hsl = hsbToHsl(h, s / 100, b / 100);
-		const freshHex = hslToHex(hsl.h, hsl.s, hsl.l);
-		if (freshHex !== pickerHex) {
-			pickerHex = freshHex;
-		}
-	});
-
-	$effect(() => {
-		const hsl = hexToHsl(pickerHex);
+	function setBrandFromHex(value: string) {
+		const hsl = hexToHsl(value);
 		const hsb = hslToHsb(hsl.h, hsl.s, hsl.l);
 		const current = wizardState.brandHsb;
 		if (
@@ -86,11 +67,17 @@
 		) {
 			setBrandHsb(hsb.h, Math.round(hsb.s * 100), Math.round(hsb.b * 100));
 		}
-	});
+	}
 
-	function brandHsbToHex(brand: { h: number; s: number; b: number }): string {
-		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
-		return hslToHex(hsl.h, hsl.s, hsl.l);
+	function syncSingleToggleSelection<T extends string>(
+		selection: string[],
+		current: T,
+		apply: (value: T) => void
+	) {
+		const next = selection[0];
+		if (next && next !== current) {
+			apply(next as T);
+		}
 	}
 
 	function attachPresetVars(color: string, font: string) {
@@ -276,7 +263,10 @@
 						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" /> Colour</MegaMenu.Trigger>
 						<MegaMenu.Panel fullWidth>
 							<MegaMenu.Column title="Picker">
-								<ColorPicker.Root bind:value={pickerHex} areaHeight={160}>
+								<ColorPicker.Root
+									bind:value={() => brandHsbToHex(wizardState.brandHsb), setBrandFromHex}
+									areaHeight={160}
+								>
 									<ColorPicker.Area />
 									<ColorPicker.HueSlider />
 									<ColorPicker.Input format="hex" />
@@ -309,14 +299,19 @@
 								<ToggleGroup.Root
 									type="single"
 									size="sm"
-									value={[wizardState.typography.fontPreset]}
+									bind:value={
+										() => [wizardState.typography.fontPreset],
+										(selection) =>
+											syncSingleToggleSelection(
+												selection,
+												wizardState.typography.fontPreset,
+												setFontPreset
+											)
+									}
 									orientation="horizontal"
 								>
 									{#each Object.entries(FONT_STACKS) as [name, stack] (name)}
-										<ToggleGroup.Item
-											value={name}
-											onclick={() => setFontPreset(name as FontPreset)}
-										>
+										<ToggleGroup.Item value={name}>
 											<span class="font-sample" {@attach attachPresetVars('', stack)}>
 												<span class="font-sample-glyph">Ag</span>
 												<span class="font-sample-name">{name}</span>
@@ -329,11 +324,19 @@
 								<ToggleGroup.Root
 									type="single"
 									size="sm"
-									value={[wizardState.typography.scale]}
+									bind:value={
+										() => [wizardState.typography.scale],
+										(selection) =>
+											syncSingleToggleSelection(
+												selection,
+												wizardState.typography.scale,
+												setTypeScale
+											)
+									}
 									orientation="vertical"
 								>
-									{#each [['compact', 'Compact'], ['default', 'Default'], ['spacious', 'Spacious']] as [val, label] (val)}
-										<ToggleGroup.Item value={val} onclick={() => setTypeScale(val as TypeScale)}>
+									{#each [['compact', 'Compact'], ['default', 'Default'], ['spacious', 'Spacious']] as const as [val, label] (val)}
+										<ToggleGroup.Item value={val}>
 											{label}
 										</ToggleGroup.Item>
 									{/each}
@@ -349,14 +352,15 @@
 								<ToggleGroup.Root
 									type="single"
 									size="sm"
-									value={[wizardState.personality]}
+									bind:value={
+										() => [wizardState.personality],
+										(selection) =>
+											syncSingleToggleSelection(selection, wizardState.personality, setPersonality)
+									}
 									orientation="vertical"
 								>
 									{#each [{ value: 'minimal', label: 'Minimal' }, { value: 'clean', label: 'Clean' }, { value: 'structured', label: 'Structured' }, { value: 'rich', label: 'Rich' }] as opt (opt.value)}
-										<ToggleGroup.Item
-											value={opt.value}
-											onclick={() => setPersonality(opt.value as Personality)}
-										>
+										<ToggleGroup.Item value={opt.value}>
 											{opt.label}
 										</ToggleGroup.Item>
 									{/each}
@@ -366,14 +370,19 @@
 								<ToggleGroup.Root
 									type="single"
 									size="sm"
-									value={[wizardState.shape.radiusPreset]}
+									bind:value={
+										() => [wizardState.shape.radiusPreset],
+										(selection) =>
+											syncSingleToggleSelection(
+												selection,
+												wizardState.shape.radiusPreset,
+												setRadiusPreset
+											)
+									}
 									orientation="horizontal"
 								>
 									{#each [{ value: 'sharp', label: 'Sharp' }, { value: 'soft', label: 'Soft' }, { value: 'rounded', label: 'Rounded' }, { value: 'pill', label: 'Pill' }] as opt (opt.value)}
-										<ToggleGroup.Item
-											value={opt.value}
-											onclick={() => setRadiusPreset(opt.value as RadiusPreset)}
-										>
+										<ToggleGroup.Item value={opt.value}>
 											<span class="corner-toggle">
 												<span class="corner-hint" data-shape={opt.value}></span>
 												<span class="corner-label">{opt.label}</span>
@@ -386,14 +395,15 @@
 								<ToggleGroup.Root
 									type="single"
 									size="sm"
-									value={[wizardState.shape.density]}
+									bind:value={
+										() => [wizardState.shape.density],
+										(selection) =>
+											syncSingleToggleSelection(selection, wizardState.shape.density, setDensity)
+									}
 									orientation="vertical"
 								>
 									{#each [{ value: 'compact', label: 'Compact' }, { value: 'default', label: 'Default' }, { value: 'spacious', label: 'Spacious' }] as opt (opt.value)}
-										<ToggleGroup.Item
-											value={opt.value}
-											onclick={() => setDensity(opt.value as Density)}
-										>
+										<ToggleGroup.Item value={opt.value}>
 											{opt.label}
 										</ToggleGroup.Item>
 									{/each}
@@ -449,28 +459,32 @@
 						<MegaMenu.Panel>
 							<MegaMenu.Column title="Light mode">
 								{#each lightContrast as check (check.label)}
-									<MegaMenu.Link>
-										{#snippet icon()}
+									<div class="contrast-result">
+										<div class="contrast-result-icon">
 											<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
 												{check.ratioLabel}
 												{check.passes ? '\u2713' : '\u2717'}
 											</Badge>
-										{/snippet}
-										{check.label}
-									</MegaMenu.Link>
+										</div>
+										<div class="contrast-result-content">
+											<div class="contrast-result-label">{check.label}</div>
+										</div>
+									</div>
 								{/each}
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Dark mode">
 								{#each darkContrast as check (check.label)}
-									<MegaMenu.Link>
-										{#snippet icon()}
+									<div class="contrast-result">
+										<div class="contrast-result-icon">
 											<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
 												{check.ratioLabel}
 												{check.passes ? '\u2713' : '\u2717'}
 											</Badge>
-										{/snippet}
-										{check.label}
-									</MegaMenu.Link>
+										</div>
+										<div class="contrast-result-content">
+											<div class="contrast-result-label">{check.label}</div>
+										</div>
+									</div>
 								{/each}
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
@@ -660,6 +674,27 @@
 		block-size: 1.5rem;
 		aspect-ratio: 1;
 		border-radius: var(--dry-radius-full, 9999px);
+	}
+
+	.contrast-result {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: start;
+		gap: var(--dry-space-3, 0.75rem);
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border-radius: var(--dry-radius-md, 0.375rem);
+	}
+
+	.contrast-result-content {
+		display: grid;
+		gap: var(--dry-space-0_5, 0.125rem);
+	}
+
+	.contrast-result-label {
+		font-size: var(--dry-type-ui-control-size, var(--dry-text-sm-size, 0.875rem));
+		font-weight: 500;
+		color: var(--dry-color-text-strong, #1a1a2e);
 	}
 
 	/* ─── Preview scene ───────────────────────────────────────────────────── */

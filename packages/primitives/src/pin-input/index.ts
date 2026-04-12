@@ -1,8 +1,8 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
-import type { PinInputCell as PinInputCellType } from './context.svelte.js';
+import type { PinInputCellState } from './context.svelte.js';
 
-export type PinInputCell = PinInputCellType;
+export type { PinInputCellState };
 
 export interface PinInputRootProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
 	value?: string;
@@ -16,7 +16,7 @@ export interface PinInputRootProps extends Omit<HTMLAttributes<HTMLDivElement>, 
 	pasteTransformer?: (text: string) => string;
 	blurOnComplete?: boolean;
 	name?: string;
-	children?: Snippet<[{ cells: PinInputCellType[] }]>;
+	children?: Snippet<[{ cells: PinInputCellState[] }]>;
 }
 
 export interface PinInputGroupProps extends HTMLAttributes<HTMLDivElement> {
@@ -24,7 +24,7 @@ export interface PinInputGroupProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export interface PinInputCellProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-	cell: PinInputCellType;
+	cell: PinInputCellState;
 	children?: Snippet<[{ char: string | null; isActive: boolean; hasFakeCaret: boolean }]>;
 }
 
@@ -34,17 +34,17 @@ export interface PinInputSeparatorProps extends HTMLAttributes<HTMLDivElement> {
 
 import PinInputRoot from './pin-input-root.svelte';
 import PinInputGroup from './pin-input-group.svelte';
-import PinInputCellComponent from './pin-input-cell.svelte';
+import PinInputCell from './pin-input-cell.svelte';
 import PinInputSeparator from './pin-input-separator.svelte';
 
 export const PinInput: {
 	Root: typeof PinInputRoot;
 	Group: typeof PinInputGroup;
-	Cell: typeof PinInputCellComponent;
+	Cell: typeof PinInputCell;
 	Separator: typeof PinInputSeparator;
 } = {
 	Root: PinInputRoot,
 	Group: PinInputGroup,
-	Cell: PinInputCellComponent,
+	Cell: PinInputCell,
 	Separator: PinInputSeparator
 };

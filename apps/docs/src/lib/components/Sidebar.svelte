@@ -35,10 +35,11 @@
 	}
 
 	$effect(() => {
-		if (!scrollRoot || !currentPath) return;
+		const root = scrollRoot;
+		if (!root || !currentPath) return;
 
 		const frame = requestAnimationFrame(() => {
-			const active = scrollRoot.querySelector('[data-active]');
+			const active = root.querySelector('[data-active]');
 			if (active instanceof HTMLElement) {
 				active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
 			}

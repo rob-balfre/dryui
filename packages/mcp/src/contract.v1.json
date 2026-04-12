@@ -10505,7 +10505,7 @@
               "description": "Field name used during native form submission."
             },
             "children": {
-              "type": "Snippet<[{ cells: PinInputCellType[] }]>",
+              "type": "Snippet<[{ cells: PinInputCellState[] }]>",
               "required": false,
               "description": "Content rendered inside the component."
             }
@@ -10548,7 +10548,7 @@
         "Cell": {
           "props": {
             "cell": {
-              "type": "PinInputCellType",
+              "type": "PinInputCellState",
               "required": true
             },
             "children": {

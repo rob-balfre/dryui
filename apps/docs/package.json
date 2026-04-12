@@ -6,7 +6,7 @@
     "dev": "bunx --bun vite dev",
     "build": "bunx --bun vite build",
     "preview": "bunx --bun vite preview",
-    "check": "bunx svelte-check@4.4.5 --tsconfig ./tsconfig.json"
+    "check": "bunx svelte-check@4.4.6 --tsconfig ./tsconfig.json"
   },
   "dependencies": {
     "@dryui/mcp": "workspace:*",

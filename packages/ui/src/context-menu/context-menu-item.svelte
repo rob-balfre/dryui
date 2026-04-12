@@ -50,7 +50,10 @@
 		align-items: center;
 		gap: var(--dry-space-2);
 		padding: var(--dry-menu-item-padding, var(--dry-space-2_5) var(--dry-space-2));
-		border-radius: var(--dry-radius-sm);
+		border-radius: var(
+			--dry-menu-item-radius,
+			min(var(--dry-control-radius, var(--dry-radius-sm)), var(--dry-space-4))
+		);
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		cursor: pointer;
 		user-select: none;
