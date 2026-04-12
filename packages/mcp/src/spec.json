@@ -1,5 +1,5 @@
 {
-  "version": "0.4.1",
+  "version": "0.5.1",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -3163,6 +3163,8 @@
         "Provide surrounding field context and a name when the selected value needs to submit with a form."
       ],
       "cssVars": {
+        "--dry-btn-align": "Align",
+        "--dry-btn-justify": "Justify",
         "--dry-select-item-radius": "Item Radius"
       },
       "dataAttributes": [
