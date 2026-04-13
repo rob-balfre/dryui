@@ -38,8 +38,8 @@ import DrawerTrigger from './drawer-trigger.svelte';
 import DrawerContent from './drawer-content.svelte';
 import DrawerOverlay from './drawer-overlay.svelte';
 import DrawerHeader from './drawer-header.svelte';
-import DrawerBody from './drawer-body.svelte';
-import DrawerFooter from './drawer-footer.svelte';
+import DrawerBody from '../internal/snippet-div.svelte';
+import DrawerFooter from '../internal/snippet-div.svelte';
 import DrawerClose from './drawer-close.svelte';
 
 export const Drawer: {

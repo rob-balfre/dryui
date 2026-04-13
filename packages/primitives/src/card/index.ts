@@ -22,9 +22,9 @@ export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 import CardRoot from './card-root.svelte';
-import CardHeader from './card-header.svelte';
-import CardContent from './card-content.svelte';
-import CardFooter from './card-footer.svelte';
+import CardHeader from '../internal/snippet-div.svelte';
+import CardContent from '../internal/snippet-div.svelte';
+import CardFooter from '../internal/snippet-div.svelte';
 
 export const Card: {
 	Root: typeof CardRoot;

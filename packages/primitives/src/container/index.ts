@@ -5,4 +5,4 @@ export interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
 	children: Snippet;
 }
 
-export { default as Container } from './container.svelte';
+export { default as Container } from '../internal/snippet-div.svelte';

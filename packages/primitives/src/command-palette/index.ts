@@ -38,7 +38,7 @@ import CommandPaletteList from './command-palette-list.svelte';
 import CommandPaletteGroup from './command-palette-group.svelte';
 import CommandPaletteItem from './command-palette-item.svelte';
 import CommandPaletteEmpty from './command-palette-empty.svelte';
-import CommandPaletteSeparator from './command-palette-separator.svelte';
+import CommandPaletteSeparator from '../internal/separator-div.svelte';
 
 export const CommandPalette: {
 	Root: typeof CommandPaletteRoot;

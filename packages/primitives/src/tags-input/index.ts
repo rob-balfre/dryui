@@ -33,7 +33,7 @@ import Root from './tags-input-root.svelte';
 import Input from './tags-input-input.svelte';
 import TagItem from './tags-input-tag.svelte';
 import TagDelete from './tags-input-tag-delete.svelte';
-import List from './tags-input-list.svelte';
+import List from '../internal/snippet-div.svelte';
 
 export const TagsInput: {
 	Root: typeof Root;

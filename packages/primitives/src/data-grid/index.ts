@@ -85,8 +85,8 @@ export interface DataGridExpandTriggerProps extends HTMLAttributes<HTMLButtonEle
 }
 
 import DataGridRoot from './data-grid-root.svelte';
-import DataGridTable from './data-grid-table.svelte';
-import DataGridHeader from './data-grid-header.svelte';
+import DataGridTable from '../internal/table-root.svelte';
+import DataGridHeader from '../internal/table-header.svelte';
 import DataGridColumn from './data-grid-column.svelte';
 import DataGridBody from './data-grid-body.svelte';
 import DataGridRow from './data-grid-row.svelte';

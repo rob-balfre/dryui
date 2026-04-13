@@ -33,9 +33,9 @@ import ContextMenuRoot from './context-menu-root.svelte';
 import ContextMenuTrigger from './context-menu-trigger.svelte';
 import ContextMenuContent from './context-menu-content.svelte';
 import ContextMenuItem from './context-menu-item.svelte';
-import ContextMenuSeparator from './context-menu-separator.svelte';
-import ContextMenuGroup from './context-menu-group.svelte';
-import ContextMenuLabel from './context-menu-label.svelte';
+import ContextMenuSeparator from '../internal/separator-div.svelte';
+import ContextMenuGroup from '../internal/group-div.svelte';
+import ContextMenuLabel from '../internal/presentation-div.svelte';
 
 export const ContextMenu: {
 	Root: typeof ContextMenuRoot;

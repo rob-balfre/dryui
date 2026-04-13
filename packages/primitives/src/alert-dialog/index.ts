@@ -41,8 +41,8 @@ import AlertDialogTrigger from './alert-dialog-trigger.svelte';
 import AlertDialogContent from './alert-dialog-content.svelte';
 import AlertDialogOverlay from './alert-dialog-overlay.svelte';
 import AlertDialogHeader from './alert-dialog-header.svelte';
-import AlertDialogBody from './alert-dialog-body.svelte';
-import AlertDialogFooter from './alert-dialog-footer.svelte';
+import AlertDialogBody from '../internal/snippet-div.svelte';
+import AlertDialogFooter from '../internal/snippet-div.svelte';
 import AlertDialogAction from './alert-dialog-action.svelte';
 import AlertDialogCancel from './alert-dialog-cancel.svelte';
 

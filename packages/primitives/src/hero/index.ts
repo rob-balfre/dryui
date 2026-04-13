@@ -23,8 +23,8 @@ export interface HeroActionsProps extends HTMLAttributes<HTMLDivElement> {
 
 import HeroRoot from './hero-root.svelte';
 import HeroHeading from './hero-heading.svelte';
-import HeroSubheading from './hero-subheading.svelte';
-import HeroActions from './hero-actions.svelte';
+import HeroSubheading from '../internal/paragraph.svelte';
+import HeroActions from '../internal/snippet-div.svelte';
 
 export const Hero: {
 	Root: typeof HeroRoot;

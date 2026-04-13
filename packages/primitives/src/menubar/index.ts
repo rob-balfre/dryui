@@ -36,8 +36,8 @@ import MenubarMenu from './menubar-menu.svelte';
 import MenubarTrigger from './menubar-trigger.svelte';
 import MenubarContent from './menubar-content.svelte';
 import MenubarItem from './menubar-item.svelte';
-import MenubarSeparator from './menubar-separator.svelte';
-import MenubarLabel from './menubar-label.svelte';
+import MenubarSeparator from '../internal/separator-div.svelte';
+import MenubarLabel from '../internal/presentation-div.svelte';
 
 export const Menubar: {
 	Root: typeof MenubarRoot;

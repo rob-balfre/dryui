@@ -25,7 +25,7 @@ export interface BreadcrumbSeparatorProps extends Omit<HTMLAttributes<HTMLLIElem
 
 import BreadcrumbRoot from './breadcrumb-root.svelte';
 import BreadcrumbList from './breadcrumb-list.svelte';
-import BreadcrumbItem from './breadcrumb-item.svelte';
+import BreadcrumbItem from '../internal/list-item.svelte';
 import BreadcrumbLink from './breadcrumb-link.svelte';
 import BreadcrumbSeparator from './breadcrumb-separator.svelte';
 

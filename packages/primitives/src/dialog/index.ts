@@ -37,8 +37,8 @@ import DialogTrigger from './dialog-trigger.svelte';
 import DialogContent from './dialog-content.svelte';
 import DialogOverlay from './dialog-overlay.svelte';
 import DialogHeader from './dialog-header.svelte';
-import DialogBody from './dialog-body.svelte';
-import DialogFooter from './dialog-footer.svelte';
+import DialogBody from '../internal/snippet-div.svelte';
+import DialogFooter from '../internal/snippet-div.svelte';
 import DialogClose from './dialog-close.svelte';
 
 export const Dialog: {

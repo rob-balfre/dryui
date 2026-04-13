@@ -36,9 +36,9 @@ import DropdownMenuRoot from './dropdown-menu-root.svelte';
 import DropdownMenuTrigger from './dropdown-menu-trigger.svelte';
 import DropdownMenuContent from './dropdown-menu-content.svelte';
 import DropdownMenuItem from './dropdown-menu-item.svelte';
-import DropdownMenuSeparator from './dropdown-menu-separator.svelte';
-import DropdownMenuGroup from './dropdown-menu-group.svelte';
-import DropdownMenuLabel from './dropdown-menu-label.svelte';
+import DropdownMenuSeparator from '../internal/separator-div.svelte';
+import DropdownMenuGroup from '../internal/group-div.svelte';
+import DropdownMenuLabel from '../internal/presentation-div.svelte';
 
 export const DropdownMenu: {
 	Root: typeof DropdownMenuRoot;

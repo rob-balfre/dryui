@@ -1,6 +1,6 @@
-# dryui component reference
+# DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 145 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 159 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -859,6 +859,98 @@ Example:
 <AlphaSlider>Content</AlphaSlider>
 ```
 
+## AffixGroup
+Package: @dryui/primitives
+Category: input
+Tags: input, affix, prefix, suffix, separator, action
+Kind: compound
+Root import: import { AffixGroup } from '@dryui/primitives'
+Parts:
+- AffixGroup.Root
+  Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | disabled (boolean), Prevents interaction and applies disabled styling., default false | invalid (boolean), default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- AffixGroup.Prefix
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <span> attributes via rest props.
+- AffixGroup.Input
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- AffixGroup.Suffix
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- AffixGroup.Separator
+  Props: none
+  Native props: Forwards <span> attributes via rest props.
+- AffixGroup.Action
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <button> attributes via rest props.
+Structure:
+  AffixGroup.Root
+    AffixGroup.Prefix
+    AffixGroup.Input
+    AffixGroup.Suffix
+    AffixGroup.Separator
+    AffixGroup.Action
+CSS variables: none
+Data attributes: data-affix-group | data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size
+Accessibility: none
+Example:
+```svelte
+<AffixGroup.Root>
+  <AffixGroup.Prefix>...</AffixGroup.Prefix>
+  <AffixGroup.Input>...</AffixGroup.Input>
+  <AffixGroup.Suffix>...</AffixGroup.Suffix>
+  <AffixGroup.Separator>...</AffixGroup.Separator>
+  <AffixGroup.Action>...</AffixGroup.Action>
+</AffixGroup.Root>
+```
+
+## SelectableTileGroup
+Package: @dryui/primitives
+Category: input
+Tags: tile, selection, picker, option, keyboard
+Kind: compound
+Root import: import { SelectableTileGroup } from '@dryui/primitives'
+Parts:
+- SelectableTileGroup.Root
+  Props: value (string), Current controlled or bindable value., default '' | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- SelectableTileGroup.Item
+  Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <button> attributes via rest props.
+- SelectableTileGroup.Indicator
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <div> attributes via rest props.
+- SelectableTileGroup.Label
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <span> attributes via rest props.
+- SelectableTileGroup.Description
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <div> attributes via rest props.
+- SelectableTileGroup.Meta
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <span> attributes via rest props.
+Structure:
+  SelectableTileGroup.Root
+    SelectableTileGroup.Item
+    SelectableTileGroup.Indicator
+    SelectableTileGroup.Label
+    SelectableTileGroup.Description
+    SelectableTileGroup.Meta
+CSS variables: none
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-value
+Accessibility: none
+Example:
+```svelte
+<SelectableTileGroup.Root>
+  <SelectableTileGroup.Item>...</SelectableTileGroup.Item>
+  <SelectableTileGroup.Indicator>...</SelectableTileGroup.Indicator>
+  <SelectableTileGroup.Label>...</SelectableTileGroup.Label>
+  <SelectableTileGroup.Description>...</SelectableTileGroup.Description>
+  <SelectableTileGroup.Meta>...</SelectableTileGroup.Meta>
+</SelectableTileGroup.Root>
+```
+
 ### form
 
 ## Label
@@ -1478,6 +1570,166 @@ Example:
     <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>
   </Card.Root>
 </Noise>
+```
+
+## AppFrame
+Package: @dryui/primitives
+Category: layout
+Tags: app-shell, frame, layout, header, actions
+Kind: simple
+Root import: import { AppFrame } from '@dryui/primitives'
+Props: title (string), Primary heading or label text. | actions (Snippet) | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: data-part
+Accessibility: none
+Example:
+```svelte
+<AppFrame>Content</AppFrame>
+```
+
+## Footer
+Package: @dryui/primitives
+Category: layout
+Tags: footer, site, links, brand, copyright
+Kind: compound
+Root import: import { Footer } from '@dryui/primitives'
+Parts:
+- Footer.Root
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+- Footer.Brand
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- Footer.Links
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+- Footer.LinkGroup
+  Props: children (Snippet), Content rendered inside the component., required | heading (string)
+  Native props: Forwards <div> attributes via rest props.
+- Footer.Copyright
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+Structure:
+  Footer.Root
+    Footer.Brand
+    Footer.Links
+    Footer.LinkGroup
+    Footer.Copyright
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<Footer.Root>
+  <Footer.Brand>...</Footer.Brand>
+  <Footer.Links>...</Footer.Links>
+  <Footer.LinkGroup>...</Footer.LinkGroup>
+  <Footer.Copyright>...</Footer.Copyright>
+</Footer.Root>
+```
+
+## Hero
+Package: @dryui/primitives
+Category: layout
+Tags: hero, landing, banner, heading, actions
+Kind: compound
+Root import: import { Hero } from '@dryui/primitives'
+Parts:
+- Hero.Root
+  Props: children (Snippet), Content rendered inside the component., required | align ('center' | 'left'), Alignment for child content along the cross axis., accepted center, left | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | backgroundImage (string) | overlay (boolean)
+  Native props: Forwards <element> attributes via rest props.
+- Hero.Heading
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <h*> attributes via rest props.
+- Hero.Subheading
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <p> attributes via rest props.
+- Hero.Actions
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+Structure:
+  Hero.Root
+    Hero.Heading
+    Hero.Subheading
+    Hero.Actions
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<Hero.Root>
+  <Hero.Heading>...</Hero.Heading>
+  <Hero.Subheading>...</Hero.Subheading>
+  <Hero.Actions>...</Hero.Actions>
+</Hero.Root>
+```
+
+## PageHeader
+Package: @dryui/primitives
+Category: layout
+Tags: page-header, title, metadata, actions, eyebrow
+Kind: compound
+Root import: import { PageHeader } from '@dryui/primitives'
+Parts:
+- PageHeader.Root
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+- PageHeader.Content
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- PageHeader.Actions
+  Props: children (Snippet), Content rendered inside the component.
+  Native props: Forwards <div> attributes via rest props.
+- PageHeader.Eyebrow
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- PageHeader.Title
+  Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <h*> attributes via rest props.
+- PageHeader.Description
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <p> attributes via rest props.
+- PageHeader.Meta
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+Structure:
+  PageHeader.Root
+    PageHeader.Content
+    PageHeader.Actions
+    PageHeader.Eyebrow
+    PageHeader.Title
+    PageHeader.Description
+    PageHeader.Meta
+CSS variables: none
+Data attributes: data-level | data-page-header | data-page-header-actions | data-page-header-content | data-page-header-description | data-page-header-eyebrow | data-page-header-meta | data-page-header-title
+Accessibility: none
+Example:
+```svelte
+<PageHeader.Root>
+  <PageHeader.Content>...</PageHeader.Content>
+  <PageHeader.Actions>...</PageHeader.Actions>
+  <PageHeader.Eyebrow>...</PageHeader.Eyebrow>
+  <PageHeader.Title>...</PageHeader.Title>
+  <PageHeader.Description>...</PageHeader.Description>
+  <PageHeader.Meta>...</PageHeader.Meta>
+</PageHeader.Root>
+```
+
+## Surface
+Package: @dryui/primitives
+Category: layout
+Tags: surface, background, container, panel
+Kind: simple
+Root import: import { Surface } from '@dryui/primitives'
+Props: background (string) | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<Surface>Content</Surface>
 ```
 
 ### navigation
@@ -3646,11 +3898,162 @@ Subpath import: import { Diagram } from '@dryui/ui/diagram'
 Props: config (DiagramConfig), required | width (number) | height (number)
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
-Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-has-description | data-part | data-self-loop | data-state | data-variant
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-fit | data-has-description | data-has-icon-component | data-icon-svg | data-part | data-self-loop | data-state | data-variant
 Accessibility: none
 Example:
 ```svelte
 <Diagram>Content</Diagram>
+```
+
+## AvatarGroup
+Package: @dryui/primitives
+Category: display
+Tags: avatar, group, people, stack, presence
+Kind: simple
+Root import: import { AvatarGroup } from '@dryui/primitives'
+Props: count (number), default 0 | maxVisible (number), default 4 | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | overlap ('sm' | 'md' | 'lg'), accepted sm, md, lg, default 'md' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | label (string), Visible label text shown for the control or item., default 'Avatar group' | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: data-overflow | data-overlap | data-part | data-size | data-status
+Accessibility: none
+Example:
+```svelte
+<AvatarGroup>Content</AvatarGroup>
+```
+
+## ChatMessage
+Package: @dryui/primitives
+Category: display
+Tags: chat, message, conversation, assistant, typing
+Kind: simple
+Root import: import { ChatMessage } from '@dryui/primitives'
+Props: role ('user' | 'assistant' | 'system'), accepted user, assistant, system, default 'user' | avatar (string) | name (string), Field name used during native form submission. | timestamp (string) | typing (boolean), default false | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: data-part | data-role | data-typing
+Accessibility: none
+Example:
+```svelte
+<ChatMessage>Content</ChatMessage>
+```
+
+## EmptyState
+Package: @dryui/primitives
+Category: display
+Tags: empty, state, placeholder, onboarding, action
+Kind: compound
+Root import: import { EmptyState } from '@dryui/primitives'
+Parts:
+- EmptyState.Root
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- EmptyState.Icon
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- EmptyState.Title
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <h*> attributes via rest props.
+- EmptyState.Description
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <p> attributes via rest props.
+- EmptyState.Action
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+Structure:
+  EmptyState.Root
+    EmptyState.Icon
+    EmptyState.Title
+    EmptyState.Description
+    EmptyState.Action
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<EmptyState.Root>
+  <EmptyState.Icon>...</EmptyState.Icon>
+  <EmptyState.Title>...</EmptyState.Title>
+  <EmptyState.Description>...</EmptyState.Description>
+  <EmptyState.Action>...</EmptyState.Action>
+</EmptyState.Root>
+```
+
+## LogoCloud
+Package: @dryui/primitives
+Category: display
+Tags: logo, brand, cloud, partners, gallery
+Kind: compound
+Root import: import { LogoCloud } from '@dryui/primitives'
+Parts:
+- LogoCloud.Root
+  Props: columns (number), default 5 | gap (string) | align ('start' | 'center' | 'end'), Alignment for child content along the cross axis., accepted start, center, end | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- LogoCloud.Item
+  Props: href (string), Destination URL when the component renders as a link. | name (string), Field name used during native form submission. | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+Structure:
+  LogoCloud.Root
+    LogoCloud.Item
+CSS variables: none
+Data attributes: data-part
+Accessibility: none
+Example:
+```svelte
+<LogoCloud.Root>
+  <LogoCloud.Item>...</LogoCloud.Item>
+</LogoCloud.Root>
+```
+
+## StatCard
+Package: @dryui/primitives
+Category: display
+Tags: stat, metric, card, kpi, trend
+Kind: compound
+Root import: import { StatCard } from '@dryui/primitives'
+Parts:
+- StatCard.Root
+  Props: tone ('neutral' | 'info' | 'success' | 'warning' | 'danger'), accepted neutral, info, success, warning, danger, default 'neutral' | density ('comfortable' | 'compact'), accepted comfortable, compact, default 'comfortable' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- StatCard.Label
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- StatCard.Value
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- StatCard.Trend
+  Props: direction ('up' | 'down' | 'flat'), accepted up, down, flat, default 'flat' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+Structure:
+  StatCard.Root
+    StatCard.Label
+    StatCard.Value
+    StatCard.Trend
+CSS variables: none
+Data attributes: data-density | data-direction | data-part | data-tone
+Accessibility: none
+Example:
+```svelte
+<StatCard.Root>
+  <StatCard.Label>...</StatCard.Label>
+  <StatCard.Value>...</StatCard.Value>
+  <StatCard.Trend>...</StatCard.Trend>
+</StatCard.Root>
+```
+
+## User
+Package: @dryui/primitives
+Category: display
+Tags: user, profile, identity, name, description
+Kind: simple
+Root import: import { User } from '@dryui/primitives'
+Props: name (string), Field name used during native form submission., required | description (string), Supporting copy that explains the current control or section. | children (Snippet | undefined), Content rendered inside the component.
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<User>Content</User>
 ```
 
 ### feedback
@@ -4133,4 +4536,20 @@ Accessibility: none
 Example:
 ```svelte
 <ShaderCanvas>Content</ShaderCanvas>
+```
+
+## WaveDivider
+Package: @dryui/primitives
+Category: visual
+Tags: divider, wave, decorative, section, svg
+Kind: simple
+Root import: import { WaveDivider } from '@dryui/primitives'
+Props: shape ('wave' | 'curve' | 'angle' | 'zigzag'), accepted wave, curve, angle, zigzag, default 'wave' | flip (boolean), default false | color (string), Semantic color or tone applied to the component. | height (number), default 48
+Native props: Forwards <svg> attributes via rest props.
+CSS variables: none
+Data attributes: none
+Accessibility: none
+Example:
+```svelte
+<WaveDivider>Content</WaveDivider>
 ```

@@ -34,7 +34,7 @@ export interface TimelineTimeProps extends HTMLAttributes<HTMLTimeElement> {
 import TimelineRoot from './timeline-root.svelte';
 import TimelineItem from './timeline-item.svelte';
 import TimelineIcon from './timeline-icon.svelte';
-import TimelineContent from './timeline-content.svelte';
+import TimelineContent from '../internal/snippet-div.svelte';
 import TimelineTitle from './timeline-title.svelte';
 import TimelineDescription from './timeline-description.svelte';
 import TimelineTime from './timeline-time.svelte';

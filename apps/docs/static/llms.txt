@@ -1,6 +1,6 @@
-# dryui
+# DryUI
 
-> 145 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
 
 ## Packages
 
@@ -322,6 +322,22 @@ Props: value (number), Current controlled or bindable value., default 100 | colo
 Data attributes: data-alpha-slider | data-alpha-slider-checkerboard | data-alpha-slider-color-track | data-alpha-slider-input | data-alpha-slider-meta | data-alpha-slider-swatch | data-alpha-slider-swatch-wrapper | data-alpha-slider-track-wrapper | data-alpha-slider-value-label
 Example: <AlphaSlider>Content</AlphaSlider>
 
+### AffixGroup
+Grouped input shell for prefixes, suffixes, separators, and actions.
+Import: @dryui/primitives
+Parts: Root, Prefix, Input, Suffix, Separator, Action
+Props: Root: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | disabled (boolean), Prevents interaction and applies disabled styling., default false | invalid (boolean), default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required | Prefix: children (Snippet), Content rendered inside the component., required | Input: children (Snippet), Content rendered inside the component., required | Suffix: children (Snippet), Content rendered inside the component., required | Action: children (Snippet), Content rendered inside the component.
+Data attributes: data-affix-group | data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size
+Example: <AffixGroup.Root>
+
+### SelectableTileGroup
+Selectable tile set for single-choice options with keyboard support.
+Import: @dryui/primitives
+Parts: Root, Item, Indicator, Label, Description, Meta
+Props: Root: value (string), Current controlled or bindable value., default '' | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Indicator: children (Snippet), Content rendered inside the component. | Label: children (Snippet), Content rendered inside the component. | Description: children (Snippet), Content rendered inside the component. | Meta: children (Snippet), Content rendered inside the component.
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-value
+Example: <SelectableTileGroup.Root>
+
 ### Category: Form
 
 ### Label
@@ -498,6 +514,44 @@ Subpath import: @dryui/ui/noise
 Props: opacity (number), default 0.22 | blend (NoiseBlendMode), default 'overlay' | animated (boolean), default false | grain (NoiseGrain), default 'medium' | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-grain | data-noise | data-noise-content | data-noise-texture | data-reduced-motion
 Example: <Noise opacity={0.12} blend="soft-light">
+
+### AppFrame
+Application shell wrapper with title, actions, and content area.
+Import: @dryui/primitives
+Props: title (string), Primary heading or label text. | actions (Snippet) | children (Snippet), Content rendered inside the component., required
+Data attributes: data-part
+Example: <AppFrame>Content</AppFrame>
+
+### Footer
+Site footer layout with brand, link groups, and copyright.
+Import: @dryui/primitives
+Parts: Root, Brand, Links, LinkGroup, Copyright
+Props: Root: children (Snippet), Content rendered inside the component., required | Brand: children (Snippet), Content rendered inside the component., required | Links: children (Snippet), Content rendered inside the component., required | LinkGroup: children (Snippet), Content rendered inside the component., required | heading (string) | Copyright: children (Snippet), Content rendered inside the component., required
+Data attributes: none
+Example: <Footer.Root>
+
+### Hero
+Hero section wrapper with heading, subheading, and actions.
+Import: @dryui/primitives
+Parts: Root, Heading, Subheading, Actions
+Props: Root: children (Snippet), Content rendered inside the component., required | align ('center' | 'left'), Alignment for child content along the cross axis., accepted center, left | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | backgroundImage (string) | overlay (boolean) | Heading: children (Snippet), Content rendered inside the component., required | Subheading: children (Snippet), Content rendered inside the component., required | Actions: children (Snippet), Content rendered inside the component., required
+Data attributes: none
+Example: <Hero.Root>
+
+### PageHeader
+Page-level header with eyebrow, title, description, metadata, and actions.
+Import: @dryui/primitives
+Parts: Root, Content, Actions, Eyebrow, Title, Description, Meta
+Props: Root: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | Actions: children (Snippet), Content rendered inside the component. | Eyebrow: children (Snippet), Content rendered inside the component., required | Title: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | children (Snippet), Content rendered inside the component., required | Description: children (Snippet), Content rendered inside the component., required | Meta: children (Snippet), Content rendered inside the component., required
+Data attributes: data-level | data-page-header | data-page-header-actions | data-page-header-content | data-page-header-description | data-page-header-eyebrow | data-page-header-meta | data-page-header-title
+Example: <PageHeader.Root>
+
+### Surface
+Simple surface wrapper for background treatment.
+Import: @dryui/primitives
+Props: background (string) | children (Snippet), Content rendered inside the component., required
+Data attributes: none
+Example: <Surface>Content</Surface>
 
 ### Category: Navigation
 
@@ -1079,8 +1133,53 @@ Config-driven diagram component with auto-layout, curved edges, clusters, swimla
 Import: @dryui/ui
 Subpath import: @dryui/ui/diagram
 Props: config (DiagramConfig), required | width (number) | height (number)
-Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-has-description | data-part | data-self-loop | data-state | data-variant
+Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-fit | data-has-description | data-has-icon-component | data-icon-svg | data-part | data-self-loop | data-state | data-variant
 Example: <Diagram>Content</Diagram>
+
+### AvatarGroup
+Compact cluster of avatars with overflow and presence status.
+Import: @dryui/primitives
+Props: count (number), default 0 | maxVisible (number), default 4 | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | overlap ('sm' | 'md' | 'lg'), accepted sm, md, lg, default 'md' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | label (string), Visible label text shown for the control or item., default 'Avatar group' | children (Snippet), Content rendered inside the component., required
+Data attributes: data-overflow | data-overlap | data-part | data-size | data-status
+Example: <AvatarGroup>Content</AvatarGroup>
+
+### ChatMessage
+Single chat row with role, avatar, name, and typing state.
+Import: @dryui/primitives
+Props: role ('user' | 'assistant' | 'system'), accepted user, assistant, system, default 'user' | avatar (string) | name (string), Field name used during native form submission. | timestamp (string) | typing (boolean), default false | children (Snippet), Content rendered inside the component., required
+Data attributes: data-part | data-role | data-typing
+Example: <ChatMessage>Content</ChatMessage>
+
+### EmptyState
+Placeholder state with icon, title, description, and action.
+Import: @dryui/primitives
+Parts: Root, Icon, Title, Description, Action
+Props: Root: children (Snippet), Content rendered inside the component., required | Icon: children (Snippet), Content rendered inside the component., required | Title: children (Snippet), Content rendered inside the component., required | Description: children (Snippet), Content rendered inside the component., required | Action: children (Snippet), Content rendered inside the component., required
+Data attributes: none
+Example: <EmptyState.Root>
+
+### LogoCloud
+Grid of linked brand logos with responsive alignment.
+Import: @dryui/primitives
+Parts: Root, Item
+Props: Root: columns (number), default 5 | gap (string) | align ('start' | 'center' | 'end'), Alignment for child content along the cross axis., accepted start, center, end | children (Snippet), Content rendered inside the component., required | Item: href (string), Destination URL when the component renders as a link. | name (string), Field name used during native form submission. | children (Snippet), Content rendered inside the component., required
+Data attributes: data-part
+Example: <LogoCloud.Root>
+
+### StatCard
+Compact KPI card with label, value, and trend.
+Import: @dryui/primitives
+Parts: Root, Label, Value, Trend
+Props: Root: tone ('neutral' | 'info' | 'success' | 'warning' | 'danger'), accepted neutral, info, success, warning, danger, default 'neutral' | density ('comfortable' | 'compact'), accepted comfortable, compact, default 'comfortable' | children (Snippet), Content rendered inside the component., required | Label: children (Snippet), Content rendered inside the component., required | Value: children (Snippet), Content rendered inside the component., required | Trend: direction ('up' | 'down' | 'flat'), accepted up, down, flat, default 'flat' | children (Snippet), Content rendered inside the component., required
+Data attributes: data-density | data-direction | data-part | data-tone
+Example: <StatCard.Root>
+
+### User
+User identity block with name, description, and optional content.
+Import: @dryui/primitives
+Props: name (string), Field name used during native form submission., required | description (string), Supporting copy that explains the current control or section. | children (Snippet | undefined), Content rendered inside the component.
+Data attributes: none
+Example: <User>Content</User>
 
 ### Category: Feedback
 
@@ -1293,6 +1392,13 @@ Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['verte
 Data attributes: data-shader-canvas | data-shader-canvas-root
 Example: <ShaderCanvas>Content</ShaderCanvas>
 
+### WaveDivider
+Decorative SVG wave divider for section separation.
+Import: @dryui/primitives
+Props: shape ('wave' | 'curve' | 'angle' | 'zigzag'), accepted wave, curve, angle, zigzag, default 'wave' | flip (boolean), default false | color (string), Semantic color or tone applied to the component. | height (number), default 48
+Data attributes: none
+Example: <WaveDivider>Content</WaveDivider>
+
 ## CSS Variables
 
 All components support CSS variable theming. Override at the :root level or component level:
@@ -1329,7 +1435,7 @@ No global install? Prefix any command with `bunx @dryui/cli …` or `npx -y @dry
 
 ## MCP Server & Skill
 
-dryui ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
+DryUI ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
 
 ### Install
 
