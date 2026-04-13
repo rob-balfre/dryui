@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Feedback } from '../../../../packages/feedback/dist/index.js';
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -157,6 +158,8 @@
 {:else}
 	{@render docsShell()}
 {/if}
+
+<Feedback serverUrl="http://127.0.0.1:4748" scrollRoot="main.docs-content" />
 
 <style>
 	.docs-shell-frame {

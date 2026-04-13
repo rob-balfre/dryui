@@ -38,5 +38,6 @@ export interface FeedbackProps {
 	strokeWidth?: number;
 	shortcut?: string;
 	serverUrl?: string;
+	scrollRoot?: string | HTMLElement;
 	class?: string;
 }

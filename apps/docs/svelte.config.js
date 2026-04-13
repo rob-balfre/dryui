@@ -6,7 +6,7 @@ const config = {
 	preprocess: [
 		dryuiLint({
 			strict: true,
-			exclude: ['.svelte-kit/', 'packages/primitives/', '/dist/', '/tour/']
+			exclude: ['.svelte-kit/', 'packages/primitives/', 'packages/feedback/', '/dist/', '/tour/']
 		})
 	],
 	kit: {
