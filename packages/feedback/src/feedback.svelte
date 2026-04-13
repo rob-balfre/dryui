@@ -5,10 +5,13 @@
 	import type { Arrow, Drawing, FeedbackProps, Point, Stroke, TextLabel, Tool } from './types.js';
 	import Toolbar from './components/toolbar.svelte';
 
-	const ACCENT = 'hsl(25 100% 55%)';
+	const ANNOTATION_FILL = 'hsl(25 100% 55%)';
+	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
+	const STROKE_OUTLINE_WIDTH = 4;
+	const TEXT_OUTLINE_RATIO = 0.22;
 
 	let {
-		color = ACCENT,
+		color = ANNOTATION_FILL,
 		strokeWidth = 3,
 		shortcut = '$mod+m',
 		serverUrl,
@@ -41,6 +44,18 @@
 	const ARROW_HEAD_SIZE = 12;
 	const TEXT_FONT_SIZE = 16;
 	const SCROLLABLE_OVERFLOW = new Set(['auto', 'scroll', 'overlay']);
+
+	function outlinedStrokeWidth(width: number): number {
+		return width + STROKE_OUTLINE_WIDTH;
+	}
+
+	function outlinedTextWidth(fontSize: number): number {
+		return Math.max(3, fontSize * TEXT_OUTLINE_RATIO);
+	}
+
+	function normalizeDrawing(drawing: Drawing): Drawing {
+		return { ...drawing, color };
+	}
 
 	function toggle() {
 		active = !active;
@@ -358,7 +373,7 @@
 				color,
 				width: strokeWidth
 			};
-			// end = arrowhead stays at click point; drag moves the tail (start)
+			// start stays anchored to the initial click; drag updates the arrowhead (end)
 		} else if (tool === 'move') {
 			const hit = findDrawingAt(point.x, point.y);
 			if (hit) {
@@ -378,7 +393,7 @@
 			currentStroke.points = [...currentStroke.points, point];
 		} else if (tool === 'arrow' && currentArrow) {
 			e.preventDefault();
-			currentArrow.start = point;
+			currentArrow.end = point;
 		} else if (tool === 'move' && moving) {
 			e.preventDefault();
 			const dx = point.x - moving.lastPoint.x;
@@ -519,7 +534,7 @@
 		window.addEventListener('resize', update, { passive: true });
 
 		const resizeObserver = target ? new ResizeObserver(update) : null;
-		resizeObserver?.observe(target);
+		if (target && resizeObserver) resizeObserver.observe(target);
 
 		return () => {
 			target?.removeEventListener('scroll', update);
@@ -534,7 +549,7 @@
 		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`)
 			.then((r) => r.json())
 			.then((data: Drawing[]) => {
-				if (data.length) drawings = data;
+				if (data.length) drawings = data.map(normalizeDrawing);
 				lastSavedVersion = saveVersion;
 			})
 			.catch(() => {
@@ -569,6 +584,8 @@
 			<svg
 				class="drawing-canvas {cursorClass}"
 				data-active={active || undefined}
+				role="application"
+				aria-label="Feedback drawing canvas"
 				onpointerdown={handlePointerDown}
 				onpointermove={handlePointerMove}
 				onpointerup={handlePointerUp}
@@ -576,29 +593,57 @@
 				onwheel={handleWheel}
 			>
 				<defs>
-					<filter id="glow">
-						<feGaussianBlur stdDeviation="3" result="blur" />
-						<feMerge>
-							<feMergeNode in="blur" />
-							<feMergeNode in="SourceGraphic" />
-						</feMerge>
+					<filter id="annotation-shadow" x="-50%" y="-50%" width="200%" height="200%">
+						<feDropShadow
+							dx="0"
+							dy="1.5"
+							stdDeviation="1.5"
+							flood-color="black"
+							flood-opacity="0.35"
+						/>
 					</filter>
 				</defs>
 
 				<g transform={`translate(${viewportLeft - scrollX} ${viewportTop - scrollY})`}>
 					{#each drawings as drawing (drawing.id)}
 						{#if drawing.kind === 'freehand'}
-							<path
-								d={pointsToPath(drawing.points)}
-								stroke={drawing.color}
-								stroke-width={drawing.width}
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								fill="none"
-								filter="url(#glow)"
-							/>
+							<g filter="url(#annotation-shadow)">
+								<path
+									d={pointsToPath(drawing.points)}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+								<path
+									d={pointsToPath(drawing.points)}
+									stroke={drawing.color}
+									stroke-width={drawing.width}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+							</g>
 						{:else if drawing.kind === 'arrow'}
-							<g filter="url(#glow)">
+							<g filter="url(#annotation-shadow)">
+								<line
+									x1={drawing.start.x}
+									y1={drawing.start.y}
+									x2={drawing.end.x}
+									y2={drawing.end.y}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+								/>
+								<path
+									d={arrowHeadPath(drawing.start, drawing.end)}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
 								<line
 									x1={drawing.start.x}
 									y1={drawing.start.y}
@@ -621,7 +666,12 @@
 							<text
 								x={drawing.position.x}
 								y={drawing.position.y}
+								filter="url(#annotation-shadow)"
 								fill={drawing.color}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedTextWidth(drawing.fontSize)}
+								paint-order="stroke fill"
+								stroke-linejoin="round"
 								font-size={drawing.fontSize}
 								font-family="system-ui, -apple-system, sans-serif"
 								font-weight="600">{drawing.text}</text
@@ -630,19 +680,45 @@
 					{/each}
 
 					{#if currentStroke}
-						<path
-							d={pointsToPath(currentStroke.points)}
-							stroke={currentStroke.color}
-							stroke-width={currentStroke.width}
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							fill="none"
-							filter="url(#glow)"
-						/>
+						<g filter="url(#annotation-shadow)">
+							<path
+								d={pointsToPath(currentStroke.points)}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentStroke.width)}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+							<path
+								d={pointsToPath(currentStroke.points)}
+								stroke={currentStroke.color}
+								stroke-width={currentStroke.width}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+						</g>
 					{/if}
 
 					{#if currentArrow}
-						<g filter="url(#glow)">
+						<g filter="url(#annotation-shadow)">
+							<line
+								x1={currentArrow.start.x}
+								y1={currentArrow.start.y}
+								x2={currentArrow.end.x}
+								y2={currentArrow.end.y}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-linecap="round"
+							/>
+							<path
+								d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
 							<line
 								x1={currentArrow.start.x}
 								y1={currentArrow.start.y}
@@ -703,8 +779,6 @@
 
 <style>
 	.feedback-root {
-		--accent: hsl(25 100% 55%);
-
 		position: fixed;
 		inset: 0;
 		z-index: 9998;
@@ -728,7 +802,7 @@
 		pointer-events: all;
 		touch-action: none;
 		cursor:
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/svg%3E")
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.35' stroke='%23000' stroke-width='5'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='4'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='%23ff7b1a' stroke-width='2.4'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3C/svg%3E")
 				2 30,
 			crosshair;
 	}
@@ -747,7 +821,7 @@
 
 	.drawing-canvas.eraser-cursor[data-active] {
 		cursor:
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/svg%3E")
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.35' stroke='%23000' stroke-width='5'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='4'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='%23ff7b1a' stroke-width='2.4'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3C/svg%3E")
 				4 28,
 			crosshair;
 	}
@@ -757,10 +831,12 @@
 		z-index: 10001;
 		display: grid;
 		grid-template-columns: 1fr auto;
-		border: 2px solid var(--accent);
+		border: 2px solid white;
 		border-radius: 6px;
-		background: hsl(225 15% 12% / 0.95);
-		box-shadow: 0 0 8px hsl(25 100% 55% / 0.5);
+		background: hsl(25 100% 55%);
+		box-shadow:
+			0 0 0 1px black,
+			0 8px 20px hsl(0 0% 0% / 0.3);
 		backdrop-filter: blur(4px);
 		overflow: hidden;
 	}
@@ -769,7 +845,7 @@
 		padding: 4px 8px;
 		border: none;
 		background: transparent;
-		color: var(--accent);
+		color: black;
 		font-size: 16px;
 		font-weight: 600;
 		font-family:
@@ -780,7 +856,7 @@
 	}
 
 	.text-input::placeholder {
-		color: hsl(220 10% 50%);
+		color: hsl(0 0% 20%);
 		font-weight: 400;
 	}
 
@@ -789,13 +865,13 @@
 		place-items: center;
 		padding: 0 8px;
 		border: none;
-		border-left: 1px solid hsl(25 100% 55% / 0.3);
-		background: hsl(25 100% 55% / 0.15);
-		color: var(--accent);
+		border-left: 2px solid white;
+		background: hsl(25 100% 55%);
+		color: black;
 		cursor: pointer;
 	}
 
 	.text-confirm-btn:hover {
-		background: hsl(25 100% 55% / 0.3);
+		background: hsl(25 100% 62%);
 	}
 </style>

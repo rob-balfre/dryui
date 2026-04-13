@@ -207,6 +207,14 @@
 		z-index: 1;
 		display: inline-grid;
 		color: var(--dry-code-copy-color);
+		--dry-btn-color: var(--dry-code-copy-color);
+	}
+
+	[data-code-block]:hover .copy-btn-slot,
+	[data-code-block]:focus-within .copy-btn-slot,
+	[data-code-block][data-copied] .copy-btn-slot {
+		color: var(--dry-code-copy-hover-color);
+		--dry-btn-color: var(--dry-code-copy-hover-color);
 	}
 
 	[data-code-block]:has([data-code-block-header]) .copy-btn-slot {

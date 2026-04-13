@@ -19,6 +19,9 @@
 	let shellEl: HTMLDivElement | undefined = $state();
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
+	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
+	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
+	const showSubmitButton = $derived(hasDrawings || submitting || sent);
 
 	function handlePointerDown(e: PointerEvent) {
 		if ((e.target as HTMLElement).closest('button')) return;
@@ -95,7 +98,7 @@
 		<Type size={18} />
 	</button>
 
-	{#if hasDrawings}
+	{#if showMoveTool}
 		<button
 			class="tool-btn"
 			data-active={(active && tool === 'move') || undefined}
@@ -106,7 +109,7 @@
 		</button>
 	{/if}
 
-	{#if hasDrawings}
+	{#if showEraserTool}
 		<button
 			class="tool-btn"
 			data-active={(active && tool === 'eraser') || undefined}
@@ -115,7 +118,9 @@
 		>
 			<Eraser size={18} />
 		</button>
+	{/if}
 
+	{#if showSubmitButton}
 		<button
 			class="tool-btn submit-btn"
 			data-submitting={submitting || undefined}
@@ -163,13 +168,15 @@
 		display: grid;
 		place-items: center;
 		padding: 8px;
-		border: none;
+		border: 2px solid transparent;
 		border-radius: 8px;
 		background: transparent;
 		color: hsl(220 10% 70%);
 		cursor: pointer;
 		transition:
 			background 0.15s,
+			border-color 0.15s,
+			box-shadow 0.15s,
 			color 0.15s;
 	}
 
@@ -180,12 +187,16 @@
 
 	.tool-btn[data-active] {
 		background: var(--accent);
-		color: white;
-		box-shadow: 0 0 8px hsl(25 100% 55% / 0.5);
+		border-color: white;
+		color: black;
+		box-shadow:
+			0 0 0 1px black,
+			0 4px 12px hsl(0 0% 0% / 0.35);
 	}
 
 	.tool-btn[data-active]:hover {
 		background: hsl(25 100% 62%);
+		color: black;
 	}
 
 	.submit-btn {
