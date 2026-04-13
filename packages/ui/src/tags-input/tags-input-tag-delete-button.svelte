@@ -22,6 +22,8 @@
 </script>
 
 <CloseButtonBase
+	variant="bare"
+	size="sm"
 	aria-label="Remove tag: {value}"
 	disabled={ctx.disabled}
 	{...rest}
