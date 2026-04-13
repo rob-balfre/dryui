@@ -1,23 +1,20 @@
 // Restores package.json exports from .exports-backup.json after npm pack/publish.
+//
+// Paired with scripts/prepack-exports.ts. Uses the shared restore helper in
+// scripts/lib/export-swap.ts.
 
-import { readFileSync, writeFileSync, unlinkSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { readBackupFile, removeBackupFile, restoreExports } from './lib/export-swap.ts';
 
 const packagePath = resolve(process.cwd(), 'package.json');
 const backupPath = resolve(process.cwd(), '.exports-backup.json');
 
-if (!existsSync(backupPath)) {
-	console.log('No .exports-backup.json — skipping postpack restore');
+const backup = readBackupFile(backupPath);
+if (!backup) {
+	console.log('postpack: no .exports-backup.json — nothing to restore');
 	process.exit(0);
 }
 
-const pkg = JSON.parse(readFileSync(packagePath, 'utf8'));
-const backup = JSON.parse(readFileSync(backupPath, 'utf8'));
-
-pkg.exports = backup.exports;
-if (backup.svelte !== undefined) pkg.svelte = backup.svelte;
-if (backup.types !== undefined) pkg.types = backup.types;
-
-writeFileSync(packagePath, JSON.stringify(pkg, null, 2) + '\n');
-unlinkSync(backupPath);
+restoreExports(packagePath, backup);
+removeBackupFile(backupPath);
 console.log('postpack: exports restored to src/ paths');
