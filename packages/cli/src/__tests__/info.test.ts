@@ -195,7 +195,7 @@ describe('formatCompound', () => {
 
 describe('getInfo — simple component', () => {
 	test('returns correct output for Button', () => {
-		const { output, error, exitCode } = getInfo('Button', mockSpec);
+		const { output, error, exitCode } = getInfo('Button', mockSpec, 'text');
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain('Button — Interactive button');
@@ -204,7 +204,7 @@ describe('getInfo — simple component', () => {
 	});
 
 	test('shows bindable marker for bindable props', () => {
-		const { output } = getInfo('Input', mockSpec);
+		const { output } = getInfo('Input', mockSpec, 'text');
 		expect(output).toContain('value');
 		expect(output).toContain('bindable');
 	});
@@ -212,10 +212,11 @@ describe('getInfo — simple component', () => {
 
 describe('getInfo — compound component', () => {
 	test('returns correct output for Card', () => {
-		const { output, error, exitCode } = getInfo('Card', mockSpec);
+		const { output, error, exitCode } = getInfo('Card', mockSpec, 'text');
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
-		expect(output).toContain('Compound: yes (use Card.Root, not Card)');
+		expect(output).toContain('Kind: compound');
+		expect(output).toContain('Use Card.Root, not Card');
 		expect(output).toContain('Required structure:');
 		expect(output).toContain('Card.Footer');
 	});
@@ -223,7 +224,7 @@ describe('getInfo — compound component', () => {
 
 describe('getInfo — unknown component', () => {
 	test('returns error for unknown component', () => {
-		const { output, error, exitCode } = getInfo('Nonexistent', mockSpec);
+		const { output, error, exitCode } = getInfo('Nonexistent', mockSpec, 'text');
 		expect(exitCode).toBe(1);
 		expect(output).toBe('');
 		expect(error).not.toBeNull();

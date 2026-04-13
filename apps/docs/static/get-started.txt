@@ -7,10 +7,21 @@
 Zero-dependency Svelte 5 component library. Use the CLI to detect the project
 and execute a tailored install plan.
 
+## Prerequisite — Install the CLI
+
+Install once so every subsequent command is short and fast:
+
+```
+bun install -g @dryui/cli    # or: npm install -g @dryui/cli
+```
+
+No bun or npm global install? Replace `dryui <cmd>` below with `npx -y @dryui/cli <cmd>`
+(or `bunx @dryui/cli <cmd>`) — same behaviour, re-fetches on each call.
+
 ## Step 1 — Run the install planner
 
 ```
-npx -y @dryui/cli install --toon
+dryui install
 ```
 
 The command prints a TOON-formatted project detection and ordered install steps.
@@ -50,7 +61,7 @@ If all steps have `status: "done"`, the project is already set up.
 After executing all steps, verify:
 
 ```
-npx -y @dryui/cli detect --toon
+dryui detect
 ```
 
 - `project: ready` → proceed below
@@ -200,20 +211,21 @@ Key rules from the reference:
 Use the MCP tools or CLI to look up components as you build:
 
 ```
-npx -y @dryui/cli info Button --toon
-npx -y @dryui/cli compose "login form" --toon
+dryui info Button
+dryui compose "login form"
 ```
 
 ## CLI tools (when MCP is not available)
 
-All commands support `--toon` for token-optimized agent output and `--full`
-to disable truncation.
+Every command outputs TOON (token-optimized, agent-friendly) by default.
+Pass `--text` for human-readable plain text, `--json` where supported, or
+`--full` to disable truncation.
 
 ```
-npx -y @dryui/cli info <component> --toon    # Full API reference
-npx -y @dryui/cli list --toon                # All available components
-npx -y @dryui/cli compose "query" --toon     # Composition guidance
-npx -y @dryui/cli add --project <name>       # Project-aware adoption plan
-npx -y @dryui/cli review <file.svelte> --toon  # Validate for spec compliance
-npx -y @dryui/cli doctor --toon              # Workspace health check
+dryui info <component>          # Full API reference
+dryui list                      # All available components
+dryui compose "query"           # Composition guidance
+dryui add --project <name>      # Project-aware adoption plan
+dryui review <file.svelte>      # Validate for spec compliance
+dryui doctor                    # Workspace health check
 ```

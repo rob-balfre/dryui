@@ -162,12 +162,12 @@
 			<DocsSectionIntro
 				id="cli"
 				title="CLI commands"
-				description="Run via bunx in any project. All commands support --help, --toon (token-optimized agent output), and --full (disable truncation). Most also accept --json."
+				description="Install once with bun install -g @dryui/cli (or npm install -g @dryui/cli), then run dryui anywhere. Every command outputs TOON (token-optimized, agent-friendly) by default — pass --text for human-readable plain text, --json where supported, or --full to disable truncation."
 			/>
 
 			<Card.Root>
 				<Card.Content>
-					<CodeBlock code="bunx @dryui/cli <command> [options]" language="bash" />
+					<CodeBlock code="dryui <command> [options]" language="bash" />
 				</Card.Content>
 			</Card.Root>
 

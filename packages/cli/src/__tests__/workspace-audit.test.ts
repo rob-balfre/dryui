@@ -107,7 +107,7 @@ describe('doctor', () => {
 			].join('\n')
 		});
 
-		const { output, error, exitCode } = getDoctor(root, mockSpec);
+		const { output, error, exitCode } = getDoctor(root, mockSpec, 'text');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
@@ -170,7 +170,7 @@ describe('lint', () => {
 			'apps/docs/package.json': '{'
 		});
 
-		const { output, error, exitCode } = getLint(root, mockSpec, { maxSeverity: 'error' });
+		const { output, error, exitCode } = getLint(root, mockSpec, 'text', { maxSeverity: 'error' });
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
@@ -211,7 +211,7 @@ describe('lint', () => {
 			].join('\n')
 		);
 
-		const { output, error, exitCode } = getLint(root, mockSpec, { changed: true });
+		const { output, error, exitCode } = getLint(root, mockSpec, 'text', { changed: true });
 
 		expect(exitCode).toBe(1);
 		expect(error).toBeNull();
@@ -230,7 +230,7 @@ describe('lint', () => {
 			].join('\n')
 		});
 
-		const result = captureCommand(() => runLint(['--changed', root], mockSpec));
+		const result = captureCommand(() => runLint(['--text', '--changed', root], mockSpec));
 
 		expect(result.exitCode).toBe(1);
 		expect(result.errors.join('\n')).toContain(
@@ -251,7 +251,7 @@ describe('doctor command', () => {
 			].join('\n')
 		});
 
-		const result = captureCommand(() => runDoctor([root], mockSpec));
+		const result = captureCommand(() => runDoctor(['--text', root], mockSpec));
 
 		expect(result.exitCode).toBe(0);
 		expect(result.errors).toEqual([]);

@@ -3,7 +3,7 @@
 import type { Spec } from './types.js';
 import { pad } from '../format.js';
 import { toonComponentList } from '@dryui/mcp/toon';
-import { runCommand, type OutputMode } from '../run.js';
+import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
 
 interface ListOptions {
 	category?: string | null;
@@ -50,60 +50,63 @@ export function groupByCategory(spec: Spec): Map<string, { name: string; descrip
 export function getList(
 	category: string | null,
 	spec: Spec,
-	options?: { toon?: boolean }
+	mode: OutputMode
 ): { output: string; error: string | null; exitCode: number } {
-	if (options?.toon) {
-		return {
-			output: toonComponentList(spec.components, category ?? undefined),
-			error: null,
-			exitCode: 0
-		};
-	}
+	switch (mode) {
+		case 'toon':
+			return {
+				output: toonComponentList(spec.components, category ?? undefined),
+				error: null,
+				exitCode: 0
+			};
+		case 'text':
+		default: {
+			const sections: string[] = [];
+			const validCategories = getCategories(spec);
 
-	const sections: string[] = [];
-	const validCategories = getCategories(spec);
+			if (category && !validCategories.includes(category)) {
+				const error = [
+					`Unknown category: "${category}"`,
+					'',
+					'Valid categories:',
+					`  ${validCategories.join(', ')}`
+				].join('\n');
+				return { output: '', error, exitCode: 1 };
+			}
 
-	if (category && !validCategories.includes(category)) {
-		const error = [
-			`Unknown category: "${category}"`,
-			'',
-			'Valid categories:',
-			`  ${validCategories.join(', ')}`
-		].join('\n');
-		return { output: '', error, exitCode: 1 };
-	}
+			const groups = groupByCategory(spec);
+			const categoriesToShow = category ? [category] : [...groups.keys()].sort();
 
-	const groups = groupByCategory(spec);
-	const categoriesToShow = category ? [category] : [...groups.keys()].sort();
+			for (const cat of categoriesToShow) {
+				const entries = groups.get(cat);
+				if (!entries || entries.length === 0) continue;
 
-	for (const cat of categoriesToShow) {
-		const entries = groups.get(cat);
-		if (!entries || entries.length === 0) continue;
+				const lines: string[] = [];
+				lines.push(`${cat.charAt(0).toUpperCase() + cat.slice(1)}:`);
 
-		const lines: string[] = [];
-		lines.push(`${cat.charAt(0).toUpperCase() + cat.slice(1)}:`);
+				const maxNameLen = Math.max(...entries.map((e) => e.name.length));
 
-		const maxNameLen = Math.max(...entries.map((e) => e.name.length));
+				for (const entry of entries) {
+					lines.push(`  ${pad(entry.name, maxNameLen + 2)}${entry.description}`);
+				}
 
-		for (const entry of entries) {
-			lines.push(`  ${pad(entry.name, maxNameLen + 2)}${entry.description}`);
+				sections.push(lines.join('\n'));
+			}
+
+			return { output: sections.join('\n\n'), error: null, exitCode: 0 };
 		}
-
-		sections.push(lines.join('\n'));
 	}
-
-	return { output: sections.join('\n\n'), error: null, exitCode: 0 };
 }
 
 export function runList(args: string[], spec: Spec): void {
 	if (args[0] === '--help') {
-		console.log('Usage: dryui list [--category <category>] [--toon]');
+		console.log('Usage: dryui list [--category <category>] [--text]');
 		console.log('');
 		console.log('List DryUI components.');
 		console.log('');
 		console.log('Options:');
 		console.log('  --category <cat>  Filter by category');
-		console.log('  --toon            Output in TOON format (token-optimized for agents)');
+		console.log('  --text            Plain-text output for humans (default is TOON)');
 		console.log('');
 		console.log('Categories:');
 		const cats = getCategories(spec);
@@ -111,7 +114,7 @@ export function runList(args: string[], spec: Spec): void {
 		process.exit(0);
 	}
 
-	const toon = args.includes('--toon');
+	const { mode } = resolveOutputMode(args, false);
 	let filterCategory: string | null = null;
 
 	// Parse --category flag
@@ -125,6 +128,5 @@ export function runList(args: string[], spec: Spec): void {
 		filterCategory = catValue.toLowerCase();
 	}
 
-	const mode: OutputMode = toon ? 'toon' : 'text';
-	runCommand(getList(filterCategory, spec, { toon }), mode);
+	runCommand(getList(filterCategory, spec, mode), mode);
 }
