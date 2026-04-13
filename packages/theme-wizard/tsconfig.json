@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.svelte-package.json",
   "compilerOptions": {
     "exactOptionalPropertyTypes": false,
     "types": ["bun-types"],
