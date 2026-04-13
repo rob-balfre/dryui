@@ -1,8 +1,11 @@
-import type { DiagramEdge, DiagramDirection, PositionedEdge } from './types.js';
+import type { DiagramEdge, DiagramDirection, DiagramLoopSide, PositionedEdge } from './types.js';
 
 const EDGE_GAP = 14;
 const BUS_OFFSET_MIN = 28;
 const BUS_OFFSET_MAX = 48;
+const DEFAULT_CORNER_RADIUS = 6;
+const BACK_EDGE_LANE_GAP = 32;
+const BACK_EDGE_LANE_STEP = 22;
 
 interface Point {
 	x: number;
@@ -16,17 +19,37 @@ interface Endpoints {
 	ty: number;
 }
 
+export interface EdgeRouteBounds {
+	minX: number;
+	minY: number;
+	maxX: number;
+	maxY: number;
+}
+
+function edgeKey(edge: { from: string; to: string }): string {
+	return `${edge.from}->${edge.to}`;
+}
+
+export interface ComputedEdges {
+	edges: PositionedEdge[];
+	collapsed: (Point[] | null)[];
+}
+
 export function computeEdgePaths(
 	edges: DiagramEdge[],
 	positions: Map<string, { x: number; y: number }>,
 	nodeDims: Map<string, { w: number; h: number }>,
-	direction: DiagramDirection
-): PositionedEdge[] {
+	direction: DiagramDirection,
+	cornerRadius: number = DEFAULT_CORNER_RADIUS,
+	reversedEdges: Set<string> = new Set(),
+	bounds?: EdgeRouteBounds
+): ComputedEdges {
 	const horizontal = direction === 'LR' || direction === 'RL';
 	const bySource = new Map<string, DiagramEdge[]>();
 	const byTarget = new Map<string, DiagramEdge[]>();
 
 	for (const edge of edges) {
+		if (reversedEdges.has(edgeKey(edge))) continue;
 		const sourceList = bySource.get(edge.from) || [];
 		sourceList.push(edge);
 		bySource.set(edge.from, sourceList);
@@ -39,11 +62,54 @@ export function computeEdgePaths(
 	const sourceBusCache = new Map<string, number>();
 	const targetBusCache = new Map<string, number>();
 
-	return edges.map((edge) => {
+	const laneCounters: Record<DiagramLoopSide, number> = {
+		over: 0,
+		under: 0,
+		left: 0,
+		right: 0
+	};
+
+	const out: PositionedEdge[] = [];
+	const collapsedOut: (Point[] | null)[] = [];
+
+	edges.forEach((edge) => {
+		const isBack = reversedEdges.has(edgeKey(edge));
+
+		if (isBack && bounds) {
+			const side = pickBackEdgeSide(edge.loop, direction);
+			const endpoints = getBackEdgeEndpoints(edge, positions, nodeDims, side);
+			if (!endpoints) {
+				out.push(emptyEdge(edge));
+				collapsedOut.push(null);
+				return;
+			}
+			const laneIndex = laneCounters[side]++;
+			const points = buildBackEdgePoints(endpoints, side, bounds, laneIndex);
+			const collapsed = collapsePoints(points);
+			const path = buildPathFromCollapsed(collapsed, cornerRadius);
+			const midpoint = getMidpointFromCollapsed(collapsed);
+			const labelOffset = side === 'over' ? -10 : side === 'under' ? 14 : 0;
+			out.push({
+				from: edge.from,
+				to: edge.to,
+				path,
+				label: edge.label,
+				labelX: midpoint.x,
+				labelY: midpoint.y + labelOffset,
+				arrow: edge.arrow || 'end',
+				dashed: edge.dashed || false,
+				color: edge.color || 'neutral'
+			});
+			collapsedOut.push(collapsed);
+			return;
+		}
+
 		const endpoints = getEndpoints(edge, positions, nodeDims, horizontal);
 
 		if (!endpoints) {
-			return emptyEdge(edge);
+			out.push(emptyEdge(edge));
+			collapsedOut.push(null);
+			return;
 		}
 
 		const sourceSiblings = bySource.get(edge.from) || [];
@@ -100,10 +166,10 @@ export function computeEdgePaths(
 		}
 
 		const collapsed = collapsePoints(points);
-		const path = buildPathFromCollapsed(collapsed);
+		const path = buildPathFromCollapsed(collapsed, cornerRadius);
 		const midpoint = getMidpointFromCollapsed(collapsed);
 
-		return {
+		out.push({
 			from: edge.from,
 			to: edge.to,
 			path,
@@ -113,8 +179,118 @@ export function computeEdgePaths(
 			arrow: edge.arrow || 'end',
 			dashed: edge.dashed || false,
 			color: edge.color || 'neutral'
-		};
+		});
+		collapsedOut.push(collapsed);
 	});
+
+	return { edges: out, collapsed: collapsedOut };
+}
+
+function pickBackEdgeSide(
+	override: DiagramLoopSide | undefined,
+	direction: DiagramDirection
+): DiagramLoopSide {
+	if (override) return override;
+	return direction === 'LR' || direction === 'RL' ? 'over' : 'right';
+}
+
+function getBackEdgeEndpoints(
+	edge: DiagramEdge,
+	positions: Map<string, { x: number; y: number }>,
+	nodeDims: Map<string, { w: number; h: number }>,
+	side: DiagramLoopSide
+): Endpoints | undefined {
+	const fromPos = positions.get(edge.from);
+	const toPos = positions.get(edge.to);
+	const fromDims = nodeDims.get(edge.from);
+	const toDims = nodeDims.get(edge.to);
+	if (!fromPos || !toPos || !fromDims || !toDims) return undefined;
+
+	const fromCenter = {
+		x: fromPos.x + fromDims.w / 2,
+		y: fromPos.y + fromDims.h / 2
+	};
+	const toCenter = {
+		x: toPos.x + toDims.w / 2,
+		y: toPos.y + toDims.h / 2
+	};
+
+	switch (side) {
+		case 'over':
+			return {
+				fx: fromCenter.x,
+				fy: fromPos.y - EDGE_GAP,
+				tx: toCenter.x,
+				ty: toPos.y - EDGE_GAP
+			};
+		case 'under':
+			return {
+				fx: fromCenter.x,
+				fy: fromPos.y + fromDims.h + EDGE_GAP,
+				tx: toCenter.x,
+				ty: toPos.y + toDims.h + EDGE_GAP
+			};
+		case 'right':
+			return {
+				fx: fromPos.x + fromDims.w + EDGE_GAP,
+				fy: fromCenter.y,
+				tx: toPos.x + toDims.w + EDGE_GAP,
+				ty: toCenter.y
+			};
+		case 'left':
+			return {
+				fx: fromPos.x - EDGE_GAP,
+				fy: fromCenter.y,
+				tx: toPos.x - EDGE_GAP,
+				ty: toCenter.y
+			};
+	}
+}
+
+function buildBackEdgePoints(
+	endpoints: Endpoints,
+	side: DiagramLoopSide,
+	bounds: EdgeRouteBounds,
+	laneIndex: number
+): Point[] {
+	switch (side) {
+		case 'over': {
+			const outerY = bounds.minY - BACK_EDGE_LANE_GAP - laneIndex * BACK_EDGE_LANE_STEP;
+			return [
+				{ x: endpoints.fx, y: endpoints.fy },
+				{ x: endpoints.fx, y: outerY },
+				{ x: endpoints.tx, y: outerY },
+				{ x: endpoints.tx, y: endpoints.ty }
+			];
+		}
+		case 'under': {
+			const outerY = bounds.maxY + BACK_EDGE_LANE_GAP + laneIndex * BACK_EDGE_LANE_STEP;
+			return [
+				{ x: endpoints.fx, y: endpoints.fy },
+				{ x: endpoints.fx, y: outerY },
+				{ x: endpoints.tx, y: outerY },
+				{ x: endpoints.tx, y: endpoints.ty }
+			];
+		}
+		case 'right': {
+			const outerX = bounds.maxX + BACK_EDGE_LANE_GAP + laneIndex * BACK_EDGE_LANE_STEP;
+			return [
+				{ x: endpoints.fx, y: endpoints.fy },
+				{ x: outerX, y: endpoints.fy },
+				{ x: outerX, y: endpoints.ty },
+				{ x: endpoints.tx, y: endpoints.ty }
+			];
+		}
+		case 'left': {
+			const outerX = bounds.minX - BACK_EDGE_LANE_GAP - laneIndex * BACK_EDGE_LANE_STEP;
+			return [
+				{ x: endpoints.fx, y: endpoints.fy },
+				{ x: outerX, y: endpoints.fy },
+				{ x: outerX, y: endpoints.ty },
+				{ x: endpoints.tx, y: endpoints.ty }
+			];
+		}
+	}
 }
 
 function getEndpoints(
@@ -283,16 +459,53 @@ function buildVerticalBusPoints(endpoints: Endpoints, busY: number): Point[] {
 	return points;
 }
 
-function buildPathFromCollapsed(collapsed: Point[]): string {
+function buildPathFromCollapsed(collapsed: Point[], cornerRadius: number = 0): string {
 	if (collapsed.length === 0) return '';
 	if (collapsed.length === 1) {
 		const p = collapsed[0]!;
 		return `M ${p.x} ${p.y}`;
 	}
 
-	return collapsed
-		.map((point, index) => (index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`))
-		.join(' ');
+	if (cornerRadius <= 0 || collapsed.length < 3) {
+		return collapsed
+			.map((point, index) => (index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`))
+			.join(' ');
+	}
+
+	const first = collapsed[0]!;
+	const segments: string[] = [`M ${first.x} ${first.y}`];
+
+	for (let i = 1; i < collapsed.length - 1; i++) {
+		const prev = collapsed[i - 1]!;
+		const corner = collapsed[i]!;
+		const next = collapsed[i + 1]!;
+
+		const inDX = corner.x - prev.x;
+		const inDY = corner.y - prev.y;
+		const inLen = Math.hypot(inDX, inDY);
+		const outDX = next.x - corner.x;
+		const outDY = next.y - corner.y;
+		const outLen = Math.hypot(outDX, outDY);
+
+		if (inLen < 0.01 || outLen < 0.01) {
+			segments.push(`L ${corner.x} ${corner.y}`);
+			continue;
+		}
+
+		const r = Math.min(cornerRadius, inLen / 2, outLen / 2);
+		const startX = corner.x - (inDX / inLen) * r;
+		const startY = corner.y - (inDY / inLen) * r;
+		const endX = corner.x + (outDX / outLen) * r;
+		const endY = corner.y + (outDY / outLen) * r;
+
+		segments.push(`L ${startX} ${startY}`);
+		segments.push(`Q ${corner.x} ${corner.y} ${endX} ${endY}`);
+	}
+
+	const last = collapsed[collapsed.length - 1]!;
+	segments.push(`L ${last.x} ${last.y}`);
+
+	return segments.join(' ');
 }
 
 function collapsePoints(points: Point[]): Point[] {
@@ -325,49 +538,124 @@ function snapCoordinate(value: number): number {
 	return Math.round(value) + 0.5;
 }
 
-function getMidpointFromCollapsed(collapsed: Point[]): Point {
+export interface PointAtFraction {
+	point: Point;
+	segmentIndex: number;
+	axis: 'h' | 'v';
+}
+
+export function getPointAtFraction(collapsed: Point[], t: number): PointAtFraction {
+	const fallback: PointAtFraction = {
+		point: collapsed[0] ?? { x: 0, y: 0 },
+		segmentIndex: 0,
+		axis: 'h'
+	};
+	if (collapsed.length < 2) return fallback;
+
 	let totalLength = 0;
-	const segments: Array<{ from: Point; to: Point; length: number }> = [];
+	const segments: Array<{
+		from: Point;
+		to: Point;
+		length: number;
+		index: number;
+		axis: 'h' | 'v';
+	}> = [];
 
 	for (let index = 1; index < collapsed.length; index += 1) {
 		const from = collapsed[index - 1]!;
 		const to = collapsed[index]!;
 		const length = Math.abs(to.x - from.x) + Math.abs(to.y - from.y);
-
 		if (length === 0) continue;
-
-		segments.push({ from, to, length });
+		const axis: 'h' | 'v' = from.x !== to.x ? 'h' : 'v';
+		segments.push({ from, to, length, index, axis });
 		totalLength += length;
 	}
 
-	if (totalLength === 0) {
-		return collapsed[0] ?? { x: 0, y: 0 };
-	}
+	if (totalLength === 0) return fallback;
 
-	let remaining = totalLength / 2;
+	const clamped = Math.max(0, Math.min(1, t));
+	let remaining = totalLength * clamped;
 
 	for (const segment of segments) {
 		if (remaining <= segment.length) {
-			if (segment.from.x !== segment.to.x) {
+			if (segment.axis === 'h') {
 				const direction = Math.sign(segment.to.x - segment.from.x);
 				return {
-					x: segment.from.x + direction * remaining,
-					y: segment.from.y
+					point: { x: segment.from.x + direction * remaining, y: segment.from.y },
+					segmentIndex: segment.index,
+					axis: 'h'
 				};
 			}
-
 			const direction = Math.sign(segment.to.y - segment.from.y);
 			return {
-				x: segment.from.x,
-				y: segment.from.y + direction * remaining
+				point: { x: segment.from.x, y: segment.from.y + direction * remaining },
+				segmentIndex: segment.index,
+				axis: 'v'
 			};
 		}
-
 		remaining -= segment.length;
 	}
 
-	return collapsed[collapsed.length - 1] ?? { x: 0, y: 0 };
+	const lastIndex = collapsed.length - 1;
+	const last = collapsed[lastIndex] ?? { x: 0, y: 0 };
+	return { point: last, segmentIndex: lastIndex, axis: 'h' };
 }
+
+function getMidpointFromCollapsed(collapsed: Point[]): Point {
+	return getPointAtFraction(collapsed, 0.5).point;
+}
+
+export interface WaypointBox {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+/** Split a collapsed polyline at the entry/exit intersections with a box centered on a point.
+ * The box is placed perpendicular to the segment containing the split point, so the polyline
+ * enters one side of the box and exits the opposite side. Returns null if the split is degenerate.
+ */
+export function splitCollapsedAtBox(
+	collapsed: Point[],
+	segmentIndex: number,
+	box: WaypointBox,
+	axis: 'h' | 'v'
+): { entry: Point[]; exit: Point[] } | null {
+	if (collapsed.length < 2 || segmentIndex < 1 || segmentIndex >= collapsed.length) return null;
+
+	const segFrom = collapsed[segmentIndex - 1]!;
+	const segTo = collapsed[segmentIndex]!;
+
+	let entryPoint: Point;
+	let exitPoint: Point;
+
+	if (axis === 'h') {
+		// Horizontal segment — polyline enters left side of box, exits right
+		const goingRight = segTo.x > segFrom.x;
+		const leftEdge = box.x;
+		const rightEdge = box.x + box.width;
+		entryPoint = { x: goingRight ? leftEdge : rightEdge, y: segFrom.y };
+		exitPoint = { x: goingRight ? rightEdge : leftEdge, y: segFrom.y };
+	} else {
+		// Vertical segment — polyline enters top, exits bottom (or vice versa)
+		const goingDown = segTo.y > segFrom.y;
+		const topEdge = box.y;
+		const bottomEdge = box.y + box.height;
+		entryPoint = { x: segFrom.x, y: goingDown ? topEdge : bottomEdge };
+		exitPoint = { x: segFrom.x, y: goingDown ? bottomEdge : topEdge };
+	}
+
+	const entry: Point[] = collapsed.slice(0, segmentIndex);
+	entry.push(snapPoint(entryPoint));
+
+	const exit: Point[] = [snapPoint(exitPoint), ...collapsed.slice(segmentIndex)];
+
+	if (entry.length < 2 || exit.length < 2) return null;
+	return { entry, exit };
+}
+
+export { collapsePoints, buildPathFromCollapsed };
 
 export function emptyEdge(edge: DiagramEdge): PositionedEdge {
 	return {

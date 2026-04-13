@@ -1,6 +1,8 @@
 import type {
 	DiagramConfig,
 	DiagramDirection,
+	DiagramEdge,
+	DiagramWaypoint,
 	PositionedNode,
 	PositionedEdge,
 	PositionedCluster,
@@ -10,25 +12,33 @@ import type {
 	PositionedMessage,
 	PositionedLifeline,
 	PositionedFragment,
+	PositionedWaypoint,
 	LayoutResult
 } from './types.js';
-import { computeEdgePaths, emptyEdge } from './edge-routing.js';
+import {
+	buildPathFromCollapsed,
+	computeEdgePaths,
+	emptyEdge,
+	getPointAtFraction,
+	splitCollapsedAtBox
+} from './edge-routing.js';
 
-const DEFAULT_NODE_GAP = 28;
-const DEFAULT_LAYER_GAP = 56;
-const DEFAULT_CLUSTER_PADDING = 32;
-const DEFAULT_NODE_HEIGHT = 44;
-const DESC_NODE_HEIGHT = 80;
-const MIN_NODE_WIDTH = 140;
-const CHAR_WIDTH = 8.5;
-const NODE_PADDING_X = 48;
+const DEFAULT_NODE_GAP = 32;
+const DEFAULT_LAYER_GAP = 64;
+const DEFAULT_CLUSTER_PADDING = 40;
+const DEFAULT_CORNER_RADIUS = 8;
+const DEFAULT_NODE_HEIGHT = 68;
+const DESC_NODE_HEIGHT = 116;
+const MIN_NODE_WIDTH = 176;
+const CHAR_WIDTH = 9;
+const NODE_PADDING_X = 64;
 const MARGIN = 40;
 
 // ── Helpers ────────────────────────────────────────────────
 
 function estimateNodeWidth(label: string, description?: string): number {
 	const labelWidth = label.length * CHAR_WIDTH + NODE_PADDING_X;
-	const descWidth = description ? description.length * 6.5 + NODE_PADDING_X + 16 : 0;
+	const descWidth = description ? description.length * 7 + NODE_PADDING_X : 0;
 	return Math.max(MIN_NODE_WIDTH, labelWidth, descWidth);
 }
 
@@ -409,6 +419,7 @@ function computeClusterBounds(
 				width: 0,
 				height: 0,
 				label: cluster.label,
+				iconComponent: cluster.iconComponent,
 				color: cluster.color || 'neutral',
 				dashed: cluster.dashed ?? true
 			};
@@ -424,10 +435,141 @@ function computeClusterBounds(
 			width: maxX - minX + padding * 2,
 			height: maxY - minY + padding * 2 + labelPad,
 			label: cluster.label,
+			iconComponent: cluster.iconComponent,
 			color: cluster.color || 'neutral',
 			dashed: cluster.dashed ?? true
 		};
 	});
+}
+
+function computeNodeAndClusterBounds(
+	nodes: PositionedNode[],
+	clusters: PositionedCluster[]
+): { minX: number; minY: number; maxX: number; maxY: number } {
+	let minX = Infinity,
+		minY = Infinity,
+		maxX = -Infinity,
+		maxY = -Infinity;
+
+	for (const n of nodes) {
+		minX = Math.min(minX, n.x);
+		minY = Math.min(minY, n.y);
+		maxX = Math.max(maxX, n.x + n.width);
+		maxY = Math.max(maxY, n.y + n.height);
+	}
+	for (const c of clusters) {
+		minX = Math.min(minX, c.x);
+		minY = Math.min(minY, c.y);
+		maxX = Math.max(maxX, c.x + c.width);
+		maxY = Math.max(maxY, c.y + c.height);
+	}
+
+	if (minX === Infinity) {
+		return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+	}
+	return { minX, minY, maxX, maxY };
+}
+
+// ── Waypoints ──────────────────────────────────────────────
+
+const WAYPOINT_DEFAULT_WIDTH = 240;
+const WAYPOINT_DEFAULT_HEIGHT_DESC = 132;
+const WAYPOINT_DEFAULT_HEIGHT = 84;
+
+function estimateWaypointDims(waypoint: DiagramWaypoint): { w: number; h: number } {
+	const w =
+		waypoint.width ??
+		Math.max(
+			MIN_NODE_WIDTH,
+			waypoint.label.length * CHAR_WIDTH + NODE_PADDING_X,
+			(waypoint.description?.length ?? 0) * 7 + NODE_PADDING_X
+		);
+	const h =
+		waypoint.height ??
+		(waypoint.description ? WAYPOINT_DEFAULT_HEIGHT_DESC : WAYPOINT_DEFAULT_HEIGHT);
+	return { w: Math.min(w, WAYPOINT_DEFAULT_WIDTH * 1.4), h };
+}
+
+function placeWaypoints(
+	configEdges: DiagramEdge[],
+	positionedEdges: PositionedEdge[],
+	collapsedByIndex: (Array<{ x: number; y: number }> | null)[],
+	cornerRadius: number
+): { edges: PositionedEdge[]; waypoints: PositionedWaypoint[] } {
+	const newEdges: PositionedEdge[] = [];
+	const waypoints: PositionedWaypoint[] = [];
+
+	configEdges.forEach((edge, i) => {
+		const positioned = positionedEdges[i];
+		const collapsed = collapsedByIndex[i];
+		if (!edge.waypoint || !positioned || !collapsed || collapsed.length < 2) {
+			if (positioned) newEdges.push(positioned);
+			return;
+		}
+
+		const wp = edge.waypoint;
+		const t = wp.position ?? 0.5;
+		const at = getPointAtFraction(collapsed, t);
+		const dims = estimateWaypointDims(wp);
+
+		// Snap box center to the segment axis so the polyline enters/exits cleanly
+		const boxCenter =
+			at.axis === 'h'
+				? { x: at.point.x, y: at.point.y } // horizontal segment — box vertical center on the line
+				: { x: at.point.x, y: at.point.y };
+		const box = {
+			x: boxCenter.x - dims.w / 2,
+			y: boxCenter.y - dims.h / 2,
+			width: dims.w,
+			height: dims.h
+		};
+
+		const split = splitCollapsedAtBox(collapsed, at.segmentIndex, box, at.axis);
+		if (!split) {
+			newEdges.push(positioned);
+			return;
+		}
+
+		const entryPath = buildPathFromCollapsed(split.entry, cornerRadius);
+		const exitPath = buildPathFromCollapsed(split.exit, cornerRadius);
+
+		// Entry segment: no arrow marker (arrow is on the exit)
+		newEdges.push({
+			...positioned,
+			path: entryPath,
+			label: undefined,
+			labelX: 0,
+			labelY: 0,
+			arrow: 'none',
+			kind: 'entry'
+		});
+		// Exit segment: keeps original arrow + label
+		const exitMid = getPointAtFraction(split.exit, 0.5).point;
+		newEdges.push({
+			...positioned,
+			path: exitPath,
+			label: positioned.label,
+			labelX: exitMid.x,
+			labelY: exitMid.y - 12,
+			kind: 'exit'
+		});
+
+		waypoints.push({
+			id: wp.id ?? `${edge.from}->${edge.to}`,
+			x: box.x,
+			y: box.y,
+			width: dims.w,
+			height: dims.h,
+			label: wp.label,
+			description: wp.description,
+			icon: wp.icon,
+			iconComponent: wp.iconComponent,
+			variant: wp.variant ?? 'default',
+			color: wp.color ?? 'neutral'
+		});
+	});
+
+	return { edges: newEdges, waypoints };
 }
 
 // ── Annotations ────────────────────────────────────────────
@@ -524,6 +666,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	const nodeGap = config.spacing?.nodeGap ?? DEFAULT_NODE_GAP;
 	const layerGap = config.spacing?.layerGap ?? DEFAULT_LAYER_GAP;
 	const clusterPadding = config.spacing?.clusterPadding ?? DEFAULT_CLUSTER_PADDING;
+	const cornerRadius = config.spacing?.cornerRadius ?? DEFAULT_CORNER_RADIUS;
 
 	const nodeIds = config.nodes.map((n) => n.id);
 	const nodeDims = buildNodeDims(config.nodes);
@@ -568,8 +711,30 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	// Compute clusters
 	const clusters = computeClusterBounds(config, positions, nodeDims, clusterPadding);
 
-	// Compute edges
-	const positionedEdges = computeEdgePaths(config.edges, positions, nodeDims, direction);
+	// Pre-edge bounds (used by back-edge router to anchor outer lanes)
+	const preBounds = computeNodeAndClusterBounds(positionedNodes, clusters);
+
+	// Compute edges (back edges route around preBounds)
+	const computed = computeEdgePaths(
+		config.edges,
+		positions,
+		nodeDims,
+		direction,
+		cornerRadius,
+		graph.reversedEdges,
+		preBounds
+	);
+	let positionedEdges = computed.edges;
+
+	// Place waypoints (post-process: split edges that have waypoints)
+	const waypointResult = placeWaypoints(
+		config.edges,
+		positionedEdges,
+		computed.collapsed,
+		cornerRadius
+	);
+	positionedEdges = waypointResult.edges;
+	const waypoints = waypointResult.waypoints;
 
 	// Compute annotations
 	const annotations = resolveAnnotations(config, positions, nodeDims);
@@ -614,6 +779,14 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 			maxX = Math.max(maxX, e.labelX + labelW / 2);
 			maxY = Math.max(maxY, e.labelY + 7);
 		}
+		// Back-edge paths can extend outside the node bbox; expand viewBox to fit
+		const pathBounds = extractPathBounds(e.path);
+		if (pathBounds) {
+			minX = Math.min(minX, pathBounds.minX);
+			minY = Math.min(minY, pathBounds.minY);
+			maxX = Math.max(maxX, pathBounds.maxX);
+			maxY = Math.max(maxY, pathBounds.maxY);
+		}
 	}
 
 	// Handle empty diagram
@@ -624,12 +797,24 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 		maxY = MARGIN * 2;
 	}
 
+	// Include waypoint bounds
+	for (const w of waypoints) {
+		minX = Math.min(minX, w.x);
+		minY = Math.min(minY, w.y);
+		maxX = Math.max(maxX, w.x + w.width);
+		maxY = Math.max(maxY, w.y + w.height);
+	}
+
 	// Shift everything so all coordinates are non-negative
 	const shiftX = minX < 0 ? -minX + MARGIN : 0;
 	const shiftY = minY < 0 ? -minY + MARGIN : 0;
 
 	if (shiftX > 0 || shiftY > 0) {
 		shiftAllPositions(positionedNodes, clusters, annotations, positionedEdges, shiftX, shiftY);
+		for (const w of waypoints) {
+			w.x += shiftX;
+			w.y += shiftY;
+		}
 		maxX += shiftX;
 		maxY += shiftY;
 	}
@@ -644,6 +829,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 		messages: [],
 		lifelines: [],
 		positionedFragments: [],
+		waypoints,
 		viewBox: { width: maxX + MARGIN, height: maxY + MARGIN }
 	};
 }
@@ -869,6 +1055,7 @@ function layoutSwimlane(config: DiagramConfig): LayoutResult {
 		messages: [],
 		lifelines: [],
 		positionedFragments: [],
+		waypoints: [],
 		viewBox: {
 			width: Math.max(totalWidth, maxViewX + MARGIN),
 			height: Math.max(totalHeight, maxViewY + MARGIN)
@@ -919,19 +1106,49 @@ function shiftAllPositions(
 	}
 }
 
-/** Shift all absolute coordinates in an SVG path string by (dx, dy) */
+/** Extract min/max x/y from an SVG path string (absolute commands only).
+ * Used to expand viewBox to include back-edge paths that extend beyond node bounds.
+ */
+function extractPathBounds(
+	path: string
+): { minX: number; minY: number; maxX: number; maxY: number } | null {
+	if (!path) return null;
+	let minX = Infinity,
+		minY = Infinity,
+		maxX = -Infinity,
+		maxY = -Infinity;
+	const matches = path.matchAll(/[MLQTSC]([^MLQTSCAHVZmlqtscahvz]*)/g);
+	for (const match of matches) {
+		const args = match[1] ?? '';
+		const nums = args.match(/-?\d+(?:\.\d+)?/g);
+		if (!nums) continue;
+		for (let i = 0; i + 1 < nums.length; i += 2) {
+			const x = parseFloat(nums[i]!);
+			const y = parseFloat(nums[i + 1]!);
+			if (x < minX) minX = x;
+			if (x > maxX) maxX = x;
+			if (y < minY) minY = y;
+			if (y > maxY) maxY = y;
+		}
+	}
+	if (minX === Infinity) return null;
+	return { minX, minY, maxX, maxY };
+}
+
+/** Shift all absolute coordinates in an SVG path string by (dx, dy).
+ * Handles multi-pair commands (Q, C, S, T) where the args contain more than one (x, y).
+ */
 function shiftSvgPath(path: string, dx: number, dy: number): string {
-	// Match SVG path commands and their coordinate pairs
-	// This handles M, L, C, Q, S, T commands with absolute coords
 	return path.replace(
-		/([MLCSQT])\s*([-\d.]+)\s+([-\d.]+)/gi,
-		(_match, cmd: string, x: string, y: string) => {
-			const upper = cmd.toUpperCase();
-			// Only shift absolute commands (uppercase)
-			if (cmd === upper) {
-				return `${cmd} ${parseFloat(x) + dx} ${parseFloat(y) + dy}`;
-			}
-			return `${cmd} ${x} ${y}`;
+		/([MLQTSC])([^MLQTSCAHVZmlqtscahvz]*)/g,
+		(_match, cmd: string, args: string) => {
+			const nums = args.match(/-?\d+(?:\.\d+)?/g);
+			if (!nums || nums.length === 0) return cmd;
+			const shifted = nums.map((n, i) => {
+				const v = parseFloat(n);
+				return (i % 2 === 0 ? v + dx : v + dy).toString();
+			});
+			return `${cmd} ${shifted.join(' ')}`;
 		}
 	);
 }
@@ -963,6 +1180,7 @@ function buildPositionedNodes(
 			label: node.label,
 			description: node.description,
 			icon: node.icon,
+			iconComponent: node.iconComponent,
 			variant: node.variant || 'default',
 			color: node.color || 'neutral',
 			state: node.state || 'default'
@@ -1197,6 +1415,7 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 		messages: positionedMessages,
 		lifelines,
 		positionedFragments,
+		waypoints: [],
 		viewBox: { width: totalWidth, height: totalHeight }
 	};
 }

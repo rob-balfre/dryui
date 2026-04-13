@@ -1,16 +1,39 @@
+import type { Component } from 'svelte';
+
 export type DiagramColor = 'neutral' | 'brand' | 'success' | 'warning' | 'error' | 'info';
 export type DiagramDirection = 'TB' | 'BT' | 'LR' | 'RL';
+
+export type DiagramIconComponent = Component<{
+	size?: number | string;
+	'aria-hidden'?: boolean | string;
+}>;
 
 export interface DiagramNode {
 	id: string;
 	label: string;
 	description?: string;
 	icon?: string;
+	iconComponent?: DiagramIconComponent;
 	variant?: 'default' | 'filled' | 'outlined' | 'pill';
 	color?: DiagramColor;
 	state?: 'default' | 'active' | 'complete' | 'blocked';
 	width?: number;
 	height?: number;
+}
+
+export type DiagramLoopSide = 'over' | 'under' | 'left' | 'right';
+
+export interface DiagramWaypoint {
+	id?: string;
+	label: string;
+	description?: string;
+	icon?: string;
+	iconComponent?: DiagramIconComponent;
+	color?: DiagramColor;
+	variant?: 'default' | 'filled' | 'outlined' | 'pill';
+	width?: number;
+	height?: number;
+	position?: number;
 }
 
 export interface DiagramEdge {
@@ -20,11 +43,14 @@ export interface DiagramEdge {
 	arrow?: 'end' | 'start' | 'both' | 'none';
 	dashed?: boolean;
 	color?: DiagramColor;
+	loop?: DiagramLoopSide;
+	waypoint?: DiagramWaypoint;
 }
 
 export interface DiagramCluster {
 	id: string;
 	label?: string;
+	iconComponent?: DiagramIconComponent;
 	nodes: string[];
 	color?: DiagramColor;
 	dashed?: boolean;
@@ -85,6 +111,7 @@ export interface DiagramConfig {
 		nodeGap?: number;
 		layerGap?: number;
 		clusterPadding?: number;
+		cornerRadius?: number;
 	};
 	ariaLabel?: string;
 }
@@ -98,6 +125,7 @@ export interface PositionedNode {
 	label: string;
 	description?: string;
 	icon?: string;
+	iconComponent?: DiagramIconComponent;
 	variant: string;
 	color: DiagramColor;
 	state: string;
@@ -113,6 +141,21 @@ export interface PositionedEdge {
 	arrow: string;
 	dashed: boolean;
 	color: DiagramColor;
+	kind?: 'full' | 'entry' | 'exit';
+}
+
+export interface PositionedWaypoint {
+	id: string;
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	label: string;
+	description?: string;
+	icon?: string;
+	iconComponent?: DiagramIconComponent;
+	variant: string;
+	color: DiagramColor;
 }
 
 export interface PositionedCluster {
@@ -122,6 +165,7 @@ export interface PositionedCluster {
 	width: number;
 	height: number;
 	label?: string;
+	iconComponent?: DiagramIconComponent;
 	color: DiagramColor;
 	dashed: boolean;
 }
@@ -202,5 +246,6 @@ export interface LayoutResult {
 	messages: PositionedMessage[];
 	lifelines: PositionedLifeline[];
 	positionedFragments: PositionedFragment[];
+	waypoints: PositionedWaypoint[];
 	viewBox: { width: number; height: number };
 }
