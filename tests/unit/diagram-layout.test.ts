@@ -377,6 +377,57 @@ describe('computeLayout', () => {
 		expect(retry!.height).toBeGreaterThan(0);
 	});
 
+	test('vertical back-edge waypoints stay centered on the lane while keeping the lower elbow upward', () => {
+		const config: DiagramConfig = {
+			direction: 'TB',
+			spacing: { cornerRadius: 16, nodeGap: 32, layerGap: 72, backEdgeLaneGap: 144 },
+			nodes: [
+				{ id: 'you', label: 'You' },
+				{ id: 'mcp', label: 'DryUI MCP' },
+				{ id: 'pre', label: 'Preprocessor' },
+				{ id: 'app', label: 'Your App' }
+			],
+			edges: [
+				{ from: 'you', to: 'mcp' },
+				{ from: 'mcp', to: 'pre' },
+				{ from: 'pre', to: 'app' },
+				{
+					from: 'app',
+					to: 'you',
+					waypoint: {
+						label: 'Live Feedback',
+						description:
+							'Annotate the running app in your browser. The agent reads your marks instantly.',
+						width: 240,
+						height: 160,
+						position: 0.32
+					}
+				}
+			],
+			clusters: [{ id: 'agent', label: 'AI Agent', direction: 'LR', nodes: ['mcp', 'pre', 'app'] }]
+		};
+
+		const result = computeLayout(config);
+		const waypoint = result.waypoints.find((w) => w.label === 'Live Feedback');
+		const entry = result.edges.find((e) => e.kind === 'entry' && e.to === 'you');
+		const exit = result.edges.find((e) => e.kind === 'exit' && e.to === 'you');
+		expect(waypoint).toBeDefined();
+		expect(entry).toBeDefined();
+		expect(exit).toBeDefined();
+
+		const entryMatch = entry!.path.match(/^M\s+([0-9.]+)\s+([0-9.]+)/);
+		const laneMatch = exit!.path.match(/^M\s+([0-9.]+)\s+([0-9.]+)/);
+		expect(entryMatch).not.toBeNull();
+		expect(laneMatch).not.toBeNull();
+		const entryY = Number(entryMatch![2]);
+		const laneX = Number(laneMatch![1]);
+		const laneInset = laneX - waypoint!.x;
+		const waypointBottom = waypoint!.y + waypoint!.height;
+
+		expect(laneInset).toBeCloseTo(waypoint!.width / 2, 1);
+		expect(waypointBottom).toBeLessThan(entryY);
+	});
+
 	test('cluster with labelPosition: left allocates a left gutter and keeps members inside the bbox', () => {
 		const top = computeLayout({
 			direction: 'LR',

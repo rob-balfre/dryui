@@ -1,5 +1,5 @@
 {
-  "version": "0.5.2",
+  "version": "1.0.0",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
