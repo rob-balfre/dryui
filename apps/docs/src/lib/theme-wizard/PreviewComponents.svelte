@@ -59,10 +59,10 @@
 				</Card.Header>
 				<Card.Content>
 					<div class="stack">
-						<Alert.Root variant="info">
-							<Alert.Title>Theme applied</Alert.Title>
-							<Alert.Description>All tokens are resolved from your brand color.</Alert.Description>
-						</Alert.Root>
+						<Alert variant="info">
+							{#snippet title()}Theme applied{/snippet}
+							{#snippet description()}All tokens are resolved from your brand color.{/snippet}
+						</Alert>
 
 						<div class="btn-row">
 							<Button variant="solid">Save changes</Button>

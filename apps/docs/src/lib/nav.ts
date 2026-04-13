@@ -129,7 +129,7 @@ export const categories: NavCategory[] = [
 			ui('Input'),
 			ui('InputGroup'),
 			ui('NumberInput'),
-			ui('OptionSwatchGroup'),
+			ui('OptionPicker'),
 			ui('PhoneInput'),
 			ui('PinInput'),
 			ui('PromptInput'),
@@ -209,6 +209,7 @@ export const categories: NavCategory[] = [
 			ui('Noise'),
 			ui('Reveal'),
 			ui('ShaderCanvas'),
+			ui('Shimmer'),
 			ui('Spotlight')
 		]
 	},

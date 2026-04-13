@@ -466,10 +466,10 @@
       "svelte": "./src/number-input/index.ts",
       "default": "./src/number-input/index.ts"
     },
-    "./option-swatch-group": {
-      "types": "./src/option-swatch-group/index.ts",
-      "svelte": "./src/option-swatch-group/index.ts",
-      "default": "./src/option-swatch-group/index.ts"
+    "./option-picker": {
+      "types": "./src/option-picker/index.ts",
+      "svelte": "./src/option-picker/index.ts",
+      "default": "./src/option-picker/index.ts"
     },
     "./pagination": {
       "types": "./src/pagination/index.ts",
@@ -575,6 +575,11 @@
       "types": "./src/shader-canvas/index.ts",
       "svelte": "./src/shader-canvas/index.ts",
       "default": "./src/shader-canvas/index.ts"
+    },
+    "./shimmer": {
+      "types": "./src/shimmer/index.ts",
+      "svelte": "./src/shimmer/index.ts",
+      "default": "./src/shimmer/index.ts"
     },
     "./sidebar": {
       "types": "./src/sidebar/index.ts",
@@ -1209,10 +1214,10 @@
         "svelte": "./dist/number-input/index.js",
         "default": "./dist/number-input/index.js"
       },
-      "./option-swatch-group": {
-        "types": "./dist/option-swatch-group/index.d.ts",
-        "svelte": "./dist/option-swatch-group/index.js",
-        "default": "./dist/option-swatch-group/index.js"
+      "./option-picker": {
+        "types": "./dist/option-picker/index.d.ts",
+        "svelte": "./dist/option-picker/index.js",
+        "default": "./dist/option-picker/index.js"
       },
       "./pagination": {
         "types": "./dist/pagination/index.d.ts",
@@ -1318,6 +1323,11 @@
         "types": "./dist/shader-canvas/index.d.ts",
         "svelte": "./dist/shader-canvas/index.js",
         "default": "./dist/shader-canvas/index.js"
+      },
+      "./shimmer": {
+        "types": "./dist/shimmer/index.d.ts",
+        "svelte": "./dist/shimmer/index.js",
+        "default": "./dist/shimmer/index.js"
       },
       "./sidebar": {
         "types": "./dist/sidebar/index.d.ts",

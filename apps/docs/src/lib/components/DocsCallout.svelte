@@ -1,41 +1,26 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Alert } from '@dryui/ui';
+	import { Alert, type AlertVariant } from '@dryui/ui';
 
 	interface Props {
 		title?: string;
 		description?: string;
-		variant?: 'info' | 'success' | 'warning' | 'error';
+		variant?: AlertVariant;
 		children?: Snippet;
 	}
 
 	let { title, description, variant = 'info', children }: Props = $props();
 </script>
 
-<Alert.Root {variant}>
-	<div class="callout-stack">
-		{#if title}
-			<Alert.Title>{title}</Alert.Title>
-		{/if}
-		{#if description}
-			<Alert.Description>{description}</Alert.Description>
-		{/if}
-		{#if children}
-			<div class="callout-content">
-				{@render children()}
-			</div>
-		{/if}
-	</div>
-</Alert.Root>
+{#snippet renderTitle()}{title}{/snippet}
+{#snippet renderDescription()}{description}{/snippet}
 
-<style>
-	.callout-stack {
-		display: grid;
-		gap: var(--dry-space-2);
-		grid-column: 1 / -1;
-	}
-
-	.callout-content {
-		display: block;
-	}
-</style>
+<Alert
+	{variant}
+	title={title ? renderTitle : undefined}
+	description={description ? renderDescription : undefined}
+>
+	{#if children}
+		{@render children()}
+	{/if}
+</Alert>

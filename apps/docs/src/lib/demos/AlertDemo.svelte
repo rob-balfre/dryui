@@ -2,6 +2,6 @@
 	import { Alert } from '@dryui/ui';
 </script>
 
-<Alert.Root variant="info">
-	<Alert.Description>Your changes have been saved successfully.</Alert.Description>
-</Alert.Root>
+<Alert variant="info">
+	{#snippet description()}Your changes have been saved successfully.{/snippet}
+</Alert>

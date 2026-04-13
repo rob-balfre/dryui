@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { setSelectableTileGroupCtx } from '../option-swatch-group/context.svelte.js';
+	import { setOptionPickerCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: string;
@@ -21,7 +21,7 @@
 		...rest
 	}: Props = $props();
 
-	setSelectableTileGroupCtx({
+	setOptionPickerCtx({
 		get value() {
 			return value;
 		},

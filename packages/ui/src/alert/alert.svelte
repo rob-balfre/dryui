@@ -1,41 +1,41 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { setAlertCtx, type AlertVariant } from './context.svelte.js';
+	import CloseButtonBase from '../internal/close-button-base.svelte';
+
+	export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		variant?: AlertVariant;
 		dismissible?: boolean;
 		onDismiss?: () => void;
-		children: Snippet;
+		icon?: Snippet;
+		title?: Snippet;
+		description?: Snippet;
+		children?: Snippet;
 	}
 
 	let {
 		variant = 'info',
 		dismissible = false,
 		onDismiss,
-		class: className,
+		icon,
+		title,
+		description,
 		children,
+		class: className,
 		...rest
 	}: Props = $props();
 
-	let isDismissed = $state(false);
+	let dismissed = $state(false);
 
-	setAlertCtx({
-		get variant() {
-			return variant;
-		},
-		get isDismissed() {
-			return isDismissed;
-		},
-		dismiss() {
-			isDismissed = true;
-			onDismiss?.();
-		}
-	});
+	function handleDismiss() {
+		dismissed = true;
+		onDismiss?.();
+	}
 </script>
 
-{#if !isDismissed}
+{#if !dismissed}
 	<div
 		role="alert"
 		data-alert
@@ -44,7 +44,29 @@
 		class={className}
 		{...rest}
 	>
-		{@render children()}
+		{#if icon}
+			<span data-alert-icon aria-hidden="true">
+				{@render icon()}
+			</span>
+		{/if}
+
+		<div data-alert-body>
+			{#if title}
+				<h5 data-alert-title>{@render title()}</h5>
+			{/if}
+			{#if description}
+				<p data-alert-description>{@render description()}</p>
+			{/if}
+			{#if children}
+				{@render children()}
+			{/if}
+		</div>
+
+		{#if dismissible}
+			<span data-alert-close>
+				<CloseButtonBase aria-label="Dismiss alert" onclick={handleDismiss} />
+			</span>
+		{/if}
 	</div>
 {/if}
 
@@ -66,7 +88,6 @@
 		grid-template-columns: auto minmax(0, 1fr) auto;
 		align-items: start;
 		column-gap: 0;
-		row-gap: var(--dry-space-1);
 		padding: var(--dry-alert-padding, var(--dry-space-6));
 		background: var(--dry-alert-bg);
 		border: 1px solid var(--dry-alert-border);
@@ -76,6 +97,43 @@
 		font-size: var(--dry-type-small-size);
 		line-height: var(--dry-type-small-leading);
 		position: relative;
+	}
+
+	[data-alert-icon] {
+		grid-column: 1;
+		color: var(--dry-alert-icon-color);
+		display: grid;
+		align-items: center;
+		margin-top: var(--dry-space-0_5);
+		padding-inline-end: var(--dry-alert-gap, var(--dry-space-3));
+	}
+
+	[data-alert-body] {
+		grid-column: 2;
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	[data-alert-close] {
+		grid-column: 3;
+		display: inline-grid;
+		align-self: start;
+		margin-inline-start: var(--dry-alert-gap, var(--dry-space-3));
+	}
+
+	[data-alert-title] {
+		font-size: var(--dry-type-heading-4-size);
+		font-weight: 600;
+		line-height: var(--dry-type-small-leading);
+		color: var(--dry-color-text-strong);
+		margin: 0;
+	}
+
+	[data-alert-description] {
+		font-size: var(--dry-type-small-size);
+		line-height: var(--dry-type-small-leading);
+		color: var(--dry-color-text-weak);
+		margin: 0;
 	}
 
 	/* ── Variants ──────────────────────────────────────────────────────────────── */

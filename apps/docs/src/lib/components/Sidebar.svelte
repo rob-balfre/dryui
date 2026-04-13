@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Sidebar } from '@dryui/ui';
+	import { Shimmer, Sidebar } from '@dryui/ui';
 	import {
 		Blocks,
 		BookOpenText,
@@ -115,9 +115,19 @@
 				title="Open Theme Wizard in a new tab"
 				onclick={onnavigate}
 			>
-				<WandSparkles size={16} aria-hidden="true" />
-				<span class="theme-wizard-label">Theme Wizard</span>
-				<ExternalLink size={14} aria-hidden="true" />
+				<Shimmer
+					color="#ffc27a"
+					duration={3.2}
+					--dry-shimmer-column="1 / -1"
+					--dry-shimmer-outer-columns="minmax(0, 1fr)"
+					--dry-shimmer-content-columns="max-content minmax(0, 1fr) max-content"
+					--dry-shimmer-gap="var(--dry-space-3)"
+					--dry-shimmer-justify-self="stretch"
+				>
+					<WandSparkles size={16} aria-hidden="true" />
+					<span>Theme Wizard</span>
+					<ExternalLink size={14} aria-hidden="true" />
+				</Shimmer>
 			</Sidebar.Item>
 		</Sidebar.Footer>
 	</Sidebar.Root>
@@ -126,66 +136,9 @@
 <style>
 	.docs-sidebar {
 		height: 100%;
-		--theme-wizard-shine-duration: 9s;
-		--theme-wizard-label-color: var(--dry-color-text-strong);
-		--theme-wizard-label-highlight: color-mix(
-			in srgb,
-			var(--dry-color-fill-brand) 72%,
-			var(--dry-color-on-brand) 28%
-		);
 	}
 
 	.scroll-root {
 		display: contents;
-	}
-
-	.theme-wizard-label {
-		display: inline-grid;
-	}
-
-	@supports ((-webkit-background-clip: text) or (background-clip: text)) {
-		.theme-wizard-label {
-			color: transparent;
-			background-image: linear-gradient(
-				100deg,
-				var(--theme-wizard-label-color) 0%,
-				var(--theme-wizard-label-color) 44%,
-				var(--theme-wizard-label-highlight) 50%,
-				var(--theme-wizard-label-color) 56%,
-				var(--theme-wizard-label-color) 100%
-			);
-			background-size: 240% 100%;
-			background-position: 130% 50%;
-			background-clip: text;
-			-webkit-background-clip: text;
-			-webkit-text-fill-color: transparent;
-			will-change: background-position, filter;
-			animation: theme-wizard-label-shine var(--theme-wizard-shine-duration) linear infinite;
-		}
-	}
-
-	@keyframes theme-wizard-label-shine {
-		0% {
-			background-position: 130% 50%;
-			filter: brightness(1) saturate(1);
-		}
-
-		8% {
-			background-position: -130% 50%;
-			filter: brightness(1.28) saturate(1.2);
-		}
-
-		12%,
-		100% {
-			background-position: -130% 50%;
-			filter: brightness(1) saturate(1);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.theme-wizard-label {
-			animation: none;
-			background-position: 0 50%;
-		}
 	}
 </style>

@@ -1,28 +1,18 @@
-export type { AlertVariant } from './context.svelte.js';
-export type {
-	AlertRootProps,
-	AlertIconProps,
-	AlertTitleProps,
-	AlertDescriptionProps,
-	AlertCloseProps
-} from '@dryui/primitives';
+import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
+import Alert from './alert.svelte';
 
-import AlertRoot from './alert-root.svelte';
-import AlertIcon from './alert-icon.svelte';
-import AlertTitle from './alert-title.svelte';
-import AlertDescription from './alert-description.svelte';
-import AlertClose from './alert-button-close.svelte';
+export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
-export const Alert: {
-	Root: typeof AlertRoot;
-	Icon: typeof AlertIcon;
-	Title: typeof AlertTitle;
-	Description: typeof AlertDescription;
-	Close: typeof AlertClose;
-} = {
-	Root: AlertRoot,
-	Icon: AlertIcon,
-	Title: AlertTitle,
-	Description: AlertDescription,
-	Close: AlertClose
-};
+export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+	variant?: AlertVariant;
+	dismissible?: boolean;
+	onDismiss?: () => void;
+	icon?: Snippet;
+	title?: Snippet;
+	description?: Snippet;
+	children?: Snippet;
+}
+
+export { Alert };
+export default Alert;

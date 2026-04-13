@@ -104,6 +104,11 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 		category: 'visual',
 		tags: ['beam', 'light', 'streak', 'shimmer', 'effect']
 	},
+	Shimmer: {
+		description: 'Warm highlight sweep that travels across wrapped text and inline icons together',
+		category: 'visual',
+		tags: ['shimmer', 'shine', 'highlight', 'text', 'icon', 'animation', 'effect']
+	},
 	Breadcrumb: {
 		description: 'Navigation trail showing page hierarchy',
 		category: 'navigation',
@@ -754,11 +759,6 @@ const COMPONENT_META: Record<string, { description: string; category: string; ta
 			'Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions',
 		category: 'input',
 		tags: ['input', 'field', 'affix', 'addon', 'control']
-	},
-	OptionSwatchGroup: {
-		description: 'Selectable swatch tiles for choosing color, size, or other visual options',
-		category: 'input',
-		tags: ['swatch', 'selection', 'options', 'tiles', 'product']
 	},
 	OptionPicker: {
 		description:
@@ -1557,7 +1557,7 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	Rating: '<Rating bind:value={score} />',
 	Badge: '<Badge variant="soft">Active</Badge>',
 	Alert:
-		'<Alert.Root variant="info"><Alert.Description>Your changes have been saved.</Alert.Description></Alert.Root>',
+		'<Alert variant="info">\n  {#snippet description()}Your changes have been saved.{/snippet}\n</Alert>',
 	Progress: '<Progress value={65} max={100} />',
 	Spinner: '<Spinner size="md" />',
 	Skeleton: '<Skeleton width="200px" height="1rem" />',

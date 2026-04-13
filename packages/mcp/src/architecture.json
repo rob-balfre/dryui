@@ -1,22 +1,22 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "0.4.0",
+  "packageVersion": "0.5.1",
   "summary": {
     "componentNodes": 289,
-    "partNodes": 663,
+    "partNodes": 654,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 145,
-    "uiComponents": 144,
-    "uiWrappers": 130,
-    "uiComposites": 14,
+    "primitiveComponents": 144,
+    "uiComponents": 145,
+    "uiWrappers": 129,
+    "uiComposites": 16,
     "rootBarrelComponents": 288,
     "subpathOnlyComponents": 1,
-    "compoundComponents": 135,
-    "wrapEdges": 130,
+    "compoundComponents": 133,
+    "wrapEdges": 129,
     "composeEdges": 10,
     "docsEdges": 0,
-    "relatedEdges": 305,
+    "relatedEdges": 302,
     "mismatches": 16,
     "primitivePartComponents": 0,
     "thinWrappers": 64
@@ -228,102 +228,6 @@
       "layer": "part",
       "category": "uncategorized",
       "description": "Suffix part for AffixGroup.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Alert",
-      "name": "Alert",
-      "label": "Alert",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "feedback",
-      "description": "Contextual feedback message with variant styling",
-      "visibility": "root+subpath",
-      "sourcePath": "packages/primitives/src/alert/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [
-        "message",
-        "notification",
-        "info",
-        "warning",
-        "error"
-      ],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Icon",
-        "Title",
-        "Description",
-        "Close"
-      ],
-      "sourceFileCount": 7,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "primitives:Alert.Close",
-      "name": "Alert.Close",
-      "label": "Close",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Close part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Alert.Description",
-      "name": "Alert.Description",
-      "label": "Description",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Description part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Alert.Icon",
-      "name": "Alert.Icon",
-      "label": "Icon",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Icon part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Alert.Root",
-      "name": "Alert.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Root part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Alert.Title",
-      "name": "Alert.Title",
-      "label": "Title",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Title part for Alert.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -8460,7 +8364,7 @@
       "label": "Alert",
       "kind": "component",
       "package": "ui",
-      "layer": "ui-wrapper",
+      "layer": "ui-composite",
       "category": "feedback",
       "description": "Contextual feedback message with variant styling",
       "visibility": "root+subpath",
@@ -8473,82 +8377,11 @@
         "warning",
         "error"
       ],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Icon",
-        "Title",
-        "Description",
-        "Close"
-      ],
-      "sourceFileCount": 7,
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
-    },
-    {
-      "id": "ui:Alert.Close",
-      "name": "Alert.Close",
-      "label": "Close",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Close part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Alert.Description",
-      "name": "Alert.Description",
-      "label": "Description",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Description part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Alert.Icon",
-      "name": "Alert.Icon",
-      "label": "Icon",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Icon part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Alert.Root",
-      "name": "Alert.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Root part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Alert.Title",
-      "name": "Alert.Title",
-      "label": "Title",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "feedback",
-      "description": "Title part for Alert.",
-      "tags": [],
-      "compound": false,
-      "parts": []
     },
     {
       "id": "ui:AlertDialog",
@@ -13651,97 +13484,112 @@
       "componentImportCount": 0
     },
     {
-      "id": "ui:OptionSwatchGroup",
-      "name": "OptionSwatchGroup",
-      "label": "OptionSwatchGroup",
+      "id": "ui:OptionPicker",
+      "name": "OptionPicker",
+      "label": "OptionPicker",
       "kind": "component",
       "package": "ui",
       "layer": "ui-composite",
       "category": "input",
-      "description": "Selectable swatch tiles for choosing color, size, or other visual options",
+      "description": "Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices",
       "visibility": "root+subpath",
-      "sourcePath": "packages/ui/src/option-swatch-group/index.ts",
+      "sourcePath": "packages/ui/src/option-picker/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
-        "swatch",
+        "picker",
         "selection",
         "options",
         "tiles",
-        "product"
+        "preset",
+        "preview"
       ],
       "compound": true,
       "parts": [
         "Root",
         "Item",
-        "Swatch",
+        "Preview",
         "Label",
+        "Description",
         "Meta"
       ],
-      "sourceFileCount": 7,
+      "sourceFileCount": 8,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
     {
-      "id": "ui:OptionSwatchGroup.Item",
-      "name": "OptionSwatchGroup.Item",
+      "id": "ui:OptionPicker.Description",
+      "name": "OptionPicker.Description",
+      "label": "Description",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "input",
+      "description": "Description part for OptionPicker.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:OptionPicker.Item",
+      "name": "OptionPicker.Item",
       "label": "Item",
       "kind": "part",
       "package": "ui",
       "layer": "part",
       "category": "input",
-      "description": "Item part for OptionSwatchGroup.",
+      "description": "Item part for OptionPicker.",
       "tags": [],
       "compound": false,
       "parts": []
     },
     {
-      "id": "ui:OptionSwatchGroup.Label",
-      "name": "OptionSwatchGroup.Label",
+      "id": "ui:OptionPicker.Label",
+      "name": "OptionPicker.Label",
       "label": "Label",
       "kind": "part",
       "package": "ui",
       "layer": "part",
       "category": "input",
-      "description": "Label part for OptionSwatchGroup.",
+      "description": "Label part for OptionPicker.",
       "tags": [],
       "compound": false,
       "parts": []
     },
     {
-      "id": "ui:OptionSwatchGroup.Meta",
-      "name": "OptionSwatchGroup.Meta",
+      "id": "ui:OptionPicker.Meta",
+      "name": "OptionPicker.Meta",
       "label": "Meta",
       "kind": "part",
       "package": "ui",
       "layer": "part",
       "category": "input",
-      "description": "Meta part for OptionSwatchGroup.",
+      "description": "Meta part for OptionPicker.",
       "tags": [],
       "compound": false,
       "parts": []
     },
     {
-      "id": "ui:OptionSwatchGroup.Root",
-      "name": "OptionSwatchGroup.Root",
+      "id": "ui:OptionPicker.Preview",
+      "name": "OptionPicker.Preview",
+      "label": "Preview",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "input",
+      "description": "Preview part for OptionPicker.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:OptionPicker.Root",
+      "name": "OptionPicker.Root",
       "label": "Root",
       "kind": "part",
       "package": "ui",
       "layer": "part",
       "category": "input",
-      "description": "Root part for OptionSwatchGroup.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:OptionSwatchGroup.Swatch",
-      "name": "OptionSwatchGroup.Swatch",
-      "label": "Swatch",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "input",
-      "description": "Swatch part for OptionSwatchGroup.",
+      "description": "Root part for OptionPicker.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -14660,6 +14508,33 @@
       "compound": false,
       "parts": [],
       "sourceFileCount": 3,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:Shimmer",
+      "name": "Shimmer",
+      "label": "Shimmer",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "visual",
+      "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/shimmer/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "shimmer",
+        "shine",
+        "highlight",
+        "text",
+        "icon",
+        "animation",
+        "effect"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -16627,41 +16502,6 @@
       "from": "primitives:AffixGroup",
       "to": "primitives:AffixGroup.Suffix",
       "label": "Suffix"
-    },
-    {
-      "id": "compound_part:primitives:Alert:primitives:Alert.Close:Close",
-      "type": "compound_part",
-      "from": "primitives:Alert",
-      "to": "primitives:Alert.Close",
-      "label": "Close"
-    },
-    {
-      "id": "compound_part:primitives:Alert:primitives:Alert.Description:Description",
-      "type": "compound_part",
-      "from": "primitives:Alert",
-      "to": "primitives:Alert.Description",
-      "label": "Description"
-    },
-    {
-      "id": "compound_part:primitives:Alert:primitives:Alert.Icon:Icon",
-      "type": "compound_part",
-      "from": "primitives:Alert",
-      "to": "primitives:Alert.Icon",
-      "label": "Icon"
-    },
-    {
-      "id": "compound_part:primitives:Alert:primitives:Alert.Root:Root",
-      "type": "compound_part",
-      "from": "primitives:Alert",
-      "to": "primitives:Alert.Root",
-      "label": "Root"
-    },
-    {
-      "id": "compound_part:primitives:Alert:primitives:Alert.Title:Title",
-      "type": "compound_part",
-      "from": "primitives:Alert",
-      "to": "primitives:Alert.Title",
-      "label": "Title"
     },
     {
       "id": "compound_part:primitives:AlertDialog:primitives:AlertDialog.Action:Action",
@@ -18967,41 +18807,6 @@
       "label": "Trigger"
     },
     {
-      "id": "compound_part:ui:Alert:ui:Alert.Close:Close",
-      "type": "compound_part",
-      "from": "ui:Alert",
-      "to": "ui:Alert.Close",
-      "label": "Close"
-    },
-    {
-      "id": "compound_part:ui:Alert:ui:Alert.Description:Description",
-      "type": "compound_part",
-      "from": "ui:Alert",
-      "to": "ui:Alert.Description",
-      "label": "Description"
-    },
-    {
-      "id": "compound_part:ui:Alert:ui:Alert.Icon:Icon",
-      "type": "compound_part",
-      "from": "ui:Alert",
-      "to": "ui:Alert.Icon",
-      "label": "Icon"
-    },
-    {
-      "id": "compound_part:ui:Alert:ui:Alert.Root:Root",
-      "type": "compound_part",
-      "from": "ui:Alert",
-      "to": "ui:Alert.Root",
-      "label": "Root"
-    },
-    {
-      "id": "compound_part:ui:Alert:ui:Alert.Title:Title",
-      "type": "compound_part",
-      "from": "ui:Alert",
-      "to": "ui:Alert.Title",
-      "label": "Title"
-    },
-    {
       "id": "compound_part:ui:AlertDialog:ui:AlertDialog.Action:Action",
       "type": "compound_part",
       "from": "ui:AlertDialog",
@@ -20465,39 +20270,46 @@
       "label": "Trigger"
     },
     {
-      "id": "compound_part:ui:OptionSwatchGroup:ui:OptionSwatchGroup.Item:Item",
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Description:Description",
       "type": "compound_part",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:OptionSwatchGroup.Item",
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Description",
+      "label": "Description"
+    },
+    {
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Item:Item",
+      "type": "compound_part",
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Item",
       "label": "Item"
     },
     {
-      "id": "compound_part:ui:OptionSwatchGroup:ui:OptionSwatchGroup.Label:Label",
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Label:Label",
       "type": "compound_part",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:OptionSwatchGroup.Label",
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Label",
       "label": "Label"
     },
     {
-      "id": "compound_part:ui:OptionSwatchGroup:ui:OptionSwatchGroup.Meta:Meta",
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Meta:Meta",
       "type": "compound_part",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:OptionSwatchGroup.Meta",
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Meta",
       "label": "Meta"
     },
     {
-      "id": "compound_part:ui:OptionSwatchGroup:ui:OptionSwatchGroup.Root:Root",
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Preview:Preview",
       "type": "compound_part",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:OptionSwatchGroup.Root",
-      "label": "Root"
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Preview",
+      "label": "Preview"
     },
     {
-      "id": "compound_part:ui:OptionSwatchGroup:ui:OptionSwatchGroup.Swatch:Swatch",
+      "id": "compound_part:ui:OptionPicker:ui:OptionPicker.Root:Root",
       "type": "compound_part",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:OptionSwatchGroup.Swatch",
-      "label": "Swatch"
+      "from": "ui:OptionPicker",
+      "to": "ui:OptionPicker.Root",
+      "label": "Root"
     },
     {
       "id": "compound_part:ui:Pagination:ui:Pagination.Content:Content",
@@ -22530,27 +22342,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:OptionSwatchGroup:ui:Field:combines_with",
-      "type": "related",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:Field",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:OptionSwatchGroup:ui:Label:combines_with",
-      "type": "related",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:OptionSwatchGroup:ui:Text:combines_with",
-      "type": "related",
-      "from": "ui:OptionSwatchGroup",
-      "to": "ui:Text",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Pagination:ui:Container:combines_with",
       "type": "related",
       "from": "ui:Pagination",
@@ -23345,12 +23136,6 @@
       "type": "wraps",
       "from": "ui:Adjust",
       "to": "primitives:Adjust"
-    },
-    {
-      "id": "wraps:ui:Alert:primitives:Alert:",
-      "type": "wraps",
-      "from": "ui:Alert",
-      "to": "primitives:Alert"
     },
     {
       "id": "wraps:ui:AlertDialog:primitives:AlertDialog:",
@@ -24324,7 +24109,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 14\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 129\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

@@ -1100,10 +1100,10 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 1,
 				component: 'Alert',
 				useWhen: 'Inline alert message within page content',
-				snippet: `<Alert.Root variant="warning">
-  <Alert.Title>Warning</Alert.Title>
-  <Alert.Description>Your session will expire in 5 minutes.</Alert.Description>
-</Alert.Root>`
+				snippet: `<Alert variant="warning">
+  {#snippet title()}Warning{/snippet}
+  {#snippet description()}Your session will expire in 5 minutes.{/snippet}
+</Alert>`
 			},
 			{
 				rank: 2,
@@ -1867,10 +1867,10 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 2,
 				component: 'Alert',
 				useWhen: 'Persistent inline message in page content',
-				snippet: `<Alert.Root variant="success">
-  <Alert.Title>Saved</Alert.Title>
-  <Alert.Description>Your changes have been saved.</Alert.Description>
-</Alert.Root>`
+				snippet: `<Alert variant="success">
+  {#snippet title()}Saved{/snippet}
+  {#snippet description()}Your changes have been saved.{/snippet}
+</Alert>`
 			}
 		],
 		antiPatterns: [
@@ -4476,40 +4476,6 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		combinesWith: ['Field.Root', 'Label', 'Button', 'Select']
-	},
-
-	{
-		component: 'OptionSwatchGroup',
-		useWhen: 'Let users pick a visual option like a color, finish, or material from swatch tiles.',
-		alternatives: [
-			{
-				rank: 1,
-				component: 'OptionSwatchGroup',
-				useWhen: 'Product options or visual selections benefit from swatches or color chips',
-				snippet: `<OptionSwatchGroup.Root bind:value={color}>
-  <OptionSwatchGroup.Item value="sage">
-    <OptionSwatchGroup.Swatch color="#7da174" />
-    <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>
-  </OptionSwatchGroup.Item>
-</OptionSwatchGroup.Root>`
-			},
-			{
-				rank: 2,
-				component: 'SelectableTileGroup',
-				useWhen: 'The choice needs larger tiles or mixed text content',
-				snippet: `<SelectableTileGroup.Root bind:value={finish}>
-  <SelectableTileGroup.Item value="matte">Matte</SelectableTileGroup.Item>
-</SelectableTileGroup.Root>`
-			}
-		],
-		antiPatterns: [
-			{
-				pattern: 'using swatches without labels',
-				reason: 'Color-only choices are ambiguous and inaccessible',
-				fix: 'Always include a text label or meta text'
-			}
-		],
-		combinesWith: ['Field.Root', 'Label', 'Text']
 	}
 ];
 
@@ -5706,31 +5672,6 @@ export const compositionRecipes: CompositionRecipe[] = [
       <SelectableTileGroup.Description>Best for most teams</SelectableTileGroup.Description>
     </SelectableTileGroup.Item>
   </SelectableTileGroup.Root>
-</Field.Root>`
-	},
-
-	{
-		name: 'option-swatch-picker',
-		description:
-			'Visual swatch picker for color, finish, or material selection with labels and metadata.',
-		tags: ['swatch', 'picker', 'color', 'material', 'selection'],
-		components: ['OptionSwatchGroup', 'Field', 'Label', 'Text'],
-		snippet: `<script>
-  import { OptionSwatchGroup, Field, Label, Text } from '@dryui/ui';
-
-  let color = $state('sage');
-</script>
-
-<Field.Root>
-  <Label>Color</Label>
-  <OptionSwatchGroup.Root bind:value={color}>
-    <OptionSwatchGroup.Item value="sage">
-      <OptionSwatchGroup.Swatch color="#7da174" />
-      <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>
-      <OptionSwatchGroup.Meta>Soft matte finish</OptionSwatchGroup.Meta>
-    </OptionSwatchGroup.Item>
-  </OptionSwatchGroup.Root>
-  <Text size="sm" color="secondary">Choose the finish that matches the product photo.</Text>
 </Field.Root>`
 	},
 

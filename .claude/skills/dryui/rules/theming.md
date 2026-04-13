@@ -271,7 +271,7 @@ Ensure sufficient contrast between text and background.
 Run the CLI diagnose command to catch theme issues:
 
 ```bash
-bunx @dryui/cli diagnose src/styles/global.css
+dryui diagnose src/styles/global.css
 ```
 
 Common diagnostic codes:

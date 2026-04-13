@@ -7,7 +7,6 @@
 		Container,
 		MegaMenu,
 		OptionPicker,
-		OptionSwatchGroup,
 		Slider,
 		Text,
 		VisuallyHidden
@@ -50,6 +49,7 @@
 	import { isDarkTheme } from '$lib/theme.svelte.js';
 	import PreviewComponents from '$lib/theme-wizard/PreviewComponents.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
+	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
@@ -353,22 +353,26 @@
 							</MegaMenu.Column>
 							<MegaMenu.Column title="Presets">
 								<div class="wizard-option-scope wizard-color-options">
-									<OptionSwatchGroup.Root
+									<OptionPicker.Root
 										columns={2}
 										bind:value={getSelectedBrandPresetName, applyBrandPresetName}
 									>
 										{#each PRESETS as preset (preset.name)}
-											<OptionSwatchGroup.Item
+											<OptionPicker.Item
 												value={preset.name}
 												size="compact"
+												layout="stacked"
 												title={preset.name}
 												aria-label={preset.name}
 											>
-												<OptionSwatchGroup.Swatch color={brandHsbToHex(preset.brandInput)} />
+												<OptionPicker.Preview
+													shape="circle"
+													color={brandHsbToHex(preset.brandInput)}
+												/>
 												<VisuallyHidden>{preset.name}</VisuallyHidden>
-											</OptionSwatchGroup.Item>
+											</OptionPicker.Item>
 										{/each}
-									</OptionSwatchGroup.Root>
+									</OptionPicker.Root>
 								</div>
 							</MegaMenu.Column>
 						</MegaMenu.Panel>
@@ -545,6 +549,9 @@
 			</div>
 
 			<div class="bar-actions">
+				<div class="wizard-toggle-scope">
+					<ThemeToggle />
+				</div>
 				<div class="wizard-action-scope">
 					<Button
 						variant="secondary"
@@ -662,6 +669,13 @@
 		--dry-btn-on-accent: var(--wizard-accent-fg);
 	}
 
+	.wizard-toggle-scope {
+		display: grid;
+		--dry-toggle-selected-bg: var(--wizard-accent-bg);
+		--dry-toggle-selected-stroke: var(--wizard-accent-border);
+		--dry-color-text-brand: var(--wizard-accent-fg);
+	}
+
 	.wizard-option-scope {
 		display: grid;
 		--dry-color-fill: var(--wizard-accent-weak);
@@ -681,21 +695,6 @@
 			var(--dry-color-bg-raised) 84%
 		);
 		--dry-option-picker-selected-border: color-mix(
-			in srgb,
-			var(--wizard-accent-border) 84%,
-			var(--dry-color-stroke-weak) 16%
-		);
-		--dry-option-swatch-group-selected-bg: color-mix(
-			in srgb,
-			var(--wizard-accent-bg) 10%,
-			var(--dry-color-bg-raised) 90%
-		);
-		--dry-option-swatch-group-selected-bg-hover: color-mix(
-			in srgb,
-			var(--wizard-accent-bg) 14%,
-			var(--dry-color-bg-raised) 86%
-		);
-		--dry-option-swatch-group-selected-border: color-mix(
 			in srgb,
 			var(--wizard-accent-border) 84%,
 			var(--dry-color-stroke-weak) 16%
@@ -755,13 +754,13 @@
 	/* ─── Color presets grid ──────────────────────────────────────────────── */
 
 	.wizard-color-options {
-		--dry-option-swatch-group-gap: var(--dry-space-1_5, var(--dry-space-2));
-		--dry-option-swatch-group-padding-x: var(--dry-space-0_5);
-		--dry-option-swatch-group-padding-y: var(--dry-space-0_5);
-		--dry-option-swatch-group-compact-padding: var(--dry-space-0_5);
-		--dry-option-swatch-group-min-block-size: 0;
-		--dry-option-swatch-group-radius: var(--dry-radius-full, 9999px);
-		--dry-option-swatch-group-swatch-size: 1.75rem;
+		--dry-option-picker-gap: var(--dry-space-1_5, var(--dry-space-2));
+		--dry-option-picker-padding-x: var(--dry-space-0_5);
+		--dry-option-picker-padding-y: var(--dry-space-0_5);
+		--dry-option-picker-min-block-size: 0;
+		--dry-option-picker-radius: var(--dry-radius-full, 9999px);
+		--dry-option-picker-preview-size: 1.75rem;
+		--dry-option-picker-preview-radius: 9999px;
 	}
 
 	.contrast-result {

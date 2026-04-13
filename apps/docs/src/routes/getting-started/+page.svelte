@@ -134,14 +134,14 @@
 				<CodeBlock language="svelte" code={themeImportsCode} />
 				<CodeBlock language="html" code={appHtmlCode} />
 
-				<Alert.Root variant="info">
-					<Alert.Title>Why theme-auto?</Alert.Title>
-					<Alert.Description>
+				<Alert variant="info">
+					{#snippet title()}Why theme-auto?{/snippet}
+					{#snippet description()}
 						<code>theme-auto</code> follows the user's OS preference via
 						<code>prefers-color-scheme</code>. Override with <code>data-theme="light"</code> or
 						<code>data-theme="dark"</code> when the user explicitly picks a mode.
-					</Alert.Description>
-				</Alert.Root>
+					{/snippet}
+				</Alert>
 			</div>
 		</section>
 
@@ -175,15 +175,15 @@
 					and validation in sync.
 				</Text>
 
-				<Alert.Root variant="info">
-					<Alert.Title>Start with lookup, not memory</Alert.Title>
-					<Alert.Description>
+				<Alert variant="info">
+					{#snippet title()}Start with lookup, not memory{/snippet}
+					{#snippet description()}
 						Use the <Link href={withBase('/tools')} underline="always">Tools</Link> page for command details
 						and the
 						<Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the
 						route-level workflow and state-heavy planner pattern.
-					</Alert.Description>
-				</Alert.Root>
+					{/snippet}
+				</Alert>
 			</div>
 		</section>
 
@@ -201,13 +201,13 @@
 				<Text size="sm" color="muted">Add to <code>.mcp.json</code> in your project root:</Text>
 				<CodeBlock language="json" code={mcpJsonCode} />
 
-				<Alert.Root variant="info">
-					<Alert.Title>Editor-specific setup</Alert.Title>
-					<Alert.Description>
+				<Alert variant="info">
+					{#snippet title()}Editor-specific setup{/snippet}
+					{#snippet description()}
 						See the <Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI commands,
 						MCP setup, and editor-specific configs.
-					</Alert.Description>
-				</Alert.Root>
+					{/snippet}
+				</Alert>
 			</div>
 		</section>
 

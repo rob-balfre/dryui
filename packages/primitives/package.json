@@ -36,11 +36,6 @@
       "svelte": "./src/affix-group/index.ts",
       "default": "./src/affix-group/index.ts"
     },
-    "./alert": {
-      "types": "./src/alert/index.ts",
-      "svelte": "./src/alert/index.ts",
-      "default": "./src/alert/index.ts"
-    },
     "./alert-dialog": {
       "types": "./src/alert-dialog/index.ts",
       "svelte": "./src/alert-dialog/index.ts",
@@ -751,6 +746,24 @@
       "default": "./dist/internal/motion.js"
     }
   },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "svelte-package -i src",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "prepack": "bun ../../scripts/prepack-exports.ts",
+    "postpack": "bun ../../scripts/postpack-exports.ts"
+  },
+  "peerDependencies": {
+    "svelte": "^5.55.1"
+  },
+  "devDependencies": {
+    "svelte": "^5.55.3",
+    "@sveltejs/package": "^2.5.7",
+    "svelte-check": "^4.4.6",
+    "typescript": "^6.0.2"
+  },
   "publishConfig": {
     "access": "public",
     "svelte": "./dist/index.js",
@@ -775,11 +788,6 @@
         "types": "./dist/affix-group/index.d.ts",
         "svelte": "./dist/affix-group/index.js",
         "default": "./dist/affix-group/index.js"
-      },
-      "./alert": {
-        "types": "./dist/alert/index.d.ts",
-        "svelte": "./dist/alert/index.js",
-        "default": "./dist/alert/index.js"
       },
       "./alert-dialog": {
         "types": "./dist/alert-dialog/index.d.ts",
@@ -1491,23 +1499,5 @@
         "default": "./dist/internal/motion.js"
       }
     }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "svelte-package -i src",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
-    "prepack": "bun ../../scripts/prepack-exports.ts",
-    "postpack": "bun ../../scripts/postpack-exports.ts"
-  },
-  "peerDependencies": {
-    "svelte": "^5.55.1"
-  },
-  "devDependencies": {
-    "svelte": "^5.55.3",
-    "@sveltejs/package": "^2.5.7",
-    "svelte-check": "^4.4.6",
-    "typescript": "^6.0.2"
   }
 }
