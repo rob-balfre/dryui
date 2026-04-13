@@ -5,7 +5,13 @@ import type { Spec } from './types.js';
 import { buildAddSnippet, formatAddPlan } from './project-planner.js';
 import { planAdd } from '@dryui/mcp/project-planner';
 import { toonAddPlan } from '@dryui/mcp/toon';
-import { resolveOutputMode, runCommand, type CommandResult, type OutputMode } from '../run.js';
+import {
+	renderCommandResultByMode,
+	resolveOutputMode,
+	runCommand,
+	type CommandResult,
+	type OutputMode
+} from '../run.js';
 
 interface AddOptions {
 	subpath?: boolean;
@@ -67,14 +73,11 @@ export function getAdd(
 			};
 			const plan = planAdd(spec, query, planOptions);
 
-			switch (mode) {
-				case 'toon':
-					return { output: toonAddPlan(plan), error: null, exitCode: 0 };
-				case 'json':
-					return { output: JSON.stringify(plan, null, 2), error: null, exitCode: 0 };
-				default:
-					return { output: formatAddPlan(plan), error: null, exitCode: 0 };
-			}
+			return renderCommandResultByMode(mode, plan, {
+				toon: (value) => toonAddPlan(value),
+				json: (value) => JSON.stringify(value, null, 2),
+				text: (value) => formatAddPlan(value)
+			});
 		} catch (error) {
 			return {
 				output: '',

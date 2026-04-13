@@ -3,7 +3,12 @@
 import type { Spec } from './types.js';
 import { pad } from '../format.js';
 import { toonComponentList } from '@dryui/mcp/toon';
-import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
+import {
+	renderCommandResultByMode,
+	resolveOutputMode,
+	runCommand,
+	type OutputMode
+} from '../run.js';
 
 interface ListOptions {
 	category?: string | null;
@@ -52,30 +57,25 @@ export function getList(
 	spec: Spec,
 	mode: OutputMode
 ): { output: string; error: string | null; exitCode: number } {
-	switch (mode) {
-		case 'toon':
-			return {
-				output: toonComponentList(spec.components, category ?? undefined),
-				error: null,
-				exitCode: 0
-			};
-		case 'text':
-		default: {
+	const validCategories = getCategories(spec);
+
+	if (category && !validCategories.includes(category)) {
+		const error = [
+			`Unknown category: "${category}"`,
+			'',
+			'Valid categories:',
+			`  ${validCategories.join(', ')}`
+		].join('\n');
+		return { output: '', error, exitCode: 1 };
+	}
+
+	const groups = groupByCategory(spec);
+	const categoriesToShow = category ? [category] : [...groups.keys()].sort();
+
+	return renderCommandResultByMode(mode, spec.components, {
+		toon: () => toonComponentList(spec.components, category ?? undefined),
+		text: () => {
 			const sections: string[] = [];
-			const validCategories = getCategories(spec);
-
-			if (category && !validCategories.includes(category)) {
-				const error = [
-					`Unknown category: "${category}"`,
-					'',
-					'Valid categories:',
-					`  ${validCategories.join(', ')}`
-				].join('\n');
-				return { output: '', error, exitCode: 1 };
-			}
-
-			const groups = groupByCategory(spec);
-			const categoriesToShow = category ? [category] : [...groups.keys()].sort();
 
 			for (const cat of categoriesToShow) {
 				const entries = groups.get(cat);
@@ -93,9 +93,9 @@ export function getList(
 				sections.push(lines.join('\n'));
 			}
 
-			return { output: sections.join('\n\n'), error: null, exitCode: 0 };
+			return sections.join('\n\n');
 		}
-	}
+	});
 }
 
 export function runList(args: string[], spec: Spec): void {

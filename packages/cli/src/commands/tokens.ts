@@ -3,7 +3,12 @@
 import { extractTokens, getTokenCategories } from '@dryui/mcp/tokens';
 import { toonTokens } from '@dryui/mcp/toon';
 import { pad } from '../format.js';
-import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
+import {
+	renderCommandResultByMode,
+	resolveOutputMode,
+	runCommand,
+	type OutputMode
+} from '../run.js';
 
 /**
  * Get the tokens output, optionally filtered by category.
@@ -15,37 +20,32 @@ export function getTokens(
 ): { output: string; error: string | null; exitCode: number } {
 	const result = extractTokens(category ?? undefined);
 
-	switch (mode) {
-		case 'toon':
-			return {
-				output: toonTokens(result, category ?? undefined),
-				error: null,
-				exitCode: 0
-			};
-		case 'text':
-		default: {
-			if (result.tokens.length === 0 && category) {
-				const available = getTokenCategories();
-				const error = [
-					`Unknown category: "${category}"`,
-					'',
-					'Valid categories:',
-					`  ${available.join(', ')}`
-				].join('\n');
-				return { output: '', error, exitCode: 1 };
-			}
+	if (result.tokens.length === 0 && category) {
+		const available = getTokenCategories();
+		const error = [
+			`Unknown category: "${category}"`,
+			'',
+			'Valid categories:',
+			`  ${available.join(', ')}`
+		].join('\n');
+		return { output: '', error, exitCode: 1 };
+	}
 
+	const grouped = new Map<string, typeof result.tokens>();
+	for (const token of result.tokens) {
+		if (!grouped.has(token.category)) {
+			grouped.set(token.category, []);
+		}
+		grouped.get(token.category)!.push(token);
+	}
+
+	const sortedCategories = [...grouped.keys()].sort();
+	return renderCommandResultByMode(mode, result, {
+		toon: (value) => toonTokens(value, category ?? undefined),
+		text: () => {
 			// Plain text output grouped by category
 			const sections: string[] = [];
-			const grouped = new Map<string, typeof result.tokens>();
-			for (const token of result.tokens) {
-				if (!grouped.has(token.category)) {
-					grouped.set(token.category, []);
-				}
-				grouped.get(token.category)!.push(token);
-			}
 
-			const sortedCategories = [...grouped.keys()].sort();
 			for (const cat of sortedCategories) {
 				const tokens = grouped.get(cat);
 				if (!tokens || tokens.length === 0) continue;
@@ -64,9 +64,9 @@ export function getTokens(
 			}
 
 			const summary = `${result.total} tokens across ${sortedCategories.length} categories`;
-			return { output: summary + '\n\n' + sections.join('\n\n'), error: null, exitCode: 0 };
+			return summary + '\n\n' + sections.join('\n\n');
 		}
-	}
+	});
 }
 
 export function runTokens(args: string[]): void {

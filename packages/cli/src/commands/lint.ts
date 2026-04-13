@@ -5,7 +5,12 @@ import type { Spec } from './types.js';
 import { formatWorkspaceReport } from '../format.js';
 import { toonWorkspaceReport } from '@dryui/mcp/toon';
 import { parseWorkspaceArgs } from './workspace-args.js';
-import { runCommand, type CommandResult, type OutputMode } from '../run.js';
+import {
+	renderCommandResultByMode,
+	runCommand,
+	type CommandResult,
+	type OutputMode
+} from '../run.js';
 
 export function getLint(
 	inputPath: string | undefined,
@@ -29,31 +34,22 @@ export function getLint(
 		});
 
 		const exitCode = report.findings.length > 0 ? 1 : 0;
-
-		switch (mode) {
-			case 'toon':
-				return {
-					output: toonWorkspaceReport(report, {
+		return renderCommandResultByMode(
+			mode,
+			report,
+			{
+				toon: (value) =>
+					toonWorkspaceReport(value, {
 						title: 'lint',
 						command: 'lint',
 						full: options.full
 					}),
-					error: null,
-					exitCode
-				};
-			case 'json':
-				return {
-					output: JSON.stringify(report, null, 2),
-					error: null,
-					exitCode
-				};
-			default:
-				return {
-					output: formatWorkspaceReport(report, { title: 'DryUI lint', summaryLabel: 'Issues' }),
-					error: null,
-					exitCode
-				};
-		}
+				json: (value) => JSON.stringify(value, null, 2),
+				text: (value) =>
+					formatWorkspaceReport(value, { title: 'DryUI lint', summaryLabel: 'Issues' })
+			},
+			exitCode
+		);
 	} catch (error) {
 		return {
 			output: '',
