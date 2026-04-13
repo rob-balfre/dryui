@@ -1,21 +1,15 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync } from 'svelte';
 import { resetToDefaults, wizardState } from '../../packages/theme-wizard/src/index.js';
 import ThemeWizardControlsHarness from './fixtures/theme-wizard-controls-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
+import { render } from './_harness';
 
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
 	resetToDefaults();
 	sessionStorage.clear();
 	localStorage.clear();
 	document.documentElement.classList.remove('theme-auto');
 	document.documentElement.removeAttribute('data-theme');
-	document.body.replaceChildren();
 });
 
 function normalizeText(value: string | null | undefined) {
@@ -23,14 +17,7 @@ function normalizeText(value: string | null | undefined) {
 }
 
 function renderPage() {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(ThemeWizardControlsHarness, { target });
-	mountedComponents.push(component);
-	flushSync();
-
-	return target;
+	return render(ThemeWizardControlsHarness).target;
 }
 
 function getButtonByText(scope: ParentNode, label: string, selector = 'button') {

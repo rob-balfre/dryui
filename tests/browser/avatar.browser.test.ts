@@ -1,28 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
 import Avatar from '../../packages/primitives/src/avatar/avatar.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderAvatar(props: { fallback?: string; alt?: string }) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(Avatar, {
-		target,
-		props
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	const { target } = render(Avatar, props);
 
 	const root = target.querySelector('[role="img"]');
 	if (!root) {

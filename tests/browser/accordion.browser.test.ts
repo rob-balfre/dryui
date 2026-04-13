@@ -1,27 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import AccordionHarness from './fixtures/accordion-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderAccordionHarness() {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(AccordionHarness, {
-		target
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	render(AccordionHarness);
 }
 
 function getAccordionParts(value: string) {

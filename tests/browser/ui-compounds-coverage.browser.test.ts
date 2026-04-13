@@ -1,48 +1,32 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import UiCompoundsCoverageHarness from './fixtures/ui-compounds-coverage-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderHarness() {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(UiCompoundsCoverageHarness, {
-		target
-	});
-
-	mountedComponents.push(component);
-	flushSync();
-	return target;
+	return render(UiCompoundsCoverageHarness).target;
 }
 
 describe('ui compounds coverage harness', () => {
-	it('dismisses alerts and marks direct title and description children', () => {
+	it('renders alert parts and dismisses on close click', () => {
 		renderHarness();
 
 		const alert = document.querySelector<HTMLElement>('[data-testid="alert-root"]');
-		const title = document.querySelector<HTMLElement>('[data-testid="alert-title"]');
-		const description = document.querySelector<HTMLElement>('[data-testid="alert-description"]');
-		const close = document.querySelector<HTMLButtonElement>('[data-testid="alert-close"]');
+		const title = alert?.querySelector<HTMLElement>('[data-alert-title]');
+		const description = alert?.querySelector<HTMLElement>('[data-alert-description]');
+		const icon = alert?.querySelector<HTMLElement>('[data-alert-icon]');
+		const close = alert?.querySelector<HTMLButtonElement>('[data-alert-close] button');
 		const dismissals = document.querySelector<HTMLElement>('[data-testid="alert-dismissals"]');
 
-		if (!alert || !title || !description || !close || !dismissals) {
+		if (!alert || !title || !description || !icon || !close || !dismissals) {
 			throw new Error('Expected alert harness elements');
 		}
 
 		expect(alert.getAttribute('data-variant')).toBe('warning');
 		expect(alert.getAttribute('data-dismissible')).toBe('true');
-		expect(title.hasAttribute('data-alert-direct-child')).toBe(true);
-		expect(description.hasAttribute('data-alert-direct-child')).toBe(true);
+		expect(title.textContent).toContain('Scheduled maintenance');
+		expect(description.textContent).toContain('deploy window');
+		expect(icon.textContent).toContain('!');
 
 		close.click();
 		flushSync();

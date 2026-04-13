@@ -1,29 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
 import InputGroupHarness from './fixtures/input-group-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { createBodyTarget, render } from './_harness';
 
 describe('input group', () => {
 	it('expands the input track to fill the available grid space', () => {
-		const target = document.createElement('div');
+		const target = createBodyTarget();
 		target.style.width = '40rem';
-		document.body.append(target);
 
-		const component = mount(InputGroupHarness, {
-			target
-		});
-
-		mountedComponents.push(component);
-		flushSync();
+		render(InputGroupHarness, {}, { target });
 
 		const root = target.querySelector<HTMLElement>('[data-input-group-root]');
 		const inputWrap = target.querySelector<HTMLElement>('[data-input-group-inputWrap]');

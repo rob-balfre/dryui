@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync } from 'svelte';
 import MotionSurfacesHarness from './fixtures/motion-surfaces-harness.svelte';
+import { render } from './_harness';
 
-const mountedComponents: ReturnType<typeof mount>[] = [];
 const intersectionCallbacks: Array<(entries: Array<{ isIntersecting: boolean }>) => void> = [];
 
 const originalIntersectionObserver = globalThis.IntersectionObserver;
@@ -41,12 +41,6 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-
 	if (originalIntersectionObserver) {
 		globalThis.IntersectionObserver = originalIntersectionObserver;
 	} else {
@@ -65,23 +59,13 @@ function setReducedMotion(value: boolean) {
 	}
 }
 
-function render(kind: 'reveal' | 'spotlight' | 'aurora' | 'noise' | 'marquee') {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(MotionSurfacesHarness, {
-		target,
-		props: { kind }
-	});
-
-	mountedComponents.push(component);
-	flushSync();
-	return target;
+function renderSurface(kind: 'reveal' | 'spotlight' | 'aurora' | 'noise' | 'marquee') {
+	return render(MotionSurfacesHarness, { kind }).target;
 }
 
 describe('motion surfaces', () => {
 	it('toggles reveal visibility from intersection state', () => {
-		const target = render('reveal');
+		const target = renderSurface('reveal');
 		const surface = target.querySelector('[data-testid="reveal"]');
 
 		if (!(surface instanceof HTMLDivElement)) {
@@ -100,7 +84,7 @@ describe('motion surfaces', () => {
 	});
 
 	it('updates spotlight coordinates from pointer movement', async () => {
-		const target = render('spotlight');
+		const target = renderSurface('spotlight');
 		const surface = target.querySelector('[data-testid="spotlight"]');
 
 		if (!(surface instanceof HTMLDivElement)) {
@@ -124,7 +108,7 @@ describe('motion surfaces', () => {
 	});
 
 	it('renders aurora with custom palette vars and noise with animation hooks', () => {
-		const auroraTarget = render('aurora');
+		const auroraTarget = renderSurface('aurora');
 		const aurora = auroraTarget.querySelector('[data-testid="aurora"]');
 
 		if (!(aurora instanceof HTMLDivElement)) {
@@ -133,7 +117,7 @@ describe('motion surfaces', () => {
 
 		expect(aurora.getAttribute('style') ?? '').toContain('--dry-aurora-color-1: #020617');
 
-		const noiseTarget = render('noise');
+		const noiseTarget = renderSurface('noise');
 		const noise = noiseTarget.querySelector('[data-testid="noise"]');
 
 		if (!(noise instanceof HTMLDivElement)) {
@@ -146,7 +130,7 @@ describe('motion surfaces', () => {
 	describe('reduced motion', () => {
 		it('reveal sets data-reduced-motion and becomes visible', () => {
 			matchMediaMatches = true;
-			const target = render('reveal');
+			const target = renderSurface('reveal');
 			const surface = target.querySelector('[data-testid="reveal"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -159,7 +143,7 @@ describe('motion surfaces', () => {
 
 		it('aurora sets data-reduced-motion and disables animation', () => {
 			matchMediaMatches = true;
-			const target = render('aurora');
+			const target = renderSurface('aurora');
 			const aurora = target.querySelector('[data-testid="aurora"]');
 
 			if (!(aurora instanceof HTMLDivElement)) {
@@ -172,7 +156,7 @@ describe('motion surfaces', () => {
 
 		it('noise sets data-reduced-motion and disables animation', () => {
 			matchMediaMatches = true;
-			const target = render('noise');
+			const target = renderSurface('noise');
 			const noise = target.querySelector('[data-testid="noise"]');
 
 			if (!(noise instanceof HTMLDivElement)) {
@@ -185,7 +169,7 @@ describe('motion surfaces', () => {
 
 		it('spotlight sets data-reduced-motion attributes when reduced-motion is active', () => {
 			matchMediaMatches = true;
-			const target = render('spotlight');
+			const target = renderSurface('spotlight');
 			const surface = target.querySelector('[data-testid="spotlight"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -199,7 +183,7 @@ describe('motion surfaces', () => {
 
 		it('marquee sets data-reduced-motion when active', () => {
 			matchMediaMatches = true;
-			const target = render('marquee');
+			const target = renderSurface('marquee');
 			const marquee = target.querySelector('[data-testid="marquee"]');
 
 			if (!(marquee instanceof HTMLDivElement)) {
@@ -212,7 +196,7 @@ describe('motion surfaces', () => {
 
 	describe('marquee', () => {
 		it('renders duplicated content', () => {
-			const target = render('marquee');
+			const target = renderSurface('marquee');
 			const marquee = target.querySelector('[data-testid="marquee"]');
 
 			if (!(marquee instanceof HTMLDivElement)) {
@@ -224,7 +208,7 @@ describe('motion surfaces', () => {
 		});
 
 		it('computes duration from content size and speed', () => {
-			const target = render('marquee');
+			const target = renderSurface('marquee');
 			const marquee = target.querySelector('[data-testid="marquee"]');
 
 			if (!(marquee instanceof HTMLDivElement)) {
@@ -237,7 +221,7 @@ describe('motion surfaces', () => {
 		});
 
 		it('supports pause-on-hover via data attribute', () => {
-			const target = render('marquee');
+			const target = renderSurface('marquee');
 			const marquee = target.querySelector('[data-testid="marquee"]');
 
 			if (!(marquee instanceof HTMLDivElement)) {
@@ -252,7 +236,7 @@ describe('motion surfaces', () => {
 		it('once=true keeps element visible after intersection triggers', () => {
 			// The harness uses once=false, but let's test the existing behavior:
 			// When once=false, element becomes invisible again after leaving viewport
-			const target = render('reveal');
+			const target = renderSurface('reveal');
 			const surface = target.querySelector('[data-testid="reveal"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -270,7 +254,7 @@ describe('motion surfaces', () => {
 		});
 
 		it('sets data-variant attribute', () => {
-			const target = render('reveal');
+			const target = renderSurface('reveal');
 			const surface = target.querySelector('[data-testid="reveal"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -283,7 +267,7 @@ describe('motion surfaces', () => {
 
 	describe('spotlight interactions', () => {
 		it('activates on focusin and deactivates on focusout', () => {
-			const target = render('spotlight');
+			const target = renderSurface('spotlight');
 			const surface = target.querySelector('[data-testid="spotlight"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -300,7 +284,7 @@ describe('motion surfaces', () => {
 		});
 
 		it('resets position on pointer leave', () => {
-			const target = render('spotlight');
+			const target = renderSurface('spotlight');
 			const surface = target.querySelector('[data-testid="spotlight"]');
 
 			if (!(surface instanceof HTMLDivElement)) {
@@ -325,7 +309,7 @@ describe('motion surfaces', () => {
 
 	describe('noise grain prop', () => {
 		it('sets data-grain attribute', () => {
-			const target = render('noise');
+			const target = renderSurface('noise');
 			const noise = target.querySelector('[data-testid="noise"]');
 
 			if (!(noise instanceof HTMLDivElement)) {

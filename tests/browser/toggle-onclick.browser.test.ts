@@ -1,28 +1,10 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it, vi } from 'vitest';
+import { flushSync } from 'svelte';
 import Toggle from '../../packages/primitives/src/toggle/toggle.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderToggle(props: Record<string, unknown>) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(Toggle, {
-		target,
-		props
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	const { target } = render(Toggle, props);
 
 	const button = target.querySelector('button');
 

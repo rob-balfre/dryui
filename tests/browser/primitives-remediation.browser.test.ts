@@ -1,37 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import CompositeInputsHarness from './fixtures/composite-inputs-harness.svelte';
 import PrimitivesRemediationDataGridHarness from './fixtures/primitives-remediation-data-grid-harness.svelte';
 import PrimitivesRemediationMenuHarness from './fixtures/primitives-remediation-menu-harness.svelte';
 import PrimitivesRemediationOverlayHarness from './fixtures/primitives-remediation-overlay-harness.svelte';
 import PrimitivesRemediationSemanticsHarness from './fixtures/primitives-remediation-semantics-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
-
-function render<ComponentProps extends Record<string, unknown>>(
-	component: Parameters<typeof mount>[0],
-	props?: ComponentProps
-) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const mounted = mount(component, {
-		target,
-		props
-	});
-
-	mountedComponents.push(mounted);
-	flushSync();
-	return target;
-}
+import { render } from './_harness';
 
 describe('primitives remediation', () => {
 	it('keeps disabled links inert and only wires field ids when the parts mount', () => {

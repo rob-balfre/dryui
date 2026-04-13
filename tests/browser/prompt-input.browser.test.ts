@@ -1,30 +1,10 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import PromptInput from '../../packages/primitives/src/prompt-input/prompt-input.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderPromptInput(onpromptsubmit?: (value: string) => void) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(PromptInput, {
-		target,
-		props: {
-			onpromptsubmit
-		}
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	const { target } = render(PromptInput, { onpromptsubmit });
 
 	const textarea = target.querySelector<HTMLTextAreaElement>('textarea[data-part="input"]');
 	const submit = target.querySelector<HTMLButtonElement>('button[data-part="submit"]');

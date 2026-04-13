@@ -1,34 +1,18 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
 import OverlaySurfaceHarness from './fixtures/overlay-surface-harness.svelte';
+import { render } from './_harness';
 
 type OverlayKind = 'alert-dialog' | 'dialog' | 'drawer' | 'command-palette';
 
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
 	delete document.documentElement.dataset.theme;
 	document.documentElement.classList.remove('theme-auto');
-	document.body.replaceChildren();
 });
 
 function mountOverlay(kind: OverlayKind) {
 	document.documentElement.dataset.theme = 'dark';
 
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(OverlaySurfaceHarness, {
-		target,
-		props: { kind }
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	render(OverlaySurfaceHarness, { kind });
 
 	const dialog = document.querySelector('dialog[open]');
 	if (!(dialog instanceof HTMLDialogElement)) {

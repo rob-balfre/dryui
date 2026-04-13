@@ -1,34 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import DocsComponentPageHarness from './fixtures/docs-component-page-harness.svelte';
 import { getComponentPageData } from './fixtures/docs-component-page-data';
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-	document.body.replaceChildren();
-});
-
-function getPageData(slug: string) {
-	return getComponentPageData(slug);
-}
+import { render } from './_harness';
 
 function renderComponentPage(slug: string) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(DocsComponentPageHarness, {
-		target,
-		props: {
-			data: getPageData(slug)
-		}
-	});
-
-	mountedComponents.push(component);
-	flushSync();
-	return target;
+	return render(DocsComponentPageHarness, {
+		data: getComponentPageData(slug)
+	}).target;
 }
 
 describe('docs component page', () => {

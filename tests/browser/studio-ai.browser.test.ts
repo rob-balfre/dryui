@@ -1,27 +1,16 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync } from 'svelte';
 import StudioShellHarness from './fixtures/studio-shell-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
+import { render } from './_harness';
 
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
 	document.documentElement.className = '';
 	delete document.documentElement.dataset.theme;
 	localStorage.clear();
 });
 
 function mountStudio() {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(StudioShellHarness, { target });
-	mountedComponents.push(component);
-	flushSync();
+	render(StudioShellHarness);
 }
 
 describe('studio ai', () => {

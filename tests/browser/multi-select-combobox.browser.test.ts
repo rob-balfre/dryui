@@ -1,32 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { flushSync } from 'svelte';
 import MultiSelectComboboxHarness from './fixtures/multi-select-combobox-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
+import { render } from './_harness';
 
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
 	document.documentElement.dataset.theme = '';
 	document.documentElement.classList.remove('theme-auto');
-	document.body.replaceChildren();
 });
 
 function renderHarness(props?: { maxSelections?: number; name?: string }) {
 	document.documentElement.dataset.theme = 'dark';
 
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(MultiSelectComboboxHarness, {
-		target,
-		props
-	});
-
-	mountedComponents.push(component);
-	flushSync();
+	render(MultiSelectComboboxHarness, props);
 
 	const input = document.querySelector<HTMLInputElement>('input[role="combobox"]');
 	if (!input) {

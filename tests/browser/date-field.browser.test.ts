@@ -1,25 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import DateFieldHarness from './fixtures/date-field-harness.svelte';
+import { render } from './_harness';
 
 describe('DateField', () => {
-	let cleanup: (() => void) | undefined;
-
-	afterEach(() => {
-		cleanup?.();
-		cleanup = undefined;
-	});
-
 	function setup() {
-		const target = document.createElement('div');
-		document.body.appendChild(target);
-		const instance = mount(DateFieldHarness, { target });
-		flushSync();
-		cleanup = () => {
-			unmount(instance);
-			target.remove();
-		};
-		return target;
+		return render(DateFieldHarness).target;
 	}
 
 	function typeKey(key: string) {
