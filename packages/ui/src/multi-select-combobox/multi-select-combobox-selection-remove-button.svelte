@@ -27,6 +27,8 @@
 </script>
 
 <CloseButtonBase
+	variant="bare"
+	size="sm"
 	aria-label={`Remove selection: ${label ?? value}`}
 	disabled={ctx.disabled}
 	{...rest}

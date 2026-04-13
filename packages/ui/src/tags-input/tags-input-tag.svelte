@@ -35,13 +35,15 @@
 		grid-auto-columns: max-content;
 		vertical-align: middle;
 		align-items: center;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-1) var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
+		padding-block: var(--dry-space-1);
+		padding-inline-start: var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
+		padding-inline-end: 0;
 		margin-inline-end: var(--dry-tags-input-gap, var(--dry-space-1_5));
 		margin-block: calc(var(--dry-tags-input-gap, var(--dry-space-1_5)) / 2);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent);
 		color: var(--dry-color-fill-brand);
-		border-radius: var(--dry-radius-full);
+		border-radius: var(--dry-tags-input-tag-radius, var(--dry-radius-md));
+		overflow: hidden;
 		font-size: var(
 			--dry-tags-input-tag-font-size,
 			var(--dry-type-tiny-size, var(--dry-text-xs-size))
@@ -51,5 +53,9 @@
 		line-height: 1.5;
 		white-space: nowrap;
 		user-select: none;
+		--dry-btn-radius: 0;
+		--dry-btn-padding-x: var(--dry-tags-input-tag-padding-x, var(--dry-space-2));
+		--dry-btn-padding-y: 0;
+		--dry-btn-font-size: inherit;
 	}
 </style>

@@ -35,18 +35,24 @@
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
-		gap: var(--dry-space-1);
-		padding: 4px var(--dry-space-2);
+		padding-block: 4px;
+		padding-inline-start: var(--dry-space-2);
+		padding-inline-end: 0;
 		background: var(--dry-color-fill-brand-weak);
 		color: var(--dry-color-text-brand);
 		box-shadow: inset 0 0 0 1px var(--dry-color-stroke-selected);
-		border-radius: var(--dry-radius-full);
+		border-radius: var(--dry-radius-md);
+		overflow: hidden;
 		font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
 		font-family: var(--dry-font-sans);
 		font-weight: 500;
 		line-height: 1.5;
 		white-space: nowrap;
 		user-select: none;
+		--dry-btn-radius: 0;
+		--dry-btn-padding-x: var(--dry-space-2);
+		--dry-btn-padding-y: 0;
+		--dry-btn-font-size: inherit;
 	}
 
 	@container (max-width: 200px) {
