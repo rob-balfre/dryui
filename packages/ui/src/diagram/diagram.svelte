@@ -7,9 +7,10 @@
 		config: DiagramConfig;
 		width?: number;
 		height?: number;
+		fit?: 'contain' | 'native';
 	}
 
-	let { config, width, height, class: className, ...rest }: Props = $props();
+	let { config, width, height, fit = 'contain', class: className, ...rest }: Props = $props();
 
 	const layout = $derived(computeLayout(config));
 	const vbW = $derived(width ?? layout.viewBox.width);
@@ -18,8 +19,10 @@
 	const uid = Math.random().toString(36).slice(2, 8);
 </script>
 
-<div data-diagram-container>
+<div data-diagram-container data-fit={fit}>
 	<svg
+		width={fit === 'native' ? vbW : undefined}
+		height={fit === 'native' ? vbH : undefined}
 		viewBox="0 0 {vbW} {vbH}"
 		preserveAspectRatio="xMidYMin meet"
 		role="img"
@@ -56,6 +59,7 @@
 		{#if layout.clusters.length > 0}
 			<g data-part="clusters">
 				{#each layout.clusters as cluster (cluster.id)}
+					{@const ClusterIcon = cluster.iconComponent}
 					<g data-part="cluster" data-color={cluster.color}>
 						<rect
 							data-part="cluster-box"
@@ -63,13 +67,31 @@
 							y={cluster.y}
 							width={cluster.width}
 							height={cluster.height}
-							rx="12"
+							rx="16"
 							data-dashed={cluster.dashed || undefined}
 						/>
 						{#if cluster.label}
-							<text data-part="cluster-label" x={cluster.x + 20} y={cluster.y + 22}
-								>{cluster.label}</text
-							>
+							{#if ClusterIcon}
+								<foreignObject
+									x={cluster.x + 16}
+									y={cluster.y + 10}
+									width={Math.max(cluster.width - 32, 80)}
+									height={24}
+								>
+									<div
+										xmlns="http://www.w3.org/1999/xhtml"
+										data-part="cluster-label-row"
+										data-color={cluster.color}
+									>
+										<ClusterIcon size={14} aria-hidden="true" />
+										<span>{cluster.label}</span>
+									</div>
+								</foreignObject>
+							{:else}
+								<text data-part="cluster-label" x={cluster.x + 20} y={cluster.y + 22}
+									>{cluster.label}</text
+								>
+							{/if}
 						{/if}
 					</g>
 				{/each}
@@ -214,12 +236,13 @@
 		<!-- Layer 2: Edges -->
 		<g data-part="edges">
 			{#each layout.edges as edge, index (`${edge.from}:${edge.to}:${index}`)}
+				{@const isEntry = edge.kind === 'entry'}
 				{@const markerEnd =
-					edge.arrow === 'end' || edge.arrow === 'both'
+					!isEntry && (edge.arrow === 'end' || edge.arrow === 'both')
 						? `url(#dry-diagram-${uid}-arrow-${edge.color})`
 						: undefined}
 				{@const markerStart =
-					edge.arrow === 'start' || edge.arrow === 'both'
+					!isEntry && (edge.arrow === 'start' || edge.arrow === 'both')
 						? `url(#dry-diagram-${uid}-arrow-${edge.color})`
 						: undefined}
 				{@const isSelfLoop = edge.from === edge.to}
@@ -243,9 +266,60 @@
 			{/each}
 		</g>
 
+		<!-- Layer 2b: Waypoints (cards sitting on edges) -->
+		{#if layout.waypoints.length > 0}
+			<g data-part="waypoints">
+				{#each layout.waypoints as wp (wp.id)}
+					{@const WpIcon = wp.iconComponent}
+					<g
+						data-part="waypoint"
+						data-variant={wp.variant}
+						data-color={wp.color}
+						transform="translate({wp.x},{wp.y})"
+					>
+						<rect
+							data-part="node-box"
+							width={wp.width}
+							height={wp.height}
+							rx={wp.variant === 'pill' ? wp.height / 2 : 16}
+						/>
+						{#if wp.variant === 'filled'}
+							<rect
+								data-part="node-texture"
+								width={wp.width}
+								height={wp.height}
+								rx={16}
+								fill="url(#dry-diagram-{uid}-dots)"
+							/>
+						{/if}
+						<foreignObject x="0" y="0" width={wp.width} height={wp.height}>
+							<div
+								data-part="node-content"
+								data-has-description={wp.description ? '' : undefined}
+								data-has-icon-component={WpIcon ? '' : undefined}
+							>
+								{#if WpIcon}
+									<span data-part="node-icon" data-icon-svg=""
+										><WpIcon size={22} aria-hidden="true" /></span
+									>
+								{:else if wp.icon}
+									<span data-part="node-icon">{wp.icon}</span>
+								{/if}
+								<span data-part="node-label">{wp.label}</span>
+								{#if wp.description}
+									<span data-part="node-description">{wp.description}</span>
+								{/if}
+							</div>
+						</foreignObject>
+					</g>
+				{/each}
+			</g>
+		{/if}
+
 		<!-- Layer 3: Nodes -->
 		<g data-part="nodes">
 			{#each layout.nodes as node (node.id)}
+				{@const NodeIcon = node.iconComponent}
 				<g
 					data-part="node"
 					data-variant={node.variant}
@@ -270,8 +344,16 @@
 						/>
 					{/if}
 					<foreignObject x="0" y="0" width={node.width} height={node.height}>
-						<div data-part="node-content" data-has-description={node.description ? '' : undefined}>
-							{#if node.icon}
+						<div
+							data-part="node-content"
+							data-has-description={node.description ? '' : undefined}
+							data-has-icon-component={NodeIcon ? '' : undefined}
+						>
+							{#if NodeIcon}
+								<span data-part="node-icon" data-icon-svg=""
+									><NodeIcon size={22} aria-hidden="true" /></span
+								>
+							{:else if node.icon}
 								<span data-part="node-icon">{node.icon}</span>
 							{/if}
 							<span data-part="node-label">{node.label}</span>
@@ -299,9 +381,31 @@
 	/* ── Container ──────────────────────────────────── */
 	[data-diagram-container] {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-content: start;
+		container-type: inline-size;
+		container-name: dry-diagram;
 		min-height: 120px;
 		max-block-size: var(--dry-diagram-max-height, none);
-		overflow: auto;
+	}
+
+	[data-diagram-container][data-fit='native'] {
+		grid-template-columns: auto;
+		justify-content: start;
+		overflow-x: auto;
+		overflow-y: hidden;
+	}
+
+	@container dry-diagram (max-width: 480px) {
+		[data-part='node-content'] {
+			padding: 12px 14px;
+		}
+		[data-part='node-content'][data-has-description] {
+			padding: 14px 16px;
+		}
+		[data-part='node-description'] {
+			display: none;
+		}
 	}
 
 	/* ── SVG root ───────────────────────────────────── */
@@ -309,10 +413,7 @@
 		--_node-bg: var(--dry-diagram-node-bg, var(--dry-color-bg-base));
 		--_node-border: var(--dry-diagram-node-border, var(--dry-color-stroke-weak));
 		--_node-color: var(--dry-diagram-node-color, var(--dry-color-text-strong));
-		--_edge-color: var(
-			--dry-diagram-edge-color,
-			color-mix(in srgb, var(--dry-color-text-strong) 24%, var(--dry-color-bg-base))
-		);
+		--_edge-color: var(--dry-diagram-edge-color, var(--dry-color-text-strong));
 		--_cluster-bg: var(
 			--dry-diagram-cluster-bg,
 			color-mix(in srgb, var(--dry-color-fill) 30%, transparent)
@@ -371,42 +472,62 @@
 	[data-part='node-content'] {
 		display: grid;
 		place-items: center;
-		gap: 2px;
-		padding: 8px 20px;
+		gap: 8px;
+		padding: 16px 22px;
 		height: 100%;
 		box-sizing: border-box;
+		font-family: var(--dry-font-sans);
 	}
 
 	[data-part='node-label'] {
-		font-family: var(--dry-font-mono);
-		font-size: 14px;
-		font-weight: 500;
+		font-size: 15px;
+		font-weight: 600;
 		color: var(--_node-color);
 		text-align: center;
-		line-height: 1.3;
-		letter-spacing: 0.02em;
+		line-height: 1.2;
+		letter-spacing: 0.005em;
 		white-space: nowrap;
 	}
 
 	[data-part='node-icon'] {
-		font-size: 16px;
+		font-size: 18px;
 		line-height: 1;
 		text-align: center;
 	}
 
+	[data-part='node-icon'][data-icon-svg] {
+		display: grid;
+		place-items: center;
+		color: var(--_node-color);
+		line-height: 0;
+	}
+
 	[data-part='node-description'] {
-		font-family: var(--dry-font-mono);
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 400;
 		color: var(--_text-muted);
 		text-align: center;
-		line-height: 1.3;
+		line-height: 1.35;
 	}
 
 	[data-part='node-content'][data-has-description] {
-		padding: 10px 24px;
+		padding: 18px 22px;
+		gap: 6px;
 		text-align: left;
 		place-items: start;
+		grid-template-rows: auto auto 1fr;
+	}
+
+	[data-part='node-content'][data-has-description] [data-part='node-icon'] {
+		padding-block-end: 4px;
+	}
+
+	[data-part='node-content'][data-has-description] [data-part='node-label'] {
+		font-size: 16px;
+	}
+
+	[data-part='node-content'][data-has-description] [data-part='node-description'] {
+		text-align: left;
 	}
 
 	/* ── Node variant: outlined ──────────────────── */
@@ -422,25 +543,36 @@
 	}
 
 	/* ── Node colors via custom property indirection ─ */
-	[data-part='node'][data-color='brand'] {
+	[data-part='node'][data-color='brand'],
+	[data-part='waypoint'][data-color='brand'] {
 		--_node-border: var(--dry-color-stroke-brand);
 		--_node-color: var(--dry-color-text-brand);
 	}
-	[data-part='node'][data-color='success'] {
+	[data-part='node'][data-color='success'],
+	[data-part='waypoint'][data-color='success'] {
 		--_node-border: var(--dry-color-stroke-success);
 		--_node-color: var(--dry-color-text-success);
 	}
-	[data-part='node'][data-color='warning'] {
+	[data-part='node'][data-color='warning'],
+	[data-part='waypoint'][data-color='warning'] {
 		--_node-border: var(--dry-color-stroke-warning);
 		--_node-color: var(--dry-color-text-warning);
 	}
-	[data-part='node'][data-color='error'] {
+	[data-part='node'][data-color='error'],
+	[data-part='waypoint'][data-color='error'] {
 		--_node-border: var(--dry-color-stroke-error);
 		--_node-color: var(--dry-color-text-error);
 	}
-	[data-part='node'][data-color='info'] {
+	[data-part='node'][data-color='info'],
+	[data-part='waypoint'][data-color='info'] {
 		--_node-border: var(--dry-color-stroke-info);
 		--_node-color: var(--dry-color-text-info);
+	}
+
+	[data-part='waypoint'] [data-part='node-box'] {
+		fill: var(--_node-bg);
+		stroke: var(--_node-border);
+		stroke-width: 2;
 	}
 
 	/* ── Node states ────────────────────────────────── */
@@ -527,6 +659,37 @@
 		font-size: 11px;
 		font-weight: 500;
 		fill: var(--_text-muted);
+	}
+
+	[data-part='cluster-label-row'] {
+		display: grid;
+		grid-template-columns: auto auto;
+		align-items: center;
+		justify-content: start;
+		gap: 8px;
+		font-family: var(--dry-font-sans);
+		font-size: 12px;
+		font-weight: 600;
+		color: var(--_text-muted);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+		line-height: 1;
+	}
+
+	[data-part='cluster-label-row'][data-color='brand'] {
+		color: var(--dry-color-text-brand);
+	}
+	[data-part='cluster-label-row'][data-color='success'] {
+		color: var(--dry-color-text-success);
+	}
+	[data-part='cluster-label-row'][data-color='warning'] {
+		color: var(--dry-color-text-warning);
+	}
+	[data-part='cluster-label-row'][data-color='error'] {
+		color: var(--dry-color-text-error);
+	}
+	[data-part='cluster-label-row'][data-color='info'] {
+		color: var(--dry-color-text-info);
 	}
 
 	/* ── Regions ────────────────────────────────────── */

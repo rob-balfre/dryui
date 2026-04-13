@@ -1,20 +1,68 @@
 <script lang="ts">
 	import { Diagram } from '@dryui/ui';
 	import type { DiagramConfig } from '@dryui/ui';
+	import {
+		Smartphone,
+		Radio,
+		ScrollText,
+		LineChart,
+		Activity,
+		Search,
+		Database,
+		Gauge,
+		Sparkles,
+		GitBranch
+	} from 'lucide-svelte';
 
 	const config: DiagramConfig = {
 		direction: 'LR',
+		spacing: { cornerRadius: 10 },
 		nodes: [
-			{ id: 'app', label: 'APP', variant: 'filled' },
-			{ id: 'vector', label: 'VECTOR', variant: 'filled' },
-			{ id: 'logs', label: 'Victoria Logs' },
-			{ id: 'metrics', label: 'Victoria Metrics' },
-			{ id: 'traces', label: 'Victoria Traces' },
-			{ id: 'logql', label: 'LogQL API' },
-			{ id: 'promql', label: 'PromQL API' },
-			{ id: 'traceql', label: 'TraceQL API' },
-			{ id: 'codex', label: 'CODEX', variant: 'filled', color: 'brand' },
-			{ id: 'codebase', label: 'CODEBASE', variant: 'filled' }
+			{
+				id: 'app',
+				label: 'App',
+				description: 'Your service',
+				iconComponent: Smartphone,
+				variant: 'filled'
+			},
+			{
+				id: 'vector',
+				label: 'Vector',
+				description: 'Pipeline router',
+				iconComponent: Radio,
+				variant: 'filled'
+			},
+			{ id: 'logs', label: 'Victoria Logs', description: 'Log storage', iconComponent: ScrollText },
+			{
+				id: 'metrics',
+				label: 'Victoria Metrics',
+				description: 'Time-series store',
+				iconComponent: LineChart
+			},
+			{
+				id: 'traces',
+				label: 'Victoria Traces',
+				description: 'Span storage',
+				iconComponent: Activity
+			},
+			{ id: 'logql', label: 'LogQL API', description: 'Query logs', iconComponent: Search },
+			{ id: 'promql', label: 'PromQL API', description: 'Query metrics', iconComponent: Gauge },
+			{ id: 'traceql', label: 'TraceQL API', description: 'Query spans', iconComponent: Database },
+			{
+				id: 'codex',
+				label: 'Codex',
+				description: 'AI agent',
+				iconComponent: Sparkles,
+				variant: 'filled',
+				color: 'brand'
+			},
+			{
+				id: 'codebase',
+				label: 'Codebase',
+				description: 'Your repo',
+				iconComponent: GitBranch,
+				variant: 'filled'
+			}
 		],
 		edges: [
 			{ from: 'app', to: 'vector' },
@@ -30,7 +78,9 @@
 		clusters: [
 			{
 				id: 'obs',
-				label: 'Observability stack services',
+				label: 'Observability stack',
+				iconComponent: Activity,
+				color: 'brand',
 				nodes: ['logs', 'metrics', 'traces', 'logql', 'promql', 'traceql']
 			}
 		]
