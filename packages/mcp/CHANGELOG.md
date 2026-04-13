@@ -1,5 +1,15 @@
 # @dryui/mcp
 
+## 1.0.1
+
+### Patch Changes
+
+- [#13](https://github.com/rob-balfre/dryui/pull/13) [`6f60494`](https://github.com/rob-balfre/dryui/commit/6f604949c14692885ef9b3b3487ebae2af8c17f9) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix `@dryui/cli install --json` failing with `ENOENT: ../@dryui/ui/src/themes/default.css`
+  in published builds. The theme token registry is now generated at build time into
+  `theme-tokens.generated.json` and bundled with `@dryui/mcp`, so the CLI no longer
+  tries to read CSS files from `@dryui/ui`'s source tree (which is not shipped with
+  the published tarball).
+
 ## 1.0.0
 
 ### Major Changes
