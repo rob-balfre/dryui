@@ -1,6 +1,4 @@
-import { readFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import themeTokensData from './theme-tokens.generated.json';
 
 export interface ThemeTokenRegistryEntry {
 	name: string;
@@ -93,37 +91,11 @@ export const SIDEBAR_PREVIEW_TOKEN_NAMES = [
 	'--dry-color-focus-ring'
 ] as const;
 
-function parseTokens(css: string): Map<string, string> {
-	const tokens = new Map<string, string>();
-	const regex = /(--dry-[\w-]+)\s*:\s*([^;]+);/g;
-	let match: RegExpExecArray | null;
-
-	while ((match = regex.exec(css)) !== null) {
-		const name = match[1]?.trim();
-		const value = match[2]?.trim();
-		if (!name || !value || tokens.has(name)) continue;
-		tokens.set(name, value);
-	}
-
-	return tokens;
-}
-
-function themeDir(): string {
-	const here = dirname(fileURLToPath(import.meta.url));
-	return resolve(here, '../../ui/src/themes');
-}
-
-function loadThemeTokens(): ThemeTokenValues {
-	const lightTokens = parseTokens(readFileSync(resolve(themeDir(), 'default.css'), 'utf-8'));
-	const darkTokens = parseTokens(readFileSync(resolve(themeDir(), 'dark.css'), 'utf-8'));
-
-	return {
-		light: Object.fromEntries(lightTokens),
-		dark: Object.fromEntries(darkTokens)
-	};
-}
-
-export const THEME_TOKEN_VALUES = loadThemeTokens();
+// Theme token values are pre-generated at build time from
+// packages/ui/src/themes/{default,dark}.css via generate-theme-tokens.ts.
+// Reading CSS at runtime would break the published CLI bundle, which does
+// not have @dryui/ui's source themes available in its node_modules tree.
+export const THEME_TOKEN_VALUES: ThemeTokenValues = themeTokensData as ThemeTokenValues;
 
 export const THEME_TOKEN_REGISTRY: ThemeTokenRegistryEntry[] = Array.from(
 	new Set([...Object.keys(THEME_TOKEN_VALUES.light), ...Object.keys(THEME_TOKEN_VALUES.dark)])
