@@ -480,6 +480,7 @@ function computeNodeAndClusterBounds(
 const WAYPOINT_DEFAULT_WIDTH = 240;
 const WAYPOINT_DEFAULT_HEIGHT_DESC = 132;
 const WAYPOINT_DEFAULT_HEIGHT = 84;
+const WAYPOINT_VERTICAL_EDGE_INSET_RATIO = 0.5;
 
 function estimateWaypointDims(waypoint: DiagramWaypoint): { w: number; h: number } {
 	const w =
@@ -493,6 +494,24 @@ function estimateWaypointDims(waypoint: DiagramWaypoint): { w: number; h: number
 		waypoint.height ??
 		(waypoint.description ? WAYPOINT_DEFAULT_HEIGHT_DESC : WAYPOINT_DEFAULT_HEIGHT);
 	return { w: Math.min(w, WAYPOINT_DEFAULT_WIDTH * 1.4), h };
+}
+
+function resolveVerticalWaypointLaneRatio(
+	collapsed: Array<{ x: number; y: number }>,
+	segmentIndex: number
+): number {
+	const laneX = collapsed[segmentIndex]?.x ?? collapsed[segmentIndex - 1]?.x;
+	if (laneX === undefined) return 0.5;
+
+	const beforeSide = Math.sign((collapsed[segmentIndex - 2]?.x ?? laneX) - laneX);
+	if (beforeSide < 0) return WAYPOINT_VERTICAL_EDGE_INSET_RATIO;
+	if (beforeSide > 0) return 1 - WAYPOINT_VERTICAL_EDGE_INSET_RATIO;
+
+	const afterSide = Math.sign((collapsed[segmentIndex + 1]?.x ?? laneX) - laneX);
+	if (afterSide < 0) return WAYPOINT_VERTICAL_EDGE_INSET_RATIO;
+	if (afterSide > 0) return 1 - WAYPOINT_VERTICAL_EDGE_INSET_RATIO;
+
+	return 0.5;
 }
 
 function placeWaypoints(
@@ -516,15 +535,11 @@ function placeWaypoints(
 		const t = wp.position ?? 0.5;
 		const at = getPointAtFraction(collapsed, t);
 		const dims = estimateWaypointDims(wp);
-
-		// Snap box center to the segment axis so the polyline enters/exits cleanly
-		const boxCenter =
-			at.axis === 'h'
-				? { x: at.point.x, y: at.point.y } // horizontal segment — box vertical center on the line
-				: { x: at.point.x, y: at.point.y };
+		const laneRatio =
+			at.axis === 'v' ? resolveVerticalWaypointLaneRatio(collapsed, at.segmentIndex) : 0.5;
 		const box = {
-			x: boxCenter.x - dims.w / 2,
-			y: boxCenter.y - dims.h / 2,
+			x: at.point.x - dims.w * laneRatio,
+			y: at.point.y - dims.h / 2,
 			width: dims.w,
 			height: dims.h
 		};

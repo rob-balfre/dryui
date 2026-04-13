@@ -58,6 +58,7 @@
 	const TOP_GAP = 96;
 	const LOOP_RIGHT_PAD = 144;
 	const CORNER_R = 16;
+	const FEEDBACK_LANE_RATIO = 0.5;
 
 	const FEEDBACK_W = 260;
 	const FEEDBACK_H = 160;
@@ -84,7 +85,7 @@
 
 	const LOOP_OUTER_X = CONTAINER_RIGHT_X + LOOP_RIGHT_PAD;
 
-	const FEEDBACK_X = LOOP_OUTER_X - FEEDBACK_W / 2;
+	const FEEDBACK_X = LOOP_OUTER_X - FEEDBACK_W * FEEDBACK_LANE_RATIO;
 	const FEEDBACK_Y = (TOP_MIDDLE_Y + CONTAINER_MIDDLE_Y) / 2 - FEEDBACK_H / 2;
 	const FEEDBACK_BOTTOM_Y = FEEDBACK_Y + FEEDBACK_H;
 
@@ -112,10 +113,10 @@
 
 	// Tuned to mirror the hand-built workflow above: TB outer + LR cluster, with
 	// backEdgeLaneGap (144) wide enough that the Live Feedback waypoint clears the
-	// cluster, and waypoint position 0.25 to land it on the loop's vertical segment.
+	// cluster and sits high enough on the loop for the lower elbow to bend upward.
 	const diagramReplica: DiagramConfig = {
 		direction: 'TB',
-		spacing: { cornerRadius: 14, nodeGap: 32, layerGap: 72, backEdgeLaneGap: 144 },
+		spacing: { cornerRadius: 16, nodeGap: 32, layerGap: 72, backEdgeLaneGap: 144 },
 		ariaLabel: 'How DryUI works, rendered with the Diagram component',
 		nodes: [
 			{
@@ -158,8 +159,8 @@
 					iconComponent: PenLine,
 					color: 'brand',
 					width: 240,
-					height: 200,
-					position: 0.25
+					height: 160,
+					position: 0.32
 				}
 			}
 		],
