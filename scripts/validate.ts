@@ -55,6 +55,7 @@ console.log('\n── Phase 1: checks + lint/primitives builds ──');
 await parallel(
 	run('check:lint', 'bun test tests/unit/lint-rules.test.ts tests/unit/lint-preprocessor.test.ts'),
 	run('check:exports', 'bun run scripts/sync-package-exports.ts --check'),
+	run('check:cli-imports', `! grep -rnE "from ['\\"]\\.\\./\\.\\./\\.\\./mcp" packages/cli/src`),
 	run('validate:spec', 'bun run scripts/validate-spec-coverage.ts'),
 	run('build:lint', 'bun run build', pkg('lint')),
 	run('build:primitives', 'bun run build', pkg('primitives'))

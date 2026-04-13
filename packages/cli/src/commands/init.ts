@@ -9,7 +9,7 @@ import {
 	detectPackageManagerFromEnv,
 	type DryuiPackageManager,
 	type ProjectPlanStep
-} from '../../../mcp/src/project-planner.js';
+} from '@dryui/mcp/project-planner';
 
 interface InitOptions {
 	targetPath: string;

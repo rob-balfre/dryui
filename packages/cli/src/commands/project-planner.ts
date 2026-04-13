@@ -9,7 +9,7 @@ import type {
 	InstallPlan,
 	ProjectDetection,
 	ProjectPlanStep
-} from '../../../mcp/src/project-planner.js';
+} from '@dryui/mcp/project-planner';
 
 interface AddOptions {
 	subpath?: boolean;

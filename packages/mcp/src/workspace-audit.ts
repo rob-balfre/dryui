@@ -365,7 +365,7 @@ type WorkspaceSummary = {
 	byRule: Record<string, number>;
 };
 
-export function buildWorkspaceReport(
+export function scanWorkspace(
 	spec: WorkspaceAuditSpec,
 	options: WorkspaceAuditOptions = {}
 ): WorkspaceReport {
@@ -474,11 +474,4 @@ export function buildWorkspaceReport(
 		warnings,
 		summary
 	};
-}
-
-export function scanWorkspace(
-	spec: WorkspaceAuditSpec,
-	options: WorkspaceAuditOptions = {}
-): WorkspaceReport {
-	return buildWorkspaceReport(spec, options);
 }
