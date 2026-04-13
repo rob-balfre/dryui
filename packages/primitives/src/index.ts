@@ -343,16 +343,6 @@ export type { BadgeProps } from './badge/index.js';
 export { User } from './user/index.js';
 export type { UserProps } from './user/index.js';
 
-export { Alert } from './alert/index.js';
-export type {
-	AlertVariant,
-	AlertRootProps,
-	AlertIconProps,
-	AlertTitleProps,
-	AlertDescriptionProps,
-	AlertCloseProps
-} from './alert/index.js';
-
 export { Toast, toastStore, createToastStore } from './toast/index.js';
 export type {
 	ToastData,

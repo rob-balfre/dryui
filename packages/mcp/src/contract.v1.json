@@ -7,8 +7,8 @@
   },
   "counts": {
     "components": 145,
-    "compositionComponents": 131,
-    "compositionRecipes": 31,
+    "compositionComponents": 130,
+    "compositionRecipes": 30,
     "tools": 11,
     "prompts": 8,
     "cliCommands": 12
@@ -3650,6 +3650,10 @@
         ]
       },
       "cssVars": {
+        "--dry-btn-font-size": "Font size",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-multi-select-item-radius": "Select Item Radius"
       },
       "dataAttributes": [
@@ -4307,169 +4311,6 @@
         }
       ],
       "example": "<InputGroup.Root>\n  <InputGroup.Prefix>...</InputGroup.Prefix>\n  <InputGroup.Input>...</InputGroup.Input>\n  <InputGroup.Suffix>...</InputGroup.Suffix>\n  <InputGroup.Separator>...</InputGroup.Separator>\n  <InputGroup.Action>...</InputGroup.Action>\n  <InputGroup.Select>...</InputGroup.Select>\n</InputGroup.Root>"
-    },
-    "OptionSwatchGroup": {
-      "import": "@dryui/ui",
-      "description": "Selectable swatch tiles for choosing color, size, or other visual options",
-      "category": "input",
-      "tags": [
-        "swatch",
-        "selection",
-        "options",
-        "tiles",
-        "product"
-      ],
-      "compound": true,
-      "parts": {
-        "Root": {
-          "props": {
-            "columns": {
-              "type": "1 | 2 | 3 | 4",
-              "required": false,
-              "acceptedValues": [
-                "1",
-                "2",
-                "3",
-                "4"
-              ]
-            }
-          }
-        },
-        "Item": {
-          "props": {
-            "size": {
-              "type": "'default' | 'compact'",
-              "required": false,
-              "acceptedValues": [
-                "default",
-                "compact"
-              ],
-              "description": "Size preset affecting density, spacing, or typography."
-            },
-            "unavailable": {
-              "type": "boolean",
-              "required": false
-            }
-          }
-        },
-        "Swatch": {
-          "props": {
-            "color": {
-              "type": "string",
-              "required": false,
-              "description": "Semantic color or tone applied to the component."
-            },
-            "shape": {
-              "type": "'circle' | 'rounded'",
-              "required": false,
-              "acceptedValues": [
-                "circle",
-                "rounded"
-              ],
-              "default": "'circle'"
-            },
-            "children": {
-              "type": "Snippet",
-              "required": false,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLSpanElement>",
-            "via": "rest",
-            "element": "span",
-            "examples": [
-              "id",
-              "style",
-              "aria-label"
-            ],
-            "note": "Forwards <span> attributes via rest props."
-          }
-        },
-        "Label": {
-          "props": {}
-        },
-        "Meta": {
-          "props": {}
-        }
-      },
-      "structure": {
-        "tree": [
-          "OptionSwatchGroup.Root",
-          "  OptionSwatchGroup.Item",
-          "  OptionSwatchGroup.Swatch",
-          "  OptionSwatchGroup.Label",
-          "  OptionSwatchGroup.Meta"
-        ]
-      },
-      "cssVars": {
-        "--dry-btn-align": "Align",
-        "--dry-btn-bg": "Background color",
-        "--dry-btn-border": "Border color",
-        "--dry-btn-color": "Text color",
-        "--dry-btn-justify": "Justify",
-        "--dry-btn-min-height": "Minimum height",
-        "--dry-btn-padding-x": "Horizontal padding",
-        "--dry-btn-padding-y": "Vertical padding",
-        "--dry-btn-radius": "Border radius",
-        "--dry-option-swatch-chip": "Swatch Chip",
-        "--dry-option-swatch-group-swatch-border": "Swatch Group Swatch Border"
-      },
-      "dataAttributes": [
-        {
-          "name": "data-columns"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-option-swatch-group-item"
-        },
-        {
-          "name": "data-option-swatch-group-label"
-        },
-        {
-          "name": "data-option-swatch-group-meta"
-        },
-        {
-          "name": "data-option-swatch-group-root"
-        },
-        {
-          "name": "data-option-swatch-group-rounded"
-        },
-        {
-          "name": "data-option-swatch-group-swatch"
-        },
-        {
-          "name": "data-orientation",
-          "description": "Reflects the current horizontal or vertical orientation.",
-          "values": [
-            "horizontal",
-            "vertical"
-          ]
-        },
-        {
-          "name": "data-part"
-        },
-        {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
-        },
-        {
-          "name": "data-size"
-        },
-        {
-          "name": "data-state"
-        },
-        {
-          "name": "data-unavailable"
-        },
-        {
-          "name": "data-value"
-        }
-      ],
-      "example": "<OptionSwatchGroup.Root>\n  <OptionSwatchGroup.Item>...</OptionSwatchGroup.Item>\n  <OptionSwatchGroup.Swatch>...</OptionSwatchGroup.Swatch>\n  <OptionSwatchGroup.Label>...</OptionSwatchGroup.Label>\n  <OptionSwatchGroup.Meta>...</OptionSwatchGroup.Meta>\n</OptionSwatchGroup.Root>"
     },
     "OptionPicker": {
       "import": "@dryui/ui",
@@ -8756,132 +8597,53 @@
         "warning",
         "error"
       ],
-      "compound": true,
-      "parts": {
-        "Root": {
-          "props": {
-            "variant": {
-              "type": "AlertVariant",
-              "required": false,
-              "description": "Visual style preset for the component.",
-              "default": "'info'"
-            },
-            "dismissible": {
-              "type": "boolean",
-              "required": false,
-              "default": "false"
-            },
-            "onDismiss": {
-              "type": "() => void",
-              "required": false
-            },
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLDivElement>",
-            "via": "rest",
-            "element": "div",
-            "examples": [
-              "id",
-              "style",
-              "role"
-            ],
-            "note": "Forwards <div> attributes via rest props."
-          }
+      "compound": false,
+      "props": {
+        "variant": {
+          "type": "AlertVariant",
+          "required": false,
+          "description": "Visual style preset for the component.",
+          "default": "'info'"
         },
-        "Icon": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLSpanElement>",
-            "via": "rest",
-            "element": "span",
-            "examples": [
-              "id",
-              "style",
-              "aria-label"
-            ],
-            "note": "Forwards <span> attributes via rest props."
-          }
+        "dismissible": {
+          "type": "boolean",
+          "required": false,
+          "default": "false"
         },
-        "Title": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLHeadingElement>",
-            "via": "rest",
-            "element": "h*",
-            "examples": [
-              "id",
-              "style",
-              "aria-label"
-            ],
-            "note": "Forwards <h*> attributes via rest props."
-          }
+        "onDismiss": {
+          "type": "() => void",
+          "required": false
         },
-        "Description": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLParagraphElement>",
-            "via": "rest",
-            "element": "p",
-            "examples": [
-              "id",
-              "style",
-              "aria-describedby"
-            ],
-            "note": "Forwards <p> attributes via rest props."
-          }
+        "icon": {
+          "type": "Snippet",
+          "required": false
         },
-        "Close": {
-          "props": {
-            "children": {
-              "type": "Snippet | undefined",
-              "required": false,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "Omit<HTMLButtonAttributes, 'children'>",
-            "via": "rest",
-            "element": "button",
-            "examples": [
-              "type",
-              "disabled",
-              "name"
-            ],
-            "omitted": [
-              "children"
-            ],
-            "note": "Forwards <button> attributes via rest props."
-          }
+        "title": {
+          "type": "Snippet",
+          "required": false,
+          "description": "Primary heading or label text."
+        },
+        "description": {
+          "type": "Snippet",
+          "required": false,
+          "description": "Supporting copy that explains the current control or section."
+        },
+        "children": {
+          "type": "Snippet",
+          "required": false,
+          "description": "Content rendered inside the component."
         }
       },
-      "structure": {
-        "tree": [
-          "Alert.Root",
-          "  Alert.Description"
-        ]
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
       },
       "cssVars": {
         "--dry-alert-bg": "Background color",
@@ -8894,10 +8656,13 @@
           "name": "data-alert"
         },
         {
-          "name": "data-alert-description"
+          "name": "data-alert-body"
         },
         {
-          "name": "data-alert-direct-child"
+          "name": "data-alert-close"
+        },
+        {
+          "name": "data-alert-description"
         },
         {
           "name": "data-alert-icon"
@@ -8912,7 +8677,7 @@
           "name": "data-variant"
         }
       ],
-      "example": "<Alert.Root variant=\"info\"><Alert.Description>Your changes have been saved.</Alert.Description></Alert.Root>"
+      "example": "<Alert variant=\"info\">\n  {#snippet description()}Your changes have been saved.{/snippet}\n</Alert>"
     },
     "Toast": {
       "import": "@dryui/ui",
@@ -11451,6 +11216,10 @@
         ]
       },
       "cssVars": {
+        "--dry-btn-font-size": "Font size",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-tags-input-font-size": "Input Font Size",
         "--dry-tags-input-gap": "Input Gap",
         "--dry-tags-input-tag-font-size": "Input Tag Font Size",
@@ -17719,6 +17488,66 @@
       ],
       "example": "<Beam>Content</Beam>"
     },
+    "Shimmer": {
+      "import": "@dryui/ui",
+      "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
+      "category": "visual",
+      "tags": [
+        "shimmer",
+        "shine",
+        "highlight",
+        "text",
+        "icon",
+        "animation",
+        "effect"
+      ],
+      "compound": false,
+      "props": {
+        "color": {
+          "type": "string",
+          "required": false,
+          "description": "Semantic color or tone applied to the component.",
+          "default": "'var(--dry-color-fill-brand)'"
+        },
+        "duration": {
+          "type": "number",
+          "required": false,
+          "default": "3"
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "Omit<HTMLAttributes<HTMLSpanElement>, 'children'>",
+        "via": "rest",
+        "element": "span",
+        "examples": [
+          "id",
+          "style",
+          "aria-label"
+        ],
+        "omitted": [
+          "children"
+        ],
+        "note": "Forwards <span> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-shimmer"
+        },
+        {
+          "name": "data-shimmer-base"
+        },
+        {
+          "name": "data-shimmer-streak"
+        }
+      ],
+      "example": "<Shimmer>Content</Shimmer>"
+    },
     "Glass": {
       "import": "@dryui/ui",
       "description": "Translucent glass wrapper with blur, tint, and saturation control",
@@ -19335,7 +19164,7 @@
             "rank": 1,
             "component": "Alert",
             "useWhen": "Inline alert message within page content",
-            "snippet": "<Alert.Root variant=\"warning\">\n  <Alert.Title>Warning</Alert.Title>\n  <Alert.Description>Your session will expire in 5 minutes.</Alert.Description>\n</Alert.Root>"
+            "snippet": "<Alert variant=\"warning\">\n  {#snippet title()}Warning{/snippet}\n  {#snippet description()}Your session will expire in 5 minutes.{/snippet}\n</Alert>"
           },
           {
             "rank": 2,
@@ -20002,7 +19831,7 @@
             "rank": 2,
             "component": "Alert",
             "useWhen": "Persistent inline message in page content",
-            "snippet": "<Alert.Root variant=\"success\">\n  <Alert.Title>Saved</Alert.Title>\n  <Alert.Description>Your changes have been saved.</Alert.Description>\n</Alert.Root>"
+            "snippet": "<Alert variant=\"success\">\n  {#snippet title()}Saved{/snippet}\n  {#snippet description()}Your changes have been saved.{/snippet}\n</Alert>"
           }
         ],
         "antiPatterns": [
@@ -22399,36 +22228,6 @@
           "Button",
           "Select"
         ]
-      },
-      "optionswatchgroup": {
-        "component": "OptionSwatchGroup",
-        "useWhen": "Let users pick a visual option like a color, finish, or material from swatch tiles.",
-        "alternatives": [
-          {
-            "rank": 1,
-            "component": "OptionSwatchGroup",
-            "useWhen": "Product options or visual selections benefit from swatches or color chips",
-            "snippet": "<OptionSwatchGroup.Root bind:value={color}>\n  <OptionSwatchGroup.Item value=\"sage\">\n    <OptionSwatchGroup.Swatch color=\"#7da174\" />\n    <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>\n  </OptionSwatchGroup.Item>\n</OptionSwatchGroup.Root>"
-          },
-          {
-            "rank": 2,
-            "component": "SelectableTileGroup",
-            "useWhen": "The choice needs larger tiles or mixed text content",
-            "snippet": "<SelectableTileGroup.Root bind:value={finish}>\n  <SelectableTileGroup.Item value=\"matte\">Matte</SelectableTileGroup.Item>\n</SelectableTileGroup.Root>"
-          }
-        ],
-        "antiPatterns": [
-          {
-            "pattern": "using swatches without labels",
-            "reason": "Color-only choices are ambiguous and inaccessible",
-            "fix": "Always include a text label or meta text"
-          }
-        ],
-        "combinesWith": [
-          "Field.Root",
-          "Label",
-          "Text"
-        ]
       }
     },
     "recipes": {
@@ -22969,24 +22768,6 @@
           "Label"
         ],
         "snippet": "<script>\n  import { SelectableTileGroup, Field, Label } from '@dryui/ui';\n\n  let plan = $state('standard');\n</script>\n\n<Field.Root>\n  <Label>Plan</Label>\n  <SelectableTileGroup.Root bind:value={plan}>\n    <SelectableTileGroup.Item value=\"standard\">\n      <SelectableTileGroup.Label>Standard</SelectableTileGroup.Label>\n      <SelectableTileGroup.Description>Best for most teams</SelectableTileGroup.Description>\n    </SelectableTileGroup.Item>\n  </SelectableTileGroup.Root>\n</Field.Root>"
-      },
-      "option-swatch-picker": {
-        "name": "option-swatch-picker",
-        "description": "Visual swatch picker for color, finish, or material selection with labels and metadata.",
-        "tags": [
-          "swatch",
-          "picker",
-          "color",
-          "material",
-          "selection"
-        ],
-        "components": [
-          "OptionSwatchGroup",
-          "Field",
-          "Label",
-          "Text"
-        ],
-        "snippet": "<script>\n  import { OptionSwatchGroup, Field, Label, Text } from '@dryui/ui';\n\n  let color = $state('sage');\n</script>\n\n<Field.Root>\n  <Label>Color</Label>\n  <OptionSwatchGroup.Root bind:value={color}>\n    <OptionSwatchGroup.Item value=\"sage\">\n      <OptionSwatchGroup.Swatch color=\"#7da174\" />\n      <OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>\n      <OptionSwatchGroup.Meta>Soft matte finish</OptionSwatchGroup.Meta>\n    </OptionSwatchGroup.Item>\n  </OptionSwatchGroup.Root>\n  <Text size=\"sm\" color=\"secondary\">Choose the finish that matches the product photo.</Text>\n</Field.Root>"
       },
       "aligned-card-list": {
         "name": "aligned-card-list",
