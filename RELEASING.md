@@ -1,0 +1,50 @@
+# Releasing
+
+Canonical release and publish guidance for this repository lives here. Link to this file from other docs instead of copying the workflow or npm-token instructions.
+
+## Automated release flow
+
+Releases are automated via [Changesets](https://github.com/changesets/changesets) and `.github/workflows/release.yml`:
+
+1. Run `bun run changeset`
+2. Push to `main`
+3. CI opens or updates the "Version Packages" PR
+4. Merge that PR
+5. CI publishes to npm and creates GitHub Releases
+
+`@dryui/primitives` and `@dryui/ui` are version-linked and should be treated as a fixed pair.
+
+## Manual release
+
+For a local release, run:
+
+```bash
+bun run release
+```
+
+That runs `validate --no-test`, versions packages, and publishes with Changesets. The `prepack` / `postpack` hooks still handle export swapping for `@dryui/primitives` and `@dryui/ui`.
+
+For one-off package publishing, use:
+
+```bash
+bun run scripts/publish.ts <package-dir> [--otp <code>] [--dry-run]
+```
+
+## npm auth gotcha
+
+There is a gitignored project-level `.npmrc` at the repo root. It takes precedence over `~/.npmrc` when publish commands run from inside the repository.
+
+The GitHub Actions `NPM_TOKEN` secret must match `./.npmrc`, not `~/.npmrc`.
+
+To rotate the CI secret to match the repo token:
+
+```bash
+awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
+  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
+```
+
+Rules:
+
+- Pipe via stdin; do not paste tokens into the GitHub web UI.
+- Use `printf` / `awk ... printf` so there is no trailing newline.
+- npm auth failures can show up as misleading 404s on publish.

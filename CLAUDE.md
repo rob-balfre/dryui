@@ -142,7 +142,7 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 - Defines per-component composition rules (alternatives, anti-patterns, combinesWith)
 - Defines cross-component recipes (named patterns with full snippets)
 - Search logic: `packages/mcp/src/composition-search.ts` (shared between MCP and CLI)
-- Consumed by: spec.json, `compose` MCP tool, `compose` CLI command, dryui skill
+- Consumed by: spec.json, `compose` MCP tool, `compose` CLI command, DryUI skill
 - When adding new components or changing component APIs, update composition-data.ts
 - Run `bun run --filter '@dryui/mcp' build` after changes to regenerate spec.json
 
@@ -155,38 +155,7 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 
 ## Releasing
 
-Automated via GitHub Actions (`.github/workflows/release.yml`) using `changesets/action@v1`:
-
-1. Push changesets to `main` → `changesets/action@v1` opens/updates a "Version Packages" PR
-2. Merge that PR → CI runs `bun run build:packages`, then `changesets/action@v1` with `publish: bun run publish:packages` (= `changeset publish`)
-3. `changeset publish` invokes `npm pack` per package. For `@dryui/ui` and `@dryui/primitives` this triggers the `prepack` / `postpack` hooks wired into their `package.json`, which call `scripts/prepack-exports.ts` and `scripts/postpack-exports.ts`
-4. The prepack hook swaps `publishConfig.{exports,svelte,types}` into top-level fields (so npm sees `dist/*.js` paths, not the `src/*.ts` workspace paths) and rewrites `workspace:*` dependency ranges to concrete `^<version>` ranges. The postpack hook restores the original `package.json` from an on-disk backup
-5. GitHub Releases are created by `changesets/action@v1` from the merged changelogs
-
-Shared swap logic lives in `scripts/lib/export-swap.ts` and is reused by `scripts/publish.ts` (the manual single-package publish wrapper) so there is one canonical implementation of the swap/restore cycle.
-
-Manual local release: `bun run release` runs `validate --no-test && version && changeset publish`. The prepack/postpack hooks still fire — no separate swap script is involved. For one-off publishes of a single package, use `bun run scripts/publish.ts <package-dir> [--otp <code>] [--dry-run]`.
-
-Secrets required: `NPM_TOKEN` (repo Actions secret, already configured)
-
-### npm auth gotcha — READ BEFORE ROTATING TOKENS
-
-A gitignored **project-level `.npmrc` at the repo root** holds the publish token (`npm_R8uE...` at time of writing — a classic Publish token). This file takes precedence over `~/.npmrc` whenever publish commands run from inside the repo (`bun run publish:packages`, `bun run release`, etc.).
-
-**The GitHub Actions `NPM_TOKEN` secret must match `./.npmrc`, NOT `~/.npmrc`.** They are usually different tokens with different scopes. The user-level token is often a granular read token that can't publish; the project-level token is the one with `@dryui/*` write permission.
-
-To rotate the CI secret to match the current project token:
-
-```bash
-awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
-  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
-```
-
-Rules:
-
-- Use `printf` / `awk ... printf` (no trailing newline). A trailing `\n` becomes URL-encoded in the Bearer header and npm returns 401, which it reports as a misleading 404 on `PUT /<pkg>`.
-- Pipe via stdin to `gh secret set`. **Never paste tokens into GitHub's web UI** — it silently injects whitespace that triggers the same 401→404 pattern.
-- The npm CLI reports 404 "package not in registry" on publish auth failures to avoid leaking package existence. Always verify the package exists on npmjs.com before assuming the 404 is real — if the package IS there, the 404 means auth is wrong.
+Canonical release, publish, and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Update that file instead of copying release workflow details into role-specific docs.
 
 ## Deployment
 

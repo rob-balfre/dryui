@@ -89,118 +89,9 @@ Accordion, Adjust, Alert, Alert Dialog, Alpha Slider, Aspect Ratio, Aurora, Avat
 
 DryUI ships two things for AI agents: a **skill** that teaches conventions (compound components, theming, CSS rules, accessibility) and an **MCP server** for live component lookup, code validation, and composition guidance. The skill is the most important part — without it, agents guess APIs and make structural mistakes.
 
-### Claude Code
+Canonical install snippets, config paths, and MCP JSON/TOML for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) and render to the docs [getting-started page](https://dryui.dev/getting-started). Update that source instead of duplicating client setup here.
 
-Install the plugin (bundles both skill + MCP server):
-
-```bash
-claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@dryui
-```
-
-### Codex
-
-Codex now supports plugins, but DryUI is not in a public Codex marketplace yet. Today there are two install paths.
-
-Public install in any repo:
-
-```bash
-$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
-codex mcp add dryui -- npx -y @dryui/mcp
-```
-
-Repo-local plugin when you are working inside this repository:
-
-1. Restart Codex so it picks up `.agents/plugins/marketplace.json`.
-2. Run `codex`, then `/plugins`.
-3. Open the `DryUI Local` marketplace and install `DryUI` from `./packages/plugin`.
-
-The repo-local plugin bundles three skills:
-
-- `dryui` for component conventions and composition checks
-- `init` for bootstrapping DryUI in a new or existing SvelteKit project
-- `live-feedback` for the feedback workflow
-
-### VS Code / Copilot
-
-Copy the skill and add the MCP server config:
-
-```bash
-npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui
-```
-
-Add to `.vscode/mcp.json` (note: root key is `"servers"`, not `"mcpServers"`):
-
-```json
-{
-	"servers": {
-		"dryui": {
-			"type": "stdio",
-			"command": "npx",
-			"args": ["-y", "@dryui/mcp"]
-		}
-	}
-}
-```
-
-### Cursor
-
-```bash
-npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
-```
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-	"mcpServers": {
-		"dryui": {
-			"command": "npx",
-			"args": ["-y", "@dryui/mcp"]
-		}
-	}
-}
-```
-
-### Windsurf
-
-```bash
-npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
-```
-
-Add to `~/.codeium/windsurf/mcp_config.json`:
-
-```json
-{
-	"mcpServers": {
-		"dryui": {
-			"command": "npx",
-			"args": ["-y", "@dryui/mcp"]
-		}
-	}
-}
-```
-
-### Zed
-
-Zed does not yet support Agent Skills. It reads `AGENTS.md` for conventions automatically. Add the MCP server to `~/.config/zed/settings.json`:
-
-```json
-{
-	"context_servers": {
-		"dryui": {
-			"command": {
-				"path": "npx",
-				"args": ["-y", "@dryui/mcp"]
-			}
-		}
-	}
-}
-```
-
-### Other MCP clients
-
-Use `npx -y @dryui/mcp` as the server command and adapt the config shape to your client.
+When working inside this repository with Codex, install the repo-local plugin via `codex` → `/plugins` → `DryUI Local`.
 
 ### From Source
 
@@ -211,7 +102,7 @@ bun install
 bun run --filter '@dryui/mcp' build
 ```
 
-Then replace `"command": "npx", "args": ["@dryui/mcp"]` with `"command": "node", "args": ["packages/mcp/dist/index.js"]` in any of the configs above.
+Then replace `"command": "npx", "args": ["-y", "@dryui/mcp"]` with `"command": "node", "args": ["packages/mcp/dist/index.js"]`.
 
 ## Development
 
@@ -229,9 +120,6 @@ bun run build
 
 # Run the docs site
 cd apps/docs && bun dev
-
-# Run the playground
-cd apps/playground && bun dev
 
 # Type-check everything
 bun run check
@@ -271,16 +159,6 @@ tests/
   browser/          # Vitest + Playwright
 ```
 
-### Publishing
-
-Uses [changesets](https://github.com/changesets/changesets) for versioning. `@dryui/primitives` and `@dryui/ui` are version-linked.
-
-```bash
-bun run changeset    # Add a changeset
-bun run version      # Bump versions
-bun run publish      # Validate, build, and publish to npm
-```
-
 ### Generating llms.txt
 
 The MCP package can generate an `llms.txt` file containing the full component spec in a format optimised for AI context:
@@ -310,26 +188,7 @@ DRYui's design language is heavily influenced by [Practical UI](https://www.prac
 
 ## Releasing
 
-Releases are automated with [Changesets](https://github.com/changesets/changesets) and GitHub Actions:
-
-1. Create a changeset: `bun run changeset`
-2. Push to `main` — CI opens a "Version Packages" PR with bumped versions and changelogs
-3. Merge that PR — CI publishes to npm and creates GitHub Releases
-
-For a manual local release: `bun run release`
-
-### npm auth gotcha
-
-A gitignored project-level `.npmrc` at the repo root holds the publish token and takes precedence over `~/.npmrc` when `bun run publish:packages` runs from inside the repo. The GitHub Actions `NPM_TOKEN` secret must match _that_ token, not the one in your user-level `~/.npmrc` — they're usually different (the project one is a classic Publish token with write scope; the user one is often a granular read token without publish rights).
-
-To rotate the CI secret to match the project token:
-
-```bash
-awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
-  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
-```
-
-Use `printf` (no trailing newline) and pipe via stdin — never paste tokens through GitHub's web UI, which can introduce invisible whitespace that npm's registry rejects as 401 and reports as 404.
+See [RELEASING.md](./RELEASING.md) for the canonical Changesets workflow, manual release command, and npm token rotation guidance.
 
 ## License
 
