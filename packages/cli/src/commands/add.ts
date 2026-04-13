@@ -3,14 +3,14 @@
 import { findComponent } from './info.js';
 import type { Spec } from './types.js';
 import { buildAddSnippet, formatAddPlan } from './project-planner.js';
-import { planAdd } from '../../../mcp/src/project-planner.js';
-import { runCommand } from '../run.js';
+import { planAdd } from '@dryui/mcp/project-planner';
+import { toonAddPlan } from '@dryui/mcp/toon';
+import { resolveOutputMode, runCommand, type CommandResult, type OutputMode } from '../run.js';
 
 interface AddOptions {
 	subpath?: boolean;
 	withTheme?: boolean;
 	project?: boolean;
-	json?: boolean;
 	target?: string;
 	cwd?: string;
 }
@@ -47,20 +47,13 @@ function parseProjectInput(
 export function getAdd(
 	query: string,
 	spec: Spec,
+	mode: OutputMode,
 	options: AddOptions = {}
-): { output: string; error: string | null; exitCode: number } {
+): CommandResult {
 	if (options.target && !options.project) {
 		return {
 			output: '',
 			error: '--target requires --project',
-			exitCode: 1
-		};
-	}
-
-	if (options.json && !options.project) {
-		return {
-			output: '',
-			error: '--json requires --project',
 			exitCode: 1
 		};
 	}
@@ -74,9 +67,14 @@ export function getAdd(
 			};
 			const plan = planAdd(spec, query, planOptions);
 
-			return options.json
-				? { output: JSON.stringify(plan, null, 2), error: null, exitCode: 0 }
-				: { output: formatAddPlan(plan), error: null, exitCode: 0 };
+			switch (mode) {
+				case 'toon':
+					return { output: toonAddPlan(plan), error: null, exitCode: 0 };
+				case 'json':
+					return { output: JSON.stringify(plan, null, 2), error: null, exitCode: 0 };
+				default:
+					return { output: formatAddPlan(plan), error: null, exitCode: 0 };
+			}
 		} catch (error) {
 			return {
 				output: '',
@@ -97,7 +95,7 @@ export function getAdd(
 export function runAdd(args: string[], spec: Spec): void {
 	if (args.length === 0 || args[0] === '--help') {
 		console.log(
-			'Usage: dryui add [--subpath] [--with-theme] [--project [path]] [--json] [--target <file>] <component>'
+			'Usage: dryui add [--subpath] [--with-theme] [--project [path]] [--json] [--text] [--target <file>] <component>'
 		);
 		console.log('');
 		console.log('Print a copyable component starter snippet or a project-aware plan.');
@@ -107,13 +105,13 @@ export function runAdd(args: string[], spec: Spec): void {
 		console.log('  --with-theme  Include theme imports for standalone setup snippets');
 		console.log('  --project     Use the shared project planner instead of snippet mode');
 		console.log('                Accepts an optional project path before the component name');
-		console.log('  --json        Output raw JSON');
+		console.log('  --text        Plain-text plan output (--project only; default is TOON)');
+		console.log('  --json        JSON plan output (--project only)');
 		console.log('  --target <file>  Choose a target Svelte file for project plans');
 		process.exit(args[0] === '--help' ? 0 : 1);
 	}
 
 	const project = args.includes('--project');
-	const json = args.includes('--json');
 	const subpath = args.includes('--subpath');
 	const withTheme = args.includes('--with-theme');
 	const targetIndex = args.indexOf('--target');
@@ -126,7 +124,7 @@ export function runAdd(args: string[], spec: Spec): void {
 	}
 
 	const positional = args.filter((arg, index) => {
-		if (['--project', '--json', '--subpath', '--with-theme', '--target'].includes(arg)) {
+		if (['--project', '--json', '--text', '--subpath', '--with-theme', '--target'].includes(arg)) {
 			return false;
 		}
 		if (targetIndex !== -1 && index === targetIndex + 1) {
@@ -135,7 +133,12 @@ export function runAdd(args: string[], spec: Spec): void {
 		return true;
 	});
 
-	if (json && !project) {
+	// Snippet mode (no --project) always produces plain text; output-mode flags
+	// only apply in --project mode where we print an AddPlan.
+	const { mode: resolvedMode } = resolveOutputMode(args);
+	const mode: OutputMode = project ? resolvedMode : 'text';
+
+	if (!project && args.includes('--json')) {
 		console.error('Error: --json requires --project');
 		process.exit(1);
 		return;
@@ -157,14 +160,14 @@ export function runAdd(args: string[], spec: Spec): void {
 		}
 
 		runCommand(
-			getAdd(query, spec, {
+			getAdd(query, spec, mode, {
 				subpath,
 				withTheme,
 				project,
-				json,
 				...(target ? { target } : {}),
 				...(parsed.cwd ? { cwd: parsed.cwd } : {})
-			})
+			}),
+			mode
 		);
 		return;
 	}
@@ -177,12 +180,12 @@ export function runAdd(args: string[], spec: Spec): void {
 	}
 
 	runCommand(
-		getAdd(query, spec, {
+		getAdd(query, spec, mode, {
 			subpath,
 			withTheme,
 			project,
-			json,
 			...(target ? { target } : {})
-		})
+		}),
+		mode
 	);
 }

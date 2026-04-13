@@ -1,30 +1,33 @@
 // Shared argument parser for workspace commands (lint, doctor).
 
-import type { WorkspaceSeverity } from '../../../mcp/src/workspace-audit.js';
+import type { WorkspaceSeverity } from '@dryui/mcp/workspace-audit';
+import { resolveOutputMode, type OutputMode } from '../run.js';
 
 export interface WorkspaceOptions {
 	readonly include?: readonly string[];
 	readonly exclude?: readonly string[];
 	readonly maxSeverity?: WorkspaceSeverity;
 	readonly changed?: boolean;
-	readonly json?: boolean;
-	readonly toon?: boolean;
 	readonly full?: boolean;
 }
 
 /**
- * Parse shared workspace flags: --include, --exclude, --changed, --max-severity, --json.
- * Returns the first positional argument as `path` and all parsed options.
+ * Parse shared workspace flags: --include, --exclude, --changed, --max-severity, --full.
+ * Output mode is resolved via resolveOutputMode — TOON is the default, `--text`
+ * opts into plain text, `--json` into JSON (only when `allowJson` is true;
+ * doctor passes `false` since it doesn't produce JSON).
  */
-export function parseWorkspaceArgs(args: string[]): {
+export function parseWorkspaceArgs(
+	args: string[],
+	{ allowJson = true }: { allowJson?: boolean } = {}
+): {
 	path: string | undefined;
+	mode: OutputMode;
 	options: WorkspaceOptions;
 } {
 	const include: string[] = [];
 	const exclude: string[] = [];
 	let path: string | undefined;
-	let json = false;
-	let toon = false;
 	let full = false;
 	let changed = false;
 	let maxSeverity: WorkspaceSeverity = 'info';
@@ -32,16 +35,6 @@ export function parseWorkspaceArgs(args: string[]): {
 	for (let index = 0; index < args.length; index++) {
 		const arg = args[index];
 		if (!arg) continue;
-
-		if (arg === '--json') {
-			json = true;
-			continue;
-		}
-
-		if (arg === '--toon') {
-			toon = true;
-			continue;
-		}
 
 		if (arg === '--full') {
 			full = true;
@@ -77,5 +70,6 @@ export function parseWorkspaceArgs(args: string[]): {
 		if (!path) path = arg;
 	}
 
-	return { path, options: { json, toon, full, include, exclude, maxSeverity, changed } };
+	const { mode } = resolveOutputMode(args, allowJson);
+	return { path, mode, options: { full, include, exclude, maxSeverity, changed } };
 }
