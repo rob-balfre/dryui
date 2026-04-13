@@ -1,5 +1,59 @@
 # @dryui/ui
 
+## 1.0.0
+
+### Major Changes
+
+- [`5e900f5`](https://github.com/rob-balfre/dryui/commit/5e900f52e89bf204edbf540bba8b24a7ea1a0acb) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Remove `Flex`, `Stack`, and `Grid` primitives.
+
+  These primitives contradicted the DryUI layout philosophy ("Layout is raw CSS grid — do not use Grid, Stack, or Flex components") and had zero internal consumers. Removed to align the published surface with the documented rule. Use raw `display: grid` with CSS custom properties and `@container` queries instead — see the `dryui-css` skill or CLAUDE.md for the canonical patterns.
+
+- [`313e94c`](https://github.com/rob-balfre/dryui/commit/313e94c3cd6dbcaa4924b51f365529078ed14d42) Thanks [@rob-balfre](https://github.com/rob-balfre)! - **Breaking:** Remove `OptionSwatchGroup` — use `OptionPicker` instead. `OptionPicker.Preview` replaces `OptionSwatchGroup.Swatch` and supports the same color/shape props, so the migration is a mechanical rename:
+
+  ```svelte
+  <!-- before -->
+  <OptionSwatchGroup.Root bind:value={color}>
+  	<OptionSwatchGroup.Item value="sage">
+  		<OptionSwatchGroup.Swatch color="#7da174" />
+  		<OptionSwatchGroup.Label>Sage</OptionSwatchGroup.Label>
+  	</OptionSwatchGroup.Item>
+  </OptionSwatchGroup.Root>
+
+  <!-- after -->
+  <OptionPicker.Root bind:value={color}>
+  	<OptionPicker.Item value="sage">
+  		<OptionPicker.Preview color="#7da174" />
+  		<OptionPicker.Label>Sage</OptionPicker.Label>
+  	</OptionPicker.Item>
+  </OptionPicker.Root>
+  ```
+
+  The shared selection context has moved from `option-swatch-group/context.svelte` to `option-picker/context.svelte` (exported as `setOptionPickerCtx` / `getOptionPickerCtx`). Consumers that only used the public compound API are unaffected.
+
+### Minor Changes
+
+- [`313e94c`](https://github.com/rob-balfre/dryui/commit/313e94c3cd6dbcaa4924b51f365529078ed14d42) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add `Shimmer` — a warm highlight sweep that animates across wrapped text and inline icons together. Uses a duplicated-content streak layer with an animated `mask-image: linear-gradient()` so the effect paints uniformly over glyphs and `currentColor` SVG strokes (e.g. lucide icons) in a single element. Exposes `color` and `duration` props plus `--dry-shimmer-{color,duration,gap}` CSS custom properties. Automatically freezes under `prefers-reduced-motion: reduce`.
+
+- [`06e99c6`](https://github.com/rob-balfre/dryui/commit/06e99c612e40398b7febb8e1af938ec1bcd73a8e) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add shared state tokens: `--dry-focus-ring` and `--dry-state-disabled-opacity` (duration tokens `--dry-duration-fast`/`--dry-duration-normal`/`--dry-duration-slow` and `--dry-ease-default` already existed and are now the single source of truth).
+
+  Migrated 37 focus-ring sites, 17 disabled-state sites, and 11 raw-duration sites in `@dryui/ui` to consume these tokens (the two flip-card sites intentionally retain `var(--dry-flip-card-duration, 0.6s)` for the long flip animation). Consumers can now restyle focus and disabled state by overriding a single CSS variable.
+
+  `@dryui/lint` gains a new `dryui/prefer-focus-ring-token` rule that flags any new occurrences of `outline: 2px solid var(--dry-color-focus-ring)` literals in scoped styles.
+
+- [`d0ec666`](https://github.com/rob-balfre/dryui/commit/d0ec666287883253a9a31ff455483bc00cadc4bb) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Diagram: close out the deferred work tracked in `packages/ui/src/diagram/PLAN.md`.
+  - `DiagramCluster.labelPosition` accepts `'top-left'` (default) or `'left'`. The layout reserves the gutter on the chosen edge and `<Diagram />` rotates the label group via `transform="rotate(-90 …)"`.
+  - Forward edge labels slide along the polyline to stay `LABEL_BORDER_AVOID_PX` (28) away from cluster boundaries via the new `computeLabelAnchor` helper and `superNodeIds` option.
+  - `layoutNested` is now recursive, supporting nested directed clusters and flat clusters nested inside directed clusters.
+  - Cross-boundary back edges anchor at the inner node instead of the cluster super-node. `layoutLayeredPass` is split into `computeLayeredPositions` + `finishLayeredPass` so the orchestrator can derive global inner-node positions and feed them to `computeEdgePaths` via `backEdgeAnchorOverrides`. Forward cross-boundary edges intentionally keep super-node anchoring.
+  - Two-tier caching: a `WeakMap` on `computeLayout` for full-result identity caching and an LRU `subLayoutCache` keyed on leaf sub-layout content so unchanged inner clusters skip the pipeline on subsequent calls.
+
+- [`06e99c6`](https://github.com/rob-balfre/dryui/commit/06e99c612e40398b7febb8e1af938ec1bcd73a8e) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add `--dry-form-control-*` shared token family for input, textarea, combobox, and color-picker form controls. Per-component `--dry-<name>-*` overrides still work — they now resolve through the shared family by default, so consumers can restyle all form controls with one change.
+
+### Patch Changes
+
+- Updated dependencies [[`313e94c`](https://github.com/rob-balfre/dryui/commit/313e94c3cd6dbcaa4924b51f365529078ed14d42), [`06e99c6`](https://github.com/rob-balfre/dryui/commit/06e99c612e40398b7febb8e1af938ec1bcd73a8e), [`d0ec666`](https://github.com/rob-balfre/dryui/commit/d0ec666287883253a9a31ff455483bc00cadc4bb), [`5e900f5`](https://github.com/rob-balfre/dryui/commit/5e900f52e89bf204edbf540bba8b24a7ea1a0acb), [`313e94c`](https://github.com/rob-balfre/dryui/commit/313e94c3cd6dbcaa4924b51f365529078ed14d42)]:
+  - @dryui/primitives@1.0.0
+
 ## 0.5.2
 
 ### Patch Changes
