@@ -9,6 +9,8 @@
 				const root = document.documentElement;
 				const wizardStateStorageKey = 'dryui-theme-wizard';
 
+				root.classList.add('no-transitions');
+
 				try {
 					const storedTheme = window.localStorage.getItem('dryui-docs-theme');
 					const explicitTheme =
@@ -68,5 +70,19 @@
 	</head>
 	<body data-sveltekit-preload-data="hover">
 		<div id="app">%sveltekit.body%</div>
+		<script>
+			(() => {
+				const root = document.documentElement;
+				const isDark =
+					root.dataset.theme === 'dark' ||
+					(root.classList.contains('theme-auto') &&
+						window.matchMedia('(prefers-color-scheme: dark)').matches);
+				if (!isDark) return;
+				for (const btn of document.querySelectorAll('button[data-theme-switch]')) {
+					btn.setAttribute('aria-checked', 'true');
+					btn.closest('[data-state]')?.setAttribute('data-state', 'on');
+				}
+			})();
+		</script>
 	</body>
 </html>

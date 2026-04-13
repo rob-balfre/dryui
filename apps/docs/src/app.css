@@ -10,6 +10,31 @@
 	--docs-demo-frame-height-lg: 200px;
 	--docs-code-font-size: 0.9em;
 	--docs-code-padding: 0.1em 0.35em;
+	--docs-theme-icon-sun-display: inline-grid;
+	--docs-theme-icon-moon-display: none;
+}
+
+[data-theme='dark'] {
+	--docs-theme-icon-sun-display: none;
+	--docs-theme-icon-moon-display: inline-grid;
+}
+
+.theme-auto {
+	@media (prefers-color-scheme: dark) {
+		& {
+			--docs-theme-icon-sun-display: none;
+			--docs-theme-icon-moon-display: inline-grid;
+		}
+	}
+}
+
+.no-transitions {
+	--dry-duration-instant: 0ms;
+	--dry-duration-fast: 0ms;
+	--dry-duration-normal: 0ms;
+	--dry-duration-slow: 0ms;
+	--dry-duration-xslow: 0ms;
+	--dry-duration-entrance: 0ms;
 }
 
 *,
