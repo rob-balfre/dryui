@@ -1,0 +1,33 @@
+name: Validate
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    # Pin to 22.04 — ubuntu-24.04 has documented CI performance regressions
+    # https://github.com/actions/runner-images/issues/11790
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
+      - uses: ./.github/actions/setup-dryui
+
+      - run: bun run validate --no-test
+
+      - run: bunx playwright install chromium
+
+      - run: bun run test:browser
