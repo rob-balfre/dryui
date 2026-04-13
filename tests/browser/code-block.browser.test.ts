@@ -1,29 +1,9 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
 import CodeBlock from '../../packages/ui/src/code-block/code-block.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderCodeBlock(props: { code: string; language?: string }) {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(CodeBlock, {
-		target,
-		props
-	});
-
-	mountedComponents.push(component);
-	flushSync();
-	return target;
+	return render(CodeBlock, props).target;
 }
 
 describe('CodeBlock', () => {

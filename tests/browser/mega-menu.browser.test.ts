@@ -1,25 +1,10 @@
-import { afterEach, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import MegaMenuHarness from './fixtures/mega-menu-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 it('opens the mega menu panel in the popover top layer', async () => {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(MegaMenuHarness, { target });
-	mountedComponents.push(component);
-
-	flushSync();
+	const { target } = render(MegaMenuHarness);
 
 	const trigger = target.querySelector<HTMLButtonElement>('[data-mega-menu-trigger]');
 	expect(trigger).toBeTruthy();
@@ -36,13 +21,7 @@ it('opens the mega menu panel in the popover top layer', async () => {
 });
 
 it('renders navigational mega-menu items as links and action items as buttons', async () => {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(MegaMenuHarness, { target });
-	mountedComponents.push(component);
-
-	flushSync();
+	const { target } = render(MegaMenuHarness);
 
 	const trigger = target.querySelector<HTMLButtonElement>('[data-mega-menu-trigger]');
 	expect(trigger).toBeTruthy();

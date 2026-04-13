@@ -1,30 +1,11 @@
-import { afterEach, expect, test } from 'vitest';
+import { expect, test } from 'vitest';
 import { page } from 'vitest/browser';
-import { flushSync, mount, unmount } from 'svelte';
 import VisualBenchmarkScene from '../../apps/docs/src/lib/benchmarks/VisualBenchmarkScene.svelte';
 import '../../apps/docs/src/app.css';
-
-const mountedScenes: ReturnType<typeof mount>[] = [];
-
-afterEach(() => {
-	for (const scene of mountedScenes.splice(0)) {
-		unmount(scene);
-	}
-
-	document.body.replaceChildren();
-});
+import { render } from './_harness';
 
 function renderScene() {
-	const host = document.createElement('div');
-	document.body.append(host);
-
-	const scene = mount(VisualBenchmarkScene, {
-		target: host
-	});
-
-	mountedScenes.push(scene);
-	flushSync();
-
+	render(VisualBenchmarkScene);
 	const root = page.getByTestId('visual-benchmark-root');
 	return { root };
 }

@@ -1,29 +1,13 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
 import ToggleHarness from './fixtures/toggle-harness.svelte';
-
-const mountedComponents: ReturnType<typeof mount>[] = [];
+import { render } from './_harness';
 
 afterEach(() => {
-	for (const component of mountedComponents.splice(0)) {
-		unmount(component);
-	}
-
 	delete document.documentElement.dataset.theme;
-	document.body.replaceChildren();
 });
 
 function renderToggleHarness() {
-	const target = document.createElement('div');
-	document.body.append(target);
-
-	const component = mount(ToggleHarness, {
-		target
-	});
-
-	mountedComponents.push(component);
-	flushSync();
-	return target;
+	return render(ToggleHarness).target;
 }
 
 function getToggleParts(testId: string) {

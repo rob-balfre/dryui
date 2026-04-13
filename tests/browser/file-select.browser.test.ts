@@ -1,24 +1,11 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { flushSync, mount, unmount } from 'svelte';
+import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
 import FileSelectHarness from './fixtures/file-select-harness.svelte';
+import { render } from './_harness';
 
 describe('FileSelect', () => {
-	let cleanup: (() => void) | undefined;
-
-	afterEach(() => {
-		cleanup?.();
-		cleanup = undefined;
-	});
-
 	function setup() {
-		const target = document.createElement('div');
-		document.body.appendChild(target);
-		const instance = mount(FileSelectHarness, { target });
-		cleanup = () => {
-			unmount(instance);
-			target.remove();
-		};
-		return target;
+		return render(FileSelectHarness).target;
 	}
 
 	it('renders trigger and placeholder value', () => {
