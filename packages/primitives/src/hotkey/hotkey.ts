@@ -6,6 +6,7 @@ export interface HotkeyConfig {
 }
 
 interface ParsedHotkey {
+	mod: boolean;
 	ctrl: boolean;
 	alt: boolean;
 	shift: boolean;
@@ -23,6 +24,7 @@ export function parseKeys(keys: string): ParsedHotkey {
 		.split('+')
 		.map((p) => p.trim());
 	const parsed: ParsedHotkey = {
+		mod: false,
 		ctrl: false,
 		alt: false,
 		shift: false,
@@ -32,6 +34,10 @@ export function parseKeys(keys: string): ParsedHotkey {
 
 	for (const part of parts) {
 		switch (part) {
+			case 'mod':
+			case '$mod':
+				parsed.mod = true;
+				break;
 			case 'ctrl':
 			case 'control':
 				parsed.ctrl = true;
@@ -56,9 +62,14 @@ export function parseKeys(keys: string): ParsedHotkey {
 }
 
 export function matchesEvent(event: KeyboardEvent, parsed: ParsedHotkey): boolean {
-	if (event.ctrlKey !== parsed.ctrl) return false;
+	if (parsed.mod) {
+		if (!event.ctrlKey && !event.metaKey) return false;
+	} else if (event.ctrlKey !== parsed.ctrl) {
+		return false;
+	}
+
 	if (event.altKey !== parsed.alt) return false;
-	if (event.metaKey !== parsed.meta) return false;
+	if (!parsed.mod && event.metaKey !== parsed.meta) return false;
 
 	if (event.key.toLowerCase() !== parsed.key) return false;
 	if (!parsed.shift && isShiftAgnosticKey(parsed.key)) return true;

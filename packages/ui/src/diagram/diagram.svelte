@@ -425,10 +425,10 @@
 
 	@container dry-diagram (max-width: 480px) {
 		[data-part='node-content'] {
-			padding: 12px 14px;
+			padding: var(--dry-diagram-node-padding-mobile, 12px 14px);
 		}
 		[data-part='node-content'][data-has-description] {
-			padding: 14px 16px;
+			padding: var(--dry-diagram-node-padding-with-description-mobile, 14px 16px);
 		}
 		[data-part='node-description'] {
 			display: none;
@@ -447,6 +447,14 @@
 		);
 		--_cluster-border: var(--dry-diagram-cluster-border, var(--dry-color-stroke-weak));
 		--_text-muted: var(--dry-diagram-text-muted, var(--dry-color-text-weak));
+		--_node-padding: var(--dry-diagram-node-padding, 16px 22px);
+		--_node-padding-with-description: var(--dry-diagram-node-padding-with-description, 18px 22px);
+		--_node-gap: var(--dry-diagram-node-gap, 8px);
+		--_node-gap-with-description: var(--dry-diagram-node-gap-with-description, 6px);
+		--_node-label-size: var(--dry-diagram-node-label-size, 15px);
+		--_node-label-size-with-description: var(--dry-diagram-node-label-size-with-description, 16px);
+		--_node-description-size: var(--dry-diagram-node-description-size, 12px);
+		--_cluster-label-size: var(--dry-diagram-cluster-label-size, 12px);
 
 		display: block;
 		overflow: visible;
@@ -499,15 +507,15 @@
 	[data-part='node-content'] {
 		display: grid;
 		place-items: center;
-		gap: 8px;
-		padding: 16px 22px;
+		gap: var(--_node-gap);
+		padding: var(--_node-padding);
 		height: 100%;
 		box-sizing: border-box;
 		font-family: var(--dry-font-sans);
 	}
 
 	[data-part='node-label'] {
-		font-size: 15px;
+		font-size: var(--_node-label-size);
 		font-weight: 600;
 		color: var(--_node-color);
 		text-align: center;
@@ -530,7 +538,7 @@
 	}
 
 	[data-part='node-description'] {
-		font-size: 12px;
+		font-size: var(--_node-description-size);
 		font-weight: 400;
 		color: var(--_text-muted);
 		text-align: center;
@@ -538,8 +546,8 @@
 	}
 
 	[data-part='node-content'][data-has-description] {
-		padding: 18px 22px;
-		gap: 6px;
+		padding: var(--_node-padding-with-description);
+		gap: var(--_node-gap-with-description);
 		text-align: left;
 		place-items: start;
 		grid-template-rows: auto auto 1fr;
@@ -550,7 +558,7 @@
 	}
 
 	[data-part='node-content'][data-has-description] [data-part='node-label'] {
-		font-size: 16px;
+		font-size: var(--_node-label-size-with-description);
 	}
 
 	[data-part='node-content'][data-has-description] [data-part='node-description'] {
@@ -695,7 +703,7 @@
 		justify-content: start;
 		gap: 8px;
 		font-family: var(--dry-font-sans);
-		font-size: 12px;
+		font-size: var(--_cluster-label-size);
 		font-weight: 600;
 		color: var(--_text-muted);
 		letter-spacing: 0.04em;
