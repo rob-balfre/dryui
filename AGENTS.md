@@ -2,38 +2,30 @@
 
 Instructions for all AI coding agents working in this repository.
 
+## Tools
+
+Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
+
 ## Setup
 
 Install the DryUI skill (conventions) and MCP server (live tools) for your AI coding tool.
 
-```bash
-# Claude Code — plugin installs both skill + MCP
-claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@dryui
+Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every supported client (Claude Code, Codex, Cursor, Windsurf, Copilot, Zed) live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) — the canonical source rendered to the docs [getting-started page](https://dryui.dev/getting-started). Don't duplicate those snippets here; update `ai-setup.ts` instead.
 
-# Codex — public/manual install
+Codex (the primary AGENTS.md audience) canonical install:
+
+```bash
+# Public / manual install
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
 codex mcp add dryui -- npx -y @dryui/mcp
 
-# Codex — repo-local plugin when working in this repository
+# Repo-local plugin when working in this repository
 codex
 /plugins
 # Install DryUI from the "DryUI Local" marketplace exposed by .agents/plugins/marketplace.json
-
-# Copilot / Cursor / Windsurf — copy skill + add MCP config
-npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
 ```
 
-For MCP server config, each tool uses a different file and root key:
-
-| Tool              | Config file                           | Root key          |
-| ----------------- | ------------------------------------- | ----------------- |
-| Cursor            | `.cursor/mcp.json`                    | `mcpServers`      |
-| VS Code / Copilot | `.vscode/mcp.json`                    | `servers`         |
-| Windsurf          | `~/.codeium/windsurf/mcp_config.json` | `mcpServers`      |
-| Zed               | `~/.config/zed/settings.json`         | `context_servers` |
-
-All tools use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the server entry.
+All MCP entries (every tool) use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the stdio server.
 
 ## CSS Rules (enforced by @dryui/lint — build fails on violations)
 
