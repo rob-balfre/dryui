@@ -33,9 +33,9 @@ Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components include Accordion, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionPicker, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree and Typography.
+Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `info` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
 
-The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the full list and parts reference.
+The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
 ## 3. Let the Theme Do Its Job
 

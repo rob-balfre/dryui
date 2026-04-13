@@ -5,6 +5,7 @@ import {
 	meetsApca,
 	type ThemeTokens
 } from '@dryui/theme-wizard';
+import { SIDEBAR_PREVIEW_TOKEN_NAMES } from '../../../../../packages/mcp/src/theme-tokens.js';
 
 export type SidebarRecipeId = 'current' | 'candidate';
 export type SidebarContractVariant = 'preview' | 'production';
@@ -38,21 +39,6 @@ export interface SidebarContract {
 	checks: SidebarChecks;
 	passesContract: boolean;
 }
-
-const PREVIEW_SEMANTIC_TOKENS = [
-	'--dry-color-bg-base',
-	'--dry-color-bg-overlay',
-	'--dry-color-bg-raised',
-	'--dry-color-text-strong',
-	'--dry-color-text-weak',
-	'--dry-color-text-brand',
-	'--dry-color-fill-brand',
-	'--dry-color-fill-brand-hover',
-	'--dry-color-fill-brand-active',
-	'--dry-color-stroke-weak',
-	'--dry-color-on-brand',
-	'--dry-color-focus-ring'
-] as const;
 
 function requireToken(tokens: TokenMap, name: string): string {
 	const value = tokens[name];
@@ -125,7 +111,7 @@ function buildPreviewProperties(
 ): Record<string, string> {
 	const properties: Record<string, string> = {};
 
-	for (const tokenName of PREVIEW_SEMANTIC_TOKENS) {
+	for (const tokenName of SIDEBAR_PREVIEW_TOKEN_NAMES) {
 		properties[tokenName] = requireToken(tokens, tokenName);
 	}
 

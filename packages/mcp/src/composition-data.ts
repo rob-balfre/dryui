@@ -1,5 +1,5 @@
 // Composition guidance — single source of truth.
-// Consumed by: spec.json, compose MCP tool, compose CLI command, dryui skill.
+// Consumed by: spec.json, compose MCP tool, compose CLI command, DryUI skill.
 
 export interface Alternative {
 	rank: number;

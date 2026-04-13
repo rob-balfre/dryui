@@ -1,9 +1,7 @@
-// Token discovery: parse --dry-* CSS variables from theme files.
+// Token discovery backed by the official theme registry.
 // Shared between @dryui/mcp (MCP tool) and @dryui/cli (CLI command).
 
-import { readFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { THEME_TOKEN_REGISTRY } from './theme-tokens.js';
 
 // ── Types ─────────────────────────────────────────────────
 
@@ -69,45 +67,6 @@ function categorize(name: string): TokenCategory {
 	return 'other';
 }
 
-// ── Parsing ───────────────────────────────────────────────
-
-/** Parse --dry-* variable declarations from a CSS string. Returns a map of name -> value. */
-function parseTokens(css: string): Map<string, string> {
-	const tokens = new Map<string, string>();
-	// Match --dry-<name>: <value>; across single or multiline declarations
-	const regex = /(--dry-[\w-]+)\s*:\s*([^;]+);/g;
-	let match: RegExpExecArray | null;
-	while ((match = regex.exec(css)) !== null) {
-		const name = match[1]!.trim();
-		const value = match[2]!.trim();
-		// First occurrence wins (`:root` appears before data-dry-type-mode blocks)
-		if (!tokens.has(name)) {
-			tokens.set(name, value);
-		}
-	}
-	return tokens;
-}
-
-// ── Theme file resolution ─────────────────────────────────
-
-function themeDir(): string {
-	const here = dirname(fileURLToPath(import.meta.url));
-	// From packages/mcp/src/ -> packages/ui/src/themes/
-	return resolve(here, '../../ui/src/themes');
-}
-
-/** Read and parse the default (light) theme. */
-function loadLightTokens(): Map<string, string> {
-	const css = readFileSync(resolve(themeDir(), 'default.css'), 'utf-8');
-	return parseTokens(css);
-}
-
-/** Read and parse the dark theme overrides. */
-function loadDarkTokens(): Map<string, string> {
-	const css = readFileSync(resolve(themeDir(), 'dark.css'), 'utf-8');
-	return parseTokens(css);
-}
-
 // ── Cache ────────────────────────────────────────────────
 
 let allTokensCache: TokenResult | null = null;
@@ -115,17 +74,14 @@ let allTokensCache: TokenResult | null = null;
 function getAllTokens(): TokenResult {
 	if (allTokensCache) return allTokensCache;
 
-	const light = loadLightTokens();
-	const dark = loadDarkTokens();
-
-	const allNames = new Set([...light.keys(), ...dark.keys()]);
-
 	const tokens: Token[] = [];
-	for (const name of allNames) {
-		const lightVal = light.get(name) ?? '';
-		const darkVal = dark.get(name) || lightVal;
-		const cat = categorize(name);
-		tokens.push({ name, category: cat, light: lightVal, dark: darkVal });
+	for (const token of THEME_TOKEN_REGISTRY) {
+		tokens.push({
+			name: token.name,
+			category: categorize(token.name),
+			light: token.light,
+			dark: token.dark
+		});
 	}
 
 	tokens.sort((a, b) => {

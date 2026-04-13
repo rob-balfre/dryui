@@ -2,6 +2,7 @@
 // Pure functions, no MCP dependency — same pattern as reviewer.ts.
 
 import { buildLineOffsets, lineAtOffset } from './utils.js';
+import { COLOR_PAIRINGS, REQUIRED_TOKENS, SURFACE_TOKENS } from './theme-tokens.js';
 
 function capture(match: RegExpMatchArray, index: number): string {
 	const value = match[index];
@@ -36,74 +37,6 @@ interface ResolvedVar {
 }
 
 // Constants
-
-const REQUIRED_TOKENS: readonly string[] = [
-	// Neutral (8)
-	'--dry-color-text-strong',
-	'--dry-color-text-weak',
-	'--dry-color-icon',
-	'--dry-color-stroke-strong',
-	'--dry-color-stroke-weak',
-	'--dry-color-fill',
-	'--dry-color-fill-hover',
-	'--dry-color-fill-active',
-
-	// Brand (9)
-	'--dry-color-brand',
-	'--dry-color-text-brand',
-	'--dry-color-fill-brand',
-	'--dry-color-fill-brand-hover',
-	'--dry-color-fill-brand-active',
-	'--dry-color-fill-brand-weak',
-	'--dry-color-stroke-brand',
-	'--dry-color-on-brand',
-	'--dry-color-focus-ring',
-
-	// Backgrounds (3)
-	'--dry-color-bg-base',
-	'--dry-color-bg-raised',
-	'--dry-color-bg-overlay',
-
-	// Status: error (6)
-	'--dry-color-text-error',
-	'--dry-color-fill-error',
-	'--dry-color-fill-error-hover',
-	'--dry-color-fill-error-weak',
-	'--dry-color-stroke-error',
-	'--dry-color-on-error',
-
-	// Status: warning (6)
-	'--dry-color-text-warning',
-	'--dry-color-fill-warning',
-	'--dry-color-fill-warning-hover',
-	'--dry-color-fill-warning-weak',
-	'--dry-color-stroke-warning',
-	'--dry-color-on-warning',
-
-	// Status: success (6)
-	'--dry-color-text-success',
-	'--dry-color-fill-success',
-	'--dry-color-fill-success-hover',
-	'--dry-color-fill-success-weak',
-	'--dry-color-stroke-success',
-	'--dry-color-on-success',
-
-	// Status: info (6)
-	'--dry-color-text-info',
-	'--dry-color-fill-info',
-	'--dry-color-fill-info-hover',
-	'--dry-color-fill-info-weak',
-	'--dry-color-stroke-info',
-	'--dry-color-on-info',
-
-	// Shadows (2)
-	'--dry-shadow-raised',
-	'--dry-shadow-overlay',
-
-	// Backdrops (2)
-	'--dry-color-overlay-backdrop',
-	'--dry-color-overlay-backdrop-strong'
-] as const;
 
 const FULL_THEME_THRESHOLD = 4;
 
@@ -261,12 +194,6 @@ const NAMED_COLORS: ReadonlySet<string> = new Set([
 	'transparent',
 	'currentcolor',
 	'inherit'
-]);
-
-const SURFACE_TOKENS: ReadonlySet<string> = new Set([
-	'--dry-color-bg-base',
-	'--dry-color-bg-raised',
-	'--dry-color-bg-overlay'
 ]);
 
 // CSS preprocessing
@@ -757,15 +684,7 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 	}
 
 	// missing-pairing: on-brand without fill-brand, on-{tone} without fill-{tone}
-	const pairings: [string, string][] = [
-		['--dry-color-fill-brand', '--dry-color-on-brand'],
-		['--dry-color-fill-error', '--dry-color-on-error'],
-		['--dry-color-fill-warning', '--dry-color-on-warning'],
-		['--dry-color-fill-success', '--dry-color-on-success'],
-		['--dry-color-fill-info', '--dry-color-on-info']
-	];
-
-	for (const [a, b] of pairings) {
+	for (const [a, b] of COLOR_PAIRINGS) {
 		if (vars.has(a) && !vars.has(b)) {
 			issues.push({
 				severity: 'warning',
@@ -965,7 +884,7 @@ export function diagnoseTheme(
 
 	// 7. Count variables
 	const found = dryVars.size;
-	const requiredSet = new Set(REQUIRED_TOKENS);
+	const requiredSet = new Set<string>(REQUIRED_TOKENS);
 	const requiredFound = [...dryVars.keys()].filter((k) => requiredSet.has(k)).length;
 	const extra = found - requiredFound;
 
