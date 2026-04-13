@@ -1,5 +1,1 @@
-import { redirect } from '@sveltejs/kit';
-
-export function load() {
-	redirect(301, '/theme-wizard');
-}
+export { load } from '../redirect.server.js';
