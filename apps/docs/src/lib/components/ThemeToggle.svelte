@@ -1,74 +1,60 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { Toggle } from '@dryui/ui';
 	import { Sun, Moon } from 'lucide-svelte';
 	import { isDarkTheme, resetThemePreference, toggleTheme } from '$lib/theme.svelte.js';
 
-	let hydrated = $state(false);
-	let darkTheme = $derived(isDarkTheme());
+	let darkTheme = $state(browser ? isDarkTheme() : false);
 
-	onMount(() => {
-		hydrated = true;
-	});
-
-	function handleToggleClick(event: MouseEvent) {
+	function handleClick(event: MouseEvent) {
 		event.preventDefault();
 
 		if (event.altKey) {
 			resetThemePreference();
-			return;
+		} else {
+			toggleTheme();
 		}
 
-		toggleTheme();
+		darkTheme = isDarkTheme();
 	}
 
-	function handleToggleKeydown(event: KeyboardEvent) {
+	function handleKeydown(event: KeyboardEvent) {
 		if (event.key !== 'Escape') {
 			return;
 		}
 
 		event.preventDefault();
 		resetThemePreference();
+		darkTheme = isDarkTheme();
 	}
 </script>
 
-<span class="theme-toggle">
-	{#if hydrated}
-		<Toggle
-			aria-label={darkTheme ? 'Switch to light theme' : 'Switch to dark theme'}
-			aria-keyshortcuts="Escape"
-			pressed={darkTheme}
-			onclick={handleToggleClick}
-			onkeydown={handleToggleKeydown}
-			size="md"
-			title="Alt-click or press Escape to return to system theme"
-		>
-			{#snippet icon()}
-				{#if darkTheme}
-					<Moon size={12} />
-				{:else}
-					<Sun size={12} />
-				{/if}
-			{/snippet}
-		</Toggle>
-	{:else}
-		<span class="placeholder" aria-hidden="true"></span>
-	{/if}
-</span>
+<Toggle
+	aria-label="Toggle theme"
+	aria-keyshortcuts="Escape"
+	pressed={darkTheme}
+	data-theme-switch="true"
+	onclick={handleClick}
+	onkeydown={handleKeydown}
+	size="md"
+	title="Alt-click or press Escape to return to system theme"
+>
+	{#snippet icon()}
+		<span class="theme-icon-sun" aria-hidden="true">
+			<Sun size={12} />
+		</span>
+		<span class="theme-icon-moon" aria-hidden="true">
+			<Moon size={12} />
+		</span>
+	{/snippet}
+</Toggle>
 
 <style>
-	.theme-toggle {
-		display: inline-grid;
-		grid-auto-flow: column;
-		grid-template-columns: minmax(64px, auto);
-		align-items: center;
-		justify-items: center;
-		min-block-size: 32px;
+	.theme-icon-sun {
+		display: var(--docs-theme-icon-sun-display, inline-grid);
 	}
 
-	.placeholder {
-		display: grid;
-		grid-template-columns: minmax(0, 64px);
-		block-size: 32px;
+	.theme-icon-moon {
+		display: var(--docs-theme-icon-moon-display, none);
 	}
 </style>
