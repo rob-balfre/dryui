@@ -108,7 +108,7 @@ describe('getDetect', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const { output, error, exitCode } = getDetect(root, mockSpec);
+		const { output, error, exitCode } = getDetect(root, mockSpec, 'text');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
@@ -135,7 +135,7 @@ describe('getDetect', () => {
 			].join('\n')
 		});
 
-		const { output, error, exitCode } = getDetect(root, mockSpec, { json: true });
+		const { output, error, exitCode } = getDetect(root, mockSpec, 'json');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
@@ -160,7 +160,7 @@ describe('getInstall', () => {
 			'src/app.html': '<html></html>'
 		});
 
-		const { output, error, exitCode } = getInstall(root, mockSpec);
+		const { output, error, exitCode } = getInstall(root, mockSpec, 'text');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
@@ -197,7 +197,7 @@ describe('CLI project planning flow', () => {
 
 		try {
 			const cwd = process.cwd();
-			const result = captureCommand(() => runDetect([], mockSpec));
+			const result = captureCommand(() => runDetect(['--text'], mockSpec));
 
 			expect(result.exitCode).toBe(0);
 			expect(result.errors).toEqual([]);
@@ -225,7 +225,7 @@ describe('CLI project planning flow', () => {
 
 		try {
 			const cwd = process.cwd();
-			const result = captureCommand(() => runInstall([], mockSpec));
+			const result = captureCommand(() => runInstall(['--text'], mockSpec));
 
 			expect(result.exitCode).toBe(0);
 			expect(result.errors).toEqual([]);
@@ -256,7 +256,7 @@ describe('CLI project planning flow', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const result = captureCommand(() => runAdd(['--project', root, 'Card'], mockSpec));
+		const result = captureCommand(() => runAdd(['--project', '--text', root, 'Card'], mockSpec));
 
 		expect(result.exitCode).toBe(0);
 		expect(result.errors).toEqual([]);
@@ -287,7 +287,7 @@ describe('getAdd project mode', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const { output, error, exitCode } = getAdd('Card', mockSpec, {
+		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text', {
 			project: true,
 			subpath: true,
 			cwd: root,
@@ -321,9 +321,8 @@ describe('getAdd project mode', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const { output, error, exitCode } = getAdd('Card', mockSpec, {
+		const { output, error, exitCode } = getAdd('Card', mockSpec, 'json', {
 			project: true,
-			json: true,
 			cwd: root
 		});
 
@@ -339,7 +338,7 @@ describe('getAdd project mode', () => {
 
 describe('getAdd snippet mode', () => {
 	test('prints a standalone component snippet when project mode is not requested', () => {
-		const { output, error, exitCode } = getAdd('Card', mockSpec);
+		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();

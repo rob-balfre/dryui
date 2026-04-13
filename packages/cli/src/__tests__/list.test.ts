@@ -94,7 +94,7 @@ describe('groupByCategory', () => {
 
 describe('getList — all components', () => {
 	test('lists all components when no category filter', () => {
-		const { output, error, exitCode } = getList(null, mockSpec);
+		const { output, error, exitCode } = getList(null, mockSpec, 'text');
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain('Action:');
@@ -107,14 +107,14 @@ describe('getList — all components', () => {
 	});
 
 	test('includes descriptions', () => {
-		const { output } = getList(null, mockSpec);
+		const { output } = getList(null, mockSpec, 'text');
 		expect(output).toContain('Interactive button');
 		expect(output).toContain('Content container');
 		expect(output).toContain('Text input');
 	});
 
 	test('categories are capitalized in output', () => {
-		const { output } = getList(null, mockSpec);
+		const { output } = getList(null, mockSpec, 'text');
 		expect(output).toContain('Action:');
 		expect(output).toContain('Display:');
 		expect(output).toContain('Input:');
@@ -123,7 +123,7 @@ describe('getList — all components', () => {
 
 describe('getList — filtered by category', () => {
 	test('filters by category', () => {
-		const { output, error, exitCode } = getList('input', mockSpec);
+		const { output, error, exitCode } = getList('input', mockSpec, 'text');
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain('Input:');
@@ -133,7 +133,7 @@ describe('getList — filtered by category', () => {
 	});
 
 	test('single category result contains all members', () => {
-		const { output } = getList('display', mockSpec);
+		const { output } = getList('display', mockSpec, 'text');
 		expect(output).toContain('Badge');
 		expect(output).toContain('Card');
 		expect(output).toContain('Status indicator');
@@ -143,7 +143,7 @@ describe('getList — filtered by category', () => {
 
 describe('getList — unknown category', () => {
 	test('returns error for unknown category', () => {
-		const { output, error, exitCode } = getList('nonexistent', mockSpec);
+		const { output, error, exitCode } = getList('nonexistent', mockSpec, 'text');
 		expect(exitCode).toBe(1);
 		expect(output).toBe('');
 		expect(error).not.toBeNull();
@@ -151,7 +151,7 @@ describe('getList — unknown category', () => {
 	});
 
 	test('error lists valid categories', () => {
-		const { error } = getList('nonexistent', mockSpec);
+		const { error } = getList('nonexistent', mockSpec, 'text');
 		expect(error).toContain('Valid categories:');
 		expect(error).toContain('action');
 		expect(error).toContain('display');

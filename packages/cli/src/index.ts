@@ -23,35 +23,40 @@ const VERSION = pkg.version;
 
 const USAGE = `Usage: dryui <command> [options]
 
+Most commands default to TOON (token-optimized) output. Pass --text for
+human-readable plain text, or --json where supported. init, feedback, and
+add (snippet mode) always produce plain text.
+
 Commands:
   init [path] [--pm bun|npm|pnpm|yarn]
                                 Bootstrap a SvelteKit + DryUI project
-  detect [--json] [--toon] [path]
+  detect [--json] [--text] [path]
                                 Detect DryUI project setup
-  install [--json] [--toon] [path]
+  install [--json] [--text] [path]
                                 Print a project install plan
   add <component>               Print a copyable starter snippet for a component
-  info <component> [--toon]     Show component API reference
-  list [--category <cat>] [--toon]
+  info <component> [--text]     Show component API reference
+  list [--category <cat>] [--text]
                                 List all components
-  compose <query> [--toon]      Look up composition guidance
-  review [--json] [--toon] <file.svelte>
+  compose <query> [--text]      Look up composition guidance
+  review [--json] [--text] <file.svelte>
                                 Validate a Svelte file against DryUI spec
-  diagnose [--json] [--toon] <file.css>
+  diagnose [--json] [--text] <file.css>
                                 Validate theme CSS
-  doctor [path] [--toon] [--include <glob>] [--exclude <glob>] [--changed]
+  doctor [path] [--text] [--include <glob>] [--exclude <glob>] [--changed]
                                 Inspect workspace health
-  lint [path] [--json] [--toon] [--include <glob>] [--exclude <glob>] [--changed]
+  lint [path] [--json] [--text] [--include <glob>] [--exclude <glob>] [--changed]
                                 Print deterministic workspace findings
-  tokens [--category <cat>] [--toon]
+  tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
   feedback <subcommand>         Start or inspect the feedback server
 
 Options:
   --help                  Show help for a command
   --version               Show version
-  --toon                  Token-optimized output for AI agents (per-command)
-  --full                  Disable truncation (use with --toon)`;
+  --text                  Plain-text output for humans (default is TOON)
+  --json                  JSON output (where supported)
+  --full                  Disable truncation`;
 
 function main(): void {
 	const args = process.argv.slice(2);

@@ -25,7 +25,7 @@ const mockSpec = {
 
 describe('getAdd', () => {
 	test('prints a starter snippet with theme imports when requested', () => {
-		const { output, error, exitCode } = getAdd('Card', mockSpec, { withTheme: true });
+		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text', { withTheme: true });
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain("import '@dryui/ui/themes/default.css';");
@@ -34,12 +34,12 @@ describe('getAdd', () => {
 	});
 
 	test('supports subpath imports', () => {
-		const { output } = getAdd('Card', mockSpec, { subpath: true });
+		const { output } = getAdd('Card', mockSpec, 'text', { subpath: true });
 		expect(output).toContain("import { Card } from '@dryui/ui/card';");
 	});
 
 	test('returns error for unknown component', () => {
-		const { error, exitCode } = getAdd('Nonexistent', mockSpec);
+		const { error, exitCode } = getAdd('Nonexistent', mockSpec, 'text');
 		expect(exitCode).toBe(1);
 		expect(error).toContain('Unknown component: "Nonexistent"');
 	});

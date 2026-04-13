@@ -3,7 +3,7 @@
 import { extractTokens, getTokenCategories } from '@dryui/mcp/tokens';
 import { toonTokens } from '@dryui/mcp/toon';
 import { pad } from '../format.js';
-import { runCommand, type OutputMode } from '../run.js';
+import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
 
 /**
  * Get the tokens output, optionally filtered by category.
@@ -11,70 +11,73 @@ import { runCommand, type OutputMode } from '../run.js';
  */
 export function getTokens(
 	category: string | null,
-	options?: { toon?: boolean }
+	mode: OutputMode
 ): { output: string; error: string | null; exitCode: number } {
 	const result = extractTokens(category ?? undefined);
 
-	if (options?.toon) {
-		return {
-			output: toonTokens(result, category ?? undefined),
-			error: null,
-			exitCode: 0
-		};
-	}
+	switch (mode) {
+		case 'toon':
+			return {
+				output: toonTokens(result, category ?? undefined),
+				error: null,
+				exitCode: 0
+			};
+		case 'text':
+		default: {
+			if (result.tokens.length === 0 && category) {
+				const available = getTokenCategories();
+				const error = [
+					`Unknown category: "${category}"`,
+					'',
+					'Valid categories:',
+					`  ${available.join(', ')}`
+				].join('\n');
+				return { output: '', error, exitCode: 1 };
+			}
 
-	if (result.tokens.length === 0 && category) {
-		const available = getTokenCategories();
-		const error = [
-			`Unknown category: "${category}"`,
-			'',
-			'Valid categories:',
-			`  ${available.join(', ')}`
-		].join('\n');
-		return { output: '', error, exitCode: 1 };
-	}
+			// Plain text output grouped by category
+			const sections: string[] = [];
+			const grouped = new Map<string, typeof result.tokens>();
+			for (const token of result.tokens) {
+				if (!grouped.has(token.category)) {
+					grouped.set(token.category, []);
+				}
+				grouped.get(token.category)!.push(token);
+			}
 
-	// Plain text output grouped by category
-	const sections: string[] = [];
-	const grouped = new Map<string, typeof result.tokens>();
-	for (const token of result.tokens) {
-		if (!grouped.has(token.category)) {
-			grouped.set(token.category, []);
+			const sortedCategories = [...grouped.keys()].sort();
+			for (const cat of sortedCategories) {
+				const tokens = grouped.get(cat);
+				if (!tokens || tokens.length === 0) continue;
+
+				const lines: string[] = [];
+				lines.push(`${cat.charAt(0).toUpperCase() + cat.slice(1)} (${tokens.length}):`);
+
+				const maxNameLen = Math.max(...tokens.map((t) => t.name.length));
+
+				for (const token of tokens) {
+					const darkDiff = token.dark !== token.light ? `  dark: ${token.dark}` : '';
+					lines.push(`  ${pad(token.name, maxNameLen + 2)}${token.light}${darkDiff}`);
+				}
+
+				sections.push(lines.join('\n'));
+			}
+
+			const summary = `${result.total} tokens across ${sortedCategories.length} categories`;
+			return { output: summary + '\n\n' + sections.join('\n\n'), error: null, exitCode: 0 };
 		}
-		grouped.get(token.category)!.push(token);
 	}
-
-	const sortedCategories = [...grouped.keys()].sort();
-	for (const cat of sortedCategories) {
-		const tokens = grouped.get(cat);
-		if (!tokens || tokens.length === 0) continue;
-
-		const lines: string[] = [];
-		lines.push(`${cat.charAt(0).toUpperCase() + cat.slice(1)} (${tokens.length}):`);
-
-		const maxNameLen = Math.max(...tokens.map((t) => t.name.length));
-
-		for (const token of tokens) {
-			const darkDiff = token.dark !== token.light ? `  dark: ${token.dark}` : '';
-			lines.push(`  ${pad(token.name, maxNameLen + 2)}${token.light}${darkDiff}`);
-		}
-
-		sections.push(lines.join('\n'));
-	}
-
-	const summary = `${result.total} tokens across ${sortedCategories.length} categories`;
-	return { output: summary + '\n\n' + sections.join('\n\n'), error: null, exitCode: 0 };
 }
 
 export function runTokens(args: string[]): void {
 	if (args[0] === '--help') {
-		console.log('Usage: dryui tokens [--category <category>] [--toon]');
+		console.log('Usage: dryui tokens [--category <category>] [--text]');
 		console.log('');
 		console.log('List DryUI --dry-* CSS design tokens.');
 		console.log('');
 		console.log('Options:');
 		console.log('  --category <cat>  Filter by category');
-		console.log('  --toon            Output in TOON format (token-optimized for agents)');
+		console.log('  --text            Plain-text output for humans (default is TOON)');
 		console.log('');
 		console.log('Categories:');
 		const cats = getTokenCategories();
@@ -82,7 +85,7 @@ export function runTokens(args: string[]): void {
 		process.exit(0);
 	}
 
-	const toon = args.includes('--toon');
+	const { mode } = resolveOutputMode(args, false);
 	let filterCategory: string | null = null;
 
 	// Parse --category flag
@@ -96,6 +99,5 @@ export function runTokens(args: string[]): void {
 		filterCategory = catValue.toLowerCase();
 	}
 
-	const mode: OutputMode = toon ? 'toon' : 'text';
-	runCommand(getTokens(filterCategory, { toon }), mode);
+	runCommand(getTokens(filterCategory, mode), mode);
 }

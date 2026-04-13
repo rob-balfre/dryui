@@ -34,6 +34,7 @@ tmp/
 test-projects/
 theme-inspo/
 diagram-samples/
+vendor/
 
 # Auto-generated .d.ts emitted into package src/ dirs when svelte-package
 # walks workspace paths (the real published .d.ts files live in dist/).
