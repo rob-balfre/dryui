@@ -376,44 +376,6 @@ Example:
 </InputGroup.Root>
 ```
 
-## OptionSwatchGroup
-Package: @dryui/ui
-Category: input
-Tags: swatch, selection, options, tiles, product
-Kind: compound
-Root import: import { OptionSwatchGroup } from '@dryui/ui'
-Subpath import: import { OptionSwatchGroup } from '@dryui/ui/option-swatch-group'
-Parts:
-- OptionSwatchGroup.Root
-  Props: columns (1 | 2 | 3 | 4), accepted 1, 2, 3, 4
-- OptionSwatchGroup.Item
-  Props: size ('default' | 'compact'), Size preset affecting density, spacing, or typography., accepted default, compact | unavailable (boolean)
-- OptionSwatchGroup.Swatch
-  Props: color (string), Semantic color or tone applied to the component. | shape ('circle' | 'rounded'), accepted circle, rounded, default 'circle' | children (Snippet), Content rendered inside the component.
-  Native props: Forwards <span> attributes via rest props.
-- OptionSwatchGroup.Label
-  Props: none
-- OptionSwatchGroup.Meta
-  Props: none
-Structure:
-  OptionSwatchGroup.Root
-    OptionSwatchGroup.Item
-    OptionSwatchGroup.Swatch
-    OptionSwatchGroup.Label
-    OptionSwatchGroup.Meta
-CSS variables: --dry-btn-align, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-option-swatch-chip, --dry-option-swatch-group-swatch-border
-Data attributes: data-columns | data-disabled (Present when the component or part is disabled.) | data-option-swatch-group-item | data-option-swatch-group-label | data-option-swatch-group-meta | data-option-swatch-group-root | data-option-swatch-group-rounded | data-option-swatch-group-swatch | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-selected (Present when the current item is selected.) | data-size | data-state | data-unavailable | data-value
-Accessibility: none
-Example:
-```svelte
-<OptionSwatchGroup.Root>
-  <OptionSwatchGroup.Item>...</OptionSwatchGroup.Item>
-  <OptionSwatchGroup.Swatch>...</OptionSwatchGroup.Swatch>
-  <OptionSwatchGroup.Label>...</OptionSwatchGroup.Label>
-  <OptionSwatchGroup.Meta>...</OptionSwatchGroup.Meta>
-</OptionSwatchGroup.Root>
-```
-
 ## OptionPicker
 Package: @dryui/ui
 Category: input
@@ -593,7 +555,7 @@ Structure:
     TagsInput.Tag
     TagsInput.TagDelete
     TagsInput.List
-CSS variables: --dry-tags-input-font-size, --dry-tags-input-gap, --dry-tags-input-tag-font-size, --dry-tags-input-tag-padding-x
+CSS variables: --dry-btn-font-size, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-tags-input-font-size, --dry-tags-input-gap, --dry-tags-input-tag-font-size, --dry-tags-input-tag-padding-x
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-index | data-part | data-size
 Accessibility: none
 Example:
@@ -1073,7 +1035,7 @@ Structure:
     MultiSelectCombobox.Input
     MultiSelectCombobox.Content
       MultiSelectCombobox.Item
-CSS variables: --dry-multi-select-item-radius
+CSS variables: --dry-btn-font-size, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-multi-select-item-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-empty | data-highlighted | data-multi-select-content | data-multi-select-empty | data-multi-select-group | data-multi-select-input | data-multi-select-item | data-multi-select-root | data-multi-select-selection-item | data-multi-select-selection-list | data-multi-select-wrapper | data-part | data-selected (Present when the current item is selected.) | data-state | data-text-value | data-value
 Accessibility: none
 Example:
@@ -3697,34 +3659,19 @@ Example:
 Package: @dryui/ui
 Category: feedback
 Tags: message, notification, info, warning, error
-Kind: compound
+Kind: simple
 Root import: import { Alert } from '@dryui/ui'
 Subpath import: import { Alert } from '@dryui/ui/alert'
-Parts:
-- Alert.Root
-  Props: variant (AlertVariant), Visual style preset for the component., default 'info' | dismissible (boolean), default false | onDismiss (() => void) | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <div> attributes via rest props.
-- Alert.Icon
-  Props: children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <span> attributes via rest props.
-- Alert.Title
-  Props: children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <h*> attributes via rest props.
-- Alert.Description
-  Props: children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <p> attributes via rest props.
-- Alert.Close
-  Props: children (Snippet | undefined), Content rendered inside the component.
-  Native props: Forwards <button> attributes via rest props.
-Structure:
-  Alert.Root
-    Alert.Description
+Props: variant (AlertVariant), Visual style preset for the component., default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
+Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-alert-bg, --dry-alert-border, --dry-alert-icon-color, --dry-radius-nested
-Data attributes: data-alert | data-alert-description | data-alert-direct-child | data-alert-icon | data-alert-title | data-dismissible | data-variant
+Data attributes: data-alert | data-alert-body | data-alert-close | data-alert-description | data-alert-icon | data-alert-title | data-dismissible | data-variant
 Accessibility: none
 Example:
 ```svelte
-<Alert.Root variant="info"><Alert.Description>Your changes have been saved.</Alert.Description></Alert.Root>
+<Alert variant="info">
+  {#snippet description()}Your changes have been saved.{/snippet}
+</Alert>
 ```
 
 ## Toast
@@ -4067,6 +4014,23 @@ Accessibility: none
 Example:
 ```svelte
 <Beam>Content</Beam>
+```
+
+## Shimmer
+Package: @dryui/ui
+Category: visual
+Tags: shimmer, shine, highlight, text, icon, animation, effect
+Kind: simple
+Root import: import { Shimmer } from '@dryui/ui'
+Subpath import: import { Shimmer } from '@dryui/ui/shimmer'
+Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | duration (number), default 3 | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <span> attributes via rest props.
+CSS variables: none
+Data attributes: data-shimmer | data-shimmer-base | data-shimmer-streak
+Accessibility: none
+Example:
+```svelte
+<Shimmer>Content</Shimmer>
 ```
 
 ## Glass
