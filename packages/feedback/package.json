@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -43,8 +43,8 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-    "@dryui/primitives": "^0.5.1",
-    "@dryui/ui": "^0.5.1"
+    "@dryui/primitives": "^1.0.0",
+    "@dryui/ui": "^1.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.1",
