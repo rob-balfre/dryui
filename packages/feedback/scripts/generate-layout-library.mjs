@@ -241,7 +241,7 @@ const SEEDS = [
 	component('alert', 'Feedback', 'Alert', {
 		label: 'Alert',
 		keywords: ['alert', 'warning', 'message'],
-		structure: '`<Alert.Root>` + `<Alert.Title>` + `<Alert.Description>`'
+		structure: '`<Alert>` with `{#snippet title()}` + `{#snippet description()}`'
 	}),
 	component('toast', 'Feedback', 'Toast', {
 		label: 'Toast',

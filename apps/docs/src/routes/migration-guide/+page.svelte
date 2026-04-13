@@ -155,13 +155,13 @@
 				</Card.Root>
 			</div>
 
-			<Alert.Root variant="info">
-				<Alert.Title>No guessing</Alert.Title>
-				<Alert.Description>
+			<Alert variant="info">
+				{#snippet title()}No guessing{/snippet}
+				{#snippet description()}
 					If a component shape is uncertain, stop and look it up. DryUI is strict by design, and the
 					lookup cost is lower than backing out a plausible but wrong abstraction.
-				</Alert.Description>
-			</Alert.Root>
+				{/snippet}
+			</Alert>
 		</div>
 
 		<Separator />

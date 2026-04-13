@@ -9,12 +9,22 @@ Bootstrap DryUI in the current project (or scaffold a new one).
 
 ## Run the CLI
 
+Install the CLI globally first so every subsequent call is short and fast:
+
 ```bash
-npx -y @dryui/cli init        # existing project — installs deps, adds theme, sets up layout
-npx -y @dryui/cli init my-app # new project — scaffolds SvelteKit + DryUI in one step
+bun install -g @dryui/cli   # or: npm install -g @dryui/cli
+```
+
+Then run init:
+
+```bash
+dryui init             # existing project — installs deps, adds theme, sets up layout
+dryui init my-app      # new project — scaffolds SvelteKit + DryUI in one step
 ```
 
 If the user specifies a package manager, pass `--pm bun|npm|pnpm|yarn`.
+
+**No global install?** `bunx @dryui/cli init` and `npx -y @dryui/cli init` work without installing — same result, just slower on every call.
 
 The CLI is idempotent — it detects what's already done and only applies missing steps. If everything is set up, it reports "DryUI is already set up" and exits.
 

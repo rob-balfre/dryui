@@ -84,7 +84,7 @@
 		box-shadow:
 			inset 0 1px 0 color-mix(in srgb, white 22%, transparent),
 			inset 0 -1px 0 color-mix(in srgb, black 10%, transparent);
-		transition: border-radius var(--dry-duration-fast, 100ms) ease;
+		transition: border-radius var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
 	[data-option-picker-preview][data-variant='font'] {
@@ -109,7 +109,7 @@
 			transparent
 		);
 		--dry-option-picker-preview-size: 2rem;
-		transition: border-radius var(--dry-duration-fast, 100ms) ease;
+		transition: border-radius var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
 	[data-option-picker-preview][data-variant='preset'][data-shape='sharp'],

@@ -352,22 +352,24 @@ All components support CSS variable theming. Override at the :root level or comp
 
 Use the CLI for deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation.
 
-All commands support \`--toon\` for token-optimized agent output and \`--full\` to disable truncation. Most also accept \`--json\`.
+Install once with \`bun install -g @dryui/cli\` (or \`npm install -g @dryui/cli\`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
 
 Current command surface: ${cliCommands.join(', ')}.
 
 \`\`\`
-bunx @dryui/cli detect --toon <project-path>
-bunx @dryui/cli install --toon <project-path>
-bunx @dryui/cli add --project --target <file> Card
-bunx @dryui/cli info <component> --toon
-bunx @dryui/cli list --toon --category layout
-bunx @dryui/cli compose "date input" --toon
-bunx @dryui/cli review --toon src/routes/+page.svelte
-bunx @dryui/cli diagnose --toon src/app.css
-bunx @dryui/cli doctor --toon --changed
-bunx @dryui/cli lint --toon --max-severity warning
+dryui detect <project-path>
+dryui install <project-path>
+dryui add --project --target <file> Card
+dryui info <component>
+dryui list --category layout
+dryui compose "date input"
+dryui review src/routes/+page.svelte
+dryui diagnose src/app.css
+dryui doctor --changed
+dryui lint --max-severity warning
 \`\`\`
+
+No global install? Prefix any command with \`bunx @dryui/cli …\` or \`npx -y @dryui/cli …\` — same behaviour, slower on each call.
 
 ## MCP Server & Skill
 

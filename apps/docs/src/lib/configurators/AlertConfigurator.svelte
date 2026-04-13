@@ -55,9 +55,8 @@
 		const variant = values.variant as AlertVariant;
 		const title = String(values.title);
 		const dismissible = values.dismissible === true ? ' dismissible' : '';
-		const close = values.dismissible === true ? '\n  <Alert.Close>Close</Alert.Close>' : '';
 
-		return `<Alert.Root variant="${variant}"${dismissible}>\n  <Alert.Title>${title}</Alert.Title>\n  <Alert.Description>${getDescription(variant)}</Alert.Description>${close}\n</Alert.Root>`;
+		return `<Alert variant="${variant}"${dismissible}>\n  {#snippet title()}${title}{/snippet}\n  {#snippet description()}${getDescription(variant)}{/snippet}\n</Alert>`;
 	}
 </script>
 
@@ -70,17 +69,14 @@
 	{#snippet preview(values)}
 		<div class="alert-preview">
 			{#if visible}
-				<Alert.Root
+				<Alert
 					variant={values.variant as AlertVariant}
 					dismissible={Boolean(values.dismissible)}
 					onDismiss={() => (visible = false)}
 				>
-					<Alert.Title>{String(values.title)}</Alert.Title>
-					<Alert.Description>{getDescription(values.variant as AlertVariant)}</Alert.Description>
-					{#if values.dismissible === true}
-						<Alert.Close>Close</Alert.Close>
-					{/if}
-				</Alert.Root>
+					{#snippet title()}{String(values.title)}{/snippet}
+					{#snippet description()}{getDescription(values.variant as AlertVariant)}{/snippet}
+				</Alert>
 			{:else}
 				<Button variant="outline" onclick={() => (visible = true)}>Show alert</Button>
 			{/if}

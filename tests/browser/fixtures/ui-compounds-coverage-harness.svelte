@@ -12,7 +12,7 @@
 
 <div data-testid="alert-dismissals">{alertDismissals}</div>
 
-<Alert.Root
+<Alert
 	variant="warning"
 	dismissible
 	data-testid="alert-root"
@@ -20,13 +20,10 @@
 		alertDismissals += 1;
 	}}
 >
-	<Alert.Icon data-testid="alert-icon">!</Alert.Icon>
-	<Alert.Title data-testid="alert-title">Scheduled maintenance</Alert.Title>
-	<Alert.Description data-testid="alert-description">
-		Expect a short deploy window after docs publish.
-	</Alert.Description>
-	<Alert.Close data-testid="alert-close" />
-</Alert.Root>
+	{#snippet icon()}!{/snippet}
+	{#snippet title()}Scheduled maintenance{/snippet}
+	{#snippet description()}Expect a short deploy window after docs publish.{/snippet}
+</Alert>
 
 <div data-testid="list-activations">{listActivations}</div>
 

@@ -190,15 +190,6 @@ export type {
 	InputGroupActionProps
 } from './input-group/index.js';
 
-export { OptionSwatchGroup } from './option-swatch-group/index.js';
-export type {
-	OptionSwatchGroupRootProps,
-	OptionSwatchGroupItemProps,
-	OptionSwatchGroupSwatchProps,
-	OptionSwatchGroupLabelProps,
-	OptionSwatchGroupMetaProps
-} from './option-swatch-group/index.js';
-
 export { OptionPicker } from './option-picker/index.js';
 export type {
 	OptionPickerRootProps,
@@ -420,14 +411,7 @@ export type {
 } from './description-list/index.js';
 
 export { Alert } from './alert/index.js';
-export type {
-	AlertVariant,
-	AlertRootProps,
-	AlertIconProps,
-	AlertTitleProps,
-	AlertDescriptionProps,
-	AlertCloseProps
-} from './alert/index.js';
+export type { AlertProps, AlertVariant } from './alert/index.js';
 
 export { Toast, toastStore, createToastStore } from './toast/index.js';
 export type {
@@ -800,6 +784,9 @@ export type { AlphaSliderProps } from './alpha-slider/index.js';
 
 export { Beam } from './beam/index.js';
 export type { BeamProps } from './beam/index.js';
+
+export { Shimmer } from './shimmer/index.js';
+export type { ShimmerProps } from './shimmer/index.js';
 
 export { Glass } from './glass/index.js';
 export type { GlassProps } from './glass/index.js';

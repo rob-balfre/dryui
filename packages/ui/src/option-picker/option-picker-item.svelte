@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
-	import { getSelectableTileGroupCtx } from '../option-swatch-group/context.svelte.js';
+	import { getOptionPickerCtx } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLButtonAttributes, 'value'> {
 		value: string;
@@ -23,7 +23,7 @@
 		...rest
 	}: Props = $props();
 
-	const ctx = getSelectableTileGroupCtx();
+	const ctx = getOptionPickerCtx();
 	const isDisabled = $derived(disabled || unavailable || ctx.disabled);
 	const isSelected = $derived(ctx.isSelected(value));
 
@@ -168,7 +168,7 @@
 	}
 
 	.root:focus-within {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: 2px;
 	}
 
@@ -197,6 +197,15 @@
 		--dry-option-picker-description-row: 3;
 		--dry-option-picker-meta-column: 1;
 		--dry-option-picker-meta-row: 4;
+	}
+
+	.content:has(> [data-option-picker-label]:only-child) {
+		grid-template-columns: 1fr;
+		justify-items: center;
+		text-align: center;
+
+		--dry-option-picker-label-column: 1;
+		--dry-option-picker-label-row: 1;
 	}
 
 	.root[data-size='compact'] .content {

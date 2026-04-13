@@ -33,7 +33,7 @@ Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components include Accordion, Alert, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionSwatchGroup, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree and Typography.
+Compound components include Accordion, AlertDialog, Breadcrumb, Calendar, Card, Carousel, Chart, ChipGroup, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DateField, DatePicker, DateRangePicker, DescriptionList, Dialog, DragAndDrop, Drawer, DropdownMenu, Field, Fieldset, FileSelect, FileUpload, FlipCard, FloatButton, HoverCard, InputGroup, LinkPreview, List, Listbox, Map, MegaMenu, Menubar, MultiSelectCombobox, NavigationMenu, NotificationCenter, OptionPicker, Pagination, PinInput, Popover, RadioGroup, RangeCalendar, RichTextEditor, SegmentedControl, Select, Sidebar, Splitter, StarRating, Stepper, Table, TableOfContents, Tabs, TagsInput, Timeline, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer, Tree and Typography.
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the full list and parts reference.
 
@@ -126,20 +126,23 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 - Codex: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo itself, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`.
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
-**3. Bootstrap the project** — `init` detects your project state and applies whatever is missing:
+**3. Install the CLI** so every subsequent command is short and fast:
 
-```
-npx -y @dryui/cli init
-```
-
-**New project from scratch?** Pass a directory name to scaffold SvelteKit + DryUI in one step:
-
-```
-npx -y @dryui/cli init my-app
-cd my-app && npm run dev
+```bash
+bun install -g @dryui/cli   # or: npm install -g @dryui/cli
 ```
 
-This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. Verify: `npx -y @dryui/cli detect --toon` — output should show `project: ready`.
+**4. Bootstrap the project** — `init` detects your project state and applies whatever is missing:
+
+```bash
+dryui init             # existing project
+dryui init my-app      # new project — scaffolds SvelteKit + DryUI in one step
+cd my-app && bun run dev
+```
+
+This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. Verify: `dryui detect` should show `project: ready`.
+
+> **No global install?** `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` work anywhere without installing — same commands, just slower (re-fetches on each call).
 
 ### Manual setup
 
@@ -185,20 +188,22 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### CLI fallback
 
-All commands support `--toon` for token-optimized agent output and `--full` to disable truncation.
+Install once with `bun install -g @dryui/cli` (or `npm install -g @dryui/cli`), then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
 
 ```bash
-bunx @dryui/cli init [path] [--pm bun]   # Bootstrap SvelteKit + DryUI project
-bunx @dryui/cli info <component> --toon  # Look up component API
-bunx @dryui/cli compose "date input" --toon  # Composition guidance
-bunx @dryui/cli detect [path] --toon     # Check project setup
-bunx @dryui/cli install [path] --toon    # Print install plan
-bunx @dryui/cli review <file.svelte> --toon  # Validate component
-bunx @dryui/cli diagnose <file.css> --toon   # Validate theme CSS
-bunx @dryui/cli doctor [path] --toon     # Audit workspace
-bunx @dryui/cli lint [path] --toon       # Deterministic findings
-bunx @dryui/cli list --toon              # List components
+dryui init [path] [--pm bun]    # Bootstrap SvelteKit + DryUI project
+dryui info <component>          # Look up component API
+dryui compose "date input"      # Composition guidance
+dryui detect [path]             # Check project setup
+dryui install [path]            # Print install plan
+dryui review <file.svelte>      # Validate component
+dryui diagnose <file.css>       # Validate theme CSS
+dryui doctor [path]             # Audit workspace
+dryui lint [path]               # Deterministic findings
+dryui list                      # List components
 ```
+
+Without a global install, prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, just slower (re-fetches on each call).
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
 
