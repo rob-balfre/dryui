@@ -2,6 +2,10 @@
 
 Bun monorepo: zero-dependency Svelte 5 components built on native browser APIs.
 
+## Tools
+
+Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
+
 ## Packages
 
 - `packages/primitives` — @dryui/primitives: headless, unstyled components
@@ -94,27 +98,16 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
 ### Quick setup
 
+Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. All MCP entries use `npx -y @dryui/mcp` as the stdio command.
+
+For Claude Code (this repo), the canonical install is:
+
 ```bash
-# Claude Code (plugin — installs skill + MCP server)
 claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui
-
-# Codex (public/manual install)
-$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
-codex mcp add dryui -- npx -y @dryui/mcp
-
-# Codex (repo-local plugin when working in this repository)
-codex
-/plugins
-# Install DryUI from the "DryUI Local" marketplace exposed by .agents/plugins/marketplace.json
-
-# Copilot / Cursor / Windsurf (skill + MCP config)
-npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui
-# Then add MCP config — see apps/docs/src/lib/ai-setup.ts for per-tool formats
-
-# Zed (MCP only — no skill support yet, reads AGENTS.md for conventions)
-# Add to ~/.config/zed/settings.json under "context_servers"
 ```
+
+When working inside this repository with Codex, install the local plugin via `codex` → `/plugins` → "DryUI Local" marketplace (exposed by `.agents/plugins/marketplace.json`).
 
 Two MCP servers are configured:
 
@@ -126,7 +119,7 @@ DryUI MCP tools:
 - lookup and source browsing (`info`, `get`, `list`)
 - composition and project planning (`compose`, `detect_project`, `plan_install`, `plan_add`)
 - validation, theme checks, and workspace audit (`review`, `diagnose`, `doctor`, `lint`)
-- CLI: `bunx @dryui/cli detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint`
+- CLI: `dryui detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint` (install once via `bun install -g @dryui/cli`; `bunx @dryui/cli <cmd>` / `npx -y @dryui/cli <cmd>` work as no-install fallbacks)
 - Skill: `packages/ui/skills/dryui/SKILL.md`
 - Plugin: `packages/plugin/` (Claude Code plugin + Codex local plugin bundling `dryui`, `init`, `live-feedback`, and MCP)
 
@@ -135,7 +128,7 @@ DryUI MCP tools:
 MCP tool output uses TOON format by default — a compact, agent-optimized notation (~40% fewer tokens than JSON). Format: `resource[count]{fields}: value1,value2,...`
 
 - MCP tools: TOON is the default for all tools (info, list, compose, review, diagnose, doctor, lint, detect_project, plan_install, plan_add)
-- CLI: plain text by default; add `--toon` for TOON output, `--json` for JSON (where supported)
+- CLI: TOON is also the default. Pass `--text` for human-readable plain text, or `--json` where supported
 - `--full` disables truncation (compose snippets, workspace findings, component examples are truncated by default in TOON mode)
 - Every TOON response includes `next[]` contextual help suggesting logical next commands
 - Pre-computed aggregates: `hasBlockers`, `autoFixable` (review), `coverage` (diagnose), `top-rule` (workspace)
@@ -164,10 +157,15 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 
 Automated via GitHub Actions (`.github/workflows/release.yml`) using `changesets/action@v1`:
 
-1. Push changesets to `main` → CI opens/updates a "Version Packages" PR
-2. Merge that PR → CI publishes to npm and creates GitHub Releases
+1. Push changesets to `main` → `changesets/action@v1` opens/updates a "Version Packages" PR
+2. Merge that PR → CI runs `bun run build:packages`, then `changesets/action@v1` with `publish: bun run publish:packages` (= `changeset publish`)
+3. `changeset publish` invokes `npm pack` per package. For `@dryui/ui` and `@dryui/primitives` this triggers the `prepack` / `postpack` hooks wired into their `package.json`, which call `scripts/prepack-exports.ts` and `scripts/postpack-exports.ts`
+4. The prepack hook swaps `publishConfig.{exports,svelte,types}` into top-level fields (so npm sees `dist/*.js` paths, not the `src/*.ts` workspace paths) and rewrites `workspace:*` dependency ranges to concrete `^<version>` ranges. The postpack hook restores the original `package.json` from an on-disk backup
+5. GitHub Releases are created by `changesets/action@v1` from the merged changelogs
 
-Manual local release: `bun run release` (validate → version → build → publish)
+Shared swap logic lives in `scripts/lib/export-swap.ts` and is reused by `scripts/publish.ts` (the manual single-package publish wrapper) so there is one canonical implementation of the swap/restore cycle.
+
+Manual local release: `bun run release` runs `validate --no-test && version && changeset publish`. The prepack/postpack hooks still fire — no separate swap script is involved. For one-off publishes of a single package, use `bun run scripts/publish.ts <package-dir> [--otp <code>] [--dry-run]`.
 
 Secrets required: `NPM_TOKEN` (repo Actions secret, already configured)
 
