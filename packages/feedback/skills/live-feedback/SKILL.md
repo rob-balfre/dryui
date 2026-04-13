@@ -133,4 +133,4 @@ After resolving all submissions, ask the user if they have more feedback. If yes
 - **Use `/submissions` endpoints, NOT `/sessions`.** The Feedback component creates submissions (screenshot + drawings), not sessions/annotations. Querying `/sessions` will always return empty results for this workflow.
 - The `<Feedback>` component is toggled with `Cmd+M` / `Ctrl+M` by default (configurable via the `shortcut` prop). The toolbar is hidden until activated.
 - Screenshots are saved as files at `screenshotPath` -- read them with the Read tool to see the annotated page.
-- Drawing coordinates are relative to the viewport at the time of submission.
+- Drawing coordinates are relative to the active feedback scroll root. On the docs site this is the main content pane, not the browser window.

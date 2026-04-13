@@ -1,12 +1,9 @@
-import type { Component } from 'svelte';
+import type { Component, ComponentType } from 'svelte';
 
 export type DiagramColor = 'neutral' | 'brand' | 'success' | 'warning' | 'error' | 'info';
 export type DiagramDirection = 'TB' | 'BT' | 'LR' | 'RL';
 
-export type DiagramIconComponent = Component<{
-	size?: number | string;
-	'aria-hidden'?: boolean | string;
-}>;
+export type DiagramIconComponent = Component<Record<string, unknown>> | ComponentType;
 
 export interface DiagramNode {
 	id: string;

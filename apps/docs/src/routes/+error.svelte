@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-	<title>{status} — DRY ui</title>
+	<title>{status} — DryUI</title>
 </svelte:head>
 
 <div class="error-page">
