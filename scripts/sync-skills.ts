@@ -1,6 +1,6 @@
 import { $ } from 'bun';
 import { readdir, exists, rm, realpath, lstat } from 'node:fs/promises';
-import { join, basename } from 'node:path';
+import { join, basename, relative } from 'node:path';
 
 const root = join(import.meta.dir, '..');
 const packageSkills = join(root, 'packages', 'ui', 'skills', 'dryui');
@@ -8,6 +8,9 @@ const rootSkills = join(root, 'skills');
 const claudeSkills = join(root, '.claude', 'skills');
 const codexSkills = join(root, '.codex', 'skills');
 const cursorRules = join(root, '.cursor', 'rules');
+
+// Files we deliberately never copy (OS metadata, etc.)
+const IGNORED_NAMES = new Set(['.DS_Store']);
 
 async function copyDir(src: string, dest: string) {
 	// If dest is a symlink, remove it first to avoid writing through it back to src
@@ -22,20 +25,24 @@ async function copyDir(src: string, dest: string) {
 	const entries = await readdir(src, { withFileTypes: true });
 
 	for (const entry of entries) {
-		if (entry.name === '.DS_Store') continue;
+		if (IGNORED_NAMES.has(entry.name)) continue;
 		const srcPath = join(src, entry.name);
 		const destPath = join(dest, entry.name);
 
 		if (entry.isDirectory()) {
 			await copyDir(srcPath, destPath);
 		} else {
-			// Skip if src and dest resolve to the same file
+			// Skip if src and dest resolve to the same file (symlink loop guard)
 			try {
 				const realSrc = await realpath(srcPath);
 				const realDest = await realpath(destPath);
 				if (realSrc === realDest) continue;
 			} catch {}
-			await Bun.write(destPath, Bun.file(srcPath));
+			// Read as bytes and write explicitly — avoids any lazy-file-ref quirks
+			// where Bun.write(path, Bun.file(src)) can silently no-op if both refs
+			// resolve to the same underlying file handle during async streaming.
+			const bytes = await Bun.file(srcPath).bytes();
+			await Bun.write(destPath, bytes);
 		}
 	}
 }
@@ -45,7 +52,7 @@ async function removeStale(src: string, dest: string) {
 	const entries = await readdir(dest, { withFileTypes: true });
 
 	for (const entry of entries) {
-		if (entry.name === '.DS_Store') continue;
+		if (IGNORED_NAMES.has(entry.name)) continue;
 		const srcPath = join(src, entry.name);
 		const destPath = join(dest, entry.name);
 
@@ -143,7 +150,58 @@ async function syncSkillToCursor(skillDir: string, skillName: string, dest: stri
 	}
 }
 
+// --- Post-sync verification ---
+
+type Mismatch = { source: string; target: string; reason: string };
+
+async function collectFiles(dir: string, base: string = dir): Promise<string[]> {
+	if (!(await exists(dir))) return [];
+	const out: string[] = [];
+	const entries = await readdir(dir, { withFileTypes: true });
+	for (const entry of entries) {
+		if (IGNORED_NAMES.has(entry.name)) continue;
+		const full = join(dir, entry.name);
+		if (entry.isDirectory()) {
+			out.push(...(await collectFiles(full, base)));
+		} else {
+			out.push(relative(base, full));
+		}
+	}
+	return out.sort();
+}
+
+async function verifySyncedTree(src: string, dest: string, mismatches: Mismatch[]) {
+	const srcFiles = await collectFiles(src);
+	const destFiles = await collectFiles(dest);
+
+	const srcSet = new Set(srcFiles);
+	const destSet = new Set(destFiles);
+
+	for (const rel of srcFiles) {
+		if (!destSet.has(rel)) {
+			mismatches.push({ source: src, target: dest, reason: `missing target file: ${rel}` });
+			continue;
+		}
+		const a = await Bun.file(join(src, rel)).bytes();
+		const b = await Bun.file(join(dest, rel)).bytes();
+		if (a.length !== b.length || !a.every((byte, i) => byte === b[i])) {
+			mismatches.push({
+				source: src,
+				target: dest,
+				reason: `content mismatch: ${rel} (src ${a.length}B, dest ${b.length}B)`
+			});
+		}
+	}
+	for (const rel of destFiles) {
+		if (!srcSet.has(rel)) {
+			mismatches.push({ source: src, target: dest, reason: `orphan target file: ${rel}` });
+		}
+	}
+}
+
 // 1. Sync packages/ui/skills/dryui/ → .claude/skills/dryui/ + .codex/skills/dryui/ + .cursor/rules/*.mdc
+const syncedTargets: Array<{ src: string; dest: string; label: string }> = [];
+
 if (await exists(packageSkills)) {
 	const claudeDest = join(claudeSkills, 'dryui');
 	const codexDest = join(codexSkills, 'dryui');
@@ -153,6 +211,12 @@ if (await exists(packageSkills)) {
 	await removeStale(packageSkills, codexDest);
 	await copyDir(packageSkills, codexDest);
 	await syncSkillToCursor(packageSkills, 'dryui', cursorRules);
+
+	syncedTargets.push(
+		{ src: packageSkills, dest: claudeDest, label: '.claude/skills/dryui' },
+		{ src: packageSkills, dest: codexDest, label: '.codex/skills/dryui' }
+	);
+
 	console.log(
 		'synced packages/ui/skills/dryui → .claude/skills/ + .codex/skills/ + .cursor/rules/'
 	);
@@ -173,6 +237,37 @@ if (await exists(rootSkills)) {
 		await removeStale(src, codexDest);
 		await copyDir(src, codexDest);
 		await syncSkillToCursor(src, entry.name, cursorRules);
+
+		syncedTargets.push(
+			{ src, dest: claudeDest, label: `.claude/skills/${entry.name}` },
+			{ src, dest: codexDest, label: `.codex/skills/${entry.name}` }
+		);
 	}
 	console.log('synced skills/* → .claude/skills/ + .codex/skills/ + .cursor/rules/');
 }
+
+// 3. Post-sync guard — assert every target is byte-identical to its source.
+// If the copy silently no-ops (the bug this guard was added to catch),
+// exit non-zero with a clear report so CI and humans notice immediately.
+const mismatches: Mismatch[] = [];
+for (const { src, dest } of syncedTargets) {
+	await verifySyncedTree(src, dest, mismatches);
+}
+
+if (mismatches.length > 0) {
+	console.error('');
+	console.error(`sync-skills: ${mismatches.length} post-sync mismatch(es) detected:`);
+	for (const m of mismatches) {
+		console.error(`  - ${relative(root, m.target)}: ${m.reason}`);
+	}
+	console.error('');
+	console.error(
+		'The sync script ran but did not leave targets byte-identical to source. ' +
+			'This usually means a destination file could not be overwritten (permissions, ' +
+			'a hostile file watcher restoring it, or a caching bug in the copy helper). ' +
+			'Re-run `bun run sync:skills`; if it persists, investigate the listed paths manually.'
+	);
+	process.exit(1);
+}
+
+console.log(`sync-skills: verified ${syncedTargets.length} target tree(s) — all in sync.`);
