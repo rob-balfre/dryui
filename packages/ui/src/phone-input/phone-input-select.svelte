@@ -306,7 +306,7 @@
 	}
 
 	[data-phone-input]:focus-within {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 		border-color: var(--dry-color-focus-ring);
 		box-shadow: 0 0 0 1px var(--dry-color-focus-ring);
@@ -317,7 +317,7 @@
 	}
 
 	[data-phone-input][data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 		pointer-events: none;
 	}

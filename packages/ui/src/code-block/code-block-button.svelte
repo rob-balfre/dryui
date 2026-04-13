@@ -318,7 +318,7 @@
 		text-decoration: none;
 		cursor: pointer;
 		border-radius: var(--dry-radius-sm);
-		transition: background var(--dry-duration-fast, 100ms);
+		transition: background var(--dry-duration-fast) var(--dry-ease-default);
 
 		&:hover {
 			background: color-mix(in srgb, currentColor 15%, transparent);

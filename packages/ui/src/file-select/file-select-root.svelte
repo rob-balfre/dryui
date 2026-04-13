@@ -94,12 +94,12 @@
 
 	[data-file-select]:focus-within {
 		border-color: var(--dry-color-focus-ring);
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 	}
 
 	[data-file-select][data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 		pointer-events: none;
 	}

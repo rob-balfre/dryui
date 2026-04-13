@@ -81,7 +81,7 @@
 	}
 
 	[data-part='item']:focus-within > a {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: 2px;
 	}
 </style>

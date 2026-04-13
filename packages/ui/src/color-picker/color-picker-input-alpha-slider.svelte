@@ -133,12 +133,12 @@
 	}
 
 	[data-cp-slider]:focus-visible {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: 2px;
 	}
 
 	[data-cp-slider][data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 	}
 </style>

@@ -188,7 +188,7 @@
 			opacity var(--dry-duration-fast) var(--dry-ease-default);
 
 		&:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
+			outline: var(--dry-focus-ring);
 			outline-offset: 2px;
 			box-shadow: 0 0 0 1px var(--dry-color-stroke-focus);
 		}

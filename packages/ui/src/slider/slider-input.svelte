@@ -152,12 +152,12 @@
 		}
 
 		&:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
+			outline: var(--dry-focus-ring);
 			outline-offset: 4px;
 		}
 
 		&[data-disabled] {
-			opacity: 0.5;
+			opacity: var(--dry-state-disabled-opacity);
 			cursor: not-allowed;
 		}
 

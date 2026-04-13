@@ -109,18 +109,18 @@
 	}
 
 	[data-number-input-wrapper] input:focus-visible {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 		border-color: var(--dry-color-focus-ring);
 	}
 
 	[data-number-input-wrapper] input[data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 	}
 
 	[data-number-input-wrapper][data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 	}
 

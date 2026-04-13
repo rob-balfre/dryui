@@ -97,14 +97,14 @@
 
 <style>
 	[data-cp-input] {
-		padding: var(--dry-space-2) var(--dry-space-3);
-		font-size: var(--dry-type-small-size);
+		padding: var(--dry-form-control-padding-block) var(--dry-form-control-padding-inline);
+		font-size: var(--dry-form-control-font-size);
 		line-height: var(--dry-type-small-leading);
 		font-family: var(--dry-font-mono);
-		color: var(--dry-color-text-strong);
-		background: var(--dry-color-bg-raised);
-		border: 1px solid var(--dry-color-stroke-strong);
-		border-radius: var(--dry-radius-md);
+		color: var(--dry-form-control-color);
+		background: var(--dry-form-control-bg);
+		border: 1px solid var(--dry-form-control-border);
+		border-radius: var(--dry-form-control-radius);
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
 			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
@@ -113,17 +113,17 @@
 	}
 
 	[data-cp-input]:hover:not([data-disabled]) {
-		border-color: var(--dry-color-stroke-strong);
+		border-color: var(--dry-form-control-border-hover);
 	}
 
 	[data-cp-input]:focus-visible {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 		border-color: var(--dry-color-focus-ring);
 	}
 
 	[data-cp-input][data-disabled] {
-		opacity: 0.5;
+		opacity: var(--dry-state-disabled-opacity);
 		cursor: not-allowed;
 	}
 </style>

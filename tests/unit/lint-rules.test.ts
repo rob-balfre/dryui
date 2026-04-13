@@ -513,4 +513,19 @@ describe('checkStyle', () => {
 		const violations = checkStyle('/* dryui-allow flex */\nflex-direction: row;');
 		expect(violations).toHaveLength(0);
 	});
+
+	test('flags outline: 2px solid var(--dry-color-focus-ring) literal', () => {
+		const violations = checkStyle(
+			'.foo:focus-visible { outline: 2px solid var(--dry-color-focus-ring); outline-offset: 2px; }'
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/prefer-focus-ring-token');
+	});
+
+	test('allows outline: var(--dry-focus-ring) shorthand', () => {
+		const violations = checkStyle(
+			'.foo:focus-visible { outline: var(--dry-focus-ring); outline-offset: 2px; }'
+		);
+		expect(violations).toHaveLength(0);
+	});
 });

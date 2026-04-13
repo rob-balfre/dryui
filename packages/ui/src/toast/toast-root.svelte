@@ -149,7 +149,7 @@
 		background: var(--dry-color-stroke-weak, #e2e8f0);
 		border-radius: 0 0 var(--dry-radius-lg) var(--dry-radius-lg);
 		overflow: hidden;
-		transition: grid-template-columns 0.3s ease;
+		transition: grid-template-columns var(--dry-duration-normal) var(--dry-ease-default);
 	}
 
 	[data-part='progress']::after {
