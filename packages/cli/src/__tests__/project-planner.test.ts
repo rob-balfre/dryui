@@ -1,95 +1,23 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { getAdd, runAdd } from '../commands/add.js';
 import { getDetect, runDetect } from '../commands/detect.js';
 import { getInstall, runInstall } from '../commands/install.js';
+import {
+	captureCommandIO,
+	cleanupTempDirs,
+	createCardMockSpec,
+	createTempTree,
+	withCwd
+} from './helpers.js';
 
-const tempDirs: string[] = [];
+const mockSpec = createCardMockSpec();
 
-const mockSpec = {
-	themeImports: {
-		default: '@dryui/ui/themes/default.css',
-		dark: '@dryui/ui/themes/dark.css'
-	},
-	components: {
-		Card: {
-			import: '@dryui/ui',
-			description: 'Content surface',
-			category: 'display',
-			tags: ['surface'],
-			compound: true,
-			parts: {
-				Root: { props: {} }
-			},
-			cssVars: {},
-			dataAttributes: [],
-			example: '<Card.Root>\n  <Card.Content>Body</Card.Content>\n</Card.Root>'
-		}
-	}
-} as const;
-
-function createProject(files: Record<string, string>): string {
-	const root = mkdtempSync(resolve(tmpdir(), 'dryui-cli-'));
-	tempDirs.push(root);
-
-	for (const [relativePath, contents] of Object.entries(files)) {
-		const absolutePath = resolve(root, relativePath);
-		mkdirSync(resolve(absolutePath, '..'), { recursive: true });
-		writeFileSync(absolutePath, contents);
-	}
-
-	return root;
-}
-
-function captureCommand(run: () => void): {
-	logs: string[];
-	errors: string[];
-	exitCode: number | null;
-} {
-	const logs: string[] = [];
-	const errors: string[] = [];
-	let exitCode: number | null = null;
-	const originalLog = console.log;
-	const originalError = console.error;
-	const originalExit = process.exit;
-
-	console.log = ((...args: unknown[]) => {
-		logs.push(args.map(String).join(' '));
-	}) as typeof console.log;
-	console.error = ((...args: unknown[]) => {
-		errors.push(args.map(String).join(' '));
-	}) as typeof console.error;
-	process.exit = ((code?: number | string | undefined) => {
-		exitCode = typeof code === 'number' ? code : 0;
-		throw new Error('exit');
-	}) as typeof process.exit;
-
-	try {
-		run();
-	} catch (error) {
-		if (!(error instanceof Error) || error.message !== 'exit') {
-			throw error;
-		}
-	} finally {
-		console.log = originalLog;
-		console.error = originalError;
-		process.exit = originalExit;
-	}
-
-	return { logs, errors, exitCode };
-}
-
-afterEach(() => {
-	for (const dir of tempDirs.splice(0)) {
-		rmSync(dir, { recursive: true, force: true });
-	}
-});
+afterEach(cleanupTempDirs);
 
 describe('getDetect', () => {
 	test('formats project detection text', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -118,7 +46,7 @@ describe('getDetect', () => {
 	});
 
 	test('returns raw JSON when requested', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -149,7 +77,7 @@ describe('getDetect', () => {
 
 describe('getInstall', () => {
 	test('formats an install plan with pending setup steps', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -173,7 +101,7 @@ describe('getInstall', () => {
 
 describe('CLI project planning flow', () => {
 	test('detect uses cwd when no path is provided', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -192,24 +120,19 @@ describe('CLI project planning flow', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const originalCwd = process.cwd();
-		process.chdir(root);
-
-		try {
+		withCwd(root, () => {
 			const cwd = process.cwd();
-			const result = captureCommand(() => runDetect(['--text'], mockSpec));
+			const result = captureCommandIO(() => runDetect(['--text'], mockSpec));
 
 			expect(result.exitCode).toBe(0);
 			expect(result.errors).toEqual([]);
 			expect(result.logs.join('\n')).toContain('DryUI project detection');
 			expect(result.logs.join('\n')).toContain(`Input: ${cwd}`);
-		} finally {
-			process.chdir(originalCwd);
-		}
+		});
 	});
 
 	test('install uses cwd when no path is provided', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -220,24 +143,19 @@ describe('CLI project planning flow', () => {
 			'src/app.html': '<html></html>'
 		});
 
-		const originalCwd = process.cwd();
-		process.chdir(root);
-
-		try {
+		withCwd(root, () => {
 			const cwd = process.cwd();
-			const result = captureCommand(() => runInstall(['--text'], mockSpec));
+			const result = captureCommandIO(() => runInstall(['--text'], mockSpec));
 
 			expect(result.exitCode).toBe(0);
 			expect(result.errors).toEqual([]);
 			expect(result.logs.join('\n')).toContain('DryUI install plan');
 			expect(result.logs.join('\n')).toContain(`Input: ${cwd}`);
-		} finally {
-			process.chdir(originalCwd);
-		}
+		});
 	});
 
 	test('add project mode accepts an explicit project path', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -256,7 +174,7 @@ describe('CLI project planning flow', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const result = captureCommand(() => runAdd(['--project', '--text', root, 'Card'], mockSpec));
+		const result = captureCommandIO(() => runAdd(['--project', '--text', root, 'Card'], mockSpec));
 
 		expect(result.exitCode).toBe(0);
 		expect(result.errors).toEqual([]);
@@ -268,7 +186,7 @@ describe('CLI project planning flow', () => {
 
 describe('getAdd project mode', () => {
 	test('formats a project-aware add plan', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',
@@ -303,7 +221,7 @@ describe('getAdd project mode', () => {
 	});
 
 	test('returns JSON for project mode when requested', () => {
-		const root = createProject({
+		const root = createTempTree({
 			'package.json': JSON.stringify({
 				dependencies: {
 					'@sveltejs/kit': '^2.0.0',

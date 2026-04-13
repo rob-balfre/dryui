@@ -5,7 +5,12 @@ import type { Spec } from './types.js';
 import { formatWorkspaceReport } from '../format.js';
 import { toonWorkspaceReport } from '@dryui/mcp/toon';
 import { parseWorkspaceArgs } from './workspace-args.js';
-import { runCommand, type CommandResult, type OutputMode } from '../run.js';
+import {
+	renderCommandResultByMode,
+	runCommand,
+	type CommandResult,
+	type OutputMode
+} from '../run.js';
 
 export function getDoctor(
 	inputPath: string | undefined,
@@ -27,28 +32,25 @@ export function getDoctor(
 			...(options.maxSeverity ? { maxSeverity: options.maxSeverity } : {}),
 			...(options.changed === undefined ? {} : { changed: options.changed })
 		});
-
-		if (mode === 'toon') {
-			return {
-				output: toonWorkspaceReport(report, {
-					title: 'doctor',
-					command: 'doctor',
-					full: options.full
-				}),
-				error: null,
-				exitCode: 0
-			};
-		}
-
-		return {
-			output: formatWorkspaceReport(report, {
-				title: 'DryUI workspace doctor',
-				showSkipped: true,
-				summaryLabel: 'Findings'
-			}),
-			error: null,
-			exitCode: 0
-		};
+		return renderCommandResultByMode(
+			mode,
+			report,
+			{
+				toon: (value) =>
+					toonWorkspaceReport(value, {
+						title: 'doctor',
+						command: 'doctor',
+						full: options.full
+					}),
+				text: (value) =>
+					formatWorkspaceReport(value, {
+						title: 'DryUI workspace doctor',
+						showSkipped: true,
+						summaryLabel: 'Findings'
+					})
+			},
+			0
+		);
 	} catch (error) {
 		return {
 			output: '',

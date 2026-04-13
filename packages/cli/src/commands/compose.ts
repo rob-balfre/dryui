@@ -3,7 +3,7 @@
 import type { Spec } from './types.js';
 import { searchComposition, formatCompositionResult } from '@dryui/mcp/composition-search';
 import { toonComposition, toonError } from '@dryui/mcp/toon';
-import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
+import { renderCommandResultByMode, runStandardCommand, type OutputMode } from '../run.js';
 
 const SETUP_PREAMBLE = [
 	"\u26A0 SETUP: Root +layout.svelte must import '@dryui/ui/themes/default.css'",
@@ -50,44 +50,38 @@ export function getCompose(
 		}
 	}
 
-	switch (mode) {
-		case 'toon':
-			return {
-				output: toonComposition(results, spec.components, { full: options.full }),
-				error: null,
-				exitCode: 0
-			};
-		case 'text':
-		default: {
-			const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(results, spec.components);
-			return { output: output.trimEnd(), error: null, exitCode: 0 };
+	return renderCommandResultByMode(mode, results, {
+		toon: (value) => toonComposition(value, spec.components, { full: options.full }),
+		text: (value) => {
+			const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(value, spec.components);
+			return output.trimEnd();
 		}
-	}
+	});
 }
 
 export function runCompose(args: string[], spec: Spec): void {
-	if (args.length === 0 || args[0] === '--help') {
-		console.log('Usage: dryui compose <query> [--text] [--full]');
-		console.log('');
-		console.log('Look up composition guidance for building UIs with DryUI.');
-		console.log('Returns ranked component alternatives, anti-patterns, and recipes.');
-		console.log('');
-		console.log('Options:');
-		console.log('  --text    Plain-text output for humans (default is TOON)');
-		console.log('  --full    Include full code snippets (disables truncation)');
-		console.log('');
-		console.log('Examples:');
-		console.log('  dryui compose "search form"');
-		console.log('  dryui compose "hotel card"');
-		console.log('  dryui compose "travel booking" --text');
-		process.exit(args[0] === '--help' ? 0 : 1);
-	}
-
-	const { mode } = resolveOutputMode(args, false);
-	const full = args.includes('--full');
-	const query = args
-		.filter((a) => !a.startsWith('--'))
-		.join(' ')
-		.trim();
-	runCommand(getCompose(query, spec, mode, { full }), mode);
+	runStandardCommand(args, {
+		help: {
+			usage: 'dryui compose <query> [--text] [--full]',
+			description: [
+				'Look up composition guidance for building UIs with DryUI.',
+				'Returns ranked component alternatives, anti-patterns, and recipes.'
+			],
+			options: [
+				'  --text    Plain-text output for humans (default is TOON)',
+				'  --full    Include full code snippets (disables truncation)'
+			],
+			examples: [
+				'  dryui compose "search form"',
+				'  dryui compose "hotel card"',
+				'  dryui compose "travel booking" --text'
+			]
+		},
+		allowJson: false,
+		minPositionals: 1,
+		execute: ({ args, mode, positionals }) =>
+			getCompose(positionals.join(' ').trim(), spec, mode, {
+				full: args.includes('--full')
+			})
+	});
 }

@@ -7,7 +7,7 @@ import {
 	formatSimple
 } from '@dryui/mcp/spec-formatters';
 import { toonComponent, toonError } from '@dryui/mcp/toon';
-import { resolveOutputMode, runCommand, type OutputMode } from '../run.js';
+import { renderCommandResultByMode, runStandardCommand, type OutputMode } from '../run.js';
 
 // Re-export shared formatters so existing consumers (tests, etc.) can import from here.
 export { formatCompound, formatSimple };
@@ -51,20 +51,10 @@ export function getInfo(
 	}
 
 	const { name, def } = result;
-
-	switch (mode) {
-		case 'toon':
-			return {
-				output: toonComponent(name, def, { full: options.full }),
-				error: null,
-				exitCode: 0
-			};
-		case 'text':
-		default: {
-			const output = def.compound ? formatCompound(name, def) : formatSimple(name, def);
-			return { output, error: null, exitCode: 0 };
-		}
-	}
+	return renderCommandResultByMode(mode, def, {
+		toon: (value) => toonComponent(name, value, { full: options.full }),
+		text: (value) => (value.compound ? formatCompound(name, value) : formatSimple(name, value))
+	});
 }
 
 /**
@@ -109,30 +99,29 @@ export function getInfoBatch(
 }
 
 export function runInfo(args: string[], spec: Spec): void {
-	if (args.length === 0 || args[0] === '--help') {
-		console.log('Usage: dryui info <component>[,<component>,...] [--text] [--full]');
-		console.log('');
-		console.log('Show API reference for one or more DryUI components.');
-		console.log('Comma-separated names are supported for batch lookup.');
-		console.log('');
-		console.log('Options:');
-		console.log('  --text    Plain-text output for humans (default is TOON)');
-		console.log('  --full    Include full example code (disables truncation)');
-		console.log('');
-		console.log('Examples:');
-		console.log('  dryui info Button');
-		console.log('  dryui info card              # case-insensitive');
-		console.log('  dryui info Button,Card,Select # batch lookup');
-		console.log('  dryui info Button --text');
-		process.exit(args[0] === '--help' ? 0 : 1);
-	}
-
-	const full = args.includes('--full');
-	const { mode } = resolveOutputMode(args, false);
-	const query = args.find((a) => !a.startsWith('--'));
-	if (!query) {
-		console.error('Error: missing component name');
-		process.exit(1);
-	}
-	runCommand(getInfoBatch(query, spec, mode, { full }), mode);
+	runStandardCommand(args, {
+		help: {
+			usage: 'dryui info <component>[,<component>,...] [--text] [--full]',
+			description: [
+				'Show API reference for one or more DryUI components.',
+				'Comma-separated names are supported for batch lookup.'
+			],
+			options: [
+				'  --text    Plain-text output for humans (default is TOON)',
+				'  --full    Include full example code (disables truncation)'
+			],
+			examples: [
+				'  dryui info Button',
+				'  dryui info card              # case-insensitive',
+				'  dryui info Button,Card,Select # batch lookup',
+				'  dryui info Button --text'
+			]
+		},
+		allowJson: false,
+		minPositionals: 1,
+		execute: ({ args, mode, positionals }) =>
+			getInfoBatch(positionals[0]!, spec, mode, {
+				full: args.includes('--full')
+			})
+	});
 }
