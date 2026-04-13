@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>{preset.name} — Layouts — dryui</title>
+	<title>{preset.name} — Layouts — DryUI</title>
 </svelte:head>
 
 <Container>

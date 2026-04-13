@@ -106,6 +106,7 @@ function firstHeading(body: string): string {
 
 async function syncSkillToCursor(skillDir: string, skillName: string, dest: string) {
 	await $`mkdir -p ${dest}`;
+	const displayName = skillName === 'dryui' ? 'DryUI' : skillName;
 
 	// Collect expected .mdc filenames so we can remove stale ones
 	const expected = new Set<string>();
@@ -115,7 +116,7 @@ async function syncSkillToCursor(skillDir: string, skillName: string, dest: stri
 	if (await exists(skillFile)) {
 		const raw = await Bun.file(skillFile).text();
 		const { meta, body } = parseFrontmatter(raw);
-		const desc = meta.description || `${skillName} skill`;
+		const desc = meta.description || `${displayName} skill`;
 		const filename = `${skillName}.mdc`;
 		expected.add(filename);
 		await Bun.write(
@@ -133,7 +134,7 @@ async function syncSkillToCursor(skillDir: string, skillName: string, dest: stri
 			const raw = await Bun.file(join(rulesDir, entry.name)).text();
 			const ruleName = basename(entry.name, '.md');
 			const heading = firstHeading(raw);
-			const desc = heading ? `${skillName}: ${heading}` : `${skillName} ${ruleName} rules`;
+			const desc = heading ? `${displayName}: ${heading}` : `${displayName} ${ruleName} rules`;
 			const filename = `${skillName}-${ruleName}.mdc`;
 			expected.add(filename);
 			await Bun.write(join(dest, filename), toMdc({ description: desc, body: raw }));

@@ -73,14 +73,14 @@
 </script>
 
 <svelte:head>
-	<title>Getting Started — dryui</title>
+	<title>Getting Started — DryUI</title>
 </svelte:head>
 
 <Container>
 	<div class="page-stack">
 		<DocsPageHeader
 			title="Getting Started"
-			description="Install dryui and render your first component in under a minute."
+			description="Install DryUI and render your first component in under a minute."
 		/>
 
 		<!-- AI prompt -->

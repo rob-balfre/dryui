@@ -4,7 +4,7 @@
 </script>
 
 <svelte:head>
-	<title>Visual Benchmark — dryui</title>
+	<title>Visual Benchmark — DryUI</title>
 </svelte:head>
 
 <VisualBenchmarkScene />

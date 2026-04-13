@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>Grid Layout Rules — dryui</title>
+	<title>Grid Layout Rules — DryUI</title>
 </svelte:head>
 
 {#snippet codeExample(code: string, language: string)}

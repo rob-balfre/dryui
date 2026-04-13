@@ -76,7 +76,7 @@
 		<QRCode
 			value="https://dryui.dev/components/qr-code"
 			size={280}
-			aria-label="dryui QR code preview"
+			aria-label="DryUI QR code preview"
 		/>
 	</div>
 {:else if name === 'Surface'}

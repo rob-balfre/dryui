@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-	<title>Changelog — dryui</title>
+	<title>Changelog — DryUI</title>
 </svelte:head>
 
 <Container>
