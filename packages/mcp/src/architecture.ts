@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { docsNavComponentNames } from './component-catalog.js';
 import { parseCompoundParts } from './generate-spec.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -12,7 +13,6 @@ const uiPackagePath = resolve(__dirname, '../../ui/package.json');
 const primitivesPackagePath = resolve(__dirname, '../../primitives/package.json');
 const specPath = resolve(__dirname, 'spec.json');
 const architectureJsonPath = resolve(__dirname, 'architecture.json');
-const docsNavPath = resolve(__dirname, '../../../apps/docs/src/lib/nav.ts');
 const reportPath = resolve(repoRoot, 'reports/architecture-audit.md');
 
 const ARCHITECTURE_JSON_URL = new URL('./architecture.json', import.meta.url);
@@ -362,14 +362,25 @@ async function collectSourceFiles(dirPath: string): Promise<string[]> {
 
 async function parseRootBarrelNames(indexPath: string): Promise<Set<string>> {
 	const source = await readText(indexPath);
+	return parsePublicComponentNames(source);
+}
+
+function parsePublicComponentNames(source: string): Set<string> {
 	const names = new Set<string>();
 
-	for (const match of source.matchAll(
-		/export\s+\{\s*([A-Za-z0-9_]+)\b[^}]*\}\s+from\s+['"]\.\/[\w-]+\/index\.js['"]/g
-	)) {
-		const name = match[1];
-		if (!name || !/^[A-Z]/u.test(name)) continue;
-		names.add(name);
+	for (const match of source.matchAll(/export\s+\{([^}]+)\}\s+from\s+['"][^'"]+['"]/g)) {
+		const clause = match[1];
+		if (!clause) continue;
+
+		for (const rawName of clause.split(',')) {
+			const cleaned = rawName
+				.trim()
+				.split(/\s+as\s+/u)[0]
+				?.trim();
+			if (!cleaned || !/^[A-Z][A-Za-z0-9]*$/u.test(cleaned)) continue;
+			if (cleaned === cleaned.toUpperCase()) continue;
+			names.add(cleaned);
+		}
 	}
 
 	return names;
@@ -420,7 +431,18 @@ async function parseSubpathExports(packagePath: string): Promise<Map<string, str
 		const basePrefix = target.startsWith(srcPrefix) ? srcPrefix : distPrefix;
 		const dir = target.slice(basePrefix.length, -indexSuffix.length);
 		if (dir.includes('/')) continue;
-		names.set(pascalFromDir(dir), dir);
+
+		const sourceIndexPath = join(dirname(packagePath), 'src', dir, 'index.ts');
+		let sourceIndex: string;
+		try {
+			sourceIndex = await readText(sourceIndexPath);
+		} catch {
+			continue;
+		}
+
+		for (const exportedName of parsePublicComponentNames(sourceIndex)) {
+			names.set(exportedName, dir);
+		}
 	}
 
 	return names;
@@ -470,18 +492,6 @@ async function buildPackageSurface(
 
 function readSpec(): RuntimeSpec {
 	return JSON.parse(readFileSync(specPath, 'utf8')) as RuntimeSpec;
-}
-
-function readDocsNavNames(source: string): string[] {
-	const names = new Set<string>();
-
-	for (const match of source.matchAll(/ui\('([A-Za-z0-9_]+)'\)/g)) {
-		const name = match[1];
-		if (!name) continue;
-		names.add(name);
-	}
-
-	return sortNames(names);
 }
 
 function sanitizeDescription(value: string | null | undefined, name: string): string {
@@ -674,8 +684,7 @@ export async function writeArchitectureArtifacts(graph: DolphinGraph): Promise<v
 
 export async function buildDolphinGraph(): Promise<DolphinGraph> {
 	const spec = readSpec();
-	const docsNavSource = await readText(docsNavPath);
-	const docsNavNames = new Set(readDocsNavNames(docsNavSource));
+	const docsNavNames = new Set(docsNavComponentNames);
 	const primitiveSurface = await buildPackageSurface(
 		'primitives',
 		primitivesSrc,
