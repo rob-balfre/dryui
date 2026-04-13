@@ -12749,6 +12749,7 @@
         "note": "Forwards <element> attributes via rest props."
       },
       "cssVars": {
+        "--dry-btn-color": "Text color",
         "--dry-code-bg": "Background color",
         "--dry-code-border": "Border color",
         "--dry-code-color": "Text color",

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Feedback } from '../../../../packages/feedback/dist/index.js';
+	import { Feedback } from '@dryui/feedback';
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
@@ -159,7 +159,9 @@
 	{@render docsShell()}
 {/if}
 
-<Feedback serverUrl="http://127.0.0.1:4748" scrollRoot="main.docs-content" />
+{#if import.meta.env.DEV}
+	<Feedback serverUrl="http://127.0.0.1:4748" scrollRoot="main.docs-content" />
+{/if}
 
 <style>
 	.docs-shell-frame {

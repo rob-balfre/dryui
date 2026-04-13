@@ -31,7 +31,7 @@ jobs:
         uses: ./.github/actions/setup-dryui
 
       - name: Build packages
-        run: bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build
+        run: bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/feedback' build
 
       - name: Build docs
         run: bunx --bun vite build

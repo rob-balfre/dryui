@@ -9,6 +9,7 @@
     "check": "bunx svelte-check@4.4.6 --tsconfig ./tsconfig.json"
   },
   "dependencies": {
+    "@dryui/feedback": "workspace:*",
     "@dryui/mcp": "workspace:*",
     "@dryui/primitives": "workspace:*",
     "@dryui/theme-wizard": "workspace:*",

@@ -168,22 +168,44 @@
 	interface ContrastCheck {
 		label: string;
 		fgToken: string;
+		bgToken: string;
 		threshold: number;
 	}
 
-	const CONTRAST_CHECKS: ContrastCheck[] = [
-		{ label: 'Text', fgToken: '--dry-color-text-strong', threshold: 4.5 },
-		{ label: 'UI', fgToken: '--dry-color-stroke-strong', threshold: 3 },
-		{ label: 'Brand', fgToken: '--dry-color-fill-brand', threshold: 3 }
-	];
-
 	const BG_TOKEN = '--dry-color-bg-base';
+
+	const CONTRAST_CHECKS: ContrastCheck[] = [
+		{
+			label: 'Surface text',
+			fgToken: '--dry-color-text-strong',
+			bgToken: BG_TOKEN,
+			threshold: 4.5
+		},
+		{
+			label: 'Surface UI',
+			fgToken: '--dry-color-stroke-strong',
+			bgToken: BG_TOKEN,
+			threshold: 3
+		},
+		{
+			label: 'On-brand text',
+			fgToken: '--dry-color-on-brand',
+			bgToken: '--dry-color-fill-brand',
+			threshold: 4.5
+		},
+		{
+			label: 'Brand fill',
+			fgToken: '--dry-color-fill-brand',
+			bgToken: BG_TOKEN,
+			threshold: 3
+		}
+	];
 
 	function getContrastResults(mode: 'light' | 'dark') {
 		const t = getAllTokens(mode);
-		const bg = t[BG_TOKEN] ?? '';
 		return CONTRAST_CHECKS.map((check) => {
 			const fg = t[check.fgToken] ?? '';
+			const bg = t[check.bgToken] ?? '';
 			const ratio = contrastBetweenCssColors(fg, bg);
 			return {
 				label: check.label,
