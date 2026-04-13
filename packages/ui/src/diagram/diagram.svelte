@@ -60,6 +60,7 @@
 			<g data-part="clusters">
 				{#each layout.clusters as cluster (cluster.id)}
 					{@const ClusterIcon = cluster.iconComponent}
+					{@const labelOnLeft = cluster.labelPosition === 'left'}
 					<g data-part="cluster" data-color={cluster.color}>
 						<rect
 							data-part="cluster-box"
@@ -71,7 +72,33 @@
 							data-dashed={cluster.dashed || undefined}
 						/>
 						{#if cluster.label}
-							{#if ClusterIcon}
+							{#if labelOnLeft}
+								{@const lcx = cluster.x + 16}
+								{@const lcy = cluster.y + cluster.height / 2}
+								{#if ClusterIcon}
+									{@const lw = Math.max(cluster.height - 32, 80)}
+									<g transform="rotate(-90 {lcx} {lcy})">
+										<foreignObject x={lcx - lw / 2} y={lcy - 12} width={lw} height={24}>
+											<div
+												xmlns="http://www.w3.org/1999/xhtml"
+												data-part="cluster-label-row"
+												data-color={cluster.color}
+											>
+												<ClusterIcon size={14} aria-hidden="true" />
+												<span>{cluster.label}</span>
+											</div>
+										</foreignObject>
+									</g>
+								{:else}
+									<text
+										data-part="cluster-label"
+										x={lcx}
+										y={lcy}
+										text-anchor="middle"
+										transform="rotate(-90 {lcx} {lcy})">{cluster.label}</text
+									>
+								{/if}
+							{:else if ClusterIcon}
 								<foreignObject
 									x={cluster.x + 16}
 									y={cluster.y + 10}

@@ -6,6 +6,11 @@ const BUS_OFFSET_MAX = 48;
 const DEFAULT_CORNER_RADIUS = 6;
 const BACK_EDGE_LANE_GAP = 32;
 const BACK_EDGE_LANE_STEP = 22;
+/** Minimum distance (in path units, measured along the polyline) between a
+ *  forward edge label and a directed-cluster boundary. Cross-boundary edges
+ *  whose natural midpoint sits closer than this to the cluster are slid along
+ *  the polyline toward the outside endpoint. */
+export const LABEL_BORDER_AVOID_PX = 28;
 
 interface Point {
 	x: number;
@@ -35,15 +40,39 @@ export interface ComputedEdges {
 	collapsed: (Point[] | null)[];
 }
 
+export interface ComputeEdgePathsOptions {
+	cornerRadius?: number;
+	reversedEdges?: Set<string>;
+	bounds?: EdgeRouteBounds;
+	backEdgeLaneGap?: number;
+	/** Set of node IDs that are super-nodes representing directed-cluster
+	 *  boundaries. Forward edge labels touching a super-node endpoint are
+	 *  biased away from that side along the polyline. */
+	superNodeIds?: Set<string>;
+	/** For cross-boundary back edges only: optionally anchor source and/or
+	 *  target to a different node ID than the edge's `from`/`to`. The layered
+	 *  orchestrator uses this to re-anchor a cross-boundary back edge from
+	 *  the cluster super-node to a specific inner node. The override is
+	 *  applied only when the edge is in `reversedEdges`, so forward
+	 *  cross-boundary edges keep super-node anchoring. */
+	backEdgeAnchorOverrides?: Map<string, { source?: string; target?: string }>;
+}
+
 export function computeEdgePaths(
 	edges: DiagramEdge[],
 	positions: Map<string, { x: number; y: number }>,
 	nodeDims: Map<string, { w: number; h: number }>,
 	direction: DiagramDirection,
-	cornerRadius: number = DEFAULT_CORNER_RADIUS,
-	reversedEdges: Set<string> = new Set(),
-	bounds?: EdgeRouteBounds
+	opts: ComputeEdgePathsOptions = {}
 ): ComputedEdges {
+	const {
+		cornerRadius = DEFAULT_CORNER_RADIUS,
+		reversedEdges = new Set<string>(),
+		bounds,
+		backEdgeLaneGap = BACK_EDGE_LANE_GAP,
+		superNodeIds,
+		backEdgeAnchorOverrides
+	} = opts;
 	const horizontal = direction === 'LR' || direction === 'RL';
 	const bySource = new Map<string, DiagramEdge[]>();
 	const byTarget = new Map<string, DiagramEdge[]>();
@@ -77,14 +106,17 @@ export function computeEdgePaths(
 
 		if (isBack && bounds) {
 			const side = pickBackEdgeSide(edge.loop, direction);
-			const endpoints = getBackEdgeEndpoints(edge, positions, nodeDims, side);
+			const overrides = backEdgeAnchorOverrides?.get(edgeKey(edge));
+			const sourceId = overrides?.source ?? edge.from;
+			const targetId = overrides?.target ?? edge.to;
+			const endpoints = getBackEdgeEndpoints(sourceId, targetId, positions, nodeDims, side);
 			if (!endpoints) {
 				out.push(emptyEdge(edge));
 				collapsedOut.push(null);
 				return;
 			}
 			const laneIndex = laneCounters[side]++;
-			const points = buildBackEdgePoints(endpoints, side, bounds, laneIndex);
+			const points = buildBackEdgePoints(endpoints, side, bounds, laneIndex, backEdgeLaneGap);
 			const collapsed = collapsePoints(points);
 			const path = buildPathFromCollapsed(collapsed, cornerRadius);
 			const midpoint = getMidpointFromCollapsed(collapsed);
@@ -98,7 +130,8 @@ export function computeEdgePaths(
 				labelY: midpoint.y + labelOffset,
 				arrow: edge.arrow || 'end',
 				dashed: edge.dashed || false,
-				color: edge.color || 'neutral'
+				color: edge.color || 'neutral',
+				bounds: boundsFromPoints(collapsed)
 			});
 			collapsedOut.push(collapsed);
 			return;
@@ -167,18 +200,19 @@ export function computeEdgePaths(
 
 		const collapsed = collapsePoints(points);
 		const path = buildPathFromCollapsed(collapsed, cornerRadius);
-		const midpoint = getMidpointFromCollapsed(collapsed);
+		const labelPoint = computeLabelAnchor(edge, collapsed, superNodeIds);
 
 		out.push({
 			from: edge.from,
 			to: edge.to,
 			path,
 			label: edge.label,
-			labelX: midpoint.x,
-			labelY: midpoint.y - (horizontal ? 12 : 0),
+			labelX: labelPoint.x,
+			labelY: labelPoint.y - (horizontal ? 12 : 0),
 			arrow: edge.arrow || 'end',
 			dashed: edge.dashed || false,
-			color: edge.color || 'neutral'
+			color: edge.color || 'neutral',
+			bounds: boundsFromPoints(collapsed)
 		});
 		collapsedOut.push(collapsed);
 	});
@@ -195,15 +229,16 @@ function pickBackEdgeSide(
 }
 
 function getBackEdgeEndpoints(
-	edge: DiagramEdge,
+	fromId: string,
+	toId: string,
 	positions: Map<string, { x: number; y: number }>,
 	nodeDims: Map<string, { w: number; h: number }>,
 	side: DiagramLoopSide
 ): Endpoints | undefined {
-	const fromPos = positions.get(edge.from);
-	const toPos = positions.get(edge.to);
-	const fromDims = nodeDims.get(edge.from);
-	const toDims = nodeDims.get(edge.to);
+	const fromPos = positions.get(fromId);
+	const toPos = positions.get(toId);
+	const fromDims = nodeDims.get(fromId);
+	const toDims = nodeDims.get(toId);
 	if (!fromPos || !toPos || !fromDims || !toDims) return undefined;
 
 	const fromCenter = {
@@ -251,11 +286,12 @@ function buildBackEdgePoints(
 	endpoints: Endpoints,
 	side: DiagramLoopSide,
 	bounds: EdgeRouteBounds,
-	laneIndex: number
+	laneIndex: number,
+	laneGap: number
 ): Point[] {
 	switch (side) {
 		case 'over': {
-			const outerY = bounds.minY - BACK_EDGE_LANE_GAP - laneIndex * BACK_EDGE_LANE_STEP;
+			const outerY = bounds.minY - laneGap - laneIndex * BACK_EDGE_LANE_STEP;
 			return [
 				{ x: endpoints.fx, y: endpoints.fy },
 				{ x: endpoints.fx, y: outerY },
@@ -264,7 +300,7 @@ function buildBackEdgePoints(
 			];
 		}
 		case 'under': {
-			const outerY = bounds.maxY + BACK_EDGE_LANE_GAP + laneIndex * BACK_EDGE_LANE_STEP;
+			const outerY = bounds.maxY + laneGap + laneIndex * BACK_EDGE_LANE_STEP;
 			return [
 				{ x: endpoints.fx, y: endpoints.fy },
 				{ x: endpoints.fx, y: outerY },
@@ -273,7 +309,7 @@ function buildBackEdgePoints(
 			];
 		}
 		case 'right': {
-			const outerX = bounds.maxX + BACK_EDGE_LANE_GAP + laneIndex * BACK_EDGE_LANE_STEP;
+			const outerX = bounds.maxX + laneGap + laneIndex * BACK_EDGE_LANE_STEP;
 			return [
 				{ x: endpoints.fx, y: endpoints.fy },
 				{ x: outerX, y: endpoints.fy },
@@ -282,7 +318,7 @@ function buildBackEdgePoints(
 			];
 		}
 		case 'left': {
-			const outerX = bounds.minX - BACK_EDGE_LANE_GAP - laneIndex * BACK_EDGE_LANE_STEP;
+			const outerX = bounds.minX - laneGap - laneIndex * BACK_EDGE_LANE_STEP;
 			return [
 				{ x: endpoints.fx, y: endpoints.fy },
 				{ x: outerX, y: endpoints.fy },
@@ -508,6 +544,21 @@ function buildPathFromCollapsed(collapsed: Point[], cornerRadius: number = 0): s
 	return segments.join(' ');
 }
 
+function boundsFromPoints(points: Point[]): EdgeRouteBounds | undefined {
+	if (points.length === 0) return undefined;
+	let minX = Infinity,
+		minY = Infinity,
+		maxX = -Infinity,
+		maxY = -Infinity;
+	for (const p of points) {
+		if (p.x < minX) minX = p.x;
+		if (p.x > maxX) maxX = p.x;
+		if (p.y < minY) minY = p.y;
+		if (p.y > maxY) maxY = p.y;
+	}
+	return { minX, minY, maxX, maxY };
+}
+
 function collapsePoints(points: Point[]): Point[] {
 	const collapsed: Point[] = [];
 
@@ -605,6 +656,52 @@ function getMidpointFromCollapsed(collapsed: Point[]): Point {
 	return getPointAtFraction(collapsed, 0.5).point;
 }
 
+function getPolylineLength(collapsed: Point[]): number {
+	let total = 0;
+	for (let i = 1; i < collapsed.length; i += 1) {
+		const a = collapsed[i - 1]!;
+		const b = collapsed[i]!;
+		total += Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+	}
+	return total;
+}
+
+/** Compute the on-polyline anchor point for an edge label. Defaults to the
+ *  geometric midpoint, but biases away from a directed-cluster boundary when
+ *  the natural midpoint would land within LABEL_BORDER_AVOID_PX of it. */
+function computeLabelAnchor(
+	edge: { from: string; to: string },
+	collapsed: Point[],
+	superNodeIds: Set<string> | undefined
+): Point {
+	if (collapsed.length < 2 || !superNodeIds) {
+		return getMidpointFromCollapsed(collapsed);
+	}
+	const fromIsCluster = superNodeIds.has(edge.from);
+	const toIsCluster = superNodeIds.has(edge.to);
+	if (fromIsCluster === toIsCluster) {
+		// Either both ends are clusters (not yet a real case) or neither —
+		// no directional bias to apply.
+		return getMidpointFromCollapsed(collapsed);
+	}
+	const length = getPolylineLength(collapsed);
+	if (length <= 0) return getMidpointFromCollapsed(collapsed);
+
+	let labelT = 0.5;
+	if (toIsCluster) {
+		// Cluster is at t=1. Pull label toward t=0 so it stays AVOID_PX from
+		// the boundary. Cap above 0.1 so it never collides with the source.
+		const maxT = 1 - LABEL_BORDER_AVOID_PX / length;
+		labelT = Math.max(0.1, Math.min(0.5, maxT));
+	} else {
+		// Cluster is at t=0. Push label toward t=1.
+		const minT = LABEL_BORDER_AVOID_PX / length;
+		labelT = Math.min(0.9, Math.max(0.5, minT));
+	}
+	if (labelT === 0.5) return getMidpointFromCollapsed(collapsed);
+	return getPointAtFraction(collapsed, labelT).point;
+}
+
 export interface WaypointBox {
 	x: number;
 	y: number;
@@ -646,10 +743,12 @@ export function splitCollapsedAtBox(
 		exitPoint = { x: segFrom.x, y: goingDown ? bottomEdge : topEdge };
 	}
 
+	// Box edges are already in the snapped frame (derived from box coords which
+	// came from collapsed/snapped points). Re-snapping would drift them by 1px.
 	const entry: Point[] = collapsed.slice(0, segmentIndex);
-	entry.push(snapPoint(entryPoint));
+	entry.push(entryPoint);
 
-	const exit: Point[] = [snapPoint(exitPoint), ...collapsed.slice(segmentIndex)];
+	const exit: Point[] = [exitPoint, ...collapsed.slice(segmentIndex)];
 
 	if (entry.length < 2 || exit.length < 2) return null;
 	return { entry, exit };

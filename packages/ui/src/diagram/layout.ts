@@ -2,6 +2,8 @@ import type {
 	DiagramConfig,
 	DiagramDirection,
 	DiagramEdge,
+	DiagramNode,
+	DiagramCluster,
 	DiagramWaypoint,
 	PositionedNode,
 	PositionedEdge,
@@ -27,6 +29,7 @@ const DEFAULT_NODE_GAP = 32;
 const DEFAULT_LAYER_GAP = 64;
 const DEFAULT_CLUSTER_PADDING = 40;
 const DEFAULT_CORNER_RADIUS = 8;
+const DEFAULT_BACK_EDGE_LANE_GAP = 32;
 const DEFAULT_NODE_HEIGHT = 68;
 const DESC_NODE_HEIGHT = 116;
 const MIN_NODE_WIDTH = 176;
@@ -388,14 +391,12 @@ function countClusterBoundaries(layer: string[], clusterMap: Map<string, string>
 // ── Cluster Bounds ─────────────────────────────────────────
 
 function computeClusterBounds(
-	config: DiagramConfig,
+	clusters: DiagramCluster[],
 	positions: Map<string, { x: number; y: number }>,
 	nodeDims: Map<string, { w: number; h: number }>,
 	padding: number
 ): PositionedCluster[] {
-	if (!config.clusters) return [];
-
-	return config.clusters.map((cluster) => {
+	return clusters.map((cluster) => {
 		let minX = Infinity,
 			minY = Infinity,
 			maxX = -Infinity,
@@ -419,22 +420,26 @@ function computeClusterBounds(
 				width: 0,
 				height: 0,
 				label: cluster.label,
+				labelPosition: cluster.labelPosition,
 				iconComponent: cluster.iconComponent,
 				color: cluster.color || 'neutral',
 				dashed: cluster.dashed ?? true
 			};
 		}
 
-		// Add space for label above
+		const labelOnLeft = cluster.labelPosition === 'left';
 		const labelPad = cluster.label ? 24 : 0;
+		const padTop = labelOnLeft ? 0 : labelPad;
+		const padLeft = labelOnLeft ? labelPad : 0;
 
 		return {
 			id: cluster.id,
-			x: minX - padding,
-			y: minY - padding - labelPad,
-			width: maxX - minX + padding * 2,
-			height: maxY - minY + padding * 2 + labelPad,
+			x: minX - padding - padLeft,
+			y: minY - padding - padTop,
+			width: maxX - minX + padding * 2 + padLeft,
+			height: maxY - minY + padding * 2 + padTop,
 			label: cluster.label,
+			labelPosition: cluster.labelPosition,
 			iconComponent: cluster.iconComponent,
 			color: cluster.color || 'neutral',
 			dashed: cluster.dashed ?? true
@@ -661,33 +666,62 @@ function resolveAnnotations(
 
 // ── Layered Layout (main entry) ────────────────────────────
 
-function layoutLayered(config: DiagramConfig): LayoutResult {
-	const direction = config.direction || 'TB';
-	const nodeGap = config.spacing?.nodeGap ?? DEFAULT_NODE_GAP;
-	const layerGap = config.spacing?.layerGap ?? DEFAULT_LAYER_GAP;
-	const clusterPadding = config.spacing?.clusterPadding ?? DEFAULT_CLUSTER_PADDING;
-	const cornerRadius = config.spacing?.cornerRadius ?? DEFAULT_CORNER_RADIUS;
+interface LayeredSpacing {
+	nodeGap: number;
+	layerGap: number;
+	clusterPadding: number;
+	cornerRadius: number;
+	backEdgeLaneGap: number;
+}
 
-	const nodeIds = config.nodes.map((n) => n.id);
-	const nodeDims = buildNodeDims(config.nodes);
+interface LayeredPassResult {
+	positionedNodes: PositionedNode[];
+	positionedClusters: PositionedCluster[];
+	positionedEdges: PositionedEdge[];
+	waypoints: PositionedWaypoint[];
+	bbox: { minX: number; minY: number; maxX: number; maxY: number };
+}
 
-	// Build cluster membership map: nodeId -> clusterId
-	const clusterMap = buildClusterMap(config);
+interface LayeredPositions {
+	positions: Map<string, { x: number; y: number }>;
+	nodeDims: Map<string, { w: number; h: number }>;
+	positionedNodes: PositionedNode[];
+	positionedClusters: PositionedCluster[];
+	preBounds: { minX: number; minY: number; maxX: number; maxY: number };
+	reversedEdges: Set<string>;
+}
 
-	// Build graph and sort
-	const graph = buildGraph(nodeIds, config.edges);
+/** Pipeline steps 1-7: build the graph, assign layers, order within layers,
+ *  assign coordinates, and pre-compute cluster bounds. Returned state is fed
+ *  to `finishLayeredPass` to compute edges and waypoints. The split lets the
+ *  recursive orchestrator inject inner-node positions between these phases
+ *  for cross-boundary back-edge re-anchoring. */
+function computeLayeredPositions(
+	nodes: DiagramNode[],
+	edges: DiagramEdge[],
+	clusters: DiagramCluster[],
+	direction: DiagramDirection,
+	spacing: LayeredSpacing
+): LayeredPositions {
+	const nodeIds = nodes.map((n) => n.id);
+	const nodeDims = buildNodeDims(nodes);
 
-	// Assign layers
+	const clusterMap = new Map<string, string>();
+	for (const cluster of clusters) {
+		for (const nodeId of cluster.nodes) {
+			if (nodeIds.includes(nodeId)) clusterMap.set(nodeId, cluster.id);
+		}
+	}
+
+	const graph = buildGraph(nodeIds, edges);
 	const layerMap = assignLayers(graph.order, graph.adjacencyOut);
 
-	// Group by layer
 	const maxLayer = Math.max(0, ...layerMap.values());
 	const layers: string[][] = Array.from({ length: maxLayer + 1 }, () => []);
 	for (const id of graph.order) {
 		layers[layerMap.get(id)!]!.push(id);
 	}
 
-	// Order within layers (cluster-aware)
 	const orderedLayers = orderWithinLayers(
 		layers,
 		graph.adjacencyOut,
@@ -695,49 +729,538 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 		clusterMap
 	);
 
-	// Assign coordinates (cluster-aware gaps)
 	const positions = assignCoordinates(
 		orderedLayers,
 		nodeDims,
 		direction,
-		nodeGap,
-		layerGap,
+		spacing.nodeGap,
+		spacing.layerGap,
 		clusterMap
 	);
 
-	// Build positioned nodes
-	const positionedNodes = buildPositionedNodes(config.nodes, positions, nodeDims);
+	const positionedNodes = buildPositionedNodes(nodes, positions, nodeDims);
 
-	// Compute clusters
-	const clusters = computeClusterBounds(config, positions, nodeDims, clusterPadding);
-
-	// Pre-edge bounds (used by back-edge router to anchor outer lanes)
-	const preBounds = computeNodeAndClusterBounds(positionedNodes, clusters);
-
-	// Compute edges (back edges route around preBounds)
-	const computed = computeEdgePaths(
-		config.edges,
+	const positionedClusters = computeClusterBounds(
+		clusters,
 		positions,
 		nodeDims,
-		direction,
-		cornerRadius,
-		graph.reversedEdges,
-		preBounds
+		spacing.clusterPadding
 	);
+
+	const preBounds = computeNodeAndClusterBounds(positionedNodes, positionedClusters);
+
+	return {
+		positions,
+		nodeDims,
+		positionedNodes,
+		positionedClusters,
+		preBounds,
+		reversedEdges: graph.reversedEdges
+	};
+}
+
+/** Pipeline steps 8-10: route edges, place waypoints, compute bbox. Takes
+ *  optional position/dim extras and back-edge anchor overrides so the
+ *  orchestrator can re-anchor cross-boundary back edges to inner nodes. */
+function finishLayeredPass(
+	edges: DiagramEdge[],
+	pos: LayeredPositions,
+	direction: DiagramDirection,
+	spacing: LayeredSpacing,
+	superNodeIds?: Set<string>,
+	extras?: {
+		extraPositions?: Map<string, { x: number; y: number }>;
+		extraDims?: Map<string, { w: number; h: number }>;
+		backEdgeAnchorOverrides?: Map<string, { source?: string; target?: string }>;
+	}
+): LayeredPassResult {
+	let edgePositions = pos.positions;
+	let edgeNodeDims = pos.nodeDims;
+	if (extras?.extraPositions || extras?.extraDims) {
+		edgePositions = new Map(pos.positions);
+		edgeNodeDims = new Map(pos.nodeDims);
+		if (extras.extraPositions) {
+			for (const [k, v] of extras.extraPositions) edgePositions.set(k, v);
+		}
+		if (extras.extraDims) {
+			for (const [k, v] of extras.extraDims) edgeNodeDims.set(k, v);
+		}
+	}
+
+	const computed = computeEdgePaths(edges, edgePositions, edgeNodeDims, direction, {
+		cornerRadius: spacing.cornerRadius,
+		reversedEdges: pos.reversedEdges,
+		bounds: pos.preBounds,
+		backEdgeLaneGap: spacing.backEdgeLaneGap,
+		superNodeIds,
+		backEdgeAnchorOverrides: extras?.backEdgeAnchorOverrides
+	});
 	let positionedEdges = computed.edges;
 
-	// Place waypoints (post-process: split edges that have waypoints)
 	const waypointResult = placeWaypoints(
-		config.edges,
+		edges,
 		positionedEdges,
 		computed.collapsed,
-		cornerRadius
+		spacing.cornerRadius
 	);
 	positionedEdges = waypointResult.edges;
 	const waypoints = waypointResult.waypoints;
 
-	// Compute annotations
-	const annotations = resolveAnnotations(config, positions, nodeDims);
+	const bbox = computeFullPassBounds(
+		pos.positionedNodes,
+		pos.positionedClusters,
+		positionedEdges,
+		waypoints
+	);
+
+	return {
+		positionedNodes: pos.positionedNodes,
+		positionedClusters: pos.positionedClusters,
+		positionedEdges,
+		waypoints,
+		bbox
+	};
+}
+
+/** Layered layout for a flat node/edge/cluster slice in local coordinates.
+ *  Annotations and the global non-negative shift stay in layoutLayered. */
+function layoutLayeredPass(
+	nodes: DiagramNode[],
+	edges: DiagramEdge[],
+	clusters: DiagramCluster[],
+	direction: DiagramDirection,
+	spacing: LayeredSpacing,
+	superNodeIds?: Set<string>
+): LayeredPassResult {
+	const pos = computeLayeredPositions(nodes, edges, clusters, direction, spacing);
+	return finishLayeredPass(edges, pos, direction, spacing, superNodeIds);
+}
+
+function computeFullPassBounds(
+	nodes: PositionedNode[],
+	clusters: PositionedCluster[],
+	edges: PositionedEdge[],
+	waypoints: PositionedWaypoint[]
+): { minX: number; minY: number; maxX: number; maxY: number } {
+	const base = computeNodeAndClusterBounds(nodes, clusters);
+	let { minX, minY, maxX, maxY } = base;
+	for (const w of waypoints) {
+		minX = Math.min(minX, w.x);
+		minY = Math.min(minY, w.y);
+		maxX = Math.max(maxX, w.x + w.width);
+		maxY = Math.max(maxY, w.y + w.height);
+	}
+	for (const e of edges) {
+		const pb = e.bounds ?? extractPathBounds(e.path);
+		if (pb) {
+			minX = Math.min(minX, pb.minX);
+			minY = Math.min(minY, pb.minY);
+			maxX = Math.max(maxX, pb.maxX);
+			maxY = Math.max(maxY, pb.maxY);
+		}
+	}
+	return { minX, minY, maxX, maxY };
+}
+
+const SUPER_NODE_PREFIX = '__dry_super_';
+
+function isSuperNodeId(id: string): boolean {
+	return id.startsWith(SUPER_NODE_PREFIX);
+}
+
+// ── Layout caches ──────────────────────────────────────────
+//
+// Two-tier caching:
+//
+// 1. `fullLayoutCache` (WeakMap by config identity): when a caller invokes
+//    computeLayout repeatedly with the *same* config object, return the
+//    already-computed result. The Svelte `<Diagram>` component re-runs its
+//    `$derived(computeLayout(config))` on every dependency change, so a stable
+//    `const config = { ... }` benefits enormously here.
+//
+// 2. `subLayoutCache` (LRU by content hash): each directed cluster sub-layout
+//    runs the full layered pipeline. When a subsequent computeLayout call
+//    contains a leaf directed cluster whose nodes/edges/direction/spacing
+//    haven't changed, we can reuse the cached LayeredPassResult instead of
+//    re-running the pipeline. Only LEAF sub-layouts (no further nested
+//    clusters) are cached — keeps the key derivation simple and the cached
+//    object stable. The merge code in `layoutNested` always spreads sub
+//    results into fresh objects, so cached entries are never mutated.
+
+const fullLayoutCache = new WeakMap<DiagramConfig, LayoutResult>();
+
+const SUB_LAYOUT_CACHE_MAX = 64;
+const subLayoutCache = new Map<string, LayeredPassResult>();
+
+function buildSubLayoutKey(
+	subNodes: DiagramNode[],
+	subEdges: DiagramEdge[],
+	direction: DiagramDirection,
+	spacing: LayeredSpacing
+): string {
+	const parts: string[] = [
+		direction,
+		`s${spacing.nodeGap}|${spacing.layerGap}|${spacing.clusterPadding}|${spacing.cornerRadius}|${spacing.backEdgeLaneGap}`
+	];
+	for (const n of subNodes) {
+		parts.push(
+			`N|${n.id}|${n.label}|${n.description ?? ''}|${n.width ?? ''}|${n.height ?? ''}|${
+				n.variant ?? ''
+			}|${n.color ?? ''}|${n.state ?? ''}`
+		);
+	}
+	for (const e of subEdges) {
+		const wp = e.waypoint;
+		parts.push(
+			`E|${e.from}|${e.to}|${e.label ?? ''}|${e.loop ?? ''}|${e.arrow ?? ''}|${
+				e.dashed ?? ''
+			}|${e.color ?? ''}|${
+				wp
+					? `W|${wp.id ?? ''}|${wp.label}|${wp.description ?? ''}|${wp.position ?? ''}|${
+							wp.width ?? ''
+						}|${wp.height ?? ''}|${wp.variant ?? ''}|${wp.color ?? ''}`
+					: ''
+			}`
+		);
+	}
+	return parts.join('||');
+}
+
+function getSubLayoutFromCache(key: string): LayeredPassResult | undefined {
+	const cached = subLayoutCache.get(key);
+	if (!cached) return undefined;
+	subLayoutCache.delete(key);
+	subLayoutCache.set(key, cached);
+	return cached;
+}
+
+function setSubLayoutInCache(key: string, result: LayeredPassResult): void {
+	if (subLayoutCache.size >= SUB_LAYOUT_CACHE_MAX) {
+		const oldest = subLayoutCache.keys().next().value;
+		if (oldest !== undefined) subLayoutCache.delete(oldest);
+	}
+	subLayoutCache.set(key, result);
+}
+
+/** True iff `inner.nodes` is a strict subset (different set, all nodes
+ *  present) of `outer.nodes`. Used to detect cluster nesting. */
+function isContainedIn(inner: DiagramCluster, outer: DiagramCluster): boolean {
+	if (inner === outer) return false;
+	const outerSet = new Set(outer.nodes);
+	if (!inner.nodes.every((n) => outerSet.has(n))) return false;
+	if (inner.nodes.length === outer.nodes.length) return false;
+	return true;
+}
+
+/** Recursive layered layout. Handles arbitrary nesting of directed clusters
+ *  (and flat clusters inside directed clusters). At each level:
+ *   1. Sub-layout each top-level directed cluster recursively, passing any
+ *      cluster whose nodes live entirely inside it as nested context.
+ *   2. Run an outer pass with super-nodes for those top-level directed
+ *      clusters and any flat clusters that live at this level.
+ *   3. Merge inner sub-layouts back into outer coordinates. */
+function layoutNested(
+	nodes: DiagramNode[],
+	edges: DiagramEdge[],
+	allClusters: DiagramCluster[],
+	direction: DiagramDirection,
+	spacing: LayeredSpacing
+): LayeredPassResult {
+	const nodeIdSet = new Set(nodes.map((n) => n.id));
+	const localClusters = allClusters.filter((c) => c.nodes.every((n) => nodeIdSet.has(n)));
+	const directedLocal = localClusters.filter((c) => c.direction);
+
+	if (directedLocal.length === 0) {
+		const flatLocal = localClusters.filter((c) => !c.direction);
+		return layoutLayeredPass(nodes, edges, flatLocal, direction, spacing);
+	}
+
+	// Top-level directed clusters at this scope: not strictly contained in any
+	// other directed cluster from the same scope.
+	const topLevelDirected = directedLocal.filter(
+		(inner) => !directedLocal.some((outer) => isContainedIn(inner, outer))
+	);
+
+	const directedClusterById = new Map<string, DiagramCluster>();
+	const memberToDirectedCluster = new Map<string, DiagramCluster>();
+	for (const cluster of topLevelDirected) {
+		directedClusterById.set(cluster.id, cluster);
+		for (const nodeId of cluster.nodes) {
+			memberToDirectedCluster.set(nodeId, cluster);
+		}
+	}
+
+	const subLayouts = new Map<string, LayeredPassResult>();
+	const subSpacings = new Map<string, LayeredSpacing>();
+	for (const cluster of topLevelDirected) {
+		const memberSet = new Set(cluster.nodes);
+		const subNodes = nodes.filter((n) => memberSet.has(n.id));
+		const subEdges = edges.filter((e) => memberSet.has(e.from) && memberSet.has(e.to));
+		// Any cluster (flat or directed) whose nodes all live inside this
+		// cluster is nested context for the recursive call.
+		const nestedClusters = allClusters.filter(
+			(c) => c !== cluster && c.nodes.every((n) => memberSet.has(n))
+		);
+		const subSpacing: LayeredSpacing = {
+			nodeGap: cluster.spacing?.nodeGap ?? spacing.nodeGap,
+			layerGap: cluster.spacing?.layerGap ?? spacing.layerGap,
+			clusterPadding: cluster.spacing?.clusterPadding ?? spacing.clusterPadding,
+			cornerRadius: cluster.spacing?.cornerRadius ?? spacing.cornerRadius,
+			backEdgeLaneGap: cluster.spacing?.backEdgeLaneGap ?? spacing.backEdgeLaneGap
+		};
+		subSpacings.set(cluster.id, subSpacing);
+		// Cache leaf sub-layouts (no further nested clusters) by content. The
+		// merge code below always spreads the cached result into fresh objects,
+		// so the cached entry stays immutable across calls.
+		let subResult: LayeredPassResult;
+		if (nestedClusters.length === 0) {
+			const key = buildSubLayoutKey(subNodes, subEdges, cluster.direction!, subSpacing);
+			const cached = getSubLayoutFromCache(key);
+			if (cached) {
+				subResult = cached;
+			} else {
+				subResult = layoutNested(subNodes, subEdges, [], cluster.direction!, subSpacing);
+				setSubLayoutInCache(key, subResult);
+			}
+		} else {
+			subResult = layoutNested(subNodes, subEdges, nestedClusters, cluster.direction!, subSpacing);
+		}
+		subLayouts.set(cluster.id, subResult);
+	}
+
+	const outerNodes: DiagramNode[] = [];
+	const seenSuperClusters = new Set<string>();
+	for (const node of nodes) {
+		const owner = memberToDirectedCluster.get(node.id);
+		if (owner) {
+			if (!seenSuperClusters.has(owner.id)) {
+				const sub = subLayouts.get(owner.id)!;
+				const subSpacing = subSpacings.get(owner.id)!;
+				const subW = sub.bbox.maxX - sub.bbox.minX;
+				const subH = sub.bbox.maxY - sub.bbox.minY;
+				const labelOnLeft = owner.labelPosition === 'left';
+				const labelPad = owner.label ? 32 : 0;
+				const padTop = labelOnLeft ? 0 : labelPad;
+				const padLeft = labelOnLeft ? labelPad : 0;
+				outerNodes.push({
+					id: SUPER_NODE_PREFIX + owner.id,
+					label: '',
+					width: subW + subSpacing.clusterPadding * 2 + padLeft,
+					height: subH + subSpacing.clusterPadding * 2 + padTop
+				});
+				seenSuperClusters.add(owner.id);
+			}
+		} else {
+			outerNodes.push(node);
+		}
+	}
+
+	// Edges internal to a directed cluster are handled by its sub-layout.
+	const outerEdges: DiagramEdge[] = [];
+	for (const edge of edges) {
+		const fromCluster = memberToDirectedCluster.get(edge.from);
+		const toCluster = memberToDirectedCluster.get(edge.to);
+		if (fromCluster && toCluster && fromCluster.id === toCluster.id) continue;
+		outerEdges.push({
+			...edge,
+			from: fromCluster ? SUPER_NODE_PREFIX + fromCluster.id : edge.from,
+			to: toCluster ? SUPER_NODE_PREFIX + toCluster.id : edge.to
+		});
+	}
+
+	// Flat clusters that live at THIS level — i.e. not inside any top-level
+	// directed cluster, where they would have been handled by the recursive
+	// sub-layout instead.
+	const flatLocal = localClusters.filter(
+		(c) => !c.direction && !topLevelDirected.some((td) => isContainedIn(c, td))
+	);
+
+	const superNodeIds = new Set<string>();
+	for (const cluster of topLevelDirected) {
+		superNodeIds.add(SUPER_NODE_PREFIX + cluster.id);
+	}
+
+	// Compute outer positions first (steps 1-7 of the layered pipeline) so we
+	// can derive global inner-node positions from the super-node placements,
+	// THEN run edge routing with overrides that re-anchor cross-boundary back
+	// edges to the actual inner nodes instead of the cluster super-node.
+	const outerPositions = computeLayeredPositions(
+		outerNodes,
+		outerEdges,
+		flatLocal,
+		direction,
+		spacing
+	);
+
+	const innerExtraPositions = new Map<string, { x: number; y: number }>();
+	const innerExtraDims = new Map<string, { w: number; h: number }>();
+	for (const outerNode of outerPositions.positionedNodes) {
+		if (!isSuperNodeId(outerNode.id)) continue;
+		const clusterId = outerNode.id.slice(SUPER_NODE_PREFIX.length);
+		const sub = subLayouts.get(clusterId)!;
+		const cluster = directedClusterById.get(clusterId)!;
+		const subSpacing = subSpacings.get(clusterId)!;
+		const labelOnLeft = cluster.labelPosition === 'left';
+		const labelPad = cluster.label ? 32 : 0;
+		const padTop = labelOnLeft ? 0 : labelPad;
+		const padLeft = labelOnLeft ? labelPad : 0;
+		const offsetX = outerNode.x + subSpacing.clusterPadding + padLeft - sub.bbox.minX;
+		const offsetY = outerNode.y + subSpacing.clusterPadding + padTop - sub.bbox.minY;
+		for (const inner of sub.positionedNodes) {
+			innerExtraPositions.set(inner.id, { x: inner.x + offsetX, y: inner.y + offsetY });
+			innerExtraDims.set(inner.id, { w: inner.width, h: inner.height });
+		}
+	}
+
+	// Build back-edge anchor overrides: each cross-boundary edge is keyed by
+	// its outer-pass form (super-node IDs), with the override pointing back at
+	// the original inner node ID. The router applies these only to back edges,
+	// so forward cross-boundary edges keep the super-node anchoring.
+	const backEdgeAnchorOverrides = new Map<string, { source?: string; target?: string }>();
+	for (const edge of edges) {
+		const fromCluster = memberToDirectedCluster.get(edge.from);
+		const toCluster = memberToDirectedCluster.get(edge.to);
+		if (fromCluster && toCluster && fromCluster.id === toCluster.id) continue;
+		if (!fromCluster && !toCluster) continue;
+		const outerKey = `${fromCluster ? SUPER_NODE_PREFIX + fromCluster.id : edge.from}->${toCluster ? SUPER_NODE_PREFIX + toCluster.id : edge.to}`;
+		backEdgeAnchorOverrides.set(outerKey, {
+			source: fromCluster ? edge.from : undefined,
+			target: toCluster ? edge.to : undefined
+		});
+	}
+
+	const outerPass = finishLayeredPass(
+		outerEdges,
+		outerPositions,
+		direction,
+		spacing,
+		superNodeIds,
+		{
+			extraPositions: innerExtraPositions,
+			extraDims: innerExtraDims,
+			backEdgeAnchorOverrides
+		}
+	);
+
+	const positionedNodes: PositionedNode[] = [];
+	const positionedClusters: PositionedCluster[] = [...outerPass.positionedClusters];
+	const positionedEdges: PositionedEdge[] = [];
+	const waypoints: PositionedWaypoint[] = [...outerPass.waypoints];
+
+	for (const outerNode of outerPass.positionedNodes) {
+		if (isSuperNodeId(outerNode.id)) {
+			const clusterId = outerNode.id.slice(SUPER_NODE_PREFIX.length);
+			const cluster = directedClusterById.get(clusterId)!;
+			const sub = subLayouts.get(clusterId)!;
+			const subSpacing = subSpacings.get(clusterId)!;
+			const labelOnLeft = cluster.labelPosition === 'left';
+			const labelPad = cluster.label ? 32 : 0;
+			const padTop = labelOnLeft ? 0 : labelPad;
+			const padLeft = labelOnLeft ? labelPad : 0;
+			const offsetX = outerNode.x + subSpacing.clusterPadding + padLeft - sub.bbox.minX;
+			const offsetY = outerNode.y + subSpacing.clusterPadding + padTop - sub.bbox.minY;
+
+			for (const inner of sub.positionedNodes) {
+				positionedNodes.push({
+					...inner,
+					x: inner.x + offsetX,
+					y: inner.y + offsetY
+				});
+			}
+			for (const innerCluster of sub.positionedClusters) {
+				positionedClusters.push({
+					...innerCluster,
+					x: innerCluster.x + offsetX,
+					y: innerCluster.y + offsetY
+				});
+			}
+			for (const innerEdge of sub.positionedEdges) {
+				positionedEdges.push({
+					...innerEdge,
+					path: shiftSvgPath(innerEdge.path, offsetX, offsetY),
+					labelX: innerEdge.labelX + offsetX,
+					labelY: innerEdge.labelY + offsetY,
+					bounds: innerEdge.bounds
+						? {
+								minX: innerEdge.bounds.minX + offsetX,
+								minY: innerEdge.bounds.minY + offsetY,
+								maxX: innerEdge.bounds.maxX + offsetX,
+								maxY: innerEdge.bounds.maxY + offsetY
+							}
+						: undefined
+				});
+			}
+			for (const innerWp of sub.waypoints) {
+				waypoints.push({
+					...innerWp,
+					x: innerWp.x + offsetX,
+					y: innerWp.y + offsetY
+				});
+			}
+			// Visible cluster chrome over the super-node slot.
+			positionedClusters.push({
+				id: cluster.id,
+				x: outerNode.x,
+				y: outerNode.y,
+				width: outerNode.width,
+				height: outerNode.height,
+				label: cluster.label,
+				labelPosition: cluster.labelPosition,
+				iconComponent: cluster.iconComponent,
+				color: cluster.color || 'neutral',
+				dashed: cluster.dashed ?? true
+			});
+		} else {
+			positionedNodes.push(outerNode);
+		}
+	}
+
+	// Cross-boundary edges keep their super-node anchoring: pointing the arrow
+	// at the cluster as a whole reads more naturally than re-anchoring to a
+	// specific inner node, which would force a Z-shape that conflicts with the
+	// inner flow.
+	positionedEdges.push(...outerPass.positionedEdges);
+
+	const bbox = computeFullPassBounds(
+		positionedNodes,
+		positionedClusters,
+		positionedEdges,
+		waypoints
+	);
+
+	return { positionedNodes, positionedClusters, positionedEdges, waypoints, bbox };
+}
+
+function layoutLayered(config: DiagramConfig): LayoutResult {
+	const direction = config.direction || 'TB';
+	const spacing: LayeredSpacing = {
+		nodeGap: config.spacing?.nodeGap ?? DEFAULT_NODE_GAP,
+		layerGap: config.spacing?.layerGap ?? DEFAULT_LAYER_GAP,
+		clusterPadding: config.spacing?.clusterPadding ?? DEFAULT_CLUSTER_PADDING,
+		cornerRadius: config.spacing?.cornerRadius ?? DEFAULT_CORNER_RADIUS,
+		backEdgeLaneGap: config.spacing?.backEdgeLaneGap ?? DEFAULT_BACK_EDGE_LANE_GAP
+	};
+
+	const nested = layoutNested(
+		config.nodes,
+		config.edges,
+		config.clusters ?? [],
+		direction,
+		spacing
+	);
+
+	const positionedNodes = nested.positionedNodes;
+	const positionedClusters = nested.positionedClusters;
+	const positionedEdges = nested.positionedEdges;
+	const waypoints = nested.waypoints;
+
+	const globalPositions = new Map<string, { x: number; y: number }>();
+	const globalDims = new Map<string, { w: number; h: number }>();
+	for (const n of positionedNodes) {
+		globalPositions.set(n.id, { x: n.x, y: n.y });
+		globalDims.set(n.id, { w: n.width, h: n.height });
+	}
+	const annotations = resolveAnnotations(config, globalPositions, globalDims);
 
 	// Compute viewBox with full bounds coverage
 	let minX = Infinity,
@@ -754,7 +1277,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	}
 
 	// Include all cluster bounds
-	for (const c of clusters) {
+	for (const c of positionedClusters) {
 		minX = Math.min(minX, c.x);
 		minY = Math.min(minY, c.y);
 		maxX = Math.max(maxX, c.x + c.width);
@@ -780,7 +1303,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 			maxY = Math.max(maxY, e.labelY + 7);
 		}
 		// Back-edge paths can extend outside the node bbox; expand viewBox to fit
-		const pathBounds = extractPathBounds(e.path);
+		const pathBounds = e.bounds ?? extractPathBounds(e.path);
 		if (pathBounds) {
 			minX = Math.min(minX, pathBounds.minX);
 			minY = Math.min(minY, pathBounds.minY);
@@ -810,7 +1333,14 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	const shiftY = minY < 0 ? -minY + MARGIN : 0;
 
 	if (shiftX > 0 || shiftY > 0) {
-		shiftAllPositions(positionedNodes, clusters, annotations, positionedEdges, shiftX, shiftY);
+		shiftAllPositions(
+			positionedNodes,
+			positionedClusters,
+			annotations,
+			positionedEdges,
+			shiftX,
+			shiftY
+		);
 		for (const w of waypoints) {
 			w.x += shiftX;
 			w.y += shiftY;
@@ -822,7 +1352,7 @@ function layoutLayered(config: DiagramConfig): LayoutResult {
 	return {
 		nodes: positionedNodes,
 		edges: positionedEdges,
-		clusters,
+		clusters: positionedClusters,
 		swimlanes: [],
 		regions: [],
 		annotations,
@@ -1103,8 +1633,19 @@ function shiftAllPositions(
 		e.labelY += dy;
 		// Shift SVG path coordinates
 		e.path = shiftSvgPath(e.path, dx, dy);
+		if (e.bounds) {
+			e.bounds = {
+				minX: e.bounds.minX + dx,
+				minY: e.bounds.minY + dy,
+				maxX: e.bounds.maxX + dx,
+				maxY: e.bounds.maxY + dy
+			};
+		}
 	}
 }
+
+const PATH_CMD_RE = /([MLQTSC])([^MLQTSCAHVZmlqtscahvz]*)/g;
+const NUM_RE = /-?\d+(?:\.\d+)?/g;
 
 /** Extract min/max x/y from an SVG path string (absolute commands only).
  * Used to expand viewBox to include back-edge paths that extend beyond node bounds.
@@ -1117,10 +1658,9 @@ function extractPathBounds(
 		minY = Infinity,
 		maxX = -Infinity,
 		maxY = -Infinity;
-	const matches = path.matchAll(/[MLQTSC]([^MLQTSCAHVZmlqtscahvz]*)/g);
-	for (const match of matches) {
-		const args = match[1] ?? '';
-		const nums = args.match(/-?\d+(?:\.\d+)?/g);
+	for (const match of path.matchAll(PATH_CMD_RE)) {
+		const args = match[2] ?? '';
+		const nums = args.match(NUM_RE);
 		if (!nums) continue;
 		for (let i = 0; i + 1 < nums.length; i += 2) {
 			const x = parseFloat(nums[i]!);
@@ -1139,18 +1679,15 @@ function extractPathBounds(
  * Handles multi-pair commands (Q, C, S, T) where the args contain more than one (x, y).
  */
 function shiftSvgPath(path: string, dx: number, dy: number): string {
-	return path.replace(
-		/([MLQTSC])([^MLQTSCAHVZmlqtscahvz]*)/g,
-		(_match, cmd: string, args: string) => {
-			const nums = args.match(/-?\d+(?:\.\d+)?/g);
-			if (!nums || nums.length === 0) return cmd;
-			const shifted = nums.map((n, i) => {
-				const v = parseFloat(n);
-				return (i % 2 === 0 ? v + dx : v + dy).toString();
-			});
-			return `${cmd} ${shifted.join(' ')}`;
-		}
-	);
+	return path.replace(PATH_CMD_RE, (_match, cmd: string, args: string) => {
+		const nums = args.match(NUM_RE);
+		if (!nums || nums.length === 0) return cmd;
+		const shifted = nums.map((n, i) => {
+			const v = parseFloat(n);
+			return (i % 2 === 0 ? v + dx : v + dy).toString();
+		});
+		return `${cmd} ${shifted.join(' ')}`;
+	});
 }
 
 function buildNodeDims(nodes: DiagramConfig['nodes']): Map<string, { w: number; h: number }> {
@@ -1423,9 +1960,14 @@ function layoutSequence(config: DiagramConfig): LayoutResult {
 // ── Public API ─────────────────────────────────────────────
 
 export function computeLayout(config: DiagramConfig): LayoutResult {
-	if (config.layout === 'sequence') return layoutSequence(config);
-	if (config.layout === 'swimlane') {
-		return layoutSwimlane(config);
-	}
-	return layoutLayered(config);
+	const cached = fullLayoutCache.get(config);
+	if (cached) return cached;
+
+	let result: LayoutResult;
+	if (config.layout === 'sequence') result = layoutSequence(config);
+	else if (config.layout === 'swimlane') result = layoutSwimlane(config);
+	else result = layoutLayered(config);
+
+	fullLayoutCache.set(config, result);
+	return result;
 }
