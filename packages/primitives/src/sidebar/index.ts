@@ -37,9 +37,9 @@ export interface SidebarTriggerProps extends HTMLButtonAttributes {
 }
 
 import SidebarRoot from './sidebar-root.svelte';
-import SidebarHeader from './sidebar-header.svelte';
+import SidebarHeader from '../internal/snippet-div.svelte';
 import SidebarContent from './sidebar-content.svelte';
-import SidebarFooter from './sidebar-footer.svelte';
+import SidebarFooter from '../internal/snippet-div.svelte';
 import SidebarGroup from './sidebar-group.svelte';
 import SidebarGroupLabel from './sidebar-group-label.svelte';
 import SidebarItem from './sidebar-item.svelte';

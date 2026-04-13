@@ -34,8 +34,8 @@ export interface TableCaptionProps extends HTMLAttributes<HTMLTableCaptionElemen
 	children: Snippet;
 }
 
-import TableRoot from './table-root.svelte';
-import TableHeader from './table-header.svelte';
+import TableRoot from '../internal/table-root.svelte';
+import TableHeader from '../internal/table-header.svelte';
 import TableBody from './table-body.svelte';
 import TableFooter from './table-footer.svelte';
 import TableRow from './table-row.svelte';

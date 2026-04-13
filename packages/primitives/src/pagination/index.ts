@@ -32,7 +32,7 @@ export interface PaginationEllipsisProps extends HTMLAttributes<HTMLSpanElement>
 
 import PaginationRoot from './pagination-root.svelte';
 import PaginationContent from './pagination-content.svelte';
-import PaginationItem from './pagination-item.svelte';
+import PaginationItem from '../internal/list-item.svelte';
 import PaginationPrevious from './pagination-previous.svelte';
 import PaginationNext from './pagination-next.svelte';
 import PaginationLink from './pagination-link.svelte';

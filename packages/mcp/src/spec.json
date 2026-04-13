@@ -18111,7 +18111,16 @@
           "name": "data-diagram-container"
         },
         {
+          "name": "data-fit"
+        },
+        {
           "name": "data-has-description"
+        },
+        {
+          "name": "data-has-icon-component"
+        },
+        {
+          "name": "data-icon-svg"
         },
         {
           "name": "data-part"
@@ -18127,6 +18136,1609 @@
         }
       ],
       "example": "<Diagram>Content</Diagram>"
+    },
+    "AffixGroup": {
+      "import": "@dryui/primitives",
+      "description": "Grouped input shell for prefixes, suffixes, separators, and actions",
+      "category": "input",
+      "tags": [
+        "input",
+        "affix",
+        "prefix",
+        "suffix",
+        "separator",
+        "action"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "size": {
+              "type": "'sm' | 'md' | 'lg'",
+              "required": false,
+              "acceptedValues": [
+                "sm",
+                "md",
+                "lg"
+              ],
+              "description": "Size preset affecting density, spacing, or typography.",
+              "default": "'md'"
+            },
+            "disabled": {
+              "type": "boolean",
+              "required": false,
+              "description": "Prevents interaction and applies disabled styling.",
+              "default": "false"
+            },
+            "invalid": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            "orientation": {
+              "type": "'horizontal' | 'vertical'",
+              "required": false,
+              "acceptedValues": [
+                "horizontal",
+                "vertical"
+              ],
+              "description": "Horizontal or vertical layout direction.",
+              "default": "'horizontal'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Prefix": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
+        },
+        "Input": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Suffix": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Separator": {
+          "props": {},
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
+        },
+        "Action": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLButtonAttributes",
+            "via": "rest",
+            "element": "button",
+            "examples": [
+              "type",
+              "disabled",
+              "name"
+            ],
+            "note": "Forwards <button> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "AffixGroup.Root",
+          "  AffixGroup.Prefix",
+          "  AffixGroup.Input",
+          "  AffixGroup.Suffix",
+          "  AffixGroup.Separator",
+          "  AffixGroup.Action"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-affix-group"
+        },
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-invalid",
+          "description": "Present when the current field value is invalid."
+        },
+        {
+          "name": "data-orientation",
+          "description": "Reflects the current horizontal or vertical orientation.",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-size"
+        }
+      ],
+      "example": "<AffixGroup.Root>\n  <AffixGroup.Prefix>...</AffixGroup.Prefix>\n  <AffixGroup.Input>...</AffixGroup.Input>\n  <AffixGroup.Suffix>...</AffixGroup.Suffix>\n  <AffixGroup.Separator>...</AffixGroup.Separator>\n  <AffixGroup.Action>...</AffixGroup.Action>\n</AffixGroup.Root>"
+    },
+    "AppFrame": {
+      "import": "@dryui/primitives",
+      "description": "Application shell wrapper with title, actions, and content area",
+      "category": "layout",
+      "tags": [
+        "app-shell",
+        "frame",
+        "layout",
+        "header",
+        "actions"
+      ],
+      "compound": false,
+      "props": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "Primary heading or label text."
+        },
+        "actions": {
+          "type": "Snippet",
+          "required": false
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-part"
+        }
+      ],
+      "example": "<AppFrame>Content</AppFrame>"
+    },
+    "AvatarGroup": {
+      "import": "@dryui/primitives",
+      "description": "Compact cluster of avatars with overflow and presence status",
+      "category": "display",
+      "tags": [
+        "avatar",
+        "group",
+        "people",
+        "stack",
+        "presence"
+      ],
+      "compound": false,
+      "props": {
+        "count": {
+          "type": "number",
+          "required": false,
+          "default": "0"
+        },
+        "maxVisible": {
+          "type": "number",
+          "required": false,
+          "default": "4"
+        },
+        "size": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Size preset affecting density, spacing, or typography.",
+          "default": "'md'"
+        },
+        "overlap": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "default": "'md'"
+        },
+        "status": {
+          "type": "'online' | 'offline' | 'busy' | 'away'",
+          "required": false,
+          "acceptedValues": [
+            "online",
+            "offline",
+            "busy",
+            "away"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "required": false,
+          "description": "Visible label text shown for the control or item.",
+          "default": "'Avatar group'"
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-overflow"
+        },
+        {
+          "name": "data-overlap"
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-size"
+        },
+        {
+          "name": "data-status"
+        }
+      ],
+      "example": "<AvatarGroup>Content</AvatarGroup>"
+    },
+    "ChatMessage": {
+      "import": "@dryui/primitives",
+      "description": "Single chat row with role, avatar, name, and typing state",
+      "category": "display",
+      "tags": [
+        "chat",
+        "message",
+        "conversation",
+        "assistant",
+        "typing"
+      ],
+      "compound": false,
+      "props": {
+        "role": {
+          "type": "'user' | 'assistant' | 'system'",
+          "required": false,
+          "acceptedValues": [
+            "user",
+            "assistant",
+            "system"
+          ],
+          "default": "'user'"
+        },
+        "avatar": {
+          "type": "string",
+          "required": false
+        },
+        "name": {
+          "type": "string",
+          "required": false,
+          "description": "Field name used during native form submission."
+        },
+        "timestamp": {
+          "type": "string",
+          "required": false
+        },
+        "typing": {
+          "type": "boolean",
+          "required": false,
+          "default": "false"
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-role"
+        },
+        {
+          "name": "data-typing"
+        }
+      ],
+      "example": "<ChatMessage>Content</ChatMessage>"
+    },
+    "EmptyState": {
+      "import": "@dryui/primitives",
+      "description": "Placeholder state with icon, title, description, and action",
+      "category": "display",
+      "tags": [
+        "empty",
+        "state",
+        "placeholder",
+        "onboarding",
+        "action"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Icon": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Title": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLHeadingElement>",
+            "via": "rest",
+            "element": "h*",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <h*> attributes via rest props."
+          }
+        },
+        "Description": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLParagraphElement>",
+            "via": "rest",
+            "element": "p",
+            "examples": [
+              "id",
+              "style",
+              "aria-describedby"
+            ],
+            "note": "Forwards <p> attributes via rest props."
+          }
+        },
+        "Action": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "EmptyState.Root",
+          "  EmptyState.Icon",
+          "  EmptyState.Title",
+          "  EmptyState.Description",
+          "  EmptyState.Action"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<EmptyState.Root>\n  <EmptyState.Icon>...</EmptyState.Icon>\n  <EmptyState.Title>...</EmptyState.Title>\n  <EmptyState.Description>...</EmptyState.Description>\n  <EmptyState.Action>...</EmptyState.Action>\n</EmptyState.Root>"
+    },
+    "Footer": {
+      "import": "@dryui/primitives",
+      "description": "Site footer layout with brand, link groups, and copyright",
+      "category": "layout",
+      "tags": [
+        "footer",
+        "site",
+        "links",
+        "brand",
+        "copyright"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLElement>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        },
+        "Brand": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Links": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLElement>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        },
+        "LinkGroup": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            },
+            "heading": {
+              "type": "string",
+              "required": false
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Copyright": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "Footer.Root",
+          "  Footer.Brand",
+          "  Footer.Links",
+          "  Footer.LinkGroup",
+          "  Footer.Copyright"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<Footer.Root>\n  <Footer.Brand>...</Footer.Brand>\n  <Footer.Links>...</Footer.Links>\n  <Footer.LinkGroup>...</Footer.LinkGroup>\n  <Footer.Copyright>...</Footer.Copyright>\n</Footer.Root>"
+    },
+    "Hero": {
+      "import": "@dryui/primitives",
+      "description": "Hero section wrapper with heading, subheading, and actions",
+      "category": "layout",
+      "tags": [
+        "hero",
+        "landing",
+        "banner",
+        "heading",
+        "actions"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            },
+            "align": {
+              "type": "'center' | 'left'",
+              "required": false,
+              "acceptedValues": [
+                "center",
+                "left"
+              ],
+              "description": "Alignment for child content along the cross axis."
+            },
+            "size": {
+              "type": "'sm' | 'md' | 'lg'",
+              "required": false,
+              "acceptedValues": [
+                "sm",
+                "md",
+                "lg"
+              ],
+              "description": "Size preset affecting density, spacing, or typography."
+            },
+            "backgroundImage": {
+              "type": "string",
+              "required": false
+            },
+            "overlay": {
+              "type": "boolean",
+              "required": false
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLElement>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        },
+        "Heading": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLHeadingElement>",
+            "via": "rest",
+            "element": "h*",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <h*> attributes via rest props."
+          }
+        },
+        "Subheading": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLParagraphElement>",
+            "via": "rest",
+            "element": "p",
+            "examples": [
+              "id",
+              "style",
+              "aria-describedby"
+            ],
+            "note": "Forwards <p> attributes via rest props."
+          }
+        },
+        "Actions": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "Hero.Root",
+          "  Hero.Heading",
+          "  Hero.Subheading",
+          "  Hero.Actions"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<Hero.Root>\n  <Hero.Heading>...</Hero.Heading>\n  <Hero.Subheading>...</Hero.Subheading>\n  <Hero.Actions>...</Hero.Actions>\n</Hero.Root>"
+    },
+    "LogoCloud": {
+      "import": "@dryui/primitives",
+      "description": "Grid of linked brand logos with responsive alignment",
+      "category": "display",
+      "tags": [
+        "logo",
+        "brand",
+        "cloud",
+        "partners",
+        "gallery"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "columns": {
+              "type": "number",
+              "required": false,
+              "default": "5"
+            },
+            "gap": {
+              "type": "string",
+              "required": false
+            },
+            "align": {
+              "type": "'start' | 'center' | 'end'",
+              "required": false,
+              "acceptedValues": [
+                "start",
+                "center",
+                "end"
+              ],
+              "description": "Alignment for child content along the cross axis."
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Item": {
+          "props": {
+            "href": {
+              "type": "string",
+              "required": false,
+              "description": "Destination URL when the component renders as a link."
+            },
+            "name": {
+              "type": "string",
+              "required": false,
+              "description": "Field name used during native form submission."
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLElement>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "LogoCloud.Root",
+          "  LogoCloud.Item"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-part"
+        }
+      ],
+      "example": "<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
+    },
+    "PageHeader": {
+      "import": "@dryui/primitives",
+      "description": "Page-level header with eyebrow, title, description, metadata, and actions",
+      "category": "layout",
+      "tags": [
+        "page-header",
+        "title",
+        "metadata",
+        "actions",
+        "eyebrow"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLElement>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        },
+        "Content": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Actions": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Eyebrow": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Title": {
+          "props": {
+            "level": {
+              "type": "1 | 2 | 3 | 4 | 5 | 6",
+              "required": false,
+              "acceptedValues": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6"
+              ],
+              "description": "Semantic heading level to render.",
+              "default": "2"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLHeadingElement>",
+            "via": "rest",
+            "element": "h*",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <h*> attributes via rest props."
+          }
+        },
+        "Description": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLParagraphElement>",
+            "via": "rest",
+            "element": "p",
+            "examples": [
+              "id",
+              "style",
+              "aria-describedby"
+            ],
+            "note": "Forwards <p> attributes via rest props."
+          }
+        },
+        "Meta": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "PageHeader.Root",
+          "  PageHeader.Content",
+          "  PageHeader.Actions",
+          "  PageHeader.Eyebrow",
+          "  PageHeader.Title",
+          "  PageHeader.Description",
+          "  PageHeader.Meta"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-level"
+        },
+        {
+          "name": "data-page-header"
+        },
+        {
+          "name": "data-page-header-actions"
+        },
+        {
+          "name": "data-page-header-content"
+        },
+        {
+          "name": "data-page-header-description"
+        },
+        {
+          "name": "data-page-header-eyebrow"
+        },
+        {
+          "name": "data-page-header-meta"
+        },
+        {
+          "name": "data-page-header-title"
+        }
+      ],
+      "example": "<PageHeader.Root>\n  <PageHeader.Content>...</PageHeader.Content>\n  <PageHeader.Actions>...</PageHeader.Actions>\n  <PageHeader.Eyebrow>...</PageHeader.Eyebrow>\n  <PageHeader.Title>...</PageHeader.Title>\n  <PageHeader.Description>...</PageHeader.Description>\n  <PageHeader.Meta>...</PageHeader.Meta>\n</PageHeader.Root>"
+    },
+    "SelectableTileGroup": {
+      "import": "@dryui/primitives",
+      "description": "Selectable tile set for single-choice options with keyboard support",
+      "category": "input",
+      "tags": [
+        "tile",
+        "selection",
+        "picker",
+        "option",
+        "keyboard"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "value": {
+              "type": "string",
+              "required": false,
+              "description": "Current controlled or bindable value.",
+              "default": "''"
+            },
+            "disabled": {
+              "type": "boolean",
+              "required": false,
+              "description": "Prevents interaction and applies disabled styling.",
+              "default": "false"
+            },
+            "orientation": {
+              "type": "'horizontal' | 'vertical'",
+              "required": false,
+              "acceptedValues": [
+                "horizontal",
+                "vertical"
+              ],
+              "description": "Horizontal or vertical layout direction.",
+              "default": "'horizontal'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Item": {
+          "props": {
+            "value": {
+              "type": "string",
+              "required": true,
+              "description": "Current controlled or bindable value."
+            },
+            "disabled": {
+              "type": "boolean",
+              "required": false,
+              "description": "Prevents interaction and applies disabled styling.",
+              "default": "false"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "Omit<HTMLButtonAttributes, 'value'>",
+            "via": "rest",
+            "element": "button",
+            "examples": [
+              "type",
+              "disabled",
+              "name"
+            ],
+            "omitted": [
+              "value"
+            ],
+            "note": "Forwards <button> attributes via rest props."
+          }
+        },
+        "Indicator": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Label": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
+        },
+        "Description": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Meta": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "SelectableTileGroup.Root",
+          "  SelectableTileGroup.Item",
+          "  SelectableTileGroup.Indicator",
+          "  SelectableTileGroup.Label",
+          "  SelectableTileGroup.Description",
+          "  SelectableTileGroup.Meta"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-orientation",
+          "description": "Reflects the current horizontal or vertical orientation.",
+          "values": [
+            "horizontal",
+            "vertical"
+          ]
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-state"
+        },
+        {
+          "name": "data-value"
+        }
+      ],
+      "example": "<SelectableTileGroup.Root>\n  <SelectableTileGroup.Item>...</SelectableTileGroup.Item>\n  <SelectableTileGroup.Indicator>...</SelectableTileGroup.Indicator>\n  <SelectableTileGroup.Label>...</SelectableTileGroup.Label>\n  <SelectableTileGroup.Description>...</SelectableTileGroup.Description>\n  <SelectableTileGroup.Meta>...</SelectableTileGroup.Meta>\n</SelectableTileGroup.Root>"
+    },
+    "StatCard": {
+      "import": "@dryui/primitives",
+      "description": "Compact KPI card with label, value, and trend",
+      "category": "display",
+      "tags": [
+        "stat",
+        "metric",
+        "card",
+        "kpi",
+        "trend"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "tone": {
+              "type": "'neutral' | 'info' | 'success' | 'warning' | 'danger'",
+              "required": false,
+              "acceptedValues": [
+                "neutral",
+                "info",
+                "success",
+                "warning",
+                "danger"
+              ],
+              "default": "'neutral'"
+            },
+            "density": {
+              "type": "'comfortable' | 'compact'",
+              "required": false,
+              "acceptedValues": [
+                "comfortable",
+                "compact"
+              ],
+              "default": "'comfortable'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Label": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Value": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        },
+        "Trend": {
+          "props": {
+            "direction": {
+              "type": "'up' | 'down' | 'flat'",
+              "required": false,
+              "acceptedValues": [
+                "up",
+                "down",
+                "flat"
+              ],
+              "default": "'flat'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLDivElement>",
+            "via": "rest",
+            "element": "div",
+            "examples": [
+              "id",
+              "style",
+              "role"
+            ],
+            "note": "Forwards <div> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "StatCard.Root",
+          "  StatCard.Label",
+          "  StatCard.Value",
+          "  StatCard.Trend"
+        ]
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-density"
+        },
+        {
+          "name": "data-direction"
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-tone"
+        }
+      ],
+      "example": "<StatCard.Root>\n  <StatCard.Label>...</StatCard.Label>\n  <StatCard.Value>...</StatCard.Value>\n  <StatCard.Trend>...</StatCard.Trend>\n</StatCard.Root>"
+    },
+    "Surface": {
+      "import": "@dryui/primitives",
+      "description": "Simple surface wrapper for background treatment",
+      "category": "layout",
+      "tags": [
+        "surface",
+        "background",
+        "container",
+        "panel"
+      ],
+      "compound": false,
+      "props": {
+        "background": {
+          "type": "string",
+          "required": false
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<Surface>Content</Surface>"
+    },
+    "User": {
+      "import": "@dryui/primitives",
+      "description": "User identity block with name, description, and optional content",
+      "category": "display",
+      "tags": [
+        "user",
+        "profile",
+        "identity",
+        "name",
+        "description"
+      ],
+      "compound": false,
+      "props": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "Field name used during native form submission."
+        },
+        "description": {
+          "type": "string",
+          "required": false,
+          "description": "Supporting copy that explains the current control or section."
+        },
+        "children": {
+          "type": "Snippet | undefined",
+          "required": false,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'children'>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "omitted": [
+          "children"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<User>Content</User>"
+    },
+    "WaveDivider": {
+      "import": "@dryui/primitives",
+      "description": "Decorative SVG wave divider for section separation",
+      "category": "visual",
+      "tags": [
+        "divider",
+        "wave",
+        "decorative",
+        "section",
+        "svg"
+      ],
+      "compound": false,
+      "props": {
+        "shape": {
+          "type": "'wave' | 'curve' | 'angle' | 'zigzag'",
+          "required": false,
+          "acceptedValues": [
+            "wave",
+            "curve",
+            "angle",
+            "zigzag"
+          ],
+          "default": "'wave'"
+        },
+        "flip": {
+          "type": "boolean",
+          "required": false,
+          "default": "false"
+        },
+        "color": {
+          "type": "string",
+          "required": false,
+          "description": "Semantic color or tone applied to the component."
+        },
+        "height": {
+          "type": "number",
+          "required": false,
+          "default": "48"
+        }
+      },
+      "forwardedProps": {
+        "baseType": "SVGAttributes<SVGSVGElement>",
+        "via": "rest",
+        "element": "svg",
+        "note": "Forwards <svg> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [],
+      "example": "<WaveDivider>Content</WaveDivider>"
     }
   },
   "composition": {

@@ -23,10 +23,10 @@ export interface FooterCopyrightProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 import FooterRoot from './footer-root.svelte';
-import FooterBrand from './footer-brand.svelte';
+import FooterBrand from '../internal/snippet-div.svelte';
 import FooterLinks from './footer-links.svelte';
 import FooterLinkGroup from './footer-link-group.svelte';
-import FooterCopyright from './footer-copyright.svelte';
+import FooterCopyright from '../internal/snippet-div.svelte';
 
 export const Footer: {
 	Root: typeof FooterRoot;

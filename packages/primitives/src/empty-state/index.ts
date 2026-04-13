@@ -21,11 +21,11 @@ export interface EmptyStateActionProps extends HTMLAttributes<HTMLDivElement> {
 	children: Snippet;
 }
 
-import EmptyStateRoot from './empty-state-root.svelte';
+import EmptyStateRoot from '../internal/snippet-div.svelte';
 import EmptyStateIcon from './empty-state-icon.svelte';
 import EmptyStateTitle from './empty-state-title.svelte';
-import EmptyStateDescription from './empty-state-description.svelte';
-import EmptyStateAction from './empty-state-action.svelte';
+import EmptyStateDescription from '../internal/paragraph.svelte';
+import EmptyStateAction from '../internal/snippet-div.svelte';
 
 export const EmptyState: {
 	Root: typeof EmptyStateRoot;
