@@ -37,26 +37,7 @@ All MCP entries (every tool) use `"command": "npx", "args": ["-y", "@dryui/mcp"]
 
 ## Releasing
 
-Automated via `.github/workflows/release.yml` (changesets/action):
-
-1. Add a changeset: `bun run changeset`
-2. Push to `main` → CI opens a "Version Packages" PR
-3. Merge that PR → CI publishes to npm + creates GitHub Releases
-
-Manual: `bun run release` (validate → version → build → publish)
-
-### npm auth gotcha
-
-There's a gitignored **project-level `.npmrc` at the repo root** that holds the publish token. It takes precedence over `~/.npmrc` when any publish command runs from inside the repo. The GitHub Actions `NPM_TOKEN` secret must match `./.npmrc`, not `~/.npmrc` — they're usually different tokens.
-
-To rotate the CI secret:
-
-```bash
-awk -F= '/^\/\/registry.npmjs.org\/:_authToken=/{printf "%s", $2}' ./.npmrc \
-  | gh secret set NPM_TOKEN --repo rob-balfre/dryui
-```
-
-Never paste tokens through the GitHub web UI — invisible whitespace causes npm to return 401, which it reports as a misleading 404 on publish. Always pipe via stdin with `printf` / `awk printf` so there's no trailing newline.
+Canonical release and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Keep release workflow changes there instead of duplicating them in agent-facing docs.
 
 ## Verification
 
