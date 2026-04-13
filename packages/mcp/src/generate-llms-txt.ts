@@ -284,7 +284,7 @@ const cliCommands = ai.cliCommands.map((entry) => entry.name) as readonly string
 function buildLlmsText(spec: Spec): string {
 	const sections: string[] = [];
 
-	sections.push(`# dryui
+	sections.push(`# DryUI
 
 > ${totalComponents} zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
 
@@ -373,7 +373,7 @@ No global install? Prefix any command with \`bunx @dryui/cli …\` or \`npx -y @
 
 ## MCP Server & Skill
 
-dryui ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
+DryUI ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
 
 ### Install
 
@@ -393,7 +393,7 @@ ${ai.tools.map((tool) => `- ${tool.name}: ${tool.description}`).join('\n')}`);
 function buildLlmsComponentsText(spec: Spec): string {
 	const sections: string[] = [];
 
-	sections.push(`# dryui component reference
+	sections.push(`# DryUI component reference
 
 > Machine-readable component import, props, styling hook, and example index for ${totalComponents} DryUI components.
 

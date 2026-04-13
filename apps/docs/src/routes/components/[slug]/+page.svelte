@@ -19,7 +19,7 @@
 </script>
 
 <svelte:head>
-	<title>{name} — dryui</title>
+	<title>{name} — DryUI</title>
 </svelte:head>
 
 {#key name}

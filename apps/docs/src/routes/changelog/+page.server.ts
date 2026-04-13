@@ -32,7 +32,7 @@ function findRepoRoot(): string {
 		}
 	}
 
-	throw new Error('Could not locate the dryui repo root for the changelog page.');
+	throw new Error('Could not locate the DryUI repo root for the changelog page.');
 }
 
 const REPO_ROOT = findRepoRoot();

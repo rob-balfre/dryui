@@ -45,7 +45,7 @@
 </script>
 
 <svelte:head>
-	<title>Migration Guide — dryui</title>
+	<title>Migration Guide — DryUI</title>
 </svelte:head>
 
 <Container>

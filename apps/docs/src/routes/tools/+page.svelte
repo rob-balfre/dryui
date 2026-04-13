@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Tools — dryui</title>
+	<title>Tools — DryUI</title>
 </svelte:head>
 
 <Container>
@@ -162,7 +162,7 @@
 			<DocsSectionIntro
 				id="cli"
 				title="CLI commands"
-				description="Install once with bun install -g @dryui/cli (or npm install -g @dryui/cli), then run dryui anywhere. Every command outputs TOON (token-optimized, agent-friendly) by default — pass --text for human-readable plain text, --json where supported, or --full to disable truncation."
+				description="Install once with bun install -g @dryui/cli (or npm install -g @dryui/cli), then run the CLI anywhere. Every command outputs TOON (token-optimized, agent-friendly) by default — pass --text for human-readable plain text, --json where supported, or --full to disable truncation."
 			/>
 
 			<Card.Root>

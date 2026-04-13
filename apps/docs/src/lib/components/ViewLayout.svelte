@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>{title} — dryui</title>
+	<title>{title} — DryUI</title>
 </svelte:head>
 
 <div class="view-layout">
