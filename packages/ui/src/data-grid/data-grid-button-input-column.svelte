@@ -237,7 +237,7 @@
 	}
 
 	[data-dg-column] input[data-filter-input]:focus {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 		border-color: var(--dry-color-fill-brand);
 	}

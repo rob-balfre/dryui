@@ -118,7 +118,7 @@
 		stroke: var(--_gauge-fill-stroke, var(--dry-gauge-fill-color));
 		stroke-width: var(--dry-gauge-stroke-width);
 		stroke-linecap: round;
-		transition: d var(--dry-duration-normal, 0.3s) var(--dry-ease-default, ease);
+		transition: d var(--dry-duration-normal) var(--dry-ease-default);
 	}
 
 	[data-gauge-label] {

@@ -83,7 +83,7 @@
 	[data-pin-input-cell][data-active] {
 		border-color: var(--dry-color-fill-brand);
 		z-index: 2;
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -2px;
 	}
 

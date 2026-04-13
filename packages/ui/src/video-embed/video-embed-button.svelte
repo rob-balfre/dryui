@@ -160,7 +160,7 @@
 		height: var(--dry-video-embed-play-size);
 		aspect-ratio: 1;
 		filter: drop-shadow(0 2px 8px rgb(15 23 42 / 0.3));
-		transition: transform var(--dry-duration-normal, 200ms) ease;
+		transition: transform var(--dry-duration-normal) var(--dry-ease-default);
 	}
 
 	.play-btn-slot:hover [data-part='play-icon'] {

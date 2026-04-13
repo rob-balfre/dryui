@@ -305,6 +305,37 @@ samp {
 	--dry-text-4xl-size: var(--dry-type-ui-display-size);
 	--dry-text-4xl-leading: var(--dry-type-ui-display-leading);
 
+	/* ─── State ───────────────────────────────────────────────────────
+	   Shared shorthands for focus / disabled state. Consumers can
+	   override these at :root to restyle every focusable or disabled
+	   control in one place.
+	   - Focus ring: `outline: var(--dry-focus-ring); outline-offset: 2px;`
+	   - Disabled state: `opacity: var(--dry-state-disabled-opacity); cursor: not-allowed;`
+	*/
+	--dry-focus-ring: 2px solid var(--dry-color-focus-ring);
+	--dry-state-disabled-opacity: 0.5;
+
+	/* ─── Form control shared tokens ──────────────────────────────────
+	   Consumed by input, textarea, combobox-input, and color-picker-input.
+	   Per-component `--dry-<name>-*` overrides still work — they now
+	   resolve through this shared family by default, so consumers can
+	   restyle all form controls with one change at :root.
+	   Intentionally excluded (pre-existing divergence):
+	   - border-focus: some controls use --dry-color-stroke-focus,
+	     others use --dry-color-focus-ring; left per-component.
+	   - bg-disabled: input uses --dry-color-bg-sunken, others rely on
+	     opacity; left per-component.
+	*/
+	--dry-form-control-bg: var(--dry-color-bg-raised);
+	--dry-form-control-border: var(--dry-color-stroke-strong);
+	--dry-form-control-border-hover: var(--dry-color-stroke-strong);
+	--dry-form-control-color: var(--dry-color-text-strong);
+	--dry-form-control-color-placeholder: var(--dry-color-text-weak);
+	--dry-form-control-radius: var(--dry-radius-md);
+	--dry-form-control-font-size: var(--dry-type-small-size);
+	--dry-form-control-padding-block: var(--dry-space-2);
+	--dry-form-control-padding-inline: var(--dry-space-3);
+
 	/* ─── Motion ──────────────────────────────────────────────────── */
 	--dry-duration-instant: 0ms;
 	--dry-duration-fast: 120ms;

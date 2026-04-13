@@ -240,7 +240,7 @@
 	[data-part='segment'] {
 		background-color: var(--_segment-bg, var(--dry-progress-bar));
 		height: 100%;
-		transition: width var(--dry-duration-slow, 300ms) ease;
+		transition: width var(--dry-duration-slow) var(--dry-ease-default);
 	}
 
 	[data-part='segment']:first-child {

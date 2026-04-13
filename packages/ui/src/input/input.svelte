@@ -48,16 +48,15 @@
 	}
 
 	input {
-		padding: var(--dry-input-padding-y, var(--dry-space-2))
-			var(--dry-input-padding-x, var(--dry-space-3));
-		font-size: var(--dry-input-font-size, var(--dry-type-small-size));
+		padding: var(--dry-input-padding-y, var(--dry-form-control-padding-block))
+			var(--dry-input-padding-x, var(--dry-form-control-padding-inline));
+		font-size: var(--dry-input-font-size, var(--dry-form-control-font-size));
 		line-height: var(--dry-type-small-leading);
 		font-family: var(--dry-font-sans);
-		color: var(--dry-input-color, var(--dry-color-text-strong));
-		background: var(--dry-input-bg, var(--dry-control-bg, var(--dry-color-bg-raised)));
-		border: 1px solid
-			var(--dry-input-border, var(--dry-control-border, var(--dry-color-stroke-strong)));
-		border-radius: var(--dry-input-radius, var(--dry-control-radius, var(--dry-radius-md)));
+		color: var(--dry-input-color, var(--dry-form-control-color));
+		background: var(--dry-input-bg, var(--dry-form-control-bg));
+		border: 1px solid var(--dry-input-border, var(--dry-form-control-border));
+		border-radius: var(--dry-input-radius, var(--dry-form-control-radius));
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
 			box-shadow var(--dry-duration-fast) var(--dry-ease-default);
@@ -65,15 +64,15 @@
 		appearance: none;
 
 		&::placeholder {
-			color: var(--dry-color-text-weak);
+			color: var(--dry-form-control-color-placeholder);
 		}
 
 		&:hover:not([data-disabled]) {
-			border-color: var(--dry-color-stroke-strong);
+			border-color: var(--dry-form-control-border-hover);
 		}
 
 		&:focus-visible {
-			outline: 2px solid var(--dry-color-focus-ring);
+			outline: var(--dry-focus-ring);
 			outline-offset: -1px;
 			border-color: var(--dry-color-stroke-focus);
 			box-shadow: 0 0 0 1px var(--dry-color-stroke-focus);

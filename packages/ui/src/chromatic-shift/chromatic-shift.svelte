@@ -96,7 +96,7 @@
 		pointer-events: none;
 		transform: translate(var(--dry-chromatic-offset), 0);
 		filter: saturate(2) hue-rotate(-30deg);
-		transition: transform var(--dry-duration-fast, 120ms) var(--dry-ease-out, ease);
+		transition: transform var(--dry-duration-fast) var(--dry-ease-out);
 	}
 
 	[data-chromatic-shift][data-active]::after {
@@ -110,7 +110,7 @@
 		pointer-events: none;
 		transform: translate(calc(var(--dry-chromatic-offset) * -1), 0);
 		filter: saturate(2) hue-rotate(30deg);
-		transition: transform var(--dry-duration-fast, 120ms) var(--dry-ease-out, ease);
+		transition: transform var(--dry-duration-fast) var(--dry-ease-out);
 	}
 
 	[data-chromatic-shift][data-channels='rgb'][data-active] {

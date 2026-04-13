@@ -115,7 +115,7 @@
 }
 
 [data-tour-root] [data-part='skipButton']:focus-visible {
-	outline: 2px solid var(--dry-color-focus-ring);
+	outline: var(--dry-focus-ring);
 	outline-offset: 2px;
 }
 
@@ -136,7 +136,7 @@
 }
 
 [data-tour-root] [data-part='prevButton']:focus-visible {
-	outline: 2px solid var(--dry-color-focus-ring);
+	outline: var(--dry-focus-ring);
 	outline-offset: 2px;
 }
 
@@ -157,7 +157,7 @@
 }
 
 [data-tour-root] [data-part='nextButton']:focus-visible {
-	outline: 2px solid var(--dry-color-focus-ring);
+	outline: var(--dry-focus-ring);
 	outline-offset: 2px;
 }
 

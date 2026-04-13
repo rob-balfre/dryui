@@ -45,7 +45,7 @@
 		cursor: pointer;
 
 		&[data-disabled] {
-			opacity: 0.5;
+			opacity: var(--dry-state-disabled-opacity);
 			cursor: not-allowed;
 		}
 

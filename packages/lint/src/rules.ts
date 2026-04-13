@@ -46,6 +46,8 @@ const GLOBAL_SELECTOR_RE = /:global\s*\(/g;
 const MEDIA_QUERY_RE = /@media\s+[^{]+\{/g;
 const ALLOWED_MEDIA_RE = /prefers-reduced-motion|prefers-color-scheme/;
 
+const FOCUS_RING_LITERAL_RE = /outline\s*:\s*2px\s+solid\s+var\(--dry-color-focus-ring\)/g;
+
 const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
@@ -441,6 +443,15 @@ export function checkStyle(content: string): Violation[] {
 				line: lineOf(match.index)
 			});
 		}
+	}
+
+	for (const match of content.matchAll(FOCUS_RING_LITERAL_RE)) {
+		violations.push({
+			rule: 'dryui/prefer-focus-ring-token',
+			message:
+				'Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).',
+			line: lineOf(match.index)
+		});
 	}
 
 	return violations;

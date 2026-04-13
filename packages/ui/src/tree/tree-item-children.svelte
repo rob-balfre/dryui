@@ -44,6 +44,6 @@
 		display: grid;
 		grid-template-rows: var(--_rows, 0fr);
 		padding-left: var(--dry-tree-indent, var(--dry-space-4));
-		transition: grid-template-rows var(--dry-duration-normal, 200ms) var(--dry-ease-default, ease);
+		transition: grid-template-rows var(--dry-duration-normal) var(--dry-ease-default);
 	}
 </style>

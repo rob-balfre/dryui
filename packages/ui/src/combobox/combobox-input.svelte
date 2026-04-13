@@ -136,12 +136,12 @@
 
 <style>
 	[data-combobox-input] {
-		--dry-combobox-bg: var(--dry-color-bg-raised);
-		--dry-combobox-border: var(--dry-color-stroke-strong);
-		--dry-combobox-color: var(--dry-color-text-strong);
-		--dry-combobox-padding-x: var(--dry-space-3);
-		--dry-combobox-padding-y: var(--dry-space-2);
-		--dry-combobox-font-size: var(--dry-type-small-size);
+		--dry-combobox-bg: var(--dry-form-control-bg);
+		--dry-combobox-border: var(--dry-form-control-border);
+		--dry-combobox-color: var(--dry-form-control-color);
+		--dry-combobox-padding-x: var(--dry-form-control-padding-inline);
+		--dry-combobox-padding-y: var(--dry-form-control-padding-block);
+		--dry-combobox-font-size: var(--dry-form-control-font-size);
 
 		display: grid;
 		padding: var(--dry-combobox-padding-y) var(--dry-combobox-padding-x);
@@ -151,7 +151,7 @@
 		color: var(--dry-combobox-color);
 		background: var(--dry-combobox-bg);
 		border: 1px solid var(--dry-combobox-border);
-		border-radius: var(--dry-combobox-radius, var(--dry-radius-md));
+		border-radius: var(--dry-combobox-radius, var(--dry-form-control-radius));
 		box-sizing: border-box;
 		appearance: none;
 		transition:
@@ -160,12 +160,12 @@
 	}
 
 	[data-combobox-input]:hover:not([data-disabled]) {
-		border-color: var(--dry-color-stroke-strong);
+		border-color: var(--dry-form-control-border-hover);
 	}
 
 	[data-combobox-input]:focus-visible,
 	[data-combobox-input]:focus {
-		outline: 2px solid var(--dry-color-focus-ring);
+		outline: var(--dry-focus-ring);
 		outline-offset: -1px;
 		border-color: var(--dry-color-stroke-focus);
 	}
