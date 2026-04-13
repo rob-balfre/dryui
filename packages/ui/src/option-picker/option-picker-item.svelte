@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
 	import { getOptionPickerCtx } from './context.svelte.js';
@@ -26,6 +27,7 @@
 	const ctx = getOptionPickerCtx();
 	const isDisabled = $derived(disabled || unavailable || ctx.disabled);
 	const isSelected = $derived(ctx.isSelected(value));
+	let hasSingleLabelChild = $state(false);
 
 	function moveFocus(current: HTMLButtonElement, direction: -1 | 1) {
 		const group = current.closest('[role="radiogroup"]');
@@ -63,6 +65,22 @@
 			ctx.select(value);
 		}
 	}
+
+	const singleLabelLayout: Attachment<HTMLSpanElement> = (node) => {
+		const updateLayout = () => {
+			const directChildren = Array.from(node.children);
+			hasSingleLabelChild =
+				directChildren.length === 1 &&
+				directChildren[0] instanceof HTMLElement &&
+				directChildren[0].hasAttribute('data-option-picker-label');
+		};
+
+		updateLayout();
+		const observer = new MutationObserver(updateLayout);
+		observer.observe(node, { childList: true });
+
+		return () => observer.disconnect();
+	};
 </script>
 
 <span
@@ -92,7 +110,7 @@
 		}}
 		onkeydown={handleKeydown}
 	>
-		<span class="content">
+		<span class="content" class:single-label={hasSingleLabelChild} {@attach singleLabelLayout}>
 			{@render children()}
 		</span>
 	</Button>
@@ -199,7 +217,7 @@
 		--dry-option-picker-meta-row: 4;
 	}
 
-	.content:has(> [data-option-picker-label]:only-child) {
+	.content.single-label {
 		grid-template-columns: 1fr;
 		justify-items: center;
 		text-align: center;
