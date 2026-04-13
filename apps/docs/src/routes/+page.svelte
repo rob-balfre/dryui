@@ -110,9 +110,12 @@
 	const VIEW_W = FEEDBACK_X + FEEDBACK_W + VIEW_MARGIN * 2;
 	const VIEW_H = CONTAINER_Y + CONTAINER_H + VIEW_MARGIN * 2;
 
+	// Tuned to mirror the hand-built workflow above: TB outer + LR cluster, with
+	// backEdgeLaneGap (144) wide enough that the Live Feedback waypoint clears the
+	// cluster, and waypoint position 0.25 to land it on the loop's vertical segment.
 	const diagramReplica: DiagramConfig = {
-		direction: 'LR',
-		spacing: { cornerRadius: 14, nodeGap: 32, layerGap: 64 },
+		direction: 'TB',
+		spacing: { cornerRadius: 14, nodeGap: 32, layerGap: 72, backEdgeLaneGap: 144 },
 		ariaLabel: 'How DryUI works, rendered with the Diagram component',
 		nodes: [
 			{
@@ -153,7 +156,10 @@
 					description:
 						'Annotate the running app in your browser. The agent reads your marks instantly via MCP — no screenshots, no retyping.',
 					iconComponent: PenLine,
-					color: 'brand'
+					color: 'brand',
+					width: 240,
+					height: 200,
+					position: 0.25
 				}
 			}
 		],
@@ -163,6 +169,7 @@
 				label: 'AI Agent',
 				iconComponent: Sparkles,
 				color: 'brand',
+				direction: 'LR',
 				nodes: ['mcp', 'preprocessor', 'app']
 			}
 		]

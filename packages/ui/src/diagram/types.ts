@@ -47,13 +47,24 @@ export interface DiagramEdge {
 	waypoint?: DiagramWaypoint;
 }
 
+export type DiagramClusterLabelPosition = 'top-left' | 'left';
+
 export interface DiagramCluster {
 	id: string;
 	label?: string;
+	labelPosition?: DiagramClusterLabelPosition;
 	iconComponent?: DiagramIconComponent;
 	nodes: string[];
 	color?: DiagramColor;
 	dashed?: boolean;
+	direction?: DiagramDirection;
+	spacing?: {
+		nodeGap?: number;
+		layerGap?: number;
+		clusterPadding?: number;
+		cornerRadius?: number;
+		backEdgeLaneGap?: number;
+	};
 }
 
 export interface DiagramAnnotation {
@@ -112,6 +123,7 @@ export interface DiagramConfig {
 		layerGap?: number;
 		clusterPadding?: number;
 		cornerRadius?: number;
+		backEdgeLaneGap?: number;
 	};
 	ariaLabel?: string;
 }
@@ -142,6 +154,7 @@ export interface PositionedEdge {
 	dashed: boolean;
 	color: DiagramColor;
 	kind?: 'full' | 'entry' | 'exit';
+	bounds?: { minX: number; minY: number; maxX: number; maxY: number };
 }
 
 export interface PositionedWaypoint {
@@ -165,6 +178,7 @@ export interface PositionedCluster {
 	width: number;
 	height: number;
 	label?: string;
+	labelPosition?: DiagramClusterLabelPosition;
 	iconComponent?: DiagramIconComponent;
 	color: DiagramColor;
 	dashed: boolean;
