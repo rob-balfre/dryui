@@ -147,14 +147,22 @@ describe('getList — unknown category', () => {
 		expect(exitCode).toBe(1);
 		expect(output).toBe('');
 		expect(error).not.toBeNull();
-		expect(error).toContain('Unknown category: "nonexistent"');
+		expect(error).toContain('Unknown category "nonexistent"');
 	});
 
 	test('error lists valid categories', () => {
 		const { error } = getList('nonexistent', mockSpec, 'text');
-		expect(error).toContain('Valid categories:');
+		expect(error).toContain('Available:');
 		expect(error).toContain('action');
 		expect(error).toContain('display');
 		expect(error).toContain('input');
+	});
+
+	test('emits toon error in toon mode', () => {
+		const { output, error, exitCode } = getList('nonexistent', mockSpec, 'toon');
+		expect(exitCode).toBe(1);
+		expect(output).toBe('');
+		expect(error).toContain('error[1]');
+		expect(error).toContain('invalid-category');
 	});
 });

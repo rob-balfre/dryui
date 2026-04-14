@@ -4,9 +4,11 @@ import type { Spec } from './types.js';
 import { pad } from '../format.js';
 import { toonComponentList } from '@dryui/mcp/toon';
 import {
+	commandError,
 	renderCommandResultByMode,
 	resolveOutputMode,
 	runCommand,
+	type CommandResult,
 	type OutputMode
 } from '../run.js';
 
@@ -52,21 +54,16 @@ export function groupByCategory(spec: Spec): Map<string, { name: string; descrip
  * Get the list output, optionally filtered by category.
  * Returns { output, error, exitCode }.
  */
-export function getList(
-	category: string | null,
-	spec: Spec,
-	mode: OutputMode
-): { output: string; error: string | null; exitCode: number } {
+export function getList(category: string | null, spec: Spec, mode: OutputMode): CommandResult {
 	const validCategories = getCategories(spec);
 
 	if (category && !validCategories.includes(category)) {
-		const error = [
-			`Unknown category: "${category}"`,
-			'',
-			'Valid categories:',
-			`  ${validCategories.join(', ')}`
-		].join('\n');
-		return { output: '', error, exitCode: 1 };
+		return commandError(
+			mode,
+			'invalid-category',
+			`Unknown category "${category}". Available: ${validCategories.join(', ')}`,
+			validCategories
+		);
 	}
 
 	const groups = groupByCategory(spec);
@@ -121,9 +118,12 @@ export function runList(args: string[], spec: Spec): void {
 	const catIdx = args.indexOf('--category');
 	if (catIdx !== -1) {
 		const catValue = args[catIdx + 1];
-		if (!catValue) {
-			console.error('Error: --category requires a value');
-			process.exit(1);
+		if (!catValue || catValue.startsWith('--')) {
+			runCommand(
+				commandError(mode, 'missing-value', '--category requires a value', getCategories(spec)),
+				mode
+			);
+			return;
 		}
 		filterCategory = catValue.toLowerCase();
 	}

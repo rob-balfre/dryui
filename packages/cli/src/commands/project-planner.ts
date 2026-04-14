@@ -70,6 +70,7 @@ function formatDetectionSummary(detection: ProjectDetection): string[] {
 		'',
 		'Files:',
 		`  package.json: ${detection.packageJsonPath ?? '(not found)'}`,
+		`  svelte.config: ${detection.files.svelteConfig ?? '(not found)'}`,
 		`  app.html: ${detection.files.appHtml ?? '(not found)'}`,
 		`  layout: ${detection.files.rootLayout ?? '(not found)'}`,
 		`  page: ${detection.files.rootPage ?? '(not found)'}`,
@@ -77,11 +78,15 @@ function formatDetectionSummary(detection: ProjectDetection): string[] {
 		'Dependencies:',
 		`  @dryui/ui: ${yesNo(detection.dependencies.ui)}`,
 		`  @dryui/primitives: ${yesNo(detection.dependencies.primitives)}`,
+		`  @dryui/lint: ${yesNo(detection.dependencies.lint)}`,
 		'',
 		'Theme:',
 		`  default imported: ${yesNo(detection.theme.defaultImported)}`,
 		`  dark imported: ${yesNo(detection.theme.darkImported)}`,
-		`  theme-auto: ${yesNo(detection.theme.themeAuto)}`
+		`  theme-auto: ${yesNo(detection.theme.themeAuto)}`,
+		'',
+		'Lint:',
+		`  preprocessor wired: ${yesNo(detection.lint.preprocessorWired)}`
 	];
 
 	if (detection.warnings.length > 0) {

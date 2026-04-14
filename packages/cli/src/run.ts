@@ -1,7 +1,19 @@
 // Shared command output handler for all CLI commands.
 
 import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { toonError } from '@dryui/mcp/toon';
+
+/**
+ * Convert an absolute path to a `~/...` form when it lives under the user's
+ * home directory. Used for agent-readable banners where the literal home path
+ * would leak the user's username.
+ */
+export function homeRelative(p: string): string {
+	const home = process.env.HOME || homedir() || '';
+	if (home && p.startsWith(home)) return '~' + p.slice(home.length);
+	return p;
+}
 
 export interface CommandResult {
 	output: string;
@@ -103,19 +115,36 @@ export function runStandardCommand(args: string[], options: StandardCommandOptio
 }
 
 /**
+ * Build a structured CommandResult for an error.
+ * In TOON mode the error is encoded via `toonError` so agents get a
+ * parseable payload; in text mode it falls back to the plain message.
+ * Callers should pair this with `runCommand(result, mode)` so errors
+ * land on the correct stream (stdout in TOON/JSON, stderr in text).
+ */
+export function commandError(
+	mode: OutputMode,
+	code: string,
+	message: string,
+	suggestions?: readonly string[],
+	exitCode = 1
+): CommandResult {
+	return {
+		output: '',
+		error:
+			mode === 'toon'
+				? toonError(code, message, suggestions ? [...suggestions] : undefined)
+				: message,
+		exitCode
+	};
+}
+
+/**
  * Return a CommandResult for a missing file, or null if the file exists.
  * Formats the error as TOON when mode is 'toon'.
  */
 export function fileNotFound(filePath: string, mode: OutputMode): CommandResult | null {
 	if (existsSync(filePath)) return null;
-	return {
-		output: '',
-		error:
-			mode === 'toon'
-				? toonError('not-found', `File not found: ${filePath}`)
-				: `File not found: ${filePath}`,
-		exitCode: 1
-	};
+	return commandError(mode, 'not-found', `File not found: ${filePath}`);
 }
 
 /**

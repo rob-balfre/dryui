@@ -147,15 +147,37 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 ### Manual setup
 
 1. `bun add @dryui/ui`
-2. Add `class="theme-auto"` to `<html>` in `src/app.html`
-3. In root layout (`src/routes/+layout.svelte`), import themes:
+2. `bun add -d @dryui/lint` — enforces grid-only layout, bans flexbox/inline-style/width at build time. Without this step the CSS discipline rules are not enforced, and `dryui review` / `doctor` become the only guardrails.
+3. Wire the lint preprocessor in `svelte.config.js` (add `dryuiLint` as the **first** item in the `preprocess` array):
+
+   ```js
+   import { dryuiLint } from '@dryui/lint';
+
+   /** @type {import('@sveltejs/kit').Config} */
+   const config = {
+   	preprocess: [
+   		dryuiLint({
+   			strict: true,
+   			exclude: ['.svelte-kit/', '/dist/']
+   		})
+   		// keep any existing preprocessors after this
+   	]
+   };
+
+   export default config;
+   ```
+
+4. Add `class="theme-auto"` to `<html>` in `src/app.html`
+5. In root layout (`src/routes/+layout.svelte`), import themes:
    ```svelte
    <script>
    	import '@dryui/ui/themes/default.css';
    	import '@dryui/ui/themes/dark.css';
    </script>
    ```
-4. Import `app.css` AFTER theme CSS if you have custom styles
+6. Import `app.css` AFTER theme CSS if you have custom styles
+
+> `dryui init` applies all six steps automatically — prefer it over manual setup when you can.
 
 ## Bindable Props — Common Confusion
 

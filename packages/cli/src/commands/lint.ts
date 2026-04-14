@@ -6,6 +6,7 @@ import { formatWorkspaceReport } from '../format.js';
 import { toonWorkspaceReport } from '@dryui/mcp/toon';
 import { parseWorkspaceArgs } from './workspace-args.js';
 import {
+	commandError,
 	renderCommandResultByMode,
 	runCommand,
 	type CommandResult,
@@ -51,11 +52,13 @@ export function getLint(
 			exitCode
 		);
 	} catch (error) {
-		return {
-			output: '',
-			error: error instanceof Error ? error.message : String(error),
-			exitCode: 1
-		};
+		const message = error instanceof Error ? error.message : String(error);
+		const isMissing =
+			/ENOENT|no such file|not found|does not exist/i.test(message) ||
+			(typeof error === 'object' &&
+				error !== null &&
+				(error as { code?: string }).code === 'ENOENT');
+		return commandError(mode, isMissing ? 'not-found' : 'scan-failed', message);
 	}
 }
 

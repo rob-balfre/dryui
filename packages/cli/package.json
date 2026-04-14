@@ -20,10 +20,11 @@
     "access": "public"
   },
   "bin": {
-    "dryui": "./dist/index.js"
+    "dryui": "./dist/index.js",
+    "dryui-ambient": "./dist/ambient.js"
   },
   "scripts": {
-    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node"
+    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts src/ambient.ts --outdir dist --target node"
   },
   "dependencies": {
     "@dryui/feedback-server": "^0.3.1",

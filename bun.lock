@@ -6,6 +6,7 @@
       "devDependencies": {
         "@changesets/changelog-github": "^0.6.0",
         "@changesets/cli": "^2.30.0",
+        "@dryui/lint": "^0.3.0",
         "@playwright/test": "^1.59.1",
         "@sveltejs/vite-plugin-svelte": "^7.0.0",
         "@vitest/browser-playwright": "^4.1.4",

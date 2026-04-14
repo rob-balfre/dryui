@@ -4,9 +4,11 @@ import { extractTokens, getTokenCategories } from '@dryui/mcp/tokens';
 import { toonTokens } from '@dryui/mcp/toon';
 import { pad } from '../format.js';
 import {
+	commandError,
 	renderCommandResultByMode,
 	resolveOutputMode,
 	runCommand,
+	type CommandResult,
 	type OutputMode
 } from '../run.js';
 
@@ -14,21 +16,17 @@ import {
  * Get the tokens output, optionally filtered by category.
  * Returns { output, error, exitCode }.
  */
-export function getTokens(
-	category: string | null,
-	mode: OutputMode
-): { output: string; error: string | null; exitCode: number } {
+export function getTokens(category: string | null, mode: OutputMode): CommandResult {
 	const result = extractTokens(category ?? undefined);
 
 	if (result.tokens.length === 0 && category) {
 		const available = getTokenCategories();
-		const error = [
-			`Unknown category: "${category}"`,
-			'',
-			'Valid categories:',
-			`  ${available.join(', ')}`
-		].join('\n');
-		return { output: '', error, exitCode: 1 };
+		return commandError(
+			mode,
+			'invalid-category',
+			`Unknown category "${category}". Available: ${available.join(', ')}`,
+			available
+		);
 	}
 
 	const grouped = new Map<string, typeof result.tokens>();
@@ -92,9 +90,12 @@ export function runTokens(args: string[]): void {
 	const catIdx = args.indexOf('--category');
 	if (catIdx !== -1) {
 		const catValue = args[catIdx + 1];
-		if (!catValue) {
-			console.error('Error: --category requires a value');
-			process.exit(1);
+		if (!catValue || catValue.startsWith('--')) {
+			runCommand(
+				commandError(mode, 'missing-value', '--category requires a value', getTokenCategories()),
+				mode
+			);
+			return;
 		}
 		filterCategory = catValue.toLowerCase();
 	}

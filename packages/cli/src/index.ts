@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 // @dryui/cli — Command-line tools for DryUI
 
+import { fileURLToPath } from 'node:url';
 import pkg from '../package.json';
 import spec from '../../mcp/src/spec.json';
 import { detectProject } from '../../mcp/src/project-planner.js';
 import { toonProjectDetection } from '@dryui/mcp/toon';
+import { commandError, homeRelative, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
@@ -19,8 +21,33 @@ import { runLint } from './commands/lint.js';
 import { runTokens } from './commands/tokens.js';
 import { runFeedback } from './commands/feedback.js';
 import { runLauncher } from './commands/launcher.js';
+import { runInstallHook } from './commands/install-hook.js';
+import { emitAmbient } from './commands/ambient.js';
 
 const VERSION = pkg.version;
+const DESCRIPTION = 'DryUI — zero-dependency Svelte 5 components + agent-ergonomic CLI.';
+
+function resolveExePath(): string {
+	const rawExe = process.argv[1] ?? fileURLToPath(import.meta.url);
+	return homeRelative(rawExe);
+}
+
+function printBanner(): void {
+	console.log(`dryui: v${VERSION}`);
+	console.log(`exe: ${resolveExePath()}`);
+	console.log(`about: ${DESCRIPTION}`);
+	console.log('');
+}
+
+function emitNotADryuiProject(): void {
+	console.log(`project: not-a-dryui-project | cwd: ${homeRelative(process.cwd())}`);
+	console.log('deps: ui=false, primitives=false, lint=false');
+	console.log('');
+	console.log('next[3]{cmd,description}:');
+	console.log('  dryui init,Bootstrap a new SvelteKit + DryUI project in this folder');
+	console.log('  dryui detect,Re-run detection with --text or --json output');
+	console.log('  dryui --help,Show the full command list');
+}
 
 const USAGE = `Usage: dryui <command> [options]
 
@@ -28,7 +55,9 @@ Most commands default to TOON (token-optimized) output. Pass --text for
 human-readable plain text, or --json where supported. init, feedback, and
 add (snippet mode) always produce plain text.
 
-In this repository, running \`dryui\` with no command opens the feedback dashboard.
+Running \`dryui\` with no command prints a compact project dashboard (or
+opens the feedback launcher inside the DryUI monorepo). Use \`dryui --help\`
+to see this message.
 
 Commands:
   init [path] [--pm bun|npm|pnpm|yarn]
@@ -52,6 +81,9 @@ Commands:
                                 Print deterministic workspace findings
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
+  ambient                       Print compact session context (for SessionStart hooks)
+  install-hook [--global] [--dry-run]
+                                Wire \`dryui ambient\` into Claude Code settings.json
   feedback <subcommand>         Start feedback tooling, inspect the server, or launch the dashboard
 
 Options:
@@ -75,23 +107,22 @@ async function main(): Promise<void> {
 		process.exit(0);
 	}
 
-	// In the DryUI repo, no-arg opens the feedback dashboard. Else keep the existing status/help flow.
 	if (!command) {
 		if (await runLauncher([])) {
 			return;
 		}
 
+		printBanner();
 		try {
 			const detection = detectProject(spec, undefined);
 			if (detection.status === 'ready' || detection.status === 'partial') {
-				console.log(`dryui v${VERSION}\n`);
 				console.log(toonProjectDetection(detection));
 				process.exit(0);
 			}
 		} catch {
-			// Not in a project — fall through to USAGE
+			// Detection threw — fall through to the not-a-project status.
 		}
-		console.log(USAGE);
+		emitNotADryuiProject();
 		process.exit(0);
 	}
 
@@ -134,14 +165,25 @@ async function main(): Promise<void> {
 		case 'tokens':
 			runTokens(commandArgs);
 			break;
+		case 'ambient':
+			emitAmbient();
+			break;
+		case 'install-hook':
+			runInstallHook(commandArgs);
+			break;
 		case 'feedback':
 			await runFeedback(commandArgs);
 			break;
 		default:
-			console.error(`Unknown command: "${command}"`);
-			console.error('');
-			console.error(USAGE);
-			process.exit(1);
+			runCommand(
+				commandError(
+					'toon',
+					'unknown-command',
+					`Unknown command: "${command}". Run \`dryui --help\` for the full command list.`,
+					['dryui --help', 'dryui list', 'dryui detect']
+				),
+				'toon'
+			);
 	}
 }
 

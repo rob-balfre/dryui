@@ -13,28 +13,42 @@ import {
 
 const mockSpec = createCardMockSpec();
 
+const LINT_WIRED_SVELTE_CONFIG = [
+	"import { dryuiLint } from '@dryui/lint';",
+	'',
+	'export default {',
+	'  preprocess: [dryuiLint({ strict: true })]',
+	'};'
+].join('\n');
+
+const readyProjectFiles = {
+	'package.json': JSON.stringify({
+		dependencies: {
+			'@sveltejs/kit': '^2.0.0',
+			svelte: '^5.0.0',
+			'@dryui/ui': 'workspace:*'
+		},
+		devDependencies: {
+			'@dryui/lint': 'workspace:*'
+		}
+	}),
+	'bun.lock': '',
+	'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+	'src/app.html': '<html class="theme-auto"></html>',
+	'src/routes/+layout.svelte': [
+		'<script lang="ts">',
+		"  import '@dryui/ui/themes/default.css';",
+		"  import '@dryui/ui/themes/dark.css';",
+		'</script>'
+	].join('\n'),
+	'src/routes/+page.svelte': '<h1>Home</h1>'
+};
+
 afterEach(cleanupTempDirs);
 
 describe('getDetect', () => {
 	test('formats project detection text', () => {
-		const root = createTempTree({
-			'package.json': JSON.stringify({
-				dependencies: {
-					'@sveltejs/kit': '^2.0.0',
-					svelte: '^5.0.0',
-					'@dryui/ui': 'workspace:*'
-				}
-			}),
-			'bun.lock': '',
-			'src/app.html': '<html class="theme-auto"></html>',
-			'src/routes/+layout.svelte': [
-				'<script lang="ts">',
-				"  import '@dryui/ui/themes/default.css';",
-				"  import '@dryui/ui/themes/dark.css';",
-				'</script>'
-			].join('\n'),
-			'src/routes/+page.svelte': '<h1>Home</h1>'
-		});
+		const root = createTempTree(readyProjectFiles);
 
 		const { output, error, exitCode } = getDetect(root, mockSpec, 'text');
 
@@ -46,22 +60,7 @@ describe('getDetect', () => {
 	});
 
 	test('returns raw JSON when requested', () => {
-		const root = createTempTree({
-			'package.json': JSON.stringify({
-				dependencies: {
-					'@sveltejs/kit': '^2.0.0',
-					svelte: '^5.0.0',
-					'@dryui/ui': 'workspace:*'
-				}
-			}),
-			'src/app.html': '<html class="theme-auto"></html>',
-			'src/routes/+layout.svelte': [
-				'<script lang="ts">',
-				"  import '@dryui/ui/themes/default.css';",
-				"  import '@dryui/ui/themes/dark.css';",
-				'</script>'
-			].join('\n')
-		});
+		const root = createTempTree(readyProjectFiles);
 
 		const { output, error, exitCode } = getDetect(root, mockSpec, 'json');
 

@@ -36,17 +36,22 @@ export interface ProjectDetection {
 	readonly dependencies: {
 		readonly ui: boolean;
 		readonly primitives: boolean;
+		readonly lint: boolean;
 	};
 	readonly files: {
 		readonly appHtml: string | null;
 		readonly appCss: string | null;
 		readonly rootLayout: string | null;
 		readonly rootPage: string | null;
+		readonly svelteConfig: string | null;
 	};
 	readonly theme: {
 		readonly defaultImported: boolean;
 		readonly darkImported: boolean;
 		readonly themeAuto: boolean;
+	};
+	readonly lint: {
+		readonly preprocessorWired: boolean;
 	};
 	readonly warnings: readonly string[];
 }
@@ -200,17 +205,66 @@ function buildStatus(
 	return stepsNeeded === 0 ? 'ready' : 'partial';
 }
 
-function installCommand(packageManager: DryuiPackageManager): string {
+function installCommand(
+	packageManager: DryuiPackageManager,
+	packageName: string,
+	options: { dev?: boolean } = {}
+): string {
+	const dev = options.dev ?? false;
 	switch (packageManager) {
 		case 'bun':
-			return 'bun add @dryui/ui';
+			return dev ? `bun add -d ${packageName}` : `bun add ${packageName}`;
 		case 'pnpm':
-			return 'pnpm add @dryui/ui';
+			return dev ? `pnpm add -D ${packageName}` : `pnpm add ${packageName}`;
 		case 'yarn':
-			return 'yarn add @dryui/ui';
+			return dev ? `yarn add -D ${packageName}` : `yarn add ${packageName}`;
 		default:
-			return 'npm install @dryui/ui';
+			return dev ? `npm install -D ${packageName}` : `npm install ${packageName}`;
 	}
+}
+
+export const SVELTE_CONFIG_NAMES = [
+	'svelte.config.js',
+	'svelte.config.ts',
+	'svelte.config.mjs',
+	'svelte.config.cjs'
+] as const;
+
+export function isSvelteConfigPath(filePath: string): boolean {
+	return SVELTE_CONFIG_NAMES.some((name) => filePath.endsWith(name));
+}
+
+function findSvelteConfig(root: string | null): string | null {
+	if (!root) return null;
+	for (const name of SVELTE_CONFIG_NAMES) {
+		const candidate = resolve(root, name);
+		if (existsSync(candidate)) return candidate;
+	}
+	return null;
+}
+
+function isLintPreprocessorWired(svelteConfigPath: string | null): boolean {
+	if (!svelteConfigPath) return false;
+	const content = readFileSync(svelteConfigPath, 'utf-8');
+	return content.includes('@dryui/lint') && content.includes('dryuiLint');
+}
+
+function buildLintPreprocessorSnippet(): string {
+	return [
+		"import { dryuiLint } from '@dryui/lint';",
+		'',
+		'// Merge into your existing config object:',
+		'const config = {',
+		'  preprocess: [',
+		'    dryuiLint({',
+		'      strict: true,',
+		"      exclude: ['.svelte-kit/', '/dist/']",
+		'    }),',
+		'    // keep any existing preprocessors after this',
+		'  ],',
+		'  // ... rest of your config (kit, compilerOptions, etc.)',
+		'};'
+	].join('\n');
 }
 
 function buildThemeImportLines(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
@@ -292,11 +346,16 @@ export function detectProject(
 	const defaultImported = hasAnyImport(themeImportFiles, spec.themeImports.default);
 	const darkImported = hasAnyImport(themeImportFiles, spec.themeImports.dark);
 	const themeAuto = appHtml ? hasThemeAuto(appHtml) : false;
+	const svelteConfig = findSvelteConfig(root);
+	const lintInstalled = dependencyNames.has('@dryui/lint');
+	const lintPreprocessorWired = isLintPreprocessorWired(svelteConfig);
 	const stepsNeeded =
 		Number(!dependencyNames.has('@dryui/ui')) +
 		Number(!defaultImported) +
 		Number(!darkImported) +
-		Number(!themeAuto);
+		Number(!themeAuto) +
+		Number(!lintInstalled) +
+		Number(!lintPreprocessorWired);
 	const warnings: string[] = [];
 
 	if (!packageJsonPath) warnings.push('No package.json found above the provided path.');
@@ -312,18 +371,23 @@ export function detectProject(
 		status: buildStatus(framework, Boolean(packageJsonPath), stepsNeeded),
 		dependencies: {
 			ui: dependencyNames.has('@dryui/ui'),
-			primitives: dependencyNames.has('@dryui/primitives')
+			primitives: dependencyNames.has('@dryui/primitives'),
+			lint: lintInstalled
 		},
 		files: {
 			appHtml,
 			appCss,
 			rootLayout,
-			rootPage
+			rootPage,
+			svelteConfig
 		},
 		theme: {
 			defaultImported,
 			darkImported,
 			themeAuto
+		},
+		lint: {
+			preprocessorWired: lintPreprocessorWired
 		},
 		warnings
 	};
@@ -343,8 +407,15 @@ const SCAFFOLD_PACKAGE_JSON = `{
 `;
 
 const SCAFFOLD_SVELTE_CONFIG = `import adapter from '@sveltejs/adapter-auto';
+import { dryuiLint } from '@dryui/lint';
 
 export default {
+  preprocess: [
+    dryuiLint({
+      strict: true,
+      exclude: ['.svelte-kit/', '/dist/']
+    })
+  ],
   kit: {
     adapter: adapter(),
   },
@@ -505,19 +576,8 @@ function getScaffoldFiles(spec: Pick<ProjectPlannerSpec, 'themeImports'>): Scaff
 	];
 }
 
-function scaffoldCommand(packageManager: DryuiPackageManager): string {
-	const deps = 'svelte @sveltejs/kit @sveltejs/vite-plugin-svelte @sveltejs/adapter-auto vite';
-	switch (packageManager) {
-		case 'bun':
-			return `bun add -d ${deps}`;
-		case 'pnpm':
-			return `pnpm add -D ${deps}`;
-		case 'yarn':
-			return `yarn add -D ${deps}`;
-		default:
-			return `npm install -D ${deps}`;
-	}
-}
+const SCAFFOLD_DEV_DEPS =
+	'svelte @sveltejs/kit @sveltejs/vite-plugin-svelte @sveltejs/adapter-auto vite';
 
 function buildScaffoldSteps(
 	spec: ProjectPlannerSpec,
@@ -545,7 +605,7 @@ function buildScaffoldSteps(
 		status: 'pending',
 		title: 'Install SvelteKit dependencies',
 		description: 'Install Svelte, SvelteKit, Vite, and adapter-auto as dev dependencies.',
-		command: scaffoldCommand(packageManager)
+		command: installCommand(packageManager, SCAFFOLD_DEV_DEPS, { dev: true })
 	});
 
 	steps.push({
@@ -553,7 +613,16 @@ function buildScaffoldSteps(
 		status: 'pending',
 		title: 'Install @dryui/ui',
 		description: 'Add the styled DryUI package to the project.',
-		command: installCommand(packageManager)
+		command: installCommand(packageManager, '@dryui/ui')
+	});
+
+	steps.push({
+		kind: 'install-package',
+		status: 'pending',
+		title: 'Install @dryui/lint',
+		description:
+			'Add the DryUI lint preprocessor as a dev dependency. The scaffolded svelte.config.js already wires dryuiLint — installing this package makes the import resolve.',
+		command: installCommand(packageManager, '@dryui/lint', { dev: true })
 	});
 
 	return steps;
@@ -588,7 +657,18 @@ export function planInstall(
 			status: 'pending',
 			title: 'Install @dryui/ui',
 			description: 'Add the styled DryUI package to the current project.',
-			command: installCommand(detection.packageManager)
+			command: installCommand(detection.packageManager, '@dryui/ui')
+		});
+	}
+
+	if (!detection.dependencies.lint) {
+		steps.push({
+			kind: 'install-package',
+			status: 'pending',
+			title: 'Install @dryui/lint',
+			description:
+				'Add the DryUI lint preprocessor as a dev dependency. It enforces grid-only layout, bans flexbox/inline-style/width-properties, and fails the build on CSS rule violations during Svelte preprocessing.',
+			command: installCommand(detection.packageManager, '@dryui/lint', { dev: true })
 		});
 	}
 
@@ -650,12 +730,35 @@ export function planInstall(
 		});
 	}
 
+	if (!detection.lint.preprocessorWired) {
+		if (detection.files.svelteConfig) {
+			steps.push({
+				kind: 'edit-file',
+				status: 'pending',
+				title: 'Wire dryuiLint into svelte.config',
+				description:
+					'Import dryuiLint from @dryui/lint and add it as the FIRST entry in the preprocess array. If the config has no preprocess field, add one. Merge into the existing config object — do NOT create a second config. Without this step, the grid-only layout rules, flex/inline-style/width bans, and other CSS discipline enforced by @dryui/lint will not run.',
+				path: detection.files.svelteConfig,
+				snippet: buildLintPreprocessorSnippet()
+			});
+		} else {
+			steps.push({
+				kind: 'blocked',
+				status: 'blocked',
+				title: 'svelte.config not found',
+				description:
+					'DryUI expects a svelte.config.{js,ts,mjs,cjs} at the project root so the @dryui/lint preprocessor can run. Create one and then wire dryuiLint into its preprocess array.'
+			});
+		}
+	}
+
 	if (steps.length === 0) {
 		steps.push({
 			kind: 'note',
 			status: 'done',
 			title: 'DryUI install plan is complete',
-			description: 'The project already has @dryui/ui, theme imports, and theme-auto configured.'
+			description:
+				'The project already has @dryui/ui, @dryui/lint, theme imports, theme-auto, and the lint preprocessor wired into svelte.config.'
 		});
 	}
 
