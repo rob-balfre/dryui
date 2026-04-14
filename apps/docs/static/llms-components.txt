@@ -1282,7 +1282,7 @@ Structure:
     DatePicker.Content
       DatePicker.Calendar
 CSS variables: none
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dp-content | data-placeholder | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -1327,8 +1327,8 @@ Structure:
     Calendar.Prev
     Calendar.Next
     Calendar.Heading
-CSS variables: --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-grid-gap, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color
-Data attributes: data-calendar | data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-grid | data-calendar-header | data-calendar-heading | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
+CSS variables: --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color
+Data attributes: data-calendar | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.)
 Accessibility: none
 Example:
 ```svelte
@@ -1370,7 +1370,7 @@ Structure:
     DateRangePicker.Calendar
     DateRangePicker.Preset
 CSS variables: none
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-drp-content | data-placeholder | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -1400,7 +1400,7 @@ Structure:
   RangeCalendar.Root
     RangeCalendar.Grid
 CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-heading-color, --dry-range-calendar-nav-bg, --dry-range-calendar-nav-border, --dry-range-calendar-nav-color, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-panel-bg, --dry-range-calendar-panel-border, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
+Data attributes: data-range-calendar-root
 Accessibility: none
 Example:
 ```svelte
@@ -3091,7 +3091,7 @@ Root import: import { Image } from '@dryui/ui'
 Subpath import: import { Image } from '@dryui/ui/image'
 Props: fallback (string) | fallbackSnippet (Snippet)
 Native props: Forwards native HTML attributes via rest props.
-CSS variables: --dry-image-bg, --dry-image-object-fit, --dry-image-radius
+CSS variables: --dry-image-bg, --dry-image-block-size, --dry-image-object-fit, --dry-image-place-self, --dry-image-radius
 Data attributes: data-state
 Accessibility: none
 Example:
