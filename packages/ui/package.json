@@ -1,6 +1,6 @@
 {
   "name": "@dryui/ui",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -1519,7 +1519,7 @@
     "postpack": "bun ../../scripts/postpack-exports.ts"
   },
   "dependencies": {
-    "@dryui/primitives": "^1.1.1"
+    "@dryui/primitives": "^1.1.2"
   },
   "peerDependencies": {
     "svelte": "^5.55.1"

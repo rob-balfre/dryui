@@ -46,12 +46,12 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.5.0",
+      "version": "0.5.1",
       "bin": {
         "dryui": "./dist/index.js",
       },
       "dependencies": {
-        "@dryui/feedback-server": "^0.3.0",
+        "@dryui/feedback-server": "^0.3.1",
         "@dryui/mcp": "^1.0.3",
       },
       "devDependencies": {
@@ -79,7 +79,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
         "zod": "^4.3.6",
@@ -124,7 +124,7 @@
     },
     "packages/primitives": {
       "name": "@dryui/primitives",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.3",
@@ -158,9 +158,9 @@
     },
     "packages/ui": {
       "name": "@dryui/ui",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "dependencies": {
-        "@dryui/primitives": "^1.1.1",
+        "@dryui/primitives": "^1.1.2",
       },
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
