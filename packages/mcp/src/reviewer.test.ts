@@ -16,7 +16,12 @@ const mockSpec = {
 		Card: {
 			compound: true,
 			parts: {
-				Root: { props: { variant: { type: 'string', required: false } } },
+				Root: {
+					props: {
+						as: { type: "'div' | 'button' | 'a'", required: false },
+						variant: { type: 'string', required: false }
+					}
+				},
 				Header: { props: {} },
 				Content: { props: {} },
 				Footer: { props: {} }
@@ -568,6 +573,46 @@ describe('Dogfooding blockers', () => {
 			'use-container-component'
 		];
 		expect(result.issues.filter((i) => dogfoodCodes.includes(i.code)).length).toBe(0);
+	});
+
+	test('warns when an interactive card wrapper is not display grid', () => {
+		const code = `<script>
+  import { Card } from '@dryui/ui';
+</script>
+<div class="submission-card">
+  <Card.Root as="button" variant="interactive">
+    <Card.Content>Open</Card.Content>
+  </Card.Root>
+</div>
+<style>
+  .submission-card {
+    text-align: left;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		const issue = result.issues.find((entry) => entry.code === 'interactive-card-wrapper');
+		expect(issue).toBeDefined();
+		expect(issue!.severity).toBe('warning');
+		expect(issue!.fix).toBe('display: grid');
+	});
+
+	test('does not warn when an interactive card wrapper uses display grid', () => {
+		const code = `<script>
+  import { Card } from '@dryui/ui';
+</script>
+<div class="submission-card">
+  <Card.Root as="button" variant="interactive">
+    <Card.Content>Open</Card.Content>
+  </Card.Root>
+</div>
+<style>
+  .submission-card {
+    display: grid;
+    text-align: left;
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((entry) => entry.code === 'interactive-card-wrapper')).toBe(false);
 	});
 });
 

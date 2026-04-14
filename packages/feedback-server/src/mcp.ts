@@ -12,7 +12,7 @@ type FeedbackToolClient = Pick<
 	| 'getAllPending'
 	| 'updateAnnotation'
 	| 'addThreadMessage'
-	| 'getPendingSubmissions'
+	| 'getSubmissions'
 	| 'resolveSubmission'
 >;
 
@@ -176,7 +176,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			const startedAt = Date.now();
 
 			while (Date.now() - startedAt < timeoutSeconds * 1000) {
-				const result = await client.getPendingSubmissions();
+				const result = await client.getSubmissions('pending');
 
 				if (result.count > 0) {
 					return {

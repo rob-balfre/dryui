@@ -130,6 +130,7 @@ export interface CreateAnnotationInput extends Omit<
 export interface UpdateAnnotationInput extends Partial<Omit<Annotation, 'id' | 'sessionId'>> {}
 
 export type SubmissionStatus = 'pending' | 'resolved';
+export type SubmissionQueryStatus = SubmissionStatus | 'all';
 
 export interface Submission {
 	id: string;

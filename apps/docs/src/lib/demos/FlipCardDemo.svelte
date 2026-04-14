@@ -254,6 +254,18 @@
 	@container (min-width: 30rem) {
 		.face-hero-front {
 			grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.9fr);
+			align-items: start;
+		}
+
+		.face-hero-front .face-topline,
+		.face-hero-front .face-copy {
+			grid-column: 1;
+		}
+
+		.face-hero-front .hero-panel {
+			grid-column: 2;
+			grid-row: 1 / span 2;
+			align-self: start;
 		}
 
 		.stat-grid {

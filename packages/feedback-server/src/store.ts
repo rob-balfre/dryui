@@ -13,6 +13,7 @@ import type {
 	SessionStatus,
 	SessionWithAnnotations,
 	Submission,
+	SubmissionQueryStatus,
 	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
@@ -70,7 +71,7 @@ interface SubmissionRow {
 	screenshot_path: string;
 	drawings: string;
 	viewport: string | null;
-	status: string;
+	status: SubmissionStatus;
 	created_at: string;
 }
 
@@ -572,12 +573,25 @@ export class FeedbackStore {
 		return row ? toSubmission(row) : null;
 	}
 
-	getPendingSubmissions(): Submission[] {
-		const rows = this.db
-			.query<SubmissionRow>(
-				"SELECT * FROM submissions WHERE status = 'pending' ORDER BY created_at ASC"
-			)
-			.all();
+	listSubmissions(status: SubmissionQueryStatus = 'all'): Submission[] {
+		// Pending uses ASC so it acts like a FIFO queue; history filters use DESC (newest first).
+		if (status === 'pending') {
+			const rows = this.db
+				.query<SubmissionRow>(
+					"SELECT * FROM submissions WHERE status = 'pending' ORDER BY created_at ASC"
+				)
+				.all();
+			return rows.map(toSubmission);
+		}
+
+		const rows =
+			status === 'all'
+				? this.db.query<SubmissionRow>('SELECT * FROM submissions ORDER BY created_at DESC').all()
+				: this.db
+						.query<SubmissionRow>(
+							'SELECT * FROM submissions WHERE status = ? ORDER BY created_at DESC'
+						)
+						.all(status);
 		return rows.map(toSubmission);
 	}
 

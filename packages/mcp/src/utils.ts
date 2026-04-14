@@ -19,3 +19,7 @@ export function lineAtOffset(lineOffsets: number[], offset: number): number {
 	}
 	return lo + 1; // 1-based
 }
+
+export function escapeRegExp(value: string): string {
+	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}

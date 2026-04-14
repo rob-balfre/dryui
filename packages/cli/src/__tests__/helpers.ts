@@ -29,14 +29,22 @@ export function createTempTree(
 	return root;
 }
 
-export function captureCommandIO(run: () => void): {
+interface CaptureResult {
 	logs: string[];
 	errors: string[];
 	exitCode: number | null;
-} {
+}
+
+interface CaptureSession {
+	result: CaptureResult;
+	swallowExit(error: unknown): void;
+	restore(): void;
+}
+
+function beginCapture(): CaptureSession {
 	const logs: string[] = [];
 	const errors: string[] = [];
-	let exitCode: number | null = null;
+	const result: CaptureResult = { logs, errors, exitCode: null };
 	const originalLog = console.log;
 	const originalError = console.error;
 	const originalExit = process.exit;
@@ -48,23 +56,47 @@ export function captureCommandIO(run: () => void): {
 		errors.push(args.map(String).join(' '));
 	}) as typeof console.error;
 	process.exit = ((code?: number | string | undefined) => {
-		exitCode = typeof code === 'number' ? code : 0;
+		result.exitCode = typeof code === 'number' ? code : 0;
 		throw new Error('exit');
 	}) as typeof process.exit;
 
+	return {
+		result,
+		swallowExit(error: unknown) {
+			if (!(error instanceof Error) || error.message !== 'exit') {
+				throw error;
+			}
+		},
+		restore() {
+			console.log = originalLog;
+			console.error = originalError;
+			process.exit = originalExit;
+		}
+	};
+}
+
+export function captureCommandIO(run: () => void): CaptureResult {
+	const session = beginCapture();
 	try {
 		run();
 	} catch (error) {
-		if (!(error instanceof Error) || error.message !== 'exit') {
-			throw error;
-		}
+		session.swallowExit(error);
 	} finally {
-		console.log = originalLog;
-		console.error = originalError;
-		process.exit = originalExit;
+		session.restore();
 	}
+	return session.result;
+}
 
-	return { logs, errors, exitCode };
+export async function captureAsyncCommandIO(run: () => Promise<void>): Promise<CaptureResult> {
+	const session = beginCapture();
+	try {
+		await run();
+	} catch (error) {
+		session.swallowExit(error);
+	} finally {
+		session.restore();
+	}
+	return session.result;
 }
 
 export function withCwd<T>(cwd: string, run: () => T): T {

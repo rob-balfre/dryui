@@ -1,3 +1,5 @@
+import { sep, isAbsolute, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { KEEPALIVE_INTERVAL_MS } from './config.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
@@ -10,6 +12,7 @@ import type {
 	CreateSubmissionInput,
 	PendingResponse,
 	SSEEvent,
+	SubmissionQueryStatus,
 	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
@@ -20,6 +23,7 @@ const CORS_HEADERS: Record<string, string> = {
 	'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type'
 };
+const UI_DIST_DIR = resolve(fileURLToPath(new URL('../dist/ui', import.meta.url)));
 
 function json(data: unknown, status = 200): Response {
 	return Response.json(data, {
@@ -75,6 +79,56 @@ function pendingResponse(annotations: Annotation[]): PendingResponse {
 		count: annotations.length,
 		annotations
 	};
+}
+
+const NO_STORE_HEADERS: Record<string, string> = {
+	'Cache-Control': 'no-store, max-age=0, must-revalidate',
+	Pragma: 'no-cache'
+};
+
+function resolveStaticAsset(rootDir: string, assetPath: string): string | null {
+	const candidate = resolve(rootDir, assetPath);
+	if (candidate !== rootDir && !candidate.startsWith(rootDir + sep)) return null;
+	if (isAbsolute(assetPath)) return null;
+	return candidate;
+}
+
+async function fileResponse(
+	filePath: string,
+	headers: Record<string, string> = {}
+): Promise<Response | null> {
+	const file = Bun.file(filePath);
+	if (!(await file.exists())) return null;
+	return new Response(file, { status: 200, headers });
+}
+
+async function uiResponse(requestUrl: URL): Promise<Response | null> {
+	const { pathname } = requestUrl;
+
+	if (pathname !== '/ui' && !pathname.startsWith('/ui/')) {
+		return null;
+	}
+
+	const assetPath =
+		pathname === '/ui' || pathname === '/ui/'
+			? 'index.html'
+			: decodeURIComponent(pathname.slice('/ui/'.length));
+	const resolvedPath = resolveStaticAsset(UI_DIST_DIR, assetPath);
+	if (!resolvedPath) {
+		return errorResponse(403, 'Forbidden');
+	}
+
+	const response = await fileResponse(resolvedPath, NO_STORE_HEADERS);
+	if (response) return response;
+
+	if (pathname === '/ui' || pathname === '/ui/') {
+		return errorResponse(503, 'Feedback UI is not built');
+	}
+	return errorResponse(404, 'Not found');
+}
+
+function isSubmissionQueryStatus(value: string | null): value is SubmissionQueryStatus {
+	return value === null || value === 'pending' || value === 'resolved' || value === 'all';
 }
 
 function createEventStream(
@@ -138,6 +192,11 @@ export function startFeedbackHttpServer(
 		async fetch(request, server) {
 			const url = new URL(request.url);
 			const { pathname } = url;
+
+			if (request.method === 'GET') {
+				const feedbackUi = await uiResponse(url);
+				if (feedbackUi) return feedbackUi;
+			}
 
 			if (request.method === 'OPTIONS') {
 				return new Response(null, { status: 204, headers: CORS_HEADERS });
@@ -286,8 +345,21 @@ export function startFeedbackHttpServer(
 			}
 
 			if (pathname === '/submissions' && request.method === 'GET') {
-				const submissions = store.getPendingSubmissions();
+				const status = url.searchParams.get('status');
+				if (!isSubmissionQueryStatus(status)) {
+					return errorResponse(400, 'Invalid submission status filter');
+				}
+
+				const submissions = store.listSubmissions(status ?? 'pending');
 				return json({ count: submissions.length, submissions });
+			}
+
+			const submissionScreenshotMatch = pathname.match(/^\/submissions\/([^/]+)\/screenshot$/);
+			if (submissionScreenshotMatch && request.method === 'GET') {
+				const submissionId = decodeURIComponent(submissionScreenshotMatch[1] ?? '');
+				const submission = store.getSubmission(submissionId);
+				if (!submission) return errorResponse(404, 'Not found');
+				return (await fileResponse(submission.screenshotPath)) ?? errorResponse(404, 'Not found');
 			}
 
 			const submissionMatch = pathname.match(/^\/submissions\/([^/]+)$/);
