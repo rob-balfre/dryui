@@ -2,8 +2,14 @@
 
 import type { Spec } from './types.js';
 import { searchComposition, formatCompositionResult } from '@dryui/mcp/composition-search';
-import { toonComposition, toonError } from '@dryui/mcp/toon';
-import { renderCommandResultByMode, runStandardCommand, type OutputMode } from '../run.js';
+import { toonComposition } from '@dryui/mcp/toon';
+import {
+	commandError,
+	renderCommandResultByMode,
+	runStandardCommand,
+	type CommandResult,
+	type OutputMode
+} from '../run.js';
 
 const SETUP_PREAMBLE = [
 	"\u26A0 SETUP: Root +layout.svelte must import '@dryui/ui/themes/default.css'",
@@ -12,51 +18,50 @@ const SETUP_PREAMBLE = [
 	''
 ].join('\n');
 
+const EMPTY_MATCH_HINTS = [
+	'Try a component name (e.g. "DatePicker", "Avatar")',
+	'Try a UI concept (e.g. "date input", "image placeholder")',
+	'Try a pattern name (e.g. "search-form", "dashboard-page")'
+];
+
 export function getCompose(
 	query: string,
 	spec: Spec,
 	mode: OutputMode,
 	options: { full?: boolean } = {}
-): { output: string; error: string | null; exitCode: number } {
+): CommandResult {
 	if (!spec.composition) {
-		return {
-			output: '',
-			error: 'No composition data available. Rebuild the MCP package.',
-			exitCode: 1
-		};
+		return commandError(
+			mode,
+			'missing-data',
+			'No composition data available. Rebuild the MCP package.'
+		);
 	}
 
 	const results = searchComposition(spec.composition, query);
+	const isEmpty = !results.componentMatches.length && !results.recipeMatches.length;
 
-	if (!results.componentMatches.length && !results.recipeMatches.length) {
-		switch (mode) {
-			case 'toon':
-				return {
-					output: '',
-					error: toonError('no-results', `No composition guidance for "${query}"`, [
-						'Try a component name (DatePicker, Avatar)',
-						'Try a UI concept (date input, image placeholder)',
-						'Try a pattern name (search-form, dashboard-page)'
-					]),
-					exitCode: 1
-				};
-			case 'text':
-			default:
-				return {
-					output: '',
-					error: `No composition guidance found for "${query}".\n\nTry:\n- A component name (e.g. "DatePicker", "Avatar")\n- A UI concept (e.g. "date input", "image placeholder")\n- A pattern name (e.g. "search-form", "dashboard-page")`,
-					exitCode: 1
-				};
-		}
-	}
-
-	return renderCommandResultByMode(mode, results, {
-		toon: (value) => toonComposition(value, spec.components, { full: options.full }),
-		text: (value) => {
-			const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(value, spec.components);
-			return output.trimEnd();
-		}
-	});
+	return renderCommandResultByMode(
+		mode,
+		results,
+		{
+			toon: (value) => toonComposition(value, spec.components, { full: options.full }),
+			text: (value) => {
+				if (isEmpty) {
+					const lines = [
+						`No composition guidance found for "${query}".`,
+						'',
+						'Try:',
+						...EMPTY_MATCH_HINTS.map((hint) => `- ${hint}`)
+					];
+					return lines.join('\n');
+				}
+				const output = SETUP_PREAMBLE + '\n' + formatCompositionResult(value, spec.components);
+				return output.trimEnd();
+			}
+		},
+		0
+	);
 }
 
 export function runCompose(args: string[], spec: Spec): void {

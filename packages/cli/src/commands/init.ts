@@ -7,6 +7,7 @@ import type { Spec } from './types.js';
 import {
 	planInstall,
 	detectPackageManagerFromEnv,
+	isSvelteConfigPath,
 	type DryuiPackageManager,
 	type ProjectPlanStep
 } from '@dryui/mcp/project-planner';
@@ -39,7 +40,14 @@ function parseInitArgs(args: string[]): InitOptions {
 	};
 }
 
+// init is text-only (no TOON mode) — progress, headings and per-step status
+// go to stdout so agents and pipes receive them as normal output. Warnings and
+// hard errors should go through console.error (stderr) explicitly.
 function log(msg: string): void {
+	console.log(msg);
+}
+
+function warn(msg: string): void {
 	console.error(msg);
 }
 
@@ -104,7 +112,60 @@ function executeEditFile(step: ProjectPlanStep): void {
 		return;
 	}
 
-	log(`  ? Skipped edit: ${step.title} (manual action needed)`);
+	if (isSvelteConfigPath(step.path)) {
+		if (content.includes('dryuiLint')) return;
+
+		const importLine = "import { dryuiLint } from '@dryui/lint';";
+		const lintEntry = "dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] })";
+
+		let updated = content;
+
+		const importMatches = [...content.matchAll(/^import[^;]*;/gm)];
+		const lastImport = importMatches.at(-1);
+		if (lastImport?.index !== undefined) {
+			const pos = lastImport.index + lastImport[0].length;
+			updated = updated.slice(0, pos) + '\n' + importLine + updated.slice(pos);
+		} else {
+			updated = importLine + '\n' + updated;
+		}
+
+		// Branch order matters: the array form is unambiguous, so match it first.
+		// The `vitePreprocess(...)` single-call form (with or without args) must match
+		// BEFORE the bare-config-object fallback — otherwise the fallback would inject
+		// a second `preprocess:` field next to the existing one and produce a
+		// duplicate-key config object.
+		if (/preprocess\s*:\s*\[/.test(updated)) {
+			updated = updated.replace(/preprocess\s*:\s*\[/, `preprocess: [\n\t\t${lintEntry},`);
+		} else if (/preprocess\s*:\s*vitePreprocess\s*\(/.test(updated)) {
+			updated = updated.replace(
+				/preprocess\s*:\s*(vitePreprocess\s*\([^)]*\))/,
+				`preprocess: [${lintEntry}, $1]`
+			);
+		} else if (/preprocess\s*:/.test(updated)) {
+			warn(
+				`  ? Skipped edit: ${step.title} (manual action needed — unrecognised preprocess shape in ${step.path}; add ${lintEntry} to the preprocess array manually)`
+			);
+			return;
+		} else if (
+			/(const\s+config\s*=\s*\{|export\s+default\s*\{|defineConfig\s*\(\s*\{)/.test(updated)
+		) {
+			updated = updated.replace(
+				/(const\s+config\s*=\s*\{|export\s+default\s*\{|defineConfig\s*\(\s*\{)/,
+				`$1\n\tpreprocess: [${lintEntry}],`
+			);
+		} else {
+			warn(
+				`  ? Skipped edit: ${step.title} (manual action needed — could not locate preprocess field or config object in ${step.path})`
+			);
+			return;
+		}
+
+		writeFileSync(step.path, updated, 'utf-8');
+		log(`  ~ ${step.title}`);
+		return;
+	}
+
+	warn(`  ? Skipped edit: ${step.title} (manual action needed)`);
 }
 
 export function runInit(args: string[], spec: Spec): void {
@@ -159,7 +220,7 @@ export function runInit(args: string[], spec: Spec): void {
 				log(`  Installing dependencies...`);
 				const ok = runShellCommand(step.command, targetPath);
 				if (!ok) {
-					log(`  Warning: "${step.command}" failed. Run it manually.`);
+					warn(`  Warning: "${step.command}" failed. Run it manually.`);
 				}
 				break;
 			}
@@ -167,7 +228,7 @@ export function runInit(args: string[], spec: Spec): void {
 				log(`  ${step.title}`);
 				break;
 			case 'blocked':
-				log(`  Warning: ${step.title} — ${step.description}`);
+				warn(`  Warning: ${step.title} — ${step.description}`);
 				break;
 		}
 	}

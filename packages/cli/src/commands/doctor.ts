@@ -6,6 +6,7 @@ import { formatWorkspaceReport } from '../format.js';
 import { toonWorkspaceReport } from '@dryui/mcp/toon';
 import { parseWorkspaceArgs } from './workspace-args.js';
 import {
+	commandError,
 	renderCommandResultByMode,
 	runCommand,
 	type CommandResult,
@@ -52,11 +53,15 @@ export function getDoctor(
 			0
 		);
 	} catch (error) {
-		return {
-			output: '',
-			error: error instanceof Error ? error.message : String(error),
-			exitCode: 1
-		};
+		const message = error instanceof Error ? error.message : String(error);
+		// ENOENT and missing-path errors from scanWorkspace should look like
+		// other "not-found" errors so agents can parse them consistently.
+		const isMissing =
+			/ENOENT|no such file|not found|does not exist/i.test(message) ||
+			(typeof error === 'object' &&
+				error !== null &&
+				(error as { code?: string }).code === 'ENOENT');
+		return commandError(mode, isMissing ? 'not-found' : 'scan-failed', message);
 	}
 }
 

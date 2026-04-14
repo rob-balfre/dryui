@@ -6,6 +6,7 @@ import { buildAddSnippet, formatAddPlan } from './project-planner.js';
 import { planAdd } from '@dryui/mcp/project-planner';
 import { toonAddPlan } from '@dryui/mcp/toon';
 import {
+	commandError,
 	renderCommandResultByMode,
 	resolveOutputMode,
 	runCommand,
@@ -57,11 +58,7 @@ export function getAdd(
 	options: AddOptions = {}
 ): CommandResult {
 	if (options.target && !options.project) {
-		return {
-			output: '',
-			error: '--target requires --project',
-			exitCode: 1
-		};
+		return commandError(mode, 'invalid-flag', '--target requires --project');
 	}
 
 	if (options.project) {
@@ -79,20 +76,26 @@ export function getAdd(
 				text: (value) => formatAddPlan(value)
 			});
 		} catch (error) {
-			return {
-				output: '',
-				error: error instanceof Error ? error.message : String(error),
-				exitCode: 1
-			};
+			const message = error instanceof Error ? error.message : String(error);
+			const code = /unknown component/i.test(message) ? 'not-found' : 'plan-failed';
+			const suggestions = code === 'not-found' ? Object.keys(spec.components).sort() : undefined;
+			return commandError(mode, code, message, suggestions);
 		}
 	}
 
-	const { output, error, exitCode } = buildAddSnippet(query, spec, {
+	const snippet = buildAddSnippet(query, spec, {
 		...(options.subpath !== undefined ? { subpath: options.subpath } : {}),
 		...(options.withTheme !== undefined ? { withTheme: options.withTheme } : {})
 	});
 
-	return { output, error, exitCode };
+	// Snippet mode is always text output. If the component lookup failed,
+	// route the error through commandError so `runCommand` sends it to the
+	// stream that matches the resolved output mode.
+	if (snippet.error) {
+		return commandError(mode, 'not-found', snippet.error, Object.keys(spec.components).sort());
+	}
+
+	return { output: snippet.output, error: null, exitCode: snippet.exitCode };
 }
 
 export function runAdd(args: string[], spec: Spec): void {
@@ -120,9 +123,13 @@ export function runAdd(args: string[], spec: Spec): void {
 	const targetIndex = args.indexOf('--target');
 	const target = targetIndex !== -1 ? args[targetIndex + 1] : undefined;
 
+	// Snippet mode (no --project) always produces plain text; output-mode flags
+	// only apply in --project mode where we print an AddPlan.
+	const { mode: resolvedMode } = resolveOutputMode(args);
+	const mode: OutputMode = project ? resolvedMode : 'text';
+
 	if (targetIndex !== -1 && (!target || target.startsWith('--'))) {
-		console.error('Error: --target requires a file path');
-		process.exit(1);
+		runCommand(commandError(mode, 'missing-value', '--target requires a file path'), mode);
 		return;
 	}
 
@@ -136,29 +143,21 @@ export function runAdd(args: string[], spec: Spec): void {
 		return true;
 	});
 
-	// Snippet mode (no --project) always produces plain text; output-mode flags
-	// only apply in --project mode where we print an AddPlan.
-	const { mode: resolvedMode } = resolveOutputMode(args);
-	const mode: OutputMode = project ? resolvedMode : 'text';
-
 	if (!project && args.includes('--json')) {
-		console.error('Error: --json requires --project');
-		process.exit(1);
+		runCommand(commandError(mode, 'invalid-flag', '--json requires --project'), mode);
 		return;
 	}
 
 	if (project) {
 		const parsed = parseProjectInput(positional, spec);
 		if (parsed.error) {
-			console.error(parsed.error);
-			process.exit(1);
+			runCommand(commandError(mode, 'invalid-args', parsed.error), mode);
 			return;
 		}
 
 		const query = parsed.query;
 		if (!query) {
-			console.error('Error: add requires a component name');
-			process.exit(1);
+			runCommand(commandError(mode, 'missing-argument', 'add requires a component name'), mode);
 			return;
 		}
 
@@ -177,8 +176,7 @@ export function runAdd(args: string[], spec: Spec): void {
 
 	const query = positional[0];
 	if (!query) {
-		console.error('Error: add requires a component name');
-		process.exit(1);
+		runCommand(commandError(mode, 'missing-argument', 'add requires a component name'), mode);
 		return;
 	}
 

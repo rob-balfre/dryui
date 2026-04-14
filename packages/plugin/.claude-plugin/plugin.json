@@ -11,5 +11,6 @@
   "license": "MIT",
   "keywords": ["svelte", "components", "ui", "dryui", "svelte5"],
   "skills": "./skills/",
-  "mcpServers": "./.mcp.json"
+  "mcpServers": "./.mcp.json",
+  "hooks": "./hooks/hooks.json"
 }

@@ -36,6 +36,14 @@ afterEach(() => {
 	}
 });
 
+const LINT_WIRED_SVELTE_CONFIG = [
+	"import { dryuiLint } from '@dryui/lint';",
+	'',
+	'export default {',
+	'  preprocess: [dryuiLint({ strict: true })]',
+	'};'
+].join('\n');
+
 describe('detectProject', () => {
 	test('detects a configured SvelteKit project', () => {
 		const root = createProject({
@@ -44,9 +52,13 @@ describe('detectProject', () => {
 					'@sveltejs/kit': '^2.0.0',
 					svelte: '^5.0.0',
 					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
 				}
 			}),
 			'bun.lock': '',
+			'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
 			'src/app.html': '<html class="theme-auto"></html>',
 			'src/routes/+layout.svelte': [
 				'<script lang="ts">',
@@ -64,6 +76,9 @@ describe('detectProject', () => {
 		expect(result.packageManager).toBe('bun');
 		expect(result.theme.themeAuto).toBe(true);
 		expect(result.theme.defaultImported).toBe(true);
+		expect(result.dependencies.lint).toBe(true);
+		expect(result.lint.preprocessorWired).toBe(true);
+		expect(result.files.svelteConfig).toBe(resolve(root, 'svelte.config.js'));
 		expect(result.files.rootPage).toBe(resolve(root, 'src/routes/+page.svelte'));
 	});
 
@@ -76,8 +91,12 @@ describe('detectProject', () => {
 					'@sveltejs/kit': '^2.0.0',
 					svelte: '^5.0.0',
 					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
 				}
 			}),
+			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
 			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
 			'apps/docs/src/app.css': [
 				"@import '@dryui/ui/themes/default.css';",
@@ -97,7 +116,69 @@ describe('detectProject', () => {
 		expect(result.packageManager).toBe('bun');
 		expect(result.theme.defaultImported).toBe(true);
 		expect(result.theme.darkImported).toBe(true);
+		expect(result.dependencies.lint).toBe(true);
+		expect(result.lint.preprocessorWired).toBe(true);
 		expect(result.files.appCss).toBe(resolve(workspaceRoot, 'apps/docs/src/app.css'));
+	});
+
+	test('flags missing lint preprocessor as partial', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'bun.lock': '',
+			'svelte.config.js': [
+				"import adapter from '@sveltejs/adapter-auto';",
+				'',
+				'export default { kit: { adapter: adapter() } };'
+			].join('\n'),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.status).toBe('partial');
+		expect(result.dependencies.lint).toBe(false);
+		expect(result.lint.preprocessorWired).toBe(false);
+		expect(result.files.svelteConfig).toBe(resolve(root, 'svelte.config.js'));
+	});
+
+	test('recognises dryuiLint wiring in svelte.config.ts', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'svelte.config.ts': LINT_WIRED_SVELTE_CONFIG,
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.lint.preprocessorWired).toBe(true);
+		expect(result.files.svelteConfig).toBe(resolve(root, 'svelte.config.ts'));
 	});
 });
 
@@ -111,6 +192,11 @@ describe('planInstall', () => {
 				}
 			}),
 			'package-lock.json': '',
+			'svelte.config.js': [
+				"import adapter from '@sveltejs/adapter-auto';",
+				'',
+				'export default { kit: { adapter: adapter() } };'
+			].join('\n'),
 			'src/app.html': '<html></html>'
 		});
 
@@ -119,10 +205,14 @@ describe('planInstall', () => {
 		expect(plan.detection.status).toBe('partial');
 		expect(plan.steps.map((step) => step.title)).toEqual([
 			'Install @dryui/ui',
+			'Install @dryui/lint',
 			'Create root layout with theme imports',
-			'Set html theme mode to auto'
+			'Set html theme mode to auto',
+			'Wire dryuiLint into svelte.config'
 		]);
 		expect(plan.steps[0]?.command).toBe('npm install @dryui/ui');
+		expect(plan.steps[1]?.command).toBe('npm install -D @dryui/lint');
+		expect(plan.steps.at(-1)?.path).toBe(resolve(root, 'svelte.config.js'));
 	});
 
 	test('edits app.css when the root layout imports it', () => {
@@ -132,8 +222,12 @@ describe('planInstall', () => {
 					'@sveltejs/kit': '^2.0.0',
 					svelte: '^5.0.0',
 					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
 				}
 			}),
+			'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
 			'src/app.html': '<html class="theme-auto"></html>',
 			'src/app.css': 'body { margin: 0; }',
 			'src/routes/+layout.svelte': [
@@ -147,6 +241,72 @@ describe('planInstall', () => {
 
 		expect(plan.steps.map((step) => step.title)).toEqual(['Add theme imports to app.css']);
 		expect(plan.steps[0]?.path).toBe(resolve(root, 'src/app.css'));
+	});
+
+	test('emits lint install + wiring steps when both are missing', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'bun.lock': '',
+			'svelte.config.js': [
+				"import adapter from '@sveltejs/adapter-auto';",
+				'',
+				'export default { kit: { adapter: adapter() } };'
+			].join('\n'),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const plan = planInstall(mockSpec, root);
+
+		const titles = plan.steps.map((step) => step.title);
+		expect(titles).toContain('Install @dryui/lint');
+		expect(titles).toContain('Wire dryuiLint into svelte.config');
+
+		const installStep = plan.steps.find((step) => step.title === 'Install @dryui/lint');
+		expect(installStep?.command).toBe('bun add -d @dryui/lint');
+
+		const wireStep = plan.steps.find((step) => step.title === 'Wire dryuiLint into svelte.config');
+		expect(wireStep?.kind).toBe('edit-file');
+		expect(wireStep?.path).toBe(resolve(root, 'svelte.config.js'));
+		expect(wireStep?.snippet).toContain("import { dryuiLint } from '@dryui/lint'");
+	});
+
+	test('blocks lint wiring when no svelte.config file exists', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const plan = planInstall(mockSpec, root);
+
+		const blocked = plan.steps.find((step) => step.title === 'svelte.config not found');
+		expect(blocked?.status).toBe('blocked');
 	});
 });
 
@@ -178,8 +338,12 @@ describe('planAdd', () => {
 					'@sveltejs/kit': '^2.0.0',
 					svelte: '^5.0.0',
 					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
 				}
 			}),
+			'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
 			'src/app.html': '<html class="theme-auto"></html>',
 			'src/routes/+layout.svelte': [
 				'<script lang="ts">',

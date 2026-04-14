@@ -35,10 +35,31 @@ function row(...values: (string | number | boolean)[]): string {
 	return '  ' + values.map((v) => esc(String(v))).join(',');
 }
 
-/** Truncate text and return a hint if it exceeds maxLen. */
-function truncate(text: string, maxLen: number, hint: string): string {
+/**
+ * Block-level truncation hint: `(truncated, N chars total — use <cmd> for complete body)`.
+ * Emitted once at the end of a block whenever any child row or body was capped.
+ * Agents can match it with a single regex.
+ */
+function formatTruncationHint(totalChars: number, overrideCmd: string): string {
+	return `(truncated, ${totalChars} chars total — use ${overrideCmd} for complete body)`;
+}
+
+/** Truncate a body text and replace with the block-level hint if it exceeds maxLen. */
+function truncate(text: string, maxLen: number, overrideCmd: string): string {
 	if (text.length <= maxLen) return text;
-	return `(truncated, ${text.length} chars -- ${hint})`;
+	return formatTruncationHint(text.length, overrideCmd);
+}
+
+/**
+ * Truncate a row-level field (message / description / reason / fix) with an inline
+ * `…` marker. Callers should emit a single block-level `formatTruncationHint` at the
+ * end of the row block when any field was capped — use the `[value, wasCapped]` tuple
+ * returned here to track that without a second length comparison.
+ */
+const FIELD_CAP = 240;
+function truncateField(value: string, max = FIELD_CAP): [string, boolean] {
+	if (value.length <= max) return [value, false];
+	return [value.slice(0, max - 1) + '…', true];
 }
 
 // ── Contextual help builder ────────────────────────────────
@@ -103,6 +124,12 @@ export function buildContextualHelp(ctx: HelpContext): string[] {
 		case 'diagnose':
 			if (ctx.hasErrors) {
 				hints.push('compose "app shell" -- get correct theme setup');
+			} else if (ctx.hasFindings) {
+				// Warnings-only case: the run is not a CI blocker but still has issues
+				// worth surfacing. Point at --full for complete context and doctor for
+				// workspace-wide triage.
+				hints.push('diagnose <file.css> --full -- see full messages');
+				hints.push('doctor --max-severity warning -- triage across workspace');
 			} else if (ctx.isEmpty) {
 				hints.push('review <file.svelte> -- validate component usage');
 			}
@@ -230,9 +257,7 @@ export function toonComponent(
 
 	// Example
 	if (def.example) {
-		const example = full
-			? def.example
-			: truncate(def.example, 400, `use add ${name} for full snippet`);
+		const example = full ? def.example : truncate(def.example, 400, `add ${name}`);
 		lines.push('', 'canonical:', example);
 	}
 
@@ -306,15 +331,25 @@ export function toonComposition(
 		return 'matches[0]: none';
 	}
 
-	// Component matches
+	// Top-level match-count aggregate. Top match is the first component match if any,
+	// otherwise the first recipe. Gives agents a pre-computed count so they can skip
+	// the whole block when it's empty.
+	const topMatch = results.componentMatches[0]?.component ?? results.recipeMatches[0]?.name ?? '';
+	lines.push(`matches[${totalMatches}]: ${topMatch}`);
+	lines.push('');
+
+	let anyFieldTruncated = false;
+
 	for (const comp of results.componentMatches) {
-		lines.push(`-- ${comp.component}: ${comp.useWhen}`);
+		const [compUseWhen, t1] = truncateField(comp.useWhen);
+		anyFieldTruncated ||= t1;
+		lines.push(`-- ${comp.component}: ${compUseWhen}`);
 
 		for (const alt of comp.alternatives) {
-			const snippet = full
-				? alt.snippet
-				: truncate(alt.snippet, 500, `use info ${alt.component} for full snippet`);
-			lines.push(`  ${alt.rank}. ${alt.component} (${alt.useWhen})`);
+			const snippet = full ? alt.snippet : truncate(alt.snippet, 500, `info ${alt.component}`);
+			const [altUseWhen, t2] = truncateField(alt.useWhen);
+			anyFieldTruncated ||= t2;
+			lines.push(`  ${alt.rank}. ${alt.component} (${altUseWhen})`);
 			const spec = components[alt.component];
 			if (spec) {
 				const requiredParts = getRequiredParts(alt.component, spec);
@@ -324,7 +359,7 @@ export function toonComposition(
 				);
 				const canonical = full
 					? spec.example
-					: truncate(spec.example, 240, `use info ${alt.component} for the canonical example`);
+					: truncate(spec.example, 240, `info ${alt.component}`);
 				lines.push('     canonical:');
 				lines.push(
 					canonical
@@ -342,8 +377,11 @@ export function toonComposition(
 		}
 
 		for (const ap of comp.antiPatterns) {
+			const [reason, t3] = truncateField(ap.reason);
+			const [fix, t4] = truncateField(ap.fix);
+			anyFieldTruncated ||= t3 || t4;
 			lines.push(`  anti-pattern: ${ap.pattern}`);
-			lines.push(`    reason: ${ap.reason} | fix: ${ap.fix}`);
+			lines.push(`    reason: ${reason} | fix: ${fix}`);
 		}
 
 		if (comp.combinesWith.length) {
@@ -352,13 +390,14 @@ export function toonComposition(
 		lines.push('');
 	}
 
-	// Recipe matches
 	for (const recipe of results.recipeMatches) {
 		const snippet = full
 			? recipe.snippet
-			: truncate(recipe.snippet, 500, `use compose "${recipe.name}" --full for complete code`);
+			: truncate(recipe.snippet, 500, `compose "${recipe.name}" --full`);
+		const [description, t5] = truncateField(recipe.description);
+		anyFieldTruncated ||= t5;
 		lines.push(`-- recipe: ${recipe.name}`);
-		lines.push(`  ${recipe.description}`);
+		lines.push(`  ${description}`);
 		lines.push(`  components: ${recipe.components.join(',')}`);
 		lines.push('  code:');
 		lines.push(
@@ -370,13 +409,16 @@ export function toonComposition(
 		lines.push('');
 	}
 
-	// Contextual help
-	const firstComponent =
-		results.componentMatches[0]?.alternatives[0]?.component ??
-		results.recipeMatches[0]?.components[0] ??
-		undefined;
+	if (anyFieldTruncated) {
+		lines.push(formatTruncationHint(FIELD_CAP, 'compose <query> --full'));
+		lines.push('');
+	}
+
+	const hasComponent =
+		results.componentMatches[0]?.alternatives[0]?.component !== undefined ||
+		results.recipeMatches[0]?.components[0] !== undefined;
 	const ctx: HelpContext = { command: 'compose' };
-	if (firstComponent) ctx.componentName = firstComponent;
+	if (hasComponent) ctx.componentName = '<Component>';
 	const help = buildContextualHelp(ctx);
 	if (help.length > 0) {
 		lines.push(formatHelp(help));
@@ -397,11 +439,19 @@ export function toonReviewResult(result: ReviewResult): string {
 		lines.push(`hasBlockers: false | autoFixable: 0`);
 	} else {
 		lines.push(header('issues', result.issues.length, ['severity', 'line', 'code', 'message']));
+		let anyTruncated = false;
 		for (const issue of result.issues) {
-			lines.push(row(issue.severity, issue.line, issue.code, issue.message));
+			const [message, mt] = truncateField(issue.message);
+			anyTruncated ||= mt;
+			lines.push(row(issue.severity, issue.line, issue.code, message));
 			if (issue.fix) {
-				lines.push(`    fix: ${issue.fix}`);
+				const [fix, ft] = truncateField(issue.fix);
+				anyTruncated ||= ft;
+				lines.push(`    fix: ${fix}`);
 			}
+		}
+		if (anyTruncated) {
+			lines.push(`  ${formatTruncationHint(FIELD_CAP, 'review <file.svelte> --full')}`);
 		}
 		lines.push(`hasBlockers: ${hasBlockers} | autoFixable: ${autoFixable}`);
 	}
@@ -436,25 +486,41 @@ export function toonDiagnoseResult(result: DiagnoseResult): string {
 		`tokens: ${variables.found} found, ${variables.required} required, ${variables.extra} extra | coverage: ${coverage}%`
 	);
 
+	const counts = { error: 0, warning: 0, info: 0 };
+	for (const issue of result.issues) {
+		counts[issue.severity]++;
+	}
+	const hasErrors = counts.error > 0;
+	const hasWarnings = counts.warning > 0;
+
 	if (result.issues.length === 0) {
 		lines.push('issues[0]: clean');
 	} else {
+		lines.push(`errors: ${counts.error} | warnings: ${counts.warning} | info: ${counts.info}`);
+
 		lines.push(header('issues', result.issues.length, ['severity', 'code', 'variable', 'message']));
+		let anyTruncated = false;
 		for (const issue of result.issues) {
-			lines.push(row(issue.severity, issue.code, issue.variable, issue.message));
+			const [message, mt] = truncateField(issue.message);
+			anyTruncated ||= mt;
+			lines.push(row(issue.severity, issue.code, issue.variable, message));
 			if (issue.fix) {
-				lines.push(`    fix: ${issue.fix}`);
+				const [fix, ft] = truncateField(issue.fix);
+				anyTruncated ||= ft;
+				lines.push(`    fix: ${fix}`);
 			}
+		}
+		if (anyTruncated) {
+			lines.push(`  ${formatTruncationHint(FIELD_CAP, 'diagnose <file.css> --full')}`);
 		}
 	}
 
 	lines.push(result.summary);
 
-	// Contextual help
-	const hasErrors = result.issues.some((i) => i.severity === 'error');
 	const help = buildContextualHelp({
 		command: 'diagnose',
 		hasErrors,
+		hasFindings: hasWarnings,
 		isEmpty: result.issues.length === 0
 	});
 	if (help.length > 0) {
@@ -481,15 +547,20 @@ export function toonWorkspaceReport(
 	const command: HelpCommand = opts?.command ?? (title.includes('lint') ? 'lint' : 'doctor');
 	const lines: string[] = [];
 
+	const hasBlockers = report.summary.error > 0;
+	const autoFixable = report.findings.filter((f) => f.fixable).length;
+
 	lines.push(`${title} | root: ${report.root}`);
 	lines.push(
 		`scanned: ${report.scannedFiles} files | errors: ${report.summary.error} | warnings: ${report.summary.warning} | info: ${report.summary.info}`
 	);
+	lines.push(`hasBlockers: ${hasBlockers} | autoFixable: ${autoFixable}`);
 
-	// Top rule (pre-computed aggregate)
-	if (report.summary.byRule && Object.keys(report.summary.byRule).length > 0) {
-		const sorted = Object.entries(report.summary.byRule).sort(([, a], [, b]) => b - a);
-		const topRule = sorted[0];
+	if (report.summary.byRule) {
+		let topRule: [string, number] | null = null;
+		for (const entry of Object.entries(report.summary.byRule)) {
+			if (!topRule || entry[1] > topRule[1]) topRule = entry;
+		}
 		if (topRule) {
 			lines.push(`top-rule: ${topRule[0]} (${topRule[1]} occurrences)`);
 		}
@@ -504,21 +575,31 @@ export function toonWorkspaceReport(
 		lines.push(
 			header('findings', findings.length, ['severity', 'rule', 'file', 'line', 'message'])
 		);
+		let anyMessageTruncated = false;
 		for (const f of findings) {
-			lines.push(row(f.severity, f.ruleId, f.file, f.line ?? '-', f.message));
-			if (f.suggestedFixes.length > 0) {
-				for (const fix of f.suggestedFixes) {
-					lines.push(
-						`    fix: ${fix.description}${fix.replacement ? ` -> ${fix.replacement}` : ''}`
-					);
+			const [message, mt] = truncateField(f.message);
+			anyMessageTruncated ||= mt;
+			lines.push(row(f.severity, f.ruleId, f.file, f.line ?? '-', message));
+			for (const fix of f.suggestedFixes) {
+				const [fixDesc, dt] = truncateField(fix.description);
+				anyMessageTruncated ||= dt;
+				let replacementStr = '';
+				if (fix.replacement) {
+					const [rep, rt] = truncateField(fix.replacement);
+					anyMessageTruncated ||= rt;
+					replacementStr = ` -> ${rep}`;
 				}
+				lines.push(`    fix: ${fixDesc}${replacementStr}`);
 			}
 		}
 
 		if (truncated) {
 			lines.push(
-				`  (showing ${MAX_FINDINGS_DEFAULT} of ${report.findings.length} -- use --full to see all)`
+				`  (showing ${MAX_FINDINGS_DEFAULT} of ${report.findings.length} — use --full to see all)`
 			);
+		}
+		if (anyMessageTruncated) {
+			lines.push(`  ${formatTruncationHint(FIELD_CAP, `review <file> or ${command} --full`)}`);
 		}
 	}
 
@@ -552,10 +633,13 @@ export function toonProjectDetection(detection: ProjectDetection): string {
 	);
 	lines.push(`root: ${detection.root ?? '(not found)'}`);
 	lines.push(
-		`deps: ui=${detection.dependencies.ui}, primitives=${detection.dependencies.primitives}`
+		`deps: ui=${detection.dependencies.ui}, primitives=${detection.dependencies.primitives}, lint=${detection.dependencies.lint}`
 	);
 	lines.push(
 		`theme: default=${detection.theme.defaultImported}, dark=${detection.theme.darkImported}, auto=${detection.theme.themeAuto}`
+	);
+	lines.push(
+		`lint: wired=${detection.lint.preprocessorWired}, svelte-config=${detection.files.svelteConfig ?? '(not found)'}`
 	);
 
 	if (detection.warnings.length > 0) {
