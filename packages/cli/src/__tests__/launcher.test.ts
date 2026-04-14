@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { resolve } from 'node:path';
 import {
-	buildLauncherTargets,
-	buildLauncherUrl,
+	buildDashboardUrl,
 	findLauncherWorkspaceRoot,
 	isHealthyProbeStatus,
 	runLauncher
@@ -23,25 +22,10 @@ describe('launcher helpers', () => {
 		expect(findLauncherWorkspaceRoot(resolve(root, 'apps/docs/src/routes'))).toBe(root);
 	});
 
-	test('builds launcher targets and url with the expected routes', () => {
-		const feedbackBaseUrl = 'http://127.0.0.1:4748';
-		const docsBaseUrl = 'http://127.0.0.1:5173';
-		const targets = buildLauncherTargets(feedbackBaseUrl, docsBaseUrl);
-		const launcherUrl = buildLauncherUrl(feedbackBaseUrl, docsBaseUrl, 42);
+	test('builds the dashboard url with the dev target encoded as a query param', () => {
+		const dashboardUrl = buildDashboardUrl('http://127.0.0.1:4748', 'http://127.0.0.1:5173', 42);
 
-		expect(targets).toEqual({
-			view: 'http://127.0.0.1:5173/view/bench/visual',
-			feedback: 'http://127.0.0.1:4748/ui',
-			docs: 'http://127.0.0.1:5173/',
-			theme: 'http://127.0.0.1:5173/theme-wizard'
-		});
-		expect(launcherUrl).toContain('http://127.0.0.1:4748/ui/launcher.html?v=42');
-		expect(decodeURIComponent(launcherUrl)).toContain(
-			'view=http://127.0.0.1:5173/view/bench/visual'
-		);
-		expect(decodeURIComponent(launcherUrl)).toContain('feedback=http://127.0.0.1:4748/ui');
-		expect(decodeURIComponent(launcherUrl)).toContain('docs=http://127.0.0.1:5173/');
-		expect(decodeURIComponent(launcherUrl)).toContain('theme=http://127.0.0.1:5173/theme-wizard');
+		expect(dashboardUrl).toBe('http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173');
 	});
 
 	test('only treats 2xx probe responses as healthy', () => {
@@ -64,7 +48,7 @@ describe('runLauncher', () => {
 		expect(launched).toBe(false);
 	});
 
-	test('prints the launcher url without opening a browser when --no-open is set', async () => {
+	test('prints the dashboard url without opening a browser when --no-open is set', async () => {
 		const root = createTempTree({
 			'apps/docs/package.json': '{"name":"@dryui/docs"}',
 			'packages/cli/package.json': '{"name":"@dryui/cli"}',
@@ -87,9 +71,11 @@ describe('runLauncher', () => {
 		);
 
 		expect(result.logs).toHaveLength(1);
-		expect(result.logs[0]).toContain('DryUI launcher');
+		expect(result.logs[0]).toContain('DryUI feedback dashboard');
 		expect(result.logs[0]).toContain(`Workspace: ${root}`);
-		expect(result.logs[0]).toContain('Launcher: http://127.0.0.1:4748/ui/launcher.html?v=42');
+		expect(result.logs[0]).toContain(
+			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173'
+		);
 		expect(result.logs[0]).toContain('Docs: already running');
 		expect(result.logs[0]).toContain('Feedback: already running');
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');

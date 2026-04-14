@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { PageHeader } from '@dryui/primitives';
 	import {
 		Alert,
 		Badge,
@@ -28,6 +29,7 @@
 	}
 
 	let activeTab = $state<SubmissionStatus>('pending');
+	let copyState = $state<'idle' | 'copied' | 'error'>('idle');
 	let error = $state('');
 	let lastLoadedAt = $state<string | null>(null);
 	let loading = $state(true);
@@ -35,6 +37,14 @@
 	let search = $state('');
 	let selectedId = $state<string | null>(null);
 	let submissions = $state<Submission[]>([]);
+
+	function readDevUrl(): string | null {
+		if (typeof window === 'undefined') return null;
+		const value = new URL(window.location.href).searchParams.get('dev');
+		return value?.trim() ? value : null;
+	}
+
+	const devUrl = readDevUrl();
 
 	function formatAbsoluteTime(value: string): string {
 		return new Intl.DateTimeFormat(undefined, {
@@ -248,6 +258,41 @@
 	let visibleResolvedCount = $derived(visibleResolvedSubmissions.length);
 	let visibleCount = $derived(visibleSubmissions.length);
 
+	let promptText = $derived.by(() => {
+		if (selectedSubmission) {
+			const notes =
+				selectedTextNotes.length > 0
+					? `\n\nText notes from the annotation:\n${selectedTextNotes.map((note) => `- ${note}`).join('\n')}`
+					: '';
+			return `Work on DryUI feedback submission ${selectedSubmission.id} from ${selectedSubmission.url}.
+
+Use the dryui-feedback MCP server:
+1. Call feedback_get_submissions to fetch the latest submission details
+2. Read the screenshot at screenshotPath to see what the user annotated
+3. Review the drawings (arrows, freehand marks, text notes) to understand the requested changes
+4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
+5. Call feedback_resolve_submission with id "${selectedSubmission.id}" once resolved${notes}`;
+		}
+		return `Work on pending DryUI feedback submissions.
+
+Use the dryui-feedback MCP server:
+1. Call feedback_get_submissions to list pending submissions
+2. For each submission, read the screenshot at screenshotPath
+3. Review the drawings (arrows, freehand marks, text notes) to understand the requested changes
+4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
+5. Call feedback_resolve_submission with the submission id after each fix is complete`;
+	});
+
+	async function copyPromptToClipboard(): Promise<void> {
+		try {
+			await navigator.clipboard.writeText(promptText);
+			copyState = 'copied';
+		} catch {
+			copyState = 'error';
+		}
+		window.setTimeout(() => (copyState = 'idle'), 2000);
+	}
+
 	onMount(() => {
 		void loadSubmissions('initial');
 		const intervalId = window.setInterval(() => void loadSubmissions('refresh'), 10_000);
@@ -256,89 +301,90 @@
 	});
 </script>
 
-<Container size="full" padding={false}>
+<Container size="xl" padding={false}>
 	<section class="dashboard">
-		<header class="hero">
-			<div class="hero-copy">
-				<Badge variant="soft" color="blue" size="sm">Feedback Console</Badge>
-				<Heading level={1}>Queue and history for feedback submissions</Heading>
-				<Text as="p" color="secondary">
-					Review queued screenshots, inspect annotations, and reopen resolved items when a fix needs
-					another pass.
-				</Text>
-			</div>
-
-			<div class="hero-actions">
+		<PageHeader.Root>
+			<PageHeader.Content>
+				<a class="brand" href="https://dryui.dev" target="_blank" rel="noreferrer">
+					<span class="wordmark" aria-label="DryUI">
+						DRY<span class="wordmark-badge">ui</span>
+					</span>
+					<span class="brand-divider" aria-hidden="true"></span>
+					<Heading level={2}>Feedback</Heading>
+				</a>
+			</PageHeader.Content>
+			<PageHeader.Actions>
+				<nav class="hero-nav" aria-label="DryUI resources">
+					<Button href="https://dryui.dev" target="_blank" rel="noreferrer" variant="ghost">
+						Docs
+					</Button>
+					<Button
+						href="https://dryui.dev/theme-wizard"
+						target="_blank"
+						rel="noreferrer"
+						variant="ghost"
+					>
+						Theme Wizard
+					</Button>
+				</nav>
+				<span class="hero-status">
+					<Text as="span" size="sm" color="secondary">
+						{lastLoadedAt ? `Updated ${formatRelativeTime(lastLoadedAt)}` : 'Not refreshed yet'}
+					</Text>
+				</span>
+				{#if devUrl}
+					<Button href={devUrl} target="_blank" rel="noreferrer" variant="solid">
+						Open dev app
+					</Button>
+				{/if}
 				<Button
 					variant="outline"
 					onclick={() => void loadSubmissions('refresh')}
 					disabled={refreshing}
 				>
-					{refreshing ? 'Refreshing...' : 'Refresh queue'}
+					{refreshing ? 'Refreshing...' : 'Refresh'}
 				</Button>
-			</div>
-		</header>
-
-		<div class="stats">
-			<Card.Root>
-				<Card.Header>
-					<Text as="span" size="sm" color="secondary">Pending queue</Text>
-				</Card.Header>
-				<Card.Content>
-					<Heading level={2}>{pendingCount}</Heading>
-				</Card.Content>
-				<Card.Footer>
-					<Text as="span" size="sm" color="secondary">Oldest items stay at the top.</Text>
-				</Card.Footer>
-			</Card.Root>
-
-			<Card.Root>
-				<Card.Header>
-					<Text as="span" size="sm" color="secondary">Resolved history</Text>
-				</Card.Header>
-				<Card.Content>
-					<Heading level={2}>{resolvedCount}</Heading>
-				</Card.Content>
-				<Card.Footer>
-					<Text as="span" size="sm" color="secondary"
-						>Newest resolved items are easiest to revisit.</Text
-					>
-				</Card.Footer>
-			</Card.Root>
-
-			<Card.Root>
-				<Card.Header>
-					<Text as="span" size="sm" color="secondary">Total submissions</Text>
-				</Card.Header>
-				<Card.Content>
-					<Heading level={2}>{totalCount}</Heading>
-				</Card.Content>
-				<Card.Footer>
-					<Text as="span" size="sm" color="secondary">
-						Last refreshed {lastLoadedAt ? formatAbsoluteTime(lastLoadedAt) : 'Never'}
-					</Text>
-				</Card.Footer>
-			</Card.Root>
-		</div>
+			</PageHeader.Actions>
+		</PageHeader.Root>
 
 		{#if error}
 			<Alert variant="error">{error}</Alert>
 		{/if}
 
+		<Card.Root variant="elevated">
+			<Card.Header>
+				<div class="prompt-header">
+					<div class="prompt-heading">
+						<Heading level={3}>LLM prompt</Heading>
+						<Text as="span" size="sm" color="secondary">
+							{selectedSubmission
+								? 'Copy this prompt to work on the selected submission'
+								: 'Copy this prompt to work on all pending submissions'}
+						</Text>
+					</div>
+					<div class="prompt-copy">
+						<Button
+							variant="solid"
+							onclick={() => void copyPromptToClipboard()}
+							disabled={copyState !== 'idle'}
+						>
+							{copyState === 'copied'
+								? 'Copied!'
+								: copyState === 'error'
+									? 'Copy failed'
+									: 'Copy prompt'}
+						</Button>
+					</div>
+				</div>
+			</Card.Header>
+			<Card.Content>
+				<pre class="prompt-body">{promptText}</pre>
+			</Card.Content>
+		</Card.Root>
+
 		<div class="workspace">
 			<div class="queue-panel">
 				<Card.Root variant="elevated">
-					<Card.Header>
-						<div class="panel-heading">
-							<div class="panel-copy">
-								<Heading level={2}>Submission browser</Heading>
-								<Text as="p" size="sm" color="secondary">
-									Search by URL or submission id, then switch between queue and history.
-								</Text>
-							</div>
-						</div>
-					</Card.Header>
-
 					<Card.Content>
 						<div class="panel-stack">
 							<Field.Root>
@@ -489,47 +535,38 @@
 			</div>
 
 			<Card.Root variant="elevated">
-				<Card.Header>
-					<div class="panel-heading">
-						<div class="panel-copy">
-							<Heading level={2}>Submission detail</Heading>
-							<Text as="p" size="sm" color="secondary">
-								Inspect the screenshot, notes, and metadata for the selected submission.
-							</Text>
-						</div>
+				{#if selectedSubmission}
+					<Card.Header>
+						<div class="detail-actions">
+							<Button
+								href={selectedSubmission.url}
+								target="_blank"
+								rel="noreferrer"
+								variant="ghost"
+							>
+								Open page
+							</Button>
 
-						{#if selectedSubmission}
-							<div class="detail-actions">
+							{#if selectedSubmission.status === 'pending'}
 								<Button
-									href={selectedSubmission.url}
-									target="_blank"
-									rel="noreferrer"
-									variant="ghost"
+									variant="solid"
+									onclick={() => void setSubmissionStatus(selectedSubmission.id, 'resolved')}
+									disabled={refreshing}
 								>
-									Open page
+									Mark resolved
 								</Button>
-
-								{#if selectedSubmission.status === 'pending'}
-									<Button
-										variant="solid"
-										onclick={() => void setSubmissionStatus(selectedSubmission.id, 'resolved')}
-										disabled={refreshing}
-									>
-										Mark resolved
-									</Button>
-								{:else}
-									<Button
-										variant="outline"
-										onclick={() => void setSubmissionStatus(selectedSubmission.id, 'pending')}
-										disabled={refreshing}
-									>
-										Move back to queue
-									</Button>
-								{/if}
-							</div>
-						{/if}
-					</div>
-				</Card.Header>
+							{:else}
+								<Button
+									variant="outline"
+									onclick={() => void setSubmissionStatus(selectedSubmission.id, 'pending')}
+									disabled={refreshing}
+								>
+									Move back to queue
+								</Button>
+							{/if}
+						</div>
+					</Card.Header>
+				{/if}
 
 				<Card.Content>
 					{#if selectedSubmission}
@@ -693,42 +730,91 @@
 		padding: var(--dry-space-4);
 	}
 
-	.hero {
-		display: grid;
-		gap: var(--dry-space-3);
-		padding: var(--dry-space-2) 0;
-	}
-
-	.hero-copy {
-		display: grid;
-		gap: var(--dry-space-2);
-	}
-
-	.hero-actions {
+	.brand {
 		display: grid;
 		grid-auto-flow: column;
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-3);
+		align-items: center;
+		color: inherit;
+		text-decoration: none;
+		border-radius: var(--dry-radius-md);
+	}
+
+	.brand:focus-visible {
+		outline: 2px solid var(--dry-color-stroke-brand, var(--dry-color-fill-brand));
+		outline-offset: 2px;
+	}
+
+	.wordmark {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 0.2em;
+		font-size: 1.35rem;
+		font-weight: 800;
+		letter-spacing: -0.03em;
+		line-height: 1;
+		color: var(--dry-color-text-strong);
+	}
+
+	.wordmark-badge {
+		border: 2px solid currentColor;
+		padding: 0.1em 0.35em;
+		border-radius: 0.3em;
+		font-size: 0.75em;
+		font-weight: 800;
+		letter-spacing: 0.02em;
+		line-height: 1;
+	}
+
+	.brand-divider {
+		display: block;
+		height: 1.5rem;
+		border-left: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.hero-nav {
+		display: grid;
+		grid-auto-flow: column;
+		gap: var(--dry-space-1);
+		align-items: center;
+	}
+
+	.prompt-header {
+		display: grid;
+		gap: var(--dry-space-3);
+		align-items: start;
+	}
+
+	.prompt-heading {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.prompt-copy {
+		display: grid;
 		justify-content: start;
 	}
 
-	.stats {
-		display: grid;
-		gap: var(--dry-space-3);
+	.prompt-body {
+		display: block;
+		margin: 0;
+		padding: var(--dry-space-3);
+		font-family: var(--dry-font-mono, ui-monospace, monospace);
+		font-size: var(--dry-font-size-sm, 0.875rem);
+		line-height: 1.6;
+		color: var(--dry-color-text-strong);
+		background: var(--dry-color-bg-raised, var(--dry-color-surface));
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-md);
+		white-space: pre-wrap;
+		word-break: break-word;
+		overflow-x: auto;
 	}
 
 	.workspace {
 		display: grid;
 		gap: var(--dry-space-4);
-	}
-
-	.panel-heading {
-		display: grid;
-		gap: var(--dry-space-3);
-	}
-
-	.panel-copy {
-		display: grid;
-		gap: var(--dry-space-1);
 	}
 
 	.panel-stack {
@@ -769,7 +855,11 @@
 
 	.detail-actions {
 		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
+		justify-content: start;
+		align-items: center;
 	}
 
 	.detail-stack {
@@ -781,9 +871,14 @@
 		--dry-image-bg: var(--dry-color-surface);
 		--dry-image-object-fit: contain;
 		--dry-image-radius: 0;
+		--dry-image-block-size: 100%;
+		--dry-image-place-self: stretch;
 
-		display: block;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(0, 1fr);
 		aspect-ratio: 16 / 10;
+		overflow: hidden;
 		background: var(--dry-color-surface);
 	}
 
@@ -812,22 +907,18 @@
 	}
 
 	@container (min-width: 42rem) {
-		.stats {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+		.submission-heading {
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: center;
 		}
 
-		.submission-heading {
+		.prompt-header {
 			grid-template-columns: minmax(0, 1fr) auto;
 			align-items: center;
 		}
 	}
 
 	@container (min-width: 64rem) {
-		.hero {
-			grid-template-columns: minmax(0, 1fr) auto;
-			align-items: end;
-		}
-
 		.workspace {
 			grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
 			align-items: start;
@@ -836,16 +927,6 @@
 		.queue-panel {
 			position: sticky;
 			inset-block-start: var(--dry-space-4);
-		}
-
-		.panel-heading {
-			grid-template-columns: minmax(0, 1fr) auto;
-			align-items: start;
-		}
-
-		.detail-actions {
-			grid-auto-flow: column;
-			justify-content: start;
 		}
 
 		.detail-grid {

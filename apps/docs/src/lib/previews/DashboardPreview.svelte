@@ -52,12 +52,7 @@
 						</div>
 						<Badge variant="outline">Live</Badge>
 					</div>
-					<Chart.Root
-						{data}
-						width={560}
-						height={220}
-						padding={{ top: 12, right: 12, bottom: 24, left: 24 }}
-					>
+					<Chart.Root {data} height={220} padding={{ top: 12, right: 12, bottom: 24, left: 24 }}>
 						<Chart.Line strokeWidth={3} showDots color="var(--dry-color-fill-brand)" />
 						<Chart.XAxis />
 						<Chart.YAxis ticks={5} />

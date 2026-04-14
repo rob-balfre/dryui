@@ -56,9 +56,12 @@
 		--dry-image-radius: var(--dry-radius-lg);
 		--dry-image-bg: var(--dry-color-bg-overlay);
 		--dry-image-object-fit: cover;
+		--dry-image-block-size: auto;
+		--dry-image-place-self: auto;
 
 		display: block;
-		height: auto;
+		block-size: var(--dry-image-block-size);
+		place-self: var(--dry-image-place-self);
 		border-radius: var(--dry-image-radius);
 		background: var(--dry-image-bg);
 		object-fit: var(--dry-image-object-fit);

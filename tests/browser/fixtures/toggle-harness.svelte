@@ -1,7 +1,7 @@
 <script lang="ts">
 	import '../../../packages/ui/src/themes/default.css';
 	import '../../../packages/ui/src/themes/dark.css';
-	import Toggle from '../../../packages/ui/src/toggle/toggle.svelte';
+	import { Toggle } from '../../../packages/ui/src/toggle';
 </script>
 
 <div data-testid="toggle-harness">

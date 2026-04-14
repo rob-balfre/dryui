@@ -17,3 +17,53 @@ body {
 #app {
 	min-block-size: 100dvh;
 }
+
+[data-page-header] {
+	container-type: inline-size;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: var(--dry-space-3) var(--dry-space-4);
+	align-items: center;
+}
+
+[data-page-header-content] {
+	display: grid;
+	grid-auto-flow: column;
+	gap: var(--dry-space-5);
+	align-items: center;
+	justify-content: start;
+}
+
+[data-page-header-actions] {
+	display: grid;
+	grid-auto-flow: column;
+	gap: var(--dry-space-3);
+	align-items: center;
+	justify-content: end;
+}
+
+@container (max-width: 56rem) {
+	[data-page-header] {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	[data-page-header-actions] {
+		justify-content: start;
+	}
+}
+
+@container (max-width: 44rem) {
+	[data-page-header] .hero-status {
+		display: none;
+	}
+}
+
+@container (max-width: 36rem) {
+	[data-page-header] .hero-nav {
+		display: none;
+	}
+
+	[data-page-header] .brand-divider {
+		display: none;
+	}
+}
