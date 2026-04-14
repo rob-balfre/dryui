@@ -35,13 +35,6 @@ interface RunLauncherOptions {
 	runtime?: Partial<LauncherRuntime>;
 }
 
-export interface LauncherTargets {
-	docs: string;
-	feedback: string;
-	theme: string;
-	view: string;
-}
-
 function hasFlag(args: string[], name: string): boolean {
 	return args.includes(name);
 }
@@ -49,13 +42,13 @@ function hasFlag(args: string[], name: string): boolean {
 function launcherHelp(): never {
 	printCommandHelp(
 		{
-			usage: 'dryui launcher [--no-open]',
+			usage: 'dryui [--no-open]',
 			description: [
-				'Open the local DryUI workbench for this repository.',
+				'Open the feedback dashboard for this repository.',
 				'The CLI starts the docs app and feedback server in the background when they are not already running.'
 			],
-			options: ['  --no-open         Print the launcher URL without opening a browser'],
-			examples: ['  dryui', '  dryui launcher --no-open']
+			options: ['  --no-open         Print the dashboard URL without opening a browser'],
+			examples: ['  dryui', '  dryui --no-open']
 		},
 		0
 	);
@@ -86,33 +79,15 @@ export function findLauncherWorkspaceRoot(start = process.cwd()): string | null 
 	}
 }
 
-export function buildLauncherTargets(
-	feedbackBaseUrl: string,
-	docsBaseUrl: string
-): LauncherTargets {
-	return {
-		view: `${docsBaseUrl}/view/bench/visual`,
-		feedback: `${feedbackBaseUrl}/ui`,
-		docs: `${docsBaseUrl}/`,
-		theme: `${docsBaseUrl}/theme-wizard`
-	};
-}
-
-export function buildLauncherUrl(
+export function buildDashboardUrl(
 	feedbackBaseUrl: string,
 	docsBaseUrl: string,
 	version = Date.now()
 ): string {
-	const launcherUrl = new URL('/ui/launcher.html', feedbackBaseUrl);
-	const targets = buildLauncherTargets(feedbackBaseUrl, docsBaseUrl);
-
-	launcherUrl.searchParams.set('v', String(version));
-	launcherUrl.searchParams.set('view', targets.view);
-	launcherUrl.searchParams.set('feedback', targets.feedback);
-	launcherUrl.searchParams.set('docs', targets.docs);
-	launcherUrl.searchParams.set('theme', targets.theme);
-
-	return launcherUrl.toString();
+	const dashboardUrl = new URL('/ui/', feedbackBaseUrl);
+	dashboardUrl.searchParams.set('v', String(version));
+	dashboardUrl.searchParams.set('dev', docsBaseUrl);
+	return dashboardUrl.toString();
 }
 
 async function ensureFeedbackServer(
@@ -157,8 +132,7 @@ async function ensureDocsServer(workspaceRoot: string, docsBaseUrl: string): Pro
 const defaultRuntime: LauncherRuntime = {
 	ensureDocsServer,
 	ensureFeedbackServer,
-	ensureFeedbackUiBuilt: (workspaceRoot) =>
-		ensureFeedbackUiBuilt({ workspaceRoot, includeLauncher: true }),
+	ensureFeedbackUiBuilt: (workspaceRoot) => ensureFeedbackUiBuilt({ workspaceRoot }),
 	now: () => Date.now(),
 	openBrowser
 };
@@ -196,16 +170,16 @@ export async function runLauncher(
 			runtime.ensureFeedbackServer(workspaceRoot, feedbackClient),
 			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
 		]);
-		const launcherUrl = buildLauncherUrl(feedbackClient.baseUrl, docsBaseUrl, runtime.now());
+		const dashboardUrl = buildDashboardUrl(feedbackClient.baseUrl, docsBaseUrl, runtime.now());
 		const noOpen = hasFlag(args, '--no-open');
-		const opened = noOpen ? false : runtime.openBrowser(launcherUrl);
+		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
 		runCommand({
 			output: [
-				'DryUI launcher',
+				'DryUI feedback dashboard',
 				'',
 				`Workspace: ${workspaceRoot}`,
-				`Launcher: ${launcherUrl}`,
+				`Dashboard: ${dashboardUrl}`,
 				`Docs: ${docsMessage}`,
 				`Feedback: ${feedbackMessage}`,
 				`Browser: ${
@@ -213,7 +187,7 @@ export async function runLauncher(
 						? 'skipped (--no-open)'
 						: opened
 							? 'opening default browser'
-							: 'could not auto-open; use the launcher URL above'
+							: 'could not auto-open; use the dashboard URL above'
 				}`
 			].join('\n'),
 			error: null,

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import CodeBlock from '../../packages/ui/src/code-block/code-block.svelte';
+import { CodeBlock } from '../../packages/ui/src/code-block';
 import { render } from './_harness';
 
 function renderCodeBlock(props: { code: string; language?: string }) {

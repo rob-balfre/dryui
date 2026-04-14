@@ -28,10 +28,9 @@ Most commands default to TOON (token-optimized) output. Pass --text for
 human-readable plain text, or --json where supported. init, feedback, and
 add (snippet mode) always produce plain text.
 
-In this repository, running \`dryui\` with no command opens the local launcher.
+In this repository, running \`dryui\` with no command opens the feedback dashboard.
 
 Commands:
-  launcher [--no-open]         Open the local DryUI launcher for this repo
   init [path] [--pm bun|npm|pnpm|yarn]
                                 Bootstrap a SvelteKit + DryUI project
   detect [--json] [--text] [path]
@@ -76,7 +75,7 @@ async function main(): Promise<void> {
 		process.exit(0);
 	}
 
-	// In the DryUI repo, no-arg opens the local launcher. Else keep the existing status/help flow.
+	// In the DryUI repo, no-arg opens the feedback dashboard. Else keep the existing status/help flow.
 	if (!command) {
 		if (await runLauncher([])) {
 			return;
@@ -99,12 +98,6 @@ async function main(): Promise<void> {
 	const commandArgs = args.slice(1);
 
 	switch (command) {
-		case 'launcher':
-			if (!(await runLauncher(commandArgs))) {
-				console.error('The DryUI launcher is only available inside the DryUI repository.');
-				process.exit(1);
-			}
-			break;
 		case 'init':
 			runInit(commandArgs, spec);
 			break;

@@ -15,8 +15,7 @@ export default defineConfig({
 		emptyOutDir: false,
 		rollupOptions: {
 			input: {
-				feedback: resolve(UI_DIR, 'index.html'),
-				launcher: resolve(UI_DIR, 'launcher.html')
+				feedback: resolve(UI_DIR, 'index.html')
 			}
 		}
 	}

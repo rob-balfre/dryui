@@ -20,7 +20,6 @@ interface FeedbackUiBuildRuntime {
 
 export interface EnsureFeedbackUiBuiltOptions {
 	workspaceRoot?: string;
-	includeLauncher?: boolean;
 	runtime?: Partial<FeedbackUiBuildRuntime>;
 }
 
@@ -49,13 +48,8 @@ function feedbackUiError(message: string, detail?: string): CommandResult {
 	};
 }
 
-function hasRequiredFiles(
-	uiDir: string,
-	includeLauncher: boolean,
-	exists: (path: string) => boolean
-): boolean {
-	if (!exists(resolve(uiDir, 'index.html'))) return false;
-	return includeLauncher ? exists(resolve(uiDir, 'launcher.html')) : true;
+function hasRequiredFiles(uiDir: string, exists: (path: string) => boolean): boolean {
+	return exists(resolve(uiDir, 'index.html'));
 }
 
 function findWorkspaceUiDir(
@@ -77,33 +71,28 @@ function findPackagedUiDir(resolvePackagedServerEntry: () => string | null): str
 export function ensureFeedbackUiBuilt(
 	options: EnsureFeedbackUiBuiltOptions = {}
 ): CommandResult | null {
-	const includeLauncher = options.includeLauncher ?? false;
 	const runtime = {
 		...defaultRuntime,
 		...options.runtime
 	};
 
 	const packagedUiDir = findPackagedUiDir(runtime.resolvePackagedServerEntry);
-	if (packagedUiDir && hasRequiredFiles(packagedUiDir, includeLauncher, runtime.exists)) {
+	if (packagedUiDir && hasRequiredFiles(packagedUiDir, runtime.exists)) {
 		return null;
 	}
 
 	const workspaceRoot = options.workspaceRoot;
 	const workspaceUiDir = findWorkspaceUiDir(workspaceRoot, runtime.exists);
-	if (workspaceUiDir && hasRequiredFiles(workspaceUiDir, includeLauncher, runtime.exists)) {
+	if (workspaceUiDir && hasRequiredFiles(workspaceUiDir, runtime.exists)) {
 		return null;
 	}
 
 	if (!workspaceRoot || !workspaceUiDir) {
-		return feedbackUiError(
-			includeLauncher
-				? 'Unable to locate a built feedback UI launcher.'
-				: 'Unable to locate a built feedback dashboard.'
-		);
+		return feedbackUiError('Unable to locate a built feedback dashboard.');
 	}
 
 	const result = runtime.buildWorkspace(workspaceRoot);
-	if (result.status === 0 && hasRequiredFiles(workspaceUiDir, includeLauncher, runtime.exists)) {
+	if (result.status === 0 && hasRequiredFiles(workspaceUiDir, runtime.exists)) {
 		return null;
 	}
 
@@ -111,10 +100,5 @@ export function ensureFeedbackUiBuilt(
 		.map((value) => value?.trim())
 		.find((value) => value && value.length > 0);
 
-	return feedbackUiError(
-		includeLauncher
-			? 'Unable to build the feedback UI launcher.'
-			: 'Unable to build the feedback dashboard.',
-		detail
-	);
+	return feedbackUiError('Unable to build the feedback dashboard.', detail);
 }
