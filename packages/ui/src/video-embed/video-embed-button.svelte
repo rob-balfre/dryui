@@ -79,6 +79,8 @@
 				data-part="media"
 				src={embedSrc}
 				{title}
+				width="100%"
+				height="100%"
 				controls
 				autoplay={autoplay || activated}
 				{poster}
@@ -90,6 +92,8 @@
 				data-part="media"
 				src={embedSrc}
 				{title}
+				width="100%"
+				height="100%"
 				frameborder="0"
 				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
 				allowfullscreen
@@ -136,6 +140,8 @@
 	}
 
 	[data-video-embed] [data-part='media'] {
+		position: absolute;
+		inset: 0;
 		height: 100%;
 		object-fit: cover;
 		border: 0;

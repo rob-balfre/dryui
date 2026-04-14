@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "1.0.0"
+    "version": "1.1.1"
   },
   "counts": {
     "components": 159,
@@ -7498,7 +7498,9 @@
       },
       "cssVars": {
         "--dry-image-bg": "Background color",
+        "--dry-image-block-size": "Block Size",
         "--dry-image-object-fit": "Object Fit",
+        "--dry-image-place-self": "Place Self",
         "--dry-image-radius": "Border radius"
       },
       "dataAttributes": [
@@ -9696,51 +9698,17 @@
       "cssVars": {},
       "dataAttributes": [
         {
-          "name": "data-calendar-cell"
-        },
-        {
-          "name": "data-calendar-columnheader"
-        },
-        {
-          "name": "data-calendar-day"
-        },
-        {
-          "name": "data-calendar-header"
-        },
-        {
-          "name": "data-calendar-heading"
-        },
-        {
-          "name": "data-calendar-panel"
-        },
-        {
-          "name": "data-calendar-row"
-        },
-        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-dp-calendar"
         },
         {
           "name": "data-dp-content"
         },
         {
-          "name": "data-outside-month"
-        },
-        {
           "name": "data-placeholder"
         },
         {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
-        },
-        {
           "name": "data-state"
-        },
-        {
-          "name": "data-today"
         }
       ],
       "example": "<DatePicker.Root bind:value={departureDate} name=\"departureDate\">\n  <DatePicker.Trigger placeholder=\"Select departure date\" />\n  <DatePicker.Content>\n    <DatePicker.Calendar />\n  </DatePicker.Content>\n</DatePicker.Root>"
@@ -9913,7 +9881,6 @@
         "--dry-calendar-day-hover-bg": "Day Hover Bg",
         "--dry-calendar-day-radius": "Day Radius",
         "--dry-calendar-day-size": "Day Size",
-        "--dry-calendar-grid-gap": "Grid Gap",
         "--dry-calendar-header-color": "Header Color",
         "--dry-calendar-muted-color": "Muted Color",
         "--dry-calendar-outside-color": "Outside Color",
@@ -9931,39 +9898,14 @@
           "name": "data-calendar"
         },
         {
-          "name": "data-calendar-cell"
-        },
-        {
-          "name": "data-calendar-columnheader"
-        },
-        {
-          "name": "data-calendar-day"
-        },
-        {
-          "name": "data-calendar-grid"
-        },
-        {
           "name": "data-calendar-header"
         },
         {
           "name": "data-calendar-heading"
         },
         {
-          "name": "data-calendar-row"
-        },
-        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-outside-month"
-        },
-        {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
-        },
-        {
-          "name": "data-today"
         }
       ],
       "example": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n</Calendar.Root>"
@@ -10156,60 +10098,17 @@
       "cssVars": {},
       "dataAttributes": [
         {
-          "name": "data-calendar-cell"
-        },
-        {
-          "name": "data-calendar-columnheader"
-        },
-        {
-          "name": "data-calendar-day"
-        },
-        {
-          "name": "data-calendar-header"
-        },
-        {
-          "name": "data-calendar-heading"
-        },
-        {
-          "name": "data-calendar-panel"
-        },
-        {
-          "name": "data-calendar-row"
-        },
-        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-drp-calendar"
         },
         {
           "name": "data-drp-content"
         },
         {
-          "name": "data-in-range"
-        },
-        {
-          "name": "data-outside-month"
-        },
-        {
           "name": "data-placeholder"
         },
         {
-          "name": "data-range-end"
-        },
-        {
-          "name": "data-range-start"
-        },
-        {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
-        },
-        {
           "name": "data-state"
-        },
-        {
-          "name": "data-today"
         }
       ],
       "example": "<DateRangePicker.Root>\n  <DateRangePicker.Trigger>...</DateRangePicker.Trigger>\n  <DateRangePicker.Content>...</DateRangePicker.Content>\n  <DateRangePicker.Calendar>...</DateRangePicker.Calendar>\n  <DateRangePicker.Preset>...</DateRangePicker.Preset>\n</DateRangePicker.Root>"
@@ -10818,46 +10717,7 @@
       },
       "dataAttributes": [
         {
-          "name": "data-calendar-cell"
-        },
-        {
-          "name": "data-calendar-columnheader"
-        },
-        {
-          "name": "data-calendar-day"
-        },
-        {
-          "name": "data-calendar-header"
-        },
-        {
-          "name": "data-calendar-heading"
-        },
-        {
-          "name": "data-calendar-panel"
-        },
-        {
-          "name": "data-calendar-row"
-        },
-        {
-          "name": "data-in-range"
-        },
-        {
-          "name": "data-outside-month"
-        },
-        {
-          "name": "data-range-calendar-grid"
-        },
-        {
           "name": "data-range-calendar-root"
-        },
-        {
-          "name": "data-range-end"
-        },
-        {
-          "name": "data-range-start"
-        },
-        {
-          "name": "data-today"
         }
       ],
       "example": "<RangeCalendar.Root>\n  <RangeCalendar.Grid>...</RangeCalendar.Grid>\n</RangeCalendar.Root>"

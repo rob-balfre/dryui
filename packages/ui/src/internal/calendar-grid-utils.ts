@@ -10,7 +10,7 @@ interface CalendarKeydownOptions {
 type CalendarKeydownResult = { type: 'navigate'; newDate: Date } | null;
 
 export function generateWeekdayLabels(locale: string, weekStartDay: number): string[] {
-	const formatter = new Intl.DateTimeFormat(locale, { weekday: 'short' });
+	const formatter = new Intl.DateTimeFormat(locale, { weekday: 'narrow' });
 	const labels: string[] = [];
 	for (let i = 0; i < 7; i++) {
 		const dayIndex = (weekStartDay + i) % 7;

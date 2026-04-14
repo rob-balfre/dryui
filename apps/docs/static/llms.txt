@@ -418,7 +418,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-picker
 Parts: Root, Trigger, Content, Calendar
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement (Placement) | offset (number) | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-dp-calendar | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dp-content | data-placeholder | data-state
 Example: <DatePicker.Root bind:value={departureDate} name="departureDate">
 
 ### Calendar
@@ -427,7 +427,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/calendar
 Parts: Root, Header, Grid, Prev, Next, Heading
 Props: Root: value (Date | null), Current controlled or bindable value., default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component. | Prev: children (Snippet), Content rendered inside the component. | Next: children (Snippet), Content rendered inside the component.
-Data attributes: data-calendar | data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-grid | data-calendar-header | data-calendar-heading | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
+Data attributes: data-calendar | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.)
 Example: <Calendar.Root>
 
 ### DateRangePicker
@@ -436,7 +436,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-disabled (Present when the component or part is disabled.) | data-drp-calendar | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-drp-content | data-placeholder | data-state
 Example: <DateRangePicker.Root>
 
 ### RangeCalendar
@@ -445,7 +445,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/range-calendar
 Parts: Root, Grid
 Props: Root: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-cell | data-calendar-columnheader | data-calendar-day | data-calendar-header | data-calendar-heading | data-calendar-panel | data-calendar-row | data-in-range | data-outside-month | data-range-calendar-grid | data-range-calendar-root | data-range-end | data-range-start | data-today
+Data attributes: data-range-calendar-root
 Example: <RangeCalendar.Root>
 
 ### Category: Layout

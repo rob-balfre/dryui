@@ -33,7 +33,7 @@
 <div role="group" data-number-input-wrapper data-size={size} data-disabled={disabled || undefined}>
 	<Button
 		variant="outline"
-		size="icon-sm"
+		size={size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'}
 		type="button"
 		tabindex={-1}
 		aria-label="Decrease value"
@@ -53,7 +53,7 @@
 	/>
 	<Button
 		variant="outline"
-		size="icon-sm"
+		size={size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'}
 		type="button"
 		tabindex={-1}
 		aria-label="Increase value"
@@ -64,7 +64,6 @@
 
 <style>
 	[data-number-input-wrapper] {
-		container-type: inline-size;
 		display: inline-grid;
 		grid-template-columns: auto minmax(3ch, max-content) auto;
 		align-items: stretch;
