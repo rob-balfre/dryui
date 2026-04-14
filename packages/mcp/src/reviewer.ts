@@ -1,7 +1,7 @@
 // DryUI Component Code Review Engine
 // Pure string/regex parsing — no Svelte compiler required.
 
-import { buildLineOffsets, lineAtOffset } from './utils.js';
+import { buildLineOffsets, escapeRegExp, lineAtOffset } from './utils.js';
 
 export interface Issue {
 	readonly severity: 'error' | 'warning' | 'suggestion';
@@ -695,6 +695,45 @@ function checkCustomMaxWidthCentering(styles: string, code: string): Issue[] {
 	return issues;
 }
 
+function classRuleHasDisplayGrid(styles: string, className: string): boolean {
+	const escaped = escapeRegExp(className);
+	const selectorRe = new RegExp(
+		`\\.${escaped}(?=[\\s\\[:.#,{>+~]|$)[^{]*\\{[^}]*display\\s*:\\s*grid\\b`,
+		's'
+	);
+	return selectorRe.test(styles);
+}
+
+function checkInteractiveCardWrapper(code: string, styles: string): Issue[] {
+	const issues: Issue[] = [];
+	const template = code
+		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
+		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
+	const lineOffsets = buildLineOffsets(code);
+	const wrapperRegex = /<([a-z][a-zA-Z0-9:-]*)\s[^>]*class=(["'])([^"']+)\2[^>]*>([\s\S]*?)<\/\1>/g;
+	let match: RegExpExecArray | null;
+
+	while ((match = wrapperRegex.exec(template)) !== null) {
+		const classAttr = match[3] ?? '';
+		const inner = match[4] ?? '';
+		if (!/<Card\.Root\b[^>]*\bas=(["'])(button|a)\1/.test(inner)) continue;
+
+		const classNames = classAttr.split(/\s+/).filter(Boolean);
+		if (classNames.some((className) => classRuleHasDisplayGrid(styles, className))) continue;
+
+		issues.push({
+			severity: 'warning',
+			code: 'interactive-card-wrapper',
+			line: lineAtOffset(lineOffsets, match.index),
+			message:
+				'Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.',
+			fix: 'display: grid'
+		});
+	}
+
+	return issues;
+}
+
 // Phase 4: Style Suggestions (severity: "suggestion")
 
 function getStyleBlockStartLine(code: string): number {
@@ -823,6 +862,7 @@ export function reviewComponent(
 	if (styles) {
 		issues.push(...checkCustomFlexLayout(styles, code));
 		issues.push(...checkCustomMaxWidthCentering(styles, code));
+		issues.push(...checkInteractiveCardWrapper(code, styles));
 	}
 
 	// Phase 4: Style suggestions

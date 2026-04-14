@@ -16,6 +16,10 @@ declare module 'bun:sqlite' {
 	}
 }
 
+interface BunFile extends Blob {
+	exists(): Promise<boolean>;
+}
+
 declare const Bun: {
 	serve(options: {
 		hostname: string;
@@ -28,4 +32,5 @@ declare const Bun: {
 		error?(error: Error): Response;
 	}): { stop(): void; hostname: string; port: number };
 	sleep(ms: number): Promise<void>;
+	file(path: string): BunFile;
 };

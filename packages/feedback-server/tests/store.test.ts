@@ -1,14 +1,20 @@
+import { rmSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { FeedbackStore } from '../src/store.ts';
 
 describe('FeedbackStore', () => {
 	let store: FeedbackStore;
+	let screenshotPaths: string[];
 
 	beforeEach(() => {
 		store = new FeedbackStore(':memory:');
+		screenshotPaths = [];
 	});
 
 	afterEach(() => {
+		for (const path of screenshotPaths) {
+			rmSync(path, { force: true });
+		}
 		store.close();
 	});
 
@@ -89,5 +95,44 @@ describe('FeedbackStore', () => {
 			role: 'agent',
 			content: 'Confirmed in the updated build.'
 		});
+	});
+
+	test('lists submissions across queue and history filters', () => {
+		const pendingOlder = store.createSubmission({
+			url: 'https://example.com/queue/older',
+			image: Buffer.from('pending').toString('base64'),
+			drawings: [{ kind: 'arrow' }]
+		});
+		const pendingNewer = store.createSubmission({
+			url: 'https://example.com/queue/newer',
+			image: Buffer.from('pending-newer').toString('base64'),
+			drawings: [{ kind: 'arrow' }]
+		});
+		const resolved = store.createSubmission({
+			url: 'https://example.com/history',
+			image: Buffer.from('resolved').toString('base64'),
+			drawings: [{ kind: 'text', text: 'Looks good' }]
+		});
+
+		screenshotPaths.push(
+			pendingOlder.screenshotPath,
+			pendingNewer.screenshotPath,
+			resolved.screenshotPath
+		);
+		store.updateSubmissionStatus(resolved.id, 'resolved');
+
+		expect(store.listSubmissions('pending').map((submission) => submission.id)).toEqual([
+			pendingOlder.id,
+			pendingNewer.id
+		]);
+		expect(store.listSubmissions('resolved').map((submission) => submission.id)).toEqual([
+			resolved.id
+		]);
+		expect(
+			store
+				.listSubmissions('all')
+				.map((submission) => submission.id)
+				.sort()
+		).toEqual([pendingOlder.id, pendingNewer.id, resolved.id].sort());
 	});
 });

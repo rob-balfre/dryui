@@ -4,6 +4,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { docsNavComponentNames } from './component-catalog.js';
 import { parseCompoundParts } from './generate-spec.js';
+import { escapeRegExp } from './utils.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../../..');
@@ -210,10 +211,6 @@ function readArchitectureJson(): string {
 
 function ensureArray<T>(value: Iterable<T>): T[] {
 	return [...value];
-}
-
-function escapeRegExp(value: string): string {
-	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function sortNames(values: Iterable<string>): string[] {

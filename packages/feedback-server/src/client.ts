@@ -10,7 +10,9 @@ import type {
 	PendingResponse,
 	Session,
 	SessionWithAnnotations,
-	Submission
+	Submission,
+	SubmissionQueryStatus,
+	SubmissionStatus
 } from './types.js';
 
 function trimTrailingSlash(value: string): string {
@@ -125,20 +127,26 @@ export class FeedbackHttpClient {
 		);
 	}
 
-	async getPendingSubmissions(): Promise<{ count: number; submissions: Submission[] }> {
+	async getSubmissions(
+		status: SubmissionQueryStatus = 'all'
+	): Promise<{ count: number; submissions: Submission[] }> {
 		return parseJson<{ count: number; submissions: Submission[] }>(
-			await fetch(`${this.baseUrl}/submissions`)
+			await fetch(`${this.baseUrl}/submissions?status=${encodeURIComponent(status)}`)
 		);
 	}
 
-	async resolveSubmission(id: string): Promise<void> {
+	async updateSubmissionStatus(id: string, status: SubmissionStatus): Promise<void> {
 		await ensureOk(
 			await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ status: 'resolved' })
+				body: JSON.stringify({ status })
 			})
 		);
+	}
+
+	async resolveSubmission(id: string): Promise<void> {
+		await this.updateSubmissionStatus(id, 'resolved');
 	}
 
 	async health(): Promise<{ status: string }> {

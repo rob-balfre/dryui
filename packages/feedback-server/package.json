@@ -37,8 +37,8 @@
     "access": "public"
   },
   "scripts": {
-    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && bunx tsc -p tsconfig.build.json",
-    "check": "bunx tsc -p tsconfig.json --noEmit",
+    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && bunx tsc -p tsconfig.build.json && bunx vite build --config ui/vite.config.ts",
+    "check": "bunx svelte-check --tsconfig ./ui/tsconfig.json && bunx tsc -p tsconfig.json --noEmit",
     "test": "bun test tests/**/*.test.ts"
   },
   "dependencies": {
@@ -46,7 +46,12 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@dryui/ui": "workspace:*",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.2"
+    "bun-types": "^1.3.12",
+    "svelte": "^5.55.3",
+    "typescript": "^6.0.2",
+    "vite": "^8.0.8"
   }
 }

@@ -18,6 +18,7 @@ import { runDoctor } from './commands/doctor.js';
 import { runLint } from './commands/lint.js';
 import { runTokens } from './commands/tokens.js';
 import { runFeedback } from './commands/feedback.js';
+import { runLauncher } from './commands/launcher.js';
 
 const VERSION = pkg.version;
 
@@ -27,7 +28,10 @@ Most commands default to TOON (token-optimized) output. Pass --text for
 human-readable plain text, or --json where supported. init, feedback, and
 add (snippet mode) always produce plain text.
 
+In this repository, running \`dryui\` with no command opens the local launcher.
+
 Commands:
+  launcher [--no-open]         Open the local DryUI launcher for this repo
   init [path] [--pm bun|npm|pnpm|yarn]
                                 Bootstrap a SvelteKit + DryUI project
   detect [--json] [--text] [path]
@@ -49,7 +53,7 @@ Commands:
                                 Print deterministic workspace findings
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
-  feedback <subcommand>         Start or inspect the feedback server
+  feedback <subcommand>         Start feedback tooling, inspect the server, or launch the dashboard
 
 Options:
   --help                  Show help for a command
@@ -58,7 +62,7 @@ Options:
   --json                  JSON output (where supported)
   --full                  Disable truncation`;
 
-function main(): void {
+async function main(): Promise<void> {
 	const args = process.argv.slice(2);
 	const command = args[0];
 
@@ -72,8 +76,12 @@ function main(): void {
 		process.exit(0);
 	}
 
-	// Content-first: no-arg shows project status if in a DryUI project, otherwise USAGE
+	// In the DryUI repo, no-arg opens the local launcher. Else keep the existing status/help flow.
 	if (!command) {
+		if (await runLauncher([])) {
+			return;
+		}
+
 		try {
 			const detection = detectProject(spec, undefined);
 			if (detection.status === 'ready' || detection.status === 'partial') {
@@ -91,6 +99,12 @@ function main(): void {
 	const commandArgs = args.slice(1);
 
 	switch (command) {
+		case 'launcher':
+			if (!(await runLauncher(commandArgs))) {
+				console.error('The DryUI launcher is only available inside the DryUI repository.');
+				process.exit(1);
+			}
+			break;
 		case 'init':
 			runInit(commandArgs, spec);
 			break;
@@ -128,7 +142,7 @@ function main(): void {
 			runTokens(commandArgs);
 			break;
 		case 'feedback':
-			void runFeedback(commandArgs);
+			await runFeedback(commandArgs);
 			break;
 		default:
 			console.error(`Unknown command: "${command}"`);
@@ -138,4 +152,4 @@ function main(): void {
 	}
 }
 
-main();
+void main();
