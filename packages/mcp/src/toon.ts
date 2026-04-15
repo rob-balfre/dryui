@@ -18,7 +18,7 @@ import { componentKind, getBindableProps, getRequiredParts } from './spec-format
 // ── Utilities ──────────────────────────────────────────────
 
 /** Escape commas and newlines in field values for TOON row safety. */
-function esc(value: string): string {
+export function esc(value: string): string {
 	if (value.includes(',') || value.includes('\n')) {
 		return `"${value.replace(/"/g, '""')}"`;
 	}
@@ -26,12 +26,12 @@ function esc(value: string): string {
 }
 
 /** Format a TOON header line: resource[count]{fields}: */
-function header(resource: string, count: number, fields: string[]): string {
+export function header(resource: string, count: number, fields: string[]): string {
 	return `${resource}[${count}]{${fields.join(',')}}:`;
 }
 
 /** Format a TOON row with indentation. */
-function row(...values: (string | number | boolean)[]): string {
+export function row(...values: (string | number | boolean)[]): string {
 	return '  ' + values.map((v) => esc(String(v))).join(',');
 }
 
@@ -56,8 +56,8 @@ function truncate(text: string, maxLen: number, overrideCmd: string): string {
  * end of the row block when any field was capped — use the `[value, wasCapped]` tuple
  * returned here to track that without a second length comparison.
  */
-const FIELD_CAP = 240;
-function truncateField(value: string, max = FIELD_CAP): [string, boolean] {
+export const FIELD_CAP = 240;
+export function truncateField(value: string, max = FIELD_CAP): [string, boolean] {
 	if (value.length <= max) return [value, false];
 	return [value.slice(0, max - 1) + '…', true];
 }
@@ -182,9 +182,10 @@ export function formatHelp(hints: string[]): string {
 export function toonComponent(
 	name: string,
 	def: ComponentDef,
-	opts?: { full?: boolean | undefined }
+	opts?: { full?: boolean | undefined; includeHelp?: boolean | undefined }
 ): string {
 	const full = opts?.full ?? false;
+	const includeHelp = opts?.includeHelp ?? true;
 	const lines: string[] = [];
 	const bindables = getBindableProps(def);
 	const requiredParts = getRequiredParts(name, def);
@@ -262,9 +263,11 @@ export function toonComponent(
 	}
 
 	// Contextual help
-	const help = buildContextualHelp({ command: 'info', componentName: name });
-	if (help.length > 0) {
-		lines.push('', formatHelp(help));
+	if (includeHelp) {
+		const help = buildContextualHelp({ command: 'info', componentName: name });
+		if (help.length > 0) {
+			lines.push('', formatHelp(help));
+		}
 	}
 
 	return lines.join('\n');
@@ -625,7 +628,11 @@ export function toonWorkspaceReport(
 
 // ── Project detection ──────────────────────────────────────
 
-export function toonProjectDetection(detection: ProjectDetection): string {
+export function toonProjectDetection(
+	detection: ProjectDetection,
+	opts?: { includeHelp?: boolean | undefined }
+): string {
+	const includeHelp = opts?.includeHelp ?? true;
 	const lines: string[] = [];
 
 	lines.push(
@@ -650,9 +657,11 @@ export function toonProjectDetection(detection: ProjectDetection): string {
 	}
 
 	// Contextual help
-	const help = buildContextualHelp({ command: 'detect', status: detection.status });
-	if (help.length > 0) {
-		lines.push('', formatHelp(help));
+	if (includeHelp) {
+		const help = buildContextualHelp({ command: 'detect', status: detection.status });
+		if (help.length > 0) {
+			lines.push('', formatHelp(help));
+		}
 	}
 
 	return lines.join('\n');
@@ -670,12 +679,16 @@ function toonStep(step: ProjectPlanStep, index: number, showSnippets = false): s
 	return parts.join('\n');
 }
 
-export function toonInstallPlan(plan: InstallPlan): string {
+export function toonInstallPlan(
+	plan: InstallPlan,
+	opts?: { includeHelp?: boolean | undefined }
+): string {
+	const includeHelp = opts?.includeHelp ?? true;
 	const lines: string[] = [];
 	const isScaffold =
 		plan.detection.status === 'unsupported' && plan.steps.some((s) => s.kind === 'create-file');
 
-	lines.push(toonProjectDetection(plan.detection));
+	lines.push(toonProjectDetection(plan.detection, { includeHelp }));
 	lines.push('');
 
 	if (plan.steps.length === 0) {
@@ -689,9 +702,11 @@ export function toonInstallPlan(plan: InstallPlan): string {
 	}
 
 	// Contextual help
-	const help = buildContextualHelp({ command: 'install' });
-	if (help.length > 0) {
-		lines.push('', formatHelp(help));
+	if (includeHelp) {
+		const help = buildContextualHelp({ command: 'install' });
+		if (help.length > 0) {
+			lines.push('', formatHelp(help));
+		}
 	}
 
 	return lines.join('\n');

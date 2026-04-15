@@ -1,3 +1,5 @@
+import { ruleMessage } from './rule-catalog.js';
+
 export interface Violation {
 	rule: string;
 	message: string;
@@ -11,7 +13,7 @@ interface NativeElementRule {
 	re: RegExp;
 }
 
-const BANNED_COMPONENTS = ['Grid', 'Stack', 'Flex'];
+const BANNED_COMPONENTS = ['Grid', 'Stack', 'Flex'] as const;
 
 const BANNED_COMPONENT_IMPORT_RE = new RegExp(
 	`\\b(${BANNED_COMPONENTS.join('|')})\\b.*from\\s+['"]@dryui/ui`,
@@ -21,6 +23,10 @@ const BANNED_COMPONENT_IMPORT_RE = new RegExp(
 const BANNED_COMPONENT_USAGE_RE = new RegExp(
 	`<(${BANNED_COMPONENTS.join('|')})(\\.|\\s|>|\\/)`,
 	'g'
+);
+
+const BANNED_COMPONENT_WORD_RES: ReadonlyArray<readonly [string, RegExp]> = BANNED_COMPONENTS.map(
+	(comp) => [comp, new RegExp(`\\b${comp}\\b`)] as const
 );
 
 const INLINE_STYLE_RE = /\bstyle\s*=/g;
@@ -224,11 +230,15 @@ export function checkScript(content: string): Violation[] {
 		const line = lookupLine(lineStarts, match.index);
 		const lineText = lines[line - 1] ?? '';
 		if (!lineText.includes('@dryui/ui')) continue;
-		for (const comp of BANNED_COMPONENTS) {
-			if (new RegExp(`\\b${comp}\\b`).test(lineText)) {
+		for (const [comp, re] of BANNED_COMPONENT_WORD_RES) {
+			if (re.test(lineText)) {
 				violations.push({
 					rule: 'dryui/no-layout-component',
-					message: `Do not import ${comp}. Use raw CSS grid with custom properties instead.`,
+					message: ruleMessage('dryui/no-layout-component', {
+						action: 'import',
+						target: comp,
+						guidance: 'raw CSS grid with custom properties instead'
+					}),
 					line
 				});
 			}
@@ -269,8 +279,11 @@ function getParentDir(filename?: string): string {
 }
 
 function createNativeElementMessage(rule: NativeElementRule): string {
-	const closing = rule.tag === 'hr' ? ' /' : '';
-	return `Raw <${rule.tag}> is only allowed inside its canonical component directory. Use <${rule.component}${closing}> elsewhere.`;
+	return ruleMessage('dryui/no-raw-native-element', {
+		tag: rule.tag,
+		component: rule.component,
+		closing: rule.tag === 'hr' ? ' /' : ''
+	});
 }
 
 export function checkMarkup(content: string, filename?: string): Violation[] {
@@ -288,7 +301,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	for (const match of markup.matchAll(INLINE_STYLE_RE)) {
 		violations.push({
 			rule: 'dryui/no-inline-style',
-			message: 'No inline style attributes. Use scoped CSS with custom properties.',
+			message: ruleMessage('dryui/no-inline-style'),
 			line: lineOf(match.index)
 		});
 	}
@@ -296,7 +309,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	for (const match of markup.matchAll(STYLE_DIRECTIVE_RE)) {
 		violations.push({
 			rule: 'dryui/no-style-directive',
-			message: 'No style: directives. Use scoped CSS with custom properties.',
+			message: ruleMessage('dryui/no-style-directive'),
 			line: lineOf(match.index)
 		});
 	}
@@ -305,16 +318,20 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		const comp = match[1];
 		violations.push({
 			rule: 'dryui/no-layout-component',
-			message: `Do not use <${comp}>. Use raw CSS grid with custom properties instead.`,
+			message: ruleMessage('dryui/no-layout-component', {
+				action: 'use',
+				target: `<${comp}>`,
+				guidance: 'raw CSS grid with custom properties instead'
+			}),
 			line: lineOf(match.index)
 		});
 	}
 
 	for (const match of markup.matchAll(COMPONENT_CLASS_RE)) {
-		const comp = match[1];
+		const comp = match[1] ?? 'Component';
 		violations.push({
 			rule: 'dryui/no-component-class',
-			message: `Do not pass class= to <${comp}>. Svelte components ignore class attributes. Use --dry-* CSS custom properties for styling overrides.`,
+			message: ruleMessage('dryui/no-component-class', { component: comp }),
 			line: lineOf(match.index)
 		});
 	}
@@ -322,8 +339,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	for (const match of markup.matchAll(CSS_IGNORE_RE)) {
 		violations.push({
 			rule: 'dryui/no-css-ignore',
-			message:
-				'Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.',
+			message: ruleMessage('dryui/no-css-ignore'),
 			line: lineOf(match.index)
 		});
 	}
@@ -332,8 +348,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		if (hasAllowComment(file, match.index, 'svelte-element')) continue;
 		violations.push({
 			rule: 'dryui/no-svelte-element',
-			message:
-				'Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).',
+			message: ruleMessage('dryui/no-svelte-element'),
 			line: lineOf(match.index)
 		});
 	}
@@ -342,8 +357,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		if (anchorHasHref(tag.text)) continue;
 		violations.push({
 			rule: 'dryui/no-anchor-without-href',
-			message:
-				'Do not use <a> without href. Use <button> for actions, or provide href for navigation.',
+			message: ruleMessage('dryui/no-anchor-without-href'),
 			line: lineOf(tag.index)
 		});
 	}
@@ -392,7 +406,10 @@ export function checkStyle(content: string): Violation[] {
 		if (hasAllowComment(file, match.index, 'flex')) continue;
 		violations.push({
 			rule: 'dryui/no-flex',
-			message: 'Do not use display: flex. Use display: grid instead.',
+			message: ruleMessage('dryui/no-flex', {
+				value: 'display: flex',
+				guidance: 'display: grid instead'
+			}),
 			line: lineOf(match.index)
 		});
 	}
@@ -402,7 +419,10 @@ export function checkStyle(content: string): Violation[] {
 		const prop = match[0].trim().replace(/;/, '').split(':')[0]!.trim();
 		violations.push({
 			rule: 'dryui/no-flex',
-			message: `Do not use ${prop}. Use CSS grid equivalents instead.`,
+			message: ruleMessage('dryui/no-flex', {
+				value: prop,
+				guidance: 'CSS grid equivalents instead'
+			}),
 			line: lineOf(match.index)
 		});
 	}
@@ -410,8 +430,7 @@ export function checkStyle(content: string): Violation[] {
 	for (const match of content.matchAll(WIDTH_RE)) {
 		violations.push({
 			rule: 'dryui/no-width',
-			message:
-				'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead.',
+			message: ruleMessage('dryui/no-width'),
 			line: lineOf(match.index)
 		});
 	}
@@ -419,7 +438,7 @@ export function checkStyle(content: string): Violation[] {
 	for (const match of content.matchAll(ALL_UNSET_RE)) {
 		violations.push({
 			rule: 'dryui/no-all-unset',
-			message: 'Do not use all: unset. Reset only the specific properties you need.',
+			message: ruleMessage('dryui/no-all-unset'),
 			line: lineOf(match.index)
 		});
 	}
@@ -427,8 +446,7 @@ export function checkStyle(content: string): Violation[] {
 	for (const match of content.matchAll(GLOBAL_SELECTOR_RE)) {
 		violations.push({
 			rule: 'dryui/no-global',
-			message:
-				'Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.',
+			message: ruleMessage('dryui/no-global'),
 			line: lineOf(match.index)
 		});
 	}
@@ -438,8 +456,7 @@ export function checkStyle(content: string): Violation[] {
 		if (!ALLOWED_MEDIA_RE.test(query)) {
 			violations.push({
 				rule: 'dryui/no-media-sizing',
-				message:
-					'Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.',
+				message: ruleMessage('dryui/no-media-sizing'),
 				line: lineOf(match.index)
 			});
 		}
@@ -448,8 +465,7 @@ export function checkStyle(content: string): Violation[] {
 	for (const match of content.matchAll(FOCUS_RING_LITERAL_RE)) {
 		violations.push({
 			rule: 'dryui/prefer-focus-ring-token',
-			message:
-				'Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).',
+			message: ruleMessage('dryui/prefer-focus-ring-token'),
 			line: lineOf(match.index)
 		});
 	}

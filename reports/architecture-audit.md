@@ -2,16 +2,16 @@
 
 ## Metrics
 
-| Metric                    | Count |
-| ------------------------- | ----: |
-| Primitive component nodes |   143 |
-| UI component nodes        |   145 |
-| UI wrappers               |   129 |
-| UI composites             |    16 |
-| Compound parts            |   654 |
-| Mismatch count            |   287 |
-| PrimitivePart components  |     0 |
-| Thin wrapper count        |    64 |
+| Metric | Count |
+| --- | ---: |
+| Primitive component nodes | 143 |
+| UI component nodes | 145 |
+| UI wrappers | 129 |
+| UI composites | 16 |
+| Compound parts | 654 |
+| Mismatch count | 287 |
+| PrimitivePart components | 0 |
+| Thin wrapper count | 64 |
 
 ## Package Overview
 
@@ -64,3 +64,4 @@ No findings in this bucket.
 ## Priority Mismatches
 
 No priority mismatches detected.
+

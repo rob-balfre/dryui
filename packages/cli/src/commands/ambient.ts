@@ -20,7 +20,13 @@ export function emitAmbient(): void {
 			detection.theme.defaultImported;
 		if (!hasDryuiSignal) return;
 		console.log(`dryui/ambient v${VERSION} | cwd: ${homeRelative(process.cwd())}`);
-		console.log(toonProjectDetection(detection));
+		const summary = toonProjectDetection(detection)
+			.replace(/\n(?:\n)?next\[\d+\]:[\s\S]*$/, '')
+			.trimEnd();
+		console.log(summary);
+		console.log('next[2]:');
+		console.log('  ask --scope setup "" -- inspect setup status and install guidance');
+		console.log('  ask --scope component "Button" -- inspect a component before editing');
 	} catch {
 		// Detection failed — silent exit keeps agent sessions noise-free.
 	}

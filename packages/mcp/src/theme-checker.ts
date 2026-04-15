@@ -1,6 +1,7 @@
 // DryUI Theme Diagnosis Engine
 // Pure functions, no MCP dependency — same pattern as reviewer.ts.
 
+import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { buildLineOffsets, lineAtOffset } from './utils.js';
 import { COLOR_PAIRINGS, REQUIRED_TOKENS, SURFACE_TOKENS } from './theme-tokens.js';
 
@@ -204,13 +205,11 @@ function stripComments(css: string): string {
 
 // Variable extraction
 
-function extractDryVariables(css: string): Map<string, VarEntry> {
-	const cleaned = stripComments(css);
+function extractDryVariables(cleaned: string): Map<string, VarEntry> {
 	const vars = new Map<string, VarEntry>();
 	const regex = /(--dry-[a-zA-Z0-9-]+)\s*:\s*([^;]*);/g;
 	let match: RegExpExecArray | null;
 
-	// Build line offsets for cleaned CSS.
 	const lineOffsets = buildLineOffsets(cleaned);
 
 	while ((match = regex.exec(cleaned)) !== null) {
@@ -223,8 +222,7 @@ function extractDryVariables(css: string): Map<string, VarEntry> {
 	return vars;
 }
 
-function extractAllVariables(css: string): Map<string, string> {
-	const cleaned = stripComments(css);
+function extractAllVariables(cleaned: string): Map<string, string> {
 	const vars = new Map<string, string>();
 	const regex = /(--[a-zA-Z0-9-]+)\s*:\s*([^;]*);/g;
 	let match: RegExpExecArray | null;
@@ -509,8 +507,8 @@ function checkMissingTokens(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 				severity: 'error',
 				code: 'missing-token',
 				variable: token,
-				message: `Required semantic token ${token} is not defined`,
-				fix: `Add ${token} with a color that fits your theme`
+				message: ruleMessage('missing-token', { variable: token }),
+				fix: ruleSuggestedFix('missing-token', { variable: token })
 			});
 		}
 	}
@@ -538,8 +536,16 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 				code: 'wrong-type',
 				variable: name,
 				value: entry.original,
-				message: `${name} expects a color value but got "${val}" (classified as ${classified})`,
-				fix: `Replace with a color value (e.g., #2563eb, rgb(37,99,235), hsl(217,91%,60%))`
+				message: ruleMessage('wrong-type', {
+					variable: name,
+					expectedType: 'color',
+					actual: val,
+					classified,
+					expectedTypeExample: 'color value (e.g., #2563eb, rgb(37,99,235), hsl(217,91%,60%))'
+				}),
+				fix: ruleSuggestedFix('wrong-type', {
+					expectedTypeExample: 'color value (e.g., #2563eb, rgb(37,99,235), hsl(217,91%,60%))'
+				})
 			});
 		}
 
@@ -550,8 +556,16 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 				code: 'wrong-type',
 				variable: name,
 				value: entry.original,
-				message: `${name} expects a length value but got "${val}" (classified as ${classified})`,
-				fix: `Replace with a length value (e.g., 0.5rem, 4px, 1em)`
+				message: ruleMessage('wrong-type', {
+					variable: name,
+					expectedType: 'length',
+					actual: val,
+					classified,
+					expectedTypeExample: 'length value (e.g., 0.5rem, 4px, 1em)'
+				}),
+				fix: ruleSuggestedFix('wrong-type', {
+					expectedTypeExample: 'length value (e.g., 0.5rem, 4px, 1em)'
+				})
 			});
 		}
 
@@ -562,8 +576,16 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 				code: 'wrong-type',
 				variable: name,
 				value: entry.original,
-				message: `${name} expects a length value but got "${val}" (classified as ${classified})`,
-				fix: `Replace with a length value (e.g., 4px, 0.375rem)`
+				message: ruleMessage('wrong-type', {
+					variable: name,
+					expectedType: 'length',
+					actual: val,
+					classified,
+					expectedTypeExample: 'length value (e.g., 4px, 0.375rem)'
+				}),
+				fix: ruleSuggestedFix('wrong-type', {
+					expectedTypeExample: 'length value (e.g., 4px, 0.375rem)'
+				})
 			});
 		}
 
@@ -574,8 +596,16 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 				code: 'wrong-type',
 				variable: name,
 				value: entry.original,
-				message: `${name} expects a time value but got "${val}" (classified as ${classified})`,
-				fix: `Replace with a time value (e.g., 100ms, 0.2s)`
+				message: ruleMessage('wrong-type', {
+					variable: name,
+					expectedType: 'time',
+					actual: val,
+					classified,
+					expectedTypeExample: 'time value (e.g., 100ms, 0.2s)'
+				}),
+				fix: ruleSuggestedFix('wrong-type', {
+					expectedTypeExample: 'time value (e.g., 100ms, 0.2s)'
+				})
 			});
 		}
 	}
@@ -599,8 +629,8 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				code: 'transparent-surface',
 				variable: token,
 				value: entry.original,
-				message: `Surface color has very low opacity (${alpha}) \u2014 cards and elevated elements will be nearly invisible`,
-				fix: `Use a solid color (e.g., #1e293b for dark themes, #f8fafc for light themes)`
+				message: ruleMessage('transparent-surface', { alpha }),
+				fix: ruleSuggestedFix('transparent-surface')
 			});
 		}
 	}
@@ -633,8 +663,11 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 						code: 'low-contrast-text',
 						variable: tokenName,
 						value: textEntry.original,
-						message: `Low contrast between ${tokenName} and --dry-color-bg-base (brightness difference: ${Math.round(Math.abs(textBrightness - bgBrightness))})`,
-						fix: `Increase brightness difference between text and background to at least 125`
+						message: ruleMessage('low-contrast-text', {
+							variable: tokenName,
+							difference: Math.round(Math.abs(textBrightness - bgBrightness))
+						}),
+						fix: ruleSuggestedFix('low-contrast-text')
 					});
 				}
 			}
@@ -657,8 +690,13 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 					code: 'no-elevation',
 					variable: '--dry-color-bg-raised',
 					value: bgRaisedEntry.original,
-					message: `--dry-color-bg-base and --dry-color-bg-raised have near-identical brightness (difference: ${Math.round(Math.abs(baseBr - raisedBr))}) \u2014 raised surfaces won't have visual separation`,
-					fix: `Make --dry-color-bg-raised 1-2 steps lighter/darker than --dry-color-bg-base`
+					message: ruleMessage('no-elevation', {
+						left: '--dry-color-bg-base',
+						right: '--dry-color-bg-raised',
+						difference: Math.round(Math.abs(baseBr - raisedBr)),
+						surfaceHint: "raised surfaces won't have visual separation"
+					}),
+					fix: 'Make --dry-color-bg-raised 1-2 steps lighter/darker than --dry-color-bg-base'
 				});
 			}
 		}
@@ -676,8 +714,13 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 					code: 'no-elevation',
 					variable: '--dry-color-bg-overlay',
 					value: bgOverlayEntry.original,
-					message: `--dry-color-bg-raised and --dry-color-bg-overlay have near-identical brightness (difference: ${Math.round(Math.abs(raisedBr - overlayBr))}) \u2014 overlay surfaces won't have visual separation`,
-					fix: `Make --dry-color-bg-overlay 1-2 steps lighter/darker than --dry-color-bg-raised`
+					message: ruleMessage('no-elevation', {
+						left: '--dry-color-bg-raised',
+						right: '--dry-color-bg-overlay',
+						difference: Math.round(Math.abs(raisedBr - overlayBr)),
+						surfaceHint: "overlay surfaces won't have visual separation"
+					}),
+					fix: 'Make --dry-color-bg-overlay 1-2 steps lighter/darker than --dry-color-bg-raised'
 				});
 			}
 		}
@@ -690,8 +733,11 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				severity: 'warning',
 				code: 'missing-pairing',
 				variable: b,
-				message: `${a} is defined but its pair ${b} is missing`,
-				fix: `Add ${b} to complete the color pairing`
+				message: ruleMessage('missing-pairing', {
+					source: a,
+					missing: b
+				}),
+				fix: ruleSuggestedFix('missing-pairing', { missing: b })
 			});
 		}
 		if (vars.has(b) && !vars.has(a)) {
@@ -699,8 +745,11 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				severity: 'warning',
 				code: 'missing-pairing',
 				variable: a,
-				message: `${b} is defined but its pair ${a} is missing`,
-				fix: `Add ${a} to complete the color pairing`
+				message: ruleMessage('missing-pairing', {
+					source: b,
+					missing: a
+				}),
+				fix: ruleSuggestedFix('missing-pairing', { missing: a })
 			});
 		}
 	}
@@ -737,8 +786,8 @@ function checkComponentTokens(
 				code: 'unknown-component-token',
 				variable: name,
 				value: entry.original,
-				message: `${name} is not a recognized component token in the spec`,
-				fix: `Check spelling against the component's cssVars in the spec`
+				message: ruleMessage('unknown-component-token', { variable: name }),
+				fix: ruleSuggestedFix('unknown-component-token')
 			});
 			continue;
 		}
@@ -752,8 +801,11 @@ function checkComponentTokens(
 					code: 'transparent-component-bg',
 					variable: name,
 					value: entry.original,
-					message: `${name} is set to transparent \u2014 the component background will be invisible`,
-					fix: `Use a solid color or reference a background token (e.g., var(--dry-color-bg-raised))`
+					message: ruleMessage('transparent-component-bg', {
+						variable: name,
+						detail: 'is set to transparent — the component background will be invisible'
+					}),
+					fix: ruleSuggestedFix('transparent-component-bg')
 				});
 			} else {
 				const alpha = extractAlpha(entry.resolved);
@@ -763,8 +815,11 @@ function checkComponentTokens(
 						code: 'transparent-component-bg',
 						variable: name,
 						value: entry.original,
-						message: `${name} has very low opacity (${alpha}) \u2014 the component background will be nearly invisible`,
-						fix: `Use a solid color or reference a background token (e.g., var(--dry-color-bg-raised))`
+						message: ruleMessage('transparent-component-bg', {
+							variable: name,
+							detail: `has very low opacity (${alpha}) — the component background will be nearly invisible`
+						}),
+						fix: ruleSuggestedFix('transparent-component-bg')
 					});
 				}
 			}
@@ -818,8 +873,10 @@ function detectDarkScheme(css: string, allVars: Map<string, string>): DiagnoseIs
 			severity: 'warning',
 			code: 'dark-scheme-no-overrides',
 			variable: '--dry-color-*',
-			message: `Project uses a dark color scheme (${signals.join(', ')}) but has no --dry-color-* overrides. DryUI's default theme is light — components will have poor contrast on dark backgrounds. Either use theme: "dark" in the generate tool, or add --dry-color-* overrides to map DryUI tokens to your dark palette.`,
-			fix: 'Use theme: "dark" in dryui.page(), or override --dry-color-bg-base, --dry-color-bg-raised, --dry-color-text-strong, --dry-color-text-weak, and other semantic tokens with dark-appropriate values'
+			message: ruleMessage('dark-scheme-no-overrides', {
+				signals: signals.join(', ')
+			}),
+			fix: ruleSuggestedFix('dark-scheme-no-overrides')
 		});
 	}
 
@@ -832,10 +889,9 @@ export function diagnoseTheme(
 	css: string,
 	spec: { components: Record<string, { cssVars: Record<string, string> }> }
 ): DiagnoseResult {
-	// 1. Strip comments
-	// 2. Extract all variables + dry variables
-	const dryVars = extractDryVariables(css);
-	const allVars = extractAllVariables(css);
+	const cleaned = stripComments(css);
+	const dryVars = extractDryVariables(cleaned);
+	const allVars = extractAllVariables(cleaned);
 
 	// 3. Resolve var references
 	const resolved = resolveVarReferences(dryVars, allVars);
@@ -846,13 +902,16 @@ export function diagnoseTheme(
 		if (/^var\(\s*--/.test(entry.resolved) && entry.resolved === entry.original) {
 			// The value is still a var() reference after resolution — unresolvable
 			const varRefMatch = entry.original.match(/var\(\s*(--[a-zA-Z0-9-]+)/);
-			const refName = varRefMatch ? varRefMatch[1] : 'unknown';
+			const refName = varRefMatch?.[1] ?? 'unknown';
 			infoIssues.push({
 				severity: 'info',
 				code: 'unresolvable-var',
 				variable: name,
 				value: entry.original,
-				message: `${name} references ${refName} which is not defined in this CSS \u2014 type and contrast checks skipped`,
+				message: ruleMessage('unresolvable-var', {
+					variable: name,
+					reference: refName
+				}),
 				fix: null
 			});
 		}
@@ -867,16 +926,19 @@ export function diagnoseTheme(
 	// 4b. If no --dry-* overrides found, check for dark scheme mismatch
 	const darkSchemeIssues = dryVars.size === 0 ? detectDarkScheme(css, allVars) : [];
 
-	// 5. Collect issues, sort by severity
 	const allIssues = [...tier1, ...tier2, ...tier3, ...tier4, ...darkSchemeIssues, ...infoIssues];
 
 	const severityOrder: Record<string, number> = { error: 0, warning: 1, info: 2 };
 	allIssues.sort((a, b) => (severityOrder[a.severity] ?? 2) - (severityOrder[b.severity] ?? 2));
 
-	// 6. Build summary
-	const errors = allIssues.filter((i) => i.severity === 'error').length;
-	const warnings = allIssues.filter((i) => i.severity === 'warning').length;
-	const infos = allIssues.filter((i) => i.severity === 'info').length;
+	let errors = 0;
+	let warnings = 0;
+	let infos = 0;
+	for (const issue of allIssues) {
+		if (issue.severity === 'error') errors += 1;
+		else if (issue.severity === 'warning') warnings += 1;
+		else infos += 1;
+	}
 	const summary =
 		allIssues.length === 0
 			? 'No issues found'

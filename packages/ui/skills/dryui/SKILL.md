@@ -13,18 +13,18 @@ Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a th
 
 **Never guess a component API. Always verify first.**
 
-- Call `info` or `compose` before using any component for the first time
+- Call `ask --scope component` or `ask --scope recipe` before using any component for the first time
 - Component APIs vary — `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable
 - Compound vs simple, required parts, available props — all differ per component
 - If you skip the lookup, you'll write plausible-looking code that silently breaks
 
-The test: can you point to an `info` or `compose` call for every component in your output?
+The test: can you point to an `ask` call for every component or pattern in your output?
 
 ## 2. Everything is Compound Until Proven Otherwise
 
 **Use `.Root`. Always check.**
 
-Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound; verify with `info`.
+Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound; verify with `ask --scope component`.
 
 ```svelte
 <!-- Wrong -->
@@ -33,7 +33,7 @@ Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `info` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
+Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
@@ -147,7 +147,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 ### Manual setup
 
 1. `bun add @dryui/ui`
-2. `bun add -d @dryui/lint` — enforces grid-only layout, bans flexbox/inline-style/width at build time. Without this step the CSS discipline rules are not enforced, and `dryui review` / `doctor` become the only guardrails.
+2. `bun add -d @dryui/lint` — enforces grid-only layout, bans flexbox/inline-style/width at build time. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
 3. Wire the lint preprocessor in `svelte.config.js` (add `dryuiLint` as the **first** item in the `preprocess` array):
 
    ```js
@@ -181,7 +181,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 
 ## Bindable Props — Common Confusion
 
-Always verify with `info`, but these are the most common mistakes:
+Always verify with `ask --scope component`, but these are the most common mistakes:
 
 - `bind:value` (Input, Select, Tabs...) vs `bind:checked` (Checkbox, Switch) vs `bind:pressed` (Toggle) vs `bind:open` (Dialog, Popover, Drawer...)
 - Select and Combobox support both `bind:value` and `bind:open`
@@ -194,19 +194,19 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### Recommended workflow
 
-1. `compose` or `info` before writing components so you confirm kind, required parts, bindables, and canonical usage.
+1. `ask --scope recipe "<query>"` or `ask --scope component "<Component>"` before writing so you confirm kind, required parts, bindables, and canonical usage.
 2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. `review` or `doctor` after implementation to catch composition drift, layout violations, and accessibility regressions.
+3. `check` after implementation to catch composition drift, layout violations, and accessibility regressions.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
 ### MCP tools (preferred)
 
 | Workflow             | Tools                                        |
 | -------------------- | -------------------------------------------- |
-| Project setup        | `detect_project`, `plan_install`, `plan_add` |
-| Lookup & composition | `info`, `get`, `list`, `compose`             |
-| Validation           | `review`, `diagnose`                         |
-| Audit                | `doctor`, `lint`                             |
+| Project setup        | `ask --scope setup ""`                        |
+| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
+| Validation           | `check <file.svelte>`, `check <theme.css>`    |
+| Audit                | `check`, `check <directory>`                  |
 
 ### CLI fallback
 

@@ -39,7 +39,7 @@
 	<div class="page-stack">
 		<DocsPageHeader
 			title="Tools"
-			description="A CLI and MCP server for project setup, component lookup, composition guidance, code validation, and workspace auditing. Same tools, two interfaces — terminal or AI agent."
+			description="A CLI and MCP server for project setup, DryUI discovery, and validation. The MCP surface is collapsed to ask/check, while the CLI stays targeted."
 		/>
 
 		<!-- Setup -->
@@ -129,8 +129,8 @@
 						<div class="stack-sm">
 							<Text size="lg" weight="medium">Lookup first</Text>
 							<Text size="sm" color="secondary">
-								Run <code>compose</code> or <code>info</code> before writing a component so you confirm
-								simple vs compound shape, required parts, bindables, and canonical usage.
+								Run <code>ask</code> before writing a component so you confirm the right scope:
+								component API, recipe guidance, list browsing, or setup state.
 							</Text>
 						</div>
 					</Card.Content>
@@ -141,8 +141,8 @@
 						<div class="stack-sm">
 							<Text size="lg" weight="medium">Validate after implementation</Text>
 							<Text size="sm" color="secondary">
-								Run <code>review</code> on the changed component or <code>doctor</code> on the workspace
-								to catch layout drift, accessibility issues, and stale guesses early.
+								Run <code>check</code> on the changed file, theme, directory, or workspace to catch
+								layout drift, accessibility issues, and stale guesses early.
 							</Text>
 						</div>
 					</Card.Content>
@@ -202,7 +202,7 @@
 			<DocsSectionIntro
 				id="mcp"
 				title="MCP tools"
-				description="The MCP server exposes these tools to any connected AI agent. All output uses TOON (token-optimized) format with contextual next-step suggestions."
+				description="The MCP server now exposes a collapsed two-tool surface to any connected AI agent. All output uses TOON (token-optimized) format with contextual next-step suggestions."
 			/>
 
 			<div class="item-grid">

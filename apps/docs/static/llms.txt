@@ -1,17 +1,17 @@
 # DryUI
 
-> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server for lookup, source retrieval, composition guidance, project planning, review, and theme diagnosis
+- @dryui/mcp: MCP server with collapsed ask/check tools for discovery, setup guidance, and validation
 - @dryui/cli: CLI for detect, install, project-aware add, lookup, source retrieval, composition guidance, and validation
 
 ## AI Surface
 
-- MCP tools: info, get, list, compose, review, diagnose, detect_project, plan_install, plan_add, doctor, lint
+- MCP tools: ask, check
 - CLI commands: init, detect, install, add, get, info, list, compose, review, diagnose, doctor, lint
 
 ## Installation
@@ -1447,14 +1447,5 @@ DryUI ships an MCP server (live tools) and a skill (conventions). All MCP output
 MCP config for tools that need it manually: `"command": "npx", "args": ["-y", "@dryui/mcp"]` — root key varies by tool (mcpServers for Cursor/Windsurf, servers for Copilot, context_servers for Zed).
 
 Available MCP tools:
-- info: Inspect component APIs, props, parts, CSS vars, and examples
-- get: Retrieve copyable source for a composed output
-- list: Discover components and source-owned catalog entries
-- compose: Get composition guidance for the right components and patterns
-- review: Review Svelte components for DryUI spec compliance and best practices
-- diagnose: Diagnose theme CSS for missing tokens, contrast issues, and value errors
-- detect_project: Detect DryUI readiness in a Svelte or SvelteKit project
-- plan_install: Build a non-mutating install checklist for a project
-- plan_add: Build a non-mutating project-aware adoption plan for a component or composed output
-- doctor: Audit a DryUI workspace and return a structured health report
-- lint: Lint a DryUI workspace and return deterministic workspace findings
+- ask: Discover components, recipes, setup guidance, and tokens through an explicit scope
+- check: Validate a component, theme file, directory, or workspace through one unified path-driven tool

@@ -1,6 +1,7 @@
 // DryUI Component Code Review Engine
 // Pure string/regex parsing — no Svelte compiler required.
 
+import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { buildLineOffsets, escapeRegExp, lineAtOffset } from './utils.js';
 
 export interface Issue {
@@ -37,7 +38,17 @@ interface TagInfo {
 	readonly selfClosing: boolean;
 }
 
-// Phase 1: Extract
+interface ReviewContext {
+	readonly code: string;
+	readonly template: string;
+	readonly lineOffsets: number[];
+}
+
+function stripScriptAndStyle(code: string): string {
+	return code
+		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
+		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
+}
 
 function extractImports(code: string): Set<string> {
 	const imports = new Set<string>();
@@ -60,15 +71,8 @@ function extractImports(code: string): Set<string> {
 	return imports;
 }
 
-function extractTags(code: string): TagInfo[] {
-	// Build template by stripping <script> and <style> blocks.
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
-
-	// Pre-compute cumulative line offsets for the full code.
-	const lineOffsets = buildLineOffsets(code);
-
+function extractTags(ctx: ReviewContext): TagInfo[] {
+	const { template, lineOffsets } = ctx;
 	const tagRegex = /<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)\s*([^>]*?)(\/)?>/g;
 	const tags: TagInfo[] = [];
 	let match: RegExpExecArray | null;
@@ -159,8 +163,6 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 	return props;
 }
 
-// Prop allowlist check
-
 const NATIVE_HTML_ATTRS: ReadonlySet<string> = new Set([
 	// Global attributes
 	'id',
@@ -239,8 +241,6 @@ function isPropAllowed(propName: string): boolean {
 	return false;
 }
 
-// Phase 2: Spec Compliance Checks (severity: "error")
-
 function checkBareCompound(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
@@ -260,8 +260,14 @@ function checkBareCompound(
 				severity: 'error',
 				code: 'bare-compound',
 				line: tag.line,
-				message: `<${tag.name}> is a compound component \u2014 use <${tag.name}.Root>`,
-				fix: `<${tag.name}.Root>`
+				message: ruleMessage('bare-compound', {
+					name: tag.name,
+					variant: 'compound',
+					target: `<${tag.name}.Root>`
+				}),
+				fix: ruleSuggestedFix('bare-compound', {
+					target: `<${tag.name}.Root>`
+				})
 			});
 			continue;
 		}
@@ -270,8 +276,14 @@ function checkBareCompound(
 			severity: 'error',
 			code: 'bare-compound',
 			line: tag.line,
-			message: `<${tag.name}> is a namespaced component \u2014 use a part like <${tag.name}.${firstPart ?? 'Text'}>`,
-			fix: `<${tag.name}.${firstPart ?? 'Text'}>`
+			message: ruleMessage('bare-compound', {
+				name: tag.name,
+				variant: 'namespaced',
+				target: `a part like <${tag.name}.${firstPart ?? 'Text'}>`
+			}),
+			fix: ruleSuggestedFix('bare-compound', {
+				target: `<${tag.name}.${firstPart ?? 'Text'}>`
+			})
 		});
 	}
 	return issues;
@@ -290,7 +302,7 @@ function checkUnknownComponent(
 				severity: 'error',
 				code: 'unknown-component',
 				line: tag.line,
-				message: `<${tag.name}> is not a known DryUI component`,
+				message: ruleMessage('unknown-component', { name: tag.name }),
 				fix: null
 			});
 		}
@@ -317,7 +329,11 @@ function checkInvalidPartName(
 				severity: 'error',
 				code: 'invalid-part',
 				line: tag.line,
-				message: `<${root}.${part}> \u2014 "${part}" is not a valid part of ${root}. Valid parts: ${validParts.join(', ')}`,
+				message: ruleMessage('invalid-part', {
+					root,
+					part,
+					validParts: validParts.join(', ')
+				}),
 				fix: null
 			});
 		}
@@ -362,7 +378,10 @@ function checkInvalidProp(
 					severity: 'error',
 					code: 'invalid-prop',
 					line: tag.line,
-					message: `<${tag.name}> does not accept prop "${checkName}"`,
+					message: ruleMessage('invalid-prop', {
+						name: tag.name,
+						prop: checkName
+					}),
 					fix: null
 				});
 			}
@@ -411,16 +430,17 @@ function checkMissingRequiredProp(
 					severity: 'error',
 					code: 'missing-required-prop',
 					line: tag.line,
-					message: `<${tag.name}> is missing required prop "${propName}"`,
-					fix: `${propName}={...}`
+					message: ruleMessage('missing-required-prop', {
+						name: tag.name,
+						prop: propName
+					}),
+					fix: ruleSuggestedFix('missing-required-prop', { prop: propName })
 				});
 			}
 		}
 	}
 	return issues;
 }
-
-// Phase 3: Structural Checks (severity: "error")
 
 function checkOrphanedPart(
 	tags: TagInfo[],
@@ -440,23 +460,20 @@ function checkOrphanedPart(
 				severity: 'error',
 				code: 'orphaned-part',
 				line: tag.line,
-				message: `<${tag.name}> used without <${root}.Root> in the template`,
-				fix: `Wrap in <${root}.Root>`
+				message: ruleMessage('orphaned-part', {
+					name: tag.name,
+					root
+				}),
+				fix: ruleSuggestedFix('orphaned-part', { root })
 			});
 		}
 	}
 	return issues;
 }
 
-function checkMissingLabel(tags: TagInfo[], code: string): Issue[] {
+function checkMissingLabel(tags: TagInfo[], ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
-
-	// Strip <script> and <style> blocks to get the template portion.
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
-
-	const lineOffsets = buildLineOffsets(code);
+	const { template, lineOffsets } = ctx;
 
 	for (const tag of tags) {
 		if (tag.name !== 'Input' && tag.name !== 'Select.Root' && tag.name !== 'Combobox.Input')
@@ -476,8 +493,8 @@ function checkMissingLabel(tags: TagInfo[], code: string): Issue[] {
 				severity: 'error',
 				code: 'missing-label',
 				line: tag.line,
-				message: `<${tag.name}> may be missing an accessible label \u2014 add aria-label or wrap in <Field.Root> with <Label>`,
-				fix: 'aria-label="..."'
+				message: ruleMessage('missing-label', { name: tag.name }),
+				fix: ruleSuggestedFix('missing-label')
 			});
 		}
 	}
@@ -511,8 +528,8 @@ function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
 				severity: 'error',
 				code: 'missing-alt',
 				line: tag.line,
-				message: '<Avatar> is missing "alt" and "fallback" props for accessibility',
-				fix: 'alt="..."'
+				message: ruleMessage('missing-alt'),
+				fix: ruleSuggestedFix('missing-alt')
 			});
 		}
 	}
@@ -603,24 +620,17 @@ function checkCustomFlexLayout(styles: string, code: string): Issue[] {
 			severity: 'error',
 			code: 'prefer-grid-layout',
 			line: styleLineToFileLine(localLine, startLine),
-			message:
-				'Use scoped CSS grid instead of flexbox. DryUI layout standard is raw grid with --dry-space-* gaps, Container for constrained width, and @container queries for responsiveness.',
-			fix: 'display: grid'
+			message: ruleMessage('prefer-grid-layout'),
+			fix: ruleSuggestedFix('prefer-grid-layout')
 		});
 	}
 	return issues;
 }
 
-function checkCustomFieldMarkup(code: string): Issue[] {
+function checkCustomFieldMarkup(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
-	// Strip <script> and <style> blocks to only scan template.
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
+	const { template, lineOffsets } = ctx;
 
-	const lineOffsets = buildLineOffsets(code);
-
-	// Check for class="field" or class='field'
 	const fieldClassRegex = /class=["']field["']/g;
 	let match: RegExpExecArray | null;
 
@@ -630,9 +640,8 @@ function checkCustomFieldMarkup(code: string): Issue[] {
 			severity: 'error',
 			code: 'use-field-component',
 			line,
-			message:
-				'Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.',
-			fix: '<Field.Root> + <Label>'
+			message: ruleMessage('use-field-component'),
+			fix: ruleSuggestedFix('use-field-component')
 		});
 	}
 
@@ -645,23 +654,17 @@ function checkCustomFieldMarkup(code: string): Issue[] {
 			severity: 'error',
 			code: 'use-field-component',
 			line,
-			message:
-				'Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.',
-			fix: '<Field.Root> + <Label>'
+			message: ruleMessage('use-field-component'),
+			fix: ruleSuggestedFix('use-field-component')
 		});
 	}
 
 	return issues;
 }
 
-function checkRawStyledButton(code: string): Issue[] {
+function checkRawStyledButton(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
-	// Strip <script> and <style> blocks to only scan template.
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
-
-	const lineOffsets = buildLineOffsets(code);
+	const { template, lineOffsets } = ctx;
 	const rawBtnRegex = /<button\s[^>]*class=/g;
 	let match: RegExpExecArray | null;
 
@@ -671,9 +674,8 @@ function checkRawStyledButton(code: string): Issue[] {
 			severity: 'error',
 			code: 'use-button-component',
 			line,
-			message:
-				"Use DryUI's <Button> component instead of raw <button> with custom classes. Button provides variants, sizes, loading states, and theme-consistent styling.",
-			fix: '<Button>'
+			message: ruleMessage('use-button-component'),
+			fix: ruleSuggestedFix('use-button-component')
 		});
 	}
 	return issues;
@@ -688,8 +690,8 @@ function checkCustomMaxWidthCentering(styles: string, code: string): Issue[] {
 			severity: 'error',
 			code: 'use-container-component',
 			line: styleLineToFileLine(localLine, startLine),
-			message: "Use DryUI's <Container> component instead of custom max-width + margin centering.",
-			fix: '<Container>'
+			message: ruleMessage('use-container-component'),
+			fix: ruleSuggestedFix('use-container-component')
 		});
 	}
 	return issues;
@@ -704,12 +706,9 @@ function classRuleHasDisplayGrid(styles: string, className: string): boolean {
 	return selectorRe.test(styles);
 }
 
-function checkInteractiveCardWrapper(code: string, styles: string): Issue[] {
+function checkInteractiveCardWrapper(ctx: ReviewContext, styles: string): Issue[] {
 	const issues: Issue[] = [];
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
-	const lineOffsets = buildLineOffsets(code);
+	const { template, lineOffsets } = ctx;
 	const wrapperRegex = /<([a-z][a-zA-Z0-9:-]*)\s[^>]*class=(["'])([^"']+)\2[^>]*>([\s\S]*?)<\/\1>/g;
 	let match: RegExpExecArray | null;
 
@@ -725,16 +724,13 @@ function checkInteractiveCardWrapper(code: string, styles: string): Issue[] {
 			severity: 'warning',
 			code: 'interactive-card-wrapper',
 			line: lineAtOffset(lineOffsets, match.index),
-			message:
-				'Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.',
-			fix: 'display: grid'
+			message: ruleMessage('interactive-card-wrapper'),
+			fix: ruleSuggestedFix('interactive-card-wrapper')
 		});
 	}
 
 	return issues;
 }
-
-// Phase 4: Style Suggestions (severity: "suggestion")
 
 function getStyleBlockStartLine(code: string): number {
 	const idx = code.search(/<style[^>]*>/);
@@ -771,9 +767,8 @@ function checkHardcodedColors(styles: string, code: string): Issue[] {
 			severity: 'suggestion',
 			code: 'hardcoded-color',
 			line: styleLineToFileLine(localLine, startLine),
-			message:
-				'Hardcoded color value \u2014 consider using `--dry-*` CSS custom properties for theming',
-			fix: 'var(--dry-*)'
+			message: ruleMessage('hardcoded-color'),
+			fix: ruleSuggestedFix('hardcoded-color')
 		});
 	}
 	return issues;
@@ -788,9 +783,8 @@ function checkManualCentering(styles: string, code: string): Issue[] {
 			severity: 'suggestion',
 			code: 'prefer-container',
 			line: styleLineToFileLine(localLine, startLine),
-			message:
-				'Manual centering with max-width + margin auto \u2014 consider using <Container> instead',
-			fix: '<Container>'
+			message: ruleMessage('prefer-container'),
+			fix: ruleSuggestedFix('prefer-container')
 		});
 	}
 	return issues;
@@ -803,22 +797,16 @@ function checkCustomThemeOverrides(styles: string, code: string): Issue[] {
 			severity: 'suggestion',
 			code: 'theme-in-style',
 			line: getStyleBlockStartLine(code),
-			message:
-				'Custom --dry-* variable overrides detected in <style> \u2014 run the `diagnose` tool on your theme CSS for a full health check',
+			message: ruleMessage('theme-in-style'),
 			fix: null
 		}
 	];
 }
 
-function checkRawHr(code: string): Issue[] {
+function checkRawHr(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
-	// Strip <script> and <style> blocks to only scan template.
-	const template = code
-		.replace(/<script[^>]*>[\s\S]*?<\/script>/g, (m) => '\n'.repeat(countNewlines(m)))
-		.replace(/<style[^>]*>[\s\S]*?<\/style>/g, (m) => '\n'.repeat(countNewlines(m)));
-
+	const { template, lineOffsets } = ctx;
 	const hrRegex = /<hr[\s/>]/g;
-	const lineOffsets = buildLineOffsets(code);
 	let match: RegExpExecArray | null;
 
 	while ((match = hrRegex.exec(template)) !== null) {
@@ -827,58 +815,62 @@ function checkRawHr(code: string): Issue[] {
 			severity: 'error',
 			code: 'prefer-separator',
 			line,
-			message: 'Raw <hr> element \u2014 use <Separator /> for consistent styling',
-			fix: '<Separator />'
+			message: ruleMessage('prefer-separator'),
+			fix: ruleSuggestedFix('prefer-separator')
 		});
 	}
 	return issues;
 }
-
-// Main
 
 export function reviewComponent(
 	code: string,
 	spec: { components: Record<string, ComponentDef> },
 	filename?: string
 ): ReviewResult {
+	const ctx: ReviewContext = {
+		code,
+		template: stripScriptAndStyle(code),
+		lineOffsets: buildLineOffsets(code)
+	};
 	const imports = extractImports(code);
-	const tags = extractTags(code);
+	const tags = extractTags(ctx);
 	const styles = extractStyles(code);
 	const issues: Issue[] = [];
 
-	// Phase 2: Spec compliance
 	issues.push(...checkBareCompound(tags, spec));
 	issues.push(...checkUnknownComponent(tags, imports, spec));
 	issues.push(...checkInvalidPartName(tags, spec));
 	issues.push(...checkInvalidProp(tags, spec));
 	issues.push(...checkMissingRequiredProp(tags, spec));
 
-	// Phase 3: Structural
 	issues.push(...checkOrphanedPart(tags, spec));
-	issues.push(...checkMissingLabel(tags, code));
+	issues.push(...checkMissingLabel(tags, ctx));
 	issues.push(...checkImageWithoutAlt(tags));
-	issues.push(...checkCustomFieldMarkup(code));
-	issues.push(...checkRawStyledButton(code));
+	issues.push(...checkCustomFieldMarkup(ctx));
+	issues.push(...checkRawStyledButton(ctx));
 	if (styles) {
 		issues.push(...checkCustomFlexLayout(styles, code));
 		issues.push(...checkCustomMaxWidthCentering(styles, code));
-		issues.push(...checkInteractiveCardWrapper(code, styles));
+		issues.push(...checkInteractiveCardWrapper(ctx, styles));
 	}
 
-	// Phase 4: Style suggestions
 	if (styles) {
 		issues.push(...checkHardcodedColors(styles, code));
 		issues.push(...checkManualCentering(styles, code));
 		issues.push(...checkCustomThemeOverrides(styles, code));
 	}
-	issues.push(...checkRawHr(code));
+	issues.push(...checkRawHr(ctx));
 
-	// Sort by line number
 	issues.sort((a, b) => a.line - b.line);
 
-	const errors = issues.filter((i) => i.severity === 'error').length;
-	const warnings = issues.filter((i) => i.severity === 'warning').length;
-	const suggestions = issues.filter((i) => i.severity === 'suggestion').length;
+	let errors = 0;
+	let warnings = 0;
+	let suggestions = 0;
+	for (const issue of issues) {
+		if (issue.severity === 'error') errors += 1;
+		else if (issue.severity === 'warning') warnings += 1;
+		else suggestions += 1;
+	}
 	const summary =
 		issues.length === 0
 			? 'No issues found'

@@ -54,7 +54,7 @@
     "dryui": {
       "type": "stdio",
       "command": "npx",
-      "args": ["@dryui/mcp"]
+      "args": ["-y", "@dryui/mcp"]
     }
   }
 }`;
@@ -170,9 +170,9 @@
 			<div class="stack-lg">
 				<Heading level={2}>Agent workflow</Heading>
 				<Text size="lg" color="secondary">
-					Before writing DryUI code, call <code>compose</code> or <code>info</code>. After
-					implementation, run <code>review</code> or <code>doctor</code>. That keeps component shape
-					and validation in sync.
+					Before writing DryUI code, call <code>ask</code> with an explicit scope. After
+					implementation, run <code>check</code> on the file or workspace. That keeps component shape
+					and validation in one loop.
 				</Text>
 
 				<Alert variant="info">
@@ -194,8 +194,8 @@
 			<div class="stack-lg">
 				<Heading level={2}>AI setup</Heading>
 				<Text size="lg" color="secondary">
-					Add the MCP server so your editor can look up components, compose layouts, and validate
-					usage.
+					Add the MCP server so your editor can discover components and recipes with <code>ask</code>,
+					then validate with <code>check</code>.
 				</Text>
 
 				<Text size="sm" color="muted">Add to <code>.mcp.json</code> in your project root:</Text>
@@ -273,7 +273,8 @@
 									<Badge variant="outline" color="green">@dryui/mcp</Badge>
 								</div>
 								<Text size="sm" color="secondary"
-									>AI tooling for component lookup, composition, validation, and project planning.</Text
+									>AI tooling for DryUI discovery with <code>ask</code> and validation with
+										<code>check</code>.</Text
 								>
 							</div>
 						</Card.Content>

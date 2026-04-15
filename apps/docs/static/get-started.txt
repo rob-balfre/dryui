@@ -83,8 +83,8 @@ the localhost URL it prints before taking any screenshots.
 ## Step 3 — Install the skill and MCP server
 
 The DryUI skill teaches your agent the conventions (compound components,
-theming, CSS grid rules, accessibility). The MCP server provides live tools
-for component lookup, composition guidance, code review, and workspace health.
+theming, CSS grid rules, accessibility). The MCP server provides the collapsed
+`ask` / `check` surface for discovery and validation.
 
 ### Claude Code (plugin — installs both)
 
@@ -211,8 +211,8 @@ Key rules from the reference:
 Use the MCP tools or CLI to look up components as you build:
 
 ```
-dryui info Button
-dryui compose "login form"
+ask --scope component "Button"
+ask --scope recipe "login form"
 ```
 
 ## CLI tools (when MCP is not available)

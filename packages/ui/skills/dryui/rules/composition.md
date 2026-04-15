@@ -398,7 +398,7 @@ Use Field.Error to show validation messages.
 
 ## Component Selection Quick Reference
 
-Before using any component, call `compose` to get the correct component and usage snippet. This table is a quick reference — `compose` has full snippets and anti-patterns.
+Before using any component, call `ask --scope recipe` or `ask --scope component` to get the correct component and usage snippet. This table is a quick reference — `ask` has the full snippets and anti-patterns.
 
 | UI Need           | Use This                               | NOT This                     |
 | ----------------- | -------------------------------------- | ---------------------------- |
@@ -431,7 +431,7 @@ Before using any component, call `compose` to get the correct component and usag
 
 ## Composition Recipes
 
-Call `compose` with any recipe name to get a full working snippet.
+Call `ask --scope recipe` with any recipe name to get a full working snippet.
 
 | Recipe                    | Description               | Key Components                         |
 | ------------------------- | ------------------------- | -------------------------------------- |
@@ -457,7 +457,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
 - Normalize route/session state in script before rendering DryUI inputs.
 - Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
 - Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
-- Run `compose` or `info` before introducing a new field shape, then run `review` or `doctor` after the flow is wired.
+- Run `ask` before introducing a new field shape, then run `check` after the flow is wired.
 
 ```svelte
 <script lang="ts">

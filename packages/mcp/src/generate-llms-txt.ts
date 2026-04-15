@@ -286,13 +286,13 @@ function buildLlmsText(spec: Spec): string {
 
 	sections.push(`# DryUI
 
-> ${totalComponents} zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for lookup, composition guidance, validation, and theme diagnosis.
+> ${totalComponents} zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server for lookup, source retrieval, composition guidance, project planning, review, and theme diagnosis
+- @dryui/mcp: MCP server with collapsed ask/check tools for discovery, setup guidance, and validation
 - @dryui/cli: CLI for detect, install, project-aware add, lookup, source retrieval, composition guidance, and validation
 
 ## AI Surface

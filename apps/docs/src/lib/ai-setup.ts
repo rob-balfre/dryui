@@ -33,17 +33,8 @@ export interface AiAgentSetup {
 }
 
 const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
-	info: 'blue',
-	get: 'orange',
-	list: 'purple',
-	compose: 'orange',
-	review: 'blue',
-	diagnose: 'green',
-	detect_project: 'blue',
-	plan_install: 'green',
-	plan_add: 'orange',
-	doctor: 'blue',
-	lint: 'purple'
+	ask: 'orange',
+	check: 'blue'
 };
 
 const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
@@ -175,7 +166,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			language: 'toml'
 		},
 		followUp:
-			'Restart Codex after installation. The skill teaches conventions, the MCP server provides live tools.'
+			'Restart Codex after installation. The skill teaches conventions, the MCP server provides the collapsed ask/check surface.'
 	},
 	{
 		id: 'copilot',
@@ -230,7 +221,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			code: mcpServersConfig,
 			language: 'json'
 		},
-		followUp: 'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 11 tools.'
+		followUp: 'Windsurf has a 100-tool limit across all MCP servers. DryUI now uses 2 tools.'
 	},
 	{
 		id: 'zed',
