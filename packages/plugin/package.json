@@ -1,6 +1,6 @@
 {
   "name": "@dryui/plugin",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "DryUI plugin bundle for Claude Code and Codex with the DryUI CLI, init, live-feedback, and MCP"
 }
