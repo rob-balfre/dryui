@@ -9,7 +9,7 @@
     "docs:check": "bun run --cwd apps/docs check",
     "docs": "bun run docs:dev",
     "build:packages": "bun run --filter '@dryui/lint' build && bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/feedback' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/feedback-server' build && bun run --filter '@dryui/cli' build",
-    "build:docs:deps": "bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/feedback' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/theme-wizard' build",
+    "build:docs:deps": "bun run --filter '@dryui/lint' build && bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/feedback' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/theme-wizard' build",
     "build:docs": "bun run build:docs:deps && bun run docs:build",
     "build": "bun run build:packages && bun run --filter '@dryui/theme-wizard' build && bun run docs:build",
     "sync:exports": "bun run scripts/sync-package-exports.ts",
