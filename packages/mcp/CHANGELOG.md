@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.0.2
+
+### Patch Changes
+
+- Manual `bun publish` to actually resolve the `@dryui/lint: workspace:*` dep in the published tarball. `changeset publish` (used by the CI release workflow) does not run `prepack`/`postpack` lifecycle scripts, so the hooks added in 2.0.1 never fired. `bun publish` does run them, so publishing by hand from `packages/mcp` produces a tarball with `"@dryui/lint": "^0.4.0"` as intended. The CI release flow still needs a structural fix so future releases don't require a manual step.
+
 ## 2.0.1
 
 ### Patch Changes
