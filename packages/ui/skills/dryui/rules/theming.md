@@ -268,9 +268,10 @@ Ensure sufficient contrast between text and background.
 
 ## Validating Theme CSS
 
-Run the CLI diagnose command to catch theme issues:
+Run `check <theme.css>` to catch theme issues. CLI fallback:
 
 ```bash
+check src/styles/global.css
 dryui diagnose src/styles/global.css
 ```
 

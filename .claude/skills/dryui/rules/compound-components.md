@@ -18,7 +18,7 @@ Every compound component uses `.Root` as the container. Never use the bare name.
 
 ## Parts Reference
 
-Below are the parts for the most commonly used compound components. Always run `dryui info <name>` for the full, up-to-date parts list.
+Below are the parts for the most commonly used compound components. Always run `ask --scope component "<name>"` or `dryui info <name>` for the full, up-to-date parts list.
 
 ### Card
 
@@ -311,6 +311,6 @@ Parts: Root, Input, Content, Item, Empty
 
 ## Full Compound Component List
 
-Run `dryui info <name>` for any component's complete parts list:
+Run `ask --scope component "<name>"` or `dryui info <name>` for any component's complete parts list:
 
 Accordion, AlertDialog, Breadcrumb, Card, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer

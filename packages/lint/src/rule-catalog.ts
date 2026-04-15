@@ -1,0 +1,319 @@
+export type RuleSeverity = 'error' | 'warning' | 'suggestion' | 'info';
+
+export interface RuleCatalogEntry {
+	readonly id: string;
+	readonly message: string;
+	readonly severity: RuleSeverity;
+	readonly suggestedFix?: string;
+}
+
+export const RULE_CATALOG = {
+	'dryui/no-layout-component': {
+		id: 'dryui/no-layout-component',
+		severity: 'error',
+		message: 'Do not {action} {target}. Use {guidance}.',
+		suggestedFix: 'Use raw CSS grid with custom properties instead.'
+	},
+	'dryui/no-inline-style': {
+		id: 'dryui/no-inline-style',
+		severity: 'error',
+		message: 'No inline style attributes. Use scoped CSS with custom properties.',
+		suggestedFix: 'Move the inline styles into the component <style> block.'
+	},
+	'dryui/no-style-directive': {
+		id: 'dryui/no-style-directive',
+		severity: 'error',
+		message: 'No style: directives. Use scoped CSS with custom properties.',
+		suggestedFix: 'Move the directive styles into the component <style> block.'
+	},
+	'dryui/no-component-class': {
+		id: 'dryui/no-component-class',
+		severity: 'error',
+		message:
+			'Do not pass class= to <{component}>. Svelte components ignore class attributes. Use --dry-* CSS custom properties for styling overrides.',
+		suggestedFix: 'Replace class= overrides with component props or --dry-* CSS custom properties.'
+	},
+	'dryui/no-css-ignore': {
+		id: 'dryui/no-css-ignore',
+		severity: 'error',
+		message:
+			'Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.',
+		suggestedFix: 'Remove the ignore comment and fix the unused selector.'
+	},
+	'dryui/no-svelte-element': {
+		id: 'dryui/no-svelte-element',
+		severity: 'error',
+		message:
+			'Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).',
+		suggestedFix: 'Replace <svelte:element> with explicit markup branches.'
+	},
+	'dryui/no-anchor-without-href': {
+		id: 'dryui/no-anchor-without-href',
+		severity: 'error',
+		message:
+			'Do not use <a> without href. Use <button> for actions, or provide href for navigation.',
+		suggestedFix: 'Add href, or switch to <button> for non-navigation actions.'
+	},
+	'dryui/no-raw-native-element': {
+		id: 'dryui/no-raw-native-element',
+		severity: 'error',
+		message:
+			'Raw <{tag}> is only allowed inside its canonical component directory. Use <{component}{closing}> elsewhere.',
+		suggestedFix: 'Use the matching DryUI component instead of the raw element.'
+	},
+	'dryui/no-flex': {
+		id: 'dryui/no-flex',
+		severity: 'error',
+		message: 'Do not use {value}. Use {guidance}.',
+		suggestedFix: 'Use CSS grid instead of flexbox layout primitives.'
+	},
+	'dryui/no-width': {
+		id: 'dryui/no-width',
+		severity: 'error',
+		message:
+			'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead.',
+		suggestedFix: 'Move sizing to the parent grid tracks.'
+	},
+	'dryui/no-all-unset': {
+		id: 'dryui/no-all-unset',
+		severity: 'error',
+		message: 'Do not use all: unset. Reset only the specific properties you need.',
+		suggestedFix: 'Replace all: unset with targeted property resets.'
+	},
+	'dryui/no-global': {
+		id: 'dryui/no-global',
+		severity: 'error',
+		message:
+			'Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.',
+		suggestedFix: 'Convert the selector to scoped CSS or use a component API.'
+	},
+	'dryui/no-media-sizing': {
+		id: 'dryui/no-media-sizing',
+		severity: 'error',
+		message:
+			'Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.',
+		suggestedFix: 'Replace the sizing media query with a container query.'
+	},
+	'dryui/prefer-focus-ring-token': {
+		id: 'dryui/prefer-focus-ring-token',
+		severity: 'error',
+		message:
+			'Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).',
+		suggestedFix: 'Use outline: var(--dry-focus-ring) plus the correct outline-offset.'
+	},
+	'bare-compound': {
+		id: 'bare-compound',
+		severity: 'error',
+		message: '<{name}> is a {variant} component — use {target}',
+		suggestedFix: '{target}'
+	},
+	'unknown-component': {
+		id: 'unknown-component',
+		severity: 'error',
+		message: '<{name}> is not a known DryUI component'
+	},
+	'invalid-part': {
+		id: 'invalid-part',
+		severity: 'error',
+		message: '<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}'
+	},
+	'invalid-prop': {
+		id: 'invalid-prop',
+		severity: 'error',
+		message: '<{name}> does not accept prop "{prop}"'
+	},
+	'missing-required-prop': {
+		id: 'missing-required-prop',
+		severity: 'error',
+		message: '<{name}> is missing required prop "{prop}"',
+		suggestedFix: '{prop}={...}'
+	},
+	'orphaned-part': {
+		id: 'orphaned-part',
+		severity: 'error',
+		message: '<{name}> used without <{root}.Root> in the template',
+		suggestedFix: 'Wrap in <{root}.Root>'
+	},
+	'missing-label': {
+		id: 'missing-label',
+		severity: 'error',
+		message:
+			'<{name}> may be missing an accessible label — add aria-label or wrap in <Field.Root> with <Label>',
+		suggestedFix: 'aria-label="..."'
+	},
+	'missing-alt': {
+		id: 'missing-alt',
+		severity: 'error',
+		message: '<Avatar> is missing "alt" and "fallback" props for accessibility',
+		suggestedFix: 'alt="..."'
+	},
+	'prefer-grid-layout': {
+		id: 'prefer-grid-layout',
+		severity: 'error',
+		message:
+			'Use scoped CSS grid instead of flexbox. DryUI layout standard is raw grid with --dry-space-* gaps, Container for constrained width, and @container queries for responsiveness.',
+		suggestedFix: 'display: grid'
+	},
+	'use-field-component': {
+		id: 'use-field-component',
+		severity: 'error',
+		message:
+			'Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.',
+		suggestedFix: '<Field.Root> + <Label>'
+	},
+	'use-button-component': {
+		id: 'use-button-component',
+		severity: 'error',
+		message:
+			"Use DryUI's <Button> component instead of raw <button> with custom classes. Button provides variants, sizes, loading states, and theme-consistent styling.",
+		suggestedFix: '<Button>'
+	},
+	'use-container-component': {
+		id: 'use-container-component',
+		severity: 'error',
+		message: "Use DryUI's <Container> component instead of custom max-width + margin centering.",
+		suggestedFix: '<Container>'
+	},
+	'interactive-card-wrapper': {
+		id: 'interactive-card-wrapper',
+		severity: 'warning',
+		message:
+			'Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.',
+		suggestedFix: 'display: grid'
+	},
+	'hardcoded-color': {
+		id: 'hardcoded-color',
+		severity: 'suggestion',
+		message: 'Hardcoded color value — consider using `--dry-*` CSS custom properties for theming',
+		suggestedFix: 'var(--dry-*)'
+	},
+	'prefer-container': {
+		id: 'prefer-container',
+		severity: 'suggestion',
+		message: 'Manual centering with max-width + margin auto — consider using <Container> instead',
+		suggestedFix: '<Container>'
+	},
+	'theme-in-style': {
+		id: 'theme-in-style',
+		severity: 'suggestion',
+		message:
+			'Custom --dry-* variable overrides detected in <style> — run the `diagnose` tool on your theme CSS for a full health check'
+	},
+	'prefer-separator': {
+		id: 'prefer-separator',
+		severity: 'error',
+		message: 'Raw <hr> element — use <Separator /> for consistent styling',
+		suggestedFix: '<Separator />'
+	},
+	'missing-token': {
+		id: 'missing-token',
+		severity: 'error',
+		message: 'Required semantic token {variable} is not defined',
+		suggestedFix: 'Add {variable} with a color that fits your theme'
+	},
+	'wrong-type': {
+		id: 'wrong-type',
+		severity: 'error',
+		message:
+			'{variable} expects a {expectedType} value but got "{actual}" (classified as {classified})',
+		suggestedFix: 'Replace with a {expectedTypeExample}'
+	},
+	'transparent-surface': {
+		id: 'transparent-surface',
+		severity: 'warning',
+		message:
+			'Surface color has very low opacity ({alpha}) — cards and elevated elements will be nearly invisible',
+		suggestedFix: 'Use a solid color (e.g., #1e293b for dark themes, #f8fafc for light themes)'
+	},
+	'low-contrast-text': {
+		id: 'low-contrast-text',
+		severity: 'warning',
+		message:
+			'Low contrast between {variable} and --dry-color-bg-base (brightness difference: {difference})',
+		suggestedFix: 'Increase brightness difference between text and background to at least 125'
+	},
+	'no-elevation': {
+		id: 'no-elevation',
+		severity: 'warning',
+		message:
+			'{left} and {right} have near-identical brightness (difference: {difference}) — {surfaceHint}',
+		suggestedFix: 'Make the later surface 1-2 steps lighter or darker than the earlier surface'
+	},
+	'missing-pairing': {
+		id: 'missing-pairing',
+		severity: 'warning',
+		message: '{source} is defined but its pair {missing} is missing',
+		suggestedFix: 'Add {missing} to complete the color pairing'
+	},
+	'unknown-component-token': {
+		id: 'unknown-component-token',
+		severity: 'warning',
+		message: '{variable} is not a recognized component token in the spec',
+		suggestedFix: "Check spelling against the component's cssVars in the spec"
+	},
+	'transparent-component-bg': {
+		id: 'transparent-component-bg',
+		severity: 'warning',
+		message: '{variable} {detail}',
+		suggestedFix:
+			'Use a solid color or reference a background token (e.g., var(--dry-color-bg-raised))'
+	},
+	'dark-scheme-no-overrides': {
+		id: 'dark-scheme-no-overrides',
+		severity: 'warning',
+		message:
+			'Project uses a dark color scheme ({signals}) but has no --dry-color-* overrides. DryUI\'s default theme is light — components will have poor contrast on dark backgrounds. Either use theme: "dark" in the generate tool, or add --dry-color-* overrides to map DryUI tokens to your dark palette.',
+		suggestedFix:
+			'Use theme: "dark" in dryui.page(), or override --dry-color-bg-base, --dry-color-bg-raised, --dry-color-text-strong, --dry-color-text-weak, and other semantic tokens with dark-appropriate values'
+	},
+	'unresolvable-var': {
+		id: 'unresolvable-var',
+		severity: 'info',
+		message:
+			'{variable} references {reference} which is not defined in this CSS — type and contrast checks skipped'
+	}
+} as const satisfies Record<string, RuleCatalogEntry>;
+
+export type RuleCatalogId = keyof typeof RULE_CATALOG;
+
+export type RuleTemplateValue = string | number;
+
+export function formatRuleText(
+	template: string | undefined,
+	values: Record<string, RuleTemplateValue> = {}
+): string | null {
+	if (!template) return null;
+	if (!template.includes('{')) return template;
+	return template.replace(/\{([a-zA-Z0-9]+)\}/g, (match, key) => {
+		const value = values[key];
+		return value === undefined ? match : String(value);
+	});
+}
+
+export function ruleMessage(
+	id: RuleCatalogId,
+	values: Record<string, RuleTemplateValue> = {}
+): string {
+	return formatRuleText(RULE_CATALOG[id].message, values) ?? RULE_CATALOG[id].message;
+}
+
+export function ruleSuggestedFix(
+	id: RuleCatalogId,
+	values: Record<string, RuleTemplateValue> = {}
+): string | null {
+	const entry = RULE_CATALOG[id];
+	return formatRuleText('suggestedFix' in entry ? entry.suggestedFix : undefined, values);
+}
+
+export function serializeRuleCatalog(): string {
+	return Object.values(RULE_CATALOG)
+		.map((entry) =>
+			[
+				entry.id,
+				entry.severity,
+				entry.message,
+				'suggestedFix' in entry ? entry.suggestedFix : ''
+			].join('\t')
+		)
+		.join('\n');
+}

@@ -31,13 +31,12 @@ The CLI is idempotent — it detects what's already done and only applies missin
 ## After init
 
 1. Tell the user init is complete and show the CLI output.
-2. Suggest next steps: start the dev server, then run `compose "app shell"` to get the root layout template.
+2. Suggest next steps: start the dev server, then run `ask --scope recipe "app shell"` to get the root layout template.
 
 ## MCP fallback (no CLI available)
 
 If `npx` is not available, use the MCP tools directly:
 
-1. `detect_project` — check project state. If `status: ready`, stop.
-2. `plan_install` — get ordered steps (does not mutate files).
-3. Execute each step: run shell commands (confirm with user first), write files using provided snippets, log notes, warn on blocked steps.
-4. `detect_project` again — verify `status: ready`.
+1. `ask --scope setup ""` — check project state and get the inline install plan. If `project: ready`, stop.
+2. Execute each setup step from the response: run shell commands (confirm with user first), write files using provided snippets, log notes, warn on blocked steps.
+3. `check` — validate the workspace after applying the setup changes.

@@ -6,7 +6,7 @@
       "devDependencies": {
         "@changesets/changelog-github": "^0.6.0",
         "@changesets/cli": "^2.30.0",
-        "@dryui/lint": "^0.3.0",
+        "@dryui/lint": "workspace:*",
         "@playwright/test": "^1.59.1",
         "@sveltejs/vite-plugin-svelte": "^7.0.0",
         "@vitest/browser-playwright": "^4.1.4",
@@ -111,6 +111,7 @@
         "dryui-mcp": "./dist/index.js",
       },
       "dependencies": {
+        "@dryui/lint": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.29.0",
         "zod": "^4.3.6",
       },

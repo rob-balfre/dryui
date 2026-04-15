@@ -70,7 +70,7 @@ Use:
 
 **Layout is raw CSS grid** — do not use `Grid`, `Stack`, or `Flex` components. Use `display: grid` with CSS custom properties and `@container` queries. See the CSS Discipline section below and the `dryui-css` skill.
 
-**Before writing any UI**, run `mcp compose` or check the component catalog to find the right DryUI components for the job. If no component exists, flag it — don't work around it with raw HTML.
+**Before writing any UI**, run `mcp ask --scope recipe "app shell"` for layout patterns or `mcp ask --scope component "<Component>"` for exact APIs. If no component exists, flag it — don't work around it with raw HTML.
 
 ## Theming
 
@@ -111,14 +111,13 @@ When working inside this repository with Codex, install the local plugin via `co
 
 Two MCP servers are configured:
 
-- **dryui** — component lookup, composition, validation, theme checks, workspace audit
+- **dryui** — scope-driven discovery and unified validation for components, setup, themes, and workspaces
 - **dryui-feedback** — feedback annotation and review (`packages/feedback-server/dist/mcp.js`)
 
 DryUI MCP tools:
 
-- lookup and source browsing (`info`, `get`, `list`)
-- composition and project planning (`compose`, `detect_project`, `plan_install`, `plan_add`)
-- validation, theme checks, and workspace audit (`review`, `diagnose`, `doctor`, `lint`)
+- discovery (`ask`)
+- validation (`check`)
 - CLI: `dryui detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint` (install once via `bun install -g @dryui/cli`; `bunx @dryui/cli <cmd>` / `npx -y @dryui/cli <cmd>` work as no-install fallbacks)
 - Skill: `packages/ui/skills/dryui/SKILL.md`
 - Plugin: `packages/plugin/` (Claude Code plugin + Codex local plugin bundling `dryui`, `init`, `live-feedback`, and MCP)
@@ -127,11 +126,11 @@ DryUI MCP tools:
 
 MCP tool output uses TOON format by default — a compact, agent-optimized notation (~40% fewer tokens than JSON). Format: `resource[count]{fields}: value1,value2,...`
 
-- MCP tools: TOON is the default for all tools (info, list, compose, review, diagnose, doctor, lint, detect_project, plan_install, plan_add)
+- MCP tools: TOON is the default for both tools (`ask`, `check`)
 - CLI: TOON is also the default. Pass `--text` for human-readable plain text, or `--json` where supported
-- `--full` disables truncation (compose snippets, workspace findings, component examples are truncated by default in TOON mode)
+- `--full` disables truncation on the CLI surface (compose snippets, workspace findings, component examples are truncated by default in TOON mode)
 - Every TOON response includes `next[]` contextual help suggesting logical next commands
-- Pre-computed aggregates: `hasBlockers`, `autoFixable` (review), `coverage` (diagnose), `top-rule` (workspace)
+- Pre-computed aggregates: `matches` (`ask`), `hasBlockers`, `autoFixable`, `coverage`, and severity counts (`check`)
 - Definitive empty states: `issues[0]: clean`, `findings[0]: clean` (not ambiguous empty output)
 - Structured errors: `error[1]{code,message}: not-found,"Unknown component"` with suggestions
 
@@ -142,7 +141,7 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 - Defines per-component composition rules (alternatives, anti-patterns, combinesWith)
 - Defines cross-component recipes (named patterns with full snippets)
 - Search logic: `packages/mcp/src/composition-search.ts` (shared between MCP and CLI)
-- Consumed by: spec.json, `compose` MCP tool, `compose` CLI command, DryUI skill
+- Consumed by: spec.json, `ask` MCP tool, `compose` CLI command, DryUI skill
 - When adding new components or changing component APIs, update composition-data.ts
 - Run `bun run --filter '@dryui/mcp' build` after changes to regenerate spec.json
 
