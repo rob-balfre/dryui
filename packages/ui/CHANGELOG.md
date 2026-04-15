@@ -1,5 +1,14 @@
 # @dryui/ui
 
+## 1.1.3
+
+### Patch Changes
+
+- [`d3dcf8c`](https://github.com/rob-balfre/dryui/commit/d3dcf8cb3b5e4839f274e192669d0c8443ec29d8) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Alert now omits `children` and `title` from the forwarded `HTMLAttributes<HTMLDivElement>` base so the component's own `title` and snippet children no longer collide with the div's inherited attributes. The generated spec and contract reflect the new `omitted` list.
+
+- Updated dependencies []:
+  - @dryui/primitives@1.1.3
+
 ## 1.1.2
 
 ### Patch Changes

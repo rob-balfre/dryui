@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.5.3
+
+### Patch Changes
+
+- [`b108f15`](https://github.com/rob-balfre/dryui/commit/b108f150d2151b2251ba76bb19d81a61c377e3c0) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui detect` (ambient command) now imports the spec and project-planner through the `@dryui/mcp` package exports instead of relative source paths, so the published CLI no longer depends on the repo layout to load detection metadata.
+
+- Updated dependencies [[`7ad699c`](https://github.com/rob-balfre/dryui/commit/7ad699c581e2d9c7c4e2004ead841e6b6932e2fc)]:
+  - @dryui/mcp@2.1.0
+
 ## 0.5.2
 
 ### Patch Changes

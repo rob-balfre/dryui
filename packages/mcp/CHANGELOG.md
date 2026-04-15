@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.1.0
+
+### Minor Changes
+
+- [`7ad699c`](https://github.com/rob-balfre/dryui/commit/7ad699c581e2d9c7c4e2004ead841e6b6932e2fc) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `detectProject` (and by extension `dryui ask --scope project` / `dryui detect`) now auto-selects a unique nested Svelte or SvelteKit project when the provided path resolves to a non-Svelte parent directory (e.g. running detection from a monorepo root that hosts a single SvelteKit app under `apps/`). When multiple candidates are present the detector warns and stays at the original root so users can rerun against the intended app. Explicit `package.json` paths are still honored without descent.
+
 ## 2.0.2
 
 ### Patch Changes
