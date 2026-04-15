@@ -129,8 +129,8 @@
 						<div class="stack-sm">
 							<Text size="lg" weight="medium">Lookup first</Text>
 							<Text size="sm" color="secondary">
-								Run <code>ask</code> before writing a component so you confirm the right scope:
-								component API, recipe guidance, list browsing, or setup state.
+								Run <code>ask</code> before writing a component so you confirm the right scope: component
+								API, recipe guidance, list browsing, or setup state.
 							</Text>
 						</div>
 					</Card.Content>
@@ -141,8 +141,8 @@
 						<div class="stack-sm">
 							<Text size="lg" weight="medium">Validate after implementation</Text>
 							<Text size="sm" color="secondary">
-								Run <code>check</code> on the changed file, theme, directory, or workspace to catch
-								layout drift, accessibility issues, and stale guesses early.
+								Run <code>check</code> on the changed file, theme, directory, or workspace to catch layout
+								drift, accessibility issues, and stale guesses early.
 							</Text>
 						</div>
 					</Card.Content>

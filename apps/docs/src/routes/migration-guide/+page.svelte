@@ -96,8 +96,8 @@
 						<div class="stack-sm">
 							<Heading level={4}>Lookup-first workflow</Heading>
 							<Text size="sm" color="secondary">
-								Call <code>ask</code> before writing components, then run <code>check</code> after
-								implementation. The goal is to remove guessing, not to memorize the surface.
+								Call <code>ask</code> before writing components, then run <code>check</code> after implementation.
+								The goal is to remove guessing, not to memorize the surface.
 							</Text>
 						</div>
 					</Card.Content>
@@ -120,8 +120,8 @@
 						<div class="stack-sm">
 							<Text weight="medium">1. Lookup</Text>
 							<Text size="sm" color="secondary">
-								Use <Link href={withBase('/tools')}>ask</Link> with the right scope to confirm simple vs
-								compound shape, required parts, bindables, and the canonical usage snippet.
+								Use <Link href={withBase('/tools')}>ask</Link> with the right scope to confirm simple
+								vs compound shape, required parts, bindables, and the canonical usage snippet.
 							</Text>
 						</div>
 					</Card.Content>
@@ -144,8 +144,8 @@
 						<div class="stack-sm">
 							<Text weight="medium">3. Validate</Text>
 							<Text size="sm" color="secondary">
-								Run <code>check</code> on the component or workspace so layout drift, compound misuse, and
-								accessibility regressions get caught before they spread.
+								Run <code>check</code> on the component or workspace so layout drift, compound misuse,
+								and accessibility regressions get caught before they spread.
 							</Text>
 						</div>
 					</Card.Content>

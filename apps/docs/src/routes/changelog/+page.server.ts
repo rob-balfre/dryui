@@ -40,7 +40,8 @@ const REPO_ROOT = findRepoRoot();
 const CORE_PACKAGE_DESCRIPTIONS: Record<string, string> = {
 	'@dryui/primitives': 'Headless, unstyled components built on native browser APIs.',
 	'@dryui/ui': 'Styled production-ready components with theme CSS and scoped styles.',
-	'@dryui/mcp': 'MCP server with collapsed ask/check tools for discovery, setup guidance, and validation.',
+	'@dryui/mcp':
+		'MCP server with collapsed ask/check tools for discovery, setup guidance, and validation.',
 	'@dryui/cli': 'CLI surface for planning, lookup, validation, and workspace audit workflows.',
 	'@dryui/lint': 'Svelte preprocessor enforcing grid-only layout and DryUI CSS rules.'
 };
