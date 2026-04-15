@@ -20,6 +20,7 @@ graphify-out/
 .vitest-attachments/
 tests/playwright/snapshots/
 tests/playwright/test-results/
+.playwright-cli/
 tmp-*.png
 benchmarks/visual-checks/playwright/snapshots/
 benchmarks/visual-checks/playwright/test-results/
