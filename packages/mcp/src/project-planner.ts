@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 
 export type DryuiFramework = 'sveltekit' | 'svelte' | 'unknown';
@@ -95,17 +95,36 @@ interface PackageJsonShape {
 	readonly devDependencies?: Record<string, string>;
 }
 
+interface PackageDetection {
+	readonly packageJsonPath: string | null;
+	readonly root: string | null;
+	readonly dependencyNames: Set<string>;
+	readonly framework: DryuiFramework;
+}
+
+interface DescendantProjectCandidate {
+	readonly packageJsonPath: string;
+	readonly root: string;
+	readonly dependencyNames: Set<string>;
+	readonly framework: DryuiFramework;
+}
+
+const DESCENDANT_PROJECT_SEARCH_MAX_DEPTH = 2;
+const DESCENDANT_PROJECT_IGNORED_DIRS = new Set([
+	'.git',
+	'.svelte-kit',
+	'build',
+	'coverage',
+	'dist',
+	'node_modules'
+]);
+
 const DIR_OVERRIDES: Readonly<Record<string, string>> = {
 	QRCode: 'qr-code'
 };
 
 function componentDir(name: string): string {
 	return DIR_OVERRIDES[name] ?? name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-}
-
-function resolveStart(inputPath?: string): string {
-	const candidate = resolve(inputPath ?? process.cwd());
-	return existsSync(candidate) && statSync(candidate).isFile() ? dirname(candidate) : candidate;
 }
 
 function findUp(start: string, fileName: string): string | null {
@@ -174,6 +193,64 @@ function detectFramework(dependencyNames: Set<string>): DryuiFramework {
 	if (dependencyNames.has('@sveltejs/kit')) return 'sveltekit';
 	if (dependencyNames.has('svelte')) return 'svelte';
 	return 'unknown';
+}
+
+function detectPackageAt(start: string): PackageDetection {
+	const packageJsonPath = findUp(start, 'package.json');
+	const root = packageJsonPath ? dirname(packageJsonPath) : null;
+	const dependencyNames = getDependencyNames(readPackageJson(packageJsonPath));
+	return {
+		packageJsonPath,
+		root,
+		dependencyNames,
+		framework: detectFramework(dependencyNames)
+	};
+}
+
+function findDescendantSvelteProjects(
+	start: string,
+	maxDepth = DESCENDANT_PROJECT_SEARCH_MAX_DEPTH
+): DescendantProjectCandidate[] {
+	const candidates: DescendantProjectCandidate[] = [];
+
+	function visit(current: string, depth: number): void {
+		if (depth >= maxDepth) return;
+
+		for (const entry of readdirSync(current, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+			if (DESCENDANT_PROJECT_IGNORED_DIRS.has(entry.name)) continue;
+
+			const childRoot = resolve(current, entry.name);
+			const childPackageJson = resolve(childRoot, 'package.json');
+			if (existsSync(childPackageJson)) {
+				const dependencyNames = getDependencyNames(readPackageJson(childPackageJson));
+				const framework = detectFramework(dependencyNames);
+				if (framework !== 'unknown') {
+					candidates.push({
+						packageJsonPath: childPackageJson,
+						root: childRoot,
+						dependencyNames,
+						framework
+					});
+				}
+			}
+
+			visit(childRoot, depth + 1);
+		}
+	}
+
+	visit(start, 0);
+	return candidates;
+}
+
+function selectDescendantProject(
+	candidates: readonly DescendantProjectCandidate[]
+): DescendantProjectCandidate | null {
+	const sveltekitCandidates = candidates.filter((candidate) => candidate.framework === 'sveltekit');
+	if (sveltekitCandidates.length === 1) return sveltekitCandidates[0] ?? null;
+	if (sveltekitCandidates.length > 1) return null;
+
+	return candidates.length === 1 ? (candidates[0] ?? null) : null;
 }
 
 function hasImport(filePath: string | null, importPath: string): boolean {
@@ -328,11 +405,33 @@ export function detectProject(
 	spec: Pick<ProjectPlannerSpec, 'themeImports'>,
 	inputPath?: string
 ): ProjectDetection {
-	const start = resolveStart(inputPath);
-	const packageJsonPath = findUp(start, 'package.json');
-	const root = packageJsonPath ? dirname(packageJsonPath) : null;
-	const dependencyNames = getDependencyNames(readPackageJson(packageJsonPath));
-	const framework = detectFramework(dependencyNames);
+	const candidate = resolve(inputPath ?? process.cwd());
+	const explicitFile = existsSync(candidate) && statSync(candidate).isFile();
+	const start = explicitFile ? dirname(candidate) : candidate;
+
+	const warnings: string[] = [];
+	let detection = detectPackageAt(start);
+
+	if (detection.framework === 'unknown' && !explicitFile) {
+		const descendants = findDescendantSvelteProjects(start);
+		const selected = selectDescendantProject(descendants);
+		if (selected) {
+			detection = selected;
+			warnings.push(
+				`Auto-selected nested ${selected.framework} project at ${selected.root} because the provided path is not a Svelte/SvelteKit project.`
+			);
+		} else if (descendants.length > 1) {
+			const sveltekitCount = descendants.filter((c) => c.framework === 'sveltekit').length;
+			warnings.push(
+				sveltekitCount > 1
+					? `Found ${sveltekitCount} nested SvelteKit projects below ${start}; rerun against the intended app directory.`
+					: `Found ${descendants.length} nested Svelte/SvelteKit projects below ${start}; rerun against the intended app directory.`
+			);
+		}
+	}
+
+	const { packageJsonPath, root, dependencyNames, framework } = detection;
+
 	const appHtmlPath = root ? resolve(root, 'src/app.html') : null;
 	const appCssPath = root ? resolve(root, 'src/app.css') : null;
 	const rootLayoutPath = root ? resolve(root, 'src/routes/+layout.svelte') : null;
@@ -356,7 +455,6 @@ export function detectProject(
 		Number(!themeAuto) +
 		Number(!lintInstalled) +
 		Number(!lintPreprocessorWired);
-	const warnings: string[] = [];
 
 	if (!packageJsonPath) warnings.push('No package.json found above the provided path.');
 	if (framework === 'unknown')
