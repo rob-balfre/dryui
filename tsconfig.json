@@ -15,8 +15,6 @@
       "@dryui/primitives/infinite-scroll": ["./packages/primitives/src/infinite-scroll/index.ts"],
       "@dryui/ui": ["./packages/ui/src/index.ts"],
       "@dryui/mcp": ["./packages/mcp/src/index.ts"],
-      "@dryui/mcp/architecture": ["./packages/mcp/src/architecture.ts"],
-      "@dryui/mcp/architecture.json": ["./packages/mcp/src/architecture.json"],
       "@dryui/mcp/project-planner": ["./packages/mcp/src/project-planner.ts"],
       "@dryui/mcp/reviewer": ["./packages/mcp/src/reviewer.ts"],
       "@dryui/mcp/theme-checker": ["./packages/mcp/src/theme-checker.ts"],

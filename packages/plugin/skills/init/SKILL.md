@@ -12,8 +12,10 @@ Bootstrap DryUI in the current project (or scaffold a new one).
 Install the CLI globally first so every subsequent call is short and fast:
 
 ```bash
-bun install -g @dryui/cli   # or: npm install -g @dryui/cli
+bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
 ```
+
+If the user also wants editor integration or feedback tooling, run `dryui` before or after init.
 
 Then run init:
 

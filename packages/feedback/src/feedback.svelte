@@ -39,6 +39,7 @@
 	let viewportHeight = $state(0);
 	let scrollX = $state(0);
 	let scrollY = $state(0);
+	let layerHostEl: HTMLElement | null = $state(null);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
@@ -55,6 +56,38 @@
 
 	function normalizeDrawing(drawing: Drawing): Drawing {
 		return { ...drawing, color };
+	}
+
+	function isOpenPopover(node: HTMLElement): boolean {
+		try {
+			return node.matches(':popover-open');
+		} catch {
+			return false;
+		}
+	}
+
+	function isLayerHost(node: Element | null): node is HTMLElement {
+		if (node instanceof HTMLDialogElement) return node.open;
+		return node instanceof HTMLElement && node.matches('[popover]') && isOpenPopover(node);
+	}
+
+	function resolveLayerHost(preferred?: HTMLElement | null): HTMLElement | null {
+		if (isLayerHost(preferred ?? null)) return preferred ?? null;
+
+		const popovers = Array.from(document.querySelectorAll<HTMLElement>('[popover]')).filter(
+			isOpenPopover
+		);
+		if (popovers.length > 0) return popovers.at(-1) ?? null;
+
+		const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]'));
+		if (dialogs.length > 0) return dialogs.at(-1) ?? null;
+
+		return null;
+	}
+
+	function syncLayerHost(preferred?: HTMLElement | null) {
+		if (typeof document === 'undefined') return;
+		layerHostEl = resolveLayerHost(preferred);
 	}
 
 	function toggle() {
@@ -103,6 +136,12 @@
 			e.preventDefault();
 			textInput = null;
 		}
+	}
+
+	function handleTextInputFocusOut(event: FocusEvent) {
+		const currentTarget = event.currentTarget as HTMLElement | null;
+		if (currentTarget?.contains(event.relatedTarget as Node | null)) return;
+		commitText();
 	}
 
 	function resolveScrollRoot(): HTMLElement | null {
@@ -522,6 +561,44 @@
 	}
 
 	$effect(() => {
+		if (typeof document === 'undefined') return;
+
+		syncLayerHost();
+
+		function handleLayerToggle(event: Event) {
+			const newState = event instanceof ToggleEvent ? event.newState : undefined;
+			const target = event.target;
+			const preferredTarget = newState === 'open' && target instanceof HTMLElement ? target : null;
+			syncLayerHost(preferredTarget);
+		}
+
+		const observer = new MutationObserver((records) => {
+			for (const record of records) {
+				if (record.target instanceof HTMLDialogElement && record.attributeName === 'open') {
+					syncLayerHost(record.target.open ? record.target : null);
+					return;
+				}
+			}
+		});
+
+		document.addEventListener('toggle', handleLayerToggle, true);
+		document.addEventListener('close', handleLayerToggle, true);
+		document.addEventListener('cancel', handleLayerToggle, true);
+		observer.observe(document.body, {
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['open']
+		});
+
+		return () => {
+			document.removeEventListener('toggle', handleLayerToggle, true);
+			document.removeEventListener('close', handleLayerToggle, true);
+			document.removeEventListener('cancel', handleLayerToggle, true);
+			observer.disconnect();
+		};
+	});
+
+	$effect(() => {
 		if (typeof window === 'undefined') return;
 
 		updateScrollMetrics();
@@ -546,15 +623,20 @@
 
 	$effect(() => {
 		if (!serverUrl) return;
-		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`)
+		const controller = new AbortController();
+		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`, {
+			signal: controller.signal
+		})
 			.then((r) => r.json())
 			.then((data: Drawing[]) => {
 				if (data.length) drawings = data.map(normalizeDrawing);
 				lastSavedVersion = saveVersion;
 			})
-			.catch(() => {
+			.catch((error) => {
+				if (error?.name === 'AbortError') return;
 				lastSavedVersion = saveVersion;
 			});
+		return () => controller.abort();
 	});
 
 	$effect(() => {
@@ -577,7 +659,7 @@
 
 <Hotkey keys={shortcut} handler={toggle} />
 
-<Portal>
+<Portal target={layerHostEl ?? 'body'}>
 	<div class="feedback-root {className ?? ''}" data-dryui-feedback>
 		{#if showOverlay}
 			<!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -746,9 +828,7 @@
 			<div
 				class="text-input-wrap"
 				style={textInputStyle(textInput.position)}
-				onfocusout={(e) => {
-					if (!e.currentTarget.contains(e.relatedTarget as Node)) commitText();
-				}}
+				onfocusout={handleTextInputFocusOut}
 			>
 				<input
 					class="text-input"
@@ -782,6 +862,11 @@
 		position: fixed;
 		inset: 0;
 		z-index: 9998;
+		margin: 0;
+		padding: 0;
+		border: none;
+		background: transparent;
+		overflow: visible;
 		pointer-events: none;
 	}
 

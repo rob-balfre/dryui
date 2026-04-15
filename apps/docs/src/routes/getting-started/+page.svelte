@@ -13,7 +13,8 @@
 	} from '@dryui/ui';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
-	import { homeIntroPrompt } from '$lib/home-intro.svelte';
+	import { aiAgentSetups } from '$lib/ai-setup';
+	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 
 	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
@@ -49,16 +50,6 @@
   </Card.Content>
 </Card.Root>`;
 
-	const mcpJsonCode = `{
-  "mcpServers": {
-    "dryui": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    }
-  }
-}`;
-
 	const forcedThemeCode = `<!-- Force dark mode -->
 <html data-theme="dark">
 
@@ -86,8 +77,22 @@
 		<!-- AI prompt -->
 		<section>
 			<div class="stack-lg">
-				<Text color="secondary">Paste this into your agent of choice.</Text>
-				<CodeBlock code={homeIntroPrompt} language="text" />
+				<Tabs.Root value="bun">
+					<Tabs.List>
+						<Tabs.Trigger value="bun">bun</Tabs.Trigger>
+						<Tabs.Trigger value="npm">npm</Tabs.Trigger>
+						<Tabs.Trigger value="pnpm">pnpm</Tabs.Trigger>
+					</Tabs.List>
+					<Tabs.Content value="bun">
+						<CodeBlock code={homeIntroPrompts.bun} language="text" />
+					</Tabs.Content>
+					<Tabs.Content value="npm">
+						<CodeBlock code={homeIntroPrompts.npm} language="text" />
+					</Tabs.Content>
+					<Tabs.Content value="pnpm">
+						<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
+					</Tabs.Content>
+				</Tabs.Root>
 			</div>
 		</section>
 
@@ -170,16 +175,23 @@
 			<div class="stack-lg">
 				<Heading level={2}>Agent workflow</Heading>
 				<Text size="lg" color="secondary">
-					Before writing DryUI code, call <code>ask</code> with an explicit scope. After
-					implementation, run <code>check</code> on the file or workspace. That keeps component shape
-					and validation in one loop.
+					Start with <code>dryui</code>. Outside the DryUI monorepo it asks which editor or agent
+					you want to wire, whether to install the Claude hook, and whether to open feedback. After
+					that, use
+					<code>dryui init</code> for new apps, <code>dryui install</code> /
+					<code>dryui detect</code>
+					for existing ones, and <code>dryui info</code> / <code>dryui compose</code> before writing
+					component code. After implementation, run <code>dryui review</code>,
+					<code>dryui diagnose</code>, or <code>dryui doctor</code> depending on what changed.
 				</Text>
 
 				<Alert variant="info">
-					{#snippet title()}Start with lookup, not memory{/snippet}
+					{#snippet title()}CLI first, MCP second{/snippet}
 					{#snippet description()}
-						Use the <Link href={withBase('/tools')} underline="always">Tools</Link> page for command details
-						and the
+						Use the <Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI setup
+						and command details. If your editor supports MCP, <code>ask</code> and
+						<code>check</code>
+						mirror the same lookup and validation loop in-editor. Use the
 						<Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the
 						route-level workflow and state-heavy planner pattern.
 					{/snippet}
@@ -189,23 +201,67 @@
 
 		<Separator />
 
-		<!-- 4. AI setup -->
+		<!-- 4. Editor integration -->
 		<section>
 			<div class="stack-lg">
-				<Heading level={2}>AI setup</Heading>
+				<Heading level={2}>Editor integration</Heading>
 				<Text size="lg" color="secondary">
-					Add the MCP server so your editor can discover components and recipes with <code>ask</code
-					>, then validate with <code>check</code>.
+					<code>dryui</code> is the default path. It can walk you through Claude Code, Codex, Copilot,
+					Cursor, Windsurf, and Zed, and it can open feedback from the same flow. The per-editor snippets
+					below are the same shared setup data that backs the CLI and docs.
 				</Text>
 
-				<Text size="sm" color="muted">Add to <code>.mcp.json</code> in your project root:</Text>
-				<CodeBlock language="json" code={mcpJsonCode} />
+				<CodeBlock language="bash" code="dryui" />
+
+				<Tabs.Root value="claude-code">
+					<Tabs.List>
+						{#each aiAgentSetups as setup (setup.id)}
+							<Tabs.Trigger value={setup.id}>{setup.label}</Tabs.Trigger>
+						{/each}
+					</Tabs.List>
+
+					{#each aiAgentSetups as setup (setup.id)}
+						<Tabs.Content value={setup.id}>
+							<div class="stack-md">
+								<Text color="secondary">{setup.description}</Text>
+
+								{#if setup.quickSetup}
+									<div class="stack-sm">
+										<Text size="sm" color="muted">{setup.quickSetup.title}</Text>
+										<CodeBlock language="bash" code={setup.quickSetup.code} />
+									</div>
+								{/if}
+
+								{#if setup.skill}
+									<div class="stack-sm">
+										<Text size="sm" color="muted">{setup.skill.title}</Text>
+										<Text size="sm" color="secondary">{setup.skill.note}</Text>
+										<CodeBlock language="bash" code={setup.skill.code} />
+									</div>
+								{/if}
+
+								<div class="stack-sm">
+									<Text size="sm" color="muted">Manual MCP config</Text>
+									<Text size="sm" color="secondary">{setup.mcp.note}</Text>
+									<CodeBlock language={setup.mcp.language} code={setup.mcp.code} />
+								</div>
+
+								<Alert variant="info">
+									{#snippet title()}Follow-up{/snippet}
+									{#snippet description()}{setup.followUp}{/snippet}
+								</Alert>
+							</div>
+						</Tabs.Content>
+					{/each}
+				</Tabs.Root>
 
 				<Alert variant="info">
-					{#snippet title()}Editor-specific setup{/snippet}
+					{#snippet title()}CLI first, snippets second{/snippet}
 					{#snippet description()}
-						See the <Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI commands,
-						MCP setup, and editor-specific configs.
+						Use <code>dryui</code> when you want the interactive flow. Use the
+						<Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI commands and
+						terminal workflows. Use <code>dryui setup</code> if you want the explicit subcommand, or the
+						tabs above if you want to wire everything yourself.
 					{/snippet}
 				</Alert>
 			</div>
@@ -273,8 +329,8 @@
 									<Badge variant="outline" color="green">@dryui/mcp</Badge>
 								</div>
 								<Text size="sm" color="secondary"
-									>AI tooling for DryUI discovery with <code>ask</code> and validation with
-									<code>check</code>.</Text
+									>CLI-first tooling for setup, lookup, and validation. MCP mirrors
+									<code>ask</code> / <code>check</code> inside supported editors.</Text
 								>
 							</div>
 						</Card.Content>

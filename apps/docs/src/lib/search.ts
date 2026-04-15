@@ -56,14 +56,16 @@ const allDocsPages: SearchItem[] = [
 	{
 		label: 'Tools',
 		href: '/tools',
-		description: 'CLI commands and MCP server setup for DryUI tooling.',
+		description: 'Install and use the DryUI CLI for setup, lookup, and validation.',
 		keywords: [
 			'cli',
-			'mcp',
+			'install',
 			'commands',
 			'tooling',
 			'terminal',
-			'model context protocol',
+			'init',
+			'detect',
+			'install plan',
 			'review',
 			'diagnose',
 			'compose'

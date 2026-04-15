@@ -87,7 +87,19 @@ Accordion, Adjust, Alert, Alert Dialog, Alpha Slider, Aspect Ratio, Aurora, Avat
 
 ## AI Integration
 
-DryUI ships two things for AI agents: a **skill** that teaches conventions (compound components, theming, CSS rules, accessibility) and an **MCP server** for live component lookup, code validation, and composition guidance. The skill is the most important part — without it, agents guess APIs and make structural mistakes.
+The entry point for working with DryUI is the CLI. Install `@dryui/cli`, start with bare `dryui` so it can walk you through editor integration and feedback, then use `dryui init` for new apps or `dryui install` / `dryui detect` for existing ones. Keep `dryui info`, `compose`, `review`, `diagnose`, and `doctor` in the loop while you work.
+
+```bash
+bun install -g @dryui/cli@latest
+dryui                # default onboarding entry point
+dryui init my-app    # scaffold a new SvelteKit + DryUI app
+dryui install .      # print an install plan for an existing project
+dryui detect .
+```
+
+No global install? Prefix commands with `bunx @dryui/cli` or `npx -y @dryui/cli`.
+
+The DryUI skill and MCP server are the editor integration layer on top of that CLI workflow. The skill teaches conventions (compound components, theming, CSS rules, accessibility), and MCP exposes the same discovery/validation loop inside supported editors with `ask` / `check`.
 
 Canonical install snippets, config paths, and MCP JSON/TOML for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) and render to the docs [getting-started page](https://dryui.dev/getting-started). Update that source instead of duplicating client setup here.
 
@@ -99,10 +111,13 @@ If you've cloned the repo and want to use a local build instead of the npm packa
 
 ```bash
 bun install
+bun run --filter '@dryui/cli' build
 bun run --filter '@dryui/mcp' build
 ```
 
-Then replace `"command": "npx", "args": ["-y", "@dryui/mcp"]` with `"command": "node", "args": ["packages/mcp/dist/index.js"]`.
+Run the CLI locally with `node packages/cli/dist/index.js <command>`.
+
+For MCP clients, replace `"command": "npx", "args": ["-y", "@dryui/mcp"]` with `"command": "node", "args": ["packages/mcp/dist/index.js"]`.
 
 ## Development
 
@@ -115,11 +130,14 @@ bun install
 ### Scripts
 
 ```bash
-# Build all packages
+# Build packages + docs production output
 bun run build
 
 # Run the docs site
-cd apps/docs && bun dev
+bun run docs
+
+# Build docs deps + docs site (same path CI deploy uses)
+bun run build:docs
 
 # Type-check everything
 bun run check
@@ -132,6 +150,9 @@ bun run check:lint
 
 # Full validation (check + test + build)
 bun run validate
+
+# Release validation gate (validate without browser tests)
+bun run release:gate
 
 # Generate component screenshots to tmp/ (requires Playwright)
 bun run screenshots:components
@@ -164,8 +185,7 @@ tests/
 The MCP package can generate an `llms.txt` file containing the full component spec in a format optimised for AI context:
 
 ```bash
-cd packages/mcp
-bun src/generate-llms-txt.ts
+bun run --filter '@dryui/mcp' generate-llms
 ```
 
 ## Design Principles

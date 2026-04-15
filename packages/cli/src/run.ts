@@ -15,6 +15,20 @@ export function homeRelative(p: string): string {
 	return p;
 }
 
+export function hasFlag(args: readonly string[], name: string): boolean {
+	return args.includes(name);
+}
+
+export function getFlag(args: readonly string[], name: string): string | undefined {
+	const index = args.indexOf(name);
+	if (index === -1) return undefined;
+	return args[index + 1];
+}
+
+export function isInteractiveTTY(): boolean {
+	return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
 export interface CommandResult {
 	output: string;
 	error: string | null;

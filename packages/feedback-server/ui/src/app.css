@@ -67,3 +67,29 @@ body {
 		display: none;
 	}
 }
+
+.feedback-screenshot-dialog {
+	--dry-dialog-max-width: 96vw;
+	--dry-dialog-max-block-size: min(92dvh, 72rem);
+	--dry-dialog-overflow: hidden;
+	--dry-dialog-body-overflow-y: hidden;
+	--dry-section-footer-justify: end;
+}
+
+.feedback-screenshot-thumb {
+	display: block;
+	max-inline-size: 100%;
+	max-block-size: 14rem;
+	background: var(--dry-color-surface);
+	border-radius: 0;
+	object-fit: contain;
+}
+
+.feedback-screenshot-full {
+	display: block;
+	max-inline-size: min(92vw, 96rem);
+	max-block-size: min(64dvh, 44rem);
+	background: var(--dry-color-surface);
+	border-radius: 0;
+	object-fit: contain;
+}

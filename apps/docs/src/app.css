@@ -28,15 +28,6 @@
 	}
 }
 
-.no-transitions {
-	--dry-duration-instant: 0ms;
-	--dry-duration-fast: 0ms;
-	--dry-duration-normal: 0ms;
-	--dry-duration-slow: 0ms;
-	--dry-duration-xslow: 0ms;
-	--dry-duration-entrance: 0ms;
-}
-
 *,
 *::before,
 *::after {

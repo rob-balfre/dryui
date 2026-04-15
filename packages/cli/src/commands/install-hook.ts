@@ -6,7 +6,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { commandError, homeRelative, printCommandHelp, runCommand } from '../run.js';
+import { commandError, hasFlag, homeRelative, printCommandHelp, runCommand } from '../run.js';
 
 interface ClaudeHookEntry {
 	type: 'command';
@@ -31,10 +31,6 @@ interface ClaudeSettings {
 // Prefers the `dryui ambient` subcommand over the `dryui-ambient` bin so
 // partial installs (only the main bin on PATH) still resolve correctly.
 const AMBIENT_COMMAND = 'dryui ambient';
-
-function hasFlag(args: string[], name: string): boolean {
-	return args.includes(name);
-}
 
 function resolveSettingsPath(args: string[]): { path: string; scope: 'project' | 'global' } {
 	if (hasFlag(args, '--global')) {

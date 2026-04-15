@@ -46,7 +46,6 @@ async function parallel(...tasks: Promise<TaskResult>[]): Promise<TaskResult[]> 
 
 // Package directories
 const pkg = (name: string) => `${root}packages/${name}`;
-const app = (name: string) => `${root}apps/${name}`;
 
 // ── Phase 1: Independent checks + first builds (parallel) ───────────────────
 // lint & primitives have no deps; quick checks have no deps
@@ -67,26 +66,15 @@ console.log('\n── Phase 2: build ui ──');
 await run('build:ui', 'bun run build', pkg('ui'));
 
 // ── Phase 3: Builds + checks that only need ui (parallel) ──────────────────
-// MCP and theme-wizard depend on ui but not each other.
+// MCP, feedback, and theme-wizard depend on ui but not each other.
 // svelte-check on primitives + ui can also run here.
 
-console.log('\n── Phase 3: build mcp/theme-wizard + check packages ──');
+console.log('\n── Phase 3: build mcp/feedback/theme-wizard + check packages ──');
 
 const phase3Tasks: Promise<TaskResult>[] = [
-	run(
-		'build:mcp',
-		[
-			'bun src/generate-spec.ts',
-			'(bun src/generate-architecture.ts & bun src/generate-contract.ts & bun src/generate-llms-txt.ts & wait)',
-			'mkdir -p dist',
-			'cp src/spec.json src/architecture.json src/contract.v1.json src/contract.v1.schema.json dist/',
-			'bun build src/index.ts src/architecture.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts --outdir dist --root src --target node',
-			"printf '#!/usr/bin/env node\\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js",
-			'bunx tsc -p tsconfig.build.json'
-		].join(' && '),
-		pkg('mcp')
-	),
-	run('build:theme-wizard', 'bun run build', `${root}packages/theme-wizard`),
+	run('build:mcp', 'bun run build', pkg('mcp')),
+	run('build:feedback', 'bun run build', pkg('feedback')),
+	run('build:theme-wizard', 'bun run build', pkg('theme-wizard')),
 	run('check:primitives', 'bun run check', pkg('primitives')),
 	run('check:ui', 'bun run check', pkg('ui'))
 ];
@@ -98,26 +86,18 @@ if (!skipTests) {
 await parallel(...phase3Tasks);
 
 // ── Phase 4: Docs build + remaining checks (parallel) ─────────────────────
-// check:docs needs .svelte-kit/ types from the vite build, so it runs after.
-// All other checks only need built packages and can run alongside the build.
+// docs:check needs .svelte-kit/ types from the docs build, so it runs after.
+// All other checks only need the package builds from earlier phases.
 
 console.log('\n── Phase 4: docs build + remaining checks ──');
 await parallel(
-	// build:docs then check:docs sequentially (check needs .svelte-kit/ types)
-	run('build:docs', 'bunx --bun vite build', app('docs')).then(() =>
-		run('check:docs', 'bun run check', app('docs'))
-	),
-	run('build:cli', 'bun build src/index.ts --outdir dist --target node', pkg('cli')),
-	run('check:mcp', 'bunx tsc -p packages/mcp/tsconfig.json --noEmit'),
-	run('check:cli', 'bunx tsc -p packages/cli/tsconfig.json --noEmit'),
-	run(
-		'check:contract',
-		'git diff --exit-code -- packages/mcp/src/spec.json packages/mcp/src/contract.v1.json packages/mcp/src/contract.v1.schema.json'
-	),
-	run(
-		'check:docs:llms',
-		'git diff --exit-code -- apps/docs/static/llms.txt apps/docs/static/llms-components.txt'
-	)
+	// docs:build then docs:check sequentially (check needs .svelte-kit/ types)
+	run('build:docs', 'bun run docs:build').then(() => run('check:docs', 'bun run docs:check')),
+	run('build:cli', 'bun run build', pkg('cli')),
+	run('check:mcp', 'bun run check:mcp'),
+	run('check:cli', 'bun run check:cli:types'),
+	run('check:contract', 'bun run check:contract'),
+	run('check:docs:llms', 'bun run check:docs:llms')
 );
 
 // ── Summary ─────────────────────────────────────────────────────────────────

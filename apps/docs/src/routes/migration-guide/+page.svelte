@@ -52,7 +52,7 @@
 	<div class="page-stack">
 		<DocsPageHeader
 			title="Migration Guide"
-			description="Use DryUI as a presentation and accessibility system, not a workflow engine. Standardize on raw CSS grid, use Container for width, and keep lookup tools in the loop."
+			description="Use DryUI as a presentation and accessibility system, not a workflow engine. Standardize on raw CSS grid, use Container for width, and keep the CLI lookup and validation loop in the process."
 		/>
 
 		<div class="stack-lg">
@@ -96,8 +96,9 @@
 						<div class="stack-sm">
 							<Heading level={4}>Lookup-first workflow</Heading>
 							<Text size="sm" color="secondary">
-								Call <code>ask</code> before writing components, then run <code>check</code> after implementation.
-								The goal is to remove guessing, not to memorize the surface.
+								Start with <code>dryui info</code> or <code>dryui compose</code>, then run
+								<code>dryui review</code> or <code>dryui doctor</code> after implementation. If your
+								editor exposes DryUI MCP, <code>ask</code> and <code>check</code> mirror the same loop.
 							</Text>
 						</div>
 					</Card.Content>
@@ -120,8 +121,9 @@
 						<div class="stack-sm">
 							<Text weight="medium">1. Lookup</Text>
 							<Text size="sm" color="secondary">
-								Use <Link href={withBase('/tools')}>ask</Link> with the right scope to confirm simple
-								vs compound shape, required parts, bindables, and the canonical usage snippet.
+								Use <Link href={withBase('/tools')}>dryui info</Link> or <code>dryui compose</code>
+								to confirm simple vs compound shape, required parts, bindables, and the canonical usage
+								snippet. If MCP is available, <code>ask</code> is the equivalent surface.
 							</Text>
 						</div>
 					</Card.Content>
@@ -144,8 +146,10 @@
 						<div class="stack-sm">
 							<Text weight="medium">3. Validate</Text>
 							<Text size="sm" color="secondary">
-								Run <code>check</code> on the component or workspace so layout drift, compound misuse,
-								and accessibility regressions get caught before they spread.
+								Run <code>dryui review</code> on components, <code>dryui diagnose</code> on theme
+								CSS, or <code>dryui doctor</code> across the workspace so layout drift, compound
+								misuse, and accessibility regressions get caught before they spread.
+								<code>check</code> is the MCP equivalent.
 							</Text>
 						</div>
 					</Card.Content>

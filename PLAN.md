@@ -130,7 +130,7 @@ Ground-truth cleanup before any refactor starts. This is the other agent's top s
 Files:
 
 - Modify `packages/mcp/src/ai-surface.ts`: delete phantom `get` tool entry (line 15), add missing `tokens` tool entry, reconcile prompts list with actual registrations. This is still the _old_ surface — we're just making the manifest true.
-- Run `bun run --filter '@dryui/mcp' build` → regenerates `spec.json`, `contract.v1.json`, `contract.v1.schema.json`, `llms.txt`, `llms-components.txt`, `architecture.json`.
+- Run `bun run --filter '@dryui/mcp' build` → regenerates `spec.json`, `contract.v1.json`, `contract.v1.schema.json`, `llms.txt`, `llms-components.txt`.
 - Verify generated artifacts now match runtime.
 - Grep for surviving references to `get` as an MCP tool (not CLI) across docs and skill files. Delete any that advertise it.
 
@@ -184,7 +184,6 @@ Files:
   - `contract.v1.schema.json`
   - `llms.txt`
   - `llms-components.txt`
-  - `architecture.json`
 - Run `check:contract` to confirm the contract regenerates cleanly.
 
 ### Phase 4 — Docs, skills, prompts, session-start

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Feedback } from '@dryui/feedback';
-	import { onMount } from 'svelte';
+	import { dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
@@ -19,14 +19,11 @@
 	let { children: routeChildren } = $props();
 	let mobileNavOpen = $state(false);
 	let lastAppliedRecipe: string | null = null;
+	let feedbackEnabled = $state(false);
 
-	onMount(() => {
-		requestAnimationFrame(() => {
-			requestAnimationFrame(() => {
-				document.documentElement.classList.remove('no-transitions');
-			});
-		});
-	});
+	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
+	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
+	const FEEDBACK_SESSION_KEY = 'dryui-feedback-enabled';
 
 	function isThemeWizardPath(pathname: string): boolean {
 		return pathname.startsWith('/theme-wizard') || pathname.startsWith(withBase('/theme-wizard'));
@@ -68,6 +65,15 @@
 	useThemeOverride(() => (isThemeWizardRoute ? activeThemeWizardTokens : {}));
 
 	afterNavigate(() => {
+		if (dev && typeof window !== 'undefined') {
+			if (page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1') {
+				window.sessionStorage.setItem(FEEDBACK_SESSION_KEY, '1');
+				feedbackEnabled = true;
+			} else {
+				feedbackEnabled = window.sessionStorage.getItem(FEEDBACK_SESSION_KEY) === '1';
+			}
+		}
+
 		if (!isThemeWizardPath(page.url.pathname)) {
 			lastAppliedRecipe = null;
 			return;
@@ -159,8 +165,8 @@
 	{@render docsShell()}
 {/if}
 
-{#if import.meta.env.DEV}
-	<Feedback serverUrl="http://127.0.0.1:4748" scrollRoot="main.docs-content" />
+{#if dev && feedbackEnabled}
+	<Feedback serverUrl={DEFAULT_FEEDBACK_SERVER_URL} scrollRoot="main.docs-content" />
 {/if}
 
 <style>

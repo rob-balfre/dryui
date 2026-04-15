@@ -25,7 +25,9 @@ describe('launcher helpers', () => {
 	test('builds the dashboard url with the dev target encoded as a query param', () => {
 		const dashboardUrl = buildDashboardUrl('http://127.0.0.1:4748', 'http://127.0.0.1:5173', 42);
 
-		expect(dashboardUrl).toBe('http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173');
+		expect(dashboardUrl).toBe(
+			'http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
+		);
 	});
 
 	test('only treats 2xx probe responses as healthy', () => {
@@ -74,7 +76,7 @@ describe('runLauncher', () => {
 		expect(result.logs[0]).toContain('DryUI feedback dashboard');
 		expect(result.logs[0]).toContain(`Workspace: ${root}`);
 		expect(result.logs[0]).toContain(
-			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173'
+			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
 		);
 		expect(result.logs[0]).toContain('Docs: already running');
 		expect(result.logs[0]).toContain('Feedback: already running');

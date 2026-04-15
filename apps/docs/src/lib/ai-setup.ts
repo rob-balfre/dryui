@@ -32,12 +32,20 @@ export interface AiAgentSetup {
 	followUp: string;
 }
 
+const CLI_INSTALL_CODE = `bun install -g @dryui/cli@latest
+dryui
+
+# npm alternative
+npm install -g @dryui/cli@latest
+dryui`;
+
 const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	ask: 'orange',
 	check: 'blue'
 };
 
 const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
+	setup: 'green',
 	init: 'blue',
 	detect: 'blue',
 	install: 'green',
@@ -53,6 +61,7 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 };
 
 const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
+	setup: 'dryui setup',
 	init: 'dryui init',
 	detect: 'dryui detect .',
 	install: 'dryui install .',
@@ -124,15 +133,20 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Install the DryUI plugin to get the skill (conventions) and MCP server (live tools) in one step.',
+			'Start with the DryUI CLI, then add the DryUI plugin so Claude can use the same discovery and validation loop in-editor.',
 		quickSetup: {
-			title: 'Install the plugin (skill + MCP server)',
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
+		skill: {
+			title: '2. Install the plugin',
+			note: 'The plugin bundles the DryUI skill and MCP server for Claude.',
 			code: `claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui`
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: 'Or set up manually: add the MCP server and copy the skill.',
+			note: '3. Manual alternative: add the MCP server and copy the skill yourself.',
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
 
@@ -143,98 +157,116 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			language: 'bash'
 		},
 		followUp:
-			'The skill teaches conventions, the MCP server provides live API lookup and code validation. The plugin installs both.'
+			'Use the CLI as the default surface. The plugin adds conventions plus ask/check inside Claude.'
 	},
 	{
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Install the DryUI skill from GitHub. It includes an MCP server dependency that Codex wires automatically.',
+			'Start with the DryUI CLI, then install the DryUI skill and MCP server so Codex can look up and validate DryUI without leaving the editor.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
 		skill: {
-			title: '1. Install the skill',
+			title: '2. Install the skill',
 			note: 'The $skill-installer downloads the skill and its MCP dependency declaration.',
 			code: '$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui'
 		},
-		quickSetup: {
-			title: '2. Add the MCP server',
-			code: 'codex mcp add dryui -- npx -y @dryui/mcp'
-		},
 		mcp: {
 			path: '.codex/config.toml',
-			note: 'Or add the MCP config manually to .codex/config.toml.',
+			note: '3. Add the MCP server with `codex mcp add dryui -- npx -y @dryui/mcp`, or place the following in `.codex/config.toml`.',
 			code: codexConfig,
 			language: 'toml'
 		},
 		followUp:
-			'Restart Codex after installation. The skill teaches conventions, the MCP server provides the collapsed ask/check surface.'
+			'Use the CLI as the default surface. Restart Codex after wiring the skill and MCP server so it can expose ask/check.'
 	},
 	{
 		id: 'copilot',
 		label: 'VS Code / Copilot',
 		description:
-			'Copilot supports Agent Skills. Copy the DryUI skill to your project and add the MCP server.',
+			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for Copilot Agent mode.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
 		skill: {
-			title: '1. Install the skill',
+			title: '2. Install the skill',
 			note: 'Copy the DryUI skill to .github/skills/ (Copilot standard) or .agents/skills/ (cross-tool).',
 			code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui`
 		},
 		mcp: {
 			path: '.vscode/mcp.json',
-			note: '2. Add the MCP server to .vscode/mcp.json. Note: root key is "servers", not "mcpServers".',
+			note: '3. Add the MCP server to `.vscode/mcp.json`. Note: root key is `"servers"`, not `"mcpServers"`.',
 			code: copilotConfig,
 			language: 'json'
 		},
 		followUp:
-			'MCP tools only work in Copilot Agent mode. The skill loads automatically when relevant.'
+			'Use the CLI as the default surface. MCP tools only work in Copilot Agent mode, and the skill loads automatically when relevant.'
 	},
 	{
 		id: 'cursor',
 		label: 'Cursor',
 		description:
-			'Cursor supports Agent Skills. Copy the DryUI skill to your project and add the MCP server.',
+			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for in-editor lookup and validation.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
 		skill: {
-			title: '1. Install the skill',
+			title: '2. Install the skill',
 			note: 'Copy the DryUI skill to .cursor/skills/ or .agents/skills/.',
 			code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui`
 		},
 		mcp: {
 			path: '.cursor/mcp.json',
-			note: '2. Add the MCP server to .cursor/mcp.json.',
+			note: '3. Add the MCP server to `.cursor/mcp.json`.',
 			code: mcpServersConfig,
 			language: 'json'
 		},
-		followUp: 'The skill loads automatically when Cursor determines DryUI is relevant to the task.'
+		followUp:
+			'Use the CLI as the default surface. The skill loads automatically when Cursor determines DryUI is relevant to the task.'
 	},
 	{
 		id: 'windsurf',
 		label: 'Windsurf',
 		description:
-			'Windsurf supports Agent Skills. Copy the DryUI skill to your project and add the MCP server.',
+			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for in-editor lookup and validation.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
 		skill: {
-			title: '1. Install the skill',
+			title: '2. Install the skill',
 			note: 'Copy the DryUI skill to .agents/skills/.',
 			code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui`
 		},
 		mcp: {
 			path: '~/.codeium/windsurf/mcp_config.json',
-			note: '2. Add the MCP server to ~/.codeium/windsurf/mcp_config.json.',
+			note: '3. Add the MCP server to `~/.codeium/windsurf/mcp_config.json`.',
 			code: mcpServersConfig,
 			language: 'json'
 		},
-		followUp: 'Windsurf has a 100-tool limit across all MCP servers. DryUI now uses 2 tools.'
+		followUp:
+			'Use the CLI as the default surface. Windsurf has a 100-tool limit across all MCP servers, and DryUI now uses 2 tools.'
 	},
 	{
 		id: 'zed',
 		label: 'Zed',
 		description:
-			'Zed does not yet support Agent Skills. Use AGENTS.md for conventions and add the MCP server for tools.',
+			'Start with the DryUI CLI. Zed does not yet support Agent Skills, so use AGENTS.md for conventions and add the MCP server for tools.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
 		mcp: {
 			path: '~/.config/zed/settings.json',
-			note: 'Add the MCP server to ~/.config/zed/settings.json. AGENTS.md at the repo root provides conventions automatically.',
+			note: '2. Add the MCP server to `~/.config/zed/settings.json`. AGENTS.md at the repo root provides conventions automatically.',
 			code: zedConfig,
 			language: 'json'
 		},
 		followUp:
-			'Zed reads AGENTS.md automatically. Verify MCP in the Agent Panel (Cmd+Shift+A) — green indicator means active.'
+			'Use the CLI as the default surface. Zed reads AGENTS.md automatically. Verify MCP in the Agent Panel (Cmd+Shift+A) — green indicator means active.'
 	}
 ];

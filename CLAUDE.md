@@ -23,13 +23,16 @@ Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 
 ```bash
 bun install                    # Install all workspace deps
-bun run build                  # Build all @dryui/* packages
+bun run build                  # Build packages + docs production output
+bun run docs                   # Run the docs site
+bun run build:docs             # Build docs deps + docs site (deploy path)
 bun run test                   # Run unit + browser tests
 bun run test:unit              # Bun test runner (tests/unit/)
 bun run test:browser           # Vitest + Playwright (tests/browser/)
 bun run check                  # Exports + type-check + contracts + docs:llms + lint violations
 bun run check:lint             # Run CSS lint rule tests
 bun run validate               # parallel pipeline: lint + build + check + test (CI gate, supports --no-test)
+bun run release:gate           # Release validation gate (validate --no-test)
 bun run changeset              # Create a changeset for release
 bun run format                 # Format all files (Prettier)
 bun run format:check           # Check formatting without writing
@@ -92,13 +95,26 @@ Two-tier system: semantic → component.
 - Theme wizard: `apps/docs/src/routes/theme-wizard/` — guided theme builder from a single brand color
 - Docs app note: the docs theme switcher defaults to system and persists explicit user picks in `localStorage` under `dryui-docs-theme`
 
+## CLI
+
+The CLI is the entry point for working with DryUI in this repo. Install it first, then use MCP only when you want the same discovery and validation loop inside an editor.
+
+```bash
+bun install -g @dryui/cli@latest
+dryui
+dryui info Button
+dryui review src/routes/+page.svelte
+```
+
+No global install? Use `bunx @dryui/cli <cmd>` or `npx -y @dryui/cli <cmd>`.
+
 ## MCP Server
 
 Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
 ### Quick setup
 
-Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. All MCP entries use `npx -y @dryui/mcp` as the stdio command.
+Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. All MCP entries use `npx -y @dryui/mcp` as the stdio command. Add this layer after the CLI is already working.
 
 For Claude Code (this repo), the canonical install is:
 
@@ -116,9 +132,9 @@ Two MCP servers are configured:
 
 DryUI MCP tools:
 
+- CLI: `dryui setup` / `init` / `detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint` (install once via `bun install -g @dryui/cli@latest`; `bunx @dryui/cli <cmd>` / `npx -y @dryui/cli <cmd>` work as no-install fallbacks)
 - discovery (`ask`)
 - validation (`check`)
-- CLI: `dryui detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint` (install once via `bun install -g @dryui/cli`; `bunx @dryui/cli <cmd>` / `npx -y @dryui/cli <cmd>` work as no-install fallbacks)
 - Skill: `packages/ui/skills/dryui/SKILL.md`
 - Plugin: `packages/plugin/` (Claude Code plugin + Codex local plugin bundling `dryui`, `init`, `live-feedback`, and MCP)
 
@@ -161,8 +177,7 @@ Canonical release, publish, and npm-auth guidance lives in [`RELEASING.md`](./RE
 Docs site deploys to Cloudflare Pages (`dryui-docs` project).
 
 ```bash
-bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build  # build deps first
-cd apps/docs && bun run build                                                      # build docs
+bun run build:docs                                                                # build docs deps + docs site
 bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs        # deploy
 ```
 

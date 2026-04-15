@@ -1,6 +1,9 @@
 import adapter from '@sveltejs/adapter-cloudflare';
 import { dryuiLint } from '@dryui/lint';
 
+const useSingleBundle = process.env.NODE_ENV !== 'production';
+const isDevCommand = process.env.npm_lifecycle_event === 'dev' || process.argv.includes('dev');
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
 	preprocess: [
@@ -14,8 +17,11 @@ const config = {
 		experimental: {
 			remoteFunctions: true
 		},
+		output: {
+			bundleStrategy: useSingleBundle ? 'single' : 'split'
+		},
 		prerender: {
-			entries: ['*']
+			entries: isDevCommand ? [] : ['*']
 		}
 	},
 	compilerOptions: {

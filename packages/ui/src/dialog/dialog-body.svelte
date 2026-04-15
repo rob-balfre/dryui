@@ -17,7 +17,7 @@
 	[data-dialog-body] {
 		--dry-section-padding: var(--dry-dialog-padding);
 		padding: var(--dry-section-padding);
-		overflow-y: auto;
+		overflow-y: var(--dry-dialog-body-overflow-y, auto);
 		min-height: 0;
 	}
 </style>

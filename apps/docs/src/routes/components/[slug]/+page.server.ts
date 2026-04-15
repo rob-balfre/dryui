@@ -1,12 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { ArchitectureFocusData } from '../../../lib/architecture';
 import { fromSlug } from '../../../lib/nav';
 import type { CatalogKind } from '../../../lib/nav';
-import {
-	getArchitectureFocus,
-	loadArchitectureGraph
-} from '../../../lib/server/architecture-graph';
 import spec from '../../../../../../packages/mcp/src/spec.json';
 
 interface PropDef {
@@ -112,7 +107,6 @@ interface ComponentPageData {
 	rootImport: string;
 	subpathImport: string | null;
 	quickStartCode: string;
-	architectureFocus: ArchitectureFocusData | null;
 }
 
 function isSpecShape(value: unknown): value is SpecShape {
@@ -197,8 +191,6 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 
 	const hasRootPart = Boolean(component.parts?.Root);
-	const architectureGraph = await loadArchitectureGraph();
-
 	const data: ComponentPageData = {
 		name: entry.name,
 		kind: entry.kind,
@@ -223,8 +215,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			component.import === '@dryui/ui'
 				? `import { ${entry.name} } from '${component.import}/${componentDir(entry.name)}'`
 				: null,
-		quickStartCode: buildQuickStartCode(entry.name, component, hasRootPart),
-		architectureFocus: getArchitectureFocus(architectureGraph, entry.name)
+		quickStartCode: buildQuickStartCode(entry.name, component, hasRootPart)
 	};
 
 	return data;
