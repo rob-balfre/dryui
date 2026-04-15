@@ -201,12 +201,12 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### MCP tools (preferred)
 
-| Workflow             | Tools                                        |
-| -------------------- | -------------------------------------------- |
-| Project setup        | `ask --scope setup ""`                        |
+| Workflow             | Tools                                                             |
+| -------------------- | ----------------------------------------------------------------- |
+| Project setup        | `ask --scope setup ""`                                            |
 | Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
-| Validation           | `check <file.svelte>`, `check <theme.css>`    |
-| Audit                | `check`, `check <directory>`                  |
+| Validation           | `check <file.svelte>`, `check <theme.css>`                        |
+| Audit                | `check`, `check <directory>`                                      |
 
 ### CLI fallback
 

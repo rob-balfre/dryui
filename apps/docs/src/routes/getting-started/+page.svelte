@@ -194,8 +194,8 @@
 			<div class="stack-lg">
 				<Heading level={2}>AI setup</Heading>
 				<Text size="lg" color="secondary">
-					Add the MCP server so your editor can discover components and recipes with <code>ask</code>,
-					then validate with <code>check</code>.
+					Add the MCP server so your editor can discover components and recipes with <code>ask</code
+					>, then validate with <code>check</code>.
 				</Text>
 
 				<Text size="sm" color="muted">Add to <code>.mcp.json</code> in your project root:</Text>
@@ -274,7 +274,7 @@
 								</div>
 								<Text size="sm" color="secondary"
 									>AI tooling for DryUI discovery with <code>ask</code> and validation with
-										<code>check</code>.</Text
+									<code>check</code>.</Text
 								>
 							</div>
 						</Card.Content>
