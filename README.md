@@ -14,13 +14,22 @@ Zero-dependency Svelte 5 components. Headless primitives. Styled defaults. AI-re
 
 ## Quick Start
 
-### Install
+### Start with the CLI
+
+```bash
+bun install -g @dryui/cli@latest
+dryui
+```
+
+No global install? Prefix commands with `bunx @dryui/cli` or `npx -y @dryui/cli`.
+
+### Install the UI package
 
 ```bash
 npm install @dryui/ui
 ```
 
-### Use
+### Use the UI package
 
 ```svelte
 <script>
