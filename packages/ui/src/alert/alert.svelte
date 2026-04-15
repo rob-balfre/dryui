@@ -5,7 +5,7 @@
 
 	export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
 		variant?: AlertVariant;
 		dismissible?: boolean;
 		onDismiss?: () => void;

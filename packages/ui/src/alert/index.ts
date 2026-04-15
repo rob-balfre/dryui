@@ -4,7 +4,7 @@ import Alert from './alert.svelte';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
-export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'> {
 	variant?: AlertVariant;
 	dismissible?: boolean;
 	onDismiss?: () => void;

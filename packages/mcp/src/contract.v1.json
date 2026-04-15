@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "1.1.1"
+    "version": "1.1.2"
   },
   "counts": {
     "components": 159,
@@ -8577,13 +8577,17 @@
         }
       },
       "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'>",
         "via": "rest",
         "element": "div",
         "examples": [
           "id",
           "style",
           "role"
+        ],
+        "omitted": [
+          "children",
+          "title"
         ],
         "note": "Forwards <div> attributes via rest props."
       },

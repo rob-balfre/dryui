@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "package": "@dryui/ui",
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -8493,13 +8493,17 @@
         }
       },
       "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'title'>",
         "via": "rest",
         "element": "div",
         "examples": [
           "id",
           "style",
           "role"
+        ],
+        "omitted": [
+          "children",
+          "title"
         ],
         "note": "Forwards <div> attributes via rest props."
       },
