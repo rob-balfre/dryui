@@ -121,6 +121,193 @@ describe('detectProject', () => {
 		expect(result.files.appCss).toBe(resolve(workspaceRoot, 'apps/docs/src/app.css'));
 	});
 
+	test('auto-selects a unique nested SvelteKit project from a non-Svelte parent directory', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'package-lock.json': '',
+			'hammerfall-dryui/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'hammerfall-dryui/bun.lock': '',
+			'hammerfall-dryui/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'hammerfall-dryui/src/app.html': '<html class="theme-auto"></html>',
+			'hammerfall-dryui/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, workspaceRoot);
+
+		expect(result.status).toBe('ready');
+		expect(result.framework).toBe('sveltekit');
+		expect(result.root).toBe(resolve(workspaceRoot, 'hammerfall-dryui'));
+		expect(result.packageManager).toBe('bun');
+		expect(result.warnings).toContain(
+			`Auto-selected nested sveltekit project at ${resolve(workspaceRoot, 'hammerfall-dryui')} because the provided path is not a Svelte/SvelteKit project.`
+		);
+	});
+
+	test('keeps explicit package.json detection anchored to the provided package file', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'package-lock.json': '',
+			'hammerfall-dryui/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			})
+		});
+
+		const result = detectProject(mockSpec, resolve(workspaceRoot, 'package.json'));
+
+		expect(result.status).toBe('unsupported');
+		expect(result.framework).toBe('unknown');
+		expect(result.root).toBe(workspaceRoot);
+		expect(result.warnings).not.toContain(
+			`Auto-selected nested sveltekit project at ${resolve(workspaceRoot, 'hammerfall-dryui')} because the provided path is not a Svelte/SvelteKit project.`
+		);
+	});
+
+	test('warns instead of guessing when multiple nested Svelte projects are present', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'apps/docs/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			}),
+			'apps/admin/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			})
+		});
+
+		const result = detectProject(mockSpec, workspaceRoot);
+
+		expect(result.status).toBe('unsupported');
+		expect(result.framework).toBe('unknown');
+		expect(result.root).toBe(workspaceRoot);
+		expect(result.warnings).toContain(
+			`Found 2 nested SvelteKit projects below ${workspaceRoot}; rerun against the intended app directory.`
+		);
+	});
+
+	test('scopes descendant auto-discovery to the requested subtree', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'apps/docs/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'apps/docs/bun.lock': '',
+			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n'),
+			'examples/demo/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			})
+		});
+
+		const result = detectProject(mockSpec, resolve(workspaceRoot, 'apps'));
+
+		expect(result.status).toBe('ready');
+		expect(result.framework).toBe('sveltekit');
+		expect(result.root).toBe(resolve(workspaceRoot, 'apps/docs'));
+		expect(result.warnings).toContain(
+			`Auto-selected nested sveltekit project at ${resolve(workspaceRoot, 'apps/docs')} because the provided path is not a Svelte/SvelteKit project.`
+		);
+		expect(result.warnings).not.toContain(
+			`Found 2 nested Svelte/SvelteKit projects below ${workspaceRoot}; rerun against the intended app directory.`
+		);
+	});
+
+	test('prefers a nested SvelteKit app over plain Svelte packages', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'apps/web/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'apps/web/bun.lock': '',
+			'apps/web/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/web/src/app.html': '<html class="theme-auto"></html>',
+			'apps/web/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n'),
+			'packages/ui/package.json': JSON.stringify({
+				dependencies: {
+					svelte: '^5.0.0'
+				}
+			})
+		});
+
+		const result = detectProject(mockSpec, workspaceRoot);
+
+		expect(result.status).toBe('ready');
+		expect(result.framework).toBe('sveltekit');
+		expect(result.root).toBe(resolve(workspaceRoot, 'apps/web'));
+		expect(result.warnings).toContain(
+			`Auto-selected nested sveltekit project at ${resolve(workspaceRoot, 'apps/web')} because the provided path is not a Svelte/SvelteKit project.`
+		);
+	});
+
 	test('flags missing lint preprocessor as partial', () => {
 		const root = createProject({
 			'package.json': JSON.stringify({

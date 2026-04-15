@@ -72,6 +72,86 @@ describe('getDetect', () => {
 			theme: { themeAuto: true }
 		});
 	});
+
+	test('formats nested project auto-discovery when the parent directory is not Svelte', () => {
+		const root = createTempTree({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'package-lock.json': '',
+			'hammerfall-dryui/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'hammerfall-dryui/bun.lock': '',
+			'hammerfall-dryui/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'hammerfall-dryui/src/app.html': '<html class="theme-auto"></html>',
+			'hammerfall-dryui/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const { output, error, exitCode } = getDetect(root, mockSpec, 'text');
+
+		expect(exitCode).toBe(0);
+		expect(error).toBeNull();
+		expect(output).toContain('Status: ready');
+		expect(output).toContain(`Root: ${resolve(root, 'hammerfall-dryui')}`);
+		expect(output).toContain('Auto-selected nested sveltekit project');
+	});
+
+	test('scopes nested auto-discovery to the requested subtree in text output', () => {
+		const root = createTempTree({
+			'package.json': JSON.stringify({
+				dependencies: {
+					react: '^18.0.0'
+				}
+			}),
+			'apps/docs/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'apps/docs/bun.lock': '',
+			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n'),
+			'examples/demo/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			})
+		});
+
+		const { output, error, exitCode } = getDetect(resolve(root, 'apps'), mockSpec, 'text');
+
+		expect(exitCode).toBe(0);
+		expect(error).toBeNull();
+		expect(output).toContain(`Root: ${resolve(root, 'apps/docs')}`);
+		expect(output).not.toContain('Found 2 nested');
+	});
 });
 
 describe('getInstall', () => {
