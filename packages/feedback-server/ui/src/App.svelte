@@ -8,6 +8,7 @@
 		Card,
 		Container,
 		DescriptionList,
+		Dialog,
 		Field,
 		Heading,
 		Image,
@@ -16,6 +17,7 @@
 		Tabs,
 		Text
 	} from '@dryui/ui';
+	import { normalizeDevUrl } from '../../src/dev-url.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
 
 	interface SubmissionResponse {
@@ -41,7 +43,7 @@
 	function readDevUrl(): string | null {
 		if (typeof window === 'undefined') return null;
 		const value = new URL(window.location.href).searchParams.get('dev');
-		return value?.trim() ? value : null;
+		return normalizeDevUrl(value);
 	}
 
 	const devUrl = readDevUrl();
@@ -581,20 +583,74 @@ Use the dryui-feedback MCP server:
 									</div>
 								</Card.Header>
 								<Card.Content noPadding={true}>
-									<div class="screenshot-image">
-										<Image
-											src={screenshotUrl(selectedSubmission.id)}
-											alt={`Feedback screenshot for ${selectedSubmission.url}`}
-											fallback="Screenshot unavailable"
-										/>
-									</div>
+									<Dialog.Root>
+										<Dialog.Trigger>
+											<Button
+												variant="bare"
+												aria-label={`Open full screenshot for ${selectedSubmission.url}`}
+											>
+												<div class="screenshot-thumbnail">
+													<Image
+														class="feedback-screenshot-thumb"
+														src={screenshotUrl(selectedSubmission.id)}
+														alt={`Feedback screenshot for ${selectedSubmission.url}`}
+														fallback="Screenshot unavailable"
+													/>
+												</div>
+											</Button>
+										</Dialog.Trigger>
+
+										<Dialog.Content class="feedback-screenshot-dialog">
+											<Dialog.Header>
+												<div class="screenshot-dialog-header">
+													<div class="screenshot-dialog-heading">
+														<Heading level={3}>Captured screenshot</Heading>
+														<Text as="span" size="sm" color="secondary">
+															{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+																selectedSubmission.viewport
+															)}
+														</Text>
+													</div>
+													<Dialog.Close aria-label="Close screenshot dialog">
+														<span aria-hidden="true">&times;</span>
+													</Dialog.Close>
+												</div>
+											</Dialog.Header>
+											<Dialog.Body class="screenshot-dialog-body">
+												<div class="screenshot-dialog-image">
+													<Image
+														class="feedback-screenshot-full"
+														src={screenshotUrl(selectedSubmission.id)}
+														alt={`Feedback screenshot for ${selectedSubmission.url}`}
+														fallback="Screenshot unavailable"
+													/>
+												</div>
+											</Dialog.Body>
+											<Dialog.Footer>
+												<Dialog.Close>Close</Dialog.Close>
+												<Button
+													href={selectedSubmission.url}
+													target="_blank"
+													rel="noreferrer"
+													variant="ghost"
+												>
+													Open page
+												</Button>
+											</Dialog.Footer>
+										</Dialog.Content>
+									</Dialog.Root>
 								</Card.Content>
 								<Card.Footer>
-									<Text as="span" size="sm" color="secondary">
-										{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-											selectedSubmission.viewport
-										)}
-									</Text>
+									<div class="screenshot-meta">
+										<Text as="span" size="sm" color="secondary">
+											Click the thumbnail to open the full capture
+										</Text>
+										<Text as="span" size="sm" color="secondary">
+											{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+												selectedSubmission.viewport
+											)}
+										</Text>
+									</div>
 								</Card.Footer>
 							</Card.Root>
 
@@ -867,19 +923,41 @@ Use the dryui-feedback MCP server:
 		gap: var(--dry-space-4);
 	}
 
-	.screenshot-image {
-		--dry-image-bg: var(--dry-color-surface);
-		--dry-image-object-fit: contain;
-		--dry-image-radius: 0;
-		--dry-image-block-size: 100%;
-		--dry-image-place-self: stretch;
-
+	.screenshot-thumbnail {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: minmax(0, 1fr);
-		aspect-ratio: 16 / 10;
+		grid-template-rows: 14rem;
+		place-items: center;
+		padding: var(--dry-space-3);
 		overflow: hidden;
 		background: var(--dry-color-surface);
+	}
+
+	.screenshot-meta {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.screenshot-dialog-heading {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.screenshot-dialog-header {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--dry-space-3);
+		align-items: start;
+	}
+
+	.screenshot-dialog-image {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(0, min(64dvh, 44rem));
+		place-items: center;
+		padding: var(--dry-space-2);
+		background: var(--dry-color-surface);
+		overflow: hidden;
 	}
 
 	.detail-grid {

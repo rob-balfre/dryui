@@ -14,7 +14,7 @@ jobs:
     # Pin to 22.04 — ubuntu-24.04 has documented CI performance regressions
     # https://github.com/actions/runner-images/issues/11790
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     permissions:
       contents: write
       pull-requests: write
@@ -32,7 +32,7 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
-      - run: bun run build:packages
+      - run: bun run release:gate
 
       - uses: changesets/action@v1
         with:

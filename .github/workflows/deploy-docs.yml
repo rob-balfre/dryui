@@ -16,7 +16,7 @@ jobs:
     # Pin to 22.04 — ubuntu-24.04 has documented CI performance regressions
     # https://github.com/actions/runner-images/issues/11790
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
+    timeout-minutes: 15
     env:
       PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -30,12 +30,8 @@ jobs:
       - name: Setup DryUI
         uses: ./.github/actions/setup-dryui
 
-      - name: Build packages
-        run: bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/feedback' build
-
       - name: Build docs
-        run: bunx --bun vite build
-        working-directory: apps/docs
+        run: bun run build:docs
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3

@@ -1,12 +1,9 @@
 # Changelog
 
-The docs changelog page is generated from live repo metadata in
-[`apps/docs/src/routes/changelog/+page.server.ts`](apps/docs/src/routes/changelog/+page.server.ts).
+DryUI release notes are tracked through Changesets and published package versions.
 
-It pulls from:
+The source of truth for unreleased notes is:
 
-- `packages/*/package.json` for package versions
-- `packages/mcp/src/spec.json` for current MCP component inventory
 - `.changeset/*.md` for pending unreleased notes
 
-If you want to update what shows up on `/changelog`, add or edit a changeset and keep the package metadata accurate.
+If you want to update upcoming release notes, add or edit a changeset and keep the package metadata accurate.

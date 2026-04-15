@@ -7,7 +7,7 @@ import {
 	FeedbackHttpClient,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
-import { printCommandHelp, runCommand, type CommandResult } from '../run.js';
+import { hasFlag, printCommandHelp, runCommand, type CommandResult } from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
@@ -33,10 +33,6 @@ interface LauncherRuntime {
 interface RunLauncherOptions {
 	cwd?: string;
 	runtime?: Partial<LauncherRuntime>;
-}
-
-function hasFlag(args: string[], name: string): boolean {
-	return args.includes(name);
 }
 
 function launcherHelp(): never {
@@ -84,9 +80,12 @@ export function buildDashboardUrl(
 	docsBaseUrl: string,
 	version = Date.now()
 ): string {
+	const devTarget = new URL(docsBaseUrl);
+	devTarget.searchParams.set('dryui-feedback', '1');
+
 	const dashboardUrl = new URL('/ui/', feedbackBaseUrl);
 	dashboardUrl.searchParams.set('v', String(version));
-	dashboardUrl.searchParams.set('dev', docsBaseUrl);
+	dashboardUrl.searchParams.set('dev', devTarget.toString());
 	return dashboardUrl.toString();
 }
 

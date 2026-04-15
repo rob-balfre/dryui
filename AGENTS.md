@@ -8,13 +8,22 @@ Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 
 ## Setup
 
-Install the DryUI skill (conventions) and MCP server (live tools) for your AI coding tool.
+Use the DryUI CLI as the entry point for working with the library. Add the skill and MCP server after that when you want the same lookup and validation loop inside your editor.
+
+```bash
+bun install -g @dryui/cli@latest
+dryui
+```
 
 Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every supported client (Claude Code, Codex, Cursor, Windsurf, Copilot, Zed) live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) — the canonical source rendered to the docs [getting-started page](https://dryui.dev/getting-started). Don't duplicate those snippets here; update `ai-setup.ts` instead.
 
 Codex (the primary AGENTS.md audience) canonical install:
 
 ```bash
+# CLI first
+bun install -g @dryui/cli@latest
+dryui
+
 # Public / manual install
 $skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
 codex mcp add dryui -- npx -y @dryui/mcp
@@ -42,3 +51,4 @@ Canonical release and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md
 ## Verification
 
 Always run `bun run --filter '@dryui/ui' build` after editing `.svelte` files in `packages/ui/`. The lint preprocessor runs during build and will reject violations.
+Prefer the root docs wrappers for docs work so local runs match CI: `bun run docs`, `bun run docs:build`, `bun run docs:check`, and `bun run build:docs`.

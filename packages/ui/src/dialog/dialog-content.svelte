@@ -53,9 +53,9 @@
 		background: transparent;
 		color: var(--dry-color-text-strong);
 		padding: 0;
-		margin: 0;
 		display: grid;
 		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));
+		place-content: center;
 		place-items: center;
 		overflow: visible;
 	}
@@ -89,9 +89,9 @@
 		color: var(--dry-color-text-strong);
 		box-shadow: var(--dry-dialog-shadow, var(--dry-overlay-shadow, var(--dry-shadow-overlay)));
 		padding: 0;
-		max-height: 85vh;
+		max-block-size: var(--dry-dialog-max-block-size, 85vh);
 		display: grid;
-		overflow: auto;
+		overflow: var(--dry-dialog-overflow, auto);
 
 		transition:
 			opacity var(--dry-duration-normal) var(--dry-ease-spring-snappy),

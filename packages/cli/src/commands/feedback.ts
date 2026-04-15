@@ -9,7 +9,14 @@ import {
 	parsePort,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
-import { commandError, printCommandHelp, runCommand, type CommandResult } from '../run.js';
+import {
+	commandError,
+	getFlag,
+	hasFlag,
+	printCommandHelp,
+	runCommand,
+	type CommandResult
+} from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
@@ -23,16 +30,6 @@ const REPO_ROOT = resolve(COMMANDS_DIR, '..', '..', '..', '..');
 
 function resolveServerEntry(): string {
 	return resolveFeedbackServerEntry({ workspaceRoot: REPO_ROOT, preferPackaged: true });
-}
-
-function getFlag(args: string[], name: string): string | undefined {
-	const index = args.indexOf(name);
-	if (index === -1) return undefined;
-	return args[index + 1];
-}
-
-function hasFlag(args: string[], name: string): boolean {
-	return args.includes(name);
 }
 
 function feedbackInitHelp(): never {

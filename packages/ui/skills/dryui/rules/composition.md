@@ -398,7 +398,7 @@ Use Field.Error to show validation messages.
 
 ## Component Selection Quick Reference
 
-Before using any component, call `ask --scope recipe` or `ask --scope component` to get the correct component and usage snippet. This table is a quick reference — `ask` has the full snippets and anti-patterns.
+Before using any component, call `dryui compose "<query>"` or `dryui info <Component>` to get the correct component and usage snippet. If MCP is available, `ask --scope recipe` and `ask --scope component` are equivalent. This table is a quick reference — the CLI and MCP surfaces both return the fuller snippets and anti-patterns.
 
 | UI Need           | Use This                               | NOT This                     |
 | ----------------- | -------------------------------------- | ---------------------------- |
@@ -431,7 +431,7 @@ Before using any component, call `ask --scope recipe` or `ask --scope component`
 
 ## Composition Recipes
 
-Call `ask --scope recipe` with any recipe name to get a full working snippet.
+Call `dryui compose "<recipe>"` with any recipe name to get a full working snippet. If MCP is available, `ask --scope recipe "<recipe>"` is equivalent.
 
 | Recipe                    | Description               | Key Components                         |
 | ------------------------- | ------------------------- | -------------------------------------- |
@@ -457,7 +457,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
 - Normalize route/session state in script before rendering DryUI inputs.
 - Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
 - Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
-- Run `ask` before introducing a new field shape, then run `check` after the flow is wired.
+- Run `dryui info <Component>` or `dryui compose "<pattern>"` before introducing a new field shape, then run `dryui review` or `dryui doctor` after the flow is wired. If MCP is available, `ask` / `check` are equivalent.
 
 ```svelte
 <script lang="ts">

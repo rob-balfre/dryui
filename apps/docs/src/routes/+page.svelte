@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, CodeBlock, Container, Diagram, Heading, Text } from '@dryui/ui';
+	import { Button, CodeBlock, Container, Diagram, Heading, Tabs, Text } from '@dryui/ui';
 	import type { DiagramConfig } from '@dryui/ui';
 	import {
 		LayoutGrid,
@@ -15,11 +15,9 @@
 		AppWindow,
 		PenLine
 	} from 'lucide-svelte';
-	import { homeIntroPrompt } from '$lib/home-intro.svelte';
+	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 	import { GITHUB_URL } from '$lib/site-meta';
-
-	const promptCode = homeIntroPrompt;
 
 	// Tuned to replace the old hand-built SVG 1:1 enough that the homepage can
 	// now use <Diagram /> as the source of truth.
@@ -107,14 +105,28 @@
 					<div class="hero-copy">
 						<div class="hero-copy-stack">
 							<Text size="xs" color="secondary" weight="medium">DryUI - Don't Repeat Yourself</Text>
-							<Heading level={1}>SvelteKit meets your favorite AI coding tool</Heading>
+							<Heading level={1}>SvelteKit meets your favourite AI coding tool</Heading>
 							<Text color="secondary">
 								An experiment in closing the gap between AI-generated and hand-crafted Svelte UIs.
 								100% free and open-source.
 							</Text>
 
-							<Text color="secondary">Paste this into your agent of choice.</Text>
-							<CodeBlock code={promptCode} language="text" />
+							<Tabs.Root value="bun">
+								<Tabs.List>
+									<Tabs.Trigger value="bun">bun</Tabs.Trigger>
+									<Tabs.Trigger value="npm">npm</Tabs.Trigger>
+									<Tabs.Trigger value="pnpm">pnpm</Tabs.Trigger>
+								</Tabs.List>
+								<Tabs.Content value="bun">
+									<CodeBlock code={homeIntroPrompts.bun} language="text" />
+								</Tabs.Content>
+								<Tabs.Content value="npm">
+									<CodeBlock code={homeIntroPrompts.npm} language="text" />
+								</Tabs.Content>
+								<Tabs.Content value="pnpm">
+									<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
+								</Tabs.Content>
+							</Tabs.Root>
 
 							<nav aria-label="Homepage links" class="footer-links">
 								<div class="action-grid">
@@ -149,10 +161,12 @@
 					<div class="workflow-copy">
 						<Heading level={2}>How DryUI works</Heading>
 						<Text color="secondary">
-							You prompt your AI agent. It queries the DryUI MCP for the right components. Generated
-							Svelte runs through the lint preprocessor into your app, and feedback loops straight
-							back to the agent. This version is rendered with the same <code>@dryui/ui</code>
-							<code>&lt;Diagram /&gt;</code> component you can ship in your own app.
+							Start with the DryUI CLI. In AI-editor setups, the MCP server mirrors that same
+							discovery and validation loop inside the editor. Generated Svelte runs through the
+							lint preprocessor into your app, and feedback loops straight back to the agent. This
+							version is rendered with the same <code>@dryui/ui</code>
+							<code>&lt;Diagram /&gt;</code>
+							component you can ship in your own app.
 						</Text>
 					</div>
 					<div class="workflow-canvas workflow-canvas--diagram">

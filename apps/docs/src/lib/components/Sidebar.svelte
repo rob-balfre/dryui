@@ -6,7 +6,6 @@
 		ExternalLink,
 		GitCompareArrows,
 		Grid2x2Check,
-		History,
 		House,
 		ToolCase,
 		WandSparkles
@@ -54,7 +53,6 @@
 		{ label: 'Home', href: withBase('/'), icon: House },
 		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
 		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
-		{ label: 'Changelog', href: withBase('/changelog'), icon: History },
 		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
 		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: GitCompareArrows }
 	];

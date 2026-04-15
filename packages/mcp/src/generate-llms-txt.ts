@@ -350,13 +350,15 @@ All components support CSS variable theming. Override at the :root level or comp
 
 ## CLI
 
-Use the CLI for deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation.
+The CLI is the default entry point for working with DryUI. Start with bare \`dryui\` for editor integration and feedback onboarding, then use it for project bootstrapping, deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation.
 
-Install once with \`bun install -g @dryui/cli\` (or \`npm install -g @dryui/cli\`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
+Install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
 
 Current command surface: ${cliCommands.join(', ')}.
 
 \`\`\`
+dryui
+dryui init my-app
 dryui detect <project-path>
 dryui install <project-path>
 dryui add --project --target <file> Card
@@ -373,7 +375,7 @@ No global install? Prefix any command with \`bunx @dryui/cli …\` or \`npx -y @
 
 ## MCP Server & Skill
 
-DryUI ships an MCP server (live tools) and a skill (conventions). All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
+After the CLI is working, DryUI also ships an MCP server (live tools) and a skill (conventions) for supported editors. All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
 
 ### Install
 
@@ -421,8 +423,10 @@ Theme imports:
 const llmsText = buildLlmsText(spec);
 const llmsComponentsText = buildLlmsComponentsText(spec);
 
-await writeFile(llmsOutputPath, llmsText);
-await writeFile(llmsComponentsOutputPath, llmsComponentsText);
+await Promise.all([
+	writeFile(llmsOutputPath, llmsText),
+	writeFile(llmsComponentsOutputPath, llmsComponentsText)
+]);
 
 console.log(`Generated llms.txt at ${llmsOutputPath}`);
 console.log(`Generated llms-components.txt at ${llmsComponentsOutputPath}`);

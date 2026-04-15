@@ -6,7 +6,7 @@ import pkg from '../package.json';
 import spec from '../../mcp/src/spec.json';
 import { detectProject } from '../../mcp/src/project-planner.js';
 import { toonProjectDetection } from '@dryui/mcp/toon';
-import { commandError, homeRelative, runCommand } from './run.js';
+import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
@@ -23,6 +23,7 @@ import { runFeedback } from './commands/feedback.js';
 import { runLauncher } from './commands/launcher.js';
 import { runInstallHook } from './commands/install-hook.js';
 import { emitAmbient } from './commands/ambient.js';
+import { runSetup } from './commands/setup.js';
 
 const VERSION = pkg.version;
 const DESCRIPTION = 'DryUI — zero-dependency Svelte 5 components + agent-ergonomic CLI.';
@@ -43,10 +44,11 @@ function emitNotADryuiProject(): void {
 	console.log(`project: not-a-dryui-project | cwd: ${homeRelative(process.cwd())}`);
 	console.log('deps: ui=false, primitives=false, lint=false');
 	console.log('');
-	console.log('next[3]{cmd,description}:');
+	console.log('next[4]{cmd,description}:');
+	console.log('  dryui setup,Open the interactive editor + feedback setup flow');
 	console.log('  dryui init,Bootstrap a new SvelteKit + DryUI project in this folder');
+	console.log('  dryui install .,Print an install plan for the current folder');
 	console.log('  dryui detect,Re-run detection with --text or --json output');
-	console.log('  dryui --help,Show the full command list');
 }
 
 const USAGE = `Usage: dryui <command> [options]
@@ -55,11 +57,14 @@ Most commands default to TOON (token-optimized) output. Pass --text for
 human-readable plain text, or --json where supported. init, feedback, and
 add (snippet mode) always produce plain text.
 
-Running \`dryui\` with no command prints a compact project dashboard (or
-opens the feedback launcher inside the DryUI monorepo). Use \`dryui --help\`
-to see this message.
+Running \`dryui\` with no command opens the feedback launcher inside the
+DryUI monorepo, prints a compact project dashboard in a DryUI project, or
+starts the interactive setup flow everywhere else. Use \`dryui --help\` to
+see this message.
 
 Commands:
+  setup [--editor <id>] [--open-feedback]
+                                Interactive editor + feedback setup
   init [path] [--pm bun|npm|pnpm|yarn]
                                 Bootstrap a SvelteKit + DryUI project
   detect [--json] [--text] [path]
@@ -112,16 +117,23 @@ async function main(): Promise<void> {
 			return;
 		}
 
-		printBanner();
 		try {
 			const detection = detectProject(spec, undefined);
 			if (detection.status === 'ready' || detection.status === 'partial') {
+				printBanner();
 				console.log(toonProjectDetection(detection));
 				process.exit(0);
 			}
 		} catch {
 			// Detection threw — fall through to the not-a-project status.
 		}
+
+		if (isInteractiveTTY()) {
+			await runSetup([]);
+			return;
+		}
+
+		printBanner();
 		emitNotADryuiProject();
 		process.exit(0);
 	}
@@ -131,6 +143,9 @@ async function main(): Promise<void> {
 	switch (command) {
 		case 'init':
 			runInit(commandArgs, spec);
+			break;
+		case 'setup':
+			await runSetup(commandArgs);
 			break;
 		case 'detect':
 			runDetect(commandArgs, spec);

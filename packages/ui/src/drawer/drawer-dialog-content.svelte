@@ -14,10 +14,15 @@
 	let dialogEl = $state<HTMLDialogElement>();
 
 	$effect(() => {
-		if (ctx.open && dialogEl && !dialogEl.open) {
+		if (!dialogEl) return;
+
+		// Native <dialog> applies a max-width that leaves a strip beside edge drawers.
+		dialogEl.style.setProperty('max-width', 'none');
+
+		if (ctx.open && !dialogEl.open) {
 			dialogEl.showModal();
 		}
-		if (!ctx.open && dialogEl?.open) {
+		if (!ctx.open && dialogEl.open) {
 			dialogEl.close();
 		}
 	});
@@ -55,7 +60,6 @@
 		background: transparent;
 		color: var(--dry-color-text-strong);
 		padding: 0;
-		margin: 0;
 		box-sizing: border-box;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);

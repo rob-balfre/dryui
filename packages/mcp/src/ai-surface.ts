@@ -33,6 +33,10 @@ export const aiSurface: AiSurfaceManifest = {
 		}
 	],
 	cliCommands: [
+		{
+			name: 'setup',
+			description: 'Interactive onboarding for editor integration and feedback tooling'
+		},
 		{ name: 'init', description: 'Print setup snippets for a new DryUI app' },
 		{ name: 'detect', description: 'Detect DryUI project setup' },
 		{ name: 'install', description: 'Print a project install plan' },

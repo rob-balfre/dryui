@@ -8,9 +8,10 @@ Releases are automated via [Changesets](https://github.com/changesets/changesets
 
 1. Run `bun run changeset`
 2. Push to `main`
-3. CI opens or updates the "Version Packages" PR
-4. Merge that PR
-5. CI publishes to npm and creates GitHub Releases
+3. CI runs `bun run release:gate`
+4. CI opens or updates the "Version Packages" PR
+5. Merge that PR
+6. CI publishes to npm and creates GitHub Releases
 
 `@dryui/primitives` and `@dryui/ui` are version-linked and should be treated as a fixed pair.
 
@@ -22,7 +23,7 @@ For a local release, run:
 bun run release
 ```
 
-That runs `validate --no-test`, versions packages, and publishes with Changesets. The `prepack` / `postpack` hooks still handle export swapping for `@dryui/primitives` and `@dryui/ui`.
+That runs `release:gate`, versions packages, and publishes with Changesets. Local release and CI release now use the same validation gate before versioning or publish. The `prepack` / `postpack` hooks handle export swapping for `@dryui/primitives`, `@dryui/ui`, and `@dryui/mcp`.
 
 For one-off package publishing, use:
 

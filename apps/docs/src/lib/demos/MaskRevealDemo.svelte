@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { MaskReveal } from '@dryui/ui';
 
 	const highlights = [
@@ -30,9 +31,15 @@
 			body: 'Good for entrance moments. Bad for tiny text-only wrappers.'
 		}
 	];
+
+	let mounted = $state(false);
+
+	onMount(() => {
+		mounted = true;
+	});
 </script>
 
-<MaskReveal shape="diamond" direction="in" threshold={0.12} duration={900} once={false}>
+{#snippet demoContent()}
 	<section class="mask-demo">
 		<header class="mask-header">
 			<div class="mask-kicker">Mask Reveal</div>
@@ -72,7 +79,15 @@
 			</div>
 		</div>
 	</section>
-</MaskReveal>
+{/snippet}
+
+{#if mounted}
+	<MaskReveal shape="diamond" direction="in" threshold={0.12} duration={900} once={false}>
+		{@render demoContent()}
+	</MaskReveal>
+{:else}
+	{@render demoContent()}
+{/if}
 
 <style>
 	.mask-demo {
