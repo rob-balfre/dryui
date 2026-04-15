@@ -113,14 +113,14 @@
 		return (
 			isSameBrand(wizardState.brandHsb, preset.recipe.brand) &&
 			wizardState.personality === preset.recipe.personality &&
-			wizardState.typography.fontPreset === preset.recipe.typography.fontPreset &&
-			wizardState.typography.scale === preset.recipe.typography.scale &&
-			wizardState.shape.radiusPreset === preset.recipe.shape.radiusPreset &&
-			wizardState.shape.radiusScale === preset.recipe.shape.radiusScale &&
-			wizardState.shape.density === preset.recipe.shape.density &&
-			wizardState.shadows.preset === preset.recipe.shadows.preset &&
-			wizardState.shadows.intensity === preset.recipe.shadows.intensity &&
-			wizardState.shadows.tintBrand === preset.recipe.shadows.tintBrand
+			wizardState.typography.fontPreset === preset.recipe.typography?.fontPreset &&
+			wizardState.typography.scale === preset.recipe.typography?.scale &&
+			wizardState.shape.radiusPreset === preset.recipe.shape?.radiusPreset &&
+			wizardState.shape.radiusScale === preset.recipe.shape?.radiusScale &&
+			wizardState.shape.density === preset.recipe.shape?.density &&
+			wizardState.shadows.preset === preset.recipe.shadows?.preset &&
+			wizardState.shadows.intensity === preset.recipe.shadows?.intensity &&
+			wizardState.shadows.tintBrand === preset.recipe.shadows?.tintBrand
 		);
 	}
 
