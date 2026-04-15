@@ -6,13 +6,13 @@
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server for lookup, source retrieval, composition guidance, project planning, review, and theme diagnosis
-- @dryui/cli: CLI for detect, install, project-aware add, lookup, source retrieval, composition guidance, and validation
+- @dryui/mcp: MCP server with collapsed ask/check tools for discovery, setup guidance, and validation
+- @dryui/cli: CLI for detect, install, add, lookup, composition guidance, validation, and workspace health
 
 ## AI Surface
 
-- MCP tools: info, get, list, compose, review, diagnose, detect_project, plan_install, plan_add
-- CLI commands: init, detect, install, add (project-aware), get, info, list, compose, review, diagnose
+- MCP tools: ask, check
+- CLI commands: init, detect, install, add, info, list, compose, review, diagnose, doctor, lint, tokens
 
 ## Installation
 
@@ -573,12 +573,5 @@ dryui ships an MCP server for AI-agent integration:
 ```
 
 Available MCP tools:
-- info: Inspect component APIs, props, parts, CSS variables, and examples
-- get: Retrieve copyable source for a composed output
-- list: Discover components and source-owned catalog entries
-- compose: Get composition guidance for the right components and patterns
-- review: Review Svelte components for DryUI spec compliance and best practices
-- diagnose: Diagnose theme CSS for missing tokens, contrast issues, and value errors
-- detect_project: Detect DryUI readiness in a Svelte or SvelteKit project
-- plan_install: Build a non-mutating install checklist for a project
-- plan_add: Build a non-mutating project-aware adoption plan for a component or composed output
+- ask: Discover components, recipes, setup guidance, and tokens through an explicit scope (component, recipe, list, setup)
+- check: Validate a component, theme file, directory, or workspace through one unified path-driven tool
