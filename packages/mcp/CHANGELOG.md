@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.0.1
+
+### Patch Changes
+
+- [`9e2c71c`](https://github.com/rob-balfre/dryui/commit/9e2c71c2f8da47fa08186c6dc720251cde590867) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Wire the shared `prepack`/`postpack` hooks into `@dryui/mcp` so its `workspace:*` dependency on `@dryui/lint` gets rewritten to a concrete `^x.y.z` range before `npm pack` builds the publish tarball. Without these hooks, `@dryui/mcp@2.0.0` shipped with an unresolved `"@dryui/lint": "workspace:*"` dep, which breaks `bun add @dryui/mcp` outside the monorepo.
+
 ## 2.0.0
 
 ### Major Changes
