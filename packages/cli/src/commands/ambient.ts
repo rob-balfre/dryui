@@ -1,6 +1,6 @@
 import pkg from '../../package.json';
-import spec from '../../../mcp/src/spec.json';
-import { detectProject } from '../../../mcp/src/project-planner.js';
+import spec from '@dryui/mcp/spec';
+import { detectProject } from '@dryui/mcp/project-planner';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { homeRelative } from '../run.js';
 
