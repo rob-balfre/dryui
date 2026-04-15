@@ -1,6 +1,6 @@
 ---
 name: dryui
-description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, and accessibility. Use MCP tools when available; fall back to CLI.'
+description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, and accessibility. Use the CLI as the default entry point; MCP mirrors the same workflow when available.'
 ---
 
 # DryUI
@@ -13,18 +13,18 @@ Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a th
 
 **Never guess a component API. Always verify first.**
 
-- Call `ask --scope component` or `ask --scope recipe` before using any component for the first time
+- Call `dryui info <component>` or `dryui compose "<query>"` before using any component for the first time. If MCP is available, `ask --scope component` and `ask --scope recipe` are equivalent.
 - Component APIs vary — `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable
 - Compound vs simple, required parts, available props — all differ per component
 - If you skip the lookup, you'll write plausible-looking code that silently breaks
 
-The test: can you point to an `ask` call for every component or pattern in your output?
+The test: can you point to a `dryui info`, `dryui compose`, or `ask` call for every component or pattern in your output?
 
 ## 2. Everything is Compound Until Proven Otherwise
 
 **Use `.Root`. Always check.**
 
-Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound; verify with `ask --scope component`.
+Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound; verify with `dryui info <Component>` or `ask --scope component`.
 
 ```svelte
 <!-- Wrong -->
@@ -33,7 +33,7 @@ Most DryUI components are compound — they require `<Card.Root>`, not `<Card>`.
 <Card.Root>content</Card.Root>
 ```
 
-Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
+Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `dryui info <Component>` or `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
@@ -118,21 +118,19 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 ## Quick Start
 
-**1. Install this skill** — you're reading it, so it's already loaded. This is the most important step.
-
-**2. Add the MCP server** for live API lookup and code validation:
-
-- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (installs skill + MCP in one step)
-- Codex: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo itself, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`.
-- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
-
-**3. Install the CLI** so every subsequent command is short and fast:
+**1. Install the CLI** so every subsequent command is short and fast:
 
 ```bash
-bun install -g @dryui/cli   # or: npm install -g @dryui/cli
+bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
 ```
 
-**4. Bootstrap the project** — `init` detects your project state and applies whatever is missing:
+**2. Start with bare `dryui`** when you want editor integration and feedback:
+
+```bash
+dryui
+```
+
+**3. Bootstrap or inspect the project** with the CLI:
 
 ```bash
 dryui init             # existing project
@@ -140,9 +138,15 @@ dryui init my-app      # new project — scaffolds SvelteKit + DryUI in one step
 cd my-app && bun run dev
 ```
 
-This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. Verify: `dryui detect` should show `project: ready`.
+This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. On existing projects, `dryui install` prints the ordered plan and `dryui detect` verifies that setup is complete.
 
 > **No global install?** `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` work anywhere without installing — same commands, just slower (re-fetches on each call).
+
+**4. Add the agent integration layer manually** if you do not want to use `dryui` / `dryui setup`:
+
+- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (installs skill + MCP in one step)
+- Codex: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo itself, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`.
+- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
 ### Manual setup
 
@@ -181,7 +185,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 
 ## Bindable Props — Common Confusion
 
-Always verify with `ask --scope component`, but these are the most common mistakes:
+Always verify with `dryui info <Component>` or `ask --scope component`, but these are the most common mistakes:
 
 - `bind:value` (Input, Select, Tabs...) vs `bind:checked` (Checkbox, Switch) vs `bind:pressed` (Toggle) vs `bind:open` (Dialog, Popover, Drawer...)
 - Select and Combobox support both `bind:value` and `bind:open`
@@ -194,25 +198,18 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### Recommended workflow
 
-1. `ask --scope recipe "<query>"` or `ask --scope component "<Component>"` before writing so you confirm kind, required parts, bindables, and canonical usage.
+1. `dryui info <Component>` or `dryui compose "<query>"` before writing so you confirm kind, required parts, bindables, and canonical usage. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
 2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. `check` after implementation to catch composition drift, layout violations, and accessibility regressions.
+3. `dryui review`, `dryui diagnose`, or `dryui doctor` after implementation to catch composition drift, layout violations, and accessibility regressions. If MCP is available, `check` is the equivalent surface.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
-### MCP tools (preferred)
+### CLI (default entry point)
 
-| Workflow             | Tools                                                             |
-| -------------------- | ----------------------------------------------------------------- |
-| Project setup        | `ask --scope setup ""`                                            |
-| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
-| Validation           | `check <file.svelte>`, `check <theme.css>`                        |
-| Audit                | `check`, `check <directory>`                                      |
-
-### CLI fallback
-
-Install once with `bun install -g @dryui/cli` (or `npm install -g @dryui/cli`), then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
+Install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`), then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
 
 ```bash
+dryui                           # default onboarding entry point
+dryui setup                     # explicit onboarding subcommand
 dryui init [path] [--pm bun]    # Bootstrap SvelteKit + DryUI project
 dryui info <component>          # Look up component API
 dryui compose "date input"      # Composition guidance
@@ -226,6 +223,15 @@ dryui list                      # List components
 ```
 
 Without a global install, prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, just slower (re-fetches on each call).
+
+### MCP tools (same workflow in-editor)
+
+| Workflow             | Tools                                                             |
+| -------------------- | ----------------------------------------------------------------- |
+| Project setup        | `ask --scope setup ""`                                            |
+| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
+| Validation           | `check <file.svelte>`, `check <theme.css>`                        |
+| Audit                | `check`, `check <directory>`                                      |
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
 

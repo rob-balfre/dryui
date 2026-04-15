@@ -1,5 +1,19 @@
 # @dryui/cli
 
+## 0.6.0
+
+### Minor Changes
+
+- [`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Added `dryui setup`, an interactive onboarding flow that walks through editor integration (Claude Code, Codex, Copilot, Cursor, Windsurf, Zed) and the optional Claude SessionStart hook, and can open feedback tooling at the end. Bare `dryui` now opens the same flow when run outside a DryUI project on a TTY, while still printing the project dashboard inside DryUI projects and the feedback launcher inside the monorepo. Per-editor snippets are shared between the CLI guide and the docs setup data. The MCP `ai-surface` manifest, `spec.json`, and `contract.v1.json` advertise the new `setup` command, and shared CLI helpers (`hasFlag`, `getFlag`, `isInteractiveTTY`) moved into `run.ts` so feedback, launcher, install-hook, and setup share one parser.
+
+### Patch Changes
+
+- [`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Feedback dashboard screenshots are now rendered as a thumbnail that opens a full-resolution Dialog with the original capture, viewport metadata, and a link out to the page. The dashboard reads its `?dev=` target through a shared `normalizeDevUrl` helper that always pins `?dryui-feedback=1` on the dev app URL, and the CLI launcher (`dryui` / `dryui feedback ui`) now constructs the dashboard URL with the same flag so the docs site only mounts the feedback overlay when the dashboard hands off to it.
+
+- Updated dependencies [[`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047), [`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047), [`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047)]:
+  - @dryui/mcp@2.1.1
+  - @dryui/feedback-server@0.3.2
+
 ## 0.5.3
 
 ### Patch Changes
