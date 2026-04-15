@@ -8,8 +8,10 @@ type ExportTarget = null | {
 };
 
 type PackageJson = {
+	svelte?: string;
 	exports?: Record<string, ExportTarget>;
 	publishConfig?: {
+		svelte?: string;
 		exports?: Record<string, ExportTarget>;
 		[key: string]: unknown;
 	};
@@ -123,10 +125,14 @@ async function syncPackageExports(config: PackageConfig): Promise<boolean> {
 	const sourceExtras = collectExtraExports(packageJson.exports);
 	const distExtras = collectExtraExports(packageJson.publishConfig?.exports);
 	const publicDirs = parsePublicDirs(barrelSource);
+	const sourceRootExport = createRootExport(false);
+	const distRootExport = createRootExport(true);
 
 	packageJson.exports = buildExports(publicDirs, sourceExtras, false);
+	packageJson.svelte = sourceRootExport.svelte;
 	packageJson.publishConfig = {
 		...packageJson.publishConfig,
+		svelte: distRootExport.svelte,
 		exports: buildExports(publicDirs, distExtras, true)
 	};
 
