@@ -1,5 +1,17 @@
 # @dryui/ui
 
+## 1.1.4
+
+### Patch Changes
+
+- [`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Dialog and Drawer expose new CSS variable knobs so consumers can override the default scroll and sizing behaviour without forking the components:
+  - `Dialog.Content` exposes `--dry-dialog-overflow` and `--dry-dialog-max-block-size`, and now uses `place-content: center` so a constrained dialog stays centred inside the native `<dialog>` viewport.
+  - `Dialog.Body` exposes `--dry-dialog-body-overflow-y` (defaulting to `auto`), so an embedded scroller can opt into `hidden` when it owns its own scroll region.
+  - `Drawer.Content` forces the underlying `<dialog>` element's `max-width` to `none` at runtime, fixing a thin gutter that appeared next to edge drawers because of the user-agent default.
+
+- Updated dependencies [[`e27993e`](https://github.com/rob-balfre/dryui/commit/e27993e4c4307f64cde953a33e055b142392d047)]:
+  - @dryui/primitives@1.1.4
+
 ## 1.1.3
 
 ### Patch Changes
