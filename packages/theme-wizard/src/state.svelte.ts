@@ -145,13 +145,13 @@ export function setBrandHsb(h: number, s: number, b: number): void {
 }
 
 /** Update a single status tone's hue. */
-export function setStatusHue(tone: 'error' | 'warning' | 'success' | 'info', hue: number): void {
+function setStatusHue(tone: 'error' | 'warning' | 'success' | 'info', hue: number): void {
 	wizardState.statusHues[tone] = hue;
 	persistState();
 }
 
 /** Update the neutral palette mode. */
-export function setNeutralMode(mode: NeutralMode): void {
+function setNeutralMode(mode: NeutralMode): void {
 	wizardState.neutralMode = mode;
 	persistState();
 }
@@ -193,7 +193,7 @@ export function setPersonality(p: Personality): void {
 }
 
 /** Override a dark background level. */
-export function setDarkBg(level: 'base' | 'raised' | 'overlay', value: string): void {
+function setDarkBg(level: 'base' | 'raised' | 'overlay', value: string): void {
 	wizardState.darkBgOverrides[level] = value;
 	persistState();
 }
@@ -326,17 +326,17 @@ const DENSITY_FACTORS: Record<Density, number> = {
 
 // ─── Shadows & elevation ────────────────────────────────────────────────────
 
-export function setShadowPreset(preset: ShadowPreset): void {
+function setShadowPreset(preset: ShadowPreset): void {
 	wizardState.shadows.preset = preset;
 	persistState();
 }
 
-export function setShadowIntensity(intensity: number): void {
+function setShadowIntensity(intensity: number): void {
 	wizardState.shadows.intensity = intensity;
 	persistState();
 }
 
-export function setShadowTint(tint: boolean): void {
+function setShadowTint(tint: boolean): void {
 	wizardState.shadows.tintBrand = tint;
 	persistState();
 }

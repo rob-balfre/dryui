@@ -16,17 +16,6 @@ function ui(name: string): NavItem {
 	return { name, kind: 'ui' };
 }
 
-export interface LayoutPreset {
-	id: string;
-	name: string;
-	description: string;
-	components: string[];
-	regions: string[];
-	snippet: string;
-}
-
-export const layoutPresets: LayoutPreset[] = [];
-
 export const categories: NavCategory[] = docsNavCategories.map(({ label, items }) => ({
 	label,
 	items: items.map(ui)

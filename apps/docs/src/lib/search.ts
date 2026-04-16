@@ -34,12 +34,6 @@ const allDocsPages: SearchItem[] = [
 		keywords: ['install', 'setup', 'theme', 'quickstart']
 	},
 	{
-		label: 'Components',
-		href: '/components',
-		description: 'Browse every published DryUI component.',
-		keywords: ['component index', 'catalog']
-	},
-	{
 		label: 'Theme Wizard',
 		href: '/theme-wizard',
 		description: 'Build and export DryUI semantic token themes.',
