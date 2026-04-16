@@ -1,5 +1,12 @@
 # @dryui/ui
 
+## 1.1.5
+
+### Patch Changes
+
+- Updated dependencies [[`66e3471`](https://github.com/rob-balfre/dryui/commit/66e3471d881d69a003119e2446dc863cc4e2f588)]:
+  - @dryui/primitives@1.1.5
+
 ## 1.1.4
 
 ### Patch Changes
