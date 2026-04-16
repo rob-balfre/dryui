@@ -123,7 +123,13 @@ claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui
 ```
 
-When working inside this repository with Codex, install the local plugin via `codex` → `/plugins` → "DryUI Local" marketplace (exposed by `.agents/plugins/marketplace.json`).
+For Codex 0.121.0 or newer, the canonical install mirrors Claude Code:
+
+```bash
+codex marketplace add rob-balfre/dryui
+```
+
+Then open Codex and install DryUI from `/plugins`. The marketplace is defined by `.agents/plugins/marketplace.json`; Codex resolves the same path whether it's cloned via `marketplace add` or discovered locally inside this repo.
 
 Two MCP servers are configured:
 

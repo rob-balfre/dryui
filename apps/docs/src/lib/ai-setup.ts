@@ -163,24 +163,24 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Start with the DryUI CLI, then install the DryUI skill and MCP server so Codex can look up and validate DryUI without leaving the editor.',
+			'Start with the DryUI CLI, then add the DryUI plugin marketplace so Codex can use the same discovery and validation loop in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
 		skill: {
-			title: '2. Install the skill',
-			note: 'The $skill-installer downloads the skill and its MCP dependency declaration.',
-			code: '$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui'
+			title: '2. Install the plugin',
+			note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server. After adding the marketplace, open Codex and install DryUI from `/plugins`.',
+			code: `codex marketplace add rob-balfre/dryui`
 		},
 		mcp: {
 			path: '.codex/config.toml',
-			note: '3. Add the MCP server with `codex mcp add dryui -- npx -y @dryui/mcp`, or place the following in `.codex/config.toml`.',
+			note: '3. Manual alternative: add the MCP server with `codex mcp add dryui -- npx -y @dryui/mcp`, or place the following in `.codex/config.toml`.',
 			code: codexConfig,
 			language: 'toml'
 		},
 		followUp:
-			'Use the CLI as the default surface. Restart Codex after wiring the skill and MCP server so it can expose ask/check.'
+			'Use the CLI as the default surface. The plugin adds conventions plus ask/check inside Codex.'
 	},
 	{
 		id: 'copilot',

@@ -145,7 +145,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 **4. Add the agent integration layer manually** if you do not want to use `dryui` / `dryui setup`:
 
 - Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (installs skill + MCP in one step)
-- Codex: public install today is `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui` then `codex mcp add dryui -- npx -y @dryui/mcp`. If you're working inside the DryUI repo itself, install the repo-local plugin from `/plugins` via `.agents/plugins/marketplace.json`.
+- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then install DryUI from `/plugins` inside Codex (installs skill + MCP in one step). Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp` + copy the skill from `packages/ui/skills/dryui`.
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
 ### Manual setup

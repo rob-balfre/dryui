@@ -1,7 +1,7 @@
 {
-  "name": "dryui-local",
+  "name": "dryui",
   "interface": {
-    "displayName": "DryUI Local"
+    "displayName": "DryUI"
   },
   "plugins": [
     {
