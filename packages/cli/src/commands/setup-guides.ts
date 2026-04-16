@@ -89,23 +89,23 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 	{
 		id: 'codex',
 		label: 'Codex',
-		description: 'Install the DryUI skill in Codex, then add the MCP server.',
+		description: 'Install the DryUI plugin for Codex, or wire the skill and MCP server manually.',
 		sections: [
 			{
-				title: 'Install the skill',
-				note: 'This downloads the DryUI skill and its MCP dependency declaration.',
-				code: `$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui`
+				title: 'Install the plugin',
+				note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server. After adding the marketplace, open Codex and install DryUI from `/plugins`.',
+				code: `codex marketplace add rob-balfre/dryui`
 			},
 			{
-				title: 'Add the MCP server',
-				note: 'Use the command directly, or place the snippet in `.codex/config.toml`.',
+				title: 'Manual alternative',
+				note: 'If you do not want the plugin, add the MCP server and drop the config into `.codex/config.toml`.',
 				code: `codex mcp add dryui -- npx -y @dryui/mcp
 
 # .codex/config.toml
 ${CODEX_CONFIG}`
 			}
 		],
-		followUp: 'Restart Codex after wiring the skill and MCP server so ask/check are available.'
+		followUp: 'Start a new Codex session after installing the plugin so ask/check are available.'
 	},
 	{
 		id: 'copilot',

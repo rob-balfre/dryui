@@ -20,19 +20,12 @@ Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every 
 Codex (the primary AGENTS.md audience) canonical install:
 
 ```bash
-# CLI first
 bun install -g @dryui/cli@latest
 dryui
-
-# Public / manual install
-$skill-installer install https://github.com/rob-balfre/dryui/tree/main/packages/ui/skills/dryui
-codex mcp add dryui -- npx -y @dryui/mcp
-
-# Repo-local plugin when working in this repository
-codex
-/plugins
-# Install DryUI from the "DryUI Local" marketplace exposed by .agents/plugins/marketplace.json
+codex marketplace add rob-balfre/dryui
 ```
+
+Then open Codex and install DryUI from `/plugins`. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp`.
 
 All MCP entries (every tool) use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the stdio server.
 
