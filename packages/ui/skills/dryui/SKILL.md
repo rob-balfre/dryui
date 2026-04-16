@@ -142,10 +142,10 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 
 > **No global install?** `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` work anywhere without installing — same commands, just slower (re-fetches on each call).
 
-**4. Add the agent integration layer manually** if you do not want to use `dryui` / `dryui setup`:
+**4. Add the editor integration layer** after the CLI is working:
 
-- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (installs skill + MCP in one step)
-- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (installs skill + MCP in one step). Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp` + copy the skill from `packages/ui/skills/dryui`.
+- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin is the canonical Claude skill install path)
+- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
 ### Manual setup

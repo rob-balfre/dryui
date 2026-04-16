@@ -15,6 +15,9 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "bin": {
+    "dryui-feedback-mcp": "./dist/mcp.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -37,7 +40,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && bunx tsc -p tsconfig.build.json && bunx vite build --config ui/vite.config.ts",
+    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && bunx tsc -p tsconfig.build.json && bunx vite build --config ui/vite.config.ts",
     "check": "bunx svelte-check --tsconfig ./ui/tsconfig.json && bunx tsc -p tsconfig.json --noEmit",
     "test": "bun test tests/**/*.test.ts"
   },

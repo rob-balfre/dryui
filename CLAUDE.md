@@ -20,7 +20,7 @@ DryUI is currently pre-alpha. Prefer current behavior over legacy compatibility,
 - `packages/feedback` — @dryui/feedback: feedback annotation UI components
 - `packages/feedback-server` — @dryui/feedback-server: feedback MCP server backend
 - `packages/theme-wizard` — @dryui/theme-wizard: theme generation library (brand color → full theme)
-- `packages/plugin` — @dryui/plugin: Claude Code + Codex plugin (bundles skill, MCP server, and feedback)
+- `packages/plugin` — @dryui/plugin: Claude Code + Codex plugin bundle (canonical Claude/Codex skill path)
 - `apps/docs` — Documentation site (SvelteKit, static adapter)
 
 ## Commands
@@ -41,7 +41,7 @@ bun run changeset              # Create a changeset for release
 bun run format                 # Format all files (Prettier)
 bun run format:check           # Check formatting without writing
 bun run sync:exports           # Regenerate package.json exports maps
-bun run sync:skills            # Sync skill files to ~/.claude/skills/
+bun run sync:skills            # Sync source skills into packages/plugin/skills/ and Cursor rules
 bun run validate:spec          # Check spec.json coverage against components
 bun run screenshots:components # Generate component screenshots to tmp/ (manual, not in CI)
 ```
@@ -118,9 +118,9 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
 ### Quick setup
 
-Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. All MCP entries use `npx -y @dryui/mcp` as the stdio command. Add this layer after the CLI is already working.
+Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. Add this layer after the CLI is already working.
 
-For Claude Code (this repo), the canonical install is:
+For Claude Code, the canonical install is:
 
 ```bash
 claude plugin marketplace add rob-balfre/dryui
@@ -133,9 +133,9 @@ For Codex 0.121.0 or newer, the canonical install mirrors Claude Code:
 codex marketplace add rob-balfre/dryui
 ```
 
-Then open Codex and install DryUI from `/plugins`. The marketplace is defined by `.agents/plugins/marketplace.json`; Codex resolves the same path whether it's cloned via `marketplace add` or discovered locally inside this repo.
+Then open Codex and install DryUI from `/plugins`. The marketplace is defined by `.agents/plugins/marketplace.json`; Codex resolves the same path whether it's cloned via `marketplace add` or discovered locally inside this repo. Use that plugin path for local development too; do not copy DryUI skills into repo-local `.claude/` or `.codex/` folders.
 
-Two MCP servers are configured:
+The plugin config ships two MCP servers:
 
 - **dryui** — scope-driven discovery and unified validation for components, setup, themes, and workspaces
 - **dryui-feedback** — feedback annotation and review (`packages/feedback-server/dist/mcp.js`)
@@ -145,8 +145,8 @@ DryUI MCP tools:
 - CLI: `dryui setup` / `init` / `detect` / `install` / `add --project` / `info <component>` / `get` / `list` / `compose` / `review` / `diagnose` / `doctor` / `lint` (install once via `bun install -g @dryui/cli@latest`; `bunx @dryui/cli <cmd>` / `npx -y @dryui/cli <cmd>` work as no-install fallbacks)
 - discovery (`ask`)
 - validation (`check`)
-- Skill: `packages/ui/skills/dryui/SKILL.md`
-- Plugin: `packages/plugin/` (Claude Code plugin + Codex local plugin bundling `dryui`, `init`, `live-feedback`, and MCP)
+- DryUI skill source: `packages/ui/skills/dryui/SKILL.md`
+- Plugin bundle: `packages/plugin/` (bundles the `dryui`, `init`, and `live-feedback` skills plus the `dryui` and `dryui-feedback` MCP servers)
 
 ### Output Format — TOON (Token-Optimized Output)
 

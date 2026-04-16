@@ -29,9 +29,9 @@ dryui
 codex marketplace add rob-balfre/dryui
 ```
 
-Then start `codex`, run `/plugins`, and install `DryUI`. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp`.
+Then start `codex`, run `/plugins`, and install `DryUI`. Inside this repo, use the local plugin from `/plugins` rather than copying skills into `.codex/skills`.
 
-All MCP entries (every tool) use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the stdio server.
+The plugin is the canonical way Claude Code and Codex get DryUI skills. Manual MCP config is only for tools that do not support plugins.
 
 ## CSS Rules (enforced by @dryui/lint — build fails on violations)
 

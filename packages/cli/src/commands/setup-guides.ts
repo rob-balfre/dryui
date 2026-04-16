@@ -25,7 +25,11 @@ const MCP_SERVERS_CONFIG = `{
 
 const CODEX_CONFIG = `[mcp_servers.dryui]
 command = "npx"
-args = ["-y", "@dryui/mcp"]`;
+args = ["-y", "@dryui/mcp"]
+
+[mcp_servers.dryui-feedback]
+command = "npx"
+args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
 const COPILOT_CONFIG = `{
   "servers": {
@@ -61,22 +65,20 @@ export const setupGuides: readonly SetupGuide[] = [
 	{
 		id: 'claude-code',
 		label: 'Claude Code',
-		description: 'Install the DryUI plugin for Claude, or wire the skill and MCP server manually.',
+		description:
+			'Install the DryUI plugin for Claude. The plugin is the canonical Claude skill path.',
 		sections: [
 			{
 				title: 'Install the plugin',
-				note: 'The plugin bundles the DryUI skill and MCP server for Claude.',
+				note: 'The plugin bundles the DryUI skill plus the DryUI MCP servers for Claude.',
 				code: `claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui`
 			},
 			{
-				title: 'Manual alternative',
-				note: 'If you do not want the plugin, add the MCP server and copy the skill yourself.',
+				title: 'Optional MCP-only fallback',
+				note: 'Only use this if you cannot install plugins. It does not install the bundled DryUI skill.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
-
-git clone --depth 1 --filter=blob:none --sparse https://github.com/rob-balfre/dryui.git /tmp/dryui
-cd /tmp/dryui && git sparse-checkout set packages/ui/skills/dryui
-mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/skills/`
+claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			},
 			{
 				title: 'Optional SessionStart hook',
@@ -84,22 +86,24 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 				code: `dryui install-hook`
 			}
 		],
-		followUp: 'Start a new Claude Code session after wiring the plugin, skill, or hook.'
+		followUp: 'Start a new Claude Code session after wiring the plugin or hook.'
 	},
 	{
 		id: 'codex',
 		label: 'Codex',
-		description: 'Install the DryUI plugin for Codex, or wire the skill and MCP server manually.',
+		description:
+			'Install the DryUI plugin for Codex. The plugin is the canonical Codex skill path.',
 		sections: [
 			{
 				title: 'Install the plugin',
-				note: 'Requires Codex 0.121.0 or newer. Run the command below, then start `codex`, run `/plugins`, and install `DryUI`. The plugin bundles the DryUI skill and MCP server.',
+				note: 'Requires Codex 0.121.0 or newer. Run the command below, then start `codex`, run `/plugins`, and install `DryUI`. The plugin bundles the DryUI skill plus the DryUI MCP servers.',
 				code: `codex marketplace add rob-balfre/dryui`
 			},
 			{
-				title: 'Manual alternative',
-				note: 'If you do not want the plugin, add the MCP server and drop the config into `.codex/config.toml`.',
+				title: 'Optional MCP-only fallback',
+				note: 'Only use this if you cannot install plugins. It does not install the bundled DryUI skill.',
 				code: `codex mcp add dryui -- npx -y @dryui/mcp
+codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
 
 # .codex/config.toml
 ${CODEX_CONFIG}`

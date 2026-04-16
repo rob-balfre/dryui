@@ -3,10 +3,9 @@ import { readdir, exists, rm, realpath, lstat } from 'node:fs/promises';
 import { join, basename, relative } from 'node:path';
 
 const root = join(import.meta.dir, '..');
-const packageSkills = join(root, 'packages', 'ui', 'skills', 'dryui');
-const rootSkills = join(root, 'skills');
-const claudeSkills = join(root, '.claude', 'skills');
-const codexSkills = join(root, '.codex', 'skills');
+const dryuiSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui');
+const feedbackSkillSource = join(root, 'packages', 'feedback', 'skills', 'live-feedback');
+const pluginSkills = join(root, 'packages', 'plugin', 'skills');
 const cursorRules = join(root, '.cursor', 'rules');
 
 // Files we deliberately never copy (OS metadata, etc.)
@@ -32,6 +31,12 @@ async function copyDir(src: string, dest: string) {
 		if (entry.isDirectory()) {
 			await copyDir(srcPath, destPath);
 		} else {
+			try {
+				const stat = await lstat(destPath);
+				if (stat.isSymbolicLink()) {
+					await rm(destPath);
+				}
+			} catch {}
 			// Skip if src and dest resolve to the same file (symlink loop guard)
 			try {
 				const realSrc = await realpath(srcPath);
@@ -200,51 +205,40 @@ async function verifySyncedTree(src: string, dest: string, mismatches: Mismatch[
 	}
 }
 
-// 1. Sync packages/ui/skills/dryui/ → .claude/skills/dryui/ + .codex/skills/dryui/ + .cursor/rules/*.mdc
+// 1. Sync source skills into the plugin bundle and generate Cursor rules.
 const syncedTargets: Array<{ src: string; dest: string; label: string }> = [];
 
-if (await exists(packageSkills)) {
-	const claudeDest = join(claudeSkills, 'dryui');
-	const codexDest = join(codexSkills, 'dryui');
+if (await exists(dryuiSkillSource)) {
+	const pluginDryuiDest = join(pluginSkills, 'dryui');
 
-	await removeStale(packageSkills, claudeDest);
-	await copyDir(packageSkills, claudeDest);
-	await removeStale(packageSkills, codexDest);
-	await copyDir(packageSkills, codexDest);
-	await syncSkillToCursor(packageSkills, 'dryui', cursorRules);
+	await removeStale(dryuiSkillSource, pluginDryuiDest);
+	await copyDir(dryuiSkillSource, pluginDryuiDest);
+	await syncSkillToCursor(dryuiSkillSource, 'dryui', cursorRules);
 
-	syncedTargets.push(
-		{ src: packageSkills, dest: claudeDest, label: '.claude/skills/dryui' },
-		{ src: packageSkills, dest: codexDest, label: '.codex/skills/dryui' }
-	);
+	syncedTargets.push({
+		src: dryuiSkillSource,
+		dest: pluginDryuiDest,
+		label: 'packages/plugin/skills/dryui'
+	});
 
-	console.log(
-		'synced packages/ui/skills/dryui → .claude/skills/ + .codex/skills/ + .cursor/rules/'
-	);
+	console.log('synced packages/ui/skills/dryui → packages/plugin/skills/dryui + .cursor/rules/');
 }
 
-// 2. Sync each skill in skills/ → .claude/skills/<name>/ + .codex/skills/<name>/ + .cursor/rules/*.mdc
-if (await exists(rootSkills)) {
-	const entries = await readdir(rootSkills, { withFileTypes: true });
+if (await exists(feedbackSkillSource)) {
+	const pluginFeedbackDest = join(pluginSkills, 'live-feedback');
 
-	for (const entry of entries) {
-		if (!entry.isDirectory() || entry.name === '.DS_Store') continue;
-		const src = join(rootSkills, entry.name);
-		const claudeDest = join(claudeSkills, entry.name);
-		const codexDest = join(codexSkills, entry.name);
+	await removeStale(feedbackSkillSource, pluginFeedbackDest);
+	await copyDir(feedbackSkillSource, pluginFeedbackDest);
 
-		await removeStale(src, claudeDest);
-		await copyDir(src, claudeDest);
-		await removeStale(src, codexDest);
-		await copyDir(src, codexDest);
-		await syncSkillToCursor(src, entry.name, cursorRules);
+	syncedTargets.push({
+		src: feedbackSkillSource,
+		dest: pluginFeedbackDest,
+		label: 'packages/plugin/skills/live-feedback'
+	});
 
-		syncedTargets.push(
-			{ src, dest: claudeDest, label: `.claude/skills/${entry.name}` },
-			{ src, dest: codexDest, label: `.codex/skills/${entry.name}` }
-		);
-	}
-	console.log('synced skills/* → .claude/skills/ + .codex/skills/ + .cursor/rules/');
+	console.log(
+		'synced packages/feedback/skills/live-feedback → packages/plugin/skills/live-feedback'
+	);
 }
 
 // 3. Post-sync guard — assert every target is byte-identical to its source.

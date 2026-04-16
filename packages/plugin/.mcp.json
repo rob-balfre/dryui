@@ -4,6 +4,11 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
     }
   }
 }
