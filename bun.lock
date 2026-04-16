@@ -17,7 +17,7 @@
         "pngjs": "^7.0.0",
         "prettier": "^3.8.3",
         "prettier-plugin-svelte": "^3.5.1",
-        "puppeteer": "^24.40.0",
+        "puppeteer": "^24.41.0",
         "svelte": "^5.55.4",
         "vitest": "^4.1.4",
       },
@@ -47,14 +47,14 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "bin": {
         "dryui": "./dist/index.js",
         "dryui-ambient": "./dist/ambient.js",
       },
       "dependencies": {
         "@dryui/feedback-server": "^0.3.2",
-        "@dryui/mcp": "^2.1.1",
+        "@dryui/mcp": "^2.1.2",
       },
       "devDependencies": {
         "@types/node": "^25.6.0",
@@ -107,7 +107,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.1.1",
+      "version": "2.1.2",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
