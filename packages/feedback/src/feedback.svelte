@@ -253,6 +253,8 @@
 		return `translate(${viewportLeft - scrollX} ${viewportTop - scrollY})`;
 	}
 
+	const scrollTransform = $derived(drawingTransform('scroll'));
+
 	function textInputStyle(position: Point, space: DrawingSpace): string {
 		const { x, y } = screenPoint(position, space);
 		return `left: ${x}px; top: ${y - 10}px;`;
@@ -790,7 +792,6 @@
 					</filter>
 				</defs>
 
-				{@const scrollTransform = drawingTransform('scroll')}
 				{#each drawings as drawing (drawing.id)}
 					{@const transform = drawingSpace(drawing) === 'scroll' ? scrollTransform : undefined}
 					{#if drawing.kind === 'freehand'}
