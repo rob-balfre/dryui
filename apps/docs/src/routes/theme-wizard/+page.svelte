@@ -56,7 +56,22 @@
 
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
+	let previewSceneRef: HTMLElement | null = $state(null);
 	let lastAppliedRecipe: string | null = null;
+
+	$effect(() => {
+		const node = previewSceneRef;
+		if (!node) return;
+		const entries = Object.entries(tokens);
+		for (const [name, value] of entries) {
+			node.style.setProperty(name, value);
+		}
+		return () => {
+			for (const [name] of entries) {
+				node.style.removeProperty(name);
+			}
+		};
+	});
 
 	useThemeOverride(() => tokens);
 
@@ -111,19 +126,6 @@
 			node.style.setProperty('--_preset-font', font);
 			return () => {
 				node.style.removeProperty('--_preset-font');
-			};
-		};
-	}
-
-	function attachThemeTokens(tokens: Record<string, string>) {
-		return (node: HTMLElement) => {
-			for (const [name, value] of Object.entries(tokens)) {
-				node.style.setProperty(name, value);
-			}
-			return () => {
-				for (const name of Object.keys(tokens)) {
-					node.style.removeProperty(name);
-				}
 			};
 		};
 	}
@@ -311,7 +313,7 @@
 								<MegaMenu.Column title="Starting points">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 										>
 											{#each startingPresets as preset (preset.name)}
@@ -336,7 +338,7 @@
 								<MegaMenu.Column title="Technical">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 										>
 											{#each technicalPresets as preset (preset.name)}
@@ -361,7 +363,7 @@
 								<MegaMenu.Column title="Editorial">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
 										>
 											{#each editorialPresets as preset (preset.name)}
@@ -449,7 +451,7 @@
 								<MegaMenu.Column title="Type scale">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={() => wizardState.typography.scale, setTypeScale}
 										>
 											{#each TYPE_SCALE_OPTIONS as [value, label] (value)}
@@ -469,7 +471,7 @@
 								<MegaMenu.Column title="Style">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={() => wizardState.personality, setPersonality}
 										>
 											{#each PERSONALITY_OPTIONS as opt (opt.value)}
@@ -498,7 +500,7 @@
 								<MegaMenu.Column title="Spacing">
 									<div class="wizard-option-scope wizard-option-list">
 										<OptionPicker.Root
-											orientation="vertical"
+											columns={1}
 											bind:value={() => wizardState.shape.density, setDensity}
 										>
 											{#each DENSITY_OPTIONS as opt (opt.value)}
@@ -651,7 +653,7 @@
 	>
 		<section class="preview-band">
 			<Container size="xl">
-				<div class="preview-scene" data-mode={themeMode} {@attach attachThemeTokens(tokens)}>
+				<div class="preview-scene" data-mode={themeMode} bind:this={previewSceneRef}>
 					<PreviewComponents />
 				</div>
 			</Container>

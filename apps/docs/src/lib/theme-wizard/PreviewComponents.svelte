@@ -314,7 +314,7 @@
 							<Textarea
 								bind:value={assistantPrompt}
 								placeholder="Ask, search, or make anything..."
-								rows={2}
+								size="sm"
 							/>
 							<div class="assistant-composer-actions">
 								<Badge color="gray" size="sm">Auto</Badge>
