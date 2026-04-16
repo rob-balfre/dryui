@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Alert, type AlertVariant } from '@dryui/ui';
+	import { Alert, type AlertProps, type AlertVariant } from '@dryui/ui';
+
+	type AlertSnippet = NonNullable<AlertProps['title']>;
 
 	interface Props {
 		title?: string;
@@ -17,8 +19,8 @@
 
 <Alert
 	{variant}
-	title={title ? renderTitle : undefined}
-	description={description ? renderDescription : undefined}
+	title={title ? (renderTitle as AlertSnippet) : undefined}
+	description={description ? (renderDescription as AlertSnippet) : undefined}
 >
 	{#if children}
 		{@render children()}

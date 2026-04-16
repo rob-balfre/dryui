@@ -1,6 +1,6 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "1.1.4",
+  "packageVersion": "1.2.0",
   "summary": {
     "componentNodes": 290,
     "partNodes": 654,
