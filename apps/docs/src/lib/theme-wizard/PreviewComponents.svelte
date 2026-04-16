@@ -1,259 +1,693 @@
 <script lang="ts">
 	import {
-		Alert,
+		Avatar,
 		Badge,
 		Button,
+		ButtonGroup,
 		Card,
 		Checkbox,
+		Chip,
 		Field,
 		Input,
 		Label,
+		NumberInput,
+		Progress,
+		PromptInput,
 		Select,
+		Slider,
+		Spinner,
 		Table,
-		Text
+		Text,
+		Textarea,
+		Toggle
 	} from '@dryui/ui';
+	import {
+		ArrowLeft,
+		ArrowRight,
+		CirclePlus,
+		ChevronRight,
+		Globe,
+		LockKeyhole,
+		Paperclip,
+		Search,
+		ShieldCheck
+	} from 'lucide-svelte';
 
 	const rows = [
 		{ name: 'Alex Morgan', role: 'Admin', status: 'Active', color: 'success' as const },
 		{ name: 'Jordan Lee', role: 'Editor', status: 'Pending', color: 'warning' as const },
 		{ name: 'Sam Rivera', role: 'Viewer', status: 'Inactive', color: 'gray' as const }
 	];
+
+	const activityLabels = ['Syncing', 'Updating', 'Loading'];
+	const discoverySources = ['Social Media', 'Search Engine', 'Referral', 'Other'];
+
+	let budget = $state(640);
+	let gpuCount = $state(8);
+	let tintWallpaper = $state(true);
+	let chatPrompt = $state('');
+	let searchQuery = $state('');
+	let assistantPrompt = $state('');
 </script>
 
 <div class="preview-root">
-	<div class="stat-row">
-		<Card.Root role="group" size="sm">
-			<Card.Content>
-				<div class="stat-card-body">
-					<div class="stat-card-label">Active users</div>
-					<div class="stat-card-value">12,450</div>
-					<div class="stat-card-trend" data-direction="up">↑ +8.3% this week</div>
-				</div>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root role="group" size="sm">
-			<Card.Content>
-				<div class="stat-card-body">
-					<div class="stat-card-label">Requests</div>
-					<div class="stat-card-value">98,201</div>
-					<div class="stat-card-trend" data-direction="up">↑ +2.1%</div>
-				</div>
-			</Card.Content>
-		</Card.Root>
-		<Card.Root role="group" size="sm">
-			<Card.Content>
-				<div class="stat-card-body">
-					<div class="stat-card-label">Error rate</div>
-					<div class="stat-card-value">0.4%</div>
-					<div class="stat-card-trend" data-direction="down">↓ -0.1%</div>
-				</div>
-			</Card.Content>
-		</Card.Root>
-	</div>
-
-	<div class="main-grid">
-		<div class="stack">
-			<Card.Root>
+	<div class="preview-mosaic">
+		<div class="preview-column">
+			<Card.Root size="sm">
 				<Card.Header>
-					<Text as="span" weight="semibold">Component preview</Text>
-				</Card.Header>
-				<Card.Content>
-					<div class="stack">
-						<Alert variant="info">
-							{#snippet title()}Theme applied{/snippet}
-							{#snippet description()}All tokens are resolved from your brand color.{/snippet}
-						</Alert>
-
-						<div class="btn-row">
-							<Button variant="solid">Save changes</Button>
-							<Button variant="secondary">Cancel</Button>
-							<Button variant="outline">Duplicate</Button>
-							<Button variant="ghost">Dismiss</Button>
-						</div>
-
-						<div class="badge-row">
-							<Badge color="gray">Neutral</Badge>
-							<Badge color="blue">Info</Badge>
-							<Badge color="green">Success</Badge>
-							<Badge color="yellow">Warning</Badge>
-							<Badge color="red">Error</Badge>
-							<Badge color="purple">Brand</Badge>
-						</div>
+					<div class="panel-copy">
+						<Text as="span" weight="semibold">Payment Method</Text>
+						<Text color="muted">All transactions are secure and encrypted.</Text>
 					</div>
-				</Card.Content>
-			</Card.Root>
-
-			<Card.Root>
-				<Card.Header>
-					<Text as="span" weight="semibold">Form fields</Text>
 				</Card.Header>
 				<Card.Content>
-					<div class="form-grid">
+					<div class="panel-stack">
 						<Field.Root>
-							<Label for="preview-name">Display name</Label>
-							<Input id="preview-name" value="Jane Smith" />
+							<Label for="preview-card-name">Name on Card</Label>
+							<Input id="preview-card-name" value="John Doe" />
 						</Field.Root>
-						<Field.Root>
-							<Label for="preview-role">Role</Label>
-							<Select.Root name="role">
-								<Select.Trigger id="preview-role">
-									<Select.Value placeholder="Select role" />
-								</Select.Trigger>
-								<Select.Content>
-									<Select.Item value="admin">Admin</Select.Item>
-									<Select.Item value="editor">Editor</Select.Item>
-									<Select.Item value="viewer">Viewer</Select.Item>
-								</Select.Content>
-							</Select.Root>
-						</Field.Root>
+
+						<div class="split-fields">
+							<Field.Root>
+								<Label for="preview-card-number">Card Number</Label>
+								<Input id="preview-card-number" value="1234 5678 9012 3456" />
+								<Text color="muted">Enter your 16-digit number.</Text>
+							</Field.Root>
+							<Field.Root>
+								<Label for="preview-card-cvv">CVV</Label>
+								<Input id="preview-card-cvv" value="123" />
+							</Field.Root>
+						</div>
+
+						<div class="split-fields">
+							<Field.Root>
+								<Label for="preview-card-month">Month</Label>
+								<Select.Root name="month">
+									<Select.Trigger id="preview-card-month">
+										<Select.Value placeholder="MM" />
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value="01">01</Select.Item>
+										<Select.Item value="02">02</Select.Item>
+										<Select.Item value="03">03</Select.Item>
+									</Select.Content>
+								</Select.Root>
+							</Field.Root>
+							<Field.Root>
+								<Label for="preview-card-year">Year</Label>
+								<Select.Root name="year">
+									<Select.Trigger id="preview-card-year">
+										<Select.Value placeholder="YYYY" />
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value="2026">2026</Select.Item>
+										<Select.Item value="2027">2027</Select.Item>
+										<Select.Item value="2028">2028</Select.Item>
+									</Select.Content>
+								</Select.Root>
+							</Field.Root>
+						</div>
+
+						<div class="panel-divider"></div>
+
+						<div class="panel-copy">
+							<Text as="span" weight="semibold">Billing Address</Text>
+							<Text color="muted">The billing address associated with your payment method</Text>
+						</div>
+
 						<div class="checkbox-row">
-							<Checkbox id="preview-notify" checked />
-							<Label for="preview-notify">
-								<Text size="sm">Enable notifications</Text>
+							<Checkbox id="preview-same-address" checked />
+							<Label for="preview-same-address">
+								<Text>Same as shipping address</Text>
 							</Label>
+						</div>
+
+						<Field.Root>
+							<Label for="preview-comments">Comments</Label>
+							<Textarea id="preview-comments" placeholder="Add any additional comments" />
+						</Field.Root>
+
+						<div class="action-row">
+							<Button variant="solid" size="sm">Submit</Button>
+							<Button variant="secondary" size="sm">Cancel</Button>
 						</div>
 					</div>
 				</Card.Content>
 			</Card.Root>
 		</div>
 
-		<Card.Root>
-			<Card.Header>
-				<Text as="span" weight="semibold">Members</Text>
-			</Card.Header>
-			<Card.Content noPadding>
-				<Table.Root>
-					<Table.Header>
-						<Table.Row>
-							<Table.Head>Name</Table.Head>
-							<Table.Head>Role</Table.Head>
-							<Table.Head>Status</Table.Head>
-						</Table.Row>
-					</Table.Header>
-					<Table.Body>
-						{#each rows as row (row.name)}
-							<Table.Row>
-								<Table.Cell>{row.name}</Table.Cell>
-								<Table.Cell>{row.role}</Table.Cell>
-								<Table.Cell>
-									<Badge color={row.color} size="sm">{row.status}</Badge>
-								</Table.Cell>
-							</Table.Row>
+		<div class="preview-column">
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="empty-state">
+						<div class="avatar-row">
+							<div class="avatar-slot"><Avatar fallback="AM" size="sm" /></div>
+							<div class="avatar-slot"><Avatar fallback="JL" size="sm" /></div>
+							<div class="avatar-slot"><Avatar fallback="SR" size="sm" /></div>
+						</div>
+						<div class="panel-copy panel-copy-center">
+							<Text as="span" weight="semibold">No Team Members</Text>
+							<Text color="muted">Invite your team to collaborate on this project.</Text>
+						</div>
+						<Button variant="secondary" size="sm">
+							<CirclePlus size={14} aria-hidden="true" />
+							Invite Members
+						</Button>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<div class="badge-strip">
+				{#each activityLabels as label (label)}
+					<Badge color="gray" size="sm">{label}</Badge>
+				{/each}
+			</div>
+
+			<div class="prompt-shell">
+				<PromptInput bind:value={chatPrompt} placeholder="Send a message..." submitLabel="Reply" />
+			</div>
+
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="panel-stack">
+						<div class="panel-copy">
+							<Text as="span" weight="semibold">Price Range</Text>
+							<Text color="muted">Set your budget range ($200 - 800).</Text>
+						</div>
+
+						<Slider bind:value={budget} min={200} max={800} size="sm" />
+
+						<Field.Root>
+							<Label for="preview-search">Search</Label>
+							<div class="search-shell">
+								<Search size={14} aria-hidden="true" />
+								<Input
+									id="preview-search"
+									bind:value={searchQuery}
+									variant="ghost"
+									placeholder="Search..."
+								/>
+								<Text color="muted">12 results</Text>
+							</div>
+						</Field.Root>
+
+						<Field.Root>
+							<Label for="preview-url">Project URL</Label>
+							<Input id="preview-url" value="https://example.com" />
+						</Field.Root>
+
+						<div class="usage-row">
+							<Text color="muted">Storage</Text>
+							<div class="usage-meter">
+								<Progress value={52} size="sm" />
+								<Text color="muted">52% used</Text>
+							</div>
+						</div>
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</div>
+
+		<div class="preview-column">
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="panel-stack">
+						<Field.Root>
+							<Label for="preview-domain">Workspace URL</Label>
+							<div class="icon-input">
+								<Globe size={14} aria-hidden="true" />
+								<Input id="preview-domain" value="https://" variant="ghost" />
+							</div>
+						</Field.Root>
+
+						<div class="status-card">
+							<div class="status-card-copy">
+								<Text as="span" weight="semibold">Two-factor authentication</Text>
+								<Text color="muted">Verify via email or phone number.</Text>
+							</div>
+							<Button variant="secondary" size="sm">Enable</Button>
+						</div>
+
+						<div class="notice-row">
+							<div class="notice-leading">
+								<ShieldCheck size={15} aria-hidden="true" />
+								<Text as="span" weight="medium">Your profile has been verified.</Text>
+							</div>
+							<ChevronRight size={14} aria-hidden="true" />
+						</div>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root size="sm">
+				<Card.Header>
+					<div class="panel-copy">
+						<Text as="span" weight="semibold">Compute Environment</Text>
+						<Text color="muted">Select the compute environment for your cluster.</Text>
+					</div>
+				</Card.Header>
+				<Card.Content>
+					<div class="panel-stack">
+						<div class="choice-stack">
+							<Card.Root size="sm" variant="interactive" selected>
+								<Card.Content>
+									<div class="choice-card">
+										<span class="choice-radio" data-selected aria-hidden="true"></span>
+										<div class="choice-card-copy">
+											<Text as="span" weight="semibold">Kubernetes</Text>
+											<Text color="muted">Run GPU workloads on a K8s configured cluster.</Text>
+										</div>
+										<Badge color="gray" size="sm">Default</Badge>
+									</div>
+								</Card.Content>
+							</Card.Root>
+							<Card.Root size="sm">
+								<Card.Content>
+									<div class="choice-card">
+										<span class="choice-radio" aria-hidden="true"></span>
+										<div class="choice-card-copy">
+											<Text as="span" weight="semibold">Virtual Machine</Text>
+											<Text color="muted">Access a VM configured cluster to run workloads.</Text>
+										</div>
+										<Text color="muted">Coming soon</Text>
+									</div>
+								</Card.Content>
+							</Card.Root>
+						</div>
+
+						<div class="panel-divider"></div>
+
+						<div class="row-between">
+							<div class="panel-copy">
+								<Text as="span" weight="semibold">Number of GPUs</Text>
+								<Text color="muted">You can add more later.</Text>
+							</div>
+							<div class="number-shell">
+								<NumberInput bind:value={gpuCount} min={1} max={16} step={1} size="sm" />
+							</div>
+						</div>
+
+						<div class="panel-divider"></div>
+
+						<div class="row-between">
+							<div class="panel-copy">
+								<Text as="span" weight="semibold">Wallpaper Tinting</Text>
+								<Text color="muted">Allow the wallpaper to be tinted.</Text>
+							</div>
+							<Toggle bind:pressed={tintWallpaper} size="sm">On</Toggle>
+						</div>
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</div>
+
+		<div class="preview-column">
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="panel-stack">
+						<div class="context-pill">
+							<Paperclip size={14} aria-hidden="true" />
+							<Text>Add context</Text>
+						</div>
+
+						<div class="assistant-composer">
+							<Textarea
+								bind:value={assistantPrompt}
+								placeholder="Ask, search, or make anything..."
+								rows={2}
+							/>
+							<div class="assistant-composer-actions">
+								<Badge color="gray" size="sm">Auto</Badge>
+								<Button variant="solid" size="sm">Go</Button>
+							</div>
+						</div>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<ButtonGroup size="sm">
+				<Button variant="outline">Archive</Button>
+				<Button variant="outline">Report</Button>
+				<Button variant="outline">Snooze</Button>
+			</ButtonGroup>
+
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="checkbox-row">
+						<Checkbox id="preview-terms" checked />
+						<Label for="preview-terms">
+							<Text>I agree to the terms and conditions</Text>
+						</Label>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<div class="toolbar-row">
+				<ButtonGroup size="sm">
+					<Button variant="outline" size="icon" aria-label="Previous">
+						<ArrowLeft size={14} aria-hidden="true" />
+					</Button>
+					<Button variant="outline">1</Button>
+					<Button variant="outline">2</Button>
+					<Button variant="outline">3</Button>
+					<Button variant="outline" size="icon" aria-label="Next">
+						<ArrowRight size={14} aria-hidden="true" />
+					</Button>
+				</ButtonGroup>
+				<Button variant="secondary" size="sm">
+					<LockKeyhole size={14} aria-hidden="true" />
+					Copilot
+				</Button>
+			</div>
+
+			<Card.Root size="sm">
+				<Card.Header>
+					<div class="panel-copy">
+						<Text as="span" weight="semibold">How did you hear about us?</Text>
+						<Text color="muted">Select the option that best describes you.</Text>
+					</div>
+				</Card.Header>
+				<Card.Content>
+					<div class="chip-row">
+						{#each discoverySources as source (source)}
+							<Chip variant="outline" color="gray">{source}</Chip>
 						{/each}
-					</Table.Body>
-				</Table.Root>
-			</Card.Content>
-		</Card.Root>
+					</div>
+				</Card.Content>
+			</Card.Root>
+
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="processing-panel">
+						<Spinner size="md" />
+						<div class="panel-copy panel-copy-center">
+							<Text as="span" weight="semibold">Processing your request</Text>
+							<Text color="muted">
+								Please wait while we process your request. Do not refresh the page.
+							</Text>
+						</div>
+						<div class="processing-progress">
+							<Progress value={64} size="sm" />
+						</div>
+						<Button variant="secondary" size="sm">Cancel</Button>
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</div>
 	</div>
+
+	<Card.Root size="sm">
+		<Card.Header>
+			<div class="panel-copy">
+				<Text as="span" weight="semibold">Members</Text>
+				<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
+			</div>
+		</Card.Header>
+		<Card.Content noPadding>
+			<Table.Root>
+				<Table.Header>
+					<Table.Row>
+						<Table.Head>Name</Table.Head>
+						<Table.Head>Role</Table.Head>
+						<Table.Head>Status</Table.Head>
+					</Table.Row>
+				</Table.Header>
+				<Table.Body>
+					{#each rows as row (row.name)}
+						<Table.Row>
+							<Table.Cell>{row.name}</Table.Cell>
+							<Table.Cell>{row.role}</Table.Cell>
+							<Table.Cell>
+								<Badge color={row.color} size="sm">{row.status}</Badge>
+							</Table.Cell>
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</Card.Content>
+	</Card.Root>
 </div>
 
 <style>
 	.preview-root {
 		display: grid;
-		gap: var(--dry-space-5);
+		gap: var(--dry-space-6);
 		container-type: inline-size;
 	}
 
-	.stat-row {
+	.preview-mosaic {
 		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.98fr) minmax(0, 1fr) minmax(0, 1.05fr);
 		gap: var(--dry-space-4);
-	}
-
-	.main-grid {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: var(--dry-space-5);
 		align-items: start;
 	}
 
-	.stack {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-
-	.btn-row {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		justify-content: start;
-		gap: var(--dry-space-2);
-	}
-
-	.badge-row {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		justify-content: start;
-		gap: var(--dry-space-2);
-	}
-
-	.form-grid {
+	.preview-column {
 		display: grid;
 		gap: var(--dry-space-3);
 	}
 
-	.checkbox-row {
+	.panel-stack,
+	.choice-stack,
+	.processing-panel,
+	.empty-state {
 		display: grid;
-		grid-template-columns: max-content minmax(0, 1fr);
-		align-items: center;
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-3);
 	}
 
-	@container (max-width: 52rem) {
-		.main-grid {
-			grid-template-columns: 1fr;
-		}
-	}
-
-	@container (max-width: 36rem) {
-		.stat-row {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.badge-row {
-			grid-auto-flow: row;
-			grid-template-columns: repeat(3, max-content);
-		}
-	}
-
-	@container (max-width: 24rem) {
-		.stat-row {
-			grid-template-columns: 1fr;
-		}
-
-		.btn-row {
-			grid-auto-flow: row;
-			grid-template-columns: repeat(2, max-content);
-		}
-	}
-	.stat-card-body {
+	.panel-copy,
+	.choice-card-copy,
+	.usage-meter {
 		display: grid;
 		gap: var(--dry-space-1);
 	}
 
-	.stat-card-label {
-		font-size: var(--dry-text-xs);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+	.panel-copy-center,
+	.processing-panel,
+	.empty-state {
+		justify-items: center;
+		text-align: center;
+	}
+
+	.action-row,
+	.avatar-row {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-3);
+		align-items: center;
+		justify-content: start;
+	}
+
+	.avatar-row {
+		gap: 0;
+		--dry-avatar-size: 2rem;
+		--dry-avatar-font-size: var(--dry-text-xs-size, 0.75rem);
+	}
+
+	.avatar-slot {
+		border-radius: 9999px;
+		background: var(--dry-color-bg-raised);
+		box-shadow: 0 0 0 2px var(--dry-color-bg-raised);
+	}
+
+	.avatar-slot + .avatar-slot {
+		margin-inline-start: calc(var(--dry-space-2) * -1);
+	}
+
+	/* dryui-allow flex */
+	.badge-strip,
+	.toolbar-row,
+	.chip-row {
+		/* dryui-allow flex */
+		display: flex;
+		/* dryui-allow flex */
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.split-fields,
+	.row-between,
+	.status-card,
+	.notice-row,
+	.usage-row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--dry-space-3);
+	}
+
+	.row-between,
+	.status-card,
+	.notice-row,
+	.usage-row {
+		align-items: center;
+	}
+
+	.number-shell {
+		display: grid;
+		justify-items: end;
+	}
+
+	.context-pill,
+	.icon-input,
+	.search-shell,
+	.notice-leading {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.prompt-shell {
+		display: grid;
+		--dry-prompt-input-textarea-min-height: 3.25rem;
+		--dry-prompt-input-gap: var(--dry-space-2);
+	}
+
+	.assistant-composer {
+		display: grid;
+		gap: var(--dry-space-2);
+		padding: var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-strong);
+		border-radius: var(--dry-radius-lg);
+		background: var(--dry-color-bg-raised);
+		--dry-input-bg: transparent;
+		--dry-input-border: transparent;
+		--dry-input-padding-x: 0;
+		--dry-input-padding-y: 0;
+	}
+
+	.assistant-composer-actions {
+		display: grid;
+		grid-template-columns: max-content 1fr max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+	}
+
+	.assistant-composer-actions > :last-child {
+		grid-column: 3;
+	}
+
+	.search-shell {
+		grid-template-columns: max-content minmax(0, 1fr) max-content;
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 82%, var(--dry-color-bg-base));
+	}
+
+	.icon-input {
+		grid-template-columns: max-content minmax(0, 1fr);
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 82%, var(--dry-color-bg-base));
+	}
+
+	.checkbox-row,
+	.choice-card {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.choice-card {
+		grid-template-columns: max-content minmax(0, 1fr) max-content;
+	}
+
+	.choice-radio {
+		display: inline-grid;
+		grid-template-columns: 0.875rem;
+		grid-template-rows: 0.875rem;
+		place-items: center;
+		border-radius: 9999px;
+		border: 1.5px solid var(--dry-color-stroke-strong);
+		background: transparent;
+	}
+
+	.choice-radio[data-selected] {
+		border-color: var(--dry-color-fill-brand);
+	}
+
+	.choice-radio[data-selected]::after {
+		content: '';
+		grid-area: 1 / 1;
+		place-self: stretch;
+		margin: 2px;
+		border-radius: 9999px;
+		background: var(--dry-color-fill-brand);
+	}
+
+	.panel-divider {
+		block-size: 1px;
+		background: var(--dry-color-stroke-weak);
+	}
+
+	.processing-panel {
+		padding-block: var(--dry-space-4);
+	}
+
+	.processing-progress {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-self: stretch;
+	}
+
+	.context-pill {
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-full);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 78%, var(--dry-color-bg-base));
+		justify-self: start;
+	}
+
+	.notice-row {
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 78%, var(--dry-color-bg-base));
+	}
+
+	.status-card-copy {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.search-shell,
+	.icon-input {
 		color: var(--dry-color-text-weak);
 	}
 
-	.stat-card-value {
-		font-size: clamp(1.5rem, 2vw + 1rem, 2.25rem);
-		font-weight: 600;
-		color: var(--dry-color-text-strong);
+	/* Outer mosaic — preview-root is the nearest container with no cards between. */
+	@container (max-width: 64rem) {
+		.preview-mosaic {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
-	.stat-card-trend {
-		font-size: var(--dry-text-sm);
+	@container (max-width: 40rem) {
+		.preview-mosaic {
+			grid-template-columns: 1fr;
+		}
 	}
 
-	.stat-card-trend[data-direction='up'] {
-		color: var(--dry-color-text-success);
-	}
+	/* Card-scoped stacking: each Card.Root creates its own container,
+	   so tight thresholds keep inner two-column rows side-by-side unless the
+	   card itself is truly narrow. */
+	@container (max-width: 22rem) {
+		.split-fields,
+		.row-between,
+		.status-card,
+		.notice-row,
+		.usage-row {
+			grid-template-columns: 1fr;
+		}
 
-	.stat-card-trend[data-direction='down'] {
-		color: var(--dry-color-text-error);
+		.number-shell {
+			justify-items: start;
+		}
 	}
 </style>

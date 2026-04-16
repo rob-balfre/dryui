@@ -294,351 +294,370 @@
 	<title>Theme Wizard — DryUI</title>
 </svelte:head>
 
-<Container size="xl">
-	<div class="wizard-page">
-		<DocsPageHeader
-			title="Theme Wizard"
-			description="Build a custom theme, preview updates live."
-		/>
+<div class="wizard-page">
+	<Container size="xl">
+		<div class="wizard-controls">
+			<DocsPageHeader
+				title="Theme Wizard"
+				description="Build a custom theme, preview updates live."
+			/>
 
-		<div class="control-bar">
-			<div class="menu-area">
-				<MegaMenu.Root>
-					<MegaMenu.Item>
-						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" /> Preset</MegaMenu.Trigger>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Starting points">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+			<div class="control-bar">
+				<div class="menu-area">
+					<MegaMenu.Root>
+						<MegaMenu.Item>
+							<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" /> Preset</MegaMenu.Trigger>
+							<MegaMenu.Panel>
+								<MegaMenu.Column title="Starting points">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+										>
+											{#each startingPresets as preset (preset.name)}
+												{@const hex = brandHsbToHex(preset.recipe.brand)}
+												{@const font =
+													FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+												<OptionPicker.Item value={preset.name}>
+													<OptionPicker.Preview
+														variant="preset"
+														data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+														{@attach attachPresetVars(hex, font)}
+													>
+														<span class="preset-thumb-text">Ag</span>
+													</OptionPicker.Preview>
+													<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+													<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Technical">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+										>
+											{#each technicalPresets as preset (preset.name)}
+												{@const hex = brandHsbToHex(preset.recipe.brand)}
+												{@const font =
+													FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+												<OptionPicker.Item value={preset.name}>
+													<OptionPicker.Preview
+														variant="preset"
+														data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+														{@attach attachPresetVars(hex, font)}
+													>
+														<span class="preset-thumb-text">Ag</span>
+													</OptionPicker.Preview>
+													<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+													<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Editorial">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+										>
+											{#each editorialPresets as preset (preset.name)}
+												{@const hex = brandHsbToHex(preset.recipe.brand)}
+												{@const font =
+													FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
+												<OptionPicker.Item value={preset.name}>
+													<OptionPicker.Preview
+														variant="preset"
+														data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+														{@attach attachPresetVars(hex, font)}
+													>
+														<span class="preset-thumb-text">Ag</span>
+													</OptionPicker.Preview>
+													<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+													<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
+
+						<MegaMenu.Item>
+							<MegaMenu.Trigger><Palette size={14} aria-hidden="true" /> Colour</MegaMenu.Trigger>
+							<MegaMenu.Panel fullWidth>
+								<MegaMenu.Column title="Picker">
+									<ColorPicker.Root
+										bind:value={() => brandHsbToHex(wizardState.brandHsb), setBrandFromHex}
+										areaHeight={160}
 									>
-										{#each startingPresets as preset (preset.name)}
-											{@const hex = brandHsbToHex(preset.recipe.brand)}
-											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													{@attach attachPresetVars(hex, font)}
+										<ColorPicker.Area />
+										<ColorPicker.HueSlider />
+										<ColorPicker.Input format="hex" />
+									</ColorPicker.Root>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Presets">
+									<div class="wizard-option-scope wizard-color-options">
+										<OptionPicker.Root
+											columns={2}
+											bind:value={getSelectedBrandPresetName, applyBrandPresetName}
+										>
+											{#each PRESETS as preset (preset.name)}
+												<OptionPicker.Item
+													value={preset.name}
+													size="compact"
+													layout="stacked"
+													title={preset.name}
+													aria-label={preset.name}
 												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Technical">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-									>
-										{#each technicalPresets as preset (preset.name)}
-											{@const hex = brandHsbToHex(preset.recipe.brand)}
-											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													{@attach attachPresetVars(hex, font)}
-												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Editorial">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-									>
-										{#each editorialPresets as preset (preset.name)}
-											{@const hex = brandHsbToHex(preset.recipe.brand)}
-											{@const font = FONT_STACKS[preset.recipe.typography?.fontPreset ?? 'System']}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													{@attach attachPresetVars(hex, font)}
-												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
+													<OptionPicker.Preview
+														shape="circle"
+														color={brandHsbToHex(preset.brandInput)}
+													/>
+													<VisuallyHidden>{preset.name}</VisuallyHidden>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
 
-					<MegaMenu.Item>
-						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" /> Colour</MegaMenu.Trigger>
-						<MegaMenu.Panel fullWidth>
-							<MegaMenu.Column title="Picker">
-								<ColorPicker.Root
-									bind:value={() => brandHsbToHex(wizardState.brandHsb), setBrandFromHex}
-									areaHeight={160}
-								>
-									<ColorPicker.Area />
-									<ColorPicker.HueSlider />
-									<ColorPicker.Input format="hex" />
-								</ColorPicker.Root>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Presets">
-								<div class="wizard-option-scope wizard-color-options">
-									<OptionPicker.Root
-										columns={2}
-										bind:value={getSelectedBrandPresetName, applyBrandPresetName}
-									>
-										{#each PRESETS as preset (preset.name)}
-											<OptionPicker.Item
-												value={preset.name}
-												size="compact"
-												layout="stacked"
-												title={preset.name}
-												aria-label={preset.name}
-											>
-												<OptionPicker.Preview
-													shape="circle"
-													color={brandHsbToHex(preset.brandInput)}
-												/>
-												<VisuallyHidden>{preset.name}</VisuallyHidden>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
+						<MegaMenu.Item>
+							<MegaMenu.Trigger><Type size={14} aria-hidden="true" /> Typography</MegaMenu.Trigger>
+							<MegaMenu.Panel>
+								<MegaMenu.Column title="Font family">
+									<div class="wizard-option-scope wizard-option-grid wizard-font-options">
+										<OptionPicker.Root
+											columns={2}
+											bind:value={() => wizardState.typography.fontPreset, setFontPreset}
+										>
+											{#each Object.entries(FONT_STACKS) as [name, stack] (name)}
+												<OptionPicker.Item value={name} layout="stacked" size="visual">
+													<OptionPicker.Preview variant="font" {@attach attachFontVar(stack)}>
+														<span class="font-preview-glyph">Ag</span>
+													</OptionPicker.Preview>
+													<OptionPicker.Label>{name}</OptionPicker.Label>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Type scale">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={() => wizardState.typography.scale, setTypeScale}
+										>
+											{#each TYPE_SCALE_OPTIONS as [value, label] (value)}
+												<OptionPicker.Item {value} size="compact">
+													<OptionPicker.Label>{label}</OptionPicker.Label>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
 
-					<MegaMenu.Item>
-						<MegaMenu.Trigger><Type size={14} aria-hidden="true" /> Typography</MegaMenu.Trigger>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Font family">
-								<div class="wizard-option-scope wizard-option-grid wizard-font-options">
-									<OptionPicker.Root
-										columns={2}
-										bind:value={() => wizardState.typography.fontPreset, setFontPreset}
-									>
-										{#each Object.entries(FONT_STACKS) as [name, stack] (name)}
-											<OptionPicker.Item value={name} layout="stacked" size="visual">
-												<OptionPicker.Preview variant="font" {@attach attachFontVar(stack)}>
-													<span class="font-preview-glyph">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{name}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Type scale">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={() => wizardState.typography.scale, setTypeScale}
-									>
-										{#each TYPE_SCALE_OPTIONS as [value, label] (value)}
-											<OptionPicker.Item {value} size="compact">
-												<OptionPicker.Label>{label}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
+						<MegaMenu.Item>
+							<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" /> Shape</MegaMenu.Trigger>
+							<MegaMenu.Panel>
+								<MegaMenu.Column title="Style">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={() => wizardState.personality, setPersonality}
+										>
+											{#each PERSONALITY_OPTIONS as opt (opt.value)}
+												<OptionPicker.Item value={opt.value} size="compact">
+													<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Corners">
+									<div class="wizard-option-scope wizard-option-grid wizard-corner-options">
+										<OptionPicker.Root
+											columns={2}
+											bind:value={() => wizardState.shape.radiusPreset, setRadiusPreset}
+										>
+											{#each RADIUS_OPTIONS as opt (opt.value)}
+												<OptionPicker.Item value={opt.value} layout="stacked" size="visual">
+													<OptionPicker.Preview variant="shape" data-shape={opt.value} />
+													<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Spacing">
+									<div class="wizard-option-scope wizard-option-list">
+										<OptionPicker.Root
+											orientation="vertical"
+											bind:value={() => wizardState.shape.density, setDensity}
+										>
+											{#each DENSITY_OPTIONS as opt (opt.value)}
+												<OptionPicker.Item value={opt.value} size="compact">
+													<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
 
-					<MegaMenu.Item>
-						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" /> Shape</MegaMenu.Trigger>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Style">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={() => wizardState.personality, setPersonality}
-									>
-										{#each PERSONALITY_OPTIONS as opt (opt.value)}
-											<OptionPicker.Item value={opt.value} size="compact">
-												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Corners">
-								<div class="wizard-option-scope wizard-option-grid wizard-corner-options">
-									<OptionPicker.Root
-										columns={2}
-										bind:value={() => wizardState.shape.radiusPreset, setRadiusPreset}
-									>
-										{#each RADIUS_OPTIONS as opt (opt.value)}
-											<OptionPicker.Item value={opt.value} layout="stacked" size="visual">
-												<OptionPicker.Preview variant="shape" data-shape={opt.value} />
-												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Spacing">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										orientation="vertical"
-										bind:value={() => wizardState.shape.density, setDensity}
-									>
-										{#each DENSITY_OPTIONS as opt (opt.value)}
-											<OptionPicker.Item value={opt.value} size="compact">
-												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
+						<MegaMenu.Item>
+							<MegaMenu.Trigger
+								><SlidersHorizontal size={14} aria-hidden="true" /> Adjust</MegaMenu.Trigger
+							>
+							<MegaMenu.Panel>
+								<MegaMenu.Column title="Filters">
+									<div class="adjust-controls">
+										<div class="adjust-row">
+											<Text size="sm">Brightness</Text>
+											<Slider
+												bind:value={wizardState.adjust.brightness}
+												min={50}
+												max={150}
+												size="sm"
+											/>
+											<Text size="xs" color="muted">{wizardState.adjust.brightness}%</Text>
+										</div>
+										<div class="adjust-row">
+											<Text size="sm">Contrast</Text>
+											<Slider
+												bind:value={wizardState.adjust.contrast}
+												min={50}
+												max={150}
+												size="sm"
+											/>
+											<Text size="xs" color="muted">{wizardState.adjust.contrast}%</Text>
+										</div>
+										<div class="adjust-row">
+											<Text size="sm">Saturation</Text>
+											<Slider
+												bind:value={wizardState.adjust.saturate}
+												min={0}
+												max={200}
+												size="sm"
+											/>
+											<Text size="xs" color="muted">{wizardState.adjust.saturate}%</Text>
+										</div>
+										<div class="adjust-row">
+											<Text size="sm">Hue shift</Text>
+											<Slider
+												bind:value={wizardState.adjust.hueRotate}
+												min={-180}
+												max={180}
+												size="sm"
+											/>
+											<Text size="xs" color="muted">{wizardState.adjust.hueRotate}°</Text>
+										</div>
+										{#if hasAdjustments}
+											<div class="wizard-action-scope">
+												<Button variant="secondary" size="sm" onclick={resetAdjust}>
+													Reset filters
+												</Button>
+											</div>
+										{/if}
+									</div>
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
 
-					<MegaMenu.Item>
-						<MegaMenu.Trigger
-							><SlidersHorizontal size={14} aria-hidden="true" /> Adjust</MegaMenu.Trigger
+						<MegaMenu.Item>
+							<MegaMenu.Trigger>
+								{#if allContrastPass}
+									<ShieldCheck size={14} aria-hidden="true" />
+								{:else}
+									<ShieldAlert size={14} aria-hidden="true" />
+								{/if}
+								Contrast
+							</MegaMenu.Trigger>
+							<MegaMenu.Panel>
+								<MegaMenu.Column title="Light mode">
+									{#each lightContrast as check (check.label)}
+										<div class="contrast-result">
+											<div class="contrast-result-icon">
+												<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
+													{check.ratioLabel}
+													{check.passes ? '\u2713' : '\u2717'}
+												</Badge>
+											</div>
+											<div class="contrast-result-content">
+												<div class="contrast-result-label">{check.label}</div>
+											</div>
+										</div>
+									{/each}
+								</MegaMenu.Column>
+								<MegaMenu.Column title="Dark mode">
+									{#each darkContrast as check (check.label)}
+										<div class="contrast-result">
+											<div class="contrast-result-icon">
+												<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
+													{check.ratioLabel}
+													{check.passes ? '\u2713' : '\u2717'}
+												</Badge>
+											</div>
+											<div class="contrast-result-content">
+												<div class="contrast-result-label">{check.label}</div>
+											</div>
+										</div>
+									{/each}
+								</MegaMenu.Column>
+							</MegaMenu.Panel>
+						</MegaMenu.Item>
+					</MegaMenu.Root>
+				</div>
+
+				<div class="bar-actions">
+					<div class="wizard-toggle-scope">
+						<ThemeToggle />
+					</div>
+					<div class="wizard-action-scope">
+						<Button
+							variant="secondary"
+							size="sm"
+							onclick={() => {
+								resetToDefaults();
+								resetAdjust();
+							}}>Reset</Button
 						>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Filters">
-								<div class="adjust-controls">
-									<div class="adjust-row">
-										<Text size="sm">Brightness</Text>
-										<Slider
-											bind:value={wizardState.adjust.brightness}
-											min={50}
-											max={150}
-											size="sm"
-										/>
-										<Text size="xs" color="muted">{wizardState.adjust.brightness}%</Text>
-									</div>
-									<div class="adjust-row">
-										<Text size="sm">Contrast</Text>
-										<Slider bind:value={wizardState.adjust.contrast} min={50} max={150} size="sm" />
-										<Text size="xs" color="muted">{wizardState.adjust.contrast}%</Text>
-									</div>
-									<div class="adjust-row">
-										<Text size="sm">Saturation</Text>
-										<Slider bind:value={wizardState.adjust.saturate} min={0} max={200} size="sm" />
-										<Text size="xs" color="muted">{wizardState.adjust.saturate}%</Text>
-									</div>
-									<div class="adjust-row">
-										<Text size="sm">Hue shift</Text>
-										<Slider
-											bind:value={wizardState.adjust.hueRotate}
-											min={-180}
-											max={180}
-											size="sm"
-										/>
-										<Text size="xs" color="muted">{wizardState.adjust.hueRotate}°</Text>
-									</div>
-									{#if hasAdjustments}
-										<div class="wizard-action-scope">
-											<Button variant="secondary" size="sm" onclick={resetAdjust}>
-												Reset filters
-											</Button>
-										</div>
-									{/if}
-								</div>
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
-
-					<MegaMenu.Item>
-						<MegaMenu.Trigger>
-							{#if allContrastPass}
-								<ShieldCheck size={14} aria-hidden="true" />
-							{:else}
-								<ShieldAlert size={14} aria-hidden="true" />
-							{/if}
-							Contrast
-						</MegaMenu.Trigger>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Light mode">
-								{#each lightContrast as check (check.label)}
-									<div class="contrast-result">
-										<div class="contrast-result-icon">
-											<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
-												{check.ratioLabel}
-												{check.passes ? '\u2713' : '\u2717'}
-											</Badge>
-										</div>
-										<div class="contrast-result-content">
-											<div class="contrast-result-label">{check.label}</div>
-										</div>
-									</div>
-								{/each}
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Dark mode">
-								{#each darkContrast as check (check.label)}
-									<div class="contrast-result">
-										<div class="contrast-result-icon">
-											<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
-												{check.ratioLabel}
-												{check.passes ? '\u2713' : '\u2717'}
-											</Badge>
-										</div>
-										<div class="contrast-result-content">
-											<div class="contrast-result-label">{check.label}</div>
-										</div>
-									</div>
-								{/each}
-							</MegaMenu.Column>
-						</MegaMenu.Panel>
-					</MegaMenu.Item>
-				</MegaMenu.Root>
-			</div>
-
-			<div class="bar-actions">
-				<div class="wizard-toggle-scope">
-					<ThemeToggle />
-				</div>
-				<div class="wizard-action-scope">
-					<Button
-						variant="secondary"
-						size="sm"
-						onclick={() => {
-							resetToDefaults();
-							resetAdjust();
-						}}>Reset</Button
-					>
-				</div>
-				<div class="wizard-action-scope wizard-action-scope-primary">
-					<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
-				</div>
-				<div class="wizard-action-scope">
-					<Button variant="secondary" size="sm" onclick={handleCopyCss}>
-						{copyFeedback || 'Copy CSS'}
-					</Button>
+					</div>
+					<div class="wizard-action-scope wizard-action-scope-primary">
+						<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
+					</div>
+					<div class="wizard-action-scope">
+						<Button variant="secondary" size="sm" onclick={handleCopyCss}>
+							{copyFeedback || 'Copy CSS'}
+						</Button>
+					</div>
 				</div>
 			</div>
 		</div>
+	</Container>
 
-		<Adjust
-			brightness={wizardState.adjust.brightness}
-			contrast={wizardState.adjust.contrast}
-			saturate={wizardState.adjust.saturate}
-			hueRotate={wizardState.adjust.hueRotate}
-		>
-			<div class="preview-scene" data-mode={themeMode} {@attach attachThemeTokens(tokens)}>
-				<PreviewComponents />
-			</div>
-		</Adjust>
-	</div>
-</Container>
+	<Adjust
+		brightness={wizardState.adjust.brightness}
+		contrast={wizardState.adjust.contrast}
+		saturate={wizardState.adjust.saturate}
+		hueRotate={wizardState.adjust.hueRotate}
+	>
+		<section class="preview-band">
+			<Container size="xl">
+				<div class="preview-scene" data-mode={themeMode} {@attach attachThemeTokens(tokens)}>
+					<PreviewComponents />
+				</div>
+			</Container>
+		</section>
+	</Adjust>
+</div>
 
 <style>
 	.wizard-page {
@@ -668,10 +687,15 @@
 			var(--dry-color-bg-raised) 88%
 		);
 		--wizard-accent-fg: var(--dry-color-text-strong);
-		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-6);
 		padding-bottom: var(--dry-space-10);
+	}
+
+	.wizard-controls {
+		container-type: inline-size;
+		display: grid;
+		gap: var(--dry-space-6);
 	}
 
 	.control-bar {
@@ -840,11 +864,15 @@
 
 	/* ─── Preview scene ───────────────────────────────────────────────────── */
 
+	.preview-band {
+		display: grid;
+		padding-block: var(--dry-space-3) var(--dry-space-8);
+		background: color-mix(in srgb, var(--dry-color-bg-base) 95%, var(--dry-color-fill-brand) 5%);
+	}
+
 	.preview-scene {
-		padding: var(--dry-space-6);
-		border-radius: var(--dry-radius-lg);
-		border: 1px solid var(--dry-color-stroke-weak);
-		background: var(--dry-color-bg-base);
+		display: grid;
+		padding: var(--dry-space-4) 0;
 		color: var(--dry-color-text-strong);
 	}
 
