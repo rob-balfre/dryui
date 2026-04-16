@@ -12,6 +12,10 @@ export const PRESETS: Preset[] = [
 		brandInput: { h: 230, s: 65, b: 85 }
 	},
 	{
+		name: 'Wireframe',
+		brandInput: { h: 0, s: 0, b: 50 }
+	},
+	{
 		name: 'Ocean',
 		brandInput: { h: 200, s: 80, b: 70 }
 	},
@@ -57,6 +61,19 @@ export const RECIPE_PRESETS: RecipePreset[] = [
 			typography: { fontPreset: 'System', scale: 'default' },
 			shape: { radiusPreset: 'soft', radiusScale: 1, density: 'default' },
 			shadows: { preset: 'elevated', intensity: 1, tintBrand: true }
+		}
+	},
+	{
+		name: 'Wireframe',
+		description: 'Monochrome, outlined, low-noise UI',
+		recipe: {
+			brand: { h: 0, s: 0, b: 50 },
+			personality: 'minimal',
+			neutralMode: 'neutral',
+			typography: { fontPreset: 'Mono', scale: 'compact' },
+			shape: { radiusPreset: 'sharp', radiusScale: 1, density: 'compact' },
+			shadows: { preset: 'flat', intensity: 1, tintBrand: false },
+			adjust: { saturate: 0 }
 		}
 	},
 	{

@@ -60,6 +60,12 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 		category: 'visual',
 		tags: ['beam', 'light', 'streak', 'shimmer', 'effect']
 	},
+	BorderBeam: {
+		description:
+			'Animated border-travel beam with masked ring highlights, bloom, and line-trace presets',
+		category: 'visual',
+		tags: ['border', 'beam', 'glow', 'ring', 'highlight', 'effect']
+	},
 	Shimmer: {
 		description: 'Warm highlight sweep that travels across wrapped text and inline icons together',
 		category: 'visual',
@@ -992,6 +998,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'Adjust',
 			'Aurora',
 			'Beam',
+			'BorderBeam',
 			'ChromaticAberration',
 			'ChromaticShift',
 			'Displacement',

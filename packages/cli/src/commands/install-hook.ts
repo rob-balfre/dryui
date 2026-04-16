@@ -6,7 +6,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { commandError, hasFlag, homeRelative, printCommandHelp, runCommand } from '../run.js';
+import {
+	commandError,
+	hasFlag,
+	homeRelative,
+	printCommandHelp,
+	runCommand,
+	type CommandResult,
+	type OutputMode
+} from '../run.js';
 
 interface ClaudeHookEntry {
 	type: 'command';
@@ -28,8 +36,7 @@ interface ClaudeSettings {
 	[key: string]: unknown;
 }
 
-// Prefers the `dryui ambient` subcommand over the `dryui-ambient` bin so
-// partial installs (only the main bin on PATH) still resolve correctly.
+// `dryui ambient` is the canonical hook entrypoint.
 const AMBIENT_COMMAND = 'dryui ambient';
 
 function resolveSettingsPath(args: string[]): { path: string; scope: 'project' | 'global' } {
@@ -63,7 +70,6 @@ function hasDryuiSessionStartHook(settings: ClaudeSettings): boolean {
 		for (const entry of group.hooks) {
 			if (entry?.type !== 'command') continue;
 			if (entry.command && entry.command.includes('dryui ambient')) return true;
-			if (entry.command && entry.command.includes('dryui-ambient')) return true;
 		}
 	}
 	return false;
@@ -119,6 +125,10 @@ export function runInstallHook(args: string[]): void {
 		});
 	}
 
+	runCommand(getInstallHookResult(args), 'toon');
+}
+
+export function getInstallHookResult(args: string[], mode: OutputMode = 'toon'): CommandResult {
 	const { path: settingsPath, scope } = resolveSettingsPath(args);
 	const dryRun = hasFlag(args, '--dry-run');
 
@@ -127,14 +137,10 @@ export function runInstallHook(args: string[]): void {
 		loaded = loadSettings(settingsPath);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
-		runCommand(
-			commandError('toon', 'invalid-settings', message, [
-				`Inspect ${homeRelative(settingsPath)}`,
-				'Fix the JSON and rerun dryui install-hook'
-			]),
-			'toon'
-		);
-		return;
+		return commandError(mode, 'invalid-settings', message, [
+			`Inspect ${homeRelative(settingsPath)}`,
+			'Fix the JSON and rerun dryui install-hook'
+		]);
 	}
 
 	if (hasDryuiSessionStartHook(loaded.data)) {
@@ -147,8 +153,7 @@ export function runInstallHook(args: string[]): void {
 			'  dryui ambient,Preview the ambient output this hook will inject',
 			'  dryui install-hook --dry-run,Re-check without touching settings'
 		];
-		runCommand({ output: lines.join('\n'), error: null, exitCode: 0 }, 'toon');
-		return;
+		return { output: lines.join('\n'), error: null, exitCode: 0 };
 	}
 
 	const merged = mergeSessionStartHook(loaded.data);
@@ -169,8 +174,7 @@ export function runInstallHook(args: string[]): void {
 			'  dryui install-hook,Apply the hook for real',
 			'  dryui install-hook --global,Target ~/.claude/settings.json instead'
 		];
-		runCommand({ output: lines.join('\n'), error: null, exitCode: 0 }, 'toon');
-		return;
+		return { output: lines.join('\n'), error: null, exitCode: 0 };
 	}
 
 	try {
@@ -178,14 +182,10 @@ export function runInstallHook(args: string[]): void {
 		writeFileSync(settingsPath, serialized);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
-		runCommand(
-			commandError('toon', 'write-failed', `Unable to write ${settingsPath}: ${message}`, [
-				'Check directory permissions',
-				'Retry with --dry-run to inspect the payload'
-			]),
-			'toon'
-		);
-		return;
+		return commandError(mode, 'write-failed', `Unable to write ${settingsPath}: ${message}`, [
+			'Check directory permissions',
+			'Retry with --dry-run to inspect the payload'
+		]);
 	}
 
 	const lines = [
@@ -197,5 +197,5 @@ export function runInstallHook(args: string[]): void {
 		'  dryui ambient,Preview the ambient output this hook injects',
 		'  claude,Start a new Claude Code session to verify the hook fires'
 	];
-	runCommand({ output: lines.join('\n'), error: null, exitCode: 0 }, 'toon');
+	return { output: lines.join('\n'), error: null, exitCode: 0 };
 }

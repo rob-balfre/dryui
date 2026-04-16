@@ -15,6 +15,7 @@
 
 <style>
 	[data-drawer-footer] {
+		grid-row: 3;
 		padding: var(--dry-space-6) var(--dry-space-8);
 		border-top: 1px solid var(--dry-drawer-border);
 		display: grid;

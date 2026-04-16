@@ -57,14 +57,14 @@ Most commands default to TOON (token-optimized) output. Pass --text for
 human-readable plain text, or --json where supported. init, feedback, and
 add (snippet mode) always produce plain text.
 
-Running \`dryui\` with no command opens the feedback launcher inside the
-DryUI monorepo, prints a compact project dashboard in a DryUI project, or
-starts the interactive setup flow everywhere else. Use \`dryui --help\` to
-see this message.
+Running \`dryui\` with no command starts the interactive setup flow in a TTY.
+Without a TTY, it opens the feedback launcher inside the DryUI monorepo,
+prints a compact project dashboard in a DryUI project, or prints setup hints
+everywhere else. Use \`dryui --help\` to see this message.
 
 Commands:
   setup [--editor <id>] [--open-feedback]
-                                Interactive editor + feedback setup
+                                Interactive setup, feedback, and project helpers
   init [path] [--pm bun|npm|pnpm|yarn]
                                 Bootstrap a SvelteKit + DryUI project
   detect [--json] [--text] [path]
@@ -113,6 +113,11 @@ async function main(): Promise<void> {
 	}
 
 	if (!command) {
+		if (isInteractiveTTY()) {
+			await runSetup([], spec);
+			return;
+		}
+
 		if (await runLauncher([])) {
 			return;
 		}
@@ -128,11 +133,6 @@ async function main(): Promise<void> {
 			// Detection threw — fall through to the not-a-project status.
 		}
 
-		if (isInteractiveTTY()) {
-			await runSetup([]);
-			return;
-		}
-
 		printBanner();
 		emitNotADryuiProject();
 		process.exit(0);
@@ -145,7 +145,7 @@ async function main(): Promise<void> {
 			runInit(commandArgs, spec);
 			break;
 		case 'setup':
-			await runSetup(commandArgs);
+			await runSetup(commandArgs, spec);
 			break;
 		case 'detect':
 			runDetect(commandArgs, spec);

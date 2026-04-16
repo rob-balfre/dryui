@@ -112,7 +112,7 @@ The DryUI skill and MCP server are the editor integration layer on top of that C
 
 Canonical install snippets, config paths, and MCP JSON/TOML for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) and render to the docs [getting-started page](https://dryui.dev/getting-started). Update that source instead of duplicating client setup here.
 
-Codex users on 0.121.0+ can install DryUI the same way as Claude Code: `codex marketplace add rob-balfre/dryui`, then install DryUI from `/plugins` inside Codex.
+Codex users on 0.121.0+ can install DryUI with `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI`.
 
 ### From Source
 

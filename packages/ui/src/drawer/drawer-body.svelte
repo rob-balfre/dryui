@@ -16,6 +16,7 @@
 
 <style>
 	[data-drawer-body] {
+		grid-row: 2;
 		padding: var(--dry-space-12) var(--dry-space-8);
 		overflow-y: auto;
 		min-height: 0;

@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { afterNavigate } from '$app/navigation';
+	import { page } from '$app/state';
+	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
 	import {
 		Adjust,
 		Badge,
@@ -22,6 +25,7 @@
 		getAllTokens,
 		getDerivedTheme,
 		applyRecipe,
+		decodeRecipe,
 		hsbToHsl,
 		hslToHex,
 		hexToHsl,
@@ -33,7 +37,6 @@
 		PRESETS,
 		RECIPE_PRESETS,
 		FONT_STACKS,
-		bg,
 		type BrandInput,
 		type RecipePreset
 	} from '@dryui/theme-wizard';
@@ -53,6 +56,26 @@
 
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
+	let lastAppliedRecipe: string | null = null;
+
+	useThemeOverride(() => tokens);
+
+	afterNavigate(() => {
+		const recipe = page.url.searchParams.get('t');
+		if (!recipe) {
+			lastAppliedRecipe = null;
+			return;
+		}
+
+		if (recipe === lastAppliedRecipe) return;
+
+		try {
+			applyRecipe(decodeRecipe(recipe));
+			lastAppliedRecipe = recipe;
+		} catch {
+			// Ignore malformed recipe URLs and leave the current in-memory state alone.
+		}
+	});
 
 	function brandHsbToHex(brand: { h: number; s: number; b: number }): string {
 		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
@@ -120,7 +143,11 @@
 			wizardState.shape.density === preset.recipe.shape?.density &&
 			wizardState.shadows.preset === preset.recipe.shadows?.preset &&
 			wizardState.shadows.intensity === preset.recipe.shadows?.intensity &&
-			wizardState.shadows.tintBrand === preset.recipe.shadows?.tintBrand
+			wizardState.shadows.tintBrand === preset.recipe.shadows?.tintBrand &&
+			wizardState.adjust.brightness === (preset.recipe.adjust?.brightness ?? 100) &&
+			wizardState.adjust.contrast === (preset.recipe.adjust?.contrast ?? 100) &&
+			wizardState.adjust.saturate === (preset.recipe.adjust?.saturate ?? 100) &&
+			wizardState.adjust.hueRotate === (preset.recipe.adjust?.hueRotate ?? 0)
 		);
 	}
 
@@ -146,23 +173,18 @@
 		}
 	}
 
-	let adjustBrightness = $state(100);
-	let adjustContrast = $state(100);
-	let adjustSaturate = $state(100);
-	let adjustHueRotate = $state(0);
-
 	function resetAdjust() {
-		adjustBrightness = 100;
-		adjustContrast = 100;
-		adjustSaturate = 100;
-		adjustHueRotate = 0;
+		wizardState.adjust.brightness = 100;
+		wizardState.adjust.contrast = 100;
+		wizardState.adjust.saturate = 100;
+		wizardState.adjust.hueRotate = 0;
 	}
 
 	let hasAdjustments = $derived(
-		adjustBrightness !== 100 ||
-			adjustContrast !== 100 ||
-			adjustSaturate !== 100 ||
-			adjustHueRotate !== 0
+		wizardState.adjust.brightness !== 100 ||
+			wizardState.adjust.contrast !== 100 ||
+			wizardState.adjust.saturate !== 100 ||
+			wizardState.adjust.hueRotate !== 0
 	);
 
 	interface ContrastCheck {
@@ -241,7 +263,7 @@
 		['Default', 'Corporate', 'Midnight'].includes(p.name)
 	);
 	const technicalPresets = RECIPE_PRESETS.filter((p) =>
-		['Dashboard', 'Terminal', 'Ember'].includes(p.name)
+		['Wireframe', 'Dashboard', 'Terminal', 'Ember'].includes(p.name)
 	);
 	const editorialPresets = RECIPE_PRESETS.filter((p) => ['Editorial', 'Playful'].includes(p.name));
 	const TYPE_SCALE_OPTIONS = [
@@ -495,23 +517,33 @@
 								<div class="adjust-controls">
 									<div class="adjust-row">
 										<Text size="sm">Brightness</Text>
-										<Slider bind:value={adjustBrightness} min={50} max={150} size="sm" />
-										<Text size="xs" color="muted">{adjustBrightness}%</Text>
+										<Slider
+											bind:value={wizardState.adjust.brightness}
+											min={50}
+											max={150}
+											size="sm"
+										/>
+										<Text size="xs" color="muted">{wizardState.adjust.brightness}%</Text>
 									</div>
 									<div class="adjust-row">
 										<Text size="sm">Contrast</Text>
-										<Slider bind:value={adjustContrast} min={50} max={150} size="sm" />
-										<Text size="xs" color="muted">{adjustContrast}%</Text>
+										<Slider bind:value={wizardState.adjust.contrast} min={50} max={150} size="sm" />
+										<Text size="xs" color="muted">{wizardState.adjust.contrast}%</Text>
 									</div>
 									<div class="adjust-row">
 										<Text size="sm">Saturation</Text>
-										<Slider bind:value={adjustSaturate} min={0} max={200} size="sm" />
-										<Text size="xs" color="muted">{adjustSaturate}%</Text>
+										<Slider bind:value={wizardState.adjust.saturate} min={0} max={200} size="sm" />
+										<Text size="xs" color="muted">{wizardState.adjust.saturate}%</Text>
 									</div>
 									<div class="adjust-row">
 										<Text size="sm">Hue shift</Text>
-										<Slider bind:value={adjustHueRotate} min={-180} max={180} size="sm" />
-										<Text size="xs" color="muted">{adjustHueRotate}°</Text>
+										<Slider
+											bind:value={wizardState.adjust.hueRotate}
+											min={-180}
+											max={180}
+											size="sm"
+										/>
+										<Text size="xs" color="muted">{wizardState.adjust.hueRotate}°</Text>
 									</div>
 									{#if hasAdjustments}
 										<div class="wizard-action-scope">
@@ -596,10 +628,10 @@
 		</div>
 
 		<Adjust
-			brightness={adjustBrightness}
-			contrast={adjustContrast}
-			saturate={adjustSaturate}
-			hueRotate={adjustHueRotate}
+			brightness={wizardState.adjust.brightness}
+			contrast={wizardState.adjust.contrast}
+			saturate={wizardState.adjust.saturate}
+			hueRotate={wizardState.adjust.hueRotate}
 		>
 			<div class="preview-scene" data-mode={themeMode} {@attach attachThemeTokens(tokens)}>
 				<PreviewComponents />

@@ -198,22 +198,36 @@ export function runFileCommand(
 	return run(readFileSync(filePath, 'utf-8'));
 }
 
+export function emitCommandResult(result: CommandResult, mode: OutputMode = 'text'): void {
+	if (result.error) {
+		if (mode === 'text') {
+			console.error(result.error);
+		} else {
+			console.log(result.error);
+		}
+	} else {
+		console.log(result.output);
+	}
+}
+
 /**
  * Print a command result and exit.
  * In toon/json mode: errors go to stdout (agent-friendly structured output).
  * In text mode: errors go to stderr (human-friendly).
  */
 export function runCommand(result: CommandResult, mode: OutputMode = 'text'): void {
-	if (result.error) {
-		if (mode === 'text') {
-			console.error(result.error);
-		} else {
-			// Agent mode: errors on stdout so agents can read them
-			console.log(result.error);
-		}
-	} else {
-		console.log(result.output);
-	}
-
+	emitCommandResult(result, mode);
 	process.exit(result.exitCode);
+}
+
+/**
+ * Emit or run-and-exit a command result based on whether the caller wants to
+ * continue executing after the result.
+ */
+export function emitOrRun(result: CommandResult, mode: OutputMode, exit: boolean): void {
+	if (exit) {
+		runCommand(result, mode);
+	} else {
+		emitCommandResult(result, mode);
+	}
 }

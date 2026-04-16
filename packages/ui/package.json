@@ -76,6 +76,11 @@
       "svelte": "./src/beam/index.ts",
       "default": "./src/beam/index.ts"
     },
+    "./border-beam": {
+      "types": "./src/border-beam/index.ts",
+      "svelte": "./src/border-beam/index.ts",
+      "default": "./src/border-beam/index.ts"
+    },
     "./breadcrumb": {
       "types": "./src/breadcrumb/index.ts",
       "svelte": "./src/breadcrumb/index.ts",
@@ -823,6 +828,11 @@
         "types": "./dist/beam/index.d.ts",
         "svelte": "./dist/beam/index.js",
         "default": "./dist/beam/index.js"
+      },
+      "./border-beam": {
+        "types": "./dist/border-beam/index.d.ts",
+        "svelte": "./dist/border-beam/index.js",
+        "default": "./dist/border-beam/index.js"
       },
       "./breadcrumb": {
         "types": "./dist/breadcrumb/index.d.ts",

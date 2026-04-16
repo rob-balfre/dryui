@@ -410,7 +410,8 @@
 			--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-strong));
 		}
 
-		&[aria-pressed='true'] {
+		&[aria-pressed='true'],
+		&[aria-pressed='true']:hover:not([data-disabled]) {
 			--_dry-btn-bg: var(--dry-btn-bg, var(--dry-color-fill-brand));
 			--_dry-btn-color: var(--dry-btn-color, var(--dry-color-on-brand));
 		}

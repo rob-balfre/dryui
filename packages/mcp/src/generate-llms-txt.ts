@@ -380,7 +380,7 @@ After the CLI is working, DryUI also ships an MCP server (live tools) and a skil
 ### Install
 
 - **Claude Code**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui\` (plugin bundles skill + MCP)
-- **Codex** (0.121.0+): \`codex marketplace add rob-balfre/dryui\`, then install DryUI from \`/plugins\` inside Codex. Manual fallback: \`codex mcp add dryui -- npx -y @dryui/mcp\` + copy the skill
+- **Codex** (0.121.0+): \`codex marketplace add rob-balfre/dryui\`, then start \`codex\`, run \`/plugins\`, and install \`DryUI\`. Manual fallback: \`codex mcp add dryui -- npx -y @dryui/mcp\` + copy the skill
 - **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui\` + add MCP config
 - **Zed**: MCP only (reads AGENTS.md for conventions)
 

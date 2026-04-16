@@ -34,7 +34,7 @@
 				</div>
 			</Dialog.Body>
 			<Dialog.Footer>
-				<Dialog.Close>Cancel</Dialog.Close>
+				<Button variant="ghost" onclick={() => (dialogOpen = false)}>Cancel</Button>
 				<Button variant="solid" onclick={() => (dialogOpen = false)}>Publish</Button>
 			</Dialog.Footer>
 		</Dialog.Content>

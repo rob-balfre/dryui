@@ -50,7 +50,6 @@
       "version": "0.6.1",
       "bin": {
         "dryui": "./dist/index.js",
-        "dryui-ambient": "./dist/ambient.js",
       },
       "dependencies": {
         "@dryui/feedback-server": "^0.3.2",

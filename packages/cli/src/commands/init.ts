@@ -198,7 +198,7 @@ export function runInit(args: string[], spec: Spec): void {
 		log('');
 		log('  DryUI is already set up in this project.');
 		log('');
-		process.exit(0);
+		return;
 	}
 
 	const isScaffold = plan.detection.status === 'unsupported';

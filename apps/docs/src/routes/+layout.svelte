@@ -3,8 +3,6 @@
 	import { dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
-	import { applyRecipe, decodeRecipe, getAllTokens } from '@dryui/theme-wizard';
 	import { Badge, Button, Container, Drawer, Heading, Link } from '@dryui/ui';
 	import { Menu } from 'lucide-svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
@@ -12,13 +10,11 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { BUILD_TIMESTAMP, DRYUI_VERSION } from '$lib/site-meta';
-	import { isDarkTheme } from '$lib/theme.svelte.js';
 	import { withBase } from '$lib/utils';
 	import '../app.css';
 
 	let { children: routeChildren } = $props();
 	let mobileNavOpen = $state(false);
-	let lastAppliedRecipe: string | null = null;
 	let feedbackEnabled = $state(false);
 
 	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
@@ -54,15 +50,7 @@
 	let isFullWidthRoute = $derived(
 		page.url.pathname.startsWith('/view/') || page.url.pathname.startsWith(withBase('/view/'))
 	);
-	let themeMode = $derived(isDarkTheme() ? 'dark' : 'light');
-	let lightThemeWizardTokens = $derived.by(() => getAllTokens('light'));
-	let darkThemeWizardTokens = $derived.by(() => getAllTokens('dark'));
-	let activeThemeWizardTokens = $derived(
-		themeMode === 'dark' ? darkThemeWizardTokens : lightThemeWizardTokens
-	);
 	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
-
-	useThemeOverride(() => (isThemeWizardRoute ? activeThemeWizardTokens : {}));
 
 	afterNavigate(() => {
 		if (dev && typeof window !== 'undefined') {
@@ -72,26 +60,6 @@
 			} else {
 				feedbackEnabled = window.sessionStorage.getItem(FEEDBACK_SESSION_KEY) === '1';
 			}
-		}
-
-		if (!isThemeWizardPath(page.url.pathname)) {
-			lastAppliedRecipe = null;
-			return;
-		}
-
-		const recipe = page.url.searchParams.get('t');
-		if (!recipe) {
-			lastAppliedRecipe = null;
-			return;
-		}
-
-		if (recipe === lastAppliedRecipe) return;
-
-		try {
-			applyRecipe(decodeRecipe(recipe));
-			lastAppliedRecipe = recipe;
-		} catch {
-			// Ignore malformed recipe URLs and leave the current in-memory state alone.
 		}
 	});
 </script>

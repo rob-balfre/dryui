@@ -1,25 +1,25 @@
 {
   "schema": "DolphinGraph",
-  "packageVersion": "1.1.3",
+  "packageVersion": "1.1.4",
   "summary": {
-    "componentNodes": 288,
+    "componentNodes": 290,
     "partNodes": 654,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 143,
-    "uiComponents": 145,
-    "uiWrappers": 129,
+    "primitiveComponents": 144,
+    "uiComponents": 146,
+    "uiWrappers": 130,
     "uiComposites": 16,
-    "rootBarrelComponents": 288,
+    "rootBarrelComponents": 290,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
-    "wrapEdges": 129,
+    "wrapEdges": 130,
     "composeEdges": 10,
     "docsEdges": 0,
     "relatedEdges": 302,
-    "mismatches": 287,
+    "mismatches": 289,
     "primitivePartComponents": 0,
-    "thinWrappers": 64
+    "thinWrappers": 65
   },
   "nodes": [
     {
@@ -583,6 +583,32 @@
       "compound": false,
       "parts": [],
       "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "primitives:BorderBeam",
+      "name": "BorderBeam",
+      "label": "BorderBeam",
+      "kind": "component",
+      "package": "primitives",
+      "layer": "primitive",
+      "category": "visual",
+      "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
+      "visibility": "root",
+      "sourcePath": "packages/primitives/src/border-beam/index.ts",
+      "publicImport": "@dryui/primitives",
+      "tags": [
+        "border",
+        "beam",
+        "glow",
+        "ring",
+        "highlight",
+        "effect"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 4,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -8762,6 +8788,32 @@
         "light",
         "streak",
         "shimmer",
+        "effect"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:BorderBeam",
+      "name": "BorderBeam",
+      "label": "BorderBeam",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-wrapper",
+      "category": "visual",
+      "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/border-beam/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "border",
+        "beam",
+        "glow",
+        "ring",
+        "highlight",
         "effect"
       ],
       "compound": false,
@@ -23245,6 +23297,12 @@
       "to": "primitives:Beam"
     },
     {
+      "id": "wraps:ui:BorderBeam:primitives:BorderBeam:",
+      "type": "wraps",
+      "from": "ui:BorderBeam",
+      "to": "primitives:BorderBeam"
+    },
+    {
       "id": "wraps:ui:Breadcrumb:primitives:Breadcrumb:",
       "type": "wraps",
       "from": "ui:Breadcrumb",
@@ -24050,6 +24108,13 @@
       "component": "Beam",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/beam/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "primitives",
+      "component": "BorderBeam",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/primitives/src/border-beam/index.ts"
     },
     {
       "kind": "missing-subpath-export",
@@ -25048,6 +25113,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
+      "component": "BorderBeam",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/border-beam/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
       "component": "Breadcrumb",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/breadcrumb/index.ts"
@@ -25987,6 +26059,7 @@
       "Backdrop",
       "Badge",
       "Beam",
+      "BorderBeam",
       "Button",
       "ButtonGroup",
       "Checkbox",
@@ -26053,7 +26126,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 143\"]\n  u_wrap[\"UI wrappers: 129\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

@@ -416,6 +416,44 @@ Use the dryui-feedback MCP server:
 									</Tabs.Trigger>
 								</Tabs.List>
 
+								{#snippet submissionRow(submission: Submission)}
+									<div
+										class="submission-row-shell"
+										data-selected={selectedSubmission?.id === submission.id || undefined}
+									>
+										<Button
+											variant="toggle"
+											size="sm"
+											aria-pressed={selectedSubmission?.id === submission.id}
+											onclick={() => (selectedId = submission.id)}
+											title={submission.url}
+										>
+											<div class="submission-row">
+												<div class="submission-row-primary">
+													<span class="submission-row-url">{submission.url}</span>
+													<Badge variant="soft" color={statusColor(submission.status)} size="sm">
+														{statusLabel(submission.status)}
+													</Badge>
+												</div>
+												<div class="submission-row-meta">
+													<div class="submission-badges">
+														<Badge variant="outline" color="gray" size="sm">
+															{submission.drawings.length} marks
+														</Badge>
+														<Badge variant="outline" color="gray" size="sm">
+															{formatViewport(submission.viewport)}
+														</Badge>
+													</div>
+													<span class="submission-row-trailing">
+														{formatRelativeTime(submission.createdAt)} / #
+														{shortenId(submission.id)}
+													</span>
+												</div>
+											</div>
+										</Button>
+									</div>
+								{/snippet}
+
 								<Tabs.Content value="pending">
 									<div class="submission-list">
 										{#if loading && pendingCount === 0}
@@ -424,44 +462,7 @@ Use the dryui-feedback MCP server:
 											<Alert variant="info">No pending submissions match the current filter.</Alert>
 										{:else}
 											{#each visiblePendingSubmissions as submission (submission.id)}
-												<div class="submission-card">
-													<Card.Root
-														as="button"
-														variant="interactive"
-														selected={selectedSubmission?.id === submission.id}
-														onclick={() => (selectedId = submission.id)}
-													>
-														<Card.Header>
-															<div class="submission-heading">
-																<Text as="span" size="sm" weight="semibold">{submission.url}</Text>
-																<Badge
-																	variant="soft"
-																	color={statusColor(submission.status)}
-																	size="sm"
-																>
-																	{statusLabel(submission.status)}
-																</Badge>
-															</div>
-														</Card.Header>
-														<Card.Content>
-															<div class="submission-badges">
-																<Badge variant="outline" color="gray" size="sm">
-																	{submission.drawings.length} marks
-																</Badge>
-																<Badge variant="outline" color="gray" size="sm">
-																	{formatViewport(submission.viewport)}
-																</Badge>
-															</div>
-														</Card.Content>
-														<Card.Footer>
-															<Text as="span" size="sm" color="secondary">
-																{formatRelativeTime(submission.createdAt)} / #{shortenId(
-																	submission.id
-																)}
-															</Text>
-														</Card.Footer>
-													</Card.Root>
-												</div>
+												{@render submissionRow(submission)}
 											{/each}
 										{/if}
 									</div>
@@ -476,44 +477,7 @@ Use the dryui-feedback MCP server:
 											>
 										{:else}
 											{#each visibleResolvedSubmissions as submission (submission.id)}
-												<div class="submission-card">
-													<Card.Root
-														as="button"
-														variant="interactive"
-														selected={selectedSubmission?.id === submission.id}
-														onclick={() => (selectedId = submission.id)}
-													>
-														<Card.Header>
-															<div class="submission-heading">
-																<Text as="span" size="sm" weight="semibold">{submission.url}</Text>
-																<Badge
-																	variant="soft"
-																	color={statusColor(submission.status)}
-																	size="sm"
-																>
-																	{statusLabel(submission.status)}
-																</Badge>
-															</div>
-														</Card.Header>
-														<Card.Content>
-															<div class="submission-badges">
-																<Badge variant="outline" color="gray" size="sm">
-																	{submission.drawings.length} marks
-																</Badge>
-																<Badge variant="outline" color="gray" size="sm">
-																	Resolved item
-																</Badge>
-															</div>
-														</Card.Content>
-														<Card.Footer>
-															<Text as="span" size="sm" color="secondary">
-																{formatRelativeTime(submission.createdAt)} / #{shortenId(
-																	submission.id
-																)}
-															</Text>
-														</Card.Footer>
-													</Card.Root>
-												</div>
+												{@render submissionRow(submission)}
 											{/each}
 										{/if}
 									</div>
@@ -887,13 +851,11 @@ Use the dryui-feedback MCP server:
 
 	.submission-list {
 		display: grid;
-		gap: var(--dry-space-3);
-		padding-block-start: var(--dry-space-3);
-	}
-
-	.submission-card {
-		display: grid;
-		text-align: left;
+		gap: 0;
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-xl);
+		background: var(--dry-color-bg-raised, var(--dry-color-surface));
+		overflow: hidden;
 	}
 
 	.submission-heading {
@@ -901,12 +863,78 @@ Use the dryui-feedback MCP server:
 		gap: var(--dry-space-2);
 	}
 
+	.submission-row-shell {
+		display: grid;
+		background: transparent;
+		border-block-end: 1px solid var(--dry-color-stroke-weak);
+		transition:
+			background var(--dry-duration-fast, 120ms) var(--dry-ease-default),
+			box-shadow var(--dry-duration-fast, 120ms) var(--dry-ease-default);
+		--dry-btn-align: stretch;
+		--dry-btn-justify: start;
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-padding-x: var(--dry-space-3);
+		--dry-btn-padding-y: var(--dry-space-2_5);
+		--dry-btn-radius: 0;
+		--dry-btn-color: var(--dry-color-text-strong);
+	}
+
+	.submission-row-shell:hover {
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 6%, transparent);
+	}
+
+	.submission-row-shell:last-child {
+		border-block-end: none;
+	}
+
+	.submission-row-shell[data-selected] {
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 10%, transparent);
+		box-shadow: inset 2px 0 0 var(--dry-color-fill-brand);
+	}
+
+	.submission-row {
+		display: grid;
+		gap: var(--dry-space-2);
+		text-align: left;
+	}
+
+	.submission-row-primary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--dry-space-2);
+		align-items: start;
+	}
+
+	.submission-row-url {
+		display: block;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: var(--dry-font-size-sm, 0.875rem);
+		font-weight: 600;
+		line-height: 1.5;
+		color: var(--dry-color-text-strong);
+	}
+
+	.submission-row-meta {
+		display: grid;
+		gap: var(--dry-space-1_5);
+	}
+
 	.submission-badges {
 		display: grid;
 		grid-auto-flow: column;
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-1_5);
 		justify-content: start;
 		align-items: center;
+	}
+
+	.submission-row-trailing {
+		display: block;
+		font-size: var(--dry-font-size-sm, 0.875rem);
+		line-height: 1.5;
+		color: var(--dry-color-text-weak);
 	}
 
 	.detail-actions {
@@ -988,6 +1016,12 @@ Use the dryui-feedback MCP server:
 		.submission-heading {
 			grid-template-columns: minmax(0, 1fr) auto;
 			align-items: center;
+		}
+
+		.submission-row-meta {
+			grid-template-columns: minmax(0, 1fr) auto;
+			align-items: center;
+			column-gap: var(--dry-space-3);
 		}
 
 		.prompt-header {

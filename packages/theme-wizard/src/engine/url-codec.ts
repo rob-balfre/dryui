@@ -22,6 +22,7 @@ export interface WizardRecipe {
 	typography?: { fontPreset: FontPreset; scale: TypeScale };
 	shape?: { radiusPreset: RadiusPreset; radiusScale: number; density: Density };
 	shadows?: { preset: ShadowPreset; intensity: number; tintBrand: boolean };
+	adjust?: { brightness?: number; contrast?: number; saturate?: number; hueRotate?: number };
 }
 
 /**
@@ -189,6 +190,17 @@ export function encodeRecipe(recipe: WizardRecipe): string {
 		parts.push(`x${xi}y${yi}z${zi}`);
 	}
 
+	if (recipe.adjust) {
+		const a = recipe.adjust;
+		const ab = Math.round(a.brightness ?? 100);
+		const ac = Math.round(a.contrast ?? 100);
+		const as_ = Math.round(a.saturate ?? 100);
+		const ah = Math.round((a.hueRotate ?? 0) + 180);
+		if (ab !== 100 || ac !== 100 || as_ !== 100 || ah !== 180) {
+			parts.push(`a${ab}b${ac}c${as_}d${ah}`);
+		}
+	}
+
 	return parts.join('-');
 }
 
@@ -266,6 +278,24 @@ export function decodeRecipe(encoded: string): WizardRecipe {
 				preset: (SHADOW_NAMES[parseInt(shadowMatch[1])] ?? 'elevated') as ShadowPreset,
 				intensity: parseInt(shadowMatch[2]) / 100,
 				tintBrand: shadowMatch[3] === '1'
+			};
+			continue;
+		}
+
+		// Adjust filters: a{brightness}b{contrast}c{saturate}d{hueRotate+180}
+		const adjustMatch = seg.match(/^a(\d+)b(\d+)c(\d+)d(\d+)$/);
+		if (
+			adjustMatch &&
+			adjustMatch[1] !== undefined &&
+			adjustMatch[2] !== undefined &&
+			adjustMatch[3] !== undefined &&
+			adjustMatch[4] !== undefined
+		) {
+			recipe.adjust = {
+				brightness: parseInt(adjustMatch[1]),
+				contrast: parseInt(adjustMatch[2]),
+				saturate: parseInt(adjustMatch[3]),
+				hueRotate: parseInt(adjustMatch[4]) - 180
 			};
 			continue;
 		}

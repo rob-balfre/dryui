@@ -6,6 +6,10 @@ Bun monorepo: zero-dependency Svelte 5 components built on native browser APIs.
 
 Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 
+## Compatibility
+
+DryUI is currently pre-alpha. Prefer current behavior over legacy compatibility, migration shims, or backwards-compatible aliases unless a task explicitly requires them.
+
 ## Packages
 
 - `packages/primitives` — @dryui/primitives: headless, unstyled components

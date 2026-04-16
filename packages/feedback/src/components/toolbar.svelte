@@ -143,7 +143,7 @@
 	.toolbar {
 		--accent: hsl(25 100% 55%);
 
-		position: fixed;
+		position: absolute;
 		right: 24px;
 		bottom: 24px;
 		z-index: 10000;

@@ -93,7 +93,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 		sections: [
 			{
 				title: 'Install the plugin',
-				note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server. After adding the marketplace, open Codex and install DryUI from `/plugins`.',
+				note: 'Requires Codex 0.121.0 or newer. Run the command below, then start `codex`, run `/plugins`, and install `DryUI`. The plugin bundles the DryUI skill and MCP server.',
 				code: `codex marketplace add rob-balfre/dryui`
 			},
 			{
@@ -105,7 +105,8 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 ${CODEX_CONFIG}`
 			}
 		],
-		followUp: 'Start a new Codex session after installing the plugin so ask/check are available.'
+		followUp:
+			'After installing the plugin, start a new Codex session so `ask` / `check` are available.'
 	},
 	{
 		id: 'copilot',

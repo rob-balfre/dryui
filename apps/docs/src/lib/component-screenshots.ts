@@ -1,6 +1,7 @@
 const customPreviewNames = new Set([
 	'Adjust',
 	'Beam',
+	'BorderBeam',
 	'ChromaticAberration',
 	'Glass',
 	'GodRays',

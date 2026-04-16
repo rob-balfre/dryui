@@ -2681,6 +2681,9 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-part"
+        },
+        {
           "name": "data-prompt-actions"
         },
         {
@@ -3714,6 +3717,16 @@
           "description": "Size preset affecting density, spacing, or typography.",
           "default": "'md'"
         },
+        "variant": {
+          "type": "SliderVariant",
+          "required": false,
+          "description": "Visual style preset for the component.",
+          "default": "'default'"
+        },
+        "valueLabel": {
+          "type": "Snippet<[{ value: number; percentage: number }]>",
+          "required": false
+        },
         "value": {
           "type": "number",
           "required": false,
@@ -3785,7 +3798,13 @@
           ]
         },
         {
+          "name": "data-part"
+        },
+        {
           "name": "data-size"
+        },
+        {
+          "name": "data-variant"
         }
       ],
       "example": "<Slider bind:value={volume} min={0} max={100} />"
@@ -3989,6 +4008,10 @@
         "--dry-tg-radius": "Border radius"
       },
       "dataAttributes": [
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
         {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
@@ -4773,6 +4796,10 @@
       },
       "dataAttributes": [
         {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
           "values": [
@@ -5422,6 +5449,10 @@
       },
       "cssVars": {},
       "dataAttributes": [
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
         {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
@@ -6751,6 +6782,9 @@
         },
         {
           "name": "data-avatar-wrapper"
+        },
+        {
+          "name": "data-part"
         },
         {
           "name": "data-shape"
@@ -9558,6 +9592,9 @@
       "cssVars": {},
       "dataAttributes": [
         {
+          "name": "data-calendar-day"
+        },
+        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
         },
@@ -9565,10 +9602,20 @@
           "name": "data-dp-content"
         },
         {
+          "name": "data-outside-month"
+        },
+        {
           "name": "data-placeholder"
         },
         {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
+        },
+        {
           "name": "data-state"
+        },
+        {
+          "name": "data-today"
         }
       ],
       "example": "<DatePicker.Root bind:value={departureDate} name=\"departureDate\">\n  <DatePicker.Trigger placeholder=\"Select departure date\" />\n  <DatePicker.Content>\n    <DatePicker.Calendar />\n  </DatePicker.Content>\n</DatePicker.Root>"
@@ -9758,6 +9805,9 @@
           "name": "data-calendar"
         },
         {
+          "name": "data-calendar-day"
+        },
+        {
           "name": "data-calendar-header"
         },
         {
@@ -9766,6 +9816,16 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-outside-month"
+        },
+        {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
+        },
+        {
+          "name": "data-today"
         }
       ],
       "example": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n</Calendar.Root>"
@@ -9958,6 +10018,9 @@
       "cssVars": {},
       "dataAttributes": [
         {
+          "name": "data-calendar-day"
+        },
+        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
         },
@@ -9965,10 +10028,29 @@
           "name": "data-drp-content"
         },
         {
+          "name": "data-in-range"
+        },
+        {
+          "name": "data-outside-month"
+        },
+        {
           "name": "data-placeholder"
         },
         {
+          "name": "data-range-end"
+        },
+        {
+          "name": "data-range-start"
+        },
+        {
+          "name": "data-selected",
+          "description": "Present when the current item is selected."
+        },
+        {
           "name": "data-state"
+        },
+        {
+          "name": "data-today"
         }
       ],
       "example": "<DateRangePicker.Root>\n  <DateRangePicker.Trigger>...</DateRangePicker.Trigger>\n  <DateRangePicker.Content>...</DateRangePicker.Content>\n  <DateRangePicker.Calendar>...</DateRangePicker.Calendar>\n  <DateRangePicker.Preset>...</DateRangePicker.Preset>\n</DateRangePicker.Root>"
@@ -10577,7 +10659,32 @@
       },
       "dataAttributes": [
         {
+          "name": "data-calendar-day"
+        },
+        {
+          "name": "data-calendar-header"
+        },
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-in-range"
+        },
+        {
+          "name": "data-outside-month"
+        },
+        {
           "name": "data-range-calendar-root"
+        },
+        {
+          "name": "data-range-end"
+        },
+        {
+          "name": "data-range-start"
+        },
+        {
+          "name": "data-today"
         }
       ],
       "example": "<RangeCalendar.Root>\n  <RangeCalendar.Grid>...</RangeCalendar.Grid>\n</RangeCalendar.Root>"
@@ -11672,7 +11779,11 @@
         }
       },
       "cssVars": {},
-      "dataAttributes": [],
+      "dataAttributes": [
+        {
+          "name": "data-dry-portal"
+        }
+      ],
       "example": "<Portal>Content</Portal>"
     },
     "VisuallyHidden": {
@@ -12548,6 +12659,9 @@
           "name": "data-qr-canvas"
         },
         {
+          "name": "data-qr-code"
+        },
+        {
           "name": "data-qr-wrapper"
         },
         {
@@ -12721,6 +12835,9 @@
       "dataAttributes": [
         {
           "name": "data-code-block"
+        },
+        {
+          "name": "data-language"
         },
         {
           "name": "data-markdown-renderer"
@@ -13286,6 +13403,12 @@
           "name": "data-pagination-info"
         },
         {
+          "name": "data-pagination-next"
+        },
+        {
+          "name": "data-pagination-prev"
+        },
+        {
           "name": "data-part"
         },
         {
@@ -13748,6 +13871,18 @@
           "name": "data-transfer-list-header"
         },
         {
+          "name": "data-transfer-move-all-source"
+        },
+        {
+          "name": "data-transfer-move-all-target"
+        },
+        {
+          "name": "data-transfer-move-source"
+        },
+        {
+          "name": "data-transfer-move-target"
+        },
+        {
           "name": "data-transfer-root"
         },
         {
@@ -13974,6 +14109,48 @@
       "dataAttributes": [
         {
           "name": "data-part"
+        },
+        {
+          "name": "data-placement"
+        },
+        {
+          "name": "data-tour-next"
+        },
+        {
+          "name": "data-tour-overlay"
+        },
+        {
+          "name": "data-tour-prev"
+        },
+        {
+          "name": "data-tour-root"
+        },
+        {
+          "name": "data-tour-skip"
+        },
+        {
+          "name": "data-tour-spotlight"
+        },
+        {
+          "name": "data-tour-tooltip"
+        },
+        {
+          "name": "data-tour-tooltip-actions"
+        },
+        {
+          "name": "data-tour-tooltip-content"
+        },
+        {
+          "name": "data-tour-tooltip-counter"
+        },
+        {
+          "name": "data-tour-tooltip-default"
+        },
+        {
+          "name": "data-tour-tooltip-footer"
+        },
+        {
+          "name": "data-tour-tooltip-title"
         }
       ],
       "example": "<Tour.Root>\n  <Tour.Tooltip>...</Tour.Tooltip>\n</Tour.Root>"
@@ -14356,6 +14533,10 @@
           "name": "data-chip-group"
         },
         {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
           "name": "data-orientation",
           "description": "Reflects the current horizontal or vertical orientation.",
           "values": [
@@ -14365,6 +14546,9 @@
         },
         {
           "name": "data-size"
+        },
+        {
+          "name": "data-state"
         }
       ],
       "example": "<ChipGroup.Root type=\"multiple\" bind:value={selectedFilters}>\n  <ChipGroup.Item value=\"direct\">Direct</ChipGroup.Item>\n  <ChipGroup.Item value=\"flexible\">Flexible</ChipGroup.Item>\n  <ChipGroup.Item value=\"wifi\">Wi-fi</ChipGroup.Item>\n</ChipGroup.Root>"
@@ -14591,6 +14775,9 @@
             "horizontal",
             "vertical"
           ]
+        },
+        {
+          "name": "data-part"
         },
         {
           "name": "data-position"
@@ -15889,6 +16076,9 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-part"
+        },
+        {
           "name": "data-phone-chevron"
         },
         {
@@ -16491,6 +16681,10 @@
       },
       "cssVars": {},
       "dataAttributes": [
+        {
+          "name": "data-active",
+          "description": "Present on the active item or current target within the component."
+        },
         {
           "name": "data-full-width"
         },
@@ -17209,6 +17403,130 @@
       ],
       "example": "<Beam>Content</Beam>"
     },
+    "BorderBeam": {
+      "import": "@dryui/ui",
+      "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
+      "category": "visual",
+      "tags": [
+        "border",
+        "beam",
+        "glow",
+        "ring",
+        "highlight",
+        "effect"
+      ],
+      "compound": false,
+      "props": {
+        "size": {
+          "type": "BorderBeamSize",
+          "required": false,
+          "description": "Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`)."
+        },
+        "colorVariant": {
+          "type": "BorderBeamColorVariant",
+          "required": false,
+          "description": "Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments."
+        },
+        "theme": {
+          "type": "BorderBeamTheme",
+          "required": false,
+          "description": "Color tuning for dark or light surfaces, or system preference when set to `auto`."
+        },
+        "staticColors": {
+          "type": "boolean",
+          "required": false
+        },
+        "duration": {
+          "type": "number",
+          "required": false
+        },
+        "active": {
+          "type": "boolean",
+          "required": false,
+          "description": "Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle."
+        },
+        "borderRadius": {
+          "type": "number | string",
+          "required": false,
+          "description": "Optional border radius override for the beam host. When omitted, the first child radius is detected automatically."
+        },
+        "brightness": {
+          "type": "number",
+          "required": false
+        },
+        "saturation": {
+          "type": "number",
+          "required": false
+        },
+        "hueRange": {
+          "type": "number",
+          "required": false
+        },
+        "strength": {
+          "type": "number",
+          "required": false,
+          "description": "Intensity multiplier for the beam stroke, inner glow, and bloom layers."
+        },
+        "onActivate": {
+          "type": "() => void",
+          "required": false,
+          "description": "Callback fired after the beam fade-in animation completes."
+        },
+        "onDeactivate": {
+          "type": "() => void",
+          "required": false,
+          "description": "Callback fired after the beam fade-out animation completes."
+        },
+        "children": {
+          "type": "Snippet",
+          "required": false,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'children'>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "omitted": [
+          "children"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-active",
+          "description": "Present while the beam is rendering its active glow and bloom layers."
+        },
+        {
+          "name": "data-beam",
+          "description": "Per-instance marker on the beam host used to scope the injected effect styles."
+        },
+        {
+          "name": "data-beam-bloom",
+          "description": "Bloom layer element that renders the outer glow spill around the active beam."
+        },
+        {
+          "name": "data-fading",
+          "description": "Present while the beam is playing its fade-out sequence."
+        },
+        {
+          "name": "data-size",
+          "description": "Reflects the current effect mode preset.",
+          "values": [
+            "sm",
+            "md",
+            "line"
+          ]
+        }
+      ],
+      "example": "<BorderBeam>Content</BorderBeam>"
+    },
     "Shimmer": {
       "import": "@dryui/ui",
       "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
@@ -17706,10 +18024,16 @@
       "cssVars": {},
       "dataAttributes": [
         {
+          "name": "data-reduced-motion"
+        },
+        {
           "name": "data-shader-canvas"
         },
         {
           "name": "data-shader-canvas-root"
+        },
+        {
+          "name": "data-webgl"
         }
       ],
       "example": "<ShaderCanvas>Content</ShaderCanvas>"

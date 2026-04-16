@@ -6,6 +6,10 @@ Instructions for all AI coding agents working in this repository.
 
 Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 
+## Compatibility
+
+DryUI is currently pre-alpha. Do not optimize for legacy compatibility or upgrade-path preservation unless a task explicitly asks for it.
+
 ## Setup
 
 Use the DryUI CLI as the entry point for working with the library. Add the skill and MCP server after that when you want the same lookup and validation loop inside your editor.
@@ -25,7 +29,7 @@ dryui
 codex marketplace add rob-balfre/dryui
 ```
 
-Then open Codex and install DryUI from `/plugins`. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp`.
+Then start `codex`, run `/plugins`, and install `DryUI`. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp`.
 
 All MCP entries (every tool) use `"command": "npx", "args": ["-y", "@dryui/mcp"]` for the stdio server.
 

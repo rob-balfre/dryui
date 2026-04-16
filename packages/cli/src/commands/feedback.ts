@@ -11,11 +11,14 @@ import {
 } from '@dryui/feedback-server';
 import {
 	commandError,
+	emitCommandResult,
+	emitOrRun,
 	getFlag,
 	hasFlag,
 	printCommandHelp,
 	runCommand,
-	type CommandResult
+	type CommandResult,
+	type OutputMode
 } from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
@@ -207,15 +210,21 @@ function startFeedbackServerInBackground(args: string[], client: FeedbackHttpCli
 	});
 }
 
-async function runFeedbackUi(args: string[]): Promise<void> {
+interface FeedbackRunOptions {
+	exitOnComplete?: boolean;
+}
+
+export async function getFeedbackUiResult(
+	args: string[],
+	mode: OutputMode = 'toon'
+): Promise<CommandResult> {
 	if (hasFlag(args, '--help')) {
 		feedbackUiHelp();
 	}
 
 	const buildResult = ensureFeedbackUiBuilt({ workspaceRoot: REPO_ROOT });
 	if (buildResult) {
-		runCommand(buildResult);
-		return;
+		return buildResult;
 	}
 
 	const endpoint = resolveUiEndpoint(args);
@@ -231,14 +240,13 @@ async function runFeedbackUi(args: string[]): Promise<void> {
 		);
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
-		runCommand(commandError('toon', 'feedback-ui-failed', message), 'toon');
-		return;
+		return commandError(mode, 'feedback-ui-failed', message);
 	}
 
 	const uiLaunchUrl = `${client.baseUrl}/ui?v=${Date.now()}`;
 	const opened = noOpen ? false : openBrowser(uiLaunchUrl);
 
-	runCommand({
+	return {
 		output: [
 			'DryUI feedback ui',
 			'',
@@ -255,7 +263,16 @@ async function runFeedbackUi(args: string[]): Promise<void> {
 		].join('\n'),
 		error: null,
 		exitCode: 0
-	});
+	};
+}
+
+async function runFeedbackUi(args: string[], options: FeedbackRunOptions = {}): Promise<void> {
+	const result = await getFeedbackUiResult(args);
+	if (options.exitOnComplete === false) {
+		emitCommandResult(result, 'toon');
+		return;
+	}
+	runCommand(result, 'toon');
 }
 
 function runFeedbackServer(args: string[]): never {
@@ -297,30 +314,28 @@ function feedbackDispatcherHelp(): never {
 	});
 }
 
-function emitUnknownFeedbackSubcommand(name: string | undefined): void {
+function getUnknownFeedbackSubcommand(name: string | undefined): CommandResult {
 	const code = name ? 'unknown-subcommand' : 'missing-subcommand';
 	const base = name
 		? `Unknown feedback subcommand: "${name}". Run \`dryui feedback --help\` for the list.`
 		: 'Missing feedback subcommand. Run `dryui feedback --help` for the list.';
-	runCommand(
-		commandError('toon', code, base, [
-			'dryui feedback --help',
-			'dryui feedback ui',
-			'dryui feedback server'
-		]),
-		'toon'
-	);
+	return commandError('toon', code, base, [
+		'dryui feedback --help',
+		'dryui feedback ui',
+		'dryui feedback server'
+	]);
 }
 
-export async function runFeedback(args: string[]): Promise<void> {
+export async function runFeedback(args: string[], options: FeedbackRunOptions = {}): Promise<void> {
 	const command = args[0];
+	const exitOnComplete = options.exitOnComplete ?? true;
 
 	if (command === '--help' || command === '-h') {
 		feedbackDispatcherHelp();
 	}
 
 	if (!command) {
-		emitUnknownFeedbackSubcommand(undefined);
+		emitOrRun(getUnknownFeedbackSubcommand(undefined), 'toon', exitOnComplete);
 		return;
 	}
 
@@ -333,7 +348,7 @@ export async function runFeedback(args: string[]): Promise<void> {
 		if (hasFlag(args.slice(1), '--help')) {
 			feedbackInitHelp();
 		}
-		runCommand(getFeedbackInit(), 'toon');
+		emitOrRun(getFeedbackInit(), 'toon', exitOnComplete);
 		return;
 	}
 
@@ -341,14 +356,14 @@ export async function runFeedback(args: string[]): Promise<void> {
 		if (hasFlag(args.slice(1), '--help')) {
 			feedbackDoctorHelp();
 		}
-		runCommand(await getFeedbackDoctor(args.slice(1)), 'toon');
+		emitOrRun(await getFeedbackDoctor(args.slice(1)), 'toon', exitOnComplete);
 		return;
 	}
 
 	if (command === 'ui') {
-		await runFeedbackUi(args.slice(1));
+		await runFeedbackUi(args.slice(1), { exitOnComplete });
 		return;
 	}
 
-	emitUnknownFeedbackSubcommand(command);
+	emitOrRun(getUnknownFeedbackSubcommand(command), 'toon', exitOnComplete);
 }
