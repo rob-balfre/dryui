@@ -1,5 +1,11 @@
 # @dryui/primitives
 
+## 1.1.5
+
+### Patch Changes
+
+- [`66e3471`](https://github.com/rob-balfre/dryui/commit/66e3471d881d69a003119e2446dc863cc4e2f588) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix CI build failures: resolve border-beam type errors with noUncheckedIndexedAccess, fix invalid @const placement in feedback drawing canvas, and add missing slider pill variant types.
+
 ## 1.1.4
 
 ### Patch Changes
