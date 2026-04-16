@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.6.1
+
+### Patch Changes
+
+- [`9ec102f`](https://github.com/rob-balfre/dryui/commit/9ec102f597c1ecd5cd82432f887c61f789d4a9b8) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Hook into Codex marketplace (0.121.0+) so the install flow mirrors Claude Code: `codex marketplace add rob-balfre/dryui`. Update setup guides, llms.txt, and skill docs with the new command.
+
+- Updated dependencies [[`9ec102f`](https://github.com/rob-balfre/dryui/commit/9ec102f597c1ecd5cd82432f887c61f789d4a9b8)]:
+  - @dryui/mcp@2.1.2
+
 ## 0.6.0
 
 ### Minor Changes
