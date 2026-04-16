@@ -171,7 +171,7 @@ export type {
 } from './segmented-control/index.js';
 
 export { Slider } from './slider/index.js';
-export type { SliderProps } from './slider/index.js';
+export type { SliderProps, SliderVariant } from './slider/index.js';
 
 export { Toggle } from './toggle/index.js';
 export type { ToggleProps } from './toggle/index.js';
@@ -784,6 +784,9 @@ export type { AlphaSliderProps } from './alpha-slider/index.js';
 
 export { Beam } from './beam/index.js';
 export type { BeamProps } from './beam/index.js';
+
+export { BorderBeam } from './border-beam/index.js';
+export type { BorderBeamProps } from './border-beam/index.js';
 
 export { Shimmer } from './shimmer/index.js';
 export type { ShimmerProps } from './shimmer/index.js';

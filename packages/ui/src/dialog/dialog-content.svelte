@@ -46,6 +46,10 @@
 	[data-dialog-content] {
 		position: fixed;
 		inset: 0;
+		/* dryui-allow width */
+		width: 100vw;
+		/* dryui-allow width */
+		max-width: none;
 		height: 100vh;
 		height: 100dvh;
 		max-height: none;

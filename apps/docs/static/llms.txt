@@ -1,6 +1,6 @@
 # DryUI
 
-> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 160 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -62,7 +62,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/toggle-group
 Parts: Root, Item
 Props: Root: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | type ('single' | 'multiple'), HTML type attribute or component-specific type selector., accepted single, multiple, default 'single' | value (string[]), Current controlled or bindable value., default [], bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
 Example: <ToggleGroup.Root>
 
 ### Clipboard
@@ -112,7 +112,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/chip-group
 Parts: Root, Item
 Props: Root: size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | type ('single' | 'multiple'), HTML type attribute or component-specific type selector., accepted single, multiple, default 'single' | value (string[]), Current controlled or bindable value., default [], bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
-Data attributes: data-chip-group | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
+Data attributes: data-chip-group | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
 Example: <ChipGroup.Root type="multiple" bind:value={selectedFilters}>
 
 ### Category: Input
@@ -139,7 +139,7 @@ AI-style prompt input with auto-resize and submit.
 Import: @dryui/ui
 Subpath import: @dryui/ui/prompt-input
 Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | onpromptsubmit ((value: string) => void) | actions (Snippet)
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
 Example: <PromptInput>Content</PromptInput>
 
 ### NumberInput
@@ -172,8 +172,8 @@ Example: <RadioGroup.Root>
 Range input slider with thumb control.
 Import: @dryui/ui
 Subpath import: @dryui/ui/slider
-Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
+Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant (SliderVariant), Visual style preset for the component., default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-variant
 Example: <Slider bind:value={volume} min={0} max={100} />
 
 ### InputGroup
@@ -278,7 +278,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/transfer
 Parts: Root, List, Item, Actions
 Props: Root: sourceItems (import('./context.svelte.js').TransferItem[]), default [], required, bindable | targetItems (import('./context.svelte.js').TransferItem[]), default [], bindable | onChange (() | source (import('./context.svelte.js').TransferItem[],), required | target (import('./context.svelte.js').TransferItem[]), Browsing context used for link navigation., required | children (Snippet), Content rendered inside the component., required | List: filterable (boolean) | content (Snippet<[{ items: TransferItemType[] }]>) | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | title (string | undefined), Primary heading or label text. | children (Snippet<[{ items: import('./context.svelte.js').TransferItem[] }]> | undefined), Content rendered inside the component. | Item: key (string), required | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | disabled (boolean | undefined), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Actions: moveToTarget (() => void), required | moveToSource (() => void), required | moveAllToTarget (() => void), required | moveAllToSource (() => void), required | canMoveToTarget (boolean), required | canMoveToSource (boolean), required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-root | data-transfer-select-all | data-type
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-move-all-source | data-transfer-move-all-target | data-transfer-move-source | data-transfer-move-target | data-transfer-root | data-transfer-select-all | data-type
 Example: <Transfer.Root>
 
 ### RichTextEditor
@@ -295,7 +295,7 @@ Phone number input with country code selector.
 Import: @dryui/ui
 Subpath import: @dryui/ui/phone-input
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | value (string), Current controlled or bindable value., default '', bindable | defaultCountry (string), default 'US' | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission. | placeholder (string), Hint text shown when no value is selected or entered., default 'Phone number' | countries (CountryInfo[]) | onchange ((value: string) => void)
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-phone-chevron | data-phone-dial-code | data-phone-flag | data-phone-input | data-phone-number-input | data-phone-select | data-phone-trigger | data-size
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-phone-chevron | data-phone-dial-code | data-phone-flag | data-phone-input | data-phone-number-input | data-phone-select | data-phone-trigger | data-size
 Example: <PhoneInput bind:value={phone} defaultCountry="US" placeholder="(555) 123-4567" />
 
 ### CountrySelect
@@ -418,7 +418,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-picker
 Parts: Root, Trigger, Content, Calendar
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement (Placement) | offset (number) | children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dp-content | data-placeholder | data-state
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
 Example: <DatePicker.Root bind:value={departureDate} name="departureDate">
 
 ### Calendar
@@ -427,7 +427,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/calendar
 Parts: Root, Header, Grid, Prev, Next, Heading
 Props: Root: value (Date | null), Current controlled or bindable value., default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component. | Prev: children (Snippet), Content rendered inside the component. | Next: children (Snippet), Content rendered inside the component.
-Data attributes: data-calendar | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.)
+Data attributes: data-calendar | data-calendar-day | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
 Example: <Calendar.Root>
 
 ### DateRangePicker
@@ -436,7 +436,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-drp-content | data-placeholder | data-state
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Example: <DateRangePicker.Root>
 
 ### RangeCalendar
@@ -445,7 +445,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/range-calendar
 Parts: Root, Grid
 Props: Root: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-range-calendar-root
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-root | data-range-end | data-range-start | data-today
 Example: <RangeCalendar.Root>
 
 ### Category: Layout
@@ -561,7 +561,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/tabs
 Parts: Root, List, Trigger, Content
 Props: Root: value (string), Bindable current tab value for controlled tab interfaces., default '' | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | activationMode ('automatic' | 'manual'), accepted automatic, manual, default 'automatic' | children (Snippet), Content rendered inside the component., required | List: children (Snippet), Content rendered inside the component., required | Trigger: value (string), Tab identifier that activates the matching content panel., required | disabled (boolean), Prevents interaction and applies disabled styling. | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | children (Snippet), Content rendered inside the component., required | Content: value (string), Current controlled or bindable value., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example: <Tabs.Root bind:value={activeTab}>
 
@@ -598,7 +598,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/toolbar
 Parts: Root, Button, Separator, Link
 Props: Root: orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required | Button: disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Link: href (string), Destination URL when the component renders as a link., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Example: <Toolbar.Root>
 
 ### Menubar
@@ -651,7 +651,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/mega-menu
 Parts: Root, Item, Trigger, Panel, Column, Link
 Props: Root: children (Snippet), Content rendered inside the component., required | Item: children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Panel: fullWidth (boolean), default false | children (Snippet), Content rendered inside the component., required | Column: title (string), Primary heading or label text. | children (Snippet), Content rendered inside the component., required | Link: href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | icon (Snippet) | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component., required
-Data attributes: data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
+Data attributes: data-active (Present on the active item or current target within the component.) | data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
 Example: <MegaMenu.Root>
 
 ### Category: Overlay
@@ -745,7 +745,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/tour
 Parts: Root, Tooltip
 Props: Root: steps (TourStep[]), required | active (boolean), default false, bindable | onComplete (() => void) | onSkip (() => void) | children (Snippet), Content rendered inside the component., required | Tooltip: children (Snippet<[TooltipSnippetParams]>), Content rendered inside the component.
-Data attributes: data-part
+Data attributes: data-part | data-placement | data-tour-next | data-tour-overlay | data-tour-prev | data-tour-root | data-tour-skip | data-tour-spotlight | data-tour-tooltip | data-tour-tooltip-actions | data-tour-tooltip-content | data-tour-tooltip-counter | data-tour-tooltip-default | data-tour-tooltip-footer | data-tour-tooltip-title
 Example: <Tour.Root>
 
 ### Backdrop
@@ -818,7 +818,7 @@ User profile image with fallback initials.
 Import: @dryui/ui
 Subpath import: @dryui/ui/avatar
 Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('circle' | 'square'), accepted circle, square, default 'circle' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | badge (Snippet) | children (Snippet | undefined), Content rendered inside the component.
-Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-shape | data-size | data-status
+Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-part | data-shape | data-size | data-status
 Example: <Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />
 
 ### Badge
@@ -967,7 +967,7 @@ QR code generator using Canvas 2D API.
 Import: @dryui/ui
 Subpath import: @dryui/ui/qr-code
 Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string), default '#000' | bgColor (string), default '#fff'
-Data attributes: data-qr-canvas | data-qr-wrapper | data-value
+Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Example: <QRCode>Content</QRCode>
 
 ### CodeBlock
@@ -983,7 +983,7 @@ Renders markdown text as styled HTML.
 Import: @dryui/ui
 Subpath import: @dryui/ui/markdown-renderer
 Props: content (string), required | sanitize (boolean), default true
-Data attributes: data-code-block | data-markdown-renderer | data-markdown-renderer-root
+Data attributes: data-code-block | data-language | data-markdown-renderer | data-markdown-renderer-root
 Example: <MarkdownRenderer>Content</MarkdownRenderer>
 
 ### VirtualList
@@ -1008,7 +1008,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/data-grid
 Parts: Root, Table, Header, Column, Body, Row, Cell, Pagination, SelectAll, SelectCell, ExpandableRow, ExpandTrigger
 Props: Root: striped (boolean), default false | items (T[]), required | pageSize (number), default 10 | selectable (boolean), default false | onSelectionChange ((selected: string[]) => void) | actionBar (Snippet<[{ selectedCount: number; clearSelection: () => void }]>) | children (Snippet), Content rendered inside the component., required | Table: children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component., required | Column: key (string), required | sortable (boolean) | filterable (boolean) | pinned (boolean) | resizable (boolean) | header (Snippet) | children (Snippet), Content rendered inside the component., required | Body: children (Snippet<[{ items: T[]; page: number }]>), Content rendered inside the component., required | Row: rowId (string) | children (Snippet), Content rendered inside the component., required | Cell: children (Snippet), Content rendered inside the component., required | Pagination: page (number), required | totalPages (number), required | totalItems (number), required | pageSize (number), required | canPrevious (boolean), required | canNext (boolean), required | previous (() => void), required | next (() => void), required | goto ((page: number) => void), required | SelectCell: rowId (string), required | rowLabel (string) | ExpandableRow: rowId (string), required | expandable (Snippet), required | children (Snippet), Content rendered inside the component., required | ExpandTrigger: rowId (string), required | children (Snippet), Content rendered inside the component.
-Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
+Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
 Example: <DataGrid.Root>
 
 ### Carousel
@@ -1017,7 +1017,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/carousel
 Parts: Root, Viewport, Slide, Prev, Next, Dots, Thumbnails
 Props: Root: orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | loop (boolean), default false | autoplay (number | false), default false | children (Snippet), Content rendered inside the component., required | Viewport: children (Snippet), Content rendered inside the component., required | Slide: children (Snippet), Content rendered inside the component., required | Prev: children (Snippet), Content rendered inside the component. | Next: children (Snippet), Content rendered inside the component. | Thumbnails: position ('bottom' | 'left' | 'right'), accepted bottom, left, right | children (Snippet<[{ index: number; isActive: boolean; scrollTo: (index: number) => void }]>), Content rendered inside the component., required
-Data attributes: data-active (Present on the active item or current target within the component.) | data-carousel-dots | data-carousel-root | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-position
+Data attributes: data-active (Present on the active item or current target within the component.) | data-carousel-dots | data-carousel-root | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-position
 Example: <Carousel.Root>
 
 ### FormatBytes
@@ -1251,7 +1251,7 @@ Renders children into a different DOM location.
 Import: @dryui/ui
 Subpath import: @dryui/ui/portal
 Props: target (string | HTMLElement | undefined), Browsing context used for link navigation. | disabled (boolean | undefined), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
-Data attributes: none
+Data attributes: data-dry-portal
 Example: <Portal>Content</Portal>
 
 ### VisuallyHidden
@@ -1336,6 +1336,14 @@ Props: color (string), Semantic color or tone applied to the component., default
 Data attributes: data-beam | data-beam-layer
 Example: <Beam>Content</Beam>
 
+### BorderBeam
+Animated border-travel beam with masked ring highlights, bloom, and line-trace presets.
+Import: @dryui/ui
+Subpath import: @dryui/ui/border-beam
+Props: size (BorderBeamSize), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`). | colorVariant (BorderBeamColorVariant), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments. | theme (BorderBeamTheme), Color tuning for dark or light surfaces, or system preference when set to `auto`. | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
+Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-size (Reflects the current effect mode preset., values sm, md, line)
+Example: <BorderBeam>Content</BorderBeam>
+
 ### Shimmer
 Warm highlight sweep that travels across wrapped text and inline icons together.
 Import: @dryui/ui
@@ -1389,7 +1397,7 @@ WebGL shader canvas with built-in presets and theme color integration.
 Import: @dryui/ui
 Subpath import: @dryui/ui/shader-canvas
 Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (ShaderCanvasPreset) | themeColors (boolean) | aspectRatio (string)
-Data attributes: data-shader-canvas | data-shader-canvas-root
+Data attributes: data-reduced-motion | data-shader-canvas | data-shader-canvas-root | data-webgl
 Example: <ShaderCanvas>Content</ShaderCanvas>
 
 ### WaveDivider
@@ -1442,7 +1450,7 @@ After the CLI is working, DryUI also ships an MCP server (live tools) and a skil
 ### Install
 
 - **Claude Code**: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin bundles skill + MCP)
-- **Codex** (0.121.0+): `codex marketplace add rob-balfre/dryui`, then install DryUI from `/plugins` inside Codex. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp` + copy the skill
+- **Codex** (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI`. Manual fallback: `codex mcp add dryui -- npx -y @dryui/mcp` + copy the skill
 - **Copilot / Cursor / Windsurf**: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config
 - **Zed**: MCP only (reads AGENTS.md for conventions)
 

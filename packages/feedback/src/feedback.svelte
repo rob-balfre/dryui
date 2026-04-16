@@ -2,7 +2,15 @@
 	import { Portal } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { Check } from 'lucide-svelte';
-	import type { Arrow, Drawing, FeedbackProps, Point, Stroke, TextLabel, Tool } from './types.js';
+	import type {
+		Arrow,
+		Drawing,
+		DrawingSpace,
+		FeedbackProps,
+		Point,
+		Stroke,
+		Tool
+	} from './types.js';
 	import Toolbar from './components/toolbar.svelte';
 
 	const ANNOTATION_FILL = 'hsl(25 100% 55%)';
@@ -24,10 +32,10 @@
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
-	let textInput: { position: Point; value: string } | null = $state(null);
+	let textInput: { position: Point; value: string; space: DrawingSpace } | null = $state(null);
 	let textInputEl: HTMLInputElement | undefined = $state();
 	let erasing = $state(false);
-	let moving: { drawingId: string; lastPoint: Point } | null = $state(null);
+	let moving: { drawingId: string; lastPoint: Point; space: DrawingSpace } | null = $state(null);
 	let justCommitted = false;
 	let saveVersion = $state(0);
 	let submitting = $state(false);
@@ -40,6 +48,8 @@
 	let scrollX = $state(0);
 	let scrollY = $state(0);
 	let layerHostEl: HTMLElement | null = $state(null);
+	let layerOriginLeft = $state(0);
+	let layerOriginTop = $state(0);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
@@ -56,6 +66,10 @@
 
 	function normalizeDrawing(drawing: Drawing): Drawing {
 		return { ...drawing, color };
+	}
+
+	function drawingSpace(drawing: Pick<Drawing, 'space'>): DrawingSpace {
+		return drawing.space ?? 'scroll';
 	}
 
 	function isOpenPopover(node: HTMLElement): boolean {
@@ -88,6 +102,21 @@
 	function syncLayerHost(preferred?: HTMLElement | null) {
 		if (typeof document === 'undefined') return;
 		layerHostEl = resolveLayerHost(preferred);
+		updateLayerMetrics();
+	}
+
+	function updateLayerMetrics() {
+		if (!layerHostEl) {
+			if (layerOriginLeft !== 0) layerOriginLeft = 0;
+			if (layerOriginTop !== 0) layerOriginTop = 0;
+			return;
+		}
+
+		const rect = layerHostEl.getBoundingClientRect();
+		const newLeft = rect.left + layerHostEl.clientLeft;
+		const newTop = rect.top + layerHostEl.clientTop;
+		if (newLeft !== layerOriginLeft) layerOriginLeft = newLeft;
+		if (newTop !== layerOriginTop) layerOriginTop = newTop;
 	}
 
 	function toggle() {
@@ -118,6 +147,7 @@
 					position: textInput.position,
 					text: textInput.value.trim(),
 					color,
+					space: textInput.space,
 					fontSize: TEXT_FONT_SIZE
 				}
 			];
@@ -155,26 +185,35 @@
 		const target = resolveScrollRoot();
 		scrollRootEl = target;
 
+		let newLeft: number, newTop: number, newWidth: number, newHeight: number;
+		let newScrollX: number, newScrollY: number;
+
 		if (target) {
 			const rect = target.getBoundingClientRect();
-			viewportLeft = rect.left;
-			viewportTop = rect.top;
-			viewportWidth = rect.width;
-			viewportHeight = rect.height;
-			scrollX = target.scrollLeft;
-			scrollY = target.scrollTop;
-			return;
+			newLeft = rect.left;
+			newTop = rect.top;
+			newWidth = rect.width;
+			newHeight = rect.height;
+			newScrollX = target.scrollLeft;
+			newScrollY = target.scrollTop;
+		} else {
+			newLeft = 0;
+			newTop = 0;
+			newWidth = window.innerWidth;
+			newHeight = window.innerHeight;
+			newScrollX = window.scrollX;
+			newScrollY = window.scrollY;
 		}
 
-		viewportLeft = 0;
-		viewportTop = 0;
-		viewportWidth = window.innerWidth;
-		viewportHeight = window.innerHeight;
-		scrollX = window.scrollX;
-		scrollY = window.scrollY;
+		if (newLeft !== viewportLeft) viewportLeft = newLeft;
+		if (newTop !== viewportTop) viewportTop = newTop;
+		if (newWidth !== viewportWidth) viewportWidth = newWidth;
+		if (newHeight !== viewportHeight) viewportHeight = newHeight;
+		if (newScrollX !== scrollX) scrollX = newScrollX;
+		if (newScrollY !== scrollY) scrollY = newScrollY;
 	}
 
-	function isInsideDrawingArea(e: PointerEvent): boolean {
+	function isInsideScrollViewport(e: PointerEvent): boolean {
 		if (!scrollRootEl) return true;
 
 		return (
@@ -185,15 +224,43 @@
 		);
 	}
 
-	function pointFromPointer(e: PointerEvent): Point {
+	function resolvePointerSpace(e: PointerEvent): DrawingSpace {
+		if (!scrollRootEl || isInsideScrollViewport(e)) return 'scroll';
+		return 'viewport';
+	}
+
+	function pointFromPointer(e: PointerEvent, space: DrawingSpace = resolvePointerSpace(e)): Point {
+		if (space === 'viewport') {
+			return { x: e.clientX, y: e.clientY };
+		}
+
 		return {
 			x: e.clientX - viewportLeft + scrollX,
 			y: e.clientY - viewportTop + scrollY
 		};
 	}
 
-	function textInputStyle(position: Point): string {
-		return `left: ${viewportLeft + position.x - scrollX}px; top: ${viewportTop + position.y - scrollY - 10}px;`;
+	function screenPoint(point: Point, space: DrawingSpace): Point {
+		if (space === 'viewport') return point;
+		return {
+			x: viewportLeft - scrollX + point.x,
+			y: viewportTop - scrollY + point.y
+		};
+	}
+
+	function drawingTransform(space: DrawingSpace): string | undefined {
+		if (space === 'viewport') return undefined;
+		return `translate(${viewportLeft - scrollX} ${viewportTop - scrollY})`;
+	}
+
+	function textInputStyle(position: Point, space: DrawingSpace): string {
+		const { x, y } = screenPoint(position, space);
+		return `left: ${x}px; top: ${y - 10}px;`;
+	}
+
+	function feedbackRootStyle(): string | undefined {
+		if (!layerHostEl) return undefined;
+		return `left: ${-layerOriginLeft}px; top: ${-layerOriginTop}px;`;
 	}
 
 	function normalizeWheelDelta(delta: number, deltaMode: number, pageSize: number): number {
@@ -220,7 +287,7 @@
 	}
 
 	function resolveWheelTarget(e: WheelEvent): HTMLElement | null {
-		if (scrollRootEl) return scrollRootEl;
+		if (scrollRootEl && isInsideScrollViewport(e as PointerEvent)) return scrollRootEl;
 
 		const overlay = e.currentTarget as SVGSVGElement | null;
 		const previousPointerEvents = overlay?.style.pointerEvents ?? '';
@@ -309,17 +376,23 @@
 	function drawingNearPoint(drawing: Drawing, px: number, py: number): boolean {
 		const threshold =
 			ERASE_RADIUS + (drawing.kind === 'text' ? drawing.fontSize : drawing.width) / 2;
+		const space = drawingSpace(drawing);
 
 		if (drawing.kind === 'freehand') {
 			const pt = { x: px, y: py };
 			for (let i = 0; i < drawing.points.length - 1; i++) {
-				if (distToSegment(pt, drawing.points[i]!, drawing.points[i + 1]!) < threshold) return true;
+				const start = screenPoint(drawing.points[i]!, space);
+				const end = screenPoint(drawing.points[i + 1]!, space);
+				if (distToSegment(pt, start, end) < threshold) return true;
 			}
 		} else if (drawing.kind === 'arrow') {
-			if (distToSegment({ x: px, y: py }, drawing.start, drawing.end) < threshold) return true;
+			const start = screenPoint(drawing.start, space);
+			const end = screenPoint(drawing.end, space);
+			if (distToSegment({ x: px, y: py }, start, end) < threshold) return true;
 		} else {
-			const tx = drawing.position.x;
-			const ty = drawing.position.y;
+			const position = screenPoint(drawing.position, space);
+			const tx = position.x;
+			const ty = position.y;
 			const approxWidth = drawing.text.length * drawing.fontSize * 0.6;
 			if (
 				px >= tx - 4 &&
@@ -370,8 +443,8 @@
 
 	function handlePointerDown(e: PointerEvent) {
 		if (!active) return;
-		if (!isInsideDrawingArea(e)) return;
-		const point = pointFromPointer(e);
+		const space = resolvePointerSpace(e);
+		const point = pointFromPointer(e, space);
 
 		if (tool === 'text') {
 			e.preventDefault();
@@ -381,14 +454,17 @@
 			}
 			if (justCommitted) return;
 
-			const hit = findDrawingAt(point.x, point.y);
+			const hit = findDrawingAt(e.clientX, e.clientY);
 			if (hit && hit.kind === 'text') {
-				textInput = { position: hit.position, value: hit.text };
+				textInput = {
+					position: hit.position,
+					value: hit.text,
+					space: drawingSpace(hit)
+				};
 				drawings = drawings.filter((d) => d.id !== hit.id);
 			} else {
-				textInput = { position: point, value: '' };
+				textInput = { position: point, value: '', space };
 			}
-			requestAnimationFrame(() => textInputEl?.focus());
 			return;
 		}
 
@@ -401,6 +477,7 @@
 				kind: 'freehand',
 				points: [point],
 				color,
+				space,
 				width: strokeWidth
 			};
 		} else if (tool === 'arrow') {
@@ -410,38 +487,45 @@
 				start: point,
 				end: point,
 				color,
+				space,
 				width: strokeWidth
 			};
 			// start stays anchored to the initial click; drag updates the arrowhead (end)
 		} else if (tool === 'move') {
-			const hit = findDrawingAt(point.x, point.y);
+			const hit = findDrawingAt(e.clientX, e.clientY);
 			if (hit) {
-				moving = { drawingId: hit.id, lastPoint: point };
+				const moveSpace = drawingSpace(hit);
+				moving = {
+					drawingId: hit.id,
+					lastPoint: pointFromPointer(e, moveSpace),
+					space: moveSpace
+				};
 			}
 		} else {
 			erasing = true;
-			eraseAt(point.x, point.y);
+			eraseAt(e.clientX, e.clientY);
 		}
 	}
 
 	function handlePointerMove(e: PointerEvent) {
-		const point = pointFromPointer(e);
-
 		if (tool === 'pencil' && currentStroke) {
 			e.preventDefault();
+			const point = pointFromPointer(e, drawingSpace(currentStroke));
 			currentStroke.points = [...currentStroke.points, point];
 		} else if (tool === 'arrow' && currentArrow) {
 			e.preventDefault();
+			const point = pointFromPointer(e, drawingSpace(currentArrow));
 			currentArrow.end = point;
 		} else if (tool === 'move' && moving) {
 			e.preventDefault();
+			const point = pointFromPointer(e, moving.space);
 			const dx = point.x - moving.lastPoint.x;
 			const dy = point.y - moving.lastPoint.y;
 			drawings = drawings.map((d) => (d.id === moving!.drawingId ? offsetDrawing(d, dx, dy) : d));
 			moving.lastPoint = point;
 		} else if (tool === 'eraser' && erasing) {
 			e.preventDefault();
-			eraseAt(point.x, point.y);
+			eraseAt(e.clientX, e.clientY);
 		}
 	}
 
@@ -602,21 +686,30 @@
 		if (typeof window === 'undefined') return;
 
 		updateScrollMetrics();
+		updateLayerMetrics();
 
 		const target = resolveScrollRoot();
-		const update = () => updateScrollMetrics();
+		const host = layerHostEl;
+		const updateAll = () => {
+			updateScrollMetrics();
+			updateLayerMetrics();
+		};
 
-		target?.addEventListener('scroll', update, { passive: true });
-		window.addEventListener('scroll', update, { passive: true });
-		window.addEventListener('resize', update, { passive: true });
+		target?.addEventListener('scroll', updateScrollMetrics, { passive: true });
+		window.addEventListener('scroll', updateScrollMetrics, { passive: true });
+		window.addEventListener('resize', updateAll, { passive: true });
 
-		const resizeObserver = target ? new ResizeObserver(update) : null;
+		const resizeObserver =
+			typeof ResizeObserver !== 'undefined' && (target || host)
+				? new ResizeObserver(updateAll)
+				: null;
 		if (target && resizeObserver) resizeObserver.observe(target);
+		if (host && resizeObserver) resizeObserver.observe(host);
 
 		return () => {
-			target?.removeEventListener('scroll', update);
-			window.removeEventListener('scroll', update);
-			window.removeEventListener('resize', update);
+			target?.removeEventListener('scroll', updateScrollMetrics);
+			window.removeEventListener('scroll', updateScrollMetrics);
+			window.removeEventListener('resize', updateAll);
 			resizeObserver?.disconnect();
 		};
 	});
@@ -655,14 +748,25 @@
 
 		return () => clearTimeout(saveTimer);
 	});
+
+	$effect(() => {
+		if (!textInput || !textInputEl) return;
+
+		const frame = requestAnimationFrame(() => textInputEl?.focus());
+		return () => cancelAnimationFrame(frame);
+	});
 </script>
 
 <Hotkey keys={shortcut} handler={toggle} />
 
 <Portal target={layerHostEl ?? 'body'}>
-	<div class="feedback-root {className ?? ''}" data-dryui-feedback>
+	<div
+		class="feedback-root {className ?? ''}"
+		data-dryui-feedback
+		data-layer-hosted={layerHostEl ? '' : undefined}
+		style={feedbackRootStyle()}
+	>
 		{#if showOverlay}
-			<!-- svelte-ignore a11y_no_static_element_interactions -->
 			<svg
 				class="drawing-canvas {cursorClass}"
 				data-active={active || undefined}
@@ -686,153 +790,161 @@
 					</filter>
 				</defs>
 
-				<g transform={`translate(${viewportLeft - scrollX} ${viewportTop - scrollY})`}>
-					{#each drawings as drawing (drawing.id)}
-						{#if drawing.kind === 'freehand'}
-							<g filter="url(#annotation-shadow)">
-								<path
-									d={pointsToPath(drawing.points)}
-									stroke={ANNOTATION_OUTLINE}
-									stroke-width={outlinedStrokeWidth(drawing.width)}
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									fill="none"
-								/>
-								<path
-									d={pointsToPath(drawing.points)}
-									stroke={drawing.color}
-									stroke-width={drawing.width}
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									fill="none"
-								/>
-							</g>
-						{:else if drawing.kind === 'arrow'}
-							<g filter="url(#annotation-shadow)">
-								<line
-									x1={drawing.start.x}
-									y1={drawing.start.y}
-									x2={drawing.end.x}
-									y2={drawing.end.y}
-									stroke={ANNOTATION_OUTLINE}
-									stroke-width={outlinedStrokeWidth(drawing.width)}
-									stroke-linecap="round"
-								/>
-								<path
-									d={arrowHeadPath(drawing.start, drawing.end)}
-									stroke={ANNOTATION_OUTLINE}
-									stroke-width={outlinedStrokeWidth(drawing.width)}
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									fill="none"
-								/>
-								<line
-									x1={drawing.start.x}
-									y1={drawing.start.y}
-									x2={drawing.end.x}
-									y2={drawing.end.y}
-									stroke={drawing.color}
-									stroke-width={drawing.width}
-									stroke-linecap="round"
-								/>
-								<path
-									d={arrowHeadPath(drawing.start, drawing.end)}
-									stroke={drawing.color}
-									stroke-width={drawing.width}
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									fill="none"
-								/>
-							</g>
-						{:else}
-							<text
-								x={drawing.position.x}
-								y={drawing.position.y}
-								filter="url(#annotation-shadow)"
-								fill={drawing.color}
-								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedTextWidth(drawing.fontSize)}
-								paint-order="stroke fill"
-								stroke-linejoin="round"
-								font-size={drawing.fontSize}
-								font-family="system-ui, -apple-system, sans-serif"
-								font-weight="600">{drawing.text}</text
-							>
-						{/if}
-					{/each}
-
-					{#if currentStroke}
-						<g filter="url(#annotation-shadow)">
+				{@const scrollTransform = drawingTransform('scroll')}
+				{#each drawings as drawing (drawing.id)}
+					{@const transform = drawingSpace(drawing) === 'scroll' ? scrollTransform : undefined}
+					{#if drawing.kind === 'freehand'}
+						<g filter="url(#annotation-shadow)" {transform}>
 							<path
-								d={pointsToPath(currentStroke.points)}
+								d={pointsToPath(drawing.points)}
 								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(currentStroke.width)}
+								stroke-width={outlinedStrokeWidth(drawing.width)}
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								fill="none"
 							/>
 							<path
-								d={pointsToPath(currentStroke.points)}
-								stroke={currentStroke.color}
-								stroke-width={currentStroke.width}
+								d={pointsToPath(drawing.points)}
+								stroke={drawing.color}
+								stroke-width={drawing.width}
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								fill="none"
 							/>
 						</g>
-					{/if}
-
-					{#if currentArrow}
-						<g filter="url(#annotation-shadow)">
+					{:else if drawing.kind === 'arrow'}
+						<g filter="url(#annotation-shadow)" {transform}>
 							<line
-								x1={currentArrow.start.x}
-								y1={currentArrow.start.y}
-								x2={currentArrow.end.x}
-								y2={currentArrow.end.y}
+								x1={drawing.start.x}
+								y1={drawing.start.y}
+								x2={drawing.end.x}
+								y2={drawing.end.y}
 								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-width={outlinedStrokeWidth(drawing.width)}
 								stroke-linecap="round"
 							/>
 							<path
-								d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+								d={arrowHeadPath(drawing.start, drawing.end)}
 								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-width={outlinedStrokeWidth(drawing.width)}
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								fill="none"
 							/>
 							<line
-								x1={currentArrow.start.x}
-								y1={currentArrow.start.y}
-								x2={currentArrow.end.x}
-								y2={currentArrow.end.y}
-								stroke={currentArrow.color}
-								stroke-width={currentArrow.width}
+								x1={drawing.start.x}
+								y1={drawing.start.y}
+								x2={drawing.end.x}
+								y2={drawing.end.y}
+								stroke={drawing.color}
+								stroke-width={drawing.width}
 								stroke-linecap="round"
 							/>
 							<path
-								d={arrowHeadPath(currentArrow.start, currentArrow.end)}
-								stroke={currentArrow.color}
-								stroke-width={currentArrow.width}
+								d={arrowHeadPath(drawing.start, drawing.end)}
+								stroke={drawing.color}
+								stroke-width={drawing.width}
 								stroke-linecap="round"
 								stroke-linejoin="round"
 								fill="none"
 							/>
 						</g>
+					{:else}
+						<text
+							x={drawing.position.x}
+							y={drawing.position.y}
+							{transform}
+							filter="url(#annotation-shadow)"
+							fill={drawing.color}
+							stroke={ANNOTATION_OUTLINE}
+							stroke-width={outlinedTextWidth(drawing.fontSize)}
+							paint-order="stroke fill"
+							stroke-linejoin="round"
+							font-size={drawing.fontSize}
+							font-family="system-ui, -apple-system, sans-serif"
+							font-weight="600">{drawing.text}</text
+						>
 					{/if}
-				</g>
+				{/each}
+
+				{#if currentStroke}
+					<g
+						filter="url(#annotation-shadow)"
+						transform={drawingTransform(drawingSpace(currentStroke))}
+					>
+						<path
+							d={pointsToPath(currentStroke.points)}
+							stroke={ANNOTATION_OUTLINE}
+							stroke-width={outlinedStrokeWidth(currentStroke.width)}
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+						<path
+							d={pointsToPath(currentStroke.points)}
+							stroke={currentStroke.color}
+							stroke-width={currentStroke.width}
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</g>
+				{/if}
+
+				{#if currentArrow}
+					<g
+						filter="url(#annotation-shadow)"
+						transform={drawingTransform(drawingSpace(currentArrow))}
+					>
+						<line
+							x1={currentArrow.start.x}
+							y1={currentArrow.start.y}
+							x2={currentArrow.end.x}
+							y2={currentArrow.end.y}
+							stroke={ANNOTATION_OUTLINE}
+							stroke-width={outlinedStrokeWidth(currentArrow.width)}
+							stroke-linecap="round"
+						/>
+						<path
+							d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+							stroke={ANNOTATION_OUTLINE}
+							stroke-width={outlinedStrokeWidth(currentArrow.width)}
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+						<line
+							x1={currentArrow.start.x}
+							y1={currentArrow.start.y}
+							x2={currentArrow.end.x}
+							y2={currentArrow.end.y}
+							stroke={currentArrow.color}
+							stroke-width={currentArrow.width}
+							stroke-linecap="round"
+						/>
+						<path
+							d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+							stroke={currentArrow.color}
+							stroke-width={currentArrow.width}
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							fill="none"
+						/>
+					</g>
+				{/if}
 			</svg>
 		{/if}
 
 		{#if textInput}
 			<div
 				class="text-input-wrap"
-				style={textInputStyle(textInput.position)}
+				style={textInputStyle(textInput.position, textInput.space)}
 				onfocusout={handleTextInputFocusOut}
 			>
 				<input
 					class="text-input"
 					type="text"
+					data-feedback-text-input
 					bind:this={textInputEl}
 					bind:value={textInput.value}
 					onkeydown={handleTextKeyDown}
@@ -861,6 +973,8 @@
 	.feedback-root {
 		position: fixed;
 		inset: 0;
+		inline-size: 100vw;
+		block-size: 100vh;
 		z-index: 9998;
 		margin: 0;
 		padding: 0;
@@ -870,16 +984,20 @@
 		pointer-events: none;
 	}
 
+	.feedback-root[data-layer-hosted] {
+		inset: auto;
+	}
+
 	.feedback-root :global(*) {
 		pointer-events: auto;
 	}
 
 	.drawing-canvas {
-		position: fixed;
+		position: absolute;
 		inset: 0;
 		z-index: 9999;
-		inline-size: 100vw;
-		block-size: 100vh;
+		inline-size: 100%;
+		block-size: 100%;
 		pointer-events: none;
 	}
 
@@ -912,7 +1030,7 @@
 	}
 
 	.text-input-wrap {
-		position: fixed;
+		position: absolute;
 		z-index: 10001;
 		display: grid;
 		grid-template-columns: 1fr auto;

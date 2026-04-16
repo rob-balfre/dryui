@@ -3,29 +3,31 @@ export interface Point {
 	y: number;
 }
 
-export interface Stroke {
+export type DrawingSpace = 'scroll' | 'viewport';
+
+interface DrawingBase {
 	id: string;
+	color: string;
+	space?: DrawingSpace;
+}
+
+export interface Stroke extends DrawingBase {
 	kind: 'freehand';
 	points: Point[];
-	color: string;
 	width: number;
 }
 
-export interface Arrow {
-	id: string;
+export interface Arrow extends DrawingBase {
 	kind: 'arrow';
 	start: Point;
 	end: Point;
-	color: string;
 	width: number;
 }
 
-export interface TextLabel {
-	id: string;
+export interface TextLabel extends DrawingBase {
 	kind: 'text';
 	position: Point;
 	text: string;
-	color: string;
 	fontSize: number;
 }
 

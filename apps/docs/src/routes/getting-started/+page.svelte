@@ -17,6 +17,10 @@
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 
+	const featuredAgentSetups = aiAgentSetups.filter(
+		(setup) => setup.id === 'claude-code' || setup.id === 'codex'
+	);
+
 	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
 <script>
   import '@dryui/ui/themes/default.css';
@@ -93,6 +97,50 @@
 						<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
 					</Tabs.Content>
 				</Tabs.Root>
+			</div>
+		</section>
+
+		<Separator />
+
+		<section>
+			<div class="stack-lg">
+				<Heading level={2}>Set up Claude Code or Codex</Heading>
+				<Text size="lg" color="secondary">
+					Once <code>dryui</code> is installed, add the DryUI plugin in Claude Code or Codex. Those are
+					the fastest editor workflows right now.
+				</Text>
+
+				<div class="stack-md">
+					{#each featuredAgentSetups as setup (setup.id)}
+						<Card.Root>
+							<Card.Content>
+								<div class="agent-setup-card">
+									<div class="stack-sm">
+										<Badge variant="outline" color={setup.id === 'claude-code' ? 'blue' : 'green'}
+											>{setup.label}</Badge
+										>
+										<Text color="secondary">{setup.description}</Text>
+									</div>
+
+									{#if setup.skill}
+										<div class="stack-sm">
+											<Text size="sm" color="muted">{setup.skill.title}</Text>
+											<Text size="sm" color="secondary">{setup.skill.note}</Text>
+											<CodeBlock language="bash" code={setup.skill.code} />
+										</div>
+									{/if}
+
+									<Text size="sm" color="secondary">{setup.followUp}</Text>
+								</div>
+							</Card.Content>
+						</Card.Root>
+					{/each}
+				</div>
+
+				<Text size="sm" color="muted">
+					Need Cursor, Copilot, Windsurf, Zed, or the manual MCP fallback? The full setup matrix is
+					further down this page.
+				</Text>
 			</div>
 		</section>
 
@@ -204,11 +252,11 @@
 		<!-- 4. Editor integration -->
 		<section>
 			<div class="stack-lg">
-				<Heading level={2}>Editor integration</Heading>
+				<Heading level={2}>Full editor setup</Heading>
 				<Text size="lg" color="secondary">
-					<code>dryui</code> is the default path. It can walk you through Claude Code, Codex, Copilot,
-					Cursor, Windsurf, and Zed, and it can open feedback from the same flow. The per-editor snippets
-					below are the same shared setup data that backs the CLI and docs.
+					Use the full matrix below if you want the complete per-editor setup, or the manual MCP
+					fallback for Claude Code and Codex. The snippets are the same shared setup data that backs
+					the CLI and docs.
 				</Text>
 
 				<CodeBlock language="bash" code="dryui" />
@@ -351,6 +399,11 @@
 		display: grid;
 		gap: var(--dry-space-2);
 		justify-items: start;
+	}
+
+	.agent-setup-card {
+		display: grid;
+		gap: var(--dry-space-4);
 	}
 
 	.badge-row {

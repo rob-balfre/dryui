@@ -106,6 +106,8 @@
 		--dry-drawer-bg: var(--dry-color-bg-overlay);
 		--dry-drawer-border: var(--dry-color-stroke-weak);
 		--dry-drawer-size: 25rem;
+		--_drawer-rest-transform: translateX(0);
+		--_drawer-enter-transform: translateX(100%);
 
 		background: var(--dry-drawer-bg);
 		color: var(--dry-color-text-strong);
@@ -114,6 +116,9 @@
 		display: grid;
 		grid-template-rows: max-content minmax(0, 1fr) max-content;
 		overflow: hidden;
+		opacity: 1;
+		transform: var(--_drawer-rest-transform);
+		will-change: transform, opacity;
 
 		transition:
 			transform var(--dry-duration-slow) var(--dry-ease-spring-snappy),
@@ -127,44 +132,37 @@
 	}
 
 	[data-drawer-content][data-side='left'] [data-drawer-panel] {
+		--_drawer-enter-transform: translateX(-100%);
 		grid-column: 1;
 		height: 100%;
 		border-right: 1px solid var(--dry-drawer-border);
 	}
 
 	[data-drawer-content][data-side='top'] [data-drawer-panel] {
+		--_drawer-rest-transform: translateY(0);
+		--_drawer-enter-transform: translateY(-100%);
 		grid-row: 1;
 		height: var(--dry-drawer-size);
 		border-bottom: 1px solid var(--dry-drawer-border);
 	}
 
 	[data-drawer-content][data-side='bottom'] [data-drawer-panel] {
+		--_drawer-rest-transform: translateY(0);
+		--_drawer-enter-transform: translateY(100%);
 		grid-row: 2;
 		height: var(--dry-drawer-size);
 		border-top: 1px solid var(--dry-drawer-border);
 	}
 
 	@starting-style {
-		[data-drawer-content][data-side='right'][open] [data-drawer-panel] {
+		[data-drawer-content][open] [data-drawer-panel] {
 			opacity: 0;
-			transform: translateX(100%);
-		}
-		[data-drawer-content][data-side='left'][open] [data-drawer-panel] {
-			opacity: 0;
-			transform: translateX(-100%);
-		}
-		[data-drawer-content][data-side='top'][open] [data-drawer-panel] {
-			opacity: 0;
-			transform: translateY(-100%);
-		}
-		[data-drawer-content][data-side='bottom'][open] [data-drawer-panel] {
-			opacity: 0;
-			transform: translateY(100%);
+			transform: var(--_drawer-enter-transform);
 		}
 	}
 
 	[data-drawer-content][data-state='open'] [data-drawer-panel] {
 		opacity: 1;
-		transform: translate(0);
+		transform: var(--_drawer-rest-transform);
 	}
 </style>

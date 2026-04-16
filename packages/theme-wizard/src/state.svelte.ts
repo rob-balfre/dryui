@@ -47,6 +47,12 @@ const DEFAULTS = {
 		preset: 'elevated' as ShadowPreset,
 		intensity: 1,
 		tintBrand: true
+	},
+	adjust: {
+		brightness: 100,
+		contrast: 100,
+		saturate: 100,
+		hueRotate: 0
 	}
 };
 
@@ -78,7 +84,8 @@ function persistState(): void {
 					darkBgOverrides,
 					typography,
 					shape,
-					shadows
+					shadows,
+					adjust
 				} = wizardState;
 				const tokens = {
 					light: getAllTokens('light'),
@@ -95,6 +102,7 @@ function persistState(): void {
 						typography,
 						shape,
 						shadows,
+						adjust,
 						tokens
 					})
 				);
@@ -117,7 +125,8 @@ export const wizardState = $state({
 	fastTrack: initial.fastTrack,
 	typography: initial.typography,
 	shape: initial.shape,
-	shadows: initial.shadows
+	shadows: initial.shadows,
+	adjust: initial.adjust
 });
 
 // ─── Derived theme ────────────────────────────────────────────────────────────
@@ -163,6 +172,7 @@ function resetStyleStateToDefaults(): void {
 	wizardState.typography = { ...DEFAULTS.typography };
 	wizardState.shape = { ...DEFAULTS.shape };
 	wizardState.shadows = { ...DEFAULTS.shadows };
+	wizardState.adjust = { ...DEFAULTS.adjust };
 }
 
 /** Set the personality (chrome level) and apply cross-step defaults. */
@@ -286,6 +296,13 @@ export function applyRecipe(recipe: WizardRecipe): void {
 	if (recipe.shadows) {
 		wizardState.shadows = { ...recipe.shadows };
 	}
+
+	wizardState.adjust = {
+		brightness: recipe.adjust?.brightness ?? DEFAULTS.adjust.brightness,
+		contrast: recipe.adjust?.contrast ?? DEFAULTS.adjust.contrast,
+		saturate: recipe.adjust?.saturate ?? DEFAULTS.adjust.saturate,
+		hueRotate: recipe.adjust?.hueRotate ?? DEFAULTS.adjust.hueRotate
+	};
 
 	persistState();
 }

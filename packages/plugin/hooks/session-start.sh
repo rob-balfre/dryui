@@ -7,12 +7,9 @@
 
 set -eu
 
-# Prefer the `dryui-ambient` bin if it's on PATH (installed CLI). Fall
-# back to `dryui ambient` subcommand, and finally to npx so users who
-# have not installed @dryui/cli globally still get ambient context.
-if command -v dryui-ambient >/dev/null 2>&1; then
-  ambient_output="$(dryui-ambient 2>/dev/null || true)"
-elif command -v dryui >/dev/null 2>&1; then
+# Prefer the main `dryui` bin, then fall back to npx so users who have
+# not installed @dryui/cli globally still get ambient context.
+if command -v dryui >/dev/null 2>&1; then
   ambient_output="$(dryui ambient 2>/dev/null || true)"
 else
   ambient_output="$(npx -y @dryui/cli ambient 2>/dev/null || true)"

@@ -3,6 +3,7 @@
 		Adjust,
 		Badge,
 		Beam,
+		BorderBeam,
 		Card,
 		ChromaticAberration,
 		Glass,
@@ -43,6 +44,25 @@
 				<Heading level={3}>Beam</Heading>
 			</div>
 		</Beam>
+	</div>
+{:else if name === 'BorderBeam'}
+	<div class="stage stage-soft">
+		<BorderBeam
+			size="md"
+			colorVariant="ocean"
+			theme="light"
+			duration={2.4}
+			borderRadius="var(--dry-radius-xl)"
+			strength={0.92}
+		>
+			<div class="effect-card">
+				<Badge variant="soft" color="blue" size="sm">Traveling edge</Badge>
+				<Heading level={3}>Border Beam</Heading>
+				<Text size="sm" color="secondary">
+					Animated highlight that traces the surface perimeter.
+				</Text>
+			</div>
+		</BorderBeam>
 	</div>
 {:else if name === 'ChromaticAberration'}
 	<div class="stage stage-dark">

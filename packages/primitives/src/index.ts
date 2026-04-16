@@ -817,6 +817,14 @@ export type { SurfaceProps } from './surface/index.js';
 export { Beam } from './beam/index.js';
 export type { BeamProps } from './beam/index.js';
 
+export { BorderBeam } from './border-beam/index.js';
+export type {
+	BorderBeamProps,
+	BorderBeamSize,
+	BorderBeamColorVariant,
+	BorderBeamTheme
+} from './border-beam/index.js';
+
 export { ChromaticAberration } from './chromatic-aberration/index.js';
 export type { ChromaticAberrationProps } from './chromatic-aberration/index.js';
 

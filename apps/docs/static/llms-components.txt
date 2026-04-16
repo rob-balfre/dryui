@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 159 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 160 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -61,7 +61,7 @@ Structure:
   ToggleGroup.Root
     ToggleGroup.Item
 CSS variables: --dry-tg-font-size, --dry-tg-min-height, --dry-tg-padding-x, --dry-tg-padding-y, --dry-tg-radius
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -187,7 +187,7 @@ Structure:
   ChipGroup.Root
     ChipGroup.Item
 CSS variables: --dry-chip-group-font-size, --dry-chip-group-padding-x, --dry-chip-group-padding-y
-Data attributes: data-chip-group | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
+Data attributes: data-chip-group | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -244,7 +244,7 @@ Subpath import: import { PromptInput } from '@dryui/ui/prompt-input'
 Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | onpromptsubmit ((value: string) => void) | actions (Snippet)
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-btn-radius, --dry-prompt-input-bg, --dry-prompt-input-border, --dry-prompt-input-color, --dry-prompt-input-gap, --dry-prompt-input-padding, --dry-prompt-input-radius, --dry-prompt-input-textarea-min-height
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
 Accessibility: none
 Example:
 ```svelte
@@ -319,10 +319,10 @@ Tags: form, range, slider, value
 Kind: simple
 Root import: import { Slider } from '@dryui/ui'
 Subpath import: import { Slider } from '@dryui/ui/slider'
-Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
+Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant (SliderVariant), Visual style preset for the component., default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
 Native props: Forwards <input> attributes via rest props.
 CSS variables: --dry-slider-thumb-size, --dry-slider-track-height
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-variant
 Accessibility: none
 Example:
 ```svelte
@@ -749,7 +749,7 @@ Structure:
     Transfer.Item
     Transfer.Actions
 CSS variables: --dry-transfer-actions-gap, --dry-transfer-bg, --dry-transfer-border, --dry-transfer-header-bg, --dry-transfer-item-hover, --dry-transfer-item-selected, --dry-transfer-list-height, --dry-transfer-padding, --dry-transfer-radius
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-root | data-transfer-select-all | data-type
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-move-all-source | data-transfer-move-all-target | data-transfer-move-source | data-transfer-move-target | data-transfer-root | data-transfer-select-all | data-type
 Accessibility: none
 Example:
 ```svelte
@@ -802,7 +802,7 @@ Subpath import: import { PhoneInput } from '@dryui/ui/phone-input'
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | value (string), Current controlled or bindable value., default '', bindable | defaultCountry (string), default 'US' | disabled (boolean), Prevents interaction and applies disabled styling., default false | name (string), Field name used during native form submission. | placeholder (string), Hint text shown when no value is selected or entered., default 'Phone number' | countries (CountryInfo[]) | onchange ((value: string) => void)
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-phone-input-bg, --dry-phone-input-border, --dry-phone-input-color, --dry-phone-input-radius
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-phone-chevron | data-phone-dial-code | data-phone-flag | data-phone-input | data-phone-number-input | data-phone-select | data-phone-trigger | data-size
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-phone-chevron | data-phone-dial-code | data-phone-flag | data-phone-input | data-phone-number-input | data-phone-select | data-phone-trigger | data-size
 Accessibility: none
 Example:
 ```svelte
@@ -1282,7 +1282,7 @@ Structure:
     DatePicker.Content
       DatePicker.Calendar
 CSS variables: none
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dp-content | data-placeholder | data-state
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1328,7 +1328,7 @@ Structure:
     Calendar.Next
     Calendar.Heading
 CSS variables: --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color
-Data attributes: data-calendar | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.)
+Data attributes: data-calendar | data-calendar-day | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1370,7 +1370,7 @@ Structure:
     DateRangePicker.Calendar
     DateRangePicker.Preset
 CSS variables: none
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-drp-content | data-placeholder | data-state
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1400,7 +1400,7 @@ Structure:
   RangeCalendar.Root
     RangeCalendar.Grid
 CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-heading-color, --dry-range-calendar-nav-bg, --dry-range-calendar-nav-border, --dry-range-calendar-nav-color, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-panel-bg, --dry-range-calendar-panel-border, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
-Data attributes: data-range-calendar-root
+Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-root | data-range-end | data-range-start | data-today
 Accessibility: none
 Example:
 ```svelte
@@ -1760,7 +1760,7 @@ Structure:
       Tabs.Trigger
     Tabs.Content
 CSS variables: --dry-tabs-trigger-active-border-bottom-color, --dry-tabs-trigger-active-border-right-color, --dry-tabs-trigger-border-bottom, --dry-tabs-trigger-border-right
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the tab trigger or panel is active., values active, inactive) | data-tabs-content | data-tabs-list | data-tabs-root
 Accessibility: Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly. | Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.
 Example:
 ```svelte
@@ -1944,7 +1944,7 @@ Structure:
     Toolbar.Separator
     Toolbar.Link
 CSS variables: none
-Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Accessibility: none
 Example:
 ```svelte
@@ -2191,7 +2191,7 @@ Structure:
       MegaMenu.Column
         MegaMenu.Link
 CSS variables: none
-Data attributes: data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
+Data attributes: data-active (Present on the active item or current target within the component.) | data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
 Accessibility: none
 Example:
 ```svelte
@@ -2647,7 +2647,7 @@ Structure:
   Tour.Root
     Tour.Tooltip
 CSS variables: none
-Data attributes: data-part
+Data attributes: data-part | data-placement | data-tour-next | data-tour-overlay | data-tour-prev | data-tour-root | data-tour-skip | data-tour-spotlight | data-tour-tooltip | data-tour-tooltip-actions | data-tour-tooltip-content | data-tour-tooltip-counter | data-tour-tooltip-default | data-tour-tooltip-footer | data-tour-tooltip-title
 Accessibility: none
 Example:
 ```svelte
@@ -2939,7 +2939,7 @@ Subpath import: import { Avatar } from '@dryui/ui/avatar'
 Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('circle' | 'square'), accepted circle, square, default 'circle' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | badge (Snippet) | children (Snippet | undefined), Content rendered inside the component.
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-avatar-font-size, --dry-avatar-radius, --dry-avatar-size
-Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-shape | data-size | data-status
+Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-part | data-shape | data-size | data-status
 Accessibility: none
 Example:
 ```svelte
@@ -3403,7 +3403,7 @@ Subpath import: import { QRCode } from '@dryui/ui/qr-code'
 Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string), default '#000' | bgColor (string), default '#fff'
 Native props: Forwards <canvas> attributes via rest props.
 CSS variables: --dry-qr-bg, --dry-qr-border, --dry-qr-padding, --dry-qr-radius, --dry-qr-size
-Data attributes: data-qr-canvas | data-qr-wrapper | data-value
+Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Accessibility: none
 Example:
 ```svelte
@@ -3437,7 +3437,7 @@ Subpath import: import { MarkdownRenderer } from '@dryui/ui/markdown-renderer'
 Props: content (string), required | sanitize (boolean), default true
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-markdown-blockquote-border, --dry-markdown-blockquote-color, --dry-markdown-code-bg, --dry-markdown-code-border, --dry-markdown-code-color, --dry-markdown-color, --dry-markdown-font-size, --dry-markdown-heading-color, --dry-markdown-hr-color, --dry-markdown-line-height, --dry-markdown-link-color, --dry-markdown-link-hover-color, --dry-markdown-max-width
-Data attributes: data-code-block | data-markdown-renderer | data-markdown-renderer-root
+Data attributes: data-code-block | data-language | data-markdown-renderer | data-markdown-renderer-root
 Accessibility: none
 Example:
 ```svelte
@@ -3536,7 +3536,7 @@ Structure:
     DataGrid.ExpandableRow
     DataGrid.ExpandTrigger
 CSS variables: --dry-data-grid-border, --dry-data-grid-head-padding-y, --dry-data-grid-header-bg, --dry-data-grid-padding-x, --dry-data-grid-padding-y, --dry-data-grid-pagination-gap, --dry-data-grid-row-hover, --dry-data-grid-row-stripe, --dry-data-grid-sort-color
-Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
+Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
 Accessibility: none
 Example:
 ```svelte
@@ -3593,7 +3593,7 @@ Structure:
     Carousel.Dots
     Carousel.Thumbnails
 CSS variables: --dry-carousel-gap, --dry-carousel-slide-size
-Data attributes: data-active (Present on the active item or current target within the component.) | data-carousel-dots | data-carousel-root | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-position
+Data attributes: data-active (Present on the active item or current target within the component.) | data-carousel-dots | data-carousel-root | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-position
 Accessibility: none
 Example:
 ```svelte
@@ -4241,7 +4241,7 @@ Root import: import { Portal } from '@dryui/ui'
 Subpath import: import { Portal } from '@dryui/ui/portal'
 Props: target (string | HTMLElement | undefined), Browsing context used for link navigation. | disabled (boolean | undefined), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
 CSS variables: none
-Data attributes: none
+Data attributes: data-dry-portal
 Accessibility: none
 Example:
 ```svelte
@@ -4419,6 +4419,23 @@ Example:
 <Beam>Content</Beam>
 ```
 
+## BorderBeam
+Package: @dryui/ui
+Category: visual
+Tags: border, beam, glow, ring, highlight, effect
+Kind: simple
+Root import: import { BorderBeam } from '@dryui/ui'
+Subpath import: import { BorderBeam } from '@dryui/ui/border-beam'
+Props: size (BorderBeamSize), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`). | colorVariant (BorderBeamColorVariant), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments. | theme (BorderBeamTheme), Color tuning for dark or light surfaces, or system preference when set to `auto`. | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
+Native props: Forwards <div> attributes via rest props.
+CSS variables: none
+Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-size (Reflects the current effect mode preset., values sm, md, line)
+Accessibility: none
+Example:
+```svelte
+<BorderBeam>Content</BorderBeam>
+```
+
 ## Shimmer
 Package: @dryui/ui
 Category: visual
@@ -4531,7 +4548,7 @@ Subpath import: import { ShaderCanvas } from '@dryui/ui/shader-canvas'
 Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (ShaderCanvasPreset) | themeColors (boolean) | aspectRatio (string)
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
-Data attributes: data-shader-canvas | data-shader-canvas-root
+Data attributes: data-reduced-motion | data-shader-canvas | data-shader-canvas-root | data-webgl
 Accessibility: none
 Example:
 ```svelte

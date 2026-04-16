@@ -7,7 +7,7 @@ import {
 	FeedbackHttpClient,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
-import { hasFlag, printCommandHelp, runCommand, type CommandResult } from '../run.js';
+import { emitOrRun, hasFlag, printCommandHelp, type CommandResult } from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
@@ -33,6 +33,7 @@ interface LauncherRuntime {
 interface RunLauncherOptions {
 	cwd?: string;
 	runtime?: Partial<LauncherRuntime>;
+	exitOnComplete?: boolean;
 }
 
 function launcherHelp(): never {
@@ -153,10 +154,11 @@ export async function runLauncher(
 		...defaultRuntime,
 		...options.runtime
 	};
+	const exitOnComplete = options.exitOnComplete ?? true;
 
 	const buildResult = runtime.ensureFeedbackUiBuilt(workspaceRoot);
 	if (buildResult) {
-		runCommand(buildResult);
+		emitOrRun(buildResult, 'toon', exitOnComplete);
 		return true;
 	}
 
@@ -173,35 +175,43 @@ export async function runLauncher(
 		const noOpen = hasFlag(args, '--no-open');
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
-		runCommand({
-			output: [
-				'DryUI feedback dashboard',
-				'',
-				`Workspace: ${workspaceRoot}`,
-				`Dashboard: ${dashboardUrl}`,
-				`Docs: ${docsMessage}`,
-				`Feedback: ${feedbackMessage}`,
-				`Browser: ${
-					noOpen
-						? 'skipped (--no-open)'
-						: opened
-							? 'opening default browser'
-							: 'could not auto-open; use the dashboard URL above'
-				}`
-			].join('\n'),
-			error: null,
-			exitCode: 0
-		});
+		emitOrRun(
+			{
+				output: [
+					'DryUI feedback dashboard',
+					'',
+					`Workspace: ${workspaceRoot}`,
+					`Dashboard: ${dashboardUrl}`,
+					`Docs: ${docsMessage}`,
+					`Feedback: ${feedbackMessage}`,
+					`Browser: ${
+						noOpen
+							? 'skipped (--no-open)'
+							: opened
+								? 'opening default browser'
+								: 'could not auto-open; use the dashboard URL above'
+					}`
+				].join('\n'),
+				error: null,
+				exitCode: 0
+			},
+			'toon',
+			exitOnComplete
+		);
 	} catch (error) {
 		if (error instanceof Error && error.message === 'exit') {
 			throw error;
 		}
 
-		runCommand({
-			output: '',
-			error: error instanceof Error ? error.message : String(error),
-			exitCode: 1
-		});
+		emitOrRun(
+			{
+				output: '',
+				error: error instanceof Error ? error.message : String(error),
+				exitCode: 1
+			},
+			'toon',
+			exitOnComplete
+		);
 	}
 
 	return true;

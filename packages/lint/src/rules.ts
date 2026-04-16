@@ -428,6 +428,7 @@ export function checkStyle(content: string): Violation[] {
 	}
 
 	for (const match of content.matchAll(WIDTH_RE)) {
+		if (hasAllowComment(file, match.index, 'width')) continue;
 		violations.push({
 			rule: 'dryui/no-width',
 			message: ruleMessage('dryui/no-width'),

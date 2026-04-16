@@ -18,6 +18,7 @@
 
 <style>
 	[data-drawer-header] {
+		grid-row: 1;
 		padding: var(--dry-space-6) var(--dry-space-8);
 		border-bottom: 1px solid var(--dry-drawer-border);
 	}

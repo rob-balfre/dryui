@@ -219,6 +219,19 @@ const PROP_DESCRIPTIONS: Record<string, string> = {
 	'Badge.color': 'Semantic tone applied to the badge background, border, or text treatment.',
 	'Badge.size': 'Badge density preset for compact metadata or standard labels.',
 	'Badge.variant': 'Badge treatment ranging from filled emphasis to subtle outline styles.',
+	'BorderBeam.active':
+		'Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle.',
+	'BorderBeam.borderRadius':
+		'Optional border radius override for the beam host. When omitted, the first child radius is detected automatically.',
+	'BorderBeam.colorVariant':
+		'Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments.',
+	'BorderBeam.onActivate': 'Callback fired after the beam fade-in animation completes.',
+	'BorderBeam.onDeactivate': 'Callback fired after the beam fade-out animation completes.',
+	'BorderBeam.size':
+		'Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`).',
+	'BorderBeam.strength': 'Intensity multiplier for the beam stroke, inner glow, and bloom layers.',
+	'BorderBeam.theme':
+		'Color tuning for dark or light surfaces, or system preference when set to `auto`.',
 	'Button.color': 'Semantic tone for primary or destructive button actions.',
 	'Button.size': 'Button density preset, including icon-only sizing variants.',
 	'Button.variant': 'Button treatment from solid primary actions to ghost and inline link styles.',
@@ -314,6 +327,22 @@ const DATA_ATTRIBUTE_META: Record<string, DataAttributeMeta> = {
 	'Dialog.data-state': {
 		description: 'Reflects whether the dialog is open or closed.',
 		values: ['open', 'closed']
+	},
+	'BorderBeam.data-active': {
+		description: 'Present while the beam is rendering its active glow and bloom layers.'
+	},
+	'BorderBeam.data-beam': {
+		description: 'Per-instance marker on the beam host used to scope the injected effect styles.'
+	},
+	'BorderBeam.data-beam-bloom': {
+		description: 'Bloom layer element that renders the outer glow spill around the active beam.'
+	},
+	'BorderBeam.data-fading': {
+		description: 'Present while the beam is playing its fade-out sequence.'
+	},
+	'BorderBeam.data-size': {
+		description: 'Reflects the current effect mode preset.',
+		values: ['sm', 'md', 'line']
 	},
 	'Drawer.data-state': {
 		description: 'Reflects whether the drawer is open or closed.',
@@ -1135,6 +1164,31 @@ async function main(): Promise<void> {
 			for (const attr of collectDataAttributes(source)) {
 				dataAttributes.add(attr);
 			}
+		}
+
+		const primDirPath = join(primSrc, dir);
+		try {
+			const primEntries = await readdir(primDirPath, { withFileTypes: true });
+			for (const entry of primEntries) {
+				if (!entry.isFile()) continue;
+				if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
+				const source = await readText(join(primDirPath, entry.name));
+
+				for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
+					const varName = match[1];
+					if (varName) cssVars[varName] = cssVarDescription(varName);
+				}
+				for (const match of source.matchAll(/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)/gm)) {
+					const varName = match[1];
+					if (varName) cssVars[varName] = cssVarDescription(varName);
+				}
+
+				for (const attr of collectDataAttributes(source)) {
+					dataAttributes.add(attr);
+				}
+			}
+		} catch {
+			/* no primitive directory fallback */
 		}
 
 		components[name] = {

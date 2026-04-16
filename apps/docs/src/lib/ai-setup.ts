@@ -170,8 +170,12 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 		},
 		skill: {
 			title: '2. Install the plugin',
-			note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server. After adding the marketplace, open Codex and install DryUI from `/plugins`.',
-			code: `codex marketplace add rob-balfre/dryui`
+			note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server.',
+			code: `codex marketplace add rob-balfre/dryui
+
+# then in Codex:
+# /plugins
+# install DryUI`
 		},
 		mcp: {
 			path: '.codex/config.toml',
@@ -180,7 +184,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 			language: 'toml'
 		},
 		followUp:
-			'Use the CLI as the default surface. The plugin adds conventions plus ask/check inside Codex.'
+			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask` / `check` are available.'
 	},
 	{
 		id: 'copilot',
