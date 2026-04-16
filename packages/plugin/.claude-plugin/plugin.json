@@ -1,7 +1,7 @@
 {
   "name": "dryui",
   "version": "0.2.0",
-  "description": "DryUI component library — Svelte guidance, bootstrap, live feedback, and MCP tools",
+  "description": "DryUI component library — Svelte guidance, bootstrap, live feedback, and MCP servers",
   "author": {
     "name": "Rob Balfre",
     "url": "https://github.com/rob-balfre"

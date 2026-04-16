@@ -103,7 +103,11 @@ const mcpServersConfig = `{
 
 const codexConfig = `[mcp_servers.dryui]
 command = "npx"
-args = ["-y", "@dryui/mcp"]`;
+args = ["-y", "@dryui/mcp"]
+
+[mcp_servers.dryui-feedback]
+command = "npx"
+args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
 const copilotConfig = `{
   "servers": {
@@ -140,20 +144,16 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		},
 		skill: {
 			title: '2. Install the plugin',
-			note: 'The plugin bundles the DryUI skill and MCP server for Claude.',
+			note: 'The plugin is the canonical Claude install path for the DryUI skill and MCP servers.',
 			code: `claude plugin marketplace add rob-balfre/dryui
 claude plugin install dryui@dryui`
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Manual alternative: add the MCP server and copy the skill yourself.',
+			note: '3. Optional MCP-only fallback: add the servers manually if you cannot use plugins. This does not install the bundled DryUI skill.',
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
-
-# Skill (copy to .claude/skills/ or .agents/skills/)
-git clone --depth 1 --filter=blob:none --sparse https://github.com/rob-balfre/dryui.git /tmp/dryui
-cd /tmp/dryui && git sparse-checkout set packages/ui/skills/dryui
-mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/skills/`,
+claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
 			language: 'bash'
 		},
 		followUp:
@@ -170,7 +170,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 		},
 		skill: {
 			title: '2. Install the plugin',
-			note: 'Requires Codex 0.121.0 or newer. The plugin bundles the DryUI skill and MCP server.',
+			note: 'Requires Codex 0.121.0 or newer. The plugin is the canonical Codex install path for the DryUI skill and MCP servers.',
 			code: `codex marketplace add rob-balfre/dryui
 
 # then in Codex:
@@ -179,7 +179,7 @@ mkdir -p .claude/skills && cp -r /tmp/dryui/packages/ui/skills/dryui .claude/ski
 		},
 		mcp: {
 			path: '.codex/config.toml',
-			note: '3. Manual alternative: add the MCP server with `codex mcp add dryui -- npx -y @dryui/mcp`, or place the following in `.codex/config.toml`.',
+			note: '3. Optional MCP-only fallback: add the servers manually if you cannot use plugins. This does not install the bundled DryUI skill.',
 			code: codexConfig,
 			language: 'toml'
 		},

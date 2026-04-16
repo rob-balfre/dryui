@@ -7,7 +7,6 @@ apps/docs/build
 .DS_Store
 *.tgz
 .claude/*
-!.claude/skills/
 .codex/
 .codex-artifacts/
 .cursor/
