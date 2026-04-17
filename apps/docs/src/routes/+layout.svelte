@@ -252,8 +252,8 @@
 		}
 
 		.docs-header-bar {
-			grid-template-areas: 'brand search theme';
-			grid-template-columns: 1fr minmax(16rem, 22rem) 1fr;
+			grid-template-areas: 'brand . search theme';
+			grid-template-columns: var(--docs-sidebar-width) 1fr minmax(16rem, 22rem) 1fr;
 			gap: var(--dry-space-4);
 			padding-inline: var(--dry-space-6);
 		}
