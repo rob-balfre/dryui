@@ -80,7 +80,10 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.3.3",
+      "version": "0.3.4",
+      "bin": {
+        "dryui-feedback-mcp": "./dist/mcp.js",
+      },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
         "zod": "^4.3.6",

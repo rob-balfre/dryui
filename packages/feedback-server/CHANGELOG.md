@@ -1,5 +1,11 @@
 # @dryui/feedback-server
 
+## 0.3.4
+
+### Patch Changes
+
+- [`dc15f8c`](https://github.com/rob-balfre/dryui/commit/dc15f8c0432db32aff8321303aa3085ac3789910) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add a `dryui-feedback-mcp` bin so the Claude and Codex plugin bundle can install the feedback MCP server without custom local wiring.
+
 ## 0.3.3
 
 ### Patch Changes
