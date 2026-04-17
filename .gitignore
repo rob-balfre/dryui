@@ -31,10 +31,17 @@ benchmarks/visual-checks/chromedp/baseline.png
 benchmarks/visual-checks/chromedp/diff.png
 tests/browser/__screenshots__/visual-benchmark.browser.test.ts/
 tmp/
-test-projects/
-theme-inspo/
-diagram-samples/
-vendor/
+# Local scratch dirs — ignore contents but keep the top-level README so future
+# contributors can see what each one is for. Git refuses to un-ignore files
+# inside a fully-ignored directory, so we ignore each dir's children instead.
+test-projects/*
+!test-projects/README.md
+theme-inspo/*
+!theme-inspo/README.md
+diagram-samples/*
+!diagram-samples/README.md
+vendor/*
+!vendor/README.md
 
 # Auto-generated .d.ts emitted into package src/ dirs when svelte-package
 # walks workspace paths (the real published .d.ts files live in dist/).

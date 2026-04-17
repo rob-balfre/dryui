@@ -50,8 +50,19 @@ test('release scripts require validation before publish', () => {
 	expect(packageJson.scripts.check).toContain('check:docs');
 	expect(packageJson.scripts.check).toContain('check:mcp');
 	expect(packageJson.scripts.build).toBe('bun run build:packages && bun run build:docs');
-	expect(packageJson.scripts['build:packages']).toBe(
-		"bun run --filter '@dryui/lint' build && bun run --filter '@dryui/primitives' build && bun run --filter '@dryui/ui' build && bun run --filter '@dryui/mcp' build && bun run --filter '@dryui/feedback-server' build && bun run --filter '@dryui/cli' build"
-	);
+	const buildPackages = packageJson.scripts['build:packages'];
+	const requiredPackages = [
+		'@dryui/lint',
+		'@dryui/primitives',
+		'@dryui/ui',
+		'@dryui/feedback',
+		'@dryui/theme-wizard',
+		'@dryui/mcp',
+		'@dryui/feedback-server',
+		'@dryui/cli'
+	];
+	for (const pkg of requiredPackages) {
+		expect(buildPackages).toContain(`--filter '${pkg}' build`);
+	}
 	expect(packageJson.scripts.validate).toBe('bun run ./scripts/validate.ts');
 });

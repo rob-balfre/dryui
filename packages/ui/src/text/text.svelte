@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLElement> {
 		as?: 'p' | 'span' | 'div';
@@ -28,21 +29,13 @@
 {#if as === 'span'}
 	<span
 		class={className}
-		data-color={color}
-		data-size={size}
-		data-font={font}
-		data-weight={weight || undefined}
-		data-variant={variant}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
 		{...rest}>{@render children()}</span
 	>
 {:else if as === 'div'}
 	<div
 		class={className}
-		data-color={color}
-		data-size={size}
-		data-font={font}
-		data-weight={weight || undefined}
-		data-variant={variant}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
 		{...rest}
 	>
 		{@render children()}
@@ -50,11 +43,7 @@
 {:else}
 	<p
 		class={className}
-		data-color={color}
-		data-size={size}
-		data-font={font}
-		data-weight={weight || undefined}
-		data-variant={variant}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
 		{...rest}
 	>
 		{@render children()}

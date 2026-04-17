@@ -269,10 +269,12 @@
 									<div class="choice-card">
 										<span class="choice-radio" data-selected aria-hidden="true"></span>
 										<div class="choice-card-copy">
-											<Text as="span" weight="semibold">Kubernetes</Text>
+											<div class="choice-card-head">
+												<Text as="span" weight="semibold">Kubernetes</Text>
+												<Badge color="gray" size="sm">Default</Badge>
+											</div>
 											<Text color="muted">Run GPU workloads on a K8s configured cluster.</Text>
 										</div>
-										<Badge color="gray" size="sm">Default</Badge>
 									</div>
 								</Card.Content>
 							</Card.Root>
@@ -281,10 +283,12 @@
 									<div class="choice-card">
 										<span class="choice-radio" aria-hidden="true"></span>
 										<div class="choice-card-copy">
-											<Text as="span" weight="semibold">Virtual Machine</Text>
+											<div class="choice-card-head">
+												<Text as="span" weight="semibold">Virtual Machine</Text>
+												<Text as="span" color="muted" size="sm">Coming soon</Text>
+											</div>
 											<Text color="muted">Access a VM configured cluster to run workloads.</Text>
 										</div>
-										<Text color="muted">Coming soon</Text>
 									</div>
 								</Card.Content>
 							</Card.Root>
@@ -522,14 +526,11 @@
 		--dry-badge-bg: color-mix(in srgb, var(--dry-color-fill) 84%, var(--dry-color-bg-raised));
 	}
 
-	/* dryui-allow flex */
 	.badge-strip,
 	.toolbar-row,
 	.chip-row {
-		/* dryui-allow flex */
-		display: flex;
-		/* dryui-allow flex */
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
 		align-items: center;
 		gap: var(--dry-space-3);
 	}
@@ -540,6 +541,10 @@
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: var(--dry-space-3);
+	}
+
+	.split-fields {
+		align-items: start;
 	}
 
 	.status-card,
@@ -626,8 +631,11 @@
 		gap: var(--dry-space-3);
 	}
 
-	.choice-card {
-		grid-template-columns: max-content minmax(0, 1fr) max-content;
+	.choice-card-head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
+		align-items: center;
+		gap: var(--dry-space-3);
 	}
 
 	.choice-radio {
@@ -714,7 +722,6 @@
 	   so tight thresholds keep inner two-column rows side-by-side unless the
 	   card itself is truly narrow. */
 	@container (max-width: 22rem) {
-		.split-fields,
 		.row-between,
 		.usage-row {
 			grid-template-columns: 1fr;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SVGAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props extends SVGAttributes<SVGSVGElement> {
 		size?: 'sm' | 'md' | 'lg';
@@ -22,8 +23,7 @@
 	viewBox="0 0 24 24"
 	fill="none"
 	xmlns="http://www.w3.org/2000/svg"
-	data-size={size}
-	data-color={color}
+	{...variantAttrs({ size, color })}
 	class={className}
 	{...rest}
 >

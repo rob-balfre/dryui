@@ -1,3 +1,4 @@
+/* Headless export for external consumers; no UI wrapper by design (re-exposed as @dryui/ui OptionPicker via type aliases only). */
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
 

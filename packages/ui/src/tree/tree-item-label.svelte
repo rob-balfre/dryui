@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { getTreeCtx, getTreeItemCtx } from './context.svelte.js';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {
+	interface Props extends HTMLButtonAttributes {
 		children: Snippet;
 	}
 
@@ -13,9 +13,8 @@
 	const itemCtx = getTreeItemCtx();
 </script>
 
-<div
-	role="button"
-	tabindex={0}
+<button
+	type="button"
 	data-part="label"
 	data-tree-label
 	data-selected={ctx.isSelected(itemCtx.itemId) || undefined}
@@ -24,29 +23,24 @@
 		ctx.selectItem(itemCtx.itemId);
 		ctx.toggleItem(itemCtx.itemId);
 	}}
-	onkeydown={(e) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			ctx.selectItem(itemCtx.itemId);
-			ctx.toggleItem(itemCtx.itemId);
-		}
-	}}
 	{...rest}
 >
 	{@render children()}
-</div>
+</button>
 
 <style>
 	[data-part='label'] {
+		appearance: none;
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
 		padding: var(--dry-tree-item-padding, var(--dry-space-1) var(--dry-space-2));
-		border: none;
+		border: 0;
 		border-radius: var(--dry-tree-item-radius, var(--dry-radius-md));
 		background: none;
+		text-align: inherit;
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		font-family: var(--dry-font-sans);
 		color: var(--dry-color-text-strong);

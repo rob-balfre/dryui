@@ -5,8 +5,20 @@ export { createAnchorPosition } from './utils/anchor-position.svelte.js';
 export type { AnchorPositionOptions, Placement } from './utils/anchor-position.svelte.js';
 export { createPositionedPopover } from './utils/positioned-popover.svelte.js';
 export { createFocusTrap } from './utils/focus-trap.svelte.js';
-export { createDismiss } from './utils/dismiss.svelte.js';
+export { createDismiss, isInsideDismissRegion } from './utils/dismiss.svelte.js';
 export type { DismissOptions } from './utils/dismiss.svelte.js';
+export { createEscapeHandler } from './utils/escape-handler.svelte.js';
+export { createMenuNavigation } from './utils/menu-navigation.svelte.js';
+export type {
+	MenuNavigationOptions,
+	MenuNavigationController
+} from './utils/menu-navigation.svelte.js';
+export { createAnchoredPopover } from './utils/anchored-popover.svelte.js';
+export type {
+	AnchoredPopoverOptions,
+	AnchoredPopoverController
+} from './utils/anchored-popover.svelte.js';
+export { variantAttrs } from './utils/variant-attrs.svelte.js';
 export {
 	getDaysInMonth,
 	getFirstDayOfMonth,

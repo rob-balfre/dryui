@@ -50,4 +50,10 @@
 	svg[data-indicator].open {
 		transform: rotate(180deg);
 	}
+
+	@media (prefers-reduced-motion: reduce) {
+		svg[data-indicator] {
+			transition: none;
+		}
+	}
 </style>

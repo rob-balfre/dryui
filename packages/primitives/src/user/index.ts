@@ -1,3 +1,4 @@
+/* Headless export for external consumers; no UI wrapper by design. */
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 

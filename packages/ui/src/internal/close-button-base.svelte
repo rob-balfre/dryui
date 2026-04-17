@@ -7,13 +7,26 @@
 	interface Props extends HTMLButtonAttributes {
 		variant?: ButtonVariant;
 		size?: ButtonSize;
+		label?: string;
 		children?: Snippet;
 	}
 
-	let { variant = 'trigger', size = 'icon-sm', children, ...rest }: Props = $props();
+	let {
+		variant = 'trigger',
+		size = 'icon-sm',
+		label = 'Dismiss',
+		children,
+		...rest
+	}: Props = $props();
 </script>
 
-<Button {variant} {size} type="button" {...rest}>
+<Button
+	{variant}
+	{size}
+	type="button"
+	aria-label={children !== undefined ? undefined : label}
+	{...rest}
+>
 	{#if children}
 		{@render children()}
 	{:else}

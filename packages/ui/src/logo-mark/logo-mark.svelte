@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		src?: string;
@@ -42,9 +43,7 @@
 	role="img"
 	aria-label={alt}
 	data-logo-mark
-	data-size={size}
-	data-shape={shape}
-	data-color={color}
+	{...variantAttrs({ size, shape, color })}
 	class={className}
 	{...rest}
 >

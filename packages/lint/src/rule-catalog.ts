@@ -80,6 +80,13 @@ export const RULE_CATALOG = {
 		message: 'Do not use all: unset. Reset only the specific properties you need.',
 		suggestedFix: 'Replace all: unset with targeted property resets.'
 	},
+	'dryui/no-important': {
+		id: 'dryui/no-important',
+		severity: 'error',
+		message:
+			'Avoid !important — fix specificity at the source. Use component props, data-* attributes, or restructure the selector.',
+		suggestedFix: 'Remove !important and resolve the underlying specificity conflict.'
+	},
 	'dryui/no-global': {
 		id: 'dryui/no-global',
 		severity: 'error',

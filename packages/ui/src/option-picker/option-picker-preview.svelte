@@ -11,19 +11,20 @@
 
 	let { color, shape = 'rounded', variant = 'default', children, ...rest }: Props = $props();
 
-	function attachPreviewVars(previewColor: string | undefined) {
-		return (node: HTMLSpanElement) => {
-			if (previewColor) {
-				node.style.setProperty('--dry-option-picker-preview-bg', previewColor);
-			} else {
-				node.style.removeProperty('--dry-option-picker-preview-bg');
-			}
-		};
-	}
+	let el: HTMLSpanElement | undefined = $state();
+
+	$effect(() => {
+		if (!el) return;
+		if (color) {
+			el.style.setProperty('--dry-option-picker-preview-bg', color);
+		} else {
+			el.style.removeProperty('--dry-option-picker-preview-bg');
+		}
+	});
 </script>
 
 <span
-	{@attach attachPreviewVars(color)}
+	bind:this={el}
 	data-option-picker-preview
 	data-option-picker-preview-shape={shape}
 	data-variant={variant !== 'default' ? variant : undefined}

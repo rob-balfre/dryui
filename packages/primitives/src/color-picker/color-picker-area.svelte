@@ -146,7 +146,6 @@
 		overflow: hidden;
 		cursor: crosshair;
 		touch-action: none;
-		flex-shrink: 0;
 	}
 
 	.area:focus-visible {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import Button from '../button/button.svelte';
 	import { resolveAlias } from '../internal/color-aliases.js';
 	import type { TagColor } from './index.js';
@@ -31,9 +32,7 @@
 	<span
 		class={className}
 		data-tag
-		data-variant={variant}
-		data-color={resolvedColor}
-		data-size={size}
+		{...variantAttrs({ variant, color: resolvedColor, size })}
 		{...rest}
 	>
 		{@render children()}

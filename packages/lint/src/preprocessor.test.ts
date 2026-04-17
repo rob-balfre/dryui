@@ -1,5 +1,5 @@
 import { describe, test, expect, spyOn } from 'bun:test';
-import { dryuiLint } from '../../packages/lint/src/index.js';
+import { dryuiLint } from './preprocessor.js';
 
 describe('dryuiLint preprocessor', () => {
 	test('returns a PreprocessorGroup with name', () => {

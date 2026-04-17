@@ -2245,7 +2245,7 @@ Structure:
     Dialog.Content
       Dialog.Header
       Dialog.Footer
-CSS variables: --dry-dialog-border, --dry-dialog-padding, --dry-radius-nested, --dry-section-border, --dry-section-padding
+CSS variables: --dry-dialog-bg, --dry-dialog-border, --dry-dialog-max-width, --dry-dialog-padding, --dry-dialog-radius, --dry-dialog-shadow, --dry-radius-nested, --dry-section-border, --dry-section-padding
 Data attributes: data-dialog-body | data-dialog-content | data-dialog-footer | data-dialog-header | data-dialog-panel | data-dialog-trigger | data-state (Reflects whether the dialog is open or closed., values open, closed)
 Accessibility: Always provide a clear heading so the dialog context is announced when it opens. | Ensure there is an obvious close path for both keyboard and pointer users.
 Example:

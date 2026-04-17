@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { getFormControlCtx } from '@dryui/primitives';
+	import { getFormControlCtx, variantAttrs } from '@dryui/primitives';
 
 	interface Props extends Omit<HTMLInputAttributes, 'size'> {
 		value?: string;
@@ -34,8 +34,7 @@
 		aria-invalid={ctx?.hasError || undefined}
 		aria-errormessage={ctx?.errorMessageId}
 		data-disabled={isDisabled || undefined}
-		data-size={size}
-		data-variant={variant !== 'default' ? variant : undefined}
+		{...variantAttrs({ size, variant: variant !== 'default' ? variant : undefined })}
 		class={className}
 		{...rest}
 	/>
@@ -45,6 +44,8 @@
 	.wrapper {
 		container-type: inline-size;
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		align-self: start;
 	}
 
 	input {

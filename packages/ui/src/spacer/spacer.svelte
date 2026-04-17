@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -11,8 +12,7 @@
 
 <div
 	aria-hidden="true"
-	data-axis={axis}
-	data-size={size || undefined}
+	{...variantAttrs({ axis, size: size || undefined })}
 	class={className}
 	{...rest}
 ></div>

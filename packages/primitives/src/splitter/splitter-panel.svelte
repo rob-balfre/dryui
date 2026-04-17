@@ -13,19 +13,8 @@
 	const ctx = getSplitterCtx();
 	const autoIndex = ctx.nextPanelIndex();
 	const index = $derived(indexProp ?? autoIndex);
-
-	const size = $derived(ctx.sizes[index]);
-
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('flex-basis', `${size}%`);
-			node.style.setProperty('flex-grow', '0');
-			node.style.setProperty('flex-shrink', '0');
-			node.style.setProperty('overflow', 'auto');
-		});
-	}
 </script>
 
-<div data-panel={index} use:applyStyles {...rest}>
+<div data-panel={index} {...rest}>
 	{@render children()}
 </div>

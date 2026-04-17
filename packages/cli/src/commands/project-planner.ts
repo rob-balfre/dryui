@@ -2,8 +2,7 @@
 
 import { findComponent } from './info.js';
 import type { ComponentDef, Spec } from './types.js';
-import { indent } from '../format.js';
-import { componentDir } from '@dryui/mcp/spec-formatters';
+import { indent, componentDir } from '@dryui/mcp/spec-formatters';
 import type {
 	AddPlan,
 	InstallPlan,

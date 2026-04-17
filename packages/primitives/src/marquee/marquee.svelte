@@ -62,14 +62,14 @@
 
 	function applyTrackStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('flex-direction', isVertical ? 'column' : 'row');
+			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
 			node.style.setProperty('gap', 'var(--marquee-gap)');
 		});
 	}
 
 	function applyContentStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('flex-direction', isVertical ? 'column' : 'row');
+			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
 			node.style.setProperty('gap', 'var(--marquee-gap)');
 		});
 	}
@@ -96,11 +96,14 @@
 
 <style>
 	.track {
-		display: flex;
+		display: grid;
+		grid-auto-columns: max-content;
+		grid-auto-rows: max-content;
 	}
 
 	.content {
-		flex-shrink: 0;
-		display: flex;
+		display: grid;
+		grid-auto-columns: max-content;
+		grid-auto-rows: max-content;
 	}
 </style>

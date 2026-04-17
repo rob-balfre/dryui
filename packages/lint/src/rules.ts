@@ -46,6 +46,8 @@ const SVELTE_ELEMENT_RE = /<svelte:element(\s|>|\/)/g;
 
 const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:/gm;
 const ALL_UNSET_RE = /(?:^|[;\s{])all\s*:\s*unset(?![a-z-])/gm;
+const IMPORTANT_RE = /!important\b/g;
+const CSS_COMMENT_RE = /\/\*[\s\S]*?\*\//g;
 
 const GLOBAL_SELECTOR_RE = /:global\s*\(/g;
 
@@ -58,13 +60,13 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
 		component: 'Button',
-		allowedDirs: new Set(['button', 'card', 'mega-menu']),
+		allowedDirs: new Set(['button', 'card', 'mega-menu', 'tree']),
 		re: /<button(\s|>|\/)/g
 	},
 	{
 		tag: 'dialog',
 		component: 'Dialog',
-		allowedDirs: new Set(['dialog', 'alert-dialog', 'drawer', 'command-palette']),
+		allowedDirs: new Set(['dialog', 'alert-dialog', 'drawer', 'command-palette', 'internal']),
 		re: /<dialog(\s|>|\/)/g
 	},
 	{ tag: 'hr', component: 'Separator', allowedDirs: new Set(['separator']), re: /<hr(\s|>|\/)/g },
@@ -266,6 +268,17 @@ function stripBlocks(content: string): string {
 	});
 }
 
+function stripCssComments(content: string): string {
+	return content.replace(CSS_COMMENT_RE, (m) => {
+		// Preserve length and newlines so match indices and line numbers stay stable.
+		let out = '';
+		for (let i = 0; i < m.length; i++) {
+			out += m.charCodeAt(i) === 10 /* \n */ ? '\n' : ' ';
+		}
+		return out;
+	});
+}
+
 function getParentDir(filename?: string): string {
 	if (!filename) return '';
 	// Parent dir = last segment of the parent path. Platform-agnostic and
@@ -440,6 +453,16 @@ export function checkStyle(content: string): Violation[] {
 		violations.push({
 			rule: 'dryui/no-all-unset',
 			message: ruleMessage('dryui/no-all-unset'),
+			line: lineOf(match.index)
+		});
+	}
+
+	const contentWithoutComments = stripCssComments(content);
+	for (const match of contentWithoutComments.matchAll(IMPORTANT_RE)) {
+		if (hasAllowComment(file, match.index, 'important')) continue;
+		violations.push({
+			rule: 'dryui/no-important',
+			message: ruleMessage('dryui/no-important'),
 			line: lineOf(match.index)
 		});
 	}

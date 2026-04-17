@@ -3,8 +3,8 @@
 
 import { fileURLToPath } from 'node:url';
 import pkg from '../package.json';
-import spec from '../../mcp/src/spec.json';
-import { detectProject } from '../../mcp/src/project-planner.js';
+import spec from '@dryui/mcp/spec.json';
+import { detectProject } from '@dryui/mcp/project-planner';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
@@ -13,11 +13,7 @@ import { runInstall } from './commands/install.js';
 import { runInfo } from './commands/info.js';
 import { runInit } from './commands/init.js';
 import { runList } from './commands/list.js';
-import { runReview } from './commands/review.js';
-import { runDiagnose } from './commands/diagnose.js';
 import { runCompose } from './commands/compose.js';
-import { runDoctor } from './commands/doctor.js';
-import { runLint } from './commands/lint.js';
 import { runTokens } from './commands/tokens.js';
 import { runFeedback } from './commands/feedback.js';
 import { runLauncher } from './commands/launcher.js';
@@ -76,14 +72,6 @@ Commands:
   list [--category <cat>] [--text]
                                 List all components
   compose <query> [--text]      Look up composition guidance
-  review [--json] [--text] <file.svelte>
-                                Validate a Svelte file against DryUI spec
-  diagnose [--json] [--text] <file.css>
-                                Validate theme CSS
-  doctor [path] [--text] [--include <glob>] [--exclude <glob>] [--changed]
-                                Inspect workspace health
-  lint [path] [--json] [--text] [--include <glob>] [--exclude <glob>] [--changed]
-                                Print deterministic workspace findings
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
   ambient                       Print compact session context (for SessionStart hooks)
@@ -161,18 +149,6 @@ async function main(): Promise<void> {
 			break;
 		case 'list':
 			runList(commandArgs, spec);
-			break;
-		case 'review':
-			runReview(commandArgs, spec);
-			break;
-		case 'diagnose':
-			runDiagnose(commandArgs, spec);
-			break;
-		case 'doctor':
-			runDoctor(commandArgs, spec);
-			break;
-		case 'lint':
-			runLint(commandArgs, spec);
 			break;
 		case 'compose':
 			runCompose(commandArgs, spec);

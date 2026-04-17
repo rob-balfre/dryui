@@ -92,10 +92,8 @@
 
 <style>
 	.gauge-label-wrapper {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		width: 100%;
-		height: 100%;
+		display: grid;
+		place-items: center;
+		block-size: 100%;
 	}
 </style>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import { resolveAlias } from '../internal/color-aliases.js';
 	import type { BadgeColor } from './index.js';
 
@@ -33,11 +34,13 @@
 		class={className}
 		data-badge={isDot ? undefined : ''}
 		data-dot={isDot ? '' : undefined}
-		data-variant={isDot ? undefined : variant}
-		data-color={resolvedColor}
-		data-size={isDot ? undefined : size}
-		data-icon-only={hasIcon ? '' : undefined}
-		data-pulse={pulse ? '' : undefined}
+		{...variantAttrs({
+			variant: isDot ? undefined : variant,
+			color: resolvedColor,
+			size: isDot ? undefined : size,
+			'data-icon-only': hasIcon ? '' : undefined,
+			'data-pulse': pulse ? '' : undefined
+		})}
 		{...rest}
 	>
 		{#if isDot}

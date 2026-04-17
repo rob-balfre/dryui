@@ -218,10 +218,9 @@
 
 <style>
 	.map-error {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
+		display: grid;
+		place-items: center;
+		block-size: 100%;
 		padding: 1rem;
 		text-align: center;
 		color: inherit;

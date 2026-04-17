@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLElement> {
 		as?: 'div' | 'button';
@@ -31,8 +32,10 @@
 		data-card
 		data-selected={selected ? '' : undefined}
 		data-orientation={orientation}
-		data-variant={variant !== 'default' ? variant : undefined}
-		data-size={size !== 'default' ? size : undefined}
+		{...variantAttrs({
+			variant: variant !== 'default' ? variant : undefined,
+			size: size !== 'default' ? size : undefined
+		})}
 		data-disabled={disabled ? '' : undefined}
 		{disabled}
 		aria-disabled={disabled || undefined}
@@ -47,8 +50,10 @@
 		data-card
 		data-selected={selected ? '' : undefined}
 		data-orientation={orientation}
-		data-variant={variant !== 'default' ? variant : undefined}
-		data-size={size !== 'default' ? size : undefined}
+		{...variantAttrs({
+			variant: variant !== 'default' ? variant : undefined,
+			size: size !== 'default' ? size : undefined
+		})}
 		data-disabled={disabled ? '' : undefined}
 		aria-disabled={disabled || undefined}
 		{...rest}
