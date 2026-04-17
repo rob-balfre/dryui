@@ -442,7 +442,11 @@
 	.agent-setup-card {
 		display: grid;
 		gap: var(--dry-space-4);
-		--dry-timeline-dot-size: 1.5rem;
+		--dry-timeline-dot-size: 1.75rem;
+		--dry-timeline-icon-font-size: var(--dry-type-small-size, 0.875rem);
+		--dry-timeline-content-line-height: 1.75rem;
+		--dry-timeline-gap: var(--dry-space-6);
+		--dry-timeline-content-gap: var(--dry-space-2);
 	}
 
 	.agent-tab-label,
