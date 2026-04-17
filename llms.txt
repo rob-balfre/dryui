@@ -1,6 +1,6 @@
 # DryUI
 
-> Zero-dependency Svelte 5 components, a project-aware CLI, and an MCP server for scope-driven discovery and path-driven validation.
+> Zero-dependency Svelte 5 core (`@dryui/primitives` + `@dryui/ui`), a project-aware CLI, and an MCP server for scope-driven discovery and path-driven validation. Optional add-ons (`@dryui/theme-wizard`, `@dryui/feedback`) declare `lucide-svelte` as a peer dependency for icons.
 
 ## Start here
 
@@ -61,24 +61,9 @@ Current command surface:
 
 ## Editor integration
 
-After the CLI is working, install the plugin or MCP integration for your editor:
+Per-tool install snippets and MCP config for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live at https://dryui.dev/getting-started. Canonical source: `apps/docs/src/lib/ai-setup.ts` — do not duplicate snippets here.
 
-- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui`
-- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI`
-- Manual MCP fallback: `npx -y @dryui/mcp`
-
-Manual MCP config:
-
-```json
-{
-  "mcpServers": {
-    "dryui": {
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    }
-  }
-}
-```
+Manual MCP fallback: `npx -y @dryui/mcp`.
 
 ## MCP tools
 

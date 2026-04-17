@@ -1,6 +1,7 @@
 {
   "name": "@dryui/ui",
   "version": "1.2.0",
+  "description": "Zero-dependency styled Svelte 5 components with scoped styles and --dry-* CSS variable theming.",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -13,6 +14,9 @@
     "url": "https://github.com/rob-balfre/dryui/issues"
   },
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "svelte": "./src/index.ts",
   "types": "./dist/index.d.ts",
   "exports": {

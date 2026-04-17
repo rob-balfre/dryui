@@ -91,19 +91,23 @@ samp {
 	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: hsl(233, 18%, 9%);
 
-	/* ─── Component: Toggle ───────────────────────────────────────── */
-	--dry-toggle-track-bg: rgba(0, 21, 128, 0.04);
-	--dry-toggle-track-stroke: rgba(0, 13, 77, 0.45);
-	--dry-toggle-selected-bg: #4c64d9;
-	--dry-toggle-selected-stroke: #4c64d9;
+	/* ─── Component: Toggle ─────────────────────────────────────────
+	   Derived from semantic tokens so brand overrides (e.g. a consumer
+	   retheming --dry-color-fill-brand) flow through to toggles too.
+	   Thumb bg is intentionally a neutral literal — it's a surface knob,
+	   not a brand-tinted element. */
+	--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
+	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
+	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
 	--dry-toggle-thumb-bg: #ffffff;
-	--dry-toggle-hover-bg: rgba(0, 21, 128, 0.04);
-	--dry-toggle-press-bg: rgba(0, 17, 102, 0.1);
-	--dry-toggle-disabled-fill: rgba(0, 17, 102, 0.1);
-	--dry-toggle-disabled-stroke: rgba(0, 17, 102, 0.1);
-	--dry-toggle-focus-ring: #4c64d9;
-	--dry-toggle-label-color: rgba(0, 6, 38, 0.9);
-	--dry-toggle-label-disabled-color: rgba(0, 17, 102, 0.1);
+	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-press-bg: var(--dry-color-fill-active);
+	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
+	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
+	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
+	--dry-toggle-label-color: var(--dry-color-text-strong);
+	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
 
 	/* ─── Component: Beam ─────────────────────────────────────────── */
 	--dry-beam-default-blend: multiply;

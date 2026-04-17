@@ -394,6 +394,44 @@ Use the dryui-feedback MCP server:
 								<Input bind:value={search} placeholder="URL, submission id, or note text" />
 							</Field.Root>
 
+							{#snippet submissionRow(submission: Submission)}
+								<div
+									class="submission-row-shell"
+									data-selected={selectedSubmission?.id === submission.id || undefined}
+								>
+									<Button
+										variant="toggle"
+										size="sm"
+										aria-pressed={selectedSubmission?.id === submission.id}
+										onclick={() => (selectedId = submission.id)}
+										title={submission.url}
+									>
+										<div class="submission-row">
+											<div class="submission-row-primary">
+												<span class="submission-row-url">{submission.url}</span>
+												<Badge variant="soft" color={statusColor(submission.status)} size="sm">
+													{statusLabel(submission.status)}
+												</Badge>
+											</div>
+											<div class="submission-row-meta">
+												<div class="submission-badges">
+													<Badge variant="outline" color="gray" size="sm">
+														{submission.drawings.length} marks
+													</Badge>
+													<Badge variant="outline" color="gray" size="sm">
+														{formatViewport(submission.viewport)}
+													</Badge>
+												</div>
+												<span class="submission-row-trailing">
+													{formatRelativeTime(submission.createdAt)} / #
+													{shortenId(submission.id)}
+												</span>
+											</div>
+										</div>
+									</Button>
+								</div>
+							{/snippet}
+
 							<Tabs.Root bind:value={activeTab}>
 								<Tabs.List>
 									<Tabs.Trigger value="pending">
@@ -416,71 +454,32 @@ Use the dryui-feedback MCP server:
 									</Tabs.Trigger>
 								</Tabs.List>
 
-								{#snippet submissionRow(submission: Submission)}
-									<div
-										class="submission-row-shell"
-										data-selected={selectedSubmission?.id === submission.id || undefined}
-									>
-										<Button
-											variant="toggle"
-											size="sm"
-											aria-pressed={selectedSubmission?.id === submission.id}
-											onclick={() => (selectedId = submission.id)}
-											title={submission.url}
-										>
-											<div class="submission-row">
-												<div class="submission-row-primary">
-													<span class="submission-row-url">{submission.url}</span>
-													<Badge variant="soft" color={statusColor(submission.status)} size="sm">
-														{statusLabel(submission.status)}
-													</Badge>
-												</div>
-												<div class="submission-row-meta">
-													<div class="submission-badges">
-														<Badge variant="outline" color="gray" size="sm">
-															{submission.drawings.length} marks
-														</Badge>
-														<Badge variant="outline" color="gray" size="sm">
-															{formatViewport(submission.viewport)}
-														</Badge>
-													</div>
-													<span class="submission-row-trailing">
-														{formatRelativeTime(submission.createdAt)} / #
-														{shortenId(submission.id)}
-													</span>
-												</div>
-											</div>
-										</Button>
-									</div>
-								{/snippet}
-
 								<Tabs.Content value="pending">
-									<div class="submission-list">
-										{#if loading && pendingCount === 0}
-											<Alert variant="info">Loading queued submissions...</Alert>
-										{:else if visiblePendingSubmissions.length === 0}
-											<Alert variant="info">No pending submissions match the current filter.</Alert>
-										{:else}
+									{#if loading && pendingCount === 0}
+										<Alert variant="info">Loading queued submissions...</Alert>
+									{:else if visiblePendingSubmissions.length === 0}
+										<Alert variant="info">No pending submissions match the current filter.</Alert>
+									{:else}
+										<div class="submission-list">
 											{#each visiblePendingSubmissions as submission (submission.id)}
 												{@render submissionRow(submission)}
 											{/each}
-										{/if}
-									</div>
+										</div>
+									{/if}
 								</Tabs.Content>
 
 								<Tabs.Content value="resolved">
-									<div class="submission-list">
-										{#if loading && resolvedCount === 0}
-											<Alert variant="info">Loading resolved history...</Alert>
-										{:else if visibleResolvedSubmissions.length === 0}
-											<Alert variant="info">No resolved submissions match the current filter.</Alert
-											>
-										{:else}
+									{#if loading && resolvedCount === 0}
+										<Alert variant="info">Loading resolved history...</Alert>
+									{:else if visibleResolvedSubmissions.length === 0}
+										<Alert variant="info">No resolved submissions match the current filter.</Alert>
+									{:else}
+										<div class="submission-list">
 											{#each visibleResolvedSubmissions as submission (submission.id)}
 												{@render submissionRow(submission)}
 											{/each}
-										{/if}
-									</div>
+										</div>
+									{/if}
 								</Tabs.Content>
 							</Tabs.Root>
 						</div>

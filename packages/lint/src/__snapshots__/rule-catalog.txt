@@ -9,6 +9,7 @@ dryui/no-raw-native-element	error	Raw <{tag}> is only allowed inside its canonic
 dryui/no-flex	error	Do not use {value}. Use {guidance}.	Use CSS grid instead of flexbox layout primitives.
 dryui/no-width	error	Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead.	Move sizing to the parent grid tracks.
 dryui/no-all-unset	error	Do not use all: unset. Reset only the specific properties you need.	Replace all: unset with targeted property resets.
+dryui/no-important	error	Avoid !important — fix specificity at the source. Use component props, data-* attributes, or restructure the selector.	Remove !important and resolve the underlying specificity conflict.
 dryui/no-global	error	Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.	Convert the selector to scoped CSS or use a component API.
 dryui/no-media-sizing	error	Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.	Replace the sizing media query with a container query.
 dryui/prefer-focus-ring-token	error	Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).	Use outline: var(--dry-focus-ring) plus the correct outline-offset.

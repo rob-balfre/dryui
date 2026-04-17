@@ -52,7 +52,10 @@ const pkg = (name: string) => `${root}packages/${name}`;
 
 console.log('\n── Phase 1: checks + lint/primitives builds ──');
 await parallel(
-	run('check:lint', 'bun test tests/unit/lint-rules.test.ts tests/unit/lint-preprocessor.test.ts'),
+	run(
+		'check:lint:unit',
+		'bun test packages/lint/src/rules.test.ts packages/lint/src/preprocessor.test.ts'
+	),
 	run('check:exports', 'bun run scripts/sync-package-exports.ts --check'),
 	run('check:cli-imports', `! grep -rnE "from ['\\"]\\.\\./\\.\\./\\.\\./mcp" packages/cli/src`),
 	run('validate:spec', 'bun run scripts/validate-spec-coverage.ts'),

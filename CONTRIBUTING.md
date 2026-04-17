@@ -12,6 +12,12 @@ bun run build
 bun run test
 ```
 
+### Environment variables
+
+The docs build runs without `PUBLIC_MAPBOX_TOKEN`; Map-related demo routes
+show a placeholder card instead. Copy `apps/docs/.env.example` to
+`apps/docs/.env` and set `PUBLIC_MAPBOX_TOKEN` to enable the live map.
+
 ## Workflow
 
 1. Fork the repo and create a feature branch
@@ -28,14 +34,7 @@ bun run test
 
 ## CSS Rules
 
-These are enforced by `@dryui/lint`:
-
-- **Grid-only layout** — `display: grid`, no flexbox
-- **Container queries** for responsive — no `@media` for sizing
-- **No inline styles** — no `style="..."` or `style:` directives
-- **No `!important`** — fix specificity at the source
-- **Scoped `<style>` only** — no CSS modules, no `:global()`
-- **`data-*` attributes** for variants, `--dry-*` CSS vars for consumer overrides
+See [CLAUDE.md § CSS Discipline](./CLAUDE.md#css-discipline) for the full list. `@dryui/lint` enforces these rules as a Svelte preprocessor — violations break the build.
 
 ## Versioning
 
@@ -44,6 +43,15 @@ We use [changesets](https://github.com/changesets/changesets) for versioning. If
 ```bash
 bun run changeset
 ```
+
+## Manual / on-demand scripts
+
+These scripts in `scripts/` are not wired into `bun run validate` or CI — run them manually when the situation calls for it.
+
+- `bun run bench:visual` (`scripts/benchmark-visual-checks.ts`) — spins up the docs app and times the Vitest browser, Playwright, Puppeteer, and chromedp visual-check runners against `/view/bench/visual`. Run when evaluating or tuning the screenshot-diff story.
+- `bun run audit:dogfood` (`scripts/dogfood-audit.ts`) — scans `.svelte` files for raw HTML, CSS patterns, and imports that should use DryUI components instead. Run before a large docs/app refactor to catch dogfooding regressions.
+- `bun run figma:inventory` (`scripts/export-figma-file-inventory.ts`) — pulls a Figma file inventory via the Figma REST API (requires `FIGMA_FILE_KEY` / token) and writes it under `docs/research/figma`. Run when refreshing the design-source catalog.
+- `bun run screenshots:components` (`scripts/generate-component-screenshots.ts`) — boots the docs app and captures per-component screenshots into `tmp/component-screenshots/`. Run when producing marketing / docs imagery; output is gitignored.
 
 ## Reporting Bugs
 

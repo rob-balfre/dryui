@@ -19,7 +19,7 @@
 	role="tabpanel"
 	id="{ctx.id}-panel-{value}"
 	aria-labelledby="{ctx.id}-tab-{value}"
-	tabindex={0}
+	tabindex={isSelected ? 0 : -1}
 	data-state={isSelected ? 'active' : 'inactive'}
 	data-tabs-content
 	hidden={!isSelected || undefined}

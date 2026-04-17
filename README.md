@@ -1,16 +1,20 @@
 # DRYui
 
-Zero-dependency Svelte 5 components. Headless primitives. Styled defaults. AI-ready.
+Zero-dependency Svelte 5 core. Headless primitives. Styled defaults. AI-ready. Optional add-ons for theme generation and feedback.
 
 ## Packages
 
-| Package             | Description                                                                                         |
-| ------------------- | --------------------------------------------------------------------------------------------------- |
-| `@dryui/primitives` | Headless, unstyled components built on native browser APIs                                          |
-| `@dryui/ui`         | Styled production-ready components with CSS variables theming                                       |
-| `@dryui/mcp`        | MCP server for lookup, source retrieval, planning, validation, theme diagnosis, and workspace audit |
-| `@dryui/cli`        | CLI tool for setup snippets, planning, lookup, validation, and workspace audit                      |
-| `@dryui/lint`       | Svelte preprocessor enforcing CSS grid-only layout, container queries, no flexbox/inline styles     |
+| Package               | Runtime deps                 | Description                                                                                         |
+| --------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------- |
+| `@dryui/primitives`   | none (svelte peer only)      | Headless, unstyled components built on native browser APIs                                          |
+| `@dryui/ui`           | `@dryui/primitives` + svelte | Styled production-ready components with CSS variables theming                                       |
+| `@dryui/mcp`          | —                            | MCP server for lookup, source retrieval, planning, validation, theme diagnosis, and workspace audit |
+| `@dryui/cli`          | —                            | CLI tool for setup snippets, planning, lookup, validation, and workspace audit                      |
+| `@dryui/lint`         | —                            | Svelte preprocessor enforcing CSS grid-only layout, container queries, no flexbox/inline styles     |
+| `@dryui/theme-wizard` | `lucide-svelte` (peer)       | Optional add-on: guided theme generation from a brand color (uses `lucide-svelte` for wizard icons) |
+| `@dryui/feedback`     | `lucide-svelte` (peer)       | Optional add-on: feedback annotation UI (uses `lucide-svelte` for toolbar icons)                    |
+
+The core runtime (`@dryui/primitives` + `@dryui/ui`) has no runtime dependencies beyond Svelte. Add-on packages may declare peer deps — those are listed above.
 
 ## Quick Start
 
@@ -44,7 +48,7 @@ npm install @dryui/ui
 			<h3>Hello</h3>
 		</Card.Header>
 		<Card.Content>
-			<p>Zero dependencies. Native browser APIs.</p>
+			<p>Zero runtime deps. Native browser APIs.</p>
 		</Card.Content>
 	</Card.Root>
 </div>
@@ -110,10 +114,7 @@ No global install? Prefix commands with `bunx @dryui/cli` or `npx -y @dryui/cli`
 
 The DryUI skill and MCP server are the editor integration layer on top of that CLI workflow. The skill teaches conventions (compound components, theming, CSS rules, accessibility), and MCP exposes the same discovery/validation loop inside supported editors with `ask` / `check`.
 
-Canonical install snippets, config paths, and MCP JSON/TOML for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) and render to the docs [getting-started page](https://dryui.dev/getting-started). Update that source instead of duplicating client setup here.
-
-Claude Code users install DryUI with `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui`.
-Codex users on 0.121.0+ install DryUI with `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI`.
+Per-tool editor setup (Claude Code, Codex, Cursor, Windsurf, Copilot, Zed) lives at https://dryui.dev/getting-started — do not copy install commands from this README; the web page is always up-to-date. The canonical source is [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts); update it there instead of duplicating client setup here.
 
 ### From Source
 
@@ -155,8 +156,8 @@ bun run check
 # Run tests
 bun run test
 
-# Lint CSS rules
-bun run check:lint
+# Lint CSS rules (lint unit tests)
+bun run check:lint:unit
 
 # Full validation (check + test + build)
 bun run validate
@@ -206,7 +207,7 @@ bun run --filter '@dryui/mcp' generate-llms
 
 ## Design Principles
 
-- **Zero dependencies** — every component uses native browser APIs (`<dialog>`, Popover API, CSS Anchor Positioning, `Intl`, Intersection Observer, Resize Observer, Web Animations API, etc.)
+- **Zero-dependency core** — `@dryui/primitives` and `@dryui/ui` ship with no runtime dependencies beyond Svelte; every component uses native browser APIs (`<dialog>`, Popover API, CSS Anchor Positioning, `Intl`, Intersection Observer, Resize Observer, Web Animations API, etc.). Optional add-ons (`@dryui/theme-wizard`, `@dryui/feedback`) declare `lucide-svelte` as a peer for icons
 - **Two-tier architecture** — headless primitives for full control, styled components for quick builds
 - **Svelte 5 runes** — built entirely with `$state`, `$derived`, `$effect`, and `$props`
 - **CSS variables** — all styling customisable via `--dry-*` custom properties

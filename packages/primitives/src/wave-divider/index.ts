@@ -1,3 +1,4 @@
+/* Headless export for external consumers; no UI wrapper by design. */
 import type { SVGAttributes } from 'svelte/elements';
 
 export interface WaveDividerProps extends SVGAttributes<SVGSVGElement> {

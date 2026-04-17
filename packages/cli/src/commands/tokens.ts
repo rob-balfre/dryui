@@ -2,7 +2,7 @@
 
 import { extractTokens, getTokenCategories } from '@dryui/mcp/tokens';
 import { toonTokens } from '@dryui/mcp/toon';
-import { pad } from '../format.js';
+import { pad } from '@dryui/mcp/spec-formatters';
 import {
 	commandError,
 	renderCommandResultByMode,

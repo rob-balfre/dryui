@@ -66,7 +66,6 @@
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		cursor: default;
-		flex-shrink: 0;
 	}
 
 	.swatch::before,

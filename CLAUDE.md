@@ -1,6 +1,6 @@
 # DryUI
 
-Bun monorepo: zero-dependency Svelte 5 components built on native browser APIs.
+Bun monorepo. Core packages (`@dryui/primitives`, `@dryui/ui`) are zero-dependency Svelte 5 built on native browser APIs. Optional add-ons (`@dryui/theme-wizard`, `@dryui/feedback`) declare `lucide-svelte` as a peer dependency for icons.
 
 ## Tools
 
@@ -34,7 +34,7 @@ bun run test                   # Run unit + browser tests
 bun run test:unit              # Bun test runner (tests/unit/)
 bun run test:browser           # Vitest + Playwright (tests/browser/)
 bun run check                  # Exports + type-check + contracts + docs:llms + lint violations
-bun run check:lint             # Run CSS lint rule tests
+bun run check:lint:unit        # Run CSS lint rule unit tests
 bun run validate               # parallel pipeline: lint + build + check + test (CI gate, supports --no-test)
 bun run release:gate           # Release validation gate (validate --no-test)
 bun run changeset              # Create a changeset for release
@@ -232,4 +232,4 @@ bunx wrangler pages deploy .svelte-kit/cloudflare --project-name=dryui-docs     
 - MCP build runs `generate-spec` first to produce spec.json from component metadata
 - The ui package scoped styles reference --dry-\* vars — components render unstyled without a theme import
 - @dryui/docs is excluded from changesets (not published)
-- Docs build requires `PUBLIC_MAPBOX_TOKEN` env var — CI sets it from secrets; locally, export it or expect map-related features to fail
+- Docs build runs without `PUBLIC_MAPBOX_TOKEN`; the Map demo falls back to a placeholder card. Set the token in `apps/docs/.env` (see `apps/docs/.env.example`) or export it in the shell to enable the live Mapbox demo. CI sets it from secrets.

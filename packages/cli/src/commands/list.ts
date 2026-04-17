@@ -1,7 +1,7 @@
 // dryui list [--category <cat>] — List components
 
 import type { Spec } from './types.js';
-import { pad } from '../format.js';
+import { pad } from '@dryui/mcp/spec-formatters';
 import { toonComponentList } from '@dryui/mcp/toon';
 import {
 	commandError,

@@ -65,21 +65,27 @@
 	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: #ffffff;
 
-	/* ─── Component: Toggle ───────────────────────────────────────── */
-	--dry-toggle-track-bg: #ffffff0f;
-	--dry-toggle-track-stroke: #ffffff99;
-	--dry-toggle-selected-bg: #a3b2ff;
-	--dry-toggle-selected-stroke: #a3b2ff;
+	/* ─── Component: Toggle ─────────────────────────────────────────
+	   Derived from semantic tokens so brand overrides (e.g. a consumer
+	   retheming --dry-color-fill-brand) flow through to toggles too.
+	   Thumb bg is intentionally a neutral literal — it's a surface knob,
+	   not a brand-tinted element. */
+	--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
+	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
+	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
 	--dry-toggle-thumb-bg: #292b33;
-	--dry-toggle-hover-bg: #ffffff0f;
-	--dry-toggle-press-bg: #ffffff1f;
-	--dry-toggle-disabled-fill: #ffffff1f;
-	--dry-toggle-disabled-stroke: #ffffff1f;
-	--dry-toggle-focus-ring: #a3b2ff;
+	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-press-bg: var(--dry-color-fill-active);
+	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
+	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
+	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
 	--dry-toggle-label-color: var(--dry-color-text-strong);
-	--dry-toggle-label-disabled-color: #ffffff1f;
+	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
 
-	/* ─── Component: Beam ─────────────────────────────────────────── */
+	/* ─── Component: Beam ─────────────────────────────────────────
+	   Blend mode is intentionally mode-specific (multiply darkens on
+	   light bg, screen lightens on dark bg) — not brand-derivable. */
 	--dry-beam-default-blend: screen;
 
 	/* ─── Status: Error ───────────────────────────────────────────── */
@@ -151,6 +157,8 @@
 	/* ─── Overlay backdrops ───────────────────────────────────────── */
 	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
 	--dry-color-overlay-backdrop-strong: hsla(0, 0%, 0%, 0.75);
+
+	/* Dark-mode enhancements — intentional. Light mode relies on component-level handling. */
 
 	/* ─── Scrollbar ───────────────────────────────────────────────── */
 	--dry-scrollbar-thumb: var(--dry-color-stroke-weak);
@@ -275,21 +283,27 @@
 			--dry-color-bg-brand: var(--dry-color-fill-brand);
 			--dry-color-bg-inverse: #ffffff;
 
-			/* ─── Component: Toggle ───────────────────────────────────────── */
-			--dry-toggle-track-bg: #ffffff0f;
-			--dry-toggle-track-stroke: #ffffff99;
-			--dry-toggle-selected-bg: #a3b2ff;
-			--dry-toggle-selected-stroke: #a3b2ff;
+			/* ─── Component: Toggle ─────────────────────────────────────────
+			   Derived from semantic tokens so brand overrides (e.g. a consumer
+			   retheming --dry-color-fill-brand) flow through to toggles too.
+			   Thumb bg is intentionally a neutral literal — it's a surface knob,
+			   not a brand-tinted element. */
+			--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
+			--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
+			--dry-toggle-selected-bg: var(--dry-color-fill-brand);
+			--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
 			--dry-toggle-thumb-bg: #292b33;
-			--dry-toggle-hover-bg: #ffffff0f;
-			--dry-toggle-press-bg: #ffffff1f;
-			--dry-toggle-disabled-fill: #ffffff1f;
-			--dry-toggle-disabled-stroke: #ffffff1f;
-			--dry-toggle-focus-ring: #a3b2ff;
+			--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
+			--dry-toggle-press-bg: var(--dry-color-fill-active);
+			--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
+			--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
+			--dry-toggle-focus-ring: var(--dry-color-fill-brand);
 			--dry-toggle-label-color: var(--dry-color-text-strong);
-			--dry-toggle-label-disabled-color: #ffffff1f;
+			--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
 
-			/* ─── Component: Beam ─────────────────────────────────────────── */
+			/* ─── Component: Beam ─────────────────────────────────────────
+			   Blend mode is intentionally mode-specific (multiply darkens on
+			   light bg, screen lightens on dark bg) — not brand-derivable. */
 			--dry-beam-default-blend: screen;
 
 			/* ─── Status: Error ───────────────────────────────────────────── */
@@ -362,6 +376,8 @@
 			/* ─── Overlay backdrops ───────────────────────────────────────── */
 			--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
 			--dry-color-overlay-backdrop-strong: hsla(0, 0%, 0%, 0.75);
+
+			/* Dark-mode enhancements — intentional. Light mode relies on component-level handling. */
 
 			/* ─── Scrollbar ───────────────────────────────────────────────── */
 			--dry-scrollbar-thumb: var(--dry-color-stroke-weak);

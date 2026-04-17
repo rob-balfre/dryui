@@ -1,4 +1,5 @@
 {
+  "_companion": "Companion manifest: .agents/plugins/marketplace.json (Codex schema). Keep shared fields (plugin name, description, path) in sync with that file.",
   "name": "dryui",
   "owner": {
     "name": "Rob Balfre",

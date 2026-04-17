@@ -51,6 +51,10 @@
     "./contract.v1.json": "./dist/contract.v1.json",
     "./contract.v1.schema.json": "./dist/contract.v1.schema.json",
     "./spec": "./dist/spec.json",
+    "./spec.json": {
+      "bun": "./src/spec.json",
+      "default": "./dist/spec.json"
+    },
     "./architecture.json": "./dist/architecture.json",
     "./composition-data": {
       "bun": "./src/composition-data.ts",

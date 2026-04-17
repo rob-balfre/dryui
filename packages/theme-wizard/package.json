@@ -13,6 +13,7 @@
     "url": "https://github.com/rob-balfre/dryui/issues"
   },
   "type": "module",
+  "sideEffects": false,
   "svelte": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {

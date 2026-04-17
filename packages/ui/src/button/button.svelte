@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import { getButtonGroupCtx } from '../button-group/context.svelte.js';
 
 	const groupCtx = getButtonGroupCtx();
@@ -84,9 +85,7 @@
 			aria-disabled={disabled || undefined}
 			data-disabled={disabled || undefined}
 			tabindex={disabled ? -1 : undefined}
-			data-variant={variant}
-			data-size={size}
-			data-color={color}
+			{...variantAttrs({ variant, size, color })}
 			class={className}
 			onclick={handleLinkClick}
 			{@attach attachRef}
@@ -98,9 +97,7 @@
 			{type}
 			{disabled}
 			data-disabled={disabled || undefined}
-			data-variant={variant}
-			data-size={size}
-			data-color={color}
+			{...variantAttrs({ variant, size, color })}
 			class={className}
 			{onclick}
 			{...rest}

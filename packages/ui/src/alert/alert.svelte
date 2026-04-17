@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import CloseButtonBase from '../internal/close-button-base.svelte';
 
 	export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
@@ -39,7 +40,7 @@
 	<div
 		role="alert"
 		data-alert
-		data-variant={variant}
+		{...variantAttrs({ variant })}
 		data-dismissible={dismissible || undefined}
 		class={className}
 		{...rest}

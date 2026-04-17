@@ -1097,8 +1097,10 @@
 		inset: auto;
 	}
 
-	.feedback-root :global(*) {
-		pointer-events: auto;
+	[data-dryui-feedback] :global {
+		* {
+			pointer-events: auto;
+		}
 	}
 
 	.drawing-canvas {

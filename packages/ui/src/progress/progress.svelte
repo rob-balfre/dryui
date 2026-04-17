@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface ProgressSegment {
 		value: number;
@@ -97,8 +98,7 @@
 	data-max={max}
 	data-segmented={segments ? '' : undefined}
 	data-has-label={showLabel ? labelPosition : undefined}
-	data-size={size}
-	data-color={color}
+	{...variantAttrs({ size, color })}
 	data-with-label={showLabel ? '' : undefined}
 	{...rest}
 >

@@ -639,8 +639,12 @@
         "Ensure there is an obvious close path for both keyboard and pointer users."
       ],
       "cssVars": {
+        "--dry-dialog-bg": "Background color",
         "--dry-dialog-border": "Border color",
+        "--dry-dialog-max-width": "Maximum width",
         "--dry-dialog-padding": "Padding",
+        "--dry-dialog-radius": "Border radius",
+        "--dry-dialog-shadow": "Box shadow",
         "--dry-radius-nested": "Nested",
         "--dry-section-border": "Border color",
         "--dry-section-padding": "Padding"

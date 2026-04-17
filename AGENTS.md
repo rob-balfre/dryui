@@ -33,13 +33,9 @@ Then start `codex`, run `/plugins`, and install `DryUI`. Inside this repo, use t
 
 The plugin is the canonical way Claude Code and Codex get DryUI skills. Manual MCP config is only for tools that do not support plugins.
 
-## CSS Rules (enforced by @dryui/lint — build fails on violations)
+## CSS Rules
 
-- **No `width`/`inline-size` properties** in scoped `<style>` blocks — no `width`, `min-width`, `max-width`, `inline-size`, or min/max variants. Grid children are sized by their track. Use `grid-template-columns`/`grid-template-rows` instead.
-- **No `display: flex`** — use `display: grid` for all layout.
-- **No inline styles** — no `style="..."` or `style:` directives.
-- **No `!important`**, no `:global()`, no CSS modules.
-- **No `<!-- svelte-ignore css_unused_selector -->`** — fix the root cause instead. Ensure DOM elements are rendered directly in the component that styles them.
+See [CLAUDE.md § CSS Discipline](./CLAUDE.md#css-discipline) for the full list. Violations are enforced by `@dryui/lint` (a Svelte preprocessor that runs during dev and build) and break the build.
 
 ## Releasing
 

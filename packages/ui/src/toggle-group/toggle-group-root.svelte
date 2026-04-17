@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import { setToggleGroupCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -57,8 +58,7 @@
 	role="toolbar"
 	aria-orientation={orientation}
 	data-part="root"
-	data-orientation={orientation}
-	data-size={size}
+	{...variantAttrs({ orientation, size })}
 	class={className}
 	{...rest}
 >

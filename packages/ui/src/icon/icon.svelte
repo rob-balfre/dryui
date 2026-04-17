@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { variantAttrs } from '@dryui/primitives';
 
 	interface Props {
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -24,8 +25,7 @@
 	role={label ? 'img' : 'presentation'}
 	aria-label={label}
 	aria-hidden={label ? undefined : true}
-	data-size={size}
-	data-color={color}
+	{...variantAttrs({ size, color })}
 	class={className}
 	use:sizeSvg
 >

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import { setButtonGroupCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -27,8 +28,7 @@
 <div
 	role="group"
 	data-button-group
-	data-orientation={orientation}
-	data-size={size}
+	{...variantAttrs({ orientation, size })}
 	class={className}
 	{...rest}
 >

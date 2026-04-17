@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { checkScript, checkMarkup, checkStyle } from '../../packages/lint/src/rules.js';
+import { checkScript, checkMarkup, checkStyle } from './rules.js';
 
 describe('checkScript', () => {
 	test('flags Grid import from @dryui/ui', () => {
@@ -442,6 +442,75 @@ describe('checkStyle', () => {
 	test('allows other all property values', () => {
 		const violations = checkStyle('.foo { all: inherit; }');
 		expect(violations).toHaveLength(0);
+	});
+
+	test('flags !important declaration', () => {
+		const violations = checkStyle('.foo { color: red !important; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-important');
+		expect(violations[0]!.message).toContain('!important');
+	});
+
+	test('flags !important without space', () => {
+		const violations = checkStyle('.foo { color: red!important; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-important');
+	});
+
+	test('allows property without !important', () => {
+		const violations = checkStyle('.foo { color: red; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag !important inside a CSS comment', () => {
+		const violations = checkStyle('.foo { /* !important would be bad */ color: red; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag !important inside a multi-line CSS comment', () => {
+		const code = `/*
+ * Avoid using !important
+ * in this file.
+ */
+.foo { color: red; }`;
+		const violations = checkStyle(code);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags !important even when a comment also contains !important', () => {
+		const code = `/* no !important below please */
+.foo { color: red !important; }`;
+		const violations = checkStyle(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-important');
+		expect(violations[0]!.line).toBe(2);
+	});
+
+	test('allows !important with dryui-allow important comment', () => {
+		const violations = checkStyle('/* dryui-allow important */\n.foo { color: red !important; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags multiple !important occurrences', () => {
+		const code = `.foo { color: red !important; }
+.bar { margin: 0 !important; }`;
+		const violations = checkStyle(code);
+		const important = violations.filter((v) => v.rule === 'dryui/no-important');
+		expect(important).toHaveLength(2);
+		expect(important[0]!.line).toBe(1);
+		expect(important[1]!.line).toBe(2);
+	});
+
+	test('does not flag !important inside a script block via checkScript', () => {
+		const violations = checkScript("const css = 'color: red !important';");
+		expect(violations.filter((v) => v.rule === 'dryui/no-important')).toHaveLength(0);
+	});
+
+	test('does not flag !important inside markup (checkMarkup strips style blocks)', () => {
+		const code = `<div>color: red !important in text</div>
+<style>.foo { color: blue; }</style>`;
+		const violations = checkMarkup(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-important')).toHaveLength(0);
 	});
 
 	test('flags :global() selector', () => {

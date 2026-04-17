@@ -37,6 +37,14 @@ jobs:
 
       - run: bun run release:gate
 
+      # Belt-and-braces: before handing off to changeset publish, pack every
+      # publishable package (with the same swap the publish flow uses) and
+      # scan every tarball for unresolved workspace:* deps. We've shipped that
+      # bug once (@dryui/mcp@2.0.0/2.0.1) — catching it here fails the release
+      # loud instead of silently breaking every consumer post-publish.
+      - name: Verify no workspace refs in tarballs
+        run: bun run scripts/verify-no-workspace-refs.ts
+
       - run: bun run release:ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

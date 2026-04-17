@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SVGAttributes } from 'svelte/elements';
+	import { variantAttrs } from '@dryui/primitives';
 	import type { DiagramConfig } from './types.js';
 	import { computeLayout } from './layout.js';
 
@@ -300,8 +301,7 @@
 					{@const WpIcon = wp.iconComponent}
 					<g
 						data-part="waypoint"
-						data-variant={wp.variant}
-						data-color={wp.color}
+						{...variantAttrs({ variant: wp.variant, color: wp.color })}
 						transform="translate({wp.x},{wp.y})"
 					>
 						<rect
@@ -349,8 +349,7 @@
 				{@const NodeIcon = node.iconComponent}
 				<g
 					data-part="node"
-					data-variant={node.variant}
-					data-color={node.color}
+					{...variantAttrs({ variant: node.variant, color: node.color })}
 					data-state={node.state}
 					transform="translate({node.x},{node.y})"
 				>

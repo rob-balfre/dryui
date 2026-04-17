@@ -5,6 +5,7 @@ import { join, basename, relative } from 'node:path';
 const root = join(import.meta.dir, '..');
 const dryuiSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui');
 const feedbackSkillSource = join(root, 'packages', 'feedback', 'skills', 'live-feedback');
+const initSkillSource = join(root, 'packages', 'cli', 'skills', 'init');
 const pluginSkills = join(root, 'packages', 'plugin', 'skills');
 const cursorRules = join(root, '.cursor', 'rules');
 
@@ -239,6 +240,21 @@ if (await exists(feedbackSkillSource)) {
 	console.log(
 		'synced packages/feedback/skills/live-feedback → packages/plugin/skills/live-feedback'
 	);
+}
+
+if (await exists(initSkillSource)) {
+	const pluginInitDest = join(pluginSkills, 'init');
+
+	await removeStale(initSkillSource, pluginInitDest);
+	await copyDir(initSkillSource, pluginInitDest);
+
+	syncedTargets.push({
+		src: initSkillSource,
+		dest: pluginInitDest,
+		label: 'packages/plugin/skills/init'
+	});
+
+	console.log('synced packages/cli/skills/init → packages/plugin/skills/init');
 }
 
 // 3. Post-sync guard — assert every target is byte-identical to its source.

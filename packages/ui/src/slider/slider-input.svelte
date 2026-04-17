@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import { getFormControlCtx } from '@dryui/primitives';
+	import { getFormControlCtx, variantAttrs } from '@dryui/primitives';
 
 	interface Props extends Omit<HTMLInputAttributes, 'size'> {
 		value?: number;
@@ -42,7 +42,7 @@
 	}
 </script>
 
-<span class="wrapper" data-variant={variant} data-size={size} use:applyStyles>
+<span class="wrapper" {...variantAttrs({ variant, size })} use:applyStyles>
 	<input
 		type="range"
 		bind:value
@@ -57,8 +57,7 @@
 		aria-errormessage={ctx?.errorMessageId}
 		data-disabled={isDisabled || undefined}
 		data-orientation={orientation}
-		data-variant={variant}
-		data-size={size}
+		{...variantAttrs({ variant, size })}
 		class={className}
 		{...rest}
 	/>
