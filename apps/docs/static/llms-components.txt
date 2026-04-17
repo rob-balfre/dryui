@@ -3195,7 +3195,7 @@ Structure:
         Timeline.Title
         Timeline.Description
         Timeline.Time
-CSS variables: --dry-timeline-content-gap, --dry-timeline-dot-color, --dry-timeline-dot-size, --dry-timeline-gap, --dry-timeline-item-columns, --dry-timeline-item-gap, --dry-timeline-item-min-w, --dry-timeline-item-pl, --dry-timeline-item-pt, --dry-timeline-line-bottom, --dry-timeline-line-color, --dry-timeline-line-h, --dry-timeline-line-left, --dry-timeline-line-right, --dry-timeline-line-top, --dry-timeline-line-w
+CSS variables: --dry-timeline-item-columns, --dry-timeline-item-min-w, --dry-timeline-item-pl, --dry-timeline-item-pt, --dry-timeline-line-bottom, --dry-timeline-line-h, --dry-timeline-line-left, --dry-timeline-line-right, --dry-timeline-line-top, --dry-timeline-line-w
 Data attributes: data-level | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Accessibility: none
 Example:
