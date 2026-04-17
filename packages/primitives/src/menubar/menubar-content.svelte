@@ -2,8 +2,8 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
-	import { getMenuItems, focusFirstItem, handleMenuKeydown } from '../internal/menu-navigation.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: 'bottom' | 'bottom-start' | 'bottom-end';
@@ -25,28 +25,21 @@
 			root?.querySelector<HTMLElement>(`[data-menubar-trigger="${menuCtx.menuId}"]`) ?? null;
 	});
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => triggerEl,
 		contentEl: () => el ?? null,
+		open: () => menuCtx.open,
 		placement: () => placement,
-		offset: () => offset
-	});
-
-	$effect(() => {
-		if (menuCtx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-			focusFirstMenubarItem();
-		} else if (!menuCtx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
+		offset: () => offset,
+		onAfterShow: () => {
+			requestAnimationFrame(() => menu.focusFirst());
 		}
 	});
 
-	function focusFirstMenubarItem() {
-		requestAnimationFrame(() => {
-			if (!el) return;
-			focusFirstItem(el, getMenuItems(el));
-		});
-	}
+	const menu = createMenuNavigation({
+		container: () => el ?? null,
+		orientation: 'vertical'
+	});
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (!el) return;
@@ -71,7 +64,7 @@
 				return;
 			}
 		}
-		handleMenuKeydown(e, getMenuItems(el));
+		menu.handleKeydown(e);
 	}
 </script>
 
@@ -82,7 +75,7 @@
 	tabindex="-1"
 	aria-labelledby={`menubar-trigger-${menuCtx.menuId}`}
 	data-state={menuCtx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (!newState && menuCtx.open) {

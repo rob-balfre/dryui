@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchorPosition, type Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
 	import { getTooltipCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -23,37 +23,12 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
-	const anchor = createAnchorPosition(
-		() => ctx.triggerEl,
-		() => contentEl ?? null,
-		{
-			get placement() {
-				return placement;
-			},
-			get offset() {
-				return offset;
-			}
-		}
-	);
-
-	$effect(() => {
-		if (!contentEl) return;
-
-		contentEl.style.cssText = typeof style === 'string' ? style : '';
-		const positionStyles = anchor.styles;
-		for (const [key, value] of Object.entries(positionStyles)) {
-			contentEl.style.setProperty(key, value);
-		}
-	});
-
-	$effect(() => {
-		if (!contentEl) return;
-
-		if (ctx.open && !contentEl.matches(':popover-open')) {
-			contentEl.showPopover();
-		} else if (!ctx.open && contentEl.matches(':popover-open')) {
-			contentEl.hidePopover();
-		}
+	const popover = createAnchoredPopover({
+		triggerEl: () => ctx.triggerEl,
+		contentEl: () => contentEl ?? null,
+		open: () => ctx.open,
+		placement: () => placement,
+		offset: () => offset
 	});
 </script>
 
@@ -64,6 +39,7 @@
 	popover="manual"
 	data-tooltip-content
 	data-state={ctx.open ? 'open' : 'closed'}
+	use:popover.applyPosition={style}
 	class={className}
 	{...rest}
 >

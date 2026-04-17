@@ -3,7 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { Placement } from '../utils/anchor-position.svelte.js';
 	import { getHoverCardCtx } from './context.svelte.js';
-	import { createPositionedPopover } from '../utils/positioned-popover.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: Placement;
@@ -17,20 +17,12 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
-	const popover = createPositionedPopover({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => contentEl ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
-	});
-
-	$effect(() => {
-		if (!contentEl) return;
-		if (ctx.open) {
-			popover.showPopover(contentEl);
-		} else {
-			popover.hidePopover(contentEl);
-		}
 	});
 
 	function handleKeydown(e: KeyboardEvent) {

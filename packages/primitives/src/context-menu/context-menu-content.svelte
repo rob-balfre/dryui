@@ -2,7 +2,8 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getContextMenuCtx } from './context.svelte.js';
-	import { getMenuItems, focusFirstItem, handleMenuKeydown } from '../internal/menu-navigation.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
+	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
@@ -14,6 +15,11 @@
 
 	let el = $state<HTMLDivElement>();
 
+	const menu = createMenuNavigation({
+		container: () => el ?? null,
+		orientation: 'vertical'
+	});
+
 	$effect(() => {
 		if (ctx.open && el) {
 			el.style.position = 'fixed';
@@ -21,41 +27,19 @@
 			el.style.top = `${ctx.position.y}px`;
 			if (!el.matches(':popover-open')) {
 				el.showPopover();
-				focusFirstItem(el, getMenuItems(el));
+				menu.focusFirst();
 			}
 		} else if (!ctx.open && el?.matches(':popover-open')) {
 			el.hidePopover();
 		}
 	});
 
-	// Manual dismiss: close on click outside or Escape
-	$effect(() => {
-		if (!ctx.open) return;
-
-		function handlePointerDown(e: PointerEvent) {
-			if (el?.contains(e.target as Node)) return;
-			ctx.close();
-		}
-
-		function handleKeydown(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				e.preventDefault();
-				ctx.close();
-			}
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		document.addEventListener('keydown', handleKeydown, true);
-		return () => {
-			document.removeEventListener('pointerdown', handlePointerDown);
-			document.removeEventListener('keydown', handleKeydown, true);
-		};
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		preventDefaultOnEscape: true
 	});
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (!el) return;
-		handleMenuKeydown(e, getMenuItems(el));
-	}
 </script>
 
 <div
@@ -67,7 +51,7 @@
 	aria-labelledby={ctx.triggerId}
 	data-state={ctx.open ? 'open' : 'closed'}
 	{style}
-	onkeydown={handleKeydown}
+	onkeydown={(e) => menu.handleKeydown(e)}
 	{...rest}
 >
 	{@render children()}

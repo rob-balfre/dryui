@@ -3,8 +3,8 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { Placement } from '../utils/anchor-position.svelte.js';
 	import { getDropdownMenuCtx } from './context.svelte.js';
-	import { createPositionedPopover } from '../utils/positioned-popover.svelte.js';
-	import { getMenuItems, focusFirstItem, handleMenuKeydown } from '../internal/menu-navigation.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: Placement;
@@ -18,27 +18,19 @@
 
 	let el = $state<HTMLDivElement>();
 
-	const popover = createPositionedPopover({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => el ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
-		offset: () => offset
+		offset: () => offset,
+		onAfterShow: () => menu.focusFirst()
 	});
 
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			popover.showPopover(el);
-			const items = getMenuItems(el);
-			focusFirstItem(el, items);
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			popover.hidePopover(el);
-		}
+	const menu = createMenuNavigation({
+		container: () => el ?? null,
+		orientation: 'vertical'
 	});
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (!el) return;
-		handleMenuKeydown(e, getMenuItems(el));
-	}
 </script>
 
 <div
@@ -58,7 +50,7 @@
 			ctx.close();
 		}
 	}}
-	onkeydown={handleKeydown}
+	onkeydown={(e) => menu.handleKeydown(e)}
 	{...rest}
 >
 	{@render children()}

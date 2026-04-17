@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createPositionedPopover } from '@dryui/primitives';
+	import { createAnchoredPopover } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
 	import { getHoverCardCtx } from './context.svelte.js';
 
@@ -24,20 +24,12 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
-	const popover = createPositionedPopover({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => contentEl ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
-	});
-
-	$effect(() => {
-		if (!contentEl) return;
-		if (ctx.open) {
-			popover.showPopover(contentEl);
-		} else {
-			popover.hidePopover(contentEl);
-		}
 	});
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -51,7 +43,6 @@
 <div
 	bind:this={contentEl}
 	id={ctx.contentId}
-	role="dialog"
 	popover="manual"
 	data-hover-card-content
 	data-state={ctx.open ? 'open' : 'closed'}

@@ -1,10 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchorPosition } from '@dryui/primitives';
+	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
-
-	const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([data-disabled])';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: 'bottom' | 'bottom-start' | 'bottom-end';
@@ -33,55 +31,29 @@
 			root?.querySelector<HTMLElement>(`[data-menubar-trigger="${menuCtx.menuId}"]`) ?? null;
 	});
 
-	const anchor = createAnchorPosition(
-		() => triggerEl,
-		() => el ?? null,
-		{
-			get placement() {
-				return placement;
-			},
-			get offset() {
-				return offset;
-			}
-		}
-	);
-
-	$effect(() => {
-		if (!el) return;
-
-		el.style.cssText = typeof style === 'string' ? style : '';
-		const positionStyles = anchor.styles;
-		for (const [key, value] of Object.entries(positionStyles)) {
-			el.style.setProperty(key, value);
+	const popover = createAnchoredPopover({
+		triggerEl: () => triggerEl,
+		contentEl: () => el ?? null,
+		open: () => menuCtx.open,
+		placement: () => placement,
+		offset: () => offset,
+		onAfterShow: (contentEl) => {
+			requestAnimationFrame(() => {
+				const focusable = contentEl.querySelector<HTMLElement>(
+					'[role="menuitem"]:not([data-disabled])'
+				);
+				if (focusable) {
+					focusable.focus();
+				} else {
+					contentEl.focus();
+				}
+			});
 		}
 	});
 
-	function getMenuItems(container: HTMLElement): HTMLElement[] {
-		return Array.from(container.querySelectorAll<HTMLElement>(MENU_ITEM_SELECTOR));
-	}
-
-	function focusItem(items: HTMLElement[], index: number): void {
-		if (items.length === 0) return;
-		const clamped = ((index % items.length) + items.length) % items.length;
-		items[clamped]?.focus();
-	}
-
-	$effect(() => {
-		if (menuCtx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-			requestAnimationFrame(() => {
-				if (!el) return;
-				const items = getMenuItems(el);
-				const first = items[0];
-				if (first) {
-					first.focus();
-				} else {
-					el.focus();
-				}
-			});
-		} else if (!menuCtx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
-		}
+	const menu = createMenuNavigation({
+		container: () => el ?? null,
+		orientation: 'vertical'
 	});
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -107,40 +79,7 @@
 				return;
 			}
 		}
-		const items = getMenuItems(el);
-		const currentIndex = items.indexOf(document.activeElement as HTMLElement);
-
-		switch (e.key) {
-			case 'ArrowDown': {
-				e.preventDefault();
-				focusItem(items, currentIndex + 1);
-				return;
-			}
-			case 'ArrowUp': {
-				e.preventDefault();
-				focusItem(items, currentIndex - 1);
-				return;
-			}
-			case 'Home': {
-				e.preventDefault();
-				focusItem(items, 0);
-				return;
-			}
-			case 'End': {
-				e.preventDefault();
-				focusItem(items, items.length - 1);
-				return;
-			}
-			default: {
-				if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-					const char = e.key.toLowerCase();
-					const match = items.find((item) =>
-						item.textContent?.trim().toLowerCase().startsWith(char)
-					);
-					if (match) match.focus();
-				}
-			}
-		}
+		menu.handleKeydown(e);
 	}
 </script>
 
@@ -153,6 +92,7 @@
 	data-menubar-content
 	data-state={menuCtx.open ? 'open' : 'closed'}
 	class={className}
+	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (!newState && menuCtx.open) {
