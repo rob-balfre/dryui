@@ -28,6 +28,9 @@ export type PackageJson = Record<string, unknown> & {
 	svelte?: string;
 	types?: string;
 	dependencies?: Record<string, string>;
+	devDependencies?: Record<string, string>;
+	peerDependencies?: Record<string, string>;
+	optionalDependencies?: Record<string, string>;
 	publishConfig?: {
 		exports?: Record<string, unknown>;
 		svelte?: string;
@@ -35,6 +38,13 @@ export type PackageJson = Record<string, unknown> & {
 		[key: string]: unknown;
 	};
 };
+
+const DEP_FIELDS = [
+	'dependencies',
+	'devDependencies',
+	'peerDependencies',
+	'optionalDependencies'
+] as const;
 
 /**
  * Everything needed to restore a package.json to its pre-swap state.
@@ -107,8 +117,8 @@ export function swapExportsForPublish(
 		pkg.publishConfig?.svelte ||
 		pkg.publishConfig?.types
 	);
-	const hasWorkspaceDeps = Object.values(pkg.dependencies || {}).some((v) =>
-		String(v).startsWith('workspace:')
+	const hasWorkspaceDeps = DEP_FIELDS.some((field) =>
+		Object.values(pkg[field] || {}).some((v) => String(v).startsWith('workspace:'))
 	);
 
 	const backup: ExportSwapBackup = {
@@ -123,16 +133,18 @@ export function swapExportsForPublish(
 	if (pkg.publishConfig?.types) pkg.types = pkg.publishConfig.types;
 	delete pkg.publishConfig;
 
-	if (pkg.dependencies) {
-		for (const [dep, version] of Object.entries(pkg.dependencies)) {
+	for (const field of DEP_FIELDS) {
+		const deps = pkg[field];
+		if (!deps) continue;
+		for (const [dep, version] of Object.entries(deps)) {
 			if (!version.startsWith('workspace:')) continue;
 			const resolved = resolveWorkspaceDep(dep, pkgJsonPath, log);
 			if (resolved === null) {
 				throw new Error(
-					`Could not resolve workspace:* dep ${dep} from ${pkgJsonPath} — expected sibling package at packages/${dep.replace(/^@dryui\//, '')}`
+					`Could not resolve workspace:* dep ${dep} (${field}) from ${pkgJsonPath} — expected sibling package at packages/${dep.replace(/^@dryui\//, '')}`
 				);
 			}
-			pkg.dependencies[dep] = resolved;
+			deps[dep] = resolved;
 		}
 	}
 

@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import Portal from '../portal/portal.svelte';
 	import { setTourCtx, type TourStep } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -323,10 +324,14 @@
 	{@render children()}
 
 	{#if active && targetRect}
-		<!-- Overlay: full-screen click barrier -->
-		<div data-tour-overlay onclick={(e) => e.stopPropagation()} role="presentation">
-			<!-- Spotlight: transparent box over target, box-shadow creates the dark overlay -->
-			<div data-tour-spotlight use:applySpotlightStyles role="presentation"></div>
-		</div>
+		<Portal>
+			<!-- Overlay: full-screen click barrier. Portaled to body so `position: fixed`
+			     escapes any ancestor that creates a containing block (container-type,
+			     transform, filter, perspective, will-change, contain: layout/strict). -->
+			<div data-tour-overlay onclick={(e) => e.stopPropagation()} role="presentation">
+				<!-- Spotlight: transparent box over target, box-shadow creates the dark overlay -->
+				<div data-tour-spotlight use:applySpotlightStyles role="presentation"></div>
+			</div>
+		</Portal>
 	{/if}
 </div>

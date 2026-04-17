@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import Portal from '../portal/portal.svelte';
 	import { getTourCtx, type TourStep } from './context.svelte.js';
 
 	interface TooltipSnippetParams {
@@ -67,36 +68,40 @@
 </script>
 
 {#if ctx.isActive && ctx.currentStepData && ctx.tooltipPosition}
-	<div
-		bind:offsetWidth={null, updateTooltipWidth}
-		bind:offsetHeight={null, updateTooltipHeight}
-		data-tour-tooltip
-		data-placement={ctx.tooltipPlacement ?? ctx.currentStepData.placement ?? 'bottom'}
-		use:applyTooltipStyles
-		role="dialog"
-		aria-label="Tour step {ctx.currentStep + 1} of {ctx.totalSteps}"
-		{...rest}
-	>
-		{#if children}
-			{@render children(snippetParams)}
-		{:else}
-			<!-- Default tooltip content -->
-			<div data-tour-tooltip-default>
-				<div data-tour-tooltip-title>{ctx.currentStepData.title}</div>
-				<div data-tour-tooltip-content>{ctx.currentStepData.content}</div>
-				<div data-tour-tooltip-footer>
-					<span data-tour-tooltip-counter>{ctx.currentStep + 1} of {ctx.totalSteps}</span>
-					<div data-tour-tooltip-actions>
-						<button type="button" data-tour-skip onclick={() => ctx.skip()}>Skip</button>
-						{#if ctx.currentStep > 0}
-							<button type="button" data-tour-prev onclick={() => ctx.prev()}>Previous</button>
-						{/if}
-						<button type="button" data-tour-next onclick={() => ctx.next()}>
-							{ctx.currentStep === ctx.totalSteps - 1 ? 'Finish' : 'Next'}
-						</button>
+	<Portal>
+		<!-- Portaled to body so `position: fixed` is anchored to the viewport
+		     instead of any ancestor that creates a containing block. -->
+		<div
+			bind:offsetWidth={null, updateTooltipWidth}
+			bind:offsetHeight={null, updateTooltipHeight}
+			data-tour-tooltip
+			data-placement={ctx.tooltipPlacement ?? ctx.currentStepData.placement ?? 'bottom'}
+			use:applyTooltipStyles
+			role="dialog"
+			aria-label="Tour step {ctx.currentStep + 1} of {ctx.totalSteps}"
+			{...rest}
+		>
+			{#if children}
+				{@render children(snippetParams)}
+			{:else}
+				<!-- Default tooltip content -->
+				<div data-tour-tooltip-default>
+					<div data-tour-tooltip-title>{ctx.currentStepData.title}</div>
+					<div data-tour-tooltip-content>{ctx.currentStepData.content}</div>
+					<div data-tour-tooltip-footer>
+						<span data-tour-tooltip-counter>{ctx.currentStep + 1} of {ctx.totalSteps}</span>
+						<div data-tour-tooltip-actions>
+							<button type="button" data-tour-skip onclick={() => ctx.skip()}>Skip</button>
+							{#if ctx.currentStep > 0}
+								<button type="button" data-tour-prev onclick={() => ctx.prev()}>Previous</button>
+							{/if}
+							<button type="button" data-tour-next onclick={() => ctx.next()}>
+								{ctx.currentStep === ctx.totalSteps - 1 ? 'Finish' : 'Next'}
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
-		{/if}
-	</div>
+			{/if}
+		</div>
+	</Portal>
 {/if}

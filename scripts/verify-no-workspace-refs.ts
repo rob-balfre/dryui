@@ -56,17 +56,17 @@ function listPublishablePackages(): Array<{ dir: string; pkgJson: string }> {
 	return out;
 }
 
-async function runExplicit(path: string): Promise<void> {
+async function runExplicit(path: string): Promise<number> {
 	const tarballs = collectTarballs(path);
 	if (tarballs.length === 0) {
 		console.error(`verify-no-workspace-refs: no .tgz files found at ${path}`);
-		process.exit(2);
+		return 2;
 	}
 	console.log(`verify-no-workspace-refs: scanning ${tarballs.length} tarball(s) from ${path}`);
-	scanAllAndExit(tarballs);
+	return scanAll(tarballs);
 }
 
-async function runDefault(): Promise<void> {
+async function runDefault(): Promise<number> {
 	const packages = listPublishablePackages();
 	const tempDir = mkdtempSync(join(tmpdir(), 'dryui-verify-tarballs-'));
 	const backups: Array<{ pkgJson: string; backup: ExportSwapBackup }> = [];
@@ -98,8 +98,12 @@ async function runDefault(): Promise<void> {
 		for (const { dir } of packages) {
 			tarballs.push(packTarball(dir, tempDir));
 		}
-		scanAllAndExit(tarballs);
+		return scanAll(tarballs);
 	} finally {
+		// Restore before the process exits so a nonzero exit never leaks
+		// mutated package.json files into the working tree. process.exit()
+		// bypasses finally, so runDefault must return its code and let the
+		// top-level caller exit after cleanup completes.
 		for (const { pkgJson, backup } of backups) {
 			restoreExports(pkgJson, backup);
 		}
@@ -107,7 +111,7 @@ async function runDefault(): Promise<void> {
 	}
 }
 
-function scanAllAndExit(tarballs: string[]): void {
+function scanAll(tarballs: string[]): number {
 	const allFindings: WorkspaceRefFinding[] = [];
 	for (const tarball of tarballs) {
 		allFindings.push(...scanTarball(tarball));
@@ -120,14 +124,12 @@ function scanAllAndExit(tarballs: string[]): void {
 		console.error(formatFindings(allFindings));
 		console.error('\nFix: ensure scripts/lib/export-swap.ts resolved every workspace:* dep');
 		console.error('       before pack (resolveWorkspaceDep fell through or publishConfig shadow).');
-		process.exit(1);
+		return 1;
 	}
 
 	console.log(`verify-no-workspace-refs: all ${tarballs.length} tarball(s) clean`);
+	return 0;
 }
 
-if (explicitPath) {
-	await runExplicit(explicitPath);
-} else {
-	await runDefault();
-}
+const exitCode = explicitPath ? await runExplicit(explicitPath) : await runDefault();
+process.exit(exitCode);

@@ -48,8 +48,16 @@ export function packTarball(packageDir: string, outputDir: string): string {
 		['pack', '--pack-destination', outputDir, '--json', '--silent'],
 		{ cwd: packageDir, encoding: 'utf8' }
 	);
-	// npm pack --json emits an array of { name, version, filename, ... }.
-	const parsed = JSON.parse(stdout) as Array<{ filename: string }>;
+	// npm pack --json emits an array of { name, version, filename, ... } at
+	// the tail of stdout. `--silent` suppresses npm's own chatter but does NOT
+	// silence lifecycle hooks (prepack etc.), so any `console.log` from a
+	// prepack script is prepended to the JSON. Strip the non-JSON prefix by
+	// finding the opening bracket of the array.
+	const jsonStart = stdout.indexOf('[');
+	if (jsonStart === -1) {
+		throw new Error(`npm pack produced no JSON output in ${packageDir}: ${stdout}`);
+	}
+	const parsed = JSON.parse(stdout.slice(jsonStart)) as Array<{ filename: string }>;
 	if (!parsed.length || !parsed[0].filename) {
 		throw new Error(`npm pack produced no tarball in ${packageDir}`);
 	}

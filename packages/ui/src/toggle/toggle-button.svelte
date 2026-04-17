@@ -88,10 +88,8 @@
 <style>
 	.root {
 		display: inline-grid;
-		grid-template-columns: var(--_track-w) max-content;
+		grid-template-columns: var(--_track-w);
 		align-items: center;
-		gap: var(--_gap);
-		padding-inline-end: var(--_gap);
 		--dry-btn-bg: var(--dry-toggle-track-bg, var(--dry-color-fill-weak));
 		--dry-btn-border: var(--dry-toggle-track-stroke, var(--dry-color-stroke-strong));
 		--dry-btn-radius: var(--_track-w);
@@ -99,6 +97,12 @@
 		--dry-btn-padding-y: 0;
 		--dry-btn-justify: start;
 		--dry-btn-min-height: var(--_track-h);
+	}
+
+	.root:has(.label) {
+		grid-template-columns: var(--_track-w) max-content;
+		gap: var(--_gap);
+		padding-inline-end: var(--_gap);
 	}
 
 	.root[data-state='on'] {

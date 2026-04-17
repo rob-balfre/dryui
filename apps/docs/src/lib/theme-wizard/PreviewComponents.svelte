@@ -42,7 +42,11 @@
 		{ name: 'Sam Rivera', role: 'Viewer', status: 'Inactive', color: 'gray' as const }
 	];
 
-	const activityLabels = ['Syncing', 'Updating', 'Loading'];
+	const activityLabels = [
+		{ label: 'Syncing', variant: 'colorful' as const, duration: 1.7 },
+		{ label: 'Updating', variant: 'ocean' as const, duration: 2.1 },
+		{ label: 'Loading', variant: 'sunset' as const, duration: 2.5 }
+	];
 	const discoverySources = ['Social Media', 'Search Engine', 'Referral', 'Other'];
 
 	let budget = $state(640);
@@ -162,14 +166,14 @@
 			</Card.Root>
 
 			<div class="badge-strip">
-				{#each activityLabels as label (label)}
+				{#each activityLabels as { label, variant, duration } (label)}
 					<BorderBeam
-						size="line"
-						colorVariant="mono"
+						size="sm"
+						colorVariant={variant}
 						theme={previewTheme}
 						borderRadius="var(--dry-radius-full)"
-						duration={2.6}
-						strength={0.76}
+						{duration}
+						strength={1}
 					>
 						<span class="activity-badge">
 							<Badge color="gray" size="sm">{label}</Badge>
@@ -526,7 +530,15 @@
 		--dry-badge-bg: color-mix(in srgb, var(--dry-color-fill) 84%, var(--dry-color-bg-raised));
 	}
 
-	.badge-strip,
+	.badge-strip {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: start;
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
 	.toolbar-row,
 	.chip-row {
 		display: grid;

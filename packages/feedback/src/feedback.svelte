@@ -84,26 +84,12 @@
 		return drawing.space ?? 'scroll';
 	}
 
-	function isOpenPopover(node: HTMLElement): boolean {
-		try {
-			return node.matches(':popover-open');
-		} catch {
-			return false;
-		}
-	}
-
 	function isLayerHost(node: Element | null): node is HTMLElement {
-		if (node instanceof HTMLDialogElement) return node.open;
-		return node instanceof HTMLElement && node.matches('[popover]') && isOpenPopover(node);
+		return node instanceof HTMLDialogElement && node.open;
 	}
 
 	function resolveLayerHost(preferred?: HTMLElement | null): HTMLElement | null {
 		if (isLayerHost(preferred ?? null)) return preferred ?? null;
-
-		const popovers = Array.from(document.querySelectorAll<HTMLElement>('[popover]')).filter(
-			isOpenPopover
-		);
-		if (popovers.length > 0) return popovers.at(-1) ?? null;
 
 		const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]'));
 		if (dialogs.length > 0) return dialogs.at(-1) ?? null;
@@ -859,6 +845,7 @@
 	<div
 		class="feedback-root {className ?? ''}"
 		data-dryui-feedback
+		data-dismiss-ignore
 		data-layer-hosted={layerHostEl ? '' : undefined}
 		style={feedbackRootStyle()}
 	>
