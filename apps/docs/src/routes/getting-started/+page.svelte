@@ -11,6 +11,7 @@
 		Text,
 		Link
 	} from '@dryui/ui';
+	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
 	import { aiAgentSetups } from '$lib/ai-setup';
@@ -124,12 +125,15 @@
 							<Card.Content>
 								<div class="agent-setup-card">
 									<div class="stack-sm">
-										<Badge
-											variant="outline"
-											color={PLUGIN_AGENT_BADGE_COLORS[
-												setup.id as keyof typeof PLUGIN_AGENT_BADGE_COLORS
-											]}>{setup.label}</Badge
-										>
+										<div class="agent-heading">
+											<AgentLogo agent={setup.id as 'claude-code' | 'codex' | 'gemini'} size={28} />
+											<Badge
+												variant="outline"
+												color={PLUGIN_AGENT_BADGE_COLORS[
+													setup.id as keyof typeof PLUGIN_AGENT_BADGE_COLORS
+												]}>{setup.label}</Badge
+											>
+										</div>
 										<Text color="secondary">{setup.description}</Text>
 									</div>
 
@@ -415,6 +419,14 @@
 	.agent-setup-card {
 		display: grid;
 		gap: var(--dry-space-4);
+	}
+
+	.agent-heading {
+		display: grid;
+		grid-template-columns: auto auto;
+		gap: var(--dry-space-2_5);
+		align-items: center;
+		justify-content: start;
 	}
 
 	.badge-row {
