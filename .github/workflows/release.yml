@@ -6,7 +6,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  # Never cancel a release in progress
+  # Never cancel a release in progress — a half-published release leaves
+  # npm + git tags + GitHub Releases in an inconsistent state.
   cancel-in-progress: false
 
 jobs:
@@ -17,6 +18,8 @@ jobs:
     timeout-minutes: 15
     permissions:
       contents: write
+    outputs:
+      released_sha: ${{ steps.record.outputs.sha }}
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
@@ -58,3 +61,41 @@ jobs:
 
             gh release create "$tag" --title "$tag" --generate-notes
           done
+
+      - name: Record released SHA
+        id: record
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  deploy-docs:
+    needs: release
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    env:
+      PUBLIC_MAPBOX_TOKEN: ${{ secrets.PUBLIC_MAPBOX_TOKEN }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+    steps:
+      - name: Checkout released SHA
+        uses: actions/checkout@v5
+        with:
+          # Use the SHA after release:ci has potentially pushed a version commit,
+          # so docs reference the just-published versions.
+          ref: ${{ needs.release.outputs.released_sha }}
+          fetch-depth: 1
+
+      - name: Setup DryUI
+        uses: ./.github/actions/setup-dryui
+
+      - name: Build docs
+        run: bun run build:docs
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/docs
+          packageManager: bun
+          command: pages deploy .svelte-kit/cloudflare --project-name=dryui-docs
