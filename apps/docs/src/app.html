@@ -7,7 +7,6 @@
 		<script>
 			(() => {
 				const root = document.documentElement;
-				const wizardStateStorageKey = 'dryui-theme-wizard';
 
 				try {
 					const storedTheme = window.localStorage.getItem('dryui-docs-theme');
@@ -25,35 +24,7 @@
 					} else {
 						delete root.dataset.theme;
 					}
-
-					if (!window.location.pathname.includes('/theme-wizard')) {
-						return;
-					}
-
-					const storedWizardState = window.sessionStorage.getItem(wizardStateStorageKey);
-					if (!storedWizardState) {
-						return;
-					}
-
-					const parsedWizardState = JSON.parse(storedWizardState);
-					const isDarkMode =
-						explicitTheme === 'dark' ||
-						(explicitTheme === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-					const activeTokens = isDarkMode
-						? parsedWizardState?.tokens?.dark
-						: parsedWizardState?.tokens?.light;
-
-					if (!activeTokens || typeof activeTokens !== 'object') {
-						return;
-					}
-
-					for (const [property, value] of Object.entries(activeTokens)) {
-						if (typeof value === 'string') {
-							root.style.setProperty(property, value);
-						}
-					}
 				} catch {
-					// Ignore storage access issues and fall back to the browser preference.
 					delete root.dataset.theme;
 					root.classList.add('theme-auto');
 				}

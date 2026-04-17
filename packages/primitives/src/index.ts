@@ -914,4 +914,5 @@ export type {
 	FooterCopyrightProps
 } from './footer/index.js';
 
-export { useThemeOverride, type ThemeTokenMap } from './use-theme-override/index.js';
+export { TokenScope } from './token-scope/index.js';
+export type { TokenScopeProps } from './token-scope/index.js';
