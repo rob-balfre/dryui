@@ -3,7 +3,8 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { Placement } from '../utils/anchor-position.svelte.js';
 	import { getPopoverCtx } from './context.svelte.js';
-	import { createPositionedPopover } from '../utils/positioned-popover.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: Placement;
@@ -17,51 +18,21 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
-	const popover = createPositionedPopover({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => contentEl ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
 	});
 
-	$effect(() => {
-		if (!contentEl) return;
-		if (ctx.open) {
-			popover.showPopover(contentEl);
-		} else {
-			popover.hidePopover(contentEl);
-		}
-	});
-
-	$effect(() => {
-		if (!ctx.open) return;
-
-		function handlePointerDown(event: PointerEvent) {
-			const target = event.target as Node;
-			if (contentEl?.contains(target) || ctx.triggerEl?.contains(target)) {
-				return;
-			}
-
-			ctx.close();
-		}
-
-		function handleKeydown(event: KeyboardEvent) {
-			if (event.key !== 'Escape') {
-				return;
-			}
-
-			event.preventDefault();
-			ctx.close();
-			ctx.triggerEl?.focus();
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		document.addEventListener('keydown', handleKeydown, true);
-
-		return () => {
-			document.removeEventListener('pointerdown', handlePointerDown);
-			document.removeEventListener('keydown', handleKeydown, true);
-		};
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => contentEl ?? null,
+		triggerEl: () => ctx.triggerEl,
+		preventDefaultOnEscape: true,
+		returnFocusTo: () => ctx.triggerEl
 	});
 </script>
 

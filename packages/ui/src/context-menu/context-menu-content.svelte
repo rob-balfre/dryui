@@ -1,9 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { createDismiss, createMenuNavigation } from '@dryui/primitives';
 	import { getContextMenuCtx } from './context.svelte.js';
-
-	const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([data-disabled])';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
@@ -15,15 +14,10 @@
 
 	let el = $state<HTMLDivElement>();
 
-	function getMenuItems(container: HTMLElement): HTMLElement[] {
-		return Array.from(container.querySelectorAll<HTMLElement>(MENU_ITEM_SELECTOR));
-	}
-
-	function focusItem(items: HTMLElement[], index: number): void {
-		if (items.length === 0) return;
-		const clamped = ((index % items.length) + items.length) % items.length;
-		items[clamped]?.focus();
-	}
+	const menu = createMenuNavigation({
+		container: () => el ?? null,
+		orientation: 'vertical'
+	});
 
 	$effect(() => {
 		if (ctx.open && el) {
@@ -32,80 +26,19 @@
 			el.style.top = `${ctx.position.y}px`;
 			if (!el.matches(':popover-open')) {
 				el.showPopover();
-				const items = getMenuItems(el);
-				const first = items[0];
-				if (first) {
-					first.focus();
-				} else {
-					el.focus();
-				}
+				menu.focusFirst();
 			}
 		} else if (!ctx.open && el?.matches(':popover-open')) {
 			el.hidePopover();
 		}
 	});
 
-	// Manual dismiss: close on click outside or Escape
-	$effect(() => {
-		if (!ctx.open) return;
-
-		function handlePointerDown(e: PointerEvent) {
-			if (el?.contains(e.target as Node)) return;
-			ctx.close();
-		}
-
-		function handleKeydown(e: KeyboardEvent) {
-			if (e.key === 'Escape') {
-				e.preventDefault();
-				ctx.close();
-			}
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		document.addEventListener('keydown', handleKeydown, true);
-		return () => {
-			document.removeEventListener('pointerdown', handlePointerDown);
-			document.removeEventListener('keydown', handleKeydown, true);
-		};
+	createDismiss({
+		enabled: () => ctx.open,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		preventDefaultOnEscape: true
 	});
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (!el) return;
-		const items = getMenuItems(el);
-		const currentIndex = items.indexOf(document.activeElement as HTMLElement);
-
-		switch (e.key) {
-			case 'ArrowDown': {
-				e.preventDefault();
-				focusItem(items, currentIndex + 1);
-				return;
-			}
-			case 'ArrowUp': {
-				e.preventDefault();
-				focusItem(items, currentIndex - 1);
-				return;
-			}
-			case 'Home': {
-				e.preventDefault();
-				focusItem(items, 0);
-				return;
-			}
-			case 'End': {
-				e.preventDefault();
-				focusItem(items, items.length - 1);
-				return;
-			}
-			default: {
-				if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-					const char = e.key.toLowerCase();
-					const match = items.find((item) =>
-						item.textContent?.trim().toLowerCase().startsWith(char)
-					);
-					if (match) match.focus();
-				}
-			}
-		}
-	}
 </script>
 
 <div
@@ -119,7 +52,7 @@
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
 	{style}
-	onkeydown={handleKeydown}
+	onkeydown={(e) => menu.handleKeydown(e)}
 	{...rest}
 >
 	{@render children()}
