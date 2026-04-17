@@ -4,6 +4,7 @@
 	import {
 		Alert,
 		Badge,
+		BorderBeam,
 		Button,
 		Card,
 		CodeBlock,
@@ -17,7 +18,7 @@
 		Tabs,
 		Text
 	} from '@dryui/ui';
-	import { Check, ExternalLink, MessageSquare, RefreshCw } from 'lucide-svelte';
+	import { Check, Copy, CornerLeftUp, ExternalLink, MessageSquare, RefreshCw } from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
 
@@ -35,10 +36,22 @@
 	let error = $state('');
 	let lastLoadedAt = $state<string | null>(null);
 	let loading = $state(true);
+	let promptCopied = $state(false);
+	let promptCopyTimer: ReturnType<typeof setTimeout> | undefined;
 	let refreshing = $state(false);
 	let search = $state('');
 	let selectedId = $state<string | null>(null);
 	let submissions = $state<Submission[]>([]);
+
+	function copyPrompt(text: string): void {
+		navigator.clipboard.writeText(text).then(() => {
+			promptCopied = true;
+			clearTimeout(promptCopyTimer);
+			promptCopyTimer = setTimeout(() => {
+				promptCopied = false;
+			}, 2000);
+		});
+	}
 
 	function readDevUrl(): string | null {
 		if (typeof window === 'undefined') return null;
@@ -526,101 +539,131 @@ Use the dryui-feedback MCP server:
 					{#if selectedSubmission}
 						<div class="detail-stack">
 							<div class="detail-top">
-								<Dialog.Root>
-									<Dialog.Trigger>
-										<Button
-											variant="bare"
-											class="screenshot-trigger"
-											aria-label={`Open full screenshot for ${selectedSubmission.url}`}
-										>
-											<Image
-												class="feedback-screenshot-thumb"
-												src={screenshotUrl(selectedSubmission.id)}
-												alt={`Feedback screenshot for ${selectedSubmission.url}`}
-												fallback="Screenshot unavailable"
-											/>
-										</Button>
-									</Dialog.Trigger>
-
-									<Dialog.Content class="feedback-screenshot-dialog">
-										<Dialog.Header>
-											<div class="screenshot-dialog-header">
-												<div class="screenshot-dialog-heading">
-													<Heading level={3}>Captured screenshot</Heading>
-													<Text as="span" size="sm" color="secondary">
-														{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-															selectedSubmission.viewport
-														)}
-													</Text>
-												</div>
-												<Dialog.Close aria-label="Close screenshot dialog">
-													<span aria-hidden="true">&times;</span>
-												</Dialog.Close>
-											</div>
-										</Dialog.Header>
-										<Dialog.Body class="screenshot-dialog-body">
-											<div class="screenshot-dialog-image">
+								<div class="detail-media">
+									<Dialog.Root>
+										<Dialog.Trigger>
+											<Button
+												variant="bare"
+												class="screenshot-trigger"
+												aria-label={`Open full screenshot for ${selectedSubmission.url}`}
+											>
 												<Image
-													class="feedback-screenshot-full"
+													class="feedback-screenshot-thumb"
 													src={screenshotUrl(selectedSubmission.id)}
 													alt={`Feedback screenshot for ${selectedSubmission.url}`}
 													fallback="Screenshot unavailable"
 												/>
-											</div>
-										</Dialog.Body>
-										<Dialog.Footer>
-											<Dialog.Close>Close</Dialog.Close>
-											<Button
-												href={selectedSubmission.url}
-												target="_blank"
-												rel="noreferrer"
-												variant="ghost"
-											>
-												Open page
 											</Button>
-										</Dialog.Footer>
-									</Dialog.Content>
-								</Dialog.Root>
+										</Dialog.Trigger>
 
-								<CodeBlock code={promptText} language="text" />
-							</div>
-
-							<section class="notes-section">
-								<header class="notes-head">
-									<Heading level={4}>Notes</Heading>
-									{#if selectedDrawingCounts.length > 0}
-										<div class="annotation-pills">
-											{#each selectedDrawingCounts as entry (entry.label)}
-												<Badge variant="outline" color="gray" size="sm">
-													{entry.label}: {entry.count}
-												</Badge>
-											{/each}
-										</div>
-									{/if}
-								</header>
-
-								{#if selectedTextNotes.length > 0}
-									<div class="notes-stack">
-										{#each selectedTextNotes as note, index (`${selectedSubmission.id}-${index}`)}
-											<div class="note-card">
-												<div class="note-card-head">
-													<MessageSquare size={12} aria-hidden="true" />
-													<Text as="span" size="xs" color="secondary">
-														Note {index + 1}
-													</Text>
+										<Dialog.Content class="feedback-screenshot-dialog">
+											<Dialog.Header>
+												<div class="screenshot-dialog-header">
+													<div class="screenshot-dialog-heading">
+														<Heading level={3}>Captured screenshot</Heading>
+														<Text as="span" size="sm" color="secondary">
+															{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+																selectedSubmission.viewport
+															)}
+														</Text>
+													</div>
+													<Dialog.Close aria-label="Close screenshot dialog">
+														<span aria-hidden="true">&times;</span>
+													</Dialog.Close>
 												</div>
-												<Text as="p" size="sm">{note}</Text>
+											</Dialog.Header>
+											<Dialog.Body class="screenshot-dialog-body">
+												<div class="screenshot-dialog-image">
+													<Image
+														class="feedback-screenshot-full"
+														src={screenshotUrl(selectedSubmission.id)}
+														alt={`Feedback screenshot for ${selectedSubmission.url}`}
+														fallback="Screenshot unavailable"
+													/>
+												</div>
+											</Dialog.Body>
+											<Dialog.Footer>
+												<Dialog.Close>Close</Dialog.Close>
+												<Button
+													href={selectedSubmission.url}
+													target="_blank"
+													rel="noreferrer"
+													variant="ghost"
+												>
+													Open page
+												</Button>
+											</Dialog.Footer>
+										</Dialog.Content>
+									</Dialog.Root>
+
+									<section class="notes-section">
+										<header class="notes-head">
+											<Heading level={4}>Notes</Heading>
+											{#if selectedDrawingCounts.length > 0}
+												<div class="annotation-pills">
+													{#each selectedDrawingCounts as entry (entry.label)}
+														<Badge variant="outline" color="gray" size="sm">
+															{entry.label}: {entry.count}
+														</Badge>
+													{/each}
+												</div>
+											{/if}
+										</header>
+
+										{#if selectedTextNotes.length > 0}
+											<div class="notes-stack">
+												{#each selectedTextNotes as note, index (`${selectedSubmission.id}-${index}`)}
+													<div class="note-card">
+														<div class="note-card-head">
+															<MessageSquare size={12} aria-hidden="true" />
+															<Text as="span" size="xs" color="secondary">
+																Note {index + 1}
+															</Text>
+														</div>
+														<Text as="p" size="sm">{note}</Text>
+													</div>
+												{/each}
 											</div>
-										{/each}
+										{:else if selectedDrawingCounts.length > 0}
+											<Text as="p" size="sm" color="secondary">
+												This submission only uses visual arrows or freehand marks.
+											</Text>
+										{:else}
+											<Text as="p" size="sm" color="secondary">No annotations attached.</Text>
+										{/if}
+									</section>
+								</div>
+
+								<div class="prompt-section">
+									<CodeBlock code={promptText} language="markdown" showCopyButton={false} />
+									<div class="prompt-copy-wrap">
+										<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
+											<Button
+												variant="solid"
+												size="sm"
+												onclick={() => copyPrompt(promptText)}
+												aria-label={promptCopied ? 'Copied prompt' : 'Copy prompt'}
+											>
+												{#if promptCopied}
+													<Check size={14} aria-hidden="true" />
+													Copied
+												{:else}
+													<Copy size={14} aria-hidden="true" />
+													Copy
+												{/if}
+											</Button>
+										</BorderBeam>
 									</div>
-								{:else if selectedDrawingCounts.length > 0}
-									<Text as="p" size="sm" color="secondary">
-										This submission only uses visual arrows or freehand marks.
-									</Text>
-								{:else}
-									<Text as="p" size="sm" color="secondary">No annotations attached.</Text>
-								{/if}
-							</section>
+									<div class="prompt-caption">
+										<CornerLeftUp size={14} aria-hidden="true" />
+										<Text as="span" size="xs" color="secondary">
+											{selectedSubmission
+												? 'Copy this prompt to work on the selected submission'
+												: 'Copy this prompt to work on all pending submissions'}
+										</Text>
+									</div>
+								</div>
+							</div>
 						</div>
 					{:else}
 						<Alert variant="info">
@@ -887,6 +930,12 @@ Use the dryui-feedback MCP server:
 		align-items: start;
 	}
 
+	.detail-media {
+		display: grid;
+		gap: var(--dry-space-3);
+		align-content: start;
+	}
+
 	.screenshot-trigger {
 		justify-self: start;
 		cursor: zoom-in;
@@ -917,6 +966,27 @@ Use the dryui-feedback MCP server:
 	.notes-section {
 		display: grid;
 		gap: var(--dry-space-2);
+	}
+
+	.prompt-section {
+		display: grid;
+		gap: var(--dry-space-1_5);
+		align-content: start;
+	}
+
+	.prompt-copy-wrap {
+		display: grid;
+		justify-self: start;
+		border-radius: 8px;
+	}
+
+	.prompt-caption {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: var(--dry-space-1_5);
+		align-items: center;
+		color: var(--dry-color-text-weak);
+		padding-inline-start: var(--dry-space-2);
 	}
 
 	.notes-head {
@@ -969,7 +1039,7 @@ Use the dryui-feedback MCP server:
 		}
 
 		.detail-top {
-			grid-template-columns: auto minmax(0, 1fr);
+			grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
 		}
 	}
 

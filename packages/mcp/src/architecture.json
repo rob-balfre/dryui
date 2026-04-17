@@ -2,24 +2,24 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.2.0",
   "summary": {
-    "componentNodes": 290,
+    "componentNodes": 291,
     "partNodes": 654,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 144,
+    "primitiveComponents": 145,
     "uiComponents": 146,
     "uiWrappers": 130,
     "uiComposites": 16,
-    "rootBarrelComponents": 290,
+    "rootBarrelComponents": 291,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
-    "composeEdges": 10,
+    "composeEdges": 11,
     "docsEdges": 0,
     "relatedEdges": 302,
-    "mismatches": 289,
+    "mismatches": 291,
     "primitivePartComponents": 0,
-    "thinWrappers": 65
+    "thinWrappers": 64
   },
   "nodes": [
     {
@@ -7771,6 +7771,25 @@
       "parts": []
     },
     {
+      "id": "primitives:TokenScope",
+      "name": "TokenScope",
+      "label": "TokenScope",
+      "kind": "component",
+      "package": "primitives",
+      "layer": "primitive",
+      "category": "uncategorized",
+      "description": "TokenScope is exported publicly but is missing generated spec metadata.",
+      "visibility": "root",
+      "sourcePath": "packages/primitives/src/token-scope/index.ts",
+      "publicImport": "@dryui/primitives",
+      "tags": [],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "primitives:Toolbar",
       "name": "Toolbar",
       "label": "Toolbar",
@@ -14104,7 +14123,7 @@
       "parts": [],
       "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 1
     },
     {
       "id": "ui:QRCode",
@@ -16531,6 +16550,12 @@
       "type": "composes",
       "from": "ui:MarkdownRenderer",
       "to": "ui:Separator"
+    },
+    {
+      "id": "composes:ui:PromptInput:ui:Button:",
+      "type": "composes",
+      "from": "ui:PromptInput",
+      "to": "ui:Button"
     },
     {
       "id": "composes:ui:Tag:ui:Badge:",
@@ -24959,6 +24984,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "primitives",
+      "component": "TokenScope",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/primitives/src/token-scope/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "primitives",
       "component": "Toolbar",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/toolbar/index.ts"
@@ -26047,6 +26079,13 @@
       "component": "VisuallyHidden",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/visually-hidden/index.ts"
+    },
+    {
+      "kind": "spec-missing",
+      "package": "primitives",
+      "component": "TokenScope",
+      "detail": "Public export exists without generated spec metadata.",
+      "sourcePath": "packages/primitives/src/token-scope/index.ts"
     }
   ],
   "signals": {
@@ -26095,7 +26134,6 @@
       "Portal",
       "Progress",
       "ProgressRing",
-      "PromptInput",
       "QRCode",
       "Rating",
       "RelativeTime",
@@ -26121,12 +26159,14 @@
     "subpathOnlyUi": [],
     "subpathOnlyPrimitives": [],
     "specMissingUi": [],
-    "specMissingPrimitives": [],
+    "specMissingPrimitives": [
+      "TokenScope"
+    ],
     "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }
