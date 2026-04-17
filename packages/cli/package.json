@@ -26,7 +26,7 @@
     "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node"
   },
   "dependencies": {
-    "@dryui/feedback-server": "^0.3.3",
+    "@dryui/feedback-server": "^0.3.5",
     "@dryui/mcp": "^2.1.3"
   },
   "devDependencies": {
