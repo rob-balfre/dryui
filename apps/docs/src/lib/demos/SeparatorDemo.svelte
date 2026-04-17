@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { Separator, Heading, Text, Badge } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 </script>
 
-<div class="demo-stack">
+<DocsDemo>
 	<section class="section">
 		<Heading level={4}>DryUI Components</Heading>
 		<Text color="secondary">Zero-dependency Svelte 5 primitives built on native browser APIs.</Text>
@@ -28,14 +29,9 @@
 			<Badge variant="soft" color="green">MIT</Badge>
 		</div>
 	</section>
-</div>
+</DocsDemo>
 
 <style>
-	.demo-stack {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-
 	.section {
 		display: grid;
 		gap: var(--dry-space-2);

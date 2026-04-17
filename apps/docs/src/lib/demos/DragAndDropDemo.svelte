@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { DragAndDrop, Badge, Separator } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	let items = $state([
 		'Design system audit',
@@ -52,7 +53,7 @@
 	}
 </script>
 
-<div class="demo-layout">
+<DocsDemo gap="xl">
 	<div class="task-list">
 		<DragAndDrop.Root {items} onReorder={(reordered) => (items = reordered)}>
 			{#each items as item, i (item)}
@@ -122,14 +123,9 @@
 			</div>
 		</div>
 	</DragAndDrop.Group>
-</div>
+</DocsDemo>
 
 <style>
-	.demo-layout {
-		display: grid;
-		gap: var(--dry-space-6);
-	}
-
 	.task-list {
 		--dry-dnd-item-columns: auto 1fr;
 	}
