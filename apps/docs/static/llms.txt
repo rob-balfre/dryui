@@ -138,7 +138,7 @@ Example: <Textarea bind:value={message} placeholder="Write a message…" />
 AI-style prompt input with auto-resize and submit.
 Import: @dryui/ui
 Subpath import: @dryui/ui/prompt-input
-Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | onpromptsubmit ((value: string) => void) | actions (Snippet)
+Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | submitSize (ButtonSize), default 'md' | submitVariant (ButtonVariant), default 'solid' | onpromptsubmit ((value: string) => void) | actions (Snippet)
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
 Example: <PromptInput>Content</PromptInput>
 

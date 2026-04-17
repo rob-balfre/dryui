@@ -16,10 +16,11 @@
 
 	interface Props {
 		currentPath: string;
+		themeWizardHref?: string;
 		onnavigate?: () => void;
 	}
 
-	let { currentPath, onnavigate }: Props = $props();
+	let { currentPath, themeWizardHref = withBase('/theme-wizard'), onnavigate }: Props = $props();
 	const totalComponents = categories.reduce((sum, c) => sum + c.items.length, 0);
 
 	function isComponentsActive(): boolean {
@@ -107,7 +108,7 @@
 		</Sidebar.Content>
 		<Sidebar.Footer>
 			<Sidebar.Item
-				href={withBase('/theme-wizard')}
+				href={themeWizardHref}
 				target="_blank"
 				rel="noreferrer"
 				title="Open Theme Wizard in a new tab"

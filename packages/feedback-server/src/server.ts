@@ -4,6 +4,7 @@ import {
 	toFeedbackBaseUrl,
 	writeFeedbackServerConfig
 } from './config.js';
+import { attachDispatcher, DISPATCH_AGENTS, type DispatchAgent } from './dispatch.js';
 import { EventBus } from './events.js';
 import { startFeedbackHttpServer } from './http.js';
 import { FeedbackStore } from './store.js';
@@ -21,6 +22,11 @@ function toNumber(value: string | undefined, fallback: number): number {
 	return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
 }
 
+function parseDispatchAgent(raw: string | undefined, fallback: DispatchAgent): DispatchAgent {
+	if (!raw) return fallback;
+	return DISPATCH_AGENTS.includes(raw as DispatchAgent) ? (raw as DispatchAgent) : fallback;
+}
+
 function main(): void {
 	const port = toNumber(
 		readFlag('--port') ?? process.env['DRYUI_FEEDBACK_PORT'],
@@ -28,11 +34,22 @@ function main(): void {
 	);
 	const host = readFlag('--host') ?? process.env['DRYUI_FEEDBACK_HOST'] ?? DEFAULT_FEEDBACK_HOST;
 	const dbPath = readFlag('--db') ?? process.env['DRYUI_FEEDBACK_STORE_PATH'];
+	const dispatchEnabled = !process.argv.includes('--no-dispatch');
+	const workspace =
+		readFlag('--workspace') ?? process.env['DRYUI_DISPATCH_WORKSPACE'] ?? process.cwd();
+	const defaultAgent = parseDispatchAgent(
+		readFlag('--default-agent') ?? process.env['DRYUI_DISPATCH_AGENT'],
+		'codex'
+	);
 
 	const store = new FeedbackStore(dbPath);
 	const bus = new EventBus();
 	const server = startFeedbackHttpServer(store, bus, { host, port });
 	const baseUrl = toFeedbackBaseUrl(server.hostname, server.port);
+
+	if (dispatchEnabled) {
+		attachDispatcher(bus, { workspace, defaultAgent });
+	}
 
 	writeFeedbackServerConfig({
 		host: server.hostname,

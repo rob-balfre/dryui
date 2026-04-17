@@ -2,6 +2,7 @@ import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
 import { DEFAULT_STORE_DIR, DEFAULT_STORE_PATH, SCREENSHOTS_DIR } from './config.js';
+import { DISPATCH_AGENTS } from './dispatch.js';
 import type {
 	Annotation,
 	AnnotationKind,
@@ -20,7 +21,10 @@ import type {
 	UpdateAnnotationInput
 } from './types.js';
 
-const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set(['codex', 'claude', 'gemini', 'off']);
+const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
+	...DISPATCH_AGENTS,
+	'off'
+]);
 
 function normalizeAgent(value: string | null | undefined): SubmissionAgent | undefined {
 	if (value && VALID_AGENTS.has(value as SubmissionAgent)) return value as SubmissionAgent;

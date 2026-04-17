@@ -241,7 +241,7 @@ Tags: prompt, input, chat, ai, textarea
 Kind: simple
 Root import: import { PromptInput } from '@dryui/ui'
 Subpath import: import { PromptInput } from '@dryui/ui/prompt-input'
-Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | onpromptsubmit ((value: string) => void) | actions (Snippet)
+Props: value (string), Current controlled or bindable value., default '' | placeholder (string), Hint text shown when no value is selected or entered., default 'Type a message...' | disabled (boolean), Prevents interaction and applies disabled styling., default false | submitLabel (string), default 'Send' | submitSize (ButtonSize), default 'md' | submitVariant (ButtonVariant), default 'solid' | onpromptsubmit ((value: string) => void) | actions (Snippet)
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-btn-radius, --dry-prompt-input-bg, --dry-prompt-input-border, --dry-prompt-input-color, --dry-prompt-input-gap, --dry-prompt-input-padding, --dry-prompt-input-radius, --dry-prompt-input-textarea-min-height
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
@@ -2955,7 +2955,7 @@ Root import: import { Badge } from '@dryui/ui'
 Subpath import: import { Badge } from '@dryui/ui/badge'
 Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (BadgeColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-badge-bg, --dry-badge-border, --dry-badge-color, --dry-badge-default-bg, --dry-badge-default-color, --dry-badge-font-size, --dry-badge-padding-x, --dry-badge-padding-y, --dry-badge-radius
+CSS variables: none
 Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
 Accessibility: none
 Example:
