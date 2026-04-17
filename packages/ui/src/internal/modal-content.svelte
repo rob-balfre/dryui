@@ -73,19 +73,16 @@
 	class={className}
 	{...rest}
 >
-	{#if variant === 'alert-dialog'}
+	<div
+		data-modal-panel
+		data-variant={variant}
+		data-side={side}
+		data-dialog-panel={variant === 'dialog' ? '' : undefined}
+		data-drawer-panel={variant === 'drawer' ? '' : undefined}
+		data-alert-dialog-panel={variant === 'alert-dialog' ? '' : undefined}
+	>
 		{@render children()}
-	{:else}
-		<div
-			data-modal-panel
-			data-variant={variant}
-			data-side={side}
-			data-dialog-panel={variant === 'dialog' ? '' : undefined}
-			data-drawer-panel={variant === 'drawer' ? '' : undefined}
-		>
-			{@render children()}
-		</div>
-	{/if}
+	</div>
 </dialog>
 
 <style>
@@ -165,30 +162,18 @@
 		}
 	}
 
-	/* ---------- AlertDialog (center, no panel wrapper) ---------- */
+	/* ---------- AlertDialog (center) ---------- */
 
 	[data-modal-content][data-variant='alert-dialog'] {
-		--dry-dialog-bg: var(--dry-color-bg-overlay);
-		--dry-dialog-border: var(--dry-color-stroke-weak);
-		--dry-dialog-radius: var(--dry-radius-xl);
-		--dry-dialog-shadow: var(--dry-shadow-overlay);
-		--dry-dialog-padding: var(--dry-space-6);
-		--dry-dialog-max-width: 32rem;
-
-		border: 1px solid var(--dry-dialog-border);
-		border-radius: var(--dry-dialog-radius);
-		background: var(--dry-dialog-bg);
-		color: var(--dry-color-text-strong);
-		box-shadow: var(--dry-dialog-shadow);
+		/* dryui-allow width */
+		width: 100vw;
+		/* dryui-allow width */
+		max-width: none;
 		display: grid;
-		grid-template-columns: min(var(--dry-dialog-max-width), 90vw);
-		margin: auto;
-		padding: 0;
-		max-height: 85vh;
-
-		transition:
-			opacity var(--dry-duration-normal) var(--dry-ease-spring-snappy),
-			transform var(--dry-duration-normal) var(--dry-ease-spring-snappy);
+		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));
+		place-content: center;
+		place-items: center;
+		overflow: visible;
 	}
 
 	[data-modal-content][data-variant='alert-dialog']::backdrop {
@@ -197,13 +182,39 @@
 		-webkit-backdrop-filter: blur(var(--dry-overlay-blur, 4px));
 	}
 
-	[data-modal-content][data-variant='alert-dialog'][data-state='open'] {
+	[data-modal-panel][data-variant='alert-dialog'] {
+		--dry-dialog-bg: var(--dry-color-bg-overlay);
+		--dry-dialog-border: var(--dry-color-stroke-weak);
+		--dry-dialog-radius: var(--dry-radius-xl);
+		--dry-dialog-shadow: var(--dry-shadow-overlay);
+		--dry-dialog-padding: var(--dry-space-6);
+		--dry-dialog-max-width: 32rem;
+
+		container-type: inline-size;
+		justify-self: stretch;
+		border: 1px solid var(--dry-dialog-border);
+		border-radius: var(--dry-dialog-radius);
+		background: var(--dry-dialog-bg);
+		color: var(--dry-color-text-strong);
+		box-shadow: var(--dry-dialog-shadow);
+		padding: 0;
+		max-block-size: 85vh;
+		display: grid;
+		grid-template-rows: max-content minmax(0, 1fr) max-content;
+		overflow: hidden;
+
+		transition:
+			opacity var(--dry-duration-normal) var(--dry-ease-spring-snappy),
+			transform var(--dry-duration-normal) var(--dry-ease-spring-snappy);
+	}
+
+	[data-modal-content][data-variant='alert-dialog'][data-state='open'] [data-modal-panel] {
 		opacity: 1;
 		transform: scale(1) translateY(0);
 	}
 
 	@starting-style {
-		[data-modal-content][data-variant='alert-dialog'][open] {
+		[data-modal-content][data-variant='alert-dialog'][open] [data-modal-panel] {
 			opacity: 0;
 			transform: scale(var(--dry-motion-scale-enter)) translateY(var(--dry-motion-distance-sm));
 		}
@@ -313,8 +324,7 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		[data-modal-panel],
-		[data-modal-content][data-variant='alert-dialog'] {
+		[data-modal-panel] {
 			transition: none;
 		}
 	}

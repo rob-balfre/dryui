@@ -672,7 +672,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/alert-dialog
 Parts: Root, Trigger, Content, Overlay, Header, Body, Footer, Action, Cancel
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component., required | Body: children (Snippet), Content rendered inside the component., required | Footer: children (Snippet), Content rendered inside the component., required | Action: children (Snippet), Content rendered inside the component., required | Cancel: children (Snippet), Content rendered inside the component., required
-Data attributes: data-alert-dialog-body | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-trigger | data-state
+Data attributes: data-alert-dialog-body | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-panel | data-alert-dialog-trigger | data-state
 Example: <AlertDialog.Root>
 
 ### Drawer
