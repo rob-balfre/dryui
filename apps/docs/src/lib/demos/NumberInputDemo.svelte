@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { NumberInput, Field, Label, Text } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	let small = $state(1);
 	let medium = $state(8);
@@ -7,7 +8,7 @@
 	let quantity = $state(3);
 </script>
 
-<div class="demo">
+<DocsDemo gap="xl">
 	<div class="sizes">
 		<div class="row">
 			<Text size="xs" color="secondary" weight="medium">size="sm"</Text>
@@ -34,14 +35,9 @@
 		</Field.Root>
 		<Text size="sm" color="secondary">Subtotal: ${(quantity * 129).toFixed(2)}</Text>
 	</div>
-</div>
+</DocsDemo>
 
 <style>
-	.demo {
-		display: grid;
-		gap: var(--dry-space-6);
-	}
-
 	.sizes {
 		display: grid;
 		gap: var(--dry-space-3);

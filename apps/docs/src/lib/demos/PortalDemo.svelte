@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { Portal, Button, Card, Badge, Text } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	let portaled = $state(true);
 	let targetEl: HTMLElement | undefined = $state();
 	let canPortal = $derived(portaled && targetEl != null);
 </script>
 
-<div class="demo">
+<DocsDemo>
 	<div class="source">
 		<Text color="secondary" size="sm">Source location</Text>
 		<Card.Root>
@@ -33,14 +34,9 @@
 	<Button variant="outline" size="sm" onclick={() => (portaled = !portaled)}>
 		{portaled ? 'Disable portal (render inline)' : 'Enable portal (teleport)'}
 	</Button>
-</div>
+</DocsDemo>
 
 <style>
-	.demo {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-
 	.source-inner {
 		display: grid;
 		gap: var(--dry-space-2);

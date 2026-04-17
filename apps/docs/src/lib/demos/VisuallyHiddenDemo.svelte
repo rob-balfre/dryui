@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button, Heading, Text, VisuallyHidden } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	const viewModes = ['Standard', 'Focus', 'Notes'] as const;
 
@@ -24,15 +25,17 @@
 	}
 </script>
 
-<div class="demo-shell">
-	<div class="demo-copy">
-		<Text as="p" size="sm" color="secondary">Common use case</Text>
-		<Heading level={3}>Icon-only controls with real text labels</Heading>
-		<Text as="p" size="sm" color="secondary">
-			<code>VisuallyHidden</code> keeps the visible UI minimal while giving each control a spoken name
-			in the accessibility tree.
-		</Text>
-	</div>
+<DocsDemo gap="lg">
+	{#snippet header()}
+		<div class="demo-copy">
+			<Text as="p" size="sm" color="secondary">Common use case</Text>
+			<Heading level={3}>Icon-only controls with real text labels</Heading>
+			<Text as="p" size="sm" color="secondary">
+				<code>VisuallyHidden</code> keeps the visible UI minimal while giving each control a spoken name
+				in the accessibility tree.
+			</Text>
+		</div>
+	{/snippet}
 
 	<div class="actions" role="group" aria-label="Icon-only button examples">
 		<Button
@@ -142,17 +145,12 @@
 			</div>
 		</div>
 	</div>
-</div>
+</DocsDemo>
 
 <style>
 	code {
 		font-family: var(--dry-font-mono);
 		font-size: var(--dry-text-sm-size);
-	}
-
-	.demo-shell {
-		display: grid;
-		gap: var(--dry-space-5);
 	}
 
 	.demo-copy {

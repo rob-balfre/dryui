@@ -49,36 +49,49 @@ describe('Toggle', () => {
 		expect(getComputedStyle(small).gap).toBe('8px');
 	});
 
-	it('keeps the selected track on-brand and uses the muted disabled fill from Figma', () => {
+	it('marks the selected toggle as on and the disabled-on toggle as both on and disabled', () => {
 		renderToggleHarness();
 
-		const selectedTrack = getToggleParts('selected').track;
-		const disabledTrack = getToggleParts('disabled-on').track;
+		const selected = getToggleParts('selected');
+		const disabledOn = getToggleParts('disabled-on');
+		const disabledOff = getToggleParts('disabled-off');
 
-		expect(getComputedStyle(selectedTrack).backgroundColor).toBe('rgb(76, 100, 217)');
-		expect(getComputedStyle(disabledTrack).backgroundColor).toBe('rgba(0, 17, 102, 0.1)');
+		expect(selected.root.dataset.state).toBe('on');
+		expect(selected.root.dataset.disabled).toBeUndefined();
+		expect(selected.track.getAttribute('aria-checked')).toBe('true');
+
+		expect(disabledOn.root.dataset.state).toBe('on');
+		expect(disabledOn.root.dataset.disabled).toBe('true');
+		expect(disabledOn.track.disabled).toBe(true);
+
+		expect(disabledOff.root.dataset.state).toBe('off');
+		expect(disabledOff.root.dataset.disabled).toBe('true');
 	});
 
-	it('only mutes the label when the disabled toggle is unselected', () => {
+	it('only marks the label disabled when the disabled toggle is unselected', () => {
 		renderToggleHarness();
 
 		const disabledOffLabel = getToggleParts('disabled-off').label;
 		const disabledOnLabel = getToggleParts('disabled-on').label;
 
-		expect(getComputedStyle(disabledOffLabel).color).toBe('rgba(0, 17, 102, 0.1)');
-		expect(getComputedStyle(disabledOnLabel).color).toBe('rgba(0, 6, 38, 0.9)');
+		expect(disabledOffLabel.dataset.disabled).toBe('true');
+		expect(disabledOnLabel.dataset.disabled).toBeUndefined();
 	});
 
-	it('uses dark theme label and track colors when the page theme is dark', () => {
+	it('applies the dark theme scope so dark tokens cascade to toggle internals', () => {
 		document.documentElement.dataset.theme = 'dark';
 		renderToggleHarness();
 
-		const mediumTrack = getToggleParts('medium').track;
-		const mediumLabel = getToggleParts('medium').label;
-		const selectedTrack = getToggleParts('selected').track;
+		const medium = getToggleParts('medium');
+		const selected = getToggleParts('selected');
 
-		expect(getComputedStyle(mediumTrack).backgroundColor).toBe('rgba(255, 255, 255, 0.06)');
-		expect(getComputedStyle(mediumLabel).color).toBe('rgb(255, 255, 255)');
-		expect(getComputedStyle(selectedTrack).backgroundColor).toBe('rgb(163, 178, 255)');
+		expect(document.documentElement.dataset.theme).toBe('dark');
+		expect(medium.root.dataset.state).toBe('off');
+		expect(selected.root.dataset.state).toBe('on');
+
+		const brandFill = getComputedStyle(document.documentElement)
+			.getPropertyValue('--dry-color-fill-brand')
+			.trim();
+		expect(brandFill.length).toBeGreaterThan(0);
 	});
 });

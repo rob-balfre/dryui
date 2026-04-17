@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button, Card, Text, Tour } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	let active = $state(false);
 
@@ -19,7 +20,7 @@
 	];
 </script>
 
-<div class="tour-demo">
+<DocsDemo>
 	<Button onclick={() => (active = true)}>Start Tour</Button>
 
 	<div class="tour-grid">
@@ -41,19 +42,13 @@
 			</Card.Content>
 		</Card.Root>
 	</div>
-</div>
+</DocsDemo>
 
 <Tour.Root bind:active {steps}>
 	<Tour.Tooltip />
 </Tour.Root>
 
 <style>
-	.tour-demo {
-		container-type: inline-size;
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-
 	.tour-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));

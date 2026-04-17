@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Backdrop, Button, Card, Text } from '@dryui/ui';
+	import DocsDemo from '$lib/components/DocsDemo.svelte';
 
 	let open = $state(false);
 
@@ -14,10 +15,12 @@
 	}
 </script>
 
-<div class="backdrop-demo">
-	<Button variant="outline" onclick={() => (open = true)}>Show Backdrop</Button>
-	<Text color="secondary">Open the preview to verify the backdrop blur and dismissal.</Text>
-</div>
+<DocsDemo gap="sm">
+	<div class="backdrop-trigger">
+		<Button variant="outline" onclick={() => (open = true)}>Show Backdrop</Button>
+		<Text color="secondary">Open the preview to verify the backdrop blur and dismissal.</Text>
+	</div>
+</DocsDemo>
 
 <Backdrop
 	{open}
@@ -47,7 +50,7 @@
 </Backdrop>
 
 <style>
-	.backdrop-demo {
+	.backdrop-trigger {
 		display: grid;
 		justify-items: start;
 		gap: var(--dry-space-3);
