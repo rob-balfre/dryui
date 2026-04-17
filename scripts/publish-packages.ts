@@ -17,13 +17,15 @@
  *   bun scripts/publish-packages.ts --dry-run # swap, skip publish, restore
  */
 
-import { readdirSync, existsSync } from 'node:fs';
+import { readdirSync, existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports, type ExportSwapBackup } from './lib/export-swap.ts';
+import { verifyPackageDist, formatIssues, type VerifyIssue } from './lib/verify-dist.ts';
 
 const dryRun = process.argv.includes('--dry-run');
+const skipBuild = process.argv.includes('--skip-build');
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..');
 const packagesDir = resolve(repoRoot, 'packages');
@@ -32,6 +34,20 @@ const pkgPaths: string[] = [];
 for (const entry of readdirSync(packagesDir)) {
 	const pkgJson = resolve(packagesDir, entry, 'package.json');
 	if (existsSync(pkgJson)) pkgPaths.push(pkgJson);
+}
+
+function isPublishable(pkgPath: string): boolean {
+	const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
+	return pkg.private !== true;
+}
+
+if (skipBuild) {
+	console.log(
+		'publish-packages: --skip-build set, skipping build step (caller is expected to have built)'
+	);
+} else {
+	console.log('publish-packages: building every publishable package before publish…');
+	execSync('bun run build:packages', { cwd: repoRoot, stdio: 'inherit' });
 }
 
 const backups: Array<{ pkgPath: string; backup: ExportSwapBackup }> = [];
@@ -46,6 +62,22 @@ try {
 	for (const pkgPath of swapped) {
 		console.log(`  - ${pkgPath.replace(repoRoot + '/', '')}`);
 	}
+
+	console.log('publish-packages: verifying dist for every publishable package…');
+	const allIssues: VerifyIssue[] = [];
+	for (const pkgPath of pkgPaths) {
+		if (!isPublishable(pkgPath)) continue;
+		allIssues.push(...verifyPackageDist(pkgPath));
+	}
+
+	if (allIssues.length > 0) {
+		console.error(
+			`publish-packages: ${allIssues.length} dist issue(s) detected — aborting before publish`
+		);
+		console.error(formatIssues(allIssues, repoRoot));
+		process.exit(1);
+	}
+	console.log('publish-packages: dist verification passed');
 
 	if (dryRun) {
 		console.log('publish-packages: --dry-run set, skipping changeset publish');

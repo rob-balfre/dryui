@@ -30,11 +30,26 @@
     "dist"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "svelte": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "svelte": "./dist/index.js",
+        "default": "./dist/index.js"
+      },
+      "./engine": {
+        "types": "./dist/engine/index.d.ts",
+        "default": "./dist/engine/index.js"
+      }
+    }
   },
   "scripts": {
     "build": "svelte-package -i src",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "prepack": "bun ../../scripts/prepack-exports.ts",
+    "postpack": "bun ../../scripts/postpack-exports.ts"
   },
   "peerDependencies": {
     "@dryui/primitives": "^1.2.0",

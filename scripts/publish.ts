@@ -21,9 +21,11 @@
  */
 
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { execSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports } from './lib/export-swap.ts';
+import { verifyPackageDist, formatIssues } from './lib/verify-dist.ts';
 
 const args = process.argv.slice(2);
 const packageDir = args[0];
@@ -50,6 +52,17 @@ console.log(`Publishing ${name}@${version} from ${packageDir}`);
 const backup = swapExportsForPublish(pkgPath);
 
 try {
+	const scriptDir = dirname(fileURLToPath(import.meta.url));
+	const repoRoot = resolve(scriptDir, '..');
+	const issues = verifyPackageDist(pkgPath);
+	if (issues.length > 0) {
+		console.error(`\n  ✗ dist verification failed for ${name}@${version}`);
+		console.error(formatIssues(issues, repoRoot));
+		console.error('\n  Run the package build (e.g. `bun run --filter <name> build`) and retry.');
+		process.exit(1);
+	}
+	console.log('  dist verification passed');
+
 	const otpFlag = otp ? `--otp=${otp}` : '';
 	const dryRunFlag = dryRun ? '--dry-run' : '';
 	const cmd = `npm publish --access public ${otpFlag} ${dryRunFlag}`.trim();
