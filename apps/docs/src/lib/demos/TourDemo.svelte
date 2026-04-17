@@ -21,26 +21,30 @@
 </script>
 
 <DocsDemo>
-	<Button onclick={() => (active = true)}>Start Tour</Button>
+	<div class="tour-demo-layout">
+		<div class="tour-demo-actions">
+			<Button onclick={() => (active = true)}>Start Tour</Button>
+		</div>
 
-	<div class="tour-grid">
-		<Card.Root id="tour-demo-plan">
-			<Card.Content>
-				<div class="tour-card-copy">
-					<strong class="tour-card-title">Plan review</strong>
-					<Text color="secondary">Check prerequisites before publishing.</Text>
-				</div>
-			</Card.Content>
-		</Card.Root>
+		<div class="tour-grid">
+			<Card.Root id="tour-demo-plan">
+				<Card.Content>
+					<div class="tour-card-copy">
+						<strong class="tour-card-title">Plan review</strong>
+						<Text color="secondary">Check prerequisites before publishing.</Text>
+					</div>
+				</Card.Content>
+			</Card.Root>
 
-		<Card.Root id="tour-demo-launch">
-			<Card.Content>
-				<div class="tour-card-copy">
-					<strong class="tour-card-title">Launch checklist</strong>
-					<Text color="secondary">Verify QA, docs, and rollout owners.</Text>
-				</div>
-			</Card.Content>
-		</Card.Root>
+			<Card.Root id="tour-demo-launch">
+				<Card.Content>
+					<div class="tour-card-copy">
+						<strong class="tour-card-title">Launch checklist</strong>
+						<Text color="secondary">Verify QA, docs, and rollout owners.</Text>
+					</div>
+				</Card.Content>
+			</Card.Root>
+		</div>
 	</div>
 </DocsDemo>
 
@@ -49,6 +53,18 @@
 </Tour.Root>
 
 <style>
+	.tour-demo-layout {
+		display: grid;
+		gap: var(--dry-space-4);
+	}
+
+	.tour-demo-actions {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: start;
+	}
+
 	.tour-grid {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));

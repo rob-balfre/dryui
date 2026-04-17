@@ -7,6 +7,7 @@
 		Button,
 		ColorPicker,
 		Container,
+		Heading,
 		MegaMenu,
 		OptionPicker,
 		Slider,
@@ -51,7 +52,6 @@
 	} from 'lucide-svelte';
 	import { isDarkTheme } from '$lib/theme.svelte.js';
 	import PreviewComponents from '$lib/theme-wizard/PreviewComponents.svelte';
-	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
@@ -95,6 +95,24 @@
 
 	function thumbSlug(name: string): string {
 		return name.toLowerCase().replace(/\s+/g, '-');
+	}
+
+	function brandHex(brand: BrandInput): string {
+		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
+		return hslToHex(hsl.h, hsl.s, hsl.l);
+	}
+
+	function recipeBrandHex(preset: RecipePreset): string {
+		return brandHex(preset.recipe.brand);
+	}
+
+	function cssVar(name: string, value: string) {
+		return (node: HTMLElement) => {
+			node.style.setProperty(name, value);
+			return () => {
+				node.style.removeProperty(name);
+			};
+		};
 	}
 
 	function isSameBrand(current: BrandInput, candidate: BrandInput): boolean {
@@ -265,117 +283,57 @@
 
 <div class="wizard-page">
 	<Container size="xl">
-		<div class="bar-actions top-bar-actions">
-			<div class="wizard-toggle-scope">
-				<ThemeToggle />
+		<header class="wizard-header">
+			<div class="wizard-title">
+				<Heading level={1}>Theme Wizard</Heading>
 			</div>
-			<div class="wizard-action-scope">
-				<Button
-					variant="secondary"
-					size="sm"
-					onclick={() => {
-						resetToDefaults();
-						resetAdjust();
-					}}>Reset</Button
-				>
+			<div class="wizard-description">
+				<Text size="lg" color="secondary">Build a custom theme, preview updates live.</Text>
 			</div>
-			<div class="wizard-action-scope wizard-action-scope-primary">
-				<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
-			</div>
-			<div class="wizard-action-scope">
-				<Button variant="secondary" size="sm" onclick={handleCopyCss}>
-					{copyFeedback || 'Copy CSS'}
-				</Button>
-			</div>
-		</div>
-	</Container>
-
-	<Container size="xl">
-		<DocsPageHeader
-			title="Theme Wizard"
-			description="Build a custom theme, preview updates live."
-		/>
+		</header>
 	</Container>
 
 	<Container size="md">
 		<div class="control-bar">
+			<div class="wizard-toggle-scope">
+				<ThemeToggle />
+			</div>
 			<div class="menu-area">
 				<MegaMenu.Root>
 					<MegaMenu.Item>
 						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" /> Preset</MegaMenu.Trigger>
-						<MegaMenu.Panel>
-							<MegaMenu.Column title="Starting points">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										columns={1}
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-									>
-										{#each startingPresets as preset (preset.name)}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													data-preset-thumb={thumbSlug(preset.name)}
-												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Technical">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										columns={1}
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-									>
-										{#each technicalPresets as preset (preset.name)}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													data-preset-thumb={thumbSlug(preset.name)}
-												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
-							<MegaMenu.Column title="Editorial">
-								<div class="wizard-option-scope wizard-option-list">
-									<OptionPicker.Root
-										columns={1}
-										bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-									>
-										{#each editorialPresets as preset (preset.name)}
-											<OptionPicker.Item value={preset.name}>
-												<OptionPicker.Preview
-													variant="preset"
-													data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-													data-preset-thumb={thumbSlug(preset.name)}
-												>
-													<span class="preset-thumb-text">Ag</span>
-												</OptionPicker.Preview>
-												<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-												<OptionPicker.Description>{preset.description}</OptionPicker.Description>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
-							</MegaMenu.Column>
+						<MegaMenu.Panel align="center">
+							{#each [['Starting points', startingPresets], ['Technical', technicalPresets], ['Editorial', editorialPresets]] as const as [title, group] (title)}
+								<MegaMenu.Column {title}>
+									<div class="wizard-option-scope wizard-option-list wizard-preset-column">
+										<OptionPicker.Root
+											columns={1}
+											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+										>
+											{#each group as preset (preset.name)}
+												<OptionPicker.Item value={preset.name} size="compact">
+													<OptionPicker.Preview
+														variant="preset"
+														data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+														data-preset-thumb={thumbSlug(preset.name)}
+														{@attach cssVar('--_preset-color', recipeBrandHex(preset))}
+													>
+														<span class="preset-thumb-text">Ag</span>
+													</OptionPicker.Preview>
+													<OptionPicker.Label>{preset.name}</OptionPicker.Label>
+													<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+												</OptionPicker.Item>
+											{/each}
+										</OptionPicker.Root>
+									</div>
+								</MegaMenu.Column>
+							{/each}
 						</MegaMenu.Panel>
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" /> Colour</MegaMenu.Trigger>
-						<MegaMenu.Panel fullWidth>
+						<MegaMenu.Panel align="center" fullWidth>
 							<MegaMenu.Column title="Picker">
 								<ColorPicker.Root
 									bind:value={() => brandHsbToHex(wizardState.brandHsb), setBrandFromHex}
@@ -389,7 +347,7 @@
 							<MegaMenu.Column title="Presets">
 								<div class="wizard-option-scope wizard-color-options">
 									<OptionPicker.Root
-										columns={2}
+										columns={3}
 										bind:value={getSelectedBrandPresetName, applyBrandPresetName}
 									>
 										{#each PRESETS as preset (preset.name)}
@@ -402,6 +360,7 @@
 											>
 												<OptionPicker.Preview
 													shape="circle"
+													color={brandHex(preset.brandInput)}
 													data-color-thumb={thumbSlug(preset.name)}
 												/>
 												<VisuallyHidden>{preset.name}</VisuallyHidden>
@@ -415,7 +374,7 @@
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger><Type size={14} aria-hidden="true" /> Typography</MegaMenu.Trigger>
-						<MegaMenu.Panel>
+						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Font family">
 								<div class="wizard-option-scope wizard-option-grid wizard-font-options">
 									<OptionPicker.Root
@@ -424,7 +383,14 @@
 									>
 										{#each Object.keys(FONT_STACKS) as name (name)}
 											<OptionPicker.Item value={name} layout="stacked" size="visual">
-												<OptionPicker.Preview variant="font" data-font-thumb={name}>
+												<OptionPicker.Preview
+													variant="font"
+													data-font-thumb={name}
+													{@attach cssVar(
+														'--_preset-font',
+														FONT_STACKS[name as keyof typeof FONT_STACKS]
+													)}
+												>
 													<span class="font-preview-glyph">Ag</span>
 												</OptionPicker.Preview>
 												<OptionPicker.Label>{name}</OptionPicker.Label>
@@ -452,7 +418,7 @@
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" /> Shape</MegaMenu.Trigger>
-						<MegaMenu.Panel>
+						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Style">
 								<div class="wizard-option-scope wizard-option-list">
 									<OptionPicker.Root
@@ -503,7 +469,7 @@
 						<MegaMenu.Trigger
 							><SlidersHorizontal size={14} aria-hidden="true" /> Adjust</MegaMenu.Trigger
 						>
-						<MegaMenu.Panel>
+						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Filters">
 								<div class="adjust-controls">
 									<div class="adjust-row">
@@ -557,7 +523,7 @@
 							{/if}
 							Contrast
 						</MegaMenu.Trigger>
-						<MegaMenu.Panel>
+						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Light mode">
 								{#each lightContrast as check (check.label)}
 									<div class="contrast-result">
@@ -591,6 +557,27 @@
 						</MegaMenu.Panel>
 					</MegaMenu.Item>
 				</MegaMenu.Root>
+			</div>
+		</div>
+
+		<div class="bar-actions below-bar-actions">
+			<div class="wizard-action-scope">
+				<Button
+					variant="secondary"
+					size="sm"
+					onclick={() => {
+						resetToDefaults();
+						resetAdjust();
+					}}>Reset</Button
+				>
+			</div>
+			<div class="wizard-action-scope wizard-action-scope-primary">
+				<Button variant="solid" size="sm" onclick={handleDownload}>Download CSS</Button>
+			</div>
+			<div class="wizard-action-scope">
+				<Button variant="secondary" size="sm" onclick={handleCopyCss}>
+					{copyFeedback || 'Copy CSS'}
+				</Button>
 			</div>
 		</div>
 	</Container>
@@ -646,18 +633,42 @@
 		padding-block: var(--dry-space-4) var(--dry-space-10);
 	}
 
-	.control-bar {
+	.wizard-header {
 		display: grid;
 		justify-items: center;
-		padding: var(--dry-space-2) var(--dry-space-3);
+		gap: var(--dry-space-2);
+		text-align: center;
+	}
+
+	.wizard-title {
+		font-size: clamp(2rem, 4vw, 2.75rem);
+		letter-spacing: -0.03em;
+	}
+
+	.wizard-description {
+		display: grid;
+		grid-template-columns: minmax(0, 64ch);
+		line-height: 1.7;
+	}
+
+	.control-bar {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		justify-self: center;
+		gap: var(--dry-space-1);
+		padding-inline: var(--dry-space-2);
+		padding-block: var(--dry-space-1);
 		border: 1px solid
 			color-mix(in srgb, var(--dry-color-stroke-weak) 76%, var(--dry-color-fill-brand) 24%);
 		border-radius: var(--dry-radius-lg);
 		background: color-mix(in srgb, var(--dry-color-bg-raised) 94%, var(--dry-color-fill-brand) 6%);
 	}
 
-	.top-bar-actions {
-		justify-self: end;
+	.below-bar-actions {
+		justify-self: center;
+		padding-top: var(--dry-space-3);
 	}
 
 	.menu-area {
@@ -741,6 +752,10 @@
 	.wizard-corner-options {
 		--dry-option-picker-gap: var(--dry-space-2);
 		--dry-option-picker-visual-min-block-size: 5rem;
+	}
+
+	.wizard-preset-column {
+		grid-template-columns: minmax(14rem, 16rem);
 	}
 
 	/* ─── Preset items ────────────────────────────────────────────────────── */

@@ -20,10 +20,30 @@
 
 	let { class: className, position = 'bottom-right', children, ...rest }: Props = $props();
 	const visible = $derived(Boolean(children) || toastStore.toasts.length > 0);
+
+	let panelEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!panelEl) return;
+		if (visible) {
+			try {
+				if (!panelEl.matches(':popover-open')) panelEl.showPopover();
+			} catch {
+				// already open
+			}
+		} else {
+			try {
+				if (panelEl.matches(':popover-open')) panelEl.hidePopover();
+			} catch {
+				// already closed
+			}
+		}
+	});
 </script>
 
 <div
-	hidden={!visible}
+	bind:this={panelEl}
+	popover="manual"
 	role="region"
 	aria-label="Notifications"
 	data-part="provider"
@@ -71,6 +91,7 @@
 		margin: 0;
 		border: none;
 		background: transparent;
+		color: inherit;
 		overflow: visible;
 		container-type: inline-size;
 

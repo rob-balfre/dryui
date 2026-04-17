@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { Portal } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		open?: boolean;
@@ -12,15 +13,17 @@
 </script>
 
 {#if open}
-	<div
-		data-backdrop
-		data-invisible={invisible || undefined}
-		aria-hidden={children ? undefined : true}
-		class={className}
-		{...rest}
-	>
-		{#if children}{@render children()}{/if}
-	</div>
+	<Portal>
+		<div
+			data-backdrop
+			data-invisible={invisible || undefined}
+			aria-hidden={children ? undefined : true}
+			class={className}
+			{...rest}
+		>
+			{#if children}{@render children()}{/if}
+		</div>
+	</Portal>
 {/if}
 
 <style>

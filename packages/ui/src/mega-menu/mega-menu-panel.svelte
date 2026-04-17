@@ -7,10 +7,18 @@
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		fullWidth?: boolean;
+		align?: 'start' | 'center' | 'end';
 		children: Snippet;
 	}
 
-	let { fullWidth = false, class: className, children, style, ...rest }: Props = $props();
+	let {
+		fullWidth = false,
+		align = 'start',
+		class: className,
+		children,
+		style,
+		...rest
+	}: Props = $props();
 
 	const ctx = getMegaMenuCtx();
 	const itemCtx = getMegaMenuItemCtx();
@@ -18,9 +26,13 @@
 	let panelEl = $state<HTMLDivElement | null>(null);
 
 	const popover = createPositionedPopover({
-		triggerEl: () => document.getElementById(itemCtx.triggerId),
+		triggerEl: () => (align === 'center' ? ctx.rootEl : document.getElementById(itemCtx.triggerId)),
 		contentEl: () => panelEl ?? null,
-		placement: () => 'bottom-start',
+		placement: () => {
+			if (align === 'center') return 'bottom';
+			if (align === 'end') return 'bottom-end';
+			return 'bottom-start';
+		},
 		offset: () => 4
 	});
 

@@ -74,7 +74,8 @@ function getCSSStyles(
 		} else if (align === 'end') {
 			styles.right = `anchor(right)`;
 		} else {
-			styles['justify-self'] = 'anchor-center';
+			styles.left = `anchor(center)`;
+			styles.translate = '-50% 0';
 		}
 	} else {
 		if (align === 'start') {
@@ -82,7 +83,8 @@ function getCSSStyles(
 		} else if (align === 'end') {
 			styles.bottom = `anchor(bottom)`;
 		} else {
-			styles['align-self'] = 'anchor-center';
+			styles.top = `anchor(center)`;
+			styles.translate = '0 -50%';
 		}
 	}
 
@@ -102,15 +104,35 @@ export function createAnchorPosition(
 
 	$effect(() => {
 		const ref = referenceEl();
-		if (!ref) return;
+		const floating = floatingEl();
+		if (!ref || !floating) return;
 
 		// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
-		ref.style.anchorName = anchorName;
+		const prev = ref.style.anchorName;
+		// Preserve any existing anchor-name by appending, so shared-anchor scenarios
+		// (multiple panels anchored to the same root) don't stomp each other.
+		const names = new Set(
+			(prev || '')
+				.split(',')
+				.map((s) => s.trim())
+				.filter(Boolean)
+		);
+		names.add(anchorName);
+		// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
+		ref.style.anchorName = [...names].join(', ');
 		styles = getCSSStyles(placement, offset, anchorName);
 
 		return () => {
+			const current = new Set(
+				// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
+				(ref.style.anchorName || '')
+					.split(',')
+					.map((s: string) => s.trim())
+					.filter(Boolean)
+			);
+			current.delete(anchorName);
 			// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
-			ref.style.anchorName = '';
+			ref.style.anchorName = current.size > 0 ? [...current].join(', ') : '';
 		};
 	});
 
