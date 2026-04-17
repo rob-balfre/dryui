@@ -144,6 +144,20 @@
 		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 		mediaQuery.addEventListener('change', scheduleRefresh);
 
+		const viewportObserver =
+			typeof IntersectionObserver === 'undefined'
+				? null
+				: new IntersectionObserver(
+						(entries) => {
+							for (const entry of entries) {
+								if (entry.isIntersecting) node.removeAttribute('data-offscreen');
+								else node.setAttribute('data-offscreen', '');
+							}
+						},
+						{ rootMargin: '200px' }
+					);
+		viewportObserver?.observe(node);
+
 		const handleAnimationEnd = (event: Event) => {
 			const animationEvent = event as AnimationEvent;
 			const animationName = animationEvent.animationName;
@@ -192,6 +206,7 @@
 			cancelAnimationFrame(animationFrame);
 			resizeObserver.disconnect();
 			childObserver.disconnect();
+			viewportObserver?.disconnect();
 			mediaQuery.removeEventListener('change', scheduleRefresh);
 			node.removeEventListener('animationend', handleAnimationEnd);
 			styleElement.remove();

@@ -17,7 +17,7 @@
 		Tabs,
 		Text
 	} from '@dryui/ui';
-	import { Check, ExternalLink, Maximize2, MessageSquare, RefreshCw } from 'lucide-svelte';
+	import { Check, ExternalLink, MessageSquare, RefreshCw } from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
 
@@ -343,15 +343,6 @@ Use the dryui-feedback MCP server:
 			<Alert variant="error">{error}</Alert>
 		{/if}
 
-		<div class="prompt-block">
-			<CodeBlock code={promptText} language="text" />
-			<Text as="span" size="xs" color="secondary">
-				{selectedSubmission
-					? 'Copy this prompt to work on the selected submission'
-					: 'Copy this prompt to work on all pending submissions'}
-			</Text>
-		</div>
-
 		<div class="workspace">
 			<div class="queue-panel">
 				<Card.Root variant="elevated" size="sm">
@@ -534,66 +525,65 @@ Use the dryui-feedback MCP server:
 				<Card.Content>
 					{#if selectedSubmission}
 						<div class="detail-stack">
-							<Dialog.Root>
-								<Dialog.Trigger>
-									<Button
-										variant="bare"
-										aria-label={`Open full screenshot for ${selectedSubmission.url}`}
-									>
-										<div class="screenshot-hero">
+							<div class="detail-top">
+								<Dialog.Root>
+									<Dialog.Trigger>
+										<Button
+											variant="bare"
+											class="screenshot-trigger"
+											aria-label={`Open full screenshot for ${selectedSubmission.url}`}
+										>
 											<Image
 												class="feedback-screenshot-thumb"
 												src={screenshotUrl(selectedSubmission.id)}
 												alt={`Feedback screenshot for ${selectedSubmission.url}`}
 												fallback="Screenshot unavailable"
 											/>
-											<span class="screenshot-hero-hint">
-												<Maximize2 size={12} aria-hidden="true" />
-												Click to expand
-											</span>
-										</div>
-									</Button>
-								</Dialog.Trigger>
-
-								<Dialog.Content class="feedback-screenshot-dialog">
-									<Dialog.Header>
-										<div class="screenshot-dialog-header">
-											<div class="screenshot-dialog-heading">
-												<Heading level={3}>Captured screenshot</Heading>
-												<Text as="span" size="sm" color="secondary">
-													{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-														selectedSubmission.viewport
-													)}
-												</Text>
-											</div>
-											<Dialog.Close aria-label="Close screenshot dialog">
-												<span aria-hidden="true">&times;</span>
-											</Dialog.Close>
-										</div>
-									</Dialog.Header>
-									<Dialog.Body class="screenshot-dialog-body">
-										<div class="screenshot-dialog-image">
-											<Image
-												class="feedback-screenshot-full"
-												src={screenshotUrl(selectedSubmission.id)}
-												alt={`Feedback screenshot for ${selectedSubmission.url}`}
-												fallback="Screenshot unavailable"
-											/>
-										</div>
-									</Dialog.Body>
-									<Dialog.Footer>
-										<Dialog.Close>Close</Dialog.Close>
-										<Button
-											href={selectedSubmission.url}
-											target="_blank"
-											rel="noreferrer"
-											variant="ghost"
-										>
-											Open page
 										</Button>
-									</Dialog.Footer>
-								</Dialog.Content>
-							</Dialog.Root>
+									</Dialog.Trigger>
+
+									<Dialog.Content class="feedback-screenshot-dialog">
+										<Dialog.Header>
+											<div class="screenshot-dialog-header">
+												<div class="screenshot-dialog-heading">
+													<Heading level={3}>Captured screenshot</Heading>
+													<Text as="span" size="sm" color="secondary">
+														{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+															selectedSubmission.viewport
+														)}
+													</Text>
+												</div>
+												<Dialog.Close aria-label="Close screenshot dialog">
+													<span aria-hidden="true">&times;</span>
+												</Dialog.Close>
+											</div>
+										</Dialog.Header>
+										<Dialog.Body class="screenshot-dialog-body">
+											<div class="screenshot-dialog-image">
+												<Image
+													class="feedback-screenshot-full"
+													src={screenshotUrl(selectedSubmission.id)}
+													alt={`Feedback screenshot for ${selectedSubmission.url}`}
+													fallback="Screenshot unavailable"
+												/>
+											</div>
+										</Dialog.Body>
+										<Dialog.Footer>
+											<Dialog.Close>Close</Dialog.Close>
+											<Button
+												href={selectedSubmission.url}
+												target="_blank"
+												rel="noreferrer"
+												variant="ghost"
+											>
+												Open page
+											</Button>
+										</Dialog.Footer>
+									</Dialog.Content>
+								</Dialog.Root>
+
+								<CodeBlock code={promptText} language="text" />
+							</div>
 
 							<section class="notes-section">
 								<header class="notes-head">
@@ -701,11 +691,6 @@ Use the dryui-feedback MCP server:
 		font-weight: 600;
 		color: var(--dry-color-text-strong);
 		letter-spacing: -0.01em;
-	}
-
-	.prompt-block {
-		display: grid;
-		gap: var(--dry-space-1_5);
 	}
 
 	.refresh-icon {
@@ -896,39 +881,15 @@ Use the dryui-feedback MCP server:
 		gap: var(--dry-space-3);
 	}
 
-	.screenshot-hero {
+	.detail-top {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: clamp(16rem, 28vh, 24rem);
-		place-items: center;
-		padding: var(--dry-space-3);
-		overflow: hidden;
-		background: var(--dry-color-surface);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-lg);
-		position: relative;
+		gap: var(--dry-space-3);
+		align-items: start;
 	}
 
-	.screenshot-hero-hint {
-		position: absolute;
-		inset-block-end: var(--dry-space-2);
-		inset-inline-end: var(--dry-space-2);
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		gap: var(--dry-space-1);
-		align-items: center;
-		padding: var(--dry-space-1) var(--dry-space-2);
-		font-size: var(--dry-font-size-xs, 0.75rem);
-		color: var(--dry-color-text-strong);
-		background: var(--dry-color-bg-raised, var(--dry-color-surface));
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-md);
-		opacity: 0.85;
-	}
-
-	.screenshot-hero:hover .screenshot-hero-hint {
-		opacity: 1;
+	.screenshot-trigger {
+		justify-self: start;
+		cursor: zoom-in;
 	}
 
 	.screenshot-dialog-heading {
@@ -1005,6 +966,10 @@ Use the dryui-feedback MCP server:
 
 		.detail-header {
 			grid-template-columns: minmax(0, 1fr) auto;
+		}
+
+		.detail-top {
+			grid-template-columns: auto minmax(0, 1fr);
 		}
 	}
 

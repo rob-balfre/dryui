@@ -79,9 +79,8 @@ body {
 .feedback-screenshot-thumb {
 	display: block;
 	max-inline-size: 100%;
-	max-block-size: 14rem;
-	background: var(--dry-color-surface);
-	border-radius: 0;
+	max-block-size: 9rem;
+	border-radius: var(--dry-radius-md);
 	object-fit: contain;
 }
 

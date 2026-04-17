@@ -721,7 +721,9 @@ function generateSmallVariantCSS(options: GenerateStylesOptions): string {
 
 	const hueShiftAnimation = staticColors
 		? ''
-		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;`;
+		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;
+  animation-play-state: var(--beam-play, running);
+  will-change: filter;`;
 
 	const hueShiftKeyframes = staticColors
 		? ''
@@ -828,12 +830,18 @@ function generateSmallVariantCSS(options: GenerateStylesOptions): string {
   animation:
     beam-spin-${id} ${duration}s linear infinite,
     beam-fade-in-${id} 0.6s ease forwards;
+  animation-play-state: var(--beam-play, running);
 }
 
 [data-beam="${id}"][data-fading] {
   animation:
     beam-spin-${id} ${duration}s linear infinite,
     beam-fade-out-${id} 0.5s ease forwards;
+  animation-play-state: var(--beam-play, running);
+}
+
+[data-beam="${id}"][data-offscreen] {
+  --beam-play: paused;
 }
 
 [data-beam="${id}"][data-active]::after,
@@ -962,7 +970,9 @@ function generateBorderVariantCSS(options: GenerateStylesOptions): string {
 
 	const hueShiftAnimation = staticColors
 		? ''
-		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;`;
+		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;
+  animation-play-state: var(--beam-play, running);
+  will-change: filter;`;
 
 	const hueShiftKeyframes = staticColors
 		? ''
@@ -1059,12 +1069,18 @@ function generateBorderVariantCSS(options: GenerateStylesOptions): string {
   animation:
     beam-spin-${id} ${duration}s linear infinite,
     beam-fade-in-${id} 0.6s ease forwards;
+  animation-play-state: var(--beam-play, running);
 }
 
 [data-beam="${id}"][data-fading] {
   animation:
     beam-spin-${id} ${duration}s linear infinite,
     beam-fade-out-${id} 0.5s ease forwards;
+  animation-play-state: var(--beam-play, running);
+}
+
+[data-beam="${id}"][data-offscreen] {
+  --beam-play: paused;
 }
 
 [data-beam="${id}"][data-active]::after,
@@ -1212,11 +1228,15 @@ function generateLineVariantCSS(options: GenerateStylesOptions): string {
 
 	const hueShiftAnimation = staticColors
 		? ''
-		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;`;
+		: `animation: beam-hue-shift-${id} 12s ease-in-out infinite;
+  animation-play-state: var(--beam-play, running);
+  will-change: filter;`;
 
 	const hueShiftBloomAnimation = staticColors
 		? ''
-		: `animation: beam-hue-shift-bloom-${id} 8s ease-in-out infinite;`;
+		: `animation: beam-hue-shift-bloom-${id} 8s ease-in-out infinite;
+  animation-play-state: var(--beam-play, running);
+  will-change: filter;`;
 
 	const hueShiftKeyframes = staticColors
 		? ''
@@ -1310,6 +1330,7 @@ function generateLineVariantCSS(options: GenerateStylesOptions): string {
     beam-spike-${id} ${(duration * 1.33).toFixed(1)}s ease-in-out infinite,
     beam-spike2-${id} ${(duration * 1.7).toFixed(1)}s ease-in-out infinite,
     beam-fade-in-${id} 0.6s ease forwards;
+  animation-play-state: var(--beam-play, running);
 }
 
 [data-beam="${id}"][data-fading] {
@@ -1320,6 +1341,11 @@ function generateLineVariantCSS(options: GenerateStylesOptions): string {
     beam-spike-${id} ${(duration * 1.33).toFixed(1)}s ease-in-out infinite,
     beam-spike2-${id} ${(duration * 1.7).toFixed(1)}s ease-in-out infinite,
     beam-fade-out-${id} 0.5s ease forwards;
+  animation-play-state: var(--beam-play, running);
+}
+
+[data-beam="${id}"][data-offscreen] {
+  --beam-play: paused;
 }
 
 [data-beam="${id}"][data-active]::after,
