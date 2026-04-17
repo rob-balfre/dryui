@@ -983,6 +983,9 @@
           "name": "data-alert-dialog-overlay"
         },
         {
+          "name": "data-alert-dialog-panel"
+        },
+        {
           "name": "data-alert-dialog-trigger"
         },
         {

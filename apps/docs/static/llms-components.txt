@@ -2310,7 +2310,7 @@ Structure:
     AlertDialog.Action
     AlertDialog.Cancel
 CSS variables: --dry-dialog-bg, --dry-dialog-border, --dry-dialog-max-width, --dry-dialog-padding, --dry-dialog-radius, --dry-dialog-shadow, --dry-section-border, --dry-section-padding
-Data attributes: data-alert-dialog-body | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-trigger | data-state
+Data attributes: data-alert-dialog-body | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-panel | data-alert-dialog-trigger | data-state
 Accessibility: none
 Example:
 ```svelte
