@@ -52,7 +52,7 @@
 	);
 	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
 
-	afterNavigate(() => {
+	afterNavigate((navigation) => {
 		if (dev && typeof window !== 'undefined') {
 			if (page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1') {
 				window.sessionStorage.setItem(FEEDBACK_SESSION_KEY, '1');
@@ -61,6 +61,14 @@
 				feedbackEnabled = window.sessionStorage.getItem(FEEDBACK_SESSION_KEY) === '1';
 			}
 		}
+
+		if (typeof document === 'undefined') return;
+		if (navigation.type === 'popstate') return;
+		const fromPath = navigation.from?.url.pathname;
+		const toPath = navigation.to?.url.pathname;
+		if (fromPath === toPath) return;
+		if (navigation.to?.url.hash) return;
+		document.querySelector('main.docs-content')?.scrollTo({ top: 0, behavior: 'instant' });
 	});
 </script>
 

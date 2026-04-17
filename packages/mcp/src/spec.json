@@ -17525,6 +17525,9 @@
           "description": "Present while the beam is playing its fade-out sequence."
         },
         {
+          "name": "data-offscreen"
+        },
+        {
           "name": "data-size",
           "description": "Reflects the current effect mode preset.",
           "values": [
