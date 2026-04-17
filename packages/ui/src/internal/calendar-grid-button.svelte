@@ -41,9 +41,10 @@
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		adapter: CalendarGridAdapter;
+		hideHeader?: boolean;
 	}
 
-	let { adapter, class: className, ...rest }: Props = $props();
+	let { adapter, hideHeader = false, class: className, ...rest }: Props = $props();
 
 	let containerEl = $state<HTMLDivElement>();
 
@@ -90,31 +91,33 @@
 
 <div {@attach bindContainer} class={className} {...rest} data-calendar-grid>
 	<div role="group" aria-label={monthYearLabel} data-calendar-panel>
-		<div data-calendar-header>
-			<Button
-				variant="trigger"
-				size="icon-sm"
-				type="button"
-				aria-label="Previous month"
-				disabled={adapter.disabled}
-				onclick={() => adapter.prevMonth()}
-			>
-				&#8249;
-			</Button>
-			<span aria-live="polite" aria-atomic="true" data-calendar-heading>
-				{monthYearLabel}
-			</span>
-			<Button
-				variant="trigger"
-				size="icon-sm"
-				type="button"
-				aria-label="Next month"
-				disabled={adapter.disabled}
-				onclick={() => adapter.nextMonth()}
-			>
-				&#8250;
-			</Button>
-		</div>
+		{#if !hideHeader}
+			<div data-calendar-header>
+				<Button
+					variant="trigger"
+					size="icon-sm"
+					type="button"
+					aria-label="Previous month"
+					disabled={adapter.disabled}
+					onclick={() => adapter.prevMonth()}
+				>
+					&#8249;
+				</Button>
+				<span aria-live="polite" aria-atomic="true" data-calendar-heading>
+					{monthYearLabel}
+				</span>
+				<Button
+					variant="trigger"
+					size="icon-sm"
+					type="button"
+					aria-label="Next month"
+					disabled={adapter.disabled}
+					onclick={() => adapter.nextMonth()}
+				>
+					&#8250;
+				</Button>
+			</div>
+		{/if}
 
 		<div role="grid" aria-label={monthYearLabel}>
 			<div role="row" data-calendar-row>

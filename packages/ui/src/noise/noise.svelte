@@ -85,6 +85,7 @@
 	[data-noise-texture] {
 		position: absolute;
 		inset: -24%;
+		z-index: 2;
 		pointer-events: none;
 		opacity: var(--dry-noise-opacity);
 		mix-blend-mode: var(--dry-noise-blend);

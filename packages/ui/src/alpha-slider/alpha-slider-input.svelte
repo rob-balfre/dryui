@@ -77,6 +77,8 @@
 
 	[data-alpha-slider-track-wrapper] {
 		position: relative;
+		display: grid;
+		grid-template-columns: 1fr;
 		height: var(--dry-space-4);
 		border-radius: var(--dry-radius-full);
 		overflow: hidden;
@@ -101,6 +103,8 @@
 
 	[data-alpha-slider-input] {
 		position: relative;
+		grid-column: 1;
+		grid-row: 1;
 		height: 100%;
 		appearance: none;
 		background: transparent;

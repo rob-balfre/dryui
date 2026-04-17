@@ -19,7 +19,6 @@
 		Spinner,
 		Table,
 		Text,
-		Textarea,
 		Toggle
 	} from '@dryui/ui';
 	import { isDarkTheme } from '$lib/theme.svelte.js';
@@ -58,188 +57,238 @@
 
 <div class="preview-root">
 	<div class="preview-mosaic">
-		<div class="preview-column">
-			<Card.Root size="sm">
-				<Card.Header>
-					<div class="panel-copy">
-						<Text as="span" weight="semibold">Payment Method</Text>
-						<Text color="muted">All transactions are secure and encrypted.</Text>
-					</div>
-				</Card.Header>
-				<Card.Content>
-					<div class="panel-stack">
-						<Field.Root>
-							<Label for="preview-card-name">Name on Card</Label>
-							<Input id="preview-card-name" value="John Doe" />
-						</Field.Root>
-
-						<div class="split-fields">
-							<Field.Root>
-								<Label for="preview-card-number">Card Number</Label>
-								<Input id="preview-card-number" value="1234 5678 9012 3456" />
-								<Text color="muted">Enter your 16-digit number.</Text>
-							</Field.Root>
-							<Field.Root>
-								<Label for="preview-card-cvv">CVV</Label>
-								<Input id="preview-card-cvv" value="123" />
-							</Field.Root>
-						</div>
-
-						<div class="split-fields">
-							<Field.Root>
-								<Label for="preview-card-month">Month</Label>
-								<Select.Root name="month">
-									<Select.Trigger id="preview-card-month">
-										<Select.Value placeholder="MM" />
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value="01">01</Select.Item>
-										<Select.Item value="02">02</Select.Item>
-										<Select.Item value="03">03</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</Field.Root>
-							<Field.Root>
-								<Label for="preview-card-year">Year</Label>
-								<Select.Root name="year">
-									<Select.Trigger id="preview-card-year">
-										<Select.Value placeholder="YYYY" />
-									</Select.Trigger>
-									<Select.Content>
-										<Select.Item value="2026">2026</Select.Item>
-										<Select.Item value="2027">2027</Select.Item>
-										<Select.Item value="2028">2028</Select.Item>
-									</Select.Content>
-								</Select.Root>
-							</Field.Root>
-						</div>
-
-						<div class="panel-divider"></div>
-
+		<div class="preview-left-pair">
+			<div class="preview-column">
+				<Card.Root size="sm">
+					<Card.Header>
 						<div class="panel-copy">
-							<Text as="span" weight="semibold">Billing Address</Text>
-							<Text color="muted">The billing address associated with your payment method</Text>
+							<Text as="span" weight="semibold">Payment Method</Text>
+							<Text color="muted">All transactions are secure and encrypted.</Text>
 						</div>
+					</Card.Header>
+					<Card.Content>
+						<div class="panel-stack">
+							<Field.Root>
+								<Label for="preview-card-name">Name on Card</Label>
+								<Input id="preview-card-name" value="John Doe" />
+							</Field.Root>
 
-						<div class="checkbox-row">
-							<Checkbox id="preview-same-address" checked />
-							<Label for="preview-same-address">
-								<Text>Same as shipping address</Text>
-							</Label>
+							<div class="split-fields">
+								<Field.Root>
+									<Label for="preview-card-number">Card Number</Label>
+									<Input id="preview-card-number" value="1234 5678 9012 3456" />
+									<Text color="muted">Enter your 16-digit number.</Text>
+								</Field.Root>
+								<Field.Root>
+									<Label for="preview-card-cvv">CVV</Label>
+									<Input id="preview-card-cvv" value="123" />
+								</Field.Root>
+							</div>
+
+							<div class="split-fields">
+								<Field.Root>
+									<Label for="preview-card-month">Month</Label>
+									<div class="form-select">
+										<Select.Root name="month">
+											<Select.Trigger id="preview-card-month">
+												<Select.Value placeholder="MM" />
+											</Select.Trigger>
+											<Select.Content>
+												<Select.Item value="01">01</Select.Item>
+												<Select.Item value="02">02</Select.Item>
+												<Select.Item value="03">03</Select.Item>
+											</Select.Content>
+										</Select.Root>
+									</div>
+								</Field.Root>
+								<Field.Root>
+									<Label for="preview-card-year">Year</Label>
+									<div class="form-select">
+										<Select.Root name="year">
+											<Select.Trigger id="preview-card-year">
+												<Select.Value placeholder="YYYY" />
+											</Select.Trigger>
+											<Select.Content>
+												<Select.Item value="2026">2026</Select.Item>
+												<Select.Item value="2027">2027</Select.Item>
+												<Select.Item value="2028">2028</Select.Item>
+											</Select.Content>
+										</Select.Root>
+									</div>
+								</Field.Root>
+							</div>
 						</div>
+					</Card.Content>
+				</Card.Root>
 
-						<Field.Root>
-							<Label for="preview-comments">Comments</Label>
-							<Textarea id="preview-comments" placeholder="Add any additional comments" />
-						</Field.Root>
-
-						<div class="action-row">
-							<Button variant="solid" size="sm">Submit</Button>
+				<Card.Root size="sm">
+					<Card.Content>
+						<div class="processing-panel">
+							<Spinner size="md" />
+							<div class="panel-copy panel-copy-center">
+								<Text as="span" weight="semibold">Processing your request</Text>
+								<Text color="muted">
+									Please wait while we process your request. Do not refresh the page.
+								</Text>
+							</div>
+							<div class="processing-progress">
+								<Progress value={64} size="sm" />
+							</div>
 							<Button variant="secondary" size="sm">Cancel</Button>
 						</div>
-					</div>
-				</Card.Content>
-			</Card.Root>
-		</div>
+					</Card.Content>
+				</Card.Root>
 
-		<div class="preview-column">
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="empty-state">
-						<div class="avatar-row">
-							<div class="avatar-slot"><Avatar fallback="AM" size="sm" /></div>
-							<div class="avatar-slot"><Avatar fallback="JL" size="sm" /></div>
-							<div class="avatar-slot"><Avatar fallback="SR" size="sm" /></div>
-						</div>
-						<div class="panel-copy panel-copy-center">
-							<Text as="span" weight="semibold">No Team Members</Text>
-							<Text color="muted">Invite your team to collaborate on this project.</Text>
-						</div>
-						<Button variant="secondary" size="sm">
-							<CirclePlus size={14} aria-hidden="true" />
-							Invite Members
-						</Button>
-					</div>
-				</Card.Content>
-			</Card.Root>
-
-			<div class="badge-strip">
-				{#each activityLabels as { label, variant, duration } (label)}
-					<BorderBeam
-						size="sm"
-						colorVariant={variant}
-						theme={previewTheme}
-						borderRadius="var(--dry-radius-full)"
-						{duration}
-						strength={1}
-					>
-						<span class="activity-badge">
-							<Badge color="gray" size="sm">{label}</Badge>
-						</span>
-					</BorderBeam>
-				{/each}
+				<ButtonGroup size="sm">
+					<Button variant="outline">Archive</Button>
+					<Button variant="outline">Report</Button>
+					<Button variant="outline">Snooze</Button>
+				</ButtonGroup>
 			</div>
 
-			<div class="prompt-shell">
-				<PromptInput bind:value={chatPrompt} placeholder="Send a message..." submitLabel="Reply" />
+			<div class="preview-column">
+				<Card.Root size="sm">
+					<Card.Content>
+						<div class="empty-state">
+							<div class="avatar-row">
+								<div class="avatar-slot"><Avatar fallback="AM" size="sm" /></div>
+								<div class="avatar-slot"><Avatar fallback="JL" size="sm" /></div>
+								<div class="avatar-slot"><Avatar fallback="SR" size="sm" /></div>
+							</div>
+							<div class="panel-copy panel-copy-center">
+								<Text as="span" weight="semibold">No Team Members</Text>
+								<Text color="muted">Invite your team to collaborate on this project.</Text>
+							</div>
+							<Button variant="secondary" size="sm">
+								<CirclePlus size={14} aria-hidden="true" />
+								Invite Members
+							</Button>
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<div class="badge-strip">
+					{#each activityLabels as { label, variant, duration } (label)}
+						<BorderBeam
+							size="sm"
+							colorVariant={variant}
+							theme={previewTheme}
+							borderRadius="var(--dry-radius-full)"
+							{duration}
+							strength={1}
+						>
+							<span class="activity-badge">
+								<Badge color="gray" size="sm">{label}</Badge>
+							</span>
+						</BorderBeam>
+					{/each}
+				</div>
+
+				<div class="prompt-shell">
+					<PromptInput
+						bind:value={chatPrompt}
+						placeholder="Send a message..."
+						submitLabel="Reply"
+					/>
+				</div>
+
+				<Card.Root size="sm">
+					<Card.Content>
+						<div class="panel-stack">
+							<div class="panel-copy">
+								<Text as="span" weight="semibold">Price Range</Text>
+								<Text color="muted">Set your budget range ($200 - 800).</Text>
+							</div>
+
+							<Slider bind:value={budget} min={200} max={800} size="sm" />
+
+							<Field.Root>
+								<Label for="preview-search">Search</Label>
+								<div class="search-shell">
+									<Search size={14} aria-hidden="true" />
+									<Input
+										id="preview-search"
+										bind:value={searchQuery}
+										variant="ghost"
+										placeholder="Search..."
+									/>
+									<Text color="muted">12 results</Text>
+								</div>
+							</Field.Root>
+
+							<Field.Root>
+								<Label for="preview-url">Project URL</Label>
+								<Input id="preview-url" value="https://example.com" />
+							</Field.Root>
+
+							<div class="usage-row">
+								<Text color="muted">Storage</Text>
+								<div class="usage-meter">
+									<Progress value={52} size="sm" />
+									<Text color="muted">52% used</Text>
+								</div>
+							</div>
+						</div>
+					</Card.Content>
+				</Card.Root>
+
+				<Card.Root size="sm">
+					<Card.Content>
+						<div class="checkbox-row">
+							<Checkbox id="preview-terms" checked />
+							<Label for="preview-terms">
+								<Text>I agree to the terms and conditions</Text>
+							</Label>
+						</div>
+					</Card.Content>
+				</Card.Root>
 			</div>
 
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="panel-stack">
+			<div class="members-panel">
+				<Card.Root size="sm">
+					<Card.Header>
 						<div class="panel-copy">
-							<Text as="span" weight="semibold">Price Range</Text>
-							<Text color="muted">Set your budget range ($200 - 800).</Text>
+							<Text as="span" weight="semibold">Members</Text>
+							<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
 						</div>
-
-						<Slider bind:value={budget} min={200} max={800} size="sm" />
-
-						<Field.Root>
-							<Label for="preview-search">Search</Label>
-							<div class="search-shell">
-								<Search size={14} aria-hidden="true" />
-								<Input
-									id="preview-search"
-									bind:value={searchQuery}
-									variant="ghost"
-									placeholder="Search..."
-								/>
-								<Text color="muted">12 results</Text>
-							</div>
-						</Field.Root>
-
-						<Field.Root>
-							<Label for="preview-url">Project URL</Label>
-							<Input id="preview-url" value="https://example.com" />
-						</Field.Root>
-
-						<div class="usage-row">
-							<Text color="muted">Storage</Text>
-							<div class="usage-meter">
-								<Progress value={52} size="sm" />
-								<Text color="muted">52% used</Text>
-							</div>
-						</div>
-					</div>
-				</Card.Content>
-			</Card.Root>
-
-			<ButtonGroup size="sm">
-				<Button variant="outline">Archive</Button>
-				<Button variant="outline">Report</Button>
-				<Button variant="outline">Snooze</Button>
-			</ButtonGroup>
-
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="checkbox-row">
-						<Checkbox id="preview-terms" checked />
-						<Label for="preview-terms">
-							<Text>I agree to the terms and conditions</Text>
-						</Label>
-					</div>
-				</Card.Content>
-			</Card.Root>
+					</Card.Header>
+					<Card.Content noPadding>
+						<Table.Root>
+							<Table.Header>
+								<Table.Row>
+									<Table.Head>Name</Table.Head>
+									<Table.Head>Role</Table.Head>
+									<Table.Head>Status</Table.Head>
+								</Table.Row>
+							</Table.Header>
+							<Table.Body>
+								{#each rows as row (row.name)}
+									<Table.Row>
+										<Table.Cell>{row.name}</Table.Cell>
+										<Table.Cell>{row.role}</Table.Cell>
+										<Table.Cell>
+											<Badge color={row.color} size="sm">{row.status}</Badge>
+										</Table.Cell>
+									</Table.Row>
+								{/each}
+							</Table.Body>
+						</Table.Root>
+					</Card.Content>
+				</Card.Root>
+				<div class="pagination-row">
+					<ButtonGroup size="sm">
+						<Button variant="outline" size="icon-sm" aria-label="Previous">
+							<ArrowLeft size={14} aria-hidden="true" />
+						</Button>
+						<Button variant="outline" size="sm">1</Button>
+						<Button variant="outline" size="sm">2</Button>
+						<Button variant="outline" size="sm">3</Button>
+						<Button variant="outline" size="icon-sm" aria-label="Next">
+							<ArrowRight size={14} aria-hidden="true" />
+						</Button>
+					</ButtonGroup>
+				</div>
+			</div>
 		</div>
 
 		<div class="preview-column">
@@ -368,72 +417,6 @@
 					Copilot
 				</Button>
 			</div>
-
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="processing-panel">
-						<Spinner size="md" />
-						<div class="panel-copy panel-copy-center">
-							<Text as="span" weight="semibold">Processing your request</Text>
-							<Text color="muted">
-								Please wait while we process your request. Do not refresh the page.
-							</Text>
-						</div>
-						<div class="processing-progress">
-							<Progress value={64} size="sm" />
-						</div>
-						<Button variant="secondary" size="sm">Cancel</Button>
-					</div>
-				</Card.Content>
-			</Card.Root>
-		</div>
-	</div>
-
-	<div class="preview-footer">
-		<div class="members-panel">
-			<Card.Root size="sm">
-				<Card.Header>
-					<div class="panel-copy">
-						<Text as="span" weight="semibold">Members</Text>
-						<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
-					</div>
-				</Card.Header>
-				<Card.Content noPadding>
-					<Table.Root>
-						<Table.Header>
-							<Table.Row>
-								<Table.Head>Name</Table.Head>
-								<Table.Head>Role</Table.Head>
-								<Table.Head>Status</Table.Head>
-							</Table.Row>
-						</Table.Header>
-						<Table.Body>
-							{#each rows as row (row.name)}
-								<Table.Row>
-									<Table.Cell>{row.name}</Table.Cell>
-									<Table.Cell>{row.role}</Table.Cell>
-									<Table.Cell>
-										<Badge color={row.color} size="sm">{row.status}</Badge>
-									</Table.Cell>
-								</Table.Row>
-							{/each}
-						</Table.Body>
-					</Table.Root>
-				</Card.Content>
-			</Card.Root>
-			<div class="pagination-row">
-				<ButtonGroup size="sm">
-					<Button variant="outline" size="icon-sm" aria-label="Previous">
-						<ArrowLeft size={14} aria-hidden="true" />
-					</Button>
-					<Button variant="outline" size="sm">1</Button>
-					<Button variant="outline" size="sm">2</Button>
-					<Button variant="outline" size="sm">3</Button>
-					<Button variant="outline" size="icon-sm" aria-label="Next">
-						<ArrowRight size={14} aria-hidden="true" />
-					</Button>
-				</ButtonGroup>
-			</div>
 		</div>
 	</div>
 </div>
@@ -441,13 +424,20 @@
 <style>
 	.preview-root {
 		display: grid;
-		gap: var(--dry-space-6);
 		container-type: inline-size;
 	}
 
 	.preview-mosaic {
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--dry-space-4);
+		align-items: start;
+	}
+
+	.preview-left-pair {
+		grid-column: span 2;
+		display: grid;
+		grid-template-columns: subgrid;
 		gap: var(--dry-space-4);
 		align-items: start;
 	}
@@ -479,18 +469,13 @@
 		text-align: center;
 	}
 
-	.action-row,
 	.avatar-row {
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		gap: var(--dry-space-3);
+		gap: 0;
 		align-items: center;
 		justify-content: start;
-	}
-
-	.avatar-row {
-		gap: 0;
 		--dry-avatar-size: 2rem;
 		--dry-avatar-font-size: var(--dry-text-xs-size, 0.75rem);
 	}
@@ -527,12 +512,6 @@
 		justify-items: start;
 		align-items: center;
 		gap: var(--dry-space-3);
-	}
-
-	.preview-footer {
-		display: grid;
-		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--dry-space-4);
 	}
 
 	.members-panel {
@@ -619,17 +598,24 @@
 	.search-shell {
 		grid-template-columns: max-content minmax(0, 1fr) max-content;
 		padding: var(--dry-space-2) var(--dry-space-3);
-		border: 1px solid var(--dry-color-stroke-weak);
+		border: 1px solid var(--dry-form-control-border);
 		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg-overlay) 82%, var(--dry-color-bg-base));
+		background: var(--dry-form-control-bg);
 	}
 
 	.icon-input {
 		grid-template-columns: max-content minmax(0, 1fr);
 		padding: var(--dry-space-2) var(--dry-space-3);
-		border: 1px solid var(--dry-color-stroke-weak);
+		border: 1px solid var(--dry-form-control-border);
 		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg-overlay) 82%, var(--dry-color-bg-base));
+		background: var(--dry-form-control-bg);
+	}
+
+	.form-select {
+		display: grid;
+		--dry-btn-bg: var(--dry-form-control-bg);
+		--dry-btn-border: var(--dry-form-control-border);
+		--dry-btn-color: var(--dry-form-control-color);
 	}
 
 	.checkbox-row,
@@ -719,10 +705,6 @@
 		.preview-mosaic {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
-
-		.preview-footer {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
 	}
 
 	@container (max-width: 40rem) {
@@ -730,12 +712,13 @@
 			grid-template-columns: 1fr;
 		}
 
-		.preview-footer {
+		.preview-left-pair {
+			grid-column: 1;
 			grid-template-columns: 1fr;
 		}
 
 		.members-panel {
-			grid-column: span 1;
+			grid-column: 1;
 		}
 	}
 

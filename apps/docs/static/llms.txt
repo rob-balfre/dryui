@@ -1389,7 +1389,7 @@ Intersection-observer mask transition with circle, diamond, or wipe shapes.
 Import: @dryui/ui
 Subpath import: @dryui/ui/mask-reveal
 Props: shape (MaskRevealShape), default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
-Data attributes: data-direction | data-mask-reveal | data-reduced-motion | data-revealed | data-shape
+Data attributes: data-direction | data-mask-reveal | data-mask-reveal-root | data-reduced-motion | data-revealed | data-shape
 Example: <MaskReveal>Content</MaskReveal>
 
 ### ShaderCanvas

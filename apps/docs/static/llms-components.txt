@@ -4110,7 +4110,7 @@ Structure:
     Toast.Description
     Toast.Close
     Toast.Action
-CSS variables: --dry-radius-nested, --dry-toast-accent, --dry-toast-action-hover-bg, --dry-toast-bg, --dry-toast-border
+CSS variables: --dry-btn-font-size, --dry-radius-nested, --dry-toast-accent, --dry-toast-action-hover-bg, --dry-toast-bg, --dry-toast-border
 Data attributes: data-part | data-persistent | data-position | data-removing | data-toast-action | data-toast-id | data-variant
 Accessibility: Do not rely on toast content as the only place critical workflow information appears.
 Example:
@@ -4531,7 +4531,7 @@ Subpath import: import { MaskReveal } from '@dryui/ui/mask-reveal'
 Props: shape (MaskRevealShape), default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mask-reveal-duration, --dry-mask-reveal-ease, --dry-mask-reveal-size
-Data attributes: data-direction | data-mask-reveal | data-reduced-motion | data-revealed | data-shape
+Data attributes: data-direction | data-mask-reveal | data-mask-reveal-root | data-reduced-motion | data-revealed | data-shape
 Accessibility: none
 Example:
 ```svelte

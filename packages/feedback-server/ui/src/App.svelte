@@ -14,6 +14,7 @@
 		Image,
 		Input,
 		Label,
+		Separator,
 		Tabs,
 		Text
 	} from '@dryui/ui';
@@ -353,7 +354,7 @@ Use the dryui-feedback MCP server:
 			<Alert variant="error">{error}</Alert>
 		{/if}
 
-		<Card.Root variant="elevated">
+		<Card.Root variant="elevated" size="sm">
 			<Card.Header>
 				<div class="prompt-header">
 					<div class="prompt-heading">
@@ -364,19 +365,17 @@ Use the dryui-feedback MCP server:
 								: 'Copy this prompt to work on all pending submissions'}
 						</Text>
 					</div>
-					<div class="prompt-copy">
-						<Button
-							variant="solid"
-							onclick={() => void copyPromptToClipboard()}
-							disabled={copyState !== 'idle'}
-						>
-							{copyState === 'copied'
-								? 'Copied!'
-								: copyState === 'error'
-									? 'Copy failed'
-									: 'Copy prompt'}
-						</Button>
-					</div>
+					<Button
+						variant="solid"
+						onclick={() => void copyPromptToClipboard()}
+						disabled={copyState !== 'idle'}
+					>
+						{copyState === 'copied'
+							? 'Copied!'
+							: copyState === 'error'
+								? 'Copy failed'
+								: 'Copy prompt'}
+					</Button>
 				</div>
 			</Card.Header>
 			<Card.Content>
@@ -386,7 +385,7 @@ Use the dryui-feedback MCP server:
 
 		<div class="workspace">
 			<div class="queue-panel">
-				<Card.Root variant="elevated">
+				<Card.Root variant="elevated" size="sm">
 					<Card.Content>
 						<div class="panel-stack">
 							<Field.Root>
@@ -499,7 +498,7 @@ Use the dryui-feedback MCP server:
 				</Card.Root>
 			</div>
 
-			<Card.Root variant="elevated">
+			<Card.Root variant="elevated" size="sm">
 				{#if selectedSubmission}
 					<Card.Header>
 						<div class="detail-actions">
@@ -536,188 +535,156 @@ Use the dryui-feedback MCP server:
 				<Card.Content>
 					{#if selectedSubmission}
 						<div class="detail-stack">
-							<Card.Root class="screenshot-card">
-								<Card.Header>
-									<div class="submission-heading">
-										<Text as="span" size="sm" weight="semibold">Captured screenshot</Text>
-										<Badge variant="soft" color={statusColor(selectedSubmission.status)} size="sm">
-											{statusLabel(selectedSubmission.status)}
-										</Badge>
-									</div>
-								</Card.Header>
-								<Card.Content noPadding={true}>
-									<Dialog.Root>
-										<Dialog.Trigger>
-											<Button
-												variant="bare"
-												aria-label={`Open full screenshot for ${selectedSubmission.url}`}
-											>
-												<div class="screenshot-thumbnail">
-													<Image
-														class="feedback-screenshot-thumb"
-														src={screenshotUrl(selectedSubmission.id)}
-														alt={`Feedback screenshot for ${selectedSubmission.url}`}
-														fallback="Screenshot unavailable"
-													/>
-												</div>
-											</Button>
-										</Dialog.Trigger>
+							<section class="detail-section">
+								<header class="section-head">
+									<Heading level={4}>Captured screenshot</Heading>
+									<Badge variant="soft" color={statusColor(selectedSubmission.status)} size="sm">
+										{statusLabel(selectedSubmission.status)}
+									</Badge>
+								</header>
 
-										<Dialog.Content class="feedback-screenshot-dialog">
-											<Dialog.Header>
-												<div class="screenshot-dialog-header">
-													<div class="screenshot-dialog-heading">
-														<Heading level={3}>Captured screenshot</Heading>
-														<Text as="span" size="sm" color="secondary">
-															{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-																selectedSubmission.viewport
-															)}
-														</Text>
-													</div>
-													<Dialog.Close aria-label="Close screenshot dialog">
-														<span aria-hidden="true">&times;</span>
-													</Dialog.Close>
+								<Dialog.Root>
+									<Dialog.Trigger>
+										<Button
+											variant="bare"
+											aria-label={`Open full screenshot for ${selectedSubmission.url}`}
+										>
+											<div class="screenshot-thumbnail">
+												<Image
+													class="feedback-screenshot-thumb"
+													src={screenshotUrl(selectedSubmission.id)}
+													alt={`Feedback screenshot for ${selectedSubmission.url}`}
+													fallback="Screenshot unavailable"
+												/>
+											</div>
+										</Button>
+									</Dialog.Trigger>
+
+									<Dialog.Content class="feedback-screenshot-dialog">
+										<Dialog.Header>
+											<div class="screenshot-dialog-header">
+												<div class="screenshot-dialog-heading">
+													<Heading level={3}>Captured screenshot</Heading>
+													<Text as="span" size="sm" color="secondary">
+														{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+															selectedSubmission.viewport
+														)}
+													</Text>
 												</div>
-											</Dialog.Header>
-											<Dialog.Body class="screenshot-dialog-body">
-												<div class="screenshot-dialog-image">
-													<Image
-														class="feedback-screenshot-full"
-														src={screenshotUrl(selectedSubmission.id)}
-														alt={`Feedback screenshot for ${selectedSubmission.url}`}
-														fallback="Screenshot unavailable"
-													/>
-												</div>
-											</Dialog.Body>
-											<Dialog.Footer>
-												<Dialog.Close>Close</Dialog.Close>
-												<Button
+												<Dialog.Close aria-label="Close screenshot dialog">
+													<span aria-hidden="true">&times;</span>
+												</Dialog.Close>
+											</div>
+										</Dialog.Header>
+										<Dialog.Body class="screenshot-dialog-body">
+											<div class="screenshot-dialog-image">
+												<Image
+													class="feedback-screenshot-full"
+													src={screenshotUrl(selectedSubmission.id)}
+													alt={`Feedback screenshot for ${selectedSubmission.url}`}
+													fallback="Screenshot unavailable"
+												/>
+											</div>
+										</Dialog.Body>
+										<Dialog.Footer>
+											<Dialog.Close>Close</Dialog.Close>
+											<Button
+												href={selectedSubmission.url}
+												target="_blank"
+												rel="noreferrer"
+												variant="ghost"
+											>
+												Open page
+											</Button>
+										</Dialog.Footer>
+									</Dialog.Content>
+								</Dialog.Root>
+
+								<Text as="span" size="sm" color="secondary">
+									{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+										selectedSubmission.viewport
+									)} / click to expand
+								</Text>
+							</section>
+
+							<Separator />
+
+							<div class="detail-grid">
+								<section class="detail-section metadata-list">
+									<Heading level={4}>Metadata</Heading>
+									<DescriptionList.Root>
+										<DescriptionList.Item>
+											<DescriptionList.Term>Submission id</DescriptionList.Term>
+											<DescriptionList.Description>
+												<Text as="span" size="sm">{shortenId(selectedSubmission.id)}</Text>
+											</DescriptionList.Description>
+										</DescriptionList.Item>
+										<DescriptionList.Item>
+											<DescriptionList.Term>Created</DescriptionList.Term>
+											<DescriptionList.Description>
+												<Text as="span" size="sm">
+													{formatAbsoluteTime(selectedSubmission.createdAt)}
+												</Text>
+											</DescriptionList.Description>
+										</DescriptionList.Item>
+										<DescriptionList.Item>
+											<DescriptionList.Term>Viewport</DescriptionList.Term>
+											<DescriptionList.Description>
+												<Text as="span" size="sm">
+													{formatViewport(selectedSubmission.viewport)}
+												</Text>
+											</DescriptionList.Description>
+										</DescriptionList.Item>
+										<DescriptionList.Item>
+											<DescriptionList.Term>Page</DescriptionList.Term>
+											<DescriptionList.Description>
+												<a
+													class="detail-link"
 													href={selectedSubmission.url}
 													target="_blank"
 													rel="noreferrer"
-													variant="ghost"
 												>
-													Open page
-												</Button>
-											</Dialog.Footer>
-										</Dialog.Content>
-									</Dialog.Root>
-								</Card.Content>
-								<Card.Footer>
-									<div class="screenshot-meta">
-										<Text as="span" size="sm" color="secondary">
-											Click the thumbnail to open the full capture
-										</Text>
-										<Text as="span" size="sm" color="secondary">
-											{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-												selectedSubmission.viewport
-											)}
-										</Text>
+													{selectedSubmission.url}
+												</a>
+											</DescriptionList.Description>
+										</DescriptionList.Item>
+									</DescriptionList.Root>
+								</section>
+
+								<section class="detail-section">
+									<Heading level={4}>Annotations</Heading>
+									<div class="submission-badges">
+										{#if selectedDrawingCounts.length > 0}
+											{#each selectedDrawingCounts as entry (entry.label)}
+												<Badge variant="outline" color="gray" size="sm">
+													{entry.label}: {entry.count}
+												</Badge>
+											{/each}
+											<Badge variant="outline" color="gray" size="sm">
+												Total: {selectedSubmission.drawings.length}
+											</Badge>
+										{:else}
+											<Text as="span" size="sm" color="secondary">No drawings attached.</Text>
+										{/if}
 									</div>
-								</Card.Footer>
-							</Card.Root>
 
-							<div class="detail-grid">
-								<Card.Root>
-									<Card.Header>
-										<Heading level={3}>Metadata</Heading>
-									</Card.Header>
-									<Card.Content>
-										<DescriptionList.Root>
-											<DescriptionList.Item>
-												<DescriptionList.Term>Submission id</DescriptionList.Term>
-												<DescriptionList.Description>
-													<Text as="span" size="sm">{selectedSubmission.id}</Text>
-												</DescriptionList.Description>
-											</DescriptionList.Item>
-											<DescriptionList.Item>
-												<DescriptionList.Term>Status</DescriptionList.Term>
-												<DescriptionList.Description>
-													<Badge
-														variant="soft"
-														color={statusColor(selectedSubmission.status)}
-														size="sm"
-													>
-														{statusLabel(selectedSubmission.status)}
+									{#if selectedTextNotes.length > 0}
+										<div class="notes-stack">
+											{#each selectedTextNotes as note, index (`${selectedSubmission.id}-${index}`)}
+												<div class="note-card">
+													<Badge variant="outline" color="gray" size="sm">
+														Note {index + 1}
 													</Badge>
-												</DescriptionList.Description>
-											</DescriptionList.Item>
-											<DescriptionList.Item>
-												<DescriptionList.Term>Created</DescriptionList.Term>
-												<DescriptionList.Description>
-													<Text as="span" size="sm">
-														{formatAbsoluteTime(selectedSubmission.createdAt)}
-													</Text>
-												</DescriptionList.Description>
-											</DescriptionList.Item>
-											<DescriptionList.Item>
-												<DescriptionList.Term>Viewport</DescriptionList.Term>
-												<DescriptionList.Description>
-													<Text as="span" size="sm">
-														{formatViewport(selectedSubmission.viewport)}
-													</Text>
-												</DescriptionList.Description>
-											</DescriptionList.Item>
-											<DescriptionList.Item>
-												<DescriptionList.Term>Screenshot file</DescriptionList.Term>
-												<DescriptionList.Description>
-													<Text as="span" size="sm">{selectedSubmission.screenshotPath}</Text>
-												</DescriptionList.Description>
-											</DescriptionList.Item>
-										</DescriptionList.Root>
-									</Card.Content>
-									<Card.Footer>
-										<Text as="span" size="sm" color="secondary">
-											Original page: {selectedSubmission.url}
-										</Text>
-									</Card.Footer>
-								</Card.Root>
-
-								<Card.Root>
-									<Card.Header>
-										<Heading level={3}>Annotation summary</Heading>
-									</Card.Header>
-									<Card.Content>
-										<div class="summary-stack">
-											<div class="submission-badges">
-												{#if selectedDrawingCounts.length > 0}
-													{#each selectedDrawingCounts as entry (entry.label)}
-														<Badge variant="outline" color="gray" size="sm">
-															{entry.label}: {entry.count}
-														</Badge>
-													{/each}
-												{:else}
-													<Alert variant="info"
-														>No drawing data was attached to this submission.</Alert
-													>
-												{/if}
-											</div>
-
-											<div class="notes-stack">
-												<Heading level={4}>Text notes</Heading>
-												{#if selectedTextNotes.length > 0}
-													{#each selectedTextNotes as note, index (`${selectedSubmission.id}-${index}`)}
-														<div class="note-card">
-															<Badge variant="outline" color="gray" size="sm">
-																Note {index + 1}
-															</Badge>
-															<Text as="p">{note}</Text>
-														</div>
-													{/each}
-												{:else}
-													<Text as="p" size="sm" color="secondary">
-														This submission only uses visual arrows or freehand marks.
-													</Text>
-												{/if}
-											</div>
+													<Text as="p">{note}</Text>
+												</div>
+											{/each}
 										</div>
-									</Card.Content>
-									<Card.Footer>
-										<Text as="span" size="sm" color="secondary">
-											{selectedSubmission.drawings.length} total marks captured with the screenshot
+									{:else}
+										<Text as="p" size="sm" color="secondary">
+											This submission only uses visual arrows or freehand marks.
 										</Text>
-									</Card.Footer>
-								</Card.Root>
+									{/if}
+								</section>
 							</div>
 						</div>
 					{:else}
@@ -728,14 +695,6 @@ Use the dryui-feedback MCP server:
 						</Alert>
 					{/if}
 				</Card.Content>
-
-				<Card.Footer>
-					<Text as="span" size="sm" color="secondary">
-						{selectedSubmission
-							? `${formatRelativeTime(selectedSubmission.createdAt)} / ${selectedSubmission.url}`
-							: 'Select a queue item to inspect its screenshot and notes.'}
-					</Text>
-				</Card.Footer>
 			</Card.Root>
 		</div>
 	</section>
@@ -745,8 +704,8 @@ Use the dryui-feedback MCP server:
 	.dashboard {
 		container-type: inline-size;
 		display: grid;
-		gap: var(--dry-space-4);
-		padding: var(--dry-space-4);
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-3);
 	}
 
 	.brand {
@@ -807,25 +766,18 @@ Use the dryui-feedback MCP server:
 
 	.prompt-heading {
 		display: grid;
-		gap: var(--dry-space-1);
-	}
-
-	.prompt-copy {
-		display: grid;
-		justify-content: start;
+		gap: var(--dry-space-0_5);
 	}
 
 	.prompt-body {
 		display: block;
 		margin: 0;
-		padding: var(--dry-space-3);
+		padding: 0;
 		font-family: var(--dry-font-mono, ui-monospace, monospace);
 		font-size: var(--dry-font-size-sm, 0.875rem);
-		line-height: 1.6;
-		color: var(--dry-color-text-strong);
-		background: var(--dry-color-bg-raised, var(--dry-color-surface));
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-md);
+		line-height: 1.55;
+		color: var(--dry-color-text-weak);
+		background: transparent;
 		white-space: pre-wrap;
 		word-break: break-word;
 		overflow-x: auto;
@@ -833,7 +785,7 @@ Use the dryui-feedback MCP server:
 
 	.workspace {
 		display: grid;
-		gap: var(--dry-space-4);
+		gap: var(--dry-space-3);
 	}
 
 	.panel-stack {
@@ -855,11 +807,6 @@ Use the dryui-feedback MCP server:
 		border-radius: var(--dry-radius-xl);
 		background: var(--dry-color-bg-raised, var(--dry-color-surface));
 		overflow: hidden;
-	}
-
-	.submission-heading {
-		display: grid;
-		gap: var(--dry-space-2);
 	}
 
 	.submission-row-shell {
@@ -889,7 +836,6 @@ Use the dryui-feedback MCP server:
 
 	.submission-row-shell[data-selected] {
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 10%, transparent);
-		box-shadow: inset 2px 0 0 var(--dry-color-fill-brand);
 	}
 
 	.submission-row {
@@ -947,22 +893,47 @@ Use the dryui-feedback MCP server:
 
 	.detail-stack {
 		display: grid;
-		gap: var(--dry-space-4);
+		gap: var(--dry-space-3);
+		--dry-separator-spacing: 0;
+	}
+
+	.detail-section {
+		display: grid;
+		gap: var(--dry-space-2);
+	}
+
+	.section-head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		gap: var(--dry-space-2);
+		align-items: center;
+	}
+
+	.detail-link {
+		color: var(--dry-color-text-strong);
+		font-size: var(--dry-font-size-sm, 0.875rem);
+		word-break: break-all;
+	}
+
+	.detail-link:hover {
+		color: var(--dry-color-fill-brand);
+	}
+
+	.metadata-list {
+		--dry-description-list-gap: var(--dry-space-1);
+		--dry-description-list-item-padding-y: var(--dry-space-2);
 	}
 
 	.screenshot-thumbnail {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: 14rem;
+		grid-template-rows: 12rem;
 		place-items: center;
-		padding: var(--dry-space-3);
+		padding: var(--dry-space-2);
 		overflow: hidden;
 		background: var(--dry-color-surface);
-	}
-
-	.screenshot-meta {
-		display: grid;
-		gap: var(--dry-space-1);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
 	}
 
 	.screenshot-dialog-heading {
@@ -989,11 +960,6 @@ Use the dryui-feedback MCP server:
 
 	.detail-grid {
 		display: grid;
-		gap: var(--dry-space-4);
-	}
-
-	.summary-stack {
-		display: grid;
 		gap: var(--dry-space-3);
 	}
 
@@ -1004,19 +970,14 @@ Use the dryui-feedback MCP server:
 
 	.note-card {
 		display: grid;
-		gap: var(--dry-space-2);
-		padding: var(--dry-space-3);
+		gap: var(--dry-space-1);
+		padding: var(--dry-space-2);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-surface);
 	}
 
 	@container (min-width: 42rem) {
-		.submission-heading {
-			grid-template-columns: minmax(0, 1fr) auto;
-			align-items: center;
-		}
-
 		.submission-row-meta {
 			grid-template-columns: minmax(0, 1fr) auto;
 			align-items: center;
@@ -1031,15 +992,17 @@ Use the dryui-feedback MCP server:
 
 	@container (min-width: 64rem) {
 		.workspace {
-			grid-template-columns: minmax(0, 24rem) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 22rem) minmax(0, 1fr);
 			align-items: start;
 		}
 
 		.queue-panel {
 			position: sticky;
-			inset-block-start: var(--dry-space-4);
+			inset-block-start: var(--dry-space-3);
 		}
+	}
 
+	@container (min-width: 40rem) {
 		.detail-grid {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
