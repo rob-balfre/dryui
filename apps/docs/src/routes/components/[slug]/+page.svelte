@@ -13,6 +13,7 @@
 	let name = $derived(data.name);
 	let DemoComponent = $derived(getComponentDemo(name));
 	let hasRootPart = $derived(data.hasRootPart);
+	let a11yNotes = $derived(data?.a11y ?? []);
 	let parts = $derived(data.parts ? Object.entries(data.parts) : []);
 	let partNames = $derived(data.parts ? Object.keys(data.parts) : []);
 	let nonRootPartNames = $derived(partNames.filter((partName) => partName !== 'Root'));
@@ -49,10 +50,10 @@
 						</Card.Root>
 					{/if}
 
-					{#if data.a11y.length > 0}
+					{#if a11yNotes.length > 0}
 						<DocsCallout title="Accessibility" variant="info">
 							<ul class="a11y-list">
-								{#each data.a11y as note (note)}
+								{#each a11yNotes as note (note)}
 									<li>{note}</li>
 								{/each}
 							</ul>

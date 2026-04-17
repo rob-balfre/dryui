@@ -3417,7 +3417,7 @@ Tags: code, syntax, pre, monospace, copy
 Kind: simple
 Root import: import { CodeBlock } from '@dryui/ui'
 Subpath import: import { CodeBlock } from '@dryui/ui/code-block'
-Props: showLineNumbers (boolean), default false | showCopyButton (boolean), default true | linkResolver ((text: string, type: string) => string | undefined) | code (string), required | language (string) | shell (Snippet<[CodeBlockShellContext]>) | children (Snippet), Content rendered inside the component.
+Props: showLineNumbers (boolean), default false | showCopyButton (boolean), default true | linkResolver ((text: string, type: string) => string | undefined) | code (string), default '', required | language (string) | shell (Snippet<[CodeBlockShellContext]>) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-btn-color, --dry-code-bg, --dry-code-border, --dry-code-color, --dry-code-copy-color, --dry-code-copy-hover-color, --dry-code-font-size, --dry-code-header-bg, --dry-code-header-color, --dry-code-line-height, --dry-code-padding, --dry-code-radius
 Data attributes: data-code-block | data-code-block-code | data-code-block-copy | data-code-block-header | data-code-block-language | data-code-block-line-content | data-code-block-line-number | data-code-block-pre | data-code-block-token-link | data-copied | data-language | data-single-line | data-token-type

@@ -6,6 +6,7 @@
 		active: boolean;
 		tool: Tool;
 		hasDrawings: boolean;
+		hidden: boolean;
 		submitting: boolean;
 		sent: boolean;
 		ontoggle: () => void;
@@ -13,10 +14,18 @@
 		onsubmit: () => void;
 	}
 
-	let { active, tool, hasDrawings, submitting, sent, ontoggle, ontoolchange, onsubmit }: Props =
-		$props();
+	let {
+		active,
+		tool,
+		hasDrawings,
+		hidden,
+		submitting,
+		sent,
+		ontoggle,
+		ontoolchange,
+		onsubmit
+	}: Props = $props();
 
-	let shellEl: HTMLDivElement | undefined = $state();
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
 	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
@@ -25,26 +34,28 @@
 
 	function handlePointerDown(e: PointerEvent) {
 		if ((e.target as HTMLElement).closest('button')) return;
+		const toolbar = e.currentTarget as HTMLDivElement;
 		dragging = true;
-		const rect = shellEl!.getBoundingClientRect();
+		const rect = toolbar.getBoundingClientRect();
 		dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-		(e.target as HTMLElement).setPointerCapture(e.pointerId);
+		toolbar.setPointerCapture(e.pointerId);
 	}
 
 	function handlePointerMove(e: PointerEvent) {
-		if (!dragging || !shellEl) return;
+		if (!dragging) return;
+		const toolbar = e.currentTarget as HTMLDivElement;
 		const x = Math.max(
 			0,
-			Math.min(window.innerWidth - shellEl.offsetWidth, e.clientX - dragOffset.x)
+			Math.min(window.innerWidth - toolbar.offsetWidth, e.clientX - dragOffset.x)
 		);
 		const y = Math.max(
 			0,
-			Math.min(window.innerHeight - shellEl.offsetHeight, e.clientY - dragOffset.y)
+			Math.min(window.innerHeight - toolbar.offsetHeight, e.clientY - dragOffset.y)
 		);
-		shellEl.style.left = `${x}px`;
-		shellEl.style.top = `${y}px`;
-		shellEl.style.right = 'auto';
-		shellEl.style.bottom = 'auto';
+		toolbar.style.left = `${x}px`;
+		toolbar.style.top = `${y}px`;
+		toolbar.style.right = 'auto';
+		toolbar.style.bottom = 'auto';
 	}
 
 	function handlePointerUp() {
@@ -63,12 +74,13 @@
 
 <div
 	class="toolbar"
-	bind:this={shellEl}
+	data-hidden={hidden || undefined}
 	onpointerdown={handlePointerDown}
 	onpointermove={handlePointerMove}
 	onpointerup={handlePointerUp}
 	role="toolbar"
 	tabindex="-1"
+	aria-hidden={hidden}
 	aria-label="Feedback drawing tools"
 >
 	<button
@@ -162,6 +174,11 @@
 
 	.toolbar:active {
 		cursor: grabbing;
+	}
+
+	.toolbar[data-hidden] {
+		visibility: hidden;
+		pointer-events: none;
 	}
 
 	.tool-btn {
