@@ -122,7 +122,7 @@
 		<span class="copy-btn-slot">
 			<Button
 				variant="trigger"
-				size="icon-sm"
+				size="sm"
 				type="button"
 				data-code-block-copy
 				onclick={handleCopy}
@@ -141,6 +141,7 @@
 					>
 						<polyline points="20 6 9 17 4 12"></polyline>
 					</svg>
+					<span>Copied</span>
 				{:else}
 					<svg
 						width="16"
@@ -155,6 +156,7 @@
 						<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
 						<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
 					</svg>
+					<span>Copy</span>
 				{/if}
 			</Button>
 		</span>
@@ -207,6 +209,8 @@
 		z-index: 1;
 		display: inline-grid;
 		color: var(--dry-code-copy-color);
+		background: var(--dry-code-bg);
+		border-radius: var(--dry-radius-md);
 		--dry-btn-color: var(--dry-code-copy-color);
 	}
 

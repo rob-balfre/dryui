@@ -2,8 +2,6 @@ import { createContext } from '@dryui/primitives';
 
 export interface MegaMenuContext {
 	readonly activeItem: string | null;
-	readonly rootEl: HTMLElement | null;
-	setRootEl: (el: HTMLElement | null) => void;
 	openItem: (id: string) => void;
 	closeItem: () => void;
 }

@@ -2,12 +2,15 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
+	import type { ButtonSize, ButtonVariant } from '../button/index.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: string;
 		placeholder?: string;
 		disabled?: boolean;
 		submitLabel?: string;
+		submitSize?: ButtonSize;
+		submitVariant?: ButtonVariant;
 		onpromptsubmit?: (value: string) => void;
 		actions?: Snippet;
 	}
@@ -17,6 +20,8 @@
 		placeholder = 'Type a message...',
 		disabled = false,
 		submitLabel = 'Send',
+		submitSize = 'md',
+		submitVariant = 'solid',
 		onpromptsubmit,
 		actions,
 		class: className,
@@ -79,7 +84,14 @@
 		{#if actions}
 			{@render actions()}
 		{/if}
-		<Button variant="solid" type="button" {disabled} onclick={submit} aria-label={submitLabel}>
+		<Button
+			variant={submitVariant}
+			size={submitSize}
+			type="button"
+			{disabled}
+			onclick={submit}
+			aria-label={submitLabel}
+		>
 			<span data-prompt-submit-label>{submitLabel}</span>
 			<svg
 				width="20"

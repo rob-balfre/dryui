@@ -29,9 +29,11 @@
 		ChevronRight,
 		Globe,
 		LockKeyhole,
+		Mic,
 		Paperclip,
 		Search,
-		ShieldCheck
+		ShieldCheck,
+		Smile
 	} from 'lucide-svelte';
 
 	const rows = [
@@ -189,7 +191,20 @@
 						bind:value={chatPrompt}
 						placeholder="Send a message..."
 						submitLabel="Reply"
-					/>
+						submitSize="sm"
+					>
+						{#snippet actions()}
+							<Button variant="ghost" size="icon-sm" aria-label="Attach file">
+								<Paperclip size={14} aria-hidden="true" />
+							</Button>
+							<Button variant="ghost" size="icon-sm" aria-label="Insert emoji">
+								<Smile size={14} aria-hidden="true" />
+							</Button>
+							<Button variant="ghost" size="icon-sm" aria-label="Record voice note">
+								<Mic size={14} aria-hidden="true" />
+							</Button>
+						{/snippet}
+					</PromptInput>
 				</div>
 
 				<Card.Root size="sm">
@@ -564,8 +579,9 @@
 
 	.prompt-shell {
 		display: grid;
-		--dry-prompt-input-textarea-min-height: 3.25rem;
+		--dry-prompt-input-padding: var(--dry-space-2);
 		--dry-prompt-input-gap: var(--dry-space-2);
+		--dry-prompt-input-textarea-min-height: var(--dry-space-6);
 	}
 
 	.assistant-composer {

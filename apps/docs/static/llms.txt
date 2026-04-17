@@ -1349,7 +1349,7 @@ Warm highlight sweep that travels across wrapped text and inline icons together.
 Import: @dryui/ui
 Subpath import: @dryui/ui/shimmer
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | duration (number), default 3 | children (Snippet), Content rendered inside the component., required
-Data attributes: data-shimmer | data-shimmer-base | data-shimmer-streak
+Data attributes: data-active (Present on the active item or current target within the component.) | data-shimmer | data-shimmer-base | data-shimmer-streak
 Example: <Shimmer>Content</Shimmer>
 
 ### Glass

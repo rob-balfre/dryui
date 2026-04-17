@@ -16,15 +16,33 @@
 		...rest
 	}: Props = $props();
 
-	function applyStyles(node: HTMLSpanElement) {
+	function setup(node: HTMLSpanElement) {
 		$effect(() => {
 			node.style.setProperty('--dry-shimmer-color', color);
 			node.style.setProperty('--dry-shimmer-duration', `${duration}s`);
 		});
+
+		$effect(() => {
+			if (typeof IntersectionObserver === 'undefined') {
+				node.dataset.active = '';
+				return;
+			}
+			const io = new IntersectionObserver(
+				(entries) => {
+					for (const entry of entries) {
+						if (entry.isIntersecting) node.dataset.active = '';
+						else delete node.dataset.active;
+					}
+				},
+				{ rootMargin: '100px' }
+			);
+			io.observe(node);
+			return () => io.disconnect();
+		});
 	}
 </script>
 
-<span data-shimmer class={className} {...rest} {@attach applyStyles}>
+<span data-shimmer class={className} {...rest} {@attach setup}>
 	<span data-shimmer-base>
 		{@render children()}
 	</span>
@@ -40,6 +58,8 @@
 		grid-column: var(--dry-shimmer-column, auto);
 		justify-self: var(--dry-shimmer-justify-self, auto);
 		isolation: isolate;
+		content-visibility: auto;
+		contain-intrinsic-size: auto;
 	}
 
 	[data-shimmer-base],
@@ -62,8 +82,13 @@
 		mask-size: 200% 100%;
 		-webkit-mask-repeat: no-repeat;
 		mask-repeat: no-repeat;
-		will-change: mask-position;
 		animation: shimmer-sweep var(--dry-shimmer-duration, 3s) linear infinite;
+		animation-play-state: paused;
+	}
+
+	[data-shimmer][data-active] [data-shimmer-streak] {
+		animation-play-state: running;
+		will-change: mask-position;
 	}
 
 	@keyframes shimmer-sweep {

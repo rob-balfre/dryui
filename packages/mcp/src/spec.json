@@ -17585,6 +17585,10 @@
       "cssVars": {},
       "dataAttributes": [
         {
+          "name": "data-active",
+          "description": "Present on the active item or current target within the component."
+        },
+        {
           "name": "data-shimmer"
         },
         {
