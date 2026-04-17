@@ -7,13 +7,14 @@ Canonical release and publish guidance for this repository lives here. Link to t
 Releases are automated via [Changesets](https://github.com/changesets/changesets) and `.github/workflows/release.yml`:
 
 1. Run `bun run changeset`
-2. Push to `main`
+2. Merge or push the change to `main`
 3. CI runs `bun run release:gate`
-4. CI opens or updates the "Version Packages" PR
-5. Merge that PR
-6. CI publishes to npm and creates GitHub Releases
+4. CI runs `bun run version`, commits the version and changelog updates back to `main`, then pushes that release commit
+5. CI publishes to npm, pushes the package tags, and creates GitHub Releases
 
 `@dryui/primitives` and `@dryui/ui` are version-linked and should be treated as a fixed pair.
+
+The release workflow expects pushes to `main` to be able to write back the release commit and tags.
 
 ## Manual release
 

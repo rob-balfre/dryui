@@ -28,6 +28,7 @@ interface LauncherRuntime {
 	ensureFeedbackUiBuilt: (workspaceRoot: string) => CommandResult | null;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
+	onProgress: (progress: { workspaceRoot: string; noOpen: boolean }) => void;
 }
 
 interface RunLauncherOptions {
@@ -134,7 +135,8 @@ const defaultRuntime: LauncherRuntime = {
 	ensureFeedbackServer,
 	ensureFeedbackUiBuilt: (workspaceRoot) => ensureFeedbackUiBuilt({ workspaceRoot }),
 	now: () => Date.now(),
-	openBrowser
+	openBrowser,
+	onProgress: () => {}
 };
 
 export async function runLauncher(
@@ -165,14 +167,16 @@ export async function runLauncher(
 	const feedbackBaseUrl = toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
 	const docsBaseUrl = `http://${DEFAULT_DOCS_HOST}:${DEFAULT_DOCS_PORT}`;
 	const feedbackClient = new FeedbackHttpClient(feedbackBaseUrl);
+	const noOpen = hasFlag(args, '--no-open');
 
 	try {
+		runtime.onProgress({ workspaceRoot, noOpen });
+
 		const [feedbackMessage, docsMessage] = await Promise.all([
 			runtime.ensureFeedbackServer(workspaceRoot, feedbackClient),
 			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
 		]);
 		const dashboardUrl = buildDashboardUrl(feedbackClient.baseUrl, docsBaseUrl, runtime.now());
-		const noOpen = hasFlag(args, '--no-open');
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
 		emitOrRun(

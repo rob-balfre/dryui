@@ -164,6 +164,12 @@ bun run validate
 # Release validation gate (validate without browser tests)
 bun run release:gate
 
+# Local version + publish flow
+bun run release
+
+# CI-only direct-on-main release flow
+bun run release:ci
+
 # Generate component screenshots to tmp/ (requires Playwright)
 bun run screenshots:components
 ```
@@ -218,7 +224,9 @@ DRYui's design language is heavily influenced by [Practical UI](https://www.prac
 
 ## Releasing
 
-See [RELEASING.md](./RELEASING.md) for the canonical Changesets workflow, manual release command, and npm token rotation guidance.
+DryUI still uses Changesets for version intent and changelog generation, but release automation now runs directly on pushes to `main`: CI validates, versions packages, commits the release changes back to `main`, publishes to npm, pushes tags, and creates GitHub Releases.
+
+See [RELEASING.md](./RELEASING.md) for the canonical release flow, manual release command, and npm token rotation guidance.
 
 ## License
 

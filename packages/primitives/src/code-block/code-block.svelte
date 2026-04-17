@@ -14,7 +14,7 @@
 		children?: Snippet;
 	}
 
-	let { code, language, shell, children, class: className, ...rest }: Props = $props();
+	let { code = '', language, shell, children, class: className, ...rest }: Props = $props();
 
 	let copied = $state(false);
 	let copyTimer: ReturnType<typeof setTimeout> | undefined;

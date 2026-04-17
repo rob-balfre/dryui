@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Portal } from '@dryui/ui';
+	import { Portal, Toast } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { Check } from 'lucide-svelte';
 	import type {
@@ -40,6 +40,8 @@
 	let saveVersion = $state(0);
 	let submitting = $state(false);
 	let sent = $state(false);
+	let toasts: FeedbackToast[] = $state([]);
+	let toolbarHiddenForCapture = $state(false);
 	let scrollRootEl: HTMLElement | null = $state(null);
 	let viewportLeft = $state(0);
 	let viewportTop = $state(0);
@@ -50,11 +52,21 @@
 	let layerHostEl: HTMLElement | null = $state(null);
 	let layerOriginLeft = $state(0);
 	let layerOriginTop = $state(0);
+	const toastTimers: Record<string, ReturnType<typeof setTimeout>> = Object.create(null);
 
 	const ERASE_RADIUS = 12;
 	const ARROW_HEAD_SIZE = 12;
 	const TEXT_FONT_SIZE = 16;
 	const SCROLLABLE_OVERFLOW = new Set(['auto', 'scroll', 'overlay']);
+	const SUCCESS_TOAST_DURATION_MS = 4000;
+	const ERROR_TOAST_DURATION_MS = 6000;
+
+	interface FeedbackToast {
+		id: string;
+		variant: 'success' | 'error';
+		title: string;
+		description: string;
+	}
 
 	function outlinedStrokeWidth(width: number): number {
 		return width + STROKE_OUTLINE_WIDTH;
@@ -255,6 +267,28 @@
 
 	const scrollTransform = $derived(drawingTransform('scroll'));
 
+	function removeToast(id: string) {
+		toasts = toasts.filter((toast) => toast.id !== id);
+
+		const timer = toastTimers[id];
+		if (!timer) return;
+		clearTimeout(timer);
+		delete toastTimers[id];
+	}
+
+	function showToast(
+		variant: FeedbackToast['variant'],
+		title: string,
+		description: string,
+		duration: number
+	) {
+		const id = crypto.randomUUID();
+		toasts = [...toasts, { id, variant, title, description }];
+		toastTimers[id] = setTimeout(() => {
+			removeToast(id);
+		}, duration);
+	}
+
 	function textInputStyle(position: Point, space: DrawingSpace): string {
 		const { x, y } = screenPoint(position, space);
 		return `left: ${x}px; top: ${y - 10}px;`;
@@ -263,6 +297,10 @@
 	function feedbackRootStyle(): string | undefined {
 		if (!layerHostEl) return undefined;
 		return `left: ${-layerOriginLeft}px; top: ${-layerOriginTop}px;`;
+	}
+
+	function waitForNextPaint(): Promise<void> {
+		return new Promise((resolve) => requestAnimationFrame(() => resolve()));
 	}
 
 	function normalizeWheelDelta(delta: number, deltaMode: number, pageSize: number): number {
@@ -573,39 +611,75 @@
 	// --- Screenshot + Submit ---
 
 	async function captureScreenshot(): Promise<string> {
+		let stream: MediaStream | null = null;
+		const video = document.createElement('video');
+
+		toolbarHiddenForCapture = true;
+		await waitForNextPaint();
+		await waitForNextPaint();
+
 		const w = window.innerWidth;
 		const h = window.innerHeight;
 
-		// Capture the current tab via Screen Capture API
-		const stream = await navigator.mediaDevices.getDisplayMedia({
-			video: { displaySurface: 'browser' },
-			preferCurrentTab: true
-		} as DisplayMediaStreamOptions);
+		try {
+			// Capture the current tab via Screen Capture API
+			stream = await navigator.mediaDevices.getDisplayMedia({
+				video: { displaySurface: 'browser' },
+				preferCurrentTab: true
+			} as DisplayMediaStreamOptions);
 
-		const video = document.createElement('video');
-		video.srcObject = stream;
-		video.muted = true;
-		await video.play();
+			video.srcObject = stream;
+			video.muted = true;
+			await video.play();
 
-		// Wait one frame for the video to render
-		await new Promise((r) => requestAnimationFrame(r));
+			// Wait one frame for the video to render
+			await waitForNextPaint();
 
-		const canvas = document.createElement('canvas');
-		canvas.width = w;
-		canvas.height = h;
-		const ctx = canvas.getContext('2d')!;
+			const canvas = document.createElement('canvas');
+			canvas.width = w;
+			canvas.height = h;
+			const ctx = canvas.getContext('2d')!;
 
-		// Draw the page capture
-		ctx.drawImage(video, 0, 0, w, h);
+			// Draw the page capture
+			ctx.drawImage(video, 0, 0, w, h);
 
-		// Stop the stream immediately
-		stream.getTracks().forEach((t) => t.stop());
-		video.srcObject = null;
+			const dataUrl = canvas.toDataURL('image/webp', 0.8);
+			canvas.width = 0;
+			canvas.height = 0;
+			return dataUrl.split(',')[1]!;
+		} finally {
+			stream?.getTracks().forEach((track) => track.stop());
+			video.srcObject = null;
+			toolbarHiddenForCapture = false;
+		}
+	}
 
-		const dataUrl = canvas.toDataURL('image/webp', 0.8);
-		canvas.width = 0;
-		canvas.height = 0;
-		return dataUrl.split(',')[1]!;
+	async function readSubmissionError(response: Response): Promise<string> {
+		try {
+			const data = await response.json();
+			if (
+				typeof data === 'object' &&
+				data &&
+				'error' in data &&
+				typeof data.error === 'string' &&
+				data.error.trim()
+			) {
+				return data.error.trim();
+			}
+		} catch {
+			// Fall back to the HTTP metadata below when the body is not JSON.
+		}
+
+		if (response.statusText) {
+			return `${response.status} ${response.statusText}`;
+		}
+
+		return `Request failed with status ${response.status}`;
+	}
+
+	function submissionErrorDescription(error: unknown): string {
+		if (error instanceof Error && error.message.trim()) return error.message;
+		return 'Please try again.';
 	}
 
 	async function handleSubmit() {
@@ -613,7 +687,7 @@
 		submitting = true;
 		try {
 			const image = await captureScreenshot();
-			await fetch(`${serverUrl}/submissions`, {
+			const response = await fetch(`${serverUrl}/submissions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
@@ -623,8 +697,19 @@
 					viewport: { width: window.innerWidth, height: window.innerHeight }
 				})
 			});
+
+			if (!response.ok) {
+				throw new Error(await readSubmissionError(response));
+			}
+
 			submitting = false;
 			sent = true;
+			showToast(
+				'success',
+				'Feedback sent',
+				'Your annotation and screenshot were queued for review.',
+				SUCCESS_TOAST_DURATION_MS
+			);
 			setTimeout(() => {
 				sent = false;
 				drawings = [];
@@ -634,6 +719,8 @@
 		} catch (e) {
 			console.error('Failed to submit feedback:', e);
 			submitting = false;
+			sent = false;
+			showToast('error', 'Feedback failed', submissionErrorDescription(e), ERROR_TOAST_DURATION_MS);
 		}
 	}
 
@@ -756,6 +843,13 @@
 
 		const frame = requestAnimationFrame(() => textInputEl?.focus());
 		return () => cancelAnimationFrame(frame);
+	});
+
+	$effect(() => {
+		return () => {
+			for (const timer of Object.values(toastTimers)) clearTimeout(timer);
+			for (const id of Object.keys(toastTimers)) delete toastTimers[id];
+		};
 	});
 </script>
 
@@ -961,6 +1055,7 @@
 			{active}
 			{tool}
 			hasDrawings={hasDrawings || sent}
+			hidden={toolbarHiddenForCapture}
 			{submitting}
 			{sent}
 			ontoggle={toggle}
@@ -968,6 +1063,19 @@
 			onsubmit={handleSubmit}
 		/>
 	</div>
+
+	{#if toasts.length > 0}
+		<Toast.Provider class="feedback-toast-provider" position="top-right">
+			{#each toasts as toast (toast.id)}
+				<Toast.Root id={toast.id} variant={toast.variant}>
+					<div class="feedback-toast-copy">
+						<Toast.Title>{toast.title}</Toast.Title>
+						<Toast.Description>{toast.description}</Toast.Description>
+					</div>
+				</Toast.Root>
+			{/each}
+		</Toast.Provider>
+	{/if}
 </Portal>
 
 <style>
@@ -1077,5 +1185,43 @@
 
 	.text-confirm-btn:hover {
 		background: hsl(25 100% 62%);
+	}
+
+	.feedback-toast-provider {
+		--dry-layer-overlay: 10002;
+		--dry-space-1: 4px;
+		--dry-space-2: 8px;
+		--dry-space-3: 12px;
+		--dry-space-4: 16px;
+		--dry-space-8: 32px;
+		--dry-space-12: 48px;
+		--dry-radius-lg: 16px;
+		--dry-shadow-lg: 0 18px 36px hsl(0 0% 0% / 0.34);
+		--dry-duration-normal: 180ms;
+		--dry-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+		--dry-ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+		--dry-font-sans: 'Inter', 'Helvetica Neue', 'Segoe UI', system-ui, sans-serif;
+		--dry-type-small-size: 0.875rem;
+		--dry-type-small-leading: 1.35;
+		--dry-type-tiny-size: 0.75rem;
+		--dry-type-tiny-leading: 1.45;
+		--dry-color-bg-overlay: hsl(228 18% 12% / 0.98);
+		--dry-color-text-strong: hsl(0 0% 100%);
+		--dry-color-text-weak: hsl(220 14% 84%);
+		--dry-color-stroke-weak: hsl(220 13% 34%);
+		--dry-color-fill-success: hsl(145 65% 46%);
+		--dry-color-fill-success-weak: hsl(145 50% 18% / 0.96);
+		--dry-color-stroke-success: hsl(145 52% 38%);
+		--dry-color-fill-error: hsl(6 84% 58%);
+		--dry-color-fill-error-weak: hsl(6 58% 18% / 0.96);
+		--dry-color-stroke-error: hsl(6 58% 40%);
+
+		pointer-events: none;
+	}
+
+	.feedback-toast-copy {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 4px;
 	}
 </style>

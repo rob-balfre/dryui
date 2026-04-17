@@ -38,6 +38,8 @@ bun run check:lint             # Run CSS lint rule tests
 bun run validate               # parallel pipeline: lint + build + check + test (CI gate, supports --no-test)
 bun run release:gate           # Release validation gate (validate --no-test)
 bun run changeset              # Create a changeset for release
+bun run release                # Local version + publish flow
+bun run release:ci             # CI-only direct-on-main release flow
 bun run format                 # Format all files (Prettier)
 bun run format:check           # Check formatting without writing
 bun run sync:exports           # Regenerate package.json exports maps
@@ -176,11 +178,11 @@ Single source of truth: `packages/mcp/src/composition-data.ts`
 - Unit tests: Bun test runner with happy-dom (`tests/unit/`)
 - Browser tests: Vitest + Playwright chromium (`tests/browser/`)
 - MCP reviewer tests: `packages/mcp/src/reviewer.test.ts`
-- CI: GitHub Actions builds docs and deploys to Cloudflare Pages on push to main. No PR validation workflow — run `bun run validate` locally before pushing
+- CI: GitHub Actions runs `validate.yml` on pull requests to `main`, and runs docs deploy + release workflows on pushes to `main`
 
 ## Releasing
 
-Canonical release, publish, and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Update that file instead of copying release workflow details into role-specific docs.
+Canonical release, publish, and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Releases are versioned, published, and tagged directly from pushes to `main`. Update that file instead of copying release workflow details into role-specific docs.
 
 ## Deployment
 

@@ -83,4 +83,37 @@ describe('runLauncher', () => {
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(result.exitCode).toBe(0);
 	});
+
+	test('reports progress before waiting for startup checks', async () => {
+		const root = createTempTree({
+			'apps/docs/package.json': '{"name":"@dryui/docs"}',
+			'packages/cli/package.json': '{"name":"@dryui/cli"}',
+			'packages/feedback-server/package.json': '{"name":"@dryui/feedback-server"}'
+		});
+		const events: string[] = [];
+
+		await captureAsyncCommandIO(() =>
+			runLauncher([], {
+				cwd: root,
+				runtime: {
+					ensureFeedbackUiBuilt: () => null,
+					onProgress: ({ workspaceRoot, noOpen }) => {
+						events.push(`progress:${workspaceRoot}:${noOpen}`);
+					},
+					ensureFeedbackServer: async () => {
+						events.push('feedback');
+						return 'already running';
+					},
+					ensureDocsServer: async () => {
+						events.push('docs');
+						return 'already running';
+					},
+					now: () => 42,
+					openBrowser: () => false
+				}
+			})
+		);
+
+		expect(events).toEqual([`progress:${root}:false`, 'feedback', 'docs']);
+	});
 });

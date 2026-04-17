@@ -2,6 +2,7 @@
 	import {
 		Avatar,
 		Badge,
+		BorderBeam,
 		Button,
 		ButtonGroup,
 		Card,
@@ -13,6 +14,7 @@
 		NumberInput,
 		Progress,
 		PromptInput,
+		RichTextEditor,
 		Select,
 		Slider,
 		Spinner,
@@ -21,6 +23,7 @@
 		Textarea,
 		Toggle
 	} from '@dryui/ui';
+	import { isDarkTheme } from '$lib/theme.svelte.js';
 	import {
 		ArrowLeft,
 		ArrowRight,
@@ -48,6 +51,7 @@
 	let chatPrompt = $state('');
 	let searchQuery = $state('');
 	let assistantPrompt = $state('');
+	let previewTheme = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 </script>
 
 <div class="preview-root">
@@ -159,7 +163,18 @@
 
 			<div class="badge-strip">
 				{#each activityLabels as label (label)}
-					<Badge color="gray" size="sm">{label}</Badge>
+					<BorderBeam
+						size="line"
+						colorVariant="mono"
+						theme={previewTheme}
+						borderRadius="var(--dry-radius-full)"
+						duration={2.6}
+						strength={0.76}
+					>
+						<span class="activity-badge">
+							<Badge color="gray" size="sm">{label}</Badge>
+						</span>
+					</BorderBeam>
 				{/each}
 			</div>
 
@@ -311,13 +326,18 @@
 						</div>
 
 						<div class="assistant-composer">
-							<Textarea
-								bind:value={assistantPrompt}
-								placeholder="Ask, search, or make anything..."
-								size="sm"
-							/>
+							<div class="assistant-editor">
+								<RichTextEditor.Root
+									bind:value={assistantPrompt}
+									placeholder="Ask, search, or make anything..."
+								>
+									<RichTextEditor.Toolbar />
+									<RichTextEditor.Content />
+								</RichTextEditor.Root>
+							</div>
 							<div class="assistant-composer-actions">
 								<Badge color="gray" size="sm">Auto</Badge>
+								<span aria-hidden="true"></span>
 								<Button variant="solid" size="sm">Go</Button>
 							</div>
 						</div>
@@ -495,6 +515,13 @@
 		margin-inline-start: calc(var(--dry-space-2) * -1);
 	}
 
+	.activity-badge {
+		display: inline-grid;
+		border-radius: var(--dry-radius-full);
+		--dry-badge-border: transparent;
+		--dry-badge-bg: color-mix(in srgb, var(--dry-color-fill) 84%, var(--dry-color-bg-raised));
+	}
+
 	/* dryui-allow flex */
 	.badge-strip,
 	.toolbar-row,
@@ -509,11 +536,16 @@
 
 	.split-fields,
 	.row-between,
-	.status-card,
-	.notice-row,
 	.usage-row {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: var(--dry-space-3);
+	}
+
+	.status-card,
+	.notice-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
 		gap: var(--dry-space-3);
 	}
 
@@ -549,14 +581,17 @@
 	.assistant-composer {
 		display: grid;
 		gap: var(--dry-space-2);
-		padding: var(--dry-space-3);
-		border: 1px solid var(--dry-color-stroke-strong);
-		border-radius: var(--dry-radius-lg);
-		background: var(--dry-color-bg-raised);
-		--dry-input-bg: transparent;
-		--dry-input-border: transparent;
-		--dry-input-padding-x: 0;
-		--dry-input-padding-y: 0;
+	}
+
+	.assistant-editor {
+		--dry-rte-border: var(--dry-color-stroke-strong);
+		--dry-rte-toolbar-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-overlay) 82%,
+			var(--dry-color-bg-base)
+		);
+		--dry-rte-content-bg: var(--dry-color-bg-raised);
+		--dry-rte-padding: var(--dry-space-3);
 	}
 
 	.assistant-composer-actions {
@@ -564,10 +599,7 @@
 		grid-template-columns: max-content 1fr max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
-	}
-
-	.assistant-composer-actions > :last-child {
-		grid-column: 3;
+		padding-inline: var(--dry-space-1);
 	}
 
 	.search-shell {
@@ -661,6 +693,10 @@
 		color: var(--dry-color-text-weak);
 	}
 
+	.notice-leading {
+		grid-template-columns: max-content minmax(0, 1fr);
+	}
+
 	/* Outer mosaic — preview-root is the nearest container with no cards between. */
 	@container (max-width: 64rem) {
 		.preview-mosaic {
@@ -680,14 +716,19 @@
 	@container (max-width: 22rem) {
 		.split-fields,
 		.row-between,
-		.status-card,
-		.notice-row,
 		.usage-row {
 			grid-template-columns: 1fr;
 		}
 
 		.number-shell {
 			justify-items: start;
+		}
+	}
+
+	@container (max-width: 15rem) {
+		.status-card,
+		.notice-row {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

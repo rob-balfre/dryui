@@ -8,7 +8,7 @@
  * prepack/postpack hooks wired into packages/ui and packages/primitives.
  *
  * Note: CI never calls this script — the release flow goes through
- * `changesets/action@v1` → `bun run publish:packages` (= `changeset publish`) →
+ * `bun run release:ci` → `bun run publish:packages` (= `changeset publish`) →
  * `npm pack` prepack/postpack hooks. This script is for manual/one-off publishes.
  *
  * Usage:

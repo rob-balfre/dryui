@@ -43,7 +43,7 @@ The plugin is the canonical way Claude Code and Codex get DryUI skills. Manual M
 
 ## Releasing
 
-Canonical release and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Keep release workflow changes there instead of duplicating them in agent-facing docs.
+Canonical release and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Release automation versions, publishes, and tags directly from pushes to `main`. Keep workflow changes there instead of duplicating them in agent-facing docs.
 
 ## Verification
 

@@ -20,7 +20,7 @@
 	}
 
 	let {
-		code,
+		code = '',
 		language,
 		showLineNumbers = false,
 		showCopyButton = true,

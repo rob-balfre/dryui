@@ -253,6 +253,25 @@ function renderPromptFrame(question: string, config: SelectPromptOptions): void 
 	console.log('');
 }
 
+function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): void {
+	renderPromptFrame(
+		noOpen ? 'Starting feedback dashboard URL lookup...' : 'Starting feedback dashboard...',
+		{
+			contextLines: mainContext
+		}
+	);
+	console.log(
+		paint(
+			noOpen
+				? 'Starting the feedback server if needed and preparing the dashboard URL.'
+				: 'Starting the feedback server if needed and opening the browser.',
+			ANSI.white
+		)
+	);
+	console.log(paint('This can take a few seconds.', ANSI.dim, ANSI.sky));
+	console.log('');
+}
+
 function setupHelp(exitCode = 0): never {
 	printCommandHelp(
 		{
@@ -441,9 +460,16 @@ async function promptConfirm(
 	return value === 'yes';
 }
 
-async function runFeedbackSession(noOpen: boolean, exitOnComplete: boolean): Promise<void> {
+async function runFeedbackSession(
+	noOpen: boolean,
+	exitOnComplete: boolean,
+	launcherOptions: Omit<
+		NonNullable<Parameters<typeof runLauncher>[1]>,
+		'cwd' | 'exitOnComplete'
+	> = {}
+): Promise<void> {
 	const args = noOpen ? ['--no-open'] : [];
-	const launched = await runLauncher(args, { exitOnComplete });
+	const launched = await runLauncher(args, { exitOnComplete, ...launcherOptions });
 	if (launched) return;
 
 	const result = await getFeedbackUiResult(args, exitOnComplete ? 'toon' : 'text');
@@ -569,7 +595,11 @@ async function runInteractiveFeedbackSetup(mainContext: string[]): Promise<void>
 		process.exit(0);
 	}
 
-	await runFeedbackSession(action === 'print', false);
+	await runFeedbackSession(action === 'print', false, {
+		runtime: {
+			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(mainContext, noOpen)
+		}
+	});
 	await promptAfterAction();
 }
 

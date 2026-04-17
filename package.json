@@ -43,6 +43,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "publish:packages": "bun scripts/publish-packages.ts",
+    "release:ci": "bun run scripts/release-ci.ts",
     "release:gate": "bun run validate --no-test",
     "release": "bun run release:gate && bun run version && bun run publish:packages"
   },

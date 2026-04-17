@@ -1,7 +1,6 @@
 import adapter from '@sveltejs/adapter-cloudflare';
 import { dryuiLint } from '@dryui/lint';
 
-const useSingleBundle = process.env.NODE_ENV !== 'production';
 const isDevCommand = process.env.npm_lifecycle_event === 'dev' || process.argv.includes('dev');
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -18,7 +17,9 @@ const config = {
 			remoteFunctions: true
 		},
 		output: {
-			bundleStrategy: useSingleBundle ? 'single' : 'split'
+			// `single` currently generates a broken client route dictionary in docs dev,
+			// which makes /theme-wizard hydrate as /components/[slug].
+			bundleStrategy: 'split'
 		},
 		prerender: {
 			entries: isDevCommand ? [] : ['*']
