@@ -1145,25 +1145,85 @@ async function main(): Promise<void> {
 		const dataAttributes = new Set<string>();
 		const entries = await readdir(dirPath, { withFileTypes: true });
 
-		for (const entry of entries) {
-			if (!entry.isFile()) continue;
-			if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
-			const source = await readText(join(dirPath, entry.name));
+		async function scanForStyleSurface(
+			filePath: string,
+			filters?: { cssVarPrefixes?: string[]; dataAttrPrefixes?: string[] }
+		): Promise<void> {
+			let source: string;
+			try {
+				source = await readText(filePath);
+			} catch {
+				return;
+			}
+
+			const cssVarPrefixes = filters?.cssVarPrefixes;
+			const dataAttrPrefixes = filters?.dataAttrPrefixes;
 
 			for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
 				const varName = match[1];
-				if (varName) cssVars[varName] = cssVarDescription(varName);
+				if (!varName) continue;
+				if (cssVarPrefixes && !cssVarPrefixes.some((p) => varName.startsWith(p))) continue;
+				cssVars[varName] = cssVarDescription(varName);
 			}
 			// Private-alias fallback pattern `--_dry-btn-bg: var(--dry-btn-bg, <fallback>)`
 			// — the first var() argument is the consumer-facing override point.
 			for (const match of source.matchAll(/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)/gm)) {
 				const varName = match[1];
-				if (varName) cssVars[varName] = cssVarDescription(varName);
+				if (!varName) continue;
+				if (cssVarPrefixes && !cssVarPrefixes.some((p) => varName.startsWith(p))) continue;
+				cssVars[varName] = cssVarDescription(varName);
 			}
 
 			for (const attr of collectDataAttributes(source)) {
+				if (dataAttrPrefixes && !dataAttrPrefixes.some((p) => attr.startsWith(p))) continue;
 				dataAttributes.add(attr);
 			}
+		}
+
+		for (const entry of entries) {
+			if (!entry.isFile()) continue;
+			if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
+			await scanForStyleSurface(join(dirPath, entry.name));
+		}
+
+		// Shared style surfaces that these compound components render through.
+		// The unified modal-content.svelte owns the dialog/panel markup + styles
+		// for Dialog/Drawer/AlertDialog, so its data-* and --dry-* contract
+		// needs to be reflected in each component's spec. Filter by component
+		// prefix so each component advertises only its own data-* surface
+		// (--dry-* filtering is broader since several shared tokens, e.g.
+		// --dry-radius-nested, land inside component-specific scopes).
+		const SHARED_STYLE_SURFACES: Record<
+			string,
+			{ path: string; cssVarPrefixes: string[]; dataAttrPrefixes: string[] }[]
+		> = {
+			Dialog: [
+				{
+					path: 'internal/modal-content.svelte',
+					cssVarPrefixes: ['--dry-dialog-', '--dry-radius-nested', '--dry-overlay-'],
+					dataAttrPrefixes: ['data-dialog-']
+				}
+			],
+			Drawer: [
+				{
+					path: 'internal/modal-content.svelte',
+					cssVarPrefixes: ['--dry-drawer-', '--dry-overlay-'],
+					dataAttrPrefixes: ['data-drawer-', 'data-side']
+				}
+			],
+			AlertDialog: [
+				{
+					path: 'internal/modal-content.svelte',
+					cssVarPrefixes: ['--dry-dialog-', '--dry-overlay-'],
+					dataAttrPrefixes: ['data-alert-dialog-']
+				}
+			]
+		};
+		for (const surface of SHARED_STYLE_SURFACES[name] ?? []) {
+			await scanForStyleSurface(join(uiSrc, surface.path), {
+				cssVarPrefixes: surface.cssVarPrefixes,
+				dataAttrPrefixes: surface.dataAttrPrefixes
+			});
 		}
 
 		const primDirPath = join(primSrc, dir);

@@ -115,6 +115,6 @@
 	});
 </script>
 
-<ModalContent ctx={modalCtx} aria-labelledby={undefined} onclick={() => {}} {...rest}>
+<ModalContent ctx={modalCtx} dismissOnBackdropClick={false} {...rest}>
 	{@render children()}
 </ModalContent>

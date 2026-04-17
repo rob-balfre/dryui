@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getAlertDialogCtx } from './context.svelte.js';
+	import ModalHeader from '../internal/modal-header.svelte';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
@@ -12,6 +13,6 @@
 	const ctx = getAlertDialogCtx();
 </script>
 
-<div id={ctx.headerId} {...rest}>
+<ModalHeader {ctx} {...rest}>
 	{@render children()}
-</div>
+</ModalHeader>

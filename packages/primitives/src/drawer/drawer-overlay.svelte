@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getDrawerCtx } from './context.svelte.js';
+	import ModalOverlay from '../internal/modal-overlay.svelte';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -9,4 +10,4 @@
 	const ctx = getDrawerCtx();
 </script>
 
-<div data-state={ctx.open ? 'open' : 'closed'} aria-hidden="true" {...rest}></div>
+<ModalOverlay {ctx} {...rest} />

@@ -15,9 +15,10 @@
 
 <ModalContent
 	{ctx}
+	side="center"
 	role="alertdialog"
-	oncancel={(e) => e.preventDefault()}
-	onclick={() => {}}
+	dismissOnEscape={false}
+	dismissOnBackdropClick={false}
 	{...rest}
 >
 	{@render children()}

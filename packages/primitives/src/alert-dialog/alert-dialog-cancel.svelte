@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import { getAlertDialogCtx } from './context.svelte.js';
+	import ModalClose from '../internal/modal-close.svelte';
 
 	interface Props extends HTMLButtonAttributes {
 		children: Snippet;
@@ -12,6 +13,6 @@
 	const ctx = getAlertDialogCtx();
 </script>
 
-<button type="button" onclick={() => ctx.close()} {...rest}>
+<ModalClose {ctx} {...rest}>
 	{@render children()}
-</button>
+</ModalClose>
