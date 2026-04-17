@@ -19,11 +19,6 @@
 	import { withBase } from '$lib/utils';
 
 	const PLUGIN_AGENT_IDS = ['claude-code', 'codex', 'gemini'] as const;
-	const PLUGIN_AGENT_BADGE_COLORS = {
-		'claude-code': 'blue',
-		codex: 'green',
-		gemini: 'purple'
-	} as const;
 
 	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
 		(PLUGIN_AGENT_IDS as readonly string[]).includes(setup.id)
@@ -119,38 +114,35 @@
 					<code>dryui-feedback</code> MCP servers in one step.
 				</Text>
 
-				<div class="stack-md">
+				<Tabs.Root value={featuredAgentSetups[0]?.id ?? 'claude-code'}>
+					<Tabs.List>
+						{#each featuredAgentSetups as setup (setup.id)}
+							<Tabs.Trigger value={setup.id}>
+								<span class="agent-tab-label">
+									<AgentLogo agent={setup.id as 'claude-code' | 'codex' | 'gemini'} size={18} />
+									{setup.label}
+								</span>
+							</Tabs.Trigger>
+						{/each}
+					</Tabs.List>
 					{#each featuredAgentSetups as setup (setup.id)}
-						<Card.Root>
-							<Card.Content>
-								<div class="agent-setup-card">
+						<Tabs.Content value={setup.id}>
+							<div class="agent-setup-card">
+								<Text color="secondary">{setup.description}</Text>
+
+								{#if setup.skill}
 									<div class="stack-sm">
-										<div class="agent-heading">
-											<AgentLogo agent={setup.id as 'claude-code' | 'codex' | 'gemini'} size={28} />
-											<Badge
-												variant="outline"
-												color={PLUGIN_AGENT_BADGE_COLORS[
-													setup.id as keyof typeof PLUGIN_AGENT_BADGE_COLORS
-												]}>{setup.label}</Badge
-											>
-										</div>
-										<Text color="secondary">{setup.description}</Text>
+										<Text size="sm" color="muted">{setup.skill.title}</Text>
+										<Text size="sm" color="secondary">{setup.skill.note}</Text>
+										<CodeBlock language="bash" code={setup.skill.code} />
 									</div>
+								{/if}
 
-									{#if setup.skill}
-										<div class="stack-sm">
-											<Text size="sm" color="muted">{setup.skill.title}</Text>
-											<Text size="sm" color="secondary">{setup.skill.note}</Text>
-											<CodeBlock language="bash" code={setup.skill.code} />
-										</div>
-									{/if}
-
-									<Text size="sm" color="secondary">{setup.followUp}</Text>
-								</div>
-							</Card.Content>
-						</Card.Root>
+								<Text size="sm" color="secondary">{setup.followUp}</Text>
+							</div>
+						</Tabs.Content>
 					{/each}
-				</div>
+				</Tabs.Root>
 
 				<Text size="sm" color="muted">
 					Using Cursor, Copilot, Windsurf, or Zed? They don't ship a DryUI plugin yet — the full
@@ -421,12 +413,11 @@
 		gap: var(--dry-space-4);
 	}
 
-	.agent-heading {
-		display: grid;
+	.agent-tab-label {
+		display: inline-grid;
 		grid-template-columns: auto auto;
-		gap: var(--dry-space-2_5);
+		gap: var(--dry-space-2);
 		align-items: center;
-		justify-content: start;
 	}
 
 	.badge-row {
