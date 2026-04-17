@@ -31,8 +31,11 @@
 		border-radius: var(--dry-radius-full);
 		background: var(--dry-timeline-dot-color, var(--dry-color-fill-brand));
 		color: var(--dry-color-bg-raised);
+		font-family: var(--dry-font-sans);
 		font-size: var(--dry-timeline-icon-font-size, var(--dry-type-tiny-size));
 		font-weight: 700;
+		font-variant-numeric: tabular-nums lining-nums;
+		line-height: 1;
 		box-shadow: 0 0 0 3px var(--dry-color-bg-raised);
 	}
 </style>

@@ -35,9 +35,21 @@
 		);
 		top: var(
 			--dry-timeline-line-top,
-			calc(var(--dry-timeline-dot-size, 0.875rem) + var(--dry-space-1))
+			calc(
+				(var(--dry-timeline-content-line-height, 1.5rem) + var(--dry-timeline-dot-size, 0.875rem)) /
+					2 + var(--dry-space-1)
+			)
 		);
-		bottom: var(--dry-timeline-line-bottom, calc(var(--dry-space-1) * -1));
+		bottom: var(
+			--dry-timeline-line-bottom,
+			calc(
+				-1 *
+					(
+						var(--dry-timeline-gap, var(--dry-space-4)) +
+							var(--dry-timeline-content-line-height, 1.5rem) / 2 - var(--dry-space-1)
+					)
+			)
+		);
 		right: var(--dry-timeline-line-right, auto);
 		height: var(--dry-timeline-line-h, auto);
 		transform: translateX(calc(var(--dry-timeline-line-w, 1px) / -2));
