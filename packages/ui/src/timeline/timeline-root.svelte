@@ -41,7 +41,7 @@
 		--dry-timeline-item-pl: 0;
 		--dry-timeline-item-pt: var(--dry-space-4);
 		--dry-timeline-line-left: 0;
-		--dry-timeline-line-top: calc(var(--dry-timeline-dot-size) / 2 + var(--dry-space-2));
+		--dry-timeline-line-top: calc(var(--dry-space-4) + var(--dry-timeline-dot-size) / 2);
 		--dry-timeline-line-right: calc(var(--dry-space-1) * -1);
 		--dry-timeline-line-bottom: auto;
 		--dry-timeline-line-w: auto;

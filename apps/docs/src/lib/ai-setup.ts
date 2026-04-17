@@ -16,6 +16,12 @@ export interface AiSurfaceCard {
 	readonly example?: string;
 }
 
+export interface AiInstallStep {
+	title: string;
+	description?: string;
+	code?: string;
+}
+
 export interface AiAgentSetup {
 	id: AiAgentId;
 	label: string;
@@ -25,6 +31,11 @@ export interface AiAgentSetup {
 		title: string;
 		code: string;
 	};
+	/**
+	 * Ordered steps for the plugin install. When present, the getting-started
+	 * page renders these as a Timeline instead of a single code block.
+	 */
+	installSteps?: AiInstallStep[];
 	skill?: {
 		title: string;
 		note: string;
@@ -162,6 +173,18 @@ export const aiAgentSetups: AiAgentSetup[] = [
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
+		installSteps: [
+			{
+				title: 'Add the DryUI marketplace',
+				description: 'Registers the repo so Claude Code can discover the DryUI plugin.',
+				code: 'claude plugin marketplace add rob-balfre/dryui'
+			},
+			{
+				title: 'Install the plugin',
+				description: 'Installs the DryUI skill and the dryui + dryui-feedback MCP servers.',
+				code: 'claude plugin install dryui@dryui'
+			}
+		],
 		skill: {
 			title: '2. Install the plugin',
 			note: 'The plugin is the canonical Claude install path for the DryUI skill and MCP servers.',
@@ -188,6 +211,17 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
+		installSteps: [
+			{
+				title: 'Add the DryUI marketplace',
+				description: 'Requires Codex 0.121.0 or newer.',
+				code: 'codex marketplace add rob-balfre/dryui'
+			},
+			{
+				title: 'Install DryUI from /plugins',
+				description: 'Start Codex, run `/plugins`, then install DryUI from the list.'
+			}
+		],
 		skill: {
 			title: '2. Install the plugin',
 			note: 'Requires Codex 0.121.0 or newer. The plugin is the canonical Codex install path for the DryUI skill and MCP servers.',
@@ -215,6 +249,19 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
+		installSteps: [
+			{
+				title: 'Clone the DryUI repo',
+				description: 'Gemini CLI installs extensions from a local path, not a GitHub URL.',
+				code: 'git clone https://github.com/rob-balfre/dryui ~/dryui'
+			},
+			{
+				title: 'Install the extension',
+				description:
+					'Points Gemini at `packages/plugin/`, which bundles GEMINI.md and the dryui + dryui-feedback MCP servers.',
+				code: 'gemini extensions install ~/dryui/packages/plugin'
+			}
+		],
 		skill: {
 			title: '2. Install the extension',
 			note: 'Gemini CLI installs extensions from a local path. Clone the repo and point `gemini extensions install` at `packages/plugin/` — the extension bundles GEMINI.md plus the dryui and dryui-feedback MCP servers.',

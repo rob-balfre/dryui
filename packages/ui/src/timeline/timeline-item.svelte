@@ -29,7 +29,9 @@
 		position: absolute;
 		left: var(
 			--dry-timeline-line-left,
-			calc(var(--dry-timeline-dot-size, 0.875rem) / 2 + var(--dry-space-2))
+			calc(
+				var(--dry-timeline-item-pl, var(--dry-space-4)) + var(--dry-timeline-dot-size, 0.875rem) / 2
+			)
 		);
 		top: var(
 			--dry-timeline-line-top,
@@ -38,7 +40,12 @@
 		bottom: var(--dry-timeline-line-bottom, calc(var(--dry-space-1) * -1));
 		right: var(--dry-timeline-line-right, auto);
 		height: var(--dry-timeline-line-h, auto);
+		transform: translateX(calc(var(--dry-timeline-line-w, 1px) / -2));
 		border-left: var(--dry-timeline-line-w, 1px) solid
 			var(--dry-timeline-line-color, var(--dry-color-stroke-weak));
+	}
+
+	[data-part='item']:last-child::before {
+		display: none;
 	}
 </style>
