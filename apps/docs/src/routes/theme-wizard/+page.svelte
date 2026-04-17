@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
 	import {
 		Adjust,
 		Badge,
@@ -12,6 +11,7 @@
 		OptionPicker,
 		Slider,
 		Text,
+		TokenScope,
 		VisuallyHidden
 	} from '@dryui/ui';
 	import {
@@ -56,24 +56,7 @@
 
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
-	let previewSceneRef: HTMLElement | null = $state(null);
 	let lastAppliedRecipe: string | null = null;
-
-	$effect(() => {
-		const node = previewSceneRef;
-		if (!node) return;
-		const entries = Object.entries(tokens);
-		for (const [name, value] of entries) {
-			node.style.setProperty(name, value);
-		}
-		return () => {
-			for (const [name] of entries) {
-				node.style.removeProperty(name);
-			}
-		};
-	});
-
-	useThemeOverride(() => tokens);
 
 	afterNavigate(() => {
 		const recipe = page.url.searchParams.get('t');
@@ -620,9 +603,11 @@
 	>
 		<section class="preview-band">
 			<Container size="xl">
-				<div class="preview-scene" data-mode={themeMode} bind:this={previewSceneRef}>
-					<PreviewComponents />
-				</div>
+				<TokenScope {tokens}>
+					<div class="preview-scene" data-mode={themeMode}>
+						<PreviewComponents />
+					</div>
+				</TokenScope>
 			</Container>
 		</section>
 	</Adjust>

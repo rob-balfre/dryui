@@ -101,7 +101,7 @@
 		padding: 0;
 	}
 
-	[data-modal-content]:not([open]) {
+	[data-modal-content][data-variant]:not([open]) {
 		display: none;
 	}
 

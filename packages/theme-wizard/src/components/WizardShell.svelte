@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { useThemeOverride } from '@dryui/primitives/use-theme-override';
+	import { TokenScope } from '@dryui/primitives/token-scope';
 	import { Text } from '@dryui/ui/text';
 	import { Button } from '@dryui/ui/button';
 	import { getAllTokens, wizardState } from '../state.svelte.js';
@@ -30,41 +30,43 @@
 		onstep
 	}: Props = $props();
 
-	useThemeOverride(() => getAllTokens());
+	const tokens = $derived(getAllTokens());
 </script>
 
-<div class="wizard-shell">
-	<header class="wizard-header">
-		<div class="wizard-header-inner">
-			<Text size="lg" weight="semibold">Theme Wizard</Text>
-			<StepIndicator currentStep={step} {...onstep ? { onstep } : {}} />
-		</div>
-	</header>
+<TokenScope {tokens}>
+	<div class="wizard-shell">
+		<header class="wizard-header">
+			<div class="wizard-header-inner">
+				<Text size="lg" weight="semibold">Theme Wizard</Text>
+				<StepIndicator currentStep={step} {...onstep ? { onstep } : {}} />
+			</div>
+		</header>
 
-	<main class="wizard-main">
-		<div class="wizard-content">
-			<div class="wizard-title">
-				<span class="wizard-step-heading">{title}</span>
-				{#if subtitle}
-					<Text as="p" color="muted">{subtitle}</Text>
+		<main class="wizard-main">
+			<div class="wizard-content">
+				<div class="wizard-title">
+					<span class="wizard-step-heading">{title}</span>
+					{#if subtitle}
+						<Text as="p" color="muted">{subtitle}</Text>
+					{/if}
+				</div>
+
+				{@render children()}
+			</div>
+		</main>
+
+		<footer class="wizard-footer">
+			<div class="wizard-footer-inner">
+				{#if onback}
+					<Button variant="ghost" onclick={onback}>&larr; {backLabel}</Button>
+				{/if}
+				{#if onnext}
+					<Button variant="solid" onclick={onnext}>{nextLabel} &rarr;</Button>
 				{/if}
 			</div>
-
-			{@render children()}
-		</div>
-	</main>
-
-	<footer class="wizard-footer">
-		<div class="wizard-footer-inner">
-			{#if onback}
-				<Button variant="ghost" onclick={onback}>&larr; {backLabel}</Button>
-			{/if}
-			{#if onnext}
-				<Button variant="solid" onclick={onnext}>{nextLabel} &rarr;</Button>
-			{/if}
-		</div>
-	</footer>
-</div>
+		</footer>
+	</div>
+</TokenScope>
 
 <style>
 	.wizard-shell {
