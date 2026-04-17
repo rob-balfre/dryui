@@ -17,8 +17,15 @@
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 
-	const featuredAgentSetups = aiAgentSetups.filter(
-		(setup) => setup.id === 'claude-code' || setup.id === 'codex'
+	const PLUGIN_AGENT_IDS = ['claude-code', 'codex', 'gemini'] as const;
+	const PLUGIN_AGENT_BADGE_COLORS = {
+		'claude-code': 'blue',
+		codex: 'green',
+		gemini: 'purple'
+	} as const;
+
+	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
+		(PLUGIN_AGENT_IDS as readonly string[]).includes(setup.id)
 	);
 
 	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
@@ -104,10 +111,11 @@
 
 		<section>
 			<div class="stack-lg">
-				<Heading level={2}>Set up Claude Code or Codex</Heading>
+				<Heading level={2}>Install the DryUI plugin</Heading>
 				<Text size="lg" color="secondary">
-					Once <code>dryui</code> is installed, add the DryUI plugin in Claude Code or Codex. Those are
-					the fastest editor workflows right now.
+					Once <code>dryui</code> is installed, add the DryUI plugin in Claude Code, Codex, or
+					Gemini CLI. Each plugin ships the DryUI skill plus the <code>dryui</code> and
+					<code>dryui-feedback</code> MCP servers in one step.
 				</Text>
 
 				<div class="stack-md">
@@ -116,8 +124,11 @@
 							<Card.Content>
 								<div class="agent-setup-card">
 									<div class="stack-sm">
-										<Badge variant="outline" color={setup.id === 'claude-code' ? 'blue' : 'green'}
-											>{setup.label}</Badge
+										<Badge
+											variant="outline"
+											color={PLUGIN_AGENT_BADGE_COLORS[
+												setup.id as keyof typeof PLUGIN_AGENT_BADGE_COLORS
+											]}>{setup.label}</Badge
 										>
 										<Text color="secondary">{setup.description}</Text>
 									</div>
@@ -138,8 +149,8 @@
 				</div>
 
 				<Text size="sm" color="muted">
-					Need Cursor, Copilot, Windsurf, Zed, or the manual MCP fallback? The full setup matrix is
-					further down this page.
+					Using Cursor, Copilot, Windsurf, or Zed? They don't ship a DryUI plugin yet — the full
+					setup matrix below covers the MCP-only install for each.
 				</Text>
 			</div>
 		</section>

@@ -1,6 +1,13 @@
 import { aiSurface } from '../../../../packages/mcp/src/ai-surface.js';
 
-export type AiAgentId = 'claude-code' | 'codex' | 'cursor' | 'copilot' | 'windsurf' | 'zed';
+export type AiAgentId =
+	| 'claude-code'
+	| 'codex'
+	| 'gemini'
+	| 'cursor'
+	| 'copilot'
+	| 'windsurf'
+	| 'zed';
 
 export interface AiSurfaceCard {
 	readonly name: string;
@@ -119,6 +126,19 @@ const copilotConfig = `{
   }
 }`;
 
+const geminiConfig = `{
+  "mcpServers": {
+    "dryui": {
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "command": "npx",
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+    }
+  }
+}`;
+
 const zedConfig = `{
   "context_servers": {
     "dryui": {
@@ -185,6 +205,30 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		followUp:
 			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask` / `check` are available.'
+	},
+	{
+		id: 'gemini',
+		label: 'Gemini CLI',
+		description:
+			'Start with the DryUI CLI, then install the DryUI extension so Gemini can use the same discovery and validation loop in-editor.',
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
+		skill: {
+			title: '2. Install the extension',
+			note: 'Gemini CLI installs extensions from a local path. Clone the repo and point `gemini extensions install` at `packages/plugin/` — the extension bundles GEMINI.md plus the dryui and dryui-feedback MCP servers.',
+			code: `git clone https://github.com/rob-balfre/dryui ~/dryui
+gemini extensions install ~/dryui/packages/plugin`
+		},
+		mcp: {
+			path: '~/.gemini/settings.json',
+			note: '3. Optional MCP-only fallback: add the servers to `~/.gemini/settings.json` if you cannot install the extension. This does not install GEMINI.md with the DryUI skill.',
+			code: geminiConfig,
+			language: 'json'
+		},
+		followUp:
+			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask` / `check` are available.'
 	},
 	{
 		id: 'copilot',

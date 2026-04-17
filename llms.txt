@@ -61,7 +61,7 @@ Current command surface:
 
 ## Editor integration
 
-Per-tool install snippets and MCP config for Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed live at https://dryui.dev/getting-started. Canonical source: `apps/docs/src/lib/ai-setup.ts` — do not duplicate snippets here.
+Per-tool install snippets and MCP config for Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Copilot, and Zed live at https://dryui.dev/getting-started. Canonical source: `apps/docs/src/lib/ai-setup.ts` — do not duplicate snippets here.
 
 Manual MCP fallback: `npx -y @dryui/mcp`.
 

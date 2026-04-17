@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Feedback } from '@dryui/feedback';
-	import { dev } from '$app/environment';
+	import { browser, dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { Badge, Button, Container, Drawer, Heading, Link } from '@dryui/ui';
@@ -52,7 +52,7 @@
 	);
 	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
 	let shouldPreserveFeedbackMode = $derived(
-		feedbackEnabled || page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1'
+		feedbackEnabled || (browser && page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1')
 	);
 	let themeWizardHref = $derived(
 		withQueryParam(

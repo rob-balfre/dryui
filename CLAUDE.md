@@ -20,7 +20,7 @@ DryUI is currently pre-alpha. Prefer current behavior over legacy compatibility,
 - `packages/feedback` — @dryui/feedback: feedback annotation UI components
 - `packages/feedback-server` — @dryui/feedback-server: feedback MCP server backend
 - `packages/theme-wizard` — @dryui/theme-wizard: theme generation library (brand color → full theme)
-- `packages/plugin` — @dryui/plugin: Claude Code + Codex plugin bundle (canonical Claude/Codex skill path)
+- `packages/plugin` — @dryui/plugin: plugin bundle for Claude Code, Codex, and Gemini CLI (canonical plugin skill path)
 - `apps/docs` — Documentation site (SvelteKit, static adapter)
 
 ## Commands
@@ -120,7 +120,7 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
 ### Quick setup
 
-Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Cursor, Windsurf, Copilot, and Zed. Add this layer after the CLI is already working.
+Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Copilot, and Zed. Add this layer after the CLI is already working.
 
 For Claude Code, the canonical install is:
 
@@ -137,6 +137,15 @@ codex marketplace add rob-balfre/dryui
 
 Then open Codex and install DryUI from `/plugins`. The marketplace is defined by `.agents/plugins/marketplace.json`; Codex resolves the same path whether it's cloned via `marketplace add` or discovered locally inside this repo. Use that plugin path for local development too; do not copy DryUI skills into repo-local `.claude/` or `.codex/` folders.
 
+For Gemini CLI, install the extension from `packages/plugin/` (it bundles `GEMINI.md` plus the two MCP servers):
+
+```bash
+git clone https://github.com/rob-balfre/dryui ~/dryui
+gemini extensions install ~/dryui/packages/plugin
+```
+
+Gemini CLI does not yet support marketplace-style installs, so the extension is pointed at a local path. Inside this repo you can run `gemini extensions link packages/plugin` instead for live-reload development.
+
 The plugin config ships two MCP servers:
 
 - **dryui** — scope-driven discovery and unified validation for components, setup, themes, and workspaces
@@ -148,7 +157,7 @@ DryUI MCP tools:
 - discovery (`ask`)
 - validation (`check`)
 - DryUI skill source: `packages/ui/skills/dryui/SKILL.md`
-- Plugin bundle: `packages/plugin/` (bundles the `dryui`, `init`, and `live-feedback` skills plus the `dryui` and `dryui-feedback` MCP servers)
+- Plugin bundle: `packages/plugin/` (ships Claude Code, Codex, and Gemini CLI variants — the `dryui`, `init`, and `live-feedback` skills plus the `dryui` and `dryui-feedback` MCP servers)
 
 ### Output Format — TOON (Token-Optimized Output)
 
