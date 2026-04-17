@@ -7,7 +7,6 @@
 		ButtonGroup,
 		Card,
 		Checkbox,
-		Chip,
 		Field,
 		Input,
 		Label,
@@ -47,7 +46,6 @@
 		{ label: 'Updating', variant: 'ocean' as const, duration: 2.1 },
 		{ label: 'Loading', variant: 'sunset' as const, duration: 2.5 }
 	];
-	const discoverySources = ['Social Media', 'Search Engine', 'Referral', 'Other'];
 
 	let budget = $state(640);
 	let gpuCount = $state(8);
@@ -225,6 +223,23 @@
 					</div>
 				</Card.Content>
 			</Card.Root>
+
+			<ButtonGroup size="sm">
+				<Button variant="outline">Archive</Button>
+				<Button variant="outline">Report</Button>
+				<Button variant="outline">Snooze</Button>
+			</ButtonGroup>
+
+			<Card.Root size="sm">
+				<Card.Content>
+					<div class="checkbox-row">
+						<Checkbox id="preview-terms" checked />
+						<Label for="preview-terms">
+							<Text>I agree to the terms and conditions</Text>
+						</Label>
+					</div>
+				</Card.Content>
+			</Card.Root>
 		</div>
 
 		<div class="preview-column">
@@ -253,6 +268,30 @@
 								<Text as="span" weight="medium">Your profile has been verified.</Text>
 							</div>
 							<ChevronRight size={14} aria-hidden="true" />
+						</div>
+
+						<div class="panel-divider"></div>
+
+						<div class="context-pill">
+							<Paperclip size={14} aria-hidden="true" />
+							<Text>Add context</Text>
+						</div>
+
+						<div class="assistant-composer">
+							<div class="assistant-editor">
+								<RichTextEditor.Root
+									bind:value={assistantPrompt}
+									placeholder="Ask, search, or make anything..."
+								>
+									<RichTextEditor.Toolbar />
+									<RichTextEditor.Content />
+								</RichTextEditor.Root>
+							</div>
+							<div class="assistant-composer-actions">
+								<Badge color="gray" size="sm">Auto</Badge>
+								<span aria-hidden="true"></span>
+								<Button variant="solid" size="sm">Go</Button>
+							</div>
 						</div>
 					</div>
 				</Card.Content>
@@ -289,7 +328,7 @@
 										<div class="choice-card-copy">
 											<div class="choice-card-head">
 												<Text as="span" weight="semibold">Virtual Machine</Text>
-												<Text as="span" color="muted" size="sm">Coming soon</Text>
+												<Badge color="gray" size="sm">Soon</Badge>
 											</div>
 											<Text color="muted">Access a VM configured cluster to run workloads.</Text>
 										</div>
@@ -322,87 +361,13 @@
 					</div>
 				</Card.Content>
 			</Card.Root>
-		</div>
 
-		<div class="preview-column">
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="panel-stack">
-						<div class="context-pill">
-							<Paperclip size={14} aria-hidden="true" />
-							<Text>Add context</Text>
-						</div>
-
-						<div class="assistant-composer">
-							<div class="assistant-editor">
-								<RichTextEditor.Root
-									bind:value={assistantPrompt}
-									placeholder="Ask, search, or make anything..."
-								>
-									<RichTextEditor.Toolbar />
-									<RichTextEditor.Content />
-								</RichTextEditor.Root>
-							</div>
-							<div class="assistant-composer-actions">
-								<Badge color="gray" size="sm">Auto</Badge>
-								<span aria-hidden="true"></span>
-								<Button variant="solid" size="sm">Go</Button>
-							</div>
-						</div>
-					</div>
-				</Card.Content>
-			</Card.Root>
-
-			<ButtonGroup size="sm">
-				<Button variant="outline">Archive</Button>
-				<Button variant="outline">Report</Button>
-				<Button variant="outline">Snooze</Button>
-			</ButtonGroup>
-
-			<Card.Root size="sm">
-				<Card.Content>
-					<div class="checkbox-row">
-						<Checkbox id="preview-terms" checked />
-						<Label for="preview-terms">
-							<Text>I agree to the terms and conditions</Text>
-						</Label>
-					</div>
-				</Card.Content>
-			</Card.Root>
-
-			<div class="toolbar-row">
-				<ButtonGroup size="sm">
-					<Button variant="outline" size="icon" aria-label="Previous">
-						<ArrowLeft size={14} aria-hidden="true" />
-					</Button>
-					<Button variant="outline">1</Button>
-					<Button variant="outline">2</Button>
-					<Button variant="outline">3</Button>
-					<Button variant="outline" size="icon" aria-label="Next">
-						<ArrowRight size={14} aria-hidden="true" />
-					</Button>
-				</ButtonGroup>
+			<div class="copilot-row">
 				<Button variant="secondary" size="sm">
 					<LockKeyhole size={14} aria-hidden="true" />
 					Copilot
 				</Button>
 			</div>
-
-			<Card.Root size="sm">
-				<Card.Header>
-					<div class="panel-copy">
-						<Text as="span" weight="semibold">How did you hear about us?</Text>
-						<Text color="muted">Select the option that best describes you.</Text>
-					</div>
-				</Card.Header>
-				<Card.Content>
-					<div class="chip-row">
-						{#each discoverySources as source (source)}
-							<Chip variant="outline" color="gray">{source}</Chip>
-						{/each}
-					</div>
-				</Card.Content>
-			</Card.Root>
 
 			<Card.Root size="sm">
 				<Card.Content>
@@ -424,36 +389,53 @@
 		</div>
 	</div>
 
-	<Card.Root size="sm">
-		<Card.Header>
-			<div class="panel-copy">
-				<Text as="span" weight="semibold">Members</Text>
-				<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
+	<div class="preview-footer">
+		<div class="members-panel">
+			<Card.Root size="sm">
+				<Card.Header>
+					<div class="panel-copy">
+						<Text as="span" weight="semibold">Members</Text>
+						<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
+					</div>
+				</Card.Header>
+				<Card.Content noPadding>
+					<Table.Root>
+						<Table.Header>
+							<Table.Row>
+								<Table.Head>Name</Table.Head>
+								<Table.Head>Role</Table.Head>
+								<Table.Head>Status</Table.Head>
+							</Table.Row>
+						</Table.Header>
+						<Table.Body>
+							{#each rows as row (row.name)}
+								<Table.Row>
+									<Table.Cell>{row.name}</Table.Cell>
+									<Table.Cell>{row.role}</Table.Cell>
+									<Table.Cell>
+										<Badge color={row.color} size="sm">{row.status}</Badge>
+									</Table.Cell>
+								</Table.Row>
+							{/each}
+						</Table.Body>
+					</Table.Root>
+				</Card.Content>
+			</Card.Root>
+			<div class="pagination-row">
+				<ButtonGroup size="sm">
+					<Button variant="outline" size="icon-sm" aria-label="Previous">
+						<ArrowLeft size={14} aria-hidden="true" />
+					</Button>
+					<Button variant="outline" size="sm">1</Button>
+					<Button variant="outline" size="sm">2</Button>
+					<Button variant="outline" size="sm">3</Button>
+					<Button variant="outline" size="icon-sm" aria-label="Next">
+						<ArrowRight size={14} aria-hidden="true" />
+					</Button>
+				</ButtonGroup>
 			</div>
-		</Card.Header>
-		<Card.Content noPadding>
-			<Table.Root>
-				<Table.Header>
-					<Table.Row>
-						<Table.Head>Name</Table.Head>
-						<Table.Head>Role</Table.Head>
-						<Table.Head>Status</Table.Head>
-					</Table.Row>
-				</Table.Header>
-				<Table.Body>
-					{#each rows as row (row.name)}
-						<Table.Row>
-							<Table.Cell>{row.name}</Table.Cell>
-							<Table.Cell>{row.role}</Table.Cell>
-							<Table.Cell>
-								<Badge color={row.color} size="sm">{row.status}</Badge>
-							</Table.Cell>
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		</Card.Content>
-	</Card.Root>
+		</div>
+	</div>
 </div>
 
 <style>
@@ -465,7 +447,7 @@
 
 	.preview-mosaic {
 		display: grid;
-		grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.98fr) minmax(0, 1fr) minmax(0, 1.05fr);
+		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: var(--dry-space-4);
 		align-items: start;
 	}
@@ -539,11 +521,23 @@
 		gap: var(--dry-space-3);
 	}
 
-	.toolbar-row,
-	.chip-row {
+	.copilot-row,
+	.pagination-row {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
+		justify-items: start;
 		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.preview-footer {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--dry-space-4);
+	}
+
+	.members-panel {
+		grid-column: span 2;
+		display: grid;
 		gap: var(--dry-space-3);
 	}
 
@@ -597,6 +591,7 @@
 
 	.assistant-composer {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: var(--dry-space-2);
 	}
 
@@ -609,6 +604,8 @@
 		);
 		--dry-rte-content-bg: var(--dry-color-bg-raised);
 		--dry-rte-padding: var(--dry-space-3);
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 	}
 
 	.assistant-composer-actions {
@@ -722,11 +719,23 @@
 		.preview-mosaic {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
+
+		.preview-footer {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
 	@container (max-width: 40rem) {
 		.preview-mosaic {
 			grid-template-columns: 1fr;
+		}
+
+		.preview-footer {
+			grid-template-columns: 1fr;
+		}
+
+		.members-panel {
+			grid-column: span 1;
 		}
 	}
 
