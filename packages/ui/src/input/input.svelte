@@ -45,7 +45,6 @@
 		container-type: inline-size;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		align-self: start;
 	}
 
 	input {

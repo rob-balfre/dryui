@@ -2,14 +2,16 @@
 	import { Portal, Toast } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { Check } from 'lucide-svelte';
-	import type {
-		Arrow,
-		Drawing,
-		DrawingSpace,
-		FeedbackProps,
-		Point,
-		Stroke,
-		Tool
+	import {
+		AGENTS,
+		type Arrow,
+		type Drawing,
+		type DrawingSpace,
+		type FeedbackProps,
+		type Point,
+		type Stroke,
+		type SubmissionAgent,
+		type Tool
 	} from './types.js';
 	import Toolbar from './components/toolbar.svelte';
 
@@ -27,8 +29,24 @@
 		class: className
 	}: FeedbackProps = $props();
 
+	const AGENT_STORAGE_KEY = 'dryui-feedback-agent';
+
+	function readStoredAgent(): SubmissionAgent {
+		if (typeof localStorage === 'undefined') return 'codex';
+		const raw = localStorage.getItem(AGENT_STORAGE_KEY);
+		return AGENTS.includes(raw as SubmissionAgent) ? (raw as SubmissionAgent) : 'codex';
+	}
+
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
+	let agent = $state<SubmissionAgent>(readStoredAgent());
+
+	function setAgent(next: SubmissionAgent) {
+		agent = next;
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem(AGENT_STORAGE_KEY, next);
+		}
+	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
@@ -680,7 +698,8 @@
 					url: location.href,
 					image,
 					drawings,
-					viewport: { width: window.innerWidth, height: window.innerHeight }
+					viewport: { width: window.innerWidth, height: window.innerHeight },
+					agent
 				})
 			});
 
@@ -1045,8 +1064,10 @@
 			hidden={toolbarHiddenForCapture}
 			{submitting}
 			{sent}
+			{agent}
 			ontoggle={toggle}
 			ontoolchange={setTool}
+			onagentchange={setAgent}
 			onsubmit={handleSubmit}
 		/>
 	</div>

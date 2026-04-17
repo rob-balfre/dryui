@@ -13,11 +13,19 @@ import type {
 	SessionStatus,
 	SessionWithAnnotations,
 	Submission,
+	SubmissionAgent,
 	SubmissionQueryStatus,
 	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
+
+const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set(['codex', 'claude', 'gemini', 'off']);
+
+function normalizeAgent(value: string | null | undefined): SubmissionAgent | undefined {
+	if (value && VALID_AGENTS.has(value as SubmissionAgent)) return value as SubmissionAgent;
+	return undefined;
+}
 
 interface SessionRow {
 	id: string;
@@ -73,6 +81,7 @@ interface SubmissionRow {
 	viewport: string | null;
 	status: SubmissionStatus;
 	created_at: string;
+	agent: string | null;
 }
 
 interface TableColumnRow {
@@ -159,6 +168,7 @@ function toAnnotation(row: AnnotationRow): Annotation {
 }
 
 function toSubmission(row: SubmissionRow): Submission {
+	const agent = normalizeAgent(row.agent);
 	return {
 		id: row.id,
 		url: row.url,
@@ -166,7 +176,8 @@ function toSubmission(row: SubmissionRow): Submission {
 		drawings: parseJson<unknown[]>(row.drawings) ?? [],
 		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
 		status: row.status as SubmissionStatus,
-		createdAt: row.created_at
+		createdAt: row.created_at,
+		...(agent ? { agent } : {})
 	};
 }
 
@@ -255,7 +266,8 @@ export class FeedbackStore {
         drawings TEXT NOT NULL DEFAULT '[]',
         viewport TEXT,
         status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
-        created_at TEXT NOT NULL
+        created_at TEXT NOT NULL,
+        agent TEXT
       );
       CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
     `);
@@ -267,6 +279,7 @@ export class FeedbackStore {
 			'color',
 			"TEXT CHECK(color IN ('brand', 'info', 'success', 'warning', 'error', 'neutral'))"
 		);
+		ensureColumn(this.db, 'submissions', 'agent', 'TEXT');
 
 		if (!existsSync(SCREENSHOTS_DIR)) {
 			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
@@ -543,10 +556,11 @@ export class FeedbackStore {
 		writeFileSync(screenshotPath, Buffer.from(input.image, 'base64'));
 
 		const now = createTimestamp();
+		const agent = normalizeAgent(input.agent);
 		this.db
 			.query(
-				`INSERT INTO submissions (id, url, screenshot_path, drawings, viewport, status, created_at)
-				 VALUES (?, ?, ?, ?, ?, 'pending', ?)`
+				`INSERT INTO submissions (id, url, screenshot_path, drawings, viewport, status, created_at, agent)
+				 VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`
 			)
 			.run(
 				id,
@@ -554,7 +568,8 @@ export class FeedbackStore {
 				screenshotPath,
 				JSON.stringify(input.drawings),
 				input.viewport ? JSON.stringify(input.viewport) : null,
-				now
+				now,
+				agent ?? null
 			);
 
 		return {
@@ -564,7 +579,8 @@ export class FeedbackStore {
 			drawings: input.drawings,
 			viewport: input.viewport ?? null,
 			status: 'pending',
-			createdAt: now
+			createdAt: now,
+			...(agent ? { agent } : {})
 		};
 	}
 

@@ -35,6 +35,9 @@ export type Drawing = Stroke | Arrow | TextLabel;
 
 export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
+export const AGENTS = ['codex', 'claude', 'gemini', 'off'] as const;
+export type SubmissionAgent = (typeof AGENTS)[number];
+
 export interface FeedbackProps {
 	color?: string;
 	strokeWidth?: number;

@@ -301,7 +301,7 @@
 			<div class="menu-area">
 				<MegaMenu.Root>
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" /> Preset</MegaMenu.Trigger>
+						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" />Preset</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center">
 							{#each [['Starting points', startingPresets], ['Technical', technicalPresets], ['Editorial', editorialPresets]] as const as [title, group] (title)}
 								<MegaMenu.Column {title}>
@@ -332,7 +332,7 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" /> Colour</MegaMenu.Trigger>
+						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" />Colour</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center" fullWidth>
 							<MegaMenu.Column title="Picker">
 								<ColorPicker.Root
@@ -373,7 +373,7 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Type size={14} aria-hidden="true" /> Typography</MegaMenu.Trigger>
+						<MegaMenu.Trigger><Type size={14} aria-hidden="true" />Typography</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Font family">
 								<div class="wizard-option-scope wizard-option-grid wizard-font-options">
@@ -417,7 +417,7 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" /> Shape</MegaMenu.Trigger>
+						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" />Shape</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Style">
 								<div class="wizard-option-scope wizard-option-list">
@@ -467,7 +467,7 @@
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger
-							><SlidersHorizontal size={14} aria-hidden="true" /> Adjust</MegaMenu.Trigger
+							><SlidersHorizontal size={14} aria-hidden="true" />Adjust</MegaMenu.Trigger
 						>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Filters">
@@ -516,12 +516,10 @@
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger>
-							{#if allContrastPass}
-								<ShieldCheck size={14} aria-hidden="true" />
-							{:else}
-								<ShieldAlert size={14} aria-hidden="true" />
-							{/if}
-							Contrast
+							{#if allContrastPass}<ShieldCheck size={14} aria-hidden="true" />{:else}<ShieldAlert
+									size={14}
+									aria-hidden="true"
+								/>{/if}Contrast
 						</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Light mode">
