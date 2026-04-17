@@ -80,7 +80,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.3.4",
+      "version": "0.3.5",
       "bin": {
         "dryui-feedback-mcp": "./dist/mcp.js",
       },
@@ -142,7 +142,7 @@
     },
     "packages/theme-wizard": {
       "name": "@dryui/theme-wizard",
-      "version": "8.0.0",
+      "version": "8.0.1",
       "devDependencies": {
         "@dryui/lint": "^0.4.1",
         "@dryui/primitives": "^1.2.0",
