@@ -8053,17 +8053,11 @@
         ]
       },
       "cssVars": {
-        "--dry-timeline-content-gap": "Content Gap",
-        "--dry-timeline-dot-color": "Dot Color",
-        "--dry-timeline-dot-size": "Dot Size",
-        "--dry-timeline-gap": "Gap spacing",
         "--dry-timeline-item-columns": "Item Columns",
-        "--dry-timeline-item-gap": "Item Gap",
         "--dry-timeline-item-min-w": "Item Min W",
         "--dry-timeline-item-pl": "Item Pl",
         "--dry-timeline-item-pt": "Item Pt",
         "--dry-timeline-line-bottom": "Line Bottom",
-        "--dry-timeline-line-color": "Line Color",
         "--dry-timeline-line-h": "Line H",
         "--dry-timeline-line-left": "Line Left",
         "--dry-timeline-line-right": "Line Right",

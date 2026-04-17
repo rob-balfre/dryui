@@ -16,15 +16,8 @@
 
 <style>
 	[data-part='root'] {
-		--dry-timeline-line-color: var(--dry-color-stroke-weak);
-		--dry-timeline-dot-size: 0.875rem;
-		--dry-timeline-dot-color: var(--dry-color-fill-brand);
-		--dry-timeline-gap: var(--dry-space-4);
-		--dry-timeline-item-gap: var(--dry-space-3);
-		--dry-timeline-content-gap: var(--dry-space-1);
-
 		display: grid;
-		gap: var(--dry-timeline-gap);
+		gap: var(--dry-timeline-gap, var(--dry-space-4));
 		color: var(--dry-color-text-strong);
 	}
 
@@ -32,7 +25,7 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		gap: var(--dry-space-4);
+		gap: var(--dry-timeline-gap, var(--dry-space-4));
 		overflow-x: auto;
 		padding-bottom: var(--dry-space-1);
 
@@ -41,7 +34,7 @@
 		--dry-timeline-item-pl: 0;
 		--dry-timeline-item-pt: var(--dry-space-4);
 		--dry-timeline-line-left: 0;
-		--dry-timeline-line-top: calc(var(--dry-space-4) + var(--dry-timeline-dot-size) / 2);
+		--dry-timeline-line-top: calc(var(--dry-space-4) + var(--dry-timeline-dot-size, 0.875rem) / 2);
 		--dry-timeline-line-right: calc(var(--dry-space-1) * -1);
 		--dry-timeline-line-bottom: auto;
 		--dry-timeline-line-w: auto;
