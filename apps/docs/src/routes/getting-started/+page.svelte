@@ -9,9 +9,11 @@
 		Alert,
 		Heading,
 		Text,
-		Link
+		Link,
+		Timeline
 	} from '@dryui/ui';
 	import AgentLogo from '$lib/components/AgentLogo.svelte';
+	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
 	import { aiAgentSetups } from '$lib/ai-setup';
@@ -86,9 +88,15 @@
 			<div class="stack-lg">
 				<Tabs.Root value="bun">
 					<Tabs.List>
-						<Tabs.Trigger value="bun">bun</Tabs.Trigger>
-						<Tabs.Trigger value="npm">npm</Tabs.Trigger>
-						<Tabs.Trigger value="pnpm">pnpm</Tabs.Trigger>
+						<Tabs.Trigger value="bun">
+							<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="npm">
+							<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="pnpm">
+							<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
+						</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content value="bun">
 						<CodeBlock code={homeIntroPrompts.bun} language="text" />
@@ -130,7 +138,24 @@
 							<div class="agent-setup-card">
 								<Text color="secondary">{setup.description}</Text>
 
-								{#if setup.skill}
+								{#if setup.installSteps && setup.installSteps.length > 0}
+									<Timeline.Root>
+										{#each setup.installSteps as step, index (step.title)}
+											<Timeline.Item>
+												<Timeline.Icon>{index + 1}</Timeline.Icon>
+												<Timeline.Content>
+													<Timeline.Title level={4}>{step.title}</Timeline.Title>
+													{#if step.description}
+														<Timeline.Description>{step.description}</Timeline.Description>
+													{/if}
+													{#if step.code}
+														<CodeBlock language="bash" code={step.code} />
+													{/if}
+												</Timeline.Content>
+											</Timeline.Item>
+										{/each}
+									</Timeline.Root>
+								{:else if setup.skill}
 									<div class="stack-sm">
 										<Text size="sm" color="muted">{setup.skill.title}</Text>
 										<Text size="sm" color="secondary">{setup.skill.note}</Text>
@@ -160,9 +185,15 @@
 
 				<Tabs.Root value="bun">
 					<Tabs.List>
-						<Tabs.Trigger value="bun">bun</Tabs.Trigger>
-						<Tabs.Trigger value="npm">npm</Tabs.Trigger>
-						<Tabs.Trigger value="pnpm">pnpm</Tabs.Trigger>
+						<Tabs.Trigger value="bun">
+							<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="npm">
+							<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
+						</Tabs.Trigger>
+						<Tabs.Trigger value="pnpm">
+							<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
+						</Tabs.Trigger>
 					</Tabs.List>
 					<Tabs.Content value="bun">
 						<CodeBlock code="bun add @dryui/ui" language="bash" />
@@ -411,9 +442,11 @@
 	.agent-setup-card {
 		display: grid;
 		gap: var(--dry-space-4);
+		--dry-timeline-dot-size: 1.5rem;
 	}
 
-	.agent-tab-label {
+	.agent-tab-label,
+	.pm-tab-label {
 		display: inline-grid;
 		grid-template-columns: auto auto;
 		gap: var(--dry-space-2);
