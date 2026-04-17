@@ -131,6 +131,7 @@ export interface UpdateAnnotationInput extends Partial<Omit<Annotation, 'id' | '
 
 export type SubmissionStatus = 'pending' | 'resolved';
 export type SubmissionQueryStatus = SubmissionStatus | 'all';
+export type SubmissionAgent = 'codex' | 'claude' | 'gemini' | 'off';
 
 export interface Submission {
 	id: string;
@@ -140,6 +141,7 @@ export interface Submission {
 	viewport: { width: number; height: number } | null;
 	status: SubmissionStatus;
 	createdAt: string;
+	agent?: SubmissionAgent;
 }
 
 export interface CreateSubmissionInput {
@@ -147,4 +149,5 @@ export interface CreateSubmissionInput {
 	image: string;
 	drawings: unknown[];
 	viewport?: { width: number; height: number };
+	agent?: SubmissionAgent;
 }

@@ -75,7 +75,7 @@
 								<Input id="preview-card-name" value="John Doe" />
 							</Field.Root>
 
-							<div class="split-fields">
+							<div class="split-fields split-fields-card">
 								<Field.Root>
 									<Label for="preview-card-number">Card Number</Label>
 									<Input id="preview-card-number" value="1234 5678 9012 3456" />
@@ -162,8 +162,7 @@
 								<Text color="muted">Invite your team to collaborate on this project.</Text>
 							</div>
 							<Button variant="secondary" size="sm">
-								<CirclePlus size={14} aria-hidden="true" />
-								Invite Members
+								<CirclePlus size={14} aria-hidden="true" />Invite Members
 							</Button>
 						</div>
 					</Card.Content>
@@ -220,14 +219,12 @@
 							<Field.Root>
 								<Label for="preview-search">Search</Label>
 								<div class="search-shell">
-									<Search size={14} aria-hidden="true" />
-									<Input
+									<Search size={16} aria-hidden="true" /><Input
 										id="preview-search"
 										bind:value={searchQuery}
 										variant="ghost"
 										placeholder="Search..."
-									/>
-									<Text color="muted">12 results</Text>
+									/><Text color="muted">12 results</Text>
 								</div>
 							</Field.Root>
 
@@ -313,8 +310,11 @@
 						<Field.Root>
 							<Label for="preview-domain">Workspace URL</Label>
 							<div class="icon-input">
-								<Globe size={14} aria-hidden="true" />
-								<Input id="preview-domain" value="https://" variant="ghost" />
+								<Globe size={16} aria-hidden="true" /><Input
+									id="preview-domain"
+									value="https://"
+									variant="ghost"
+								/>
 							</div>
 						</Field.Root>
 
@@ -328,8 +328,9 @@
 
 						<div class="notice-row">
 							<div class="notice-leading">
-								<ShieldCheck size={15} aria-hidden="true" />
-								<Text as="span" weight="medium">Your profile has been verified.</Text>
+								<ShieldCheck size={15} aria-hidden="true" /><Text as="span" weight="medium"
+									>Your profile has been verified.</Text
+								>
 							</div>
 							<ChevronRight size={14} aria-hidden="true" />
 						</div>
@@ -337,8 +338,7 @@
 						<div class="panel-divider"></div>
 
 						<div class="context-pill">
-							<Paperclip size={14} aria-hidden="true" />
-							<Text>Add context</Text>
+							<Paperclip size={14} aria-hidden="true" /><Text>Add context</Text>
 						</div>
 
 						<div class="assistant-composer">
@@ -420,7 +420,7 @@
 								<Text as="span" weight="semibold">Wallpaper Tinting</Text>
 								<Text color="muted">Allow the wallpaper to be tinted.</Text>
 							</div>
-							<Toggle bind:pressed={tintWallpaper} size="sm">On</Toggle>
+							<Toggle bind:pressed={tintWallpaper} size="sm">{tintWallpaper ? 'On' : 'Off'}</Toggle>
 						</div>
 					</div>
 				</Card.Content>
@@ -428,8 +428,7 @@
 
 			<div class="copilot-row">
 				<Button variant="secondary" size="sm">
-					<LockKeyhole size={14} aria-hidden="true" />
-					Copilot
+					<LockKeyhole size={14} aria-hidden="true" />Copilot
 				</Button>
 			</div>
 		</div>
@@ -547,6 +546,10 @@
 		align-items: start;
 	}
 
+	.split-fields-card {
+		grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+	}
+
 	.status-card,
 	.notice-row {
 		display: grid;
@@ -567,14 +570,22 @@
 	}
 
 	.context-pill,
-	.icon-input,
-	.search-shell,
 	.notice-leading {
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-3);
+	}
+
+	.icon-input,
+	.search-shell {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+		--dry-input-padding-x: 0;
 	}
 
 	.prompt-shell {

@@ -12,7 +12,7 @@
 
 	const ctx = getDragAndDropCtx();
 
-	let itemIsDragging = $derived(ctx.draggedIndex === index);
+	let itemIsDragging = $derived(ctx.draggedIndex === index && ctx.isDragging);
 	let isOver = $derived(ctx.overIndex === index && ctx.isDragging && ctx.draggedIndex !== index);
 
 	let grabbing = $state(false);
