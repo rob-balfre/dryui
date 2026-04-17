@@ -13,6 +13,6 @@
 	const ctx = getDialogCtx();
 </script>
 
-<ModalContent {ctx} {...rest}>
+<ModalContent {ctx} side="center" {...rest}>
 	{@render children()}
 </ModalContent>

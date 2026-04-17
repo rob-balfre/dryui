@@ -13,6 +13,6 @@
 	const ctx = getDrawerCtx();
 </script>
 
-<ModalContent {ctx} data-side={ctx.side} {...rest}>
+<ModalContent {ctx} side={ctx.side} {...rest}>
 	{@render children()}
 </ModalContent>
