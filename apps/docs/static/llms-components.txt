@@ -4446,7 +4446,7 @@ Subpath import: import { Shimmer } from '@dryui/ui/shimmer'
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | duration (number), default 3 | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
-Data attributes: data-shimmer | data-shimmer-base | data-shimmer-streak
+Data attributes: data-active (Present on the active item or current target within the component.) | data-shimmer | data-shimmer-base | data-shimmer-streak
 Accessibility: none
 Example:
 ```svelte

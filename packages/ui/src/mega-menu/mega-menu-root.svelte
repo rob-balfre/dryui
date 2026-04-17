@@ -10,19 +10,12 @@
 	let { class: className, children, ...rest }: Props = $props();
 
 	let activeItem = $state<string | null>(null);
-	let rootEl = $state<HTMLElement | null>(null);
 	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	setMegaMenuCtx({
 		get activeItem() {
 			return activeItem;
-		},
-		get rootEl() {
-			return rootEl;
-		},
-		setRootEl(el) {
-			rootEl = el;
 		},
 		openItem(id) {
 			clearTimeout(closeTimer);
@@ -39,13 +32,6 @@
 			}, 300);
 		}
 	});
-
-	function attachRoot(node: HTMLElement) {
-		rootEl = node;
-		return () => {
-			if (rootEl === node) rootEl = null;
-		};
-	}
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape' && activeItem) {
@@ -75,7 +61,6 @@
 </script>
 
 <nav
-	{@attach attachRoot}
 	data-mega-menu-root
 	data-state={activeItem ? 'open' : 'closed'}
 	class={className}

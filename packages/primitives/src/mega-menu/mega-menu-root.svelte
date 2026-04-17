@@ -10,7 +10,6 @@
 	let { class: className, children, ...rest }: Props = $props();
 
 	let activeItem = $state<string | null>(null);
-	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
 
 	setMegaMenuCtx({
@@ -19,13 +18,9 @@
 		},
 		openItem(id) {
 			clearTimeout(closeTimer);
-			clearTimeout(openTimer);
-			openTimer = setTimeout(() => {
-				activeItem = id;
-			}, 150);
+			activeItem = id;
 		},
 		closeItem() {
-			clearTimeout(openTimer);
 			clearTimeout(closeTimer);
 			closeTimer = setTimeout(() => {
 				activeItem = null;
@@ -36,7 +31,6 @@
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape' && activeItem) {
 			e.preventDefault();
-			clearTimeout(openTimer);
 			clearTimeout(closeTimer);
 			activeItem = null;
 		}
@@ -46,7 +40,6 @@
 		const nav = e.currentTarget as HTMLElement;
 		const related = e.relatedTarget as Node | null;
 		if (related && !nav.contains(related)) {
-			clearTimeout(openTimer);
 			clearTimeout(closeTimer);
 			activeItem = null;
 		}
@@ -54,7 +47,6 @@
 
 	$effect(() => {
 		return () => {
-			clearTimeout(openTimer);
 			clearTimeout(closeTimer);
 		};
 	});

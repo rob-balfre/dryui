@@ -26,7 +26,7 @@
 	let panelEl = $state<HTMLDivElement | null>(null);
 
 	const popover = createPositionedPopover({
-		triggerEl: () => (align === 'center' ? ctx.rootEl : document.getElementById(itemCtx.triggerId)),
+		triggerEl: () => document.getElementById(itemCtx.triggerId),
 		contentEl: () => panelEl ?? null,
 		placement: () => {
 			if (align === 'center') return 'bottom';
