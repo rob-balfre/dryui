@@ -4,6 +4,7 @@
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import DocsSectionIntro from '$lib/components/DocsSectionIntro.svelte';
 	import DocsCallout from '$lib/components/DocsCallout.svelte';
+	import { CircleCheck } from 'lucide-svelte';
 </script>
 
 <svelte:head>
@@ -37,68 +38,64 @@
 				description="Five rules that govern all layout in DryUI."
 			/>
 
-			<div class="rules-grid">
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Heading level={4}>Grid only</Heading>
-							<Text size="sm" color="secondary">
-								Every layout uses <code>display: grid</code>. Never use <code>display: flex</code> or
-								DryUI layout components like Grid, Stack, or Flex.
-							</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
+			<ol class="rules-list">
+				<li class="rule-item">
+					<span class="rule-icon"><CircleCheck size={20} /></span>
+					<div class="rule-body">
+						<Heading level={4}>Grid only</Heading>
+						<Text size="sm" color="secondary">
+							Every layout uses <code>display: grid</code>. Never use <code>display: flex</code> or DryUI
+							layout components like Grid, Stack, or Flex.
+						</Text>
+					</div>
+				</li>
 
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Heading level={4}>Container queries</Heading>
-							<Text size="sm" color="secondary">
-								Use <code>container-type: inline-size</code> with <code>@container</code> for
-								responsive behavior. Never use <code>@media</code> for sizing breakpoints.
-							</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
+				<li class="rule-item">
+					<span class="rule-icon"><CircleCheck size={20} /></span>
+					<div class="rule-body">
+						<Heading level={4}>Container queries</Heading>
+						<Text size="sm" color="secondary">
+							Use <code>container-type: inline-size</code> with <code>@container</code> for
+							responsive behavior. Never use <code>@media</code> for sizing breakpoints.
+						</Text>
+					</div>
+				</li>
 
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Heading level={4}>Spacing tokens</Heading>
-							<Text size="sm" color="secondary">
-								Always use <code>--dry-space-*</code> tokens for gap and padding. Never hardcode pixel
-								values for spacing.
-							</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
+				<li class="rule-item">
+					<span class="rule-icon"><CircleCheck size={20} /></span>
+					<div class="rule-body">
+						<Heading level={4}>Spacing tokens</Heading>
+						<Text size="sm" color="secondary">
+							Always use <code>--dry-space-*</code> tokens for gap and padding. Never hardcode pixel values
+							for spacing.
+						</Text>
+					</div>
+				</li>
 
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Heading level={4}>CSS custom properties</Heading>
-							<Text size="sm" color="secondary">
-								Expose layout configuration as <code>--var</code> custom properties so consumers can override
-								values without touching your CSS.
-							</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
+				<li class="rule-item">
+					<span class="rule-icon"><CircleCheck size={20} /></span>
+					<div class="rule-body">
+						<Heading level={4}>CSS custom properties</Heading>
+						<Text size="sm" color="secondary">
+							Expose layout configuration as <code>--var</code> custom properties so consumers can override
+							values without touching your CSS.
+						</Text>
+					</div>
+				</li>
 
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Heading level={4}>Scoped styles only</Heading>
-							<Text size="sm" color="secondary">
-								All layout CSS goes in scoped <code>&lt;style&gt;</code> blocks. No inline styles,
-								no <code>style:</code> directives, no <code>:global()</code>, no
-								<code>!important</code>.
-							</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
-			</div>
+				<li class="rule-item">
+					<span class="rule-icon"><CircleCheck size={20} /></span>
+					<div class="rule-body">
+						<Heading level={4}>Scoped styles only</Heading>
+						<Text size="sm" color="secondary">
+							All layout CSS goes in scoped <code>&lt;style&gt;</code> blocks. No inline styles, no
+							<code>style:</code>
+							directives, no <code>:global()</code>, no
+							<code>!important</code>.
+						</Text>
+					</div>
+				</li>
+			</ol>
 		</div>
 
 		<Separator />
@@ -327,16 +324,37 @@
 		display: grid;
 		gap: var(--dry-space-10);
 	}
-	.rules-grid {
+	.rules-list {
 		display: grid;
-		grid-template-columns: 1fr;
-		gap: var(--dry-space-4);
-		container-type: inline-size;
+		gap: 0;
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		overflow: hidden;
 	}
 
-	@container (min-width: 480px) {
-		.rules-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
+	.rule-item {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		gap: var(--dry-space-4);
+		padding: var(--dry-space-5) var(--dry-space-6);
+		border-block-end: 1px solid var(--dry-color-stroke-weak);
+		align-items: start;
+	}
+
+	.rule-item:last-child {
+		border-block-end: none;
+	}
+
+	.rule-icon {
+		color: var(--dry-color-fill-brand);
+		padding-block-start: 2px;
+	}
+
+	.rule-body {
+		display: grid;
+		gap: var(--dry-space-1);
 	}
 </style>

@@ -2740,6 +2740,16 @@
           "required": false,
           "default": "'Send'"
         },
+        "submitSize": {
+          "type": "ButtonSize",
+          "required": false,
+          "default": "'md'"
+        },
+        "submitVariant": {
+          "type": "ButtonVariant",
+          "required": false,
+          "default": "'solid'"
+        },
         "onpromptsubmit": {
           "type": "(value: string) => void",
           "required": false
@@ -6958,17 +6968,7 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
-      "cssVars": {
-        "--dry-badge-bg": "Background color",
-        "--dry-badge-border": "Border color",
-        "--dry-badge-color": "Text color",
-        "--dry-badge-default-bg": "Default Bg",
-        "--dry-badge-default-color": "Default Color",
-        "--dry-badge-font-size": "Font size",
-        "--dry-badge-padding-x": "Horizontal padding",
-        "--dry-badge-padding-y": "Vertical padding",
-        "--dry-badge-radius": "Border radius"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-badge"

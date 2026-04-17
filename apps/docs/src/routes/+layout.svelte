@@ -10,7 +10,7 @@
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { BUILD_TIMESTAMP, DRYUI_VERSION } from '$lib/site-meta';
-	import { withBase } from '$lib/utils';
+	import { withBase, withQueryParam } from '$lib/utils';
 	import '../app.css';
 
 	let { children: routeChildren } = $props();
@@ -51,6 +51,16 @@
 		page.url.pathname.startsWith('/view/') || page.url.pathname.startsWith(withBase('/view/'))
 	);
 	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
+	let shouldPreserveFeedbackMode = $derived(
+		feedbackEnabled || page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1'
+	);
+	let themeWizardHref = $derived(
+		withQueryParam(
+			withBase('/theme-wizard'),
+			FEEDBACK_QUERY_PARAM,
+			shouldPreserveFeedbackMode ? '1' : null
+		)
+	);
 
 	afterNavigate((navigation) => {
 		if (dev && typeof window !== 'undefined') {
@@ -92,6 +102,7 @@
 											<Drawer.Body padding={false}>
 												<Sidebar
 													currentPath={page.url.pathname}
+													{themeWizardHref}
 													onnavigate={() => (mobileNavOpen = false)}
 												/>
 											</Drawer.Body>
@@ -122,7 +133,7 @@
 			</header>
 
 			<nav class="docs-nav">
-				<Sidebar currentPath={page.url.pathname} />
+				<Sidebar currentPath={page.url.pathname} {themeWizardHref} />
 			</nav>
 
 			<main class="docs-content">

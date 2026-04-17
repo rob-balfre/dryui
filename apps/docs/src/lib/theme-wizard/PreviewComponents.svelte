@@ -2,7 +2,6 @@
 	import {
 		Avatar,
 		Badge,
-		BorderBeam,
 		Button,
 		ButtonGroup,
 		Card,
@@ -21,7 +20,6 @@
 		Text,
 		Toggle
 	} from '@dryui/ui';
-	import { isDarkTheme } from '$lib/theme.svelte.js';
 	import {
 		ArrowLeft,
 		ArrowRight,
@@ -43,9 +41,9 @@
 	];
 
 	const activityLabels = [
-		{ label: 'Syncing', variant: 'colorful' as const, duration: 1.7 },
-		{ label: 'Updating', variant: 'ocean' as const, duration: 2.1 },
-		{ label: 'Loading', variant: 'sunset' as const, duration: 2.5 }
+		{ label: 'Syncing', tone: 'info' as const },
+		{ label: 'Updating', tone: 'success' as const },
+		{ label: 'Loading', tone: 'warning' as const }
 	];
 
 	let budget = $state(640);
@@ -54,7 +52,6 @@
 	let chatPrompt = $state('');
 	let searchQuery = $state('');
 	let assistantPrompt = $state('');
-	let previewTheme = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 </script>
 
 <div class="preview-root">
@@ -169,19 +166,10 @@
 				</Card.Root>
 
 				<div class="badge-strip">
-					{#each activityLabels as { label, variant, duration } (label)}
-						<BorderBeam
-							size="sm"
-							colorVariant={variant}
-							theme={previewTheme}
-							borderRadius="var(--dry-radius-full)"
-							{duration}
-							strength={1}
-						>
-							<span class="activity-badge">
-								<Badge color="gray" size="sm">{label}</Badge>
-							</span>
-						</BorderBeam>
+					{#each activityLabels as { label, tone } (label)}
+						<div class="activity-pill" data-tone={tone}>
+							<Badge color={tone} size="sm">{label}</Badge>
+						</div>
 					{/each}
 				</div>
 
@@ -504,11 +492,53 @@
 		margin-inline-start: calc(var(--dry-space-2) * -1);
 	}
 
-	.activity-badge {
+	.activity-pill {
+		--_activity-radius: var(--dry-control-radius, var(--dry-radius-md));
+		--_activity-fill: var(--dry-color-fill-brand);
+		--_activity-fill-weak: var(--dry-color-fill-brand-weak);
+		--_activity-stroke: var(--dry-color-stroke-brand);
+		--_activity-text: var(--dry-color-text-brand);
+		--dry-badge-radius: var(--_activity-radius);
+		--dry-badge-bg: color-mix(in srgb, var(--_activity-fill-weak) 88%, var(--dry-color-bg-raised));
+		--dry-badge-color: var(--_activity-text);
+		--dry-badge-border: color-mix(
+			in srgb,
+			var(--_activity-stroke) 38%,
+			var(--dry-color-stroke-weak)
+		);
 		display: inline-grid;
-		border-radius: var(--dry-radius-full);
-		--dry-badge-border: transparent;
-		--dry-badge-bg: color-mix(in srgb, var(--dry-color-fill) 84%, var(--dry-color-bg-raised));
+		align-items: center;
+		padding: 1px;
+		border-radius: var(--_activity-radius);
+		background: linear-gradient(
+			135deg,
+			color-mix(in srgb, var(--_activity-fill) 26%, transparent),
+			color-mix(in srgb, var(--_activity-stroke) 78%, var(--dry-color-stroke-weak))
+		);
+		box-shadow:
+			inset 0 0 0 1px color-mix(in srgb, var(--_activity-stroke) 24%, transparent),
+			0 0 1rem color-mix(in srgb, var(--_activity-fill) 18%, transparent);
+	}
+
+	.activity-pill[data-tone='info'] {
+		--_activity-fill: var(--dry-color-fill-info);
+		--_activity-fill-weak: var(--dry-color-fill-info-weak);
+		--_activity-stroke: var(--dry-color-stroke-info-strong);
+		--_activity-text: var(--dry-color-text-info);
+	}
+
+	.activity-pill[data-tone='success'] {
+		--_activity-fill: var(--dry-color-fill-success);
+		--_activity-fill-weak: var(--dry-color-fill-success-weak);
+		--_activity-stroke: var(--dry-color-stroke-success-strong);
+		--_activity-text: var(--dry-color-text-success);
+	}
+
+	.activity-pill[data-tone='warning'] {
+		--_activity-fill: var(--dry-color-fill-warning);
+		--_activity-fill-weak: var(--dry-color-fill-warning-weak);
+		--_activity-stroke: var(--dry-color-stroke-warning-strong);
+		--_activity-text: var(--dry-color-text-warning);
 	}
 
 	.badge-strip {

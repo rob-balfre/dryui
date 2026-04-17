@@ -1,14 +1,16 @@
 {
+  "name": "dryui",
+  "version": "0.3.0",
+  "description": "DryUI component library — Svelte 5 guidance, bootstrap, live feedback, and MCP servers",
   "mcpServers": {
     "dryui": {
-      "type": "stdio",
       "command": "sh",
       "args": ["-c", "cd \"${TMPDIR:-/tmp}\" && exec npx -y @dryui/mcp"]
     },
     "dryui-feedback": {
-      "type": "stdio",
       "command": "sh",
       "args": ["-c", "cd \"${TMPDIR:-/tmp}\" && exec npx -y -p @dryui/feedback-server dryui-feedback-mcp"]
     }
-  }
+  },
+  "contextFileName": "GEMINI.md"
 }

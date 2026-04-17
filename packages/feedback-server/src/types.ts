@@ -131,7 +131,7 @@ export interface UpdateAnnotationInput extends Partial<Omit<Annotation, 'id' | '
 
 export type SubmissionStatus = 'pending' | 'resolved';
 export type SubmissionQueryStatus = SubmissionStatus | 'all';
-export type SubmissionAgent = 'codex' | 'claude' | 'gemini' | 'off';
+export type SubmissionAgent = 'codex' | 'claude' | 'gemini' | 'copilot' | 'off';
 
 export interface Submission {
 	id: string;
