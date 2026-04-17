@@ -8840,6 +8840,7 @@
         "Do not rely on toast content as the only place critical workflow information appears."
       ],
       "cssVars": {
+        "--dry-btn-font-size": "Font size",
         "--dry-radius-nested": "Nested",
         "--dry-toast-accent": "Accent",
         "--dry-toast-action-hover-bg": "Action Hover Bg",
@@ -18028,6 +18029,9 @@
         },
         {
           "name": "data-mask-reveal"
+        },
+        {
+          "name": "data-mask-reveal-root"
         },
         {
           "name": "data-reduced-motion"

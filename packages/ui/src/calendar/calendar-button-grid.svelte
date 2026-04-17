@@ -48,4 +48,4 @@
 	};
 </script>
 
-<CalendarGridButton {adapter} {...props} />
+<CalendarGridButton {adapter} hideHeader {...props} />

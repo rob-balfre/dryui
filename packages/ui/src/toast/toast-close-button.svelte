@@ -14,10 +14,22 @@
 	const ctx = getToastCtx();
 </script>
 
-<CloseButtonBase
-	aria-label="Close notification"
-	{...rest}
-	onclick={() => toastStore.remove(ctx.id)}
->
-	{@render children()}
-</CloseButtonBase>
+<span data-part="toast-close">
+	<CloseButtonBase
+		aria-label="Close notification"
+		{...rest}
+		onclick={() => toastStore.remove(ctx.id)}
+	>
+		{@render children()}
+	</CloseButtonBase>
+</span>
+
+<style>
+	[data-part='toast-close'] {
+		position: absolute;
+		top: var(--dry-space-3);
+		right: var(--dry-space-3);
+		display: inline-grid;
+		--dry-btn-font-size: var(--dry-type-heading-3-size, var(--dry-text-xl-size));
+	}
+</style>

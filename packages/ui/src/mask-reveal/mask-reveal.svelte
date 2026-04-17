@@ -96,23 +96,26 @@
 	});
 </script>
 
-<div
-	{@attach captureElement}
-	{@attach applyDuration}
-	class={className}
-	data-mask-reveal
-	data-shape={shape}
-	data-direction={direction}
-	data-revealed={revealed || undefined}
-	data-reduced-motion={prefersReducedMotion || undefined}
-	{...rest}
->
-	{#if childSnippet}
-		{@render childSnippet()}
-	{/if}
+<div {@attach captureElement} class={className} data-mask-reveal-root {...rest}>
+	<div
+		{@attach applyDuration}
+		data-mask-reveal
+		data-shape={shape}
+		data-direction={direction}
+		data-revealed={revealed || undefined}
+		data-reduced-motion={prefersReducedMotion || undefined}
+	>
+		{#if childSnippet}
+			{@render childSnippet()}
+		{/if}
+	</div>
 </div>
 
 <style>
+	[data-mask-reveal-root] {
+		display: block;
+	}
+
 	[data-mask-reveal] {
 		--dry-mask-reveal-duration: var(--dry-duration-entrance, 480ms);
 		--dry-mask-reveal-ease: var(--dry-ease-spring-snappy, cubic-bezier(0.16, 1, 0.3, 1));
