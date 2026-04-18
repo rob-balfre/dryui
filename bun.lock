@@ -47,13 +47,13 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.7.1",
+      "version": "0.7.2",
       "bin": {
         "dryui": "./dist/index.js",
       },
       "dependencies": {
-        "@dryui/feedback-server": "^0.3.5",
-        "@dryui/mcp": "^2.1.3",
+        "@dryui/feedback-server": "^0.4.0",
+        "@dryui/mcp": "^2.1.4",
       },
       "devDependencies": {
         "@types/node": "^25.6.0",
@@ -62,10 +62,10 @@
     },
     "packages/feedback": {
       "name": "@dryui/feedback",
-      "version": "0.2.2",
+      "version": "0.3.0",
       "dependencies": {
-        "@dryui/primitives": "^1.2.0",
-        "@dryui/ui": "^1.2.0",
+        "@dryui/primitives": "^1.3.0",
+        "@dryui/ui": "^1.3.0",
       },
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
@@ -80,7 +80,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.3.5",
+      "version": "0.4.0",
       "bin": {
         "dryui-feedback-mcp": "./dist/mcp.js",
       },
@@ -102,7 +102,7 @@
     },
     "packages/lint": {
       "name": "@dryui/lint",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "devDependencies": {
         "svelte": "^5.55.3",
         "typescript": "^6.0.2",
@@ -110,7 +110,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.1.3",
+      "version": "2.1.4",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
@@ -130,7 +130,7 @@
     },
     "packages/primitives": {
       "name": "@dryui/primitives",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.3",
@@ -143,11 +143,11 @@
     },
     "packages/theme-wizard": {
       "name": "@dryui/theme-wizard",
-      "version": "8.0.1",
+      "version": "9.0.0",
       "devDependencies": {
-        "@dryui/lint": "^0.4.1",
-        "@dryui/primitives": "^1.2.0",
-        "@dryui/ui": "^1.2.0",
+        "@dryui/lint": "^0.4.2",
+        "@dryui/primitives": "^1.3.0",
+        "@dryui/ui": "^1.3.0",
         "@sveltejs/package": "^2.5.7",
         "bun-types": "^1.3.12",
         "lucide-svelte": "^1.0.1",
@@ -156,17 +156,17 @@
         "typescript": "^6.0.2",
       },
       "peerDependencies": {
-        "@dryui/primitives": "^1.2.0",
-        "@dryui/ui": "^1.2.0",
+        "@dryui/primitives": "^1.3.0",
+        "@dryui/ui": "^1.3.0",
         "lucide-svelte": ">=1.0.1",
         "svelte": "^5.55.1",
       },
     },
     "packages/ui": {
       "name": "@dryui/ui",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "dependencies": {
-        "@dryui/primitives": "^1.2.0",
+        "@dryui/primitives": "^1.3.0",
       },
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
