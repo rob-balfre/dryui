@@ -1,5 +1,13 @@
 # @dryui/primitives
 
+## 1.3.1
+
+### Patch Changes
+
+- [`7b7c582`](https://github.com/rob-balfre/dryui/commit/7b7c58201f67dcd2e64845d4db0190b9a10398e6) Thanks [@rob-balfre](https://github.com/rob-balfre)! - - `@dryui/primitives` + `@dryui/ui` Marquee: shift the track by the measured content size (with trailing padding on content instead of gap on the track) so the keyframe loop stays seamless across varying item counts and speeds.
+  - `@dryui/ui` Tabs.List: scroll horizontally when triggers overflow the container instead of pushing the parent wider; hide the scrollbar and contain inline-size so the list stays within its grid track.
+  - `@dryui/ui` Heading: balance multi-line headings with `text-wrap: balance`.
+
 ## 1.3.0
 
 ### Minor Changes
