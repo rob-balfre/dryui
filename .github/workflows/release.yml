@@ -35,6 +35,13 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
+      # Fail loudly if publishable packages changed since the last release
+      # without a corresponding `.changeset/*.md`. We don't auto-generate
+      # changesets from commits, so this is the only thing keeping a feature
+      # wave from quietly skipping its npm publish.
+      - name: Require changeset for unreleased package changes
+        run: bun run scripts/check-changeset-required.ts
+
       - run: bun run release:gate
 
       # Belt-and-braces: before handing off to changeset publish, pack every
