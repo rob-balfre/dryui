@@ -39,7 +39,7 @@
     "screenshots:components": "bun run ./scripts/generate-component-screenshots.ts",
     "validate": "bun run ./scripts/validate.ts",
     "changeset": "changeset",
-    "version": "changeset version && bun update",
+    "version": "changeset version && bun update && bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-architecture && bun run --filter '@dryui/mcp' generate-contract && bun run --filter '@dryui/mcp' generate-llms",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "publish:packages": "bun scripts/publish-packages.ts",
