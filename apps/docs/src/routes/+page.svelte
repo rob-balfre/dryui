@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, CodeBlock, Diagram, Heading, Marquee, Tabs, Text } from '@dryui/ui';
+	import { Button, Card, CodeBlock, Diagram, Heading, Marquee, Tabs, Text } from '@dryui/ui';
 	import { allComponentNames, toSlug } from '$lib/nav';
 	import type { DiagramConfig } from '@dryui/ui';
 	import {
@@ -14,7 +14,10 @@
 		Zap,
 		Wrench,
 		Palette,
-		Check
+		Check,
+		Compass,
+		Cpu,
+		Bot
 	} from 'lucide-svelte';
 	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import CompetitorLogo from '$lib/components/CompetitorLogo.svelte';
@@ -59,7 +62,7 @@
 		{
 			id: 'claude-design',
 			label: 'Claude Design',
-			blurb: "Anthropic's AI tool for prompts → prototypes and slides.",
+			blurb: "Anthropic's AI, prompts → prototypes.",
 			them: [
 				'Powered by Claude Opus 4.7',
 				'Reads your design system + codebase',
@@ -95,7 +98,7 @@
 			them: [
 				'React-first with Radix and Tailwind',
 				'Official MCP for component discovery',
-				'Community ports exist, still Tailwind-bound'
+				'Ports exist, still Tailwind-bound'
 			],
 			themPrice: 'Free',
 			dry: [
@@ -109,24 +112,22 @@
 			label: 'v0',
 			blurb: "Vercel's AI chat → Next.js + shadcn + Tailwind.",
 			them: [
-				'Chat → running React app, deploys to Vercel',
+				'Chat → React app, deploys to Vercel',
 				'Mini / Pro / Max token-based tiers',
 				'Generated code, not a maintained library'
 			],
 			themPrice: 'Est. $0–$100+ / mo',
 			dry: [
-				'Imported package; one update upgrades all',
+				'Imported package, updates upgrade all',
 				'No token meter, no paid tiers',
 				'Native browser APIs, no framework lock-in'
 			]
 		}
 	];
 
-	// Tuned to replace the old hand-built SVG 1:1 enough that the homepage can
-	// now use <Diagram /> as the source of truth.
 	const workflowDiagram: DiagramConfig = {
 		direction: 'TB',
-		spacing: { cornerRadius: 16, nodeGap: 24, layerGap: 96, backEdgeLaneGap: 144 },
+		spacing: { cornerRadius: 16, nodeGap: 28, layerGap: 112, backEdgeLaneGap: 240 },
 		ariaLabel: 'How DryUI works, rendered with the Diagram component',
 		nodes: [
 			{
@@ -134,32 +135,32 @@
 				label: 'You',
 				description: 'Write a prompt',
 				iconComponent: User,
-				width: 248,
-				height: 128
+				width: 280,
+				height: 144
 			},
 			{
 				id: 'mcp',
 				label: 'DryUI MCP',
 				description: 'Look up components',
 				iconComponent: Boxes,
-				width: 224,
-				height: 136
+				width: 236,
+				height: 152
 			},
 			{
 				id: 'preprocessor',
 				label: 'DryUI Linter',
 				description: 'Lint component output',
 				iconComponent: ShieldCheck,
-				width: 224,
-				height: 136
+				width: 236,
+				height: 152
 			},
 			{
 				id: 'app',
 				label: 'Your App',
 				description: 'Render the UI',
 				iconComponent: AppWindow,
-				width: 224,
-				height: 136
+				width: 236,
+				height: 152
 			}
 		],
 		edges: [
@@ -175,9 +176,9 @@
 					description: 'Mark up the running app. Your agent reads it instantly via MCP.',
 					iconComponent: PenLine,
 					color: 'brand',
-					width: 380,
-					height: 156,
-					position: 0.32
+					width: 420,
+					height: 172,
+					position: 0.36
 				}
 			}
 		],
@@ -189,11 +190,45 @@
 				color: 'brand',
 				direction: 'LR',
 				dashed: false,
-				spacing: { nodeGap: 32, clusterPadding: 36 },
+				spacing: { nodeGap: 24, clusterPadding: 32 },
 				nodes: ['mcp', 'preprocessor', 'app']
 			}
 		]
 	};
+
+	function clipEntryToCluster(node: HTMLElement) {
+		const apply = () => {
+			const svg = node.querySelector('svg');
+			if (!svg) return;
+			const cluster = svg.querySelector<SVGRectElement>('[data-part="cluster-box"]');
+			if (!cluster) return;
+			const right =
+				parseFloat(cluster.getAttribute('x') ?? '0') +
+				parseFloat(cluster.getAttribute('width') ?? '0');
+			const paths = svg.querySelectorAll<SVGPathElement>('[data-part="edge-path"]');
+			for (const path of paths) {
+				const d = path.getAttribute('d') ?? '';
+				const match = d.match(/^M\s+([\d.-]+)\s+([\d.-]+)\s+L\s+([\d.-]+)\s+([\d.-]+)/);
+				if (!match) continue;
+				const [, x1, y1, x2, y2] = match;
+				const startX = parseFloat(x1);
+				const endX = parseFloat(x2);
+				if (y1 !== y2) continue;
+				if (startX < right && endX > right) {
+					path.setAttribute('d', d.replace(/^M\s+[\d.-]+\s+[\d.-]+/, `M ${right} ${y1}`));
+				}
+			}
+		};
+		apply();
+		const observer = new MutationObserver(apply);
+		observer.observe(node, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['d']
+		});
+		return () => observer.disconnect();
+	}
 </script>
 
 <svelte:head>
@@ -420,30 +455,84 @@
 				</Tabs.Root>
 			</div>
 		</section>
-
-		<section class="workflow">
-			<Heading level={2}>How DryUI works</Heading>
-			<Text color="secondary">
-				Start with the DryUI CLI. In AI-editor setups, the MCP server mirrors that same discovery
-				and validation loop inside the editor. Generated code runs through the lint preprocessor
-				into your app, and feedback loops straight back to the agent. This version is rendered with
-				the same <code>@dryui/ui</code>
-				<code>&lt;Diagram /&gt;</code>
-				component you can ship in your own app.
-			</Text>
-			<div class="workflow-canvas">
-				<Diagram config={workflowDiagram} />
-			</div>
-		</section>
 	</div>
+
+	<section class="workflow">
+		<div class="workflow-head">
+			<Heading level={2}>How DryUI works</Heading>
+			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
+		</div>
+		<div class="workflow-canvas" {@attach clipEntryToCluster}>
+			<Diagram config={workflowDiagram} />
+		</div>
+		<Text size="xs" color="secondary">
+			Rendered with the same
+			<a class="workflow-link" href={withBase('/components/diagram')}
+				><code>&lt;Diagram /&gt;</code></a
+			> component you can ship.
+		</Text>
+	</section>
+
+	<section class="hood">
+		<div class="hood-head">
+			<Heading level={2}>Under the hood</Heading>
+			<Text color="secondary">Why we built DryUI on Svelte 5 and SvelteKit, not React.</Text>
+		</div>
+		<div class="hood-grid">
+			<Card.Root>
+				<Card.Content>
+					<span class="hood-icon"><Compass size={20} aria-hidden="true" /></span>
+					<div class="hood-name">Opinionated</div>
+					<p class="hood-note">
+						One framework, one way to do things. Runes for state, scoped styles for CSS, file-based
+						routing. No "pick your stack" meeting.
+					</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Content>
+					<span class="hood-icon"><Cpu size={20} aria-hidden="true" /></span>
+					<div class="hood-name">Compiler-first</div>
+					<p class="hood-note">
+						Svelte compiles to plain DOM updates. No virtual DOM, no runtime tax. The compile step
+						gives DryUI a hook to lint your code at build time.
+					</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Content>
+					<span class="hood-icon"><Boxes size={20} aria-hidden="true" /></span>
+					<div class="hood-name">Batteries included</div>
+					<p class="hood-note">
+						SvelteKit ships routing, SSR, endpoints, forms, and transitions. The React equivalent is
+						half a dozen libraries you wire together yourself.
+					</p>
+				</Card.Content>
+			</Card.Root>
+			<Card.Root>
+				<Card.Content>
+					<span class="hood-icon"><Bot size={20} aria-hidden="true" /></span>
+					<div class="hood-name">One path for agents</div>
+					<p class="hood-note">
+						React's ecosystem sprawls across Redux, Zustand, Tailwind, CSS-in-JS, Next, Remix, and
+						TanStack. Too much choice and disparate deps confuse LLMs. Svelte gives them one obvious
+						path.
+					</p>
+				</Card.Content>
+			</Card.Root>
+		</div>
+		<Text size="xs" color="secondary">
+			Learning a new framework is a problem of the past. Your agent already speaks Svelte.
+		</Text>
+	</section>
 </div>
 
 <style>
 	.page {
 		display: grid;
-		grid-template-columns: minmax(0, 48rem);
-		justify-content: center;
+		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
+		gap: clamp(var(--dry-space-14), 10vw, var(--dry-space-24));
 		padding-block: clamp(var(--dry-space-14), 12vw, var(--dry-space-24));
 		padding-inline: var(--dry-space-4);
 		text-align: center;
@@ -452,6 +541,8 @@
 	.page-stack {
 		container-type: inline-size;
 		display: grid;
+		grid-template-columns: minmax(0, 48rem);
+		justify-content: center;
 		gap: clamp(var(--dry-space-14), 10vw, var(--dry-space-24));
 		justify-items: center;
 	}
@@ -827,28 +918,45 @@
 
 	.workflow {
 		display: grid;
-		gap: var(--dry-space-3);
+		grid-template-columns: minmax(0, 72rem);
+		justify-content: center;
+		gap: var(--dry-space-6);
 		justify-items: center;
-		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.workflow-head {
+		display: grid;
+		grid-template-columns: minmax(0, 36rem);
+		gap: var(--dry-space-2);
+		justify-items: center;
+	}
+
+	.workflow-link {
+		color: inherit;
+		text-decoration: none;
+		transition: color 150ms;
+	}
+
+	.workflow-link:hover {
+		color: var(--dry-color-fill-brand);
 	}
 
 	.workflow-canvas {
 		justify-self: stretch;
 		display: grid;
-		padding-block-start: var(--dry-space-4);
 		--dry-diagram-node-bg: color-mix(in srgb, var(--dry-color-bg-base) 82%, transparent);
 		--dry-diagram-node-border: color-mix(in srgb, var(--dry-color-stroke-weak) 92%, transparent);
 		--dry-diagram-edge-color: color-mix(in srgb, var(--dry-color-text-strong) 92%, transparent);
-		--dry-diagram-node-padding: 20px 28px;
-		--dry-diagram-node-padding-with-description: 24px 28px;
-		--dry-diagram-node-padding-mobile: 16px 18px;
-		--dry-diagram-node-padding-with-description-mobile: 18px 20px;
-		--dry-diagram-node-gap: 10px;
-		--dry-diagram-node-gap-with-description: 8px;
-		--dry-diagram-node-label-size: 1.125rem;
-		--dry-diagram-node-label-size-with-description: 1.375rem;
-		--dry-diagram-node-description-size: 0.9375rem;
-		--dry-diagram-cluster-label-size: 0.875rem;
+		--dry-diagram-node-padding: 24px 24px;
+		--dry-diagram-node-padding-with-description: 26px 24px;
+		--dry-diagram-node-padding-mobile: 18px 22px;
+		--dry-diagram-node-padding-with-description-mobile: 20px 24px;
+		--dry-diagram-node-gap: 12px;
+		--dry-diagram-node-gap-with-description: 10px;
+		--dry-diagram-node-label-size: 1.25rem;
+		--dry-diagram-node-label-size-with-description: 1.5rem;
+		--dry-diagram-node-description-size: 1rem;
+		--dry-diagram-cluster-label-size: 0.9375rem;
 		--dry-diagram-cluster-bg: color-mix(
 			in srgb,
 			var(--dry-color-fill-brand) 5%,
@@ -860,5 +968,58 @@
 			transparent
 		);
 		--dry-diagram-text-muted: var(--dry-color-text-weak);
+	}
+
+	.hood {
+		container-type: inline-size;
+		display: grid;
+		grid-template-columns: minmax(0, 56rem);
+		justify-content: center;
+		gap: var(--dry-space-6);
+		justify-items: center;
+	}
+
+	.hood-head {
+		display: grid;
+		gap: var(--dry-space-2);
+		justify-items: center;
+	}
+
+	.hood-grid {
+		justify-self: stretch;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-4);
+		text-align: start;
+	}
+
+	@container (min-width: 44rem) {
+		.hood-grid {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
+	.hood-icon {
+		display: inline-grid;
+		place-items: center;
+		padding: 0.5rem;
+		border-radius: 9999px;
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
+		color: var(--dry-color-fill-brand);
+	}
+
+	.hood-name {
+		font-weight: 700;
+		color: var(--dry-color-text-strong);
+		line-height: 1.4;
+		padding-block-start: var(--dry-space-3);
+	}
+
+	.hood-note {
+		margin: 0;
+		padding-block-start: var(--dry-space-2);
+		font-size: var(--dry-type-small-size, 0.875rem);
+		color: var(--dry-color-text-weak);
+		line-height: 1.55;
 	}
 </style>
