@@ -65,6 +65,17 @@ function buildOsaArgs(terminalApp: TerminalApp, cliCommand: string, workspace: s
 	return ['-e', `tell application "Terminal" to do script "${osaQuote(wrapped)}"`];
 }
 
+function openCodexUrl(url: string): void {
+	if (platform() === 'win32') {
+		// `start "" "<url>"` — empty title arg is required when the target is quoted.
+		spawn('cmd.exe', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
+		return;
+	}
+	// sh -c is intentional: spawn('open', [url]) drops the prompt when fired from
+	// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
+	spawn('sh', ['-c', `open ${shellQuote(url)}`], { stdio: 'ignore', detached: true }).unref();
+}
+
 function dispatch(submission: Submission, options: DispatcherOptions): void {
 	const target = resolveAgent(submission, options.defaultAgent);
 	if (target === 'off') {
@@ -75,24 +86,32 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	console.error(`[dispatch] → ${target} (${submission.id})`);
 	if (target === 'codex') {
 		const url = `codex://new?prompt=${encodeURIComponent(prompt)}&path=${encodeURIComponent(options.workspace)}`;
-		// sh -c is intentional: spawn('open', [url]) drops the prompt when fired from
-		// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
-		spawn('sh', ['-c', `open ${shellQuote(url)}`], { stdio: 'ignore', detached: true }).unref();
+		openCodexUrl(url);
 		return;
 	}
-	const cliArgs = TERMINAL_CLI[target].map((a) => shellQuote(a)).join(' ');
+	const cli = TERMINAL_CLI[target];
+	if (platform() === 'win32') {
+		spawn('wt.exe', ['-d', options.workspace, '--', ...cli, prompt], {
+			stdio: 'ignore',
+			detached: true
+		}).unref();
+		return;
+	}
+	const cliArgs = cli.map((a) => shellQuote(a)).join(' ');
 	const cliCommand = `${cliArgs} ${shellQuote(prompt)}`;
 	const args = buildOsaArgs(options.terminalApp ?? 'terminal', cliCommand, options.workspace);
 	spawn('osascript', args, { stdio: 'ignore', detached: true }).unref();
 }
 
 export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () => void {
-	if (platform() !== 'darwin') {
-		console.error(`[dispatch] unsupported platform ${platform()}; dispatch disabled`);
+	const p = platform();
+	if (p !== 'darwin' && p !== 'win32') {
+		console.error(`[dispatch] unsupported platform ${p}; dispatch disabled`);
 		return () => {};
 	}
+	const terminalLabel = p === 'win32' ? 'wt' : (options.terminalApp ?? 'terminal');
 	console.error(
-		`[dispatch] enabled (default=${options.defaultAgent}, workspace=${options.workspace}, terminal=${options.terminalApp ?? 'terminal'})`
+		`[dispatch] enabled (default=${options.defaultAgent}, workspace=${options.workspace}, terminal=${terminalLabel})`
 	);
 	return bus.subscribe((event) => dispatch(event.payload as Submission, options), {
 		agent: true,
