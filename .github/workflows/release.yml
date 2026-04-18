@@ -113,4 +113,7 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
           packageManager: bun
-          command: pages deploy .svelte-kit/cloudflare --project-name=dryui-docs
+          # --branch=main is required: deploy-docs checks out a specific SHA, so
+          # wrangler sees detached HEAD and otherwise falls back to a "head"
+          # preview alias instead of promoting to the dryui.dev production env.
+          command: pages deploy .svelte-kit/cloudflare --project-name=dryui-docs --branch=main
