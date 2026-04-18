@@ -76,6 +76,7 @@
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
+		justify-content: var(--dry-tabs-list-justify, start);
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 		gap: 0;
 	}

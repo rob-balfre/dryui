@@ -51,6 +51,7 @@
 		page.url.pathname.startsWith('/view/') || page.url.pathname.startsWith(withBase('/view/'))
 	);
 	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
+	let isHomeRoute = $derived(page.url.pathname === '/' || page.url.pathname === withBase('/'));
 	let shouldPreserveFeedbackMode = $derived(
 		feedbackEnabled || (browser && page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1')
 	);
@@ -77,14 +78,20 @@
 		const fromPath = navigation.from?.url.pathname;
 		const toPath = navigation.to?.url.pathname;
 		if (fromPath === toPath) return;
-		if (navigation.to?.url.hash) return;
+		const hash = navigation.to?.url.hash;
+		if (hash) {
+			requestAnimationFrame(() => {
+				document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			});
+			return;
+		}
 		document.querySelector('main.docs-content')?.scrollTo({ top: 0, behavior: 'instant' });
 	});
 </script>
 
 {#snippet docsShell()}
 	<div class="docs-shell-frame">
-		<div class="docs-shell">
+		<div class="docs-shell" data-home={isHomeRoute || undefined}>
 			<header class="docs-header">
 				<Container size="full" padding={false}>
 					<div class="docs-header-bar">
@@ -139,7 +146,17 @@
 			<main class="docs-content">
 				{@render routeChildren?.()}
 				<footer class="docs-footer">
-					<small class="docs-footer-copyright">{publishedLabel}</small>
+					<p class="footer-credit">
+						Made by <a
+							class="footer-link"
+							href="https://robertbalfre.dev/"
+							target="_blank"
+							rel="noreferrer">Robert Balfré</a
+						>
+						in Sydney 🐨
+						<span class="footer-sep" aria-hidden="true">•</span>
+						{publishedLabel}
+					</p>
 				</footer>
 			</main>
 		</div>
@@ -232,6 +249,18 @@
 		border-inline-end: 1px solid var(--dry-sidebar-border, transparent);
 	}
 
+	.docs-shell[data-home] .mobile-nav,
+	.docs-shell[data-home] .docs-nav,
+	.docs-shell[data-home] .docs-header {
+		display: none;
+	}
+
+	.docs-shell[data-home] {
+		grid-template-areas: 'content';
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: 1fr;
+	}
+
 	.docs-content {
 		grid-area: content;
 		display: grid;
@@ -277,12 +306,37 @@
 	}
 
 	.docs-footer {
-		padding: var(--dry-space-6) 0;
+		display: grid;
+		gap: var(--dry-space-1);
+		justify-items: center;
+		padding: var(--dry-space-6) var(--dry-space-4) var(--dry-space-5);
 		text-align: center;
 	}
 
-	.docs-footer-copyright {
+	.footer-credit {
+		margin: 0;
+		font-size: 0.75rem;
 		color: var(--dry-color-text-weak);
-		font-size: var(--dry-type-small-size);
+		line-height: 1.8;
+	}
+
+	.footer-link {
+		color: var(--dry-color-text-strong);
+		font-weight: 600;
+		text-decoration: none;
+		border-block-end: 1px solid color-mix(in srgb, var(--dry-color-fill-brand) 60%, transparent);
+		transition:
+			border-color 150ms,
+			color 150ms;
+	}
+
+	.footer-link:hover {
+		color: var(--dry-color-fill-brand);
+		border-block-end-color: var(--dry-color-fill-brand);
+	}
+
+	.footer-sep {
+		color: color-mix(in srgb, var(--dry-color-text-weak) 60%, transparent);
+		margin-inline: 0.25em;
 	}
 </style>

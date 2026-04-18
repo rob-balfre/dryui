@@ -6,6 +6,9 @@ import type { Submission, SubmissionAgent } from './types.js';
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
 export const DISPATCH_AGENTS: readonly DispatchAgent[] = ['codex', 'claude', 'gemini', 'copilot'];
 
+export type TerminalApp = 'terminal' | 'ghostty';
+export const TERMINAL_APPS: readonly TerminalApp[] = ['terminal', 'ghostty'];
+
 const TERMINAL_CLI: Record<Exclude<DispatchAgent, 'codex'>, readonly string[]> = {
 	claude: ['claude'],
 	gemini: ['gemini'],
@@ -17,6 +20,7 @@ const CODEX_PLUGIN_CHIP = '[@dryui](plugin://dryui@dryui) ';
 export interface DispatcherOptions {
 	workspace: string;
 	defaultAgent: DispatchAgent;
+	terminalApp?: TerminalApp;
 }
 
 function buildPrompt(s: Submission, target: DispatchAgent): string {
@@ -38,6 +42,29 @@ function resolveAgent(submission: Submission, defaultAgent: DispatchAgent): Subm
 	return defaultAgent;
 }
 
+function buildOsaArgs(terminalApp: TerminalApp, cliCommand: string, workspace: string): string[] {
+	if (terminalApp === 'ghostty') {
+		// Ghostty 1.3+ AppleScript. `command` is wrapped in `/bin/sh -c` by Ghostty
+		// when it has arguments, so shell-quoted args inside cliCommand work as expected.
+		return [
+			'-e',
+			'tell application "Ghostty"',
+			'-e',
+			'set cfg to new surface configuration',
+			'-e',
+			`set initial working directory of cfg to "${osaQuote(workspace)}"`,
+			'-e',
+			`set command of cfg to "${osaQuote(cliCommand)}"`,
+			'-e',
+			'new window with configuration cfg',
+			'-e',
+			'end tell'
+		];
+	}
+	const wrapped = `cd ${shellQuote(workspace)} && ${cliCommand}`;
+	return ['-e', `tell application "Terminal" to do script "${osaQuote(wrapped)}"`];
+}
+
 function dispatch(submission: Submission, options: DispatcherOptions): void {
 	const target = resolveAgent(submission, options.defaultAgent);
 	if (target === 'off') {
@@ -54,9 +81,9 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		return;
 	}
 	const cliArgs = TERMINAL_CLI[target].map((a) => shellQuote(a)).join(' ');
-	const command = `cd ${shellQuote(options.workspace)} && ${cliArgs} ${shellQuote(prompt)}`;
-	const script = `tell application "Terminal" to do script "${osaQuote(command)}"`;
-	spawn('osascript', ['-e', script], { stdio: 'ignore', detached: true }).unref();
+	const cliCommand = `${cliArgs} ${shellQuote(prompt)}`;
+	const args = buildOsaArgs(options.terminalApp ?? 'terminal', cliCommand, options.workspace);
+	spawn('osascript', args, { stdio: 'ignore', detached: true }).unref();
 }
 
 export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () => void {
@@ -65,7 +92,7 @@ export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () 
 		return () => {};
 	}
 	console.error(
-		`[dispatch] enabled (default=${options.defaultAgent}, workspace=${options.workspace})`
+		`[dispatch] enabled (default=${options.defaultAgent}, workspace=${options.workspace}, terminal=${options.terminalApp ?? 'terminal'})`
 	);
 	return bus.subscribe((event) => dispatch(event.payload as Submission, options), {
 		agent: true,

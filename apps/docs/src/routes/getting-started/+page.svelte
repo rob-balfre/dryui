@@ -12,6 +12,7 @@
 		Link,
 		Timeline
 	} from '@dryui/ui';
+	import { page } from '$app/state';
 	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
@@ -25,6 +26,18 @@
 	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
 		(PLUGIN_AGENT_IDS as readonly string[]).includes(setup.id)
 	);
+
+	const pluginParam = page.url.searchParams.get('plugin');
+	const isFeaturedPlugin = pluginParam
+		? (PLUGIN_AGENT_IDS as readonly string[]).includes(pluginParam)
+		: false;
+	const isKnownAgent = pluginParam
+		? aiAgentSetups.some((setup) => setup.id === pluginParam)
+		: false;
+	const initialPluginTab = isFeaturedPlugin
+		? (pluginParam as string)
+		: (featuredAgentSetups[0]?.id ?? 'claude-code');
+	const initialEditorTab = isKnownAgent ? (pluginParam as string) : 'claude-code';
 
 	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
 <script>
@@ -113,7 +126,7 @@
 
 		<Separator />
 
-		<section>
+		<section id="install-plugin">
 			<div class="stack-lg">
 				<Heading level={2}>Install the DryUI plugin</Heading>
 				<Text size="lg" color="secondary">
@@ -122,7 +135,7 @@
 					<code>dryui-feedback</code> MCP servers in one step.
 				</Text>
 
-				<Tabs.Root value={featuredAgentSetups[0]?.id ?? 'claude-code'}>
+				<Tabs.Root value={initialPluginTab}>
 					<Tabs.List>
 						{#each featuredAgentSetups as setup (setup.id)}
 							<Tabs.Trigger value={setup.id}>
@@ -288,7 +301,7 @@
 		<Separator />
 
 		<!-- 4. Editor integration -->
-		<section>
+		<section id="full-editor-setup">
 			<div class="stack-lg">
 				<Heading level={2}>Full editor setup</Heading>
 				<Text size="lg" color="secondary">
@@ -299,7 +312,7 @@
 
 				<CodeBlock language="bash" code="dryui" />
 
-				<Tabs.Root value="claude-code">
+				<Tabs.Root value={initialEditorTab}>
 					<Tabs.List>
 						{#each aiAgentSetups as setup (setup.id)}
 							<Tabs.Trigger value={setup.id}>{setup.label}</Tabs.Trigger>
@@ -431,6 +444,32 @@
 	.page-stack {
 		display: grid;
 		gap: var(--dry-space-12);
+	}
+
+	section[id] {
+		scroll-margin-block-start: var(--dry-space-6);
+		border-radius: var(--dry-radius-xl);
+	}
+
+	section[id]:target {
+		animation: section-highlight 1.8s ease-out;
+	}
+
+	@keyframes section-highlight {
+		0% {
+			background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
+			box-shadow: 0 0 0 1px color-mix(in srgb, var(--dry-color-stroke-brand) 60%, transparent);
+		}
+		100% {
+			background: transparent;
+			box-shadow: 0 0 0 1px transparent;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		section[id]:target {
+			animation: none;
+		}
 	}
 
 	.arch-layer {

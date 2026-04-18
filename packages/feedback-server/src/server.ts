@@ -4,7 +4,13 @@ import {
 	toFeedbackBaseUrl,
 	writeFeedbackServerConfig
 } from './config.js';
-import { attachDispatcher, DISPATCH_AGENTS, type DispatchAgent } from './dispatch.js';
+import {
+	attachDispatcher,
+	DISPATCH_AGENTS,
+	TERMINAL_APPS,
+	type DispatchAgent,
+	type TerminalApp
+} from './dispatch.js';
 import { EventBus } from './events.js';
 import { startFeedbackHttpServer } from './http.js';
 import { FeedbackStore } from './store.js';
@@ -27,6 +33,12 @@ function parseDispatchAgent(raw: string | undefined, fallback: DispatchAgent): D
 	return DISPATCH_AGENTS.includes(raw as DispatchAgent) ? (raw as DispatchAgent) : fallback;
 }
 
+function parseTerminalApp(raw: string | undefined, fallback: TerminalApp): TerminalApp {
+	if (!raw) return fallback;
+	const normalized = raw.toLowerCase() as TerminalApp;
+	return TERMINAL_APPS.includes(normalized) ? normalized : fallback;
+}
+
 function main(): void {
 	const port = toNumber(
 		readFlag('--port') ?? process.env['DRYUI_FEEDBACK_PORT'],
@@ -41,6 +53,10 @@ function main(): void {
 		readFlag('--default-agent') ?? process.env['DRYUI_DISPATCH_AGENT'],
 		'codex'
 	);
+	const terminalApp = parseTerminalApp(
+		readFlag('--terminal-app') ?? process.env['DRYUI_DISPATCH_TERMINAL_APP'],
+		'terminal'
+	);
 
 	const store = new FeedbackStore(dbPath);
 	const bus = new EventBus();
@@ -48,7 +64,7 @@ function main(): void {
 	const baseUrl = toFeedbackBaseUrl(server.hostname, server.port);
 
 	if (dispatchEnabled) {
-		attachDispatcher(bus, { workspace, defaultAgent });
+		attachDispatcher(bus, { workspace, defaultAgent, terminalApp });
 	}
 
 	writeFeedbackServerConfig({
