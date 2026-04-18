@@ -164,13 +164,12 @@
 			}
 		],
 		edges: [
-			{ from: 'you', to: 'mcp', beam: true },
-			{ from: 'mcp', to: 'preprocessor', beam: true },
-			{ from: 'preprocessor', to: 'app', beam: true },
+			{ from: 'you', to: 'mcp' },
+			{ from: 'mcp', to: 'preprocessor' },
+			{ from: 'preprocessor', to: 'app' },
 			{
 				from: 'app',
 				to: 'you',
-				beam: true,
 				waypoint: {
 					id: 'live-feedback',
 					label: 'Live Feedback',
