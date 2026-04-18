@@ -57,6 +57,7 @@
 		$effect(() => {
 			node.style.setProperty('--marquee-duration', `${duration}s`);
 			node.style.setProperty('--marquee-gap', gap);
+			node.style.setProperty('--marquee-shift', `${contentSize}px`);
 		});
 	}
 
@@ -100,7 +101,6 @@
 	[data-marquee-track] {
 		display: grid;
 		grid-auto-flow: var(--_flow, column);
-		gap: var(--marquee-gap, 1rem);
 		animation-duration: var(--dry-marquee-speed);
 		animation-timing-function: linear;
 		animation-iteration-count: infinite;
@@ -111,6 +111,17 @@
 		display: grid;
 		grid-auto-flow: var(--_flow, column);
 		gap: var(--marquee-gap, 1rem);
+	}
+
+	/* Trailing padding on content (not gap on track) keeps the keyframe loop seamless. */
+	[data-marquee][data-direction='left'] [data-marquee-content],
+	[data-marquee][data-direction='right'] [data-marquee-content] {
+		padding-inline-end: var(--marquee-gap, 1rem);
+	}
+
+	[data-marquee][data-direction='up'] [data-marquee-content],
+	[data-marquee][data-direction='down'] [data-marquee-content] {
+		padding-block-end: var(--marquee-gap, 1rem);
 	}
 
 	[data-marquee][data-direction='left'] [data-marquee-track],
@@ -137,7 +148,7 @@
 			transform: translateX(0);
 		}
 		to {
-			transform: translateX(-50%);
+			transform: translateX(calc(-1 * var(--marquee-shift, 0px)));
 		}
 	}
 
@@ -146,7 +157,7 @@
 			transform: translateY(0);
 		}
 		to {
-			transform: translateY(-50%);
+			transform: translateY(calc(-1 * var(--marquee-shift, 0px)));
 		}
 	}
 
