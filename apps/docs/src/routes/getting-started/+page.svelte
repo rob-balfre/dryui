@@ -13,6 +13,7 @@
 		Timeline
 	} from '@dryui/ui';
 	import { page } from '$app/state';
+	import { browser } from '$app/environment';
 	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
@@ -27,17 +28,17 @@
 		(PLUGIN_AGENT_IDS as readonly string[]).includes(setup.id)
 	);
 
-	const pluginParam = page.url.searchParams.get('plugin');
-	const isFeaturedPlugin = pluginParam
-		? (PLUGIN_AGENT_IDS as readonly string[]).includes(pluginParam)
-		: false;
-	const isKnownAgent = pluginParam
-		? aiAgentSetups.some((setup) => setup.id === pluginParam)
-		: false;
-	const initialPluginTab = isFeaturedPlugin
-		? (pluginParam as string)
-		: (featuredAgentSetups[0]?.id ?? 'claude-code');
-	const initialEditorTab = isKnownAgent ? (pluginParam as string) : 'claude-code';
+	const pluginParam = $derived(browser ? page.url.searchParams.get('plugin') : null);
+	const isFeaturedPlugin = $derived(
+		pluginParam ? (PLUGIN_AGENT_IDS as readonly string[]).includes(pluginParam) : false
+	);
+	const isKnownAgent = $derived(
+		pluginParam ? aiAgentSetups.some((setup) => setup.id === pluginParam) : false
+	);
+	const initialPluginTab = $derived(
+		isFeaturedPlugin ? (pluginParam as string) : (featuredAgentSetups[0]?.id ?? 'claude-code')
+	);
+	const initialEditorTab = $derived(isKnownAgent ? (pluginParam as string) : 'claude-code');
 
 	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
 <script>
