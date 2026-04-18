@@ -164,12 +164,13 @@
 			}
 		],
 		edges: [
-			{ from: 'you', to: 'mcp' },
-			{ from: 'mcp', to: 'preprocessor' },
-			{ from: 'preprocessor', to: 'app' },
+			{ from: 'you', to: 'mcp', beam: true },
+			{ from: 'mcp', to: 'preprocessor', beam: true },
+			{ from: 'preprocessor', to: 'app', beam: true },
 			{
 				from: 'app',
 				to: 'you',
+				beam: true,
 				waypoint: {
 					id: 'live-feedback',
 					label: 'Live Feedback',
@@ -209,8 +210,11 @@
 			for (const path of paths) {
 				const d = path.getAttribute('d') ?? '';
 				const match = d.match(/^M\s+([\d.-]+)\s+([\d.-]+)\s+L\s+([\d.-]+)\s+([\d.-]+)/);
-				if (!match) continue;
-				const [, x1, y1, x2, y2] = match;
+				if (!match || match.length < 5) continue;
+				const x1 = match[1] as string;
+				const y1 = match[2] as string;
+				const x2 = match[3] as string;
+				const y2 = match[4] as string;
 				const startX = parseFloat(x1);
 				const endX = parseFloat(x2);
 				if (y1 !== y2) continue;
