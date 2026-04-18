@@ -17,10 +17,15 @@
 		Check,
 		Compass,
 		Cpu,
-		Bot
+		Bot,
+		GitCompare,
+		Workflow,
+		Hand,
+		PackageOpen
 	} from 'lucide-svelte';
 	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import CompetitorLogo from '$lib/components/CompetitorLogo.svelte';
+	import GithubIcon from '$lib/components/GithubIcon.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
@@ -245,7 +250,7 @@
 				<Logo />
 			</div>
 			<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
-			<Heading level={1}>Closing the gap between<br />AI-generated & hand-crafted UIs</Heading>
+			<Heading level={1}>Closing the gap between <br />AI-generated & hand-crafted UIs</Heading>
 			<Text color="secondary">100% free & open-source.</Text>
 
 			<div class="hero-tabs">
@@ -278,11 +283,7 @@
 					<Rocket size={16} aria-hidden="true" /> Get Started
 				</Button>
 				<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
-						><path
-							d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"
-						/></svg
-					> GitHub
+					<GithubIcon size={16} /> GitHub
 				</Button>
 			</nav>
 		</section>
@@ -308,13 +309,13 @@
 				</a>
 			</div>
 			<a class="plugins-manual" href={withBase('/getting-started#full-editor-setup')}>
-				<Wrench size={12} aria-hidden="true" />
 				<Text size="xs" color="secondary" weight="medium">or configure manually</Text>
 			</a>
 		</section>
 
 		<section class="showcase">
 			<div class="showcase-head">
+				<span class="section-icon"><PackageOpen size={20} aria-hidden="true" /></span>
 				<Heading level={2}>What's inside</Heading>
 				<Text color="secondary">
 					One library, everything you need to ship AI-generated UIs that look hand-crafted.
@@ -340,7 +341,7 @@
 			</div>
 
 			<div class="component-marquee">
-				<Marquee speed={1500} pauseOnHover fade gap="0.75rem">
+				<Marquee speed={60} pauseOnHover fade gap="0.75rem">
 					{#each componentShowcase as name (name)}
 						<a class="component-chip" href={withBase(`/components/${toSlug(name)}`)}>{name}</a>
 					{/each}
@@ -395,14 +396,15 @@
 					</div>
 				</li>
 			</ul>
+			<Text size="xs" color="secondary">Yes, we have light and dark modes.</Text>
 		</section>
 
 		<section class="compare">
 			<div class="compare-head">
+				<span class="section-icon"><GitCompare size={20} aria-hidden="true" /></span>
 				<Heading level={2}>How DryUI compares</Heading>
 				<Text color="secondary">
-					Same AI-native ambition as the rest, but as a zero-dependency component library, free and
-					open source, wired into your agent via MCP.
+					A zero-dependency library, free and open source, wired to your agent via MCP.
 				</Text>
 			</div>
 
@@ -457,11 +459,14 @@
 					{/each}
 				</Tabs.Root>
 			</div>
+			<Text size="xs" color="secondary">You just need an AI agent (free local ones work fine).</Text
+			>
 		</section>
 	</div>
 
 	<section class="workflow">
 		<div class="workflow-head">
+			<span class="section-icon"><Workflow size={20} aria-hidden="true" /></span>
 			<Heading level={2}>How DryUI works</Heading>
 			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
 		</div>
@@ -478,6 +483,7 @@
 
 	<section class="hood">
 		<div class="hood-head">
+			<span class="section-icon"><Wrench size={20} aria-hidden="true" /></span>
 			<Heading level={2}>Under the hood</Heading>
 			<Text color="secondary">Why we built DryUI on Svelte 5 and SvelteKit, not React.</Text>
 		</div>
@@ -528,6 +534,20 @@
 			Learning a new framework is a problem of the past. Your agent already speaks Svelte.
 		</Text>
 	</section>
+
+	<section class="cta">
+		<span class="section-icon"><Hand size={20} aria-hidden="true" /></span>
+		<Heading level={2}>Still here?</Heading>
+		<Text color="secondary">Install the plugin, wire it to your agent, and start building.</Text>
+		<nav aria-label="Get started links" class="actions">
+			<Button variant="solid" size="md" href={withBase('/getting-started')}>
+				<Rocket size={16} aria-hidden="true" /> Get Started
+			</Button>
+			<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
+				<GithubIcon size={16} /> GitHub
+			</Button>
+		</nav>
+	</section>
 </div>
 
 <style>
@@ -535,8 +555,8 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
-		gap: clamp(var(--dry-space-14), 10vw, var(--dry-space-24));
-		padding-block: clamp(var(--dry-space-14), 12vw, var(--dry-space-24));
+		gap: clamp(var(--dry-space-20), 14vw, var(--dry-space-32));
+		padding-block: clamp(var(--dry-space-20), 16vw, var(--dry-space-32));
 		padding-inline: var(--dry-space-4);
 		text-align: center;
 	}
@@ -546,14 +566,18 @@
 		display: grid;
 		grid-template-columns: minmax(0, 48rem);
 		justify-content: center;
-		gap: clamp(var(--dry-space-14), 10vw, var(--dry-space-24));
+		gap: clamp(var(--dry-space-20), 14vw, var(--dry-space-32));
 		justify-items: center;
+		--dry-type-heading-1-size: clamp(1.5rem, 0.875rem + 2.75cqi, 2.25rem);
+		--dry-type-heading-1-leading: 1.15;
+		--dry-type-heading-2-size: clamp(1.375rem, 1rem + 1.75cqi, 1.875rem);
+		--dry-type-heading-2-leading: 1.2;
 	}
 
 	.brand {
 		display: grid;
 		justify-items: center;
-		font-size: clamp(2rem, 5cqi, 3.25rem);
+		font-size: clamp(1.5rem, 0.25rem + 6.25cqi, 3.25rem);
 		color: var(--dry-color-text-strong);
 	}
 
@@ -562,6 +586,16 @@
 		gap: var(--dry-space-1);
 		justify-items: center;
 		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.hero br {
+		display: none;
+	}
+
+	@container (min-width: 30rem) {
+		.hero br {
+			display: inline;
+		}
 	}
 
 	.hero-tabs {
@@ -597,7 +631,7 @@
 		grid-auto-flow: column;
 		grid-auto-columns: auto;
 		justify-content: center;
-		gap: var(--dry-space-12);
+		gap: clamp(var(--dry-space-4), 6cqi, var(--dry-space-12));
 	}
 
 	.stat {
@@ -609,7 +643,7 @@
 	}
 
 	.stat-value {
-		font-size: clamp(2rem, 6cqi, 2.75rem);
+		font-size: clamp(1.5rem, 0.625rem + 4.5cqi, 2.75rem);
 		font-weight: 800;
 		line-height: 1;
 		color: var(--dry-color-text-strong);
@@ -707,14 +741,6 @@
 		.feature-check-list {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 			column-gap: var(--dry-space-8);
-		}
-	}
-
-	@container (max-width: 40rem) {
-		.stats-grid {
-			grid-auto-flow: row;
-			grid-auto-columns: auto;
-			gap: var(--dry-space-6);
 		}
 	}
 
@@ -844,14 +870,6 @@
 		padding-block-start: var(--dry-space-4);
 	}
 
-	@container (max-width: 28rem) {
-		.actions {
-			grid-auto-flow: row;
-			grid-auto-columns: 1fr;
-			justify-self: stretch;
-		}
-	}
-
 	.plugins {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -862,8 +880,7 @@
 
 	.plugins-grid {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: minmax(0, 1fr);
+		grid-template-columns: repeat(4, minmax(0, 1fr));
 		gap: var(--dry-space-3);
 		justify-self: stretch;
 	}
@@ -914,8 +931,7 @@
 
 	@container (max-width: 30rem) {
 		.plugins-grid {
-			grid-auto-flow: row;
-			grid-auto-columns: 1fr;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 	}
 
@@ -1002,13 +1018,19 @@
 		}
 	}
 
-	.hood-icon {
+	.hood-icon,
+	.section-icon {
 		display: inline-grid;
 		place-items: center;
 		padding: 0.5rem;
 		border-radius: 9999px;
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
 		color: var(--dry-color-fill-brand);
+	}
+
+	.section-icon {
+		justify-self: center;
+		margin-block-end: var(--dry-space-2);
 	}
 
 	.hood-name {
@@ -1024,5 +1046,13 @@
 		font-size: var(--dry-type-small-size, 0.875rem);
 		color: var(--dry-color-text-weak);
 		line-height: 1.55;
+	}
+
+	.cta {
+		display: grid;
+		grid-template-columns: minmax(0, 36rem);
+		justify-content: center;
+		justify-items: center;
+		gap: var(--dry-space-2);
 	}
 </style>

@@ -79,6 +79,14 @@
 		justify-content: var(--dry-tabs-list-justify, start);
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 		gap: 0;
+		overflow-x: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+		contain: inline-size;
+	}
+
+	[data-tabs-list]::-webkit-scrollbar {
+		display: none;
 	}
 
 	[data-tabs-list][data-orientation='vertical'] {
@@ -86,5 +94,9 @@
 		grid-auto-columns: initial;
 		border-bottom: none;
 		border-right: 1px solid var(--dry-color-stroke-weak);
+		overflow-x: visible;
+		overflow-y: auto;
+		overscroll-behavior-x: auto;
+		overscroll-behavior-y: contain;
 	}
 </style>

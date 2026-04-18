@@ -29,7 +29,6 @@
 
 	const isVertical = $derived(direction === 'up' || direction === 'down');
 	const duration = $derived(contentSize > 0 && speed > 0 ? contentSize / speed : 0);
-	const isReverse = $derived(direction === 'right' || direction === 'down');
 
 	onMount(() =>
 		observeReducedMotionPreference((matches) => {
@@ -57,13 +56,13 @@
 		$effect(() => {
 			node.style.setProperty('--marquee-duration', `${duration}s`);
 			node.style.setProperty('--marquee-gap', gap);
+			node.style.setProperty('--marquee-shift', `${contentSize}px`);
 		});
 	}
 
 	function applyTrackStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
-			node.style.setProperty('gap', 'var(--marquee-gap)');
 		});
 	}
 
@@ -71,6 +70,12 @@
 		$effect(() => {
 			node.style.setProperty('grid-auto-flow', isVertical ? 'row' : 'column');
 			node.style.setProperty('gap', 'var(--marquee-gap)');
+			// Trailing padding on content (not gap on track) keeps the keyframe loop seamless.
+			node.style.setProperty(
+				isVertical ? 'padding-block-end' : 'padding-inline-end',
+				'var(--marquee-gap)'
+			);
+			node.style.removeProperty(isVertical ? 'padding-inline-end' : 'padding-block-end');
 		});
 	}
 </script>

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { flushSync } from 'svelte';
 import TabsHarness from './fixtures/tabs-harness.svelte';
+import TabsOverflowHarness from './fixtures/tabs-overflow-harness.svelte';
 import { render } from './_harness';
 
 function getTrigger(value: string): HTMLButtonElement {
@@ -89,5 +90,35 @@ describe('Tabs', () => {
 		const list = document.querySelector<HTMLElement>('[data-testid="tabs-list"]');
 		expect(list?.getAttribute('aria-orientation')).toBe('vertical');
 		expect(list?.getAttribute('data-orientation')).toBe('vertical');
+	});
+
+	it('scrolls horizontally when triggers exceed the container width', () => {
+		render(TabsOverflowHarness);
+
+		const list = document.querySelector<HTMLElement>('[data-testid="tabs-list"]');
+		if (!list) throw new Error('Expected tabs-list');
+
+		expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+
+		const styles = getComputedStyle(list);
+		expect(styles.overflowX).toBe('auto');
+		expect(styles.scrollbarWidth).toBe('none');
+
+		list.scrollLeft = 120;
+		expect(list.scrollLeft).toBeGreaterThan(0);
+	});
+
+	it('does not push its parent wider than the parent track', () => {
+		render(TabsOverflowHarness);
+
+		const constraint = document.querySelector<HTMLElement>('[data-testid="constraint"]');
+		const list = document.querySelector<HTMLElement>('[data-testid="tabs-list"]');
+		if (!constraint || !list) throw new Error('Expected constraint and tabs-list');
+
+		// The list overflows internally...
+		expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+		// ...but its host stays within the parent's track and does not grow it.
+		expect(constraint.scrollWidth).toBe(constraint.clientWidth);
+		expect(list.clientWidth).toBeLessThanOrEqual(constraint.clientWidth);
 	});
 });
