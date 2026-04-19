@@ -139,6 +139,18 @@ describe('patchViteConfigFeedbackNoExternal', () => {
 		expect(readFileSync(configPath, 'utf-8')).toBe(original);
 	});
 
+	test('creates a minimal vite.config.ts when none exists', () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const configPath = resolve(root, 'vite.config.ts');
+
+		expect(patchViteConfigFeedbackNoExternal(configPath)).toBe(true);
+
+		const written = readFileSync(configPath, 'utf-8');
+		expect(written).toContain("import { sveltekit } from '@sveltejs/kit/vite';");
+		expect(written).toContain("noExternal: ['@dryui/feedback']");
+		expect(viteConfigHasFeedbackNoExternal(configPath)).toBe(true);
+	});
+
 	test('patches a bare export default object', () => {
 		const root = createTempTree({
 			'vite.config.js': ['export default {', '\tplugins: []', '};'].join('\n')

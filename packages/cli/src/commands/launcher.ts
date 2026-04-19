@@ -383,10 +383,13 @@ async function planAndApplyFeedbackSetup(
 	runtime: UserProjectLauncherRuntime
 ): Promise<LabelledMessage[] | null> {
 	const layoutPath = detection.files.rootLayout;
-	const viteConfigPath = detection.root ? runtime.findViteConfig(detection.root) : null;
-	const viteConfigPatched = viteConfigPath
-		? runtime.viteConfigHasFeedbackNoExternal(viteConfigPath)
-		: true;
+	const existingViteConfig = detection.root ? runtime.findViteConfig(detection.root) : null;
+	const viteConfigPath =
+		existingViteConfig ??
+		(detection.root && layoutPath ? resolve(detection.root, 'vite.config.ts') : null);
+	const viteConfigPatched = existingViteConfig
+		? runtime.viteConfigHasFeedbackNoExternal(existingViteConfig)
+		: false;
 
 	const needsInstall = !detection.dependencies.feedback;
 	const needsMount = !detection.feedback.layoutPath;
