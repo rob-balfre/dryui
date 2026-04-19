@@ -843,7 +843,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 export const docsNavCategories: DocsNavCategory[] = [
 	{
 		label: 'Layout',
-		items: ['Container', 'Separator', 'ScrollArea', 'Splitter', 'Spacer']
+		items: ['Container', 'AppFrame', 'Separator', 'ScrollArea', 'Splitter', 'Spacer']
 	},
 	{
 		label: 'Nav',
