@@ -1,7 +1,8 @@
-import { spawn } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { execFileSync, spawn } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
+import type { DryuiPackageManager } from '@dryui/mcp/project-planner';
 
 const require = createRequire(import.meta.url);
 
@@ -116,7 +117,8 @@ export async function waitForUrl(url: string, timeoutMs = 15_000): Promise<boole
 export async function ensureUrlReady(
 	url: string,
 	start: () => void,
-	failureMessage: string
+	failureMessage: string,
+	timeoutMs?: number
 ): Promise<string> {
 	if (await urlResponds(url)) {
 		return 'already running';
@@ -124,9 +126,87 @@ export async function ensureUrlReady(
 
 	start();
 
-	if (await waitForUrl(url)) {
+	if (await waitForUrl(url, timeoutMs)) {
 		return 'started in the background';
 	}
 
 	throw new Error(failureMessage);
+}
+
+export interface PortHolder {
+	pid: number;
+	command: string;
+}
+
+export function findPortHolder(port: number): PortHolder | null {
+	if (process.platform === 'win32') return null;
+
+	let pidOutput: string;
+	try {
+		pidOutput = execFileSync('lsof', [`-ti:${port}`, '-sTCP:LISTEN'], {
+			stdio: ['ignore', 'pipe', 'ignore'],
+			encoding: 'utf8'
+		}).trim();
+	} catch {
+		return null;
+	}
+	if (!pidOutput) return null;
+
+	const firstLine = pidOutput.split('\n')[0];
+	if (!firstLine) return null;
+	const pid = Number.parseInt(firstLine, 10);
+	if (!Number.isFinite(pid) || pid <= 0) return null;
+
+	let command = 'unknown';
+	try {
+		const commOutput = execFileSync('ps', ['-p', String(pid), '-o', 'comm='], {
+			stdio: ['ignore', 'pipe', 'ignore'],
+			encoding: 'utf8'
+		}).trim();
+		if (commOutput) {
+			const basename = commOutput.split('/').pop();
+			command = basename || commOutput;
+		}
+	} catch {}
+
+	return { pid, command };
+}
+
+export function killPortHolder(pid: number): boolean {
+	try {
+		process.kill(pid, 'SIGTERM');
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+export function readProjectDevScript(root: string): string | null {
+	const pkgJsonPath = resolve(root, 'package.json');
+	if (!existsSync(pkgJsonPath)) return null;
+	try {
+		const raw = readFileSync(pkgJsonPath, 'utf8');
+		const pkg = JSON.parse(raw) as { scripts?: Record<string, string> };
+		return pkg.scripts?.dev ?? null;
+	} catch {
+		return null;
+	}
+}
+
+export interface SpawnProjectDevServerOptions {
+	root: string;
+	packageManager: DryuiPackageManager;
+	host: string;
+	port: number;
+}
+
+export function spawnProjectDevServerInBackground(options: SpawnProjectDevServerOptions): void {
+	const pm = options.packageManager === 'unknown' ? 'npm' : options.packageManager;
+	const args = ['run', 'dev', '--', '--host', options.host, '--port', String(options.port)];
+	const child = spawn(pm, args, {
+		cwd: options.root,
+		detached: true,
+		stdio: 'ignore'
+	});
+	child.unref();
 }

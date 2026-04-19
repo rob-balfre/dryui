@@ -7,14 +7,27 @@ import {
 	FeedbackHttpClient,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
+import {
+	detectProject as detectProjectDefault,
+	type ProjectDetection,
+	type ProjectPlannerSpec
+} from '@dryui/mcp/project-planner';
 import { emitOrRun, hasFlag, printCommandHelp, type CommandResult } from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
+	findPortHolder as findPortHolderDefault,
 	isHealthyProbeStatus,
+	killPortHolder as killPortHolderDefault,
 	openBrowser,
+	type PortHolder,
+	readProjectDevScript as readProjectDevScriptDefault,
 	resolveFeedbackServerEntry,
-	spawnFeedbackServerInBackground
+	spawnFeedbackServerInBackground,
+	spawnProjectDevServerInBackground as spawnProjectDevServerDefault,
+	type SpawnProjectDevServerOptions,
+	urlResponds as urlRespondsDefault,
+	waitForUrl as waitForUrlDefault
 } from './launch-utils.js';
 
 export { isHealthyProbeStatus };
@@ -77,29 +90,78 @@ export function findLauncherWorkspaceRoot(start = process.cwd()): string | null 
 	}
 }
 
+interface DashboardOutputSections {
+	rootLabel: string;
+	rootValue: string;
+	dashboardUrl: string;
+	servers: Array<{ label: string; message: string }>;
+	noOpen: boolean;
+	opened: boolean;
+}
+
+function renderDashboardOutput(sections: DashboardOutputSections): string {
+	const browser = sections.noOpen
+		? 'skipped (--no-open)'
+		: sections.opened
+			? 'opening default browser'
+			: 'could not auto-open; use the dashboard URL above';
+
+	return [
+		'DryUI feedback dashboard',
+		'',
+		`${sections.rootLabel}: ${sections.rootValue}`,
+		`Dashboard: ${sections.dashboardUrl}`,
+		...sections.servers.map(({ label, message }) => `${label}: ${message}`),
+		`Browser: ${browser}`
+	].join('\n');
+}
+
+function emitLauncherError(error: unknown, exitOnComplete: boolean): void {
+	if (error instanceof Error && error.message === 'exit') {
+		throw error;
+	}
+
+	emitOrRun(
+		{
+			output: '',
+			error: error instanceof Error ? error.message : String(error),
+			exitCode: 1
+		},
+		'toon',
+		exitOnComplete
+	);
+}
+
 export function buildDashboardUrl(
 	feedbackBaseUrl: string,
-	docsBaseUrl: string,
+	docsBaseUrl: string | null,
 	version = Date.now()
 ): string {
-	const devTarget = new URL(docsBaseUrl);
-	devTarget.searchParams.set('dryui-feedback', '1');
-
 	const dashboardUrl = new URL('/ui/', feedbackBaseUrl);
 	dashboardUrl.searchParams.set('v', String(version));
-	dashboardUrl.searchParams.set('dev', devTarget.toString());
+
+	if (docsBaseUrl) {
+		const devTarget = new URL(docsBaseUrl);
+		devTarget.searchParams.set('dryui-feedback', '1');
+		dashboardUrl.searchParams.set('dev', devTarget.toString());
+	}
+
 	return dashboardUrl.toString();
 }
 
 async function ensureFeedbackServer(
 	workspaceRoot: string,
-	client: FeedbackHttpClient
+	client: FeedbackHttpClient,
+	options: { preferPackaged?: boolean } = {}
 ): Promise<string> {
 	return ensureUrlReady(
 		`${client.baseUrl}/health`,
 		() =>
 			spawnFeedbackServerInBackground({
-				entry: resolveFeedbackServerEntry({ workspaceRoot }),
+				entry: resolveFeedbackServerEntry({
+					workspaceRoot,
+					...(options.preferPackaged ? { preferPackaged: true } : {})
+				}),
 				cwd: workspaceRoot,
 				host: DEFAULT_FEEDBACK_HOST,
 				port: DEFAULT_FEEDBACK_PORT
@@ -138,6 +200,202 @@ const defaultRuntime: LauncherRuntime = {
 	openBrowser,
 	onProgress: () => {}
 };
+
+const DEFAULT_PROJECT_DEV_HOST = '127.0.0.1';
+const DEFAULT_PROJECT_DEV_PORT = 5173;
+const PROJECT_DEV_READY_TIMEOUT_MS = 30_000;
+const PORT_FREE_WAIT_MS = 500;
+
+export interface UserProjectLauncherRuntime {
+	detectProject: (cwd: string) => ProjectDetection;
+	readProjectDevScript: (root: string) => string | null;
+	ensureFeedbackServer: (projectRoot: string, client: FeedbackHttpClient) => Promise<string>;
+	ensureFeedbackUiBuilt: () => CommandResult | null;
+	urlResponds: (url: string) => Promise<boolean>;
+	findPortHolder: (port: number) => PortHolder | null;
+	killPortHolder: (pid: number) => boolean;
+	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => void;
+	waitForUrl: (url: string, timeoutMs: number) => Promise<boolean>;
+	promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean>;
+	sleep: (ms: number) => Promise<void>;
+	now: () => number;
+	openBrowser: (url: string) => boolean;
+	onProgress: (info: { cwd: string; noOpen: boolean; projectRoot: string }) => void;
+}
+
+export interface RunUserProjectLauncherOptions {
+	cwd?: string;
+	spec: Pick<ProjectPlannerSpec, 'themeImports'>;
+	runtime?: Partial<UserProjectLauncherRuntime>;
+	exitOnComplete?: boolean;
+}
+
+type DevServerPlan =
+	| { kind: 'keep'; url: string }
+	| { kind: 'spawn'; url: string; killPid?: number }
+	| { kind: 'skip'; url: string; reason: string };
+
+async function planUserProjectDevServer(
+	runtime: UserProjectLauncherRuntime,
+	options: { host: string; port: number }
+): Promise<DevServerPlan> {
+	const url = `http://${options.host}:${options.port}`;
+
+	if (await runtime.urlResponds(url)) {
+		return { kind: 'keep', url };
+	}
+
+	const holder = runtime.findPortHolder(options.port);
+	if (!holder) {
+		return { kind: 'spawn', url };
+	}
+
+	const kill = await runtime.promptKillPortHolder(holder, options.port);
+	if (!kill) {
+		return {
+			kind: 'skip',
+			url,
+			reason: `port ${options.port} busy (PID ${holder.pid} ${holder.command})`
+		};
+	}
+
+	return { kind: 'spawn', url, killPid: holder.pid };
+}
+
+async function executeUserProjectDevServerPlan(
+	runtime: UserProjectLauncherRuntime,
+	plan: DevServerPlan,
+	options: SpawnProjectDevServerOptions
+): Promise<{ ok: boolean; url: string; message: string }> {
+	if (plan.kind === 'keep') {
+		return { ok: true, url: plan.url, message: 'already running' };
+	}
+	if (plan.kind === 'skip') {
+		return { ok: false, url: plan.url, message: `skipped (${plan.reason})` };
+	}
+
+	if (plan.killPid !== undefined) {
+		const killed = runtime.killPortHolder(plan.killPid);
+		if (!killed) {
+			return {
+				ok: false,
+				url: plan.url,
+				message: `skipped (failed to kill PID ${plan.killPid})`
+			};
+		}
+		await runtime.sleep(PORT_FREE_WAIT_MS);
+	}
+
+	runtime.spawnProjectDevServer(options);
+	const ready = await runtime.waitForUrl(plan.url, PROJECT_DEV_READY_TIMEOUT_MS);
+	if (!ready) {
+		return {
+			ok: false,
+			url: plan.url,
+			message: `skipped (dev server did not respond within ${PROJECT_DEV_READY_TIMEOUT_MS / 1000}s)`
+		};
+	}
+	return { ok: true, url: plan.url, message: 'started in the background' };
+}
+
+const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject'> = {
+	readProjectDevScript: readProjectDevScriptDefault,
+	ensureFeedbackServer: (projectRoot, client) =>
+		ensureFeedbackServer(projectRoot, client, { preferPackaged: true }),
+	ensureFeedbackUiBuilt: () => ensureFeedbackUiBuilt({}),
+	urlResponds: urlRespondsDefault,
+	findPortHolder: findPortHolderDefault,
+	killPortHolder: killPortHolderDefault,
+	spawnProjectDevServer: spawnProjectDevServerDefault,
+	waitForUrl: waitForUrlDefault,
+	// Default declines to kill — safe for non-TTY callers that have no way to confirm.
+	promptKillPortHolder: async () => false,
+	sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+	now: () => Date.now(),
+	openBrowser,
+	onProgress: () => {}
+};
+
+export async function runUserProjectLauncher(
+	args: string[],
+	options: RunUserProjectLauncherOptions
+): Promise<boolean> {
+	const cwd = options.cwd ?? process.cwd();
+	const runtime: UserProjectLauncherRuntime = {
+		...defaultUserProjectRuntime,
+		detectProject: (path) => detectProjectDefault(options.spec, path),
+		...options.runtime
+	};
+	const exitOnComplete = options.exitOnComplete ?? true;
+
+	const detection = runtime.detectProject(cwd);
+	if (detection.status !== 'ready' || !detection.root) return false;
+	const packageManager = detection.packageManager;
+	if (packageManager === 'unknown') return false;
+	if (!runtime.readProjectDevScript(detection.root)) return false;
+
+	const buildResult = runtime.ensureFeedbackUiBuilt();
+	if (buildResult) {
+		emitOrRun(buildResult, 'toon', exitOnComplete);
+		return true;
+	}
+
+	const feedbackBaseUrl = toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
+	const feedbackClient = new FeedbackHttpClient(feedbackBaseUrl);
+	const noOpen = hasFlag(args, '--no-open');
+	const devHost = DEFAULT_PROJECT_DEV_HOST;
+	const devPort = DEFAULT_PROJECT_DEV_PORT;
+
+	try {
+		const plan = await planUserProjectDevServer(runtime, { host: devHost, port: devPort });
+
+		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
+
+		const [feedbackMessage, devResult] = await Promise.all([
+			runtime.ensureFeedbackServer(detection.root, feedbackClient),
+			executeUserProjectDevServerPlan(runtime, plan, {
+				root: detection.root,
+				packageManager,
+				host: devHost,
+				port: devPort
+			})
+		]);
+
+		const dashboardUrl = buildDashboardUrl(
+			feedbackClient.baseUrl,
+			devResult.ok ? devResult.url : null,
+			runtime.now()
+		);
+		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
+
+		emitOrRun(
+			{
+				output: renderDashboardOutput({
+					rootLabel: 'Project',
+					rootValue: detection.root,
+					dashboardUrl,
+					servers: [
+						{
+							label: 'Project dev',
+							message: `${devResult.message}${devResult.ok ? ` at ${devResult.url}` : ''}`
+						},
+						{ label: 'Feedback', message: feedbackMessage }
+					],
+					noOpen,
+					opened
+				}),
+				error: null,
+				exitCode: 0
+			},
+			'toon',
+			exitOnComplete
+		);
+	} catch (error) {
+		emitLauncherError(error, exitOnComplete);
+	}
+
+	return true;
+}
 
 export async function runLauncher(
 	args: string[],
@@ -181,21 +439,17 @@ export async function runLauncher(
 
 		emitOrRun(
 			{
-				output: [
-					'DryUI feedback dashboard',
-					'',
-					`Workspace: ${workspaceRoot}`,
-					`Dashboard: ${dashboardUrl}`,
-					`Docs: ${docsMessage}`,
-					`Feedback: ${feedbackMessage}`,
-					`Browser: ${
-						noOpen
-							? 'skipped (--no-open)'
-							: opened
-								? 'opening default browser'
-								: 'could not auto-open; use the dashboard URL above'
-					}`
-				].join('\n'),
+				output: renderDashboardOutput({
+					rootLabel: 'Workspace',
+					rootValue: workspaceRoot,
+					dashboardUrl,
+					servers: [
+						{ label: 'Docs', message: docsMessage },
+						{ label: 'Feedback', message: feedbackMessage }
+					],
+					noOpen,
+					opened
+				}),
 				error: null,
 				exitCode: 0
 			},
@@ -203,19 +457,7 @@ export async function runLauncher(
 			exitOnComplete
 		);
 	} catch (error) {
-		if (error instanceof Error && error.message === 'exit') {
-			throw error;
-		}
-
-		emitOrRun(
-			{
-				output: '',
-				error: error instanceof Error ? error.message : String(error),
-				exitCode: 1
-			},
-			'toon',
-			exitOnComplete
-		);
+		emitLauncherError(error, exitOnComplete);
 	}
 
 	return true;

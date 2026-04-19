@@ -50,7 +50,7 @@
 
 	const userMessage = 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!';
 	const assistantMessage =
-		"Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps me usable.";
+		"Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps my output usable.";
 
 	const CINEMATIC_SEEN_KEY = 'dryui-home-cinematic-seen';
 
