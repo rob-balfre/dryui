@@ -110,7 +110,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.1.4",
+      "version": "2.1.5",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
@@ -130,7 +130,7 @@
     },
     "packages/primitives": {
       "name": "@dryui/primitives",
-      "version": "1.3.1",
+      "version": "1.4.0",
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.3",
@@ -143,11 +143,11 @@
     },
     "packages/theme-wizard": {
       "name": "@dryui/theme-wizard",
-      "version": "9.0.0",
+      "version": "10.0.0",
       "devDependencies": {
         "@dryui/lint": "^0.4.2",
-        "@dryui/primitives": "^1.3.0",
-        "@dryui/ui": "^1.3.0",
+        "@dryui/primitives": "^1.4.0",
+        "@dryui/ui": "^1.4.0",
         "@sveltejs/package": "^2.5.7",
         "bun-types": "^1.3.12",
         "lucide-svelte": "^1.0.1",
@@ -156,19 +156,20 @@
         "typescript": "^6.0.2",
       },
       "peerDependencies": {
-        "@dryui/primitives": "^1.3.0",
-        "@dryui/ui": "^1.3.0",
+        "@dryui/primitives": "^1.4.0",
+        "@dryui/ui": "^1.4.0",
         "lucide-svelte": ">=1.0.1",
         "svelte": "^5.55.1",
       },
     },
     "packages/ui": {
       "name": "@dryui/ui",
-      "version": "1.3.1",
+      "version": "1.4.0",
       "dependencies": {
-        "@dryui/primitives": "^1.3.1",
+        "@dryui/primitives": "^1.4.0",
       },
       "devDependencies": {
+        "@dryui/lint": "workspace:*",
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.3",
         "svelte-check": "^4.4.6",
