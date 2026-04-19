@@ -1,5 +1,13 @@
 # @dryui/theme-wizard
 
+## 10.0.0
+
+### Patch Changes
+
+- Updated dependencies [[`8971b0e`](https://github.com/rob-balfre/dryui/commit/8971b0e4dca6de0be282f6710ad5ceefb31e921a)]:
+  - @dryui/ui@1.4.0
+  - @dryui/primitives@1.4.0
+
 ## 9.0.0
 
 ### Patch Changes
