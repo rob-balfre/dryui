@@ -31,6 +31,12 @@ import {
 	type SetupGuide,
 	type SetupGuideId
 } from './setup-guides.js';
+import {
+	formatInstallResult,
+	installPreviewLines,
+	isAutoInstallable,
+	runEditorInstall
+} from './setup-installers.js';
 import type { Spec } from './types.js';
 
 type MainMenuValue = 'setup' | 'feedback' | 'init' | 'install' | 'detect' | 'exit';
@@ -276,7 +282,7 @@ function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): v
 function setupHelp(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--open-feedback] [--no-open]`,
+			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--install] [--claude-hook] [--open-feedback] [--no-open]`,
 			description: [
 				'Interactive action menu for editor setup, feedback, and common project helpers.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
@@ -284,6 +290,8 @@ function setupHelp(exitCode = 0): never {
 			],
 			options: [
 				'  --editor <id>     Print setup steps for one editor or agent',
+				'  --install         After printing the editor steps, run them (skill copy + MCP config merge).',
+				'                    Supported for copilot, cursor, opencode, windsurf, zed.',
 				'  --claude-hook     Run `dryui install-hook` after the Claude guide',
 				'  --open-feedback   Open feedback tooling after printing setup steps',
 				'  --no-open         When opening feedback, print the URL instead of opening the browser'
@@ -291,7 +299,7 @@ function setupHelp(exitCode = 0): never {
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
-				'  dryui setup --editor opencode',
+				'  dryui setup --editor opencode --install',
 				'  dryui setup --editor claude-code --claude-hook',
 				'  dryui setup --open-feedback --no-open'
 			]
@@ -603,6 +611,25 @@ async function runInteractiveEditorSetup(args: string[], mainContext: string[]):
 			}
 		}
 
+		if (isAutoInstallable(editor)) {
+			const previewLines = installPreviewLines(editor, { cwd: process.cwd() });
+			const runIt = await promptConfirm('Install for me now?', true, {
+				contextLines: [...contextLines, '', ...previewLines]
+			});
+			if (runIt) {
+				const result = runEditorInstall(editor, { cwd: process.cwd() });
+				if (result) {
+					console.log('');
+					console.log(formatInstallResult(result));
+				}
+				const next = await promptAfterAction('editor');
+				if (next === 'main') {
+					return;
+				}
+				continue;
+			}
+		}
+
 		const next = await promptSelect<PostGuideValue>(
 			'What next?',
 			[
@@ -745,6 +772,23 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 		console.log(formatGuide(getSetupGuide(editor)));
 		if (editor === 'claude-code' && hasFlag(args, '--claude-hook')) {
 			emitCommandResult(getInstallHookResult([], 'text'));
+		}
+		if (hasFlag(args, '--install')) {
+			if (!isAutoInstallable(editor)) {
+				console.error('');
+				console.error(
+					`--install is not supported for ${editor}. Follow the printed steps above instead.`
+				);
+				process.exit(1);
+			}
+			const result = runEditorInstall(editor, { cwd: process.cwd() });
+			if (result) {
+				console.log('');
+				console.log(formatInstallResult(result));
+				if (!result.ok) {
+					process.exit(1);
+				}
+			}
 		}
 		if (hasFlag(args, '--open-feedback')) {
 			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);
