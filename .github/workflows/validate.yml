@@ -22,7 +22,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
         with:
-          fetch-depth: 1
+          # Full history so check:changeset can find the last
+          # `chore: version packages` commit via `git log --grep`.
+          fetch-depth: 0
 
       - uses: ./.github/actions/setup-dryui
 
