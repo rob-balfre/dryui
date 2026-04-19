@@ -334,13 +334,29 @@ gemini extensions install ~/dryui/packages/plugin`
 	},
 	{
 		id: 'copilot',
-		label: 'VS Code / Copilot',
+		label: 'Copilot',
 		description:
 			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for Copilot Agent mode.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
+		installSteps: [
+			{
+				title: 'Install the DryUI skill',
+				description:
+					'Copy the DryUI skill to `.github/skills/` for Copilot, or `.agents/skills/` if you want a shared cross-tool skill folder.',
+				code: 'npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui',
+				language: 'bash'
+			},
+			{
+				title: 'Add the MCP server',
+				description:
+					'Put this in `.vscode/mcp.json`. Copilot uses `servers`, not `mcpServers`, and MCP tools only run in Agent mode.',
+				code: copilotConfig,
+				language: 'json'
+			}
+		],
 		skill: {
 			title: '2. Install the skill',
 			note: 'Copy the DryUI skill to .github/skills/ (Copilot standard) or .agents/skills/ (cross-tool).',

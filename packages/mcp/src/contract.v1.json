@@ -7521,16 +7521,7 @@
         "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
         "Only add landmark or region semantics when the section has a unique, meaningful label."
       ],
-      "cssVars": {
-        "--dry-app-frame-bg": "Frame Bg",
-        "--dry-app-frame-border": "Frame Border",
-        "--dry-app-frame-chrome-bg": "Frame Chrome Bg",
-        "--dry-app-frame-dot-close": "Frame Dot Close",
-        "--dry-app-frame-dot-max": "Frame Dot Max",
-        "--dry-app-frame-dot-min": "Frame Dot Min",
-        "--dry-app-frame-dot-size": "Frame Dot Size",
-        "--dry-app-frame-radius": "Frame Radius"
-      },
+      "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-app-frame"

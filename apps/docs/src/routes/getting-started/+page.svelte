@@ -14,7 +14,7 @@
 	} from '@dryui/ui';
 	import { page } from '$app/state';
 	import { browser } from '$app/environment';
-	import AgentLogo from '$lib/components/AgentLogo.svelte';
+	import AgentLogo, { type AgentLogoId } from '$lib/components/AgentLogo.svelte';
 	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
@@ -22,7 +22,16 @@
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 
-	const FEATURED_AGENT_IDS = ['claude-code', 'codex', 'gemini', 'opencode'] as const;
+	const FEATURED_AGENT_IDS = [
+		'claude-code',
+		'codex',
+		'gemini',
+		'opencode',
+		'copilot',
+		'cursor',
+		'windsurf',
+		'zed'
+	] as const;
 
 	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
 		(FEATURED_AGENT_IDS as readonly string[]).includes(setup.id)
@@ -131,9 +140,9 @@
 			<div class="stack-lg">
 				<Heading level={2}>Install the DryUI integration</Heading>
 				<Text size="lg" color="secondary">
-					Once <code>dryui</code> is installed, wire DryUI into Claude Code, Codex, Gemini CLI, or
-					OpenCode. Depending on the agent, that means a plugin, an extension, or a native skill +
-					MCP setup. Each path exposes the DryUI skill plus the <code>dryui</code> and
+					Once <code>dryui</code> is installed, wire DryUI into your editor or agent of choice.
+					Depending on the tool, that means a plugin, an extension, or a native skill + MCP setup.
+					Each path exposes the DryUI skill plus the <code>dryui</code> and
 					<code>dryui-feedback</code> MCP servers.
 				</Text>
 
@@ -142,10 +151,7 @@
 						{#each featuredAgentSetups as setup (setup.id)}
 							<Tabs.Trigger value={setup.id}>
 								<span class="agent-tab-label">
-									<AgentLogo
-										agent={setup.id as 'claude-code' | 'codex' | 'gemini' | 'opencode'}
-										size={18}
-									/>
+									<AgentLogo agent={setup.id as AgentLogoId} size={18} />
 									{setup.label}
 								</span>
 							</Tabs.Trigger>
@@ -186,11 +192,6 @@
 						</Tabs.Content>
 					{/each}
 				</Tabs.Root>
-
-				<Text size="sm" color="muted">
-					Using Cursor, Copilot, Windsurf, or Zed? The full setup matrix below covers their skill
-					and MCP paths too.
-				</Text>
 			</div>
 		</section>
 

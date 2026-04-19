@@ -5,7 +5,6 @@
 		Avatar,
 		Button,
 		Card,
-		ChatThread,
 		CodeBlock,
 		Diagram,
 		Heading,
@@ -14,6 +13,7 @@
 		Text,
 		TypingIndicator
 	} from '@dryui/ui';
+	import { getReducedMotionPreference } from '@dryui/primitives';
 	import { allComponentNames, toSlug } from '$lib/nav';
 	import type { DiagramConfig } from '@dryui/ui';
 	import {
@@ -48,42 +48,115 @@
 
 	const componentShowcase = allComponentNames();
 
-	const chatMessages = [
-		{
-			role: 'user' as const,
-			name: 'You',
-			text: 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!'
-		},
-		{
-			role: 'assistant' as const,
-			name: 'Agent',
-			text: "Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps me usable."
-		}
-	];
+	const userMessage = 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!';
+	const assistantMessage =
+		"Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps me usable.";
 
-	let chatVisibleCount = $state(0);
+	const CINEMATIC_SEEN_KEY = 'dryui-home-cinematic-seen';
+
+	let userTypedText = $state('');
+	let userBubbleVisible = $state(false);
+	let assistantVisible = $state(false);
 	let assistantTyping = $state(false);
+	let assistantTypedText = $state('');
+	let frameVisible = $state(false);
+	let supportingVisible = $state(false);
+	let cinematicActive = $state(true);
+	let skipFadeIn = $state(false);
+	let hydrated = $state(false);
+
+	function jumpToFinal() {
+		userTypedText = userMessage;
+		userBubbleVisible = true;
+		assistantVisible = true;
+		assistantTyping = false;
+		assistantTypedText = assistantMessage;
+		frameVisible = true;
+		supportingVisible = true;
+		cinematicActive = false;
+	}
+
+	function shouldSkipCinematic(): boolean {
+		if (typeof window === 'undefined') return true;
+		if (getReducedMotionPreference()) return true;
+		try {
+			return window.sessionStorage.getItem(CINEMATIC_SEEN_KEY) === '1';
+		} catch {
+			return false;
+		}
+	}
+
+	function markSeen() {
+		if (typeof window === 'undefined') return;
+		try {
+			window.sessionStorage.setItem(CINEMATIC_SEEN_KEY, '1');
+		} catch {
+			/* ignore quota / privacy mode */
+		}
+	}
 
 	onMount(() => {
+		if (shouldSkipCinematic()) {
+			jumpToFinal();
+			skipFadeIn = true;
+			hydrated = true;
+			return;
+		}
+
+		hydrated = true;
+
 		const timers: ReturnType<typeof setTimeout>[] = [];
-		timers.push(
-			setTimeout(() => {
-				chatVisibleCount = 1;
-			}, 600)
-		);
-		timers.push(
-			setTimeout(() => {
-				assistantTyping = true;
-				chatVisibleCount = 2;
-			}, 1800)
-		);
-		timers.push(
-			setTimeout(() => {
-				assistantTyping = false;
-			}, 3400)
-		);
+		let cancelled = false;
+
+		const wait = (ms: number) =>
+			new Promise<void>((resolve) => {
+				const id = setTimeout(resolve, ms);
+				timers.push(id);
+			});
+
+		const typewriter = (text: string, charDelay: number, setter: (value: string) => void) =>
+			new Promise<void>((resolve) => {
+				let i = 0;
+				const tick = () => {
+					if (cancelled) return resolve();
+					if (i >= text.length) return resolve();
+					i += 1;
+					setter(text.slice(0, i));
+					timers.push(setTimeout(tick, charDelay));
+				};
+				tick();
+			});
+
+		(async () => {
+			await wait(900);
+			if (cancelled) return;
+			await typewriter(userMessage, 55, (t) => (userTypedText = t));
+			if (cancelled) return;
+			await wait(450);
+			if (cancelled) return;
+			userBubbleVisible = true;
+			await wait(750);
+			if (cancelled) return;
+			assistantVisible = true;
+			assistantTyping = true;
+			await wait(1200);
+			if (cancelled) return;
+			assistantTyping = false;
+			await typewriter(assistantMessage, 14, (t) => (assistantTypedText = t));
+			if (cancelled) return;
+			await wait(600);
+			if (cancelled) return;
+			frameVisible = true;
+			await wait(900);
+			if (cancelled) return;
+			supportingVisible = true;
+			cinematicActive = false;
+			markSeen();
+		})();
+
 		return () => {
-			for (const t of timers) clearTimeout(t);
+			cancelled = true;
+			for (const id of timers) clearTimeout(id);
 		};
 	});
 
@@ -298,48 +371,93 @@
 
 <div class="page">
 	<div class="page-stack">
-		<section class="hero">
+		<section
+			class="hero"
+			class:hero--hydrated={hydrated}
+			class:hero--skip-fade={skipFadeIn}
+			data-cinematic-active={cinematicActive || undefined}
+		>
 			<div class="hero-main">
-				<div class="hero-lockup">
+				<div
+					class="hero-lockup hero-reveal"
+					data-revealed={supportingVisible || undefined}
+					inert={!supportingVisible}
+				>
 					<div class="hero-brand">
 						<Logo />
 					</div>
 					<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
 				</div>
 				<div class="hero-intro">
-					<AppFrame title="agent.chat" --dry-app-frame-content-padding="var(--dry-space-5)">
+					<AppFrame
+						title={frameVisible ? 'agent.chat' : ''}
+						--dry-app-frame-content-padding="var(--dry-space-5)"
+						--dry-app-frame-transition={skipFadeIn ? '0s' : '700ms ease'}
+						--dry-app-frame-bg={frameVisible ? 'var(--dry-color-bg-base)' : 'transparent'}
+						--dry-app-frame-border={frameVisible ? 'var(--dry-color-stroke-weak)' : 'transparent'}
+						--dry-app-frame-chrome-bg={frameVisible ? 'var(--dry-color-bg-raised)' : 'transparent'}
+						--dry-app-frame-dot-close={frameVisible ? '#ff5f56' : 'transparent'}
+						--dry-app-frame-dot-min={frameVisible ? '#ffbd2e' : 'transparent'}
+						--dry-app-frame-dot-max={frameVisible ? '#27c93f' : 'transparent'}
+					>
 						<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
-							<ChatThread messageCount={chatVisibleCount} scrollKey={chatVisibleCount}>
-								{#snippet children({ index })}
-									{@const msg = chatMessages[index]!}
-									{@const isTyping = index === 1 && assistantTyping}
-									<div class="chat-row" data-role={msg.role}>
-										<div class="chat-avatar">
-											<Avatar size="sm" alt={msg.name}>
-												{#if msg.role === 'user'}
-													<User size={14} aria-hidden="true" />
-												{:else}
-													<Sparkles size={14} aria-hidden="true" />
-												{/if}
-											</Avatar>
-										</div>
-										<div class="chat-msg" data-role={msg.role}>
-											<span class="chat-msg-name">{msg.name}</span>
-											<div class="chat-msg-body">
-												{#if isTyping}
+							<div class="chat-row" data-role="user" data-bubble={userBubbleVisible || undefined}>
+								<div class="chat-avatar" data-revealed={userBubbleVisible || undefined}>
+									<Avatar size="sm" alt="You">
+										<User size={14} aria-hidden="true" />
+									</Avatar>
+								</div>
+								<div class="chat-msg" data-role="user" data-bubble={userBubbleVisible || undefined}>
+									<span class="chat-msg-name" data-revealed={userBubbleVisible || undefined}>
+										You
+									</span>
+									<div class="chat-msg-body">
+										<span class="chat-msg-ghost" aria-hidden="true">{userMessage}</span>
+										<span class="chat-msg-live" aria-live="polite"
+											>{userTypedText}{#if cinematicActive && !userBubbleVisible}<span
+													class="caret"
+													aria-hidden="true">▍</span
+												>{/if}</span
+										>
+									</div>
+								</div>
+							</div>
+
+							{#if assistantVisible}
+								<div class="chat-row" data-role="assistant">
+									<div class="chat-avatar" data-revealed="true">
+										<Avatar size="sm" alt="Agent">
+											<Sparkles size={14} aria-hidden="true" />
+										</Avatar>
+									</div>
+									<div class="chat-msg" data-role="assistant" data-bubble="true">
+										<span class="chat-msg-name" data-revealed="true">Agent</span>
+										<div class="chat-msg-body">
+											<span class="chat-msg-ghost" aria-hidden="true">{assistantMessage}</span>
+											{#if assistantTyping}
+												<div class="chat-msg-typing">
 													<TypingIndicator aria-label="Agent is typing" />
-												{:else}
-													{msg.text}
-												{/if}
-											</div>
+												</div>
+											{:else}
+												<span class="chat-msg-live" aria-live="polite"
+													>{assistantTypedText}{#if cinematicActive && assistantTypedText.length > 0 && assistantTypedText.length < assistantMessage.length}<span
+															class="caret"
+															aria-hidden="true">▍</span
+														>{/if}</span
+												>
+											{/if}
 										</div>
 									</div>
-								{/snippet}
-							</ChatThread>
+								</div>
+							{/if}
 						</div>
 					</AppFrame>
 				</div>
-				<div class="hero-install">
+				<div
+					class="hero-install hero-reveal"
+					data-revealed={supportingVisible || undefined}
+					inert={!supportingVisible}
+				>
 					<Text size="xs" color="secondary">100% free & open-source.</Text>
 					<div class="hero-tabs">
 						<Tabs.Root value="bun">
@@ -369,7 +487,12 @@
 					</div>
 				</div>
 
-				<nav aria-label="Homepage links" class="actions">
+				<nav
+					aria-label="Homepage links"
+					class="actions hero-reveal"
+					data-revealed={supportingVisible || undefined}
+					inert={!supportingVisible}
+				>
 					<Button variant="solid" size="md" href={withBase('/getting-started')}>
 						<Rocket size={16} aria-hidden="true" /> Get Started
 					</Button>
@@ -379,7 +502,11 @@
 				</nav>
 			</div>
 
-			<section class="plugins">
+			<section
+				class="plugins hero-reveal"
+				data-revealed={supportingVisible || undefined}
+				inert={!supportingVisible}
+			>
 				<Text size="xs" color="secondary" weight="medium">Supported in</Text>
 				<div class="plugins-grid">
 					<a class="plugin" href={withBase('/getting-started?plugin=claude-code#install-plugin')}>
@@ -398,9 +525,21 @@
 						<AgentLogo agent="opencode" size={40} />
 						<span class="plugin-name">OpenCode</span>
 					</a>
-					<a class="plugin" href={withBase('/getting-started?plugin=copilot#full-editor-setup')}>
+					<a class="plugin" href={withBase('/getting-started?plugin=copilot#install-plugin')}>
 						<AgentLogo agent="copilot" size={40} />
 						<span class="plugin-name">Copilot</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=cursor#install-plugin')}>
+						<AgentLogo agent="cursor" size={40} />
+						<span class="plugin-name">Cursor</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=windsurf#install-plugin')}>
+						<AgentLogo agent="windsurf" size={40} />
+						<span class="plugin-name">Windsurf</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=zed#install-plugin')}>
+						<AgentLogo agent="zed" size={40} />
+						<span class="plugin-name">Zed</span>
 					</a>
 				</div>
 				<a class="plugins-manual" href={withBase('/getting-started#full-editor-setup')}>
@@ -680,6 +819,44 @@
 		min-block-size: 100svh;
 		padding-block: clamp(var(--dry-space-6), 4vh, var(--dry-space-12));
 		row-gap: clamp(var(--dry-space-8), 6vh, var(--dry-space-16));
+		opacity: 0;
+	}
+
+	.hero--hydrated {
+		opacity: 1;
+	}
+
+	.hero--skip-fade {
+		animation: hero-skip-fade 800ms ease-out both;
+	}
+
+	.hero--skip-fade .hero-reveal,
+	.hero--skip-fade .chat-msg,
+	.hero--skip-fade .chat-avatar,
+	.hero--skip-fade .chat-msg-name,
+	.hero--skip-fade .chat-row[data-role='assistant'] {
+		transition: none;
+		animation: none;
+	}
+
+	@keyframes hero-skip-fade {
+		from {
+			opacity: 0;
+			transform: translateY(0.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero {
+			opacity: 1;
+		}
+		.hero--skip-fade {
+			animation: none;
+		}
 	}
 
 	.hero-main {
@@ -724,9 +901,8 @@
 	.hero-chat {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-4);
 		text-align: start;
-		--dry-chat-thread-gap: var(--dry-space-4);
-		--dry-chat-thread-message-gap: var(--dry-space-4);
 	}
 
 	.chat-row {
@@ -743,11 +919,29 @@
 
 	.chat-row[data-role='assistant'] {
 		justify-content: start;
+		animation: assistant-row-enter 600ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+	}
+
+	@keyframes assistant-row-enter {
+		from {
+			opacity: 0;
+			transform: translateY(0.5rem);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.chat-avatar {
 		display: grid;
 		padding-block-end: var(--dry-space-1);
+		opacity: 0;
+		transition: opacity 500ms ease;
+	}
+
+	.chat-avatar[data-revealed] {
+		opacity: 1;
 	}
 
 	.chat-row[data-role='user'] .chat-avatar {
@@ -765,32 +959,115 @@
 		gap: var(--dry-space-1);
 		padding: var(--dry-space-3) var(--dry-space-4);
 		border-radius: var(--dry-radius-lg);
+		background: transparent;
+		border: 1px solid transparent;
+		color: var(--dry-color-text-strong);
+		transition:
+			background-color 700ms ease,
+			border-color 700ms ease,
+			color 700ms ease;
 	}
 
 	.chat-msg[data-role='user'] {
-		background: var(--dry-color-fill-brand);
-		color: var(--dry-color-text-on-fill);
 		border-end-end-radius: var(--dry-radius-sm);
 	}
 
+	.chat-msg[data-role='user'][data-bubble] {
+		background: var(--dry-color-fill-brand);
+		color: var(--dry-color-text-on-fill);
+	}
+
 	.chat-msg[data-role='assistant'] {
+		border-end-start-radius: var(--dry-radius-sm);
+	}
+
+	.chat-msg[data-role='assistant'][data-bubble] {
 		background: var(--dry-color-bg-raised);
 		color: var(--dry-color-text-strong);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-end-start-radius: var(--dry-radius-sm);
+		border-color: var(--dry-color-stroke-weak);
 	}
 
 	.chat-msg-name {
 		font-size: var(--dry-type-small-size, 0.875rem);
 		font-weight: 600;
 		letter-spacing: 0.01em;
+		opacity: 0;
+		transition: opacity 500ms ease;
+	}
+
+	.chat-msg-name[data-revealed] {
 		opacity: 0.85;
 	}
 
 	.chat-msg-body {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto;
 		font-size: var(--dry-type-body-size, 1rem);
 		line-height: 1.55;
 		text-wrap: pretty;
+	}
+
+	.chat-msg-ghost,
+	.chat-msg-live {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	.chat-msg-ghost {
+		visibility: hidden;
+		pointer-events: none;
+		user-select: none;
+	}
+
+	.chat-msg-typing {
+		grid-column: 1;
+		grid-row: 1;
+		align-self: start;
+	}
+
+	.caret {
+		display: inline-block;
+		margin-inline-start: 0.1em;
+		color: var(--dry-color-text-strong);
+		font-weight: 400;
+		line-height: 1;
+		animation: caret-blink 1s steps(1) infinite;
+	}
+
+	.hero-reveal {
+		opacity: 0;
+		transition: opacity 700ms ease 80ms;
+	}
+
+	.hero-reveal[data-revealed] {
+		opacity: 1;
+	}
+
+	@keyframes caret-blink {
+		0%,
+		49% {
+			opacity: 1;
+		}
+		50%,
+		100% {
+			opacity: 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.chat-avatar,
+		.chat-msg,
+		.chat-msg-name,
+		.hero-reveal,
+		.chat-row[data-role='assistant'] {
+			transition: none;
+			animation: none;
+		}
+		.caret {
+			animation: none;
+			opacity: 1;
+		}
 	}
 
 	.hero-tabs {

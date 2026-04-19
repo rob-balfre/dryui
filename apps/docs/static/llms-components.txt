@@ -1539,7 +1539,7 @@ Root import: import { AppFrame } from '@dryui/ui'
 Subpath import: import { AppFrame } from '@dryui/ui/app-frame'
 Props: title (string), Primary heading or label text. | actions (Snippet) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-app-frame-bg, --dry-app-frame-border, --dry-app-frame-chrome-bg, --dry-app-frame-dot-close, --dry-app-frame-dot-max, --dry-app-frame-dot-min, --dry-app-frame-dot-size, --dry-app-frame-radius
+CSS variables: none
 Data attributes: data-app-frame | data-part | data-tone
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
