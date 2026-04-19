@@ -37,6 +37,7 @@ export interface ProjectDetection {
 		readonly ui: boolean;
 		readonly primitives: boolean;
 		readonly lint: boolean;
+		readonly feedback: boolean;
 	};
 	readonly files: {
 		readonly appHtml: string | null;
@@ -52,6 +53,9 @@ export interface ProjectDetection {
 	};
 	readonly lint: {
 		readonly preprocessorWired: boolean;
+	};
+	readonly feedback: {
+		readonly layoutPath: string | null;
 	};
 	readonly warnings: readonly string[];
 }
@@ -110,7 +114,7 @@ interface DescendantProjectCandidate {
 }
 
 const DESCENDANT_PROJECT_SEARCH_MAX_DEPTH = 2;
-const DESCENDANT_PROJECT_IGNORED_DIRS = new Set([
+const PROJECT_WALK_IGNORED_DIRS = new Set([
 	'.git',
 	'.svelte-kit',
 	'build',
@@ -218,7 +222,7 @@ function findDescendantSvelteProjects(
 
 		for (const entry of readdirSync(current, { withFileTypes: true })) {
 			if (!entry.isDirectory()) continue;
-			if (DESCENDANT_PROJECT_IGNORED_DIRS.has(entry.name)) continue;
+			if (PROJECT_WALK_IGNORED_DIRS.has(entry.name)) continue;
 
 			const childRoot = resolve(current, entry.name);
 			const childPackageJson = resolve(childRoot, 'package.json');
@@ -271,6 +275,41 @@ function importsAppCss(rootLayoutPath: string | null): boolean {
 	if (!rootLayoutPath) return false;
 	const content = readFileSync(rootLayoutPath, 'utf-8');
 	return content.includes('app.css');
+}
+
+const FEEDBACK_LAYOUT_SEARCH_MAX_DEPTH = 2;
+const FEEDBACK_IMPORT_PATTERN = /from\s+['"]@dryui\/feedback['"]/;
+
+function layoutImportsFeedback(layoutPath: string): boolean {
+	try {
+		return FEEDBACK_IMPORT_PATTERN.test(readFileSync(layoutPath, 'utf-8'));
+	} catch {
+		return false;
+	}
+}
+
+function findFeedbackLayout(root: string | null): string | null {
+	if (!root) return null;
+	const routesDir = resolve(root, 'src/routes');
+	if (!existsSync(routesDir)) return null;
+
+	function visit(current: string, depth: number): string | null {
+		if (depth > FEEDBACK_LAYOUT_SEARCH_MAX_DEPTH) return null;
+
+		const layoutPath = resolve(current, '+layout.svelte');
+		if (layoutImportsFeedback(layoutPath)) return layoutPath;
+
+		for (const entry of readdirSync(current, { withFileTypes: true })) {
+			if (!entry.isDirectory()) continue;
+			if (PROJECT_WALK_IGNORED_DIRS.has(entry.name)) continue;
+			const found = visit(resolve(current, entry.name), depth + 1);
+			if (found) return found;
+		}
+
+		return null;
+	}
+
+	return visit(routesDir, 0);
 }
 
 function buildStatus(
@@ -448,6 +487,7 @@ export function detectProject(
 	const svelteConfig = findSvelteConfig(root);
 	const lintInstalled = dependencyNames.has('@dryui/lint');
 	const lintPreprocessorWired = isLintPreprocessorWired(svelteConfig);
+	const feedbackInstalled = dependencyNames.has('@dryui/feedback');
 	const stepsNeeded =
 		Number(!dependencyNames.has('@dryui/ui')) +
 		Number(!defaultImported) +
@@ -470,7 +510,8 @@ export function detectProject(
 		dependencies: {
 			ui: dependencyNames.has('@dryui/ui'),
 			primitives: dependencyNames.has('@dryui/primitives'),
-			lint: lintInstalled
+			lint: lintInstalled,
+			feedback: feedbackInstalled
 		},
 		files: {
 			appHtml,
@@ -486,6 +527,9 @@ export function detectProject(
 		},
 		lint: {
 			preprocessorWired: lintPreprocessorWired
+		},
+		feedback: {
+			layoutPath: feedbackInstalled ? findFeedbackLayout(root) : null
 		},
 		warnings
 	};

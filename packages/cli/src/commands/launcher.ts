@@ -90,13 +90,19 @@ export function findLauncherWorkspaceRoot(start = process.cwd()): string | null 
 	}
 }
 
+interface LabelledMessage {
+	label: string;
+	message: string;
+}
+
 interface DashboardOutputSections {
 	rootLabel: string;
 	rootValue: string;
 	dashboardUrl: string;
-	servers: Array<{ label: string; message: string }>;
+	servers: LabelledMessage[];
 	noOpen: boolean;
 	opened: boolean;
+	notes?: LabelledMessage[];
 }
 
 function renderDashboardOutput(sections: DashboardOutputSections): string {
@@ -112,8 +118,28 @@ function renderDashboardOutput(sections: DashboardOutputSections): string {
 		`${sections.rootLabel}: ${sections.rootValue}`,
 		`Dashboard: ${sections.dashboardUrl}`,
 		...sections.servers.map(({ label, message }) => `${label}: ${message}`),
-		`Browser: ${browser}`
+		`Browser: ${browser}`,
+		...(sections.notes ?? []).map(({ label, message }) => `${label}: ${message}`)
 	].join('\n');
+}
+
+function feedbackWidgetNote(detection: ProjectDetection): LabelledMessage | null {
+	const label = 'Feedback widget';
+	if (!detection.dependencies.feedback) {
+		const pm = detection.packageManager === 'unknown' ? 'bun' : detection.packageManager;
+		return {
+			label,
+			message: `not installed — run \`${pm} add @dryui/feedback\` and mount \`<Feedback serverUrl="http://127.0.0.1:4748" />\` in src/routes/+layout.svelte`
+		};
+	}
+	if (!detection.feedback.layoutPath) {
+		return {
+			label,
+			message:
+				'not mounted — import `{ Feedback } from "@dryui/feedback"` and render `<Feedback serverUrl="http://127.0.0.1:4748" />` in src/routes/+layout.svelte'
+		};
+	}
+	return null;
 }
 
 function emitLauncherError(error: unknown, exitOnComplete: boolean): void {
@@ -368,6 +394,8 @@ export async function runUserProjectLauncher(
 		);
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
+		const widgetNote = feedbackWidgetNote(detection);
+
 		emitOrRun(
 			{
 				output: renderDashboardOutput({
@@ -382,7 +410,8 @@ export async function runUserProjectLauncher(
 						{ label: 'Feedback', message: feedbackMessage }
 					],
 					noOpen,
-					opened
+					opened,
+					...(widgetNote ? { notes: [widgetNote] } : {})
 				}),
 				error: null,
 				exitCode: 0
