@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.10.0
+
+### Minor Changes
+
+- [`2d227f1`](https://github.com/rob-balfre/dryui/commit/2d227f1e981361bc34a12e1554430435e03a4df4) Thanks [@rob-balfre](https://github.com/rob-balfre)! - - `@dryui/cli` feedback session: when `@dryui/feedback` is missing or not mounted, the interactive menu now asks to install the package and inject `<Feedback serverUrl="http://127.0.0.1:4748" />` into the root `src/routes/+layout.svelte` automatically. Non-TTY callers continue to receive the existing warning. The edit is idempotent, creates a `<script lang="ts">` block if one is missing, and does not create a layout file if the project has none.
+
 ## 0.9.0
 
 ### Minor Changes
