@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.8.0
+
+### Minor Changes
+
+- [`68da473`](https://github.com/rob-balfre/dryui/commit/68da473840519a6911d63395ba71998514a860a3) Thanks [@rob-balfre](https://github.com/rob-balfre)! - - `@dryui/cli` feedback session: detect the user's own DryUI project, offer to kill the port 5173 holder, spawn its dev server in the background, and point the feedback dashboard at it alongside the feedback server. Non-TTY callers skip the kill prompt and fall back to the original docs-monorepo flow.
+
 ## 0.7.2
 
 ### Patch Changes
