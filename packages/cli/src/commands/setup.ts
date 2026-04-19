@@ -469,6 +469,17 @@ async function promptKillPortHolder(holder: PortHolder, port: number): Promise<b
 	);
 }
 
+async function promptMountFeedback(
+	action: 'install-and-mount' | 'mount-only',
+	layoutPath: string
+): Promise<boolean> {
+	const question =
+		action === 'install-and-mount'
+			? `Install @dryui/feedback and mount <Feedback /> in ${layoutPath}?`
+			: `Mount <Feedback /> in ${layoutPath}?`;
+	return await promptConfirm(question, true);
+}
+
 async function runFeedbackSession(
 	noOpen: boolean,
 	exitOnComplete: boolean,
@@ -489,6 +500,7 @@ async function runFeedbackSession(
 			spec,
 			runtime: {
 				promptKillPortHolder,
+				promptMountFeedback,
 				...(onProgress
 					? {
 							onProgress: ({ cwd, noOpen: projectNoOpen }) =>
