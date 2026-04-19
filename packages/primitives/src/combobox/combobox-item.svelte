@@ -27,17 +27,9 @@
 	const isSelected = $derived(ctx.value === value);
 	const isHighlighted = $derived(ctx.activeIndex === index);
 
-	let el = $state<HTMLDivElement>();
-
-	$effect(() => {
-		if (isHighlighted && el) {
-			el.scrollIntoView({ block: 'nearest' });
-		}
-	});
-
 	function handleClick(e: MouseEvent & { currentTarget: HTMLDivElement }) {
 		if (disabled) return;
-		const text = el?.textContent?.trim() ?? '';
+		const text = e.currentTarget.textContent?.trim() ?? '';
 		ctx.select(value, text);
 		ctx.close();
 		ctx.inputEl?.focus();
@@ -48,17 +40,21 @@
 		if (disabled) return;
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
-			const text = el?.textContent?.trim() ?? '';
+			const text = e.currentTarget.textContent?.trim() ?? '';
 			ctx.select(value, text);
 			ctx.close();
 			ctx.inputEl?.focus();
 		}
 		if (onkeydown) (onkeydown as (e: KeyboardEvent & { currentTarget: HTMLDivElement }) => void)(e);
 	}
+
+	function keepHighlightedItemVisible(node: HTMLDivElement) {
+		node.scrollIntoView({ block: 'nearest' });
+	}
 </script>
 
 <div
-	bind:this={el}
+	{@attach isHighlighted && keepHighlightedItemVisible}
 	role="option"
 	id={`${ctx.contentId}-item-${index}`}
 	tabindex={disabled ? undefined : -1}

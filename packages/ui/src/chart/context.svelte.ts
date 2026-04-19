@@ -1,5 +1,7 @@
 import { createContext } from '@dryui/primitives';
 
+export { registerChartInteractive } from '@dryui/primitives';
+
 export interface ChartDataPoint {
 	label: string;
 	value: number;
@@ -21,5 +23,7 @@ interface ChartContext {
 	readonly padding: { top: number; right: number; bottom: number; left: number };
 	hasBars: boolean;
 	hasHorizontalBars: boolean;
+	interactiveHandler?: (index: number) => void;
+	interactiveOwner?: symbol;
 }
 export const [setChartCtx, getChartCtx] = createContext<ChartContext>('chart');

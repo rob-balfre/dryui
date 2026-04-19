@@ -25,6 +25,7 @@
 	let displayText = $state('');
 	let inputValue = $state('');
 	let activeIndex = $state(-1);
+	let inputEl = $state<HTMLInputElement | null>(null);
 
 	setComboboxCtx({
 		get open() {
@@ -47,7 +48,12 @@
 		},
 		inputId,
 		contentId,
-		inputEl: null,
+		get inputEl() {
+			return inputEl;
+		},
+		set inputEl(element: HTMLInputElement | null) {
+			inputEl = element;
+		},
 		show() {
 			if (!disabled) open = true;
 		},

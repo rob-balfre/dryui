@@ -17,8 +17,8 @@
 	[data-option-picker-description] {
 		grid-column: var(--dry-option-picker-description-column, 2);
 		grid-row: var(--dry-option-picker-description-row, 2);
-		font-size: var(--dry-type-small-size);
-		line-height: 1.35;
+		font-size: var(--dry-option-picker-description-size, var(--dry-type-small-size));
+		line-height: var(--dry-option-picker-description-line-height, 1.35);
 		color: var(--dry-color-text-weak);
 		text-wrap: pretty;
 	}

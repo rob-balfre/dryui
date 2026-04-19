@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { observeOffscreenState } from '@dryui/primitives/internal/motion';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
 		color?: string | undefined;
@@ -55,6 +56,8 @@
 			node.style.setProperty('--dry-rays-blend', blendMode);
 			node.style.setProperty('--dry-rays-speed', speedValue);
 		});
+
+		$effect(() => observeOffscreenState(node, { rootMargin: '200px' }));
 	}
 
 	// Flash-on-load: background is a computed conic-gradient with a dynamic number of stops
@@ -105,6 +108,14 @@
 
 	[data-god-rays][data-animated] [data-god-rays-layer] {
 		animation: god-rays-rotate var(--dry-rays-speed, 30s) linear infinite;
+	}
+
+	[data-god-rays][data-animated]:not([data-offscreen]) [data-god-rays-layer] {
+		will-change: transform, filter;
+	}
+
+	[data-god-rays][data-offscreen] [data-god-rays-layer] {
+		animation-play-state: paused;
 	}
 
 	@keyframes god-rays-rotate {

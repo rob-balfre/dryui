@@ -1,5 +1,19 @@
 <script lang="ts">
-	import { Button, Card, CodeBlock, Diagram, Heading, Marquee, Tabs, Text } from '@dryui/ui';
+	import { onMount } from 'svelte';
+	import {
+		AppFrame,
+		Avatar,
+		Button,
+		Card,
+		ChatThread,
+		CodeBlock,
+		Diagram,
+		Heading,
+		Marquee,
+		Tabs,
+		Text,
+		TypingIndicator
+	} from '@dryui/ui';
 	import { allComponentNames, toSlug } from '$lib/nav';
 	import type { DiagramConfig } from '@dryui/ui';
 	import {
@@ -33,6 +47,45 @@
 	import { GITHUB_URL } from '$lib/site-meta';
 
 	const componentShowcase = allComponentNames();
+
+	const chatMessages = [
+		{
+			role: 'user' as const,
+			name: 'You',
+			text: 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!'
+		},
+		{
+			role: 'assistant' as const,
+			name: 'Agent',
+			text: "Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps me usable."
+		}
+	];
+
+	let chatVisibleCount = $state(0);
+	let assistantTyping = $state(false);
+
+	onMount(() => {
+		const timers: ReturnType<typeof setTimeout>[] = [];
+		timers.push(
+			setTimeout(() => {
+				chatVisibleCount = 1;
+			}, 600)
+		);
+		timers.push(
+			setTimeout(() => {
+				assistantTyping = true;
+				chatVisibleCount = 2;
+			}, 1800)
+		);
+		timers.push(
+			setTimeout(() => {
+				assistantTyping = false;
+			}, 3400)
+		);
+		return () => {
+			for (const t of timers) clearTimeout(t);
+		};
+	});
 
 	type CompetitorId = 'figma-make' | 'claude-design' | 'stitch' | 'shadcn' | 'v0';
 
@@ -246,71 +299,110 @@
 <div class="page">
 	<div class="page-stack">
 		<section class="hero">
-			<div class="brand">
-				<Logo />
-			</div>
-			<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
-			<Heading level={1}>Closing the gap between <br />AI-generated & hand-crafted UIs</Heading>
-			<Text color="secondary">100% free & open-source.</Text>
+			<div class="hero-main">
+				<div class="hero-lockup">
+					<div class="hero-brand">
+						<Logo />
+					</div>
+					<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
+				</div>
+				<div class="hero-intro">
+					<AppFrame title="agent.chat" --dry-app-frame-content-padding="var(--dry-space-5)">
+						<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
+							<ChatThread messageCount={chatVisibleCount} scrollKey={chatVisibleCount}>
+								{#snippet children({ index })}
+									{@const msg = chatMessages[index]}
+									{@const isTyping = index === 1 && assistantTyping}
+									<div class="chat-row" data-role={msg.role}>
+										<div class="chat-avatar">
+											<Avatar size="sm" alt={msg.name}>
+												{#if msg.role === 'user'}
+													<User size={14} aria-hidden="true" />
+												{:else}
+													<Sparkles size={14} aria-hidden="true" />
+												{/if}
+											</Avatar>
+										</div>
+										<div class="chat-msg" data-role={msg.role}>
+											<span class="chat-msg-name">{msg.name}</span>
+											<div class="chat-msg-body">
+												{#if isTyping}
+													<TypingIndicator aria-label="Agent is typing" />
+												{:else}
+													{msg.text}
+												{/if}
+											</div>
+										</div>
+									</div>
+								{/snippet}
+							</ChatThread>
+						</div>
+					</AppFrame>
+				</div>
+				<div class="hero-install">
+					<Text size="xs" color="secondary">100% free & open-source.</Text>
+					<div class="hero-tabs">
+						<Tabs.Root value="bun">
+							<div class="hero-tabs-list">
+								<Tabs.List>
+									<Tabs.Trigger value="bun">
+										<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
+									</Tabs.Trigger>
+									<Tabs.Trigger value="npm">
+										<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
+									</Tabs.Trigger>
+									<Tabs.Trigger value="pnpm">
+										<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
+									</Tabs.Trigger>
+								</Tabs.List>
+							</div>
+							<Tabs.Content value="bun">
+								<CodeBlock code={homeIntroPrompts.bun} language="text" />
+							</Tabs.Content>
+							<Tabs.Content value="npm">
+								<CodeBlock code={homeIntroPrompts.npm} language="text" />
+							</Tabs.Content>
+							<Tabs.Content value="pnpm">
+								<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
+							</Tabs.Content>
+						</Tabs.Root>
+					</div>
+				</div>
 
-			<div class="hero-tabs">
-				<Tabs.Root value="bun">
-					<Tabs.List --dry-tabs-list-justify="center">
-						<Tabs.Trigger value="bun">
-							<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="npm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="pnpm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
-						</Tabs.Trigger>
-					</Tabs.List>
-					<Tabs.Content value="bun">
-						<CodeBlock code={homeIntroPrompts.bun} language="text" />
-					</Tabs.Content>
-					<Tabs.Content value="npm">
-						<CodeBlock code={homeIntroPrompts.npm} language="text" />
-					</Tabs.Content>
-					<Tabs.Content value="pnpm">
-						<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
-					</Tabs.Content>
-				</Tabs.Root>
+				<nav aria-label="Homepage links" class="actions">
+					<Button variant="solid" size="md" href={withBase('/getting-started')}>
+						<Rocket size={16} aria-hidden="true" /> Get Started
+					</Button>
+					<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
+						<GithubIcon size={16} /> GitHub
+					</Button>
+				</nav>
 			</div>
 
-			<nav aria-label="Homepage links" class="actions">
-				<Button variant="solid" size="md" href={withBase('/getting-started')}>
-					<Rocket size={16} aria-hidden="true" /> Get Started
-				</Button>
-				<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
-					<GithubIcon size={16} /> GitHub
-				</Button>
-			</nav>
-		</section>
-
-		<section class="plugins">
-			<Text size="xs" color="secondary" weight="medium">Plugin available in</Text>
-			<div class="plugins-grid">
-				<a class="plugin" href={withBase('/getting-started?plugin=claude-code#install-plugin')}>
-					<AgentLogo agent="claude-code" size={40} />
-					<span class="plugin-name">Claude Code</span>
+			<section class="plugins">
+				<Text size="xs" color="secondary" weight="medium">Plugin available in</Text>
+				<div class="plugins-grid">
+					<a class="plugin" href={withBase('/getting-started?plugin=claude-code#install-plugin')}>
+						<AgentLogo agent="claude-code" size={40} />
+						<span class="plugin-name">Claude Code</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=codex#install-plugin')}>
+						<AgentLogo agent="codex" size={40} />
+						<span class="plugin-name">Codex</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=gemini#install-plugin')}>
+						<AgentLogo agent="gemini" size={40} />
+						<span class="plugin-name">Gemini CLI</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=copilot#full-editor-setup')}>
+						<AgentLogo agent="copilot" size={40} />
+						<span class="plugin-name">Copilot</span>
+					</a>
+				</div>
+				<a class="plugins-manual" href={withBase('/getting-started#full-editor-setup')}>
+					<Text size="xs" color="secondary" weight="medium">or configure manually</Text>
 				</a>
-				<a class="plugin" href={withBase('/getting-started?plugin=codex#install-plugin')}>
-					<AgentLogo agent="codex" size={40} />
-					<span class="plugin-name">Codex</span>
-				</a>
-				<a class="plugin" href={withBase('/getting-started?plugin=gemini#install-plugin')}>
-					<AgentLogo agent="gemini" size={40} />
-					<span class="plugin-name">Gemini CLI</span>
-				</a>
-				<a class="plugin" href={withBase('/getting-started?plugin=copilot#full-editor-setup')}>
-					<AgentLogo agent="copilot" size={40} />
-					<span class="plugin-name">Copilot</span>
-				</a>
-			</div>
-			<a class="plugins-manual" href={withBase('/getting-started#full-editor-setup')}>
-				<Text size="xs" color="secondary" weight="medium">or configure manually</Text>
-			</a>
+			</section>
 		</section>
 
 		<section class="showcase">
@@ -410,16 +502,18 @@
 
 			<div class="compare-tabs">
 				<Tabs.Root value="figma-make">
-					<Tabs.List --dry-tabs-list-justify="center">
-						{#each competitors as c (c.id)}
-							<Tabs.Trigger value={c.id}>
-								<span class="competitor-tab-label">
-									<CompetitorLogo id={c.id} size={18} />
-									{c.label}
-								</span>
-							</Tabs.Trigger>
-						{/each}
-					</Tabs.List>
+					<div class="compare-tabs-list">
+						<Tabs.List>
+							{#each competitors as c (c.id)}
+								<Tabs.Trigger value={c.id}>
+									<span class="competitor-tab-label">
+										<CompetitorLogo id={c.id} size={18} />
+										{c.label}
+									</span>
+								</Tabs.Trigger>
+							{/each}
+						</Tabs.List>
+					</div>
 					{#each competitors as c (c.id)}
 						<Tabs.Content value={c.id}>
 							<div class="compare-grid">
@@ -556,7 +650,7 @@
 		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
 		gap: clamp(var(--dry-space-20), 14vw, var(--dry-space-32));
-		padding-block: clamp(var(--dry-space-20), 16vw, var(--dry-space-32));
+		padding-block: 0 clamp(var(--dry-space-20), 16vw, var(--dry-space-32));
 		padding-inline: var(--dry-space-4);
 		text-align: center;
 	}
@@ -574,34 +668,134 @@
 		--dry-type-heading-2-leading: 1.2;
 	}
 
-	.brand {
+	.hero {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: 1fr auto;
+		justify-items: center;
+		min-block-size: 100svh;
+		padding-block: clamp(var(--dry-space-6), 4vh, var(--dry-space-12));
+		row-gap: clamp(var(--dry-space-8), 6vh, var(--dry-space-16));
+	}
+
+	.hero-main {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		align-content: center;
+		gap: clamp(var(--dry-space-6), 4vh, var(--dry-space-14));
+		justify-self: stretch;
+		min-block-size: 0;
+	}
+
+	.hero-lockup {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.hero-brand {
 		display: grid;
 		justify-items: center;
-		font-size: clamp(1.5rem, 0.25rem + 6.25cqi, 3.25rem);
+		font-size: clamp(2.5rem, 0.5rem + 9cqi, 4.5rem);
 		color: var(--dry-color-text-strong);
 	}
 
-	.hero {
+	.hero-intro {
 		display: grid;
-		gap: var(--dry-space-1);
-		justify-items: center;
+		grid-template-columns: minmax(0, 36rem);
+		justify-content: center;
+		justify-self: stretch;
+	}
+
+	.hero-install {
+		display: grid;
 		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-4);
+		justify-items: center;
+		justify-self: stretch;
 	}
 
-	.hero br {
-		display: none;
+	.hero-chat {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		text-align: start;
+		--dry-chat-thread-gap: var(--dry-space-4);
+		--dry-chat-thread-message-gap: var(--dry-space-4);
 	}
 
-	@container (min-width: 30rem) {
-		.hero br {
-			display: inline;
-		}
+	.chat-row {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: auto;
+		gap: var(--dry-space-2);
+		align-items: end;
+	}
+
+	.chat-row[data-role='user'] {
+		justify-content: end;
+	}
+
+	.chat-row[data-role='assistant'] {
+		justify-content: start;
+	}
+
+	.chat-avatar {
+		display: grid;
+		padding-block-end: var(--dry-space-1);
+	}
+
+	.chat-row[data-role='user'] .chat-avatar {
+		order: 2;
+	}
+
+	.chat-row[data-role='assistant'] .chat-avatar {
+		order: 0;
+	}
+
+	.chat-msg {
+		order: 1;
+		display: grid;
+		grid-template-columns: minmax(0, 24rem);
+		gap: var(--dry-space-1);
+		padding: var(--dry-space-3) var(--dry-space-4);
+		border-radius: var(--dry-radius-lg);
+	}
+
+	.chat-msg[data-role='user'] {
+		background: var(--dry-color-fill-brand);
+		color: var(--dry-color-text-on-fill);
+		border-end-end-radius: var(--dry-radius-sm);
+	}
+
+	.chat-msg[data-role='assistant'] {
+		background: var(--dry-color-bg-raised);
+		color: var(--dry-color-text-strong);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-end-start-radius: var(--dry-radius-sm);
+	}
+
+	.chat-msg-name {
+		font-size: var(--dry-type-small-size, 0.875rem);
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		opacity: 0.85;
+	}
+
+	.chat-msg-body {
+		font-size: var(--dry-type-body-size, 1rem);
+		line-height: 1.55;
+		text-wrap: pretty;
 	}
 
 	.hero-tabs {
 		justify-self: stretch;
 		display: grid;
-		padding-block-start: var(--dry-space-4);
+	}
+
+	.hero-tabs-list {
+		--dry-tabs-list-justify: center;
 	}
 
 	.pm-tab-label,
@@ -675,8 +869,8 @@
 	.component-chip {
 		display: inline-grid;
 		place-items: center;
-		padding: 0.4rem 0.85rem;
-		border-radius: 9999px;
+		padding: var(--dry-space-1_5) var(--dry-space-3);
+		border-radius: var(--dry-radius-full);
 		border: 1px solid var(--dry-color-stroke-weak);
 		background: color-mix(in srgb, var(--dry-color-bg-raised) 55%, transparent);
 		color: var(--dry-color-text-strong);
@@ -717,8 +911,8 @@
 	.feature-check {
 		display: inline-grid;
 		place-items: center;
-		padding: 0.25rem;
-		border-radius: 9999px;
+		padding: var(--dry-space-1);
+		border-radius: var(--dry-radius-full);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 16%, transparent);
 		color: var(--dry-color-fill-brand);
 	}
@@ -731,7 +925,6 @@
 
 	.feature-note {
 		margin: 0;
-		padding-block-start: 0.15rem;
 		font-size: var(--dry-type-small-size, 0.875rem);
 		color: var(--dry-color-text-weak);
 		line-height: 1.55;
@@ -746,7 +939,7 @@
 
 	.compare {
 		display: grid;
-		gap: var(--dry-space-5);
+		gap: var(--dry-space-6);
 		justify-items: center;
 		grid-template-columns: minmax(0, 1fr);
 		justify-self: stretch;
@@ -763,11 +956,15 @@
 		display: grid;
 	}
 
+	.compare-tabs-list {
+		--dry-tabs-list-justify: center;
+	}
+
 	.compare-grid {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: var(--dry-space-4);
-		padding-block-start: var(--dry-space-5);
+		padding-block-start: var(--dry-space-4);
 		text-align: start;
 	}
 
@@ -791,7 +988,7 @@
 	}
 
 	.compare-price-label {
-		font-size: 0.7rem;
+		font-size: var(--dry-type-xs-size, 0.75rem);
 		font-weight: 600;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
@@ -1022,8 +1219,8 @@
 	.section-icon {
 		display: inline-grid;
 		place-items: center;
-		padding: 0.5rem;
-		border-radius: 9999px;
+		padding: var(--dry-space-2);
+		border-radius: var(--dry-radius-full);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
 		color: var(--dry-color-fill-brand);
 	}

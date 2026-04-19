@@ -63,6 +63,17 @@ describe('runCheck', () => {
 		expect(output).toContain('bare-compound');
 	});
 
+	test('a .svelte path includes lint-backed component violations', () => {
+		const root = createProject({
+			'Example.svelte': '<div style="color: red">hello</div>'
+		});
+
+		const output = runCheck(spec, { path: 'Example.svelte' }, { cwd: root });
+
+		expect(output).toContain('kind: component');
+		expect(output).toContain('dryui/no-inline-style');
+	});
+
 	test('a .css path triggers theme diagnosis', () => {
 		const root = createProject({
 			'theme.css': ':root { --dry-color-fill-brand: 16px; }'

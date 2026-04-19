@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { BlendMode } from '@dryui/primitives/beam';
+	import { observeOffscreenState } from '@dryui/primitives/internal/motion';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
 		color?: string;
@@ -40,6 +41,8 @@
 			if (blendMode) node.style.setProperty('--dry-beam-blend', blendMode);
 			else node.style.removeProperty('--dry-beam-blend');
 		});
+
+		$effect(() => observeOffscreenState(node, { rootMargin: '200px' }));
 	}
 </script>
 
@@ -61,12 +64,22 @@
 		position: relative;
 		overflow: hidden;
 		border-radius: inherit;
+		contain: content;
 	}
 
 	[data-beam-layer] {
 		position: absolute;
 		inset: 0;
 		pointer-events: none;
+		overflow: hidden;
+		opacity: calc(var(--dry-beam-intensity, 70) / 100);
+		mix-blend-mode: var(--dry-beam-blend, var(--dry-beam-default-blend, multiply));
+	}
+
+	[data-beam-layer]::before {
+		content: '';
+		position: absolute;
+		inset: -100%;
 		background-image: linear-gradient(
 			var(--dry-beam-angle, 45deg),
 			transparent 0%,
@@ -75,26 +88,32 @@
 			transparent calc(50% + var(--dry-beam-width, 2px)),
 			transparent 100%
 		);
-		background-size: 300% 300%;
-		opacity: calc(var(--dry-beam-intensity, 70) / 100);
-		mix-blend-mode: var(--dry-beam-blend, var(--dry-beam-default-blend, multiply));
 		filter: blur(calc(var(--dry-beam-width, 2px) * 2));
 		animation: beam-sweep var(--dry-beam-speed, 3s) ease-in-out infinite;
+		backface-visibility: hidden;
+	}
+
+	[data-beam]:not([data-offscreen]) [data-beam-layer]::before {
+		will-change: transform, filter;
+	}
+
+	[data-beam][data-offscreen] [data-beam-layer]::before {
+		animation-play-state: paused;
 	}
 
 	@keyframes beam-sweep {
-		0% {
-			background-position: -50% -50%;
+		from {
+			transform: translate(-33.333%, -33.333%);
 		}
-		100% {
-			background-position: 150% 150%;
+		to {
+			transform: translate(33.333%, 33.333%);
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		[data-beam-layer] {
+		[data-beam-layer]::before {
 			animation: none;
-			background-position: 50% 50%;
+			transform: translate(0, 0);
 		}
 	}
 </style>

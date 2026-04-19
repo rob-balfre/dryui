@@ -1,5 +1,5 @@
 import type { Snippet } from 'svelte';
-import type { HTMLAttributes } from 'svelte/elements';
+import type { HTMLAnchorAttributes, HTMLButtonAttributes, HTMLAttributes } from 'svelte/elements';
 import type { Placement } from '../utils/anchor-position.svelte.js';
 
 export interface HoverCardRootProps {
@@ -8,7 +8,8 @@ export interface HoverCardRootProps {
 	children: Snippet;
 }
 
-export interface HoverCardTriggerProps extends HTMLAttributes<HTMLAnchorElement> {
+export interface HoverCardTriggerProps
+	extends Omit<HTMLAnchorAttributes, 'children' | 'href'>, Omit<HTMLButtonAttributes, 'children'> {
 	href?: string;
 	children: Snippet;
 }

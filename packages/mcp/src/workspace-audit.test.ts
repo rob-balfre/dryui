@@ -172,4 +172,30 @@ describe('scanWorkspace', () => {
 			report.findings.some((finding) => finding.ruleId === 'component/interactive-card-wrapper')
 		).toBe(true);
 	});
+
+	test('surfaces lint-backed component findings in workspace output', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n'),
+			'src/routes/+page.svelte': '<div style="color: red">hello</div>'
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+
+		expect(
+			report.findings.some((finding) => finding.ruleId === 'component/dryui/no-inline-style')
+		).toBe(true);
+	});
 });

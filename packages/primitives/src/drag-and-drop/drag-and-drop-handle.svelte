@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { mergeIds } from '../utils/merge-ids.js';
 	import { getDragAndDropCtx } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -8,11 +9,16 @@
 		children?: Snippet | undefined;
 	}
 
-	let { index, children, ...rest }: Props = $props();
+	let {
+		index,
+		children,
+		'aria-describedby': ariaDescribedBy,
+		'aria-label': ariaLabel,
+		...rest
+	}: Props = $props();
 
 	const ctx = getDragAndDropCtx();
 
-	// Register that a handle exists so items don't initiate drag themselves
 	ctx.registerHandle();
 
 	function handlePointerDown(e: PointerEvent) {
@@ -28,18 +34,40 @@
 			ctx.endDrag();
 		}
 	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		const upKey = ctx.orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+		const downKey = ctx.orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
+
+		if (e.key === upKey) {
+			e.preventDefault();
+			ctx.moveItem(index, 'up');
+		}
+
+		if (e.key === downKey) {
+			e.preventDefault();
+			ctx.moveItem(index, 'down');
+		}
+
+		if (e.key === 'Escape' && ctx.isDragging) {
+			e.preventDefault();
+			ctx.cancelDrag();
+		}
+	}
 </script>
 
 <div
 	role="button"
 	tabindex="0"
-	aria-roledescription="drag handle"
-	aria-label="Drag to reorder"
-	aria-pressed={ctx.isDragging && ctx.draggedIndex === index ? 'true' : undefined}
+	aria-roledescription="reorder handle"
+	aria-label={ariaLabel ?? `Reorder item ${index + 1}`}
+	aria-describedby={mergeIds(ariaDescribedBy, ctx.instructionsId)}
+	aria-keyshortcuts={ctx.orientation === 'vertical' ? 'ArrowUp ArrowDown' : 'ArrowLeft ArrowRight'}
 	data-dnd-handle
 	data-dragging={ctx.isDragging && ctx.draggedIndex === index ? '' : undefined}
 	onpointerdown={handlePointerDown}
 	onpointerup={handlePointerUp}
+	onkeydown={handleKeydown}
 	{...rest}
 >
 	{#if children}

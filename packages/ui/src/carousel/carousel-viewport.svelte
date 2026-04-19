@@ -35,6 +35,8 @@
 
 <div
 	bind:this={el}
+	aria-atomic="false"
+	aria-live={ctx.autoplayRunning ? 'off' : 'polite'}
 	data-carousel-viewport=""
 	data-orientation={ctx.orientation}
 	class={className}

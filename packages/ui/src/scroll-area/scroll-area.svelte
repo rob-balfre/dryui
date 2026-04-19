@@ -7,16 +7,28 @@
 		children: Snippet;
 	}
 
-	let { orientation = 'vertical', class: className, children, ...rest }: Props = $props();
+	let {
+		orientation = 'vertical',
+		role: roleProp,
+		tabindex = 0,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		class: className,
+		children,
+		...rest
+	}: Props = $props();
+
+	const role = $derived(roleProp ?? (ariaLabel || ariaLabelledBy ? 'region' : undefined));
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	role="region"
-	aria-label="Scrollable content"
+	{role}
+	aria-label={ariaLabel}
+	aria-labelledby={ariaLabelledBy}
 	data-scroll-area
 	data-orientation={orientation}
-	tabindex={0}
+	{tabindex}
 	class={className}
 	{...rest}
 >

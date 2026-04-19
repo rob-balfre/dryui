@@ -13,24 +13,6 @@
 	const itemCtx = getTreeItemCtx();
 </script>
 
-<div
-	role="button"
-	tabindex={0}
-	data-tree-label
-	data-selected={ctx.isSelected(itemCtx.itemId) || undefined}
-	class={className}
-	onclick={() => {
-		ctx.selectItem(itemCtx.itemId);
-		ctx.toggleItem(itemCtx.itemId);
-	}}
-	onkeydown={(e) => {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			ctx.selectItem(itemCtx.itemId);
-			ctx.toggleItem(itemCtx.itemId);
-		}
-	}}
-	{...rest}
->
+<div data-selected={ctx.isSelected(itemCtx.itemId) || undefined} class={className} {...rest}>
 	{@render children()}
 </div>

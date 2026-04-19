@@ -48,20 +48,20 @@
 		getMenuIds() {
 			return menuIds;
 		},
-		focusNextMenu(currentId) {
+		focusNextMenu(currentId, open = false) {
 			const idx = menuIds.indexOf(currentId);
 			const nextIdx = (idx + 1) % menuIds.length;
 			const nextId = menuIds[nextIdx] ?? null;
-			activeMenu = nextId;
+			activeMenu = open ? nextId : null;
 			requestAnimationFrame(() => {
 				rootEl?.querySelector<HTMLButtonElement>(`[data-menubar-trigger="${nextId}"]`)?.focus();
 			});
 		},
-		focusPrevMenu(currentId) {
+		focusPrevMenu(currentId, open = false) {
 			const idx = menuIds.indexOf(currentId);
 			const prevIdx = (idx - 1 + menuIds.length) % menuIds.length;
 			const prevId = menuIds[prevIdx] ?? null;
-			activeMenu = prevId;
+			activeMenu = open ? prevId : null;
 			requestAnimationFrame(() => {
 				rootEl?.querySelector<HTMLButtonElement>(`[data-menubar-trigger="${prevId}"]`)?.focus();
 			});

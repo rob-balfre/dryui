@@ -1,18 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-
-	interface CountryOption {
-		code: string;
-		name: string;
-		dialCode: string;
-		flag: string;
-		region: string;
-	}
+	import { Combobox } from '../combobox/index.js';
+	import CountrySelectSync from './country-select-sync.svelte';
+	import { COUNTRY_DATA, filterCountriesByRegions } from '../internal/countries.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'onchange'> {
-		value?: string; // ISO code, bindable
-		regions?: string[]; // filter to specific regions
+		value?: string;
+		regions?: string[];
 		showDialCode?: boolean;
 		disabled?: boolean;
 		placeholder?: string;
@@ -28,241 +23,119 @@
 		disabled = false,
 		placeholder = 'Select country',
 		name,
+		id,
+		class: className,
 		onchange,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		'aria-describedby': ariaDescribedby,
+		'aria-invalid': ariaInvalid,
+		'aria-errormessage': ariaErrormessage,
 		...rest
 	}: Props = $props();
 
-	// Full country list (50+ countries)
-	const allCountries: CountryOption[] = [
-		{
-			code: 'AF',
-			name: 'Afghanistan',
-			dialCode: '+93',
-			flag: '\u{1F1E6}\u{1F1EB}',
-			region: 'Asia'
-		},
-		{
-			code: 'AR',
-			name: 'Argentina',
-			dialCode: '+54',
-			flag: '\u{1F1E6}\u{1F1F7}',
-			region: 'Americas'
-		},
-		{
-			code: 'AU',
-			name: 'Australia',
-			dialCode: '+61',
-			flag: '\u{1F1E6}\u{1F1FA}',
-			region: 'Oceania'
-		},
-		{ code: 'AT', name: 'Austria', dialCode: '+43', flag: '\u{1F1E6}\u{1F1F9}', region: 'Europe' },
-		{ code: 'BE', name: 'Belgium', dialCode: '+32', flag: '\u{1F1E7}\u{1F1EA}', region: 'Europe' },
-		{ code: 'BR', name: 'Brazil', dialCode: '+55', flag: '\u{1F1E7}\u{1F1F7}', region: 'Americas' },
-		{ code: 'CA', name: 'Canada', dialCode: '+1', flag: '\u{1F1E8}\u{1F1E6}', region: 'Americas' },
-		{ code: 'CL', name: 'Chile', dialCode: '+56', flag: '\u{1F1E8}\u{1F1F1}', region: 'Americas' },
-		{ code: 'CN', name: 'China', dialCode: '+86', flag: '\u{1F1E8}\u{1F1F3}', region: 'Asia' },
-		{
-			code: 'CO',
-			name: 'Colombia',
-			dialCode: '+57',
-			flag: '\u{1F1E8}\u{1F1F4}',
-			region: 'Americas'
-		},
-		{
-			code: 'CZ',
-			name: 'Czech Republic',
-			dialCode: '+420',
-			flag: '\u{1F1E8}\u{1F1FF}',
-			region: 'Europe'
-		},
-		{ code: 'DK', name: 'Denmark', dialCode: '+45', flag: '\u{1F1E9}\u{1F1F0}', region: 'Europe' },
-		{ code: 'EG', name: 'Egypt', dialCode: '+20', flag: '\u{1F1EA}\u{1F1EC}', region: 'Africa' },
-		{ code: 'FI', name: 'Finland', dialCode: '+358', flag: '\u{1F1EB}\u{1F1EE}', region: 'Europe' },
-		{ code: 'FR', name: 'France', dialCode: '+33', flag: '\u{1F1EB}\u{1F1F7}', region: 'Europe' },
-		{ code: 'DE', name: 'Germany', dialCode: '+49', flag: '\u{1F1E9}\u{1F1EA}', region: 'Europe' },
-		{ code: 'GR', name: 'Greece', dialCode: '+30', flag: '\u{1F1EC}\u{1F1F7}', region: 'Europe' },
-		{ code: 'HK', name: 'Hong Kong', dialCode: '+852', flag: '\u{1F1ED}\u{1F1F0}', region: 'Asia' },
-		{ code: 'IN', name: 'India', dialCode: '+91', flag: '\u{1F1EE}\u{1F1F3}', region: 'Asia' },
-		{ code: 'ID', name: 'Indonesia', dialCode: '+62', flag: '\u{1F1EE}\u{1F1E9}', region: 'Asia' },
-		{ code: 'IE', name: 'Ireland', dialCode: '+353', flag: '\u{1F1EE}\u{1F1EA}', region: 'Europe' },
-		{ code: 'IL', name: 'Israel', dialCode: '+972', flag: '\u{1F1EE}\u{1F1F1}', region: 'Asia' },
-		{ code: 'IT', name: 'Italy', dialCode: '+39', flag: '\u{1F1EE}\u{1F1F9}', region: 'Europe' },
-		{ code: 'JP', name: 'Japan', dialCode: '+81', flag: '\u{1F1EF}\u{1F1F5}', region: 'Asia' },
-		{ code: 'KE', name: 'Kenya', dialCode: '+254', flag: '\u{1F1F0}\u{1F1EA}', region: 'Africa' },
-		{
-			code: 'KR',
-			name: 'South Korea',
-			dialCode: '+82',
-			flag: '\u{1F1F0}\u{1F1F7}',
-			region: 'Asia'
-		},
-		{ code: 'MY', name: 'Malaysia', dialCode: '+60', flag: '\u{1F1F2}\u{1F1FE}', region: 'Asia' },
-		{ code: 'MX', name: 'Mexico', dialCode: '+52', flag: '\u{1F1F2}\u{1F1FD}', region: 'Americas' },
-		{
-			code: 'NL',
-			name: 'Netherlands',
-			dialCode: '+31',
-			flag: '\u{1F1F3}\u{1F1F1}',
-			region: 'Europe'
-		},
-		{
-			code: 'NZ',
-			name: 'New Zealand',
-			dialCode: '+64',
-			flag: '\u{1F1F3}\u{1F1FF}',
-			region: 'Oceania'
-		},
-		{ code: 'NG', name: 'Nigeria', dialCode: '+234', flag: '\u{1F1F3}\u{1F1EC}', region: 'Africa' },
-		{ code: 'NO', name: 'Norway', dialCode: '+47', flag: '\u{1F1F3}\u{1F1F4}', region: 'Europe' },
-		{ code: 'PK', name: 'Pakistan', dialCode: '+92', flag: '\u{1F1F5}\u{1F1F0}', region: 'Asia' },
-		{ code: 'PE', name: 'Peru', dialCode: '+51', flag: '\u{1F1F5}\u{1F1EA}', region: 'Americas' },
-		{
-			code: 'PH',
-			name: 'Philippines',
-			dialCode: '+63',
-			flag: '\u{1F1F5}\u{1F1ED}',
-			region: 'Asia'
-		},
-		{ code: 'PL', name: 'Poland', dialCode: '+48', flag: '\u{1F1F5}\u{1F1F1}', region: 'Europe' },
-		{
-			code: 'PT',
-			name: 'Portugal',
-			dialCode: '+351',
-			flag: '\u{1F1F5}\u{1F1F9}',
-			region: 'Europe'
-		},
-		{ code: 'RO', name: 'Romania', dialCode: '+40', flag: '\u{1F1F7}\u{1F1F4}', region: 'Europe' },
-		{ code: 'RU', name: 'Russia', dialCode: '+7', flag: '\u{1F1F7}\u{1F1FA}', region: 'Europe' },
-		{
-			code: 'SA',
-			name: 'Saudi Arabia',
-			dialCode: '+966',
-			flag: '\u{1F1F8}\u{1F1E6}',
-			region: 'Asia'
-		},
-		{ code: 'SG', name: 'Singapore', dialCode: '+65', flag: '\u{1F1F8}\u{1F1EC}', region: 'Asia' },
-		{
-			code: 'ZA',
-			name: 'South Africa',
-			dialCode: '+27',
-			flag: '\u{1F1FF}\u{1F1E6}',
-			region: 'Africa'
-		},
-		{ code: 'ES', name: 'Spain', dialCode: '+34', flag: '\u{1F1EA}\u{1F1F8}', region: 'Europe' },
-		{ code: 'SE', name: 'Sweden', dialCode: '+46', flag: '\u{1F1F8}\u{1F1EA}', region: 'Europe' },
-		{
-			code: 'CH',
-			name: 'Switzerland',
-			dialCode: '+41',
-			flag: '\u{1F1E8}\u{1F1ED}',
-			region: 'Europe'
-		},
-		{ code: 'TW', name: 'Taiwan', dialCode: '+886', flag: '\u{1F1F9}\u{1F1FC}', region: 'Asia' },
-		{ code: 'TH', name: 'Thailand', dialCode: '+66', flag: '\u{1F1F9}\u{1F1ED}', region: 'Asia' },
-		{ code: 'TR', name: 'Turkey', dialCode: '+90', flag: '\u{1F1F9}\u{1F1F7}', region: 'Europe' },
-		{
-			code: 'AE',
-			name: 'United Arab Emirates',
-			dialCode: '+971',
-			flag: '\u{1F1E6}\u{1F1EA}',
-			region: 'Asia'
-		},
-		{
-			code: 'GB',
-			name: 'United Kingdom',
-			dialCode: '+44',
-			flag: '\u{1F1EC}\u{1F1E7}',
-			region: 'Europe'
-		},
-		{
-			code: 'US',
-			name: 'United States',
-			dialCode: '+1',
-			flag: '\u{1F1FA}\u{1F1F8}',
-			region: 'Americas'
-		},
-		{ code: 'VN', name: 'Vietnam', dialCode: '+84', flag: '\u{1F1FB}\u{1F1F3}', region: 'Asia' }
-	];
-
-	const filteredCountries = $derived(
-		regions ? allCountries.filter((c) => regions.includes(c.region)) : allCountries
-	);
-
-	let searchQuery = $state('');
 	let open = $state(false);
+	let query = $state('');
+	let userHasTyped = $state(false);
 
-	const searchResults = $derived(
-		searchQuery
-			? filteredCountries.filter(
-					(c) =>
-						c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-						c.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-						c.dialCode.includes(searchQuery)
-				)
-			: filteredCountries
-	);
+	const inputProps = $derived(id ? { id } : {});
+	const filteredCountries = $derived(filterCountriesByRegions(COUNTRY_DATA, regions));
+	const selectedCountry = $derived(filteredCountries.find((country) => country.code === value));
+	const selectedName = $derived(selectedCountry?.name ?? '');
+	const searchResults = $derived.by(() => {
+		if (!userHasTyped) {
+			return filteredCountries;
+		}
 
-	const selectedCountry = $derived(filteredCountries.find((c) => c.code === value));
+		const trimmed = query.trim();
+		if (trimmed === '') {
+			return filteredCountries;
+		}
 
-	function selectCountry(code: string) {
-		value = code;
-		open = false;
-		searchQuery = '';
+		const normalizedQuery = trimmed.toLowerCase();
+		return filteredCountries.filter(
+			(country) =>
+				country.name.toLowerCase().includes(normalizedQuery) ||
+				country.code.toLowerCase().includes(normalizedQuery) ||
+				country.dialCode.includes(trimmed)
+		);
+	});
+
+	function handleInput(event: Event & { currentTarget: HTMLInputElement }) {
+		query = event.currentTarget.value;
+		userHasTyped = true;
+	}
+
+	function handleFocus() {
+		query = selectedName;
+		userHasTyped = false;
+	}
+
+	function handleSelect(code: string, name: string) {
+		query = name;
+		userHasTyped = false;
 		onchange?.(code);
 	}
 </script>
 
-<div data-part="country-select" {...rest}>
-	<button
-		type="button"
-		data-part="trigger"
-		{disabled}
-		onclick={() => {
-			if (!disabled) open = !open;
-		}}
-		aria-expanded={open}
-		aria-haspopup="listbox"
-	>
-		{#if selectedCountry}
-			<span data-part="flag">{selectedCountry.flag}</span>
-			<span data-part="country-name">{selectedCountry.name}</span>
-			{#if showDialCode}
-				<span data-part="dial-code">{selectedCountry.dialCode}</span>
-			{/if}
-		{:else}
-			<span data-part="placeholder">{placeholder}</span>
-		{/if}
-	</button>
+<Combobox.Root bind:open bind:value {disabled} {name}>
+	<CountrySelectSync
+		{open}
+		{query}
+		{userHasTyped}
+		selectedCode={value}
+		{selectedName}
+		results={searchResults}
+	/>
 
-	{#if open}
-		<div data-part="dropdown" role="listbox" aria-label="Countries">
-			<input
-				type="text"
-				data-part="search"
-				placeholder="Search countries..."
-				bind:value={searchQuery}
-				aria-label="Search countries"
+	<div data-part="country-select" class={className} {...rest}>
+		<label
+			data-part="control"
+			data-state={open ? 'open' : 'closed'}
+			data-disabled={disabled ? '' : undefined}
+		>
+			<span data-part="flag" aria-hidden="true">
+				{selectedCountry?.flag ?? '\u{1F30D}'}
+			</span>
+
+			<Combobox.Input
+				{...inputProps}
+				data-part="input"
+				{disabled}
+				{placeholder}
+				aria-label={ariaLabel}
+				aria-labelledby={ariaLabelledby}
+				aria-describedby={ariaDescribedby}
+				aria-invalid={ariaInvalid}
+				aria-errormessage={ariaErrormessage}
+				autocomplete="off"
+				spellcheck="false"
+				onfocus={handleFocus}
+				oninput={handleInput}
 			/>
-			{#each searchResults as country (country.code)}
-				<button
-					type="button"
-					role="option"
-					data-part="option"
-					aria-selected={country.code === value}
-					data-selected={country.code === value ? '' : undefined}
-					onclick={() => selectCountry(country.code)}
-				>
-					<span data-part="flag">{country.flag}</span>
-					<span data-part="country-name">{country.name}</span>
-					{#if showDialCode}
-						<span data-part="dial-code">{country.dialCode}</span>
-					{/if}
-				</button>
-			{/each}
-		</div>
-	{/if}
 
-	{#if name}
-		<input type="hidden" {name} {value} />
-	{/if}
-</div>
+			{#if showDialCode && selectedCountry}
+				<span data-part="dial-code" aria-hidden="true">{selectedCountry.dialCode}</span>
+			{/if}
+		</label>
+
+		<Combobox.Content data-part="dropdown">
+			{#if searchResults.length === 0}
+				<Combobox.Empty data-part="empty">No countries found.</Combobox.Empty>
+			{:else}
+				{#each searchResults as country, index (country.code)}
+					<Combobox.Item
+						value={country.code}
+						{index}
+						data-part="option"
+						data-flag={country.flag}
+						data-dial-code={showDialCode ? country.dialCode : undefined}
+						onclick={() => handleSelect(country.code, country.name)}
+					>
+						<span data-part="country-name">{country.name}</span>
+					</Combobox.Item>
+				{/each}
+			{/if}
+		</Combobox.Content>
+	</div>
+</Combobox.Root>

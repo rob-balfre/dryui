@@ -58,9 +58,8 @@
 	{/if}
 
 	<div
-		role="listbox"
+		role="group"
 		aria-label={title ?? (type === 'source' ? 'Available items' : 'Selected items')}
-		aria-multiselectable="true"
 		data-transfer-list
 		data-type={type}
 		{...rest}
@@ -88,14 +87,10 @@
 				{@render content({ items: filterItems(items) })}
 			{:else}
 				{#each filterItems(items) as item (item.key)}
-					<!-- svelte-ignore a11y_no_noninteractive_element_to_interactive_role -->
 					<label
-						role="option"
 						data-transfer-item
 						data-disabled={item.disabled ? '' : undefined}
 						data-selected={selectedSet.has(item.key) ? '' : undefined}
-						aria-selected={selectedSet.has(item.key)}
-						aria-disabled={item.disabled ?? false}
 					>
 						<Checkbox
 							checked={selectedSet.has(item.key)}

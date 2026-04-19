@@ -2,6 +2,7 @@
 	import { flushSync } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { createId, mergeIds } from '@dryui/primitives';
 	import { setDragAndDropCtx } from './context.svelte.js';
 	import { getGroupCtx } from './group-context.svelte.js';
 
@@ -19,6 +20,7 @@
 		orientation = 'vertical',
 		listId,
 		children,
+		'aria-describedby': ariaDescribedBy,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -46,6 +48,16 @@
 	let crossListIndex: number | null = null;
 
 	const groupCtx = getGroupCtx();
+	const instructionsId = createId('dry-dnd-instructions');
+
+	let keyboardInstructions = $derived.by(() => {
+		const arrowKeys =
+			orientation === 'vertical' ? 'Arrow Up and Arrow Down' : 'Arrow Left and Arrow Right';
+		if (hasHandle) {
+			return `Use the reorder handle and ${arrowKeys} to move items. Drag with a pointer to reorder, and press Escape to cancel an active drag.`;
+		}
+		return `Focus an item and use ${arrowKeys} to move it. Drag with a pointer to reorder, and press Escape to cancel an active drag.`;
+	});
 
 	// Register with group when inside one
 	$effect(() => {
@@ -71,6 +83,30 @@
 	const FLIP_DURATION = 200;
 	const FLIP_EASING = 'cubic-bezier(0.2, 0, 0, 1)';
 
+	function getInsertAt(from: number, to: number) {
+		return to > from ? to - 1 : to;
+	}
+
+	function announceReorder(from: number, to: number) {
+		if (to === from || to === from + 1) return;
+		const insertAt = getInsertAt(from, to);
+		announce(`Item moved to position ${insertAt + 1} of ${items.length}`);
+	}
+
+	function focusReorderedControl(index: number) {
+		const targetItem = rootElement?.querySelector<HTMLElement>(
+			`[data-dnd-item][data-index="${index}"]`
+		);
+		if (!targetItem) return;
+
+		if (hasHandle) {
+			targetItem.querySelector<HTMLElement>('[data-dnd-handle]')?.focus();
+			return;
+		}
+
+		targetItem.focus();
+	}
+
 	function captureRects(): Map<number, DOMRect> {
 		const rects = new Map<number, DOMRect>();
 		if (!rootElement) return rects;
@@ -85,7 +121,7 @@
 		if (to === from || to === from + 1) return;
 
 		const firstRects = captureRects();
-		const insertAt = to > from ? to - 1 : to;
+		const insertAt = getInsertAt(from, to);
 
 		const newItems = [...items];
 		const removed = newItems.splice(from, 1);
@@ -337,7 +373,9 @@
 			isPending = false;
 			isDragging = true;
 			createPreview();
-			announce(`Grabbed item at position ${(draggedIndex ?? 0) + 1}. Use arrow keys to move.`);
+			announce(
+				`Grabbed item at position ${(draggedIndex ?? 0) + 1} of ${items.length}. Drag to move and release to drop.`
+			);
 		}
 
 		if (isDragging) {
@@ -360,7 +398,7 @@
 			) {
 				resetState();
 				groupCtx.move(listId, from, toListId, toIdx);
-				announce('Item moved to another list');
+				announce(`Item moved to position ${toIdx + 1} in another list`);
 				return;
 			}
 			animateCrossListDrop(from, toListId, toIdx);
@@ -379,6 +417,7 @@
 			) {
 				resetState();
 				applyReorder(from, to);
+				announceReorder(from, to);
 				return;
 			}
 			animateDrop(from, to);
@@ -490,6 +529,7 @@
 				isAnimating = false;
 				resetState();
 				applyReorder(from, to);
+				announceReorder(from, to);
 			})
 			.catch(() => {
 				if (placeholderEl) placeholderEl.style.removeProperty('display');
@@ -607,7 +647,7 @@
 				isAnimating = false;
 				resetState();
 				flushSync(() => groupCtx!.move(listId!, from, toListId, toIdx));
-				announce('Item moved to another list');
+				announce(`Item moved to position ${toIdx + 1} in another list`);
 			})
 			.catch(() => {
 				if (placeholderEl) placeholderEl.style.removeProperty('display');
@@ -645,14 +685,6 @@
 		isPending = false;
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape' && isDragging && !isAnimating) {
-			e.preventDefault();
-			announce('Reorder cancelled');
-			resetState();
-		}
-	}
-
 	setDragAndDropCtx({
 		get draggedIndex() {
 			return draggedIndex;
@@ -671,6 +703,12 @@
 		},
 		get foreignOverIndex() {
 			return foreignOverIndex;
+		},
+		get instructionsId() {
+			return instructionsId;
+		},
+		get itemCount() {
+			return items.length;
 		},
 		registerHandle() {
 			hasHandle = true;
@@ -711,6 +749,7 @@
 			if (toGap !== fromIndex && toGap !== fromIndex + 1) {
 				reorder(fromIndex, toGap);
 				const insertAt = toGap > fromIndex ? toGap - 1 : toGap;
+				focusReorderedControl(insertAt);
 				announce(`Item moved to position ${insertAt + 1} of ${items.length}`);
 			}
 		},
@@ -729,10 +768,13 @@
 
 <div
 	bind:this={rootElement}
-	role="listbox"
+	role="list"
+	aria-roledescription="sortable list"
+	aria-describedby={mergeIds(ariaDescribedBy, instructionsId)}
 	data-dnd-root
 	data-orientation={orientation}
 	data-dragging={isDragging ? '' : undefined}
+	data-handle={hasHandle ? '' : undefined}
 	data-over-end={(isDragging && overIndex !== null && overIndex >= items.length) ||
 	(foreignOverIndex !== null && foreignOverIndex >= items.length)
 		? ''
@@ -740,18 +782,20 @@
 	onpointermove={handlePointerMove}
 	onpointerup={handlePointerUp}
 	onpointercancel={handlePointerCancel}
-	onkeydown={handleKeydown}
 	{...rest}
 	class={className}
 >
 	{@render children()}
-	<div aria-live="assertive" aria-atomic="true" class="liveRegion">
+	<div id={instructionsId} data-dnd-instructions class="assistiveText">
+		{keyboardInstructions}
+	</div>
+	<div data-dnd-live-region aria-live="assertive" aria-atomic="true" class="assistiveText">
 		{liveRegionMessage}
 	</div>
 </div>
 
 <style>
-	.liveRegion {
+	.assistiveText {
 		position: absolute;
 		aspect-ratio: 1;
 		height: 1px;

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { getTreeCtx, getTreeItemCtx } from './context.svelte.js';
 
-	interface Props extends HTMLButtonAttributes {
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
 	}
 
@@ -13,24 +13,17 @@
 	const itemCtx = getTreeItemCtx();
 </script>
 
-<button
-	type="button"
+<div
 	data-part="label"
-	data-tree-label
 	data-selected={ctx.isSelected(itemCtx.itemId) || undefined}
 	class={className}
-	onclick={() => {
-		ctx.selectItem(itemCtx.itemId);
-		ctx.toggleItem(itemCtx.itemId);
-	}}
 	{...rest}
 >
 	{@render children()}
-</button>
+</div>
 
 <style>
 	[data-part='label'] {
-		appearance: none;
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
@@ -44,19 +37,15 @@
 		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		font-family: var(--dry-font-sans);
 		color: var(--dry-color-text-strong);
+		outline: var(--dry-tree-item-focus-ring, none);
+		outline-offset: var(--dry-tree-item-focus-offset, 0px);
 		cursor: pointer;
 		user-select: none;
-		outline: none;
 		transition: background var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
 	[data-part='label']:hover {
 		background: var(--dry-tree-item-hover-bg, var(--dry-color-fill));
-	}
-
-	[data-part='label']:focus-visible {
-		outline: var(--dry-focus-ring);
-		outline-offset: 2px;
 	}
 
 	[data-part='label'][data-selected] {

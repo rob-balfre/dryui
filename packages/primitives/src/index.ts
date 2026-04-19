@@ -1,6 +1,7 @@
 // Shared utilities for building custom components
 export { createContext } from './utils/create-context.js';
 export { createId } from './utils/create-id.js';
+export { mergeIds } from './utils/merge-ids.js';
 export { createAnchorPosition } from './utils/anchor-position.svelte.js';
 export type { AnchorPositionOptions, Placement } from './utils/anchor-position.svelte.js';
 export { createPositionedPopover } from './utils/positioned-popover.svelte.js';
@@ -62,6 +63,8 @@ export {
 	clamp
 } from './color-picker/color-utils.js';
 export { extractColorsFromImage } from './color-picker/extract-colors.js';
+export { COUNTRY_DATA } from './internal/countries.js';
+export type { CountryInfo, CountryRegion } from './internal/countries.js';
 
 export { Button } from './button/index.js';
 export type { ButtonProps } from './button/index.js';
@@ -599,6 +602,8 @@ export type {
 
 export { Chart } from './chart/index.js';
 export type { ChartDataPoint, ChartStackedDataPoint } from './chart/index.js';
+export { registerChartInteractive } from './chart/context.svelte.js';
+export type { ChartContext } from './chart/context.svelte.js';
 export type {
 	ChartRootProps,
 	ChartBarsProps,
@@ -646,6 +651,8 @@ export type {
 	HoverCardTriggerProps,
 	HoverCardContentProps
 } from './hover-card/index.js';
+export { setHoverCardCtx, getHoverCardCtx } from './hover-card/context.svelte.js';
+export type { HoverCardContext } from './hover-card/context.svelte.js';
 
 export { Icon } from './icon/index.js';
 export type { IconProps } from './icon/index.js';
@@ -857,7 +864,6 @@ export type { ShaderCanvasProps, ShaderCanvasAutoUniforms } from './shader-canva
 
 export { PhoneInput } from './phone-input/index.js';
 export type { PhoneInputProps } from './phone-input/index.js';
-export type { CountryInfo } from './phone-input/index.js';
 
 export { CountrySelect } from './country-select/index.js';
 export type { CountrySelectProps } from './country-select/index.js';

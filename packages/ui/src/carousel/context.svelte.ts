@@ -6,10 +6,15 @@ interface CarouselContext {
 	readonly orientation: 'horizontal' | 'vertical';
 	readonly canScrollPrev: boolean;
 	readonly canScrollNext: boolean;
+	readonly autoplayEnabled: boolean;
+	readonly autoplayPaused: boolean;
+	readonly autoplayRunning: boolean;
 	scrollTo: (index: number) => void;
 	syncActiveIndex: (index: number) => void;
 	scrollPrev: () => void;
 	scrollNext: () => void;
+	toggleAutoplay: () => void;
+	getSlideId: (index: number) => string;
 	registerViewport: (el: HTMLElement) => void;
 	registerSlide: () => number;
 	unregisterSlide: () => void;

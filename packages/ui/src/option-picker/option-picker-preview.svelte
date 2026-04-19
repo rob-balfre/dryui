@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {
@@ -11,20 +12,23 @@
 
 	let { color, shape = 'rounded', variant = 'default', children, ...rest }: Props = $props();
 
-	let el: HTMLSpanElement | undefined = $state();
+	function applyColor(value?: string): Attachment<HTMLSpanElement> {
+		return (node) => {
+			if (value) {
+				node.style.setProperty('--dry-option-picker-preview-bg', value);
+			} else {
+				node.style.removeProperty('--dry-option-picker-preview-bg');
+			}
 
-	$effect(() => {
-		if (!el) return;
-		if (color) {
-			el.style.setProperty('--dry-option-picker-preview-bg', color);
-		} else {
-			el.style.removeProperty('--dry-option-picker-preview-bg');
-		}
-	});
+			return () => {
+				node.style.removeProperty('--dry-option-picker-preview-bg');
+			};
+		};
+	}
 </script>
 
 <span
-	bind:this={el}
+	{@attach applyColor(color)}
 	data-option-picker-preview
 	data-option-picker-preview-shape={shape}
 	data-variant={variant !== 'default' ? variant : undefined}
@@ -39,9 +43,10 @@
 		grid-column: var(--dry-option-picker-preview-column, 1);
 		grid-row: var(--dry-option-picker-preview-row, 1 / span 3);
 		place-items: center;
-		align-self: center;
+		align-self: var(--dry-option-picker-preview-align-self, center);
 		block-size: var(--dry-option-picker-preview-size, 2.25rem);
 		aspect-ratio: 1;
+		margin-block-start: var(--dry-option-picker-preview-offset-block-start, 0);
 		padding: var(--dry-option-picker-preview-padding, 0);
 		border: 1px solid var(--dry-option-picker-preview-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-option-picker-preview-radius, var(--dry-radius-md));
@@ -75,7 +80,7 @@
 			var(--_preset-color) 46%,
 			var(--dry-color-stroke-weak) 54%
 		);
-		--dry-option-picker-preview-size: 2.75rem;
+		--dry-option-picker-preview-size: var(--dry-option-picker-preview-preset-size, 2.75rem);
 		background: linear-gradient(
 			155deg,
 			color-mix(in srgb, white 18%, var(--_preset-color) 82%) 0%,

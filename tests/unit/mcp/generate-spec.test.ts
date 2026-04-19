@@ -11,6 +11,11 @@ const typographyIndex = await Bun.file(
 const primitiveTypographyIndex = await Bun.file(
 	new URL('../../../packages/primitives/src/typography/index.ts', import.meta.url)
 ).text();
+const spec = (await Bun.file(
+	new URL('../../../packages/mcp/src/spec.json', import.meta.url)
+).json()) as {
+	components: Record<string, { a11y?: string[] }>;
+};
 
 describe('generate-spec typography parsing', () => {
 	test('captures primitive typography heading props and accepted values', () => {
@@ -34,5 +39,11 @@ describe('generate-spec typography parsing', () => {
 
 		expect(example).toContain('<Typography.Heading');
 		expect(example).not.toContain('.Root');
+	});
+
+	test('generated spec includes accessibility notes for every component', () => {
+		for (const [name, def] of Object.entries(spec.components)) {
+			expect(def.a11y?.length, `${name} is missing accessibility guidance`).toBeGreaterThan(0);
+		}
 	});
 });

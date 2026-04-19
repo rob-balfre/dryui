@@ -6,8 +6,8 @@ import {
 	type ProjectDetection,
 	type ProjectPlannerSpec
 } from './project-planner.js';
+import { checkComponent } from './component-checker.js';
 import { diagnoseTheme } from './theme-checker.js';
-import { reviewComponent } from './reviewer.js';
 
 export type WorkspaceSeverity = 'error' | 'warning' | 'info';
 
@@ -322,9 +322,9 @@ function reviewFindings(
 	content: string,
 	spec: WorkspaceAuditSpec
 ): WorkspaceFinding[] {
-	const result = reviewComponent(
+	const result = checkComponent(
 		content,
-		spec as Parameters<typeof reviewComponent>[1],
+		spec as Parameters<typeof checkComponent>[1],
 		normalizePath(relative(root, filePath))
 	);
 	return result.issues.map((issue) =>
@@ -435,10 +435,7 @@ export function scanWorkspace(
 			continue;
 		}
 
-		if (
-			file.endsWith('.svelte') &&
-			(content.includes('@dryui/ui') || content.includes('@dryui/primitives'))
-		) {
+		if (file.endsWith('.svelte')) {
 			findings.push(...reviewFindings(root, absPath, content, spec));
 			continue;
 		}

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { mergeIds } from '@dryui/primitives';
 	import { getDragAndDropCtx } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -8,7 +9,13 @@
 		children: Snippet<[{ isDragging: boolean; isOver: boolean }]>;
 	}
 
-	let { index, children, class: className, ...rest }: Props = $props();
+	let {
+		index,
+		children,
+		'aria-describedby': ariaDescribedBy,
+		class: className,
+		...rest
+	}: Props = $props();
 
 	const ctx = getDragAndDropCtx();
 
@@ -18,22 +25,17 @@
 			ctx.foreignOverIndex === index
 	);
 
-	let grabbing = $state(false);
-
 	function handlePointerDown(e: PointerEvent) {
 		// Only start drag if there's no handle registered (drag from whole item)
 		if (!ctx.hasHandle) {
 			e.preventDefault();
 			ctx.startDrag(index, e);
-			grabbing = true;
 		}
 	}
 
-	function handlePointerUp() {
-		grabbing = false;
-	}
-
 	function handleKeydown(e: KeyboardEvent) {
+		if (ctx.hasHandle) return;
+
 		if (e.key === ' ' || e.key === 'Enter') {
 			e.preventDefault();
 			if (ctx.isDragging && ctx.draggedIndex === index) {
@@ -54,25 +56,32 @@
 			ctx.moveItem(index, 'down');
 		}
 
-		if (e.key === 'Escape') {
+		if (e.key === 'Escape' && ctx.isDragging) {
 			e.preventDefault();
 			ctx.cancelDrag();
 		}
 	}
 </script>
 
+<!-- svelte-ignore a11y_no_noninteractive_tabindex (keyboard reordering keeps the item itself focusable when there is no separate handle) -->
 <div
-	role="option"
-	tabindex="0"
-	aria-roledescription="sortable"
-	aria-label="Item {index + 1}, press Space to grab, arrow keys to move"
+	role="listitem"
+	tabindex={ctx.hasHandle ? undefined : 0}
+	aria-roledescription="sortable item"
+	aria-posinset={index + 1}
+	aria-setsize={ctx.itemCount}
+	aria-describedby={mergeIds(ariaDescribedBy, !ctx.hasHandle ? ctx.instructionsId : undefined)}
+	aria-keyshortcuts={!ctx.hasHandle
+		? ctx.orientation === 'vertical'
+			? 'ArrowUp ArrowDown'
+			: 'ArrowLeft ArrowRight'
+		: undefined}
 	data-dnd-item
 	data-index={index}
 	data-dragging={itemIsDragging ? '' : undefined}
 	data-drag-active={ctx.isDragging ? '' : undefined}
 	data-over={isOver ? '' : undefined}
 	onpointerdown={handlePointerDown}
-	onpointerup={handlePointerUp}
 	onkeydown={handleKeydown}
 	{...rest}
 	class={className}

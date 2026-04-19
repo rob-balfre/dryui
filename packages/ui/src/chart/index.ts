@@ -8,6 +8,7 @@ export interface ChartRootProps extends SVGAttributes<SVGSVGElement> {
 	width?: number;
 	height?: number;
 	padding?: { top?: number; right?: number; bottom?: number; left?: number };
+	summary?: string;
 	children: Snippet;
 }
 

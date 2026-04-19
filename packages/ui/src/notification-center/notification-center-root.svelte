@@ -36,7 +36,6 @@
 		get panelId() {
 			return panelId;
 		},
-		triggerEl: null,
 		markAllRead() {
 			items = items.map((item) => ({ ...item, read: true }));
 		},

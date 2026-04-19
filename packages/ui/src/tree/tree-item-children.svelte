@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getTreeCtx, getTreeItemCtx } from './context.svelte.js';
@@ -7,18 +8,16 @@
 		children: Snippet;
 	}
 
-	let { class: className, children, style, ...rest }: Props = $props();
+	let { class: className, children, ...rest }: Props = $props();
 
 	const ctx = getTreeCtx();
 	const itemCtx = getTreeItemCtx();
 	const open = $derived(ctx.isExpanded(itemCtx.itemId));
-
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--_rows', open ? '1fr' : '0fr');
-		});
-	}
+	const branchItemId = itemCtx.itemId;
+	ctx.registerBranch(branchItemId);
+	onDestroy(() => {
+		ctx.unregisterBranch(branchItemId);
+	});
 </script>
 
 <div
@@ -28,7 +27,6 @@
 	data-state={open ? 'open' : 'closed'}
 	class={className}
 	{...rest}
-	{@attach applyStyles}
 >
 	<div class="tree-item-inner">
 		{@render children()}
@@ -42,8 +40,12 @@
 
 	[data-part='children'] {
 		display: grid;
-		grid-template-rows: var(--_rows, 0fr);
+		grid-template-rows: 0fr;
 		padding-left: var(--dry-tree-indent, var(--dry-space-4));
 		transition: grid-template-rows var(--dry-duration-normal) var(--dry-ease-default);
+	}
+
+	[data-part='children'][data-state='open'] {
+		grid-template-rows: 1fr;
 	}
 </style>

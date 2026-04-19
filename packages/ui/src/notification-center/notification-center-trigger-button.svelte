@@ -11,13 +11,6 @@
 	let { children, onclick, ...rest }: Props = $props();
 
 	const ctx = getNotificationCenterCtx();
-
-	$effect(() => {
-		const el = document.getElementById(ctx.triggerId);
-		if (el) {
-			ctx.triggerEl = el as HTMLButtonElement;
-		}
-	});
 </script>
 
 <Button
@@ -25,8 +18,8 @@
 	type="button"
 	id={ctx.triggerId}
 	popovertarget={ctx.panelId}
+	aria-controls={ctx.panelId}
 	aria-expanded={ctx.open}
-	aria-haspopup="dialog"
 	data-notification-center-trigger
 	{onclick}
 	{...rest}

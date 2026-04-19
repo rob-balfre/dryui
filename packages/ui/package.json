@@ -50,6 +50,11 @@
       "svelte": "./src/alpha-slider/index.ts",
       "default": "./src/alpha-slider/index.ts"
     },
+    "./app-frame": {
+      "types": "./src/app-frame/index.ts",
+      "svelte": "./src/app-frame/index.ts",
+      "default": "./src/app-frame/index.ts"
+    },
     "./aspect-ratio": {
       "types": "./src/aspect-ratio/index.ts",
       "svelte": "./src/aspect-ratio/index.ts",
@@ -803,6 +808,11 @@
         "svelte": "./dist/alpha-slider/index.js",
         "default": "./dist/alpha-slider/index.js"
       },
+      "./app-frame": {
+        "types": "./dist/app-frame/index.d.ts",
+        "svelte": "./dist/app-frame/index.js",
+        "default": "./dist/app-frame/index.js"
+      },
       "./aspect-ratio": {
         "types": "./dist/aspect-ratio/index.d.ts",
         "svelte": "./dist/aspect-ratio/index.js",
@@ -1539,6 +1549,7 @@
     "svelte": "^5.55.1"
   },
   "devDependencies": {
+    "@dryui/lint": "workspace:*",
     "svelte": "^5.55.3",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",

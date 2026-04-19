@@ -37,7 +37,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <button> attributes via rest props.
 CSS variables: --dry-btn-bg, --dry-btn-border, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-size | data-state
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <Toggle>Content</Toggle>
@@ -62,7 +62,7 @@ Structure:
     ToggleGroup.Item
 CSS variables: --dry-tg-font-size, --dry-tg-min-height, --dry-tg-padding-x, --dry-tg-padding-y, --dry-tg-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <ToggleGroup.Root>
@@ -81,7 +81,7 @@ Props: value (string), Current controlled or bindable value., required | timeout
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-clipboard | data-copied
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <Clipboard>Content</Clipboard>
@@ -97,7 +97,7 @@ Subpath import: import { ScrollToTop } from '@dryui/ui/scroll-to-top'
 Props: position ('bottom-right' | 'bottom-left' | 'bottom-center'), accepted bottom-right, bottom-left, bottom-center, default 'bottom-right' | class (string) | threshold (number), default 300 | target (HTMLElement | undefined), Browsing context used for link navigation. | behavior (ScrollBehavior), default 'smooth' | children (Snippet<[{ visible: boolean; scrollToTop: () => void }]>), Content rendered inside the component., required
 CSS variables: none
 Data attributes: data-position | data-visible
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <ScrollToTop>Content</ScrollToTop>
@@ -126,7 +126,7 @@ Structure:
     FloatButton.Action
 CSS variables: --dry-fab-gap, --dry-fab-offset, --dry-fab-position, --dry-fab-z-index
 Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-state
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <FloatButton.Root>
@@ -146,7 +146,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-button-group-hover-z-index, --dry-button-group-radius
 Data attributes: data-button-group | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <ButtonGroup>Content</ButtonGroup>
@@ -163,7 +163,7 @@ Props: selected (boolean), Whether the current item is selected. | disabled (boo
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-fg, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color
 Data attributes: data-chip-color | data-chip-selected | data-chip-size | data-chip-variant | data-disabled (Present when the component or part is disabled.) | data-selected (Present when the current item is selected.)
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <Chip variant="soft" color="blue">Policy friendly</Chip>
@@ -188,7 +188,7 @@ Structure:
     ChipGroup.Item
 CSS variables: --dry-chip-group-font-size, --dry-chip-group-padding-x, --dry-chip-group-padding-y
 Data attributes: data-chip-group | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
-Accessibility: none
+Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
 ```svelte
 <ChipGroup.Root type="multiple" bind:value={selectedFilters}>
@@ -228,7 +228,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: --dry-input-bg, --dry-input-border, --dry-input-font-size, --dry-input-padding-x, --dry-input-padding-y
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <Textarea bind:value={message} placeholder="Write a message…" />
@@ -245,7 +245,7 @@ Props: value (string), Current controlled or bindable value., default '' | place
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-btn-radius, --dry-prompt-input-bg, --dry-prompt-input-border, --dry-prompt-input-color, --dry-prompt-input-gap, --dry-prompt-input-padding, --dry-prompt-input-radius, --dry-prompt-input-textarea-min-height
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-prompt-actions | data-prompt-input | data-prompt-submit-label | data-prompt-textarea
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <PromptInput>Content</PromptInput>
@@ -262,7 +262,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <input> attributes via rest props.
 CSS variables: --dry-input-bg, --dry-input-border, --dry-input-color, --dry-input-font-size, --dry-input-padding-x, --dry-input-padding-y, --dry-input-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-number-input-wrapper | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <NumberInput bind:value={quantity} min={0} max={100} step={1} size="sm" />
@@ -304,7 +304,7 @@ Structure:
     RadioGroup.Item
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-radio-group-item | data-radio-group-root | data-state
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <RadioGroup.Root>
@@ -323,7 +323,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <input> attributes via rest props.
 CSS variables: --dry-slider-thumb-size, --dry-slider-track-height
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-variant
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.
 Example:
 ```svelte
 <Slider bind:value={volume} min={0} max={100} />
@@ -363,7 +363,7 @@ Structure:
     InputGroup.Select
 CSS variables: --dry-input-group-bg, --dry-input-group-border, --dry-input-group-border-strong, --dry-input-group-color, --dry-input-group-font-size, --dry-input-group-gap, --dry-input-group-muted, --dry-input-group-padding-x, --dry-input-group-padding-y, --dry-input-group-radius, --dry-input-group-separator
 Data attributes: data-affix-group | data-disabled (Present when the component or part is disabled.) | data-input-group-action | data-input-group-caret | data-input-group-input | data-input-group-inputWrap | data-input-group-prefix | data-input-group-root | data-input-group-select | data-input-group-selectWrap | data-input-group-separator | data-input-group-suffix | data-invalid (Present when the current field value is invalid.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <InputGroup.Root>
@@ -406,7 +406,7 @@ Structure:
     OptionPicker.Meta
 CSS variables: --dry-btn-align, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-option-picker-description-column, --dry-option-picker-description-row, --dry-option-picker-label-column, --dry-option-picker-label-row, --dry-option-picker-meta-column, --dry-option-picker-meta-row, --dry-option-picker-preview-bg, --dry-option-picker-preview-border, --dry-option-picker-preview-color, --dry-option-picker-preview-column, --dry-option-picker-preview-radius, --dry-option-picker-preview-row, --dry-option-picker-preview-size
 Data attributes: data-columns | data-disabled (Present when the component or part is disabled.) | data-layout | data-option-picker-description | data-option-picker-item | data-option-picker-label | data-option-picker-meta | data-option-picker-preview | data-option-picker-preview-shape | data-option-picker-root | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-selected (Present when the current item is selected.) | data-shape | data-size | data-state | data-unavailable | data-value | data-variant
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <OptionPicker.Root>
@@ -437,7 +437,7 @@ Structure:
     Listbox.Item
 CSS variables: --dry-listbox-bg, --dry-listbox-border, --dry-listbox-item-hover-bg, --dry-listbox-item-padding-x, --dry-listbox-item-padding-y, --dry-listbox-item-radius, --dry-listbox-item-selected-bg, --dry-listbox-item-selected-border, --dry-listbox-item-selected-color, --dry-listbox-padding, --dry-listbox-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-listbox-item | data-listbox-root | data-selected (Present when the current item is selected.) | data-value
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <Listbox.Root>
@@ -472,7 +472,7 @@ Structure:
     PinInput.Separator
 CSS variables: --dry-pin-bg, --dry-pin-border, --dry-pin-caret-color, --dry-pin-cell-bg, --dry-pin-cell-border, --dry-pin-cell-border-bottom, --dry-pin-cell-radius, --dry-pin-font-size, --dry-pin-radius, --dry-pin-separator-color, --dry-pin-size
 Data attributes: data-active (Present on the active item or current target within the component.) | data-complete | data-disabled (Present when the component or part is disabled.) | data-error | data-inactive | data-mask | data-pin-input-caret | data-pin-input-cell | data-pin-input-group | data-pin-input-hidden | data-pin-input-lg | data-pin-input-md | data-pin-input-placeholder | data-pin-input-root | data-pin-input-separator | data-pin-input-sm | data-state | data-variant
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <PinInput.Root bind:value={pin} length={6} oncomplete={handleVerify}>
@@ -503,7 +503,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-star-size
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-highlighted | data-readonly | data-size | data-state
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <Rating bind:value={score} />
@@ -520,7 +520,7 @@ Props: value (string), Current controlled or bindable value., default '', bindab
 Native props: Forwards <input> attributes via rest props.
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-placeholder | data-time-display | data-time-input-wrapper | data-time-separator
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <TimeInput>Content</TimeInput>
@@ -557,7 +557,7 @@ Structure:
     TagsInput.List
 CSS variables: --dry-btn-font-size, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-tags-input-font-size, --dry-tags-input-gap, --dry-tags-input-tag-font-size, --dry-tags-input-tag-padding-x
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-index | data-part | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <TagsInput.Root>
@@ -602,7 +602,7 @@ Structure:
     FileUpload.ItemDelete
 CSS variables: --dry-fu-bg, --dry-fu-border, --dry-fu-font-size, --dry-fu-min-height, --dry-fu-padding
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-fu-dropzone | data-fu-item | data-fu-item-name | data-fu-item-size | data-fu-list | data-index | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <FileUpload.Root>
@@ -640,7 +640,7 @@ Structure:
     FileSelect.Clear
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-file-select | data-fs-value | data-loading | data-placeholder
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <FileSelect.Root>
@@ -693,7 +693,7 @@ Structure:
     ColorPicker.ChannelInput
 CSS variables: --dry-alpha-rgb, --dry-color-picker-area-height, --dry-color-picker-area-width, --dry-color-picker-grid-dark, --dry-color-picker-grid-light, --dry-color-picker-grid-size, --dry-color-picker-indicator-border, --dry-color-picker-indicator-color, --dry-color-picker-indicator-left, --dry-color-picker-indicator-shadow, --dry-color-picker-indicator-size, --dry-color-picker-indicator-top, --dry-color-picker-slider-thumb-bg, --dry-color-picker-slider-thumb-border, --dry-color-picker-slider-thumb-shadow, --dry-color-picker-slider-thumb-shadow-hover, --dry-color-picker-slider-thumb-size, --dry-color-picker-slider-track-height, --dry-color-picker-surface-hover, --dry-color-picker-swatch-size, --dry-color-picker-width, --dry-slider-thumb-size, --dry-slider-track-height, --dry-swatch-color, --dry-swatch-opacity
 Data attributes: data-channel | data-color-picker | data-cp-area | data-cp-area-canvas | data-cp-area-indicator | data-cp-input | data-cp-slider | data-cp-slider-wrapper | data-cp-swatch | data-disabled (Present when the component or part is disabled.) | data-format | data-interactive
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <ColorPicker.Root>
@@ -717,7 +717,7 @@ Subpath import: import { DropZone } from '@dryui/ui/drop-zone'
 Props: accept (string) | onDrop ((files: File[]) => void)
 CSS variables: none
 Data attributes: data-active (Present on the active item or current target within the component.) | data-drop-zone | data-drop-zone-text
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <DropZone>Content</DropZone>
@@ -750,7 +750,7 @@ Structure:
     Transfer.Actions
 CSS variables: --dry-transfer-actions-gap, --dry-transfer-bg, --dry-transfer-border, --dry-transfer-header-bg, --dry-transfer-item-hover, --dry-transfer-item-selected, --dry-transfer-list-height, --dry-transfer-padding, --dry-transfer-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-move-all-source | data-transfer-move-all-target | data-transfer-move-source | data-transfer-move-target | data-transfer-root | data-transfer-select-all | data-type
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <Transfer.Root>
@@ -783,7 +783,7 @@ Structure:
     RichTextEditor.Content
 CSS variables: --dry-rte-border, --dry-rte-button-size, --dry-rte-content-bg, --dry-rte-padding, --dry-rte-popover-z-index, --dry-rte-radius, --dry-rte-toolbar-bg
 Data attributes: data-active (Present on the active item or current target within the component.) | data-format | data-part | data-placeholder | data-readonly | data-rte-content | data-rte-root | data-rte-toolbar
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern. | Label editor toolbars and popovers explicitly, and ensure formatting actions remain keyboard-complete.
 Example:
 ```svelte
 <RichTextEditor.Root>
@@ -803,7 +803,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-phone-input-bg, --dry-phone-input-border, --dry-phone-input-color, --dry-phone-input-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-phone-chevron | data-phone-dial-code | data-phone-flag | data-phone-input | data-phone-number-input | data-phone-select | data-phone-trigger | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <PhoneInput bind:value={phone} defaultCountry="US" placeholder="(555) 123-4567" />
@@ -819,8 +819,8 @@ Subpath import: import { CountrySelect } from '@dryui/ui/country-select'
 Props: value (string), Current controlled or bindable value., default '', bindable | regions (string[]) | showDialCode (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | placeholder (string), Hint text shown when no value is selected or entered., default 'Select country' | name (string), Field name used during native form submission. | onchange ((code: string) => void) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
-Data attributes: data-country-select-wrapper | data-part | data-selected (Present when the current item is selected.)
-Accessibility: none
+Data attributes: data-country-select-wrapper | data-dial-code | data-disabled (Present when the component or part is disabled.) | data-flag | data-highlighted | data-part | data-state
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <CountrySelect bind:value={country} placeholder="Select country" />
@@ -837,7 +837,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-dti-gap
 Data attributes: data-date-time-input | data-part
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <DateTimeInput bind:value={appointmentDate} name="appointment" />
@@ -853,7 +853,7 @@ Subpath import: import { AlphaSlider } from '@dryui/ui/alpha-slider'
 Props: value (number), Current controlled or bindable value., default 100 | color (string), Semantic color or tone applied to the component., default 'hsl(230 | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | onchange ((value: number) => void)
 CSS variables: none
 Data attributes: data-alpha-slider | data-alpha-slider-checkerboard | data-alpha-slider-color-track | data-alpha-slider-input | data-alpha-slider-meta | data-alpha-slider-swatch | data-alpha-slider-swatch-wrapper | data-alpha-slider-track-wrapper | data-alpha-slider-value-label
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.
 Example:
 ```svelte
 <AlphaSlider>Content</AlphaSlider>
@@ -893,7 +893,7 @@ Structure:
     AffixGroup.Action
 CSS variables: none
 Data attributes: data-affix-group | data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <AffixGroup.Root>
@@ -939,7 +939,7 @@ Structure:
     SelectableTileGroup.Meta
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state | data-value
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
 ```svelte
 <SelectableTileGroup.Root>
@@ -964,7 +964,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: --dry-label-color, --dry-label-font-size, --dry-label-leading, --dry-label-weight
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-required | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Label>Content</Label>
@@ -991,7 +991,7 @@ Structure:
   Field.Root
 CSS variables: --dry-field-gap
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Field.Root>
@@ -1027,7 +1027,7 @@ Structure:
     Fieldset.Content
 CSS variables: none
 Data attributes: data-fieldset | data-fieldset-content | data-fieldset-description | data-fieldset-legend
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Fieldset.Root>
@@ -1129,7 +1129,7 @@ Structure:
       MultiSelectCombobox.Item
 CSS variables: --dry-btn-font-size, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-multi-select-item-radius
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-empty | data-highlighted | data-multi-select-content | data-multi-select-empty | data-multi-select-group | data-multi-select-input | data-multi-select-item | data-multi-select-root | data-multi-select-selection-item | data-multi-select-selection-list | data-multi-select-wrapper | data-part | data-selected (Present when the current item is selected.) | data-state | data-text-value | data-value
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name="frameworks">
@@ -1152,7 +1152,7 @@ Example:
 ## SegmentedControl
 Package: @dryui/ui
 Category: form
-Tags: segmented, switcher, single-select, view-toggle
+Tags: segmented, switcher, single-select, view-toggle, tabs, toggle
 Kind: compound
 Root import: import { SegmentedControl } from '@dryui/ui'
 Subpath import: import { SegmentedControl } from '@dryui/ui/segmented-control'
@@ -1168,7 +1168,7 @@ Structure:
     SegmentedControl.Item
 CSS variables: --dry-sc-radius, --dry-sc-selected-bg, --dry-sc-selected-border
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-segmented-control-item | data-state
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <SegmentedControl.Root bind:value={tripType}>
@@ -1210,7 +1210,7 @@ Structure:
       Combobox.Item
 CSS variables: --dry-combobox-bg, --dry-combobox-border, --dry-combobox-color, --dry-combobox-font-size, --dry-combobox-item-radius, --dry-combobox-padding-x, --dry-combobox-padding-y
 Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Combobox.Root bind:value={selectedFramework} name="framework">
@@ -1245,7 +1245,7 @@ Structure:
     DateField.Separator
 CSS variables: --dry-df-bg, --dry-df-border, --dry-df-color, --dry-df-font-size, --dry-df-padding-x, --dry-df-padding-y, --dry-df-radius
 Data attributes: data-df-root | data-df-segment | data-df-separator | data-df-wrapper | data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-placeholder | data-segment | data-separator | data-size
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <DateField.Root bind:value={departureDate} name="departureDate">
@@ -1283,7 +1283,7 @@ Structure:
       DatePicker.Calendar
 CSS variables: none
 Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <DatePicker.Root bind:value={departureDate} name="departureDate">
@@ -1329,7 +1329,7 @@ Structure:
     Calendar.Heading
 CSS variables: --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color
 Data attributes: data-calendar | data-calendar-day | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Calendar.Root>
@@ -1371,7 +1371,7 @@ Structure:
     DateRangePicker.Preset
 CSS variables: none
 Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <DateRangePicker.Root>
@@ -1401,7 +1401,7 @@ Structure:
     RangeCalendar.Grid
 CSS variables: --dry-range-calendar-bg, --dry-range-calendar-border, --dry-range-calendar-day-hover-bg, --dry-range-calendar-day-radius, --dry-range-calendar-day-size, --dry-range-calendar-heading-color, --dry-range-calendar-nav-bg, --dry-range-calendar-nav-border, --dry-range-calendar-nav-color, --dry-range-calendar-outside-color, --dry-range-calendar-padding, --dry-range-calendar-panel-bg, --dry-range-calendar-panel-border, --dry-range-calendar-radius, --dry-range-calendar-range-bg, --dry-range-calendar-selected-bg, --dry-range-calendar-selected-color, --dry-range-calendar-selected-hover-bg, --dry-range-calendar-shadow, --dry-range-calendar-today-color
 Data attributes: data-calendar-day | data-calendar-header | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-range-calendar-root | data-range-end | data-range-start | data-today
-Accessibility: none
+Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <RangeCalendar.Root>
@@ -1422,7 +1422,7 @@ Props: size ('sm' | 'md' | 'lg' | 'xl' | 'full'), Size preset affecting density,
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-container-padding
 Data attributes: data-padding | data-size
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Container>
@@ -1441,7 +1441,7 @@ Props: orientation ('horizontal' | 'vertical'), Horizontal or vertical layout di
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-separator-color, --dry-separator-size, --dry-separator-spacing
 Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-variant
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Separator />
@@ -1458,7 +1458,7 @@ Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'), Size preset affecting de
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-axis | data-size
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Spacer size="lg" />
@@ -1467,7 +1467,7 @@ Example:
 ## AspectRatio
 Package: @dryui/ui
 Category: layout
-Tags: image, video, ratio, responsive
+Tags: image, video, ratio, responsive, media, frame
 Kind: simple
 Root import: import { AspectRatio } from '@dryui/ui'
 Subpath import: import { AspectRatio } from '@dryui/ui/aspect-ratio'
@@ -1475,7 +1475,7 @@ Props: ratio (number), default 16 / 9 | children (Snippet), Content rendered ins
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <AspectRatio>Content</AspectRatio>
@@ -1492,7 +1492,7 @@ Props: orientation ('vertical' | 'horizontal' | 'both'), Horizontal or vertical 
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-scroll-area
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <ScrollArea>Content</ScrollArea>
@@ -1521,13 +1521,30 @@ Structure:
     Splitter.Handle
 CSS variables: --dry-splitter-handle-z-index
 Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-panel | data-part
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Splitter.Root>
   <Splitter.Panel>...</Splitter.Panel>
   <Splitter.Handle>...</Splitter.Handle>
 </Splitter.Root>
+```
+
+## AppFrame
+Package: @dryui/ui
+Category: layout
+Tags: app-shell, frame, layout, header, chrome, traffic-lights
+Kind: simple
+Root import: import { AppFrame } from '@dryui/ui'
+Subpath import: import { AppFrame } from '@dryui/ui/app-frame'
+Props: title (string), Primary heading or label text. | actions (Snippet) | children (Snippet), Content rendered inside the component., required
+Native props: Forwards <div> attributes via rest props.
+CSS variables: --dry-app-frame-bg, --dry-app-frame-border, --dry-app-frame-chrome-bg, --dry-app-frame-dot-close, --dry-app-frame-dot-max, --dry-app-frame-dot-min, --dry-app-frame-dot-size, --dry-app-frame-radius
+Data attributes: data-app-frame | data-part | data-tone
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
+Example:
+```svelte
+<AppFrame>Content</AppFrame>
 ```
 
 ## Aurora
@@ -1541,7 +1558,7 @@ Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Aurora palette="ocean">
@@ -1561,8 +1578,8 @@ Subpath import: import { Noise } from '@dryui/ui/noise'
 Props: opacity (number), default 0.22 | blend (NoiseBlendMode), default 'overlay' | animated (boolean), default false | grain (NoiseGrain), default 'medium' | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-noise-blend, --dry-noise-opacity, --dry-noise-pattern
-Data attributes: data-animated | data-grain | data-noise | data-noise-content | data-noise-texture | data-reduced-motion
-Accessibility: none
+Data attributes: data-animated | data-grain | data-noise | data-noise-content | data-noise-texture | data-paused | data-reduced-motion
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Noise opacity={0.12} blend="soft-light">
@@ -1570,22 +1587,6 @@ Example:
     <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>
   </Card.Root>
 </Noise>
-```
-
-## AppFrame
-Package: @dryui/primitives
-Category: layout
-Tags: app-shell, frame, layout, header, actions
-Kind: simple
-Root import: import { AppFrame } from '@dryui/primitives'
-Props: title (string), Primary heading or label text. | actions (Snippet) | children (Snippet), Content rendered inside the component., required
-Native props: Forwards <div> attributes via rest props.
-CSS variables: none
-Data attributes: data-part
-Accessibility: none
-Example:
-```svelte
-<AppFrame>Content</AppFrame>
 ```
 
 ## Footer
@@ -1618,7 +1619,7 @@ Structure:
     Footer.Copyright
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Footer.Root>
@@ -1655,7 +1656,7 @@ Structure:
     Hero.Actions
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Hero.Root>
@@ -1703,7 +1704,7 @@ Structure:
     PageHeader.Meta
 CSS variables: none
 Data attributes: data-level | data-page-header | data-page-header-actions | data-page-header-content | data-page-header-description | data-page-header-eyebrow | data-page-header-meta | data-page-header-title
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <PageHeader.Root>
@@ -1726,7 +1727,7 @@ Props: background (string) | children (Snippet), Content rendered inside the com
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
 <Surface>Content</Surface>
@@ -1805,7 +1806,7 @@ Structure:
       Breadcrumb.Separator
 CSS variables: none
 Data attributes: data-breadcrumb | data-breadcrumb-current | data-breadcrumb-item | data-breadcrumb-link | data-breadcrumb-list | data-breadcrumb-separator
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant. | Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal.
 Example:
 ```svelte
 <Breadcrumb.Root>
@@ -1864,7 +1865,7 @@ Structure:
     Pagination.Ellipsis
 CSS variables: none
 Data attributes: data-pagination-content | data-pagination-ellipsis | data-state
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <Pagination.Root>
@@ -1880,7 +1881,7 @@ Example:
 ## Stepper
 Package: @dryui/ui
 Category: navigation
-Tags: steps, wizard, progress, workflow
+Tags: steps, wizard, progress, workflow, multi-step, form
 Kind: compound
 Root import: import { Stepper } from '@dryui/ui'
 Subpath import: import { Stepper } from '@dryui/ui/stepper'
@@ -1904,7 +1905,7 @@ Structure:
       Stepper.Separator
 CSS variables: --dry-stepper-connector-width
 Data attributes: data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-state
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <Stepper.Root bind:activeStep={activeStep}>
@@ -1945,7 +1946,7 @@ Structure:
     Toolbar.Link
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <Toolbar.Root>
@@ -1993,7 +1994,7 @@ Structure:
     Menubar.Label
 CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-menubar-content | data-menubar-item | data-menubar-label | data-menubar-root | data-menubar-separator | data-menubar-trigger | data-state
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <Menubar.Root>
@@ -2040,7 +2041,7 @@ Structure:
     NavigationMenu.Link
 CSS variables: --dry-nav-menu-bg, --dry-nav-menu-border, --dry-nav-menu-content-bg, --dry-nav-menu-content-border, --dry-nav-menu-content-padding, --dry-nav-menu-content-radius, --dry-nav-menu-content-shadow, --dry-nav-menu-gap, --dry-nav-menu-link-padding-x, --dry-nav-menu-link-padding-y, --dry-nav-menu-padding, --dry-nav-menu-radius, --dry-nav-menu-shadow, --dry-nav-menu-trigger-padding-x, --dry-nav-menu-trigger-padding-y
 Data attributes: data-active (Present on the active item or current target within the component.) | data-nav-menu | data-nav-menu-content | data-nav-menu-link | data-nav-menu-list | data-nav-menu-trigger | data-state
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <NavigationMenu.Root>
@@ -2095,7 +2096,7 @@ Structure:
     Sidebar.Trigger
 CSS variables: --dry-sidebar-content-padding, --dry-sidebar-item-padding-x
 Data attributes: data-active (Present on the active item or current target within the component.) | data-collapsed | data-side (Indicates the resolved placement side for the overlay surface., values top, right, bottom, left) | data-sidebar | data-sidebar-content | data-sidebar-footer | data-sidebar-group | data-sidebar-group-label | data-sidebar-header | data-sidebar-item | data-sidebar-trigger | data-state
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <Sidebar.Root>
@@ -2132,7 +2133,7 @@ Structure:
     TableOfContents.Item
 CSS variables: --dry-toc-active-color, --dry-toc-bg, --dry-toc-border, --dry-toc-indent, --dry-toc-item-padding-x, --dry-toc-item-padding-y, --dry-toc-muted-color, --dry-toc-padding, --dry-toc-radius, --dry-toc-shadow
 Data attributes: data-active (Present on the active item or current target within the component.) | data-level | data-part
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <TableOfContents.Root>
@@ -2152,7 +2153,7 @@ Props: underline ('always' | 'hover' | 'none'), accepted always, hover, none, de
 Native props: Forwards <a> attributes via rest props.
 CSS variables: --dry-link-hover-color
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-underline
-Accessibility: none
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
 ```svelte
 <Link>Content</Link>
@@ -2190,9 +2191,9 @@ Structure:
     MegaMenu.Panel
       MegaMenu.Column
         MegaMenu.Link
-CSS variables: none
-Data attributes: data-active (Present on the active item or current target within the component.) | data-full-width | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
-Accessibility: none
+CSS variables: --dry-anchor-try-fallbacks
+Data attributes: data-active (Present on the active item or current target within the component.) | data-full-width | data-layout | data-mega-menu-column | data-mega-menu-item | data-mega-menu-link | data-mega-menu-panel | data-mega-menu-root | data-mega-menu-trigger | data-part | data-selected (Present when the current item is selected.) | data-state
+Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <MegaMenu.Root>
@@ -2311,7 +2312,7 @@ Structure:
     AlertDialog.Cancel
 CSS variables: --dry-dialog-bg, --dry-dialog-border, --dry-dialog-max-width, --dry-dialog-padding, --dry-dialog-radius, --dry-dialog-shadow, --dry-section-border, --dry-section-padding
 Data attributes: data-alert-dialog-body | data-alert-dialog-content | data-alert-dialog-footer | data-alert-dialog-header | data-alert-dialog-overlay | data-alert-dialog-panel | data-alert-dialog-trigger | data-state
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <AlertDialog.Root>
@@ -2364,7 +2365,7 @@ Structure:
       Drawer.Header
 CSS variables: --dry-drawer-bg, --dry-drawer-border, --dry-drawer-size, --dry-sidebar-bg, --dry-sidebar-border, --dry-sidebar-radius, --dry-sidebar-shadow
 Data attributes: data-drawer-body | data-drawer-content | data-drawer-footer | data-drawer-header | data-drawer-overlay | data-drawer-panel | data-drawer-trigger | data-no-padding | data-side (Indicates the resolved placement side for the overlay surface., values top, right, bottom, left) | data-state (Reflects whether the drawer is open or closed., values open, closed)
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <Drawer.Root bind:open={drawerOpen}>
@@ -2435,7 +2436,7 @@ Structure:
     Tooltip.Content
 CSS variables: none
 Data attributes: data-state | data-tooltip-content | data-tooltip-trigger
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <Tooltip.Root>
@@ -2481,7 +2482,7 @@ Structure:
       DropdownMenu.Item
 CSS variables: --dry-radius-nested
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <DropdownMenu.Root>
@@ -2533,7 +2534,7 @@ Structure:
     ContextMenu.Label
 CSS variables: --dry-menu-bg, --dry-menu-border, --dry-menu-padding, --dry-menu-radius, --dry-menu-shadow
 Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-disabled (Present when the component or part is disabled.) | data-state
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <ContextMenu.Root>
@@ -2549,7 +2550,7 @@ Example:
 ## CommandPalette
 Package: @dryui/ui
 Category: overlay
-Tags: modal, search, command, shortcut, palette
+Tags: modal, search, command, shortcut, palette, navigation, launcher
 Kind: compound
 Root import: import { CommandPalette } from '@dryui/ui'
 Subpath import: import { CommandPalette } from '@dryui/ui/command-palette'
@@ -2585,7 +2586,7 @@ Structure:
     CommandPalette.Separator
 CSS variables: --dry-cmd-bg, --dry-cmd-border, --dry-cmd-item-radius, --dry-cmd-max-width, --dry-cmd-radius, --dry-cmd-shadow
 Data attributes: data-active (Present on the active item or current target within the component.) | data-command-palette-empty | data-command-palette-group | data-command-palette-group-heading | data-command-palette-input | data-command-palette-item | data-command-palette-list | data-command-palette-root | data-command-palette-separator | data-disabled (Present when the component or part is disabled.) | data-state (Reflects whether the command palette dialog is open or closed., values open, closed) | data-value
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <CommandPalette.Root>
@@ -2601,7 +2602,7 @@ Example:
 ## LinkPreview
 Package: @dryui/ui
 Category: overlay
-Tags: link, preview, hover, popup
+Tags: link, preview, hover, popup, popover, card
 Kind: compound
 Root import: import { LinkPreview } from '@dryui/ui'
 Subpath import: import { LinkPreview } from '@dryui/ui/link-preview'
@@ -2620,7 +2621,7 @@ Structure:
     LinkPreview.Content
 CSS variables: --dry-link-preview-bg, --dry-link-preview-border, --dry-link-preview-color, --dry-link-preview-padding, --dry-link-preview-radius, --dry-link-preview-shadow, --dry-link-preview-underline-offset
 Data attributes: data-link-preview-content | data-link-preview-trigger | data-state
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <LinkPreview.Root>
@@ -2648,7 +2649,7 @@ Structure:
     Tour.Tooltip
 CSS variables: none
 Data attributes: data-part | data-placement | data-tour-next | data-tour-overlay | data-tour-prev | data-tour-root | data-tour-skip | data-tour-spotlight | data-tour-tooltip | data-tour-tooltip-actions | data-tour-tooltip-content | data-tour-tooltip-counter | data-tour-tooltip-default | data-tour-tooltip-footer | data-tour-tooltip-title
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.
 Example:
 ```svelte
 <Tour.Root>
@@ -2667,7 +2668,7 @@ Props: open (boolean), Whether the overlay or disclosure is currently open., def
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-backdrop-bg, --dry-backdrop-blur, --dry-backdrop-padding
 Data attributes: data-backdrop | data-invisible
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <Backdrop>Content</Backdrop>
@@ -2682,10 +2683,10 @@ Root import: import { HoverCard } from '@dryui/ui'
 Subpath import: import { HoverCard } from '@dryui/ui/hover-card'
 Parts:
 - HoverCard.Root
-  Props: openDelay (number), default 700 | closeDelay (number), default 300 | children (Snippet), Content rendered inside the component., required
+  Props: openDelay (number) | closeDelay (number) | children (Snippet), Content rendered inside the component., required
 - HoverCard.Trigger
   Props: href (string), Destination URL when the component renders as a link. | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards native HTML attributes via rest props.
+  Native props: Forwards <a> attributes via rest props.
 - HoverCard.Content
   Props: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
@@ -2693,9 +2694,9 @@ Structure:
   HoverCard.Root
     HoverCard.Trigger
     HoverCard.Content
-CSS variables: --dry-hover-card-bg, --dry-hover-card-border, --dry-hover-card-max-width, --dry-hover-card-min-width, --dry-hover-card-padding, --dry-hover-card-radius, --dry-hover-card-shadow
-Data attributes: data-hover-card-content | data-hover-card-trigger | data-state
-Accessibility: none
+CSS variables: --dry-btn-font-size, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-hover-card-bg, --dry-hover-card-border, --dry-hover-card-max-width, --dry-hover-card-min-width, --dry-hover-card-padding, --dry-hover-card-radius, --dry-hover-card-shadow
+Data attributes: data-hover-card-content | data-hover-card-trigger | data-hover-card-trigger-shell | data-state
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.
 Example:
 ```svelte
 <HoverCard.Root>
@@ -2707,7 +2708,7 @@ Example:
 ## NotificationCenter
 Package: @dryui/ui
 Category: overlay
-Tags: notification, bell, alerts, inbox, popover, unread
+Tags: notification, bell, alerts, inbox, popover, unread, feedback, status
 Kind: compound
 Root import: import { NotificationCenter } from '@dryui/ui'
 Subpath import: import { NotificationCenter } from '@dryui/ui/notification-center'
@@ -2734,7 +2735,7 @@ Structure:
         NotificationCenter.Item
 CSS variables: --dry-nc-item-padding, --dry-nc-panel-width, --dry-nc-unread-bg
 Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-variant
-Accessibility: none
+Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>
@@ -2780,7 +2781,7 @@ Structure:
     Card.Footer
 CSS variables: --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow, --dry-radius-nested
 Data attributes: data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Card.Root>
@@ -2859,7 +2860,7 @@ Structure:
     Collapsible.Content
 CSS variables: none
 Data attributes: data-collapsible-content | data-collapsible-content-inner | data-disabled (Present when the component or part is disabled.) | data-indicator | data-state (Reflects whether the collapsible content is expanded or collapsed., values open, closed)
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Collapsible.Root>
@@ -2910,7 +2911,7 @@ Structure:
         Table.Cell
 CSS variables: --dry-scrollbar-thumb, --dry-scrollbar-track, --dry-table-border, --dry-table-head-padding-y, --dry-table-header-bg, --dry-table-padding-x, --dry-table-padding-y
 Data attributes: data-table-wrapper
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
 <Table.Root>
@@ -2940,7 +2941,7 @@ Props: src (string), Source URL for image, video, or other media content. | alt 
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-avatar-font-size, --dry-avatar-radius, --dry-avatar-size
 Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-part | data-shape | data-size | data-status
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />
@@ -2957,7 +2958,7 @@ Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging f
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
 Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Badge variant="soft">Active</Badge>
@@ -2972,7 +2973,7 @@ Root import: import { Chart } from '@dryui/ui'
 Subpath import: import { Chart } from '@dryui/ui/chart'
 Parts:
 - Chart.Root
-  Props: data (import('@dryui/primitives').ChartDataPoint[]), required | width (number) | height (number) | padding ({ top?: number; right?: number; bottom?: number; left?: number }) | children (Snippet), Content rendered inside the component., required
+  Props: data (import('@dryui/primitives').ChartDataPoint[]), required | width (number) | height (number) | padding ({ top?: number; right?: number; bottom?: number; left?: number }) | summary (string) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <svg> attributes via rest props.
 - Chart.Bars
   Props: radius (number), default 2 | onclick ((event: { label: string; value: number; index: number }) => void)
@@ -3009,8 +3010,8 @@ Structure:
     Chart.XAxis
     Chart.YAxis
 CSS variables: --dry-chart-axis-color, --dry-chart-bar-color, --dry-chart-bg, --dry-chart-border, --dry-chart-grid-color, --dry-chart-line-color, --dry-chart-radius
-Data attributes: data-chart | data-chart-area | data-chart-axis | data-chart-bars | data-chart-container | data-chart-donut | data-chart-donut-label | data-chart-horizontal-bar | data-chart-line | data-chart-stacked-bar | data-clickable | data-part
-Accessibility: none
+Data attributes: data-chart | data-chart-a11y | data-chart-area | data-chart-axis | data-chart-bars | data-chart-container | data-chart-data-list | data-chart-donut | data-chart-donut-label | data-chart-horizontal-bar | data-chart-line | data-chart-root | data-chart-stacked-bar | data-chart-summary | data-clickable | data-interactive | data-list | data-part
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
 <Chart.Root>
@@ -3036,7 +3037,7 @@ Props: messageCount (number), required | scrollKey (number), default 0 | childre
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-chat-thread-gap, --dry-chat-thread-message-gap
 Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <ChatThread messageCount={messages.length}>
@@ -3059,7 +3060,7 @@ Props: none
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-typing-indicator-dot-color, --dry-typing-indicator-dot-size, --dry-typing-indicator-gap
 Data attributes: data-dot | data-typing-indicator
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <TypingIndicator aria-label="Assistant is typing" />
@@ -3076,7 +3077,7 @@ Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl'), Size preset affecting density, s
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-icon-color, --dry-icon-size
 Data attributes: data-color | data-size
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Icon>Content</Icon>
@@ -3093,7 +3094,7 @@ Props: fallback (string) | fallbackSnippet (Snippet)
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: --dry-image-bg, --dry-image-block-size, --dry-image-object-fit, --dry-image-place-self, --dry-image-radius
 Data attributes: data-state
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Image>Content</Image>
@@ -3110,7 +3111,7 @@ Props: keys (string[]) | children (Snippet), Content rendered inside the compone
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-kbd-bg, --dry-kbd-border, --dry-kbd-font-size, --dry-kbd-radius
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Kbd>Content</Kbd>
@@ -3147,7 +3148,7 @@ Structure:
     List.Subheader
 CSS variables: --dry-list-color, --dry-list-gap, --dry-list-item-active-bg, --dry-list-item-gap, --dry-list-item-hover-bg, --dry-list-item-icon-color, --dry-list-item-padding, --dry-list-item-radius, --dry-list-padding, --dry-list-primary-size, --dry-list-secondary-color, --dry-list-secondary-size, --dry-list-subheader-color
 Data attributes: data-dense | data-disable-padding | data-disabled (Present when the component or part is disabled.) | data-interactive | data-list-item | data-list-item-icon | data-list-item-primary | data-list-item-secondary | data-list-item-text | data-list-root | data-list-subheader
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <List.Root>
@@ -3197,7 +3198,7 @@ Structure:
         Timeline.Time
 CSS variables: --dry-timeline-item-columns, --dry-timeline-item-min-w, --dry-timeline-item-pl, --dry-timeline-item-pt, --dry-timeline-line-bottom, --dry-timeline-line-h, --dry-timeline-line-left, --dry-timeline-line-right, --dry-timeline-line-top, --dry-timeline-line-w
 Data attributes: data-level | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Timeline.Root>
@@ -3234,7 +3235,7 @@ Parts:
   Native props: Forwards <blockquote> attributes via rest props.
 CSS variables: --dry-typography-text-color
 Data attributes: data-as | data-color | data-level | data-size | data-variant
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Typography.Heading level={2}>Launch readiness</Typography.Heading>
@@ -3252,7 +3253,7 @@ Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepte
 Native props: Forwards <h*> attributes via rest props.
 CSS variables: none
 Data attributes: data-level | data-variant
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Heading level={2}>Launch readiness</Heading>
@@ -3269,7 +3270,7 @@ Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the comp
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-typography-text-color
 Data attributes: data-color | data-font | data-size | data-variant | data-weight
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Text as="p" color="secondary" size="sm">Use Text for supporting copy, labels, and starter-kit body content.</Text>
@@ -3302,7 +3303,7 @@ Structure:
       DescriptionList.Description
 CSS variables: none
 Data attributes: data-description-list | data-description-list-dd | data-description-list-item | data-description-list-term
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <DescriptionList.Root>
@@ -3328,7 +3329,7 @@ Props: src (string), Source URL for image, video, or other media content. | alt 
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-logo-mark-bg, --dry-logo-mark-color, --dry-logo-mark-font-size, --dry-logo-mark-radius, --dry-logo-mark-size
 Data attributes: data-color | data-logo-mark | data-shape | data-size
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <LogoMark>Content</LogoMark>
@@ -3345,7 +3346,7 @@ Props: variant (RevealVariant), Visual style preset for the component., default 
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-reveal-delay, --dry-reveal-distance, --dry-reveal-duration, --dry-reveal-ease, --dry-reveal-hidden-blur, --dry-reveal-hidden-opacity, --dry-reveal-hidden-scale, --dry-reveal-mask-radius, --dry-reveal-mask-top, --dry-reveal-offset-y
 Data attributes: data-reduced-motion | data-reveal | data-variant | data-visible
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Reveal variant="slide-up" delay={120}>
@@ -3366,7 +3367,7 @@ Props: radius (number), default 260 | intensity (number), default 26 | color (st
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-spotlight-color, --dry-spotlight-intensity, --dry-spotlight-radius, --dry-spotlight-x, --dry-spotlight-y
 Data attributes: data-active (Present on the active item or current target within the component.) | data-follow-pointer | data-spotlight | data-static
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Spotlight intensity={32}>
@@ -3386,8 +3387,8 @@ Subpath import: import { Marquee } from '@dryui/ui/marquee'
 Props: speed (number), default 50 | direction ('left' | 'right' | 'up' | 'down'), accepted left, right, up, down, default 'left' | pauseOnHover (boolean), default false | fade (boolean), default false | gap (string), default '1rem' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-marquee-gap, --dry-marquee-speed
-Data attributes: data-direction | data-fade | data-marquee | data-marquee-content | data-marquee-track | data-pause-on-hover | data-reduced-motion
-Accessibility: none
+Data attributes: data-direction | data-fade | data-marquee | data-marquee-content | data-marquee-track | data-pause-on-hover | data-paused | data-reduced-motion
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <Marquee>Content</Marquee>
@@ -3404,7 +3405,7 @@ Props: value (string), Current controlled or bindable value., required | size (n
 Native props: Forwards <canvas> attributes via rest props.
 CSS variables: --dry-qr-bg, --dry-qr-border, --dry-qr-padding, --dry-qr-radius, --dry-qr-size
 Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <QRCode>Content</QRCode>
@@ -3421,7 +3422,7 @@ Props: showLineNumbers (boolean), default false | showCopyButton (boolean), defa
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-btn-color, --dry-code-bg, --dry-code-border, --dry-code-color, --dry-code-copy-color, --dry-code-copy-hover-color, --dry-code-font-size, --dry-code-header-bg, --dry-code-header-color, --dry-code-line-height, --dry-code-padding, --dry-code-radius
 Data attributes: data-code-block | data-code-block-code | data-code-block-copy | data-code-block-header | data-code-block-language | data-code-block-line-content | data-code-block-line-number | data-code-block-pre | data-code-block-token-link | data-copied | data-language | data-single-line | data-token-type
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <CodeBlock>Content</CodeBlock>
@@ -3438,7 +3439,7 @@ Props: content (string), required | sanitize (boolean), default true
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-markdown-blockquote-border, --dry-markdown-blockquote-color, --dry-markdown-code-bg, --dry-markdown-code-border, --dry-markdown-code-color, --dry-markdown-color, --dry-markdown-font-size, --dry-markdown-heading-color, --dry-markdown-hr-color, --dry-markdown-line-height, --dry-markdown-link-color, --dry-markdown-link-hover-color, --dry-markdown-max-width
 Data attributes: data-code-block | data-language | data-markdown-renderer | data-markdown-renderer-root
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <MarkdownRenderer>Content</MarkdownRenderer>
@@ -3455,7 +3456,7 @@ Props: items (T[]), required | itemHeight (number | ((index: number) => number))
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-virtual-list-scrollbar-radius, --dry-virtual-list-scrollbar-thumb, --dry-virtual-list-scrollbar-thumb-hover, --dry-virtual-list-scrollbar-track, --dry-virtual-list-scrollbar-width
 Data attributes: data-virtual-list | data-virtual-list-inner
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <VirtualList>Content</VirtualList>
@@ -3472,7 +3473,7 @@ Props: onLoadMore (() => void | Promise<void>), required | hasMore (boolean), de
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-infinite-scroll-end-color, --dry-infinite-scroll-end-font-size, --dry-infinite-scroll-end-padding, --dry-infinite-scroll-indicator-color, --dry-infinite-scroll-indicator-padding
 Data attributes: data-infinite-scroll | data-is-end-message | data-is-indicator | data-is-sentinel
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <InfiniteScroll>Content</InfiniteScroll>
@@ -3537,7 +3538,7 @@ Structure:
     DataGrid.ExpandTrigger
 CSS variables: --dry-data-grid-border, --dry-data-grid-head-padding-y, --dry-data-grid-header-bg, --dry-data-grid-padding-x, --dry-data-grid-padding-y, --dry-data-grid-pagination-gap, --dry-data-grid-row-hover, --dry-data-grid-row-stripe, --dry-data-grid-sort-color
 Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
 <DataGrid.Root>
@@ -3593,8 +3594,8 @@ Structure:
     Carousel.Dots
     Carousel.Thumbnails
 CSS variables: --dry-carousel-gap, --dry-carousel-slide-size
-Data attributes: data-active (Present on the active item or current target within the component.) | data-carousel-dots | data-carousel-root | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-position
-Accessibility: none
+Data attributes: data-active (Present on the active item or current target within the component.) | data-autoplay-enabled | data-autoplay-state | data-carousel-dots | data-carousel-root | data-carousel-rotation-control | data-carousel-slide | data-carousel-thumbnails | data-carousel-viewport | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-position
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences. | Only add region semantics when the scrollable surface has a unique, meaningful label.
 Example:
 ```svelte
 <Carousel.Root>
@@ -3618,7 +3619,7 @@ Props: value (number), Current controlled or bindable value., required | locale 
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-format-bytes-color, --dry-format-bytes-font-size
 Data attributes: data-format-bytes
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <FormatBytes>Content</FormatBytes>
@@ -3635,7 +3636,7 @@ Props: date (Date | string | number), required | locale (string), default 'en' |
 Native props: Forwards <time> attributes via rest props.
 CSS variables: --dry-format-date-color, --dry-format-date-font-size
 Data attributes: data-format-date
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <FormatDate>Content</FormatDate>
@@ -3652,7 +3653,7 @@ Props: value (number), Current controlled or bindable value., required | locale 
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-format-number-color, --dry-format-number-font-size
 Data attributes: data-format-number
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <FormatNumber>Content</FormatNumber>
@@ -3669,7 +3670,7 @@ Props: position (number), default 50, bindable | orientation ('horizontal' | 've
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-image-comparison-arrow-color, --dry-image-comparison-arrow-width, --dry-image-comparison-arrow-width-wide, --dry-image-comparison-grip-z-index, --dry-image-comparison-handle-color, --dry-image-comparison-handle-shadow, --dry-image-comparison-handle-width, --dry-image-comparison-handle-z-index, --dry-image-comparison-position, --dry-image-comparison-radius
 Data attributes: data-dragging | data-ic-grip | data-ic-grip-arrow | data-ic-grip-arrow-end | data-ic-grip-arrow-start | data-ic-grip-arrows | data-ic-handle | data-ic-handle-line | data-ic-handle-wrapper | data-ic-layer | data-ic-layer-before | data-image-comparison | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.
 Example:
 ```svelte
 <ImageComparison>Content</ImageComparison>
@@ -3686,7 +3687,7 @@ Props: date (Date | string | number), required | locale (string), default 'en' |
 Native props: Forwards <time> attributes via rest props.
 CSS variables: --dry-relative-time-color, --dry-relative-time-font-size
 Data attributes: data-relative-time
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <RelativeTime>Content</RelativeTime>
@@ -3717,9 +3718,9 @@ Structure:
     Tree.Item
     Tree.ItemLabel
     Tree.ItemChildren
-CSS variables: --dry-tree-icon-size, --dry-tree-indent, --dry-tree-item-hover-bg, --dry-tree-item-padding, --dry-tree-item-radius, --dry-tree-item-selected-bg, --dry-tree-item-selected-color, --dry-tree-item-selected-indicator
-Data attributes: data-expanded | data-item-id | data-part | data-selected (Present when the current item is selected.) | data-state | data-tree-label
-Accessibility: none
+CSS variables: --dry-tree-icon-size, --dry-tree-indent, --dry-tree-item-focus-offset, --dry-tree-item-focus-ring, --dry-tree-item-hover-bg, --dry-tree-item-padding, --dry-tree-item-radius, --dry-tree-item-selected-bg, --dry-tree-item-selected-color, --dry-tree-item-selected-indicator
+Data attributes: data-branch | data-expanded | data-focused | data-item-id | data-part | data-selected (Present when the current item is selected.) | data-state
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal.
 Example:
 ```svelte
 <Tree.Root>
@@ -3740,7 +3741,7 @@ Props: value (number), Current controlled or bindable value., required | min (nu
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-gauge-fill-color, --dry-gauge-size, --dry-gauge-stroke-width, --dry-gauge-track-color
 Data attributes: data-gauge | data-gauge-label | data-part
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Gauge value={72} min={0} max={100} thresholds={[{ value: 30, color: "red" }, { value: 70, color: "orange" }, { value: 90, color: "green" }]} />
@@ -3757,7 +3758,7 @@ Props: data (number[]), required | width (number), default 100 | height (number)
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-sparkline-color, --dry-sparkline-fill-opacity
 Data attributes: data-part | data-sparkline
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
 <Sparkline data={[5, 10, 3, 8, 12, 7]} width={120} height={30} />
@@ -3786,7 +3787,7 @@ Structure:
     FlipCard.Back
 CSS variables: --dry-flip-card-back-transform, --dry-flip-card-duration, --dry-flip-card-front-transform, --dry-flip-card-perspective
 Data attributes: data-direction | data-flip-card | data-flip-card-back | data-flip-card-front | data-flipped | data-part | data-trigger
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <FlipCard.Root trigger="hover">
@@ -3806,7 +3807,7 @@ Props: src (string), Source URL for image, video, or other media content., requi
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-video-embed-play-size, --dry-video-embed-radius
 Data attributes: data-activated | data-part | data-provider | data-video-embed
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <VideoEmbed src="https://youtube.com/watch?v=dQw4w9WgXcQ" provider="youtube" title="Video title" />
@@ -3838,7 +3839,7 @@ Structure:
     Map.Controls
 CSS variables: --dry-map-border, --dry-map-radius
 Data attributes: data-map-root | data-part
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Map.Root center={[-122.4, 37.8]} zoom={12}>
@@ -3864,7 +3865,7 @@ Structure:
   StarRating.Root
 CSS variables: --dry-star-rating-color, --dry-star-rating-size
 Data attributes: data-label | data-size | data-star | data-star-rating | data-stars
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <StarRating.Root>
@@ -3874,7 +3875,7 @@ Example:
 ## Tag
 Package: @dryui/ui
 Category: display
-Tags: tag, label, chip, badge, category
+Tags: tag, label, chip, badge, category, status
 Kind: simple
 Root import: import { Tag } from '@dryui/ui'
 Subpath import: import { Tag } from '@dryui/ui/tag'
@@ -3882,7 +3883,7 @@ Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the compo
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-tag-bg, --dry-tag-border, --dry-tag-color, --dry-tag-font-size, --dry-tag-padding-x, --dry-tag-padding-y
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Tag>Content</Tag>
@@ -3899,7 +3900,7 @@ Props: config (DiagramConfig), required | width (number) | height (number)
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
 Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-fit | data-has-description | data-has-icon-component | data-icon-svg | data-part | data-self-loop | data-state | data-variant
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
 <Diagram>Content</Diagram>
@@ -3915,7 +3916,7 @@ Props: count (number), default 0 | maxVisible (number), default 4 | size ('sm' |
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-overflow | data-overlap | data-part | data-size | data-status
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <AvatarGroup>Content</AvatarGroup>
@@ -3931,7 +3932,7 @@ Props: role ('user' | 'assistant' | 'system'), accepted user, assistant, system,
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-part | data-role | data-typing
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.
 Example:
 ```svelte
 <ChatMessage>Content</ChatMessage>
@@ -3967,7 +3968,7 @@ Structure:
     EmptyState.Action
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <EmptyState.Root>
@@ -3996,7 +3997,7 @@ Structure:
     LogoCloud.Item
 CSS variables: none
 Data attributes: data-part
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <LogoCloud.Root>
@@ -4030,7 +4031,7 @@ Structure:
     StatCard.Trend
 CSS variables: none
 Data attributes: data-density | data-direction | data-part | data-tone
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <StatCard.Root>
@@ -4050,7 +4051,7 @@ Props: name (string), Field name used during native form submission., required |
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <User>Content</User>
@@ -4069,7 +4070,7 @@ Props: variant (AlertVariant), Visual style preset for the component., default '
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-alert-bg, --dry-alert-border, --dry-alert-icon-color, --dry-radius-nested
 Data attributes: data-alert | data-alert-body | data-alert-close | data-alert-description | data-alert-icon | data-alert-title | data-dismissible | data-variant
-Accessibility: none
+Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.
 Example:
 ```svelte
 <Alert variant="info">
@@ -4135,7 +4136,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-progress-bar, --dry-progress-height, --dry-progress-label-inside, --dry-progress-radius
 Data attributes: data-color | data-has-label | data-max | data-part | data-position | data-segmented | data-size | data-state | data-value | data-with-label
-Accessibility: none
+Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced.
 Example:
 ```svelte
 <Progress value={65} max={100} />
@@ -4152,7 +4153,7 @@ Props: variant ('text' | 'circular' | 'rectangular'), Visual style preset for th
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-skeleton-color, --dry-skeleton-highlight, --dry-skeleton-radius
 Data attributes: data-variant
-Accessibility: none
+Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced.
 Example:
 ```svelte
 <Skeleton width="200px" height="1rem" />
@@ -4169,7 +4170,7 @@ Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typ
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: --dry-spinner-color, --dry-spinner-size, --dry-spinner-width
 Data attributes: data-color | data-size
-Accessibility: none
+Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced.
 Example:
 ```svelte
 <Spinner size="md" />
@@ -4186,7 +4187,7 @@ Props: color ('primary' | 'gray' | 'green' | 'red' | 'yellow'), Semantic color o
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-progress-ring-indeterminate-speed, --dry-progress-ring-indicator-color
 Data attributes: data-color | data-max | data-part | data-state | data-value
-Accessibility: none
+Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced.
 Example:
 ```svelte
 <ProgressRing>Content</ProgressRing>
@@ -4219,8 +4220,8 @@ Structure:
     DragAndDrop.Handle
     DragAndDrop.Group
 CSS variables: none
-Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-item | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over | data-over-end
-Accessibility: none
+Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-instructions | data-dnd-item | data-dnd-live-region | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-handle | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over | data-over-end
+Accessibility: Provide a clear accessible name for every interactive target and keep the action model consistent. | Match keyboard behavior to the established widget pattern rather than inventing a custom key map.
 Example:
 ```svelte
 <DragAndDrop.Root>
@@ -4242,7 +4243,7 @@ Subpath import: import { Portal } from '@dryui/ui/portal'
 Props: target (string | HTMLElement | undefined), Browsing context used for link navigation. | disabled (boolean | undefined), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
 CSS variables: none
 Data attributes: data-dry-portal
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Portal>Content</Portal>
@@ -4259,7 +4260,7 @@ Props: children (Snippet), Content rendered inside the component., required
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <VisuallyHidden>Content</VisuallyHidden>
@@ -4276,7 +4277,7 @@ Props: active (boolean | undefined) | initialFocus (string | undefined) | return
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
 <FocusTrap>Content</FocusTrap>
@@ -4292,7 +4293,7 @@ Subpath import: import { Hotkey } from '@dryui/ui/hotkey'
 Props: keys (string), required | handler (() => void), required | enabled (boolean) | preventDefault (boolean)
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Hotkey>Content</Hotkey>
@@ -4309,7 +4310,7 @@ Props: children (Snippet), Content rendered inside the component. | viewBox (str
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
 <Svg>Content</Svg>
@@ -4327,8 +4328,8 @@ Subpath import: import { ChromaticShift } from '@dryui/ui/chromatic-shift'
 Props: offset (number), default 3 | channels (ChromaticShiftChannels), default 'rgb' | trigger (ChromaticShiftTrigger), default 'hover' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-chromatic-offset
-Data attributes: data-active (Present on the active item or current target within the component.) | data-animated | data-channels | data-chromatic-shift | data-reduced-motion
-Accessibility: none
+Data attributes: data-active (Present on the active item or current target within the component.) | data-animated | data-channels | data-chromatic-shift | data-paused | data-reduced-motion
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <ChromaticShift>Content</ChromaticShift>
@@ -4345,7 +4346,7 @@ Props: offset (number), default 3 | angle (number), default 0 | children (Snippe
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-chromatic-aberration | data-chromatic-aberration-svg
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <ChromaticAberration>Content</ChromaticAberration>
@@ -4362,7 +4363,7 @@ Props: scale (number), default 12 | turbulence (DisplacementTurbulence), default
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-animated | data-displacement | data-displacement-svg | data-reduced-motion | data-turbulence
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Displacement>Content</Displacement>
@@ -4379,7 +4380,7 @@ Props: color (string), Semantic color or tone applied to the component., default
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-glow-blend, --dry-glow-color, --dry-glow-intensity, --dry-glow-radius
 Data attributes: data-glow
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Glow>Content</Glow>
@@ -4396,7 +4397,7 @@ Props: brightness (number) | contrast (number) | saturate (number) | hueRotate (
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-adjust
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Adjust>Content</Adjust>
@@ -4412,8 +4413,8 @@ Subpath import: import { Beam } from '@dryui/ui/beam'
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-beam-angle, --dry-beam-color, --dry-beam-intensity, --dry-beam-speed, --dry-beam-width
-Data attributes: data-beam | data-beam-layer
-Accessibility: none
+Data attributes: data-beam | data-beam-layer | data-offscreen
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Beam>Content</Beam>
@@ -4429,8 +4430,8 @@ Subpath import: import { BorderBeam } from '@dryui/ui/border-beam'
 Props: size (BorderBeamSize), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`). | colorVariant (BorderBeamColorVariant), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments. | theme (BorderBeamTheme), Color tuning for dark or light surfaces, or system preference when set to `auto`. | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
-Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-offscreen | data-size (Reflects the current effect mode preset., values sm, md, line)
-Accessibility: none
+Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-size (Reflects the current effect mode preset., values sm, md, line)
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <BorderBeam>Content</BorderBeam>
@@ -4447,7 +4448,7 @@ Props: color (string), Semantic color or tone applied to the component., default
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
 Data attributes: data-active (Present on the active item or current target within the component.) | data-shimmer | data-shimmer-base | data-shimmer-streak
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Shimmer>Content</Shimmer>
@@ -4464,7 +4465,7 @@ Props: blur (number), default 12 | tint (string), default 'rgba(255 | saturation
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-glass
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Glass>Content</Glass>
@@ -4480,8 +4481,8 @@ Subpath import: import { GodRays } from '@dryui/ui/god-rays'
 Props: color (string), Semantic color or tone applied to the component. | rayCount (number) | intensity (number) | center ({ x: number; y: number }) | speed (number) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-rays-blend, --dry-rays-color, --dry-rays-cx, --dry-rays-cy, --dry-rays-intensity, --dry-rays-speed
-Data attributes: data-animated | data-god-rays | data-god-rays-layer
-Accessibility: none
+Data attributes: data-animated | data-god-rays | data-god-rays-layer | data-offscreen
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <GodRays>Content</GodRays>
@@ -4497,8 +4498,8 @@ Subpath import: import { GradientMesh } from '@dryui/ui/gradient-mesh'
 Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed (GradientMeshSpeed), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mesh-color-1, --dry-mesh-color-2, --dry-mesh-color-3, --dry-mesh-color-4, --dry-mesh-duration, --dry-mesh-pointer-x, --dry-mesh-pointer-y
-Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-reduced-motion
-Accessibility: none
+Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <GradientMesh>Content</GradientMesh>
@@ -4515,7 +4516,7 @@ Props: dotSize (HalftoneDotSize), default 'medium' | angle (number), default 45 
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-halftone-angle, --dry-halftone-color, --dry-halftone-dot-radius, --dry-halftone-opacity, --dry-halftone-pattern-size
 Data attributes: data-dot-size | data-halftone | data-halftone-content
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <Halftone>Content</Halftone>
@@ -4532,7 +4533,7 @@ Props: shape (MaskRevealShape), default 'circle' | direction ('in' | 'out'), acc
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mask-reveal-duration, --dry-mask-reveal-ease, --dry-mask-reveal-size
 Data attributes: data-direction | data-mask-reveal | data-mask-reveal-root | data-reduced-motion | data-revealed | data-shape
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <MaskReveal>Content</MaskReveal>
@@ -4549,7 +4550,7 @@ Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['verte
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-reduced-motion | data-shader-canvas | data-shader-canvas-root | data-webgl
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <ShaderCanvas>Content</ShaderCanvas>
@@ -4565,7 +4566,7 @@ Props: shape ('wave' | 'curve' | 'angle' | 'zigzag'), accepted wave, curve, angl
 Native props: Forwards <svg> attributes via rest props.
 CSS variables: none
 Data attributes: none
-Accessibility: none
+Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
 ```svelte
 <WaveDivider>Content</WaveDivider>

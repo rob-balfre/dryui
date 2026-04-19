@@ -2,6 +2,11 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import {
+		observeInViewport,
+		observePageVisibility,
+		observeReducedMotionPreference
+	} from '@dryui/primitives/internal/motion';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		offset?: number;
@@ -24,6 +29,9 @@
 
 	let active = $state(false);
 	let prefersReducedMotion = $state(false);
+	let onScreen = $state(true);
+	let tabVisible = $state(true);
+	const paused = $derived(!onScreen || !tabVisible);
 
 	const shouldActivate = $derived.by(() => {
 		if (prefersReducedMotion) return false;
@@ -42,20 +50,33 @@
 
 	const offsetValue = $derived(`${Math.max(0, offset)}px`);
 
-	onMount(() => {
-		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-		prefersReducedMotion = mql.matches;
-		const handler = (e: MediaQueryListEvent) => {
-			prefersReducedMotion = e.matches;
-		};
-		mql.addEventListener('change', handler);
-		return () => mql.removeEventListener('change', handler);
-	});
+	onMount(() =>
+		observeReducedMotionPreference((matches) => {
+			prefersReducedMotion = matches;
+		})
+	);
 
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
 			node.style.setProperty('--dry-chromatic-offset', offsetValue);
+		});
+
+		$effect(() => {
+			const stopViewport = observeInViewport(
+				node,
+				(inView) => {
+					onScreen = inView;
+				},
+				{ rootMargin: '200px' }
+			);
+			const stopVisibility = observePageVisibility((visible) => {
+				tabVisible = visible;
+			});
+			return () => {
+				stopViewport();
+				stopVisibility();
+			};
 		});
 	}
 </script>
@@ -67,6 +88,7 @@
 	data-channels={channels}
 	data-animated={(animated && !prefersReducedMotion) || undefined}
 	data-reduced-motion={prefersReducedMotion || undefined}
+	data-paused={paused || undefined}
 	onpointerenter={trigger === 'hover' ? handlePointerEnter : undefined}
 	onpointerleave={trigger === 'hover' ? handlePointerLeave : undefined}
 	{...rest}
@@ -141,6 +163,11 @@
 
 	[data-chromatic-shift][data-animated]::after {
 		animation: chromatic-drift-b 4s ease-in-out infinite alternate-reverse;
+	}
+
+	[data-chromatic-shift][data-animated][data-paused]::before,
+	[data-chromatic-shift][data-animated][data-paused]::after {
+		animation-play-state: paused;
 	}
 
 	@keyframes chromatic-drift-r {

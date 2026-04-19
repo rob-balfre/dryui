@@ -25,12 +25,9 @@
 </script>
 
 <label
-	role="option"
 	data-transfer-item
 	data-disabled={disabled ? '' : undefined}
 	data-selected={isSelected ? '' : undefined}
-	aria-selected={isSelected}
-	aria-disabled={disabled}
 	{...rest}
 >
 	<Checkbox checked={isSelected} {disabled} onchange={toggle} size="sm" />

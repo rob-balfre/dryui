@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { SVGAttributes } from 'svelte/elements';
-	import { getChartCtx } from './context.svelte.js';
+	import { getChartCtx, registerChartInteractive } from './context.svelte.js';
 
 	interface Props extends Omit<SVGAttributes<SVGGElement>, 'onclick'> {
 		radius?: number;
@@ -31,12 +31,32 @@
 	function handleClick(bar: (typeof bars)[number]) {
 		onclick?.({ label: bar.point.label, value: bar.point.value, index: bar.index });
 	}
+
+	function attachBarClick(bar: (typeof bars)[number]) {
+		if (!onclick) return undefined;
+
+		return (node: SVGRectElement) => {
+			const handleNodeClick = () => handleClick(bar);
+			node.addEventListener('click', handleNodeClick);
+			return () => node.removeEventListener('click', handleNodeClick);
+		};
+	}
+
+	const registeredHandler = $derived(
+		onclick
+			? (index: number) => {
+					const point = ctx.data[index];
+					if (!point) return;
+					onclick({ label: point.label, value: point.value, index });
+				}
+			: undefined
+	);
+
+	registerChartInteractive(ctx, () => registeredHandler);
 </script>
 
 <g role="list" aria-label="Bar chart data" data-chart-bars class={className} {...rest}>
-	{#each bars as bar}
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	{#each bars as bar (bar.index)}
 		<rect
 			x={bar.x}
 			y={bar.y}
@@ -44,20 +64,9 @@
 			height={bar.height}
 			rx={radius}
 			fill={bar.point.color ?? 'currentColor'}
-			role={onclick ? 'button' : 'listitem'}
-			tabindex={onclick ? 0 : undefined}
-			aria-label="{bar.point.label}: {bar.point.value}"
 			data-part="bar"
 			data-clickable={onclick ? '' : undefined}
-			onclick={onclick ? () => handleClick(bar) : undefined}
-			onkeydown={onclick
-				? (e: KeyboardEvent) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							handleClick(bar);
-						}
-					}
-				: undefined}
+			{@attach attachBarClick(bar)}
 		/>
 	{/each}
 </g>

@@ -22,7 +22,8 @@
 <div
 	class={className}
 	id={ctx.contentId}
-	role="region"
+	aria-hidden={!ctx.open}
+	inert={!ctx.open}
 	data-state={ctx.open ? 'open' : 'closed'}
 	data-collapsible-content
 	{...rest}

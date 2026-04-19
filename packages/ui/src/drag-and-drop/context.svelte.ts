@@ -7,6 +7,8 @@ export interface DragAndDropContext {
 	readonly orientation: 'vertical' | 'horizontal';
 	readonly hasHandle: boolean;
 	readonly foreignOverIndex: number | null;
+	readonly instructionsId: string;
+	readonly itemCount: number;
 	registerHandle: () => void;
 	startDrag: (index: number, event: PointerEvent) => void;
 	handleDragOver: (index: number) => void;

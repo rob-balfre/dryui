@@ -22,7 +22,8 @@
 <div
 	class={['content', className]}
 	id={itemCtx.contentId}
-	role="region"
+	aria-hidden={!itemCtx.open}
+	inert={!itemCtx.open}
 	data-state={itemCtx.open ? 'open' : 'closed'}
 	{...rest}
 	use:applyStyles

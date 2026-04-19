@@ -301,7 +301,10 @@
 			<div class="menu-area">
 				<MegaMenu.Root>
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Sparkles size={14} aria-hidden="true" />Preset</MegaMenu.Trigger>
+						<MegaMenu.Trigger
+							><Sparkles size={14} aria-hidden="true" /><span class="trigger-label">Preset</span
+							></MegaMenu.Trigger
+						>
 						<MegaMenu.Panel align="center">
 							{#each [['Starting points', startingPresets], ['Technical', technicalPresets], ['Editorial', editorialPresets]] as const as [title, group] (title)}
 								<MegaMenu.Column {title}>
@@ -332,7 +335,10 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Palette size={14} aria-hidden="true" />Colour</MegaMenu.Trigger>
+						<MegaMenu.Trigger
+							><Palette size={14} aria-hidden="true" /><span class="trigger-label">Colour</span
+							></MegaMenu.Trigger
+						>
 						<MegaMenu.Panel align="center" fullWidth>
 							<MegaMenu.Column title="Picker">
 								<ColorPicker.Root
@@ -373,7 +379,10 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Type size={14} aria-hidden="true" />Typography</MegaMenu.Trigger>
+						<MegaMenu.Trigger
+							><Type size={14} aria-hidden="true" /><span class="trigger-label">Typography</span
+							></MegaMenu.Trigger
+						>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Font family">
 								<div class="wizard-option-scope wizard-option-grid wizard-font-options">
@@ -417,7 +426,10 @@
 					</MegaMenu.Item>
 
 					<MegaMenu.Item>
-						<MegaMenu.Trigger><Shapes size={14} aria-hidden="true" />Shape</MegaMenu.Trigger>
+						<MegaMenu.Trigger
+							><Shapes size={14} aria-hidden="true" /><span class="trigger-label">Shape</span
+							></MegaMenu.Trigger
+						>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Style">
 								<div class="wizard-option-scope wizard-option-list">
@@ -467,7 +479,9 @@
 
 					<MegaMenu.Item>
 						<MegaMenu.Trigger
-							><SlidersHorizontal size={14} aria-hidden="true" />Adjust</MegaMenu.Trigger
+							><SlidersHorizontal size={14} aria-hidden="true" /><span class="trigger-label"
+								>Adjust</span
+							></MegaMenu.Trigger
 						>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Filters">
@@ -519,7 +533,7 @@
 							{#if allContrastPass}<ShieldCheck size={14} aria-hidden="true" />{:else}<ShieldAlert
 									size={14}
 									aria-hidden="true"
-								/>{/if}Contrast
+								/>{/if}<span class="trigger-label">Contrast</span>
 						</MegaMenu.Trigger>
 						<MegaMenu.Panel align="center">
 							<MegaMenu.Column title="Light mode">
@@ -627,6 +641,7 @@
 		);
 		--wizard-accent-fg: var(--dry-color-text-strong);
 		display: grid;
+		container-type: inline-size;
 		gap: var(--dry-space-6);
 		padding-block: var(--dry-space-4) var(--dry-space-10);
 	}
@@ -651,13 +666,13 @@
 
 	.control-bar {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
 		align-items: center;
-		justify-self: center;
+		justify-self: stretch;
 		gap: var(--dry-space-1);
 		padding-inline: var(--dry-space-2);
-		padding-block: var(--dry-space-1);
+		padding-block: var(--dry-space-2);
 		border: 1px solid
 			color-mix(in srgb, var(--dry-color-stroke-weak) 76%, var(--dry-color-fill-brand) 24%);
 		border-radius: var(--dry-radius-lg);
@@ -665,12 +680,15 @@
 	}
 
 	.below-bar-actions {
-		justify-self: center;
+		justify-self: stretch;
 		padding-top: var(--dry-space-3);
 	}
 
 	.menu-area {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-self: stretch;
+		justify-items: center;
 		--dry-mega-menu-panel-bg: color-mix(
 			in srgb,
 			var(--dry-color-bg-raised) 94%,
@@ -687,12 +705,55 @@
 		--dry-btn-trigger-open-border: var(--wizard-accent-border);
 	}
 
+	.trigger-label {
+		position: absolute;
+		clip-path: inset(50%);
+		overflow: hidden;
+		white-space: nowrap;
+		block-size: 1px;
+		padding: 0;
+		margin: -1px;
+	}
+
 	.bar-actions {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
 		align-items: center;
 		gap: var(--dry-space-2);
+	}
+
+	@container (min-width: 52rem) {
+		.control-bar {
+			grid-auto-flow: column;
+			grid-template-columns: none;
+			grid-auto-columns: max-content;
+			justify-self: center;
+			padding-block: var(--dry-space-1);
+		}
+
+		.menu-area {
+			justify-self: start;
+			justify-items: start;
+		}
+
+		.trigger-label {
+			position: static;
+			clip-path: none;
+			overflow: visible;
+			white-space: normal;
+			block-size: auto;
+			margin: 0;
+		}
+
+		.bar-actions {
+			grid-template-columns: none;
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+		}
+
+		.below-bar-actions {
+			justify-self: center;
+		}
 	}
 
 	.wizard-action-scope {
@@ -753,7 +814,22 @@
 	}
 
 	.wizard-preset-column {
-		grid-template-columns: minmax(14rem, 16rem);
+		grid-template-columns: minmax(13.25rem, 14.75rem);
+		--dry-option-picker-gap: var(--dry-space-1_5, var(--dry-space-2));
+		--dry-option-picker-item-gap: var(--dry-space-2_5, var(--dry-space-3));
+		--dry-option-picker-item-column-gap: var(--dry-space-2_5, var(--dry-space-3));
+		--dry-option-picker-item-row-gap: var(--dry-space-1, 0.25rem);
+		--dry-option-picker-padding-y: var(--dry-space-2_5, 0.625rem);
+		--dry-option-picker-padding-x: var(--dry-space-3, 0.75rem);
+		--dry-option-picker-content-align: start;
+		--dry-option-picker-compact-min-block-size: 4.75rem;
+		--dry-option-picker-preview-align-self: start;
+		--dry-option-picker-preview-offset-block-start: 0.125rem;
+		--dry-option-picker-preview-preset-size: 2.5rem;
+		--dry-option-picker-label-size: 0.9375rem;
+		--dry-option-picker-label-line-height: 1.1;
+		--dry-option-picker-description-size: 0.875rem;
+		--dry-option-picker-description-line-height: 1.3;
 	}
 
 	/* ─── Preset items ────────────────────────────────────────────────────── */

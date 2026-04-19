@@ -24,6 +24,11 @@
       "types": "./dist/rule-catalog.d.ts",
       "bun": "./src/rule-catalog.ts",
       "default": "./dist/rule-catalog.js"
+    },
+    "./rules": {
+      "types": "./dist/rules.d.ts",
+      "bun": "./src/rules.ts",
+      "default": "./dist/rules.js"
     }
   },
   "scripts": {

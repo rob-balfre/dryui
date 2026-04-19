@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
+	import { VisuallyHidden } from '../visually-hidden/index.js';
 	import { getCarouselCtx } from './context.svelte.js';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -14,24 +15,36 @@
 </script>
 
 <div
-	role="tablist"
-	aria-label="Slide thumbnails"
+	role="group"
+	aria-label="Choose slide to display"
 	data-carousel-thumbnails
 	data-position={position}
 	class={className}
 	{...rest}
 >
 	{#each Array(ctx.totalSlides) as _, i (i)}
+		{@const isActive = ctx.activeIndex === i}
 		<Button
 			variant="bare"
 			type="button"
-			role="tab"
-			aria-selected={ctx.activeIndex === i}
-			aria-label="Go to slide {i + 1}"
-			data-active={ctx.activeIndex === i ? '' : undefined}
-			onclick={() => ctx.scrollTo(i)}
+			aria-controls={ctx.getSlideId(i)}
+			aria-disabled={isActive ? true : undefined}
+			data-active={isActive ? '' : undefined}
+			onclick={() => {
+				if (!isActive) {
+					ctx.scrollTo(i);
+				}
+			}}
 		>
-			{@render children({ index: i, isActive: ctx.activeIndex === i, scrollTo: ctx.scrollTo })}
+			<VisuallyHidden>
+				Show slide {i + 1} of {ctx.totalSlides}
+				{#if isActive}
+					(current slide)
+				{/if}
+			</VisuallyHidden>
+			<span class="thumbnail-preview" aria-hidden="true">
+				{@render children({ index: i, isActive, scrollTo: ctx.scrollTo })}
+			</span>
 		</Button>
 	{/each}
 </div>
@@ -61,5 +74,9 @@
 		grid-auto-columns: unset;
 		overflow-y: auto;
 		overflow-x: hidden;
+	}
+
+	.thumbnail-preview {
+		display: inline-grid;
 	}
 </style>

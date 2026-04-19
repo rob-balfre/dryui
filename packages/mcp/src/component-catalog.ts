@@ -31,7 +31,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	AspectRatio: {
 		description: 'Constrains child content to a specific aspect ratio',
 		category: 'layout',
-		tags: ['image', 'video', 'ratio', 'responsive']
+		tags: ['image', 'video', 'ratio', 'responsive', 'media', 'frame']
 	},
 	Adjust: {
 		description:
@@ -164,7 +164,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	CommandPalette: {
 		description: 'Searchable command menu dialog',
 		category: 'overlay',
-		tags: ['modal', 'search', 'command', 'shortcut', 'palette']
+		tags: ['modal', 'search', 'command', 'shortcut', 'palette', 'navigation', 'launcher']
 	},
 	Container: {
 		description: 'Centered content container with max-width',
@@ -375,7 +375,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	LinkPreview: {
 		description: 'Link preview popup on hover',
 		category: 'overlay',
-		tags: ['link', 'preview', 'hover', 'popup']
+		tags: ['link', 'preview', 'hover', 'popup', 'popover', 'card']
 	},
 	List: {
 		description: 'Structured list with items, icons, and subheaders',
@@ -436,7 +436,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	NotificationCenter: {
 		description: 'Notification panel with trigger, groups, and items',
 		category: 'overlay',
-		tags: ['notification', 'bell', 'alerts', 'inbox', 'popover', 'unread']
+		tags: ['notification', 'bell', 'alerts', 'inbox', 'popover', 'unread', 'feedback', 'status']
 	},
 	NumberInput: {
 		description: 'Numeric input with increment/decrement controls',
@@ -543,7 +543,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	SegmentedControl: {
 		description: 'Compact segmented switch for mutually exclusive options',
 		category: 'form',
-		tags: ['segmented', 'switcher', 'single-select', 'view-toggle']
+		tags: ['segmented', 'switcher', 'single-select', 'view-toggle', 'tabs', 'toggle']
 	},
 	Select: {
 		description: 'Closed dropdown select for choosing one option from a fixed list',
@@ -604,7 +604,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	Stepper: {
 		description: 'Step-by-step progress indicator',
 		category: 'navigation',
-		tags: ['steps', 'wizard', 'progress', 'workflow']
+		tags: ['steps', 'wizard', 'progress', 'workflow', 'multi-step', 'form']
 	},
 	Svg: {
 		description: 'Accessible SVG wrapper with viewBox and aria-label defaults',
@@ -746,7 +746,7 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 	Tag: {
 		description: 'Small labeled tag element with color and variant support',
 		category: 'display',
-		tags: ['tag', 'label', 'chip', 'badge', 'category']
+		tags: ['tag', 'label', 'chip', 'badge', 'category', 'status']
 	},
 	Diagram: {
 		description:
@@ -761,10 +761,10 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 		surface: 'primitive'
 	},
 	AppFrame: {
-		description: 'Application shell wrapper with title, actions, and content area',
+		description:
+			'Windowed app chrome with traffic-light dots, title, and actions around a content area',
 		category: 'layout',
-		tags: ['app-shell', 'frame', 'layout', 'header', 'actions'],
-		surface: 'primitive'
+		tags: ['app-shell', 'frame', 'layout', 'header', 'chrome', 'traffic-lights']
 	},
 	AvatarGroup: {
 		description: 'Compact cluster of avatars with overflow and presence status',
@@ -843,185 +843,192 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 export const docsNavCategories: DocsNavCategory[] = [
 	{
 		label: 'Layout',
-		items: ['AspectRatio', 'Container', 'ScrollArea', 'Separator', 'Spacer', 'Splitter']
+		items: ['Container', 'Separator', 'ScrollArea', 'Splitter', 'Spacer']
 	},
 	{
-		label: 'Navigation',
+		label: 'Nav',
 		items: [
-			'Breadcrumb',
 			'Link',
-			'MegaMenu',
-			'Menubar',
-			'NavigationMenu',
+			'Breadcrumb',
+			'Tabs',
 			'Pagination',
 			'Sidebar',
+			'NavigationMenu',
+			'MegaMenu',
+			'Menubar',
+			'Accordion',
+			'Collapsible',
+			'Tree',
 			'Stepper',
 			'TableOfContents',
-			'Tabs',
 			'Toolbar'
 		]
 	},
 	{
-		label: 'Display',
+		label: 'Content',
 		items: [
-			'Accordion',
-			'Avatar',
-			'Badge',
 			'Card',
-			'Carousel',
-			'Chart',
-			'ChatThread',
-			'CodeBlock',
-			'Collapsible',
-			'DataGrid',
+			'Text',
+			'Heading',
+			'List',
 			'DescriptionList',
-			'FlipCard',
+			'Timeline',
+			'MarkdownRenderer',
+			'CodeBlock',
+			'ChatThread',
+			'Kbd',
+			'Marquee',
+			'Typography'
+		]
+	},
+	{
+		label: 'Data',
+		items: [
+			'Table',
+			'DataGrid',
+			'Chart',
+			'Sparkline',
+			'Gauge',
+			'Diagram',
+			'Map',
+			'QRCode',
+			'FormatNumber',
 			'FormatBytes',
 			'FormatDate',
-			'FormatNumber',
-			'Gauge',
-			'Heading',
-			'Icon',
-			'Image',
-			'ImageComparison',
-			'InfiniteScroll',
-			'Kbd',
-			'LinkPreview',
-			'List',
-			'LogoMark',
-			'Map',
-			'MarkdownRenderer',
-			'Marquee',
-			'QRCode',
 			'RelativeTime',
-			'Sparkline',
-			'Tag',
-			'Table',
-			'Text',
-			'Timeline',
-			'Tree',
-			'TypingIndicator',
-			'Typography',
-			'VideoEmbed',
+			'InfiniteScroll',
 			'VirtualList'
 		]
 	},
 	{
-		label: 'Diagrams',
-		items: ['Diagram']
-	},
-	{
-		label: 'Action',
+		label: 'Media',
 		items: [
-			'Button',
-			'ButtonGroup',
-			'Chip',
-			'ChipGroup',
-			'Clipboard',
-			'FloatButton',
-			'ScrollToTop',
-			'Toggle',
-			'ToggleGroup'
+			'Image',
+			'Avatar',
+			'Icon',
+			'AspectRatio',
+			'VideoEmbed',
+			'Carousel',
+			'ImageComparison',
+			'FlipCard',
+			'LogoMark'
 		]
 	},
 	{
-		label: 'Input',
+		label: 'Forms',
 		items: [
-			'AlphaSlider',
-			'Checkbox',
-			'ColorPicker',
-			'CountrySelect',
-			'DropZone',
-			'FileSelect',
-			'FileUpload',
 			'Input',
-			'InputGroup',
-			'NumberInput',
-			'OptionPicker',
-			'PhoneInput',
-			'PinInput',
-			'PromptInput',
-			'RadioGroup',
-			'Rating',
-			'RichTextEditor',
-			'Slider',
-			'StarRating',
-			'TagsInput',
 			'Textarea',
-			'Transfer'
-		]
-	},
-	{
-		label: 'Form',
-		items: [
-			'Calendar',
+			'NumberInput',
+			'PhoneInput',
+			'Checkbox',
+			'RadioGroup',
+			'Select',
 			'Combobox',
 			'MultiSelectCombobox',
+			'Listbox',
+			'Slider',
+			'AlphaSlider',
+			'ColorPicker',
 			'DateField',
 			'DatePicker',
 			'DateRangePicker',
 			'DateTimeInput',
+			'TimeInput',
+			'Calendar',
+			'RangeCalendar',
+			'FileSelect',
+			'FileUpload',
+			'DropZone',
+			'PromptInput',
+			'RichTextEditor',
+			'PinInput',
+			'TagsInput',
+			'InputGroup',
 			'Field',
 			'Fieldset',
 			'Label',
-			'Listbox',
-			'RangeCalendar',
+			'CountrySelect'
+		]
+	},
+	{
+		label: 'Controls',
+		items: [
+			'Button',
+			'ButtonGroup',
+			'Toggle',
+			'ToggleGroup',
+			'Chip',
+			'ChipGroup',
 			'SegmentedControl',
-			'Select',
-			'TimeInput'
+			'OptionPicker',
+			'Rating',
+			'StarRating',
+			'Transfer',
+			'Clipboard',
+			'DragAndDrop',
+			'FloatButton',
+			'ScrollToTop'
 		]
 	},
 	{
 		label: 'Overlay',
 		items: [
-			'AlertDialog',
-			'Backdrop',
-			'CommandPalette',
-			'ContextMenu',
 			'Dialog',
+			'AlertDialog',
 			'Drawer',
-			'DropdownMenu',
-			'HoverCard',
-			'NotificationCenter',
 			'Popover',
+			'HoverCard',
 			'Tooltip',
-			'Tour'
+			'DropdownMenu',
+			'ContextMenu',
+			'CommandPalette',
+			'NotificationCenter',
+			'LinkPreview',
+			'Tour',
+			'Backdrop'
 		]
 	},
 	{
-		label: 'Feedback',
-		items: ['Alert', 'Progress', 'ProgressRing', 'Skeleton', 'Spinner', 'Toast']
+		label: 'Status',
+		items: [
+			'Alert',
+			'Toast',
+			'Badge',
+			'Tag',
+			'Progress',
+			'ProgressRing',
+			'Skeleton',
+			'Spinner',
+			'TypingIndicator'
+		]
 	},
 	{
-		label: 'Visual',
+		label: 'Effects',
 		items: [
-			'Adjust',
 			'Aurora',
+			'Glow',
+			'Shimmer',
+			'Reveal',
+			'Spotlight',
 			'Beam',
 			'BorderBeam',
+			'Glass',
+			'Noise',
+			'GradientMesh',
+			'Adjust',
 			'ChromaticAberration',
 			'ChromaticShift',
 			'Displacement',
-			'Glass',
-			'Glow',
 			'GodRays',
-			'GradientMesh',
 			'Halftone',
 			'MaskReveal',
-			'Noise',
-			'Reveal',
-			'ShaderCanvas',
-			'Shimmer',
-			'Spotlight'
+			'ShaderCanvas'
 		]
 	},
 	{
-		label: 'Interaction',
-		items: ['DragAndDrop']
-	},
-	{
-		label: 'Utility',
-		items: ['FocusTrap', 'Hotkey', 'Portal', 'Svg', 'VisuallyHidden']
+		label: 'Utils',
+		items: ['Hotkey', 'FocusTrap', 'Portal', 'Svg', 'VisuallyHidden']
 	}
 ];
 

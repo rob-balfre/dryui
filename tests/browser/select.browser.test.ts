@@ -82,6 +82,29 @@ describe('Select', () => {
 		expect(trigger.getAttribute('aria-expanded')).toBe('true');
 	});
 
+	it('applies anchored positioning styles to the content when opened', async () => {
+		render(SelectHarness);
+
+		const trigger = getTrigger();
+		const content = getContent();
+
+		trigger.click();
+
+		for (let i = 0; i < 30; i++) {
+			flushSync();
+			if (content.matches(':popover-open')) break;
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
+
+		const inlineStyle = content.getAttribute('style') ?? '';
+		expect(inlineStyle).toContain('position-anchor');
+		expect(trigger.style.getPropertyValue('anchor-name')).toContain('--dryui-anchor-');
+		expect(content.style.position).toBe('fixed');
+		expect(content.style.getPropertyValue('position-area')).toBe('block-end span-inline-end');
+		expect(content.style.getPropertyValue('position-try-fallbacks')).toContain('flip-block');
+		expect(content.style.justifySelf).toBe('start');
+	});
+
 	it('selects an item on click and updates bound value + aria-selected', async () => {
 		render(SelectHarness);
 

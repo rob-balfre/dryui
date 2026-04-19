@@ -14,12 +14,23 @@ export function createPositionedPopover(options: PositionedPopoverOptions) {
 	const anchor = useAnchorStyles(options);
 
 	function showPopover(el: HTMLElement) {
+		if (el.matches(':popover-open')) return;
+
+		const source = options.triggerEl();
 		try {
-			if (!el.matches(':popover-open')) {
+			if (source) {
+				(
+					el as HTMLElement & { showPopover: (options?: { source?: HTMLElement }) => void }
+				).showPopover({ source });
+			} else {
 				el.showPopover();
 			}
 		} catch {
-			// Already shown
+			try {
+				el.showPopover();
+			} catch {
+				// Already shown
+			}
 		}
 	}
 

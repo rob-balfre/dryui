@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getTooltipCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?:
@@ -28,33 +28,12 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => contentEl ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
-	});
-
-	$effect(() => {
-		if (!contentEl) return;
-
-		if (ctx.open) {
-			try {
-				if (!contentEl.matches(':popover-open')) {
-					contentEl.showPopover();
-				}
-			} catch {
-				// Already shown
-			}
-		} else {
-			try {
-				if (contentEl.matches(':popover-open')) {
-					contentEl.hidePopover();
-				}
-			} catch {
-				// Already hidden
-			}
-		}
 	});
 </script>
 
@@ -64,7 +43,7 @@
 	role="tooltip"
 	popover="manual"
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	{...rest}
 >
 	{@render children()}

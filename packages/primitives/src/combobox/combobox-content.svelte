@@ -2,7 +2,8 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getComboboxCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import { createDismiss } from '../utils/dismiss.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?:
@@ -38,33 +39,20 @@
 
 	let el = $state<HTMLDivElement>();
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.inputEl,
 		contentEl: () => el ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
 	});
 
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
-		}
-	});
-
-	// Manual dismiss: close on click outside input+popover, or Escape
-	$effect(() => {
-		if (!ctx.open) return;
-
-		function handlePointerDown(e: PointerEvent) {
-			const target = e.target as Node;
-			if (ctx.inputEl?.contains(target) || el?.contains(target)) return;
-			ctx.close();
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		return () => document.removeEventListener('pointerdown', handlePointerDown);
+	createDismiss({
+		enabled: () => ctx.open,
+		escapeKey: false,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.inputEl
 	});
 </script>
 
@@ -75,7 +63,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.inputId}
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	{...rest}
 >
 	{#if loading}

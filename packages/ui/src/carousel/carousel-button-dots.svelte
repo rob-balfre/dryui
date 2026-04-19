@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
+	import { VisuallyHidden } from '../visually-hidden/index.js';
 	import { getCarouselCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
@@ -9,19 +10,35 @@
 	const ctx = getCarouselCtx();
 </script>
 
-<div role="tablist" aria-label="Slide indicators" data-carousel-dots class={className} {...rest}>
+<div
+	role="group"
+	aria-label="Choose slide to display"
+	data-carousel-dots
+	class={className}
+	{...rest}
+>
 	{#each Array(ctx.totalSlides) as _, i (i)}
+		{@const isActive = ctx.activeIndex === i}
 		<Button
 			variant="toggle"
 			size="icon-sm"
 			type="button"
-			role="tab"
-			aria-selected={ctx.activeIndex === i}
-			aria-pressed={ctx.activeIndex === i}
-			aria-label="Go to slide {i + 1}"
-			onclick={() => ctx.scrollTo(i)}
+			aria-controls={ctx.getSlideId(i)}
+			aria-disabled={isActive ? true : undefined}
+			data-active={isActive ? '' : undefined}
+			onclick={() => {
+				if (!isActive) {
+					ctx.scrollTo(i);
+				}
+			}}
 		>
-			<span class="dot"></span>
+			<VisuallyHidden>
+				Show slide {i + 1} of {ctx.totalSlides}
+				{#if isActive}
+					(current slide)
+				{/if}
+			</VisuallyHidden>
+			<span class="dot" aria-hidden="true"></span>
 		</Button>
 	{/each}
 </div>
@@ -45,7 +62,7 @@
 		opacity: 0.4;
 	}
 
-	[aria-selected='true'] .dot {
+	[data-active] .dot {
 		opacity: 1;
 	}
 </style>

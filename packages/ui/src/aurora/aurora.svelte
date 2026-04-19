@@ -3,6 +3,14 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { BlendMode } from '@dryui/primitives/aurora';
+	import {
+		getReducedMotionPreference,
+		observeInViewport,
+		observePageVisibility,
+		observeReducedMotionPreference,
+		registerPropertyOnce,
+		supportsPropertyRegistration
+	} from '@dryui/primitives/internal/motion';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		palette?: 'sunrise' | 'ocean' | 'forest' | 'cosmic' | readonly [string, string, string];
@@ -58,13 +66,6 @@
 	const customPalette = $derived(Array.isArray(palette) ? palette : null);
 
 	onMount(() => {
-		const {
-			registerPropertyOnce,
-			supportsPropertyRegistration,
-			observeReducedMotionPreference,
-			getReducedMotionPreference
-		} = await_motion();
-
 		supportsAnimation = supportsPropertyRegistration();
 		registerPropertyOnce({
 			name: '--dry-aurora-angle',
@@ -79,27 +80,21 @@
 			initialValue: '0%'
 		});
 
-		documentVisible = document.visibilityState === 'visible';
-		const handleVisibilityChange = () => {
-			documentVisible = document.visibilityState === 'visible';
-		};
-		document.addEventListener('visibilitychange', handleVisibilityChange);
-
-		const updateAnimatedState = (matches: boolean) => {
+		const stopVisibility = observePageVisibility((visible) => {
+			documentVisible = visible;
+		});
+		const stopMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
-		};
-		const stopMotionObserver = observeReducedMotionPreference(updateAnimatedState);
-		let stopViewportObserver = () => {};
-
-		if (rootNode && 'IntersectionObserver' in window) {
-			const observer = new IntersectionObserver(
-				([entry]) => {
-					inViewport = entry?.isIntersecting ?? true;
+		});
+		let stopViewport = () => {};
+		if (rootNode) {
+			stopViewport = observeInViewport(
+				rootNode,
+				(inView) => {
+					inViewport = inView;
 				},
 				{ threshold: 0.12 }
 			);
-			observer.observe(rootNode);
-			stopViewportObserver = () => observer.disconnect();
 		}
 
 		if (!supportsAnimation || getReducedMotionPreference()) {
@@ -107,43 +102,11 @@
 		}
 
 		return () => {
-			document.removeEventListener('visibilitychange', handleVisibilityChange);
-			stopMotionObserver();
-			stopViewportObserver();
+			stopVisibility();
+			stopMotion();
+			stopViewport();
 		};
 	});
-
-	function await_motion() {
-		// Dynamic import would be needed for the motion utils from primitives
-		// Instead, inline the logic since we're rendering directly
-		return {
-			registerPropertyOnce(opts: {
-				name: string;
-				syntax: string;
-				inherits: boolean;
-				initialValue: string;
-			}) {
-				try {
-					CSS.registerProperty(opts);
-				} catch {
-					// already registered or not supported
-				}
-			},
-			supportsPropertyRegistration() {
-				return typeof CSS !== 'undefined' && 'registerProperty' in CSS;
-			},
-			observeReducedMotionPreference(cb: (matches: boolean) => void) {
-				const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-				cb(mql.matches);
-				const handler = (e: MediaQueryListEvent) => cb(e.matches);
-				mql.addEventListener('change', handler);
-				return () => mql.removeEventListener('change', handler);
-			},
-			getReducedMotionPreference() {
-				return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-			}
-		};
-	}
 
 	function applyRootStyles(node: HTMLElement) {
 		$effect(() => {

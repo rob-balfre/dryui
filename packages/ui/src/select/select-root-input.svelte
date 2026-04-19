@@ -39,6 +39,7 @@
 	const contentId = generateFormId('select-content');
 
 	let displayText = $state('');
+	let triggerEl = $state<HTMLElement | null>(null);
 
 	setSelectCtx({
 		get open() {
@@ -55,7 +56,12 @@
 		},
 		triggerId,
 		contentId,
-		triggerEl: null,
+		get triggerEl() {
+			return triggerEl;
+		},
+		set triggerEl(element: HTMLElement | null) {
+			triggerEl = element;
+		},
 		show() {
 			if (!disabled) open = true;
 		},

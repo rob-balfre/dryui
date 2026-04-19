@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
@@ -22,14 +23,21 @@
 	const ctx = getMenubarCtx();
 	const menuCtx = getMenubarMenuCtx();
 
-	let el = $state<HTMLDivElement>();
-	let triggerEl = $state<HTMLElement | null>(null);
+	let el = $state<HTMLDivElement | null>(null);
+	const triggerEl = $derived(
+		ctx.rootElement?.querySelector<HTMLElement>(`[data-menubar-trigger="${menuCtx.menuId}"]`) ??
+			null
+	);
 
-	$effect(() => {
-		const root = ctx.rootElement;
-		triggerEl =
-			root?.querySelector<HTMLElement>(`[data-menubar-trigger="${menuCtx.menuId}"]`) ?? null;
-	});
+	function attachContent(node: HTMLDivElement) {
+		el = node;
+
+		return () => {
+			if (el === node) {
+				el = null;
+			}
+		};
+	}
 
 	const popover = createAnchoredPopover({
 		triggerEl: () => triggerEl,
@@ -61,12 +69,12 @@
 		switch (e.key) {
 			case 'ArrowRight': {
 				e.preventDefault();
-				ctx.focusNextMenu(menuCtx.menuId);
+				ctx.focusNextMenu(menuCtx.menuId, true);
 				return;
 			}
 			case 'ArrowLeft': {
 				e.preventDefault();
-				ctx.focusPrevMenu(menuCtx.menuId);
+				ctx.focusPrevMenu(menuCtx.menuId, true);
 				return;
 			}
 			case 'Escape': {
@@ -84,15 +92,15 @@
 </script>
 
 <div
-	bind:this={el}
+	{@attach attachContent}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	popover="auto"
 	role="menu"
 	tabindex="-1"
-	aria-labelledby={`menubar-trigger-${menuCtx.menuId}`}
+	aria-labelledby={triggerEl?.id}
 	data-menubar-content
 	data-state={menuCtx.open ? 'open' : 'closed'}
 	class={className}
-	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (!newState && menuCtx.open) {

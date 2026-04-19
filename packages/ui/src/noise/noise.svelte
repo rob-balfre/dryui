@@ -2,7 +2,11 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { observeReducedMotionPreference } from '@dryui/primitives/internal/motion';
+	import {
+		observeInViewport,
+		observePageVisibility,
+		observeReducedMotionPreference
+	} from '@dryui/primitives/internal/motion';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		opacity?: number;
@@ -24,15 +28,25 @@
 	}: Props = $props();
 
 	let prefersReducedMotion = $state(false);
+	let onScreen = $state(true);
+	let tabVisible = $state(true);
 
-	onMount(() =>
-		observeReducedMotionPreference((matches) => {
+	onMount(() => {
+		const stopMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
-		})
-	);
+		});
+		const stopVisibility = observePageVisibility((visible) => {
+			tabVisible = visible;
+		});
+		return () => {
+			stopMotion();
+			stopVisibility();
+		};
+	});
 
 	const normalizedOpacity = $derived(`${Math.max(0, Math.min(1, opacity))}`);
 	const shouldAnimate = $derived(animated && !prefersReducedMotion);
+	const paused = $derived(!onScreen || !tabVisible);
 
 	function applyStyles(node: HTMLElement) {
 		$effect(() => {
@@ -40,6 +54,16 @@
 			node.style.setProperty('--dry-noise-opacity', normalizedOpacity);
 			node.style.setProperty('--dry-noise-blend', blend);
 		});
+
+		$effect(() =>
+			observeInViewport(
+				node,
+				(inView) => {
+					onScreen = inView;
+				},
+				{ rootMargin: '200px' }
+			)
+		);
 	}
 </script>
 
@@ -48,6 +72,7 @@
 	data-noise
 	data-animated={shouldAnimate || undefined}
 	data-reduced-motion={prefersReducedMotion || undefined}
+	data-paused={paused || undefined}
 	data-grain={grain}
 	{...rest}
 	{@attach applyStyles}
@@ -95,8 +120,15 @@
 	}
 
 	[data-noise][data-animated] [data-noise-texture] {
-		will-change: transform;
 		animation: noise-drift 1.6s steps(6) infinite;
+	}
+
+	[data-noise][data-animated]:not([data-paused]) [data-noise-texture] {
+		will-change: transform;
+	}
+
+	[data-noise][data-animated][data-paused] [data-noise-texture] {
+		animation-play-state: paused;
 	}
 
 	[data-noise][data-reduced-motion] [data-noise-texture] {

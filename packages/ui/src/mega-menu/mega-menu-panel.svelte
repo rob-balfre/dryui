@@ -24,6 +24,8 @@
 	const itemCtx = getMegaMenuItemCtx();
 
 	let panelEl = $state<HTMLDivElement | null>(null);
+	let layout = $state<'columns' | 'stacked'>('columns');
+	const STACK_THRESHOLD = 32 * 16;
 
 	const popover = createPositionedPopover({
 		triggerEl: () => document.getElementById(itemCtx.triggerId),
@@ -36,8 +38,18 @@
 		offset: () => 4
 	});
 
+	function watchLayout(node: HTMLDivElement) {
+		const update = () => {
+			const next = window.innerWidth < STACK_THRESHOLD ? 'stacked' : 'columns';
+			if (next !== layout) layout = next;
+		};
+		update();
+		window.addEventListener('resize', update);
+		return () => window.removeEventListener('resize', update);
+	}
+
 	function handlePointerEnter() {
-		ctx.openItem(itemCtx.itemId);
+		ctx.openItem(itemCtx.itemId, itemCtx.triggerId);
 	}
 
 	function handlePointerLeave() {
@@ -70,12 +82,15 @@
 		{@attach attachPanel}
 		{@attach syncPopover(itemCtx.open)}
 		{@attach fromAction(popover.applyPosition, () => style)}
-		role="region"
+		{@attach watchLayout}
+		id={itemCtx.panelId}
+		role="group"
 		popover="manual"
 		data-mega-menu-panel
 		aria-labelledby={itemCtx.triggerId}
 		data-state={itemCtx.open ? 'open' : 'closed'}
 		data-full-width={fullWidth || undefined}
+		data-layout={layout}
 		class={className}
 		onpointerenter={handlePointerEnter}
 		onpointerleave={handlePointerLeave}
@@ -86,6 +101,13 @@
 {/if}
 
 <style>
+	@position-try --dry-mega-menu-panel-viewport-fit {
+		position-area: none;
+		inset-inline: 4vw;
+		inset-block-start: anchor(bottom);
+		margin-top: 0.5rem;
+	}
+
 	[data-mega-menu-panel] {
 		inset: unset;
 		margin: 0;
@@ -95,11 +117,14 @@
 		border-radius: var(--dry-radius-lg, 0.5rem);
 		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
 		padding: var(--dry-space-4, 1rem);
+		/* dryui-allow width */
+		max-inline-size: var(--dry-mega-menu-panel-max-width, min(92vw, 60rem));
 		display: grid;
 		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-auto-columns: minmax(var(--dry-mega-menu-panel-column-min, 12rem), max-content);
 		align-items: start;
 		gap: var(--dry-space-6, 1.5rem);
+		--dry-anchor-try-fallbacks: flip-block, flip-inline, --dry-mega-menu-panel-viewport-fit;
 	}
 
 	[data-mega-menu-panel]:not(:popover-open) {
@@ -108,6 +133,13 @@
 
 	[data-mega-menu-panel]:popover-open {
 		display: grid;
+	}
+
+	[data-mega-menu-panel][data-layout='stacked'] {
+		grid-auto-flow: row;
+		grid-auto-columns: auto;
+		grid-auto-rows: auto;
+		gap: var(--dry-space-4, 1rem);
 	}
 
 	[data-mega-menu-panel][data-full-width] {

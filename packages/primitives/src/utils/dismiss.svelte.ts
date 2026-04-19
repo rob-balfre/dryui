@@ -49,7 +49,10 @@ export function isInsideDismissRegion(
 	if (regions.contentEl?.contains(target)) return true;
 	if (regions.triggerEl?.contains(target)) return true;
 	if (regions.containerEl?.contains(target)) return true;
-	if (target instanceof Element && target.closest('[data-dismiss-ignore]')) return true;
+	const ElementCtor = globalThis.Element;
+	if (typeof ElementCtor !== 'undefined' && target instanceof ElementCtor) {
+		if (target.closest('[data-dismiss-ignore]')) return true;
+	}
 	return false;
 }
 

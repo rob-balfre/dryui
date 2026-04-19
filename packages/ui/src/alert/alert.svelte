@@ -53,7 +53,7 @@
 
 		<div data-alert-body>
 			{#if title}
-				<h5 data-alert-title>{@render title()}</h5>
+				<div data-alert-title>{@render title()}</div>
 			{/if}
 			{#if description}
 				<p data-alert-description>{@render description()}</p>

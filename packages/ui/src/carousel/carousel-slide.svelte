@@ -10,6 +10,7 @@
 	let { class: className, children, ...rest }: Props = $props();
 	const ctx = getCarouselCtx();
 	const index = ctx.registerSlide();
+	const slideId = ctx.getSlideId(index);
 
 	$effect(() => {
 		return () => ctx.unregisterSlide();
@@ -17,11 +18,14 @@
 </script>
 
 <div
+	id={slideId}
 	role="group"
 	aria-roledescription="slide"
-	aria-label="Slide {index + 1} of {ctx.totalSlides}"
+	aria-hidden={ctx.activeIndex === index ? undefined : true}
+	aria-label={`${index + 1} of ${ctx.totalSlides}`}
 	data-carousel-slide=""
 	data-active={ctx.activeIndex === index ? '' : undefined}
+	inert={ctx.activeIndex !== index}
 	class={className}
 	{...rest}
 >

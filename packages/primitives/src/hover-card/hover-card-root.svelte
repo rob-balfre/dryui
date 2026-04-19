@@ -19,21 +19,12 @@
 	let openTimeout: ReturnType<typeof setTimeout>;
 	let closeTimeout: ReturnType<typeof setTimeout>;
 
-	function show() {
-		clearTimeout(closeTimeout);
-		openTimeout = setTimeout(() => {
-			open = true;
-		}, openDelay);
-	}
-
-	function close() {
+	function clearTimers() {
 		clearTimeout(openTimeout);
-		closeTimeout = setTimeout(() => {
-			open = false;
-		}, closeDelay);
+		clearTimeout(closeTimeout);
 	}
 
-	setHoverCardCtx({
+	const ctx = {
 		get open() {
 			return open;
 		},
@@ -43,15 +34,60 @@
 		get contentId() {
 			return contentId;
 		},
-		triggerEl: null,
+		triggerEl: null as HTMLElement | null,
+		contentEl: null as HTMLElement | null,
+		triggerHovered: false,
+		contentHovered: false,
+		triggerFocused: false,
+		contentFocused: false,
+		ignoreNextTriggerFocusOpen: false,
 		show,
-		close
-	});
+		showImmediate,
+		close,
+		forceClose
+	};
+
+	function hasActiveInteraction() {
+		return ctx.triggerHovered || ctx.contentHovered || ctx.triggerFocused || ctx.contentFocused;
+	}
+
+	function show() {
+		clearTimeout(closeTimeout);
+		if (open) return;
+		openTimeout = setTimeout(() => {
+			if (!open) open = true;
+		}, openDelay);
+	}
+
+	function showImmediate() {
+		clearTimers();
+		if (!open) open = true;
+	}
+
+	function close() {
+		clearTimeout(openTimeout);
+		closeTimeout = setTimeout(() => {
+			if (!hasActiveInteraction() && open) {
+				open = false;
+			}
+		}, closeDelay);
+	}
+
+	function forceClose() {
+		clearTimers();
+		ctx.triggerHovered = false;
+		ctx.contentHovered = false;
+		ctx.triggerFocused = false;
+		ctx.contentFocused = false;
+		ctx.ignoreNextTriggerFocusOpen = true;
+		if (open) open = false;
+	}
+
+	setHoverCardCtx(ctx);
 
 	$effect(() => {
 		return () => {
-			clearTimeout(openTimeout);
-			clearTimeout(closeTimeout);
+			clearTimers();
 		};
 	});
 </script>

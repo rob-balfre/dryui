@@ -51,42 +51,59 @@ function getCSSStyles(
 		inset: 'unset',
 		margin: '0',
 		'position-anchor': anchorName,
-		'position-try-fallbacks': 'flip-block, flip-inline'
+		'position-try-fallbacks': 'var(--dry-anchor-try-fallbacks, flip-block, flip-inline)'
 	};
 
 	if (side === 'bottom') {
-		styles.top = `anchor(bottom)`;
-		styles['margin-top'] = `${offset}px`;
-	} else if (side === 'top') {
-		styles.bottom = `anchor(top)`;
-		styles['margin-bottom'] = `${offset}px`;
-	} else if (side === 'right') {
-		styles.left = `anchor(right)`;
-		styles['margin-left'] = `${offset}px`;
-	} else if (side === 'left') {
-		styles.right = `anchor(left)`;
-		styles['margin-right'] = `${offset}px`;
-	}
-
-	if (side === 'top' || side === 'bottom') {
 		if (align === 'start') {
-			styles.left = `anchor(left)`;
+			styles['position-area'] = 'block-end span-inline-end';
+			styles['justify-self'] = 'start';
 		} else if (align === 'end') {
-			styles.right = `anchor(right)`;
+			styles['position-area'] = 'block-end span-inline-start';
+			styles['justify-self'] = 'end';
 		} else {
-			styles.left = `anchor(center)`;
-			styles.translate = '-50% 0';
+			styles['position-area'] = 'block-end';
+			styles['justify-self'] = 'anchor-center';
+		}
+	} else if (side === 'top') {
+		if (align === 'start') {
+			styles['position-area'] = 'block-start span-inline-end';
+			styles['justify-self'] = 'start';
+		} else if (align === 'end') {
+			styles['position-area'] = 'block-start span-inline-start';
+			styles['justify-self'] = 'end';
+		} else {
+			styles['position-area'] = 'block-start';
+			styles['justify-self'] = 'anchor-center';
+		}
+	} else if (side === 'right') {
+		if (align === 'start') {
+			styles['position-area'] = 'inline-end span-block-end';
+			styles['align-self'] = 'start';
+		} else if (align === 'end') {
+			styles['position-area'] = 'inline-end span-block-start';
+			styles['align-self'] = 'end';
+		} else {
+			styles['position-area'] = 'inline-end';
+			styles['align-self'] = 'anchor-center';
 		}
 	} else {
 		if (align === 'start') {
-			styles.top = `anchor(top)`;
+			styles['position-area'] = 'inline-start span-block-end';
+			styles['align-self'] = 'start';
 		} else if (align === 'end') {
-			styles.bottom = `anchor(bottom)`;
+			styles['position-area'] = 'inline-start span-block-start';
+			styles['align-self'] = 'end';
 		} else {
-			styles.top = `anchor(center)`;
-			styles.translate = '0 -50%';
+			styles['position-area'] = 'inline-start';
+			styles['align-self'] = 'anchor-center';
 		}
 	}
+
+	if (side === 'bottom') styles['margin-top'] = `${offset}px`;
+	else if (side === 'top') styles['margin-bottom'] = `${offset}px`;
+	else if (side === 'right') styles['margin-left'] = `${offset}px`;
+	else if (side === 'left') styles['margin-right'] = `${offset}px`;
 
 	return styles;
 }

@@ -4,6 +4,8 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
 		getReducedMotionPreference,
+		observeInViewport,
+		observePageVisibility,
 		observeReducedMotionPreference,
 		registerPropertyOnce,
 		supportsPropertyRegistration,
@@ -30,6 +32,9 @@
 	let element = $state<HTMLDivElement | null>(null);
 	let prefersReducedMotion = $state(false);
 	let animated = $state(false);
+	let onScreen = $state(true);
+	let tabVisible = $state(true);
+	const paused = $derived(!onScreen || !tabVisible);
 	let pointerX = $state('50%');
 	let pointerY = $state('50%');
 	let pointerFrame = $state<number | null>(null);
@@ -126,19 +131,31 @@
 		};
 
 		const stopMotionObserver = observeReducedMotionPreference(updateAnimatedState);
+		const stopVisibility = observePageVisibility((visible) => {
+			tabVisible = visible;
+		});
+		let stopViewport = () => {};
+		if (element) {
+			stopViewport = observeInViewport(
+				element,
+				(inView) => {
+					onScreen = inView;
+				},
+				{ rootMargin: '200px' }
+			);
+		}
 
 		if (!supportsPropertyRegistration() || getReducedMotionPreference()) {
 			animated = false;
-			return () => {
-				cancelQueuedPointerPosition();
-				stopMotionObserver();
-			};
+		} else {
+			animated = true;
 		}
 
-		animated = true;
 		return () => {
 			cancelQueuedPointerPosition();
 			stopMotionObserver();
+			stopVisibility();
+			stopViewport();
 		};
 	});
 
@@ -164,6 +181,7 @@
 	data-animated={animated || undefined}
 	data-interactive={interactive || undefined}
 	data-reduced-motion={prefersReducedMotion || undefined}
+	data-paused={paused || undefined}
 	onpointermove={interactive ? handlePointerMove : undefined}
 	onpointerleave={interactive ? handlePointerLeave : undefined}
 	{...rest}
@@ -211,6 +229,10 @@
 
 	[data-gradient-mesh][data-animated] {
 		animation: mesh-cycle var(--dry-mesh-duration) ease-in-out infinite alternate;
+	}
+
+	[data-gradient-mesh][data-animated][data-paused] {
+		animation-play-state: paused;
 	}
 
 	[data-gradient-mesh][data-interactive] {

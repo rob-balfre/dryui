@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchorPosition } from '@dryui/primitives';
-	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, type Placement } from '@dryui/primitives';
 	import { getMultiSelectComboboxCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -28,29 +28,6 @@
 
 	let el = $state<HTMLDivElement | null>(null);
 
-	const anchor = createAnchorPosition(
-		() => ctx.anchorEl,
-		() => el ?? null,
-		{
-			get placement() {
-				return placement;
-			},
-			get offset() {
-				return offset;
-			}
-		}
-	);
-
-	$effect(() => {
-		if (!el) return;
-
-		el.style.cssText = typeof style === 'string' ? style : '';
-		const positionStyles = anchor.styles;
-		for (const [key, value] of Object.entries(positionStyles)) {
-			el.style.setProperty(key, value);
-		}
-	});
-
 	function attachContent(node: HTMLDivElement) {
 		el = node;
 
@@ -61,41 +38,26 @@
 		};
 	}
 
-	function syncPopover(isOpen: boolean) {
-		return (node: HTMLDivElement) => {
-			if (isOpen && !node.matches(':popover-open')) {
-				node.showPopover();
-			} else if (!isOpen && node.matches(':popover-open')) {
-				node.hidePopover();
-			}
-		};
-	}
+	const popover = createAnchoredPopover({
+		triggerEl: () => ctx.anchorEl,
+		contentEl: () => el ?? null,
+		open: () => ctx.open,
+		placement: () => placement,
+		offset: () => offset
+	});
 
-	function dismissOnOutsidePointerDown(node: HTMLDivElement) {
-		function handlePointerDown(event: PointerEvent) {
-			const target = event.target;
-			if (!(target instanceof Node)) {
-				return;
-			}
-
-			if (ctx.anchorEl?.contains(target) || node.contains(target)) {
-				return;
-			}
-
-			ctx.close();
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		return () => {
-			document.removeEventListener('pointerdown', handlePointerDown);
-		};
-	}
+	createDismiss({
+		enabled: () => ctx.open,
+		escapeKey: false,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.anchorEl
+	});
 </script>
 
 <div
 	{@attach attachContent}
-	{@attach syncPopover(ctx.open)}
-	{@attach ctx.open && dismissOnOutsidePointerDown}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	popover="manual"
 	role="listbox"
 	id={ctx.contentId}
@@ -123,6 +85,7 @@
 	[data-multi-select-content] {
 		inset: unset;
 		margin: 0;
+		grid-template-columns: minmax(anchor-size(inline), max-content);
 		background: var(--dry-color-bg-overlay);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);

@@ -16,18 +16,7 @@
 		if (itemCtx.open) {
 			ctx.closeItem();
 		} else {
-			ctx.openItem(itemCtx.itemId);
-		}
-	}
-
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Enter' || e.key === ' ') {
-			e.preventDefault();
-			if (itemCtx.open) {
-				ctx.closeItem();
-			} else {
-				ctx.openItem(itemCtx.itemId);
-			}
+			ctx.openItem(itemCtx.itemId, itemCtx.triggerId);
 		}
 	}
 </script>
@@ -36,12 +25,11 @@
 	type="button"
 	class={className}
 	id={itemCtx.triggerId}
+	aria-controls={itemCtx.open ? itemCtx.panelId : undefined}
 	aria-expanded={itemCtx.open}
-	aria-haspopup="true"
 	data-active={itemCtx.open || undefined}
 	data-state={itemCtx.open ? 'open' : 'closed'}
 	onclick={handleClick}
-	onkeydown={handleKeydown}
 	{...rest}
 >
 	{@render children()}

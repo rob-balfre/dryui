@@ -42,6 +42,73 @@ export function supportsIntersectionObservers(): boolean {
 	return typeof IntersectionObserver !== 'undefined';
 }
 
+export function observeInViewport(
+	target: Element,
+	onChange: (inView: boolean) => void,
+	options: IntersectionObserverInit = {}
+): () => void {
+	if (!supportsIntersectionObservers()) {
+		onChange(true);
+		return () => {};
+	}
+
+	const observer = new IntersectionObserver((entries) => {
+		for (const entry of entries) onChange(entry.isIntersecting);
+	}, options);
+	observer.observe(target);
+	return () => observer.disconnect();
+}
+
+export function observePageVisibility(onChange: (visible: boolean) => void): () => void {
+	if (typeof document === 'undefined') {
+		onChange(true);
+		return () => {};
+	}
+
+	const update = () => onChange(document.visibilityState === 'visible');
+	update();
+	document.addEventListener('visibilitychange', update);
+	return () => document.removeEventListener('visibilitychange', update);
+}
+
+/**
+ * Toggles a `data-offscreen` attribute on the node whenever it leaves the viewport
+ * or the page tab is hidden. Consumers can use this attribute in CSS to pause
+ * animations. Returns a cleanup function that disconnects both observers.
+ */
+export function observeOffscreenState(
+	target: HTMLElement,
+	options: IntersectionObserverInit = {}
+): () => void {
+	let onScreen = true;
+	let tabVisible = true;
+
+	const apply = () => {
+		if (onScreen && tabVisible) target.removeAttribute('data-offscreen');
+		else target.setAttribute('data-offscreen', '');
+	};
+
+	const stopViewport = observeInViewport(
+		target,
+		(visible) => {
+			if (visible === onScreen) return;
+			onScreen = visible;
+			apply();
+		},
+		options
+	);
+	const stopVisibility = observePageVisibility((visible) => {
+		if (visible === tabVisible) return;
+		tabVisible = visible;
+		apply();
+	});
+
+	return () => {
+		stopViewport();
+		stopVisibility();
+	};
+}
+
 export function supportsPointerTracking(): boolean {
 	return typeof window !== 'undefined' && 'PointerEvent' in window;
 }

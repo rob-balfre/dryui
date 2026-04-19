@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'bun:test';
-import { checkScript, checkMarkup, checkStyle } from './rules.js';
+import { checkScript, checkMarkup, checkStyle, checkSvelteFile } from './rules.js';
 
 describe('checkScript', () => {
 	test('flags Grid import from @dryui/ui', () => {
@@ -596,5 +596,31 @@ describe('checkStyle', () => {
 			'.foo:focus-visible { outline: var(--dry-focus-ring); outline-offset: 2px; }'
 		);
 		expect(violations).toHaveLength(0);
+	});
+});
+
+describe('checkSvelteFile', () => {
+	test('merges script, markup, and style violations with file-relative lines', () => {
+		const code = [
+			'<script>',
+			"\timport { Grid } from '@dryui/ui';",
+			'</script>',
+			'',
+			'<div style="color: red">hello</div>',
+			'',
+			'<style>',
+			'\t.foo { width: 100%; }',
+			'</style>'
+		].join('\n');
+
+		const violations = checkSvelteFile(code, 'src/example.svelte');
+
+		expect(violations).toHaveLength(3);
+		expect(violations.map((violation) => violation.rule)).toEqual([
+			'dryui/no-layout-component',
+			'dryui/no-inline-style',
+			'dryui/no-width'
+		]);
+		expect(violations.map((violation) => violation.line)).toEqual([2, 5, 8]);
 	});
 });

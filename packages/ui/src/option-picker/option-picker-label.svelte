@@ -17,8 +17,8 @@
 	[data-option-picker-label] {
 		grid-column: var(--dry-option-picker-label-column, 2);
 		grid-row: var(--dry-option-picker-label-row, 1);
-		font-size: var(--dry-type-small-size);
+		font-size: var(--dry-option-picker-label-size, var(--dry-type-small-size));
 		font-weight: 600;
-		line-height: 1.2;
+		line-height: var(--dry-option-picker-label-line-height, 1.2);
 	}
 </style>
