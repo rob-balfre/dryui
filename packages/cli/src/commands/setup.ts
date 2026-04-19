@@ -469,15 +469,22 @@ async function promptKillPortHolder(holder: PortHolder, port: number): Promise<b
 	);
 }
 
-async function promptMountFeedback(
-	action: 'install-and-mount' | 'mount-only',
-	layoutPath: string
-): Promise<boolean> {
-	const question =
-		action === 'install-and-mount'
-			? `Install @dryui/feedback and mount <Feedback /> in ${layoutPath}?`
-			: `Mount <Feedback /> in ${layoutPath}?`;
-	return await promptConfirm(question, true);
+async function promptFeedbackSetup(plan: {
+	install: boolean;
+	mount: boolean;
+	layoutPath: string | null;
+	viteConfig: boolean;
+	viteConfigPath: string | null;
+}): Promise<boolean> {
+	const actions: string[] = [];
+	if (plan.install) actions.push('• Install @dryui/feedback');
+	if (plan.mount && plan.layoutPath) actions.push(`• Mount <Feedback /> in ${plan.layoutPath}`);
+	if (plan.viteConfig && plan.viteConfigPath) {
+		actions.push(`• Add @dryui/feedback to ssr.noExternal in ${plan.viteConfigPath}`);
+	}
+	return await promptConfirm('Set up @dryui/feedback for this project?', true, {
+		contextLines: actions
+	});
 }
 
 async function runFeedbackSession(
@@ -500,7 +507,7 @@ async function runFeedbackSession(
 			spec,
 			runtime: {
 				promptKillPortHolder,
-				promptMountFeedback,
+				promptFeedbackSetup,
 				...(onProgress
 					? {
 							onProgress: ({ cwd, noOpen: projectNoOpen }) =>

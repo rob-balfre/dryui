@@ -18,11 +18,13 @@ import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
 	findPortHolder as findPortHolderDefault,
+	findViteConfig as findViteConfigDefault,
 	installPackage as installPackageDefault,
 	isHealthyProbeStatus,
 	killPortHolder as killPortHolderDefault,
 	mountFeedbackInLayout as mountFeedbackInLayoutDefault,
 	openBrowser,
+	patchViteConfigFeedbackNoExternal as patchViteConfigFeedbackNoExternalDefault,
 	type PortHolder,
 	readProjectDevScript as readProjectDevScriptDefault,
 	resolveFeedbackServerEntry,
@@ -30,6 +32,7 @@ import {
 	spawnProjectDevServerInBackground as spawnProjectDevServerDefault,
 	type SpawnProjectDevServerOptions,
 	urlResponds as urlRespondsDefault,
+	viteConfigHasFeedbackNoExternal as viteConfigHasFeedbackNoExternalDefault,
 	waitForUrl as waitForUrlDefault
 } from './launch-utils.js';
 
@@ -235,7 +238,13 @@ const DEFAULT_PROJECT_DEV_PORT = 5173;
 const PROJECT_DEV_READY_TIMEOUT_MS = 30_000;
 const PORT_FREE_WAIT_MS = 500;
 
-export type FeedbackMountAction = 'install-and-mount' | 'mount-only';
+export interface FeedbackSetupPlan {
+	install: boolean;
+	mount: boolean;
+	layoutPath: string | null;
+	viteConfig: boolean;
+	viteConfigPath: string | null;
+}
 
 export interface UserProjectLauncherRuntime {
 	detectProject: (cwd: string) => ProjectDetection;
@@ -248,13 +257,16 @@ export interface UserProjectLauncherRuntime {
 	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => void;
 	waitForUrl: (url: string, timeoutMs: number) => Promise<boolean>;
 	promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean>;
-	promptMountFeedback: (action: FeedbackMountAction, layoutPath: string) => Promise<boolean>;
+	promptFeedbackSetup: (plan: FeedbackSetupPlan) => Promise<boolean>;
 	installPackage: (
 		cwd: string,
 		packageManager: Exclude<DryuiPackageManager, 'unknown'>,
 		packageName: string
 	) => boolean;
 	mountFeedbackInLayout: (layoutPath: string, serverUrl: string) => boolean;
+	findViteConfig: (root: string) => string | null;
+	viteConfigHasFeedbackNoExternal: (configPath: string) => boolean;
+	patchViteConfigFeedbackNoExternal: (configPath: string) => boolean;
 	sleep: (ms: number) => Promise<void>;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
@@ -348,12 +360,15 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	waitForUrl: waitForUrlDefault,
 	// Default declines to kill — safe for non-TTY callers that have no way to confirm.
 	promptKillPortHolder: async () => false,
-	// Default declines to mount — safe for non-TTY callers that have no way to confirm.
-	promptMountFeedback: async () => false,
+	// Default declines setup — safe for non-TTY callers that have no way to confirm.
+	promptFeedbackSetup: async () => false,
 	installPackage: (cwd, packageManager, packageName) =>
 		installPackageDefault({ cwd, packageManager, packageName }),
 	mountFeedbackInLayout: (layoutPath, serverUrl) =>
 		mountFeedbackInLayoutDefault({ layoutPath, serverUrl }),
+	findViteConfig: findViteConfigDefault,
+	viteConfigHasFeedbackNoExternal: viteConfigHasFeedbackNoExternalDefault,
+	patchViteConfigFeedbackNoExternal: patchViteConfigFeedbackNoExternalDefault,
 	sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 	now: () => Date.now(),
 	openBrowser,
@@ -362,44 +377,75 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 
 const FEEDBACK_SERVER_URL = `http://${DEFAULT_FEEDBACK_HOST}:${DEFAULT_FEEDBACK_PORT}`;
 
-interface FeedbackMountResult {
-	mounted: boolean;
-	message: string;
-}
-
-async function planAndApplyFeedbackMount(
+async function planAndApplyFeedbackSetup(
 	detection: ProjectDetection,
 	packageManager: Exclude<DryuiPackageManager, 'unknown'>,
 	runtime: UserProjectLauncherRuntime
-): Promise<FeedbackMountResult | null> {
-	if (detection.dependencies.feedback && detection.feedback.layoutPath) return null;
-
+): Promise<LabelledMessage[] | null> {
 	const layoutPath = detection.files.rootLayout;
-	if (!layoutPath) {
-		return { mounted: false, message: 'no src/routes/+layout.svelte — create one and rerun' };
+	const viteConfigPath = detection.root ? runtime.findViteConfig(detection.root) : null;
+	const viteConfigPatched = viteConfigPath
+		? runtime.viteConfigHasFeedbackNoExternal(viteConfigPath)
+		: true;
+
+	const needsInstall = !detection.dependencies.feedback;
+	const needsMount = !detection.feedback.layoutPath;
+	const needsViteConfig = viteConfigPath !== null && !viteConfigPatched;
+
+	if (!needsInstall && !needsMount && !needsViteConfig) return null;
+
+	if (needsMount && !layoutPath) {
+		return [
+			{
+				label: 'Feedback widget',
+				message: 'no src/routes/+layout.svelte — create one and rerun'
+			}
+		];
 	}
 
-	const action: FeedbackMountAction = detection.dependencies.feedback
-		? 'mount-only'
-		: 'install-and-mount';
+	const plan: FeedbackSetupPlan = {
+		install: needsInstall,
+		mount: needsMount,
+		layoutPath,
+		viteConfig: needsViteConfig,
+		viteConfigPath
+	};
 
-	const confirmed = await runtime.promptMountFeedback(action, layoutPath);
+	const confirmed = await runtime.promptFeedbackSetup(plan);
 	if (!confirmed) return null;
 
-	if (action === 'install-and-mount') {
+	const notes: LabelledMessage[] = [];
+
+	if (needsInstall) {
 		const installed = runtime.installPackage(detection.root!, packageManager, '@dryui/feedback');
 		if (!installed) {
-			return {
-				mounted: false,
+			notes.push({
+				label: 'Feedback widget',
 				message: `install failed — run \`${packageManager} add @dryui/feedback\` manually`
-			};
+			});
+			return notes;
 		}
 	}
 
-	const mounted = runtime.mountFeedbackInLayout(layoutPath, FEEDBACK_SERVER_URL);
-	return mounted
-		? { mounted: true, message: `mounted in ${layoutPath}` }
-		: { mounted: false, message: `failed to edit ${layoutPath}` };
+	if (needsMount && layoutPath) {
+		const mounted = runtime.mountFeedbackInLayout(layoutPath, FEEDBACK_SERVER_URL);
+		notes.push({
+			label: 'Feedback widget',
+			message: mounted ? `mounted in ${layoutPath}` : `failed to edit ${layoutPath}`
+		});
+	}
+
+	if (needsViteConfig && viteConfigPath) {
+		const patched = runtime.patchViteConfigFeedbackNoExternal(viteConfigPath);
+		notes.push({
+			label: 'Vite config',
+			message: patched
+				? `added @dryui/feedback to ssr.noExternal in ${viteConfigPath}`
+				: `could not patch ${viteConfigPath} — add @dryui/feedback to ssr.noExternal manually`
+		});
+	}
+
+	return notes;
 }
 
 export async function runUserProjectLauncher(
@@ -434,7 +480,7 @@ export async function runUserProjectLauncher(
 
 	try {
 		const plan = await planUserProjectDevServer(runtime, { host: devHost, port: devPort });
-		const mountResult = await planAndApplyFeedbackMount(detection, packageManager, runtime);
+		const setupNotes = await planAndApplyFeedbackSetup(detection, packageManager, runtime);
 
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
 
@@ -455,9 +501,8 @@ export async function runUserProjectLauncher(
 		);
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
-		const widgetNote = mountResult
-			? { label: 'Feedback widget', message: mountResult.message }
-			: feedbackWidgetNote(detection);
+		const fallbackNote = feedbackWidgetNote(detection);
+		const notes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
 
 		emitOrRun(
 			{
@@ -474,7 +519,7 @@ export async function runUserProjectLauncher(
 					],
 					noOpen,
 					opened,
-					...(widgetNote ? { notes: [widgetNote] } : {})
+					...(notes.length > 0 ? { notes } : {})
 				}),
 				error: null,
 				exitCode: 0
