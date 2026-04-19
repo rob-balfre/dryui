@@ -266,3 +266,86 @@ export function mountFeedbackInLayout(options: MountFeedbackOptions): boolean {
 		return false;
 	}
 }
+
+const VITE_CONFIG_CANDIDATES = [
+	'vite.config.ts',
+	'vite.config.js',
+	'vite.config.mts',
+	'vite.config.mjs'
+];
+
+export function findViteConfig(root: string): string | null {
+	for (const name of VITE_CONFIG_CANDIDATES) {
+		const candidate = resolve(root, name);
+		if (existsSync(candidate)) return candidate;
+	}
+	return null;
+}
+
+const FEEDBACK_NO_EXTERNAL_PATTERN =
+	/noExternal\s*:\s*(?:\[[\s\S]*?['"]@dryui\/feedback['"][\s\S]*?\]|['"]@dryui\/feedback['"])/;
+
+export function viteConfigHasFeedbackNoExternal(configPath: string): boolean {
+	try {
+		return FEEDBACK_NO_EXTERNAL_PATTERN.test(readFileSync(configPath, 'utf-8'));
+	} catch {
+		return false;
+	}
+}
+
+function injectIntoExistingNoExternalArray(content: string): string | null {
+	const match = content.match(/noExternal\s*:\s*\[([\s\S]*?)\]/);
+	if (!match) return null;
+	const inner = match[1] ?? '';
+	const trimmed = inner.trim();
+	const separator = trimmed === '' || trimmed.endsWith(',') ? '' : ', ';
+	const replacement = `noExternal: [${inner.replace(/\s*$/, '')}${separator}'@dryui/feedback']`;
+	return content.replace(match[0], replacement);
+}
+
+function injectNoExternalIntoSsrBlock(content: string): string | null {
+	const match = content.match(/ssr\s*:\s*\{/);
+	if (!match) return null;
+	const insertPos = (match.index ?? 0) + match[0].length;
+	return (
+		content.slice(0, insertPos) +
+		`\n\t\tnoExternal: ['@dryui/feedback'],` +
+		content.slice(insertPos)
+	);
+}
+
+function injectSsrIntoConfigObject(content: string): string | null {
+	const match = content.match(/defineConfig\s*\(\s*\{/) ?? content.match(/export\s+default\s*\{/);
+	if (!match) return null;
+	const insertPos = (match.index ?? 0) + match[0].length;
+	return (
+		content.slice(0, insertPos) +
+		`\n\tssr: { noExternal: ['@dryui/feedback'] },` +
+		content.slice(insertPos)
+	);
+}
+
+export function patchViteConfigFeedbackNoExternal(configPath: string): boolean {
+	let content: string;
+	try {
+		content = readFileSync(configPath, 'utf-8');
+	} catch {
+		return false;
+	}
+
+	if (FEEDBACK_NO_EXTERNAL_PATTERN.test(content)) return true;
+
+	const updated =
+		injectIntoExistingNoExternalArray(content) ??
+		injectNoExternalIntoSsrBlock(content) ??
+		injectSsrIntoConfigObject(content);
+
+	if (!updated) return false;
+
+	try {
+		writeFileSync(configPath, updated, 'utf-8');
+		return true;
+	} catch {
+		return false;
+	}
+}

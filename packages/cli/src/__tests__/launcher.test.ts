@@ -166,9 +166,12 @@ function buildRuntime(
 		spawnProjectDevServer: () => {},
 		waitForUrl: async () => true,
 		promptKillPortHolder: async () => false,
-		promptMountFeedback: async () => false,
+		promptFeedbackSetup: async () => false,
 		installPackage: () => true,
 		mountFeedbackInLayout: () => true,
+		findViteConfig: () => null,
+		viteConfigHasFeedbackNoExternal: () => true,
+		patchViteConfigFeedbackNoExternal: () => true,
 		sleep: async () => {},
 		now: () => 42,
 		openBrowser: () => false,
@@ -377,8 +380,9 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).toContain('Feedback widget: not mounted');
 	});
 
-	test('auto-installs and mounts when the user confirms', async () => {
+	test('auto-installs, mounts, and patches vite config when the user confirms', async () => {
 		const root = createTempTree({ 'package.json': '{}' });
+		const viteConfigPath = resolve(root, 'vite.config.ts');
 		const detection: ProjectDetection = {
 			...readyDetection(root),
 			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
@@ -386,7 +390,12 @@ describe('runUserProjectLauncher', () => {
 		};
 		const installCalls: Array<{ pm: string; pkg: string }> = [];
 		const mountCalls: string[] = [];
-		const promptCalls: Array<{ action: string; layoutPath: string }> = [];
+		const patchCalls: string[] = [];
+		const promptCalls: Array<{
+			install: boolean;
+			mount: boolean;
+			viteConfig: boolean;
+		}> = [];
 
 		const result = await captureAsyncCommandIO(() =>
 			runUserProjectLauncher(['--no-open'], {
@@ -395,8 +404,14 @@ describe('runUserProjectLauncher', () => {
 				runtime: buildRuntime({
 					detectProject: () => detection,
 					urlResponds: async () => true,
-					promptMountFeedback: async (action, layoutPath) => {
-						promptCalls.push({ action, layoutPath });
+					findViteConfig: () => viteConfigPath,
+					viteConfigHasFeedbackNoExternal: () => false,
+					promptFeedbackSetup: async (plan) => {
+						promptCalls.push({
+							install: plan.install,
+							mount: plan.mount,
+							viteConfig: plan.viteConfig
+						});
 						return true;
 					},
 					installPackage: (_cwd, pm, pkg) => {
@@ -406,42 +421,62 @@ describe('runUserProjectLauncher', () => {
 					mountFeedbackInLayout: (layoutPath) => {
 						mountCalls.push(layoutPath);
 						return true;
+					},
+					patchViteConfigFeedbackNoExternal: (configPath) => {
+						patchCalls.push(configPath);
+						return true;
 					}
 				})
 			})
 		);
 
-		expect(promptCalls).toEqual([
-			{ action: 'install-and-mount', layoutPath: detection.files.rootLayout! }
-		]);
+		expect(promptCalls).toEqual([{ install: true, mount: true, viteConfig: true }]);
 		expect(installCalls).toEqual([{ pm: 'bun', pkg: '@dryui/feedback' }]);
 		expect(mountCalls).toEqual([detection.files.rootLayout!]);
+		expect(patchCalls).toEqual([viteConfigPath]);
 		expect(result.logs[0]).toContain(`Feedback widget: mounted in ${detection.files.rootLayout}`);
+		expect(result.logs[0]).toContain(
+			`Vite config: added @dryui/feedback to ssr.noExternal in ${viteConfigPath}`
+		);
 	});
 
-	test('mounts without install when only the component is missing', async () => {
+	test('only patches vite config when install and mount are already done', async () => {
 		const root = createTempTree({ 'package.json': '{}' });
-		const detection: ProjectDetection = {
-			...readyDetection(root),
-			feedback: { layoutPath: null }
-		};
+		const viteConfigPath = resolve(root, 'vite.config.ts');
+		const detection = readyDetection(root);
 		const installCalls: number[] = [];
-		const mountCalls: string[] = [];
+		const mountCalls: number[] = [];
+		const patchCalls: string[] = [];
 
-		await captureAsyncCommandIO(() =>
+		const result = await captureAsyncCommandIO(() =>
 			runUserProjectLauncher(['--no-open'], {
 				cwd: root,
 				spec: STUB_SPEC,
 				runtime: buildRuntime({
 					detectProject: () => detection,
 					urlResponds: async () => true,
-					promptMountFeedback: async () => true,
+					findViteConfig: () => viteConfigPath,
+					viteConfigHasFeedbackNoExternal: () => false,
+					promptFeedbackSetup: async (plan) => {
+						expect(plan).toEqual({
+							install: false,
+							mount: false,
+							layoutPath: detection.files.rootLayout,
+							viteConfig: true,
+							viteConfigPath
+						});
+						return true;
+					},
 					installPackage: () => {
 						installCalls.push(1);
 						return true;
 					},
-					mountFeedbackInLayout: (layoutPath) => {
-						mountCalls.push(layoutPath);
+					mountFeedbackInLayout: () => {
+						mountCalls.push(1);
+						return true;
+					},
+					patchViteConfigFeedbackNoExternal: (configPath) => {
+						patchCalls.push(configPath);
 						return true;
 					}
 				})
@@ -449,7 +484,34 @@ describe('runUserProjectLauncher', () => {
 		);
 
 		expect(installCalls).toEqual([]);
-		expect(mountCalls).toEqual([detection.files.rootLayout!]);
+		expect(mountCalls).toEqual([]);
+		expect(patchCalls).toEqual([viteConfigPath]);
+		expect(result.logs[0]).toContain('Vite config: added @dryui/feedback');
+	});
+
+	test('reports when the vite patch fails', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const viteConfigPath = resolve(root, 'vite.config.ts');
+		const detection = readyDetection(root);
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true,
+					findViteConfig: () => viteConfigPath,
+					viteConfigHasFeedbackNoExternal: () => false,
+					promptFeedbackSetup: async () => true,
+					patchViteConfigFeedbackNoExternal: () => false
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain(
+			`Vite config: could not patch ${viteConfigPath} — add @dryui/feedback to ssr.noExternal manually`
+		);
 	});
 
 	test('reports when the install step fails', async () => {
@@ -467,7 +529,7 @@ describe('runUserProjectLauncher', () => {
 				runtime: buildRuntime({
 					detectProject: () => detection,
 					urlResponds: async () => true,
-					promptMountFeedback: async () => true,
+					promptFeedbackSetup: async () => true,
 					installPackage: () => false
 				})
 			})
