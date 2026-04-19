@@ -9,6 +9,7 @@ import {
 } from '@dryui/feedback-server';
 import {
 	detectProject as detectProjectDefault,
+	type DryuiPackageManager,
 	type ProjectDetection,
 	type ProjectPlannerSpec
 } from '@dryui/mcp/project-planner';
@@ -17,8 +18,10 @@ import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
 	findPortHolder as findPortHolderDefault,
+	installPackage as installPackageDefault,
 	isHealthyProbeStatus,
 	killPortHolder as killPortHolderDefault,
+	mountFeedbackInLayout as mountFeedbackInLayoutDefault,
 	openBrowser,
 	type PortHolder,
 	readProjectDevScript as readProjectDevScriptDefault,
@@ -232,6 +235,8 @@ const DEFAULT_PROJECT_DEV_PORT = 5173;
 const PROJECT_DEV_READY_TIMEOUT_MS = 30_000;
 const PORT_FREE_WAIT_MS = 500;
 
+export type FeedbackMountAction = 'install-and-mount' | 'mount-only';
+
 export interface UserProjectLauncherRuntime {
 	detectProject: (cwd: string) => ProjectDetection;
 	readProjectDevScript: (root: string) => string | null;
@@ -243,6 +248,13 @@ export interface UserProjectLauncherRuntime {
 	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => void;
 	waitForUrl: (url: string, timeoutMs: number) => Promise<boolean>;
 	promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean>;
+	promptMountFeedback: (action: FeedbackMountAction, layoutPath: string) => Promise<boolean>;
+	installPackage: (
+		cwd: string,
+		packageManager: Exclude<DryuiPackageManager, 'unknown'>,
+		packageName: string
+	) => boolean;
+	mountFeedbackInLayout: (layoutPath: string, serverUrl: string) => boolean;
 	sleep: (ms: number) => Promise<void>;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
@@ -336,11 +348,59 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	waitForUrl: waitForUrlDefault,
 	// Default declines to kill — safe for non-TTY callers that have no way to confirm.
 	promptKillPortHolder: async () => false,
+	// Default declines to mount — safe for non-TTY callers that have no way to confirm.
+	promptMountFeedback: async () => false,
+	installPackage: (cwd, packageManager, packageName) =>
+		installPackageDefault({ cwd, packageManager, packageName }),
+	mountFeedbackInLayout: (layoutPath, serverUrl) =>
+		mountFeedbackInLayoutDefault({ layoutPath, serverUrl }),
 	sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 	now: () => Date.now(),
 	openBrowser,
 	onProgress: () => {}
 };
+
+const FEEDBACK_SERVER_URL = `http://${DEFAULT_FEEDBACK_HOST}:${DEFAULT_FEEDBACK_PORT}`;
+
+interface FeedbackMountResult {
+	mounted: boolean;
+	message: string;
+}
+
+async function planAndApplyFeedbackMount(
+	detection: ProjectDetection,
+	packageManager: Exclude<DryuiPackageManager, 'unknown'>,
+	runtime: UserProjectLauncherRuntime
+): Promise<FeedbackMountResult | null> {
+	if (detection.dependencies.feedback && detection.feedback.layoutPath) return null;
+
+	const layoutPath = detection.files.rootLayout;
+	if (!layoutPath) {
+		return { mounted: false, message: 'no src/routes/+layout.svelte — create one and rerun' };
+	}
+
+	const action: FeedbackMountAction = detection.dependencies.feedback
+		? 'mount-only'
+		: 'install-and-mount';
+
+	const confirmed = await runtime.promptMountFeedback(action, layoutPath);
+	if (!confirmed) return null;
+
+	if (action === 'install-and-mount') {
+		const installed = runtime.installPackage(detection.root!, packageManager, '@dryui/feedback');
+		if (!installed) {
+			return {
+				mounted: false,
+				message: `install failed — run \`${packageManager} add @dryui/feedback\` manually`
+			};
+		}
+	}
+
+	const mounted = runtime.mountFeedbackInLayout(layoutPath, FEEDBACK_SERVER_URL);
+	return mounted
+		? { mounted: true, message: `mounted in ${layoutPath}` }
+		: { mounted: false, message: `failed to edit ${layoutPath}` };
+}
 
 export async function runUserProjectLauncher(
 	args: string[],
@@ -374,6 +434,7 @@ export async function runUserProjectLauncher(
 
 	try {
 		const plan = await planUserProjectDevServer(runtime, { host: devHost, port: devPort });
+		const mountResult = await planAndApplyFeedbackMount(detection, packageManager, runtime);
 
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
 
@@ -394,7 +455,9 @@ export async function runUserProjectLauncher(
 		);
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
-		const widgetNote = feedbackWidgetNote(detection);
+		const widgetNote = mountResult
+			? { label: 'Feedback widget', message: mountResult.message }
+			: feedbackWidgetNote(detection);
 
 		emitOrRun(
 			{

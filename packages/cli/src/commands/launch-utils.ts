@@ -1,5 +1,5 @@
-import { execFileSync, spawn } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import type { DryuiPackageManager } from '@dryui/mcp/project-planner';
@@ -209,4 +209,60 @@ export function spawnProjectDevServerInBackground(options: SpawnProjectDevServer
 		stdio: 'ignore'
 	});
 	child.unref();
+}
+
+export interface InstallPackageOptions {
+	cwd: string;
+	packageManager: Exclude<DryuiPackageManager, 'unknown'>;
+	packageName: string;
+}
+
+export function installPackage(options: InstallPackageOptions): boolean {
+	const result = spawnSync(options.packageManager, ['add', options.packageName], {
+		cwd: options.cwd,
+		stdio: 'inherit'
+	});
+	return result.status === 0;
+}
+
+export interface MountFeedbackOptions {
+	layoutPath: string;
+	serverUrl: string;
+}
+
+const FEEDBACK_IMPORT_STATEMENT = "import { Feedback } from '@dryui/feedback';";
+
+function injectFeedbackImport(content: string): string {
+	const scriptOpen = content.match(/<script[^>]*>/);
+	if (scriptOpen) {
+		const insertPos = (scriptOpen.index ?? 0) + scriptOpen[0].length;
+		return (
+			content.slice(0, insertPos) + `\n\t${FEEDBACK_IMPORT_STATEMENT}` + content.slice(insertPos)
+		);
+	}
+	return `<script lang="ts">\n\t${FEEDBACK_IMPORT_STATEMENT}\n</script>\n\n${content}`;
+}
+
+export function mountFeedbackInLayout(options: MountFeedbackOptions): boolean {
+	let content: string;
+	try {
+		content = readFileSync(options.layoutPath, 'utf-8');
+	} catch {
+		return false;
+	}
+
+	if (/from\s+['"]@dryui\/feedback['"]/.test(content)) return true;
+
+	const withImport = injectFeedbackImport(content);
+	const feedbackTag = `<Feedback serverUrl="${options.serverUrl}" />`;
+	const updated = /<Feedback\b/.test(withImport)
+		? withImport
+		: `${withImport.replace(/\s*$/, '')}\n\n${feedbackTag}\n`;
+
+	try {
+		writeFileSync(options.layoutPath, updated, 'utf-8');
+		return true;
+	} catch {
+		return false;
+	}
 }

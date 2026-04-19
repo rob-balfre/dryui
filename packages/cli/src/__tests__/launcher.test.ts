@@ -166,6 +166,9 @@ function buildRuntime(
 		spawnProjectDevServer: () => {},
 		waitForUrl: async () => true,
 		promptKillPortHolder: async () => false,
+		promptMountFeedback: async () => false,
+		installPackage: () => true,
+		mountFeedbackInLayout: () => true,
 		sleep: async () => {},
 		now: () => 42,
 		openBrowser: () => false,
@@ -372,6 +375,132 @@ describe('runUserProjectLauncher', () => {
 		);
 
 		expect(result.logs[0]).toContain('Feedback widget: not mounted');
+	});
+
+	test('auto-installs and mounts when the user confirms', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
+			feedback: { layoutPath: null }
+		};
+		const installCalls: Array<{ pm: string; pkg: string }> = [];
+		const mountCalls: string[] = [];
+		const promptCalls: Array<{ action: string; layoutPath: string }> = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true,
+					promptMountFeedback: async (action, layoutPath) => {
+						promptCalls.push({ action, layoutPath });
+						return true;
+					},
+					installPackage: (_cwd, pm, pkg) => {
+						installCalls.push({ pm, pkg });
+						return true;
+					},
+					mountFeedbackInLayout: (layoutPath) => {
+						mountCalls.push(layoutPath);
+						return true;
+					}
+				})
+			})
+		);
+
+		expect(promptCalls).toEqual([
+			{ action: 'install-and-mount', layoutPath: detection.files.rootLayout! }
+		]);
+		expect(installCalls).toEqual([{ pm: 'bun', pkg: '@dryui/feedback' }]);
+		expect(mountCalls).toEqual([detection.files.rootLayout!]);
+		expect(result.logs[0]).toContain(`Feedback widget: mounted in ${detection.files.rootLayout}`);
+	});
+
+	test('mounts without install when only the component is missing', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			feedback: { layoutPath: null }
+		};
+		const installCalls: number[] = [];
+		const mountCalls: string[] = [];
+
+		await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true,
+					promptMountFeedback: async () => true,
+					installPackage: () => {
+						installCalls.push(1);
+						return true;
+					},
+					mountFeedbackInLayout: (layoutPath) => {
+						mountCalls.push(layoutPath);
+						return true;
+					}
+				})
+			})
+		);
+
+		expect(installCalls).toEqual([]);
+		expect(mountCalls).toEqual([detection.files.rootLayout!]);
+	});
+
+	test('reports when the install step fails', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
+			feedback: { layoutPath: null }
+		};
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true,
+					promptMountFeedback: async () => true,
+					installPackage: () => false
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain(
+			'Feedback widget: install failed — run `bun add @dryui/feedback` manually'
+		);
+	});
+
+	test('reports when no src/routes/+layout.svelte exists', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
+			files: { ...readyDetection(root).files, rootLayout: null },
+			feedback: { layoutPath: null }
+		};
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain(
+			'Feedback widget: no src/routes/+layout.svelte — create one and rerun'
+		);
 	});
 
 	test('emits no feedback widget note when installed and mounted', async () => {
