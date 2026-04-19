@@ -23,7 +23,8 @@ import { getFeedbackUiResult } from './feedback.js';
 import { runInit } from './init.js';
 import { getInstallHookResult } from './install-hook.js';
 import { getInstall } from './install.js';
-import { runLauncher } from './launcher.js';
+import { runLauncher, runUserProjectLauncher } from './launcher.js';
+import type { PortHolder } from './launch-utils.js';
 import {
 	getSetupGuide,
 	setupGuideIds,
@@ -461,9 +462,17 @@ async function promptConfirm(
 	return value === 'yes';
 }
 
+async function promptKillPortHolder(holder: PortHolder, port: number): Promise<boolean> {
+	return await promptConfirm(
+		`Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Kill it and start your project dev server?`,
+		false
+	);
+}
+
 async function runFeedbackSession(
 	noOpen: boolean,
 	exitOnComplete: boolean,
+	spec: Spec | null,
 	launcherOptions: Omit<
 		NonNullable<Parameters<typeof runLauncher>[1]>,
 		'cwd' | 'exitOnComplete'
@@ -472,6 +481,24 @@ async function runFeedbackSession(
 	const args = noOpen ? ['--no-open'] : [];
 	const launched = await runLauncher(args, { exitOnComplete, ...launcherOptions });
 	if (launched) return;
+
+	if (spec) {
+		const onProgress = launcherOptions.runtime?.onProgress;
+		const userProjectLaunched = await runUserProjectLauncher(args, {
+			exitOnComplete,
+			spec,
+			runtime: {
+				promptKillPortHolder,
+				...(onProgress
+					? {
+							onProgress: ({ cwd, noOpen: projectNoOpen }) =>
+								onProgress({ workspaceRoot: cwd, noOpen: projectNoOpen })
+						}
+					: {})
+			}
+		});
+		if (userProjectLaunched) return;
+	}
 
 	const result = await getFeedbackUiResult(args, exitOnComplete ? 'toon' : 'text');
 	if (exitOnComplete) {
@@ -579,7 +606,7 @@ async function runInteractiveEditorSetup(args: string[], mainContext: string[]):
 	}
 }
 
-async function runInteractiveFeedbackSetup(mainContext: string[]): Promise<void> {
+async function runInteractiveFeedbackSetup(spec: Spec, mainContext: string[]): Promise<void> {
 	const action = await promptSelect(
 		'How would you like to start feedback?',
 		FEEDBACK_MENU_OPTIONS,
@@ -596,7 +623,7 @@ async function runInteractiveFeedbackSetup(mainContext: string[]): Promise<void>
 		process.exit(0);
 	}
 
-	await runFeedbackSession(action === 'print', false, {
+	await runFeedbackSession(action === 'print', false, spec, {
 		runtime: {
 			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(mainContext, noOpen)
 		}
@@ -664,7 +691,7 @@ async function runInteractiveSetup(args: string[], spec: Spec): Promise<void> {
 				await runInteractiveEditorSetup(args, mainContext);
 				break;
 			case 'feedback':
-				await runInteractiveFeedbackSetup(mainContext);
+				await runInteractiveFeedbackSetup(spec, mainContext);
 				mainContext = buildMainContext(spec);
 				break;
 			case 'init':
@@ -701,7 +728,7 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 			emitCommandResult(getInstallHookResult([], 'text'));
 		}
 		if (hasFlag(args, '--open-feedback')) {
-			await runFeedbackSession(hasFlag(args, '--no-open'), true);
+			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);
 			return;
 		}
 		process.exit(0);
@@ -709,7 +736,7 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 
 	if (!isInteractiveTTY()) {
 		if (hasFlag(args, '--open-feedback')) {
-			await runFeedbackSession(hasFlag(args, '--no-open'), true);
+			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);
 			return;
 		}
 		setupHelp();
