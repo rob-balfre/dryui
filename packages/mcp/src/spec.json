@@ -15825,20 +15825,18 @@
             }
           },
           "forwardedProps": {
-            "baseType": "Omit<HTMLAnchorAttributes, 'children' | 'href'>, Omit<HTMLButtonAttributes, 'children'>",
+            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'children'>",
             "via": "rest",
-            "element": "a",
+            "element": "element",
             "examples": [
-              "href",
-              "target",
-              "rel"
+              "id",
+              "class",
+              "aria-label"
             ],
             "omitted": [
-              "children",
-              "href",
               "children"
             ],
-            "note": "Forwards <a> attributes via rest props."
+            "note": "Forwards <element> attributes via rest props."
           }
         },
         "Content": {

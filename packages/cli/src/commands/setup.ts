@@ -84,7 +84,7 @@ const MAIN_MENU_OPTIONS: readonly SelectOption<MainMenuValue>[] = [
 	{
 		label: 'Set up editor or agent',
 		value: 'setup',
-		description: 'Choose Claude, Codex, Copilot, Cursor, Windsurf, or Zed.'
+		description: 'Choose Claude, Codex, OpenCode, Copilot, Cursor, Windsurf, or Zed.'
 	},
 	{
 		label: 'Start feedback session',
@@ -290,6 +290,7 @@ function setupHelp(exitCode = 0): never {
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
+				'  dryui setup --editor opencode',
 				'  dryui setup --editor claude-code --claude-hook',
 				'  dryui setup --open-feedback --no-open'
 			]

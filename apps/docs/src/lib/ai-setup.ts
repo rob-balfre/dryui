@@ -4,6 +4,7 @@ export type AiAgentId =
 	| 'claude-code'
 	| 'codex'
 	| 'gemini'
+	| 'opencode'
 	| 'cursor'
 	| 'copilot'
 	| 'windsurf'
@@ -20,6 +21,7 @@ export interface AiInstallStep {
 	title: string;
 	description?: string;
 	code?: string;
+	language?: string;
 }
 
 export interface AiAgentSetup {
@@ -150,6 +152,20 @@ const geminiConfig = `{
   }
 }`;
 
+const opencodeConfig = `{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "dryui": {
+      "type": "local",
+      "command": ["npx", "-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "local",
+      "command": ["npx", "-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+    }
+  }
+}`;
+
 const zedConfig = `{
   "context_servers": {
     "dryui": {
@@ -276,6 +292,45 @@ gemini extensions install ~/dryui/packages/plugin`
 		},
 		followUp:
 			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask` / `check` are available.'
+	},
+	{
+		id: 'opencode',
+		label: 'OpenCode',
+		description:
+			"Start with the DryUI CLI, then use OpenCode's native skill and MCP setup so it can follow DryUI conventions and call the same discovery and validation tools in-editor.",
+		quickSetup: {
+			title: '1. Install the CLI',
+			code: CLI_INSTALL_CODE
+		},
+		installSteps: [
+			{
+				title: 'Install the DryUI skill',
+				description:
+					'OpenCode loads skills from `.opencode/skills/` and also understands `.agents/skills/` compatibility paths.',
+				code: 'npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui',
+				language: 'bash'
+			},
+			{
+				title: 'Add the MCP servers',
+				description:
+					'Put this in `opencode.json` at your project root so OpenCode can start the dryui and dryui-feedback servers locally.',
+				code: opencodeConfig,
+				language: 'json'
+			}
+		],
+		skill: {
+			title: '2. Install the skill',
+			note: "Use OpenCode's native skill path. `.agents/skills/dryui` also works if you want one cross-tool skill folder.",
+			code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui`
+		},
+		mcp: {
+			path: 'opencode.json',
+			note: '3. Add the MCP servers to `opencode.json`. OpenCode expects local MCP servers under the `mcp` object with `type: "local"` and command arrays.',
+			code: opencodeConfig,
+			language: 'json'
+		},
+		followUp:
+			'Use the CLI as the default surface. OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths. Restart OpenCode after adding the skill and `opencode.json`.'
 	},
 	{
 		id: 'copilot',

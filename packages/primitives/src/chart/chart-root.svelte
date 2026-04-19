@@ -75,7 +75,7 @@
 	const summaryText = $derived.by(() => {
 		if (summary?.trim()) return summary;
 		if (data.length === 0) return 'No data points available.';
-		if (data.length === 1) return `${data[0].label}: ${data[0].value}.`;
+		if (data.length === 1) return `${data[0]!.label}: ${data[0]!.value}.`;
 		const { highest, lowest } = stats;
 		if (!highest || !lowest) return `${data.length} data points available.`;
 		return `${data.length} data points. Highest is ${highest.label} at ${highest.value}. Lowest is ${lowest.label} at ${lowest.value}. Total is ${stats.total}.`;

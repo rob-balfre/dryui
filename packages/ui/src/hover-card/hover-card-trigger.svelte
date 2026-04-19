@@ -1,13 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { Button } from '../button/index.js';
 	import { getHoverCardCtx } from './context.svelte.js';
 
-	interface Props
-		extends
-			Omit<HTMLAnchorAttributes, 'children' | 'href'>,
-			Omit<HTMLButtonAttributes, 'children'> {
+	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 		href?: string;
 		children: Snippet;
 	}

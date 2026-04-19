@@ -19,7 +19,7 @@ bun install -g @dryui/cli@latest
 dryui
 ```
 
-Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every supported client (Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Copilot, Zed) live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) — the canonical source rendered to the docs [getting-started page](https://dryui.dev/getting-started). Don't duplicate those snippets here; update `ai-setup.ts` instead.
+Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every supported client (Claude Code, Codex, Gemini CLI, OpenCode, Cursor, Windsurf, Copilot, Zed) live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) — the canonical source rendered to the docs [getting-started page](https://dryui.dev/getting-started). Don't duplicate those snippets here; update `ai-setup.ts` instead.
 
 Codex (the primary AGENTS.md audience) canonical install:
 
@@ -31,7 +31,7 @@ codex marketplace add rob-balfre/dryui
 
 Then start `codex`, run `/plugins`, and install `DryUI`. Inside this repo, use the local plugin from `/plugins` rather than copying skills into `.codex/skills`.
 
-The plugin is the canonical way Claude Code, Codex, and Gemini CLI get DryUI skills. Manual MCP config is only for tools that do not support plugins.
+The plugin is the canonical way Claude Code, Codex, and Gemini CLI get DryUI skills. OpenCode uses its native `.opencode/skills/` + `opencode.json` path. Manual MCP config is only for tools that do not support skills or plugins natively.
 
 ## CSS Rules
 

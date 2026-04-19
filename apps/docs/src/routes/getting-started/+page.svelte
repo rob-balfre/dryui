@@ -22,21 +22,21 @@
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
 
-	const PLUGIN_AGENT_IDS = ['claude-code', 'codex', 'gemini'] as const;
+	const FEATURED_AGENT_IDS = ['claude-code', 'codex', 'gemini', 'opencode'] as const;
 
 	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
-		(PLUGIN_AGENT_IDS as readonly string[]).includes(setup.id)
+		(FEATURED_AGENT_IDS as readonly string[]).includes(setup.id)
 	);
 
 	const pluginParam = $derived(browser ? page.url.searchParams.get('plugin') : null);
-	const isFeaturedPlugin = $derived(
-		pluginParam ? (PLUGIN_AGENT_IDS as readonly string[]).includes(pluginParam) : false
+	const isFeaturedAgent = $derived(
+		pluginParam ? (FEATURED_AGENT_IDS as readonly string[]).includes(pluginParam) : false
 	);
 	const isKnownAgent = $derived(
 		pluginParam ? aiAgentSetups.some((setup) => setup.id === pluginParam) : false
 	);
-	const initialPluginTab = $derived(
-		isFeaturedPlugin ? (pluginParam as string) : (featuredAgentSetups[0]?.id ?? 'claude-code')
+	const initialFeaturedTab = $derived(
+		isFeaturedAgent ? (pluginParam as string) : (featuredAgentSetups[0]?.id ?? 'claude-code')
 	);
 	const initialEditorTab = $derived(isKnownAgent ? (pluginParam as string) : 'claude-code');
 
@@ -129,19 +129,23 @@
 
 		<section id="install-plugin">
 			<div class="stack-lg">
-				<Heading level={2}>Install the DryUI plugin</Heading>
+				<Heading level={2}>Install the DryUI integration</Heading>
 				<Text size="lg" color="secondary">
-					Once <code>dryui</code> is installed, add the DryUI plugin in Claude Code, Codex, or
-					Gemini CLI. Each plugin ships the DryUI skill plus the <code>dryui</code> and
-					<code>dryui-feedback</code> MCP servers in one step.
+					Once <code>dryui</code> is installed, wire DryUI into Claude Code, Codex, Gemini CLI, or
+					OpenCode. Depending on the agent, that means a plugin, an extension, or a native skill +
+					MCP setup. Each path exposes the DryUI skill plus the <code>dryui</code> and
+					<code>dryui-feedback</code> MCP servers.
 				</Text>
 
-				<Tabs.Root value={initialPluginTab}>
+				<Tabs.Root value={initialFeaturedTab}>
 					<Tabs.List>
 						{#each featuredAgentSetups as setup (setup.id)}
 							<Tabs.Trigger value={setup.id}>
 								<span class="agent-tab-label">
-									<AgentLogo agent={setup.id as 'claude-code' | 'codex' | 'gemini'} size={18} />
+									<AgentLogo
+										agent={setup.id as 'claude-code' | 'codex' | 'gemini' | 'opencode'}
+										size={18}
+									/>
 									{setup.label}
 								</span>
 							</Tabs.Trigger>
@@ -163,7 +167,7 @@
 														<Timeline.Description>{step.description}</Timeline.Description>
 													{/if}
 													{#if step.code}
-														<CodeBlock language="bash" code={step.code} />
+														<CodeBlock language={step.language ?? 'bash'} code={step.code} />
 													{/if}
 												</Timeline.Content>
 											</Timeline.Item>
@@ -184,8 +188,8 @@
 				</Tabs.Root>
 
 				<Text size="sm" color="muted">
-					Using Cursor, Copilot, Windsurf, or Zed? They don't ship a DryUI plugin yet — the full
-					setup matrix below covers the MCP-only install for each.
+					Using Cursor, Copilot, Windsurf, or Zed? The full setup matrix below covers their skill
+					and MCP paths too.
 				</Text>
 			</div>
 		</section>
@@ -306,9 +310,9 @@
 			<div class="stack-lg">
 				<Heading level={2}>Full editor setup</Heading>
 				<Text size="lg" color="secondary">
-					Use the full matrix below if you want the complete per-editor setup, or the manual MCP
-					fallback for Claude Code and Codex. The snippets are the same shared setup data that backs
-					the CLI and docs.
+					Use the full matrix below if you want the complete per-editor setup, including native
+					skill paths and manual MCP config where a marketplace plugin is not available. The
+					snippets are the same shared setup data that backs the CLI and docs.
 				</Text>
 
 				<CodeBlock language="bash" code="dryui" />

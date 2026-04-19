@@ -1,4 +1,11 @@
-export type SetupGuideId = 'claude-code' | 'codex' | 'copilot' | 'cursor' | 'windsurf' | 'zed';
+export type SetupGuideId =
+	| 'claude-code'
+	| 'codex'
+	| 'opencode'
+	| 'copilot'
+	| 'cursor'
+	| 'windsurf'
+	| 'zed';
 
 export interface SetupGuideSection {
 	title: string;
@@ -41,6 +48,20 @@ const COPILOT_CONFIG = `{
   }
 }`;
 
+const OPENCODE_CONFIG = `{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "dryui": {
+      "type": "local",
+      "command": ["npx", "-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "local",
+      "command": ["npx", "-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+    }
+  }
+}`;
+
 const ZED_CONFIG = `{
   "context_servers": {
     "dryui": {
@@ -55,6 +76,7 @@ const ZED_CONFIG = `{
 export const setupGuideIds: readonly SetupGuideId[] = [
 	'claude-code',
 	'codex',
+	'opencode',
 	'copilot',
 	'cursor',
 	'windsurf',
@@ -111,6 +133,26 @@ ${CODEX_CONFIG}`
 		],
 		followUp:
 			'After installing the plugin, start a new Codex session so `ask` / `check` are available.'
+	},
+	{
+		id: 'opencode',
+		label: 'OpenCode',
+		description:
+			"Use OpenCode's native skill path plus local MCP config so DryUI conventions and tools are available in-editor.",
+		sections: [
+			{
+				title: 'Install the skill',
+				note: 'Copy to `.opencode/skills/` for the native OpenCode path. `.agents/skills/` also works if you want a shared cross-tool folder.',
+				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui`
+			},
+			{
+				title: 'Add the MCP servers',
+				note: 'Put this in `opencode.json` at the project root. OpenCode expects local MCP servers under `mcp` with `type: "local"`.',
+				code: OPENCODE_CONFIG
+			}
+		],
+		followUp:
+			'OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths. Restart OpenCode after wiring `opencode.json`.'
 	},
 	{
 		id: 'copilot',

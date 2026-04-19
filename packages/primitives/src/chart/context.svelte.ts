@@ -21,8 +21,8 @@ export interface ChartContext {
 	readonly padding: { top: number; right: number; bottom: number; left: number };
 	hasBars: boolean;
 	hasHorizontalBars: boolean;
-	interactiveHandler?: (index: number) => void;
-	interactiveOwner?: symbol;
+	interactiveHandler?: ((index: number) => void) | undefined;
+	interactiveOwner?: symbol | undefined;
 }
 export const [setChartCtx, getChartCtx] = createContext<ChartContext>('chart');
 
