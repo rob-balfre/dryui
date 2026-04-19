@@ -325,12 +325,29 @@ function injectSsrIntoConfigObject(content: string): string | null {
 	);
 }
 
+const MINIMAL_VITE_CONFIG = `import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [sveltekit()],
+	ssr: {
+		noExternal: ['@dryui/feedback']
+	}
+});
+`;
+
 export function patchViteConfigFeedbackNoExternal(configPath: string): boolean {
 	let content: string;
 	try {
 		content = readFileSync(configPath, 'utf-8');
-	} catch {
-		return false;
+	} catch (err) {
+		if ((err as NodeJS.ErrnoException).code !== 'ENOENT') return false;
+		try {
+			writeFileSync(configPath, MINIMAL_VITE_CONFIG, 'utf-8');
+			return true;
+		} catch {
+			return false;
+		}
 	}
 
 	if (FEEDBACK_NO_EXTERNAL_PATTERN.test(content)) return true;
