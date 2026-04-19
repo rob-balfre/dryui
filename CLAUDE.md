@@ -120,7 +120,7 @@ Registered in `.mcp.json`. Run via: `bun run packages/mcp/dist/index.js`
 
 ### Quick setup
 
-Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Copilot, and Zed. Add this layer after the CLI is already working.
+Per-tool install snippets and MCP server configurations are the single source of truth in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts), which renders to the docs site [getting-started page](https://dryui.dev/getting-started). Supported targets: Claude Code, Codex, Gemini CLI, OpenCode, Cursor, Windsurf, Copilot, and Zed. Add this layer after the CLI is already working.
 
 For Claude Code, the canonical install is:
 
@@ -145,6 +145,14 @@ gemini extensions install ~/dryui/packages/plugin
 ```
 
 Gemini CLI does not yet support marketplace-style installs, so the extension is pointed at a local path. Inside this repo you can run `gemini extensions link packages/plugin` instead for live-reload development.
+
+For OpenCode, use the native skill + MCP path:
+
+```bash
+npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui
+```
+
+Then add the `dryui` and `dryui-feedback` local MCP servers to `opencode.json` at the project root. OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths.
 
 The plugin config ships two MCP servers:
 

@@ -114,7 +114,7 @@ No global install? Prefix commands with `bunx @dryui/cli` or `npx -y @dryui/cli`
 
 The DryUI skill and MCP server are the editor integration layer on top of that CLI workflow. The skill teaches conventions (compound components, theming, CSS rules, accessibility), and MCP exposes the same discovery/validation loop inside supported editors with `ask` / `check`.
 
-Per-tool editor setup (Claude Code, Codex, Gemini CLI, Cursor, Windsurf, Copilot, Zed) lives at https://dryui.dev/getting-started — do not copy install commands from this README; the web page is always up-to-date. The canonical source is [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts); update it there instead of duplicating client setup here.
+Per-tool editor setup (Claude Code, Codex, Gemini CLI, OpenCode, Cursor, Windsurf, Copilot, Zed) lives at https://dryui.dev/getting-started — do not copy install commands from this README; the web page is always up-to-date. The canonical source is [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts); update it there instead of duplicating client setup here.
 
 ### From Source
 

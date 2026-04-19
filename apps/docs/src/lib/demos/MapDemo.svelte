@@ -15,7 +15,7 @@
 		const mapboxgl = mapboxModule.default;
 		mapboxgl.workerUrl = workerModule.default;
 		mapboxgl.accessToken = token;
-		window.mapboxgl = mapboxgl;
+		(window as unknown as { mapboxgl?: unknown }).mapboxgl = mapboxgl;
 		ready = true;
 	});
 </script>

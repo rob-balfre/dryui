@@ -78,7 +78,7 @@
 	}
 </script>
 
-<Combobox.Root bind:open bind:value {disabled} {name}>
+<Combobox.Root bind:open bind:value {disabled} {...name !== undefined ? { name } : {}}>
 	<CountrySelectSync
 		{open}
 		{query}

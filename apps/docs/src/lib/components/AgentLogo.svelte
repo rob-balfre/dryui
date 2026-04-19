@@ -1,5 +1,5 @@
 <script lang="ts">
-	export type AgentLogoId = 'claude-code' | 'codex' | 'gemini' | 'copilot';
+	export type AgentLogoId = 'claude-code' | 'codex' | 'gemini' | 'opencode' | 'copilot';
 
 	interface Props {
 		agent: AgentLogoId;
@@ -29,6 +29,11 @@
 				d="M20.616 10.835a14.147 14.147 0 01-4.45-3.001 14.111 14.111 0 01-3.678-6.452.503.503 0 00-.975 0 14.134 14.134 0 01-3.679 6.452 14.155 14.155 0 01-4.45 3.001c-.65.28-1.318.505-2.002.678a.502.502 0 000 .975c.684.172 1.35.397 2.002.677a14.147 14.147 0 014.45 3.001 14.112 14.112 0 013.679 6.453.502.502 0 00.975 0c.172-.685.397-1.351.677-2.003a14.145 14.145 0 013.001-4.45 14.113 14.113 0 016.453-3.678.503.503 0 000-.975 13.245 13.245 0 01-2.003-.678z"
 			/>
 		</svg>
+	{:else if agent === 'opencode'}
+		<svg viewBox="0 0 24 24" fill="none" width={size} height={size}>
+			<rect x="6" y="4" width="12" height="16" stroke="currentColor" stroke-width="2" />
+			<rect x="9" y="7" width="6" height="10" fill="currentColor" opacity="0.45" />
+		</svg>
 	{:else if agent === 'copilot'}
 		<svg viewBox="0 0 24 24" fill="currentColor" fill-rule="evenodd" width={size} height={size}>
 			<path
@@ -55,6 +60,10 @@
 
 	.agent-logo[data-agent='gemini'] {
 		color: hsl(265 75% 68%);
+	}
+
+	.agent-logo[data-agent='opencode'] {
+		color: hsl(0 0% 72%);
 	}
 
 	.agent-logo[data-agent='copilot'] {

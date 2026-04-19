@@ -311,7 +311,7 @@
 						<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
 							<ChatThread messageCount={chatVisibleCount} scrollKey={chatVisibleCount}>
 								{#snippet children({ index })}
-									{@const msg = chatMessages[index]}
+									{@const msg = chatMessages[index]!}
 									{@const isTyping = index === 1 && assistantTyping}
 									<div class="chat-row" data-role={msg.role}>
 										<div class="chat-avatar">
@@ -380,7 +380,7 @@
 			</div>
 
 			<section class="plugins">
-				<Text size="xs" color="secondary" weight="medium">Plugin available in</Text>
+				<Text size="xs" color="secondary" weight="medium">Supported in</Text>
 				<div class="plugins-grid">
 					<a class="plugin" href={withBase('/getting-started?plugin=claude-code#install-plugin')}>
 						<AgentLogo agent="claude-code" size={40} />
@@ -393,6 +393,10 @@
 					<a class="plugin" href={withBase('/getting-started?plugin=gemini#install-plugin')}>
 						<AgentLogo agent="gemini" size={40} />
 						<span class="plugin-name">Gemini CLI</span>
+					</a>
+					<a class="plugin" href={withBase('/getting-started?plugin=opencode#install-plugin')}>
+						<AgentLogo agent="opencode" size={40} />
+						<span class="plugin-name">OpenCode</span>
 					</a>
 					<a class="plugin" href={withBase('/getting-started?plugin=copilot#full-editor-setup')}>
 						<AgentLogo agent="copilot" size={40} />

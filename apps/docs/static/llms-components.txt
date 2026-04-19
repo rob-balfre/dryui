@@ -2686,7 +2686,7 @@ Parts:
   Props: openDelay (number) | closeDelay (number) | children (Snippet), Content rendered inside the component., required
 - HoverCard.Trigger
   Props: href (string), Destination URL when the component renders as a link. | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <a> attributes via rest props.
+  Native props: Forwards <element> attributes via rest props.
 - HoverCard.Content
   Props: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
