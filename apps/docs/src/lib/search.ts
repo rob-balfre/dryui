@@ -1,3 +1,4 @@
+import { componentMeta } from '../../../../packages/mcp/src/component-catalog.js';
 import { categories, toSlug } from '$lib/nav';
 export interface SearchItem {
 	label: string;
@@ -77,12 +78,21 @@ const docsPages = allDocsPages.filter((page) => validRoutes.has(page.href));
 
 function getComponentItems(): SearchItem[] {
 	return categories.flatMap((category) =>
-		category.items.map((item) => ({
-			label: item.name,
-			href: `/components/${toSlug(item.name)}`,
-			description: `${category.label} component`,
-			keywords: [category.label.toLowerCase(), 'component', item.kind]
-		}))
+		category.items.map((item) => {
+			const keywords = [
+				category.label.toLowerCase(),
+				'component',
+				item.kind,
+				...(componentMeta[item.name]?.tags ?? [])
+			];
+
+			return {
+				label: item.name,
+				href: `/components/${toSlug(item.name)}`,
+				description: `${category.label} component`,
+				keywords: [...new Set(keywords)]
+			};
+		})
 	);
 }
 

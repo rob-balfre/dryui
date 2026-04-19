@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createPositionedPopover } from '../utils/positioned-popover.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 	import { getMegaMenuCtx, getMegaMenuItemCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -17,21 +17,6 @@
 
 	let panelEl = $state<HTMLDivElement | null>(null);
 
-	const popover = createPositionedPopover({
-		triggerEl: () => document.getElementById(itemCtx.triggerId),
-		contentEl: () => panelEl ?? null,
-		placement: () => 'bottom-start',
-		offset: () => 4
-	});
-
-	function handlePointerEnter() {
-		ctx.openItem(itemCtx.itemId);
-	}
-
-	function handlePointerLeave() {
-		ctx.closeItem();
-	}
-
 	function attachPanel(node: HTMLDivElement) {
 		panelEl = node;
 
@@ -42,23 +27,29 @@
 		};
 	}
 
-	function syncPopover(isOpen: boolean) {
-		return (node: HTMLDivElement) => {
-			if (isOpen && !node.matches(':popover-open')) {
-				popover.showPopover(node);
-			} else if (!isOpen && node.matches(':popover-open')) {
-				popover.hidePopover(node);
-			}
-		};
+	const popover = createAnchoredPopover({
+		triggerEl: () => document.getElementById(itemCtx.triggerId),
+		contentEl: () => panelEl ?? null,
+		open: () => itemCtx.open,
+		placement: () => 'bottom-start',
+		offset: () => 4
+	});
+
+	function handlePointerEnter() {
+		ctx.openItem(itemCtx.itemId, itemCtx.triggerId);
+	}
+
+	function handlePointerLeave() {
+		ctx.closeItem();
 	}
 </script>
 
 {#if itemCtx.open}
 	<div
 		{@attach attachPanel}
-		{@attach syncPopover(itemCtx.open)}
 		{@attach fromAction(popover.applyPosition, () => style)}
-		role="region"
+		id={itemCtx.panelId}
+		role="group"
 		popover="manual"
 		class={className}
 		aria-labelledby={itemCtx.triggerId}

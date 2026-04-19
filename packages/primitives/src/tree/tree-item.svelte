@@ -12,6 +12,8 @@
 
 	const ctx = getTreeCtx();
 	const expanded = $derived(ctx.isExpanded(itemId));
+	const focused = $derived(ctx.isFocused(itemId));
+	const hasChildren = $derived(ctx.hasChildren(itemId));
 	const selected = $derived(ctx.isSelected(itemId));
 
 	setTreeItemCtx({
@@ -23,12 +25,24 @@
 
 <div
 	role="treeitem"
-	aria-expanded={expanded}
+	tabindex={focused ? 0 : -1}
+	aria-expanded={hasChildren ? expanded : undefined}
 	aria-selected={selected}
+	data-branch={hasChildren || undefined}
 	data-expanded={expanded || undefined}
+	data-focused={focused || undefined}
 	data-selected={selected || undefined}
 	data-item-id={itemId}
 	class={className}
+	onclick={(e) => {
+		(e.currentTarget as HTMLElement).focus();
+		ctx.selectItem(itemId);
+	}}
+	ondblclick={() => {
+		if (hasChildren) {
+			ctx.toggleItem(itemId);
+		}
+	}}
 	{...rest}
 >
 	{@render children()}

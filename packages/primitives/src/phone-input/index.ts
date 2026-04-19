@@ -1,12 +1,7 @@
 import type { HTMLAttributes } from 'svelte/elements';
+import type { CountryInfo } from '../internal/countries.js';
 
-export interface CountryInfo {
-	code: string;
-	name: string;
-	dialCode: string;
-	flag: string;
-	format?: string;
-}
+export type { CountryInfo };
 
 export interface PhoneInputProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onchange'> {
 	value?: string;

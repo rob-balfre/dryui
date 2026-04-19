@@ -420,6 +420,10 @@
           "  Card.Footer"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-card-bg": "Background color",
         "--dry-card-padding": "Padding",
@@ -868,6 +872,11 @@
           "  AlertDialog.Cancel"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-dialog-bg": "Background color",
         "--dry-dialog-border": "Border color",
@@ -1087,6 +1096,11 @@
           "    Drawer.Header"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-drawer-bg": "Background color",
         "--dry-drawer-border": "Border color",
@@ -1346,6 +1360,11 @@
           "  Tooltip.Content"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -1525,6 +1544,11 @@
           "    DropdownMenu.Item"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-radius-nested": "Nested"
       },
@@ -1712,6 +1736,11 @@
           "  ContextMenu.Label"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-menu-bg": "Background color",
         "--dry-menu-border": "Border color",
@@ -2016,6 +2045,10 @@
           "  Collapsible.Content"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -2051,7 +2084,9 @@
         "search",
         "command",
         "shortcut",
-        "palette"
+        "palette",
+        "navigation",
+        "launcher"
       ],
       "compound": true,
       "parts": {
@@ -2219,6 +2254,11 @@
           "  CommandPalette.Separator"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-cmd-bg": "Background color",
         "--dry-cmd-border": "Border color",
@@ -2308,6 +2348,10 @@
         "via": "rest",
         "note": "Forwards native HTML attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-label-color": "Text color",
         "--dry-label-font-size": "Font size",
@@ -2423,6 +2467,10 @@
           "Field.Root"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-field-gap": "Gap spacing"
       },
@@ -2535,6 +2583,10 @@
           "  Fieldset.Content"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -2594,6 +2646,10 @@
         "via": "rest",
         "note": "Forwards native HTML attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-input-bg": "Background color",
         "--dry-input-border": "Border color",
@@ -2682,6 +2738,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-btn-radius": "Border radius",
         "--dry-prompt-input-bg": "Input Bg",
@@ -2780,6 +2840,10 @@
         ],
         "note": "Forwards <input> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-input-bg": "Background color",
         "--dry-input-border": "Border color",
@@ -2986,6 +3050,10 @@
           "  RadioGroup.Item"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -3525,6 +3593,10 @@
           "    MultiSelectCombobox.Item"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-btn-font-size": "Font size",
         "--dry-btn-padding-x": "Horizontal padding",
@@ -3597,7 +3669,9 @@
         "segmented",
         "switcher",
         "single-select",
-        "view-toggle"
+        "view-toggle",
+        "tabs",
+        "toggle"
       ],
       "compound": true,
       "parts": {
@@ -3681,6 +3755,10 @@
           "  SegmentedControl.Item"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-sc-radius": "Border radius",
         "--dry-sc-selected-bg": "Selected Bg",
@@ -3797,6 +3875,11 @@
         ],
         "note": "Forwards <input> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.",
+        "If content auto-advances, provide pause or stop controls and respect reduced-motion preferences."
+      ],
       "cssVars": {
         "--dry-slider-thumb-size": "Thumb size",
         "--dry-slider-track-height": "Track height"
@@ -3881,6 +3964,10 @@
         ],
         "note": "Forwards <button> attributes via rest props."
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-btn-bg": "Background color",
         "--dry-btn-border": "Border color",
@@ -4017,6 +4104,10 @@
           "  ToggleGroup.Item"
         ]
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-tg-font-size": "Font size",
         "--dry-tg-min-height": "Minimum height",
@@ -4136,6 +4227,10 @@
           "  InputGroup.Select"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-input-group-bg": "Group Bg",
         "--dry-input-group-border": "Group Border",
@@ -4333,6 +4428,10 @@
           "  OptionPicker.Meta"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-btn-align": "Align",
         "--dry-btn-bg": "Background color",
@@ -4472,6 +4571,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-container-padding": "Padding"
       },
@@ -4534,6 +4637,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-separator-color": "Line color",
         "--dry-separator-size": "Size",
@@ -4600,6 +4707,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -4619,7 +4730,9 @@
         "image",
         "video",
         "ratio",
-        "responsive"
+        "responsive",
+        "media",
+        "frame"
       ],
       "compound": false,
       "props": {
@@ -4645,6 +4758,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<AspectRatio>Content</AspectRatio>"
@@ -4979,6 +5096,11 @@
           "    Breadcrumb.Separator"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant.",
+        "Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -5173,6 +5295,10 @@
           "  Pagination.Ellipsis"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -5195,7 +5321,9 @@
         "steps",
         "wizard",
         "progress",
-        "workflow"
+        "workflow",
+        "multi-step",
+        "form"
       ],
       "compound": true,
       "parts": {
@@ -5327,6 +5455,10 @@
         ],
         "note": "Stepper.List wraps Stepper.Step and Stepper.Separator. Bind activeStep on Root when controlling the current step."
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {
         "--dry-stepper-connector-width": "Connector Width"
       },
@@ -5464,6 +5596,10 @@
           "  Toolbar.Link"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -5656,6 +5792,11 @@
           "  Menubar.Label"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -5823,6 +5964,11 @@
           "  NavigationMenu.Link"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-nav-menu-bg": "Menu Bg",
         "--dry-nav-menu-border": "Menu Border",
@@ -6072,6 +6218,10 @@
           "  Sidebar.Trigger"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {
         "--dry-sidebar-content-padding": "Content Padding",
         "--dry-sidebar-item-padding-x": "Item Padding X"
@@ -6225,6 +6375,10 @@
           "  TableOfContents.Item"
         ]
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {
         "--dry-toc-active-color": "Active Color",
         "--dry-toc-bg": "Background color",
@@ -6301,6 +6455,10 @@
         ],
         "note": "Forwards <a> attributes via rest props."
       },
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant."
+      ],
       "cssVars": {
         "--dry-link-hover-color": "Hover Color"
       },
@@ -6354,6 +6512,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -6476,6 +6639,10 @@
           "  Splitter.Handle"
         ]
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-splitter-handle-z-index": "Handle Z Index"
       },
@@ -6685,6 +6852,11 @@
           "      Table.Cell"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone."
+      ],
       "cssVars": {
         "--dry-scrollbar-thumb": "Thumb",
         "--dry-scrollbar-track": "Track color",
@@ -6782,6 +6954,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-avatar-font-size": "Font size",
         "--dry-avatar-radius": "Border radius",
@@ -6880,6 +7056,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -6939,6 +7119,10 @@
             },
             "padding": {
               "type": "{ top?: number; right?: number; bottom?: number; left?: number }",
+              "required": false
+            },
+            "summary": {
+              "type": "string",
               "required": false
             },
             "children": {
@@ -7133,6 +7317,11 @@
           "  Chart.YAxis"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone."
+      ],
       "cssVars": {
         "--dry-chart-axis-color": "Axis Color",
         "--dry-chart-bar-color": "Bar Color",
@@ -7147,6 +7336,9 @@
           "name": "data-chart"
         },
         {
+          "name": "data-chart-a11y"
+        },
+        {
           "name": "data-chart-area"
         },
         {
@@ -7157,6 +7349,9 @@
         },
         {
           "name": "data-chart-container"
+        },
+        {
+          "name": "data-chart-data-list"
         },
         {
           "name": "data-chart-donut"
@@ -7171,16 +7366,95 @@
           "name": "data-chart-line"
         },
         {
+          "name": "data-chart-root"
+        },
+        {
           "name": "data-chart-stacked-bar"
         },
         {
+          "name": "data-chart-summary"
+        },
+        {
           "name": "data-clickable"
+        },
+        {
+          "name": "data-interactive"
+        },
+        {
+          "name": "data-list"
         },
         {
           "name": "data-part"
         }
       ],
       "example": "<Chart.Root>\n  <Chart.Bars>...</Chart.Bars>\n  <Chart.Line>...</Chart.Line>\n  <Chart.Area>...</Chart.Area>\n  <Chart.Donut>...</Chart.Donut>\n  <Chart.StackedBar>...</Chart.StackedBar>\n  <Chart.HorizontalBar>...</Chart.HorizontalBar>\n  <Chart.XAxis>...</Chart.XAxis>\n  <Chart.YAxis>...</Chart.YAxis>\n</Chart.Root>"
+    },
+    "AppFrame": {
+      "import": "@dryui/ui",
+      "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
+      "category": "layout",
+      "tags": [
+        "app-shell",
+        "frame",
+        "layout",
+        "header",
+        "chrome",
+        "traffic-lights"
+      ],
+      "compound": false,
+      "props": {
+        "title": {
+          "type": "string",
+          "required": false,
+          "description": "Primary heading or label text."
+        },
+        "actions": {
+          "type": "Snippet",
+          "required": false
+        },
+        "children": {
+          "type": "Snippet",
+          "required": true,
+          "description": "Content rendered inside the component."
+        }
+      },
+      "forwardedProps": {
+        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "via": "rest",
+        "element": "div",
+        "examples": [
+          "id",
+          "style",
+          "role"
+        ],
+        "note": "Forwards <div> attributes via rest props."
+      },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
+      "cssVars": {
+        "--dry-app-frame-bg": "Frame Bg",
+        "--dry-app-frame-border": "Frame Border",
+        "--dry-app-frame-chrome-bg": "Frame Chrome Bg",
+        "--dry-app-frame-dot-close": "Frame Dot Close",
+        "--dry-app-frame-dot-max": "Frame Dot Max",
+        "--dry-app-frame-dot-min": "Frame Dot Min",
+        "--dry-app-frame-dot-size": "Frame Dot Size",
+        "--dry-app-frame-radius": "Frame Radius"
+      },
+      "dataAttributes": [
+        {
+          "name": "data-app-frame"
+        },
+        {
+          "name": "data-part"
+        },
+        {
+          "name": "data-tone"
+        }
+      ],
+      "example": "<AppFrame>Content</AppFrame>"
     },
     "ChatThread": {
       "import": "@dryui/ui",
@@ -7235,6 +7509,10 @@
         ],
         "note": "Forwards <element> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-chat-thread-gap": "Thread Gap",
         "--dry-chat-thread-message-gap": "Thread Message Gap"
@@ -7275,6 +7553,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-typing-indicator-dot-color": "Indicator Dot Color",
         "--dry-typing-indicator-dot-size": "Indicator Dot Size",
@@ -7353,6 +7635,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-icon-color": "Text color",
         "--dry-icon-size": "Size"
@@ -7393,6 +7679,10 @@
         "via": "rest",
         "note": "Forwards native HTML attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-image-bg": "Background color",
         "--dry-image-block-size": "Block Size",
@@ -7440,6 +7730,10 @@
         ],
         "note": "Forwards <element> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-kbd-bg": "Background color",
         "--dry-kbd-border": "Border color",
@@ -7457,7 +7751,9 @@
         "link",
         "preview",
         "hover",
-        "popup"
+        "popup",
+        "popover",
+        "card"
       ],
       "compound": true,
       "parts": {
@@ -7545,6 +7841,11 @@
           "  LinkPreview.Content"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-link-preview-bg": "Preview Bg",
         "--dry-link-preview-border": "Preview Border",
@@ -7718,6 +8019,10 @@
           "  List.Subheader"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-list-color": "Text color",
         "--dry-list-gap": "Gap spacing",
@@ -7964,6 +8269,10 @@
           "      Timeline.Time"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-timeline-item-columns": "Item Columns",
         "--dry-timeline-item-min-w": "Item Min W",
@@ -8159,6 +8468,10 @@
         ],
         "note": "Typography is a namespaced set of standalone text parts. Use Typography.Heading or Typography.Text directly; there is no Typography.Root wrapper."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-typography-text-color": "Text Color"
       },
@@ -8234,6 +8547,10 @@
         ],
         "note": "Forwards <h*> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -8339,6 +8656,10 @@
         ],
         "note": "Forwards <element> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-typography-text-color": "Text Color"
       },
@@ -8462,6 +8783,10 @@
           "    DescriptionList.Description"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -8542,6 +8867,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Do not rely on transient feedback as the only place critical workflow information appears.",
+        "Label dismiss or retry actions explicitly so their purpose is announced.",
+        "Choose live-region urgency carefully and do not make short-lived announcements the only source of important information."
+      ],
       "cssVars": {
         "--dry-alert-bg": "Background color",
         "--dry-alert-border": "Border color",
@@ -8848,6 +9178,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Do not rely on transient feedback as the only place critical workflow information appears.",
+        "Label dismiss or retry actions explicitly so their purpose is announced."
+      ],
       "cssVars": {
         "--dry-progress-bar": "Bar",
         "--dry-progress-height": "Height",
@@ -8931,6 +9265,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Do not rely on transient feedback as the only place critical workflow information appears.",
+        "Label dismiss or retry actions explicitly so their purpose is announced."
+      ],
       "cssVars": {
         "--dry-skeleton-color": "Text color",
         "--dry-skeleton-highlight": "Highlight",
@@ -8989,6 +9327,10 @@
         "element": "svg",
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Do not rely on transient feedback as the only place critical workflow information appears.",
+        "Label dismiss or retry actions explicitly so their purpose is announced."
+      ],
       "cssVars": {
         "--dry-spinner-color": "Text color",
         "--dry-spinner-size": "Size",
@@ -9215,6 +9557,10 @@
           "    Combobox.Item"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-combobox-bg": "Background color",
         "--dry-combobox-border": "Border color",
@@ -9397,6 +9743,10 @@
           "  DateField.Separator"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-df-bg": "Background color",
         "--dry-df-border": "Border color",
@@ -9591,6 +9941,11 @@
           "    DatePicker.Calendar"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -9784,6 +10139,10 @@
           "  Calendar.Heading"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-calendar-bg": "Background color",
         "--dry-calendar-border": "Border color",
@@ -10017,6 +10376,10 @@
           "  DateRangePicker.Preset"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -10149,6 +10512,10 @@
           "  Listbox.Item"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-listbox-bg": "Background color",
         "--dry-listbox-border": "Border color",
@@ -10259,6 +10626,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-logo-mark-bg": "Mark Bg",
         "--dry-logo-mark-color": "Mark Color",
@@ -10476,6 +10847,10 @@
           "  PinInput.Separator"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-pin-bg": "Cell background color",
         "--dry-pin-border": "Cell border color",
@@ -10637,6 +11012,10 @@
           "  RangeCalendar.Grid"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Provide native name, autocomplete, and value wiring when the component participates in form submission."
+      ],
       "cssVars": {
         "--dry-range-calendar-bg": "Calendar Bg",
         "--dry-range-calendar-border": "Calendar Border",
@@ -10760,6 +11139,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-star-size": "Size"
       },
@@ -10845,6 +11228,10 @@
         ],
         "note": "Forwards <input> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -11044,6 +11431,10 @@
           "  TagsInput.List"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-btn-font-size": "Font size",
         "--dry-btn-padding-x": "Horizontal padding",
@@ -11295,6 +11686,10 @@
           "  FileUpload.ItemDelete"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-fu-bg": "Background color",
         "--dry-fu-border": "Border color",
@@ -11460,6 +11855,10 @@
           "  FileSelect.Clear"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -11684,6 +12083,10 @@
           "  ColorPicker.ChannelInput"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-alpha-rgb": "Rgb",
         "--dry-color-picker-area-height": "Picker Area Height",
@@ -11780,6 +12183,10 @@
           "description": "Content rendered inside the component."
         }
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -11817,6 +12224,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<VisuallyHidden>Content</VisuallyHidden>"
@@ -11866,6 +12277,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<FocusTrap>Content</FocusTrap>"
@@ -11912,6 +12328,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -11952,6 +12372,10 @@
           "required": false
         }
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Hotkey>Content</Hotkey>"
@@ -12003,6 +12427,11 @@
           "description": "Content rendered inside the component."
         }
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -12076,6 +12505,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-reveal-delay": "Delay",
         "--dry-reveal-distance": "Distance",
@@ -12159,6 +12592,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-spotlight-color": "Text color",
         "--dry-spotlight-intensity": "Intensity",
@@ -12251,6 +12688,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-aurora-angle": "Angle",
         "--dry-aurora-color-1": "Color 1",
@@ -12343,6 +12784,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-noise-blend": "Blend",
         "--dry-noise-opacity": "Opacity",
@@ -12363,6 +12808,9 @@
         },
         {
           "name": "data-noise-texture"
+        },
+        {
+          "name": "data-paused"
         },
         {
           "name": "data-reduced-motion"
@@ -12478,6 +12926,10 @@
           "  FloatButton.Action"
         ]
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-fab-gap": "Gap spacing",
         "--dry-fab-offset": "Offset",
@@ -12563,6 +13015,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-marquee-gap": "Gap spacing",
         "--dry-marquee-speed": "Speed"
@@ -12585,6 +13042,9 @@
         },
         {
           "name": "data-pause-on-hover"
+        },
+        {
+          "name": "data-paused"
         },
         {
           "name": "data-reduced-motion"
@@ -12649,6 +13109,10 @@
         ],
         "note": "Forwards <canvas> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-qr-bg": "Background color",
         "--dry-qr-border": "Border color",
@@ -12729,6 +13193,10 @@
         ],
         "note": "Forwards <element> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-btn-color": "Text color",
         "--dry-code-bg": "Background color",
@@ -12820,6 +13288,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-markdown-blockquote-border": "Blockquote Border",
         "--dry-markdown-blockquote-color": "Blockquote Color",
@@ -12897,6 +13369,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-virtual-list-scrollbar-radius": "List Scrollbar Radius",
         "--dry-virtual-list-scrollbar-thumb": "List Scrollbar Thumb",
@@ -12971,6 +13448,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-infinite-scroll-end-color": "Scroll End Color",
         "--dry-infinite-scroll-end-font-size": "Scroll End Font Size",
@@ -13357,6 +13839,11 @@
           "  DataGrid.ExpandTrigger"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone."
+      ],
       "cssVars": {
         "--dry-data-grid-border": "Grid Border",
         "--dry-data-grid-head-padding-y": "Grid Head Padding Y",
@@ -13565,6 +14052,10 @@
           "  DragAndDrop.Group"
         ]
       },
+      "a11y": [
+        "Provide a clear accessible name for every interactive target and keep the action model consistent.",
+        "Match keyboard behavior to the established widget pattern rather than inventing a custom key map."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -13574,7 +14065,13 @@
           "name": "data-dnd-handle"
         },
         {
+          "name": "data-dnd-instructions"
+        },
+        {
           "name": "data-dnd-item"
+        },
+        {
+          "name": "data-dnd-live-region"
         },
         {
           "name": "data-dnd-preview"
@@ -13587,6 +14084,9 @@
         },
         {
           "name": "data-dragging"
+        },
+        {
+          "name": "data-handle"
         },
         {
           "name": "data-index"
@@ -13630,6 +14130,10 @@
           "required": false
         }
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -13832,6 +14336,10 @@
           "  Transfer.Actions"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-transfer-actions-gap": "Actions Gap",
         "--dry-transfer-bg": "Background color",
@@ -13989,6 +14497,11 @@
           "  RichTextEditor.Content"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.",
+        "Label editor toolbars and popovers explicitly, and ensure formatting actions remain keyboard-complete."
+      ],
       "cssVars": {
         "--dry-rte-border": "Border color",
         "--dry-rte-button-size": "Button Size",
@@ -14108,6 +14621,10 @@
           "  Tour.Tooltip"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -14198,6 +14715,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-backdrop-bg": "Background color",
         "--dry-backdrop-blur": "Blur",
@@ -14263,6 +14785,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-button-group-hover-z-index": "Group Hover Z Index",
         "--dry-button-group-radius": "Group Radius"
@@ -14381,6 +14907,10 @@
         "via": "rest",
         "note": "Forwards native HTML attributes via rest props."
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-btn-accent": "Accent",
         "--dry-btn-accent-fg": "Accent Fg",
@@ -14526,6 +15056,10 @@
           "  ChipGroup.Item"
         ]
       },
+      "a11y": [
+        "Provide discernible text or an aria-label for controls that do not expose visible text.",
+        "Use button semantics for in-place actions and link semantics for navigation."
+      ],
       "cssVars": {
         "--dry-chip-group-font-size": "Group Font Size",
         "--dry-chip-group-padding-x": "Group Padding X",
@@ -14747,6 +15281,12 @@
           "  Carousel.Thumbnails"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.",
+        "Only add region semantics when the scrollable surface has a unique, meaningful label."
+      ],
       "cssVars": {
         "--dry-carousel-gap": "Gap spacing",
         "--dry-carousel-slide-size": "Slide Size"
@@ -14757,10 +15297,19 @@
           "description": "Present on the active item or current target within the component."
         },
         {
+          "name": "data-autoplay-enabled"
+        },
+        {
+          "name": "data-autoplay-state"
+        },
+        {
           "name": "data-carousel-dots"
         },
         {
           "name": "data-carousel-root"
+        },
+        {
+          "name": "data-carousel-rotation-control"
         },
         {
           "name": "data-carousel-slide"
@@ -14840,6 +15389,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-format-bytes-color": "Bytes Color",
         "--dry-format-bytes-font-size": "Bytes Font Size"
@@ -14996,6 +15549,10 @@
         ],
         "note": "Forwards <time> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-format-date-color": "Date Color",
         "--dry-format-date-font-size": "Date Font Size"
@@ -15090,6 +15647,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-format-number-color": "Number Color",
         "--dry-format-number-font-size": "Number Font Size"
@@ -15153,6 +15714,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "If content auto-advances, provide pause or stop controls and respect reduced-motion preferences."
+      ],
       "cssVars": {
         "--dry-image-comparison-arrow-color": "Comparison Arrow Color",
         "--dry-image-comparison-arrow-width": "Comparison Arrow Width",
@@ -15232,13 +15798,11 @@
           "props": {
             "openDelay": {
               "type": "number",
-              "required": false,
-              "default": "700"
+              "required": false
             },
             "closeDelay": {
               "type": "number",
-              "required": false,
-              "default": "300"
+              "required": false
             },
             "children": {
               "type": "Snippet",
@@ -15261,9 +15825,20 @@
             }
           },
           "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLAnchorElement>",
+            "baseType": "Omit<HTMLAnchorAttributes, 'children' | 'href'>, Omit<HTMLButtonAttributes, 'children'>",
             "via": "rest",
-            "note": "Forwards native HTML attributes via rest props."
+            "element": "a",
+            "examples": [
+              "href",
+              "target",
+              "rel"
+            ],
+            "omitted": [
+              "children",
+              "href",
+              "children"
+            ],
+            "note": "Forwards <a> attributes via rest props."
           }
         },
         "Content": {
@@ -15304,7 +15879,16 @@
           "  HoverCard.Content"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content."
+      ],
       "cssVars": {
+        "--dry-btn-font-size": "Font size",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-hover-card-bg": "Card Bg",
         "--dry-hover-card-border": "Card Border",
         "--dry-hover-card-max-width": "Card Max Width",
@@ -15319,6 +15903,9 @@
         },
         {
           "name": "data-hover-card-trigger"
+        },
+        {
+          "name": "data-hover-card-trigger-shell"
         },
         {
           "name": "data-state"
@@ -15390,6 +15977,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Do not rely on transient feedback as the only place critical workflow information appears.",
+        "Label dismiss or retry actions explicitly so their purpose is announced."
+      ],
       "cssVars": {
         "--dry-progress-ring-indeterminate-speed": "Ring Indeterminate Speed",
         "--dry-progress-ring-indicator-color": "Ring Indicator Color"
@@ -15451,6 +16042,10 @@
         ],
         "note": "Forwards <time> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-relative-time-color": "Time Color",
         "--dry-relative-time-font-size": "Time Font Size"
@@ -15579,9 +16174,16 @@
           "  Tree.ItemChildren"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal."
+      ],
       "cssVars": {
         "--dry-tree-icon-size": "Icon Size",
         "--dry-tree-indent": "Indent",
+        "--dry-tree-item-focus-offset": "Item Focus Offset",
+        "--dry-tree-item-focus-ring": "Item Focus Ring",
         "--dry-tree-item-hover-bg": "Item Hover Bg",
         "--dry-tree-item-padding": "Item Padding",
         "--dry-tree-item-radius": "Item Radius",
@@ -15591,7 +16193,13 @@
       },
       "dataAttributes": [
         {
+          "name": "data-branch"
+        },
+        {
           "name": "data-expanded"
+        },
+        {
+          "name": "data-focused"
         },
         {
           "name": "data-item-id"
@@ -15605,9 +16213,6 @@
         },
         {
           "name": "data-state"
-        },
-        {
-          "name": "data-tree-label"
         }
       ],
       "example": "<Tree.Root>\n  <Tree.Item>...</Tree.Item>\n  <Tree.ItemLabel>...</Tree.ItemLabel>\n  <Tree.ItemChildren>...</Tree.ItemChildren>\n</Tree.Root>"
@@ -15674,6 +16279,10 @@
         "element": "svg",
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-gauge-fill-color": "Fill Color",
         "--dry-gauge-size": "Size",
@@ -15752,6 +16361,11 @@
         ],
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone."
+      ],
       "cssVars": {
         "--dry-sparkline-color": "Text color",
         "--dry-sparkline-fill-opacity": "Fill Opacity"
@@ -15871,6 +16485,10 @@
           "  FlipCard.Back"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-flip-card-back-transform": "Card Back Transform",
         "--dry-flip-card-duration": "Card Duration",
@@ -15970,6 +16588,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-video-embed-play-size": "Embed Play Size",
         "--dry-video-embed-radius": "Embed Radius"
@@ -16067,6 +16689,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-phone-input-bg": "Input Bg",
         "--dry-phone-input-border": "Input Border",
@@ -16179,17 +16805,33 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
           "name": "data-country-select-wrapper"
         },
         {
+          "name": "data-dial-code"
+        },
+        {
+          "name": "data-disabled",
+          "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-flag"
+        },
+        {
+          "name": "data-highlighted"
+        },
+        {
           "name": "data-part"
         },
         {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
+          "name": "data-state"
         }
       ],
       "example": "<CountrySelect bind:value={country} placeholder=\"Select country\" />"
@@ -16264,6 +16906,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {
         "--dry-dti-gap": "Gap spacing"
       },
@@ -16287,7 +16933,9 @@
         "alerts",
         "inbox",
         "popover",
-        "unread"
+        "unread",
+        "feedback",
+        "status"
       ],
       "compound": true,
       "parts": {
@@ -16449,6 +17097,12 @@
           "      NotificationCenter.Item"
         ]
       },
+      "a11y": [
+        "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
+        "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
+        "Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
       "cssVars": {
         "--dry-nc-item-padding": "Item Padding",
         "--dry-nc-panel-width": "Panel Width",
@@ -16682,7 +17336,14 @@
           "      MegaMenu.Link"
         ]
       },
-      "cssVars": {},
+      "a11y": [
+        "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
+        "Preserve the expected keyboard model and expose current or selected state where relevant.",
+        "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
+      ],
+      "cssVars": {
+        "--dry-anchor-try-fallbacks": "Try Fallbacks"
+      },
       "dataAttributes": [
         {
           "name": "data-active",
@@ -16690,6 +17351,9 @@
         },
         {
           "name": "data-full-width"
+        },
+        {
+          "name": "data-layout"
         },
         {
           "name": "data-mega-menu-column"
@@ -16905,6 +17569,10 @@
           "  Map.Controls"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-map-border": "Border color",
         "--dry-map-radius": "Border radius"
@@ -16970,6 +17638,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-chromatic-offset": "Offset"
       },
@@ -16986,6 +17658,9 @@
         },
         {
           "name": "data-chromatic-shift"
+        },
+        {
+          "name": "data-paused"
         },
         {
           "name": "data-reduced-motion"
@@ -17033,6 +17708,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17090,6 +17769,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17162,6 +17845,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-glow-blend": "Blend",
         "--dry-glow-color": "Text color",
@@ -17241,6 +17928,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17297,6 +17988,11 @@
           "required": false
         }
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.",
+        "If content auto-advances, provide pause or stop controls and respect reduced-motion preferences."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17389,6 +18085,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-beam-angle": "Angle",
         "--dry-beam-color": "Text color",
@@ -17402,6 +18102,9 @@
         },
         {
           "name": "data-beam-layer"
+        },
+        {
+          "name": "data-offscreen"
         }
       ],
       "example": "<Beam>Content</Beam>"
@@ -17500,6 +18203,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17517,9 +18224,6 @@
         {
           "name": "data-fading",
           "description": "Present while the beam is playing its fade-out sequence."
-        },
-        {
-          "name": "data-offscreen"
         },
         {
           "name": "data-size",
@@ -17579,6 +18283,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17642,6 +18350,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -17705,6 +18417,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-rays-blend": "Blend",
         "--dry-rays-color": "Text color",
@@ -17722,6 +18438,9 @@
         },
         {
           "name": "data-god-rays-layer"
+        },
+        {
+          "name": "data-offscreen"
         }
       ],
       "example": "<GodRays>Content</GodRays>"
@@ -17772,6 +18491,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-mesh-color-1": "Color 1",
         "--dry-mesh-color-2": "Color 2",
@@ -17793,6 +18516,9 @@
         },
         {
           "name": "data-interactive"
+        },
+        {
+          "name": "data-paused"
         },
         {
           "name": "data-reduced-motion"
@@ -17852,6 +18578,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-halftone-angle": "Angle",
         "--dry-halftone-color": "Text color",
@@ -17931,6 +18661,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {
         "--dry-mask-reveal-duration": "Reveal Duration",
         "--dry-mask-reveal-ease": "Reveal Ease",
@@ -18034,6 +18768,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18080,6 +18818,10 @@
         "element": "svg",
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Svg>Content</Svg>"
@@ -18148,6 +18890,10 @@
           "StarRating.Root"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-star-rating-color": "Rating Color",
         "--dry-star-rating-size": "Rating Size"
@@ -18180,7 +18926,8 @@
         "label",
         "chip",
         "badge",
-        "category"
+        "category",
+        "status"
       ],
       "compound": false,
       "props": {
@@ -18237,6 +18984,10 @@
         ],
         "note": "Forwards <span> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {
         "--dry-tag-bg": "Background color",
         "--dry-tag-border": "Border color",
@@ -18298,6 +19049,11 @@
         "element": "svg",
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18510,6 +19266,10 @@
           "  AffixGroup.Action"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18539,53 +19299,6 @@
         }
       ],
       "example": "<AffixGroup.Root>\n  <AffixGroup.Prefix>...</AffixGroup.Prefix>\n  <AffixGroup.Input>...</AffixGroup.Input>\n  <AffixGroup.Suffix>...</AffixGroup.Suffix>\n  <AffixGroup.Separator>...</AffixGroup.Separator>\n  <AffixGroup.Action>...</AffixGroup.Action>\n</AffixGroup.Root>"
-    },
-    "AppFrame": {
-      "import": "@dryui/primitives",
-      "description": "Application shell wrapper with title, actions, and content area",
-      "category": "layout",
-      "tags": [
-        "app-shell",
-        "frame",
-        "layout",
-        "header",
-        "actions"
-      ],
-      "compound": false,
-      "props": {
-        "title": {
-          "type": "string",
-          "required": false,
-          "description": "Primary heading or label text."
-        },
-        "actions": {
-          "type": "Snippet",
-          "required": false
-        },
-        "children": {
-          "type": "Snippet",
-          "required": true,
-          "description": "Content rendered inside the component."
-        }
-      },
-      "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLDivElement>",
-        "via": "rest",
-        "element": "div",
-        "examples": [
-          "id",
-          "style",
-          "role"
-        ],
-        "note": "Forwards <div> attributes via rest props."
-      },
-      "cssVars": {},
-      "dataAttributes": [
-        {
-          "name": "data-part"
-        }
-      ],
-      "example": "<AppFrame>Content</AppFrame>"
     },
     "AvatarGroup": {
       "import": "@dryui/primitives",
@@ -18664,6 +19377,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18742,6 +19459,11 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content.",
+        "Choose live-region urgency carefully and do not make short-lived announcements the only source of important information."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -18879,6 +19601,10 @@
           "  EmptyState.Action"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<EmptyState.Root>\n  <EmptyState.Icon>...</EmptyState.Icon>\n  <EmptyState.Title>...</EmptyState.Title>\n  <EmptyState.Description>...</EmptyState.Description>\n  <EmptyState.Action>...</EmptyState.Action>\n</EmptyState.Root>"
@@ -19010,6 +19736,10 @@
           "  Footer.Copyright"
         ]
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Footer.Root>\n  <Footer.Brand>...</Footer.Brand>\n  <Footer.Links>...</Footer.Links>\n  <Footer.LinkGroup>...</Footer.LinkGroup>\n  <Footer.Copyright>...</Footer.Copyright>\n</Footer.Root>"
@@ -19143,6 +19873,10 @@
           "  Hero.Actions"
         ]
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Hero.Root>\n  <Hero.Heading>...</Hero.Heading>\n  <Hero.Subheading>...</Hero.Subheading>\n  <Hero.Actions>...</Hero.Actions>\n</Hero.Root>"
@@ -19236,6 +19970,10 @@
           "  LogoCloud.Item"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -19423,6 +20161,10 @@
           "  PageHeader.Meta"
         ]
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -19632,6 +20374,10 @@
           "  SelectableTileGroup.Meta"
         ]
       },
+      "a11y": [
+        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
+        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -19791,6 +20537,10 @@
           "  StatCard.Trend"
         ]
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [
         {
@@ -19841,6 +20591,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<Surface>Content</Surface>"
@@ -19888,6 +20642,10 @@
         ],
         "note": "Forwards <div> attributes via rest props."
       },
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<User>Content</User>"
@@ -19938,6 +20696,10 @@
         "element": "svg",
         "note": "Forwards <svg> attributes via rest props."
       },
+      "a11y": [
+        "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
+        "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
+      ],
       "cssVars": {},
       "dataAttributes": [],
       "example": "<WaveDivider>Content</WaveDivider>"

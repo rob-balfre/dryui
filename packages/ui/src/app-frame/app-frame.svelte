@@ -1,0 +1,125 @@
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	interface Props extends HTMLAttributes<HTMLDivElement> {
+		title?: string;
+		actions?: Snippet;
+		children: Snippet;
+	}
+
+	let { title, actions, children, class: className, ...rest }: Props = $props();
+</script>
+
+<div data-app-frame class={className} {...rest}>
+	<div data-part="chrome" aria-hidden="true">
+		<div data-part="dots">
+			<span data-part="dot" data-tone="close"></span>
+			<span data-part="dot" data-tone="min"></span>
+			<span data-part="dot" data-tone="max"></span>
+		</div>
+		{#if title}
+			<span data-part="title">{title}</span>
+		{/if}
+		{#if actions}
+			<div data-part="actions">
+				{@render actions()}
+			</div>
+		{/if}
+	</div>
+	<div data-part="content">
+		{@render children()}
+	</div>
+</div>
+
+<style>
+	[data-app-frame] {
+		--dry-app-frame-bg: var(--dry-color-bg-base);
+		--dry-app-frame-chrome-bg: var(--dry-color-bg-raised);
+		--dry-app-frame-border: var(--dry-color-stroke-weak);
+		--dry-app-frame-radius: var(--dry-radius-xl);
+		--dry-app-frame-dot-size: 0.75rem;
+		--dry-app-frame-dot-close: #ff5f56;
+		--dry-app-frame-dot-min: #ffbd2e;
+		--dry-app-frame-dot-max: #27c93f;
+
+		display: grid;
+		grid-template-rows: auto minmax(0, 1fr);
+		border: 1px solid var(--dry-app-frame-border);
+		border-radius: var(--dry-app-frame-radius);
+		background: var(--dry-app-frame-bg);
+		overflow: clip;
+	}
+
+	[data-part='chrome'] {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: auto;
+		align-items: center;
+		padding: var(--dry-app-frame-chrome-padding, var(--dry-space-3) var(--dry-space-4));
+		border-block-end: 1px solid var(--dry-app-frame-border);
+		background: var(--dry-app-frame-chrome-bg);
+	}
+
+	[data-part='chrome'] > * {
+		grid-row: 1;
+		grid-column: 1;
+	}
+
+	[data-part='dots'] {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: auto;
+		gap: var(--dry-space-1_5);
+		align-items: center;
+		justify-self: start;
+	}
+
+	[data-part='dot'] {
+		display: block;
+		block-size: var(--dry-app-frame-dot-size);
+		aspect-ratio: 1;
+		border-radius: var(--dry-radius-full);
+		background: var(--dry-color-stroke-weak);
+	}
+
+	[data-part='dot'][data-tone='close'] {
+		background: var(--dry-app-frame-dot-close);
+	}
+
+	[data-part='dot'][data-tone='min'] {
+		background: var(--dry-app-frame-dot-min);
+	}
+
+	[data-part='dot'][data-tone='max'] {
+		background: var(--dry-app-frame-dot-max);
+	}
+
+	[data-part='title'] {
+		justify-self: center;
+		color: var(--dry-color-text-weak);
+		font-size: var(--dry-type-small-size, 0.875rem);
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		text-align: center;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		pointer-events: none;
+	}
+
+	[data-part='actions'] {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: auto;
+		align-items: center;
+		gap: var(--dry-space-2);
+		justify-self: end;
+	}
+
+	[data-part='content'] {
+		display: grid;
+		padding: var(--dry-app-frame-content-padding, 0);
+		min-block-size: 0;
+	}
+</style>

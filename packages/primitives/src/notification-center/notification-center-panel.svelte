@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getNotificationCenterCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?:
@@ -28,33 +28,12 @@
 
 	let panelEl = $state<HTMLDivElement>();
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => panelEl ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
-	});
-
-	$effect(() => {
-		if (!panelEl) return;
-
-		if (ctx.open) {
-			try {
-				if (!panelEl.matches(':popover-open')) {
-					panelEl.showPopover();
-				}
-			} catch {
-				// Already shown
-			}
-		} else {
-			try {
-				if (panelEl.matches(':popover-open')) {
-					panelEl.hidePopover();
-				}
-			} catch {
-				// Already hidden
-			}
-		}
 	});
 </script>
 
@@ -65,7 +44,7 @@
 	role="region"
 	aria-label="Notifications"
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const event = /** @type {ToggleEvent} */ (e);
 		if (event.newState === 'open') {

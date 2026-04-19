@@ -10,25 +10,45 @@
 	let { class: className, children, ...rest }: Props = $props();
 
 	let activeItem = $state<string | null>(null);
+	let activeTriggerId = $state<string | null>(null);
 	let openTimer: ReturnType<typeof setTimeout> | undefined;
 	let closeTimer: ReturnType<typeof setTimeout> | undefined;
+
+	function clearPendingTimers() {
+		clearTimeout(openTimer);
+		clearTimeout(closeTimer);
+	}
+
+	function closeImmediately(options?: { restoreFocus?: boolean }) {
+		const triggerId = options?.restoreFocus ? activeTriggerId : null;
+		clearPendingTimers();
+		activeItem = null;
+		activeTriggerId = null;
+
+		if (!triggerId) return;
+
+		const trigger = document.getElementById(triggerId);
+		if (trigger instanceof HTMLElement) {
+			trigger.focus();
+		}
+	}
 
 	setMegaMenuCtx({
 		get activeItem() {
 			return activeItem;
 		},
-		openItem(id) {
-			clearTimeout(closeTimer);
-			clearTimeout(openTimer);
+		openItem(id, triggerId) {
+			clearPendingTimers();
 			openTimer = setTimeout(() => {
 				activeItem = id;
+				activeTriggerId = triggerId;
 			}, 150);
 		},
 		closeItem() {
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
+			clearPendingTimers();
 			closeTimer = setTimeout(() => {
 				activeItem = null;
+				activeTriggerId = null;
 			}, 300);
 		}
 	});
@@ -36,9 +56,7 @@
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape' && activeItem) {
 			e.preventDefault();
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
-			activeItem = null;
+			closeImmediately({ restoreFocus: true });
 		}
 	}
 
@@ -46,16 +64,13 @@
 		const nav = e.currentTarget as HTMLElement;
 		const related = e.relatedTarget as Node | null;
 		if (related && !nav.contains(related)) {
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
-			activeItem = null;
+			closeImmediately();
 		}
 	}
 
 	$effect(() => {
 		return () => {
-			clearTimeout(openTimer);
-			clearTimeout(closeTimer);
+			clearPendingTimers();
 		};
 	});
 </script>

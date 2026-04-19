@@ -15,7 +15,7 @@
 <div
 	class={className}
 	id={itemCtx.contentId}
-	role="region"
+	aria-hidden={!itemCtx.open}
 	hidden={!itemCtx.open}
 	data-state={itemCtx.open ? 'open' : 'closed'}
 	data-accordion-content

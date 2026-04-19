@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { SVGAttributes } from 'svelte/elements';
-	import { getChartCtx } from './context.svelte.js';
+	import { getChartCtx, registerChartInteractive } from './context.svelte.js';
 
 	interface Props extends Omit<SVGAttributes<SVGGElement>, 'onclick'> {
 		innerRadius?: number;
@@ -43,12 +43,32 @@
 	function handleClick(seg: (typeof segments)[number]) {
 		onclick?.({ label: seg.point.label, value: seg.point.value, index: seg.index });
 	}
+
+	function attachSegmentClick(seg: (typeof segments)[number]) {
+		if (!onclick) return undefined;
+
+		return (node: SVGCircleElement) => {
+			const handleNodeClick = () => handleClick(seg);
+			node.addEventListener('click', handleNodeClick);
+			return () => node.removeEventListener('click', handleNodeClick);
+		};
+	}
+
+	const registeredHandler = $derived(
+		onclick
+			? (index: number) => {
+					const point = ctx.data[index];
+					if (!point) return;
+					onclick({ label: point.label, value: point.value, index });
+				}
+			: undefined
+	);
+
+	registerChartInteractive(ctx, () => registeredHandler);
 </script>
 
 <g role="list" aria-label="Donut chart data" {...rest}>
-	{#each segments as seg}
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	{#each segments as seg (seg.index)}
 		<circle
 			{cx}
 			{cy}
@@ -59,20 +79,9 @@
 			stroke-dasharray={seg.dasharray}
 			stroke-dashoffset={seg.dashoffset}
 			transform="rotate(-90 {cx} {cy})"
-			role={onclick ? 'button' : 'listitem'}
-			tabindex={onclick ? 0 : undefined}
-			aria-label="{seg.point.label}: {seg.point.value}"
 			data-part="donut-segment"
 			data-clickable={onclick ? '' : undefined}
-			onclick={onclick ? () => handleClick(seg) : undefined}
-			onkeydown={onclick
-				? (e: KeyboardEvent) => {
-						if (e.key === 'Enter' || e.key === ' ') {
-							e.preventDefault();
-							handleClick(seg);
-						}
-					}
-				: undefined}
+			{@attach attachSegmentClick(seg)}
 		/>
 	{/each}
 	{#if label}

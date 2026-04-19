@@ -6,6 +6,9 @@ export interface Violation {
 	line: number;
 }
 
+const SCRIPT_BLOCK_RE = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+const STYLE_BLOCK_RE = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
+
 interface NativeElementRule {
 	tag: string;
 	component: string;
@@ -140,6 +143,29 @@ function lookupLine(lineStarts: number[], index: number): number {
 		else hi = mid - 1;
 	}
 	return lo + 1;
+}
+
+function blockStartLine(content: string, lineStarts: number[], blockIndex: number): number {
+	const tagEnd = content.indexOf('>', blockIndex);
+	const contentStart = tagEnd === -1 ? blockIndex : tagEnd + 1;
+	return lookupLine(lineStarts, contentStart);
+}
+
+function offsetViolations(violations: Violation[], lineOffset: number): Violation[] {
+	return violations.map((violation) => ({
+		...violation,
+		line: lineOffset + violation.line - 1
+	}));
+}
+
+function uniqueViolations(violations: Violation[]): Violation[] {
+	const seen = new Set<string>();
+	return violations.filter((violation) => {
+		const key = `${violation.rule}:${violation.line}:${violation.message}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
 }
 
 interface TagMatch {
@@ -495,4 +521,27 @@ export function checkStyle(content: string): Violation[] {
 	}
 
 	return violations;
+}
+
+export function checkSvelteFile(content: string, filename?: string): Violation[] {
+	const lineStarts = buildLineIndex(content);
+	const violations: Violation[] = [...checkMarkup(content, filename)];
+
+	for (const match of content.matchAll(SCRIPT_BLOCK_RE)) {
+		const script = match[1] ?? '';
+		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
+		violations.push(...offsetViolations(checkScript(script), startLine));
+	}
+
+	for (const match of content.matchAll(STYLE_BLOCK_RE)) {
+		const style = match[1] ?? '';
+		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
+		violations.push(...offsetViolations(checkStyle(style), startLine));
+	}
+
+	return uniqueViolations(violations).sort((left, right) => {
+		if (left.line !== right.line) return left.line - right.line;
+		if (left.rule !== right.rule) return left.rule.localeCompare(right.rule);
+		return left.message.localeCompare(right.message);
+	});
 }

@@ -9,8 +9,8 @@ export interface MenubarContext {
 	registerMenu: (id: string) => void;
 	unregisterMenu: (id: string) => void;
 	getMenuIds: () => string[];
-	focusNextMenu: (currentId: string) => void;
-	focusPrevMenu: (currentId: string) => void;
+	focusNextMenu: (currentId: string, open?: boolean) => void;
+	focusPrevMenu: (currentId: string, open?: boolean) => void;
 }
 
 export const [setMenubarCtx, getMenubarCtx] = createContext<MenubarContext>('menubar');

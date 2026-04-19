@@ -20,6 +20,13 @@ export const categories: NavCategory[] = docsNavCategories.map(({ label, items }
 	label,
 	items: items.map(ui)
 }));
+const categoryByComponent = new Map<string, string>();
+
+for (const category of categories) {
+	for (const item of category.items) {
+		categoryByComponent.set(item.name, category.label);
+	}
+}
 
 export function toSlug(name: string): string {
 	return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
@@ -45,4 +52,8 @@ export function getComponentItem(name: string): NavItem | undefined {
 		}
 	}
 	return undefined;
+}
+
+export function getCategoryLabel(name: string): string | undefined {
+	return categoryByComponent.get(name);
 }

@@ -1,7 +1,7 @@
 import { readFileSync, statSync, type Stats } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import { checkComponent } from '../component-checker.js';
 import { diagnoseTheme } from '../theme-checker.js';
-import { reviewComponent } from '../reviewer.js';
 import { scanWorkspace, type WorkspaceReport } from '../workspace-audit.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import type { Spec } from '../spec-types.js';
@@ -132,7 +132,7 @@ function renderTheme(spec: Spec, absPath: string): string {
 
 function renderComponent(spec: Spec, absPath: string): string {
 	const code = readFileSync(absPath, 'utf-8');
-	const result = reviewComponent(code, spec, absPath);
+	const result = checkComponent(code, spec, absPath);
 	const rel = displayPath(absPath);
 	const issues: CheckIssue[] = result.issues.map((issue) => ({
 		file: rel,

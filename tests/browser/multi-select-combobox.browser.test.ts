@@ -21,6 +21,24 @@ function renderHarness(props?: { maxSelections?: number; name?: string }) {
 	return input;
 }
 
+function getContent() {
+	const content = document.querySelector<HTMLDivElement>('[data-testid="multi-select-content"]');
+	if (!content) {
+		throw new Error('Expected multi-select content');
+	}
+
+	return content;
+}
+
+function getRoot() {
+	const root = document.querySelector<HTMLElement>('[data-multi-select-root]');
+	if (!root) {
+		throw new Error('Expected multi-select root');
+	}
+
+	return root;
+}
+
 function fireInput(input: HTMLInputElement, value: string) {
 	input.value = value;
 	input.dispatchEvent(new Event('input', { bubbles: true }));
@@ -66,6 +84,22 @@ function getHiddenValues(name = 'assignees') {
 }
 
 describe('MultiSelectCombobox', () => {
+	it('opens with canonical anchor-positioning styles when the input is focused', () => {
+		const input = renderHarness();
+		const content = getContent();
+		const root = getRoot();
+
+		input.focus();
+		flushSync();
+
+		expect(input.getAttribute('aria-expanded')).toBe('true');
+		expect(root.style.getPropertyValue('anchor-name')).toContain('--dryui-anchor-');
+		expect(content.style.position).toBe('fixed');
+		expect(content.style.getPropertyValue('position-area')).toBe('block-end span-inline-end');
+		expect(content.style.getPropertyValue('position-try-fallbacks')).toContain('flip-block');
+		expect(content.style.justifySelf).toBe('start');
+	});
+
 	it('selects multiple values with keyboard and renders hidden inputs', () => {
 		const input = renderHarness();
 

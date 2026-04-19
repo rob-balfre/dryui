@@ -1,6 +1,9 @@
 <script lang="ts" generics="T">
+	import { flushSync } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { createId } from '../utils/create-id.js';
+	import { mergeIds } from '../utils/merge-ids.js';
 	import { setDragAndDropCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -10,7 +13,14 @@
 		children: Snippet;
 	}
 
-	let { items, onReorder, orientation = 'vertical', children, ...rest }: Props = $props();
+	let {
+		items,
+		onReorder,
+		orientation = 'vertical',
+		children,
+		'aria-describedby': ariaDescribedBy,
+		...rest
+	}: Props = $props();
 
 	let draggedIndex: number | null = $state(null);
 	let overIndex: number | null = $state(null);
@@ -28,10 +38,38 @@
 
 	let previewEl: HTMLElement | null = null;
 	let rafId: number | null = null;
+	const instructionsId = createId('dry-dnd-instructions');
+
+	let keyboardInstructions = $derived.by(() => {
+		const arrowKeys =
+			orientation === 'vertical' ? 'Arrow Up and Arrow Down' : 'Arrow Left and Arrow Right';
+		if (hasHandle) {
+			return `Use the reorder handle and ${arrowKeys} to move items. Drag with a pointer to reorder, and press Escape to cancel an active drag.`;
+		}
+		return `Focus an item and use ${arrowKeys} to move it. Drag with a pointer to reorder, and press Escape to cancel an active drag.`;
+	});
 
 	const DRAG_THRESHOLD = 8;
 	const SCROLL_THRESHOLD = 40;
 	const SCROLL_SPEED = 8;
+
+	function announceReorder(to: number) {
+		announce(`Item moved to position ${to + 1} of ${items.length}`);
+	}
+
+	function focusReorderedControl(index: number) {
+		const targetItem = rootElement?.querySelector<HTMLElement>(
+			`[data-dnd-item][data-index="${index}"]`
+		);
+		if (!targetItem) return;
+
+		if (hasHandle) {
+			targetItem.querySelector<HTMLElement>('[data-dnd-handle]')?.focus();
+			return;
+		}
+
+		targetItem.focus();
+	}
 
 	function reorder(from: number, to: number) {
 		if (from === to) return;
@@ -39,7 +77,7 @@
 		const removed = newItems.splice(from, 1);
 		if (removed.length === 0) return;
 		newItems.splice(to, 0, removed[0]!);
-		onReorder(newItems);
+		flushSync(() => onReorder(newItems));
 	}
 
 	function createPreview() {
@@ -182,7 +220,9 @@
 			isPending = false;
 			isDragging = true;
 			createPreview();
-			announce(`Grabbed item at position ${(draggedIndex ?? 0) + 1}. Use arrow keys to move.`);
+			announce(
+				`Grabbed item at position ${(draggedIndex ?? 0) + 1} of ${items.length}. Drag to move and release to drop.`
+			);
 		}
 
 		if (isDragging) {
@@ -200,7 +240,7 @@
 			const to = overIndex;
 			resetState();
 			reorder(from, to);
-			announce(`Item moved to position ${to + 1}`);
+			announceReorder(to);
 		} else {
 			resetState();
 		}
@@ -221,14 +261,6 @@
 		isPending = false;
 	}
 
-	function handleKeydown(e: KeyboardEvent) {
-		if (e.key === 'Escape' && isDragging) {
-			e.preventDefault();
-			announce('Reorder cancelled');
-			resetState();
-		}
-	}
-
 	setDragAndDropCtx({
 		get draggedIndex() {
 			return draggedIndex;
@@ -244,6 +276,12 @@
 		},
 		get hasHandle() {
 			return hasHandle;
+		},
+		get instructionsId() {
+			return instructionsId;
+		},
+		get itemCount() {
+			return items.length;
 		},
 		registerHandle() {
 			hasHandle = true;
@@ -272,7 +310,7 @@
 				const to = overIndex;
 				resetState();
 				reorder(from, to);
-				announce(`Item moved to position ${to + 1}`);
+				announceReorder(to);
 			} else {
 				resetState();
 			}
@@ -286,6 +324,7 @@
 				direction === 'up' ? Math.max(0, fromIndex - 1) : Math.min(items.length - 1, fromIndex + 1);
 			if (fromIndex !== toIndex) {
 				reorder(fromIndex, toIndex);
+				focusReorderedControl(toIndex);
 				announce(`Item moved to position ${toIndex + 1} of ${items.length}`);
 			}
 		},
@@ -304,24 +343,29 @@
 
 <div
 	bind:this={rootElement}
-	role="listbox"
+	role="list"
+	aria-roledescription="sortable list"
+	aria-describedby={mergeIds(ariaDescribedBy, instructionsId)}
 	data-dnd-root
 	data-orientation={orientation}
 	data-dragging={isDragging ? '' : undefined}
+	data-handle={hasHandle ? '' : undefined}
 	onpointermove={handlePointerMove}
 	onpointerup={handlePointerUp}
 	onpointercancel={handlePointerCancel}
-	onkeydown={handleKeydown}
 	{...rest}
 >
 	{@render children()}
-	<div aria-live="assertive" aria-atomic="true" class="liveRegion">
+	<div id={instructionsId} data-dnd-instructions class="assistiveText">
+		{keyboardInstructions}
+	</div>
+	<div data-dnd-live-region aria-live="assertive" aria-atomic="true" class="assistiveText">
 		{liveRegionMessage}
 	</div>
 </div>
 
 <style>
-	.liveRegion {
+	.assistiveText {
 		position: absolute;
 		width: 1px;
 		height: 1px;

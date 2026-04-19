@@ -10,11 +10,14 @@
 	const ctx = getRichTextEditorCtx();
 
 	let toolbarEl: HTMLDivElement;
+	type LinkRequestOrigin = 'toolbar' | 'content';
 
 	let showLinkInput = $state(false);
 	let linkUrl = $state('');
 	let linkInputEl = $state<HTMLInputElement>();
 	let savedSelection = $state<Range | null>(null);
+	let linkReturnFocusEl = $state<HTMLElement | null>(null);
+	let linkRequestOrigin = $state<LinkRequestOrigin>('toolbar');
 
 	const FOCUSABLE_SELECTOR = 'button:not([disabled]), [role="button"]:not([disabled])';
 
@@ -31,6 +34,28 @@
 		if (items.length > 0 && !items.some((el) => el.getAttribute('tabindex') === '0')) {
 			items[0]!.setAttribute('tabindex', '0');
 		}
+	});
+
+	$effect(() => {
+		if (!toolbarEl) return;
+
+		function handleLinkRequest(event: Event) {
+			if (ctx.readonly || !(event.target instanceof Node)) return;
+
+			const editorRoot = toolbarEl.closest<HTMLElement>('[data-rte-root]');
+			if (!editorRoot?.contains(event.target)) return;
+
+			ctx.updateState();
+			openLinkInput(ctx.currentLink, {
+				origin: 'content',
+				returnFocusTo: ctx.contentEl
+			});
+		}
+
+		document.addEventListener('rte-link-request', handleLinkRequest);
+		return () => {
+			document.removeEventListener('rte-link-request', handleLinkRequest);
+		};
 	});
 
 	function handleKeydown(event: KeyboardEvent) {
@@ -66,11 +91,29 @@
 		items[nextIndex]!.focus();
 	}
 
-	function openLinkInput(currentLink: string | null) {
+	function focusToolbarItem(item: HTMLElement | null) {
+		if (!toolbarEl || !item) return;
+
+		for (const focusableItem of queryFocusable(toolbarEl)) {
+			focusableItem.setAttribute('tabindex', focusableItem === item ? '0' : '-1');
+		}
+
+		item.focus();
+	}
+
+	function openLinkInput(
+		currentLink: string | null,
+		options: {
+			origin?: LinkRequestOrigin;
+			returnFocusTo?: HTMLElement | null;
+		} = {}
+	) {
 		const sel = window.getSelection();
 		if (sel && sel.rangeCount > 0) {
 			savedSelection = sel.getRangeAt(0).cloneRange();
 		}
+		linkRequestOrigin = options.origin ?? 'toolbar';
+		linkReturnFocusEl = options.returnFocusTo ?? null;
 		linkUrl = currentLink ?? 'https://';
 		showLinkInput = true;
 		requestAnimationFrame(() => {
@@ -79,13 +122,7 @@
 		});
 	}
 
-	function closeLinkInput() {
-		showLinkInput = false;
-		linkUrl = '';
-		savedSelection = null;
-	}
-
-	function restoreSelection() {
+	function restoreSavedSelection() {
 		if (savedSelection) {
 			const sel = window.getSelection();
 			if (sel) {
@@ -93,6 +130,35 @@
 				sel.addRange(savedSelection);
 			}
 		}
+	}
+
+	function cancelLinkInput() {
+		if (linkRequestOrigin === 'content') {
+			restoreSavedSelection();
+			ctx.contentEl?.focus();
+		} else {
+			focusToolbarItem(linkReturnFocusEl);
+		}
+
+		closeLinkInput();
+	}
+
+	function applyLink() {
+		if (linkUrl) {
+			restoreSavedSelection();
+			ctx.insertLink(linkUrl);
+		}
+
+		closeLinkInput();
+		ctx.contentEl?.focus();
+	}
+
+	function closeLinkInput() {
+		showLinkInput = false;
+		linkUrl = '';
+		savedSelection = null;
+		linkReturnFocusEl = null;
+		linkRequestOrigin = 'toolbar';
 	}
 </script>
 
@@ -321,13 +387,11 @@
 			title="Link (Ctrl+K)"
 			tabindex={-1}
 			onmousedown={(e) => e.preventDefault()}
-			onclick={() => {
-				if (ctx.currentLink) {
-					openLinkInput(ctx.currentLink);
-				} else {
-					openLinkInput(null);
-				}
-			}}
+			onclick={(event) =>
+				openLinkInput(ctx.currentLink, {
+					origin: 'toolbar',
+					returnFocusTo: event.currentTarget as HTMLElement
+				})}
 		>
 			<svg
 				width="16"
@@ -382,19 +446,16 @@
 				<input
 					bind:value={linkUrl}
 					bind:this={linkInputEl}
+					aria-label="Link URL"
 					data-part="linkInput"
 					type="url"
 					placeholder="https://example.com"
 					onkeydown={(e) => {
 						if (e.key === 'Enter') {
 							e.preventDefault();
-							if (linkUrl) {
-								restoreSelection();
-								ctx.insertLink(linkUrl);
-							}
-							closeLinkInput();
+							applyLink();
 						} else if (e.key === 'Escape') {
-							closeLinkInput();
+							cancelLinkInput();
 						}
 					}}
 				/>
@@ -403,20 +464,14 @@
 					size="sm"
 					type="button"
 					data-part="linkApply"
-					onclick={() => {
-						if (linkUrl) {
-							restoreSelection();
-							ctx.insertLink(linkUrl);
-						}
-						closeLinkInput();
-					}}>Apply</Button
+					onclick={() => applyLink()}>Apply</Button
 				>
 				<Button
 					variant="outline"
 					size="sm"
 					type="button"
 					data-part="linkCancel"
-					onclick={() => closeLinkInput()}>Cancel</Button
+					onclick={() => cancelLinkInput()}>Cancel</Button
 				>
 			</div>
 		{/if}

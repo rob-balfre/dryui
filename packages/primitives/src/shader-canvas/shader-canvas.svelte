@@ -4,6 +4,8 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
 		getReducedMotionPreference,
+		observeInViewport,
+		observePageVisibility,
 		observeReducedMotionPreference,
 		supportsWebGL2
 	} from '../internal/motion.js';
@@ -94,11 +96,9 @@
 			prefersReducedMotion = true;
 		}
 
-		documentVisible = !document.hidden;
-		const handleVisibilityChange = () => {
-			documentVisible = !document.hidden;
-		};
-		document.addEventListener('visibilitychange', handleVisibilityChange);
+		const stopVisibilityObserver = observePageVisibility((visible) => {
+			documentVisible = visible;
+		});
 
 		// Initialize shader program
 		$effect(() => {
@@ -148,16 +148,10 @@
 		});
 
 		$effect(() => {
-			if (!containerEl || typeof IntersectionObserver === 'undefined') return;
-
-			const observer = new IntersectionObserver((entries) => {
-				const entry = entries[0];
-				inViewport = entry?.isIntersecting ?? true;
+			if (!containerEl) return;
+			return observeInViewport(containerEl, (inView) => {
+				inViewport = inView;
 			});
-
-			observer.observe(containerEl);
-
-			return () => observer.disconnect();
 		});
 
 		// Render loop
@@ -250,7 +244,7 @@
 		});
 
 		return () => {
-			document.removeEventListener('visibilitychange', handleVisibilityChange);
+			stopVisibilityObserver();
 			stopMotionObserver();
 		};
 	});

@@ -1,12 +1,1 @@
-import { createContext } from '@dryui/primitives';
-
-interface HoverCardContext {
-	readonly open: boolean;
-	readonly triggerId: string;
-	readonly contentId: string;
-	triggerEl: HTMLElement | null;
-	show: () => void;
-	close: () => void;
-}
-
-export const [setHoverCardCtx, getHoverCardCtx] = createContext<HoverCardContext>('hover-card');
+export { setHoverCardCtx, getHoverCardCtx, type HoverCardContext } from '@dryui/primitives';

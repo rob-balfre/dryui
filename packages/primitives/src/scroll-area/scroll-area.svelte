@@ -7,7 +7,17 @@
 		children: Snippet;
 	}
 
-	let { orientation = 'vertical', children, ...rest }: Props = $props();
+	let {
+		orientation = 'vertical',
+		role: roleProp,
+		tabindex = 0,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
+		children,
+		...rest
+	}: Props = $props();
+
+	const role = $derived(roleProp ?? (ariaLabel || ariaLabelledBy ? 'region' : undefined));
 
 	function applyOverflow(node: HTMLElement) {
 		$effect(() => {
@@ -19,11 +29,12 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	role="region"
-	aria-label="Scrollable content"
+	{role}
+	aria-label={ariaLabel}
+	aria-labelledby={ariaLabelledBy}
 	data-orientation={orientation}
-	tabindex={0}
-	use:applyOverflow
+	{tabindex}
+	{@attach applyOverflow}
 	{...rest}
 >
 	{@render children()}

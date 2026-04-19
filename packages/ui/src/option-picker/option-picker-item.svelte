@@ -193,9 +193,16 @@
 	.content {
 		display: grid;
 		grid-template-columns: auto minmax(0, 1fr);
-		align-items: center;
+		align-items: var(--dry-option-picker-content-align, center);
 		justify-items: start;
-		gap: var(--dry-option-picker-item-gap, var(--dry-space-3));
+		column-gap: var(
+			--dry-option-picker-item-column-gap,
+			var(--dry-option-picker-item-gap, var(--dry-space-3))
+		);
+		row-gap: var(
+			--dry-option-picker-item-row-gap,
+			var(--dry-option-picker-item-gap, var(--dry-space-3))
+		);
 		padding: var(--dry-option-picker-padding-y, var(--dry-space-3))
 			var(--dry-option-picker-padding-x, var(--dry-space-3));
 		min-block-size: var(--dry-option-picker-min-block-size, 3.5rem);
@@ -227,7 +234,7 @@
 	}
 
 	.root[data-size='compact'] .content {
-		min-block-size: 2.75rem;
+		min-block-size: var(--dry-option-picker-compact-min-block-size, 2.75rem);
 	}
 
 	.root[data-size='visual'] .content {

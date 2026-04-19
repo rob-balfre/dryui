@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '@dryui/primitives';
 	import { getNotificationCenterCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -33,54 +34,68 @@
 
 	const ctx = getNotificationCenterCtx();
 
-	let panelEl = $state<HTMLDivElement>();
+	let panelEl = $state<HTMLDivElement | null>(null);
+	const triggerEl = $derived(document.getElementById(ctx.triggerId) as HTMLElement | null);
 
-	const anchor = useAnchorStyles({
-		triggerEl: () => ctx.triggerEl,
-		contentEl: () => panelEl ?? null,
-		placement: () => placement,
-		offset: () => offset
-	});
+	function attachPanel(node: HTMLDivElement) {
+		panelEl = node;
 
-	$effect(() => {
-		if (!panelEl) return;
-
-		if (ctx.open) {
-			try {
-				if (!panelEl.matches(':popover-open')) {
-					panelEl.showPopover();
-				}
-			} catch {
-				// Already shown
+		return () => {
+			if (panelEl === node) {
+				panelEl = null;
 			}
+		};
+	}
 
-			// Nudge panel into viewport if anchor positioning overflows
+	function focusTrigger() {
+		if (triggerEl instanceof HTMLElement) {
+			triggerEl.focus();
+		}
+	}
+
+	function handleClose(restoreFocus: boolean) {
+		if (ctx.open) {
+			ctx.close();
+		}
+		if (restoreFocus) {
+			requestAnimationFrame(() => focusTrigger());
+		}
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key !== 'Escape') return;
+		event.preventDefault();
+		event.stopPropagation();
+		handleClose(true);
+	}
+
+	const popover = createAnchoredPopover({
+		triggerEl: () => triggerEl,
+		contentEl: () => panelEl ?? null,
+		open: () => ctx.open,
+		placement: () => placement,
+		offset: () => offset,
+		onAfterShow: (node) => {
 			requestAnimationFrame(() => {
-				if (!panelEl) return;
-				panelEl.style.translate = '';
-				const rect = panelEl.getBoundingClientRect();
+				node.style.translate = '';
+				const rect = node.getBoundingClientRect();
 				const pad = 8;
 				if (rect.left < pad) {
-					panelEl.style.translate = `${pad - rect.left}px 0`;
+					node.style.translate = `${pad - rect.left}px 0`;
 				} else if (rect.right > window.innerWidth - pad) {
-					panelEl.style.translate = `${window.innerWidth - pad - rect.right}px 0`;
+					node.style.translate = `${window.innerWidth - pad - rect.right}px 0`;
 				}
 			});
-		} else {
-			try {
-				if (panelEl.matches(':popover-open')) {
-					panelEl.hidePopover();
-				}
-			} catch {
-				// Already hidden
-			}
-			if (panelEl) panelEl.style.translate = '';
+		},
+		onAfterHide: (node) => {
+			node.style.translate = '';
 		}
 	});
 </script>
 
 <div
-	bind:this={panelEl}
+	{@attach attachPanel}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	id={ctx.panelId}
 	popover="auto"
 	role="region"
@@ -88,15 +103,19 @@
 	data-notification-center-panel
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
-	use:anchor.applyPosition={style}
 	ontoggle={(e) => {
 		const event = /** @type {ToggleEvent} */ (e);
 		if (event.newState === 'open') {
 			ctx.show();
 		} else {
-			ctx.close();
+			const restoreFocus =
+				panelEl instanceof HTMLElement &&
+				document.activeElement instanceof HTMLElement &&
+				panelEl.contains(document.activeElement);
+			handleClose(restoreFocus);
 		}
 	}}
+	onkeydown={handleKeydown}
 	{...rest}
 >
 	{@render children()}

@@ -2,6 +2,11 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import {
+		observeInViewport,
+		observePageVisibility,
+		observeReducedMotionPreference
+	} from '@dryui/primitives/internal/motion';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		scale?: number;
@@ -48,17 +53,12 @@
 	}
 
 	onMount(() => {
-		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
-		prefersReducedMotion = mql.matches;
-		const handler = (e: MediaQueryListEvent) => {
-			prefersReducedMotion = e.matches;
-		};
-		mql.addEventListener('change', handler);
-		documentVisible = !document.hidden;
-		const handleVisibilityChange = () => {
-			documentVisible = !document.hidden;
-		};
-		document.addEventListener('visibilitychange', handleVisibilityChange);
+		const stopMotion = observeReducedMotionPreference((matches) => {
+			prefersReducedMotion = matches;
+		});
+		const stopVisibility = observePageVisibility((visible) => {
+			documentVisible = visible;
+		});
 
 		let frameId: number | undefined;
 		let lastTime = 0;
@@ -86,21 +86,15 @@
 		});
 
 		$effect(() => {
-			if (!element || typeof IntersectionObserver === 'undefined') return;
-
-			const observer = new IntersectionObserver((entries) => {
-				const entry = entries[0];
-				inViewport = entry?.isIntersecting ?? true;
+			if (!element) return;
+			return observeInViewport(element, (inView) => {
+				inViewport = inView;
 			});
-
-			observer.observe(element);
-
-			return () => observer.disconnect();
 		});
 
 		return () => {
-			document.removeEventListener('visibilitychange', handleVisibilityChange);
-			mql.removeEventListener('change', handler);
+			stopMotion();
+			stopVisibility();
 		};
 	});
 

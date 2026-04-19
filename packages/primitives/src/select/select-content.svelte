@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getSelectCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 	import { getOptionItems, handleMenuKeydown } from '../internal/menu-navigation.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -29,32 +29,24 @@
 
 	let el = $state<HTMLDivElement>();
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => el ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
-		offset: () => offset
+		offset: () => offset,
+		onAfterShow: (node) => focusFirstSelectItem(node)
 	});
 
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-			focusFirstSelectItem();
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
-		}
-	});
-
-	function focusFirstSelectItem() {
-		if (!el) return;
-		const items = getOptionItems(el);
+	function focusFirstSelectItem(container: HTMLElement) {
+		const items = getOptionItems(container);
 		const selected = items.find((item) => item.getAttribute('aria-selected') === 'true');
 		if (selected) {
 			selected.focus();
 		} else if (items[0]) {
 			items[0].focus();
 		} else {
-			el.focus();
+			container.focus();
 		}
 	}
 
@@ -77,7 +69,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (newState && !ctx.open) {

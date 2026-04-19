@@ -5,7 +5,7 @@
 
 	let { initialValue = '' }: { initialValue?: string } = $props();
 
-	let value = $state(initialValue);
+	let value = $derived(initialValue);
 	let open = $state(false);
 </script>
 

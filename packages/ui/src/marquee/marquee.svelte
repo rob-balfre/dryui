@@ -2,7 +2,11 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { observeReducedMotionPreference } from '@dryui/primitives/internal/motion';
+	import {
+		observeInViewport,
+		observePageVisibility,
+		observeReducedMotionPreference
+	} from '@dryui/primitives/internal/motion';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		speed?: number;
@@ -24,18 +28,40 @@
 		...rest
 	}: Props = $props();
 
+	let rootEl: HTMLDivElement | undefined = $state();
 	let contentEl: HTMLDivElement | undefined = $state();
 	let contentSize = $state(0);
 	let prefersReducedMotion = $state(false);
+	let onScreen = $state(true);
+	let tabVisible = $state(true);
 
 	const isVertical = $derived(direction === 'up' || direction === 'down');
 	const duration = $derived(contentSize > 0 && speed > 0 ? contentSize / speed : 0);
+	const paused = $derived(!onScreen || !tabVisible);
 
-	onMount(() =>
-		observeReducedMotionPreference((matches) => {
+	onMount(() => {
+		const unsubscribeMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
-		})
-	);
+		});
+		const unsubscribeVisibility = observePageVisibility((visible) => {
+			tabVisible = visible;
+		});
+		return () => {
+			unsubscribeMotion();
+			unsubscribeVisibility();
+		};
+	});
+
+	$effect(() => {
+		if (!rootEl) return;
+		return observeInViewport(
+			rootEl,
+			(inView) => {
+				onScreen = inView;
+			},
+			{ rootMargin: '200px' }
+		);
+	});
 
 	$effect(() => {
 		if (!contentEl) return;
@@ -69,12 +95,14 @@
 </script>
 
 <div
+	bind:this={rootEl}
 	class={className}
 	data-marquee
 	data-direction={direction}
 	data-pause-on-hover={pauseOnHover || undefined}
 	data-fade={fade || undefined}
 	data-reduced-motion={prefersReducedMotion || undefined}
+	data-paused={paused || undefined}
 	use:applyRootStyles
 	{...rest}
 >
@@ -96,6 +124,7 @@
 
 		overflow: hidden;
 		position: relative;
+		contain: content;
 	}
 
 	[data-marquee-track] {
@@ -104,6 +133,10 @@
 		animation-duration: var(--dry-marquee-speed);
 		animation-timing-function: linear;
 		animation-iteration-count: infinite;
+		backface-visibility: hidden;
+	}
+
+	[data-marquee]:not([data-paused]) [data-marquee-track] {
 		will-change: transform;
 	}
 
@@ -140,6 +173,10 @@
 	}
 
 	[data-marquee][data-pause-on-hover]:hover [data-marquee-track] {
+		animation-play-state: paused;
+	}
+
+	[data-marquee][data-paused] [data-marquee-track] {
 		animation-play-state: paused;
 	}
 

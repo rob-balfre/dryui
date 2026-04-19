@@ -34,6 +34,7 @@
 	// View state: which month/year is the calendar showing
 	let viewMonth = $state(startDate ? startDate.getMonth() : new Date().getMonth());
 	let viewYear = $state(startDate ? startDate.getFullYear() : new Date().getFullYear());
+	let triggerEl = $state<HTMLElement | null>(null);
 
 	// The day that has keyboard focus within the calendar grid
 	let focusedDate = $state<Date>(startDate ?? new Date());
@@ -86,7 +87,12 @@
 		},
 		triggerId,
 		contentId,
-		triggerEl: null,
+		get triggerEl() {
+			return triggerEl;
+		},
+		set triggerEl(element: HTMLElement | null) {
+			triggerEl = element;
+		},
 		show() {
 			if (!disabled) {
 				selecting = 'start';

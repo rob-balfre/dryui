@@ -1,59 +1,11 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
-	import { setHoverCardCtx } from './context.svelte.js';
+	import type { ComponentProps } from 'svelte';
+	import { HoverCard as PrimitiveHoverCard } from '@dryui/primitives';
 
-	interface Props {
-		openDelay?: number;
-		closeDelay?: number;
-		children: Snippet;
-	}
-
-	let { openDelay = 700, closeDelay = 300, children }: Props = $props();
-
-	let open = $state(false);
-
-	const triggerId = generateFormId('hovercard-trigger');
-	const contentId = generateFormId('hovercard-content');
-
-	let openTimeout: ReturnType<typeof setTimeout>;
-	let closeTimeout: ReturnType<typeof setTimeout>;
-
-	function show() {
-		clearTimeout(closeTimeout);
-		openTimeout = setTimeout(() => {
-			open = true;
-		}, openDelay);
-	}
-
-	function close() {
-		clearTimeout(openTimeout);
-		closeTimeout = setTimeout(() => {
-			open = false;
-		}, closeDelay);
-	}
-
-	setHoverCardCtx({
-		get open() {
-			return open;
-		},
-		get triggerId() {
-			return triggerId;
-		},
-		get contentId() {
-			return contentId;
-		},
-		triggerEl: null,
-		show,
-		close
-	});
-
-	$effect(() => {
-		return () => {
-			clearTimeout(openTimeout);
-			clearTimeout(closeTimeout);
-		};
-	});
+	// The styled hover-card only adds theme tokens to trigger/content, so root
+	// is a pure re-export of the primitives implementation. The ctx set here is
+	// consumed by the ui trigger/content via the shared primitives ctx key.
+	let props: ComponentProps<typeof PrimitiveHoverCard.Root> = $props();
 </script>
 
-{@render children()}
+<PrimitiveHoverCard.Root {...props} />

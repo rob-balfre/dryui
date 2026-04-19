@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchorPosition } from '@dryui/primitives';
-	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, createDismiss, type Placement } from '@dryui/primitives';
 	import { getComboboxCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -26,56 +26,38 @@
 
 	const ctx = getComboboxCtx();
 
-	let el = $state<HTMLDivElement>();
+	let el = $state<HTMLDivElement | null>(null);
 
-	const anchor = createAnchorPosition(
-		() => ctx.inputEl,
-		() => el ?? null,
-		{
-			get placement() {
-				return placement;
-			},
-			get offset() {
-				return offset;
+	function attachContent(node: HTMLDivElement) {
+		el = node;
+
+		return () => {
+			if (el === node) {
+				el = null;
 			}
-		}
-	);
+		};
+	}
 
-	$effect(() => {
-		if (!el) return;
-
-		el.style.cssText = typeof style === 'string' ? style : '';
-		const positionStyles = anchor.styles;
-		for (const [key, value] of Object.entries(positionStyles)) {
-			el.style.setProperty(key, value);
-		}
+	const popover = createAnchoredPopover({
+		triggerEl: () => ctx.inputEl,
+		contentEl: () => el ?? null,
+		open: () => ctx.open,
+		placement: () => placement,
+		offset: () => offset
 	});
 
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
-		}
-	});
-
-	// Manual dismiss: close on click outside input+popover
-	$effect(() => {
-		if (!ctx.open) return;
-
-		function handlePointerDown(e: PointerEvent) {
-			const target = e.target as Node;
-			if (ctx.inputEl?.contains(target) || el?.contains(target)) return;
-			ctx.close();
-		}
-
-		document.addEventListener('pointerdown', handlePointerDown);
-		return () => document.removeEventListener('pointerdown', handlePointerDown);
+	createDismiss({
+		enabled: () => ctx.open,
+		escapeKey: false,
+		onDismiss: () => ctx.close(),
+		contentEl: () => el ?? null,
+		triggerEl: () => ctx.inputEl
 	});
 </script>
 
 <div
-	bind:this={el}
+	{@attach attachContent}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	popover="manual"
 	role="listbox"
 	id={ctx.contentId}
@@ -105,7 +87,7 @@
 		margin: 0;
 
 		display: grid;
-		grid-template-columns: minmax(12rem, max-content);
+		grid-template-columns: minmax(max(12rem, anchor-size(inline)), max-content);
 		background: var(--dry-color-bg-overlay);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);

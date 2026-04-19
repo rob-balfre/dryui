@@ -3,7 +3,10 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { componentCompositions, compositionRecipes } from './composition-data';
 import { aiSurface } from './ai-surface.js';
-import { componentMeta as manifestComponentMeta } from './component-catalog.js';
+import {
+	componentMeta as manifestComponentMeta,
+	type ComponentMetaEntry
+} from './component-catalog.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uiSrc = resolve(__dirname, '../../ui/src');
@@ -282,6 +285,106 @@ const A11Y_NOTES: Record<string, string[]> = {
 	],
 	Toast: ['Do not rely on toast content as the only place critical workflow information appears.']
 };
+
+const CATEGORY_A11Y_NOTES: Record<string, string[]> = {
+	action: [
+		'Provide discernible text or an aria-label for controls that do not expose visible text.',
+		'Use button semantics for in-place actions and link semantics for navigation.'
+	],
+	display: [
+		'Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.',
+		'Keep heading, reading, and focus order aligned with the surrounding content.'
+	],
+	feedback: [
+		'Do not rely on transient feedback as the only place critical workflow information appears.',
+		'Label dismiss or retry actions explicitly so their purpose is announced.'
+	],
+	form: [
+		'Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.',
+		'Provide native name, autocomplete, and value wiring when the component participates in form submission.'
+	],
+	input: [
+		'Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.',
+		'Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.'
+	],
+	interaction: [
+		'Provide a clear accessible name for every interactive target and keep the action model consistent.',
+		'Match keyboard behavior to the established widget pattern rather than inventing a custom key map.'
+	],
+	layout: [
+		'This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.',
+		'Only add landmark or region semantics when the section has a unique, meaningful label.'
+	],
+	navigation: [
+		'Use concise, descriptive labels so navigation items are understandable when announced out of context.',
+		'Preserve the expected keyboard model and expose current or selected state where relevant.'
+	],
+	overlay: [
+		'Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.',
+		'Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.'
+	],
+	visual: [
+		'Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.',
+		'Respect reduced-motion and contrast requirements when animation or filtering is enabled.'
+	]
+};
+
+function hasAnyTag(meta: ComponentMetaEntry, tags: string[]): boolean {
+	return tags.some((tag) => meta.tags.includes(tag));
+}
+
+function buildGeneratedA11yNotes(meta: ComponentMetaEntry): string[] {
+	const fallbackNotes = CATEGORY_A11Y_NOTES.display ?? [];
+	const notes = [...(CATEGORY_A11Y_NOTES[meta.category] ?? fallbackNotes)];
+
+	if (hasAnyTag(meta, ['alert', 'message', 'notification', 'toast'])) {
+		notes.push(
+			'Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['carousel', 'slideshow', 'slider'])) {
+		notes.push(
+			'If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['chart', 'graph', 'data', 'visualization'])) {
+		notes.push(
+			'Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['dialog', 'drawer', 'menu', 'menubar', 'modal', 'popover', 'tooltip'])) {
+		notes.push(
+			'Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['editor', 'formatting', 'rich-text', 'contenteditable'])) {
+		notes.push(
+			'Label editor toolbars and popovers explicitly, and ensure formatting actions remain keyboard-complete.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['scroll', 'overflow', 'scrollbar'])) {
+		notes.push(
+			'Only add region semantics when the scrollable surface has a unique, meaningful label.'
+		);
+	}
+
+	if (hasAnyTag(meta, ['tree', 'hierarchy', 'nested'])) {
+		notes.push(
+			'Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal.'
+		);
+	}
+
+	return [...new Set(notes)];
+}
+
+function getA11yNotes(name: string, meta: ComponentMetaEntry): string[] {
+	return A11Y_NOTES[name] ?? buildGeneratedA11yNotes(meta);
+}
 
 type DataAttributeMeta = {
 	description: string;
@@ -1251,6 +1354,8 @@ async function main(): Promise<void> {
 			/* no primitive directory fallback */
 		}
 
+		const a11yNotes = getA11yNotes(name, meta);
+
 		components[name] = {
 			import: '@dryui/ui',
 			description: meta.description,
@@ -1260,7 +1365,7 @@ async function main(): Promise<void> {
 			...propsOrParts,
 			...(PROP_GROUPS[name] ? { groups: PROP_GROUPS[name] } : {}),
 			...(compound ? { structure: deriveStructure(example, name) } : {}),
-			...(A11Y_NOTES[name] ? { a11y: A11Y_NOTES[name] } : {}),
+			a11y: a11yNotes,
 			cssVars: Object.fromEntries(Object.entries(cssVars).sort(([a], [b]) => a.localeCompare(b))),
 			dataAttributes: [...dataAttributes].sort().map((attr) => describeDataAttribute(name, attr)),
 			example
@@ -1355,6 +1460,8 @@ async function main(): Promise<void> {
 			}
 		}
 
+		const a11yNotes = getA11yNotes(name, meta);
+
 		components[name] = {
 			import: '@dryui/primitives',
 			description: meta.description,
@@ -1364,7 +1471,7 @@ async function main(): Promise<void> {
 			...propsOrParts,
 			...(PROP_GROUPS[name] ? { groups: PROP_GROUPS[name] } : {}),
 			...(compound ? { structure: deriveStructure(example, name) } : {}),
-			...(A11Y_NOTES[name] ? { a11y: A11Y_NOTES[name] } : {}),
+			a11y: a11yNotes,
 			cssVars: {},
 			dataAttributes: [...dataAttributes].sort().map((attr) => describeDataAttribute(name, attr)),
 			example

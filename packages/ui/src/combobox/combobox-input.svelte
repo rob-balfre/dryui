@@ -19,13 +19,14 @@
 
 	const ctx = getComboboxCtx();
 
-	let el = $state<HTMLInputElement>();
-
-	$effect(() => {
-		if (el) {
-			ctx.inputEl = el;
-		}
-	});
+	function attachInput(node: HTMLInputElement) {
+		ctx.inputEl = node;
+		return () => {
+			if (ctx.inputEl === node) {
+				ctx.inputEl = null;
+			}
+		};
+	}
 
 	function getOptionItems(contentEl: HTMLElement | null): HTMLElement[] {
 		if (!contentEl) return [];
@@ -91,6 +92,18 @@
 				ctx.close();
 				break;
 			}
+			case 'Home': {
+				if (!ctx.open || items.length === 0) break;
+				e.preventDefault();
+				ctx.setActiveIndex(0);
+				break;
+			}
+			case 'End': {
+				if (!ctx.open || items.length === 0) break;
+				e.preventDefault();
+				ctx.setActiveIndex(items.length - 1);
+				break;
+			}
 			case 'Tab': {
 				if (ctx.open) {
 					if (ctx.activeIndex >= 0 && items[ctx.activeIndex]) {
@@ -109,7 +122,7 @@
 </script>
 
 <input
-	bind:this={el}
+	{@attach attachInput}
 	id={ctx.inputId}
 	type="text"
 	role="combobox"

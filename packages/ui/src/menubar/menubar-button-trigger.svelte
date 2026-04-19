@@ -8,10 +8,11 @@
 		children: Snippet;
 	}
 
-	let { children, onclick, onkeydown, ...rest }: Props = $props();
+	let { children, onclick, onkeydown, id, ...rest }: Props = $props();
 
 	const ctx = getMenubarCtx();
 	const menuCtx = getMenubarMenuCtx();
+	const triggerId = $derived(id ?? `menubar-trigger-${menuCtx.menuId}`);
 
 	function handleClick(e: MouseEvent & { currentTarget: HTMLButtonElement }) {
 		if (menuCtx.open) {
@@ -32,12 +33,12 @@
 		switch (e.key) {
 			case 'ArrowRight': {
 				e.preventDefault();
-				ctx.focusNextMenu(menuCtx.menuId);
+				ctx.focusNextMenu(menuCtx.menuId, ctx.hasOpenMenu);
 				break;
 			}
 			case 'ArrowLeft': {
 				e.preventDefault();
-				ctx.focusPrevMenu(menuCtx.menuId);
+				ctx.focusPrevMenu(menuCtx.menuId, ctx.hasOpenMenu);
 				break;
 			}
 			case 'ArrowDown': {
@@ -59,6 +60,7 @@
 <Button
 	variant="trigger"
 	type="button"
+	id={triggerId}
 	role="menuitem"
 	aria-haspopup="menu"
 	aria-expanded={menuCtx.open}

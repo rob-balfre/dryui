@@ -24,6 +24,18 @@
 
 	let contentEl = $state<HTMLDivElement>();
 
+	$effect(() => {
+		if (contentEl) {
+			ctx.contentEl = contentEl;
+
+			return () => {
+				if (ctx.contentEl === contentEl) {
+					ctx.contentEl = null;
+				}
+			};
+		}
+	});
+
 	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => contentEl ?? null,
@@ -35,8 +47,30 @@
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			e.preventDefault();
-			ctx.close();
+			ctx.forceClose();
+			ctx.ignoreNextTriggerFocusOpen = true;
+			ctx.triggerEl?.focus();
 		}
+	}
+
+	function handlePointerEnter() {
+		ctx.contentHovered = true;
+		ctx.showImmediate();
+	}
+
+	function handlePointerLeave() {
+		ctx.contentHovered = false;
+		ctx.close();
+	}
+
+	function handleFocusIn() {
+		ctx.contentFocused = true;
+		ctx.showImmediate();
+	}
+
+	function handleFocusOut() {
+		ctx.contentFocused = false;
+		ctx.close();
 	}
 </script>
 
@@ -44,11 +78,15 @@
 	bind:this={contentEl}
 	id={ctx.contentId}
 	popover="manual"
+	role="dialog"
+	aria-labelledby={ctx.triggerId}
 	data-hover-card-content
 	data-state={ctx.open ? 'open' : 'closed'}
 	use:popover.applyPosition={style}
-	onpointerenter={() => ctx.show()}
-	onpointerleave={() => ctx.close()}
+	onpointerenter={handlePointerEnter}
+	onpointerleave={handlePointerLeave}
+	onfocusin={handleFocusIn}
+	onfocusout={handleFocusOut}
 	onkeydown={handleKeydown}
 	class={className}
 	{...rest}

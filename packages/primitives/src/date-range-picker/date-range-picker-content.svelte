@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getDateRangePickerCtx } from './context.svelte.js';
-	import { useAnchorStyles } from '../utils/use-anchor-styles.svelte.js';
+	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		placement?: 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end';
@@ -16,19 +16,12 @@
 
 	let el = $state<HTMLDivElement>();
 
-	const anchor = useAnchorStyles({
+	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
 		contentEl: () => el ?? null,
+		open: () => ctx.open,
 		placement: () => placement,
 		offset: () => offset
-	});
-
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
-		}
 	});
 </script>
 
@@ -39,7 +32,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:anchor.applyPosition={style}
+	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (newState && !ctx.open) {

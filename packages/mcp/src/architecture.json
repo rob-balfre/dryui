@@ -2,24 +2,24 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.3.1",
   "summary": {
-    "componentNodes": 291,
+    "componentNodes": 292,
     "partNodes": 654,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
-    "uiComponents": 146,
-    "uiWrappers": 130,
+    "uiComponents": 147,
+    "uiWrappers": 131,
     "uiComposites": 16,
-    "rootBarrelComponents": 291,
+    "rootBarrelComponents": 292,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
-    "wrapEdges": 130,
-    "composeEdges": 11,
+    "wrapEdges": 131,
+    "composeEdges": 14,
     "docsEdges": 0,
     "relatedEdges": 302,
-    "mismatches": 291,
+    "mismatches": 293,
     "primitivePartComponents": 0,
-    "thinWrappers": 64
+    "thinWrappers": 65
   },
   "nodes": [
     {
@@ -398,7 +398,7 @@
       "package": "primitives",
       "layer": "primitive",
       "category": "layout",
-      "description": "Application shell wrapper with title, actions, and content area",
+      "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
       "visibility": "root",
       "sourcePath": "packages/primitives/src/app-frame/index.ts",
       "publicImport": "@dryui/primitives",
@@ -407,7 +407,8 @@
         "frame",
         "layout",
         "header",
-        "actions"
+        "chrome",
+        "traffic-lights"
       ],
       "compound": false,
       "parts": [],
@@ -431,7 +432,9 @@
         "image",
         "video",
         "ratio",
-        "responsive"
+        "responsive",
+        "media",
+        "frame"
       ],
       "compound": false,
       "parts": [],
@@ -1785,7 +1788,9 @@
         "search",
         "command",
         "shortcut",
-        "palette"
+        "palette",
+        "navigation",
+        "launcher"
       ],
       "compound": true,
       "parts": [
@@ -2060,7 +2065,7 @@
       ],
       "compound": false,
       "parts": [],
-      "sourceFileCount": 2,
+      "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -4224,7 +4229,9 @@
         "link",
         "preview",
         "hover",
-        "popup"
+        "popup",
+        "popover",
+        "card"
       ],
       "compound": true,
       "parts": [
@@ -5188,7 +5195,9 @@
         "alerts",
         "inbox",
         "popover",
-        "unread"
+        "unread",
+        "feedback",
+        "status"
       ],
       "compound": true,
       "parts": [
@@ -6147,7 +6156,9 @@
         "segmented",
         "switcher",
         "single-select",
-        "view-toggle"
+        "view-toggle",
+        "tabs",
+        "toggle"
       ],
       "compound": true,
       "parts": [
@@ -6891,7 +6902,9 @@
         "steps",
         "wizard",
         "progress",
-        "workflow"
+        "workflow",
+        "multi-step",
+        "form"
       ],
       "compound": true,
       "parts": [
@@ -7308,7 +7321,8 @@
         "label",
         "chip",
         "badge",
-        "category"
+        "category",
+        "status"
       ],
       "compound": false,
       "parts": [],
@@ -8670,6 +8684,32 @@
       "componentImportCount": 0
     },
     {
+      "id": "ui:AppFrame",
+      "name": "AppFrame",
+      "label": "AppFrame",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-wrapper",
+      "category": "layout",
+      "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/app-frame/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "app-shell",
+        "frame",
+        "layout",
+        "header",
+        "chrome",
+        "traffic-lights"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:AspectRatio",
       "name": "AspectRatio",
       "label": "AspectRatio",
@@ -8685,7 +8725,9 @@
         "image",
         "video",
         "ratio",
-        "responsive"
+        "responsive",
+        "media",
+        "frame"
       ],
       "compound": false,
       "parts": [],
@@ -9208,7 +9250,7 @@
       ],
       "sourceFileCount": 10,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 1
     },
     {
       "id": "ui:Carousel.Dots",
@@ -10013,7 +10055,9 @@
         "search",
         "command",
         "shortcut",
-        "palette"
+        "palette",
+        "navigation",
+        "launcher"
       ],
       "compound": true,
       "parts": [
@@ -12205,7 +12249,7 @@
       ],
       "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 1
     },
     {
       "id": "ui:HoverCard.Content",
@@ -12580,7 +12624,9 @@
         "link",
         "preview",
         "hover",
-        "popup"
+        "popup",
+        "popover",
+        "card"
       ],
       "compound": true,
       "parts": [
@@ -13516,7 +13562,9 @@
         "alerts",
         "inbox",
         "popover",
-        "unread"
+        "unread",
+        "feedback",
+        "status"
       ],
       "compound": true,
       "parts": [
@@ -14462,7 +14510,9 @@
         "segmented",
         "switcher",
         "single-select",
-        "view-toggle"
+        "view-toggle",
+        "tabs",
+        "toggle"
       ],
       "compound": true,
       "parts": [
@@ -15081,7 +15131,9 @@
         "steps",
         "wizard",
         "progress",
-        "workflow"
+        "workflow",
+        "multi-step",
+        "form"
       ],
       "compound": true,
       "parts": [
@@ -15474,7 +15526,8 @@
         "label",
         "chip",
         "badge",
-        "category"
+        "category",
+        "status"
       ],
       "compound": false,
       "parts": [],
@@ -16510,6 +16563,12 @@
   ],
   "edges": [
     {
+      "id": "composes:primitives:CountrySelect:primitives:Combobox:",
+      "type": "composes",
+      "from": "primitives:CountrySelect",
+      "to": "primitives:Combobox"
+    },
+    {
       "id": "composes:primitives:DateTimeInput:primitives:DateField:",
       "type": "composes",
       "from": "primitives:DateTimeInput",
@@ -16522,6 +16581,12 @@
       "to": "primitives:TimeInput"
     },
     {
+      "id": "composes:ui:Carousel:ui:VisuallyHidden:",
+      "type": "composes",
+      "from": "ui:Carousel",
+      "to": "ui:VisuallyHidden"
+    },
+    {
       "id": "composes:ui:DateTimeInput:ui:DatePicker:",
       "type": "composes",
       "from": "ui:DateTimeInput",
@@ -16532,6 +16597,12 @@
       "type": "composes",
       "from": "ui:DateTimeInput",
       "to": "ui:TimeInput"
+    },
+    {
+      "id": "composes:ui:HoverCard:ui:Button:",
+      "type": "composes",
+      "from": "ui:HoverCard",
+      "to": "ui:Button"
     },
     {
       "id": "composes:ui:InfiniteScroll:ui:Spinner:",
@@ -23286,6 +23357,12 @@
       "to": "primitives:AlertDialog"
     },
     {
+      "id": "wraps:ui:AppFrame:primitives:AppFrame:",
+      "type": "wraps",
+      "from": "ui:AppFrame",
+      "to": "primitives:AppFrame"
+    },
+    {
       "id": "wraps:ui:AspectRatio:primitives:AspectRatio:",
       "type": "wraps",
       "from": "ui:AspectRatio",
@@ -24050,6 +24127,13 @@
   ],
   "clusters": [],
   "mismatches": [
+    {
+      "kind": "docs-nav-missing",
+      "package": "docs",
+      "component": "AppFrame",
+      "detail": "Public UI export is missing from the docs component navigation.",
+      "sourcePath": "packages/ui/src/app-frame/index.ts"
+    },
     {
       "kind": "missing-subpath-export",
       "package": "primitives",
@@ -25103,6 +25187,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
+      "component": "AppFrame",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/app-frame/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
       "component": "AspectRatio",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/aspect-ratio/index.ts"
@@ -26092,6 +26183,7 @@
     "primitivePartComponents": [],
     "thinWrapperComponents": [
       "Adjust",
+      "AppFrame",
       "AspectRatio",
       "Aurora",
       "Avatar",
@@ -26162,11 +26254,13 @@
     "specMissingPrimitives": [
       "TokenScope"
     ],
-    "docsNavMissing": [],
+    "docsNavMissing": [
+      "AppFrame"
+    ],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { fromSlug } from '../../../lib/nav';
+import { fromSlug, getCategoryLabel } from '../../../lib/nav';
 import type { CatalogKind } from '../../../lib/nav';
 import spec from '../../../../../../packages/mcp/src/spec.json';
 
@@ -195,7 +195,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		name: entry.name,
 		kind: entry.kind,
 		description: component.description,
-		category: component.category,
+		category: getCategoryLabel(entry.name) ?? component.category,
 		tags: component.tags,
 		compound: component.compound,
 		hasRootPart,

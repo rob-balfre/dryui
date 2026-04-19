@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { observeInViewport, observePageVisibility } from '@dryui/primitives/internal/motion';
 
 	interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
 		color?: string;
@@ -17,27 +18,36 @@
 	}: Props = $props();
 
 	function setup(node: HTMLSpanElement) {
+		let onScreen = true;
+		let tabVisible = true;
+
+		const apply = () => {
+			if (onScreen && tabVisible) node.dataset.active = '';
+			else delete node.dataset.active;
+		};
+
 		$effect(() => {
 			node.style.setProperty('--dry-shimmer-color', color);
 			node.style.setProperty('--dry-shimmer-duration', `${duration}s`);
 		});
 
 		$effect(() => {
-			if (typeof IntersectionObserver === 'undefined') {
-				node.dataset.active = '';
-				return;
-			}
-			const io = new IntersectionObserver(
-				(entries) => {
-					for (const entry of entries) {
-						if (entry.isIntersecting) node.dataset.active = '';
-						else delete node.dataset.active;
-					}
+			const unsubscribeViewport = observeInViewport(
+				node,
+				(inView) => {
+					onScreen = inView;
+					apply();
 				},
 				{ rootMargin: '100px' }
 			);
-			io.observe(node);
-			return () => io.disconnect();
+			const unsubscribeVisibility = observePageVisibility((visible) => {
+				tabVisible = visible;
+				apply();
+			});
+			return () => {
+				unsubscribeViewport();
+				unsubscribeVisibility();
+			};
 		});
 	}
 </script>

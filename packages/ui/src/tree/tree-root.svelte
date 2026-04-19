@@ -23,6 +23,38 @@
 	}
 
 	let expandedItems = createExpandedItems();
+	let branchItems = new SvelteSet<string>();
+	let focusedItem = $state<string | null>(selectedItem);
+
+	function toggleItem(id: string) {
+		if (expandedItems.has(id)) expandedItems.delete(id);
+		else expandedItems.add(id);
+	}
+
+	function expandItem(id: string) {
+		expandedItems.add(id);
+	}
+
+	function collapseItem(id: string) {
+		expandedItems.delete(id);
+	}
+
+	function selectItem(id: string) {
+		selectedItem = id;
+		focusedItem = id;
+	}
+
+	function setFocusedItem(id: string) {
+		focusedItem = id;
+	}
+
+	function registerBranch(id: string) {
+		branchItems.add(id);
+	}
+
+	function unregisterBranch(id: string) {
+		branchItems.delete(id);
+	}
 
 	setTreeCtx({
 		get expandedItems() {
@@ -31,115 +63,151 @@
 		get selectedItem() {
 			return selectedItem;
 		},
-		toggleItem(id) {
-			if (expandedItems.has(id)) expandedItems.delete(id);
-			else expandedItems.add(id);
+		get focusedItem() {
+			return focusedItem;
 		},
-		expandItem(id) {
-			expandedItems.add(id);
-		},
-		collapseItem(id) {
-			expandedItems.delete(id);
-		},
-		selectItem(id) {
-			selectedItem = id;
-		},
+		toggleItem,
+		expandItem,
+		collapseItem,
+		selectItem,
+		setFocusedItem,
+		registerBranch,
+		unregisterBranch,
 		isExpanded(id) {
 			return expandedItems.has(id);
 		},
 		isSelected(id) {
 			return selectedItem === id;
+		},
+		isFocused(id) {
+			return focusedItem === id;
+		},
+		hasChildren(id) {
+			return branchItems.has(id);
 		}
 	});
 
-	function handleKeydown(e: KeyboardEvent) {
-		const tree = e.currentTarget as HTMLElement;
+	function initializeTree(node: HTMLElement) {
+		if (focusedItem !== null) return;
+		const itemId = node.querySelector<HTMLElement>('[role="treeitem"]')?.dataset.itemId;
+
+		if (itemId) {
+			focusedItem = itemId;
+		}
+	}
+
+	function getVisibleItems(tree: HTMLElement) {
 		const items = Array.from(tree.querySelectorAll('[role="treeitem"]')) as HTMLElement[];
-		const visibleItems = items.filter((item) => {
+
+		return items.filter((item) => {
 			let parent = item.parentElement;
+
 			while (parent && parent !== tree) {
 				if (parent.getAttribute('role') === 'group') {
-					const groupParent = parent.closest('[role="treeitem"]');
-					if (groupParent && groupParent.getAttribute('aria-expanded') === 'false') {
+					const groupParent = parent.closest<HTMLElement>('[role="treeitem"]');
+					if (groupParent?.getAttribute('aria-expanded') === 'false') {
 						return false;
 					}
 				}
+
 				parent = parent.parentElement;
 			}
+
 			return true;
 		});
+	}
 
-		const currentIndex = visibleItems.indexOf(
-			document.activeElement?.closest('[role="treeitem"]') as HTMLElement
-		);
-		if (currentIndex === -1) return;
+	function getCurrentItem(tree: HTMLElement, visibleItems: HTMLElement[]) {
+		const activeItem =
+			document.activeElement instanceof HTMLElement
+				? document.activeElement.closest<HTMLElement>('[role="treeitem"]')
+				: null;
 
-		const currentItem = visibleItems[currentIndex]!;
+		if (activeItem && tree.contains(activeItem)) {
+			return activeItem;
+		}
+
+		if (focusedItem !== null) {
+			return visibleItems.find((item) => item.dataset.itemId === focusedItem) ?? null;
+		}
+
+		return visibleItems[0] ?? null;
+	}
+
+	function focusItem(item: HTMLElement | null | undefined) {
+		if (!item) return;
+		const itemId = item.dataset.itemId;
+		if (itemId && itemId !== focusedItem) {
+			focusedItem = itemId;
+		}
+		item.focus();
+	}
+
+	function handleFocusIn(e: FocusEvent) {
+		const item =
+			e.target instanceof HTMLElement ? e.target.closest<HTMLElement>('[role="treeitem"]') : null;
+		const itemId = item?.dataset.itemId;
+
+		if (itemId && itemId !== focusedItem) {
+			focusedItem = itemId;
+		}
+	}
+
+	function handleKeydown(e: KeyboardEvent) {
+		const tree = e.currentTarget as HTMLElement;
+		const visibleItems = getVisibleItems(tree);
+		const currentItem = getCurrentItem(tree, visibleItems);
+		if (!currentItem) return;
+
+		const currentIndex = visibleItems.indexOf(currentItem);
 		const itemId = currentItem.dataset.itemId;
 
 		switch (e.key) {
 			case 'ArrowDown': {
 				e.preventDefault();
-				const next = visibleItems[currentIndex + 1];
-				if (next) {
-					const label = next.querySelector('[data-tree-label]') as HTMLElement;
-					(label ?? next).focus();
-				}
+				focusItem(visibleItems[currentIndex + 1]);
 				break;
 			}
 			case 'ArrowUp': {
 				e.preventDefault();
-				const prev = visibleItems[currentIndex - 1];
-				if (prev) {
-					const label = prev.querySelector('[data-tree-label]') as HTMLElement;
-					(label ?? prev).focus();
-				}
+				focusItem(visibleItems[currentIndex - 1]);
 				break;
 			}
 			case 'ArrowRight': {
 				e.preventDefault();
-				if (itemId) {
-					const hasChildren = currentItem.querySelector('[role="group"]');
-					if (hasChildren && !expandedItems.has(itemId)) {
-						expandedItems.add(itemId);
-					} else if (hasChildren && expandedItems.has(itemId)) {
-						const firstChild = currentItem.querySelector('[role="group"] > [role="treeitem"]');
-						if (firstChild) {
-							const label = firstChild.querySelector('[data-tree-label]') as HTMLElement;
-							(label ?? (firstChild as HTMLElement)).focus();
-						}
+				if (itemId && branchItems.has(itemId)) {
+					if (!expandedItems.has(itemId)) {
+						expandItem(itemId);
+					} else {
+						focusItem(currentItem.querySelector<HTMLElement>('[role="group"] [role="treeitem"]'));
 					}
 				}
 				break;
 			}
 			case 'ArrowLeft': {
 				e.preventDefault();
-				if (itemId && expandedItems.has(itemId)) {
-					expandedItems.delete(itemId);
+				if (itemId && branchItems.has(itemId) && expandedItems.has(itemId)) {
+					collapseItem(itemId);
 				} else {
-					const parentGroup = currentItem.parentElement?.closest('[role="treeitem"]');
-					if (parentGroup) {
-						const label = parentGroup.querySelector('[data-tree-label]') as HTMLElement;
-						(label ?? (parentGroup as HTMLElement)).focus();
-					}
+					focusItem(currentItem.parentElement?.closest<HTMLElement>('[role="treeitem"]'));
 				}
 				break;
 			}
 			case 'Home': {
 				e.preventDefault();
-				const first = visibleItems[0];
-				if (first) {
-					const label = first.querySelector('[data-tree-label]') as HTMLElement;
-					(label ?? first).focus();
-				}
+				focusItem(visibleItems[0]);
 				break;
 			}
 			case 'End': {
 				e.preventDefault();
-				const last = visibleItems[visibleItems.length - 1];
-				if (last) {
-					const label = last.querySelector('[data-tree-label]') as HTMLElement;
-					(label ?? last).focus();
+				focusItem(visibleItems[visibleItems.length - 1]);
+				break;
+			}
+			case 'Enter':
+			case ' ': {
+				if (itemId) {
+					e.preventDefault();
+					selectItem(itemId);
 				}
 				break;
 			}
@@ -147,7 +215,15 @@
 	}
 </script>
 
-<div role="tree" data-part="root" class={className} onkeydown={handleKeydown} {...rest}>
+<div
+	role="tree"
+	data-part="root"
+	class={className}
+	onfocusin={handleFocusIn}
+	onkeydown={handleKeydown}
+	{@attach initializeTree}
+	{...rest}
+>
 	{@render children()}
 </div>
 

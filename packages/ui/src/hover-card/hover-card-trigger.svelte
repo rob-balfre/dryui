@@ -1,9 +1,13 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAttributes } from 'svelte/elements';
+	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import { Button } from '../button/index.js';
 	import { getHoverCardCtx } from './context.svelte.js';
 
-	interface Props extends HTMLAttributes<HTMLAnchorElement> {
+	interface Props
+		extends
+			Omit<HTMLAnchorAttributes, 'children' | 'href'>,
+			Omit<HTMLButtonAttributes, 'children'> {
 		href?: string;
 		children: Snippet;
 	}
@@ -12,57 +16,95 @@
 
 	const ctx = getHoverCardCtx();
 
-	let anchorEl = $state<HTMLAnchorElement>();
+	let triggerEl = $state<HTMLAnchorElement | HTMLButtonElement>();
 
 	$effect(() => {
-		if (anchorEl) {
-			ctx.triggerEl = anchorEl;
+		if (triggerEl) {
+			ctx.triggerEl = triggerEl;
+
+			return () => {
+				if (ctx.triggerEl === triggerEl) {
+					ctx.triggerEl = null;
+				}
+			};
 		}
 	});
+
+	function handlePointerEnter() {
+		ctx.triggerHovered = true;
+		ctx.show();
+	}
+
+	function handlePointerLeave() {
+		ctx.triggerHovered = false;
+		ctx.close();
+	}
+
+	function handleFocusIn() {
+		ctx.triggerFocused = true;
+
+		if (ctx.ignoreNextTriggerFocusOpen) {
+			ctx.ignoreNextTriggerFocusOpen = false;
+			return;
+		}
+
+		ctx.showImmediate();
+	}
+
+	function handleFocusOut() {
+		ctx.triggerFocused = false;
+		ctx.close();
+	}
+
+	function handleKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape' && ctx.open) {
+			event.preventDefault();
+			ctx.forceClose();
+			triggerEl?.focus();
+		}
+	}
+
+	function handleRef(el: HTMLButtonElement | HTMLAnchorElement | null) {
+		triggerEl = el ?? undefined;
+	}
 </script>
 
-<a
-	bind:this={anchorEl}
-	id={ctx.triggerId}
-	{href}
-	data-hover-card-trigger
-	aria-haspopup="true"
-	aria-expanded={ctx.open}
-	data-state={ctx.open ? 'open' : 'closed'}
-	onpointerenter={() => ctx.show()}
-	onpointerleave={() => ctx.close()}
-	onfocus={() => ctx.show()}
-	onblur={() => ctx.close()}
-	class={className}
-	{...rest}
->
-	{@render children()}
-</a>
+<span class={className} data-hover-card-trigger-shell>
+	<Button
+		ref={handleRef}
+		variant="link"
+		size="sm"
+		color="primary"
+		id={ctx.triggerId}
+		{href}
+		data-hover-card-trigger
+		aria-haspopup="dialog"
+		aria-controls={ctx.contentId}
+		aria-expanded={ctx.open}
+		data-state={ctx.open ? 'open' : 'closed'}
+		onpointerenter={handlePointerEnter}
+		onpointerleave={handlePointerLeave}
+		onfocusin={handleFocusIn}
+		onfocusout={handleFocusOut}
+		onkeydown={handleKeydown}
+		{...rest}
+	>
+		{@render children()}
+	</Button>
+</span>
 
 <style>
-	[data-hover-card-trigger] {
+	[data-hover-card-trigger-shell] {
+		--dry-btn-min-height: auto;
+		--dry-btn-padding-x: 0;
+		--dry-btn-padding-y: 0;
+		--dry-btn-font-size: inherit;
+		--dry-btn-radius: var(--dry-radius-sm);
 		display: inline-grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		align-items: center;
-		gap: var(--dry-space-1);
-		color: var(--dry-color-text-brand);
-		text-decoration: underline;
-		text-decoration-color: var(--dry-color-stroke-brand);
-		text-decoration-thickness: 1px;
-		text-underline-offset: 0.18em;
 		cursor: help;
-		transition:
-			color var(--dry-duration-fast) var(--dry-ease-default),
-			text-decoration-color var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-hover-card-trigger]:hover {
-		color: var(--dry-color-fill-brand-hover);
-		text-decoration-color: currentColor;
-	}
-
-	[data-hover-card-trigger]:focus-visible {
+	[data-hover-card-trigger-shell]:focus-within {
 		outline: 2px solid var(--dry-color-stroke-focus);
 		outline-offset: 3px;
 		border-radius: var(--dry-radius-sm);

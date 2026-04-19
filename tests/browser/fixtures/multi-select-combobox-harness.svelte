@@ -60,9 +60,13 @@
 			{/each}
 		</MultiSelectCombobox.SelectionList>
 
-		<MultiSelectCombobox.Input placeholder="Search teammates..." aria-label="Assignees" />
+		<MultiSelectCombobox.Input
+			placeholder="Search teammates..."
+			aria-label="Assignees"
+			data-testid="multi-select-input"
+		/>
 
-		<MultiSelectCombobox.Content>
+		<MultiSelectCombobox.Content data-testid="multi-select-content">
 			{#each filteredGroups as group (group.label)}
 				<MultiSelectCombobox.Group label={group.label}>
 					{#each group.items as option (option.value)}

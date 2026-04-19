@@ -346,6 +346,9 @@ export type {
 	ChartYAxisProps
 } from './chart/index.js';
 
+export { AppFrame } from './app-frame/index.js';
+export type { AppFrameProps } from './app-frame/index.js';
+
 export { ChatThread } from './chat-thread/index.js';
 export type { ChatThreadProps } from './chat-thread/index.js';
 

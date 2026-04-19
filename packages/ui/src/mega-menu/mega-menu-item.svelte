@@ -13,17 +13,19 @@
 	const ctx = getMegaMenuCtx();
 	const itemId = generateFormId('mm-item');
 	const triggerId = generateFormId('mm-trigger');
+	const panelId = generateFormId('mm-panel');
 
 	setMegaMenuItemCtx({
 		itemId,
 		triggerId,
+		panelId,
 		get open() {
 			return ctx.activeItem === itemId;
 		}
 	});
 
 	function handlePointerEnter() {
-		ctx.openItem(itemId);
+		ctx.openItem(itemId, triggerId);
 	}
 
 	function handlePointerLeave() {

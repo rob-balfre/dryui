@@ -13,7 +13,6 @@ export interface NotificationCenterContext {
 	readonly open: boolean;
 	readonly triggerId: string;
 	readonly panelId: string;
-	triggerEl: HTMLElement | null;
 	markAllRead: () => void;
 	markRead: (id: string) => void;
 	remove: (id: string) => void;

@@ -1,8 +1,8 @@
 <script lang="ts">
+	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchorPosition } from '@dryui/primitives';
-	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
 	import { getSelectCtx } from './context.svelte.js';
 
 	const OPTION_SELECTOR = '[role="option"]:not([data-disabled])';
@@ -24,30 +24,17 @@
 
 	const ctx = getSelectCtx();
 
-	let el = $state<HTMLDivElement>();
+	let el = $state<HTMLDivElement | null>(null);
 
-	const anchor = createAnchorPosition(
-		() => ctx.triggerEl,
-		() => el ?? null,
-		{
-			get placement() {
-				return placement;
-			},
-			get offset() {
-				return offset;
+	function attachContent(node: HTMLDivElement) {
+		el = node;
+
+		return () => {
+			if (el === node) {
+				el = null;
 			}
-		}
-	);
-
-	$effect(() => {
-		if (!el) return;
-
-		el.style.cssText = typeof style === 'string' ? style : '';
-		const positionStyles = anchor.styles;
-		for (const [key, value] of Object.entries(positionStyles)) {
-			el.style.setProperty(key, value);
-		}
-	});
+		};
+	}
 
 	function getOptionItems(container: HTMLElement): HTMLElement[] {
 		return Array.from(container.querySelectorAll<HTMLElement>(OPTION_SELECTOR));
@@ -59,12 +46,14 @@
 		items[clamped]?.focus();
 	}
 
-	$effect(() => {
-		if (ctx.open && el && !el.matches(':popover-open')) {
-			el.showPopover();
+	const popover = createAnchoredPopover({
+		triggerEl: () => ctx.triggerEl,
+		contentEl: () => el ?? null,
+		open: () => ctx.open,
+		placement: () => placement,
+		offset: () => offset,
+		onAfterShow: () => {
 			focusFirstSelectItem();
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
 		}
 	});
 
@@ -127,7 +116,8 @@
 </script>
 
 <div
-	bind:this={el}
+	{@attach attachContent}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	popover="auto"
 	role="listbox"
 	id={ctx.contentId}
@@ -156,7 +146,7 @@
 		margin: 0;
 
 		display: grid;
-		grid-template-columns: minmax(12rem, max-content);
+		grid-template-columns: minmax(max(12rem, anchor-size(inline)), max-content);
 		background: var(--dry-overlay-bg, var(--dry-color-bg-overlay));
 		border: 1px solid var(--dry-overlay-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-overlay-radius, var(--dry-radius-md));

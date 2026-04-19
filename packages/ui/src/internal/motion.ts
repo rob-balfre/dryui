@@ -6,7 +6,10 @@ export {
 	supportsPointerTracking,
 	supportsPropertyRegistration,
 	registerPropertyOnce,
-	supportsWebGL2
+	supportsWebGL2,
+	observeInViewport,
+	observePageVisibility,
+	observeOffscreenState
 } from '@dryui/primitives/internal/motion';
 
 // UI-only motion utilities
