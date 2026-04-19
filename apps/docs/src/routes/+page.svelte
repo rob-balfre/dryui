@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import {
 		AppFrame,
-		Avatar,
 		Button,
 		Card,
 		CodeBlock,
@@ -29,6 +28,7 @@
 		Wrench,
 		Palette,
 		Check,
+		ChevronRight,
 		Compass,
 		Cpu,
 		Bot,
@@ -50,30 +50,29 @@
 
 	const userMessage = 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!';
 	const assistantMessage =
-		"Install DryUI. It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps my output usable.";
+		"You're absolutely right! Why don't you try DryUI? It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps my output usable.";
+
+	const userChars = [...userMessage];
+	const assistantChars = [...assistantMessage];
 
 	const CINEMATIC_SEEN_KEY = 'dryui-home-cinematic-seen';
 
-	let userTypedText = $state('');
-	let userBubbleVisible = $state(false);
+	let userTypedLen = $state(0);
 	let assistantVisible = $state(false);
-	let assistantTyping = $state(false);
-	let assistantTypedText = $state('');
-	let frameVisible = $state(false);
+	let assistantThinking = $state(false);
+	let assistantTypedLen = $state(0);
+	let chromeRevealed = $state(false);
 	let supportingVisible = $state(false);
-	let cinematicActive = $state(true);
 	let skipFadeIn = $state(false);
 	let hydrated = $state(false);
 
 	function jumpToFinal() {
-		userTypedText = userMessage;
-		userBubbleVisible = true;
+		userTypedLen = userMessage.length;
 		assistantVisible = true;
-		assistantTyping = false;
-		assistantTypedText = assistantMessage;
-		frameVisible = true;
+		assistantThinking = false;
+		assistantTypedLen = assistantMessage.length;
+		chromeRevealed = true;
 		supportingVisible = true;
-		cinematicActive = false;
 	}
 
 	function shouldSkipCinematic(): boolean {
@@ -114,14 +113,14 @@
 				timers.push(id);
 			});
 
-		const typewriter = (text: string, charDelay: number, setter: (value: string) => void) =>
+		const typewriter = (total: number, charDelay: number, setter: (value: number) => void) =>
 			new Promise<void>((resolve) => {
 				let i = 0;
 				const tick = () => {
 					if (cancelled) return resolve();
-					if (i >= text.length) return resolve();
+					if (i >= total) return resolve();
 					i += 1;
-					setter(text.slice(0, i));
+					setter(i);
 					timers.push(setTimeout(tick, charDelay));
 				};
 				tick();
@@ -130,27 +129,23 @@
 		(async () => {
 			await wait(900);
 			if (cancelled) return;
-			await typewriter(userMessage, 55, (t) => (userTypedText = t));
+			await typewriter(userChars.length, 55, (n) => (userTypedLen = n));
 			if (cancelled) return;
-			await wait(450);
-			if (cancelled) return;
-			userBubbleVisible = true;
-			await wait(750);
+			await wait(500);
 			if (cancelled) return;
 			assistantVisible = true;
-			assistantTyping = true;
+			assistantThinking = true;
 			await wait(1200);
 			if (cancelled) return;
-			assistantTyping = false;
-			await typewriter(assistantMessage, 14, (t) => (assistantTypedText = t));
+			assistantThinking = false;
+			await typewriter(assistantChars.length, 28, (n) => (assistantTypedLen = n));
 			if (cancelled) return;
-			await wait(600);
+			await wait(500);
 			if (cancelled) return;
-			frameVisible = true;
-			await wait(900);
+			chromeRevealed = true;
+			await wait(800);
 			if (cancelled) return;
 			supportingVisible = true;
-			cinematicActive = false;
 			markSeen();
 		})();
 
@@ -371,12 +366,7 @@
 
 <div class="page">
 	<div class="page-stack">
-		<section
-			class="hero"
-			class:hero--hydrated={hydrated}
-			class:hero--skip-fade={skipFadeIn}
-			data-cinematic-active={cinematicActive || undefined}
-		>
+		<section class="hero" class:hero--hydrated={hydrated} class:hero--skip-fade={skipFadeIn}>
 			<div class="hero-main">
 				<div
 					class="hero-lockup hero-reveal"
@@ -389,76 +379,75 @@
 					<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
 				</div>
 				<div class="hero-intro">
-					<AppFrame
-						title={frameVisible ? 'agent.chat' : ''}
-						--dry-app-frame-content-padding="var(--dry-space-5)"
-						--dry-app-frame-transition={skipFadeIn ? '0s' : '700ms ease'}
-						--dry-app-frame-bg={frameVisible ? 'var(--dry-color-bg-base)' : 'transparent'}
-						--dry-app-frame-border={frameVisible ? 'var(--dry-color-stroke-weak)' : 'transparent'}
-						--dry-app-frame-chrome-bg={frameVisible ? 'var(--dry-color-bg-raised)' : 'transparent'}
-						--dry-app-frame-dot-close={frameVisible ? '#ff5f56' : 'transparent'}
-						--dry-app-frame-dot-min={frameVisible ? '#ffbd2e' : 'transparent'}
-						--dry-app-frame-dot-max={frameVisible ? '#27c93f' : 'transparent'}
-					>
-						<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
-							<div class="chat-row" data-role="user" data-bubble={userBubbleVisible || undefined}>
-								<div class="chat-avatar" data-revealed={userBubbleVisible || undefined}>
-									<Avatar size="sm" alt="You">
-										<User size={14} aria-hidden="true" />
-									</Avatar>
-								</div>
-								<div class="chat-msg" data-role="user" data-bubble={userBubbleVisible || undefined}>
-									<span class="chat-msg-name" data-revealed={userBubbleVisible || undefined}>
-										You
-									</span>
-									<div class="chat-msg-body">
-										<span class="chat-msg-ghost" aria-hidden="true">{userMessage}</span>
-										<span class="chat-msg-live" aria-live="polite"
-											>{userTypedText}{#if cinematicActive && !userBubbleVisible}<span
-													class="caret"
-													aria-hidden="true">▍</span
-												>{/if}</span
+					<div class="hero-intro-frame">
+						<AppFrame
+							title={chromeRevealed ? 'agent.chat' : ''}
+							--dry-app-frame-content-padding="var(--dry-space-5)"
+							--dry-app-frame-transition={skipFadeIn ? '0s' : '700ms'}
+							--dry-app-frame-bg={chromeRevealed ? 'var(--dry-color-bg-base)' : 'transparent'}
+							--dry-app-frame-border={chromeRevealed
+								? 'var(--dry-color-stroke-weak)'
+								: 'transparent'}
+							--dry-app-frame-chrome-bg={chromeRevealed
+								? 'var(--dry-color-bg-raised)'
+								: 'transparent'}
+							--dry-app-frame-dot-close={chromeRevealed ? '#ff5f56' : 'transparent'}
+							--dry-app-frame-dot-min={chromeRevealed ? '#ffbd2e' : 'transparent'}
+							--dry-app-frame-dot-max={chromeRevealed ? '#27c93f' : 'transparent'}
+						>
+							<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
+								<div class="chat-row" data-role="user">
+									<div class="chat-msg" data-role="user">
+										<span class="chat-msg-prompt" aria-hidden="true"
+											><ChevronRight size={16} /></span
+										>
+										<span class="chat-msg-text" aria-label={userMessage}
+											>{#each userChars as char, i (i)}<span
+													class="chat-msg-char"
+													data-on={i < userTypedLen || undefined}
+													aria-hidden="true">{char}</span
+												>{/each}</span
 										>
 									</div>
 								</div>
-							</div>
 
-							{#if assistantVisible}
-								<div class="chat-row" data-role="assistant">
-									<div class="chat-avatar" data-revealed="true">
-										<Avatar size="sm" alt="Agent">
-											<Sparkles size={14} aria-hidden="true" />
-										</Avatar>
-									</div>
-									<div class="chat-msg" data-role="assistant" data-bubble="true">
-										<span class="chat-msg-name" data-revealed="true">Agent</span>
-										<div class="chat-msg-body">
-											<span class="chat-msg-ghost" aria-hidden="true">{assistantMessage}</span>
-											{#if assistantTyping}
-												<div class="chat-msg-typing">
-													<TypingIndicator aria-label="Agent is typing" />
-												</div>
+								{#if assistantVisible}
+									<div class="chat-row" data-role="assistant">
+										<div class="chat-msg" data-role="assistant">
+											<span class="chat-msg-prompt" aria-hidden="true"
+												><ChevronRight size={16} /></span
+											>
+											{#if assistantThinking}
+												<TypingIndicator aria-label="Agent is typing" />
 											{:else}
-												<span class="chat-msg-live" aria-live="polite"
-													>{assistantTypedText}{#if cinematicActive && assistantTypedText.length > 0 && assistantTypedText.length < assistantMessage.length}<span
-															class="caret"
-															aria-hidden="true">▍</span
-														>{/if}</span
+												<span class="chat-msg-text" aria-label={assistantMessage}
+													>{#each assistantChars as char, i (i)}<span
+															class="chat-msg-char"
+															data-on={i < assistantTypedLen || undefined}
+															aria-hidden="true">{char}</span
+														>{/each}</span
 												>
 											{/if}
 										</div>
 									</div>
-								</div>
-							{/if}
-						</div>
-					</AppFrame>
+								{/if}
+							</div>
+						</AppFrame>
+					</div>
+
+					<div
+						class="hero-reveal"
+						data-revealed={supportingVisible || undefined}
+						inert={!supportingVisible}
+					>
+						<Text size="xs" color="secondary">100% free & open-source.</Text>
+					</div>
 				</div>
 				<div
 					class="hero-install hero-reveal"
 					data-revealed={supportingVisible || undefined}
 					inert={!supportingVisible}
 				>
-					<Text size="xs" color="secondary">100% free & open-source.</Text>
 					<div class="hero-tabs">
 						<Tabs.Root value="bun">
 							<div class="hero-tabs-list">
@@ -832,8 +821,6 @@
 
 	.hero--skip-fade .hero-reveal,
 	.hero--skip-fade .chat-msg,
-	.hero--skip-fade .chat-avatar,
-	.hero--skip-fade .chat-msg-name,
 	.hero--skip-fade .chat-row[data-role='assistant'] {
 		transition: none;
 		animation: none;
@@ -888,6 +875,19 @@
 		grid-template-columns: minmax(0, 36rem);
 		justify-content: center;
 		justify-self: stretch;
+		gap: var(--dry-space-3);
+	}
+
+	.hero-intro-frame {
+		display: grid;
+		grid-template-columns: minmax(0, 52rem);
+		justify-self: center;
+	}
+
+	@container (min-width: 48rem) {
+		.hero-intro-frame {
+			margin-inline: -2rem;
+		}
 	}
 
 	.hero-install {
@@ -907,18 +907,10 @@
 
 	.chat-row {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: auto;
-		gap: var(--dry-space-2);
-		align-items: end;
-	}
-
-	.chat-row[data-role='user'] {
-		justify-content: end;
+		justify-content: start;
 	}
 
 	.chat-row[data-role='assistant'] {
-		justify-content: start;
 		animation: assistant-row-enter 600ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 	}
 
@@ -933,106 +925,32 @@
 		}
 	}
 
-	.chat-avatar {
-		display: grid;
-		padding-block-end: var(--dry-space-1);
-		opacity: 0;
-		transition: opacity 500ms ease;
-	}
-
-	.chat-avatar[data-revealed] {
-		opacity: 1;
-	}
-
-	.chat-row[data-role='user'] .chat-avatar {
-		order: 2;
-	}
-
-	.chat-row[data-role='assistant'] .chat-avatar {
-		order: 0;
-	}
-
 	.chat-msg {
-		order: 1;
 		display: grid;
-		grid-template-columns: minmax(0, 24rem);
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-3) var(--dry-space-4);
-		border-radius: var(--dry-radius-lg);
-		background: transparent;
-		border: 1px solid transparent;
-		color: var(--dry-color-text-strong);
-		transition:
-			background-color 700ms ease,
-			border-color 700ms ease,
-			color 700ms ease;
-	}
-
-	.chat-msg[data-role='user'] {
-		border-end-end-radius: var(--dry-radius-sm);
-	}
-
-	.chat-msg[data-role='user'][data-bubble] {
-		background: var(--dry-color-fill-brand);
-		color: var(--dry-color-text-on-fill);
-	}
-
-	.chat-msg[data-role='assistant'] {
-		border-end-start-radius: var(--dry-radius-sm);
-	}
-
-	.chat-msg[data-role='assistant'][data-bubble] {
-		background: var(--dry-color-bg-raised);
-		color: var(--dry-color-text-strong);
-		border-color: var(--dry-color-stroke-weak);
-	}
-
-	.chat-msg-name {
-		font-size: var(--dry-type-small-size, 0.875rem);
-		font-weight: 600;
-		letter-spacing: 0.01em;
-		opacity: 0;
-		transition: opacity 500ms ease;
-	}
-
-	.chat-msg-name[data-revealed] {
-		opacity: 0.85;
-	}
-
-	.chat-msg-body {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: auto;
-		font-size: var(--dry-type-body-size, 1rem);
+		grid-template-columns: auto minmax(0, 46rem);
+		gap: var(--dry-space-2);
+		font-family: var(--dry-font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+		font-size: var(--dry-type-small-size, 0.9375rem);
 		line-height: 1.55;
-		text-wrap: pretty;
-	}
-
-	.chat-msg-ghost,
-	.chat-msg-live {
-		grid-column: 1;
-		grid-row: 1;
-	}
-
-	.chat-msg-ghost {
-		visibility: hidden;
-		pointer-events: none;
-		user-select: none;
-	}
-
-	.chat-msg-typing {
-		grid-column: 1;
-		grid-row: 1;
-		align-self: start;
-	}
-
-	.caret {
-		display: inline-block;
-		margin-inline-start: 0.1em;
 		color: var(--dry-color-text-strong);
-		font-weight: 400;
-		line-height: 1;
-		animation: caret-blink 1s steps(1) infinite;
+	}
+
+	.chat-msg-prompt {
+		align-self: start;
+		padding-block-start: 0.2em;
+		color: var(--dry-color-fill-brand);
+	}
+
+	.chat-msg[data-role='assistant'] .chat-msg-prompt {
+		visibility: hidden;
+	}
+
+	.chat-msg-char {
+		visibility: hidden;
+	}
+
+	.chat-msg-char[data-on] {
+		visibility: visible;
 	}
 
 	.hero-reveal {
@@ -1044,29 +962,12 @@
 		opacity: 1;
 	}
 
-	@keyframes caret-blink {
-		0%,
-		49% {
-			opacity: 1;
-		}
-		50%,
-		100% {
-			opacity: 0;
-		}
-	}
-
 	@media (prefers-reduced-motion: reduce) {
-		.chat-avatar,
 		.chat-msg,
-		.chat-msg-name,
 		.hero-reveal,
 		.chat-row[data-role='assistant'] {
 			transition: none;
 			animation: none;
-		}
-		.caret {
-			animation: none;
-			opacity: 1;
 		}
 	}
 
@@ -1345,7 +1246,7 @@
 		grid-auto-columns: auto;
 		justify-content: center;
 		gap: var(--dry-space-3);
-		padding-block-start: var(--dry-space-4);
+		padding: var(--dry-space-6) 0;
 	}
 
 	.plugins {
@@ -1531,6 +1432,5 @@
 		grid-template-columns: minmax(0, 36rem);
 		justify-content: center;
 		justify-items: center;
-		gap: var(--dry-space-2);
 	}
 </style>
