@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.12.1
+
+### Patch Changes
+
+- [`ea01d9d`](https://github.com/rob-balfre/dryui/commit/ea01d9d567dcf3ddd5ede903671c70081bde5514) Thanks [@rob-balfre](https://github.com/rob-balfre)! - - `@dryui/cli` feedback auto-setup: when a SvelteKit app has no `vite.config.(ts|js|mts|mjs)` at all, the CLI now writes a minimal one (with `ssr.noExternal: ['@dryui/feedback']`) instead of silently skipping the patch step. Previously the check quietly reported "patched" when no config existed, which left the app without the SSR exclusion and the feedback widget failing on first run.
+
 ## 0.12.0
 
 ### Minor Changes
