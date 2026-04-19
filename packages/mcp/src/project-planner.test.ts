@@ -82,6 +82,73 @@ describe('detectProject', () => {
 		expect(result.files.rootPage).toBe(resolve(root, 'src/routes/+page.svelte'));
 	});
 
+	test('detects @dryui/feedback dependency and a mounted <Feedback /> in the root layout', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*',
+					'@dryui/feedback': 'workspace:*'
+				}
+			}),
+			'bun.lock': '',
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import { Feedback } from '@dryui/feedback';",
+				'</script>',
+				'<Feedback serverUrl="http://localhost:4748" />'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.dependencies.feedback).toBe(true);
+		expect(result.feedback.layoutPath).toBe(resolve(root, 'src/routes/+layout.svelte'));
+	});
+
+	test('reports feedback missing when @dryui/feedback is not installed', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0'
+				}
+			}),
+			'src/routes/+layout.svelte': '<h1>Layout</h1>'
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.dependencies.feedback).toBe(false);
+		expect(result.feedback.layoutPath).toBeNull();
+	});
+
+	test('finds a mounted <Feedback /> inside a nested group layout', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/feedback': 'workspace:*'
+				}
+			}),
+			'src/routes/+layout.svelte': '<slot />',
+			'src/routes/(app)/+layout.svelte': [
+				'<script>',
+				"  import { Feedback } from '@dryui/feedback';",
+				'</script>',
+				'<Feedback />'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.dependencies.feedback).toBe(true);
+		expect(result.feedback.layoutPath).toBe(resolve(root, 'src/routes/(app)/+layout.svelte'));
+	});
+
 	test('inherits the workspace package manager and accepts theme imports from app.css', () => {
 		const workspaceRoot = createProject({
 			'package.json': JSON.stringify({ private: true }),

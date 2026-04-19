@@ -134,7 +134,7 @@ function readyDetection(root: string): ProjectDetection {
 		framework: 'sveltekit',
 		packageManager: 'bun',
 		status: 'ready',
-		dependencies: { ui: true, primitives: true, lint: true },
+		dependencies: { ui: true, primitives: true, lint: true, feedback: true },
 		files: {
 			appHtml: resolve(root, 'src/app.html'),
 			appCss: resolve(root, 'src/app.css'),
@@ -144,6 +144,7 @@ function readyDetection(root: string): ProjectDetection {
 		},
 		theme: { defaultImported: true, darkImported: true, themeAuto: true },
 		lint: { preprocessorWired: true },
+		feedback: { layoutPath: resolve(root, 'src/routes/+layout.svelte') },
 		warnings: []
 	};
 }
@@ -326,6 +327,68 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).toContain('Project dev: skipped (port 5173 busy (PID 12345 bun))');
 		expect(result.logs[0]).toContain('Dashboard: http://127.0.0.1:4748/ui/?v=42');
 		expect(result.logs[0]).not.toContain('dev=');
+	});
+
+	test('warns when @dryui/feedback is not installed', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
+			feedback: { layoutPath: null }
+		};
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain(
+			'Feedback widget: not installed — run `bun add @dryui/feedback`'
+		);
+	});
+
+	test('warns when Feedback component is not mounted in any layout', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			feedback: { layoutPath: null }
+		};
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain('Feedback widget: not mounted');
+	});
+
+	test('emits no feedback widget note when installed and mounted', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => true
+				})
+			})
+		);
+
+		expect(result.logs[0]).not.toContain('Feedback widget:');
 	});
 
 	test('skips the dev server when spawn times out waiting for ready', async () => {
