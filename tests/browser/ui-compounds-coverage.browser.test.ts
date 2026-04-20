@@ -64,24 +64,32 @@ describe('ui compounds coverage harness', () => {
 			throw new Error('Expected list harness elements');
 		}
 
+		const enabledButton = enabledItem.querySelector<HTMLButtonElement>('button');
+		const disabledButton = disabledItem.querySelector<HTMLButtonElement>('button');
+
+		if (!enabledButton || !disabledButton) {
+			throw new Error('Expected interactive list item buttons');
+		}
+
 		expect(root.getAttribute('data-dense')).toBe('true');
 		expect(root.getAttribute('data-disable-padding')).toBe('true');
 		expect(subheader.getAttribute('role')).toBe('presentation');
-		expect(enabledItem.getAttribute('role')).toBe('button');
-		expect(enabledItem.getAttribute('tabindex')).toBe('0');
-		expect(disabledItem.getAttribute('aria-disabled')).toBe('true');
-		expect(disabledItem.getAttribute('tabindex')).toBeNull();
+		expect(enabledItem.getAttribute('role')).toBeNull();
+		expect(enabledButton.type).toBe('button');
+		expect(enabledButton.disabled).toBe(false);
+		expect(disabledButton.disabled).toBe(true);
+		expect(disabledItem.getAttribute('data-disabled')).toBe('true');
 		expect(icon.textContent).toBe('1');
 		expect(childrenText.textContent).toContain('Ship docs update');
 		expect(snippetText.textContent).toContain('Rollback window');
 		expect(snippetText.textContent).toContain('Disabled until checks pass');
 
-		enabledItem.click();
-		enabledItem.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
-		disabledItem.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+		enabledButton.click();
+		enabledButton.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+		disabledButton.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
 		flushSync();
 
-		expect(activations.textContent).toBe('2');
+		expect(activations.textContent).toBe('1');
 	});
 
 	it('renders the full table structure including wrapper, caption, and footer', () => {

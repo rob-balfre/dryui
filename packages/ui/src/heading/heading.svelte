@@ -6,6 +6,7 @@
 	interface Props extends HTMLAttributes<HTMLHeadingElement> {
 		level?: 1 | 2 | 3 | 4 | 5 | 6;
 		variant?: 'default' | 'display';
+		className?: HTMLAttributes<HTMLHeadingElement>['class'];
 		children: Snippet;
 	}
 

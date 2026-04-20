@@ -4,11 +4,9 @@
 	import { Checkbox } from '../../../packages/ui/src/checkbox/index.js';
 
 	let {
-		initialChecked = false,
+		initialChecked: checked = false,
 		indeterminate = false
 	}: { initialChecked?: boolean; indeterminate?: boolean } = $props();
-
-	let checked = $state(initialChecked);
 </script>
 
 <div data-testid="bound-checked">{String(checked)}</div>

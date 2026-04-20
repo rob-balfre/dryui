@@ -15,3 +15,11 @@ Brief description of changes.
 - [ ] Tests added/updated if needed
 - [ ] No inline styles or flexbox
 - [ ] Changeset added if this changes published packages
+
+## Coverage Notes
+
+If this PR adds or materially changes an interactive component, include one of:
+
+- browser coverage added or updated
+- docs visual coverage updated
+- exemption noted as `coverage-exemption: #123`

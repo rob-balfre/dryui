@@ -59,6 +59,7 @@ await parallel(
 	run('check:exports', 'bun run scripts/sync-package-exports.ts --check'),
 	run('check:cli-imports', `! grep -rnE "from ['\\"]\\.\\./\\.\\./\\.\\./mcp" packages/cli/src`),
 	run('check:changeset', 'bun run scripts/check-changeset-required.ts'),
+	run('check:interactive-coverage', 'bun run scripts/check-interactive-coverage.ts'),
 	run('validate:spec', 'bun run scripts/validate-spec-coverage.ts'),
 	run('build:lint', 'bun run build', pkg('lint')),
 	run('build:primitives', 'bun run build', pkg('primitives'))

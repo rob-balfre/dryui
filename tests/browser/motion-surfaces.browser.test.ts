@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { flushSync } from 'svelte';
+import { flushSync, unmount } from 'svelte';
 import MotionSurfacesHarness from './fixtures/motion-surfaces-harness.svelte';
 import { render } from './_harness';
 
@@ -105,6 +105,17 @@ describe('motion surfaces', () => {
 		const inlineStyle = surface.getAttribute('style') ?? '';
 		expect(inlineStyle).toContain('--dry-spotlight-x: 60px');
 		expect(inlineStyle).toContain('--dry-spotlight-y: 70px');
+	});
+
+	it('cleans up the spotlight element reference on unmount', async () => {
+		const { target, instance } = render(MotionSurfacesHarness, { kind: 'spotlight' });
+		const surface = target.querySelector('[data-testid="spotlight"]');
+
+		if (!(surface instanceof HTMLDivElement)) {
+			throw new Error('Expected spotlight surface');
+		}
+
+		await unmount(instance);
 	});
 
 	it('renders aurora with custom palette vars and noise with animation hooks', () => {
@@ -230,6 +241,20 @@ describe('motion surfaces', () => {
 
 			expect(marquee.hasAttribute('data-pause-on-hover')).toBe(true);
 		});
+
+		it('pauses when the marquee leaves the viewport', () => {
+			const target = renderSurface('marquee');
+			const marquee = target.querySelector('[data-testid="marquee"]');
+
+			if (!(marquee instanceof HTMLDivElement)) {
+				throw new Error('Expected marquee surface');
+			}
+
+			intersectionCallbacks[0]?.([{ isIntersecting: false }]);
+			flushSync();
+
+			expect(marquee.hasAttribute('data-paused')).toBe(true);
+		});
 	});
 
 	describe('reveal variants', () => {
@@ -317,6 +342,20 @@ describe('motion surfaces', () => {
 			}
 
 			expect(noise.getAttribute('data-grain')).toBe('fine');
+		});
+
+		it('pauses animated noise when it leaves the viewport', () => {
+			const target = renderSurface('noise');
+			const noise = target.querySelector('[data-testid="noise"]');
+
+			if (!(noise instanceof HTMLDivElement)) {
+				throw new Error('Expected noise surface');
+			}
+
+			intersectionCallbacks[0]?.([{ isIntersecting: false }]);
+			flushSync();
+
+			expect(noise.hasAttribute('data-paused')).toBe(true);
 		});
 	});
 });

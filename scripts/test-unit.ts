@@ -1,35 +1,35 @@
 import { $ } from 'bun';
 
 const root = new URL('../', import.meta.url);
-const excludedSegments: string[] = [];
 const bunTestArgs = process.argv.slice(2);
+
+const suiteGlobs = [
+	'tests/unit/**/*.test.ts',
+	'packages/cli/src/__tests__/*.test.ts',
+	'packages/feedback-server/tests/**/*.test.ts',
+	'packages/lint/src/*.test.ts',
+	'packages/mcp/src/**/*.test.ts',
+	'packages/theme-wizard/src/engine/*.test.ts'
+];
 
 await $`bun run --filter '@dryui/mcp' generate-spec`.cwd(root.pathname);
 
-const files: string[] = [];
-const globs = [
-	new Bun.Glob('tests/unit/**/*.test.ts'),
-	new Bun.Glob('packages/feedback-server/tests/**/*.test.ts')
-];
+const files = new Set<string>();
+const globs = suiteGlobs.map((pattern) => new Bun.Glob(pattern));
 
 for (const glob of globs) {
 	for await (const file of glob.scan({ cwd: root.pathname })) {
-		const normalized = `/${file}`;
-		if (excludedSegments.some((segment) => normalized.includes(segment))) {
-			continue;
-		}
-
-		files.push(file);
+		files.add(file);
 	}
 }
 
-files.sort();
+const sortedFiles = [...files].sort();
 
-if (files.length === 0) {
+if (sortedFiles.length === 0) {
 	throw new Error('No unit tests matched the supported test suite.');
 }
 
-const proc = Bun.spawn(['bun', 'test', ...bunTestArgs, ...files], {
+const proc = Bun.spawn(['bun', 'test', ...bunTestArgs, ...sortedFiles], {
 	cwd: root.pathname,
 	stdin: 'inherit',
 	stdout: 'inherit',

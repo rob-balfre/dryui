@@ -1,0 +1,4426 @@
+{
+  "generatedAt": "2026-04-20T07:19:44.278Z",
+  "scope": "public @dryui/ui components from packages/mcp/src/spec.json",
+  "summary": {
+    "totalComponents": 147,
+    "byTier": [
+      {
+        "tier": "tier0",
+        "total": 24,
+        "withBrowserSpec": 24,
+        "withUnitTest": 10,
+        "withDocsDemo": 24,
+        "withDocsRoute": 24,
+        "withDocsVisualTest": 24
+      },
+      {
+        "tier": "tier1",
+        "total": 6,
+        "withBrowserSpec": 6,
+        "withUnitTest": 0,
+        "withDocsDemo": 6,
+        "withDocsRoute": 6,
+        "withDocsVisualTest": 6
+      },
+      {
+        "tier": "tier2",
+        "total": 117,
+        "withBrowserSpec": 21,
+        "withUnitTest": 28,
+        "withDocsDemo": 117,
+        "withDocsRoute": 117,
+        "withDocsVisualTest": 117
+      }
+    ],
+    "tier0WithoutBrowserSpecs": [],
+    "componentsWithoutTests": [
+      "AlertDialog",
+      "AlphaSlider",
+      "AppFrame",
+      "AspectRatio",
+      "Aurora",
+      "Backdrop",
+      "Breadcrumb",
+      "ButtonGroup",
+      "ChatThread",
+      "Chip",
+      "ChipGroup",
+      "ChromaticAberration",
+      "ChromaticShift",
+      "Clipboard",
+      "CommandPalette",
+      "DateTimeInput",
+      "DescriptionList",
+      "Displacement",
+      "DropZone",
+      "Fieldset",
+      "FileUpload",
+      "FlipCard",
+      "FloatButton",
+      "FocusTrap",
+      "FormatBytes",
+      "FormatDate",
+      "FormatNumber",
+      "Gauge",
+      "Glass",
+      "Glow",
+      "GodRays",
+      "GradientMesh",
+      "Halftone",
+      "InfiniteScroll",
+      "Kbd",
+      "LinkPreview",
+      "Listbox",
+      "LogoMark",
+      "Marquee",
+      "MaskReveal",
+      "NavigationMenu",
+      "Noise",
+      "NumberInput",
+      "OptionPicker",
+      "Pagination",
+      "Portal",
+      "Progress",
+      "ProgressRing",
+      "QRCode",
+      "Rating",
+      "RelativeTime",
+      "Reveal",
+      "ScrollToTop",
+      "SegmentedControl",
+      "Shimmer",
+      "Skeleton",
+      "Slider",
+      "Spacer",
+      "Sparkline",
+      "Spinner",
+      "Splitter",
+      "Spotlight",
+      "StarRating",
+      "Stepper",
+      "Svg",
+      "TableOfContents",
+      "Tag",
+      "TagsInput",
+      "TimeInput",
+      "Timeline",
+      "Toast",
+      "ToggleGroup",
+      "Toolbar",
+      "Tour",
+      "TypingIndicator",
+      "VideoEmbed",
+      "VirtualList",
+      "VisuallyHidden"
+    ],
+    "componentsWithoutDocsSurface": []
+  },
+  "components": [
+    {
+      "name": "Button",
+      "slug": "button",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Interactive button or link-styled action for submissions and calls to action",
+      "compound": false,
+      "tier": "tier0",
+      "docsRoute": "/components/button",
+      "browserSpecs": [
+        "tests/browser/button.browser.test.ts",
+        "tests/browser/code-block.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/button-harness.svelte",
+        "tests/browser/fixtures/docs-component-page-data.ts",
+        "tests/browser/fixtures/feedback-overlay-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/cli/src/__tests__/info.test.ts",
+        "packages/feedback-server/tests/dev-url.test.ts",
+        "packages/lint/src/preprocessor.test.ts",
+        "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/reviewer.test.ts",
+        "tests/unit/highlighter/integration.test.ts",
+        "tests/unit/highlighter/registry.test.ts",
+        "tests/unit/highlighter/svelte.test.ts",
+        "tests/unit/markdown-parser/ast.test.ts",
+        "tests/unit/mcp/toon.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AlertDialogDemo.svelte",
+        "apps/docs/src/lib/demos/AppFrameDemo.svelte",
+        "apps/docs/src/lib/demos/AuroraDemo.svelte",
+        "apps/docs/src/lib/demos/BackdropDemo.svelte",
+        "apps/docs/src/lib/demos/ButtonDemo.svelte",
+        "apps/docs/src/lib/demos/ButtonGroupDemo.svelte",
+        "apps/docs/src/lib/demos/CardDemo.svelte",
+        "apps/docs/src/lib/demos/CommandPaletteDemo.svelte",
+        "apps/docs/src/lib/demos/DialogDemo.svelte",
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/DropdownMenuDemo.svelte",
+        "apps/docs/src/lib/demos/FocusTrapDemo.svelte",
+        "apps/docs/src/lib/demos/PopoverDemo.svelte",
+        "apps/docs/src/lib/demos/PortalDemo.svelte",
+        "apps/docs/src/lib/demos/TooltipDemo.svelte",
+        "apps/docs/src/lib/demos/TourDemo.svelte",
+        "apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Calendar",
+      "slug": "calendar",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Interactive calendar grid for date navigation",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/calendar",
+      "browserSpecs": [
+        "tests/browser/calendar.browser.test.ts",
+        "tests/browser/range-calendar.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/calendar-harness.svelte",
+        "tests/browser/fixtures/range-calendar-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CalendarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Checkbox",
+      "slug": "checkbox",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Boolean toggle input with indeterminate state",
+      "compound": false,
+      "tier": "tier0",
+      "docsRoute": "/components/checkbox",
+      "browserSpecs": [
+        "tests/browser/checkbox.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/checkbox-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CheckboxDemo.svelte",
+        "apps/docs/src/lib/demos/FieldsetDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Combobox",
+      "slug": "combobox",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Searchable text input with filterable dropdown suggestions",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/combobox",
+      "browserSpecs": [
+        "tests/browser/combobox.browser.test.ts",
+        "tests/browser/multi-select-combobox.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/combobox-harness.svelte",
+        "tests/browser/fixtures/multi-select-combobox-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ComboboxDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ContextMenu",
+      "slug": "context-menu",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Right-click menu with actions",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/context-menu",
+      "browserSpecs": [
+        "tests/browser/context-menu.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/context-menu-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-menu-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ContextMenuDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DatePicker",
+      "slug": "date-picker",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Calendar popup date picker with locale support",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/date-picker",
+      "browserSpecs": [
+        "tests/browser/date-picker.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/date-picker-harness.svelte"
+      ],
+      "unitTests": [
+        "tests/unit/interactive-coverage-policy.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DatePickerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DateRangePicker",
+      "slug": "date-range-picker",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Date range selection with calendar popup",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/date-range-picker",
+      "browserSpecs": [
+        "tests/browser/date-range-picker.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/date-range-picker-harness.svelte",
+        "tests/browser/fixtures/docs-component-page-data.ts"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DateRangePickerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Dialog",
+      "slug": "dialog",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Modal dialog using native dialog element",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/dialog",
+      "browserSpecs": [
+        "tests/browser/dialog.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/dialog-harness.svelte",
+        "tests/browser/fixtures/docs-component-page-data.ts",
+        "tests/browser/fixtures/overlay-surface-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/cli/src/__tests__/info.test.ts",
+        "packages/mcp/src/reviewer.test.ts",
+        "tests/unit/mcp/toon.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DialogDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Drawer",
+      "slug": "drawer",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Slide-in panel from any edge",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/drawer",
+      "browserSpecs": [
+        "tests/browser/drawer.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/drawer-harness.svelte",
+        "tests/browser/fixtures/overlay-surface-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DrawerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DropdownMenu",
+      "slug": "dropdown-menu",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Trigger-activated dropdown with menu items",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/dropdown-menu",
+      "browserSpecs": [
+        "tests/browser/dropdown-menu.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/dropdown-menu-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-menu-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DropdownMenuDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Field",
+      "slug": "field",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Form field wrapper with label, description, and error",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/field",
+      "browserSpecs": [
+        "tests/browser/date-field.browser.test.ts",
+        "tests/browser/field.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/composite-inputs-harness.svelte",
+        "tests/browser/fixtures/date-field-harness.svelte",
+        "tests/browser/fixtures/field-harness.svelte",
+        "tests/browser/fixtures/input-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte",
+        "tests/browser/fixtures/textarea-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DialogDemo.svelte",
+        "apps/docs/src/lib/demos/FieldDemo.svelte",
+        "apps/docs/src/lib/demos/NumberInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FileSelect",
+      "slug": "file-select",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Select a file or folder path via external picker",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/file-select",
+      "browserSpecs": [
+        "tests/browser/file-select.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/file-select-harness.svelte"
+      ],
+      "unitTests": [
+        "tests/unit/file-select.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FileSelectDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "HoverCard",
+      "slug": "hover-card",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Card popup on hover with delay-based open/close",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/hover-card",
+      "browserSpecs": [
+        "tests/browser/a11y-hover-card.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/hover-card-a11y-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/HoverCardDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-overlay.visual.spec.ts",
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Input",
+      "slug": "input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Text input with size variants",
+      "compound": false,
+      "tier": "tier0",
+      "docsRoute": "/components/input",
+      "browserSpecs": [
+        "tests/browser/input-group.browser.test.ts",
+        "tests/browser/input.browser.test.ts",
+        "tests/browser/phone-input.browser.test.ts",
+        "tests/browser/primitives-remediation.browser.test.ts",
+        "tests/browser/prompt-input.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/composite-inputs-harness.svelte",
+        "tests/browser/fixtures/field-harness.svelte",
+        "tests/browser/fixtures/input-group-harness.svelte",
+        "tests/browser/fixtures/input-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [
+        "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/brand.test.ts",
+        "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/mini/tests/brand.test.ts",
+        "packages/cli/src/__tests__/info.test.ts",
+        "packages/cli/src/__tests__/project-planner.test.ts",
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DialogDemo.svelte",
+        "apps/docs/src/lib/demos/FieldDemo.svelte",
+        "apps/docs/src/lib/demos/FocusTrapDemo.svelte",
+        "apps/docs/src/lib/demos/InputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "MegaMenu",
+      "slug": "mega-menu",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Horizontal navigation with large dropdown panels and columns",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/mega-menu",
+      "browserSpecs": [
+        "tests/browser/mega-menu.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/__screenshots__/mega-menu.browser.test.ts/mega-menu-accessibility-closes-the-panel-when-the-open-trigger-is-clicked-again-1.png",
+        "tests/browser/fixtures/mega-menu-harness.svelte",
+        "tests/browser/fixtures/theme-wizard-controls-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MegaMenuDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Menubar",
+      "slug": "menubar",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Horizontal menu bar with dropdown menus",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/menubar",
+      "browserSpecs": [
+        "tests/browser/a11y-menubar-notification.browser.test.ts",
+        "tests/browser/menubar.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/__screenshots__/a11y-menubar-notification.browser.test.ts/menubar-and-notification-center-accessibility-keeps-notification-center-trigger-and-panel-semantics-truthful-and-restores-focus-on-escape-1.png",
+        "tests/browser/__screenshots__/a11y-menubar-notification.browser.test.ts/menubar-and-notification-center-accessibility-labels-the-open-menu-from-the-rendered-trigger-id-1.png",
+        "tests/browser/__screenshots__/a11y-menubar-notification.browser.test.ts/menubar-and-notification-center-accessibility-moves-focus-across-top-level-triggers-without-opening--and-switches-menus-when-already-open-1.png",
+        "tests/browser/fixtures/menubar-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MenubarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "MultiSelectCombobox",
+      "slug": "multi-select-combobox",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Searchable multi-select combobox with removable selected tokens",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/multi-select-combobox",
+      "browserSpecs": [
+        "tests/browser/multi-select-combobox.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/multi-select-combobox-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MultiSelectComboboxDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Popover",
+      "slug": "popover",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Floating content panel anchored to a trigger",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/popover",
+      "browserSpecs": [
+        "tests/browser/popover.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/feedback-overlay-harness.svelte",
+        "tests/browser/fixtures/popover-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-overlay-harness.svelte"
+      ],
+      "unitTests": [
+        "tests/unit/interactive-coverage-policy.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PopoverDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "RadioGroup",
+      "slug": "radio-group",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Single selection from multiple options",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/radio-group",
+      "browserSpecs": [
+        "tests/browser/radio-group.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/radio-group-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RadioGroupDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "RangeCalendar",
+      "slug": "range-calendar",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Calendar for selecting date ranges",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/range-calendar",
+      "browserSpecs": [
+        "tests/browser/range-calendar.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/range-calendar-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RangeCalendarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Select",
+      "slug": "select",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Closed dropdown select for choosing one option from a fixed list",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/select",
+      "browserSpecs": [
+        "tests/browser/file-select.browser.test.ts",
+        "tests/browser/multi-select-combobox.browser.test.ts",
+        "tests/browser/select.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/file-select-harness.svelte",
+        "tests/browser/fixtures/multi-select-combobox-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-menu-harness.svelte",
+        "tests/browser/fixtures/select-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SelectDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Textarea",
+      "slug": "textarea",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Multi-line text input",
+      "compound": false,
+      "tier": "tier0",
+      "docsRoute": "/components/textarea",
+      "browserSpecs": [
+        "tests/browser/textarea.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/textarea-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TextareaDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Toggle",
+      "slug": "toggle",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Pressable toggle button",
+      "compound": false,
+      "tier": "tier0",
+      "docsRoute": "/components/toggle",
+      "browserSpecs": [
+        "tests/browser/theme-bootstrap.browser.test.ts",
+        "tests/browser/toggle-onclick.browser.test.ts",
+        "tests/browser/toggle.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/toggle-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/ToggleDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Tooltip",
+      "slug": "tooltip",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Hover/focus popup with descriptive text",
+      "compound": true,
+      "tier": "tier0",
+      "docsRoute": "/components/tooltip",
+      "browserSpecs": [
+        "tests/browser/tooltip.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/primitives-remediation-overlay-harness.svelte",
+        "tests/browser/fixtures/tooltip-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TooltipDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-overlay.visual.spec.ts",
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Carousel",
+      "slug": "carousel",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Scrollable content carousel with slide navigation",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/carousel",
+      "browserSpecs": [
+        "tests/browser/a11y-carousel.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/carousel-a11y-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CarouselDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Chart",
+      "slug": "chart",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "SVG-based chart with bars, lines, and axes",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/chart",
+      "browserSpecs": [
+        "tests/browser/a11y-chart-scrollarea-alert.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChartDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "NotificationCenter",
+      "slug": "notification-center",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Notification panel with trigger, groups, and items",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/notification-center",
+      "browserSpecs": [
+        "tests/browser/a11y-menubar-notification.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/notification-center-a11y-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/NotificationCenterDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "RichTextEditor",
+      "slug": "rich-text-editor",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Basic rich text editor with formatting toolbar",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/rich-text-editor",
+      "browserSpecs": [
+        "tests/browser/a11y-transfer-rte.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RichTextEditorDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Transfer",
+      "slug": "transfer",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Dual-list transfer component for moving items between lists",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/transfer",
+      "browserSpecs": [
+        "tests/browser/a11y-transfer-rte.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TransferDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Tree",
+      "slug": "tree",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Hierarchical tree view with expand/collapse",
+      "compound": true,
+      "tier": "tier1",
+      "docsRoute": "/components/tree",
+      "browserSpecs": [
+        "tests/browser/a11y-tree.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TreeDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Accordion",
+      "slug": "accordion",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Collapsible content sections, single or multiple mode",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/accordion",
+      "browserSpecs": [
+        "tests/browser/a11y-accordion-collapsible.browser.test.ts",
+        "tests/browser/accordion.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/a11y-accordion-collapsible-harness.svelte",
+        "tests/browser/fixtures/accordion-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AccordionDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Adjust",
+      "slug": "adjust",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "CSS filter adjustment wrapper for brightness, contrast, saturation, and hue shifts",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/adjust",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/mcp/toon.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AdjustDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Alert",
+      "slug": "alert",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Contextual feedback message with variant styling",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/alert",
+      "browserSpecs": [
+        "tests/browser/a11y-chart-scrollarea-alert.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/overlay-surface-harness.svelte",
+        "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AlertDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "AlertDialog",
+      "slug": "alert-dialog",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Modal dialog requiring user confirmation",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/alert-dialog",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/overlay-surface-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AlertDialogDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "AlphaSlider",
+      "slug": "alpha-slider",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Slider for selecting alpha/opacity values in color pickers",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/alpha-slider",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AlphaSliderDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "AppFrame",
+      "slug": "app-frame",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/app-frame",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AppFrameDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "AspectRatio",
+      "slug": "aspect-ratio",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Constrains child content to a specific aspect ratio",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/aspect-ratio",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AspectRatioDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Aurora",
+      "slug": "aurora",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Ambient gradient surface with browser-native animated color fields and static fallback",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/aurora",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/motion-surfaces-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AuroraDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Avatar",
+      "slug": "avatar",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "User profile image with fallback initials",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/avatar",
+      "browserSpecs": [
+        "tests/browser/avatar.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts",
+        "packages/mcp/src/workspace-audit.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AvatarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Backdrop",
+      "slug": "backdrop",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Full-screen overlay behind modals and dialogs",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/backdrop",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BackdropDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Badge",
+      "slug": "badge",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Small status indicator label",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/badge",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts",
+        "tests/unit/interactive-coverage-policy.test.ts",
+        "tests/unit/mcp/toon.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AdjustDemo.svelte",
+        "apps/docs/src/lib/demos/AuroraDemo.svelte",
+        "apps/docs/src/lib/demos/BadgeDemo.svelte",
+        "apps/docs/src/lib/demos/DataGridDemo.svelte",
+        "apps/docs/src/lib/demos/DragAndDropDemo.svelte",
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/FlipCardDemo.svelte",
+        "apps/docs/src/lib/demos/GlassDemo.svelte",
+        "apps/docs/src/lib/demos/HotkeyDemo.svelte",
+        "apps/docs/src/lib/demos/PortalDemo.svelte",
+        "apps/docs/src/lib/demos/SeparatorDemo.svelte",
+        "apps/docs/src/lib/demos/ShaderCanvasDemo.svelte",
+        "apps/docs/src/lib/demos/SplitterDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Beam",
+      "slug": "beam",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Animated linear light streak surface for directional highlights and shimmer accents",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/beam",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/border-beam-radius.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BeamDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "BorderBeam",
+      "slug": "border-beam",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/border-beam",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/border-beam-radius.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Breadcrumb",
+      "slug": "breadcrumb",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Navigation trail showing page hierarchy",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/breadcrumb",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BreadcrumbDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ButtonGroup",
+      "slug": "button-group",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Groups related buttons with shared styling",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/button-group",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ButtonGroupDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Card",
+      "slug": "card",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Contained content surface with header/content/footer sections",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/card",
+      "browserSpecs": [
+        "tests/browser/a11y-hover-card.browser.test.ts",
+        "tests/browser/card.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/card-harness.svelte",
+        "tests/browser/fixtures/motion-surfaces-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/cli/src/__tests__/info.test.ts",
+        "packages/cli/src/__tests__/project-planner.test.ts",
+        "packages/cli/src/__tests__/run.test.ts",
+        "packages/cli/src/__tests__/scaffold.test.ts",
+        "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/project-planner.test.ts",
+        "packages/mcp/src/reviewer.test.ts",
+        "packages/mcp/src/tools/check.test.ts",
+        "packages/mcp/src/workspace-audit.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BackdropDemo.svelte",
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte",
+        "apps/docs/src/lib/demos/CardDemo.svelte",
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/MapDemo.svelte",
+        "apps/docs/src/lib/demos/PortalDemo.svelte",
+        "apps/docs/src/lib/demos/TourDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ChatThread",
+      "slug": "chat-thread",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Conversation thread container with restart action and auto-scroll behavior",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/chat-thread",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChatThreadDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Chip",
+      "slug": "chip",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Interactive pill for filters, selections, and inline state",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/chip",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChipDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ChipGroup",
+      "slug": "chip-group",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Single or multi-select chip cluster",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/chip-group",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChipGroupDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ChromaticAberration",
+      "slug": "chromatic-aberration",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Soft channel-offset wrapper for chromatic distortion on surfaces and media",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/chromatic-aberration",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChromaticAberrationDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ChromaticShift",
+      "slug": "chromatic-shift",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "RGB channel separation effect with hover and animation triggers",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/chromatic-shift",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ChromaticShiftDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Clipboard",
+      "slug": "clipboard",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Copy text to clipboard with native Clipboard API",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/clipboard",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ClipboardDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "CodeBlock",
+      "slug": "code-block",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Code display with optional line numbers and copy button",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/code-block",
+      "browserSpecs": [
+        "tests/browser/code-block.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/highlighter/css.test.ts",
+        "tests/unit/highlighter/generic.test.ts",
+        "tests/unit/highlighter/integration.test.ts",
+        "tests/unit/highlighter/registry.test.ts",
+        "tests/unit/highlighter/svelte.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte",
+        "apps/docs/src/lib/demos/CodeBlockDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Collapsible",
+      "slug": "collapsible",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Expandable/collapsible content panel",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/collapsible",
+      "browserSpecs": [
+        "tests/browser/a11y-accordion-collapsible.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/a11y-accordion-collapsible-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CollapsibleDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ColorPicker",
+      "slug": "color-picker",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Color selection with area, hue/alpha sliders, and eyedropper",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/color-picker",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/color-picker-channel.test.ts",
+        "tests/unit/color-utils.test.ts",
+        "tests/unit/extract-colors.test.ts",
+        "tests/unit/primitives/extract-colors.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ColorPickerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "CommandPalette",
+      "slug": "command-palette",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Searchable command menu dialog",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/command-palette",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/feedback-overlay-harness.svelte",
+        "tests/browser/fixtures/overlay-surface-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CommandPaletteDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Container",
+      "slug": "container",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Centered content container with max-width",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/container",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ContainerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DataGrid",
+      "slug": "data-grid",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Enhanced table with sorting, filtering, and pagination",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/data-grid",
+      "browserSpecs": [
+        "tests/browser/primitives-remediation.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/primitives-remediation-data-grid-harness.svelte"
+      ],
+      "unitTests": [
+        "tests/unit/highlighter/integration.test.ts",
+        "tests/unit/highlighter/svelte.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DataGridDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DateField",
+      "slug": "date-field",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Form-first locale-aware segmented date input",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/date-field",
+      "browserSpecs": [
+        "tests/browser/date-field.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/date-field-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DateFieldDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DateTimeInput",
+      "slug": "date-time-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Combined date and time input with locale-aware segments",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/date-time-input",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DateTimeInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DescriptionList",
+      "slug": "description-list",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Responsive term and value list for summaries and specs",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/description-list",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DescriptionListDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Diagram",
+      "slug": "diagram",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/diagram",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/diagram-layout.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DiagramDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Displacement",
+      "slug": "displacement",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "SVG turbulence displacement filter for organic distortion effects",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/displacement",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DisplacementDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DragAndDrop",
+      "slug": "drag-and-drop",
+      "importPackage": "@dryui/ui",
+      "category": "interaction",
+      "description": "Reorderable list with drag and keyboard support",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/drag-and-drop",
+      "browserSpecs": [
+        "tests/browser/a11y-drag-and-drop.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/drag-and-drop-a11y-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DragAndDropDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "DropZone",
+      "slug": "drop-zone",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Drag-and-drop file drop zone area",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/drop-zone",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DropZoneDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Fieldset",
+      "slug": "fieldset",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Structured field grouping with legend, description, and content",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/fieldset",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FieldsetDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FileUpload",
+      "slug": "file-upload",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "File selection with drag-and-drop dropzone",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/file-upload",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FileUploadDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FlipCard",
+      "slug": "flip-card",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Flippable card with front and back faces",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/flip-card",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FlipCardDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FloatButton",
+      "slug": "float-button",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Floating action button with expandable actions",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/float-button",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FloatButtonDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FocusTrap",
+      "slug": "focus-trap",
+      "importPackage": "@dryui/ui",
+      "category": "utility",
+      "description": "Traps keyboard focus within a container element",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/focus-trap",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FocusTrapDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FormatBytes",
+      "slug": "format-bytes",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Formats byte values with Intl.NumberFormat",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/format-bytes",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FormatBytesDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FormatDate",
+      "slug": "format-date",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Formats dates with Intl.DateTimeFormat",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/format-date",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FormatDateDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "FormatNumber",
+      "slug": "format-number",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Formats numbers with Intl.NumberFormat",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/format-number",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FormatNumberDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Gauge",
+      "slug": "gauge",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "SVG gauge indicator with configurable arc, thresholds, and label",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/gauge",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DiagramDemo.svelte",
+        "apps/docs/src/lib/demos/GaugeDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Glass",
+      "slug": "glass",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Translucent glass wrapper with blur, tint, and saturation control",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/glass",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/GlassDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Glow",
+      "slug": "glow",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Soft glow effect wrapper with configurable color, intensity, and animation",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/glow",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/GlowDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "GodRays",
+      "slug": "god-rays",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Volumetric radial light rays surface with configurable origin, spread, and intensity",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/god-rays",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/GodRaysDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "GradientMesh",
+      "slug": "gradient-mesh",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Animated multi-color gradient mesh background with optional interactivity",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/gradient-mesh",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/GradientMeshDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Halftone",
+      "slug": "halftone",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "SVG halftone dot pattern overlay with configurable size, angle, and color",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/halftone",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/HalftoneDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Heading",
+      "slug": "heading",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Standalone semantic heading export for starter-kit typography",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/heading",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/FlipCardDemo.svelte",
+        "apps/docs/src/lib/demos/HeadingDemo.svelte",
+        "apps/docs/src/lib/demos/SeparatorDemo.svelte",
+        "apps/docs/src/lib/demos/SplitterDemo.svelte",
+        "apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Hotkey",
+      "slug": "hotkey",
+      "importPackage": "@dryui/ui",
+      "category": "utility",
+      "description": "Keyboard shortcut handler with modifier support",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/hotkey",
+      "browserSpecs": [
+        "tests/browser/hotkey.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/hotkey.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/HotkeyDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Icon",
+      "slug": "icon",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Sized and colored SVG icon wrapper with accessibility label",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/icon",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/IconDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Image",
+      "slug": "image",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Image with loading states and fallback support",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/image",
+      "browserSpecs": [
+        "tests/browser/image-comparison.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/image-comparison-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ImageDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ImageComparison",
+      "slug": "image-comparison",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Before/after image comparison slider",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/image-comparison",
+      "browserSpecs": [
+        "tests/browser/image-comparison.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/image-comparison-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ImageComparisonDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "InfiniteScroll",
+      "slug": "infinite-scroll",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Loads more content when user scrolls near bottom",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/infinite-scroll",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/InfiniteScrollDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "InputGroup",
+      "slug": "input-group",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/input-group",
+      "browserSpecs": [
+        "tests/browser/input-group.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/input-group-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/InputGroupDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Kbd",
+      "slug": "kbd",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Keyboard shortcut display element",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/kbd",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/CommandPaletteDemo.svelte",
+        "apps/docs/src/lib/demos/FlipCardDemo.svelte",
+        "apps/docs/src/lib/demos/HotkeyDemo.svelte",
+        "apps/docs/src/lib/demos/KbdDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Label",
+      "slug": "label",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Form label with size variants",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/label",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/composite-inputs-harness.svelte",
+        "tests/browser/fixtures/field-harness.svelte",
+        "tests/browser/fixtures/input-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte",
+        "tests/browser/fixtures/textarea-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DialogDemo.svelte",
+        "apps/docs/src/lib/demos/FieldDemo.svelte",
+        "apps/docs/src/lib/demos/LabelDemo.svelte",
+        "apps/docs/src/lib/demos/NumberInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Link",
+      "slug": "link",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Styled anchor with external and disabled states",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/link",
+      "browserSpecs": [
+        "tests/browser/ui-remediation.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/link-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/LinkDemo.svelte",
+        "apps/docs/src/lib/demos/MapDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "LinkPreview",
+      "slug": "link-preview",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Link preview popup on hover",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/link-preview",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/LinkPreviewDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "List",
+      "slug": "list",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Structured list with items, icons, and subheaders",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/list",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/cli/src/__tests__/list.test.ts",
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ListDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Listbox",
+      "slug": "listbox",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Single or multi-select list with keyboard navigation",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/listbox",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ListboxDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "LogoMark",
+      "slug": "logo-mark",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Brand mark, status indicator, or category badge with image or fallback text",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/logo-mark",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/LogoMarkDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Map",
+      "slug": "map",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Interactive map container with markers, popups, layers, and controls",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/map",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "node_modules/.bun/zod@3.25.76/node_modules/zod/src/v3/tests/map.test.ts",
+        "node_modules/.bun/zod@3.25.76/node_modules/zod/src/v4/classic/tests/map.test.ts",
+        "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v3/tests/map.test.ts",
+        "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/map.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MapDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "MarkdownRenderer",
+      "slug": "markdown-renderer",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Renders markdown text as styled HTML",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/markdown-renderer",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/markdown-parser/ast.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MarkdownRendererDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Marquee",
+      "slug": "marquee",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Scrolling text/content ticker with CSS animations",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/marquee",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/motion-surfaces-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MarqueeDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "MaskReveal",
+      "slug": "mask-reveal",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Intersection-observer mask transition with circle, diamond, or wipe shapes",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/mask-reveal",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/MaskRevealDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "NavigationMenu",
+      "slug": "navigation-menu",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Site-level navigation with flyout content panels",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/navigation-menu",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/NavigationMenuDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Noise",
+      "slug": "noise",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Texture overlay that adds grain and atmosphere to surfaces without external assets",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/noise",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/motion-surfaces-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/NoiseDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "NumberInput",
+      "slug": "number-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Numeric input with increment/decrement controls",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/number-input",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte",
+        "apps/docs/src/lib/demos/NumberInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "OptionPicker",
+      "slug": "option-picker",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/option-picker",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/OptionPickerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Pagination",
+      "slug": "pagination",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Page navigation with previous/next and page links",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/pagination",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PaginationDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "PhoneInput",
+      "slug": "phone-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Phone number input with country code selector",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/phone-input",
+      "browserSpecs": [
+        "tests/browser/phone-input.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PhoneInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "PinInput",
+      "slug": "pin-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Segmented input for PIN/OTP codes with single hidden input architecture",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/pin-input",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/composite-inputs-harness.svelte"
+      ],
+      "unitTests": [
+        "tests/unit/pin-input.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PinInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Portal",
+      "slug": "portal",
+      "importPackage": "@dryui/ui",
+      "category": "utility",
+      "description": "Renders children into a different DOM location",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/portal",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PortalDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Progress",
+      "slug": "progress",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Progress bar indicator",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/progress",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ProgressDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ProgressRing",
+      "slug": "progress-ring",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Circular progress ring with SVG rendering",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/progress-ring",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ProgressRingDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "PromptInput",
+      "slug": "prompt-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "AI-style prompt input with auto-resize and submit",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/prompt-input",
+      "browserSpecs": [
+        "tests/browser/prompt-input.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/PromptInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "QRCode",
+      "slug": "qr-code",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "QR code generator using Canvas 2D API",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/qr-code",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/QRCodeDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Rating",
+      "slug": "rating",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Star rating input with half-star support",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/rating",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RatingDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "RelativeTime",
+      "slug": "relative-time",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Displays relative time with auto-updating",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/relative-time",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RelativeTimeDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Reveal",
+      "slug": "reveal",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/reveal",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/docs-component-page-data.ts",
+        "tests/browser/fixtures/motion-surfaces-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/RevealDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ScrollArea",
+      "slug": "scroll-area",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Custom scrollable area with styled scrollbars",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/scroll-area",
+      "browserSpecs": [
+        "tests/browser/a11y-chart-scrollarea-alert.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ScrollAreaDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-shell.visual.spec.ts",
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ScrollToTop",
+      "slug": "scroll-to-top",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Button that scrolls to top of page or container",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/scroll-to-top",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ScrollToTopDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "SegmentedControl",
+      "slug": "segmented-control",
+      "importPackage": "@dryui/ui",
+      "category": "form",
+      "description": "Compact segmented switch for mutually exclusive options",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/segmented-control",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SegmentedControlDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Separator",
+      "slug": "separator",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Visual divider between content",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/separator",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/DragAndDropDemo.svelte",
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/SeparatorDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ShaderCanvas",
+      "slug": "shader-canvas",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "WebGL shader canvas with built-in presets and theme color integration",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/shader-canvas",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/motion/webgl-context.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ShaderCanvasDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Shimmer",
+      "slug": "shimmer",
+      "importPackage": "@dryui/ui",
+      "category": "visual",
+      "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/shimmer",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ShimmerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Sidebar",
+      "slug": "sidebar",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Collapsible side navigation panel",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/sidebar",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [
+        "apps/docs/src/lib/theme-wizard/sidebar-contract.test.ts",
+        "tests/unit/sidebar-contract.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SidebarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Skeleton",
+      "slug": "skeleton",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Loading placeholder animation",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/skeleton",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SkeletonDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Slider",
+      "slug": "slider",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Range input slider with thumb control",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/slider",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte",
+        "apps/docs/src/lib/demos/SliderDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Spacer",
+      "slug": "spacer",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Empty space component for spacing",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/spacer",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SpacerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Sparkline",
+      "slug": "sparkline",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Compact inline SVG sparkline chart",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/sparkline",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SparklineDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Spinner",
+      "slug": "spinner",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Loading spinner animation",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/spinner",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SpinnerDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Splitter",
+      "slug": "splitter",
+      "importPackage": "@dryui/ui",
+      "category": "layout",
+      "description": "Resizable split panels with drag handle",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/splitter",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SplitterDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Spotlight",
+      "slug": "spotlight",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Pointer-reactive radial highlight surface for cards, hero blocks, and interactive panels",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/spotlight",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/motion-surfaces-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SpotlightDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "StarRating",
+      "slug": "star-rating",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Read-only star rating display with filled and outlined variants",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/star-rating",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/StarRatingDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Stepper",
+      "slug": "stepper",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Step-by-step progress indicator",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/stepper",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/StepperDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Svg",
+      "slug": "svg",
+      "importPackage": "@dryui/ui",
+      "category": "utility",
+      "description": "Accessible SVG wrapper with viewBox and aria-label defaults",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/svg",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/SvgDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Table",
+      "slug": "table",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Data table with header, body, footer sections",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/table",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TableDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "TableOfContents",
+      "slug": "table-of-contents",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Auto-generated table of contents from headings",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/table-of-contents",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TableOfContentsDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Tabs",
+      "slug": "tabs",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Tabbed content navigation",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/tabs",
+      "browserSpecs": [
+        "tests/browser/tabs.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/tabs-harness.svelte",
+        "tests/browser/fixtures/tabs-overflow-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TabsDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Tag",
+      "slug": "tag",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Small labeled tag element with color and variant support",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/tag",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TagDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "TagsInput",
+      "slug": "tags-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Input for managing a list of tags",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/tags-input",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TagsInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Text",
+      "slug": "text",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Standalone body copy export for starter-kit typography",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/text",
+      "browserSpecs": [
+        "tests/browser/context-menu.browser.test.ts",
+        "tests/browser/textarea.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/context-menu-harness.svelte",
+        "tests/browser/fixtures/primitives-remediation-menu-harness.svelte",
+        "tests/browser/fixtures/textarea-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/cli/src/__tests__/info.test.ts",
+        "packages/mcp/src/reviewer.test.ts",
+        "tests/unit/motion/webgl-context.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/AdjustDemo.svelte",
+        "apps/docs/src/lib/demos/AlertDialogDemo.svelte",
+        "apps/docs/src/lib/demos/AppFrameDemo.svelte",
+        "apps/docs/src/lib/demos/AuroraDemo.svelte",
+        "apps/docs/src/lib/demos/BackdropDemo.svelte",
+        "apps/docs/src/lib/demos/BeamDemo.svelte",
+        "apps/docs/src/lib/demos/ContainerDemo.svelte",
+        "apps/docs/src/lib/demos/DialogDemo.svelte",
+        "apps/docs/src/lib/demos/DrawerDemo.svelte",
+        "apps/docs/src/lib/demos/FlipCardDemo.svelte",
+        "apps/docs/src/lib/demos/GlassDemo.svelte",
+        "apps/docs/src/lib/demos/GodRaysDemo.svelte",
+        "apps/docs/src/lib/demos/HotkeyDemo.svelte",
+        "apps/docs/src/lib/demos/LogoMarkDemo.svelte",
+        "apps/docs/src/lib/demos/MapDemo.svelte",
+        "apps/docs/src/lib/demos/NumberInputDemo.svelte",
+        "apps/docs/src/lib/demos/PortalDemo.svelte",
+        "apps/docs/src/lib/demos/SeparatorDemo.svelte",
+        "apps/docs/src/lib/demos/ShaderCanvasDemo.svelte",
+        "apps/docs/src/lib/demos/SpacerDemo.svelte",
+        "apps/docs/src/lib/demos/SplitterDemo.svelte",
+        "apps/docs/src/lib/demos/SpotlightDemo.svelte",
+        "apps/docs/src/lib/demos/TextDemo.svelte",
+        "apps/docs/src/lib/demos/TourDemo.svelte",
+        "apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ThemeToggle",
+      "slug": "theme-toggle",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Persisted light/dark theme switcher with system-preference fallback",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/theme-toggle",
+      "browserSpecs": [
+        "tests/browser/theme-bootstrap.browser.test.ts"
+      ],
+      "browserSupport": [],
+      "unitTests": [
+        "tests/unit/theme-controller.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ThemeToggleDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "TimeInput",
+      "slug": "time-input",
+      "importPackage": "@dryui/ui",
+      "category": "input",
+      "description": "Native time input with form control integration",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/time-input",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/composite-inputs-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TimeInputDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Timeline",
+      "slug": "timeline",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Vertical timeline for activity feeds and history",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/timeline",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TimelineDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Toast",
+      "slug": "toast",
+      "importPackage": "@dryui/ui",
+      "category": "feedback",
+      "description": "Temporary notification message",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/toast",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ToastDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "ToggleGroup",
+      "slug": "toggle-group",
+      "importPackage": "@dryui/ui",
+      "category": "action",
+      "description": "Group of toggle buttons with single/multiple selection",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/toggle-group",
+      "browserSpecs": [],
+      "browserSupport": [
+        "tests/browser/fixtures/theme-wizard-controls-harness.svelte"
+      ],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/BorderBeamDemo.svelte",
+        "apps/docs/src/lib/demos/ToggleGroupDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Toolbar",
+      "slug": "toolbar",
+      "importPackage": "@dryui/ui",
+      "category": "navigation",
+      "description": "Horizontal button group for actions",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/toolbar",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/ToolbarDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Tour",
+      "slug": "tour",
+      "importPackage": "@dryui/ui",
+      "category": "overlay",
+      "description": "Step-by-step guided tour overlay with spotlight",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/tour",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TourDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "TypingIndicator",
+      "slug": "typing-indicator",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Animated three-dot typing status indicator",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/typing-indicator",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TypingIndicatorDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "Typography",
+      "slug": "typography",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Standalone semantic text exports: heading, text, code, blockquote",
+      "compound": true,
+      "tier": "tier2",
+      "docsRoute": "/components/typography",
+      "browserSpecs": [
+        "tests/browser/docs-component-page.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/docs-component-page-data.ts",
+        "tests/browser/fixtures/docs-component-page-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/mcp/src/reviewer.test.ts",
+        "tests/unit/mcp/generate-spec.test.ts",
+        "tests/unit/mcp/reviewer.test.ts"
+      ],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/TypographyDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "VideoEmbed",
+      "slug": "video-embed",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Video player embed for YouTube, Vimeo, and native sources",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/video-embed",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/VideoEmbedDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "VirtualList",
+      "slug": "virtual-list",
+      "importPackage": "@dryui/ui",
+      "category": "display",
+      "description": "Renders only visible items from large lists for performance",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/virtual-list",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/VirtualListDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    },
+    {
+      "name": "VisuallyHidden",
+      "slug": "visually-hidden",
+      "importPackage": "@dryui/ui",
+      "category": "utility",
+      "description": "Hides content visually but keeps it accessible to screen readers",
+      "compound": false,
+      "tier": "tier2",
+      "docsRoute": "/components/visually-hidden",
+      "browserSpecs": [],
+      "browserSupport": [],
+      "unitTests": [],
+      "docsDemos": [
+        "apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte"
+      ],
+      "docsVisualTests": [
+        "tests/playwright/docs-visual.spec.ts"
+      ],
+      "signals": {
+        "hasBrowserSpec": false,
+        "hasUnitTest": false,
+        "hasDocsDemo": true,
+        "hasDocsRoute": true,
+        "hasDocsVisualTest": true
+      }
+    }
+  ]
+}

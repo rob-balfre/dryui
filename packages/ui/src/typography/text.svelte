@@ -14,10 +14,10 @@
 		...rest
 	}: TextProps = $props();
 
-	let tone = $derived(
+	let tone: TextProps['color'] = $derived(
 		color ?? (variant === 'muted' || variant === 'secondary' ? variant : 'default')
 	);
-	let textVariant = $derived(variant === 'label' ? 'label' : 'default');
+	let textVariant: 'default' | 'label' = $derived(variant === 'label' ? 'label' : 'default');
 </script>
 
 <Text {as} color={tone} {size} {font} {weight} variant={textVariant} {className} {...rest}>

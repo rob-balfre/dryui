@@ -21,6 +21,8 @@
     "test:coverage:browser": "vitest --browser --run --coverage --coverage.provider=v8 --coverage.reportsDirectory=coverage/browser --coverage.reporter=text --coverage.reporter=html --coverage.reporter=json-summary tests/browser",
     "coverage:summary": "bun run ./scripts/coverage-summary.ts",
     "coverage:check": "bun run ./scripts/check-coverage-baseline.ts",
+    "coverage:matrix": "bun run ./scripts/generate-component-coverage-matrix.ts",
+    "check:interactive-coverage": "bun run ./scripts/check-interactive-coverage.ts",
     "test:coverage": "bun run test:coverage:unit && bun run test:coverage:browser && bun run coverage:summary",
     "check:exports": "bun run scripts/sync-package-exports.ts --check",
     "check:packages": "bun run --filter '@dryui/primitives' check && bun run --filter '@dryui/ui' check",

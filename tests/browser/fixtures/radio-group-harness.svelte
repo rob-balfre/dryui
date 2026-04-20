@@ -4,7 +4,7 @@
 	import { RadioGroup } from '../../../packages/ui/src/radio-group/index.js';
 
 	let {
-		initialValue = '',
+		initialValue: value = '',
 		orientation = 'vertical',
 		disabled = false
 	}: {
@@ -12,8 +12,6 @@
 		orientation?: 'horizontal' | 'vertical';
 		disabled?: boolean;
 	} = $props();
-
-	let value = $state(initialValue);
 </script>
 
 <div data-testid="bound-value">{value}</div>

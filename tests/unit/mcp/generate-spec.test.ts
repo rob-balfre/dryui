@@ -45,6 +45,20 @@ describe('generate-spec typography parsing', () => {
 		expect(text.forwardedProps?.baseType).toBe('HTMLAttributes<HTMLElement>');
 	});
 
+	test('captures ui typography heading props through export type re-exports', () => {
+		const heading = parsePartContract(
+			typographyIndex,
+			'Typography',
+			'Heading',
+			typographyIndexPath
+		);
+
+		expect(Object.keys(heading.props)).toEqual(
+			expect.arrayContaining(['level', 'variant', 'className'])
+		);
+		expect(heading.props.variant?.acceptedValues).toEqual(['default', 'display']);
+	});
+
 	test('generates rootless examples when a namespace has no Root part', () => {
 		const example = generateExample('Typography', true, ['Heading', 'Text', 'Code', 'Blockquote']);
 
