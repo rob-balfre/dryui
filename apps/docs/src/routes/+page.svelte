@@ -921,10 +921,11 @@
 	}
 
 	.hero-skip {
-		position: absolute;
+		position: fixed;
 		inset-inline-start: 50%;
-		inset-block-end: clamp(var(--dry-space-2), 3vh, var(--dry-space-6));
+		inset-block-end: clamp(var(--dry-space-3), 3vh, var(--dry-space-6));
 		transform: translateX(-50%);
+		z-index: 20;
 		--dry-btn-bg: color-mix(in srgb, var(--dry-color-bg-base) 72%, transparent);
 		--dry-btn-color: var(--dry-color-text-weak);
 		--dry-btn-border: color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);

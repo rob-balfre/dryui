@@ -49,10 +49,6 @@ const BANNED_GUIDANCE_CHECKS = [
 			'full layout component',
 			'Flex with buttons for toolbar'
 		]
-	},
-	{
-		path: resolve(repoRoot, 'scripts/dogfood-audit.ts'),
-		patterns: ['Flex or Stack', "suggestion: 'Grid'", "suggestion: 'Flex'"]
 	}
 ] as const;
 

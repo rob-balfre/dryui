@@ -195,10 +195,7 @@
 		--dry-dialog-shadow: var(--dry-shadow-overlay);
 		--dry-dialog-padding: var(--dry-space-6);
 		--dry-dialog-max-width: 32rem;
-		--dry-radius-nested: max(
-			0px,
-			calc(var(--dry-dialog-radius) - var(--dry-dialog-padding))
-		);
+		--dry-radius-nested: max(0px, calc(var(--dry-dialog-radius) - var(--dry-dialog-padding)));
 		--dry-btn-radius: var(--dry-radius-nested);
 
 		container-type: inline-size;
