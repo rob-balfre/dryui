@@ -323,8 +323,12 @@
 													>
 														<span class="preset-thumb-text">Ag</span>
 													</OptionPicker.Preview>
-													<OptionPicker.Label>{preset.name}</OptionPicker.Label>
-													<OptionPicker.Description>{preset.description}</OptionPicker.Description>
+													<OptionPicker.Label>
+														<span class="preset-option-label">{preset.name}</span>
+													</OptionPicker.Label>
+													<OptionPicker.Description>
+														<span class="preset-option-description">{preset.description}</span>
+													</OptionPicker.Description>
 												</OptionPicker.Item>
 											{/each}
 										</OptionPicker.Root>
@@ -722,13 +726,26 @@
 		gap: var(--dry-space-2);
 	}
 
-	@container (min-width: 52rem) {
+	@container (min-width: 22rem) {
 		.control-bar {
 			grid-auto-flow: column;
+			grid-template-columns: max-content minmax(0, 1fr);
+			justify-self: center;
+			align-items: center;
+			gap: var(--dry-space-3);
+			padding-block: var(--dry-space-1);
+		}
+
+		.menu-area {
+			justify-self: start;
+			justify-items: start;
+		}
+	}
+
+	@container (min-width: 52rem) {
+		.control-bar {
 			grid-template-columns: none;
 			grid-auto-columns: max-content;
-			justify-self: center;
-			padding-block: var(--dry-space-1);
 		}
 
 		.menu-area {
@@ -822,7 +839,7 @@
 		--dry-option-picker-padding-y: var(--dry-space-2_5, 0.625rem);
 		--dry-option-picker-padding-x: var(--dry-space-3, 0.75rem);
 		--dry-option-picker-content-align: start;
-		--dry-option-picker-compact-min-block-size: 4.75rem;
+		--dry-option-picker-compact-min-block-size: 7.5rem;
 		--dry-option-picker-preview-align-self: start;
 		--dry-option-picker-preview-offset-block-start: 0.125rem;
 		--dry-option-picker-preview-preset-size: 2.5rem;
@@ -830,6 +847,20 @@
 		--dry-option-picker-label-line-height: 1.1;
 		--dry-option-picker-description-size: 0.875rem;
 		--dry-option-picker-description-line-height: 1.3;
+	}
+
+	.preset-option-label {
+		align-self: start;
+	}
+
+	.preset-option-description {
+		display: -webkit-box;
+		min-block-size: calc(2 * 1.3em);
+		overflow: hidden;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		text-wrap: auto;
 	}
 
 	/* ─── Preset items ────────────────────────────────────────────────────── */
