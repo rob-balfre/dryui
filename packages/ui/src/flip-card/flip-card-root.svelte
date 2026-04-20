@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import Button from '../button/button.svelte';
+	import VisuallyHidden from '../visually-hidden/visually-hidden.svelte';
 	import { setFlipCardCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -14,6 +16,8 @@
 		trigger = 'hover',
 		direction = 'horizontal',
 		flipped = $bindable(false),
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
 		class: className,
 		children,
 		...rest
@@ -22,6 +26,8 @@
 	function toggle() {
 		flipped = !flipped;
 	}
+
+	const toggleLabel = $derived(flipped ? 'Show front of card' : 'Show back of card');
 
 	setFlipCardCtx({
 		get flipped() {
@@ -33,29 +39,34 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
 	data-flip-card
+	data-part="root"
 	data-flipped={flipped ? '' : undefined}
 	data-trigger={trigger}
 	data-direction={direction}
-	role={trigger === 'click' ? 'button' : 'group'}
-	aria-roledescription="flip card"
-	tabindex={trigger === 'click' ? 0 : undefined}
+	role={trigger === 'hover' ? 'group' : undefined}
+	aria-roledescription={trigger === 'hover' ? 'flip card' : undefined}
+	aria-label={trigger === 'hover' ? ariaLabel : undefined}
+	aria-labelledby={trigger === 'hover' ? ariaLabelledBy : undefined}
 	onmouseenter={trigger === 'hover' ? () => (flipped = true) : undefined}
 	onmouseleave={trigger === 'hover' ? () => (flipped = false) : undefined}
-	onclick={trigger === 'click' ? toggle : undefined}
-	onkeydown={trigger === 'click'
-		? (e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					toggle();
-				}
-			}
-		: undefined}
 	class={className}
 	{...rest}
 >
+	{#if trigger === 'click'}
+		<span data-flip-card-toggle-shell>
+			<Button
+				variant="bare"
+				aria-pressed={flipped}
+				aria-label={ariaLabel ?? toggleLabel}
+				aria-labelledby={ariaLabelledBy}
+				onclick={toggle}
+			>
+				<VisuallyHidden>{toggleLabel}</VisuallyHidden>
+			</Button>
+		</span>
+	{/if}
 	{@render children()}
 </div>
 
@@ -70,6 +81,22 @@
 		perspective: var(--dry-flip-card-perspective);
 		position: relative;
 		transform-style: preserve-3d;
+	}
+
+	[data-flip-card-toggle-shell] {
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		display: grid;
+		border-radius: inherit;
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: inherit;
+		--dry-btn-padding-x: 0;
+		--dry-btn-padding-y: 0;
+		--dry-btn-min-height: 0;
+		--dry-btn-radius: inherit;
+		box-shadow: none;
 	}
 
 	[data-flip-card][data-direction='horizontal'][data-flipped] {

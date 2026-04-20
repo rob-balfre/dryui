@@ -2,16 +2,16 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		children: Snippet;
 	}
 
 	let { class: className, children, ...rest }: Props = $props();
 </script>
 
-<div data-list-item-icon class={className} {...rest}>
+<span data-list-item-icon class={className} {...rest}>
 	{@render children()}
-</div>
+</span>
 
 <style>
 	[data-list-item-icon] {

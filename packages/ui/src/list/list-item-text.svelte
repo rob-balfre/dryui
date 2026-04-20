@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		primary?: Snippet;
 		secondary?: Snippet;
 		children?: Snippet;
@@ -11,7 +11,7 @@
 	let { class: className, primary, secondary, children, ...rest }: Props = $props();
 </script>
 
-<div data-list-item-text class={className} {...rest}>
+<span data-list-item-text class={className} {...rest}>
 	{#if primary}
 		<span data-list-item-primary>{@render primary()}</span>
 	{:else if children}
@@ -20,7 +20,7 @@
 	{#if secondary}
 		<span data-list-item-secondary>{@render secondary()}</span>
 	{/if}
-</div>
+</span>
 
 <style>
 	[data-list-item-text] {
