@@ -41,80 +41,50 @@
 	type PageModule = {
 		id: string;
 		title: string;
-		note: string;
-		tag: string;
-		color: 'blue' | 'green' | 'purple';
 	};
 
 	let aboveFoldModules = $state<PageModule[]>([
 		{
 			id: 'hero',
-			title: 'Hero statement',
-			note: 'Lead with the strongest product promise.',
-			tag: 'Content',
-			color: 'purple'
+			title: 'Hero statement'
 		},
 		{
 			id: 'search-rail',
-			title: 'Search rail',
-			note: 'Pull action forward before the scroll.',
-			tag: 'Product',
-			color: 'blue'
+			title: 'Search rail'
 		},
 		{
 			id: 'signal-strip',
-			title: 'Signal strip',
-			note: 'Show quick proof with metrics and customer logos.',
-			tag: 'Trust',
-			color: 'green'
+			title: 'Signal strip'
 		}
 	]);
 
 	let coreModules = $state<PageModule[]>([
 		{
 			id: 'feature-grid',
-			title: 'Feature grid',
-			note: 'Explain the system in three clear steps.',
-			tag: 'Content',
-			color: 'purple'
+			title: 'Feature grid'
 		},
 		{
 			id: 'pricing-cards',
-			title: 'Pricing cards',
-			note: 'Expose the shape, radius, and spacing tokens.',
-			tag: 'Commerce',
-			color: 'blue'
+			title: 'Pricing cards'
 		},
 		{
 			id: 'comparison-table',
-			title: 'Comparison table',
-			note: 'Make dense data still feel readable.',
-			tag: 'Data',
-			color: 'green'
+			title: 'Comparison table'
 		}
 	]);
 
 	let followThroughModules = $state<PageModule[]>([
 		{
 			id: 'customer-quotes',
-			title: 'Customer quotes',
-			note: 'Layer social proof after the core story lands.',
-			tag: 'Trust',
-			color: 'green'
+			title: 'Customer quotes'
 		},
 		{
 			id: 'faq-stack',
-			title: 'FAQ stack',
-			note: 'Resolve objections without losing visual rhythm.',
-			tag: 'Support',
-			color: 'blue'
+			title: 'FAQ stack'
 		},
 		{
 			id: 'closing-cta',
-			title: 'Closing CTA',
-			note: 'Repeat the brand action with a cleaner ask.',
-			tag: 'Growth',
-			color: 'purple'
+			title: 'Closing CTA'
 		}
 	]);
 
@@ -152,19 +122,19 @@
 		{
 			id: 'above-fold',
 			title: 'Above the fold',
-			description: 'Fastest route to the first impression.',
+			description: 'First impression.',
 			tone: 'warning' as const
 		},
 		{
 			id: 'core',
-			title: 'Core content',
-			description: 'Where the heavy lifting happens.',
+			title: 'Core',
+			description: 'Main story.',
 			tone: 'brand' as const
 		},
 		{
 			id: 'follow-through',
-			title: 'Trust and follow-through',
-			description: 'Retention, proof, and the last nudge.',
+			title: 'Trust and close',
+			description: 'Proof and close.',
 			tone: 'success' as const
 		}
 	] as const;
@@ -362,23 +332,7 @@
 
 			<div class="workflow-panel">
 				<Card.Root size="sm">
-					<Card.Header>
-						<div class="panel-copy">
-							<Text as="span" weight="semibold">Page builder</Text>
-							<Text color="muted">
-								Swap static preview chrome for a proper drag-and-drop module board.
-							</Text>
-						</div>
-					</Card.Header>
 					<Card.Content>
-						<div class="workflow-intro">
-							<Text as="span" weight="medium">Reorder the pieces of a landing page.</Text>
-							<Text color="muted">
-								The board shows how drag surfaces, handles, and indicators respond to the current
-								theme.
-							</Text>
-						</div>
-
 						<DragAndDrop.Group onMove={moveModule}>
 							<div class="workflow-board">
 								{#each moduleColumns as column (column.id)}
@@ -404,17 +358,7 @@
 											{#each getModuleList(column.id) as module, index (module.id)}
 												<DragAndDrop.Item {index}>
 													<DragAndDrop.Handle {index} />
-													<div class="workflow-item-copy">
-														<Text as="span" weight="medium" data-module-title>
-															{module.title}
-														</Text>
-														<Text size="sm" color="muted" data-module-note>
-															{module.note}
-														</Text>
-													</div>
-													<Badge variant="soft" color={module.color} size="sm">
-														{module.tag}
-													</Badge>
+													<span class="workflow-module-title">{module.title}</span>
 												</DragAndDrop.Item>
 											{/each}
 										</DragAndDrop.Root>
@@ -427,7 +371,7 @@
 			</div>
 		</div>
 
-		<div class="preview-column">
+		<div class="preview-column preview-rail">
 			<Card.Root size="sm">
 				<Card.Content>
 					<div class="panel-stack">
@@ -563,6 +507,7 @@
 	.preview-root {
 		display: grid;
 		container-type: inline-size;
+		container-name: preview-root;
 	}
 
 	.preview-mosaic {
@@ -699,7 +644,6 @@
 		gap: var(--dry-space-3);
 	}
 
-	.workflow-intro,
 	.workflow-column-copy,
 	.workflow-item-copy {
 		display: grid;
@@ -710,21 +654,22 @@
 		container-type: inline-size;
 		display: grid;
 		grid-template-columns: repeat(3, minmax(0, 1fr));
-		gap: var(--dry-space-4);
+		gap: var(--dry-space-3);
 	}
 
 	.workflow-column {
 		display: grid;
 		grid-template-rows: auto 1fr;
-		gap: var(--dry-space-3);
-		padding: var(--dry-space-4);
+		gap: var(--dry-space-2);
+		padding: var(--dry-space-3);
 		border-radius: var(--dry-radius-xl);
 		background: color-mix(in srgb, var(--dry-color-bg-sunken) 88%, var(--dry-color-bg-overlay));
 		border: 1px solid
 			color-mix(in srgb, var(--dry-color-stroke-weak) 78%, var(--dry-color-bg-overlay));
-		--dry-dnd-item-columns: auto minmax(0, 1fr) max-content;
-		--dry-dnd-gap: var(--dry-space-3);
-		--dry-dnd-item-padding: var(--dry-space-3) var(--dry-space-4);
+		--dry-dnd-item-columns: auto minmax(0, 1fr);
+		--dry-dnd-gap: var(--dry-space-2);
+		--dry-dnd-item-gap: var(--dry-space-2);
+		--dry-dnd-item-padding: var(--dry-space-2) var(--dry-space-3);
 	}
 
 	.workflow-column-header,
@@ -732,6 +677,22 @@
 		display: grid;
 		align-items: start;
 		gap: var(--dry-space-2);
+	}
+
+	.workflow-module-title {
+		margin: 0;
+		display: block;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-family: var(--dry-font-sans);
+		color: var(--dry-color-text-strong);
+		font-size: var(--dry-type-ui-body-size, var(--dry-type-small-size, var(--dry-text-base-size)));
+		line-height: var(
+			--dry-type-ui-body-leading,
+			var(--dry-type-small-leading, var(--dry-text-base-leading))
+		);
+		font-weight: 500;
 	}
 
 	.workflow-column-header {
@@ -961,13 +922,41 @@
 	}
 
 	/* Outer mosaic — preview-root is the nearest container with no cards between. */
-	@container (max-width: 64rem) {
+	@container preview-root (max-width: 64rem) {
 		.preview-mosaic {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
+
+		.preview-left-pair,
+		.preview-rail {
+			grid-column: 1 / -1;
+		}
+
+		.preview-rail {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			align-items: start;
+		}
+
+		.preview-rail > .copilot-row {
+			grid-column: 1 / -1;
+		}
+
+		.workflow-board {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+
+		.workflow-board > .workflow-column:last-child:nth-child(odd) {
+			grid-column: 1 / -1;
+		}
 	}
 
-	@container (max-width: 40rem) {
+	@container preview-root (max-width: 48rem) {
+		.preview-rail {
+			grid-template-columns: 1fr;
+		}
+	}
+
+	@container preview-root (max-width: 40rem) {
 		.preview-mosaic {
 			grid-template-columns: 1fr;
 		}
@@ -979,6 +968,10 @@
 
 		.workflow-board {
 			grid-template-columns: 1fr;
+		}
+
+		.workflow-board > .workflow-column:last-child:nth-child(odd) {
+			grid-column: auto;
 		}
 
 		.workflow-panel {
