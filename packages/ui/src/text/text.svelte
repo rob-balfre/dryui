@@ -60,6 +60,7 @@
 		color: var(--dry-typography-text-color, var(--dry-color-text-strong));
 		font-family: var(--dry-font-sans);
 		line-height: 1.7;
+		text-wrap: pretty;
 	}
 
 	[data-color='muted'] {

@@ -58,6 +58,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}
 	data-dropdown-menu-content
+	data-dry-stagger
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
 	ontoggle={(e) => {
@@ -97,10 +98,17 @@
 				var(--dry-menu-radius, var(--dry-radius-lg)) - var(--dry-menu-padding, var(--dry-space-2))
 			)
 		);
+		--dry-btn-radius: var(--dry-radius-nested);
+		--dry-radius-inner: var(--dry-radius-nested);
 
 		transition:
 			opacity var(--dry-duration-fast) var(--dry-ease-emphasized),
 			transform var(--dry-duration-fast) var(--dry-ease-emphasized);
+	}
+
+	[data-dropdown-menu-content][data-state='closed'] {
+		transition-duration: calc(var(--dry-duration-fast) / 2);
+		transition-timing-function: var(--dry-ease-out);
 	}
 
 	[data-dropdown-menu-content]:not(:popover-open) {

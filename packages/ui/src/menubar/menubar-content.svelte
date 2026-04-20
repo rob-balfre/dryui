@@ -99,6 +99,7 @@
 	tabindex="-1"
 	aria-labelledby={triggerEl?.id}
 	data-menubar-content
+	data-dry-stagger
 	data-state={menuCtx.open ? 'open' : 'closed'}
 	class={className}
 	ontoggle={(e) => {

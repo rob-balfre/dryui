@@ -275,6 +275,7 @@
 		font-size: var(--dry-type-ui-caption-size, var(--dry-text-xs-size, 0.75rem));
 		color: var(--dry-color-text-weak, #64748b);
 		white-space: nowrap;
+		font-variant-numeric: tabular-nums;
 	}
 
 	[data-part='label'][data-position='inside'] {

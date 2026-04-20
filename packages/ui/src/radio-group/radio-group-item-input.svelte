@@ -91,12 +91,18 @@
 		position: absolute;
 		top: 50%;
 		left: 50%;
-		transform: translate(-50%, -50%) scale(0);
+		transform: translate(-50%, -50%) scale(0.25);
+		opacity: 0;
+		filter: blur(4px);
 		height: 8px;
 		aspect-ratio: 1;
 		border-radius: var(--dry-radius-full);
 		background: var(--dry-color-on-brand);
-		transition: transform var(--dry-duration-fast) var(--dry-ease-default);
+		transform-origin: center;
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+			transform var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+			filter var(--dry-duration-fast) var(--dry-ease-spring-snappy);
 	}
 
 	[data-radio-group-item] input[type='radio']:hover:not(:disabled) {
@@ -120,6 +126,15 @@
 
 	[data-radio-group-item] input[type='radio']:checked::after {
 		transform: translate(-50%, -50%) scale(1);
+		opacity: 1;
+		filter: blur(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[data-radio-group-item] input[type='radio']::after {
+			transition: none;
+			filter: none;
+		}
 	}
 
 	[data-radio-group-item] input[type='radio']:checked:hover:not(:disabled) {

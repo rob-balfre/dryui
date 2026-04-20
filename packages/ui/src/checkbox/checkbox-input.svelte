@@ -133,8 +133,21 @@
 
 		&::after {
 			content: '';
-			display: none;
-			transition: transform var(--dry-duration-fast) var(--dry-ease-spring);
+			display: block;
+			height: 60%;
+			aspect-ratio: 35 / 60;
+			border: solid transparent;
+			border-width: 0 2px 2px 0;
+			margin-left: calc(var(--dry-checkbox-size) * 0.52);
+			margin-top: calc(var(--dry-checkbox-size) * -0.18);
+			transform-origin: center;
+			opacity: 0;
+			transform: rotate(45deg) scale(0.25);
+			filter: blur(4px);
+			transition:
+				opacity var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+				transform var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+				filter var(--dry-duration-fast) var(--dry-ease-spring-snappy);
 		}
 
 		&[data-state='checked'] {
@@ -143,16 +156,10 @@
 			box-shadow: inset 0 0 0 1px var(--dry-color-stroke-selected);
 
 			&::after {
-				display: block;
-				height: 60%;
-				aspect-ratio: 35 / 60;
-				border: solid var(--dry-checkbox-check-color);
-				border-width: 0 2px 2px 0;
-				margin-left: calc(var(--dry-checkbox-size) * 0.52);
-				margin-top: calc(var(--dry-checkbox-size) * -0.18);
+				border-color: var(--dry-checkbox-check-color);
+				opacity: 1;
 				transform: rotate(45deg) scale(1);
-				transform-origin: center;
-				animation: checkScale var(--dry-duration-fast) var(--dry-ease-spring);
+				filter: blur(0);
 			}
 		}
 
@@ -163,11 +170,15 @@
 			box-shadow: inset 0 0 0 1px var(--dry-color-stroke-selected);
 
 			&::after {
-				display: block;
 				height: 2px;
+				aspect-ratio: auto;
+				border: none;
 				background: var(--dry-checkbox-check-color);
+				margin-left: 0;
+				margin-top: 0;
+				opacity: 1;
 				transform: scale(1);
-				animation: dashScale var(--dry-duration-fast) var(--dry-ease-spring);
+				filter: blur(0);
 			}
 		}
 
@@ -226,28 +237,16 @@
 		--dry-checkbox-radius: var(--dry-radius-md);
 	}
 
-	@keyframes checkScale {
-		from {
-			transform: rotate(45deg) scale(0);
+	@media (prefers-reduced-motion: reduce) {
+		input::after {
+			transition: none;
+			filter: none;
 		}
-		to {
+		input[data-state='checked']::after {
 			transform: rotate(45deg) scale(1);
 		}
-	}
-
-	@keyframes dashScale {
-		from {
-			transform: scale(0);
-		}
-		to {
-			transform: scale(1);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		input[data-state='checked']::after,
 		input[data-state='indeterminate']::after {
-			animation: none;
+			transform: scale(1);
 		}
 	}
 </style>

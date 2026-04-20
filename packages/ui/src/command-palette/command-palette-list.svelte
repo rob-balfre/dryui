@@ -15,6 +15,7 @@
 <div
 	role="listbox"
 	data-command-palette-list
+	data-dry-stagger
 	id={ctx.listId}
 	aria-label="Commands"
 	class={className}

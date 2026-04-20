@@ -64,6 +64,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.inputId}
 	data-combobox-content
+	data-dry-stagger
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
 	{...rest}

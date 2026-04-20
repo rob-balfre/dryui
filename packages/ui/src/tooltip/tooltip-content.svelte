@@ -70,6 +70,11 @@
 			transform var(--dry-duration-fast) var(--dry-ease-emphasized);
 	}
 
+	[data-tooltip-content][data-state='closed'] {
+		transition-duration: calc(var(--dry-duration-fast) / 2);
+		transition-timing-function: var(--dry-ease-out);
+	}
+
 	[data-tooltip-content]:not(:popover-open) {
 		display: none;
 	}

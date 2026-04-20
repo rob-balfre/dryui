@@ -123,6 +123,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}
 	data-select-content
+	data-dry-stagger
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
 	ontoggle={(e) => {

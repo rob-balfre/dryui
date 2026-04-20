@@ -18,9 +18,25 @@
 </script>
 
 <Button {variant} {size} type="button" aria-label={label} {...rest}>
-	{#if children}
-		{@render children()}
-	{:else}
-		{glyph}
-	{/if}
+	<span data-part="nav-arrow-icon" data-direction={direction}>
+		{#if children}
+			{@render children()}
+		{:else}
+			{glyph}
+		{/if}
+	</span>
 </Button>
+
+<style>
+	[data-part='nav-arrow-icon'] {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+	[data-part='nav-arrow-icon'][data-direction='prev'] {
+		transform: translateX(-0.5px);
+	}
+	[data-part='nav-arrow-icon'][data-direction='next'] {
+		transform: translateX(0.5px);
+	}
+</style>

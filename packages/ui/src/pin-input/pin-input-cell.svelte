@@ -53,6 +53,7 @@
 		height: var(--dry-pin-size);
 		font-size: var(--dry-pin-font-size);
 		font-family: var(--dry-font-mono);
+		font-variant-numeric: tabular-nums;
 		font-weight: 500;
 		color: var(--dry-color-text-strong);
 		background: var(--dry-pin-bg);

@@ -166,10 +166,11 @@
 		height: var(--dry-video-embed-play-size);
 		aspect-ratio: 1;
 		filter: drop-shadow(0 2px 8px rgb(15 23 42 / 0.3));
+		transform: translateX(1px);
 		transition: transform var(--dry-duration-normal) var(--dry-ease-default);
 	}
 
 	.play-btn-slot:hover [data-part='play-icon'] {
-		transform: scale(1.1);
+		transform: translateX(1px) scale(1.1);
 	}
 </style>

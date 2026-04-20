@@ -65,6 +65,9 @@
 	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: #ffffff;
 
+	/* ─── Image edge ring (dark) ─────────────────────────────────── */
+	--dry-image-edge: rgba(255, 255, 255, 0.1);
+
 	/* ─── Component: Toggle ─────────────────────────────────────────
 	   Derived from semantic tokens so brand overrides (e.g. a consumer
 	   retheming --dry-color-fill-brand) flow through to toggles too.
@@ -282,6 +285,9 @@
 			--dry-color-bg-alternate: var(--dry-color-bg-sunken);
 			--dry-color-bg-brand: var(--dry-color-fill-brand);
 			--dry-color-bg-inverse: #ffffff;
+
+			/* ─── Image edge ring (dark) ─────────────────────────────────── */
+			--dry-image-edge: rgba(255, 255, 255, 0.1);
 
 			/* ─── Component: Toggle ─────────────────────────────────────────
 			   Derived from semantic tokens so brand overrides (e.g. a consumer
