@@ -569,7 +569,7 @@
 					</a>
 				</div>
 				<a class="plugins-manual" href={withBase('/getting-started#full-editor-setup')}>
-					<Text size="xs" color="secondary" weight="medium">or configure manually</Text>
+					<Text size="xs" color="secondary" weight="medium">or configure manually.</Text>
 				</a>
 			</section>
 		</section>
@@ -624,7 +624,7 @@
 					<div>
 						<div class="feature-name">CLI</div>
 						<p class="feature-note">
-							<code>dryui</code> for setup, lookup, compose, and review
+							<code>dryui</code> for setup, lookup, tokens, and feedback tooling
 						</p>
 					</div>
 				</li>

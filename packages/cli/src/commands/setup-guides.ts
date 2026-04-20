@@ -1,6 +1,7 @@
 export type SetupGuideId =
 	| 'claude-code'
 	| 'codex'
+	| 'gemini'
 	| 'opencode'
 	| 'copilot'
 	| 'cursor'
@@ -48,6 +49,19 @@ const COPILOT_CONFIG = `{
   }
 }`;
 
+const GEMINI_CONFIG = `{
+  "mcpServers": {
+    "dryui": {
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "command": "npx",
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+    }
+  }
+}`;
+
 const OPENCODE_CONFIG = `{
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
@@ -77,9 +91,13 @@ const SVELTE_MCP_NOTE =
 	'Adds list-sections, get-documentation, svelte-autofixer, and playground-link. `dryui setup --install` registers it automatically (pass `--no-svelte-mcp` to skip).';
 
 const SVELTE_SECTION_CLAUDE: SetupGuideSection = {
-	title: 'Svelte MCP (recommended companion)',
-	note: `${SVELTE_MCP_NOTE} Claude plugin does not bundle this; run it once to register the server for this user.`,
-	code: 'claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp'
+	title: 'Svelte companion (recommended)',
+	note: `${SVELTE_MCP_NOTE} Prefer the official Claude plugin. If you cannot use plugins, the MCP-only fallback below still works.`,
+	code: `claude plugin marketplace add sveltejs/ai-tools
+claude plugin install svelte@svelte
+
+# MCP-only fallback
+claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`
 };
 
 const SVELTE_SECTION_CODEX: SetupGuideSection = {
@@ -88,6 +106,12 @@ const SVELTE_SECTION_CODEX: SetupGuideSection = {
 	code: `[mcp_servers.svelte]
 command = "npx"
 args = ["-y", "@sveltejs/mcp"]`
+};
+
+const SVELTE_SECTION_GEMINI: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Gemini CLI does not bundle this; run it once to register the server for this user.`,
+	code: 'gemini mcp add -t stdio -s user svelte npx -y @sveltejs/mcp'
 };
 
 const SVELTE_SECTION_OPENCODE: SetupGuideSection = {
@@ -132,6 +156,7 @@ const SVELTE_SECTION_ZED: SetupGuideSection = {
 export const setupGuideIds: readonly SetupGuideId[] = [
 	'claude-code',
 	'codex',
+	'gemini',
 	'opencode',
 	'copilot',
 	'cursor',
@@ -191,6 +216,27 @@ ${CODEX_CONFIG}`
 		],
 		followUp:
 			'After installing the plugin, start a new Codex session so `ask` / `check` are available.'
+	},
+	{
+		id: 'gemini',
+		label: 'Gemini CLI',
+		description:
+			'Install the DryUI extension for Gemini. The extension is the canonical Gemini skill path.',
+		sections: [
+			{
+				title: 'Install the extension',
+				note: 'Gemini CLI installs extensions from a local path. Clone DryUI, then point Gemini at `packages/plugin/`. The extension bundles GEMINI.md plus the dryui and dryui-feedback MCP servers.',
+				code: `git clone https://github.com/rob-balfre/dryui ~/dryui
+gemini extensions install ~/dryui/packages/plugin`
+			},
+			{
+				title: 'Optional MCP-only fallback',
+				note: 'Only use this if you cannot install the extension. It does not install GEMINI.md with the bundled DryUI skill.',
+				code: GEMINI_CONFIG
+			},
+			SVELTE_SECTION_GEMINI
+		],
+		followUp: 'After installing the extension, restart Gemini so `ask` / `check` are available.'
 	},
 	{
 		id: 'opencode',

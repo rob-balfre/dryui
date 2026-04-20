@@ -286,8 +286,8 @@
 					<code>dryui init</code> for new apps, <code>dryui install</code> /
 					<code>dryui detect</code>
 					for existing ones, and <code>dryui info</code> / <code>dryui compose</code> before writing
-					component code. After implementation, run <code>dryui review</code>,
-					<code>dryui diagnose</code>, or <code>dryui doctor</code> depending on what changed.
+					component code. After implementation, use DryUI MCP <code>check</code> if it is available, then
+					run the app's normal build and test commands.
 				</Text>
 
 				<Alert variant="info">

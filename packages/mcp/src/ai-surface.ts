@@ -37,17 +37,22 @@ export const aiSurface: AiSurfaceManifest = {
 			name: 'setup',
 			description: 'Interactive onboarding for editor integration and feedback tooling'
 		},
-		{ name: 'init', description: 'Print setup snippets for a new DryUI app' },
+		{ name: 'init', description: 'Bootstrap a SvelteKit + DryUI project' },
 		{ name: 'detect', description: 'Detect DryUI project setup' },
 		{ name: 'install', description: 'Print a project install plan' },
 		{ name: 'add', description: 'Print a copyable starter snippet or a project-aware plan' },
-		{ name: 'get', description: 'Print copyable Svelte source for a composed output' },
 		{ name: 'info', description: 'Show component API reference' },
 		{ name: 'list', description: 'List all components' },
 		{ name: 'compose', description: 'Look up composition guidance' },
-		{ name: 'review', description: 'Validate a Svelte file against DryUI spec' },
-		{ name: 'diagnose', description: 'Validate theme CSS' },
-		{ name: 'doctor', description: 'Inspect workspace health' },
-		{ name: 'lint', description: 'Print deterministic workspace findings' }
+		{ name: 'tokens', description: 'List `--dry-*` design tokens' },
+		{ name: 'ambient', description: 'Print compact session context for SessionStart hooks' },
+		{
+			name: 'install-hook',
+			description: 'Wire `dryui ambient` into Claude Code settings.json'
+		},
+		{
+			name: 'feedback',
+			description: 'Start feedback tooling, inspect the server, or launch the dashboard'
+		}
 	]
 } as const;
