@@ -49,6 +49,12 @@ export interface AiAgentSetup {
 		code: string;
 		language: string;
 	};
+	companionMcp?: {
+		title: string;
+		note: string;
+		code: string;
+		language: string;
+	};
 	followUp: string;
 }
 
@@ -177,6 +183,56 @@ const zedConfig = `{
   }
 }`;
 
+const companionSvelteNote =
+	'DryUI runs `dryui setup --install` to register this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code and Codex, paste the snippet below.';
+
+const svelteCompanionClaude = 'claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp';
+
+const svelteCompanionCodex = `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]`;
+
+const svelteCompanionGemini = 'gemini mcp add -t stdio -s user svelte npx -y @sveltejs/mcp';
+
+const svelteCompanionMcpServers = `{
+  "mcpServers": {
+    "svelte": {
+      "command": "npx",
+      "args": ["-y", "@sveltejs/mcp"]
+    }
+  }
+}`;
+
+const svelteCompanionOpencode = `{
+  "mcp": {
+    "svelte": {
+      "type": "local",
+      "command": ["npx", "-y", "@sveltejs/mcp"]
+    }
+  }
+}`;
+
+const svelteCompanionCopilot = `{
+  "servers": {
+    "svelte": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@sveltejs/mcp"]
+    }
+  }
+}`;
+
+const svelteCompanionZed = `{
+  "context_servers": {
+    "svelte": {
+      "command": {
+        "path": "npx",
+        "args": ["-y", "@sveltejs/mcp"]
+      }
+    }
+  }
+}`;
+
 // ── Agent setup definitions ──
 
 export const aiAgentSetups: AiAgentSetup[] = [
@@ -213,6 +269,12 @@ claude plugin install dryui@dryui`
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
+			language: 'bash'
+		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds list-sections, get-documentation, svelte-autofixer, and playground-link so the agent can ground Svelte 5 and SvelteKit answers in the official docs.`,
+			code: svelteCompanionClaude,
 			language: 'bash'
 		},
 		followUp:
@@ -253,6 +315,12 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			code: codexConfig,
 			language: 'toml'
 		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Append this block to \`~/.codex/config.toml\`.`,
+			code: svelteCompanionCodex,
+			language: 'toml'
+		},
 		followUp:
 			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask` / `check` are available.'
 	},
@@ -289,6 +357,12 @@ gemini extensions install ~/dryui/packages/plugin`
 			note: '3. Optional MCP-only fallback: add the servers to `~/.gemini/settings.json` if you cannot install the extension. This does not install GEMINI.md with the DryUI skill.',
 			code: geminiConfig,
 			language: 'json'
+		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Run this once to register the server for Gemini CLI.`,
+			code: svelteCompanionGemini,
+			language: 'bash'
 		},
 		followUp:
 			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask` / `check` are available.'
@@ -327,6 +401,12 @@ gemini extensions install ~/dryui/packages/plugin`
 			path: 'opencode.json',
 			note: '3. Add the MCP servers to `opencode.json`. OpenCode expects local MCP servers under the `mcp` object with `type: "local"` and command arrays.',
 			code: opencodeConfig,
+			language: 'json'
+		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds a third entry under the \`mcp\` object in \`opencode.json\`.`,
+			code: svelteCompanionOpencode,
 			language: 'json'
 		},
 		followUp:
@@ -368,6 +448,12 @@ gemini extensions install ~/dryui/packages/plugin`
 			code: copilotConfig,
 			language: 'json'
 		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds a sibling entry under \`servers\` in \`.vscode/mcp.json\`.`,
+			code: svelteCompanionCopilot,
+			language: 'json'
+		},
 		followUp:
 			'Use the CLI as the default surface. MCP tools only work in Copilot Agent mode, and the skill loads automatically when relevant.'
 	},
@@ -389,6 +475,12 @@ gemini extensions install ~/dryui/packages/plugin`
 			path: '.cursor/mcp.json',
 			note: '3. Add the MCP server to `.cursor/mcp.json`.',
 			code: mcpServersConfig,
+			language: 'json'
+		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds a sibling entry under \`mcpServers\` in \`.cursor/mcp.json\`.`,
+			code: svelteCompanionMcpServers,
 			language: 'json'
 		},
 		followUp:
@@ -414,8 +506,14 @@ gemini extensions install ~/dryui/packages/plugin`
 			code: mcpServersConfig,
 			language: 'json'
 		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds a sibling entry under \`mcpServers\` in \`~/.codeium/windsurf/mcp_config.json\`.`,
+			code: svelteCompanionMcpServers,
+			language: 'json'
+		},
 		followUp:
-			'Use the CLI as the default surface. Windsurf has a 100-tool limit across all MCP servers, and DryUI now uses 2 tools.'
+			'Use the CLI as the default surface. Windsurf has a 100-tool limit across all MCP servers; DryUI uses 2 tools and @sveltejs/mcp adds 4.'
 	},
 	{
 		id: 'zed',
@@ -430,6 +528,12 @@ gemini extensions install ~/dryui/packages/plugin`
 			path: '~/.config/zed/settings.json',
 			note: '2. Add the MCP server to `~/.config/zed/settings.json`. AGENTS.md at the repo root provides conventions automatically.',
 			code: zedConfig,
+			language: 'json'
+		},
+		companionMcp: {
+			title: 'Svelte MCP (recommended companion)',
+			note: `${companionSvelteNote} Adds a sibling entry under \`context_servers\` in \`~/.config/zed/settings.json\`.`,
+			code: svelteCompanionZed,
 			language: 'json'
 		},
 		followUp:

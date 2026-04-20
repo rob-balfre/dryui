@@ -10,6 +10,7 @@ export interface ComboboxContext {
 	readonly inputId: string;
 	readonly contentId: string;
 	inputEl: HTMLInputElement | null;
+	triggerEl: HTMLElement | null;
 	show: () => void;
 	close: () => void;
 	toggle: () => void;

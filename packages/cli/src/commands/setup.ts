@@ -35,7 +35,8 @@ import {
 	formatInstallResult,
 	installPreviewLines,
 	isAutoInstallable,
-	runEditorInstall
+	runEditorInstall,
+	summarizeSvelteMcpStatus
 } from './setup-installers.js';
 import type { Spec } from './types.js';
 
@@ -235,7 +236,8 @@ function buildMainContext(spec: Spec): string[] {
 			`project: ${detection.status} | framework: ${detection.framework} | pkg-manager: ${detection.packageManager}`,
 			`root: ${detection.root ? homeRelative(detection.root) : '(not found)'}`,
 			`deps: ui=${yesNo(detection.dependencies.ui)}, primitives=${yesNo(detection.dependencies.primitives)}, lint=${yesNo(detection.dependencies.lint)}`,
-			`theme: default=${yesNo(detection.theme.defaultImported)}, dark=${yesNo(detection.theme.darkImported)}, auto=${yesNo(detection.theme.themeAuto)}`
+			`theme: default=${yesNo(detection.theme.defaultImported)}, dark=${yesNo(detection.theme.darkImported)}, auto=${yesNo(detection.theme.themeAuto)}`,
+			summarizeSvelteMcpStatus({ cwd: process.cwd() })
 		];
 	} catch {
 		return [`cwd: ${homeRelative(process.cwd())}`, 'project: detection failed'];
@@ -282,24 +284,26 @@ function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): v
 function setupHelp(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--install] [--claude-hook] [--open-feedback] [--no-open]`,
+			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--install] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open]`,
 			description: [
 				'Interactive action menu for editor setup, feedback, and common project helpers.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
 				'Without a TTY, use --editor and/or --open-feedback for deterministic output.'
 			],
 			options: [
-				'  --editor <id>     Print setup steps for one editor or agent',
-				'  --install         After printing the editor steps, run them (skill copy + MCP config merge).',
-				'                    Supported for copilot, cursor, opencode, windsurf, zed.',
-				'  --claude-hook     Run `dryui install-hook` after the Claude guide',
-				'  --open-feedback   Open feedback tooling after printing setup steps',
-				'  --no-open         When opening feedback, print the URL instead of opening the browser'
+				'  --editor <id>       Print setup steps for one editor or agent',
+				'  --install           After printing the editor steps, run them (skill copy + MCP config merge).',
+				'                      Supported for copilot, cursor, opencode, windsurf, zed.',
+				'  --no-svelte-mcp     Skip registering the official @sveltejs/mcp server (default: on)',
+				'  --claude-hook       Run `dryui install-hook` after the Claude guide',
+				'  --open-feedback     Open feedback tooling after printing setup steps',
+				'  --no-open           When opening feedback, print the URL instead of opening the browser'
 			],
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
 				'  dryui setup --editor opencode --install',
+				'  dryui setup --editor cursor --install --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
 				'  dryui setup --open-feedback --no-open'
 			]
@@ -571,7 +575,11 @@ export function getInitTargetStatus(projectPath: string): InitTargetStatus | nul
 	return null;
 }
 
-async function runInteractiveEditorSetup(args: string[], mainContext: string[]): Promise<void> {
+async function runInteractiveEditorSetup(
+	args: string[],
+	mainContext: string[],
+	defaultSvelteMcp: boolean
+): Promise<void> {
 	const editorOptions: readonly SelectOption<EditorMenuValue>[] = [
 		...setupGuideIds.map((id) => ({
 			label: getSetupGuide(id).label,
@@ -612,12 +620,21 @@ async function runInteractiveEditorSetup(args: string[], mainContext: string[]):
 		}
 
 		if (isAutoInstallable(editor)) {
-			const previewLines = installPreviewLines(editor, { cwd: process.cwd() });
+			const previewCtx = { cwd: process.cwd(), includeSvelteMcp: defaultSvelteMcp };
+			const previewLines = installPreviewLines(editor, previewCtx);
 			const runIt = await promptConfirm('Install for me now?', true, {
 				contextLines: [...contextLines, '', ...previewLines]
 			});
 			if (runIt) {
-				const result = runEditorInstall(editor, { cwd: process.cwd() });
+				const includeSvelteMcp = await promptConfirm(
+					'Also register the official @sveltejs/mcp server?',
+					defaultSvelteMcp,
+					{ contextLines: [...contextLines, '', ...previewLines] }
+				);
+				const result = runEditorInstall(editor, {
+					cwd: process.cwd(),
+					includeSvelteMcp
+				});
 				if (result) {
 					console.log('');
 					console.log(formatInstallResult(result));
@@ -724,7 +741,11 @@ async function runInteractiveInit(spec: Spec, mainContext: string[]): Promise<vo
 	await promptAfterAction();
 }
 
-async function runInteractiveSetup(args: string[], spec: Spec): Promise<void> {
+async function runInteractiveSetup(
+	args: string[],
+	spec: Spec,
+	defaultSvelteMcp: boolean
+): Promise<void> {
 	let mainContext = buildMainContext(spec);
 
 	while (true) {
@@ -734,7 +755,7 @@ async function runInteractiveSetup(args: string[], spec: Spec): Promise<void> {
 
 		switch (action) {
 			case 'setup':
-				await runInteractiveEditorSetup(args, mainContext);
+				await runInteractiveEditorSetup(args, mainContext, defaultSvelteMcp);
 				break;
 			case 'feedback':
 				await runInteractiveFeedbackSetup(spec, mainContext);
@@ -758,10 +779,16 @@ async function runInteractiveSetup(args: string[], spec: Spec): Promise<void> {
 	}
 }
 
+function resolveIncludeSvelteMcp(args: string[]): boolean {
+	return !hasFlag(args, '--no-svelte-mcp');
+}
+
 export async function runSetup(args: string[], spec: Spec): Promise<void> {
 	if (hasFlag(args, '--help') || hasFlag(args, '-h')) {
 		setupHelp();
 	}
+
+	const includeSvelteMcp = resolveIncludeSvelteMcp(args);
 
 	const editor = getFlag(args, '--editor');
 	if (editor) {
@@ -781,7 +808,10 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 				);
 				process.exit(1);
 			}
-			const result = runEditorInstall(editor, { cwd: process.cwd() });
+			const result = runEditorInstall(editor, {
+				cwd: process.cwd(),
+				includeSvelteMcp
+			});
 			if (result) {
 				console.log('');
 				console.log(formatInstallResult(result));
@@ -805,5 +835,5 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 		setupHelp();
 	}
 
-	await runInteractiveSetup(args, spec);
+	await runInteractiveSetup(args, spec, includeSvelteMcp);
 }

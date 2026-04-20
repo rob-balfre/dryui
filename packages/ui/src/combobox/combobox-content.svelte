@@ -25,6 +25,7 @@
 	}: Props = $props();
 
 	const ctx = getComboboxCtx();
+	const getTriggerEl = () => ctx.triggerEl ?? ctx.inputEl;
 
 	let el = $state<HTMLDivElement | null>(null);
 
@@ -39,7 +40,7 @@
 	}
 
 	const popover = createAnchoredPopover({
-		triggerEl: () => ctx.inputEl,
+		triggerEl: getTriggerEl,
 		contentEl: () => el ?? null,
 		open: () => ctx.open,
 		placement: () => placement,
@@ -51,7 +52,7 @@
 		escapeKey: false,
 		onDismiss: () => ctx.close(),
 		contentEl: () => el ?? null,
-		triggerEl: () => ctx.inputEl
+		triggerEl: getTriggerEl
 	});
 </script>
 
@@ -87,7 +88,10 @@
 		margin: 0;
 
 		display: grid;
-		grid-template-columns: minmax(max(12rem, anchor-size(inline)), max-content);
+		grid-template-columns: minmax(
+			max(var(--dry-combobox-content-min-inline-size, 12rem), anchor-size(inline)),
+			max-content
+		);
 		background: var(--dry-color-bg-overlay);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);

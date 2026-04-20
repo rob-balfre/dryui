@@ -351,6 +351,17 @@
 									<CodeBlock language={setup.mcp.language} code={setup.mcp.code} />
 								</div>
 
+								{#if setup.companionMcp}
+									<div class="stack-sm">
+										<Text size="sm" color="muted">{setup.companionMcp.title}</Text>
+										<Text size="sm" color="secondary">{setup.companionMcp.note}</Text>
+										<CodeBlock
+											language={setup.companionMcp.language}
+											code={setup.companionMcp.code}
+										/>
+									</div>
+								{/if}
+
 								<Alert variant="info">
 									{#snippet title()}Follow-up{/snippet}
 									{#snippet description()}{setup.followUp}{/snippet}

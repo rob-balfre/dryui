@@ -4,9 +4,12 @@ import { join, resolve } from 'node:path';
 import {
 	autoInstallableEditors,
 	formatInstallResult,
+	installPreviewLines,
 	isAutoInstallable,
 	mergeServersConfig,
-	runEditorInstall
+	readSvelteMcpRegistrations,
+	runEditorInstall,
+	summarizeSvelteMcpStatus
 } from '../commands/setup-installers.js';
 import { cleanupTempDirs, createTempTree } from './helpers.js';
 
@@ -269,6 +272,147 @@ describe('formatInstallResult', () => {
 		expect(text).toContain('Copy DryUI skill: created');
 		expect(text).toContain('Update .cursor/mcp.json: created');
 		expect(text).toContain('Restart your editor');
+	});
+});
+
+describe('Svelte MCP companion', () => {
+	test('copilot installer registers @sveltejs/mcp under servers when opted in', () => {
+		const root = createTempTree({});
+		const result = runEditorInstall('copilot', {
+			cwd: root,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, '.vscode/mcp.json'), 'utf-8'));
+		expect(config.servers.svelte).toEqual({
+			type: 'stdio',
+			command: 'npx',
+			args: ['-y', '@sveltejs/mcp']
+		});
+	});
+
+	test('cursor installer registers @sveltejs/mcp under mcpServers when opted in', () => {
+		const root = createTempTree({});
+		const result = runEditorInstall('cursor', {
+			cwd: root,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
+		expect(config.mcpServers.svelte).toEqual({
+			command: 'npx',
+			args: ['-y', '@sveltejs/mcp']
+		});
+	});
+
+	test('opencode installer registers svelte as a third mcp entry when opted in', () => {
+		const root = createTempTree({});
+		const result = runEditorInstall('opencode', {
+			cwd: root,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, 'opencode.json'), 'utf-8'));
+		expect(Object.keys(config.mcp).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(config.mcp.svelte).toEqual({
+			type: 'local',
+			command: ['npx', '-y', '@sveltejs/mcp']
+		});
+	});
+
+	test('windsurf installer registers svelte alongside DryUI servers when opted in', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const result = runEditorInstall('windsurf', {
+			cwd: root,
+			homeDir: home,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(
+			readFileSync(join(home, '.codeium/windsurf/mcp_config.json'), 'utf-8')
+		);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+	});
+
+	test('zed installer registers svelte under context_servers when opted in', () => {
+		const home = createTempTree({});
+		const result = runEditorInstall('zed', {
+			cwd: home,
+			homeDir: home,
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.config/zed/settings.json'), 'utf-8'));
+		expect(config.context_servers.svelte).toEqual({
+			command: { path: 'npx', args: ['-y', '@sveltejs/mcp'] }
+		});
+	});
+
+	test('default (includeSvelteMcp omitted) leaves the svelte server out', () => {
+		const root = createTempTree({});
+		const result = runEditorInstall('cursor', {
+			cwd: root,
+			runDegit: fakeDegit([])
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
+		expect(Object.keys(config.mcpServers)).toEqual(['dryui']);
+	});
+
+	test('preview lines mention the svelte companion when opted in', () => {
+		const root = createTempTree({});
+		const lines = installPreviewLines('cursor', { cwd: root, includeSvelteMcp: true });
+		expect(lines.some((line) => line.includes('+ svelte'))).toBe(true);
+	});
+
+	test('readSvelteMcpRegistrations finds servers installed by the installer', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		runEditorInstall('cursor', {
+			cwd: root,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		runEditorInstall('windsurf', {
+			cwd: root,
+			homeDir: home,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+
+		const statuses = readSvelteMcpRegistrations({ cwd: root, homeDir: home });
+		const cursor = statuses.find((entry) => entry.editor === 'cursor');
+		const windsurf = statuses.find((entry) => entry.editor === 'windsurf');
+		const zed = statuses.find((entry) => entry.editor === 'zed');
+
+		expect(cursor?.status).toBe('registered');
+		expect(windsurf?.status).toBe('registered');
+		expect(zed?.status).toBe('missing');
+	});
+
+	test('summarizeSvelteMcpStatus names the editors that have it registered', () => {
+		const root = createTempTree({});
+		runEditorInstall('cursor', {
+			cwd: root,
+			runDegit: fakeDegit([]),
+			includeSvelteMcp: true
+		});
+		const summary = summarizeSvelteMcpStatus({ cwd: root, homeDir: createTempTree({}) });
+		expect(summary).toContain('svelte-mcp');
+		expect(summary).toContain('cursor');
+	});
+
+	test('summarizeSvelteMcpStatus reports not-registered when absent', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		expect(summarizeSvelteMcpStatus({ cwd: root, homeDir: home })).toBe(
+			'svelte-mcp: not registered in any wired editor'
+		);
 	});
 });
 

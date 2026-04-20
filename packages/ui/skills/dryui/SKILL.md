@@ -116,6 +116,18 @@ The test: every `<Input>`, `<Select.Root>`, `<Textarea>` is inside a `Field.Root
 
 The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>`, `<hr>`, `<table>` — each should be a DryUI component instead.
 
+## 7. Ask the Svelte MCP for Svelte Questions
+
+**DryUI owns components. `@sveltejs/mcp` owns the framework.**
+
+For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, `+page.server.ts` shape, form actions, and anything Svelte-syntax adjacent: call the official `svelte-autofixer` and `get-documentation` tools from `@sveltejs/mcp` before guessing from memory.
+
+- `dryui setup --install` registers `@sveltejs/mcp` by default; pass `--no-svelte-mcp` to skip.
+- If it's not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
+- Scope split: DryUI `ask`/`check` cover component APIs, theming, composition, and validation. Svelte MCP covers the runtime, compiler, and framework idioms.
+
+The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either (a) call `svelte-autofixer` / `get-documentation`, or (b) confirm the pattern is already covered by a DryUI recipe via `ask --scope recipe`?
+
 ## Quick Start
 
 **1. Install the CLI** so every subsequent command is short and fast:
@@ -148,6 +160,8 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 - Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
 - OpenCode: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui` + add the `dryui` and `dryui-feedback` local MCP servers in `opencode.json` (OpenCode also loads `.agents/skills/dryui` and reads `AGENTS.md`)
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
+
+**5. Register the Svelte MCP companion.** `dryui setup --install` does this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`; for Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 
 ### Manual setup
 

@@ -22,7 +22,7 @@
 
 <div data-diagram-container data-fit={fit}>
 	<svg
-		width={fit === 'native' ? vbW : undefined}
+		width={fit === 'native' ? vbW : '100%'}
 		height={fit === 'native' ? vbH : undefined}
 		viewBox="0 0 {vbW} {vbH}"
 		preserveAspectRatio="xMidYMin meet"

@@ -164,9 +164,11 @@ function buildRuntime(
 		findPortHolder: () => null,
 		killPortHolder: () => true,
 		spawnProjectDevServer: () => {},
-		waitForUrl: async () => true,
+		waitForUrlDetailed: async () => ({ ok: true, status: 200 }),
+		readProjectDevLogTail: () => [],
 		promptKillPortHolder: async () => false,
 		promptFeedbackSetup: async () => false,
+		projectHasDependency: () => true,
 		installPackage: () => true,
 		mountFeedbackInLayout: () => true,
 		findViteConfig: () => null,
@@ -263,7 +265,7 @@ describe('runUserProjectLauncher', () => {
 					spawnProjectDevServer: () => {
 						spawned = true;
 					},
-					waitForUrl: async () => true
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 })
 				})
 			})
 		);
@@ -298,7 +300,7 @@ describe('runUserProjectLauncher', () => {
 					spawnProjectDevServer: () => {
 						spawned = true;
 					},
-					waitForUrl: async () => true
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 })
 				})
 			})
 		);
@@ -380,7 +382,7 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).toContain('Feedback widget: not mounted');
 	});
 
-	test('auto-installs, mounts, and patches vite config when the user confirms', async () => {
+	test('auto-installs @dryui/feedback plus its lucide peer, mounts, and patches vite config', async () => {
 		const root = createTempTree({ 'package.json': '{}' });
 		const viteConfigPath = resolve(root, 'vite.config.ts');
 		const detection: ProjectDetection = {
@@ -388,7 +390,7 @@ describe('runUserProjectLauncher', () => {
 			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
 			feedback: { layoutPath: null }
 		};
-		const installCalls: Array<{ pm: string; pkg: string }> = [];
+		const installCalls: Array<{ pm: string; pkgs: string[] }> = [];
 		const mountCalls: string[] = [];
 		const patchCalls: string[] = [];
 		const promptCalls: Array<{
@@ -406,6 +408,7 @@ describe('runUserProjectLauncher', () => {
 					urlResponds: async () => true,
 					findViteConfig: () => viteConfigPath,
 					viteConfigHasFeedbackNoExternal: () => false,
+					projectHasDependency: (_root, name) => name !== 'lucide-svelte',
 					promptFeedbackSetup: async (plan) => {
 						promptCalls.push({
 							install: plan.install,
@@ -414,8 +417,8 @@ describe('runUserProjectLauncher', () => {
 						});
 						return true;
 					},
-					installPackage: (_cwd, pm, pkg) => {
-						installCalls.push({ pm, pkg });
+					installPackage: (_cwd, pm, pkgs) => {
+						installCalls.push({ pm, pkgs });
 						return true;
 					},
 					mountFeedbackInLayout: (layoutPath) => {
@@ -431,12 +434,43 @@ describe('runUserProjectLauncher', () => {
 		);
 
 		expect(promptCalls).toEqual([{ install: true, mount: true, viteConfig: true }]);
-		expect(installCalls).toEqual([{ pm: 'bun', pkg: '@dryui/feedback' }]);
+		expect(installCalls).toEqual([{ pm: 'bun', pkgs: ['@dryui/feedback', 'lucide-svelte'] }]);
 		expect(mountCalls).toEqual([detection.files.rootLayout!]);
 		expect(patchCalls).toEqual([viteConfigPath]);
+		expect(result.logs[0]).toContain(
+			'Feedback icons: installed lucide-svelte (peer dependency of @dryui/feedback)'
+		);
 		expect(result.logs[0]).toContain(`Feedback widget: mounted in ${detection.files.rootLayout}`);
 		expect(result.logs[0]).toContain(
-			`Vite config: added @dryui/feedback to ssr.noExternal in ${viteConfigPath}`
+			`Vite config: added @dryui/feedback and lucide-svelte to ssr.noExternal in ${viteConfigPath}`
+		);
+	});
+
+	test('installs the lucide peer even when @dryui/feedback is already present', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const detection = readyDetection(root);
+		const installCalls: Array<{ pm: string; pkgs: string[] }> = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => detection,
+					urlResponds: async () => true,
+					projectHasDependency: (_root, name) => name !== 'lucide-svelte',
+					promptFeedbackSetup: async () => true,
+					installPackage: (_cwd, pm, pkgs) => {
+						installCalls.push({ pm, pkgs });
+						return true;
+					}
+				})
+			})
+		);
+
+		expect(installCalls).toEqual([{ pm: 'bun', pkgs: ['lucide-svelte'] }]);
+		expect(result.logs[0]).toContain(
+			'Feedback icons: installed lucide-svelte (peer dependency of @dryui/feedback)'
 		);
 	});
 
@@ -486,7 +520,9 @@ describe('runUserProjectLauncher', () => {
 		expect(installCalls).toEqual([]);
 		expect(mountCalls).toEqual([]);
 		expect(patchCalls).toEqual([viteConfigPath]);
-		expect(result.logs[0]).toContain('Vite config: added @dryui/feedback');
+		expect(result.logs[0]).toContain(
+			'Vite config: added @dryui/feedback and lucide-svelte to ssr.noExternal'
+		);
 	});
 
 	test('reports when the vite patch fails', async () => {
@@ -510,7 +546,7 @@ describe('runUserProjectLauncher', () => {
 		);
 
 		expect(result.logs[0]).toContain(
-			`Vite config: could not patch ${viteConfigPath} — add @dryui/feedback to ssr.noExternal manually`
+			`Vite config: could not patch ${viteConfigPath}: add @dryui/feedback and lucide-svelte to ssr.noExternal manually`
 		);
 	});
 
@@ -536,7 +572,7 @@ describe('runUserProjectLauncher', () => {
 		);
 
 		expect(result.logs[0]).toContain(
-			'Feedback widget: install failed — run `bun add @dryui/feedback` manually'
+			'Feedback widget: install failed: run `bun add @dryui/feedback` manually'
 		);
 	});
 
@@ -582,7 +618,7 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).not.toContain('Feedback widget:');
 	});
 
-	test('skips the dev server when spawn times out waiting for ready', async () => {
+	test('reports HTTP status and error summary when the dev server returns 5xx', async () => {
 		const root = createTempTree({ 'package.json': '{}' });
 
 		const result = await captureAsyncCommandIO(() =>
@@ -593,13 +629,50 @@ describe('runUserProjectLauncher', () => {
 					detectProject: () => readyDetection(root),
 					urlResponds: async () => false,
 					findPortHolder: () => null,
-					waitForUrl: async () => false
+					waitForUrlDetailed: async () => ({
+						ok: false,
+						status: 500,
+						errorSummary:
+							"Cannot find module '/p/node_modules/lucide-svelte/dist/icons/index' imported from /p/node_modules/lucide-svelte/dist/lucide-svelte.js"
+					}),
+					readProjectDevLogTail: () => [
+						'[vite] ready in 326 ms',
+						'[vite] (ssr) Error when evaluating SSR module /src/routes/+layout.svelte'
+					]
+				})
+			})
+		);
+
+		expect(result.logs[0]).toContain('Project dev: failed: HTTP 500 after 30s');
+		expect(result.logs[0]).toContain('Project dev error:');
+		expect(result.logs[0]).toContain('Cannot find module');
+		expect(result.logs[0]).toContain('Project dev log tail:');
+		expect(result.logs[0]).toContain('[vite] ready in 326 ms');
+		expect(result.logs[0]).toContain('Project dev log: ');
+		expect(result.logs[0]).not.toContain('dev=');
+	});
+
+	test('reports transport error when the dev server never binds the port', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => false,
+					findPortHolder: () => null,
+					waitForUrlDetailed: async () => ({
+						ok: false,
+						transportError: 'fetch failed: ECONNREFUSED 127.0.0.1:5173'
+					})
 				})
 			})
 		);
 
 		expect(result.logs[0]).toContain(
-			'Project dev: skipped (dev server did not respond within 30s)'
+			'Project dev: failed: no response after 30s (fetch failed: ECONNREFUSED 127.0.0.1:5173)'
 		);
 		expect(result.logs[0]).not.toContain('dev=');
 	});

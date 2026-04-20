@@ -1,6 +1,6 @@
 # DryUI
 
-> 160 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -325,15 +325,6 @@ Data attributes: data-disabled (Present when the component or part is disabled.)
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example: <PhoneInput bind:value={phone} defaultCountry="US" placeholder="(555) 123-4567" />
 
-### CountrySelect
-Country selector dropdown with flags and dial codes.
-Import: @dryui/ui
-Subpath import: @dryui/ui/country-select
-Props: value (string), Current controlled or bindable value., default '', bindable | regions (string[]) | showDialCode (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | placeholder (string), Hint text shown when no value is selected or entered., default 'Select country' | name (string), Field name used during native form submission. | onchange ((code: string) => void) | children (Snippet), Content rendered inside the component.
-Data attributes: data-country-select-wrapper | data-dial-code | data-disabled (Present when the component or part is disabled.) | data-flag | data-highlighted | data-part | data-state
-Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
-Example: <CountrySelect bind:value={country} placeholder="Select country" />
-
 ### DateTimeInput
 Combined date and time input with locale-aware segments.
 Import: @dryui/ui
@@ -436,8 +427,8 @@ Searchable text input with filterable dropdown suggestions.
 Import: @dryui/ui
 Subpath import: @dryui/ui/combobox
 Parts: Root, Input, Content, Item, Empty, Group
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (string), Current controlled or bindable value., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Input: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | index (number), required | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (string), Current controlled or bindable value., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Input: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | leading (Snippet) | trailing (Snippet) | placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | index (number), required | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
+Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-has-icon | data-has-leading | data-has-trailing | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <Combobox.Root bind:value={selectedFramework} name="framework">
 

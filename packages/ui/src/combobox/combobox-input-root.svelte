@@ -26,6 +26,7 @@
 	let inputValue = $state('');
 	let activeIndex = $state(-1);
 	let inputEl = $state<HTMLInputElement | null>(null);
+	let triggerEl = $state<HTMLElement | null>(null);
 
 	setComboboxCtx({
 		get open() {
@@ -53,6 +54,12 @@
 		},
 		set inputEl(element: HTMLInputElement | null) {
 			inputEl = element;
+		},
+		get triggerEl() {
+			return triggerEl;
+		},
+		set triggerEl(element: HTMLElement | null) {
+			triggerEl = element;
 		},
 		show() {
 			if (!disabled) open = true;
@@ -93,6 +100,7 @@
 	[data-combobox-wrapper] {
 		container-type: inline-size;
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		position: relative;
 	}
 </style>

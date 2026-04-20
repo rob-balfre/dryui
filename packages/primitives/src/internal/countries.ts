@@ -395,11 +395,3 @@ export const COUNTRY_DATA: CountryInfo[] = [
 		region: 'Asia'
 	}
 ];
-
-export function filterCountriesByRegions(countries: CountryInfo[], regions?: string[]) {
-	if (regions === undefined) {
-		return countries;
-	}
-
-	return countries.filter((country) => regions.includes(country.region));
-}

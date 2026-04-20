@@ -29,6 +29,7 @@ export interface InstallContext {
 	cwd: string;
 	homeDir?: string;
 	runDegit?: (target: string) => DegitOutcome;
+	includeSvelteMcp?: boolean;
 }
 
 export interface InstallResult {
@@ -49,6 +50,14 @@ const NPX_DRYUI_FEEDBACK_MCP = {
 	command: 'npx',
 	args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
 } as const;
+const NPX_SVELTE_MCP = { command: 'npx', args: ['-y', '@sveltejs/mcp'] } as const;
+
+function maybeSvelte<T>(
+	ctx: InstallContext,
+	build: () => T
+): { svelte: T } | Record<string, never> {
+	return ctx.includeSvelteMcp ? { svelte: build() } : {};
+}
 
 function defaultRunDegit(target: string): DegitOutcome {
 	const result = spawnSync('npx', ['-y', 'degit', '--force', SKILL_SOURCE, target], {
@@ -186,14 +195,58 @@ function finalize(editor: SetupGuideId, steps: InstallStepResult[]): InstallResu
 	};
 }
 
+interface EditorMcpConfig {
+	containerKey: string;
+	configPath: (ctx: InstallContext) => string;
+	label: (configPath: string) => string;
+}
+
+const EDITOR_MCP_CONFIG: Partial<Record<SetupGuideId, EditorMcpConfig>> = {
+	copilot: {
+		containerKey: 'servers',
+		configPath: (ctx) => join(ctx.cwd, '.vscode/mcp.json'),
+		label: () => 'Update .vscode/mcp.json'
+	},
+	cursor: {
+		containerKey: 'mcpServers',
+		configPath: (ctx) => join(ctx.cwd, '.cursor/mcp.json'),
+		label: () => 'Update .cursor/mcp.json'
+	},
+	opencode: {
+		containerKey: 'mcp',
+		configPath: (ctx) => join(ctx.cwd, 'opencode.json'),
+		label: () => 'Update opencode.json'
+	},
+	windsurf: {
+		containerKey: 'mcpServers',
+		configPath: (ctx) => join(ctx.homeDir ?? homedir(), '.codeium/windsurf/mcp_config.json'),
+		label: () => 'Update ~/.codeium/windsurf/mcp_config.json'
+	},
+	zed: {
+		containerKey: 'context_servers',
+		configPath: (ctx) => join(ctx.homeDir ?? homedir(), '.config/zed/settings.json'),
+		label: () => 'Update ~/.config/zed/settings.json'
+	}
+};
+
+function editorMcpParams(
+	editor: SetupGuideId,
+	ctx: InstallContext
+): Pick<MergeServersOptions, 'path' | 'containerKey' | 'label'> {
+	const config = EDITOR_MCP_CONFIG[editor]!;
+	const path = config.configPath(ctx);
+	return { path, containerKey: config.containerKey, label: config.label(path) };
+}
+
 function copilotInstaller(ctx: InstallContext): InstallResult {
 	const runDegit = ctx.runDegit ?? defaultRunDegit;
 	const skill = copySkill(join(ctx.cwd, '.github/skills/dryui'), runDegit);
 	const config = mergeServersConfig({
-		path: join(ctx.cwd, '.vscode/mcp.json'),
-		containerKey: 'servers',
-		servers: { dryui: { type: 'stdio', ...NPX_DRYUI_MCP } },
-		label: 'Update .vscode/mcp.json'
+		...editorMcpParams('copilot', ctx),
+		servers: {
+			dryui: { type: 'stdio', ...NPX_DRYUI_MCP },
+			...maybeSvelte(ctx, () => ({ type: 'stdio', ...NPX_SVELTE_MCP }))
+		}
 	});
 	return finalize('copilot', [skill, config]);
 }
@@ -202,10 +255,11 @@ function cursorInstaller(ctx: InstallContext): InstallResult {
 	const runDegit = ctx.runDegit ?? defaultRunDegit;
 	const skill = copySkill(join(ctx.cwd, '.agents/skills/dryui'), runDegit);
 	const config = mergeServersConfig({
-		path: join(ctx.cwd, '.cursor/mcp.json'),
-		containerKey: 'mcpServers',
-		servers: { dryui: NPX_DRYUI_MCP },
-		label: 'Update .cursor/mcp.json'
+		...editorMcpParams('cursor', ctx),
+		servers: {
+			dryui: NPX_DRYUI_MCP,
+			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
+		}
 	});
 	return finalize('cursor', [skill, config]);
 }
@@ -214,41 +268,44 @@ function opencodeInstaller(ctx: InstallContext): InstallResult {
 	const runDegit = ctx.runDegit ?? defaultRunDegit;
 	const skill = copySkill(join(ctx.cwd, '.opencode/skills/dryui'), runDegit);
 	const config = mergeServersConfig({
-		path: join(ctx.cwd, 'opencode.json'),
-		containerKey: 'mcp',
+		...editorMcpParams('opencode', ctx),
 		servers: {
 			dryui: { type: 'local', command: ['npx', '-y', '@dryui/mcp'] },
 			'dryui-feedback': {
 				type: 'local',
 				command: ['npx', '-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
-			}
+			},
+			...maybeSvelte(ctx, () => ({
+				type: 'local',
+				command: ['npx', '-y', '@sveltejs/mcp']
+			}))
 		},
-		defaultRoot: { $schema: 'https://opencode.ai/config.json' },
-		label: 'Update opencode.json'
+		defaultRoot: { $schema: 'https://opencode.ai/config.json' }
 	});
 	return finalize('opencode', [skill, config]);
 }
 
 function windsurfInstaller(ctx: InstallContext): InstallResult {
 	const runDegit = ctx.runDegit ?? defaultRunDegit;
-	const home = ctx.homeDir ?? homedir();
 	const skill = copySkill(join(ctx.cwd, '.agents/skills/dryui'), runDegit);
 	const config = mergeServersConfig({
-		path: join(home, '.codeium/windsurf/mcp_config.json'),
-		containerKey: 'mcpServers',
-		servers: { dryui: NPX_DRYUI_MCP, 'dryui-feedback': NPX_DRYUI_FEEDBACK_MCP },
-		label: 'Update ~/.codeium/windsurf/mcp_config.json'
+		...editorMcpParams('windsurf', ctx),
+		servers: {
+			dryui: NPX_DRYUI_MCP,
+			'dryui-feedback': NPX_DRYUI_FEEDBACK_MCP,
+			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
+		}
 	});
 	return finalize('windsurf', [skill, config]);
 }
 
 function zedInstaller(ctx: InstallContext): InstallResult {
-	const home = ctx.homeDir ?? homedir();
 	const config = mergeServersConfig({
-		path: join(home, '.config/zed/settings.json'),
-		containerKey: 'context_servers',
-		servers: { dryui: { command: { path: 'npx', args: ['-y', '@dryui/mcp'] } } },
-		label: 'Update ~/.config/zed/settings.json'
+		...editorMcpParams('zed', ctx),
+		servers: {
+			dryui: { command: { path: 'npx', args: ['-y', '@dryui/mcp'] } },
+			...maybeSvelte(ctx, () => ({ command: { path: 'npx', args: ['-y', '@sveltejs/mcp'] } }))
+		}
 	});
 	return finalize('zed', [config]);
 }
@@ -277,34 +334,85 @@ export function runEditorInstall(id: SetupGuideId, ctx: InstallContext): Install
 
 export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): readonly string[] {
 	const home = ctx.homeDir ?? homedir();
+	const svelteSuffix = ctx.includeSvelteMcp ? ' + svelte' : '';
 	switch (id) {
 		case 'copilot':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.github/skills/dryui'))}`,
-				`• Merge dryui server into ${homeRelative(join(ctx.cwd, '.vscode/mcp.json'))}`
+				`• Merge dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.vscode/mcp.json'))}`
 			];
 		case 'cursor':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.agents/skills/dryui'))}`,
-				`• Merge dryui server into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
+				`• Merge dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
 			];
 		case 'opencode':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.opencode/skills/dryui'))}`,
-				`• Merge dryui + dryui-feedback servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
+				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
 			];
 		case 'windsurf':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.agents/skills/dryui'))}`,
-				`• Merge dryui + dryui-feedback into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
+				`• Merge dryui + dryui-feedback${svelteSuffix} into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
 			];
 		case 'zed':
 			return [
-				`• Merge dryui context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
+				`• Merge dryui${svelteSuffix} context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
 			];
 		default:
 			return [];
 	}
+}
+
+interface SvelteMcpRegistration {
+	editor: SetupGuideId;
+	configPath: string;
+	status: 'registered' | 'not-registered' | 'missing' | 'invalid';
+}
+
+function probeSvelteInConfig(
+	editor: SetupGuideId,
+	config: EditorMcpConfig,
+	ctx: InstallContext
+): SvelteMcpRegistration {
+	const configPath = config.configPath(ctx);
+	let raw: string;
+	try {
+		raw = readFileSync(configPath, 'utf-8').trim();
+	} catch {
+		return { editor, configPath, status: 'missing' };
+	}
+	if (!raw) return { editor, configPath, status: 'missing' };
+	try {
+		const parsed = JSON.parse(raw) as Record<string, unknown>;
+		const container = parsed[config.containerKey];
+		if (!container || typeof container !== 'object' || Array.isArray(container)) {
+			return { editor, configPath, status: 'not-registered' };
+		}
+		const registered = 'svelte' in (container as Record<string, unknown>);
+		return { editor, configPath, status: registered ? 'registered' : 'not-registered' };
+	} catch {
+		return { editor, configPath, status: 'invalid' };
+	}
+}
+
+export function readSvelteMcpRegistrations(ctx: InstallContext): readonly SvelteMcpRegistration[] {
+	const entries: SvelteMcpRegistration[] = [];
+	for (const [editor, config] of Object.entries(EDITOR_MCP_CONFIG) as Array<
+		[SetupGuideId, EditorMcpConfig]
+	>) {
+		entries.push(probeSvelteInConfig(editor, config, ctx));
+	}
+	return entries;
+}
+
+export function summarizeSvelteMcpStatus(ctx: InstallContext): string {
+	const registrations = readSvelteMcpRegistrations(ctx);
+	const registered = registrations.filter((entry) => entry.status === 'registered');
+	if (registered.length === 0) return 'svelte-mcp: not registered in any wired editor';
+	const names = registered.map((entry) => entry.editor).join(', ');
+	return `svelte-mcp: registered for ${names}`;
 }
 
 export function formatInstallResult(result: InstallResult): string {
