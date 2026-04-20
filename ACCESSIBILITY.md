@@ -4,9 +4,9 @@ DryUI targets WCAG 2.2 AA across the core interactive component surface.
 
 This repository does not make a library-wide AAA claim. AAA remains a useful stretch target for individual experiences, but it is not the baseline standard for the component library as a whole.
 
-For custom widgets, APG-aligned semantics and keyboard behavior are required. That includes truthful roles and states, predictable focus management, and keyboard interaction that matches the established widget pattern instead of a DryUI-specific variant.
+For custom widgets, APG-aligned semantics and keyboard behaviour are required. That includes truthful roles and states, predictable focus management, and keyboard interaction that matches the established widget pattern instead of a DryUI-specific variant.
 
-## What "AA-ready" Means Here
+## What AA-ready Means Here
 
 A component is only considered AA-ready in this repository when:
 
@@ -18,12 +18,19 @@ A component is only considered AA-ready in this repository when:
 
 ## Verification
 
-Accessibility regressions are expected to be caught by code review and automated checks together:
+Accessibility regressions should be caught by review and automation together:
 
 - `tests/browser/a11y-*.browser.test.ts` covers widget-specific semantic and keyboard regressions
 - `bun run test:browser` is part of the pull-request validation workflow
 - `bun run --filter '@dryui/ui' build` remains required after editing `.svelte` files in `packages/ui/`
 - generated component metadata in `packages/mcp/src/spec.json` must include explicit a11y guidance for every exported component surface
+
+## Contributor Checklist
+
+- Add or update a browser test when interactive behaviour, keyboard handling, or semantics change.
+- Keep accessible labels, descriptions, and error associations explicit.
+- Prefer native semantics where possible; only ship custom widget roles when the full pattern is implemented.
+- Treat motion and transient feedback as accessibility concerns, not just visual polish.
 
 ## Scope Notes
 
