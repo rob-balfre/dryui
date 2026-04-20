@@ -1,47 +1,41 @@
 # AGENTS.md
 
-Instructions for all AI coding agents working in this repository.
+Repo-wide instructions for AI coding agents working in this repository.
 
-## Tools
+## Canonical Docs
 
-Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
+- Public overview: [`README.md`](./README.md)
+- Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
+- CSS discipline: [`docs/policies/css-discipline.md`](./docs/policies/css-discipline.md)
+- Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
+- Release flow: [`RELEASING.md`](./RELEASING.md)
 
-## Compatibility
+## Canonical Sources
 
-DryUI is currently pre-alpha. Do not optimize for legacy compatibility or upgrade-path preservation unless a task explicitly asks for it.
+- Editor install snippets and MCP config examples live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts). Do not duplicate them elsewhere.
+- Skill sources live in:
+  - [`packages/ui/skills/dryui/`](./packages/ui/skills/dryui/)
+  - [`packages/feedback/skills/live-feedback/`](./packages/feedback/skills/live-feedback/)
+  - [`packages/cli/skills/init/`](./packages/cli/skills/init/)
+- Sync generated skill copies with `bun run sync:skills`. Do not edit `packages/plugin/skills/` or `.cursor/rules/` directly.
+- The local plugin source is [`packages/plugin`](./packages/plugin). `/plugins` refers to the in-app Codex or Claude install flow, not a repo directory.
 
-## Setup
+## Repo Rules
 
-Use the DryUI CLI as the entry point for working with the library. Add the skill and MCP server after that when you want the same lookup and validation loop inside your editor.
+- Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
+- DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
+- Use the DryUI CLI as the default entry point:
 
 ```bash
 bun install -g @dryui/cli@latest
 dryui
 ```
 
-Per-tool install snippets, config file paths, and MCP JSON/TOML blobs for every supported client (Claude Code, Codex, Gemini CLI, OpenCode, Cursor, Windsurf, Copilot, Zed) live in [`apps/docs/src/lib/ai-setup.ts`](apps/docs/src/lib/ai-setup.ts) — the canonical source rendered to the docs [getting-started page](https://dryui.dev/getting-started). Don't duplicate those snippets here; update `ai-setup.ts` instead.
-
-Codex (the primary AGENTS.md audience) canonical install:
-
-```bash
-bun install -g @dryui/cli@latest
-dryui
-codex marketplace add rob-balfre/dryui
-```
-
-Then start `codex`, run `/plugins`, and install `DryUI`. Inside this repo, use the local plugin from `/plugins` rather than copying skills into `.codex/skills`.
-
-The plugin is the canonical way Claude Code, Codex, and Gemini CLI get DryUI skills. OpenCode uses its native `.opencode/skills/` + `opencode.json` path. Manual MCP config is only for tools that do not support skills or plugins natively.
-
-## CSS Rules
-
-See [CLAUDE.md § CSS Discipline](./CLAUDE.md#css-discipline) for the full list. Violations are enforced by `@dryui/lint` (a Svelte preprocessor that runs during dev and build) and break the build.
-
-## Releasing
-
-Canonical release and npm-auth guidance lives in [`RELEASING.md`](./RELEASING.md). Release automation versions, publishes, and tags directly from pushes to `main`. Keep workflow changes there instead of duplicating them in agent-facing docs.
+- Keep root-level Markdown durable. One-off audits, scratch TODOs, and generated reports belong under `docs/`, `reports/`, or ignored local directories, not the repo root.
+- Repo-local editor install output such as `.agents/skills/`, `.github/skills/`, `.opencode/`, and `opencode.json` is not canonical source.
 
 ## Verification
 
-Always run `bun run --filter '@dryui/ui' build` after editing `.svelte` files in `packages/ui/`. The lint preprocessor runs during build and will reject violations.
-Prefer the root docs wrappers for docs work so local runs match CI: `bun run docs`, `bun run docs:build`, `bun run docs:check`, and `bun run build:docs`.
+- After editing `.svelte` files in `packages/ui/`, run `bun run --filter '@dryui/ui' build`.
+- For docs work, prefer the root wrappers so local runs match CI: `bun run docs`, `bun run docs:build`, `bun run docs:check`, and `bun run build:docs`.
+- After changing skill content or setup guidance, run `bun run sync:skills`.

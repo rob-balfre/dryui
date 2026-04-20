@@ -32,7 +32,7 @@ For one-off package publishing, use:
 bun run scripts/publish.ts <package-dir> [--otp <code>] [--dry-run]
 ```
 
-## npm auth gotcha
+## Maintainer Note: npm auth
 
 There is a gitignored project-level `.npmrc` at the repo root. It takes precedence over `~/.npmrc` when publish commands run from inside the repository.
 
