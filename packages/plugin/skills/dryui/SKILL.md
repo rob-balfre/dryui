@@ -85,6 +85,19 @@ The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero i
 
 The test: grep your output for `display: flex`, `style=`, `@media` — all should return nothing.
 
+## 4A. Escape Hatches Mean Stop.
+
+**If lint or the compiler pushes you toward an escape hatch, the structure is usually wrong.**
+
+- Never add `:global()`, `!important`, `all: unset`, `<svelte:element>`, or `<!-- svelte-ignore ... -->` just to make a selector or warning go away
+- Never add `width`, `min-width`, `max-width`, `inline-size`, `min-inline-size`, or `max-inline-size` to solve layout pressure
+- Never use raw native elements outside their canonical DryUI component directories just because composition feels inconvenient
+- Never pass `class=` to DryUI components expecting it to style their internals; use wrapper elements, component props, `data-*` attributes, or `--dry-*` tokens instead
+- When blocked, restructure the markup instead: add a local wrapper, split explicit `{#if}` branches, move sizing to parent grid tracks, or promote the pattern into the canonical component where the raw element belongs
+- Treat `dryui/no-global`, `dryui/no-important`, `dryui/no-width`, `dryui/no-raw-native-element`, `dryui/no-css-ignore`, and `dryui/no-svelte-element` as design feedback, not obstacles to suppress
+
+The test: grep your output for `:global(`, `!important`, `all: unset`, `svelte-ignore`, `svelte:element`, raw `<button`, raw `<input`, raw `<select`, raw `<dialog`, raw `<hr`, raw `<table`, and `width:` — all should return nothing unless you are editing the canonical component that owns that native element.
+
 ## 5. Every Input Gets a Field.Root
 
 **Accessibility isn't optional.**
