@@ -13,6 +13,24 @@ const root = new URL('../', import.meta.url).pathname;
 const start = performance.now();
 const skipTests = process.argv.includes('--no-test');
 
+async function gitStatus(): Promise<string> {
+	const proc = Bun.spawn(['git', 'status', '--porcelain'], {
+		cwd: root,
+		stdin: 'ignore',
+		stdout: 'pipe',
+		stderr: 'inherit'
+	});
+	const out = await new Response(proc.stdout).text();
+	const code = await proc.exited;
+	if (code !== 0) {
+		console.error(`\n✗ git status failed (exit ${code})`);
+		process.exit(code);
+	}
+	return out;
+}
+
+const dirtyBefore = await gitStatus();
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 type TaskResult = { name: string; ms: number };
@@ -105,6 +123,22 @@ await parallel(
 	run('check:contract', 'bun run check:contract'),
 	run('check:docs:llms', 'bun run check:docs:llms')
 );
+
+// ── Drift guard ─────────────────────────────────────────────────────────────
+// Catch files the pipeline regenerated that aren't committed. Release refuses
+// to run with a dirty worktree, so surfacing drift here (not just on CI) means
+// contributors see it locally before pushing.
+
+const dirtyAfter = await gitStatus();
+if (dirtyAfter !== dirtyBefore) {
+	const beforeLines = new Set(dirtyBefore.split('\n').filter(Boolean));
+	const newlyDirty = dirtyAfter.split('\n').filter((line) => line && !beforeLines.has(line));
+	if (newlyDirty.length > 0) {
+		console.error('\n✗ validate dirtied the worktree. Commit these regenerated files:');
+		for (const line of newlyDirty) console.error(`  ${line}`);
+		process.exit(1);
+	}
+}
 
 // ── Summary ─────────────────────────────────────────────────────────────────
 
