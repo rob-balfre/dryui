@@ -128,12 +128,7 @@
 <style>
 	[data-reveal] {
 		--dry-reveal-distance: var(--dry-motion-distance-sm, 0.75rem);
-		/* If Reveal is inside a [data-dry-stagger] parent, inherit the
-		   stagger delay the utility computed for this child (from its
-		   `:nth-child()` position or a custom `--dry-index`). Explicit
-		   `delay` prop usage still wins because `applyStyles` sets
-		   `--dry-reveal-delay` inline. */
-		--dry-reveal-delay: var(--_dry-stagger-delay, 0ms);
+		--dry-reveal-delay: var(--dry-stagger-delay, 0ms);
 		--dry-reveal-duration: var(--dry-duration-entrance, 480ms);
 		--dry-reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
 		--dry-reveal-hidden-opacity: var(--dry-motion-opacity-enter, 0);

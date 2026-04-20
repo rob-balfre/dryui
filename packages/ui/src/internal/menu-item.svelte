@@ -63,10 +63,6 @@
 		color: var(--dry-color-text-strong);
 		min-height: var(--dry-space-11);
 
-		/* `background` reacts to hover; `opacity`/`transform` give the
-		   stagger utility (applied on parent `[data-dry-stagger]`
-		   wrappers in dropdown-menu, context-menu, and menubar) something
-		   to delay on enter. */
 		transition:
 			background var(--dry-duration-fast) var(--dry-ease-default),
 			opacity var(--dry-duration-fast) var(--dry-ease-out),
