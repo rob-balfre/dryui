@@ -61,7 +61,6 @@
 		--dry-toast-accent: var(--dry-color-fill-info);
 		--dry-radius-nested: max(0px, calc(var(--dry-radius-lg) - var(--dry-space-4)));
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		position: relative;
 		background: var(--dry-toast-bg, var(--dry-color-bg-overlay));

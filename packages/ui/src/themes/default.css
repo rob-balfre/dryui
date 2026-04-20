@@ -512,19 +512,16 @@ samp {
 	}
 }
 
-/* Stagger — per-child transition-delay driven by `--dry-index`.
-   Consumers set `--dry-index` on each child (via `style="--dry-index: {i};"`
-   in a Svelte `{#each}`), or rely on the `:nth-child()` fallback below for
-   user-supplied children (e.g. `<slot />` content). The child must have a
-   `transition` declared on its enter properties (opacity/transform) for
-   `transition-delay` to take effect. */
+/* Stagger — per-child transition-delay driven by `--dry-index`. The first
+   12 children get `--dry-index` automatically via `:nth-child()`; for longer
+   lists set `--dry-index` on each child. The child must declare a
+   `transition` on its enter properties for the delay to have effect. */
 [data-dry-stagger] > * {
-	--_dry-index: var(--dry-index, 0);
-	--_dry-stagger-delay: calc(
-		min(var(--_dry-index), var(--dry-stagger-max)) * var(--dry-stagger-step)
+	--dry-stagger-delay: calc(
+		min(var(--dry-index, 0), var(--dry-stagger-max)) * var(--dry-stagger-step)
 	);
-	transition-delay: var(--_dry-stagger-delay);
-	animation-delay: var(--_dry-stagger-delay);
+	transition-delay: var(--dry-stagger-delay);
+	animation-delay: var(--dry-stagger-delay);
 }
 
 [data-dry-stagger] > *:nth-child(1) {
@@ -566,19 +563,15 @@ samp {
 
 @media (prefers-reduced-motion: reduce) {
 	[data-dry-stagger] > * {
-		transition-delay: 0ms;
-		animation-delay: 0ms;
+		transition: none;
+		animation: none;
 	}
 }
 
-/* Utility: apply tabular-nums to live/changing numeric displays. Prefer
-   component-scoped CSS; use this class when a number is rendered directly
-   in a template (e.g. inline stats). */
 .dry-tabular-nums {
 	font-variant-numeric: tabular-nums;
 }
 
-/* Icon reveal — opacity/scale/blur, spring */
 [data-dry-icon-reveal] {
 	transition:
 		opacity var(--dry-duration-fast) var(--dry-ease-spring-snappy),

@@ -72,8 +72,6 @@
 		color: var(--dry-color-text-strong);
 		min-height: var(--dry-space-11);
 
-		/* Enter transition so the stagger utility on
-		   [data-command-palette-list][data-dry-stagger] can delay it. */
 		transition:
 			opacity var(--dry-duration-fast) var(--dry-ease-out),
 			transform var(--dry-duration-fast) var(--dry-ease-out);

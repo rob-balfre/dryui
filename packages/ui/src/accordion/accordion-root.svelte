@@ -47,13 +47,6 @@
 	});
 </script>
 
-<!--
-	`data-dry-stagger` staggers the enter animation of the accordion items
-	using the shared utility in `themes/default.css`. Item ordering is
-	derived from `:nth-child()` — consumers can override by setting
-	`--dry-index` directly on an `<AccordionItem>` if they render items
-	in a non-DOM order.
--->
 <div data-accordion data-dry-stagger data-orientation={orientation} class={className} {...rest}>
 	{@render children()}
 </div>

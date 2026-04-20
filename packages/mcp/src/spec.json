@@ -453,7 +453,6 @@
         "--dry-card-radius": "Border radius",
         "--dry-card-selected-ring-color": "Selected Ring Color",
         "--dry-card-shadow": "Box shadow",
-        "--dry-radius-inner": "Inner",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
@@ -1290,7 +1289,6 @@
         "--dry-popover-padding": "Padding",
         "--dry-popover-radius": "Border radius",
         "--dry-popover-shadow": "Box shadow",
-        "--dry-radius-inner": "Inner",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
@@ -1620,7 +1618,6 @@
       "cssVars": {
         "--dry-btn-radius": "Border radius",
         "--dry-menu-item-padding": "Item Padding",
-        "--dry-radius-inner": "Inner",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
@@ -9119,7 +9116,6 @@
         "--dry-alert-border": "Border color",
         "--dry-alert-icon-color": "Icon Color",
         "--dry-btn-radius": "Border radius",
-        "--dry-radius-inner": "Inner",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
@@ -9322,7 +9318,6 @@
       "cssVars": {
         "--dry-btn-font-size": "Font size",
         "--dry-btn-radius": "Border radius",
-        "--dry-radius-inner": "Inner",
         "--dry-radius-nested": "Nested",
         "--dry-toast-accent": "Accent",
         "--dry-toast-action-hover-bg": "Action Hover Bg",
@@ -12632,22 +12627,7 @@
           "name": "data-clipboard"
         },
         {
-          "name": "data-clipboard-button"
-        },
-        {
-          "name": "data-clipboard-icon-stack"
-        },
-        {
           "name": "data-copied"
-        },
-        {
-          "name": "data-dry-icon-reveal"
-        },
-        {
-          "name": "data-hidden"
-        },
-        {
-          "name": "data-state"
         }
       ],
       "example": "<Clipboard>Content</Clipboard>"
@@ -12838,9 +12818,6 @@
         "--dry-reveal-offset-y": "Offset Y"
       },
       "dataAttributes": [
-        {
-          "name": "data-dry-stagger"
-        },
         {
           "name": "data-reduced-motion"
         },

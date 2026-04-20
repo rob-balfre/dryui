@@ -62,7 +62,6 @@
 		--dry-popover-padding: var(--dry-space-4);
 		--dry-radius-nested: max(0px, calc(var(--dry-popover-radius) - var(--dry-popover-padding)));
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		inset: unset;
 		margin: 0;
