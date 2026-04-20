@@ -644,8 +644,7 @@
 		gap: var(--dry-space-3);
 	}
 
-	.workflow-column-copy,
-	.workflow-item-copy {
+	.workflow-column-copy {
 		display: grid;
 		gap: var(--dry-space-1);
 	}
