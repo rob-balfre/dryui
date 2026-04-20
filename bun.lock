@@ -130,7 +130,7 @@
     },
     "packages/primitives": {
       "name": "@dryui/primitives",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.3",
@@ -164,9 +164,9 @@
     },
     "packages/ui": {
       "name": "@dryui/ui",
-      "version": "1.5.0",
+      "version": "1.5.1",
       "dependencies": {
-        "@dryui/primitives": "^1.5.0",
+        "@dryui/primitives": "^1.5.1",
       },
       "devDependencies": {
         "@dryui/lint": "workspace:*",
