@@ -1,6 +1,7 @@
 import { sep, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { KEEPALIVE_INTERVAL_MS } from './config.js';
+import { getDispatchTargetsSnapshot, type DispatcherOptions } from './dispatch.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
 import type {
@@ -183,7 +184,7 @@ function createEventStream(
 export function startFeedbackHttpServer(
 	store: FeedbackStore,
 	bus: EventBus,
-	options: { port: number; host: string }
+	options: { port: number; host: string; dispatcher?: DispatcherOptions }
 ): { stop(): void; hostname: string; port: number } {
 	return Bun.serve({
 		hostname: options.host,
@@ -208,6 +209,17 @@ export function startFeedbackHttpServer(
 
 			if (pathname === '/status' && request.method === 'GET') {
 				return json(bus.counts());
+			}
+
+			if (pathname === '/dispatch-targets' && request.method === 'GET') {
+				if (!options.dispatcher) {
+					return json({
+						defaultAgent: 'codex',
+						configuredAgents: []
+					});
+				}
+
+				return json(getDispatchTargetsSnapshot(options.dispatcher));
 			}
 
 			if (pathname === '/sessions' && request.method === 'POST') {

@@ -58,6 +58,7 @@ function waitForAsyncWork(delay = 20) {
 function setupSubmissionEnvironment(options?: {
 	onCapture?: () => void;
 	submissionResponse?: Response;
+	dispatchTargetsResponse?: Response;
 }) {
 	const originalMediaDevices = navigator.mediaDevices;
 	const originalSetPointerCapture = (
@@ -87,6 +88,31 @@ function setupSubmissionEnvironment(options?: {
 		}
 		if (url.includes('/drawings?') && init?.method === 'PUT') {
 			return new Response(null, { status: 204 });
+		}
+		if (url.endsWith('/dispatch-targets') && (!init?.method || init.method === 'GET')) {
+			return (
+				options?.dispatchTargetsResponse ??
+				new Response(
+					JSON.stringify({
+						defaultAgent: 'codex',
+						configuredAgents: [
+							'claude',
+							'codex',
+							'gemini',
+							'opencode',
+							'copilot',
+							'copilot-vscode',
+							'cursor',
+							'windsurf',
+							'zed'
+						]
+					}),
+					{
+						status: 200,
+						headers: { 'Content-Type': 'application/json' }
+					}
+				)
+			);
 		}
 		if (url.endsWith('/submissions') && init?.method === 'POST') {
 			return (
@@ -259,6 +285,73 @@ describe('feedback overlay hosting', () => {
 			expect(document.body.textContent).toContain('Submission rejected by API');
 			expect(document.querySelector('[aria-label="Sent!"]')).toBeNull();
 			expect(document.querySelector('[aria-label="Send feedback"]')).not.toBeNull();
+		} finally {
+			env.restore();
+		}
+	});
+
+	it('opens a chooser dialog and submits the selected dispatch target', async () => {
+		const env = setupSubmissionEnvironment();
+
+		try {
+			render(Feedback, { serverUrl: 'http://feedback.test' });
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const agentButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Dispatch target: Codex. Click to change."]'
+			);
+			if (!agentButton) throw new Error('Expected dispatch target button');
+
+			agentButton.click();
+			flushSync();
+
+			const chooserOptions = Array.from(
+				document.querySelectorAll<HTMLButtonElement>('.agent-option')
+			).map((button) => button.textContent ?? '');
+
+			expect(chooserOptions.some((text) => text.includes('Copilot CLI'))).toBe(true);
+			expect(chooserOptions.some((text) => text.includes('Copilot VS Code'))).toBe(true);
+
+			const cursorOption = Array.from(
+				document.querySelectorAll<HTMLButtonElement>('.agent-option')
+			).find((button) => button.textContent?.includes('Cursor'));
+			if (!cursorOption) throw new Error('Expected Cursor option in chooser');
+
+			cursorOption.click();
+			flushSync();
+
+			const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
+			if (!drawButton) throw new Error('Expected feedback draw button');
+			drawButton.click();
+			flushSync();
+
+			const canvas = document.querySelector<SVGSVGElement>(
+				'[aria-label="Feedback drawing canvas"]'
+			);
+			if (!canvas) throw new Error('Expected feedback drawing canvas');
+
+			drawStroke(canvas);
+
+			const submitButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Send feedback"]'
+			);
+			if (!submitButton) throw new Error('Expected feedback submit button');
+
+			submitButton.click();
+			await waitForAsyncWork(50);
+			flushSync();
+
+			const submissionCall = env.fetchSpy.mock.calls.find(
+				([input, init]) =>
+					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
+					init?.method === 'POST'
+			);
+
+			expect(submissionCall).toBeDefined();
+			expect(JSON.parse(String(submissionCall?.[1]?.body))).toMatchObject({
+				agent: 'cursor'
+			});
 		} finally {
 			env.restore();
 		}

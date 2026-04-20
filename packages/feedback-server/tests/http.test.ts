@@ -293,4 +293,25 @@ describe('feedback HTTP server', () => {
 		});
 		expect(response.status).toBe(400);
 	});
+
+	test('reports dispatch targets for the launcher picker', async () => {
+		server.stop();
+		server = startFeedbackHttpServer(store, bus, {
+			host: '127.0.0.1',
+			port: 0,
+			dispatcher: {
+				workspace: process.cwd(),
+				defaultAgent: 'codex',
+				terminalApp: 'terminal'
+			}
+		});
+		baseUrl = `http://${server.hostname}:${server.port}`;
+
+		const response = await fetch(`${baseUrl}/dispatch-targets`);
+		expect(response.status).toBe(200);
+		expect(await response.json()).toMatchObject({
+			defaultAgent: 'codex',
+			configuredAgents: expect.any(Array)
+		});
+	});
 });

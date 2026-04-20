@@ -60,7 +60,11 @@ function main(): void {
 
 	const store = new FeedbackStore(dbPath);
 	const bus = new EventBus();
-	const server = startFeedbackHttpServer(store, bus, { host, port });
+	const server = startFeedbackHttpServer(store, bus, {
+		host,
+		port,
+		dispatcher: { workspace, defaultAgent, terminalApp }
+	});
 	const baseUrl = toFeedbackBaseUrl(server.hostname, server.port);
 
 	if (dispatchEnabled) {
