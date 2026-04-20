@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.2.2
+
+### Patch Changes
+
+- [`3ae293a`](https://github.com/rob-balfre/dryui/commit/3ae293a0b691e773b35154caa9b2a915a4c58487) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add `ThemeToggle` component plus `createThemeController` and `themeFlashScript` helpers to `@dryui/ui`. `ThemeToggle` wraps the existing `Toggle` with bundled sun/moon SVG icons, supports Alt-click / Escape to return to system mode, persists the explicit pick under a configurable `storageKey` (default `'dryui-theme'`), and accepts an optional pre-built controller so multiple surfaces can share state. `createThemeController` exposes `mode`, `isDark`, `setMode`, `cycle`, and `reset` for custom triggers, and `themeFlashScript` returns the inline IIFE to embed in `<head>` so the stored preference applies synchronously before first paint.
+
 ## 2.2.1
 
 ### Patch Changes
