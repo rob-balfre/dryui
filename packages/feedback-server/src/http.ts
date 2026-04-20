@@ -1,7 +1,14 @@
 import { sep, isAbsolute, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { KEEPALIVE_INTERVAL_MS } from './config.js';
-import { getDispatchTargetsSnapshot, type DispatcherOptions } from './dispatch.js';
+import {
+	dispatchPrompt,
+	getDispatchTargetsSnapshot,
+	isDispatchPlatformSupported,
+	DISPATCH_AGENTS,
+	type DispatchAgent,
+	type DispatcherOptions
+} from './dispatch.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
 import type {
@@ -220,6 +227,34 @@ export function startFeedbackHttpServer(
 				}
 
 				return json(getDispatchTargetsSnapshot(options.dispatcher));
+			}
+
+			if (pathname === '/dispatch' && request.method === 'POST') {
+				if (!options.dispatcher) {
+					return errorResponse(503, 'Dispatcher not configured');
+				}
+				if (!isDispatchPlatformSupported()) {
+					return errorResponse(503, 'Dispatcher not supported on this platform');
+				}
+
+				let body: { agent?: unknown; prompt?: unknown };
+				try {
+					body = await readJson(request);
+				} catch {
+					return errorResponse(400, 'Invalid JSON');
+				}
+
+				const agent = body.agent;
+				if (typeof agent !== 'string' || !DISPATCH_AGENTS.includes(agent as DispatchAgent)) {
+					return errorResponse(400, 'Invalid agent');
+				}
+				const prompt = body.prompt;
+				if (typeof prompt !== 'string' || prompt.trim().length === 0) {
+					return errorResponse(400, 'Missing prompt');
+				}
+
+				dispatchPrompt(agent as DispatchAgent, prompt, options.dispatcher);
+				return json({ dispatched: true, agent }, 202);
 			}
 
 			if (pathname === '/sessions' && request.method === 'POST') {

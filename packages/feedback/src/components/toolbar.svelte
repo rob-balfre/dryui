@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Dialog } from '@dryui/ui';
+	import { DropdownMenu } from '@dryui/ui';
 	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send, PowerOff } from 'lucide-svelte';
 	import { AGENTS, type SubmissionAgent, type Tool } from '../types.js';
 	import AgentIcon from './agent-icon.svelte';
@@ -35,7 +35,7 @@
 		onsubmit
 	}: Props = $props();
 
-	let agentDialogOpen = $state(false);
+	let agentMenuOpen = $state(false);
 	const FALLBACK_AGENTS = AGENTS.filter(
 		(entry): entry is Exclude<SubmissionAgent, 'off'> => entry !== 'off'
 	);
@@ -44,7 +44,7 @@
 		...(availableAgents.length > 0 ? availableAgents : FALLBACK_AGENTS),
 		'off'
 	]);
-	const dialogTitle = $derived(
+	const menuLabel = $derived(
 		availableAgents.length > 0 ? 'Configured dispatch targets' : 'Dispatch target'
 	);
 
@@ -55,7 +55,7 @@
 	const showSubmitButton = $derived(hasDrawings || submitting || sent);
 
 	function handlePointerDown(e: PointerEvent) {
-		if ((e.target as HTMLElement).closest('button')) return;
+		if ((e.target as HTMLElement).closest('button, [role="menu"], [role="menuitem"]')) return;
 		const toolbar = e.currentTarget as HTMLDivElement;
 		dragging = true;
 		const rect = toolbar.getBoundingClientRect();
@@ -95,7 +95,6 @@
 
 	function chooseAgent(next: SubmissionAgent) {
 		onagentchange(next);
-		agentDialogOpen = false;
 	}
 </script>
 
@@ -159,60 +158,54 @@
 		</button>
 	{/if}
 
-	<Dialog.Root bind:open={agentDialogOpen}>
-		<Dialog.Trigger>
-			<button
-				class="tool-btn agent-btn"
-				data-agent={agent}
-				title={`Dispatch to ${AGENT_META[agent].label} on submit — click to change`}
-				aria-label={`Dispatch target: ${AGENT_META[agent].label}. Click to change.`}
-			>
-				{#if agent === 'off'}
-					<PowerOff size={16} />
-				{:else}
-					<AgentIcon {agent} size={16} />
-				{/if}
-				<span class="agent-label">{AGENT_META[agent].shortLabel}</span>
-			</button>
-		</Dialog.Trigger>
+	<div class="dispatch-menu-wrap">
+		<DropdownMenu.Root bind:open={agentMenuOpen}>
+			<DropdownMenu.Trigger>
+				<button
+					class="tool-btn agent-btn"
+					data-agent={agent}
+					title={`Dispatch to ${AGENT_META[agent].label} on submit. Click to change.`}
+					aria-label={`Dispatch target: ${AGENT_META[agent].label}. Click to change.`}
+				>
+					{#if agent === 'off'}
+						<PowerOff size={16} />
+					{:else}
+						<AgentIcon {agent} size={16} />
+					{/if}
+					<span class="agent-label">{AGENT_META[agent].shortLabel}</span>
+				</button>
+			</DropdownMenu.Trigger>
 
-		<Dialog.Content
-			--dry-dialog-max-width="min(48rem, calc(100vw - 2rem))"
-			--dry-dialog-overflow="visible"
-		>
-			<Dialog.Header>{dialogTitle}</Dialog.Header>
-			<Dialog.Body>
-				<div class="agent-dialog-body">
-					<p class="agent-dialog-copy">
-						Choose where feedback should launch when you submit the next screenshot.
-					</p>
-					<div class="agent-grid" role="list" aria-label="Dispatch targets">
-						{#each chooserAgents as choice (choice)}
-							<button
-								class="agent-option"
-								data-active={choice === agent || undefined}
-								data-mode={AGENT_META[choice].mode}
-								onclick={() => chooseAgent(choice)}
-								type="button"
-							>
-								<div class="agent-option-head">
-									{#if choice === 'off'}
-										<span class="agent-option-icon">
-											<PowerOff size={18} aria-hidden="true" />
-										</span>
-									{:else}
-										<AgentIcon agent={choice} size={18} />
-									{/if}
-									<span class="agent-option-label">{AGENT_META[choice].label}</span>
-								</div>
-								<span class="agent-option-description">{AGENT_META[choice].description}</span>
-							</button>
-						{/each}
-					</div>
-				</div>
-			</Dialog.Body>
-		</Dialog.Content>
-	</Dialog.Root>
+			<DropdownMenu.Content placement="top-end" offset={10}>
+				<DropdownMenu.Label>{menuLabel}</DropdownMenu.Label>
+				{#each chooserAgents as choice (choice)}
+					<DropdownMenu.Item
+						data-agent={choice}
+						data-mode={AGENT_META[choice].mode}
+						data-active={choice === agent || undefined}
+						onclick={() => chooseAgent(choice)}
+					>
+						<span class="agent-menu-icon" data-agent={choice}>
+							{#if choice === 'off'}
+								<PowerOff size={18} aria-hidden="true" />
+							{:else}
+								<AgentIcon agent={choice} size={18} />
+							{/if}
+						</span>
+						<span class="agent-menu-text">
+							<span class="agent-menu-label">{AGENT_META[choice].label}</span>
+							<span class="agent-menu-description">{AGENT_META[choice].description}</span>
+						</span>
+						<span class="agent-menu-check" data-mode={AGENT_META[choice].mode} aria-hidden="true">
+							{#if choice === agent}
+								<Check size={14} />
+							{/if}
+						</span>
+					</DropdownMenu.Item>
+				{/each}
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	</div>
 
 	{#if showSubmitButton}
 		<button
@@ -402,86 +395,86 @@
 		--agent-fg-hover: hsl(220 10% 75%);
 	}
 
-	.agent-dialog-body {
-		display: grid;
-		gap: 0.875rem;
-		container-type: inline-size;
+	.dispatch-menu-wrap {
+		display: contents;
+
+		--dry-menu-bg: hsl(225 15% 15% / 0.98);
+		--dry-menu-border: 1px solid hsl(220 13% 24%);
+		--dry-menu-shadow: 0 8px 32px hsl(0 0% 0% / 0.5);
+		--dry-color-text-strong: hsl(220 12% 92%);
+		--dry-color-fill: hsl(225 14% 22%);
+		--dry-menu-item-padding: 10px 12px;
+		--dry-menu-item-radius: 8px;
 	}
 
-	.agent-dialog-copy {
-		margin: 0;
-		font-size: 0.95rem;
-		color: hsl(220 10% 74%);
-	}
-
-	.agent-grid {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 0.75rem;
-	}
-
-	.agent-option {
-		display: grid;
-		gap: 0.5rem;
-		padding: 0.875rem;
-		border: 1px solid hsl(220 13% 24%);
-		border-radius: 14px;
-		background: hsl(225 14% 12%);
-		color: hsl(220 12% 90%);
-		text-align: left;
-		cursor: pointer;
-		transition:
-			border-color 0.15s ease,
-			background 0.15s ease,
-			transform 0.15s ease;
-	}
-
-	.agent-option:hover {
-		background: hsl(225 14% 16%);
-		border-color: hsl(220 16% 34%);
-		transform: translateY(-1px);
-	}
-
-	.agent-option[data-active] {
-		border-color: hsl(25 100% 55%);
-		background: hsl(225 14% 17%);
-		box-shadow: 0 0 0 1px hsl(25 100% 55% / 0.35);
-	}
-
-	.agent-option[data-mode='off'][data-active] {
-		border-color: hsl(220 10% 55%);
-		box-shadow: 0 0 0 1px hsl(220 10% 55% / 0.35);
-	}
-
-	.agent-option-head {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		justify-content: start;
-		align-items: center;
-		gap: 0.55rem;
-	}
-
-	.agent-option-icon {
+	.agent-menu-icon {
 		display: inline-grid;
 		place-items: center;
-		color: hsl(220 10% 60%);
+		color: hsl(220 10% 70%);
 	}
 
-	.agent-option-label {
-		font-size: 0.95rem;
+	.agent-menu-icon[data-agent='claude'] {
+		color: hsl(25 100% 65%);
+	}
+	.agent-menu-icon[data-agent='codex'] {
+		color: hsl(200 75% 62%);
+	}
+	.agent-menu-icon[data-agent='gemini'] {
+		color: hsl(265 75% 68%);
+	}
+	.agent-menu-icon[data-agent='opencode'] {
+		color: hsl(0 0% 88%);
+	}
+	.agent-menu-icon[data-agent='copilot'] {
+		color: hsl(150 55% 62%);
+	}
+	.agent-menu-icon[data-agent='copilot-vscode'] {
+		color: hsl(210 86% 70%);
+	}
+	.agent-menu-icon[data-agent='cursor'] {
+		color: hsl(208 84% 70%);
+	}
+	.agent-menu-icon[data-agent='windsurf'] {
+		color: hsl(177 69% 71%);
+	}
+	.agent-menu-icon[data-agent='zed'] {
+		color: hsl(0 0% 92%);
+	}
+	.agent-menu-icon[data-agent='off'] {
+		color: hsl(220 10% 55%);
+	}
+
+	.agent-menu-text {
+		display: grid;
+		gap: 2px;
+	}
+
+	.agent-menu-label {
+		font-size: 13px;
 		font-weight: 600;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
 	}
 
-	.agent-option-description {
-		font-size: 0.82rem;
+	.agent-menu-description {
+		font-size: 11px;
 		line-height: 1.35;
-		color: hsl(220 10% 68%);
+		color: hsl(220 10% 66%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
 	}
 
-	@container (max-width: 40rem) {
-		.agent-grid {
-			grid-template-columns: minmax(0, 1fr);
-		}
+	.agent-menu-check {
+		display: inline-grid;
+		place-items: center;
+		color: hsl(25 100% 65%);
+	}
+
+	.agent-menu-check[data-mode='off'] {
+		color: hsl(220 10% 70%);
 	}
 </style>
