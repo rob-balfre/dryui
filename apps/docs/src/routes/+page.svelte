@@ -7,6 +7,7 @@
 		CodeBlock,
 		Diagram,
 		Heading,
+		Hotkey,
 		Marquee,
 		Tabs,
 		Text,
@@ -63,8 +64,11 @@
 	let assistantTypedLen = $state(0);
 	let chromeRevealed = $state(false);
 	let supportingVisible = $state(false);
+	let cinematicSkipped = $state(false);
 	let skipFadeIn = $state(false);
 	let hydrated = $state(false);
+	let cinematicCancelled = false;
+	let cinematicTimers: ReturnType<typeof setTimeout>[] = [];
 
 	function jumpToFinal() {
 		userTypedLen = userMessage.length;
@@ -94,6 +98,22 @@
 		}
 	}
 
+	function clearCinematicPlayback() {
+		cinematicCancelled = true;
+		for (const id of cinematicTimers) clearTimeout(id);
+		cinematicTimers = [];
+	}
+
+	const canSkip = $derived(hydrated && !skipFadeIn && !cinematicSkipped && !supportingVisible);
+
+	function skipCinematic() {
+		if (!canSkip) return;
+		cinematicSkipped = true;
+		clearCinematicPlayback();
+		jumpToFinal();
+		markSeen();
+	}
+
 	onMount(() => {
 		if (shouldSkipCinematic()) {
 			jumpToFinal();
@@ -103,56 +123,53 @@
 		}
 
 		hydrated = true;
-
-		const timers: ReturnType<typeof setTimeout>[] = [];
-		let cancelled = false;
+		cinematicCancelled = false;
+		cinematicTimers = [];
 
 		const wait = (ms: number) =>
 			new Promise<void>((resolve) => {
 				const id = setTimeout(resolve, ms);
-				timers.push(id);
+				cinematicTimers.push(id);
 			});
 
 		const typewriter = (total: number, charDelay: number, setter: (value: number) => void) =>
 			new Promise<void>((resolve) => {
 				let i = 0;
 				const tick = () => {
-					if (cancelled) return resolve();
+					if (cinematicCancelled) return resolve();
 					if (i >= total) return resolve();
 					i += 1;
 					setter(i);
-					timers.push(setTimeout(tick, charDelay));
+					cinematicTimers.push(setTimeout(tick, charDelay));
 				};
 				tick();
 			});
 
 		(async () => {
 			await wait(900);
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			await typewriter(userChars.length, 55, (n) => (userTypedLen = n));
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			await wait(500);
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			assistantVisible = true;
 			assistantThinking = true;
 			await wait(1200);
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			assistantThinking = false;
 			await typewriter(assistantChars.length, 28, (n) => (assistantTypedLen = n));
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			await wait(500);
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			chromeRevealed = true;
 			await wait(800);
-			if (cancelled) return;
+			if (cinematicCancelled) return;
 			supportingVisible = true;
+			cinematicTimers = [];
 			markSeen();
 		})();
 
-		return () => {
-			cancelled = true;
-			for (const id of timers) clearTimeout(id);
-		};
+		return () => clearCinematicPlayback();
 	});
 
 	type CompetitorId = 'figma-make' | 'claude-design' | 'stitch' | 'shadcn' | 'v0';
@@ -364,9 +381,16 @@
 	<title>DryUI - Don't Repeat Yourself.</title>
 </svelte:head>
 
+<Hotkey keys="escape" handler={skipCinematic} enabled={canSkip} />
+
 <div class="page">
 	<div class="page-stack">
-		<section class="hero" class:hero--hydrated={hydrated} class:hero--skip-fade={skipFadeIn}>
+		<section
+			class="hero"
+			class:hero--hydrated={hydrated}
+			class:hero--no-motion={skipFadeIn || cinematicSkipped}
+			class:hero--skip-fade={skipFadeIn}
+		>
 			<div class="hero-main">
 				<div
 					class="hero-lockup hero-reveal"
@@ -383,7 +407,7 @@
 						<AppFrame
 							title={chromeRevealed ? 'agent.chat' : ''}
 							--dry-app-frame-content-padding="var(--dry-space-5)"
-							--dry-app-frame-transition={skipFadeIn ? '0s' : '700ms'}
+							--dry-app-frame-transition={skipFadeIn || cinematicSkipped ? '0s' : '700ms'}
 							--dry-app-frame-bg={chromeRevealed ? 'var(--dry-color-bg-base)' : 'transparent'}
 							--dry-app-frame-border={chromeRevealed
 								? 'var(--dry-color-stroke-weak)'
@@ -489,6 +513,19 @@
 						<GithubIcon size={16} /> GitHub
 					</Button>
 				</nav>
+
+				{#if canSkip}
+					<div class="hero-skip">
+						<Button
+							variant="bare"
+							size="sm"
+							aria-label="Skip intro animation"
+							onclick={skipCinematic}
+						>
+							Skip (or hit esc)
+						</Button>
+					</div>
+				{/if}
 			</div>
 
 			<section
@@ -819,9 +856,9 @@
 		animation: hero-skip-fade 800ms ease-out both;
 	}
 
-	.hero--skip-fade .hero-reveal,
-	.hero--skip-fade .chat-msg,
-	.hero--skip-fade .chat-row[data-role='assistant'] {
+	.hero--no-motion .hero-reveal,
+	.hero--no-motion .chat-msg,
+	.hero--no-motion .chat-row[data-role='assistant'] {
 		transition: none;
 		animation: none;
 	}
@@ -847,6 +884,7 @@
 	}
 
 	.hero-main {
+		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		justify-items: center;
@@ -882,6 +920,34 @@
 		display: grid;
 		grid-template-columns: minmax(0, 52rem);
 		justify-self: center;
+	}
+
+	.hero-skip {
+		position: absolute;
+		inset-inline-start: 50%;
+		inset-block-end: clamp(var(--dry-space-2), 3vh, var(--dry-space-6));
+		transform: translateX(-50%);
+		--dry-btn-bg: color-mix(in srgb, var(--dry-color-bg-base) 72%, transparent);
+		--dry-btn-color: var(--dry-color-text-weak);
+		--dry-btn-border: color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		--dry-btn-radius: var(--dry-radius-full);
+		--dry-btn-padding-x: var(--dry-space-3);
+		--dry-btn-padding-y: var(--dry-space-1_5);
+		--dry-btn-font-size: 0.75rem;
+		font-weight: 500;
+		line-height: 1;
+		letter-spacing: 0.01em;
+		opacity: 0.72;
+		backdrop-filter: blur(6px);
+		transition: opacity 120ms ease;
+	}
+
+	.hero-skip:hover,
+	.hero-skip:focus-within {
+		opacity: 1;
+		--dry-btn-color: var(--dry-color-text-strong);
+		--dry-btn-border: color-mix(in srgb, var(--dry-color-stroke-brand) 45%, transparent);
+		--dry-btn-bg: color-mix(in srgb, var(--dry-color-bg-raised) 92%, transparent);
 	}
 
 	@container (min-width: 48rem) {

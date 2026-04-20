@@ -18,9 +18,7 @@
 			<span data-part="dot" data-tone="min"></span>
 			<span data-part="dot" data-tone="max"></span>
 		</div>
-		{#if title}
-			<span data-part="title">{title}</span>
-		{/if}
+		<span data-part="title">{title ?? ''}</span>
 		{#if actions}
 			<div data-part="actions">
 				{@render actions()}
@@ -94,10 +92,19 @@
 	}
 
 	[data-part='title'] {
+		display: block;
 		justify-self: center;
 		color: var(--dry-color-text-weak);
 		font-size: var(--dry-type-small-size, 0.875rem);
 		font-weight: 500;
+		line-height: var(
+			--dry-app-frame-title-line-height,
+			calc(var(--dry-type-small-size, 0.875rem) * 1.2)
+		);
+		min-block-size: var(
+			--dry-app-frame-title-line-height,
+			calc(var(--dry-type-small-size, 0.875rem) * 1.2)
+		);
 		letter-spacing: 0.01em;
 		text-align: center;
 		text-overflow: ellipsis;
