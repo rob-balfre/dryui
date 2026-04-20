@@ -43,10 +43,6 @@ These are on-demand tools, not part of `bun run validate`:
 - `bun run coverage:summary` re-reads existing coverage artifacts and refreshes `coverage/summary/coverage-summary.json` plus `coverage-summary.md`.
 - `bun run coverage:matrix` regenerates `reports/component-coverage-matrix.json` and `.md` from the public component spec plus matching tests and docs surfaces.
 - `bun run test:docs-visual` is the slower docs regression lane for docs shell, representative component pages, and theming or layout changes. It is intentionally not part of `bun run validate` or the fast PR workflow.
-- `bun run bench:visual` checks screenshot runner performance.
-- `bun run audit:dogfood` scans for raw HTML or styling patterns that should use DryUI components.
-- `bun run figma:inventory` exports a Figma file inventory under `docs/research/figma`.
-- `bun run screenshots:components` writes component screenshots to `tmp/component-screenshots/`.
 
 If `bun run coverage:summary` reports missing artifacts, re-run the matching producer command first: `bun run test:coverage:unit` for `coverage/unit/lcov.info` and `bun run test:coverage:browser` for `coverage/browser/coverage-summary.json` plus `coverage/browser/index.html`.
 

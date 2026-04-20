@@ -28,21 +28,10 @@ Terminal Saved Output*.txt
 .opencode/
 opencode.json
 tmp-*.png
-benchmarks/visual-checks/playwright/snapshots/
-benchmarks/visual-checks/playwright/test-results/
-benchmarks/visual-checks/puppeteer/actual.png
-benchmarks/visual-checks/puppeteer/baseline.png
-benchmarks/visual-checks/puppeteer/diff.png
-benchmarks/visual-checks/chromedp/actual.png
-benchmarks/visual-checks/chromedp/baseline.png
-benchmarks/visual-checks/chromedp/diff.png
 tests/browser/__screenshots__/
 tmp/
 # Generated analysis artifacts live here when scripts are run locally.
 reports/architecture-audit.md
-reports/code-viz.graph.json
-reports/code-viz.html
-reports/code-viz.md
 
 # Local scratch dirs — ignore contents but keep the top-level README so future
 # contributors can see what each one is for. Git refuses to un-ignore files
