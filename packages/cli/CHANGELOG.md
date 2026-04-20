@@ -1,5 +1,25 @@
 # @dryui/cli
 
+## 0.13.0
+
+### Minor Changes
+
+- [`8e4aeba`](https://github.com/rob-balfre/dryui/commit/8e4aeba80edc2dd5597895cc70bb94a26494d97c) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add first-class support for the official Svelte MCP (`@sveltejs/mcp`) as a recommended companion.
+  - `dryui setup --install` now also registers `@sveltejs/mcp` alongside the DryUI servers for Copilot, Cursor, OpenCode, Windsurf, and Zed. Pass `--no-svelte-mcp` to opt out.
+  - Interactive `dryui setup` asks before writing the svelte server to the MCP config (default yes) and surfaces `svelte-mcp: registered for …` in the menu status.
+  - Each printed `dryui setup --editor <id>` guide now includes a "Svelte MCP (recommended companion)" section with the paste-in snippet for editors where auto-install is not supported (Claude Code, Codex, Gemini CLI).
+  - The DryUI skill gains a new rule directing agents to use `svelte-autofixer` / `get-documentation` from `@sveltejs/mcp` for Svelte 5 and SvelteKit questions, keeping DryUI focused on component APIs.
+  - Docs getting-started page renders a new companion block per agent with the exact snippet for that tool's config file.
+
+### Patch Changes
+
+- [`8e4aeba`](https://github.com/rob-balfre/dryui/commit/8e4aeba80edc2dd5597895cc70bb94a26494d97c) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Fix `dryui` feedback setup on fresh projects: the CLI now also ensures the `lucide-svelte` peer dependency of `@dryui/feedback` is installed and added to `ssr.noExternal` in `vite.config.ts`. Without this, a fresh SvelteKit project would 500 on every SSR request with `Cannot find module '…/lucide-svelte/dist/icons/index'` once the Feedback widget was mounted.
+
+  Also surface actual dev server errors in the CLI output instead of reporting a generic `skipped (dev server did not respond within 30s)` timeout. When the user's dev server returns 5xx, the CLI now reports the HTTP status and the error summary extracted from the response body. When the dev server never binds the port, the transport error is shown. Dev server stdout/stderr is captured to a temp log file and the tail plus the log path are included in the output so you can diagnose what went wrong without re-running anything.
+
+- Updated dependencies [[`8e4aeba`](https://github.com/rob-balfre/dryui/commit/8e4aeba80edc2dd5597895cc70bb94a26494d97c)]:
+  - @dryui/mcp@2.2.1
+
 ## 0.12.1
 
 ### Patch Changes
