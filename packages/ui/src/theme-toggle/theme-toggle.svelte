@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Snippet } from 'svelte';
+	import { onDestroy, type Snippet } from 'svelte';
 	import type { ClassValue, HTMLButtonAttributes } from 'svelte/elements';
 	import Toggle from '../toggle/toggle-button.svelte';
 	import {
@@ -63,7 +63,15 @@
 	// Swapping the controller or key after mount is not supported; this is an
 	// init-time choice, so the linter warning about one-shot capture is expected.
 	// svelte-ignore state_referenced_locally
+	const ownsController = externalController === undefined;
+	// svelte-ignore state_referenced_locally
 	const controller = externalController ?? createThemeController({ storageKey });
+
+	onDestroy(() => {
+		if (ownsController) {
+			controller.destroy();
+		}
+	});
 
 	type ToggleClickEvent = Parameters<NonNullable<HTMLButtonAttributes['onclick']>>[0];
 	type ToggleKeyEvent = Parameters<NonNullable<HTMLButtonAttributes['onkeydown']>>[0];
