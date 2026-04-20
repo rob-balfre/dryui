@@ -91,7 +91,7 @@ Subpath import: import { ThemeToggle } from '@dryui/ui/theme-toggle'
 Props: storageKey (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | controller (ThemeController) | sunIcon (Snippet) | moonIcon (Snippet) | onModeChange ((mode: ThemeMode) => void) | disabled (boolean), Prevents interaction and applies disabled styling. | class (ClassValue)
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: none
-Data attributes: data-mode | data-theme-switch
+Data attributes: data-dry-icon-reveal | data-hidden | data-mode | data-theme-switch
 Accessibility: Keep the default aria-label or pass a custom one so the purpose of the button is announced. | The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme.
 Example:
 ```svelte
@@ -1091,7 +1091,7 @@ Structure:
     Select.Content
       Select.Item
 CSS variables: --dry-btn-align, --dry-btn-justify, --dry-select-item-radius
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example:
 ```svelte
@@ -1253,7 +1253,7 @@ Structure:
     Combobox.Content
       Combobox.Item
 CSS variables: --dry-combobox-affix-gap, --dry-combobox-affix-min-inline-size, --dry-combobox-bg, --dry-combobox-border, --dry-combobox-color, --dry-combobox-font-size, --dry-combobox-item-icon-size, --dry-combobox-item-radius, --dry-combobox-padding-x, --dry-combobox-padding-y
-Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-has-icon | data-has-leading | data-has-trailing | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
+Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-has-icon | data-has-leading | data-has-trailing | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
@@ -2048,7 +2048,7 @@ Structure:
     Menubar.Separator
     Menubar.Label
 CSS variables: none
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-menubar-content | data-menubar-item | data-menubar-label | data-menubar-root | data-menubar-separator | data-menubar-trigger | data-state
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-menubar-content | data-menubar-item | data-menubar-label | data-menubar-root | data-menubar-separator | data-menubar-trigger | data-state
 Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2465,7 +2465,7 @@ Structure:
   Popover.Root
     Popover.Trigger
     Popover.Content
-CSS variables: --dry-popover-bg, --dry-popover-border, --dry-popover-padding, --dry-popover-radius, --dry-popover-shadow, --dry-radius-nested
+CSS variables: --dry-btn-radius, --dry-popover-bg, --dry-popover-border, --dry-popover-padding, --dry-popover-radius, --dry-popover-shadow, --dry-radius-nested
 Data attributes: data-popover-content | data-popover-trigger | data-state (Reflects whether the popover is open or closed., values open, closed)
 Accessibility: Avoid placing essential actions in hover-only or transient content; keyboard users must be able to reopen the popover.
 Example:
@@ -2568,8 +2568,8 @@ Structure:
     DropdownMenu.Trigger
     DropdownMenu.Content
       DropdownMenu.Item
-CSS variables: --dry-menu-item-padding, --dry-radius-nested
-Data attributes: data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
+CSS variables: --dry-btn-radius, --dry-menu-item-padding, --dry-radius-nested
+Data attributes: data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-dry-stagger | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2621,7 +2621,7 @@ Structure:
     ContextMenu.Group
     ContextMenu.Label
 CSS variables: --dry-menu-bg, --dry-menu-border, --dry-menu-item-padding, --dry-menu-padding, --dry-menu-radius, --dry-menu-shadow
-Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-state
+Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-dry-stagger | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2673,7 +2673,7 @@ Structure:
     CommandPalette.Empty
     CommandPalette.Separator
 CSS variables: --dry-cmd-bg, --dry-cmd-border, --dry-cmd-item-radius, --dry-cmd-max-width, --dry-cmd-radius, --dry-cmd-shadow
-Data attributes: data-active (Present on the active item or current target within the component.) | data-command-palette-empty | data-command-palette-group | data-command-palette-group-heading | data-command-palette-input | data-command-palette-item | data-command-palette-list | data-command-palette-root | data-command-palette-separator | data-disabled (Present when the component or part is disabled.) | data-state (Reflects whether the command palette dialog is open or closed., values open, closed) | data-value
+Data attributes: data-active (Present on the active item or current target within the component.) | data-command-palette-empty | data-command-palette-group | data-command-palette-group-heading | data-command-palette-input | data-command-palette-item | data-command-palette-list | data-command-palette-root | data-command-palette-separator | data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-state (Reflects whether the command palette dialog is open or closed., values open, closed) | data-value
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2900,7 +2900,7 @@ Structure:
     Card.Header
     Card.Content
     Card.Footer
-CSS variables: --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow, --dry-radius-nested
+CSS variables: --dry-btn-radius, --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow, --dry-radius-nested
 Data attributes: data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -2942,7 +2942,7 @@ Structure:
       Accordion.Trigger
       Accordion.Content
 CSS variables: none
-Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-disabled (Present when the component or part is disabled.) | data-indicator | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
+Data attributes: data-accordion | data-accordion-content | data-accordion-content-inner | data-accordion-item | data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-indicator | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-state (Reflects whether the current accordion item is expanded or collapsed., values open, closed)
 Accessibility: Use descriptive trigger text so the hidden content is understandable before expansion. | Keep each trigger paired with its matching content so keyboard and screen-reader relationships stay intact.
 Example:
 ```svelte
@@ -3131,7 +3131,7 @@ Structure:
     Chart.XAxis
     Chart.YAxis
 CSS variables: --dry-chart-axis-color, --dry-chart-bar-color, --dry-chart-bg, --dry-chart-border, --dry-chart-grid-color, --dry-chart-line-color, --dry-chart-radius
-Data attributes: data-chart | data-chart-a11y | data-chart-area | data-chart-axis | data-chart-bars | data-chart-container | data-chart-data-list | data-chart-donut | data-chart-donut-label | data-chart-horizontal-bar | data-chart-line | data-chart-root | data-chart-stacked-bar | data-chart-summary | data-clickable | data-interactive | data-list | data-part
+Data attributes: data-chart | data-chart-a11y | data-chart-area | data-chart-axis | data-chart-bars | data-chart-container | data-chart-data-list | data-chart-donut | data-chart-donut-label | data-chart-horizontal-bar | data-chart-line | data-chart-root | data-chart-stacked-bar | data-chart-summary | data-chart-tick-label | data-clickable | data-interactive | data-list | data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
@@ -3658,7 +3658,7 @@ Structure:
     DataGrid.ExpandableRow
     DataGrid.ExpandTrigger
 CSS variables: --dry-data-grid-border, --dry-data-grid-head-padding-y, --dry-data-grid-header-bg, --dry-data-grid-padding-x, --dry-data-grid-padding-y, --dry-data-grid-pagination-gap, --dry-data-grid-row-hover, --dry-data-grid-row-stripe, --dry-data-grid-sort-color
-Data attributes: data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped
+Data attributes: data-align | data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped | data-type
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
@@ -4189,7 +4189,7 @@ Root import: import { Alert } from '@dryui/ui'
 Subpath import: import { Alert } from '@dryui/ui/alert'
 Props: variant ('info' | 'success' | 'warning' | 'error'), Visual style preset for the component., accepted info, success, warning, error, default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-alert-bg, --dry-alert-border, --dry-alert-icon-color, --dry-radius-nested
+CSS variables: --dry-alert-bg, --dry-alert-border, --dry-alert-icon-color, --dry-btn-radius, --dry-radius-nested
 Data attributes: data-alert | data-alert-body | data-alert-close | data-alert-description | data-alert-icon | data-alert-title | data-dismissible | data-variant
 Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.
 Example:
@@ -4232,8 +4232,8 @@ Structure:
     Toast.Description
     Toast.Close
     Toast.Action
-CSS variables: --dry-btn-font-size, --dry-radius-nested, --dry-toast-accent, --dry-toast-action-hover-bg, --dry-toast-bg, --dry-toast-border
-Data attributes: data-part | data-persistent | data-position | data-removing | data-toast-action | data-toast-id | data-variant
+CSS variables: --dry-btn-font-size, --dry-btn-radius, --dry-radius-nested, --dry-toast-accent, --dry-toast-action-hover-bg, --dry-toast-bg, --dry-toast-border
+Data attributes: data-dry-stagger | data-part | data-persistent | data-position | data-removing | data-toast-action | data-toast-id | data-variant
 Accessibility: Do not rely on toast content as the only place critical workflow information appears.
 Example:
 ```svelte

@@ -531,6 +531,7 @@
         "Keep heading, reading, and focus order aligned with the surrounding content."
       ],
       "cssVars": {
+        "--dry-btn-radius": "Border radius",
         "--dry-card-bg": "Background color",
         "--dry-card-padding": "Padding",
         "--dry-card-radius": "Border radius",
@@ -1366,6 +1367,7 @@
         "Avoid placing essential actions in hover-only or transient content; keyboard users must be able to reopen the popover."
       ],
       "cssVars": {
+        "--dry-btn-radius": "Border radius",
         "--dry-popover-bg": "Background color",
         "--dry-popover-border": "Border color",
         "--dry-popover-padding": "Padding",
@@ -1698,6 +1700,7 @@
         "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
       ],
       "cssVars": {
+        "--dry-btn-radius": "Border radius",
         "--dry-menu-item-padding": "Item Padding",
         "--dry-radius-nested": "Nested"
       },
@@ -1716,6 +1719,9 @@
         },
         {
           "name": "data-dropdown-trigger-wrap"
+        },
+        {
+          "name": "data-dry-stagger"
         },
         {
           "name": "data-state"
@@ -1908,6 +1914,9 @@
           "name": "data-context-menu-separator"
         },
         {
+          "name": "data-dry-stagger"
+        },
+        {
           "name": "data-state"
         }
       ],
@@ -2072,6 +2081,9 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-dry-stagger"
         },
         {
           "name": "data-indicator"
@@ -2441,6 +2453,9 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-dry-stagger"
         },
         {
           "name": "data-state",
@@ -3417,6 +3432,9 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-dry-stagger"
+        },
+        {
           "name": "data-indicator"
         },
         {
@@ -4380,6 +4398,12 @@
       ],
       "cssVars": {},
       "dataAttributes": [
+        {
+          "name": "data-dry-icon-reveal"
+        },
+        {
+          "name": "data-hidden"
+        },
         {
           "name": "data-mode"
         },
@@ -6053,6 +6077,9 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-dry-stagger"
+        },
+        {
           "name": "data-menubar-content"
         },
         {
@@ -7624,6 +7651,9 @@
           "name": "data-chart-summary"
         },
         {
+          "name": "data-chart-tick-label"
+        },
+        {
           "name": "data-clickable"
         },
         {
@@ -9169,6 +9199,7 @@
         "--dry-alert-bg": "Background color",
         "--dry-alert-border": "Border color",
         "--dry-alert-icon-color": "Icon Color",
+        "--dry-btn-radius": "Border radius",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
@@ -9370,6 +9401,7 @@
       ],
       "cssVars": {
         "--dry-btn-font-size": "Font size",
+        "--dry-btn-radius": "Border radius",
         "--dry-radius-nested": "Nested",
         "--dry-toast-accent": "Accent",
         "--dry-toast-action-hover-bg": "Action Hover Bg",
@@ -9377,6 +9409,9 @@
         "--dry-toast-border": "Border color"
       },
       "dataAttributes": [
+        {
+          "name": "data-dry-stagger"
+        },
         {
           "name": "data-part"
         },
@@ -9910,6 +9945,9 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-dry-stagger"
         },
         {
           "name": "data-has-icon"
@@ -14218,6 +14256,9 @@
       },
       "dataAttributes": [
         {
+          "name": "data-align"
+        },
+        {
           "name": "data-data-grid"
         },
         {
@@ -14292,6 +14333,9 @@
         },
         {
           "name": "data-striped"
+        },
+        {
+          "name": "data-type"
         }
       ],
       "example": "<DataGrid.Root>\n  <DataGrid.Table>...</DataGrid.Table>\n  <DataGrid.Header>...</DataGrid.Header>\n  <DataGrid.Column>...</DataGrid.Column>\n  <DataGrid.Body>...</DataGrid.Body>\n  <DataGrid.Row>...</DataGrid.Row>\n  <DataGrid.Cell>...</DataGrid.Cell>\n  <DataGrid.Pagination>...</DataGrid.Pagination>\n  <DataGrid.SelectAll>...</DataGrid.SelectAll>\n  <DataGrid.SelectCell>...</DataGrid.SelectCell>\n  <DataGrid.ExpandableRow>...</DataGrid.ExpandableRow>\n  <DataGrid.ExpandTrigger>...</DataGrid.ExpandTrigger>\n</DataGrid.Root>"
