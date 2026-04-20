@@ -33,6 +33,7 @@
 		{@render children()}
 		<svg
 			data-indicator
+			data-state={ctx.open ? 'open' : 'closed'}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"
 			fill="none"
@@ -55,6 +56,22 @@
 		aspect-ratio: 1;
 		place-self: center;
 		opacity: 0.5;
-		transition: transform var(--dry-duration-fast) var(--dry-ease-default);
+		transform-origin: center;
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+			transform var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+			filter var(--dry-duration-fast) var(--dry-ease-spring-snappy);
+	}
+
+	svg[data-indicator][data-state='open'] {
+		opacity: 1;
+		transform: scale(1.05);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		svg[data-indicator] {
+			transition: none;
+			filter: none;
+		}
 	}
 </style>

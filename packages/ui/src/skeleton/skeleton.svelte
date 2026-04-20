@@ -91,10 +91,12 @@
 		--dry-skeleton-radius: var(--dry-radius-full);
 		aspect-ratio: 1;
 		height: var(--_h, var(--dry-space-10));
+		box-shadow: inset 0 0 0 1px var(--dry-image-edge);
 	}
 
 	div[data-variant='rectangular'] {
 		--dry-skeleton-radius: var(--dry-radius-sm);
 		height: var(--_h, var(--dry-space-16));
+		box-shadow: inset 0 0 0 1px var(--dry-image-edge);
 	}
 </style>

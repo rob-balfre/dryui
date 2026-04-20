@@ -47,6 +47,7 @@
 	role="region"
 	aria-label="Notifications"
 	data-part="provider"
+	data-dry-stagger
 	data-position={position}
 	class={className}
 	{...rest}

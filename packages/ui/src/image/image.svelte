@@ -67,6 +67,11 @@
 		object-fit: var(--dry-image-object-fit);
 	}
 
+	img[data-state='loaded'],
+	img[data-state='fallback'] {
+		box-shadow: inset 0 0 0 1px var(--dry-image-edge);
+	}
+
 	img[data-state='fallback'] {
 		opacity: 0.95;
 	}

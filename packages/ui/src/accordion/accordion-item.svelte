@@ -46,6 +46,17 @@
 		display: grid;
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 
+		/* Enter transition so the stagger utility on the root
+		   (data-dry-stagger) has something to delay. */
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-out),
+			transform var(--dry-duration-fast) var(--dry-ease-out);
+
+		@starting-style {
+			opacity: 0;
+			transform: translateY(4px);
+		}
+
 		&:last-child {
 			border-bottom: none;
 		}

@@ -45,6 +45,7 @@
 			font-size="11"
 			fill="currentColor"
 			opacity="0.6"
+			data-chart-tick-label
 		>
 			{Math.round(tick.value)}
 		</text>
@@ -62,5 +63,9 @@
 <style>
 	[data-chart-axis] {
 		color: var(--dry-chart-axis-color);
+	}
+
+	[data-chart-tick-label] {
+		font-variant-numeric: tabular-nums;
 	}
 </style>

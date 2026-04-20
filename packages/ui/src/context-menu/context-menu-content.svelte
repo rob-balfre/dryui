@@ -60,6 +60,7 @@
 	id={ctx.contentId}
 	aria-labelledby={ctx.triggerId}
 	data-context-menu-content
+	data-dry-stagger
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
 	{style}
