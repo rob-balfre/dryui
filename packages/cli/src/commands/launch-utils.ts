@@ -388,7 +388,7 @@ export function findViteConfig(root: string): string | null {
 
 export const FEEDBACK_SSR_NO_EXTERNAL = ['@dryui/feedback', 'lucide-svelte'] as const;
 
-function escapeRegExp(input: string): string {
+export function escapeRegExp(input: string): string {
 	return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 

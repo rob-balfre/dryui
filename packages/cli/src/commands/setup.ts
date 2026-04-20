@@ -21,7 +21,7 @@ import {
 import { getDetect } from './detect.js';
 import { getFeedbackUiResult } from './feedback.js';
 import { runInit } from './init.js';
-import { getInstallHookResult } from './install-hook.js';
+import { getInstallHookResult, getInstallHookStatus } from './install-hook.js';
 import { getInstall } from './install.js';
 import { runLauncher, runUserProjectLauncher } from './launcher.js';
 import type { PortHolder } from './launch-utils.js';
@@ -33,10 +33,13 @@ import {
 } from './setup-guides.js';
 import {
 	formatInstallResult,
+	getAgentSetupStatus,
 	installPreviewLines,
 	isAutoInstallable,
 	runEditorInstall,
-	summarizeSvelteMcpStatus
+	runSvelteCompanionInstall,
+	svelteCompanionPreviewLines,
+	summarizeAgentSetupStatus
 } from './setup-installers.js';
 import type { Spec } from './types.js';
 
@@ -44,13 +47,14 @@ type MainMenuValue = 'setup' | 'feedback' | 'init' | 'install' | 'detect' | 'exi
 type EditorMenuValue = SetupGuideId | 'back' | 'exit';
 type FeedbackMenuValue = 'open' | 'print' | 'back' | 'exit';
 type PackageManagerMenuValue = DryuiPackageManager | 'back' | 'exit';
-type PostGuideValue = 'again' | 'main' | 'exit';
+type PostGuideValue = 'svelte' | 'again' | 'main' | 'exit';
 type InitTargetStatus = { kind: 'confirm' | 'error'; message: string };
 
 interface SelectOption<T extends string> {
 	label: string;
 	value: T;
 	description?: string;
+	icon?: string;
 }
 
 interface SelectPromptOptions {
@@ -92,31 +96,37 @@ const MAIN_MENU_OPTIONS: readonly SelectOption<MainMenuValue>[] = [
 	{
 		label: 'Set up editor or agent',
 		value: 'setup',
-		description: 'Choose Claude, Codex, OpenCode, Copilot, Cursor, Windsurf, or Zed.'
+		icon: '⌘',
+		description: 'Choose Claude, Codex, Gemini, OpenCode, Copilot, Cursor, Windsurf, or Zed.'
 	},
 	{
 		label: 'Start feedback session',
 		value: 'feedback',
+		icon: '◉',
 		description: 'Open the feedback dashboard or print its URL.'
 	},
 	{
 		label: 'Bootstrap a new project',
 		value: 'init',
+		icon: '✦',
 		description: 'Choose a project name/path and package manager, then run `dryui init`.'
 	},
 	{
 		label: 'Print install plan for current folder',
 		value: 'install',
+		icon: '≡',
 		description: 'Inspect what DryUI would change before installing.'
 	},
 	{
 		label: 'Detect current project setup',
 		value: 'detect',
+		icon: '⌕',
 		description: 'Inspect the current folder before choosing an action.'
 	},
 	{
 		label: 'Exit',
-		value: 'exit'
+		value: 'exit',
+		icon: '⏻'
 	}
 ];
 
@@ -124,20 +134,24 @@ const FEEDBACK_MENU_OPTIONS: readonly SelectOption<FeedbackMenuValue>[] = [
 	{
 		label: 'Open dashboard now',
 		value: 'open',
+		icon: '↗',
 		description: 'Start the feedback server if needed and open the browser.'
 	},
 	{
 		label: 'Print dashboard URL only',
 		value: 'print',
+		icon: '⎘',
 		description: 'Start the feedback server if needed, but do not open the browser.'
 	},
 	{
 		label: 'Back to main menu',
-		value: 'back'
+		value: 'back',
+		icon: '←'
 	},
 	{
 		label: 'Exit',
-		value: 'exit'
+		value: 'exit',
+		icon: '⏻'
 	}
 ];
 
@@ -145,30 +159,36 @@ const PACKAGE_MANAGER_OPTIONS: readonly SelectOption<PackageManagerMenuValue>[] 
 	{
 		label: 'bun',
 		value: 'bun',
+		icon: '◈',
 		description: 'Fastest path in this repo and the current default.'
 	},
 	{
 		label: 'pnpm',
 		value: 'pnpm',
+		icon: '◌',
 		description: 'Use pnpm workspaces and lockfile conventions.'
 	},
 	{
 		label: 'npm',
 		value: 'npm',
+		icon: '□',
 		description: 'Use the default npm workflow.'
 	},
 	{
 		label: 'yarn',
 		value: 'yarn',
+		icon: '△',
 		description: 'Use the Yarn workflow.'
 	},
 	{
 		label: 'Back to main menu',
-		value: 'back'
+		value: 'back',
+		icon: '←'
 	},
 	{
 		label: 'Exit',
-		value: 'exit'
+		value: 'exit',
+		icon: '⏻'
 	}
 ];
 
@@ -178,6 +198,27 @@ function isSetupGuideId(value: string): value is SetupGuideId {
 
 function yesNo(value: boolean): string {
 	return value ? 'yes' : 'no';
+}
+
+function takeLeadingSentences(text: string, count: number): string {
+	const sentences = text
+		.trim()
+		.split(/(?<=[.!?])\s+/)
+		.filter(Boolean);
+	return sentences.slice(0, count).join(' ');
+}
+
+function formatPreviewCodeLines(guide: SetupGuide, code: string): string[] {
+	const lines = code.split('\n');
+	if (lines.length <= 2 && !lines.some((line) => /^[{\[]/.test(line.trim()))) {
+		return lines.map((line) => `   ${line}`);
+	}
+
+	if (lines.length <= 4 && lines.every((line) => !/^[{\[]/.test(line.trim()))) {
+		return [...lines.map((line) => `   ${line}`)];
+	}
+
+	return [`   See \`dryui setup --editor ${guide.id}\` for the full snippet.`];
 }
 
 function formatGuide(guide: SetupGuide): string {
@@ -198,6 +239,29 @@ function formatGuide(guide: SetupGuide): string {
 	return lines.join('\n').trimEnd();
 }
 
+export function formatGuidePreviewLines(guide: SetupGuide): string[] {
+	const [primary, ...optional] = guide.sections;
+	if (!primary) return [guide.label];
+
+	const lines = [guide.label, '', `1. ${primary.title}`];
+	if (primary.note) {
+		lines.push(`   ${takeLeadingSentences(primary.note, 2)}`);
+	}
+	lines.push(...formatPreviewCodeLines(guide, primary.code));
+
+	if (optional.length) {
+		lines.push('');
+		lines.push('Optional');
+		for (const [index, section] of optional.entries()) {
+			lines.push(`   ${index + 2}. ${section.title}`);
+		}
+	}
+
+	lines.push('');
+	lines.push(`Follow-up: ${guide.followUp}`);
+	return lines;
+}
+
 function colorEnabled(): boolean {
 	return Boolean(output.isTTY && !process.env.NO_COLOR);
 }
@@ -209,23 +273,153 @@ function paint(text: string, ...codes: string[]): string {
 
 function paintContextLine(line: string, index: number): string {
 	if (!line.trim()) return line;
-	if (index === 0) return paint(line, ANSI.bold, ANSI.cyan);
-	if (/^Follow-up:/.test(line)) return paint(line, ANSI.bold, ANSI.mint);
+	if (index === 0) return paint(`◆ ${line}`, ANSI.bold, ANSI.cyan);
+	if (/^Follow-up:/.test(line)) return paint(`↳ ${line}`, ANSI.bold, ANSI.mint);
 	if (/^\d+\./.test(line)) return paint(line, ANSI.bold, ANSI.gold);
 	if (/^ {3}/.test(line)) return paint(line, ANSI.slate);
 	return paint(line, ANSI.white);
 }
 
 function paintOptionLabel(label: string, selected: boolean): string {
+	const text = label.trim();
 	if (selected) {
-		return paint(` ${label} `, ANSI.bold, ANSI.black, ANSI.bgCyan);
+		if (!colorEnabled()) {
+			return text;
+		}
+		return paint(` ${text} `, ANSI.bold, ANSI.black, ANSI.bgCyan);
 	}
 
-	return paint(label, ANSI.white);
+	return paint(text, ANSI.white);
 }
 
 function paintOptionDescription(description: string, selected: boolean): string {
 	return selected ? paint(description, ANSI.sky) : paint(description, ANSI.dim, ANSI.slate);
+}
+
+function divider(width = output.columns ?? 72): string {
+	return '─'.repeat(Math.max(36, Math.min(72, width - 2)));
+}
+
+function splitContextLine(line: string): { label: string; value: string } | null {
+	if (!line.trim() || /^\s/.test(line)) return null;
+	const separatorIndex = line.indexOf(':');
+	if (separatorIndex === -1) return null;
+
+	return {
+		label: line.slice(0, separatorIndex).trim(),
+		value: line.slice(separatorIndex + 1).trim()
+	};
+}
+
+function isKeyValueContext(lines: readonly string[]): boolean {
+	const nonEmptyLines = lines.filter((line) => line.trim());
+	return nonEmptyLines.length > 0 && nonEmptyLines.every((line) => splitContextLine(line) !== null);
+}
+
+function formatContextBlockLines(contextLines: readonly string[] = []): string[] {
+	if (!contextLines.length) return [];
+
+	if (isKeyValueContext(contextLines)) {
+		const entries = contextLines
+			.map((line) => splitContextLine(line))
+			.filter((entry): entry is { label: string; value: string } => entry !== null);
+		const labelWidth = Math.max(...entries.map((entry) => entry.label.length));
+
+		return [
+			paint('Current workspace', ANSI.bold, ANSI.slate),
+			'',
+			...entries.map((entry) => {
+				const label = paint(entry.label.padEnd(labelWidth), ANSI.bold, ANSI.sky);
+				const value = paint(entry.value, ANSI.white);
+				return `  ${label}  ${value}`;
+			})
+		];
+	}
+
+	return contextLines.map((line, index) =>
+		line.trim() ? `  ${paintContextLine(line, index)}` : ''
+	);
+}
+
+function formatOptionText<T extends string>(option: SelectOption<T>): string {
+	return option.icon ? `${option.icon} ${option.label}` : option.label;
+}
+
+export function formatPromptFrameLines(question: string, config: SelectPromptOptions): string[] {
+	const lines = [
+		paint('◈ DryUI', ANSI.bold, ANSI.cyan),
+		paint('Interactive command menu', ANSI.dim, ANSI.sky),
+		paint(divider(), ANSI.dim, ANSI.slate),
+		''
+	];
+
+	lines.push(...formatContextBlockLines(config.contextLines));
+
+	if (config.contextLines?.length) {
+		lines.push('');
+	}
+
+	lines.push(paint(question, ANSI.bold, ANSI.white), '');
+	return lines;
+}
+
+function formatSelectBodyLines<T extends string>(
+	options: readonly SelectOption<T>[],
+	selectedIndex: number,
+	config: SelectPromptOptions
+): string[] {
+	const lines: string[] = [];
+
+	for (const [index, option] of options.entries()) {
+		const selected = index === selectedIndex;
+		const marker = selected ? paint('›', ANSI.bold, ANSI.gold) : paint(' ', ANSI.dim, ANSI.slate);
+		const label = paintOptionLabel(formatOptionText(option), selected);
+		lines.push(`${marker} ${label}`);
+		if (option.description) {
+			const descriptionPrefix = selected ? paint('↳', ANSI.dim, ANSI.sky) : ' ';
+			lines.push(`  ${descriptionPrefix} ${paintOptionDescription(option.description, selected)}`);
+		}
+		if (index < options.length - 1) {
+			lines.push('');
+		}
+	}
+
+	lines.push('');
+	lines.push(paint(config.footer ?? '↑/↓ move  Enter select  Ctrl+C quit.', ANSI.dim, ANSI.sky));
+	return lines;
+}
+
+export function formatSelectScreenLines<T extends string>(
+	question: string,
+	options: readonly SelectOption<T>[],
+	selectedIndex: number,
+	config: SelectPromptOptions
+): string[] {
+	return [
+		...formatPromptFrameLines(question, config),
+		...formatSelectBodyLines(options, selectedIndex, config)
+	];
+}
+
+function getEditorMenuIcon(editor: SetupGuideId): string {
+	switch (editor) {
+		case 'claude-code':
+			return '☼';
+		case 'codex':
+			return '⌘';
+		case 'gemini':
+			return '✦';
+		case 'opencode':
+			return '◉';
+		case 'copilot':
+			return '△';
+		case 'cursor':
+			return '◌';
+		case 'windsurf':
+			return '≈';
+		case 'zed':
+			return '□';
+	}
 }
 
 function buildMainContext(spec: Spec): string[] {
@@ -237,7 +431,7 @@ function buildMainContext(spec: Spec): string[] {
 			`root: ${detection.root ? homeRelative(detection.root) : '(not found)'}`,
 			`deps: ui=${yesNo(detection.dependencies.ui)}, primitives=${yesNo(detection.dependencies.primitives)}, lint=${yesNo(detection.dependencies.lint)}`,
 			`theme: default=${yesNo(detection.theme.defaultImported)}, dark=${yesNo(detection.theme.darkImported)}, auto=${yesNo(detection.theme.themeAuto)}`,
-			summarizeSvelteMcpStatus({ cwd: process.cwd() })
+			summarizeAgentSetupStatus({ cwd: process.cwd() })
 		];
 	} catch {
 		return [`cwd: ${homeRelative(process.cwd())}`, 'project: detection failed'];
@@ -246,20 +440,9 @@ function buildMainContext(spec: Spec): string[] {
 
 function renderPromptFrame(question: string, config: SelectPromptOptions): void {
 	console.clear();
-	console.log(paint('DryUI', ANSI.bold, ANSI.cyan));
-	console.log(paint('Interactive command menu', ANSI.dim, ANSI.sky));
-	console.log('');
-
-	for (const [index, line] of (config.contextLines ?? []).entries()) {
-		console.log(paintContextLine(line, index));
+	for (const line of formatPromptFrameLines(question, config)) {
+		console.log(line);
 	}
-
-	if (config.contextLines?.length) {
-		console.log('');
-	}
-
-	console.log(paint(question, ANSI.bold, ANSI.white));
-	console.log('');
 }
 
 function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): void {
@@ -278,6 +461,42 @@ function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): v
 		)
 	);
 	console.log(paint('This can take a few seconds.', ANSI.dim, ANSI.sky));
+	console.log('');
+}
+
+function renderEditorInstallProgress(
+	editor: SetupGuide,
+	contextLines: readonly string[],
+	includeSvelteMcp: boolean
+): void {
+	renderPromptFrame(`Installing ${editor.label} setup...`, { contextLines });
+	console.log(paint('Copying the DryUI skill and updating the editor MCP config.', ANSI.white));
+	console.log(
+		paint(
+			`Svelte MCP: ${includeSvelteMcp ? 'including @sveltejs/mcp' : 'skipped'}.`,
+			ANSI.dim,
+			ANSI.sky
+		)
+	);
+	console.log(
+		paint(
+			'Please wait. This can take a few seconds while npx resolves packages.',
+			ANSI.dim,
+			ANSI.sky
+		)
+	);
+	console.log('');
+}
+
+function renderSvelteCompanionInstallProgress(
+	editor: SetupGuide,
+	contextLines: readonly string[]
+): void {
+	renderPromptFrame(`Installing the Svelte companion for ${editor.label}...`, { contextLines });
+	console.log(
+		paint('Wiring the Svelte companion without re-running the full DryUI install.', ANSI.white)
+	);
+	console.log(paint('Please wait while the plugin or MCP config is updated.', ANSI.dim, ANSI.sky));
 	console.log('');
 }
 
@@ -302,6 +521,7 @@ function setupHelp(exitCode = 0): never {
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
+				'  dryui setup --editor gemini',
 				'  dryui setup --editor opencode --install',
 				'  dryui setup --editor cursor --install --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
@@ -319,18 +539,9 @@ function renderSelect<T extends string>(
 	config: SelectPromptOptions
 ): void {
 	renderPromptFrame(question, config);
-
-	for (const [index, option] of options.entries()) {
-		const selected = index === selectedIndex;
-		const marker = selected ? paint('>', ANSI.bold, ANSI.gold) : paint(' ', ANSI.dim, ANSI.slate);
-		console.log(`${marker} ${paintOptionLabel(option.label, selected)}`);
-		if (option.description) {
-			console.log(`  ${paintOptionDescription(option.description, selected)}`);
-		}
+	for (const line of formatSelectBodyLines(options, selectedIndex, config)) {
+		console.log(line);
 	}
-
-	console.log('');
-	console.log(paint(config.footer ?? 'Use Up/Down and Enter.', ANSI.dim, ANSI.sky));
 }
 
 async function promptText(
@@ -465,8 +676,8 @@ async function promptConfirm(
 	const value = await promptSelect(
 		question,
 		[
-			{ label: 'Yes', value: 'yes' },
-			{ label: 'No', value: 'no' }
+			{ label: 'Yes', value: 'yes', icon: '✓' },
+			{ label: 'No', value: 'no', icon: '•' }
 		],
 		{ ...config, initialIndex: defaultValue ? 0 : 1 }
 	);
@@ -583,10 +794,11 @@ async function runInteractiveEditorSetup(
 	const editorOptions: readonly SelectOption<EditorMenuValue>[] = [
 		...setupGuideIds.map((id) => ({
 			label: getSetupGuide(id).label,
-			value: id
+			value: id,
+			icon: getEditorMenuIcon(id)
 		})),
-		{ label: 'Back to main menu', value: 'back' },
-		{ label: 'Exit', value: 'exit' }
+		{ label: 'Back to main menu', value: 'back', icon: '←' },
+		{ label: 'Exit', value: 'exit', icon: '⏻' }
 	];
 
 	while (true) {
@@ -603,19 +815,26 @@ async function runInteractiveEditorSetup(
 		}
 
 		const guide = getSetupGuide(editor);
-		const contextLines = formatGuide(guide).split('\n');
+		const contextLines = formatGuidePreviewLines(guide);
 
 		if (editor === 'claude-code') {
-			const installHook = await promptConfirm('Install the Claude SessionStart hook now?', false, {
-				contextLines
-			});
-			if (installHook) {
-				emitCommandResult(getInstallHookResult([], 'text'));
-				const next = await promptAfterAction('editor');
-				if (next === 'main') {
-					return;
+			const hookStatus = getInstallHookStatus({ cwd: process.cwd() });
+			if (!hookStatus.project && !hookStatus.global) {
+				const installHook = await promptConfirm(
+					'Install the Claude SessionStart hook now?',
+					false,
+					{
+						contextLines
+					}
+				);
+				if (installHook) {
+					emitCommandResult(getInstallHookResult([], 'text'));
+					const next = await promptAfterAction('editor');
+					if (next === 'main') {
+						return;
+					}
+					continue;
 				}
-				continue;
 			}
 		}
 
@@ -630,6 +849,11 @@ async function runInteractiveEditorSetup(
 					'Also register the official @sveltejs/mcp server?',
 					defaultSvelteMcp,
 					{ contextLines: [...contextLines, '', ...previewLines] }
+				);
+				renderEditorInstallProgress(
+					guide,
+					[...contextLines, '', ...previewLines],
+					includeSvelteMcp
 				);
 				const result = runEditorInstall(editor, {
 					cwd: process.cwd(),
@@ -647,15 +871,39 @@ async function runInteractiveEditorSetup(
 			}
 		}
 
-		const next = await promptSelect<PostGuideValue>(
-			'What next?',
-			[
-				{ label: 'Choose another editor', value: 'again' },
-				{ label: 'Back to main menu', value: 'main' },
-				{ label: 'Exit', value: 'exit' }
-			],
-			{ contextLines }
+		const setupStatus = getAgentSetupStatus(editor, { cwd: process.cwd() });
+		const nextOptions: SelectOption<PostGuideValue>[] = [];
+		if (!setupStatus.svelte) {
+			nextOptions.push({
+				label: 'Install Svelte companion only',
+				value: 'svelte',
+				icon: '∿',
+				description:
+					'Adds the official Svelte plugin or MCP server for this editor without touching DryUI.'
+			});
+		}
+		nextOptions.push(
+			{ label: 'Choose another editor', value: 'again', icon: '↺' },
+			{ label: 'Back to main menu', value: 'main', icon: '←' },
+			{ label: 'Exit', value: 'exit', icon: '⏻' }
 		);
+
+		const next = await promptSelect<PostGuideValue>('What next?', nextOptions, { contextLines });
+
+		if (next === 'svelte') {
+			const previewLines = svelteCompanionPreviewLines(editor, { cwd: process.cwd() });
+			renderSvelteCompanionInstallProgress(guide, [...contextLines, '', ...previewLines]);
+			const result = runSvelteCompanionInstall(editor, { cwd: process.cwd() });
+			if (result) {
+				console.log('');
+				console.log(formatInstallResult(result));
+			}
+			const after = await promptAfterAction('editor');
+			if (after === 'main') {
+				return;
+			}
+			continue;
+		}
 
 		if (next === 'again') {
 			continue;
@@ -808,6 +1056,10 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 				);
 				process.exit(1);
 			}
+			console.log('');
+			console.log(
+				`Installing ${getSetupGuide(editor).label} setup. Please wait while npx resolves packages...`
+			);
 			const result = runEditorInstall(editor, {
 				cwd: process.cwd(),
 				includeSvelteMcp

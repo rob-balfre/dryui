@@ -215,7 +215,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 1. `dryui info <Component>` or `dryui compose "<query>"` before writing so you confirm kind, required parts, bindables, and canonical usage. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
 2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. `dryui review`, `dryui diagnose`, or `dryui doctor` after implementation to catch composition drift, layout violations, and accessibility regressions. If MCP is available, `check` is the equivalent surface.
+3. Run `check` if DryUI MCP is available after implementation to catch composition drift, layout violations, and accessibility regressions. Without MCP, rely on the `@dryui/lint` preprocessor plus the project's normal build and test commands.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
 ### CLI (default entry point)
@@ -230,11 +230,11 @@ dryui info <component>          # Look up component API
 dryui compose "date input"      # Composition guidance
 dryui detect [path]             # Check project setup
 dryui install [path]            # Print install plan
-dryui review <file.svelte>      # Validate component
-dryui diagnose <file.css>       # Validate theme CSS
-dryui doctor [path]             # Audit workspace
-dryui lint [path]               # Deterministic findings
 dryui list                      # List components
+dryui tokens --category color   # Browse design tokens
+dryui ambient                   # SessionStart context
+dryui install-hook --dry-run    # Preview Claude hook wiring
+dryui feedback init             # Feedback tooling setup
 ```
 
 Without a global install, prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, just slower (re-fetches on each call).

@@ -268,10 +268,9 @@ Ensure sufficient contrast between text and background.
 
 ## Validating Theme CSS
 
-Run `dryui diagnose <theme.css>` to catch theme issues. If MCP is available, `check <theme.css>` is equivalent:
+Use `check <theme.css>` when DryUI MCP is available to catch theme issues. Without MCP, validate by rebuilding the app with `@dryui/lint` wired and checking the resulting diagnostics:
 
 ```bash
-dryui diagnose src/styles/global.css
 check src/styles/global.css
 ```
 

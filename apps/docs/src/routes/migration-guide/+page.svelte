@@ -96,9 +96,9 @@
 						<div class="stack-sm">
 							<Heading level={4}>Lookup-first workflow</Heading>
 							<Text size="sm" color="secondary">
-								Start with <code>dryui info</code> or <code>dryui compose</code>, then run
-								<code>dryui review</code> or <code>dryui doctor</code> after implementation. If your
-								editor exposes DryUI MCP, <code>ask</code> and <code>check</code> mirror the same loop.
+								Start with <code>dryui info</code> or <code>dryui compose</code>, then use
+								<code>check</code> if your editor exposes DryUI MCP. Without MCP, rely on the
+								project build, tests, and the <code>@dryui/lint</code> preprocessor to catch drift.
 							</Text>
 						</div>
 					</Card.Content>
@@ -146,10 +146,10 @@
 						<div class="stack-sm">
 							<Text weight="medium">3. Validate</Text>
 							<Text size="sm" color="secondary">
-								Run <code>dryui review</code> on components, <code>dryui diagnose</code> on theme
-								CSS, or <code>dryui doctor</code> across the workspace so layout drift, compound
-								misuse, and accessibility regressions get caught before they spread.
-								<code>check</code> is the MCP equivalent.
+								Run <code>check</code> on the component, theme CSS, directory, or workspace when DryUI
+								MCP is available so layout drift, compound misuse, and accessibility regressions get caught
+								before they spread. Without MCP, rebuild and run the normal test suite after wiring the
+								change.
 							</Text>
 						</div>
 					</Card.Content>

@@ -457,7 +457,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
 - Normalize route/session state in script before rendering DryUI inputs.
 - Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
 - Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
-- Run `dryui info <Component>` or `dryui compose "<pattern>"` before introducing a new field shape, then run `dryui review` or `dryui doctor` after the flow is wired. If MCP is available, `ask` / `check` are equivalent.
+- Run `dryui info <Component>` or `dryui compose "<pattern>"` before introducing a new field shape, then use MCP `check` if it is available after the flow is wired. Without MCP, rely on the `@dryui/lint` preprocessor plus the project's normal build and test commands.
 
 ```svelte
 <script lang="ts">

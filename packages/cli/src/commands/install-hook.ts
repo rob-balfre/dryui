@@ -39,6 +39,13 @@ interface ClaudeSettings {
 // `dryui ambient` is the canonical hook entrypoint.
 const AMBIENT_COMMAND = 'dryui ambient';
 
+export interface InstallHookStatus {
+	project: boolean;
+	projectPath: string;
+	global: boolean;
+	globalPath: string;
+}
+
 function resolveSettingsPath(args: string[]): { path: string; scope: 'project' | 'global' } {
 	if (hasFlag(args, '--global')) {
 		return { path: resolve(homedir(), '.claude', 'settings.json'), scope: 'global' };
@@ -75,6 +82,14 @@ function hasDryuiSessionStartHook(settings: ClaudeSettings): boolean {
 	return false;
 }
 
+function hasDryuiSessionStartHookAtPath(path: string): boolean {
+	try {
+		return hasDryuiSessionStartHook(loadSettings(path).data);
+	} catch {
+		return false;
+	}
+}
+
 function mergeSessionStartHook(settings: ClaudeSettings): ClaudeSettings {
 	const next: ClaudeSettings = { ...settings };
 	const hooks: ClaudeSettingsHooks = { ...(next.hooks ?? {}) };
@@ -103,6 +118,23 @@ function mergeSessionStartHook(settings: ClaudeSettings): ClaudeSettings {
 function ensureDir(path: string): void {
 	const dir = dirname(path);
 	if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+}
+
+export function getInstallHookStatus(options?: {
+	cwd?: string;
+	homeDir?: string;
+}): InstallHookStatus {
+	const cwd = options?.cwd ?? process.cwd();
+	const homeDir = options?.homeDir ?? homedir();
+	const projectPath = resolve(cwd, '.claude', 'settings.json');
+	const globalPath = resolve(homeDir, '.claude', 'settings.json');
+
+	return {
+		project: hasDryuiSessionStartHookAtPath(projectPath),
+		projectPath,
+		global: hasDryuiSessionStartHookAtPath(globalPath),
+		globalPath
+	};
 }
 
 export function runInstallHook(args: string[]): void {

@@ -76,14 +76,13 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	detect: 'blue',
 	install: 'green',
 	add: 'green',
-	get: 'orange',
 	info: 'blue',
 	list: 'purple',
 	compose: 'orange',
-	review: 'blue',
-	diagnose: 'green',
-	doctor: 'blue',
-	lint: 'purple'
+	tokens: 'purple',
+	ambient: 'gray',
+	'install-hook': 'gray',
+	feedback: 'green'
 };
 
 const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
@@ -92,14 +91,13 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	detect: 'dryui detect .',
 	install: 'dryui install .',
 	add: 'dryui add --project --target src/routes/+page.svelte Card',
-	get: 'dryui get "Checkout Forms"',
 	info: 'dryui info card',
 	list: 'dryui list --category layout',
 	compose: 'dryui compose "date input"',
-	review: 'dryui review src/routes/+page.svelte',
-	diagnose: 'dryui diagnose src/app.css',
-	doctor: 'dryui doctor --changed',
-	lint: 'dryui lint --max-severity warning'
+	tokens: 'dryui tokens --category color',
+	ambient: 'dryui ambient',
+	'install-hook': 'dryui install-hook --dry-run',
+	feedback: 'dryui feedback ui --no-open'
 };
 
 export const dryuiMcpTools: readonly AiSurfaceCard[] = aiSurface.tools.map((tool) => ({
@@ -208,9 +206,13 @@ const zedConfig = `{
 }`;
 
 const companionSvelteNote =
-	'DryUI runs `dryui setup --install` to register this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code and Codex, paste the snippet below.';
+	'DryUI runs `dryui setup --install` to register this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code, Codex, and Gemini, use the snippet below.';
 
-const svelteCompanionClaude = 'claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp';
+const svelteCompanionClaude = `claude plugin marketplace add sveltejs/ai-tools
+claude plugin install svelte@svelte
+
+# MCP-only fallback
+claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`;
 
 const svelteCompanionCodex = `[mcp_servers.svelte]
 command = "npx"
@@ -308,8 +310,8 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		companionMcp: {
-			title: 'Svelte MCP (recommended companion)',
-			note: `${companionSvelteNote} Adds list-sections, get-documentation, svelte-autofixer, and playground-link so the agent can ground Svelte 5 and SvelteKit answers in the official docs.`,
+			title: 'Svelte companion (recommended)',
+			note: 'Prefer the official Claude Svelte plugin. If you cannot use plugins, the MCP-only fallback below still adds list-sections, get-documentation, svelte-autofixer, and playground-link so the agent can ground Svelte 5 and SvelteKit answers in the official docs.',
 			code: svelteCompanionClaude,
 			language: 'bash'
 		},

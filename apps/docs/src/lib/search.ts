@@ -51,7 +51,7 @@ const allDocsPages: SearchItem[] = [
 	{
 		label: 'Tools',
 		href: '/tools',
-		description: 'Install and use the DryUI CLI for setup, lookup, and validation.',
+		description: 'Install and use the DryUI CLI for setup, lookup, tokens, and feedback tooling.',
 		keywords: [
 			'cli',
 			'install',
@@ -61,9 +61,10 @@ const allDocsPages: SearchItem[] = [
 			'init',
 			'detect',
 			'install plan',
-			'review',
-			'diagnose',
-			'compose'
+			'compose',
+			'tokens',
+			'feedback',
+			'ambient'
 		]
 	},
 	{

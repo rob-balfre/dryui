@@ -1,14 +1,20 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import {
 	autoInstallableEditors,
 	formatInstallResult,
+	getAgentSetupStatus,
 	installPreviewLines,
 	isAutoInstallable,
 	mergeServersConfig,
+	mergeTomlSection,
+	readAgentSetupStatuses,
 	readSvelteMcpRegistrations,
 	runEditorInstall,
+	runSvelteCompanionInstall,
+	svelteCompanionPreviewLines,
+	summarizeAgentSetupStatus,
 	summarizeSvelteMcpStatus
 } from '../commands/setup-installers.js';
 import { cleanupTempDirs, createTempTree } from './helpers.js';
@@ -35,6 +41,7 @@ describe('isAutoInstallable', () => {
 	test('returns false for editors that need interactive plugin install', () => {
 		expect(isAutoInstallable('claude-code')).toBe(false);
 		expect(isAutoInstallable('codex')).toBe(false);
+		expect(isAutoInstallable('gemini')).toBe(false);
 	});
 
 	test('autoInstallableEditors lists exactly the wired set', () => {
@@ -243,6 +250,7 @@ describe('runEditorInstall', () => {
 		const root = createTempTree({});
 		expect(runEditorInstall('claude-code', { cwd: root })).toBeNull();
 		expect(runEditorInstall('codex', { cwd: root })).toBeNull();
+		expect(runEditorInstall('gemini', { cwd: root })).toBeNull();
 	});
 
 	test('reports failure when degit fails and surfaces it in the formatted output', () => {
@@ -370,6 +378,181 @@ describe('Svelte MCP companion', () => {
 		expect(lines.some((line) => line.includes('+ svelte'))).toBe(true);
 	});
 
+	test('companion preview lines describe the standalone install path', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		expect(svelteCompanionPreviewLines('claude-code', { cwd: root, homeDir: home })).toEqual([
+			'• Install the official `svelte@svelte` Claude plugin if it is missing',
+			'• Falls back to the existing plugin state when already present'
+		]);
+	});
+
+	test('mergeTomlSection appends a new block once and then becomes unchanged', () => {
+		const home = createTempTree({
+			'.codex/config.toml': `[mcp_servers.dryui]
+command = "npx"
+args = ["-y", "@dryui/mcp"]
+`
+		});
+		const target = join(home, '.codex/config.toml');
+
+		const first = mergeTomlSection({
+			path: target,
+			section: 'mcp_servers.svelte',
+			block: `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]`,
+			label: 'Update ~/.codex/config.toml'
+		});
+		const second = mergeTomlSection({
+			path: target,
+			section: 'mcp_servers.svelte',
+			block: `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]`,
+			label: 'Update ~/.codex/config.toml'
+		});
+
+		expect(first.status).toBe('merged');
+		expect(readFileSync(target, 'utf-8')).toContain('[mcp_servers.svelte]');
+		expect(second.status).toBe('unchanged');
+	});
+
+	test('runSvelteCompanionInstall enables the Claude plugin when already installed but disabled', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.claude/settings.json': JSON.stringify({
+				enabledPlugins: {
+					'svelte@svelte': false
+				}
+			}),
+			'.claude/plugins/installed_plugins.json': JSON.stringify({
+				plugins: {
+					'svelte@svelte': [{ installPath: '/tmp/svelte-plugin' }]
+				}
+			})
+		});
+		const calls: Array<{ command: string; args: readonly string[] }> = [];
+
+		const result = runSvelteCompanionInstall('claude-code', {
+			cwd: root,
+			homeDir: home,
+			runProcess: (command, args) => {
+				calls.push({ command, args });
+				return { ok: true, message: `${command} ${args.join(' ')}` };
+			}
+		});
+
+		expect(result?.ok).toBe(true);
+		expect(calls).toEqual([
+			{
+				command: 'claude',
+				args: ['plugin', 'enable', 'svelte@svelte']
+			}
+		]);
+	});
+
+	test('runSvelteCompanionInstall installs the Claude plugin when missing', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.claude/settings.json': JSON.stringify({ enabledPlugins: {} }),
+			'.claude/plugins/installed_plugins.json': JSON.stringify({ plugins: {} })
+		});
+		const calls: Array<{ command: string; args: readonly string[] }> = [];
+
+		const result = runSvelteCompanionInstall('claude-code', {
+			cwd: root,
+			homeDir: home,
+			runProcess: (command, args) => {
+				calls.push({ command, args });
+				return { ok: true, message: `${command} ${args.join(' ')}` };
+			}
+		});
+
+		expect(result?.ok).toBe(true);
+		expect(calls).toEqual([
+			{
+				command: 'claude',
+				args: ['plugin', 'marketplace', 'add', 'sveltejs/ai-tools']
+			},
+			{
+				command: 'claude',
+				args: ['plugin', 'install', 'svelte@svelte']
+			}
+		]);
+	});
+
+	test('runSvelteCompanionInstall appends the codex config block', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+
+		const result = runSvelteCompanionInstall('codex', { cwd: root, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		expect(readFileSync(join(home, '.codex/config.toml'), 'utf-8')).toContain(
+			'[mcp_servers.svelte]'
+		);
+	});
+
+	test('runSvelteCompanionInstall merges the gemini config', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				},
+				theme: 'keep-me'
+			})
+		});
+
+		const result = runSvelteCompanionInstall('gemini', { cwd: root, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
+		expect(config.theme).toBe('keep-me');
+		expect(config.mcpServers.svelte).toEqual({
+			command: 'npx',
+			args: ['-y', '@sveltejs/mcp']
+		});
+	});
+
+	test('runSvelteCompanionInstall can wire cursor without re-running the full install', () => {
+		const root = createTempTree({
+			'.cursor/mcp.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+
+		const result = runSvelteCompanionInstall('cursor', { cwd: root });
+
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
+		expect(config.mcpServers.dryui).toEqual({
+			command: 'npx',
+			args: ['-y', '@dryui/mcp']
+		});
+		expect(config.mcpServers.svelte).toEqual({
+			command: 'npx',
+			args: ['-y', '@sveltejs/mcp']
+		});
+	});
+
+	test('getAgentSetupStatus reflects the companion after a standalone install', () => {
+		const root = createTempTree({
+			'.cursor/mcp.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+
+		expect(getAgentSetupStatus('cursor', { cwd: root }).svelte).toBe(false);
+		runSvelteCompanionInstall('cursor', { cwd: root });
+		expect(getAgentSetupStatus('cursor', { cwd: root }).svelte).toBe(true);
+	});
+
 	test('readSvelteMcpRegistrations finds servers installed by the installer', () => {
 		const root = createTempTree({});
 		const home = createTempTree({});
@@ -395,16 +578,123 @@ describe('Svelte MCP companion', () => {
 		expect(zed?.status).toBe('missing');
 	});
 
+	test('readSvelteMcpRegistrations includes codex and gemini companion setup', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.codex/config.toml': `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]
+`,
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					svelte: { command: 'npx', args: ['-y', '@sveltejs/mcp'] }
+				}
+			})
+		});
+
+		const statuses = readSvelteMcpRegistrations({ cwd: root, homeDir: home });
+		expect(statuses.find((entry) => entry.editor === 'codex')?.status).toBe('registered');
+		expect(statuses.find((entry) => entry.editor === 'gemini')?.status).toBe('registered');
+	});
+
+	test('readSvelteMcpRegistrations counts a claude plugin that bundles svelte', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const installPath = join(home, '.claude/plugins/cache/dryui/dryui/0.2.0');
+		mkdirSync(join(installPath, '.claude-plugin'), { recursive: true });
+		writeFileSync(
+			join(home, '.claude/settings.json'),
+			JSON.stringify({
+				enabledPlugins: {
+					'dryui@dryui': true
+				}
+			})
+		);
+		writeFileSync(
+			join(home, '.claude/plugins/installed_plugins.json'),
+			JSON.stringify({
+				plugins: {
+					'dryui@dryui': [{ installPath }]
+				}
+			})
+		);
+		writeFileSync(
+			join(installPath, '.claude-plugin/plugin.json'),
+			JSON.stringify({
+				mcpServers: './.mcp.json'
+			})
+		);
+		writeFileSync(
+			join(installPath, '.mcp.json'),
+			JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx' },
+					svelte: { command: 'npx' }
+				}
+			})
+		);
+
+		const statuses = readSvelteMcpRegistrations({ cwd: root, homeDir: home });
+		expect(statuses.find((entry) => entry.editor === 'claude-code')?.status).toBe('registered');
+	});
+
+	test('readSvelteMcpRegistrations counts the standalone claude svelte plugin', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const installPath = join(home, '.claude/plugins/cache/svelte/svelte/1.0.4');
+		mkdirSync(join(installPath, '.claude-plugin'), { recursive: true });
+		writeFileSync(
+			join(home, '.claude/settings.json'),
+			JSON.stringify({
+				enabledPlugins: {
+					'svelte@svelte': true
+				}
+			})
+		);
+		writeFileSync(
+			join(home, '.claude/plugins/installed_plugins.json'),
+			JSON.stringify({
+				plugins: {
+					'svelte@svelte': [{ installPath }]
+				}
+			})
+		);
+		writeFileSync(
+			join(installPath, '.claude-plugin/plugin.json'),
+			JSON.stringify({
+				mcpServers: './.mcp.json'
+			})
+		);
+		writeFileSync(
+			join(installPath, '.mcp.json'),
+			JSON.stringify({
+				mcpServers: {
+					svelte: { type: 'http', url: 'https://mcp.svelte.dev/mcp' }
+				}
+			})
+		);
+
+		const statuses = readSvelteMcpRegistrations({ cwd: root, homeDir: home });
+		expect(statuses.find((entry) => entry.editor === 'claude-code')?.status).toBe('registered');
+	});
+
 	test('summarizeSvelteMcpStatus names the editors that have it registered', () => {
 		const root = createTempTree({});
+		const home = createTempTree({
+			'.codex/config.toml': `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]
+`
+		});
 		runEditorInstall('cursor', {
 			cwd: root,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
-		const summary = summarizeSvelteMcpStatus({ cwd: root, homeDir: createTempTree({}) });
+		const summary = summarizeSvelteMcpStatus({ cwd: root, homeDir: home });
 		expect(summary).toContain('svelte-mcp');
 		expect(summary).toContain('cursor');
+		expect(summary).toContain('codex');
 	});
 
 	test('summarizeSvelteMcpStatus reports not-registered when absent', () => {
@@ -413,6 +703,163 @@ describe('Svelte MCP companion', () => {
 		expect(summarizeSvelteMcpStatus({ cwd: root, homeDir: home })).toBe(
 			'svelte-mcp: not registered in any wired editor'
 		);
+	});
+});
+
+describe('agent setup summary', () => {
+	test('lists configured agents and annotates svelte when present', () => {
+		const root = createTempTree({
+			'.vscode/mcp.json': JSON.stringify({
+				servers: {
+					dryui: { command: 'npx' },
+					svelte: { command: 'npx' }
+				}
+			})
+		});
+		const home = createTempTree({
+			'.codex/config.toml': `[plugins."dryui@dryui"]
+enabled = true
+
+[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]
+`,
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+		const installPath = join(home, '.claude/plugins/cache/dryui/dryui/0.2.0');
+		mkdirSync(join(installPath, '.claude-plugin'), { recursive: true });
+		writeFileSync(
+			join(home, '.claude/settings.json'),
+			JSON.stringify({
+				enabledPlugins: {
+					'dryui@dryui': true
+				}
+			})
+		);
+		writeFileSync(
+			join(home, '.claude/plugins/installed_plugins.json'),
+			JSON.stringify({
+				plugins: {
+					'dryui@dryui': [{ installPath }]
+				}
+			})
+		);
+		writeFileSync(
+			join(installPath, '.claude-plugin/plugin.json'),
+			JSON.stringify({
+				mcpServers: './.mcp.json'
+			})
+		);
+		writeFileSync(
+			join(installPath, '.mcp.json'),
+			JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx' },
+					svelte: { command: 'npx' }
+				}
+			})
+		);
+
+		const statuses = readAgentSetupStatuses({ cwd: root, homeDir: home });
+		expect(statuses.find((entry) => entry.editor === 'claude-code')).toEqual({
+			editor: 'claude-code',
+			dryui: true,
+			svelte: true,
+			source: 'plugin'
+		});
+		expect(statuses.find((entry) => entry.editor === 'codex')).toEqual({
+			editor: 'codex',
+			dryui: true,
+			svelte: true,
+			source: 'plugin'
+		});
+		expect(statuses.find((entry) => entry.editor === 'gemini')).toEqual({
+			editor: 'gemini',
+			dryui: true,
+			svelte: false,
+			source: 'mcp'
+		});
+		expect(statuses.find((entry) => entry.editor === 'copilot')).toEqual({
+			editor: 'copilot',
+			dryui: true,
+			svelte: true,
+			source: 'mcp'
+		});
+
+		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe(
+			'agents: claude [plugin + svelte], codex [plugin + svelte], gemini [mcp], copilot [mcp + svelte]'
+		);
+	});
+
+	test('counts claude project .mcp.json alongside plugin wiring', () => {
+		const root = createTempTree({
+			'.mcp.json': JSON.stringify({
+				mcpServers: {
+					dryui: { type: 'stdio', command: 'bun', args: ['run', 'packages/mcp/dist/index.js'] }
+				}
+			})
+		});
+		const home = createTempTree({});
+		const dryuiInstallPath = join(home, '.claude/plugins/cache/dryui/dryui/0.2.0');
+		const svelteInstallPath = join(home, '.claude/plugins/cache/svelte/svelte/1.0.4');
+		mkdirSync(join(dryuiInstallPath, '.claude-plugin'), { recursive: true });
+		mkdirSync(join(svelteInstallPath, '.claude-plugin'), { recursive: true });
+		writeFileSync(
+			join(home, '.claude/settings.json'),
+			JSON.stringify({
+				enabledPlugins: {
+					'dryui@dryui': true,
+					'svelte@svelte': true
+				}
+			})
+		);
+		writeFileSync(
+			join(home, '.claude/plugins/installed_plugins.json'),
+			JSON.stringify({
+				plugins: {
+					'dryui@dryui': [{ installPath: dryuiInstallPath }],
+					'svelte@svelte': [{ installPath: svelteInstallPath }]
+				}
+			})
+		);
+		writeFileSync(
+			join(dryuiInstallPath, '.claude-plugin/plugin.json'),
+			JSON.stringify({ mcpServers: './.mcp.json' })
+		);
+		writeFileSync(
+			join(dryuiInstallPath, '.mcp.json'),
+			JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx' }
+				}
+			})
+		);
+		writeFileSync(
+			join(svelteInstallPath, '.claude-plugin/plugin.json'),
+			JSON.stringify({ mcpServers: './.mcp.json' })
+		);
+		writeFileSync(
+			join(svelteInstallPath, '.mcp.json'),
+			JSON.stringify({
+				mcpServers: {
+					svelte: { type: 'http', url: 'https://mcp.svelte.dev/mcp' }
+				}
+			})
+		);
+
+		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe(
+			'agents: claude [plugin + mcp + svelte]'
+		);
+	});
+
+	test('reports no wired agents when nothing is configured', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe('agents: none wired yet');
 	});
 });
 
