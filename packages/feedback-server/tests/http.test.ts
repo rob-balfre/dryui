@@ -142,13 +142,47 @@ describe('feedback HTTP server', () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				url: 'https://example.com/queue/older',
-				image: Buffer.from('pending-older-screenshot').toString('base64'),
-				drawings: [{ kind: 'arrow' }]
+				image: {
+					webp: Buffer.from('pending-older-webp').toString('base64'),
+					png: Buffer.from('pending-older-png').toString('base64')
+				},
+				drawings: [
+					{
+						id: 'arrow-older',
+						kind: 'arrow',
+						color: 'hsl(25 100% 55%)',
+						start: { x: 10, y: 10 },
+						end: { x: 50, y: 50 },
+						width: 3
+					}
+				],
+				hints: [
+					{
+						corner: 'top-left',
+						percentX: 4,
+						percentY: 5,
+						element: { tag: 'nav', selector: 'nav.primary' }
+					}
+				],
+				viewport: { width: 2560, height: 1440 },
+				scroll: { x: 0, y: 120 }
 			})
 		});
 		expect(pendingOlderResponse.status).toBe(201);
 		const pendingOlder = (await pendingOlderResponse.json()) as Submission;
-		screenshotPaths.push(pendingOlder.screenshotPath);
+		screenshotPaths.push(pendingOlder.screenshotPath.webp, pendingOlder.screenshotPath.png);
+
+		expect(pendingOlder.screenshotPath.webp).toMatch(/\.webp$/);
+		expect(pendingOlder.screenshotPath.png).toMatch(/\.png$/);
+		expect(pendingOlder.hints).toEqual([
+			{
+				corner: 'top-left',
+				percentX: 4,
+				percentY: 5,
+				element: { tag: 'nav', selector: 'nav.primary' }
+			}
+		]);
+		expect(pendingOlder.scroll).toEqual({ x: 0, y: 120 });
 
 		await new Promise((resolve) => setTimeout(resolve, 5));
 
@@ -157,26 +191,50 @@ describe('feedback HTTP server', () => {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				url: 'https://example.com/queue/newer',
-				image: Buffer.from('pending-newer-screenshot').toString('base64'),
-				drawings: [{ kind: 'arrow' }]
+				image: {
+					webp: Buffer.from('pending-newer-webp').toString('base64'),
+					png: Buffer.from('pending-newer-png').toString('base64')
+				},
+				drawings: [
+					{
+						id: 'arrow-newer',
+						kind: 'arrow',
+						color: 'hsl(25 100% 55%)',
+						start: { x: 1, y: 1 },
+						end: { x: 10, y: 10 },
+						width: 3
+					}
+				]
 			})
 		});
 		expect(pendingNewerResponse.status).toBe(201);
 		const pendingNewer = (await pendingNewerResponse.json()) as Submission;
-		screenshotPaths.push(pendingNewer.screenshotPath);
+		screenshotPaths.push(pendingNewer.screenshotPath.webp, pendingNewer.screenshotPath.png);
 
 		const resolvedResponse = await fetch(`${baseUrl}/submissions`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({
 				url: 'https://example.com/history',
-				image: Buffer.from('resolved-screenshot').toString('base64'),
-				drawings: [{ kind: 'text', text: 'Looks good' }]
+				image: {
+					webp: Buffer.from('resolved-webp').toString('base64'),
+					png: Buffer.from('resolved-png').toString('base64')
+				},
+				drawings: [
+					{
+						id: 'text-resolved',
+						kind: 'text',
+						color: 'hsl(25 100% 55%)',
+						position: { x: 20, y: 40 },
+						text: 'Looks good',
+						fontSize: 16
+					}
+				]
 			})
 		});
 		expect(resolvedResponse.status).toBe(201);
 		const resolved = (await resolvedResponse.json()) as Submission;
-		screenshotPaths.push(resolved.screenshotPath);
+		screenshotPaths.push(resolved.screenshotPath.webp, resolved.screenshotPath.png);
 
 		const updateResponse = await fetch(`${baseUrl}/submissions/${resolved.id}`, {
 			method: 'PATCH',
@@ -210,9 +268,29 @@ describe('feedback HTTP server', () => {
 			[pendingOlder.id, pendingNewer.id, resolved.id].sort()
 		);
 
-		const screenshotResponse = await fetch(`${baseUrl}/submissions/${pendingOlder.id}/screenshot`);
-		expect(screenshotResponse.status).toBe(200);
-		expect(screenshotResponse.headers.get('content-type')).toContain('image/webp');
-		expect((await screenshotResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
+		const webpResponse = await fetch(`${baseUrl}/submissions/${pendingOlder.id}/screenshot`);
+		expect(webpResponse.status).toBe(200);
+		expect(webpResponse.headers.get('content-type')).toContain('image/webp');
+		expect((await webpResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
+
+		const pngResponse = await fetch(
+			`${baseUrl}/submissions/${pendingOlder.id}/screenshot?format=png`
+		);
+		expect(pngResponse.status).toBe(200);
+		expect(pngResponse.headers.get('content-type')).toContain('image/png');
+		expect((await pngResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
+	});
+
+	test('rejects submissions missing paired image fields', async () => {
+		const response = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/bad',
+				image: { webp: Buffer.from('only-webp').toString('base64') },
+				drawings: []
+			})
+		});
+		expect(response.status).toBe(400);
 	});
 });

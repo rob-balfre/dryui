@@ -2,7 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { FeedbackHttpClient } from './client.js';
-import type { Annotation } from './types.js';
+import type { Annotation, Submission } from './types.js';
 
 type FeedbackToolClient = Pick<
 	FeedbackHttpClient,
@@ -32,6 +32,46 @@ function formatAnnotation(annotation: Annotation): string {
 	if (annotation.svelteComponents) lines.push(`Svelte: ${annotation.svelteComponents}`);
 
 	return lines.join('\n');
+}
+
+/**
+ * Shape a submission row for the MCP wire. We surface both screenshot paths,
+ * the scroll offset at submit time, per-drawing hints (parallel array), and a
+ * small `summary` block so agents can see drawing counts and top-level corners
+ * without iterating. Existing fields pass through unchanged.
+ */
+function enrichSubmissionForResponse(submission: Submission): Record<string, unknown> {
+	const drawings = submission.drawings ?? [];
+	const hints = submission.hints ?? [];
+	const kindCounts: Record<string, number> = {};
+	for (const drawing of drawings) {
+		const kind = drawing.kind ?? 'unknown';
+		kindCounts[kind] = (kindCounts[kind] ?? 0) + 1;
+	}
+
+	const cornerCounts: Record<string, number> = {};
+	for (const hint of hints) {
+		cornerCounts[hint.corner] = (cornerCounts[hint.corner] ?? 0) + 1;
+	}
+
+	return {
+		id: submission.id,
+		url: submission.url,
+		status: submission.status,
+		createdAt: submission.createdAt,
+		...(submission.agent ? { agent: submission.agent } : {}),
+		screenshotPath: submission.screenshotPath,
+		viewport: submission.viewport,
+		scroll: submission.scroll ?? null,
+		drawings,
+		hints,
+		summary: {
+			drawingCount: drawings.length,
+			hintCount: hints.length,
+			drawingKinds: kindCounts,
+			corners: cornerCounts
+		}
+	};
 }
 
 export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToolClient): void {
@@ -155,7 +195,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 
 	server.tool(
 		'feedback_get_submissions',
-		'Poll for pending feedback submissions. Returns screenshot file paths and drawing data.',
+		'Poll for pending feedback submissions. Returns both WebP and PNG screenshot paths, scroll offset at submit time, per-drawing position hints, and the raw drawings.',
 		{
 			timeoutSeconds: z
 				.number()
@@ -179,11 +219,12 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 				const result = await client.getSubmissions('pending');
 
 				if (result.count > 0) {
+					const submissions = result.submissions.map(enrichSubmissionForResponse);
 					return {
 						content: [
 							{
 								type: 'text',
-								text: JSON.stringify({ timedOut: false, ...result }, null, 2)
+								text: JSON.stringify({ timedOut: false, count: result.count, submissions }, null, 2)
 							}
 						]
 					};
