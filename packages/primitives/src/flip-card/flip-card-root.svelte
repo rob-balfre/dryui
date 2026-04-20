@@ -14,6 +14,8 @@
 		trigger = 'hover',
 		direction = 'horizontal',
 		flipped = $bindable(false),
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledBy,
 		children,
 		...rest
 	}: Props = $props();
@@ -21,6 +23,8 @@
 	function toggle() {
 		flipped = !flipped;
 	}
+
+	const toggleLabel = $derived(flipped ? 'Show front of card' : 'Show back of card');
 
 	setFlipCardCtx({
 		get flipped() {
@@ -32,26 +36,52 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
+	data-part="root"
 	data-flipped={flipped ? '' : undefined}
 	data-trigger={trigger}
 	data-direction={direction}
-	role={trigger === 'click' ? 'button' : 'group'}
-	aria-roledescription="flip card"
-	tabindex={trigger === 'click' ? 0 : undefined}
+	role={trigger === 'hover' ? 'group' : undefined}
+	aria-roledescription={trigger === 'hover' ? 'flip card' : undefined}
+	aria-label={trigger === 'hover' ? ariaLabel : undefined}
+	aria-labelledby={trigger === 'hover' ? ariaLabelledBy : undefined}
 	onmouseenter={trigger === 'hover' ? () => (flipped = true) : undefined}
 	onmouseleave={trigger === 'hover' ? () => (flipped = false) : undefined}
-	onclick={trigger === 'click' ? toggle : undefined}
-	onkeydown={trigger === 'click'
-		? (e) => {
-				if (e.key === 'Enter' || e.key === ' ') {
-					e.preventDefault();
-					toggle();
-				}
-			}
-		: undefined}
 	{...rest}
 >
+	{#if trigger === 'click'}
+		<button
+			type="button"
+			data-part="toggle"
+			aria-pressed={flipped}
+			aria-label={ariaLabel ?? toggleLabel}
+			aria-labelledby={ariaLabelledBy}
+			onclick={toggle}
+		></button>
+	{/if}
 	{@render children()}
 </div>
+
+<style>
+	[data-part='root'] {
+		position: relative;
+	}
+
+	[data-part='toggle'] {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		border: 0;
+		padding: 0;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		cursor: pointer;
+		appearance: none;
+	}
+
+	[data-part='toggle']:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
+	}
+</style>

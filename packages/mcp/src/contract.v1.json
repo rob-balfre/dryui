@@ -8278,6 +8278,18 @@
         "Keep heading, reading, and focus order aligned with the surrounding content."
       ],
       "cssVars": {
+        "--dry-btn-accent": "Accent",
+        "--dry-btn-accent-fg": "Accent Fg",
+        "--dry-btn-accent-stroke": "Accent Stroke",
+        "--dry-btn-accent-weak": "Accent Weak",
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-on-accent": "On Accent",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-list-color": "Text color",
         "--dry-list-gap": "Gap spacing",
         "--dry-list-item-active-bg": "Item Active Bg",
@@ -8317,6 +8329,9 @@
         },
         {
           "name": "data-list-item-secondary"
+        },
+        {
+          "name": "data-list-item-surface"
         },
         {
           "name": "data-list-item-text"
@@ -8584,6 +8599,19 @@
                 "6"
               ],
               "description": "Heading level used to render semantic h1 through h6 output."
+            },
+            "variant": {
+              "type": "'default' | 'display'",
+              "required": false,
+              "acceptedValues": [
+                "default",
+                "display"
+              ],
+              "description": "Visual style preset for the component."
+            },
+            "className": {
+              "type": "HTMLAttributes<HTMLHeadingElement>['class']",
+              "required": false
             },
             "children": {
               "type": "Snippet",
@@ -16835,6 +16863,13 @@
         "Keep heading, reading, and focus order aligned with the surrounding content."
       ],
       "cssVars": {
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-flip-card-back-transform": "Card Back Transform",
         "--dry-flip-card-duration": "Card Duration",
         "--dry-flip-card-front-transform": "Card Front Transform",
@@ -16852,6 +16887,9 @@
         },
         {
           "name": "data-flip-card-front"
+        },
+        {
+          "name": "data-flip-card-toggle-shell"
         },
         {
           "name": "data-flipped"
