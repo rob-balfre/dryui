@@ -15,7 +15,18 @@ Tags: form, action, click, submit, cta, link-button
 Kind: simple
 Root import: import { Button } from '@dryui/ui'
 Subpath import: import { Button } from '@dryui/ui/button'
-Props: variant (ButtonVariant), Button treatment from solid primary actions to ghost and inline link styles., default 'solid' | size (ButtonSize), Button density preset, including icon-only sizing variants., default 'md' | color (ButtonColor), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
+Props: variant (| 'solid'
+	| 'outline'
+	| 'ghost'
+	| 'soft'
+	| 'secondary'
+	| 'link'
+	| 'bare'
+	| 'trigger'
+	| 'nav'
+	| 'tab'
+	| 'toggle'
+	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | (string & {}) | null), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <button> attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg, --dry-btn-trigger-open-bg, --dry-btn-trigger-open-border, --dry-btn-trigger-open-color
 Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
@@ -176,7 +187,7 @@ Tags: chip, pill, filter, selection, tag
 Kind: simple
 Root import: import { Chip } from '@dryui/ui'
 Subpath import: import { Chip } from '@dryui/ui/chip'
-Props: selected (boolean), Whether the current item is selected. | disabled (boolean), Prevents interaction and applies disabled styling. | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (ChipColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | onclick ((event: MouseEvent) => void) | children (Snippet), Content rendered inside the component., required
+Props: selected (boolean), Whether the current item is selected. | disabled (boolean), Prevents interaction and applies disabled styling. | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (AliasableColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | onclick ((event: MouseEvent) => void) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards native HTML attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-fg, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color
 Data attributes: data-chip-color | data-chip-selected | data-chip-size | data-chip-variant | data-disabled (Present when the component or part is disabled.) | data-selected (Present when the current item is selected.)
@@ -336,7 +347,7 @@ Tags: form, range, slider, value
 Kind: simple
 Root import: import { Slider } from '@dryui/ui'
 Subpath import: import { Slider } from '@dryui/ui/slider'
-Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant (SliderVariant), Visual style preset for the component., default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
+Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant ('default' | 'pill'), Visual style preset for the component., accepted default, pill, default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
 Native props: Forwards <input> attributes via rest props.
 CSS variables: --dry-slider-thumb-size, --dry-slider-track-height
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-variant
@@ -1054,7 +1065,18 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Select.Content
-  Props: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Select.Item
   Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
@@ -1099,7 +1121,18 @@ Parts:
   Props: placeholder (string), Hint text shown when no value is selected or entered., default ''
   Native props: Forwards <input> attributes via rest props.
 - MultiSelectCombobox.Content
-  Props: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - MultiSelectCombobox.Group
   Props: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
@@ -1192,7 +1225,18 @@ Parts:
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | leading (Snippet) | trailing (Snippet) | placeholder (string), Hint text shown when no value is selected or entered., default ''
   Native props: Forwards <input> attributes via rest props.
 - Combobox.Content
-  Props: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Combobox.Item
   Props: value (string), Current controlled or bindable value., required | index (number), required | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required
@@ -1271,7 +1315,18 @@ Parts:
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 - DatePicker.Content
-  Props: placement (Placement) | offset (number) | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end | offset (number) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DatePicker.Calendar
   Props: none
@@ -1282,7 +1337,7 @@ Structure:
     DatePicker.Content
       DatePicker.Calendar
 CSS variables: none
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -1370,7 +1425,7 @@ Structure:
     DateRangePicker.Calendar
     DateRangePicker.Preset
 CSS variables: none
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
@@ -1554,7 +1609,7 @@ Tags: background, gradient, ambient, shader-like, hero
 Kind: simple
 Root import: import { Aurora } from '@dryui/ui'
 Subpath import: import { Aurora } from '@dryui/ui/aurora'
-Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | motion (AuroraMotion), default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
+Props: palette (AuroraNamedPalette | readonly [string, string, string]), default 'cosmic' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | motion ('auto' | 'never'), accepted auto, never, default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace ('srgb' | 'oklch' | 'oklab'), accepted srgb, oklch, oklab, default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
@@ -1575,7 +1630,7 @@ Tags: texture, grain, surface, overlay, shader-like
 Kind: simple
 Root import: import { Noise } from '@dryui/ui'
 Subpath import: import { Noise } from '@dryui/ui/noise'
-Props: opacity (number), default 0.22 | blend (NoiseBlendMode), default 'overlay' | animated (boolean), default false | grain (NoiseGrain), default 'medium' | children (Snippet), Content rendered inside the component.
+Props: opacity (number), default 0.22 | blend ('soft-light' | 'overlay' | 'multiply'), accepted soft-light, overlay, multiply, default 'overlay' | animated (boolean), default false | grain ('fine' | 'medium' | 'coarse'), accepted fine, medium, coarse, default 'medium' | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-noise-blend, --dry-noise-opacity, --dry-noise-pattern
 Data attributes: data-animated | data-grain | data-noise | data-noise-content | data-noise-texture | data-paused | data-reduced-motion
@@ -2393,7 +2448,18 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Popover.Content
-  Props: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 Structure:
   Popover.Root
@@ -2428,7 +2494,18 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <span> attributes via rest props.
 - Tooltip.Content
-  Props: placement (Placement), default 'top' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'top' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 Structure:
   Tooltip.Root
@@ -2461,7 +2538,18 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DropdownMenu.Content
-  Props: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DropdownMenu.Item
   Props: disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
@@ -2480,8 +2568,8 @@ Structure:
     DropdownMenu.Trigger
     DropdownMenu.Content
       DropdownMenu.Item
-CSS variables: --dry-radius-nested
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
+CSS variables: --dry-menu-item-padding, --dry-radius-nested
+Data attributes: data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2532,8 +2620,8 @@ Structure:
     ContextMenu.Separator
     ContextMenu.Group
     ContextMenu.Label
-CSS variables: --dry-menu-bg, --dry-menu-border, --dry-menu-padding, --dry-menu-radius, --dry-menu-shadow
-Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-disabled (Present when the component or part is disabled.) | data-state
+CSS variables: --dry-menu-bg, --dry-menu-border, --dry-menu-item-padding, --dry-menu-padding, --dry-menu-radius, --dry-menu-shadow
+Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
 ```svelte
@@ -2613,7 +2701,18 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <a> attributes via rest props.
 - LinkPreview.Content
-  Props: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 Structure:
   LinkPreview.Root
@@ -2688,7 +2787,18 @@ Parts:
   Props: href (string), Destination URL when the component renders as a link. | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <element> attributes via rest props.
 - HoverCard.Content
-  Props: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 Structure:
   HoverCard.Root
@@ -2719,7 +2829,18 @@ Parts:
   Props: children (Snippet<[{ unreadCount: number }]>), Content rendered inside the component., required
   Native props: Forwards <button> attributes via rest props.
 - NotificationCenter.Panel
-  Props: placement (Placement), default 'bottom-end' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+  Props: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-end' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - NotificationCenter.Item
   Props: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | read (boolean), default false | timestamp (Date) | variant ('info' | 'warning' | 'critical'), Visual style preset for the component., accepted info, warning, critical | action (Snippet) | children (Snippet), Content rendered inside the component., required
@@ -2954,7 +3075,7 @@ Tags: status, count, label, tag
 Kind: simple
 Root import: import { Badge } from '@dryui/ui'
 Subpath import: import { Badge } from '@dryui/ui/badge'
-Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (BadgeColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
+Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
 Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
@@ -3222,10 +3343,10 @@ Root import: import { Typography } from '@dryui/ui'
 Subpath import: import { Typography } from '@dryui/ui/typography'
 Parts:
 - Typography.Heading
-  Props: variant ('default' | 'display'), Visual style preset for the component., accepted default, display | level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | children (Snippet), Content rendered inside the component., required
+  Props: level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <h*> attributes via rest props.
 - Typography.Text
-  Props: color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary'), Visual style preset for the component., accepted default, muted, secondary | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | children (Snippet), Content rendered inside the component., required
+  Props: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label
   Native props: Forwards <element> attributes via rest props.
 - Typography.Code
   Props: children (Snippet), Content rendered inside the component., required
@@ -3233,8 +3354,8 @@ Parts:
 - Typography.Blockquote
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <blockquote> attributes via rest props.
-CSS variables: --dry-typography-text-color
-Data attributes: data-as | data-color | data-level | data-size | data-variant
+CSS variables: none
+Data attributes: none
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3249,7 +3370,7 @@ Tags: text, heading, title, typography
 Kind: simple
 Root import: import { Heading } from '@dryui/ui'
 Subpath import: import { Heading } from '@dryui/ui/heading'
-Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default' | children (Snippet), Content rendered inside the component., required
+Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default' | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <h*> attributes via rest props.
 CSS variables: none
 Data attributes: data-level | data-variant
@@ -3266,7 +3387,7 @@ Tags: text, copy, paragraph, typography
 Kind: simple
 Root import: import { Text } from '@dryui/ui'
 Subpath import: import { Text } from '@dryui/ui/text'
-Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | children (Snippet), Content rendered inside the component., required
+Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-typography-text-color
 Data attributes: data-color | data-font | data-size | data-variant | data-weight
@@ -3342,7 +3463,7 @@ Tags: animation, reveal, intersection-observer, stagger, motion
 Kind: simple
 Root import: import { Reveal } from '@dryui/ui'
 Subpath import: import { Reveal } from '@dryui/ui/reveal'
-Props: variant (RevealVariant), Visual style preset for the component., default 'fade' | once (boolean), default true | threshold (number), default 0.18 | delay (number) | duration (number) | distance (number | string) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
+Props: variant ('fade' | 'slide-up' | 'scale-in' | 'blur-up' | 'mask-up'), Visual style preset for the component., accepted fade, slide-up, scale-in, blur-up, mask-up, default 'fade' | once (boolean), default true | threshold (number), default 0.18 | delay (number) | duration (number) | distance (number | string) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-reveal-delay, --dry-reveal-distance, --dry-reveal-duration, --dry-reveal-ease, --dry-reveal-hidden-blur, --dry-reveal-hidden-opacity, --dry-reveal-hidden-scale, --dry-reveal-mask-radius, --dry-reveal-mask-top, --dry-reveal-offset-y
 Data attributes: data-reduced-motion | data-reveal | data-variant | data-visible
@@ -3879,7 +4000,7 @@ Tags: tag, label, chip, badge, category, status
 Kind: simple
 Root import: import { Tag } from '@dryui/ui'
 Subpath import: import { Tag } from '@dryui/ui/tag'
-Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (TagColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
+Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (BadgeColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-tag-bg, --dry-tag-border, --dry-tag-color, --dry-tag-font-size, --dry-tag-padding-x, --dry-tag-padding-y
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
@@ -4066,7 +4187,7 @@ Tags: message, notification, info, warning, error
 Kind: simple
 Root import: import { Alert } from '@dryui/ui'
 Subpath import: import { Alert } from '@dryui/ui/alert'
-Props: variant (AlertVariant), Visual style preset for the component., default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
+Props: variant ('info' | 'success' | 'warning' | 'error'), Visual style preset for the component., accepted info, success, warning, error, default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-alert-bg, --dry-alert-border, --dry-alert-icon-color, --dry-radius-nested
 Data attributes: data-alert | data-alert-body | data-alert-close | data-alert-description | data-alert-icon | data-alert-title | data-dismissible | data-variant
@@ -4325,7 +4446,7 @@ Tags: chromatic, aberration, rgb, glitch, effect, animation
 Kind: simple
 Root import: import { ChromaticShift } from '@dryui/ui'
 Subpath import: import { ChromaticShift } from '@dryui/ui/chromatic-shift'
-Props: offset (number), default 3 | channels (ChromaticShiftChannels), default 'rgb' | trigger (ChromaticShiftTrigger), default 'hover' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: offset (number), default 3 | channels ('rgb' | 'rb'), accepted rgb, rb, default 'rgb' | trigger ('hover' | 'always' | 'none'), accepted hover, always, none, default 'hover' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-chromatic-offset
 Data attributes: data-active (Present on the active item or current target within the component.) | data-animated | data-channels | data-chromatic-shift | data-paused | data-reduced-motion
@@ -4359,7 +4480,7 @@ Tags: displacement, distortion, turbulence, filter, svg, animation
 Kind: simple
 Root import: import { Displacement } from '@dryui/ui'
 Subpath import: import { Displacement } from '@dryui/ui/displacement'
-Props: scale (number), default 12 | turbulence (DisplacementTurbulence), default 'medium' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: scale (number), default 12 | turbulence ('gentle' | 'medium' | 'rough'), accepted gentle, medium, rough, default 'medium' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-animated | data-displacement | data-displacement-svg | data-reduced-motion | data-turbulence
@@ -4427,7 +4548,7 @@ Tags: border, beam, glow, ring, highlight, effect
 Kind: simple
 Root import: import { BorderBeam } from '@dryui/ui'
 Subpath import: import { BorderBeam } from '@dryui/ui/border-beam'
-Props: size (BorderBeamSize), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`). | colorVariant (BorderBeamColorVariant), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments. | theme (BorderBeamTheme), Color tuning for dark or light surfaces, or system preference when set to `auto`. | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
+Props: size ('sm' | 'md' | 'line'), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`)., accepted sm, md, line | colorVariant ('colorful' | 'mono' | 'ocean' | 'sunset'), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments., accepted colorful, mono, ocean, sunset | theme ('auto' | 'light' | 'dark'), Color tuning for dark or light surfaces, or system preference when set to `auto`., accepted auto, light, dark | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-size (Reflects the current effect mode preset., values sm, md, line)
@@ -4495,7 +4616,7 @@ Tags: gradient, mesh, background, animation, interactive, color
 Kind: simple
 Root import: import { GradientMesh } from '@dryui/ui'
 Subpath import: import { GradientMesh } from '@dryui/ui/gradient-mesh'
-Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed (GradientMeshSpeed), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mesh-color-1, --dry-mesh-color-2, --dry-mesh-color-3, --dry-mesh-color-4, --dry-mesh-duration, --dry-mesh-pointer-x, --dry-mesh-pointer-y
 Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion
@@ -4512,7 +4633,7 @@ Tags: halftone, dots, pattern, texture, print, overlay
 Kind: simple
 Root import: import { Halftone } from '@dryui/ui'
 Subpath import: import { Halftone } from '@dryui/ui/halftone'
-Props: dotSize (HalftoneDotSize), default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
+Props: dotSize ('fine' | 'medium' | 'coarse' | number), default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-halftone-angle, --dry-halftone-color, --dry-halftone-dot-radius, --dry-halftone-opacity, --dry-halftone-pattern-size
 Data attributes: data-dot-size | data-halftone | data-halftone-content
@@ -4529,7 +4650,7 @@ Tags: mask, reveal, transition, intersection-observer, animation, clip-path
 Kind: simple
 Root import: import { MaskReveal } from '@dryui/ui'
 Subpath import: import { MaskReveal } from '@dryui/ui/mask-reveal'
-Props: shape (MaskRevealShape), default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
+Props: shape ('circle' | 'linear' | 'diagonal' | 'diamond'), accepted circle, linear, diagonal, diamond, default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mask-reveal-duration, --dry-mask-reveal-ease, --dry-mask-reveal-size
 Data attributes: data-direction | data-mask-reveal | data-mask-reveal-root | data-reduced-motion | data-revealed | data-shape
@@ -4546,7 +4667,11 @@ Tags: shader, webgl, canvas, glsl, animation, background, preset
 Kind: simple
 Root import: import { ShaderCanvas } from '@dryui/ui'
 Subpath import: import { ShaderCanvas } from '@dryui/ui/shader-canvas'
-Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (ShaderCanvasPreset) | themeColors (boolean) | aspectRatio (string)
+Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (| 'gradient-flow'
+	| 'particle-field'
+	| 'wave-distortion'
+	| 'mesh-gradient'
+	| 'liquid-metal'), accepted gradient-flow, particle-field, wave-distortion, mesh-gradient, liquid-metal | themeColors (boolean) | aspectRatio (string)
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-reduced-motion | data-shader-canvas | data-shader-canvas-root | data-webgl

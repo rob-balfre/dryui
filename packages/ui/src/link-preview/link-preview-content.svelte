@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredOverlayContent } from '../internal/anchored-overlay-content.svelte.js';
 	import { getLinkPreviewCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -22,25 +22,22 @@
 
 	const ctx = getLinkPreviewCtx();
 
-	let contentEl = $state<HTMLDivElement>();
-
-	const popover = createAnchoredPopover({
-		triggerEl: () => ctx.triggerEl,
-		contentEl: () => contentEl ?? null,
-		open: () => ctx.open,
+	const overlay = createAnchoredOverlayContent({
+		ctx,
 		placement: () => placement,
-		offset: () => offset
+		offset: () => offset,
+		style: () => style
 	});
 </script>
 
 <div
-	bind:this={contentEl}
+	{@attach overlay.bindContent}
+	{@attach overlay.position}
 	id={ctx.contentId}
 	role="tooltip"
 	popover="manual"
 	data-link-preview-content
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:popover.applyPosition={style}
 	onmouseenter={() => ctx.showImmediate()}
 	onmouseleave={() => ctx.close()}
 	class={className}

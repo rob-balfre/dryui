@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
@@ -22,7 +23,17 @@
 
 	const ctx = getDropdownMenuCtx();
 
-	let el = $state<HTMLDivElement>();
+	let el = $state<HTMLDivElement | null>(null);
+
+	function attachContent(node: HTMLDivElement) {
+		el = node;
+
+		return () => {
+			if (el === node) {
+				el = null;
+			}
+		};
+	}
 
 	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
@@ -39,7 +50,8 @@
 </script>
 
 <div
-	bind:this={el}
+	{@attach attachContent}
+	{@attach fromAction(popover.applyPosition, () => style)}
 	popover="auto"
 	role="menu"
 	tabindex="-1"
@@ -48,7 +60,6 @@
 	data-dropdown-menu-content
 	data-state={ctx.open ? 'open' : 'closed'}
 	class={className}
-	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (newState && !ctx.open) {
@@ -70,6 +81,7 @@
 		inset: unset;
 		margin: 0;
 
+		--dry-menu-item-padding: var(--dry-space-3) var(--dry-space-4);
 		background: var(--dry-menu-bg, var(--dry-overlay-bg, var(--dry-color-bg-overlay)));
 		color: var(--dry-color-text-strong);
 		border: 1px solid

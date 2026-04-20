@@ -20,7 +20,8 @@
 		font = 'sans',
 		weight,
 		variant = 'default',
-		class: className,
+		class: classAttr,
+		className = classAttr,
 		children,
 		...rest
 	}: Props = $props();

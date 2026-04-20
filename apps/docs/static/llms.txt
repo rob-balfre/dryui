@@ -12,7 +12,7 @@
 ## AI Surface
 
 - MCP tools: ask, check
-- CLI commands: setup, init, detect, install, add, get, info, list, compose, review, diagnose, doctor, lint
+- CLI commands: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback
 
 ## Installation
 
@@ -43,7 +43,18 @@ Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides. If 
 Interactive button or link-styled action for submissions and calls to action.
 Import: @dryui/ui
 Subpath import: @dryui/ui/button
-Props: variant (ButtonVariant), Button treatment from solid primary actions to ghost and inline link styles., default 'solid' | size (ButtonSize), Button density preset, including icon-only sizing variants., default 'md' | color (ButtonColor), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
+Props: variant (| 'solid'
+	| 'outline'
+	| 'ghost'
+	| 'soft'
+	| 'secondary'
+	| 'link'
+	| 'bare'
+	| 'trigger'
+	| 'nav'
+	| 'tab'
+	| 'toggle'
+	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | (string & {}) | null), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example: <Button variant="solid" onclick={handleClick}>Save</Button>
@@ -117,7 +128,7 @@ Example: <ButtonGroup>Content</ButtonGroup>
 Interactive pill for filters, selections, and inline state.
 Import: @dryui/ui
 Subpath import: @dryui/ui/chip
-Props: selected (boolean), Whether the current item is selected. | disabled (boolean), Prevents interaction and applies disabled styling. | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (ChipColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | onclick ((event: MouseEvent) => void) | children (Snippet), Content rendered inside the component., required
+Props: selected (boolean), Whether the current item is selected. | disabled (boolean), Prevents interaction and applies disabled styling. | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (AliasableColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | href (string), Destination URL when the component renders as a link. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | onclick ((event: MouseEvent) => void) | children (Snippet), Content rendered inside the component., required
 Data attributes: data-chip-color | data-chip-selected | data-chip-size | data-chip-variant | data-disabled (Present when the component or part is disabled.) | data-selected (Present when the current item is selected.)
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example: <Chip variant="soft" color="blue">Policy friendly</Chip>
@@ -193,7 +204,7 @@ Example: <RadioGroup.Root>
 Range input slider with thumb control.
 Import: @dryui/ui
 Subpath import: @dryui/ui/slider
-Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant (SliderVariant), Visual style preset for the component., default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
+Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | variant ('default' | 'pill'), Visual style preset for the component., accepted default, pill, default 'default' | valueLabel (Snippet<[{ value: number; percentage: number }]>) | value (number), Current controlled or bindable value., default 50, bindable | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | step (number), Step interval used when incrementing numeric values., default 1 | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal'
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-variant
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.
 Example: <Slider bind:value={volume} min={0} max={100} />
@@ -406,7 +417,18 @@ Closed dropdown select for choosing one option from a fixed list.
 Import: @dryui/ui
 Subpath import: @dryui/ui/select
 Parts: Root, Trigger, Content, Item, Value
-Props: Root: open (boolean), Controls whether the select menu is currently expanded., bindable | value (string), Bindable selected value for the current option set., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | options (Array<string | { value: string; label: string }>) | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component. | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
+Props: Root: open (boolean), Controls whether the select menu is currently expanded., bindable | value (string), Bindable selected value for the current option set., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | options (Array<string | { value: string; label: string }>) | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component. | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example: <Select.Root bind:value={selected} bind:open={selectOpen} name="selection">
@@ -416,7 +438,18 @@ Searchable multi-select combobox with removable selected tokens.
 Import: @dryui/ui
 Subpath import: @dryui/ui/multi-select-combobox
 Parts: Root, Input, Content, Group, Item, Empty, SelectionList, SelectionItem, SelectionRemove
-Props: Root: value (string[]), Current controlled or bindable value. | query (string) | open (boolean), Whether the overlay or disclosure is currently open. | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission. | maxSelections (number) | onvaluechange ((value: string[]) => void) | onquerychange ((query: string) => void) | children (Snippet), Content rendered inside the component., required | Input: placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | textValue (string) | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | SelectionList: children (Snippet), Content rendered inside the component., required | SelectionItem: value (string), Current controlled or bindable value., required | children (Snippet | undefined), Content rendered inside the component. | SelectionRemove: value (string), Current controlled or bindable value., required | label (string | undefined), Visible label text shown for the control or item.
+Props: Root: value (string[]), Current controlled or bindable value. | query (string) | open (boolean), Whether the overlay or disclosure is currently open. | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission. | maxSelections (number) | onvaluechange ((value: string[]) => void) | onquerychange ((query: string) => void) | children (Snippet), Content rendered inside the component., required | Input: placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | textValue (string) | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | SelectionList: children (Snippet), Content rendered inside the component., required | SelectionItem: value (string), Current controlled or bindable value., required | children (Snippet | undefined), Content rendered inside the component. | SelectionRemove: value (string), Current controlled or bindable value., required | label (string | undefined), Visible label text shown for the control or item.
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-empty | data-highlighted | data-multi-select-content | data-multi-select-empty | data-multi-select-group | data-multi-select-input | data-multi-select-item | data-multi-select-root | data-multi-select-selection-item | data-multi-select-selection-list | data-multi-select-wrapper | data-part | data-selected (Present when the current item is selected.) | data-state | data-text-value | data-value
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name="frameworks">
@@ -436,7 +469,18 @@ Searchable text input with filterable dropdown suggestions.
 Import: @dryui/ui
 Subpath import: @dryui/ui/combobox
 Parts: Root, Input, Content, Item, Empty, Group
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (string), Current controlled or bindable value., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Input: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | leading (Snippet) | trailing (Snippet) | placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (Placement), default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | index (number), required | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (string), Current controlled or bindable value., bindable | disabled (boolean), Prevents interaction and applies disabled styling. | name (string), Field name used during native form submission., Adds a hidden input so the selected value participates in native form submission. | children (Snippet), Content rendered inside the component., required | Input: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | leading (Snippet) | trailing (Snippet) | placeholder (string), Hint text shown when no value is selected or entered., default '' | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 4 | loading (boolean), default false | loadingContent (Snippet) | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | index (number), required | disabled (boolean), Prevents interaction and applies disabled styling., default false | icon (Snippet) | children (Snippet), Content rendered inside the component., required | Empty: children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
 Data attributes: data-combobox-content | data-combobox-empty | data-combobox-group | data-combobox-input | data-combobox-item | data-combobox-wrapper | data-disabled (Present when the component or part is disabled.) | data-has-icon | data-has-leading | data-has-trailing | data-highlighted | data-invalid (Present when the current field value is invalid.) | data-part | data-size | data-state | data-value
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <Combobox.Root bind:value={selectedFramework} name="framework">
@@ -456,8 +500,19 @@ Calendar popup date picker with locale support.
 Import: @dryui/ui
 Subpath import: @dryui/ui/date-picker
 Parts: Root, Trigger, Content, Calendar
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement (Placement) | offset (number) | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-dp-content | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Trigger: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end | offset (number) | children (Snippet), Content rendered inside the component., required
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-placeholder | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <DatePicker.Root bind:value={departureDate} name="departureDate">
 
@@ -477,7 +532,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-drp-content | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <DateRangePicker.Root>
 
@@ -561,7 +616,7 @@ Example: <AppFrame>Content</AppFrame>
 Ambient gradient surface with browser-native animated color fields and static fallback.
 Import: @dryui/ui
 Subpath import: @dryui/ui/aurora
-Props: palette (AuroraPalette), default 'cosmic' | speed (AuroraSpeed), default 'normal' | motion (AuroraMotion), default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace (AuroraColorSpace), default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
+Props: palette (AuroraNamedPalette | readonly [string, string, string]), default 'cosmic' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | motion ('auto' | 'never'), accepted auto, never, default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace ('srgb' | 'oklch' | 'oklab'), accepted srgb, oklch, oklab, default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <Aurora palette="ocean">
@@ -570,7 +625,7 @@ Example: <Aurora palette="ocean">
 Texture overlay that adds grain and atmosphere to surfaces without external assets.
 Import: @dryui/ui
 Subpath import: @dryui/ui/noise
-Props: opacity (number), default 0.22 | blend (NoiseBlendMode), default 'overlay' | animated (boolean), default false | grain (NoiseGrain), default 'medium' | children (Snippet), Content rendered inside the component.
+Props: opacity (number), default 0.22 | blend ('soft-light' | 'overlay' | 'multiply'), accepted soft-light, overlay, multiply, default 'overlay' | animated (boolean), default false | grain ('fine' | 'medium' | 'coarse'), accepted fine, medium, coarse, default 'medium' | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-grain | data-noise | data-noise-content | data-noise-texture | data-paused | data-reduced-motion
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <Noise opacity={0.12} blend="soft-light">
@@ -758,7 +813,18 @@ Floating content panel anchored to a trigger.
 Import: @dryui/ui
 Subpath import: @dryui/ui/popover
 Parts: Root, Trigger, Content
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
 Data attributes: data-popover-content | data-popover-trigger | data-state (Reflects whether the popover is open or closed., values open, closed)
 Accessibility: Avoid placing essential actions in hover-only or transient content; keyboard users must be able to reopen the popover.
 Example: <Popover.Root bind:open={popoverOpen}>
@@ -768,7 +834,18 @@ Hover/focus popup with descriptive text.
 Import: @dryui/ui
 Subpath import: @dryui/ui/tooltip
 Parts: Root, Trigger, Content
-Props: Root: openDelay (number), default 700 | closeDelay (number), default 300 | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'top' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+Props: Root: openDelay (number), default 700 | closeDelay (number), default 300 | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'top' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
 Data attributes: data-state | data-tooltip-content | data-tooltip-trigger
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <Tooltip.Root>
@@ -778,8 +855,19 @@ Trigger-activated dropdown with menu items.
 Import: @dryui/ui
 Subpath import: @dryui/ui/dropdown-menu
 Parts: Root, Trigger, Content, Item, Separator, Group, Label
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Group: children (Snippet), Content rendered inside the component., required | Label: children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Group: children (Snippet), Content rendered inside the component., required | Label: children (Snippet), Content rendered inside the component., required
+Data attributes: data-dropdown-menu-content | data-dropdown-menu-item | data-dropdown-menu-label | data-dropdown-menu-separator | data-dropdown-trigger-wrap | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <DropdownMenu.Root>
 
@@ -789,7 +877,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/context-menu
 Parts: Root, Trigger, Content, Item, Separator, Group, Label
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | Item: disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required | Group: children (Snippet), Content rendered inside the component., required | Label: children (Snippet), Content rendered inside the component., required
-Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-disabled (Present when the component or part is disabled.) | data-state
+Data attributes: data-context-menu-content | data-context-menu-item | data-context-menu-label | data-context-menu-separator | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <ContextMenu.Root>
 
@@ -808,7 +896,18 @@ Link preview popup on hover.
 Import: @dryui/ui
 Subpath import: @dryui/ui/link-preview
 Parts: Root, Trigger, Content
-Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | openDelay (number), default 700 | closeDelay (number), default 300 | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | openDelay (number), default 700 | closeDelay (number), default 300 | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
 Data attributes: data-link-preview-content | data-link-preview-trigger | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <LinkPreview.Root>
@@ -837,7 +936,18 @@ Card popup on hover with delay-based open/close.
 Import: @dryui/ui
 Subpath import: @dryui/ui/hover-card
 Parts: Root, Trigger, Content
-Props: Root: openDelay (number) | closeDelay (number) | children (Snippet), Content rendered inside the component., required | Trigger: href (string), Destination URL when the component renders as a link. | children (Snippet), Content rendered inside the component., required | Content: placement (Placement), default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
+Props: Root: openDelay (number) | closeDelay (number) | children (Snippet), Content rendered inside the component., required | Trigger: href (string), Destination URL when the component renders as a link. | children (Snippet), Content rendered inside the component., required | Content: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
 Data attributes: data-hover-card-content | data-hover-card-trigger | data-hover-card-trigger-shell | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.
 Example: <HoverCard.Root>
@@ -847,7 +957,18 @@ Notification panel with trigger, groups, and items.
 Import: @dryui/ui
 Subpath import: @dryui/ui/notification-center
 Parts: Root, Trigger, Panel, Item, Group
-Props: Root: items (import('./context.svelte.js').NotificationItem[]), default $bindable<NotificationItem[]>([]), bindable | open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet<[{ unreadCount: number }]>), Content rendered inside the component., required | Panel: placement (Placement), default 'bottom-end' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | read (boolean), default false | timestamp (Date) | variant ('info' | 'warning' | 'critical'), Visual style preset for the component., accepted info, warning, critical | action (Snippet) | children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
+Props: Root: items (import('./context.svelte.js').NotificationItem[]), default $bindable<NotificationItem[]>([]), bindable | open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | children (Snippet), Content rendered inside the component., required | Trigger: children (Snippet<[{ unreadCount: number }]>), Content rendered inside the component., required | Panel: placement (| 'top'
+	| 'top-start'
+	| 'top-end'
+	| 'bottom'
+	| 'bottom-start'
+	| 'bottom-end'
+	| 'left'
+	| 'left-start'
+	| 'left-end'
+	| 'right'
+	| 'right-start'
+	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-end' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | read (boolean), default false | timestamp (Date) | variant ('info' | 'warning' | 'critical'), Visual style preset for the component., accepted info, warning, critical | action (Snippet) | children (Snippet), Content rendered inside the component., required | Group: label (string), Visible label text shown for the control or item., required | children (Snippet), Content rendered inside the component., required
 Data attributes: data-id | data-notification-center-group | data-notification-center-item | data-notification-center-panel | data-notification-center-root | data-notification-center-trigger | data-part | data-state | data-variant
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example: <NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>
@@ -907,7 +1028,7 @@ Example: <Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />
 Small status indicator label.
 Import: @dryui/ui
 Subpath import: @dryui/ui/badge
-Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (BadgeColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
+Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
 Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Badge variant="soft">Active</Badge>
@@ -992,8 +1113,8 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/typography
 Parts: Heading, Text, Code, Blockquote
 Namespace parts only: no Root wrapper
-Props: Heading: variant ('default' | 'display'), Visual style preset for the component., accepted default, display | level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | children (Snippet), Content rendered inside the component., required | Text: color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary'), Visual style preset for the component., accepted default, muted, secondary | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | children (Snippet), Content rendered inside the component., required | Code: children (Snippet), Content rendered inside the component., required | Blockquote: children (Snippet), Content rendered inside the component., required
-Data attributes: data-as | data-color | data-level | data-size | data-variant
+Props: Heading: level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | children (Snippet), Content rendered inside the component., required | Text: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label | Code: children (Snippet), Content rendered inside the component., required | Blockquote: children (Snippet), Content rendered inside the component., required
+Data attributes: none
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Typography.Heading level={2}>Launch readiness</Typography.Heading>
 
@@ -1001,7 +1122,7 @@ Example: <Typography.Heading level={2}>Launch readiness</Typography.Heading>
 Standalone semantic heading export for starter-kit typography.
 Import: @dryui/ui
 Subpath import: @dryui/ui/heading
-Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default' | children (Snippet), Content rendered inside the component., required
+Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default' | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
 Data attributes: data-level | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Heading level={2}>Launch readiness</Heading>
@@ -1010,7 +1131,7 @@ Example: <Heading level={2}>Launch readiness</Heading>
 Standalone body copy export for starter-kit typography.
 Import: @dryui/ui
 Subpath import: @dryui/ui/text
-Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | children (Snippet), Content rendered inside the component., required
+Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required
 Data attributes: data-color | data-font | data-size | data-variant | data-weight
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Text as="p" color="secondary" size="sm">Use Text for supporting copy, labels, and starter-kit body content.</Text>
@@ -1038,7 +1159,7 @@ Example: <LogoMark>Content</LogoMark>
 IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks.
 Import: @dryui/ui
 Subpath import: @dryui/ui/reveal
-Props: variant (RevealVariant), Visual style preset for the component., default 'fade' | once (boolean), default true | threshold (number), default 0.18 | delay (number) | duration (number) | distance (number | string) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
+Props: variant ('fade' | 'slide-up' | 'scale-in' | 'blur-up' | 'mask-up'), Visual style preset for the component., accepted fade, slide-up, scale-in, blur-up, mask-up, default 'fade' | once (boolean), default true | threshold (number), default 0.18 | delay (number) | duration (number) | distance (number | string) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
 Data attributes: data-reduced-motion | data-reveal | data-variant | data-visible
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Reveal variant="slide-up" delay={120}>
@@ -1242,7 +1363,7 @@ Example: <StarRating.Root>
 Small labeled tag element with color and variant support.
 Import: @dryui/ui
 Subpath import: @dryui/ui/tag
-Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (TagColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
+Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (BadgeColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Tag>Content</Tag>
@@ -1313,7 +1434,7 @@ Example: <User>Content</User>
 Contextual feedback message with variant styling.
 Import: @dryui/ui
 Subpath import: @dryui/ui/alert
-Props: variant (AlertVariant), Visual style preset for the component., default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
+Props: variant ('info' | 'success' | 'warning' | 'error'), Visual style preset for the component., accepted info, success, warning, error, default 'info' | dismissible (boolean), default false | onDismiss (() => void) | icon (Snippet) | title (Snippet), Primary heading or label text. | description (Snippet), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
 Data attributes: data-alert | data-alert-body | data-alert-close | data-alert-description | data-alert-icon | data-alert-title | data-dismissible | data-variant
 Accessibility: Do not rely on transient feedback as the only place critical workflow information appears. | Label dismiss or retry actions explicitly so their purpose is announced. | Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.
 Example: <Alert variant="info">
@@ -1429,7 +1550,7 @@ Example: <Svg>Content</Svg>
 RGB channel separation effect with hover and animation triggers.
 Import: @dryui/ui
 Subpath import: @dryui/ui/chromatic-shift
-Props: offset (number), default 3 | channels (ChromaticShiftChannels), default 'rgb' | trigger (ChromaticShiftTrigger), default 'hover' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: offset (number), default 3 | channels ('rgb' | 'rb'), accepted rgb, rb, default 'rgb' | trigger ('hover' | 'always' | 'none'), accepted hover, always, none, default 'hover' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
 Data attributes: data-active (Present on the active item or current target within the component.) | data-animated | data-channels | data-chromatic-shift | data-paused | data-reduced-motion
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <ChromaticShift>Content</ChromaticShift>
@@ -1447,7 +1568,7 @@ Example: <ChromaticAberration>Content</ChromaticAberration>
 SVG turbulence displacement filter for organic distortion effects.
 Import: @dryui/ui
 Subpath import: @dryui/ui/displacement
-Props: scale (number), default 12 | turbulence (DisplacementTurbulence), default 'medium' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: scale (number), default 12 | turbulence ('gentle' | 'medium' | 'rough'), accepted gentle, medium, rough, default 'medium' | animated (boolean), default false | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-displacement | data-displacement-svg | data-reduced-motion | data-turbulence
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <Displacement>Content</Displacement>
@@ -1483,7 +1604,7 @@ Example: <Beam>Content</Beam>
 Animated border-travel beam with masked ring highlights, bloom, and line-trace presets.
 Import: @dryui/ui
 Subpath import: @dryui/ui/border-beam
-Props: size (BorderBeamSize), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`). | colorVariant (BorderBeamColorVariant), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments. | theme (BorderBeamTheme), Color tuning for dark or light surfaces, or system preference when set to `auto`. | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
+Props: size ('sm' | 'md' | 'line'), Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`)., accepted sm, md, line | colorVariant ('colorful' | 'mono' | 'ocean' | 'sunset'), Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments., accepted colorful, mono, ocean, sunset | theme ('auto' | 'light' | 'dark'), Color tuning for dark or light surfaces, or system preference when set to `auto`., accepted auto, light, dark | staticColors (boolean) | duration (number) | active (boolean), Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle. | borderRadius (number | string), Optional border radius override for the beam host. When omitted, the first child radius is detected automatically. | brightness (number) | saturation (number) | hueRange (number) | strength (number), Intensity multiplier for the beam stroke, inner glow, and bloom layers. | onActivate (() => void), Callback fired after the beam fade-in animation completes. | onDeactivate (() => void), Callback fired after the beam fade-out animation completes. | children (Snippet), Content rendered inside the component.
 Data attributes: data-active (Present while the beam is rendering its active glow and bloom layers.) | data-beam (Per-instance marker on the beam host used to scope the injected effect styles.) | data-beam-bloom (Bloom layer element that renders the outer glow spill around the active beam.) | data-fading (Present while the beam is playing its fade-out sequence.) | data-size (Reflects the current effect mode preset., values sm, md, line)
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <BorderBeam>Content</BorderBeam>
@@ -1519,7 +1640,7 @@ Example: <GodRays>Content</GodRays>
 Animated multi-color gradient mesh background with optional interactivity.
 Import: @dryui/ui
 Subpath import: @dryui/ui/gradient-mesh
-Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed (GradientMeshSpeed), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <GradientMesh>Content</GradientMesh>
@@ -1528,7 +1649,7 @@ Example: <GradientMesh>Content</GradientMesh>
 SVG halftone dot pattern overlay with configurable size, angle, and color.
 Import: @dryui/ui
 Subpath import: @dryui/ui/halftone
-Props: dotSize (HalftoneDotSize), default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
+Props: dotSize ('fine' | 'medium' | 'coarse' | number), default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
 Data attributes: data-dot-size | data-halftone | data-halftone-content
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <Halftone>Content</Halftone>
@@ -1537,7 +1658,7 @@ Example: <Halftone>Content</Halftone>
 Intersection-observer mask transition with circle, diamond, or wipe shapes.
 Import: @dryui/ui
 Subpath import: @dryui/ui/mask-reveal
-Props: shape (MaskRevealShape), default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
+Props: shape ('circle' | 'linear' | 'diagonal' | 'diamond'), accepted circle, linear, diagonal, diamond, default 'circle' | direction ('in' | 'out'), accepted in, out, default 'in' | once (boolean), default true | threshold (number), default 0.18 | duration (number) | children (Snippet), Content rendered inside the component.
 Data attributes: data-direction | data-mask-reveal | data-mask-reveal-root | data-reduced-motion | data-revealed | data-shape
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <MaskReveal>Content</MaskReveal>
@@ -1546,7 +1667,11 @@ Example: <MaskReveal>Content</MaskReveal>
 WebGL shader canvas with built-in presets and theme color integration.
 Import: @dryui/ui
 Subpath import: @dryui/ui/shader-canvas
-Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (ShaderCanvasPreset) | themeColors (boolean) | aspectRatio (string)
+Props: fragmentShader (string) | vertexShader (PrimitiveShaderCanvasProps['vertexShader']) | autoUniforms (PrimitiveShaderCanvasProps['autoUniforms']) | uniforms (PrimitiveShaderCanvasProps['uniforms']) | pixelRatio (PrimitiveShaderCanvasProps['pixelRatio']) | fps (PrimitiveShaderCanvasProps['fps']) | paused (PrimitiveShaderCanvasProps['paused']) | fallback (PrimitiveShaderCanvasProps['fallback']) | children (Snippet), Content rendered inside the component., required | preset (| 'gradient-flow'
+	| 'particle-field'
+	| 'wave-distortion'
+	| 'mesh-gradient'
+	| 'liquid-metal'), accepted gradient-flow, particle-field, wave-distortion, mesh-gradient, liquid-metal | themeColors (boolean) | aspectRatio (string)
 Data attributes: data-reduced-motion | data-shader-canvas | data-shader-canvas-root | data-webgl
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <ShaderCanvas>Content</ShaderCanvas>
@@ -1576,7 +1701,7 @@ The CLI is the default entry point for working with DryUI. Start with bare `dryu
 
 Install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
 
-Current command surface: setup, init, detect, install, add, get, info, list, compose, review, diagnose, doctor, lint.
+Current command surface: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback.
 
 ```
 dryui
@@ -1587,10 +1712,10 @@ dryui add --project --target <file> Card
 dryui info <component>
 dryui list --category layout
 dryui compose "date input"
-dryui review src/routes/+page.svelte
-dryui diagnose src/app.css
-dryui doctor --changed
-dryui lint --max-severity warning
+dryui tokens --category color
+dryui ambient
+dryui install-hook --dry-run
+dryui feedback init
 ```
 
 No global install? Prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, slower on each call.

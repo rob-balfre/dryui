@@ -1,8 +1,6 @@
-import { getContext, setContext } from 'svelte';
+import { createContext } from '@dryui/primitives';
 
-const CHIP_GROUP_KEY = Symbol('chip-group');
-
-interface ChipGroupContext {
+export interface ChipGroupContext {
 	readonly type: 'single' | 'multiple';
 	readonly disabled: boolean;
 	readonly value: string[];
@@ -10,11 +8,4 @@ interface ChipGroupContext {
 	isSelected: (itemValue: string) => boolean;
 }
 
-export function setChipGroupCtx(ctx: ChipGroupContext) {
-	setContext(CHIP_GROUP_KEY, ctx);
-	return ctx;
-}
-
-export function getChipGroupCtx() {
-	return getContext<ChipGroupContext>(CHIP_GROUP_KEY);
-}
+export const [setChipGroupCtx, getChipGroupCtx] = createContext<ChipGroupContext>('chip-group');

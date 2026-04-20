@@ -11,7 +11,7 @@
     "compositionRecipes": 30,
     "tools": 2,
     "prompts": 2,
-    "cliCommands": 13
+    "cliCommands": 12
   },
   "themeImports": {
     "default": "@dryui/ui/themes/default.css",
@@ -45,7 +45,7 @@
       },
       {
         "name": "init",
-        "description": "Print setup snippets for a new DryUI app"
+        "description": "Bootstrap a SvelteKit + DryUI project"
       },
       {
         "name": "detect",
@@ -60,10 +60,6 @@
         "description": "Print a copyable starter snippet or a project-aware plan"
       },
       {
-        "name": "get",
-        "description": "Print copyable Svelte source for a composed output"
-      },
-      {
         "name": "info",
         "description": "Show component API reference"
       },
@@ -76,20 +72,20 @@
         "description": "Look up composition guidance"
       },
       {
-        "name": "review",
-        "description": "Validate a Svelte file against DryUI spec"
+        "name": "tokens",
+        "description": "List `--dry-*` design tokens"
       },
       {
-        "name": "diagnose",
-        "description": "Validate theme CSS"
+        "name": "ambient",
+        "description": "Print compact session context for SessionStart hooks"
       },
       {
-        "name": "doctor",
-        "description": "Inspect workspace health"
+        "name": "install-hook",
+        "description": "Wire `dryui ambient` into Claude Code settings.json"
       },
       {
-        "name": "lint",
-        "description": "Print deterministic workspace findings"
+        "name": "feedback",
+        "description": "Start feedback tooling, inspect the server, or launch the dashboard"
       }
     ]
   },
@@ -109,19 +105,41 @@
       "compound": false,
       "props": {
         "variant": {
-          "type": "ButtonVariant",
+          "type": "| 'solid'\n\t| 'outline'\n\t| 'ghost'\n\t| 'soft'\n\t| 'secondary'\n\t| 'link'\n\t| 'bare'\n\t| 'trigger'\n\t| 'nav'\n\t| 'tab'\n\t| 'toggle'\n\t| 'pill'",
           "required": false,
+          "acceptedValues": [
+            "solid",
+            "outline",
+            "ghost",
+            "soft",
+            "secondary",
+            "link",
+            "bare",
+            "trigger",
+            "nav",
+            "tab",
+            "toggle",
+            "pill"
+          ],
           "description": "Button treatment from solid primary actions to ghost and inline link styles.",
           "default": "'solid'"
         },
         "size": {
-          "type": "ButtonSize",
+          "type": "'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'",
           "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg",
+            "icon",
+            "icon-sm",
+            "icon-lg"
+          ],
           "description": "Button density preset, including icon-only sizing variants.",
           "default": "'md'"
         },
         "color": {
-          "type": "ButtonColor",
+          "type": "'primary' | 'danger' | (string & {}) | null",
           "required": false,
           "description": "Semantic tone for primary or destructive button actions.",
           "default": "'primary'"
@@ -1295,8 +1313,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom'"
             },
             "offset": {
@@ -1413,8 +1445,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'top'"
             },
             "offset": {
@@ -1517,8 +1563,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom-start'"
             },
             "offset": {
@@ -1638,13 +1698,10 @@
         "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
       ],
       "cssVars": {
+        "--dry-menu-item-padding": "Item Padding",
         "--dry-radius-nested": "Nested"
       },
       "dataAttributes": [
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
         {
           "name": "data-dropdown-menu-content"
         },
@@ -1832,6 +1889,7 @@
       "cssVars": {
         "--dry-menu-bg": "Background color",
         "--dry-menu-border": "Border color",
+        "--dry-menu-item-padding": "Item Padding",
         "--dry-menu-padding": "Padding",
         "--dry-menu-radius": "Border radius",
         "--dry-menu-shadow": "Box shadow"
@@ -1848,10 +1906,6 @@
         },
         {
           "name": "data-context-menu-separator"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
         },
         {
           "name": "data-state"
@@ -3246,8 +3300,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom-start'"
             },
             "offset": {
@@ -3479,8 +3547,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom-start'"
             },
             "offset": {
@@ -3901,8 +3983,12 @@
           "default": "'md'"
         },
         "variant": {
-          "type": "SliderVariant",
+          "type": "'default' | 'pill'",
           "required": false,
+          "acceptedValues": [
+            "default",
+            "pill"
+          ],
           "description": "Visual style preset for the component.",
           "default": "'default'"
         },
@@ -7179,7 +7265,7 @@
           "default": "'soft'"
         },
         "color": {
-          "type": "BadgeColor",
+          "type": "AliasableColor",
           "required": false,
           "description": "Semantic tone applied to the badge background, border, or text treatment.",
           "default": "'gray'"
@@ -7960,8 +8046,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom'"
             },
             "offset": {
@@ -8472,15 +8572,6 @@
       "parts": {
         "Heading": {
           "props": {
-            "variant": {
-              "type": "'default' | 'display'",
-              "required": false,
-              "acceptedValues": [
-                "default",
-                "display"
-              ],
-              "description": "Visual style preset for the component."
-            },
             "level": {
               "type": "1 | 2 | 3 | 4 | 5 | 6",
               "required": false,
@@ -8514,6 +8605,55 @@
         },
         "Text": {
           "props": {
+            "as": {
+              "type": "'p' | 'span' | 'div'",
+              "required": false,
+              "acceptedValues": [
+                "p",
+                "span",
+                "div"
+              ],
+              "description": "Text element to render for inline, block, or paragraph copy."
+            },
+            "size": {
+              "type": "'xs' | 'sm' | 'md' | 'lg'",
+              "required": false,
+              "acceptedValues": [
+                "xs",
+                "sm",
+                "md",
+                "lg"
+              ],
+              "description": "Size preset affecting density, spacing, or typography.",
+              "note": "Applies DryUI text scale tokens for compact or emphasized body copy."
+            },
+            "font": {
+              "type": "'sans' | 'mono'",
+              "required": false,
+              "acceptedValues": [
+                "sans",
+                "mono"
+              ]
+            },
+            "weight": {
+              "type": "'normal' | 'medium' | 'semibold' | 'bold'",
+              "required": false,
+              "acceptedValues": [
+                "normal",
+                "medium",
+                "semibold",
+                "bold"
+              ]
+            },
+            "className": {
+              "type": "HTMLAttributes<HTMLElement>['class']",
+              "required": false
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            },
             "color": {
               "type": "'default' | 'muted' | 'secondary'",
               "required": false,
@@ -8526,40 +8666,15 @@
               "note": "Use muted or secondary for supporting copy without reaching for inline color styles."
             },
             "variant": {
-              "type": "'default' | 'muted' | 'secondary'",
+              "type": "'default' | 'muted' | 'secondary' | 'label'",
               "required": false,
               "acceptedValues": [
                 "default",
                 "muted",
-                "secondary"
+                "secondary",
+                "label"
               ],
               "description": "Visual style preset for the component."
-            },
-            "size": {
-              "type": "'sm' | 'md' | 'lg'",
-              "required": false,
-              "acceptedValues": [
-                "sm",
-                "md",
-                "lg"
-              ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "note": "Applies DryUI text scale tokens for compact or emphasized body copy."
-            },
-            "as": {
-              "type": "'p' | 'span' | 'div'",
-              "required": false,
-              "acceptedValues": [
-                "p",
-                "span",
-                "div"
-              ],
-              "description": "Text element to render for inline, block, or paragraph copy."
-            },
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
             }
           },
           "forwardedProps": {
@@ -8626,26 +8741,8 @@
         "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
         "Keep heading, reading, and focus order aligned with the surrounding content."
       ],
-      "cssVars": {
-        "--dry-typography-text-color": "Text Color"
-      },
-      "dataAttributes": [
-        {
-          "name": "data-as"
-        },
-        {
-          "name": "data-color"
-        },
-        {
-          "name": "data-level"
-        },
-        {
-          "name": "data-size"
-        },
-        {
-          "name": "data-variant"
-        }
-      ],
+      "cssVars": {},
+      "dataAttributes": [],
       "example": "<Typography.Heading level={2}>Launch readiness</Typography.Heading>\n<Typography.Text color=\"muted\" size=\"sm\">Use Typography.Text for supporting copy and metadata.</Typography.Text>"
     },
     "Heading": {
@@ -8683,6 +8780,10 @@
           ],
           "description": "Visual style preset for the component.",
           "default": "'default'"
+        },
+        "className": {
+          "type": "HTMLAttributes<HTMLHeadingElement>['class']",
+          "required": false
         },
         "children": {
           "type": "Snippet",
@@ -8792,6 +8893,10 @@
           ],
           "description": "Visual style preset for the component.",
           "default": "'default'"
+        },
+        "className": {
+          "type": "HTMLAttributes<HTMLElement>['class']",
+          "required": false
         },
         "children": {
           "type": "Snippet",
@@ -8972,8 +9077,14 @@
       "compound": false,
       "props": {
         "variant": {
-          "type": "AlertVariant",
+          "type": "'info' | 'success' | 'warning' | 'error'",
           "required": false,
+          "acceptedValues": [
+            "info",
+            "success",
+            "warning",
+            "error"
+          ],
           "description": "Visual style preset for the component.",
           "default": "'info'"
         },
@@ -9590,8 +9701,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom-start'"
             },
             "offset": {
@@ -10067,8 +10192,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
-              "required": false
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
+              "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ]
             },
             "offset": {
               "type": "number",
@@ -10128,9 +10267,6 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-dp-content"
         },
         {
           "name": "data-outside-month"
@@ -10562,9 +10698,6 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-drp-content"
         },
         {
           "name": "data-in-range"
@@ -12631,8 +12764,15 @@
       "compound": false,
       "props": {
         "variant": {
-          "type": "RevealVariant",
+          "type": "'fade' | 'slide-up' | 'scale-in' | 'blur-up' | 'mask-up'",
           "required": false,
+          "acceptedValues": [
+            "fade",
+            "slide-up",
+            "scale-in",
+            "blur-up",
+            "mask-up"
+          ],
           "description": "Visual style preset for the component.",
           "default": "'fade'"
         },
@@ -12808,18 +12948,22 @@
       "compound": false,
       "props": {
         "palette": {
-          "type": "AuroraPalette",
+          "type": "AuroraNamedPalette | readonly [string, string, string]",
           "required": false,
           "default": "'cosmic'"
         },
         "speed": {
-          "type": "AuroraSpeed",
+          "type": "'slow' | 'normal' | 'fast' | number",
           "required": false,
           "default": "'normal'"
         },
         "motion": {
-          "type": "AuroraMotion",
+          "type": "'auto' | 'never'",
           "required": false,
+          "acceptedValues": [
+            "auto",
+            "never"
+          ],
           "default": "'auto'"
         },
         "intensity": {
@@ -12833,8 +12977,13 @@
           "default": "50"
         },
         "colorSpace": {
-          "type": "AuroraColorSpace",
+          "type": "'srgb' | 'oklch' | 'oklab'",
           "required": false,
+          "acceptedValues": [
+            "srgb",
+            "oklch",
+            "oklab"
+          ],
           "default": "'srgb'"
         },
         "blendMode": {
@@ -12927,8 +13076,13 @@
           "default": "0.22"
         },
         "blend": {
-          "type": "NoiseBlendMode",
+          "type": "'soft-light' | 'overlay' | 'multiply'",
           "required": false,
+          "acceptedValues": [
+            "soft-light",
+            "overlay",
+            "multiply"
+          ],
           "default": "'overlay'"
         },
         "animated": {
@@ -12937,8 +13091,13 @@
           "default": "false"
         },
         "grain": {
-          "type": "NoiseGrain",
+          "type": "'fine' | 'medium' | 'coarse'",
           "required": false,
+          "acceptedValues": [
+            "fine",
+            "medium",
+            "coarse"
+          ],
           "default": "'medium'"
         },
         "children": {
@@ -15020,7 +15179,7 @@
           "default": "'soft'"
         },
         "color": {
-          "type": "ChipColor",
+          "type": "AliasableColor",
           "required": false,
           "description": "Semantic color or tone applied to the component.",
           "default": "'gray'"
@@ -16016,8 +16175,22 @@
         "Content": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom'"
             },
             "offset": {
@@ -17057,8 +17230,22 @@
         "Panel": {
           "props": {
             "placement": {
-              "type": "Placement",
+              "type": "| 'top'\n\t| 'top-start'\n\t| 'top-end'\n\t| 'bottom'\n\t| 'bottom-start'\n\t| 'bottom-end'\n\t| 'left'\n\t| 'left-start'\n\t| 'left-end'\n\t| 'right'\n\t| 'right-start'\n\t| 'right-end'",
               "required": false,
+              "acceptedValues": [
+                "top",
+                "top-start",
+                "top-end",
+                "bottom",
+                "bottom-start",
+                "bottom-end",
+                "left",
+                "left-start",
+                "left-end",
+                "right",
+                "right-start",
+                "right-end"
+              ],
               "default": "'bottom-end'"
             },
             "offset": {
@@ -17677,13 +17864,22 @@
           "default": "3"
         },
         "channels": {
-          "type": "ChromaticShiftChannels",
+          "type": "'rgb' | 'rb'",
           "required": false,
+          "acceptedValues": [
+            "rgb",
+            "rb"
+          ],
           "default": "'rgb'"
         },
         "trigger": {
-          "type": "ChromaticShiftTrigger",
+          "type": "'hover' | 'always' | 'none'",
           "required": false,
+          "acceptedValues": [
+            "hover",
+            "always",
+            "none"
+          ],
           "default": "'hover'"
         },
         "animated": {
@@ -17813,8 +18009,13 @@
           "default": "12"
         },
         "turbulence": {
-          "type": "DisplacementTurbulence",
+          "type": "'gentle' | 'medium' | 'rough'",
           "required": false,
+          "acceptedValues": [
+            "gentle",
+            "medium",
+            "rough"
+          ],
           "default": "'medium'"
         },
         "animated": {
@@ -18194,18 +18395,34 @@
       "compound": false,
       "props": {
         "size": {
-          "type": "BorderBeamSize",
+          "type": "'sm' | 'md' | 'line'",
           "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "line"
+          ],
           "description": "Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`)."
         },
         "colorVariant": {
-          "type": "BorderBeamColorVariant",
+          "type": "'colorful' | 'mono' | 'ocean' | 'sunset'",
           "required": false,
+          "acceptedValues": [
+            "colorful",
+            "mono",
+            "ocean",
+            "sunset"
+          ],
           "description": "Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments."
         },
         "theme": {
-          "type": "BorderBeamTheme",
+          "type": "'auto' | 'light' | 'dark'",
           "required": false,
+          "acceptedValues": [
+            "auto",
+            "light",
+            "dark"
+          ],
           "description": "Color tuning for dark or light surfaces, or system preference when set to `auto`."
         },
         "staticColors": {
@@ -18535,7 +18752,7 @@
           "default": "['#7b68ee'"
         },
         "speed": {
-          "type": "GradientMeshSpeed",
+          "type": "'slow' | 'normal' | 'fast' | number",
           "required": false,
           "default": "'normal'"
         },
@@ -18611,7 +18828,7 @@
       "compound": false,
       "props": {
         "dotSize": {
-          "type": "HalftoneDotSize",
+          "type": "'fine' | 'medium' | 'coarse' | number",
           "required": false,
           "default": "'medium'"
         },
@@ -18687,8 +18904,14 @@
       "compound": false,
       "props": {
         "shape": {
-          "type": "MaskRevealShape",
+          "type": "'circle' | 'linear' | 'diagonal' | 'diamond'",
           "required": false,
+          "acceptedValues": [
+            "circle",
+            "linear",
+            "diagonal",
+            "diamond"
+          ],
           "default": "'circle'"
         },
         "direction": {
@@ -18815,8 +19038,15 @@
           "description": "Content rendered inside the component."
         },
         "preset": {
-          "type": "ShaderCanvasPreset",
-          "required": false
+          "type": "| 'gradient-flow'\n\t| 'particle-field'\n\t| 'wave-distortion'\n\t| 'mesh-gradient'\n\t| 'liquid-metal'",
+          "required": false,
+          "acceptedValues": [
+            "gradient-flow",
+            "particle-field",
+            "wave-distortion",
+            "mesh-gradient",
+            "liquid-metal"
+          ]
         },
         "themeColors": {
           "type": "boolean",
@@ -19013,7 +19243,7 @@
           "default": "'soft'"
         },
         "color": {
-          "type": "TagColor",
+          "type": "BadgeColor",
           "required": false,
           "description": "Semantic color or tone applied to the component.",
           "default": "'gray'"

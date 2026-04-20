@@ -12,26 +12,36 @@
 
 	const ctx = getContextMenuCtx();
 
-	let el = $state<HTMLDivElement>();
+	let el = $state<HTMLDivElement | null>(null);
+
+	function attachContent(node: HTMLDivElement) {
+		el = node;
+
+		return () => {
+			if (el === node) {
+				el = null;
+			}
+		};
+	}
 
 	const menu = createMenuNavigation({
 		container: () => el ?? null,
 		orientation: 'vertical'
 	});
 
-	$effect(() => {
-		if (ctx.open && el) {
-			el.style.position = 'fixed';
-			el.style.left = `${ctx.position.x}px`;
-			el.style.top = `${ctx.position.y}px`;
-			if (!el.matches(':popover-open')) {
-				el.showPopover();
+	function syncPopover(node: HTMLDivElement) {
+		if (ctx.open) {
+			node.style.position = 'fixed';
+			node.style.left = `${ctx.position.x}px`;
+			node.style.top = `${ctx.position.y}px`;
+			if (!node.matches(':popover-open')) {
+				node.showPopover();
 				menu.focusFirst();
 			}
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
+		} else if (node.matches(':popover-open')) {
+			node.hidePopover();
 		}
-	});
+	}
 
 	createDismiss({
 		enabled: () => ctx.open,
@@ -42,7 +52,8 @@
 </script>
 
 <div
-	bind:this={el}
+	{@attach attachContent}
+	{@attach syncPopover}
 	popover="manual"
 	role="menu"
 	tabindex="-1"
@@ -69,6 +80,7 @@
 		--dry-menu-radius: var(--dry-radius-lg);
 		--dry-menu-shadow: var(--dry-shadow-lg);
 		--dry-menu-padding: var(--dry-space-1);
+		--dry-menu-item-padding: var(--dry-space-2_5) var(--dry-space-2);
 
 		display: grid;
 		grid-template-columns: minmax(12rem, max-content);

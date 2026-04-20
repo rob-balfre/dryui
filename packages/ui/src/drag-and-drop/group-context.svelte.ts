@@ -1,6 +1,4 @@
-import { getContext, setContext, hasContext } from 'svelte';
-
-const GROUP_KEY = Symbol('drag-and-drop-group');
+import { createContext } from '@dryui/primitives';
 
 export interface DragAndDropGroupContext {
 	register(listId: string, element: HTMLElement): void;
@@ -11,10 +9,12 @@ export interface DragAndDropGroupContext {
 	move(fromListId: string, fromIndex: number, toListId: string, toIndex: number): void;
 }
 
+const [_setGroupCtx, _getGroupCtx] = createContext<DragAndDropGroupContext>('drag-and-drop-group');
+
 export function setGroupCtx(ctx: DragAndDropGroupContext) {
-	setContext(GROUP_KEY, ctx);
+	return _setGroupCtx(ctx);
 }
 
 export function getGroupCtx(): DragAndDropGroupContext | null {
-	return hasContext(GROUP_KEY) ? getContext<DragAndDropGroupContext>(GROUP_KEY) : null;
+	return _getGroupCtx() ?? null;
 }

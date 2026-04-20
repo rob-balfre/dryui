@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import docsAppHtml from '../../apps/docs/src/app.html?raw';
+import { themeFlashScript } from '../../packages/ui/src/theme-toggle/theme-flash.ts';
 
 function extractInlineScript(html: string): string {
 	const match = html.match(/<script>([\s\S]*?)<\/script>/);
@@ -28,7 +29,9 @@ afterEach(() => {
 
 describe('theme bootstrap', () => {
 	it('applies the stored docs theme and falls back to system mode for invalid values', () => {
-		const script = extractInlineScript(docsAppHtml);
+		const script = extractInlineScript(
+			docsAppHtml.replace('%dryui.themeFlash%', themeFlashScript('dryui-docs-theme'))
+		);
 
 		localStorage.setItem('dryui-docs-theme', 'dark');
 		runBootstrap(script);

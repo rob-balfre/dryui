@@ -27,7 +27,7 @@ export interface DismissOptions {
 	 * `onDismiss` fires. Needed when the popover would otherwise close via the
 	 * browser's Popover API and swallow the trigger-focus-restore logic.
 	 */
-	preventDefaultOnEscape?: boolean;
+	preventDefaultOnEscape?: boolean | (() => boolean);
 	/** After Escape dismisses, focus is returned to this element if provided. */
 	returnFocusTo?: () => HTMLElement | null;
 }
@@ -71,6 +71,10 @@ export function createDismiss(options: DismissOptions): void {
 	const escapeKey = options.escapeKey ?? true;
 	const clickOutside = options.clickOutside ?? true;
 	const isEnabled = options.enabled ?? (() => true);
+	const preventDefaultOnEscape =
+		typeof options.preventDefaultOnEscape === 'function'
+			? options.preventDefaultOnEscape
+			: () => options.preventDefaultOnEscape ?? false;
 
 	$effect(() => {
 		if (!escapeKey) return;
@@ -78,7 +82,7 @@ export function createDismiss(options: DismissOptions): void {
 
 		function handleKeydown(e: KeyboardEvent) {
 			if (e.key !== 'Escape') return;
-			if (options.preventDefaultOnEscape) {
+			if (preventDefaultOnEscape()) {
 				e.preventDefault();
 			}
 			options.onDismiss();

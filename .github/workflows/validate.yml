@@ -33,3 +33,40 @@ jobs:
       - run: bunx playwright install chromium
 
       - run: bun run test:browser
+
+  coverage:
+    # Pin to 22.04 — ubuntu-24.04 has documented CI performance regressions
+    # https://github.com/actions/runner-images/issues/11790
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: ./.github/actions/setup-dryui
+
+      - run: bunx playwright install chromium
+
+      - run: bun run test:coverage
+
+      - run: bun run coverage:check
+
+      - name: Publish coverage summary
+        if: always()
+        continue-on-error: true
+        run: cat coverage/summary/coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-${{ github.sha }}
+          path: |
+            coverage/summary
+            coverage/unit
+            coverage/browser
+          if-no-files-found: ignore
+          retention-days: 14

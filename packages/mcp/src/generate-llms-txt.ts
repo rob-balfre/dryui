@@ -13,6 +13,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../../../');
 
 const specPath = resolve(__dirname, 'spec.json');
+const repoLlmsOutputPath = resolve(repoRoot, 'llms.txt');
 const llmsOutputPath = resolve(repoRoot, 'apps/docs/static/llms.txt');
 const llmsComponentsOutputPath = resolve(repoRoot, 'apps/docs/static/llms-components.txt');
 
@@ -365,10 +366,10 @@ dryui add --project --target <file> Card
 dryui info <component>
 dryui list --category layout
 dryui compose "date input"
-dryui review src/routes/+page.svelte
-dryui diagnose src/app.css
-dryui doctor --changed
-dryui lint --max-severity warning
+dryui tokens --category color
+dryui ambient
+dryui install-hook --dry-run
+dryui feedback init
 \`\`\`
 
 No global install? Prefix any command with \`bunx @dryui/cli …\` or \`npx -y @dryui/cli …\` — same behaviour, slower on each call.
@@ -425,10 +426,12 @@ const llmsText = buildLlmsText(spec);
 const llmsComponentsText = buildLlmsComponentsText(spec);
 
 await Promise.all([
+	writeFile(repoLlmsOutputPath, llmsText),
 	writeFile(llmsOutputPath, llmsText),
 	writeFile(llmsComponentsOutputPath, llmsComponentsText)
 ]);
 
+console.log(`Generated llms.txt at ${repoLlmsOutputPath}`);
 console.log(`Generated llms.txt at ${llmsOutputPath}`);
 console.log(`Generated llms-components.txt at ${llmsComponentsOutputPath}`);
 console.log(`  ${totalComponents} components documented`);

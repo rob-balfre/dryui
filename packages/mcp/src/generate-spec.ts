@@ -1,3 +1,4 @@
+import { existsSync, readFileSync } from 'node:fs';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -703,12 +704,62 @@ function descriptionForProp(
 	return PROP_DESCRIPTIONS[`${componentName}.${propName}`] ?? GENERIC_PROP_DESCRIPTIONS[propName];
 }
 
+function resolvePropTypeReference(
+	typeExpression: string,
+	source: string,
+	sourcePath?: string,
+	stack = new Set<string>()
+): string {
+	const trimmed = typeExpression.trim();
+	if (!trimmed) return trimmed;
+
+	const indexedMatch = trimmed.match(/^(\w+)\[['"]([^'"]+)['"]\]$/);
+	if (indexedMatch?.[1] && indexedMatch[2]) {
+		const props = resolvePropsFromTypeExpression(indexedMatch[1], source, sourcePath, stack);
+		return props[indexedMatch[2]]?.type ?? trimmed;
+	}
+
+	const identifierMatch = trimmed.match(/^(\w+)$/);
+	if (!identifierMatch?.[1]) return trimmed;
+
+	const typeName = identifierMatch[1];
+	const visitKey = `${sourcePath ?? 'inline'}:${typeName}:prop-type`;
+	if (stack.has(visitKey)) return trimmed;
+
+	stack.add(visitKey);
+
+	try {
+		const aliasType = parseTypeAliasBaseType(source, typeName);
+		if (aliasType) {
+			return resolvePropTypeReference(aliasType, source, sourcePath, stack);
+		}
+
+		const importedType = resolveImportedTypeSource(source, typeName, sourcePath);
+		if (!importedType) return trimmed;
+
+		return resolvePropTypeReference(
+			importedType.exportedName,
+			importedType.source,
+			importedType.sourcePath,
+			stack
+		);
+	} finally {
+		stack.delete(visitKey);
+	}
+}
+
 function enrichProps(
 	props: Record<string, PropShape>,
 	componentName: string,
-	partName?: string
+	partName?: string,
+	source?: string,
+	sourcePath?: string
 ): Record<string, PropShape> {
 	for (const [propName, prop] of Object.entries(props)) {
+		if (source) {
+			prop.type = resolvePropTypeReference(prop.type, source, sourcePath);
+		}
+
 		const acceptedValues = extractAcceptedValues(prop.type);
 		if (acceptedValues) {
 			prop.acceptedValues = acceptedValues;
@@ -801,10 +852,270 @@ function resolveTypeAliasToInterface(
 
 	const identMatch = firstType.match(/^(\w+)$/);
 	if (identMatch?.[1]) {
-		return enrichProps(parseInterface(source, identMatch[1]), componentName, partName);
+		return enrichProps(parseInterface(source, identMatch[1]), componentName, partName, source);
 	}
 
 	return {};
+}
+
+function splitTopLevel(input: string, separator: string): string[] {
+	const parts: string[] = [];
+	let start = 0;
+	let angleDepth = 0;
+	let parenDepth = 0;
+	let bracketDepth = 0;
+	let braceDepth = 0;
+	let quote: "'" | '"' | null = null;
+
+	for (let i = 0; i < input.length; i += 1) {
+		const char = input[i];
+		const prev = input[i - 1];
+
+		if ((char === "'" || char === '"') && prev !== '\\') {
+			quote = quote === char ? null : (quote ?? (char as "'" | '"'));
+			continue;
+		}
+
+		if (quote) continue;
+
+		if (char === '<') angleDepth += 1;
+		else if (char === '>') angleDepth = Math.max(0, angleDepth - 1);
+		else if (char === '(') parenDepth += 1;
+		else if (char === ')') parenDepth = Math.max(0, parenDepth - 1);
+		else if (char === '[') bracketDepth += 1;
+		else if (char === ']') bracketDepth = Math.max(0, bracketDepth - 1);
+		else if (char === '{') braceDepth += 1;
+		else if (char === '}') braceDepth = Math.max(0, braceDepth - 1);
+		else if (
+			char === separator &&
+			angleDepth === 0 &&
+			parenDepth === 0 &&
+			bracketDepth === 0 &&
+			braceDepth === 0
+		) {
+			parts.push(input.slice(start, i).trim());
+			start = i + 1;
+		}
+	}
+
+	parts.push(input.slice(start).trim());
+	return parts.filter(Boolean);
+}
+
+function unwrapGeneric(typeExpression: string, genericName: string): string | null {
+	const prefix = `${genericName}<`;
+	if (!typeExpression.startsWith(prefix) || !typeExpression.endsWith('>')) {
+		return null;
+	}
+
+	return typeExpression.slice(prefix.length, -1).trim();
+}
+
+function parseQuotedPropNames(typeExpression: string): string[] {
+	return [...typeExpression.matchAll(/'([^']+)'/g)]
+		.map((match) => match[1])
+		.filter((value): value is string => Boolean(value));
+}
+
+function resolveImportPath(specifier: string, sourcePath?: string): string | null {
+	if (!sourcePath || !specifier.startsWith('.')) return null;
+
+	const basePath = resolve(dirname(sourcePath), specifier);
+	const candidates = /\.[a-z]+$/i.test(basePath)
+		? [
+				basePath,
+				basePath.replace(/\.js$/i, '.ts'),
+				basePath.replace(/\.js$/i, '.tsx'),
+				basePath.replace(/\.mjs$/i, '.ts'),
+				basePath.replace(/\.mjs$/i, '.tsx')
+			]
+		: [
+				basePath,
+				`${basePath}.ts`,
+				`${basePath}.tsx`,
+				`${basePath}.js`,
+				join(basePath, 'index.ts'),
+				join(basePath, 'index.tsx'),
+				join(basePath, 'index.js')
+			];
+
+	return candidates.find((candidate) => existsSync(candidate)) ?? null;
+}
+
+function resolveImportedTypeSource(
+	source: string,
+	typeName: string,
+	sourcePath?: string
+): { exportedName: string; source: string; sourcePath: string } | null {
+	if (!sourcePath) return null;
+
+	for (const match of source.matchAll(
+		/import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g
+	)) {
+		const bindings = match[1];
+		const specifier = match[2];
+		if (!bindings || !specifier) continue;
+
+		for (const binding of bindings.split(',')) {
+			const normalized = binding.trim().replace(/^type\s+/, '');
+			if (!normalized) continue;
+
+			const bindingMatch = normalized.match(/^(\w+)(?:\s+as\s+(\w+))?$/);
+			if (!bindingMatch?.[1]) continue;
+
+			const importedName = bindingMatch[1];
+			const localName = bindingMatch[2] ?? importedName;
+			if (localName !== typeName) continue;
+
+			const importPath = resolveImportPath(specifier, sourcePath);
+			if (!importPath) return null;
+
+			return {
+				exportedName: importedName,
+				source: readFileSync(importPath, 'utf8'),
+				sourcePath: importPath
+			};
+		}
+	}
+
+	return null;
+}
+
+function resolvePropsFromTypeExpression(
+	typeExpression: string,
+	source: string,
+	sourcePath?: string,
+	stack = new Set<string>()
+): Record<string, PropShape> {
+	const trimmed = typeExpression.trim();
+	if (!trimmed) return {};
+
+	const intersections = splitTopLevel(trimmed, '&');
+	if (intersections.length > 1) {
+		return intersections.reduce<Record<string, PropShape>>((merged, part) => {
+			Object.assign(merged, resolvePropsFromTypeExpression(part, source, sourcePath, stack));
+			return merged;
+		}, {});
+	}
+
+	const omitInner = unwrapGeneric(trimmed, 'Omit');
+	if (omitInner) {
+		const [targetType, omittedProps] = splitTopLevel(omitInner, ',');
+		const props = resolvePropsFromTypeExpression(targetType ?? '', source, sourcePath, stack);
+		for (const propName of parseQuotedPropNames(omittedProps ?? '')) {
+			delete props[propName];
+		}
+		return props;
+	}
+
+	const pickInner = unwrapGeneric(trimmed, 'Pick');
+	if (pickInner) {
+		const [targetType, pickedProps] = splitTopLevel(pickInner, ',');
+		const props = resolvePropsFromTypeExpression(targetType ?? '', source, sourcePath, stack);
+		const selected = new Set(parseQuotedPropNames(pickedProps ?? ''));
+		return Object.fromEntries(Object.entries(props).filter(([propName]) => selected.has(propName)));
+	}
+
+	const partialInner = unwrapGeneric(trimmed, 'Partial');
+	if (partialInner) {
+		const props = resolvePropsFromTypeExpression(partialInner, source, sourcePath, stack);
+		for (const value of Object.values(props)) {
+			value.required = false;
+		}
+		return props;
+	}
+
+	const identifierMatch = trimmed.match(/^(\w+)$/);
+	if (!identifierMatch?.[1]) return {};
+
+	const typeName = identifierMatch[1];
+	const visitKey = `${sourcePath ?? 'inline'}:${typeName}`;
+	if (stack.has(visitKey)) return {};
+
+	stack.add(visitKey);
+
+	try {
+		const props = parseInterface(source, typeName);
+		const baseType =
+			parseInterfaceBaseType(source, typeName) ?? parseTypeAliasBaseType(source, typeName);
+
+		if (Object.keys(props).length > 0 || baseType) {
+			return {
+				...(baseType ? resolvePropsFromTypeExpression(baseType, source, sourcePath, stack) : {}),
+				...props
+			};
+		}
+
+		const importedType = resolveImportedTypeSource(source, typeName, sourcePath);
+		if (!importedType) return {};
+
+		return resolvePropsFromTypeExpression(
+			importedType.exportedName,
+			importedType.source,
+			importedType.sourcePath,
+			stack
+		);
+	} finally {
+		stack.delete(visitKey);
+	}
+}
+
+function resolveForwardedPropsFromTypeExpression(
+	typeExpression: string,
+	source: string,
+	sourcePath?: string,
+	stack = new Set<string>()
+): ForwardedPropsShape | null {
+	const trimmed = typeExpression.trim();
+	if (!trimmed) return null;
+
+	const direct = describeForwardedProps(trimmed);
+	if (direct) return direct;
+
+	const intersections = splitTopLevel(trimmed, '&');
+	if (intersections.length > 1) {
+		for (const part of intersections) {
+			const resolved = resolveForwardedPropsFromTypeExpression(part, source, sourcePath, stack);
+			if (resolved) return resolved;
+		}
+	}
+
+	for (const genericName of ['Omit', 'Pick', 'Partial', 'Readonly']) {
+		const inner = unwrapGeneric(trimmed, genericName);
+		if (!inner) continue;
+
+		const [targetType] = splitTopLevel(inner, ',');
+		return resolveForwardedPropsFromTypeExpression(targetType ?? '', source, sourcePath, stack);
+	}
+
+	const identifierMatch = trimmed.match(/^(\w+)$/);
+	if (!identifierMatch?.[1]) return null;
+
+	const typeName = identifierMatch[1];
+	const visitKey = `${sourcePath ?? 'inline'}:${typeName}:forwarded`;
+	if (stack.has(visitKey)) return null;
+
+	stack.add(visitKey);
+
+	try {
+		const baseType =
+			parseInterfaceBaseType(source, typeName) ?? parseTypeAliasBaseType(source, typeName);
+		if (baseType) {
+			return resolveForwardedPropsFromTypeExpression(baseType, source, sourcePath, stack);
+		}
+
+		const importedType = resolveImportedTypeSource(source, typeName, sourcePath);
+		if (!importedType) return null;
+
+		return resolveForwardedPropsFromTypeExpression(
+			importedType.exportedName,
+			importedType.source,
+			importedType.sourcePath,
+			stack
+		);
+	} finally {
+		stack.delete(visitKey);
+	}
 }
 
 function parsePropContract(
@@ -819,7 +1130,7 @@ function parsePropContract(
 	if (Object.keys(props).length === 0) {
 		props = resolveTypeAliasToInterface(source, name, componentName, partName);
 	} else {
-		props = enrichProps(props, componentName, partName);
+		props = enrichProps(props, componentName, partName, source);
 	}
 
 	return {
@@ -896,16 +1207,20 @@ function partPropInterfaceNames(componentName: string, partName: string): string
 function parsePartContract(
 	source: string,
 	componentName: string,
-	partName: string
+	partName: string,
+	sourcePath?: string
 ): { props: Record<string, PropShape>; forwardedProps: ForwardedPropsShape | null } {
 	for (const ifaceName of partPropInterfaceNames(componentName, partName)) {
-		const props = parseInterface(source, ifaceName);
+		const props = resolvePropsFromTypeExpression(ifaceName, source, sourcePath);
 		const baseType =
 			parseInterfaceBaseType(source, ifaceName) ?? parseTypeAliasBaseType(source, ifaceName);
 		if (Object.keys(props).length > 0 || baseType) {
 			return {
-				props: enrichProps(props, componentName, partName),
-				forwardedProps: describeForwardedProps(baseType)
+				props: enrichProps(props, componentName, partName, source, sourcePath),
+				forwardedProps:
+					(baseType
+						? resolveForwardedPropsFromTypeExpression(baseType, source, sourcePath)
+						: null) ?? describeForwardedProps(baseType)
 			};
 		}
 	}
@@ -1144,12 +1459,15 @@ async function main(): Promise<void> {
 	for (const name of componentNames) {
 		const dir = dirForComponent(name);
 		const dirPath = join(uiSrc, dir);
-		const indexContent = await readText(join(dirPath, 'index.ts'));
+		const indexPath = join(dirPath, 'index.ts');
+		const indexContent = await readText(indexPath);
 
 		// Read primitives source as fallback for inherited/re-exported props
 		let primContent: string | null = null;
+		let primIndexPath: string | null = null;
 		try {
-			primContent = await readText(join(primSrc, dir, 'index.ts'));
+			primIndexPath = join(primSrc, dir, 'index.ts');
+			primContent = await readText(primIndexPath);
 		} catch {
 			/* no primitives source for this component */
 		}
@@ -1168,13 +1486,13 @@ async function main(): Promise<void> {
 		if (compound) {
 			const partsObj: Record<string, PartShape> = {};
 			for (const part of parts) {
-				const contract = parsePartContract(indexContent, name, part);
+				const contract = parsePartContract(indexContent, name, part, indexPath);
 				const parsed = contract.props;
 				let fwdProps = contract.forwardedProps;
 
 				// Merge props from primitives for this part
-				if (primContent) {
-					const primContract = parsePartContract(primContent, name, part);
+				if (primContent && primIndexPath) {
+					const primContract = parsePartContract(primContent, name, part, primIndexPath);
 					for (const [key, val] of Object.entries(primContract.props)) {
 						if (!parsed[key]) parsed[key] = val;
 					}
@@ -1380,9 +1698,10 @@ async function main(): Promise<void> {
 		if (components[name]) continue; // already found in UI
 		const dir = dirForComponent(name);
 		const dirPath = join(primSrc, dir);
+		const indexPath = join(dirPath, 'index.ts');
 		let indexContent: string;
 		try {
-			indexContent = await readText(join(dirPath, 'index.ts'));
+			indexContent = await readText(indexPath);
 		} catch {
 			continue; // directory doesn't exist
 		}
@@ -1398,7 +1717,7 @@ async function main(): Promise<void> {
 		if (compound) {
 			const partsObj: Record<string, PartShape> = {};
 			for (const part of parts) {
-				const contract = parsePartContract(indexContent, name, part);
+				const contract = parsePartContract(indexContent, name, part, indexPath);
 				const parsed = contract.props;
 				const bindableProps = findBindableProps(dir, part);
 

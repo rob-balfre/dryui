@@ -39,7 +39,9 @@ describe('Combobox', () => {
 		expect(content.matches(':popover-open')).toBe(true);
 		expect(document.querySelector('[data-testid="bound-open"]')?.textContent).toBe('true');
 		expect(input.getAttribute('aria-expanded')).toBe('true');
-		expect(input.style.getPropertyValue('anchor-name')).toContain('--dryui-anchor-');
+		const trigger = input.closest<HTMLElement>('[data-combobox-input]');
+		expect(trigger).not.toBeNull();
+		expect(trigger!.style.getPropertyValue('anchor-name')).toContain('--dryui-anchor-');
 		expect(content.style.position).toBe('fixed');
 		expect(content.style.getPropertyValue('position-area')).toBe('block-end span-inline-end');
 		expect(content.style.getPropertyValue('position-try-fallbacks')).toContain('flip-block');

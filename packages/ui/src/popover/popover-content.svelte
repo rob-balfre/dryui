@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover, createDismiss } from '@dryui/primitives';
+	import { createDismiss } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredOverlayContent } from '../internal/anchored-overlay-content.svelte.js';
 	import { getPopoverCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -22,20 +23,17 @@
 
 	const ctx = getPopoverCtx();
 
-	let contentEl = $state<HTMLDivElement>();
-
-	const popover = createAnchoredPopover({
-		triggerEl: () => ctx.triggerEl,
-		contentEl: () => contentEl ?? null,
-		open: () => ctx.open,
+	const overlay = createAnchoredOverlayContent({
+		ctx,
 		placement: () => placement,
-		offset: () => offset
+		offset: () => offset,
+		style: () => style
 	});
 
 	createDismiss({
 		enabled: () => ctx.open,
 		onDismiss: () => ctx.close(),
-		contentEl: () => contentEl ?? null,
+		contentEl: overlay.contentEl,
 		triggerEl: () => ctx.triggerEl,
 		preventDefaultOnEscape: true,
 		returnFocusTo: () => ctx.triggerEl
@@ -43,12 +41,12 @@
 </script>
 
 <div
-	bind:this={contentEl}
+	{@attach overlay.bindContent}
+	{@attach overlay.position}
 	id={ctx.contentId}
 	popover="manual"
 	data-popover-content
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:popover.applyPosition={style}
 	class={className}
 	{...rest}
 >

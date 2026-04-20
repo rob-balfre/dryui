@@ -2,22 +2,11 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getDatePickerCtx } from './context.svelte.js';
-	import { createAnchoredPopover } from '../utils/anchored-popover.svelte.js';
+	import OverlayContent from '../internal/overlay-content.svelte';
+	import type { Placement } from '../utils/anchor-position.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
-		placement?:
-			| 'top'
-			| 'top-start'
-			| 'top-end'
-			| 'bottom'
-			| 'bottom-start'
-			| 'bottom-end'
-			| 'left'
-			| 'left-start'
-			| 'left-end'
-			| 'right'
-			| 'right-start'
-			| 'right-end';
+		placement?: Placement;
 		offset?: number;
 		children: Snippet;
 	}
@@ -25,26 +14,15 @@
 	let { placement = 'bottom-start', offset = 8, children, style, ...rest }: Props = $props();
 
 	const ctx = getDatePickerCtx();
-
-	let el = $state<HTMLDivElement>();
-
-	const popover = createAnchoredPopover({
-		triggerEl: () => ctx.triggerEl,
-		contentEl: () => el ?? null,
-		open: () => ctx.open,
-		placement: () => placement,
-		offset: () => offset
-	});
 </script>
 
-<div
-	bind:this={el}
-	popover="auto"
+<OverlayContent
+	{ctx}
+	{placement}
+	{offset}
+	{style}
+	popoverMode="auto"
 	role="dialog"
-	id={ctx.contentId}
-	aria-labelledby={ctx.triggerId}
-	data-state={ctx.open ? 'open' : 'closed'}
-	use:popover.applyPosition={style}
 	ontoggle={(e) => {
 		const newState = (e as ToggleEvent).newState === 'open';
 		if (newState && !ctx.open) {
@@ -56,4 +34,4 @@
 	{...rest}
 >
 	{@render children()}
-</div>
+</OverlayContent>

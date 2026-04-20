@@ -32,8 +32,22 @@ export function extractThemeColor(
 	property: string,
 	element?: HTMLElement
 ): [number, number, number] {
+	if (typeof document === 'undefined') {
+		return [0, 0, 0];
+	}
+
+	const readComputedStyle =
+		typeof getComputedStyle === 'function'
+			? getComputedStyle
+			: typeof window !== 'undefined' && typeof window.getComputedStyle === 'function'
+				? window.getComputedStyle.bind(window)
+				: null;
+	if (!readComputedStyle) {
+		return [0, 0, 0];
+	}
+
 	const el = element ?? document.documentElement;
-	const value = getComputedStyle(el).getPropertyValue(property).trim();
+	const value = readComputedStyle(el).getPropertyValue(property).trim();
 
 	// Parse hex (#rgb, #rrggbb)
 	const hexMatch = value.match(/^#([0-9a-f]{3,8})$/i);

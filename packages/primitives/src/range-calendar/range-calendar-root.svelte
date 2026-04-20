@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { setRangeCalendarCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths } from '../utils/date-utils.js';
+	import { createDateViewState } from '../internal/date-view-state.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		startDate?: Date | null;
@@ -25,11 +25,10 @@
 		...rest
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
-
-	let viewMonth = $state(startDate ? startDate.getMonth() : new Date().getMonth());
-	let viewYear = $state(startDate ? startDate.getFullYear() : new Date().getFullYear());
-	let focusedDate = $state<Date>(startDate ?? new Date());
+	const view = createDateViewState({
+		getLocale: () => locale,
+		getInitialDate: () => startDate
+	});
 	let hoveredDate = $state<Date | null>(null);
 
 	// Selection state: first click sets start, second click sets end
@@ -46,13 +45,13 @@
 			return hoveredDate;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -67,7 +66,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		selectDate(date: Date) {
 			if (!selecting) {
@@ -85,26 +84,14 @@
 				}
 				selecting = false;
 			}
-			focusedDate = date;
+			view.setFocusedDate(date);
 		},
 		setHoveredDate(date: Date | null) {
 			hoveredDate = date;
 		},
-		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
-		},
-		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
-		},
-		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
-		}
+		nextMonth: view.nextMonth,
+		prevMonth: view.prevMonth,
+		setFocusedDate: view.setFocusedDate
 	});
 </script>
 
