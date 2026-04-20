@@ -335,7 +335,15 @@ export function startFeedbackHttpServer(
 			if (pathname === '/submissions' && request.method === 'POST') {
 				try {
 					const body = await readJson<CreateSubmissionInput>(request);
-					if (!body.url || !body.image) return errorResponse(400, 'Missing url or image');
+					if (!body.url) return errorResponse(400, 'Missing url');
+					if (
+						!body.image ||
+						typeof body.image !== 'object' ||
+						typeof body.image.webp !== 'string' ||
+						typeof body.image.png !== 'string'
+					) {
+						return errorResponse(400, 'Missing image.webp or image.png');
+					}
 					const submission = store.createSubmission(body);
 					bus.emit(sessionEvent('submission.created', submission.url, submission));
 					return json(submission, 201);
@@ -359,7 +367,13 @@ export function startFeedbackHttpServer(
 				const submissionId = decodeURIComponent(submissionScreenshotMatch[1] ?? '');
 				const submission = store.getSubmission(submissionId);
 				if (!submission) return errorResponse(404, 'Not found');
-				return (await fileResponse(submission.screenshotPath)) ?? errorResponse(404, 'Not found');
+				// Format selector: ?format=png or ?format=webp. PNG has an empty
+				// string path for legacy rows, in which case we fall back to WebP.
+				const requested = url.searchParams.get('format');
+				const pngPath = submission.screenshotPath.png;
+				const targetPath =
+					requested === 'png' && pngPath ? pngPath : submission.screenshotPath.webp;
+				return (await fileResponse(targetPath)) ?? errorResponse(404, 'Not found');
 			}
 
 			const submissionMatch = pathname.match(/^\/submissions\/([^/]+)$/);

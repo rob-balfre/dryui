@@ -283,8 +283,8 @@
 
 Use the dryui-feedback MCP server:
 1. Call feedback_get_submissions to fetch the latest submission details
-2. Read the screenshot at screenshotPath to see what the user annotated
-3. Review the drawings (arrows, freehand marks, text notes) to understand the requested changes
+2. Read the screenshot at screenshotPath.png (fallback to screenshotPath.webp) to see what the user annotated
+3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
 5. Call feedback_resolve_submission with id "${selectedSubmission.id}" once resolved${notes}`;
 		}
@@ -292,8 +292,8 @@ Use the dryui-feedback MCP server:
 
 Use the dryui-feedback MCP server:
 1. Call feedback_get_submissions to list pending submissions
-2. For each submission, read the screenshot at screenshotPath
-3. Review the drawings (arrows, freehand marks, text notes) to understand the requested changes
+2. For each submission, read the screenshot at screenshotPath.png (fallback to screenshotPath.webp)
+3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
 5. Call feedback_resolve_submission with the submission id after each fix is complete`;
 	});

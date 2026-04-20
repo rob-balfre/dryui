@@ -133,21 +133,98 @@ export type SubmissionStatus = 'pending' | 'resolved';
 export type SubmissionQueryStatus = SubmissionStatus | 'all';
 export type SubmissionAgent = 'codex' | 'claude' | 'gemini' | 'copilot' | 'off';
 
+export interface SubmissionPoint {
+	x: number;
+	y: number;
+}
+
+export type DrawingSpace = 'scroll' | 'viewport';
+
+interface SubmissionDrawingBase {
+	id: string;
+	color: string;
+	space?: DrawingSpace;
+}
+
+export interface SubmissionStrokeDrawing extends SubmissionDrawingBase {
+	kind: 'freehand';
+	points: SubmissionPoint[];
+	width: number;
+}
+
+export interface SubmissionArrowDrawing extends SubmissionDrawingBase {
+	kind: 'arrow';
+	start: SubmissionPoint;
+	end: SubmissionPoint;
+	width: number;
+}
+
+export interface SubmissionTextDrawing extends SubmissionDrawingBase {
+	kind: 'text';
+	position: SubmissionPoint;
+	text: string;
+	fontSize: number;
+}
+
+export type SubmissionDrawing =
+	| SubmissionStrokeDrawing
+	| SubmissionArrowDrawing
+	| SubmissionTextDrawing;
+
+export type SubmissionCorner = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center';
+
+export interface SubmissionHintElement {
+	tag: string;
+	id?: string;
+	selector?: string;
+}
+
+export interface SubmissionDrawingHint {
+	corner: SubmissionCorner;
+	percentX: number;
+	percentY: number;
+	element?: SubmissionHintElement;
+}
+
+export interface SubmissionScrollOffset {
+	x: number;
+	y: number;
+}
+
+export interface SubmissionScreenshotPaths {
+	webp: string;
+	png: string;
+}
+
+/**
+ * New submissions always carry both WebP and PNG paths. Legacy rows that only
+ * have a WebP file populate `webp` with the existing path and leave `png` as an
+ * empty string; callers check truthiness before reading.
+ */
 export interface Submission {
 	id: string;
 	url: string;
-	screenshotPath: string;
-	drawings: unknown[];
+	screenshotPath: SubmissionScreenshotPaths;
+	drawings: SubmissionDrawing[];
+	hints?: SubmissionDrawingHint[];
 	viewport: { width: number; height: number } | null;
+	scroll?: SubmissionScrollOffset | null;
 	status: SubmissionStatus;
 	createdAt: string;
 	agent?: SubmissionAgent;
 }
 
+export interface CreateSubmissionImageInput {
+	webp: string;
+	png: string;
+}
+
 export interface CreateSubmissionInput {
 	url: string;
-	image: string;
-	drawings: unknown[];
+	image: CreateSubmissionImageInput;
+	drawings: SubmissionDrawing[];
+	hints?: SubmissionDrawingHint[];
 	viewport?: { width: number; height: number };
+	scroll?: SubmissionScrollOffset;
 	agent?: SubmissionAgent;
 }

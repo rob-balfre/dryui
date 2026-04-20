@@ -15,7 +15,10 @@ import type {
 	SessionWithAnnotations,
 	Submission,
 	SubmissionAgent,
+	SubmissionDrawing,
+	SubmissionDrawingHint,
 	SubmissionQueryStatus,
+	SubmissionScrollOffset,
 	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
@@ -81,8 +84,11 @@ interface SubmissionRow {
 	id: string;
 	url: string;
 	screenshot_path: string;
+	screenshot_png_path: string | null;
 	drawings: string;
+	hints: string | null;
 	viewport: string | null;
+	scroll: string | null;
 	status: SubmissionStatus;
 	created_at: string;
 	agent: string | null;
@@ -173,12 +179,21 @@ function toAnnotation(row: AnnotationRow): Annotation {
 
 function toSubmission(row: SubmissionRow): Submission {
 	const agent = normalizeAgent(row.agent);
+	const hints = parseJson<SubmissionDrawingHint[]>(row.hints);
+	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
 	return {
 		id: row.id,
 		url: row.url,
-		screenshotPath: row.screenshot_path,
-		drawings: parseJson<unknown[]>(row.drawings) ?? [],
+		screenshotPath: {
+			webp: row.screenshot_path,
+			// Legacy rows pre-dual-emission only have the WebP file. Expose an
+			// empty PNG path so readers can fall back to WebP explicitly.
+			png: row.screenshot_png_path ?? ''
+		},
+		drawings: parseJson<SubmissionDrawing[]>(row.drawings) ?? [],
+		...(hints ? { hints } : {}),
 		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
+		...(scroll !== undefined ? { scroll } : {}),
 		status: row.status as SubmissionStatus,
 		createdAt: row.created_at,
 		...(agent ? { agent } : {})
@@ -267,8 +282,11 @@ export class FeedbackStore {
         id TEXT PRIMARY KEY,
         url TEXT NOT NULL,
         screenshot_path TEXT NOT NULL,
+        screenshot_png_path TEXT,
         drawings TEXT NOT NULL DEFAULT '[]',
+        hints TEXT,
         viewport TEXT,
+        scroll TEXT,
         status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
         created_at TEXT NOT NULL,
         agent TEXT
@@ -284,6 +302,12 @@ export class FeedbackStore {
 			"TEXT CHECK(color IN ('brand', 'info', 'success', 'warning', 'error', 'neutral'))"
 		);
 		ensureColumn(this.db, 'submissions', 'agent', 'TEXT');
+		// Additive migration for pre-dual-emission databases. Existing rows keep
+		// their WebP-only screenshot_path; new columns default to NULL and new
+		// submissions populate all four.
+		ensureColumn(this.db, 'submissions', 'screenshot_png_path', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
 
 		if (!existsSync(SCREENSHOTS_DIR)) {
 			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
@@ -556,22 +580,29 @@ export class FeedbackStore {
 
 	createSubmission(input: CreateSubmissionInput): Submission {
 		const id = randomUUID();
-		const screenshotPath = `${SCREENSHOTS_DIR}/${id}.webp`;
-		writeFileSync(screenshotPath, Buffer.from(input.image, 'base64'));
+		const webpPath = `${SCREENSHOTS_DIR}/${id}.webp`;
+		const pngPath = `${SCREENSHOTS_DIR}/${id}.png`;
+		writeFileSync(webpPath, Buffer.from(input.image.webp, 'base64'));
+		writeFileSync(pngPath, Buffer.from(input.image.png, 'base64'));
 
 		const now = createTimestamp();
 		const agent = normalizeAgent(input.agent);
+		const hints = input.hints ?? [];
 		this.db
 			.query(
-				`INSERT INTO submissions (id, url, screenshot_path, drawings, viewport, status, created_at, agent)
-				 VALUES (?, ?, ?, ?, ?, 'pending', ?, ?)`
+				`INSERT INTO submissions (
+					id, url, screenshot_path, screenshot_png_path, drawings, hints, viewport, scroll, status, created_at, agent
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
 			)
 			.run(
 				id,
 				input.url,
-				screenshotPath,
+				webpPath,
+				pngPath,
 				JSON.stringify(input.drawings),
+				hints.length > 0 ? JSON.stringify(hints) : null,
 				input.viewport ? JSON.stringify(input.viewport) : null,
+				input.scroll ? JSON.stringify(input.scroll) : null,
 				now,
 				agent ?? null
 			);
@@ -579,9 +610,11 @@ export class FeedbackStore {
 		return {
 			id,
 			url: input.url,
-			screenshotPath,
+			screenshotPath: { webp: webpPath, png: pngPath },
 			drawings: input.drawings,
+			...(hints.length > 0 ? { hints } : {}),
 			viewport: input.viewport ?? null,
+			...(input.scroll ? { scroll: input.scroll } : {}),
 			status: 'pending',
 			createdAt: now,
 			...(agent ? { agent } : {})

@@ -4,6 +4,7 @@
 	import { Check } from 'lucide-svelte';
 	import {
 		AGENTS,
+		type DispatchTargetsResponse,
 		type Arrow,
 		type Drawing,
 		type DrawingSpace,
@@ -13,6 +14,7 @@
 		type SubmissionAgent,
 		type Tool
 	} from './types.js';
+	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
 	import Toolbar from './components/toolbar.svelte';
 
 	const ANNOTATION_FILL = 'hsl(25 100% 55%)';
@@ -30,6 +32,7 @@
 	}: FeedbackProps = $props();
 
 	const AGENT_STORAGE_KEY = 'dryui-feedback-agent';
+	const DEFAULT_CONFIGURED_AGENTS = AGENTS.filter((entry) => entry !== 'off');
 
 	function readStoredAgent(): SubmissionAgent {
 		if (typeof localStorage === 'undefined') return 'codex';
@@ -40,11 +43,41 @@
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
 	let agent = $state<SubmissionAgent>(readStoredAgent());
+	let configuredAgents = $state<Array<Exclude<SubmissionAgent, 'off'>>>([
+		...DEFAULT_CONFIGURED_AGENTS
+	]);
 
 	function setAgent(next: SubmissionAgent) {
 		agent = next;
 		if (typeof localStorage !== 'undefined') {
 			localStorage.setItem(AGENT_STORAGE_KEY, next);
+		}
+	}
+
+	function configuredAgentList(
+		payload: DispatchTargetsResponse
+	): Array<Exclude<SubmissionAgent, 'off'>> {
+		const configured = payload.configuredAgents.filter((entry) =>
+			DEFAULT_CONFIGURED_AGENTS.includes(entry)
+		);
+		return configured.length > 0 ? configured : [...DEFAULT_CONFIGURED_AGENTS];
+	}
+
+	async function loadDispatchTargets(): Promise<void> {
+		if (!serverUrl) return;
+
+		try {
+			const response = await fetch(`${serverUrl}/dispatch-targets`);
+			if (!response.ok) return;
+
+			const payload = (await response.json()) as DispatchTargetsResponse;
+			configuredAgents = configuredAgentList(payload);
+
+			if (agent !== 'off' && !configuredAgents.includes(agent as Exclude<SubmissionAgent, 'off'>)) {
+				setAgent(payload.defaultAgent);
+			}
+		} catch {
+			// Keep the full supported list when the server does not expose launch metadata.
 		}
 	}
 	let drawings: Drawing[] = $state([]);
@@ -614,7 +647,17 @@
 
 	// --- Screenshot + Submit ---
 
-	async function captureScreenshot(): Promise<string> {
+	interface Screenshots {
+		webp: string;
+		png: string;
+	}
+
+	function stripDataUrlPrefix(dataUrl: string): string {
+		const comma = dataUrl.indexOf(',');
+		return comma === -1 ? dataUrl : dataUrl.slice(comma + 1);
+	}
+
+	async function captureScreenshot(): Promise<Screenshots> {
 		let stream: MediaStream | null = null;
 		const video = document.createElement('video');
 
@@ -647,14 +690,74 @@
 			// Draw the page capture
 			ctx.drawImage(video, 0, 0, w, h);
 
-			const dataUrl = canvas.toDataURL('image/webp', 0.8);
+			// Emit both WebP (compact, 0.8 quality) and PNG (lossless) so agents
+			// that cannot decode WebP still have a readable copy.
+			const webp = stripDataUrlPrefix(canvas.toDataURL('image/webp', 0.8));
+			const png = stripDataUrlPrefix(canvas.toDataURL('image/png'));
 			canvas.width = 0;
 			canvas.height = 0;
-			return dataUrl.split(',')[1]!;
+			return { webp, png };
 		} finally {
 			stream?.getTracks().forEach((track) => track.stop());
 			video.srcObject = null;
 			toolbarHiddenForCapture = false;
+		}
+	}
+
+	function anchorPointFor(drawing: Drawing): Point | null {
+		if (drawing.kind === 'freehand') return drawing.points[0] ?? null;
+		if (drawing.kind === 'arrow') return drawing.end;
+		return drawing.position;
+	}
+
+	function toViewportPoint(point: Point, space: DrawingSpace): Point {
+		if (space === 'viewport') return point;
+		return {
+			x: point.x - scrollX + viewportLeft,
+			y: point.y - scrollY + viewportTop
+		};
+	}
+
+	function buildDrawingHints(items: Drawing[]): DrawingHint[] {
+		const viewportW = window.innerWidth;
+		const viewportH = window.innerHeight;
+
+		// Temporarily disable pointer events on every descendant of the feedback
+		// root so elementFromPoint resolves to the underlying page content instead
+		// of our drawing canvas. The root itself sets pointer-events: none but its
+		// children override that to auto, so we switch each descendant back off.
+		const overlayChildren = Array.from(
+			document.querySelectorAll<HTMLElement | SVGElement>('[data-dryui-feedback] *')
+		);
+		const previousPointerEvents = overlayChildren.map((el) => el.style.pointerEvents);
+		for (const el of overlayChildren) el.style.pointerEvents = 'none';
+
+		try {
+			return items.map((drawing) => {
+				const anchor = anchorPointFor(drawing);
+				const space = drawingSpace(drawing);
+				const viewportPoint = anchor
+					? toViewportPoint(anchor, space)
+					: { x: viewportW / 2, y: viewportH / 2 };
+
+				const position = describePosition(viewportPoint.x, viewportPoint.y, viewportW, viewportH);
+
+				let element: DrawingHint['element'];
+				if (anchor) {
+					const hit = document.elementFromPoint(viewportPoint.x, viewportPoint.y);
+					const descriptor = describeElement(hit);
+					if (descriptor) element = descriptor;
+				}
+
+				return {
+					...position,
+					...(element ? { element } : {})
+				};
+			});
+		} finally {
+			overlayChildren.forEach((el, index) => {
+				el.style.pointerEvents = previousPointerEvents[index] ?? '';
+			});
 		}
 	}
 
@@ -691,6 +794,12 @@
 		submitting = true;
 		try {
 			const image = await captureScreenshot();
+			// Snapshot viewport + scroll after capture so the numbers line up with
+			// the frame agents will read. buildDrawingHints reads the same window
+			// metrics on purpose.
+			const viewport = { width: window.innerWidth, height: window.innerHeight };
+			const scroll = { x: scrollX, y: scrollY };
+			const hints = buildDrawingHints(drawings);
 			const response = await fetch(`${serverUrl}/submissions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -698,7 +807,9 @@
 					url: location.href,
 					image,
 					drawings,
-					viewport: { width: window.innerWidth, height: window.innerHeight },
+					hints,
+					viewport,
+					scroll,
 					agent
 				})
 			});
@@ -855,6 +966,10 @@
 			for (const timer of Object.values(toastTimers)) clearTimeout(timer);
 			for (const id of Object.keys(toastTimers)) delete toastTimers[id];
 		};
+	});
+
+	onMount(() => {
+		void loadDispatchTargets();
 	});
 </script>
 
@@ -1065,6 +1180,7 @@
 			{submitting}
 			{sent}
 			{agent}
+			availableAgents={configuredAgents}
 			ontoggle={toggle}
 			ontoolchange={setTool}
 			onagentchange={setAgent}

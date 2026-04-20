@@ -1,6 +1,36 @@
 import { rmSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { FeedbackStore } from '../src/store.ts';
+import type { SubmissionDrawing } from '../src/types.ts';
+
+function drawingArrow(id = 'a1'): SubmissionDrawing {
+	return {
+		id,
+		kind: 'arrow',
+		color: 'hsl(25 100% 55%)',
+		start: { x: 100, y: 100 },
+		end: { x: 200, y: 150 },
+		width: 3
+	};
+}
+
+function drawingText(id = 't1', text = 'Looks good'): SubmissionDrawing {
+	return {
+		id,
+		kind: 'text',
+		color: 'hsl(25 100% 55%)',
+		position: { x: 50, y: 60 },
+		text,
+		fontSize: 16
+	};
+}
+
+function imagePayload(tag: string): { webp: string; png: string } {
+	return {
+		webp: Buffer.from(`${tag}-webp`).toString('base64'),
+		png: Buffer.from(`${tag}-png`).toString('base64')
+	};
+}
 
 describe('FeedbackStore', () => {
 	let store: FeedbackStore;
@@ -100,24 +130,27 @@ describe('FeedbackStore', () => {
 	test('lists submissions across queue and history filters', () => {
 		const pendingOlder = store.createSubmission({
 			url: 'https://example.com/queue/older',
-			image: Buffer.from('pending').toString('base64'),
-			drawings: [{ kind: 'arrow' }]
+			image: imagePayload('pending'),
+			drawings: [drawingArrow('pending-older')]
 		});
 		const pendingNewer = store.createSubmission({
 			url: 'https://example.com/queue/newer',
-			image: Buffer.from('pending-newer').toString('base64'),
-			drawings: [{ kind: 'arrow' }]
+			image: imagePayload('pending-newer'),
+			drawings: [drawingArrow('pending-newer')]
 		});
 		const resolved = store.createSubmission({
 			url: 'https://example.com/history',
-			image: Buffer.from('resolved').toString('base64'),
-			drawings: [{ kind: 'text', text: 'Looks good' }]
+			image: imagePayload('resolved'),
+			drawings: [drawingText('resolved-text', 'Looks good')]
 		});
 
 		screenshotPaths.push(
-			pendingOlder.screenshotPath,
-			pendingNewer.screenshotPath,
-			resolved.screenshotPath
+			pendingOlder.screenshotPath.webp,
+			pendingOlder.screenshotPath.png,
+			pendingNewer.screenshotPath.webp,
+			pendingNewer.screenshotPath.png,
+			resolved.screenshotPath.webp,
+			resolved.screenshotPath.png
 		);
 		store.updateSubmissionStatus(resolved.id, 'resolved');
 
@@ -134,5 +167,50 @@ describe('FeedbackStore', () => {
 				.map((submission) => submission.id)
 				.sort()
 		).toEqual([pendingOlder.id, pendingNewer.id, resolved.id].sort());
+	});
+
+	test('persists dual screenshot paths, hints, and scroll offset', () => {
+		const submission = store.createSubmission({
+			url: 'https://example.com/hints',
+			image: imagePayload('hints'),
+			drawings: [drawingArrow('arrow-1'), drawingText('text-1', 'Fix spacing')],
+			hints: [
+				{
+					corner: 'top-right',
+					percentX: 96.4,
+					percentY: 2.3,
+					element: { tag: 'button', id: 'nav-close', selector: 'button#nav-close' }
+				},
+				{
+					corner: 'center',
+					percentX: 50,
+					percentY: 50
+				}
+			],
+			viewport: { width: 2560, height: 1440 },
+			scroll: { x: 0, y: 420 }
+		});
+
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		const saved = store.getSubmission(submission.id);
+		expect(saved).not.toBeNull();
+		expect(saved?.screenshotPath.webp).toMatch(/\.webp$/);
+		expect(saved?.screenshotPath.png).toMatch(/\.png$/);
+		expect(saved?.hints).toEqual([
+			{
+				corner: 'top-right',
+				percentX: 96.4,
+				percentY: 2.3,
+				element: { tag: 'button', id: 'nav-close', selector: 'button#nav-close' }
+			},
+			{
+				corner: 'center',
+				percentX: 50,
+				percentY: 50
+			}
+		]);
+		expect(saved?.scroll).toEqual({ x: 0, y: 420 });
+		expect(saved?.drawings).toHaveLength(2);
 	});
 });

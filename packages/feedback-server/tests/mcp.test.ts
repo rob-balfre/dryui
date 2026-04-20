@@ -1,6 +1,12 @@
 import { describe, expect, test } from 'bun:test';
 import { registerFeedbackTools } from '../src/mcp.ts';
-import type { Annotation, PendingResponse, Session, SessionWithAnnotations } from '../src/types.ts';
+import type {
+	Annotation,
+	PendingResponse,
+	Session,
+	SessionWithAnnotations,
+	Submission
+} from '../src/types.ts';
 
 type ToolResult = Promise<{ content: Array<{ type: string; text: string }> }>;
 type ToolHandler = (params: Record<string, unknown>) => ToolResult;
@@ -140,5 +146,108 @@ describe('feedback MCP tools', () => {
 		expect(result.content[0]?.text).toContain('"timedOut": false');
 		expect(result.content[0]?.text).toContain(annotation.id);
 		expect(calls).toBe(2);
+	});
+
+	test('get_submissions surfaces dual screenshot paths, scroll, hints, and summary', async () => {
+		const submission: Submission = {
+			id: 'sub-1',
+			url: 'https://example.com/page',
+			screenshotPath: {
+				webp: '/tmp/sub-1.webp',
+				png: '/tmp/sub-1.png'
+			},
+			drawings: [
+				{
+					id: 'arrow-1',
+					kind: 'arrow',
+					color: 'hsl(25 100% 55%)',
+					start: { x: 100, y: 100 },
+					end: { x: 200, y: 150 },
+					width: 3
+				},
+				{
+					id: 'text-1',
+					kind: 'text',
+					color: 'hsl(25 100% 55%)',
+					position: { x: 2475, y: 59 },
+					text: 'Too tight',
+					fontSize: 16
+				}
+			],
+			hints: [
+				{
+					corner: 'center',
+					percentX: 58.6,
+					percentY: 10.4,
+					element: { tag: 'header', selector: 'header.page' }
+				},
+				{
+					corner: 'top-right',
+					percentX: 96.7,
+					percentY: 4.1,
+					element: { tag: 'button', id: 'close-btn', selector: 'button#close-btn' }
+				}
+			],
+			viewport: { width: 2560, height: 1440 },
+			scroll: { x: 0, y: 420 },
+			status: 'pending',
+			createdAt: '2026-04-20T12:00:00.000Z'
+		};
+		const mock = createMockServer();
+
+		registerFeedbackTools(mock.server as never, {
+			listSessions: async (): Promise<Session[]> => [],
+			getSession: async (): Promise<SessionWithAnnotations> => ({
+				id: 'session-1',
+				url: 'https://example.com',
+				status: 'active',
+				createdAt: 'now',
+				annotations: []
+			}),
+			getPending: async (): Promise<PendingResponse> => createPending(),
+			getAllPending: async (): Promise<PendingResponse> => createPending(),
+			updateAnnotation: async () => createAnnotation('x'),
+			addThreadMessage: async () => createAnnotation('x'),
+			getSubmissions: async () => ({ count: 1, submissions: [submission] }),
+			resolveSubmission: async () => undefined
+		});
+
+		const result = await mock.getHandler('feedback_get_submissions')({
+			timeoutSeconds: 2,
+			pollIntervalSeconds: 1
+		});
+
+		const text = result.content[0]?.text ?? '';
+		const payload = JSON.parse(text) as {
+			timedOut: boolean;
+			count: number;
+			submissions: Array<{
+				id: string;
+				screenshotPath: { webp: string; png: string };
+				scroll: { x: number; y: number } | null;
+				hints: Array<{ corner: string; percentX: number; percentY: number }>;
+				summary: {
+					drawingCount: number;
+					hintCount: number;
+					drawingKinds: Record<string, number>;
+					corners: Record<string, number>;
+				};
+			}>;
+		};
+
+		expect(payload.timedOut).toBe(false);
+		expect(payload.count).toBe(1);
+		expect(payload.submissions[0]?.screenshotPath).toEqual({
+			webp: '/tmp/sub-1.webp',
+			png: '/tmp/sub-1.png'
+		});
+		expect(payload.submissions[0]?.scroll).toEqual({ x: 0, y: 420 });
+		expect(payload.submissions[0]?.hints).toHaveLength(2);
+		expect(payload.submissions[0]?.summary).toEqual({
+			drawingCount: 2,
+			hintCount: 2,
+			drawingKinds: { arrow: 1, text: 1 },
+			corners: { center: 1, 'top-right': 1 }
+		});
 	});
 });
