@@ -4140,6 +4140,81 @@
       ],
       "example": "<ToggleGroup.Root>\n  <ToggleGroup.Item>...</ToggleGroup.Item>\n</ToggleGroup.Root>"
     },
+    "ThemeToggle": {
+      "import": "@dryui/ui",
+      "description": "Persisted light/dark theme switcher with system-preference fallback",
+      "category": "action",
+      "tags": [
+        "theme",
+        "dark-mode",
+        "light-mode",
+        "toggle",
+        "switcher",
+        "preference"
+      ],
+      "compound": false,
+      "props": {
+        "storageKey": {
+          "type": "string",
+          "required": false
+        },
+        "size": {
+          "type": "'sm' | 'md' | 'lg'",
+          "required": false,
+          "acceptedValues": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Size preset affecting density, spacing, or typography.",
+          "default": "'md'"
+        },
+        "controller": {
+          "type": "ThemeController",
+          "required": false
+        },
+        "sunIcon": {
+          "type": "Snippet",
+          "required": false
+        },
+        "moonIcon": {
+          "type": "Snippet",
+          "required": false
+        },
+        "onModeChange": {
+          "type": "(mode: ThemeMode) => void",
+          "required": false
+        },
+        "disabled": {
+          "type": "boolean",
+          "required": false,
+          "description": "Prevents interaction and applies disabled styling."
+        },
+        "class": {
+          "type": "ClassValue",
+          "required": false
+        }
+      },
+      "forwardedProps": {
+        "baseType": "Omit<\n\tHTMLButtonAttributes,\n\t'onclick' | 'onkeydown' | 'disabled' | 'class'\n>",
+        "via": "rest",
+        "note": "Forwards native HTML attributes via rest props."
+      },
+      "a11y": [
+        "Keep the default aria-label or pass a custom one so the purpose of the button is announced.",
+        "The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-mode"
+        },
+        {
+          "name": "data-theme-switch"
+        }
+      ],
+      "example": "<ThemeToggle storageKey=\"my-app-theme\" />"
+    },
     "InputGroup": {
       "import": "@dryui/ui",
       "description": "Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions",
@@ -22378,6 +22453,54 @@
         "combinesWith": [
           "Card.Header",
           "Toolbar"
+        ]
+      },
+      "themetoggle": {
+        "component": "ThemeToggle",
+        "useWhen": "Persistent dark/light theme switcher in an app header or settings surface, with a system-preference default",
+        "alternatives": [
+          {
+            "rank": 1,
+            "component": "ThemeToggle",
+            "useWhen": "One-click dark/light switcher with Alt-click or Escape to return to system mode",
+            "snippet": "<ThemeToggle storageKey=\"my-app-theme\" />"
+          },
+          {
+            "rank": 2,
+            "component": "SegmentedControl",
+            "useWhen": "Explicit three-way picker (system / light / dark) in a settings panel",
+            "snippet": "<SegmentedControl bind:value={themeMode} options={[\n  { value: 'system', label: 'System' },\n  { value: 'light', label: 'Light' },\n  { value: 'dark', label: 'Dark' },\n]} />"
+          },
+          {
+            "rank": 3,
+            "component": "createThemeController",
+            "useWhen": "Custom trigger or programmatic access to mode/isDark without the default UI",
+            "snippet": "const theme = createThemeController({ storageKey: 'my-app-theme' });\n// theme.mode, theme.isDark, theme.setMode('dark'), theme.reset()"
+          }
+        ],
+        "antiPatterns": [
+          {
+            "pattern": "<input type=\"checkbox\" onchange={toggleDark}>",
+            "reason": "Raw checkbox bypasses the theme-auto class, data-theme attribute, and flash-prevention script",
+            "fix": "ThemeToggle"
+          },
+          {
+            "pattern": "<button onclick={() => document.documentElement.classList.toggle(\"dark\")}>",
+            "reason": "Does not persist the choice, ignores prefers-color-scheme, and causes a flash on the next load",
+            "fix": "ThemeToggle"
+          },
+          {
+            "pattern": "Swapping CSS files from JavaScript to change theme",
+            "reason": "Forces a network round-trip and a repaint; the DryUI theme system uses a single set of tokens gated by data-theme and theme-auto",
+            "fix": "ThemeToggle"
+          }
+        ],
+        "combinesWith": [
+          "AppFrame",
+          "Toolbar",
+          "NavigationMenu",
+          "Sidebar",
+          "Tooltip"
         ]
       },
       "toggle": {

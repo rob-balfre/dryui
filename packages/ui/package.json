@@ -680,6 +680,11 @@
       "svelte": "./src/textarea/index.ts",
       "default": "./src/textarea/index.ts"
     },
+    "./theme-toggle": {
+      "types": "./src/theme-toggle/index.ts",
+      "svelte": "./src/theme-toggle/index.ts",
+      "default": "./src/theme-toggle/index.ts"
+    },
     "./time-input": {
       "types": "./src/time-input/index.ts",
       "svelte": "./src/time-input/index.ts",
@@ -1432,6 +1437,11 @@
         "types": "./dist/textarea/index.d.ts",
         "svelte": "./dist/textarea/index.js",
         "default": "./dist/textarea/index.js"
+      },
+      "./theme-toggle": {
+        "types": "./dist/theme-toggle/index.d.ts",
+        "svelte": "./dist/theme-toggle/index.js",
+        "default": "./dist/theme-toggle/index.js"
       },
       "./time-input": {
         "types": "./dist/time-input/index.d.ts",

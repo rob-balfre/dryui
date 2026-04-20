@@ -1,6 +1,6 @@
 # DryUI
 
-> 159 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 160 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -66,6 +66,15 @@ Props: Root: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, 
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-size | data-state
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example: <ToggleGroup.Root>
+
+### ThemeToggle
+Persisted light/dark theme switcher with system-preference fallback.
+Import: @dryui/ui
+Subpath import: @dryui/ui/theme-toggle
+Props: storageKey (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | controller (ThemeController) | sunIcon (Snippet) | moonIcon (Snippet) | onModeChange ((mode: ThemeMode) => void) | disabled (boolean), Prevents interaction and applies disabled styling. | class (ClassValue)
+Data attributes: data-mode | data-theme-switch
+Accessibility: Keep the default aria-label or pass a custom one so the purpose of the button is announced. | The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme.
+Example: <ThemeToggle storageKey="my-app-theme" />
 
 ### Clipboard
 Copy text to clipboard with native Clipboard API.

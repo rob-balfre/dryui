@@ -2124,6 +2124,58 @@ export const componentCompositions: ComponentComposition[] = [
 	},
 
 	{
+		component: 'ThemeToggle',
+		useWhen:
+			'Persistent dark/light theme switcher in an app header or settings surface, with a system-preference default',
+		alternatives: [
+			{
+				rank: 1,
+				component: 'ThemeToggle',
+				useWhen: 'One-click dark/light switcher with Alt-click or Escape to return to system mode',
+				snippet: `<ThemeToggle storageKey="my-app-theme" />`
+			},
+			{
+				rank: 2,
+				component: 'SegmentedControl',
+				useWhen: 'Explicit three-way picker (system / light / dark) in a settings panel',
+				snippet: `<SegmentedControl bind:value={themeMode} options={[
+  { value: 'system', label: 'System' },
+  { value: 'light', label: 'Light' },
+  { value: 'dark', label: 'Dark' },
+]} />`
+			},
+			{
+				rank: 3,
+				component: 'createThemeController',
+				useWhen: 'Custom trigger or programmatic access to mode/isDark without the default UI',
+				snippet: `const theme = createThemeController({ storageKey: 'my-app-theme' });
+// theme.mode, theme.isDark, theme.setMode('dark'), theme.reset()`
+			}
+		],
+		antiPatterns: [
+			{
+				pattern: '<input type="checkbox" onchange={toggleDark}>',
+				reason:
+					'Raw checkbox bypasses the theme-auto class, data-theme attribute, and flash-prevention script',
+				fix: 'ThemeToggle'
+			},
+			{
+				pattern: '<button onclick={() => document.documentElement.classList.toggle("dark")}>',
+				reason:
+					'Does not persist the choice, ignores prefers-color-scheme, and causes a flash on the next load',
+				fix: 'ThemeToggle'
+			},
+			{
+				pattern: 'Swapping CSS files from JavaScript to change theme',
+				reason:
+					'Forces a network round-trip and a repaint; the DryUI theme system uses a single set of tokens gated by data-theme and theme-auto',
+				fix: 'ThemeToggle'
+			}
+		],
+		combinesWith: ['AppFrame', 'Toolbar', 'NavigationMenu', 'Sidebar', 'Tooltip']
+	},
+
+	{
 		component: 'Toggle',
 		useWhen:
 			'Pressable button that toggles between active and inactive states, or on/off toggle with immediate effect',

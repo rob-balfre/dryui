@@ -278,6 +278,10 @@ const A11Y_NOTES: Record<string, string[]> = {
 		'Provide surrounding field context and a name when the selected value needs to submit with a form.'
 	],
 	Switch: ['Use switches for immediate on/off settings and pair them with visible labels.'],
+	ThemeToggle: [
+		'Keep the default aria-label or pass a custom one so the purpose of the button is announced.',
+		'The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme.'
+	],
 	Tabs: [
 		'Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly.',
 		'Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.'
@@ -998,6 +1002,7 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 		'<SegmentedControl.Root bind:value={tripType}>\n  <SegmentedControl.Item value="one-way">One way</SegmentedControl.Item>\n  <SegmentedControl.Item value="round-trip">Round trip</SegmentedControl.Item>\n  <SegmentedControl.Item value="multi-city">Multi-city</SegmentedControl.Item>\n</SegmentedControl.Root>',
 	Heading: '<Heading level={2}>Launch readiness</Heading>',
 	Text: '<Text as="p" color="secondary" size="sm">Use Text for supporting copy, labels, and starter-kit body content.</Text>',
+	ThemeToggle: '<ThemeToggle storageKey="my-app-theme" />',
 	TypingIndicator: '<TypingIndicator aria-label="Assistant is typing" />',
 	Typography:
 		'<Typography.Heading level={2}>Launch readiness</Typography.Heading>\n<Typography.Text color="muted" size="sm">Use Typography.Text for supporting copy and metadata.</Typography.Text>',

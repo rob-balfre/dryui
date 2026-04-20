@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 159 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 160 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -68,6 +68,23 @@ Example:
 <ToggleGroup.Root>
   <ToggleGroup.Item>...</ToggleGroup.Item>
 </ToggleGroup.Root>
+```
+
+## ThemeToggle
+Package: @dryui/ui
+Category: action
+Tags: theme, dark-mode, light-mode, toggle, switcher, preference
+Kind: simple
+Root import: import { ThemeToggle } from '@dryui/ui'
+Subpath import: import { ThemeToggle } from '@dryui/ui/theme-toggle'
+Props: storageKey (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | controller (ThemeController) | sunIcon (Snippet) | moonIcon (Snippet) | onModeChange ((mode: ThemeMode) => void) | disabled (boolean), Prevents interaction and applies disabled styling. | class (ClassValue)
+Native props: Forwards native HTML attributes via rest props.
+CSS variables: none
+Data attributes: data-mode | data-theme-switch
+Accessibility: Keep the default aria-label or pass a custom one so the purpose of the button is announced. | The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme.
+Example:
+```svelte
+<ThemeToggle storageKey="my-app-theme" />
 ```
 
 ## Clipboard
