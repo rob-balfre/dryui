@@ -1,5 +1,19 @@
 # @dryui/feedback
 
+## 0.4.0
+
+### Minor Changes
+
+- [`a91a0fe`](https://github.com/rob-balfre/dryui/commit/a91a0fe0b5fbe134c30031eb4fa6fa043fb36e49) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Feedback submissions now carry both a WebP and a PNG screenshot plus structured position hints for every drawing. `captureScreenshot` in the client emits `{ webp, png }` (both base64, prefix stripped); WebP is quality 0.8 for compactness and PNG is lossless so agents that cannot decode WebP can still read the frame. The server writes both files to `~/.dryui-feedback/screenshots/<uuid>.webp` and `<uuid>.png`, stores the PNG path in a new `screenshot_png_path` column (additive, nullable migration so legacy WebP-only rows keep working), and exposes `screenshotPath: { webp, png }` on the `Submission` type. The `POST /submissions` endpoint now requires an `image: { webp, png }` object; `GET /submissions/:id/screenshot?format=png` serves the PNG variant.
+
+  Every submission also includes the scroll offset at submit time (`scroll: { x, y }`) and a parallel `hints: DrawingHint[]` array aligned with `drawings` index-for-index. Each hint carries a coarse corner (`top-left | top-right | bottom-left | bottom-right | center`), normalized `percentX/percentY` relative to the viewport, and when an anchor point resolves via `document.elementFromPoint`, a short element descriptor (`tag`, `id`, `selector`). The helper `position-hints.ts` ships in `@dryui/feedback` and is covered by unit tests. `feedback_get_submissions` in the MCP now surfaces both screenshot paths, scroll, per-drawing hints, and a pre-computed `summary` block (drawing counts by kind, corner counts) so agents do not have to iterate to orient themselves. The `Submission.drawings` type is now a proper discriminated union instead of `unknown[]`.
+
+### Patch Changes
+
+- Updated dependencies [[`3ae293a`](https://github.com/rob-balfre/dryui/commit/3ae293a0b691e773b35154caa9b2a915a4c58487)]:
+  - @dryui/ui@1.6.0
+  - @dryui/primitives@1.6.0
+
 ## 0.3.0
 
 ### Minor Changes
