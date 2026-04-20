@@ -54,6 +54,7 @@
     "--dry-color-bg-alternate": "var(--dry-color-bg-sunken)",
     "--dry-color-bg-brand": "var(--dry-color-fill-brand)",
     "--dry-color-bg-inverse": "hsl(233, 18%, 9%)",
+    "--dry-image-edge": "rgba(0, 0, 0, 0.1)",
     "--dry-toggle-track-bg": "var(--dry-color-fill-brand-weak)",
     "--dry-toggle-track-stroke": "var(--dry-color-stroke-strong)",
     "--dry-toggle-selected-bg": "var(--dry-color-fill-brand)",
@@ -247,6 +248,8 @@
     "--dry-motion-opacity-enter": "0",
     "--dry-motion-blur-enter": "16px",
     "--dry-motion-scale-enter": "0.96",
+    "--dry-stagger-step": "60ms",
+    "--dry-stagger-max": "8",
     "--dry-glass-blur": "12px",
     "--dry-glass-tint": "var(--dry-color-bg-raised)",
     "--dry-glass-opacity": "72%",
@@ -283,7 +286,9 @@
     "--dry-scrollbar-thumb": "var(--dry-color-stroke-weak)",
     "--dry-scrollbar-thumb-hover": "var(--dry-color-stroke-strong)",
     "--dry-scrollbar-track": "transparent",
-    "--dry-scrollbar-width": "8px"
+    "--dry-scrollbar-width": "8px",
+    "--dry-stagger-delay": "calc(\n\t\tmin(var(--dry-index, 0), var(--dry-stagger-max)) * var(--dry-stagger-step)\n\t)",
+    "--dry-index": "0"
   },
   "dark": {
     "--dry-color-text-strong": "hsla(0, 0%, 100%, 1)",
@@ -340,6 +345,7 @@
     "--dry-color-bg-alternate": "var(--dry-color-bg-sunken)",
     "--dry-color-bg-brand": "var(--dry-color-fill-brand)",
     "--dry-color-bg-inverse": "#ffffff",
+    "--dry-image-edge": "rgba(255, 255, 255, 0.1)",
     "--dry-toggle-track-bg": "var(--dry-color-fill-brand-weak)",
     "--dry-toggle-track-stroke": "var(--dry-color-stroke-strong)",
     "--dry-toggle-selected-bg": "var(--dry-color-fill-brand)",
