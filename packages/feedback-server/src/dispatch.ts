@@ -55,9 +55,8 @@ export interface DispatchTargetsSnapshot {
 	configuredAgents: DispatchAgent[];
 }
 
-function buildPrompt(s: Submission, target: DispatchAgent): string {
-	const pluginChip = target === 'codex' ? CODEX_PLUGIN_CHIP : '';
-	return `${pluginChip}New feedback submission ${s.id} on ${s.url}. Call feedback_get_submissions via the dryui-feedback MCP to fetch the screenshot and drawings, act on the change, then resolve with feedback_resolve_submission.`;
+function buildPrompt(s: Submission): string {
+	return `New feedback submission ${s.id} on ${s.url}. Call feedback_get_submissions via the dryui-feedback MCP to fetch the screenshot and drawings, act on the change, then resolve with feedback_resolve_submission.`;
 }
 
 function shellQuote(s: string): string {
@@ -449,18 +448,21 @@ function openExternalUrl(url: string): void {
 	spawnDetached('sh', ['-c', `open ${shellQuote(url)}`]);
 }
 
-function dispatch(submission: Submission, options: DispatcherOptions): void {
-	const target = resolveAgent(submission, options.defaultAgent);
-	if (target === 'off') {
-		console.error(`[dispatch] skip (off) ${submission.id}`);
-		return;
-	}
+export function isDispatchPlatformSupported(): boolean {
+	const currentPlatform = platform();
+	return currentPlatform === 'darwin' || currentPlatform === 'win32';
+}
 
-	const prompt = buildPrompt(submission, target);
-	console.error(`[dispatch] → ${target} (${submission.id})`);
+export function dispatchPrompt(
+	target: DispatchAgent,
+	prompt: string,
+	options: Pick<DispatcherOptions, 'workspace' | 'terminalApp'>
+): void {
+	const fullPrompt = target === 'codex' ? `${CODEX_PLUGIN_CHIP}${prompt}` : prompt;
+	console.error(`[dispatch] → ${target}`);
 
 	if (target === 'codex') {
-		const url = `codex://new?prompt=${encodeURIComponent(prompt)}&path=${encodeURIComponent(options.workspace)}`;
+		const url = `codex://new?prompt=${encodeURIComponent(fullPrompt)}&path=${encodeURIComponent(options.workspace)}`;
 		openExternalUrl(url);
 		return;
 	}
@@ -470,17 +472,17 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		const vscodeCli = resolveVsCodeCli();
 		if (vscodeCli) {
 			console.error(`[dispatch] launching ${vscodeCli.command} chat for ${target}`);
-			spawnDetached(vscodeCli.command, buildVsCodeChatArgs(prompt), options.workspace);
+			spawnDetached(vscodeCli.command, buildVsCodeChatArgs(fullPrompt), options.workspace);
 			return;
 		}
-		copyPromptToClipboard(prompt);
+		copyPromptToClipboard(fullPrompt);
 		console.error(`[dispatch] copied prompt to clipboard for ${target} (deeplink fallback)`);
 		openExternalUrl(`${resolveVsCodeUrlScheme()}://GitHub.Copilot-Chat/chat?mode=agent`);
 		return;
 	}
 
 	if (target === 'cursor' || target === 'windsurf' || target === 'zed') {
-		copyPromptToClipboard(prompt);
+		copyPromptToClipboard(fullPrompt);
 		console.error(`[dispatch] copied prompt to clipboard for ${target}`);
 		openWorkspaceApp(target, options.workspace);
 		return;
@@ -493,15 +495,27 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	if (platform() === 'win32') {
 		const wtArgs =
 			target === 'opencode'
-				? ['-d', options.workspace, '--', 'opencode', options.workspace, '--prompt', prompt]
-				: ['-d', options.workspace, '--', ...TERMINAL_CLI[target], prompt];
+				? ['-d', options.workspace, '--', 'opencode', options.workspace, '--prompt', fullPrompt]
+				: ['-d', options.workspace, '--', ...TERMINAL_CLI[target], fullPrompt];
 		spawnDetached('wt.exe', wtArgs);
 		return;
 	}
 
-	const cliCommand = buildCliInvocation(target, prompt, options.workspace);
+	const cliCommand = buildCliInvocation(target, fullPrompt, options.workspace);
 	const args = buildOsaArgs(options.terminalApp ?? 'terminal', cliCommand, options.workspace);
 	spawnDetached('osascript', args);
+}
+
+function dispatch(submission: Submission, options: DispatcherOptions): void {
+	const target = resolveAgent(submission, options.defaultAgent);
+	if (target === 'off') {
+		console.error(`[dispatch] skip (off) ${submission.id}`);
+		return;
+	}
+
+	const prompt = buildPrompt(submission);
+	console.error(`[dispatch] submission ${submission.id}`);
+	dispatchPrompt(target, prompt, options);
 }
 
 export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () => void {

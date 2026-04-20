@@ -10,6 +10,7 @@
 		CodeBlock,
 		Container,
 		Dialog,
+		DropdownMenu,
 		Field,
 		Heading,
 		Image,
@@ -18,9 +19,22 @@
 		Tabs,
 		Text
 	} from '@dryui/ui';
-	import { Check, Copy, CornerLeftUp, ExternalLink, MessageSquare, RefreshCw } from 'lucide-svelte';
+	import {
+		Check,
+		ChevronDown,
+		Copy,
+		CornerLeftUp,
+		ExternalLink,
+		MessageSquare,
+		Rocket,
+		RefreshCw
+	} from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
+	import AgentIcon from './agent-icon.svelte';
+	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
+
+	const AGENT_STORAGE_KEY = 'dryui-feedback-target-agent';
 
 	interface SubmissionResponse {
 		count: number;
@@ -42,6 +56,12 @@
 	let search = $state('');
 	let selectedId = $state<string | null>(null);
 	let submissions = $state<Submission[]>([]);
+	let dispatchTargets = $state<DispatchAgent[]>([]);
+	let targetAgent = $state<DispatchAgent | null>(null);
+	let launching = $state(false);
+	let launched = $state(false);
+	let launchError = $state('');
+	let launchFeedbackTimer: ReturnType<typeof setTimeout> | undefined;
 
 	function copyPrompt(text: string): void {
 		navigator.clipboard.writeText(text).then(() => {
@@ -51,6 +71,69 @@
 				promptCopied = false;
 			}, 2000);
 		});
+	}
+
+	function pickTargetAgent(
+		stored: DispatchAgent | null,
+		fallback: DispatchAgent | undefined,
+		available: DispatchAgent[]
+	): DispatchAgent | null {
+		if (stored && available.includes(stored)) return stored;
+		if (fallback && available.includes(fallback)) return fallback;
+		return available[0] ?? null;
+	}
+
+	async function loadDispatchTargets(): Promise<void> {
+		try {
+			const response = await fetch('/dispatch-targets');
+			if (!response.ok) return;
+			const body = (await response.json()) as {
+				defaultAgent?: DispatchAgent;
+				configuredAgents?: DispatchAgent[];
+			};
+			dispatchTargets = body.configuredAgents ?? [];
+			const stored =
+				typeof window !== 'undefined'
+					? (window.localStorage.getItem(AGENT_STORAGE_KEY) as DispatchAgent | null)
+					: null;
+			targetAgent = pickTargetAgent(stored, body.defaultAgent, dispatchTargets);
+		} catch {
+			// Dispatcher is optional; swallow errors silently.
+		}
+	}
+
+	function chooseTargetAgent(agent: DispatchAgent): void {
+		targetAgent = agent;
+		if (typeof window !== 'undefined') {
+			window.localStorage.setItem(AGENT_STORAGE_KEY, agent);
+		}
+	}
+
+	async function launchAgent(prompt: string): Promise<void> {
+		if (!targetAgent || launching) return;
+		launching = true;
+		launched = false;
+		launchError = '';
+		try {
+			const response = await fetch('/dispatch', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ agent: targetAgent, prompt })
+			});
+			if (!response.ok) {
+				const message = await response.text();
+				throw new Error(message || `HTTP ${response.status}`);
+			}
+			launched = true;
+			clearTimeout(launchFeedbackTimer);
+			launchFeedbackTimer = setTimeout(() => {
+				launched = false;
+			}, 2500);
+		} catch (errorValue) {
+			launchError = extractMessage(errorValue);
+		} finally {
+			launching = false;
+		}
 	}
 
 	function readDevUrl(): string | null {
@@ -300,9 +383,14 @@ Use the dryui-feedback MCP server:
 
 	onMount(() => {
 		void loadSubmissions('initial');
+		void loadDispatchTargets();
 		const intervalId = window.setInterval(() => void loadSubmissions('refresh'), 10_000);
 
-		return () => window.clearInterval(intervalId);
+		return () => {
+			window.clearInterval(intervalId);
+			clearTimeout(launchFeedbackTimer);
+			clearTimeout(promptCopyTimer);
+		};
 	});
 </script>
 
@@ -637,30 +725,88 @@ Use the dryui-feedback MCP server:
 
 								<div class="prompt-section">
 									<CodeBlock code={promptText} language="markdown" showCopyButton={false} />
-									<div class="prompt-copy-wrap">
-										<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
-											<Button
-												variant="solid"
-												size="sm"
-												onclick={() => copyPrompt(promptText)}
-												aria-label={promptCopied ? 'Copied prompt' : 'Copy prompt'}
-											>
-												{#if promptCopied}
-													<Check size={14} aria-hidden="true" />
-													Copied
-												{:else}
-													<Copy size={14} aria-hidden="true" />
-													Copy
-												{/if}
-											</Button>
-										</BorderBeam>
+									<div class="prompt-actions">
+										{#if dispatchTargets.length > 0 && targetAgent}
+											<div class="launch-group">
+												<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
+													<Button
+														variant="solid"
+														size="sm"
+														onclick={() => launchAgent(promptText)}
+														disabled={launching}
+														aria-label={launched
+															? 'Agent launched'
+															: `Launch ${AGENT_INFO[targetAgent].label}`}
+													>
+														{#if launched}
+															<Check size={14} aria-hidden="true" />
+															Launched
+														{:else if launching}
+															<Rocket size={14} aria-hidden="true" />
+															Launching...
+														{:else}
+															<Rocket size={14} aria-hidden="true" />
+															Launch {AGENT_INFO[targetAgent].shortLabel}
+														{/if}
+													</Button>
+												</BorderBeam>
+												<DropdownMenu.Root>
+													<DropdownMenu.Trigger>
+														<Button variant="soft" size="sm" aria-label="Choose dispatch target">
+															<AgentIcon agent={targetAgent} size={14} />
+															<ChevronDown size={12} aria-hidden="true" />
+														</Button>
+													</DropdownMenu.Trigger>
+													<DropdownMenu.Content placement="top-end" offset={8}>
+														<DropdownMenu.Label>Dispatch target</DropdownMenu.Label>
+														{#each dispatchTargets as agent (agent)}
+															<DropdownMenu.Item
+																onclick={() => chooseTargetAgent(agent)}
+																data-active={agent === targetAgent || undefined}
+															>
+																<AgentIcon {agent} size={16} />
+																<span class="agent-menu-label">
+																	{AGENT_INFO[agent].label}
+																</span>
+																{#if agent === targetAgent}
+																	<Check size={12} aria-hidden="true" />
+																{/if}
+															</DropdownMenu.Item>
+														{/each}
+													</DropdownMenu.Content>
+												</DropdownMenu.Root>
+											</div>
+										{/if}
+										<Button
+											variant="soft"
+											size="sm"
+											onclick={() => copyPrompt(promptText)}
+											aria-label={promptCopied ? 'Copied prompt' : 'Copy prompt'}
+										>
+											{#if promptCopied}
+												<Check size={14} aria-hidden="true" />
+												Copied
+											{:else}
+												<Copy size={14} aria-hidden="true" />
+												Copy
+											{/if}
+										</Button>
 									</div>
+									{#if launchError}
+										<Alert variant="error">{launchError}</Alert>
+									{/if}
 									<div class="prompt-caption">
 										<CornerLeftUp size={14} aria-hidden="true" />
 										<Text as="span" size="xs" color="secondary">
-											{selectedSubmission
-												? 'Copy this prompt to work on the selected submission'
-												: 'Copy this prompt to work on all pending submissions'}
+											{#if dispatchTargets.length > 0 && targetAgent}
+												{selectedSubmission
+													? 'Launch the agent with this prompt, or copy to paste elsewhere'
+													: 'Launch to run through all pending submissions in order, or copy the prompt'}
+											{:else}
+												{selectedSubmission
+													? 'Copy this prompt to work on the selected submission'
+													: 'Copy this prompt to work on all pending submissions'}
+											{/if}
 										</Text>
 									</div>
 								</div>
@@ -976,10 +1122,27 @@ Use the dryui-feedback MCP server:
 		align-content: start;
 	}
 
-	.prompt-copy-wrap {
+	.prompt-actions {
 		display: grid;
-		justify-self: start;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: start;
+		align-items: center;
+		gap: var(--dry-space-2);
+	}
+
+	.launch-group {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-1);
 		border-radius: 8px;
+	}
+
+	.agent-menu-label {
+		font-size: var(--dry-text-sm-size);
+		font-weight: 500;
 	}
 
 	.prompt-caption {
