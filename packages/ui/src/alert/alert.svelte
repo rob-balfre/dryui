@@ -84,7 +84,6 @@
 			)
 		);
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		container-type: inline-size;
 		display: grid;

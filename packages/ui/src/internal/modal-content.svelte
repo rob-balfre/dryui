@@ -133,7 +133,6 @@
 			)
 		);
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		container-type: inline-size;
 		justify-self: stretch;
@@ -201,7 +200,6 @@
 			calc(var(--dry-dialog-radius) - var(--dry-dialog-padding))
 		);
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		container-type: inline-size;
 		justify-self: stretch;

@@ -99,7 +99,6 @@
 			)
 		);
 		--dry-btn-radius: var(--dry-radius-nested);
-		--dry-radius-inner: var(--dry-radius-nested);
 
 		transition:
 			opacity var(--dry-duration-fast) var(--dry-ease-emphasized),
