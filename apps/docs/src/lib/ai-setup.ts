@@ -135,12 +135,36 @@ args = ["-y", "@dryui/mcp"]
 command = "npx"
 args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
-const copilotConfig = `{
+// Copilot CLI reads ~/.copilot/mcp-config.json with the `mcpServers` root key.
+// The feedback server needs the `sh -c 'cd ${TMPDIR} && exec npx ...'` wrapper because
+// `npx -p <workspace-pkg> <bin>` fails inside Bun workspaces (cwd shadow).
+const copilotCliConfig = `{
+  "mcpServers": {
+    "dryui": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "sh",
+      "args": ["-c", "cd \\"\${TMPDIR:-/tmp}\\" && exec npx -y -p @dryui/feedback-server dryui-feedback-mcp"]
+    }
+  }
+}`;
+
+// VS Code Copilot (extension) uses the `servers` root key in .vscode/mcp.json.
+const copilotVscodeConfig = `{
   "servers": {
     "dryui": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "sh",
+      "args": ["-c", "cd \\"\${TMPDIR:-/tmp}\\" && exec npx -y -p @dryui/feedback-server dryui-feedback-mcp"]
     }
   }
 }`;
@@ -212,7 +236,19 @@ const svelteCompanionOpencode = `{
   }
 }`;
 
-const svelteCompanionCopilot = `{
+// Copilot CLI format (~/.copilot/mcp-config.json uses `mcpServers`).
+const svelteCompanionCopilotCli = `{
+  "mcpServers": {
+    "svelte": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@sveltejs/mcp"]
+    }
+  }
+}`;
+
+// VS Code Copilot extension format (.vscode/mcp.json uses `servers`).
+const svelteCompanionCopilotVscode = `{
   "servers": {
     "svelte": {
       "type": "stdio",
@@ -416,7 +452,7 @@ gemini extensions install ~/dryui/packages/plugin`
 		id: 'copilot',
 		label: 'Copilot',
 		description:
-			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for Copilot Agent mode.',
+			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP servers. Copilot has two surfaces with different config formats: the CLI (`copilot`) reads `~/.copilot/mcp-config.json` with root key `mcpServers`, while the VS Code extension reads `.vscode/mcp.json` with root key `servers`.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -430,10 +466,17 @@ gemini extensions install ~/dryui/packages/plugin`
 				language: 'bash'
 			},
 			{
-				title: 'Add the MCP server',
+				title: 'Add the MCP servers (Copilot CLI)',
 				description:
-					'Put this in `.vscode/mcp.json`. Copilot uses `servers`, not `mcpServers`, and MCP tools only run in Agent mode.',
-				code: copilotConfig,
+					'Copilot CLI reads `~/.copilot/mcp-config.json` at the user level. Root key is `mcpServers`. Includes both the dryui and dryui-feedback servers.',
+				code: copilotCliConfig,
+				language: 'json'
+			},
+			{
+				title: 'Add the MCP servers (VS Code Copilot)',
+				description:
+					'If you also use the VS Code Copilot extension, put this in `.vscode/mcp.json` at the project root. Root key is `servers`, not `mcpServers`. MCP tools only run in Agent mode.',
+				code: copilotVscodeConfig,
 				language: 'json'
 			}
 		],
@@ -443,19 +486,19 @@ gemini extensions install ~/dryui/packages/plugin`
 			code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui`
 		},
 		mcp: {
-			path: '.vscode/mcp.json',
-			note: '3. Add the MCP server to `.vscode/mcp.json`. Note: root key is `"servers"`, not `"mcpServers"`.',
-			code: copilotConfig,
+			path: '~/.copilot/mcp-config.json',
+			note: '3. Add the MCP servers for Copilot CLI at `~/.copilot/mcp-config.json` (user-level). Root key is `mcpServers`. If you also use the VS Code Copilot extension, mirror this into `.vscode/mcp.json` but rename the root key to `servers`.',
+			code: copilotCliConfig,
 			language: 'json'
 		},
 		companionMcp: {
 			title: 'Svelte MCP (recommended companion)',
-			note: `${companionSvelteNote} Adds a sibling entry under \`servers\` in \`.vscode/mcp.json\`.`,
-			code: svelteCompanionCopilot,
+			note: `${companionSvelteNote} For Copilot CLI, add this under \`mcpServers\` in \`~/.copilot/mcp-config.json\`. For VS Code Copilot, add the equivalent block under \`servers\` in \`.vscode/mcp.json\`.`,
+			code: svelteCompanionCopilotCli,
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. MCP tools only work in Copilot Agent mode, and the skill loads automatically when relevant.'
+			'Use the CLI as the default surface. Copilot CLI picks up MCP servers from `~/.copilot/mcp-config.json` on launch. In the VS Code extension, MCP tools only work in Agent mode, and the skill loads automatically when relevant.'
 	},
 	{
 		id: 'cursor',

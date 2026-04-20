@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process';
-import { platform } from 'node:os';
+import { readFileSync } from 'node:fs';
+import { homedir, platform } from 'node:os';
+import { join } from 'node:path';
 import type { EventBus } from './events.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
@@ -65,6 +67,81 @@ function buildOsaArgs(terminalApp: TerminalApp, cliCommand: string, workspace: s
 	return ['-e', `tell application "Terminal" to do script "${osaQuote(wrapped)}"`];
 }
 
+// Track which `~/.copilot/mcp-config.json` warnings we've already printed so
+// repeated dispatches don't spam the same stderr hint on every submission.
+const copilotConfigWarnings = new Set<string>();
+
+const COPILOT_CONFIG_SNIPPET = `{
+  "mcpServers": {
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "sh",
+      "args": ["-c", "cd \\"\${TMPDIR:-/tmp}\\" && exec npx -y -p @dryui/feedback-server dryui-feedback-mcp"]
+    }
+  }
+}`;
+
+function warnOnce(key: string, message: string): void {
+	if (copilotConfigWarnings.has(key)) return;
+	copilotConfigWarnings.add(key);
+	console.error(message);
+}
+
+// Fast, best-effort check for `dryui-feedback` in ~/.copilot/mcp-config.json.
+// Missing file or malformed JSON is not fatal; we warn and let the launch proceed
+// (Copilot will still receive the prompt, just without native MCP tools).
+function checkCopilotMcpConfig(): void {
+	const path = join(homedir(), '.copilot', 'mcp-config.json');
+	let raw: string;
+	try {
+		raw = readFileSync(path, 'utf8');
+	} catch (err: unknown) {
+		const code = (err as NodeJS.ErrnoException | null)?.code;
+		if (code === 'ENOENT') {
+			warnOnce(
+				`missing:${path}`,
+				[
+					`[dispatch] warning: ${path} not found.`,
+					`[dispatch] Copilot CLI reads MCP servers from this file. Without it, the dispatched prompt`,
+					`[dispatch] will run but the \`dryui-feedback\` MCP tools will not be available to Copilot.`,
+					`[dispatch] To enable them, create the file with:`,
+					...COPILOT_CONFIG_SNIPPET.split('\n').map((line) => `[dispatch]   ${line}`),
+					`[dispatch] Proceeding with launch anyway.`
+				].join('\n')
+			);
+			return;
+		}
+		warnOnce(
+			`read:${path}:${code ?? 'unknown'}`,
+			`[dispatch] warning: could not read ${path} (${code ?? 'unknown error'}). Proceeding with launch anyway.`
+		);
+		return;
+	}
+	let parsed: unknown;
+	try {
+		parsed = JSON.parse(raw);
+	} catch (err: unknown) {
+		const msg = err instanceof Error ? err.message : String(err);
+		warnOnce(
+			`parse:${path}`,
+			`[dispatch] warning: ${path} is not valid JSON (${msg}). Proceeding with launch anyway.`
+		);
+		return;
+	}
+	const servers = (parsed as { mcpServers?: Record<string, unknown> } | null)?.mcpServers;
+	if (!servers || typeof servers !== 'object' || !('dryui-feedback' in servers)) {
+		warnOnce(
+			`missing-entry:${path}`,
+			[
+				`[dispatch] warning: ${path} has no \`dryui-feedback\` entry under \`mcpServers\`.`,
+				`[dispatch] Add this block so Copilot CLI can reach the feedback MCP:`,
+				...COPILOT_CONFIG_SNIPPET.split('\n').map((line) => `[dispatch]   ${line}`),
+				`[dispatch] Proceeding with launch anyway.`
+			].join('\n')
+		);
+	}
+}
+
 function openCodexUrl(url: string): void {
 	if (platform() === 'win32') {
 		// `start "" "<url>"` — empty title arg is required when the target is quoted.
@@ -90,6 +167,11 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		return;
 	}
 	const cli = TERMINAL_CLI[target];
+	if (target === 'copilot') {
+		// Copilot CLI only loads MCP servers from ~/.copilot/mcp-config.json.
+		// Warn if it's missing or incomplete so the user knows why native tools are absent.
+		checkCopilotMcpConfig();
+	}
 	if (platform() === 'win32') {
 		spawn('wt.exe', ['-d', options.workspace, '--', ...cli, prompt], {
 			stdio: 'ignore',
