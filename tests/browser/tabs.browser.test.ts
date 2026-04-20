@@ -71,6 +71,17 @@ describe('Tabs', () => {
 		expect(getTrigger('analytics').tabIndex).toBe(-1);
 	});
 
+	it('auto-selects the focused tab in automatic activation mode', () => {
+		render(TabsHarness);
+
+		const analytics = getTrigger('analytics');
+		analytics.focus();
+		flushSync();
+
+		expect(analytics.getAttribute('aria-selected')).toBe('true');
+		expect(document.querySelector('[data-testid="bound-value"]')?.textContent).toBe('analytics');
+	});
+
 	it('disables triggers via the disabled prop', () => {
 		render(TabsHarness);
 

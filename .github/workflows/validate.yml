@@ -29,6 +29,9 @@ jobs:
       - uses: ./.github/actions/setup-dryui
 
       - run: bun run validate --no-test
+        env:
+          DRYUI_BASE_REF: origin/${{ github.base_ref }}
+          DRYUI_PR_BODY: ${{ github.event.pull_request.body }}
 
       - run: bunx playwright install chromium
 
@@ -54,10 +57,15 @@ jobs:
 
       - run: bun run coverage:check
 
+      - run: bun run coverage:matrix
+
       - name: Publish coverage summary
         if: always()
         continue-on-error: true
-        run: cat coverage/summary/coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+        run: |
+          cat coverage/summary/coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+          echo >> "$GITHUB_STEP_SUMMARY"
+          sed -n '1,18p' reports/component-coverage-matrix.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload coverage artifacts
         if: always()
@@ -68,5 +76,7 @@ jobs:
             coverage/summary
             coverage/unit
             coverage/browser
+            reports/component-coverage-matrix.json
+            reports/component-coverage-matrix.md
           if-no-files-found: ignore
           retention-days: 14

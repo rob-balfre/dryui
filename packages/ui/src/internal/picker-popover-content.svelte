@@ -10,7 +10,7 @@
 		dataAttribute: 'data-dp-content' | 'data-drp-content';
 		placement?: Placement;
 		offset?: number;
-		contentClass?: string;
+		contentClass?: HTMLAttributes<HTMLDivElement>['class'];
 		contentStyle?: HTMLAttributes<HTMLDivElement>['style'];
 		children: Snippet;
 	}

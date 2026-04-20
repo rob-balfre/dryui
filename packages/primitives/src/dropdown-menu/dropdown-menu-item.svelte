@@ -9,7 +9,7 @@
 		children: Snippet;
 	}
 
-	let { disabled, children, onclick, onkeydown, ...rest }: Props = $props();
+	let { disabled = false, children, onclick, onkeydown, ...rest }: Props = $props();
 
 	const ctx = getDropdownMenuCtx();
 </script>

@@ -10,6 +10,7 @@
 		font?: 'sans' | 'mono';
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		variant?: 'default' | 'label';
+		className?: HTMLAttributes<HTMLElement>['class'];
 		children: Snippet;
 	}
 

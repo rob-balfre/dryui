@@ -5,9 +5,7 @@
 	import { Field } from '../../../packages/ui/src/field/index.js';
 	import { Label } from '../../../packages/ui/src/label/index.js';
 
-	let { initialValue = '' }: { initialValue?: string } = $props();
-
-	let boundValue = $state(initialValue);
+	let { initialValue: boundValue = '' }: { initialValue?: string } = $props();
 </script>
 
 <div data-testid="bound-value">{boundValue}</div>

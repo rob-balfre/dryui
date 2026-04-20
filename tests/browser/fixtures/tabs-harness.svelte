@@ -4,14 +4,12 @@
 	import { Tabs } from '../../../packages/ui/src/tabs/index.js';
 
 	let {
-		initialValue = 'overview',
+		initialValue: value = 'overview',
 		orientation = 'horizontal'
 	}: {
 		initialValue?: string;
 		orientation?: 'horizontal' | 'vertical';
 	} = $props();
-
-	let value = $state(initialValue);
 </script>
 
 <div data-testid="bound-value">{value}</div>

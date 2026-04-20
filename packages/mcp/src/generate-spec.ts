@@ -950,7 +950,7 @@ function resolveImportedTypeSource(
 	if (!sourcePath) return null;
 
 	for (const match of source.matchAll(
-		/import\s+(?:type\s+)?\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g
+		/(?:import\s+(?:type\s+)?|export\s+type\s+)\{([^}]+)\}\s+from\s+['"]([^'"]+)['"]/g
 	)) {
 		const bindings = match[1];
 		const specifier = match[2];

@@ -4,11 +4,9 @@
 	import { Drawer } from '../../../packages/ui/src/drawer/index.js';
 
 	let {
-		initialOpen = false,
+		initialOpen: open = false,
 		side = 'right'
 	}: { initialOpen?: boolean; side?: 'top' | 'right' | 'bottom' | 'left' } = $props();
-
-	let open = $state(initialOpen);
 </script>
 
 <div data-testid="bound-open">{String(open)}</div>

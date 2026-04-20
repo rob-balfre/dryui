@@ -3,9 +3,7 @@
 	import '../../../packages/ui/src/themes/dark.css';
 	import { Dialog } from '../../../packages/ui/src/dialog/index.js';
 
-	let { initialOpen = false }: { initialOpen?: boolean } = $props();
-
-	let open = $state(initialOpen);
+	let { initialOpen: open = false }: { initialOpen?: boolean } = $props();
 </script>
 
 <div data-testid="bound-open">{String(open)}</div>

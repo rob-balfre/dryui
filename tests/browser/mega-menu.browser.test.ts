@@ -72,6 +72,22 @@ describe('mega menu accessibility', () => {
 		expect(document.activeElement).toBe(trigger);
 	});
 
+	it('closes the panel when the open trigger is clicked again', async () => {
+		const { target } = render(MegaMenuHarness);
+		const trigger = getTrigger(target);
+
+		trigger.click();
+		await waitForOpenDelay();
+		expect(getPanel()).toBeTruthy();
+
+		trigger.click();
+		await new Promise((resolve) => setTimeout(resolve, 325));
+		flushSync();
+
+		expect(getPanel()).toBeNull();
+		expect(trigger.getAttribute('aria-expanded')).toBe('false');
+	});
+
 	it('renders navigational mega-menu items as links and action items as buttons', async () => {
 		const { target } = render(MegaMenuHarness);
 
