@@ -1,5 +1,11 @@
 # @dryui/primitives
 
+## 1.5.1
+
+### Patch Changes
+
+- [`38d58fe`](https://github.com/rob-balfre/dryui/commit/38d58fe6d985fdcd38d0633920d4150ccfa59704) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `AppFrame` now always renders its title row and reserves a stable line-height via `min-block-size`, so toggling `title` from empty to a value no longer causes the chrome bar to reflow. Also drops the `{#if title}` guard — passing `title=""` or omitting the prop both render an empty, space-reserving title row.
+
 ## 1.5.0
 
 ### Minor Changes
