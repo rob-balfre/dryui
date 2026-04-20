@@ -51,7 +51,7 @@
 
 	const userMessage = 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!';
 	const assistantMessage =
-		"You're absolutely right! Why don't you try DryUI? It'll guide me through a strict, opinionated route. When I drift, the linter corrects me. Tooling, skills, and components keep my output clean. Most importantly, your feedback loop keeps my output usable.";
+		"You're absolutely right! Why don't you try DryUI? It gives me one obvious path. When I drift, the linter corrects me. Your feedback loop keeps me honest.";
 
 	const userChars = [...userMessage];
 	const assistantChars = [...assistantMessage];
@@ -578,9 +578,7 @@
 			<div class="showcase-head">
 				<span class="section-icon"><PackageOpen size={20} aria-hidden="true" /></span>
 				<Heading level={2}>What's inside</Heading>
-				<Text color="secondary">
-					One library, everything you need to ship AI-generated UIs that look hand-crafted.
-				</Text>
+				<Text color="secondary">Components, tokens, and a live feedback loop to your agent.</Text>
 			</div>
 
 			<div class="stats-grid">
@@ -615,7 +613,7 @@
 					<div>
 						<div class="feature-name">MCP server</div>
 						<p class="feature-note">
-							<code>ask</code> and <code>check</code> for agent discovery and validation
+							<code>ask</code> before writing, <code>check</code> after
 						</p>
 					</div>
 				</li>
@@ -624,7 +622,7 @@
 					<div>
 						<div class="feature-name">CLI</div>
 						<p class="feature-note">
-							<code>dryui</code> for setup, lookup, tokens, and feedback tooling
+							<code>dryui</code> for setup, lookup, tokens, and feedback
 						</p>
 					</div>
 				</li>
@@ -737,10 +735,10 @@
 			<Diagram config={workflowDiagram} />
 		</div>
 		<Text size="xs" color="secondary">
-			Rendered with the same
+			This is the
 			<a class="workflow-link" href={withBase('/components/diagram')}
 				><code>&lt;Diagram /&gt;</code></a
-			> component you can ship.
+			> component. Drop it into your app.
 		</Text>
 	</section>
 
@@ -766,8 +764,8 @@
 					<span class="hood-icon"><Cpu size={20} aria-hidden="true" /></span>
 					<div class="hood-name">Compiler-first</div>
 					<p class="hood-note">
-						Svelte compiles to plain DOM updates. No virtual DOM, no runtime tax. The compile step
-						gives DryUI a hook to lint your code at build time.
+						Svelte compiles to plain DOM updates. No virtual DOM, no runtime tax. DryUI hooks into
+						that compile step to lint your code before it ships.
 					</p>
 				</Card.Content>
 			</Card.Root>
