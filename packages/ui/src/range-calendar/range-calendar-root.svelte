@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { getWeekStartDay, addMonths } from '@dryui/primitives';
+	import { createDateViewController } from '../internal/date-family-controller.svelte.js';
 	import { setRangeCalendarCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -26,11 +26,11 @@
 		...rest
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
+	const view = createDateViewController({
+		initialDate: startDate,
+		locale: () => locale
+	});
 
-	let viewMonth = $state(startDate ? startDate.getMonth() : new Date().getMonth());
-	let viewYear = $state(startDate ? startDate.getFullYear() : new Date().getFullYear());
-	let focusedDate = $state<Date>(startDate ?? new Date());
 	let hoveredDate = $state<Date | null>(null);
 
 	let selecting = $state(false);
@@ -46,13 +46,13 @@
 			return hoveredDate;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -67,7 +67,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		selectDate(date: Date) {
 			if (!selecting) {
@@ -83,25 +83,19 @@
 				}
 				selecting = false;
 			}
-			focusedDate = date;
+			view.focusDate(date);
 		},
 		setHoveredDate(date: Date | null) {
 			hoveredDate = date;
 		},
 		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
+			view.nextMonth();
 		},
 		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
+			view.prevMonth();
 		},
 		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		}
 	});
 </script>

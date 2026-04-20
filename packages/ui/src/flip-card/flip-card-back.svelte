@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { getContext } from 'svelte';
+	import { getFlipCardCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
 	}
 
 	let { class: className, children, ...rest }: Props = $props();
-	const ctx = getContext<{ flipped: boolean }>('flip-card');
+	const ctx = getFlipCardCtx();
 </script>
 
 <div

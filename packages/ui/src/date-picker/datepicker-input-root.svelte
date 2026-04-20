@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
+	import {
+		createDateViewController,
+		createPickerPopoverController
+	} from '../internal/date-family-controller.svelte.js';
 	import { setDatePickerCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths } from '@dryui/primitives';
 
 	interface Props {
 		open?: boolean;
@@ -26,18 +28,20 @@
 		children
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
+	const view = createDateViewController({
+		initialDate: value,
+		locale: () => locale
+	});
 
-	const triggerId = generateFormId('datepicker-trigger');
-	const contentId = generateFormId('datepicker-content');
-
-	// View state: which month/year is the calendar showing
-	let viewMonth = $state(value ? value.getMonth() : new Date().getMonth());
-	let viewYear = $state(value ? value.getFullYear() : new Date().getFullYear());
-	let triggerEl = $state<HTMLElement | null>(null);
-
-	// The day that has keyboard focus within the calendar grid
-	let focusedDate = $state<Date>(value ?? new Date());
+	const popover = createPickerPopoverController({
+		triggerIdPrefix: 'datepicker-trigger',
+		contentIdPrefix: 'datepicker-content',
+		open: () => open,
+		setOpen: (nextOpen) => {
+			open = nextOpen;
+		},
+		disabled: () => disabled
+	});
 
 	function serializeDateValue(date: Date | null): string {
 		if (!date) return '';
@@ -57,13 +61,13 @@
 			return value;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -78,60 +82,48 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
-		triggerId,
-		contentId,
+		get triggerId() {
+			return popover.triggerId;
+		},
+		get contentId() {
+			return popover.contentId;
+		},
 		get triggerEl() {
-			return triggerEl;
+			return popover.triggerEl;
 		},
 		set triggerEl(element: HTMLElement | null) {
-			triggerEl = element;
+			popover.setTriggerEl(element);
 		},
 		show() {
-			if (!disabled) open = true;
+			popover.show();
 		},
 		close() {
-			open = false;
+			popover.close();
 		},
 		toggle() {
-			if (!disabled) open = !open;
+			popover.toggle();
 		},
 		select(date: Date) {
 			value = date;
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
-			open = false;
+			view.setFocusedDate(date);
+			popover.close();
 		},
 		goToMonth(month: number) {
-			if (month < 0) {
-				viewMonth = 11;
-				viewYear = viewYear - 1;
-			} else if (month > 11) {
-				viewMonth = 0;
-				viewYear = viewYear + 1;
-			} else {
-				viewMonth = month;
-			}
+			view.goToMonth(month);
 		},
 		goToYear(year: number) {
-			viewYear = year;
+			view.goToYear(year);
 		},
 		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
+			view.nextMonth();
 		},
 		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
+			view.prevMonth();
 		},
 		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		}
 	});
 </script>

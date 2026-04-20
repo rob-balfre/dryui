@@ -47,6 +47,48 @@ describe('feedback command', () => {
 		expect(result.exitCode).toBe(0);
 	});
 
+	test('prints the local setup guide for feedback init', async () => {
+		const result = await captureAsyncCommandIO(() =>
+			runFeedback(['init'], { exitOnComplete: false })
+		);
+
+		expect(result.logs).toHaveLength(1);
+		expect(result.logs[0]).toContain('DryUI feedback init');
+		expect(result.logs[0]).toContain('Server URL: http://127.0.0.1:4748');
+		expect(result.logs[0]).toContain('packages/feedback-server/hooks/check-feedback.sh');
+		expect(result.logs[0]).toContain('dryui feedback doctor');
+		expect(result.errors).toEqual([]);
+		expect(result.exitCode).toBeNull();
+	});
+
+	test('runs feedback doctor against a live server', async () => {
+		const result = await captureAsyncCommandIO(() =>
+			runFeedback(['doctor', '--endpoint', baseUrl], { exitOnComplete: false })
+		);
+
+		expect(result.logs).toHaveLength(1);
+		expect(result.logs[0]).toContain('DryUI feedback doctor');
+		expect(result.logs[0]).toContain(`Endpoint: ${baseUrl}`);
+		expect(result.logs[0]).toContain('Health: ok');
+		expect(result.logs[0]).toContain('Active listeners: 0');
+		expect(result.logs[0]).toContain('Agent listeners: 0');
+		expect(result.errors).toEqual([]);
+		expect(result.exitCode).toBeNull();
+	});
+
+	test('surfaces a structured error when feedback doctor cannot reach the server', async () => {
+		const result = await captureAsyncCommandIO(() =>
+			runFeedback(['doctor', '--endpoint', 'http://127.0.0.1:9'], { exitOnComplete: false })
+		);
+
+		expect(result.logs).toHaveLength(1);
+		expect(result.logs[0]).toContain('feedback-unreachable');
+		expect(result.logs[0]).toContain('dryui feedback server');
+		expect(result.logs[0]).toContain('dryui feedback ui');
+		expect(result.errors).toEqual([]);
+		expect(result.exitCode).toBeNull();
+	});
+
 	test('prints the dashboard url without opening a browser when --no-open is set', async () => {
 		const result = await captureAsyncCommandIO(() =>
 			runFeedback(['ui', '--endpoint', baseUrl, '--no-open'])
@@ -73,5 +115,23 @@ describe('feedback command', () => {
 		expect(result.logs[0]).toContain('Server: already running');
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(result.exitCode).toBe(0);
+	});
+
+	test('reports missing and unknown feedback subcommands as structured errors', async () => {
+		const missing = await captureAsyncCommandIO(() => runFeedback([], { exitOnComplete: false }));
+		expect(missing.logs).toHaveLength(1);
+		expect(missing.logs[0]).toContain('missing-subcommand');
+		expect(missing.logs[0]).toContain('dryui feedback --help');
+		expect(missing.errors).toEqual([]);
+		expect(missing.exitCode).toBeNull();
+
+		const unknown = await captureAsyncCommandIO(() =>
+			runFeedback(['wat'], { exitOnComplete: false })
+		);
+		expect(unknown.logs).toHaveLength(1);
+		expect(unknown.logs[0]).toContain('unknown-subcommand');
+		expect(unknown.logs[0]).toContain('Unknown feedback subcommand: "wat"');
+		expect(unknown.errors).toEqual([]);
+		expect(unknown.exitCode).toBeNull();
 	});
 });

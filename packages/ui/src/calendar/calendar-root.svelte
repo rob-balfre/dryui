@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { createDateViewController } from '../internal/date-family-controller.svelte.js';
 	import { setCalendarCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: Date | null;
@@ -24,24 +24,23 @@
 		...rest
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
-
-	let viewMonth = $state(value ? value.getMonth() : new Date().getMonth());
-	let viewYear = $state(value ? value.getFullYear() : new Date().getFullYear());
-	let focusedDate = $state<Date>(value ?? new Date());
+	const view = createDateViewController({
+		initialDate: value,
+		locale: () => locale
+	});
 
 	setCalendarCtx({
 		get value() {
 			return value;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -56,7 +55,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		get multiple() {
 			return false;
@@ -66,38 +65,22 @@
 		},
 		select(date: Date) {
 			value = date;
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		},
 		goToMonth(month: number) {
-			if (month < 0) {
-				viewMonth = 11;
-				viewYear = viewYear - 1;
-			} else if (month > 11) {
-				viewMonth = 0;
-				viewYear = viewYear + 1;
-			} else {
-				viewMonth = month;
-			}
+			view.goToMonth(month);
 		},
 		goToYear(year: number) {
-			viewYear = year;
+			view.goToYear(year);
 		},
 		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
+			view.nextMonth();
 		},
 		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
+			view.prevMonth();
 		},
 		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		}
 	});
 </script>

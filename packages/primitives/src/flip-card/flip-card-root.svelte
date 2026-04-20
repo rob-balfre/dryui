@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { setContext } from 'svelte';
+	import { setFlipCardCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		trigger?: 'hover' | 'click';
@@ -22,7 +22,7 @@
 		flipped = !flipped;
 	}
 
-	setContext('flip-card', {
+	setFlipCardCtx({
 		get flipped() {
 			return flipped;
 		},

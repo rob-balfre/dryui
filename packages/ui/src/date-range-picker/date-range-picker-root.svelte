@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
+	import {
+		createDateViewController,
+		createPickerPopoverController
+	} from '../internal/date-family-controller.svelte.js';
 	import { setDateRangePickerCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths, isSameDay } from '@dryui/primitives';
 
 	interface Props {
 		open?: boolean;
@@ -26,24 +28,32 @@
 		children
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
-
-	const triggerId = generateFormId('date-range-picker-trigger');
-	const contentId = generateFormId('date-range-picker-content');
-
-	// View state: which month/year is the calendar showing
-	let viewMonth = $state(startDate ? startDate.getMonth() : new Date().getMonth());
-	let viewYear = $state(startDate ? startDate.getFullYear() : new Date().getFullYear());
-	let triggerEl = $state<HTMLElement | null>(null);
-
-	// The day that has keyboard focus within the calendar grid
-	let focusedDate = $state<Date>(startDate ?? new Date());
+	const view = createDateViewController({
+		initialDate: startDate,
+		locale: () => locale
+	});
 
 	// Hover date for range preview
 	let hoverDate = $state<Date | null>(null);
 
 	// Selection mode: 'start' means next click sets start, 'end' means next click sets end
 	let selecting = $state<'start' | 'end'>('start');
+
+	const popover = createPickerPopoverController({
+		triggerIdPrefix: 'date-range-picker-trigger',
+		contentIdPrefix: 'date-range-picker-content',
+		open: () => open,
+		setOpen: (nextOpen) => {
+			open = nextOpen;
+		},
+		disabled: () => disabled,
+		onShow: () => {
+			selecting = 'start';
+		},
+		onClose: () => {
+			hoverDate = null;
+		}
+	});
 
 	setDateRangePickerCtx({
 		get open() {
@@ -56,13 +66,13 @@
 			return endDate;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -77,7 +87,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		get hoverDate() {
 			return hoverDate;
@@ -85,41 +95,33 @@
 		get selecting() {
 			return selecting;
 		},
-		triggerId,
-		contentId,
+		get triggerId() {
+			return popover.triggerId;
+		},
+		get contentId() {
+			return popover.contentId;
+		},
 		get triggerEl() {
-			return triggerEl;
+			return popover.triggerEl;
 		},
 		set triggerEl(element: HTMLElement | null) {
-			triggerEl = element;
+			popover.setTriggerEl(element);
 		},
 		show() {
-			if (!disabled) {
-				selecting = 'start';
-				open = true;
-			}
+			popover.show();
 		},
 		close() {
-			open = false;
-			hoverDate = null;
+			popover.close();
 		},
 		toggle() {
-			if (!disabled) {
-				if (!open) {
-					selecting = 'start';
-				}
-				open = !open;
-				if (!open) {
-					hoverDate = null;
-				}
-			}
+			popover.toggle();
 		},
 		selectDate(date: Date) {
 			if (selecting === 'start') {
 				startDate = date;
 				endDate = null;
 				selecting = 'end';
-				focusedDate = date;
+				view.focusDate(date);
 			} else {
 				// 'end' mode
 				if (startDate && date.getTime() < startDate.getTime()) {
@@ -130,27 +132,20 @@
 					endDate = date;
 				}
 				selecting = 'start';
-				hoverDate = null;
-				open = false;
+				popover.close();
 			}
 		},
 		setHoverDate(date: Date | null) {
 			hoverDate = date;
 		},
 		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
+			view.nextMonth();
 		},
 		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
+			view.prevMonth();
 		},
 		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		}
 	});
 </script>

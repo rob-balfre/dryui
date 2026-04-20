@@ -6,6 +6,7 @@
 		ButtonGroup,
 		Card,
 		Checkbox,
+		DragAndDrop,
 		Field,
 		Input,
 		Label,
@@ -16,13 +17,10 @@
 		Select,
 		Slider,
 		Spinner,
-		Table,
 		Text,
 		Toggle
 	} from '@dryui/ui';
 	import {
-		ArrowLeft,
-		ArrowRight,
 		CirclePlus,
 		ChevronRight,
 		Globe,
@@ -34,17 +32,91 @@
 		Smile
 	} from 'lucide-svelte';
 
-	const rows = [
-		{ name: 'Alex Morgan', role: 'Admin', status: 'Active', color: 'success' as const },
-		{ name: 'Jordan Lee', role: 'Editor', status: 'Pending', color: 'warning' as const },
-		{ name: 'Sam Rivera', role: 'Viewer', status: 'Inactive', color: 'gray' as const }
-	];
-
 	const activityLabels = [
 		{ label: 'Syncing', tone: 'info' as const },
 		{ label: 'Updating', tone: 'success' as const },
 		{ label: 'Loading', tone: 'warning' as const }
 	];
+
+	type PageModule = {
+		id: string;
+		title: string;
+		note: string;
+		tag: string;
+		color: 'blue' | 'green' | 'purple';
+	};
+
+	let aboveFoldModules = $state<PageModule[]>([
+		{
+			id: 'hero',
+			title: 'Hero statement',
+			note: 'Lead with the strongest product promise.',
+			tag: 'Content',
+			color: 'purple'
+		},
+		{
+			id: 'search-rail',
+			title: 'Search rail',
+			note: 'Pull action forward before the scroll.',
+			tag: 'Product',
+			color: 'blue'
+		},
+		{
+			id: 'signal-strip',
+			title: 'Signal strip',
+			note: 'Show quick proof with metrics and customer logos.',
+			tag: 'Trust',
+			color: 'green'
+		}
+	]);
+
+	let coreModules = $state<PageModule[]>([
+		{
+			id: 'feature-grid',
+			title: 'Feature grid',
+			note: 'Explain the system in three clear steps.',
+			tag: 'Content',
+			color: 'purple'
+		},
+		{
+			id: 'pricing-cards',
+			title: 'Pricing cards',
+			note: 'Expose the shape, radius, and spacing tokens.',
+			tag: 'Commerce',
+			color: 'blue'
+		},
+		{
+			id: 'comparison-table',
+			title: 'Comparison table',
+			note: 'Make dense data still feel readable.',
+			tag: 'Data',
+			color: 'green'
+		}
+	]);
+
+	let followThroughModules = $state<PageModule[]>([
+		{
+			id: 'customer-quotes',
+			title: 'Customer quotes',
+			note: 'Layer social proof after the core story lands.',
+			tag: 'Trust',
+			color: 'green'
+		},
+		{
+			id: 'faq-stack',
+			title: 'FAQ stack',
+			note: 'Resolve objections without losing visual rhythm.',
+			tag: 'Support',
+			color: 'blue'
+		},
+		{
+			id: 'closing-cta',
+			title: 'Closing CTA',
+			note: 'Repeat the brand action with a cleaner ask.',
+			tag: 'Growth',
+			color: 'purple'
+		}
+	]);
 
 	let budget = $state(640);
 	let gpuCount = $state(8);
@@ -52,6 +124,50 @@
 	let chatPrompt = $state('');
 	let searchQuery = $state('');
 	let assistantPrompt = $state('');
+
+	function getModuleList(id: string): PageModule[] {
+		if (id === 'above-fold') return aboveFoldModules;
+		if (id === 'core') return coreModules;
+		return followThroughModules;
+	}
+
+	function setModuleList(id: string, items: PageModule[]) {
+		if (id === 'above-fold') aboveFoldModules = items;
+		else if (id === 'core') coreModules = items;
+		else followThroughModules = items;
+	}
+
+	function moveModule(fromId: string, fromIndex: number, toId: string, toIndex: number) {
+		const source = [...getModuleList(fromId)];
+		const [module] = source.splice(fromIndex, 1);
+		if (!module) return;
+		setModuleList(fromId, source);
+
+		const target = [...getModuleList(toId)];
+		target.splice(toIndex, 0, module);
+		setModuleList(toId, target);
+	}
+
+	const moduleColumns = [
+		{
+			id: 'above-fold',
+			title: 'Above the fold',
+			description: 'Fastest route to the first impression.',
+			tone: 'warning' as const
+		},
+		{
+			id: 'core',
+			title: 'Core content',
+			description: 'Where the heavy lifting happens.',
+			tone: 'brand' as const
+		},
+		{
+			id: 'follow-through',
+			title: 'Trust and follow-through',
+			description: 'Retention, proof, and the last nudge.',
+			tone: 'success' as const
+		}
+	] as const;
 </script>
 
 <div class="preview-root">
@@ -244,50 +360,70 @@
 				</Card.Root>
 			</div>
 
-			<div class="members-panel">
+			<div class="workflow-panel">
 				<Card.Root size="sm">
 					<Card.Header>
 						<div class="panel-copy">
-							<Text as="span" weight="semibold">Members</Text>
-							<Text color="muted">Mix form controls, data surfaces, and feedback states.</Text>
+							<Text as="span" weight="semibold">Page builder</Text>
+							<Text color="muted">
+								Swap static preview chrome for a proper drag-and-drop module board.
+							</Text>
 						</div>
 					</Card.Header>
-					<Card.Content noPadding>
-						<Table.Root>
-							<Table.Header>
-								<Table.Row>
-									<Table.Head>Name</Table.Head>
-									<Table.Head>Role</Table.Head>
-									<Table.Head>Status</Table.Head>
-								</Table.Row>
-							</Table.Header>
-							<Table.Body>
-								{#each rows as row (row.name)}
-									<Table.Row>
-										<Table.Cell>{row.name}</Table.Cell>
-										<Table.Cell>{row.role}</Table.Cell>
-										<Table.Cell>
-											<Badge color={row.color} size="sm">{row.status}</Badge>
-										</Table.Cell>
-									</Table.Row>
+					<Card.Content>
+						<div class="workflow-intro">
+							<Text as="span" weight="medium">Reorder the pieces of a landing page.</Text>
+							<Text color="muted">
+								The board shows how drag surfaces, handles, and indicators respond to the current
+								theme.
+							</Text>
+						</div>
+
+						<DragAndDrop.Group onMove={moveModule}>
+							<div class="workflow-board">
+								{#each moduleColumns as column (column.id)}
+									<div class="workflow-column">
+										<div class="workflow-column-header">
+											<div class="workflow-column-title">
+												<span class="workflow-column-dot" data-tone={column.tone}></span>
+												<div class="workflow-column-copy">
+													<Text as="span" weight="semibold">{column.title}</Text>
+													<Text size="sm" color="muted">{column.description}</Text>
+												</div>
+											</div>
+											<Badge color="gray" size="sm">{getModuleList(column.id).length}</Badge>
+										</div>
+
+										<DragAndDrop.Root
+											items={getModuleList(column.id)}
+											listId={column.id}
+											aria-label={`${column.title} modules`}
+											data-testid={`theme-wizard-module-column-${column.id}`}
+											onReorder={(items) => setModuleList(column.id, items)}
+										>
+											{#each getModuleList(column.id) as module, index (module.id)}
+												<DragAndDrop.Item {index}>
+													<DragAndDrop.Handle {index} />
+													<div class="workflow-item-copy">
+														<Text as="span" weight="medium" data-module-title>
+															{module.title}
+														</Text>
+														<Text size="sm" color="muted" data-module-note>
+															{module.note}
+														</Text>
+													</div>
+													<Badge variant="soft" color={module.color} size="sm">
+														{module.tag}
+													</Badge>
+												</DragAndDrop.Item>
+											{/each}
+										</DragAndDrop.Root>
+									</div>
 								{/each}
-							</Table.Body>
-						</Table.Root>
+							</div>
+						</DragAndDrop.Group>
 					</Card.Content>
 				</Card.Root>
-				<div class="pagination-row">
-					<ButtonGroup size="sm">
-						<Button variant="outline" size="icon-sm" aria-label="Previous">
-							<ArrowLeft size={14} aria-hidden="true" />
-						</Button>
-						<Button variant="outline" size="sm">1</Button>
-						<Button variant="outline" size="sm">2</Button>
-						<Button variant="outline" size="sm">3</Button>
-						<Button variant="outline" size="icon-sm" aria-label="Next">
-							<ArrowRight size={14} aria-hidden="true" />
-						</Button>
-					</ButtonGroup>
-				</div>
 			</div>
 		</div>
 
@@ -550,18 +686,85 @@
 		gap: var(--dry-space-3);
 	}
 
-	.copilot-row,
-	.pagination-row {
+	.copilot-row {
 		display: grid;
 		justify-items: start;
 		align-items: center;
 		gap: var(--dry-space-3);
 	}
 
-	.members-panel {
+	.workflow-panel {
 		grid-column: span 2;
 		display: grid;
 		gap: var(--dry-space-3);
+	}
+
+	.workflow-intro,
+	.workflow-column-copy,
+	.workflow-item-copy {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.workflow-board {
+		container-type: inline-size;
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: var(--dry-space-4);
+	}
+
+	.workflow-column {
+		display: grid;
+		grid-template-rows: auto 1fr;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-4);
+		border-radius: var(--dry-radius-xl);
+		background: color-mix(in srgb, var(--dry-color-bg-sunken) 88%, var(--dry-color-bg-overlay));
+		border: 1px solid
+			color-mix(in srgb, var(--dry-color-stroke-weak) 78%, var(--dry-color-bg-overlay));
+		--dry-dnd-item-columns: auto minmax(0, 1fr) max-content;
+		--dry-dnd-gap: var(--dry-space-3);
+		--dry-dnd-item-padding: var(--dry-space-3) var(--dry-space-4);
+	}
+
+	.workflow-column-header,
+	.workflow-column-title {
+		display: grid;
+		align-items: start;
+		gap: var(--dry-space-2);
+	}
+
+	.workflow-column-header {
+		grid-template-columns: minmax(0, 1fr) max-content;
+	}
+
+	.workflow-column-title {
+		grid-template-columns: max-content minmax(0, 1fr);
+	}
+
+	.workflow-column-dot {
+		display: grid;
+		grid-template-columns: 0.625rem;
+		grid-template-rows: 0.625rem;
+		margin-top: calc(var(--dry-space-1) + 2px);
+		border-radius: var(--dry-radius-full);
+		background: var(--dry-color-fill-brand);
+		box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+	}
+
+	.workflow-column-dot[data-tone='warning'] {
+		color: var(--dry-color-fill-warning);
+		background: var(--dry-color-fill-warning);
+	}
+
+	.workflow-column-dot[data-tone='brand'] {
+		color: var(--dry-color-fill-brand);
+		background: var(--dry-color-fill-brand);
+	}
+
+	.workflow-column-dot[data-tone='success'] {
+		color: var(--dry-color-fill-success);
+		background: var(--dry-color-fill-success);
 	}
 
 	.split-fields,
@@ -774,7 +977,11 @@
 			grid-template-columns: 1fr;
 		}
 
-		.members-panel {
+		.workflow-board {
+			grid-template-columns: 1fr;
+		}
+
+		.workflow-panel {
 			grid-column: 1;
 		}
 	}

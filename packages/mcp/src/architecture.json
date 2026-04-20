@@ -14,7 +14,7 @@
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
-    "composeEdges": 13,
+    "composeEdges": 15,
     "docsEdges": 0,
     "relatedEdges": 304,
     "mismatches": 291,
@@ -3387,7 +3387,7 @@
         "Front",
         "Back"
       ],
-      "sourceFileCount": 4,
+      "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -11760,7 +11760,7 @@
         "Front",
         "Back"
       ],
-      "sourceFileCount": 4,
+      "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -16405,7 +16405,7 @@
       ],
       "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 2
     },
     {
       "id": "ui:Typography.Blockquote",
@@ -16613,6 +16613,18 @@
       "type": "composes",
       "from": "ui:Transfer",
       "to": "ui:Checkbox"
+    },
+    {
+      "id": "composes:ui:Typography:ui:Heading:",
+      "type": "composes",
+      "from": "ui:Typography",
+      "to": "ui:Heading"
+    },
+    {
+      "id": "composes:ui:Typography:ui:Text:",
+      "type": "composes",
+      "from": "ui:Typography",
+      "to": "ui:Text"
     },
     {
       "id": "compound_part:primitives:Accordion:primitives:Accordion.Content:Content",

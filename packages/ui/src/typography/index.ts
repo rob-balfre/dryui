@@ -1,18 +1,16 @@
-import type {
-	HeadingProps as PrimitiveHeadingProps,
-	TextProps as PrimitiveTextProps
-} from '@dryui/primitives';
+import type { TextProps as SharedTextProps } from '../text/index.js';
 
-export interface HeadingProps extends PrimitiveHeadingProps {
-	variant?: 'default' | 'display';
-}
+export type { HeadingProps } from '../heading/index.js';
 
 export type { CodeProps, BlockquoteProps } from '@dryui/primitives';
 
-export interface TextProps extends PrimitiveTextProps {
+export interface TextProps extends Omit<SharedTextProps, 'color' | 'variant'> {
 	color?: 'default' | 'muted' | 'secondary';
-	variant?: 'default' | 'muted' | 'secondary';
-	size?: 'sm' | 'md' | 'lg';
+	variant?: 'default' | 'muted' | 'secondary' | 'label';
+	size?: SharedTextProps['size'];
+	font?: SharedTextProps['font'];
+	weight?: SharedTextProps['weight'];
+	className?: SharedTextProps['className'];
 }
 
 import TypographyHeading from './heading.svelte';

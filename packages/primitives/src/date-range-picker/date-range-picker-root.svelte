@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setDateRangePickerCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths, isSameDay } from '../utils/date-utils.js';
+	import { createDateViewState } from '../internal/date-view-state.svelte.js';
 
 	interface Props {
 		open?: boolean;
@@ -26,17 +26,13 @@
 		children
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
-
 	const triggerId = generateFormId('date-range-picker-trigger');
 	const contentId = generateFormId('date-range-picker-content');
-
-	// View state: which month/year is the calendar showing
-	let viewMonth = $state(startDate ? startDate.getMonth() : new Date().getMonth());
-	let viewYear = $state(startDate ? startDate.getFullYear() : new Date().getFullYear());
-
-	// The day that has keyboard focus within the calendar grid
-	let focusedDate = $state<Date>(startDate ?? new Date());
+	let triggerEl = $state<HTMLElement | null>(null);
+	const view = createDateViewState({
+		getLocale: () => locale,
+		getInitialDate: () => startDate
+	});
 
 	// Hover date for range preview
 	let hoverDate = $state<Date | null>(null);
@@ -55,13 +51,13 @@
 			return endDate;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -76,7 +72,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		get hoverDate() {
 			return hoverDate;
@@ -86,7 +82,12 @@
 		},
 		triggerId,
 		contentId,
-		triggerEl: null,
+		get triggerEl() {
+			return triggerEl;
+		},
+		set triggerEl(element: HTMLElement | null) {
+			triggerEl = element;
+		},
 		show() {
 			if (!disabled) {
 				selecting = 'start';
@@ -113,7 +114,7 @@
 				startDate = date;
 				endDate = null;
 				selecting = 'end';
-				focusedDate = date;
+				view.setFocusedDate(date);
 			} else {
 				// 'end' mode
 				if (startDate && date.getTime() < startDate.getTime()) {
@@ -131,21 +132,9 @@
 		setHoverDate(date: Date | null) {
 			hoverDate = date;
 		},
-		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
-		},
-		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
-		},
-		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
-		}
+		nextMonth: view.nextMonth,
+		prevMonth: view.prevMonth,
+		setFocusedDate: view.setFocusedDate
 	});
 </script>
 

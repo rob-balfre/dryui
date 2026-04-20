@@ -1,16 +1,20 @@
 import { describe, expect, test } from 'bun:test';
+import { fileURLToPath } from 'node:url';
 import {
 	generateExample,
 	parseCompoundParts,
 	parsePartContract
 } from '../../../packages/mcp/src/generate-spec.ts';
 
-const typographyIndex = await Bun.file(
-	new URL('../../../packages/ui/src/typography/index.ts', import.meta.url)
-).text();
-const primitiveTypographyIndex = await Bun.file(
-	new URL('../../../packages/primitives/src/typography/index.ts', import.meta.url)
-).text();
+const typographyIndexUrl = new URL('../../../packages/ui/src/typography/index.ts', import.meta.url);
+const typographyIndexPath = fileURLToPath(typographyIndexUrl);
+const typographyIndex = await Bun.file(typographyIndexUrl).text();
+const primitiveTypographyIndexUrl = new URL(
+	'../../../packages/primitives/src/typography/index.ts',
+	import.meta.url
+);
+const primitiveTypographyIndexPath = fileURLToPath(primitiveTypographyIndexUrl);
+const primitiveTypographyIndex = await Bun.file(primitiveTypographyIndexUrl).text();
 const spec = (await Bun.file(
 	new URL('../../../packages/mcp/src/spec.json', import.meta.url)
 ).json()) as {
@@ -22,16 +26,23 @@ describe('generate-spec typography parsing', () => {
 		const parts = parseCompoundParts(primitiveTypographyIndex, 'Typography');
 		expect(parts).toEqual(['Heading', 'Text', 'Code', 'Blockquote']);
 
-		const heading = parsePartContract(primitiveTypographyIndex, 'Typography', 'Heading');
+		const heading = parsePartContract(
+			primitiveTypographyIndex,
+			'Typography',
+			'Heading',
+			primitiveTypographyIndexPath
+		);
 		expect(Object.keys(heading.props)).toContain('level');
 		expect(heading.props.level?.acceptedValues).toEqual(['1', '2', '3', '4', '5', '6']);
 	});
 
 	test('captures ui typography text overrides', () => {
-		const text = parsePartContract(typographyIndex, 'Typography', 'Text');
+		const text = parsePartContract(typographyIndex, 'Typography', 'Text', typographyIndexPath);
 
 		expect(Object.keys(text.props)).toEqual(expect.arrayContaining(['color', 'size', 'variant']));
 		expect(text.props.color?.acceptedValues).toEqual(['default', 'muted', 'secondary']);
+		expect(text.props.size?.acceptedValues).toEqual(['xs', 'sm', 'md', 'lg']);
+		expect(text.forwardedProps?.baseType).toBe('HTMLAttributes<HTMLElement>');
 	});
 
 	test('generates rootless examples when a namespace has no Root part', () => {

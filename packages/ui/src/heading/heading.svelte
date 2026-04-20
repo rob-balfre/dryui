@@ -9,7 +9,14 @@
 		children: Snippet;
 	}
 
-	let { level = 2, variant = 'default', class: className, children, ...rest }: Props = $props();
+	let {
+		level = 2,
+		variant = 'default',
+		class: classAttr,
+		className = classAttr,
+		children,
+		...rest
+	}: Props = $props();
 </script>
 
 {#if level === 1}
@@ -51,6 +58,7 @@
 		font-weight: 700;
 		line-height: var(--dry-type-heading-2-leading, 2.5rem);
 		letter-spacing: -0.03em;
+		text-wrap: balance;
 	}
 
 	[data-level='1'] {

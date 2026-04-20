@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createAnchoredPopover } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
+	import { createAnchoredOverlayContent } from '../internal/anchored-overlay-content.svelte.js';
 	import { getHoverCardCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -22,26 +22,14 @@
 
 	const ctx = getHoverCardCtx();
 
-	let contentEl = $state<HTMLDivElement>();
-
-	$effect(() => {
-		if (contentEl) {
-			ctx.contentEl = contentEl;
-
-			return () => {
-				if (ctx.contentEl === contentEl) {
-					ctx.contentEl = null;
-				}
-			};
-		}
-	});
-
-	const popover = createAnchoredPopover({
-		triggerEl: () => ctx.triggerEl,
-		contentEl: () => contentEl ?? null,
-		open: () => ctx.open,
+	const overlay = createAnchoredOverlayContent({
+		ctx,
 		placement: () => placement,
-		offset: () => offset
+		offset: () => offset,
+		style: () => style,
+		onContentChange: (contentEl) => {
+			ctx.contentEl = contentEl;
+		}
 	});
 
 	function handleKeydown(e: KeyboardEvent) {
@@ -75,14 +63,14 @@
 </script>
 
 <div
-	bind:this={contentEl}
+	{@attach overlay.bindContent}
+	{@attach overlay.position}
 	id={ctx.contentId}
 	popover="manual"
 	role="dialog"
 	aria-labelledby={ctx.triggerId}
 	data-hover-card-content
 	data-state={ctx.open ? 'open' : 'closed'}
-	use:popover.applyPosition={style}
 	onpointerenter={handlePointerEnter}
 	onpointerleave={handlePointerLeave}
 	onfocusin={handleFocusIn}

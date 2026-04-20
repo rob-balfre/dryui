@@ -1,14 +1,7 @@
 import { createContext } from '@dryui/primitives';
+import type { MenuRootState } from '../internal/menu-root-state.svelte.js';
 
-export interface DropdownMenuContext {
-	readonly open: boolean;
-	readonly triggerId: string;
-	readonly contentId: string;
-	triggerEl: HTMLElement | null;
-	show: () => void;
-	close: () => void;
-	toggle: () => void;
-}
+export interface DropdownMenuContext extends MenuRootState {}
 
 export const [setDropdownMenuCtx, getDropdownMenuCtx] =
 	createContext<DropdownMenuContext>('dropdown-menu');

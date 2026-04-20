@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { setCalendarCtx } from './context.svelte.js';
-	import { getWeekStartDay, addMonths } from '../utils/date-utils.js';
+	import { createDateViewState } from '../internal/date-view-state.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: Date | null;
@@ -24,27 +24,23 @@
 		...rest
 	}: Props = $props();
 
-	const weekStartDay = $derived(getWeekStartDay(locale));
-
-	// View state: which month/year is the calendar showing
-	let viewMonth = $state(value ? value.getMonth() : new Date().getMonth());
-	let viewYear = $state(value ? value.getFullYear() : new Date().getFullYear());
-
-	// The day that has keyboard focus within the calendar grid
-	let focusedDate = $state<Date>(value ?? new Date());
+	const view = createDateViewState({
+		getLocale: () => locale,
+		getInitialDate: () => value
+	});
 
 	setCalendarCtx({
 		get value() {
 			return value;
 		},
 		get focusedDate() {
-			return focusedDate;
+			return view.focusedDate;
 		},
 		get viewMonth() {
-			return viewMonth;
+			return view.viewMonth;
 		},
 		get viewYear() {
-			return viewYear;
+			return view.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -59,7 +55,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return weekStartDay;
+			return view.weekStartDay;
 		},
 		get multiple() {
 			return false;
@@ -69,39 +65,13 @@
 		},
 		select(date: Date) {
 			value = date;
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
+			view.setFocusedDate(date);
 		},
-		goToMonth(month: number) {
-			if (month < 0) {
-				viewMonth = 11;
-				viewYear = viewYear - 1;
-			} else if (month > 11) {
-				viewMonth = 0;
-				viewYear = viewYear + 1;
-			} else {
-				viewMonth = month;
-			}
-		},
-		goToYear(year: number) {
-			viewYear = year;
-		},
-		nextMonth() {
-			const next = addMonths(new Date(viewYear, viewMonth, 1), 1);
-			viewMonth = next.getMonth();
-			viewYear = next.getFullYear();
-		},
-		prevMonth() {
-			const prev = addMonths(new Date(viewYear, viewMonth, 1), -1);
-			viewMonth = prev.getMonth();
-			viewYear = prev.getFullYear();
-		},
-		setFocusedDate(date: Date) {
-			focusedDate = date;
-			viewMonth = date.getMonth();
-			viewYear = date.getFullYear();
-		}
+		goToMonth: view.goToMonth,
+		goToYear: view.goToYear,
+		nextMonth: view.nextMonth,
+		prevMonth: view.prevMonth,
+		setFocusedDate: view.setFocusedDate
 	});
 </script>
 

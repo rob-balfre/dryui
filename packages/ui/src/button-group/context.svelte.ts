@@ -1,17 +1,15 @@
-import { getContext, setContext, hasContext } from 'svelte';
-
-const KEY = Symbol('button-group');
+import { createContext } from '@dryui/primitives';
 
 export interface ButtonGroupContext {
 	readonly orientation: 'horizontal' | 'vertical';
 }
 
+const [_setButtonGroupCtx, _getButtonGroupCtx] = createContext<ButtonGroupContext>('button-group');
+
 export function setButtonGroupCtx(ctx: ButtonGroupContext) {
-	setContext(KEY, ctx);
-	return ctx;
+	return _setButtonGroupCtx(ctx);
 }
 
 export function getButtonGroupCtx(): ButtonGroupContext | undefined {
-	if (!hasContext(KEY)) return undefined;
-	return getContext<ButtonGroupContext>(KEY);
+	return _getButtonGroupCtx();
 }
