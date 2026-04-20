@@ -1,0 +1,50 @@
+{
+  "unit": {
+    "linesPct": 56.03,
+    "functionsPct": 43.12,
+    "packages": {
+      "apps/docs": {
+        "linesPct": 88.54,
+        "functionsPct": 88.89
+      },
+      "packages/cli": {
+        "linesPct": 16.54,
+        "functionsPct": 3.02
+      },
+      "packages/feedback": {
+        "linesPct": 100,
+        "functionsPct": 100
+      },
+      "packages/feedback-server": {
+        "linesPct": 61.86,
+        "functionsPct": 46.75
+      },
+      "packages/lint": {
+        "linesPct": 90.79,
+        "functionsPct": 0
+      },
+      "packages/mcp": {
+        "linesPct": 71.66,
+        "functionsPct": 33.33
+      },
+      "packages/primitives": {
+        "linesPct": 58.79,
+        "functionsPct": 67.82
+      },
+      "packages/theme-wizard": {
+        "linesPct": 53.4,
+        "functionsPct": 61.18
+      },
+      "packages/ui": {
+        "linesPct": 52.51,
+        "functionsPct": 79.86
+      }
+    }
+  },
+  "browser": {
+    "linesPct": 28.29,
+    "functionsPct": 30.63,
+    "statementsPct": 27.64,
+    "branchesPct": 18.44
+  }
+}
