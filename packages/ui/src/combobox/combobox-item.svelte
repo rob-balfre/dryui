@@ -27,6 +27,7 @@
 
 	const isSelected = $derived(ctx.value === value);
 	const isHighlighted = $derived(ctx.activeIndex === index);
+	const hasIcon = $derived(Boolean(icon));
 
 	function handleClick(e: MouseEvent & { currentTarget: HTMLDivElement }) {
 		if (disabled) return;
@@ -64,6 +65,7 @@
 	data-state={isSelected ? 'selected' : 'unselected'}
 	data-highlighted={isHighlighted || undefined}
 	data-disabled={disabled || undefined}
+	data-has-icon={hasIcon || undefined}
 	data-value={value}
 	class={className}
 	onclick={handleClick}
@@ -82,10 +84,10 @@
 			var(--dry-control-radius, var(--dry-radius-sm)),
 			var(--dry-space-4)
 		);
+		--_dry-combobox-item-icon-size: var(--dry-combobox-item-icon-size, 1.5rem);
 
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: minmax(0, 1fr);
 		align-items: center;
 		padding: var(--dry-space-2) var(--dry-space-3);
 		border-radius: var(--dry-combobox-item-radius);
@@ -95,6 +97,11 @@
 		outline: none;
 		color: var(--dry-color-text-strong);
 		min-height: var(--dry-space-10);
+	}
+
+	[data-combobox-item][data-has-icon] {
+		column-gap: var(--dry-space-2);
+		grid-template-columns: minmax(var(--_dry-combobox-item-icon-size), max-content) minmax(0, 1fr);
 	}
 
 	[data-combobox-item]:hover:not([data-disabled]),
@@ -121,8 +128,9 @@
 	}
 
 	[data-combobox-item] [data-part='icon'] {
-		display: inline-grid;
+		display: grid;
 		align-items: center;
-		margin-right: var(--dry-space-2);
+		justify-content: center;
+		line-height: 1;
 	}
 </style>

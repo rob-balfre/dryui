@@ -1,7 +1,9 @@
+import { createHash } from 'node:crypto';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { dirname, resolve } from 'node:path';
 import type { DryuiPackageManager } from '@dryui/mcp/project-planner';
 
 const require = createRequire(import.meta.url);
@@ -87,31 +89,54 @@ export function isHealthyProbeStatus(status: number): boolean {
 	return status >= 200 && status < 300;
 }
 
-export async function urlResponds(url: string, timeoutMs = 1_500): Promise<boolean> {
+export interface UrlProbeResult {
+	readonly ok: boolean;
+	readonly status?: number;
+	readonly errorSummary?: string;
+	readonly transportError?: string;
+}
+
+export async function probeUrl(url: string, timeoutMs = 1_500): Promise<UrlProbeResult> {
 	try {
 		const response = await fetch(url, {
 			redirect: 'manual',
 			signal: AbortSignal.timeout(timeoutMs)
 		});
-
-		return isHealthyProbeStatus(response.status);
-	} catch {
-		return false;
+		if (isHealthyProbeStatus(response.status)) {
+			return { ok: true, status: response.status };
+		}
+		let errorSummary: string | undefined;
+		if (response.status >= 500) {
+			try {
+				errorSummary = extractDevServerErrorSummary(await response.text());
+			} catch {}
+		}
+		return { ok: false, status: response.status, ...(errorSummary ? { errorSummary } : {}) };
+	} catch (err) {
+		return { ok: false, transportError: err instanceof Error ? err.message : String(err) };
 	}
 }
 
+export async function urlResponds(url: string, timeoutMs = 1_500): Promise<boolean> {
+	return (await probeUrl(url, timeoutMs)).ok;
+}
+
 export async function waitForUrl(url: string, timeoutMs = 15_000): Promise<boolean> {
+	return (await waitForUrlDetailed(url, timeoutMs)).ok;
+}
+
+export async function waitForUrlDetailed(url: string, timeoutMs = 15_000): Promise<UrlProbeResult> {
 	const startedAt = Date.now();
+	let last: UrlProbeResult = { ok: false };
 
 	while (Date.now() - startedAt < timeoutMs) {
-		if (await urlResponds(url)) {
-			return true;
-		}
+		last = await probeUrl(url);
+		if (last.ok) return last;
 
 		await new Promise((resolve) => setTimeout(resolve, 250));
 	}
 
-	return false;
+	return last;
 }
 
 export async function ensureUrlReady(
@@ -131,6 +156,33 @@ export async function ensureUrlReady(
 	}
 
 	throw new Error(failureMessage);
+}
+
+export function extractDevServerErrorSummary(body: string): string | undefined {
+	if (!body) return undefined;
+	const preMatches = body.match(/<pre[^>]*>([\s\S]*?)<\/pre>/gi);
+	let candidate = '';
+	if (preMatches && preMatches.length > 0) {
+		candidate = preMatches.map((block) => block.replace(/<pre[^>]*>|<\/pre>/gi, '')).join('\n');
+	} else {
+		candidate = body.replace(/<[^>]+>/g, ' ');
+	}
+	const decoded = candidate
+		.replace(/&amp;/g, '&')
+		.replace(/&lt;/g, '<')
+		.replace(/&gt;/g, '>')
+		.replace(/&quot;/g, '"')
+		.replace(/&#39;/g, "'")
+		.replace(/\r/g, '')
+		.trim();
+	if (!decoded) return undefined;
+	const firstMeaningful = decoded
+		.split('\n')
+		.map((line) => line.trim())
+		// Vite's SSR 500 page prefixes the real error with a generic "Internal Error" heading.
+		.find((line) => line.length > 0 && line !== 'Internal Error');
+	if (!firstMeaningful) return undefined;
+	return firstMeaningful.length > 500 ? `${firstMeaningful.slice(0, 500)}…` : firstMeaningful;
 }
 
 export interface PortHolder {
@@ -182,14 +234,60 @@ export function killPortHolder(pid: number): boolean {
 }
 
 export function readProjectDevScript(root: string): string | null {
-	const pkgJsonPath = resolve(root, 'package.json');
-	if (!existsSync(pkgJsonPath)) return null;
 	try {
-		const raw = readFileSync(pkgJsonPath, 'utf8');
+		const raw = readFileSync(resolve(root, 'package.json'), 'utf8');
 		const pkg = JSON.parse(raw) as { scripts?: Record<string, string> };
 		return pkg.scripts?.dev ?? null;
 	} catch {
 		return null;
+	}
+}
+
+export function projectHasDependency(root: string, name: string): boolean {
+	try {
+		const raw = readFileSync(resolve(root, 'package.json'), 'utf8');
+		const pkg = JSON.parse(raw) as {
+			dependencies?: Record<string, string>;
+			devDependencies?: Record<string, string>;
+			peerDependencies?: Record<string, string>;
+			optionalDependencies?: Record<string, string>;
+		};
+		return Boolean(
+			pkg.dependencies?.[name] ??
+			pkg.devDependencies?.[name] ??
+			pkg.peerDependencies?.[name] ??
+			pkg.optionalDependencies?.[name]
+		);
+	} catch {
+		return false;
+	}
+}
+
+export function projectDevLogPath(root: string): string {
+	const hash = createHash('sha1').update(resolve(root)).digest('hex').slice(0, 12);
+	return resolve(tmpdir(), `dryui-dev-${hash}.log`);
+}
+
+function openProjectDevLog(logPath: string): number | null {
+	try {
+		mkdirSync(dirname(logPath), { recursive: true });
+		return openSync(logPath, 'w');
+	} catch {
+		return null;
+	}
+}
+
+export function readProjectDevLogTail(logPath: string, maxLines = 40): string[] {
+	try {
+		const raw = readFileSync(logPath, 'utf-8');
+		if (!raw) return [];
+		const lines = raw
+			.split('\n')
+			.map((line) => line.replace(/\x1b\[[0-9;]*m/g, '').trimEnd())
+			.filter((line) => line.length > 0);
+		return lines.slice(-maxLines);
+	} catch {
+		return [];
 	}
 }
 
@@ -198,27 +296,33 @@ export interface SpawnProjectDevServerOptions {
 	packageManager: DryuiPackageManager;
 	host: string;
 	port: number;
+	logPath?: string;
 }
 
 export function spawnProjectDevServerInBackground(options: SpawnProjectDevServerOptions): void {
 	const pm = options.packageManager === 'unknown' ? 'npm' : options.packageManager;
 	const args = ['run', 'dev', '--', '--host', options.host, '--port', String(options.port)];
+	const logFd = options.logPath ? openProjectDevLog(options.logPath) : null;
+	const stdio: ['ignore', 'ignore' | number, 'ignore' | number] =
+		logFd !== null ? ['ignore', logFd, logFd] : ['ignore', 'ignore', 'ignore'];
 	const child = spawn(pm, args, {
 		cwd: options.root,
 		detached: true,
-		stdio: 'ignore'
+		stdio
 	});
 	child.unref();
+	if (logFd !== null) closeSync(logFd);
 }
 
 export interface InstallPackageOptions {
 	cwd: string;
 	packageManager: Exclude<DryuiPackageManager, 'unknown'>;
-	packageName: string;
+	packageNames: string[];
 }
 
 export function installPackage(options: InstallPackageOptions): boolean {
-	const result = spawnSync(options.packageManager, ['add', options.packageName], {
+	if (options.packageNames.length === 0) return true;
+	const result = spawnSync(options.packageManager, ['add', ...options.packageNames], {
 		cwd: options.cwd,
 		stdio: 'inherit'
 	});
@@ -282,24 +386,48 @@ export function findViteConfig(root: string): string | null {
 	return null;
 }
 
-const FEEDBACK_NO_EXTERNAL_PATTERN =
-	/noExternal\s*:\s*(?:\[[\s\S]*?['"]@dryui\/feedback['"][\s\S]*?\]|['"]@dryui\/feedback['"])/;
+export const FEEDBACK_SSR_NO_EXTERNAL = ['@dryui/feedback', 'lucide-svelte'] as const;
+
+function escapeRegExp(input: string): string {
+	return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function noExternalContainsPackage(content: string, name: string): boolean {
+	const escaped = escapeRegExp(name);
+	const pattern = new RegExp(
+		`noExternal\\s*:\\s*(?:\\[[\\s\\S]*?['"]${escaped}['"][\\s\\S]*?\\]|['"]${escaped}['"])`
+	);
+	return pattern.test(content);
+}
+
+function missingNoExternalPackages(content: string): string[] {
+	return FEEDBACK_SSR_NO_EXTERNAL.filter((name) => !noExternalContainsPackage(content, name));
+}
 
 export function viteConfigHasFeedbackNoExternal(configPath: string): boolean {
 	try {
-		return FEEDBACK_NO_EXTERNAL_PATTERN.test(readFileSync(configPath, 'utf-8'));
+		const content = readFileSync(configPath, 'utf-8');
+		return missingNoExternalPackages(content).length === 0;
 	} catch {
 		return false;
 	}
 }
 
-function injectIntoExistingNoExternalArray(content: string): string | null {
+function renderNoExternalArray(names: readonly string[]): string {
+	return `[${names.map((name) => `'${name}'`).join(', ')}]`;
+}
+
+function injectIntoExistingNoExternalArray(
+	content: string,
+	missing: readonly string[]
+): string | null {
 	const match = content.match(/noExternal\s*:\s*\[([\s\S]*?)\]/);
 	if (!match) return null;
 	const inner = match[1] ?? '';
 	const trimmed = inner.trim();
 	const separator = trimmed === '' || trimmed.endsWith(',') ? '' : ', ';
-	const replacement = `noExternal: [${inner.replace(/\s*$/, '')}${separator}'@dryui/feedback']`;
+	const additions = missing.map((name) => `'${name}'`).join(', ');
+	const replacement = `noExternal: [${inner.replace(/\s*$/, '')}${separator}${additions}]`;
 	return content.replace(match[0], replacement);
 }
 
@@ -309,7 +437,7 @@ function injectNoExternalIntoSsrBlock(content: string): string | null {
 	const insertPos = (match.index ?? 0) + match[0].length;
 	return (
 		content.slice(0, insertPos) +
-		`\n\t\tnoExternal: ['@dryui/feedback'],` +
+		`\n\t\tnoExternal: ${renderNoExternalArray(FEEDBACK_SSR_NO_EXTERNAL)},` +
 		content.slice(insertPos)
 	);
 }
@@ -320,7 +448,7 @@ function injectSsrIntoConfigObject(content: string): string | null {
 	const insertPos = (match.index ?? 0) + match[0].length;
 	return (
 		content.slice(0, insertPos) +
-		`\n\tssr: { noExternal: ['@dryui/feedback'] },` +
+		`\n\tssr: { noExternal: ${renderNoExternalArray(FEEDBACK_SSR_NO_EXTERNAL)} },` +
 		content.slice(insertPos)
 	);
 }
@@ -331,7 +459,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
 	plugins: [sveltekit()],
 	ssr: {
-		noExternal: ['@dryui/feedback']
+		noExternal: ${renderNoExternalArray(FEEDBACK_SSR_NO_EXTERNAL)}
 	}
 });
 `;
@@ -350,10 +478,11 @@ export function patchViteConfigFeedbackNoExternal(configPath: string): boolean {
 		}
 	}
 
-	if (FEEDBACK_NO_EXTERNAL_PATTERN.test(content)) return true;
+	const missing = missingNoExternalPackages(content);
+	if (missing.length === 0) return true;
 
 	const updated =
-		injectIntoExistingNoExternalArray(content) ??
+		injectIntoExistingNoExternalArray(content, missing) ??
 		injectNoExternalIntoSsrBlock(content) ??
 		injectSsrIntoConfigObject(content);
 

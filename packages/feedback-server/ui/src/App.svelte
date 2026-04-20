@@ -540,61 +540,62 @@ Use the dryui-feedback MCP server:
 						<div class="detail-stack">
 							<div class="detail-top">
 								<div class="detail-media">
-									<Dialog.Root>
-										<Dialog.Trigger>
-											<Button
-												variant="bare"
-												class="screenshot-trigger"
-												aria-label={`Open full screenshot for ${selectedSubmission.url}`}
-											>
-												<Image
-													class="feedback-screenshot-thumb"
-													src={screenshotUrl(selectedSubmission.id)}
-													alt={`Feedback screenshot for ${selectedSubmission.url}`}
-													fallback="Screenshot unavailable"
-												/>
-											</Button>
-										</Dialog.Trigger>
-
-										<Dialog.Content class="feedback-screenshot-dialog">
-											<Dialog.Header>
-												<div class="screenshot-dialog-header">
-													<div class="screenshot-dialog-heading">
-														<Heading level={3}>Captured screenshot</Heading>
-														<Text as="span" size="sm" color="secondary">
-															{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
-																selectedSubmission.viewport
-															)}
-														</Text>
-													</div>
-													<Dialog.Close aria-label="Close screenshot dialog">
-														<span aria-hidden="true">&times;</span>
-													</Dialog.Close>
-												</div>
-											</Dialog.Header>
-											<Dialog.Body class="screenshot-dialog-body">
-												<div class="screenshot-dialog-image">
+									<div class="screenshot-trigger">
+										<Dialog.Root>
+											<Dialog.Trigger>
+												<Button
+													variant="bare"
+													aria-label={`Open full screenshot for ${selectedSubmission.url}`}
+												>
 													<Image
-														class="feedback-screenshot-full"
+														class="feedback-screenshot-thumb"
 														src={screenshotUrl(selectedSubmission.id)}
 														alt={`Feedback screenshot for ${selectedSubmission.url}`}
 														fallback="Screenshot unavailable"
 													/>
-												</div>
-											</Dialog.Body>
-											<Dialog.Footer>
-												<Dialog.Close>Close</Dialog.Close>
-												<Button
-													href={selectedSubmission.url}
-													target="_blank"
-													rel="noreferrer"
-													variant="ghost"
-												>
-													Open page
 												</Button>
-											</Dialog.Footer>
-										</Dialog.Content>
-									</Dialog.Root>
+											</Dialog.Trigger>
+
+											<Dialog.Content class="feedback-screenshot-dialog">
+												<Dialog.Header>
+													<div class="screenshot-dialog-header">
+														<div class="screenshot-dialog-heading">
+															<Heading level={3}>Captured screenshot</Heading>
+															<Text as="span" size="sm" color="secondary">
+																{formatAbsoluteTime(selectedSubmission.createdAt)} / {formatViewport(
+																	selectedSubmission.viewport
+																)}
+															</Text>
+														</div>
+														<Dialog.Close aria-label="Close screenshot dialog">
+															<span aria-hidden="true">&times;</span>
+														</Dialog.Close>
+													</div>
+												</Dialog.Header>
+												<Dialog.Body class="screenshot-dialog-body">
+													<div class="screenshot-dialog-image">
+														<Image
+															class="feedback-screenshot-full"
+															src={screenshotUrl(selectedSubmission.id)}
+															alt={`Feedback screenshot for ${selectedSubmission.url}`}
+															fallback="Screenshot unavailable"
+														/>
+													</div>
+												</Dialog.Body>
+												<Dialog.Footer>
+													<Dialog.Close>Close</Dialog.Close>
+													<Button
+														href={selectedSubmission.url}
+														target="_blank"
+														rel="noreferrer"
+														variant="ghost"
+													>
+														Open page
+													</Button>
+												</Dialog.Footer>
+											</Dialog.Content>
+										</Dialog.Root>
+									</div>
 
 									<section class="notes-section">
 										<header class="notes-head">
@@ -937,6 +938,7 @@ Use the dryui-feedback MCP server:
 	}
 
 	.screenshot-trigger {
+		display: grid;
 		justify-self: start;
 		cursor: zoom-in;
 	}

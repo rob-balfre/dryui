@@ -38,7 +38,20 @@ describe('findViteConfig', () => {
 });
 
 describe('viteConfigHasFeedbackNoExternal', () => {
-	test('true when @dryui/feedback appears inside a noExternal array', () => {
+	test('true when both @dryui/feedback and lucide-svelte are listed', () => {
+		const root = createTempTree({
+			'vite.config.ts': [
+				"import { defineConfig } from 'vite';",
+				'',
+				'export default defineConfig({',
+				"\tssr: { noExternal: ['@dryui/feedback', 'lucide-svelte'] }",
+				'});'
+			].join('\n')
+		});
+		expect(viteConfigHasFeedbackNoExternal(resolve(root, 'vite.config.ts'))).toBe(true);
+	});
+
+	test('false when only @dryui/feedback is listed (lucide-svelte peer missing)', () => {
 		const root = createTempTree({
 			'vite.config.ts': [
 				"import { defineConfig } from 'vite';",
@@ -48,10 +61,10 @@ describe('viteConfigHasFeedbackNoExternal', () => {
 				'});'
 			].join('\n')
 		});
-		expect(viteConfigHasFeedbackNoExternal(resolve(root, 'vite.config.ts'))).toBe(true);
+		expect(viteConfigHasFeedbackNoExternal(resolve(root, 'vite.config.ts'))).toBe(false);
 	});
 
-	test('false when ssr.noExternal exists but does not list @dryui/feedback', () => {
+	test('false when ssr.noExternal exists but does not list either required package', () => {
 		const root = createTempTree({
 			'vite.config.ts': [
 				"import { defineConfig } from 'vite';",
@@ -71,18 +84,18 @@ describe('viteConfigHasFeedbackNoExternal', () => {
 });
 
 describe('patchViteConfigFeedbackNoExternal', () => {
-	test('injects ssr.noExternal into a defineConfig object that has none', () => {
+	test('injects ssr.noExternal with both packages into a defineConfig object that has none', () => {
 		const root = createTempTree({ 'vite.config.ts': DEFINE_CONFIG_BASE });
 		const configPath = resolve(root, 'vite.config.ts');
 
 		expect(patchViteConfigFeedbackNoExternal(configPath)).toBe(true);
 
 		const updated = readFileSync(configPath, 'utf-8');
-		expect(updated).toContain("ssr: { noExternal: ['@dryui/feedback'] }");
+		expect(updated).toContain("ssr: { noExternal: ['@dryui/feedback', 'lucide-svelte'] }");
 		expect(viteConfigHasFeedbackNoExternal(configPath)).toBe(true);
 	});
 
-	test('appends @dryui/feedback to an existing noExternal array', () => {
+	test('appends both required packages to an existing noExternal array', () => {
 		const root = createTempTree({
 			'vite.config.ts': [
 				"import { defineConfig } from 'vite';",
@@ -101,9 +114,31 @@ describe('patchViteConfigFeedbackNoExternal', () => {
 		const updated = readFileSync(configPath, 'utf-8');
 		expect(updated).toContain("'other-lib'");
 		expect(updated).toContain("'@dryui/feedback'");
+		expect(updated).toContain("'lucide-svelte'");
 	});
 
-	test('adds noExternal inside an existing ssr object with other fields', () => {
+	test('adds only the missing lucide-svelte peer when @dryui/feedback is already listed', () => {
+		const root = createTempTree({
+			'vite.config.ts': [
+				"import { defineConfig } from 'vite';",
+				'',
+				'export default defineConfig({',
+				"\tssr: { noExternal: ['@dryui/feedback'] }",
+				'});'
+			].join('\n')
+		});
+		const configPath = resolve(root, 'vite.config.ts');
+
+		expect(patchViteConfigFeedbackNoExternal(configPath)).toBe(true);
+
+		const updated = readFileSync(configPath, 'utf-8');
+		expect(updated).toContain("'@dryui/feedback'");
+		expect(updated).toContain("'lucide-svelte'");
+		// The pre-existing entry is not duplicated.
+		expect(updated.match(/@dryui\/feedback/g)?.length).toBe(1);
+	});
+
+	test('adds noExternal with both packages inside an existing ssr object with other fields', () => {
 		const root = createTempTree({
 			'vite.config.ts': [
 				"import { defineConfig } from 'vite';",
@@ -120,16 +155,16 @@ describe('patchViteConfigFeedbackNoExternal', () => {
 		expect(patchViteConfigFeedbackNoExternal(configPath)).toBe(true);
 
 		const updated = readFileSync(configPath, 'utf-8');
-		expect(updated).toContain("noExternal: ['@dryui/feedback']");
+		expect(updated).toContain("noExternal: ['@dryui/feedback', 'lucide-svelte']");
 		expect(updated).toContain('target: "node"');
 	});
 
-	test('is idempotent when the package is already listed', () => {
+	test('is idempotent when both packages are already listed', () => {
 		const original = [
 			"import { defineConfig } from 'vite';",
 			'',
 			'export default defineConfig({',
-			"\tssr: { noExternal: ['@dryui/feedback'] }",
+			"\tssr: { noExternal: ['@dryui/feedback', 'lucide-svelte'] }",
 			'});'
 		].join('\n');
 		const root = createTempTree({ 'vite.config.ts': original });
@@ -147,11 +182,11 @@ describe('patchViteConfigFeedbackNoExternal', () => {
 
 		const written = readFileSync(configPath, 'utf-8');
 		expect(written).toContain("import { sveltekit } from '@sveltejs/kit/vite';");
-		expect(written).toContain("noExternal: ['@dryui/feedback']");
+		expect(written).toContain("noExternal: ['@dryui/feedback', 'lucide-svelte']");
 		expect(viteConfigHasFeedbackNoExternal(configPath)).toBe(true);
 	});
 
-	test('patches a bare export default object', () => {
+	test('patches a bare export default object with both packages', () => {
 		const root = createTempTree({
 			'vite.config.js': ['export default {', '\tplugins: []', '};'].join('\n')
 		});
@@ -160,6 +195,6 @@ describe('patchViteConfigFeedbackNoExternal', () => {
 		expect(patchViteConfigFeedbackNoExternal(configPath)).toBe(true);
 
 		const updated = readFileSync(configPath, 'utf-8');
-		expect(updated).toContain("ssr: { noExternal: ['@dryui/feedback'] }");
+		expect(updated).toContain("ssr: { noExternal: ['@dryui/feedback', 'lucide-svelte'] }");
 	});
 });

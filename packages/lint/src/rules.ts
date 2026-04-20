@@ -85,7 +85,6 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 			'date-field',
 			'combobox',
 			'multi-select-combobox',
-			'country-select',
 			'select',
 			'phone-input',
 			'rating',

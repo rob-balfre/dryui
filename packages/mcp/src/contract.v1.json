@@ -6,8 +6,8 @@
     "version": "1.4.1"
   },
   "counts": {
-    "components": 160,
-    "compositionComponents": 130,
+    "components": 159,
+    "compositionComponents": 129,
     "compositionRecipes": 30,
     "tools": 2,
     "prompts": 2,
@@ -9485,6 +9485,14 @@
               "description": "Size preset affecting density, spacing, or typography.",
               "default": "'md'"
             },
+            "leading": {
+              "type": "Snippet",
+              "required": false
+            },
+            "trailing": {
+              "type": "Snippet",
+              "required": false
+            },
             "placeholder": {
               "type": "string",
               "required": false,
@@ -9641,10 +9649,13 @@
         "Provide native name, autocomplete, and value wiring when the component participates in form submission."
       ],
       "cssVars": {
+        "--dry-combobox-affix-gap": "Affix Gap",
+        "--dry-combobox-affix-min-inline-size": "Affix Min Inline Size",
         "--dry-combobox-bg": "Background color",
         "--dry-combobox-border": "Border color",
         "--dry-combobox-color": "Text color",
         "--dry-combobox-font-size": "Font size",
+        "--dry-combobox-item-icon-size": "Item Icon Size",
         "--dry-combobox-item-radius": "Item Radius",
         "--dry-combobox-padding-x": "Horizontal padding",
         "--dry-combobox-padding-y": "Vertical padding"
@@ -9671,6 +9682,15 @@
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-has-icon"
+        },
+        {
+          "name": "data-has-leading"
+        },
+        {
+          "name": "data-has-trailing"
         },
         {
           "name": "data-highlighted"
@@ -16811,108 +16831,6 @@
       ],
       "example": "<PhoneInput bind:value={phone} defaultCountry=\"US\" placeholder=\"(555) 123-4567\" />"
     },
-    "CountrySelect": {
-      "import": "@dryui/ui",
-      "description": "Country selector dropdown with flags and dial codes",
-      "category": "input",
-      "tags": [
-        "form",
-        "country",
-        "select",
-        "region",
-        "flag",
-        "dial-code"
-      ],
-      "compound": false,
-      "props": {
-        "value": {
-          "type": "string",
-          "required": false,
-          "description": "Current controlled or bindable value.",
-          "default": "''",
-          "bindable": true
-        },
-        "regions": {
-          "type": "string[]",
-          "required": false
-        },
-        "showDialCode": {
-          "type": "boolean",
-          "required": false,
-          "default": "false"
-        },
-        "disabled": {
-          "type": "boolean",
-          "required": false,
-          "description": "Prevents interaction and applies disabled styling.",
-          "default": "false"
-        },
-        "placeholder": {
-          "type": "string",
-          "required": false,
-          "description": "Hint text shown when no value is selected or entered.",
-          "default": "'Select country'"
-        },
-        "name": {
-          "type": "string",
-          "required": false,
-          "description": "Field name used during native form submission."
-        },
-        "onchange": {
-          "type": "(code: string) => void",
-          "required": false
-        },
-        "children": {
-          "type": "Snippet",
-          "required": false,
-          "description": "Content rendered inside the component."
-        }
-      },
-      "forwardedProps": {
-        "baseType": "Omit<HTMLAttributes<HTMLDivElement>, 'onchange'>",
-        "via": "rest",
-        "element": "div",
-        "examples": [
-          "id",
-          "style",
-          "role"
-        ],
-        "omitted": [
-          "onchange"
-        ],
-        "note": "Forwards <div> attributes via rest props."
-      },
-      "a11y": [
-        "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
-        "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
-      ],
-      "cssVars": {},
-      "dataAttributes": [
-        {
-          "name": "data-country-select-wrapper"
-        },
-        {
-          "name": "data-dial-code"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-flag"
-        },
-        {
-          "name": "data-highlighted"
-        },
-        {
-          "name": "data-part"
-        },
-        {
-          "name": "data-state"
-        }
-      ],
-      "example": "<CountrySelect bind:value={country} placeholder=\"Select country\" />"
-    },
     "DateTimeInput": {
       "import": "@dryui/ui",
       "description": "Combined date and time input with locale-aware segments",
@@ -22899,30 +22817,6 @@
           "Label",
           "Text",
           "Card.Content"
-        ]
-      },
-      "countryselect": {
-        "component": "CountrySelect",
-        "useWhen": "Select a country with flag icons and dial codes",
-        "alternatives": [
-          {
-            "rank": 1,
-            "component": "CountrySelect",
-            "useWhen": "Country selection with flags",
-            "snippet": "<CountrySelect bind:value={country} />"
-          },
-          {
-            "rank": 2,
-            "component": "Select",
-            "useWhen": "Simple country dropdown without flags",
-            "snippet": "<Select.Root bind:value={country}>\n  <Select.Trigger><Select.Value /></Select.Trigger>\n  <Select.Content>\n    <Select.Item value=\"US\">United States</Select.Item>\n  </Select.Content>\n</Select.Root>"
-          }
-        ],
-        "antiPatterns": [],
-        "combinesWith": [
-          "Field.Root",
-          "Label",
-          "PhoneInput"
         ]
       },
       "datefield": {

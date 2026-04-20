@@ -195,11 +195,6 @@
       "svelte": "./src/context-menu/index.ts",
       "default": "./src/context-menu/index.ts"
     },
-    "./country-select": {
-      "types": "./src/country-select/index.ts",
-      "svelte": "./src/country-select/index.ts",
-      "default": "./src/country-select/index.ts"
-    },
     "./data-grid": {
       "types": "./src/data-grid/index.ts",
       "svelte": "./src/data-grid/index.ts",
@@ -952,11 +947,6 @@
         "types": "./dist/context-menu/index.d.ts",
         "svelte": "./dist/context-menu/index.js",
         "default": "./dist/context-menu/index.js"
-      },
-      "./country-select": {
-        "types": "./dist/country-select/index.d.ts",
-        "svelte": "./dist/country-select/index.js",
-        "default": "./dist/country-select/index.js"
       },
       "./data-grid": {
         "types": "./dist/data-grid/index.d.ts",

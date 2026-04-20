@@ -26,14 +26,18 @@ import {
 	openBrowser,
 	patchViteConfigFeedbackNoExternal as patchViteConfigFeedbackNoExternalDefault,
 	type PortHolder,
+	projectDevLogPath,
+	projectHasDependency as projectHasDependencyDefault,
+	readProjectDevLogTail as readProjectDevLogTailDefault,
 	readProjectDevScript as readProjectDevScriptDefault,
 	resolveFeedbackServerEntry,
 	spawnFeedbackServerInBackground,
 	spawnProjectDevServerInBackground as spawnProjectDevServerDefault,
 	type SpawnProjectDevServerOptions,
 	urlResponds as urlRespondsDefault,
+	type UrlProbeResult,
 	viteConfigHasFeedbackNoExternal as viteConfigHasFeedbackNoExternalDefault,
-	waitForUrl as waitForUrlDefault
+	waitForUrlDetailed as waitForUrlDetailedDefault
 } from './launch-utils.js';
 
 export { isHealthyProbeStatus };
@@ -255,13 +259,15 @@ export interface UserProjectLauncherRuntime {
 	findPortHolder: (port: number) => PortHolder | null;
 	killPortHolder: (pid: number) => boolean;
 	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => void;
-	waitForUrl: (url: string, timeoutMs: number) => Promise<boolean>;
+	waitForUrlDetailed: (url: string, timeoutMs: number) => Promise<UrlProbeResult>;
+	readProjectDevLogTail: (logPath: string, maxLines?: number) => string[];
 	promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean>;
 	promptFeedbackSetup: (plan: FeedbackSetupPlan) => Promise<boolean>;
+	projectHasDependency: (root: string, name: string) => boolean;
 	installPackage: (
 		cwd: string,
 		packageManager: Exclude<DryuiPackageManager, 'unknown'>,
-		packageName: string
+		packageNames: string[]
 	) => boolean;
 	mountFeedbackInLayout: (layoutPath: string, serverUrl: string) => boolean;
 	findViteConfig: (root: string) => string | null;
@@ -284,6 +290,13 @@ type DevServerPlan =
 	| { kind: 'keep'; url: string }
 	| { kind: 'spawn'; url: string; killPid?: number }
 	| { kind: 'skip'; url: string; reason: string };
+
+interface DevServerExecutionResult {
+	ok: boolean;
+	url: string;
+	message: string;
+	errorDetails?: LabelledMessage[];
+}
 
 async function planUserProjectDevServer(
 	runtime: UserProjectLauncherRuntime,
@@ -312,11 +325,40 @@ async function planUserProjectDevServer(
 	return { kind: 'spawn', url, killPid: holder.pid };
 }
 
+function formatProbeFailureMessage(probe: UrlProbeResult, timeoutSec: number): string {
+	if (probe.status !== undefined) {
+		return `failed: HTTP ${probe.status} after ${timeoutSec}s`;
+	}
+	if (probe.transportError) {
+		return `failed: no response after ${timeoutSec}s (${probe.transportError})`;
+	}
+	return `failed: no response after ${timeoutSec}s`;
+}
+
+function buildDevServerErrorDetails(
+	probe: UrlProbeResult,
+	logPath: string | null,
+	logTail: readonly string[]
+): LabelledMessage[] {
+	const details: LabelledMessage[] = [];
+	if (probe.errorSummary) {
+		details.push({ label: 'Project dev error', message: probe.errorSummary });
+	}
+	if (logTail.length > 0) {
+		const joined = logTail.join('\n    ');
+		details.push({ label: 'Project dev log tail', message: `\n    ${joined}` });
+	}
+	if (logPath) {
+		details.push({ label: 'Project dev log', message: logPath });
+	}
+	return details;
+}
+
 async function executeUserProjectDevServerPlan(
 	runtime: UserProjectLauncherRuntime,
 	plan: DevServerPlan,
 	options: SpawnProjectDevServerOptions
-): Promise<{ ok: boolean; url: string; message: string }> {
+): Promise<DevServerExecutionResult> {
 	if (plan.kind === 'keep') {
 		return { ok: true, url: plan.url, message: 'already running' };
 	}
@@ -337,15 +379,20 @@ async function executeUserProjectDevServerPlan(
 	}
 
 	runtime.spawnProjectDevServer(options);
-	const ready = await runtime.waitForUrl(plan.url, PROJECT_DEV_READY_TIMEOUT_MS);
-	if (!ready) {
-		return {
-			ok: false,
-			url: plan.url,
-			message: `skipped (dev server did not respond within ${PROJECT_DEV_READY_TIMEOUT_MS / 1000}s)`
-		};
+	const probe = await runtime.waitForUrlDetailed(plan.url, PROJECT_DEV_READY_TIMEOUT_MS);
+	if (probe.ok) {
+		return { ok: true, url: plan.url, message: 'started in the background' };
 	}
-	return { ok: true, url: plan.url, message: 'started in the background' };
+
+	const timeoutSec = PROJECT_DEV_READY_TIMEOUT_MS / 1000;
+	const logPath = options.logPath ?? null;
+	const logTail = logPath ? runtime.readProjectDevLogTail(logPath) : [];
+	return {
+		ok: false,
+		url: plan.url,
+		message: formatProbeFailureMessage(probe, timeoutSec),
+		errorDetails: buildDevServerErrorDetails(probe, logPath, logTail)
+	};
 }
 
 const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject'> = {
@@ -357,13 +404,15 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	findPortHolder: findPortHolderDefault,
 	killPortHolder: killPortHolderDefault,
 	spawnProjectDevServer: spawnProjectDevServerDefault,
-	waitForUrl: waitForUrlDefault,
+	waitForUrlDetailed: waitForUrlDetailedDefault,
+	readProjectDevLogTail: readProjectDevLogTailDefault,
 	// Default declines to kill — safe for non-TTY callers that have no way to confirm.
 	promptKillPortHolder: async () => false,
 	// Default declines setup — safe for non-TTY callers that have no way to confirm.
 	promptFeedbackSetup: async () => false,
-	installPackage: (cwd, packageManager, packageName) =>
-		installPackageDefault({ cwd, packageManager, packageName }),
+	projectHasDependency: projectHasDependencyDefault,
+	installPackage: (cwd, packageManager, packageNames) =>
+		installPackageDefault({ cwd, packageManager, packageNames }),
 	mountFeedbackInLayout: (layoutPath, serverUrl) =>
 		mountFeedbackInLayoutDefault({ layoutPath, serverUrl }),
 	findViteConfig: findViteConfigDefault,
@@ -392,10 +441,13 @@ async function planAndApplyFeedbackSetup(
 		: false;
 
 	const needsInstall = !detection.dependencies.feedback;
+	const needsLucideInstall = detection.root
+		? !runtime.projectHasDependency(detection.root, 'lucide-svelte')
+		: false;
 	const needsMount = !detection.feedback.layoutPath;
 	const needsViteConfig = viteConfigPath !== null && !viteConfigPatched;
 
-	if (!needsInstall && !needsMount && !needsViteConfig) return null;
+	if (!needsInstall && !needsLucideInstall && !needsMount && !needsViteConfig) return null;
 
 	if (needsMount && !layoutPath) {
 		return [
@@ -419,14 +471,24 @@ async function planAndApplyFeedbackSetup(
 
 	const notes: LabelledMessage[] = [];
 
-	if (needsInstall) {
-		const installed = runtime.installPackage(detection.root!, packageManager, '@dryui/feedback');
+	const packagesToInstall: string[] = [];
+	if (needsInstall) packagesToInstall.push('@dryui/feedback');
+	if (needsLucideInstall) packagesToInstall.push('lucide-svelte');
+
+	if (packagesToInstall.length > 0) {
+		const installed = runtime.installPackage(detection.root!, packageManager, packagesToInstall);
 		if (!installed) {
 			notes.push({
 				label: 'Feedback widget',
-				message: `install failed — run \`${packageManager} add @dryui/feedback\` manually`
+				message: `install failed: run \`${packageManager} add ${packagesToInstall.join(' ')}\` manually`
 			});
 			return notes;
+		}
+		if (needsLucideInstall) {
+			notes.push({
+				label: 'Feedback icons',
+				message: 'installed lucide-svelte (peer dependency of @dryui/feedback)'
+			});
 		}
 	}
 
@@ -443,8 +505,8 @@ async function planAndApplyFeedbackSetup(
 		notes.push({
 			label: 'Vite config',
 			message: patched
-				? `added @dryui/feedback to ssr.noExternal in ${viteConfigPath}`
-				: `could not patch ${viteConfigPath} — add @dryui/feedback to ssr.noExternal manually`
+				? `added @dryui/feedback and lucide-svelte to ssr.noExternal in ${viteConfigPath}`
+				: `could not patch ${viteConfigPath}: add @dryui/feedback and lucide-svelte to ssr.noExternal manually`
 		});
 	}
 
@@ -487,13 +549,15 @@ export async function runUserProjectLauncher(
 
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
 
+		const devLogPath = plan.kind === 'spawn' ? projectDevLogPath(detection.root) : null;
 		const [feedbackMessage, devResult] = await Promise.all([
 			runtime.ensureFeedbackServer(detection.root, feedbackClient),
 			executeUserProjectDevServerPlan(runtime, plan, {
 				root: detection.root,
 				packageManager,
 				host: devHost,
-				port: devPort
+				port: devPort,
+				...(devLogPath ? { logPath: devLogPath } : {})
 			})
 		]);
 
@@ -505,7 +569,8 @@ export async function runUserProjectLauncher(
 		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
 
 		const fallbackNote = feedbackWidgetNote(detection);
-		const notes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
+		const baseNotes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
+		const notes: LabelledMessage[] = [...baseNotes, ...(devResult.errorDetails ?? [])];
 
 		emitOrRun(
 			{

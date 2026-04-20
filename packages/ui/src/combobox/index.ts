@@ -11,6 +11,8 @@ export type {
 
 export interface ComboboxInputProps extends Omit<PrimitiveComboboxInputProps, 'size'> {
 	size?: 'sm' | 'md' | 'lg';
+	leading?: Snippet;
+	trailing?: Snippet;
 }
 
 export interface ComboboxGroupProps extends HTMLAttributes<HTMLDivElement> {

@@ -720,9 +720,6 @@ export type { VideoEmbedProps } from './video-embed/index.js';
 export { PhoneInput } from './phone-input/index.js';
 export type { PhoneInputProps } from './phone-input/index.js';
 
-export { CountrySelect } from './country-select/index.js';
-export type { CountrySelectProps } from './country-select/index.js';
-
 export { DateTimeInput } from './date-time-input/index.js';
 export type { DateTimeInputProps } from './date-time-input/index.js';
 

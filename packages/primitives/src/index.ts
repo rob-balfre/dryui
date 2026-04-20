@@ -64,7 +64,7 @@ export {
 } from './color-picker/color-utils.js';
 export { extractColorsFromImage } from './color-picker/extract-colors.js';
 export { COUNTRY_DATA } from './internal/countries.js';
-export type { CountryInfo, CountryRegion } from './internal/countries.js';
+export type { CountryInfo } from './internal/countries.js';
 
 export { Button } from './button/index.js';
 export type { ButtonProps } from './button/index.js';
@@ -864,9 +864,6 @@ export type { ShaderCanvasProps, ShaderCanvasAutoUniforms } from './shader-canva
 
 export { PhoneInput } from './phone-input/index.js';
 export type { PhoneInputProps } from './phone-input/index.js';
-
-export { CountrySelect } from './country-select/index.js';
-export type { CountrySelectProps } from './country-select/index.js';
 
 export { DateTimeInput } from './date-time-input/index.js';
 export type { DateTimeInputProps } from './date-time-input/index.js';

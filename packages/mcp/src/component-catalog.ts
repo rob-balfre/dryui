@@ -176,11 +176,6 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 		category: 'overlay',
 		tags: ['menu', 'right-click', 'context', 'actions']
 	},
-	CountrySelect: {
-		description: 'Country selector dropdown with flags and dial codes',
-		category: 'input',
-		tags: ['form', 'country', 'select', 'region', 'flag', 'dial-code']
-	},
 	DataGrid: {
 		description: 'Enhanced table with sorting, filtering, and pagination',
 		category: 'display',
@@ -947,8 +942,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'InputGroup',
 			'Field',
 			'Fieldset',
-			'Label',
-			'CountrySelect'
+			'Label'
 		]
 	},
 	{

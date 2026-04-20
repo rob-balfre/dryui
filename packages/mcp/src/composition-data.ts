@@ -2468,32 +2468,6 @@ export const componentCompositions: ComponentComposition[] = [
 	},
 
 	{
-		component: 'CountrySelect',
-		useWhen: 'Select a country with flag icons and dial codes',
-		alternatives: [
-			{
-				rank: 1,
-				component: 'CountrySelect',
-				useWhen: 'Country selection with flags',
-				snippet: `<CountrySelect bind:value={country} />`
-			},
-			{
-				rank: 2,
-				component: 'Select',
-				useWhen: 'Simple country dropdown without flags',
-				snippet: `<Select.Root bind:value={country}>
-  <Select.Trigger><Select.Value /></Select.Trigger>
-  <Select.Content>
-    <Select.Item value="US">United States</Select.Item>
-  </Select.Content>
-</Select.Root>`
-			}
-		],
-		antiPatterns: [],
-		combinesWith: ['Field.Root', 'Label', 'PhoneInput']
-	},
-
-	{
 		component: 'DateField',
 		useWhen: 'Compact inline date input with segmented editing',
 		alternatives: [

@@ -73,6 +73,62 @@ const ZED_CONFIG = `{
   }
 }`;
 
+const SVELTE_MCP_NOTE =
+	'Adds list-sections, get-documentation, svelte-autofixer, and playground-link. `dryui setup --install` registers it automatically (pass `--no-svelte-mcp` to skip).';
+
+const SVELTE_SECTION_CLAUDE: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Claude plugin does not bundle this; run it once to register the server for this user.`,
+	code: 'claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp'
+};
+
+const SVELTE_SECTION_CODEX: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Append this block to \`~/.codex/config.toml\`.`,
+	code: `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]`
+};
+
+const SVELTE_SECTION_OPENCODE: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Adds a third entry under the \`mcp\` object in \`opencode.json\`.`,
+	code: `"svelte": {
+  "type": "local",
+  "command": ["npx", "-y", "@sveltejs/mcp"]
+}`
+};
+
+const SVELTE_SECTION_COPILOT: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Adds a sibling entry under \`servers\` in \`.vscode/mcp.json\`.`,
+	code: `"svelte": {
+  "type": "stdio",
+  "command": "npx",
+  "args": ["-y", "@sveltejs/mcp"]
+}`
+};
+
+const SVELTE_SECTION_MCP_SERVERS: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Adds a sibling entry under \`mcpServers\`.`,
+	code: `"svelte": {
+  "command": "npx",
+  "args": ["-y", "@sveltejs/mcp"]
+}`
+};
+
+const SVELTE_SECTION_ZED: SetupGuideSection = {
+	title: 'Svelte MCP (recommended companion)',
+	note: `${SVELTE_MCP_NOTE} Adds a sibling entry under \`context_servers\`.`,
+	code: `"svelte": {
+  "command": {
+    "path": "npx",
+    "args": ["-y", "@sveltejs/mcp"]
+  }
+}`
+};
+
 export const setupGuideIds: readonly SetupGuideId[] = [
 	'claude-code',
 	'codex',
@@ -106,7 +162,8 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				title: 'Optional SessionStart hook',
 				note: 'Inject `dryui ambient` into Claude Code sessions.',
 				code: `dryui install-hook`
-			}
+			},
+			SVELTE_SECTION_CLAUDE
 		],
 		followUp: 'Start a new Claude Code session after wiring the plugin or hook.'
 	},
@@ -129,7 +186,8 @@ codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-
 
 # .codex/config.toml
 ${CODEX_CONFIG}`
-			}
+			},
+			SVELTE_SECTION_CODEX
 		],
 		followUp:
 			'After installing the plugin, start a new Codex session so `ask` / `check` are available.'
@@ -149,7 +207,8 @@ ${CODEX_CONFIG}`
 				title: 'Add the MCP servers',
 				note: 'Put this in `opencode.json` at the project root. OpenCode expects local MCP servers under `mcp` with `type: "local"`.',
 				code: OPENCODE_CONFIG
-			}
+			},
+			SVELTE_SECTION_OPENCODE
 		],
 		followUp:
 			'OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths. Restart OpenCode after wiring `opencode.json`.'
@@ -169,7 +228,8 @@ ${CODEX_CONFIG}`
 				title: 'Add the MCP server',
 				note: 'Copilot uses `servers`, not `mcpServers`, in `.vscode/mcp.json`.',
 				code: COPILOT_CONFIG
-			}
+			},
+			SVELTE_SECTION_COPILOT
 		],
 		followUp: 'MCP tools only work in Copilot Agent mode.'
 	},
@@ -188,7 +248,8 @@ ${CODEX_CONFIG}`
 				title: 'Add the MCP server',
 				note: 'Put this in `.cursor/mcp.json`.',
 				code: MCP_SERVERS_CONFIG
-			}
+			},
+			SVELTE_SECTION_MCP_SERVERS
 		],
 		followUp: 'Cursor loads the skill automatically when DryUI is relevant to the task.'
 	},
@@ -207,9 +268,11 @@ ${CODEX_CONFIG}`
 				title: 'Add the MCP server',
 				note: 'Put this in `~/.codeium/windsurf/mcp_config.json`.',
 				code: MCP_SERVERS_CONFIG
-			}
+			},
+			SVELTE_SECTION_MCP_SERVERS
 		],
-		followUp: 'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 2.'
+		followUp:
+			'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 2 and @sveltejs/mcp adds 4.'
 	},
 	{
 		id: 'zed',
@@ -221,7 +284,8 @@ ${CODEX_CONFIG}`
 				title: 'Add the MCP server',
 				note: 'Put this in `~/.config/zed/settings.json`.',
 				code: ZED_CONFIG
-			}
+			},
+			SVELTE_SECTION_ZED
 		],
 		followUp: 'Verify the DryUI MCP is active in the Agent Panel (Cmd+Shift+A).'
 	}
