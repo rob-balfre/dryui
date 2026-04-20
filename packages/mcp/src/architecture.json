@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.5.1",
   "summary": {
-    "componentNodes": 290,
+    "componentNodes": 291,
     "partNodes": 654,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 144,
-    "uiComponents": 146,
+    "uiComponents": 147,
     "uiWrappers": 130,
-    "uiComposites": 16,
-    "rootBarrelComponents": 290,
+    "uiComposites": 17,
+    "rootBarrelComponents": 291,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
     "composeEdges": 13,
     "docsEdges": 0,
-    "relatedEdges": 299,
-    "mismatches": 290,
+    "relatedEdges": 304,
+    "mismatches": 291,
     "primitivePartComponents": 0,
     "thinWrappers": 64
   },
@@ -15628,6 +15628,32 @@
       "componentImportCount": 0
     },
     {
+      "id": "ui:ThemeToggle",
+      "name": "ThemeToggle",
+      "label": "ThemeToggle",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "action",
+      "description": "Persisted light/dark theme switcher with system-preference fallback",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/theme-toggle/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "theme",
+        "dark-mode",
+        "light-mode",
+        "toggle",
+        "switcher",
+        "preference"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 4,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:TimeInput",
       "name": "TimeInput",
       "label": "TimeInput",
@@ -22980,6 +23006,41 @@
       "label": "combines_with"
     },
     {
+      "id": "related:ui:ThemeToggle:ui:AppFrame:combines_with",
+      "type": "related",
+      "from": "ui:ThemeToggle",
+      "to": "ui:AppFrame",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ThemeToggle:ui:NavigationMenu:combines_with",
+      "type": "related",
+      "from": "ui:ThemeToggle",
+      "to": "ui:NavigationMenu",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ThemeToggle:ui:Sidebar:combines_with",
+      "type": "related",
+      "from": "ui:ThemeToggle",
+      "to": "ui:Sidebar",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ThemeToggle:ui:Toolbar:combines_with",
+      "type": "related",
+      "from": "ui:ThemeToggle",
+      "to": "ui:Toolbar",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ThemeToggle:ui:Tooltip:combines_with",
+      "type": "related",
+      "from": "ui:ThemeToggle",
+      "to": "ui:Tooltip",
+      "label": "combines_with"
+    },
+    {
       "id": "related:ui:TimeInput:ui:Field:combines_with",
       "type": "related",
       "from": "ui:TimeInput",
@@ -25963,6 +26024,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
+      "component": "ThemeToggle",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/theme-toggle/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
       "component": "TimeInput",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/time-input/index.ts"
@@ -26151,7 +26219,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 16\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 17\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

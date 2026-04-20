@@ -636,6 +636,11 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 		category: 'input',
 		tags: ['form', 'text', 'multiline', 'textarea']
 	},
+	ThemeToggle: {
+		description: 'Persisted light/dark theme switcher with system-preference fallback',
+		category: 'action',
+		tags: ['theme', 'dark-mode', 'light-mode', 'toggle', 'switcher', 'preference']
+	},
 	TimeInput: {
 		description: 'Native time input with form control integration',
 		category: 'input',
@@ -952,6 +957,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'ButtonGroup',
 			'Toggle',
 			'ToggleGroup',
+			'ThemeToggle',
 			'Chip',
 			'ChipGroup',
 			'SegmentedControl',

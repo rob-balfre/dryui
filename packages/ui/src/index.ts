@@ -179,6 +179,14 @@ export type { ToggleProps } from './toggle/index.js';
 export { ToggleGroup } from './toggle-group/index.js';
 export type { ToggleGroupRootProps, ToggleGroupItemProps } from './toggle-group/index.js';
 
+export { ThemeToggle, createThemeController, themeFlashScript } from './theme-toggle/index.js';
+export type {
+	ThemeToggleProps,
+	ThemeMode,
+	ThemeController,
+	ThemeControllerOptions
+} from './theme-toggle/index.js';
+
 export { InputGroup } from './input-group/index.js';
 export type {
 	InputGroupRootProps,
