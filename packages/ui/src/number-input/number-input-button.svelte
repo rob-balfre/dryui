@@ -82,6 +82,7 @@
 		font-size: var(--dry-input-font-size);
 		line-height: var(--dry-type-small-leading);
 		font-family: var(--dry-font-sans);
+		font-variant-numeric: tabular-nums;
 		color: var(--dry-input-color);
 		background: var(--dry-input-bg);
 		border: 1px solid var(--dry-input-border);

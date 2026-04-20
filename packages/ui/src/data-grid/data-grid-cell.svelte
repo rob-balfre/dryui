@@ -29,4 +29,9 @@
 		background: inherit;
 		box-shadow: 2px 0 4px -2px rgb(15 23 42 / 0.1);
 	}
+
+	[data-dg-cell][data-type='number'],
+	[data-dg-cell][data-align='end'] {
+		font-variant-numeric: tabular-nums;
+	}
 </style>

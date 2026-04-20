@@ -249,6 +249,7 @@
 		padding-inline: var(--dry-space-4);
 		font-size: var(--dry-text-sm-size, 0.875rem);
 		font-weight: 600;
+		font-variant-numeric: tabular-nums;
 		color: var(--dry-color-text);
 		clip-path: inset(
 			0 calc(100% - var(--dry-slider-progress, 50%)) 0 0 round var(--dry-radius-full)

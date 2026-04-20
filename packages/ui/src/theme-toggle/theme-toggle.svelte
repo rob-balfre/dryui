@@ -113,7 +113,12 @@
 >
 	{#snippet icon()}
 		<span class="icons" data-mode={iconState}>
-			<span class="icon sun" aria-hidden="true">
+			<span
+				class="icon sun"
+				data-dry-icon-reveal
+				data-hidden={iconState === 'dark' || undefined}
+				aria-hidden="true"
+			>
 				{#if sunIcon}
 					{@render sunIcon()}
 				{:else}
@@ -138,7 +143,12 @@
 					</svg>
 				{/if}
 			</span>
-			<span class="icon moon" aria-hidden="true">
+			<span
+				class="icon moon"
+				data-dry-icon-reveal
+				data-hidden={iconState === 'light' || undefined}
+				aria-hidden="true"
+			>
 				{#if moonIcon}
 					{@render moonIcon()}
 				{:else}

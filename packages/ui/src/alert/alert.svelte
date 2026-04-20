@@ -83,6 +83,8 @@
 					var(--dry-alert-padding, var(--dry-space-6))
 			)
 		);
+		--dry-btn-radius: var(--dry-radius-nested);
+		--dry-radius-inner: var(--dry-radius-nested);
 
 		container-type: inline-size;
 		display: grid;

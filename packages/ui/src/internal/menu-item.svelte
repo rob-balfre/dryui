@@ -62,7 +62,20 @@
 		outline: none;
 		color: var(--dry-color-text-strong);
 		min-height: var(--dry-space-11);
-		transition: background var(--dry-duration-fast) var(--dry-ease-default);
+
+		/* `background` reacts to hover; `opacity`/`transform` give the
+		   stagger utility (applied on parent `[data-dry-stagger]`
+		   wrappers in dropdown-menu, context-menu, and menubar) something
+		   to delay on enter. */
+		transition:
+			background var(--dry-duration-fast) var(--dry-ease-default),
+			opacity var(--dry-duration-fast) var(--dry-ease-out),
+			transform var(--dry-duration-fast) var(--dry-ease-out);
+
+		@starting-style {
+			opacity: 0;
+			transform: translateY(4px);
+		}
 	}
 
 	div:hover:not([data-disabled]),

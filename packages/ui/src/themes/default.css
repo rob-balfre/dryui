@@ -91,6 +91,12 @@ samp {
 	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: hsl(233, 18%, 9%);
 
+	/* ─── Image edge ring ────────────────────────────────────────────
+	   Subtle 1px outline for image surfaces (avatars, images, image
+	   skeletons). Prevents image edges from reading as surface
+	   imperfections. Hardcoded rgba — not brand-derivable. */
+	--dry-image-edge: rgba(0, 0, 0, 0.1);
+
 	/* ─── Component: Toggle ─────────────────────────────────────────
 	   Derived from semantic tokens so brand overrides (e.g. a consumer
 	   retheming --dry-color-fill-brand) flow through to toggles too.
@@ -365,6 +371,10 @@ samp {
 	--dry-motion-blur-enter: 16px;
 	--dry-motion-scale-enter: 0.96;
 
+	/* ─── Stagger ─────────────────────────────────────────────────── */
+	--dry-stagger-step: 60ms;
+	--dry-stagger-max: 8; /* cap delay so very long lists don't take forever */
+
 	/* ─── Glass surface ───────────────────────────────────────────── */
 	--dry-glass-blur: 12px;
 	--dry-glass-tint: var(--dry-color-bg-raised);
@@ -499,5 +509,94 @@ samp {
 		--dry-motion-opacity-enter: 1;
 		--dry-motion-blur-enter: 0px;
 		--dry-motion-scale-enter: 1;
+	}
+}
+
+/* Stagger — per-child transition-delay driven by `--dry-index`.
+   Consumers set `--dry-index` on each child (via `style="--dry-index: {i};"`
+   in a Svelte `{#each}`), or rely on the `:nth-child()` fallback below for
+   user-supplied children (e.g. `<slot />` content). The child must have a
+   `transition` declared on its enter properties (opacity/transform) for
+   `transition-delay` to take effect. */
+[data-dry-stagger] > * {
+	--_dry-index: var(--dry-index, 0);
+	--_dry-stagger-delay: calc(
+		min(var(--_dry-index), var(--dry-stagger-max)) * var(--dry-stagger-step)
+	);
+	transition-delay: var(--_dry-stagger-delay);
+	animation-delay: var(--_dry-stagger-delay);
+}
+
+[data-dry-stagger] > *:nth-child(1) {
+	--dry-index: 0;
+}
+[data-dry-stagger] > *:nth-child(2) {
+	--dry-index: 1;
+}
+[data-dry-stagger] > *:nth-child(3) {
+	--dry-index: 2;
+}
+[data-dry-stagger] > *:nth-child(4) {
+	--dry-index: 3;
+}
+[data-dry-stagger] > *:nth-child(5) {
+	--dry-index: 4;
+}
+[data-dry-stagger] > *:nth-child(6) {
+	--dry-index: 5;
+}
+[data-dry-stagger] > *:nth-child(7) {
+	--dry-index: 6;
+}
+[data-dry-stagger] > *:nth-child(8) {
+	--dry-index: 7;
+}
+[data-dry-stagger] > *:nth-child(9) {
+	--dry-index: 8;
+}
+[data-dry-stagger] > *:nth-child(10) {
+	--dry-index: 9;
+}
+[data-dry-stagger] > *:nth-child(11) {
+	--dry-index: 10;
+}
+[data-dry-stagger] > *:nth-child(12) {
+	--dry-index: 11;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-dry-stagger] > * {
+		transition-delay: 0ms;
+		animation-delay: 0ms;
+	}
+}
+
+/* Utility: apply tabular-nums to live/changing numeric displays. Prefer
+   component-scoped CSS; use this class when a number is rendered directly
+   in a template (e.g. inline stats). */
+.dry-tabular-nums {
+	font-variant-numeric: tabular-nums;
+}
+
+/* Icon reveal — opacity/scale/blur, spring */
+[data-dry-icon-reveal] {
+	transition:
+		opacity var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+		transform var(--dry-duration-fast) var(--dry-ease-spring-snappy),
+		filter var(--dry-duration-fast) var(--dry-ease-spring-snappy);
+	transform-origin: center;
+}
+[data-dry-icon-reveal][data-state='hidden'],
+[data-dry-icon-reveal][data-hidden],
+[data-dry-icon-reveal][hidden] {
+	opacity: 0;
+	transform: scale(0.25);
+	filter: blur(4px);
+}
+@media (prefers-reduced-motion: reduce) {
+	[data-dry-icon-reveal] {
+		transition: none;
+		filter: none;
+		transform: none;
 	}
 }

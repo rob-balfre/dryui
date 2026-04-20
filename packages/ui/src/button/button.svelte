@@ -177,6 +177,7 @@
 		text-decoration: none;
 		white-space: nowrap;
 		user-select: none;
+		transform-origin: center;
 		transition:
 			background var(--dry-duration-fast) var(--dry-ease-default),
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
@@ -191,7 +192,7 @@
 		}
 
 		&:active:not([data-disabled]) {
-			transform: translateY(1px);
+			transform: scale(0.98);
 		}
 
 		&[data-disabled] {
@@ -499,7 +500,7 @@
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
-		height: var(--dry-space-8);
+		height: var(--dry-space-10);
 		--_dry-btn-radius: var(--dry-btn-radius, var(--dry-radius-sm));
 		--_dry-btn-font-size: var(
 			--dry-btn-font-size,

@@ -23,6 +23,16 @@
 		...rest
 	}: Props = $props();
 
+	// Publish the item's index as `--dry-index` so
+	// [data-combobox-content][data-dry-stagger] can compute a per-item
+	// `transition-delay`. Done via an attach (rather than inline
+	// `style=`) to satisfy the repo's `no-inline-style` rule.
+	function applyStaggerIndex(node: HTMLDivElement) {
+		$effect(() => {
+			node.style.setProperty('--dry-index', String(index));
+		});
+	}
+
 	const ctx = getComboboxCtx();
 
 	const isSelected = $derived(ctx.value === value);
@@ -68,6 +78,7 @@
 	data-has-icon={hasIcon || undefined}
 	data-value={value}
 	class={className}
+	{@attach applyStaggerIndex}
 	onclick={handleClick}
 	onkeydown={handleKeydown}
 	{...rest}
@@ -97,6 +108,17 @@
 		outline: none;
 		color: var(--dry-color-text-strong);
 		min-height: var(--dry-space-10);
+
+		/* Enter transition so the stagger utility on
+		   [data-combobox-content][data-dry-stagger] can delay it. */
+		transition:
+			opacity var(--dry-duration-fast) var(--dry-ease-out),
+			transform var(--dry-duration-fast) var(--dry-ease-out);
+
+		@starting-style {
+			opacity: 0;
+			transform: translateY(4px);
+		}
 	}
 
 	[data-combobox-item][data-has-icon] {
