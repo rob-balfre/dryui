@@ -2,6 +2,7 @@
 	import { Portal, Toast } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { Check } from 'lucide-svelte';
+	import { onMount } from 'svelte';
 	import {
 		AGENTS,
 		type DispatchTargetsResponse,
@@ -32,7 +33,9 @@
 	}: FeedbackProps = $props();
 
 	const AGENT_STORAGE_KEY = 'dryui-feedback-agent';
-	const DEFAULT_CONFIGURED_AGENTS = AGENTS.filter((entry) => entry !== 'off');
+	const DEFAULT_CONFIGURED_AGENTS = AGENTS.filter(
+		(entry): entry is Exclude<SubmissionAgent, 'off'> => entry !== 'off'
+	);
 
 	function readStoredAgent(): SubmissionAgent {
 		if (typeof localStorage === 'undefined') return 'codex';
@@ -262,14 +265,14 @@
 		if (newScrollY !== scrollY) scrollY = newScrollY;
 	}
 
-	function isInsideScrollViewport(e: PointerEvent): boolean {
+	function isInsideScrollViewport(point: { clientX: number; clientY: number }): boolean {
 		if (!scrollRootEl) return true;
 
 		return (
-			e.clientX >= viewportLeft &&
-			e.clientX <= viewportLeft + viewportWidth &&
-			e.clientY >= viewportTop &&
-			e.clientY <= viewportTop + viewportHeight
+			point.clientX >= viewportLeft &&
+			point.clientX <= viewportLeft + viewportWidth &&
+			point.clientY >= viewportTop &&
+			point.clientY <= viewportTop + viewportHeight
 		);
 	}
 
@@ -364,7 +367,7 @@
 	}
 
 	function resolveWheelTarget(e: WheelEvent): HTMLElement | null {
-		if (scrollRootEl && isInsideScrollViewport(e as PointerEvent)) return scrollRootEl;
+		if (scrollRootEl && isInsideScrollViewport(e)) return scrollRootEl;
 
 		const overlay = e.currentTarget as SVGSVGElement | null;
 		const previousPointerEvents = overlay?.style.pointerEvents ?? '';

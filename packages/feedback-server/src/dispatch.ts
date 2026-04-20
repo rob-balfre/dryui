@@ -1,20 +1,45 @@
-import { spawn } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { which } from 'bun';
+import { spawn, spawnSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
 import { join } from 'node:path';
+import { createProbeCache, hasJsonEntry, type ProbeCache } from './config-probe.js';
 import type { EventBus } from './events.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
-export const DISPATCH_AGENTS: readonly DispatchAgent[] = ['codex', 'claude', 'gemini', 'copilot'];
+export const DISPATCH_AGENTS: readonly DispatchAgent[] = [
+	'claude',
+	'codex',
+	'gemini',
+	'opencode',
+	'copilot',
+	'copilot-vscode',
+	'cursor',
+	'windsurf',
+	'zed'
+] as const;
 
 export type TerminalApp = 'terminal' | 'ghostty';
 export const TERMINAL_APPS: readonly TerminalApp[] = ['terminal', 'ghostty'];
 
-const TERMINAL_CLI: Record<Exclude<DispatchAgent, 'codex'>, readonly string[]> = {
+const TERMINAL_CLI: Record<'claude' | 'gemini' | 'opencode' | 'copilot', readonly string[]> = {
 	claude: ['claude'],
 	gemini: ['gemini'],
+	opencode: ['opencode'],
 	copilot: ['copilot', '-i']
+};
+
+const APP_COMMANDS: Record<'cursor' | 'windsurf' | 'zed', readonly [string, ...string[]]> = {
+	cursor: ['cursor'],
+	windsurf: ['windsurf'],
+	zed: ['zed']
+};
+
+const APP_NAMES: Record<'cursor' | 'windsurf' | 'zed', string> = {
+	cursor: 'Cursor',
+	windsurf: 'Windsurf',
+	zed: 'Zed'
 };
 
 const CODEX_PLUGIN_CHIP = '[@dryui](plugin://dryui@dryui) ';
@@ -23,6 +48,11 @@ export interface DispatcherOptions {
 	workspace: string;
 	defaultAgent: DispatchAgent;
 	terminalApp?: TerminalApp;
+}
+
+export interface DispatchTargetsSnapshot {
+	defaultAgent: DispatchAgent;
+	configuredAgents: DispatchAgent[];
 }
 
 function buildPrompt(s: Submission, target: DispatchAgent): string {
@@ -38,6 +68,203 @@ function osaQuote(s: string): string {
 	return s.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
 }
 
+// PATH contents and installed apps are stable for the lifetime of this process;
+// memoize so repeated /dispatch-targets GETs don't re-walk PATH for 9 agents each.
+const commandExistsCache = new Map<string, boolean>();
+const macAppExistsCache = new Map<string, boolean>();
+const vscodeChatSupportCache = new Map<string, boolean>();
+let vscodeCliCache: VsCodeCliTarget | null | undefined;
+
+type VsCodeUrlScheme = 'vscode' | 'vscode-insiders';
+
+interface VsCodeCliTarget {
+	command: string;
+	urlScheme: VsCodeUrlScheme;
+}
+
+interface VsCodeCliResolverContext {
+	currentPlatform: NodeJS.Platform;
+	homeDir: string;
+	resolveCommand(command: string): string | null;
+	pathExists(path: string): boolean;
+	supportsChat(command: string): boolean;
+}
+
+function commandExists(command: string): boolean {
+	const cached = commandExistsCache.get(command);
+	if (cached !== undefined) return cached;
+	const found = which(command) !== null;
+	commandExistsCache.set(command, found);
+	return found;
+}
+
+function macAppExists(name: string): boolean {
+	const cached = macAppExistsCache.get(name);
+	if (cached !== undefined) return cached;
+	const found =
+		platform() === 'darwin' &&
+		(existsSync(join('/Applications', `${name}.app`)) ||
+			existsSync(join(homedir(), 'Applications', `${name}.app`)));
+	macAppExistsCache.set(name, found);
+	return found;
+}
+
+function supportsVsCodeChat(command: string): boolean {
+	const cached = vscodeChatSupportCache.get(command);
+	if (cached !== undefined) return cached;
+
+	const result = spawnSync(command, ['chat', '--help'], {
+		encoding: 'utf8',
+		stdio: ['ignore', 'pipe', 'pipe'],
+		timeout: 2000,
+		windowsHide: true
+	});
+	const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
+	const supported = result.status === 0 && /\bUsage:\s+\S+\s+chat\b/.test(output);
+	vscodeChatSupportCache.set(command, supported);
+	return supported;
+}
+
+export function resolveVsCodeCliWith(context: VsCodeCliResolverContext): VsCodeCliTarget | null {
+	const candidates: VsCodeCliTarget[] = [];
+	const seen = new Set<string>();
+	const addCandidate = (command: string | null, urlScheme: VsCodeUrlScheme) => {
+		if (!command || seen.has(command)) return;
+		seen.add(command);
+		candidates.push({ command, urlScheme });
+	};
+
+	if (context.currentPlatform === 'darwin') {
+		addCandidate('/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code', 'vscode');
+		addCandidate(
+			join(
+				context.homeDir,
+				'Applications',
+				'Visual Studio Code.app/Contents/Resources/app/bin/code'
+			),
+			'vscode'
+		);
+		addCandidate(
+			'/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code-insiders',
+			'vscode-insiders'
+		);
+		addCandidate(
+			join(
+				context.homeDir,
+				'Applications',
+				'Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code-insiders'
+			),
+			'vscode-insiders'
+		);
+	}
+
+	addCandidate(context.resolveCommand('code'), 'vscode');
+	addCandidate(context.resolveCommand('code-insiders'), 'vscode-insiders');
+
+	for (const candidate of candidates) {
+		if (!context.pathExists(candidate.command)) continue;
+		if (context.supportsChat(candidate.command)) return candidate;
+	}
+
+	return null;
+}
+
+function resolveVsCodeCli(): VsCodeCliTarget | null {
+	if (vscodeCliCache !== undefined) return vscodeCliCache;
+	vscodeCliCache = resolveVsCodeCliWith({
+		currentPlatform: platform(),
+		homeDir: homedir(),
+		resolveCommand: (command) => which(command),
+		pathExists: (path) => existsSync(path),
+		supportsChat: supportsVsCodeChat
+	});
+	return vscodeCliCache;
+}
+
+function resolveVsCodeUrlScheme(): VsCodeUrlScheme {
+	const cli = resolveVsCodeCli();
+	if (cli) return cli.urlScheme;
+	if (!macAppExists('Visual Studio Code') && macAppExists('Visual Studio Code - Insiders')) {
+		return 'vscode-insiders';
+	}
+	return 'vscode';
+}
+
+function isConfiguredAgent(
+	agent: DispatchAgent,
+	options: DispatcherOptions,
+	cache: ProbeCache
+): boolean {
+	switch (agent) {
+		case 'claude':
+			return commandExists('claude');
+		case 'codex':
+			return commandExists('codex') || macAppExists('Codex');
+		case 'gemini':
+			return commandExists('gemini');
+		case 'opencode':
+			return (
+				commandExists('opencode') ||
+				hasJsonEntry(join(options.workspace, 'opencode.json'), 'mcp', 'dryui-feedback', cache) ||
+				hasJsonEntry(join(options.workspace, 'opencode.json'), 'mcp', 'dryui', cache)
+			);
+		case 'copilot':
+			return (
+				commandExists('copilot') ||
+				hasJsonEntry(
+					join(homedir(), '.copilot', 'mcp-config.json'),
+					'mcpServers',
+					'dryui-feedback',
+					cache
+				)
+			);
+		case 'copilot-vscode': {
+			const vscodeConfig = join(options.workspace, '.vscode', 'mcp.json');
+			return (
+				resolveVsCodeCli() !== null ||
+				macAppExists('Visual Studio Code') ||
+				macAppExists('Visual Studio Code - Insiders') ||
+				hasJsonEntry(vscodeConfig, 'servers', 'dryui-feedback', cache) ||
+				hasJsonEntry(vscodeConfig, 'servers', 'dryui', cache)
+			);
+		}
+		case 'cursor':
+			return (
+				commandExists('cursor') ||
+				macAppExists('Cursor') ||
+				hasJsonEntry(join(options.workspace, '.cursor', 'mcp.json'), 'mcpServers', 'dryui', cache)
+			);
+		case 'windsurf': {
+			const windsurfConfig = join(homedir(), '.codeium', 'windsurf', 'mcp_config.json');
+			return (
+				commandExists('windsurf') ||
+				macAppExists('Windsurf') ||
+				hasJsonEntry(windsurfConfig, 'mcpServers', 'dryui-feedback', cache) ||
+				hasJsonEntry(windsurfConfig, 'mcpServers', 'dryui', cache)
+			);
+		}
+		case 'zed':
+			return (
+				commandExists('zed') ||
+				macAppExists('Zed') ||
+				hasJsonEntry(
+					join(homedir(), '.config', 'zed', 'settings.json'),
+					'context_servers',
+					'dryui',
+					cache
+				)
+			);
+	}
+}
+
+export function getDispatchTargetsSnapshot(options: DispatcherOptions): DispatchTargetsSnapshot {
+	const cache = createProbeCache();
+	return {
+		defaultAgent: options.defaultAgent,
+		configuredAgents: DISPATCH_AGENTS.filter((agent) => isConfiguredAgent(agent, options, cache))
+	};
+}
+
 function resolveAgent(submission: Submission, defaultAgent: DispatchAgent): SubmissionAgent {
 	const choice = submission.agent;
 	if (choice === 'off' || (choice && DISPATCH_AGENTS.includes(choice))) return choice;
@@ -46,8 +273,6 @@ function resolveAgent(submission: Submission, defaultAgent: DispatchAgent): Subm
 
 function buildOsaArgs(terminalApp: TerminalApp, cliCommand: string, workspace: string): string[] {
 	if (terminalApp === 'ghostty') {
-		// Ghostty 1.3+ AppleScript. `command` is wrapped in `/bin/sh -c` by Ghostty
-		// when it has arguments, so shell-quoted args inside cliCommand work as expected.
 		return [
 			'-e',
 			'tell application "Ghostty"',
@@ -67,9 +292,49 @@ function buildOsaArgs(terminalApp: TerminalApp, cliCommand: string, workspace: s
 	return ['-e', `tell application "Terminal" to do script "${osaQuote(wrapped)}"`];
 }
 
-// Track which `~/.copilot/mcp-config.json` warnings we've already printed so
-// repeated dispatches don't spam the same stderr hint on every submission.
-const copilotConfigWarnings = new Set<string>();
+function buildCliInvocation(
+	target: keyof typeof TERMINAL_CLI,
+	prompt: string,
+	workspace: string
+): string {
+	if (target === 'opencode') {
+		return `${shellQuote('opencode')} ${shellQuote(workspace)} --prompt ${shellQuote(prompt)}`;
+	}
+
+	const cli = TERMINAL_CLI[target];
+	const cliArgs = cli.map((entry) => shellQuote(entry)).join(' ');
+	return `${cliArgs} ${shellQuote(prompt)}`;
+}
+
+export function buildVsCodeChatArgs(prompt: string): string[] {
+	return ['chat', '--mode', 'agent', prompt];
+}
+
+function spawnDetached(command: string, args: readonly string[], cwd?: string): void {
+	spawn(command, args, { stdio: 'ignore', detached: true, cwd }).unref();
+}
+
+function copyPromptToClipboard(prompt: string): void {
+	const tool = platform() === 'win32' ? 'clip.exe' : 'pbcopy';
+	const child = spawn(tool, [], { stdio: ['pipe', 'ignore', 'ignore'] });
+	child.stdin.end(prompt);
+}
+
+function openWorkspaceApp(target: keyof typeof APP_COMMANDS, workspace: string): void {
+	if (platform() === 'win32') {
+		const command = APP_COMMANDS[target][0];
+		spawnDetached('cmd.exe', ['/c', 'start', '', command, workspace]);
+		return;
+	}
+
+	// sh -c is intentional: spawn('open', [...]) drops the prompt when fired from
+	// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
+	spawnDetached('sh', ['-c', `open -a ${shellQuote(APP_NAMES[target])} ${shellQuote(workspace)}`]);
+}
+
+// Track which config warnings we've already printed so repeated dispatches
+// don't spam the same stderr hint on every submission.
+const dispatchConfigWarnings = new Set<string>();
 
 const COPILOT_CONFIG_SNIPPET = `{
   "mcpServers": {
@@ -81,17 +346,30 @@ const COPILOT_CONFIG_SNIPPET = `{
   }
 }`;
 
+const COPILOT_VSCODE_CONFIG_SNIPPET = `{
+  "servers": {
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "sh",
+      "args": ["-c", "cd \\"\${TMPDIR:-/tmp}\\" && exec npx -y -p @dryui/feedback-server dryui-feedback-mcp"]
+    }
+  }
+}`;
+
 function warnOnce(key: string, message: string): void {
-	if (copilotConfigWarnings.has(key)) return;
-	copilotConfigWarnings.add(key);
+	if (dispatchConfigWarnings.has(key)) return;
+	dispatchConfigWarnings.add(key);
 	console.error(message);
 }
 
-// Fast, best-effort check for `dryui-feedback` in ~/.copilot/mcp-config.json.
-// Missing file or malformed JSON is not fatal; we warn and let the launch proceed
-// (Copilot will still receive the prompt, just without native MCP tools).
-function checkCopilotMcpConfig(): void {
-	const path = join(homedir(), '.copilot', 'mcp-config.json');
+interface DispatchConfigCheck {
+	path: string;
+	rootKey: 'mcpServers' | 'servers';
+	readerLabel: string;
+	snippet: string;
+}
+
+function checkDispatchConfig({ path, rootKey, readerLabel, snippet }: DispatchConfigCheck): void {
 	let raw: string;
 	try {
 		raw = readFileSync(path, 'utf8');
@@ -102,10 +380,10 @@ function checkCopilotMcpConfig(): void {
 				`missing:${path}`,
 				[
 					`[dispatch] warning: ${path} not found.`,
-					`[dispatch] Copilot CLI reads MCP servers from this file. Without it, the dispatched prompt`,
-					`[dispatch] will run but the \`dryui-feedback\` MCP tools will not be available to Copilot.`,
+					`[dispatch] ${readerLabel} reads MCP servers from this file. Without it, the dispatched prompt`,
+					`[dispatch] will run but the \`dryui-feedback\` MCP tools will not be available.`,
 					`[dispatch] To enable them, create the file with:`,
-					...COPILOT_CONFIG_SNIPPET.split('\n').map((line) => `[dispatch]   ${line}`),
+					...snippet.split('\n').map((line) => `[dispatch]   ${line}`),
 					`[dispatch] Proceeding with launch anyway.`
 				].join('\n')
 			);
@@ -128,29 +406,47 @@ function checkCopilotMcpConfig(): void {
 		);
 		return;
 	}
-	const servers = (parsed as { mcpServers?: Record<string, unknown> } | null)?.mcpServers;
+	const servers = (
+		parsed as { mcpServers?: Record<string, unknown>; servers?: Record<string, unknown> } | null
+	)?.[rootKey];
 	if (!servers || typeof servers !== 'object' || !('dryui-feedback' in servers)) {
 		warnOnce(
 			`missing-entry:${path}`,
 			[
-				`[dispatch] warning: ${path} has no \`dryui-feedback\` entry under \`mcpServers\`.`,
-				`[dispatch] Add this block so Copilot CLI can reach the feedback MCP:`,
-				...COPILOT_CONFIG_SNIPPET.split('\n').map((line) => `[dispatch]   ${line}`),
+				`[dispatch] warning: ${path} has no \`dryui-feedback\` entry under \`${rootKey}\`.`,
+				`[dispatch] Add this block so ${readerLabel} can reach the feedback MCP:`,
+				...snippet.split('\n').map((line) => `[dispatch]   ${line}`),
 				`[dispatch] Proceeding with launch anyway.`
 			].join('\n')
 		);
 	}
 }
 
-function openCodexUrl(url: string): void {
+function checkCopilotCliMcpConfig(): void {
+	checkDispatchConfig({
+		path: join(homedir(), '.copilot', 'mcp-config.json'),
+		rootKey: 'mcpServers',
+		readerLabel: 'Copilot CLI',
+		snippet: COPILOT_CONFIG_SNIPPET
+	});
+}
+
+function checkCopilotVsCodeMcpConfig(workspace: string): void {
+	checkDispatchConfig({
+		path: join(workspace, '.vscode', 'mcp.json'),
+		rootKey: 'servers',
+		readerLabel: 'VS Code Copilot',
+		snippet: COPILOT_VSCODE_CONFIG_SNIPPET
+	});
+}
+
+function openExternalUrl(url: string): void {
 	if (platform() === 'win32') {
 		// `start "" "<url>"` — empty title arg is required when the target is quoted.
-		spawn('cmd.exe', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref();
+		spawnDetached('cmd.exe', ['/c', 'start', '', url]);
 		return;
 	}
-	// sh -c is intentional: spawn('open', [url]) drops the prompt when fired from
-	// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
-	spawn('sh', ['-c', `open ${shellQuote(url)}`], { stdio: 'ignore', detached: true }).unref();
+	spawnDetached('sh', ['-c', `open ${shellQuote(url)}`]);
 }
 
 function dispatch(submission: Submission, options: DispatcherOptions): void {
@@ -159,39 +455,62 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		console.error(`[dispatch] skip (off) ${submission.id}`);
 		return;
 	}
+
 	const prompt = buildPrompt(submission, target);
 	console.error(`[dispatch] → ${target} (${submission.id})`);
+
 	if (target === 'codex') {
 		const url = `codex://new?prompt=${encodeURIComponent(prompt)}&path=${encodeURIComponent(options.workspace)}`;
-		openCodexUrl(url);
+		openExternalUrl(url);
 		return;
 	}
-	const cli = TERMINAL_CLI[target];
+
+	if (target === 'copilot-vscode') {
+		checkCopilotVsCodeMcpConfig(options.workspace);
+		const vscodeCli = resolveVsCodeCli();
+		if (vscodeCli) {
+			console.error(`[dispatch] launching ${vscodeCli.command} chat for ${target}`);
+			spawnDetached(vscodeCli.command, buildVsCodeChatArgs(prompt), options.workspace);
+			return;
+		}
+		copyPromptToClipboard(prompt);
+		console.error(`[dispatch] copied prompt to clipboard for ${target} (deeplink fallback)`);
+		openExternalUrl(`${resolveVsCodeUrlScheme()}://GitHub.Copilot-Chat/chat?mode=agent`);
+		return;
+	}
+
+	if (target === 'cursor' || target === 'windsurf' || target === 'zed') {
+		copyPromptToClipboard(prompt);
+		console.error(`[dispatch] copied prompt to clipboard for ${target}`);
+		openWorkspaceApp(target, options.workspace);
+		return;
+	}
+
 	if (target === 'copilot') {
-		// Copilot CLI only loads MCP servers from ~/.copilot/mcp-config.json.
-		// Warn if it's missing or incomplete so the user knows why native tools are absent.
-		checkCopilotMcpConfig();
+		checkCopilotCliMcpConfig();
 	}
+
 	if (platform() === 'win32') {
-		spawn('wt.exe', ['-d', options.workspace, '--', ...cli, prompt], {
-			stdio: 'ignore',
-			detached: true
-		}).unref();
+		const wtArgs =
+			target === 'opencode'
+				? ['-d', options.workspace, '--', 'opencode', options.workspace, '--prompt', prompt]
+				: ['-d', options.workspace, '--', ...TERMINAL_CLI[target], prompt];
+		spawnDetached('wt.exe', wtArgs);
 		return;
 	}
-	const cliArgs = cli.map((a) => shellQuote(a)).join(' ');
-	const cliCommand = `${cliArgs} ${shellQuote(prompt)}`;
+
+	const cliCommand = buildCliInvocation(target, prompt, options.workspace);
 	const args = buildOsaArgs(options.terminalApp ?? 'terminal', cliCommand, options.workspace);
-	spawn('osascript', args, { stdio: 'ignore', detached: true }).unref();
+	spawnDetached('osascript', args);
 }
 
 export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () => void {
-	const p = platform();
-	if (p !== 'darwin' && p !== 'win32') {
-		console.error(`[dispatch] unsupported platform ${p}; dispatch disabled`);
+	const currentPlatform = platform();
+	if (currentPlatform !== 'darwin' && currentPlatform !== 'win32') {
+		console.error(`[dispatch] unsupported platform ${currentPlatform}; dispatch disabled`);
 		return () => {};
 	}
-	const terminalLabel = p === 'win32' ? 'wt' : (options.terminalApp ?? 'terminal');
+	const terminalLabel = currentPlatform === 'win32' ? 'wt' : (options.terminalApp ?? 'terminal');
 	console.error(
 		`[dispatch] enabled (default=${options.defaultAgent}, workspace=${options.workspace}, terminal=${terminalLabel})`
 	);

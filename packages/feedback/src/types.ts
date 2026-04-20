@@ -35,8 +35,24 @@ export type Drawing = Stroke | Arrow | TextLabel;
 
 export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
-export const AGENTS = ['codex', 'claude', 'gemini', 'copilot', 'off'] as const;
+export const AGENTS = [
+	'claude',
+	'codex',
+	'gemini',
+	'opencode',
+	'copilot',
+	'copilot-vscode',
+	'cursor',
+	'windsurf',
+	'zed',
+	'off'
+] as const;
 export type SubmissionAgent = (typeof AGENTS)[number];
+
+export interface DispatchTargetsResponse {
+	defaultAgent: Exclude<SubmissionAgent, 'off'>;
+	configuredAgents: Array<Exclude<SubmissionAgent, 'off'>>;
+}
 
 export interface FeedbackProps {
 	color?: string;
