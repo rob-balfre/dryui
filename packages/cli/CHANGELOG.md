@@ -1,5 +1,13 @@
 # @dryui/cli
 
+## 0.13.2
+
+### Patch Changes
+
+- Updated dependencies [[`ddfdd05`](https://github.com/rob-balfre/dryui/commit/ddfdd051b32d0a2b312cd3b049e067c18ac8f188), [`ddfdd05`](https://github.com/rob-balfre/dryui/commit/ddfdd051b32d0a2b312cd3b049e067c18ac8f188)]:
+  - @dryui/feedback-server@0.6.0
+  - @dryui/mcp@2.2.3
+
 ## 0.13.1
 
 ### Patch Changes
