@@ -1,5 +1,16 @@
 # @dryui/ui
 
+## 1.7.2
+
+### Patch Changes
+
+- [`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Stretch interactive `List.Item` content to fill the row width. The item renders its contents inside a `<Button>`, whose grid used `justify-content: center; place-items: center`, shrinking the icon-and-text surface to its intrinsic width and centering it inside the row. Interactive list items now set `--dry-btn-justify: stretch` and `--dry-btn-align: stretch` so the surface fills the row and the icon sits at the start, matching non-interactive items and subheaders.
+
+- [`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Floor `--dry-radius-nested` at `--dry-radius-sm` instead of `0px` so buttons inside Card, Alert, Dialog, Toast, DropdownMenu, and Popover never collapse to a square radius. With the default token pair (e.g. card radius `16px`, padding `32px`), the concentric-radius math `R − P` goes negative and previously clamped to `0`, making every nested `<Button>` square. The new floor preserves the concentric effect when `R > P` and falls back to the theme's `sm` radius otherwise.
+
+- Updated dependencies []:
+  - @dryui/primitives@1.7.2
+
 ## 1.7.1
 
 ### Patch Changes

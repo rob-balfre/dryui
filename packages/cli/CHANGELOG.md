@@ -1,5 +1,24 @@
 # @dryui/cli
 
+## 0.14.0
+
+### Minor Changes
+
+- [`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui setup --editor copilot --install` now writes `.mcp.json` at the project root (with the `mcpServers` key) instead of `.vscode/mcp.json` (with the `servers` key). GitHub Copilot CLI 1.x removed `.vscode/mcp.json` support and moved workspace MCP config to `.mcp.json` (same shape as Claude Code's `.mcp.json`), so the old installer silently stopped wiring Copilot CLI. The installer also now registers `dryui-feedback` alongside `dryui`, which had been missing from the Copilot target entirely.
+
+  The agent status probe was updated to check, in order: project `.mcp.json`, `~/.copilot/mcp-config.json` (Copilot CLI user config), and legacy `.vscode/mcp.json`. Existing VS Code Copilot extension users with `.vscode/mcp.json` continue to be detected. The Copilot setup guide text now reflects the new location.
+
+- [`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Gemini CLI is now auto-installable via `dryui setup --editor gemini --install` — it merges both `dryui` and `dryui-feedback` MCP servers into `~/.gemini/settings.json`, preserving other keys. Previously `setup` only printed manual instructions for Gemini, so users who went the manual route before the extension existed often ended up with only `dryui` registered and silent feedback failures when the browser feedback flow tried to call `feedback_get_submissions`.
+
+  The agent status probe now also:
+  - detects a Gemini extension installed via `gemini extensions install <path>` by scanning `~/.gemini/extensions/*/gemini-extension.json` for `name: "dryui"` (reports `source: 'plugin'` or `'mixed'` instead of `'none'`);
+  - tracks whether `dryui-feedback` is wired alongside `dryui` for every editor, surfaces it as a new `feedback` column in the Agents table and a `(no feedback)` tag in the text summary when the feedback server is missing.
+
+### Patch Changes
+
+- Updated dependencies [[`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394)]:
+  - @dryui/feedback-server@0.6.2
+
 ## 0.13.3
 
 ### Patch Changes
