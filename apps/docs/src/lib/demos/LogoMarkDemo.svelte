@@ -39,13 +39,8 @@
 			size="lg"
 		/>
 		<LogoMark fallback="MJ" alt="Maria Jensen" size="lg" color="brand" shape="circle" />
-		<LogoMark
-			src="https://broken.example/missing.png"
-			alt="Fallback when image fails"
-			fallback="FB"
-			size="lg"
-		/>
-		<Text size="sm" color="secondary">Image with fallback on error</Text>
+		<LogoMark fallback="FB" alt="Fallback initials" size="lg" />
+		<Text size="sm" color="secondary">Image and text fallbacks</Text>
 	</div>
 </DocsDemo>
 

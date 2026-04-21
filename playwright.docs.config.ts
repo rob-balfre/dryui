@@ -23,6 +23,8 @@ export default defineConfig({
 	outputDir: './tests/playwright/test-results',
 	use: {
 		baseURL,
+		browserName: 'chromium',
+		headless: true,
 		viewport: { width: 1440, height: 1200 },
 		deviceScaleFactor: 1,
 		colorScheme: 'light',
