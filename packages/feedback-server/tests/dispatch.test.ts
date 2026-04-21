@@ -6,6 +6,22 @@ import {
 	resolveWindsurfCliWith,
 	resolveVsCodeCliWith
 } from '../src/dispatch.ts';
+import { buildFeedbackDispatchPrompt } from '../src/prompts.ts';
+
+describe('feedback prompts', () => {
+	test('dispatch prompt asks agents to lint before resolving', () => {
+		const prompt = buildFeedbackDispatchPrompt({
+			id: 'sub-123',
+			url: 'https://example.com/page'
+		});
+
+		expect(prompt).toContain('run the relevant project linter/check command');
+		expect(prompt).toContain('fix any violations');
+		expect(prompt.indexOf('run the relevant project linter/check command')).toBeLessThan(
+			prompt.indexOf('then resolve with feedback_resolve_submission')
+		);
+	});
+});
 
 describe('VS Code dispatch resolution', () => {
 	test('prefers the macOS VS Code app CLI over a non-VS Code code binary on PATH', () => {

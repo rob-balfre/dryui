@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createDismiss, createMenuNavigation } from '@dryui/primitives';
+	import {
+		createDismiss,
+		createMenuNavigation,
+		tryShowPopover,
+		tryHidePopover
+	} from '@dryui/primitives';
 	import { getContextMenuCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -34,12 +39,11 @@
 			node.style.position = 'fixed';
 			node.style.left = `${ctx.position.x}px`;
 			node.style.top = `${ctx.position.y}px`;
-			if (!node.matches(':popover-open')) {
-				node.showPopover();
-				menu.focusFirst();
-			}
-		} else if (node.matches(':popover-open')) {
-			node.hidePopover();
+			const wasOpen = node.matches(':popover-open');
+			tryShowPopover(node);
+			if (!wasOpen) menu.focusFirst();
+		} else {
+			tryHidePopover(node);
 		}
 	}
 

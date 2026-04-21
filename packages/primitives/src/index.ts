@@ -5,6 +5,7 @@ export { mergeIds } from './utils/merge-ids.js';
 export { createAnchorPosition } from './utils/anchor-position.svelte.js';
 export type { AnchorPositionOptions, Placement } from './utils/anchor-position.svelte.js';
 export { createPositionedPopover } from './utils/positioned-popover.svelte.js';
+export { tryShowPopover, tryHidePopover } from './utils/popover-toggle.js';
 export { createFocusTrap } from './utils/focus-trap.svelte.js';
 export { createDismiss, isInsideDismissRegion } from './utils/dismiss.svelte.js';
 export type { DismissOptions } from './utils/dismiss.svelte.js';

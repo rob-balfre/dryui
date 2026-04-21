@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { tryShowPopover, tryHidePopover } from '../utils/popover-toggle.js';
 	import { toastStore } from './toast-store.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -20,20 +21,8 @@
 
 	$effect(() => {
 		if (!popoverEl) return;
-
-		if (toastStore.toasts.length > 0) {
-			try {
-				popoverEl.showPopover();
-			} catch {
-				// Already showing
-			}
-		} else {
-			try {
-				popoverEl.hidePopover();
-			} catch {
-				// Already hidden
-			}
-		}
+		if (toastStore.toasts.length > 0) tryShowPopover(popoverEl);
+		else tryHidePopover(popoverEl);
 	});
 </script>
 

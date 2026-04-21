@@ -8,10 +8,10 @@
 
 	type HostKind = 'command-palette' | 'popover';
 
-	let { kind }: { kind: HostKind } = $props();
+	let { kind, serverUrl }: { kind: HostKind; serverUrl?: string } = $props();
 </script>
 
-<Feedback />
+<Feedback {serverUrl} />
 
 {#if kind === 'command-palette'}
 	<CommandPalette.Root open={true}>

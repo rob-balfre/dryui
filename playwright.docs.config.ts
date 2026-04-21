@@ -4,8 +4,9 @@ const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:4173';
 const webServer = process.env.PLAYWRIGHT_BASE_URL
 	? undefined
 	: {
-			command: 'bunx --bun vite dev --host 127.0.0.1 --port 4173',
+			command: 'bun --bun vite dev --host 127.0.0.1 --port 4173',
 			cwd: './apps/docs',
+			env: { ...process.env, PUBLIC_MAPBOX_TOKEN: '' },
 			url: baseURL,
 			reuseExistingServer: true,
 			timeout: 120_000
@@ -14,10 +15,9 @@ const webServer = process.env.PLAYWRIGHT_BASE_URL
 export default defineConfig({
 	testDir: './tests/playwright',
 	testMatch: /.*visual\.spec\.ts$/,
-	fullyParallel: false,
+	fullyParallel: true,
 	forbidOnly: true,
 	retries: 0,
-	workers: 1,
 	timeout: 120_000,
 	snapshotDir: './tests/playwright/snapshots',
 	outputDir: './tests/playwright/test-results',

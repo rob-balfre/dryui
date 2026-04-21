@@ -591,13 +591,13 @@ function splitTrackValues(value: string): string[] {
 	return tracks;
 }
 
-function checkCustomFlexLayout(styles: string, code: string): Issue[] {
+function checkCustomFlexLayout(styles: string, ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	if (/display:\s*(?:inline-)?flex/.test(styles)) {
 		// Suppress for complex layout contexts where "use grid" is not helpful
 		if (isComplexLayoutContext(styles)) return issues;
 
-		const startLine = getStyleBlockStartLine(code);
+		const startLine = getStyleBlockStartLine(ctx);
 		const localLine = findLineInBlock(styles, /display:\s*(?:inline-)?flex/);
 		issues.push({
 			severity: 'error',
@@ -656,10 +656,10 @@ function checkRawStyledButton(ctx: ReviewContext): Issue[] {
 	return issues;
 }
 
-function checkCustomMaxWidthCentering(styles: string, code: string): Issue[] {
+function checkCustomMaxWidthCentering(styles: string, ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	if (/max-width/.test(styles) && /margin[^;]*auto/.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
+		const startLine = getStyleBlockStartLine(ctx);
 		const localLine = findLineInBlock(styles, /max-width/);
 		issues.push({
 			severity: 'error',
@@ -706,10 +706,10 @@ function checkInteractiveCardWrapper(ctx: ReviewContext, styles: string): Issue[
 	return issues;
 }
 
-function getStyleBlockStartLine(code: string): number {
+function getStyleBlockStartLine(ctx: ReviewContext): number {
+	const { code, lineOffsets } = ctx;
 	const idx = code.search(/<style[^>]*>/);
 	if (idx === -1) return 1;
-	const lineOffsets = buildLineOffsets(code);
 	// The content starts after the <style> tag itself.
 	const tagEndIdx = code.indexOf('>', idx) + 1;
 	return lineAtOffset(lineOffsets, tagEndIdx);
@@ -728,11 +728,11 @@ function findLineInBlock(block: string, regex: RegExp): number {
 	return 1;
 }
 
-function checkHardcodedColors(styles: string, code: string): Issue[] {
+function checkHardcodedColors(styles: string, ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	const colorRegex = /(?:^|;)\s*(?:color|background(?:-color)?)\s*:\s*(?!.*var\s*\()/m;
 	if (colorRegex.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
+		const startLine = getStyleBlockStartLine(ctx);
 		const localLine = findLineInBlock(
 			styles,
 			/(?:color|background(?:-color)?)\s*:\s*(?!.*var\s*\()/
@@ -748,10 +748,10 @@ function checkHardcodedColors(styles: string, code: string): Issue[] {
 	return issues;
 }
 
-function checkManualCentering(styles: string, code: string): Issue[] {
+function checkManualCentering(styles: string, ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	if (/max-width/.test(styles) && /margin:\s*[^;]*auto/.test(styles)) {
-		const startLine = getStyleBlockStartLine(code);
+		const startLine = getStyleBlockStartLine(ctx);
 		const localLine = findLineInBlock(styles, /max-width/);
 		issues.push({
 			severity: 'suggestion',
@@ -764,13 +764,13 @@ function checkManualCentering(styles: string, code: string): Issue[] {
 	return issues;
 }
 
-function checkCustomThemeOverrides(styles: string, code: string): Issue[] {
+function checkCustomThemeOverrides(styles: string, ctx: ReviewContext): Issue[] {
 	if (!styles || !/--dry-/.test(styles)) return [];
 	return [
 		{
 			severity: 'suggestion',
 			code: 'theme-in-style',
-			line: getStyleBlockStartLine(code),
+			line: getStyleBlockStartLine(ctx),
 			message: ruleMessage('theme-in-style'),
 			fix: null
 		}
@@ -800,10 +800,11 @@ export function reviewComponent(
 	spec: { components: Record<string, ComponentDef> },
 	filename?: string
 ): ReviewResult {
+	const template = stripScriptAndStyle(code);
 	const ctx: ReviewContext = {
 		code,
-		template: stripScriptAndStyle(code),
-		lineOffsets: buildLineOffsets(code)
+		template,
+		lineOffsets: buildLineOffsets(template)
 	};
 	const imports = extractImports(code);
 	const tags = extractTags(ctx);
@@ -822,15 +823,15 @@ export function reviewComponent(
 	issues.push(...checkCustomFieldMarkup(ctx));
 	issues.push(...checkRawStyledButton(ctx));
 	if (styles) {
-		issues.push(...checkCustomFlexLayout(styles, code));
-		issues.push(...checkCustomMaxWidthCentering(styles, code));
+		issues.push(...checkCustomFlexLayout(styles, ctx));
+		issues.push(...checkCustomMaxWidthCentering(styles, ctx));
 		issues.push(...checkInteractiveCardWrapper(ctx, styles));
 	}
 
 	if (styles) {
-		issues.push(...checkHardcodedColors(styles, code));
-		issues.push(...checkManualCentering(styles, code));
-		issues.push(...checkCustomThemeOverrides(styles, code));
+		issues.push(...checkHardcodedColors(styles, ctx));
+		issues.push(...checkManualCentering(styles, ctx));
+		issues.push(...checkCustomThemeOverrides(styles, ctx));
 	}
 	issues.push(...checkRawHr(ctx));
 

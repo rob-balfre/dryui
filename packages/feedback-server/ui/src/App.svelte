@@ -30,6 +30,7 @@
 		RefreshCw
 	} from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
+	import { FEEDBACK_LINTER_PROMPT_STEP } from '../../src/prompts.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
 	import AgentIcon from './agent-icon.svelte';
 	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
@@ -369,7 +370,8 @@ Use the dryui-feedback MCP server:
 2. Read the screenshot at screenshotPath.png (fallback to screenshotPath.webp) to see what the user annotated
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-5. Call feedback_resolve_submission with id "${selectedSubmission.id}" once resolved${notes}`;
+5. ${FEEDBACK_LINTER_PROMPT_STEP}
+6. Call feedback_resolve_submission with id "${selectedSubmission.id}" once resolved${notes}`;
 		}
 		return `Work on pending DryUI feedback submissions.
 
@@ -378,7 +380,8 @@ Use the dryui-feedback MCP server:
 2. For each submission, read the screenshot at screenshotPath.png (fallback to screenshotPath.webp)
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-5. Call feedback_resolve_submission with the submission id after each fix is complete`;
+5. ${FEEDBACK_LINTER_PROMPT_STEP}
+6. Call feedback_resolve_submission with the submission id after each fix is complete`;
 	});
 
 	onMount(() => {

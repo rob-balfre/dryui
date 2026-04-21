@@ -3,7 +3,7 @@ lockfile = "bun.lock"
 
 [test]
 # Browser tests run under vitest (tests/browser/**/*.browser.test.ts, see
-# vitest.config.ts) and playwright specs run under `bunx playwright test`
+# vitest.config.ts) and playwright specs run under `bun --bun playwright test`
 # (see playwright.docs.config.ts). Exclude them from bun's test discovery
 # so `bun test` at the repo root only picks up unit-runnable suites.
 pathIgnorePatterns = ["tests/browser", "tests/playwright"]
