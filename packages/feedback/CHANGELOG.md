@@ -1,5 +1,17 @@
 # @dryui/feedback
 
+## 0.4.4
+
+### Patch Changes
+
+- [`9921ae4`](https://github.com/rob-balfre/dryui/commit/9921ae4df796a6b18980f99c5d2429b038a343c1) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Extract `tryShowPopover`/`tryHidePopover` into `@dryui/primitives` so toast providers, context menus, and the feedback toast layer share one guarded popover-toggle helper instead of repeating inline try/catch + `:popover-open` checks.
+
+- [`9921ae4`](https://github.com/rob-balfre/dryui/commit/9921ae4df796a6b18980f99c5d2429b038a343c1) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Promote feedback success and error toasts through a feedback-owned native popover layer so they render above modal hosts.
+
+- Updated dependencies [[`9921ae4`](https://github.com/rob-balfre/dryui/commit/9921ae4df796a6b18980f99c5d2429b038a343c1)]:
+  - @dryui/primitives@1.7.3
+  - @dryui/ui@1.7.3
+
 ## 0.4.3
 
 ### Patch Changes

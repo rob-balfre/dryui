@@ -3,7 +3,7 @@
   "version": 1,
   "package": {
     "name": "@dryui/ui",
-    "version": "1.7.2"
+    "version": "1.7.3"
   },
   "counts": {
     "components": 160,
