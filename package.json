@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "postinstall": "bun run ./scripts/sync-skills.ts",
+    "postinstall": "bun run ./scripts/install-hooks.ts && bun run ./scripts/sync-skills.ts",
+    "setup:hooks": "bun run ./scripts/install-hooks.ts",
     "sync:skills": "bun run ./scripts/sync-skills.ts",
     "docs:dev": "bun run --cwd apps/docs dev",
     "docs:build": "bun run --cwd apps/docs build",
@@ -45,7 +46,9 @@
     "publish:packages": "bun scripts/publish-packages.ts",
     "release:ci": "bun run scripts/release-ci.ts",
     "release:gate": "bun run validate --no-test",
-    "release": "bun run release:gate && bun run version && bun run publish:packages"
+    "release": "bun run release:gate && bun run version && bun run publish:packages",
+    "vm": "bun run ./scripts/vm.ts",
+    "vm:test": "smolvm machine run --net --image oven/bun:alpine -- sh -c 'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",

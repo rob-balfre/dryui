@@ -8,6 +8,8 @@ cd dryui
 bun install
 ```
 
+`bun install` wires `core.hooksPath` to [`.githooks/`](./.githooks/) via a postinstall step, so every clone inherits the shared pre-commit (spec/contract regen + prettier check) and pre-push (changeset gate) hooks. Re-run with `bun run setup:hooks` if you ever unset it.
+
 ## Optional Docs Setup
 
 The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a placeholder. Copy `apps/docs/.env.example` to `apps/docs/.env` only if you want the live Mapbox demo locally.
