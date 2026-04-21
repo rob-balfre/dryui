@@ -62,7 +62,6 @@
     "@dryui/lint": "^0.4.2",
     "@dryui/primitives": "^1.7.0",
     "@dryui/ui": "^1.7.0",
-    "lucide-svelte": "^1.0.1",
     "svelte": "^5.55.3",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",

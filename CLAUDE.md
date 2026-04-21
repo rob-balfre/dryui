@@ -7,6 +7,7 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 ## Claude-specific notes
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
+- Use `smolvm` to test the public `bunx @dryui/cli` install flow in a throwaway Linux VM without touching the host Mac. Command shapes and install notes live in the Isolated Testing section of [`AGENTS.md`](./AGENTS.md).
 - The optional Claude SessionStart hook is installed with:
 
 ```bash
@@ -19,7 +20,7 @@ dryui install-hook
 ## Canonical Links
 
 - Repo-wide agent rules: [`AGENTS.md`](./AGENTS.md)
-- CSS discipline: [`docs/policies/css-discipline.md`](./docs/policies/css-discipline.md)
+- CSS discipline and token rules: [`packages/ui/skills/dryui/rules/theming.md`](./packages/ui/skills/dryui/rules/theming.md)
 - Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
 - Release flow: [`RELEASING.md`](./RELEASING.md)

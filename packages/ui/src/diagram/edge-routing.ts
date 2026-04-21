@@ -10,7 +10,7 @@ const BACK_EDGE_LANE_STEP = 22;
  *  forward edge label and a directed-cluster boundary. Cross-boundary edges
  *  whose natural midpoint sits closer than this to the cluster are slid along
  *  the polyline toward the outside endpoint. */
-export const LABEL_BORDER_AVOID_PX = 28;
+const LABEL_BORDER_AVOID_PX = 28;
 
 interface Point {
 	x: number;
@@ -24,7 +24,7 @@ interface Endpoints {
 	ty: number;
 }
 
-export interface EdgeRouteBounds {
+interface EdgeRouteBounds {
 	minX: number;
 	minY: number;
 	maxX: number;
@@ -35,12 +35,12 @@ function edgeKey(edge: { from: string; to: string }): string {
 	return `${edge.from}->${edge.to}`;
 }
 
-export interface ComputedEdges {
+interface ComputedEdges {
 	edges: PositionedEdge[];
 	collapsed: (Point[] | null)[];
 }
 
-export interface ComputeEdgePathsOptions {
+interface ComputeEdgePathsOptions {
 	cornerRadius?: number;
 	reversedEdges?: Set<string>;
 	bounds?: EdgeRouteBounds;
@@ -589,7 +589,7 @@ function snapCoordinate(value: number): number {
 	return Math.round(value) + 0.5;
 }
 
-export interface PointAtFraction {
+interface PointAtFraction {
 	point: Point;
 	segmentIndex: number;
 	axis: 'h' | 'v';
@@ -702,7 +702,7 @@ function computeLabelAnchor(
 	return getPointAtFraction(collapsed, labelT).point;
 }
 
-export interface WaypointBox {
+interface WaypointBox {
 	x: number;
 	y: number;
 	width: number;
@@ -754,7 +754,7 @@ export function splitCollapsedAtBox(
 	return { entry, exit };
 }
 
-export { collapsePoints, buildPathFromCollapsed };
+export { buildPathFromCollapsed };
 
 export function emptyEdge(edge: DiagramEdge): PositionedEdge {
 	return {

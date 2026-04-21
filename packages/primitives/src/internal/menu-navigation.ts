@@ -6,7 +6,7 @@
 const MENU_ITEM_SELECTOR = '[role="menuitem"]:not([data-disabled])';
 const OPTION_SELECTOR = '[role="option"]:not([data-disabled])';
 
-export function getMenuItems(
+function getMenuItems(
 	container: HTMLElement,
 	selector: string = MENU_ITEM_SELECTOR
 ): HTMLElement[] {
@@ -17,13 +17,13 @@ export function getOptionItems(container: HTMLElement): HTMLElement[] {
 	return getMenuItems(container, OPTION_SELECTOR);
 }
 
-export function focusItem(items: HTMLElement[], index: number): void {
+function focusItem(items: HTMLElement[], index: number): void {
 	if (items.length === 0) return;
 	const clamped = ((index % items.length) + items.length) % items.length;
 	items[clamped]!.focus();
 }
 
-export function focusFirstItem(container: HTMLElement, items: HTMLElement[]): void {
+function focusFirstItem(container: HTMLElement, items: HTMLElement[]): void {
 	const first = items[0];
 	if (first) {
 		first.focus();

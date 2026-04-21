@@ -1,5 +1,5 @@
 /** sin/cos color rotation using u_time, u_resolution, optional u_color_* uniforms */
-export const gradientFlow = `#version 300 es
+const gradientFlow = `#version 300 es
 precision highp float;
 
 in vec2 v_uv;
@@ -29,7 +29,7 @@ void main() {
 `;
 
 /** Procedural dots via hash/noise functions */
-export const particleField = `#version 300 es
+const particleField = `#version 300 es
 precision highp float;
 
 in vec2 v_uv;
@@ -77,7 +77,7 @@ void main() {
 `;
 
 /** Sinusoidal UV warp, responds to u_mouse */
-export const waveDistortion = `#version 300 es
+const waveDistortion = `#version 300 es
 precision highp float;
 
 in vec2 v_uv;
@@ -111,7 +111,7 @@ void main() {
 `;
 
 /** Multi-point gradient interpolation */
-export const meshGradient = `#version 300 es
+const meshGradient = `#version 300 es
 precision highp float;
 
 in vec2 v_uv;
@@ -149,7 +149,7 @@ void main() {
 `;
 
 /** Fresnel-like metallic reflection via distance fields */
-export const liquidMetal = `#version 300 es
+const liquidMetal = `#version 300 es
 precision highp float;
 
 in vec2 v_uv;

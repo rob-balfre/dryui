@@ -30,13 +30,13 @@ const SNIPPET_CAP = 500;
 export type AskScope = 'component' | 'recipe' | 'list' | 'setup';
 export type AskListKind = 'component' | 'token';
 
-export interface AskInput {
+interface AskInput {
 	readonly query: string;
 	readonly scope: AskScope;
 	readonly kind?: AskListKind;
 }
 
-export interface AskOptions {
+interface AskOptions {
 	readonly cwd?: string;
 }
 

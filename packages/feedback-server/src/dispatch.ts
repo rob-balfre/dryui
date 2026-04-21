@@ -50,7 +50,7 @@ export interface DispatcherOptions {
 	terminalApp?: TerminalApp;
 }
 
-export interface DispatchTargetsSnapshot {
+interface DispatchTargetsSnapshot {
 	defaultAgent: DispatchAgent;
 	configuredAgents: DispatchAgent[];
 }

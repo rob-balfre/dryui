@@ -7,7 +7,7 @@ import {
 import { checkSvelteFile, type Violation } from '@dryui/lint/rules';
 import { reviewComponent, type ComponentDef } from './reviewer.js';
 
-export interface ComponentIssue {
+interface ComponentIssue {
 	readonly severity: RuleSeverity;
 	readonly code: string;
 	readonly line: number;
@@ -15,7 +15,7 @@ export interface ComponentIssue {
 	readonly fix: string | null;
 }
 
-export interface ComponentCheckResult {
+interface ComponentCheckResult {
 	readonly issues: ComponentIssue[];
 	readonly summary: string;
 	readonly filename?: string;

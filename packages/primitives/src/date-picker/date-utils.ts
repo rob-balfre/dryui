@@ -3,14 +3,9 @@
  * Kept for backward compatibility — new code should import from '../utils/date-utils.js'.
  */
 export {
-	getDaysInMonth,
-	getFirstDayOfMonth,
-	getWeekStartDay,
 	isSameDay,
 	isToday,
 	isDateInRange,
 	formatDate,
-	getCalendarDays,
-	addMonths,
-	addYears
+	getCalendarDays
 } from '../utils/date-utils.js';

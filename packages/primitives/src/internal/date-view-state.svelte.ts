@@ -6,7 +6,7 @@ interface DateViewStateOptions {
 	getInitialDate: () => Date | null | undefined;
 }
 
-export interface DateViewStateController {
+interface DateViewStateController {
 	readonly weekStartDay: number;
 	readonly viewMonth: number;
 	readonly viewYear: number;

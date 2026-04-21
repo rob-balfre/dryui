@@ -22,13 +22,9 @@ function getHandles(root: HTMLElement) {
 
 function getLabels(root: HTMLElement) {
 	return Array.from(root.querySelectorAll<HTMLElement>('[data-dnd-item]'))
-		.map((item) => {
-			const title =
-				item.querySelector<HTMLElement>('[data-module-title]')?.textContent?.trim() ?? '';
-			const note = item.querySelector<HTMLElement>('[data-module-note]')?.textContent?.trim() ?? '';
-			return `${title} ${note}`.trim();
-		})
-		.map((value) => value?.replace(/\s+/g, ' ').trim() ?? '')
+		.map(
+			(item) => item.querySelector<HTMLElement>('.workflow-module-title')?.textContent?.trim() ?? ''
+		)
 		.filter(Boolean);
 }
 
@@ -42,20 +38,12 @@ describe('theme wizard preview', () => {
 			throw new Error('Expected drag-and-drop handle');
 		}
 
-		expect(getLabels(root)).toEqual([
-			'Hero statement Lead with the strongest product promise.',
-			'Search rail Pull action forward before the scroll.',
-			'Signal strip Show quick proof with metrics and customer logos.'
-		]);
+		expect(getLabels(root)).toEqual(['Hero statement', 'Search rail', 'Signal strip']);
 
 		firstHandle.focus();
 		firstHandle.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'ArrowDown' }));
 		await nextFrame();
 
-		expect(getLabels(root)).toEqual([
-			'Search rail Pull action forward before the scroll.',
-			'Hero statement Lead with the strongest product promise.',
-			'Signal strip Show quick proof with metrics and customer logos.'
-		]);
+		expect(getLabels(root)).toEqual(['Search rail', 'Hero statement', 'Signal strip']);
 	});
 });

@@ -7,7 +7,7 @@ export interface ComponentMetaEntry {
 	surface?: ComponentSurface;
 }
 
-export interface DocsNavCategory {
+interface DocsNavCategory {
 	label: string;
 	items: string[];
 }

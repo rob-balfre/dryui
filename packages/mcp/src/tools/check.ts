@@ -24,11 +24,11 @@ interface IssueAggregates {
 	readonly autoFixable: number;
 }
 
-export interface CheckInput {
+interface CheckInput {
 	readonly path?: string;
 }
 
-export interface CheckOptions {
+interface CheckOptions {
 	readonly cwd?: string;
 }
 

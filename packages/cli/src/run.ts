@@ -37,26 +37,26 @@ export interface CommandResult {
 
 export type OutputMode = 'text' | 'json' | 'toon';
 
-export interface CommandResultRenderers<T> {
+interface CommandResultRenderers<T> {
 	toon: (value: T) => string;
 	json?: (value: T) => string;
 	text: (value: T) => string;
 }
 
-export interface CommandHelp {
+interface CommandHelp {
 	usage: string;
 	description: readonly string[];
 	options?: readonly string[];
 	examples?: readonly string[];
 }
 
-export interface StandardCommandContext {
+interface StandardCommandContext {
 	args: string[];
 	mode: OutputMode;
 	positionals: string[];
 }
 
-export interface StandardCommandOptions {
+interface StandardCommandOptions {
 	help: CommandHelp;
 	allowJson?: boolean;
 	minPositionals?: number;

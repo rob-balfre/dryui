@@ -1,1 +1,1 @@
-export { setHoverCardCtx, getHoverCardCtx, type HoverCardContext } from '@dryui/primitives';
+export { getHoverCardCtx } from '@dryui/primitives';

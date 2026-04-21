@@ -1,6 +1,6 @@
 import type { SubmissionAgent } from '../types.js';
 
-export interface AgentMeta {
+interface AgentMeta {
 	id: SubmissionAgent;
 	label: string;
 	shortLabel: string;

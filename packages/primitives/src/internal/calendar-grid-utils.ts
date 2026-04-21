@@ -70,7 +70,7 @@ export function getDayISOString(day: Date): string {
 /*  Keyboard navigation                                                       */
 /* -------------------------------------------------------------------------- */
 
-export interface CalendarKeydownCallbacks {
+interface CalendarKeydownCallbacks {
 	/** Called for Enter / Space on an in-range day. */
 	onSelect: (day: Date) => void;
 	/** Called for Escape — only date-picker and date-range-picker use this. */

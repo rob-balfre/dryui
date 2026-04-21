@@ -6,7 +6,7 @@ interface DateViewControllerConfig {
 	locale: () => string;
 }
 
-export interface DateViewController {
+interface DateViewController {
 	readonly focusedDate: Date;
 	readonly viewMonth: number;
 	readonly viewYear: number;

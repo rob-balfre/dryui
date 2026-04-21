@@ -157,7 +157,9 @@ function orderWithinLayers(
 
 	// Initialize positions
 	for (const layer of layers) {
-		layer.forEach((id, i) => posInLayer.set(id, i));
+		for (const [i, id] of layer.entries()) {
+			posInLayer.set(id, i);
+		}
 	}
 
 	function resortLayer(layer: string[], neighbors: Map<string, string[]>): string[] {
@@ -180,14 +182,18 @@ function orderWithinLayers(
 	for (let i = 1; i < layers.length; i++) {
 		const next = resortLayer(layers[i]!, adjacencyIn);
 		layers[i] = next;
-		next.forEach((id, j) => posInLayer.set(id, j));
+		for (const [j, id] of next.entries()) {
+			posInLayer.set(id, j);
+		}
 	}
 
 	// Up sweep
 	for (let i = layers.length - 2; i >= 0; i--) {
 		const next = resortLayer(layers[i]!, adjacencyOut);
 		layers[i] = next;
-		next.forEach((id, j) => posInLayer.set(id, j));
+		for (const [j, id] of next.entries()) {
+			posInLayer.set(id, j);
+		}
 	}
 
 	// Cluster-aware grouping: after barycenter ordering, group cluster members together
@@ -202,7 +208,9 @@ function orderWithinLayers(
 				posInLayer
 			);
 			layers[i] = regrouped;
-			regrouped.forEach((id, j) => posInLayer.set(id, j));
+			for (const [j, id] of regrouped.entries()) {
+				posInLayer.set(id, j);
+			}
 		}
 	}
 

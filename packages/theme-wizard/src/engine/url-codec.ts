@@ -7,7 +7,7 @@ import type {
 	ShadowPreset,
 	TypeScale,
 	FontPreset
-} from '../state.svelte.js';
+} from './types.js';
 
 export interface DecodedTheme {
 	brand: BrandInput;
@@ -107,9 +107,8 @@ export function decodeTheme(encoded: string): DecodedTheme {
 
 		// Parse status hues: sequences of letter+digits, e.g. e350w45s145i210
 		const statusRegex = /([ewsi])(\d+(?:\.\d+)?)/g;
-		let match: RegExpExecArray | null;
 
-		while ((match = statusRegex.exec(segment)) !== null) {
+		for (const match of segment.matchAll(statusRegex)) {
 			const key = match[1];
 			const rawHue = match[2];
 			if (key === undefined || rawHue === undefined) continue;
@@ -302,8 +301,7 @@ export function decodeRecipe(encoded: string): WizardRecipe {
 
 		// Status hues: e{h}w{h}s{h}i{h}
 		const statusRegex = /([ewsi])(\d+(?:\.\d+)?)/g;
-		let match: RegExpExecArray | null;
-		while ((match = statusRegex.exec(seg)) !== null) {
+		for (const match of seg.matchAll(statusRegex)) {
 			const key = match[1];
 			const hue = parseFloat(match[2]!);
 			if (key === 'e') statusHues.error = hue;

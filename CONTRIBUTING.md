@@ -21,7 +21,7 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 
 ## Contributor Checklist
 
-- Read the CSS rules in [`docs/policies/css-discipline.md`](./docs/policies/css-discipline.md).
+- Read the CSS and token rules in [`packages/ui/skills/dryui/rules/theming.md`](./packages/ui/skills/dryui/rules/theming.md).
 - Read the accessibility baseline in [`ACCESSIBILITY.md`](./ACCESSIBILITY.md).
 - When changing exported component behaviour, update composition or spec sources as needed and rebuild `@dryui/mcp`.
 - Add or update browser coverage for interactive or accessibility-sensitive changes.

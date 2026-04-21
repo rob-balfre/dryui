@@ -1,6 +1,6 @@
 import type { SSEEvent } from './types.js';
 
-export interface EventSubscriberOptions {
+interface EventSubscriberOptions {
 	agent?: boolean;
 	matches?(event: SSEEvent): boolean;
 }

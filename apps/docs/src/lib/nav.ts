@@ -2,7 +2,7 @@ import { docsNavCategories } from '../../../../packages/mcp/src/component-catalo
 
 export type CatalogKind = 'ui' | 'primitive';
 
-export interface NavItem {
+interface NavItem {
 	name: string;
 	kind: CatalogKind;
 }
@@ -45,7 +45,7 @@ export function allComponentNames(): string[] {
 	return categories.flatMap((c) => c.items.map((item) => item.name));
 }
 
-export function getComponentItem(name: string): NavItem | undefined {
+function getComponentItem(name: string): NavItem | undefined {
 	for (const category of categories) {
 		for (const item of category.items) {
 			if (item.name === name) return item;

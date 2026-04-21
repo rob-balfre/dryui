@@ -1,8 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { getCatalogEntries } from '../../packages/mcp/src/catalog-data.ts';
 import { allComponentNames, toSlug } from '../../apps/docs/src/lib/nav.ts';
 
-export type DocsVisualRouteKind = 'component' | 'block' | 'template' | 'starter-kit' | 'smoke';
+export type DocsVisualRouteKind = 'component' | 'smoke';
 
 export interface DocsVisualRoute {
 	kind: DocsVisualRouteKind;
@@ -12,36 +11,13 @@ export interface DocsVisualRoute {
 	headingText?: string;
 }
 
-export const docsVisualRoutes: DocsVisualRoute[] = [
-	...allComponentNames().map((name) => ({
-		kind: 'component' as const,
-		name,
-		path: `/components/${toSlug(name)}`,
-		selector: '.demo-surface',
-		headingText: name
-	})),
-	...getCatalogEntries('blocks').map((entry) => ({
-		kind: 'block' as const,
-		name: entry.name,
-		path: `/blocks/${entry.slug}`,
-		selector: '.detail-layout',
-		headingText: entry.name
-	})),
-	...getCatalogEntries('templates').map((entry) => ({
-		kind: 'template' as const,
-		name: entry.name,
-		path: `/templates/${entry.slug}`,
-		selector: '.detail-layout',
-		headingText: entry.name
-	})),
-	...getCatalogEntries('starter-kit').map((entry) => ({
-		kind: 'starter-kit' as const,
-		name: entry.name,
-		path: `/starter-kit/${entry.slug}`,
-		selector: '.detail-layout',
-		headingText: entry.name
-	}))
-];
+export const docsVisualRoutes: DocsVisualRoute[] = allComponentNames().map((name) => ({
+	kind: 'component' as const,
+	name,
+	path: `/components/${toSlug(name)}`,
+	selector: '.demo-surface',
+	headingText: name
+}));
 
 export const docsSmokeRoutes: DocsVisualRoute[] = [
 	{

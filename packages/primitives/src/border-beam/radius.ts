@@ -1,4 +1,4 @@
-export function parsePixelRadius(value: string, fallback: number): number {
+function parsePixelRadius(value: string, fallback: number): number {
 	const first = value.split(' ')[0]?.trim() ?? '';
 	const parsed = Number.parseFloat(first);
 	return Number.isFinite(parsed) ? parsed : fallback;

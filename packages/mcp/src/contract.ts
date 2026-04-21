@@ -28,7 +28,7 @@ interface Spec {
 	};
 }
 
-export interface ContractV1 {
+interface ContractV1 {
 	readonly schema: 'DryUIContractV1';
 	readonly version: 1;
 	readonly package: {
@@ -59,7 +59,7 @@ export interface ContractV1 {
 	};
 }
 
-export interface ContractArtifacts {
+interface ContractArtifacts {
 	readonly contract: ContractV1;
 	readonly contractJson: string;
 	readonly schemaJson: string;
@@ -315,7 +315,7 @@ function buildSchema(): Record<string, unknown> {
 	};
 }
 
-export function buildContractV1(): ContractV1 {
+function buildContractV1(): ContractV1 {
 	const spec = readSpec();
 	const ai = spec.ai ?? aiSurface;
 	return {

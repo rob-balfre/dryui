@@ -6,5 +6,3 @@ export function setCardCtx() {
 	const ctx = { isCard: true };
 	return _setCardCtx(ctx);
 }
-
-export { getCardCtx };

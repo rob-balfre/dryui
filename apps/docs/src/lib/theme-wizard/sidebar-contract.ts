@@ -7,12 +7,12 @@ import {
 } from '@dryui/theme-wizard';
 import { SIDEBAR_PREVIEW_TOKEN_NAMES } from '../../../../../packages/mcp/src/theme-tokens.js';
 
-export type SidebarRecipeId = 'current' | 'candidate';
-export type SidebarContractVariant = 'preview' | 'production';
-export type ThemeMode = 'light' | 'dark';
+type SidebarRecipeId = 'current' | 'candidate';
+type SidebarContractVariant = 'preview' | 'production';
+type ThemeMode = 'light' | 'dark';
 
 type TokenMap = ThemeTokens[ThemeMode];
-export type SidebarNonColorCue = 'weight' | 'indicator';
+type SidebarNonColorCue = 'weight' | 'indicator';
 
 interface SidebarChecks {
 	textOnActive: number;
@@ -26,7 +26,7 @@ interface SidebarChecks {
 	cueTypes: SidebarNonColorCue[];
 }
 
-export interface SidebarContract {
+interface SidebarContract {
 	mode: ThemeMode;
 	recipe: SidebarRecipeId;
 	surface: string;

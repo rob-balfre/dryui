@@ -3,7 +3,7 @@
  * Used by Sparkline and Chart Area components.
  */
 
-export interface Point {
+interface Point {
 	x: number;
 	y: number;
 }
@@ -54,7 +54,7 @@ export function dataToPoints(
  * @param options.smooth - If true, use cubic bezier curves for smooth lines
  * @returns SVG path `d` attribute string
  */
-export function buildLinePath(
+function buildLinePath(
 	points: number[],
 	width: number,
 	height: number,

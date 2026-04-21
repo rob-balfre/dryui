@@ -48,7 +48,7 @@ export interface MapPopupInstance {
 }
 
 /** Opaque control instance passed to addControl/removeControl */
-export interface MapControl {}
+export type MapControl = object;
 
 /** Source instance returned by map.getSource() */
 export interface MapSource {

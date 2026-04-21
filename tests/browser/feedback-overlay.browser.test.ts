@@ -307,15 +307,15 @@ describe('feedback overlay hosting', () => {
 			flushSync();
 
 			const chooserOptions = Array.from(
-				document.querySelectorAll<HTMLButtonElement>('.agent-option')
-			).map((button) => button.textContent ?? '');
+				document.querySelectorAll<HTMLElement>('[role="menuitem"][data-agent]')
+			).map((option) => option.textContent ?? '');
 
 			expect(chooserOptions.some((text) => text.includes('Copilot CLI'))).toBe(true);
 			expect(chooserOptions.some((text) => text.includes('Copilot VS Code'))).toBe(true);
 
 			const cursorOption = Array.from(
-				document.querySelectorAll<HTMLButtonElement>('.agent-option')
-			).find((button) => button.textContent?.includes('Cursor'));
+				document.querySelectorAll<HTMLElement>('[role="menuitem"][data-agent]')
+			).find((option) => option.textContent?.includes('Cursor'));
 			if (!cursorOption) throw new Error('Expected Cursor option in chooser');
 
 			cursorOption.click();

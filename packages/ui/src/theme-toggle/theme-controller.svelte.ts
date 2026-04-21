@@ -29,7 +29,7 @@ export interface ThemeController {
 	destroy(): void;
 }
 
-export const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
+const DARK_MEDIA_QUERY = '(prefers-color-scheme: dark)';
 export const DEFAULT_STORAGE_KEY = 'dryui-theme';
 
 function isBrowser(): boolean {
