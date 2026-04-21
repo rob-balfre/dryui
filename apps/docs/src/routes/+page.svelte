@@ -379,7 +379,6 @@
 
 <svelte:head>
 	<title>DryUI - Don't Repeat Yourself.</title>
-	<meta name="description" content={SITE_DESCRIPTION} />
 </svelte:head>
 
 <Hotkey keys="escape" handler={skipCinematic} enabled={canSkip} />
