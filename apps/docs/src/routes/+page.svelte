@@ -45,7 +45,7 @@
 	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
 	import { homeIntroPrompts } from '$lib/home-intro.svelte';
 	import { withBase } from '$lib/utils';
-	import { GITHUB_URL } from '$lib/site-meta';
+	import { GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
 
 	const componentShowcase = allComponentNames();
 
@@ -379,6 +379,7 @@
 
 <svelte:head>
 	<title>DryUI - Don't Repeat Yourself.</title>
+	<meta name="description" content={SITE_DESCRIPTION} />
 </svelte:head>
 
 <Hotkey keys="escape" handler={skipCinematic} enabled={canSkip} />
@@ -401,6 +402,7 @@
 						<Logo />
 					</div>
 					<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
+					<Text size="md" color="secondary" weight="bold">{SITE_DESCRIPTION}</Text>
 				</div>
 				<div class="hero-intro">
 					<div class="hero-intro-frame">

@@ -1,6 +1,6 @@
 # DryUI
 
-Zero-dependency Svelte 5 core. Headless primitives. Styled defaults. CLI and MCP tooling for agent-assisted workflows. Optional add-ons cover theme generation and feedback collection.
+160+ components and theme controls, plus a CLI, MCP, and feedback engine to keep AI on track.
 
 Docs and editor setup: <https://dryui.dev/getting-started>
 
