@@ -74,7 +74,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.6.4",
+      "version": "0.6.5",
       "bin": {
         "dryui-feedback-mcp": "./dist/mcp.js",
       },
