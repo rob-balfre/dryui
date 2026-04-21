@@ -49,7 +49,8 @@
     "release": "bun run release:gate && bun run version && bun run publish:packages",
     "vm": "bun run ./scripts/vm.ts",
     "vm:exec": "bun run ./scripts/vm-exec.ts",
-    "vm:test": "smolvm machine run --net --image oven/bun:alpine -- sh -c 'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'"
+    "vm:test": "smolvm machine run --net --image oven/bun:alpine -- sh -c 'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'",
+    "bump-deps": "bunx npm-check-updates -u --deep --dep prod,dev,peer,optional --target latest && bun install"
   },
   "devDependencies": {
     "@changesets/changelog-github": "^0.6.0",

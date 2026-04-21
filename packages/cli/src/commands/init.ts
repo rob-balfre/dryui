@@ -18,6 +18,10 @@ interface InitOptions {
 	packageManager: DryuiPackageManager;
 }
 
+interface InitRuntime {
+	runCommand?: (command: string, cwd: string) => boolean;
+}
+
 function parseInitArgs(args: string[]): InitOptions {
 	let targetPath = process.cwd();
 	let userPath: string | null = null;
@@ -172,7 +176,7 @@ function executeEditFile(step: ProjectPlanStep): void {
 	warn(`  ? Skipped edit: ${step.title} (manual action needed)`);
 }
 
-export function runInit(args: string[], spec: Spec): void {
+export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): void {
 	if (args[0] === '--help') {
 		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn]');
 		console.log('');
@@ -185,10 +189,14 @@ export function runInit(args: string[], spec: Spec): void {
 	}
 
 	const { targetPath, userPath, packageManager } = parseInitArgs(args);
+	const runCommand = runtime.runCommand ?? runShellCommand;
 
 	mkdirSync(targetPath, { recursive: true });
 
-	const plan = planInstall(spec, targetPath, { packageManager });
+	const plan = planInstall(spec, targetPath, {
+		packageManager,
+		strictTarget: userPath !== null
+	});
 
 	const firstStep = plan.steps[0];
 	if (
@@ -220,7 +228,7 @@ export function runInit(args: string[], spec: Spec): void {
 			case 'install-package': {
 				if (!step.command) break;
 				log(`  Installing dependencies...`);
-				const ok = runShellCommand(step.command, targetPath);
+				const ok = runCommand(step.command, targetPath);
 				if (!ok) {
 					warn(`  Warning: "${step.command}" failed. Run it manually.`);
 				}

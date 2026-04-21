@@ -144,12 +144,8 @@ Use AlertDialog for destructive confirmations. It traps focus and requires expli
 			<p>This action cannot be undone.</p>
 		</AlertDialog.Body>
 		<AlertDialog.Footer>
-			<AlertDialog.Cancel>
-				<Button variant="outline">Cancel</Button>
-			</AlertDialog.Cancel>
-			<AlertDialog.Action>
-				<Button variant="solid">Delete</Button>
-			</AlertDialog.Action>
+			<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+			<AlertDialog.Action>Delete</AlertDialog.Action>
 		</AlertDialog.Footer>
 	</AlertDialog.Content>
 </AlertDialog.Root>

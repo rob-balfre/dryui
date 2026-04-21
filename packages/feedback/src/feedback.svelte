@@ -14,6 +14,7 @@
 		type Point,
 		type Stroke,
 		type SubmissionAgent,
+		type SubmitStatus,
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
@@ -93,7 +94,7 @@
 	let moving: { drawingId: string; lastPoint: Point; space: DrawingSpace } | null = $state(null);
 	let justCommitted = false;
 	let saveVersion = $state(0);
-	let submitting = $state(false);
+	let submitStatus: SubmitStatus = $state('idle');
 	let sent = $state(false);
 	let toasts: FeedbackToast[] = $state([]);
 	let toastLayerEl: HTMLDivElement | undefined = $state();
@@ -666,19 +667,26 @@
 		let stream: MediaStream | null = null;
 		const video = document.createElement('video');
 
-		toolbarHiddenForCapture = true;
-		await waitForNextPaint();
-		await waitForNextPaint();
-
 		const w = window.innerWidth;
 		const h = window.innerHeight;
 
 		try {
+			if (!navigator.mediaDevices?.getDisplayMedia) {
+				throw new Error('Browser screen capture is unavailable in this context.');
+			}
+
 			// Capture the current tab via Screen Capture API
+			submitStatus = 'waiting-for-capture';
+			toolbarHiddenForCapture = true;
+			await waitForNextPaint();
+			await waitForNextPaint();
+
 			stream = await navigator.mediaDevices.getDisplayMedia({
 				video: { displaySurface: 'browser' },
 				preferCurrentTab: true
 			} as DisplayMediaStreamOptions);
+
+			submitStatus = 'capturing';
 
 			video.srcObject = stream;
 			video.muted = true;
@@ -690,7 +698,8 @@
 			const canvas = document.createElement('canvas');
 			canvas.width = w;
 			canvas.height = h;
-			const ctx = canvas.getContext('2d')!;
+			const ctx = canvas.getContext('2d');
+			if (!ctx) throw new Error('Could not prepare screenshot capture.');
 
 			// Draw the page capture
 			ctx.drawImage(video, 0, 0, w, h);
@@ -790,15 +799,25 @@
 	}
 
 	function submissionErrorDescription(error: unknown): string {
+		if (error instanceof DOMException) {
+			if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
+				return 'Screen capture was cancelled. Choose this browser tab when prompted to send feedback.';
+			}
+
+			if (error.name === 'NotFoundError') {
+				return 'No capturable browser tab was available. Try again from the tab you want to annotate.';
+			}
+		}
+
 		if (error instanceof Error && error.message.trim()) return error.message;
 		return 'Please try again.';
 	}
 
 	async function handleSubmit() {
-		if (!serverUrl || submitting) return;
-		submitting = true;
+		if (!serverUrl || submitStatus !== 'idle' || sent) return;
 		try {
 			const image = await captureScreenshot();
+			submitStatus = 'uploading';
 			// Snapshot viewport + scroll after capture so the numbers line up with
 			// the frame agents will read. buildDrawingHints reads the same window
 			// metrics on purpose.
@@ -823,7 +842,7 @@
 				throw new Error(await readSubmissionError(response));
 			}
 
-			submitting = false;
+			submitStatus = 'idle';
 			sent = true;
 			showToast(
 				'success',
@@ -839,7 +858,7 @@
 			}, 1500);
 		} catch (e) {
 			console.error('Failed to submit feedback:', e);
-			submitting = false;
+			submitStatus = 'idle';
 			sent = false;
 			showToast('error', 'Feedback failed', submissionErrorDescription(e), ERROR_TOAST_DURATION_MS);
 		}
@@ -1204,7 +1223,7 @@
 			{tool}
 			hasDrawings={hasDrawings || sent}
 			hidden={toolbarHiddenForCapture}
-			{submitting}
+			{submitStatus}
 			{sent}
 			{agent}
 			availableAgents={configuredAgents}

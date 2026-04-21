@@ -3802,11 +3802,13 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 1,
 				component: 'ChatThread',
 				useWhen: 'Chat conversation container',
-				snippet: `<ChatThread.Root>
-  {#each messages as msg}
-    <div>{msg.text}</div>
-  {/each}
-</ChatThread.Root>`
+				snippet: `<ChatThread messageCount={messages.length}>
+  {#snippet children({ index })}
+    <ChatMessage role={messages[index].role} name={messages[index].name}>
+      {messages[index].message}
+    </ChatMessage>
+  {/snippet}
+</ChatThread>`
 			}
 		],
 		antiPatterns: [
@@ -4937,7 +4939,7 @@ export const compositionRecipes: CompositionRecipe[] = [
               <Badge variant="soft">{user.role}</Badge>
             </Table.Cell>
             <Table.Cell>
-              <Badge variant="soft" color={user.status === 'Active' ? 'success' : 'default'}>{user.status}</Badge>
+              <Badge variant="soft" color={user.status === 'Active' ? 'success' : 'gray'}>{user.status}</Badge>
             </Table.Cell>
           </Table.Row>
         {/each}
@@ -5127,12 +5129,8 @@ export const compositionRecipes: CompositionRecipe[] = [
       <Text>This action cannot be undone. All data associated with this project will be permanently removed.</Text>
     </AlertDialog.Body>
     <AlertDialog.Footer>
-      <AlertDialog.Cancel>
-        <Button variant="outline">Cancel</Button>
-      </AlertDialog.Cancel>
-      <AlertDialog.Action>
-        <Button color="danger">Delete</Button>
-      </AlertDialog.Action>
+      <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+      <AlertDialog.Action>Delete</AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>`

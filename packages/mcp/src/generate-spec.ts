@@ -571,21 +571,95 @@ function parseInterface(source: string, name: string): Record<string, PropShape>
 	const body = source.slice(braceStart + 1, end);
 	const props: Record<string, PropShape> = {};
 
-	for (const line of body.split('\n')) {
-		const trimmed = line.trim();
-		const match = trimmed.match(/^(\w+)(\?)?:\s*(.+?);?\s*$/);
+	for (const entry of splitInterfaceProps(body)) {
+		const match = entry.match(/^(?:readonly\s+)?(\w+)(\?)?:\s*(.+)$/s);
 		if (!match) continue;
 
 		const propName = match[1];
-		const optional = match[2];
+		const optional = Boolean(match[2]);
 		const rawType = match[3];
 		if (!propName || !rawType) continue;
 
 		props[propName] = {
-			type: rawType.replace(/;$/, '').trim(),
+			type: normalizeParsedPropType(rawType, optional),
 			required: !optional
 		};
 	}
+
+	return props;
+}
+
+function normalizeParsedPropType(rawType: string, optional: boolean): string {
+	let type = rawType
+		.replace(/^\|\s*/, '')
+		.replace(/;$/, '')
+		.trim();
+	if (optional) type = type.replace(/\s*\|\s*undefined$/, '').trim();
+	if (type.startsWith('Snippet<')) type = type.replace(/\s+/g, ' ');
+	return type;
+}
+
+function splitInterfaceProps(body: string): string[] {
+	const props: string[] = [];
+	const lines = body.split('\n');
+	let buffer = '';
+	let depth = 0;
+	let quote: "'" | '"' | null = null;
+
+	function pushBuffer() {
+		const trimmed = buffer.trim().replace(/;$/, '').trim();
+		if (trimmed) props.push(trimmed);
+		buffer = '';
+		depth = 0;
+		quote = null;
+	}
+
+	for (let index = 0; index < lines.length; index += 1) {
+		const line = lines[index] ?? '';
+		const nextTrimmed = lines
+			.slice(index + 1)
+			.find((candidate) => candidate.trim())
+			?.trim();
+		const trimmed = line.trim();
+
+		if (!buffer) {
+			if (!trimmed) continue;
+			if (depth !== 0) continue;
+
+			const match = trimmed.match(/^(?:readonly\s+)?(\w+)(\?)?:\s*(.*)$/);
+			if (!match) continue;
+
+			buffer = `${match[1]}${match[2] ?? ''}: ${match[3]}`;
+		} else {
+			buffer += `\n${line}`;
+		}
+
+		for (let i = 0; i < line.length; i += 1) {
+			const char = line[i];
+			const prev = i > 0 ? line[i - 1] : null;
+
+			if ((char === "'" || char === '"') && prev !== '\\') {
+				quote = quote === char ? null : (quote ?? (char as "'" | '"'));
+				continue;
+			}
+
+			if (quote) continue;
+
+			if (char === '{' || char === '(' || char === '[' || char === '<') depth += 1;
+			else if (char === '}' || char === ')' || char === ']' || (char === '>' && prev !== '=')) {
+				depth = Math.max(0, depth - 1);
+			}
+		}
+
+		if (!buffer) continue;
+
+		const lineEndsProp = !/[<([&|,:=?]$/.test(trimmed) && !/^[|&]/.test(nextTrimmed ?? '');
+		if (depth === 0 && lineEndsProp) {
+			pushBuffer();
+		}
+	}
+
+	if (buffer) pushBuffer();
 
 	return props;
 }
@@ -1282,6 +1356,8 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	Avatar: '<Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />',
 	ChatThread:
 		'<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>',
+	DataGrid:
+		'<DataGrid.Root items={rows} pageSize={10}>\n  <DataGrid.Table>\n    <DataGrid.Header>\n      <DataGrid.Row>\n        <DataGrid.Column key="name" sortable>Name</DataGrid.Column>\n        <DataGrid.Column key="status">Status</DataGrid.Column>\n      </DataGrid.Row>\n    </DataGrid.Header>\n    <DataGrid.Body>\n      {#snippet children({ items })}\n        {#each items as row (row.id)}\n          <DataGrid.Row rowId={row.id}>\n            <DataGrid.Cell>{row.name}</DataGrid.Cell>\n            <DataGrid.Cell>{row.status}</DataGrid.Cell>\n          </DataGrid.Row>\n        {/each}\n      {/snippet}\n    </DataGrid.Body>\n  </DataGrid.Table>\n  <DataGrid.Pagination />\n</DataGrid.Root>',
 	Chip: '<Chip variant="soft" color="blue">Policy friendly</Chip>',
 	ChipGroup:
 		'<ChipGroup.Root type="multiple" bind:value={selectedFilters}>\n  <ChipGroup.Item value="direct">Direct</ChipGroup.Item>\n  <ChipGroup.Item value="flexible">Flexible</ChipGroup.Item>\n  <ChipGroup.Item value="wifi">Wi-fi</ChipGroup.Item>\n</ChipGroup.Root>',

@@ -91,7 +91,62 @@
     "dist"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./architecture": {
+        "types": "./dist/architecture.d.ts",
+        "default": "./dist/architecture.js"
+      },
+      "./reviewer": {
+        "types": "./dist/reviewer.d.ts",
+        "default": "./dist/reviewer.js"
+      },
+      "./theme-checker": {
+        "types": "./dist/theme-checker.d.ts",
+        "default": "./dist/theme-checker.js"
+      },
+      "./project-planner": {
+        "types": "./dist/project-planner.d.ts",
+        "default": "./dist/project-planner.js"
+      },
+      "./workspace-audit": {
+        "types": "./dist/workspace-audit.d.ts",
+        "default": "./dist/workspace-audit.js"
+      },
+      "./contract.v1.json": "./dist/contract.v1.json",
+      "./contract.v1.schema.json": "./dist/contract.v1.schema.json",
+      "./spec": "./dist/spec.json",
+      "./spec.json": "./dist/spec.json",
+      "./architecture.json": "./dist/architecture.json",
+      "./composition-data": {
+        "types": "./dist/composition-data.d.ts",
+        "default": "./dist/composition-data.js"
+      },
+      "./spec-types": {
+        "types": "./dist/spec-types.d.ts",
+        "default": "./dist/spec-types.js"
+      },
+      "./spec-formatters": {
+        "types": "./dist/spec-formatters.d.ts",
+        "default": "./dist/spec-formatters.js"
+      },
+      "./toon": {
+        "types": "./dist/toon.d.ts",
+        "default": "./dist/toon.js"
+      },
+      "./composition-search": {
+        "types": "./dist/composition-search.d.ts",
+        "default": "./dist/composition-search.js"
+      },
+      "./tokens": {
+        "types": "./dist/tokens.d.ts",
+        "default": "./dist/tokens.js"
+      }
+    }
   },
   "scripts": {
     "generate-spec": "bun src/generate-spec.ts",
@@ -113,6 +168,6 @@
   },
   "devDependencies": {
     "@types/node": "^25.6.0",
-    "typescript": "^6.0.2"
+    "typescript": "^6.0.3"
   }
 }

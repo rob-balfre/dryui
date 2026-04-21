@@ -254,6 +254,26 @@ describe('detectProject', () => {
 		);
 	});
 
+	test('keeps an explicit empty target anchored to the target directory when strictTarget is enabled', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				private: true,
+				workspaces: ['projects/*']
+			}),
+			'bun.lock': '',
+			'projects/smoke/.keep': ''
+		});
+
+		const target = resolve(workspaceRoot, 'projects/smoke');
+		const result = detectProject(mockSpec, target, { strictTarget: true });
+
+		expect(result.status).toBe('unsupported');
+		expect(result.framework).toBe('unknown');
+		expect(result.root).toBeNull();
+		expect(result.packageJsonPath).toBeNull();
+		expect(result.warnings).toContain('No package.json found at the provided path.');
+	});
+
 	test('warns instead of guessing when multiple nested Svelte projects are present', () => {
 		const workspaceRoot = createProject({
 			'package.json': JSON.stringify({

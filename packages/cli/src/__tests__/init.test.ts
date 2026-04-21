@@ -161,6 +161,68 @@ describe('runInit', () => {
 		expect(readFileSync(layoutPath, 'utf8')).toContain('{@render children()}');
 	});
 
+	test('scaffolds an explicit child target without touching the parent workspace root', () => {
+		const rootLayout = [
+			'<script lang="ts">',
+			"\timport { RootShell } from '$lib/root-shell';",
+			'</script>',
+			'',
+			'<RootShell />'
+		].join('\n');
+		const rootAppHtml = '<html lang="en" class="workspace-root"></html>';
+		const rootSvelteConfig = [
+			"import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';",
+			'',
+			'export default {',
+			'\tpreprocess: vitePreprocess()',
+			'};'
+		].join('\n');
+		const root = createTempTree({
+			'package.json': JSON.stringify({
+				private: true,
+				workspaces: ['projects/*']
+			}),
+			'bun.lock': '',
+			'src/app.html': rootAppHtml,
+			'src/routes/+layout.svelte': rootLayout,
+			'svelte.config.js': rootSvelteConfig,
+			'projects/smoke/.keep': ''
+		});
+		const workspaceRoot = realpathSync(root);
+		const target = realpathSync(join(root, 'projects/smoke'));
+		const commands: Array<{ command: string; cwd: string }> = [];
+
+		const result = withCwd(root, () =>
+			captureCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun'], spec, {
+					runCommand: (command, cwd) => {
+						commands.push({ command, cwd });
+						return true;
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(commands).toEqual([
+			{
+				command:
+					'bun add -d svelte @sveltejs/kit @sveltejs/vite-plugin-svelte @sveltejs/adapter-auto vite',
+				cwd: target
+			},
+			{ command: 'bun add @dryui/ui', cwd: target },
+			{ command: 'bun add -d @dryui/lint', cwd: target }
+		]);
+		expect(readFileSync(join(workspaceRoot, 'src/app.html'), 'utf8')).toBe(rootAppHtml);
+		expect(readFileSync(join(workspaceRoot, 'src/routes/+layout.svelte'), 'utf8')).toBe(rootLayout);
+		expect(readFileSync(join(workspaceRoot, 'svelte.config.js'), 'utf8')).toBe(rootSvelteConfig);
+		expect(readFileSync(join(target, 'package.json'), 'utf8')).toContain('"name": "my-dryui-app"');
+		expect(existsSync(join(target, 'src/routes/+layout.svelte'))).toBe(true);
+		expect(readFileSync(join(target, 'src/routes/+layout.svelte'), 'utf8')).toContain(
+			'{@render children()}'
+		);
+	});
+
 	test('next-steps cd line preserves an absolute path verbatim', () => {
 		// Regression: previously `targetPath.startsWith(process.cwd())` lacked a
 		// path-boundary check, so if cwd was `/a` and the user typed `/app`, the

@@ -94,6 +94,10 @@ function extractStyles(code: string): string | null {
 	return styleMatch ? (styleMatch[1] ?? null) : null;
 }
 
+function stripCssComments(styles: string): string {
+	return styles.replace(/\/\*[\s\S]*?\*\//g, (m) => '\n'.repeat(countNewlines(m)));
+}
+
 // Extraction helpers
 
 function countNewlines(str: string): number {
@@ -766,11 +770,16 @@ function checkManualCentering(styles: string, ctx: ReviewContext): Issue[] {
 
 function checkCustomThemeOverrides(styles: string, ctx: ReviewContext): Issue[] {
 	if (!styles || !/--dry-/.test(styles)) return [];
+	const cleanStyles = stripCssComments(styles);
+	const declRegex = /(?:^|[;{])\s*--dry-[\w-]+\s*:/m;
+	if (!declRegex.test(cleanStyles)) return [];
+	const startLine = getStyleBlockStartLine(ctx);
+	const localLine = findLineInBlock(cleanStyles, declRegex);
 	return [
 		{
 			severity: 'suggestion',
 			code: 'theme-in-style',
-			line: getStyleBlockStartLine(ctx),
+			line: styleLineToFileLine(localLine, startLine),
 			message: ruleMessage('theme-in-style'),
 			fix: null
 		}
