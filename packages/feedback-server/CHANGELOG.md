@@ -1,5 +1,11 @@
 # @dryui/feedback-server
 
+## 0.6.3
+
+### Patch Changes
+
+- [`9921ae4`](https://github.com/rob-balfre/dryui/commit/9921ae4df796a6b18980f99c5d2429b038a343c1) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Ask feedback agents to run the relevant project linter/check command before resolving feedback submissions.
+
 ## 0.6.2
 
 ### Patch Changes
