@@ -4,6 +4,7 @@
 	import { getContextMenuCtx } from './context.svelte.js';
 	import { createDismiss } from '../utils/dismiss.svelte.js';
 	import { createMenuNavigation } from '../utils/menu-navigation.svelte.js';
+	import { tryShowPopover, tryHidePopover } from '../utils/popover-toggle.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
@@ -21,16 +22,16 @@
 	});
 
 	$effect(() => {
-		if (ctx.open && el) {
+		if (!el) return;
+		if (ctx.open) {
 			el.style.position = 'fixed';
 			el.style.left = `${ctx.position.x}px`;
 			el.style.top = `${ctx.position.y}px`;
-			if (!el.matches(':popover-open')) {
-				el.showPopover();
-				menu.focusFirst();
-			}
-		} else if (!ctx.open && el?.matches(':popover-open')) {
-			el.hidePopover();
+			const wasOpen = el.matches(':popover-open');
+			tryShowPopover(el);
+			if (!wasOpen) menu.focusFirst();
+		} else {
+			tryHidePopover(el);
 		}
 	});
 

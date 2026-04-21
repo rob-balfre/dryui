@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Portal, Toast } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
+	import { tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import { Check } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import {
@@ -95,6 +96,7 @@
 	let submitting = $state(false);
 	let sent = $state(false);
 	let toasts: FeedbackToast[] = $state([]);
+	let toastLayerEl: HTMLDivElement | undefined = $state();
 	let toolbarHiddenForCapture = $state(false);
 	let scrollRootEl: HTMLElement | null = $state(null);
 	let viewportLeft = $state(0);
@@ -965,6 +967,28 @@
 	});
 
 	$effect(() => {
+		const node = toastLayerEl;
+		if (!node) return;
+
+		if (toasts.length === 0) {
+			tryHidePopover(node);
+			return;
+		}
+
+		if (layerHostEl && !layerHostEl.isConnected) return;
+
+		const frame = requestAnimationFrame(() => {
+			if (node.isConnected) tryShowPopover(node);
+		});
+
+		// Hide on cleanup so host-change re-promotion reopens in the top layer.
+		return () => {
+			cancelAnimationFrame(frame);
+			tryHidePopover(node);
+		};
+	});
+
+	$effect(() => {
 		return () => {
 			for (const timer of Object.values(toastTimers)) clearTimeout(timer);
 			for (const id of Object.keys(toastTimers)) delete toastTimers[id];
@@ -1191,18 +1215,25 @@
 		/>
 	</div>
 
-	{#if toasts.length > 0}
-		<Toast.Provider class="feedback-toast-provider" position="top-right">
-			{#each toasts as toast (toast.id)}
-				<Toast.Root id={toast.id} variant={toast.variant}>
-					<div class="feedback-toast-copy">
-						<Toast.Title>{toast.title}</Toast.Title>
-						<Toast.Description>{toast.description}</Toast.Description>
-					</div>
-				</Toast.Root>
-			{/each}
-		</Toast.Provider>
-	{/if}
+	<div
+		bind:this={toastLayerEl}
+		popover="manual"
+		role="region"
+		aria-label="Feedback notifications"
+		data-dryui-feedback-toast-layer
+		data-dry-stagger
+		data-position="top-right"
+		class="feedback-toast-provider"
+	>
+		{#each toasts as toast (toast.id)}
+			<Toast.Root id={toast.id} variant={toast.variant}>
+				<div class="feedback-toast-copy">
+					<Toast.Title>{toast.title}</Toast.Title>
+					<Toast.Description>{toast.description}</Toast.Description>
+				</div>
+			</Toast.Root>
+		{/each}
+	</div>
 </Portal>
 
 <style>
@@ -1345,7 +1376,24 @@
 		--dry-color-fill-error-weak: hsl(6 58% 18% / 0.96);
 		--dry-color-stroke-error: hsl(6 58% 40%);
 
+		position: fixed;
+		inset: var(--dry-space-4) var(--dry-space-4) auto auto;
+		z-index: var(--dry-layer-overlay);
+		display: grid;
+		grid-template-columns: minmax(0, min(420px, calc(100vw - var(--dry-space-8))));
+		gap: var(--dry-space-3);
+		padding: 0;
+		margin: 0;
+		border: none;
+		background: transparent;
+		color: inherit;
+		overflow: visible;
+		container-type: inline-size;
 		pointer-events: none;
+	}
+
+	.feedback-toast-provider:not(:popover-open) {
+		display: none;
 	}
 
 	.feedback-toast-copy {

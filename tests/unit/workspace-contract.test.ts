@@ -25,6 +25,12 @@ const validateWorkflow = await Bun.file(
 const docsVisualWorkflow = await Bun.file(
 	new URL('../../.github/workflows/docs-visual.yml', import.meta.url)
 ).text();
+const docsVisualConfig = await Bun.file(
+	new URL('../../playwright.docs.config.ts', import.meta.url)
+).text();
+const docsVisualSpec = await Bun.file(
+	new URL('../../tests/playwright/docs-visual.spec.ts', import.meta.url)
+).text();
 const testUnitScript = await Bun.file(
 	new URL('../../scripts/test-unit.ts', import.meta.url)
 ).text();
@@ -97,6 +103,7 @@ test('release scripts require validation before publish', () => {
 
 test('CI workflow runs a dedicated coverage lane and uploads retained artifacts', () => {
 	expect(validateWorkflow).toContain('coverage:');
+	expect(validateWorkflow).toContain('- run: bun --bun playwright install chromium');
 	expect(validateWorkflow).toContain('- run: bun run test:coverage');
 	expect(validateWorkflow).toContain('- run: bun run coverage:check');
 	expect(validateWorkflow).toContain('- run: bun run coverage:matrix');
@@ -112,9 +119,22 @@ test('CI workflow runs a dedicated coverage lane and uploads retained artifacts'
 });
 
 test('docs visual coverage runs in its own slower workflow', () => {
+	expect(packageJson.scripts['test:docs-visual']).toBe(
+		'bun --bun playwright test -c playwright.docs.config.ts'
+	);
+	expect(packageJson.scripts['test:docs-visual:update']).toBe(
+		'bun --bun playwright test -c playwright.docs.config.ts --update-snapshots'
+	);
+	expect(docsVisualConfig).toContain("command: 'bun --bun vite dev --host 127.0.0.1 --port 4173'");
+	expect(docsVisualConfig).toContain('fullyParallel: true');
+	expect(docsVisualConfig).not.toContain('workers: 1');
+	expect(docsVisualSpec).not.toContain("mode: 'serial'");
+	expect(docsVisualConfig).toContain("browserName: 'chromium'");
+	expect(docsVisualConfig).toContain('headless: true');
 	expect(docsVisualWorkflow).toContain('name: Docs Visual');
 	expect(docsVisualWorkflow).toContain('workflow_dispatch:');
 	expect(docsVisualWorkflow).toContain('schedule:');
+	expect(docsVisualWorkflow).toContain('- run: bun --bun playwright install chromium');
 	expect(docsVisualWorkflow).toContain('- run: bun run test:docs-visual');
 	expect(docsVisualWorkflow).not.toContain('pull_request:');
 	expect(docsVisualWorkflow).toContain('name: docs-visual-${{ github.sha }}');

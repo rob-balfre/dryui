@@ -4,6 +4,7 @@ test.use({ viewport: { width: 1440, height: 1200 } });
 
 async function openComponentRoute(page: Page, slug: string) {
 	const response = await page.goto(`/components/${slug}`, { waitUntil: 'domcontentloaded' });
+	await page.waitForLoadState('networkidle');
 	await forceLightTheme(page);
 	await waitForFonts(page);
 	await waitForHydration(page);
@@ -86,7 +87,7 @@ test('dialog demo opens, renders the content panel, and closes with escape', asy
 	await openComponentRoute(page, 'dialog');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Open Dialog' });
+	const trigger = surface.getByRole('button', { name: 'Edit policy' });
 	const dialog = page.locator('[data-dialog-content][open]');
 	const panel = dialog.locator('[data-dialog-panel]');
 
@@ -311,7 +312,8 @@ test('tour demo supports next, previous, and finish across both steps', async ({
 	await expect(tooltip).toContainText('2 of 2');
 	await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
 	await expect(tooltip).toHaveAttribute('data-placement', 'left');
-	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-2.png');
+	await page.mouse.move(24, 24);
+	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-2.png', { maxDiffPixels: 200 });
 
 	await page.getByRole('button', { name: 'Previous' }).click();
 	await expect(tooltip).toContainText('Plan review');

@@ -27,7 +27,7 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
-      - run: bunx playwright install chromium
+      - run: bun --bun playwright install chromium
 
       - run: bun run test:docs-visual
 

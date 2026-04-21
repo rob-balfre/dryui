@@ -63,6 +63,23 @@ describe('runCheck', () => {
 		expect(output).toContain('bare-compound');
 	});
 
+	test('a .svelte path accepts BorderBeam from the generated spec', () => {
+		const root = createProject({
+			'Example.svelte': [
+				'<script>',
+				"  import { BorderBeam } from '@dryui/ui';",
+				'</script>',
+				'<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>Content</BorderBeam>'
+			].join('\n')
+		});
+
+		const output = runCheck(spec, { path: 'Example.svelte' }, { cwd: root });
+
+		expect(output).toContain('kind: component');
+		expect(output).not.toContain('unknown-component');
+		expect(output).not.toContain('BorderBeam> is not a known DryUI component');
+	});
+
 	test('a .svelte path includes lint-backed component violations', () => {
 		const root = createProject({
 			'Example.svelte': '<div style="color: red">hello</div>'

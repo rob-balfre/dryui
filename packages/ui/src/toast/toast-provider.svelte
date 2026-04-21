@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { toastStore } from '@dryui/primitives';
+	import { toastStore, tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import ToastRoot from './toast-root.svelte';
 	import ToastTitle from './toast-title.svelte';
 	import ToastDescription from './toast-description.svelte';
@@ -25,19 +25,8 @@
 
 	$effect(() => {
 		if (!panelEl) return;
-		if (visible) {
-			try {
-				if (!panelEl.matches(':popover-open')) panelEl.showPopover();
-			} catch {
-				// already open
-			}
-		} else {
-			try {
-				if (panelEl.matches(':popover-open')) panelEl.hidePopover();
-			} catch {
-				// already closed
-			}
-		}
+		if (visible) tryShowPopover(panelEl);
+		else tryHidePopover(panelEl);
 	});
 </script>
 

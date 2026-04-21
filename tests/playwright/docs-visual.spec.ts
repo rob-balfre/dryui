@@ -6,8 +6,6 @@ import {
 	screenshotName
 } from './docs-visual.helpers';
 
-test.describe.configure({ mode: 'serial' });
-
 for (const route of docsVisualRoutes) {
 	test(`${route.kind} ${route.name}`, async ({ page }) => {
 		const target = await expectDocsRoute(page, route);

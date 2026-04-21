@@ -11,9 +11,9 @@ afterEach(() => {
 	document.documentElement.classList.remove('theme-auto');
 });
 
-function mountFeedback(kind: HostKind) {
+function mountFeedback(kind: HostKind, options?: { serverUrl?: string }) {
 	document.documentElement.dataset.theme = 'dark';
-	render(FeedbackOverlayHarness, { kind });
+	render(FeedbackOverlayHarness, { kind, serverUrl: options?.serverUrl });
 
 	const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
 	if (!drawButton) {
@@ -243,6 +243,45 @@ describe('feedback overlay hosting', () => {
 						init?.method === 'POST'
 				)
 			).toBe(true);
+		} finally {
+			env.restore();
+		}
+	});
+
+	it('opens the feedback toast in the top layer above a modal host', async () => {
+		const env = setupSubmissionEnvironment();
+
+		try {
+			const { canvas } = mountFeedback('command-palette', {
+				serverUrl: 'http://feedback.test'
+			});
+
+			drawStroke(canvas);
+
+			const submitButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Send feedback"]'
+			);
+			if (!submitButton) throw new Error('Expected feedback submit button');
+
+			submitButton.click();
+			await waitForAsyncWork(50);
+			flushSync();
+
+			const toastLayer = document.querySelector<HTMLElement>('[data-dryui-feedback-toast-layer]');
+			if (!toastLayer) throw new Error('Expected feedback toast layer');
+
+			expect(toastLayer.matches(':popover-open')).toBe(true);
+
+			const toastRoot = toastLayer.querySelector<HTMLElement>('[data-toast-id]');
+			if (!toastRoot) throw new Error('Expected feedback toast content');
+
+			toastRoot.style.pointerEvents = 'auto';
+			const rect = toastRoot.getBoundingClientRect();
+			const topElement = document.elementFromPoint(
+				rect.left + rect.width / 2,
+				rect.top + rect.height / 2
+			);
+			expect(topElement instanceof Node && toastLayer.contains(topElement)).toBe(true);
 		} finally {
 			env.restore();
 		}

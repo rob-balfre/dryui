@@ -270,6 +270,31 @@ describe('Spec Compliance (errors)', () => {
 });
 
 describe('Structural (errors)', () => {
+	test('reports template issue lines after multiline scripts', () => {
+		const code = `<script>
+  import { Foobar } from '@dryui/ui';
+  const copy = [
+    'one',
+    'two',
+    'three',
+    'four'
+  ].join('\\n');
+</script>
+<Foobar>content</Foobar>`;
+		const result = reviewComponent(code, mockSpec);
+		const issue = result.issues.find((i) => i.code === 'unknown-component');
+		expect(issue?.line).toBe(10);
+	});
+
+	test('accepts BorderBeam from the generated spec', () => {
+		const code = `<script>
+  import { BorderBeam } from '@dryui/ui';
+</script>
+<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>Content</BorderBeam>`;
+		const result = reviewComponent(code, spec);
+		expect(result.issues.some((i) => i.code === 'unknown-component')).toBe(false);
+	});
+
 	test('flags orphaned compound part', () => {
 		const code = `<script>
   import { Card } from '@dryui/ui';

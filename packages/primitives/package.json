@@ -744,8 +744,9 @@
       "default": "./src/wave-divider/index.ts"
     },
     "./internal/motion": {
-      "types": "./dist/internal/motion.d.ts",
-      "default": "./dist/internal/motion.js"
+      "types": "./src/internal/motion.ts",
+      "svelte": "./src/internal/motion.ts",
+      "default": "./src/internal/motion.ts"
     }
   },
   "files": [

@@ -1,3 +1,4 @@
+import { tryHidePopover, tryShowPopover } from './popover-toggle.js';
 import { useAnchorStyles } from './use-anchor-styles.svelte.js';
 import type { Placement } from './anchor-position.svelte.js';
 
@@ -15,31 +16,22 @@ export function createPositionedPopover(options: PositionedPopoverOptions) {
 		if (el.matches(':popover-open')) return;
 
 		const source = options.triggerEl();
+		if (!source) {
+			tryShowPopover(el);
+			return;
+		}
+
 		try {
-			if (source) {
-				(
-					el as HTMLElement & { showPopover: (options?: { source?: HTMLElement }) => void }
-				).showPopover({ source });
-			} else {
-				el.showPopover();
-			}
+			(
+				el as HTMLElement & { showPopover: (options?: { source?: HTMLElement }) => void }
+			).showPopover({ source });
 		} catch {
-			try {
-				el.showPopover();
-			} catch {
-				// Already shown
-			}
+			tryShowPopover(el);
 		}
 	}
 
 	function hidePopover(el: HTMLElement) {
-		try {
-			if (el.matches(':popover-open')) {
-				el.hidePopover();
-			}
-		} catch {
-			// Already hidden
-		}
+		tryHidePopover(el);
 	}
 
 	return {

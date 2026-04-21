@@ -24,8 +24,8 @@ export const docsSmokeRoutes: DocsVisualRoute[] = [
 		kind: 'smoke',
 		name: 'Theme Wizard Preview',
 		path: '/theme-wizard/preview',
-		selector: '.preview-container',
-		headingText: 'Preview & Export'
+		selector: '.preview-scene',
+		headingText: 'Theme Wizard'
 	},
 	{
 		kind: 'smoke',
@@ -38,6 +38,7 @@ export const docsSmokeRoutes: DocsVisualRoute[] = [
 
 export async function openDocsRoute(page: Page, path: string): Promise<Response | null> {
 	const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
+	await page.waitForLoadState('networkidle');
 	await forceLightTheme(page);
 	await waitForFonts(page);
 	await waitForHydration(page);
@@ -176,7 +177,9 @@ async function assertComponentHealth(page: Page, route: DocsVisualRoute): Promis
 		const heights = await panels.evaluateAll((nodes) =>
 			nodes.map((node) => Math.round(node.getBoundingClientRect().height))
 		);
-		const templateToken = await root.getAttribute('data-template-token');
+		const trackTemplate = await root.evaluate((node) =>
+			getComputedStyle(node).getPropertyValue('--_splitter-columns')
+		);
 
 		expect(
 			beforeWidths[0],
@@ -194,8 +197,8 @@ async function assertComponentHealth(page: Page, route: DocsVisualRoute): Promis
 			heights[1],
 			`${route.path} right panel should render a meaningful preview height`
 		).toBeGreaterThan(180);
-		expect(templateToken, `${route.path} should render track sizing declaratively`).toContain(
-			'splitter-horizontal'
+		expect(trackTemplate, `${route.path} should render resizable grid tracks`).toContain(
+			'max-content'
 		);
 	}
 }

@@ -5,6 +5,7 @@ import { homedir, platform } from 'node:os';
 import { join } from 'node:path';
 import { createProbeCache, hasJsonEntry, type ProbeCache } from './config-probe.js';
 import type { EventBus } from './events.js';
+import { buildFeedbackDispatchPrompt } from './prompts.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
@@ -55,10 +56,6 @@ export interface DispatcherOptions {
 interface DispatchTargetsSnapshot {
 	defaultAgent: DispatchAgent;
 	configuredAgents: DispatchAgent[];
-}
-
-function buildPrompt(s: Submission): string {
-	return `New feedback submission ${s.id} on ${s.url}. Call feedback_get_submissions via the dryui-feedback MCP to fetch the screenshot and drawings, act on the change, then resolve with feedback_resolve_submission.`;
 }
 
 function shellQuote(s: string): string {
@@ -627,7 +624,7 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		return;
 	}
 
-	const prompt = buildPrompt(submission);
+	const prompt = buildFeedbackDispatchPrompt(submission);
 	console.error(`[dispatch] submission ${submission.id}`);
 	dispatchPrompt(target, prompt, options);
 }
