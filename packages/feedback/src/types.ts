@@ -35,6 +35,8 @@ export type Drawing = Stroke | Arrow | TextLabel;
 
 export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
+export type SubmitStatus = 'idle' | 'waiting-for-capture' | 'capturing' | 'uploading';
+
 export const AGENTS = [
 	'claude',
 	'codex',

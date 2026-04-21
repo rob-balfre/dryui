@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { DropdownMenu } from '@dryui/ui';
 	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send, PowerOff } from 'lucide-svelte';
-	import { AGENTS, type SubmissionAgent, type Tool } from '../types.js';
+	import { AGENTS, type SubmissionAgent, type SubmitStatus, type Tool } from '../types.js';
 	import AgentIcon from './agent-icon.svelte';
 	import { AGENT_META } from './agent-meta.js';
 
@@ -10,7 +10,7 @@
 		tool: Tool;
 		hasDrawings: boolean;
 		hidden: boolean;
-		submitting: boolean;
+		submitStatus: SubmitStatus;
 		sent: boolean;
 		agent: SubmissionAgent;
 		availableAgents: Array<Exclude<SubmissionAgent, 'off'>>;
@@ -25,7 +25,7 @@
 		tool,
 		hasDrawings,
 		hidden,
-		submitting,
+		submitStatus,
 		sent,
 		agent,
 		availableAgents,
@@ -34,6 +34,17 @@
 		onagentchange,
 		onsubmit
 	}: Props = $props();
+
+	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
+		idle: { label: 'Send feedback', aria: 'Send feedback' },
+		'waiting-for-capture': {
+			label: 'Share tab',
+			aria: 'Choose this tab to capture feedback'
+		},
+		capturing: { label: 'Capturing...', aria: 'Capturing screenshot' },
+		uploading: { label: 'Sending...', aria: 'Sending feedback' }
+	};
+	const SENT_COPY = { label: 'Sent!', aria: 'Sent!' } as const;
 
 	let agentMenuOpen = $state(false);
 	const FALLBACK_AGENTS = AGENTS.filter(
@@ -50,9 +61,11 @@
 
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
+	const submitting = $derived(submitStatus !== 'idle');
 	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
 	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
 	const showSubmitButton = $derived(hasDrawings || submitting || sent);
+	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
 	function handlePointerDown(e: PointerEvent) {
 		if ((e.target as HTMLElement).closest('button, [role="menu"], [role="menuitem"]')) return;
@@ -213,15 +226,14 @@
 			data-submitting={submitting || undefined}
 			data-sent={sent || undefined}
 			onclick={onsubmit}
-			aria-label={sent ? 'Sent!' : submitting ? 'Sending...' : 'Send feedback'}
+			aria-label={submitCopy.aria}
 		>
 			{#if sent}
 				<Check size={16} />
-				<span class="submit-label">Sent!</span>
 			{:else}
 				<Send size={16} />
-				<span class="submit-label">{submitting ? 'Sending...' : 'Send feedback'}</span>
 			{/if}
+			<span class="submit-label">{submitCopy.label}</span>
 		</button>
 	{/if}
 </div>

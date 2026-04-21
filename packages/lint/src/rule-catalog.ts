@@ -204,7 +204,8 @@ export const RULE_CATALOG = {
 		id: 'theme-in-style',
 		severity: 'suggestion',
 		message:
-			'Custom --dry-* variable overrides detected in <style> — run the `diagnose` tool on your theme CSS for a full health check'
+			'Custom --dry-* variable declarations detected in <style> — run the `diagnose` tool on your theme CSS for a full health check',
+		suggestedFix: 'Move custom --dry-* declarations to theme CSS'
 	},
 	'prefer-separator': {
 		id: 'prefer-separator',

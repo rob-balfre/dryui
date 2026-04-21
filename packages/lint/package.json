@@ -35,8 +35,8 @@
     "build": "tsc"
   },
   "devDependencies": {
-    "svelte": "^5.55.3",
-    "typescript": "^6.0.2"
+    "svelte": "^5.55.4",
+    "typescript": "^6.0.3"
   },
   "publishConfig": {
     "access": "public"

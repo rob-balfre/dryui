@@ -708,7 +708,7 @@ describe('Clean pass', () => {
 });
 
 describe('Custom theme override detection', () => {
-	test('suggests diagnose for --dry-* overrides in style block', () => {
+	test('suggests diagnose for --dry-* declarations in style block', () => {
 		const code = `<script>
   import { Card } from '@dryui/ui';
   import '@dryui/ui/themes/default.css';
@@ -723,6 +723,21 @@ describe('Custom theme override detection', () => {
 		expect(
 			result.issues.some((i) => i.severity === 'suggestion' && i.message.includes('diagnose'))
 		).toBe(true);
+	});
+
+	test('does not suggest diagnose for token consumption in style block', () => {
+		const code = `<script>
+  import { Card } from '@dryui/ui';
+  import '@dryui/ui/themes/default.css';
+</script>
+<Card.Root><Card.Content>Hi</Card.Content></Card.Root>
+<style>
+  .panel {
+    gap: var(--dry-space-4);
+  }
+</style>`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.message.includes('diagnose'))).toBe(false);
 	});
 
 	test('no suggestion when style has no --dry-* overrides', () => {

@@ -94,6 +94,10 @@ export interface PlanAddOptions {
 	readonly withTheme?: boolean;
 }
 
+export interface DetectProjectOptions {
+	readonly strictTarget?: boolean;
+}
+
 interface PackageJsonShape {
 	readonly dependencies?: Record<string, string>;
 	readonly devDependencies?: Record<string, string>;
@@ -199,8 +203,17 @@ function detectFramework(dependencyNames: Set<string>): DryuiFramework {
 	return 'unknown';
 }
 
-function detectPackageAt(start: string): PackageDetection {
-	const packageJsonPath = findUp(start, 'package.json');
+function detectPackageAt(
+	start: string,
+	options: { readonly strictTarget?: boolean } = {}
+): PackageDetection {
+	let packageJsonPath: string | null;
+	if (options.strictTarget) {
+		const candidate = resolve(start, 'package.json');
+		packageJsonPath = existsSync(candidate) ? candidate : null;
+	} else {
+		packageJsonPath = findUp(start, 'package.json');
+	}
 	const root = packageJsonPath ? dirname(packageJsonPath) : null;
 	const dependencyNames = getDependencyNames(readPackageJson(packageJsonPath));
 	return {
@@ -442,16 +455,18 @@ function findComponent(
 
 export function detectProject(
 	spec: Pick<ProjectPlannerSpec, 'themeImports'>,
-	inputPath?: string
+	inputPath?: string,
+	options: DetectProjectOptions = {}
 ): ProjectDetection {
 	const candidate = resolve(inputPath ?? process.cwd());
 	const explicitFile = existsSync(candidate) && statSync(candidate).isFile();
 	const start = explicitFile ? dirname(candidate) : candidate;
+	const strictTarget = options.strictTarget ?? false;
 
 	const warnings: string[] = [];
-	let detection = detectPackageAt(start);
+	let detection = detectPackageAt(start, { strictTarget });
 
-	if (detection.framework === 'unknown' && !explicitFile) {
+	if (!strictTarget && detection.framework === 'unknown' && !explicitFile) {
 		const descendants = findDescendantSvelteProjects(start);
 		const selected = selectDescendantProject(descendants);
 		if (selected) {
@@ -496,7 +511,12 @@ export function detectProject(
 		Number(!lintInstalled) +
 		Number(!lintPreprocessorWired);
 
-	if (!packageJsonPath) warnings.push('No package.json found above the provided path.');
+	if (!packageJsonPath)
+		warnings.push(
+			strictTarget
+				? 'No package.json found at the provided path.'
+				: 'No package.json found above the provided path.'
+		);
 	if (framework === 'unknown')
 		warnings.push('DryUI planning currently targets Svelte and SvelteKit projects.');
 
@@ -772,6 +792,7 @@ function buildScaffoldSteps(
 
 export interface PlanInstallOptions {
 	readonly packageManager?: DryuiPackageManager;
+	readonly strictTarget?: boolean;
 }
 
 export function planInstall(
@@ -779,7 +800,9 @@ export function planInstall(
 	inputPath?: string,
 	options?: PlanInstallOptions
 ): InstallPlan {
-	const detection = detectProject(spec, inputPath);
+	const detection = detectProject(spec, inputPath, {
+		strictTarget: options?.strictTarget ?? false
+	});
 	const steps: ProjectPlanStep[] = [];
 
 	if (detection.status === 'unsupported') {

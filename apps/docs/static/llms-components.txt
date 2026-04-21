@@ -122,7 +122,7 @@ Tags: scroll, navigation, top, button
 Kind: simple
 Root import: import { ScrollToTop } from '@dryui/ui'
 Subpath import: import { ScrollToTop } from '@dryui/ui/scroll-to-top'
-Props: position ('bottom-right' | 'bottom-left' | 'bottom-center'), accepted bottom-right, bottom-left, bottom-center, default 'bottom-right' | class (string) | threshold (number), default 300 | target (HTMLElement | undefined), Browsing context used for link navigation. | behavior (ScrollBehavior), default 'smooth' | children (Snippet<[{ visible: boolean; scrollToTop: () => void }]>), Content rendered inside the component., required
+Props: position ('bottom-right' | 'bottom-left' | 'bottom-center'), accepted bottom-right, bottom-left, bottom-center, default 'bottom-right' | class (string) | threshold (number), default 300 | target (HTMLElement), Browsing context used for link navigation. | behavior (ScrollBehavior), default 'smooth' | children (Snippet<[{ visible: boolean; scrollToTop: () => void }]>), Content rendered inside the component., required
 CSS variables: none
 Data attributes: data-position | data-visible
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation. | Only add region semantics when the scrollable surface has a unique, meaningful label.
@@ -325,7 +325,7 @@ Parts:
   Props: value (string), Current controlled or bindable value., bindable | name (string), Field name used during native form submission. | disabled (boolean), Prevents interaction and applies disabled styling. | required (boolean) | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - RadioGroup.Item
-  Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet | undefined), Content rendered inside the component.
+  Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component.
   Native props: Forwards <input> attributes via rest props.
 Structure:
   RadioGroup.Root
@@ -569,10 +569,10 @@ Parts:
   Props: placeholder (string), Hint text shown when no value is selected or entered.
   Native props: Forwards <input> attributes via rest props.
 - TagsInput.Tag
-  Props: index (number), required | value (string), Current controlled or bindable value., required, bindable | children (Snippet | undefined), Content rendered inside the component.
+  Props: index (number), required | value (string), Current controlled or bindable value., required, bindable | children (Snippet), Content rendered inside the component.
   Native props: Forwards <span> attributes via rest props.
 - TagsInput.TagDelete
-  Props: index (number), required | value (string | undefined), Current controlled or bindable value.
+  Props: index (number), required | value (string), Current controlled or bindable value.
   Native props: Forwards <button> attributes via rest props.
 - TagsInput.List
   Props: children (Snippet), Content rendered inside the component., required
@@ -605,7 +605,7 @@ Root import: import { FileUpload } from '@dryui/ui'
 Subpath import: import { FileUpload } from '@dryui/ui/file-upload'
 Parts:
 - FileUpload.Root
-  Props: files (File[]), bindable | accept (string | undefined) | multiple (boolean | undefined) | maxSize (number | undefined) | maxFiles (number | undefined) | disabled (boolean | undefined), Prevents interaction and applies disabled styling. | onFilesChange (((files: File[]) => void) | undefined) | children (Snippet), Content rendered inside the component., required
+  Props: files (File[]), bindable | accept (string) | multiple (boolean) | maxSize (number) | maxFiles (number) | disabled (boolean), Prevents interaction and applies disabled styling. | onFilesChange (((files: File[]) => void)) | children (Snippet), Content rendered inside the component., required
 - FileUpload.Dropzone
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
@@ -619,7 +619,7 @@ Parts:
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | children (Snippet), Content rendered inside the component. | file (File), required | index (number), required
   Native props: Forwards <li> attributes via rest props.
 - FileUpload.ItemDelete
-  Props: index (number), required | children (Snippet | undefined), Content rendered inside the component.
+  Props: index (number), required | children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 Structure:
   FileUpload.Root
@@ -651,7 +651,7 @@ Root import: import { FileSelect } from '@dryui/ui'
 Subpath import: import { FileSelect } from '@dryui/ui/file-select'
 Parts:
 - FileSelect.Root
-  Props: value (string | null), Current controlled or bindable value., default null | onrequest ((() => Promise<string | null>) | undefined) | onchange (((value: string | null) => void) | undefined) | disabled (boolean | undefined), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
+  Props: value (string | null), Current controlled or bindable value., default null | onrequest ((() => Promise<string | null>)) | onchange (((value: string | null) => void)) | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
 - FileSelect.Trigger
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <button> attributes via rest props.
@@ -659,7 +659,7 @@ Parts:
   Props: placeholder (string), Hint text shown when no value is selected or entered., default 'No file selected'
   Native props: Forwards <span> attributes via rest props.
 - FileSelect.Clear
-  Props: children (Snippet | undefined), Content rendered inside the component.
+  Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 Structure:
   FileSelect.Root
@@ -702,10 +702,10 @@ Parts:
   Props: format ('hex' | 'rgb' | 'hsl'), accepted hex, rgb, hsl, default 'hex'
   Native props: Forwards <input> attributes via rest props.
 - ColorPicker.Swatch
-  Props: color (string | undefined), Semantic color or tone applied to the component.
+  Props: color (string), Semantic color or tone applied to the component.
   Native props: Forwards <div> attributes via rest props.
 - ColorPicker.EyeDropper
-  Props: children (Snippet | undefined), Content rendered inside the component.
+  Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 - ColorPicker.ChannelInput
   Props: channel ('h' | 's' | 'v'), accepted h, s, v, required
@@ -760,16 +760,19 @@ Root import: import { Transfer } from '@dryui/ui'
 Subpath import: import { Transfer } from '@dryui/ui/transfer'
 Parts:
 - Transfer.Root
-  Props: sourceItems (import('./context.svelte.js').TransferItem[]), default [], required, bindable | targetItems (import('./context.svelte.js').TransferItem[]), default [], bindable | onChange (() | source (import('./context.svelte.js').TransferItem[],), required | target (import('./context.svelte.js').TransferItem[]), Browsing context used for link navigation., required | children (Snippet), Content rendered inside the component., required
+  Props: sourceItems (import('./context.svelte.js').TransferItem[]), default [], required, bindable | targetItems (import('./context.svelte.js').TransferItem[]), default [], bindable | onChange ((
+		source: import('./context.svelte.js').TransferItem[],
+		target: import('./context.svelte.js').TransferItem[]
+	) => void) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Transfer.List
-  Props: filterable (boolean) | content (Snippet<[{ items: TransferItemType[] }]>) | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | title (string | undefined), Primary heading or label text. | children (Snippet<[{ items: import('./context.svelte.js').TransferItem[] }]> | undefined), Content rendered inside the component.
+  Props: filterable (boolean) | content (Snippet<[{ items: TransferItemType[] }]>) | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | title (string), Primary heading or label text. | children (Snippet<[{ items: import('./context.svelte.js').TransferItem[] }]>), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - Transfer.Item
-  Props: key (string), required | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | disabled (boolean | undefined), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
+  Props: key (string), required | type ('source' | 'target'), HTML type attribute or component-specific type selector., accepted source, target, required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards native HTML attributes via rest props.
 - Transfer.Actions
-  Props: moveToTarget (() => void), required | moveToSource (() => void), required | moveAllToTarget (() => void), required | moveAllToSource (() => void), required | canMoveToTarget (boolean), required | canMoveToSource (boolean), required
+  Props: children (Snippet< [ { moveToTarget: () => void; moveToSource: () => void; moveAllToTarget: () => void; moveAllToSource: () => void; canMoveToTarget: boolean; canMoveToSource: boolean; } ] >), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 Structure:
   Transfer.Root
@@ -1147,10 +1150,10 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - MultiSelectCombobox.SelectionItem
-  Props: value (string), Current controlled or bindable value., required | children (Snippet | undefined), Content rendered inside the component.
+  Props: value (string), Current controlled or bindable value., required | children (Snippet), Content rendered inside the component.
   Native props: Forwards <span> attributes via rest props.
 - MultiSelectCombobox.SelectionRemove
-  Props: value (string), Current controlled or bindable value., required | label (string | undefined), Visible label text shown for the control or item.
+  Props: value (string), Current controlled or bindable value., required | label (string), Visible label text shown for the control or item.
   Native props: Forwards <button> attributes via rest props.
 Structure:
   MultiSelectCombobox.Root
@@ -1312,7 +1315,7 @@ Parts:
 - DatePicker.Root
   Props: open (boolean), Whether the overlay or disclosure is currently open., bindable | value (Date | null), Current controlled or bindable value., bindable | name (string), Field name used during native form submission., Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD. | locale (string) | min (Date | null), Minimum allowed value. | max (Date | null), Maximum allowed value. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
 - DatePicker.Trigger
-  Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component.
+  Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 - DatePicker.Content
   Props: placement (| 'top'
@@ -1407,7 +1410,7 @@ Parts:
 - DateRangePicker.Root
   Props: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
 - DateRangePicker.Trigger
-  Props: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet | undefined), Content rendered inside the component.
+  Props: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
 - DateRangePicker.Content
   Props: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
@@ -1568,7 +1571,7 @@ Parts:
   Props: index (number), required | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Splitter.Handle
-  Props: index (number), required | children (Snippet | undefined), Content rendered inside the component.
+  Props: index (number), required | children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 Structure:
   Splitter.Root
@@ -1851,7 +1854,7 @@ Parts:
   Props: href (string), Destination URL when the component renders as a link. | current (boolean), default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <a> attributes via rest props.
 - Breadcrumb.Separator
-  Props: children (Snippet | undefined), Content rendered inside the component.
+  Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <li> attributes via rest props.
 Structure:
   Breadcrumb.Root
@@ -3058,7 +3061,7 @@ Tags: user, profile, image, initials
 Kind: simple
 Root import: import { Avatar } from '@dryui/ui'
 Subpath import: import { Avatar } from '@dryui/ui/avatar'
-Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('circle' | 'square'), accepted circle, square, default 'circle' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | badge (Snippet) | children (Snippet | undefined), Content rendered inside the component.
+Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('circle' | 'square'), accepted circle, square, default 'circle' | status ('online' | 'offline' | 'busy' | 'away'), accepted online, offline, busy, away | badge (Snippet) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-avatar-font-size, --dry-avatar-radius, --dry-avatar-size
 Data attributes: data-avatar | data-avatar-badge | data-avatar-status | data-avatar-wrapper | data-part | data-shape | data-size | data-status
@@ -3154,7 +3157,7 @@ Tags: chat, thread, conversation, log
 Kind: simple
 Root import: import { ChatThread } from '@dryui/ui'
 Subpath import: import { ChatThread } from '@dryui/ui/chat-thread'
-Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet<), Content rendered inside the component., required | index (number), required | viewTransitionName (string), required | isLatest (boolean), required
+Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >), Content rendered inside the component., required
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-chat-thread-gap, --dry-chat-thread-message-gap
 Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport
@@ -3539,7 +3542,7 @@ Tags: code, syntax, pre, monospace, copy
 Kind: simple
 Root import: import { CodeBlock } from '@dryui/ui'
 Subpath import: import { CodeBlock } from '@dryui/ui/code-block'
-Props: showLineNumbers (boolean), default false | showCopyButton (boolean), default true | linkResolver ((text: string, type: string) => string | undefined) | code (string), default '', required | language (string) | shell (Snippet<[CodeBlockShellContext]>) | children (Snippet), Content rendered inside the component.
+Props: showLineNumbers (boolean), default false | showCopyButton (boolean), default true | linkResolver ((text: string, type: string) => string) | code (string), default '', required | language (string) | shell (Snippet<[CodeBlockShellContext]>) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-btn-color, --dry-code-bg, --dry-code-border, --dry-code-color, --dry-code-copy-color, --dry-code-copy-hover-color, --dry-code-font-size, --dry-code-header-bg, --dry-code-header-color, --dry-code-line-height, --dry-code-padding, --dry-code-radius
 Data attributes: data-code-block | data-code-block-code | data-code-block-copy | data-code-block-header | data-code-block-language | data-code-block-line-content | data-code-block-line-number | data-code-block-pre | data-code-block-token-link | data-copied | data-language | data-single-line | data-token-type
@@ -3630,7 +3633,7 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <td> attributes via rest props.
 - DataGrid.Pagination
-  Props: page (number), required | totalPages (number), required | totalItems (number), required | pageSize (number), required | canPrevious (boolean), required | canNext (boolean), required | previous (() => void), required | next (() => void), required | goto ((page: number) => void), required
+  Props: children (Snippet< [ { page: number; totalPages: number; totalItems: number; pageSize: number; canPrevious: boolean; canNext: boolean; previous: () => void; next: () => void; goto: (page: number) => void; } ] >), Content rendered inside the component.
   Native props: Forwards <element> attributes via rest props.
 - DataGrid.SelectAll
   Props: none
@@ -3647,33 +3650,38 @@ Parts:
 Structure:
   DataGrid.Root
     DataGrid.Table
-    DataGrid.Header
-    DataGrid.Column
-    DataGrid.Body
-    DataGrid.Row
-    DataGrid.Cell
+      DataGrid.Header
+        DataGrid.Row
+          DataGrid.Column
+      DataGrid.Body
+        DataGrid.Row
+          DataGrid.Cell
     DataGrid.Pagination
-    DataGrid.SelectAll
-    DataGrid.SelectCell
-    DataGrid.ExpandableRow
-    DataGrid.ExpandTrigger
 CSS variables: --dry-data-grid-border, --dry-data-grid-head-padding-y, --dry-data-grid-header-bg, --dry-data-grid-padding-x, --dry-data-grid-padding-y, --dry-data-grid-pagination-gap, --dry-data-grid-row-hover, --dry-data-grid-row-stripe, --dry-data-grid-sort-color
 Data attributes: data-align | data-data-grid | data-dg-body | data-dg-cell | data-dg-column | data-dg-header | data-dg-pagination | data-dg-row | data-dg-select-cell | data-dg-table | data-expanded | data-filter-input | data-pagination-info | data-pagination-next | data-pagination-prev | data-part | data-pinned | data-resizable | data-resizing | data-row-id | data-selected (Present when the current item is selected.) | data-sort-indicator | data-sort-trigger | data-sortable | data-sorted | data-striped | data-type
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
 ```svelte
-<DataGrid.Root>
-  <DataGrid.Table>...</DataGrid.Table>
-  <DataGrid.Header>...</DataGrid.Header>
-  <DataGrid.Column>...</DataGrid.Column>
-  <DataGrid.Body>...</DataGrid.Body>
-  <DataGrid.Row>...</DataGrid.Row>
-  <DataGrid.Cell>...</DataGrid.Cell>
-  <DataGrid.Pagination>...</DataGrid.Pagination>
-  <DataGrid.SelectAll>...</DataGrid.SelectAll>
-  <DataGrid.SelectCell>...</DataGrid.SelectCell>
-  <DataGrid.ExpandableRow>...</DataGrid.ExpandableRow>
-  <DataGrid.ExpandTrigger>...</DataGrid.ExpandTrigger>
+<DataGrid.Root items={rows} pageSize={10}>
+  <DataGrid.Table>
+    <DataGrid.Header>
+      <DataGrid.Row>
+        <DataGrid.Column key="name" sortable>Name</DataGrid.Column>
+        <DataGrid.Column key="status">Status</DataGrid.Column>
+      </DataGrid.Row>
+    </DataGrid.Header>
+    <DataGrid.Body>
+      {#snippet children({ items })}
+        {#each items as row (row.id)}
+          <DataGrid.Row rowId={row.id}>
+            <DataGrid.Cell>{row.name}</DataGrid.Cell>
+            <DataGrid.Cell>{row.status}</DataGrid.Cell>
+          </DataGrid.Row>
+        {/each}
+      {/snippet}
+    </DataGrid.Body>
+  </DataGrid.Table>
+  <DataGrid.Pagination />
 </DataGrid.Root>
 ```
 
@@ -4168,7 +4176,7 @@ Category: display
 Tags: user, profile, identity, name, description
 Kind: simple
 Root import: import { User } from '@dryui/primitives'
-Props: name (string), Field name used during native form submission., required | description (string), Supporting copy that explains the current control or section. | children (Snippet | undefined), Content rendered inside the component.
+Props: name (string), Field name used during native form submission., required | description (string), Supporting copy that explains the current control or section. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
@@ -4208,7 +4216,12 @@ Root import: import { Toast } from '@dryui/ui'
 Subpath import: import { Toast } from '@dryui/ui/toast'
 Parts:
 - Toast.Provider
-  Props: children (Snippet), Content rendered inside the component.
+  Props: position ('top-right'
+		| 'top-left'
+		| 'bottom-right'
+		| 'bottom-left'
+		| 'top-center'
+		| 'bottom-center'), accepted top-right, top-left, bottom-right, bottom-left, top-center, bottom-center, default 'bottom-right' | children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - Toast.Root
   Props: id (string), Unique HTML id used for labels, aria relationships, or targeted styling., required | variant ('info' | 'success' | 'warning' | 'error'), Visual style preset for the component., accepted info, success, warning, error, default 'info' | persistent (boolean) | progress (number) | children (Snippet), Content rendered inside the component., required
@@ -4253,7 +4266,7 @@ Tags: loading, progress, bar, percentage
 Kind: simple
 Root import: import { Progress } from '@dryui/ui'
 Subpath import: import { Progress } from '@dryui/ui/progress'
-Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | color ('blue' | 'green' | 'red' | 'yellow'), Semantic color or tone applied to the component., accepted blue, green, red, yellow, default 'blue' | value (number | undefined), Current controlled or bindable value. | max (number), Maximum allowed value., default 100 | segments (ProgressSegment[]) | thresholds (ProgressThreshold[]) | showLabel (boolean | 'inside' | 'outside')
+Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | color ('blue' | 'green' | 'red' | 'yellow'), Semantic color or tone applied to the component., accepted blue, green, red, yellow, default 'blue' | value (number), Current controlled or bindable value. | max (number), Maximum allowed value., default 100 | segments (ProgressSegment[]) | thresholds (ProgressThreshold[]) | showLabel (boolean | 'inside' | 'outside')
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-progress-bar, --dry-progress-height, --dry-progress-label-inside, --dry-progress-radius
 Data attributes: data-color | data-has-label | data-max | data-part | data-position | data-segmented | data-size | data-state | data-value | data-with-label
@@ -4304,7 +4317,7 @@ Tags: progress, ring, circular, loading
 Kind: simple
 Root import: import { ProgressRing } from '@dryui/ui'
 Subpath import: import { ProgressRing } from '@dryui/ui/progress-ring'
-Props: color ('primary' | 'gray' | 'green' | 'red' | 'yellow'), Semantic color or tone applied to the component., accepted primary, gray, green, red, yellow, default 'primary' | indeterminate (boolean), default false | value (number | undefined), Current controlled or bindable value. | max (number), Maximum allowed value., default 100 | size (number), Size preset affecting density, spacing, or typography., default 40 | strokeWidth (number), default 4
+Props: color ('primary' | 'gray' | 'green' | 'red' | 'yellow'), Semantic color or tone applied to the component., accepted primary, gray, green, red, yellow, default 'primary' | indeterminate (boolean), default false | value (number), Current controlled or bindable value. | max (number), Maximum allowed value., default 100 | size (number), Size preset affecting density, spacing, or typography., default 40 | strokeWidth (number), default 4
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-progress-ring-indeterminate-speed, --dry-progress-ring-indicator-color
 Data attributes: data-color | data-max | data-part | data-state | data-value
@@ -4331,7 +4344,7 @@ Parts:
   Props: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DragAndDrop.Handle
-  Props: index (number), required | children (Snippet | undefined), Content rendered inside the component.
+  Props: index (number), required | children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - DragAndDrop.Group
   Props: none
@@ -4361,7 +4374,7 @@ Tags: teleport, portal, mount, target
 Kind: simple
 Root import: import { Portal } from '@dryui/ui'
 Subpath import: import { Portal } from '@dryui/ui/portal'
-Props: target (string | HTMLElement | undefined), Browsing context used for link navigation. | disabled (boolean | undefined), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
+Props: target (string | HTMLElement), Browsing context used for link navigation. | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
 CSS variables: none
 Data attributes: data-dry-portal
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
@@ -4394,7 +4407,7 @@ Tags: a11y, focus, trap, modal, keyboard
 Kind: simple
 Root import: import { FocusTrap } from '@dryui/ui'
 Subpath import: import { FocusTrap } from '@dryui/ui/focus-trap'
-Props: active (boolean | undefined) | initialFocus (string | undefined) | returnFocus (boolean | undefined) | children (Snippet | undefined), Content rendered inside the component.
+Props: active (boolean) | initialFocus (string) | returnFocus (boolean) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: none
