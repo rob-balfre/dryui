@@ -9,7 +9,7 @@
 	import Logo from '$lib/components/Logo.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { BUILD_TIMESTAMP, DRYUI_VERSION } from '$lib/site-meta';
+	import { BUILD_TIMESTAMP, DRYUI_VERSION, SITE_DESCRIPTION } from '$lib/site-meta';
 	import { withBase, withQueryParam } from '$lib/utils';
 	import '../app.css';
 
@@ -88,6 +88,10 @@
 		document.querySelector('main.docs-content')?.scrollTo({ top: 0, behavior: 'instant' });
 	});
 </script>
+
+<svelte:head>
+	<meta name="description" content={SITE_DESCRIPTION} />
+</svelte:head>
 
 {#snippet docsShell()}
 	<div class="docs-shell-frame">
