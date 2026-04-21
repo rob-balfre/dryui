@@ -19,7 +19,7 @@ import {
 	type ProbeCache
 } from '@dryui/feedback-server/internals/probe';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { homeRelative } from '../run.js';
@@ -50,6 +50,7 @@ export interface InstallResult {
 export interface AgentSetupStatus {
 	editor: SetupGuideId;
 	dryui: boolean;
+	feedback: boolean;
 	svelte: boolean;
 	source: 'plugin' | 'mcp' | 'mixed' | 'none';
 }
@@ -59,6 +60,7 @@ export interface AgentSetupEntry {
 	displayName: string;
 	plugin: boolean;
 	mcp: boolean;
+	feedback: boolean;
 	svelte: boolean;
 }
 
@@ -314,9 +316,9 @@ interface EditorMcpConfig {
 
 const EDITOR_MCP_CONFIG: Partial<Record<SetupGuideId, EditorMcpConfig>> = {
 	copilot: {
-		containerKey: 'servers',
-		configPath: (ctx) => join(ctx.cwd, '.vscode/mcp.json'),
-		label: () => 'Update .vscode/mcp.json'
+		containerKey: 'mcpServers',
+		configPath: (ctx) => join(ctx.cwd, '.mcp.json'),
+		label: () => 'Update .mcp.json'
 	},
 	cursor: {
 		containerKey: 'mcpServers',
@@ -383,6 +385,7 @@ function copilotInstaller(ctx: InstallContext): InstallResult {
 		...editorMcpParams('copilot', ctx),
 		servers: {
 			dryui: { type: 'stdio', ...NPX_DRYUI_MCP },
+			'dryui-feedback': { type: 'stdio', ...NPX_DRYUI_FEEDBACK_MCP },
 			...maybeSvelte(ctx, () => ({ type: 'stdio', ...NPX_SVELTE_MCP }))
 		}
 	});
@@ -437,6 +440,22 @@ function windsurfInstaller(ctx: InstallContext): InstallResult {
 	return finalize('windsurf', [skill, config]);
 }
 
+// Gemini has a native extension path (`gemini extensions install packages/plugin`)
+// that bundles both MCP servers plus GEMINI.md. This installer is the MCP-only
+// fallback for users who can't run the extension path — it wires both servers
+// into ~/.gemini/settings.json so feedback works without the extension.
+function geminiInstaller(ctx: InstallContext): InstallResult {
+	const config = mergeServersConfig({
+		...editorMcpParams('gemini', ctx),
+		servers: {
+			dryui: NPX_DRYUI_MCP,
+			'dryui-feedback': NPX_DRYUI_FEEDBACK_MCP,
+			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
+		}
+	});
+	return finalize('gemini', [config]);
+}
+
 function zedInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('zed', ctx),
@@ -451,6 +470,7 @@ function zedInstaller(ctx: InstallContext): InstallResult {
 const INSTALLERS: Partial<Record<SetupGuideId, (ctx: InstallContext) => InstallResult>> = {
 	copilot: copilotInstaller,
 	cursor: cursorInstaller,
+	gemini: geminiInstaller,
 	opencode: opencodeInstaller,
 	windsurf: windsurfInstaller,
 	zed: zedInstaller
@@ -602,7 +622,7 @@ export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): read
 		case 'copilot':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.github/skills/dryui'))}`,
-				`• Merge dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.vscode/mcp.json'))}`
+				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.mcp.json'))}`
 			];
 		case 'cursor':
 			return [
@@ -613,6 +633,10 @@ export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): read
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.opencode/skills/dryui'))}`,
 				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
+			];
+		case 'gemini':
+			return [
+				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.gemini/settings.json'))}`
 			];
 		case 'windsurf':
 			return [
@@ -694,6 +718,41 @@ function hasClaudePluginServer(
 	return hasJsonEntry(join(installPath, '.mcp.json'), 'mcpServers', serverName, cache);
 }
 
+// Gemini extensions live at ~/.gemini/extensions/<folder>/gemini-extension.json.
+// The folder name isn't always the extension name, so try the conventional
+// `<name>/` folder first and fall back to a full scan keyed by manifest `name`.
+function findGeminiExtensionManifest(
+	home: string,
+	extensionName: string,
+	cache?: ProbeCache
+): string | null {
+	const extensionsDir = join(home, '.gemini/extensions');
+	const conventional = join(extensionsDir, extensionName, 'gemini-extension.json');
+	const direct = readJsonObject(conventional, cache);
+	if (direct && direct.name === extensionName) return conventional;
+
+	let entries: string[];
+	try {
+		entries = readdirSync(extensionsDir);
+	} catch {
+		return null;
+	}
+	for (const entry of entries) {
+		if (entry === extensionName) continue;
+		const manifestPath = join(extensionsDir, entry, 'gemini-extension.json');
+		const parsed = readJsonObject(manifestPath, cache);
+		if (parsed && parsed.name === extensionName) return manifestPath;
+	}
+	return null;
+}
+
+function deriveSource(plugin: boolean, mcp: boolean): AgentSetupStatus['source'] {
+	if (plugin && mcp) return 'mixed';
+	if (plugin) return 'plugin';
+	if (mcp) return 'mcp';
+	return 'none';
+}
+
 function probeAgentSetup(
 	editor: SetupGuideId,
 	ctx: InstallContext,
@@ -708,14 +767,19 @@ function probeAgentSetup(
 		const mcp =
 			hasJsonEntry(claudeSettings, 'mcpServers', 'dryui', cache) ||
 			hasJsonEntry(join(ctx.cwd, '.mcp.json'), 'mcpServers', 'dryui', cache);
+		const feedback =
+			(plugin && hasClaudePluginServer(home, 'dryui@dryui', 'dryui-feedback', cache)) ||
+			hasJsonEntry(claudeSettings, 'mcpServers', 'dryui-feedback', cache) ||
+			hasJsonEntry(join(ctx.cwd, '.mcp.json'), 'mcpServers', 'dryui-feedback', cache);
 		return {
 			editor,
 			dryui: plugin || mcp,
+			feedback,
 			svelte:
 				hasJsonEntry(claudeSettings, 'mcpServers', 'svelte', cache) ||
 				(plugin && hasClaudePluginServer(home, 'dryui@dryui', 'svelte', cache)) ||
 				(sveltePlugin && hasClaudePluginServer(home, 'svelte@svelte', 'svelte', cache)),
-			source: plugin && mcp ? 'mixed' : plugin ? 'plugin' : mcp ? 'mcp' : 'none'
+			source: deriveSource(plugin, mcp)
 		};
 	}
 
@@ -723,47 +787,69 @@ function probeAgentSetup(
 		const codexConfig = join(home, '.codex/config.toml');
 		const plugin = hasTomlSection(codexConfig, 'plugins."dryui@dryui"', cache);
 		const mcp = hasTomlSection(codexConfig, 'mcp_servers.dryui', cache);
+		const pluginMcpManifest = join(home, '.codex/.tmp/marketplaces/dryui/.mcp.json');
 		return {
 			editor,
 			dryui: plugin || mcp,
+			feedback:
+				hasTomlSection(codexConfig, 'mcp_servers."dryui-feedback"', cache) ||
+				(plugin && hasJsonEntry(pluginMcpManifest, 'mcpServers', 'dryui-feedback', cache)),
 			svelte:
 				hasTomlSection(codexConfig, 'mcp_servers.svelte', cache) ||
-				(plugin &&
-					hasJsonEntry(
-						join(home, '.codex/.tmp/marketplaces/dryui/.mcp.json'),
-						'mcpServers',
-						'svelte',
-						cache
-					)),
-			source: plugin && mcp ? 'mixed' : plugin ? 'plugin' : mcp ? 'mcp' : 'none'
+				(plugin && hasJsonEntry(pluginMcpManifest, 'mcpServers', 'svelte', cache)),
+			source: deriveSource(plugin, mcp)
 		};
 	}
 
 	if (editor === 'copilot') {
-		const copilotCliConfig = join(home, '.copilot/mcp-config.json');
-		const vscodeConfig = join(ctx.cwd, '.vscode/mcp.json');
-		const mcp =
-			hasJsonEntry(copilotCliConfig, 'mcpServers', 'dryui', cache) ||
-			hasJsonEntry(vscodeConfig, 'servers', 'dryui', cache);
+		// Copilot CLI loads .mcp.json (workspace) and ~/.copilot/mcp-config.json (user).
+		// VS Code's Copilot extension still reads .vscode/mcp.json with a `servers` key,
+		// kept as a legacy fallback for pre-CLI-migration setups.
+		const copilotSources = [
+			[join(ctx.cwd, '.mcp.json'), 'mcpServers'],
+			[join(home, '.copilot/mcp-config.json'), 'mcpServers'],
+			[join(ctx.cwd, '.vscode/mcp.json'), 'servers']
+		] as const;
+		const hasAny = (name: string) =>
+			copilotSources.some(([path, key]) => hasJsonEntry(path, key, name, cache));
+		const mcp = hasAny('dryui');
 		return {
 			editor,
 			dryui: mcp,
-			svelte:
-				hasJsonEntry(copilotCliConfig, 'mcpServers', 'svelte', cache) ||
-				hasJsonEntry(vscodeConfig, 'servers', 'svelte', cache),
+			feedback: hasAny('dryui-feedback'),
+			svelte: hasAny('svelte'),
 			source: mcp ? 'mcp' : 'none'
+		};
+	}
+
+	if (editor === 'gemini') {
+		const geminiSettings = join(home, '.gemini/settings.json');
+		const pluginManifest = findGeminiExtensionManifest(home, 'dryui', cache);
+		const plugin = pluginManifest !== null;
+		const mcp = hasJsonEntry(geminiSettings, 'mcpServers', 'dryui', cache);
+		const pluginHas = (name: string) =>
+			pluginManifest !== null && hasJsonEntry(pluginManifest, 'mcpServers', name, cache);
+		return {
+			editor,
+			dryui: plugin || mcp,
+			feedback:
+				pluginHas('dryui-feedback') ||
+				hasJsonEntry(geminiSettings, 'mcpServers', 'dryui-feedback', cache),
+			svelte: pluginHas('svelte') || hasJsonEntry(geminiSettings, 'mcpServers', 'svelte', cache),
+			source: deriveSource(plugin, mcp)
 		};
 	}
 
 	const config = EDITOR_MCP_CONFIG[editor];
 	if (!config) {
-		return { editor, dryui: false, svelte: false, source: 'none' };
+		return { editor, dryui: false, feedback: false, svelte: false, source: 'none' };
 	}
 	const path = config.configPath(ctx);
 	const mcp = hasJsonEntry(path, config.containerKey, 'dryui', cache);
 	return {
 		editor,
 		dryui: mcp,
+		feedback: hasJsonEntry(path, config.containerKey, 'dryui-feedback', cache),
 		svelte: hasJsonEntry(path, config.containerKey, 'svelte', cache),
 		source: mcp ? 'mcp' : 'none'
 	};
@@ -774,7 +860,9 @@ function shortEditorName(editor: SetupGuideId): string {
 }
 
 function formatAgentSetupStatus(status: AgentSetupStatus): string {
-	const labels = [status.source === 'mixed' ? 'plugin + mcp' : status.source];
+	const sourceLabel = status.source === 'mixed' ? 'plugin + mcp' : status.source;
+	const primary = status.dryui && !status.feedback ? `${sourceLabel} (no feedback)` : sourceLabel;
+	const labels = [primary];
 	if (status.svelte) labels.push('svelte');
 	return `${shortEditorName(status.editor)} [${labels.join(' + ')}]`;
 }
@@ -856,7 +944,7 @@ export function readAgentSetupStatuses(ctx: InstallContext): readonly AgentSetup
 }
 
 export function getAgentSetupStatus(editor: SetupGuideId, ctx: InstallContext): AgentSetupStatus {
-	return probeAgentSetup(editor, ctx);
+	return probeAgentSetup(editor, ctx, createProbeCache());
 }
 
 export function summarizeAgentSetupStatus(ctx: InstallContext): string {
@@ -873,6 +961,7 @@ export function readAgentSetupEntries(ctx: InstallContext): readonly AgentSetupE
 			displayName: shortEditorName(status.editor),
 			plugin: status.source === 'plugin' || status.source === 'mixed',
 			mcp: status.source === 'mcp' || status.source === 'mixed',
+			feedback: status.feedback,
 			svelte: status.svelte
 		}));
 }

@@ -40,11 +40,16 @@ command = "npx"
 args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
 const COPILOT_CONFIG = `{
-  "servers": {
+  "mcpServers": {
     "dryui": {
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@dryui/mcp"]
+    },
+    "dryui-feedback": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
     }
   }
 }`;
@@ -125,7 +130,7 @@ const SVELTE_SECTION_OPENCODE: SetupGuideSection = {
 
 const SVELTE_SECTION_COPILOT: SetupGuideSection = {
 	title: 'Svelte MCP (recommended companion)',
-	note: `${SVELTE_MCP_NOTE} Adds a sibling entry under \`servers\` in \`.vscode/mcp.json\`.`,
+	note: `${SVELTE_MCP_NOTE} Adds a sibling entry under \`mcpServers\` in \`.mcp.json\`.`,
 	code: `"svelte": {
   "type": "stdio",
   "command": "npx",
@@ -230,13 +235,13 @@ ${CODEX_CONFIG}`
 gemini extensions install ~/dryui/packages/plugin`
 			},
 			{
-				title: 'Optional MCP-only fallback',
-				note: 'Only use this if you cannot install the extension. It does not install GEMINI.md with the bundled DryUI skill.',
+				title: 'Or use the MCP-only fallback',
+				note: '`dryui setup --editor gemini --install` merges both servers into `~/.gemini/settings.json` for you. Use this if you cannot install the extension (it skips GEMINI.md with the bundled DryUI skill).',
 				code: GEMINI_CONFIG
 			},
 			SVELTE_SECTION_GEMINI
 		],
-		followUp: 'After installing the extension, restart Gemini so `ask` / `check` are available.'
+		followUp: 'Restart Gemini after installing so `ask` / `check` are available.'
 	},
 	{
 		id: 'opencode',
@@ -261,9 +266,9 @@ gemini extensions install ~/dryui/packages/plugin`
 	},
 	{
 		id: 'copilot',
-		label: 'VS Code / Copilot',
+		label: 'GitHub Copilot',
 		description:
-			'Copy the DryUI skill into the repo and add the MCP server for Copilot Agent mode.',
+			'Copy the DryUI skill into the repo and add the MCP servers for Copilot CLI and VS Code Agent mode.',
 		sections: [
 			{
 				title: 'Install the skill',
@@ -271,13 +276,14 @@ gemini extensions install ~/dryui/packages/plugin`
 				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui`
 			},
 			{
-				title: 'Add the MCP server',
-				note: 'Copilot uses `servers`, not `mcpServers`, in `.vscode/mcp.json`.',
+				title: 'Add the MCP servers',
+				note: 'Copilot CLI reads `.mcp.json` at the project root (workspace) and `~/.copilot/mcp-config.json` (user). The schema uses `mcpServers`, same as Claude Code. The VS Code Copilot extension still reads `.vscode/mcp.json` with a `servers` key — if you rely on it there, duplicate the entries into `.vscode/mcp.json` under `servers`.',
 				code: COPILOT_CONFIG
 			},
 			SVELTE_SECTION_COPILOT
 		],
-		followUp: 'MCP tools only work in Copilot Agent mode.'
+		followUp:
+			'MCP tools are available in Copilot CLI and VS Code Copilot Agent mode. Start a fresh session after wiring.'
 	},
 	{
 		id: 'cursor',

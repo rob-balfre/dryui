@@ -7,7 +7,7 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 ## Claude-specific notes
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
-- Use `smolvm` to test the public `bunx @dryui/cli` install flow in a throwaway Linux VM without touching the host Mac. Command shapes and install notes live in the Isolated Testing section of [`AGENTS.md`](./AGENTS.md).
+- Use `bun vm:test` (one-shot scaffold + build) or `bun vm` (scaffold + Vite dev with HMR) to exercise the public `bunx @dryui/cli` flow in a throwaway smolvm microVM. Use `bun vm:exec <cmd>` from another tab to run commands inside the live session (e.g. `bun vm:exec dryui list`). Source and gotchas live in [`scripts/vm.ts`](./scripts/vm.ts) and [`scripts/vm-exec.ts`](./scripts/vm-exec.ts).
 - The optional Claude SessionStart hook is installed with:
 
 ```bash

@@ -48,6 +48,7 @@
     "release:gate": "bun run validate --no-test",
     "release": "bun run release:gate && bun run version && bun run publish:packages",
     "vm": "bun run ./scripts/vm.ts",
+    "vm:exec": "bun run ./scripts/vm-exec.ts",
     "vm:test": "smolvm machine run --net --image oven/bun:alpine -- sh -c 'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'"
   },
   "devDependencies": {

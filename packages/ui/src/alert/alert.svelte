@@ -77,7 +77,7 @@
 		--dry-alert-border: var(--dry-color-stroke-info);
 		--dry-alert-icon-color: var(--dry-color-fill-info);
 		--dry-radius-nested: max(
-			0px,
+			var(--dry-radius-sm),
 			calc(
 				var(--dry-alert-radius, var(--dry-surface-radius, var(--dry-radius-lg))) -
 					var(--dry-alert-padding, var(--dry-space-6))

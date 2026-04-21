@@ -93,7 +93,7 @@
 		grid-template-columns: minmax(12rem, auto);
 		padding: var(--dry-menu-padding, var(--dry-space-2));
 		--dry-radius-nested: max(
-			0px,
+			var(--dry-radius-sm),
 			calc(
 				var(--dry-menu-radius, var(--dry-radius-lg)) - var(--dry-menu-padding, var(--dry-space-2))
 			)

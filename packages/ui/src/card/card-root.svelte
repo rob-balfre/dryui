@@ -66,7 +66,7 @@
 	[data-card] {
 		--dry-card-radius: var(--dry-radius-2xl);
 		--dry-radius-nested: max(
-			0px,
+			var(--dry-radius-sm),
 			calc(var(--dry-card-radius) - var(--dry-card-padding, var(--dry-space-8)))
 		);
 		--dry-btn-radius: var(--dry-radius-nested);

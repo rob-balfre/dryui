@@ -36,6 +36,8 @@ const APP_COMMANDS: Record<'cursor' | 'windsurf' | 'zed', readonly [string, ...s
 	zed: ['zed']
 };
 
+type WorkspaceAppTarget = keyof typeof APP_COMMANDS;
+
 const APP_NAMES: Record<'cursor' | 'windsurf' | 'zed', string> = {
 	cursor: 'Cursor',
 	windsurf: 'Windsurf',
@@ -71,8 +73,9 @@ function osaQuote(s: string): string {
 // memoize so repeated /dispatch-targets GETs don't re-walk PATH for 9 agents each.
 const commandExistsCache = new Map<string, boolean>();
 const macAppExistsCache = new Map<string, boolean>();
-const vscodeChatSupportCache = new Map<string, boolean>();
+const chatSupportCache = new Map<string, boolean>();
 let vscodeCliCache: VsCodeCliTarget | null | undefined;
+let windsurfCliCache: string | null | undefined;
 
 type VsCodeUrlScheme = 'vscode' | 'vscode-insiders';
 
@@ -81,7 +84,7 @@ interface VsCodeCliTarget {
 	urlScheme: VsCodeUrlScheme;
 }
 
-interface VsCodeCliResolverContext {
+interface CliResolverContext {
 	currentPlatform: NodeJS.Platform;
 	homeDir: string;
 	resolveCommand(command: string): string | null;
@@ -108,8 +111,8 @@ function macAppExists(name: string): boolean {
 	return found;
 }
 
-function supportsVsCodeChat(command: string): boolean {
-	const cached = vscodeChatSupportCache.get(command);
+function supportsChatCommand(command: string): boolean {
+	const cached = chatSupportCache.get(command);
 	if (cached !== undefined) return cached;
 
 	const result = spawnSync(command, ['chat', '--help'], {
@@ -120,22 +123,33 @@ function supportsVsCodeChat(command: string): boolean {
 	});
 	const output = `${result.stdout ?? ''}\n${result.stderr ?? ''}`;
 	const supported = result.status === 0 && /\bUsage:\s+\S+\s+chat\b/.test(output);
-	vscodeChatSupportCache.set(command, supported);
+	chatSupportCache.set(command, supported);
 	return supported;
 }
 
-export function resolveVsCodeCliWith(context: VsCodeCliResolverContext): VsCodeCliTarget | null {
+function firstSupportedCli<T extends { command: string }>(
+	candidates: readonly T[],
+	context: Pick<CliResolverContext, 'pathExists' | 'supportsChat'>
+): T | null {
+	for (const candidate of candidates) {
+		if (!context.pathExists(candidate.command)) continue;
+		if (context.supportsChat(candidate.command)) return candidate;
+	}
+	return null;
+}
+
+export function resolveVsCodeCliWith(context: CliResolverContext): VsCodeCliTarget | null {
 	const candidates: VsCodeCliTarget[] = [];
 	const seen = new Set<string>();
-	const addCandidate = (command: string | null, urlScheme: VsCodeUrlScheme) => {
+	const add = (command: string | null, urlScheme: VsCodeUrlScheme) => {
 		if (!command || seen.has(command)) return;
 		seen.add(command);
 		candidates.push({ command, urlScheme });
 	};
 
 	if (context.currentPlatform === 'darwin') {
-		addCandidate('/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code', 'vscode');
-		addCandidate(
+		add('/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code', 'vscode');
+		add(
 			join(
 				context.homeDir,
 				'Applications',
@@ -143,11 +157,11 @@ export function resolveVsCodeCliWith(context: VsCodeCliResolverContext): VsCodeC
 			),
 			'vscode'
 		);
-		addCandidate(
+		add(
 			'/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code-insiders',
 			'vscode-insiders'
 		);
-		addCandidate(
+		add(
 			join(
 				context.homeDir,
 				'Applications',
@@ -157,15 +171,29 @@ export function resolveVsCodeCliWith(context: VsCodeCliResolverContext): VsCodeC
 		);
 	}
 
-	addCandidate(context.resolveCommand('code'), 'vscode');
-	addCandidate(context.resolveCommand('code-insiders'), 'vscode-insiders');
+	add(context.resolveCommand('code'), 'vscode');
+	add(context.resolveCommand('code-insiders'), 'vscode-insiders');
 
-	for (const candidate of candidates) {
-		if (!context.pathExists(candidate.command)) continue;
-		if (context.supportsChat(candidate.command)) return candidate;
+	return firstSupportedCli(candidates, context);
+}
+
+export function resolveWindsurfCliWith(context: CliResolverContext): string | null {
+	const candidates: { command: string }[] = [];
+	const seen = new Set<string>();
+	const add = (command: string | null) => {
+		if (!command || seen.has(command)) return;
+		seen.add(command);
+		candidates.push({ command });
+	};
+
+	if (context.currentPlatform === 'darwin') {
+		add('/Applications/Windsurf.app/Contents/Resources/app/bin/windsurf');
+		add(join(context.homeDir, 'Applications', 'Windsurf.app/Contents/Resources/app/bin/windsurf'));
 	}
 
-	return null;
+	add(context.resolveCommand('windsurf'));
+
+	return firstSupportedCli(candidates, context)?.command ?? null;
 }
 
 function resolveVsCodeCli(): VsCodeCliTarget | null {
@@ -175,9 +203,21 @@ function resolveVsCodeCli(): VsCodeCliTarget | null {
 		homeDir: homedir(),
 		resolveCommand: (command) => which(command),
 		pathExists: (path) => existsSync(path),
-		supportsChat: supportsVsCodeChat
+		supportsChat: supportsChatCommand
 	});
 	return vscodeCliCache;
+}
+
+function resolveWindsurfCli(): string | null {
+	if (windsurfCliCache !== undefined) return windsurfCliCache;
+	windsurfCliCache = resolveWindsurfCliWith({
+		currentPlatform: platform(),
+		homeDir: homedir(),
+		resolveCommand: (command) => which(command),
+		pathExists: (path) => existsSync(path),
+		supportsChat: supportsChatCommand
+	});
+	return windsurfCliCache;
 }
 
 function resolveVsCodeUrlScheme(): VsCodeUrlScheme {
@@ -238,6 +278,7 @@ function isConfiguredAgent(
 			return (
 				commandExists('windsurf') ||
 				macAppExists('Windsurf') ||
+				resolveWindsurfCli() !== null ||
 				hasJsonEntry(windsurfConfig, 'mcpServers', 'dryui-feedback', cache) ||
 				hasJsonEntry(windsurfConfig, 'mcpServers', 'dryui', cache)
 			);
@@ -309,6 +350,10 @@ export function buildVsCodeChatArgs(prompt: string): string[] {
 	return ['chat', '--mode', 'agent', prompt];
 }
 
+export function buildWindsurfChatArgs(prompt: string): string[] {
+	return ['chat', '--mode', 'agent', '--maximize', prompt];
+}
+
 function spawnDetached(command: string, args: readonly string[], cwd?: string): void {
 	spawn(command, args, { stdio: 'ignore', detached: true, cwd }).unref();
 }
@@ -319,16 +364,72 @@ function copyPromptToClipboard(prompt: string): void {
 	child.stdin.end(prompt);
 }
 
-function openWorkspaceApp(target: keyof typeof APP_COMMANDS, workspace: string): void {
-	if (platform() === 'win32') {
-		const command = APP_COMMANDS[target][0];
-		spawnDetached('cmd.exe', ['/c', 'start', '', command, workspace]);
+export type WorkspaceAppLaunchStrategy = 'cli' | 'mac-open' | 'windows-start';
+
+export interface WorkspaceAppLaunchContext {
+	currentPlatform: NodeJS.Platform;
+	commandExists(command: string): boolean;
+	macAppExists(name: string): boolean;
+}
+
+export interface WorkspaceAppLaunchPlan {
+	command: string;
+	args: readonly string[];
+	strategy: WorkspaceAppLaunchStrategy;
+}
+
+export function buildWorkspaceAppLaunch(
+	target: WorkspaceAppTarget,
+	workspace: string,
+	context: WorkspaceAppLaunchContext
+): WorkspaceAppLaunchPlan | null {
+	const [command, ...args] = APP_COMMANDS[target];
+
+	if (context.commandExists(command)) {
+		return {
+			command,
+			args: [...args, workspace],
+			strategy: 'cli'
+		};
+	}
+
+	if (context.currentPlatform === 'win32') {
+		return {
+			command: 'cmd.exe',
+			args: ['/c', 'start', '', command, ...args, workspace],
+			strategy: 'windows-start'
+		};
+	}
+
+	if (context.currentPlatform === 'darwin' && context.macAppExists(APP_NAMES[target])) {
+		return {
+			command: 'sh',
+			// sh -c is intentional: spawn('open', [...]) drops the prompt when fired from
+			// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
+			args: ['-c', `open -a ${shellQuote(APP_NAMES[target])} ${shellQuote(workspace)}`],
+			strategy: 'mac-open'
+		};
+	}
+
+	return null;
+}
+
+function openWorkspaceApp(target: WorkspaceAppTarget, workspace: string): void {
+	const launch = buildWorkspaceAppLaunch(target, workspace, {
+		currentPlatform: platform(),
+		commandExists,
+		macAppExists
+	});
+
+	if (!launch) {
+		console.error(
+			`[dispatch] unable to launch ${target}: ${APP_COMMANDS[target][0]} is not on PATH and ${APP_NAMES[target]}.app was not found`
+		);
 		return;
 	}
 
-	// sh -c is intentional: spawn('open', [...]) drops the prompt when fired from
-	// the long-lived server process, while sh -c 'open ...' works. Root cause unclear.
-	spawnDetached('sh', ['-c', `open -a ${shellQuote(APP_NAMES[target])} ${shellQuote(workspace)}`]);
+	console.error(`[dispatch] launching ${target} via ${launch.strategy}`);
+	spawnDetached(launch.command, launch.args);
 }
 
 // Track which config warnings we've already printed so repeated dispatches
@@ -481,7 +582,20 @@ export function dispatchPrompt(
 		return;
 	}
 
-	if (target === 'cursor' || target === 'windsurf' || target === 'zed') {
+	if (target === 'windsurf') {
+		copyPromptToClipboard(fullPrompt);
+		console.error(`[dispatch] copied prompt to clipboard for ${target}`);
+		const windsurfCli = resolveWindsurfCli();
+		if (windsurfCli) {
+			console.error(`[dispatch] launching ${windsurfCli} chat for ${target}`);
+			spawnDetached(windsurfCli, buildWindsurfChatArgs(fullPrompt), options.workspace);
+			return;
+		}
+		openWorkspaceApp(target, options.workspace);
+		return;
+	}
+
+	if (target === 'cursor' || target === 'zed') {
 		copyPromptToClipboard(fullPrompt);
 		console.error(`[dispatch] copied prompt to clipboard for ${target}`);
 		openWorkspaceApp(target, options.workspace);

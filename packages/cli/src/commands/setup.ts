@@ -212,6 +212,7 @@ const AGENT_COLUMNS: readonly {
 	{ header: '', get: (e) => e.displayName },
 	{ header: 'plugin', get: (e) => (e.plugin ? FLAG_ON : FLAG_OFF) },
 	{ header: 'mcp', get: (e) => (e.mcp ? FLAG_ON : FLAG_OFF) },
+	{ header: 'feedback', get: (e) => (e.feedback ? FLAG_ON : FLAG_OFF) },
 	{ header: 'svelte', get: (e) => (e.svelte ? FLAG_ON : FLAG_OFF) }
 ];
 
@@ -644,7 +645,7 @@ function setupHelp(exitCode = 0): never {
 			options: [
 				'  --editor <id>       Print setup steps for one editor or agent',
 				'  --install           After printing the editor steps, run them (skill copy + MCP config merge).',
-				'                      Supported for copilot, cursor, opencode, windsurf, zed.',
+				'                      Supported for copilot, cursor, gemini, opencode, windsurf, zed.',
 				'  --no-svelte-mcp     Skip registering the official @sveltejs/mcp server (default: on)',
 				'  --claude-hook       Run `dryui install-hook` after the Claude guide',
 				'  --open-feedback     Open feedback tooling after printing setup steps',
@@ -653,7 +654,7 @@ function setupHelp(exitCode = 0): never {
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
-				'  dryui setup --editor gemini',
+				'  dryui setup --editor gemini --install',
 				'  dryui setup --editor opencode --install',
 				'  dryui setup --editor cursor --install --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
