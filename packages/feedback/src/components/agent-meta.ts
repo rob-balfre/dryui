@@ -62,8 +62,8 @@ export const AGENT_META: Record<SubmissionAgent, AgentMeta> = {
 		id: 'windsurf',
 		label: 'Windsurf',
 		shortLabel: 'Windsurf',
-		description: 'Open Windsurf and copy the feedback prompt to the clipboard.',
-		mode: 'clipboard'
+		description: 'Open Windsurf Chat with the feedback prompt.',
+		mode: 'prompt'
 	},
 	zed: {
 		id: 'zed',

@@ -100,6 +100,8 @@
 		--dry-btn-accent-weak: var(--dry-list-item-hover-bg);
 		--dry-btn-on-accent: inherit;
 		--dry-btn-radius: var(--dry-list-item-radius);
+		--dry-btn-justify: stretch;
+		--dry-btn-align: stretch;
 		box-shadow: none;
 		cursor: pointer;
 	}

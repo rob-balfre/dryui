@@ -60,7 +60,10 @@
 		--dry-popover-radius: var(--dry-overlay-radius, var(--dry-radius-lg));
 		--dry-popover-shadow: var(--dry-overlay-shadow, var(--dry-shadow-lg));
 		--dry-popover-padding: var(--dry-space-4);
-		--dry-radius-nested: max(0px, calc(var(--dry-popover-radius) - var(--dry-popover-padding)));
+		--dry-radius-nested: max(
+			var(--dry-radius-sm),
+			calc(var(--dry-popover-radius) - var(--dry-popover-padding))
+		);
 		--dry-btn-radius: var(--dry-radius-nested);
 
 		inset: unset;

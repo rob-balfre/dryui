@@ -36,32 +36,9 @@ dryui
 
 ## Isolated Testing
 
-To exercise the public install flow (`bunx @dryui/cli init`, `bun run build`, dev server) without polluting the host Mac, use [smolvm](https://github.com/smol-machines/smolvm), a lightweight Linux microVM that boots in ~240ms on Apple Silicon. Port forwarding lets you open the VM's dev server in your Mac's browser, and Vite HMR works over the same forward.
-
-One-shot install and build smoke test in a disposable VM:
-
-```bash
-smolvm machine run --net --image oven/bun:alpine -- sh -c \
-  'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'
-```
-
-Persistent dev session with a dynamically-chosen host port (avoids collisions with any existing dev server already on 5173):
-
-```bash
-PORT=$(python3 -c 'import socket;s=socket.socket();s.bind(("",0));print(s.getsockname()[1]);s.close()')
-smolvm machine create --net --image oven/bun:alpine -p $PORT:5173 dryui-dev
-smolvm machine start --name dryui-dev
-smolvm machine exec --name dryui-dev -- sh -c 'bunx -y @dryui/cli init /app --pm bun'
-echo "→ http://localhost:$PORT"
-smolvm machine exec --name dryui-dev -- sh -c \
-  'cd /app && bun run dev -- --host 0.0.0.0 --port 5173'
-# Ctrl-C the dev server when done, then:
-smolvm machine delete -f dryui-dev
-```
-
-`--port 5173` inside the VM stays fixed (Vite's default); only the host-side port is dynamic. smolvm does not support `-p 0:5173` auto-allocation, so the Python one-liner picks a free port first. If you prefer a memorable fixed port, `-p 15173:5173` is a safe default.
-
-Install via `curl -sSL https://smolmachines.com/install.sh | bash`, then ensure the extracted `agent-rootfs` lives at `~/Library/Application Support/smolvm/agent-rootfs` (the installer does not always place it there).
+- Use `bun vm:test` (one-shot scaffold + build) or `bun vm` (scaffold + Vite dev with HMR) to exercise the public `bunx @dryui/cli` flow in a throwaway [smolvm](https://github.com/smol-machines/smolvm) microVM. Both wrappers live in the root `package.json`; source and gotchas (ephemeral-only, Vite-under-node, stdout buffering, `--host 0.0.0.0`) are in [`scripts/vm.ts`](./scripts/vm.ts).
+- While `bun vm` is running, use `bun vm:exec <cmd>` in any other tab to run commands inside the live VM (e.g. `bun vm:exec dryui list`). It relays via a shared-volume request/response loop; see [`scripts/vm-exec.ts`](./scripts/vm-exec.ts). `smolvm machine exec` itself does not work against ephemerals.
+- Install smolvm via `curl -sSL https://smolmachines.com/install.sh | /bin/bash` (use `/bin/bash` explicitly; a Homebrew Intel `bash` first on PATH reports the wrong arch). Ensure the extracted `agent-rootfs` lives at `~/Library/Application Support/smolvm/agent-rootfs`.
 
 ## Verification
 

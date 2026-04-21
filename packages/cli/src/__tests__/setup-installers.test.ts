@@ -33,6 +33,7 @@ describe('isAutoInstallable', () => {
 	test('returns true for the wired editors', () => {
 		expect(isAutoInstallable('copilot')).toBe(true);
 		expect(isAutoInstallable('cursor')).toBe(true);
+		expect(isAutoInstallable('gemini')).toBe(true);
 		expect(isAutoInstallable('opencode')).toBe(true);
 		expect(isAutoInstallable('windsurf')).toBe(true);
 		expect(isAutoInstallable('zed')).toBe(true);
@@ -41,13 +42,13 @@ describe('isAutoInstallable', () => {
 	test('returns false for editors that need interactive plugin install', () => {
 		expect(isAutoInstallable('claude-code')).toBe(false);
 		expect(isAutoInstallable('codex')).toBe(false);
-		expect(isAutoInstallable('gemini')).toBe(false);
 	});
 
 	test('autoInstallableEditors lists exactly the wired set', () => {
 		expect([...autoInstallableEditors()].sort()).toEqual([
 			'copilot',
 			'cursor',
+			'gemini',
 			'opencode',
 			'windsurf',
 			'zed'
@@ -169,7 +170,7 @@ describe('mergeServersConfig', () => {
 });
 
 describe('runEditorInstall', () => {
-	test('copilot writes the skill folder and .vscode/mcp.json', () => {
+	test('copilot writes the skill folder and .mcp.json with both DryUI servers', () => {
 		const root = createTempTree({});
 		const calls: string[] = [];
 
@@ -182,11 +183,17 @@ describe('runEditorInstall', () => {
 		expect(calls).toEqual([resolve(root, '.github/skills/dryui')]);
 		expect(existsSync(join(root, '.github/skills/dryui/SKILL.md'))).toBe(true);
 
-		const config = JSON.parse(readFileSync(join(root, '.vscode/mcp.json'), 'utf-8'));
-		expect(config.servers.dryui).toEqual({
+		const config = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf-8'));
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
+		expect(config.mcpServers.dryui).toEqual({
 			type: 'stdio',
 			command: 'npx',
 			args: ['-y', '@dryui/mcp']
+		});
+		expect(config.mcpServers['dryui-feedback']).toEqual({
+			type: 'stdio',
+			command: 'npx',
+			args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
 		});
 	});
 
@@ -231,6 +238,71 @@ describe('runEditorInstall', () => {
 		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
 	});
 
+	test('gemini merges dryui + dryui-feedback into ~/.gemini/settings.json, preserving other keys', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				ui: { theme: 'keep' },
+				mcpServers: { context7: { httpUrl: 'https://mcp.context7.com' } }
+			})
+		});
+
+		const result = runEditorInstall('gemini', { cwd: root, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
+		expect(config.ui).toEqual({ theme: 'keep' });
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['context7', 'dryui', 'dryui-feedback']);
+		expect(config.mcpServers.dryui).toEqual({
+			command: 'npx',
+			args: ['-y', '@dryui/mcp']
+		});
+		expect(config.mcpServers['dryui-feedback']).toEqual({
+			command: 'npx',
+			args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+		});
+	});
+
+	test('gemini creates ~/.gemini/settings.json when the file is missing', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+
+		const result = runEditorInstall('gemini', { cwd: root, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
+	});
+
+	test('gemini reports unchanged on a second run against the same settings.json', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+
+		runEditorInstall('gemini', { cwd: root, homeDir: home });
+		const second = runEditorInstall('gemini', { cwd: root, homeDir: home })!;
+
+		expect(second.ok).toBe(true);
+		expect(second.steps.every((step) => step.status === 'unchanged')).toBe(true);
+	});
+
+	test('gemini fills in a missing dryui-feedback server while preserving a partial config', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					context7: { httpUrl: 'https://mcp.context7.com' }
+				}
+			})
+		});
+
+		const result = runEditorInstall('gemini', { cwd: root, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['context7', 'dryui', 'dryui-feedback']);
+	});
+
 	test('zed merges only the context_servers block in a sandboxed home', () => {
 		const home = createTempTree({
 			'.config/zed/settings.json': JSON.stringify({ ui_font_size: 14 })
@@ -250,7 +322,6 @@ describe('runEditorInstall', () => {
 		const root = createTempTree({});
 		expect(runEditorInstall('claude-code', { cwd: root })).toBeNull();
 		expect(runEditorInstall('codex', { cwd: root })).toBeNull();
-		expect(runEditorInstall('gemini', { cwd: root })).toBeNull();
 	});
 
 	test('reports failure when degit fails and surfaces it in the formatted output', () => {
@@ -284,7 +355,7 @@ describe('formatInstallResult', () => {
 });
 
 describe('Svelte MCP companion', () => {
-	test('copilot installer registers @sveltejs/mcp under servers when opted in', () => {
+	test('copilot installer registers @sveltejs/mcp under mcpServers when opted in', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('copilot', {
 			cwd: root,
@@ -292,8 +363,9 @@ describe('Svelte MCP companion', () => {
 			includeSvelteMcp: true
 		});
 		expect(result?.ok).toBe(true);
-		const config = JSON.parse(readFileSync(join(root, '.vscode/mcp.json'), 'utf-8'));
-		expect(config.servers.svelte).toEqual({
+		const config = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf-8'));
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(config.mcpServers.svelte).toEqual({
 			type: 'stdio',
 			command: 'npx',
 			args: ['-y', '@sveltejs/mcp']
@@ -344,6 +416,19 @@ describe('Svelte MCP companion', () => {
 		const config = JSON.parse(
 			readFileSync(join(home, '.codeium/windsurf/mcp_config.json'), 'utf-8')
 		);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+	});
+
+	test('gemini installer registers svelte alongside DryUI servers when opted in', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const result = runEditorInstall('gemini', {
+			cwd: root,
+			homeDir: home,
+			includeSvelteMcp: true
+		});
+		expect(result?.ok).toBe(true);
+		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
 		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
 	});
 
@@ -768,30 +853,34 @@ args = ["-y", "@sveltejs/mcp"]
 		expect(statuses.find((entry) => entry.editor === 'claude-code')).toEqual({
 			editor: 'claude-code',
 			dryui: true,
+			feedback: false,
 			svelte: true,
 			source: 'plugin'
 		});
 		expect(statuses.find((entry) => entry.editor === 'codex')).toEqual({
 			editor: 'codex',
 			dryui: true,
+			feedback: false,
 			svelte: true,
 			source: 'plugin'
 		});
 		expect(statuses.find((entry) => entry.editor === 'gemini')).toEqual({
 			editor: 'gemini',
 			dryui: true,
+			feedback: false,
 			svelte: false,
 			source: 'mcp'
 		});
 		expect(statuses.find((entry) => entry.editor === 'copilot')).toEqual({
 			editor: 'copilot',
 			dryui: true,
+			feedback: false,
 			svelte: true,
 			source: 'mcp'
 		});
 
 		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe(
-			'agents: claude [plugin + svelte], codex [plugin + svelte], gemini [mcp], copilot [mcp + svelte]'
+			'agents: claude [plugin (no feedback) + svelte], codex [plugin (no feedback) + svelte], gemini [mcp (no feedback)], copilot [mcp (no feedback) + svelte]'
 		);
 	});
 
@@ -851,8 +940,11 @@ args = ["-y", "@sveltejs/mcp"]
 			})
 		);
 
+		// `.mcp.json` is shared: Claude Code reads it, and so does Copilot CLI (since the
+		// Copilot CLI v1.x migration away from .vscode/mcp.json). Both tools should
+		// report configured when the file is present.
 		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe(
-			'agents: claude [plugin + mcp + svelte]'
+			'agents: claude [plugin + mcp (no feedback) + svelte], copilot [mcp (no feedback)]'
 		);
 	});
 
@@ -860,6 +952,174 @@ args = ["-y", "@sveltejs/mcp"]
 		const root = createTempTree({});
 		const home = createTempTree({});
 		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe('agents: none wired yet');
+	});
+
+	test('copilot probe picks up the Copilot CLI user-level mcp-config.json', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.copilot/mcp-config.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					'dryui-feedback': {
+						command: 'npx',
+						args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+					}
+				}
+			})
+		});
+
+		const status = getAgentSetupStatus('copilot', { cwd: root, homeDir: home });
+		expect(status.dryui).toBe(true);
+		expect(status.feedback).toBe(true);
+		expect(status.source).toBe('mcp');
+	});
+
+	test('copilot probe still honours legacy .vscode/mcp.json with the servers key', () => {
+		const root = createTempTree({
+			'.vscode/mcp.json': JSON.stringify({
+				servers: {
+					dryui: { type: 'stdio', command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+		const home = createTempTree({});
+
+		const status = getAgentSetupStatus('copilot', { cwd: root, homeDir: home });
+		expect(status.dryui).toBe(true);
+		expect(status.feedback).toBe(false);
+		expect(status.source).toBe('mcp');
+	});
+
+	test('drops the (no feedback) annotation once dryui-feedback is present', () => {
+		const root = createTempTree({});
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					'dryui-feedback': {
+						command: 'npx',
+						args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+					}
+				}
+			})
+		});
+
+		expect(summarizeAgentSetupStatus({ cwd: root, homeDir: home })).toBe('agents: gemini [mcp]');
+	});
+});
+
+describe('gemini probe', () => {
+	test('detects an installed extension via ~/.gemini/extensions/<name>/gemini-extension.json', () => {
+		const home = createTempTree({});
+		const extDir = join(home, '.gemini/extensions/dryui');
+		mkdirSync(extDir, { recursive: true });
+		writeFileSync(
+			join(extDir, 'gemini-extension.json'),
+			JSON.stringify({
+				name: 'dryui',
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					'dryui-feedback': {
+						command: 'npx',
+						args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+					}
+				}
+			})
+		);
+
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.dryui).toBe(true);
+		expect(status.feedback).toBe(true);
+		expect(status.source).toBe('plugin');
+	});
+
+	test('detects an extension whose folder name differs from the extension name', () => {
+		const home = createTempTree({});
+		const extDir = join(home, '.gemini/extensions/my-custom-folder');
+		mkdirSync(extDir, { recursive: true });
+		writeFileSync(
+			join(extDir, 'gemini-extension.json'),
+			JSON.stringify({
+				name: 'dryui',
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		);
+
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.source).toBe('plugin');
+	});
+
+	test('flags an incomplete MCP config (dryui present, dryui-feedback missing)', () => {
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.dryui).toBe(true);
+		expect(status.feedback).toBe(false);
+		expect(status.source).toBe('mcp');
+	});
+
+	test('reports both servers wired when dryui and dryui-feedback are in settings.json', () => {
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					'dryui-feedback': {
+						command: 'npx',
+						args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+					}
+				}
+			})
+		});
+
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.dryui).toBe(true);
+		expect(status.feedback).toBe(true);
+		expect(status.source).toBe('mcp');
+	});
+
+	test('reports mixed source when both extension and settings.json entries are present', () => {
+		const home = createTempTree({
+			'.gemini/settings.json': JSON.stringify({
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] }
+				}
+			})
+		});
+		const extDir = join(home, '.gemini/extensions/dryui');
+		mkdirSync(extDir, { recursive: true });
+		writeFileSync(
+			join(extDir, 'gemini-extension.json'),
+			JSON.stringify({
+				name: 'dryui',
+				mcpServers: {
+					dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] },
+					'dryui-feedback': {
+						command: 'npx',
+						args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+					}
+				}
+			})
+		);
+
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.source).toBe('mixed');
+		expect(status.feedback).toBe(true);
+	});
+
+	test('reports none when neither the extension nor a settings.json entry exists', () => {
+		const home = createTempTree({});
+		const status = getAgentSetupStatus('gemini', { cwd: home, homeDir: home });
+		expect(status.dryui).toBe(false);
+		expect(status.feedback).toBe(false);
+		expect(status.source).toBe('none');
 	});
 });
 

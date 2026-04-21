@@ -72,14 +72,17 @@ bun run validate
 
 ### Testing In A Clean VM
 
-To exercise the published install flow end-to-end without touching your host, scaffold and build DryUI inside a throwaway Linux microVM with [smolvm](https://github.com/smol-machines/smolvm):
+To exercise the published install flow end-to-end without touching your host, use [smolvm](https://github.com/smol-machines/smolvm). Two wrappers are in the root `package.json`:
 
 ```bash
-smolvm machine run --net --image oven/bun:alpine -- sh -c \
-  'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'
+bun vm:test              # ephemeral: bunx @dryui/cli init + bun run build, exits when done
+bun vm                   # ephemeral: init + vite dev (HMR) at http://localhost:<auto-port>
+bun vm:exec dryui list   # run a command inside the live `bun vm` session (any terminal)
 ```
 
-For a persistent dev session with Mac-browser port forwarding and Vite HMR, see the Isolated Testing section of [`AGENTS.md`](./AGENTS.md).
+`bun vm` prints `✓ DryUI dev server ready (HMR): http://localhost:<PORT>` once Vite is actually serving; Ctrl+C tears the VM down. `bun vm:exec <args>` runs the given command in the scaffolded VM via a shared-volume relay, so you can drive the CLI (`dryui list`, `dryui info Button`, etc.) against the live project from any other tab. Install smolvm with `curl -sSL https://smolmachines.com/install.sh | /bin/bash` (use `/bin/bash` explicitly so a Homebrew Intel `bash` on your PATH does not request the wrong platform tarball).
+
+Implementation notes and smolvm/Vite gotchas live in [`scripts/vm.ts`](./scripts/vm.ts).
 
 See the supporting docs for the rest:
 

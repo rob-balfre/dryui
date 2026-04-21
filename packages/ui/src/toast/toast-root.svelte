@@ -59,7 +59,7 @@
 <style>
 	[data-part='root'] {
 		--dry-toast-accent: var(--dry-color-fill-info);
-		--dry-radius-nested: max(0px, calc(var(--dry-radius-lg) - var(--dry-space-4)));
+		--dry-radius-nested: max(var(--dry-radius-sm), calc(var(--dry-radius-lg) - var(--dry-space-4)));
 		--dry-btn-radius: var(--dry-radius-nested);
 
 		position: relative;
