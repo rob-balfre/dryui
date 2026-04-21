@@ -1,5 +1,11 @@
 # @dryui/feedback-server
 
+## 0.6.2
+
+### Patch Changes
+
+- [`9580c51`](https://github.com/rob-balfre/dryui/commit/9580c51aafd1259a75be8f462342694baf7b5394) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Launch Windsurf feedback dispatch through `windsurf chat` when the CLI is available, including the bundled macOS CLI inside Windsurf.app. Falls back to the existing clipboard and app-open path when chat dispatch is unavailable.
+
 ## 0.6.1
 
 ### Patch Changes
