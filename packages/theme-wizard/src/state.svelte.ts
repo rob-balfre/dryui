@@ -2,22 +2,33 @@ import { untrack } from 'svelte';
 import { generateTheme, type BrandInput, type ThemeTokens } from './engine/derivation.js';
 import { PRESETS } from './engine/presets.js';
 import type { WizardRecipe } from './engine/url-codec.js';
+import type {
+	NeutralMode,
+	Personality,
+	RadiusPreset,
+	Density,
+	ShadowPreset,
+	TypeScale,
+	FontPreset
+} from './engine/types.js';
+
+export type {
+	NeutralMode,
+	Personality,
+	RadiusPreset,
+	Density,
+	ShadowPreset,
+	TypeScale,
+	FontPreset
+} from './engine/types.js';
 
 export type PreviewMode = 'light' | 'dark' | 'side-by-side';
-export type NeutralMode = 'monochromatic' | 'neutral';
-export type RadiusPreset = 'sharp' | 'soft' | 'rounded' | 'pill';
-export type Density = 'compact' | 'default' | 'spacious';
-export type ShadowPreset = 'flat' | 'subtle' | 'elevated' | 'deep';
-export type Personality = 'minimal' | 'clean' | 'structured' | 'rich';
-export type FontPreset = 'System' | 'Humanist' | 'Geometric' | 'Classical' | 'Serif' | 'Mono';
 
 function fmtRem(value: number): string {
 	return `${parseFloat(value.toFixed(4))}rem`;
 }
 
 // ─── Reactive state ───────────────────────────────────────────────────────────
-
-export type TypeScale = 'compact' | 'default' | 'spacious';
 
 const STORAGE_KEY = 'dryui-theme-wizard';
 
@@ -629,7 +640,7 @@ const TYPE_SCALE_FACTORS: Record<TypeScale, number> = {
 	spacious: 1.1
 };
 
-export function getTypographyTokens(
+function getTypographyTokens(
 	fontPreset: FontPreset = wizardState.typography.fontPreset,
 	scale: TypeScale = wizardState.typography.scale
 ): Record<string, string> {

@@ -32,6 +32,8 @@ tests/browser/__screenshots__/
 tmp/
 # Generated analysis artifacts live here when scripts are run locally.
 reports/architecture-audit.md
+# Local sandbox for trying out code-quality / dead-code / cycle tools.
+.analysis/
 
 # Local scratch dirs — ignore contents but keep the top-level README so future
 # contributors can see what each one is for. Git refuses to un-ignore files

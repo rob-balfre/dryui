@@ -14,11 +14,13 @@ import {
 
 interface InitOptions {
 	targetPath: string;
+	userPath: string | null;
 	packageManager: DryuiPackageManager;
 }
 
 function parseInitArgs(args: string[]): InitOptions {
 	let targetPath = process.cwd();
+	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
 
 	for (let i = 0; i < args.length; i++) {
@@ -31,11 +33,13 @@ function parseInitArgs(args: string[]): InitOptions {
 			i++;
 		} else if (!arg.startsWith('-')) {
 			targetPath = resolve(process.cwd(), arg);
+			userPath = arg;
 		}
 	}
 
 	return {
 		targetPath,
+		userPath,
 		packageManager: packageManager ?? detectPackageManagerFromEnv()
 	};
 }
@@ -180,11 +184,9 @@ export function runInit(args: string[], spec: Spec): void {
 		process.exit(0);
 	}
 
-	const { targetPath, packageManager } = parseInitArgs(args);
+	const { targetPath, userPath, packageManager } = parseInitArgs(args);
 
-	if (!existsSync(targetPath)) {
-		mkdirSync(targetPath, { recursive: true });
-	}
+	mkdirSync(targetPath, { recursive: true });
 
 	const plan = planInstall(spec, targetPath, { packageManager });
 
@@ -248,10 +250,8 @@ export function runInit(args: string[], spec: Spec): void {
 	log('');
 	log('  Next steps:');
 	if (!cwdIsTarget) {
-		const relPath = targetPath.startsWith(process.cwd())
-			? targetPath.slice(process.cwd().length + 1)
-			: targetPath;
-		log(`    cd ${relPath}`);
+		// Preserve the user-typed path verbatim so absolute inputs aren't sliced.
+		log(`    cd ${userPath ?? targetPath}`);
 	}
 	log(`    ${devCommand}`);
 	log('');

@@ -14,9 +14,8 @@ const outPath = resolve(here, 'theme-tokens.generated.json');
 function parseTokens(css: string): Record<string, string> {
 	const tokens: Record<string, string> = {};
 	const regex = /(--dry-[\w-]+)\s*:\s*([^;]+);/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = regex.exec(css)) !== null) {
+	for (const match of css.matchAll(regex)) {
 		const name = match[1]?.trim();
 		const value = match[2]?.trim();
 		if (!name || !value || name in tokens) continue;

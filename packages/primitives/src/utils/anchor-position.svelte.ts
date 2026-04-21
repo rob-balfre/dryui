@@ -124,7 +124,6 @@ export function createAnchorPosition(
 		const floating = floatingEl();
 		if (!ref || !floating) return;
 
-		// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
 		const prev = ref.style.anchorName;
 		// Preserve any existing anchor-name by appending, so shared-anchor scenarios
 		// (multiple panels anchored to the same root) don't stomp each other.
@@ -135,20 +134,17 @@ export function createAnchorPosition(
 				.filter(Boolean)
 		);
 		names.add(anchorName);
-		// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
 		ref.style.anchorName = [...names].join(', ');
 		styles = getCSSStyles(placement, offset, anchorName);
 
 		return () => {
 			const current = new Set(
-				// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
 				(ref.style.anchorName || '')
 					.split(',')
 					.map((s: string) => s.trim())
 					.filter(Boolean)
 			);
 			current.delete(anchorName);
-			// @ts-ignore anchorName may not be in CSSStyleDeclaration depending on TS lib version
 			ref.style.anchorName = current.size > 0 ? [...current].join(', ') : '';
 		};
 	});

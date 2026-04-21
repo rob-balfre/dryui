@@ -1,12 +1,12 @@
 import themeTokensData from './theme-tokens.generated.json';
 
-export interface ThemeTokenRegistryEntry {
+interface ThemeTokenRegistryEntry {
 	name: string;
 	light: string;
 	dark: string;
 }
 
-export interface ThemeTokenValues {
+interface ThemeTokenValues {
 	light: Record<string, string>;
 	dark: Record<string, string>;
 }
@@ -95,7 +95,7 @@ export const SIDEBAR_PREVIEW_TOKEN_NAMES = [
 // packages/ui/src/themes/{default,dark}.css via generate-theme-tokens.ts.
 // Reading CSS at runtime would break the published CLI bundle, which does
 // not have @dryui/ui's source themes available in its node_modules tree.
-export const THEME_TOKEN_VALUES: ThemeTokenValues = themeTokensData as ThemeTokenValues;
+const THEME_TOKEN_VALUES: ThemeTokenValues = themeTokensData as ThemeTokenValues;
 
 export const THEME_TOKEN_REGISTRY: ThemeTokenRegistryEntry[] = Array.from(
 	new Set([...Object.keys(THEME_TOKEN_VALUES.light), ...Object.keys(THEME_TOKEN_VALUES.dark)])

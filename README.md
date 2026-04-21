@@ -70,11 +70,22 @@ bun run docs
 bun run validate
 ```
 
+### Testing In A Clean VM
+
+To exercise the published install flow end-to-end without touching your host, scaffold and build DryUI inside a throwaway Linux microVM with [smolvm](https://github.com/smol-machines/smolvm):
+
+```bash
+smolvm machine run --net --image oven/bun:alpine -- sh -c \
+  'mkdir -p /app && cd /app && bunx -y @dryui/cli init . --pm bun && bun run build'
+```
+
+For a persistent dev session with Mac-browser port forwarding and Vite HMR, see the Isolated Testing section of [`AGENTS.md`](./AGENTS.md).
+
 See the supporting docs for the rest:
 
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributor workflow
 - [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) for the accessibility baseline
-- [`docs/policies/css-discipline.md`](./docs/policies/css-discipline.md) for CSS rules
+- [`packages/ui/skills/dryui/rules/theming.md`](./packages/ui/skills/dryui/rules/theming.md) for CSS and token rules
 - [`RELEASING.md`](./RELEASING.md) for release and npm-auth guidance
 
 ## Design Principles

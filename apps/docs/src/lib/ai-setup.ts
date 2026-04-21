@@ -1,6 +1,6 @@
 import { aiSurface } from '../../../../packages/mcp/src/ai-surface.js';
 
-export type AiAgentId =
+type AiAgentId =
 	| 'claude-code'
 	| 'codex'
 	| 'gemini'
@@ -10,21 +10,21 @@ export type AiAgentId =
 	| 'windsurf'
 	| 'zed';
 
-export interface AiSurfaceCard {
+interface AiSurfaceCard {
 	readonly name: string;
 	readonly description: string;
 	readonly color: 'blue' | 'green' | 'orange' | 'purple' | 'gray';
 	readonly example?: string;
 }
 
-export interface AiInstallStep {
+interface AiInstallStep {
 	title: string;
 	description?: string;
 	code?: string;
 	language?: string;
 }
 
-export interface AiAgentSetup {
+interface AiAgentSetup {
 	id: AiAgentId;
 	label: string;
 	description: string;
@@ -100,7 +100,7 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	feedback: 'dryui feedback ui --no-open'
 };
 
-export const dryuiMcpTools: readonly AiSurfaceCard[] = aiSurface.tools.map((tool) => ({
+const dryuiMcpTools: readonly AiSurfaceCard[] = aiSurface.tools.map((tool) => ({
 	name: tool.name,
 	description: tool.description,
 	color: MCP_TOOL_COLORS[tool.name] ?? 'gray'

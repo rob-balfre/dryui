@@ -22,19 +22,51 @@ afterEach(() => {
 });
 
 describe('setup menu formatting', () => {
-	test('renders workspace context as a labeled snapshot', () => {
+	test('renders workspace context as a bordered table', () => {
 		const lines = formatPromptFrameLines('What would you like to do?', {
-			contextLines: [
-				'cwd: ~/druid',
-				'project: ready | framework: sveltekit | pkg-manager: bun',
-				'root: ~/druid'
-			]
+			contextLines: ['cwd: ~/druid', 'project: ready · sveltekit · bun', 'root: ~/druid']
 		});
 
 		expect(lines).toContain('Current workspace');
-		expect(lines).toContain('  cwd      ~/druid');
-		expect(lines).toContain('  project  ready | framework: sveltekit | pkg-manager: bun');
+		expect(lines).toContain('┌─────────┬─────────────────────────┐');
+		expect(lines).toContain('│ cwd     │ ~/druid                 │');
+		expect(lines).toContain('│ project │ ready · sveltekit · bun │');
+		expect(lines).toContain('│ root    │ ~/druid                 │');
+		expect(lines).toContain('└─────────┴─────────────────────────┘');
 		expect(lines).toContain('What would you like to do?');
+	});
+
+	test('stacks continuation rows with blank label cells', () => {
+		const lines = formatPromptFrameLines('What would you like to do?', {
+			contextLines: [
+				'cwd: ~/druid',
+				'agents: claude    plugin + svelte',
+				'  codex     plugin + mcp + svelte',
+				'  gemini    mcp + svelte'
+			]
+		});
+
+		expect(lines).toContain('│ cwd    │ ~/druid                         │');
+		expect(lines).toContain('│ agents │ claude    plugin + svelte       │');
+		expect(lines).toContain('│        │ codex     plugin + mcp + svelte │');
+		expect(lines).toContain('│        │ gemini    mcp + svelte          │');
+	});
+
+	test('renders row separators between every row automatically', () => {
+		const lines = formatPromptFrameLines('What would you like to do?', {
+			contextLines: [
+				'cwd: ~/druid',
+				'project: ready · svelte · bun',
+				'deps: ✓ ui   · primitives   ✓ lint'
+			]
+		});
+
+		const midSeparators = lines.filter(
+			(line) => line === '├─────────┼──────────────────────────────┤'
+		);
+		expect(midSeparators.length).toBe(2);
+		expect(lines).toContain('│ project │ ready · svelte · bun         │');
+		expect(lines).toContain('│ deps    │ ✓ ui   · primitives   ✓ lint │');
 	});
 
 	test('renders menu options with icons and the richer footer', () => {

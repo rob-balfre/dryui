@@ -18,6 +18,21 @@ type FeedbackToolClient = Pick<
 
 type ToolRegistrar = Pick<McpServer, 'tool'>;
 
+async function pollUntilReady<T>(
+	fetchOnce: () => Promise<T>,
+	hasResults: (value: T) => boolean,
+	timeoutSeconds: number,
+	pollIntervalSeconds: number
+): Promise<{ timedOut: boolean; value: T | null }> {
+	const startedAt = Date.now();
+	while (Date.now() - startedAt < timeoutSeconds * 1000) {
+		const value = await fetchOnce();
+		if (hasResults(value)) return { timedOut: false, value };
+		await new Promise((resolve) => setTimeout(resolve, pollIntervalSeconds * 1000));
+	}
+	return { timedOut: true, value: null };
+}
+
 function formatAnnotation(annotation: Annotation): string {
 	const lines = [
 		`ID: ${annotation.id}`,
@@ -213,24 +228,23 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 				.describe('Polling interval in seconds (default 3)')
 		},
 		async ({ timeoutSeconds = 30, pollIntervalSeconds = 3 }) => {
-			const startedAt = Date.now();
+			const { timedOut, value } = await pollUntilReady(
+				() => client.getSubmissions('pending'),
+				(result) => result.count > 0,
+				timeoutSeconds,
+				pollIntervalSeconds
+			);
 
-			while (Date.now() - startedAt < timeoutSeconds * 1000) {
-				const result = await client.getSubmissions('pending');
-
-				if (result.count > 0) {
-					const submissions = result.submissions.map(enrichSubmissionForResponse);
-					return {
-						content: [
-							{
-								type: 'text',
-								text: JSON.stringify({ timedOut: false, count: result.count, submissions }, null, 2)
-							}
-						]
-					};
-				}
-
-				await new Promise((resolve) => setTimeout(resolve, pollIntervalSeconds * 1000));
+			if (!timedOut && value) {
+				const submissions = value.submissions.map(enrichSubmissionForResponse);
+				return {
+					content: [
+						{
+							type: 'text',
+							text: JSON.stringify({ timedOut: false, count: value.count, submissions }, null, 2)
+						}
+					]
+				};
 			}
 
 			return {
@@ -273,22 +287,17 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			timeoutSeconds: z.number().int().min(1).max(300).optional().describe('Timeout in seconds')
 		},
 		async ({ sessionId, pollIntervalSeconds = 3, timeoutSeconds = 120 }) => {
-			const startedAt = Date.now();
+			const { timedOut, value } = await pollUntilReady(
+				() => (sessionId ? client.getPending(sessionId) : client.getAllPending()),
+				(pending) => pending.count > 0,
+				timeoutSeconds,
+				pollIntervalSeconds
+			);
 
-			while (Date.now() - startedAt < timeoutSeconds * 1000) {
-				const pending = sessionId
-					? await client.getPending(sessionId)
-					: await client.getAllPending();
-
-				if (pending.count > 0) {
-					return {
-						content: [
-							{ type: 'text', text: JSON.stringify({ timedOut: false, ...pending }, null, 2) }
-						]
-					};
-				}
-
-				await new Promise((resolve) => setTimeout(resolve, pollIntervalSeconds * 1000));
+			if (!timedOut && value) {
+				return {
+					content: [{ type: 'text', text: JSON.stringify({ timedOut: false, ...value }, null, 2) }]
+				};
 			}
 
 			return {

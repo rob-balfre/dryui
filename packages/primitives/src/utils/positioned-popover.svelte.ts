@@ -1,8 +1,6 @@
 import { useAnchorStyles } from './use-anchor-styles.svelte.js';
 import type { Placement } from './anchor-position.svelte.js';
 
-export type { Placement };
-
 interface PositionedPopoverOptions {
 	triggerEl: () => HTMLElement | null;
 	contentEl: () => HTMLElement | null;

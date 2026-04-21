@@ -850,7 +850,7 @@ function placeVersionInfo(matrix: Matrix, version: number) {
 
 export type ErrorCorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 
-export interface QRCodeOptions {
+interface QRCodeOptions {
 	errorCorrection?: ErrorCorrectionLevel;
 }
 

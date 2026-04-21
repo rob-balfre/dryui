@@ -106,7 +106,7 @@ function parseBlockquote(line: string): string | null {
 	return match[1] ?? '';
 }
 
-export interface ParseOptions {
+interface ParseOptions {
 	sanitize?: boolean;
 }
 
@@ -284,6 +284,8 @@ function astToHtml(nodes: MarkdownNode[]): string {
 					return `<ol>${node.items.map((item) => `<li>${item}</li>`).join('')}</ol>`;
 				case 'hr':
 					return '<hr />';
+				default:
+					return '';
 			}
 		})
 		.join('\n');

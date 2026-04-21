@@ -3,7 +3,7 @@ export interface AiSurfaceEntry {
 	readonly description: string;
 }
 
-export interface AiSurfaceManifest {
+interface AiSurfaceManifest {
 	readonly tools: readonly AiSurfaceEntry[];
 	readonly prompts: readonly AiSurfaceEntry[];
 	readonly cliCommands: readonly AiSurfaceEntry[];

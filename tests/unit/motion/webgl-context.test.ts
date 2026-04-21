@@ -97,17 +97,33 @@ describe('createShaderProgram', () => {
 	it('returns null on shader compile error', () => {
 		const gl = createMockGL({ compileSuccess: false });
 		const canvas = createMockCanvas(gl);
+		const errorSpy = mock(() => {});
+		const originalError = console.error;
+		console.error = errorSpy;
 
-		const result = createShaderProgram(canvas, 'invalid', 'invalid');
-		expect(result).toBeNull();
+		try {
+			const result = createShaderProgram(canvas, 'invalid', 'invalid');
+			expect(result).toBeNull();
+			expect(errorSpy).toHaveBeenCalled();
+		} finally {
+			console.error = originalError;
+		}
 	});
 
 	it('returns null on program link error', () => {
 		const gl = createMockGL({ linkSuccess: false });
 		const canvas = createMockCanvas(gl);
+		const errorSpy = mock(() => {});
+		const originalError = console.error;
+		console.error = errorSpy;
 
-		const result = createShaderProgram(canvas, 'v', 'f');
-		expect(result).toBeNull();
+		try {
+			const result = createShaderProgram(canvas, 'v', 'f');
+			expect(result).toBeNull();
+			expect(errorSpy).toHaveBeenCalled();
+		} finally {
+			console.error = originalError;
+		}
 	});
 
 	it('destroy cleans up GL resources', () => {

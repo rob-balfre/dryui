@@ -54,6 +54,14 @@ export interface AgentSetupStatus {
 	source: 'plugin' | 'mcp' | 'mixed' | 'none';
 }
 
+export interface AgentSetupEntry {
+	editor: SetupGuideId;
+	displayName: string;
+	plugin: boolean;
+	mcp: boolean;
+	svelte: boolean;
+}
+
 export interface DegitOutcome {
 	ok: boolean;
 	message: string;
@@ -855,6 +863,18 @@ export function summarizeAgentSetupStatus(ctx: InstallContext): string {
 	const configured = readAgentSetupStatuses(ctx).filter((status) => status.dryui);
 	if (configured.length === 0) return 'agents: none wired yet';
 	return `agents: ${configured.map(formatAgentSetupStatus).join(', ')}`;
+}
+
+export function readAgentSetupEntries(ctx: InstallContext): readonly AgentSetupEntry[] {
+	return readAgentSetupStatuses(ctx)
+		.filter((status) => status.dryui)
+		.map((status) => ({
+			editor: status.editor,
+			displayName: shortEditorName(status.editor),
+			plugin: status.source === 'plugin' || status.source === 'mixed',
+			mcp: status.source === 'mcp' || status.source === 'mixed',
+			svelte: status.svelte
+		}));
 }
 
 export function summarizeSvelteMcpStatus(ctx: InstallContext): string {

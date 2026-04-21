@@ -181,15 +181,40 @@ export function formatStructure(name: string, def: ComponentDef): string[] {
 	return lines;
 }
 
+function formatHeaderLines(name: string, def: ComponentDef): string[] {
+	const lines: string[] = [
+		`${name} — ${def.description}`,
+		`Category: ${def.category} | Tags: ${def.tags.join(', ')}`,
+		`Root import: import { ${name} } from '${def.import}'`
+	];
+	const subpath = getSubpathImport(name, def);
+	if (subpath) lines.push(`Subpath import: ${subpath}`);
+	return lines;
+}
+
+function formatCssDataA11yBlock(def: ComponentDef): string[] {
+	const lines: string[] = [
+		'',
+		'CSS Variables:',
+		...formatCssVars(def.cssVars),
+		'',
+		'Data Attributes:',
+		...formatDataAttributes(def.dataAttributes),
+		'',
+		'Accessibility:',
+		...formatA11yNotes(def.a11y)
+	];
+	if (def.example) {
+		lines.push('', 'Canonical usage:', indent(def.example, 2));
+	}
+	return lines;
+}
+
 export function formatCompound(name: string, def: ComponentDef): string {
 	const lines: string[] = [];
 	const requiredParts = getRequiredParts(name, def);
 	const bindables = getBindableProps(def);
-	lines.push(`${name} — ${def.description}`);
-	lines.push(`Category: ${def.category} | Tags: ${def.tags.join(', ')}`);
-	lines.push(`Root import: import { ${name} } from '${def.import}'`);
-	const subpath = getSubpathImport(name, def);
-	if (subpath) lines.push(`Subpath import: ${subpath}`);
+	lines.push(...formatHeaderLines(name, def));
 	const kind = componentKind(def);
 	const hasRoot = kind === 'compound';
 	lines.push(`Kind: ${kind}`);
@@ -215,31 +240,14 @@ export function formatCompound(name: string, def: ComponentDef): string {
 			lines.push(...formatPart(name, partName, partDef));
 		}
 	}
-	lines.push('');
-	lines.push('CSS Variables:');
-	lines.push(...formatCssVars(def.cssVars));
-	lines.push('');
-	lines.push('Data Attributes:');
-	lines.push(...formatDataAttributes(def.dataAttributes));
-	lines.push('');
-	lines.push('Accessibility:');
-	lines.push(...formatA11yNotes(def.a11y));
-	if (def.example) {
-		lines.push('');
-		lines.push('Canonical usage:');
-		lines.push(indent(def.example, 2));
-	}
+	lines.push(...formatCssDataA11yBlock(def));
 	return lines.join('\n');
 }
 
 export function formatSimple(name: string, def: ComponentDef): string {
 	const lines: string[] = [];
 	const bindables = getBindableProps(def);
-	lines.push(`${name} — ${def.description}`);
-	lines.push(`Category: ${def.category} | Tags: ${def.tags.join(', ')}`);
-	lines.push(`Root import: import { ${name} } from '${def.import}'`);
-	const subpath = getSubpathImport(name, def);
-	if (subpath) lines.push(`Subpath import: ${subpath}`);
+	lines.push(...formatHeaderLines(name, def));
 	lines.push(`Kind: ${componentKind(def)}`);
 	lines.push('Required parts: none');
 	lines.push(`Bindable props: ${bindables.length ? bindables.join(', ') : 'none'}`);
@@ -257,19 +265,6 @@ export function formatSimple(name: string, def: ComponentDef): string {
 	lines.push('');
 	lines.push('Native props:');
 	lines.push(...formatForwardedProps(def.forwardedProps));
-	lines.push('');
-	lines.push('CSS Variables:');
-	lines.push(...formatCssVars(def.cssVars));
-	lines.push('');
-	lines.push('Data Attributes:');
-	lines.push(...formatDataAttributes(def.dataAttributes));
-	lines.push('');
-	lines.push('Accessibility:');
-	lines.push(...formatA11yNotes(def.a11y));
-	if (def.example) {
-		lines.push('');
-		lines.push('Canonical usage:');
-		lines.push(indent(def.example, 2));
-	}
+	lines.push(...formatCssDataA11yBlock(def));
 	return lines.join('\n');
 }

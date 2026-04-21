@@ -36,10 +36,11 @@ import {
 	getAgentSetupStatus,
 	installPreviewLines,
 	isAutoInstallable,
+	readAgentSetupEntries,
 	runEditorInstall,
 	runSvelteCompanionInstall,
 	svelteCompanionPreviewLines,
-	summarizeAgentSetupStatus
+	type AgentSetupEntry
 } from './setup-installers.js';
 import type { Spec } from './types.js';
 
@@ -59,6 +60,7 @@ interface SelectOption<T extends string> {
 
 interface SelectPromptOptions {
 	contextLines?: readonly string[];
+	secondaryLines?: readonly string[];
 	footer?: string;
 	initialIndex?: number;
 }
@@ -196,8 +198,56 @@ function isSetupGuideId(value: string): value is SetupGuideId {
 	return setupGuideIds.includes(value as SetupGuideId);
 }
 
-function yesNo(value: boolean): string {
-	return value ? 'yes' : 'no';
+const FLAG_ON = '✓';
+const FLAG_OFF = '·';
+
+function formatFlagRow(flags: readonly { label: string; on: boolean }[]): string {
+	return flags.map((f) => `${f.on ? FLAG_ON : FLAG_OFF} ${f.label}`).join('   ');
+}
+
+const AGENT_COLUMNS: readonly {
+	header: string;
+	get: (entry: AgentSetupEntry) => string;
+}[] = [
+	{ header: '', get: (e) => e.displayName },
+	{ header: 'plugin', get: (e) => (e.plugin ? FLAG_ON : FLAG_OFF) },
+	{ header: 'mcp', get: (e) => (e.mcp ? FLAG_ON : FLAG_OFF) },
+	{ header: 'svelte', get: (e) => (e.svelte ? FLAG_ON : FLAG_OFF) }
+];
+
+export function buildAgentsBlock(cwd: string): string[] {
+	const entries = readAgentSetupEntries({ cwd });
+	if (entries.length === 0) {
+		return [paint('Agents: none wired yet', ANSI.dim, ANSI.slate)];
+	}
+
+	const colWidths = AGENT_COLUMNS.map((col) =>
+		Math.max(col.header.length, ...entries.map((entry) => col.get(entry).length))
+	);
+	const bar = paint('│', ANSI.dim, ANSI.slate);
+	const border = (left: string, mid: string, right: string): string =>
+		paint(left + colWidths.map((w) => '─'.repeat(w + 2)).join(mid) + right, ANSI.dim, ANSI.slate);
+	const renderRow = (cells: readonly string[], paintCell: (text: string) => string): string =>
+		bar + cells.map((cell, i) => ` ${paintCell(cell.padEnd(colWidths[i]!))} ${bar}`).join('');
+
+	const headerCells = AGENT_COLUMNS.map((col) => col.header);
+	const header = renderRow(headerCells, (text) => paint(text, ANSI.bold, ANSI.sky));
+
+	const out = [
+		paint('Agents', ANSI.bold, ANSI.slate),
+		border('┌', '┬', '┐'),
+		header,
+		border('├', '┼', '┤')
+	];
+	for (const [index, entry] of entries.entries()) {
+		const cells = AGENT_COLUMNS.map((col) => col.get(entry));
+		out.push(renderRow(cells, (text) => paint(text, ANSI.white)));
+		if (index < entries.length - 1) {
+			out.push(border('├', '┼', '┤'));
+		}
+	}
+	out.push(border('└', '┴', '┘'));
+	return out;
 }
 
 function takeLeadingSentences(text: string, count: number): string {
@@ -300,40 +350,73 @@ function divider(width = output.columns ?? 72): string {
 	return '─'.repeat(Math.max(36, Math.min(72, width - 2)));
 }
 
-function splitContextLine(line: string): { label: string; value: string } | null {
-	if (!line.trim() || /^\s/.test(line)) return null;
+type ContextEntry =
+	| { kind: 'pair'; label: string; value: string }
+	| { kind: 'continuation'; value: string };
+
+function parseContextEntry(line: string): ContextEntry | null {
+	if (line.startsWith('  ')) {
+		return { kind: 'continuation', value: line.slice(2).replace(/\s+$/, '') };
+	}
+	if (!line.trim()) return null;
 	const separatorIndex = line.indexOf(':');
 	if (separatorIndex === -1) return null;
-
+	const afterColon = line.slice(separatorIndex + 1);
 	return {
+		kind: 'pair',
 		label: line.slice(0, separatorIndex).trim(),
-		value: line.slice(separatorIndex + 1).trim()
+		value: (afterColon.startsWith(' ') ? afterColon.slice(1) : afterColon).replace(/\s+$/, '')
 	};
 }
 
-function isKeyValueContext(lines: readonly string[]): boolean {
-	const nonEmptyLines = lines.filter((line) => line.trim());
-	return nonEmptyLines.length > 0 && nonEmptyLines.every((line) => splitContextLine(line) !== null);
+function parseContextEntries(lines: readonly string[]): ContextEntry[] | null {
+	const eligible = lines.filter((line) => line.trim());
+	if (eligible.length === 0) return null;
+	const parsed: ContextEntry[] = [];
+	let hasPair = false;
+	for (const line of eligible) {
+		const entry = parseContextEntry(line);
+		if (!entry) return null;
+		if (entry.kind === 'pair') hasPair = true;
+		parsed.push(entry);
+	}
+	return hasPair ? parsed : null;
 }
 
 function formatContextBlockLines(contextLines: readonly string[] = []): string[] {
 	if (!contextLines.length) return [];
 
-	if (isKeyValueContext(contextLines)) {
-		const entries = contextLines
-			.map((line) => splitContextLine(line))
-			.filter((entry): entry is { label: string; value: string } => entry !== null);
-		const labelWidth = Math.max(...entries.map((entry) => entry.label.length));
+	const entries = parseContextEntries(contextLines);
+	if (entries) {
+		const labelWidth = entries.reduce(
+			(width, entry) => (entry.kind === 'pair' ? Math.max(width, entry.label.length) : width),
+			0
+		);
+		const valueWidth = entries.reduce((width, entry) => Math.max(width, entry.value.length), 0);
 
-		return [
-			paint('Current workspace', ANSI.bold, ANSI.slate),
-			'',
-			...entries.map((entry) => {
-				const label = paint(entry.label.padEnd(labelWidth), ANSI.bold, ANSI.sky);
-				const value = paint(entry.value, ANSI.white);
-				return `  ${label}  ${value}`;
-			})
-		];
+		const border = (left: string, mid: string, right: string): string =>
+			paint(
+				`${left}${'─'.repeat(labelWidth + 2)}${mid}${'─'.repeat(valueWidth + 2)}${right}`,
+				ANSI.dim,
+				ANSI.slate
+			);
+		const bar = paint('│', ANSI.dim, ANSI.slate);
+		const blankCell = ' '.repeat(labelWidth);
+
+		const out = [paint('Current workspace', ANSI.bold, ANSI.slate), border('┌', '┬', '┐')];
+		for (const [index, entry] of entries.entries()) {
+			const labelText =
+				entry.kind === 'pair'
+					? paint(entry.label.padEnd(labelWidth), ANSI.bold, ANSI.sky)
+					: blankCell;
+			const value = paint(entry.value.padEnd(valueWidth), ANSI.white);
+			out.push(`${bar} ${labelText} ${bar} ${value} ${bar}`);
+			if (index < entries.length - 1) {
+				out.push(border('├', '┼', '┤'));
+			}
+		}
+		out.push(border('└', '┴', '┘'));
+		return out;
 	}
 
 	return contextLines.map((line, index) =>
@@ -356,6 +439,11 @@ export function formatPromptFrameLines(question: string, config: SelectPromptOpt
 	lines.push(...formatContextBlockLines(config.contextLines));
 
 	if (config.contextLines?.length) {
+		lines.push('');
+	}
+
+	if (config.secondaryLines?.length) {
+		lines.push(...config.secondaryLines);
 		lines.push('');
 	}
 
@@ -425,14 +513,35 @@ function getEditorMenuIcon(editor: SetupGuideId): string {
 function buildMainContext(spec: Spec): string[] {
 	try {
 		const detection = detectProject(spec, undefined);
-		return [
-			`cwd: ${homeRelative(process.cwd())}`,
-			`project: ${detection.status} | framework: ${detection.framework} | pkg-manager: ${detection.packageManager}`,
-			`root: ${detection.root ? homeRelative(detection.root) : '(not found)'}`,
-			`deps: ui=${yesNo(detection.dependencies.ui)}, primitives=${yesNo(detection.dependencies.primitives)}, lint=${yesNo(detection.dependencies.lint)}`,
-			`theme: default=${yesNo(detection.theme.defaultImported)}, dark=${yesNo(detection.theme.darkImported)}, auto=${yesNo(detection.theme.themeAuto)}`,
-			summarizeAgentSetupStatus({ cwd: process.cwd() })
+		const cwd = homeRelative(process.cwd());
+		const root = detection.root ? homeRelative(detection.root) : null;
+
+		const lines = [
+			`cwd: ${cwd}`,
+			`project: ${detection.status} · ${detection.framework} · ${detection.packageManager}`
 		];
+
+		if (root && root !== cwd) {
+			lines.push(`root: ${root}`);
+		} else if (!root) {
+			lines.push('root: (not found)');
+		}
+
+		lines.push(
+			`deps: ${formatFlagRow([
+				{ label: 'ui', on: detection.dependencies.ui },
+				{ label: 'primitives', on: detection.dependencies.primitives },
+				{ label: 'lint', on: detection.dependencies.lint }
+			])}`
+		);
+		lines.push(
+			`theme: ${formatFlagRow([
+				{ label: 'default', on: detection.theme.defaultImported },
+				{ label: 'dark', on: detection.theme.darkImported },
+				{ label: 'auto', on: detection.theme.themeAuto }
+			])}`
+		);
+		return lines;
 	} catch {
 		return [`cwd: ${homeRelative(process.cwd())}`, 'project: detection failed'];
 	}
@@ -445,11 +554,34 @@ function renderPromptFrame(question: string, config: SelectPromptOptions): void 
 	}
 }
 
-function renderFeedbackLaunchProgress(mainContext: string[], noOpen: boolean): void {
+function renderDetectView(mainContext: readonly string[], agentsBlock: readonly string[]): void {
+	console.clear();
+	console.log(paint('◈ DryUI', ANSI.bold, ANSI.cyan));
+	console.log(paint('Detected project setup', ANSI.dim, ANSI.sky));
+	console.log(paint(divider(), ANSI.dim, ANSI.slate));
+	console.log('');
+	for (const line of formatContextBlockLines(mainContext)) {
+		console.log(line);
+	}
+	if (agentsBlock.length) {
+		console.log('');
+		for (const line of agentsBlock) {
+			console.log(line);
+		}
+	}
+	console.log('');
+}
+
+function renderFeedbackLaunchProgress(
+	mainContext: string[],
+	agentsBlock: readonly string[],
+	noOpen: boolean
+): void {
 	renderPromptFrame(
 		noOpen ? 'Starting feedback dashboard URL lookup...' : 'Starting feedback dashboard...',
 		{
-			contextLines: mainContext
+			contextLines: mainContext,
+			secondaryLines: agentsBlock
 		}
 	);
 	console.log(
@@ -789,6 +921,7 @@ export function getInitTargetStatus(projectPath: string): InitTargetStatus | nul
 async function runInteractiveEditorSetup(
 	args: string[],
 	mainContext: string[],
+	agentsBlock: readonly string[],
 	defaultSvelteMcp: boolean
 ): Promise<void> {
 	const editorOptions: readonly SelectOption<EditorMenuValue>[] = [
@@ -803,7 +936,8 @@ async function runInteractiveEditorSetup(
 
 	while (true) {
 		const editor = await promptSelect('Which editor or agent do you want to wire?', editorOptions, {
-			contextLines: mainContext
+			contextLines: mainContext,
+			secondaryLines: agentsBlock
 		});
 
 		if (editor === 'back') {
@@ -917,12 +1051,17 @@ async function runInteractiveEditorSetup(
 	}
 }
 
-async function runInteractiveFeedbackSetup(spec: Spec, mainContext: string[]): Promise<void> {
+async function runInteractiveFeedbackSetup(
+	spec: Spec,
+	mainContext: string[],
+	agentsBlock: readonly string[]
+): Promise<void> {
 	const action = await promptSelect(
 		'How would you like to start feedback?',
 		FEEDBACK_MENU_OPTIONS,
 		{
-			contextLines: mainContext
+			contextLines: mainContext,
+			secondaryLines: agentsBlock
 		}
 	);
 
@@ -936,15 +1075,20 @@ async function runInteractiveFeedbackSetup(spec: Spec, mainContext: string[]): P
 
 	await runFeedbackSession(action === 'print', false, spec, {
 		runtime: {
-			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(mainContext, noOpen)
+			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(mainContext, agentsBlock, noOpen)
 		}
 	});
 	await promptAfterAction();
 }
 
-async function runInteractiveInit(spec: Spec, mainContext: string[]): Promise<void> {
+async function runInteractiveInit(
+	spec: Spec,
+	mainContext: string[],
+	agentsBlock: readonly string[]
+): Promise<void> {
 	const projectPath = await promptText('Where should the new project live?', 'my-app', {
-		contextLines: mainContext
+		contextLines: mainContext,
+		secondaryLines: agentsBlock
 	});
 	const detectedPm = detectPackageManagerFromEnv();
 	const initialIndex = PACKAGE_MANAGER_OPTIONS.findIndex((option) => option.value === detectedPm);
@@ -953,6 +1097,7 @@ async function runInteractiveInit(spec: Spec, mainContext: string[]): Promise<vo
 		PACKAGE_MANAGER_OPTIONS,
 		{
 			contextLines: [...mainContext, `target: ${projectPath}`],
+			secondaryLines: agentsBlock,
 			initialIndex: initialIndex === -1 ? 0 : initialIndex
 		}
 	);
@@ -978,7 +1123,8 @@ async function runInteractiveInit(spec: Spec, mainContext: string[]): Promise<vo
 				...mainContext,
 				`target: ${homeRelative(resolve(process.cwd(), projectPath))}`,
 				`package-manager: ${packageManager}`
-			]
+			],
+			secondaryLines: agentsBlock
 		});
 		if (!confirmed) {
 			return;
@@ -994,31 +1140,27 @@ async function runInteractiveSetup(
 	spec: Spec,
 	defaultSvelteMcp: boolean
 ): Promise<void> {
-	let mainContext = buildMainContext(spec);
-
 	while (true) {
-		const action = await promptSelect('What would you like to do?', MAIN_MENU_OPTIONS, {
-			contextLines: mainContext
-		});
+		const mainContext = buildMainContext(spec);
+		const agentsBlock = buildAgentsBlock(process.cwd());
+		const action = await promptSelect('What would you like to do?', MAIN_MENU_OPTIONS);
 
 		switch (action) {
 			case 'setup':
-				await runInteractiveEditorSetup(args, mainContext, defaultSvelteMcp);
+				await runInteractiveEditorSetup(args, mainContext, agentsBlock, defaultSvelteMcp);
 				break;
 			case 'feedback':
-				await runInteractiveFeedbackSetup(spec, mainContext);
-				mainContext = buildMainContext(spec);
+				await runInteractiveFeedbackSetup(spec, mainContext, agentsBlock);
 				break;
 			case 'init':
-				await runInteractiveInit(spec, mainContext);
-				mainContext = buildMainContext(spec);
+				await runInteractiveInit(spec, mainContext, agentsBlock);
 				break;
 			case 'install':
 				emitCommandResult(getInstall('.', spec, 'text'));
 				await promptAfterAction();
 				break;
 			case 'detect':
-				emitCommandResult(getDetect('.', spec, 'text'));
+				renderDetectView(mainContext, agentsBlock);
 				await promptAfterAction();
 				break;
 			case 'exit':

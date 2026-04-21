@@ -1,4 +1,4 @@
-export const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
+const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
 
 export function normalizeDevUrl(value: string | null | undefined): string | null {
 	if (!value?.trim()) return null;

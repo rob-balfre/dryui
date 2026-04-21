@@ -1,8 +1,6 @@
 import { createAnchorPosition } from './anchor-position.svelte.js';
 import type { Placement } from './anchor-position.svelte.js';
 
-export type { Placement };
-
 interface AnchorStylesOptions {
 	triggerEl: () => HTMLElement | null;
 	contentEl: () => HTMLElement | null;

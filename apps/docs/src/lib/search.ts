@@ -1,13 +1,13 @@
 import { componentMeta } from '../../../../packages/mcp/src/component-catalog.js';
 import { categories, toSlug } from '$lib/nav';
-export interface SearchItem {
+interface SearchItem {
 	label: string;
 	href: string;
 	description: string;
 	keywords: string[];
 }
 
-export interface SearchSection {
+interface SearchSection {
 	heading: string;
 	items: SearchItem[];
 }

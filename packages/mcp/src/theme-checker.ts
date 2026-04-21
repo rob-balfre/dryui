@@ -208,14 +208,13 @@ function stripComments(css: string): string {
 function extractDryVariables(cleaned: string): Map<string, VarEntry> {
 	const vars = new Map<string, VarEntry>();
 	const regex = /(--dry-[a-zA-Z0-9-]+)\s*:\s*([^;]*);/g;
-	let match: RegExpExecArray | null;
 
 	const lineOffsets = buildLineOffsets(cleaned);
 
-	while ((match = regex.exec(cleaned)) !== null) {
+	for (const match of cleaned.matchAll(regex)) {
 		const name = capture(match, 1);
 		const value = (match[2] ?? '').trim();
-		const line = lineAtOffset(lineOffsets, match.index);
+		const line = lineAtOffset(lineOffsets, match.index ?? 0);
 		vars.set(name, { value, line });
 	}
 
@@ -225,9 +224,8 @@ function extractDryVariables(cleaned: string): Map<string, VarEntry> {
 function extractAllVariables(cleaned: string): Map<string, string> {
 	const vars = new Map<string, string>();
 	const regex = /(--[a-zA-Z0-9-]+)\s*:\s*([^;]*);/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = regex.exec(cleaned)) !== null) {
+	for (const match of cleaned.matchAll(regex)) {
 		const name = capture(match, 1);
 		const value = (match[2] ?? '').trim();
 		vars.set(name, value);

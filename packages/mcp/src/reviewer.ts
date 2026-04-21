@@ -57,9 +57,8 @@ function extractImports(code: string): Set<string> {
 
 	const scriptContent = scriptMatch[1] ?? '';
 	const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"]@dryui\/(ui|primitives)['"]/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = importRegex.exec(scriptContent)) !== null) {
+	for (const match of scriptContent.matchAll(importRegex)) {
 		const raw = match[1] ?? '';
 		const names = raw.split(',');
 		for (const name of names) {
@@ -75,13 +74,12 @@ function extractTags(ctx: ReviewContext): TagInfo[] {
 	const { template, lineOffsets } = ctx;
 	const tagRegex = /<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)\s*([^>]*?)(\/)?>/g;
 	const tags: TagInfo[] = [];
-	let match: RegExpExecArray | null;
 
-	while ((match = tagRegex.exec(template)) !== null) {
+	for (const match of template.matchAll(tagRegex)) {
 		const name = match[1] ?? '';
 		const attrsStr = match[2] ?? '';
 		const selfClosing = match[3] === '/';
-		const line = lineAtOffset(lineOffsets, match.index);
+		const line = lineAtOffset(lineOffsets, match.index ?? 0);
 		const props = extractPropsFromAttrs(attrsStr);
 		const hasSpread = /\{\.\.\./.test(attrsStr);
 
@@ -134,15 +132,14 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 
 	// bind:propName
 	const bindRegex = /\bbind:([a-zA-Z_][a-zA-Z0-9_]*)/g;
-	let m: RegExpExecArray | null;
-	while ((m = bindRegex.exec(stripped)) !== null) {
+	for (const m of stripped.matchAll(bindRegex)) {
 		const bound = m[1];
 		if (bound) props.push('bind:' + bound);
 	}
 
 	// propName={ or propName="
 	const namedRegex = /\b([a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
-	while ((m = namedRegex.exec(stripped)) !== null) {
+	for (const m of stripped.matchAll(namedRegex)) {
 		const propName = m[1];
 		if (propName && !props.includes(propName)) {
 			props.push(propName);
@@ -151,7 +148,7 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 
 	// Boolean props: bare identifiers not followed by =
 	const boolRegex = /(?<!\.)(?<![:{])\b([a-zA-Z_][a-zA-Z0-9_-]*)\b(?!\s*=)/g;
-	while ((m = boolRegex.exec(stripped)) !== null) {
+	for (const m of stripped.matchAll(boolRegex)) {
 		const propName = m[1];
 		if (!propName) continue;
 		if (props.includes(propName) || props.includes('bind:' + propName) || propName === 'bind') {
@@ -341,32 +338,34 @@ function checkInvalidPartName(
 	return issues;
 }
 
+function resolveSpecPropsForTag(
+	tag: TagInfo,
+	spec: { components: Record<string, ComponentDef> }
+): Record<string, PropDef> | null {
+	const segments = tag.name.split('.');
+	const root = segments[0] ?? '';
+	const part = segments[1];
+	if (!root) return null;
+	const def = spec.components[root];
+	if (!def) return null;
+
+	if (part) {
+		return def.parts?.[part]?.props ?? null;
+	}
+	if (!def.compound) {
+		return def.props ?? null;
+	}
+	// Bare compound root (e.g. <Tabs>) — already flagged by checkBareCompound.
+	return null;
+}
+
 function checkInvalidProp(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
 ): Issue[] {
 	const issues: Issue[] = [];
 	for (const tag of tags) {
-		const segments = tag.name.split('.');
-		const root = segments[0] ?? '';
-		const part = segments[1];
-		if (!root) continue;
-		const def = spec.components[root];
-		if (!def) continue;
-
-		let specProps: Record<string, PropDef> | undefined;
-
-		if (part) {
-			// Compound part — look up part props.
-			specProps = def.parts?.[part]?.props;
-		} else if (!def.compound) {
-			// Non-compound component — use top-level props.
-			specProps = def.props;
-		} else {
-			// Bare compound usage (already flagged by checkBareCompound) — skip.
-			continue;
-		}
-
+		const specProps = resolveSpecPropsForTag(tag, spec);
 		if (!specProps) continue;
 
 		for (const prop of tag.props) {
@@ -398,23 +397,7 @@ function checkMissingRequiredProp(
 	for (const tag of tags) {
 		if (tag.hasSpread) continue;
 
-		const segments = tag.name.split('.');
-		const root = segments[0] ?? '';
-		const part = segments[1];
-		if (!root) continue;
-		const def = spec.components[root];
-		if (!def) continue;
-
-		let specProps: Record<string, PropDef> | undefined;
-
-		if (part) {
-			specProps = def.parts?.[part]?.props;
-		} else if (!def.compound) {
-			specProps = def.props;
-		} else {
-			continue;
-		}
-
+		const specProps = resolveSpecPropsForTag(tag, spec);
 		if (!specProps) continue;
 
 		// Normalise tag props (strip bind: prefix) for lookup.
@@ -509,10 +492,10 @@ function findTagOffset(
 	lineOffsets: number[]
 ): number {
 	const regex = new RegExp(`<${tagName.replace('.', '\\.')}[\\s/>]`, 'g');
-	let match: RegExpExecArray | null;
-	while ((match = regex.exec(template)) !== null) {
-		const line = lineAtOffset(lineOffsets, match.index);
-		if (line === targetLine) return match.index;
+	for (const match of template.matchAll(regex)) {
+		const offset = match.index ?? 0;
+		const line = lineAtOffset(lineOffsets, offset);
+		if (line === targetLine) return offset;
 	}
 	return -1;
 }
@@ -627,36 +610,29 @@ function checkCustomFlexLayout(styles: string, code: string): Issue[] {
 	return issues;
 }
 
+function pushFieldComponentIssue(issues: Issue[], line: number): void {
+	issues.push({
+		severity: 'error',
+		code: 'use-field-component',
+		line,
+		message: ruleMessage('use-field-component'),
+		fix: ruleSuggestedFix('use-field-component')
+	});
+}
+
 function checkCustomFieldMarkup(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	const { template, lineOffsets } = ctx;
 
 	const fieldClassRegex = /class=["']field["']/g;
-	let match: RegExpExecArray | null;
-
-	while ((match = fieldClassRegex.exec(template)) !== null) {
-		const line = lineAtOffset(lineOffsets, match.index);
-		issues.push({
-			severity: 'error',
-			code: 'use-field-component',
-			line,
-			message: ruleMessage('use-field-component'),
-			fix: ruleSuggestedFix('use-field-component')
-		});
+	for (const match of template.matchAll(fieldClassRegex)) {
+		pushFieldComponentIssue(issues, lineAtOffset(lineOffsets, match.index ?? 0));
 	}
 
 	// Check for <span> followed by <input, <select, or <textarea (manual label+input pairing)
 	const manualFieldRegex = /<span[^>]*>[\s\S]*?<\/span>\s*<(?:input|select|textarea)[\s/>]/g;
-
-	while ((match = manualFieldRegex.exec(template)) !== null) {
-		const line = lineAtOffset(lineOffsets, match.index);
-		issues.push({
-			severity: 'error',
-			code: 'use-field-component',
-			line,
-			message: ruleMessage('use-field-component'),
-			fix: ruleSuggestedFix('use-field-component')
-		});
+	for (const match of template.matchAll(manualFieldRegex)) {
+		pushFieldComponentIssue(issues, lineAtOffset(lineOffsets, match.index ?? 0));
 	}
 
 	return issues;
@@ -666,10 +642,9 @@ function checkRawStyledButton(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	const { template, lineOffsets } = ctx;
 	const rawBtnRegex = /<button\s[^>]*class=/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = rawBtnRegex.exec(template)) !== null) {
-		const line = lineAtOffset(lineOffsets, match.index);
+	for (const match of template.matchAll(rawBtnRegex)) {
+		const line = lineAtOffset(lineOffsets, match.index ?? 0);
 		issues.push({
 			severity: 'error',
 			code: 'use-button-component',
@@ -710,9 +685,8 @@ function checkInteractiveCardWrapper(ctx: ReviewContext, styles: string): Issue[
 	const issues: Issue[] = [];
 	const { template, lineOffsets } = ctx;
 	const wrapperRegex = /<([a-z][a-zA-Z0-9:-]*)\s[^>]*class=(["'])([^"']+)\2[^>]*>([\s\S]*?)<\/\1>/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = wrapperRegex.exec(template)) !== null) {
+	for (const match of template.matchAll(wrapperRegex)) {
 		const classAttr = match[3] ?? '';
 		const inner = match[4] ?? '';
 		if (!/<Card\.Root\b[^>]*\bas=(["'])(button|a)\1/.test(inner)) continue;
@@ -723,7 +697,7 @@ function checkInteractiveCardWrapper(ctx: ReviewContext, styles: string): Issue[
 		issues.push({
 			severity: 'warning',
 			code: 'interactive-card-wrapper',
-			line: lineAtOffset(lineOffsets, match.index),
+			line: lineAtOffset(lineOffsets, match.index ?? 0),
 			message: ruleMessage('interactive-card-wrapper'),
 			fix: ruleSuggestedFix('interactive-card-wrapper')
 		});
@@ -807,10 +781,9 @@ function checkRawHr(ctx: ReviewContext): Issue[] {
 	const issues: Issue[] = [];
 	const { template, lineOffsets } = ctx;
 	const hrRegex = /<hr[\s/>]/g;
-	let match: RegExpExecArray | null;
 
-	while ((match = hrRegex.exec(template)) !== null) {
-		const line = lineAtOffset(lineOffsets, match.index);
+	for (const match of template.matchAll(hrRegex)) {
+		const line = lineAtOffset(lineOffsets, match.index ?? 0);
 		issues.push({
 			severity: 'error',
 			code: 'prefer-separator',

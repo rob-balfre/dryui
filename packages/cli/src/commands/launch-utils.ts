@@ -283,6 +283,7 @@ export function readProjectDevLogTail(logPath: string, maxLines = 40): string[] 
 		if (!raw) return [];
 		const lines = raw
 			.split('\n')
+			// biome-ignore lint/suspicious/noControlCharactersInRegex: ANSI escape strip is intentional
 			.map((line) => line.replace(/\x1b\[[0-9;]*m/g, '').trimEnd())
 			.filter((line) => line.length > 0);
 		return lines.slice(-maxLines);

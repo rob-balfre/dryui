@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { runInit } from '../commands/init.js';
 import { captureCommandIO, cleanupTempDirs, createTempTree, withCwd } from './helpers.js';
@@ -159,6 +159,68 @@ describe('runInit', () => {
 		expect(result.logs).toContain('  + root layout with theme imports');
 		expect(existsSync(layoutPath)).toBe(true);
 		expect(readFileSync(layoutPath, 'utf8')).toContain('{@render children()}');
+	});
+
+	test('next-steps cd line preserves an absolute path verbatim', () => {
+		// Regression: previously `targetPath.startsWith(process.cwd())` lacked a
+		// path-boundary check, so if cwd was `/a` and the user typed `/app`, the
+		// displayed path got its `/a` prefix sliced off and `cd pp` was printed.
+		// Reproduce that shape here by making the cwd a prefix-sibling of the
+		// target (same parent, target name starts with the cwd's name).
+		const rawParent = createTempTree({
+			'a/.keep': '',
+			'app/package.json': packageJson,
+			'app/bun.lock': '',
+			'app/svelte.config.js': readySvelteConfig,
+			'app/src/app.html': '<html lang="en" class="shell"></html>',
+			'app/src/routes/+layout.svelte': readyLayout
+		});
+		// Resolve through /private on macOS so cwd() matches what startsWith saw.
+		const parent = realpathSync(rawParent);
+		const cwd = join(parent, 'a');
+		const target = join(parent, 'app');
+
+		const result = withCwd(cwd, () =>
+			captureCommandIO(() => runInit([target, '--pm', 'bun'], spec))
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(result.logs).toContain(`    cd ${target}`);
+		expect(result.logs).toContain('    bun run dev');
+	});
+
+	test('next-steps cd line shows the relative path the user typed', () => {
+		const root = createTempTree({
+			'myapp/package.json': packageJson,
+			'myapp/bun.lock': '',
+			'myapp/svelte.config.js': readySvelteConfig,
+			'myapp/src/app.html': '<html lang="en" class="shell"></html>',
+			'myapp/src/routes/+layout.svelte': readyLayout
+		});
+
+		const result = withCwd(root, () =>
+			captureCommandIO(() => runInit(['myapp', '--pm', 'bun'], spec))
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(result.logs).toContain('    cd myapp');
+		expect(result.logs).toContain('    bun run dev');
+	});
+
+	test('next-steps omits the cd line when initializing the current directory', () => {
+		const root = createTempTree({
+			'package.json': packageJson,
+			'bun.lock': '',
+			'svelte.config.js': readySvelteConfig,
+			'src/app.html': '<html lang="en" class="shell"></html>',
+			'src/routes/+layout.svelte': readyLayout
+		});
+
+		const result = withCwd(root, () => captureCommandIO(() => runInit(['.', '--pm', 'bun'], spec)));
+
+		expect(result.errors).toEqual([]);
+		expect(result.logs.some((line) => line.startsWith('    cd '))).toBe(false);
+		expect(result.logs).toContain('    bun run dev');
 	});
 
 	test('warns instead of rewriting an unrecognised preprocess shape', () => {

@@ -81,7 +81,7 @@ export const sizeThemePresets: Record<
  * @deprecated Use `sizeThemePresets` for per-size theme values.
  * Retained for backward compatibility — maps to `md` size presets.
  */
-export const themeColors: Record<'dark' | 'light', ThemeColors> = {
+const themeColors: Record<'dark' | 'light', ThemeColors> = {
 	dark: { ...sizeThemePresets.md.dark },
 	light: { ...sizeThemePresets.md.light }
 };
