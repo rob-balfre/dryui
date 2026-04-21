@@ -1,5 +1,11 @@
 # @dryui/feedback-server
 
+## 0.6.5
+
+### Patch Changes
+
+- [`57b65f6`](https://github.com/rob-balfre/dryui/commit/57b65f646f9e3fb3371ebebc1898d5a2d5ca74de) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Auto-dispatched feedback prompts now carry the same 6-step review body and annotation text notes that the admin dashboard preview shows, instead of a one-line instruction. Fixes a regression where agents launched on submission lost the annotation context.
+
 ## 0.6.4
 
 ### Patch Changes
