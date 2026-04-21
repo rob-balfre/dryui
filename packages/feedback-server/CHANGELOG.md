@@ -1,5 +1,15 @@
 # @dryui/feedback-server
 
+## 0.6.1
+
+### Patch Changes
+
+- [`49fa611`](https://github.com/rob-balfre/dryui/commit/49fa6116ebc9570b830e80b2df9529643a8219e2) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Internal cleanup across the workspace: un-export symbols only consumed
+  inside their own module, modernize RegExp iteration to `str.matchAll`,
+  and drop unused dev dependencies (puppeteer, pixelmatch, pngjs,
+  lucide-svelte, adapter-static). No public API changes for documented
+  entry points.
+
 ## 0.6.0
 
 ### Minor Changes
