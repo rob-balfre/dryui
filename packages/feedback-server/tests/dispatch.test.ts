@@ -9,17 +9,71 @@ import {
 import { buildFeedbackDispatchPrompt } from '../src/prompts.ts';
 
 describe('feedback prompts', () => {
-	test('dispatch prompt asks agents to lint before resolving', () => {
+	test('dispatch prompt walks agents through the full review steps', () => {
 		const prompt = buildFeedbackDispatchPrompt({
 			id: 'sub-123',
-			url: 'https://example.com/page'
+			url: 'https://example.com/page',
+			drawings: []
 		});
 
-		expect(prompt).toContain('run the relevant project linter/check command');
-		expect(prompt).toContain('fix any violations');
-		expect(prompt.indexOf('run the relevant project linter/check command')).toBeLessThan(
-			prompt.indexOf('then resolve with feedback_resolve_submission')
+		expect(prompt).toContain(
+			'Work on DryUI feedback submission sub-123 from https://example.com/page'
 		);
+		expect(prompt).toContain('Use the dryui-feedback MCP server:');
+		expect(prompt).toContain('1. Call feedback_get_submissions');
+		expect(prompt).toContain('2. Read the screenshot at screenshotPath.png');
+		expect(prompt).toContain('Run the relevant project linter/check command');
+		expect(prompt).toContain('Call feedback_resolve_submission with id "sub-123"');
+		expect(prompt.indexOf('Run the relevant project linter/check command')).toBeLessThan(
+			prompt.indexOf('Call feedback_resolve_submission')
+		);
+	});
+
+	test('dispatch prompt appends text notes from the annotation when present', () => {
+		const prompt = buildFeedbackDispatchPrompt({
+			id: 'sub-456',
+			url: 'http://localhost:5173/',
+			drawings: [
+				{
+					id: 'd1',
+					kind: 'text',
+					color: '#fff',
+					position: { x: 10, y: 20 },
+					text: 'Add a header bar',
+					fontSize: 14
+				},
+				{
+					id: 'd2',
+					kind: 'arrow',
+					color: '#fff',
+					start: { x: 0, y: 0 },
+					end: { x: 10, y: 10 },
+					width: 2
+				}
+			]
+		});
+
+		expect(prompt).toContain('Text notes from the annotation:');
+		expect(prompt).toContain('- Add a header bar');
+	});
+
+	test('dispatch prompt omits the notes block when there are no text drawings', () => {
+		const prompt = buildFeedbackDispatchPrompt({
+			id: 'sub-789',
+			url: 'http://localhost:5173/',
+			drawings: [
+				{
+					id: 'd1',
+					kind: 'arrow',
+					color: '#fff',
+					start: { x: 0, y: 0 },
+					end: { x: 10, y: 10 },
+					width: 2
+				}
+			]
+		});
+
+		expect(prompt).not.toContain('Text notes from the annotation:');
 	});
 });
 

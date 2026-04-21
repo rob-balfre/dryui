@@ -30,7 +30,11 @@
 		RefreshCw
 	} from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
-	import { FEEDBACK_LINTER_PROMPT_STEP } from '../../src/prompts.js';
+	import {
+		buildFeedbackBulkPrompt,
+		buildFeedbackDispatchPrompt,
+		getTextNotes
+	} from '../../src/prompts.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
 	import AgentIcon from './agent-icon.svelte';
 	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
@@ -254,17 +258,6 @@
 		}));
 	}
 
-	function getTextNotes(drawings: unknown[]): string[] {
-		return drawings.flatMap((drawing) => {
-			if (typeof drawing !== 'object' || drawing === null) return [];
-
-			const kind = Reflect.get(drawing, 'kind');
-			const text = Reflect.get(drawing, 'text');
-
-			return kind === 'text' && typeof text === 'string' ? [text] : [];
-		});
-	}
-
 	async function readSubmissions(): Promise<SubmissionResponse> {
 		const response = await fetch('/submissions?status=all');
 		if (!response.ok) {
@@ -357,32 +350,9 @@
 	let visibleResolvedCount = $derived(visibleResolvedSubmissions.length);
 	let visibleCount = $derived(visibleSubmissions.length);
 
-	let promptText = $derived.by(() => {
-		if (selectedSubmission) {
-			const notes =
-				selectedTextNotes.length > 0
-					? `\n\nText notes from the annotation:\n${selectedTextNotes.map((note) => `- ${note}`).join('\n')}`
-					: '';
-			return `Work on DryUI feedback submission ${selectedSubmission.id} from ${selectedSubmission.url}.
-
-Use the dryui-feedback MCP server:
-1. Call feedback_get_submissions to fetch the latest submission details
-2. Read the screenshot at screenshotPath.png (fallback to screenshotPath.webp) to see what the user annotated
-3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-5. ${FEEDBACK_LINTER_PROMPT_STEP}
-6. Call feedback_resolve_submission with id "${selectedSubmission.id}" once resolved${notes}`;
-		}
-		return `Work on pending DryUI feedback submissions.
-
-Use the dryui-feedback MCP server:
-1. Call feedback_get_submissions to list pending submissions
-2. For each submission, read the screenshot at screenshotPath.png (fallback to screenshotPath.webp)
-3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-5. ${FEEDBACK_LINTER_PROMPT_STEP}
-6. Call feedback_resolve_submission with the submission id after each fix is complete`;
-	});
+	let promptText = $derived(
+		selectedSubmission ? buildFeedbackDispatchPrompt(selectedSubmission) : buildFeedbackBulkPrompt()
+	);
 
 	onMount(() => {
 		void loadSubmissions('initial');
