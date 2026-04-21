@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Mirror the CI changeset gate so a missing `.changeset/*.md` fails
+# locally instead of blocking Release on main (see .github/workflows/release.yml).
+# Bypass with `git push --no-verify` when pushing a WIP branch you plan
+# to fix up before merging.
+
+# Skip inside CI runners — the release-ci script pushes the "chore: version
+# packages" commit itself, and the CI workflow already runs this check
+# directly before reaching the push.
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+  exit 0
+fi
+
+exec bun run scripts/check-changeset-required.ts

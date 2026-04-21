@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Auto-regenerate MCP spec/contract files if component sources changed
+# This prevents check:contract from failing due to stale generated files
+
+STAGED=$(git diff --cached --name-only)
+
+# Check if any primitives or ui source files are staged
+if echo "$STAGED" | grep -qE '^packages/(primitives|ui)/src/'; then
+  echo "[pre-commit] Component sources changed — regenerating spec/contract..."
+
+  bun run --filter '@dryui/mcp' generate-spec && \
+  bun run --filter '@dryui/mcp' generate-contract && \
+  bun run --filter '@dryui/mcp' generate-llms
+
+  git add packages/mcp/src/spec.json \
+          packages/mcp/src/contract.v1.json \
+          packages/mcp/src/contract.v1.schema.json \
+          llms.txt \
+          apps/docs/static/llms.txt \
+          apps/docs/static/llms-components.txt
+
+  echo "[pre-commit] Spec/contract files regenerated and staged."
+fi
+
+# Regenerate theme-tokens.generated.json if UI theme CSS changed. The
+# release pipeline will otherwise catch the drift and refuse to run.
+if echo "$STAGED" | grep -qE '^packages/ui/src/themes/.*\.css$'; then
+  echo "[pre-commit] UI theme CSS changed — regenerating theme-tokens..."
+  bun run --filter '@dryui/mcp' generate-theme-tokens
+  git add packages/mcp/src/theme-tokens.generated.json
+fi
+
+# Check formatting on staged files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|js|svelte|json|css|md)$' || true)
+if [ -n "$STAGED_FILES" ]; then
+  echo "$STAGED_FILES" | xargs bunx prettier --check 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo ""
+    echo "[pre-commit] Formatting check failed. Run 'bun run format' and re-stage."
+    exit 1
+  fi
+fi

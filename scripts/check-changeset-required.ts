@@ -42,8 +42,27 @@ const GENERATED_FILES = new Set([
 	'packages/mcp/src/theme-tokens.generated.json'
 ]);
 
+// Paths that live under packages/ but aren't part of the published tarball,
+// so they don't need a changeset on their own. Pure source/test/tooling edits
+// still bundled with a real change will show the real file alongside them
+// and trip the gate correctly.
+const NON_PUBLISHABLE_PATTERNS: readonly RegExp[] = [
+	/\/__tests__\//,
+	/\.test\.[tj]sx?$/,
+	/\.spec\.[tj]sx?$/,
+	/\/tsconfig[^/]*\.json$/,
+	/\/tsbuildinfo$/,
+	/\.tsbuildinfo$/,
+	/\/CHANGELOG\.md$/
+];
+
+function isNonPublishablePath(path: string): boolean {
+	return NON_PUBLISHABLE_PATTERNS.some((re) => re.test(path));
+}
+
 function getPackageRootFromPath(path: string): string | null {
 	if (GENERATED_FILES.has(path)) return null;
+	if (isNonPublishablePath(path)) return null;
 	const match = path.match(/^packages\/([^/]+)\//);
 	return match ? match[1]! : null;
 }
