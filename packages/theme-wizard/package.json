@@ -1,6 +1,6 @@
 {
   "name": "@dryui/theme-wizard",
-  "version": "13.0.1",
+  "version": "13.0.2",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -53,15 +53,15 @@
     "postpack": "bun ../../scripts/postpack-exports.ts"
   },
   "peerDependencies": {
-    "@dryui/primitives": "^1.7.3",
-    "@dryui/ui": "^1.7.3",
+    "@dryui/primitives": "^1.7.4",
+    "@dryui/ui": "^1.7.4",
     "lucide-svelte": ">=1.0.1",
     "svelte": "^5.55.4"
   },
   "devDependencies": {
-    "@dryui/lint": "^0.4.2",
-    "@dryui/primitives": "^1.7.3",
-    "@dryui/ui": "^1.7.3",
+    "@dryui/lint": "^0.4.3",
+    "@dryui/primitives": "^1.7.4",
+    "@dryui/ui": "^1.7.4",
     "svelte": "^5.55.4",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",
