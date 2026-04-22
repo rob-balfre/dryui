@@ -41,13 +41,13 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.16.0",
+      "version": "0.16.1",
       "bin": {
         "dryui": "./dist/index.js",
       },
       "dependencies": {
         "@dryui/feedback-server": "^0.7.0",
-        "@dryui/mcp": "^2.2.6",
+        "@dryui/mcp": "^2.2.7",
       },
       "devDependencies": {
         "@types/node": "^25.6.0",
@@ -104,7 +104,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.2.6",
+      "version": "2.2.7",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
