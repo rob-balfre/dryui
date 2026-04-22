@@ -1,4 +1,5 @@
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 
 export type DryuiFramework = 'sveltekit' | 'svelte' | 'unknown';
@@ -228,12 +229,20 @@ function findDescendantSvelteProjects(
 	start: string,
 	maxDepth = DESCENDANT_PROJECT_SEARCH_MAX_DEPTH
 ): DescendantProjectCandidate[] {
+	if (start === homedir()) return [];
 	const candidates: DescendantProjectCandidate[] = [];
 
 	function visit(current: string, depth: number): void {
 		if (depth >= maxDepth) return;
 
-		for (const entry of readdirSync(current, { withFileTypes: true })) {
+		let entries: Dirent[];
+		try {
+			entries = readdirSync(current, { withFileTypes: true });
+		} catch {
+			return;
+		}
+
+		for (const entry of entries) {
 			if (!entry.isDirectory()) continue;
 			if (PROJECT_WALK_IGNORED_DIRS.has(entry.name)) continue;
 
