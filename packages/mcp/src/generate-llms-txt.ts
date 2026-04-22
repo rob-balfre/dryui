@@ -8,6 +8,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aiSurface } from './ai-surface.js';
+import { DOCS_ROUTES } from './docs-surface.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../../../');
@@ -300,6 +301,10 @@ function buildLlmsText(spec: Spec): string {
 
 - MCP tools: ${mcpTools.join(', ')}
 - CLI commands: ${cliCommands.join(', ')}
+
+## First-party docs
+
+${DOCS_ROUTES.map((r) => `- [${r.label}](https://dryui.dev${r.path}): ${r.description}`).join('\n')}
 
 ## Installation
 

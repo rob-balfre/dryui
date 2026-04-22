@@ -1,0 +1,120 @@
+/**
+ * Canonical manifest of DryUI first-party docs and agent editor support.
+ *
+ * Keeps one source of truth for:
+ *  - the docs IA (`/`, `/getting-started`, `/components`, …) that `search.ts`,
+ *    the llms.txt generator, and the nightly drift checks all consume
+ *  - the canonical agent IDs (`claude-code`, `codex`, `gemini`, …) that the
+ *    docs site renders setup cards for, and which plugin manifests must not
+ *    drift against
+ *  - the docs allowlist agents are told to trust in generated prompt bundles
+ *    (re-exported from `ai-surface.ts` for convenience)
+ *
+ * Consumers:
+ *  - `apps/docs/src/lib/search.ts` and `apps/docs/src/lib/ai-setup.ts` import
+ *    the agent IDs + route list
+ *  - `packages/mcp/src/generate-llms-txt.ts` inlines the route list
+ *  - `tests/unit/docs-surface.test.ts` cross-checks every entry against the
+ *    filesystem and `ai-setup.ts` / plugin manifests
+ */
+import { aiSurface } from './ai-surface.js';
+
+export type AgentId =
+	| 'claude-code'
+	| 'codex'
+	| 'gemini'
+	| 'opencode'
+	| 'copilot'
+	| 'cursor'
+	| 'windsurf'
+	| 'zed';
+
+/**
+ * Canonical agent IDs DryUI ships editor-setup guidance for. Ordering is the
+ * display order on the docs getting-started page.
+ */
+export const AGENT_IDS: readonly AgentId[] = [
+	'claude-code',
+	'codex',
+	'gemini',
+	'opencode',
+	'copilot',
+	'cursor',
+	'windsurf',
+	'zed'
+] as const;
+
+/**
+ * First-party docs routes. Paths are SvelteKit route URLs; the parity test
+ * checks that every route has a corresponding apps/docs/src/routes/_/+page.svelte.
+ *
+ * The dynamic `/components/[slug]` route is represented as `/components`;
+ * the component slugs themselves come from spec.json at generate time.
+ */
+export interface DocsRoute {
+	readonly path: string;
+	readonly label: string;
+	readonly description: string;
+	readonly keywords?: readonly string[];
+}
+
+export const DOCS_ROUTES: readonly DocsRoute[] = [
+	{
+		path: '/',
+		label: 'Home',
+		description: 'Landing page for DryUI',
+		keywords: ['index', 'overview', 'landing']
+	},
+	{
+		path: '/getting-started',
+		label: 'Getting Started',
+		description: 'Install DryUI, import the theme, and bootstrap your app',
+		keywords: ['install', 'setup', 'theme', 'quickstart']
+	},
+	{
+		path: '/components',
+		label: 'Components',
+		description: 'Per-component reference with props, parts, examples, and anti-patterns'
+	},
+	{
+		path: '/theme-wizard',
+		label: 'Theme Wizard',
+		description: 'Build and export DryUI semantic token themes',
+		keywords: ['tokens', 'palette', 'theme editor', 'preset themes']
+	},
+	{
+		path: '/tools',
+		label: 'Tools',
+		description: 'Install and use the DryUI CLI for setup, lookup, tokens, and feedback tooling',
+		keywords: ['cli', 'install', 'commands', 'init', 'detect', 'tokens', 'feedback']
+	},
+	{
+		path: '/how-it-works',
+		label: 'How it works',
+		description: 'Architecture and mental model for DryUI-backed apps'
+	},
+	{
+		path: '/how-we-work',
+		label: 'How we work',
+		description: 'Per-module architecture diagrams and internal workflow'
+	},
+	{
+		path: '/grid-rules',
+		label: 'Grid rules',
+		description: 'The DryUI layout discipline: grid-first, container queries, token-based spacing'
+	},
+	{
+		path: '/migration-guide',
+		label: 'Migration guide',
+		description: 'Move from Tailwind, shadcn, or ad-hoc component libraries onto DryUI'
+	}
+];
+
+export const DOCS_ROUTE_PATHS = DOCS_ROUTES.map((r) => r.path);
+
+/**
+ * Docs allowlist for generated prompt bundles. Re-exported here so consumers
+ * can import a single docs-surface module and avoid reaching into ai-surface's
+ * prompt bundle structure directly.
+ */
+export const DOCS_ALLOWLIST: readonly string[] = aiSurface.promptBundles[0]?.docsAllowlist ?? [];

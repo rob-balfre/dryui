@@ -810,7 +810,13 @@
 
 	.diagram-shell {
 		display: grid;
+		grid-template-columns: auto;
 		justify-content: center;
 		overflow-x: auto;
+	}
+
+	.diagram-shell :global([data-diagram-container]) {
+		container-type: normal;
+		width: max-content;
 	}
 </style>

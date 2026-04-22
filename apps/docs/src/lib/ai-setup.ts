@@ -1,14 +1,7 @@
 import { aiSurface } from '../../../../packages/mcp/src/ai-surface.js';
+import type { AgentId } from '../../../../packages/mcp/src/docs-surface.js';
 
-type AiAgentId =
-	| 'claude-code'
-	| 'codex'
-	| 'gemini'
-	| 'opencode'
-	| 'cursor'
-	| 'copilot'
-	| 'windsurf'
-	| 'zed';
+type AiAgentId = AgentId;
 
 interface AiSurfaceCard {
 	readonly name: string;

@@ -1,5 +1,12 @@
-import { componentMeta } from '../../../../packages/mcp/src/component-catalog.js';
+import spec from '../../../../packages/mcp/src/spec.json' with { type: 'json' };
 import { categories, toSlug } from '$lib/nav';
+
+// spec.json is generated from per-component .meta.ts files and carries the
+// same description/category/tags surface the old component-catalog exposed.
+const componentMeta = spec.components as Record<
+	string,
+	{ description?: string; category?: string; tags?: string[] }
+>;
 interface SearchItem {
 	label: string;
 	href: string;

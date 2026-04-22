@@ -63,6 +63,11 @@
       "types": "./dist/define.d.ts",
       "default": "./dist/define.js"
     },
+    "./docs-surface": {
+      "bun": "./src/docs-surface.ts",
+      "types": "./dist/docs-surface.d.ts",
+      "default": "./dist/docs-surface.js"
+    },
     "./agent-contract.v1.json": {
       "bun": "./src/agent-contract.v1.json",
       "default": "./dist/agent-contract.v1.json"
@@ -152,6 +157,10 @@
         "types": "./dist/define.d.ts",
         "default": "./dist/define.js"
       },
+      "./docs-surface": {
+        "types": "./dist/docs-surface.d.ts",
+        "default": "./dist/docs-surface.js"
+      },
       "./agent-contract.v1.json": "./dist/agent-contract.v1.json",
       "./agent-contract.v1.schema.json": "./dist/agent-contract.v1.schema.json",
       "./contract.v1.json": "./dist/contract.v1.json",
@@ -196,7 +205,7 @@
     "check:agent-contract": "bun src/check-agent-contract.ts",
     "check": "bun run check:contract && bun run check:agent-contract",
     "postinstall": "node -e \"try{require('fs').chmodSync(require('path').join(__dirname,'dist','index.js'),0o755)}catch{}\"",
-    "build": "bun run generate-spec && (bun run generate-architecture & bun run generate-contract & bun run generate-agent-contract & bun run generate-llms & bun run generate-theme-tokens & wait) && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && cp src/agent-contract.v1.json dist/agent-contract.v1.json && cp src/agent-contract.v1.schema.json dist/agent-contract.v1.schema.json && cp src/theme-tokens.generated.json dist/theme-tokens.generated.json && bun build src/index.ts src/architecture.ts src/agent-contract.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts src/tokens.ts src/repair.ts src/define.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && chmod +x dist/index.js && bunx tsc -p tsconfig.build.json",
+    "build": "bun run generate-spec && (bun run generate-architecture & bun run generate-contract & bun run generate-agent-contract & bun run generate-llms & bun run generate-theme-tokens & wait) && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && cp src/agent-contract.v1.json dist/agent-contract.v1.json && cp src/agent-contract.v1.schema.json dist/agent-contract.v1.schema.json && cp src/theme-tokens.generated.json dist/theme-tokens.generated.json && bun build src/index.ts src/architecture.ts src/agent-contract.ts src/reviewer.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts src/tokens.ts src/repair.ts src/define.ts src/docs-surface.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && chmod +x dist/index.js && bunx tsc -p tsconfig.build.json",
     "prepack": "bun ../../scripts/prepack-exports.ts",
     "postpack": "bun ../../scripts/postpack-exports.ts",
     "check:publint": "publint",
