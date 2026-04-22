@@ -53,7 +53,13 @@ export interface SpawnFeedbackServerOptions {
 	project?: string;
 }
 
-export function spawnFeedbackServerInBackground(options: SpawnFeedbackServerOptions): void {
+export interface SpawnedProcess {
+	pid: number;
+}
+
+export function spawnFeedbackServerInBackground(
+	options: SpawnFeedbackServerOptions
+): SpawnedProcess | null {
 	const args = ['run', options.entry];
 	if (options.port !== undefined) args.push('--port', String(options.port));
 	if (options.host) args.push('--host', options.host);
@@ -66,6 +72,22 @@ export function spawnFeedbackServerInBackground(options: SpawnFeedbackServerOpti
 		stdio: 'ignore'
 	});
 	child.unref();
+	return child.pid !== undefined ? { pid: child.pid } : null;
+}
+
+/**
+ * Send SIGTERM to a process we started via `spawn(..., { detached: true })`.
+ * Addresses the process group first (negative pid) so child workers die too;
+ * falls back to a single-pid signal if the group signal fails.
+ */
+export function killOwnedProcess(pid: number): void {
+	try {
+		process.kill(-pid, 'SIGTERM');
+		return;
+	} catch {}
+	try {
+		process.kill(pid, 'SIGTERM');
+	} catch {}
 }
 
 export function openBrowser(url: string): boolean {
@@ -144,20 +166,25 @@ export async function waitForUrlDetailed(url: string, timeoutMs = 15_000): Promi
 	return last;
 }
 
+export interface EnsureUrlReadyResult {
+	message: string;
+	ownedPid: number | null;
+}
+
 export async function ensureUrlReady(
 	url: string,
-	start: () => void,
+	start: () => SpawnedProcess | null,
 	failureMessage: string,
 	timeoutMs?: number
-): Promise<string> {
+): Promise<EnsureUrlReadyResult> {
 	if (await urlResponds(url)) {
-		return 'already running';
+		return { message: 'already running', ownedPid: null };
 	}
 
-	start();
+	const spawned = start();
 
 	if (await waitForUrl(url, timeoutMs)) {
-		return 'started in the background';
+		return { message: 'started in the background', ownedPid: spawned?.pid ?? null };
 	}
 
 	throw new Error(failureMessage);
@@ -305,7 +332,9 @@ export interface SpawnProjectDevServerOptions {
 	logPath?: string;
 }
 
-export function spawnProjectDevServerInBackground(options: SpawnProjectDevServerOptions): void {
+export function spawnProjectDevServerInBackground(
+	options: SpawnProjectDevServerOptions
+): SpawnedProcess | null {
 	const pm = options.packageManager === 'unknown' ? 'npm' : options.packageManager;
 	const args = ['run', 'dev', '--', '--host', options.host, '--port', String(options.port)];
 	const logFd = options.logPath ? openProjectDevLog(options.logPath) : null;
@@ -318,6 +347,7 @@ export function spawnProjectDevServerInBackground(options: SpawnProjectDevServer
 	});
 	child.unref();
 	if (logFd !== null) closeSync(logFd);
+	return child.pid !== undefined ? { pid: child.pid } : null;
 }
 
 export interface InstallPackageOptions {

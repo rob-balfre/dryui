@@ -15,7 +15,14 @@ import {
 	type ProjectDetection,
 	type ProjectPlannerSpec
 } from '@dryui/mcp/project-planner';
-import { emitOrRun, hasFlag, printCommandHelp, type CommandResult } from '../run.js';
+import {
+	emitCommandResult,
+	emitOrRun,
+	hasFlag,
+	isInteractiveTTY,
+	printCommandHelp,
+	type CommandResult
+} from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
@@ -24,6 +31,7 @@ import {
 	findViteConfig as findViteConfigDefault,
 	installPackage as installPackageDefault,
 	isHealthyProbeStatus,
+	killOwnedProcess as killOwnedProcessDefault,
 	killPortHolder as killPortHolderDefault,
 	mountFeedbackInLayout as mountFeedbackInLayoutDefault,
 	openBrowser,
@@ -36,6 +44,7 @@ import {
 	resolveFeedbackServerEntry,
 	spawnFeedbackServerInBackground,
 	spawnProjectDevServerInBackground as spawnProjectDevServerDefault,
+	type SpawnedProcess,
 	type SpawnProjectDevServerOptions,
 	urlResponds as urlRespondsDefault,
 	type UrlProbeResult,
@@ -48,10 +57,17 @@ export { isHealthyProbeStatus };
 const DEFAULT_DOCS_HOST = '127.0.0.1';
 const DEFAULT_DOCS_PORT = 5173;
 
+interface EnsureDocsServerResult {
+	message: string;
+	ownedPid: number | null;
+}
+
 interface LauncherRuntime {
-	ensureDocsServer: (workspaceRoot: string, docsBaseUrl: string) => Promise<string>;
+	ensureDocsServer: (workspaceRoot: string, docsBaseUrl: string) => Promise<EnsureDocsServerResult>;
 	ensureFeedbackServer: (workspaceRoot: string) => Promise<EnsureFeedbackServerResult>;
 	ensureFeedbackUiBuilt: (workspaceRoot: string) => CommandResult | null;
+	killOwnedProcess: (pid: number) => void;
+	isInteractiveTTY: () => boolean;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
 	onProgress: (progress: { workspaceRoot: string; noOpen: boolean }) => void;
@@ -66,14 +82,18 @@ interface RunLauncherOptions {
 function launcherHelp(): never {
 	printCommandHelp(
 		{
-			usage: 'dryui [--no-open]',
+			usage: 'dryui [--no-open] [--detach]',
 			description: [
 				'Open the app in feedback mode for this repository.',
-				'The CLI starts the docs app and feedback server in the background when they are not already running.',
+				'The CLI starts the docs app and feedback server when they are not already running.',
+				'In an interactive terminal the CLI stays attached until you press Ctrl-C so you can shut the servers down cleanly.',
 				'Submitting feedback opens the dashboard in a new tab so you can pick which agent to launch per submission.'
 			],
-			options: ['  --no-open         Print the site and dashboard URLs without opening a browser'],
-			examples: ['  dryui', '  dryui --no-open']
+			options: [
+				'  --no-open         Print the site and dashboard URLs without opening a browser',
+				'  --detach          Spawn servers in the background and exit immediately (old behavior)'
+			],
+			examples: ['  dryui', '  dryui --no-open', '  dryui --detach']
 		},
 		0
 	);
@@ -163,15 +183,58 @@ function emitLauncherError(error: unknown, exitOnComplete: boolean): void {
 		throw error;
 	}
 
-	emitOrRun(
+	emitCommandResult(
 		{
 			output: '',
 			error: error instanceof Error ? error.message : String(error),
 			exitCode: 1
 		},
-		'toon',
-		exitOnComplete
+		'toon'
 	);
+
+	if (exitOnComplete) {
+		process.exit(1);
+	}
+}
+
+interface ShutdownWaitOptions {
+	ownedPids: readonly number[];
+	killOwnedProcess: (pid: number) => void;
+}
+
+/**
+ * Install SIGINT/SIGTERM/SIGHUP handlers that send SIGTERM to the process
+ * groups this invocation started, then resolve. The CLI uses this to keep the
+ * foreground alive until the user hits Ctrl-C, so servers get a clean shutdown
+ * signal instead of being orphaned when the shell exits.
+ */
+async function waitForShutdownSignal(options: ShutdownWaitOptions): Promise<void> {
+	if (options.ownedPids.length === 0) return;
+
+	await new Promise<void>((resolve) => {
+		const handler = (): void => {
+			process.off('SIGINT', handler);
+			process.off('SIGTERM', handler);
+			process.off('SIGHUP', handler);
+			console.log('');
+			console.log('Stopping servers...');
+			for (const pid of options.ownedPids) {
+				options.killOwnedProcess(pid);
+			}
+			resolve();
+		};
+		process.on('SIGINT', handler);
+		process.on('SIGTERM', handler);
+		process.on('SIGHUP', handler);
+	});
+}
+
+function collectOwnedPids(...pids: ReadonlyArray<number | null | undefined>): number[] {
+	const owned: number[] = [];
+	for (const pid of pids) {
+		if (typeof pid === 'number' && pid > 0) owned.push(pid);
+	}
+	return owned;
 }
 
 export function buildDashboardUrl(
@@ -194,6 +257,7 @@ export function buildDashboardUrl(
 interface EnsureFeedbackServerResult {
 	baseUrl: string;
 	message: string;
+	ownedPid: number | null;
 }
 
 async function waitForFeedbackServerConfig(
@@ -228,13 +292,13 @@ async function ensureFeedbackServer(
 		: toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
 
 	if (await urlRespondsDefault(`${candidateUrl}/health`)) {
-		return { baseUrl: candidateUrl, message: 'already running' };
+		return { baseUrl: candidateUrl, message: 'already running', ownedPid: null };
 	}
 
 	const requestedPort = existingConfig?.port ?? DEFAULT_FEEDBACK_PORT;
 	const previousUpdatedAt = existingConfig?.updatedAt ?? null;
 
-	spawnFeedbackServerInBackground({
+	const spawned = spawnFeedbackServerInBackground({
 		entry: resolveFeedbackServerEntry({
 			...(options.workspaceRoot ? { workspaceRoot: options.workspaceRoot } : {}),
 			...(options.preferPackaged ? { preferPackaged: true } : {})
@@ -254,10 +318,14 @@ async function ensureFeedbackServer(
 
 	// The server writes server.json after Bun.serve succeeds, so a fresh
 	// updatedAt means the listener is bound — no extra /health probe needed.
-	return { baseUrl: ready.baseUrl, message: 'started in the background' };
+	return {
+		baseUrl: ready.baseUrl,
+		message: 'started in the background',
+		ownedPid: spawned?.pid ?? null
+	};
 }
 
-function startDocsServerInBackground(workspaceRoot: string): void {
+function startDocsServerInBackground(workspaceRoot: string): SpawnedProcess | null {
 	const child = spawn(
 		'bun',
 		['run', 'dev', '--', '--host', DEFAULT_DOCS_HOST, '--port', String(DEFAULT_DOCS_PORT)],
@@ -269,9 +337,13 @@ function startDocsServerInBackground(workspaceRoot: string): void {
 	);
 
 	child.unref();
+	return child.pid !== undefined ? { pid: child.pid } : null;
 }
 
-async function ensureDocsServer(workspaceRoot: string, docsBaseUrl: string): Promise<string> {
+async function ensureDocsServer(
+	workspaceRoot: string,
+	docsBaseUrl: string
+): Promise<EnsureDocsServerResult> {
 	return ensureUrlReady(
 		docsBaseUrl,
 		() => startDocsServerInBackground(workspaceRoot),
@@ -283,6 +355,8 @@ const defaultRuntime: LauncherRuntime = {
 	ensureDocsServer,
 	ensureFeedbackServer: (workspaceRoot) => ensureFeedbackServer(workspaceRoot, { workspaceRoot }),
 	ensureFeedbackUiBuilt: (workspaceRoot) => ensureFeedbackUiBuilt({ workspaceRoot }),
+	killOwnedProcess: killOwnedProcessDefault,
+	isInteractiveTTY,
 	now: () => Date.now(),
 	openBrowser,
 	onProgress: () => {}
@@ -309,7 +383,9 @@ export interface UserProjectLauncherRuntime {
 	urlResponds: (url: string) => Promise<boolean>;
 	findPortHolder: (port: number) => PortHolder | null;
 	killPortHolder: (pid: number) => boolean;
-	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => void;
+	killOwnedProcess: (pid: number) => void;
+	isInteractiveTTY: () => boolean;
+	spawnProjectDevServer: (options: SpawnProjectDevServerOptions) => SpawnedProcess | null;
 	waitForUrlDetailed: (url: string, timeoutMs: number) => Promise<UrlProbeResult>;
 	readProjectDevLogTail: (logPath: string, maxLines?: number) => string[];
 	promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean>;
@@ -346,6 +422,7 @@ interface DevServerExecutionResult {
 	ok: boolean;
 	url: string;
 	message: string;
+	ownedPid: number | null;
 	errorDetails?: LabelledMessage[];
 }
 
@@ -411,10 +488,10 @@ async function executeUserProjectDevServerPlan(
 	options: SpawnProjectDevServerOptions
 ): Promise<DevServerExecutionResult> {
 	if (plan.kind === 'keep') {
-		return { ok: true, url: plan.url, message: 'already running' };
+		return { ok: true, url: plan.url, message: 'already running', ownedPid: null };
 	}
 	if (plan.kind === 'skip') {
-		return { ok: false, url: plan.url, message: `skipped (${plan.reason})` };
+		return { ok: false, url: plan.url, message: `skipped (${plan.reason})`, ownedPid: null };
 	}
 
 	if (plan.killPid !== undefined) {
@@ -423,16 +500,22 @@ async function executeUserProjectDevServerPlan(
 			return {
 				ok: false,
 				url: plan.url,
-				message: `skipped (failed to kill PID ${plan.killPid})`
+				message: `skipped (failed to kill PID ${plan.killPid})`,
+				ownedPid: null
 			};
 		}
 		await runtime.sleep(PORT_FREE_WAIT_MS);
 	}
 
-	runtime.spawnProjectDevServer(options);
+	const spawned = runtime.spawnProjectDevServer(options);
 	const probe = await runtime.waitForUrlDetailed(plan.url, PROJECT_DEV_READY_TIMEOUT_MS);
 	if (probe.ok) {
-		return { ok: true, url: plan.url, message: 'started in the background' };
+		return {
+			ok: true,
+			url: plan.url,
+			message: 'started in the background',
+			ownedPid: spawned?.pid ?? null
+		};
 	}
 
 	const timeoutSec = PROJECT_DEV_READY_TIMEOUT_MS / 1000;
@@ -442,6 +525,7 @@ async function executeUserProjectDevServerPlan(
 		ok: false,
 		url: plan.url,
 		message: formatProbeFailureMessage(probe, timeoutSec),
+		ownedPid: spawned?.pid ?? null,
 		errorDetails: buildDevServerErrorDetails(probe, logPath, logTail)
 	};
 }
@@ -454,6 +538,8 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	urlResponds: urlRespondsDefault,
 	findPortHolder: findPortHolderDefault,
 	killPortHolder: killPortHolderDefault,
+	killOwnedProcess: killOwnedProcessDefault,
+	isInteractiveTTY,
 	spawnProjectDevServer: spawnProjectDevServerDefault,
 	waitForUrlDetailed: waitForUrlDetailedDefault,
 	readProjectDevLogTail: readProjectDevLogTailDefault,
@@ -587,6 +673,7 @@ export async function runUserProjectLauncher(
 	}
 
 	const noOpen = hasFlag(args, '--no-open');
+	const detach = hasFlag(args, '--detach');
 	const devHost = DEFAULT_PROJECT_DEV_HOST;
 	const devPort = DEFAULT_PROJECT_DEV_PORT;
 
@@ -617,11 +704,17 @@ export async function runUserProjectLauncher(
 		const primaryUrl = siteUrl ?? dashboardUrl;
 		const opened = noOpen ? false : runtime.openBrowser(primaryUrl);
 
+		const ownedPids = collectOwnedPids(feedbackResult.ownedPid, devResult.ownedPid);
+		const waitForeground = !detach && runtime.isInteractiveTTY() && ownedPids.length > 0;
+
 		const fallbackNote = feedbackWidgetNote(detection);
 		const baseNotes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
 		const notes: LabelledMessage[] = [...baseNotes, ...(devResult.errorDetails ?? [])];
+		if (waitForeground) {
+			notes.push({ label: 'Tip', message: 'press Ctrl-C to stop servers and exit' });
+		}
 
-		emitOrRun(
+		emitCommandResult(
 			{
 				output: renderDashboardOutput({
 					rootLabel: 'Project',
@@ -642,9 +735,16 @@ export async function runUserProjectLauncher(
 				error: null,
 				exitCode: 0
 			},
-			'toon',
-			exitOnComplete
+			'toon'
 		);
+
+		if (waitForeground) {
+			await waitForShutdownSignal({ ownedPids, killOwnedProcess: runtime.killOwnedProcess });
+		}
+
+		if (exitOnComplete) {
+			process.exit(0);
+		}
 	} catch (error) {
 		emitLauncherError(error, exitOnComplete);
 	}
@@ -679,11 +779,12 @@ export async function runLauncher(
 
 	const docsBaseUrl = `http://${DEFAULT_DOCS_HOST}:${DEFAULT_DOCS_PORT}`;
 	const noOpen = hasFlag(args, '--no-open');
+	const detach = hasFlag(args, '--detach');
 
 	try {
 		runtime.onProgress({ workspaceRoot, noOpen });
 
-		const [feedbackResult, docsMessage] = await Promise.all([
+		const [feedbackResult, docsResult] = await Promise.all([
 			runtime.ensureFeedbackServer(workspaceRoot),
 			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
 		]);
@@ -691,7 +792,15 @@ export async function runLauncher(
 		const dashboardUrl = buildDashboardUrl(feedbackResult.baseUrl, docsBaseUrl, runtime.now());
 		const opened = noOpen ? false : runtime.openBrowser(siteUrl ?? dashboardUrl);
 
-		emitOrRun(
+		const ownedPids = collectOwnedPids(feedbackResult.ownedPid, docsResult.ownedPid);
+		const waitForeground = !detach && runtime.isInteractiveTTY() && ownedPids.length > 0;
+
+		const notes: LabelledMessage[] = [];
+		if (waitForeground) {
+			notes.push({ label: 'Tip', message: 'press Ctrl-C to stop servers and exit' });
+		}
+
+		emitCommandResult(
 			{
 				output: renderDashboardOutput({
 					rootLabel: 'Workspace',
@@ -699,18 +808,26 @@ export async function runLauncher(
 					siteUrl,
 					dashboardUrl,
 					servers: [
-						{ label: 'Docs', message: docsMessage },
+						{ label: 'Docs', message: docsResult.message },
 						{ label: 'Feedback', message: `${feedbackResult.message} at ${feedbackResult.baseUrl}` }
 					],
 					noOpen,
-					opened
+					opened,
+					...(notes.length > 0 ? { notes } : {})
 				}),
 				error: null,
 				exitCode: 0
 			},
-			'toon',
-			exitOnComplete
+			'toon'
 		);
+
+		if (waitForeground) {
+			await waitForShutdownSignal({ ownedPids, killOwnedProcess: runtime.killOwnedProcess });
+		}
+
+		if (exitOnComplete) {
+			process.exit(0);
+		}
 	} catch (error) {
 		emitLauncherError(error, exitOnComplete);
 	}

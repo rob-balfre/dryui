@@ -202,9 +202,9 @@ function resolveUiEndpoint(args: string[], projectRoot: string): string | undefi
 	return existingConfig?.baseUrl;
 }
 
-function startFeedbackServerInBackground(args: string[], projectRoot: string): void {
+function startFeedbackServerInBackground(args: string[], projectRoot: string) {
 	const launch = resolveServerLaunchArgs(args, projectRoot);
-	spawnFeedbackServerInBackground({
+	return spawnFeedbackServerInBackground({
 		entry: resolveServerEntry(),
 		port: launch.port,
 		...(launch.host ? { host: launch.host } : {}),
@@ -240,11 +240,12 @@ export async function getFeedbackUiResult(
 
 	let serverMessage: string;
 	try {
-		serverMessage = await ensureUrlReady(
+		const ready = await ensureUrlReady(
 			`${client.baseUrl}/health`,
 			() => startFeedbackServerInBackground(args, projectRoot),
 			`Unable to start the feedback server at ${client.baseUrl}.`
 		);
+		serverMessage = ready.message;
 	} catch (error) {
 		const message = error instanceof Error ? error.message : String(error);
 		return commandError(mode, 'feedback-ui-failed', message);

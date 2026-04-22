@@ -68,9 +68,10 @@ describe('runLauncher', () => {
 					ensureFeedbackUiBuilt: () => null,
 					ensureFeedbackServer: async () => ({
 						baseUrl: 'http://127.0.0.1:4748',
-						message: 'already running'
+						message: 'already running',
+						ownedPid: null
 					}),
-					ensureDocsServer: async () => 'already running',
+					ensureDocsServer: async () => ({ message: 'already running', ownedPid: null }),
 					now: () => 42,
 					openBrowser: () => {
 						throw new Error('browser should not be opened');
@@ -107,9 +108,10 @@ describe('runLauncher', () => {
 					ensureFeedbackUiBuilt: () => null,
 					ensureFeedbackServer: async () => ({
 						baseUrl: 'http://127.0.0.1:4748',
-						message: 'already running'
+						message: 'already running',
+						ownedPid: null
 					}),
-					ensureDocsServer: async () => 'already running',
+					ensureDocsServer: async () => ({ message: 'already running', ownedPid: null }),
 					now: () => 42,
 					openBrowser: (url) => {
 						openedUrl = url;
@@ -140,11 +142,15 @@ describe('runLauncher', () => {
 					},
 					ensureFeedbackServer: async () => {
 						events.push('feedback');
-						return { baseUrl: 'http://127.0.0.1:4748', message: 'already running' };
+						return {
+							baseUrl: 'http://127.0.0.1:4748',
+							message: 'already running',
+							ownedPid: null
+						};
 					},
 					ensureDocsServer: async () => {
 						events.push('docs');
-						return 'already running';
+						return { message: 'already running', ownedPid: null };
 					},
 					now: () => 42,
 					openBrowser: () => false
@@ -194,13 +200,16 @@ function buildRuntime(
 		readProjectDevScript: () => 'vite dev',
 		ensureFeedbackServer: async () => ({
 			baseUrl: 'http://127.0.0.1:4748',
-			message: 'already running'
+			message: 'already running',
+			ownedPid: null
 		}),
 		ensureFeedbackUiBuilt: () => null,
 		urlResponds: async () => false,
 		findPortHolder: () => null,
 		killPortHolder: () => true,
-		spawnProjectDevServer: () => {},
+		killOwnedProcess: () => {},
+		isInteractiveTTY: () => false,
+		spawnProjectDevServer: () => null,
 		waitForUrlDetailed: async () => ({ ok: true, status: 200 }),
 		readProjectDevLogTail: () => [],
 		promptKillPortHolder: async () => false,
@@ -269,6 +278,7 @@ describe('runUserProjectLauncher', () => {
 					},
 					spawnProjectDevServer: () => {
 						spawned = true;
+						return null;
 					},
 					promptKillPortHolder: async () => {
 						prompted = true;
@@ -301,6 +311,7 @@ describe('runUserProjectLauncher', () => {
 					findPortHolder: () => null,
 					spawnProjectDevServer: () => {
 						spawned = true;
+						return null;
 					},
 					waitForUrlDetailed: async () => ({ ok: true, status: 200 })
 				})
@@ -336,6 +347,7 @@ describe('runUserProjectLauncher', () => {
 					},
 					spawnProjectDevServer: () => {
 						spawned = true;
+						return null;
 					},
 					waitForUrlDetailed: async () => ({ ok: true, status: 200 })
 				})
@@ -712,5 +724,99 @@ describe('runUserProjectLauncher', () => {
 			'Project dev: failed: no response after 30s (fetch failed: ECONNREFUSED 127.0.0.1:5173)'
 		);
 		expect(result.logs[0]).not.toContain('dev=');
+	});
+
+	test('stays attached in a TTY and kills owned servers on SIGINT', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const killed: number[] = [];
+
+		const promise = captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => false,
+					findPortHolder: () => null,
+					spawnProjectDevServer: () => ({ pid: 91234 }),
+					ensureFeedbackServer: async () => ({
+						baseUrl: 'http://127.0.0.1:4748',
+						message: 'started in the background',
+						ownedPid: 91235
+					}),
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 }),
+					isInteractiveTTY: () => true,
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					}
+				})
+			})
+		);
+
+		// Give the launcher a tick to print output and install signal handlers.
+		await new Promise((r) => setTimeout(r, 20));
+		process.emit('SIGINT');
+
+		const result = await promise;
+		expect(result.logs[0]).toContain('Tip: press Ctrl-C to stop servers and exit');
+		expect(result.logs.join('\n')).toContain('Stopping servers...');
+		expect(killed.sort()).toEqual([91234, 91235]);
+		expect(result.exitCode).toBe(0);
+	});
+
+	test('--detach exits immediately without waiting even in a TTY', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const killed: number[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open', '--detach'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => false,
+					findPortHolder: () => null,
+					spawnProjectDevServer: () => ({ pid: 77777 }),
+					ensureFeedbackServer: async () => ({
+						baseUrl: 'http://127.0.0.1:4748',
+						message: 'started in the background',
+						ownedPid: 77778
+					}),
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 }),
+					isInteractiveTTY: () => true,
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					}
+				})
+			})
+		);
+
+		expect(result.logs[0]).not.toContain('Tip: press Ctrl-C');
+		expect(killed).toEqual([]);
+		expect(result.exitCode).toBe(0);
+	});
+
+	test('does not wait when all servers were already running', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const killed: number[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => true,
+					isInteractiveTTY: () => true,
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					}
+				})
+			})
+		);
+
+		expect(result.logs[0]).not.toContain('Tip: press Ctrl-C');
+		expect(killed).toEqual([]);
+		expect(result.exitCode).toBe(0);
 	});
 });
