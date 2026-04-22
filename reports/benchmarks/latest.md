@@ -2,8 +2,8 @@
 
 - mode: **smoke**
 - format: **prompt-only**
-- started: 2026-04-22T22:46:29.621Z
-- finished: 2026-04-22T22:46:29.752Z
+- started: 2026-04-22T22:59:27.848Z
+- finished: 2026-04-22T22:59:28.010Z
 - tasks: 9
 - checks: 10 pass / 0 fail
 

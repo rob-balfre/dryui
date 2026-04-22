@@ -1,8 +1,8 @@
 {
   "mode": "smoke",
   "format": "prompt-only",
-  "startedAt": "2026-04-22T22:46:29.621Z",
-  "finishedAt": "2026-04-22T22:46:29.752Z",
+  "startedAt": "2026-04-22T22:59:27.848Z",
+  "finishedAt": "2026-04-22T22:59:28.010Z",
   "taskCount": 9,
   "outcomes": [
     {
@@ -31,7 +31,7 @@
       "kind": "deterministic-prompt",
       "ok": true,
       "detail": "two calls produced byte-identical output (1391 chars)",
-      "durationMs": 128
+      "durationMs": 158
     },
     {
       "task": "data-display-dashboard",

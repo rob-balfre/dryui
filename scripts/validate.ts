@@ -142,6 +142,14 @@ await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --s
 console.log('\n── Phase 6: benchmark smoke ──');
 await run('bench:smoke', 'bun run scripts/benchmark/run.ts --smoke');
 
+// ── Phase 7: Generated-skill sync drift ─────────────────────────────────────
+// sync:skills rewrites packages/plugin/skills/** and .cursor/rules/** from
+// packages/ui/skills, etc. Running it here ensures the drift guard below
+// catches any edit made directly to a generated copy.
+
+console.log('\n── Phase 7: sync:skills drift guard ──');
+await run('sync:skills', 'bun run sync:skills');
+
 // ── Drift guard ─────────────────────────────────────────────────────────────
 // Catch files the pipeline regenerated that aren't committed. Release refuses
 // to run with a dirty worktree, so surfacing drift here (not just on CI) means

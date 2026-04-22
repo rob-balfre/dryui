@@ -33,6 +33,23 @@ jobs:
           DRYUI_BASE_REF: origin/${{ github.base_ref }}
           DRYUI_PR_BODY: ${{ github.event.pull_request.body }}
 
+      - name: Publish benchmark smoke summary
+        if: always()
+        continue-on-error: true
+        run: |
+          if [ -f reports/benchmarks/latest.md ]; then
+            cat reports/benchmarks/latest.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload benchmark smoke artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-smoke-${{ github.sha }}
+          path: reports/benchmarks/latest.*
+          if-no-files-found: ignore
+          retention-days: 14
+
       - run: bun --bun playwright install chromium
 
       - run: bun run test:browser
