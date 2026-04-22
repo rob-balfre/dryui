@@ -5,6 +5,12 @@ import { diagnoseTheme } from '../theme-checker.js';
 import { scanWorkspace, type WorkspaceReport } from '../workspace-audit.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import type { Spec } from '../spec-types.js';
+import { enrichDiagnostic } from '../enrich-diagnostics.js';
+import type {
+	DryUiRepairIssue,
+	DryUiRepairIssueSeverity,
+	DryUiRepairIssueSource
+} from '../repair-types.js';
 import { StructuredToolError } from './tool-error.js';
 
 type CheckSeverity = 'error' | 'warning' | 'suggestion' | 'info';
@@ -30,6 +36,11 @@ interface CheckInput {
 
 interface CheckOptions {
 	readonly cwd?: string;
+}
+
+export interface CheckResult {
+	readonly text: string;
+	readonly diagnostics: readonly DryUiRepairIssue[];
 }
 
 function cap(value: string, max = FIELD_CAP): string {
@@ -100,7 +111,27 @@ function renderCheckReport(opts: CheckReportOptions): string {
 	return lines.join('\n');
 }
 
-function renderTheme(spec: Spec, absPath: string): string {
+// The current rule catalog ships prose guidance, not concrete before/after
+// diffs, so we deliberately do NOT fabricate a fix pair from the fix string.
+// Agents should treat autoFixable=false as "use hint, then re-check".
+// When a rule starts shipping structured diffs we add the mapping here.
+function makeFixPair(_suggestedFix: string | null): { before: string; after: string } | undefined {
+	return undefined;
+}
+
+function dedupeDiagnostics(issues: readonly DryUiRepairIssue[]): readonly DryUiRepairIssue[] {
+	const seen = new Set<string>();
+	const out: DryUiRepairIssue[] = [];
+	for (const issue of issues) {
+		const key = `${issue.source}|${issue.code}|${issue.file ?? ''}|${issue.line ?? ''}|${issue.message}`;
+		if (seen.has(key)) continue;
+		seen.add(key);
+		out.push(issue);
+	}
+	return out;
+}
+
+function renderTheme(spec: Spec, absPath: string): CheckResult {
 	const css = readFileSync(absPath, 'utf-8');
 	const result = diagnoseTheme(css, spec, absPath);
 	const rel = displayPath(absPath);
@@ -112,13 +143,24 @@ function renderTheme(spec: Spec, absPath: string): string {
 		message: issue.message,
 		suggestedFix: issue.fix
 	}));
+	const diagnostics = dedupeDiagnostics(
+		result.issues.map((issue) =>
+			enrichDiagnostic({
+				source: 'theme' as const,
+				code: issue.code,
+				severity: issue.severity as DryUiRepairIssueSeverity,
+				message: issue.message,
+				file: rel
+			})
+		)
+	);
 
 	const missingCount = result.issues.filter((issue) => issue.code === 'missing-token').length;
 	const totalRequired = result.variables.required + missingCount;
 	const coverage =
 		totalRequired > 0 ? Math.round((result.variables.required / totalRequired) * 100) : 100;
 
-	return renderCheckReport({
+	const text = renderCheckReport({
 		kind: 'theme',
 		targetLine: `target: ${rel} | coverage: ${coverage}%`,
 		issues,
@@ -128,9 +170,10 @@ function renderTheme(spec: Spec, absPath: string): string {
 			'ask --scope setup "" -- review project bootstrap and theme guidance'
 		]
 	});
+	return { text, diagnostics };
 }
 
-function renderComponent(spec: Spec, absPath: string): string {
+function renderComponent(spec: Spec, absPath: string): CheckResult {
 	const code = readFileSync(absPath, 'utf-8');
 	const result = checkComponent(code, spec, absPath);
 	const rel = displayPath(absPath);
@@ -142,8 +185,22 @@ function renderComponent(spec: Spec, absPath: string): string {
 		message: issue.message,
 		suggestedFix: issue.fix
 	}));
+	const diagnostics = dedupeDiagnostics(
+		result.issues.map((issue) => {
+			const fix = issue.fix !== null ? makeFixPair(issue.fix) : undefined;
+			return enrichDiagnostic({
+				source: 'lint',
+				code: issue.code,
+				severity: issue.severity as DryUiRepairIssueSeverity,
+				message: issue.message,
+				file: rel,
+				line: issue.line,
+				...(fix ? { fix } : {})
+			});
+		})
+	);
 
-	return renderCheckReport({
+	const text = renderCheckReport({
 		kind: 'component',
 		targetLine: `target: ${rel}`,
 		issues,
@@ -153,9 +210,10 @@ function renderComponent(spec: Spec, absPath: string): string {
 			'ask --scope recipe "<pattern>" -- look up a better DryUI pattern if the current markup is off'
 		]
 	});
+	return { text, diagnostics };
 }
 
-function renderWorkspace(result: WorkspaceReport): string {
+function renderWorkspace(result: WorkspaceReport): CheckResult {
 	const issues: CheckIssue[] = result.findings.map((finding) => ({
 		file: finding.file,
 		line: finding.line,
@@ -167,6 +225,24 @@ function renderWorkspace(result: WorkspaceReport): string {
 				? finding.suggestedFixes.map((fix) => fix.description).join(' | ')
 				: null
 	}));
+	const diagnostics = dedupeDiagnostics(
+		result.findings.map((finding) => {
+			const source: DryUiRepairIssueSource = finding.ruleId.startsWith('theme/')
+				? 'theme'
+				: finding.ruleId.startsWith('project/')
+					? 'lint'
+					: 'workspace';
+			return enrichDiagnostic({
+				source,
+				code: finding.ruleId,
+				severity: finding.severity as DryUiRepairIssueSeverity,
+				message: finding.message,
+				file: finding.file,
+				...(finding.line !== null ? { line: finding.line } : {}),
+				...(finding.column !== null ? { column: finding.column } : {})
+			});
+		})
+	);
 
 	const extraBlocks: string[] = [];
 	if (result.warnings.length > 0) {
@@ -178,7 +254,7 @@ function renderWorkspace(result: WorkspaceReport): string {
 		);
 	}
 
-	return renderCheckReport({
+	const text = renderCheckReport({
 		kind: 'workspace',
 		targetLine: `target: ${result.root} | scanned: ${result.scannedFiles} files`,
 		issues,
@@ -189,6 +265,7 @@ function renderWorkspace(result: WorkspaceReport): string {
 			'ask --scope setup "" -- review project setup and adoption guidance'
 		]
 	});
+	return { text, diagnostics };
 }
 
 function resolveCheckTarget(inputPath: string | undefined, cwd?: string): string | null {
@@ -211,7 +288,11 @@ function statOrThrow(absPath: string): Stats {
 	}
 }
 
-export function runCheck(spec: Spec, input: CheckInput, options: CheckOptions = {}): string {
+export function runCheckStructured(
+	spec: Spec,
+	input: CheckInput,
+	options: CheckOptions = {}
+): CheckResult {
 	const absPath = resolveCheckTarget(input.path, options.cwd);
 
 	if (!absPath) {
@@ -237,4 +318,9 @@ export function runCheck(spec: Spec, input: CheckInput, options: CheckOptions = 
 		`Unsupported path type: ${displayPath(absPath)}`,
 		['check', 'check <file.svelte>', 'check <theme.css>', 'check <directory>']
 	);
+}
+
+/** CLI-friendly wrapper. Returns just the TOON text. */
+export function runCheck(spec: Spec, input: CheckInput, options: CheckOptions = {}): string {
+	return runCheckStructured(spec, input, options).text;
 }

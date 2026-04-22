@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import spec from '../spec.json' assert { type: 'json' };
-import { runCheck } from './check.js';
+import { runCheck, runCheckStructured } from './check.js';
 
 const tempDirs: string[] = [];
 
@@ -101,6 +101,36 @@ describe('runCheck', () => {
 		expect(output).toContain('kind: theme');
 		expect(output).toContain('coverage:');
 		expect(output).toContain('wrong-type');
+	});
+
+	test('runCheckStructured emits enriched diagnostics for component violations', () => {
+		const root = createProject({
+			'Example.svelte': '<div style="color: red">hello</div>'
+		});
+
+		const result = runCheckStructured(spec, { path: 'Example.svelte' }, { cwd: root });
+
+		expect(result.text).toContain('dryui/no-inline-style');
+		const inline = result.diagnostics.find((d) => d.code === 'lint/dryui/no-inline-style');
+		expect(inline).toBeDefined();
+		expect(inline?.source).toBe('lint');
+		expect(inline?.severity).toBe('error');
+		expect(inline?.file).toMatch(/Example\.svelte$/);
+		expect(inline?.hint).toMatch(/custom property/i);
+		expect(inline?.docsRef).toMatch(/^https:\/\/dryui\.dev/);
+	});
+
+	test('runCheckStructured emits enriched diagnostics for theme violations', () => {
+		const root = createProject({
+			'theme.css': ':root { --dry-color-fill-brand: 16px; }'
+		});
+
+		const result = runCheckStructured(spec, { path: 'theme.css' }, { cwd: root });
+
+		const wrongType = result.diagnostics.find((d) => d.code === 'theme/wrong-type');
+		expect(wrongType).toBeDefined();
+		expect(wrongType?.source).toBe('theme');
+		expect(wrongType?.hint).toBeDefined();
 	});
 
 	test('a directory path scopes the workspace scan', () => {

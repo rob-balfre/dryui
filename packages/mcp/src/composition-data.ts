@@ -6334,5 +6334,51 @@ body {
      - gap="lg"               more breathing room between providers
      - justify="center"       centre the list under a hero heading
      - Swap Badge for Chip    if providers should be clickable filters -->`
+	},
+
+	{
+		name: 'self-correction',
+		description:
+			'The DryUI self-correction loop for agents: write Svelte, run `dryui check`, read the structured `dryui-diagnostics` JSON block, apply the `hint` for each issue, re-run `check`. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.',
+		tags: [
+			'agent',
+			'repair',
+			'self-correction',
+			'check',
+			'lint',
+			'hint',
+			'diagnostics',
+			'loop',
+			'autofix'
+		],
+		components: [],
+		snippet: `<!--
+  Agent repair loop for DryUI check output.
+
+  Every 'check' response over MCP carries two content blocks:
+    1. TOON summary (human-readable)
+    2. A JSON block tagged 'dryui-diagnostics' with { diagnostics: [...] }
+
+  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.
+  Prefer 'hint' over 'message'. 'hint' is prescriptive ("do X"), 'message'
+  is diagnostic ("X is wrong").
+-->
+
+1. write Svelte or theme CSS
+2. call tool 'check' with { path: 'path/to/file.svelte' }
+3. parse the dryui-diagnostics JSON block from the response
+4. for each diagnostic with severity = 'error':
+     - if diagnostic.fix exists, apply fix.after and goto step 6
+     - otherwise apply diagnostic.hint to produce a candidate edit
+5. write the edited file
+6. for Svelte-compiler-level issues, call the Svelte MCP
+   'svelte-autofixer' tool on the file
+7. call 'check' again
+8. loop until diagnostics is empty or no progress is being made
+
+Stop conditions:
+  - diagnostics array is empty AND hasBlockers=false -> done
+  - same diagnostic code repeats after 2 attempts -> surface to human
+  - any parse/* diagnostic -> fix the syntax before looping further`
 	}
 ];

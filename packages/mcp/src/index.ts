@@ -5,7 +5,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import type { Spec } from './spec-types.js';
 import { runAsk, type AskScope, type AskListKind } from './tools/ask.js';
-import { runCheck } from './tools/check.js';
+import { runCheck, runCheckStructured } from './tools/check.js';
 import { toolErrorResponse } from './tools/tool-error.js';
 
 const require = createRequire(import.meta.url);
@@ -132,8 +132,18 @@ server.tool(
 	},
 	async ({ path, cwd }) => {
 		try {
-			const text = runCheck(getSpec(), path ? { path } : {}, cwd ? { cwd } : {});
-			return { content: [{ type: 'text', text }] };
+			const result = runCheckStructured(getSpec(), path ? { path } : {}, cwd ? { cwd } : {});
+			// Emit both blocks so humans read the TOON summary and agents
+			// parse the JSON diagnostics for repair loops. The JSON block is
+			// fenced and tagged so clients that only surface the first text
+			// block still see the human output first.
+			const diagnosticsJson = JSON.stringify({ diagnostics: result.diagnostics }, null, 2);
+			return {
+				content: [
+					{ type: 'text', text: result.text },
+					{ type: 'text', text: `\`\`\`json dryui-diagnostics\n${diagnosticsJson}\n\`\`\`` }
+				]
+			};
 		} catch (error) {
 			return toolErrorResponse(error);
 		}

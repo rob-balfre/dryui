@@ -8,7 +8,7 @@
   "counts": {
     "components": 160,
     "compositionComponents": 130,
-    "compositionRecipes": 37,
+    "compositionRecipes": 38,
     "tools": 2,
     "prompts": 2,
     "cliCommands": 13,
@@ -25960,6 +25960,23 @@
           "Badge"
         ],
         "snippet": "<script>\n  import { ChipGroup, Badge } from '@dryui/ui';\n</script>\n\n<!-- \"WORKS WITH\" pattern: eyebrow label + wrapping provider badges.\n     ChipGroup.Label lives inside Root as the first child so the flex row\n     treats it as a sibling pill-height item with the rest of the chips. -->\n<ChipGroup.Root gap=\"md\" justify=\"start\">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant=\"soft\">Local / MLX</Badge>\n  <Badge variant=\"soft\">OpenAI</Badge>\n  <Badge variant=\"soft\">Anthropic</Badge>\n  <Badge variant=\"soft\">Google</Badge>\n  <Badge variant=\"soft\">Mistral</Badge>\n  <Badge variant=\"soft\">Groq</Badge>\n  <Badge variant=\"soft\">Ollama</Badge>\n  <Badge variant=\"soft\">OpenRouter</Badge>\n  <Badge variant=\"soft\">Together</Badge>\n  <Badge variant=\"soft\">Perplexity</Badge>\n  <Badge variant=\"soft\">xAI</Badge>\n</ChipGroup.Root>\n\n<!-- Variants:\n     - gap=\"lg\"               more breathing room between providers\n     - justify=\"center\"       centre the list under a hero heading\n     - Swap Badge for Chip    if providers should be clickable filters -->"
+      },
+      "self-correction": {
+        "name": "self-correction",
+        "description": "The DryUI self-correction loop for agents: write Svelte, run `dryui check`, read the structured `dryui-diagnostics` JSON block, apply the `hint` for each issue, re-run `check`. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.",
+        "tags": [
+          "agent",
+          "repair",
+          "self-correction",
+          "check",
+          "lint",
+          "hint",
+          "diagnostics",
+          "loop",
+          "autofix"
+        ],
+        "components": [],
+        "snippet": "<!--\n  Agent repair loop for DryUI check output.\n\n  Every 'check' response over MCP carries two content blocks:\n    1. TOON summary (human-readable)\n    2. A JSON block tagged 'dryui-diagnostics' with { diagnostics: [...] }\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. call tool 'check' with { path: 'path/to/file.svelte' }\n3. parse the dryui-diagnostics JSON block from the response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. call 'check' again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
       }
     }
   }
