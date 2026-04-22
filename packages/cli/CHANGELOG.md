@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.15.0
+
+### Minor Changes
+
+- [`11237c0`](https://github.com/rob-balfre/dryui/commit/11237c056147c06b9e74f4109ddd592dd33fb3c6) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui init` now wires `@dryui/feedback` into the scaffolded project (install, mount `<Feedback />` in the root layout, patch `vite.config` `ssr.noExternal`) and offers to launch the feedback dashboard in a TTY. Pass `--no-launch` to skip the prompt.
+
 ## 0.14.1
 
 ### Patch Changes
