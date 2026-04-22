@@ -1,6 +1,8 @@
 // Canonical type definitions derived from the spec.json structure.
 // Shared between @dryui/mcp and @dryui/cli.
 
+import type { AiSurfaceManifest } from './ai-surface.js';
+
 export interface PropDef {
 	readonly type: string;
 	readonly required?: boolean;
@@ -86,6 +88,7 @@ export interface Spec {
 	readonly package: string;
 	readonly themeImports: { readonly default: string; readonly dark: string };
 	readonly components: Record<string, ComponentDef>;
+	readonly ai?: AiSurfaceManifest;
 	readonly composition?: {
 		readonly components: Record<string, CompositionComponentDef>;
 		readonly recipes: Record<string, CompositionRecipeDef>;

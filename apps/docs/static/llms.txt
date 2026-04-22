@@ -12,7 +12,7 @@
 ## AI Surface
 
 - MCP tools: ask, check
-- CLI commands: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback
+- CLI commands: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback, prompt
 
 ## Installation
 
@@ -1709,7 +1709,7 @@ The CLI is the default entry point for working with DryUI. Start with bare `dryu
 
 Install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
 
-Current command surface: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback.
+Current command surface: setup, init, detect, install, add, info, list, compose, tokens, ambient, install-hook, feedback, prompt.
 
 ```
 dryui

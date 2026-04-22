@@ -1,0 +1,482 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DryUI agent contract v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "version",
+    "package",
+    "source",
+    "ai",
+    "themeImports",
+    "validation",
+    "components",
+    "recipes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "DryUIAgentContractV1"
+    },
+    "version": {
+      "const": 1
+    },
+    "package": {
+      "$ref": "#/$defs/package"
+    },
+    "source": {
+      "$ref": "#/$defs/source"
+    },
+    "ai": {
+      "$ref": "#/$defs/ai"
+    },
+    "themeImports": {
+      "$ref": "#/$defs/themeImports"
+    },
+    "validation": {
+      "$ref": "#/$defs/validation"
+    },
+    "components": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/component"
+      }
+    },
+    "recipes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/recipe"
+      }
+    }
+  },
+  "$defs": {
+    "package": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "version"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec",
+        "aiSurface",
+        "composition"
+      ],
+      "properties": {
+        "spec": {
+          "type": "string"
+        },
+        "aiSurface": {
+          "type": "string"
+        },
+        "composition": {
+          "type": "string"
+        }
+      }
+    },
+    "aiEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "promptBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "targets",
+        "dependencies",
+        "defaultPrompt",
+        "docsAllowlist",
+        "componentScopes",
+        "rules",
+        "checks",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "cli",
+              "mcp",
+              "docs",
+              "skill",
+              "llms"
+            ]
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defaultPrompt": {
+          "type": "string"
+        },
+        "docsAllowlist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "componentScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
+      }
+    },
+    "ai": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tools",
+        "prompts",
+        "cliCommands",
+        "promptBundles"
+      ],
+      "properties": {
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/aiEntry"
+          }
+        },
+        "prompts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/aiEntry"
+          }
+        },
+        "cliCommands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/aiEntry"
+          }
+        },
+        "promptBundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/promptBundle"
+          }
+        }
+      }
+    },
+    "themeImports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "dark"
+      ],
+      "properties": {
+        "default": {
+          "type": "string"
+        },
+        "dark": {
+          "type": "string"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "checks",
+        "repairLoop"
+      ],
+      "properties": {
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "repairLoop": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "propSignature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signature",
+        "required",
+        "bindable"
+      ],
+      "properties": {
+        "signature": {
+          "type": "string"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "bindable": {
+          "type": "boolean"
+        },
+        "default": {
+          "type": "string"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    },
+    "part": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "props"
+      ],
+      "properties": {
+        "props": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/propSignature"
+          }
+        },
+        "forwards": {
+          "type": "string"
+        }
+      }
+    },
+    "antiPattern": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pattern",
+        "reason",
+        "fix"
+      ],
+      "properties": {
+        "pattern": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "fix": {
+          "type": "string"
+        }
+      }
+    },
+    "component": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "category",
+        "tags",
+        "kind",
+        "import",
+        "requiredParts",
+        "bindableProps",
+        "usage",
+        "accessibility",
+        "antiPatterns",
+        "rules",
+        "checks"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "category": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "kind": {
+          "enum": [
+            "simple",
+            "compound",
+            "namespaced"
+          ]
+        },
+        "import": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "package",
+            "statement"
+          ],
+          "properties": {
+            "package": {
+              "type": "string"
+            },
+            "statement": {
+              "type": "string"
+            },
+            "subpathStatement": {
+              "type": "string"
+            }
+          }
+        },
+        "requiredParts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "bindableProps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "props": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/propSignature"
+          }
+        },
+        "parts": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/part"
+          }
+        },
+        "structure": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "usage": {
+          "type": "string"
+        },
+        "accessibility": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "antiPatterns": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/antiPattern"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "recipe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "tags",
+        "components",
+        "snippet"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "components": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "snippet": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

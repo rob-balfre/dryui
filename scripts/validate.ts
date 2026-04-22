@@ -121,6 +121,7 @@ await parallel(
 	run('check:mcp', 'bun run check:mcp'),
 	run('check:cli', 'bun run check:cli:types'),
 	run('check:contract', 'bun run check:contract'),
+	run('check:agent-contract', 'bun run check:agent-contract'),
 	run('check:docs:llms', 'bun run check:docs:llms')
 );
 

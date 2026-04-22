@@ -16,6 +16,8 @@
       "@dryui/ui": ["./packages/ui/src/index.ts"],
       "@dryui/mcp": ["./packages/mcp/src/index.ts"],
       "@dryui/mcp/project-planner": ["./packages/mcp/src/project-planner.ts"],
+      "@dryui/mcp/agent-contract": ["./packages/mcp/src/agent-contract.ts"],
+      "@dryui/mcp/agent-contract.v1.json": ["./packages/mcp/src/agent-contract.v1.json"],
       "@dryui/mcp/reviewer": ["./packages/mcp/src/reviewer.ts"],
       "@dryui/mcp/theme-checker": ["./packages/mcp/src/theme-checker.ts"],
       "@dryui/mcp/spec": ["./packages/mcp/src/spec.json"],

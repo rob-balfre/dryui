@@ -20,6 +20,7 @@ import { runLauncher } from './commands/launcher.js';
 import { runInstallHook } from './commands/install-hook.js';
 import { emitAmbient } from './commands/ambient.js';
 import { runSetup } from './commands/setup.js';
+import { runPrompt } from './commands/prompt.js';
 
 const VERSION = pkg.version;
 const DESCRIPTION = 'DryUI — zero-dependency Svelte 5 components + agent-ergonomic CLI.';
@@ -72,6 +73,7 @@ Commands:
   list [--category <cat>] [--text]
                                 List all components
   compose <query> [--text]      Look up composition guidance
+  prompt --component <name>     Generate task-specific implementation prompt context
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
   ambient                       Print compact session context (for SessionStart hooks)
@@ -152,6 +154,9 @@ async function main(): Promise<void> {
 			break;
 		case 'compose':
 			runCompose(commandArgs, spec);
+			break;
+		case 'prompt':
+			runPrompt(commandArgs);
 			break;
 		case 'tokens':
 			runTokens(commandArgs);
