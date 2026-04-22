@@ -1,5 +1,27 @@
 # @dryui/ui
 
+## 1.8.0
+
+### Minor Changes
+
+- [`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `ChipGroup` grows three knobs and a new subcomponent:
+  - `gap` (`'sm' | 'md' | 'lg'`, default `'md'`) maps onto `--dry-space-{1,2,3}` tokens.
+  - `justify` (`'start' | 'center' | 'end' | 'between'`, default `'start'`) controls inline alignment.
+  - `ChipGroup.Label` renders a label slot inside the group, positioned alongside items.
+
+  The root now uses `display: flex; flex-wrap: wrap` so Badge/Chip/tag clusters wrap naturally on responsive layouts (the previous `inline-grid` approach forced single-line content into awkward column tracks). This is the only sanctioned use of flex-wrap in the design system; the `dryui/no-flex` lint rule has a matching carve-out for `[data-chip-group]`.
+
+  Existing `<ChipGroup.Root>` and `<ChipGroup.Item>` consumers render unchanged unless they were relying on the old grid-track wrapping behaviour.
+
+- [`f16e759`](https://github.com/rob-balfre/dryui/commit/f16e7598da88d5d4ddf313c27c3db1b822dad596) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add `maxMeasure` prop to `Heading` and `Text` for ergonomic headline and body widths in ch units (narrow | default | wide | false). Heading.narrow caps at ~22ch for editorial hero headlines; Text presets are wider for body copy. Existing consumers (no prop) render identically.
+
+  MCP: surface prop-level notes on component queries and add two recipes. `ask --scope component "Heading"` now warns that `variant="display"` inherits `--dry-font-sans` unless `--dry-font-display` is overridden. `ask --scope recipe "serif display"` walks through importing Newsreader and scoping the override to `body` (never `:root`). `ask --scope recipe "narrow headline"` replaces the legacy grid-wrapper hack with `<Heading maxMeasure="narrow">`.
+
+### Patch Changes
+
+- Updated dependencies [[`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981)]:
+  - @dryui/primitives@1.8.0
+
 ## 1.7.4
 
 ### Patch Changes

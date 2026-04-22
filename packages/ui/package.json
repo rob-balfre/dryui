@@ -1,6 +1,6 @@
 {
   "name": "@dryui/ui",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "description": "Zero-dependency styled Svelte 5 components with scoped styles and --dry-* CSS variable theming.",
   "author": "Rob Balfre",
   "license": "MIT",
@@ -1543,7 +1543,7 @@
     "postpack": "bun ../../scripts/postpack-exports.ts"
   },
   "dependencies": {
-    "@dryui/primitives": "^1.7.4"
+    "@dryui/primitives": "^1.8.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.4"

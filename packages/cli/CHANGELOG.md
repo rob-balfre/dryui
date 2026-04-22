@@ -1,5 +1,18 @@
 # @dryui/cli
 
+## 0.17.0
+
+### Minor Changes
+
+- [`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui init` gains `--no-feedback` to skip installing `@dryui/feedback`, mounting `<Feedback />` in the root layout, and patching `vite.config`. Useful for CI scaffolds, library starters, or projects that want to opt in later.
+
+  The scaffolded `+layout.svelte` now imports `@dryui/ui/themes/default.css` and `@dryui/ui/themes/dark.css` BEFORE `../app.css`. The previous order silently let the theme defaults clobber any `--dry-*` token overrides in `app.css`, so token customisations appeared to do nothing. Existing scaffolds are unaffected; new scaffolds get the correct order at write-time.
+
+### Patch Changes
+
+- Updated dependencies [[`f16e759`](https://github.com/rob-balfre/dryui/commit/f16e7598da88d5d4ddf313c27c3db1b822dad596)]:
+  - @dryui/mcp@2.3.0
+
 ## 0.16.1
 
 ### Patch Changes

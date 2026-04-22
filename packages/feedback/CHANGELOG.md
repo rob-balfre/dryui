@@ -1,5 +1,17 @@
 # @dryui/feedback
 
+## 0.5.0
+
+### Minor Changes
+
+- [`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981) Thanks [@rob-balfre](https://github.com/rob-balfre)! - The `<Feedback />` widget now honours a runtime opt-out. Set `DRY_FEEDBACK_DISABLED=1` (or `VITE_DRY_FEEDBACK_DISABLED=1`) and the component renders nothing on both server and client, without removing the import or unmounting in the layout. Useful for CI, screenshot jobs, recorded demos, and any environment where the dev-only widget should stay out of the DOM. Prefer the `VITE_`-prefixed form so Vite bakes the flag into the client bundle for consistent SSR + client behaviour.
+
+### Patch Changes
+
+- Updated dependencies [[`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981), [`f16e759`](https://github.com/rob-balfre/dryui/commit/f16e7598da88d5d4ddf313c27c3db1b822dad596)]:
+  - @dryui/primitives@1.8.0
+  - @dryui/ui@1.8.0
+
 ## 0.4.6
 
 ### Patch Changes
