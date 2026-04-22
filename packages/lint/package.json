@@ -31,8 +31,14 @@
       "default": "./dist/rules.js"
     }
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "check:publint": "publint",
+    "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "devDependencies": {
     "svelte": "^5.55.4",

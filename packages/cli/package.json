@@ -23,7 +23,10 @@
     "dryui": "./dist/index.js"
   },
   "scripts": {
-    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node"
+    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node",
+    "check:publint": "publint",
+    "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
     "@dryui/feedback-server": "^0.7.0",

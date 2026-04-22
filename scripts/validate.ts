@@ -125,6 +125,16 @@ await parallel(
 	run('check:docs:llms', 'bun run check:docs:llms')
 );
 
+// ── Phase 5: Publish-hygiene gate (publint + attw post-swap) ────────────────
+// All package builds are done, so we can temporarily apply the prepack swap,
+// run publint + attw against the shape npm will see, and restore. This is the
+// accurate pre-publish gate — the same check publish-packages.ts runs again
+// just before `changeset publish`, but catching it here means contributors
+// never hit it during a release.
+
+console.log('\n── Phase 5: publish-hygiene ──');
+await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --swap');
+
 // ── Drift guard ─────────────────────────────────────────────────────────────
 // Catch files the pipeline regenerated that aren't committed. Release refuses
 // to run with a dirty worktree, so surfacing drift here (not just on CI) means

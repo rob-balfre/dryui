@@ -38,6 +38,7 @@
     "check:lint": "bun test tests/unit/lint-rules.test.ts tests/unit/lint-preprocessor.test.ts",
     "check:lint:violations": "bun run scripts/check-lint-violations.ts",
     "check:cli:types": "bunx tsc -p packages/cli/tsconfig.json --noEmit",
+    "check:publish-hygiene": "bun run scripts/check-publish-hygiene.ts --swap",
     "check": "bun run check:exports && bun run check:packages && bun run check:docs && bun run check:docs:demos && bun run check:contract && bun run check:agent-contract && bun run check:docs:llms && bun run check:mcp && bun run check:feedback-server && bun run check:cli:types && bun run check:lint:violations",
     "validate:spec": "bun run scripts/validate-spec-coverage.ts",
     "validate": "bun run ./scripts/validate.ts",
@@ -55,6 +56,7 @@
     "bump-deps": "bunx npm-check-updates -u --deep --dep prod,dev,peer,optional --target latest && bun install"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.2",
     "@changesets/changelog-github": "^0.6.0",
     "@changesets/cli": "^2.31.0",
     "@playwright/test": "^1.59.1",
@@ -65,6 +67,7 @@
     "playwright": "1.59.1",
     "prettier": "^3.8.3",
     "prettier-plugin-svelte": "^3.5.1",
+    "publint": "0.3.18",
     "svelte": "^5.55.4",
     "vitest": "^4.1.5"
   }

@@ -50,7 +50,10 @@
     "build": "svelte-package -i src",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "prepack": "bun ../../scripts/prepack-exports.ts",
-    "postpack": "bun ../../scripts/postpack-exports.ts"
+    "postpack": "bun ../../scripts/postpack-exports.ts",
+    "check:publint": "publint",
+    "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
+    "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "peerDependencies": {
     "@dryui/primitives": "^1.8.0",

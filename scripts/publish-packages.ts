@@ -33,6 +33,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports, type ExportSwapBackup } from './lib/export-swap.ts';
 import { verifyPackageDist, formatIssues, type VerifyIssue } from './lib/verify-dist.ts';
+import { checkPackage as checkPublishHygiene } from './check-publish-hygiene.ts';
 
 const dryRun = process.argv.includes('--dry-run');
 const skipBuild = process.argv.includes('--skip-build');
@@ -138,6 +139,29 @@ try {
 		process.exit(1);
 	}
 	console.log('publish-packages: post-swap dist verification passed');
+
+	// ─── Step 4b: publish-hygiene gate (publint + attw) ────────────────────────
+	// Runs against the post-swap package.json so the validators see exactly
+	// the shape npm will publish. Catches dist/exports drift, stale types,
+	// and ESM/CJS resolution problems before the tarball goes public.
+	console.log('publish-packages: running publint + attw on every publishable package…');
+	const hygieneFailures: string[] = [];
+	for (const pkgPath of pkgPaths) {
+		if (!isPublishable(pkgPath)) continue;
+		const result = checkPublishHygiene(pkgPath);
+		if (!result.ok) hygieneFailures.push(...result.failures);
+	}
+	if (hygieneFailures.length > 0) {
+		console.error(
+			`publish-packages: ${hygieneFailures.length} publish-hygiene failure(s) — aborting before publish`
+		);
+		for (const failure of hygieneFailures) {
+			console.error(failure);
+			console.error('---');
+		}
+		process.exit(1);
+	}
+	console.log('publish-packages: publish-hygiene check passed');
 
 	if (dryRun) {
 		console.log('publish-packages: --dry-run set, skipping changeset publish');
