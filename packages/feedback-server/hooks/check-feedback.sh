@@ -1,9 +1,26 @@
 #!/usr/bin/env bash
 
-CONFIG_PATH="${DRYUI_FEEDBACK_CONFIG_PATH:-$HOME/.dryui-feedback/server.json}"
-BASE_URL="${DRYUI_FEEDBACK_URL:-}"
+find_feedback_config() {
+  local dir="$PWD"
+  while :; do
+    if [ -f "$dir/.dryui/feedback/server.json" ]; then
+      echo "$dir/.dryui/feedback/server.json"
+      return 0
+    fi
+    local parent
+    parent=$(dirname "$dir")
+    [ "$parent" = "$dir" ] && return 1
+    dir="$parent"
+  done
+}
 
-if [ -z "$BASE_URL" ] && [ -f "$CONFIG_PATH" ]; then
+CONFIG_PATH="${DRYUI_FEEDBACK_CONFIG_PATH:-}"
+if [ -z "$CONFIG_PATH" ]; then
+  CONFIG_PATH=$(find_feedback_config || true)
+fi
+
+BASE_URL="${DRYUI_FEEDBACK_URL:-}"
+if [ -z "$BASE_URL" ] && [ -n "$CONFIG_PATH" ] && [ -f "$CONFIG_PATH" ]; then
   BASE_URL=$(python3 - "$CONFIG_PATH" <<'PY' 2>/dev/null
 import json
 import pathlib
@@ -18,11 +35,9 @@ PY
 )
 fi
 
-if [ -z "$BASE_URL" ]; then
-  HOST="${DRYUI_FEEDBACK_HOST:-127.0.0.1}"
-  PORT="${DRYUI_FEEDBACK_PORT:-4748}"
-  BASE_URL="http://${HOST}:${PORT}"
-fi
+# Without a project config and no DRYUI_FEEDBACK_URL, we have nothing to poll.
+# Silently exit so the hook stays a no-op instead of spamming a default URL.
+[ -z "$BASE_URL" ] && exit 0
 
 RESPONSE=$(curl -s --connect-timeout 1 "${BASE_URL%/}/pending" 2>/dev/null) || exit 0
 COUNT=$(echo "$RESPONSE" | python3 -c "import sys,json; print(json.load(sys.stdin).get('count',0))" 2>/dev/null)

@@ -27,7 +27,7 @@ If `dist/` does not exist, build first:
 cd packages/feedback-server && bun run build
 ```
 
-The server listens on port 4748 by default (`DEFAULT_FEEDBACK_PORT`). Data is stored in `~/.dryui-feedback/store.db`.
+The server binds port 4748 by default (`DEFAULT_FEEDBACK_PORT`) and walks up to the first free port if it's taken. State lives under `<project>/.dryui/feedback/` (store.db, screenshots, server.json), so each project keeps its own queue.
 
 ## 2. Find or Start the Dev Server
 

@@ -66,7 +66,10 @@ describe('runLauncher', () => {
 				cwd: resolve(root, 'apps/docs'),
 				runtime: {
 					ensureFeedbackUiBuilt: () => null,
-					ensureFeedbackServer: async () => 'already running',
+					ensureFeedbackServer: async () => ({
+						baseUrl: 'http://127.0.0.1:4748',
+						message: 'already running'
+					}),
 					ensureDocsServer: async () => 'already running',
 					now: () => 42,
 					openBrowser: () => {
@@ -84,7 +87,7 @@ describe('runLauncher', () => {
 			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
 		);
 		expect(result.logs[0]).toContain('Docs: already running');
-		expect(result.logs[0]).toContain('Feedback: already running');
+		expect(result.logs[0]).toContain('Feedback: already running at http://127.0.0.1:4748');
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(result.exitCode).toBe(0);
 	});
@@ -102,7 +105,10 @@ describe('runLauncher', () => {
 				cwd: root,
 				runtime: {
 					ensureFeedbackUiBuilt: () => null,
-					ensureFeedbackServer: async () => 'already running',
+					ensureFeedbackServer: async () => ({
+						baseUrl: 'http://127.0.0.1:4748',
+						message: 'already running'
+					}),
 					ensureDocsServer: async () => 'already running',
 					now: () => 42,
 					openBrowser: (url) => {
@@ -134,7 +140,7 @@ describe('runLauncher', () => {
 					},
 					ensureFeedbackServer: async () => {
 						events.push('feedback');
-						return 'already running';
+						return { baseUrl: 'http://127.0.0.1:4748', message: 'already running' };
 					},
 					ensureDocsServer: async () => {
 						events.push('docs');
@@ -186,7 +192,10 @@ function buildRuntime(
 ): Partial<UserProjectLauncherRuntime> {
 	return {
 		readProjectDevScript: () => 'vite dev',
-		ensureFeedbackServer: async () => 'already running',
+		ensureFeedbackServer: async () => ({
+			baseUrl: 'http://127.0.0.1:4748',
+			message: 'already running'
+		}),
 		ensureFeedbackUiBuilt: () => null,
 		urlResponds: async () => false,
 		findPortHolder: () => null,

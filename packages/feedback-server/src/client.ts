@@ -2,6 +2,7 @@ import {
 	DEFAULT_FEEDBACK_HOST,
 	DEFAULT_FEEDBACK_PORT,
 	DEFAULT_FEEDBACK_URL,
+	findProjectFeedbackConfig,
 	readFeedbackServerConfig
 } from './config.js';
 import type {
@@ -19,14 +20,39 @@ function trimTrailingSlash(value: string): string {
 	return value.replace(/\/$/, '');
 }
 
-export function resolveFeedbackBaseUrl(input?: string): string {
-	if (input) return trimTrailingSlash(input);
+export interface ResolveFeedbackBaseUrlOptions {
+	/** Explicit base URL takes precedence over everything. */
+	baseUrl?: string;
+	/** Project root to read `.dryui/feedback/server.json` from. */
+	projectRoot?: string;
+	/** Walk up from this directory looking for a project config. */
+	cwd?: string;
+}
+
+/**
+ * Resolve the feedback base URL for a given project context.
+ *
+ * Priority: explicit baseUrl > DRYUI_FEEDBACK_URL > project config (exact root)
+ * > project config (walking up from cwd) > DRYUI_FEEDBACK_HOST/PORT env pair
+ * > DEFAULT_FEEDBACK_URL.
+ */
+export function resolveFeedbackBaseUrl(
+	options: ResolveFeedbackBaseUrlOptions | string = {}
+): string {
+	const opts: ResolveFeedbackBaseUrlOptions =
+		typeof options === 'string' ? { baseUrl: options } : options;
+	if (opts.baseUrl) return trimTrailingSlash(opts.baseUrl);
 	const envUrl = process.env['DRYUI_FEEDBACK_URL'];
 	if (envUrl) return trimTrailingSlash(envUrl);
 
-	const config = readFeedbackServerConfig();
-	if (config?.baseUrl) {
-		return trimTrailingSlash(config.baseUrl);
+	if (opts.projectRoot) {
+		const config = readFeedbackServerConfig(opts.projectRoot);
+		if (config?.baseUrl) return trimTrailingSlash(config.baseUrl);
+	}
+
+	const discovered = findProjectFeedbackConfig(opts.cwd ?? process.cwd());
+	if (discovered?.config.baseUrl) {
+		return trimTrailingSlash(discovered.config.baseUrl);
 	}
 
 	const envHost = process.env['DRYUI_FEEDBACK_HOST'] ?? DEFAULT_FEEDBACK_HOST;
@@ -53,8 +79,8 @@ async function parseJson<T>(response: Response): Promise<T> {
 export class FeedbackHttpClient {
 	readonly baseUrl: string;
 
-	constructor(baseUrl?: string) {
-		this.baseUrl = resolveFeedbackBaseUrl(baseUrl);
+	constructor(input?: string | ResolveFeedbackBaseUrlOptions) {
+		this.baseUrl = resolveFeedbackBaseUrl(input);
 	}
 
 	async listSessions(): Promise<Session[]> {
