@@ -233,8 +233,11 @@ describe('feedback overlay hosting', () => {
 			expect(env.getDisplayMedia).toHaveBeenCalledTimes(1);
 			expect(env.stopTrack).toHaveBeenCalledTimes(1);
 			expect(document.body.textContent).toContain('Feedback sent');
+			// Copy tracks feedback.svelte. The inline agent picker was removed in
+			// `9b55ed9f Open site in feedback mode and pick agents from the dashboard`;
+			// the success toast now points users at the dashboard tab.
 			expect(document.body.textContent).toContain(
-				'Your annotation and screenshot were queued for review.'
+				'Pick which agent to launch in the dashboard tab.'
 			);
 			expect(
 				env.fetchSpy.mock.calls.some(
@@ -329,7 +332,12 @@ describe('feedback overlay hosting', () => {
 		}
 	});
 
-	it('opens a chooser dialog and submits the selected dispatch target', async () => {
+	it('does not render an inline agent picker; submissions omit `agent` so the dashboard drives dispatch', async () => {
+		// Removal contract: commit `9b55ed9f Open site in feedback mode and pick
+		// agents from the dashboard` moved the per-submission agent selection
+		// out of the overlay toolbar and onto the dashboard tab. The overlay
+		// must no longer expose a dispatch-target button, and submissions must
+		// not pre-bind an `agent` field.
 		const env = setupSubmissionEnvironment();
 
 		try {
@@ -337,28 +345,8 @@ describe('feedback overlay hosting', () => {
 			await waitForAsyncWork(20);
 			flushSync();
 
-			const agentButton = document.querySelector<HTMLButtonElement>(
-				'[aria-label="Dispatch target: Codex. Click to change."]'
-			);
-			if (!agentButton) throw new Error('Expected dispatch target button');
-
-			agentButton.click();
-			flushSync();
-
-			const chooserOptions = Array.from(
-				document.querySelectorAll<HTMLElement>('[role="menuitem"][data-agent]')
-			).map((option) => option.textContent ?? '');
-
-			expect(chooserOptions.some((text) => text.includes('Copilot CLI'))).toBe(true);
-			expect(chooserOptions.some((text) => text.includes('Copilot VS Code'))).toBe(true);
-
-			const cursorOption = Array.from(
-				document.querySelectorAll<HTMLElement>('[role="menuitem"][data-agent]')
-			).find((option) => option.textContent?.includes('Cursor'));
-			if (!cursorOption) throw new Error('Expected Cursor option in chooser');
-
-			cursorOption.click();
-			flushSync();
+			const agentButtons = document.querySelectorAll('[aria-label^="Dispatch target:"]');
+			expect(agentButtons.length).toBe(0);
 
 			const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
 			if (!drawButton) throw new Error('Expected feedback draw button');
@@ -369,7 +357,6 @@ describe('feedback overlay hosting', () => {
 				'[aria-label="Feedback drawing canvas"]'
 			);
 			if (!canvas) throw new Error('Expected feedback drawing canvas');
-
 			drawStroke(canvas);
 
 			const submitButton = document.querySelector<HTMLButtonElement>(
@@ -386,11 +373,9 @@ describe('feedback overlay hosting', () => {
 					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
 					init?.method === 'POST'
 			);
-
 			expect(submissionCall).toBeDefined();
-			expect(JSON.parse(String(submissionCall?.[1]?.body))).toMatchObject({
-				agent: 'cursor'
-			});
+			const body = JSON.parse(String(submissionCall?.[1]?.body));
+			expect(body.agent).toBeUndefined();
 		} finally {
 			env.restore();
 		}
