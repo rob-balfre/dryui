@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.16.1
+
+### Patch Changes
+
+- [`4935108`](https://github.com/rob-balfre/dryui/commit/49351088643822ca03e4000afddd7f6e3320ed73) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Starting a feedback session from a directory with no Svelte/SvelteKit project no longer crashes when the descendant project walk hits an unreadable folder (e.g. `~/.Trash` on macOS). The walker skips inaccessible directories, and the interactive feedback menu now shows a brief notice explaining why the dev server was not auto-started before falling back to the dashboard-only URL.
+
+- Updated dependencies [[`4935108`](https://github.com/rob-balfre/dryui/commit/49351088643822ca03e4000afddd7f6e3320ed73)]:
+  - @dryui/mcp@2.2.7
+
 ## 0.16.0
 
 ### Minor Changes
