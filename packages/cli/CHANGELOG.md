@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.17.1
+
+### Patch Changes
+
+- [`54d061d`](https://github.com/rob-balfre/dryui/commit/54d061d19c464d9ea45f1ed46d2c92495da59a47) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add generated agent contract artifacts and a minimal `dryui prompt --component` command.
+
+- Updated dependencies [[`54d061d`](https://github.com/rob-balfre/dryui/commit/54d061d19c464d9ea45f1ed46d2c92495da59a47)]:
+  - @dryui/mcp@2.3.1
+
 ## 0.17.0
 
 ### Minor Changes
