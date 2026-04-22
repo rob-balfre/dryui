@@ -4,10 +4,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { componentCompositions, compositionRecipes } from './composition-data';
 import { aiSurface } from './ai-surface.js';
-import {
-	componentMeta as manifestComponentMeta,
-	type ComponentMetaEntry
-} from './component-catalog.js';
+import type { ComponentMetaEntry } from './component-catalog.js';
+import { loadComponentMeta } from './load-component-meta.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uiSrc = resolve(__dirname, '../../ui/src');
@@ -61,7 +59,11 @@ type ComponentShape = {
 	example: string;
 };
 
-const COMPONENT_META = manifestComponentMeta;
+// Single-source metadata: per-component `.meta.ts` sibling files are the
+// authoritative catalog. Populated at the start of main() via
+// loadComponentMeta(). Starts empty so accidental early access throws loudly
+// rather than silently returning stale data.
+let COMPONENT_META: Record<string, ComponentMetaEntry> = {};
 
 const BINDABLE_MAP: Record<string, string[]> = {
 	'input/input.svelte': ['value'],
@@ -1548,6 +1550,12 @@ async function readText(filePath: string): Promise<string> {
 async function main(): Promise<void> {
 	console.log('Generating spec...');
 
+	// Load per-component meta.ts files. These are the single source of truth
+	// for description/category/tags/surface.
+	const { entries: metaEntries } = await loadComponentMeta();
+	COMPONENT_META = metaEntries;
+	console.log(`  Loaded ${Object.keys(metaEntries).length} component meta files`);
+
 	const indexSrc = await readText(join(uiSrc, 'index.ts'));
 	const componentNames: string[] = [];
 
@@ -1578,7 +1586,7 @@ async function main(): Promise<void> {
 			/* no primitives source for this component */
 		}
 
-		const meta = manifestComponentMeta[name];
+		const meta = COMPONENT_META[name];
 		if (!meta) {
 			console.warn(`  Missing metadata for ${name}`);
 			continue;
@@ -1799,8 +1807,10 @@ async function main(): Promise<void> {
 		};
 	}
 
-	// Pass 2: scan primitives for components without UI layer
-	for (const name of Object.keys(manifestComponentMeta)) {
+	// Pass 2: scan primitives for components without UI layer.
+	// Sort alphabetically so the spec output is deterministic across
+	// filesystems now that metadata comes from on-disk .meta.ts files.
+	for (const name of [...Object.keys(COMPONENT_META)].sort((a, b) => a.localeCompare(b))) {
 		if (components[name]) continue; // already found in UI
 		const dir = dirForComponent(name);
 		const dirPath = join(primSrc, dir);
@@ -1812,7 +1822,7 @@ async function main(): Promise<void> {
 			continue; // directory doesn't exist
 		}
 
-		const meta = manifestComponentMeta[name];
+		const meta = COMPONENT_META[name];
 		if (!meta) continue;
 
 		const parts = parseCompoundParts(indexContent, name);

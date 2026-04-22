@@ -18,11 +18,10 @@
 
 import { resolve } from 'node:path';
 import {
-	componentMeta,
 	docsNavComponentNames,
-	primitiveComponentNames,
 	skillCompoundComponents
 } from '../packages/mcp/src/component-catalog.js';
+import { loadComponentMeta } from '../packages/mcp/src/load-component-meta.js';
 
 const repoRoot = resolve(import.meta.dir, '..');
 const uiSrcDir = resolve(repoRoot, 'packages/ui/src');
@@ -138,8 +137,11 @@ const [
 	getSpecCompounds()
 ]);
 
-const manifestNames = new Set(Object.keys(componentMeta));
-const primitiveManifestNames = new Set(primitiveComponentNames);
+const { metas: loadedMetas } = await loadComponentMeta();
+const manifestNames = new Set(loadedMetas.map((m) => m.name));
+const primitiveManifestNames = new Set(
+	loadedMetas.filter((m) => m.surface === 'primitive').map((m) => m.name)
+);
 const uiManifestNames = new Set(
 	[...manifestNames].filter((name) => !primitiveManifestNames.has(name))
 );
