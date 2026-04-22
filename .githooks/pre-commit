@@ -31,6 +31,16 @@ if echo "$STAGED" | grep -qE '^packages/ui/src/themes/.*\.css$'; then
   git add packages/mcp/src/theme-tokens.generated.json
 fi
 
+# Resync packages/plugin/skills/* and .cursor/rules/* when a skill source
+# changes. postinstall runs sync:skills too, but only on `bun install`; a
+# raw edit+commit can otherwise ship a stale plugin copy (which dirties CI
+# after bun install normalizes it → release:ci refuses the worktree).
+if echo "$STAGED" | grep -qE '^packages/(ui/skills/dryui|feedback/skills/live-feedback|cli/skills/init)/'; then
+  echo "[pre-commit] Skill source changed — regenerating plugin/.cursor copies..."
+  bun run ./scripts/sync-skills.ts
+  git add packages/plugin/skills .cursor/rules
+fi
+
 # Check formatting on staged files
 STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(ts|js|svelte|json|css|md)$' || true)
 if [ -n "$STAGED_FILES" ]; then
