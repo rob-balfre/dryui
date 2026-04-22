@@ -3,10 +3,25 @@ export interface AiSurfaceEntry {
 	readonly description: string;
 }
 
-interface AiSurfaceManifest {
+export interface AiPromptBundle {
+	readonly id: string;
+	readonly title: string;
+	readonly description: string;
+	readonly targets: readonly string[];
+	readonly dependencies: readonly string[];
+	readonly defaultPrompt: string;
+	readonly docsAllowlist: readonly string[];
+	readonly componentScopes: readonly string[];
+	readonly rules: readonly string[];
+	readonly checks: readonly string[];
+	readonly source: string;
+}
+
+export interface AiSurfaceManifest {
 	readonly tools: readonly AiSurfaceEntry[];
 	readonly prompts: readonly AiSurfaceEntry[];
 	readonly cliCommands: readonly AiSurfaceEntry[];
+	readonly promptBundles: readonly AiPromptBundle[];
 }
 
 export const aiSurface: AiSurfaceManifest = {
@@ -53,6 +68,44 @@ export const aiSurface: AiSurfaceManifest = {
 		{
 			name: 'feedback',
 			description: 'Start feedback tooling, inspect the server, or launch the dashboard'
+		},
+		{
+			name: 'prompt',
+			description: 'Generate task-specific DryUI implementation prompts'
+		}
+	],
+	promptBundles: [
+		{
+			id: 'component-implementation',
+			title: 'DryUI component implementation',
+			description:
+				'Task-specific Svelte implementation context for one DryUI component and its surrounding rules.',
+			targets: ['cli', 'mcp', 'docs', 'skill', 'llms'],
+			dependencies: ['spec.json', 'composition-data.ts', 'theme-tokens.generated.json'],
+			defaultPrompt:
+				'Use real Svelte 5 with @dryui/ui components. Prefer component props, compound parts, DryUI tokens, and generated validation checks over ad hoc markup or inline styling.',
+			docsAllowlist: [
+				'README.md',
+				'CONTRIBUTING.md',
+				'ACCESSIBILITY.md',
+				'packages/ui/skills/dryui/SKILL.md',
+				'packages/ui/skills/dryui/rules/theming.md',
+				'packages/mcp/src/spec.json',
+				'packages/mcp/src/agent-contract.v1.json'
+			],
+			componentScopes: ['component', 'recipe', 'token', 'setup'],
+			rules: [
+				'Import DryUI components from @dryui/ui or the documented subpath import.',
+				'Use compound component parts exactly as documented by required-parts.',
+				'Prefer DryUI props and CSS variables over raw HTML replacements or inline theme values.',
+				'Preserve accessible names, labels, focus order, and native element semantics.'
+			],
+			checks: [
+				'dryui check <file.svelte>',
+				'svelte-autofixer <file.svelte>',
+				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
+			],
+			source: 'packages/mcp/src/ai-surface.ts'
 		}
 	]
 } as const;

@@ -39,6 +39,8 @@ const GENERATED_FILES = new Set([
 	'packages/mcp/src/architecture.json',
 	'packages/mcp/src/contract.v1.json',
 	'packages/mcp/src/contract.v1.schema.json',
+	'packages/mcp/src/agent-contract.v1.json',
+	'packages/mcp/src/agent-contract.v1.schema.json',
 	'packages/mcp/src/theme-tokens.generated.json'
 ]);
 

@@ -45,7 +45,8 @@
         "compositionRecipes",
         "tools",
         "prompts",
-        "cliCommands"
+        "cliCommands",
+        "promptBundles"
       ],
       "properties": {
         "components": {
@@ -69,6 +70,10 @@
           "minimum": 0
         },
         "cliCommands": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "promptBundles": {
           "type": "integer",
           "minimum": 0
         }
@@ -96,7 +101,8 @@
       "required": [
         "tools",
         "prompts",
-        "cliCommands"
+        "cliCommands",
+        "promptBundles"
       ],
       "properties": {
         "tools": {
@@ -107,6 +113,12 @@
         },
         "cliCommands": {
           "$ref": "#/$defs/aiEntries"
+        },
+        "promptBundles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/aiPromptBundle"
+          }
         }
       }
     },
@@ -160,6 +172,82 @@
       "type": "array",
       "items": {
         "$ref": "#/$defs/aiEntry"
+      }
+    },
+    "aiPromptBundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "title",
+        "description",
+        "targets",
+        "dependencies",
+        "defaultPrompt",
+        "docsAllowlist",
+        "componentScopes",
+        "rules",
+        "checks",
+        "source"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "cli",
+              "mcp",
+              "docs",
+              "skill",
+              "llms"
+            ]
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "defaultPrompt": {
+          "type": "string"
+        },
+        "docsAllowlist": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "componentScopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source": {
+          "type": "string"
+        }
       }
     },
     "propDef": {

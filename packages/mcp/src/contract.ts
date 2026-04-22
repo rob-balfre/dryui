@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { aiSurface, type AiSurfaceEntry } from './ai-surface.js';
+import { aiSurface, type AiPromptBundle, type AiSurfaceEntry } from './ai-surface.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const specPath = resolve(__dirname, 'spec.json');
@@ -25,6 +25,7 @@ interface Spec {
 		readonly tools: readonly AiSurfaceEntry[];
 		readonly prompts: readonly AiSurfaceEntry[];
 		readonly cliCommands: readonly AiSurfaceEntry[];
+		readonly promptBundles?: readonly AiPromptBundle[];
 	};
 }
 
@@ -42,6 +43,7 @@ interface ContractV1 {
 		readonly tools: number;
 		readonly prompts: number;
 		readonly cliCommands: number;
+		readonly promptBundles: number;
 	};
 	readonly themeImports: {
 		readonly default: string;
@@ -51,6 +53,7 @@ interface ContractV1 {
 		readonly tools: readonly AiSurfaceEntry[];
 		readonly prompts: readonly AiSurfaceEntry[];
 		readonly cliCommands: readonly AiSurfaceEntry[];
+		readonly promptBundles: readonly AiPromptBundle[];
 	};
 	readonly components: Record<string, unknown>;
 	readonly composition: {
@@ -106,7 +109,8 @@ function buildSchema(): Record<string, unknown> {
 					'compositionRecipes',
 					'tools',
 					'prompts',
-					'cliCommands'
+					'cliCommands',
+					'promptBundles'
 				],
 				properties: {
 					components: { type: 'integer', minimum: 0 },
@@ -114,7 +118,8 @@ function buildSchema(): Record<string, unknown> {
 					compositionRecipes: { type: 'integer', minimum: 0 },
 					tools: { type: 'integer', minimum: 0 },
 					prompts: { type: 'integer', minimum: 0 },
-					cliCommands: { type: 'integer', minimum: 0 }
+					cliCommands: { type: 'integer', minimum: 0 },
+					promptBundles: { type: 'integer', minimum: 0 }
 				}
 			},
 			themeImports: {
@@ -129,11 +134,15 @@ function buildSchema(): Record<string, unknown> {
 			ai: {
 				type: 'object',
 				additionalProperties: false,
-				required: ['tools', 'prompts', 'cliCommands'],
+				required: ['tools', 'prompts', 'cliCommands', 'promptBundles'],
 				properties: {
 					tools: { $ref: '#/$defs/aiEntries' },
 					prompts: { $ref: '#/$defs/aiEntries' },
-					cliCommands: { $ref: '#/$defs/aiEntries' }
+					cliCommands: { $ref: '#/$defs/aiEntries' },
+					promptBundles: {
+						type: 'array',
+						items: { $ref: '#/$defs/aiPromptBundle' }
+					}
 				}
 			},
 			components: {
@@ -169,6 +178,39 @@ function buildSchema(): Record<string, unknown> {
 			aiEntries: {
 				type: 'array',
 				items: { $ref: '#/$defs/aiEntry' }
+			},
+			aiPromptBundle: {
+				type: 'object',
+				additionalProperties: false,
+				required: [
+					'id',
+					'title',
+					'description',
+					'targets',
+					'dependencies',
+					'defaultPrompt',
+					'docsAllowlist',
+					'componentScopes',
+					'rules',
+					'checks',
+					'source'
+				],
+				properties: {
+					id: { type: 'string' },
+					title: { type: 'string' },
+					description: { type: 'string' },
+					targets: {
+						type: 'array',
+						items: { enum: ['cli', 'mcp', 'docs', 'skill', 'llms'] }
+					},
+					dependencies: { type: 'array', items: { type: 'string' } },
+					defaultPrompt: { type: 'string' },
+					docsAllowlist: { type: 'array', items: { type: 'string' } },
+					componentScopes: { type: 'array', items: { type: 'string' } },
+					rules: { type: 'array', items: { type: 'string' } },
+					checks: { type: 'array', items: { type: 'string' } },
+					source: { type: 'string' }
+				}
 			},
 			propDef: {
 				type: 'object',
@@ -317,7 +359,11 @@ function buildSchema(): Record<string, unknown> {
 
 function buildContractV1(): ContractV1 {
 	const spec = readSpec();
-	const ai = spec.ai ?? aiSurface;
+	const ai = {
+		...aiSurface,
+		...spec.ai,
+		promptBundles: spec.ai?.promptBundles ?? aiSurface.promptBundles
+	};
 	return {
 		schema: 'DryUIContractV1',
 		version: 1,
@@ -331,7 +377,8 @@ function buildContractV1(): ContractV1 {
 			compositionRecipes: Object.keys(spec.composition?.recipes ?? {}).length,
 			tools: ai.tools.length,
 			prompts: ai.prompts.length,
-			cliCommands: ai.cliCommands.length
+			cliCommands: ai.cliCommands.length,
+			promptBundles: ai.promptBundles.length
 		},
 		themeImports: spec.themeImports,
 		ai,
