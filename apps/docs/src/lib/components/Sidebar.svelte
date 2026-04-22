@@ -8,7 +8,8 @@
 		Grid2x2Check,
 		House,
 		ToolCase,
-		WandSparkles
+		WandSparkles,
+		Workflow
 	} from 'lucide-svelte';
 	import { categories, toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
@@ -55,7 +56,8 @@
 		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
 		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
 		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
-		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: GitCompareArrows }
+		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: GitCompareArrows },
+		{ label: 'How We Work', href: withBase('/how-we-work'), icon: Workflow }
 	];
 </script>
 
