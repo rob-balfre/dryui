@@ -2,9 +2,73 @@ import { afterEach, describe, expect, test } from 'bun:test';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { runInit } from '../commands/init.js';
-import { captureCommandIO, cleanupTempDirs, createTempTree, withCwd } from './helpers.js';
+import { captureAsyncCommandIO, cleanupTempDirs, createTempTree, withCwd } from './helpers.js';
 
 afterEach(cleanupTempDirs);
+
+interface FeedbackRuntimeStubs {
+	installPackage: (options: {
+		cwd: string;
+		packageManager: string;
+		packageNames: string[];
+	}) => boolean;
+	mountFeedback: (options: { layoutPath: string; serverUrl: string }) => boolean;
+	patchViteConfig: (configPath: string) => boolean;
+	findViteConfig: (root: string) => string | null;
+	isInteractiveTTY: () => boolean;
+}
+
+interface FeedbackRuntimeRecorder {
+	installCalls: Array<{
+		cwd: string;
+		packageManager: string;
+		packageNames: string[];
+	}>;
+	mountCalls: Array<{ layoutPath: string; serverUrl: string }>;
+	patchCalls: string[];
+	stubs: FeedbackRuntimeStubs;
+}
+
+function buildFeedbackRuntime(
+	overrides: Partial<FeedbackRuntimeStubs> = {}
+): FeedbackRuntimeRecorder {
+	const installCalls: FeedbackRuntimeRecorder['installCalls'] = [];
+	const mountCalls: FeedbackRuntimeRecorder['mountCalls'] = [];
+	const patchCalls: string[] = [];
+	const stubs: FeedbackRuntimeStubs = {
+		installPackage: (options) => {
+			installCalls.push({ ...options });
+			return true;
+		},
+		mountFeedback: (options) => {
+			mountCalls.push({ ...options });
+			return true;
+		},
+		patchViteConfig: (configPath) => {
+			patchCalls.push(configPath);
+			return true;
+		},
+		findViteConfig: (root) => join(root, 'vite.config.ts'),
+		isInteractiveTTY: () => false,
+		...overrides
+	};
+	return { installCalls, mountCalls, patchCalls, stubs };
+}
+
+function scaffoldTestBed(runtimeOverrides: Partial<FeedbackRuntimeStubs> = {}): {
+	root: string;
+	target: string;
+	feedback: FeedbackRuntimeRecorder;
+} {
+	const root = createTempTree({
+		'package.json': JSON.stringify({ private: true, workspaces: ['projects/*'] }),
+		'bun.lock': '',
+		'projects/smoke/.keep': ''
+	});
+	const target = realpathSync(join(root, 'projects/smoke'));
+	const feedback = buildFeedbackRuntime(runtimeOverrides);
+	return { root, target, feedback };
+}
 
 const spec = {
 	themeImports: {
@@ -52,23 +116,24 @@ const editableSvelteConfig = [
 ].join('\n');
 
 describe('runInit', () => {
-	test('prints help and exits cleanly', () => {
-		const result = captureCommandIO(() => runInit(['--help'], spec));
+	test('prints help and exits cleanly', async () => {
+		const result = await captureAsyncCommandIO(() => runInit(['--help'], spec));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn]',
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch]',
 			'',
 			'Bootstrap a SvelteKit + DryUI project.',
 			'',
 			'Options:',
 			'  [path]           Target directory (default: current directory)',
-			'  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)'
+			'  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)',
+			'  --no-launch      Skip the feedback dashboard launch prompt after scaffold'
 		]);
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBe(0);
 	});
 
-	test('returns early when DryUI is already set up', () => {
+	test('returns early when DryUI is already set up', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
 			'bun.lock': '',
@@ -77,14 +142,14 @@ describe('runInit', () => {
 			'src/routes/+layout.svelte': readyLayout
 		});
 
-		const result = withCwd(root, () => captureCommandIO(() => runInit([], spec)));
+		const result = await withCwd(root, () => captureAsyncCommandIO(() => runInit([], spec)));
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs).toEqual(['', '  DryUI is already set up in this project.', '']);
 		expect(result.exitCode).toBeNull();
 	});
 
-	test('edits app.html, the root layout, and svelte.config in place', () => {
+	test('edits app.html, the root layout, and svelte.config in place', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
 			'bun.lock': '',
@@ -99,7 +164,7 @@ describe('runInit', () => {
 			].join('\n')
 		});
 
-		const result = captureCommandIO(() => runInit([root], spec));
+		const result = await captureAsyncCommandIO(() => runInit([root], spec));
 		const layout = readFileSync(join(root, 'src/routes/+layout.svelte'), 'utf8');
 		const appHtml = readFileSync(join(root, 'src/app.html'), 'utf8');
 		const svelteConfig = readFileSync(join(root, 'svelte.config.js'), 'utf8');
@@ -117,9 +182,11 @@ describe('runInit', () => {
 		expect(svelteConfig).toContain(
 			"preprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] }), vitePreprocess()]"
 		);
+		// In-place edits never trigger feedback setup.
+		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
 	});
 
-	test('adds theme imports to app.css when the layout already owns app.css', () => {
+	test('adds theme imports to app.css when the layout already owns app.css', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
 			'bun.lock': '',
@@ -135,7 +202,7 @@ describe('runInit', () => {
 			].join('\n')
 		});
 
-		const result = captureCommandIO(() => runInit([root], spec));
+		const result = await captureAsyncCommandIO(() => runInit([root], spec));
 		const appCss = readFileSync(join(root, 'src/app.css'), 'utf8');
 
 		expect(result.errors).toEqual([]);
@@ -144,7 +211,7 @@ describe('runInit', () => {
 		expect(appCss).toContain("@import '@dryui/ui/themes/dark.css';\nbody { color: tomato; }");
 	});
 
-	test('creates a new root layout when one is missing', () => {
+	test('creates a new root layout when one is missing', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
 			'bun.lock': '',
@@ -152,7 +219,7 @@ describe('runInit', () => {
 			'src/app.html': '<html lang="en" class="theme-auto"></html>'
 		});
 
-		const result = captureCommandIO(() => runInit([root], spec));
+		const result = await captureAsyncCommandIO(() => runInit([root], spec));
 		const layoutPath = join(root, 'src/routes/+layout.svelte');
 
 		expect(result.errors).toEqual([]);
@@ -161,7 +228,7 @@ describe('runInit', () => {
 		expect(readFileSync(layoutPath, 'utf8')).toContain('{@render children()}');
 	});
 
-	test('scaffolds an explicit child target without touching the parent workspace root', () => {
+	test('scaffolds an explicit child target without touching the parent workspace root', async () => {
 		const rootLayout = [
 			'<script lang="ts">',
 			"\timport { RootShell } from '$lib/root-shell';",
@@ -191,14 +258,16 @@ describe('runInit', () => {
 		const workspaceRoot = realpathSync(root);
 		const target = realpathSync(join(root, 'projects/smoke'));
 		const commands: Array<{ command: string; cwd: string }> = [];
+		const feedback = buildFeedbackRuntime();
 
-		const result = withCwd(root, () =>
-			captureCommandIO(() =>
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun'], spec, {
 					runCommand: (command, cwd) => {
 						commands.push({ command, cwd });
 						return true;
-					}
+					},
+					...feedback.stubs
 				})
 			)
 		);
@@ -213,6 +282,24 @@ describe('runInit', () => {
 			{ command: 'bun add @dryui/ui', cwd: target },
 			{ command: 'bun add -d @dryui/lint', cwd: target }
 		]);
+		expect(feedback.installCalls).toEqual([
+			{
+				cwd: target,
+				packageManager: 'bun',
+				packageNames: ['@dryui/feedback', 'lucide-svelte']
+			}
+		]);
+		expect(feedback.mountCalls).toEqual([
+			{
+				layoutPath: join(target, 'src/routes/+layout.svelte'),
+				serverUrl: 'http://127.0.0.1:4748'
+			}
+		]);
+		expect(feedback.patchCalls).toEqual([join(target, 'vite.config.ts')]);
+		expect(result.logs).toContain('  Setting up @dryui/feedback...');
+		expect(result.logs).toContain('  + @dryui/feedback + lucide-svelte');
+		expect(result.logs).toContain('  ~ Mounted <Feedback /> in src/routes/+layout.svelte');
+		expect(result.logs).toContain('  ~ Added @dryui/feedback to ssr.noExternal in vite.config');
 		expect(readFileSync(join(workspaceRoot, 'src/app.html'), 'utf8')).toBe(rootAppHtml);
 		expect(readFileSync(join(workspaceRoot, 'src/routes/+layout.svelte'), 'utf8')).toBe(rootLayout);
 		expect(readFileSync(join(workspaceRoot, 'svelte.config.js'), 'utf8')).toBe(rootSvelteConfig);
@@ -223,7 +310,123 @@ describe('runInit', () => {
 		);
 	});
 
-	test('next-steps cd line preserves an absolute path verbatim', () => {
+	test('scaffold launches feedback dashboard when the user confirms the prompt', async () => {
+		const { root, target, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+		const launcherCalls: Array<{ cwd: string }> = [];
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun'], spec, {
+					runCommand: () => true,
+					...feedback.stubs,
+					promptLaunch: async () => true,
+					runLauncher: async (cwd) => {
+						launcherCalls.push({ cwd });
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(launcherCalls).toEqual([{ cwd: target }]);
+		expect(result.logs).toContain('  Launching feedback dashboard...');
+		// The "Next steps:" block is skipped when the launcher runs.
+		expect(result.logs.some((line) => line.includes('Next steps:'))).toBe(false);
+	});
+
+	test('scaffold falls back to next steps when the user declines the prompt', async () => {
+		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+		const launcherCalls: string[] = [];
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun'], spec, {
+					runCommand: () => true,
+					...feedback.stubs,
+					promptLaunch: async () => false,
+					runLauncher: async (cwd) => {
+						launcherCalls.push(cwd);
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(launcherCalls).toEqual([]);
+		expect(result.logs).toContain('    cd projects/smoke');
+		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs.some((line) => line.includes('Tip: run `bunx @dryui/cli`'))).toBe(true);
+	});
+
+	test('--no-launch skips the launch prompt even in a TTY', async () => {
+		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+		let promptCalls = 0;
+		let launcherCalls = 0;
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-launch'], spec, {
+					runCommand: () => true,
+					...feedback.stubs,
+					promptLaunch: async () => {
+						promptCalls++;
+						return true;
+					},
+					runLauncher: async () => {
+						launcherCalls++;
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(promptCalls).toBe(0);
+		expect(launcherCalls).toBe(0);
+		expect(result.logs).toContain('    bun run dev');
+	});
+
+	test('non-TTY scaffold sets up feedback but never prompts', async () => {
+		const { root, feedback } = scaffoldTestBed();
+		let promptCalls = 0;
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun'], spec, {
+					runCommand: () => true,
+					...feedback.stubs,
+					promptLaunch: async () => {
+						promptCalls++;
+						return true;
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(promptCalls).toBe(0);
+		expect(feedback.installCalls).toHaveLength(1);
+		expect(result.logs).toContain('    bun run dev');
+	});
+
+	test('feedback setup is skipped when an install step fails', async () => {
+		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun'], spec, {
+					runCommand: () => false,
+					...feedback.stubs,
+					promptLaunch: async () => true
+				})
+			)
+		);
+
+		expect(feedback.installCalls).toEqual([]);
+		expect(feedback.mountCalls).toEqual([]);
+		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
+	});
+
+	test('next-steps cd line preserves an absolute path verbatim', async () => {
 		// Regression: previously `targetPath.startsWith(process.cwd())` lacked a
 		// path-boundary check, so if cwd was `/a` and the user typed `/app`, the
 		// displayed path got its `/a` prefix sliced off and `cd pp` was printed.
@@ -242,8 +445,8 @@ describe('runInit', () => {
 		const cwd = join(parent, 'a');
 		const target = join(parent, 'app');
 
-		const result = withCwd(cwd, () =>
-			captureCommandIO(() => runInit([target, '--pm', 'bun'], spec))
+		const result = await withCwd(cwd, () =>
+			captureAsyncCommandIO(() => runInit([target, '--pm', 'bun'], spec))
 		);
 
 		expect(result.errors).toEqual([]);
@@ -251,7 +454,7 @@ describe('runInit', () => {
 		expect(result.logs).toContain('    bun run dev');
 	});
 
-	test('next-steps cd line shows the relative path the user typed', () => {
+	test('next-steps cd line shows the relative path the user typed', async () => {
 		const root = createTempTree({
 			'myapp/package.json': packageJson,
 			'myapp/bun.lock': '',
@@ -260,8 +463,8 @@ describe('runInit', () => {
 			'myapp/src/routes/+layout.svelte': readyLayout
 		});
 
-		const result = withCwd(root, () =>
-			captureCommandIO(() => runInit(['myapp', '--pm', 'bun'], spec))
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() => runInit(['myapp', '--pm', 'bun'], spec))
 		);
 
 		expect(result.errors).toEqual([]);
@@ -269,7 +472,7 @@ describe('runInit', () => {
 		expect(result.logs).toContain('    bun run dev');
 	});
 
-	test('next-steps omits the cd line when initializing the current directory', () => {
+	test('next-steps omits the cd line when initializing the current directory', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
 			'bun.lock': '',
@@ -278,14 +481,16 @@ describe('runInit', () => {
 			'src/routes/+layout.svelte': readyLayout
 		});
 
-		const result = withCwd(root, () => captureCommandIO(() => runInit(['.', '--pm', 'bun'], spec)));
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() => runInit(['.', '--pm', 'bun'], spec))
+		);
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs.some((line) => line.startsWith('    cd '))).toBe(false);
 		expect(result.logs).toContain('    bun run dev');
 	});
 
-	test('warns instead of rewriting an unrecognised preprocess shape', () => {
+	test('warns instead of rewriting an unrecognised preprocess shape', async () => {
 		const weirdConfig = [
 			'const preprocessor = buildPreprocessor();',
 			'',
@@ -301,7 +506,7 @@ describe('runInit', () => {
 			'src/routes/+layout.svelte': readyLayout
 		});
 
-		const result = captureCommandIO(() => runInit([root], spec));
+		const result = await captureAsyncCommandIO(() => runInit([root], spec));
 		const svelteConfig = readFileSync(join(root, 'svelte.config.js'), 'utf8');
 
 		expect(result.logs).toContain('  Setting up DryUI...');

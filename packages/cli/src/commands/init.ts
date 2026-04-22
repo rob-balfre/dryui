@@ -3,6 +3,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { createInterface } from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
 import type { Spec } from './types.js';
 import {
 	planInstall,
@@ -11,21 +13,43 @@ import {
 	type DryuiPackageManager,
 	type ProjectPlanStep
 } from '@dryui/mcp/project-planner';
+import { isInteractiveTTY } from '../run.js';
+import {
+	FEEDBACK_SERVER_URL,
+	findViteConfig,
+	installPackage,
+	mountFeedbackInLayout,
+	patchViteConfigFeedbackNoExternal,
+	type InstallPackageOptions,
+	type MountFeedbackOptions
+} from './launch-utils.js';
+import { runUserProjectLauncher } from './launcher.js';
+
+type ConcretePackageManager = Exclude<DryuiPackageManager, 'unknown'>;
 
 interface InitOptions {
 	targetPath: string;
 	userPath: string | null;
 	packageManager: DryuiPackageManager;
+	noLaunch: boolean;
 }
 
 interface InitRuntime {
 	runCommand?: (command: string, cwd: string) => boolean;
+	installPackage?: (options: InstallPackageOptions) => boolean;
+	mountFeedback?: (options: MountFeedbackOptions) => boolean;
+	patchViteConfig?: (configPath: string) => boolean;
+	findViteConfig?: (root: string) => string | null;
+	isInteractiveTTY?: () => boolean;
+	promptLaunch?: () => Promise<boolean>;
+	runLauncher?: (cwd: string, spec: Spec) => Promise<void>;
 }
 
 function parseInitArgs(args: string[]): InitOptions {
 	let targetPath = process.cwd();
 	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
+	let noLaunch = false;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]!;
@@ -35,6 +59,8 @@ function parseInitArgs(args: string[]): InitOptions {
 				packageManager = next;
 			}
 			i++;
+		} else if (arg === '--no-launch') {
+			noLaunch = true;
 		} else if (!arg.startsWith('-')) {
 			targetPath = resolve(process.cwd(), arg);
 			userPath = arg;
@@ -44,7 +70,8 @@ function parseInitArgs(args: string[]): InitOptions {
 	return {
 		targetPath,
 		userPath,
-		packageManager: packageManager ?? detectPackageManagerFromEnv()
+		packageManager: packageManager ?? detectPackageManagerFromEnv(),
+		noLaunch
 	};
 }
 
@@ -176,19 +203,96 @@ function executeEditFile(step: ProjectPlanStep): void {
 	warn(`  ? Skipped edit: ${step.title} (manual action needed)`);
 }
 
-export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): void {
+function setupFeedback(
+	targetPath: string,
+	packageManager: ConcretePackageManager,
+	runtime: {
+		installPackage: NonNullable<InitRuntime['installPackage']>;
+		mountFeedback: NonNullable<InitRuntime['mountFeedback']>;
+		patchViteConfig: NonNullable<InitRuntime['patchViteConfig']>;
+		findViteConfig: NonNullable<InitRuntime['findViteConfig']>;
+	}
+): boolean {
+	log('');
+	log('  Setting up @dryui/feedback...');
+
+	const installed = runtime.installPackage({
+		cwd: targetPath,
+		packageManager,
+		packageNames: ['@dryui/feedback', 'lucide-svelte']
+	});
+	if (!installed) {
+		warn('  Warning: failed to install @dryui/feedback and lucide-svelte. Run it manually.');
+		return false;
+	}
+	log('  + @dryui/feedback + lucide-svelte');
+
+	const layoutPath = resolve(targetPath, 'src/routes/+layout.svelte');
+	const mounted = runtime.mountFeedback({ layoutPath, serverUrl: FEEDBACK_SERVER_URL });
+	if (mounted) {
+		log('  ~ Mounted <Feedback /> in src/routes/+layout.svelte');
+	} else {
+		warn('  Warning: could not mount <Feedback /> automatically. Add it to your root layout.');
+	}
+
+	const viteConfigPath =
+		runtime.findViteConfig(targetPath) ?? resolve(targetPath, 'vite.config.ts');
+	const patched = runtime.patchViteConfig(viteConfigPath);
+	if (patched) {
+		log('  ~ Added @dryui/feedback to ssr.noExternal in vite.config');
+	} else {
+		warn(
+			`  Warning: could not patch ${viteConfigPath}. Add @dryui/feedback and lucide-svelte to ssr.noExternal manually.`
+		);
+	}
+
+	return true;
+}
+
+async function promptLaunchFeedbackDefault(): Promise<boolean> {
+	const previousRawMode = Boolean(input.isRaw);
+	if (typeof input.setRawMode === 'function') {
+		input.setRawMode(false);
+	}
+	input.resume();
+
+	const rl = createInterface({ input, output });
+	try {
+		const answer = (await rl.question('  Launch feedback dashboard now? (Y/n) '))
+			.trim()
+			.toLowerCase();
+		if (!answer) return true;
+		return answer === 'y' || answer === 'yes';
+	} finally {
+		rl.close();
+		if (typeof input.setRawMode === 'function') {
+			input.setRawMode(previousRawMode);
+		}
+	}
+}
+
+async function runLauncherDefault(cwd: string, spec: Spec): Promise<void> {
+	await runUserProjectLauncher([], { cwd, spec });
+}
+
+export async function runInit(
+	args: string[],
+	spec: Spec,
+	runtime: InitRuntime = {}
+): Promise<void> {
 	if (args[0] === '--help') {
-		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn]');
+		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch]');
 		console.log('');
 		console.log('Bootstrap a SvelteKit + DryUI project.');
 		console.log('');
 		console.log('Options:');
 		console.log('  [path]           Target directory (default: current directory)');
 		console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
+		console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
 		process.exit(0);
 	}
 
-	const { targetPath, userPath, packageManager } = parseInitArgs(args);
+	const { targetPath, userPath, packageManager, noLaunch } = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runShellCommand;
 
 	mkdirSync(targetPath, { recursive: true });
@@ -216,6 +320,7 @@ export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): 
 	log(isScaffold ? '  Scaffolding SvelteKit + DryUI project...' : '  Setting up DryUI...');
 	log('');
 
+	let installsSucceeded = true;
 	for (const step of plan.steps) {
 		switch (step.kind) {
 			case 'create-file':
@@ -230,6 +335,7 @@ export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): 
 				log(`  Installing dependencies...`);
 				const ok = runCommand(step.command, targetPath);
 				if (!ok) {
+					installsSucceeded = false;
 					warn(`  Warning: "${step.command}" failed. Run it manually.`);
 				}
 				break;
@@ -240,6 +346,31 @@ export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): 
 			case 'blocked':
 				warn(`  Warning: ${step.title} — ${step.description}`);
 				break;
+		}
+	}
+
+	let feedbackReady = false;
+	if (isScaffold && installsSucceeded) {
+		const concretePm: ConcretePackageManager =
+			packageManager === 'unknown' ? 'npm' : packageManager;
+		feedbackReady = setupFeedback(targetPath, concretePm, {
+			installPackage: runtime.installPackage ?? installPackage,
+			mountFeedback: runtime.mountFeedback ?? mountFeedbackInLayout,
+			patchViteConfig: runtime.patchViteConfig ?? patchViteConfigFeedbackNoExternal,
+			findViteConfig: runtime.findViteConfig ?? findViteConfig
+		});
+	}
+
+	const tty = (runtime.isInteractiveTTY ?? isInteractiveTTY)();
+	if (isScaffold && feedbackReady && !noLaunch && tty) {
+		log('');
+		const shouldLaunch = await (runtime.promptLaunch ?? promptLaunchFeedbackDefault)();
+		if (shouldLaunch) {
+			log('');
+			log('  Launching feedback dashboard...');
+			log('');
+			await (runtime.runLauncher ?? runLauncherDefault)(targetPath, spec);
+			return;
 		}
 	}
 
@@ -262,5 +393,11 @@ export function runInit(args: string[], spec: Spec, runtime: InitRuntime = {}): 
 		log(`    cd ${userPath ?? targetPath}`);
 	}
 	log(`    ${devCommand}`);
+	if (isScaffold && feedbackReady) {
+		log('');
+		log(
+			'  Tip: run `bunx @dryui/cli` in the project to open the feedback dashboard alongside dev.'
+		);
+	}
 	log('');
 }

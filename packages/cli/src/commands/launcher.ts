@@ -17,6 +17,7 @@ import { emitOrRun, hasFlag, printCommandHelp, type CommandResult } from '../run
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
 	ensureUrlReady,
+	FEEDBACK_SERVER_URL,
 	findPortHolder as findPortHolderDefault,
 	findViteConfig as findViteConfigDefault,
 	installPackage as installPackageDefault,
@@ -423,8 +424,6 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	openBrowser,
 	onProgress: () => {}
 };
-
-const FEEDBACK_SERVER_URL = `http://${DEFAULT_FEEDBACK_HOST}:${DEFAULT_FEEDBACK_PORT}`;
 
 async function planAndApplyFeedbackSetup(
 	detection: ProjectDetection,

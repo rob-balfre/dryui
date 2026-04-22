@@ -130,7 +130,7 @@ async function main(): Promise<void> {
 
 	switch (command) {
 		case 'init':
-			runInit(commandArgs, spec);
+			await runInit(commandArgs, spec);
 			break;
 		case 'setup':
 			await runSetup(commandArgs, spec);
