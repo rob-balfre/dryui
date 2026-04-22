@@ -1,6 +1,6 @@
 {
   "name": "@dryui/primitives",
-  "version": "1.7.4",
+  "version": "1.8.0",
   "description": "Zero-dependency headless Svelte 5 primitives built on native browser APIs.",
   "author": "Rob Balfre",
   "license": "MIT",

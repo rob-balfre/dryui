@@ -1,5 +1,18 @@
 # @dryui/mcp
 
+## 2.3.0
+
+### Minor Changes
+
+- [`f16e759`](https://github.com/rob-balfre/dryui/commit/f16e7598da88d5d4ddf313c27c3db1b822dad596) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add `maxMeasure` prop to `Heading` and `Text` for ergonomic headline and body widths in ch units (narrow | default | wide | false). Heading.narrow caps at ~22ch for editorial hero headlines; Text presets are wider for body copy. Existing consumers (no prop) render identically.
+
+  MCP: surface prop-level notes on component queries and add two recipes. `ask --scope component "Heading"` now warns that `variant="display"` inherits `--dry-font-sans` unless `--dry-font-display` is overridden. `ask --scope recipe "serif display"` walks through importing Newsreader and scoping the override to `body` (never `:root`). `ask --scope recipe "narrow headline"` replaces the legacy grid-wrapper hack with `<Heading maxMeasure="narrow">`.
+
+### Patch Changes
+
+- Updated dependencies [[`0b4a533`](https://github.com/rob-balfre/dryui/commit/0b4a5335e03a6cdb153f65187df7f7fae690d981)]:
+  - @dryui/lint@0.5.0
+
 ## 2.2.7
 
 ### Patch Changes
