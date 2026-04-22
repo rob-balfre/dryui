@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.15.1
+
+### Patch Changes
+
+- [`0ff075c`](https://github.com/rob-balfre/dryui/commit/0ff075c34ac266f03cef34b9ef3a8f6be0f6c740) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui setup` no longer repeats the Current workspace and Agents tables above every interactive prompt. The header now appears only when the user picks the "Detect current project setup" menu item.
+
 ## 0.15.0
 
 ### Minor Changes
