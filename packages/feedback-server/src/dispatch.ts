@@ -626,7 +626,10 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 
 	const prompt = buildFeedbackDispatchPrompt(submission);
 	console.error(`[dispatch] submission ${submission.id}`);
-	dispatchPrompt(target, prompt, options);
+	dispatchPrompt(target, prompt, {
+		...options,
+		workspace: submission.workspace ?? options.workspace
+	});
 }
 
 export function attachDispatcher(bus: EventBus, options: DispatcherOptions): () => void {

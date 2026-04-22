@@ -319,4 +319,42 @@ describe('feedback HTTP server', () => {
 			configuredAgents: expect.any(Array)
 		});
 	});
+
+	test('stamps new submissions with the dispatcher workspace', async () => {
+		server.stop();
+		const workspace = '/tmp/dryui-stamp-workspace';
+		server = startFeedbackHttpServer(store, bus, {
+			host: '127.0.0.1',
+			port: 0,
+			dispatcher: {
+				workspace,
+				defaultAgent: 'codex',
+				terminalApp: 'terminal'
+			}
+		});
+		baseUrl = `http://${server.hostname}:${server.port}`;
+
+		const submissionResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/stamped',
+				image: {
+					webp: Buffer.from('stamped-webp').toString('base64'),
+					png: Buffer.from('stamped-png').toString('base64')
+				},
+				drawings: []
+			})
+		});
+		expect(submissionResponse.status).toBe(201);
+		const submission = (await submissionResponse.json()) as Submission;
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+		expect(submission.workspace).toBe(workspace);
+
+		// Round-trip via GET to confirm the column persisted, not just the insert return value.
+		const queueResponse = await fetch(`${baseUrl}/submissions`);
+		const payload = (await queueResponse.json()) as { submissions: Submission[] };
+		const persisted = payload.submissions.find((entry) => entry.id === submission.id);
+		expect(persisted?.workspace).toBe(workspace);
+	});
 });

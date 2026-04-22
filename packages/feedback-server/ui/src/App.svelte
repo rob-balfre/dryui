@@ -149,12 +149,16 @@
 		}
 	}
 
-	async function dispatchAgent(prompt: string): Promise<void> {
+	async function dispatchAgent(prompt: string, submissionId?: string): Promise<void> {
 		if (!targetAgent) throw new Error('No dispatch target configured');
 		const response = await fetch('/dispatch', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ agent: targetAgent, prompt })
+			body: JSON.stringify({
+				agent: targetAgent,
+				prompt,
+				...(submissionId ? { submissionId } : {})
+			})
 		});
 		if (!response.ok) {
 			const message = await response.text();

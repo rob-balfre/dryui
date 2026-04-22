@@ -33,7 +33,7 @@
 		refreshing: boolean;
 		onChooseAgent: (agent: DispatchAgent) => void;
 		onSetStatus: (id: string, status: SubmissionStatus) => void | Promise<void>;
-		onLaunch: (prompt: string) => Promise<void>;
+		onLaunch: (prompt: string, submissionId: string) => Promise<void>;
 	}
 
 	interface DrawingCount {
@@ -131,7 +131,7 @@
 		launched = false;
 		launchError = '';
 		try {
-			await onLaunch(promptText);
+			await onLaunch(promptText, submission.id);
 			launched = true;
 			clearTimeout(launchTimer);
 			launchTimer = setTimeout(() => {

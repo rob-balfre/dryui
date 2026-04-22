@@ -222,6 +222,8 @@ export interface Submission {
 	status: SubmissionStatus;
 	createdAt: string;
 	agent?: SubmissionAgent;
+	/** Dispatch prefers this over the live server workspace so deeplinks survive the server being restarted from a different cwd. */
+	workspace?: string;
 }
 
 export interface CreateSubmissionImageInput {

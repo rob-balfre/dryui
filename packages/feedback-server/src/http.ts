@@ -237,7 +237,7 @@ export function startFeedbackHttpServer(
 					return errorResponse(503, 'Dispatcher not supported on this platform');
 				}
 
-				let body: { agent?: unknown; prompt?: unknown };
+				let body: { agent?: unknown; prompt?: unknown; submissionId?: unknown };
 				try {
 					body = await readJson(request);
 				} catch {
@@ -253,7 +253,18 @@ export function startFeedbackHttpServer(
 					return errorResponse(400, 'Missing prompt');
 				}
 
-				dispatchPrompt(agent as DispatchAgent, prompt, options.dispatcher);
+				// Prefer the submission's captured workspace so deeplinks survive
+				// the server being restarted from a different cwd.
+				const pinned =
+					typeof body.submissionId === 'string' && body.submissionId.length > 0
+						? store.getSubmission(body.submissionId)
+						: null;
+				const workspace = pinned?.workspace ?? options.dispatcher.workspace;
+
+				dispatchPrompt(agent as DispatchAgent, prompt, {
+					...options.dispatcher,
+					workspace
+				});
 				return json({ dispatched: true, agent }, 202);
 			}
 
@@ -391,7 +402,9 @@ export function startFeedbackHttpServer(
 					) {
 						return errorResponse(400, 'Missing image.webp or image.png');
 					}
-					const submission = store.createSubmission(body);
+					const submission = store.createSubmission(body, {
+						workspace: options.dispatcher?.workspace
+					});
 					bus.emit(sessionEvent('submission.created', submission.url, submission));
 					return json(submission, 201);
 				} catch {

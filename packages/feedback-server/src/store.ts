@@ -92,6 +92,7 @@ interface SubmissionRow {
 	status: SubmissionStatus;
 	created_at: string;
 	agent: string | null;
+	workspace: string | null;
 }
 
 interface TableColumnRow {
@@ -194,7 +195,8 @@ function toSubmission(row: SubmissionRow): Submission {
 		...(scroll !== undefined ? { scroll } : {}),
 		status: row.status as SubmissionStatus,
 		createdAt: row.created_at,
-		...(agent ? { agent } : {})
+		...(agent ? { agent } : {}),
+		...(row.workspace ? { workspace: row.workspace } : {})
 	};
 }
 
@@ -294,7 +296,8 @@ export class FeedbackStore {
         scroll TEXT,
         status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
         created_at TEXT NOT NULL,
-        agent TEXT
+        agent TEXT,
+        workspace TEXT
       );
       CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
     `);
@@ -313,6 +316,7 @@ export class FeedbackStore {
 		ensureColumn(this.db, 'submissions', 'screenshot_png_path', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
 
 		ensureDirectory(this.screenshotsDir);
 	}
@@ -581,7 +585,7 @@ export class FeedbackStore {
 			.run(url, JSON.stringify(drawings), createTimestamp());
 	}
 
-	createSubmission(input: CreateSubmissionInput): Submission {
+	createSubmission(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission {
 		const id = randomUUID();
 		const webpPath = join(this.screenshotsDir, `${id}.webp`);
 		const pngPath = join(this.screenshotsDir, `${id}.png`);
@@ -591,11 +595,12 @@ export class FeedbackStore {
 		const now = createTimestamp();
 		const agent = normalizeAgent(input.agent);
 		const hints = input.hints ?? [];
+		const workspace = context.workspace ?? null;
 		this.db
 			.query(
 				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, viewport, scroll, status, created_at, agent
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
+					id, url, screenshot_path, screenshot_png_path, drawings, hints, viewport, scroll, status, created_at, agent, workspace
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
 			)
 			.run(
 				id,
@@ -607,7 +612,8 @@ export class FeedbackStore {
 				input.viewport ? JSON.stringify(input.viewport) : null,
 				input.scroll ? JSON.stringify(input.scroll) : null,
 				now,
-				agent ?? null
+				agent ?? null,
+				workspace
 			);
 
 		return {
@@ -620,7 +626,8 @@ export class FeedbackStore {
 			...(input.scroll ? { scroll: input.scroll } : {}),
 			status: 'pending',
 			createdAt: now,
-			...(agent ? { agent } : {})
+			...(agent ? { agent } : {}),
+			...(workspace ? { workspace } : {})
 		};
 	}
 
