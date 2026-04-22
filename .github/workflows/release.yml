@@ -35,14 +35,58 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
+      # `bun install` postinstall runs sync:skills, which regenerates
+      # packages/plugin/skills/* and .cursor/rules/* from their sources in
+      # packages/{ui,feedback,cli}/skills. If a commit landed on main with a
+      # stale synced copy, the worktree is now dirty and release:ci would
+      # refuse to run. Self-heal by committing the regenerated files; the
+      # retriggered Release run will see a clean worktree and proceed.
+      - name: Self-heal sync:skills drift
+        id: heal-sync
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          STATUS=$(git status --porcelain)
+          if [ -z "$STATUS" ]; then
+            echo "drift=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Lines are like " M path", "?? path", "A  path". Drop the 3-char
+          # status prefix and check paths against the sync target roots.
+          NON_SYNC=$(echo "$STATUS" | awk '{print substr($0, 4)}' \
+            | grep -vE '^(packages/plugin/skills/|\.cursor/rules/)' || true)
+          if [ -n "$NON_SYNC" ]; then
+            echo "sync-drift-check: worktree is dirty outside sync targets, not auto-healing"
+            echo "$STATUS"
+            exit 1
+          fi
+
+          echo "sync-drift-check: committing regenerated sync:skills output"
+          echo "$STATUS"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add packages/plugin/skills .cursor/rules
+          git commit -m "chore: resync generated skills"
+          git push origin HEAD:main
+          echo "drift=true" >> "$GITHUB_OUTPUT"
+
+      # If we pushed a resync commit, skip the rest of the release pipeline.
+      # The resync push retriggers Release, which will run publish on a clean
+      # worktree. Running publish here would race that retriggered run and
+      # risk double-versioning when changesets are present.
+
       # Fail loudly if publishable packages changed since the last release
       # without a corresponding `.changeset/*.md`. We don't auto-generate
       # changesets from commits, so this is the only thing keeping a feature
       # wave from quietly skipping its npm publish.
       - name: Require changeset for unreleased package changes
+        if: steps.heal-sync.outputs.drift != 'true'
         run: bun run scripts/check-changeset-required.ts
 
-      - run: bun run release:gate
+      - name: Release gate
+        if: steps.heal-sync.outputs.drift != 'true'
+        run: bun run release:gate
 
       # Belt-and-braces: before handing off to changeset publish, pack every
       # publishable package (with the same swap the publish flow uses) and
@@ -50,15 +94,19 @@ jobs:
       # bug once (@dryui/mcp@2.0.0/2.0.1) — catching it here fails the release
       # loud instead of silently breaking every consumer post-publish.
       - name: Verify no workspace refs in tarballs
+        if: steps.heal-sync.outputs.drift != 'true'
         run: bun run scripts/verify-no-workspace-refs.ts
 
-      - run: bun run release:ci
+      - name: Release CI
+        if: steps.heal-sync.outputs.drift != 'true'
+        run: bun run release:ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub releases for published tags
+        if: steps.heal-sync.outputs.drift != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -79,10 +127,14 @@ jobs:
 
       - name: Record released SHA
         id: record
+        if: steps.heal-sync.outputs.drift != 'true'
         run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
   deploy-docs:
     needs: release
+    # Skip docs deploy when release exited early after a resync push — the
+    # retriggered Release run will handle the deploy.
+    if: needs.release.outputs.released_sha != ''
     runs-on: ubuntu-22.04
     timeout-minutes: 15
     permissions:

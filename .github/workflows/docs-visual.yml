@@ -27,6 +27,12 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
+      # Docs import workspace packages (e.g. @dryui/feedback) whose "svelte"
+      # entry points resolve to ./dist/*. Build them before spinning up Vite,
+      # otherwise the dev server fails with "Failed to resolve entry for
+      # package" and every snapshot times out.
+      - run: bun run build:packages
+
       - run: bun --bun playwright install chromium
 
       - run: bun run test:docs-visual
