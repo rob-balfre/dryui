@@ -1,4 +1,6 @@
-import { rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { FeedbackStore } from '../src/store.ts';
 import type { SubmissionDrawing } from '../src/types.ts';
@@ -34,10 +36,12 @@ function imagePayload(tag: string): { webp: string; png: string } {
 
 describe('FeedbackStore', () => {
 	let store: FeedbackStore;
+	let screenshotsDir: string;
 	let screenshotPaths: string[];
 
 	beforeEach(() => {
-		store = new FeedbackStore(':memory:');
+		screenshotsDir = mkdtempSync(join(tmpdir(), 'dryui-feedback-store-'));
+		store = new FeedbackStore({ dbPath: ':memory:', screenshotsDir });
 		screenshotPaths = [];
 	});
 
@@ -46,6 +50,7 @@ describe('FeedbackStore', () => {
 			rmSync(path, { force: true });
 		}
 		store.close();
+		rmSync(screenshotsDir, { recursive: true, force: true });
 	});
 
 	test('creates sessions and annotations with persisted contract fields', () => {

@@ -4,9 +4,10 @@ import { fileURLToPath } from 'node:url';
 import {
 	DEFAULT_FEEDBACK_HOST,
 	DEFAULT_FEEDBACK_PORT,
-	DEFAULT_STORE_PATH,
 	FeedbackHttpClient,
 	parsePort,
+	projectFeedbackPaths,
+	readFeedbackServerConfig,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
 import {
@@ -47,21 +48,25 @@ function feedbackInitHelp(): never {
 }
 
 function getFeedbackInit(): CommandResult {
+	const paths = projectFeedbackPaths(process.cwd());
 	return {
 		output: [
 			'DryUI feedback init',
 			'',
-			`Server URL: http://127.0.0.1:${DEFAULT_FEEDBACK_PORT}`,
-			`SQLite store: ${DEFAULT_STORE_PATH}`,
+			`Default server URL: http://127.0.0.1:${DEFAULT_FEEDBACK_PORT} (port increments if taken)`,
+			`Project state: ${paths.dir}`,
+			`  SQLite store: ${paths.dbPath}`,
+			`  Screenshots: ${paths.screenshotsDir}`,
+			`  Server config: ${paths.configPath}`,
 			'Hook script: packages/feedback-server/hooks/check-feedback.sh',
 			'',
 			'Suggested next steps:',
-			'1. Start the server with `dryui feedback server`.',
+			'1. Start the server with `dryui feedback server` from this project.',
 			'2. Add a separate feedback MCP entry that points at `packages/feedback-server/dist/mcp.js`.',
 			'3. Register the hook script with your prompt-submit hook if you want pending annotations injected into context.',
 			'',
 			'next[2]{cmd,description}:',
-			'  dryui feedback server,Start the local feedback server in the foreground',
+			'  dryui feedback server,Start the local feedback server in the foreground for this project',
 			'  dryui feedback doctor,Probe a running feedback server for health + listener state'
 		].join('\n'),
 		error: null,
@@ -86,7 +91,14 @@ function feedbackDoctorHelp(): never {
 
 async function getFeedbackDoctor(args: string[]): Promise<CommandResult> {
 	const endpoint = getFlag(args, '--endpoint');
-	const client = new FeedbackHttpClient(endpoint);
+	const projectRoot = process.cwd();
+	const paths = projectFeedbackPaths(projectRoot);
+	const projectConfig = endpoint ? null : readFeedbackServerConfig(projectRoot);
+	const resolvedEndpoint = endpoint ?? projectConfig?.baseUrl;
+	const client = new FeedbackHttpClient({
+		...(resolvedEndpoint ? { baseUrl: resolvedEndpoint } : {}),
+		projectRoot
+	});
 
 	try {
 		const [health, status] = await Promise.all([client.health(), client.status()]);
@@ -94,11 +106,12 @@ async function getFeedbackDoctor(args: string[]): Promise<CommandResult> {
 			output: [
 				'DryUI feedback doctor',
 				'',
+				`Project: ${projectRoot}`,
 				`Endpoint: ${client.baseUrl}`,
 				`Health: ${health.status}`,
 				`Active listeners: ${status.activeListeners}`,
 				`Agent listeners: ${status.agentListeners}`,
-				`Store path: ${DEFAULT_STORE_PATH}`
+				`Store path: ${projectConfig?.dbPath ?? paths.dbPath}`
 			].join('\n'),
 			error: null,
 			exitCode: 0
@@ -127,7 +140,7 @@ function feedbackServerHelp(): never {
 		examples: [
 			'  dryui feedback server',
 			'  dryui feedback server --port 5757',
-			'  dryui feedback server --host 0.0.0.0 --db ~/.dryui-feedback/local.db'
+			'  dryui feedback server --project ~/code/my-app --db ./.dryui/feedback/preview.db'
 		]
 	});
 }
@@ -151,7 +164,7 @@ function feedbackUiHelp(): never {
 			examples: [
 				'  dryui feedback ui',
 				'  dryui feedback ui --endpoint http://127.0.0.1:4748 --no-open',
-				'  dryui feedback ui --port 5757 --db ~/.dryui-feedback/preview.db'
+				'  dryui feedback ui --port 5757 --db ./.dryui/feedback/preview.db'
 			]
 		},
 		0
@@ -160,53 +173,43 @@ function feedbackUiHelp(): never {
 
 function resolveServerLaunchArgs(
 	args: string[],
-	client: FeedbackHttpClient
-): { host?: string; port: number; db?: string } {
+	projectRoot: string
+): { host?: string; port: number; db?: string; project: string } {
 	const host = getFlag(args, '--host');
 	const db = getFlag(args, '--db');
 	const explicitPort = getFlag(args, '--port');
+	const fallbackPort = readFeedbackServerConfig(projectRoot)?.port ?? DEFAULT_FEEDBACK_PORT;
 
-	if (explicitPort || host) {
-		return {
-			...(host ? { host } : {}),
-			port: parsePort(explicitPort, DEFAULT_FEEDBACK_PORT),
-			...(db ? { db } : {})
-		};
-	}
-
-	try {
-		const url = new URL(client.baseUrl);
-		return {
-			host: url.hostname,
-			port: parsePort(url.port || undefined, DEFAULT_FEEDBACK_PORT),
-			...(db ? { db } : {})
-		};
-	} catch {
-		return {
-			port: DEFAULT_FEEDBACK_PORT,
-			...(db ? { db } : {})
-		};
-	}
+	return {
+		...(host ? { host } : {}),
+		port: parsePort(explicitPort, fallbackPort),
+		...(db ? { db } : {}),
+		project: projectRoot
+	};
 }
 
-function resolveUiEndpoint(args: string[]): string | undefined {
+function resolveUiEndpoint(args: string[], projectRoot: string): string | undefined {
 	const endpoint = getFlag(args, '--endpoint');
 	if (endpoint) return endpoint;
 
 	const host = getFlag(args, '--host');
 	const port = getFlag(args, '--port');
-	if (!host && !port) return undefined;
+	if (host || port) {
+		return toFeedbackBaseUrl(host ?? DEFAULT_FEEDBACK_HOST, parsePort(port, DEFAULT_FEEDBACK_PORT));
+	}
 
-	return toFeedbackBaseUrl(host ?? DEFAULT_FEEDBACK_HOST, parsePort(port, DEFAULT_FEEDBACK_PORT));
+	const existingConfig = readFeedbackServerConfig(projectRoot);
+	return existingConfig?.baseUrl;
 }
 
-function startFeedbackServerInBackground(args: string[], client: FeedbackHttpClient): void {
-	const launch = resolveServerLaunchArgs(args, client);
+function startFeedbackServerInBackground(args: string[], projectRoot: string): void {
+	const launch = resolveServerLaunchArgs(args, projectRoot);
 	spawnFeedbackServerInBackground({
 		entry: resolveServerEntry(),
 		port: launch.port,
 		...(launch.host ? { host: launch.host } : {}),
-		...(launch.db ? { db: launch.db } : {})
+		...(launch.db ? { db: launch.db } : {}),
+		project: launch.project
 	});
 }
 
@@ -227,15 +230,19 @@ export async function getFeedbackUiResult(
 		return buildResult;
 	}
 
-	const endpoint = resolveUiEndpoint(args);
+	const projectRoot = process.cwd();
+	const endpoint = resolveUiEndpoint(args, projectRoot);
 	const noOpen = hasFlag(args, '--no-open');
-	const client = new FeedbackHttpClient(endpoint);
+	const client = new FeedbackHttpClient({
+		...(endpoint ? { baseUrl: endpoint } : {}),
+		projectRoot
+	});
 
 	let serverMessage: string;
 	try {
 		serverMessage = await ensureUrlReady(
 			`${client.baseUrl}/health`,
-			() => startFeedbackServerInBackground(args, client),
+			() => startFeedbackServerInBackground(args, projectRoot),
 			`Unable to start the feedback server at ${client.baseUrl}.`
 		);
 	} catch (error) {
@@ -250,6 +257,7 @@ export async function getFeedbackUiResult(
 		output: [
 			'DryUI feedback ui',
 			'',
+			`Project: ${projectRoot}`,
 			`Endpoint: ${client.baseUrl}`,
 			`Dashboard: ${uiLaunchUrl}`,
 			`Server: ${serverMessage}`,
@@ -280,11 +288,13 @@ function runFeedbackServer(args: string[]): never {
 		feedbackServerHelp();
 	}
 
+	const projectRoot = getFlag(args, '--project') ?? process.cwd();
+	const existingConfig = readFeedbackServerConfig(projectRoot);
 	const entry = resolveServerEntry();
-	const port = parsePort(getFlag(args, '--port'), DEFAULT_FEEDBACK_PORT);
+	const port = parsePort(getFlag(args, '--port'), existingConfig?.port ?? DEFAULT_FEEDBACK_PORT);
 	const host = getFlag(args, '--host');
 	const db = getFlag(args, '--db');
-	const commandArgs = ['run', entry, '--port', String(port)];
+	const commandArgs = ['run', entry, '--port', String(port), '--project', projectRoot];
 
 	if (host) commandArgs.push('--host', host);
 	if (db) commandArgs.push('--db', db);

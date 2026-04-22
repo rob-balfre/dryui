@@ -1,4 +1,6 @@
-import { rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { EventBus } from '../src/events.ts';
 import { startFeedbackHttpServer } from '../src/http.ts';
@@ -10,10 +12,12 @@ describe('feedback HTTP server', () => {
 	let bus: EventBus;
 	let server: { stop(): void; hostname: string; port: number };
 	let baseUrl: string;
+	let screenshotsDir: string;
 	let screenshotPaths: string[];
 
 	beforeEach(() => {
-		store = new FeedbackStore(':memory:');
+		screenshotsDir = mkdtempSync(join(tmpdir(), 'dryui-feedback-http-'));
+		store = new FeedbackStore({ dbPath: ':memory:', screenshotsDir });
 		bus = new EventBus();
 		server = startFeedbackHttpServer(store, bus, { host: '127.0.0.1', port: 0 });
 		baseUrl = `http://${server.hostname}:${server.port}`;
@@ -26,6 +30,7 @@ describe('feedback HTTP server', () => {
 		}
 		server.stop();
 		store.close();
+		rmSync(screenshotsDir, { recursive: true, force: true });
 	});
 
 	async function createSession(url = 'https://example.com/workspace'): Promise<Session> {

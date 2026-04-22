@@ -4,8 +4,9 @@ import { dirname, resolve } from 'node:path';
 import {
 	DEFAULT_FEEDBACK_HOST,
 	DEFAULT_FEEDBACK_PORT,
-	FeedbackHttpClient,
 	normalizeDevUrl,
+	projectFeedbackPaths,
+	readFeedbackServerConfig,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
 import {
@@ -49,7 +50,7 @@ const DEFAULT_DOCS_PORT = 5173;
 
 interface LauncherRuntime {
 	ensureDocsServer: (workspaceRoot: string, docsBaseUrl: string) => Promise<string>;
-	ensureFeedbackServer: (workspaceRoot: string, client: FeedbackHttpClient) => Promise<string>;
+	ensureFeedbackServer: (workspaceRoot: string) => Promise<EnsureFeedbackServerResult>;
 	ensureFeedbackUiBuilt: (workspaceRoot: string) => CommandResult | null;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
@@ -190,25 +191,70 @@ export function buildDashboardUrl(
 	return dashboardUrl.toString();
 }
 
+interface EnsureFeedbackServerResult {
+	baseUrl: string;
+	message: string;
+}
+
+async function waitForFeedbackServerConfig(
+	projectRoot: string,
+	previousUpdatedAt: string | null,
+	timeoutMs = 10_000
+): Promise<{ baseUrl: string } | null> {
+	const startedAt = Date.now();
+	while (Date.now() - startedAt < timeoutMs) {
+		const config = readFeedbackServerConfig(projectRoot);
+		if (config && config.updatedAt !== previousUpdatedAt && config.baseUrl) {
+			return { baseUrl: config.baseUrl };
+		}
+		await new Promise((resolve) => setTimeout(resolve, 150));
+	}
+	return null;
+}
+
+/**
+ * Ensure a feedback server is running for `projectRoot`. Uses the project's
+ * `.dryui/feedback/server.json` both as the source of truth for where the
+ * server should be reachable and as a signal that the server has finished
+ * binding (server rewrites it on startup once it picks an actual port).
+ */
 async function ensureFeedbackServer(
-	workspaceRoot: string,
-	client: FeedbackHttpClient,
-	options: { preferPackaged?: boolean } = {}
-): Promise<string> {
-	return ensureUrlReady(
-		`${client.baseUrl}/health`,
-		() =>
-			spawnFeedbackServerInBackground({
-				entry: resolveFeedbackServerEntry({
-					workspaceRoot,
-					...(options.preferPackaged ? { preferPackaged: true } : {})
-				}),
-				cwd: workspaceRoot,
-				host: DEFAULT_FEEDBACK_HOST,
-				port: DEFAULT_FEEDBACK_PORT
-			}),
-		`Unable to start the feedback server at ${client.baseUrl}.`
-	);
+	projectRoot: string,
+	options: { workspaceRoot?: string; preferPackaged?: boolean } = {}
+): Promise<EnsureFeedbackServerResult> {
+	const existingConfig = readFeedbackServerConfig(projectRoot);
+	const candidateUrl = existingConfig?.baseUrl
+		? existingConfig.baseUrl
+		: toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
+
+	if (await urlRespondsDefault(`${candidateUrl}/health`)) {
+		return { baseUrl: candidateUrl, message: 'already running' };
+	}
+
+	const requestedPort = existingConfig?.port ?? DEFAULT_FEEDBACK_PORT;
+	const previousUpdatedAt = existingConfig?.updatedAt ?? null;
+
+	spawnFeedbackServerInBackground({
+		entry: resolveFeedbackServerEntry({
+			...(options.workspaceRoot ? { workspaceRoot: options.workspaceRoot } : {}),
+			...(options.preferPackaged ? { preferPackaged: true } : {})
+		}),
+		cwd: projectRoot,
+		host: DEFAULT_FEEDBACK_HOST,
+		port: requestedPort,
+		project: projectRoot
+	});
+
+	const ready = await waitForFeedbackServerConfig(projectRoot, previousUpdatedAt);
+	if (!ready) {
+		throw new Error(
+			`Unable to start the feedback server for ${projectRoot}. Check ${projectFeedbackPaths(projectRoot).configPath}.`
+		);
+	}
+
+	// The server writes server.json after Bun.serve succeeds, so a fresh
+	// updatedAt means the listener is bound — no extra /health probe needed.
+	return { baseUrl: ready.baseUrl, message: 'started in the background' };
 }
 
 function startDocsServerInBackground(workspaceRoot: string): void {
@@ -235,7 +281,7 @@ async function ensureDocsServer(workspaceRoot: string, docsBaseUrl: string): Pro
 
 const defaultRuntime: LauncherRuntime = {
 	ensureDocsServer,
-	ensureFeedbackServer,
+	ensureFeedbackServer: (workspaceRoot) => ensureFeedbackServer(workspaceRoot, { workspaceRoot }),
 	ensureFeedbackUiBuilt: (workspaceRoot) => ensureFeedbackUiBuilt({ workspaceRoot }),
 	now: () => Date.now(),
 	openBrowser,
@@ -258,7 +304,7 @@ export interface FeedbackSetupPlan {
 export interface UserProjectLauncherRuntime {
 	detectProject: (cwd: string) => ProjectDetection;
 	readProjectDevScript: (root: string) => string | null;
-	ensureFeedbackServer: (projectRoot: string, client: FeedbackHttpClient) => Promise<string>;
+	ensureFeedbackServer: (projectRoot: string) => Promise<EnsureFeedbackServerResult>;
 	ensureFeedbackUiBuilt: () => CommandResult | null;
 	urlResponds: (url: string) => Promise<boolean>;
 	findPortHolder: (port: number) => PortHolder | null;
@@ -402,8 +448,8 @@ async function executeUserProjectDevServerPlan(
 
 const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject'> = {
 	readProjectDevScript: readProjectDevScriptDefault,
-	ensureFeedbackServer: (projectRoot, client) =>
-		ensureFeedbackServer(projectRoot, client, { preferPackaged: true }),
+	ensureFeedbackServer: (projectRoot) =>
+		ensureFeedbackServer(projectRoot, { preferPackaged: true }),
 	ensureFeedbackUiBuilt: () => ensureFeedbackUiBuilt({}),
 	urlResponds: urlRespondsDefault,
 	findPortHolder: findPortHolderDefault,
@@ -540,8 +586,6 @@ export async function runUserProjectLauncher(
 		return true;
 	}
 
-	const feedbackBaseUrl = toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
-	const feedbackClient = new FeedbackHttpClient(feedbackBaseUrl);
 	const noOpen = hasFlag(args, '--no-open');
 	const devHost = DEFAULT_PROJECT_DEV_HOST;
 	const devPort = DEFAULT_PROJECT_DEV_PORT;
@@ -553,8 +597,8 @@ export async function runUserProjectLauncher(
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
 
 		const devLogPath = plan.kind === 'spawn' ? projectDevLogPath(detection.root) : null;
-		const [feedbackMessage, devResult] = await Promise.all([
-			runtime.ensureFeedbackServer(detection.root, feedbackClient),
+		const [feedbackResult, devResult] = await Promise.all([
+			runtime.ensureFeedbackServer(detection.root),
 			executeUserProjectDevServerPlan(runtime, plan, {
 				root: detection.root,
 				packageManager,
@@ -566,7 +610,7 @@ export async function runUserProjectLauncher(
 
 		const siteUrl = normalizeDevUrl(devResult.ok ? devResult.url : null);
 		const dashboardUrl = buildDashboardUrl(
-			feedbackClient.baseUrl,
+			feedbackResult.baseUrl,
 			devResult.ok ? devResult.url : null,
 			runtime.now()
 		);
@@ -589,7 +633,7 @@ export async function runUserProjectLauncher(
 							label: 'Project dev',
 							message: `${devResult.message}${devResult.ok ? ` at ${devResult.url}` : ''}`
 						},
-						{ label: 'Feedback', message: feedbackMessage }
+						{ label: 'Feedback', message: `${feedbackResult.message} at ${feedbackResult.baseUrl}` }
 					],
 					noOpen,
 					opened,
@@ -633,20 +677,18 @@ export async function runLauncher(
 		return true;
 	}
 
-	const feedbackBaseUrl = toFeedbackBaseUrl(DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT);
 	const docsBaseUrl = `http://${DEFAULT_DOCS_HOST}:${DEFAULT_DOCS_PORT}`;
-	const feedbackClient = new FeedbackHttpClient(feedbackBaseUrl);
 	const noOpen = hasFlag(args, '--no-open');
 
 	try {
 		runtime.onProgress({ workspaceRoot, noOpen });
 
-		const [feedbackMessage, docsMessage] = await Promise.all([
-			runtime.ensureFeedbackServer(workspaceRoot, feedbackClient),
+		const [feedbackResult, docsMessage] = await Promise.all([
+			runtime.ensureFeedbackServer(workspaceRoot),
 			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
 		]);
 		const siteUrl = normalizeDevUrl(docsBaseUrl);
-		const dashboardUrl = buildDashboardUrl(feedbackClient.baseUrl, docsBaseUrl, runtime.now());
+		const dashboardUrl = buildDashboardUrl(feedbackResult.baseUrl, docsBaseUrl, runtime.now());
 		const opened = noOpen ? false : runtime.openBrowser(siteUrl ?? dashboardUrl);
 
 		emitOrRun(
@@ -658,7 +700,7 @@ export async function runLauncher(
 					dashboardUrl,
 					servers: [
 						{ label: 'Docs', message: docsMessage },
-						{ label: 'Feedback', message: feedbackMessage }
+						{ label: 'Feedback', message: `${feedbackResult.message} at ${feedbackResult.baseUrl}` }
 					],
 					noOpen,
 					opened

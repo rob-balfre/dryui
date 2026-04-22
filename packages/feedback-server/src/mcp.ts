@@ -313,7 +313,12 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 }
 
 export function createFeedbackMcpServer(baseUrl?: string): McpServer {
-	const client = new FeedbackHttpClient(baseUrl);
+	// When no explicit baseUrl is given, the client walks up from cwd to find
+	// the project's .dryui/feedback/server.json, so editors invoking the MCP
+	// pick up the right per-project feedback server automatically.
+	const client = baseUrl
+		? new FeedbackHttpClient(baseUrl)
+		: new FeedbackHttpClient({ cwd: process.cwd() });
 	const server = new McpServer({ name: '@dryui/feedback-server', version: '0.0.1' });
 
 	registerFeedbackTools(server, client);

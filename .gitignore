@@ -27,6 +27,7 @@ Terminal Saved Output*.txt
 .github/skills/
 .opencode/
 opencode.json
+.dryui/
 tmp-*.png
 tests/browser/__screenshots__/
 tmp/

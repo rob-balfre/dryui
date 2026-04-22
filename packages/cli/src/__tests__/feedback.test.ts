@@ -1,3 +1,6 @@
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { EventBus } from '../../../feedback-server/src/events.ts';
 import { startFeedbackHttpServer } from '../../../feedback-server/src/http.ts';
@@ -10,9 +13,11 @@ describe('feedback command', () => {
 	let bus: EventBus;
 	let server: { stop(): void; hostname: string; port: number };
 	let baseUrl: string;
+	let screenshotsDir: string;
 
 	beforeEach(() => {
-		store = new FeedbackStore(':memory:');
+		screenshotsDir = mkdtempSync(join(tmpdir(), 'dryui-cli-feedback-'));
+		store = new FeedbackStore({ dbPath: ':memory:', screenshotsDir });
 		bus = new EventBus();
 		server = startFeedbackHttpServer(store, bus, { host: '127.0.0.1', port: 0 });
 		baseUrl = `http://${server.hostname}:${server.port}`;
@@ -21,6 +26,7 @@ describe('feedback command', () => {
 	afterEach(() => {
 		server.stop();
 		store.close();
+		rmSync(screenshotsDir, { recursive: true, force: true });
 	});
 
 	test('prints subcommand help for feedback ui', async () => {
@@ -42,7 +48,7 @@ describe('feedback command', () => {
 			'Examples:',
 			'  dryui feedback ui',
 			'  dryui feedback ui --endpoint http://127.0.0.1:4748 --no-open',
-			'  dryui feedback ui --port 5757 --db ~/.dryui-feedback/preview.db'
+			'  dryui feedback ui --port 5757 --db ./.dryui/feedback/preview.db'
 		]);
 		expect(result.exitCode).toBe(0);
 	});
@@ -54,7 +60,8 @@ describe('feedback command', () => {
 
 		expect(result.logs).toHaveLength(1);
 		expect(result.logs[0]).toContain('DryUI feedback init');
-		expect(result.logs[0]).toContain('Server URL: http://127.0.0.1:4748');
+		expect(result.logs[0]).toContain('Default server URL: http://127.0.0.1:4748');
+		expect(result.logs[0]).toContain('.dryui/feedback');
 		expect(result.logs[0]).toContain('packages/feedback-server/hooks/check-feedback.sh');
 		expect(result.logs[0]).toContain('dryui feedback doctor');
 		expect(result.errors).toEqual([]);

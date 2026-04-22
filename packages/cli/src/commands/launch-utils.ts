@@ -50,6 +50,7 @@ export interface SpawnFeedbackServerOptions {
 	host?: string;
 	port?: number;
 	db?: string;
+	project?: string;
 }
 
 export function spawnFeedbackServerInBackground(options: SpawnFeedbackServerOptions): void {
@@ -57,6 +58,7 @@ export function spawnFeedbackServerInBackground(options: SpawnFeedbackServerOpti
 	if (options.port !== undefined) args.push('--port', String(options.port));
 	if (options.host) args.push('--host', options.host);
 	if (options.db) args.push('--db', options.db);
+	if (options.project) args.push('--project', options.project);
 
 	const child = spawn('bun', args, {
 		...(options.cwd ? { cwd: options.cwd } : {}),

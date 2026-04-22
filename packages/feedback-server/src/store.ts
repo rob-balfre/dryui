@@ -1,7 +1,7 @@
 import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
-import { DEFAULT_STORE_DIR, DEFAULT_STORE_PATH, SCREENSHOTS_DIR } from './config.js';
+import { dirname, join } from 'node:path';
 import { DISPATCH_AGENTS } from './dispatch.js';
 import type {
 	Annotation,
@@ -98,11 +98,9 @@ interface TableColumnRow {
 	name: string;
 }
 
-function ensureStoreDir(dbPath: string): void {
-	const lastSlash = dbPath.lastIndexOf('/');
-	const dir = lastSlash === -1 ? DEFAULT_STORE_DIR : dbPath.slice(0, lastSlash);
-	if (!existsSync(dir)) {
-		mkdirSync(dir, { recursive: true });
+function ensureDirectory(path: string): void {
+	if (!existsSync(path)) {
+		mkdirSync(path, { recursive: true });
 	}
 }
 
@@ -209,14 +207,21 @@ function createTimestamp(): string {
 	return new Date().toISOString();
 }
 
+export interface FeedbackStoreOptions {
+	dbPath: string;
+	screenshotsDir?: string;
+}
+
 export class FeedbackStore {
 	readonly db: Database;
 	readonly dbPath: string;
+	readonly screenshotsDir: string;
 
-	constructor(dbPath: string = DEFAULT_STORE_PATH) {
-		this.dbPath = dbPath;
-		ensureStoreDir(dbPath);
-		this.db = new Database(dbPath, { create: true });
+	constructor(options: FeedbackStoreOptions) {
+		this.dbPath = options.dbPath;
+		this.screenshotsDir = options.screenshotsDir ?? join(dirname(options.dbPath), 'screenshots');
+		ensureDirectory(dirname(this.dbPath));
+		this.db = new Database(this.dbPath, { create: true });
 		this.db.exec('PRAGMA journal_mode = WAL');
 		this.init();
 	}
@@ -309,9 +314,7 @@ export class FeedbackStore {
 		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
 
-		if (!existsSync(SCREENSHOTS_DIR)) {
-			mkdirSync(SCREENSHOTS_DIR, { recursive: true });
-		}
+		ensureDirectory(this.screenshotsDir);
 	}
 
 	close(): void {
@@ -580,8 +583,8 @@ export class FeedbackStore {
 
 	createSubmission(input: CreateSubmissionInput): Submission {
 		const id = randomUUID();
-		const webpPath = `${SCREENSHOTS_DIR}/${id}.webp`;
-		const pngPath = `${SCREENSHOTS_DIR}/${id}.png`;
+		const webpPath = join(this.screenshotsDir, `${id}.webp`);
+		const pngPath = join(this.screenshotsDir, `${id}.png`);
 		writeFileSync(webpPath, Buffer.from(input.image.webp, 'base64'));
 		writeFileSync(pngPath, Buffer.from(input.image.png, 'base64'));
 
