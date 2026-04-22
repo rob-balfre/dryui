@@ -1,0 +1,31 @@
+{
+	"id": "overlay-navigation",
+	"claim": "Agent chooses the right overlay primitive: Dialog for modal tasks, Popover for transient menus, DropdownMenu for action lists anchored to a trigger.",
+	"prompt": "Build a HeaderBar.svelte with: (a) a 'New project' button that opens a Dialog-based creation form, (b) a user avatar that opens a DropdownMenu with Profile/Settings/Log out, and (c) a 'Help' button that reveals a Popover with shortcuts. No raw <dialog> or custom overlays.",
+	"target_components": ["Dialog", "Popover", "DropdownMenu", "Avatar", "Button"],
+	"allowed_tools": ["ask", "check", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "HeaderBar.svelte builds."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "No lint errors; anchor without href not used."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "Each overlay uses its appropriate DryUI compound.",
+			"params": {
+				"mustInclude": ["Dialog.Root", "Popover.Root", "DropdownMenu.Root"],
+				"mustExclude": ["<dialog", "document.body.appendChild"]
+			}
+		},
+		{
+			"kind": "a11y-pass",
+			"description": "Overlays trap focus, restore focus on close, and expose accessible names."
+		}
+	],
+	"budget": { "max_turns": 8, "max_tokens": 45000, "max_seconds": 300 },
+	"tags": ["overlay", "nav", "composition"]
+}

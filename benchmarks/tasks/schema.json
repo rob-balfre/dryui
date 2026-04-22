@@ -1,0 +1,83 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://dryui.dev/benchmarks/task.schema.json",
+	"title": "DryUI Benchmark Task",
+	"description": "A single benchmark task manifest. Runs exercise DryUI's agent surface end-to-end (prompt, write, check, iterate) and record whether the agent produced working Svelte against the pinned claim.",
+	"type": "object",
+	"required": ["id", "claim", "prompt", "target_components", "acceptance_checks", "budget"],
+	"additionalProperties": false,
+	"properties": {
+		"id": {
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]*$",
+			"description": "Stable slug used as filename, metric key, and artifact directory name."
+		},
+		"claim": {
+			"type": "string",
+			"minLength": 10,
+			"description": "One-sentence description of what the agent should succeed at."
+		},
+		"prompt": {
+			"type": "string",
+			"minLength": 20,
+			"description": "User-facing prompt the agent receives. Kept short on purpose — longer rubrics hide in acceptance_checks."
+		},
+		"target_components": {
+			"type": "array",
+			"minItems": 1,
+			"items": { "type": "string" },
+			"description": "DryUI components the task is expected to touch. Must all exist in spec.json."
+		},
+		"allowed_tools": {
+			"type": "array",
+			"items": {
+				"type": "string",
+				"enum": ["ask", "check", "prompt", "svelte-autofixer", "read", "write", "grep"]
+			},
+			"description": "Tool surface the agent is permitted to use. Defaults to the full DryUI surface."
+		},
+		"acceptance_checks": {
+			"type": "array",
+			"minItems": 1,
+			"items": {
+				"type": "object",
+				"required": ["kind", "description"],
+				"properties": {
+					"kind": {
+						"type": "string",
+						"enum": [
+							"build",
+							"dryui-check-clean",
+							"component-coverage",
+							"a11y-pass",
+							"visual-diff",
+							"token-coverage",
+							"deterministic-prompt",
+							"custom"
+						]
+					},
+					"description": { "type": "string" },
+					"params": { "type": "object" }
+				}
+			}
+		},
+		"budget": {
+			"type": "object",
+			"required": ["max_turns", "max_tokens"],
+			"properties": {
+				"max_turns": { "type": "integer", "minimum": 1, "maximum": 50 },
+				"max_tokens": { "type": "integer", "minimum": 1000, "maximum": 200000 },
+				"max_seconds": { "type": "integer", "minimum": 10, "maximum": 3600 }
+			}
+		},
+		"golden_artifacts": {
+			"type": "array",
+			"items": { "type": "string" },
+			"description": "Paths (relative to reports/benchmarks/artifacts/<id>/) of golden artifacts to diff against — e.g. a minimal working Svelte snapshot or an expected token set."
+		},
+		"tags": {
+			"type": "array",
+			"items": { "type": "string" }
+		}
+	}
+}

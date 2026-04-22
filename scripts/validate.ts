@@ -135,6 +135,13 @@ await parallel(
 console.log('\n── Phase 5: publish-hygiene ──');
 await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --swap');
 
+// ── Phase 6: Benchmark smoke lane ───────────────────────────────────────────
+// No LLM calls — only validates task manifests and runs the deterministic
+// CLI/tool checks. The full live lane runs nightly with DRYUI_BENCHMARK_LIVE=1.
+
+console.log('\n── Phase 6: benchmark smoke ──');
+await run('bench:smoke', 'bun run scripts/benchmark/run.ts --smoke');
+
 // ── Drift guard ─────────────────────────────────────────────────────────────
 // Catch files the pipeline regenerated that aren't committed. Release refuses
 // to run with a dirty worktree, so surfacing drift here (not just on CI) means

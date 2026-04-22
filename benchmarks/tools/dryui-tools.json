@@ -1,0 +1,28 @@
+{
+	"$schema": "https://json-schema.org/draft-07/schema#",
+	"tools": [
+		{
+			"name": "ask",
+			"mcp": "@dryui/mcp",
+			"description": "Discover DryUI components, recipes, tokens, and setup guidance. Takes { query, scope, kind?, cwd? }. Scope is one of component | recipe | list | setup.",
+			"usage": "ask --scope component \"Button\" to fetch a full component reference; ask --scope recipe \"app shell\" for the setup recipe."
+		},
+		{
+			"name": "check",
+			"mcp": "@dryui/mcp",
+			"description": "Validate a .svelte file, a theme .css file, a directory, or the whole workspace. Returns TOON summary + JSON-fenced `dryui-diagnostics` block with hint + docsRef per issue.",
+			"usage": "check path/to/file.svelte after every write. Feed diagnostics[].hint back into the next prompt until diagnostics is empty."
+		},
+		{
+			"name": "prompt",
+			"cli": "@dryui/cli",
+			"description": "Task-specific prompt generation from the agent contract. Deterministic — same input always produces the same output.",
+			"usage": "dryui prompt --component Button for import/usage/anti-patterns; dryui prompt --recipe \"settings form\" for a multi-component plan."
+		},
+		{
+			"name": "svelte-autofixer",
+			"mcp": "@svelte/svelte",
+			"description": "Runs Svelte's own compiler diagnostics + autofix on a file. Use after DryUI's check loop converges, for Svelte-specific syntax that DryUI's lint doesn't cover."
+		}
+	]
+}

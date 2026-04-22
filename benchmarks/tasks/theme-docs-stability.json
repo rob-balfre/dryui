@@ -1,0 +1,26 @@
+{
+	"id": "theme-docs-stability",
+	"claim": "Agent edits theme tokens cleanly: overrides land in the right scope (per-route, body, or *.theme.css), not at :root inside app.css.",
+	"prompt": "A stakeholder wants the marketing route (/marketing/*) to use a warmer brand palette without changing the app-wide theme. Implement the override using the pattern ask --scope recipe \"customize-tokens\" recommends. Do not put overrides at :root in app.css.",
+	"target_components": [],
+	"allowed_tools": ["ask", "check", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "Docs/app still build."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "No `partial-override` or `wrong-type` theme-checker findings."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "Override is scoped per-route (or in a *.theme.css file), not at :root.",
+			"params": {
+				"mustExclude": [":root {", "app.css"]
+			}
+		}
+	],
+	"budget": { "max_turns": 6, "max_tokens": 30000, "max_seconds": 240 },
+	"tags": ["theme", "tokens"]
+}

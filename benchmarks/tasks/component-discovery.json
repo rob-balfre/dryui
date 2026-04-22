@@ -1,0 +1,21 @@
+{
+	"id": "component-discovery",
+	"claim": "Agent finds the correct DryUI component for a concrete UI need via `ask`, without guessing generic HTML.",
+	"prompt": "I need a collapsible FAQ section with at most one item open at a time. Which DryUI component should I use, and what's the minimal compound structure?",
+	"target_components": ["Accordion"],
+	"allowed_tools": ["ask"],
+	"acceptance_checks": [
+		{
+			"kind": "component-coverage",
+			"description": "Response identifies Accordion (not Collapsible, not <details>).",
+			"params": { "mustInclude": ["Accordion.Root", "Accordion.Trigger"] }
+		},
+		{
+			"kind": "deterministic-prompt",
+			"description": "`dryui prompt --component Accordion` returns identical output across two calls.",
+			"params": { "component": "Accordion" }
+		}
+	],
+	"budget": { "max_turns": 3, "max_tokens": 8000, "max_seconds": 60 },
+	"tags": ["smoke", "ask", "discovery"]
+}

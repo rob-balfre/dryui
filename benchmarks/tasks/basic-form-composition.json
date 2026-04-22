@@ -1,0 +1,28 @@
+{
+	"id": "basic-form-composition",
+	"claim": "Agent composes a labelled, validated settings form using Field.Root + Label + Input + Button.",
+	"prompt": "Build a single-file Settings.svelte with three fields: display name (required), email (required, email type), and a notifications toggle. Show inline validation errors on submit, and a Save button. Use DryUI's Field compound and Toggle. No raw <input> or <label>.",
+	"target_components": ["Field", "Label", "Input", "Toggle", "Button"],
+	"allowed_tools": ["ask", "check", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "Settings.svelte type-checks and builds."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "`dryui check Settings.svelte` reports zero errors and zero warnings."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "Field.Root wraps every labelled control; Button is used for Save.",
+			"params": { "mustInclude": ["Field.Root", "Label", "Button"] }
+		},
+		{
+			"kind": "a11y-pass",
+			"description": "Form controls have associated labels and visible focus rings."
+		}
+	],
+	"budget": { "max_turns": 6, "max_tokens": 30000, "max_seconds": 240 },
+	"tags": ["form", "field", "composition"]
+}

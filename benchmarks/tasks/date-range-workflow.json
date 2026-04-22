@@ -1,0 +1,24 @@
+{
+	"id": "date-range-workflow",
+	"claim": "Agent drives a date-range picker end-to-end, binding values and formatting output without reaching for a third-party calendar.",
+	"prompt": "Build a BookingRange.svelte that lets the user pick check-in and check-out dates using DryUI's DateRangePicker. Disable past dates. Show the duration in nights below the picker. Use bindable props, not manual state plumbing.",
+	"target_components": ["DateRangePicker", "Text"],
+	"allowed_tools": ["ask", "check", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "BookingRange.svelte builds."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "No errors; uses `bind:value` not manual plumbing."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "DateRangePicker compound is used, not hand-rolled Calendar.",
+			"params": { "mustInclude": ["DateRangePicker.Root"], "mustExclude": ["new Date(", "Date.now()"] }
+		}
+	],
+	"budget": { "max_turns": 6, "max_tokens": 30000, "max_seconds": 240 },
+	"tags": ["date", "bindable"]
+}

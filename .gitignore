@@ -57,3 +57,7 @@ packages/*/src/**/*.svelte.d.ts
 packages/*/src/**/index.d.ts
 packages/*/src/**/*.d.ts
 !packages/ui/src/tour/tour-root.css.d.ts
+
+# Benchmark run artifacts (large, per-run, regenerable)
+reports/benchmarks/artifacts/
+!reports/benchmarks/artifacts/.gitkeep

@@ -1,0 +1,83 @@
+{
+  "mode": "smoke",
+  "format": "prompt-only",
+  "startedAt": "2026-04-22T22:46:29.621Z",
+  "finishedAt": "2026-04-22T22:46:29.752Z",
+  "taskCount": 9,
+  "outcomes": [
+    {
+      "task": "basic-form-composition",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 5 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "cli-init-smoke",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 1 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "component-discovery",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 1 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "component-discovery",
+      "kind": "deterministic-prompt",
+      "ok": true,
+      "detail": "two calls produced byte-identical output (1391 chars)",
+      "durationMs": 128
+    },
+    {
+      "task": "data-display-dashboard",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 5 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "date-range-workflow",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 2 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "feedback-loop",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 1 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "overlay-navigation",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 5 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "selection-workflows",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 4 target components exist in spec.json",
+      "durationMs": 0
+    },
+    {
+      "task": "theme-docs-stability",
+      "kind": "target_components",
+      "ok": true,
+      "detail": "all 0 target components exist in spec.json",
+      "durationMs": 0
+    }
+  ],
+  "summary": {
+    "pass": 10,
+    "fail": 0
+  }
+}

@@ -1,0 +1,27 @@
+{
+	"id": "feedback-loop",
+	"claim": "Agent drives the self-correction loop: write Svelte, run `check`, parse the `dryui-diagnostics` JSON block, apply the hint, re-check, converge with zero errors.",
+	"prompt": "Starting from an intentionally bad component (raw <button>, inline style, @media sizing), drive DryUI's check tool until diagnostics is empty. Use only the hints returned by check, not external docs.",
+	"target_components": ["Button"],
+	"allowed_tools": ["check", "svelte-autofixer", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "dryui-check-clean",
+			"description": "Final `check` output has empty diagnostics array."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "Final file uses <Button> (not <button>) and container queries (not @media).",
+			"params": {
+				"mustInclude": ["<Button", "@container"],
+				"mustExclude": ["<button", "@media"]
+			}
+		},
+		{
+			"kind": "custom",
+			"description": "Repair loop took fewer than 5 iterations."
+		}
+	],
+	"budget": { "max_turns": 10, "max_tokens": 40000, "max_seconds": 300 },
+	"tags": ["repair-loop", "check"]
+}

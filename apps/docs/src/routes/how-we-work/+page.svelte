@@ -787,7 +787,7 @@
 				<Card.Root>
 					<Card.Content>
 						<div class="diagram-shell">
-							<Diagram config={mod.diagram} />
+							<Diagram config={mod.diagram} fit="native" />
 						</div>
 					</Card.Content>
 				</Card.Root>
@@ -810,8 +810,7 @@
 
 	.diagram-shell {
 		display: grid;
-		grid-template-columns: minmax(0, 520px);
 		justify-content: center;
-		overflow: auto;
+		overflow-x: auto;
 	}
 </style>

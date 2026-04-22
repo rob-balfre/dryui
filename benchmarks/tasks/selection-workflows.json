@@ -1,0 +1,24 @@
+{
+	"id": "selection-workflows",
+	"claim": "Agent picks the right selection primitive for the task: RadioGroup for mutually-exclusive small sets, Combobox for large typeable sets, MultiSelectCombobox for multi-select.",
+	"prompt": "Build an Invoice.svelte that lets the user (1) pick a currency from a list of 180+ ISO codes, (2) pick an invoice state from Draft/Sent/Paid/Void, and (3) attach zero or more tags from a typeable list. No raw <select> or manual <datalist>.",
+	"target_components": ["Combobox", "RadioGroup", "MultiSelectCombobox", "Field"],
+	"allowed_tools": ["ask", "check", "read", "write"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "Invoice.svelte type-checks and builds."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "`dryui check Invoice.svelte` reports zero errors."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "Uses Combobox for currency, RadioGroup (or SegmentedControl) for state, MultiSelectCombobox for tags.",
+			"params": { "mustInclude": ["Combobox.Root", "MultiSelectCombobox.Root"], "mustExclude": ["<select", "<datalist"] }
+		}
+	],
+	"budget": { "max_turns": 8, "max_tokens": 40000, "max_seconds": 300 },
+	"tags": ["form", "selection"]
+}

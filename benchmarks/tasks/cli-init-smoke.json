@@ -1,0 +1,28 @@
+{
+	"id": "cli-init-smoke",
+	"claim": "`dryui init` produces a buildable SvelteKit project wired to @dryui/ui themes and app-shell recipe.",
+	"prompt": "Run `bunx -y @dryui/cli init .` against an empty directory. Then ensure the resulting app builds and the default app-shell renders.",
+	"target_components": ["Container"],
+	"allowed_tools": ["read", "write", "grep"],
+	"acceptance_checks": [
+		{
+			"kind": "build",
+			"description": "`bun run build` exits 0 after init."
+		},
+		{
+			"kind": "dryui-check-clean",
+			"description": "`dryui check` reports zero errors on the scaffolded project."
+		},
+		{
+			"kind": "component-coverage",
+			"description": "The scaffold imports at least one DryUI component from @dryui/ui.",
+			"params": { "minComponents": 1 }
+		},
+		{
+			"kind": "token-coverage",
+			"description": "The generated theme CSS declares every required --dry-* token family."
+		}
+	],
+	"budget": { "max_turns": 4, "max_tokens": 20000, "max_seconds": 180 },
+	"tags": ["smoke", "cli", "setup"]
+}
