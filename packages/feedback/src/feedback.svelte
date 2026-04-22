@@ -5,15 +5,12 @@
 	import { Check } from 'lucide-svelte';
 	import { onMount } from 'svelte';
 	import {
-		AGENTS,
-		type DispatchTargetsResponse,
 		type Arrow,
 		type Drawing,
 		type DrawingSpace,
 		type FeedbackProps,
 		type Point,
 		type Stroke,
-		type SubmissionAgent,
 		type SubmitStatus,
 		type Tool
 	} from './types.js';
@@ -24,6 +21,8 @@
 	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
 	const STROKE_OUTLINE_WIDTH = 4;
 	const TEXT_OUTLINE_RATIO = 0.22;
+	const ACTIVATION_QUERY_PARAM = 'dryui-feedback';
+	const DASHBOARD_TAB_NAME = 'dryui-feedback-list';
 
 	let {
 		color = ANNOTATION_FILL,
@@ -34,57 +33,8 @@
 		class: className
 	}: FeedbackProps = $props();
 
-	const AGENT_STORAGE_KEY = 'dryui-feedback-agent';
-	const DEFAULT_CONFIGURED_AGENTS = AGENTS.filter(
-		(entry): entry is Exclude<SubmissionAgent, 'off'> => entry !== 'off'
-	);
-
-	function readStoredAgent(): SubmissionAgent {
-		if (typeof localStorage === 'undefined') return 'codex';
-		const raw = localStorage.getItem(AGENT_STORAGE_KEY);
-		return AGENTS.includes(raw as SubmissionAgent) ? (raw as SubmissionAgent) : 'codex';
-	}
-
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
-	let agent = $state<SubmissionAgent>(readStoredAgent());
-	let configuredAgents = $state<Array<Exclude<SubmissionAgent, 'off'>>>([
-		...DEFAULT_CONFIGURED_AGENTS
-	]);
-
-	function setAgent(next: SubmissionAgent) {
-		agent = next;
-		if (typeof localStorage !== 'undefined') {
-			localStorage.setItem(AGENT_STORAGE_KEY, next);
-		}
-	}
-
-	function configuredAgentList(
-		payload: DispatchTargetsResponse
-	): Array<Exclude<SubmissionAgent, 'off'>> {
-		const configured = payload.configuredAgents.filter((entry) =>
-			DEFAULT_CONFIGURED_AGENTS.includes(entry)
-		);
-		return configured.length > 0 ? configured : [...DEFAULT_CONFIGURED_AGENTS];
-	}
-
-	async function loadDispatchTargets(): Promise<void> {
-		if (!serverUrl) return;
-
-		try {
-			const response = await fetch(`${serverUrl}/dispatch-targets`);
-			if (!response.ok) return;
-
-			const payload = (await response.json()) as DispatchTargetsResponse;
-			configuredAgents = configuredAgentList(payload);
-
-			if (agent !== 'off' && !configuredAgents.includes(agent as Exclude<SubmissionAgent, 'off'>)) {
-				setAgent(payload.defaultAgent);
-			}
-		} catch {
-			// Keep the full supported list when the server does not expose launch metadata.
-		}
-	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
@@ -775,6 +725,25 @@
 		}
 	}
 
+	async function readSubmissionId(response: Response): Promise<string | null> {
+		try {
+			const data = await response.json();
+			if (typeof data === 'object' && data && 'id' in data && typeof data.id === 'string') {
+				return data.id;
+			}
+		} catch {
+			// Server didn't return JSON; opening the dashboard without focus is still useful.
+		}
+		return null;
+	}
+
+	function openDashboardTab(submissionId: string | null): void {
+		if (!serverUrl || typeof window === 'undefined') return;
+		const target = new URL('/ui/', serverUrl);
+		if (submissionId) target.searchParams.set('focus', submissionId);
+		window.open(target.toString(), DASHBOARD_TAB_NAME);
+	}
+
 	async function readSubmissionError(response: Response): Promise<string> {
 		try {
 			const data = await response.json();
@@ -833,8 +802,7 @@
 					drawings,
 					hints,
 					viewport,
-					scroll,
-					agent
+					scroll
 				})
 			});
 
@@ -842,12 +810,15 @@
 				throw new Error(await readSubmissionError(response));
 			}
 
+			const submissionId = await readSubmissionId(response);
+			openDashboardTab(submissionId);
+
 			submitStatus = 'idle';
 			sent = true;
 			showToast(
 				'success',
 				'Feedback sent',
-				'Your annotation and screenshot were queued for review.',
+				'Pick which agent to launch in the dashboard tab.',
 				SUCCESS_TOAST_DURATION_MS
 			);
 			setTimeout(() => {
@@ -1014,8 +985,17 @@
 		};
 	});
 
+	function shouldAutoActivate(): boolean {
+		if (typeof window === 'undefined') return false;
+		try {
+			return new URL(window.location.href).searchParams.get(ACTIVATION_QUERY_PARAM) === '1';
+		} catch {
+			return false;
+		}
+	}
+
 	onMount(() => {
-		void loadDispatchTargets();
+		if (shouldAutoActivate() && !active) active = true;
 	});
 </script>
 
@@ -1225,11 +1205,8 @@
 			hidden={toolbarHiddenForCapture}
 			{submitStatus}
 			{sent}
-			{agent}
-			availableAgents={configuredAgents}
 			ontoggle={toggle}
 			ontoolchange={setTool}
-			onagentchange={setAgent}
 			onsubmit={handleSubmit}
 		/>
 	</div>

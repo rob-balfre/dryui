@@ -1,9 +1,6 @@
 <script lang="ts">
-	import { DropdownMenu } from '@dryui/ui';
-	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send, PowerOff } from 'lucide-svelte';
-	import { AGENTS, type SubmissionAgent, type SubmitStatus, type Tool } from '../types.js';
-	import AgentIcon from './agent-icon.svelte';
-	import { AGENT_META } from './agent-meta.js';
+	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
+	import { type SubmitStatus, type Tool } from '../types.js';
 
 	interface Props {
 		active: boolean;
@@ -12,11 +9,8 @@
 		hidden: boolean;
 		submitStatus: SubmitStatus;
 		sent: boolean;
-		agent: SubmissionAgent;
-		availableAgents: Array<Exclude<SubmissionAgent, 'off'>>;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
-		onagentchange: (agent: SubmissionAgent) => void;
 		onsubmit: () => void;
 	}
 
@@ -27,11 +21,8 @@
 		hidden,
 		submitStatus,
 		sent,
-		agent,
-		availableAgents,
 		ontoggle,
 		ontoolchange,
-		onagentchange,
 		onsubmit
 	}: Props = $props();
 
@@ -45,19 +36,6 @@
 		uploading: { label: 'Sending...', aria: 'Sending feedback' }
 	};
 	const SENT_COPY = { label: 'Sent!', aria: 'Sent!' } as const;
-
-	let agentMenuOpen = $state(false);
-	const FALLBACK_AGENTS = AGENTS.filter(
-		(entry): entry is Exclude<SubmissionAgent, 'off'> => entry !== 'off'
-	);
-
-	const chooserAgents = $derived<SubmissionAgent[]>([
-		...(availableAgents.length > 0 ? availableAgents : FALLBACK_AGENTS),
-		'off'
-	]);
-	const menuLabel = $derived(
-		availableAgents.length > 0 ? 'Configured dispatch targets' : 'Dispatch target'
-	);
 
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
@@ -104,10 +82,6 @@
 		} else {
 			ontoggle();
 		}
-	}
-
-	function chooseAgent(next: SubmissionAgent) {
-		onagentchange(next);
 	}
 </script>
 
@@ -170,55 +144,6 @@
 			<Eraser size={18} />
 		</button>
 	{/if}
-
-	<div class="dispatch-menu-wrap">
-		<DropdownMenu.Root bind:open={agentMenuOpen}>
-			<DropdownMenu.Trigger>
-				<button
-					class="tool-btn agent-btn"
-					data-agent={agent}
-					title={`Dispatch to ${AGENT_META[agent].label} on submit. Click to change.`}
-					aria-label={`Dispatch target: ${AGENT_META[agent].label}. Click to change.`}
-				>
-					{#if agent === 'off'}
-						<PowerOff size={16} />
-					{:else}
-						<AgentIcon {agent} size={16} />
-					{/if}
-					<span class="agent-label">{AGENT_META[agent].shortLabel}</span>
-				</button>
-			</DropdownMenu.Trigger>
-
-			<DropdownMenu.Content placement="top-end" offset={10}>
-				<DropdownMenu.Label>{menuLabel}</DropdownMenu.Label>
-				{#each chooserAgents as choice (choice)}
-					<DropdownMenu.Item
-						data-agent={choice}
-						data-mode={AGENT_META[choice].mode}
-						data-active={choice === agent || undefined}
-						onclick={() => chooseAgent(choice)}
-					>
-						<span class="agent-menu-icon" data-agent={choice}>
-							{#if choice === 'off'}
-								<PowerOff size={18} aria-hidden="true" />
-							{:else}
-								<AgentIcon agent={choice} size={18} />
-							{/if}
-						</span>
-						<span class="agent-menu-text">
-							<span class="agent-menu-label">{AGENT_META[choice].label}</span>
-							<span class="agent-menu-description">{AGENT_META[choice].description}</span>
-						</span>
-						<span class="agent-menu-check" data-mode={AGENT_META[choice].mode} aria-hidden="true">
-							{#if choice === agent}
-								<Check size={14} />
-							{/if}
-						</span>
-					</DropdownMenu.Item>
-				{/each}
-			</DropdownMenu.Content>
-		</DropdownMenu.Root>
-	</div>
 
 	{#if showSubmitButton}
 		<button
@@ -324,8 +249,7 @@
 		color: hsl(145 70% 70%);
 	}
 
-	.submit-label,
-	.agent-label {
+	.submit-label {
 		font-size: 12px;
 		font-weight: 600;
 		font-family:
@@ -333,160 +257,5 @@
 			-apple-system,
 			sans-serif;
 		white-space: nowrap;
-	}
-
-	.agent-btn {
-		grid-template-columns: auto auto;
-		gap: 4px;
-		padding-inline-end: 10px;
-		color: var(--agent-fg);
-	}
-
-	.agent-btn:hover {
-		background: var(--agent-bg-hover);
-		color: var(--agent-fg-hover);
-	}
-
-	.agent-btn[data-agent='codex'] {
-		--agent-fg: hsl(200 75% 62%);
-		--agent-bg-hover: hsl(200 45% 22%);
-		--agent-fg-hover: hsl(200 85% 74%);
-	}
-
-	.agent-btn[data-agent='claude'] {
-		--agent-fg: hsl(25 100% 65%);
-		--agent-bg-hover: hsl(25 45% 22%);
-		--agent-fg-hover: hsl(25 100% 75%);
-	}
-
-	.agent-btn[data-agent='gemini'] {
-		--agent-fg: hsl(265 75% 68%);
-		--agent-bg-hover: hsl(265 35% 22%);
-		--agent-fg-hover: hsl(265 85% 78%);
-	}
-
-	.agent-btn[data-agent='opencode'] {
-		--agent-fg: hsl(0 0% 72%);
-		--agent-bg-hover: hsl(220 12% 22%);
-		--agent-fg-hover: hsl(0 0% 92%);
-	}
-
-	.agent-btn[data-agent='copilot'] {
-		--agent-fg: hsl(150 55% 62%);
-		--agent-bg-hover: hsl(150 30% 22%);
-		--agent-fg-hover: hsl(150 60% 74%);
-	}
-
-	.agent-btn[data-agent='copilot-vscode'] {
-		--agent-fg: hsl(210 86% 70%);
-		--agent-bg-hover: hsl(210 40% 22%);
-		--agent-fg-hover: hsl(210 92% 82%);
-	}
-
-	.agent-btn[data-agent='cursor'] {
-		--agent-fg: hsl(208 84% 70%);
-		--agent-bg-hover: hsl(208 45% 22%);
-		--agent-fg-hover: hsl(208 92% 82%);
-	}
-
-	.agent-btn[data-agent='windsurf'] {
-		--agent-fg: hsl(177 69% 71%);
-		--agent-bg-hover: hsl(177 36% 21%);
-		--agent-fg-hover: hsl(177 80% 83%);
-	}
-
-	.agent-btn[data-agent='zed'] {
-		--agent-fg: hsl(0 0% 92%);
-		--agent-bg-hover: hsl(220 12% 22%);
-		--agent-fg-hover: hsl(0 0% 100%);
-	}
-
-	.agent-btn[data-agent='off'] {
-		--agent-fg: hsl(220 10% 55%);
-		--agent-bg-hover: hsl(220 12% 22%);
-		--agent-fg-hover: hsl(220 10% 75%);
-	}
-
-	.dispatch-menu-wrap {
-		display: contents;
-
-		--dry-menu-bg: hsl(225 15% 15% / 0.98);
-		--dry-menu-border: 1px solid hsl(220 13% 24%);
-		--dry-menu-shadow: 0 8px 32px hsl(0 0% 0% / 0.5);
-		--dry-color-text-strong: hsl(220 12% 92%);
-		--dry-color-fill: hsl(225 14% 22%);
-		--dry-menu-item-padding: 10px 12px;
-		--dry-menu-item-radius: 8px;
-	}
-
-	.agent-menu-icon {
-		display: inline-grid;
-		place-items: center;
-		color: hsl(220 10% 70%);
-	}
-
-	.agent-menu-icon[data-agent='claude'] {
-		color: hsl(25 100% 65%);
-	}
-	.agent-menu-icon[data-agent='codex'] {
-		color: hsl(200 75% 62%);
-	}
-	.agent-menu-icon[data-agent='gemini'] {
-		color: hsl(265 75% 68%);
-	}
-	.agent-menu-icon[data-agent='opencode'] {
-		color: hsl(0 0% 88%);
-	}
-	.agent-menu-icon[data-agent='copilot'] {
-		color: hsl(150 55% 62%);
-	}
-	.agent-menu-icon[data-agent='copilot-vscode'] {
-		color: hsl(210 86% 70%);
-	}
-	.agent-menu-icon[data-agent='cursor'] {
-		color: hsl(208 84% 70%);
-	}
-	.agent-menu-icon[data-agent='windsurf'] {
-		color: hsl(177 69% 71%);
-	}
-	.agent-menu-icon[data-agent='zed'] {
-		color: hsl(0 0% 92%);
-	}
-	.agent-menu-icon[data-agent='off'] {
-		color: hsl(220 10% 55%);
-	}
-
-	.agent-menu-text {
-		display: grid;
-		gap: 2px;
-	}
-
-	.agent-menu-label {
-		font-size: 13px;
-		font-weight: 600;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-	}
-
-	.agent-menu-description {
-		font-size: 11px;
-		line-height: 1.35;
-		color: hsl(220 10% 66%);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-	}
-
-	.agent-menu-check {
-		display: inline-grid;
-		place-items: center;
-		color: hsl(25 100% 65%);
-	}
-
-	.agent-menu-check[data-mode='off'] {
-		color: hsl(220 10% 70%);
 	}
 </style>

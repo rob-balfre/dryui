@@ -40,10 +40,32 @@
 	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
 
 	const AGENT_STORAGE_KEY = 'dryui-feedback-target-agent';
+	const FOCUS_QUERY_PARAM = 'focus';
 
 	interface SubmissionResponse {
 		count: number;
 		submissions: Submission[];
+	}
+
+	function readFocusId(): string | null {
+		if (typeof window === 'undefined') return null;
+		try {
+			return new URL(window.location.href).searchParams.get(FOCUS_QUERY_PARAM);
+		} catch {
+			return null;
+		}
+	}
+
+	function clearFocusQueryParam(): void {
+		if (typeof window === 'undefined') return;
+		try {
+			const current = new URL(window.location.href);
+			if (!current.searchParams.has(FOCUS_QUERY_PARAM)) return;
+			current.searchParams.delete(FOCUS_QUERY_PARAM);
+			window.history.replaceState(window.history.state, '', current.toString());
+		} catch {
+			// Navigation state is not critical; swallow replace failures.
+		}
 	}
 
 	interface DrawingCount {
@@ -67,6 +89,7 @@
 	let launched = $state(false);
 	let launchError = $state('');
 	let launchFeedbackTimer: ReturnType<typeof setTimeout> | undefined;
+	let focusApplied = false;
 
 	function copyPrompt(text: string): void {
 		navigator.clipboard.writeText(text).then(() => {
@@ -281,12 +304,25 @@
 			const response = await readSubmissions();
 			submissions = response.submissions;
 			lastLoadedAt = new Date().toISOString();
+			applyFocusSelection();
 		} catch (errorValue) {
 			error = extractMessage(errorValue);
 		} finally {
 			loading = false;
 			refreshing = false;
 		}
+	}
+
+	function applyFocusSelection(): void {
+		if (focusApplied) return;
+		focusApplied = true;
+		const focusId = readFocusId();
+		if (!focusId) return;
+		const match = submissions.find((submission) => submission.id === focusId);
+		if (!match) return;
+		activeTab = match.status;
+		selectedId = match.id;
+		clearFocusQueryParam();
 	}
 
 	async function setSubmissionStatus(
