@@ -1,5 +1,11 @@
 # @dryui/feedback
 
+## 0.4.6
+
+### Patch Changes
+
+- [`b6213cb`](https://github.com/rob-balfre/dryui/commit/b6213cb21b57b863d2ae5710a57826ad7a971baa) Thanks [@rob-balfre](https://github.com/rob-balfre)! - `dryui` now opens the dev site with `?dryui-feedback=1` so the Feedback component starts in annotation mode, and submitting feedback opens the dashboard in a named tab focused on the new submission (`?focus=<id>`). The inline agent picker in the toolbar has been removed; pick which agent to launch per submission from the dashboard instead. `@dryui/feedback-server` now re-exports `normalizeDevUrl`.
+
 ## 0.4.5
 
 ### Patch Changes
