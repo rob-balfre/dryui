@@ -22,9 +22,6 @@ const packageJson = await parsePackageJson(new URL('../../package.json', import.
 const validateWorkflow = await Bun.file(
 	new URL('../../.github/workflows/validate.yml', import.meta.url)
 ).text();
-const docsVisualWorkflow = await Bun.file(
-	new URL('../../.github/workflows/docs-visual.yml', import.meta.url)
-).text();
 const docsVisualConfig = await Bun.file(
 	new URL('../../playwright.docs.config.ts', import.meta.url)
 ).text();
@@ -118,7 +115,7 @@ test('CI workflow runs a dedicated coverage lane and uploads retained artifacts'
 	expect(validateWorkflow).toContain('retention-days: 14');
 });
 
-test('docs visual coverage runs in its own slower workflow', () => {
+test('docs visual suite stays runnable locally', () => {
 	expect(packageJson.scripts['test:docs-visual']).toBe(
 		'bun --bun playwright test -c playwright.docs.config.ts'
 	);
@@ -131,11 +128,4 @@ test('docs visual coverage runs in its own slower workflow', () => {
 	expect(docsVisualSpec).not.toContain("mode: 'serial'");
 	expect(docsVisualConfig).toContain("browserName: 'chromium'");
 	expect(docsVisualConfig).toContain('headless: true');
-	expect(docsVisualWorkflow).toContain('name: Docs Visual');
-	expect(docsVisualWorkflow).toContain('workflow_dispatch:');
-	expect(docsVisualWorkflow).toContain('schedule:');
-	expect(docsVisualWorkflow).toContain('- run: bun --bun playwright install chromium');
-	expect(docsVisualWorkflow).toContain('- run: bun run test:docs-visual');
-	expect(docsVisualWorkflow).not.toContain('pull_request:');
-	expect(docsVisualWorkflow).toContain('name: docs-visual-${{ github.sha }}');
 });
