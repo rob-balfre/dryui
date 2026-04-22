@@ -37,25 +37,6 @@ export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
 export type SubmitStatus = 'idle' | 'waiting-for-capture' | 'capturing' | 'uploading';
 
-export const AGENTS = [
-	'claude',
-	'codex',
-	'gemini',
-	'opencode',
-	'copilot',
-	'copilot-vscode',
-	'cursor',
-	'windsurf',
-	'zed',
-	'off'
-] as const;
-export type SubmissionAgent = (typeof AGENTS)[number];
-
-export interface DispatchTargetsResponse {
-	defaultAgent: Exclude<SubmissionAgent, 'off'>;
-	configuredAgents: Array<Exclude<SubmissionAgent, 'off'>>;
-}
-
 export interface FeedbackProps {
 	color?: string;
 	strokeWidth?: number;

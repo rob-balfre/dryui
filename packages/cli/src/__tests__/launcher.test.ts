@@ -54,7 +54,7 @@ describe('runLauncher', () => {
 		expect(launched).toBe(false);
 	});
 
-	test('prints the dashboard url without opening a browser when --no-open is set', async () => {
+	test('prints the site and dashboard urls without opening a browser when --no-open is set', async () => {
 		const root = createTempTree({
 			'apps/docs/package.json': '{"name":"@dryui/docs"}',
 			'packages/cli/package.json': '{"name":"@dryui/cli"}',
@@ -77,8 +77,9 @@ describe('runLauncher', () => {
 		);
 
 		expect(result.logs).toHaveLength(1);
-		expect(result.logs[0]).toContain('DryUI feedback dashboard');
+		expect(result.logs[0]).toContain('DryUI feedback');
 		expect(result.logs[0]).toContain(`Workspace: ${root}`);
+		expect(result.logs[0]).toContain('Site: http://127.0.0.1:5173/?dryui-feedback=1');
 		expect(result.logs[0]).toContain(
 			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
 		);
@@ -86,6 +87,33 @@ describe('runLauncher', () => {
 		expect(result.logs[0]).toContain('Feedback: already running');
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(result.exitCode).toBe(0);
+	});
+
+	test('opens the site url (not the dashboard) when --no-open is absent', async () => {
+		const root = createTempTree({
+			'apps/docs/package.json': '{"name":"@dryui/docs"}',
+			'packages/cli/package.json': '{"name":"@dryui/cli"}',
+			'packages/feedback-server/package.json': '{"name":"@dryui/feedback-server"}'
+		});
+
+		let openedUrl: string | null = null;
+		await captureAsyncCommandIO(() =>
+			runLauncher([], {
+				cwd: root,
+				runtime: {
+					ensureFeedbackUiBuilt: () => null,
+					ensureFeedbackServer: async () => 'already running',
+					ensureDocsServer: async () => 'already running',
+					now: () => 42,
+					openBrowser: (url) => {
+						openedUrl = url;
+						return true;
+					}
+				}
+			})
+		);
+
+		expect(openedUrl).toBe('http://127.0.0.1:5173/?dryui-feedback=1');
 	});
 
 	test('reports progress before waiting for startup checks', async () => {

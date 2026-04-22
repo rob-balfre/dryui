@@ -5,6 +5,7 @@ import {
 	DEFAULT_FEEDBACK_HOST,
 	DEFAULT_FEEDBACK_PORT,
 	FeedbackHttpClient,
+	normalizeDevUrl,
 	toFeedbackBaseUrl
 } from '@dryui/feedback-server';
 import {
@@ -66,10 +67,11 @@ function launcherHelp(): never {
 		{
 			usage: 'dryui [--no-open]',
 			description: [
-				'Open the feedback dashboard for this repository.',
-				'The CLI starts the docs app and feedback server in the background when they are not already running.'
+				'Open the app in feedback mode for this repository.',
+				'The CLI starts the docs app and feedback server in the background when they are not already running.',
+				'Submitting feedback opens the dashboard in a new tab so you can pick which agent to launch per submission.'
 			],
-			options: ['  --no-open         Print the dashboard URL without opening a browser'],
+			options: ['  --no-open         Print the site and dashboard URLs without opening a browser'],
 			examples: ['  dryui', '  dryui --no-open']
 		},
 		0
@@ -109,6 +111,7 @@ interface LabelledMessage {
 interface DashboardOutputSections {
 	rootLabel: string;
 	rootValue: string;
+	siteUrl: string | null;
 	dashboardUrl: string;
 	servers: LabelledMessage[];
 	noOpen: boolean;
@@ -121,12 +124,13 @@ function renderDashboardOutput(sections: DashboardOutputSections): string {
 		? 'skipped (--no-open)'
 		: sections.opened
 			? 'opening default browser'
-			: 'could not auto-open; use the dashboard URL above';
+			: 'could not auto-open; use the site URL above';
 
 	return [
-		'DryUI feedback dashboard',
+		'DryUI feedback',
 		'',
 		`${sections.rootLabel}: ${sections.rootValue}`,
+		...(sections.siteUrl ? [`Site: ${sections.siteUrl}`] : []),
 		`Dashboard: ${sections.dashboardUrl}`,
 		...sections.servers.map(({ label, message }) => `${label}: ${message}`),
 		`Browser: ${browser}`,
@@ -560,12 +564,14 @@ export async function runUserProjectLauncher(
 			})
 		]);
 
+		const siteUrl = normalizeDevUrl(devResult.ok ? devResult.url : null);
 		const dashboardUrl = buildDashboardUrl(
 			feedbackClient.baseUrl,
 			devResult.ok ? devResult.url : null,
 			runtime.now()
 		);
-		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
+		const primaryUrl = siteUrl ?? dashboardUrl;
+		const opened = noOpen ? false : runtime.openBrowser(primaryUrl);
 
 		const fallbackNote = feedbackWidgetNote(detection);
 		const baseNotes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
@@ -576,6 +582,7 @@ export async function runUserProjectLauncher(
 				output: renderDashboardOutput({
 					rootLabel: 'Project',
 					rootValue: detection.root,
+					siteUrl,
 					dashboardUrl,
 					servers: [
 						{
@@ -638,14 +645,16 @@ export async function runLauncher(
 			runtime.ensureFeedbackServer(workspaceRoot, feedbackClient),
 			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
 		]);
+		const siteUrl = normalizeDevUrl(docsBaseUrl);
 		const dashboardUrl = buildDashboardUrl(feedbackClient.baseUrl, docsBaseUrl, runtime.now());
-		const opened = noOpen ? false : runtime.openBrowser(dashboardUrl);
+		const opened = noOpen ? false : runtime.openBrowser(siteUrl ?? dashboardUrl);
 
 		emitOrRun(
 			{
 				output: renderDashboardOutput({
 					rootLabel: 'Workspace',
 					rootValue: workspaceRoot,
+					siteUrl,
 					dashboardUrl,
 					servers: [
 						{ label: 'Docs', message: docsMessage },
