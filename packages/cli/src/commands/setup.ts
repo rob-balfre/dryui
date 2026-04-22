@@ -548,14 +548,16 @@ function buildMainContext(spec: Spec): string[] {
 	}
 }
 
-function renderPromptFrame(question: string, config: SelectPromptOptions): void {
+function renderPromptFrame(question: string, config: SelectPromptOptions = {}): void {
 	console.clear();
 	for (const line of formatPromptFrameLines(question, config)) {
 		console.log(line);
 	}
 }
 
-function renderDetectView(mainContext: readonly string[], agentsBlock: readonly string[]): void {
+function renderDetectView(spec: Spec): void {
+	const mainContext = buildMainContext(spec);
+	const agentsBlock = buildAgentsBlock(process.cwd());
 	console.clear();
 	console.log(paint('◈ DryUI', ANSI.bold, ANSI.cyan));
 	console.log(paint('Detected project setup', ANSI.dim, ANSI.sky));
@@ -573,17 +575,9 @@ function renderDetectView(mainContext: readonly string[], agentsBlock: readonly 
 	console.log('');
 }
 
-function renderFeedbackLaunchProgress(
-	mainContext: string[],
-	agentsBlock: readonly string[],
-	noOpen: boolean
-): void {
+function renderFeedbackLaunchProgress(noOpen: boolean): void {
 	renderPromptFrame(
-		noOpen ? 'Starting feedback dashboard URL lookup...' : 'Starting feedback dashboard...',
-		{
-			contextLines: mainContext,
-			secondaryLines: agentsBlock
-		}
+		noOpen ? 'Starting feedback dashboard URL lookup...' : 'Starting feedback dashboard...'
 	);
 	console.log(
 		paint(
@@ -919,12 +913,7 @@ export function getInitTargetStatus(projectPath: string): InitTargetStatus | nul
 	return null;
 }
 
-async function runInteractiveEditorSetup(
-	args: string[],
-	mainContext: string[],
-	agentsBlock: readonly string[],
-	defaultSvelteMcp: boolean
-): Promise<void> {
+async function runInteractiveEditorSetup(args: string[], defaultSvelteMcp: boolean): Promise<void> {
 	const editorOptions: readonly SelectOption<EditorMenuValue>[] = [
 		...setupGuideIds.map((id) => ({
 			label: getSetupGuide(id).label,
@@ -936,10 +925,7 @@ async function runInteractiveEditorSetup(
 	];
 
 	while (true) {
-		const editor = await promptSelect('Which editor or agent do you want to wire?', editorOptions, {
-			contextLines: mainContext,
-			secondaryLines: agentsBlock
-		});
+		const editor = await promptSelect('Which editor or agent do you want to wire?', editorOptions);
 
 		if (editor === 'back') {
 			return;
@@ -1052,19 +1038,8 @@ async function runInteractiveEditorSetup(
 	}
 }
 
-async function runInteractiveFeedbackSetup(
-	spec: Spec,
-	mainContext: string[],
-	agentsBlock: readonly string[]
-): Promise<void> {
-	const action = await promptSelect(
-		'How would you like to start feedback?',
-		FEEDBACK_MENU_OPTIONS,
-		{
-			contextLines: mainContext,
-			secondaryLines: agentsBlock
-		}
-	);
+async function runInteractiveFeedbackSetup(spec: Spec): Promise<void> {
+	const action = await promptSelect('How would you like to start feedback?', FEEDBACK_MENU_OPTIONS);
 
 	if (action === 'back') {
 		return;
@@ -1076,29 +1051,21 @@ async function runInteractiveFeedbackSetup(
 
 	await runFeedbackSession(action === 'print', false, spec, {
 		runtime: {
-			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(mainContext, agentsBlock, noOpen)
+			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(noOpen)
 		}
 	});
 	await promptAfterAction();
 }
 
-async function runInteractiveInit(
-	spec: Spec,
-	mainContext: string[],
-	agentsBlock: readonly string[]
-): Promise<void> {
-	const projectPath = await promptText('Where should the new project live?', 'my-app', {
-		contextLines: mainContext,
-		secondaryLines: agentsBlock
-	});
+async function runInteractiveInit(spec: Spec): Promise<void> {
+	const projectPath = await promptText('Where should the new project live?', 'my-app');
 	const detectedPm = detectPackageManagerFromEnv();
 	const initialIndex = PACKAGE_MANAGER_OPTIONS.findIndex((option) => option.value === detectedPm);
 	const packageManager = await promptSelect<PackageManagerMenuValue>(
 		'Which package manager should init use?',
 		PACKAGE_MANAGER_OPTIONS,
 		{
-			contextLines: [...mainContext, `target: ${projectPath}`],
-			secondaryLines: agentsBlock,
+			contextLines: [`target: ${projectPath}`],
 			initialIndex: initialIndex === -1 ? 0 : initialIndex
 		}
 	);
@@ -1121,11 +1088,9 @@ async function runInteractiveInit(
 	if (targetStatus?.kind === 'confirm') {
 		const confirmed = await promptConfirm(targetStatus.message, false, {
 			contextLines: [
-				...mainContext,
 				`target: ${homeRelative(resolve(process.cwd(), projectPath))}`,
 				`package-manager: ${packageManager}`
-			],
-			secondaryLines: agentsBlock
+			]
 		});
 		if (!confirmed) {
 			return;
@@ -1142,26 +1107,24 @@ async function runInteractiveSetup(
 	defaultSvelteMcp: boolean
 ): Promise<void> {
 	while (true) {
-		const mainContext = buildMainContext(spec);
-		const agentsBlock = buildAgentsBlock(process.cwd());
 		const action = await promptSelect('What would you like to do?', MAIN_MENU_OPTIONS);
 
 		switch (action) {
 			case 'setup':
-				await runInteractiveEditorSetup(args, mainContext, agentsBlock, defaultSvelteMcp);
+				await runInteractiveEditorSetup(args, defaultSvelteMcp);
 				break;
 			case 'feedback':
-				await runInteractiveFeedbackSetup(spec, mainContext, agentsBlock);
+				await runInteractiveFeedbackSetup(spec);
 				break;
 			case 'init':
-				await runInteractiveInit(spec, mainContext, agentsBlock);
+				await runInteractiveInit(spec);
 				break;
 			case 'install':
 				emitCommandResult(getInstall('.', spec, 'text'));
 				await promptAfterAction();
 				break;
 			case 'detect':
-				renderDetectView(mainContext, agentsBlock);
+				renderDetectView(spec);
 				await promptAfterAction();
 				break;
 			case 'exit':
