@@ -16,12 +16,14 @@ export type ButtonVariant =
 
 export type ButtonSize = 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 
-export type ButtonColor = 'primary' | 'danger' | (string & {}) | null;
+export type ButtonColor = 'primary' | 'danger' | 'ink' | (string & {}) | null;
 
 export interface ButtonProps extends Omit<PrimitiveButtonProps, 'color'> {
 	variant?: ButtonVariant;
 	size?: ButtonSize;
 	color?: ButtonColor;
+	/** Back-compat alias for `class` — matches Heading/Text ergonomics. Prefer `class`. */
+	className?: string;
 }
 
 export { default as Button } from './button.svelte';

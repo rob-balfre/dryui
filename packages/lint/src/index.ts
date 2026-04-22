@@ -1,6 +1,14 @@
 export { dryuiLint } from './preprocessor.js';
 export type { DryuiLintOptions } from './preprocessor.js';
-export { checkScript, checkMarkup, checkStyle, checkSvelteFile, type Violation } from './rules.js';
+export {
+	checkScript,
+	checkMarkup,
+	checkStyle,
+	checkSvelteFile,
+	checkThemeImportOrder,
+	fixThemeImportOrder,
+	type Violation
+} from './rules.js';
 export {
 	RULE_CATALOG,
 	formatRuleText,

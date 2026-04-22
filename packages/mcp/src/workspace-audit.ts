@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
+import { checkThemeImportOrder, fixThemeImportOrder } from '@dryui/lint/rules';
+import { ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import {
 	detectProject,
 	type ProjectDetection,
@@ -331,7 +333,10 @@ function reviewFindings(
 		toFinding(
 			normalizePath(relative(root, filePath)),
 			issue.line,
-			`component/${issue.code}`,
+			// Rules scoped to the project (e.g. `project/theme-import-order`) cross
+			// file boundaries and must keep that prefix. Everything else is a
+			// component-level finding and is scoped under `component/`.
+			issue.code.startsWith('project/') ? issue.code : `component/${issue.code}`,
 			issue.severity === 'suggestion' ? 'info' : issue.severity,
 			issue.message,
 			issue.fix
@@ -345,7 +350,7 @@ function themeFindings(
 	content: string,
 	spec: WorkspaceAuditSpec
 ): WorkspaceFinding[] {
-	const result = diagnoseTheme(content, spec as Parameters<typeof diagnoseTheme>[1]);
+	const result = diagnoseTheme(content, spec as Parameters<typeof diagnoseTheme>[1], filePath);
 	return result.issues.map((issue) =>
 		toFinding(
 			normalizePath(relative(root, filePath)),
@@ -356,6 +361,38 @@ function themeFindings(
 			issue.fix
 		)
 	);
+}
+
+/**
+ * Scan a .ts/.js/.mjs/.cjs file for theme-import-order violations. This catches
+ * the common SvelteKit root-layout bug where `../app.css` is imported before
+ * `@dryui/ui/themes/default.css`, silently clobbering token overrides.
+ */
+function moduleImportFindings(root: string, filePath: string, content: string): WorkspaceFinding[] {
+	const violations = checkThemeImportOrder(content);
+	if (violations.length === 0) return [];
+	const rel = normalizePath(relative(root, filePath));
+	const fixedContent = fixThemeImportOrder(content);
+	return violations.map((v) => ({
+		file: rel,
+		line: v.line,
+		column: null,
+		ruleId: 'project/theme-import-order',
+		severity: 'error' as const,
+		fixable: fixedContent !== content,
+		message: v.message,
+		suggestedFixes:
+			fixedContent !== content
+				? [
+						{
+							description:
+								ruleSuggestedFix('theme-import-order') ??
+								'Reorder imports: theme CSS before local CSS.',
+							replacement: fixedContent
+						}
+					]
+				: []
+	}));
 }
 
 type WorkspaceSummary = {
@@ -442,6 +479,11 @@ export function scanWorkspace(
 
 		if (file.endsWith('.css') && content.includes('--dry-')) {
 			findings.push(...themeFindings(root, absPath, content, spec));
+			continue;
+		}
+
+		if (/\.(ts|js|mjs|cjs)$/.test(file)) {
+			findings.push(...moduleImportFindings(root, absPath, content));
 		}
 	}
 

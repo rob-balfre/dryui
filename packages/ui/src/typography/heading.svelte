@@ -5,12 +5,13 @@
 	let {
 		level = 2,
 		variant = 'default',
+		maxMeasure = false,
 		class: className,
 		children,
 		...rest
 	}: HeadingProps = $props();
 </script>
 
-<Heading {level} {variant} {className} {...rest}>
+<Heading {level} {variant} {maxMeasure} {className} {...rest}>
 	{@render children()}
 </Heading>

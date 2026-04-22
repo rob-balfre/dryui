@@ -1,5 +1,11 @@
 import { describe, test, expect } from 'bun:test';
-import { checkScript, checkMarkup, checkStyle, checkSvelteFile } from './rules.js';
+import {
+	checkScript,
+	checkMarkup,
+	checkStyle,
+	checkSvelteFile,
+	fixThemeImportOrder
+} from './rules.js';
 
 describe('checkScript', () => {
 	test('flags Grid import from @dryui/ui', () => {
@@ -79,13 +85,6 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
-	test('flags class= on a component', () => {
-		const violations = checkMarkup('<Button class="my-btn">click</Button>');
-		expect(violations).toHaveLength(1);
-		expect(violations[0]!.rule).toBe('dryui/no-component-class');
-		expect(violations[0]!.message).toContain('Button');
-	});
-
 	test('flags class= on a compound component', () => {
 		const violations = checkMarkup('<Card.Root class="custom">content</Card.Root>');
 		expect(violations).toHaveLength(1);
@@ -105,15 +104,26 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.rule).toBe('dryui/no-component-class');
 	});
 
-	test('flags class= on multi-line component tag', () => {
+	test('does not flag class= on Button (officially supported)', () => {
+		const violations = checkMarkup('<Button class="my-btn" color="ink">click</Button>');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('does not flag class= on Heading/Text (officially supported)', () => {
+		const violations = checkMarkup('<Heading class="hero">Title</Heading>');
+		expect(violations).toHaveLength(0);
+		const violationsText = checkMarkup('<Text class="lede">Body copy</Text>');
+		expect(violationsText).toHaveLength(0);
+	});
+
+	test('does not flag class= on multi-line Button tag', () => {
 		const code = `<Button
-  variant="primary"
+  variant="solid"
+  color="ink"
   class="extra"
 >click</Button>`;
 		const violations = checkMarkup(code);
-		expect(violations).toHaveLength(1);
-		expect(violations[0]!.rule).toBe('dryui/no-component-class');
-		expect(violations[0]!.line).toBe(1);
+		expect(violations).toHaveLength(0);
 	});
 
 	test('does not flag class= on HTML elements', () => {
@@ -433,6 +443,49 @@ describe('checkStyle', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('allows max-width in ch (typographic measure)', () => {
+		const violations = checkStyle('.prose { max-width: 55ch; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows max-width in em', () => {
+		const violations = checkStyle('.prose { max-width: 44em; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows max-width in ex', () => {
+		const violations = checkStyle('.prose { max-width: 110ex; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows max-inline-size in ch', () => {
+		const violations = checkStyle('.prose { max-inline-size: 70ch; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows min-width: 12ch', () => {
+		const violations = checkStyle('.foo { min-width: 12ch; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('flags max-width: 400px (freezes at pixel breakpoint)', () => {
+		const violations = checkStyle('.foo { max-width: 400px; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-width');
+	});
+
+	test('flags mixed calc with pixel and ch', () => {
+		// Mixed values still freeze layout since the pixel term dominates.
+		const violations = checkStyle('.foo { max-width: calc(55ch + 20px); }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-width');
+	});
+
+	test('no-width message surfaces allowed units for typographic measure', () => {
+		const violations = checkStyle('.foo { max-width: 400px; }');
+		expect(violations[0]!.message).toContain('ch, ex, em');
+	});
+
 	test('flags all: unset', () => {
 		const violations = checkStyle('.foo { all: unset; }');
 		expect(violations).toHaveLength(1);
@@ -622,5 +675,174 @@ describe('checkSvelteFile', () => {
 			'dryui/no-width'
 		]);
 		expect(violations.map((violation) => violation.line)).toEqual([2, 5, 8]);
+	});
+});
+
+describe('no-flex carve-out for ChipGroup', () => {
+	test('flex inside data-chip-group root element is allowed', () => {
+		const code = [
+			'<div class="chip-group" data-chip-group>',
+			'  <span class="chip">one</span>',
+			'  <span class="chip">two</span>',
+			'</div>',
+			'',
+			'<style>',
+			'  .chip-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }',
+			'</style>'
+		].join('\n');
+		const violations = checkSvelteFile(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
+	});
+
+	test('flex on a direct child of a data-chip-group element is allowed', () => {
+		const code = [
+			'<div class="chip-group" data-chip-group>',
+			'  <span class="chip">one</span>',
+			'  <span class="chip">two</span>',
+			'</div>',
+			'',
+			'<style>',
+			'  .chip { display: flex; align-items: center; }',
+			'</style>'
+		].join('\n');
+		const violations = checkSvelteFile(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
+	});
+
+	test('flex elsewhere still fails', () => {
+		const code = [
+			'<div class="chip-group" data-chip-group>',
+			'  <span class="chip">one</span>',
+			'</div>',
+			'<div class="other">x</div>',
+			'',
+			'<style>',
+			'  .chip-group { display: flex; }',
+			'  .other { display: flex; }',
+			'</style>'
+		].join('\n');
+		const violations = checkSvelteFile(code);
+		const flexViolations = violations.filter((v) => v.rule === 'dryui/no-flex');
+		expect(flexViolations).toHaveLength(1);
+		// .other should trigger, .chip-group should not
+		expect(flexViolations[0]!.message).toContain('display: flex');
+	});
+
+	test('[data-chip-group] attribute selector in CSS is always exempt', () => {
+		// Even without markup context, [data-chip-group] is the compound component's
+		// root marker, so flex on it is intentional.
+		const violations = checkStyle('[data-chip-group] { display: flex; }');
+		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
+	});
+
+	test('no-flex message mentions ChipGroup.Root', () => {
+		const violations = checkStyle('.foo { display: flex; }');
+		expect(violations[0]!.message).toContain('ChipGroup.Root');
+		expect(violations[0]!.message).toContain('chip row');
+	});
+
+	test('block comments before [data-chip-group] do not smuggle flex-wrap text into the scan', () => {
+		// Regression: ChipGroup.Root ships a docstring mentioning "flex-wrap" above
+		// the [data-chip-group] rule. Without comment-stripping, the word "flex-wrap"
+		// inside the comment got flagged as a property violation.
+		const css = [
+			'/*',
+			' * ChipGroup wraps tag clusters.',
+			' * This is the sanctioned home for flex-wrap.',
+			' */',
+			'[data-chip-group] {',
+			'  display: flex;',
+			'  flex-wrap: wrap;',
+			'}'
+		].join('\n');
+		expect(checkStyle(css).filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
+	});
+});
+
+describe('theme-import-order', () => {
+	test('local CSS before theme CSS → error', () => {
+		const code = [
+			"import '../app.css';",
+			"import '@dryui/ui/themes/default.css';",
+			"import '@dryui/ui/themes/dark.css';"
+		].join('\n');
+		const violations = checkScript(code);
+		const order = violations.filter((v) => v.rule === 'project/theme-import-order');
+		expect(order).toHaveLength(1);
+		expect(order[0]!.line).toBe(1);
+	});
+
+	test('theme CSS before local CSS → no error', () => {
+		const code = [
+			"import '@dryui/ui/themes/default.css';",
+			"import '@dryui/ui/themes/dark.css';",
+			"import '../app.css';"
+		].join('\n');
+		const violations = checkScript(code);
+		expect(violations.filter((v) => v.rule === 'project/theme-import-order')).toHaveLength(0);
+	});
+
+	test('only theme CSS imported → no error', () => {
+		const code = [
+			"import '@dryui/ui/themes/default.css';",
+			"import '@dryui/ui/themes/dark.css';"
+		].join('\n');
+		const violations = checkScript(code);
+		expect(violations.filter((v) => v.rule === 'project/theme-import-order')).toHaveLength(0);
+	});
+
+	test('only local CSS imported → no error', () => {
+		const code = "import '../app.css';";
+		const violations = checkScript(code);
+		expect(violations.filter((v) => v.rule === 'project/theme-import-order')).toHaveLength(0);
+	});
+
+	test('wrong order error message surfaces ask recipe steer', () => {
+		const code = ["import '../app.css';", "import '@dryui/ui/themes/default.css';"].join('\n');
+		const violations = checkScript(code);
+		const msg = violations.find((v) => v.rule === 'project/theme-import-order')!.message;
+		expect(msg).toContain('customize tokens');
+	});
+
+	test('+layout.svelte script block surfaces theme-import-order', () => {
+		const code = [
+			'<script>',
+			"  import '../app.css';",
+			"  import '@dryui/ui/themes/default.css';",
+			"  import '@dryui/ui/themes/dark.css';",
+			'</script>',
+			'<main>hello</main>'
+		].join('\n');
+		const violations = checkSvelteFile(code, 'src/routes/+layout.svelte');
+		const order = violations.filter((v) => v.rule === 'project/theme-import-order');
+		expect(order).toHaveLength(1);
+		// The Svelte file offsets from the script start line, so '../app.css' is
+		// on line 2 of the file.
+		expect(order[0]!.line).toBe(2);
+	});
+
+	test('fixThemeImportOrder reorders imports theme-first', () => {
+		const input = [
+			"import '../app.css';",
+			"import '@dryui/ui/themes/default.css';",
+			"import '@dryui/ui/themes/dark.css';"
+		].join('\n');
+		const fixed = fixThemeImportOrder(input);
+		// The theme imports now precede the local CSS import.
+		const themeIdx = fixed.indexOf('@dryui/ui/themes/default.css');
+		const localIdx = fixed.indexOf('../app.css');
+		expect(themeIdx).toBeLessThan(localIdx);
+		// No duplication of imports.
+		expect(fixed.match(/@dryui\/ui\/themes\/default\.css/g)!.length).toBe(1);
+		expect(fixed.match(/\.\.\/app\.css/g)!.length).toBe(1);
+	});
+
+	test('fixThemeImportOrder is a no-op when order is correct', () => {
+		const input = [
+			"import '@dryui/ui/themes/default.css';",
+			"import '@dryui/ui/themes/dark.css';",
+			"import '../app.css';"
+		].join('\n');
+		expect(fixThemeImportOrder(input)).toBe(input);
 	});
 });

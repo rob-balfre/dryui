@@ -120,14 +120,15 @@ describe('runInit', () => {
 		const result = await captureAsyncCommandIO(() => runInit(['--help'], spec));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch]',
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]',
 			'',
 			'Bootstrap a SvelteKit + DryUI project.',
 			'',
 			'Options:',
 			'  [path]           Target directory (default: current directory)',
 			'  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)',
-			'  --no-launch      Skip the feedback dashboard launch prompt after scaffold'
+			'  --no-launch      Skip the feedback dashboard launch prompt after scaffold',
+			'  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />'
 		]);
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBe(0);
@@ -424,6 +425,65 @@ describe('runInit', () => {
 		expect(feedback.installCalls).toEqual([]);
 		expect(feedback.mountCalls).toEqual([]);
 		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
+	});
+
+	test('--no-feedback skips @dryui/feedback install, mount, and vite patch', async () => {
+		const { root, target, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+		let promptCalls = 0;
+		let launcherCalls = 0;
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
+					runCommand: () => true,
+					...feedback.stubs,
+					promptLaunch: async () => {
+						promptCalls++;
+						return true;
+					},
+					runLauncher: async () => {
+						launcherCalls++;
+					}
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(feedback.installCalls).toEqual([]);
+		expect(feedback.mountCalls).toEqual([]);
+		expect(feedback.patchCalls).toEqual([]);
+		expect(promptCalls).toBe(0);
+		expect(launcherCalls).toBe(0);
+		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
+		expect(result.logs).toContain('    bun run dev');
+		const layout = readFileSync(join(target, 'src/routes/+layout.svelte'), 'utf8');
+		expect(layout).not.toContain('@dryui/feedback');
+		expect(layout).not.toContain('<Feedback');
+	});
+
+	test('scaffold writes +layout.svelte with theme CSS imports before app.css', async () => {
+		const { root, target, feedback } = scaffoldTestBed();
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
+					runCommand: () => true,
+					...feedback.stubs
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		const layout = readFileSync(join(target, 'src/routes/+layout.svelte'), 'utf8');
+		const defaultThemeIdx = layout.indexOf("'@dryui/ui/themes/default.css'");
+		const darkThemeIdx = layout.indexOf("'@dryui/ui/themes/dark.css'");
+		const appCssIdx = layout.indexOf("'../app.css'");
+		expect(defaultThemeIdx).toBeGreaterThan(-1);
+		expect(darkThemeIdx).toBeGreaterThan(-1);
+		expect(appCssIdx).toBeGreaterThan(-1);
+		// Theme imports must precede app.css so :root token overrides in app.css win.
+		expect(defaultThemeIdx).toBeLessThan(appCssIdx);
+		expect(darkThemeIdx).toBeLessThan(appCssIdx);
 	});
 
 	test('next-steps cd line preserves an absolute path verbatim', async () => {

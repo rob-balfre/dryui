@@ -8,6 +8,8 @@
 		value?: string[];
 		disabled?: boolean;
 		orientation?: 'horizontal' | 'vertical';
+		gap?: 'sm' | 'md' | 'lg';
+		justify?: 'start' | 'center' | 'end' | 'between';
 		children: Snippet;
 	}
 
@@ -16,6 +18,8 @@
 		value = $bindable([]),
 		disabled = false,
 		orientation = 'horizontal',
+		gap = 'md',
+		justify = 'start',
 		children,
 		...rest
 	}: Props = $props();
@@ -45,6 +49,13 @@
 	});
 </script>
 
-<div role="group" data-orientation={orientation} {...rest}>
+<div
+	role="group"
+	data-chip-group
+	data-orientation={orientation}
+	data-gap={gap}
+	data-justify={justify}
+	{...rest}
+>
 	{@render children()}
 </div>

@@ -64,15 +64,16 @@ export const RULE_CATALOG = {
 	'dryui/no-flex': {
 		id: 'dryui/no-flex',
 		severity: 'error',
-		message: 'Do not use {value}. Use {guidance}.',
+		message:
+			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: ask --scope recipe "chip row").',
 		suggestedFix: 'Use CSS grid instead of flexbox layout primitives.'
 	},
 	'dryui/no-width': {
 		id: 'dryui/no-width',
 		severity: 'error',
 		message:
-			'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead.',
-		suggestedFix: 'Move sizing to the parent grid tracks.'
+			'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead. Allowed units for typographic measure: ch, ex, em (e.g. max-width: 55ch is allowed, since it tracks text content, not viewport layout).',
+		suggestedFix: 'Move sizing to the parent grid tracks, or use ch/ex/em for text measure.'
 	},
 	'dryui/no-all-unset': {
 		id: 'dryui/no-all-unset',
@@ -216,8 +217,25 @@ export const RULE_CATALOG = {
 	'missing-token': {
 		id: 'missing-token',
 		severity: 'error',
-		message: 'Required semantic token {variable} is not defined',
+		message:
+			'Required semantic token {variable} is not defined. Full-theme files must define every semantic token (run: ask --scope recipe "customize tokens").',
 		suggestedFix: 'Add {variable} with a color that fits your theme'
+	},
+	'partial-override': {
+		id: 'partial-override',
+		severity: 'info',
+		message:
+			'{count} --dry-* token override(s) detected in a non-theme file. This is fine for scoped tweaks, but globally overriding a few tokens at :root/html/body often masks contrast problems. For a full custom theme, rename to *.theme.css or add /* @dryui-theme */ at the top. For 1-10 site-wide tweaks, scope them under .page / body selectors. For 1-5 per-route tweaks, put them in a scoped component style (run: ask --scope recipe "customize tokens").',
+		suggestedFix:
+			'Either (a) rename to *.theme.css for a full theme, (b) add /* @dryui-theme */ directive, (c) scope under .page / body, or (d) move to a per-route component <style>.'
+	},
+	'theme-import-order': {
+		id: 'theme-import-order',
+		severity: 'error',
+		message:
+			'Import @dryui/ui theme CSS BEFORE local CSS that overrides --dry-* tokens. Local CSS imported first has its overrides clobbered by the theme defaults, so the theme "wins" and overrides appear to have no effect (run: ask --scope recipe "customize tokens").',
+		suggestedFix:
+			'Reorder: import "@dryui/ui/themes/default.css" and "@dryui/ui/themes/dark.css" BEFORE local "../app.css" (or similar).'
 	},
 	'wrong-type': {
 		id: 'wrong-type',

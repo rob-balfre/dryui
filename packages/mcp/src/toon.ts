@@ -210,6 +210,8 @@ export function toonComponent(
 	}
 
 	// Props (simple) or Parts (compound)
+	const propNotes: Array<[string, string]> = [];
+
 	if (def.compound && def.parts) {
 		const partEntries = Object.entries(def.parts);
 		lines.push('', header('parts', partEntries.length, ['part']));
@@ -224,6 +226,7 @@ export function toonComponent(
 					if (propDef.acceptedValues?.length)
 						flags.push(`values:${propDef.acceptedValues.join('|')}`);
 					lines.push(`    ${propName}: ${flags.join(' | ')}`);
+					if (propDef.note) propNotes.push([`${partName}.${propName}`, propDef.note]);
 				}
 			}
 		}
@@ -235,7 +238,16 @@ export function toonComponent(
 				lines.push(
 					row(propName, propDef.type, propDef.required ? 'yes' : 'no', propDef.default ?? '-')
 				);
+				if (propDef.note) propNotes.push([propName, propDef.note]);
 			}
+		}
+	}
+
+	// Prop notes — surface adoption context that does not fit on the row itself.
+	if (propNotes.length > 0) {
+		lines.push('', header('prop-notes', propNotes.length, ['prop', 'note']));
+		for (const [prop, note] of propNotes) {
+			lines.push(row(prop, note));
 		}
 	}
 

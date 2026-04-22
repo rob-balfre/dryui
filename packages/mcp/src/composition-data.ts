@@ -1440,12 +1440,18 @@ export const componentCompositions: ComponentComposition[] = [
 				component: 'Button (as link)',
 				useWhen: 'Navigation that looks like a button',
 				snippet: `<Button href="/settings" variant="outline">Settings</Button>`
+			},
+			{
+				rank: 3,
+				component: 'Button (editorial CTA)',
+				useWhen: 'Editorial/download CTA that reads as a solid near-black pill',
+				snippet: `<Button color="ink" size="lg" href="/download">Download for Mac</Button>`
 			}
 		],
 		antiPatterns: [
 			{
 				pattern: '<button>',
-				reason: 'Native button — no theming, no variant system',
+				reason: 'Native button. No theming, no variant system.',
 				fix: 'Button'
 			},
 			{
@@ -1458,6 +1464,18 @@ export const componentCompositions: ComponentComposition[] = [
 				reason:
 					'Button provides variants, sizes, loading states, icons, and theme-consistent styling. Custom buttons bypass the design system.',
 				fix: '<Button variant="solid">Submit</Button>'
+			},
+			{
+				pattern: 'className on Button',
+				reason:
+					"Button accepts 'class' (Svelte idiomatic). For a solid near-black editorial CTA, use the 'ink' color preset; for deeper visual overrides, wrap with --dry-btn-* token overrides or pass a scoped 'class'.",
+				fix: '<Button class="..." color="ink">Download</Button>'
+			},
+			{
+				pattern: 'span wrapper setting --dry-btn-bg / --dry-btn-color for a black CTA',
+				reason:
+					"The 'ink' color preset already renders a theme-aware near-black/white button via --dry-color-bg-inverse and --dry-color-text-inverse. Wrapping adds indirection and loses the data-color hook.",
+				fix: '<Button color="ink">Download</Button>'
 			}
 		],
 		combinesWith: ['Card.Footer', 'Dialog.Footer']
@@ -3119,26 +3137,38 @@ export const componentCompositions: ComponentComposition[] = [
 
 	{
 		component: 'ChipGroup',
-		useWhen: 'Single or multi-select chip cluster for filtering or category selection',
+		useWhen:
+			'Wrapping cluster of Badge, Chip, or tag children; also handles single/multi-select chip filters',
 		alternatives: [
 			{
 				rank: 1,
 				component: 'ChipGroup',
-				useWhen: 'Filter chip group with selection state',
-				snippet: `<ChipGroup bind:value={selected} type="multiple">
-  <Chip value="new">New</Chip>
-  <Chip value="sale">Sale</Chip>
-  <Chip value="popular">Popular</Chip>
-</ChipGroup>`
+				useWhen: 'Responsive wrapping row of Badge/tag children (e.g. "WORKS WITH" provider list)',
+				snippet: `<ChipGroup.Root gap="md">
+  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>
+  <Badge variant="soft">Local/MLX</Badge>
+  <Badge variant="soft">OpenAI</Badge>
+  <Badge variant="soft">Anthropic</Badge>
+</ChipGroup.Root>`
 			},
 			{
 				rank: 2,
+				component: 'ChipGroup',
+				useWhen: 'Filter chip group with selection state',
+				snippet: `<ChipGroup.Root type="multiple" bind:value={selected}>
+  <ChipGroup.Item value="new">New</ChipGroup.Item>
+  <ChipGroup.Item value="sale">Sale</ChipGroup.Item>
+  <ChipGroup.Item value="popular">Popular</ChipGroup.Item>
+</ChipGroup.Root>`
+			},
+			{
+				rank: 3,
 				component: 'SegmentedControl',
 				useWhen: 'Exclusive selection from 2-4 options in a compact control',
 				snippet: `<SegmentedControl bind:value={choice} options={[...]} />`
 			},
 			{
-				rank: 3,
+				rank: 4,
 				component: 'ToggleGroup',
 				useWhen: 'Toggle buttons for toolbar actions',
 				snippet: `<ToggleGroup.Root bind:value={selection} type="multiple">
@@ -3148,12 +3178,24 @@ export const componentCompositions: ComponentComposition[] = [
 		],
 		antiPatterns: [
 			{
+				pattern: '<div> with display: flex; flex-wrap: wrap for chips',
+				reason:
+					'dryui/no-flex bans raw flex-wrap. ChipGroup.Root is the sanctioned wrapper and carries the data-chip-group carve-out.',
+				fix: 'ChipGroup.Root'
+			},
+			{
+				pattern: '<div> with grid-template-columns: repeat(N, max-content) for tag rows',
+				reason:
+					'Hand-rolled grid breakpoints fight content-driven wrapping. ChipGroup.Root handles it in one prop.',
+				fix: 'ChipGroup.Root'
+			},
+			{
 				pattern: 'Multiple Chip components without ChipGroup',
-				reason: 'ChipGroup manages selection state and keyboard navigation',
-				fix: 'ChipGroup'
+				reason: 'ChipGroup manages layout, selection state, and keyboard navigation',
+				fix: 'ChipGroup.Root'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: ['Badge', 'Chip', 'Tag', 'Card.Content']
 	},
 
 	{
@@ -3987,6 +4029,13 @@ export const componentCompositions: ComponentComposition[] = [
 				pattern: 'Unstyled <h1> to <h6>',
 				reason: 'Heading provides consistent typography scale and theme integration',
 				fix: 'Heading'
+			},
+			{
+				pattern:
+					'Wrapping Heading in a grid/flex just to cap its width (e.g. grid-template-columns: minmax(0, 34rem) 1fr)',
+				reason:
+					'Heading exposes maxMeasure for ergonomic headline widths; the wrapper hack exists only to work around the old no-width rule, which now allows ch units.',
+				fix: '<Heading maxMeasure="narrow">…</Heading>'
 			}
 		],
 		combinesWith: ['Card.Header']
@@ -4562,6 +4611,160 @@ export const compositionRecipes: CompositionRecipe[] = [
   .app-header { padding: var(--dry-space-4) 0; font-weight: bold; }
   .page-content { display: grid; gap: var(--dry-space-6); }
 </style>`
+	},
+
+	{
+		name: 'customize-tokens',
+		description:
+			'Three correct ways to customize --dry-* tokens. Pick by scope: (a) scoped wrapper on a single route for 1-5 per-page tweaks, (b) body/html selector with the /* @dryui-theme */ directive for 1-10 site-wide tweaks (or use the *.theme.css filename), or (c) a full *.theme.css file when defining an entirely custom palette. Dumping a handful of overrides at :root inside app.css raises a partial-override info telling you to pick one of these.',
+		tags: [
+			'theme',
+			'tokens',
+			'customize',
+			'customise',
+			'override',
+			'overrides',
+			'partial-override',
+			'theme-file',
+			'dry-color',
+			'dry-space',
+			'palette'
+		],
+		components: [],
+		snippet: `<!--
+  Three correct ways to customize --dry-* tokens. Pick by scope.
+  Do NOT dump a handful of overrides at :root in app.css, since that hides
+  contrast problems and triggers the partial-override check.
+-->
+
+<!-- ========== (a) Per-route scoped override (1-5 tokens, one page) ========== -->
+<!-- src/routes/marketing/+page.svelte -->
+<script>
+  import { Container } from '@dryui/ui';
+</script>
+
+<div class="page">
+  <Container>
+    <h1>Launch day</h1>
+  </Container>
+</div>
+
+<style>
+  /* Overrides scope to .page and inherit down, so only this route picks them
+     up. No :root, no directive needed. */
+  .page {
+    --dry-color-bg-base: #fff7ed;
+    --dry-color-fill-brand: #ea580c;
+    --dry-color-on-brand: #ffffff;
+    --dry-color-stroke-weak: #fed7aa;
+  }
+</style>
+
+<!-- ========== (b) Site-wide partial override (1-10 tokens, whole app) ========== -->
+<!-- src/app.css — mark the file as an intentional theme file with either the
+     directive OR the *.theme.css filename. Scope overrides under a selector
+     (body or html), not :root, so routes that want to tweak further still can. -->
+/* @dryui-theme */
+@import '@dryui/ui/themes/default.css';
+@import '@dryui/ui/themes/dark.css';
+
+body {
+  --dry-color-fill-brand: #ea580c;
+  --dry-color-fill-brand-hover: #c2410c;
+  --dry-color-fill-brand-active: #9a3412;
+  --dry-color-on-brand: #ffffff;
+  --dry-color-focus-ring: rgba(234, 88, 12, 0.4);
+}
+
+<!-- ========== (c) Full custom theme (*.theme.css, every semantic token) ========== -->
+<!-- src/lib/brand.theme.css — the .theme.css filename turns on completeness
+     checking, so missing tokens surface as errors. Use when defining an
+     entirely custom palette (neutral + brand + status + surfaces). Import
+     AFTER the stock theme CSS so your values win. -->
+:root, [data-theme='brand'] {
+  /* Neutral */
+  --dry-color-text-strong: #0f172a;
+  --dry-color-text-weak: rgba(15, 23, 42, 0.65);
+  --dry-color-icon: rgba(15, 23, 42, 0.75);
+  --dry-color-stroke-strong: rgba(15, 23, 42, 0.35);
+  --dry-color-stroke-weak: rgba(15, 23, 42, 0.1);
+  --dry-color-fill: rgba(15, 23, 42, 0.05);
+  --dry-color-fill-hover: rgba(15, 23, 42, 0.08);
+  --dry-color-fill-active: rgba(15, 23, 42, 0.12);
+  /* Backgrounds */
+  --dry-color-bg-base: #fff7ed;
+  --dry-color-bg-raised: #ffedd5;
+  --dry-color-bg-overlay: #fed7aa;
+  /* Brand + the remaining ~35 semantic tokens go here. Run
+     \`check src/lib/brand.theme.css\` to see every token the checker expects. */
+}
+
+<!-- Import order matters. In +layout.svelte: theme CSS BEFORE local CSS. -->
+<!-- src/routes/+layout.svelte -->
+<script>
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+  import '$lib/brand.theme.css';
+  import '../app.css';
+</script>`
+	},
+
+	{
+		name: 'light-only',
+		description:
+			'Force the site into light mode for every visitor, regardless of OS preference. Use for brand sites, marketing pages, or docs that were designed around a light palette and should not flip on a dark-preferring OS.',
+		tags: [
+			'theme',
+			'light',
+			'light-only',
+			'force-light',
+			'data-theme',
+			'theme-auto',
+			'brand',
+			'marketing'
+		],
+		components: [],
+		snippet: `<!-- 1. app.html — keep theme-auto AND pin data-theme="light".
+     - data-theme="light" makes the page render with light tokens on every OS.
+     - theme-auto is still useful: if a user explicitly opts in to dark via a
+       toggle (swapping data-theme to "dark"), the media query under the
+       theme-auto class can still drive dark tokens. With data-theme="light"
+       present, the theme-auto block is guarded so dark OS preference cannot
+       silently override your light design. -->
+<!doctype html>
+<html lang="en" class="theme-auto" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    %sveltekit.head%
+  </head>
+  <body>
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+
+<!-- 2. src/app.css — import BOTH theme files.
+     default.css defines light tokens on :root. dark.css contains the
+     [data-theme='dark'] override and the guarded .theme-auto block.
+     You still want dark.css imported so an opt-in dark toggle keeps working. -->
+@import '@dryui/ui/themes/default.css';
+@import '@dryui/ui/themes/dark.css';
+
+<!-- 3. src/routes/+layout.svelte — nothing special; tokens already resolve light. -->
+<script>
+  import '../app.css';
+  import { Container } from '@dryui/ui';
+
+  let { children } = $props();
+</script>
+
+<main>
+  <Container>{@render children()}</Container>
+</main>
+
+<!-- Gotcha: do NOT drop theme-auto to "force light". Leaving theme-auto in
+     place preserves the opt-in dark pathway (user sets data-theme="dark")
+     without making light the default. -->`
 	},
 
 	{
@@ -5835,5 +6038,301 @@ export const compositionRecipes: CompositionRecipe[] = [
     }
   }
 </style>`
+	},
+
+	{
+		name: 'custom-button-color',
+		description:
+			'Customize a Button past the built-in primary/danger palette. Three tiers from least-invasive to most: (a) use the color="ink" preset for a solid near-black editorial CTA that auto-inverts in dark theme, (b) pass a scoped class to tune padding, radius, or typography without theme drift, (c) wrap with --dry-btn-* token overrides for deep visual customization when neither preset nor class is enough.',
+		tags: [
+			'button',
+			'cta',
+			'ink',
+			'black',
+			'editorial',
+			'color',
+			'custom',
+			'customize',
+			'download',
+			'theme',
+			'tokens'
+		],
+		components: ['Button'],
+		snippet: `<!-- Tier A: color="ink" preset (preferred).
+     Renders a solid near-black button with white text in light theme; in dark
+     theme it auto-inverts to a white button with near-black text. Uses
+     --dry-color-bg-inverse / --dry-color-text-inverse under the hood, so any
+     theme override of those tokens flows through. Zero configuration. -->
+<script>
+  import { Button } from '@dryui/ui';
+</script>
+
+<Button color="ink" size="lg" href="/download">Download for Mac</Button>
+
+<!-- Tier B: scoped \`class\` prop (granular typography/shape).
+     Button forwards \`class\` to its root element, alongside internal data-*
+     attributes. Use for per-call-site tweaks that do not fit a token. Keep
+     selectors scoped; :global() escapes are fine because Button's root is
+     rendered inside the consumer's component scope. -->
+<script>
+  import { Button } from '@dryui/ui';
+</script>
+
+<Button class="hero-cta" color="ink" size="lg" href="/download">
+  Download for Mac
+</Button>
+
+<style>
+  .hero-cta {
+    letter-spacing: 0.02em;
+    font-weight: 600;
+    min-width: 16rem;
+  }
+</style>
+
+<!-- Tier C: --dry-btn-* token overrides (deepest).
+     Every button visual is routed through a public --dry-btn-* var with a
+     token default. Override the vars on a wrapper (or on the Button itself via
+     \`style=\`) when you need a specific background, text, border, radius, or
+     shadow that is not reachable by preset or class. -->
+<script>
+  import { Button } from '@dryui/ui';
+</script>
+
+<span class="brand-cta">
+  <Button size="lg" href="/download">Download for Mac</Button>
+</span>
+
+<style>
+  .brand-cta {
+    --dry-btn-bg: #111111;
+    --dry-btn-color: #fafafa;
+    --dry-btn-border: #000000;
+    --dry-btn-radius: 9999px;
+  }
+</style>`
+	},
+
+	{
+		name: 'narrow-headline',
+		description:
+			'Editorial hero with a ch-bounded headline. Uses <Heading maxMeasure="narrow"> to cap the headline at ~22ch so long titles wrap on a measure that feels typeset, not reflowed. Replaces the legacy grid-wrapper hack (grid-template-columns: minmax(0, 34rem) 1fr) that was only needed while dryui/no-width banned max-width entirely.',
+		tags: [
+			'headline',
+			'hero',
+			'typography',
+			'measure',
+			'heading',
+			'editorial',
+			'narrow',
+			'max-inline-size',
+			'ch',
+			'osaurus'
+		],
+		components: ['Heading', 'Text'],
+		snippet: `<!-- Editorial hero: narrow headline measure for rhythm.
+     maxMeasure="narrow" maps to max-inline-size: 22ch on the rendered <h*>.
+     ch tracks the text content, so the measure adapts to font size and zoom
+     without freezing a px layout. Body copy stays readable with its own cap. -->
+<script>
+  import { Heading, Text } from '@dryui/ui';
+</script>
+
+<section class="hero">
+  <Heading level={1} variant="display" maxMeasure="narrow">
+    Inference is all you need.
+  </Heading>
+  <Text size="lg" color="muted" maxMeasure="default">
+    Run open-weight models on your laptop. No cloud, no keys, no telemetry.
+  </Text>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--dry-space-6);
+    padding-block: var(--dry-space-16);
+  }
+</style>
+
+<!-- Anti-pattern (do not do this):
+
+  <div class="hero-grid">
+    <Heading level={1}>Inference is all you need.</Heading>
+  </div>
+
+  <style>
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 34rem) 1fr;
+    }
+  </style>
+
+  That wrapper existed only to cap the heading width before maxMeasure shipped.
+  It mixes layout with typographic measure and pins the cap in rem, which does
+  not track the font. Prefer maxMeasure="narrow" on Heading directly. -->`
+	},
+
+	{
+		name: 'serif-display',
+		description:
+			'Heading variant="display" with a serif typeface. Override --dry-font-display on body (or a scoped wrapper), never :root (that trips the theme-checker full-theme-override rule). Without an override, display falls back to --dry-font-sans.',
+		tags: [
+			'typography',
+			'display',
+			'heading',
+			'serif',
+			'font',
+			'newsreader',
+			'google-fonts',
+			'theme',
+			'--dry-font-display',
+			'editorial'
+		],
+		components: ['Heading'],
+		snippet: `<!-- Serif display heading: override --dry-font-display on a scoped
+     wrapper. variant="display" on Heading reads --dry-font-display and
+     falls back to --dry-font-sans, so without an override you get sans. -->
+
+<!-- 1. app.html: link a serif font. Newsreader is a good editorial default. -->
+<!doctype html>
+<html lang="en" class="theme-auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap"
+      rel="stylesheet"
+    />
+    %sveltekit.head%
+  </head>
+  <body>
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+
+<!-- 2. app.css: override --dry-font-display on body (or a .page wrapper).
+     Do NOT put this on :root (that trips the theme-checker
+     full-theme-override rule, which reserves :root for generated theme
+     files). Scoping to body keeps the override local to the app instance
+     and reads every <Heading variant="display"> beneath it. -->
+body {
+  --dry-font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+}
+
+<!-- 3. Any page: variant="display" now renders with the serif. -->
+<script>
+  import { Heading, Text } from '@dryui/ui';
+</script>
+
+<section class="hero">
+  <Heading level={1} variant="display" maxMeasure="narrow">
+    Inference is all you need.
+  </Heading>
+  <Text size="lg" color="muted">Open-weight models, on your laptop.</Text>
+</section>
+
+<style>
+  .hero {
+    display: grid;
+    gap: var(--dry-space-6);
+  }
+</style>
+
+<!-- Gotchas:
+     - Only the Heading variant reads --dry-font-display. Other typography
+       components still use --dry-font-sans or --dry-font-mono.
+     - Override on body or a .page wrapper, NOT on :root. The theme-checker
+       treats :root { --dry-* } blocks as full theme overrides and flags them
+       when they do not ship a complete token set.
+     - If you want the serif scoped to one section (landing page only), move
+       the override onto a wrapper class instead of body. -->`
+	},
+
+	{
+		name: 'chip-row',
+		description:
+			'Responsive wrapping row of Badge, Chip, or tag children. ChipGroup.Root is the sanctioned flex-wrap wrapper: it carries the data-chip-group attribute that exempts it from dryui/no-flex, so a 20-item tag list reflows naturally across any container width without grid breakpoints.',
+		tags: [
+			'chip',
+			'tag',
+			'badge',
+			'pill',
+			'wrap',
+			'cluster',
+			'flex-wrap',
+			'responsive',
+			'filter',
+			'layout'
+		],
+		components: ['ChipGroup', 'Badge'],
+		snippet: `<script>
+  import { ChipGroup, Badge } from '@dryui/ui';
+</script>
+
+<!-- Canonical chip row: ChipGroup.Root wraps Badge/Chip children and
+     handles responsive flow. DO NOT reach for <div style="display:flex;
+     flex-wrap:wrap"> or a grid-template-columns: repeat(N, max-content)
+     hack — ChipGroup.Root is the carve-out. -->
+<ChipGroup.Root gap="md">
+  <Badge variant="soft" color="blue">TypeScript</Badge>
+  <Badge variant="soft" color="green">Svelte 5</Badge>
+  <Badge variant="soft" color="purple">Vite</Badge>
+  <Badge variant="soft">Bun</Badge>
+  <Badge variant="soft">Vitest</Badge>
+  <Badge variant="soft">Playwright</Badge>
+</ChipGroup.Root>
+
+<!-- gap: 'sm' | 'md' | 'lg' — maps to --dry-space tokens.
+     justify: 'start' | 'center' | 'end' | 'between' — controls horizontal
+     alignment when the row does not fill the container. -->`
+	},
+
+	{
+		name: 'works-with',
+		description:
+			'Eyebrow-labelled provider list, like the osaurus.ai "WORKS WITH" section. ChipGroup.Label renders the small-caps eyebrow, and the Root handles wrapping across breakpoints. Use for "compatible with", "integrates with", "powered by", or any capability disclosure that needs a heading plus a wrapping pill list.',
+		tags: [
+			'works-with',
+			'compatible',
+			'integrates',
+			'powered-by',
+			'eyebrow',
+			'label',
+			'marketing',
+			'provider',
+			'capability',
+			'chip',
+			'badge'
+		],
+		components: ['ChipGroup', 'Badge'],
+		snippet: `<script>
+  import { ChipGroup, Badge } from '@dryui/ui';
+</script>
+
+<!-- "WORKS WITH" pattern: eyebrow label + wrapping provider badges.
+     ChipGroup.Label lives inside Root as the first child so the flex row
+     treats it as a sibling pill-height item with the rest of the chips. -->
+<ChipGroup.Root gap="md" justify="start">
+  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>
+  <Badge variant="soft">Local / MLX</Badge>
+  <Badge variant="soft">OpenAI</Badge>
+  <Badge variant="soft">Anthropic</Badge>
+  <Badge variant="soft">Google</Badge>
+  <Badge variant="soft">Mistral</Badge>
+  <Badge variant="soft">Groq</Badge>
+  <Badge variant="soft">Ollama</Badge>
+  <Badge variant="soft">OpenRouter</Badge>
+  <Badge variant="soft">Together</Badge>
+  <Badge variant="soft">Perplexity</Badge>
+  <Badge variant="soft">xAI</Badge>
+</ChipGroup.Root>
+
+<!-- Variants:
+     - gap="lg"               more breathing room between providers
+     - justify="center"       centre the list under a hero heading
+     - Swap Badge for Chip    if providers should be clickable filters -->`
 	}
 ];

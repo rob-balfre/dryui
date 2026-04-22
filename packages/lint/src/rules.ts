@@ -43,11 +43,29 @@ const FLEX_PROPS_RE =
 
 const COMPONENT_CLASS_RE = /<([A-Z][a-zA-Z0-9.]*)[^>]*?\bclass\s*=/gs;
 
+// Components that officially accept a `class` prop and forward it to the root
+// element. These are opt-in exceptions to the `dryui/no-component-class` rule:
+// passing class= here is supported and documented, so we do not flag it.
+const COMPONENTS_ACCEPTING_CLASS: ReadonlySet<string> = new Set([
+	'Button',
+	'Heading',
+	'Text',
+	'Typography.Heading',
+	'Typography.Text'
+]);
+
 const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
 
 const SVELTE_ELEMENT_RE = /<svelte:element(\s|>|\/)/g;
 
-const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:/gm;
+const WIDTH_RE = /(?:^|[;\s{])(?:(?:max|min)-)?(?:width|inline-size)\s*:\s*([^;}]+)/gm;
+
+// Typographic measure units (ch, ex, em) track text content, not viewport layout.
+// e.g. `max-width: 55ch` constrains text column to ~55 characters — allowed.
+const MEASURE_UNIT_RE = /(?:^|[^a-zA-Z0-9])-?[\d.]+(ch|ex|em)(?![a-zA-Z0-9])/;
+// Disallowed viewport/pixel units that freeze layout at a size breakpoint.
+const PIXEL_UNIT_RE =
+	/(?:^|[^a-zA-Z0-9])-?[\d.]+(px|rem|vw|vh|%|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh|pt|pc|cm|mm|in)(?![a-zA-Z0-9])/i;
 const ALL_UNSET_RE = /(?:^|[;\s{])all\s*:\s*unset(?![a-z-])/gm;
 const IMPORTANT_RE = /!important\b/g;
 const CSS_COMMENT_RE = /\/\*[\s\S]*?\*\//g;
@@ -272,6 +290,8 @@ export function checkScript(content: string): Violation[] {
 		}
 	}
 
+	violations.push(...checkThemeImportOrder(content, lineStarts));
+
 	const seen = new Set<string>();
 	return violations.filter((v) => {
 		const key = `${v.line}:${v.message}`;
@@ -279,6 +299,131 @@ export function checkScript(content: string): Violation[] {
 		seen.add(key);
 		return true;
 	});
+}
+
+// Theme import order check
+
+const SIDE_EFFECT_IMPORT_RE = /^[ \t]*import\s+['"]([^'"]+)['"]\s*;?\s*$/gm;
+const THEME_IMPORT_RE = /^@dryui\/ui\/themes\/[^'"]*\.css$/;
+const LOCAL_CSS_IMPORT_RE = /\.(css|pcss|postcss|scss)$/i;
+
+interface SideEffectImport {
+	path: string;
+	line: number;
+}
+
+/**
+ * Detect mixed imports of `@dryui/ui/themes/*.css` and local CSS in the wrong
+ * order. The theme CSS defines `--dry-*` defaults. Local CSS that overrides
+ * those tokens MUST be imported AFTER the theme CSS, otherwise the theme defaults
+ * clobber the overrides and the theme appears unchanged.
+ *
+ * This operates only on side-effect imports (`import 'path';`), which is the
+ * convention for CSS in Vite/SvelteKit. Named imports and re-exports are
+ * ignored because they are not CSS.
+ */
+export function checkThemeImportOrder(
+	content: string,
+	lineStarts: number[] = buildLineIndex(content)
+): Violation[] {
+	const sideEffectImports: SideEffectImport[] = [];
+	for (const match of content.matchAll(SIDE_EFFECT_IMPORT_RE)) {
+		const path = match[1];
+		if (!path) continue;
+		sideEffectImports.push({
+			path,
+			line: lookupLine(lineStarts, match.index ?? 0)
+		});
+	}
+
+	if (sideEffectImports.length < 2) return [];
+
+	// Find first theme import and first local CSS import.
+	let firstThemeIdx = -1;
+	let firstLocalCssIdx = -1;
+	for (let i = 0; i < sideEffectImports.length; i++) {
+		const imp = sideEffectImports[i]!;
+		if (THEME_IMPORT_RE.test(imp.path)) {
+			if (firstThemeIdx === -1) firstThemeIdx = i;
+			continue;
+		}
+		// Local CSS is a relative path ending in a CSS-like extension.
+		// Also accept bare specifier ending in .css (e.g. package exports).
+		if (LOCAL_CSS_IMPORT_RE.test(imp.path) && !imp.path.startsWith('@dryui/ui/themes/')) {
+			if (firstLocalCssIdx === -1) firstLocalCssIdx = i;
+		}
+	}
+
+	if (firstThemeIdx === -1 || firstLocalCssIdx === -1) return [];
+	if (firstLocalCssIdx >= firstThemeIdx) return []; // correct order
+
+	const localImport = sideEffectImports[firstLocalCssIdx]!;
+	return [
+		{
+			// Rule id uses the `project/` prefix to align with project-scoped findings
+			// in workspace-audit (e.g. `project/missing-theme-import`). The underlying
+			// catalog entry is keyed as `theme-import-order` for message lookup.
+			rule: 'project/theme-import-order',
+			message: ruleMessage('theme-import-order'),
+			line: localImport.line
+		}
+	];
+}
+
+/**
+ * Autofix: return the same content with side-effect imports reordered so that
+ * `@dryui/ui/themes/*.css` imports come BEFORE any local CSS side-effect import.
+ * Non-import lines and named imports are preserved in place.
+ */
+export function fixThemeImportOrder(content: string): string {
+	// Collect each side-effect import with its start/end offsets.
+	interface ImportSpan {
+		start: number;
+		end: number; // exclusive, end of the line (up to and including the trailing newline or EOF)
+		path: string;
+		text: string;
+	}
+	const spans: ImportSpan[] = [];
+	for (const match of content.matchAll(SIDE_EFFECT_IMPORT_RE)) {
+		const path = match[1];
+		if (!path) continue;
+		const start = match.index ?? 0;
+		// End of the matched line: advance to the next newline (inclusive).
+		let end = start + match[0].length;
+		if (content[end] === '\n') end += 1;
+		spans.push({ start, end, path, text: content.slice(start, end) });
+	}
+
+	if (spans.length < 2) return content;
+
+	// Classify each span.
+	const themeSpans: ImportSpan[] = [];
+	const localCssSpans: ImportSpan[] = [];
+	for (const span of spans) {
+		if (THEME_IMPORT_RE.test(span.path)) themeSpans.push(span);
+		else if (LOCAL_CSS_IMPORT_RE.test(span.path) && !span.path.startsWith('@dryui/ui/themes/'))
+			localCssSpans.push(span);
+	}
+
+	if (themeSpans.length === 0 || localCssSpans.length === 0) return content;
+	const firstTheme = themeSpans[0]!;
+	const firstLocal = localCssSpans[0]!;
+	if (firstLocal.start >= firstTheme.start) return content;
+
+	// Rebuild: collect every theme import text, concatenate, then stitch into the
+	// spot of the first local-CSS import. Blank out each theme span in-place (via
+	// replacement with empty string). We do this right-to-left to keep offsets valid.
+	const removals = [...themeSpans].sort((a, b) => b.start - a.start);
+	let out = content;
+	for (const span of removals) {
+		out = out.slice(0, span.start) + out.slice(span.end);
+	}
+	// Insert theme imports (in original order) BEFORE the first local-CSS import.
+	// Recompute firstLocal position in the new string by searching for its text.
+	const insertion = themeSpans.map((s) => s.text).join('');
+	const insertAt = out.indexOf(firstLocal.text);
+	if (insertAt === -1) return content; // safety
+	return out.slice(0, insertAt) + insertion + out.slice(insertAt);
 }
 
 const SCRIPT_OR_STYLE_BLOCK_RE = /<(?:script|style)[\s>][\s\S]*?<\/(?:script|style)>/gi;
@@ -367,6 +512,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 
 	for (const match of markup.matchAll(COMPONENT_CLASS_RE)) {
 		const comp = match[1] ?? 'Component';
+		if (COMPONENTS_ACCEPTING_CLASS.has(comp)) continue;
 		violations.push({
 			rule: 'dryui/no-component-class',
 			message: ruleMessage('dryui/no-component-class', { component: comp }),
@@ -431,17 +577,74 @@ function hasAllowComment(file: FileContext, matchIndex: number, keyword: string)
 	return prevLine.includes(`dryui-allow ${keyword}`);
 }
 
-export function checkStyle(content: string): Violation[] {
+export interface StyleContext {
+	readonly chipGroupExemptClasses?: ReadonlySet<string>;
+}
+
+/**
+ * Extract the CSS selector immediately preceding a property match.
+ * Walks backward to find the last `{` and captures the selector block before it.
+ */
+function selectorAtOffset(css: string, propertyIndex: number): string {
+	// Find the last `{` at or before propertyIndex
+	const braceIdx = css.lastIndexOf('{', propertyIndex);
+	if (braceIdx === -1) return '';
+	// Find the previous `}` or `;` or start-of-string to delimit the selector start
+	let start = 0;
+	for (let i = braceIdx - 1; i >= 0; i--) {
+		const ch = css[i];
+		if (ch === '}' || ch === ';') {
+			start = i + 1;
+			break;
+		}
+	}
+	return css.slice(start, braceIdx).trim();
+}
+
+/**
+ * Returns true when the CSS selector targets an element marked exempt.
+ * Exempt targets:
+ *   - `[data-chip-group]` attribute selector (with or without tag prefix)
+ *   - `.foo` where `foo` is in exemptClasses (ChipGroup root or direct child)
+ *   - `.parent > .child` where parent is exempt (covers immediate children)
+ */
+function selectorIsChipGroupExempt(selector: string, exemptClasses: ReadonlySet<string>): boolean {
+	if (!selector) return false;
+	// Normalize: collapse whitespace
+	const norm = selector.replace(/\s+/g, ' ').trim();
+	// `[data-chip-group]` attribute selector matches the ChipGroup root directly
+	if (/\[data-chip-group(?:[=\]~|^$*])/i.test(norm)) return true;
+	if (exemptClasses.size === 0) return false;
+	// Match any class in the selector against the exempt set. A selector like
+	// `.chip-group > .chip` is exempt when `chip-group` or `chip` is exempt.
+	const classMatches = norm.match(/\.[-_a-zA-Z0-9]+/g) ?? [];
+	for (const raw of classMatches) {
+		if (exemptClasses.has(raw.slice(1))) return true;
+	}
+	return false;
+}
+
+export function checkStyle(content: string, context: StyleContext = {}): Violation[] {
 	const violations: Violation[] = [];
+	// `scan` has comments blanked out (length-preserving) so rule regexes don't
+	// flag property names that appear in prose comments like
+	// `/* flex-wrap is the sanctioned primitive */`. `file` keeps the original
+	// content so `hasAllowComment` can still see `/* dryui-allow flex */` on the
+	// preceding line.
+	const scan = stripCssComments(content);
 	const file: FileContext = {
 		content,
 		lines: content.split('\n'),
 		lineStarts: buildLineIndex(content)
 	};
 	const lineOf = (i: number) => lookupLine(file.lineStarts, i);
+	const exemptClasses = context.chipGroupExemptClasses ?? new Set<string>();
+	const inChipGroupScope = (idx: number): boolean =>
+		selectorIsChipGroupExempt(selectorAtOffset(scan, idx), exemptClasses);
 
-	for (const match of content.matchAll(FLEX_DISPLAY_RE)) {
+	for (const match of scan.matchAll(FLEX_DISPLAY_RE)) {
 		if (hasAllowComment(file, match.index, 'flex')) continue;
+		if (inChipGroupScope(match.index)) continue;
 		violations.push({
 			rule: 'dryui/no-flex',
 			message: ruleMessage('dryui/no-flex', {
@@ -452,8 +655,9 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	for (const match of content.matchAll(FLEX_PROPS_RE)) {
+	for (const match of scan.matchAll(FLEX_PROPS_RE)) {
 		if (hasAllowComment(file, match.index, 'flex')) continue;
+		if (inChipGroupScope(match.index)) continue;
 		const prop = match[0].trim().replace(/;/, '').split(':')[0]!.trim();
 		violations.push({
 			rule: 'dryui/no-flex',
@@ -465,8 +669,13 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	for (const match of content.matchAll(WIDTH_RE)) {
+	for (const match of scan.matchAll(WIDTH_RE)) {
 		if (hasAllowComment(file, match.index, 'width')) continue;
+		const rawValue = (match[1] ?? '').trim();
+		// Allow typographic measure units (ch, ex, em) — they track text content,
+		// not viewport layout. e.g. `max-width: 55ch` constrains text columns.
+		// Reject if the value also contains pixel/viewport units (mixed calcs stay banned).
+		if (MEASURE_UNIT_RE.test(rawValue) && !PIXEL_UNIT_RE.test(rawValue)) continue;
 		violations.push({
 			rule: 'dryui/no-width',
 			message: ruleMessage('dryui/no-width'),
@@ -474,7 +683,7 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	for (const match of content.matchAll(ALL_UNSET_RE)) {
+	for (const match of scan.matchAll(ALL_UNSET_RE)) {
 		violations.push({
 			rule: 'dryui/no-all-unset',
 			message: ruleMessage('dryui/no-all-unset'),
@@ -482,8 +691,7 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	const contentWithoutComments = stripCssComments(content);
-	for (const match of contentWithoutComments.matchAll(IMPORTANT_RE)) {
+	for (const match of scan.matchAll(IMPORTANT_RE)) {
 		if (hasAllowComment(file, match.index, 'important')) continue;
 		violations.push({
 			rule: 'dryui/no-important',
@@ -492,7 +700,7 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	for (const match of content.matchAll(GLOBAL_SELECTOR_RE)) {
+	for (const match of scan.matchAll(GLOBAL_SELECTOR_RE)) {
 		violations.push({
 			rule: 'dryui/no-global',
 			message: ruleMessage('dryui/no-global'),
@@ -500,7 +708,7 @@ export function checkStyle(content: string): Violation[] {
 		});
 	}
 
-	for (const match of content.matchAll(MEDIA_QUERY_RE)) {
+	for (const match of scan.matchAll(MEDIA_QUERY_RE)) {
 		const query = match[0];
 		if (!ALLOWED_MEDIA_RE.test(query)) {
 			violations.push({
@@ -511,7 +719,7 @@ export function checkStyle(content: string): Violation[] {
 		}
 	}
 
-	for (const match of content.matchAll(FOCUS_RING_LITERAL_RE)) {
+	for (const match of scan.matchAll(FOCUS_RING_LITERAL_RE)) {
 		violations.push({
 			rule: 'dryui/prefer-focus-ring-token',
 			message: ruleMessage('dryui/prefer-focus-ring-token'),
@@ -522,9 +730,130 @@ export function checkStyle(content: string): Violation[] {
 	return violations;
 }
 
+/**
+ * Scan markup for elements carrying `data-chip-group` and their direct children.
+ * Returns the set of class names (without the leading dot) that are exempt from
+ * `dryui/no-flex`. The ChipGroup.Root component marks its root element with
+ * `data-chip-group` and uses flexbox to wrap chips — chip layout is intentionally
+ * flex-based and must not trigger the rule.
+ */
+function collectChipGroupClasses(content: string): Set<string> {
+	const exempt = new Set<string>();
+	const markup = stripBlocks(content);
+
+	// Match any opening tag with data-chip-group attribute.
+	// Capture the full tag so we can pull its class list and find the matching end.
+	const chipGroupTagRe =
+		/<([a-zA-Z][a-zA-Z0-9-]*|[A-Z][a-zA-Z0-9.]*)([^>]*\bdata-chip-group(?:=["'][^"']*["'])?[^>]*)>/g;
+
+	for (const match of markup.matchAll(chipGroupTagRe)) {
+		const attrs = match[2] ?? '';
+		// Pull classes from the root element itself.
+		for (const cls of extractClassNames(attrs)) exempt.add(cls);
+
+		// Also pull classes from the immediate children. Naive: walk forward from
+		// the match, tracking depth, and capture all direct-child opening tags.
+		const tagName = match[1] ?? '';
+		const bodyStart = (match.index ?? 0) + match[0].length;
+		collectDirectChildClasses(markup, bodyStart, tagName, exempt);
+	}
+
+	// ChipGroup.Root from @dryui/ui also qualifies — users compose it by name.
+	// `<ChipGroup.Root>` itself is exempt; its scoped class names won't show up
+	// in user CSS (it's a component), but any class wrapper around it might.
+	return exempt;
+}
+
+function extractClassNames(attrsStr: string): string[] {
+	const out: string[] = [];
+	// class="foo bar baz" — ignore expressions, only capture literal tokens.
+	const staticClassRe = /\bclass\s*=\s*"([^"]*)"/g;
+	const staticClassReSingle = /\bclass\s*=\s*'([^']*)'/g;
+	for (const re of [staticClassRe, staticClassReSingle]) {
+		for (const m of attrsStr.matchAll(re)) {
+			for (const token of (m[1] ?? '').split(/\s+/)) {
+				if (token && /^[-_a-zA-Z][-_a-zA-Z0-9]*$/.test(token)) out.push(token);
+			}
+		}
+	}
+	// class:foo or class:foo={cond} — Svelte's conditional class directive.
+	const directiveRe = /\bclass:([-_a-zA-Z][-_a-zA-Z0-9]*)/g;
+	for (const m of attrsStr.matchAll(directiveRe)) {
+		const name = m[1];
+		if (name) out.push(name);
+	}
+	return out;
+}
+
+function collectDirectChildClasses(
+	markup: string,
+	start: number,
+	_parentTag: string,
+	out: Set<string>
+): void {
+	// Walk the markup from `start` tracking tag nesting. For each depth-1 opening
+	// tag (an immediate child of the chip-group root), harvest its class list.
+	// Stop when depth returns to 0 (matching close of the chip-group root).
+	//
+	// Simpler rule: `depth` counts how deep we are BELOW the chip-group root.
+	// Entering the function: depth = 0 means we're inside the chip-group, scanning
+	// its immediate children. Opening a non-self-closing tag increments depth; a
+	// closing tag decrements. When depth drops below 0 we've left the root.
+	let depth = 0;
+	let pos = start;
+
+	while (pos < markup.length) {
+		const next = markup.indexOf('<', pos);
+		if (next === -1) break;
+
+		// Comment skip
+		if (markup.startsWith('<!--', next)) {
+			const end = markup.indexOf('-->', next + 4);
+			pos = end === -1 ? markup.length : end + 3;
+			continue;
+		}
+
+		if (markup.startsWith('</', next)) {
+			const gt = markup.indexOf('>', next);
+			if (gt === -1) break;
+			if (depth === 0) {
+				// The first unbalanced closing tag at our level closes the chip-group
+				// root (or the structure is malformed). Either way, we're done.
+				return;
+			}
+			depth -= 1;
+			pos = gt + 1;
+			continue;
+		}
+
+		// Opening or self-closing tag.
+		const gt = markup.indexOf('>', next);
+		if (gt === -1) break;
+		const tagText = markup.slice(next, gt + 1);
+		const tagNameMatch = /^<([a-zA-Z][a-zA-Z0-9-]*|[A-Z][a-zA-Z0-9.]*)\b/.exec(tagText);
+		const tagName = tagNameMatch ? (tagNameMatch[1] ?? '') : '';
+		const selfClosing = /\/>$/.test(tagText);
+		const voidTag =
+			/^(br|hr|img|input|meta|link|source|track|wbr|area|base|col|embed|param)$/i.test(tagName);
+
+		if (depth === 0 && tagName) {
+			for (const cls of extractClassNames(tagText)) out.add(cls);
+		}
+
+		if (!selfClosing && !voidTag) depth += 1;
+
+		pos = gt + 1;
+	}
+}
+
+function escapeTagName(name: string): string {
+	return name.replace(/[.\\+*?^${}()|[\]/-]/g, '\\$&');
+}
+
 export function checkSvelteFile(content: string, filename?: string): Violation[] {
 	const lineStarts = buildLineIndex(content);
 	const violations: Violation[] = [...checkMarkup(content, filename)];
+	const chipGroupExemptClasses = collectChipGroupClasses(content);
 
 	for (const match of content.matchAll(SCRIPT_BLOCK_RE)) {
 		const script = match[1] ?? '';
@@ -535,7 +864,7 @@ export function checkSvelteFile(content: string, filename?: string): Violation[]
 	for (const match of content.matchAll(STYLE_BLOCK_RE)) {
 		const style = match[1] ?? '';
 		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
-		violations.push(...offsetViolations(checkStyle(style), startLine));
+		violations.push(...offsetViolations(checkStyle(style, { chipGroupExemptClasses }), startLine));
 	}
 
 	return uniqueViolations(violations).sort((left, right) => {

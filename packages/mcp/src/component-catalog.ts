@@ -122,9 +122,21 @@ export const componentMeta: Record<string, ComponentMetaEntry> = {
 		tags: ['chip', 'pill', 'filter', 'selection', 'tag']
 	},
 	ChipGroup: {
-		description: 'Single or multi-select chip cluster',
-		category: 'action',
-		tags: ['chip', 'group', 'filters', 'selection']
+		description:
+			'Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex',
+		category: 'layout',
+		tags: [
+			'chip',
+			'group',
+			'tag',
+			'badge',
+			'pill',
+			'wrap',
+			'cluster',
+			'filters',
+			'selection',
+			'responsive'
+		]
 	},
 	ChromaticShift: {
 		description: 'RGB channel separation effect with hover and animation triggers',

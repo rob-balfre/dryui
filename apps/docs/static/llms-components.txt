@@ -26,10 +26,10 @@ Props: variant (| 'solid'
 	| 'nav'
 	| 'tab'
 	| 'toggle'
-	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | (string & {}) | null), Semantic tone for primary or destructive button actions., default 'primary' | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
+	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | 'ink' | (string & {}) | null), Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets., accepted primary, danger, ink, null, default 'primary' | className (string) | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <button> attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg, --dry-btn-trigger-open-bg, --dry-btn-trigger-open-border, --dry-btn-trigger-open-color
-Data attributes: data-color | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
+Data attributes: data-color (Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme., values primary, danger, ink) | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example:
 ```svelte
@@ -195,35 +195,6 @@ Accessibility: Provide discernible text or an aria-label for controls that do no
 Example:
 ```svelte
 <Chip variant="soft" color="blue">Policy friendly</Chip>
-```
-
-## ChipGroup
-Package: @dryui/ui
-Category: action
-Tags: chip, group, filters, selection
-Kind: compound
-Root import: import { ChipGroup } from '@dryui/ui'
-Subpath import: import { ChipGroup } from '@dryui/ui/chip-group'
-Parts:
-- ChipGroup.Root
-  Props: size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | type ('single' | 'multiple'), HTML type attribute or component-specific type selector., accepted single, multiple, default 'single' | value (string[]), Current controlled or bindable value., default [], bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <div> attributes via rest props.
-- ChipGroup.Item
-  Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <button> attributes via rest props.
-Structure:
-  ChipGroup.Root
-    ChipGroup.Item
-CSS variables: --dry-chip-group-font-size, --dry-chip-group-padding-x, --dry-chip-group-padding-y
-Data attributes: data-chip-group | data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
-Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
-Example:
-```svelte
-<ChipGroup.Root type="multiple" bind:value={selectedFilters}>
-  <ChipGroup.Item value="direct">Direct</ChipGroup.Item>
-  <ChipGroup.Item value="flexible">Flexible</ChipGroup.Item>
-  <ChipGroup.Item value="wifi">Wi-fi</ChipGroup.Item>
-</ChipGroup.Root>
 ```
 
 ### input
@@ -651,7 +622,7 @@ Root import: import { FileSelect } from '@dryui/ui'
 Subpath import: import { FileSelect } from '@dryui/ui/file-select'
 Parts:
 - FileSelect.Root
-  Props: value (string | null), Current controlled or bindable value., default null | onrequest ((() => Promise<string | null>)) | onchange (((value: string | null) => void)) | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
+  Props: value (string | null), Current controlled or bindable value., accepted null, default null | onrequest ((() => Promise<string | null>)) | onchange (((value: string | null) => void)) | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
 - FileSelect.Trigger
   Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <button> attributes via rest props.
@@ -1612,7 +1583,7 @@ Tags: background, gradient, ambient, shader-like, hero
 Kind: simple
 Root import: import { Aurora } from '@dryui/ui'
 Subpath import: import { Aurora } from '@dryui/ui/aurora'
-Props: palette (AuroraNamedPalette | readonly [string, string, string]), default 'cosmic' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | motion ('auto' | 'never'), accepted auto, never, default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace ('srgb' | 'oklch' | 'oklab'), accepted srgb, oklch, oklab, default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
+Props: palette (AuroraNamedPalette | readonly [string, string, string]), default 'cosmic' | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | motion ('auto' | 'never'), accepted auto, never, default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace ('srgb' | 'oklch' | 'oklab'), accepted srgb, oklch, oklab, default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
@@ -1645,6 +1616,40 @@ Example:
     <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>
   </Card.Root>
 </Noise>
+```
+
+## ChipGroup
+Package: @dryui/ui
+Category: layout
+Tags: chip, group, tag, badge, pill, wrap, cluster, filters, selection, responsive
+Kind: compound
+Root import: import { ChipGroup } from '@dryui/ui'
+Subpath import: import { ChipGroup } from '@dryui/ui/chip-group'
+Parts:
+- ChipGroup.Root
+  Props: size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | type ('single' | 'multiple'), HTML type attribute or component-specific type selector., accepted single, multiple, default 'single' | value (string[]), Current controlled or bindable value., default [], bindable | disabled (boolean), Prevents interaction and applies disabled styling., default false | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | gap ('sm' | 'md' | 'lg'), accepted sm, md, lg, default 'md' | justify ('start' | 'center' | 'end' | 'between'), accepted start, center, end, between, default 'start' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <div> attributes via rest props.
+- ChipGroup.Item
+  Props: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling. | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <button> attributes via rest props.
+- ChipGroup.Label
+  Props: children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <span> attributes via rest props.
+Structure:
+  ChipGroup.Root
+    ChipGroup.Label
+CSS variables: --dry-chip-group-font-size, --dry-chip-group-gap, --dry-chip-group-padding-x, --dry-chip-group-padding-y
+Data attributes: data-chip-group | data-chip-group-label | data-disabled (Present when the component or part is disabled.) | data-gap | data-justify | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
+Example:
+```svelte
+<ChipGroup.Root gap="md">
+  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>
+  <Badge variant="soft">Local/MLX</Badge>
+  <Badge variant="soft">OpenAI</Badge>
+  <Badge variant="soft">Anthropic</Badge>
+  <Badge variant="soft">Mistral</Badge>
+</ChipGroup.Root>
 ```
 
 ## Footer
@@ -3346,10 +3351,10 @@ Root import: import { Typography } from '@dryui/ui'
 Subpath import: import { Typography } from '@dryui/ui/typography'
 Parts:
 - Typography.Heading
-  Props: level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
+  Props: level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, variant='display' uses --dry-font-display, which defaults to --dry-font-sans. Override --dry-font-display on body or a scoped wrapper (not :root) for a distinct display typeface. | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <h*> attributes via rest props.
 - Typography.Text
-  Props: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label
+  Props: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label
   Native props: Forwards <element> attributes via rest props.
 - Typography.Code
   Props: children (Snippet), Content rendered inside the component., required
@@ -3373,10 +3378,10 @@ Tags: text, heading, title, typography
 Kind: simple
 Root import: import { Heading } from '@dryui/ui'
 Subpath import: import { Heading } from '@dryui/ui/heading'
-Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default' | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
+Props: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, default 'default', variant='display' uses --dry-font-display, which defaults to --dry-font-sans. For a distinct display typeface (e.g., a serif), override --dry-font-display on body or a scoped wrapper, not :root. See recipe: serif-display. | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, default false, Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. Replaces the grid-wrapper hack that existed while dryui/no-width banned max-width. | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <h*> attributes via rest props.
 CSS variables: none
-Data attributes: data-level | data-variant
+Data attributes: data-level | data-measure | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3390,10 +3395,10 @@ Tags: text, copy, paragraph, typography
 Kind: simple
 Root import: import { Text } from '@dryui/ui'
 Subpath import: import { Text } from '@dryui/ui/text'
-Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required
+Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, default false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure. | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-typography-text-color
-Data attributes: data-color | data-font | data-size | data-variant | data-weight
+Data attributes: data-color | data-font | data-measure | data-size | data-variant | data-weight
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3694,7 +3699,7 @@ Root import: import { Carousel } from '@dryui/ui'
 Subpath import: import { Carousel } from '@dryui/ui/carousel'
 Parts:
 - Carousel.Root
-  Props: orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | loop (boolean), default false | autoplay (number | false), default false | children (Snippet), Content rendered inside the component., required
+  Props: orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | loop (boolean), default false | autoplay (number | false), accepted false, default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Carousel.Viewport
   Props: children (Snippet), Content rendered inside the component., required
@@ -3831,7 +3836,7 @@ Root import: import { Tree } from '@dryui/ui'
 Subpath import: import { Tree } from '@dryui/ui/tree'
 Parts:
 - Tree.Root
-  Props: defaultExpanded (string[]), default [] | selectedItem (string | null), default null, bindable | children (Snippet), Content rendered inside the component., required
+  Props: defaultExpanded (string[]), default [] | selectedItem (string | null), accepted null, default null, bindable | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - Tree.Item
   Props: itemId (string), required | children (Snippet), Content rendered inside the component., required
@@ -4629,7 +4634,7 @@ Tags: gradient, mesh, background, animation, interactive, color
 Kind: simple
 Root import: import { GradientMesh } from '@dryui/ui'
 Subpath import: import { GradientMesh } from '@dryui/ui/gradient-mesh'
-Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mesh-color-1, --dry-mesh-color-2, --dry-mesh-color-3, --dry-mesh-color-4, --dry-mesh-duration, --dry-mesh-pointer-x, --dry-mesh-pointer-y
 Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion
@@ -4646,7 +4651,7 @@ Tags: halftone, dots, pattern, texture, print, overlay
 Kind: simple
 Root import: import { Halftone } from '@dryui/ui'
 Subpath import: import { Halftone } from '@dryui/ui/halftone'
-Props: dotSize ('fine' | 'medium' | 'coarse' | number), default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
+Props: dotSize ('fine' | 'medium' | 'coarse' | number), accepted fine, medium, coarse, default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-halftone-angle, --dry-halftone-color, --dry-halftone-dot-radius, --dry-halftone-opacity, --dry-halftone-pattern-size
 Data attributes: data-dot-size | data-halftone | data-halftone-content

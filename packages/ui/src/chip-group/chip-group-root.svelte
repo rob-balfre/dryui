@@ -10,6 +10,8 @@
 		disabled?: boolean;
 		orientation?: 'horizontal' | 'vertical';
 		size?: 'sm' | 'md';
+		gap?: 'sm' | 'md' | 'lg';
+		justify?: 'start' | 'center' | 'end' | 'between';
 		children: Snippet;
 	}
 
@@ -19,6 +21,8 @@
 		disabled = false,
 		orientation = 'horizontal',
 		size = 'sm',
+		gap = 'md',
+		justify = 'start',
 		class: className,
 		children,
 		...rest
@@ -52,7 +56,7 @@
 <div
 	role="group"
 	data-chip-group
-	{...variantAttrs({ orientation, size })}
+	{...variantAttrs({ orientation, size, gap, justify })}
 	class={className}
 	{...rest}
 >
@@ -60,21 +64,55 @@
 </div>
 
 <style>
+	/*
+	 * ChipGroup wraps tag/chip clusters with content-driven flow.
+	 * This is the sanctioned home for flex-wrap: the `[data-chip-group]`
+	 * attribute is carved out of `dryui/no-flex` so chip/tag wrapping
+	 * reads naturally without grid hacks.
+	 */
 	[data-chip-group] {
-		display: inline-grid;
-		grid-template-columns: repeat(auto-fill, minmax(min-content, max-content));
-		gap: var(--dry-space-2);
-	}
-
-	[data-chip-group][data-orientation='horizontal'] {
-		grid-auto-flow: column;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--dry-chip-group-gap, var(--dry-space-2));
 	}
 
 	[data-chip-group][data-orientation='vertical'] {
-		grid-template-columns: 1fr;
-		justify-items: start;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 
+	/* Gap presets — map onto --dry-space tokens. */
+	[data-chip-group][data-gap='sm'] {
+		--dry-chip-group-gap: var(--dry-space-1);
+	}
+
+	[data-chip-group][data-gap='md'] {
+		--dry-chip-group-gap: var(--dry-space-2);
+	}
+
+	[data-chip-group][data-gap='lg'] {
+		--dry-chip-group-gap: var(--dry-space-3);
+	}
+
+	/* Justify presets. */
+	[data-chip-group][data-justify='start'] {
+		justify-content: flex-start;
+	}
+
+	[data-chip-group][data-justify='center'] {
+		justify-content: center;
+	}
+
+	[data-chip-group][data-justify='end'] {
+		justify-content: flex-end;
+	}
+
+	[data-chip-group][data-justify='between'] {
+		justify-content: space-between;
+	}
+
+	/* Size presets retained for backward-compatible Item styling. */
 	[data-chip-group][data-size='sm'] {
 		--dry-chip-group-font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
 		--dry-chip-group-padding-x: var(--dry-space-2_5);

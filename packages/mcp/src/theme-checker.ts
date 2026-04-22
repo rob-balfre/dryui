@@ -41,6 +41,18 @@ interface ResolvedVar {
 
 const FULL_THEME_THRESHOLD = 4;
 
+// Detection for a "full theme" file: files that opt into completeness checking.
+// A file is treated as a full theme when ANY of these signals are present:
+//   - Filename ends in `.theme.css`
+//   - First 10 non-empty lines contain `/* @dryui-theme */` directive
+function isThemeFile(css: string, filename?: string): boolean {
+	if (filename && /\.theme\.css$/i.test(filename)) return true;
+	// Look for directive in the first ~10 lines (before any ruleset).
+	const header = css.slice(0, 2000);
+	if (/\/\*\s*@dryui-theme\s*\*\//.test(header)) return true;
+	return false;
+}
+
 const NAMED_COLORS: ReadonlySet<string> = new Set([
 	// CSS Level 1-4 named colors (complete list)
 	'aliceblue',
@@ -490,13 +502,34 @@ function extractAlpha(value: string): number {
 }
 
 // Tier 1: Missing tokens
+//
+// Behavior depends on whether the file is flagged as a "full theme":
+//   - Full theme (filename `*.theme.css` or `/* @dryui-theme */` directive):
+//     require every REQUIRED_TOKENS entry. Missing ones emit `missing-token` errors.
+//   - Non-theme file with >= FULL_THEME_THRESHOLD partial overrides:
+//     emit a single `partial-override` info (not 44 errors). This is the common
+//     pattern of overriding a handful of semantic tokens in an `app.css` at :root.
+//   - Non-theme file with fewer overrides: silent (targeted customization).
 
-function checkMissingTokens(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
+function checkMissingTokens(vars: Map<string, ResolvedVar>, isFullTheme: boolean): DiagnoseIssue[] {
 	// Count how many semantic color tokens are defined.
 	const semanticCount = REQUIRED_TOKENS.filter((t) => vars.has(t)).length;
 
-	// If fewer than threshold, this is targeted customization — skip.
+	// If fewer than threshold, treat as targeted customization regardless of signal.
 	if (semanticCount < FULL_THEME_THRESHOLD) return [];
+
+	if (!isFullTheme) {
+		// Partial override: one info, not N errors. Steer the user toward the recipe.
+		return [
+			{
+				severity: 'info',
+				code: 'partial-override',
+				variable: '--dry-color-*',
+				message: ruleMessage('partial-override', { count: semanticCount }),
+				fix: ruleSuggestedFix('partial-override')
+			}
+		];
+	}
 
 	const issues: DiagnoseIssue[] = [];
 	for (const token of REQUIRED_TOKENS) {
@@ -885,8 +918,12 @@ function detectDarkScheme(css: string, allVars: Map<string, string>): DiagnoseIs
 
 export function diagnoseTheme(
 	css: string,
-	spec: { components: Record<string, { cssVars: Record<string, string> }> }
+	spec: { components: Record<string, { cssVars: Record<string, string> }> },
+	filename?: string
 ): DiagnoseResult {
+	// Detect whether this file opts into "full theme" completeness checking BEFORE
+	// stripping comments (the directive `/* @dryui-theme */` lives in a comment).
+	const isFullTheme = isThemeFile(css, filename);
 	const cleaned = stripComments(css);
 	const dryVars = extractDryVariables(cleaned);
 	const allVars = extractAllVariables(cleaned);
@@ -916,7 +953,7 @@ export function diagnoseTheme(
 	}
 
 	// 4. Run tiers 1-4
-	const tier1 = checkMissingTokens(resolved);
+	const tier1 = checkMissingTokens(resolved, isFullTheme);
 	const tier2 = checkValueTypes(resolved);
 	const tier3 = checkContrastHeuristics(resolved);
 	const tier4 = checkComponentTokens(resolved, spec);

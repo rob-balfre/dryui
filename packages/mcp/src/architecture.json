@@ -3,7 +3,7 @@
   "packageVersion": "1.7.4",
   "summary": {
     "componentNodes": 291,
-    "partNodes": 654,
+    "partNodes": 656,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 144,
@@ -16,7 +16,7 @@
     "wrapEdges": 130,
     "composeEdges": 15,
     "docsEdges": 0,
-    "relatedEdges": 304,
+    "relatedEdges": 307,
     "mismatches": 291,
     "primitivePartComponents": 0,
     "thinWrappers": 64
@@ -1309,23 +1309,30 @@
       "kind": "component",
       "package": "primitives",
       "layer": "primitive",
-      "category": "action",
-      "description": "Single or multi-select chip cluster",
+      "category": "layout",
+      "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
       "visibility": "root",
       "sourcePath": "packages/primitives/src/chip-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
         "chip",
         "group",
+        "tag",
+        "badge",
+        "pill",
+        "wrap",
+        "cluster",
         "filters",
-        "selection"
+        "selection",
+        "responsive"
       ],
       "compound": true,
       "parts": [
         "Root",
-        "Item"
+        "Item",
+        "Label"
       ],
-      "sourceFileCount": 4,
+      "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -1336,8 +1343,21 @@
       "kind": "part",
       "package": "primitives",
       "layer": "part",
-      "category": "action",
+      "category": "layout",
       "description": "Item part for ChipGroup.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "primitives:ChipGroup.Label",
+      "name": "ChipGroup.Label",
+      "label": "Label",
+      "kind": "part",
+      "package": "primitives",
+      "layer": "part",
+      "category": "layout",
+      "description": "Label part for ChipGroup.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -1349,7 +1369,7 @@
       "kind": "part",
       "package": "primitives",
       "layer": "part",
-      "category": "action",
+      "category": "layout",
       "description": "Root part for ChipGroup.",
       "tags": [],
       "compound": false,
@@ -9550,23 +9570,30 @@
       "kind": "component",
       "package": "ui",
       "layer": "ui-wrapper",
-      "category": "action",
-      "description": "Single or multi-select chip cluster",
+      "category": "layout",
+      "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
       "visibility": "root",
       "sourcePath": "packages/ui/src/chip-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
         "chip",
         "group",
+        "tag",
+        "badge",
+        "pill",
+        "wrap",
+        "cluster",
         "filters",
-        "selection"
+        "selection",
+        "responsive"
       ],
       "compound": true,
       "parts": [
         "Root",
-        "Item"
+        "Item",
+        "Label"
       ],
-      "sourceFileCount": 4,
+      "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -9577,8 +9604,21 @@
       "kind": "part",
       "package": "ui",
       "layer": "part",
-      "category": "action",
+      "category": "layout",
       "description": "Item part for ChipGroup.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:ChipGroup.Label",
+      "name": "ChipGroup.Label",
+      "label": "Label",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "layout",
+      "description": "Label part for ChipGroup.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -9590,7 +9630,7 @@
       "kind": "part",
       "package": "ui",
       "layer": "part",
-      "category": "action",
+      "category": "layout",
       "description": "Root part for ChipGroup.",
       "tags": [],
       "compound": false,
@@ -16984,6 +17024,13 @@
       "label": "Item"
     },
     {
+      "id": "compound_part:primitives:ChipGroup:primitives:ChipGroup.Label:Label",
+      "type": "compound_part",
+      "from": "primitives:ChipGroup",
+      "to": "primitives:ChipGroup.Label",
+      "label": "Label"
+    },
+    {
       "id": "compound_part:primitives:ChipGroup:primitives:ChipGroup.Root:Root",
       "type": "compound_part",
       "from": "primitives:ChipGroup",
@@ -19287,6 +19334,13 @@
       "label": "Item"
     },
     {
+      "id": "compound_part:ui:ChipGroup:ui:ChipGroup.Label:Label",
+      "type": "compound_part",
+      "from": "ui:ChipGroup",
+      "to": "ui:ChipGroup.Label",
+      "label": "Label"
+    },
+    {
       "id": "compound_part:ui:ChipGroup:ui:ChipGroup.Root:Root",
       "type": "compound_part",
       "from": "ui:ChipGroup",
@@ -21534,10 +21588,31 @@
       "label": "combines_with"
     },
     {
+      "id": "related:ui:ChipGroup:ui:Badge:combines_with",
+      "type": "related",
+      "from": "ui:ChipGroup",
+      "to": "ui:Badge",
+      "label": "combines_with"
+    },
+    {
       "id": "related:ui:ChipGroup:ui:Card:combines_with",
       "type": "related",
       "from": "ui:ChipGroup",
       "to": "ui:Card",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ChipGroup:ui:Chip:combines_with",
+      "type": "related",
+      "from": "ui:ChipGroup",
+      "to": "ui:Chip",
+      "label": "combines_with"
+    },
+    {
+      "id": "related:ui:ChipGroup:ui:Tag:combines_with",
+      "type": "related",
+      "from": "ui:ChipGroup",
+      "to": "ui:Tag",
       "label": "combines_with"
     },
     {

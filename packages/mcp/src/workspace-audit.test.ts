@@ -198,4 +198,67 @@ describe('scanWorkspace', () => {
 			report.findings.some((finding) => finding.ruleId === 'component/dryui/no-inline-style')
 		).toBe(true);
 	});
+
+	test('surfaces theme-import-order in a +layout.svelte with wrong order', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': ':root { --dry-color-bg-base: #111; }',
+			// Wrong order: local CSS imported before theme CSS.
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '../app.css';",
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>',
+				'<main>hello</main>'
+			].join('\n')
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const order = report.findings.filter(
+			(finding) => finding.ruleId === 'project/theme-import-order'
+		);
+		expect(order.length).toBeGreaterThan(0);
+		// Autofix should be attached.
+		expect(order[0]!.fixable).toBe(true);
+		expect(order[0]!.suggestedFixes.length).toBeGreaterThan(0);
+		expect(order[0]!.suggestedFixes[0]!.replacement).toContain('@dryui/ui/themes/default.css');
+	});
+
+	test('surfaces theme-import-order in a .ts module file with wrong order', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': ':root { --dry-color-bg-base: #111; }',
+			// Wrong order inside a .ts entry file (e.g. a Vite entry).
+			'src/entry.ts': ["import '../app.css';", "import '@dryui/ui/themes/default.css';"].join('\n'),
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const order = report.findings.filter(
+			(finding) => finding.ruleId === 'project/theme-import-order'
+		);
+		expect(order.length).toBe(1);
+		expect(order[0]!.file).toContain('src/entry.ts');
+	});
 });

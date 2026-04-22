@@ -103,7 +103,7 @@ function allTokens(overrides: Record<string, string> = {}): string {
 }
 
 describe('Missing tokens', () => {
-	test('CSS with 10 of 48 tokens → errors listing 38 missing', () => {
+	test('theme.css with 10 of 48 tokens → errors listing 38 missing', () => {
 		const css = `:root {
   --dry-color-text-strong: hsla(230, 100%, 15%, 0.90);
   --dry-color-text-weak: hsla(230, 100%, 20%, 0.65);
@@ -116,14 +116,14 @@ describe('Missing tokens', () => {
   --dry-color-brand: hsl(230, 65%, 55%);
   --dry-color-text-brand: hsl(230, 65%, 40%);
 }`;
-		const result = diagnoseTheme(css, mockSpec);
+		const result = diagnoseTheme(css, mockSpec, 'mytheme.theme.css');
 		const missing = result.issues.filter((i) => i.code === 'missing-token');
 		expect(missing.length).toBe(38);
 	});
 
 	test('CSS with all 48 tokens → no missing-token errors', () => {
 		const css = allTokens();
-		const result = diagnoseTheme(css, mockSpec);
+		const result = diagnoseTheme(css, mockSpec, 'mytheme.theme.css');
 		const missing = result.issues.filter((i) => i.code === 'missing-token');
 		expect(missing.length).toBe(0);
 	});
@@ -149,16 +149,80 @@ describe('Missing tokens', () => {
 		expect(missing.length).toBe(0);
 	});
 
-	test('CSS with exactly 4 tokens → flag missing tokens (at threshold)', () => {
+	test('theme.css with exactly 4 tokens → flag missing tokens (at threshold)', () => {
 		const css = `:root {
   --dry-color-fill-brand: hsl(230, 65%, 55%);
   --dry-color-on-brand: #ffffff;
   --dry-color-fill-error: hsl(0, 70%, 50%);
   --dry-color-on-error: #ffffff;
 }`;
-		const result = diagnoseTheme(css, mockSpec);
+		const result = diagnoseTheme(css, mockSpec, 'x.theme.css');
 		const missing = result.issues.filter((i) => i.code === 'missing-token');
 		expect(missing.length).toBe(44);
+	});
+});
+
+describe('Partial override (non-theme file)', () => {
+	test('app.css with 5 token overrides → single partial-override info (not 44 errors)', () => {
+		// Use brand tokens (fill-brand/on-brand is a pairing, so add both); status
+		// tokens are single so they won't trigger missing-pairing warnings.
+		const css = `:root {
+  --dry-color-bg-base: #0f172a;
+  --dry-color-bg-raised: #1e293b;
+  --dry-color-text-strong: #f8fafc;
+  --dry-color-fill-brand: #3b82f6;
+  --dry-color-on-brand: #ffffff;
+}`;
+		const result = diagnoseTheme(css, mockSpec, 'src/app.css');
+		const missing = result.issues.filter((i) => i.code === 'missing-token');
+		expect(missing.length).toBe(0);
+		const partial = result.issues.filter((i) => i.code === 'partial-override');
+		expect(partial.length).toBe(1);
+		expect(partial[0]!.severity).toBe('info');
+		expect(partial[0]!.message).toContain('customize tokens');
+	});
+
+	test('file with /* @dryui-theme */ directive → treated as full theme', () => {
+		const css = `/* @dryui-theme */
+:root {
+  --dry-color-bg-base: #0f172a;
+  --dry-color-bg-raised: #1e293b;
+  --dry-color-text-strong: #f8fafc;
+  --dry-color-fill-brand: #3b82f6;
+  --dry-color-on-brand: #ffffff;
+}`;
+		const result = diagnoseTheme(css, mockSpec, 'src/app.css');
+		const missing = result.issues.filter((i) => i.code === 'missing-token');
+		expect(missing.length).toBeGreaterThan(30);
+		const partial = result.issues.filter((i) => i.code === 'partial-override');
+		expect(partial.length).toBe(0);
+	});
+
+	test('*.theme.css filename → treated as full theme even without directive', () => {
+		const css = `:root {
+  --dry-color-bg-base: #0f172a;
+  --dry-color-bg-raised: #1e293b;
+  --dry-color-text-strong: #f8fafc;
+  --dry-color-fill-brand: #3b82f6;
+  --dry-color-on-brand: #ffffff;
+}`;
+		const result = diagnoseTheme(css, mockSpec, 'src/custom.theme.css');
+		const missing = result.issues.filter((i) => i.code === 'missing-token');
+		expect(missing.length).toBeGreaterThan(30);
+	});
+
+	test('missing-token message includes ask recipe steering', () => {
+		const css = `:root {
+  --dry-color-bg-base: #0f172a;
+  --dry-color-bg-raised: #1e293b;
+  --dry-color-text-strong: #f8fafc;
+  --dry-color-fill-brand: #3b82f6;
+  --dry-color-on-brand: #ffffff;
+}`;
+		const result = diagnoseTheme(css, mockSpec, 'src/my.theme.css');
+		const missing = result.issues.find((i) => i.code === 'missing-token');
+		expect(missing).toBeDefined();
+		expect(missing!.message).toContain('customize tokens');
 	});
 });
 
@@ -469,7 +533,7 @@ describe('CSS comments', () => {
 describe('Valid themes', () => {
 	test('complete light theme → no issues', () => {
 		const css = allTokens();
-		const result = diagnoseTheme(css, mockSpec);
+		const result = diagnoseTheme(css, mockSpec, 'light.theme.css');
 		expect(result.issues.length).toBe(0);
 	});
 
@@ -530,7 +594,7 @@ describe('Valid themes', () => {
 			'--dry-color-overlay-backdrop': 'hsla(0, 0%, 0%, 0.6)',
 			'--dry-color-overlay-backdrop-strong': 'hsla(0, 0%, 0%, 0.8)'
 		});
-		const result = diagnoseTheme(css, mockSpec);
+		const result = diagnoseTheme(css, mockSpec, 'dark.theme.css');
 		expect(result.issues.length).toBe(0);
 	});
 });

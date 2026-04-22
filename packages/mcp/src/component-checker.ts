@@ -25,6 +25,13 @@ function isRuleCatalogId(value: string): value is RuleCatalogId {
 	return value in RULE_CATALOG;
 }
 
+// Some violation rule ids use a `project/` prefix to identify findings that
+// straddle files (e.g. `project/theme-import-order`), but their catalog entry
+// is keyed by the short name. Map prefix → catalog id here.
+const PROJECT_RULE_TO_CATALOG_ID: Record<string, RuleCatalogId> = {
+	'project/theme-import-order': 'theme-import-order'
+};
+
 function lintViolationToIssue(violation: Violation): ComponentIssue {
 	if (isRuleCatalogId(violation.rule)) {
 		return {
@@ -33,6 +40,17 @@ function lintViolationToIssue(violation: Violation): ComponentIssue {
 			line: violation.line,
 			message: violation.message,
 			fix: ruleSuggestedFix(violation.rule)
+		};
+	}
+
+	const mapped = PROJECT_RULE_TO_CATALOG_ID[violation.rule];
+	if (mapped) {
+		return {
+			severity: RULE_CATALOG[mapped].severity,
+			code: violation.rule,
+			line: violation.line,
+			message: violation.message,
+			fix: ruleSuggestedFix(mapped)
 		};
 	}
 

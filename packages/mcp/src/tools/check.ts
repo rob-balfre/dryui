@@ -102,7 +102,7 @@ function renderCheckReport(opts: CheckReportOptions): string {
 
 function renderTheme(spec: Spec, absPath: string): string {
 	const css = readFileSync(absPath, 'utf-8');
-	const result = diagnoseTheme(css, spec);
+	const result = diagnoseTheme(css, spec, absPath);
 	const rel = displayPath(absPath);
 	const issues: CheckIssue[] = result.issues.map((issue) => ({
 		file: rel,
