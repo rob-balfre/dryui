@@ -167,6 +167,10 @@ const PROP_NOTES: Record<string, string> = {
 		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
 	'DatePicker.Root.name':
 		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
+	'Heading.maxMeasure':
+		'Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. Replaces the grid-wrapper hack that existed while dryui/no-width banned max-width.',
+	'Heading.variant':
+		"variant='display' uses --dry-font-display, which defaults to --dry-font-sans. For a distinct display typeface (e.g., a serif), override --dry-font-display on body or a scoped wrapper, not :root. See recipe: serif-display.",
 	'NumberInput.size':
 		'Adjusts input density and its default maximum width for compact counter-style fields.',
 	'Select.Root.name':
@@ -174,9 +178,17 @@ const PROP_NOTES: Record<string, string> = {
 	'Stepper.Root.activeStep': 'Bindable current step index for controlled multi-step flows.',
 	'Text.color':
 		'Use muted or secondary for supporting copy without reaching for inline color styles.',
+	'Text.maxMeasure':
+		'Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure.',
 	'Text.size': 'Applies DryUI text scale tokens for compact or emphasized body copy.',
+	'Typography.Heading.maxMeasure':
+		'Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines.',
+	'Typography.Heading.variant':
+		"variant='display' uses --dry-font-display, which defaults to --dry-font-sans. Override --dry-font-display on body or a scoped wrapper (not :root) for a distinct display typeface.",
 	'Typography.Text.color':
 		'Use muted or secondary for supporting copy without reaching for inline color styles.',
+	'Typography.Text.maxMeasure':
+		'Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch.',
 	'Typography.Text.size': 'Applies DryUI text scale tokens for compact or emphasized body copy.'
 };
 
@@ -197,6 +209,8 @@ const GENERIC_PROP_DESCRIPTIONS: Record<string, string> = {
 	label: 'Visible label text shown for the control or item.',
 	level: 'Semantic heading level to render.',
 	max: 'Maximum allowed value.',
+	maxMeasure:
+		'Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.',
 	min: 'Minimum allowed value.',
 	name: 'Field name used during native form submission.',
 	onSelect: 'Callback fired when the item is selected.',
@@ -235,7 +249,8 @@ const PROP_DESCRIPTIONS: Record<string, string> = {
 	'BorderBeam.strength': 'Intensity multiplier for the beam stroke, inner glow, and bloom layers.',
 	'BorderBeam.theme':
 		'Color tuning for dark or light surfaces, or system preference when set to `auto`.',
-	'Button.color': 'Semantic tone for primary or destructive button actions.',
+	'Button.color':
+		"Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets.",
 	'Button.size': 'Button density preset, including icon-only sizing variants.',
 	'Button.variant': 'Button treatment from solid primary actions to ghost and inline link styles.',
 	'Card.Root.selected': 'Applies selected-state styling for interactive card surfaces.',
@@ -422,6 +437,11 @@ const DATA_ATTRIBUTE_META: Record<string, DataAttributeMeta> = {
 	'Accordion.data-state': {
 		description: 'Reflects whether the current accordion item is expanded or collapsed.',
 		values: ['open', 'closed']
+	},
+	'Button.data-color': {
+		description:
+			"Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme.",
+		values: ['primary', 'danger', 'ink']
 	},
 	'Collapsible.data-state': {
 		description: 'Reflects whether the collapsible content is expanded or collapsed.',
@@ -701,6 +721,16 @@ function extractAcceptedValues(rawType: string): string[] | undefined {
 			values.push(part);
 			continue;
 		}
+
+		// Tolerate the `(string & {})` union-widening idiom used to keep IDE
+		// autocomplete on a literal union while still accepting arbitrary strings
+		// (e.g. `'primary' | 'danger' | 'ink' | (string & {}) | null`). The bare
+		// `string` / `number` primitives behave the same way when used as the
+		// escape hatch. In all these cases we still want to surface the literal
+		// values as documented accepted values.
+		const normalized = part.replace(/\s+/g, '');
+		if (normalized === '(string&{})' || normalized === '(number&{})') continue;
+		if (normalized === 'string' || normalized === 'number') continue;
 
 		return undefined;
 	}
@@ -1360,7 +1390,7 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 		'<DataGrid.Root items={rows} pageSize={10}>\n  <DataGrid.Table>\n    <DataGrid.Header>\n      <DataGrid.Row>\n        <DataGrid.Column key="name" sortable>Name</DataGrid.Column>\n        <DataGrid.Column key="status">Status</DataGrid.Column>\n      </DataGrid.Row>\n    </DataGrid.Header>\n    <DataGrid.Body>\n      {#snippet children({ items })}\n        {#each items as row (row.id)}\n          <DataGrid.Row rowId={row.id}>\n            <DataGrid.Cell>{row.name}</DataGrid.Cell>\n            <DataGrid.Cell>{row.status}</DataGrid.Cell>\n          </DataGrid.Row>\n        {/each}\n      {/snippet}\n    </DataGrid.Body>\n  </DataGrid.Table>\n  <DataGrid.Pagination />\n</DataGrid.Root>',
 	Chip: '<Chip variant="soft" color="blue">Policy friendly</Chip>',
 	ChipGroup:
-		'<ChipGroup.Root type="multiple" bind:value={selectedFilters}>\n  <ChipGroup.Item value="direct">Direct</ChipGroup.Item>\n  <ChipGroup.Item value="flexible">Flexible</ChipGroup.Item>\n  <ChipGroup.Item value="wifi">Wi-fi</ChipGroup.Item>\n</ChipGroup.Root>',
+		'<ChipGroup.Root gap="md">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant="soft">Local/MLX</Badge>\n  <Badge variant="soft">OpenAI</Badge>\n  <Badge variant="soft">Anthropic</Badge>\n  <Badge variant="soft">Mistral</Badge>\n</ChipGroup.Root>',
 	Tooltip:
 		'<Tooltip.Root>\n  <Tooltip.Trigger>\n    <Button variant="ghost">Hover me</Button>\n  </Tooltip.Trigger>\n  <Tooltip.Content>Extra information</Tooltip.Content>\n</Tooltip.Root>',
 	Card: '<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card body content goes here.</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button variant="solid">Action</Button>\n  </Card.Footer>\n</Card.Root>',

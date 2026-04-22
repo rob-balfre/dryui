@@ -578,7 +578,11 @@ export { Chip } from './chip/index.js';
 export type { ChipProps } from './chip/index.js';
 
 export { ChipGroup } from './chip-group/index.js';
-export type { ChipGroupRootProps, ChipGroupItemProps } from './chip-group/index.js';
+export type {
+	ChipGroupRootProps,
+	ChipGroupItemProps,
+	ChipGroupLabelProps
+} from './chip-group/index.js';
 
 export { Calendar } from './calendar/index.js';
 export type {

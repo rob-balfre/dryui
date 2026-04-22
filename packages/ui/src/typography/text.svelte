@@ -9,6 +9,7 @@
 		size = 'md',
 		font = 'sans',
 		weight,
+		maxMeasure = false,
 		class: className,
 		children,
 		...rest
@@ -20,6 +21,16 @@
 	let textVariant: 'default' | 'label' = $derived(variant === 'label' ? 'label' : 'default');
 </script>
 
-<Text {as} color={tone} {size} {font} {weight} variant={textVariant} {className} {...rest}>
+<Text
+	{as}
+	color={tone}
+	{size}
+	{font}
+	{weight}
+	variant={textVariant}
+	{maxMeasure}
+	{className}
+	{...rest}
+>
 	{@render children()}
 </Text>

@@ -6,6 +6,7 @@
 	interface Props extends HTMLAttributes<HTMLHeadingElement> {
 		level?: 1 | 2 | 3 | 4 | 5 | 6;
 		variant?: 'default' | 'display';
+		maxMeasure?: 'narrow' | 'default' | 'wide' | false;
 		className?: HTMLAttributes<HTMLHeadingElement>['class'];
 		children: Snippet;
 	}
@@ -13,35 +14,40 @@
 	let {
 		level = 2,
 		variant = 'default',
+		maxMeasure = false,
 		class: classAttr,
 		className = classAttr,
 		children,
 		...rest
 	}: Props = $props();
+
+	let measure: 'narrow' | 'default' | 'wide' | undefined = $derived(
+		maxMeasure === false ? undefined : maxMeasure
+	);
 </script>
 
 {#if level === 1}
-	<h1 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h1 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h1>
 {:else if level === 2}
-	<h2 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h2 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h2>
 {:else if level === 3}
-	<h3 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h3 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h3>
 {:else if level === 4}
-	<h4 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h4 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h4>
 {:else if level === 5}
-	<h5 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h5 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h5>
 {:else}
-	<h6 class={className} {...variantAttrs({ level, variant })} {...rest}>
+	<h6 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h6>
 {/if}
@@ -93,8 +99,24 @@
 	}
 
 	[data-variant='display'] {
+		font-family: var(--dry-font-display, var(--dry-font-sans));
 		font-size: var(--dry-type-display-size, var(--dry-text-4xl-size, 2.25rem));
 		line-height: var(--dry-type-display-leading, 4rem);
 		letter-spacing: -0.04em;
+	}
+
+	/* ── Measure (max-inline-size) ─────────────────────────────────────────────
+	   ch-unit measure tracks text content, not viewport layout. Editorial
+	   headlines wrap at narrow widths (~22ch) for rhythm. */
+	[data-measure='narrow'] {
+		max-inline-size: 22ch;
+	}
+
+	[data-measure='default'] {
+		max-inline-size: 45ch;
+	}
+
+	[data-measure='wide'] {
+		max-inline-size: 65ch;
 	}
 </style>

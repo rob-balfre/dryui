@@ -32,6 +32,7 @@ interface InitOptions {
 	userPath: string | null;
 	packageManager: DryuiPackageManager;
 	noLaunch: boolean;
+	noFeedback: boolean;
 }
 
 interface InitRuntime {
@@ -50,6 +51,7 @@ function parseInitArgs(args: string[]): InitOptions {
 	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
 	let noLaunch = false;
+	let noFeedback = false;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]!;
@@ -61,6 +63,8 @@ function parseInitArgs(args: string[]): InitOptions {
 			i++;
 		} else if (arg === '--no-launch') {
 			noLaunch = true;
+		} else if (arg === '--no-feedback') {
+			noFeedback = true;
 		} else if (!arg.startsWith('-')) {
 			targetPath = resolve(process.cwd(), arg);
 			userPath = arg;
@@ -71,7 +75,8 @@ function parseInitArgs(args: string[]): InitOptions {
 		targetPath,
 		userPath,
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
-		noLaunch
+		noLaunch,
+		noFeedback
 	};
 }
 
@@ -91,10 +96,45 @@ function runShellCommand(command: string, cwd: string): boolean {
 	return result.status === 0;
 }
 
+// The scaffold template from @dryui/mcp/project-planner emits layout imports
+// with app.css BEFORE the theme CSS. That silently overwrites every :root token
+// override in app.css. Correct order is theme CSS first, app.css last — we
+// fix it here at write-time so the scaffold honours its own docs.
+function fixLayoutImportOrder(snippet: string): string {
+	const match = snippet.match(/<script[^>]*>([\s\S]*?)<\/script>/);
+	if (!match) return snippet;
+	const scriptOpen = match[0].slice(0, match[0].indexOf(match[1]!));
+	const body = match[1]!;
+	const themeImportLines: string[] = [];
+	const otherLines: string[] = [];
+	let appCssLine: string | null = null;
+	for (const rawLine of body.split('\n')) {
+		if (/import\s+['"]@dryui\/ui\/themes\//.test(rawLine)) {
+			themeImportLines.push(rawLine);
+			continue;
+		}
+		if (/import\s+['"][^'"]*app\.css['"]/.test(rawLine)) {
+			appCssLine = rawLine;
+			continue;
+		}
+		otherLines.push(rawLine);
+	}
+	if (themeImportLines.length === 0 || appCssLine === null) return snippet;
+
+	const reordered = [...otherLines];
+	// Drop any leading blanks otherLines started with so imports sit tight under <script>.
+	while (reordered.length > 0 && reordered[0]!.trim() === '') reordered.shift();
+	const rebuiltBody = ['', ...themeImportLines, appCssLine, ...reordered].join('\n');
+	return snippet.replace(match[0], `${scriptOpen}${rebuiltBody}</script>`);
+}
+
 function executeCreateFile(step: ProjectPlanStep): void {
 	if (!step.path || !step.snippet) return;
 	mkdirSync(dirname(step.path), { recursive: true });
-	writeFileSync(step.path, step.snippet, 'utf-8');
+	const content = step.path.endsWith('+layout.svelte')
+		? fixLayoutImportOrder(step.snippet)
+		: step.snippet;
+	writeFileSync(step.path, content, 'utf-8');
 	log(`  + ${step.title.replace('Create ', '')}`);
 }
 
@@ -281,7 +321,7 @@ export async function runInit(
 	runtime: InitRuntime = {}
 ): Promise<void> {
 	if (args[0] === '--help') {
-		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch]');
+		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
 		console.log('');
 		console.log('Bootstrap a SvelteKit + DryUI project.');
 		console.log('');
@@ -289,10 +329,11 @@ export async function runInit(
 		console.log('  [path]           Target directory (default: current directory)');
 		console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
 		console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
+		console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
 		process.exit(0);
 	}
 
-	const { targetPath, userPath, packageManager, noLaunch } = parseInitArgs(args);
+	const { targetPath, userPath, packageManager, noLaunch, noFeedback } = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runShellCommand;
 
 	mkdirSync(targetPath, { recursive: true });
@@ -350,7 +391,7 @@ export async function runInit(
 	}
 
 	let feedbackReady = false;
-	if (isScaffold && installsSucceeded) {
+	if (isScaffold && installsSucceeded && !noFeedback) {
 		const concretePm: ConcretePackageManager =
 			packageManager === 'unknown' ? 'npm' : packageManager;
 		feedbackReady = setupFeedback(targetPath, concretePm, {

@@ -159,6 +159,26 @@ Force a specific theme:
 
 Use `data-theme="light"` for the inverse.
 
+### Option B.1: Light-only sites
+
+For a site that should always render light (brand / marketing / docs), combine
+both attributes on `<html>`:
+
+```html
+<html class="theme-auto" data-theme="light"></html>
+```
+
+- `data-theme="light"` pins the page to light tokens even on a dark-preferring
+  OS. The `.theme-auto` dark block is guarded with
+  `:not([data-theme='light'])`, so a dark OS cannot silently override your
+  light design.
+- `class="theme-auto"` stays so an opt-in dark toggle (flipping `data-theme`
+  to `"dark"`) keeps working. Drop `theme-auto` entirely only if you never
+  want a dark pathway, and the explicit `data-theme='dark']` rule is enough
+  on its own.
+
+Use `ask --scope recipe "light only"` for the full scaffold.
+
 ### Option C: Persisted theme toggle
 
 If you add a theme switcher, keep system mode as the default and only store explicit user choices:

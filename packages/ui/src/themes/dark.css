@@ -217,7 +217,15 @@
 	--dry-grain-blend: soft-light;
 }
 
-.theme-auto {
+/* When `.theme-auto` is combined with `data-theme="light"`, the explicit
+   `data-theme` wins — do NOT apply dark tokens under that combo, even on a
+   dark-preferring OS. Without this guard, `<html class="theme-auto" data-theme="light">`
+   on a dark OS would still resolve to dark tokens because the media query
+   below fires regardless of the attribute. Explicit `data-theme="dark"` is
+   already handled by the rule above; this class only drives the system-aware
+   auto behaviour when no explicit override is present (or when the override is
+   explicitly dark). */
+.theme-auto:not([data-theme='light']) {
 	@media (prefers-color-scheme: dark) {
 		& {
 			/* ─── Neutral ─────────────────────────────────────────────────── */

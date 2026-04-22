@@ -17,6 +17,37 @@
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
 	import Toolbar from './components/toolbar.svelte';
 
+	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
+	// omit the widget entirely. Useful for CI, screenshot jobs, or
+	// demo/recreation contexts where editing the root layout is not an option.
+	//
+	// - process.env.DRY_FEEDBACK_DISABLED covers the SSR process (Node).
+	// - import.meta.env.VITE_DRY_FEEDBACK_DISABLED also works and is baked into
+	//   the client bundle by Vite, so it disables the widget on both sides.
+	//   Prefer the VITE_-prefixed form for consistent SSR + client behavior.
+	const feedbackDisabled = (() => {
+		const maybeProcess = (globalThis as { process?: { env?: Record<string, unknown> } }).process;
+		try {
+			const env = maybeProcess?.env;
+			if (env) {
+				if (env.DRY_FEEDBACK_DISABLED) return true;
+				if (env.VITE_DRY_FEEDBACK_DISABLED) return true;
+			}
+		} catch {
+			// process is not available in the current runtime; ignore.
+		}
+		try {
+			const metaEnv = (import.meta as { env?: Record<string, unknown> }).env;
+			if (metaEnv) {
+				if (metaEnv.DRY_FEEDBACK_DISABLED) return true;
+				if (metaEnv.VITE_DRY_FEEDBACK_DISABLED) return true;
+			}
+		} catch {
+			// import.meta.env is unavailable outside Vite builds; ignore.
+		}
+		return false;
+	})();
+
 	const ANNOTATION_FILL = 'hsl(25 100% 55%)';
 	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
 	const STROKE_OUTLINE_WIDTH = 4;
@@ -999,238 +1030,240 @@
 	});
 </script>
 
-<Hotkey keys={shortcut} handler={toggle} />
+{#if !feedbackDisabled}
+	<Hotkey keys={shortcut} handler={toggle} />
 
-<Portal target={layerHostEl ?? 'body'}>
-	<div
-		class="feedback-root {className ?? ''}"
-		data-dryui-feedback
-		data-dismiss-ignore
-		data-layer-hosted={layerHostEl ? '' : undefined}
-		style={feedbackRootStyle()}
-	>
-		{#if showOverlay}
-			<svg
-				class="drawing-canvas {cursorClass}"
-				data-active={active || undefined}
-				role="application"
-				aria-label="Feedback drawing canvas"
-				onpointerdown={handlePointerDown}
-				onpointermove={handlePointerMove}
-				onpointerup={handlePointerUp}
-				onpointercancel={handlePointerUp}
-				onwheel={handleWheel}
-			>
-				<defs>
-					<filter id="annotation-shadow" x="-50%" y="-50%" width="200%" height="200%">
-						<feDropShadow
-							dx="0"
-							dy="1.5"
-							stdDeviation="1.5"
-							flood-color="black"
-							flood-opacity="0.35"
-						/>
-					</filter>
-				</defs>
+	<Portal target={layerHostEl ?? 'body'}>
+		<div
+			class="feedback-root {className ?? ''}"
+			data-dryui-feedback
+			data-dismiss-ignore
+			data-layer-hosted={layerHostEl ? '' : undefined}
+			style={feedbackRootStyle()}
+		>
+			{#if showOverlay}
+				<svg
+					class="drawing-canvas {cursorClass}"
+					data-active={active || undefined}
+					role="application"
+					aria-label="Feedback drawing canvas"
+					onpointerdown={handlePointerDown}
+					onpointermove={handlePointerMove}
+					onpointerup={handlePointerUp}
+					onpointercancel={handlePointerUp}
+					onwheel={handleWheel}
+				>
+					<defs>
+						<filter id="annotation-shadow" x="-50%" y="-50%" width="200%" height="200%">
+							<feDropShadow
+								dx="0"
+								dy="1.5"
+								stdDeviation="1.5"
+								flood-color="black"
+								flood-opacity="0.35"
+							/>
+						</filter>
+					</defs>
 
-				{#each drawings as drawing (drawing.id)}
-					{@const transform = drawingSpace(drawing) === 'scroll' ? scrollTransform : undefined}
-					{#if drawing.kind === 'freehand'}
-						<g filter="url(#annotation-shadow)" {transform}>
-							<path
-								d={pointsToPath(drawing.points)}
+					{#each drawings as drawing (drawing.id)}
+						{@const transform = drawingSpace(drawing) === 'scroll' ? scrollTransform : undefined}
+						{#if drawing.kind === 'freehand'}
+							<g filter="url(#annotation-shadow)" {transform}>
+								<path
+									d={pointsToPath(drawing.points)}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+								<path
+									d={pointsToPath(drawing.points)}
+									stroke={drawing.color}
+									stroke-width={drawing.width}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+							</g>
+						{:else if drawing.kind === 'arrow'}
+							<g filter="url(#annotation-shadow)" {transform}>
+								<line
+									x1={drawing.start.x}
+									y1={drawing.start.y}
+									x2={drawing.end.x}
+									y2={drawing.end.y}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+								/>
+								<path
+									d={arrowHeadPath(drawing.start, drawing.end)}
+									stroke={ANNOTATION_OUTLINE}
+									stroke-width={outlinedStrokeWidth(drawing.width)}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+								<line
+									x1={drawing.start.x}
+									y1={drawing.start.y}
+									x2={drawing.end.x}
+									y2={drawing.end.y}
+									stroke={drawing.color}
+									stroke-width={drawing.width}
+									stroke-linecap="round"
+								/>
+								<path
+									d={arrowHeadPath(drawing.start, drawing.end)}
+									stroke={drawing.color}
+									stroke-width={drawing.width}
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									fill="none"
+								/>
+							</g>
+						{:else}
+							<text
+								x={drawing.position.x}
+								y={drawing.position.y}
+								{transform}
+								filter="url(#annotation-shadow)"
+								fill={drawing.color}
 								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(drawing.width)}
-								stroke-linecap="round"
+								stroke-width={outlinedTextWidth(drawing.fontSize)}
+								paint-order="stroke fill"
 								stroke-linejoin="round"
-								fill="none"
-							/>
-							<path
-								d={pointsToPath(drawing.points)}
-								stroke={drawing.color}
-								stroke-width={drawing.width}
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								fill="none"
-							/>
-						</g>
-					{:else if drawing.kind === 'arrow'}
-						<g filter="url(#annotation-shadow)" {transform}>
-							<line
-								x1={drawing.start.x}
-								y1={drawing.start.y}
-								x2={drawing.end.x}
-								y2={drawing.end.y}
-								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(drawing.width)}
-								stroke-linecap="round"
-							/>
-							<path
-								d={arrowHeadPath(drawing.start, drawing.end)}
-								stroke={ANNOTATION_OUTLINE}
-								stroke-width={outlinedStrokeWidth(drawing.width)}
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								fill="none"
-							/>
-							<line
-								x1={drawing.start.x}
-								y1={drawing.start.y}
-								x2={drawing.end.x}
-								y2={drawing.end.y}
-								stroke={drawing.color}
-								stroke-width={drawing.width}
-								stroke-linecap="round"
-							/>
-							<path
-								d={arrowHeadPath(drawing.start, drawing.end)}
-								stroke={drawing.color}
-								stroke-width={drawing.width}
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								fill="none"
-							/>
-						</g>
-					{:else}
-						<text
-							x={drawing.position.x}
-							y={drawing.position.y}
-							{transform}
+								font-size={drawing.fontSize}
+								font-family="system-ui, -apple-system, sans-serif"
+								font-weight="600">{drawing.text}</text
+							>
+						{/if}
+					{/each}
+
+					{#if currentStroke}
+						<g
 							filter="url(#annotation-shadow)"
-							fill={drawing.color}
-							stroke={ANNOTATION_OUTLINE}
-							stroke-width={outlinedTextWidth(drawing.fontSize)}
-							paint-order="stroke fill"
-							stroke-linejoin="round"
-							font-size={drawing.fontSize}
-							font-family="system-ui, -apple-system, sans-serif"
-							font-weight="600">{drawing.text}</text
+							transform={drawingTransform(drawingSpace(currentStroke))}
 						>
+							<path
+								d={pointsToPath(currentStroke.points)}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentStroke.width)}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+							<path
+								d={pointsToPath(currentStroke.points)}
+								stroke={currentStroke.color}
+								stroke-width={currentStroke.width}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+						</g>
 					{/if}
-				{/each}
 
-				{#if currentStroke}
-					<g
-						filter="url(#annotation-shadow)"
-						transform={drawingTransform(drawingSpace(currentStroke))}
-					>
-						<path
-							d={pointsToPath(currentStroke.points)}
-							stroke={ANNOTATION_OUTLINE}
-							stroke-width={outlinedStrokeWidth(currentStroke.width)}
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							fill="none"
-						/>
-						<path
-							d={pointsToPath(currentStroke.points)}
-							stroke={currentStroke.color}
-							stroke-width={currentStroke.width}
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							fill="none"
-						/>
-					</g>
-				{/if}
+					{#if currentArrow}
+						<g
+							filter="url(#annotation-shadow)"
+							transform={drawingTransform(drawingSpace(currentArrow))}
+						>
+							<line
+								x1={currentArrow.start.x}
+								y1={currentArrow.start.y}
+								x2={currentArrow.end.x}
+								y2={currentArrow.end.y}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-linecap="round"
+							/>
+							<path
+								d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+								stroke={ANNOTATION_OUTLINE}
+								stroke-width={outlinedStrokeWidth(currentArrow.width)}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+							<line
+								x1={currentArrow.start.x}
+								y1={currentArrow.start.y}
+								x2={currentArrow.end.x}
+								y2={currentArrow.end.y}
+								stroke={currentArrow.color}
+								stroke-width={currentArrow.width}
+								stroke-linecap="round"
+							/>
+							<path
+								d={arrowHeadPath(currentArrow.start, currentArrow.end)}
+								stroke={currentArrow.color}
+								stroke-width={currentArrow.width}
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								fill="none"
+							/>
+						</g>
+					{/if}
+				</svg>
+			{/if}
 
-				{#if currentArrow}
-					<g
-						filter="url(#annotation-shadow)"
-						transform={drawingTransform(drawingSpace(currentArrow))}
-					>
-						<line
-							x1={currentArrow.start.x}
-							y1={currentArrow.start.y}
-							x2={currentArrow.end.x}
-							y2={currentArrow.end.y}
-							stroke={ANNOTATION_OUTLINE}
-							stroke-width={outlinedStrokeWidth(currentArrow.width)}
-							stroke-linecap="round"
-						/>
-						<path
-							d={arrowHeadPath(currentArrow.start, currentArrow.end)}
-							stroke={ANNOTATION_OUTLINE}
-							stroke-width={outlinedStrokeWidth(currentArrow.width)}
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							fill="none"
-						/>
-						<line
-							x1={currentArrow.start.x}
-							y1={currentArrow.start.y}
-							x2={currentArrow.end.x}
-							y2={currentArrow.end.y}
-							stroke={currentArrow.color}
-							stroke-width={currentArrow.width}
-							stroke-linecap="round"
-						/>
-						<path
-							d={arrowHeadPath(currentArrow.start, currentArrow.end)}
-							stroke={currentArrow.color}
-							stroke-width={currentArrow.width}
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							fill="none"
-						/>
-					</g>
-				{/if}
-			</svg>
-		{/if}
-
-		{#if textInput}
-			<div
-				class="text-input-wrap"
-				style={textInputStyle(textInput.position, textInput.space)}
-				onfocusout={handleTextInputFocusOut}
-			>
-				<input
-					class="text-input"
-					type="text"
-					data-feedback-text-input
-					bind:this={textInputEl}
-					bind:value={textInput.value}
-					onkeydown={handleTextKeyDown}
-					placeholder="Type annotation..."
-				/>
-				<button class="text-confirm-btn" onclick={commitText} aria-label="Confirm annotation">
-					<Check size={14} />
-				</button>
-			</div>
-		{/if}
-
-		<Toolbar
-			{active}
-			{tool}
-			hasDrawings={hasDrawings || sent}
-			hidden={toolbarHiddenForCapture}
-			{submitStatus}
-			{sent}
-			ontoggle={toggle}
-			ontoolchange={setTool}
-			onsubmit={handleSubmit}
-		/>
-	</div>
-
-	<div
-		bind:this={toastLayerEl}
-		popover="manual"
-		role="region"
-		aria-label="Feedback notifications"
-		data-dryui-feedback-toast-layer
-		data-dry-stagger
-		data-position="top-right"
-		class="feedback-toast-provider"
-	>
-		{#each toasts as toast (toast.id)}
-			<Toast.Root id={toast.id} variant={toast.variant}>
-				<div class="feedback-toast-copy">
-					<Toast.Title>{toast.title}</Toast.Title>
-					<Toast.Description>{toast.description}</Toast.Description>
+			{#if textInput}
+				<div
+					class="text-input-wrap"
+					style={textInputStyle(textInput.position, textInput.space)}
+					onfocusout={handleTextInputFocusOut}
+				>
+					<input
+						class="text-input"
+						type="text"
+						data-feedback-text-input
+						bind:this={textInputEl}
+						bind:value={textInput.value}
+						onkeydown={handleTextKeyDown}
+						placeholder="Type annotation..."
+					/>
+					<button class="text-confirm-btn" onclick={commitText} aria-label="Confirm annotation">
+						<Check size={14} />
+					</button>
 				</div>
-			</Toast.Root>
-		{/each}
-	</div>
-</Portal>
+			{/if}
+
+			<Toolbar
+				{active}
+				{tool}
+				hasDrawings={hasDrawings || sent}
+				hidden={toolbarHiddenForCapture}
+				{submitStatus}
+				{sent}
+				ontoggle={toggle}
+				ontoolchange={setTool}
+				onsubmit={handleSubmit}
+			/>
+		</div>
+
+		<div
+			bind:this={toastLayerEl}
+			popover="manual"
+			role="region"
+			aria-label="Feedback notifications"
+			data-dryui-feedback-toast-layer
+			data-dry-stagger
+			data-position="top-right"
+			class="feedback-toast-provider"
+		>
+			{#each toasts as toast (toast.id)}
+				<Toast.Root id={toast.id} variant={toast.variant}>
+					<div class="feedback-toast-copy">
+						<Toast.Title>{toast.title}</Toast.Title>
+						<Toast.Description>{toast.description}</Toast.Description>
+					</div>
+				</Toast.Root>
+			{/each}
+		</div>
+	</Portal>
+{/if}
 
 <style>
 	.feedback-root {

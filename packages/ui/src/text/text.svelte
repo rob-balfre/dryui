@@ -10,6 +10,7 @@
 		font?: 'sans' | 'mono';
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		variant?: 'default' | 'label';
+		maxMeasure?: 'narrow' | 'default' | 'wide' | false;
 		className?: HTMLAttributes<HTMLElement>['class'];
 		children: Snippet;
 	}
@@ -21,23 +22,28 @@
 		font = 'sans',
 		weight,
 		variant = 'default',
+		maxMeasure = false,
 		class: classAttr,
 		className = classAttr,
 		children,
 		...rest
 	}: Props = $props();
+
+	let measure: 'narrow' | 'default' | 'wide' | undefined = $derived(
+		maxMeasure === false ? undefined : maxMeasure
+	);
 </script>
 
 {#if as === 'span'}
 	<span
 		class={className}
-		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
 		{...rest}>{@render children()}</span
 	>
 {:else if as === 'div'}
 	<div
 		class={className}
-		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
 		{...rest}
 	>
 		{@render children()}
@@ -45,7 +51,7 @@
 {:else}
 	<p
 		class={className}
-		{...variantAttrs({ color, size, font, weight: weight || undefined, variant })}
+		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
 		{...rest}
 	>
 		{@render children()}
@@ -131,5 +137,20 @@
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
 		font-weight: 600;
+	}
+
+	/* ── Measure (max-inline-size) ─────────────────────────────────────────────
+	   Body copy gets wider presets than Heading so paragraphs read well
+	   without feeling cramped. */
+	[data-measure='narrow'] {
+		max-inline-size: 48ch;
+	}
+
+	[data-measure='default'] {
+		max-inline-size: 65ch;
+	}
+
+	[data-measure='wide'] {
+		max-inline-size: 80ch;
 	}
 </style>

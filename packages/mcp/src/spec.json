@@ -55,10 +55,20 @@
           "default": "'md'"
         },
         "color": {
-          "type": "'primary' | 'danger' | (string & {}) | null",
+          "type": "'primary' | 'danger' | 'ink' | (string & {}) | null",
           "required": false,
-          "description": "Semantic tone for primary or destructive button actions.",
+          "acceptedValues": [
+            "primary",
+            "danger",
+            "ink",
+            "null"
+          ],
+          "description": "Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets.",
           "default": "'primary'"
+        },
+        "className": {
+          "type": "string",
+          "required": false
         },
         "disabled": {
           "type": "boolean",
@@ -171,7 +181,13 @@
       },
       "dataAttributes": [
         {
-          "name": "data-color"
+          "name": "data-color",
+          "description": "Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme.",
+          "values": [
+            "primary",
+            "danger",
+            "ink"
+          ]
         },
         {
           "name": "data-disabled",
@@ -8543,7 +8559,20 @@
                 "default",
                 "display"
               ],
-              "description": "Visual style preset for the component."
+              "description": "Visual style preset for the component.",
+              "note": "variant='display' uses --dry-font-display, which defaults to --dry-font-sans. Override --dry-font-display on body or a scoped wrapper (not :root) for a distinct display typeface."
+            },
+            "maxMeasure": {
+              "type": "'narrow' | 'default' | 'wide' | false",
+              "required": false,
+              "acceptedValues": [
+                "narrow",
+                "default",
+                "wide",
+                "false"
+              ],
+              "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
+              "note": "Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines."
             },
             "className": {
               "type": "HTMLAttributes<HTMLHeadingElement>['class']",
@@ -8608,6 +8637,18 @@
                 "semibold",
                 "bold"
               ]
+            },
+            "maxMeasure": {
+              "type": "'narrow' | 'default' | 'wide' | false",
+              "required": false,
+              "acceptedValues": [
+                "narrow",
+                "default",
+                "wide",
+                "false"
+              ],
+              "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
+              "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch."
             },
             "className": {
               "type": "HTMLAttributes<HTMLElement>['class']",
@@ -8743,7 +8784,21 @@
             "display"
           ],
           "description": "Visual style preset for the component.",
+          "note": "variant='display' uses --dry-font-display, which defaults to --dry-font-sans. For a distinct display typeface (e.g., a serif), override --dry-font-display on body or a scoped wrapper, not :root. See recipe: serif-display.",
           "default": "'default'"
+        },
+        "maxMeasure": {
+          "type": "'narrow' | 'default' | 'wide' | false",
+          "required": false,
+          "acceptedValues": [
+            "narrow",
+            "default",
+            "wide",
+            "false"
+          ],
+          "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
+          "note": "Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. Replaces the grid-wrapper hack that existed while dryui/no-width banned max-width.",
+          "default": "false"
         },
         "className": {
           "type": "HTMLAttributes<HTMLHeadingElement>['class']",
@@ -8774,6 +8829,9 @@
       "dataAttributes": [
         {
           "name": "data-level"
+        },
+        {
+          "name": "data-measure"
         },
         {
           "name": "data-variant"
@@ -8858,6 +8916,19 @@
           "description": "Visual style preset for the component.",
           "default": "'default'"
         },
+        "maxMeasure": {
+          "type": "'narrow' | 'default' | 'wide' | false",
+          "required": false,
+          "acceptedValues": [
+            "narrow",
+            "default",
+            "wide",
+            "false"
+          ],
+          "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
+          "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure.",
+          "default": "false"
+        },
         "className": {
           "type": "HTMLAttributes<HTMLElement>['class']",
           "required": false
@@ -8892,6 +8963,9 @@
         },
         {
           "name": "data-font"
+        },
+        {
+          "name": "data-measure"
         },
         {
           "name": "data-size"
@@ -12040,6 +12114,9 @@
             "value": {
               "type": "string | null",
               "required": false,
+              "acceptedValues": [
+                "null"
+              ],
               "description": "Current controlled or bindable value.",
               "default": "null"
             },
@@ -12940,6 +13017,11 @@
         "speed": {
           "type": "'slow' | 'normal' | 'fast' | number",
           "required": false,
+          "acceptedValues": [
+            "slow",
+            "normal",
+            "fast"
+          ],
           "default": "'normal'"
         },
         "motion": {
@@ -15208,13 +15290,19 @@
     },
     "ChipGroup": {
       "import": "@dryui/ui",
-      "description": "Single or multi-select chip cluster",
-      "category": "action",
+      "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
+      "category": "layout",
       "tags": [
         "chip",
         "group",
+        "tag",
+        "badge",
+        "pill",
+        "wrap",
+        "cluster",
         "filters",
-        "selection"
+        "selection",
+        "responsive"
       ],
       "compound": true,
       "parts": {
@@ -15263,6 +15351,27 @@
               "description": "Horizontal or vertical layout direction.",
               "default": "'horizontal'"
             },
+            "gap": {
+              "type": "'sm' | 'md' | 'lg'",
+              "required": false,
+              "acceptedValues": [
+                "sm",
+                "md",
+                "lg"
+              ],
+              "default": "'md'"
+            },
+            "justify": {
+              "type": "'start' | 'center' | 'end' | 'between'",
+              "required": false,
+              "acceptedValues": [
+                "start",
+                "center",
+                "end",
+                "between"
+              ],
+              "default": "'start'"
+            },
             "children": {
               "type": "Snippet",
               "required": true,
@@ -15310,20 +15419,41 @@
             ],
             "note": "Forwards <button> attributes via rest props."
           }
+        },
+        "Label": {
+          "props": {
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "HTMLAttributes<HTMLSpanElement>",
+            "via": "rest",
+            "element": "span",
+            "examples": [
+              "id",
+              "style",
+              "aria-label"
+            ],
+            "note": "Forwards <span> attributes via rest props."
+          }
         }
       },
       "structure": {
         "tree": [
           "ChipGroup.Root",
-          "  ChipGroup.Item"
+          "  ChipGroup.Label"
         ]
       },
       "a11y": [
-        "Provide discernible text or an aria-label for controls that do not expose visible text.",
-        "Use button semantics for in-place actions and link semantics for navigation."
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
       ],
       "cssVars": {
         "--dry-chip-group-font-size": "Group Font Size",
+        "--dry-chip-group-gap": "Group Gap",
         "--dry-chip-group-padding-x": "Group Padding X",
         "--dry-chip-group-padding-y": "Group Padding Y"
       },
@@ -15332,8 +15462,17 @@
           "name": "data-chip-group"
         },
         {
+          "name": "data-chip-group-label"
+        },
+        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-gap"
+        },
+        {
+          "name": "data-justify"
         },
         {
           "name": "data-orientation",
@@ -15350,7 +15489,7 @@
           "name": "data-state"
         }
       ],
-      "example": "<ChipGroup.Root type=\"multiple\" bind:value={selectedFilters}>\n  <ChipGroup.Item value=\"direct\">Direct</ChipGroup.Item>\n  <ChipGroup.Item value=\"flexible\">Flexible</ChipGroup.Item>\n  <ChipGroup.Item value=\"wifi\">Wi-fi</ChipGroup.Item>\n</ChipGroup.Root>"
+      "example": "<ChipGroup.Root gap=\"md\">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant=\"soft\">Local/MLX</Badge>\n  <Badge variant=\"soft\">OpenAI</Badge>\n  <Badge variant=\"soft\">Anthropic</Badge>\n  <Badge variant=\"soft\">Mistral</Badge>\n</ChipGroup.Root>"
     },
     "Carousel": {
       "import": "@dryui/ui",
@@ -15385,6 +15524,9 @@
             "autoplay": {
               "type": "number | false",
               "required": false,
+              "acceptedValues": [
+                "false"
+              ],
               "default": "false"
             },
             "children": {
@@ -16354,6 +16496,9 @@
             "selectedItem": {
               "type": "string | null",
               "required": false,
+              "acceptedValues": [
+                "null"
+              ],
               "default": "null",
               "bindable": true
             },
@@ -18693,6 +18838,11 @@
         "speed": {
           "type": "'slow' | 'normal' | 'fast' | number",
           "required": false,
+          "acceptedValues": [
+            "slow",
+            "normal",
+            "fast"
+          ],
           "default": "'normal'"
         },
         "interactive": {
@@ -18769,6 +18919,11 @@
         "dotSize": {
           "type": "'fine' | 'medium' | 'coarse' | number",
           "required": false,
+          "acceptedValues": [
+            "fine",
+            "medium",
+            "coarse"
+          ],
           "default": "'medium'"
         },
         "angle": {
@@ -22164,12 +22319,18 @@
             "component": "Button (as link)",
             "useWhen": "Navigation that looks like a button",
             "snippet": "<Button href=\"/settings\" variant=\"outline\">Settings</Button>"
+          },
+          {
+            "rank": 3,
+            "component": "Button (editorial CTA)",
+            "useWhen": "Editorial/download CTA that reads as a solid near-black pill",
+            "snippet": "<Button color=\"ink\" size=\"lg\" href=\"/download\">Download for Mac</Button>"
           }
         ],
         "antiPatterns": [
           {
             "pattern": "<button>",
-            "reason": "Native button — no theming, no variant system",
+            "reason": "Native button. No theming, no variant system.",
             "fix": "Button"
           },
           {
@@ -22181,6 +22342,16 @@
             "pattern": "raw <button> with custom CSS classes",
             "reason": "Button provides variants, sizes, loading states, icons, and theme-consistent styling. Custom buttons bypass the design system.",
             "fix": "<Button variant=\"solid\">Submit</Button>"
+          },
+          {
+            "pattern": "className on Button",
+            "reason": "Button accepts 'class' (Svelte idiomatic). For a solid near-black editorial CTA, use the 'ink' color preset; for deeper visual overrides, wrap with --dry-btn-* token overrides or pass a scoped 'class'.",
+            "fix": "<Button class=\"...\" color=\"ink\">Download</Button>"
+          },
+          {
+            "pattern": "span wrapper setting --dry-btn-bg / --dry-btn-color for a black CTA",
+            "reason": "The 'ink' color preset already renders a theme-aware near-black/white button via --dry-color-bg-inverse and --dry-color-text-inverse. Wrapping adds indirection and loses the data-color hook.",
+            "fix": "<Button color=\"ink\">Download</Button>"
           }
         ],
         "combinesWith": [
@@ -23632,22 +23803,28 @@
       },
       "chipgroup": {
         "component": "ChipGroup",
-        "useWhen": "Single or multi-select chip cluster for filtering or category selection",
+        "useWhen": "Wrapping cluster of Badge, Chip, or tag children; also handles single/multi-select chip filters",
         "alternatives": [
           {
             "rank": 1,
             "component": "ChipGroup",
-            "useWhen": "Filter chip group with selection state",
-            "snippet": "<ChipGroup bind:value={selected} type=\"multiple\">\n  <Chip value=\"new\">New</Chip>\n  <Chip value=\"sale\">Sale</Chip>\n  <Chip value=\"popular\">Popular</Chip>\n</ChipGroup>"
+            "useWhen": "Responsive wrapping row of Badge/tag children (e.g. \"WORKS WITH\" provider list)",
+            "snippet": "<ChipGroup.Root gap=\"md\">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant=\"soft\">Local/MLX</Badge>\n  <Badge variant=\"soft\">OpenAI</Badge>\n  <Badge variant=\"soft\">Anthropic</Badge>\n</ChipGroup.Root>"
           },
           {
             "rank": 2,
+            "component": "ChipGroup",
+            "useWhen": "Filter chip group with selection state",
+            "snippet": "<ChipGroup.Root type=\"multiple\" bind:value={selected}>\n  <ChipGroup.Item value=\"new\">New</ChipGroup.Item>\n  <ChipGroup.Item value=\"sale\">Sale</ChipGroup.Item>\n  <ChipGroup.Item value=\"popular\">Popular</ChipGroup.Item>\n</ChipGroup.Root>"
+          },
+          {
+            "rank": 3,
             "component": "SegmentedControl",
             "useWhen": "Exclusive selection from 2-4 options in a compact control",
             "snippet": "<SegmentedControl bind:value={choice} options={[...]} />"
           },
           {
-            "rank": 3,
+            "rank": 4,
             "component": "ToggleGroup",
             "useWhen": "Toggle buttons for toolbar actions",
             "snippet": "<ToggleGroup.Root bind:value={selection} type=\"multiple\">\n  <ToggleGroup.Item value=\"a\">A</ToggleGroup.Item>\n</ToggleGroup.Root>"
@@ -23655,12 +23832,25 @@
         ],
         "antiPatterns": [
           {
+            "pattern": "<div> with display: flex; flex-wrap: wrap for chips",
+            "reason": "dryui/no-flex bans raw flex-wrap. ChipGroup.Root is the sanctioned wrapper and carries the data-chip-group carve-out.",
+            "fix": "ChipGroup.Root"
+          },
+          {
+            "pattern": "<div> with grid-template-columns: repeat(N, max-content) for tag rows",
+            "reason": "Hand-rolled grid breakpoints fight content-driven wrapping. ChipGroup.Root handles it in one prop.",
+            "fix": "ChipGroup.Root"
+          },
+          {
             "pattern": "Multiple Chip components without ChipGroup",
-            "reason": "ChipGroup manages selection state and keyboard navigation",
-            "fix": "ChipGroup"
+            "reason": "ChipGroup manages layout, selection state, and keyboard navigation",
+            "fix": "ChipGroup.Root"
           }
         ],
         "combinesWith": [
+          "Badge",
+          "Chip",
+          "Tag",
           "Card.Content"
         ]
       },
@@ -24427,6 +24617,11 @@
             "pattern": "Unstyled <h1> to <h6>",
             "reason": "Heading provides consistent typography scale and theme integration",
             "fix": "Heading"
+          },
+          {
+            "pattern": "Wrapping Heading in a grid/flex just to cap its width (e.g. grid-template-columns: minmax(0, 34rem) 1fr)",
+            "reason": "Heading exposes maxMeasure for ergonomic headline widths; the wrapper hack exists only to work around the old no-width rule, which now allows ch units.",
+            "fix": "<Heading maxMeasure=\"narrow\">…</Heading>"
           }
         ],
         "combinesWith": [
@@ -24943,6 +25138,41 @@
           "Container"
         ],
         "snippet": "<!-- 1. app.html — add theme-auto class -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — import themes (resets are built in) -->\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\n<!-- 3. src/routes/+layout.svelte — root layout -->\n<script>\n  import '../app.css';\n  import { Container } from '@dryui/ui';\n\n  let { children } = $props();\n</script>\n\n<header>\n  <Container>\n    <div class=\"app-header\">My App</div>\n  </Container>\n</header>\n<main>\n  <Container>\n    <div class=\"page-content\">\n      {@render children()}\n    </div>\n  </Container>\n</main>\n\n<style>\n  .app-header { padding: var(--dry-space-4) 0; font-weight: bold; }\n  .page-content { display: grid; gap: var(--dry-space-6); }\n</style>"
+      },
+      "customize-tokens": {
+        "name": "customize-tokens",
+        "description": "Three correct ways to customize --dry-* tokens. Pick by scope: (a) scoped wrapper on a single route for 1-5 per-page tweaks, (b) body/html selector with the /* @dryui-theme */ directive for 1-10 site-wide tweaks (or use the *.theme.css filename), or (c) a full *.theme.css file when defining an entirely custom palette. Dumping a handful of overrides at :root inside app.css raises a partial-override info telling you to pick one of these.",
+        "tags": [
+          "theme",
+          "tokens",
+          "customize",
+          "customise",
+          "override",
+          "overrides",
+          "partial-override",
+          "theme-file",
+          "dry-color",
+          "dry-space",
+          "palette"
+        ],
+        "components": [],
+        "snippet": "<!--\n  Three correct ways to customize --dry-* tokens. Pick by scope.\n  Do NOT dump a handful of overrides at :root in app.css, since that hides\n  contrast problems and triggers the partial-override check.\n-->\n\n<!-- ========== (a) Per-route scoped override (1-5 tokens, one page) ========== -->\n<!-- src/routes/marketing/+page.svelte -->\n<script>\n  import { Container } from '@dryui/ui';\n</script>\n\n<div class=\"page\">\n  <Container>\n    <h1>Launch day</h1>\n  </Container>\n</div>\n\n<style>\n  /* Overrides scope to .page and inherit down, so only this route picks them\n     up. No :root, no directive needed. */\n  .page {\n    --dry-color-bg-base: #fff7ed;\n    --dry-color-fill-brand: #ea580c;\n    --dry-color-on-brand: #ffffff;\n    --dry-color-stroke-weak: #fed7aa;\n  }\n</style>\n\n<!-- ========== (b) Site-wide partial override (1-10 tokens, whole app) ========== -->\n<!-- src/app.css — mark the file as an intentional theme file with either the\n     directive OR the *.theme.css filename. Scope overrides under a selector\n     (body or html), not :root, so routes that want to tweak further still can. -->\n/* @dryui-theme */\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\nbody {\n  --dry-color-fill-brand: #ea580c;\n  --dry-color-fill-brand-hover: #c2410c;\n  --dry-color-fill-brand-active: #9a3412;\n  --dry-color-on-brand: #ffffff;\n  --dry-color-focus-ring: rgba(234, 88, 12, 0.4);\n}\n\n<!-- ========== (c) Full custom theme (*.theme.css, every semantic token) ========== -->\n<!-- src/lib/brand.theme.css — the .theme.css filename turns on completeness\n     checking, so missing tokens surface as errors. Use when defining an\n     entirely custom palette (neutral + brand + status + surfaces). Import\n     AFTER the stock theme CSS so your values win. -->\n:root, [data-theme='brand'] {\n  /* Neutral */\n  --dry-color-text-strong: #0f172a;\n  --dry-color-text-weak: rgba(15, 23, 42, 0.65);\n  --dry-color-icon: rgba(15, 23, 42, 0.75);\n  --dry-color-stroke-strong: rgba(15, 23, 42, 0.35);\n  --dry-color-stroke-weak: rgba(15, 23, 42, 0.1);\n  --dry-color-fill: rgba(15, 23, 42, 0.05);\n  --dry-color-fill-hover: rgba(15, 23, 42, 0.08);\n  --dry-color-fill-active: rgba(15, 23, 42, 0.12);\n  /* Backgrounds */\n  --dry-color-bg-base: #fff7ed;\n  --dry-color-bg-raised: #ffedd5;\n  --dry-color-bg-overlay: #fed7aa;\n  /* Brand + the remaining ~35 semantic tokens go here. Run\n     `check src/lib/brand.theme.css` to see every token the checker expects. */\n}\n\n<!-- Import order matters. In +layout.svelte: theme CSS BEFORE local CSS. -->\n<!-- src/routes/+layout.svelte -->\n<script>\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import '$lib/brand.theme.css';\n  import '../app.css';\n</script>"
+      },
+      "light-only": {
+        "name": "light-only",
+        "description": "Force the site into light mode for every visitor, regardless of OS preference. Use for brand sites, marketing pages, or docs that were designed around a light palette and should not flip on a dark-preferring OS.",
+        "tags": [
+          "theme",
+          "light",
+          "light-only",
+          "force-light",
+          "data-theme",
+          "theme-auto",
+          "brand",
+          "marketing"
+        ],
+        "components": [],
+        "snippet": "<!-- 1. app.html — keep theme-auto AND pin data-theme=\"light\".\n     - data-theme=\"light\" makes the page render with light tokens on every OS.\n     - theme-auto is still useful: if a user explicitly opts in to dark via a\n       toggle (swapping data-theme to \"dark\"), the media query under the\n       theme-auto class can still drive dark tokens. With data-theme=\"light\"\n       present, the theme-auto block is guarded so dark OS preference cannot\n       silently override your light design. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\" data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — import BOTH theme files.\n     default.css defines light tokens on :root. dark.css contains the\n     [data-theme='dark'] override and the guarded .theme-auto block.\n     You still want dark.css imported so an opt-in dark toggle keeps working. -->\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\n<!-- 3. src/routes/+layout.svelte — nothing special; tokens already resolve light. -->\n<script>\n  import '../app.css';\n  import { Container } from '@dryui/ui';\n\n  let { children } = $props();\n</script>\n\n<main>\n  <Container>{@render children()}</Container>\n</main>\n\n<!-- Gotcha: do NOT drop theme-auto to \"force light\". Leaving theme-auto in\n     place preserves the opt-in dark pathway (user sets data-theme=\"dark\")\n     without making light the default. -->"
       },
       "page-shell-simple": {
         "name": "page-shell-simple",
@@ -25489,6 +25719,111 @@
           "Text"
         ],
         "snippet": "<!-- Aligned card list — parent grid defines shared columns,\n     each Card.Root uses subgrid to inherit the tracks.\n     Columns stay aligned across all rows without a <table>. -->\n<script>\n  import { Card, Badge, Text } from '@dryui/ui';\n\n  const flights = [\n    { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },\n    { airline: 'Pacific Wings', route: 'SFO → JFK', depart: '10:40', arrive: '21:10', duration: '7h 30m', stops: '1 stop', price: '$194' },\n    { airline: 'Coastal Jet', route: 'SFO → JFK', depart: '14:20', arrive: '22:50', duration: '5h 30m', stops: 'Nonstop', price: '$312' },\n  ];\n</script>\n\n<div class=\"flight-list\">\n  <!-- Column headers share the same grid tracks as rows -->\n  <div class=\"flight-list-header\">\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Airline</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Route</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Depart</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Arrive</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Duration</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Price</Text>\n  </div>\n\n  {#each flights as flight (flight.airline + flight.depart)}\n    <Card.Root variant=\"interactive\">\n      <Card.Content noPadding>\n        <div class=\"flight-row\">\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"medium\">{flight.airline}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" font=\"mono\">{flight.route}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.depart}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.arrive}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" size=\"sm\" color=\"secondary\">{flight.duration}</Text>\n            <Badge variant=\"soft\" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"bold\">{flight.price}</Text>\n          </div>\n        </div>\n      </Card.Content>\n    </Card.Root>\n  {/each}\n</div>\n\n<style>\n  /* Parent grid defines the shared column tracks */\n  .flight-list {\n    display: grid;\n    grid-template-columns: 1fr 1fr auto auto 1fr auto;\n    gap: var(--dry-space-2);\n  }\n\n  /* Header spans all columns and inherits tracks via subgrid */\n  .flight-list-header {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    padding: 0 var(--dry-space-4) var(--dry-space-2);\n  }\n\n  /* :global() is required here — subgrid must reach Card's internal\n     elements which live in a child component scope. */\n  .flight-list :global([data-card]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  .flight-list :global([data-card-content]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  /* Row inside the card inherits tracks */\n  .flight-row {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    align-items: center;\n    padding: var(--dry-space-3) var(--dry-space-4);\n  }\n\n  /* Each cell aligns to its parent track */\n  .flight-cell {\n    display: grid;\n    gap: var(--dry-space-1);\n    align-content: center;\n  }\n\n  /* Responsive: collapse to stacked layout on narrow containers */\n  @container (max-width: 640px) {\n    .flight-list {\n      grid-template-columns: 1fr;\n    }\n\n    .flight-list-header {\n      display: none;\n    }\n\n    .flight-row {\n      grid-template-columns: 1fr 1fr;\n      gap: var(--dry-space-2);\n    }\n  }\n</style>"
+      },
+      "custom-button-color": {
+        "name": "custom-button-color",
+        "description": "Customize a Button past the built-in primary/danger palette. Three tiers from least-invasive to most: (a) use the color=\"ink\" preset for a solid near-black editorial CTA that auto-inverts in dark theme, (b) pass a scoped class to tune padding, radius, or typography without theme drift, (c) wrap with --dry-btn-* token overrides for deep visual customization when neither preset nor class is enough.",
+        "tags": [
+          "button",
+          "cta",
+          "ink",
+          "black",
+          "editorial",
+          "color",
+          "custom",
+          "customize",
+          "download",
+          "theme",
+          "tokens"
+        ],
+        "components": [
+          "Button"
+        ],
+        "snippet": "<!-- Tier A: color=\"ink\" preset (preferred).\n     Renders a solid near-black button with white text in light theme; in dark\n     theme it auto-inverts to a white button with near-black text. Uses\n     --dry-color-bg-inverse / --dry-color-text-inverse under the hood, so any\n     theme override of those tokens flows through. Zero configuration. -->\n<script>\n  import { Button } from '@dryui/ui';\n</script>\n\n<Button color=\"ink\" size=\"lg\" href=\"/download\">Download for Mac</Button>\n\n<!-- Tier B: scoped `class` prop (granular typography/shape).\n     Button forwards `class` to its root element, alongside internal data-*\n     attributes. Use for per-call-site tweaks that do not fit a token. Keep\n     selectors scoped; :global() escapes are fine because Button's root is\n     rendered inside the consumer's component scope. -->\n<script>\n  import { Button } from '@dryui/ui';\n</script>\n\n<Button class=\"hero-cta\" color=\"ink\" size=\"lg\" href=\"/download\">\n  Download for Mac\n</Button>\n\n<style>\n  .hero-cta {\n    letter-spacing: 0.02em;\n    font-weight: 600;\n    min-width: 16rem;\n  }\n</style>\n\n<!-- Tier C: --dry-btn-* token overrides (deepest).\n     Every button visual is routed through a public --dry-btn-* var with a\n     token default. Override the vars on a wrapper (or on the Button itself via\n     `style=`) when you need a specific background, text, border, radius, or\n     shadow that is not reachable by preset or class. -->\n<script>\n  import { Button } from '@dryui/ui';\n</script>\n\n<span class=\"brand-cta\">\n  <Button size=\"lg\" href=\"/download\">Download for Mac</Button>\n</span>\n\n<style>\n  .brand-cta {\n    --dry-btn-bg: #111111;\n    --dry-btn-color: #fafafa;\n    --dry-btn-border: #000000;\n    --dry-btn-radius: 9999px;\n  }\n</style>"
+      },
+      "narrow-headline": {
+        "name": "narrow-headline",
+        "description": "Editorial hero with a ch-bounded headline. Uses <Heading maxMeasure=\"narrow\"> to cap the headline at ~22ch so long titles wrap on a measure that feels typeset, not reflowed. Replaces the legacy grid-wrapper hack (grid-template-columns: minmax(0, 34rem) 1fr) that was only needed while dryui/no-width banned max-width entirely.",
+        "tags": [
+          "headline",
+          "hero",
+          "typography",
+          "measure",
+          "heading",
+          "editorial",
+          "narrow",
+          "max-inline-size",
+          "ch",
+          "osaurus"
+        ],
+        "components": [
+          "Heading",
+          "Text"
+        ],
+        "snippet": "<!-- Editorial hero: narrow headline measure for rhythm.\n     maxMeasure=\"narrow\" maps to max-inline-size: 22ch on the rendered <h*>.\n     ch tracks the text content, so the measure adapts to font size and zoom\n     without freezing a px layout. Body copy stays readable with its own cap. -->\n<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<section class=\"hero\">\n  <Heading level={1} variant=\"display\" maxMeasure=\"narrow\">\n    Inference is all you need.\n  </Heading>\n  <Text size=\"lg\" color=\"muted\" maxMeasure=\"default\">\n    Run open-weight models on your laptop. No cloud, no keys, no telemetry.\n  </Text>\n</section>\n\n<style>\n  .hero {\n    display: grid;\n    gap: var(--dry-space-6);\n    padding-block: var(--dry-space-16);\n  }\n</style>\n\n<!-- Anti-pattern (do not do this):\n\n  <div class=\"hero-grid\">\n    <Heading level={1}>Inference is all you need.</Heading>\n  </div>\n\n  <style>\n    .hero-grid {\n      display: grid;\n      grid-template-columns: minmax(0, 34rem) 1fr;\n    }\n  </style>\n\n  That wrapper existed only to cap the heading width before maxMeasure shipped.\n  It mixes layout with typographic measure and pins the cap in rem, which does\n  not track the font. Prefer maxMeasure=\"narrow\" on Heading directly. -->"
+      },
+      "serif-display": {
+        "name": "serif-display",
+        "description": "Heading variant=\"display\" with a serif typeface. Override --dry-font-display on body (or a scoped wrapper), never :root (that trips the theme-checker full-theme-override rule). Without an override, display falls back to --dry-font-sans.",
+        "tags": [
+          "typography",
+          "display",
+          "heading",
+          "serif",
+          "font",
+          "newsreader",
+          "google-fonts",
+          "theme",
+          "--dry-font-display",
+          "editorial"
+        ],
+        "components": [
+          "Heading"
+        ],
+        "snippet": "<!-- Serif display heading: override --dry-font-display on a scoped\n     wrapper. variant=\"display\" on Heading reads --dry-font-display and\n     falls back to --dry-font-sans, so without an override you get sans. -->\n\n<!-- 1. app.html: link a serif font. Newsreader is a good editorial default. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n    <link\n      href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap\"\n      rel=\"stylesheet\"\n    />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. app.css: override --dry-font-display on body (or a .page wrapper).\n     Do NOT put this on :root (that trips the theme-checker\n     full-theme-override rule, which reserves :root for generated theme\n     files). Scoping to body keeps the override local to the app instance\n     and reads every <Heading variant=\"display\"> beneath it. -->\nbody {\n  --dry-font-display: 'Newsreader', Georgia, 'Times New Roman', serif;\n}\n\n<!-- 3. Any page: variant=\"display\" now renders with the serif. -->\n<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<section class=\"hero\">\n  <Heading level={1} variant=\"display\" maxMeasure=\"narrow\">\n    Inference is all you need.\n  </Heading>\n  <Text size=\"lg\" color=\"muted\">Open-weight models, on your laptop.</Text>\n</section>\n\n<style>\n  .hero {\n    display: grid;\n    gap: var(--dry-space-6);\n  }\n</style>\n\n<!-- Gotchas:\n     - Only the Heading variant reads --dry-font-display. Other typography\n       components still use --dry-font-sans or --dry-font-mono.\n     - Override on body or a .page wrapper, NOT on :root. The theme-checker\n       treats :root { --dry-* } blocks as full theme overrides and flags them\n       when they do not ship a complete token set.\n     - If you want the serif scoped to one section (landing page only), move\n       the override onto a wrapper class instead of body. -->"
+      },
+      "chip-row": {
+        "name": "chip-row",
+        "description": "Responsive wrapping row of Badge, Chip, or tag children. ChipGroup.Root is the sanctioned flex-wrap wrapper: it carries the data-chip-group attribute that exempts it from dryui/no-flex, so a 20-item tag list reflows naturally across any container width without grid breakpoints.",
+        "tags": [
+          "chip",
+          "tag",
+          "badge",
+          "pill",
+          "wrap",
+          "cluster",
+          "flex-wrap",
+          "responsive",
+          "filter",
+          "layout"
+        ],
+        "components": [
+          "ChipGroup",
+          "Badge"
+        ],
+        "snippet": "<script>\n  import { ChipGroup, Badge } from '@dryui/ui';\n</script>\n\n<!-- Canonical chip row: ChipGroup.Root wraps Badge/Chip children and\n     handles responsive flow. DO NOT reach for <div style=\"display:flex;\n     flex-wrap:wrap\"> or a grid-template-columns: repeat(N, max-content)\n     hack — ChipGroup.Root is the carve-out. -->\n<ChipGroup.Root gap=\"md\">\n  <Badge variant=\"soft\" color=\"blue\">TypeScript</Badge>\n  <Badge variant=\"soft\" color=\"green\">Svelte 5</Badge>\n  <Badge variant=\"soft\" color=\"purple\">Vite</Badge>\n  <Badge variant=\"soft\">Bun</Badge>\n  <Badge variant=\"soft\">Vitest</Badge>\n  <Badge variant=\"soft\">Playwright</Badge>\n</ChipGroup.Root>\n\n<!-- gap: 'sm' | 'md' | 'lg' — maps to --dry-space tokens.\n     justify: 'start' | 'center' | 'end' | 'between' — controls horizontal\n     alignment when the row does not fill the container. -->"
+      },
+      "works-with": {
+        "name": "works-with",
+        "description": "Eyebrow-labelled provider list, like the osaurus.ai \"WORKS WITH\" section. ChipGroup.Label renders the small-caps eyebrow, and the Root handles wrapping across breakpoints. Use for \"compatible with\", \"integrates with\", \"powered by\", or any capability disclosure that needs a heading plus a wrapping pill list.",
+        "tags": [
+          "works-with",
+          "compatible",
+          "integrates",
+          "powered-by",
+          "eyebrow",
+          "label",
+          "marketing",
+          "provider",
+          "capability",
+          "chip",
+          "badge"
+        ],
+        "components": [
+          "ChipGroup",
+          "Badge"
+        ],
+        "snippet": "<script>\n  import { ChipGroup, Badge } from '@dryui/ui';\n</script>\n\n<!-- \"WORKS WITH\" pattern: eyebrow label + wrapping provider badges.\n     ChipGroup.Label lives inside Root as the first child so the flex row\n     treats it as a sibling pill-height item with the rest of the chips. -->\n<ChipGroup.Root gap=\"md\" justify=\"start\">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant=\"soft\">Local / MLX</Badge>\n  <Badge variant=\"soft\">OpenAI</Badge>\n  <Badge variant=\"soft\">Anthropic</Badge>\n  <Badge variant=\"soft\">Google</Badge>\n  <Badge variant=\"soft\">Mistral</Badge>\n  <Badge variant=\"soft\">Groq</Badge>\n  <Badge variant=\"soft\">Ollama</Badge>\n  <Badge variant=\"soft\">OpenRouter</Badge>\n  <Badge variant=\"soft\">Together</Badge>\n  <Badge variant=\"soft\">Perplexity</Badge>\n  <Badge variant=\"soft\">xAI</Badge>\n</ChipGroup.Root>\n\n<!-- Variants:\n     - gap=\"lg\"               more breathing room between providers\n     - justify=\"center\"       centre the list under a hero heading\n     - Swap Badge for Chip    if providers should be clickable filters -->"
       }
     }
   },

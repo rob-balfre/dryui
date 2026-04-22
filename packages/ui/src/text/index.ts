@@ -8,6 +8,12 @@ export interface TextProps extends HTMLAttributes<HTMLElement> {
 	font?: 'sans' | 'mono';
 	weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 	variant?: 'default' | 'label';
+	/**
+	 * Caps the rendered inline size in ch units so body copy wraps on ergonomic
+	 * measure. `false` (default) keeps the existing behaviour of no cap.
+	 * `narrow` ≈ 48ch, `default` ≈ 65ch, `wide` ≈ 80ch.
+	 */
+	maxMeasure?: 'narrow' | 'default' | 'wide' | false;
 	className?: HTMLAttributes<HTMLElement>['class'];
 	children: Snippet;
 }

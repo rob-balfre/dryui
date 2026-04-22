@@ -59,6 +59,17 @@ describe('runAsk', () => {
 		expect(output).not.toContain('kind: component');
 	});
 
+	test('recipe scope returns customize-tokens guidance', () => {
+		const output = runAsk(spec, { query: 'customize tokens', scope: 'recipe' });
+
+		expect(output).toContain('kind: recipe');
+		expect(output).toContain('recipe:customize-tokens');
+		// All three strategies (scoped wrapper, directive, .theme.css) should be
+		// discoverable in the recipe payload.
+		expect(output).toContain('@dryui-theme');
+		expect(output).toContain('.theme.css');
+	});
+
 	test('list scope can filter to tokens', () => {
 		const output = runAsk(spec, { query: '', scope: 'list', kind: 'token' });
 
@@ -102,5 +113,37 @@ describe('runAsk', () => {
 		expect(output).toContain('kind: component');
 		expect(output).toContain('install-plan');
 		expect(output).toContain(root);
+	});
+
+	test('Heading component scope surfaces the display-font note', () => {
+		const output = runAsk(spec, { query: 'Heading', scope: 'component' });
+
+		expect(output).toContain('kind: component');
+		// Prop notes block must be rendered so the display font guidance is
+		// discoverable without needing to open spec.json by hand.
+		expect(output).toContain('prop-notes[');
+		expect(output).toContain('--dry-font-display');
+		// maxMeasure note should land in the same block.
+		expect(output).toContain('maxMeasure');
+		expect(output).toContain('22ch');
+	});
+
+	test('recipe scope returns narrow-headline guidance', () => {
+		const output = runAsk(spec, { query: 'narrow headline', scope: 'recipe' });
+
+		expect(output).toContain('kind: recipe');
+		expect(output).toContain('recipe:narrow-headline');
+		expect(output).toContain('maxMeasure="narrow"');
+	});
+
+	test('recipe scope returns serif-display guidance', () => {
+		const output = runAsk(spec, { query: 'serif display', scope: 'recipe' });
+
+		expect(output).toContain('kind: recipe');
+		expect(output).toContain('recipe:serif-display');
+		expect(output).toContain('--dry-font-display');
+		// Description (not just snippet) must warn about :root so readers see
+		// the theme-checker gotcha even if the snippet gets truncated.
+		expect(output).toContain('never :root');
 	});
 });

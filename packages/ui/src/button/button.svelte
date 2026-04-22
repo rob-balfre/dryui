@@ -26,11 +26,15 @@
 			| 'pill';
 		size?: 'sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg';
 		// Autocomplete still suggests the canonical values via the literal union.
-		color?: 'primary' | 'danger' | (string & {}) | null;
+		// 'ink' renders a solid near-black editorial CTA in light theme that auto-inverts
+		// (light bg, dark text) in dark theme, using --dry-color-{bg,text}-inverse tokens.
+		color?: 'primary' | 'danger' | 'ink' | (string & {}) | null;
 		href?: string;
 		rel?: string;
 		target?: string;
 		download?: boolean | string;
+		/** Back-compat alias for `class` — matches Heading/Text ergonomics. Prefer `class`. */
+		className?: HTMLButtonAttributes['class'];
 		/** Callback invoked with the rendered `<button>` or `<a>` element on mount, `null` on destroy. */
 		ref?: (el: HTMLButtonElement | HTMLAnchorElement | null) => void;
 		children: Snippet;
@@ -52,7 +56,8 @@
 		download,
 		type = 'button',
 		onclick,
-		class: className,
+		class: classAttr,
+		className = classAttr,
 		ref,
 		children,
 		...rest
@@ -449,6 +454,30 @@
 		--_dry-btn-accent-hover: var(--dry-btn-accent-hover, var(--dry-color-fill-error-hover));
 		--_dry-btn-accent-active: var(--dry-btn-accent-active, var(--dry-color-fill-error-hover));
 		--_dry-btn-on-accent: var(--dry-btn-on-accent, var(--dry-color-on-error));
+	}
+
+	/* ── Ink: editorial "download / primary CTA" preset.
+	   Uses the semantic `inverse` tokens so the surface flips between themes:
+	   light theme → near-black bg + white text; dark theme → white bg + near-black
+	   text. Any consumer token override (--dry-btn-bg etc.) still wins because the
+	   variant styles read from the public layer first. */
+	:is(a, button)[data-color='ink'] {
+		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-bg-inverse));
+		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-inverse));
+		--_dry-btn-accent-stroke: var(--dry-btn-accent-stroke, var(--dry-color-stroke-strong));
+		--_dry-btn-accent-weak: var(
+			--dry-btn-accent-weak,
+			color-mix(in srgb, var(--dry-color-bg-inverse) 10%, transparent)
+		);
+		--_dry-btn-accent-hover: var(
+			--dry-btn-accent-hover,
+			color-mix(in srgb, var(--dry-color-bg-inverse) 85%, transparent)
+		);
+		--_dry-btn-accent-active: var(
+			--dry-btn-accent-active,
+			color-mix(in srgb, var(--dry-color-bg-inverse) 75%, transparent)
+		);
+		--_dry-btn-on-accent: var(--dry-btn-on-accent, var(--dry-color-text-inverse));
 	}
 
 	/* ── Sizes ─────────────────────────────────────────────────────────────────── */
