@@ -1132,7 +1132,7 @@ async function runInteractiveInit(
 		}
 	}
 
-	runInit([projectPath, '--pm', packageManager], spec);
+	await runInit([projectPath, '--pm', packageManager], spec);
 	await promptAfterAction();
 }
 
