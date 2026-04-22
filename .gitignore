@@ -61,3 +61,10 @@ packages/*/src/**/*.d.ts
 # Benchmark run artifacts (large, per-run, regenerable)
 reports/benchmarks/artifacts/
 !reports/benchmarks/artifacts/.gitkeep
+
+# Benchmark run outputs — regenerated on every validate/bench:smoke run.
+# Keep `baseline.json` tracked so regression gates have a stable target.
+reports/benchmarks/latest.json
+reports/benchmarks/latest.md
+reports/benchmarks/history/*.jsonl
+!reports/benchmarks/history/.gitkeep

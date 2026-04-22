@@ -65,12 +65,18 @@ function toSlug(name: string): string {
 		.toLowerCase();
 }
 
+// Files that live inside a component dir but carry zero runtime behaviour —
+// changing them cannot regress interactive behaviour, so they do not force
+// browser coverage. Any entry added here must be genuinely runtime-inert.
+const NON_INTERACTIVE_SUFFIXES = ['.meta.ts'];
+
 export function collectTouchedInteractiveComponents(changedFiles: string[]): string[] {
 	const touched = new Set<string>();
 
 	for (const filePath of changedFiles.map(normalizePath)) {
 		const match = filePath.match(/^packages\/(?:ui|primitives)\/src\/([^/]+)(?:\/|$)/);
 		if (!match) continue;
+		if (NON_INTERACTIVE_SUFFIXES.some((suffix) => filePath.endsWith(suffix))) continue;
 
 		const component = componentSlugToName.get(match[1]);
 		if (component) touched.add(component);
