@@ -6,7 +6,8 @@ import { stdin as input, stdout as output } from 'node:process';
 import {
 	detectPackageManagerFromEnv,
 	detectProject,
-	type DryuiPackageManager
+	type DryuiPackageManager,
+	type ProjectDetection
 } from '@dryui/mcp/project-planner';
 import {
 	emitCommandResult,
@@ -591,6 +592,25 @@ function renderFeedbackLaunchProgress(noOpen: boolean): void {
 	console.log('');
 }
 
+function renderNoProjectFeedbackNotice(detection: ProjectDetection, cwd: string): void {
+	renderPromptFrame(detectionIssueTitle(detection));
+	console.log(
+		paint(
+			'Opening the feedback dashboard only. Run from your Svelte or SvelteKit app directory to also start its dev server.',
+			ANSI.white
+		)
+	);
+	console.log(paint(`cwd: ${homeRelative(cwd)}`, ANSI.dim, ANSI.sky));
+	console.log('');
+}
+
+function detectionIssueTitle(detection: ProjectDetection): string {
+	if (!detection.packageJsonPath) return 'No Svelte or SvelteKit project detected';
+	if (detection.framework === 'unknown') return 'Not a Svelte or SvelteKit project';
+	if (detection.packageManager === 'unknown') return 'Could not detect a package manager';
+	return 'No dev script found in package.json';
+}
+
 function renderEditorInstallProgress(
 	editor: SetupGuide,
 	contextLines: readonly string[],
@@ -851,6 +871,8 @@ async function runFeedbackSession(
 	if (launched) return;
 
 	if (spec) {
+		const cwd = process.cwd();
+		const detection = detectProject(spec, cwd);
 		const onProgress = launcherOptions.runtime?.onProgress;
 		const userProjectLaunched = await runUserProjectLauncher(args, {
 			exitOnComplete,
@@ -858,6 +880,7 @@ async function runFeedbackSession(
 			runtime: {
 				promptKillPortHolder,
 				promptFeedbackSetup,
+				detectProject: () => detection,
 				...(onProgress
 					? {
 							onProgress: ({ cwd, noOpen: projectNoOpen }) =>
@@ -867,6 +890,10 @@ async function runFeedbackSession(
 			}
 		});
 		if (userProjectLaunched) return;
+
+		if (!exitOnComplete) {
+			renderNoProjectFeedbackNotice(detection, cwd);
+		}
 	}
 
 	const result = await getFeedbackUiResult(args, exitOnComplete ? 'toon' : 'text');

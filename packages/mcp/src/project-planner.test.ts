@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { chmodSync, mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { detectProject, planAdd, planInstall, type ProjectPlannerSpec } from './project-planner.js';
@@ -303,6 +303,43 @@ describe('detectProject', () => {
 		expect(result.warnings).toContain(
 			`Found 2 nested SvelteKit projects below ${workspaceRoot}; rerun against the intended app directory.`
 		);
+	});
+
+	test('survives unreadable descendant directories instead of crashing', () => {
+		const workspaceRoot = createProject({
+			'package.json': JSON.stringify({
+				dependencies: { react: '^18.0.0' }
+			}),
+			'quarantine/.keep': '',
+			'apps/docs/package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: { '@dryui/lint': 'workspace:*' }
+			}),
+			'apps/docs/bun.lock': '',
+			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const quarantine = resolve(workspaceRoot, 'quarantine');
+		chmodSync(quarantine, 0o000);
+		try {
+			const result = detectProject(mockSpec, workspaceRoot);
+
+			expect(result.framework).toBe('sveltekit');
+			expect(result.root).toBe(resolve(workspaceRoot, 'apps/docs'));
+		} finally {
+			chmodSync(quarantine, 0o755);
+		}
 	});
 
 	test('scopes descendant auto-discovery to the requested subtree', () => {
