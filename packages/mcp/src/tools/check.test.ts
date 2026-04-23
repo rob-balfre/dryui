@@ -150,4 +150,57 @@ describe('runCheck', () => {
 		expect(output).toContain('kind: workspace');
 		expect(output).toContain(`target: ${resolve(root, 'apps/example')}`);
 	});
+
+	test('workspace-scope component violations keep hint and docsRef', () => {
+		// workspace-audit prefixes component rule ids with `component/`, which
+		// must be stripped before enrichDiagnostic so the namespaced code lands
+		// on a HINTS key (`lint/dryui/*`).
+		const root = createProject({
+			'packages/ui/src/thing.svelte': [
+				'<div class="thing"></div>',
+				'<style>',
+				'  .thing { display: flex; }',
+				'</style>'
+			].join('\n')
+		});
+
+		const result = runCheckStructured(spec, {}, { cwd: root });
+
+		const flex = result.diagnostics.find((d) => d.code === 'lint/dryui/no-flex');
+		expect(flex).toBeDefined();
+		expect(flex?.source).toBe('lint');
+		expect(flex?.code).toBe('lint/dryui/no-flex');
+		expect(flex?.hint).toBeDefined();
+		expect(flex?.hint?.length ?? 0).toBeGreaterThan(0);
+		expect(flex?.docsRef).toMatch(/^https:\/\/dryui\.dev/);
+	});
+
+	test('runCheckStructured exposes a summary that matches the TOON header', () => {
+		const root = createProject({
+			'Example.svelte': '<div style="color: red">hello</div>'
+		});
+
+		const result = runCheckStructured(spec, { path: 'Example.svelte' }, { cwd: root });
+
+		// JSON summary must match TOON header exactly so the self-correction
+		// recipe's stop condition ("diagnostics empty AND hasBlockers=false")
+		// reads the same truth from either transport.
+		expect(result.summary.hasBlockers).toBe(result.diagnostics.some((d) => d.severity === 'error'));
+		expect(result.summary.autoFixable).toBe(
+			result.diagnostics.filter((d) => d.autoFixable === true).length
+		);
+
+		const toonLine = result.text.split('\n').find((line) => line.startsWith('hasBlockers:'));
+		expect(toonLine).toBe(
+			`hasBlockers: ${result.summary.hasBlockers} | autoFixable: ${result.summary.autoFixable}`
+		);
+
+		// makeFixPair is currently a stub. The honest signal is that no
+		// enriched diagnostic ships a structured fix, so autoFixable is 0.
+		expect(result.summary.autoFixable).toBe(0);
+
+		expect(result.summary.counts.total).toBe(result.diagnostics.length);
+		const expectedErrorCount = result.diagnostics.filter((d) => d.severity === 'error').length;
+		expect(result.summary.counts.error).toBe(expectedErrorCount);
+	});
 });

@@ -76,15 +76,14 @@ async function main() {
 	}
 
 	const backups: Array<{ pkgPath: string; backup: ExportSwapBackup }> = [];
-	if (swap) {
-		for (const pkgPath of pkgPaths) {
-			backups.push({ pkgPath, backup: swapExportsForPublish(pkgPath, { silent: true }) });
-		}
-	}
-
 	let allOk = true;
 	const allFailures: string[] = [];
 	try {
+		if (swap) {
+			for (const pkgPath of pkgPaths) {
+				backups.push({ pkgPath, backup: swapExportsForPublish(pkgPath, { silent: true }) });
+			}
+		}
 		for (const pkgPath of pkgPaths) {
 			process.stdout.write(`check-publish-hygiene: ${pkgName(pkgPath)} `);
 			const result = checkPackage(pkgPath);

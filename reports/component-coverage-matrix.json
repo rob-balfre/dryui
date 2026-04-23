@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-04-20T07:19:44.278Z",
+  "generatedAt": "2026-04-22T23:59:25.296Z",
   "scope": "public @dryui/ui components from packages/mcp/src/spec.json",
   "summary": {
     "totalComponents": 147,
@@ -25,8 +25,8 @@
       {
         "tier": "tier2",
         "total": 117,
-        "withBrowserSpec": 21,
-        "withUnitTest": 28,
+        "withBrowserSpec": 24,
+        "withUnitTest": 30,
         "withDocsDemo": 117,
         "withDocsRoute": 117,
         "withDocsVisualTest": 117
@@ -43,8 +43,6 @@
       "Breadcrumb",
       "ButtonGroup",
       "ChatThread",
-      "Chip",
-      "ChipGroup",
       "ChromaticAberration",
       "ChromaticShift",
       "Clipboard",
@@ -135,10 +133,15 @@
         "tests/browser/fixtures/feedback-overlay-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/preprocessor.test.ts",
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/cli/src/__tests__/info.test.ts",
+        "packages/cli/src/__tests__/prompt.test.ts",
         "packages/feedback-server/tests/dev-url.test.ts",
         "packages/lint/src/preprocessor.test.ts",
         "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/define.test.ts",
+        "packages/mcp/src/load-component-meta.test.ts",
         "packages/mcp/src/reviewer.test.ts",
         "tests/unit/highlighter/integration.test.ts",
         "tests/unit/highlighter/registry.test.ts",
@@ -592,6 +595,8 @@
         "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
       ],
       "unitTests": [
+        ".analysis/node_modules/zod/src/v4/classic/tests/brand.test.ts",
+        ".analysis/node_modules/zod/src/v4/mini/tests/brand.test.ts",
         "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/brand.test.ts",
         "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/mini/tests/brand.test.ts",
         "packages/cli/src/__tests__/info.test.ts",
@@ -826,6 +831,7 @@
         "tests/browser/fixtures/select-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts"
       ],
       "docsDemos": [
@@ -858,6 +864,7 @@
         "tests/browser/fixtures/textarea-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts"
       ],
       "docsDemos": [
@@ -1128,7 +1135,9 @@
         "tests/browser/fixtures/a11y-accordion-collapsible-harness.svelte",
         "tests/browser/fixtures/accordion-harness.svelte"
       ],
-      "unitTests": [],
+      "unitTests": [
+        "packages/mcp/src/load-component-meta.test.ts"
+      ],
       "docsDemos": [
         "apps/docs/src/lib/demos/AccordionDemo.svelte"
       ],
@@ -1137,7 +1146,7 @@
       ],
       "signals": {
         "hasBrowserSpec": true,
-        "hasUnitTest": false,
+        "hasUnitTest": true,
         "hasDocsDemo": true,
         "hasDocsRoute": true,
         "hasDocsVisualTest": true
@@ -1188,7 +1197,9 @@
         "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts",
+        "packages/mcp/src/define.test.ts",
         "packages/mcp/src/reviewer.test.ts"
       ],
       "docsDemos": [
@@ -1406,8 +1417,11 @@
       "tier": "tier2",
       "docsRoute": "/components/badge",
       "browserSpecs": [],
-      "browserSupport": [],
+      "browserSupport": [
+        "tests/browser/fixtures/chip-group-harness.svelte"
+      ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts",
         "tests/unit/interactive-coverage-policy.test.ts",
         "tests/unit/mcp/toon.test.ts"
@@ -1478,6 +1492,8 @@
       "browserSpecs": [],
       "browserSupport": [],
       "unitTests": [
+        "packages/mcp/src/reviewer.test.ts",
+        "packages/mcp/src/tools/check.test.ts",
         "tests/unit/border-beam-radius.test.ts"
       ],
       "docsDemos": [
@@ -1567,6 +1583,7 @@
         "tests/browser/fixtures/primitives-remediation-semantics-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/cli/src/__tests__/info.test.ts",
         "packages/cli/src/__tests__/project-planner.test.ts",
         "packages/cli/src/__tests__/run.test.ts",
@@ -1632,8 +1649,12 @@
       "compound": false,
       "tier": "tier2",
       "docsRoute": "/components/chip",
-      "browserSpecs": [],
-      "browserSupport": [],
+      "browserSpecs": [
+        "tests/browser/chip-group.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/chip-group-harness.svelte"
+      ],
       "unitTests": [],
       "docsDemos": [
         "apps/docs/src/lib/demos/ChipDemo.svelte"
@@ -1642,7 +1663,7 @@
         "tests/playwright/docs-visual.spec.ts"
       ],
       "signals": {
-        "hasBrowserSpec": false,
+        "hasBrowserSpec": true,
         "hasUnitTest": false,
         "hasDocsDemo": true,
         "hasDocsRoute": true,
@@ -1653,14 +1674,20 @@
       "name": "ChipGroup",
       "slug": "chip-group",
       "importPackage": "@dryui/ui",
-      "category": "action",
-      "description": "Single or multi-select chip cluster",
+      "category": "layout",
+      "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
       "compound": true,
       "tier": "tier2",
       "docsRoute": "/components/chip-group",
-      "browserSpecs": [],
-      "browserSupport": [],
-      "unitTests": [],
+      "browserSpecs": [
+        "tests/browser/chip-group.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/fixtures/chip-group-harness.svelte"
+      ],
+      "unitTests": [
+        "packages/lint/src/rules.test.ts"
+      ],
       "docsDemos": [
         "apps/docs/src/lib/demos/ChipGroupDemo.svelte"
       ],
@@ -1668,8 +1695,8 @@
         "tests/playwright/docs-visual.spec.ts"
       ],
       "signals": {
-        "hasBrowserSpec": false,
-        "hasUnitTest": false,
+        "hasBrowserSpec": true,
+        "hasUnitTest": true,
         "hasDocsDemo": true,
         "hasDocsRoute": true,
         "hasDocsVisualTest": true
@@ -2505,9 +2532,20 @@
       "compound": false,
       "tier": "tier2",
       "docsRoute": "/components/heading",
-      "browserSpecs": [],
-      "browserSupport": [],
+      "browserSpecs": [
+        "tests/browser/heading-text.browser.test.ts"
+      ],
+      "browserSupport": [
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Heading-maxMeasure-default-maps-to-data-measure--default--and--45ch-max-inline-size-1.png",
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Heading-maxMeasure-narrow-maps-to-data-measure--narrow--and--22ch-max-inline-size-1.png",
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Heading-maxMeasure-wide-maps-to-data-measure--wide--and--65ch-max-inline-size-1.png",
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Text-maxMeasure-default-maps-to-data-measure--default--and--65ch-max-inline-size-1.png",
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Text-maxMeasure-narrow-maps-to-data-measure--narrow--and--48ch-max-inline-size-1.png",
+        "tests/browser/__screenshots__/heading-text.browser.test.ts/Text-maxMeasure-wide-maps-to-data-measure--wide--and--80ch-max-inline-size-1.png",
+        "tests/browser/fixtures/heading-text-harness.svelte"
+      ],
       "unitTests": [
+        "packages/lint/src/rules.test.ts",
         "packages/mcp/src/reviewer.test.ts"
       ],
       "docsDemos": [
@@ -2521,7 +2559,7 @@
         "tests/playwright/docs-visual.spec.ts"
       ],
       "signals": {
-        "hasBrowserSpec": false,
+        "hasBrowserSpec": true,
         "hasUnitTest": true,
         "hasDocsDemo": true,
         "hasDocsRoute": true,
@@ -2921,6 +2959,9 @@
       "browserSpecs": [],
       "browserSupport": [],
       "unitTests": [
+        ".analysis/node_modules/tsconfig-paths/src/__tests__/mapping-entry.test.ts",
+        ".analysis/node_modules/zod/src/v3/tests/map.test.ts",
+        ".analysis/node_modules/zod/src/v4/classic/tests/map.test.ts",
         "node_modules/.bun/zod@3.25.76/node_modules/zod/src/v3/tests/map.test.ts",
         "node_modules/.bun/zod@3.25.76/node_modules/zod/src/v4/classic/tests/map.test.ts",
         "node_modules/.bun/zod@4.3.6/node_modules/zod/src/v3/tests/map.test.ts",
@@ -3521,6 +3562,7 @@
       "browserSpecs": [],
       "browserSupport": [],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts",
         "packages/mcp/src/reviewer.test.ts"
       ],
@@ -3606,7 +3648,6 @@
       "browserSpecs": [],
       "browserSupport": [],
       "unitTests": [
-        "apps/docs/src/lib/theme-wizard/sidebar-contract.test.ts",
         "tests/unit/sidebar-contract.test.ts"
       ],
       "docsDemos": [
@@ -3900,6 +3941,7 @@
         "tests/browser/fixtures/ui-compounds-coverage-harness.svelte"
       ],
       "unitTests": [
+        "node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts",
         "packages/lint/src/rules.test.ts"
       ],
       "docsDemos": [
@@ -4038,15 +4080,18 @@
       "docsRoute": "/components/text",
       "browserSpecs": [
         "tests/browser/context-menu.browser.test.ts",
+        "tests/browser/heading-text.browser.test.ts",
         "tests/browser/textarea.browser.test.ts"
       ],
       "browserSupport": [
         "tests/browser/fixtures/context-menu-harness.svelte",
+        "tests/browser/fixtures/heading-text-harness.svelte",
         "tests/browser/fixtures/primitives-remediation-menu-harness.svelte",
         "tests/browser/fixtures/textarea-harness.svelte"
       ],
       "unitTests": [
         "packages/cli/src/__tests__/info.test.ts",
+        "packages/lint/src/rules.test.ts",
         "packages/mcp/src/reviewer.test.ts",
         "tests/unit/motion/webgl-context.test.ts"
       ],

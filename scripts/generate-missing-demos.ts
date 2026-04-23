@@ -28,7 +28,10 @@
 
 import { resolve } from 'node:path';
 import { existsSync, readdirSync, writeFileSync } from 'node:fs';
-import { componentMeta, docsNavComponentNames } from '../packages/mcp/src/component-catalog.js';
+import { docsNavComponentNames } from '../packages/mcp/src/component-catalog.js';
+import { loadComponentMeta } from '../packages/mcp/src/load-component-meta.js';
+
+const { entries: componentMeta } = await loadComponentMeta();
 
 const repoRoot = resolve(import.meta.dir, '..');
 const demosDir = resolve(repoRoot, 'apps/docs/src/lib/demos');

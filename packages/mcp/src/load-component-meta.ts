@@ -5,8 +5,9 @@
  * `*.meta.ts` file, and produces the aggregated `Record<string, ComponentMetaEntry>`
  * that generate-spec.ts historically got from `component-catalog.ts`.
  *
- * Falls back cleanly: if no meta files exist yet, the loader returns an empty
- * record and the generator keeps using the catalog (dual-read migration path).
+ * If no meta files exist the loader returns an empty record. It is the sole
+ * source of truth for component metadata. `component-catalog.ts` only owns the
+ * docs-nav and skill-curation surfaces.
  */
 import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';

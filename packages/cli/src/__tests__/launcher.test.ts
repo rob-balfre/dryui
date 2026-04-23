@@ -160,6 +160,41 @@ describe('runLauncher', () => {
 
 		expect(events).toEqual([`progress:${root}:false`, 'feedback', 'docs']);
 	});
+
+	test('kills feedback server pid when docs server startup rejects', async () => {
+		const root = createTempTree({
+			'apps/docs/package.json': '{"name":"@dryui/docs"}',
+			'packages/cli/package.json': '{"name":"@dryui/cli"}',
+			'packages/feedback-server/package.json': '{"name":"@dryui/feedback-server"}'
+		});
+		const killed: number[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runLauncher(['--no-open'], {
+				cwd: root,
+				runtime: {
+					ensureFeedbackUiBuilt: () => null,
+					ensureFeedbackServer: async () => ({
+						baseUrl: 'http://127.0.0.1:4748',
+						message: 'started in the background',
+						ownedPid: 12345
+					}),
+					ensureDocsServer: async () => {
+						throw new Error('docs boom');
+					},
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					},
+					now: () => 42,
+					openBrowser: () => false
+				}
+			})
+		);
+
+		expect(killed).toEqual([12345]);
+		expect(result.exitCode).toBe(1);
+		expect(result.logs.join('\n')).toContain('docs boom');
+	});
 });
 
 const STUB_SPEC = {
@@ -818,5 +853,34 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).not.toContain('Tip: press Ctrl-C');
 		expect(killed).toEqual([]);
 		expect(result.exitCode).toBe(0);
+	});
+
+	test('kills dev server pid when feedback server startup rejects', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const killed: number[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => false,
+					findPortHolder: () => null,
+					spawnProjectDevServer: () => ({ pid: 55555 }),
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 }),
+					ensureFeedbackServer: async () => {
+						throw new Error('feedback boom');
+					},
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					}
+				})
+			})
+		);
+
+		expect(killed).toEqual([55555]);
+		expect(result.exitCode).toBe(1);
+		expect(result.logs.join('\n')).toContain('feedback boom');
 	});
 });

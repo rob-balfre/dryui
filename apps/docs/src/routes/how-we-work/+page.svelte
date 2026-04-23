@@ -51,6 +51,26 @@
 
 	const sharedSpacing = { nodeGap: 28, layerGap: 80, cornerRadius: 18 };
 	const terminal = { color: 'success', state: 'complete' } as const;
+	const NODE_WIDTH = 360;
+	const DIAGRAM_MARGIN = 40;
+
+	function getDiagramColumns(config: DiagramConfig): number {
+		const inDeg = new Map<string, number>();
+		const outDeg = new Map<string, number>();
+		for (const edge of config.edges ?? []) {
+			outDeg.set(edge.from, (outDeg.get(edge.from) ?? 0) + 1);
+			inDeg.set(edge.to, (inDeg.get(edge.to) ?? 0) + 1);
+		}
+		let max = 1;
+		for (const v of outDeg.values()) if (v > max) max = v;
+		for (const v of inDeg.values()) if (v > max) max = v;
+		return max;
+	}
+
+	function getDiagramWidth(config: DiagramConfig): number {
+		const cols = getDiagramColumns(config);
+		return cols * NODE_WIDTH + (cols - 1) * sharedSpacing.nodeGap + DIAGRAM_MARGIN * 2;
+	}
 
 	const primitivesDiagram: DiagramConfig = {
 		direction: 'TB',
@@ -786,8 +806,8 @@
 				<DocsSectionIntro id={mod.id} title={mod.title} description={mod.description} />
 				<Card.Root>
 					<Card.Content>
-						<div class="diagram-shell">
-							<Diagram config={mod.diagram} fit="native" />
+						<div class="diagram-shell" style:--diagram-width="{getDiagramWidth(mod.diagram)}px">
+							<Diagram config={mod.diagram} />
 						</div>
 					</Card.Content>
 				</Card.Root>
@@ -810,13 +830,8 @@
 
 	.diagram-shell {
 		display: grid;
-		grid-template-columns: auto;
-		justify-content: center;
+		grid-template-columns: var(--diagram-width);
+		justify-content: safe center;
 		overflow-x: auto;
-	}
-
-	.diagram-shell :global([data-diagram-container]) {
-		container-type: normal;
-		width: max-content;
 	}
 </style>

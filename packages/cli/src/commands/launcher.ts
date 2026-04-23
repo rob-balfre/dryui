@@ -237,6 +237,30 @@ function collectOwnedPids(...pids: ReadonlyArray<number | null | undefined>): nu
 	return owned;
 }
 
+interface OwnedPidResult {
+	readonly ownedPid: number | null;
+}
+
+async function settleOrKillOnRejection<A extends OwnedPidResult, B extends OwnedPidResult>(
+	promises: readonly [Promise<A>, Promise<B>],
+	killOwnedProcess: (pid: number) => void
+): Promise<[A, B]> {
+	const settled = await Promise.allSettled(promises);
+	const rejected = settled.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
+	if (rejected.length > 0) {
+		for (const r of settled) {
+			if (r.status === 'fulfilled') {
+				collectOwnedPids(r.value.ownedPid).forEach(killOwnedProcess);
+			}
+		}
+		throw rejected[0]!.reason;
+	}
+	return [
+		(settled[0] as PromiseFulfilledResult<A>).value,
+		(settled[1] as PromiseFulfilledResult<B>).value
+	];
+}
+
 export function buildDashboardUrl(
 	feedbackBaseUrl: string,
 	docsBaseUrl: string | null,
@@ -684,16 +708,19 @@ export async function runUserProjectLauncher(
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
 
 		const devLogPath = plan.kind === 'spawn' ? projectDevLogPath(detection.root) : null;
-		const [feedbackResult, devResult] = await Promise.all([
-			runtime.ensureFeedbackServer(detection.root),
-			executeUserProjectDevServerPlan(runtime, plan, {
-				root: detection.root,
-				packageManager,
-				host: devHost,
-				port: devPort,
-				...(devLogPath ? { logPath: devLogPath } : {})
-			})
-		]);
+		const [feedbackResult, devResult] = await settleOrKillOnRejection(
+			[
+				runtime.ensureFeedbackServer(detection.root),
+				executeUserProjectDevServerPlan(runtime, plan, {
+					root: detection.root,
+					packageManager,
+					host: devHost,
+					port: devPort,
+					...(devLogPath ? { logPath: devLogPath } : {})
+				})
+			],
+			runtime.killOwnedProcess
+		);
 
 		const siteUrl = normalizeDevUrl(devResult.ok ? devResult.url : null);
 		const dashboardUrl = buildDashboardUrl(
@@ -784,10 +811,13 @@ export async function runLauncher(
 	try {
 		runtime.onProgress({ workspaceRoot, noOpen });
 
-		const [feedbackResult, docsResult] = await Promise.all([
-			runtime.ensureFeedbackServer(workspaceRoot),
-			runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
-		]);
+		const [feedbackResult, docsResult] = await settleOrKillOnRejection(
+			[
+				runtime.ensureFeedbackServer(workspaceRoot),
+				runtime.ensureDocsServer(workspaceRoot, docsBaseUrl)
+			],
+			runtime.killOwnedProcess
+		);
 		const siteUrl = normalizeDevUrl(docsBaseUrl);
 		const dashboardUrl = buildDashboardUrl(feedbackResult.baseUrl, docsBaseUrl, runtime.now());
 		const opened = noOpen ? false : runtime.openBrowser(siteUrl ?? dashboardUrl);

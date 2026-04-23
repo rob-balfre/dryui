@@ -1,18 +1,18 @@
 /**
- * Migrates the legacy `packages/mcp/src/component-catalog.ts` into per-component
- * `.meta.ts` sibling files under `packages/ui/src/<dir>/` or
- * `packages/primitives/src/<dir>/`.
+ * Rebuilds the per-component `.meta.ts` sibling files under
+ * `packages/ui/src/<dir>/` or `packages/primitives/src/<dir>/` from the
+ * aggregated view produced by `loadComponentMeta`.
  *
- * Emits one file per catalog entry, locating the component by converting the
- * PascalCase catalog key into the existing kebab-case directory. Components
- * whose catalog entry has `surface: 'primitive'` land in primitives; everything
- * else is composed and lands in ui. A catalog entry whose target directory
- * does not exist is logged and skipped so the migration is self-reporting.
+ * Emits one file per entry, locating the component by converting the
+ * PascalCase name into the existing kebab-case directory. Components whose
+ * entry has `surface: 'primitive'` land in primitives; everything else is
+ * composed and lands in ui. An entry whose target directory does not exist is
+ * logged and skipped so the regeneration is self-reporting.
  *
- * Re-runnable: generated files are idempotent. The accompanying
- * `loadComponentMeta` in `packages/mcp/src/load-component-meta.ts` aggregates
- * these files at build time, and `generate-spec.ts` prefers the meta entries
- * over the catalog while both exist (dual-read).
+ * Re-runnable: generated files are idempotent. The loader
+ * (`packages/mcp/src/load-component-meta.ts`) reads these same files, so the
+ * pipeline is round-trippable — regenerating writes back the schema-validated
+ * shape of whatever the loader just produced.
  *
  * Usage:
  *   bun scripts/generate-component-meta.ts         # emit files
@@ -22,26 +22,15 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { loadComponentMeta } from '../packages/mcp/src/load-component-meta.js';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..');
 
 const dry = process.argv.includes('--dry');
 
-// ── Import catalog dynamically (Bun resolves the .ts source) ────────────────
-const { componentMeta } = (await import(
-	resolve(repoRoot, 'packages/mcp/src/component-catalog.ts')
-)) as {
-	componentMeta: Record<
-		string,
-		{
-			description: string;
-			category: string;
-			tags: string[];
-			surface?: 'primitive' | 'composed';
-		}
-	>;
-};
+// ── Load per-component meta via the shared loader ───────────────────────────
+const { entries: componentMeta } = await loadComponentMeta();
 
 function pascalToKebab(name: string): string {
 	return name

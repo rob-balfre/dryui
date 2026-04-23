@@ -1,6 +1,9 @@
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
-import { componentMeta, docsNavComponentNames } from '../packages/mcp/src/component-catalog.js';
+import { docsNavComponentNames } from '../packages/mcp/src/component-catalog.js';
+import { loadComponentMeta } from '../packages/mcp/src/load-component-meta.js';
+
+const { entries: componentMeta } = await loadComponentMeta();
 
 type RiskTier = 'tier0' | 'tier1' | 'tier2';
 

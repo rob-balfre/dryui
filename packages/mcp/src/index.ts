@@ -133,11 +133,14 @@ server.tool(
 	async ({ path, cwd }) => {
 		try {
 			const result = runCheckStructured(getSpec(), path ? { path } : {}, cwd ? { cwd } : {});
-			// Emit both blocks so humans read the TOON summary and agents
-			// parse the JSON diagnostics for repair loops. The JSON block is
-			// fenced and tagged so clients that only surface the first text
-			// block still see the human output first.
-			const diagnosticsJson = JSON.stringify({ diagnostics: result.diagnostics }, null, 2);
+			// Two content blocks: humans read the TOON summary, agents parse the
+			// fenced JSON for repair loops. Clients that only surface the first
+			// block still see the human output.
+			const diagnosticsJson = JSON.stringify(
+				{ summary: result.summary, diagnostics: result.diagnostics },
+				null,
+				2
+			);
 			return {
 				content: [
 					{ type: 'text', text: result.text },

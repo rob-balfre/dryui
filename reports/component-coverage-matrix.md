@@ -1,6 +1,6 @@
 # Component Coverage Matrix
 
-Generated: 2026-04-20T07:19:44.279Z
+Generated: 2026-04-22T23:59:25.297Z
 
 Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 
@@ -10,19 +10,19 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | ----- | ---------: | ------------: | ---------: | ---------: | ----------: | ----------------: |
 | tier0 |         24 |            24 |         10 |         24 |          24 |                24 |
 | tier1 |          6 |             6 |          0 |          6 |           6 |                 6 |
-| tier2 |        117 |            21 |         28 |        117 |         117 |               117 |
+| tier2 |        117 |            24 |         30 |        117 |         117 |               117 |
 
 ## High-Risk Gaps
 
 - Tier 0 components without a dedicated browser spec: none
-- Components without browser or unit tests: AlertDialog, AlphaSlider, AppFrame, AspectRatio, Aurora, Backdrop, Breadcrumb, ButtonGroup, ChatThread, Chip, ChipGroup, ChromaticAberration, ChromaticShift, Clipboard, CommandPalette, DateTimeInput, DescriptionList, Displacement, DropZone, Fieldset, FileUpload, FlipCard, FloatButton, FocusTrap, FormatBytes, FormatDate, FormatNumber, Gauge, Glass, Glow, GodRays, GradientMesh, Halftone, InfiniteScroll, Kbd, LinkPreview, Listbox, LogoMark, Marquee, MaskReveal, NavigationMenu, Noise, NumberInput, OptionPicker, Pagination, Portal, Progress, ProgressRing, QRCode, Rating, RelativeTime, Reveal, ScrollToTop, SegmentedControl, Shimmer, Skeleton, Slider, Spacer, Sparkline, Spinner, Splitter, Spotlight, StarRating, Stepper, Svg, TableOfContents, Tag, TagsInput, TimeInput, Timeline, Toast, ToggleGroup, Toolbar, Tour, TypingIndicator, VideoEmbed, VirtualList, VisuallyHidden
+- Components without browser or unit tests: AlertDialog, AlphaSlider, AppFrame, AspectRatio, Aurora, Backdrop, Breadcrumb, ButtonGroup, ChatThread, ChromaticAberration, ChromaticShift, Clipboard, CommandPalette, DateTimeInput, DescriptionList, Displacement, DropZone, Fieldset, FileUpload, FlipCard, FloatButton, FocusTrap, FormatBytes, FormatDate, FormatNumber, Gauge, Glass, Glow, GodRays, GradientMesh, Halftone, InfiniteScroll, Kbd, LinkPreview, Listbox, LogoMark, Marquee, MaskReveal, NavigationMenu, Noise, NumberInput, OptionPicker, Pagination, Portal, Progress, ProgressRing, QRCode, Rating, RelativeTime, Reveal, ScrollToTop, SegmentedControl, Shimmer, Skeleton, Slider, Spacer, Sparkline, Spinner, Splitter, Spotlight, StarRating, Stepper, Svg, TableOfContents, Tag, TagsInput, TimeInput, Timeline, Toast, ToggleGroup, Toolbar, Tour, TypingIndicator, VideoEmbed, VirtualList, VisuallyHidden
 - Components without a docs route or docs demo: none
 
 ## Full Matrix
 
 | Component           | Tier  | Category    | Browser Specs | Unit Tests | Docs Demos | Docs Route                        | Docs Visual |
 | ------------------- | ----- | ----------- | ------------: | ---------: | ---------: | --------------------------------- | ----------- |
-| Button              | tier0 | action      |             2 |         10 |         17 | /components/button                | yes         |
+| Button              | tier0 | action      |             2 |         15 |         17 | /components/button                | yes         |
 | Calendar            | tier0 | form        |             2 |          0 |          1 | /components/calendar              | yes         |
 | Checkbox            | tier0 | input       |             1 |          0 |          2 | /components/checkbox              | yes         |
 | Combobox            | tier0 | form        |             2 |          1 |          1 | /components/combobox              | yes         |
@@ -35,15 +35,15 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | Field               | tier0 | form        |             2 |          1 |          3 | /components/field                 | yes         |
 | FileSelect          | tier0 | input       |             1 |          1 |          1 | /components/file-select           | yes         |
 | HoverCard           | tier0 | overlay     |             1 |          0 |          1 | /components/hover-card            | yes         |
-| Input               | tier0 | input       |             5 |          5 |          4 | /components/input                 | yes         |
+| Input               | tier0 | input       |             5 |          7 |          4 | /components/input                 | yes         |
 | MegaMenu            | tier0 | navigation  |             1 |          0 |          1 | /components/mega-menu             | yes         |
 | Menubar             | tier0 | navigation  |             2 |          0 |          1 | /components/menubar               | yes         |
 | MultiSelectCombobox | tier0 | form        |             1 |          0 |          1 | /components/multi-select-combobox | yes         |
 | Popover             | tier0 | overlay     |             1 |          1 |          1 | /components/popover               | yes         |
 | RadioGroup          | tier0 | input       |             1 |          0 |          1 | /components/radio-group           | yes         |
 | RangeCalendar       | tier0 | form        |             1 |          0 |          1 | /components/range-calendar        | yes         |
-| Select              | tier0 | form        |             3 |          1 |          1 | /components/select                | yes         |
-| Textarea            | tier0 | input       |             1 |          1 |          1 | /components/textarea              | yes         |
+| Select              | tier0 | form        |             3 |          2 |          1 | /components/select                | yes         |
+| Textarea            | tier0 | input       |             1 |          2 |          1 | /components/textarea              | yes         |
 | Toggle              | tier0 | action      |             3 |          0 |          2 | /components/toggle                | yes         |
 | Tooltip             | tier0 | overlay     |             1 |          0 |          1 | /components/tooltip               | yes         |
 | Carousel            | tier1 | display     |             1 |          0 |          1 | /components/carousel              | yes         |
@@ -52,9 +52,9 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | RichTextEditor      | tier1 | input       |             1 |          0 |          1 | /components/rich-text-editor      | yes         |
 | Transfer            | tier1 | input       |             1 |          0 |          1 | /components/transfer              | yes         |
 | Tree                | tier1 | display     |             1 |          0 |          1 | /components/tree                  | yes         |
-| Accordion           | tier2 | display     |             2 |          0 |          1 | /components/accordion             | yes         |
+| Accordion           | tier2 | display     |             2 |          1 |          1 | /components/accordion             | yes         |
 | Adjust              | tier2 | visual      |             0 |          1 |          1 | /components/adjust                | yes         |
-| Alert               | tier2 | feedback    |             1 |          2 |          1 | /components/alert                 | yes         |
+| Alert               | tier2 | feedback    |             1 |          4 |          1 | /components/alert                 | yes         |
 | AlertDialog         | tier2 | overlay     |             0 |          0 |          1 | /components/alert-dialog          | yes         |
 | AlphaSlider         | tier2 | input       |             0 |          0 |          1 | /components/alpha-slider          | yes         |
 | AppFrame            | tier2 | layout      |             0 |          0 |          1 | /components/app-frame             | yes         |
@@ -62,15 +62,15 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | Aurora              | tier2 | layout      |             0 |          0 |          1 | /components/aurora                | yes         |
 | Avatar              | tier2 | display     |             1 |          2 |          1 | /components/avatar                | yes         |
 | Backdrop            | tier2 | overlay     |             0 |          0 |          1 | /components/backdrop              | yes         |
-| Badge               | tier2 | display     |             0 |          3 |         13 | /components/badge                 | yes         |
+| Badge               | tier2 | display     |             0 |          4 |         13 | /components/badge                 | yes         |
 | Beam                | tier2 | visual      |             0 |          1 |          1 | /components/beam                  | yes         |
-| BorderBeam          | tier2 | visual      |             0 |          1 |          1 | /components/border-beam           | yes         |
+| BorderBeam          | tier2 | visual      |             0 |          3 |          1 | /components/border-beam           | yes         |
 | Breadcrumb          | tier2 | navigation  |             0 |          0 |          1 | /components/breadcrumb            | yes         |
 | ButtonGroup         | tier2 | action      |             0 |          0 |          1 | /components/button-group          | yes         |
-| Card                | tier2 | display     |             2 |          9 |          7 | /components/card                  | yes         |
+| Card                | tier2 | display     |             2 |         10 |          7 | /components/card                  | yes         |
 | ChatThread          | tier2 | display     |             0 |          0 |          1 | /components/chat-thread           | yes         |
-| Chip                | tier2 | action      |             0 |          0 |          1 | /components/chip                  | yes         |
-| ChipGroup           | tier2 | action      |             0 |          0 |          1 | /components/chip-group            | yes         |
+| Chip                | tier2 | action      |             1 |          0 |          1 | /components/chip                  | yes         |
+| ChipGroup           | tier2 | layout      |             1 |          1 |          1 | /components/chip-group            | yes         |
 | ChromaticAberration | tier2 | visual      |             0 |          0 |          1 | /components/chromatic-aberration  | yes         |
 | ChromaticShift      | tier2 | visual      |             0 |          0 |          1 | /components/chromatic-shift       | yes         |
 | Clipboard           | tier2 | action      |             0 |          0 |          1 | /components/clipboard             | yes         |
@@ -101,7 +101,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | GodRays             | tier2 | visual      |             0 |          0 |          1 | /components/god-rays              | yes         |
 | GradientMesh        | tier2 | visual      |             0 |          0 |          1 | /components/gradient-mesh         | yes         |
 | Halftone            | tier2 | visual      |             0 |          0 |          1 | /components/halftone              | yes         |
-| Heading             | tier2 | display     |             0 |          1 |          5 | /components/heading               | yes         |
+| Heading             | tier2 | display     |             1 |          2 |          5 | /components/heading               | yes         |
 | Hotkey              | tier2 | utility     |             1 |          1 |          1 | /components/hotkey                | yes         |
 | Icon                | tier2 | display     |             0 |          1 |          1 | /components/icon                  | yes         |
 | Image               | tier2 | display     |             1 |          0 |          1 | /components/image                 | yes         |
@@ -115,7 +115,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | List                | tier2 | display     |             0 |          2 |          1 | /components/list                  | yes         |
 | Listbox             | tier2 | input       |             0 |          0 |          1 | /components/listbox               | yes         |
 | LogoMark            | tier2 | display     |             0 |          0 |          1 | /components/logo-mark             | yes         |
-| Map                 | tier2 | display     |             0 |          4 |          1 | /components/map                   | yes         |
+| Map                 | tier2 | display     |             0 |          7 |          1 | /components/map                   | yes         |
 | MarkdownRenderer    | tier2 | display     |             0 |          1 |          1 | /components/markdown-renderer     | yes         |
 | Marquee             | tier2 | display     |             0 |          0 |          1 | /components/marquee               | yes         |
 | MaskReveal          | tier2 | visual      |             0 |          0 |          1 | /components/mask-reveal           | yes         |
@@ -137,10 +137,10 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | ScrollArea          | tier2 | layout      |             1 |          0 |          1 | /components/scroll-area           | yes         |
 | ScrollToTop         | tier2 | action      |             0 |          0 |          1 | /components/scroll-to-top         | yes         |
 | SegmentedControl    | tier2 | form        |             0 |          0 |          1 | /components/segmented-control     | yes         |
-| Separator           | tier2 | layout      |             0 |          2 |          3 | /components/separator             | yes         |
+| Separator           | tier2 | layout      |             0 |          3 |          3 | /components/separator             | yes         |
 | ShaderCanvas        | tier2 | visual      |             0 |          1 |          1 | /components/shader-canvas         | yes         |
 | Shimmer             | tier2 | visual      |             0 |          0 |          1 | /components/shimmer               | yes         |
-| Sidebar             | tier2 | navigation  |             0 |          2 |          1 | /components/sidebar               | yes         |
+| Sidebar             | tier2 | navigation  |             0 |          1 |          1 | /components/sidebar               | yes         |
 | Skeleton            | tier2 | feedback    |             0 |          0 |          1 | /components/skeleton              | yes         |
 | Slider              | tier2 | input       |             0 |          0 |          2 | /components/slider                | yes         |
 | Spacer              | tier2 | layout      |             0 |          0 |          1 | /components/spacer                | yes         |
@@ -151,12 +151,12 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 | StarRating          | tier2 | display     |             0 |          0 |          1 | /components/star-rating           | yes         |
 | Stepper             | tier2 | navigation  |             0 |          0 |          1 | /components/stepper               | yes         |
 | Svg                 | tier2 | utility     |             0 |          0 |          1 | /components/svg                   | yes         |
-| Table               | tier2 | display     |             0 |          1 |          1 | /components/table                 | yes         |
+| Table               | tier2 | display     |             0 |          2 |          1 | /components/table                 | yes         |
 | TableOfContents     | tier2 | navigation  |             0 |          0 |          1 | /components/table-of-contents     | yes         |
 | Tabs                | tier2 | navigation  |             1 |          1 |          1 | /components/tabs                  | yes         |
 | Tag                 | tier2 | display     |             0 |          0 |          1 | /components/tag                   | yes         |
 | TagsInput           | tier2 | input       |             0 |          0 |          1 | /components/tags-input            | yes         |
-| Text                | tier2 | display     |             2 |          3 |         25 | /components/text                  | yes         |
+| Text                | tier2 | display     |             3 |          4 |         25 | /components/text                  | yes         |
 | ThemeToggle         | tier2 | action      |             1 |          1 |          1 | /components/theme-toggle          | yes         |
 | TimeInput           | tier2 | input       |             0 |          0 |          1 | /components/time-input            | yes         |
 | Timeline            | tier2 | display     |             0 |          0 |          1 | /components/timeline              | yes         |
@@ -178,7 +178,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: action
 - Browser specs: tests/browser/button.browser.test.ts, tests/browser/code-block.browser.test.ts
 - Browser support files: tests/browser/fixtures/button-harness.svelte, tests/browser/fixtures/docs-component-page-data.ts, tests/browser/fixtures/feedback-overlay-harness.svelte
-- Unit tests: packages/cli/src/**tests**/info.test.ts, packages/feedback-server/tests/dev-url.test.ts, packages/lint/src/preprocessor.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts, tests/unit/highlighter/integration.test.ts, tests/unit/highlighter/registry.test.ts, tests/unit/highlighter/svelte.test.ts, tests/unit/markdown-parser/ast.test.ts, tests/unit/mcp/toon.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/preprocessor.test.ts, node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/cli/src/**tests**/info.test.ts, packages/cli/src/**tests**/prompt.test.ts, packages/feedback-server/tests/dev-url.test.ts, packages/lint/src/preprocessor.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/define.test.ts, packages/mcp/src/load-component-meta.test.ts, packages/mcp/src/reviewer.test.ts, tests/unit/highlighter/integration.test.ts, tests/unit/highlighter/registry.test.ts, tests/unit/highlighter/svelte.test.ts, tests/unit/markdown-parser/ast.test.ts, tests/unit/mcp/toon.test.ts
 - Docs demos: apps/docs/src/lib/demos/AlertDialogDemo.svelte, apps/docs/src/lib/demos/AppFrameDemo.svelte, apps/docs/src/lib/demos/AuroraDemo.svelte, apps/docs/src/lib/demos/BackdropDemo.svelte, apps/docs/src/lib/demos/ButtonDemo.svelte, apps/docs/src/lib/demos/ButtonGroupDemo.svelte, apps/docs/src/lib/demos/CardDemo.svelte, apps/docs/src/lib/demos/CommandPaletteDemo.svelte, apps/docs/src/lib/demos/DialogDemo.svelte, apps/docs/src/lib/demos/DrawerDemo.svelte, apps/docs/src/lib/demos/DropdownMenuDemo.svelte, apps/docs/src/lib/demos/FocusTrapDemo.svelte, apps/docs/src/lib/demos/PopoverDemo.svelte, apps/docs/src/lib/demos/PortalDemo.svelte, apps/docs/src/lib/demos/TooltipDemo.svelte, apps/docs/src/lib/demos/TourDemo.svelte, apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte
 - Docs route: /components/button
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -321,7 +321,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: input
 - Browser specs: tests/browser/input-group.browser.test.ts, tests/browser/input.browser.test.ts, tests/browser/phone-input.browser.test.ts, tests/browser/primitives-remediation.browser.test.ts, tests/browser/prompt-input.browser.test.ts
 - Browser support files: tests/browser/fixtures/composite-inputs-harness.svelte, tests/browser/fixtures/field-harness.svelte, tests/browser/fixtures/input-group-harness.svelte, tests/browser/fixtures/input-harness.svelte, tests/browser/fixtures/primitives-remediation-semantics-harness.svelte
-- Unit tests: node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/brand.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/mini/tests/brand.test.ts, packages/cli/src/**tests**/info.test.ts, packages/cli/src/**tests**/project-planner.test.ts, packages/mcp/src/reviewer.test.ts
+- Unit tests: .analysis/node_modules/zod/src/v4/classic/tests/brand.test.ts, .analysis/node_modules/zod/src/v4/mini/tests/brand.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/brand.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/mini/tests/brand.test.ts, packages/cli/src/**tests**/info.test.ts, packages/cli/src/**tests**/project-planner.test.ts, packages/mcp/src/reviewer.test.ts
 - Docs demos: apps/docs/src/lib/demos/DialogDemo.svelte, apps/docs/src/lib/demos/FieldDemo.svelte, apps/docs/src/lib/demos/FocusTrapDemo.svelte, apps/docs/src/lib/demos/InputDemo.svelte
 - Docs route: /components/input
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -398,7 +398,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: form
 - Browser specs: tests/browser/file-select.browser.test.ts, tests/browser/multi-select-combobox.browser.test.ts, tests/browser/select.browser.test.ts
 - Browser support files: tests/browser/fixtures/file-select-harness.svelte, tests/browser/fixtures/multi-select-combobox-harness.svelte, tests/browser/fixtures/primitives-remediation-menu-harness.svelte, tests/browser/fixtures/select-harness.svelte
-- Unit tests: packages/lint/src/rules.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts
 - Docs demos: apps/docs/src/lib/demos/SelectDemo.svelte
 - Docs route: /components/select
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -409,7 +409,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: input
 - Browser specs: tests/browser/textarea.browser.test.ts
 - Browser support files: tests/browser/fixtures/textarea-harness.svelte
-- Unit tests: packages/lint/src/rules.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts
 - Docs demos: apps/docs/src/lib/demos/TextareaDemo.svelte
 - Docs route: /components/textarea
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -508,7 +508,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: display
 - Browser specs: tests/browser/a11y-accordion-collapsible.browser.test.ts, tests/browser/accordion.browser.test.ts
 - Browser support files: tests/browser/fixtures/a11y-accordion-collapsible-harness.svelte, tests/browser/fixtures/accordion-harness.svelte
-- Unit tests: none
+- Unit tests: packages/mcp/src/load-component-meta.test.ts
 - Docs demos: apps/docs/src/lib/demos/AccordionDemo.svelte
 - Docs route: /components/accordion
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -530,7 +530,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: feedback
 - Browser specs: tests/browser/a11y-chart-scrollarea-alert.browser.test.ts
 - Browser support files: tests/browser/fixtures/overlay-surface-harness.svelte, tests/browser/fixtures/ui-compounds-coverage-harness.svelte
-- Unit tests: packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/define.test.ts, packages/mcp/src/reviewer.test.ts
 - Docs demos: apps/docs/src/lib/demos/AlertDemo.svelte
 - Docs route: /components/alert
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -617,8 +617,8 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Tier: tier2
 - Category: display
 - Browser specs: none
-- Browser support files: none
-- Unit tests: packages/lint/src/rules.test.ts, tests/unit/interactive-coverage-policy.test.ts, tests/unit/mcp/toon.test.ts
+- Browser support files: tests/browser/fixtures/chip-group-harness.svelte
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts, tests/unit/interactive-coverage-policy.test.ts, tests/unit/mcp/toon.test.ts
 - Docs demos: apps/docs/src/lib/demos/AdjustDemo.svelte, apps/docs/src/lib/demos/AuroraDemo.svelte, apps/docs/src/lib/demos/BadgeDemo.svelte, apps/docs/src/lib/demos/DataGridDemo.svelte, apps/docs/src/lib/demos/DragAndDropDemo.svelte, apps/docs/src/lib/demos/DrawerDemo.svelte, apps/docs/src/lib/demos/FlipCardDemo.svelte, apps/docs/src/lib/demos/GlassDemo.svelte, apps/docs/src/lib/demos/HotkeyDemo.svelte, apps/docs/src/lib/demos/PortalDemo.svelte, apps/docs/src/lib/demos/SeparatorDemo.svelte, apps/docs/src/lib/demos/ShaderCanvasDemo.svelte, apps/docs/src/lib/demos/SplitterDemo.svelte
 - Docs route: /components/badge
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -640,7 +640,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: visual
 - Browser specs: none
 - Browser support files: none
-- Unit tests: tests/unit/border-beam-radius.test.ts
+- Unit tests: packages/mcp/src/reviewer.test.ts, packages/mcp/src/tools/check.test.ts, tests/unit/border-beam-radius.test.ts
 - Docs demos: apps/docs/src/lib/demos/BorderBeamDemo.svelte
 - Docs route: /components/border-beam
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -673,7 +673,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: display
 - Browser specs: tests/browser/a11y-hover-card.browser.test.ts, tests/browser/card.browser.test.ts
 - Browser support files: tests/browser/fixtures/card-harness.svelte, tests/browser/fixtures/motion-surfaces-harness.svelte, tests/browser/fixtures/primitives-remediation-semantics-harness.svelte
-- Unit tests: packages/cli/src/**tests**/info.test.ts, packages/cli/src/**tests**/project-planner.test.ts, packages/cli/src/**tests**/run.test.ts, packages/cli/src/**tests**/scaffold.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/project-planner.test.ts, packages/mcp/src/reviewer.test.ts, packages/mcp/src/tools/check.test.ts, packages/mcp/src/workspace-audit.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/cli/src/**tests**/info.test.ts, packages/cli/src/**tests**/project-planner.test.ts, packages/cli/src/**tests**/run.test.ts, packages/cli/src/**tests**/scaffold.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/project-planner.test.ts, packages/mcp/src/reviewer.test.ts, packages/mcp/src/tools/check.test.ts, packages/mcp/src/workspace-audit.test.ts
 - Docs demos: apps/docs/src/lib/demos/BackdropDemo.svelte, apps/docs/src/lib/demos/BorderBeamDemo.svelte, apps/docs/src/lib/demos/CardDemo.svelte, apps/docs/src/lib/demos/DrawerDemo.svelte, apps/docs/src/lib/demos/MapDemo.svelte, apps/docs/src/lib/demos/PortalDemo.svelte, apps/docs/src/lib/demos/TourDemo.svelte
 - Docs route: /components/card
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -693,8 +693,8 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 
 - Tier: tier2
 - Category: action
-- Browser specs: none
-- Browser support files: none
+- Browser specs: tests/browser/chip-group.browser.test.ts
+- Browser support files: tests/browser/fixtures/chip-group-harness.svelte
 - Unit tests: none
 - Docs demos: apps/docs/src/lib/demos/ChipDemo.svelte
 - Docs route: /components/chip
@@ -703,10 +703,10 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 ### ChipGroup
 
 - Tier: tier2
-- Category: action
-- Browser specs: none
-- Browser support files: none
-- Unit tests: none
+- Category: layout
+- Browser specs: tests/browser/chip-group.browser.test.ts
+- Browser support files: tests/browser/fixtures/chip-group-harness.svelte
+- Unit tests: packages/lint/src/rules.test.ts
 - Docs demos: apps/docs/src/lib/demos/ChipGroupDemo.svelte
 - Docs route: /components/chip-group
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1045,9 +1045,9 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 
 - Tier: tier2
 - Category: display
-- Browser specs: none
-- Browser support files: none
-- Unit tests: packages/mcp/src/reviewer.test.ts
+- Browser specs: tests/browser/heading-text.browser.test.ts
+- Browser support files: tests/browser/**screenshots**/heading-text.browser.test.ts/Heading-maxMeasure-default-maps-to-data-measure--default--and--45ch-max-inline-size-1.png, tests/browser/**screenshots**/heading-text.browser.test.ts/Heading-maxMeasure-narrow-maps-to-data-measure--narrow--and--22ch-max-inline-size-1.png, tests/browser/**screenshots**/heading-text.browser.test.ts/Heading-maxMeasure-wide-maps-to-data-measure--wide--and--65ch-max-inline-size-1.png, tests/browser/**screenshots**/heading-text.browser.test.ts/Text-maxMeasure-default-maps-to-data-measure--default--and--65ch-max-inline-size-1.png, tests/browser/**screenshots**/heading-text.browser.test.ts/Text-maxMeasure-narrow-maps-to-data-measure--narrow--and--48ch-max-inline-size-1.png, tests/browser/**screenshots**/heading-text.browser.test.ts/Text-maxMeasure-wide-maps-to-data-measure--wide--and--80ch-max-inline-size-1.png, tests/browser/fixtures/heading-text-harness.svelte
+- Unit tests: packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts
 - Docs demos: apps/docs/src/lib/demos/FlipCardDemo.svelte, apps/docs/src/lib/demos/HeadingDemo.svelte, apps/docs/src/lib/demos/SeparatorDemo.svelte, apps/docs/src/lib/demos/SplitterDemo.svelte, apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte
 - Docs route: /components/heading
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1201,7 +1201,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: display
 - Browser specs: none
 - Browser support files: none
-- Unit tests: node_modules/.bun/zod@3.25.76/node_modules/zod/src/v3/tests/map.test.ts, node_modules/.bun/zod@3.25.76/node_modules/zod/src/v4/classic/tests/map.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v3/tests/map.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/map.test.ts
+- Unit tests: .analysis/node_modules/tsconfig-paths/src/**tests**/mapping-entry.test.ts, .analysis/node_modules/zod/src/v3/tests/map.test.ts, .analysis/node_modules/zod/src/v4/classic/tests/map.test.ts, node_modules/.bun/zod@3.25.76/node_modules/zod/src/v3/tests/map.test.ts, node_modules/.bun/zod@3.25.76/node_modules/zod/src/v4/classic/tests/map.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v3/tests/map.test.ts, node_modules/.bun/zod@4.3.6/node_modules/zod/src/v4/classic/tests/map.test.ts
 - Docs demos: apps/docs/src/lib/demos/MapDemo.svelte
 - Docs route: /components/map
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1443,7 +1443,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: layout
 - Browser specs: none
 - Browser support files: none
-- Unit tests: packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts
 - Docs demos: apps/docs/src/lib/demos/DragAndDropDemo.svelte, apps/docs/src/lib/demos/DrawerDemo.svelte, apps/docs/src/lib/demos/SeparatorDemo.svelte
 - Docs route: /components/separator
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1476,7 +1476,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: navigation
 - Browser specs: none
 - Browser support files: none
-- Unit tests: apps/docs/src/lib/theme-wizard/sidebar-contract.test.ts, tests/unit/sidebar-contract.test.ts
+- Unit tests: tests/unit/sidebar-contract.test.ts
 - Docs demos: apps/docs/src/lib/demos/SidebarDemo.svelte
 - Docs route: /components/sidebar
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1597,7 +1597,7 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 - Category: display
 - Browser specs: none
 - Browser support files: tests/browser/fixtures/ui-compounds-coverage-harness.svelte
-- Unit tests: packages/lint/src/rules.test.ts
+- Unit tests: node_modules/.bun/@dryui+lint@0.4.2/node_modules/@dryui/lint/src/rules.test.ts, packages/lint/src/rules.test.ts
 - Docs demos: apps/docs/src/lib/demos/TableDemo.svelte
 - Docs route: /components/table
 - Docs visual tests: tests/playwright/docs-visual.spec.ts
@@ -1650,9 +1650,9 @@ Scope: public `@dryui/ui` components from `packages/mcp/src/spec.json`.
 
 - Tier: tier2
 - Category: display
-- Browser specs: tests/browser/context-menu.browser.test.ts, tests/browser/textarea.browser.test.ts
-- Browser support files: tests/browser/fixtures/context-menu-harness.svelte, tests/browser/fixtures/primitives-remediation-menu-harness.svelte, tests/browser/fixtures/textarea-harness.svelte
-- Unit tests: packages/cli/src/**tests**/info.test.ts, packages/mcp/src/reviewer.test.ts, tests/unit/motion/webgl-context.test.ts
+- Browser specs: tests/browser/context-menu.browser.test.ts, tests/browser/heading-text.browser.test.ts, tests/browser/textarea.browser.test.ts
+- Browser support files: tests/browser/fixtures/context-menu-harness.svelte, tests/browser/fixtures/heading-text-harness.svelte, tests/browser/fixtures/primitives-remediation-menu-harness.svelte, tests/browser/fixtures/textarea-harness.svelte
+- Unit tests: packages/cli/src/**tests**/info.test.ts, packages/lint/src/rules.test.ts, packages/mcp/src/reviewer.test.ts, tests/unit/motion/webgl-context.test.ts
 - Docs demos: apps/docs/src/lib/demos/AdjustDemo.svelte, apps/docs/src/lib/demos/AlertDialogDemo.svelte, apps/docs/src/lib/demos/AppFrameDemo.svelte, apps/docs/src/lib/demos/AuroraDemo.svelte, apps/docs/src/lib/demos/BackdropDemo.svelte, apps/docs/src/lib/demos/BeamDemo.svelte, apps/docs/src/lib/demos/ContainerDemo.svelte, apps/docs/src/lib/demos/DialogDemo.svelte, apps/docs/src/lib/demos/DrawerDemo.svelte, apps/docs/src/lib/demos/FlipCardDemo.svelte, apps/docs/src/lib/demos/GlassDemo.svelte, apps/docs/src/lib/demos/GodRaysDemo.svelte, apps/docs/src/lib/demos/HotkeyDemo.svelte, apps/docs/src/lib/demos/LogoMarkDemo.svelte, apps/docs/src/lib/demos/MapDemo.svelte, apps/docs/src/lib/demos/NumberInputDemo.svelte, apps/docs/src/lib/demos/PortalDemo.svelte, apps/docs/src/lib/demos/SeparatorDemo.svelte, apps/docs/src/lib/demos/ShaderCanvasDemo.svelte, apps/docs/src/lib/demos/SpacerDemo.svelte, apps/docs/src/lib/demos/SplitterDemo.svelte, apps/docs/src/lib/demos/SpotlightDemo.svelte, apps/docs/src/lib/demos/TextDemo.svelte, apps/docs/src/lib/demos/TourDemo.svelte, apps/docs/src/lib/demos/VisuallyHiddenDemo.svelte
 - Docs route: /components/text
 - Docs visual tests: tests/playwright/docs-visual.spec.ts

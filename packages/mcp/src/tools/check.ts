@@ -24,12 +24,6 @@ interface CheckIssue {
 	readonly suggestedFix: string | null;
 }
 
-interface IssueAggregates {
-	readonly counts: Record<CheckSeverity, number>;
-	readonly hasBlockers: boolean;
-	readonly autoFixable: number;
-}
-
 interface CheckInput {
 	readonly path?: string;
 }
@@ -38,9 +32,31 @@ interface CheckOptions {
 	readonly cwd?: string;
 }
 
+/**
+ * Aggregate view of the enriched diagnostics that the JSON block (and the
+ * TOON header) serialise. `autoFixable` and `hasBlockers` are computed from
+ * the post-enrichment diagnostics so the two transports agree.
+ *
+ * Today `autoFixable` is always 0 because {@link makeFixPair} is a stub; no
+ * rule ships a structured diff yet. That is intentional and the honest signal
+ * to agents: treat `autoFixable=false` as "apply `hint`, then re-check".
+ */
+export interface CheckSummary {
+	readonly hasBlockers: boolean;
+	readonly autoFixable: number;
+	readonly counts: {
+		readonly error: number;
+		readonly warning: number;
+		readonly suggestion: number;
+		readonly info: number;
+		readonly total: number;
+	};
+}
+
 export interface CheckResult {
 	readonly text: string;
 	readonly diagnostics: readonly DryUiRepairIssue[];
+	readonly summary: CheckSummary;
 }
 
 function cap(value: string, max = FIELD_CAP): string {
@@ -52,16 +68,24 @@ function displayPath(absPath: string): string {
 	return rel && !rel.startsWith('..') ? rel : absPath;
 }
 
-function deriveAggregates(issues: readonly CheckIssue[]): IssueAggregates {
-	const counts: Record<CheckSeverity, number> = { error: 0, warning: 0, suggestion: 0, info: 0 };
+/**
+ * Summary computed from the enriched (post-dedup) diagnostics so the TOON
+ * `hasBlockers | autoFixable` header and the JSON `summary` block agree. The
+ * `autoFixable` count deliberately uses `d.autoFixable === true` rather than
+ * the prose `suggestedFix` string; prose guidance is not a structured diff
+ * and agents cannot apply it without the `hint`.
+ */
+function deriveDiagnosticSummary(diagnostics: readonly DryUiRepairIssue[]): CheckSummary {
+	const counts = { error: 0, warning: 0, suggestion: 0, info: 0, total: 0 };
 	let autoFixable = 0;
 	let hasBlockers = false;
-	for (const issue of issues) {
-		counts[issue.severity] += 1;
-		if (issue.suggestedFix !== null) autoFixable += 1;
-		if (issue.severity === 'error') hasBlockers = true;
+	for (const d of diagnostics) {
+		counts[d.severity] += 1;
+		counts.total += 1;
+		if (d.autoFixable === true) autoFixable += 1;
+		if (d.severity === 'error') hasBlockers = true;
 	}
-	return { counts, hasBlockers, autoFixable };
+	return { hasBlockers, autoFixable, counts };
 }
 
 function renderIssues(issues: readonly CheckIssue[]): string[] {
@@ -85,13 +109,14 @@ interface CheckReportOptions {
 	readonly kind: string;
 	readonly targetLine: string;
 	readonly issues: readonly CheckIssue[];
-	readonly summary: string;
+	readonly diagnosticSummary: CheckSummary;
+	readonly summaryLine: string;
 	readonly nextHints: readonly string[];
 	readonly extraBlocks?: readonly string[];
 }
 
 function renderCheckReport(opts: CheckReportOptions): string {
-	const { counts, hasBlockers, autoFixable } = deriveAggregates(opts.issues);
+	const { hasBlockers, autoFixable, counts } = opts.diagnosticSummary;
 	const lines: string[] = [
 		`kind: ${opts.kind}`,
 		opts.targetLine,
@@ -107,7 +132,7 @@ function renderCheckReport(opts: CheckReportOptions): string {
 		}
 	}
 
-	lines.push('', `summary: ${opts.summary}`, '', formatHelp([...opts.nextHints]));
+	lines.push('', `summary: ${opts.summaryLine}`, '', formatHelp([...opts.nextHints]));
 	return lines.join('\n');
 }
 
@@ -154,6 +179,7 @@ function renderTheme(spec: Spec, absPath: string): CheckResult {
 			})
 		)
 	);
+	const summary = deriveDiagnosticSummary(diagnostics);
 
 	const missingCount = result.issues.filter((issue) => issue.code === 'missing-token').length;
 	const totalRequired = result.variables.required + missingCount;
@@ -164,13 +190,14 @@ function renderTheme(spec: Spec, absPath: string): CheckResult {
 		kind: 'theme',
 		targetLine: `target: ${rel} | coverage: ${coverage}%`,
 		issues,
-		summary: result.summary,
+		diagnosticSummary: summary,
+		summaryLine: result.summary,
 		nextHints: [
 			'ask --scope list "" -- browse available components and tokens',
 			'ask --scope setup "" -- review project bootstrap and theme guidance'
 		]
 	});
-	return { text, diagnostics };
+	return { text, diagnostics, summary };
 }
 
 function renderComponent(spec: Spec, absPath: string): CheckResult {
@@ -199,18 +226,20 @@ function renderComponent(spec: Spec, absPath: string): CheckResult {
 			});
 		})
 	);
+	const summary = deriveDiagnosticSummary(diagnostics);
 
 	const text = renderCheckReport({
 		kind: 'component',
 		targetLine: `target: ${rel}`,
 		issues,
-		summary: result.summary,
+		diagnosticSummary: summary,
+		summaryLine: result.summary,
 		nextHints: [
 			'ask --scope component "<Component>" -- inspect the relevant component API before fixing',
 			'ask --scope recipe "<pattern>" -- look up a better DryUI pattern if the current markup is off'
 		]
 	});
-	return { text, diagnostics };
+	return { text, diagnostics, summary };
 }
 
 function renderWorkspace(result: WorkspaceReport): CheckResult {
@@ -227,14 +256,29 @@ function renderWorkspace(result: WorkspaceReport): CheckResult {
 	}));
 	const diagnostics = dedupeDiagnostics(
 		result.findings.map((finding) => {
-			const source: DryUiRepairIssueSource = finding.ruleId.startsWith('theme/')
-				? 'theme'
-				: finding.ruleId.startsWith('project/')
-					? 'lint'
-					: 'workspace';
+			// workspace-audit prefixes component-scoped rules with `component/`
+			// so the flat rule list stays disambiguated. Strip it here and route
+			// to `lint` so enrichDiagnostic produces the same namespaced code
+			// (`lint/dryui/<rule>`) as the single-file path, which is what the
+			// HINTS registry keys off.
+			let source: DryUiRepairIssueSource;
+			let code: string;
+			if (finding.ruleId.startsWith('theme/')) {
+				source = 'theme';
+				code = finding.ruleId;
+			} else if (finding.ruleId.startsWith('project/')) {
+				source = 'lint';
+				code = finding.ruleId;
+			} else if (finding.ruleId.startsWith('component/')) {
+				source = 'lint';
+				code = finding.ruleId.slice('component/'.length);
+			} else {
+				source = 'workspace';
+				code = finding.ruleId;
+			}
 			return enrichDiagnostic({
 				source,
-				code: finding.ruleId,
+				code,
 				severity: finding.severity as DryUiRepairIssueSeverity,
 				message: finding.message,
 				file: finding.file,
@@ -244,6 +288,7 @@ function renderWorkspace(result: WorkspaceReport): CheckResult {
 		})
 	);
 
+	const summary = deriveDiagnosticSummary(diagnostics);
 	const extraBlocks: string[] = [];
 	if (result.warnings.length > 0) {
 		extraBlocks.push(
@@ -258,14 +303,15 @@ function renderWorkspace(result: WorkspaceReport): CheckResult {
 		kind: 'workspace',
 		targetLine: `target: ${result.root} | scanned: ${result.scannedFiles} files`,
 		issues,
-		summary: `${result.summary.error} errors, ${result.summary.warning} warnings, ${result.summary.info} info`,
+		diagnosticSummary: summary,
+		summaryLine: `${result.summary.error} errors, ${result.summary.warning} warnings, ${result.summary.info} info`,
 		extraBlocks,
 		nextHints: [
 			'ask --scope component "<Component>" -- inspect a flagged component before fixing it',
 			'ask --scope setup "" -- review project setup and adoption guidance'
 		]
 	});
-	return { text, diagnostics };
+	return { text, diagnostics, summary };
 }
 
 function resolveCheckTarget(inputPath: string | undefined, cwd?: string): string | null {

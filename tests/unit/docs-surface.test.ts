@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
 	AGENT_IDS,
@@ -9,6 +9,20 @@ import {
 } from '../../packages/mcp/src/docs-surface.ts';
 
 const repoRoot = resolve(import.meta.dir, '../..');
+
+function hasPageDescendant(dir: string): boolean {
+	let entries;
+	try {
+		entries = readdirSync(dir, { withFileTypes: true });
+	} catch {
+		return false;
+	}
+	for (const entry of entries) {
+		if (entry.isFile() && entry.name === '+page.svelte') return true;
+		if (entry.isDirectory() && hasPageDescendant(resolve(dir, entry.name))) return true;
+	}
+	return false;
+}
 
 describe('docs-surface', () => {
 	test('every DOCS_ROUTE has a matching +page.svelte on disk', () => {
@@ -22,14 +36,16 @@ describe('docs-surface', () => {
 				'+page.svelte'
 			);
 			if (existsSync(staticPath)) continue;
-			// Look for a dynamic child (any [slug])
+			// Look for a +page.svelte anywhere beneath the route's folder (e.g. a
+			// dynamic `[slug]` child). Walk is recursive so nested dynamic routes
+			// would also satisfy this check.
 			const dynamicParent = resolve(
 				repoRoot,
 				'apps/docs/src/routes',
 				route.path === '/' ? '' : route.path.slice(1)
 			);
-			const found = existsSync(dynamicParent);
-			expect(found, `route ${route.path} has no +page.svelte or dynamic child`).toBe(true);
+			const found = hasPageDescendant(dynamicParent);
+			expect(found, `route ${route.path} has no +page.svelte descendant on disk`).toBe(true);
 		}
 	});
 
