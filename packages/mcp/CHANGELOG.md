@@ -1,5 +1,45 @@
 # @dryui/mcp
 
+## 2.4.0
+
+### Minor Changes
+
+- [`e1b4091`](https://github.com/rob-balfre/dryui/commit/e1b4091d641048b4db8844c3956da59c74fad9e6) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Migrate component metadata to per-component `<name>.meta.ts` sibling files (Plan Phase 2).
+  - New `@dryui/mcp/define` subpath export exposes `defineComponent` (Zod-validated config) and `createLibrary` (indexed by name, category, tag, surface) for downstream tooling and generators.
+  - New `load-component-meta.ts` glob-scans `packages/ui/src/**/*.meta.ts` and `packages/primitives/src/**/*.meta.ts` and returns the same `Record<string, ComponentMetaEntry>` shape the old `componentMeta` catalog exported.
+  - `generate-spec.ts` now loads meta files as the single source of truth; `spec.json` and `agent-contract.v1.json` are byte-stable after the migration.
+  - `component-catalog.ts` trimmed from 1119 to 293 lines: the 160-entry `componentMeta` record and the `primitiveComponentNames` helper are gone. Nav curation (`docsNavCategories` / `docsNavComponentNames`) and the skill compound list (`skillCompoundComponents`) remain as they are authoritative for a different surface.
+  - `scripts/generate-component-meta.ts` regenerates the `.meta.ts` files from the current component set; re-runnable and idempotent.
+
+  No runtime behaviour changes for consumers; this is a build-time refactor that kills the catalog drift risk called out in the plan.
+
+- [`954fcab`](https://github.com/rob-balfre/dryui/commit/954fcab90d767b79261e384e8185fdd9a2907616) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Consolidate docs, skills, and plugin parity surfaces (Plan Phase 6).
+
+  New `@dryui/mcp/docs-surface` subpath export with:
+  - `AGENT_IDS`: canonical list of supported editor-setup agent IDs (claude-code, codex, gemini, opencode, copilot, cursor, windsurf, zed). `apps/docs/src/lib/ai-setup.ts` now derives its `AiAgentId` type from this.
+  - `DOCS_ROUTES` / `DOCS_ROUTE_PATHS`: first-party docs routes with label + description + keywords. Consumed by `search.ts` and the llms.txt generator.
+  - `DOCS_ALLOWLIST`: re-exported from the existing ai-surface prompt bundle so consumers hit one import.
+
+  `apps/docs/src/lib/search.ts` was silently broken by Phase 2 (it imported `componentMeta` from the trimmed catalog); it now reads from `spec.json` directly so the docs build stays green.
+
+  `generate-llms-txt.ts` includes a new "First-party docs" section pulled from `DOCS_ROUTES`, so llms.txt keeps agents pointed at the authoritative route list.
+
+  Three parity tests in `tests/unit/`:
+  - `docs-surface.test.ts`: every `DOCS_ROUTE` has a matching `+page.svelte`, no duplicate route paths, agent IDs are unique.
+  - `ai-setup-contract.test.ts`: `ai-setup.ts` declares a setup card for every `AGENT_IDS` entry and does not name unknown agent IDs.
+  - `plugin-manifest-contract.test.ts`: plugin manifests stay under the 30-line budget and do not inline long setup blocks.
+
+- [`0a51dd8`](https://github.com/rob-balfre/dryui/commit/0a51dd88a3cdd645f73fde30e0e39d002433bc95) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Ship the structured repair loop for agent-driven fixes (Plan Phase 4).
+  - New `@dryui/mcp/repair` subpath export with `DryUiRepairIssue`, `enrichDiagnostic`, `knownHintCodes`, and `runCheckStructured`.
+  - The `check` MCP tool now returns both the TOON summary (human-readable) and a second content block containing a JSON-fenced `dryui-diagnostics` payload (machine-readable). Agents can parse the latter for repair loops. The JSON block is `{ summary, diagnostics }`, where `summary` exposes `hasBlockers`, `autoFixable`, and per-severity `counts` computed from the enriched diagnostics so it agrees with the TOON header.
+  - Diagnostics carry a namespaced `code` (`lint/dryui/*`, `theme/*`, `workspace/*`, `parse/*`), `hint` (prescriptive "do X" guidance, not just diagnostic prose), and `docsRef`. Hint registry covers all 15 DryUI lint rules, `project/theme-import-order`, 11 theme-checker codes, and a parse-error fallback. Unknown codes round-trip without a hint so agents degrade gracefully.
+  - New `self-correction` recipe in composition-data documenting the intended write, check, enrich-hint, edit, re-check loop.
+
+### Patch Changes
+
+- Updated dependencies [[`eca0978`](https://github.com/rob-balfre/dryui/commit/eca0978a6b6625b0ce2f6e7f8a63164d1c606734)]:
+  - @dryui/lint@0.5.1
+
 ## 2.3.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @dryui/cli
 
+## 0.17.2
+
+### Patch Changes
+
+- [`f32e64a`](https://github.com/rob-balfre/dryui/commit/f32e64a115b78b5d4af45d538e39e471d1bdec30) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Kill peer server PIDs when one side of the launcher rejects so failed startups do not leave orphaned background processes.
+
+  `dryui` and `dryui dev` start two servers in parallel (feedback + docs, or feedback + user dev server). Previously a rejection on one side left the other side's spawned PID running after the command exited. The launcher now awaits both promises, and if either rejects, the owned PIDs of any fulfilled peers are passed to `killOwnedProcess` before the error is rethrown.
+
+- Updated dependencies [[`e1b4091`](https://github.com/rob-balfre/dryui/commit/e1b4091d641048b4db8844c3956da59c74fad9e6), [`954fcab`](https://github.com/rob-balfre/dryui/commit/954fcab90d767b79261e384e8185fdd9a2907616), [`e96430c`](https://github.com/rob-balfre/dryui/commit/e96430c92b64009042fcc49ec02cf46363267a77), [`0a51dd8`](https://github.com/rob-balfre/dryui/commit/0a51dd88a3cdd645f73fde30e0e39d002433bc95)]:
+  - @dryui/mcp@2.4.0
+  - @dryui/feedback-server@0.8.0
+
 ## 0.17.1
 
 ### Patch Changes

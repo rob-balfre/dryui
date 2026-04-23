@@ -1,5 +1,11 @@
 # @dryui/lint
 
+## 0.5.1
+
+### Patch Changes
+
+- [`eca0978`](https://github.com/rob-balfre/dryui/commit/eca0978a6b6625b0ce2f6e7f8a63164d1c606734) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Declare `files: ["dist"]` explicitly. Without it, `npm pack` inside the workspace excluded `dist/` because the repo-level `.gitignore` ignores it — a hygiene hole that `publint`/`attw` now catch via the new `check:publish-hygiene` gate.
+
 ## 0.5.0
 
 ### Minor Changes
