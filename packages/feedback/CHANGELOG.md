@@ -1,5 +1,19 @@
 # @dryui/feedback
 
+## 0.5.1
+
+### Patch Changes
+
+- [#29](https://github.com/rob-balfre/dryui/pull/29) [`c3550b4`](https://github.com/rob-balfre/dryui/commit/c3550b4a3c8ff235f4988bb3efa6dc3bee85a4e5) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Address the main-branch review findings across security, SSR stability, generated artifact hygiene, docs deployment, and tooling validation.
+
+  Rename the MarkdownRenderer raw HTML opt-out from `sanitize={false}` to the explicit `dangerouslyAllowRawHtml` prop, harden local feedback server request boundaries, sanitize rich text editor HTML, move component IDs to Svelte SSR-safe IDs, and tighten DateField and drag preview cleanup.
+
+  Also stabilize package declaration cleanup, generated artifact drift checks, docs static output and component manifests, MCP reviewer/theme diagnostics, CLI setup/install behavior, feedback page identity, and docs demo coverage.
+
+- Updated dependencies [[`ed72d91`](https://github.com/rob-balfre/dryui/commit/ed72d91d5919fb00d24727ef438b0945dec84a4c), [`c3550b4`](https://github.com/rob-balfre/dryui/commit/c3550b4a3c8ff235f4988bb3efa6dc3bee85a4e5)]:
+  - @dryui/ui@2.0.0
+  - @dryui/primitives@2.0.0
+
 ## 0.5.0
 
 ### Minor Changes

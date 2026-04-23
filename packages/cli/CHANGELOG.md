@@ -1,5 +1,42 @@
 # @dryui/cli
 
+## 0.18.0
+
+### Minor Changes
+
+- [#28](https://github.com/rob-balfre/dryui/pull/28) [`ed72d91`](https://github.com/rob-balfre/dryui/commit/ed72d91d5919fb00d24727ef438b0945dec84a4c) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Close the gap between the static linter and how UIs actually render. Two parallel tracks: structural component fixes that make four classes of design bugs impossible at the source, and a new vision-critique tool that catches the residue.
+
+  **Components (`@dryui/ui`, `@dryui/primitives`)**
+  - `Badge`: container switched from `inline-grid; place-items: center` to `inline-grid; grid-auto-flow: column; align-items: center; gap`. Children with both an `<Icon>` and a text node now sit inline instead of stacking icon-above-text. The icon-only fast path is unchanged.
+  - `Badge`: now reads `variant`, `color`, and `size` from `PAGE_HEADER_META_CONTEXT` when no explicit value is passed, so consumers can hoist the variant decision to the row.
+  - New `<Pluralize count={n} singular="hotel" plural="hotels" />` (or shorthand `noun="pax"`). Renders with `tabular-nums` + `nowrap`. Eliminates `1 hotels` mismatches at the source.
+  - New `<RefId>` (optional `prefix` prop). Wraps reference IDs in `nowrap` + tabular-nums + monospace so tokens like `BA-3490221` never break mid-token.
+  - `PageHeader.Meta` accepts optional `variant` / `color` / `size` props that propagate to descendant `Badge` instances via context. Also enforces a wrapping chip flow row at the layout level.
+
+  **Lint rules (`@dryui/lint`)**
+  - `polish/badge-plural-mismatch`: flags `{count} word` patterns inside `<Badge>` that risk plural mismatch; suggests `<Pluralize>`.
+  - `polish/page-header-meta-mixed-variants`: flags `<PageHeader.Meta>` rows that mix Badge variants without a parent variant; suggests hoisting the variant.
+  - `polish/raw-ref-id-needs-wrap`: flags raw `[A-Z]{2,4}-\d{5,}` literals not wrapped in `<RefId>`.
+
+  **Vision-critique tool (`@dryui/mcp`, `@dryui/cli`)**
+  - New MCP tool `check-vision` and CLI subcommand `dryui check-vision <url>`. Renders the URL in headless Chromium, screenshots it, and sends the PNG plus a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, alignment, orphan, spacing rhythm) to Claude vision. Returns TOON findings + JSON.
+  - Requires `ANTHROPIC_API_KEY` in env (or `--api-key`). Prompt cache is wired so the rubric system message hits the cache after the first call.
+  - `@dryui/mcp` reviewer's `prefer-grid-layout` rule now respects the same `[data-chip-group]` selector carve-out and `/* dryui-allow flex */` per-declaration opt-out that `@dryui/lint`'s `dryui/no-flex` already honors, so the two surfaces agree.
+
+  The static linter has a hard ceiling: it cannot see runtime wrap, plural agreement, contrast against live data, or alignment drift. This pair (component-layer impossibility + VLM critique) covers the gap.
+
+### Patch Changes
+
+- [#29](https://github.com/rob-balfre/dryui/pull/29) [`c3550b4`](https://github.com/rob-balfre/dryui/commit/c3550b4a3c8ff235f4988bb3efa6dc3bee85a4e5) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Address the main-branch review findings across security, SSR stability, generated artifact hygiene, docs deployment, and tooling validation.
+
+  Rename the MarkdownRenderer raw HTML opt-out from `sanitize={false}` to the explicit `dangerouslyAllowRawHtml` prop, harden local feedback server request boundaries, sanitize rich text editor HTML, move component IDs to Svelte SSR-safe IDs, and tighten DateField and drag preview cleanup.
+
+  Also stabilize package declaration cleanup, generated artifact drift checks, docs static output and component manifests, MCP reviewer/theme diagnostics, CLI setup/install behavior, feedback page identity, and docs demo coverage.
+
+- Updated dependencies [[`ed72d91`](https://github.com/rob-balfre/dryui/commit/ed72d91d5919fb00d24727ef438b0945dec84a4c), [`c3550b4`](https://github.com/rob-balfre/dryui/commit/c3550b4a3c8ff235f4988bb3efa6dc3bee85a4e5)]:
+  - @dryui/mcp@2.6.0
+  - @dryui/feedback-server@0.8.2
+
 ## 0.17.2
 
 ### Patch Changes
