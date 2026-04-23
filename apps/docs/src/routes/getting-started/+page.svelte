@@ -63,10 +63,11 @@
 
 	const buttonCode = `<script>
   import { Button } from '@dryui/ui';
+  let saved = false;
 <\/script>
 
-<Button variant="solid" onclick={() => console.log('clicked')}>
-  Save changes
+<Button variant="solid" onclick={() => saved = true}>
+  {saved ? 'Saved' : 'Save changes'}
 </Button>`;
 
 	const cardCode = `<script>

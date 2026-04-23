@@ -9,10 +9,12 @@
 	}
 
 	let { open = $bindable(false), children }: Props = $props();
+	const uid = $props.id();
 
 	setContextMenuCtx(
 		createPositionedMenuRootState({
 			idBase: 'context-menu',
+			uid,
 			getOpen: () => open,
 			setOpen: (value) => {
 				open = value;

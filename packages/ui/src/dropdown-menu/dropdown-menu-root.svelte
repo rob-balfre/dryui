@@ -9,10 +9,12 @@
 	}
 
 	let { open = $bindable(false), children }: Props = $props();
+	const uid = $props.id();
 
 	setDropdownMenuCtx(
 		createMenuRootState({
 			idBase: 'dropdown',
+			uid,
 			getOpen: () => open,
 			setOpen: (value) => {
 				open = value;

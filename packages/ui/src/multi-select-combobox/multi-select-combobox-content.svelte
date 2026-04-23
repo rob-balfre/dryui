@@ -87,6 +87,7 @@
 		margin: 0;
 		grid-template-columns: minmax(anchor-size(inline), max-content);
 		background: var(--dry-color-bg-overlay);
+		/* dryui-allow solid-border-on-raised: popover menu keeps an explicit edge for contrast against busy app surfaces. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		box-shadow: var(--dry-shadow-lg);

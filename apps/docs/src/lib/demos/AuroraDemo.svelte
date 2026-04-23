@@ -33,6 +33,7 @@
 							</div>
 
 							<div class="hero-copy">
+								<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 								<h3 class="hero-title">Ambient background effect</h3>
 								<Text color="secondary">
 									Layered gradients drift when the browser can animate custom properties, then fall
@@ -70,6 +71,7 @@
 			<div class="mini-card mini-card-sunrise" aria-hidden="true"></div>
 			<div class="mini-shell">
 				<p class="mini-label">Sunrise</p>
+				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h4 class="mini-title">Warm launch surface</h4>
 				<Text color="secondary" size="sm">
 					A brighter preset for promotional callouts and high-energy hero moments.
@@ -81,6 +83,7 @@
 			<div class="mini-card mini-card-custom" aria-hidden="true"></div>
 			<div class="mini-shell">
 				<p class="mini-label">Custom tuple</p>
+				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h4 class="mini-title">Editorial calm</h4>
 				<Text color="secondary" size="sm">
 					Swap in your own three-color tuple when the built-in palettes are close but not exact.

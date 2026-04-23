@@ -17,7 +17,7 @@ import {
 	readJsonObject,
 	readRawText,
 	type ProbeCache
-} from '@dryui/feedback-server/internals/probe';
+} from './setup-probe.js';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
@@ -156,6 +156,33 @@ function errorMessage(error: unknown): string {
 	return error instanceof Error ? error.message : String(error);
 }
 
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+	return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+}
+
+function semanticJsonEqual(left: unknown, right: unknown): boolean {
+	if (Object.is(left, right)) return true;
+
+	if (Array.isArray(left) || Array.isArray(right)) {
+		if (!Array.isArray(left) || !Array.isArray(right)) return false;
+		if (left.length !== right.length) return false;
+		return left.every((value, index) => semanticJsonEqual(value, right[index]));
+	}
+
+	if (isPlainObject(left) || isPlainObject(right)) {
+		if (!isPlainObject(left) || !isPlainObject(right)) return false;
+		const leftKeys = Object.keys(left).sort();
+		const rightKeys = Object.keys(right).sort();
+		if (leftKeys.length !== rightKeys.length) return false;
+		return leftKeys.every((key, index) => {
+			if (rightKeys[index] !== key) return false;
+			return semanticJsonEqual(left[key], right[key]);
+		});
+	}
+
+	return false;
+}
+
 function runProcessStep(
 	label: string,
 	command: string,
@@ -216,9 +243,7 @@ export function mergeServersConfig(options: MergeServersOptions): InstallStepRes
 	let changed = !existed;
 	const mergedContainer: Record<string, unknown> = { ...containerObj };
 	for (const [key, value] of Object.entries(options.servers)) {
-		const before = JSON.stringify(mergedContainer[key]);
-		const next = JSON.stringify(value);
-		if (before !== next) changed = true;
+		if (!semanticJsonEqual(mergedContainer[key], value)) changed = true;
 		mergedContainer[key] = value;
 	}
 

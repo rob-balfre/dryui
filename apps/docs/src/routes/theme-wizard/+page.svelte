@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
+	import type { PageProps } from './$types';
 	import {
 		Adjust,
 		Badge,
@@ -55,9 +57,38 @@
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import PreviewComponents from '$lib/theme-wizard/PreviewComponents.svelte';
 
+	let { data }: PageProps = $props();
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
 	const tokens = $derived(getAllTokens(themeMode));
 	let lastAppliedRecipe: string | null = null;
+
+	function decodeBrowserRecipe() {
+		if (!browser) return data;
+
+		const recipeParam = new URL(window.location.href).searchParams.get('t');
+		if (!recipeParam) return { recipeParam: null, recipe: null };
+
+		try {
+			return {
+				recipeParam,
+				recipe: decodeRecipe(recipeParam)
+			};
+		} catch {
+			return {
+				recipeParam,
+				recipe: null
+			};
+		}
+	}
+
+	function applyInitialRecipe() {
+		const initial = decodeBrowserRecipe();
+		if (!initial.recipeParam || !initial.recipe) return;
+		applyRecipe(initial.recipe);
+		lastAppliedRecipe = initial.recipeParam;
+	}
+
+	applyInitialRecipe();
 
 	afterNavigate(() => {
 		const recipe = page.url.searchParams.get('t');
@@ -678,6 +709,7 @@
 		justify-self: center;
 		gap: var(--dry-space-1);
 		padding: var(--dry-space-1);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-raised);

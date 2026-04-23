@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '@dryui/primitives';
 	import { getCommandPaletteCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -14,7 +13,8 @@
 	let { value, disabled, onSelect, class: className, children, ...rest }: Props = $props();
 
 	const ctx = getCommandPaletteCtx();
-	const id = generateFormId('cmd-item');
+	const uid = $props.id();
+	const id = `cmd-item-${uid}`;
 
 	let visible = $derived.by(() => {
 		const q = ctx.query.toLowerCase().trim();
@@ -58,7 +58,7 @@
 
 <style>
 	[data-command-palette-item] {
-		--dry-cmd-item-radius: var(--dry-radius-nested-dialog);
+		--dry-cmd-item-radius: min(var(--dry-radius-nested-dialog), var(--dry-space-4));
 
 		display: grid;
 		grid-auto-flow: column;

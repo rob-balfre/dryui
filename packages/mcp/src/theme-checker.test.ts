@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'bun:test';
 import { diagnoseTheme } from './theme-checker.js';
+import { THEME_TOKEN_NAME_SET } from './theme-tokens.js';
 
 const mockSpec = {
 	components: {
@@ -500,6 +501,17 @@ describe('Component tokens', () => {
 				(i) =>
 					i.variable === '--dry-card-bg' &&
 					(i.code === 'transparent-component-bg' || i.code === 'unknown-component-token')
+			)
+		).toBe(false);
+	});
+
+	test('generated theme registry tokens are not treated as unknown component tokens', () => {
+		expect(THEME_TOKEN_NAME_SET.has('--dry-ease-default')).toBe(true);
+		const css = `:root { --dry-ease-default: cubic-bezier(0.2, 0, 0, 1); }`;
+		const result = diagnoseTheme(css, mockSpec);
+		expect(
+			result.issues.some(
+				(i) => i.code === 'unknown-component-token' && i.variable === '--dry-ease-default'
 			)
 		).toBe(false);
 	});

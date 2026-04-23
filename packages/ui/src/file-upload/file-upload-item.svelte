@@ -27,6 +27,7 @@
 		font-family: var(--dry-font-sans);
 		color: var(--dry-color-text-strong);
 		background: var(--dry-color-bg-raised);
+		/* dryui-allow solid-border-on-raised: uploaded file rows need a visible item boundary in dense lists. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 	}

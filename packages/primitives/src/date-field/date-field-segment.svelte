@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getDateFieldCtx, type DateSegmentType } from './context.svelte.js';
 
@@ -25,12 +26,31 @@
 	);
 
 	let inputBuffer = '';
-	let bufferTimeout: ReturnType<typeof setTimeout>;
+	let segmentEl: HTMLSpanElement | undefined;
+	let bufferTimeout: ReturnType<typeof setTimeout> | undefined;
+
+	function clearBufferTimeout() {
+		if (bufferTimeout === undefined) return;
+		clearTimeout(bufferTimeout);
+		bufferTimeout = undefined;
+	}
+
+	function resetInputBuffer() {
+		clearBufferTimeout();
+		inputBuffer = '';
+	}
+
+	onDestroy(resetInputBuffer);
 
 	function registerSegment(node: HTMLSpanElement) {
+		segmentEl = node;
 		ctx.registerSegment(type, node);
+		node.addEventListener('blur', resetInputBuffer);
 		return {
 			destroy() {
+				node.removeEventListener('blur', resetInputBuffer);
+				resetInputBuffer();
+				if (segmentEl === node) segmentEl = undefined;
 				ctx.unregisterSegment(type);
 			}
 		};
@@ -77,21 +97,21 @@
 				break;
 			case 'Backspace': {
 				e.preventDefault();
-				inputBuffer = '';
+				resetInputBuffer();
 				ctx.updateSegment(type, minValue);
 				break;
 			}
 			default: {
 				if (/^\d$/.test(e.key)) {
 					e.preventDefault();
-					clearTimeout(bufferTimeout);
+					clearBufferTimeout();
 					inputBuffer += e.key;
 					const num = parseInt(inputBuffer, 10);
 					const maxDigits = type === 'year' ? 4 : 2;
 
 					if (inputBuffer.length >= maxDigits || num > maxValue) {
 						ctx.updateSegment(type, Math.min(Math.max(num, minValue), maxValue));
-						inputBuffer = '';
+						resetInputBuffer();
 						// Auto-advance to next segment
 						if (type !== 'year') {
 							ctx.focusSegment(type, 'next');
@@ -100,6 +120,8 @@
 						ctx.updateSegment(type, num);
 						bufferTimeout = setTimeout(() => {
 							inputBuffer = '';
+							bufferTimeout = undefined;
+							if (document.activeElement !== segmentEl) return;
 							if (type !== 'year') {
 								ctx.focusSegment(type, 'next');
 							}

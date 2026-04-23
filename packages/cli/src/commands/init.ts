@@ -28,7 +28,7 @@ import { runUserProjectLauncher } from './launcher.js';
 import {
 	injectOverridesIntoPackageJson,
 	loadDevTarballsManifest,
-	rewriteInstallCommand,
+	rewriteInstallCommandArgs,
 	wrapInstallPackage,
 	type DevTarballsManifest
 } from './dev-tarballs.js';
@@ -45,7 +45,7 @@ interface InitOptions {
 }
 
 interface InitRuntime {
-	runCommand?: (command: string, cwd: string) => boolean;
+	runCommand?: (command: string, args: readonly string[], cwd: string) => boolean;
 	installPackage?: (options: InstallPackageOptions) => boolean;
 	mountFeedback?: (options: MountFeedbackOptions) => boolean;
 	patchViteConfig?: (configPath: string) => boolean;
@@ -53,6 +53,38 @@ interface InitRuntime {
 	isInteractiveTTY?: () => boolean;
 	promptLaunch?: () => Promise<boolean>;
 	runLauncher?: (cwd: string, spec: Spec) => Promise<void>;
+}
+
+interface ParsedInstallCommand {
+	command: string;
+	args: string[];
+	display: string;
+}
+
+const PACKAGE_MANAGERS = ['bun', 'pnpm', 'npm', 'yarn'] as const;
+
+function isPackageManager(value: string): value is ConcretePackageManager {
+	return PACKAGE_MANAGERS.includes(value as ConcretePackageManager);
+}
+
+function printInitHelp(exitCode = 0): never {
+	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
+	console.log('');
+	console.log('Bootstrap a SvelteKit + DryUI project.');
+	console.log('');
+	console.log('Options:');
+	console.log('  [path]           Target directory (default: current directory)');
+	console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
+	console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
+	console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
+	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
+	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
+	process.exit(exitCode);
+}
+
+function failInitArgs(message: string): never {
+	console.error(`Error: ${message}`);
+	process.exit(1);
 }
 
 function parseInitArgs(args: string[]): InitOptions {
@@ -66,18 +98,27 @@ function parseInitArgs(args: string[]): InitOptions {
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]!;
 		const next = args[i + 1];
-		if (arg === '--pm' && next) {
-			if (next === 'bun' || next === 'pnpm' || next === 'npm' || next === 'yarn') {
-				packageManager = next;
+		if (arg === '--pm') {
+			if (!next || next.startsWith('-')) {
+				failInitArgs('--pm requires a package manager: bun, npm, pnpm, or yarn');
 			}
+			if (!isPackageManager(next)) {
+				failInitArgs(`unknown package manager for --pm: ${next}`);
+			}
+			packageManager = next;
 			i++;
 		} else if (arg === '--no-launch') {
 			noLaunch = true;
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
-		} else if (arg === '--dev-tarballs' && next) {
+		} else if (arg === '--dev-tarballs') {
+			if (!next || next.startsWith('-')) {
+				failInitArgs('--dev-tarballs requires a directory');
+			}
 			devTarballsDir = resolve(process.cwd(), next);
 			i++;
+		} else if (arg.startsWith('-')) {
+			failInitArgs(`unknown option: ${arg}`);
 		} else if (!arg.startsWith('-')) {
 			targetPath = resolve(process.cwd(), arg);
 			userPath = arg;
@@ -105,9 +146,29 @@ function warn(msg: string): void {
 	console.error(msg);
 }
 
-function runShellCommand(command: string, cwd: string): boolean {
-	const result = spawnSync(command, { cwd, stdio: 'inherit', shell: true });
+function runProcessCommand(command: string, args: readonly string[], cwd: string): boolean {
+	const result = spawnSync(command, args, { cwd, stdio: 'inherit', shell: false });
 	return result.status === 0;
+}
+
+function formatCommandArg(arg: string): string {
+	return /\s/.test(arg) ? JSON.stringify(arg) : arg;
+}
+
+function parseInstallCommand(
+	command: string,
+	manifest: DevTarballsManifest | null
+): ParsedInstallCommand | null {
+	const tokens = command.trim().split(/\s+/).filter(Boolean);
+	const executable = tokens[0];
+	if (!executable) return null;
+	const rawArgs = tokens.slice(1);
+	const args = manifest ? rewriteInstallCommandArgs(rawArgs, manifest) : rawArgs;
+	return {
+		command: executable,
+		args,
+		display: [executable, ...args].map(formatCommandArg).join(' ')
+	};
 }
 
 // The scaffold template from @dryui/mcp/project-planner emits layout imports
@@ -337,9 +398,6 @@ function applyDevTarballsToSteps(
 		if (step.kind === 'create-file' && step.path?.endsWith('/package.json') && step.snippet) {
 			return { ...step, snippet: injectOverridesIntoPackageJson(step.snippet, manifest) };
 		}
-		if ((step.kind === 'run-command' || step.kind === 'install-package') && step.command) {
-			return { ...step, command: rewriteInstallCommand(step.command, manifest) };
-		}
 		return step;
 	});
 }
@@ -349,24 +407,13 @@ export async function runInit(
 	spec: Spec,
 	runtime: InitRuntime = {}
 ): Promise<void> {
-	if (args[0] === '--help') {
-		console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
-		console.log('');
-		console.log('Bootstrap a SvelteKit + DryUI project.');
-		console.log('');
-		console.log('Options:');
-		console.log('  [path]           Target directory (default: current directory)');
-		console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
-		console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
-		console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
-		// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
-		// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
-		process.exit(0);
+	if (args.includes('--help') || args.includes('-h')) {
+		printInitHelp(0);
 	}
 
 	const { targetPath, userPath, packageManager, noLaunch, noFeedback, devTarballsDir } =
 		parseInitArgs(args);
-	const runCommand = runtime.runCommand ?? runShellCommand;
+	const runCommand = runtime.runCommand ?? runProcessCommand;
 
 	const devTarballsManifest: DevTarballsManifest | null = devTarballsDir
 		? loadDevTarballsManifest(devTarballsDir)
@@ -413,11 +460,13 @@ export async function runInit(
 			case 'run-command':
 			case 'install-package': {
 				if (!step.command) break;
+				const installCommand = parseInstallCommand(step.command, devTarballsManifest);
+				if (!installCommand) break;
 				log(`  Installing dependencies...`);
-				const ok = runCommand(step.command, targetPath);
+				const ok = runCommand(installCommand.command, installCommand.args, targetPath);
 				if (!ok) {
 					installsSucceeded = false;
-					warn(`  Warning: "${step.command}" failed. Run it manually.`);
+					warn(`  Warning: "${installCommand.display}" failed. Run it manually.`);
 				}
 				break;
 			}

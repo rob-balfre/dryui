@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '@dryui/primitives';
 	import { getMultiSelectComboboxCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -24,7 +23,8 @@
 	}: Props = $props();
 
 	const ctx = getMultiSelectComboboxCtx();
-	const id = generateFormId('multi-select-combobox-item');
+	const uid = $props.id();
+	const id = `multi-select-combobox-item-${uid}`;
 
 	const isSelected = $derived(ctx.isSelected(value));
 	const isUnavailable = $derived(disabled || !ctx.canSelect(value));

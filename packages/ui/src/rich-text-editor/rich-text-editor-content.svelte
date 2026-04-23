@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { getRichTextEditorCtx } from '@dryui/primitives/rich-text-editor';
+	import {
+		getRichTextEditorCtx,
+		setSanitizedRichTextHtml
+	} from '@dryui/primitives/rich-text-editor';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -12,17 +15,19 @@
 
 	// Register the content element with the context
 	$effect(() => {
-		if (contentEl) {
-			ctx.contentEl = contentEl;
-		}
+		if (!contentEl) return;
+		ctx.contentEl = contentEl;
+		return () => {
+			if (ctx.contentEl === contentEl) ctx.contentEl = null;
+		};
 	});
 
 	// Sync value into contenteditable (also clears hint elements on mount)
 	$effect(() => {
 		if (!contentEl) return;
-		const html = ctx.html || '';
+		const html = ctx.sanitizeHtml(ctx.html || '');
 		if (contentEl.innerHTML !== html && document.activeElement !== contentEl) {
-			contentEl.innerHTML = html;
+			setSanitizedRichTextHtml(contentEl, html);
 		}
 	});
 
@@ -96,8 +101,11 @@
 	onkeydown={handleKeydown}
 	{...rest}
 >
+	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h1>.</h1>
+	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h2>.</h2>
+	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h3>.</h3>
 	<p></p>
 	<ul><li></li></ul>

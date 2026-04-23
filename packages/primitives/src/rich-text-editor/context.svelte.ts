@@ -26,6 +26,7 @@ export interface RichTextEditorContext {
 	getContent: () => string;
 	updateState: () => void;
 	syncValue: () => void;
+	sanitizeHtml: (html: string) => string;
 }
 export const [setRichTextEditorCtx, getRichTextEditorCtx] =
 	createContext<RichTextEditorContext>('rich-text-editor');

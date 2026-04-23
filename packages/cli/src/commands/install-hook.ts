@@ -38,6 +38,10 @@ interface ClaudeSettings {
 
 // `dryui ambient` is the canonical hook entrypoint.
 const AMBIENT_COMMAND = 'dryui ambient';
+const SUPPORTED_AMBIENT_COMMAND_TOKENS: readonly (readonly string[])[] = [
+	['dryui', 'ambient'],
+	['bun', 'run', 'dryui', 'ambient']
+];
 
 export interface InstallHookStatus {
 	project: boolean;
@@ -69,6 +73,18 @@ function loadSettings(path: string): { data: ClaudeSettings; existed: boolean } 
 	}
 }
 
+function commandTokens(command: string): string[] {
+	return command.trim().split(/\s+/).filter(Boolean);
+}
+
+function isDryuiAmbientCommand(command: string): boolean {
+	const tokens = commandTokens(command);
+	return SUPPORTED_AMBIENT_COMMAND_TOKENS.some((supported) => {
+		if (supported.length !== tokens.length) return false;
+		return supported.every((token, index) => tokens[index] === token);
+	});
+}
+
 function hasDryuiSessionStartHook(settings: ClaudeSettings): boolean {
 	const groups = settings.hooks?.SessionStart;
 	if (!Array.isArray(groups)) return false;
@@ -76,7 +92,7 @@ function hasDryuiSessionStartHook(settings: ClaudeSettings): boolean {
 		if (!group || !Array.isArray(group.hooks)) continue;
 		for (const entry of group.hooks) {
 			if (entry?.type !== 'command') continue;
-			if (entry.command && entry.command.includes('dryui ambient')) return true;
+			if (entry.command && isDryuiAmbientCommand(entry.command)) return true;
 		}
 	}
 	return false;

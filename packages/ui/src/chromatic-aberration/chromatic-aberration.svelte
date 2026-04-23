@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createId } from '@dryui/primitives';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
@@ -11,7 +10,8 @@
 
 	let { offset = 3, angle = 0, children, class: className, style, ...rest }: Props = $props();
 
-	const filterId = createId('dry-chromatic');
+	const uid = $props.id();
+	const filterId = `dry-chromatic-${uid}`;
 
 	const offsetX = $derived(Math.round(offset * Math.cos((angle * Math.PI) / 180)));
 	const offsetY = $derived(Math.round(offset * Math.sin((angle * Math.PI) / 180)));

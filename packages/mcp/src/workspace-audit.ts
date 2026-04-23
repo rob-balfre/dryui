@@ -97,6 +97,7 @@ const DEFAULT_EXCLUDED_SEGMENTS = new Set([
 ]);
 const DEFAULT_EXCLUDED_PATHS = new Set<string>();
 const MAX_SEVERITY: Record<WorkspaceSeverity, number> = { info: 0, warning: 1, error: 2 };
+const DRYUI_THEME_DIRECTIVE_RE = /\/\*\s*@dryui-theme\s*\*\//;
 
 function normalizePath(path: string): string {
 	return path.replaceAll('\\', '/').replace(/^\.\/+/, '');
@@ -225,6 +226,28 @@ function matchesChangedFile(path: string, changedFiles: Set<string>): boolean {
 		if (normalized.endsWith(`/${changed}`)) return true;
 	}
 	return false;
+}
+
+function isThemeCssFilename(path: string): boolean {
+	return /\.theme\.css$/i.test(normalizePath(path));
+}
+
+function hasDryThemeDirective(content: string): boolean {
+	return DRYUI_THEME_DIRECTIVE_RE.test(content.slice(0, 2000));
+}
+
+function shouldAnalyzeCssThemeFile(
+	path: string,
+	content: string,
+	projectCssFiles: ReadonlySet<string>
+): boolean {
+	const normalized = normalizePath(path);
+	return (
+		content.includes('--dry-') ||
+		isThemeCssFilename(normalized) ||
+		hasDryThemeDirective(content) ||
+		projectCssFiles.has(normalized)
+	);
 }
 
 function severityAtOrAbove(
@@ -440,13 +463,37 @@ export function scanWorkspace(
 		);
 	}
 
-	const scannedFiles = files.filter((file) =>
+	const scanFiles = files.filter((file) =>
 		shouldScanFile(file, include, exclude, changedFiles, explicitInclude)
-	).length;
+	);
+	const scannedFiles = scanFiles.length;
 	const skippedFiles = files.length - scannedFiles;
+	const projectCssFiles = new Set<string>();
 
 	for (const file of files) {
-		if (!shouldScanFile(file, include, exclude, changedFiles, explicitInclude)) continue;
+		if (!file.endsWith('package.json')) continue;
+		try {
+			const absPath = resolve(root, file);
+			const parsed = JSON.parse(readFileSync(absPath, 'utf8')) as {
+				dependencies?: Record<string, string>;
+				devDependencies?: Record<string, string>;
+			};
+			const dependencyNames = new Set([
+				...Object.keys(parsed.dependencies ?? {}),
+				...Object.keys(parsed.devDependencies ?? {})
+			]);
+			if (!dependencyNames.has('svelte') && !dependencyNames.has('@sveltejs/kit')) continue;
+			const project = detectProject(spec, absPath);
+			if (project.dependencies.ui && project.files.appCss) {
+				projectCssFiles.add(normalizePath(relative(root, project.files.appCss)));
+			}
+		} catch {
+			// The main scan loop reports invalid package JSON. This pre-pass only
+			// gathers project CSS context for theme-file routing.
+		}
+	}
+
+	for (const file of scanFiles) {
 		const absPath = resolve(root, file);
 		const content = readFileSync(absPath, 'utf8');
 
@@ -486,7 +533,7 @@ export function scanWorkspace(
 			continue;
 		}
 
-		if (file.endsWith('.css') && content.includes('--dry-')) {
+		if (file.endsWith('.css') && shouldAnalyzeCssThemeFile(file, content, projectCssFiles)) {
 			findings.push(...themeFindings(root, absPath, content, spec));
 			continue;
 		}

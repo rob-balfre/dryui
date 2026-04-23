@@ -55,6 +55,7 @@
 
 <section class="playground" aria-label="Interactive Border Beam playground">
 	<div class="playground-header">
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="playground-title">Playground</h3>
 		<p class="playground-copy">
 			The docs theme toggle drives the preview, so the same controls show both dark and light mode.

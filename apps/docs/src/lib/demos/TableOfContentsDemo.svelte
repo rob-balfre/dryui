@@ -4,14 +4,19 @@
 
 <div class="demo-layout">
 	<div class="demo-article" id="toc-demo-content">
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h2 id="toc-introduction">Introduction</h2>
 		<p>Overview of the project and its goals.</p>
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h2 id="toc-getting-started">Getting Started</h2>
 		<p>Installation steps and initial setup guide.</p>
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 id="toc-prerequisites">Prerequisites</h3>
 		<p>Required tools and dependencies.</p>
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 id="toc-installation">Installation</h3>
 		<p>Step-by-step installation instructions.</p>
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h2 id="toc-configuration">Configuration</h2>
 		<p>Configuring the project for your environment.</p>
 	</div>

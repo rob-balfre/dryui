@@ -55,6 +55,13 @@ function waitForAsyncWork(delay = 20) {
 	return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
+function canonicalTestPageUrl(): string {
+	const url = new URL(window.location.href);
+	url.searchParams.delete('dryui-feedback');
+	url.hash = '';
+	return url.toString();
+}
+
 function setupSubmissionEnvironment(options?: {
 	onCapture?: () => void;
 	submissionResponse?: Response;
@@ -206,7 +213,9 @@ describe('feedback overlay hosting', () => {
 		try {
 			render(Feedback, { serverUrl: 'http://feedback.test' });
 
-			const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
+			const drawButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Draw"], [aria-label="Stop drawing"]'
+			);
 			if (!drawButton) throw new Error('Expected feedback draw button');
 
 			drawButton.click();
@@ -248,6 +257,91 @@ describe('feedback overlay hosting', () => {
 			).toBe(true);
 		} finally {
 			env.restore();
+		}
+	});
+
+	it('uses one canonical page URL for saved drawings and submitted feedback', async () => {
+		const originalHref = window.location.href;
+		history.pushState(null, '', '/workspace?dryui-feedback=1&tab=settings#notes');
+		const expectedPageUrl = canonicalTestPageUrl();
+		const env = setupSubmissionEnvironment();
+
+		try {
+			render(Feedback, { serverUrl: 'http://feedback.test' });
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Draw"], [aria-label="Stop drawing"]'
+			);
+			if (!drawButton) throw new Error('Expected feedback draw button');
+			if (drawButton.getAttribute('aria-label') === 'Draw') {
+				drawButton.click();
+				flushSync();
+			}
+
+			const canvas = document.querySelector<SVGSVGElement>(
+				'[aria-label="Feedback drawing canvas"]'
+			);
+			if (!canvas) throw new Error('Expected feedback drawing canvas');
+			drawStroke(canvas);
+
+			const submitButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Send feedback"]'
+			);
+			if (!submitButton) throw new Error('Expected feedback submit button');
+			submitButton.click();
+			await waitForAsyncWork(50);
+			flushSync();
+
+			const drawingsCall = env.fetchSpy.mock.calls.find(([input, init]) => {
+				const url = String(input instanceof Request ? input.url : input);
+				return url.includes('/drawings?') && (!init?.method || init.method === 'GET');
+			});
+			expect(drawingsCall).toBeDefined();
+			const drawingsRequestUrl = new URL(String(drawingsCall?.[0]));
+			expect(drawingsRequestUrl.searchParams.get('url')).toBe(expectedPageUrl);
+
+			const submissionCall = env.fetchSpy.mock.calls.find(
+				([input, init]) =>
+					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
+					init?.method === 'POST'
+			);
+			expect(submissionCall).toBeDefined();
+			const body = JSON.parse(String(submissionCall?.[1]?.body));
+			expect(body.url).toBe(expectedPageUrl);
+		} finally {
+			env.restore();
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('loads drawings again when client-side navigation changes the page key', async () => {
+		const originalHref = window.location.href;
+		history.pushState(null, '', '/feedback-page-one?dryui-feedback=1');
+		const env = setupSubmissionEnvironment();
+
+		try {
+			render(Feedback, { serverUrl: 'http://feedback.test' });
+			await waitForAsyncWork(20);
+			flushSync();
+			env.fetchSpy.mockClear();
+
+			history.pushState(null, '', '/feedback-page-two?dryui-feedback=1&mode=draw#active');
+			const expectedPageUrl = canonicalTestPageUrl();
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawingsCall = env.fetchSpy.mock.calls.find(([input, init]) => {
+				const url = String(input instanceof Request ? input.url : input);
+				return url.includes('/drawings?') && (!init?.method || init.method === 'GET');
+			});
+			expect(drawingsCall).toBeDefined();
+			const drawingsRequestUrl = new URL(String(drawingsCall?.[0]));
+			expect(drawingsRequestUrl.searchParams.get('url')).toBe(expectedPageUrl);
+		} finally {
+			env.restore();
+			history.replaceState(null, '', originalHref);
 		}
 	});
 

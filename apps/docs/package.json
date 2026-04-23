@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@dryui/lint": "workspace:*",
-    "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@sveltejs/adapter-static": "^3.0.10",
     "@sveltejs/kit": "^2.57.1",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/mapbox-gl": "^3.5.0",

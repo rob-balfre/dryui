@@ -89,6 +89,7 @@
 		gap: var(--dry-space-1);
 		padding: var(--dry-space-1);
 		background: var(--dry-color-bg-overlay);
+		/* dryui-allow solid-border-on-raised: toolbar chrome needs a visible control group boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 	}

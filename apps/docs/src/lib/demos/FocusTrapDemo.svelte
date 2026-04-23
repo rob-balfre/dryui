@@ -29,6 +29,7 @@
 	kbd {
 		padding: var(--dry-space-1) var(--dry-space-2);
 		background: var(--dry-color-bg-raised);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-sm);
 		font-size: 0.85em;

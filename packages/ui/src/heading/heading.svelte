@@ -27,26 +27,32 @@
 </script>
 
 {#if level === 1}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h1 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h1>
 {:else if level === 2}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h2 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h2>
 {:else if level === 3}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h3 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h3>
 {:else if level === 4}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h4 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h4>
 {:else if level === 5}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h5 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h5>
 {:else}
+	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h6 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h6>
@@ -64,7 +70,6 @@
 		font-family: var(--dry-font-sans);
 		font-weight: 700;
 		line-height: var(--dry-type-heading-2-leading, 2.5rem);
-		letter-spacing: -0.03em;
 		text-wrap: balance;
 	}
 
@@ -102,7 +107,6 @@
 		font-family: var(--dry-font-display, var(--dry-font-sans));
 		font-size: var(--dry-type-display-size, var(--dry-text-4xl-size, 2.25rem));
 		line-height: var(--dry-type-display-leading, 4rem);
-		letter-spacing: -0.04em;
 	}
 
 	/* ── Measure (max-inline-size) ─────────────────────────────────────────────

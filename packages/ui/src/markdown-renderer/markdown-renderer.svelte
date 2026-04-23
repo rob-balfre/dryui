@@ -5,22 +5,28 @@
 	import { Separator } from '../separator/index.js';
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		content: string;
-		sanitize?: boolean;
+		dangerouslyAllowRawHtml?: boolean;
 	}
 
-	let { content, sanitize = true, class: className, ...rest }: Props = $props();
+	let { content, dangerouslyAllowRawHtml = false, class: className, ...rest }: Props = $props();
 
-	const nodes = $derived(parseMarkdownToAst(content, { sanitize }));
+	const nodes = $derived(parseMarkdownToAst(content, { sanitize: !dangerouslyAllowRawHtml }));
 </script>
 
 {#snippet renderNodes(items: MarkdownNode[])}
 	{#each items as node}
 		{#if node.type === 'heading'}
+			<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{#if node.level === 1}<h1>{@html node.content}</h1>
+				<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{:else if node.level === 2}<h2>{@html node.content}</h2>
+				<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{:else if node.level === 3}<h3>{@html node.content}</h3>
+				<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{:else if node.level === 4}<h4>{@html node.content}</h4>
+				<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{:else if node.level === 5}<h5>{@html node.content}</h5>
+				<!-- dryui-allow raw-heading: MarkdownRenderer maps parsed markdown heading nodes to their semantic HTML tag. -->
 			{:else}<h6>{@html node.content}</h6>
 			{/if}
 		{:else if node.type === 'paragraph'}

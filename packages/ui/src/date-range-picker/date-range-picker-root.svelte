@@ -27,6 +27,7 @@
 		disabled = false,
 		children
 	}: Props = $props();
+	const uid = $props.id();
 
 	const view = createDateViewController({
 		initialDate: startDate,
@@ -42,6 +43,7 @@
 	const popover = createPickerPopoverController({
 		triggerIdPrefix: 'date-range-picker-trigger',
 		contentIdPrefix: 'date-range-picker-content',
+		uid,
 		open: () => open,
 		setOpen: (nextOpen) => {
 			open = nextOpen;

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setLinkPreviewCtx } from './context.svelte.js';
 
 	interface Props {
@@ -12,8 +11,9 @@
 
 	let { open = $bindable(false), openDelay = 700, closeDelay = 300, children }: Props = $props();
 
-	const triggerId = generateFormId('link-preview-trigger');
-	const contentId = generateFormId('link-preview-content');
+	const uid = $props.id();
+	const triggerId = `link-preview-trigger-${uid}`;
+	const contentId = `link-preview-content-${uid}`;
 
 	let openTimeout: ReturnType<typeof setTimeout>;
 	let closeTimeout: ReturnType<typeof setTimeout>;

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setContextMenuCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,8 +9,9 @@
 
 	let { open = $bindable(false), children }: Props = $props();
 
-	const triggerId = generateFormId('context-menu-trigger');
-	const contentId = generateFormId('context-menu-content');
+	const uid = $props.id();
+	const triggerId = `context-menu-trigger-${uid}`;
+	const contentId = `context-menu-content-${uid}`;
 
 	let position = $state({ x: 0, y: 0 });
 

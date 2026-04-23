@@ -1,4 +1,4 @@
-import adapter from '@sveltejs/adapter-cloudflare';
+import adapter from '@sveltejs/adapter-static';
 import { dryuiLint } from '@dryui/lint';
 
 const isDevCommand = process.env.npm_lifecycle_event === 'dev' || process.argv.includes('dev');
@@ -12,7 +12,7 @@ const config = {
 		})
 	],
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({ pages: 'build', assets: 'build' }),
 		experimental: {
 			remoteFunctions: true
 		},

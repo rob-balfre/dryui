@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '@dryui/primitives';
 	import { getMegaMenuCtx, setMegaMenuItemCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -11,9 +10,10 @@
 	let { class: className, children, ...rest }: Props = $props();
 
 	const ctx = getMegaMenuCtx();
-	const itemId = generateFormId('mm-item');
-	const triggerId = generateFormId('mm-trigger');
-	const panelId = generateFormId('mm-panel');
+	const uid = $props.id();
+	const itemId = `mm-item-${uid}`;
+	const triggerId = `mm-trigger-${uid}`;
+	const panelId = `mm-panel-${uid}`;
 
 	setMegaMenuItemCtx({
 		itemId,

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { getMenubarCtx, setMenubarMenuCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,7 +9,8 @@
 
 	let { children }: Props = $props();
 
-	const menuId = generateFormId('menubar-menu');
+	const uid = $props.id();
+	const menuId = `menubar-menu-${uid}`;
 	const ctx = getMenubarCtx();
 
 	onMount(() => {

@@ -319,6 +319,7 @@
 
 	[data-modal-content][data-variant='drawer'][data-side='top'] [data-modal-panel] {
 		--_drawer-rest-transform: translateY(0);
+		/* dryui-allow symmetric-exit-animation: this is the off-canvas enter position for a top drawer, not the exit animation. */
 		--_drawer-enter-transform: translateY(-100%);
 		grid-row: 1;
 		height: var(--dry-drawer-size);
@@ -327,6 +328,7 @@
 
 	[data-modal-content][data-variant='drawer'][data-side='bottom'] [data-modal-panel] {
 		--_drawer-rest-transform: translateY(0);
+		/* dryui-allow symmetric-exit-animation: this is the off-canvas enter position for a bottom drawer, not the exit animation. */
 		--_drawer-enter-transform: translateY(100%);
 		grid-row: 2;
 		height: var(--dry-drawer-size);

@@ -8,6 +8,7 @@
 			<div class="content">
 				<div class="intro">
 					<p class="eyebrow">Pointer tracking</p>
+					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3>Move across the panel to pull the light toward the cursor.</h3>
 					<Text color="secondary">
 						This is the point of Spotlight: a hover signal that pulls attention toward the active
@@ -42,6 +43,7 @@
 			<div class="content">
 				<div class="intro">
 					<p class="eyebrow">Static focus</p>
+					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3>A centered glow that stays visible without pointer movement.</h3>
 					<Text color="secondary">
 						Use the static variant when a card needs built-in focal contrast before the user even

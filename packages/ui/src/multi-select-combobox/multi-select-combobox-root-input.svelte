@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '@dryui/primitives';
 	import { setMultiSelectComboboxCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -31,8 +30,9 @@
 		...rest
 	}: Props = $props();
 
-	const inputId = generateFormId('multi-select-combobox-input');
-	const contentId = generateFormId('multi-select-combobox-content');
+	const uid = $props.id();
+	const inputId = `multi-select-combobox-input-${uid}`;
+	const contentId = `multi-select-combobox-content-${uid}`;
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let inputEl = $state<HTMLInputElement | null>(null);
@@ -251,6 +251,7 @@
 		justify-content: start;
 		gap: var(--dry-space-1_5);
 		padding: var(--dry-space-2);
+		/* dryui-allow solid-border-on-raised: composite input needs a persistent field edge plus raised fill for token contrast. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);

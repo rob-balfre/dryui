@@ -5,6 +5,7 @@
 <div class="svg-demo">
 	<div class="svg-intro">
 		<p class="svg-eyebrow">More than a single circle</p>
+		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="svg-title">
 			Use <code>Svg</code> for layered marks, badges, and tiny data visuals.
 		</h3>

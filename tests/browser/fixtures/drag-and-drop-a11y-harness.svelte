@@ -24,7 +24,13 @@
 		{ id: 'prim-2', label: 'Refine component API' },
 		{ id: 'prim-3', label: 'Ship documentation' }
 	]);
+
+	let showUiHandleRoot = $state(true);
 </script>
+
+<button type="button" data-testid="hide-ui-handle-root" onclick={() => (showUiHandleRoot = false)}>
+	Hide UI handle root
+</button>
 
 <section data-testid="ui-handleless-section">
 	<DragAndDrop.Root
@@ -35,26 +41,35 @@
 	>
 		{#each uiHandlelessItems as item, index (item.id)}
 			<DragAndDrop.Item {index}>
-				<span data-item-label>{item.label}</span>
+				<span id={`ui-handleless-label-${item.id}`} data-item-label>{item.label}</span>
 			</DragAndDrop.Item>
 		{/each}
 	</DragAndDrop.Root>
 </section>
 
 <section data-testid="ui-handle-section">
-	<DragAndDrop.Root
-		items={uiHandleItems}
-		aria-label="UI handle tasks"
-		data-testid="ui-handle-root"
-		onReorder={(reordered) => (uiHandleItems = reordered)}
-	>
-		{#each uiHandleItems as item, index (item.id)}
-			<DragAndDrop.Item {index}>
-				<DragAndDrop.Handle {index} />
-				<span data-item-label>{item.label}</span>
-			</DragAndDrop.Item>
-		{/each}
-	</DragAndDrop.Root>
+	{#if showUiHandleRoot}
+		<DragAndDrop.Root
+			items={uiHandleItems}
+			aria-label="UI handle tasks"
+			data-testid="ui-handle-root"
+			onReorder={(reordered) => (uiHandleItems = reordered)}
+		>
+			{#each uiHandleItems as item, index (item.id)}
+				<DragAndDrop.Item {index}>
+					<DragAndDrop.Handle {index} />
+					<span
+						id={`ui-handle-label-${item.id}`}
+						aria-describedby={`ui-handle-hint-${item.id}`}
+						data-item-label
+					>
+						{item.label}
+					</span>
+					<span id={`ui-handle-hint-${item.id}`} hidden>Drag preview hint</span>
+				</DragAndDrop.Item>
+			{/each}
+		</DragAndDrop.Root>
+	{/if}
 </section>
 
 <section data-testid="primitive-handle-section">
@@ -67,7 +82,14 @@
 		{#each primitiveHandleItems as item, index (item.id)}
 			<PrimitiveDragAndDrop.Item {index}>
 				<PrimitiveDragAndDrop.Handle {index} />
-				<span data-item-label>{item.label}</span>
+				<span
+					id={`primitive-label-${item.id}`}
+					aria-describedby={`primitive-hint-${item.id}`}
+					data-item-label
+				>
+					{item.label}
+				</span>
+				<span id={`primitive-hint-${item.id}`} hidden>Drag preview hint</span>
 			</PrimitiveDragAndDrop.Item>
 		{/each}
 	</PrimitiveDragAndDrop.Root>

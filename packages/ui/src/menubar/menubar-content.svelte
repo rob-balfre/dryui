@@ -123,6 +123,7 @@
 
 		background: var(--dry-color-bg-overlay);
 		color: var(--dry-color-text-strong);
+		/* dryui-allow solid-border-on-raised: menu popover keeps a visible edge while floating above varied content. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-popover);
 		box-shadow: var(--dry-shadow-overlay);

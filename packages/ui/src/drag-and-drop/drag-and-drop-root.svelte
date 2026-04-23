@@ -1,8 +1,8 @@
 <script lang="ts" generics="T">
-	import { flushSync } from 'svelte';
+	import { flushSync, onDestroy } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createId, mergeIds } from '@dryui/primitives';
+	import { mergeIds } from '@dryui/primitives';
 	import { setDragAndDropCtx } from './context.svelte.js';
 	import { getGroupCtx } from './group-context.svelte.js';
 
@@ -48,7 +48,8 @@
 	let crossListIndex: number | null = null;
 
 	const groupCtx = getGroupCtx();
-	const instructionsId = createId('dry-dnd-instructions');
+	const uid = $props.id();
+	const instructionsId = `dry-dnd-instructions-${uid}`;
 
 	let keyboardInstructions = $derived.by(() => {
 		const arrowKeys =
@@ -172,6 +173,7 @@
 
 		const clone = draggedEl.cloneNode(true) as HTMLElement;
 		clone.setAttribute('data-dnd-preview', '');
+		scrubPreviewClone(clone);
 		clone.removeAttribute('data-index');
 		clone.removeAttribute('data-dragging');
 		clone.removeAttribute('data-drag-active');
@@ -202,6 +204,33 @@
 		document.body.appendChild(clone);
 		previewEl = clone;
 		updatePreviewPosition();
+	}
+
+	function scrubPreviewClone(clone: HTMLElement) {
+		clone.setAttribute('aria-hidden', 'true');
+		clone.setAttribute('inert', '');
+		clone.removeAttribute('id');
+
+		for (const el of clone.querySelectorAll<HTMLElement>('[id]')) {
+			el.removeAttribute('id');
+		}
+
+		const relationshipAttrs = [
+			'for',
+			'aria-activedescendant',
+			'aria-controls',
+			'aria-describedby',
+			'aria-details',
+			'aria-labelledby',
+			'aria-owns'
+		];
+		const selector = relationshipAttrs.map((attr) => `[${attr}]`).join(',');
+
+		for (const el of clone.querySelectorAll<HTMLElement>(selector)) {
+			for (const attr of relationshipAttrs) {
+				el.removeAttribute(attr);
+			}
+		}
 	}
 
 	function updatePreviewPosition() {
@@ -357,6 +386,8 @@
 			rafId = null;
 		}
 	}
+
+	onDestroy(removePreview);
 
 	function handlePointerMove(e: PointerEvent) {
 		if (isAnimating) return;

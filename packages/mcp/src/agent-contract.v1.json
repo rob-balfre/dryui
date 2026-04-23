@@ -10331,11 +10331,11 @@
           "required": true,
           "bindable": false
         },
-        "sanitize": {
-          "signature": "sanitize: boolean | default:true",
+        "dangerouslyAllowRawHtml": {
+          "signature": "dangerouslyAllowRawHtml: boolean | default:false",
           "required": false,
           "bindable": false,
-          "default": "true"
+          "default": "false"
         }
       }
     },

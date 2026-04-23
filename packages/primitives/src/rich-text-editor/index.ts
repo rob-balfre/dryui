@@ -22,6 +22,7 @@ interface ToolbarSnippetParams {
 }
 
 export interface RichTextEditorRootProps extends HTMLAttributes<HTMLDivElement> {
+	/** HTML is sanitized before rendering and before bind:value updates are emitted. */
 	value?: string;
 	placeholder?: string;
 	readonly?: boolean;
@@ -39,6 +40,12 @@ export interface RichTextEditorContentProps extends HTMLAttributes<HTMLDivElemen
 
 export { setRichTextEditorCtx, getRichTextEditorCtx } from './context.svelte.js';
 export type { RichTextEditorContext } from './context.svelte.js';
+export {
+	sanitizeRichTextElement,
+	sanitizeRichTextHtml,
+	sanitizeRichTextUrl,
+	setSanitizedRichTextHtml
+} from './sanitize-html.js';
 
 import RichTextEditorRoot from './rich-text-editor-root.svelte';
 import RichTextEditorToolbar from './rich-text-editor-toolbar.svelte';

@@ -23,5 +23,6 @@
 		<DateField.Segment type="year" data-testid="segment-year" />
 	</DateField.Root>
 
+	<button type="button" data-testid="outside-focus">Outside</button>
 	<output data-testid="value-output">{formatValue(value)}</output>
 </div>

@@ -59,6 +59,7 @@
 		font-family: var(--dry-font-mono);
 		color: var(--dry-color-text-strong);
 		background: var(--dry-color-bg-raised);
+		/* dryui-allow solid-border-on-raised: numeric color channel inputs use field affordance inside a raised picker. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		transition:

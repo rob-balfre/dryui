@@ -330,10 +330,19 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-dry-button"
+        },
+        {
           "name": "data-dry-icon"
         },
         {
           "name": "data-group-orientation"
+        },
+        {
+          "name": "data-icon-end"
+        },
+        {
+          "name": "data-icon-start"
         },
         {
           "name": "data-in-group"
@@ -13830,10 +13839,10 @@
           "type": "string",
           "required": true
         },
-        "sanitize": {
+        "dangerouslyAllowRawHtml": {
           "type": "boolean",
           "required": false,
-          "default": "true"
+          "default": "false"
         }
       },
       "forwardedProps": {

@@ -4,27 +4,11 @@
 	import DataTablePreview from '$lib/previews/DataTablePreview.svelte';
 	import FormPreview from '$lib/previews/FormPreview.svelte';
 
-	const themeClasses = ['theme-auto', 'theme-dark', 'theme-light'] as const;
 	const surfaces = [
 		{ label: 'Surface mix', value: '3 previews' },
 		{ label: 'Snapshot mode', value: 'element compare' },
 		{ label: 'Theme', value: 'default auto' }
 	] as const;
-
-	$effect(() => {
-		const root = document.documentElement;
-		const previousClasses = themeClasses.filter((themeClass) =>
-			root.classList.contains(themeClass)
-		);
-
-		root.classList.remove(...themeClasses);
-		root.classList.add('theme-light');
-
-		return () => {
-			root.classList.remove(...themeClasses);
-			root.classList.add(...previousClasses);
-		};
-	});
 </script>
 
 <div class="scene-shell">

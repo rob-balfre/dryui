@@ -5,14 +5,14 @@
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		content: string;
-		sanitize?: boolean;
+		dangerouslyAllowRawHtml?: boolean;
 		codeBlock?: Snippet<[{ code: string; language: string }]>;
 		hr?: Snippet;
 	}
 
-	let { content, sanitize = true, codeBlock, hr, ...rest }: Props = $props();
+	let { content, dangerouslyAllowRawHtml = false, codeBlock, hr, ...rest }: Props = $props();
 
-	const nodes = $derived(parseMarkdownToAst(content, { sanitize }));
+	const nodes = $derived(parseMarkdownToAst(content, { sanitize: !dangerouslyAllowRawHtml }));
 </script>
 
 {#snippet renderNodes(items: MarkdownNode[])}

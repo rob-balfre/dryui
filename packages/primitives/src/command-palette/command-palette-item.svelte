@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { getCommandPaletteCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -14,7 +13,8 @@
 	let { value, disabled, onSelect, children, ...rest }: Props = $props();
 
 	const ctx = getCommandPaletteCtx();
-	const id = generateFormId('cmd-item');
+	const uid = $props.id();
+	const id = `cmd-item-${uid}`;
 
 	let el = $state<HTMLElement>();
 

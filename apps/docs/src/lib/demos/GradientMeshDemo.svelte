@@ -30,6 +30,7 @@
 
 			<div class="hero">
 				<div class="hero-copy">
+					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3>Mesh as a background, not a thin strip</h3>
 					<p>
 						Give the effect real surface area, a strong foreground card, and a slow ambient drift so
@@ -50,6 +51,7 @@
 			<div class="lanes">
 				{#each lanes as lane (lane.title)}
 					<article class="lane">
+						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h4>{lane.title}</h4>
 						<p>{lane.body}</p>
 					</article>

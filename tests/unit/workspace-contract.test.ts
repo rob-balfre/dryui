@@ -31,6 +31,7 @@ const docsVisualSpec = await Bun.file(
 const testUnitScript = await Bun.file(
 	new URL('../../scripts/test-unit.ts', import.meta.url)
 ).text();
+const validateScript = await Bun.file(new URL('../../scripts/validate.ts', import.meta.url)).text();
 
 test('unit test contract points at the local unit suite', () => {
 	expect(packageJson.scripts['test:unit']).toBe('bun run ./scripts/test-unit.ts');
@@ -77,11 +78,24 @@ test('coverage scripts are available for unit and browser suites', () => {
 });
 
 test('release scripts require validation before publish', () => {
+	expect(packageJson.scripts['clean:package-src-declarations']).toBe(
+		'bun run scripts/check-generated-files.ts --clean-package-src-declarations'
+	);
+	expect(packageJson.scripts['check:package-src-declarations']).toBe(
+		'bun run scripts/check-generated-files.ts --check-package-src-declarations'
+	);
 	expect(packageJson.scripts.check).toContain('check:packages');
 	expect(packageJson.scripts.check).toContain('check:docs');
 	expect(packageJson.scripts.check).toContain('check:mcp');
+	expect(packageJson.scripts.check).toContain('check:package-src-declarations');
+	expect(packageJson.scripts.check).toContain('check:architecture');
+	expect(packageJson.scripts.check).toContain('check:lint:violations');
+	expect(packageJson.scripts['check:architecture']).toBe(
+		"bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-architecture\" packages/mcp/src/spec.json packages/mcp/src/architecture.json"
+	);
 	expect(packageJson.scripts.build).toBe('bun run build:packages && bun run build:docs');
 	const buildPackages = packageJson.scripts['build:packages'];
+	expect(buildPackages).toContain('bun run clean:package-src-declarations');
 	const requiredPackages = [
 		'@dryui/lint',
 		'@dryui/primitives',
@@ -96,6 +110,12 @@ test('release scripts require validation before publish', () => {
 		expect(buildPackages).toContain(`--filter '${pkg}' build`);
 	}
 	expect(packageJson.scripts.validate).toBe('bun run ./scripts/validate.ts');
+	expect(packageJson.scripts['release:gate']).toBe('bun run validate --no-test');
+	expect(validateScript).toContain("run('check:lint:violations', 'bun run check:lint:violations')");
+	expect(validateScript).toContain("await run('check:architecture', 'bun run check:architecture')");
+	expect(validateScript).toContain(
+		"await run('clean:package-src-declarations', 'bun run clean:package-src-declarations')"
+	);
 });
 
 test('CI workflow runs a dedicated coverage lane and uploads retained artifacts', () => {

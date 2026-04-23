@@ -51,6 +51,40 @@ function pressKey(element: HTMLElement, key: string) {
 	flushSync();
 }
 
+function beginPointerDrag(root: HTMLElement, handle: HTMLElement) {
+	const pointerId = 1;
+	handle.dispatchEvent(
+		new PointerEvent('pointerdown', {
+			bubbles: true,
+			cancelable: true,
+			button: 0,
+			clientX: 8,
+			clientY: 8,
+			pointerId
+		})
+	);
+	flushSync();
+
+	root.dispatchEvent(
+		new PointerEvent('pointermove', {
+			bubbles: true,
+			cancelable: true,
+			clientX: 28,
+			clientY: 28,
+			pointerId
+		})
+	);
+	flushSync();
+}
+
+function getPreview() {
+	const preview = document.querySelector<HTMLElement>('[data-dnd-preview]');
+	if (!(preview instanceof HTMLElement)) {
+		throw new Error('Expected drag preview clone');
+	}
+	return preview;
+}
+
 describe('DragAndDrop accessibility remediations', () => {
 	it('uses sortable list semantics instead of listbox and option roles', () => {
 		render(DragAndDropA11yHarness);
@@ -143,5 +177,52 @@ describe('DragAndDrop accessibility remediations', () => {
 			expect(getLiveRegion(root).textContent).toContain('Item moved to position 2 of 3');
 			expect(document.activeElement?.getAttribute('role')).toBe('button');
 		}
+	});
+
+	it('scrubs ids and relationship attributes from pointer drag preview clones', async () => {
+		render(DragAndDropA11yHarness);
+
+		for (const root of [getRoot('ui-handle-root'), getRoot('primitive-handle-root')]) {
+			const [firstHandle] = getHandles(root);
+			if (!firstHandle) {
+				throw new Error('Expected reorder handle');
+			}
+
+			beginPointerDrag(root, firstHandle);
+			await nextFrame();
+
+			const preview = getPreview();
+			expect(preview.getAttribute('aria-hidden')).toBe('true');
+			expect(preview.hasAttribute('inert')).toBe(true);
+			expect(preview.hasAttribute('id')).toBe(false);
+			expect(preview.querySelector('[id]')).toBeNull();
+			expect(preview.querySelector('[aria-describedby]')).toBeNull();
+
+			root.dispatchEvent(new PointerEvent('pointercancel', { bubbles: true, cancelable: true }));
+			flushSync();
+			expect(document.querySelector('[data-dnd-preview]')).toBeNull();
+		}
+	});
+
+	it('removes an active pointer drag preview when the root is destroyed', async () => {
+		render(DragAndDropA11yHarness);
+
+		const root = getRoot('ui-handle-root');
+		const [firstHandle] = getHandles(root);
+		const hideRoot = document.querySelector<HTMLButtonElement>(
+			'[data-testid="hide-ui-handle-root"]'
+		);
+		if (!firstHandle || !hideRoot) {
+			throw new Error('Expected drag handle and hide button');
+		}
+
+		beginPointerDrag(root, firstHandle);
+		await nextFrame();
+		expect(getPreview()).toBeTruthy();
+
+		hideRoot.click();
+		flushSync();
+
+		expect(document.querySelector('[data-dnd-preview]')).toBeNull();
 	});
 });

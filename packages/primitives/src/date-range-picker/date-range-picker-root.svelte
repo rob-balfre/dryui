@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setDateRangePickerCtx } from './context.svelte.js';
 	import { createDateViewState } from '../internal/date-view-state.svelte.js';
 
@@ -26,8 +25,9 @@
 		children
 	}: Props = $props();
 
-	const triggerId = generateFormId('date-range-picker-trigger');
-	const contentId = generateFormId('date-range-picker-content');
+	const uid = $props.id();
+	const triggerId = `date-range-picker-trigger-${uid}`;
+	const contentId = `date-range-picker-content-${uid}`;
 	let triggerEl = $state<HTMLElement | null>(null);
 	const view = createDateViewState({
 		getLocale: () => locale,

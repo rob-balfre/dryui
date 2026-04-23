@@ -134,6 +134,50 @@ describe('runInit', () => {
 		expect(result.exitCode).toBe(0);
 	});
 
+	test('prints help when -h or --help appears after other args', async () => {
+		const shortHelp = await captureAsyncCommandIO(() => runInit(['myapp', '-h'], spec));
+		const longHelp = await captureAsyncCommandIO(() => runInit(['myapp', '--help'], spec));
+
+		expect(shortHelp.exitCode).toBe(0);
+		expect(longHelp.exitCode).toBe(0);
+		expect(shortHelp.logs[0]).toBe(
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]'
+		);
+		expect(longHelp.logs).toEqual(shortHelp.logs);
+		expect(shortHelp.errors).toEqual([]);
+		expect(longHelp.errors).toEqual([]);
+	});
+
+	test('rejects unknown init flags', async () => {
+		const result = await captureAsyncCommandIO(() => runInit(['myapp', '--wat'], spec));
+
+		expect(result.logs).toEqual([]);
+		expect(result.errors).toEqual(['Error: unknown option: --wat']);
+		expect(result.exitCode).toBe(1);
+	});
+
+	test('validates --pm values before scaffolding', async () => {
+		const missing = await captureAsyncCommandIO(() => runInit(['myapp', '--pm'], spec));
+		const flagValue = await captureAsyncCommandIO(() =>
+			runInit(['myapp', '--pm', '--no-feedback'], spec)
+		);
+		const invalid = await captureAsyncCommandIO(() => runInit(['myapp', '--pm', 'deno'], spec));
+
+		expect(missing.logs).toEqual([]);
+		expect(flagValue.logs).toEqual([]);
+		expect(invalid.logs).toEqual([]);
+		expect(missing.errors).toEqual([
+			'Error: --pm requires a package manager: bun, npm, pnpm, or yarn'
+		]);
+		expect(flagValue.errors).toEqual([
+			'Error: --pm requires a package manager: bun, npm, pnpm, or yarn'
+		]);
+		expect(invalid.errors).toEqual(['Error: unknown package manager for --pm: deno']);
+		expect(missing.exitCode).toBe(1);
+		expect(flagValue.exitCode).toBe(1);
+		expect(invalid.exitCode).toBe(1);
+	});
+
 	test('returns early when DryUI is already set up', async () => {
 		const root = createTempTree({
 			'package.json': packageJson,
@@ -258,14 +302,14 @@ describe('runInit', () => {
 		});
 		const workspaceRoot = realpathSync(root);
 		const target = realpathSync(join(root, 'projects/smoke'));
-		const commands: Array<{ command: string; cwd: string }> = [];
+		const commands: Array<{ command: string; args: readonly string[]; cwd: string }> = [];
 		const feedback = buildFeedbackRuntime();
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun'], spec, {
-					runCommand: (command, cwd) => {
-						commands.push({ command, cwd });
+					runCommand: (command, args, cwd) => {
+						commands.push({ command, args, cwd });
 						return true;
 					},
 					...feedback.stubs
@@ -276,12 +320,20 @@ describe('runInit', () => {
 		expect(result.errors).toEqual([]);
 		expect(commands).toEqual([
 			{
-				command:
-					'bun add -d svelte @sveltejs/kit @sveltejs/vite-plugin-svelte @sveltejs/adapter-auto vite',
+				command: 'bun',
+				args: [
+					'add',
+					'-d',
+					'svelte',
+					'@sveltejs/kit',
+					'@sveltejs/vite-plugin-svelte',
+					'@sveltejs/adapter-auto',
+					'vite'
+				],
 				cwd: target
 			},
-			{ command: 'bun add @dryui/ui', cwd: target },
-			{ command: 'bun add -d @dryui/lint', cwd: target }
+			{ command: 'bun', args: ['add', '@dryui/ui'], cwd: target },
+			{ command: 'bun', args: ['add', '-d', '@dryui/lint'], cwd: target }
 		]);
 		expect(feedback.installCalls).toEqual([
 			{
@@ -309,6 +361,61 @@ describe('runInit', () => {
 		expect(readFileSync(join(target, 'src/routes/+layout.svelte'), 'utf8')).toContain(
 			'{@render children()}'
 		);
+	});
+
+	test('--dev-tarballs substitutes package tokens without splitting paths with spaces', async () => {
+		const { root, target, feedback } = scaffoldTestBed();
+		const uiTarball = join(root, 'packed tarballs/@dryui ui;touch nope.tgz');
+		const lintTarball = join(root, 'packed tarballs/@dryui lint.tgz');
+		const tarballsDir = createTempTree({
+			'manifest.json': JSON.stringify({
+				generatedAt: 'test',
+				packages: {
+					'@dryui/ui': { version: '0.0.0', tarball: uiTarball },
+					'@dryui/lint': { version: '0.0.0', tarball: lintTarball }
+				}
+			})
+		});
+		const commands: Array<{ command: string; args: readonly string[]; cwd: string }> = [];
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(
+					['projects/smoke', '--pm', 'bun', '--dev-tarballs', tarballsDir, '--no-feedback'],
+					spec,
+					{
+						runCommand: (command, args, cwd) => {
+							commands.push({ command, args, cwd });
+							return true;
+						},
+						...feedback.stubs
+					}
+				)
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(commands).toEqual([
+			{
+				command: 'bun',
+				args: [
+					'add',
+					'-d',
+					'svelte',
+					'@sveltejs/kit',
+					'@sveltejs/vite-plugin-svelte',
+					'@sveltejs/adapter-auto',
+					'vite'
+				],
+				cwd: target
+			},
+			{ command: 'bun', args: ['add', uiTarball], cwd: target },
+			{ command: 'bun', args: ['add', '-d', lintTarball], cwd: target }
+		]);
+
+		const writtenPackageJson = JSON.parse(readFileSync(join(target, 'package.json'), 'utf8'));
+		expect(writtenPackageJson.overrides['@dryui/ui']).toBe(`file:${uiTarball}`);
+		expect(writtenPackageJson.overrides['@dryui/lint']).toBe(`file:${lintTarball}`);
 	});
 
 	test('scaffold launches feedback dashboard when the user confirms the prompt', async () => {

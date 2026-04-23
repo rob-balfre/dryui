@@ -3,7 +3,12 @@
 
 import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { buildLineOffsets, lineAtOffset } from './utils.js';
-import { COLOR_PAIRINGS, REQUIRED_TOKENS, SURFACE_TOKENS } from './theme-tokens.js';
+import {
+	COLOR_PAIRINGS,
+	REQUIRED_TOKENS,
+	SURFACE_TOKENS,
+	THEME_TOKEN_NAME_SET
+} from './theme-tokens.js';
 
 function capture(match: RegExpMatchArray, index: number): string {
 	const value = match[index];
@@ -805,10 +810,9 @@ function checkComponentTokens(
 	}
 
 	for (const [name, entry] of vars) {
-		// Skip semantic tokens (--dry-color-*, --dry-space-*, etc.) — only check component tokens.
-		// Component tokens follow the pattern --dry-{component}-{property} where the second segment
-		// is a component name (not a known primitive category).
-		if (/^--dry-(?:color|space|radius|duration|shadow|text|font)-/.test(name)) continue;
+		// Skip tokens from the generated theme registry. Anything outside that
+		// registry is treated as a component-level token and checked against spec.
+		if (THEME_TOKEN_NAME_SET.has(name)) continue;
 
 		// This is a component-level token.
 		if (!validComponentVars.has(name)) {

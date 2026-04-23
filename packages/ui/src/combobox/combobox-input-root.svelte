@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { setComboboxCtx } from './context.svelte.js';
 
 	interface Props {
@@ -19,8 +18,9 @@
 		children
 	}: Props = $props();
 
-	const inputId = generateFormId('combobox-input');
-	const contentId = generateFormId('combobox-content');
+	const uid = $props.id();
+	const inputId = `combobox-input-${uid}`;
+	const contentId = `combobox-content-${uid}`;
 
 	let displayText = $state('');
 	let inputValue = $state('');

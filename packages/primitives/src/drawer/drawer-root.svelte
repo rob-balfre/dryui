@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setDrawerCtx } from './context.svelte.js';
 
 	interface Props {
@@ -11,7 +10,8 @@
 
 	let { open = $bindable(false), side = 'right', children }: Props = $props();
 
-	const headerId = generateFormId('drawer');
+	const uid = $props.id();
+	const headerId = `drawer-${uid}`;
 
 	const ctx = setDrawerCtx({
 		get open() {

@@ -22,6 +22,7 @@
 		<section class="noise-demo">
 			<header class="noise-header">
 				<div class="noise-kicker">Noise overlay</div>
+				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h3>Use grain to break up flat surfaces and keep dark UI from feeling plastic.</h3>
 				<p>
 					This demo uses a split-tone poster with multiple contrast bands so the texture is visible
@@ -32,6 +33,7 @@
 			<div class="noise-panel">
 				<article class="noise-hero">
 					<p class="noise-eyebrow">Textured surface</p>
+					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h4>Visible grain over layered color fields.</h4>
 					<p>
 						The overlay has enough area and contrast to read as a material treatment, not a faint
@@ -42,6 +44,7 @@
 				<div class="noise-grid">
 					{#each samples as sample (sample.title)}
 						<article class="noise-card">
+							<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 							<h4>{sample.title}</h4>
 							<p>{sample.body}</p>
 						</article>

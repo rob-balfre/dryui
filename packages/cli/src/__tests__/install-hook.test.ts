@@ -67,6 +67,28 @@ describe('install-hook status', () => {
 		);
 		expect(getInstallHookStatus({ cwd: root, homeDir: home }).project).toBe(true);
 	});
+
+	test('does not detect commands that only mention dryui ambient text', () => {
+		const root = createTempTree({
+			'.claude/settings.json': JSON.stringify({
+				hooks: {
+					SessionStart: [{ hooks: [{ type: 'command', command: 'echo dryui ambient' }] }]
+				}
+			})
+		});
+
+		expect(getInstallHookStatus({ cwd: root, homeDir: root }).project).toBe(false);
+
+		const result = withCwd(root, () => getInstallHookResult([], 'text'));
+		const written = JSON.parse(readFileSync(join(root, '.claude/settings.json'), 'utf8'));
+
+		expect(result.exitCode).toBe(0);
+		expect(result.output).toContain('install-hook: merged | scope: project');
+		expect(written.hooks.SessionStart[0].hooks).toEqual([
+			{ type: 'command', command: 'echo dryui ambient' },
+			{ type: 'command', command: 'dryui ambient' }
+		]);
+	});
 });
 
 describe('install-hook result', () => {

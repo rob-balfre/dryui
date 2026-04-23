@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setSelectCtx } from './context.svelte.js';
 
 	interface Props {
@@ -19,8 +18,9 @@
 		children
 	}: Props = $props();
 
-	const triggerId = generateFormId('select-trigger');
-	const contentId = generateFormId('select-content');
+	const uid = $props.id();
+	const triggerId = `select-trigger-${uid}`;
+	const contentId = `select-content-${uid}`;
 
 	let displayText = $state('');
 	let triggerEl = $state<HTMLElement | null>(null);

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createId } from '../utils/create-id.js';
 	import { setCollapsibleCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -12,7 +11,8 @@
 
 	let { open = $bindable(false), disabled = false, children, ...rest }: Props = $props();
 
-	const contentId = createId('collapsible-content');
+	const uid = $props.id();
+	const contentId = `collapsible-content-${uid}`;
 
 	setCollapsibleCtx({
 		get open() {

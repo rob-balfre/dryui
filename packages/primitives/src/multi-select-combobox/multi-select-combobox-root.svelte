@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setMultiSelectComboboxCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -30,8 +29,9 @@
 		...rest
 	}: Props = $props();
 
-	const inputId = generateFormId('multi-select-combobox-input');
-	const contentId = generateFormId('multi-select-combobox-content');
+	const uid = $props.id();
+	const inputId = `multi-select-combobox-input-${uid}`;
+	const contentId = `multi-select-combobox-content-${uid}`;
 
 	let rootEl = $state<HTMLDivElement | null>(null);
 	let inputEl = $state<HTMLInputElement | null>(null);

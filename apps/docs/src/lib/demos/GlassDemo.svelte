@@ -13,6 +13,7 @@
 					</div>
 
 					<div class="glass-copy">
+						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h3 class="glass-title">Frosted glass effect</h3>
 						<Text color="secondary">
 							Blur, tint, and saturation only read clearly when the surface sits over layered color

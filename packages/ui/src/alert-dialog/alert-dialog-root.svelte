@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { setAlertDialogCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,7 +9,8 @@
 
 	let { open = $bindable(false), children }: Props = $props();
 
-	const headerId = generateFormId('alert-dialog');
+	const uid = $props.id();
+	const headerId = `alert-dialog-${uid}`;
 
 	setAlertDialogCtx({
 		get open() {
