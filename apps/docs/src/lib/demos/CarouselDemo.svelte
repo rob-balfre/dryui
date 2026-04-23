@@ -65,6 +65,7 @@
 						<div class="copy">
 							<span class="eyebrow">{slide.eyebrow}</span>
 							<div class="headline">
+								<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 								<h3>{slide.title}</h3>
 								<p>{slide.description}</p>
 							</div>

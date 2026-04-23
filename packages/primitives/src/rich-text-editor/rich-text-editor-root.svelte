@@ -2,8 +2,14 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { setRichTextEditorCtx } from './context.svelte.js';
+	import {
+		sanitizeRichTextElement,
+		sanitizeRichTextHtml,
+		sanitizeRichTextUrl
+	} from './sanitize-html.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
+		/** HTML is sanitized before rendering and before bind:value updates are emitted. */
 		value?: string;
 		placeholder?: string;
 		readonly?: boolean;
@@ -69,7 +75,7 @@
 
 	function syncValue() {
 		if (ctx.contentEl) {
-			value = ctx.contentEl.innerHTML;
+			value = sanitizeRichTextElement(ctx.contentEl);
 		}
 	}
 
@@ -99,7 +105,7 @@
 			return currentLink;
 		},
 		get html() {
-			return value;
+			return sanitizeRichTextHtml(value);
 		},
 		get readonly() {
 			return readonlyProp;
@@ -141,14 +147,17 @@
 		},
 		insertLink(url: string) {
 			if (readonlyProp) return;
+			const safeUrl = sanitizeRichTextUrl(url);
+			if (!safeUrl) return;
+
 			const sel = window.getSelection();
 			if (!sel || sel.rangeCount === 0) return;
 
 			// If no text selected, insert the URL as link text
 			if (sel.isCollapsed) {
 				const a = document.createElement('a');
-				a.href = url;
-				a.textContent = url;
+				a.href = safeUrl;
+				a.textContent = safeUrl;
 				a.target = '_blank';
 				a.rel = 'noopener noreferrer';
 				const range = sel.getRangeAt(0);
@@ -159,10 +168,10 @@
 				sel.removeAllRanges();
 				sel.addRange(range);
 			} else {
-				document.execCommand('createLink', false, url);
+				document.execCommand('createLink', false, safeUrl);
 				// Add target and rel to newly created links
 				if (ctx.contentEl) {
-					const links = ctx.contentEl.querySelectorAll('a[href="' + CSS.escape(url) + '"]');
+					const links = ctx.contentEl.querySelectorAll('a[href="' + CSS.escape(safeUrl) + '"]');
 					links.forEach((link) => {
 						link.setAttribute('target', '_blank');
 						link.setAttribute('rel', 'noopener noreferrer');
@@ -176,10 +185,11 @@
 			execCommand('unlink');
 		},
 		getContent() {
-			return ctx.contentEl?.innerHTML ?? '';
+			return sanitizeRichTextHtml(ctx.contentEl?.innerHTML ?? '');
 		},
 		updateState,
-		syncValue
+		syncValue,
+		sanitizeHtml: sanitizeRichTextHtml
 	});
 </script>
 

@@ -63,6 +63,19 @@
 		)
 	);
 
+	function getHashTarget(hash: string): HTMLElement | null {
+		if (!hash.startsWith('#') || hash.length <= 1) return null;
+
+		let id = hash.slice(1);
+		try {
+			id = decodeURIComponent(id);
+		} catch {
+			// Malformed percent-encoding should not break route navigation.
+		}
+
+		return document.getElementById(id);
+	}
+
 	afterNavigate((navigation) => {
 		if (dev && typeof window !== 'undefined') {
 			if (page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1') {
@@ -81,7 +94,7 @@
 		const hash = navigation.to?.url.hash;
 		if (hash) {
 			requestAnimationFrame(() => {
-				document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+				getHashTarget(hash)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 			});
 			return;
 		}

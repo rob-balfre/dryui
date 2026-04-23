@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { setFormControlCtx, generateFormId } from '@dryui/primitives';
+	import { setFormControlCtx } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		children: Snippet;
@@ -21,7 +21,8 @@
 		...rest
 	}: Props = $props();
 
-	const id = generateFormId('field');
+	const uid = $props.id();
+	const id = `field-${uid}`;
 	let hasDescription = $state(false);
 	let hasErrorMessage = $state(false);
 

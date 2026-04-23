@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { getNavigationMenuCtx, setNavigationMenuItemCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,9 +9,10 @@
 	let { children }: Props = $props();
 
 	const ctx = getNavigationMenuCtx();
-	const itemId = generateFormId('nav-item');
-	const triggerId = generateFormId('nav-trigger');
-	const contentId = generateFormId('nav-content');
+	const uid = $props.id();
+	const itemId = `nav-item-${uid}`;
+	const triggerId = `nav-trigger-${uid}`;
+	const contentId = `nav-content-${uid}`;
 
 	setNavigationMenuItemCtx({
 		itemId,

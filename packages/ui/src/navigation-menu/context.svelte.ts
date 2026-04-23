@@ -1,4 +1,4 @@
-import { createContext, generateFormId } from '@dryui/primitives';
+import { createContext } from '@dryui/primitives';
 
 export interface NavigationMenuContext {
 	readonly activeItem: string | null;
@@ -16,5 +16,3 @@ export interface NavigationMenuItemContext {
 }
 export const [setNavigationMenuItemCtx, getNavigationMenuItemCtx] =
 	createContext<NavigationMenuItemContext>('navigation-menu-item');
-
-export { generateFormId };

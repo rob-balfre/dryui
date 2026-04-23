@@ -4,7 +4,7 @@
  * Run: bun src/generate-llms-txt.ts
  */
 
-import { readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aiSurface } from './ai-surface.js';
@@ -17,6 +17,10 @@ const specPath = resolve(__dirname, 'spec.json');
 const repoLlmsOutputPath = resolve(repoRoot, 'llms.txt');
 const llmsOutputPath = resolve(repoRoot, 'apps/docs/static/llms.txt');
 const llmsComponentsOutputPath = resolve(repoRoot, 'apps/docs/static/llms-components.txt');
+const docsComponentPagesOutputPath = resolve(
+	repoRoot,
+	'apps/docs/src/lib/generated/component-pages.json'
+);
 
 interface PropDef {
 	readonly type: string;
@@ -82,6 +86,40 @@ interface Spec {
 		readonly prompts: readonly { readonly name: string; readonly description: string }[];
 		readonly cliCommands: readonly { readonly name: string; readonly description: string }[];
 	};
+	readonly composition?: {
+		readonly components: Record<string, CompositionComponent>;
+	};
+}
+
+interface CompositionAlternative {
+	readonly rank: number;
+	readonly component: string;
+	readonly useWhen: string;
+	readonly snippet: string;
+}
+
+interface CompositionAntiPattern {
+	readonly pattern: string;
+	readonly reason: string;
+	readonly fix: string;
+}
+
+interface CompositionComponent {
+	readonly component: string;
+	readonly useWhen: string;
+	readonly alternatives: readonly CompositionAlternative[];
+	readonly antiPatterns: readonly CompositionAntiPattern[];
+	readonly combinesWith: readonly string[];
+}
+
+interface DocsComponentPageEntry {
+	readonly component: ComponentSpec;
+	readonly related: CompositionComponent | null;
+}
+
+interface DocsComponentPagesManifest {
+	readonly themeImports: Spec['themeImports'];
+	readonly components: Record<string, DocsComponentPageEntry>;
 }
 
 function isSpec(value: unknown): value is Spec {
@@ -427,16 +465,39 @@ Theme imports:
 	return sections.join('\n');
 }
 
+function normalizeCompositionKey(name: string): string {
+	return name.toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function buildDocsComponentPagesManifest(spec: Spec): DocsComponentPagesManifest {
+	return {
+		themeImports: spec.themeImports,
+		components: Object.fromEntries(
+			Object.entries(spec.components).map(([name, component]) => [
+				name,
+				{
+					component,
+					related: spec.composition?.components[normalizeCompositionKey(name)] ?? null
+				}
+			])
+		)
+	};
+}
+
 const llmsText = buildLlmsText(spec);
 const llmsComponentsText = buildLlmsComponentsText(spec);
+const docsComponentPagesManifest = `${JSON.stringify(buildDocsComponentPagesManifest(spec), null, 2)}\n`;
 
+await mkdir(dirname(docsComponentPagesOutputPath), { recursive: true });
 await Promise.all([
 	writeFile(repoLlmsOutputPath, llmsText),
 	writeFile(llmsOutputPath, llmsText),
-	writeFile(llmsComponentsOutputPath, llmsComponentsText)
+	writeFile(llmsComponentsOutputPath, llmsComponentsText),
+	writeFile(docsComponentPagesOutputPath, docsComponentPagesManifest)
 ]);
 
 console.log(`Generated llms.txt at ${repoLlmsOutputPath}`);
 console.log(`Generated llms.txt at ${llmsOutputPath}`);
 console.log(`Generated llms-components.txt at ${llmsComponentsOutputPath}`);
+console.log(`Generated component page manifest at ${docsComponentPagesOutputPath}`);
 console.log(`  ${totalComponents} components documented`);

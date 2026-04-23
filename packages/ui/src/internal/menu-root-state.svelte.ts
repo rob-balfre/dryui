@@ -1,5 +1,3 @@
-import { generateFormId } from '@dryui/primitives';
-
 export interface MenuRootState {
 	readonly open: boolean;
 	readonly triggerId: string;
@@ -21,13 +19,14 @@ export interface PositionedMenuRootState extends MenuRootState {
 
 interface CreateMenuRootStateOptions {
 	idBase: string;
+	uid: string;
 	getOpen: () => boolean;
 	setOpen: (value: boolean) => void;
 }
 
 function createBaseMenuRootState(options: CreateMenuRootStateOptions) {
-	const triggerId = generateFormId(`${options.idBase}-trigger`);
-	const contentId = generateFormId(`${options.idBase}-content`);
+	const triggerId = `${options.idBase}-trigger-${options.uid}`;
+	const contentId = `${options.idBase}-content-${options.uid}`;
 
 	return {
 		triggerId,

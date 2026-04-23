@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setHoverCardCtx } from './context.svelte.js';
 
 	interface Props {
@@ -13,8 +12,9 @@
 
 	let open = $state(false);
 
-	const triggerId = generateFormId('hovercard-trigger');
-	const contentId = generateFormId('hovercard-content');
+	const uid = $props.id();
+	const triggerId = `hovercard-trigger-${uid}`;
+	const contentId = `hovercard-content-${uid}`;
 
 	let openTimeout: ReturnType<typeof setTimeout>;
 	let closeTimeout: ReturnType<typeof setTimeout>;

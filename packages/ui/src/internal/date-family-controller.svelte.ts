@@ -1,4 +1,4 @@
-import { generateFormId, getWeekStartDay } from '@dryui/primitives';
+import { getWeekStartDay } from '@dryui/primitives';
 import { SvelteDate } from 'svelte/reactivity';
 
 interface DateViewControllerConfig {
@@ -90,6 +90,7 @@ export function createDateViewController({
 interface PickerPopoverControllerConfig {
 	triggerIdPrefix: string;
 	contentIdPrefix: string;
+	uid: string;
 	open: () => boolean;
 	setOpen: (open: boolean) => void;
 	disabled: () => boolean;
@@ -110,14 +111,15 @@ export interface PickerPopoverController {
 export function createPickerPopoverController({
 	triggerIdPrefix,
 	contentIdPrefix,
+	uid,
 	open,
 	setOpen,
 	disabled,
 	onShow,
 	onClose
 }: PickerPopoverControllerConfig) {
-	const triggerId = generateFormId(triggerIdPrefix);
-	const contentId = generateFormId(contentIdPrefix);
+	const triggerId = `${triggerIdPrefix}-${uid}`;
+	const contentId = `${contentIdPrefix}-${uid}`;
 
 	let triggerEl = $state<HTMLElement | null>(null);
 

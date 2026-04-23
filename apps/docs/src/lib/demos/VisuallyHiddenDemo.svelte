@@ -182,6 +182,7 @@
 		display: grid;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-4);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);
@@ -197,6 +198,7 @@
 		display: grid;
 		gap: var(--dry-space-2);
 		padding-bottom: var(--dry-space-3);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 	}
 
@@ -214,6 +216,7 @@
 	.label-chip {
 		display: grid;
 		padding: var(--dry-space-1) var(--dry-space-2);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-sm);
 		background: var(--dry-color-bg-base);

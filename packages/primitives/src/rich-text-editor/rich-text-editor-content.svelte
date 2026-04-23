@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getRichTextEditorCtx } from './context.svelte.js';
+	import { setSanitizedRichTextHtml } from './sanitize-html.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {}
 
@@ -12,18 +13,20 @@
 
 	// Register the content element with the context
 	$effect(() => {
-		if (contentEl) {
-			ctx.contentEl = contentEl;
-		}
+		if (!contentEl) return;
+		ctx.contentEl = contentEl;
+		return () => {
+			if (ctx.contentEl === contentEl) ctx.contentEl = null;
+		};
 	});
 
 	// Sync initial value into contenteditable
 	$effect(() => {
-		if (contentEl && ctx.html && contentEl.innerHTML !== ctx.html) {
-			// Only set innerHTML if the editor is not focused (avoid clobbering user edits)
-			if (document.activeElement !== contentEl) {
-				contentEl.innerHTML = ctx.html;
-			}
+		if (!contentEl) return;
+		const html = ctx.sanitizeHtml(ctx.html || '');
+		// Only set innerHTML if the editor is not focused (avoid clobbering user edits)
+		if (contentEl.innerHTML !== html && document.activeElement !== contentEl) {
+			setSanitizedRichTextHtml(contentEl, html);
 		}
 	});
 

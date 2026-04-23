@@ -141,8 +141,17 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 		if (bound) props.push('bind:' + bound);
 	}
 
+	// Svelte component CSS custom properties: --token-name={...} or --token-name="..."
+	const cssCustomPropertyRegex = /(?<![\w-])(--[a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
+	for (const m of stripped.matchAll(cssCustomPropertyRegex)) {
+		const propName = m[1];
+		if (propName && !props.includes(propName)) {
+			props.push(propName);
+		}
+	}
+
 	// propName={ or propName="
-	const namedRegex = /\b([a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
+	const namedRegex = /(?<![\w:-])([a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
 	for (const m of stripped.matchAll(namedRegex)) {
 		const propName = m[1];
 		if (propName && !props.includes(propName)) {
@@ -151,7 +160,7 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 	}
 
 	// Boolean props: bare identifiers not followed by =
-	const boolRegex = /(?<!\.)(?<![:{])\b([a-zA-Z_][a-zA-Z0-9_-]*)\b(?!\s*=)/g;
+	const boolRegex = /(?<!\.)(?<![:{-])\b([a-zA-Z_][a-zA-Z0-9_-]*)\b(?!\s*=)/g;
 	for (const m of stripped.matchAll(boolRegex)) {
 		const propName = m[1];
 		if (!propName) continue;
@@ -233,11 +242,126 @@ const NATIVE_HTML_ATTRS: ReadonlySet<string> = new Set([
 	'htmlFor'
 ]);
 
+const NATIVE_EVENT_ATTRS: ReadonlySet<string> = new Set([
+	'onabort',
+	'onanimationcancel',
+	'onanimationend',
+	'onanimationiteration',
+	'onanimationstart',
+	'onauxclick',
+	'onbeforeinput',
+	'onbeforematch',
+	'onbeforetoggle',
+	'onblur',
+	'oncancel',
+	'oncanplay',
+	'oncanplaythrough',
+	'onchange',
+	'onclick',
+	'onclose',
+	'oncontextlost',
+	'oncontextmenu',
+	'oncontextrestored',
+	'oncopy',
+	'oncuechange',
+	'oncut',
+	'ondblclick',
+	'ondrag',
+	'ondragend',
+	'ondragenter',
+	'ondragleave',
+	'ondragover',
+	'ondragstart',
+	'ondrop',
+	'ondurationchange',
+	'onemptied',
+	'onended',
+	'onerror',
+	'onfocus',
+	'onfocusin',
+	'onfocusout',
+	'onformdata',
+	'onfullscreenchange',
+	'onfullscreenerror',
+	'ongotpointercapture',
+	'oninput',
+	'oninvalid',
+	'onkeydown',
+	'onkeypress',
+	'onkeyup',
+	'onload',
+	'onloadeddata',
+	'onloadedmetadata',
+	'onloadstart',
+	'onlostpointercapture',
+	'onmousedown',
+	'onmouseenter',
+	'onmouseleave',
+	'onmousemove',
+	'onmouseout',
+	'onmouseover',
+	'onmouseup',
+	'onpaste',
+	'onpause',
+	'onplay',
+	'onplaying',
+	'onpointercancel',
+	'onpointerdown',
+	'onpointerenter',
+	'onpointerleave',
+	'onpointermove',
+	'onpointerout',
+	'onpointerover',
+	'onpointerrawupdate',
+	'onpointerup',
+	'onprogress',
+	'onratechange',
+	'onreset',
+	'onresize',
+	'onscroll',
+	'onscrollend',
+	'onsecuritypolicyviolation',
+	'onseeked',
+	'onseeking',
+	'onselect',
+	'onselectionchange',
+	'onselectstart',
+	'onslotchange',
+	'onstalled',
+	'onsubmit',
+	'onsuspend',
+	'ontimeupdate',
+	'ontoggle',
+	'ontouchcancel',
+	'ontouchend',
+	'ontouchmove',
+	'ontouchstart',
+	'ontransitioncancel',
+	'ontransitionend',
+	'ontransitionrun',
+	'ontransitionstart',
+	'onvolumechange',
+	'onwaiting',
+	'onwheel'
+]);
+
+function isNativeEventAttribute(propName: string): boolean {
+	if (NATIVE_EVENT_ATTRS.has(propName)) return true;
+	if (!propName.endsWith('capture')) return false;
+	const eventName = propName.slice(0, -'capture'.length);
+	return NATIVE_EVENT_ATTRS.has(eventName);
+}
+
+function isCssCustomPropertyAttribute(propName: string): boolean {
+	return /^--[a-zA-Z_][a-zA-Z0-9_-]*$/.test(propName);
+}
+
 function isPropAllowed(propName: string): boolean {
 	if (NATIVE_HTML_ATTRS.has(propName)) return true;
 	if (propName.startsWith('aria-')) return true;
 	if (propName.startsWith('data-')) return true;
-	if (propName.startsWith('on')) return true;
+	if (isNativeEventAttribute(propName)) return true;
+	if (isCssCustomPropertyAttribute(propName)) return true;
 	if (propName.startsWith('bind:')) return true;
 	return false;
 }

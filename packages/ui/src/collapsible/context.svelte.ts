@@ -1,4 +1,4 @@
-import { createContext, createId } from '@dryui/primitives';
+import { createContext } from '@dryui/primitives';
 
 interface CollapsibleContext {
 	readonly open: boolean;
@@ -8,5 +8,3 @@ interface CollapsibleContext {
 }
 export const [setCollapsibleCtx, getCollapsibleCtx] =
 	createContext<CollapsibleContext>('collapsible');
-
-export { createId };

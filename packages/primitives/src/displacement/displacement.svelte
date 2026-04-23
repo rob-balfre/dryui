@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createId } from '../utils/create-id.js';
 	import {
 		getReducedMotionPreference,
 		observeReducedMotionPreference
@@ -25,7 +24,8 @@
 		...rest
 	}: Props = $props();
 
-	const filterId = createId('displacement');
+	const uid = $props.id();
+	const filterId = `displacement-${uid}`;
 	let seed = $state(1);
 	let prefersReducedMotion = $state(false);
 

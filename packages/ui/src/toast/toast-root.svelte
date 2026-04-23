@@ -108,6 +108,7 @@
 		}
 	}
 
+	/* dryui-allow ad-hoc-enter-keyframe: toast predates motion wrappers and keeps reduced-motion handling in this file. */
 	@keyframes slideIn {
 		from {
 			opacity: 0;

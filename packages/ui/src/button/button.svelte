@@ -81,9 +81,33 @@
 		(onclick as ((event: MouseEvent) => void) | undefined)?.(event);
 	}
 
-	function attachRef(node: HTMLButtonElement | HTMLAnchorElement) {
+	function syncIconEdgeAttrs(node: HTMLButtonElement | HTMLAnchorElement) {
+		const children = Array.from(node.children).filter(
+			(child): child is HTMLElement => child instanceof HTMLElement
+		);
+		const firstChild = children[0];
+		const lastChild = children[children.length - 1];
+
+		node.toggleAttribute('data-icon-start', firstChild?.hasAttribute('data-dry-icon') === true);
+		node.toggleAttribute('data-icon-end', lastChild?.hasAttribute('data-dry-icon') === true);
+	}
+
+	function attachButton(node: HTMLButtonElement | HTMLAnchorElement) {
 		ref?.(node);
-		return () => ref?.(null);
+		syncIconEdgeAttrs(node);
+
+		const observer = new MutationObserver(() => syncIconEdgeAttrs(node));
+		observer.observe(node, {
+			attributeFilter: ['data-dry-icon'],
+			attributes: true,
+			childList: true,
+			subtree: true
+		});
+
+		return () => {
+			observer.disconnect();
+			ref?.(null);
+		};
 	}
 </script>
 
@@ -98,11 +122,14 @@
 			aria-disabled={disabled || undefined}
 			data-disabled={disabled || undefined}
 			data-optical={optical}
+			data-dry-button
+			data-icon-start={undefined}
+			data-icon-end={undefined}
 			tabindex={disabled ? -1 : undefined}
 			{...variantAttrs({ variant, size, color })}
 			class={className}
 			onclick={handleLinkClick}
-			{@attach attachRef}
+			{@attach attachButton}
 		>
 			{@render children()}
 		</a>
@@ -112,11 +139,14 @@
 			{disabled}
 			data-disabled={disabled || undefined}
 			data-optical={optical}
+			data-dry-button
+			data-icon-start={undefined}
+			data-icon-end={undefined}
 			{...variantAttrs({ variant, size, color })}
 			class={className}
 			{onclick}
 			{...rest}
-			{@attach attachRef}
+			{@attach attachButton}
 		>
 			{@render children()}
 		</button>
@@ -136,8 +166,7 @@
 		display: inline-grid;
 	}
 
-	a,
-	button {
+	[data-dry-button] {
 		/* Resolve public button tokens without stomping inherited overrides. */
 		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-fill-brand));
 		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-brand));
@@ -227,17 +256,17 @@
 	   to disable the nudge. Data-attribute selectors pierce Svelte style
 	   scoping without needing `:global()`, which is banned by
 	   `dryui/no-global`. */
-	:is(a, button)[data-optical='auto']:has(> [data-dry-icon]:first-child) {
+	[data-dry-button][data-optical='auto'][data-icon-start] {
 		padding-inline-start: calc(var(--_dry-btn-padding-x) - var(--dry-optical-icon-offset));
 	}
 
-	:is(a, button)[data-optical='auto']:has(> [data-dry-icon]:last-child) {
+	[data-dry-button][data-optical='auto'][data-icon-end] {
 		padding-inline-end: calc(var(--_dry-btn-padding-x) - var(--dry-optical-icon-offset));
 	}
 
 	/* ── Variants ──────────────────────────────────────────────────────────────── */
 
-	:is(a, button)[data-variant='solid'] {
+	[data-dry-button][data-variant='solid'] {
 		--_dry-btn-bg: var(--dry-btn-bg, var(--_dry-btn-accent));
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-on-accent));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -252,7 +281,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='outline'] {
+	[data-dry-button][data-variant='outline'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, var(--_dry-btn-accent-stroke));
@@ -272,7 +301,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='ghost'] {
+	[data-dry-button][data-variant='ghost'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -294,7 +323,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='soft'] {
+	[data-dry-button][data-variant='soft'] {
 		--_dry-btn-bg: var(--dry-btn-bg, var(--_dry-btn-accent-weak));
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -311,7 +340,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='secondary'] {
+	[data-dry-button][data-variant='secondary'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, var(--_dry-btn-accent-stroke));
@@ -330,7 +359,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='bare'] {
+	[data-dry-button][data-variant='bare'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, inherit);
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -346,7 +375,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='link'] {
+	[data-dry-button][data-variant='link'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -366,7 +395,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='trigger'] {
+	[data-dry-button][data-variant='trigger'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-strong));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -389,7 +418,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='nav'] {
+	[data-dry-button][data-variant='nav'] {
 		--_dry-btn-bg: var(--dry-btn-bg, var(--dry-color-bg-raised));
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-strong));
 		--_dry-btn-border: var(--dry-btn-border, var(--dry-color-stroke-weak));
@@ -407,7 +436,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='tab'] {
+	[data-dry-button][data-variant='tab'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-weak));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -429,7 +458,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='toggle'] {
+	[data-dry-button][data-variant='toggle'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-weak));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -446,7 +475,7 @@
 		}
 	}
 
-	:is(a, button)[data-variant='pill'] {
+	[data-dry-button][data-variant='pill'] {
 		--_dry-btn-bg: var(--dry-btn-bg, transparent);
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-weak));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
@@ -463,7 +492,7 @@
 		}
 	}
 
-	:is(a, button)[data-color='primary'] {
+	[data-dry-button][data-color='primary'] {
 		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-fill-brand));
 		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-brand));
 		--_dry-btn-accent-stroke: var(--dry-btn-accent-stroke, var(--dry-color-stroke-brand));
@@ -472,7 +501,7 @@
 		--_dry-btn-accent-active: var(--dry-btn-accent-active, var(--dry-color-fill-brand-active));
 	}
 
-	:is(a, button)[data-color='danger'] {
+	[data-dry-button][data-color='danger'] {
 		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-fill-error));
 		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-error));
 		--_dry-btn-accent-stroke: var(--dry-btn-accent-stroke, var(--dry-color-stroke-error));
@@ -487,7 +516,7 @@
 	   light theme → near-black bg + white text; dark theme → white bg + near-black
 	   text. Any consumer token override (--dry-btn-bg etc.) still wins because the
 	   variant styles read from the public layer first. */
-	:is(a, button)[data-color='ink'] {
+	[data-dry-button][data-color='ink'] {
 		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-bg-inverse));
 		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-inverse));
 		--_dry-btn-accent-stroke: var(--dry-btn-accent-stroke, var(--dry-color-stroke-strong));
@@ -508,7 +537,7 @@
 
 	/* ── Sizes ─────────────────────────────────────────────────────────────────── */
 
-	:is(a, button)[data-size='sm'] {
+	[data-dry-button][data-size='sm'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, var(--dry-space-3));
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, var(--dry-space-1_5));
 		--_dry-btn-font-size: var(
@@ -519,7 +548,7 @@
 		min-height: var(--dry-btn-min-height, var(--dry-space-8));
 	}
 
-	:is(a, button)[data-size='md'] {
+	[data-dry-button][data-size='md'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, var(--dry-space-4));
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, var(--dry-space-2_5));
 		--_dry-btn-font-size: var(
@@ -530,7 +559,7 @@
 		min-height: var(--dry-btn-min-height, var(--dry-space-12));
 	}
 
-	:is(a, button)[data-size='lg'] {
+	[data-dry-button][data-size='lg'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, var(--dry-space-6));
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, var(--dry-space-3));
 		--_dry-btn-font-size: var(
@@ -543,7 +572,7 @@
 
 	/* ── Icon-only sizes (square aspect ratio) ────────────────────────────── */
 
-	:is(a, button)[data-size='icon'] {
+	[data-dry-button][data-size='icon'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
@@ -551,7 +580,7 @@
 		--_dry-btn-radius: var(--dry-btn-radius, var(--dry-radius-md));
 	}
 
-	:is(a, button)[data-size='icon-sm'] {
+	[data-dry-button][data-size='icon-sm'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
@@ -563,7 +592,7 @@
 		);
 	}
 
-	:is(a, button)[data-size='icon-lg'] {
+	[data-dry-button][data-size='icon-lg'] {
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, 0);
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, 0);
 		aspect-ratio: 1;
@@ -577,47 +606,47 @@
 
 	/* ── Button-group integration ─────────────────────────────────────── */
 
-	.wrapper[data-in-group] :is(a, button) {
+	.wrapper[data-in-group] [data-dry-button] {
 		border-radius: 0;
 	}
 
 	/* Horizontal: first child gets left radii */
-	.wrapper[data-in-group][data-group-orientation='horizontal']:first-child :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='horizontal']:first-child [data-dry-button] {
 		border-top-left-radius: var(--dry-button-group-radius);
 		border-bottom-left-radius: var(--dry-button-group-radius);
 	}
 
 	/* Horizontal: last child gets right radii */
-	.wrapper[data-in-group][data-group-orientation='horizontal']:last-child :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='horizontal']:last-child [data-dry-button] {
 		border-top-right-radius: var(--dry-button-group-radius);
 		border-bottom-right-radius: var(--dry-button-group-radius);
 	}
 
 	/* Horizontal: non-first child removes inline-start border */
-	.wrapper[data-in-group][data-group-orientation='horizontal']:not(:first-child) :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='horizontal']:not(:first-child) [data-dry-button] {
 		border-inline-start: 0;
 	}
 
 	/* Vertical: first child gets top radii */
-	.wrapper[data-in-group][data-group-orientation='vertical']:first-child :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='vertical']:first-child [data-dry-button] {
 		border-top-left-radius: var(--dry-button-group-radius);
 		border-top-right-radius: var(--dry-button-group-radius);
 	}
 
 	/* Vertical: last child gets bottom radii */
-	.wrapper[data-in-group][data-group-orientation='vertical']:last-child :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='vertical']:last-child [data-dry-button] {
 		border-bottom-left-radius: var(--dry-button-group-radius);
 		border-bottom-right-radius: var(--dry-button-group-radius);
 	}
 
 	/* Vertical: non-first child removes block-start border */
-	.wrapper[data-in-group][data-group-orientation='vertical']:not(:first-child) :is(a, button) {
+	.wrapper[data-in-group][data-group-orientation='vertical']:not(:first-child) [data-dry-button] {
 		border-block-start: 0;
 	}
 
 	/* Hover/focus z-index for grouped buttons */
-	.wrapper[data-in-group]:hover :is(a, button),
-	.wrapper[data-in-group]:focus-within :is(a, button) {
+	.wrapper[data-in-group]:hover [data-dry-button],
+	.wrapper[data-in-group]:focus-within [data-dry-button] {
 		z-index: var(--dry-button-group-hover-z-index);
 		position: relative;
 	}

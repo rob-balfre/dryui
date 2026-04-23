@@ -48,6 +48,7 @@
 	{...rest}
 >
 	{#if showImage}
+		<!-- dryui-allow raw-img: LogoMark owns the intrinsic brand mark image and fallback lifecycle. -->
 		<img {src} {alt} onerror={handleError} />
 	{:else}
 		<span aria-hidden="true">{getFallbackText()}</span>

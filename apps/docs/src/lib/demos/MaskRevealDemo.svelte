@@ -43,6 +43,7 @@
 	<section class="mask-demo">
 		<header class="mask-header">
 			<div class="mask-kicker">Mask Reveal</div>
+			<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 			<h3>Open the surface from the center so the transition is unmistakable.</h3>
 			<p>
 				The demo uses a dense poster-style layout instead of a single line, which makes the clip
@@ -53,6 +54,7 @@
 		<div class="mask-grid">
 			<article class="mask-hero">
 				<p class="mask-eyebrow">Entrance moment</p>
+				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h4>Reveal content with a strong silhouette and clear interior structure.</h4>
 				<p>
 					The brighter center panel, hard edges, and layered chips give the mask something to shape
@@ -63,6 +65,7 @@
 			<div class="mask-cards">
 				{#each cards as card (card.title)}
 					<article class="mask-card">
+						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h4>{card.title}</h4>
 						<p>{card.body}</p>
 					</article>
@@ -94,6 +97,7 @@
 		display: grid;
 		gap: var(--dry-space-4);
 		padding: var(--dry-space-4);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-2xl);
 		background:
@@ -142,6 +146,7 @@
 		display: grid;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-5);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-xl);
 		background:
@@ -176,6 +181,7 @@
 		display: grid;
 		gap: var(--dry-space-1_5);
 		padding: var(--dry-space-4);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-floating);

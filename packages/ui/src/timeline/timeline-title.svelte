@@ -11,16 +11,22 @@
 </script>
 
 {#if level === 1}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h1 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h1>
 {:else if level === 2}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h2 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h2>
 {:else if level === 3}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h3 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h3>
 {:else if level === 4}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h4 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h4>
 {:else if level === 5}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h5 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h5>
 {:else}
+	<!-- dryui-allow raw-heading: Timeline.Title owns its semantic heading element while applying timeline-specific title styling. -->
 	<h6 data-part="title" data-level={level} class={className} {...rest}>{@render children()}</h6>
 {/if}
 

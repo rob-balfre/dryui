@@ -56,6 +56,7 @@
 		align-items: end;
 		gap: var(--dry-space-4);
 		padding: var(--dry-space-4);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);

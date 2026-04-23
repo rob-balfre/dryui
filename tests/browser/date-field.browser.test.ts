@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { flushSync } from 'svelte';
 import DateFieldHarness from './fixtures/date-field-harness.svelte';
 import { render } from './_harness';
 
 describe('DateField', () => {
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	function setup() {
 		return render(DateFieldHarness).target;
 	}
@@ -72,5 +76,29 @@ describe('DateField', () => {
 
 		expect(valueOutput.textContent).toBe('2026-12-31');
 		expect(hiddenInput.value).toBe('2026-12-31');
+	});
+
+	it('does not auto-advance a segment after the segment blurs', () => {
+		vi.useFakeTimers();
+
+		const target = setup();
+		const month = target.querySelector('[data-testid="segment-month"]') as HTMLSpanElement;
+		const day = target.querySelector('[data-testid="segment-day"]') as HTMLSpanElement;
+		const outside = target.querySelector('[data-testid="outside-focus"]') as HTMLButtonElement;
+
+		month.focus();
+		typeKey('1');
+
+		expect(month.textContent).toBe('01');
+		expect(document.activeElement).toBe(month);
+
+		outside.focus();
+		flushSync();
+
+		vi.advanceTimersByTime(800);
+		flushSync();
+
+		expect(document.activeElement).toBe(outside);
+		expect(day.textContent).toBe('DD');
 	});
 });

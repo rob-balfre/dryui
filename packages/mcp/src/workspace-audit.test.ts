@@ -173,6 +173,44 @@ describe('scanWorkspace', () => {
 		).toBe(true);
 	});
 
+	test('routes CSS theme analysis by filename, directive, and project app CSS context', () => {
+		const darkCss = [
+			':root {',
+			'  color-scheme: dark;',
+			'  --bg: #050505;',
+			'}',
+			'body { background: var(--bg); }'
+		].join('\n');
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				'</script>'
+			].join('\n'),
+			'src/app.css': darkCss,
+			'src/custom.theme.css': darkCss,
+			'src/brand.css': `/* @dryui-theme */\n${darkCss}`
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const darkSchemeFiles = report.findings
+			.filter((finding) => finding.ruleId === 'theme/dark-scheme-no-overrides')
+			.map((finding) => finding.file);
+
+		expect(darkSchemeFiles).toContain('src/app.css');
+		expect(darkSchemeFiles).toContain('src/custom.theme.css');
+		expect(darkSchemeFiles).toContain('src/brand.css');
+	});
+
 	test('surfaces lint-backed component findings in workspace output', () => {
 		const root = createProject({
 			'package.json': JSON.stringify({

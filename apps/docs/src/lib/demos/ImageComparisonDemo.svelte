@@ -53,6 +53,7 @@
 	.comparison-scene span {
 		display: inline-grid;
 		padding: var(--dry-space-2) var(--dry-space-3);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid color-mix(in srgb, var(--dry-color-bg-overlay) 55%, transparent);
 		border-radius: 9999px;
 		background: color-mix(in srgb, var(--dry-color-bg-overlay) 18%, transparent);
@@ -96,6 +97,7 @@
 		place-items: center;
 		gap: var(--dry-space-0_5);
 		padding: var(--dry-space-3);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-full);
 		background: var(--dry-color-bg-overlay);

@@ -107,6 +107,9 @@ export const THEME_TOKEN_REGISTRY: ThemeTokenRegistryEntry[] = Array.from(
 		dark: THEME_TOKEN_VALUES.dark[name] ?? THEME_TOKEN_VALUES.light[name] ?? ''
 	}));
 
+export const THEME_TOKEN_NAMES = THEME_TOKEN_REGISTRY.map((token) => token.name);
+export const THEME_TOKEN_NAME_SET: ReadonlySet<string> = new Set(THEME_TOKEN_NAMES);
+
 export function pickThemeTokens(tokenNames: readonly string[]): ThemeTokenValues {
 	return {
 		light: Object.fromEntries(

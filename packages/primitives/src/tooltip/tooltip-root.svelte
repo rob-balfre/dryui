@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setTooltipCtx } from './context.svelte.js';
 
 	interface Props {
@@ -13,8 +12,9 @@
 
 	let open = $state(false);
 
-	const triggerId = generateFormId('tooltip-trigger');
-	const contentId = generateFormId('tooltip-content');
+	const uid = $props.id();
+	const triggerId = `tooltip-trigger-${uid}`;
+	const contentId = `tooltip-content-${uid}`;
 
 	let openTimeout: ReturnType<typeof setTimeout>;
 	let closeTimeout: ReturnType<typeof setTimeout>;

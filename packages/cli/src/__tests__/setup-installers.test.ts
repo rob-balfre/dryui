@@ -131,6 +131,33 @@ describe('mergeServersConfig', () => {
 		expect(second.status).toBe('unchanged');
 	});
 
+	test('reports unchanged for semantically identical server config with different property order', () => {
+		const existing = JSON.stringify(
+			{
+				mcpServers: {
+					dryui: { args: ['-y', '@dryui/mcp'], command: 'npx' }
+				},
+				unrelated: 'keep me'
+			},
+			null,
+			2
+		);
+		const root = createTempTree({
+			'.cursor/mcp.json': existing
+		});
+		const target = join(root, '.cursor/mcp.json');
+
+		const step = mergeServersConfig({
+			path: target,
+			containerKey: 'mcpServers',
+			servers: { dryui: { command: 'npx', args: ['-y', '@dryui/mcp'] } },
+			label: 'Update .cursor/mcp.json'
+		});
+
+		expect(step.status).toBe('unchanged');
+		expect(readFileSync(target, 'utf-8')).toBe(existing);
+	});
+
 	test('fails clearly on invalid JSON (e.g. JSONC with comments)', () => {
 		const root = createTempTree({
 			'settings.json': '{\n  // comment\n  "context_servers": {}\n}'

@@ -28,7 +28,12 @@ let totalViolations = 0;
 const glob = new Glob('**/*.svelte');
 
 async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
+	const paths: string[] = [];
 	for await (const path of glob.scan(scanDir)) {
+		paths.push(path);
+	}
+
+	for (const path of paths.sort((left, right) => left.localeCompare(right))) {
 		const filePath = `${scanDir}/${path}`;
 		const content = await Bun.file(filePath).text();
 

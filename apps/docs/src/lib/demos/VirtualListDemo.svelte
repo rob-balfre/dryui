@@ -18,6 +18,7 @@
 <style>
 	.virtual-list {
 		height: 20rem;
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-overlay);
@@ -29,6 +30,7 @@
 		align-items: center;
 		gap: var(--dry-space-3);
 		padding: 0 var(--dry-space-4);
+		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 	}
 

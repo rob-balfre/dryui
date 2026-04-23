@@ -1,12 +1,6 @@
-import spec from '../../../../packages/mcp/src/spec.json' with { type: 'json' };
+import { DOCS_ROUTES } from '../../../../packages/mcp/src/docs-surface.js';
 import { categories, toSlug } from '$lib/nav';
 
-// spec.json is generated from per-component .meta.ts files and carries the
-// same description/category/tags surface the old component-catalog exposed.
-const componentMeta = spec.components as Record<
-	string,
-	{ description?: string; category?: string; tags?: string[] }
->;
 interface SearchItem {
 	label: string;
 	href: string;
@@ -21,68 +15,22 @@ interface SearchSection {
 
 // Build-time route discovery — Vite resolves this at compile time so stale
 // entries pointing to deleted routes are automatically filtered out.
-const routeModules = import.meta.glob('/src/routes/**/+page.svelte');
+const routeModules = {
+	...import.meta.glob('/src/routes/**/+page.svelte'),
+	...import.meta.glob('/apps/docs/src/routes/**/+page.svelte')
+};
 const validRoutes = new Set(
 	Object.keys(routeModules).map(
-		(p) => p.replace('/src/routes', '').replace('/+page.svelte', '') || '/'
+		(p) => p.replace(/^\/(?:apps\/docs\/)?src\/routes/, '').replace('/+page.svelte', '') || '/'
 	)
 );
 
-const allDocsPages: SearchItem[] = [
-	{
-		label: 'Home',
-		href: '/',
-		description: 'Landing page for DryUI.',
-		keywords: ['index', 'overview', 'landing']
-	},
-	{
-		label: 'Getting Started',
-		href: '/getting-started',
-		description: 'Install DryUI, import the theme, and bootstrap your app.',
-		keywords: ['install', 'setup', 'theme', 'quickstart']
-	},
-	{
-		label: 'Theme Wizard',
-		href: '/theme-wizard',
-		description: 'Build and export DryUI semantic token themes.',
-		keywords: [
-			'tokens',
-			'palette',
-			'theme editor',
-			'preset themes',
-			'aurora',
-			'midnight',
-			'terminal'
-		]
-	},
-	{
-		label: 'Tools',
-		href: '/tools',
-		description: 'Install and use the DryUI CLI for setup, lookup, tokens, and feedback tooling.',
-		keywords: [
-			'cli',
-			'install',
-			'commands',
-			'tooling',
-			'terminal',
-			'init',
-			'detect',
-			'install plan',
-			'compose',
-			'tokens',
-			'feedback',
-			'ambient'
-		]
-	},
-	{
-		label: 'Changelog',
-		href: '/changelog',
-		description: 'Release notes and recent changes.',
-		keywords: ['releases', 'updates', 'versions']
-	}
-];
-
-const docsPages = allDocsPages.filter((page) => validRoutes.has(page.href));
+const docsPages = DOCS_ROUTES.filter((route) => validRoutes.has(route.path)).map((route) => ({
+	label: route.label,
+	href: route.path,
+	description: `${route.description}.`,
+	keywords: [...(route.keywords ?? [])]
+}));
 
 function getComponentItems(): SearchItem[] {
 	return categories.flatMap((category) =>
@@ -91,7 +39,8 @@ function getComponentItems(): SearchItem[] {
 				category.label.toLowerCase(),
 				'component',
 				item.kind,
-				...(componentMeta[item.name]?.tags ?? [])
+				item.name.toLowerCase(),
+				toSlug(item.name)
 			];
 
 			return {

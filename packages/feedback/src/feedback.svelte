@@ -3,7 +3,7 @@
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import { Check } from 'lucide-svelte';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import {
 		type Arrow,
 		type Drawing,
@@ -54,6 +54,7 @@
 	const TEXT_OUTLINE_RATIO = 0.22;
 	const ACTIVATION_QUERY_PARAM = 'dryui-feedback';
 	const DASHBOARD_TAB_NAME = 'dryui-feedback-list';
+	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
 
 	let {
 		color = ANNOTATION_FILL,
@@ -90,6 +91,7 @@
 	let layerHostEl: HTMLElement | null = $state(null);
 	let layerOriginLeft = $state(0);
 	let layerOriginTop = $state(0);
+	let currentPageUrl = $state(canonicalPageUrl());
 	const toastTimers: Record<string, ReturnType<typeof setTimeout>> = Object.create(null);
 
 	const ERASE_RADIUS = 12;
@@ -813,6 +815,39 @@
 		return 'Please try again.';
 	}
 
+	function canonicalPageUrl(): string {
+		if (typeof window === 'undefined') return '/';
+		const url = new URL(window.location.href);
+		url.searchParams.delete(ACTIVATION_QUERY_PARAM);
+		url.hash = '';
+		return url.toString();
+	}
+
+	function saveDrawings(pageUrl: string, version: number, drawingSnapshot: Drawing[]): void {
+		if (!serverUrl || !pageUrl) return;
+		lastSavedVersion = version;
+		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl)}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(drawingSnapshot)
+		}).catch(() => {});
+	}
+
+	function flushPendingDrawings(): void {
+		if (!serverUrl || saveVersion === lastSavedVersion) return;
+		clearTimeout(saveTimer);
+		saveDrawings(currentPageUrl, saveVersion, drawings);
+	}
+
+	function syncCurrentPageUrl(): void {
+		const nextPageUrl = canonicalPageUrl();
+		if (nextPageUrl === currentPageUrl) return;
+		flushPendingDrawings();
+		currentPageUrl = nextPageUrl;
+		drawings = [];
+		lastSavedVersion = saveVersion;
+	}
+
 	async function handleSubmit() {
 		if (!serverUrl || submitStatus !== 'idle' || sent) return;
 		try {
@@ -828,7 +863,7 @@
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
-					url: location.href,
+					url: currentPageUrl,
 					image,
 					drawings,
 					hints,
@@ -871,9 +906,50 @@
 	let lastSavedVersion = 0;
 	let saveTimer: ReturnType<typeof setTimeout> | undefined;
 
-	function pageUrl(): string {
-		return typeof location !== 'undefined' ? location.pathname : '/';
-	}
+	onMount(() => {
+		syncCurrentPageUrl();
+
+		const pushState = history.pushState;
+		const replaceState = history.replaceState;
+		const notifyLocationChange = () => window.dispatchEvent(new Event(LOCATION_CHANGE_EVENT));
+		const handleLocationChange = () => syncCurrentPageUrl();
+		const pushStateWithFeedbackNavigation: History['pushState'] = function (
+			this: History,
+			data: unknown,
+			unused: string,
+			url?: string | URL | null
+		) {
+			const result = pushState.call(this, data, unused, url);
+			notifyLocationChange();
+			return result;
+		};
+		const replaceStateWithFeedbackNavigation: History['replaceState'] = function (
+			this: History,
+			data: unknown,
+			unused: string,
+			url?: string | URL | null
+		) {
+			const result = replaceState.call(this, data, unused, url);
+			notifyLocationChange();
+			return result;
+		};
+
+		history.pushState = pushStateWithFeedbackNavigation;
+		history.replaceState = replaceStateWithFeedbackNavigation;
+		window.addEventListener('popstate', handleLocationChange);
+		window.addEventListener('hashchange', handleLocationChange);
+		window.addEventListener(LOCATION_CHANGE_EVENT, handleLocationChange);
+
+		return () => {
+			if (history.pushState === pushStateWithFeedbackNavigation) history.pushState = pushState;
+			if (history.replaceState === replaceStateWithFeedbackNavigation) {
+				history.replaceState = replaceState;
+			}
+			window.removeEventListener('popstate', handleLocationChange);
+			window.removeEventListener('hashchange', handleLocationChange);
+			window.removeEventListener(LOCATION_CHANGE_EVENT, handleLocationChange);
+		};
+	});
 
 	$effect(() => {
 		if (typeof document === 'undefined') return;
@@ -946,14 +1022,17 @@
 	});
 
 	$effect(() => {
-		if (!serverUrl) return;
+		const pageUrl = currentPageUrl;
+		if (!serverUrl || !pageUrl) return;
+		const versionAtRequest = untrack(() => saveVersion);
 		const controller = new AbortController();
-		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`, {
+		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl)}`, {
 			signal: controller.signal
 		})
 			.then((r) => r.json())
 			.then((data: Drawing[]) => {
-				if (data.length) drawings = data.map(normalizeDrawing);
+				if (saveVersion !== versionAtRequest) return;
+				drawings = Array.isArray(data) ? data.map(normalizeDrawing) : [];
 				lastSavedVersion = saveVersion;
 			})
 			.catch((error) => {
@@ -965,16 +1044,13 @@
 
 	$effect(() => {
 		const v = saveVersion;
-		if (!serverUrl || v === lastSavedVersion) return;
+		const pageUrl = currentPageUrl;
+		const drawingSnapshot = drawings;
+		if (!serverUrl || !pageUrl || v === lastSavedVersion) return;
 
 		clearTimeout(saveTimer);
 		saveTimer = setTimeout(() => {
-			lastSavedVersion = v;
-			fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl())}`, {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(drawings)
-			}).catch(() => {});
+			saveDrawings(pageUrl, v, drawingSnapshot);
 		}, 500);
 
 		return () => clearTimeout(saveTimer);

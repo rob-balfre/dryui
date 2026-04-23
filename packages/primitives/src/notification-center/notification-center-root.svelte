@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setNotificationCenterCtx, type NotificationItem } from './context.svelte.js';
 
 	interface Props {
@@ -11,8 +10,9 @@
 
 	let { items = $bindable([]), open = $bindable(false), children }: Props = $props();
 
-	const triggerId = generateFormId('nc-trigger');
-	const panelId = generateFormId('nc-panel');
+	const uid = $props.id();
+	const triggerId = `nc-trigger-${uid}`;
+	const panelId = `nc-panel-${uid}`;
 
 	const unreadCount = $derived(items.filter((item) => !item.read).length);
 

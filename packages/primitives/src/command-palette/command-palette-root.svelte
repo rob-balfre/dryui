@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setCommandPaletteCtx } from './context.svelte.js';
 	import ModalContent from '../internal/modal-content.svelte';
 
@@ -12,8 +11,9 @@
 
 	let { open = $bindable(false), children, ...rest }: Props = $props();
 
-	const listId = generateFormId('cmd-list');
-	const inputId = generateFormId('cmd-input');
+	const uid = $props.id();
+	const listId = `cmd-list-${uid}`;
+	const inputId = `cmd-input-${uid}`;
 
 	let query = $state('');
 	let activeItemId = $state('');

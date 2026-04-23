@@ -86,6 +86,7 @@
 	[data-part='root'] {
 		display: block;
 		padding: var(--dry-space-2);
+		/* dryui-allow solid-border-on-raised: tag editor is a form field with token chips on a raised input surface. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);

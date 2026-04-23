@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '../utils/form-control.svelte.js';
 	import { setDropdownMenuCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,8 +9,9 @@
 
 	let { open = $bindable(false), children }: Props = $props();
 
-	const triggerId = generateFormId('dropdown-trigger');
-	const contentId = generateFormId('dropdown-content');
+	const uid = $props.id();
+	const triggerId = `dropdown-trigger-${uid}`;
+	const contentId = `dropdown-content-${uid}`;
 
 	setDropdownMenuCtx({
 		get open() {

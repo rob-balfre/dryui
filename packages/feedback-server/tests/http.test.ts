@@ -7,6 +7,20 @@ import { startFeedbackHttpServer } from '../src/http.ts';
 import { FeedbackStore } from '../src/store.ts';
 import type { Annotation, Session, Submission } from '../src/types.ts';
 
+const FOREIGN_ORIGIN = 'https://attacker.example';
+const DEV_ORIGIN = 'http://localhost:5173';
+
+function imagePayload(tag: string): { webp: string; png: string } {
+	return {
+		webp: Buffer.from(`${tag}-webp`).toString('base64'),
+		png: Buffer.from(`${tag}-png`).toString('base64')
+	};
+}
+
+function expectNoWildcardCors(response: Response): void {
+	expect(response.headers.get('access-control-allow-origin')).not.toBe('*');
+}
+
 describe('feedback HTTP server', () => {
 	let store: FeedbackStore;
 	let bus: EventBus;
@@ -43,6 +57,130 @@ describe('feedback HTTP server', () => {
 		expect(response.status).toBe(201);
 		return response.json() as Promise<Session>;
 	}
+
+	test('rejects foreign origins from read, state-changing, dispatch, and SSE endpoints', async () => {
+		const session = await createSession();
+		const annotationResponse = await fetch(`${baseUrl}/sessions/${session.id}/annotations`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				x: 12,
+				y: 160,
+				comment: 'Add more space above this card.',
+				element: 'section "Highlights"',
+				elementPath: 'main > section:nth-of-type(2)',
+				timestamp: 123,
+				color: 'warning',
+				isFixed: false
+			})
+		});
+		expect(annotationResponse.status).toBe(201);
+		const annotation = (await annotationResponse.json()) as Annotation;
+
+		const submissionResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/security',
+				image: imagePayload('security'),
+				drawings: []
+			})
+		});
+		expect(submissionResponse.status).toBe(201);
+		const submission = (await submissionResponse.json()) as Submission;
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		const drawingUrl = '/security';
+		const attempts: Array<Promise<Response>> = [
+			fetch(`${baseUrl}/submissions`, { headers: { Origin: FOREIGN_ORIGIN } }),
+			fetch(`${baseUrl}/drawings?url=${encodeURIComponent(drawingUrl)}`, {
+				headers: { Origin: FOREIGN_ORIGIN }
+			}),
+			fetch(`${baseUrl}/drawings?url=${encodeURIComponent(drawingUrl)}`, {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json', Origin: FOREIGN_ORIGIN },
+				body: JSON.stringify([{ id: 'blocked' }])
+			}),
+			fetch(`${baseUrl}/annotations/${annotation.id}`, { headers: { Origin: FOREIGN_ORIGIN } }),
+			fetch(`${baseUrl}/events`, { headers: { Origin: FOREIGN_ORIGIN } }),
+			fetch(`${baseUrl}/sessions/${session.id}/events`, { headers: { Origin: FOREIGN_ORIGIN } }),
+			fetch(`${baseUrl}/dispatch`, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json', Origin: FOREIGN_ORIGIN },
+				body: JSON.stringify({ agent: 'codex', prompt: 'Do not run this.' })
+			})
+		];
+
+		const responses = await Promise.all(attempts);
+		for (const response of responses) {
+			expect(response.status).toBe(403);
+			expectNoWildcardCors(response);
+		}
+		expect(store.getDrawings(drawingUrl)).toEqual([]);
+	});
+
+	test('allows local dev and same-origin browser requests without wildcard CORS', async () => {
+		const preflight = await fetch(`${baseUrl}/submissions`, {
+			method: 'OPTIONS',
+			headers: {
+				Origin: DEV_ORIGIN,
+				'Access-Control-Request-Method': 'POST',
+				'Access-Control-Request-Headers': 'Content-Type'
+			}
+		});
+		expect(preflight.status).toBe(204);
+		expect(preflight.headers.get('access-control-allow-origin')).toBe(DEV_ORIGIN);
+
+		const submissionResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Origin: DEV_ORIGIN },
+			body: JSON.stringify({
+				url: 'https://example.com/dev-origin',
+				image: imagePayload('dev-origin'),
+				drawings: []
+			})
+		});
+		expect(submissionResponse.status).toBe(201);
+		expect(submissionResponse.headers.get('access-control-allow-origin')).toBe(DEV_ORIGIN);
+		expectNoWildcardCors(submissionResponse);
+		const submission = (await submissionResponse.json()) as Submission;
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		const drawingUrl = '/dev-origin';
+		const saveDrawingsResponse = await fetch(
+			`${baseUrl}/drawings?url=${encodeURIComponent(drawingUrl)}`,
+			{
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json', Origin: DEV_ORIGIN },
+				body: JSON.stringify([{ id: 'allowed' }])
+			}
+		);
+		expect(saveDrawingsResponse.status).toBe(204);
+		expect(saveDrawingsResponse.headers.get('access-control-allow-origin')).toBe(DEV_ORIGIN);
+
+		const readDrawingsResponse = await fetch(
+			`${baseUrl}/drawings?url=${encodeURIComponent(drawingUrl)}`,
+			{ headers: { Origin: DEV_ORIGIN } }
+		);
+		expect(readDrawingsResponse.status).toBe(200);
+		expect(readDrawingsResponse.headers.get('access-control-allow-origin')).toBe(DEV_ORIGIN);
+		expect(await readDrawingsResponse.json()).toEqual([{ id: 'allowed' }]);
+
+		const sameOrigin = new URL(baseUrl).origin;
+		const sameOriginQueue = await fetch(`${baseUrl}/submissions`, {
+			headers: { Origin: sameOrigin }
+		});
+		expect(sameOriginQueue.status).toBe(200);
+		expect(sameOriginQueue.headers.get('access-control-allow-origin')).toBe(sameOrigin);
+
+		const sameOriginDispatch = await fetch(`${baseUrl}/dispatch`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json', Origin: sameOrigin },
+			body: JSON.stringify({ agent: 'not-real', prompt: 'Validation should handle this.' })
+		});
+		expect(sameOriginDispatch.status).not.toBe(403);
+		expect(sameOriginDispatch.headers.get('access-control-allow-origin')).toBe(sameOrigin);
+	});
 
 	test('creates sessions and annotations and exposes pending state', async () => {
 		const session = await createSession();

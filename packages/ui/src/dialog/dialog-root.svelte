@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { setDialogCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,7 +9,8 @@
 
 	let { open = $bindable(false), children }: Props = $props();
 
-	const headerId = generateFormId('dialog');
+	const uid = $props.id();
+	const headerId = `dialog-${uid}`;
 
 	setDialogCtx({
 		get open() {

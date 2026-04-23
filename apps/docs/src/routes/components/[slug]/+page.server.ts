@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { fromSlug, getCategoryLabel } from '../../../lib/nav';
 import type { CatalogKind } from '../../../lib/nav';
-import spec from '../../../../../../packages/mcp/src/spec.json';
+import componentPages from '$lib/generated/component-pages.json';
 
 interface PropDef {
 	type: string;
@@ -74,15 +74,12 @@ interface CompositionComponent {
 	combinesWith: string[];
 }
 
-interface SpecShape {
+interface ComponentPageManifest {
 	themeImports: {
 		default: string;
 		dark: string;
 	};
-	components: Record<string, ComponentSpec>;
-	composition?: {
-		components: Record<string, CompositionComponent>;
-	};
+	components: Record<string, { component: ComponentSpec; related: CompositionComponent | null }>;
 }
 
 interface ComponentPageData {
@@ -109,18 +106,8 @@ interface ComponentPageData {
 	quickStartCode: string;
 }
 
-function isSpecShape(value: unknown): value is SpecShape {
-	return (
-		typeof value === 'object' && value !== null && 'themeImports' in value && 'components' in value
-	);
-}
-
-if (!isSpecShape(spec)) {
-	throw new Error('spec.json does not match expected SpecShape');
-}
-
-const fullSpec: SpecShape = spec;
-const components = fullSpec.components;
+const componentPageManifest = componentPages as ComponentPageManifest;
+const components = componentPageManifest.components;
 const REPO_URL = 'https://github.com/rob-balfre/dryui';
 
 function componentDir(name: string): string {
@@ -146,10 +133,6 @@ function sourcePackage(kind: CatalogKind): 'ui' | 'primitives' {
 	return kind === 'primitive' ? 'primitives' : 'ui';
 }
 
-function normalizeCompositionKey(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, '');
-}
-
 function collectExampleImports(example: string): string[] {
 	const seen = new Set<string>();
 
@@ -167,8 +150,8 @@ function buildQuickStartCode(name: string, component: ComponentSpec, hasRootPart
 	const importNames = [name, ...collectExampleImports(example).filter((item) => item !== name)];
 
 	if (component.import === '@dryui/ui') {
-		lines.push(`  import '${fullSpec.themeImports.default}';`);
-		lines.push(`  import '${fullSpec.themeImports.dark}';`);
+		lines.push(`  import '${componentPageManifest.themeImports.default}';`);
+		lines.push(`  import '${componentPageManifest.themeImports.dark}';`);
 	}
 
 	lines.push(`  import { ${importNames.join(', ')} } from '${component.import}';`);
@@ -185,11 +168,12 @@ export const load: PageServerLoad = async ({ params }) => {
 		throw error(404, `Component "${params.slug}" not found`);
 	}
 
-	const component = (components as Record<string, ComponentSpec>)[entry.name];
-	if (!component) {
+	const manifestEntry = components[entry.name];
+	if (!manifestEntry) {
 		throw error(404, `Component "${params.slug}" not found`);
 	}
 
+	const { component, related } = manifestEntry;
 	const hasRootPart = Boolean(component.parts?.Root);
 	const data: ComponentPageData = {
 		name: entry.name,
@@ -208,7 +192,7 @@ export const load: PageServerLoad = async ({ params }) => {
 		cssVars: component.cssVars,
 		dataAttributes: component.dataAttributes,
 		sourceUrl: `${REPO_URL}/tree/main/packages/${sourcePackage(entry.kind)}/src/${componentDir(entry.name)}`,
-		related: fullSpec.composition?.components[normalizeCompositionKey(entry.name)] ?? null,
+		related,
 		example: component.example,
 		rootImport: `import { ${entry.name} } from '${component.import}'`,
 		subpathImport:

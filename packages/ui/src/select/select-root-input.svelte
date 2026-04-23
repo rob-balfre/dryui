@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { setSelectCtx } from './context.svelte.js';
 	import SelectTrigger from './select-trigger-button.svelte';
 	import SelectValue from './select-value.svelte';
@@ -35,8 +34,9 @@
 		options?.map((opt) => (typeof opt === 'string' ? { value: opt, label: opt } : opt))
 	);
 
-	const triggerId = generateFormId('select-trigger');
-	const contentId = generateFormId('select-content');
+	const uid = $props.id();
+	const triggerId = `select-trigger-${uid}`;
+	const contentId = `select-content-${uid}`;
 
 	let displayText = $state('');
 	let triggerEl = $state<HTMLElement | null>(null);

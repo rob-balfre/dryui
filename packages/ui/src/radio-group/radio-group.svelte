@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { createId } from '@dryui/primitives';
 	import { setRadioGroupCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -25,7 +24,8 @@
 		...rest
 	}: Props = $props();
 
-	const fallbackName = createId('dryui-radio');
+	const uid = $props.id();
+	const fallbackName = `dryui-radio-${uid}`;
 	const groupName = $derived(name ?? fallbackName);
 
 	setRadioGroupCtx({

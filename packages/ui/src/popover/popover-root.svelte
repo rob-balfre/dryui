@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { generateFormId } from '@dryui/primitives';
 	import { setPopoverCtx } from './context.svelte.js';
 
 	interface Props {
@@ -10,8 +9,9 @@
 
 	let { open = $bindable(false), children }: Props = $props();
 
-	const triggerId = generateFormId('popover-trigger');
-	const contentId = generateFormId('popover-content');
+	const uid = $props.id();
+	const triggerId = `popover-trigger-${uid}`;
+	const contentId = `popover-content-${uid}`;
 
 	setPopoverCtx({
 		get open() {

@@ -33,8 +33,11 @@ function rewritePackageName(name: string, manifest: DevTarballsManifest): string
 	return entry ? entry.tarball : name;
 }
 
-export function rewriteInstallCommand(command: string, manifest: DevTarballsManifest): string {
-	return command.replace(/@dryui\/[a-z0-9-]+/g, (token) => rewritePackageName(token, manifest));
+export function rewriteInstallCommandArgs(
+	args: readonly string[],
+	manifest: DevTarballsManifest
+): string[] {
+	return args.map((arg) => rewritePackageName(arg, manifest));
 }
 
 export function injectOverridesIntoPackageJson(

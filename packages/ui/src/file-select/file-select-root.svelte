@@ -85,6 +85,7 @@
 		padding: var(--dry-space-2) var(--dry-space-3);
 		font-family: var(--dry-font-sans);
 		background: var(--dry-color-bg-raised);
+		/* dryui-allow solid-border-on-raised: file select is a form control and needs a persistent field edge. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		transition:
