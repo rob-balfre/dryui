@@ -220,7 +220,7 @@ ${CODEX_CONFIG}`
 			SVELTE_SECTION_CODEX
 		],
 		followUp:
-			'After installing the plugin, start a new Codex session so `ask` / `check` are available.'
+			'After installing the plugin, start a new Codex session so `ask`, `check`, and `check-vision` are available.'
 	},
 	{
 		id: 'gemini',
@@ -241,7 +241,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			},
 			SVELTE_SECTION_GEMINI
 		],
-		followUp: 'Restart Gemini after installing so `ask` / `check` are available.'
+		followUp: 'Restart Gemini after installing so `ask`, `check`, and `check-vision` are available.'
 	},
 	{
 		id: 'opencode',
@@ -324,7 +324,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			SVELTE_SECTION_MCP_SERVERS
 		],
 		followUp:
-			'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 2 and @sveltejs/mcp adds 4.'
+			'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 3 and @sveltejs/mcp adds 4.'
 	},
 	{
 		id: 'zed',

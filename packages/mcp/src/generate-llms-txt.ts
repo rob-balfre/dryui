@@ -332,8 +332,8 @@ function buildLlmsText(spec: Spec): string {
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server with collapsed ask/check tools for discovery, setup guidance, and validation
-- @dryui/cli: CLI for detect, install, project-aware add, lookup, source retrieval, composition guidance, and validation
+- @dryui/mcp: MCP server with ask/check/check-vision tools for discovery, setup guidance, static validation, and rendered-page critique
+- @dryui/cli: CLI for setup, check, detect, install, project-aware add, lookup, composition guidance, tokens, visual checks, and feedback tooling
 
 ## AI Surface
 
@@ -410,6 +410,8 @@ dryui info <component>
 dryui list --category layout
 dryui compose "date input"
 dryui tokens --category color
+dryui check src/routes/+page.svelte
+dryui check --visual http://localhost:5173
 dryui ambient
 dryui install-hook --dry-run
 dryui feedback init

@@ -18,7 +18,11 @@
       },
       {
         "name": "check",
-        "description": "Validate a component, theme file, directory, or workspace through one unified path-driven tool"
+        "description": "Validate a component, theme file, directory, workspace, or rendered URL through one unified tool"
+      },
+      {
+        "name": "check-vision",
+        "description": "Render a URL, screenshot it, and critique visible polish defects with the Codex CLI"
       }
     ],
     "prompts": [
@@ -67,6 +71,14 @@
       {
         "name": "tokens",
         "description": "List `--dry-*` design tokens"
+      },
+      {
+        "name": "check",
+        "description": "Validate files, themes, workspaces, or rendered URLs"
+      },
+      {
+        "name": "check-vision",
+        "description": "Alias for `dryui check --visual <url>`"
       },
       {
         "name": "ambient",
@@ -126,6 +138,7 @@
         ],
         "checks": [
           "dryui check <file.svelte>",
+          "dryui check --visual <url> for rendered-page polish",
           "svelte-autofixer <file.svelte>",
           "bun run --filter @dryui/ui build when editing packages/ui Svelte sources"
         ],
@@ -140,13 +153,14 @@
   "validation": {
     "checks": [
       "dryui check <file.svelte>",
+      "dryui check --visual <url> for rendered-page polish",
       "Svelte MCP svelte-autofixer on edited Svelte code",
       "bun run --filter @dryui/ui build when editing packages/ui Svelte sources"
     ],
     "repairLoop": [
       "Generate task-specific context with dryui prompt or MCP ask.",
       "Write real Svelte using @dryui/ui components.",
-      "Run dryui check and Svelte MCP svelte-autofixer.",
+      "Run dryui check, optional dryui check --visual, and Svelte MCP svelte-autofixer.",
       "Repair diagnostics until generated checks pass."
     ]
   },

@@ -53,7 +53,7 @@
 				id: 'mcp',
 				label: '@dryui/mcp',
 				description:
-					'ask/check turn the request into exact component, recipe, and validation guidance.',
+					'ask/check/check-vision turn requests into component, validation, and rendered UI guidance.',
 				iconComponent: Boxes,
 				color: 'brand',
 				width: 360,

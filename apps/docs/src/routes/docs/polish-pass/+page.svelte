@@ -461,7 +461,10 @@ dryui check --polish src/routes/dashboard/+page.svelte
 dryui check --polish
 
 # Polish + lint + contract in one call
-dryui check src/routes/dashboard/+page.svelte`,
+dryui check src/routes/dashboard/+page.svelte
+
+# Rendered polish pass after your dev server is running
+dryui check --visual http://localhost:5173/dashboard`,
 				'bash'
 			)}
 

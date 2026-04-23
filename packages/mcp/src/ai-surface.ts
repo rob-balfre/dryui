@@ -34,7 +34,12 @@ export const aiSurface: AiSurfaceManifest = {
 		{
 			name: 'check',
 			description:
-				'Validate a component, theme file, directory, or workspace through one unified path-driven tool'
+				'Validate a component, theme file, directory, workspace, or rendered URL through one unified tool'
+		},
+		{
+			name: 'check-vision',
+			description:
+				'Render a URL, screenshot it, and critique visible polish defects with the Codex CLI'
 		}
 	],
 	prompts: [
@@ -60,6 +65,14 @@ export const aiSurface: AiSurfaceManifest = {
 		{ name: 'list', description: 'List all components' },
 		{ name: 'compose', description: 'Look up composition guidance' },
 		{ name: 'tokens', description: 'List `--dry-*` design tokens' },
+		{
+			name: 'check',
+			description: 'Validate files, themes, workspaces, or rendered URLs'
+		},
+		{
+			name: 'check-vision',
+			description: 'Alias for `dryui check --visual <url>`'
+		},
 		{ name: 'ambient', description: 'Print compact session context for SessionStart hooks' },
 		{
 			name: 'install-hook',
@@ -102,6 +115,7 @@ export const aiSurface: AiSurfaceManifest = {
 			],
 			checks: [
 				'dryui check <file.svelte>',
+				'dryui check --visual <url> for rendered-page polish',
 				'svelte-autofixer <file.svelte>',
 				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
 			],

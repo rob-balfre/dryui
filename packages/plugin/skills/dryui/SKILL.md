@@ -228,7 +228,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 1. `dryui info <Component>` or `dryui compose "<query>"` before writing so you confirm kind, required parts, bindables, and canonical usage. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
 2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. Run `check` if DryUI MCP is available after implementation to catch composition drift, layout violations, and accessibility regressions. Without MCP, rely on the `@dryui/lint` preprocessor plus the project's normal build and test commands.
+3. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, and accessibility regressions. Use `dryui check --visual <url>` or MCP `check` with `visualUrl` when rendered pixels need review.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
 ### CLI (default entry point)
@@ -243,6 +243,8 @@ dryui info <component>          # Look up component API
 dryui compose "date input"      # Composition guidance
 dryui detect [path]             # Check project setup
 dryui install [path]            # Print install plan
+dryui check [path]              # Validate file, theme, directory, or workspace
+dryui check --visual <url>      # Screenshot a URL and critique rendered polish
 dryui list                      # List components
 dryui tokens --category color   # Browse design tokens
 dryui ambient                   # SessionStart context
@@ -260,6 +262,7 @@ Without a global install, prefix any command with `bunx @dryui/cli …` or `npx 
 | Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
 | Validation           | `check <file.svelte>`, `check <theme.css>`                        |
 | Audit                | `check`, `check <directory>`                                      |
+| Rendered UI          | `check` with `visualUrl`, or direct `check-vision`                |
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
 

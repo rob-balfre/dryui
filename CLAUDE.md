@@ -8,6 +8,7 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - Use `bun vm:test` (one-shot scaffold + build) or `bun vm` (scaffold + Vite dev with HMR) to exercise the public `bunx @dryui/cli` flow in a throwaway smolvm microVM. Use `bun vm:exec <cmd>` from another tab to run commands inside the live session (e.g. `bun vm:exec dryui list`). Source and gotchas live in [`scripts/vm.ts`](./scripts/vm.ts) and [`scripts/vm-exec.ts`](./scripts/vm-exec.ts).
+- Use `dryui check [path]` for static validation and `dryui check --visual <url>` for rendered-page visual critique. In MCP, use `check` with `visualUrl` or the direct `check-vision` tool.
 - The optional Claude SessionStart hook is installed with:
 
 ```bash

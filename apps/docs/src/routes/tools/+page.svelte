@@ -32,7 +32,7 @@ npx -y @dryui/cli`;
 	<div class="stack-lg">
 		<DocsPageHeader
 			title="Tools"
-			description="The CLI is the entry point to DryUI. Install it, run dryui, and browse the available commands below."
+			description="The CLI is the entry point to DryUI. Install it, run dryui, and use check for static validation or rendered visual review."
 		/>
 
 		<div class="stack-lg">
@@ -65,7 +65,7 @@ npx -y @dryui/cli`;
 			<DocsSectionIntro
 				id="commands"
 				title="Use DryUI"
-				description="Inside this monorepo, bare dryui opens the feedback dashboard and local tools. Everywhere else, start with dryui, then use the commands below as the default DryUI surface."
+				description="Inside this monorepo, bare dryui opens the feedback dashboard and local tools. Everywhere else, start with dryui, then use the commands below as the default DryUI surface. Use dryui check --visual for screenshots when static checks pass but the page still looks off."
 			/>
 
 			<CodeBlock code={commandReference} language="bash" />

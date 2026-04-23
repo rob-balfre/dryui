@@ -8,6 +8,7 @@ import { detectProject } from '@dryui/mcp/project-planner';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
+import { runCheckCommand } from './commands/check.js';
 import { runCheckVision } from './commands/check-vision.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
@@ -77,8 +78,10 @@ Commands:
   prompt --component <name>     Generate task-specific implementation prompt context
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
+  check [path] [--polish|--no-polish] [--visual <url>]
+                                Validate files, themes, workspaces, or rendered URLs
   check-vision <url> [--viewport=<wxh>] [--wait-for=<sel>]
-                                Screenshot a URL and have Codex CLI critique it
+                                Alias for \`dryui check --visual <url>\`
   ambient                       Print compact session context (for SessionStart hooks)
   install-hook [--global] [--dry-run]
                                 Wire \`dryui ambient\` into Claude Code settings.json
@@ -163,6 +166,9 @@ async function main(): Promise<void> {
 			break;
 		case 'tokens':
 			runTokens(commandArgs);
+			break;
+		case 'check':
+			await runCheckCommand(commandArgs, spec);
 			break;
 		case 'check-vision':
 			await runCheckVision(commandArgs);

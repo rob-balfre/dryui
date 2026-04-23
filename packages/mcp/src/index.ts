@@ -46,7 +46,8 @@ const SERVER_INSTRUCTIONS = [
 	'4. CORRECT CSS TOKENS: Background is --dry-color-bg-base. Text is --dry-color-text-strong.',
 	'   Use `ask --scope list --kind token` to browse the token surface when needed.',
 	'',
-	'5. CHECK AFTER WRITING: Run `check` on the file, theme, or workspace after edits. It replaces',
+	'5. CHECK AFTER WRITING: Run `check` on the file, theme, or workspace after edits. For rendered',
+	'   pages, run `check` with `visualUrl` (or the direct `check-vision` tool). It replaces',
 	'   the old review/diagnose/lint/doctor split with one validation surface.',
 	'',
 	'6. USE DRYUI COMPONENTS FOR UI ELEMENTS: Prefer Field.Root + Label for fields, Button instead',
@@ -108,17 +109,37 @@ server.tool(
 
 const CHECK_DESC = [
 	'Collapse DryUI validation into a single path-driven tool.\n\n',
-	'Input: optional `path`, optional `scope`.\n',
+	'Input: optional `path`, optional `scope`, or optional `visualUrl` for rendered-page critique.\n',
 	'- no path: workspace scan\n',
 	'- `.svelte` file: component review\n',
 	'- `.css` file: theme diagnosis\n',
-	'- directory: workspace scan scoped to that directory\n\n',
+	'- directory: workspace scan scoped to that directory\n',
+	'- `visualUrl`: render a URL in headless Chromium and critique the screenshot with Codex CLI\n\n',
 	'Scope filter (maps to `--polish` / `--no-polish` CLI flags):\n',
 	'- `scope: "polish"`: only polish-category rules (raw headings, tabular nums, enter/exit timing, etc.)\n',
 	'- `scope: "no-polish"`: everything except polish (default correctness + a11y pass)\n',
 	'- omit `scope`: run every rule\n\n',
-	'Output: unified TOON with `issues`, aggregates, and `next[]` steering back toward `ask`.'
+	'Output: unified TOON with `issues` or visual `findings`, aggregates, and `next[]` steering back toward `ask`.'
 ].join('');
+
+function visionToolResponse(result: Awaited<ReturnType<typeof runVisionCheck>>) {
+	const diagnosticsJson = JSON.stringify(
+		{
+			summary: result.summary,
+			screenshotPath: result.screenshotPath,
+			findings: result.findings,
+			diagnostics: result.diagnostics
+		},
+		null,
+		2
+	);
+	return {
+		content: [
+			{ type: 'text' as const, text: result.text },
+			{ type: 'text' as const, text: `\`\`\`json dryui-vision\n${diagnosticsJson}\n\`\`\`` }
+		]
+	};
+}
 
 server.tool(
 	'check',
@@ -139,10 +160,39 @@ server.tool(
 			.optional()
 			.describe(
 				'Optional category filter. "polish": only run polish-category rules (raw headings, tabular nums, enter/exit timing, solid-border-on-raised, etc.). "no-polish": skip polish rules, run everything else. Omit to run every rule.'
-			)
+			),
+		visualUrl: z
+			.string()
+			.optional()
+			.describe(
+				'Optional absolute http(s) URL for the rendered visual check. When provided, `path` is ignored and the tool returns vision findings.'
+			),
+		viewport: z
+			.string()
+			.optional()
+			.describe('Viewport size for visualUrl as `<width>x<height>`. Defaults to 1440x900.'),
+		extraRubric: z
+			.string()
+			.optional()
+			.describe('Optional addendum for visualUrl; e.g. "focus on the hero region".'),
+		waitFor: z
+			.string()
+			.optional()
+			.describe('Optional CSS selector to wait for before visualUrl screenshotting.')
 	},
-	async ({ path, cwd, scope }) => {
+	async ({ path, cwd, scope, visualUrl, viewport, extraRubric, waitFor }) => {
 		try {
+			if (visualUrl) {
+				return visionToolResponse(
+					await runVisionCheck({
+						url: visualUrl,
+						...(viewport ? { viewport } : {}),
+						...(extraRubric ? { extraRubric } : {}),
+						...(waitFor ? { waitFor } : {})
+					})
+				);
+			}
+
 			const input = {
 				...(path ? { path } : {}),
 				...(scope ? { scope } : {})
@@ -201,28 +251,14 @@ server.tool(
 	},
 	async ({ url, viewport, extraRubric, waitFor }) => {
 		try {
-			const result = await runVisionCheck({
-				url,
-				...(viewport ? { viewport } : {}),
-				...(extraRubric ? { extraRubric } : {}),
-				...(waitFor ? { waitFor } : {})
-			});
-			const diagnosticsJson = JSON.stringify(
-				{
-					summary: result.summary,
-					screenshotPath: result.screenshotPath,
-					findings: result.findings,
-					diagnostics: result.diagnostics
-				},
-				null,
-				2
+			return visionToolResponse(
+				await runVisionCheck({
+					url,
+					...(viewport ? { viewport } : {}),
+					...(extraRubric ? { extraRubric } : {}),
+					...(waitFor ? { waitFor } : {})
+				})
 			);
-			return {
-				content: [
-					{ type: 'text', text: result.text },
-					{ type: 'text', text: `\`\`\`json dryui-vision\n${diagnosticsJson}\n\`\`\`` }
-				]
-			};
 		} catch (error) {
 			return toolErrorResponse(error);
 		}

@@ -6,17 +6,17 @@ Docs and editor setup: <https://dryui.dev/getting-started>
 
 ## Workspace Packages
 
-| Package                  | Description                                                                  |
-| ------------------------ | ---------------------------------------------------------------------------- |
-| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                   |
-| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming         |
-| `@dryui/lint`            | Svelte preprocessor that enforces DryUI CSS discipline                       |
-| `@dryui/cli`             | CLI for setup, discovery, install planning, tokens, and feedback tooling     |
-| `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor discovery and validation |
-| `@dryui/theme-wizard`    | Optional guided theme generator                                              |
-| `@dryui/feedback`        | Optional feedback annotation UI                                              |
-| `@dryui/feedback-server` | Companion feedback server and MCP backend                                    |
-| `@dryui/plugin`          | Plugin bundle for Claude Code, Codex, and Gemini CLI                         |
+| Package                  | Description                                                                                                            |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                             |
+| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                   |
+| `@dryui/lint`            | Svelte preprocessor that enforces DryUI CSS discipline                                                                 |
+| `@dryui/cli`             | CLI for setup, discovery, install planning, static checks, visual checks, tokens, and feedback tooling                 |
+| `@dryui/mcp`             | MCP server exposing `ask`, `check`, and `check-vision` for in-editor discovery, validation, and rendered-page critique |
+| `@dryui/theme-wizard`    | Optional guided theme generator                                                                                        |
+| `@dryui/feedback`        | Optional feedback annotation UI                                                                                        |
+| `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                              |
+| `@dryui/plugin`          | Plugin bundle for Claude Code, Codex, and Gemini CLI                                                                   |
 
 ## Quick Start
 
@@ -61,6 +61,8 @@ Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by d
 The CLI is the default entry point. Once it is working, add the skill and MCP layer for your editor from <https://dryui.dev/getting-started>.
 
 Repo contributors should treat [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts) as the canonical setup source for editor snippets and MCP config examples.
+
+Use `dryui check [path]` for static validation, `dryui check --polish` for polish-only linting, and `dryui check --visual <url>` when a running page needs screenshot-based critique. The MCP `check` tool mirrors this with `visualUrl`, and `check-vision` remains available as the direct visual tool.
 
 ## Develop From Source
 

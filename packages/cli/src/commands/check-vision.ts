@@ -32,6 +32,8 @@ function help(exitCode = 0): never {
 				'against the DryUI taste rubric (chip wrap, plural mismatch, variant mix,',
 				'mid-token break, contrast, alignment, orphan, spacing rhythm).',
 				'',
+				'This is a compatibility alias for `dryui check --visual <url>`.',
+				'',
 				'Requires the Codex CLI on PATH and an authenticated Codex session.'
 			],
 			options: [
@@ -42,6 +44,7 @@ function help(exitCode = 0): never {
 				'  --json               Emit JSON instead of TOON'
 			],
 			examples: [
+				'  dryui check --visual http://localhost:5173/components/badge',
 				'  dryui check-vision http://localhost:5173/components/badge',
 				'  dryui check-vision https://example.com --viewport=1280x720',
 				'  dryui check-vision http://localhost:5173/dashboard --wait-for=.demo-surface'
