@@ -1,6 +1,6 @@
 // dryui check-vision <url> — Render a URL and have Codex critique the screenshot.
 
-import { runVisionCheck } from '../../../mcp/src/tools/check-vision.js';
+import { runVisionCheck } from '@dryui/mcp/check-vision';
 import {
 	commandError,
 	emitCommandResult,
