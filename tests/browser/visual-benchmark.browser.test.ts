@@ -40,7 +40,8 @@ test('visual benchmark theme helper forces light tokens and restores the previou
 	expect(document.documentElement.dataset.theme).toBe('dark');
 });
 
-test('visual benchmark scene stays stable', async () => {
+// tests/browser/__screenshots__/ is gitignored, so CI never has a baseline.
+test.skipIf(import.meta.env.DRYUI_CI)('visual benchmark scene stays stable', async () => {
 	const { root } = renderScene();
 
 	await expect(root).toMatchScreenshot('visual-benchmark-scene', {

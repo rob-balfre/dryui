@@ -12,7 +12,10 @@ const suiteGlobs = [
 	'packages/theme-wizard/src/engine/*.test.ts'
 ];
 
-await $`bun run --filter '@dryui/mcp' generate-spec`.cwd(root.pathname);
+await Promise.all([
+	$`bun run --filter '@dryui/mcp' generate-spec`.cwd(root.pathname),
+	$`bunx svelte-kit sync`.cwd(new URL('apps/docs', root).pathname)
+]);
 
 const files = new Set<string>();
 const globs = suiteGlobs.map((pattern) => new Bun.Glob(pattern));

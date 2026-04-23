@@ -7,6 +7,9 @@ const browserConditions = process.env.VITEST ? ['browser'] : undefined;
 
 export default defineConfig({
 	plugins: [svelte()],
+	define: {
+		'import.meta.env.DRYUI_CI': JSON.stringify(process.env.CI === 'true')
+	},
 	resolve: {
 		conditions: browserConditions,
 		alias: [

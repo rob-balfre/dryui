@@ -797,11 +797,11 @@
     },
     "./*/*": null,
     "./internal/*": null,
-    "./themes/aurora.css": "./dist/themes/aurora.css",
-    "./themes/dark.css": "./dist/themes/dark.css",
-    "./themes/default.css": "./dist/themes/default.css",
-    "./themes/midnight.css": "./dist/themes/midnight.css",
-    "./themes/terminal.css": "./dist/themes/terminal.css"
+    "./themes/aurora.css": "./src/themes/aurora.css",
+    "./themes/dark.css": "./src/themes/dark.css",
+    "./themes/default.css": "./src/themes/default.css",
+    "./themes/midnight.css": "./src/themes/midnight.css",
+    "./themes/terminal.css": "./src/themes/terminal.css"
   },
   "publishConfig": {
     "access": "public",
