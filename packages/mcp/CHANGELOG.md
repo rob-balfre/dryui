@@ -1,5 +1,13 @@
 # @dryui/mcp
 
+## 2.7.0
+
+### Minor Changes
+
+- [`a7bb3d5`](https://github.com/rob-balfre/dryui/commit/a7bb3d55a0c817d292421b800c9ef44d8be750c4) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add the unified `dryui check` CLI command, including `dryui check --visual <url>` as the canonical rendered-page critique path, and keep `dryui check-vision` as a compatibility alias.
+
+  Expose the same visual path through the MCP `check` tool via `visualUrl`, advertise the direct `check-vision` tool in the shared AI surface, and refresh the bundled DryUI skill guidance for the current check workflow.
+
 ## 2.6.3
 
 ### Patch Changes
