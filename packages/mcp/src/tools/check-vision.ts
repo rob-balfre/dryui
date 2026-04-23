@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { chromium, type Browser } from 'playwright';
+import { chromium, type Browser, type Page } from 'playwright';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import { enrichDiagnostic } from '../enrich-diagnostics.js';
 import type { DryUiRepairIssue } from '../repair-types.js';
@@ -58,7 +58,7 @@ export interface VisionCheckResult {
 }
 
 export interface VisionRenderer {
-	(input: VisionRendererInput): Promise<{ bytes: Buffer; screenshotPath: string }>;
+	(input: VisionRendererInput): Promise<VisionRenderResult>;
 }
 
 export interface VisionReviewer {
@@ -69,6 +69,12 @@ interface VisionRendererInput {
 	readonly url: string;
 	readonly viewport: { width: number; height: number };
 	readonly waitFor?: string;
+}
+
+interface VisionRenderResult {
+	readonly bytes: Buffer;
+	readonly screenshotPath: string;
+	readonly findings?: readonly VisionFinding[];
 }
 
 interface VisionReviewInput {
@@ -179,10 +185,7 @@ function parseViewport(raw: string | undefined): { width: number; height: number
 	return { width, height };
 }
 
-async function defaultRenderer(input: VisionRendererInput): Promise<{
-	bytes: Buffer;
-	screenshotPath: string;
-}> {
+async function defaultRenderer(input: VisionRendererInput): Promise<VisionRenderResult> {
 	const screenshotPath = join(tmpdir(), `dryui-vision-${Date.now()}.png`);
 	let browser: Browser | undefined;
 	try {
@@ -202,12 +205,207 @@ async function defaultRenderer(input: VisionRendererInput): Promise<{
 					requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
 				})
 		);
+		const findings = await collectLayoutFindings(page);
 		const bytes = await page.screenshot({ type: 'png', fullPage: false });
 		await writeFile(screenshotPath, bytes);
-		return { bytes, screenshotPath };
+		return { bytes, screenshotPath, findings };
 	} finally {
 		if (browser) await browser.close();
 	}
+}
+
+async function collectLayoutFindings(page: Page): Promise<readonly VisionFinding[]> {
+	return await page.evaluate(() => {
+		type Finding = {
+			rule: string;
+			severity: 'error' | 'warning' | 'suggestion';
+			message: string;
+			evidence?: string;
+		};
+		type Box = {
+			top: number;
+			right: number;
+			bottom: number;
+			left: number;
+			width: number;
+			height: number;
+		};
+
+		const viewportHeight = window.innerHeight;
+		const viewportWidth = window.innerWidth;
+		const findings: Finding[] = [];
+		const seen = new Set<string>();
+
+		function boxOf(element: Element): Box {
+			const rect = element.getBoundingClientRect();
+			return {
+				top: rect.top,
+				right: rect.right,
+				bottom: rect.bottom,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height
+			};
+		}
+
+		function visible(element: Element): boolean {
+			const box = boxOf(element);
+			if (box.width < 4 || box.height < 4) return false;
+			if (box.bottom < 0 || box.top > viewportHeight || box.right < 0 || box.left > viewportWidth) {
+				return false;
+			}
+			const style = window.getComputedStyle(element);
+			return (
+				style.display !== 'none' && style.visibility !== 'hidden' && Number(style.opacity) > 0.05
+			);
+		}
+
+		function label(element: Element): string {
+			const tag = element.tagName.toLowerCase();
+			const id = element.id ? `#${element.id}` : '';
+			const classes =
+				typeof element.className === 'string'
+					? element.className
+							.split(/\s+/)
+							.filter(Boolean)
+							.slice(0, 3)
+							.map((name) => `.${name}`)
+							.join('')
+					: '';
+			return `${tag}${id}${classes}`;
+		}
+
+		function textOf(element: Element): string {
+			return (element.textContent ?? '').replace(/\s+/g, ' ').trim();
+		}
+
+		function push(finding: Finding): void {
+			const key = `${finding.rule}:${finding.message}`;
+			if (seen.has(key)) return;
+			seen.add(key);
+			findings.push(finding);
+		}
+
+		function isHeaderish(element: Element): boolean {
+			const haystack = [
+				element.tagName,
+				element.id,
+				typeof element.className === 'string' ? element.className : '',
+				element.getAttribute('data-testid') ?? '',
+				element.getAttribute('data-test') ?? ''
+			]
+				.join(' ')
+				.toLowerCase();
+			return /(^|\W)(header|page-header|hero|title|trip-header|summary)(\W|$)/.test(haystack);
+		}
+
+		function headerContainerFor(h1: Element): Element | null {
+			let current: Element | null = h1;
+			for (let depth = 0; current && depth < 5; depth += 1, current = current.parentElement) {
+				if (isHeaderish(current)) return current;
+			}
+			return h1.parentElement;
+		}
+
+		function nextTextBelow(h1: Element, container: Element): Element | null {
+			const h1Box = boxOf(h1);
+			const candidates = [...container.querySelectorAll('p,h2,h3,[class],[data-testid]')]
+				.filter((candidate) => candidate !== h1 && visible(candidate))
+				.filter((candidate) => {
+					const text = textOf(candidate);
+					if (text.length < 8) return false;
+					const box = boxOf(candidate);
+					if (box.top < h1Box.bottom - 1) return false;
+					if (box.left > h1Box.right || box.right < h1Box.left) return false;
+					const lower =
+						`${candidate.tagName} ${candidate.getAttribute('class') ?? ''}`.toLowerCase();
+					return (
+						/^(p|h2|h3)$/i.test(candidate.tagName) ||
+						/(subtitle|description|dek|summary|supporting|copy|lead)/.test(lower)
+					);
+				})
+				.sort((left, right) => boxOf(left).top - boxOf(right).top);
+			return candidates[0] ?? null;
+		}
+
+		for (const h1 of [...document.querySelectorAll('h1')].filter(visible).slice(0, 4)) {
+			const container = headerContainerFor(h1);
+			if (!container) continue;
+			const supporting = nextTextBelow(h1, container);
+			if (!supporting) continue;
+			const h1Box = boxOf(h1);
+			const supportingBox = boxOf(supporting);
+			const gap = supportingBox.top - h1Box.bottom;
+			const fontSize = Number.parseFloat(window.getComputedStyle(h1).fontSize) || 32;
+			const looseThreshold = Math.max(12, Math.round(fontSize * 0.35));
+			const tightThreshold = -2;
+			if (gap > looseThreshold || gap < tightThreshold) {
+				const direction = gap > looseThreshold ? 'too far from' : 'colliding with';
+				push({
+					rule: 'vision/header-rhythm',
+					severity: 'suggestion',
+					message: `Header rhythm looks off: ${label(h1)} is ${direction} the supporting line below it.`,
+					evidence: `${label(container)} h1-to-supporting gap=${Math.round(gap)}px threshold=${looseThreshold}px`
+				});
+			}
+		}
+
+		function isMetaish(element: Element): boolean {
+			const haystack = [
+				element.tagName,
+				element.id,
+				typeof element.className === 'string' ? element.className : '',
+				element.getAttribute('role') ?? '',
+				element.getAttribute('data-testid') ?? '',
+				element.getAttribute('data-test') ?? ''
+			]
+				.join(' ')
+				.toLowerCase();
+			return /(meta|chip|badge|pill|tag|toolbar|actions|summary)/.test(haystack);
+		}
+
+		function childUnion(element: Element): Box | null {
+			const children = [...element.children].filter(visible);
+			if (children.length === 0) return null;
+			const boxes = children.map(boxOf);
+			return {
+				top: Math.min(...boxes.map((box) => box.top)),
+				right: Math.max(...boxes.map((box) => box.right)),
+				bottom: Math.max(...boxes.map((box) => box.bottom)),
+				left: Math.min(...boxes.map((box) => box.left)),
+				width: 0,
+				height: 0
+			};
+		}
+
+		const metaCandidates = [
+			...document.querySelectorAll('header [class], main [class], section [class], [data-testid]')
+		]
+			.filter((element) => visible(element) && isMetaish(element))
+			.filter((element) => {
+				const box = boxOf(element);
+				return box.height >= 24 && box.height <= 96 && box.width >= 160;
+			});
+
+		for (const element of metaCandidates.slice(0, 16)) {
+			const outer = boxOf(element);
+			const inner = childUnion(element);
+			if (!inner) continue;
+			const topPad = inner.top - outer.top;
+			const bottomPad = outer.bottom - inner.bottom;
+			const centerDrift = Math.abs((inner.top + inner.bottom) / 2 - (outer.top + outer.bottom) / 2);
+			if (topPad - bottomPad >= 7 || centerDrift >= 5) {
+				push({
+					rule: 'vision/stray-padding',
+					severity: 'warning',
+					message: `Meta row padding looks accidental: ${label(element)} content is not vertically centered.`,
+					evidence: `${label(element)} top=${Math.round(topPad)}px bottom=${Math.round(bottomPad)}px center-drift=${Math.round(centerDrift)}px`
+				});
+			}
+		}
+
+		return findings;
+	});
 }
 
 async function defaultReviewer(input: VisionReviewInput): Promise<VisionReviewResult> {
@@ -393,6 +591,20 @@ function parseFindings(raw: string): ParsedFindings {
 	return { findings, parseError: null };
 }
 
+function mergeFindings(...groups: readonly (readonly VisionFinding[])[]): readonly VisionFinding[] {
+	const merged: VisionFinding[] = [];
+	const seen = new Set<string>();
+	for (const group of groups) {
+		for (const finding of group) {
+			const key = `${finding.rule}:${finding.severity}:${finding.message}`;
+			if (seen.has(key)) continue;
+			seen.add(key);
+			merged.push(finding);
+		}
+	}
+	return merged;
+}
+
 function findingsToDiagnostics(findings: readonly VisionFinding[]): readonly DryUiRepairIssue[] {
 	return findings.map((f) =>
 		enrichDiagnostic({
@@ -477,7 +689,11 @@ export async function runVisionCheck(
 	const renderer = options.renderer ?? defaultRenderer;
 	const reviewer = options.reviewer ?? defaultReviewer;
 
-	const { bytes, screenshotPath } = await renderer({
+	const {
+		bytes,
+		screenshotPath,
+		findings: rendererFindings = []
+	} = await renderer({
 		url: parsedUrl.toString(),
 		viewport,
 		...(input.waitFor ? { waitFor: input.waitFor } : {})
@@ -499,7 +715,9 @@ export async function runVisionCheck(
 	});
 	const rawText = review.rawText;
 	const model = review.model;
-	const { findings, parseError } = parseFindings(rawText);
+	const parsed = parseFindings(rawText);
+	const findings = mergeFindings(parsed.findings, rendererFindings);
+	const parseError = parsed.parseError;
 
 	const summary = deriveSummary(findings);
 	const diagnostics = findingsToDiagnostics(findings);

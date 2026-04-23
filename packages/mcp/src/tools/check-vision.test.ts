@@ -36,6 +36,40 @@ describe('runVisionCheck', () => {
 		expect(result.text).toContain('hasBlockers: false');
 	});
 
+	test('merges renderer layout findings when the reviewer returns clean JSON', async () => {
+		const { reviewer } = stubReviewer('{ "findings": [] }');
+		const renderer: VisionRenderer = async () => ({
+			bytes: FAKE_PNG,
+			screenshotPath: '/tmp/dryui-vision-test.png',
+			findings: [
+				{
+					rule: 'vision/header-rhythm',
+					severity: 'suggestion',
+					message: 'Header H1 and supporting line have a loose gap.',
+					evidence: 'h1-to-supporting gap=16px threshold=12px'
+				},
+				{
+					rule: 'vision/stray-padding',
+					severity: 'warning',
+					message: 'Meta row content sits low in its band.',
+					evidence: 'top=12px bottom=0px center-drift=6px'
+				}
+			]
+		});
+
+		const result = await runVisionCheck({ url: 'https://example.com' }, { reviewer, renderer });
+
+		expect(result.findings).toHaveLength(2);
+		expect(result.summary.counts.warning).toBe(1);
+		expect(result.summary.counts.suggestion).toBe(1);
+		expect(result.diagnostics.map((d) => d.code)).toEqual([
+			'vision/header-rhythm',
+			'vision/stray-padding'
+		]);
+		expect(result.text).toContain('vision/header-rhythm');
+		expect(result.text).toContain('vision/stray-padding');
+	});
+
 	test('strips ```json fences and parses findings', async () => {
 		const fenced = [
 			'```json',
