@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.6.2
+
+### Patch Changes
+
+- [`fc6d4d3`](https://github.com/rob-balfre/dryui/commit/fc6d4d381a8e9d5482d28b85545e9434073ed388) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Teach `check-vision` to flag cramped headers, text stacks, toolbars, and chip/meta rows as `vision/cramped-layout` instead of treating visually squashed density as clean.
+
 ## 2.6.1
 
 ### Patch Changes

@@ -107,7 +107,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.6.1",
+      "version": "2.6.2",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
