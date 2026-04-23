@@ -23,8 +23,12 @@ export const DISPATCH_AGENTS: readonly DispatchAgent[] = [
 export type TerminalApp = 'terminal' | 'ghostty';
 export const TERMINAL_APPS: readonly TerminalApp[] = ['terminal', 'ghostty'];
 
-const TERMINAL_CLI: Record<'claude' | 'gemini' | 'opencode' | 'copilot', readonly string[]> = {
+const TERMINAL_CLI: Record<
+	'claude' | 'codex' | 'gemini' | 'opencode' | 'copilot',
+	readonly string[]
+> = {
 	claude: ['claude'],
+	codex: ['codex'],
 	gemini: ['gemini'],
 	opencode: ['opencode'],
 	copilot: ['copilot', '-i']
@@ -459,7 +463,7 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	const prompt = buildPrompt(submission, target);
 	console.error(`[dispatch] → ${target} (${submission.id})`);
 
-	if (target === 'codex') {
+	if (target === 'codex' && !commandExists('codex')) {
 		const url = `codex://new?prompt=${encodeURIComponent(prompt)}&path=${encodeURIComponent(options.workspace)}`;
 		openExternalUrl(url);
 		return;

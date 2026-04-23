@@ -20,7 +20,7 @@ export const AGENT_META: Record<SubmissionAgent, AgentMeta> = {
 		id: 'codex',
 		label: 'Codex',
 		shortLabel: 'Codex',
-		description: 'Open Codex with the DryUI plugin chip prefilled.',
+		description: 'Launch Codex CLI with the feedback prompt.',
 		mode: 'prompt'
 	},
 	gemini: {
