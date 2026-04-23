@@ -11,7 +11,8 @@ import {
 	detectPackageManagerFromEnv,
 	isSvelteConfigPath,
 	type DryuiPackageManager,
-	type ProjectPlanStep
+	type ProjectPlanStep,
+	type InstallPlan
 } from '@dryui/mcp/project-planner';
 import { isInteractiveTTY } from '../run.js';
 import {
@@ -24,6 +25,13 @@ import {
 	type MountFeedbackOptions
 } from './launch-utils.js';
 import { runUserProjectLauncher } from './launcher.js';
+import {
+	injectOverridesIntoPackageJson,
+	loadDevTarballsManifest,
+	rewriteInstallCommand,
+	wrapInstallPackage,
+	type DevTarballsManifest
+} from './dev-tarballs.js';
 
 type ConcretePackageManager = Exclude<DryuiPackageManager, 'unknown'>;
 
@@ -33,6 +41,7 @@ interface InitOptions {
 	packageManager: DryuiPackageManager;
 	noLaunch: boolean;
 	noFeedback: boolean;
+	devTarballsDir: string | null;
 }
 
 interface InitRuntime {
@@ -52,6 +61,7 @@ function parseInitArgs(args: string[]): InitOptions {
 	let packageManager: DryuiPackageManager | null = null;
 	let noLaunch = false;
 	let noFeedback = false;
+	let devTarballsDir: string | null = null;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i]!;
@@ -65,6 +75,9 @@ function parseInitArgs(args: string[]): InitOptions {
 			noLaunch = true;
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
+		} else if (arg === '--dev-tarballs' && next) {
+			devTarballsDir = resolve(process.cwd(), next);
+			i++;
 		} else if (!arg.startsWith('-')) {
 			targetPath = resolve(process.cwd(), arg);
 			userPath = arg;
@@ -76,7 +89,8 @@ function parseInitArgs(args: string[]): InitOptions {
 		userPath,
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
 		noLaunch,
-		noFeedback
+		noFeedback,
+		devTarballsDir
 	};
 }
 
@@ -315,6 +329,21 @@ async function runLauncherDefault(cwd: string, spec: Spec): Promise<void> {
 	await runUserProjectLauncher([], { cwd, spec });
 }
 
+function applyDevTarballsToSteps(
+	steps: InstallPlan['steps'],
+	manifest: DevTarballsManifest
+): ProjectPlanStep[] {
+	return steps.map((step) => {
+		if (step.kind === 'create-file' && step.path?.endsWith('/package.json') && step.snippet) {
+			return { ...step, snippet: injectOverridesIntoPackageJson(step.snippet, manifest) };
+		}
+		if ((step.kind === 'run-command' || step.kind === 'install-package') && step.command) {
+			return { ...step, command: rewriteInstallCommand(step.command, manifest) };
+		}
+		return step;
+	});
+}
+
 export async function runInit(
 	args: string[],
 	spec: Spec,
@@ -330,11 +359,18 @@ export async function runInit(
 		console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
 		console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
 		console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
+		// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
+		// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
 		process.exit(0);
 	}
 
-	const { targetPath, userPath, packageManager, noLaunch, noFeedback } = parseInitArgs(args);
+	const { targetPath, userPath, packageManager, noLaunch, noFeedback, devTarballsDir } =
+		parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runShellCommand;
+
+	const devTarballsManifest: DevTarballsManifest | null = devTarballsDir
+		? loadDevTarballsManifest(devTarballsDir)
+		: null;
 
 	mkdirSync(targetPath, { recursive: true });
 
@@ -343,9 +379,13 @@ export async function runInit(
 		strictTarget: userPath !== null
 	});
 
-	const firstStep = plan.steps[0];
+	const effectiveSteps = devTarballsManifest
+		? applyDevTarballsToSteps(plan.steps, devTarballsManifest)
+		: plan.steps;
+
+	const firstStep = effectiveSteps[0];
 	if (
-		plan.steps.length === 1 &&
+		effectiveSteps.length === 1 &&
 		firstStep &&
 		firstStep.kind === 'note' &&
 		firstStep.status === 'done'
@@ -362,7 +402,7 @@ export async function runInit(
 	log('');
 
 	let installsSucceeded = true;
-	for (const step of plan.steps) {
+	for (const step of effectiveSteps) {
 		switch (step.kind) {
 			case 'create-file':
 				executeCreateFile(step);
@@ -394,8 +434,12 @@ export async function runInit(
 	if (isScaffold && installsSucceeded && !noFeedback) {
 		const concretePm: ConcretePackageManager =
 			packageManager === 'unknown' ? 'npm' : packageManager;
+		const baseInstall = runtime.installPackage ?? installPackage;
+		const effectiveInstall = devTarballsManifest
+			? wrapInstallPackage(baseInstall, devTarballsManifest)
+			: baseInstall;
 		feedbackReady = setupFeedback(targetPath, concretePm, {
-			installPackage: runtime.installPackage ?? installPackage,
+			installPackage: effectiveInstall,
 			mountFeedback: runtime.mountFeedback ?? mountFeedbackInLayout,
 			patchViteConfig: runtime.patchViteConfig ?? patchViteConfigFeedbackNoExternal,
 			findViteConfig: runtime.findViteConfig ?? findViteConfig
