@@ -473,6 +473,11 @@
       "svelte": "./src/pin-input/index.ts",
       "default": "./src/pin-input/index.ts"
     },
+    "./pluralize": {
+      "types": "./src/pluralize/index.ts",
+      "svelte": "./src/pluralize/index.ts",
+      "default": "./src/pluralize/index.ts"
+    },
     "./popover": {
       "types": "./src/popover/index.ts",
       "svelte": "./src/popover/index.ts",
@@ -517,6 +522,11 @@
       "types": "./src/rating/index.ts",
       "svelte": "./src/rating/index.ts",
       "default": "./src/rating/index.ts"
+    },
+    "./ref-id": {
+      "types": "./src/ref-id/index.ts",
+      "svelte": "./src/ref-id/index.ts",
+      "default": "./src/ref-id/index.ts"
     },
     "./relative-time": {
       "types": "./src/relative-time/index.ts",
@@ -1230,6 +1240,11 @@
         "svelte": "./dist/pin-input/index.js",
         "default": "./dist/pin-input/index.js"
       },
+      "./pluralize": {
+        "types": "./dist/pluralize/index.d.ts",
+        "svelte": "./dist/pluralize/index.js",
+        "default": "./dist/pluralize/index.js"
+      },
       "./popover": {
         "types": "./dist/popover/index.d.ts",
         "svelte": "./dist/popover/index.js",
@@ -1274,6 +1289,11 @@
         "types": "./dist/rating/index.d.ts",
         "svelte": "./dist/rating/index.js",
         "default": "./dist/rating/index.js"
+      },
+      "./ref-id": {
+        "types": "./dist/ref-id/index.d.ts",
+        "svelte": "./dist/ref-id/index.js",
+        "default": "./dist/ref-id/index.js"
       },
       "./relative-time": {
         "types": "./dist/relative-time/index.d.ts",

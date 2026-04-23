@@ -2,24 +2,24 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.9.0",
   "summary": {
-    "componentNodes": 296,
+    "componentNodes": 298,
     "partNodes": 656,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 144,
+    "primitiveComponents": 146,
     "uiComponents": 152,
     "uiWrappers": 130,
     "uiComposites": 22,
-    "rootBarrelComponents": 296,
+    "rootBarrelComponents": 298,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
-    "composeEdges": 15,
+    "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 293,
+    "mismatches": 297,
     "primitivePartComponents": 0,
-    "thinWrappers": 61
+    "thinWrappers": 60
   },
   "nodes": [
     {
@@ -5323,7 +5323,7 @@
         "Description",
         "Meta"
       ],
-      "sourceFileCount": 9,
+      "sourceFileCount": 10,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -5650,6 +5650,25 @@
       "parts": []
     },
     {
+      "id": "primitives:Pluralize",
+      "name": "Pluralize",
+      "label": "Pluralize",
+      "kind": "component",
+      "package": "primitives",
+      "layer": "primitive",
+      "category": "uncategorized",
+      "description": "Pluralize is exported publicly but is missing generated spec metadata.",
+      "visibility": "root",
+      "sourcePath": "packages/primitives/src/pluralize/index.ts",
+      "publicImport": "@dryui/primitives",
+      "tags": [],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "primitives:Popover",
       "name": "Popover",
       "label": "Popover",
@@ -5964,6 +5983,25 @@
         "review",
         "score"
       ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "primitives:RefId",
+      "name": "RefId",
+      "label": "RefId",
+      "kind": "component",
+      "package": "primitives",
+      "layer": "primitive",
+      "category": "uncategorized",
+      "description": "RefId is exported publicly but is missing generated spec metadata.",
+      "visibility": "root",
+      "sourcePath": "packages/primitives/src/ref-id/index.ts",
+      "publicImport": "@dryui/primitives",
+      "tags": [],
       "compound": false,
       "parts": [],
       "sourceFileCount": 2,
@@ -8824,7 +8862,7 @@
       "parts": [],
       "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
-      "componentImportCount": 0
+      "componentImportCount": 1
     },
     {
       "id": "ui:Beam",
@@ -16712,6 +16750,12 @@
       "type": "composes",
       "from": "primitives:DateTimeInput",
       "to": "primitives:TimeInput"
+    },
+    {
+      "id": "composes:ui:Badge:primitives:PageHeader:",
+      "type": "composes",
+      "from": "ui:Badge",
+      "to": "primitives:PageHeader"
     },
     {
       "id": "composes:ui:Carousel:ui:VisuallyHidden:",
@@ -24948,6 +24992,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "primitives",
+      "component": "Pluralize",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/primitives/src/pluralize/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "primitives",
       "component": "Popover",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/popover/index.ts"
@@ -25007,6 +25058,13 @@
       "component": "Rating",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/rating/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "primitives",
+      "component": "RefId",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/primitives/src/ref-id/index.ts"
     },
     {
       "kind": "missing-subpath-export",
@@ -26362,6 +26420,20 @@
     {
       "kind": "spec-missing",
       "package": "primitives",
+      "component": "Pluralize",
+      "detail": "Public export exists without generated spec metadata.",
+      "sourcePath": "packages/primitives/src/pluralize/index.ts"
+    },
+    {
+      "kind": "spec-missing",
+      "package": "primitives",
+      "component": "RefId",
+      "detail": "Public export exists without generated spec metadata.",
+      "sourcePath": "packages/primitives/src/ref-id/index.ts"
+    },
+    {
+      "kind": "spec-missing",
+      "package": "primitives",
       "component": "TokenScope",
       "detail": "Public export exists without generated spec metadata.",
       "sourcePath": "packages/primitives/src/token-scope/index.ts"
@@ -26376,7 +26448,6 @@
       "Aurora",
       "Avatar",
       "Backdrop",
-      "Badge",
       "Beam",
       "BorderBeam",
       "Button",
@@ -26436,13 +26507,15 @@
     "subpathOnlyPrimitives": [],
     "specMissingUi": [],
     "specMissingPrimitives": [
+      "Pluralize",
+      "RefId",
       "TokenScope"
     ],
     "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

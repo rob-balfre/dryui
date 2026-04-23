@@ -7246,14 +7246,12 @@
             "soft",
             "dot"
           ],
-          "description": "Badge treatment ranging from filled emphasis to subtle outline styles.",
-          "default": "'soft'"
+          "description": "Badge treatment ranging from filled emphasis to subtle outline styles."
         },
         "color": {
           "type": "AliasableColor",
           "required": false,
-          "description": "Semantic tone applied to the badge background, border, or text treatment.",
-          "default": "'gray'"
+          "description": "Semantic tone applied to the badge background, border, or text treatment."
         },
         "size": {
           "type": "'sm' | 'md'",
@@ -7262,8 +7260,7 @@
             "sm",
             "md"
           ],
-          "description": "Badge density preset for compact metadata or standard labels.",
-          "default": "'sm'"
+          "description": "Badge density preset for compact metadata or standard labels."
         },
         "children": {
           "type": "Snippet",
@@ -7319,9 +7316,6 @@
         },
         {
           "name": "data-variant"
-        },
-        {
-          "name": "data-wrapper"
         }
       ],
       "example": "<Badge variant=\"soft\">Active</Badge>"
@@ -20686,6 +20680,43 @@
               "type": "Snippet",
               "required": true,
               "description": "Content rendered inside the component."
+            },
+            "variant": {
+              "type": "'solid' | 'outline' | 'soft'",
+              "required": false,
+              "acceptedValues": [
+                "solid",
+                "outline",
+                "soft"
+              ],
+              "description": "Visual style preset for the component."
+            },
+            "color": {
+              "type": "| 'gray'\n\t| 'blue'\n\t| 'red'\n\t| 'green'\n\t| 'yellow'\n\t| 'purple'\n\t| 'orange'\n\t| 'info'\n\t| 'success'\n\t| 'warning'\n\t| 'danger'",
+              "required": false,
+              "acceptedValues": [
+                "gray",
+                "blue",
+                "red",
+                "green",
+                "yellow",
+                "purple",
+                "orange",
+                "info",
+                "success",
+                "warning",
+                "danger"
+              ],
+              "description": "Semantic color or tone applied to the component."
+            },
+            "size": {
+              "type": "'sm' | 'md'",
+              "required": false,
+              "acceptedValues": [
+                "sm",
+                "md"
+              ],
+              "description": "Size preset affecting density, spacing, or typography."
             }
           },
           "forwardedProps": {

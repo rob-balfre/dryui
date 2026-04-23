@@ -1755,7 +1755,17 @@ Parts:
   Props: children (Snippet), Content rendered inside the component., required
   Native props: Forwards <p> attributes via rest props.
 - PageHeader.Meta
-  Props: children (Snippet), Content rendered inside the component., required
+  Props: children (Snippet), Content rendered inside the component., required | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft | color (| 'gray'
+	| 'blue'
+	| 'red'
+	| 'green'
+	| 'yellow'
+	| 'purple'
+	| 'orange'
+	| 'info'
+	| 'success'
+	| 'warning'
+	| 'danger'), Semantic color or tone applied to the component., accepted gray, blue, red, green, yellow, purple, orange, info, success, warning, danger | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md
   Native props: Forwards <div> attributes via rest props.
 Structure:
   PageHeader.Root
@@ -3083,10 +3093,10 @@ Tags: status, count, label, tag
 Kind: simple
 Root import: import { Badge } from '@dryui/ui'
 Subpath import: import { Badge } from '@dryui/ui/badge'
-Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
+Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment. | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
-Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant | data-wrapper
+Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte

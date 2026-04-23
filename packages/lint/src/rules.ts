@@ -147,6 +147,26 @@ const CLASS_TABULAR_NUMS_RE = /class\s*=\s*["'][^"']*\bdry-tabular-nums\b[^"']*[
 const TERNARY_ICON_RE =
 	/\{\s*[\w.]+\s*\?\s*<([A-Z]\w*(?:Icon|Icn))\b[^>]*\/?\s*>\s*:\s*<([A-Z]\w*(?:Icon|Icn))\b[^>]*\/?\s*>\s*\}/g;
 
+// polish/badge-plural-mismatch — interpolated value followed by a bare lowercase
+// word inside a <Badge>...</Badge> block. e.g. `{count} guests`. The Pluralize
+// primitive handles the singular/plural form switch. Self-closing badges are
+// skipped (no children).
+const BADGE_PLURAL_INNER_RE = /\{[^}]+\}\s+[a-z][a-z'-]*\b/g;
+
+// polish/page-header-meta-mixed-variants — capture variant attribute values on
+// chip-like children (Badge, Chip, Tag) inside a <PageHeader.Meta> block. Used
+// to detect 2+ distinct variants when the parent itself doesn't set one.
+const META_CHILD_VARIANT_RE = /<(Badge|Chip|Tag)\b[^>]*\bvariant\s*=\s*["']([^"']+)["']/g;
+
+// polish/page-header-meta-mixed-variants — pull variant attr off the
+// PageHeader.Meta opening tag itself. When set, children inherit via context
+// and we treat the block as conformant.
+const META_PARENT_VARIANT_RE = /\bvariant\s*=\s*["']([^"']+)["']/;
+
+// polish/raw-ref-id-needs-wrap — RFE-style alphanumeric reference: 2-4 caps,
+// dash, 5+ digits. e.g. BA-3490221. Word-bounded to avoid mid-word hits.
+const RAW_REF_ID_RE = /\b[A-Z]{2,4}-\d{5,}\b/g;
+
 // polish/nested-radius-mismatch — only flag when a child's radius token
 // actually equals the tier the container is using. Each container maps to one
 // radius tier on the default scale (card/dialog/sheet → 2xl, popover → xl,
@@ -381,6 +401,76 @@ function anchorHasHref(tagText: string): boolean {
 	return /\{href\}/.test(tagText) || /(?<![\w:-])href\s*=/.test(tagText);
 }
 
+interface ElementBlock {
+	openIndex: number; // start of `<TagName`
+	openText: string; // the full opening tag, e.g. `<Badge variant="soft">`
+	innerStart: number; // index after the `>` of the opening tag
+	innerEnd: number; // index of `<` that starts the matching close tag
+	inner: string; // content between innerStart and innerEnd
+}
+
+/**
+ * Find every `<TagName ...>...</TagName>` block in `content`, balancing nested
+ * tags of the same name. Skips self-closing forms (no inner content). Comments
+ * are skipped at the outer level. Returns block data with absolute indices.
+ *
+ * Note: only matches the first depth of close tags by counting opens vs closes
+ * of the same name. Mismatched markup terminates the block at content end.
+ */
+function findElementBlocks(content: string, tagName: string): ElementBlock[] {
+	const blocks: ElementBlock[] = [];
+	const opens = findOpeningTags(content, tagName);
+	const escapedName = escapeTagName(tagName);
+	const closeRe = new RegExp(`</${escapedName}\\s*>`, 'g');
+	const openRe = new RegExp(`<${escapedName}(?=[\\s/>])`, 'g');
+
+	for (const open of opens) {
+		// Self-closing form has no inner content; the `<Badge ... />` ends with /
+		// just before the final `>`. Skip.
+		if (/\/\s*>$/.test(open.text)) continue;
+
+		const innerStart = open.index + open.text.length;
+		// Walk forward, tracking depth: every nested `<TagName` opens a level,
+		// every `</TagName>` closes one. Self-closing nested tags don't change
+		// depth. We don't track unrelated tags.
+		let depth = 1;
+		let cursor = innerStart;
+
+		while (cursor < content.length && depth > 0) {
+			closeRe.lastIndex = cursor;
+			const closeMatch = closeRe.exec(content);
+			if (!closeMatch) break;
+
+			openRe.lastIndex = cursor;
+			let opensBefore = 0;
+			let openMatch: RegExpExecArray | null;
+			while ((openMatch = openRe.exec(content)) && openMatch.index < closeMatch.index) {
+				// Confirm not self-closing by walking forward to the matching `>`.
+				const nestedOpenEnd = content.indexOf('>', openMatch.index);
+				if (nestedOpenEnd === -1) break;
+				const tagSlice = content.slice(openMatch.index, nestedOpenEnd + 1);
+				if (!/\/\s*>$/.test(tagSlice)) opensBefore += 1;
+			}
+
+			depth = depth - 1 + opensBefore;
+			cursor = closeMatch.index + closeMatch[0].length;
+
+			if (depth === 0) {
+				blocks.push({
+					openIndex: open.index,
+					openText: open.text,
+					innerStart,
+					innerEnd: closeMatch.index,
+					inner: content.slice(innerStart, closeMatch.index)
+				});
+				break;
+			}
+		}
+	}
+
+	return blocks;
+}
+
 export function checkScript(content: string, categoryFilter?: CategoryFilter): Violation[] {
 	const violations: Violation[] = [];
 	const lineStarts = buildLineIndex(content);
@@ -571,6 +661,23 @@ function stripCssComments(content: string): string {
 	});
 }
 
+const ANY_TAG_RE = /<\/?[a-zA-Z][^>]*>/g;
+
+/**
+ * Replace every HTML/Svelte element tag with same-length whitespace, leaving
+ * text content (and Svelte expressions outside tags) intact. Used by polish
+ * rules that scan text-only content within an element block.
+ */
+function stripTags(content: string): string {
+	return content.replace(ANY_TAG_RE, (m) => {
+		let out = '';
+		for (let i = 0; i < m.length; i++) {
+			out += m.charCodeAt(i) === 10 /* \n */ ? '\n' : ' ';
+		}
+		return out;
+	});
+}
+
 function getParentDir(filename?: string): string {
 	if (!filename) return '';
 	// Parent dir = last segment of the parent path. Platform-agnostic and
@@ -751,6 +858,75 @@ export function checkMarkup(
 				rule: 'polish/raw-icon-conditional',
 				message: ruleMessage('polish/raw-icon-conditional'),
 				line: lineOf(match.index)
+			});
+		}
+	}
+
+	// polish/badge-plural-mismatch — interpolated value followed by a bare
+	// lowercase word inside a <Badge>...</Badge>. Element opening/closing tags
+	// in the inner content are stripped (length-preserving) before the regex
+	// runs, so `<Pluralize count={n} singular="pax"/>` does NOT match — its
+	// `{n} singular` lives inside a tag, not in text content.
+	if (allowed('polish/badge-plural-mismatch')) {
+		for (const block of findElementBlocks(markup, 'Badge')) {
+			if (hasAllowComment(file, block.openIndex, 'badge-plural-mismatch')) continue;
+			const textOnly = stripTags(block.inner);
+			for (const m of textOnly.matchAll(BADGE_PLURAL_INNER_RE)) {
+				const matchText = m[0]!.trim();
+				violations.push({
+					rule: 'polish/badge-plural-mismatch',
+					message: ruleMessage('polish/badge-plural-mismatch', { match: matchText }),
+					line: lineOf(block.innerStart + (m.index ?? 0))
+				});
+			}
+		}
+	}
+
+	// polish/page-header-meta-mixed-variants — when the parent <PageHeader.Meta>
+	// has no `variant` attribute and 2+ chip-like children specify different
+	// variants explicitly, the row reads as inconsistent. If the parent sets a
+	// variant, children inherit via context — treat as conformant.
+	if (allowed('polish/page-header-meta-mixed-variants')) {
+		for (const block of findElementBlocks(markup, 'PageHeader.Meta')) {
+			if (hasAllowComment(file, block.openIndex, 'page-header-meta-mixed-variants')) continue;
+			if (META_PARENT_VARIANT_RE.test(block.openText)) continue;
+			const variants = new Set<string>();
+			for (const m of block.inner.matchAll(META_CHILD_VARIANT_RE)) {
+				const v = m[2];
+				if (v) variants.add(v);
+			}
+			if (variants.size < 2) continue;
+			const sorted = [...variants].sort().join(', ');
+			violations.push({
+				rule: 'polish/page-header-meta-mixed-variants',
+				message: ruleMessage('polish/page-header-meta-mixed-variants', { variants: sorted }),
+				line: lineOf(block.openIndex)
+			});
+		}
+	}
+
+	// polish/raw-ref-id-needs-wrap — RFE-style tokens (BA-3490221) outside a
+	// <RefId>...</RefId> wrap. Script/style blocks are already stripped by
+	// `stripBlocks` in the caller. Matches inside element opening tags
+	// (attributes) are skipped via a lookbehind: a match preceded by `=`,
+	// quote, or attribute-name character is treated as part of an attribute.
+	if (allowed('polish/raw-ref-id-needs-wrap')) {
+		const refBlocks = findElementBlocks(markup, 'RefId');
+		const isInsideRefId = (idx: number): boolean =>
+			refBlocks.some((b) => idx >= b.innerStart && idx < b.innerEnd);
+		for (const m of markup.matchAll(RAW_REF_ID_RE)) {
+			const matchIdx = m.index ?? 0;
+			if (hasAllowComment(file, matchIdx, 'raw-ref-id-needs-wrap')) continue;
+			if (isInsideRefId(matchIdx)) continue;
+			// Skip matches inside an opening tag (attribute values, names, etc.).
+			const lastOpen = markup.lastIndexOf('<', matchIdx);
+			const lastClose = markup.lastIndexOf('>', matchIdx);
+			if (lastOpen > lastClose) continue;
+			const matchText = m[0]!;
+			violations.push({
+				rule: 'polish/raw-ref-id-needs-wrap',
+				message: ruleMessage('polish/raw-ref-id-needs-wrap', { match: matchText }),
+				line: lineOf(matchIdx)
 			});
 		}
 	}

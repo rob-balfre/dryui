@@ -1242,6 +1242,144 @@ describe('polish/nested-radius-mismatch', () => {
 	});
 });
 
+describe('polish/badge-plural-mismatch', () => {
+	test('flags interpolated count followed by a bare word', () => {
+		const violations = checkMarkup('<Badge>{count} guests</Badge>');
+		const polish = violations.filter((v) => v.rule === 'polish/badge-plural-mismatch');
+		expect(polish).toHaveLength(1);
+		expect(polish[0]!.message).toContain('Pluralize');
+	});
+
+	test('flags inside a Badge with attributes', () => {
+		const violations = checkMarkup('<Badge variant="soft" color="ink">{n} items</Badge>');
+		const polish = violations.filter((v) => v.rule === 'polish/badge-plural-mismatch');
+		expect(polish).toHaveLength(1);
+	});
+
+	test('does not flag Badge wrapping a Pluralize primitive', () => {
+		const code = '<Badge><Pluralize count={n} singular="pax" plural="paxes" /></Badge>';
+		const violations = checkMarkup(code);
+		expect(violations.filter((v) => v.rule === 'polish/badge-plural-mismatch')).toHaveLength(0);
+	});
+
+	test('does not flag a single interpolation with no trailing word', () => {
+		const violations = checkMarkup('<Badge>{label}</Badge>');
+		expect(violations.filter((v) => v.rule === 'polish/badge-plural-mismatch')).toHaveLength(0);
+	});
+
+	test('does not flag self-closing Badge', () => {
+		const violations = checkMarkup('<Badge variant="dot" />');
+		expect(violations.filter((v) => v.rule === 'polish/badge-plural-mismatch')).toHaveLength(0);
+	});
+
+	test('respects dryui-allow badge-plural-mismatch', () => {
+		const code = ['<!-- dryui-allow badge-plural-mismatch -->', '<Badge>{n} pax</Badge>'].join(
+			'\n'
+		);
+		const violations = checkMarkup(code);
+		expect(violations.filter((v) => v.rule === 'polish/badge-plural-mismatch')).toHaveLength(0);
+	});
+});
+
+describe('polish/page-header-meta-mixed-variants', () => {
+	test('flags 2+ Badge children with different variants', () => {
+		const code =
+			'<PageHeader.Meta><Badge variant="soft">A</Badge><Badge variant="solid">B</Badge></PageHeader.Meta>';
+		const violations = checkMarkup(code);
+		const polish = violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants');
+		expect(polish).toHaveLength(1);
+		expect(polish[0]!.message).toContain('soft');
+		expect(polish[0]!.message).toContain('solid');
+	});
+
+	test('does not flag uniform variants on children', () => {
+		const code =
+			'<PageHeader.Meta><Badge variant="soft">A</Badge><Badge variant="soft">B</Badge></PageHeader.Meta>';
+		const violations = checkMarkup(code);
+		expect(
+			violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants')
+		).toHaveLength(0);
+	});
+
+	test('does not flag a single Badge child', () => {
+		const code = '<PageHeader.Meta><Badge variant="soft">A</Badge></PageHeader.Meta>';
+		const violations = checkMarkup(code);
+		expect(
+			violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants')
+		).toHaveLength(0);
+	});
+
+	test('does not flag when parent sets variant (children inherit via context)', () => {
+		const code =
+			'<PageHeader.Meta variant="soft"><Badge variant="solid">A</Badge><Badge variant="outline">B</Badge></PageHeader.Meta>';
+		const violations = checkMarkup(code);
+		expect(
+			violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants')
+		).toHaveLength(0);
+	});
+
+	test('also catches mixed variants across Chip / Tag siblings', () => {
+		const code =
+			'<PageHeader.Meta><Chip variant="soft">A</Chip><Tag variant="solid">B</Tag></PageHeader.Meta>';
+		const violations = checkMarkup(code);
+		expect(
+			violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants')
+		).toHaveLength(1);
+	});
+
+	test('respects dryui-allow page-header-meta-mixed-variants', () => {
+		const code = [
+			'<!-- dryui-allow page-header-meta-mixed-variants -->',
+			'<PageHeader.Meta><Badge variant="soft">A</Badge><Badge variant="solid">B</Badge></PageHeader.Meta>'
+		].join('\n');
+		const violations = checkMarkup(code);
+		expect(
+			violations.filter((v) => v.rule === 'polish/page-header-meta-mixed-variants')
+		).toHaveLength(0);
+	});
+});
+
+describe('polish/raw-ref-id-needs-wrap', () => {
+	test('flags a raw RFE-style reference in text content', () => {
+		const violations = checkMarkup('<p>Booking ref BA-3490221 attached.</p>');
+		const polish = violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap');
+		expect(polish).toHaveLength(1);
+		expect(polish[0]!.message).toContain('BA-3490221');
+		expect(polish[0]!.message).toContain('RefId');
+	});
+
+	test('does not flag a reference already wrapped in <RefId>', () => {
+		const violations = checkMarkup('<p>Booking ref <RefId>BA-3490221</RefId> attached.</p>');
+		expect(violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap')).toHaveLength(0);
+	});
+
+	test('does not flag attribute values or template fragments', () => {
+		// In an attribute the token is part of markup, not display text. Skip.
+		const violations = checkMarkup('<a href="/refs/BA-3490221">link</a>');
+		expect(violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap')).toHaveLength(0);
+	});
+
+	test('does not flag short prefixes / digit tails (regex floor)', () => {
+		const violations = checkMarkup('<p>Order A-1234 placed.</p>');
+		expect(violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap')).toHaveLength(0);
+	});
+
+	test('flags multiple distinct refs in the same paragraph', () => {
+		const violations = checkMarkup('<p>Refs BA-3490221 and IATA-99887 differ.</p>');
+		const polish = violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap');
+		expect(polish).toHaveLength(2);
+	});
+
+	test('respects dryui-allow raw-ref-id-needs-wrap', () => {
+		const code = [
+			'<!-- dryui-allow raw-ref-id-needs-wrap -->',
+			'<p>Booking ref BA-3490221 attached.</p>'
+		].join('\n');
+		const violations = checkMarkup(code);
+		expect(violations.filter((v) => v.rule === 'polish/raw-ref-id-needs-wrap')).toHaveLength(0);
+	});
+});
+
 describe('--polish category filter', () => {
 	test('checkSvelteFile with filter=polish skips correctness rules', () => {
 		const code = [

@@ -146,6 +146,44 @@ const HINTS: Record<string, HintBuilder> = {
 	'parse/svelte-parse-error': () => ({
 		hint: 'The Svelte compiler could not parse the file. Fix the syntax first — attribute typos and unclosed tags are the usual cause — then rerun `check`.',
 		docsRef: `${DOCS_BASE}/concepts/troubleshooting#parse-errors`
+	}),
+
+	// ── vision rubric ─────────────────────────────────────────────────────────
+	'vision/chip-wrap': () => ({
+		hint: 'Use Badge with leadingIcon (or PageHeader.Meta with explicit icon slots) so the icon stays inline. A stacked icon means the chip width is too narrow or the label wrapped.',
+		docsRef: `${DOCS_BASE}/components/badge#leading-icon`
+	}),
+	'vision/plural-mismatch': () => ({
+		hint: 'Use Pluralize so the noun agrees with the count. Hard-coded copy like "1 hotels" should be `<Pluralize count={n} singular="hotel" plural="hotels" />`.',
+		docsRef: `${DOCS_BASE}/components/pluralize`
+	}),
+	'vision/variant-mix': () => ({
+		hint: 'Pick one Badge variant per row (all soft, or all outlined, or all solid). Mixed variants in the same chip group read as accidental, not deliberate.',
+		docsRef: `${DOCS_BASE}/components/badge#variants`
+	}),
+	'vision/mid-token-break': () => ({
+		hint: 'Wrap reference IDs in `<RefId>` so the token stays atomic. RefId applies `white-space: nowrap` and a non-breaking-hyphen segmenter so codes like BA-3490221 never break across lines.',
+		docsRef: `${DOCS_BASE}/components/ref-id`
+	}),
+	'vision/low-contrast': () => ({
+		hint: 'Bump the text token to --dry-color-text-strong, or pick a heavier surface token. Run `check <theme.css>` to verify the pair hits WCAG AA (4.5:1 body, 3:1 large).',
+		docsRef: `${DOCS_BASE}/concepts/theming#contrast`
+	}),
+	'vision/alignment': () => ({
+		hint: 'Replace bespoke flex with `display: grid` and explicit `align-items: baseline`. Drift here usually means line-height differences across siblings; pin to the same typography preset.',
+		docsRef: `${DOCS_BASE}/concepts/layout#baseline-alignment`
+	}),
+	'vision/orphan': () => ({
+		hint: 'Use `text-wrap: balance` (headings) or `text-wrap: pretty` (body) so the last line is never a single orphan word. DryUI heading tokens enable balance by default.',
+		docsRef: `${DOCS_BASE}/concepts/typography#wrap-balance`
+	}),
+	'vision/spacing-rhythm': () => ({
+		hint: 'Snap vertical gaps to one --dry-space-* step per region. Mixed `gap` values (e.g. 12px next to 18px) read as broken rhythm.',
+		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
+	}),
+	'vision/parse-error': () => ({
+		hint: 'The vision model returned content that did not parse as JSON. Inspect the raw response in the `evidence` field (usually a transient model hiccup); rerun the check.',
+		docsRef: `${DOCS_BASE}/concepts/troubleshooting#vision-parse-errors`
 	})
 };
 

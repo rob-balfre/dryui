@@ -5,11 +5,11 @@
  * agents running a self-correction loop want a stable, structured record they
  * can key by `code` and feed back into prompts. This is that record.
  *
- * Every `check` source (lint, theme, workspace, parse) produces issues in this
- * shape via {@link enrichDiagnostic}, which attaches a prescriptive `hint` and
- * docs pointer when the `code` is known.
+ * Every `check` source (lint, theme, workspace, parse, vision) produces issues
+ * in this shape via {@link enrichDiagnostic}, which attaches a prescriptive
+ * `hint` and docs pointer when the `code` is known.
  */
-export type DryUiRepairIssueSource = 'lint' | 'theme' | 'workspace' | 'parse';
+export type DryUiRepairIssueSource = 'lint' | 'theme' | 'workspace' | 'parse' | 'vision';
 export type DryUiRepairIssueSeverity = 'error' | 'warning' | 'suggestion' | 'info';
 
 export interface DryUiRepairFix {
@@ -20,7 +20,7 @@ export interface DryUiRepairFix {
 export interface DryUiRepairIssue {
 	/** Which subsystem surfaced this issue. */
 	readonly source: DryUiRepairIssueSource;
-	/** Stable, namespaced code. `lint/<rule>`, `theme/<code>`, `workspace/<rule>`, `parse/<code>`. */
+	/** Stable, namespaced code. `lint/<rule>`, `theme/<code>`, `workspace/<rule>`, `parse/<code>`, `vision/<code>`. */
 	readonly code: string;
 	readonly severity: DryUiRepairIssueSeverity;
 	/** Diagnostic text (what's wrong). */

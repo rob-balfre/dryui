@@ -1434,10 +1434,9 @@
       ],
       "props": {
         "variant": {
-          "signature": "variant: 'solid' | 'outline' | 'soft' | 'dot' | default:'soft' | values:solid|outline|soft|dot",
+          "signature": "variant: 'solid' | 'outline' | 'soft' | 'dot' | values:solid|outline|soft|dot",
           "required": false,
           "bindable": false,
-          "default": "'soft'",
           "values": [
             "solid",
             "outline",
@@ -1447,17 +1446,15 @@
           "description": "Badge treatment ranging from filled emphasis to subtle outline styles."
         },
         "color": {
-          "signature": "color: AliasableColor | default:'gray'",
+          "signature": "color: AliasableColor",
           "required": false,
           "bindable": false,
-          "default": "'gray'",
           "description": "Semantic tone applied to the badge background, border, or text treatment."
         },
         "size": {
-          "signature": "size: 'sm' | 'md' | default:'sm' | values:sm|md",
+          "signature": "size: 'sm' | 'md' | values:sm|md",
           "required": false,
           "bindable": false,
-          "default": "'sm'",
           "values": [
             "sm",
             "md"
@@ -11975,6 +11972,46 @@
               "required": true,
               "bindable": false,
               "description": "Content rendered inside the component."
+            },
+            "variant": {
+              "signature": "variant: 'solid' | 'outline' | 'soft' | values:solid|outline|soft",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "solid",
+                "outline",
+                "soft"
+              ],
+              "description": "Visual style preset for the component."
+            },
+            "color": {
+              "signature": "color: | 'gray'\n\t| 'blue'\n\t| 'red'\n\t| 'green'\n\t| 'yellow'\n\t| 'purple'\n\t| 'orange'\n\t| 'info'\n\t| 'success'\n\t| 'warning'\n\t| 'danger' | values:gray|blue|red|green|yellow|purple|orange|info|success|warning|danger",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "gray",
+                "blue",
+                "red",
+                "green",
+                "yellow",
+                "purple",
+                "orange",
+                "info",
+                "success",
+                "warning",
+                "danger"
+              ],
+              "description": "Semantic color or tone applied to the component."
+            },
+            "size": {
+              "signature": "size: 'sm' | 'md' | values:sm|md",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "sm",
+                "md"
+              ],
+              "description": "Size preset affecting density, spacing, or typography."
             }
           },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."

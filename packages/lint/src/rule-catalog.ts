@@ -403,6 +403,32 @@ export const RULE_CATALOG = {
 		severity: 'suggestion',
 		suggestedFix: 'Replace with <Image src="..." alt="..." />. Run: ask --scope component "Image".',
 		category: 'polish'
+	},
+	'polish/badge-plural-mismatch': {
+		id: 'polish/badge-plural-mismatch',
+		message:
+			'Badge text "{match}" risks plural mismatch. Use <Pluralize count={...} singular="..." plural="..." /> from @dryui/primitives.',
+		severity: 'warning',
+		suggestedFix:
+			'Replace "{count} word" with <Pluralize count={count} singular="word" plural="words" />',
+		category: 'polish'
+	},
+	'polish/page-header-meta-mixed-variants': {
+		id: 'polish/page-header-meta-mixed-variants',
+		message:
+			'PageHeader.Meta children mix variants ({variants}). Set variant on PageHeader.Meta itself (it propagates via context) or unify all chips.',
+		severity: 'warning',
+		suggestedFix:
+			'Move variant to <PageHeader.Meta variant="..."> or pick one variant for all child Badges.',
+		category: 'polish'
+	},
+	'polish/raw-ref-id-needs-wrap': {
+		id: 'polish/raw-ref-id-needs-wrap',
+		message:
+			'Reference ID "{match}" can break mid-token. Wrap in <RefId> from @dryui/primitives for nowrap + tabular-nums.',
+		severity: 'suggestion',
+		suggestedFix: 'Wrap in <RefId>{value}</RefId>',
+		category: 'polish'
 	}
 } as const satisfies Record<string, RuleCatalogEntry>;
 

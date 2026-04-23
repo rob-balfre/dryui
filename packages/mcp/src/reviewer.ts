@@ -685,6 +685,28 @@ function isComplexLayoutContext(styles: string): boolean {
 	if (/flex-wrap\s*:/.test(styles) && /\border\s*:/.test(styles)) return true;
 	if (/flex-basis\s*:[^;]*calc\s*\(/.test(styles)) return true;
 
+	// Selector-level carve-out: ChipGroup.Root and any element marked with
+	// `data-chip-group` is the sanctioned home for flex-wrap chip flow. Mirrors
+	// the same exemption in `@dryui/lint`'s `dryui/no-flex` rule.
+	if (/\[data-chip-group(?:[=\]~|^$*])/i.test(styles)) return true;
+
+	// Per-declaration opt-out: `/* dryui-allow flex */` on the line immediately
+	// preceding `display: flex` or `flex-wrap`. Mirrors the lint rule semantics
+	// so a single comment silences both surfaces.
+	if (hasFlexAllowComment(styles)) return true;
+
+	return false;
+}
+
+function hasFlexAllowComment(styles: string): boolean {
+	const lines = styles.split('\n');
+	for (let i = 1; i < lines.length; i++) {
+		const line = lines[i] ?? '';
+		if (/display:\s*(?:inline-)?flex|flex-wrap\s*:/.test(line)) {
+			const prev = lines[i - 1] ?? '';
+			if (prev.includes('dryui-allow flex')) return true;
+		}
+	}
 	return false;
 }
 

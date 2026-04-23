@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { variantAttrs } from '@dryui/primitives';
+	import { getPageHeaderMetaCtx } from '@dryui/primitives/page-header';
 	import { resolveAlias } from '../internal/color-aliases.js';
 	import type { BadgeColor } from './index.js';
 
@@ -21,9 +22,9 @@
 	}
 
 	let {
-		variant = 'soft',
-		color = 'gray',
-		size = 'sm',
+		variant: variantProp,
+		color: colorProp,
+		size: sizeProp,
 		class: className,
 		children,
 		pulse,
@@ -31,43 +32,42 @@
 		numeric = false,
 		...rest
 	}: Props = $props();
+
+	const ctx = getPageHeaderMetaCtx();
+	const variant = $derived(variantProp ?? ctx?.variant ?? 'soft');
+	const color = $derived<BadgeColor>(colorProp ?? ctx?.color ?? 'gray');
+	const size = $derived(sizeProp ?? ctx?.size ?? 'sm');
 	const resolvedColor = $derived(resolveAlias(color, 'gray'));
 	const isDot = $derived(variant === 'dot');
 	const hasIcon = $derived(!!icon && !isDot);
 </script>
 
-<span data-wrapper>
-	<span
-		class={className}
-		data-badge={isDot ? undefined : ''}
-		data-dot={isDot ? '' : undefined}
-		data-numeric={numeric && !isDot ? 'true' : undefined}
-		{...variantAttrs({
-			variant: isDot ? undefined : variant,
-			color: resolvedColor,
-			size: isDot ? undefined : size,
-			'data-icon-only': hasIcon ? '' : undefined,
-			'data-pulse': pulse ? '' : undefined
-		})}
-		{...rest}
-	>
-		{#if isDot}
-			<!-- dot variant renders no content -->
-		{:else if icon}
-			{@render icon()}
-		{:else if children}
-			{@render children()}
-		{/if}
-	</span>
+<span
+	class={className}
+	data-badge={isDot ? undefined : ''}
+	data-dot={isDot ? '' : undefined}
+	data-numeric={numeric && !isDot ? 'true' : undefined}
+	{...variantAttrs({
+		variant: isDot ? undefined : variant,
+		color: resolvedColor,
+		size: isDot ? undefined : size,
+		'data-icon-only': hasIcon ? '' : undefined,
+		'data-pulse': pulse ? '' : undefined
+	})}
+	{...rest}
+>
+	{#if isDot}
+		<!-- dot variant renders no content -->
+	{:else if icon}
+		{@render icon()}
+	{:else if children}
+		{@render children()}
+	{/if}
 </span>
 
 <style>
-	[data-wrapper] {
-		display: inline-grid;
-		justify-self: start;
-	}
-
 	[data-badge] {
+		justify-self: start;
 		/* Component tokens (Tier 3) */
 		--_badge-bg-default: var(--dry-color-fill);
 		--_badge-color-default: var(--dry-color-text-weak);
@@ -85,7 +85,9 @@
 		--_badge-radius: var(--dry-badge-radius, var(--_badge-radius-default));
 
 		display: inline-grid;
-		place-items: center;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: var(--dry-space-1);
 		padding: var(--_badge-padding-y) var(--_badge-padding-x);
 		font-size: var(--_badge-font-size);
 		font-family: var(--dry-font-sans);

@@ -20,6 +20,10 @@ export function hasFlag(args: readonly string[], name: string): boolean {
 }
 
 export function getFlag(args: readonly string[], name: string): string | undefined {
+	const eqPrefix = `${name}=`;
+	for (const arg of args) {
+		if (arg.startsWith(eqPrefix)) return arg.slice(eqPrefix.length);
+	}
 	const index = args.indexOf(name);
 	if (index === -1) return undefined;
 	return args[index + 1];

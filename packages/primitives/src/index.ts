@@ -650,6 +650,12 @@ export type { FormatDateProps } from './format-date/index.js';
 export { FormatNumber } from './format-number/index.js';
 export type { FormatNumberProps } from './format-number/index.js';
 
+export { Pluralize } from './pluralize/index.js';
+export type { PluralizeProps } from './pluralize/index.js';
+
+export { RefId } from './ref-id/index.js';
+export type { RefIdProps } from './ref-id/index.js';
+
 export { HoverCard } from './hover-card/index.js';
 export type {
 	HoverCardRootProps,

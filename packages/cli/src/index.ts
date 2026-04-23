@@ -8,6 +8,7 @@ import { detectProject } from '@dryui/mcp/project-planner';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
+import { runCheckVision } from './commands/check-vision.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
 import { runInfo } from './commands/info.js';
@@ -76,6 +77,8 @@ Commands:
   prompt --component <name>     Generate task-specific implementation prompt context
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
+  check-vision <url> [--viewport=<wxh>] [--wait-for=<sel>] [--api-key=<key>]
+                                Screenshot a URL and have Claude critique it
   ambient                       Print compact session context (for SessionStart hooks)
   install-hook [--global] [--dry-run]
                                 Wire \`dryui ambient\` into Claude Code settings.json
@@ -160,6 +163,9 @@ async function main(): Promise<void> {
 			break;
 		case 'tokens':
 			runTokens(commandArgs);
+			break;
+		case 'check-vision':
+			await runCheckVision(commandArgs);
 			break;
 		case 'ambient':
 			emitAmbient();
