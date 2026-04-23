@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@dryui/feedback-server": "^0.8.2",
-    "@dryui/mcp": "^2.6.1",
+    "@dryui/mcp": "^2.6.2",
     "playwright": "^1.59.1"
   },
   "devDependencies": {
