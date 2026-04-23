@@ -23,14 +23,16 @@
     "dryui": "./dist/index.js"
   },
   "scripts": {
-    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node",
+    "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node --external playwright --external @anthropic-ai/sdk",
     "check:publint": "publint",
     "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.90.0",
     "@dryui/feedback-server": "^0.8.0",
-    "@dryui/mcp": "^2.4.0"
+    "@dryui/mcp": "^2.4.0",
+    "playwright": "^1.59.1"
   },
   "devDependencies": {
     "@types/node": "^25.6.0",

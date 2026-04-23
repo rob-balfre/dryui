@@ -667,7 +667,17 @@ Example: <Hero.Root>
 Page-level header with eyebrow, title, description, metadata, and actions.
 Import: @dryui/primitives
 Parts: Root, Content, Actions, Eyebrow, Title, Description, Meta
-Props: Root: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | Actions: children (Snippet), Content rendered inside the component. | Eyebrow: children (Snippet), Content rendered inside the component., required | Title: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | children (Snippet), Content rendered inside the component., required | Description: children (Snippet), Content rendered inside the component., required | Meta: children (Snippet), Content rendered inside the component., required
+Props: Root: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | Actions: children (Snippet), Content rendered inside the component. | Eyebrow: children (Snippet), Content rendered inside the component., required | Title: level (1 | 2 | 3 | 4 | 5 | 6), Semantic heading level to render., accepted 1, 2, 3, 4, 5, 6, default 2 | children (Snippet), Content rendered inside the component., required | Description: children (Snippet), Content rendered inside the component., required | Meta: children (Snippet), Content rendered inside the component., required | variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft | color (| 'gray'
+	| 'blue'
+	| 'red'
+	| 'green'
+	| 'yellow'
+	| 'purple'
+	| 'orange'
+	| 'info'
+	| 'success'
+	| 'warning'
+	| 'danger'), Semantic color or tone applied to the component., accepted gray, blue, red, green, yellow, purple, orange, info, success, warning, danger | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md
 Data attributes: data-level | data-page-header | data-page-header-actions | data-page-header-content | data-page-header-description | data-page-header-eyebrow | data-page-header-meta | data-page-header-title
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <PageHeader.Root>
@@ -1043,8 +1053,8 @@ Example: <Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />
 Small status indicator label.
 Import: @dryui/ui
 Subpath import: @dryui/ui/badge
-Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
-Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant | data-wrapper
+Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment. | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
+Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Badge variant="soft">Active</Badge>
 

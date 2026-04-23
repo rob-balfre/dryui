@@ -1,6 +1,7 @@
 /* Headless export for external consumers; no UI wrapper by design. */
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
+import type { PageHeaderMetaColor } from './meta-context.js';
 
 export interface PageHeaderRootProps extends HTMLAttributes<HTMLElement> {
 	children: Snippet;
@@ -29,7 +30,13 @@ export interface PageHeaderDescriptionProps extends HTMLAttributes<HTMLParagraph
 
 export interface PageHeaderMetaProps extends HTMLAttributes<HTMLDivElement> {
 	children: Snippet;
+	variant?: 'solid' | 'outline' | 'soft';
+	color?: PageHeaderMetaColor;
+	size?: 'sm' | 'md';
 }
+
+export { getPageHeaderMetaCtx } from './meta-context.js';
+export type { PageHeaderMetaContext, PageHeaderMetaColor } from './meta-context.js';
 
 import PageHeaderRoot from './page-header-root.svelte';
 import PageHeaderContent from './page-header-content.svelte';

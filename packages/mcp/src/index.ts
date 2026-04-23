@@ -6,6 +6,7 @@ import { z } from 'zod';
 import type { Spec } from './spec-types.js';
 import { runAsk, type AskScope, type AskListKind } from './tools/ask.js';
 import { runCheck, runCheckStructured } from './tools/check.js';
+import { runVisionCheck } from './tools/check-vision.js';
 import { toolErrorResponse } from './tools/tool-error.js';
 
 const require = createRequire(import.meta.url);
@@ -159,6 +160,76 @@ server.tool(
 				content: [
 					{ type: 'text', text: result.text },
 					{ type: 'text', text: `\`\`\`json dryui-diagnostics\n${diagnosticsJson}\n\`\`\`` }
+				]
+			};
+		} catch (error) {
+			return toolErrorResponse(error);
+		}
+	}
+);
+
+const CHECK_VISION_DESC = [
+	'Render a URL in headless Chromium, screenshot it, and have a Claude vision pass critique it ',
+	'against a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, ',
+	'alignment, orphan, spacing rhythm). Returns TOON findings table + JSON block.\n\n',
+	'Use when the static `check` tool passes but the rendered page still looks off. The static ',
+	'linter cannot see runtime issues like wrapped chips, mismatched plurals, or broken contrast ',
+	'on dark glass; this tool fills that gap.\n\n',
+	'Requires ANTHROPIC_API_KEY in the environment (or pass `apiKey`). The headless browser is ',
+	'launched per call; expect 5-15 seconds end-to-end for a typical page.'
+].join('');
+
+server.tool(
+	'check-vision',
+	CHECK_VISION_DESC,
+	{
+		url: z
+			.string()
+			.describe('Absolute http(s) URL to screenshot. Use a running dev server or public URL.'),
+		viewport: z
+			.string()
+			.optional()
+			.describe('Viewport size as `<width>x<height>`. Defaults to 1440x900.'),
+		extraRubric: z
+			.string()
+			.optional()
+			.describe('Optional addendum appended to the user message; e.g. "focus on the hero region".'),
+		waitFor: z
+			.string()
+			.optional()
+			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).'),
+		apiKey: z
+			.string()
+			.optional()
+			.describe(
+				'Override the ANTHROPIC_API_KEY env var. Prefer the env var; only use this for one-off testing.'
+			)
+	},
+	async ({ url, viewport, extraRubric, waitFor, apiKey }) => {
+		try {
+			const result = await runVisionCheck(
+				{
+					url,
+					...(viewport ? { viewport } : {}),
+					...(extraRubric ? { extraRubric } : {}),
+					...(waitFor ? { waitFor } : {})
+				},
+				apiKey ? { apiKey } : {}
+			);
+			const diagnosticsJson = JSON.stringify(
+				{
+					summary: result.summary,
+					screenshotPath: result.screenshotPath,
+					findings: result.findings,
+					diagnostics: result.diagnostics
+				},
+				null,
+				2
+			);
+			return {
+				content: [
+					{ type: 'text', text: result.text },
+					{ type: 'text', text: `\`\`\`json dryui-vision\n${diagnosticsJson}\n\`\`\`` }
 				]
 			};
 		} catch (error) {
