@@ -6,12 +6,14 @@
  * that the sequential pipeline repeated 3-4x.
  *
  * Usage:  bun run scripts/validate.ts
- *         bun run scripts/validate.ts --no-test   (skip browser tests)
+ *         bun run scripts/validate.ts --no-test                  (skip browser tests)
+ *         bun run scripts/validate.ts --skip-publish-hygiene     (skip publish-hygiene)
  */
 
 const root = new URL('../', import.meta.url).pathname;
 const start = performance.now();
 const skipTests = process.argv.includes('--no-test');
+const skipPublishHygiene = process.argv.includes('--skip-publish-hygiene');
 
 async function gitStatus(): Promise<string> {
 	const proc = Bun.spawn(['git', 'status', '--porcelain'], {
@@ -152,7 +154,11 @@ await run('check:docs:llms', 'bun run check:docs:llms');
 // never hit it during a release.
 
 console.log('\n── Phase 6: publish-hygiene ──');
-await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --swap');
+if (skipPublishHygiene) {
+	console.log('publish-hygiene skipped');
+} else {
+	await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --swap');
+}
 
 // ── Phase 7: Benchmark smoke lane ───────────────────────────────────────────
 // No LLM calls — only validates task manifests and runs the deterministic

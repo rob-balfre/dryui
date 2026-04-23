@@ -55,7 +55,7 @@
     "format:check": "prettier --check .",
     "publish:packages": "bun scripts/publish-packages.ts",
     "release:ci": "bun run scripts/release-ci.ts",
-    "release:gate": "bun run validate --no-test",
+    "release:gate": "bun run validate --no-test --skip-publish-hygiene",
     "release": "bun run release:gate && bun run version && bun run publish:packages",
     "vm": "bun run ./scripts/vm.ts",
     "vm:exec": "bun run ./scripts/vm-exec.ts",

@@ -33,7 +33,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports, type ExportSwapBackup } from './lib/export-swap.ts';
 import { verifyPackageDist, formatIssues, type VerifyIssue } from './lib/verify-dist.ts';
-import { checkPackage as checkPublishHygiene } from './check-publish-hygiene.ts';
+import { checkPackages as checkPublishHygiene } from './check-publish-hygiene.ts';
 
 const dryRun = process.argv.includes('--dry-run');
 const skipBuild = process.argv.includes('--skip-build');
@@ -46,6 +46,7 @@ for (const entry of readdirSync(packagesDir)) {
 	const pkgJson = resolve(packagesDir, entry, 'package.json');
 	if (existsSync(pkgJson)) pkgPaths.push(pkgJson);
 }
+const publishablePkgPaths = pkgPaths.filter((pkgPath) => isPublishable(pkgPath));
 
 function isPublishable(pkgPath: string): boolean {
 	const pkg = JSON.parse(readFileSync(pkgPath, 'utf8')) as Record<string, unknown>;
@@ -72,8 +73,7 @@ if (skipBuild) {
 
 console.log('publish-packages: verifying dist for every publishable package (pre-swap)…');
 const preflightIssues: VerifyIssue[] = [];
-for (const pkgPath of pkgPaths) {
-	if (!isPublishable(pkgPath)) continue;
+for (const pkgPath of publishablePkgPaths) {
 	preflightIssues.push(...verifyPackageDist(pkgPath));
 }
 
@@ -119,6 +119,8 @@ for (const pkgPath of swapped) {
 
 // ─── Step 4: publish (with finally-bound restore) ───────────────────────────
 
+let exitCode = 0;
+
 try {
 	// Post-swap sanity check: the swap rewrites publishConfig.exports into the
 	// top level, which changes the set of paths we verify. Catch the case where
@@ -126,8 +128,7 @@ try {
 	// declared in publishConfig are missing.
 	console.log('publish-packages: verifying dist for every publishable package (post-swap)…');
 	const postSwapIssues: VerifyIssue[] = [];
-	for (const pkgPath of pkgPaths) {
-		if (!isPublishable(pkgPath)) continue;
+	for (const pkgPath of publishablePkgPaths) {
 		postSwapIssues.push(...verifyPackageDist(pkgPath));
 	}
 
@@ -136,44 +137,55 @@ try {
 			`publish-packages: ${postSwapIssues.length} post-swap dist issue(s) detected — aborting before publish`
 		);
 		console.error(formatIssues(postSwapIssues, repoRoot));
-		process.exit(1);
+		exitCode = 1;
 	}
-	console.log('publish-packages: post-swap dist verification passed');
 
-	// ─── Step 4b: publish-hygiene gate (publint + attw) ────────────────────────
-	// Runs against the post-swap package.json so the validators see exactly
-	// the shape npm will publish. Catches dist/exports drift, stale types,
-	// and ESM/CJS resolution problems before the tarball goes public.
-	console.log('publish-packages: running publint + attw on every publishable package…');
-	const hygieneFailures: string[] = [];
-	for (const pkgPath of pkgPaths) {
-		if (!isPublishable(pkgPath)) continue;
-		const result = checkPublishHygiene(pkgPath);
-		if (!result.ok) hygieneFailures.push(...result.failures);
-	}
-	if (hygieneFailures.length > 0) {
-		console.error(
-			`publish-packages: ${hygieneFailures.length} publish-hygiene failure(s) — aborting before publish`
-		);
-		for (const failure of hygieneFailures) {
-			console.error(failure);
-			console.error('---');
-		}
-		process.exit(1);
-	}
-	console.log('publish-packages: publish-hygiene check passed');
+	if (exitCode === 0) {
+		console.log('publish-packages: post-swap dist verification passed');
 
-	if (dryRun) {
-		console.log('publish-packages: --dry-run set, skipping changeset publish');
-	} else {
-		execSync('bun x changeset publish', {
-			cwd: repoRoot,
-			stdio: 'inherit'
+		// ─── Step 4b: publish-hygiene gate (publint + attw) ────────────────────────
+		// Runs against the post-swap package.json so the validators see exactly
+		// the shape npm will publish. Catches dist/exports drift, stale types,
+		// and ESM/CJS resolution problems before the tarball goes public.
+		console.log('publish-packages: running publint + attw on every publishable package…');
+		const hygiene = await checkPublishHygiene(publishablePkgPaths, {
+			onResult: (result) => {
+				console.log(
+					`publish-packages: ${result.name} publish-hygiene ${result.ok ? 'ok' : 'FAIL'}`
+				);
+			}
 		});
+		if (!hygiene.ok) {
+			console.error(
+				`publish-packages: ${hygiene.failures.length} publish-hygiene failure(s) — aborting before publish`
+			);
+			for (const failure of hygiene.failures) {
+				console.error(failure);
+				console.error('---');
+			}
+			exitCode = 1;
+		}
+	}
+
+	if (exitCode === 0) {
+		console.log('publish-packages: publish-hygiene check passed');
+
+		if (dryRun) {
+			console.log('publish-packages: --dry-run set, skipping changeset publish');
+		} else {
+			execSync('bun x changeset publish', {
+				cwd: repoRoot,
+				stdio: 'inherit'
+			});
+		}
 	}
 } finally {
 	for (const { pkgPath, backup } of backups) {
 		restoreExports(pkgPath, backup);
 	}
 	console.log('publish-packages: restored all package.json files');
+}
+
+if (exitCode !== 0) {
+	process.exit(exitCode);
 }

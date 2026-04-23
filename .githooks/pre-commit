@@ -10,20 +10,23 @@ if echo "$STAGED" | grep -qE '^packages/(primitives|ui)/src/'; then
   echo "[pre-commit] Component sources changed — regenerating spec/contract..."
 
   bun run --filter '@dryui/mcp' generate-spec && \
+  bun run --filter '@dryui/mcp' generate-architecture && \
   bun run --filter '@dryui/mcp' generate-contract && \
   bun run --filter '@dryui/mcp' generate-agent-contract && \
   bun run --filter '@dryui/mcp' generate-llms
 
   git add packages/mcp/src/spec.json \
+          packages/mcp/src/architecture.json \
           packages/mcp/src/contract.v1.json \
           packages/mcp/src/contract.v1.schema.json \
           packages/mcp/src/agent-contract.v1.json \
           packages/mcp/src/agent-contract.v1.schema.json \
           llms.txt \
           apps/docs/static/llms.txt \
-          apps/docs/static/llms-components.txt
+          apps/docs/static/llms-components.txt \
+          apps/docs/src/lib/generated/component-pages.json
 
-  echo "[pre-commit] Spec/contract files regenerated and staged."
+  echo "[pre-commit] Spec/contract/docs files regenerated and staged."
 fi
 
 # Regenerate theme-tokens.generated.json if UI theme CSS changed. The

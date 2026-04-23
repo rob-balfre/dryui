@@ -20,7 +20,7 @@
 
 import { readdirSync, existsSync, readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports, type ExportSwapBackup } from './lib/export-swap.ts';
 
@@ -50,6 +50,28 @@ function run(cmd: string, args: string[], cwd: string): { ok: boolean; output: s
 	return { ok: res.status === 0, output };
 }
 
+function runAsync(
+	cmd: string,
+	args: string[],
+	cwd: string
+): Promise<{ ok: boolean; output: string }> {
+	return new Promise((resolve) => {
+		const child = spawn(cmd, args, {
+			cwd,
+			stdio: ['ignore', 'pipe', 'pipe']
+		});
+		const chunks: Buffer[] = [];
+		child.stdout.on('data', (chunk: Buffer) => chunks.push(chunk));
+		child.stderr.on('data', (chunk: Buffer) => chunks.push(chunk));
+		child.on('error', (err) => {
+			resolve({ ok: false, output: String(err) });
+		});
+		child.on('close', (code) => {
+			resolve({ ok: code === 0, output: Buffer.concat(chunks).toString('utf8') });
+		});
+	});
+}
+
 export function checkPackage(pkgPath: string): { ok: boolean; failures: string[] } {
 	const dir = dirname(pkgPath);
 	const failures: string[] = [];
@@ -67,6 +89,86 @@ export function checkPackage(pkgPath: string): { ok: boolean; failures: string[]
 	return { ok: failures.length === 0, failures };
 }
 
+export interface PackageHygieneResult {
+	pkgPath: string;
+	name: string;
+	ok: boolean;
+	failures: string[];
+}
+
+export interface PackageHygieneSummary {
+	ok: boolean;
+	failures: string[];
+	results: PackageHygieneResult[];
+}
+
+interface CheckPackagesOptions {
+	concurrency?: number;
+	onResult?: (result: PackageHygieneResult) => void;
+}
+
+async function checkPackageAsync(pkgPath: string): Promise<PackageHygieneResult> {
+	const dir = dirname(pkgPath);
+	const name = pkgName(pkgPath);
+	const failures: string[] = [];
+
+	const publint = await runAsync('bunx', ['publint'], dir);
+	if (!publint.ok) {
+		failures.push(`publint failed for ${name}:\n${publint.output}`);
+	}
+
+	const attw = await runAsync(
+		'bunx',
+		['attw', '--pack', '.', '--ignore-rules', ...ATTW_IGNORE],
+		dir
+	);
+	if (!attw.ok) {
+		failures.push(`attw failed for ${name}:\n${attw.output}`);
+	}
+
+	return { pkgPath, name, ok: failures.length === 0, failures };
+}
+
+function defaultConcurrency(packageCount: number): number {
+	const fromEnv = Number(process.env.DRYUI_PUBLISH_HYGIENE_CONCURRENCY);
+	const requested = Number.isFinite(fromEnv) && fromEnv > 0 ? Math.floor(fromEnv) : 3;
+	return Math.max(1, Math.min(packageCount, requested));
+}
+
+async function mapLimit<T, R>(
+	items: T[],
+	limit: number,
+	worker: (item: T, index: number) => Promise<R>
+): Promise<R[]> {
+	const results = new Array<R>(items.length);
+	let next = 0;
+
+	async function runNext(): Promise<void> {
+		while (next < items.length) {
+			const index = next;
+			next += 1;
+			results[index] = await worker(items[index]!, index);
+		}
+	}
+
+	await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => runNext()));
+	return results;
+}
+
+export async function checkPackages(
+	pkgPaths: string[],
+	options: CheckPackagesOptions = {}
+): Promise<PackageHygieneSummary> {
+	const concurrency = options.concurrency ?? defaultConcurrency(pkgPaths.length);
+	const results = await mapLimit(pkgPaths, concurrency, async (pkgPath) => {
+		const result = await checkPackageAsync(pkgPath);
+		options.onResult?.(result);
+		return result;
+	});
+	const failures = results.flatMap((result) => result.failures);
+	return { ok: failures.length === 0, failures, results };
+}
+
 async function main() {
 	const swap = process.argv.includes('--swap');
 	const pkgPaths: string[] = [];
@@ -76,25 +178,18 @@ async function main() {
 	}
 
 	const backups: Array<{ pkgPath: string; backup: ExportSwapBackup }> = [];
-	let allOk = true;
-	const allFailures: string[] = [];
+	let summary: PackageHygieneSummary = { ok: true, failures: [], results: [] };
 	try {
 		if (swap) {
 			for (const pkgPath of pkgPaths) {
 				backups.push({ pkgPath, backup: swapExportsForPublish(pkgPath, { silent: true }) });
 			}
 		}
-		for (const pkgPath of pkgPaths) {
-			process.stdout.write(`check-publish-hygiene: ${pkgName(pkgPath)} `);
-			const result = checkPackage(pkgPath);
-			if (result.ok) {
-				process.stdout.write('ok\n');
-			} else {
-				process.stdout.write('FAIL\n');
-				allOk = false;
-				allFailures.push(...result.failures);
+		summary = await checkPackages(pkgPaths, {
+			onResult: (result) => {
+				console.log(`check-publish-hygiene: ${result.name} ${result.ok ? 'ok' : 'FAIL'}`);
 			}
-		}
+		});
 	} finally {
 		if (swap) {
 			for (const { pkgPath, backup } of backups) {
@@ -103,9 +198,9 @@ async function main() {
 		}
 	}
 
-	if (!allOk) {
+	if (!summary.ok) {
 		console.error('\ncheck-publish-hygiene: failures detected\n');
-		for (const failure of allFailures) {
+		for (const failure of summary.failures) {
 			console.error(failure);
 			console.error('---');
 		}
