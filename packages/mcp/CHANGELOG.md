@@ -1,5 +1,11 @@
 # @dryui/mcp
 
+## 2.6.1
+
+### Patch Changes
+
+- [`80e6c0f`](https://github.com/rob-balfre/dryui/commit/80e6c0fc2b725272caac83241197c9607aa0a755) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Route `check-vision` through the Codex CLI instead of an Anthropic API key path, fix the reviewer output schema for structured responses, and update the CLI, MCP, and changelog messaging to match the Codex-based flow.
+
 ## 2.6.0
 
 ### Minor Changes
