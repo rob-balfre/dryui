@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.18.2
+
+### Patch Changes
+
+- [`4a34691`](https://github.com/rob-balfre/dryui/commit/4a34691404b9286face5e81ea59f757ff976c2be) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Rebuild the bundled `dryui check-vision` command against the MCP visual rubric that flags cramped headers and packed chip/meta rows.
+
 ## 0.18.1
 
 ### Patch Changes
