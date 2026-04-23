@@ -68,3 +68,7 @@ reports/benchmarks/latest.json
 reports/benchmarks/latest.md
 reports/benchmarks/history/*.jsonl
 !reports/benchmarks/history/.gitkeep
+
+# E2E harness outputs — tarballs are per-run and logs are throwaway artifacts.
+reports/e2e-tarballs/
+reports/e2e-runs/
