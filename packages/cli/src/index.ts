@@ -77,8 +77,8 @@ Commands:
   prompt --component <name>     Generate task-specific implementation prompt context
   tokens [--category <cat>] [--text]
                                 List --dry-* CSS design tokens
-  check-vision <url> [--viewport=<wxh>] [--wait-for=<sel>] [--api-key=<key>]
-                                Screenshot a URL and have Claude critique it
+  check-vision <url> [--viewport=<wxh>] [--wait-for=<sel>]
+                                Screenshot a URL and have Codex CLI critique it
   ambient                       Print compact session context (for SessionStart hooks)
   install-hook [--global] [--dry-run]
                                 Wire \`dryui ambient\` into Claude Code settings.json

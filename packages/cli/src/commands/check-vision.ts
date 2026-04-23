@@ -1,6 +1,6 @@
-// dryui check-vision <url> — Render a URL and have Claude critique the screenshot.
+// dryui check-vision <url> — Render a URL and have Codex critique the screenshot.
 
-import { runVisionCheck } from '@dryui/mcp/check-vision';
+import { runVisionCheck } from '../../../mcp/src/tools/check-vision.js';
 import {
 	commandError,
 	emitCommandResult,
@@ -26,19 +26,17 @@ function isStructuredToolError(
 function help(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage:
-				'dryui check-vision <url> [--viewport=<wxh>] [--wait-for=<selector>] [--api-key=<key>]',
+			usage: 'dryui check-vision <url> [--viewport=<wxh>] [--wait-for=<selector>]',
 			description: [
-				'Render <url> in headless Chromium and have Claude critique the screenshot',
+				'Render <url> in headless Chromium and have Codex CLI critique the screenshot',
 				'against the DryUI taste rubric (chip wrap, plural mismatch, variant mix,',
 				'mid-token break, contrast, alignment, orphan, spacing rhythm).',
 				'',
-				'Requires ANTHROPIC_API_KEY in the environment, or pass --api-key.'
+				'Requires the Codex CLI on PATH and an authenticated Codex session.'
 			],
 			options: [
 				'  --viewport=<wxh>     Viewport size (default 1440x900)',
 				'  --wait-for=<sel>     CSS selector to wait for before screenshotting',
-				'  --api-key=<key>      Anthropic API key (overrides ANTHROPIC_API_KEY)',
 				'  --extra-rubric=<s>   Extra emphasis appended to the user message',
 				'  --text               Plain text output (default is TOON)',
 				'  --json               Emit JSON instead of TOON'
@@ -71,21 +69,15 @@ export async function runCheckVision(args: string[]): Promise<void> {
 	const mode = resolveMode(args);
 	const viewport = getFlag(args, '--viewport');
 	const waitFor = getFlag(args, '--wait-for');
-	const apiKey = getFlag(args, '--api-key');
 	const extraRubric = getFlag(args, '--extra-rubric');
 
 	try {
-		const result = await runVisionCheck(
-			{
-				url,
-				...(viewport ? { viewport } : {}),
-				...(waitFor ? { waitFor } : {}),
-				...(extraRubric ? { extraRubric } : {})
-			},
-			{
-				...(apiKey ? { apiKey } : {})
-			}
-		);
+		const result = await runVisionCheck({
+			url,
+			...(viewport ? { viewport } : {}),
+			...(waitFor ? { waitFor } : {}),
+			...(extraRubric ? { extraRubric } : {})
+		});
 
 		const exitCode = result.summary.hasBlockers ? 1 : 0;
 		const output =

@@ -27,8 +27,8 @@
   - `polish/raw-ref-id-needs-wrap`: flags raw `[A-Z]{2,4}-\d{5,}` literals not wrapped in `<RefId>`.
 
   **Vision-critique tool (`@dryui/mcp`, `@dryui/cli`)**
-  - New MCP tool `check-vision` and CLI subcommand `dryui check-vision <url>`. Renders the URL in headless Chromium, screenshots it, and sends the PNG plus a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, alignment, orphan, spacing rhythm) to Claude vision. Returns TOON findings + JSON.
-  - Requires `ANTHROPIC_API_KEY` in env (or `--api-key`). Prompt cache is wired so the rubric system message hits the cache after the first call.
+  - New MCP tool `check-vision` and CLI subcommand `dryui check-vision <url>`. Renders the URL in headless Chromium, screenshots it, and sends the PNG plus a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, alignment, orphan, spacing rhythm) to the Codex CLI. Returns TOON findings + JSON.
+  - Requires the Codex CLI on PATH and an authenticated Codex session.
   - `@dryui/mcp` reviewer's `prefer-grid-layout` rule now respects the same `[data-chip-group]` selector carve-out and `/* dryui-allow flex */` per-declaration opt-out that `@dryui/lint`'s `dryui/no-flex` already honors, so the two surfaces agree.
 
   The static linter has a hard ceiling: it cannot see runtime wrap, plural agreement, contrast against live data, or alignment drift. This pair (component-layer impossibility + VLM critique) covers the gap.

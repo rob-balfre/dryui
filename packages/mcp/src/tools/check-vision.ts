@@ -1,7 +1,7 @@
-import { writeFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import Anthropic from '@anthropic-ai/sdk';
 import { chromium, type Browser } from 'playwright';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import { enrichDiagnostic } from '../enrich-diagnostics.js';
@@ -39,10 +39,9 @@ export interface VisionCheckInput {
 }
 
 export interface VisionCheckOptions {
-	readonly apiKey?: string;
 	readonly model?: string;
-	/** Override the Anthropic client. Used by tests to stub the SDK. */
-	readonly client?: Pick<Anthropic, 'messages'>;
+	/** Override the Codex reviewer. Used by tests to stub the CLI. */
+	readonly reviewer?: VisionReviewer;
 	/** Override the screenshot pipeline. Tests inject deterministic bytes. */
 	readonly renderer?: VisionRenderer;
 }
@@ -59,14 +58,51 @@ export interface VisionRenderer {
 	(input: VisionRendererInput): Promise<{ bytes: Buffer; screenshotPath: string }>;
 }
 
+export interface VisionReviewer {
+	(input: VisionReviewInput): Promise<VisionReviewResult>;
+}
+
 interface VisionRendererInput {
 	readonly url: string;
 	readonly viewport: { width: number; height: number };
 	readonly waitFor?: string;
 }
 
-const DEFAULT_MODEL = 'claude-sonnet-4-6';
+interface VisionReviewInput {
+	readonly screenshotPath: string;
+	readonly userText: string;
+	readonly rubricPrompt: string;
+	readonly model?: string;
+}
+
+interface VisionReviewResult {
+	readonly rawText: string;
+	readonly model: string;
+}
+
+const DEFAULT_MODEL = 'codex-default';
 const DEFAULT_VIEWPORT = { width: 1440, height: 900 } as const;
+const REVIEW_OUTPUT_SCHEMA = {
+	type: 'object',
+	additionalProperties: false,
+	required: ['findings'],
+	properties: {
+		findings: {
+			type: 'array',
+			items: {
+				type: 'object',
+				additionalProperties: false,
+				required: ['rule', 'severity', 'message', 'evidence'],
+				properties: {
+					rule: { type: 'string' },
+					severity: { type: 'string', enum: ['error', 'warning', 'suggestion'] },
+					message: { type: 'string' },
+					evidence: { type: ['string', 'null'] }
+				}
+			}
+		}
+	}
+} as const;
 const RUBRIC_PROMPT = [
 	'You are a senior product designer auditing a screenshot of a web UI for visual polish defects.',
 	'',
@@ -137,21 +173,6 @@ function parseViewport(raw: string | undefined): { width: number; height: number
 	return { width, height };
 }
 
-function resolveApiKey(options: VisionCheckOptions): string {
-	const fromOptions = options.apiKey?.trim();
-	if (fromOptions) return fromOptions;
-	const fromEnv = process.env.ANTHROPIC_API_KEY?.trim();
-	if (fromEnv) return fromEnv;
-	throw new StructuredToolError(
-		'missing-api-key',
-		'check-vision requires an Anthropic API key. Set ANTHROPIC_API_KEY in the environment or pass --api-key.',
-		[
-			'export ANTHROPIC_API_KEY=sk-ant-...',
-			'dryui check-vision https://example.com --api-key sk-ant-...'
-		]
-	);
-}
-
 async function defaultRenderer(input: VisionRendererInput): Promise<{
 	bytes: Buffer;
 	screenshotPath: string;
@@ -181,6 +202,123 @@ async function defaultRenderer(input: VisionRendererInput): Promise<{
 	} finally {
 		if (browser) await browser.close();
 	}
+}
+
+async function defaultReviewer(input: VisionReviewInput): Promise<VisionReviewResult> {
+	const workDir = await mkdtemp(join(tmpdir(), 'dryui-codex-vision-'));
+	const outputPath = join(workDir, 'vision-output.json');
+	const schemaPath = join(workDir, 'vision-output.schema.json');
+	const prompt = [
+		input.rubricPrompt,
+		'',
+		'Inspect the attached screenshot only. Do not browse, do not infer unseen states, and do not explain your reasoning.',
+		input.userText
+	].join('\n');
+
+	try {
+		await writeFile(schemaPath, JSON.stringify(REVIEW_OUTPUT_SCHEMA, null, 2));
+		const args = [
+			'exec',
+			'-',
+			'--skip-git-repo-check',
+			'--ephemeral',
+			'--ignore-rules',
+			'--sandbox',
+			'read-only',
+			'--color',
+			'never',
+			'--output-schema',
+			schemaPath,
+			'--output-last-message',
+			outputPath,
+			'--image',
+			input.screenshotPath
+		];
+		if (input.model) args.push('--model', input.model);
+
+		const result = await runCodex(args, prompt, workDir);
+		const rawText = await readLastMessage(outputPath, result.stdout);
+		if (!rawText) {
+			throw new StructuredToolError(
+				'codex-empty-response',
+				'check-vision did not receive a final response from the Codex CLI.',
+				['codex login', 'codex exec --help']
+			);
+		}
+
+		return {
+			rawText,
+			model: input.model?.trim() || DEFAULT_MODEL
+		};
+	} finally {
+		await rm(workDir, { recursive: true, force: true });
+	}
+}
+
+async function readLastMessage(outputPath: string, stdoutFallback: string): Promise<string> {
+	try {
+		const fromFile = (await readFile(outputPath, 'utf8')).trim();
+		if (fromFile) return fromFile;
+	} catch {
+		// Fall back to stdout if Codex did not materialize the output file.
+	}
+	return stdoutFallback.trim();
+}
+
+async function runCodex(
+	args: readonly string[],
+	prompt: string,
+	cwd: string
+): Promise<{ stdout: string; stderr: string }> {
+	const child = spawn('codex', args, {
+		cwd,
+		stdio: ['pipe', 'pipe', 'pipe']
+	});
+
+	let stdout = '';
+	let stderr = '';
+
+	child.stdout.setEncoding('utf8');
+	child.stdout.on('data', (chunk: string) => {
+		stdout += chunk;
+	});
+	child.stderr.setEncoding('utf8');
+	child.stderr.on('data', (chunk: string) => {
+		stderr += chunk;
+	});
+
+	const completion = new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
+		child.on('error', (error: NodeJS.ErrnoException) => {
+			if (error.code === 'ENOENT') {
+				reject(
+					new StructuredToolError(
+						'missing-codex',
+						'check-vision requires the Codex CLI to be installed and available on PATH.',
+						['codex --help', 'codex login']
+					)
+				);
+				return;
+			}
+			reject(error);
+		});
+		child.on('close', (code) => {
+			if (code === 0) {
+				resolve({ stdout, stderr });
+				return;
+			}
+			reject(
+				new StructuredToolError(
+					'codex-failed',
+					`check-vision failed to run the Codex CLI${stderr.trim() ? `: ${cap(stderr.trim())}` : '.'}`,
+					['codex login', 'codex exec --help']
+				)
+			);
+		});
+	});
+
+	child.stdin.write(prompt);
+	child.stdin.end();
+	return await completion;
 }
 
 function stripCodeFences(text: string): string {
@@ -247,17 +385,6 @@ function parseFindings(raw: string): ParsedFindings {
 		if (finding) findings.push(finding);
 	}
 	return { findings, parseError: null };
-}
-
-interface VisionResponseLike {
-	readonly content: ReadonlyArray<{ type: string; text?: string }>;
-}
-
-function extractText(response: VisionResponseLike): string {
-	for (const block of response.content) {
-		if (block.type === 'text' && typeof block.text === 'string') return block.text;
-	}
-	return '';
 }
 
 function findingsToDiagnostics(findings: readonly VisionFinding[]): readonly DryUiRepairIssue[] {
@@ -341,9 +468,8 @@ export async function runVisionCheck(
 ): Promise<VisionCheckResult> {
 	const parsedUrl = validateUrl(input.url);
 	const viewport = parseViewport(input.viewport);
-	const model = options.model ?? DEFAULT_MODEL;
 	const renderer = options.renderer ?? defaultRenderer;
-	const client = options.client ?? new Anthropic({ apiKey: resolveApiKey(options) });
+	const reviewer = options.reviewer ?? defaultReviewer;
 
 	const { bytes, screenshotPath } = await renderer({
 		url: parsedUrl.toString(),
@@ -355,37 +481,18 @@ export async function runVisionCheck(
 		? `Inspect the screenshot and report any defects per the rubric. Additional emphasis: ${input.extraRubric}\n\nRespond with ONLY the JSON object.`
 		: 'Inspect the screenshot and report any defects per the rubric. Respond with ONLY the JSON object.';
 
-	const response = await client.messages.create({
-		model,
-		max_tokens: 2048,
-		// Cache the rubric: the system prompt is byte-identical across every
-		// call, so the second + screenshot pays the cheap cache-read rate.
-		system: [
-			{
-				type: 'text',
-				text: RUBRIC_PROMPT,
-				cache_control: { type: 'ephemeral' }
-			}
-		],
-		messages: [
-			{
-				role: 'user',
-				content: [
-					{
-						type: 'image',
-						source: {
-							type: 'base64',
-							media_type: 'image/png',
-							data: bytes.toString('base64')
-						}
-					},
-					{ type: 'text', text: userText }
-				]
-			}
-		]
-	});
+	// Keep the PNG bytes in memory for renderer parity tests even though the
+	// default Codex reviewer reads the screenshot from disk via --image.
+	void bytes;
 
-	const rawText = extractText(response as VisionResponseLike);
+	const review = await reviewer({
+		screenshotPath,
+		userText,
+		rubricPrompt: RUBRIC_PROMPT,
+		...(options.model ? { model: options.model } : {})
+	});
+	const rawText = review.rawText;
+	const model = review.model;
 	const { findings, parseError } = parseFindings(rawText);
 
 	const summary = deriveSummary(findings);

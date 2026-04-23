@@ -169,13 +169,13 @@ server.tool(
 );
 
 const CHECK_VISION_DESC = [
-	'Render a URL in headless Chromium, screenshot it, and have a Claude vision pass critique it ',
+	'Render a URL in headless Chromium, screenshot it, and have the Codex CLI critique it ',
 	'against a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, ',
 	'alignment, orphan, spacing rhythm). Returns TOON findings table + JSON block.\n\n',
 	'Use when the static `check` tool passes but the rendered page still looks off. The static ',
 	'linter cannot see runtime issues like wrapped chips, mismatched plurals, or broken contrast ',
 	'on dark glass; this tool fills that gap.\n\n',
-	'Requires ANTHROPIC_API_KEY in the environment (or pass `apiKey`). The headless browser is ',
+	'Requires the Codex CLI on PATH and an authenticated Codex session. The headless browser is ',
 	'launched per call; expect 5-15 seconds end-to-end for a typical page.'
 ].join('');
 
@@ -197,25 +197,16 @@ server.tool(
 		waitFor: z
 			.string()
 			.optional()
-			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).'),
-		apiKey: z
-			.string()
-			.optional()
-			.describe(
-				'Override the ANTHROPIC_API_KEY env var. Prefer the env var; only use this for one-off testing.'
-			)
+			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).')
 	},
-	async ({ url, viewport, extraRubric, waitFor, apiKey }) => {
+	async ({ url, viewport, extraRubric, waitFor }) => {
 		try {
-			const result = await runVisionCheck(
-				{
-					url,
-					...(viewport ? { viewport } : {}),
-					...(extraRubric ? { extraRubric } : {}),
-					...(waitFor ? { waitFor } : {})
-				},
-				apiKey ? { apiKey } : {}
-			);
+			const result = await runVisionCheck({
+				url,
+				...(viewport ? { viewport } : {}),
+				...(extraRubric ? { extraRubric } : {}),
+				...(waitFor ? { waitFor } : {})
+			});
 			const diagnosticsJson = JSON.stringify(
 				{
 					summary: result.summary,

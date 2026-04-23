@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { runVisionCheck, type VisionRenderer } from './check-vision.js';
+import { runVisionCheck, type VisionRenderer, type VisionReviewer } from './check-vision.js';
 
 const FAKE_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
@@ -8,34 +8,23 @@ const FAKE_RENDERER: VisionRenderer = async () => ({
 	screenshotPath: '/tmp/dryui-vision-test.png'
 });
 
-interface StubResponse {
-	content: ReadonlyArray<{ type: 'text'; text: string }>;
-}
-
-function stubClient(response: StubResponse) {
-	const messageCalls: unknown[] = [];
-	const client = {
-		messages: {
-			async create(params: unknown): Promise<StubResponse> {
-				messageCalls.push(params);
-				return response;
-			}
-		}
+function stubReviewer(rawText: string, model = 'codex-test') {
+	const reviewCalls: unknown[] = [];
+	const reviewer: VisionReviewer = async (params) => {
+		reviewCalls.push(params);
+		return { rawText, model };
 	};
-	return { client, messageCalls };
+	return { reviewer, reviewCalls };
 }
 
 describe('runVisionCheck', () => {
 	test('parses { findings: [] } as a clean run', async () => {
-		const { client } = stubClient({
-			content: [{ type: 'text', text: '{ "findings": [] }' }]
-		});
+		const { reviewer } = stubReviewer('{ "findings": [] }');
 
 		const result = await runVisionCheck(
 			{ url: 'https://example.com' },
 			{
-				apiKey: 'sk-test',
-				client: client as Parameters<typeof runVisionCheck>[1]['client'],
+				reviewer,
 				renderer: FAKE_RENDERER
 			}
 		);
@@ -59,13 +48,12 @@ describe('runVisionCheck', () => {
 			'```'
 		].join('\n');
 
-		const { client } = stubClient({ content: [{ type: 'text', text: fenced }] });
+		const { reviewer } = stubReviewer(fenced);
 
 		const result = await runVisionCheck(
 			{ url: 'https://example.com' },
 			{
-				apiKey: 'sk-test',
-				client: client as Parameters<typeof runVisionCheck>[1]['client'],
+				reviewer,
 				renderer: FAKE_RENDERER
 			}
 		);
@@ -82,15 +70,12 @@ describe('runVisionCheck', () => {
 	});
 
 	test('emits a parseError diagnostic when the model returns non-JSON', async () => {
-		const { client } = stubClient({
-			content: [{ type: 'text', text: 'I think this looks fine, no issues to report!' }]
-		});
+		const { reviewer } = stubReviewer('I think this looks fine, no issues to report!');
 
 		const result = await runVisionCheck(
 			{ url: 'https://example.com' },
 			{
-				apiKey: 'sk-test',
-				client: client as Parameters<typeof runVisionCheck>[1]['client'],
+				reviewer,
 				renderer: FAKE_RENDERER
 			}
 		);
@@ -106,42 +91,41 @@ describe('runVisionCheck', () => {
 
 	test('rejects non-http(s) URLs', async () => {
 		await expect(
-			runVisionCheck({ url: 'file:///etc/passwd' }, { apiKey: 'sk-test', renderer: FAKE_RENDERER })
+			runVisionCheck(
+				{ url: 'file:///etc/passwd' },
+				{ reviewer: stubReviewer('{ "findings": [] }').reviewer, renderer: FAKE_RENDERER }
+			)
 		).rejects.toThrow(/http or https/);
 	});
 
-	test('throws structured error when no API key is available', async () => {
-		const previous = process.env.ANTHROPIC_API_KEY;
-		delete process.env.ANTHROPIC_API_KEY;
-		try {
-			await expect(
-				runVisionCheck({ url: 'https://example.com' }, { renderer: FAKE_RENDERER })
-			).rejects.toThrow(/ANTHROPIC_API_KEY/);
-		} finally {
-			if (previous !== undefined) process.env.ANTHROPIC_API_KEY = previous;
-		}
+	test('surfaces reviewer failures', async () => {
+		const reviewer: VisionReviewer = async () => {
+			throw new Error('codex exploded');
+		};
+
+		await expect(
+			runVisionCheck({ url: 'https://example.com' }, { reviewer, renderer: FAKE_RENDERER })
+		).rejects.toThrow(/codex exploded/);
 	});
 
-	test('caches the rubric in the system prompt block', async () => {
-		const { client, messageCalls } = stubClient({
-			content: [{ type: 'text', text: '{ "findings": [] }' }]
-		});
+	test('passes the rubric and extra emphasis into the reviewer prompt', async () => {
+		const { reviewer, reviewCalls } = stubReviewer('{ "findings": [] }');
 
 		await runVisionCheck(
 			{ url: 'https://example.com', extraRubric: 'focus on the hero' },
 			{
-				apiKey: 'sk-test',
-				client: client as Parameters<typeof runVisionCheck>[1]['client'],
+				reviewer,
 				renderer: FAKE_RENDERER
 			}
 		);
 
-		const params = messageCalls[0] as {
-			system: ReadonlyArray<{ cache_control?: unknown }>;
-			messages: ReadonlyArray<{ content: ReadonlyArray<{ type: string; text?: string }> }>;
+		const params = reviewCalls[0] as {
+			rubricPrompt: string;
+			userText: string;
+			screenshotPath: string;
 		};
-		expect(params.system[0]?.cache_control).toEqual({ type: 'ephemeral' });
-		const userText = params.messages[0]?.content.find((c) => c.type === 'text')?.text ?? '';
-		expect(userText).toContain('focus on the hero');
+		expect(params.rubricPrompt).toContain('vision/chip-wrap');
+		expect(params.userText).toContain('focus on the hero');
+		expect(params.screenshotPath).toBe('/tmp/dryui-vision-test.png');
 	});
 });
