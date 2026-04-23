@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.18.3
+
+### Patch Changes
+
+- [`079368c`](https://github.com/rob-balfre/dryui/commit/079368cc3f67bbd837d7f7a9b6bfd8459d7bb43f) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Teach `check-vision` to flag page-header rhythm issues and stray row padding, including overly loose H1-to-subtitle gaps and meta/chip rows with accidental top padding.
+
+- Updated dependencies [[`079368c`](https://github.com/rob-balfre/dryui/commit/079368cc3f67bbd837d7f7a9b6bfd8459d7bb43f)]:
+  - @dryui/mcp@2.6.3
+
 ## 0.18.2
 
 ### Patch Changes

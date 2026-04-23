@@ -1,6 +1,6 @@
 {
   "name": "@dryui/cli",
-  "version": "0.18.2",
+  "version": "0.18.3",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@dryui/feedback-server": "^0.8.2",
-    "@dryui/mcp": "^2.6.2",
+    "@dryui/mcp": "^2.6.3",
     "playwright": "^1.59.1"
   },
   "devDependencies": {
