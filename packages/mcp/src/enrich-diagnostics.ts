@@ -185,6 +185,14 @@ const HINTS: Record<string, HintBuilder> = {
 		hint: 'Add breathing room around the dense region: increase the stack gap between title, subtitle, and metadata; let chip rows wrap; and keep badges/date pills from visually crowding adjacent text.',
 		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
 	}),
+	'vision/header-rhythm': () => ({
+		hint: 'Tune the page-header stack as a single rhythm: keep the H1 and supporting line optically connected, then use a larger step before metadata. Avoid one-off margins between title and subtitle.',
+		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
+	}),
+	'vision/stray-padding': () => ({
+		hint: 'Remove accidental top/bottom padding or asymmetric margins. Meta/chip rows should sit centered in their band with symmetric block padding and a deliberate gap from neighboring text.',
+		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
+	}),
 	'vision/parse-error': () => ({
 		hint: 'The vision model returned content that did not parse as JSON. Inspect the raw response in the `evidence` field (usually a transient model hiccup); rerun the check.',
 		docsRef: `${DOCS_BASE}/concepts/troubleshooting#vision-parse-errors`

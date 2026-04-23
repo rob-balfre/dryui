@@ -20,6 +20,8 @@ export const VISION_RULES = {
 	orphan: 'vision/orphan',
 	spacingRhythm: 'vision/spacing-rhythm',
 	crampedLayout: 'vision/cramped-layout',
+	headerRhythm: 'vision/header-rhythm',
+	strayPadding: 'vision/stray-padding',
 	parseError: 'vision/parse-error'
 } as const;
 
@@ -118,11 +120,13 @@ const RUBRIC_PROMPT = [
 	`7. ${VISION_RULES.orphan}: a single word on its own line at the end of a paragraph or heading (rivers/orphans).`,
 	`8. ${VISION_RULES.spacingRhythm}: adjacent components with inconsistent vertical spacing where consistency is expected.`,
 	`9. ${VISION_RULES.crampedLayout}: a header, text stack, toolbar, or chip/meta row is visibly squashed together. Flag when headings, subtitles, badges, dates, or controls have too little breathing room, appear packed into one block, or feel compressed even if they do not overlap.`,
+	`10. ${VISION_RULES.headerRhythm}: a page header stack has poor vertical rhythm. Flag when the H1 and subtitle/supporting copy are too far apart or too close, when the eyebrow/title/subtitle/meta gaps do not form a deliberate scale, or when the title no longer feels connected to the line below it.`,
+	`11. ${VISION_RULES.strayPadding}: a row or section has unexplained top/bottom padding, content is not vertically centered in its visible band, or a chip/meta row appears to have random top padding. Flag padding that looks accidental even if the row does not overlap anything.`,
 	'',
 	'For EACH defect found, return a finding. Severity rubric:',
 	'- error: breaks legibility (low contrast, illegible)',
-	'- warning: clearly wrong (chip wrap, plural mismatch, mid-token break, cramped layout)',
-	'- suggestion: taste-call (variant mix, alignment drift, orphan, spacing rhythm)',
+	'- warning: clearly wrong (chip wrap, plural mismatch, mid-token break, cramped layout, stray padding)',
+	'- suggestion: taste-call (variant mix, alignment drift, orphan, spacing rhythm, header rhythm)',
 	'',
 	'Output ONLY this JSON, no prose, no code fences:',
 	'{ "findings": [ { "rule": "vision/<code>", "severity": "<level>", "message": "<one sentence: what and where>" } ] }',

@@ -47,6 +47,16 @@ describe('runVisionCheck', () => {
 						rule: 'vision/cramped-layout',
 						severity: 'warning',
 						message: 'Page header title, subtitle, and metadata chips are packed too tightly.'
+					},
+					{
+						rule: 'vision/header-rhythm',
+						severity: 'suggestion',
+						message: 'The H1 and subtitle have too much vertical distance to read as one header.'
+					},
+					{
+						rule: 'vision/stray-padding',
+						severity: 'warning',
+						message: 'The metadata row has stray top padding and the chips sit low in the band.'
 					}
 				]
 			}),
@@ -63,18 +73,25 @@ describe('runVisionCheck', () => {
 			}
 		);
 
-		expect(result.findings).toHaveLength(3);
+		expect(result.findings).toHaveLength(5);
 		expect(result.summary.hasBlockers).toBe(true);
 		expect(result.summary.counts.error).toBe(1);
-		expect(result.summary.counts.warning).toBe(2);
+		expect(result.summary.counts.warning).toBe(3);
+		expect(result.summary.counts.suggestion).toBe(1);
 		expect(result.diagnostics[0]?.code).toBe('vision/chip-wrap');
 		expect(result.diagnostics[0]?.source).toBe('vision');
 		expect(result.diagnostics[0]?.hint).toMatch(/Badge/);
 		expect(result.diagnostics[1]?.code).toBe('vision/low-contrast');
 		expect(result.diagnostics[2]?.code).toBe('vision/cramped-layout');
 		expect(result.diagnostics[2]?.hint).toMatch(/breathing room/);
+		expect(result.diagnostics[3]?.code).toBe('vision/header-rhythm');
+		expect(result.diagnostics[3]?.hint).toMatch(/page-header stack/);
+		expect(result.diagnostics[4]?.code).toBe('vision/stray-padding');
+		expect(result.diagnostics[4]?.hint).toMatch(/asymmetric margins/);
 		expect(result.text).toContain('vision/chip-wrap');
 		expect(result.text).toContain('vision/cramped-layout');
+		expect(result.text).toContain('vision/header-rhythm');
+		expect(result.text).toContain('vision/stray-padding');
 	});
 
 	test('emits a parseError diagnostic when the model returns non-JSON', async () => {
@@ -135,6 +152,10 @@ describe('runVisionCheck', () => {
 		expect(params.rubricPrompt).toContain('vision/chip-wrap');
 		expect(params.rubricPrompt).toContain('vision/cramped-layout');
 		expect(params.rubricPrompt).toContain('visibly squashed together');
+		expect(params.rubricPrompt).toContain('vision/header-rhythm');
+		expect(params.rubricPrompt).toContain('H1 and subtitle');
+		expect(params.rubricPrompt).toContain('vision/stray-padding');
+		expect(params.rubricPrompt).toContain('random top padding');
 		expect(params.userText).toContain('focus on the hero');
 		expect(params.screenshotPath).toBe('/tmp/dryui-vision-test.png');
 	});
