@@ -6,6 +6,12 @@ export interface FieldRootProps extends HTMLAttributes<HTMLDivElement> {
 	error?: string;
 	required?: boolean;
 	disabled?: boolean;
+	/**
+	 * Opt-in: when true, Inputs inside this Field use a concentric inner
+	 * radius derived from Field padding. Use when Field wraps Input inside a
+	 * padded card/container so inner corners align with the outer edge.
+	 */
+	nestRadius?: boolean;
 }
 
 export interface FieldDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {

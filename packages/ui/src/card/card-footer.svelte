@@ -15,7 +15,7 @@
 
 <style>
 	[data-card-footer] {
-		padding: var(--dry-card-padding, var(--dry-space-8));
+		padding: var(--dry-card-padding, var(--dry-padding-card));
 		border-top: 1px solid var(--dry-card-border, var(--dry-color-stroke-weak));
 	}
 

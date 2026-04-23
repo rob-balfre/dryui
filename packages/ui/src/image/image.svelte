@@ -69,7 +69,8 @@
 
 	img[data-state='loaded'],
 	img[data-state='fallback'] {
-		box-shadow: inset 0 0 0 1px var(--dry-image-edge);
+		outline: 1px solid var(--dry-image-edge);
+		outline-offset: -1px;
 	}
 
 	img[data-state='fallback'] {

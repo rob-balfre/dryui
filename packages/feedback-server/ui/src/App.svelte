@@ -87,6 +87,18 @@
 		return () => document.removeEventListener('mousedown', handler);
 	});
 
+	$effect(() => {
+		if (!searchOpen) return;
+		const handler = (event: KeyboardEvent) => {
+			if (event.key !== 'Escape') return;
+			if (!searchContainer?.contains(event.target as Node)) return;
+			event.preventDefault();
+			closeSearch();
+		};
+		document.addEventListener('keydown', handler);
+		return () => document.removeEventListener('keydown', handler);
+	});
+
 	function openSearch(): void {
 		searchOpen = true;
 	}
@@ -94,13 +106,6 @@
 	function closeSearch(): void {
 		search = '';
 		searchOpen = false;
-	}
-
-	function handleSearchKeydown(event: KeyboardEvent): void {
-		if (event.key === 'Escape') {
-			event.preventDefault();
-			closeSearch();
-		}
 	}
 	let submissions = $state<Submission[]>([]);
 	let dispatchTargets = $state<DispatchAgent[]>([]);
@@ -428,7 +433,7 @@
 							class="filter-search"
 							class:is-open={searchOpen || hasActiveSearch}
 							bind:this={searchContainer}
-							onkeydown={handleSearchKeydown}
+							role="search"
 						>
 							{#if searchOpen || hasActiveSearch}
 								<Input

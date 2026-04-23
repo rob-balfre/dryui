@@ -6380,5 +6380,277 @@ Stop conditions:
   - diagnostics array is empty AND hasBlockers=false -> done
   - same diagnostic code repeats after 2 attempts -> surface to human
   - any parse/* diagnostic -> fix the syntax before looping further`
+	},
+
+	// ── Visual Polish ─────────────────────────────────────────────────────────
+
+	{
+		name: 'typography',
+		description:
+			'Text wrapping and typographic pairings. Use <Heading> for balanced headings, <Text as="p"> for pretty paragraphs. Both ship with text-wrap defaults that prevent orphans.',
+		tags: ['typography', 'heading', 'text', 'text-wrap', 'balance', 'pretty', 'polish'],
+		components: ['Heading', 'Text'],
+		snippet: `<script>
+  import { Heading, Text } from '@dryui/ui';
+</script>
+
+<Heading level={1}>
+  Heading with text-wrap: balance
+  so subtitles don't strand a single word.
+</Heading>
+<Text as="p">
+  Body copy uses text-wrap: pretty by default. It's subtler than balance. Prevents single-word orphans on the last line without re-wrapping the whole paragraph.
+</Text>
+
+<!-- Raw <h1> and <p> also get the defaults via :where() in the theme reset,
+     so even hand-rolled markdown inherits the treatment. -->`
+	},
+
+	{
+		name: 'concentric-radius',
+		description:
+			'Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (Card, Dialog, Popover, Toast, Tooltip, Sheet, Field).',
+		tags: ['radius', 'concentric', 'card', 'nesting', 'polish', 'corner', 'rounded'],
+		components: ['Card', 'Button'],
+		snippet: `<script>
+  import { Card, Button } from '@dryui/ui';
+</script>
+
+<Card.Root>
+  <Card.Content>
+    <!-- The Button inside this Card inherits --dry-btn-radius: var(--dry-radius-nested-card)
+         automatically, so inner corners sit concentric with the outer 16px. -->
+    <Button>Action</Button>
+  </Card.Content>
+</Card.Root>
+
+<!-- Nested tokens available: nested-card, nested-dialog, nested-popover,
+     nested-sheet, nested-toast, nested-tooltip, nested-field. -->`
+	},
+
+	{
+		name: 'icon-swap',
+		description:
+			'Animate between two icons on state change (copy to check, play to pause, chevron flip). Uses the retarget-friendly opacity/scale/blur transition so repeated toggles feel right.',
+		tags: ['icon', 'animation', 'swap', 'copy', 'check', 'polish', 'motion'],
+		components: ['IconSwap', 'Button'],
+		snippet: `<script>
+  import { Button, IconSwap } from '@dryui/ui';
+  import CopyIcon from '@dryui/icons/copy.svelte';
+  import CheckIcon from '@dryui/icons/check.svelte';
+
+  let copied = $state(false);
+
+  function copy() {
+    navigator.clipboard.writeText('hello');
+    copied = true;
+    setTimeout(() => (copied = false), 2000);
+  }
+</script>
+
+<Button onclick={copy}>
+  <IconSwap icon={copied ? CheckIcon : CopyIcon} />
+  {copied ? 'Copied' : 'Copy'}
+</Button>`
+	},
+
+	{
+		name: 'numeric-display',
+		description:
+			'Stable-width digit rendering for counters, clocks, prices, scores. Tabular-nums stops digits from jittering as values change.',
+		tags: ['numeric', 'counter', 'clock', 'tabular-nums', 'digits', 'polish', 'number'],
+		components: ['Numeric', 'Badge'],
+		snippet: `<script>
+  import { Numeric, Badge } from '@dryui/ui';
+
+  let count = $state(0);
+</script>
+
+<Numeric value={count} stable minDigits={3} align="end" />
+<Badge numeric>{count}</Badge>
+
+<button onclick={() => count++}>+</button>
+
+<!-- Or apply the utility class directly to any numeric element:
+  <span class="dry-tabular-nums">{value}</span>
+-->`
+	},
+
+	{
+		name: 'interactive-motion',
+		description:
+			'Transitions vs keyframes. Use transitions for interactive states (hover, focus, open/close) so the motion retargets mid-interaction. Keyframes are for one-shot staged sequences.',
+		tags: ['motion', 'transition', 'keyframe', 'interactive', 'polish', 'interruptible'],
+		components: [],
+		snippet: `<script>
+  let open = $state(false);
+</script>
+
+<button
+  onclick={() => (open = !open)}
+  data-state={open ? 'open' : 'closed'}
+  class="toggle"
+>
+  Toggle
+</button>
+
+<style>
+  /* GOOD: transition retargets mid-press. Spamming the button feels right. */
+  .toggle {
+    transform: scale(1);
+    transition: transform var(--dry-duration-fast) var(--dry-ease-spring-snappy);
+  }
+  .toggle[data-state='open'] {
+    transform: scale(1.1);
+  }
+
+  /* BAD (don't do this):
+  @keyframes wobble { ... }
+  .toggle[data-state='open'] { animation: wobble 200ms; }
+  Fixed timeline, can't retarget if user releases mid-animation. */
+</style>`
+	},
+
+	{
+		name: 'stagger-entrance',
+		description:
+			'Break entering content into chunks, stagger by 80 to 100ms. Use <Enter> for a single element, <Stagger> for a container, or in:enter={{ index }} for a Svelte transition.',
+		tags: ['enter', 'stagger', 'animation', 'entrance', 'polish', 'motion', 'reveal'],
+		components: ['Enter', 'Stagger', 'Heading', 'Text', 'Button'],
+		snippet: `<script>
+  import { Enter, Stagger, Heading, Text, Button } from '@dryui/ui';
+  import { enter } from '@dryui/ui/motion';
+</script>
+
+<!-- Option A: auto-indexed Stagger container -->
+<Stagger step="section">
+  <Heading level={1}>Welcome</Heading>
+  <Text as="p">A paragraph that follows.</Text>
+  <Button>Call to action</Button>
+</Stagger>
+
+<!-- Option B: explicit Enter with index -->
+<Enter index={0}>
+  <Heading level={1}>Welcome</Heading>
+</Enter>
+<Enter index={1}>
+  <Text as="p">A paragraph that follows.</Text>
+</Enter>
+
+<!-- Option C: Svelte transition with programmatic index -->
+{#each items as item, i}
+  <div in:enter={{ index: i }}>{item}</div>
+{/each}`
+	},
+
+	{
+		name: 'exit-animation',
+		description:
+			'Subtle exits. A small fixed offset (~12px) beats mirroring the entrance. Use <Exit> as a wrapper or out:leave as a Svelte transition.',
+		tags: ['exit', 'leave', 'animation', 'dismiss', 'polish', 'motion'],
+		components: ['Exit'],
+		snippet: `<script>
+  import { leave } from '@dryui/ui/motion';
+
+  let open = $state(true);
+</script>
+
+{#if open}
+  <div out:leave>
+    <p>This dismisses with a subtle 12px offset + fade + slight blur.</p>
+    <button onclick={() => (open = false)}>Close</button>
+  </div>
+{/if}
+
+<!-- Pair with in:enter for symmetric usage. Exit is intentionally smaller
+     than entrance so dismissal feels softer than introduction. -->`
+	},
+
+	{
+		name: 'shadow-as-border',
+		description:
+			'Three-layer box-shadow (edge + close contact + ambient) reads cleaner than a solid 1px border. Works over images and mixed backgrounds. No double-edge when combined with drop shadows.',
+		tags: ['shadow', 'border', 'card', 'elevation', 'polish'],
+		components: ['Card'],
+		snippet: `<script>
+  import { Card } from '@dryui/ui';
+</script>
+
+<!-- Default Card: shadow-only (no border) -->
+<Card.Root>
+  <Card.Content>
+    A Card that reads as raised without a solid edge.
+  </Card.Content>
+</Card.Root>
+
+<!-- Bordered escape hatch, when you want the 1px edge back -->
+<Card.Root bordered>
+  <Card.Content>A Card with both shadow and border.</Card.Content>
+</Card.Root>
+
+<!-- Raw pattern. Use the token family directly on any raised surface: -->
+<style>
+  .my-raised-surface {
+    background: var(--dry-color-bg-raised);
+    border-radius: var(--dry-radius-lg);
+    box-shadow: var(--dry-shadow-sm);
+    transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);
+  }
+  .my-raised-surface:hover {
+    box-shadow: var(--dry-shadow-sm-hover);
+  }
+</style>`
+	},
+
+	{
+		name: 'icon-in-button',
+		description:
+			'Buttons with leading/trailing icons get an automatic optical offset (--dry-optical-icon-offset) so the label reads visually centered, not geometrically centered.',
+		tags: ['button', 'icon', 'optical', 'alignment', 'polish'],
+		components: ['Button', 'Icon'],
+		snippet: `<script>
+  import { Button, Icon } from '@dryui/ui';
+  import SearchIcon from '@dryui/icons/search.svelte';
+</script>
+
+<!-- Leading icon: padding-inline-start shrinks by --dry-optical-icon-offset -->
+<Button>
+  <Icon src={SearchIcon} />
+  Search
+</Button>
+
+<!-- Trailing icon: padding-inline-end shrinks -->
+<Button>
+  Next
+  <Icon src={SearchIcon} />
+</Button>
+
+<!-- Opt out: optical="off" keeps geometric padding -->
+<Button optical="off">
+  <Icon src={SearchIcon} />
+  Geometric
+</Button>`
+	},
+
+	{
+		name: 'image-edge',
+		description:
+			'Images and avatars get a 1px outline (--dry-image-edge) that adapts to theme (black/10% in light, white/10% in dark). Stops image edges from reading as surface imperfections.',
+		tags: ['image', 'avatar', 'edge', 'outline', 'polish'],
+		components: ['Image', 'Avatar'],
+		snippet: `<script>
+  import { Image, Avatar } from '@dryui/ui';
+</script>
+
+<Image src="/photo.jpg" alt="Landscape" width={480} height={320} />
+<Avatar src="/face.jpg" name="Rob" />
+
+<!-- For hand-rolled media, apply the same pattern: -->
+<style>
+  .my-image {
+    outline: 1px solid var(--dry-image-edge);
+    outline-offset: -1px;
+  }
+</style>`
 	}
 ];

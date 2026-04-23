@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 160 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 165 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -29,7 +29,7 @@ Props: variant (| 'solid'
 	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | 'ink' | (string & {}) | null), Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets., accepted primary, danger, ink, null, default 'primary' | className (string) | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <button> attributes via rest props.
 CSS variables: --dry-btn-accent, --dry-btn-accent-active, --dry-btn-accent-fg, --dry-btn-accent-hover, --dry-btn-accent-stroke, --dry-btn-accent-weak, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-font-size, --dry-btn-ghost-underline, --dry-btn-on-accent, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-btn-soft-active-bg, --dry-btn-soft-bg, --dry-btn-soft-hover-bg, --dry-btn-trigger-open-bg, --dry-btn-trigger-open-border, --dry-btn-trigger-open-color
-Data attributes: data-color (Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme., values primary, danger, ink) | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
+Data attributes: data-color (Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme., values primary, danger, ink) | data-disabled (Present when the component or part is disabled.) | data-dry-icon | data-group-orientation | data-in-group | data-optical | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example:
 ```svelte
@@ -964,7 +964,7 @@ Root import: import { Field } from '@dryui/ui'
 Subpath import: import { Field } from '@dryui/ui/field'
 Parts:
 - Field.Root
-  Props: children (Snippet), Content rendered inside the component., required | error (string), default '' | required (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false
+  Props: children (Snippet), Content rendered inside the component., required | error (string), default '' | required (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | nestRadius (boolean), default false
   Native props: Forwards <div> attributes via rest props.
 - Field.Description
   Props: children (Snippet), Content rendered inside the component., required
@@ -974,8 +974,8 @@ Parts:
   Native props: Forwards <p> attributes via rest props.
 Structure:
   Field.Root
-CSS variables: --dry-field-gap
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
+CSS variables: --dry-field-gap, --dry-input-radius
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error | data-nest-radius
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
@@ -2908,8 +2908,8 @@ Structure:
     Card.Header
     Card.Content
     Card.Footer
-CSS variables: --dry-btn-radius, --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow, --dry-radius-nested
-Data attributes: data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
+CSS variables: --dry-btn-radius, --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow
+Data attributes: data-bordered | data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3086,7 +3086,7 @@ Subpath import: import { Badge } from '@dryui/ui/badge'
 Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
 Native props: Forwards <span> attributes via rest props.
 CSS variables: none
-Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
+Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3205,7 +3205,7 @@ Subpath import: import { Icon } from '@dryui/ui/icon'
 Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, xl, default 'md' | color ('primary' | 'muted' | 'current'), Semantic color or tone applied to the component., accepted primary, muted, current, default 'current' | label (string), Visible label text shown for the control or item. | class (string) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <span> attributes via rest props.
 CSS variables: --dry-icon-color, --dry-icon-size
-Data attributes: data-color | data-size
+Data attributes: data-color | data-dry-icon | data-size
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -4038,6 +4038,86 @@ Accessibility: Treat the component as presentational unless it exposes interacti
 Example:
 ```svelte
 <Diagram>Content</Diagram>
+```
+
+## IconSwap
+Package: @dryui/ui
+Category: display
+Tags: icon, swap, crossfade, animation, motion
+Kind: simple
+Root import: import { IconSwap } from '@dryui/ui'
+Subpath import: import { IconSwap } from '@dryui/ui/icon-swap'
+Props: none
+CSS variables: none
+Data attributes: data-size
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<IconSwap>Content</IconSwap>
+```
+
+## Numeric
+Package: @dryui/ui
+Category: display
+Tags: numeric, tabular, number, stable, align
+Kind: simple
+Root import: import { Numeric } from '@dryui/ui'
+Subpath import: import { Numeric } from '@dryui/ui/numeric'
+Props: none
+CSS variables: none
+Data attributes: data-align
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<Numeric>Content</Numeric>
+```
+
+## Enter
+Package: @dryui/ui
+Category: display
+Tags: animation, enter, reveal, motion, polish
+Kind: simple
+Root import: import { Enter } from '@dryui/ui'
+Subpath import: import { Enter } from '@dryui/ui/enter'
+Props: none
+CSS variables: none
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<Enter>Content</Enter>
+```
+
+## Exit
+Package: @dryui/ui
+Category: display
+Tags: animation, exit, leave, motion, polish
+Kind: simple
+Root import: import { Exit } from '@dryui/ui'
+Subpath import: import { Exit } from '@dryui/ui/exit'
+Props: none
+CSS variables: none
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<Exit>Content</Exit>
+```
+
+## Stagger
+Package: @dryui/ui
+Category: display
+Tags: animation, stagger, enter, motion, polish
+Kind: simple
+Root import: import { Stagger } from '@dryui/ui'
+Subpath import: import { Stagger } from '@dryui/ui/stagger'
+Props: none
+CSS variables: none
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<Stagger>Content</Stagger>
 ```
 
 ## AvatarGroup

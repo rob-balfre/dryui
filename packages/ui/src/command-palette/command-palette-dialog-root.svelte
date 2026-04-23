@@ -135,10 +135,11 @@
 </dialog>
 
 <style>
+	/* outer: var(--dry-radius-dialog); children inside the padded region use var(--dry-radius-nested-dialog). */
 	[data-command-palette-root] {
 		--dry-cmd-bg: var(--dry-color-bg-overlay);
 		--dry-cmd-border: var(--dry-color-stroke-weak);
-		--dry-cmd-radius: var(--dry-radius-xl);
+		--dry-cmd-radius: var(--dry-radius-dialog);
 		--dry-cmd-shadow: var(--dry-shadow-xl);
 		--dry-cmd-max-width: 32rem;
 

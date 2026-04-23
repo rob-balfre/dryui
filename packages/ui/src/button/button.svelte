@@ -35,6 +35,13 @@
 		download?: boolean | string;
 		/** Back-compat alias for `class` — matches Heading/Text ergonomics. Prefer `class`. */
 		className?: HTMLButtonAttributes['class'];
+		/**
+		 * Optical compensation for leading/trailing icons. When `'auto'` (default),
+		 * the button trims its inline padding on the icon side by
+		 * `--dry-optical-icon-offset` so the label reads visually centered against
+		 * the icon. Set to `'off'` to disable the nudge.
+		 */
+		optical?: 'auto' | 'off';
 		/** Callback invoked with the rendered `<button>` or `<a>` element on mount, `null` on destroy. */
 		ref?: (el: HTMLButtonElement | HTMLAnchorElement | null) => void;
 		children: Snippet;
@@ -58,6 +65,7 @@
 		onclick,
 		class: classAttr,
 		className = classAttr,
+		optical = 'auto',
 		ref,
 		children,
 		...rest
@@ -89,6 +97,7 @@
 			{download}
 			aria-disabled={disabled || undefined}
 			data-disabled={disabled || undefined}
+			data-optical={optical}
 			tabindex={disabled ? -1 : undefined}
 			{...variantAttrs({ variant, size, color })}
 			class={className}
@@ -102,6 +111,7 @@
 			{type}
 			{disabled}
 			data-disabled={disabled || undefined}
+			data-optical={optical}
 			{...variantAttrs({ variant, size, color })}
 			class={className}
 			{onclick}
@@ -207,6 +217,22 @@
 			cursor: not-allowed;
 			box-shadow: none;
 		}
+	}
+
+	/* ── Optical icon offset ───────────────────────────────────────────────────
+	   When a button has a leading or trailing child marked with
+	   `[data-dry-icon]`, trim the padding on that side by
+	   `--dry-optical-icon-offset` so the label reads visually centered against
+	   the icon. Consumers set `data-optical="off"` (via the `optical` prop)
+	   to disable the nudge. Data-attribute selectors pierce Svelte style
+	   scoping without needing `:global()`, which is banned by
+	   `dryui/no-global`. */
+	:is(a, button)[data-optical='auto']:has(> [data-dry-icon]:first-child) {
+		padding-inline-start: calc(var(--_dry-btn-padding-x) - var(--dry-optical-icon-offset));
+	}
+
+	:is(a, button)[data-optical='auto']:has(> [data-dry-icon]:last-child) {
+		padding-inline-end: calc(var(--_dry-btn-padding-x) - var(--dry-optical-icon-offset));
 	}
 
 	/* ── Variants ──────────────────────────────────────────────────────────────── */

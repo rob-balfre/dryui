@@ -77,6 +77,7 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-popover); children inside the padded region use var(--dry-radius-nested-popover). */
 	[data-dropdown-menu-content] {
 		/* Reset UA popover defaults */
 		inset: unset;
@@ -87,7 +88,7 @@
 		color: var(--dry-color-text-strong);
 		border: 1px solid
 			var(--dry-menu-border, var(--dry-overlay-border, var(--dry-color-stroke-weak)));
-		border-radius: var(--dry-menu-radius, var(--dry-overlay-radius, var(--dry-radius-lg)));
+		border-radius: var(--dry-menu-radius, var(--dry-overlay-radius, var(--dry-radius-popover)));
 		box-shadow: var(--dry-menu-shadow, var(--dry-overlay-shadow, var(--dry-shadow-overlay)));
 		display: grid;
 		grid-template-columns: minmax(12rem, auto);
@@ -95,7 +96,8 @@
 		--dry-radius-nested: max(
 			var(--dry-radius-sm),
 			calc(
-				var(--dry-menu-radius, var(--dry-radius-lg)) - var(--dry-menu-padding, var(--dry-space-2))
+				var(--dry-menu-radius, var(--dry-radius-popover)) -
+					var(--dry-menu-padding, var(--dry-space-2))
 			)
 		);
 		--dry-btn-radius: var(--dry-radius-nested);

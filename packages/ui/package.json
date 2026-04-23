@@ -360,6 +360,11 @@
       "svelte": "./src/icon/index.ts",
       "default": "./src/icon/index.ts"
     },
+    "./icon-swap": {
+      "types": "./src/icon-swap/index.ts",
+      "svelte": "./src/icon-swap/index.ts",
+      "default": "./src/icon-swap/index.ts"
+    },
     "./image": {
       "types": "./src/image/index.ts",
       "svelte": "./src/image/index.ts",
@@ -450,6 +455,11 @@
       "svelte": "./src/menubar/index.ts",
       "default": "./src/menubar/index.ts"
     },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "svelte": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
+    },
     "./multi-select-combobox": {
       "types": "./src/multi-select-combobox/index.ts",
       "svelte": "./src/multi-select-combobox/index.ts",
@@ -469,6 +479,11 @@
       "types": "./src/notification-center/index.ts",
       "svelte": "./src/notification-center/index.ts",
       "default": "./src/notification-center/index.ts"
+    },
+    "./numeric": {
+      "types": "./src/numeric/index.ts",
+      "svelte": "./src/numeric/index.ts",
+      "default": "./src/numeric/index.ts"
     },
     "./number-input": {
       "types": "./src/number-input/index.ts",
@@ -1118,6 +1133,11 @@
         "svelte": "./dist/icon/index.js",
         "default": "./dist/icon/index.js"
       },
+      "./icon-swap": {
+        "types": "./dist/icon-swap/index.d.ts",
+        "svelte": "./dist/icon-swap/index.js",
+        "default": "./dist/icon-swap/index.js"
+      },
       "./image": {
         "types": "./dist/image/index.d.ts",
         "svelte": "./dist/image/index.js",
@@ -1208,6 +1228,11 @@
         "svelte": "./dist/menubar/index.js",
         "default": "./dist/menubar/index.js"
       },
+      "./motion": {
+        "types": "./dist/motion/index.d.ts",
+        "svelte": "./dist/motion/index.js",
+        "default": "./dist/motion/index.js"
+      },
       "./multi-select-combobox": {
         "types": "./dist/multi-select-combobox/index.d.ts",
         "svelte": "./dist/multi-select-combobox/index.js",
@@ -1227,6 +1252,11 @@
         "types": "./dist/notification-center/index.d.ts",
         "svelte": "./dist/notification-center/index.js",
         "default": "./dist/notification-center/index.js"
+      },
+      "./numeric": {
+        "types": "./dist/numeric/index.d.ts",
+        "svelte": "./dist/numeric/index.js",
+        "default": "./dist/numeric/index.js"
       },
       "./number-input": {
         "types": "./dist/number-input/index.d.ts",

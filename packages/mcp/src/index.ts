@@ -107,11 +107,15 @@ server.tool(
 
 const CHECK_DESC = [
 	'Collapse DryUI validation into a single path-driven tool.\n\n',
-	'Input: optional `path`.\n',
+	'Input: optional `path`, optional `scope`.\n',
 	'- no path: workspace scan\n',
 	'- `.svelte` file: component review\n',
 	'- `.css` file: theme diagnosis\n',
 	'- directory: workspace scan scoped to that directory\n\n',
+	'Scope filter (maps to `--polish` / `--no-polish` CLI flags):\n',
+	'- `scope: "polish"`: only polish-category rules (raw headings, tabular nums, enter/exit timing, etc.)\n',
+	'- `scope: "no-polish"`: everything except polish (default correctness + a11y pass)\n',
+	'- omit `scope`: run every rule\n\n',
 	'Output: unified TOON with `issues`, aggregates, and `next[]` steering back toward `ask`.'
 ].join('');
 
@@ -128,11 +132,21 @@ server.tool(
 			.optional()
 			.describe(
 				'Target project directory for workspace scans and relative path resolution. Required in monorepos — without it the MCP server falls back to its own working directory, which may point at the wrong workspace.'
+			),
+		scope: z
+			.enum(['polish', 'no-polish'])
+			.optional()
+			.describe(
+				'Optional category filter. "polish": only run polish-category rules (raw headings, tabular nums, enter/exit timing, solid-border-on-raised, etc.). "no-polish": skip polish rules, run everything else. Omit to run every rule.'
 			)
 	},
-	async ({ path, cwd }) => {
+	async ({ path, cwd, scope }) => {
 		try {
-			const result = runCheckStructured(getSpec(), path ? { path } : {}, cwd ? { cwd } : {});
+			const input = {
+				...(path ? { path } : {}),
+				...(scope ? { scope } : {})
+			};
+			const result = runCheckStructured(getSpec(), input, cwd ? { cwd } : {});
 			// Two content blocks: humans read the TOON summary, agents parse the
 			// fenced JSON for repair loops. Clients that only surface the first
 			// block still see the human output.

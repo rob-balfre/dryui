@@ -57,15 +57,19 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-toast); children inside the padded region use var(--dry-radius-nested-toast). */
 	[data-part='root'] {
 		--dry-toast-accent: var(--dry-color-fill-info);
-		--dry-radius-nested: max(var(--dry-radius-sm), calc(var(--dry-radius-lg) - var(--dry-space-4)));
+		--dry-radius-nested: max(
+			var(--dry-radius-sm),
+			calc(var(--dry-radius-toast) - var(--dry-space-4))
+		);
 		--dry-btn-radius: var(--dry-radius-nested);
 
 		position: relative;
 		background: var(--dry-toast-bg, var(--dry-color-bg-overlay));
 		border: 1px solid var(--dry-toast-border, var(--dry-color-stroke-weak));
-		border-radius: var(--dry-radius-lg);
+		border-radius: var(--dry-radius-toast);
 		box-shadow: var(--dry-shadow-lg);
 		padding: var(--dry-space-4);
 		padding-right: calc(var(--dry-space-4) + var(--dry-space-12) + var(--dry-space-2));
@@ -148,7 +152,7 @@
 		display: grid;
 		grid-template-columns: var(--progress-width, 0%) 1fr;
 		background: var(--dry-color-stroke-weak, #e2e8f0);
-		border-radius: 0 0 var(--dry-radius-lg) var(--dry-radius-lg);
+		border-radius: 0 0 var(--dry-radius-toast) var(--dry-radius-toast);
 		overflow: hidden;
 		transition: grid-template-columns var(--dry-duration-normal) var(--dry-ease-default);
 	}

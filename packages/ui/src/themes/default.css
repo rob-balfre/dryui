@@ -10,11 +10,20 @@ html {
 	color: var(--dry-color-text-strong);
 	background: var(--dry-color-bg-base);
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 }
 
 body {
 	margin: 0;
 	min-height: 100dvh;
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+	text-wrap: balance;
+}
+:where(p) {
+	text-wrap: pretty;
 }
 
 code,
@@ -221,12 +230,62 @@ samp {
 
 	/* ─── Radius ──────────────────────────────────────────────────── */
 	--dry-radius-none: 0;
+	--dry-radius-xs: 2px;
 	--dry-radius-sm: 4px;
 	--dry-radius-md: 8px;
 	--dry-radius-lg: 8px;
 	--dry-radius-xl: 12px;
 	--dry-radius-2xl: 16px;
 	--dry-radius-full: 9999px;
+
+	/* ─── Concentric radius ─────────────────────────────────────────
+	   Per-container outer radii + the padding each container wraps
+	   its children in. The derived `--dry-radius-nested-*` tokens
+	   below are what children inside the padded region should use
+	   so inner corners sit concentric with the outer edge. */
+	--dry-radius-card: var(--dry-radius-2xl);
+	--dry-radius-dialog: var(--dry-radius-2xl);
+	--dry-radius-popover: var(--dry-radius-xl);
+	--dry-radius-sheet: var(--dry-radius-2xl);
+	--dry-radius-toast: var(--dry-radius-lg);
+	--dry-radius-tooltip: var(--dry-radius-md);
+
+	--dry-padding-card: var(--dry-space-8);
+	--dry-padding-dialog: var(--dry-space-6);
+	--dry-padding-popover: var(--dry-space-2);
+	--dry-padding-sheet: var(--dry-space-6);
+	--dry-padding-toast: var(--dry-space-3);
+	--dry-padding-tooltip: var(--dry-space-2);
+	--dry-padding-field: var(--dry-space-4);
+
+	--dry-radius-nested-card: max(
+		var(--dry-radius-sm),
+		calc(var(--dry-radius-card) - var(--dry-padding-card))
+	);
+	--dry-radius-nested-dialog: max(
+		var(--dry-radius-sm),
+		calc(var(--dry-radius-dialog) - var(--dry-padding-dialog))
+	);
+	--dry-radius-nested-popover: max(
+		var(--dry-radius-xs),
+		calc(var(--dry-radius-popover) - var(--dry-padding-popover))
+	);
+	--dry-radius-nested-sheet: max(
+		var(--dry-radius-sm),
+		calc(var(--dry-radius-sheet) - var(--dry-padding-sheet))
+	);
+	--dry-radius-nested-toast: max(
+		var(--dry-radius-xs),
+		calc(var(--dry-radius-toast) - var(--dry-padding-toast))
+	);
+	--dry-radius-nested-tooltip: max(
+		var(--dry-radius-xs),
+		calc(var(--dry-radius-tooltip) - var(--dry-padding-tooltip))
+	);
+	--dry-radius-nested-field: max(
+		var(--dry-radius-sm),
+		calc(var(--dry-radius-md) - var(--dry-padding-field))
+	);
 
 	/* ─── Typography ──────────────────────────────────────────────── */
 	--dry-font-sans:
@@ -375,6 +434,50 @@ samp {
 	--dry-stagger-step: 60ms;
 	--dry-stagger-max: 8; /* cap delay so very long lists don't take forever */
 
+	/* ─── Entrance motion ──────────────────────────────────────────
+	   Dramatic one-shot reveal (hero sections, page loads). Distinct
+	   from `--dry-duration-entrance` which drives ambient component
+	   mounts. `dry-enter` keyframe + `.dry-enter` class below consume
+	   these tokens. */
+	--dry-enter-translate: 8px;
+	--dry-enter-blur: 5px;
+	--dry-enter-duration: 800ms;
+	--dry-enter-ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+	--dry-enter-stagger-section: 100ms;
+	--dry-enter-stagger-word: 80ms;
+	--dry-enter-stagger-letter: 40ms;
+	--dry-enter-stagger-max: 16;
+
+	/* ─── Exit motion ──────────────────────────────────────────────
+	   Subtle dismissal — small fixed offset, not full container
+	   travel. Consumed by the `leave` Svelte transition and any
+	   overlay primitive using `out:leave`. */
+	--dry-exit-translate: 12px;
+	--dry-exit-blur: 4px;
+	--dry-exit-duration: var(--dry-duration-slow);
+	--dry-exit-ease: var(--dry-ease-out);
+
+	/* ─── Icon swap ────────────────────────────────────────────────
+	   Motion for `<IconSwap>` when one icon replaces another
+	   (copy ↔ check, play ↔ pause). Uses the same retarget-friendly
+	   transition as `[data-dry-icon-reveal]`. */
+	--dry-icon-swap-duration: var(--dry-duration-fast);
+	--dry-icon-swap-ease: var(--dry-ease-spring-snappy);
+	--dry-icon-swap-scale-out: 0.85;
+	--dry-icon-swap-blur-out: 2px;
+
+	/* ─── Optical offset ───────────────────────────────────────────
+	   Small horizontal nudge used by `:has()` selectors on Button,
+	   Chip, etc. to shift padding on the icon side so the label
+	   reads visually centered. */
+	--dry-optical-icon-offset: 0.125rem;
+
+	/* ─── Numeric variant ──────────────────────────────────────────
+	   Indirection layer so `.dry-tabular-nums` and the `Numeric`
+	   primitive can be swapped to `slashed-zero tabular-nums` or
+	   similar without a code sweep. */
+	--dry-numeric-variant: tabular-nums;
+
 	/* ─── Glass surface ───────────────────────────────────────────── */
 	--dry-glass-blur: 12px;
 	--dry-glass-tint: var(--dry-color-bg-raised);
@@ -435,17 +538,29 @@ samp {
 	--dry-tracking-wide: 0.05em;
 	--dry-tracking-wider: 0.1em;
 
-	/* ─── Utility shadows (fixed dark ink for depth across themes) ── */
-	--dry-shadow-sm: 0 1px 2px 0 color-mix(in srgb, #020617 12%, transparent);
+	/* ─── Utility shadows — three-layer shadow-as-border recipe ──────
+	   Edge + close contact + ambient, so a raised surface reads as
+	   raised without needing a solid border. Consumers: Card, Button,
+	   and any raised chrome that used to pair border + subtle shadow.
+	   Hover variants ramp the first two layers slightly. */
+	--dry-shadow-sm:
+		0px 0px 0px 1px rgba(0, 0, 0, 0.06), 0px 1px 2px -1px rgba(0, 0, 0, 0.06),
+		0px 2px 4px 0px rgba(0, 0, 0, 0.04);
 	--dry-shadow-md:
-		0 4px 6px -1px color-mix(in srgb, #020617 18%, transparent),
-		0 2px 4px -2px color-mix(in srgb, #020617 14%, transparent);
+		0px 0px 0px 1px rgba(0, 0, 0, 0.07), 0px 2px 4px -1px rgba(0, 0, 0, 0.08),
+		0px 4px 8px -2px rgba(0, 0, 0, 0.04);
 	--dry-shadow-lg:
-		0 10px 15px -3px color-mix(in srgb, #020617 24%, transparent),
-		0 4px 6px -4px color-mix(in srgb, #020617 18%, transparent);
+		0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 4px 8px -2px rgba(0, 0, 0, 0.08),
+		0px 8px 20px -4px rgba(0, 0, 0, 0.06);
 	--dry-shadow-xl:
-		0 20px 25px -5px color-mix(in srgb, #020617 30%, transparent),
-		0 8px 10px -6px color-mix(in srgb, #020617 22%, transparent);
+		0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 8px 16px -4px rgba(0, 0, 0, 0.1),
+		0px 20px 40px -8px rgba(0, 0, 0, 0.08);
+	--dry-shadow-sm-hover:
+		0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px -1px rgba(0, 0, 0, 0.08),
+		0px 2px 4px 0px rgba(0, 0, 0, 0.06);
+	--dry-shadow-md-hover:
+		0px 0px 0px 1px rgba(0, 0, 0, 0.09), 0px 2px 4px -1px rgba(0, 0, 0, 0.1),
+		0px 4px 8px -2px rgba(0, 0, 0, 0.06);
 
 	/* ─── Layers ──────────────────────────────────────────────────── */
 	--dry-layer-overlay: 50;
@@ -509,6 +624,18 @@ samp {
 		--dry-motion-opacity-enter: 1;
 		--dry-motion-blur-enter: 0px;
 		--dry-motion-scale-enter: 1;
+		--dry-enter-translate: 0px;
+		--dry-enter-blur: 0px;
+		--dry-enter-duration: 1ms;
+		--dry-enter-stagger-section: 0ms;
+		--dry-enter-stagger-word: 0ms;
+		--dry-enter-stagger-letter: 0ms;
+		--dry-exit-translate: 0px;
+		--dry-exit-blur: 0px;
+		--dry-exit-duration: 1ms;
+		--dry-icon-swap-duration: 0ms;
+		--dry-icon-swap-scale-out: 1;
+		--dry-icon-swap-blur-out: 0px;
 	}
 }
 
@@ -569,7 +696,33 @@ samp {
 }
 
 .dry-tabular-nums {
-	font-variant-numeric: tabular-nums;
+	font-variant-numeric: var(--dry-numeric-variant);
+}
+
+/* ─── Entrance animation ───────────────────────────────────────────
+   One-shot reveal for mounted content. Keyframes here are acceptable
+   (non-interactive, fires once on mount). Apply via:
+   - `<Enter index={n}>` / `<Stagger>` components.
+   - `in:enter={{ index }}` Svelte transition.
+   - `.dry-enter` + `style="--dry-enter-index: {n}"` for hand-rolled markup. */
+@keyframes dry-enter {
+	from {
+		transform: translateY(var(--dry-enter-translate));
+		filter: blur(var(--dry-enter-blur));
+		opacity: 0;
+	}
+}
+.dry-enter {
+	animation: dry-enter var(--dry-enter-duration) var(--dry-enter-ease) both;
+	animation-delay: calc(
+		var(--dry-enter-stagger-section) * min(var(--dry-enter-index, 0), var(--dry-enter-stagger-max))
+	);
+}
+@media (prefers-reduced-motion: reduce) {
+	.dry-enter {
+		animation-duration: 1ms;
+		animation-delay: 0ms;
+	}
 }
 
 [data-dry-icon-reveal] {

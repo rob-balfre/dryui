@@ -2,6 +2,7 @@ import {
 	RULE_CATALOG,
 	ruleSuggestedFix,
 	type RuleCatalogId,
+	type RuleCategory,
 	type RuleSeverity
 } from '@dryui/lint/rule-catalog';
 import { checkSvelteFile, type Violation } from '@dryui/lint/rules';
@@ -95,14 +96,29 @@ function summarizeIssues(issues: readonly ComponentIssue[]): string {
 	return summary;
 }
 
+export interface CheckComponentOptions {
+	readonly categoryFilter?: ReadonlySet<RuleCategory>;
+}
+
 export function checkComponent(
 	code: string,
 	spec: { components: Record<string, ComponentDef> },
-	filename?: string
+	filename?: string,
+	options: CheckComponentOptions = {}
 ): ComponentCheckResult {
 	const review = reviewComponent(code, spec, filename);
-	const lintIssues = checkSvelteFile(code, filename).map(lintViolationToIssue);
-	const issues = dedupeIssues([...review.issues, ...lintIssues]).sort((left, right) => {
+	const lintIssues = checkSvelteFile(code, filename, options.categoryFilter).map(
+		lintViolationToIssue
+	);
+	// Correctness-scoped runs drop the reviewer's spec-driven issues (those are
+	// correctness-level structural checks about the component surface). The
+	// polish scope keeps only polish/* rules.
+	const filteredReviewIssues = options.categoryFilter
+		? options.categoryFilter.has('correctness')
+			? review.issues
+			: []
+		: review.issues;
+	const issues = dedupeIssues([...filteredReviewIssues, ...lintIssues]).sort((left, right) => {
 		if (left.line !== right.line) return left.line - right.line;
 		if (left.severity !== right.severity) {
 			const rank = { error: 3, warning: 2, suggestion: 1, info: 0 } as const;

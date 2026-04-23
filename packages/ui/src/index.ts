@@ -845,3 +845,15 @@ export type {
 	DiagramColor,
 	DiagramDirection
 } from './diagram/index.js';
+
+// Visual Polish — motion, numeric, icon-swap
+
+export { IconSwap } from './icon-swap/index.js';
+
+export { Numeric } from './numeric/index.js';
+
+export { Enter } from './motion/index.js';
+export { Exit } from './motion/index.js';
+export { Stagger } from './motion/index.js';
+export { enter, leave } from './motion/index.js';
+export type { EnterOptions, LeaveOptions } from './motion/index.js';

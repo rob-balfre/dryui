@@ -75,6 +75,7 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-popover); children inside the padded region use var(--dry-radius-nested-popover). */
 	[data-context-menu-content] {
 		/* Reset UA popover defaults */
 		inset: unset;
@@ -82,7 +83,7 @@
 
 		--dry-menu-bg: var(--dry-color-bg-overlay);
 		--dry-menu-border: var(--dry-color-stroke-weak);
-		--dry-menu-radius: var(--dry-radius-lg);
+		--dry-menu-radius: var(--dry-radius-popover);
 		--dry-menu-shadow: var(--dry-shadow-lg);
 		--dry-menu-padding: var(--dry-space-1);
 		--dry-menu-item-padding: var(--dry-space-2_5) var(--dry-space-2);

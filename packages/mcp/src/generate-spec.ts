@@ -1354,7 +1354,12 @@ function parseDefaults(svelteSource: string): Record<string, string> {
 	return defaults;
 }
 
-const DIR_OVERRIDES: Record<string, string> = { QRCode: 'qr-code' };
+const DIR_OVERRIDES: Record<string, string> = {
+	QRCode: 'qr-code',
+	Enter: 'motion',
+	Exit: 'motion',
+	Stagger: 'motion'
+};
 
 function dirForComponent(name: string): string {
 	if (DIR_OVERRIDES[name]) return DIR_OVERRIDES[name];

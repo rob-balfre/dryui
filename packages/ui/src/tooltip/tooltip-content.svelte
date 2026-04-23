@@ -45,6 +45,7 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-tooltip); children inside the padded region use var(--dry-radius-nested-tooltip). */
 	[data-tooltip-content] {
 		/* Reset UA popover defaults */
 		inset: unset;
@@ -53,7 +54,7 @@
 		background: var(--dry-tooltip-bg, var(--dry-color-bg-inverse));
 		color: var(--dry-tooltip-color, var(--dry-color-text-inverse));
 		border: 1px solid var(--dry-tooltip-border, var(--dry-color-stroke-inverse-weak));
-		border-radius: var(--dry-tooltip-radius, var(--dry-overlay-radius, var(--dry-radius-xl)));
+		border-radius: var(--dry-tooltip-radius, var(--dry-overlay-radius, var(--dry-radius-tooltip)));
 		display: grid;
 		grid-template-columns: minmax(0, min(28ch, calc(100vw - var(--dry-space-8))));
 		padding: var(--dry-tooltip-padding-y, var(--dry-space-6))

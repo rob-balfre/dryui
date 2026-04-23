@@ -1,6 +1,6 @@
 # DryUI
 
-> 160 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 165 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -67,7 +67,7 @@ Props: variant (| 'solid'
 	| 'tab'
 	| 'toggle'
 	| 'pill'), Button treatment from solid primary actions to ghost and inline link styles., accepted solid, outline, ghost, soft, secondary, link, bare, trigger, nav, tab, toggle, pill, default 'solid' | size ('sm' | 'md' | 'lg' | 'icon' | 'icon-sm' | 'icon-lg'), Button density preset, including icon-only sizing variants., accepted sm, md, lg, icon, icon-sm, icon-lg, default 'md' | color ('primary' | 'danger' | 'ink' | (string & {}) | null), Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets., accepted primary, danger, ink, null, default 'primary' | className (string) | disabled (boolean), Prevents interaction and applies disabled styling., default false | href (string), Destination URL when the component renders as a link., When provided, Button renders an anchor instead of a button for link-style actions. | rel (string), Relationship between the current document and the linked resource. | target (string), Browsing context used for link navigation. | download (boolean | string), Requests download behavior when the component renders as a link. | type ('button' | 'submit' | 'reset'), HTML type attribute or component-specific type selector., accepted button, submit, reset, default 'button' | children (Snippet), Content rendered inside the component., required
-Data attributes: data-color (Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme., values primary, danger, ink) | data-disabled (Present when the component or part is disabled.) | data-group-orientation | data-in-group | data-size | data-variant
+Data attributes: data-color (Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme., values primary, danger, ink) | data-disabled (Present when the component or part is disabled.) | data-dry-icon | data-group-orientation | data-in-group | data-optical | data-size | data-variant
 Accessibility: Provide discernible text or an aria-label for icon-only buttons. | Use the href prop for navigation so the element keeps link semantics.
 Example: <Button variant="solid" onclick={handleClick}>Save</Button>
 
@@ -402,8 +402,8 @@ Form field wrapper with label, description, and error.
 Import: @dryui/ui
 Subpath import: @dryui/ui/field
 Parts: Root, Description, Error
-Props: Root: children (Snippet), Content rendered inside the component., required | error (string), default '' | required (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | Description: children (Snippet), Content rendered inside the component., required | Error: children (Snippet), Content rendered inside the component., required
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error
+Props: Root: children (Snippet), Content rendered inside the component., required | error (string), default '' | required (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | nestRadius (boolean), default false | Description: children (Snippet), Content rendered inside the component., required | Error: children (Snippet), Content rendered inside the component., required
+Data attributes: data-disabled (Present when the component or part is disabled.) | data-error | data-field | data-field-description | data-field-error | data-nest-radius
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <Field.Root>
 
@@ -996,7 +996,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/card
 Parts: Root, Header, Content, Footer
 Props: Root: as ('div' | 'a' | 'button'), Underlying HTML element to render for the component., accepted div, a, button, default 'div' | selected (boolean), Applies selected-state styling for interactive card surfaces. | disabled (boolean), Prevents interaction and applies disabled styling. | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal | variant ('default' | 'elevated' | 'interactive'), Visual style preset for the component., accepted default, elevated, interactive, default 'default' | size ('default' | 'sm'), Size preset affecting density, spacing, or typography., accepted default, sm, default 'default' | children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | noPadding (boolean), default false | Footer: children (Snippet), Content rendered inside the component., required
-Data attributes: data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
+Data attributes: data-bordered | data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Card.Root>
 
@@ -1044,7 +1044,7 @@ Small status indicator label.
 Import: @dryui/ui
 Subpath import: @dryui/ui/badge
 Props: variant ('solid' | 'outline' | 'soft' | 'dot'), Badge treatment ranging from filled emphasis to subtle outline styles., accepted solid, outline, soft, dot, default 'soft' | color (AliasableColor), Semantic tone applied to the badge background, border, or text treatment., default 'gray' | size ('sm' | 'md'), Badge density preset for compact metadata or standard labels., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component. | pulse (boolean) | icon (Snippet)
-Data attributes: data-badge | data-color | data-dot | data-icon-only | data-pulse | data-size | data-variant | data-wrapper
+Data attributes: data-badge | data-color | data-dot | data-icon-only | data-numeric | data-pulse | data-size | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Badge variant="soft">Active</Badge>
 
@@ -1080,7 +1080,7 @@ Sized and colored SVG icon wrapper with accessibility label.
 Import: @dryui/ui
 Subpath import: @dryui/ui/icon
 Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, xl, default 'md' | color ('primary' | 'muted' | 'current'), Semantic color or tone applied to the component., accepted primary, muted, current, default 'current' | label (string), Visible label text shown for the control or item. | class (string) | children (Snippet), Content rendered inside the component., required
-Data attributes: data-color | data-size
+Data attributes: data-color | data-dry-icon | data-size
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Icon>Content</Icon>
 
@@ -1391,6 +1391,46 @@ Props: config (DiagramConfig), required | width (number) | height (number)
 Data attributes: data-color | data-dashed | data-diagram | data-diagram-container | data-fit | data-has-description | data-has-icon-component | data-icon-svg | data-part | data-self-loop | data-state | data-variant
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example: <Diagram>Content</Diagram>
+
+### IconSwap
+Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens.
+Import: @dryui/ui
+Subpath import: @dryui/ui/icon-swap
+Data attributes: data-size
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <IconSwap>Content</IconSwap>
+
+### Numeric
+Tabular-nums numeric display with optional stable min-width and alignment.
+Import: @dryui/ui
+Subpath import: @dryui/ui/numeric
+Data attributes: data-align
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <Numeric>Content</Numeric>
+
+### Enter
+Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals..
+Import: @dryui/ui
+Subpath import: @dryui/ui/enter
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <Enter>Content</Enter>
+
+### Exit
+Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur)..
+Import: @dryui/ui
+Subpath import: @dryui/ui/exit
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <Exit>Content</Exit>
+
+### Stagger
+Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value..
+Import: @dryui/ui
+Subpath import: @dryui/ui/stagger
+Data attributes: data-dry-stagger
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <Stagger>Content</Stagger>
 
 ### AvatarGroup
 Compact cluster of avatars with overflow and presence status.

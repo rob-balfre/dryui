@@ -8,6 +8,7 @@
 		error?: string;
 		required?: boolean;
 		disabled?: boolean;
+		nestRadius?: boolean;
 	}
 
 	let {
@@ -15,6 +16,7 @@
 		error = '',
 		required = false,
 		disabled = false,
+		nestRadius = false,
 		class: className,
 		...rest
 	}: Props = $props();
@@ -67,6 +69,7 @@
 	data-field
 	data-disabled={disabled || undefined}
 	data-error={error ? '' : undefined}
+	data-nest-radius={nestRadius ? '' : undefined}
 	class={className}
 	{...rest}
 >
@@ -85,6 +88,10 @@
 
 		&[data-error] {
 			--dry-field-gap: var(--dry-space-1);
+		}
+
+		&[data-nest-radius] {
+			--dry-input-radius: var(--dry-radius-nested-field);
 		}
 	}
 </style>

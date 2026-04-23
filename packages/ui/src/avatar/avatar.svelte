@@ -121,7 +121,8 @@
 		font-size: var(--dry-avatar-font-size);
 		font-weight: 600;
 		line-height: 1;
-		box-shadow: inset 0 0 0 1px var(--dry-image-edge);
+		outline: 1px solid var(--dry-image-edge);
+		outline-offset: -1px;
 		overflow: hidden;
 		user-select: none;
 	}

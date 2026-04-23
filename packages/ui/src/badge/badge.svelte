@@ -12,6 +12,12 @@
 		children?: Snippet;
 		pulse?: boolean;
 		icon?: Snippet;
+		/**
+		 * Tabular-nums + min-width so numeric counts don't jitter as values
+		 * change (e.g. 9 → 10, 99 → 100). Applies `font-variant-numeric`
+		 * from `--dry-numeric-variant` and a 1.5em min-width.
+		 */
+		numeric?: boolean;
 	}
 
 	let {
@@ -22,6 +28,7 @@
 		children,
 		pulse,
 		icon,
+		numeric = false,
 		...rest
 	}: Props = $props();
 	const resolvedColor = $derived(resolveAlias(color, 'gray'));
@@ -34,6 +41,7 @@
 		class={className}
 		data-badge={isDot ? undefined : ''}
 		data-dot={isDot ? '' : undefined}
+		data-numeric={numeric && !isDot ? 'true' : undefined}
 		{...variantAttrs({
 			variant: isDot ? undefined : variant,
 			color: resolvedColor,
@@ -323,5 +331,14 @@
 		display: inline-grid;
 		place-items: center;
 		padding: var(--dry-space-0_5, 0.125rem);
+	}
+
+	/* ── Numeric counts ────────────────────────────────────────────────────────
+	   Tabular-nums + min-width so values like "9" and "10" occupy the same
+	   footprint and don't jitter the surrounding layout as counts change. */
+	[data-numeric='true'] {
+		font-variant-numeric: var(--dry-numeric-variant);
+		min-width: 1.5em;
+		text-align: center;
 	}
 </style>

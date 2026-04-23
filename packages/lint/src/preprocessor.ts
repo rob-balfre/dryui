@@ -1,5 +1,6 @@
 import type { PreprocessorGroup } from 'svelte/compiler';
 import { checkScript, checkMarkup, checkStyle, type Violation } from './rules.js';
+import { RULE_CATALOG, type RuleSeverity } from './rule-catalog.js';
 
 export interface DryuiLintOptions {
 	strict?: boolean;
@@ -10,16 +11,33 @@ function formatViolation(filename: string, v: Violation): string {
 	return `[${v.rule}] ${filename}:${v.line} — ${v.message}`;
 }
 
+const SEVERITY_BY_ID = RULE_CATALOG as Record<string, { severity: RuleSeverity }>;
+
+function severityOf(rule: string): RuleSeverity {
+	const entry = SEVERITY_BY_ID[rule];
+	if (entry) return entry.severity;
+	return 'error';
+}
+
 function report(filename: string, violations: Violation[], strict: boolean): void {
 	if (violations.length === 0) return;
 
-	if (strict) {
-		const messages = violations.map((v) => formatViolation(filename, v)).join('\n');
+	const blocking = violations.filter((v) => severityOf(v.rule) === 'error');
+	const nonBlocking = violations.filter((v) => severityOf(v.rule) !== 'error');
+
+	for (const v of nonBlocking) {
+		console.warn(formatViolation(filename, v));
+	}
+
+	if (strict && blocking.length > 0) {
+		const messages = blocking.map((v) => formatViolation(filename, v)).join('\n');
 		throw new Error(`DryUI lint violations:\n${messages}`);
 	}
 
-	for (const v of violations) {
-		console.warn(formatViolation(filename, v));
+	if (!strict) {
+		for (const v of blocking) {
+			console.warn(formatViolation(filename, v));
+		}
 	}
 }
 

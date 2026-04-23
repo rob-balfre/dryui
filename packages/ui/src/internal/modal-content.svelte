@@ -86,6 +86,7 @@
 </dialog>
 
 <style>
+	/* dialog: outer: var(--dry-radius-dialog); children inside the padded region use var(--dry-radius-nested-dialog). */
 	[data-modal-content] {
 		position: fixed;
 		inset: 0;
@@ -128,7 +129,7 @@
 		--dry-radius-nested: max(
 			var(--dry-radius-sm),
 			calc(
-				var(--dry-dialog-radius, var(--dry-overlay-radius, var(--dry-radius-2xl))) -
+				var(--dry-dialog-radius, var(--dry-overlay-radius, var(--dry-radius-dialog))) -
 					var(--dry-dialog-padding)
 			)
 		);
@@ -137,7 +138,7 @@
 		container-type: inline-size;
 		justify-self: stretch;
 		border: 1px solid var(--dry-dialog-border);
-		border-radius: var(--dry-dialog-radius, var(--dry-overlay-radius, var(--dry-radius-2xl)));
+		border-radius: var(--dry-dialog-radius, var(--dry-overlay-radius, var(--dry-radius-dialog)));
 		background: var(--dry-dialog-bg, var(--dry-overlay-bg, var(--dry-color-bg-overlay)));
 		color: var(--dry-color-text-strong);
 		box-shadow: var(--dry-dialog-shadow, var(--dry-overlay-shadow, var(--dry-shadow-overlay)));

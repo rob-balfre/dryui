@@ -141,7 +141,7 @@
       "name": "@dryui/theme-wizard",
       "version": "14.0.0",
       "devDependencies": {
-        "@dryui/lint": "^0.5.0",
+        "@dryui/lint": "^0.5.1",
         "@dryui/primitives": "^1.8.0",
         "@dryui/ui": "^1.8.0",
         "@sveltejs/package": "^2.5.7",

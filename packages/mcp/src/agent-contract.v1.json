@@ -6415,6 +6415,78 @@
         "  EmptyState.Action"
       ]
     },
+    "Enter": {
+      "name": "Enter",
+      "description": "Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals.",
+      "category": "display",
+      "tags": [
+        "animation",
+        "enter",
+        "reveal",
+        "motion",
+        "polish"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { Enter } from '@dryui/ui'",
+        "subpathStatement": "import { Enter } from '@dryui/ui/enter'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<Enter>Content</Enter>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import Enter from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component Enter",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ]
+    },
+    "Exit": {
+      "name": "Exit",
+      "description": "Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur).",
+      "category": "display",
+      "tags": [
+        "animation",
+        "exit",
+        "leave",
+        "motion",
+        "polish"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { Exit } from '@dryui/ui'",
+        "subpathStatement": "import { Exit } from '@dryui/ui/exit'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<Exit>Content</Exit>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import Exit from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component Exit",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ]
+    },
     "Field": {
       "name": "Field",
       "description": "Form field wrapper with label, description, and error",
@@ -6497,6 +6569,12 @@
               "bindable": false,
               "default": "false",
               "description": "Prevents interaction and applies disabled styling."
+            },
+            "nestRadius": {
+              "signature": "nestRadius: boolean | default:false",
+              "required": false,
+              "bindable": false,
+              "default": "false"
             }
           },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
@@ -8744,6 +8822,42 @@
           "description": "Content rendered inside the component."
         }
       }
+    },
+    "IconSwap": {
+      "name": "IconSwap",
+      "description": "Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens",
+      "category": "display",
+      "tags": [
+        "icon",
+        "swap",
+        "crossfade",
+        "animation",
+        "motion"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { IconSwap } from '@dryui/ui'",
+        "subpathStatement": "import { IconSwap } from '@dryui/ui/icon-swap'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<IconSwap>Content</IconSwap>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import IconSwap from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component IconSwap",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ]
     },
     "Image": {
       "name": "Image",
@@ -11537,6 +11651,42 @@
           "description": "Prevents interaction and applies disabled styling."
         }
       }
+    },
+    "Numeric": {
+      "name": "Numeric",
+      "description": "Tabular-nums numeric display with optional stable min-width and alignment",
+      "category": "display",
+      "tags": [
+        "numeric",
+        "tabular",
+        "number",
+        "stable",
+        "align"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { Numeric } from '@dryui/ui'",
+        "subpathStatement": "import { Numeric } from '@dryui/ui/numeric'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<Numeric>Content</Numeric>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import Numeric from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component Numeric",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ]
     },
     "OptionPicker": {
       "name": "OptionPicker",
@@ -15062,6 +15212,42 @@
           "description": "Content rendered inside the component."
         }
       }
+    },
+    "Stagger": {
+      "name": "Stagger",
+      "description": "Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value.",
+      "category": "display",
+      "tags": [
+        "animation",
+        "stagger",
+        "enter",
+        "motion",
+        "polish"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { Stagger } from '@dryui/ui'",
+        "subpathStatement": "import { Stagger } from '@dryui/ui/stagger'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<Stagger>Content</Stagger>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import Stagger from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component Stagger",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ]
     },
     "StarRating": {
       "name": "StarRating",
@@ -18631,6 +18817,24 @@
       ],
       "snippet": "<script>\n  import { CommandPalette, Hotkey } from '@dryui/ui';\n\n  let open = $state(false);\n\n  function handleSelect(value) {\n    if (value === 'new') { /* create new */ }\n    else if (value === 'search') { /* open search */ }\n    open = false;\n  }\n</script>\n\n<Hotkey keys=\"mod+k\" onpress={() => open = true} />\n\n<CommandPalette.Root bind:open onSelect={handleSelect}>\n  <CommandPalette.Input placeholder=\"Type a command or search...\" />\n  <CommandPalette.List>\n    <CommandPalette.Empty>No results found.</CommandPalette.Empty>\n    <CommandPalette.Group heading=\"Actions\">\n      <CommandPalette.Item value=\"new\">New document</CommandPalette.Item>\n      <CommandPalette.Item value=\"search\">Search files</CommandPalette.Item>\n      <CommandPalette.Item value=\"settings\">Open settings</CommandPalette.Item>\n    </CommandPalette.Group>\n    <CommandPalette.Group heading=\"Navigation\">\n      <CommandPalette.Item value=\"dashboard\">Go to Dashboard</CommandPalette.Item>\n      <CommandPalette.Item value=\"projects\">Go to Projects</CommandPalette.Item>\n    </CommandPalette.Group>\n  </CommandPalette.List>\n</CommandPalette.Root>"
     },
+    "concentric-radius": {
+      "name": "concentric-radius",
+      "description": "Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (Card, Dialog, Popover, Toast, Tooltip, Sheet, Field).",
+      "tags": [
+        "radius",
+        "concentric",
+        "card",
+        "nesting",
+        "polish",
+        "corner",
+        "rounded"
+      ],
+      "components": [
+        "Card",
+        "Button"
+      ],
+      "snippet": "<script>\n  import { Card, Button } from '@dryui/ui';\n</script>\n\n<Card.Root>\n  <Card.Content>\n    <!-- The Button inside this Card inherits --dry-btn-radius: var(--dry-radius-nested-card)\n         automatically, so inner corners sit concentric with the outer 16px. -->\n    <Button>Action</Button>\n  </Card.Content>\n</Card.Root>\n\n<!-- Nested tokens available: nested-card, nested-dialog, nested-popover,\n     nested-sheet, nested-toast, nested-tooltip, nested-field. -->"
+    },
     "custom-button-color": {
       "name": "custom-button-color",
       "description": "Customize a Button past the built-in primary/danger palette. Three tiers from least-invasive to most: (a) use the color=\"ink\" preset for a solid near-black editorial CTA that auto-inverts in dark theme, (b) pass a scoped class to tune padding, radius, or typography without theme drift, (c) wrap with --dry-btn-* token overrides for deep visual customization when neither preset nor class is enough.",
@@ -18751,6 +18955,22 @@
       ],
       "snippet": "<script>\n  import { Drawer, Button, Sidebar, Avatar, Text, Separator } from '@dryui/ui';\n\n  let drawerOpen = $state(false);\n</script>\n\n<Drawer.Root bind:open={drawerOpen} side=\"left\">\n  <Drawer.Trigger>\n    <Button variant=\"ghost\" size=\"icon\" aria-label=\"Open menu\">\n      <svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\">\n        <line x1=\"3\" y1=\"6\" x2=\"21\" y2=\"6\" /><line x1=\"3\" y1=\"12\" x2=\"21\" y2=\"12\" /><line x1=\"3\" y1=\"18\" x2=\"21\" y2=\"18\" />\n      </svg>\n    </Button>\n  </Drawer.Trigger>\n  <Drawer.Content>\n    <Drawer.Header>\n      <div class=\"drawer-user\">\n        <Avatar src=\"/avatar.jpg\" alt=\"Jane Smith\" fallback=\"JS\" size=\"md\" />\n        <div class=\"drawer-user-info\">\n          <Text as=\"span\" size=\"md\">Jane Smith</Text>\n          <Text as=\"span\" size=\"sm\" color=\"muted\">jane@example.com</Text>\n        </div>\n      </div>\n    </Drawer.Header>\n    <Drawer.Body>\n      <Sidebar.Root>\n        <Sidebar.Content>\n          <Sidebar.Group>\n            <Sidebar.GroupLabel>Main</Sidebar.GroupLabel>\n            <Sidebar.Item href=\"/dashboard\" active>Dashboard</Sidebar.Item>\n            <Sidebar.Item href=\"/projects\">Projects</Sidebar.Item>\n            <Sidebar.Item href=\"/messages\">Messages</Sidebar.Item>\n          </Sidebar.Group>\n          <Separator />\n          <Sidebar.Group>\n            <Sidebar.GroupLabel>Account</Sidebar.GroupLabel>\n            <Sidebar.Item href=\"/settings\">Settings</Sidebar.Item>\n            <Sidebar.Item href=\"/help\">Help</Sidebar.Item>\n          </Sidebar.Group>\n        </Sidebar.Content>\n      </Sidebar.Root>\n    </Drawer.Body>\n    <Drawer.Footer>\n      <Button variant=\"ghost\" onclick={() => { drawerOpen = false; }}>Sign out</Button>\n    </Drawer.Footer>\n  </Drawer.Content>\n</Drawer.Root>\n\n<style>\n  .drawer-user { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; align-items: center; gap: var(--dry-space-4); }\n  .drawer-user-info { display: grid; gap: var(--dry-space-2); }\n</style>"
     },
+    "exit-animation": {
+      "name": "exit-animation",
+      "description": "Subtle exits. A small fixed offset (~12px) beats mirroring the entrance. Use <Exit> as a wrapper or out:leave as a Svelte transition.",
+      "tags": [
+        "exit",
+        "leave",
+        "animation",
+        "dismiss",
+        "polish",
+        "motion"
+      ],
+      "components": [
+        "Exit"
+      ],
+      "snippet": "<script>\n  import { leave } from '@dryui/ui/motion';\n\n  let open = $state(true);\n</script>\n\n{#if open}\n  <div out:leave>\n    <p>This dismisses with a subtle 12px offset + fade + slight blur.</p>\n    <button onclick={() => (open = false)}>Close</button>\n  </div>\n{/if}\n\n<!-- Pair with in:enter for symmetric usage. Exit is intentionally smaller\n     than entrance so dismissal feels softer than introduction. -->"
+    },
     "file-upload-form": {
       "name": "file-upload-form",
       "description": "File upload with drag-and-drop zone, progress indicator, and submit button.",
@@ -18809,6 +19029,70 @@
         "Button"
       ],
       "snippet": "<script>\n  import { Aurora, Noise, Reveal, Button, Card, Container, Text, Heading } from '@dryui/ui';\n</script>\n\n<Aurora palette={['#08111f', '#1d4ed8', '#14b8a6']} speed={0.8}>\n  <Noise opacity={0.08} blend=\"soft-light\" animated={false} />\n  <Container>\n    <div class=\"hero-content\">\n      <Reveal variant=\"fade\" once>\n        <Heading level={1}>Ambient motion, no runtime.</Heading>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={80}>\n        <Text as=\"p\">Browser-native surfaces that stay readable, responsive, and reduced-motion aware.</Text>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={140}>\n        <div class=\"hero-actions\">\n          <Button variant=\"solid\">Explore docs</Button>\n          <Button variant=\"outline\">View motion guide</Button>\n        </div>\n      </Reveal>\n      <Reveal variant=\"scale-in\" delay={220}>\n        <Card.Root>\n          <Card.Content>Hero proof card</Card.Content>\n        </Card.Root>\n      </Reveal>\n    </div>\n  </Container>\n</Aurora>\n\n<style>\n  .hero-content { display: grid; gap: var(--dry-space-8); }\n  .hero-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(min-content, max-content)); gap: var(--dry-space-2); }\n</style>"
+    },
+    "icon-in-button": {
+      "name": "icon-in-button",
+      "description": "Buttons with leading/trailing icons get an automatic optical offset (--dry-optical-icon-offset) so the label reads visually centered, not geometrically centered.",
+      "tags": [
+        "button",
+        "icon",
+        "optical",
+        "alignment",
+        "polish"
+      ],
+      "components": [
+        "Button",
+        "Icon"
+      ],
+      "snippet": "<script>\n  import { Button, Icon } from '@dryui/ui';\n  import SearchIcon from '@dryui/icons/search.svelte';\n</script>\n\n<!-- Leading icon: padding-inline-start shrinks by --dry-optical-icon-offset -->\n<Button>\n  <Icon src={SearchIcon} />\n  Search\n</Button>\n\n<!-- Trailing icon: padding-inline-end shrinks -->\n<Button>\n  Next\n  <Icon src={SearchIcon} />\n</Button>\n\n<!-- Opt out: optical=\"off\" keeps geometric padding -->\n<Button optical=\"off\">\n  <Icon src={SearchIcon} />\n  Geometric\n</Button>"
+    },
+    "icon-swap": {
+      "name": "icon-swap",
+      "description": "Animate between two icons on state change (copy to check, play to pause, chevron flip). Uses the retarget-friendly opacity/scale/blur transition so repeated toggles feel right.",
+      "tags": [
+        "icon",
+        "animation",
+        "swap",
+        "copy",
+        "check",
+        "polish",
+        "motion"
+      ],
+      "components": [
+        "IconSwap",
+        "Button"
+      ],
+      "snippet": "<script>\n  import { Button, IconSwap } from '@dryui/ui';\n  import CopyIcon from '@dryui/icons/copy.svelte';\n  import CheckIcon from '@dryui/icons/check.svelte';\n\n  let copied = $state(false);\n\n  function copy() {\n    navigator.clipboard.writeText('hello');\n    copied = true;\n    setTimeout(() => (copied = false), 2000);\n  }\n</script>\n\n<Button onclick={copy}>\n  <IconSwap icon={copied ? CheckIcon : CopyIcon} />\n  {copied ? 'Copied' : 'Copy'}\n</Button>"
+    },
+    "image-edge": {
+      "name": "image-edge",
+      "description": "Images and avatars get a 1px outline (--dry-image-edge) that adapts to theme (black/10% in light, white/10% in dark). Stops image edges from reading as surface imperfections.",
+      "tags": [
+        "image",
+        "avatar",
+        "edge",
+        "outline",
+        "polish"
+      ],
+      "components": [
+        "Image",
+        "Avatar"
+      ],
+      "snippet": "<script>\n  import { Image, Avatar } from '@dryui/ui';\n</script>\n\n<Image src=\"/photo.jpg\" alt=\"Landscape\" width={480} height={320} />\n<Avatar src=\"/face.jpg\" name=\"Rob\" />\n\n<!-- For hand-rolled media, apply the same pattern: -->\n<style>\n  .my-image {\n    outline: 1px solid var(--dry-image-edge);\n    outline-offset: -1px;\n  }\n</style>"
+    },
+    "interactive-motion": {
+      "name": "interactive-motion",
+      "description": "Transitions vs keyframes. Use transitions for interactive states (hover, focus, open/close) so the motion retargets mid-interaction. Keyframes are for one-shot staged sequences.",
+      "tags": [
+        "motion",
+        "transition",
+        "keyframe",
+        "interactive",
+        "polish",
+        "interruptible"
+      ],
+      "components": [],
+      "snippet": "<script>\n  let open = $state(false);\n</script>\n\n<button\n  onclick={() => (open = !open)}\n  data-state={open ? 'open' : 'closed'}\n  class=\"toggle\"\n>\n  Toggle\n</button>\n\n<style>\n  /* GOOD: transition retargets mid-press. Spamming the button feels right. */\n  .toggle {\n    transform: scale(1);\n    transition: transform var(--dry-duration-fast) var(--dry-ease-spring-snappy);\n  }\n  .toggle[data-state='open'] {\n    transform: scale(1.1);\n  }\n\n  /* BAD (don't do this):\n  @keyframes wobble { ... }\n  .toggle[data-state='open'] { animation: wobble 200ms; }\n  Fixed timeline, can't retarget if user releases mid-animation. */\n</style>"
     },
     "light-only": {
       "name": "light-only",
@@ -18940,6 +19224,24 @@
       ],
       "snippet": "<script>\n  import { Card, Avatar, Text, Badge, Separator } from '@dryui/ui';\n\n  const notifications = [\n    { user: 'Sarah Chen', avatar: 'SC', action: 'commented on', target: 'Design Review', time: '2 min ago', unread: true },\n    { user: 'Marcus Rivera', avatar: 'MR', action: 'approved', target: 'PR #142', time: '1 hour ago', unread: true },\n    { user: 'Emily Watson', avatar: 'EW', action: 'assigned you to', target: 'Bug Fix #89', time: '3 hours ago', unread: false },\n  ];\n</script>\n\n<Card.Root>\n  <Card.Header>\n    <div class=\"notif-header\">\n      <Text weight=\"bold\">Notifications</Text>\n      <Badge variant=\"soft\">{notifications.filter(n => n.unread).length} new</Badge>\n    </div>\n  </Card.Header>\n  <Card.Content>\n    <div class=\"notif-list\">\n      {#each notifications as notif, i (notif.time)}\n        <div class=\"notif-item\">\n          <Avatar fallback={notif.avatar} size=\"sm\" />\n          <div class=\"notif-body\">\n            <Text>\n              <Text weight=\"bold\">{notif.user}</Text> {notif.action} <Text weight=\"medium\">{notif.target}</Text>\n            </Text>\n            <Text size=\"sm\" color=\"secondary\">{notif.time}</Text>\n          </div>\n          {#if notif.unread}\n            <div class=\"unread-dot\" aria-label=\"Unread\"></div>\n          {/if}\n        </div>\n        {#if i < notifications.length - 1}\n          <Separator />\n        {/if}\n      {/each}\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .notif-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n  .notif-list { display: grid; gap: var(--dry-space-2); }\n  .notif-item { display: grid; grid-template-columns: max-content 1fr max-content; align-items: start; gap: var(--dry-space-2); }\n  .notif-body { display: grid; gap: var(--dry-space-1); }\n  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dry-color-fill-brand); margin-top: var(--dry-space-1); }\n</style>"
     },
+    "numeric-display": {
+      "name": "numeric-display",
+      "description": "Stable-width digit rendering for counters, clocks, prices, scores. Tabular-nums stops digits from jittering as values change.",
+      "tags": [
+        "numeric",
+        "counter",
+        "clock",
+        "tabular-nums",
+        "digits",
+        "polish",
+        "number"
+      ],
+      "components": [
+        "Numeric",
+        "Badge"
+      ],
+      "snippet": "<script>\n  import { Numeric, Badge } from '@dryui/ui';\n\n  let count = $state(0);\n</script>\n\n<Numeric value={count} stable minDigits={3} align=\"end\" />\n<Badge numeric>{count}</Badge>\n\n<button onclick={() => count++}>+</button>\n\n<!-- Or apply the utility class directly to any numeric element:\n  <span class=\"dry-tabular-nums\">{value}</span>\n-->"
+    },
     "page-shell-simple": {
       "name": "page-shell-simple",
       "description": "Simple page layout with header and centered content. Use Container for pages without a sidebar.",
@@ -19029,6 +19331,21 @@
       ],
       "snippet": "<!-- Serif display heading: override --dry-font-display on a scoped\n     wrapper. variant=\"display\" on Heading reads --dry-font-display and\n     falls back to --dry-font-sans, so without an override you get sans. -->\n\n<!-- 1. app.html: link a serif font. Newsreader is a good editorial default. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n    <link\n      href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap\"\n      rel=\"stylesheet\"\n    />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. app.css: override --dry-font-display on body (or a .page wrapper).\n     Do NOT put this on :root (that trips the theme-checker\n     full-theme-override rule, which reserves :root for generated theme\n     files). Scoping to body keeps the override local to the app instance\n     and reads every <Heading variant=\"display\"> beneath it. -->\nbody {\n  --dry-font-display: 'Newsreader', Georgia, 'Times New Roman', serif;\n}\n\n<!-- 3. Any page: variant=\"display\" now renders with the serif. -->\n<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<section class=\"hero\">\n  <Heading level={1} variant=\"display\" maxMeasure=\"narrow\">\n    Inference is all you need.\n  </Heading>\n  <Text size=\"lg\" color=\"muted\">Open-weight models, on your laptop.</Text>\n</section>\n\n<style>\n  .hero {\n    display: grid;\n    gap: var(--dry-space-6);\n  }\n</style>\n\n<!-- Gotchas:\n     - Only the Heading variant reads --dry-font-display. Other typography\n       components still use --dry-font-sans or --dry-font-mono.\n     - Override on body or a .page wrapper, NOT on :root. The theme-checker\n       treats :root { --dry-* } blocks as full theme overrides and flags them\n       when they do not ship a complete token set.\n     - If you want the serif scoped to one section (landing page only), move\n       the override onto a wrapper class instead of body. -->"
     },
+    "shadow-as-border": {
+      "name": "shadow-as-border",
+      "description": "Three-layer box-shadow (edge + close contact + ambient) reads cleaner than a solid 1px border. Works over images and mixed backgrounds. No double-edge when combined with drop shadows.",
+      "tags": [
+        "shadow",
+        "border",
+        "card",
+        "elevation",
+        "polish"
+      ],
+      "components": [
+        "Card"
+      ],
+      "snippet": "<script>\n  import { Card } from '@dryui/ui';\n</script>\n\n<!-- Default Card: shadow-only (no border) -->\n<Card.Root>\n  <Card.Content>\n    A Card that reads as raised without a solid edge.\n  </Card.Content>\n</Card.Root>\n\n<!-- Bordered escape hatch, when you want the 1px edge back -->\n<Card.Root bordered>\n  <Card.Content>A Card with both shadow and border.</Card.Content>\n</Card.Root>\n\n<!-- Raw pattern. Use the token family directly on any raised surface: -->\n<style>\n  .my-raised-surface {\n    background: var(--dry-color-bg-raised);\n    border-radius: var(--dry-radius-lg);\n    box-shadow: var(--dry-shadow-sm);\n    transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);\n  }\n  .my-raised-surface:hover {\n    box-shadow: var(--dry-shadow-sm-hover);\n  }\n</style>"
+    },
     "shared-element-detail-transition": {
       "name": "shared-element-detail-transition",
       "description": "Detail-page transition recipe that leans on the browser View Transition API and degrades cleanly when it is unavailable.",
@@ -19081,6 +19398,27 @@
       ],
       "snippet": "<script>\n  import { Spotlight, Reveal, Card, Text } from '@dryui/ui';\n\n  const features = [\n    { title: 'Fast', copy: 'Keeps motion browser-native.' },\n    { title: 'Readable', copy: 'Preserves contrast and hierarchy.' },\n    { title: 'Adaptive', copy: 'Falls back when motion is reduced.' },\n  ];\n</script>\n\n<div class=\"feature-grid\">\n  {#each features as feature, index (feature.title)}\n    <Reveal variant=\"fade\" delay={index * 80}>\n      <Spotlight radius={160} intensity={0.6} color=\"var(--dry-color-primary)\">\n        <Card.Root>\n          <Card.Content>\n            <Text weight=\"bold\">{feature.title}</Text>\n            <Text as=\"p\">{feature.copy}</Text>\n          </Card.Content>\n        </Card.Root>\n      </Spotlight>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-6); }\n</style>"
     },
+    "stagger-entrance": {
+      "name": "stagger-entrance",
+      "description": "Break entering content into chunks, stagger by 80 to 100ms. Use <Enter> for a single element, <Stagger> for a container, or in:enter={{ index }} for a Svelte transition.",
+      "tags": [
+        "enter",
+        "stagger",
+        "animation",
+        "entrance",
+        "polish",
+        "motion",
+        "reveal"
+      ],
+      "components": [
+        "Enter",
+        "Stagger",
+        "Heading",
+        "Text",
+        "Button"
+      ],
+      "snippet": "<script>\n  import { Enter, Stagger, Heading, Text, Button } from '@dryui/ui';\n  import { enter } from '@dryui/ui/motion';\n</script>\n\n<!-- Option A: auto-indexed Stagger container -->\n<Stagger step=\"section\">\n  <Heading level={1}>Welcome</Heading>\n  <Text as=\"p\">A paragraph that follows.</Text>\n  <Button>Call to action</Button>\n</Stagger>\n\n<!-- Option B: explicit Enter with index -->\n<Enter index={0}>\n  <Heading level={1}>Welcome</Heading>\n</Enter>\n<Enter index={1}>\n  <Text as=\"p\">A paragraph that follows.</Text>\n</Enter>\n\n<!-- Option C: Svelte transition with programmatic index -->\n{#each items as item, i}\n  <div in:enter={{ index: i }}>{item}</div>\n{/each}"
+    },
     "surface-composition": {
       "name": "surface-composition",
       "description": "Layered visual effects (Aurora background, Noise grain, Glow highlight) composed with nesting. Each wrapper adds one effect layer; content sits inside the innermost component.",
@@ -19116,6 +19454,24 @@
         "Button"
       ],
       "snippet": "<script>\n  import { Toast, Button } from '@dryui/ui';\n  import { toastStore } from '@dryui/ui/toast';\n</script>\n\n<!-- Place Toast.Provider once in your layout (e.g. +layout.svelte) -->\n<Toast.Provider position=\"bottom-right\" />\n\n<div class=\"toast-triggers\">\n  <Button variant=\"solid\" onclick={() => toastStore.success('Changes saved', { description: 'Your settings have been updated.' })}>\n    Save changes\n  </Button>\n  <Button variant=\"outline\" onclick={() => toastStore.info('Tip', { description: 'You can undo this action within 5 seconds.' })}>\n    Show info\n  </Button>\n  <Button variant=\"soft\" color=\"danger\" onclick={() => toastStore.error('Delete failed', { description: 'Could not delete the item. Please try again.' })}>\n    Trigger error\n  </Button>\n</div>\n\n<style>\n  .toast-triggers { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--dry-space-4); }\n</style>"
+    },
+    "typography": {
+      "name": "typography",
+      "description": "Text wrapping and typographic pairings. Use <Heading> for balanced headings, <Text as=\"p\"> for pretty paragraphs. Both ship with text-wrap defaults that prevent orphans.",
+      "tags": [
+        "typography",
+        "heading",
+        "text",
+        "text-wrap",
+        "balance",
+        "pretty",
+        "polish"
+      ],
+      "components": [
+        "Heading",
+        "Text"
+      ],
+      "snippet": "<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<Heading level={1}>\n  Heading with text-wrap: balance\n  so subtitles don't strand a single word.\n</Heading>\n<Text as=\"p\">\n  Body copy uses text-wrap: pretty by default. It's subtler than balance. Prevents single-word orphans on the last line without re-wrapping the whole paragraph.\n</Text>\n\n<!-- Raw <h1> and <p> also get the defaults via :where() in the theme reset,\n     so even hand-rolled markdown inherits the treatment. -->"
     },
     "user-profile-card": {
       "name": "user-profile-card",

@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.8.0",
   "summary": {
-    "componentNodes": 291,
+    "componentNodes": 293,
     "partNodes": 656,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 144,
-    "uiComponents": 147,
+    "uiComponents": 149,
     "uiWrappers": 130,
-    "uiComposites": 17,
-    "rootBarrelComponents": 291,
+    "uiComposites": 19,
+    "rootBarrelComponents": 293,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
     "composeEdges": 15,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 291,
+    "mismatches": 295,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -12304,6 +12304,31 @@
       "componentImportCount": 0
     },
     {
+      "id": "ui:IconSwap",
+      "name": "IconSwap",
+      "label": "IconSwap",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/icon-swap/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "icon",
+        "swap",
+        "crossfade",
+        "animation",
+        "motion"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 3,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:Image",
       "name": "Image",
       "label": "Image",
@@ -13648,6 +13673,31 @@
         "number",
         "input",
         "counter"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 3,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:Numeric",
+      "name": "Numeric",
+      "label": "Numeric",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Tabular-nums numeric display with optional stable min-width and alignment",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/numeric/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "numeric",
+        "tabular",
+        "number",
+        "stable",
+        "align"
       ],
       "compound": false,
       "parts": [],
@@ -24191,6 +24241,20 @@
   "clusters": [],
   "mismatches": [
     {
+      "kind": "docs-nav-missing",
+      "package": "docs",
+      "component": "IconSwap",
+      "detail": "Public UI export is missing from the docs component navigation.",
+      "sourcePath": "packages/ui/src/icon-swap/index.ts"
+    },
+    {
+      "kind": "docs-nav-missing",
+      "package": "docs",
+      "component": "Numeric",
+      "detail": "Public UI export is missing from the docs component navigation.",
+      "sourcePath": "packages/ui/src/numeric/index.ts"
+    },
+    {
       "kind": "missing-subpath-export",
       "package": "primitives",
       "component": "Accordion",
@@ -25663,6 +25727,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
+      "component": "IconSwap",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/icon-swap/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
       "component": "Image",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/image/index.ts"
@@ -25820,6 +25891,13 @@
       "component": "NumberInput",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/number-input/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
+      "component": "Numeric",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/numeric/index.ts"
     },
     {
       "kind": "missing-subpath-export",
@@ -26299,11 +26377,14 @@
     "specMissingPrimitives": [
       "TokenScope"
     ],
-    "docsNavMissing": [],
+    "docsNavMissing": [
+      "IconSwap",
+      "Numeric"
+    ],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 17\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 19\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

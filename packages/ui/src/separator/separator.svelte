@@ -3,7 +3,7 @@
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		orientation?: 'horizontal' | 'vertical';
-		variant?: 'weak' | 'strong';
+		variant?: 'weak' | 'strong' | 'shadow';
 		decorative?: boolean;
 	}
 
@@ -50,5 +50,21 @@
 
 	div[data-variant='strong'] {
 		--dry-separator-color: var(--dry-color-stroke-strong);
+	}
+
+	/* ── Variant: shadow (theme-friendlier edge on image backgrounds) ─────── */
+
+	div[data-variant='shadow'] {
+		background-color: transparent;
+		box-shadow: 0 1px 0 var(--dry-color-stroke-weak);
+	}
+
+	div[data-variant='shadow'][data-orientation='horizontal'] {
+		height: 1px;
+	}
+
+	div[data-variant='shadow'][data-orientation='vertical'] {
+		box-shadow: 1px 0 0 var(--dry-color-stroke-weak);
+		grid-template-columns: 1px;
 	}
 </style>

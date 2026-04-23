@@ -22,6 +22,7 @@
 </script>
 
 <span
+	data-dry-icon=""
 	role={label ? 'img' : 'presentation'}
 	aria-label={label}
 	aria-hidden={label ? undefined : true}

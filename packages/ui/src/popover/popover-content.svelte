@@ -54,10 +54,11 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-popover); children inside the padded region use var(--dry-radius-nested-popover). */
 	[data-popover-content] {
 		--dry-popover-bg: var(--dry-overlay-bg, var(--dry-color-bg-overlay));
 		--dry-popover-border: var(--dry-overlay-border, var(--dry-color-stroke-weak));
-		--dry-popover-radius: var(--dry-overlay-radius, var(--dry-radius-lg));
+		--dry-popover-radius: var(--dry-overlay-radius, var(--dry-radius-popover));
 		--dry-popover-shadow: var(--dry-overlay-shadow, var(--dry-shadow-lg));
 		--dry-popover-padding: var(--dry-space-4);
 		--dry-radius-nested: max(

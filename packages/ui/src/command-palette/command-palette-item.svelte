@@ -58,7 +58,7 @@
 
 <style>
 	[data-command-palette-item] {
-		--dry-cmd-item-radius: min(var(--dry-control-radius, var(--dry-radius-sm)), var(--dry-space-4));
+		--dry-cmd-item-radius: var(--dry-radius-nested-dialog);
 
 		display: grid;
 		grid-auto-flow: column;

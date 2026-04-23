@@ -6,9 +6,9 @@
     "version": "1.8.0"
   },
   "counts": {
-    "components": 160,
+    "components": 165,
     "compositionComponents": 130,
-    "compositionRecipes": 38,
+    "compositionRecipes": 48,
     "tools": 2,
     "prompts": 2,
     "cliCommands": 13,
@@ -330,10 +330,16 @@
           "description": "Present when the component or part is disabled."
         },
         {
+          "name": "data-dry-icon"
+        },
+        {
           "name": "data-group-orientation"
         },
         {
           "name": "data-in-group"
+        },
+        {
+          "name": "data-optical"
         },
         {
           "name": "data-size"
@@ -604,10 +610,12 @@
         "--dry-card-padding": "Padding",
         "--dry-card-radius": "Border radius",
         "--dry-card-selected-ring-color": "Selected Ring Color",
-        "--dry-card-shadow": "Box shadow",
-        "--dry-radius-nested": "Nested"
+        "--dry-card-shadow": "Box shadow"
       },
       "dataAttributes": [
+        {
+          "name": "data-bordered"
+        },
         {
           "name": "data-card"
         },
@@ -2632,6 +2640,11 @@
               "required": false,
               "description": "Prevents interaction and applies disabled styling.",
               "default": "false"
+            },
+            "nestRadius": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
             }
           },
           "forwardedProps": {
@@ -2697,7 +2710,8 @@
         "Provide native name, autocomplete, and value wiring when the component participates in form submission."
       ],
       "cssVars": {
-        "--dry-field-gap": "Gap spacing"
+        "--dry-field-gap": "Gap spacing",
+        "--dry-input-radius": "Border radius"
       },
       "dataAttributes": [
         {
@@ -2715,6 +2729,9 @@
         },
         {
           "name": "data-field-error"
+        },
+        {
+          "name": "data-nest-radius"
         }
       ],
       "example": "<Field.Root>\n  <Label>Username</Label>\n  <Input bind:value={username} />\n</Field.Root>"
@@ -7419,6 +7436,9 @@
           "name": "data-icon-only"
         },
         {
+          "name": "data-numeric"
+        },
+        {
           "name": "data-pulse"
         },
         {
@@ -7972,6 +7992,9 @@
       "dataAttributes": [
         {
           "name": "data-color"
+        },
+        {
+          "name": "data-dry-icon"
         },
         {
           "name": "data-size"
@@ -19625,6 +19648,131 @@
       ],
       "example": "<Diagram>Content</Diagram>"
     },
+    "IconSwap": {
+      "import": "@dryui/ui",
+      "description": "Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens",
+      "category": "display",
+      "tags": [
+        "icon",
+        "swap",
+        "crossfade",
+        "animation",
+        "motion"
+      ],
+      "compound": false,
+      "props": {},
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-size"
+        }
+      ],
+      "example": "<IconSwap>Content</IconSwap>"
+    },
+    "Numeric": {
+      "import": "@dryui/ui",
+      "description": "Tabular-nums numeric display with optional stable min-width and alignment",
+      "category": "display",
+      "tags": [
+        "numeric",
+        "tabular",
+        "number",
+        "stable",
+        "align"
+      ],
+      "compound": false,
+      "props": {},
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-align"
+        }
+      ],
+      "example": "<Numeric>Content</Numeric>"
+    },
+    "Enter": {
+      "import": "@dryui/ui",
+      "description": "Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals.",
+      "category": "display",
+      "tags": [
+        "animation",
+        "enter",
+        "reveal",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "props": {},
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-dry-stagger"
+        }
+      ],
+      "example": "<Enter>Content</Enter>"
+    },
+    "Exit": {
+      "import": "@dryui/ui",
+      "description": "Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur).",
+      "category": "display",
+      "tags": [
+        "animation",
+        "exit",
+        "leave",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "props": {},
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-dry-stagger"
+        }
+      ],
+      "example": "<Exit>Content</Exit>"
+    },
+    "Stagger": {
+      "import": "@dryui/ui",
+      "description": "Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value.",
+      "category": "display",
+      "tags": [
+        "animation",
+        "stagger",
+        "enter",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "props": {},
+      "a11y": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "cssVars": {},
+      "dataAttributes": [
+        {
+          "name": "data-dry-stagger"
+        }
+      ],
+      "example": "<Stagger>Content</Stagger>"
+    },
     "AffixGroup": {
       "import": "@dryui/primitives",
       "description": "Grouped input shell for prefixes, suffixes, separators, and actions",
@@ -25977,6 +26125,176 @@
         ],
         "components": [],
         "snippet": "<!--\n  Agent repair loop for DryUI check output.\n\n  Every 'check' response over MCP carries two content blocks:\n    1. TOON summary (human-readable)\n    2. A JSON block tagged 'dryui-diagnostics' with { diagnostics: [...] }\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. call tool 'check' with { path: 'path/to/file.svelte' }\n3. parse the dryui-diagnostics JSON block from the response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. call 'check' again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
+      },
+      "typography": {
+        "name": "typography",
+        "description": "Text wrapping and typographic pairings. Use <Heading> for balanced headings, <Text as=\"p\"> for pretty paragraphs. Both ship with text-wrap defaults that prevent orphans.",
+        "tags": [
+          "typography",
+          "heading",
+          "text",
+          "text-wrap",
+          "balance",
+          "pretty",
+          "polish"
+        ],
+        "components": [
+          "Heading",
+          "Text"
+        ],
+        "snippet": "<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<Heading level={1}>\n  Heading with text-wrap: balance\n  so subtitles don't strand a single word.\n</Heading>\n<Text as=\"p\">\n  Body copy uses text-wrap: pretty by default. It's subtler than balance. Prevents single-word orphans on the last line without re-wrapping the whole paragraph.\n</Text>\n\n<!-- Raw <h1> and <p> also get the defaults via :where() in the theme reset,\n     so even hand-rolled markdown inherits the treatment. -->"
+      },
+      "concentric-radius": {
+        "name": "concentric-radius",
+        "description": "Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (Card, Dialog, Popover, Toast, Tooltip, Sheet, Field).",
+        "tags": [
+          "radius",
+          "concentric",
+          "card",
+          "nesting",
+          "polish",
+          "corner",
+          "rounded"
+        ],
+        "components": [
+          "Card",
+          "Button"
+        ],
+        "snippet": "<script>\n  import { Card, Button } from '@dryui/ui';\n</script>\n\n<Card.Root>\n  <Card.Content>\n    <!-- The Button inside this Card inherits --dry-btn-radius: var(--dry-radius-nested-card)\n         automatically, so inner corners sit concentric with the outer 16px. -->\n    <Button>Action</Button>\n  </Card.Content>\n</Card.Root>\n\n<!-- Nested tokens available: nested-card, nested-dialog, nested-popover,\n     nested-sheet, nested-toast, nested-tooltip, nested-field. -->"
+      },
+      "icon-swap": {
+        "name": "icon-swap",
+        "description": "Animate between two icons on state change (copy to check, play to pause, chevron flip). Uses the retarget-friendly opacity/scale/blur transition so repeated toggles feel right.",
+        "tags": [
+          "icon",
+          "animation",
+          "swap",
+          "copy",
+          "check",
+          "polish",
+          "motion"
+        ],
+        "components": [
+          "IconSwap",
+          "Button"
+        ],
+        "snippet": "<script>\n  import { Button, IconSwap } from '@dryui/ui';\n  import CopyIcon from '@dryui/icons/copy.svelte';\n  import CheckIcon from '@dryui/icons/check.svelte';\n\n  let copied = $state(false);\n\n  function copy() {\n    navigator.clipboard.writeText('hello');\n    copied = true;\n    setTimeout(() => (copied = false), 2000);\n  }\n</script>\n\n<Button onclick={copy}>\n  <IconSwap icon={copied ? CheckIcon : CopyIcon} />\n  {copied ? 'Copied' : 'Copy'}\n</Button>"
+      },
+      "numeric-display": {
+        "name": "numeric-display",
+        "description": "Stable-width digit rendering for counters, clocks, prices, scores. Tabular-nums stops digits from jittering as values change.",
+        "tags": [
+          "numeric",
+          "counter",
+          "clock",
+          "tabular-nums",
+          "digits",
+          "polish",
+          "number"
+        ],
+        "components": [
+          "Numeric",
+          "Badge"
+        ],
+        "snippet": "<script>\n  import { Numeric, Badge } from '@dryui/ui';\n\n  let count = $state(0);\n</script>\n\n<Numeric value={count} stable minDigits={3} align=\"end\" />\n<Badge numeric>{count}</Badge>\n\n<button onclick={() => count++}>+</button>\n\n<!-- Or apply the utility class directly to any numeric element:\n  <span class=\"dry-tabular-nums\">{value}</span>\n-->"
+      },
+      "interactive-motion": {
+        "name": "interactive-motion",
+        "description": "Transitions vs keyframes. Use transitions for interactive states (hover, focus, open/close) so the motion retargets mid-interaction. Keyframes are for one-shot staged sequences.",
+        "tags": [
+          "motion",
+          "transition",
+          "keyframe",
+          "interactive",
+          "polish",
+          "interruptible"
+        ],
+        "components": [],
+        "snippet": "<script>\n  let open = $state(false);\n</script>\n\n<button\n  onclick={() => (open = !open)}\n  data-state={open ? 'open' : 'closed'}\n  class=\"toggle\"\n>\n  Toggle\n</button>\n\n<style>\n  /* GOOD: transition retargets mid-press. Spamming the button feels right. */\n  .toggle {\n    transform: scale(1);\n    transition: transform var(--dry-duration-fast) var(--dry-ease-spring-snappy);\n  }\n  .toggle[data-state='open'] {\n    transform: scale(1.1);\n  }\n\n  /* BAD (don't do this):\n  @keyframes wobble { ... }\n  .toggle[data-state='open'] { animation: wobble 200ms; }\n  Fixed timeline, can't retarget if user releases mid-animation. */\n</style>"
+      },
+      "stagger-entrance": {
+        "name": "stagger-entrance",
+        "description": "Break entering content into chunks, stagger by 80 to 100ms. Use <Enter> for a single element, <Stagger> for a container, or in:enter={{ index }} for a Svelte transition.",
+        "tags": [
+          "enter",
+          "stagger",
+          "animation",
+          "entrance",
+          "polish",
+          "motion",
+          "reveal"
+        ],
+        "components": [
+          "Enter",
+          "Stagger",
+          "Heading",
+          "Text",
+          "Button"
+        ],
+        "snippet": "<script>\n  import { Enter, Stagger, Heading, Text, Button } from '@dryui/ui';\n  import { enter } from '@dryui/ui/motion';\n</script>\n\n<!-- Option A: auto-indexed Stagger container -->\n<Stagger step=\"section\">\n  <Heading level={1}>Welcome</Heading>\n  <Text as=\"p\">A paragraph that follows.</Text>\n  <Button>Call to action</Button>\n</Stagger>\n\n<!-- Option B: explicit Enter with index -->\n<Enter index={0}>\n  <Heading level={1}>Welcome</Heading>\n</Enter>\n<Enter index={1}>\n  <Text as=\"p\">A paragraph that follows.</Text>\n</Enter>\n\n<!-- Option C: Svelte transition with programmatic index -->\n{#each items as item, i}\n  <div in:enter={{ index: i }}>{item}</div>\n{/each}"
+      },
+      "exit-animation": {
+        "name": "exit-animation",
+        "description": "Subtle exits. A small fixed offset (~12px) beats mirroring the entrance. Use <Exit> as a wrapper or out:leave as a Svelte transition.",
+        "tags": [
+          "exit",
+          "leave",
+          "animation",
+          "dismiss",
+          "polish",
+          "motion"
+        ],
+        "components": [
+          "Exit"
+        ],
+        "snippet": "<script>\n  import { leave } from '@dryui/ui/motion';\n\n  let open = $state(true);\n</script>\n\n{#if open}\n  <div out:leave>\n    <p>This dismisses with a subtle 12px offset + fade + slight blur.</p>\n    <button onclick={() => (open = false)}>Close</button>\n  </div>\n{/if}\n\n<!-- Pair with in:enter for symmetric usage. Exit is intentionally smaller\n     than entrance so dismissal feels softer than introduction. -->"
+      },
+      "shadow-as-border": {
+        "name": "shadow-as-border",
+        "description": "Three-layer box-shadow (edge + close contact + ambient) reads cleaner than a solid 1px border. Works over images and mixed backgrounds. No double-edge when combined with drop shadows.",
+        "tags": [
+          "shadow",
+          "border",
+          "card",
+          "elevation",
+          "polish"
+        ],
+        "components": [
+          "Card"
+        ],
+        "snippet": "<script>\n  import { Card } from '@dryui/ui';\n</script>\n\n<!-- Default Card: shadow-only (no border) -->\n<Card.Root>\n  <Card.Content>\n    A Card that reads as raised without a solid edge.\n  </Card.Content>\n</Card.Root>\n\n<!-- Bordered escape hatch, when you want the 1px edge back -->\n<Card.Root bordered>\n  <Card.Content>A Card with both shadow and border.</Card.Content>\n</Card.Root>\n\n<!-- Raw pattern. Use the token family directly on any raised surface: -->\n<style>\n  .my-raised-surface {\n    background: var(--dry-color-bg-raised);\n    border-radius: var(--dry-radius-lg);\n    box-shadow: var(--dry-shadow-sm);\n    transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);\n  }\n  .my-raised-surface:hover {\n    box-shadow: var(--dry-shadow-sm-hover);\n  }\n</style>"
+      },
+      "icon-in-button": {
+        "name": "icon-in-button",
+        "description": "Buttons with leading/trailing icons get an automatic optical offset (--dry-optical-icon-offset) so the label reads visually centered, not geometrically centered.",
+        "tags": [
+          "button",
+          "icon",
+          "optical",
+          "alignment",
+          "polish"
+        ],
+        "components": [
+          "Button",
+          "Icon"
+        ],
+        "snippet": "<script>\n  import { Button, Icon } from '@dryui/ui';\n  import SearchIcon from '@dryui/icons/search.svelte';\n</script>\n\n<!-- Leading icon: padding-inline-start shrinks by --dry-optical-icon-offset -->\n<Button>\n  <Icon src={SearchIcon} />\n  Search\n</Button>\n\n<!-- Trailing icon: padding-inline-end shrinks -->\n<Button>\n  Next\n  <Icon src={SearchIcon} />\n</Button>\n\n<!-- Opt out: optical=\"off\" keeps geometric padding -->\n<Button optical=\"off\">\n  <Icon src={SearchIcon} />\n  Geometric\n</Button>"
+      },
+      "image-edge": {
+        "name": "image-edge",
+        "description": "Images and avatars get a 1px outline (--dry-image-edge) that adapts to theme (black/10% in light, white/10% in dark). Stops image edges from reading as surface imperfections.",
+        "tags": [
+          "image",
+          "avatar",
+          "edge",
+          "outline",
+          "polish"
+        ],
+        "components": [
+          "Image",
+          "Avatar"
+        ],
+        "snippet": "<script>\n  import { Image, Avatar } from '@dryui/ui';\n</script>\n\n<Image src=\"/photo.jpg\" alt=\"Landscape\" width={480} height={320} />\n<Avatar src=\"/face.jpg\" name=\"Rob\" />\n\n<!-- For hand-rolled media, apply the same pattern: -->\n<style>\n  .my-image {\n    outline: 1px solid var(--dry-image-edge);\n    outline-offset: -1px;\n  }\n</style>"
       }
     }
   }

@@ -16,7 +16,7 @@
 
 <style>
 	[data-card-content] {
-		padding: var(--dry-card-padding, var(--dry-space-8));
+		padding: var(--dry-card-padding, var(--dry-padding-card));
 		overflow-x: auto;
 	}
 

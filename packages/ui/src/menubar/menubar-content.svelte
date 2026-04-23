@@ -115,6 +115,7 @@
 </div>
 
 <style>
+	/* outer: var(--dry-radius-popover); children inside the padded region use var(--dry-radius-nested-popover). */
 	[data-menubar-content] {
 		/* Reset UA popover defaults */
 		inset: unset;
@@ -123,7 +124,7 @@
 		background: var(--dry-color-bg-overlay);
 		color: var(--dry-color-text-strong);
 		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-lg);
+		border-radius: var(--dry-radius-popover);
 		box-shadow: var(--dry-shadow-overlay);
 		padding: var(--dry-space-1);
 

@@ -64,6 +64,26 @@
 	--dry-shadow-brand: 0 0 12px hsla(145, 80%, 50%, 0.15), 0 0 4px hsla(145, 80%, 50%, 0.1);
 	--dry-shadow-accent: 0 0 12px hsla(45, 90%, 55%, 0.15), 0 0 4px hsla(45, 90%, 55%, 0.1);
 
+	/* ─── Utility shadows — thin edge, minimal layering (CRT feel) ─── */
+	--dry-shadow-sm:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.08), 0px 1px 2px -1px rgba(0, 0, 0, 0.55),
+		0px 2px 4px 0px rgba(0, 0, 0, 0.4);
+	--dry-shadow-md:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.6),
+		0px 4px 8px -2px rgba(0, 0, 0, 0.4);
+	--dry-shadow-lg:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.12), 0px 4px 8px -2px rgba(0, 0, 0, 0.65),
+		0px 8px 20px -4px rgba(0, 0, 0, 0.5);
+	--dry-shadow-xl:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.14), 0px 8px 16px -4px rgba(0, 0, 0, 0.7),
+		0px 20px 40px -8px rgba(0, 0, 0, 0.6);
+	--dry-shadow-sm-hover:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.12), 0px 1px 2px -1px rgba(0, 0, 0, 0.6),
+		0px 2px 4px 0px rgba(0, 0, 0, 0.45);
+	--dry-shadow-md-hover:
+		0px 0px 0px 1px rgba(255, 255, 255, 0.14), 0px 2px 4px -1px rgba(0, 0, 0, 0.65),
+		0px 4px 8px -2px rgba(0, 0, 0, 0.45);
+
 	/* ─── Glass — minimal, tinted dark ────────────────────────────── */
 	--dry-glass-blur: 8px;
 	--dry-glass-tint: hsla(0, 0%, 4%, 0.85);
