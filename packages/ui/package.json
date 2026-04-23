@@ -480,15 +480,15 @@
       "svelte": "./src/notification-center/index.ts",
       "default": "./src/notification-center/index.ts"
     },
-    "./numeric": {
-      "types": "./src/numeric/index.ts",
-      "svelte": "./src/numeric/index.ts",
-      "default": "./src/numeric/index.ts"
-    },
     "./number-input": {
       "types": "./src/number-input/index.ts",
       "svelte": "./src/number-input/index.ts",
       "default": "./src/number-input/index.ts"
+    },
+    "./numeric": {
+      "types": "./src/numeric/index.ts",
+      "svelte": "./src/numeric/index.ts",
+      "default": "./src/numeric/index.ts"
     },
     "./option-picker": {
       "types": "./src/option-picker/index.ts",
@@ -1253,15 +1253,15 @@
         "svelte": "./dist/notification-center/index.js",
         "default": "./dist/notification-center/index.js"
       },
-      "./numeric": {
-        "types": "./dist/numeric/index.d.ts",
-        "svelte": "./dist/numeric/index.js",
-        "default": "./dist/numeric/index.js"
-      },
       "./number-input": {
         "types": "./dist/number-input/index.d.ts",
         "svelte": "./dist/number-input/index.js",
         "default": "./dist/number-input/index.js"
+      },
+      "./numeric": {
+        "types": "./dist/numeric/index.d.ts",
+        "svelte": "./dist/numeric/index.js",
+        "default": "./dist/numeric/index.js"
       },
       "./option-picker": {
         "types": "./dist/option-picker/index.d.ts",
