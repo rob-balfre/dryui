@@ -1,5 +1,14 @@
 # @dryui/cli
 
+## 0.19.1
+
+### Patch Changes
+
+- [`bb66563`](https://github.com/rob-balfre/dryui/commit/bb6656337ba32a12ff71f2213fec8bc98101fe1d) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Add deterministic layout heuristics to `check-vision` so page-header rhythm and stray meta-row padding can be reported even when the image reviewer returns a clean result.
+
+- Updated dependencies [[`bb66563`](https://github.com/rob-balfre/dryui/commit/bb6656337ba32a12ff71f2213fec8bc98101fe1d)]:
+  - @dryui/mcp@2.7.1
+
 ## 0.19.0
 
 ### Minor Changes
