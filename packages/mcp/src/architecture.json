@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "1.8.0",
   "summary": {
-    "componentNodes": 293,
+    "componentNodes": 296,
     "partNodes": 656,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 144,
-    "uiComponents": 149,
+    "uiComponents": 152,
     "uiWrappers": 130,
-    "uiComposites": 19,
-    "rootBarrelComponents": 293,
+    "uiComposites": 22,
+    "rootBarrelComponents": 296,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
     "wrapEdges": 130,
     "composeEdges": 15,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 295,
+    "mismatches": 293,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -11433,6 +11433,56 @@
       "componentImportCount": 0
     },
     {
+      "id": "ui:Enter",
+      "name": "Enter",
+      "label": "Enter",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals.",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/enter/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "animation",
+        "enter",
+        "reveal",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:Exit",
+      "name": "Exit",
+      "label": "Exit",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur).",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/exit/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "animation",
+        "exit",
+        "leave",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:Field",
       "name": "Field",
       "label": "Field",
@@ -15110,6 +15160,31 @@
       "compound": false,
       "parts": [],
       "sourceFileCount": 3,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:Stagger",
+      "name": "Stagger",
+      "label": "Stagger",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "display",
+      "description": "Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value.",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/stagger/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "animation",
+        "stagger",
+        "enter",
+        "motion",
+        "polish"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
     },
@@ -24241,20 +24316,6 @@
   "clusters": [],
   "mismatches": [
     {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "IconSwap",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/icon-swap/index.ts"
-    },
-    {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "Numeric",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/numeric/index.ts"
-    },
-    {
       "kind": "missing-subpath-export",
       "package": "primitives",
       "component": "Accordion",
@@ -26377,14 +26438,11 @@
     "specMissingPrimitives": [
       "TokenScope"
     ],
-    "docsNavMissing": [
-      "IconSwap",
-      "Numeric"
-    ],
+    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 19\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

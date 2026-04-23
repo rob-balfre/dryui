@@ -260,6 +260,16 @@
       "svelte": "./src/dropdown-menu/index.ts",
       "default": "./src/dropdown-menu/index.ts"
     },
+    "./enter": {
+      "types": "./src/enter/index.ts",
+      "svelte": "./src/enter/index.ts",
+      "default": "./src/enter/index.ts"
+    },
+    "./exit": {
+      "types": "./src/exit/index.ts",
+      "svelte": "./src/exit/index.ts",
+      "default": "./src/exit/index.ts"
+    },
     "./field": {
       "types": "./src/field/index.ts",
       "svelte": "./src/field/index.ts",
@@ -644,6 +654,11 @@
       "types": "./src/spotlight/index.ts",
       "svelte": "./src/spotlight/index.ts",
       "default": "./src/spotlight/index.ts"
+    },
+    "./stagger": {
+      "types": "./src/stagger/index.ts",
+      "svelte": "./src/stagger/index.ts",
+      "default": "./src/stagger/index.ts"
     },
     "./star-rating": {
       "types": "./src/star-rating/index.ts",
@@ -1033,6 +1048,16 @@
         "svelte": "./dist/dropdown-menu/index.js",
         "default": "./dist/dropdown-menu/index.js"
       },
+      "./enter": {
+        "types": "./dist/enter/index.d.ts",
+        "svelte": "./dist/enter/index.js",
+        "default": "./dist/enter/index.js"
+      },
+      "./exit": {
+        "types": "./dist/exit/index.d.ts",
+        "svelte": "./dist/exit/index.js",
+        "default": "./dist/exit/index.js"
+      },
       "./field": {
         "types": "./dist/field/index.d.ts",
         "svelte": "./dist/field/index.js",
@@ -1417,6 +1442,11 @@
         "types": "./dist/spotlight/index.d.ts",
         "svelte": "./dist/spotlight/index.js",
         "default": "./dist/spotlight/index.js"
+      },
+      "./stagger": {
+        "types": "./dist/stagger/index.d.ts",
+        "svelte": "./dist/stagger/index.js",
+        "default": "./dist/stagger/index.js"
       },
       "./star-rating": {
         "types": "./dist/star-rating/index.d.ts",

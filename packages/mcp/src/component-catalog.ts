@@ -87,7 +87,8 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'FormatDate',
 			'RelativeTime',
 			'InfiniteScroll',
-			'VirtualList'
+			'VirtualList',
+			'Numeric'
 		]
 	},
 	{
@@ -96,6 +97,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'Image',
 			'Avatar',
 			'Icon',
+			'IconSwap',
 			'AspectRatio',
 			'VideoEmbed',
 			'Carousel',
@@ -213,7 +215,10 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'GodRays',
 			'Halftone',
 			'MaskReveal',
-			'ShaderCanvas'
+			'ShaderCanvas',
+			'Enter',
+			'Exit',
+			'Stagger'
 		]
 	},
 	{
