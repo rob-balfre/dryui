@@ -42,7 +42,12 @@ describe('runVisionCheck', () => {
 			JSON.stringify({
 				findings: [
 					{ rule: 'vision/chip-wrap', severity: 'warning', message: 'Filter chip stacked.' },
-					{ rule: 'vision/low-contrast', severity: 'error', message: 'Body fails 4.5:1 on glass.' }
+					{ rule: 'vision/low-contrast', severity: 'error', message: 'Body fails 4.5:1 on glass.' },
+					{
+						rule: 'vision/cramped-layout',
+						severity: 'warning',
+						message: 'Page header title, subtitle, and metadata chips are packed too tightly.'
+					}
 				]
 			}),
 			'```'
@@ -58,15 +63,18 @@ describe('runVisionCheck', () => {
 			}
 		);
 
-		expect(result.findings).toHaveLength(2);
+		expect(result.findings).toHaveLength(3);
 		expect(result.summary.hasBlockers).toBe(true);
 		expect(result.summary.counts.error).toBe(1);
-		expect(result.summary.counts.warning).toBe(1);
+		expect(result.summary.counts.warning).toBe(2);
 		expect(result.diagnostics[0]?.code).toBe('vision/chip-wrap');
 		expect(result.diagnostics[0]?.source).toBe('vision');
 		expect(result.diagnostics[0]?.hint).toMatch(/Badge/);
 		expect(result.diagnostics[1]?.code).toBe('vision/low-contrast');
+		expect(result.diagnostics[2]?.code).toBe('vision/cramped-layout');
+		expect(result.diagnostics[2]?.hint).toMatch(/breathing room/);
 		expect(result.text).toContain('vision/chip-wrap');
+		expect(result.text).toContain('vision/cramped-layout');
 	});
 
 	test('emits a parseError diagnostic when the model returns non-JSON', async () => {
@@ -125,6 +133,8 @@ describe('runVisionCheck', () => {
 			screenshotPath: string;
 		};
 		expect(params.rubricPrompt).toContain('vision/chip-wrap');
+		expect(params.rubricPrompt).toContain('vision/cramped-layout');
+		expect(params.rubricPrompt).toContain('visibly squashed together');
 		expect(params.userText).toContain('focus on the hero');
 		expect(params.screenshotPath).toBe('/tmp/dryui-vision-test.png');
 	});

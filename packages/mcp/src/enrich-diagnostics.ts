@@ -181,6 +181,10 @@ const HINTS: Record<string, HintBuilder> = {
 		hint: 'Snap vertical gaps to one --dry-space-* step per region. Mixed `gap` values (e.g. 12px next to 18px) read as broken rhythm.',
 		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
 	}),
+	'vision/cramped-layout': () => ({
+		hint: 'Add breathing room around the dense region: increase the stack gap between title, subtitle, and metadata; let chip rows wrap; and keep badges/date pills from visually crowding adjacent text.',
+		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
+	}),
 	'vision/parse-error': () => ({
 		hint: 'The vision model returned content that did not parse as JSON. Inspect the raw response in the `evidence` field (usually a transient model hiccup); rerun the check.',
 		docsRef: `${DOCS_BASE}/concepts/troubleshooting#vision-parse-errors`

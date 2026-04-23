@@ -19,6 +19,7 @@ export const VISION_RULES = {
 	alignment: 'vision/alignment',
 	orphan: 'vision/orphan',
 	spacingRhythm: 'vision/spacing-rhythm',
+	crampedLayout: 'vision/cramped-layout',
 	parseError: 'vision/parse-error'
 } as const;
 
@@ -116,11 +117,12 @@ const RUBRIC_PROMPT = [
 	`6. ${VISION_RULES.alignment}: items in a row that should baseline-align but do not.`,
 	`7. ${VISION_RULES.orphan}: a single word on its own line at the end of a paragraph or heading (rivers/orphans).`,
 	`8. ${VISION_RULES.spacingRhythm}: adjacent components with inconsistent vertical spacing where consistency is expected.`,
+	`9. ${VISION_RULES.crampedLayout}: a header, text stack, toolbar, or chip/meta row is visibly squashed together. Flag when headings, subtitles, badges, dates, or controls have too little breathing room, appear packed into one block, or feel compressed even if they do not overlap.`,
 	'',
 	'For EACH defect found, return a finding. Severity rubric:',
 	'- error: breaks legibility (low contrast, illegible)',
-	'- warning: clearly wrong (chip wrap, plural mismatch, mid-token break)',
-	'- suggestion: taste-call (variant mix, alignment drift, orphan)',
+	'- warning: clearly wrong (chip wrap, plural mismatch, mid-token break, cramped layout)',
+	'- suggestion: taste-call (variant mix, alignment drift, orphan, spacing rhythm)',
 	'',
 	'Output ONLY this JSON, no prose, no code fences:',
 	'{ "findings": [ { "rule": "vision/<code>", "severity": "<level>", "message": "<one sentence: what and where>" } ] }',
