@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.19.3
+
+### Patch Changes
+
+- [`a3800ff`](https://github.com/rob-balfre/dryui/commit/a3800ffcb7b66ddf7da4083df04a89501946ee71) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Make `dryui init` launch copy and behavior match project feedback mode. After scaffolding, the prompt now asks to run the project in feedback mode, and the launcher receives an interactive port-holder prompt so a busy port 5173 no longer silently skips the newly scaffolded dev server and falls back to the dashboard-only URL.
+
 ## 0.19.2
 
 ### Patch Changes
