@@ -5,11 +5,12 @@
 	import { page } from '$app/state';
 	import { Badge, Button, Container, Drawer, Heading, Link } from '@dryui/ui';
 	import { Menu } from 'lucide-svelte';
+	import GithubIcon from '$lib/components/GithubIcon.svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { BUILD_TIMESTAMP, DRYUI_VERSION, SITE_DESCRIPTION } from '$lib/site-meta';
+	import { BUILD_TIMESTAMP, DRYUI_VERSION, GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
 	import { withBase, withQueryParam } from '$lib/utils';
 	import '../app.css';
 
@@ -106,9 +107,38 @@
 	<meta name="description" content={SITE_DESCRIPTION} />
 </svelte:head>
 
+{#snippet homeMiniNav()}
+	<div class="home-mini-nav" aria-label="Docs navigation">
+		<div class="home-mini-nav-brand">
+			<Link href={withBase('/')}>
+				<Heading level={2}>
+					<Logo />
+				</Heading>
+			</Link>
+		</div>
+		<div class="home-mini-nav-search">
+			<GlobalSearch />
+		</div>
+		<div class="home-mini-nav-actions">
+			<Button variant="ghost" size="sm" href={GITHUB_URL} target="_blank" rel="noreferrer">
+				<GithubIcon size={16} /> GitHub
+			</Button>
+			<span class="home-mini-nav-cta">
+				<Button variant="solid" color="primary" size="sm" href={withBase('/getting-started')}
+					>Get Started</Button
+				>
+			</span>
+			<ThemeToggle />
+		</div>
+	</div>
+{/snippet}
+
 {#snippet docsShell()}
 	<div class="docs-shell-frame">
 		<div class="docs-shell" data-home={isHomeRoute || undefined}>
+			{#if isHomeRoute}
+				{@render homeMiniNav()}
+			{/if}
 			<header class="docs-header">
 				<Container size="full" padding={false}>
 					<div class="docs-header-bar">
@@ -355,5 +385,83 @@
 	.footer-sep {
 		color: color-mix(in srgb, var(--dry-color-text-weak) 60%, transparent);
 		margin-inline: 0.25em;
+	}
+
+	.home-mini-nav {
+		position: fixed;
+		inset-block-start: 0;
+		inset-inline: 0;
+		z-index: 10;
+		container-type: inline-size;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(min-content, 22rem) minmax(0, 1fr);
+		align-items: center;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-3) var(--dry-space-4);
+		background: color-mix(in srgb, var(--dry-color-bg-base, #0b0b0b) 72%, transparent);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
+		border-block-end: 1px solid var(--dry-color-stroke-weak, transparent);
+		opacity: 0;
+		transform: translateY(-6px);
+		animation: home-mini-nav-in 320ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
+	}
+
+	.home-mini-nav-brand {
+		display: inline-grid;
+		place-items: center;
+		justify-self: start;
+	}
+
+	.home-mini-nav-search {
+		justify-self: stretch;
+	}
+
+	.home-mini-nav-actions {
+		display: inline-grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+		justify-self: end;
+	}
+
+	@keyframes home-mini-nav-in {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.home-mini-nav {
+			animation: none;
+			opacity: 1;
+			transform: none;
+		}
+	}
+
+	@container (max-width: 40rem) {
+		.home-mini-nav {
+			grid-template-columns: auto 1fr auto;
+			padding: var(--dry-space-2) var(--dry-space-3);
+		}
+		.home-mini-nav-search {
+			display: none;
+		}
+		.home-mini-nav-cta {
+			display: none;
+		}
+	}
+
+	.docs-shell[data-home] .docs-content {
+		scroll-padding-block-start: var(--dry-space-14);
+		padding-block-start: var(--dry-space-16);
+	}
+
+	@container (max-width: 40rem) {
+		.docs-shell[data-home] .docs-content {
+			padding-block-start: var(--dry-space-12);
+		}
 	}
 </style>

@@ -80,7 +80,7 @@ Always include a reduced-motion override:
 }
 ```
 
-The `@media` block comes after the default rule in the same scoped stylesheet, so equal specificity plus source order handles the override without `!important` — which is banned by `@dryui/lint` (`dryui/no-important`). In JS, skip delayed typewriter/replay steps and render the final state immediately when reduced motion is active.
+The `@media` block comes after the default rule in the same scoped stylesheet, so equal specificity plus source order handles the override without `!important` (banned by `@dryui/lint` via `dryui/no-important`). In JS, skip delayed typewriter/replay steps and render the final state immediately when reduced motion is active.
 
 ## Svelte notes
 

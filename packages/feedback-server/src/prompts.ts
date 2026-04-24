@@ -3,11 +3,7 @@ import type { Submission, SubmissionDrawing } from './types.js';
 export const FEEDBACK_LINTER_PROMPT_STEP =
 	'Run the relevant project linter/check command and fix any violations before resolving.';
 export const FEEDBACK_PIPELINE_PROMPT_STEP =
-	'Read the local DESIGN.md if present; treat this feedback as the highest-priority user intent, then preserve the durable DESIGN.md identity unless the feedback clearly overrides it.';
-export const FEEDBACK_POLISH_PROMPT_STEP =
-	'Apply the make-interfaces-feel-better polish pass explicitly: hierarchy, spacing, alignment, density, states, copy clarity, and whether the result feels intentionally designed.';
-export const FEEDBACK_VISUAL_PROMPT_STEP =
-	'When the page can be rendered locally, run dryui check --visual against the submission URL with the DESIGN.md context before resolving.';
+	'If PRODUCT.md or DESIGN.md exists at the project root (these are impeccable-owned), read them for context; treat this feedback as the highest-priority user intent, then preserve the durable product/design identity unless the feedback clearly overrides it.';
 
 export function getTextNotes(drawings: readonly SubmissionDrawing[] | undefined): string[] {
 	if (!drawings) return [];
@@ -34,10 +30,8 @@ Use the dryui-feedback MCP server:
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. ${FEEDBACK_PIPELINE_PROMPT_STEP}
 5. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-6. ${FEEDBACK_POLISH_PROMPT_STEP}
-7. ${FEEDBACK_LINTER_PROMPT_STEP}
-8. ${FEEDBACK_VISUAL_PROMPT_STEP}
-9. Call feedback_resolve_submission with id "${s.id}" once resolved${notes}`;
+6. ${FEEDBACK_LINTER_PROMPT_STEP}
+7. Call feedback_resolve_submission with id "${s.id}" once resolved${notes}`;
 }
 
 export function buildFeedbackBulkPrompt(): string {
@@ -49,8 +43,6 @@ Use the dryui-feedback MCP server:
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
 4. ${FEEDBACK_PIPELINE_PROMPT_STEP}
 5. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-6. ${FEEDBACK_POLISH_PROMPT_STEP}
-7. ${FEEDBACK_LINTER_PROMPT_STEP}
-8. ${FEEDBACK_VISUAL_PROMPT_STEP}
-9. Call feedback_resolve_submission with the submission id after each fix is complete`;
+6. ${FEEDBACK_LINTER_PROMPT_STEP}
+7. Call feedback_resolve_submission with the submission id after each fix is complete`;
 }

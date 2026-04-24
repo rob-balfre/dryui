@@ -60,8 +60,7 @@ dryui`;
 
 const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	ask: 'orange',
-	check: 'blue',
-	'check-vision': 'purple'
+	check: 'blue'
 };
 
 const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
@@ -75,7 +74,6 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	compose: 'orange',
 	tokens: 'purple',
 	check: 'blue',
-	'check-vision': 'purple',
 	ambient: 'gray',
 	'install-hook': 'gray',
 	feedback: 'green'
@@ -92,7 +90,6 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	compose: 'dryui compose "date input"',
 	tokens: 'dryui tokens --category color',
 	check: 'dryui check src/routes/+page.svelte',
-	'check-vision': 'dryui check --visual http://localhost:5173',
 	ambient: 'dryui ambient',
 	'install-hook': 'dryui install-hook --dry-run',
 	feedback: 'dryui feedback ui --no-open'
@@ -317,7 +314,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. The plugin adds conventions plus ask/check/check-vision inside Claude.'
+			'Use the CLI as the default surface. The plugin adds conventions plus ask/check inside Claude.'
 	},
 	{
 		id: 'codex',
@@ -361,7 +358,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'toml'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask`, `check`, and `check-vision` are available.'
+			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask` and `check` are available.'
 	},
 	{
 		id: 'gemini',
@@ -404,7 +401,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask`, `check`, and `check-vision` are available.'
+			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask` and `check` are available.'
 	},
 	{
 		id: 'opencode',

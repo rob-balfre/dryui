@@ -2,6 +2,31 @@
 @import '@dryui/ui/themes/dark.css';
 @import 'mapbox-gl/dist/mapbox-gl.css';
 
+@font-face {
+	font-family: 'Monaspace Neon';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.101/fonts/webfonts/MonaspaceNeon-Regular.woff2')
+		format('woff2');
+}
+@font-face {
+	font-family: 'Monaspace Neon';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.101/fonts/webfonts/MonaspaceNeon-Medium.woff2')
+		format('woff2');
+}
+@font-face {
+	font-family: 'Monaspace Neon';
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url('https://cdn.jsdelivr.net/gh/githubnext/monaspace@v1.101/fonts/webfonts/MonaspaceNeon-Bold.woff2')
+		format('woff2');
+}
+
 :root {
 	--docs-z-sticky-label: 1;
 	--docs-z-mobile-header: 10;
@@ -12,11 +37,38 @@
 	--docs-code-padding: 0.1em 0.35em;
 	--docs-theme-icon-sun-display: inline-grid;
 	--docs-theme-icon-moon-display: none;
+
+	--dry-color-fill-accent: oklch(72% 0.14 52);
+	--dry-color-fill-accent-hover: oklch(68% 0.16 50);
+	--dry-color-fill-accent-active: oklch(64% 0.17 48);
+	--dry-color-fill-accent-weak: oklch(72% 0.14 52 / 0.18);
+	--dry-color-stroke-accent: oklch(72% 0.14 52 / 0.5);
+	--dry-color-stroke-accent-strong: oklch(72% 0.14 52 / 0.8);
+	--dry-color-stroke-accent-weak: oklch(72% 0.14 52 / 0.2);
+
+	--dry-font-mono:
+		'Monaspace Neon', 'Commit Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+
+body::before {
+	content: '';
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 1;
+	opacity: var(--dry-grain-opacity, 0.05);
+	background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.95  0 0 0 0 0.58  0 0 0 0 0.22  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+	background-size: 240px 240px;
 }
 
 [data-theme='dark'] {
 	--docs-theme-icon-sun-display: none;
 	--docs-theme-icon-moon-display: inline-grid;
+
+	--dry-color-fill-accent: oklch(76% 0.13 55);
+	--dry-color-fill-accent-hover: oklch(80% 0.13 57);
+	--dry-color-fill-accent-active: oklch(82% 0.14 58);
+	--dry-color-fill-accent-weak: oklch(76% 0.13 55 / 0.22);
 }
 
 .theme-auto {
@@ -24,6 +76,11 @@
 		& {
 			--docs-theme-icon-sun-display: none;
 			--docs-theme-icon-moon-display: inline-grid;
+
+			--dry-color-fill-accent: oklch(76% 0.13 55);
+			--dry-color-fill-accent-hover: oklch(80% 0.13 57);
+			--dry-color-fill-accent-active: oklch(82% 0.14 58);
+			--dry-color-fill-accent-weak: oklch(76% 0.13 55 / 0.22);
 		}
 	}
 }
@@ -55,7 +112,6 @@ code {
 	border-radius: var(--dry-radius-sm);
 }
 
-/* Global scrollbar styling so docs-level overflow containers match the theme */
 * {
 	scrollbar-width: thin;
 	scrollbar-color: var(--dry-scrollbar-thumb) var(--dry-scrollbar-track);
@@ -86,7 +142,6 @@ code {
 	background: transparent;
 }
 
-/* Vertical spacing utilities (grid-based) */
 .stack-xl {
 	display: grid;
 	gap: var(--dry-space-8);

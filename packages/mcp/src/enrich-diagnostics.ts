@@ -98,7 +98,7 @@ const HINTS: Record<string, HintBuilder> = {
 
 	// ── theme-checker codes ───────────────────────────────────────────────────
 	'theme/missing-token': (ctx) => ({
-		hint: `Add the missing --dry-* token to your theme CSS${ctx.path ? ` (${ctx.path})` : ''}. The reviewer catalogue lists the full token surface; run ask --scope list --kind token to browse it.`,
+		hint: `Add the missing --dry-* token to your theme CSS${ctx.path ? ` (${ctx.path})` : ''}. Run ask --scope list --kind token to browse the full token surface.`,
 		docsRef: `${DOCS_BASE}/concepts/theming#required-tokens`
 	}),
 	'theme/wrong-type': () => ({
@@ -144,88 +144,8 @@ const HINTS: Record<string, HintBuilder> = {
 
 	// ── parse fallback ─────────────────────────────────────────────────────────
 	'parse/svelte-parse-error': () => ({
-		hint: 'The Svelte compiler could not parse the file. Fix the syntax first — attribute typos and unclosed tags are the usual cause — then rerun `check`.',
+		hint: 'The Svelte compiler could not parse the file. Fix the syntax first (attribute typos and unclosed tags are the usual cause), then rerun `check`.',
 		docsRef: `${DOCS_BASE}/concepts/troubleshooting#parse-errors`
-	}),
-
-	// ── vision rubric ─────────────────────────────────────────────────────────
-	'vision/chip-wrap': () => ({
-		hint: 'Use Badge with leadingIcon (or PageHeader.Meta with explicit icon slots) so the icon stays inline. A stacked icon means the chip width is too narrow or the label wrapped.',
-		docsRef: `${DOCS_BASE}/components/badge#leading-icon`
-	}),
-	'vision/plural-mismatch': () => ({
-		hint: 'Use Pluralize so the noun agrees with the count. Hard-coded copy like "1 hotels" should be `<Pluralize count={n} singular="hotel" plural="hotels" />`.',
-		docsRef: `${DOCS_BASE}/components/pluralize`
-	}),
-	'vision/variant-mix': () => ({
-		hint: 'Pick one Badge variant per row (all soft, or all outlined, or all solid). Mixed variants in the same chip group read as accidental, not deliberate.',
-		docsRef: `${DOCS_BASE}/components/badge#variants`
-	}),
-	'vision/mid-token-break': () => ({
-		hint: 'Wrap reference IDs in `<RefId>` so the token stays atomic. RefId applies `white-space: nowrap` and a non-breaking-hyphen segmenter so codes like BA-3490221 never break across lines.',
-		docsRef: `${DOCS_BASE}/components/ref-id`
-	}),
-	'vision/low-contrast': () => ({
-		hint: 'Bump the text token to --dry-color-text-strong, or pick a heavier surface token. Run `check <theme.css>` to verify the pair hits WCAG AA (4.5:1 body, 3:1 large).',
-		docsRef: `${DOCS_BASE}/concepts/theming#contrast`
-	}),
-	'vision/alignment': () => ({
-		hint: 'Replace bespoke flex with `display: grid` and explicit `align-items: baseline`. Drift here usually means line-height differences across siblings; pin to the same typography preset.',
-		docsRef: `${DOCS_BASE}/concepts/layout#baseline-alignment`
-	}),
-	'vision/orphan': () => ({
-		hint: 'Use `text-wrap: balance` (headings) or `text-wrap: pretty` (body) so the last line is never a single orphan word. DryUI heading tokens enable balance by default.',
-		docsRef: `${DOCS_BASE}/concepts/typography#wrap-balance`
-	}),
-	'vision/spacing-rhythm': () => ({
-		hint: 'Snap vertical gaps to one --dry-space-* step per region. Mixed `gap` values (e.g. 12px next to 18px) read as broken rhythm.',
-		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
-	}),
-	'vision/cramped-layout': () => ({
-		hint: 'Add breathing room around the dense region: increase the stack gap between title, subtitle, and metadata; let chip rows wrap; and keep badges/date pills from visually crowding adjacent text.',
-		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
-	}),
-	'vision/header-rhythm': () => ({
-		hint: 'Tune the page-header stack as a single rhythm: keep the H1 and supporting line optically connected, then use a larger step before metadata. Avoid one-off margins between title and subtitle.',
-		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
-	}),
-	'vision/stray-padding': () => ({
-		hint: 'Remove accidental top/bottom padding or asymmetric margins. Meta/chip rows should sit centered in their band with symmetric block padding and a deliberate gap from neighboring text.',
-		docsRef: `${DOCS_BASE}/concepts/layout#spacing-scale`
-	}),
-	'vision/parse-error': () => ({
-		hint: 'The vision model returned content that did not parse as JSON. Inspect the raw response in the `evidence` field (usually a transient model hiccup); rerun the check.',
-		docsRef: `${DOCS_BASE}/concepts/troubleshooting#vision-parse-errors`
-	}),
-
-	// -- design brief ----------------------------------------------------------
-	'design/missing-frontmatter': () => ({
-		hint: 'Start DESIGN.md with YAML frontmatter. At minimum include `name:` and `overview:` so MCP and CLI checks can pass identity into visual review.',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/missing-name': () => ({
-		hint: 'Add a concrete product, surface, or interface name in `name:` or the first H1. This gives visual review a stable identity to preserve.',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/missing-overview': () => ({
-		hint: 'Add a short overview that names the target user, job, and interface intent. Avoid generic phrases like "modern app".',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/missing-colors': () => ({
-		hint: 'Describe the color direction: palette intent, contrast expectations, and any surface/accent rules the visual reviewer should enforce.',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/missing-typography': () => ({
-		hint: 'Describe typography direction: hierarchy, density, tone, and whether the UI should feel editorial, operational, playful, or restrained.',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/missing-do-donts': () => ({
-		hint: "Add Do and Don't bullets that capture hard guardrails, such as density, imagery, motion, and anti-patterns to avoid.",
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
-	}),
-	'design/too-vague': () => ({
-		hint: 'Replace generic identity language with concrete domain nouns, user goals, and interface qualities that can be seen in a screenshot.',
-		docsRef: `${DOCS_BASE}/concepts/design-briefs`
 	})
 };
 

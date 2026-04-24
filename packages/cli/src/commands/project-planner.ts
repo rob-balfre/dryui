@@ -66,7 +66,6 @@ function formatDetectionSummary(detection: ProjectDetection): string[] {
 		`Status: ${detection.status}`,
 		`Framework: ${detection.framework}`,
 		`Package manager: ${detection.packageManager}`,
-		`Design brief: ${detection.design.present ? (detection.design.path ?? 'yes') : 'not found'}`,
 		'',
 		'Files:',
 		`  package.json: ${detection.packageJsonPath ?? '(not found)'}`,

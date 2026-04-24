@@ -6,7 +6,6 @@ import { z } from 'zod';
 import type { Spec } from './spec-types.js';
 import { runAsk, type AskScope, type AskListKind } from './tools/ask.js';
 import { runCheck, runCheckStructured } from './tools/check.js';
-import { runVisionCheck } from './tools/check-vision.js';
 import { toolErrorResponse } from './tools/tool-error.js';
 
 const require = createRequire(import.meta.url);
@@ -46,9 +45,8 @@ const SERVER_INSTRUCTIONS = [
 	'4. CORRECT CSS TOKENS: Background is --dry-color-bg-base. Text is --dry-color-text-strong.',
 	'   Use `ask --scope list --kind token` to browse the token surface when needed.',
 	'',
-	'5. CHECK AFTER WRITING: Run `check` on the file, theme, or workspace after edits. For rendered',
-	'   pages, run `check` with `visualUrl` (or the direct `check-vision` tool). It replaces',
-	'   the old review/diagnose/lint/doctor split with one validation surface.',
+	'5. CHECK AFTER WRITING: Run `check` on the file, theme, or workspace after edits to validate',
+	'   the component contract, a11y, tokens, and CSS discipline.',
 	'',
 	'6. USE DRYUI COMPONENTS FOR UI ELEMENTS: Prefer Field.Root + Label for fields, Button instead',
 	'   of raw `<button>`, and Separator instead of `<hr>`. Let `ask` confirm component coverage',
@@ -109,39 +107,13 @@ server.tool(
 
 const CHECK_DESC = [
 	'Collapse DryUI validation into a single path-driven tool.\n\n',
-	'Input: optional `path`, optional `scope`, or optional `visualUrl` for rendered-page critique.\n',
+	'Input: optional `path`.\n',
 	'- no path: workspace scan\n',
-	'- `.svelte` file: component review\n',
-	'- `.css` file: theme diagnosis\n',
-	'- `DESIGN.md`: design brief diagnosis\n',
-	'- directory: workspace scan scoped to that directory\n',
-	'- `visualUrl`: render a URL in headless Chromium and critique the screenshot with Codex CLI; auto-discovers nearest DESIGN.md unless `designPath` is provided\n\n',
-	'Scope filter (maps to `--polish` / `--no-polish` CLI flags):\n',
-	'- `scope: "polish"`: only polish-category rules (raw headings, tabular nums, enter/exit timing, etc.)\n',
-	'- `scope: "no-polish"`: everything except polish (default correctness + a11y pass)\n',
-	'- omit `scope`: run every rule\n\n',
-	'Output: unified TOON with `issues` or visual `findings`, aggregates, and `next[]` steering back toward `ask`.'
+	'- `.svelte` file: component review (contract + a11y)\n',
+	'- `.css` file: theme diagnosis (tokens + contrast + pairings)\n',
+	'- directory: workspace scan scoped to that directory\n\n',
+	'Output: unified TOON with `issues`, aggregates, and `next[]` steering back toward `ask`.'
 ].join('');
-
-function visionToolResponse(result: Awaited<ReturnType<typeof runVisionCheck>>) {
-	const diagnosticsJson = JSON.stringify(
-		{
-			summary: result.summary,
-			screenshotPath: result.screenshotPath,
-			...(result.designBriefPath ? { designBriefPath: result.designBriefPath } : {}),
-			findings: result.findings,
-			diagnostics: result.diagnostics
-		},
-		null,
-		2
-	);
-	return {
-		content: [
-			{ type: 'text' as const, text: result.text },
-			{ type: 'text' as const, text: `\`\`\`json dryui-vision\n${diagnosticsJson}\n\`\`\`` }
-		]
-	};
-}
 
 server.tool(
 	'check',
@@ -156,58 +128,12 @@ server.tool(
 			.optional()
 			.describe(
 				'Target project directory for workspace scans and relative path resolution. Required in monorepos — without it the MCP server falls back to its own working directory, which may point at the wrong workspace.'
-			),
-		scope: z
-			.enum(['polish', 'no-polish'])
-			.optional()
-			.describe(
-				'Optional category filter. "polish": only run polish-category rules (raw headings, tabular nums, enter/exit timing, solid-border-on-raised, etc.). "no-polish": skip polish rules, run everything else. Omit to run every rule.'
-			),
-		visualUrl: z
-			.string()
-			.optional()
-			.describe(
-				'Optional absolute http(s) URL for the rendered visual check. When provided, `path` is ignored and the tool returns vision findings.'
-			),
-		viewport: z
-			.string()
-			.optional()
-			.describe('Viewport size for visualUrl as `<width>x<height>`. Defaults to 1440x900.'),
-		extraRubric: z
-			.string()
-			.optional()
-			.describe('Optional addendum for visualUrl; e.g. "focus on the hero region".'),
-		waitFor: z
-			.string()
-			.optional()
-			.describe('Optional CSS selector to wait for before visualUrl screenshotting.'),
-		designPath: z
-			.string()
-			.optional()
-			.describe(
-				'Optional DESIGN.md path for visualUrl. If omitted, the tool auto-discovers the nearest DESIGN.md from cwd and uses it when present.'
 			)
 	},
-	async ({ path, cwd, scope, visualUrl, viewport, extraRubric, waitFor, designPath }) => {
+	async ({ path, cwd }) => {
 		try {
-			if (visualUrl) {
-				return visionToolResponse(
-					await runVisionCheck(
-						{
-							url: visualUrl,
-							...(viewport ? { viewport } : {}),
-							...(extraRubric ? { extraRubric } : {}),
-							...(waitFor ? { waitFor } : {}),
-							...(designPath ? { designPath } : {})
-						},
-						cwd ? { cwd } : {}
-					)
-				);
-			}
-
 			const input = {
-				...(path ? { path } : {}),
-				...(scope ? { scope } : {})
+				...(path ? { path } : {})
 			};
 			const result = runCheckStructured(getSpec(), input, cwd ? { cwd } : {});
 			// Two content blocks: humans read the TOON summary, agents parse the
@@ -224,60 +150,6 @@ server.tool(
 					{ type: 'text', text: `\`\`\`json dryui-diagnostics\n${diagnosticsJson}\n\`\`\`` }
 				]
 			};
-		} catch (error) {
-			return toolErrorResponse(error);
-		}
-	}
-);
-
-const CHECK_VISION_DESC = [
-	'Render a URL in headless Chromium, screenshot it, and have the Codex CLI critique it ',
-	'against a taste rubric (chip wrap, plural mismatch, variant mix, mid-token break, contrast, ',
-	'alignment, orphan, spacing rhythm). Returns TOON findings table + JSON block.\n\n',
-	'Use when the static `check` tool passes but the rendered page still looks off. The static ',
-	'linter cannot see runtime issues like wrapped chips, mismatched plurals, or broken contrast ',
-	'on dark glass; this tool fills that gap.\n\n',
-	'Requires the Codex CLI on PATH and an authenticated Codex session. The headless browser is ',
-	'launched per call; expect 5-15 seconds end-to-end for a typical page.'
-].join('');
-
-server.tool(
-	'check-vision',
-	CHECK_VISION_DESC,
-	{
-		url: z
-			.string()
-			.describe('Absolute http(s) URL to screenshot. Use a running dev server or public URL.'),
-		viewport: z
-			.string()
-			.optional()
-			.describe('Viewport size as `<width>x<height>`. Defaults to 1440x900.'),
-		extraRubric: z
-			.string()
-			.optional()
-			.describe('Optional addendum appended to the user message; e.g. "focus on the hero region".'),
-		waitFor: z
-			.string()
-			.optional()
-			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).'),
-		designPath: z
-			.string()
-			.optional()
-			.describe(
-				'Optional DESIGN.md path. If omitted, check-vision auto-discovers the nearest DESIGN.md from the current working directory and uses it when present.'
-			)
-	},
-	async ({ url, viewport, extraRubric, waitFor, designPath }) => {
-		try {
-			return visionToolResponse(
-				await runVisionCheck({
-					url,
-					...(viewport ? { viewport } : {}),
-					...(extraRubric ? { extraRubric } : {}),
-					...(waitFor ? { waitFor } : {}),
-					...(designPath ? { designPath } : {})
-				})
-			);
 		} catch (error) {
 			return toolErrorResponse(error);
 		}

@@ -25,7 +25,7 @@ npx -y @dryui/cli`;
 </script>
 
 <svelte:head>
-	<title>Tools — DryUI</title>
+	<title>Tools · DryUI</title>
 </svelte:head>
 
 <Container>
@@ -65,7 +65,7 @@ npx -y @dryui/cli`;
 			<DocsSectionIntro
 				id="commands"
 				title="Use DryUI"
-				description="Inside this monorepo, bare dryui opens the feedback dashboard and local tools. Everywhere else, start with dryui, then use the commands below as the default DryUI surface. Use dryui check --visual for screenshots when static checks pass but the page still looks off."
+				description="Inside this monorepo, bare dryui opens the feedback dashboard and local tools. Everywhere else, start with dryui, then use the commands below as the default DryUI surface. For design-quality review (critique, polish, visual), install impeccable alongside DryUI and use /impeccable <command> in your AI harness."
 			/>
 
 			<CodeBlock code={commandReference} language="bash" />

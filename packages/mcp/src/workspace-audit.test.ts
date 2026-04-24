@@ -133,46 +133,6 @@ describe('scanWorkspace', () => {
 		);
 	});
 
-	test('surfaces reviewer-backed interactive card wrapper findings in lint output', () => {
-		const root = createProject({
-			'package.json': JSON.stringify({
-				dependencies: {
-					'@sveltejs/kit': '^2.0.0',
-					svelte: '^5.0.0',
-					'@dryui/ui': 'workspace:*'
-				}
-			}),
-			'src/app.html': '<html class="theme-auto"></html>',
-			'src/routes/+layout.svelte': [
-				'<script lang="ts">',
-				"  import '@dryui/ui/themes/default.css';",
-				"  import '@dryui/ui/themes/dark.css';",
-				'</script>'
-			].join('\n'),
-			'src/routes/+page.svelte': [
-				'<script lang="ts">',
-				"  import { Card } from '@dryui/ui';",
-				'</script>',
-				'<div class="submission-card">',
-				'  <Card.Root as="button">',
-				'    <Card.Content>Open</Card.Content>',
-				'  </Card.Root>',
-				'</div>',
-				'<style>',
-				'  .submission-card {',
-				'    text-align: left;',
-				'  }',
-				'</style>'
-			].join('\n')
-		});
-
-		const report = scanWorkspace(mockSpec, { cwd: root });
-
-		expect(
-			report.findings.some((finding) => finding.ruleId === 'component/interactive-card-wrapper')
-		).toBe(true);
-	});
-
 	test('routes CSS theme analysis by filename, directive, and project app CSS context', () => {
 		const darkCss = [
 			':root {',

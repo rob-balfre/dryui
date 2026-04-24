@@ -34,12 +34,7 @@ export const aiSurface: AiSurfaceManifest = {
 		{
 			name: 'check',
 			description:
-				'Validate a component, theme file, directory, workspace, or DESIGN.md-aware rendered URL through one unified tool'
-		},
-		{
-			name: 'check-vision',
-			description:
-				'Render a URL, screenshot it, and critique visible polish defects against DESIGN.md and the feel-better polish rubric'
+				'Validate a component, theme file, directory, or workspace against the DryUI contract, a11y, and token rules'
 		}
 	],
 	prompts: [
@@ -67,11 +62,8 @@ export const aiSurface: AiSurfaceManifest = {
 		{ name: 'tokens', description: 'List `--dry-*` design tokens' },
 		{
 			name: 'check',
-			description: 'Validate files, themes, workspaces, or DESIGN.md-aware rendered URLs'
-		},
-		{
-			name: 'check-vision',
-			description: 'Alias for `dryui check --visual <url>`'
+			description:
+				'Validate files, themes, or workspaces against DryUI contract, a11y, and token rules'
 		},
 		{ name: 'ambient', description: 'Print compact session context for SessionStart hooks' },
 		{
@@ -92,7 +84,7 @@ export const aiSurface: AiSurfaceManifest = {
 			id: 'component-implementation',
 			title: 'DryUI component implementation',
 			description:
-				'Task-specific Svelte implementation context for one DryUI component, DESIGN.md-aware rendered checks, and its surrounding rules.',
+				'Task-specific Svelte implementation context for one DryUI component, its contract, and its surrounding rules.',
 			targets: ['cli', 'mcp', 'docs', 'skill', 'llms'],
 			dependencies: ['spec.json', 'composition-data.ts', 'theme-tokens.generated.json'],
 			defaultPrompt:
@@ -111,12 +103,10 @@ export const aiSurface: AiSurfaceManifest = {
 				'Import DryUI components from @dryui/ui or the documented subpath import.',
 				'Use compound component parts exactly as documented by required-parts.',
 				'Prefer DryUI props and CSS variables over raw HTML replacements or inline theme values.',
-				'Preserve accessible names, labels, focus order, and native element semantics.',
-				'Use DESIGN.md as the compact UI brief when present, then apply the feel-better polish rubric during rendered checks.'
+				'Preserve accessible names, labels, focus order, and native element semantics.'
 			],
 			checks: [
 				'dryui check <file.svelte>',
-				'dryui check --visual <url> for DESIGN.md-aware rendered-page polish',
 				'svelte-autofixer <file.svelte>',
 				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
 			],

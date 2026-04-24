@@ -34,10 +34,6 @@ const IGNORED_DIRS = new Set(['themes', 'internal', 'utils']);
 const BANNED_LAYOUT_COMPONENTS = ['Grid', 'Flex', 'Stack'] as const;
 const BANNED_GUIDANCE_CHECKS = [
 	{
-		path: resolve(repoRoot, 'packages/mcp/src/reviewer.ts'),
-		patterns: ['<Grid>', '<Flex>', '<Stack>']
-	},
-	{
 		path: resolve(repoRoot, 'packages/mcp/src/index.ts'),
 		patterns: ['layout components apply']
 	},

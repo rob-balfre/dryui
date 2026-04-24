@@ -11,7 +11,8 @@
 		Marquee,
 		Tabs,
 		Text,
-		TypingIndicator
+		TypingIndicator,
+		VisuallyHidden
 	} from '@dryui/ui';
 	import { getReducedMotionPreference } from '@dryui/primitives';
 	import { allComponentNames, toSlug } from '$lib/nav';
@@ -24,10 +25,7 @@
 		ShieldCheck,
 		AppWindow,
 		PenLine,
-		Package,
-		Zap,
 		Wrench,
-		Palette,
 		Check,
 		ChevronRight,
 		Compass,
@@ -392,16 +390,29 @@
 			class:hero--skip-fade={skipFadeIn}
 		>
 			<div class="hero-main">
+				<VisuallyHidden>
+					<Heading level={1}>DryUI. Don't repeat yourself.</Heading>
+				</VisuallyHidden>
 				<div
 					class="hero-lockup hero-reveal"
 					data-revealed={supportingVisible || undefined}
 					inert={!supportingVisible}
+					aria-hidden="true"
 				>
 					<div class="hero-brand">
 						<Logo />
 					</div>
-					<Text size="xs" color="secondary" weight="medium">Don't Repeat Yourself</Text>
-					<Text size="md" color="secondary" weight="bold">{SITE_DESCRIPTION}</Text>
+					<div class="hero-headline-visual">
+						<span class="hero-headline-text">Don't repeat yourself.</span>
+					</div>
+					<Text size="md" color="secondary" weight="medium">
+						<span class="hero-subhead-line">{SITE_DESCRIPTION}</span>
+						<span class="hero-stat-line">
+							<span class="hero-stat-num">160</span> components,
+							<span class="hero-stat-num">0</span> runtime deps,
+							<span class="hero-stat-num">300</span> theme tokens.
+						</span>
+					</Text>
 				</div>
 				<div class="hero-intro">
 					<div class="hero-intro-frame">
@@ -416,9 +427,9 @@
 							--dry-app-frame-chrome-bg={chromeRevealed
 								? 'var(--dry-color-bg-raised)'
 								: 'transparent'}
-							--dry-app-frame-dot-close={chromeRevealed ? '#ff5f56' : 'transparent'}
-							--dry-app-frame-dot-min={chromeRevealed ? '#ffbd2e' : 'transparent'}
-							--dry-app-frame-dot-max={chromeRevealed ? '#27c93f' : 'transparent'}
+							--dry-app-frame-dot-close={chromeRevealed ? 'oklch(65% 0.14 25)' : 'transparent'}
+							--dry-app-frame-dot-min={chromeRevealed ? 'oklch(80% 0.15 80)' : 'transparent'}
+							--dry-app-frame-dot-max={chromeRevealed ? 'oklch(65% 0.16 140)' : 'transparent'}
 						>
 							<div class="hero-chat" aria-label="Why DryUI, shown as a chat conversation">
 								<div class="chat-row" data-role="user">
@@ -507,9 +518,11 @@
 					data-revealed={supportingVisible || undefined}
 					inert={!supportingVisible}
 				>
-					<Button variant="solid" size="md" href={withBase('/getting-started')}>
-						<Rocket size={16} aria-hidden="true" /> Get Started
-					</Button>
+					<span class="cta-warm">
+						<Button variant="solid" size="md" href={withBase('/getting-started')}>
+							<Rocket size={16} aria-hidden="true" /> Get Started
+						</Button>
+					</span>
 					<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
 						<GithubIcon size={16} /> GitHub
 					</Button>
@@ -577,27 +590,10 @@
 
 		<section class="showcase">
 			<div class="showcase-head">
+				<span class="section-label"><span class="section-num">01</span> What's inside</span>
 				<span class="section-icon"><PackageOpen size={20} aria-hidden="true" /></span>
 				<Heading level={2}>What's inside</Heading>
 				<Text color="secondary">Components, tokens, and a live feedback loop to your agent.</Text>
-			</div>
-
-			<div class="stats-grid">
-				<div class="stat">
-					<Package size={20} aria-hidden="true" />
-					<span class="stat-value">160</span>
-					<span class="stat-label">Components</span>
-				</div>
-				<div class="stat">
-					<Zap size={20} aria-hidden="true" />
-					<span class="stat-value">0</span>
-					<span class="stat-label">Runtime deps</span>
-				</div>
-				<div class="stat">
-					<Palette size={20} aria-hidden="true" />
-					<span class="stat-value">300+</span>
-					<span class="stat-label">Theme tokens</span>
-				</div>
 			</div>
 
 			<div class="component-marquee">
@@ -656,11 +652,11 @@
 					</div>
 				</li>
 			</ul>
-			<Text size="xs" color="secondary">Yes, we have light and dark modes.</Text>
 		</section>
 
 		<section class="compare">
 			<div class="compare-head">
+				<span class="section-label"><span class="section-num">02</span> How DryUI compares</span>
 				<span class="section-icon"><GitCompare size={20} aria-hidden="true" /></span>
 				<Heading level={2}>How DryUI compares</Heading>
 				<Text color="secondary">
@@ -728,6 +724,7 @@
 
 	<section class="workflow">
 		<div class="workflow-head">
+			<span class="section-label"><span class="section-num">03</span> How DryUI works</span>
 			<span class="section-icon"><Workflow size={20} aria-hidden="true" /></span>
 			<Heading level={2}>How DryUI works</Heading>
 			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
@@ -745,66 +742,106 @@
 
 	<section class="hood">
 		<div class="hood-head">
+			<span class="section-label"><span class="section-num">04</span> Under the hood</span>
 			<span class="section-icon"><Wrench size={20} aria-hidden="true" /></span>
 			<Heading level={2}>Under the hood</Heading>
 			<Text color="secondary">Why we built DryUI on Svelte 5 and SvelteKit, not React.</Text>
 		</div>
-		<div class="hood-grid">
-			<Card.Root>
-				<Card.Content>
-					<span class="hood-icon"><Compass size={20} aria-hidden="true" /></span>
-					<div class="hood-name">Opinionated</div>
-					<p class="hood-note">
-						One framework, one way to do things. Runes for state, scoped styles for CSS, file-based
-						routing. No "pick your stack" meeting.
-					</p>
-				</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Content>
-					<span class="hood-icon"><Cpu size={20} aria-hidden="true" /></span>
-					<div class="hood-name">Compiler-first</div>
-					<p class="hood-note">
-						Svelte compiles to plain DOM updates. No virtual DOM, no runtime tax. DryUI hooks into
-						that compile step to lint your code before it ships.
-					</p>
-				</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Content>
-					<span class="hood-icon"><Boxes size={20} aria-hidden="true" /></span>
-					<div class="hood-name">Batteries included</div>
-					<p class="hood-note">
-						SvelteKit ships routing, SSR, endpoints, forms, and transitions. The React equivalent is
-						half a dozen libraries you wire together yourself.
-					</p>
-				</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Content>
-					<span class="hood-icon"><Bot size={20} aria-hidden="true" /></span>
-					<div class="hood-name">One path for agents</div>
-					<p class="hood-note">
-						React's ecosystem sprawls across Redux, Zustand, Tailwind, CSS-in-JS, Next, Remix, and
-						TanStack. Too much choice and disparate deps confuse LLMs. Svelte gives them one obvious
-						path.
-					</p>
-				</Card.Content>
-			</Card.Root>
+
+		<div class="hood-editorial">
+			<article class="hood-claim hood-claim--compiler">
+				<header class="hood-claim-head">
+					<span class="hood-claim-kicker">Compiler-first</span>
+					<span class="hood-claim-badge" aria-hidden="true"><Cpu size={16} /></span>
+				</header>
+				<p class="hood-claim-lede">
+					Svelte compiles to plain DOM updates. No virtual DOM, no runtime tax.
+					<span class="hood-highlight"
+						>DryUI hooks into that compile step to lint your code before it ships.</span
+					>
+				</p>
+				<div class="hood-compiler-demo" aria-hidden="true">
+					<div class="hood-compiler-source">
+						<span class="hood-compiler-tag">.svelte</span>
+						<pre class="hood-compiler-code"><code
+								><span class="tok-punc">&lt;</span><span class="tok-tag">Button</span> <span
+									class="tok-attr">variant</span
+								><span class="tok-punc">=</span><span class="tok-str">"solid"</span><span
+									class="tok-punc">&gt;</span
+								>Ship it<span class="tok-punc">&lt;/</span><span class="tok-tag">Button</span><span
+									class="tok-punc">&gt;</span
+								></code
+							></pre>
+					</div>
+					<span class="hood-compiler-arrow" aria-hidden="true">→</span>
+					<div class="hood-compiler-out">
+						<span class="hood-compiler-tag">compiled DOM</span>
+						<pre class="hood-compiler-code"><code
+								><span class="tok-punc">&lt;</span><span class="tok-tag">button</span> <span
+									class="tok-attr">class</span
+								><span class="tok-punc">=</span><span class="tok-str">"dry-btn"</span><span
+									class="tok-punc">&gt;</span
+								>Ship it<span class="tok-punc">&lt;/</span><span class="tok-tag">button</span><span
+									class="tok-punc">&gt;</span
+								></code
+							></pre>
+					</div>
+				</div>
+			</article>
+
+			<article class="hood-claim hood-claim--agents">
+				<header class="hood-claim-head">
+					<span class="hood-claim-kicker">One path for agents</span>
+					<span class="hood-claim-badge" aria-hidden="true"><Bot size={16} /></span>
+				</header>
+				<p class="hood-claim-lede">
+					Too much choice confuses LLMs.
+					<span class="hood-highlight">Svelte gives them one obvious path.</span>
+				</p>
+				<ul class="hood-stack" aria-label="React ecosystem sprawl versus Svelte's single path">
+					<li class="hood-stack-item hood-stack-item--strike">Redux</li>
+					<li class="hood-stack-item hood-stack-item--strike">Zustand</li>
+					<li class="hood-stack-item hood-stack-item--strike">Tailwind</li>
+					<li class="hood-stack-item hood-stack-item--strike">CSS-in-JS</li>
+					<li class="hood-stack-item hood-stack-item--strike">TanStack Router</li>
+					<li class="hood-stack-item hood-stack-item--strike">Next.js</li>
+					<li class="hood-stack-item hood-stack-item--strike">Remix</li>
+					<li class="hood-stack-item hood-stack-item--keep">Svelte</li>
+				</ul>
+			</article>
+
+			<article class="hood-claim hood-claim--prose">
+				<header class="hood-claim-head">
+					<span class="hood-claim-kicker">Opinionated, batteries included</span>
+					<span class="hood-claim-badge" aria-hidden="true"><Compass size={16} /></span>
+				</header>
+				<p class="hood-claim-prose">
+					One framework, one way to do things:
+					<code class="hood-code">runes</code> for state,
+					<code class="hood-code">scoped styles</code> for CSS,
+					<code class="hood-code">file-based routing</code> out of the box, plus SSR, endpoints, forms,
+					and transitions. No "pick your stack" meeting, no half a dozen libraries to wire together. You
+					open the editor and start building.
+				</p>
+			</article>
 		</div>
+
 		<Text size="xs" color="secondary">
 			Learning a new framework is a problem of the past. Your agent already speaks Svelte.
 		</Text>
 	</section>
 
 	<section class="cta">
+		<span class="section-label"><span class="section-num">05</span> Still here?</span>
 		<span class="section-icon"><Hand size={20} aria-hidden="true" /></span>
 		<Heading level={2}>Still here?</Heading>
 		<Text color="secondary">Install the plugin, wire it to your agent, and start building.</Text>
 		<nav aria-label="Get started links" class="actions">
-			<Button variant="solid" size="md" href={withBase('/getting-started')}>
-				<Rocket size={16} aria-hidden="true" /> Get Started
-			</Button>
+			<span class="cta-warm">
+				<Button variant="solid" size="md" href={withBase('/getting-started')}>
+					<Rocket size={16} aria-hidden="true" /> Get Started
+				</Button>
+			</span>
 			<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
 				<GithubIcon size={16} /> GitHub
 			</Button>
@@ -898,6 +935,47 @@
 		grid-template-columns: minmax(0, 1fr);
 		justify-items: center;
 		gap: var(--dry-space-3);
+	}
+
+	.hero-headline-visual {
+		font-size: clamp(1.5rem, 0.875rem + 2.75cqi, 2.25rem);
+		line-height: 1.15;
+		font-weight: 700;
+		letter-spacing: -0.01em;
+		color: var(--dry-color-text-strong);
+		text-wrap: balance;
+	}
+
+	.hero-headline-text {
+		position: relative;
+		display: inline-block;
+		padding-block-end: 0.18em;
+		background-image: linear-gradient(
+			90deg,
+			var(--dry-color-fill-accent) 0%,
+			color-mix(in oklch, var(--dry-color-fill-accent) 30%, transparent) 100%
+		);
+		background-repeat: no-repeat;
+		background-position: 0 100%;
+		background-size: 100% 0.12em;
+	}
+
+	.hero-subhead-line {
+		display: block;
+	}
+
+	.hero-stat-line {
+		display: block;
+		font-family: var(--dry-font-mono);
+		font-size: 0.8125rem;
+		letter-spacing: 0.02em;
+		color: var(--dry-color-text-weak);
+		padding-block-start: var(--dry-space-1);
+	}
+
+	.hero-stat-num {
+		color: var(--dry-color-fill-accent-active);
+		font-weight: 600;
 	}
 
 	.hero-brand {
@@ -1066,37 +1144,6 @@
 		display: grid;
 		gap: var(--dry-space-2);
 		justify-items: center;
-	}
-
-	.stats-grid {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: auto;
-		justify-content: center;
-		gap: clamp(var(--dry-space-4), 6cqi, var(--dry-space-12));
-	}
-
-	.stat {
-		display: grid;
-		justify-items: center;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-2) var(--dry-space-3);
-		color: var(--dry-color-fill-brand);
-	}
-
-	.stat-value {
-		font-size: clamp(1.5rem, 0.625rem + 4.5cqi, 2.75rem);
-		font-weight: 800;
-		line-height: 1;
-		color: var(--dry-color-text-strong);
-		letter-spacing: -0.02em;
-		padding-block-start: var(--dry-space-2);
-	}
-
-	.stat-label {
-		font-size: var(--dry-type-small-size, 0.875rem);
-		color: var(--dry-color-text-weak);
-		font-weight: 500;
 	}
 
 	.component-marquee {
@@ -1315,6 +1362,37 @@
 		padding: var(--dry-space-6) 0;
 	}
 
+	.cta-warm {
+		display: inline-grid;
+		border-radius: var(--dry-radius-md);
+		transform: translateY(0);
+		transition:
+			transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+			box-shadow 280ms cubic-bezier(0.16, 1, 0.3, 1);
+		--dry-btn-border: color-mix(in srgb, var(--dry-color-fill-accent) 55%, transparent);
+	}
+
+	.cta-warm:hover {
+		transform: translateY(-1px);
+		--dry-btn-border: var(--dry-color-fill-accent-active);
+		box-shadow:
+			0 8px 20px -10px color-mix(in srgb, var(--dry-color-fill-accent) 65%, transparent),
+			0 2px 6px -3px color-mix(in srgb, var(--dry-color-fill-accent-active) 55%, transparent);
+	}
+
+	.cta-warm:focus-within {
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--dry-color-fill-accent) 30%, transparent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cta-warm {
+			transition: none;
+		}
+		.cta-warm:hover {
+			transform: none;
+		}
+	}
+
 	.plugins {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -1449,21 +1527,6 @@
 		justify-items: center;
 	}
 
-	.hood-grid {
-		justify-self: stretch;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--dry-space-4);
-		text-align: start;
-	}
-
-	@container (min-width: 44rem) {
-		.hood-grid {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-	}
-
-	.hood-icon,
 	.section-icon {
 		display: inline-grid;
 		place-items: center;
@@ -1471,26 +1534,255 @@
 		border-radius: var(--dry-radius-full);
 		background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
 		color: var(--dry-color-fill-brand);
-	}
-
-	.section-icon {
 		justify-self: center;
 		margin-block-end: var(--dry-space-2);
 	}
 
-	.hood-name {
-		font-weight: 700;
-		color: var(--dry-color-text-strong);
-		line-height: 1.4;
-		padding-block-start: var(--dry-space-3);
+	.section-label {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: baseline;
+		gap: var(--dry-space-2);
+		justify-self: center;
+		margin-block-end: var(--dry-space-1);
+		font-family: var(--dry-font-mono);
+		font-size: 0.6875rem;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
 	}
 
-	.hood-note {
+	.section-num {
+		color: var(--dry-color-fill-accent-active);
+		font-weight: 700;
+		letter-spacing: 0.08em;
+	}
+
+	.hood-editorial {
+		justify-self: stretch;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-6);
+		text-align: start;
+	}
+
+	@container (min-width: 44rem) {
+		.hood-editorial {
+			grid-template-columns: 1.35fr 1fr;
+			grid-template-rows: auto auto;
+			column-gap: var(--dry-space-6);
+			row-gap: var(--dry-space-6);
+		}
+		.hood-claim--compiler {
+			grid-column: 1 / 2;
+			grid-row: 1 / 2;
+		}
+		.hood-claim--agents {
+			grid-column: 2 / 3;
+			grid-row: 1 / 3;
+		}
+		.hood-claim--prose {
+			grid-column: 1 / 2;
+			grid-row: 2 / 3;
+		}
+	}
+
+	.hood-claim {
+		display: grid;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-5);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 80%, transparent);
+		border-radius: var(--dry-radius-xl);
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 32%, transparent);
+	}
+
+	.hood-claim--agents {
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 48%, transparent);
+		border-color: color-mix(in srgb, var(--dry-color-stroke-weak) 90%, transparent);
+		align-content: start;
+	}
+
+	.hood-claim--prose {
+		background: transparent;
+		border: none;
+		padding: var(--dry-space-2) 0 0;
+	}
+
+	.hood-claim-head {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.hood-claim-kicker {
+		font-family: var(--dry-font-mono);
+		font-size: 0.75rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-strong);
+		font-weight: 600;
+	}
+
+	.hood-claim-badge {
+		display: inline-grid;
+		place-items: center;
+		grid-template-columns: 1.75rem;
+		grid-template-rows: 1.75rem;
+		border-radius: var(--dry-radius-full);
+		background: color-mix(in srgb, var(--dry-color-fill-accent) 18%, transparent);
+		color: var(--dry-color-fill-accent-active);
+	}
+
+	.hood-claim-lede {
 		margin: 0;
-		padding-block-start: var(--dry-space-2);
-		font-size: var(--dry-type-small-size, 0.875rem);
-		color: var(--dry-color-text-weak);
+		font-size: 1rem;
 		line-height: 1.55;
+		color: var(--dry-color-text-weak);
+	}
+
+	.hood-highlight {
+		color: var(--dry-color-text-strong);
+		font-weight: 500;
+	}
+
+	.hood-claim-prose {
+		margin: 0;
+		font-size: 1rem;
+		line-height: 1.6;
+		color: var(--dry-color-text-weak);
+	}
+
+	.hood-claim-prose .hood-code {
+		font-family: var(--dry-font-mono);
+		font-size: 0.9em;
+		background: color-mix(in srgb, var(--dry-color-fill-accent) 10%, var(--dry-color-bg-raised));
+		color: var(--dry-color-text-strong);
+		padding: 0.1em 0.4em;
+		border-radius: var(--dry-radius-sm);
+	}
+
+	/* Compiler demo block: source on the left, compiled DOM on the right, arrow between.
+	   Varies rhythm from the other claim. Uses the mono-ui face throughout. */
+	.hood-compiler-demo {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding: var(--dry-space-3);
+		border: 1px dashed color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		border-radius: var(--dry-radius-md);
+		background: color-mix(in srgb, var(--dry-color-bg-base) 60%, transparent);
+	}
+
+	.hood-compiler-source,
+	.hood-compiler-out {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-1);
+	}
+
+	.hood-compiler-tag {
+		font-family: var(--dry-font-mono);
+		font-size: 0.625rem;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
+	}
+
+	.hood-compiler-code {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: 0.75rem;
+		line-height: 1.5;
+		white-space: nowrap;
+		overflow-x: auto;
+		color: var(--dry-color-text-strong);
+	}
+
+	.hood-compiler-code .tok-tag {
+		color: var(--dry-color-fill-brand);
+	}
+	.hood-compiler-code .tok-attr {
+		color: var(--dry-color-fill-accent-active);
+	}
+	.hood-compiler-code .tok-str {
+		color: color-mix(in oklch, var(--dry-color-text-strong) 70%, var(--dry-color-fill-accent));
+	}
+	.hood-compiler-code .tok-punc {
+		color: var(--dry-color-text-weak);
+	}
+
+	.hood-compiler-arrow {
+		font-family: var(--dry-font-mono);
+		font-size: 1.25rem;
+		color: var(--dry-color-fill-accent-active);
+		padding-inline: var(--dry-space-1);
+	}
+
+	@container (max-width: 32rem) {
+		.hood-compiler-demo {
+			grid-template-columns: minmax(0, 1fr);
+			grid-auto-rows: auto;
+		}
+		.hood-compiler-arrow {
+			justify-self: start;
+			transform: rotate(90deg);
+			padding: var(--dry-space-1) 0;
+		}
+	}
+
+	/* Framework stack: struck-out competitors, Svelte standing. */
+	.hood-stack {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-1_5);
+		font-family: var(--dry-font-mono);
+	}
+
+	.hood-stack-item {
+		display: grid;
+		grid-template-columns: 1.25rem minmax(0, 1fr);
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding: var(--dry-space-1_5) var(--dry-space-2);
+		font-size: 0.8125rem;
+		border-radius: var(--dry-radius-sm);
+	}
+
+	.hood-stack-item::before {
+		content: '';
+		display: grid;
+		grid-template-columns: 0.5rem;
+		grid-template-rows: 0.5rem;
+		border-radius: 50%;
+		justify-self: center;
+	}
+
+	.hood-stack-item--strike {
+		color: color-mix(in srgb, var(--dry-color-text-weak) 80%, transparent);
+		text-decoration: line-through;
+		text-decoration-color: color-mix(in srgb, var(--dry-color-text-weak) 60%, transparent);
+		text-decoration-thickness: 1px;
+	}
+
+	.hood-stack-item--strike::before {
+		background: color-mix(in srgb, var(--dry-color-text-weak) 40%, transparent);
+	}
+
+	.hood-stack-item--keep {
+		color: var(--dry-color-text-strong);
+		font-weight: 700;
+		background: color-mix(in srgb, var(--dry-color-fill-accent) 14%, transparent);
+		border: 1px solid color-mix(in srgb, var(--dry-color-fill-accent) 35%, transparent);
+	}
+
+	.hood-stack-item--keep::before {
+		background: var(--dry-color-fill-accent-active);
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--dry-color-fill-accent) 25%, transparent);
 	}
 
 	.cta {

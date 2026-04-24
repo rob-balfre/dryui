@@ -16,6 +16,8 @@ interface FeedbackRuntimeStubs {
 	patchViteConfig: (configPath: string) => boolean;
 	findViteConfig: (root: string) => string | null;
 	isInteractiveTTY: () => boolean;
+	promptInstallImpeccable: () => Promise<boolean>;
+	installImpeccable: (cwd: string) => boolean;
 }
 
 interface FeedbackRuntimeRecorder {
@@ -26,6 +28,8 @@ interface FeedbackRuntimeRecorder {
 	}>;
 	mountCalls: Array<{ layoutPath: string; serverUrl: string }>;
 	patchCalls: string[];
+	impeccablePromptCalls: { count: number };
+	impeccableInstallCalls: string[];
 	stubs: FeedbackRuntimeStubs;
 }
 
@@ -35,6 +39,11 @@ function buildFeedbackRuntime(
 	const installCalls: FeedbackRuntimeRecorder['installCalls'] = [];
 	const mountCalls: FeedbackRuntimeRecorder['mountCalls'] = [];
 	const patchCalls: string[] = [];
+	// Tests that don't care about impeccable still scaffold through runInit's
+	// post-scaffold step, so stub both the prompt (declining) and the installer
+	// by default. Dedicated impeccable tests override these.
+	const impeccablePromptCalls = { count: 0 };
+	const impeccableInstallCalls: string[] = [];
 	const stubs: FeedbackRuntimeStubs = {
 		installPackage: (options) => {
 			installCalls.push({ ...options });
@@ -50,9 +59,24 @@ function buildFeedbackRuntime(
 		},
 		findViteConfig: (root) => join(root, 'vite.config.ts'),
 		isInteractiveTTY: () => false,
+		promptInstallImpeccable: async () => {
+			impeccablePromptCalls.count += 1;
+			return false;
+		},
+		installImpeccable: (cwd) => {
+			impeccableInstallCalls.push(cwd);
+			return true;
+		},
 		...overrides
 	};
-	return { installCalls, mountCalls, patchCalls, stubs };
+	return {
+		installCalls,
+		mountCalls,
+		patchCalls,
+		impeccablePromptCalls,
+		impeccableInstallCalls,
+		stubs
+	};
 }
 
 function scaffoldTestBed(runtimeOverrides: Partial<FeedbackRuntimeStubs> = {}): {
@@ -120,15 +144,16 @@ describe('runInit', () => {
 		const result = await captureAsyncCommandIO(() => runInit(['--help'], spec));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]',
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback] [--skip-impeccable]',
 			'',
 			'Bootstrap a SvelteKit + DryUI project.',
 			'',
 			'Options:',
-			'  [path]           Target directory (default: current directory)',
-			'  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)',
-			'  --no-launch      Skip the feedback-mode launch prompt after scaffold',
-			'  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />'
+			'  [path]             Target directory (default: current directory)',
+			'  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)',
+			'  --no-launch        Skip the feedback-mode launch prompt after scaffold',
+			'  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />',
+			'  --skip-impeccable  Skip installing impeccable design skills after scaffold'
 		]);
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBe(0);
@@ -141,7 +166,7 @@ describe('runInit', () => {
 		expect(shortHelp.exitCode).toBe(0);
 		expect(longHelp.exitCode).toBe(0);
 		expect(shortHelp.logs[0]).toBe(
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]'
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback] [--skip-impeccable]'
 		);
 		expect(longHelp.logs).toEqual(shortHelp.logs);
 		expect(shortHelp.errors).toEqual([]);
@@ -691,5 +716,109 @@ describe('runInit', () => {
 			`  ? Skipped edit: Wire dryuiLint into svelte.config (manual action needed — unrecognised preprocess shape in ${join(root, 'svelte.config.js')}; add dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] }) to the preprocess array manually)`
 		]);
 		expect(svelteConfig).toBe(weirdConfig);
+	});
+
+	test('prompts for impeccable install in a TTY and runs the installer when accepted', async () => {
+		const { root, target, feedback } = scaffoldTestBed({
+			isInteractiveTTY: () => true,
+			promptInstallImpeccable: async () => true
+		});
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback', '--no-launch'], spec, {
+					runCommand: () => true,
+					...feedback.stubs
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(feedback.impeccableInstallCalls).toEqual([target]);
+		expect(result.logs).toContain('  Installing impeccable design skills...');
+		expect(result.logs.some((line) => line.startsWith('  Skipped impeccable.'))).toBe(false);
+	});
+
+	test('prompts for impeccable install in a TTY and skips installer when declined', async () => {
+		const { root, feedback } = scaffoldTestBed({
+			isInteractiveTTY: () => true,
+			promptInstallImpeccable: async () => false
+		});
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback', '--no-launch'], spec, {
+					runCommand: () => true,
+					...feedback.stubs
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(feedback.impeccableInstallCalls).toEqual([]);
+		expect(result.logs).toContain(
+			'  Skipped impeccable. Install later with: npx impeccable skills install'
+		);
+		expect(result.logs.some((line) => line.includes('Installing impeccable'))).toBe(false);
+	});
+
+	test('non-TTY scaffold installs impeccable silently without prompting', async () => {
+		const { root, target, feedback } = scaffoldTestBed();
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
+					runCommand: () => true,
+					...feedback.stubs
+				})
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(feedback.impeccablePromptCalls.count).toBe(0);
+		expect(feedback.impeccableInstallCalls).toEqual([target]);
+		expect(result.logs).toContain('  Installing impeccable design skills...');
+	});
+
+	test('--skip-impeccable bypasses the prompt and the installer', async () => {
+		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(
+					['projects/smoke', '--pm', 'bun', '--no-feedback', '--no-launch', '--skip-impeccable'],
+					spec,
+					{
+						runCommand: () => true,
+						...feedback.stubs
+					}
+				)
+			)
+		);
+
+		expect(result.errors).toEqual([]);
+		expect(feedback.impeccablePromptCalls.count).toBe(0);
+		expect(feedback.impeccableInstallCalls).toEqual([]);
+		expect(result.logs.some((line) => line.includes('impeccable'))).toBe(false);
+	});
+
+	test('impeccable install failure warns but does not abort init', async () => {
+		const { root, feedback } = scaffoldTestBed({
+			installImpeccable: () => false
+		});
+
+		const result = await withCwd(root, () =>
+			captureAsyncCommandIO(() =>
+				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
+					runCommand: () => true,
+					...feedback.stubs
+				})
+			)
+		);
+
+		expect(result.errors).toContain(
+			'  Warning: impeccable install did not complete. Install later with: npx impeccable skills install'
+		);
+		expect(result.logs).toContain('    bun run dev');
 	});
 });

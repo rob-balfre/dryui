@@ -1,5 +1,5 @@
 // DryUI Theme Diagnosis Engine
-// Pure functions, no MCP dependency — same pattern as reviewer.ts.
+// Pure functions, no MCP dependency. Same pattern as component-checker.ts.
 
 import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { buildLineOffsets, lineAtOffset } from './utils.js';

@@ -52,8 +52,7 @@
 			{
 				id: 'mcp',
 				label: '@dryui/mcp',
-				description:
-					'ask/check/check-vision turn requests into component, validation, and rendered UI guidance.',
+				description: 'ask and check turn requests into component discovery and static validation.',
 				iconComponent: Boxes,
 				color: 'brand',
 				width: 360,

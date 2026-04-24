@@ -31,7 +31,8 @@ bun install -g @dryui/cli@latest
 dryui
 ```
 
-- Use `dryui check [path]` for static validation and `dryui check --visual <url>` for rendered-page visual critique. In MCP, `check` is the canonical validation tool and accepts `visualUrl`; `check-vision` remains the direct visual tool.
+- Use `dryui check [path]` or MCP `check` for static validation: component contracts, a11y, tokens, CSS discipline.
+- For design-quality work (brief, critique, polish, visual review, anti-pattern detection), DryUI delegates to [impeccable](https://impeccable.style). Install alongside DryUI via `dryui init` or `npx impeccable skills install`, then use `/impeccable <command>` from your AI harness. `PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
 - Keep root-level Markdown durable. One-off audits, scratch TODOs, and generated reports belong under `docs/`, `reports/`, or ignored local directories, not the repo root.
 - Repo-local editor install output such as `.agents/skills/`, `.github/skills/`, `.opencode/`, and `opencode.json` is not canonical source.
 

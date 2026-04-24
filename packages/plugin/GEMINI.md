@@ -17,4 +17,8 @@ Use the `dryui-feedback` MCP server's tools to act on in-app feedback annotation
 4. **Semantic tokens** — background: `--dry-color-bg-base`, text: `--dry-color-text-strong`. Use `ask --scope list --kind token` to explore.
 5. **Run `check`** on any file, theme, or workspace you edit.
 
+## Design guidance, critique, polish
+
+DryUI is components + tokens + contracts. It deliberately does NOT ship design opinion. For brief, critique, polish, visual review, or anti-pattern detection, use [impeccable](https://impeccable.style) (installed alongside DryUI by `dryui init` or via `npx impeccable skills install`). Invoke its commands from your harness: `/impeccable teach`, `/impeccable craft`, `/impeccable shape`, `/impeccable critique`, `/impeccable audit`, `/impeccable polish`. `PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
+
 Full skill documentation lives at `packages/plugin/skills/dryui/SKILL.md` in the DryUI repository.

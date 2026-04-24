@@ -1,6 +1,5 @@
-// dryui check — Static DryUI validation, with an optional rendered visual pass.
+// dryui check — Static DryUI validation.
 
-import { runVisionCheck, type VisionCheckResult } from '@dryui/mcp/check-vision';
 import { runCheckStructured, type CheckResult } from '@dryui/mcp/repair';
 import type { Spec } from '@dryui/mcp/spec-types';
 import {
@@ -13,26 +12,12 @@ import {
 	type OutputMode
 } from '../run.js';
 
-type CheckScope = 'polish' | 'no-polish';
-
 interface CheckCommandOptions {
 	readonly runStatic?: typeof runCheckStructured;
-	readonly runVisual?: typeof runVisionCheck;
 }
 
-const VALUE_FLAGS = new Set([
-	'--cwd',
-	'--design',
-	'--extra-rubric',
-	'--scope',
-	'--viewport',
-	'--visual',
-	'--visual-url',
-	'--wait-for'
-]);
+const VALUE_FLAGS = new Set(['--cwd']);
 
-// Duck-type StructuredToolError so the CLI does not need to expose the MCP
-// package's internal error class as a public API.
 function isStructuredToolError(
 	value: unknown
 ): value is { name: string; code: string; message: string; suggestions: readonly string[] } {
@@ -47,32 +32,24 @@ function isStructuredToolError(
 function help(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage:
-				'dryui check [path] [--polish|--no-polish] [--visual <url>] [--viewport=<wxh>] [--wait-for=<selector>]',
+			usage: 'dryui check [path] [--cwd=<path>]',
 			description: [
-				'Validate a DryUI file, theme, directory, or workspace through the unified checker.',
-				'Without a path, check scans the current workspace. With --visual, it renders',
-				'a URL in headless Chromium and asks Codex CLI to critique the screenshot.'
+				'Validate a DryUI file, theme, directory, or workspace. Runs component',
+				'contracts, a11y, tokens, and CSS discipline checks. Without a path,',
+				'check scans the current workspace.',
+				'',
+				'For design-quality flows (brief, critique, polish, visual review),',
+				'use impeccable: https://impeccable.style'
 			],
 			options: [
-				'  --polish             Only run polish-category rules',
-				'  --no-polish          Skip polish rules; run correctness + a11y checks',
-				'  --scope=<scope>      Equivalent explicit scope: polish or no-polish',
-				'  --cwd=<path>         Resolve paths and workspace scans from another directory',
-				'  --visual <url>       Run the rendered visual check for a local or public URL',
-				'  --visual-url=<url>   Same as --visual <url>',
-				'  --design=<path>      DESIGN.md for visual review (auto-discovers nearest if omitted)',
-				'  --viewport=<wxh>     Visual check viewport size (default 1440x900)',
-				'  --wait-for=<sel>     Visual check selector to wait for before screenshotting',
-				'  --extra-rubric=<s>   Extra visual-review emphasis for Codex',
-				'  --text               Plain text output (default is TOON)',
-				'  --json               Emit JSON instead of TOON'
+				'  --cwd=<path>    Resolve paths and workspace scans from another directory',
+				'  --text          Plain text output (default is TOON)',
+				'  --json          Emit JSON instead of TOON'
 			],
 			examples: [
 				'  dryui check src/routes/+page.svelte',
-				'  dryui check --polish',
-				'  dryui check --visual http://localhost:5173/dashboard',
-				'  dryui check --visual-url=https://example.com --viewport=1280x720'
+				'  dryui check',
+				'  dryui check --cwd=./my-project src/lib/'
 			]
 		},
 		exitCode
@@ -118,51 +95,9 @@ function positionals(args: readonly string[]): string[] {
 	return out;
 }
 
-function resolveScope(
-	args: readonly string[],
-	mode: OutputMode
-): CheckScope | undefined | CommandResult {
-	const polish = hasFlag(args, '--polish');
-	const noPolish = hasFlag(args, '--no-polish');
-	const explicit = getOptionValue(args, '--scope');
-
-	if ([polish, noPolish, Boolean(explicit)].filter(Boolean).length > 1) {
-		return commandError(
-			mode,
-			'conflicting-scope',
-			'Choose only one check scope: --polish, --no-polish, or --scope.',
-			['dryui check --polish', 'dryui check --no-polish']
-		);
-	}
-
-	if (polish) return 'polish';
-	if (noPolish) return 'no-polish';
-	if (!explicit) return undefined;
-	if (explicit === 'polish' || explicit === 'no-polish') return explicit;
-	return commandError(mode, 'invalid-scope', `Unsupported check scope: ${explicit}`, [
-		'dryui check --scope=polish',
-		'dryui check --scope=no-polish'
-	]);
-}
-
 function staticOutput(result: CheckResult, mode: OutputMode): string {
 	if (mode !== 'json') return result.text;
 	return JSON.stringify({ summary: result.summary, diagnostics: result.diagnostics }, null, 2);
-}
-
-function visualOutput(result: VisionCheckResult, mode: OutputMode): string {
-	if (mode !== 'json') return result.text;
-	return JSON.stringify(
-		{
-			summary: result.summary,
-			screenshotPath: result.screenshotPath,
-			...(result.designBriefPath ? { designBriefPath: result.designBriefPath } : {}),
-			findings: result.findings,
-			diagnostics: result.diagnostics
-		},
-		null,
-		2
-	);
 }
 
 function structuredErrorResult(error: unknown, mode: OutputMode): CommandResult {
@@ -180,49 +115,6 @@ export async function getCheckCommandResult(
 	options: CheckCommandOptions = {}
 ): Promise<CommandResult> {
 	const runStatic = options.runStatic ?? runCheckStructured;
-	const runVisual = options.runVisual ?? runVisionCheck;
-	const visualUrl = getOptionValue(args, '--visual-url') ?? getOptionValue(args, '--visual');
-	const wantsVisual =
-		visualUrl !== undefined ||
-		hasFlag(args, '--visual') ||
-		hasFlag(args, '--visual-url') ||
-		args.some((arg) => arg.startsWith('--visual=') || arg.startsWith('--visual-url='));
-
-	if (wantsVisual) {
-		if (!visualUrl) {
-			return commandError(mode, 'missing-visual-url', 'Missing URL for visual check.', [
-				'dryui check --visual http://localhost:5173',
-				'dryui check --visual-url=https://example.com'
-			]);
-		}
-		const viewport = getOptionValue(args, '--viewport');
-		const waitFor = getOptionValue(args, '--wait-for');
-		const extraRubric = getOptionValue(args, '--extra-rubric');
-		const designPath = getOptionValue(args, '--design');
-		const cwd = getOptionValue(args, '--cwd');
-		try {
-			const result = await runVisual(
-				{
-					url: visualUrl,
-					...(viewport ? { viewport } : {}),
-					...(waitFor ? { waitFor } : {}),
-					...(extraRubric ? { extraRubric } : {}),
-					...(designPath ? { designPath } : {})
-				},
-				cwd ? { cwd } : {}
-			);
-			return {
-				output: visualOutput(result, mode),
-				error: null,
-				exitCode: result.summary.hasBlockers ? 1 : 0
-			};
-		} catch (error) {
-			return structuredErrorResult(error, mode);
-		}
-	}
-
-	const scope = resolveScope(args, mode);
-	if (scope && typeof scope !== 'string') return scope;
 
 	try {
 		const path = positionals(args)[0];
@@ -230,8 +122,7 @@ export async function getCheckCommandResult(
 		const result = runStatic(
 			spec,
 			{
-				...(path ? { path } : {}),
-				...(scope ? { scope } : {})
+				...(path ? { path } : {})
 			},
 			cwd ? { cwd } : {}
 		);

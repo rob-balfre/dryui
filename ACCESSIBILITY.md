@@ -30,7 +30,7 @@ Accessibility regressions should be caught by review and automation together:
 - Add or update a browser test when interactive behaviour, keyboard handling, or semantics change.
 - Keep accessible labels, descriptions, and error associations explicit.
 - Prefer native semantics where possible; only ship custom widget roles when the full pattern is implemented.
-- Treat motion and transient feedback as accessibility concerns, not just visual polish.
+- Treat motion and transient feedback as accessibility concerns, not just a surface-level visual detail.
 
 ## Scope Notes
 

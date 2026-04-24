@@ -1,9 +1,6 @@
 import { readFileSync, statSync, type Stats } from 'node:fs';
-import { basename, resolve } from 'node:path';
-import { checkTheme } from '@dryui/lint/rules';
-import { RULE_CATALOG, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
+import { resolve } from 'node:path';
 import { checkComponent } from '../component-checker.js';
-import { analyzeDesignBrief, DESIGN_BRIEF_FILENAME } from '../design-brief.js';
 import { diagnoseTheme } from '../theme-checker.js';
 import { scanWorkspace, type WorkspaceReport } from '../workspace-audit.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
@@ -30,27 +27,10 @@ interface CheckIssue {
 
 interface CheckInput {
 	readonly path?: string;
-	/**
-	 * Category filter flag for the lint dispatcher.
-	 * - `'polish'`: only run `category: 'polish'` rules.
-	 * - `'no-polish'`: run everything except polish rules.
-	 * - `undefined`: run every rule (default).
-	 *
-	 * CLI surface: `--polish` / `--no-polish`.
-	 */
-	readonly scope?: 'polish' | 'no-polish';
 }
 
 interface CheckOptions {
 	readonly cwd?: string;
-}
-
-type LintCategory = 'correctness' | 'a11y' | 'polish';
-
-function resolveCategoryFilter(scope: CheckInput['scope']): ReadonlySet<LintCategory> | undefined {
-	if (scope === 'polish') return new Set<LintCategory>(['polish']);
-	if (scope === 'no-polish') return new Set<LintCategory>(['correctness', 'a11y']);
-	return undefined;
 }
 
 /**
@@ -172,46 +152,23 @@ function dedupeDiagnostics(issues: readonly DryUiRepairIssue[]): readonly DryUiR
 	return out;
 }
 
-function renderTheme(
-	spec: Spec,
-	absPath: string,
-	categoryFilter: ReadonlySet<LintCategory> | undefined
-): CheckResult {
+function renderTheme(spec: Spec, absPath: string): CheckResult {
 	const css = readFileSync(absPath, 'utf-8');
-	// `--polish` / `--no-polish` don't reshape the theme-checker's core
-	// semantic-token / contrast / pairing passes — those are correctness rules.
-	// Polish-category theme rules (e.g. `polish/missing-theme-smoothing`) come
-	// from the lint dispatcher via `checkTheme()`.
-	const skipTheme = categoryFilter !== undefined && !categoryFilter.has('correctness');
 	const rel = displayPath(absPath);
-	const themeResult = skipTheme ? null : diagnoseTheme(css, spec, absPath);
-	const polishThemeViolations = checkTheme(css, absPath, categoryFilter);
-	const polishIssues: CheckIssue[] = polishThemeViolations.map((v) => {
-		const entry = (RULE_CATALOG as Record<string, { severity: CheckSeverity }>)[v.rule];
-		return {
-			file: rel,
-			line: v.line,
-			rule: v.rule,
-			severity: entry?.severity ?? 'suggestion',
-			message: v.message,
-			suggestedFix: ruleSuggestedFix(v.rule as Parameters<typeof ruleSuggestedFix>[0])
-		};
-	});
+	const themeResult = diagnoseTheme(css, spec, absPath);
 
-	const themeIssues: CheckIssue[] = themeResult
-		? themeResult.issues.map((issue) => ({
-				file: rel,
-				line: null,
-				rule: issue.code,
-				severity: issue.severity,
-				message: issue.message,
-				suggestedFix: issue.fix
-			}))
-		: [];
-	const issues: CheckIssue[] = [...themeIssues, ...polishIssues];
+	const themeIssues: CheckIssue[] = themeResult.issues.map((issue) => ({
+		file: rel,
+		line: null,
+		rule: issue.code,
+		severity: issue.severity,
+		message: issue.message,
+		suggestedFix: issue.fix
+	}));
+	const issues: CheckIssue[] = [...themeIssues];
 
 	const diagnostics = dedupeDiagnostics([
-		...(themeResult?.issues ?? []).map((issue) =>
+		...themeResult.issues.map((issue) =>
 			enrichDiagnostic({
 				source: 'theme' as const,
 				code: issue.code,
@@ -219,36 +176,17 @@ function renderTheme(
 				message: issue.message,
 				file: rel
 			})
-		),
-		...polishThemeViolations.map((v) =>
-			enrichDiagnostic({
-				source: 'lint' as const,
-				code: v.rule,
-				severity: ((RULE_CATALOG as Record<string, { severity: DryUiRepairIssueSeverity }>)[v.rule]
-					?.severity ?? 'warning') as DryUiRepairIssueSeverity,
-				message: v.message,
-				file: rel,
-				line: v.line
-			})
 		)
 	]);
 	const summary = deriveDiagnosticSummary(diagnostics);
 
-	const missingCount =
-		themeResult?.issues.filter((issue) => issue.code === 'missing-token').length ?? 0;
-	const totalRequired = (themeResult?.variables.required ?? 0) + missingCount;
+	const missingCount = themeResult.issues.filter((issue) => issue.code === 'missing-token').length;
+	const totalRequired = themeResult.variables.required + missingCount;
 	const coverage =
-		totalRequired > 0
-			? Math.round(((themeResult?.variables.required ?? 0) / totalRequired) * 100)
-			: 100;
+		totalRequired > 0 ? Math.round((themeResult.variables.required / totalRequired) * 100) : 100;
 
-	const summaryLine = themeResult
-		? themeResult.summary
-		: `${issues.length} polish issue${issues.length === 1 ? '' : 's'}`;
-
-	// Skip the coverage field entirely when the correctness passes didn't run —
-	// otherwise the header reads "coverage: 100%" even though nothing was audited.
-	const targetLine = themeResult ? `target: ${rel} | coverage: ${coverage}%` : `target: ${rel}`;
+	const summaryLine = themeResult.summary;
+	const targetLine = `target: ${rel} | coverage: ${coverage}%`;
 
 	const text = renderCheckReport({
 		kind: 'theme',
@@ -264,13 +202,9 @@ function renderTheme(
 	return { text, diagnostics, summary };
 }
 
-function renderComponent(
-	spec: Spec,
-	absPath: string,
-	categoryFilter: ReadonlySet<LintCategory> | undefined
-): CheckResult {
+function renderComponent(spec: Spec, absPath: string): CheckResult {
 	const code = readFileSync(absPath, 'utf-8');
-	const result = checkComponent(code, spec, absPath, categoryFilter ? { categoryFilter } : {});
+	const result = checkComponent(code, spec, absPath);
 	const rel = displayPath(absPath);
 	const issues: CheckIssue[] = result.issues.map((issue) => ({
 		file: rel,
@@ -305,48 +239,6 @@ function renderComponent(
 		nextHints: [
 			'ask --scope component "<Component>" -- inspect the relevant component API before fixing',
 			'ask --scope recipe "<pattern>" -- look up a better DryUI pattern if the current markup is off'
-		]
-	});
-	return { text, diagnostics, summary };
-}
-
-function renderDesign(absPath: string, cwd?: string): CheckResult {
-	const brief = analyzeDesignBrief(absPath, cwd);
-	const issues: CheckIssue[] = brief.issues.map((issue) => ({
-		file: brief.displayPath,
-		line: issue.line,
-		rule: issue.code,
-		severity: issue.severity,
-		message: issue.message,
-		suggestedFix: issue.suggestedFix
-	}));
-	const diagnostics = dedupeDiagnostics(
-		brief.issues.map((issue) =>
-			enrichDiagnostic({
-				source: 'design',
-				code: issue.code,
-				severity: issue.severity,
-				message: issue.message,
-				file: brief.displayPath,
-				...(issue.line !== null ? { line: issue.line } : {})
-			})
-		)
-	);
-	const summary = deriveDiagnosticSummary(diagnostics);
-	const identity = brief.name
-		? `identity: ${brief.name}${brief.overview ? ` | overview: ${brief.overview}` : ''}`
-		: null;
-
-	const text = renderCheckReport({
-		kind: 'design',
-		targetLine: `target: ${brief.displayPath}`,
-		issues,
-		diagnosticSummary: summary,
-		summaryLine: brief.summary,
-		extraBlocks: identity ? [identity] : [],
-		nextHints: [
-			'check --visual <url> -- run a rendered review with this DESIGN.md context',
-			'check <file.svelte> -- run the static checker on the implementation'
 		]
 	});
 	return { text, diagnostics, summary };
@@ -450,44 +342,29 @@ export function runCheckStructured(
 	options: CheckOptions = {}
 ): CheckResult {
 	const absPath = resolveCheckTarget(input.path, options.cwd);
-	const categoryFilter = resolveCategoryFilter(input.scope);
 
 	if (!absPath) {
-		return renderWorkspace(
-			scanWorkspace(spec, {
-				...(options.cwd ? { cwd: options.cwd } : {}),
-				...(categoryFilter ? { categoryFilter } : {})
-			})
-		);
+		return renderWorkspace(scanWorkspace(spec, options.cwd ? { cwd: options.cwd } : {}));
 	}
 
 	const stats = statOrThrow(absPath);
 
 	if (stats.isDirectory()) {
-		return renderWorkspace(
-			scanWorkspace(spec, {
-				cwd: absPath,
-				...(categoryFilter ? { categoryFilter } : {})
-			})
-		);
+		return renderWorkspace(scanWorkspace(spec, { cwd: absPath }));
 	}
 
 	if (absPath.endsWith('.svelte')) {
-		return renderComponent(spec, absPath, categoryFilter);
+		return renderComponent(spec, absPath);
 	}
 
 	if (absPath.endsWith('.css')) {
-		return renderTheme(spec, absPath, categoryFilter);
-	}
-
-	if (basename(absPath) === DESIGN_BRIEF_FILENAME) {
-		return renderDesign(absPath, options.cwd);
+		return renderTheme(spec, absPath);
 	}
 
 	throw new StructuredToolError(
 		'unsupported-path',
 		`Unsupported path type: ${displayPath(absPath)}`,
-		['check', 'check <file.svelte>', 'check <theme.css>', 'check DESIGN.md', 'check <directory>']
+		['check', 'check <file.svelte>', 'check <theme.css>', 'check <directory>']
 	);
 }
 

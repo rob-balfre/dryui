@@ -296,14 +296,13 @@ function buildAgentContractV1(): AgentContractV1 {
 		validation: {
 			checks: [
 				'dryui check <file.svelte>',
-				'dryui check --visual <url> for DESIGN.md-aware rendered-page polish',
 				'Svelte MCP svelte-autofixer on edited Svelte code',
 				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
 			],
 			repairLoop: [
 				'Generate task-specific context with dryui prompt or MCP ask.',
 				'Write real Svelte using @dryui/ui components.',
-				'Run dryui check, optional DESIGN.md-aware dryui check --visual using the feel-better polish rubric, and Svelte MCP svelte-autofixer.',
+				'Run dryui check and Svelte MCP svelte-autofixer.',
 				'Repair diagnostics until generated checks pass.'
 			]
 		},

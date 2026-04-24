@@ -8,7 +8,7 @@ import type {
 	CompositionRecipeDef,
 	Spec
 } from './spec-types.js';
-import type { ReviewResult } from './reviewer.js';
+import type { ReviewResult } from './component-checker.js';
 import type { DiagnoseResult } from './theme-checker.js';
 import type { WorkspaceReport, WorkspaceFinding } from './workspace-audit.js';
 import type { ProjectDetection, InstallPlan, AddPlan, ProjectPlanStep } from './project-planner.js';

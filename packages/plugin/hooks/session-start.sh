@@ -23,6 +23,28 @@ if [ -z "$ambient_output" ]; then
   exit 0
 fi
 
+# Nudge users to install impeccable design skills if none of the common
+# skill targets exist yet. Append a single-line hint onto the ambient
+# banner so it shows up in the same SessionStart context block.
+impeccable_installed=0
+for rel in \
+  ".claude/skills/impeccable/SKILL.md" \
+  ".codex/skills/impeccable/SKILL.md" \
+  ".cursor/skills/impeccable/SKILL.md" \
+  ".gemini/skills/impeccable/SKILL.md" \
+  ".agents/skills/impeccable/SKILL.md" \
+  ".opencode/skills/impeccable/SKILL.md"; do
+  if [ -f "$PWD/$rel" ]; then
+    impeccable_installed=1
+    break
+  fi
+done
+
+if [ "$impeccable_installed" -eq 0 ]; then
+  ambient_output="${ambient_output}
+DryUI + impeccable: install design skills with 'npx impeccable skills install'"
+fi
+
 # JSON-escape the payload and emit as SessionStart additionalContext.
 # We use python3 (available on macOS + most Linux) to avoid fragile
 # bash-based escaping.

@@ -220,7 +220,7 @@ ${CODEX_CONFIG}`
 			SVELTE_SECTION_CODEX
 		],
 		followUp:
-			'After installing the plugin, start a new Codex session so `ask`, `check`, and `check-vision` are available.'
+			'After installing the plugin, start a new Codex session so `ask` and `check` are available.'
 	},
 	{
 		id: 'gemini',
@@ -241,7 +241,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			},
 			SVELTE_SECTION_GEMINI
 		],
-		followUp: 'Restart Gemini after installing so `ask`, `check`, and `check-vision` are available.'
+		followUp: 'Restart Gemini after installing so `ask` and `check` are available.'
 	},
 	{
 		id: 'opencode',

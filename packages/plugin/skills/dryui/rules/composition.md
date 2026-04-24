@@ -398,7 +398,7 @@ Use Field.Error to show validation messages.
 
 ## Component Selection Quick Reference
 
-Before using any component, call `dryui compose "<query>"` or `dryui info <Component>` to get the correct component and usage snippet. If MCP is available, `ask --scope recipe` and `ask --scope component` are equivalent. This table is a quick reference — the CLI and MCP surfaces both return the fuller snippets and anti-patterns.
+Before using any component, call `dryui ask --scope recipe "<pattern>"` (for layouts) or `dryui ask --scope component "<Component>"` (for APIs) to get the correct component and usage snippet. This table is a quick reference. The CLI and MCP surfaces both return the fuller snippets and anti-patterns.
 
 | UI Need           | Use This                               | NOT This                     |
 | ----------------- | -------------------------------------- | ---------------------------- |
@@ -431,7 +431,7 @@ Before using any component, call `dryui compose "<query>"` or `dryui info <Compo
 
 ## Composition Recipes
 
-Call `dryui compose "<recipe>"` with any recipe name to get a full working snippet. If MCP is available, `ask --scope recipe "<recipe>"` is equivalent.
+Call `dryui ask --scope recipe "<recipe>"` with any recipe name to get a full working snippet.
 
 | Recipe                    | Description               | Key Components                         |
 | ------------------------- | ------------------------- | -------------------------------------- |
@@ -457,7 +457,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
 - Normalize route/session state in script before rendering DryUI inputs.
 - Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
 - Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
-- Run `dryui info <Component>` or `dryui compose "<pattern>"` before introducing a new field shape, then run `dryui check [path]` or MCP `check` after the flow is wired. Use `dryui check --visual <url>` or MCP `check` with `visualUrl` when the rendered page needs visual review.
+- Run `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"` before introducing a new field shape, then run `dryui check [path]` or MCP `check` after the flow is wired.
 
 ```svelte
 <script lang="ts">

@@ -228,33 +228,6 @@ describe('detectProject', () => {
 		);
 	});
 
-	test('detects DESIGN.md inside an auto-selected nested SvelteKit project', () => {
-		const workspaceRoot = createProject({
-			'package.json': JSON.stringify({
-				dependencies: {
-					react: '^18.0.0'
-				}
-			}),
-			'package-lock.json': '',
-			'hammerfall-dryui/package.json': JSON.stringify({
-				dependencies: {
-					'@sveltejs/kit': '^2.0.0',
-					svelte: '^5.0.0',
-					'@dryui/ui': 'workspace:*'
-				}
-			}),
-			'hammerfall-dryui/DESIGN.md': '# Hammerfall\n'
-		});
-
-		const result = detectProject(mockSpec, workspaceRoot);
-
-		expect(result.root).toBe(resolve(workspaceRoot, 'hammerfall-dryui'));
-		expect(result.design).toEqual({
-			present: true,
-			path: resolve(workspaceRoot, 'hammerfall-dryui/DESIGN.md')
-		});
-	});
-
 	test('keeps explicit package.json detection anchored to the provided package file', () => {
 		const workspaceRoot = createProject({
 			'package.json': JSON.stringify({

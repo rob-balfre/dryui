@@ -73,23 +73,6 @@ describe('getDetect', () => {
 		});
 	});
 
-	test('reports DESIGN.md presence in text and JSON detection output', () => {
-		const root = createTempTree({ ...readyProjectFiles, 'DESIGN.md': '# DESIGN.md\n' });
-
-		const text = getDetect(root, mockSpec, 'text');
-		const json = getDetect(root, mockSpec, 'json');
-		const parsed = JSON.parse(json.output);
-
-		expect(text.exitCode).toBe(0);
-		expect(text.error).toBeNull();
-		expect(text.output).toContain(`Design brief: ${resolve(root, 'DESIGN.md')}`);
-		expect(json.exitCode).toBe(0);
-		expect(parsed.design).toMatchObject({
-			present: true,
-			path: resolve(root, 'DESIGN.md')
-		});
-	});
-
 	test('formats nested project auto-discovery when the parent directory is not Svelte', () => {
 		const root = createTempTree({
 			'package.json': JSON.stringify({
@@ -126,37 +109,6 @@ describe('getDetect', () => {
 		expect(output).toContain('Status: ready');
 		expect(output).toContain(`Root: ${resolve(root, 'hammerfall-dryui')}`);
 		expect(output).toContain('Auto-selected nested sveltekit project');
-	});
-
-	test('reports DESIGN.md from an auto-discovered nested project', () => {
-		const root = createTempTree({
-			'package.json': JSON.stringify({
-				dependencies: {
-					react: '^18.0.0'
-				}
-			}),
-			'package-lock.json': '',
-			'hammerfall-dryui/package.json': JSON.stringify({
-				dependencies: {
-					'@sveltejs/kit': '^2.0.0',
-					svelte: '^5.0.0',
-					'@dryui/ui': 'workspace:*'
-				}
-			}),
-			'hammerfall-dryui/DESIGN.md': '# Hammerfall\n'
-		});
-
-		const text = getDetect(root, mockSpec, 'text');
-		const json = getDetect(root, mockSpec, 'json');
-		const designPath = resolve(root, 'hammerfall-dryui/DESIGN.md');
-
-		expect(text.exitCode).toBe(0);
-		expect(text.error).toBeNull();
-		expect(text.output).toContain(`Design brief: ${designPath}`);
-		expect(JSON.parse(json.output).design).toMatchObject({
-			present: true,
-			path: designPath
-		});
 	});
 
 	test('scopes nested auto-discovery to the requested subtree in text output', () => {

@@ -107,19 +107,14 @@ Use this data to identify what the user wants changed:
 ## 7. Act on the Feedback
 
 Based on the submissions, make the necessary code changes. Treat feedback submissions as the
-highest-priority user intent for the current repair loop. If the project has a local `DESIGN.md`,
-read it before editing and preserve that durable product identity unless the feedback clearly
-overrides it.
+highest-priority user intent for the current repair loop.
 
 Use the same UI creation pipeline as the DryUI skill while resolving feedback:
 
 1. Read the feedback screenshot and drawings.
-2. Read `DESIGN.md` if present.
-3. Confirm any DryUI component APIs you touch with `dryui info` or `dryui compose`.
-4. Apply the requested fix using DryUI components, CSS grid layout, and `--dry-*` tokens.
-5. Run an explicit make-interfaces-feel-better polish pass for hierarchy, spacing, alignment, density, states, copy clarity, and intentionality.
-6. Run deterministic checks.
-7. Run visual review when the page can be rendered.
+2. Confirm any DryUI component APIs you touch with `dryui ask --scope component` (or MCP `ask`).
+3. Apply the requested fix using DryUI components, CSS grid layout, and `--dry-*` tokens.
+4. Run deterministic checks with `dryui check [path]` or MCP `check`.
 
 Common actions:
 
@@ -129,10 +124,10 @@ Common actions:
 - **Fix bugs** -- address functional issues the user identified
 - **Change content** -- update text, labels, or placeholder copy
 
-After making changes, run the relevant project check command and fix violations. When a dev server is
-available, run `dryui check --visual <submission-url>`; include `--design <path-to-DESIGN.md>` when
-the design brief is not auto-discoverable from the current working directory. Then tell the user to
-refresh the page and verify. If using browser tools, trigger a reload.
+After making changes, run the relevant project check command and fix violations. Then tell the user
+to refresh the page and verify. If using browser tools, trigger a reload. For design-quality
+reviews (critique, polish, audit) use [impeccable](https://impeccable.style) via
+`/impeccable critique <target>`, `/impeccable polish <target>`, or `/impeccable audit <target>`.
 
 ## 8. Resolve Submissions
 
@@ -149,7 +144,6 @@ After resolving all submissions, ask the user if they have more feedback. If yes
 - The feedback HTTP server (port 4748) must be running for drawing persistence and submission storage to work. Without it, the `<Feedback>` component's drawings will not save.
 - The MCP server (`dryui-feedback` in `.mcp.json`) connects to the HTTP server to read/write data. Both must be running.
 - **Use `/submissions` endpoints, NOT `/sessions`.** The Feedback component creates submissions (screenshot + drawings), not sessions/annotations. Querying `/sessions` will always return empty results for this workflow.
-- If annotation feedback conflicts with `DESIGN.md`, follow the annotation for that submission. If the new direction should persist, update `DESIGN.md` as part of the repair.
 - The `<Feedback>` component is toggled with `Cmd+M` / `Ctrl+M` by default (configurable via the `shortcut` prop). The toolbar is hidden until activated.
 - Screenshots are saved as files at `screenshotPath` -- read them with the Read tool to see the annotated page.
 - Drawing coordinates are relative to the active feedback scroll root. On the docs site this is the main content pane, not the browser window.

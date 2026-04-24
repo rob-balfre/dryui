@@ -24,7 +24,7 @@ import type {
 	CompositionComponentDef,
 	CompositionRecipeDef
 } from '../../../packages/mcp/src/spec-types.ts';
-import type { ReviewResult } from '../../../packages/mcp/src/reviewer.ts';
+import type { ReviewResult } from '../../../packages/mcp/src/component-checker.ts';
 import type { DiagnoseResult } from '../../../packages/mcp/src/theme-checker.ts';
 import type {
 	WorkspaceFinding,

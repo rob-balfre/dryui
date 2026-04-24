@@ -55,13 +55,6 @@ export interface WorkspaceAuditOptions {
 	readonly exclude?: readonly string[];
 	readonly changed?: boolean;
 	readonly maxSeverity?: WorkspaceSeverity;
-	/**
-	 * Optional lint-category filter. Restricts the component-level scan to the
-	 * named categories (e.g. `new Set(['polish'])` for a polish-only pass).
-	 * Theme and project-level findings always run; only the per-file component
-	 * lint respects the filter.
-	 */
-	readonly categoryFilter?: ReadonlySet<'correctness' | 'a11y' | 'polish'>;
 }
 
 export interface WorkspaceAuditSpec extends Pick<ProjectPlannerSpec, 'themeImports'> {
@@ -352,14 +345,12 @@ function reviewFindings(
 	root: string,
 	filePath: string,
 	content: string,
-	spec: WorkspaceAuditSpec,
-	categoryFilter: WorkspaceAuditOptions['categoryFilter']
+	spec: WorkspaceAuditSpec
 ): WorkspaceFinding[] {
 	const result = checkComponent(
 		content,
 		spec as Parameters<typeof checkComponent>[1],
-		normalizePath(relative(root, filePath)),
-		{ ...(categoryFilter ? { categoryFilter } : {}) }
+		normalizePath(relative(root, filePath))
 	);
 	return result.issues.map((issue) =>
 		toFinding(
@@ -529,7 +520,7 @@ export function scanWorkspace(
 		}
 
 		if (file.endsWith('.svelte')) {
-			findings.push(...reviewFindings(root, absPath, content, spec, options.categoryFilter));
+			findings.push(...reviewFindings(root, absPath, content, spec));
 			continue;
 		}
 

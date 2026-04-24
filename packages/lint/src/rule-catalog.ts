@@ -1,6 +1,6 @@
 export type RuleSeverity = 'error' | 'warning' | 'suggestion' | 'info';
 
-export type RuleCategory = 'correctness' | 'a11y' | 'polish';
+export type RuleCategory = 'correctness' | 'a11y';
 
 export interface RuleCatalogEntry {
 	readonly id: string;
@@ -8,9 +8,8 @@ export interface RuleCatalogEntry {
 	readonly severity: RuleSeverity;
 	readonly suggestedFix?: string;
 	/**
-	 * Rule category. Enables scope filtering (e.g. `--polish` / `--no-polish`).
-	 * Optional for backwards compatibility — entries without a category default
-	 * to `'correctness'`.
+	 * Rule category. Enables scope filtering. Optional for backwards
+	 * compatibility — entries without a category default to `'correctness'`.
 	 */
 	readonly category?: RuleCategory;
 }
@@ -305,130 +304,6 @@ export const RULE_CATALOG = {
 		severity: 'info',
 		message:
 			'{variable} references {reference} which is not defined in this CSS — type and contrast checks skipped'
-	},
-	'polish/raw-heading': {
-		id: 'polish/raw-heading',
-		message:
-			'Raw <{tag}> used. Prefer <Heading level={level}>: gets text-wrap: balance, optical typography scale, and correct measure limits by default.',
-		severity: 'suggestion',
-		suggestedFix:
-			'Replace with <Heading level={n}>...</Heading>. Run: ask --scope component "Heading".',
-		category: 'polish'
-	},
-	'polish/raw-paragraph': {
-		id: 'polish/raw-paragraph',
-		message: 'Raw <p> used. <Text as="p"> adds text-wrap: pretty and measure caps.',
-		severity: 'info',
-		suggestedFix: 'Replace with <Text as="p">...</Text>. Run: ask --scope component "Text".',
-		category: 'polish'
-	},
-	'polish/nested-radius-mismatch': {
-		id: 'polish/nested-radius-mismatch',
-		message:
-			'Child radius matches container radius. Use var(--dry-radius-nested-{container}) so inner corners sit concentric with the outer edge.',
-		severity: 'suggestion',
-		suggestedFix: 'Swap the child border-radius to the matching --dry-radius-nested-* token.',
-		category: 'polish'
-	},
-	'polish/raw-icon-conditional': {
-		id: 'polish/raw-icon-conditional',
-		message:
-			'Conditional icon swap without animation. Use <IconSwap icon={cond ? A : B} /> for opacity/scale/blur transitions.',
-		severity: 'suggestion',
-		suggestedFix: 'Replace the ternary with <IconSwap icon={cond ? A : B} />.',
-		category: 'polish'
-	},
-	'polish/missing-theme-smoothing': {
-		id: 'polish/missing-theme-smoothing',
-		message:
-			'Theme CSS missing -webkit-font-smoothing: antialiased on html. Import @dryui/ui/themes/default.css or set it explicitly.',
-		severity: 'warning',
-		suggestedFix:
-			'Add -webkit-font-smoothing: antialiased and -moz-osx-font-smoothing: grayscale to the html rule.',
-		category: 'polish'
-	},
-	'polish/numeric-without-tabular': {
-		id: 'polish/numeric-without-tabular',
-		message:
-			'Numeric display without tabular-nums — digits will jitter as values change. Apply class "dry-tabular-nums" or font-variant-numeric: var(--dry-numeric-variant).',
-		severity: 'suggestion',
-		suggestedFix:
-			'Add class="dry-tabular-nums" or font-variant-numeric: var(--dry-numeric-variant).',
-		category: 'polish'
-	},
-	'polish/inter-tabular-warning': {
-		id: 'polish/inter-tabular-warning',
-		message:
-			'Inter + tabular-nums combination — Inter changes numeral shapes under tabular-nums. Verify this matches your design intent.',
-		severity: 'info',
-		category: 'polish'
-	},
-	'polish/keyframes-on-interactive': {
-		id: 'polish/keyframes-on-interactive',
-		message:
-			'Keyframe animation "{name}" applied on interactive state "{selector}". Keyframes run on a fixed timeline and don\'t retarget mid-interaction. Use a CSS transition on the animated properties instead.',
-		severity: 'warning',
-		suggestedFix:
-			'Replace @keyframes + animation: {name} with transition: <props> var(--dry-duration-*) var(--dry-ease-*);',
-		category: 'polish'
-	},
-	'polish/ad-hoc-enter-keyframe': {
-		id: 'polish/ad-hoc-enter-keyframe',
-		message:
-			'Ad-hoc entrance animation "{name}". Use <Enter>/<Stagger> or in:enter={{ index }} for consistent timing and reduced-motion handling.',
-		severity: 'suggestion',
-		suggestedFix: 'Replace with <Enter index={n}>...</Enter> or add in:enter={{ index: n }}.',
-		category: 'polish'
-	},
-	'polish/symmetric-exit-animation': {
-		id: 'polish/symmetric-exit-animation',
-		message:
-			'Exit animation mirrors enter (full travel). Prefer a subtle fixed offset (~12px) so the dismissal feels softer than the introduction. Use out:leave.',
-		severity: 'suggestion',
-		suggestedFix: 'Use out:leave from @dryui/ui/motion or reduce exit translate to ~12px.',
-		category: 'polish'
-	},
-	'polish/solid-border-on-raised': {
-		id: 'polish/solid-border-on-raised',
-		message:
-			'Raised surface with a solid border. Prefer var(--dry-shadow-sm) for a softer edge that adapts to any background.',
-		severity: 'warning',
-		suggestedFix: 'Replace border: 1px solid ... with box-shadow: var(--dry-shadow-sm).',
-		category: 'polish'
-	},
-	'polish/raw-img': {
-		id: 'polish/raw-img',
-		message:
-			'Raw <img> found. Misses the edge-overlay that matches every other surface in the design system. Use <Image src="..." alt="..."/>.',
-		severity: 'suggestion',
-		suggestedFix: 'Replace with <Image src="..." alt="..." />. Run: ask --scope component "Image".',
-		category: 'polish'
-	},
-	'polish/badge-plural-mismatch': {
-		id: 'polish/badge-plural-mismatch',
-		message:
-			'Badge text "{match}" risks plural mismatch. Use <Pluralize count={...} singular="..." plural="..." /> from @dryui/primitives.',
-		severity: 'warning',
-		suggestedFix:
-			'Replace "{count} word" with <Pluralize count={count} singular="word" plural="words" />',
-		category: 'polish'
-	},
-	'polish/page-header-meta-mixed-variants': {
-		id: 'polish/page-header-meta-mixed-variants',
-		message:
-			'PageHeader.Meta children mix variants ({variants}). Set variant on PageHeader.Meta itself (it propagates via context) or unify all chips.',
-		severity: 'warning',
-		suggestedFix:
-			'Move variant to <PageHeader.Meta variant="..."> or pick one variant for all child Badges.',
-		category: 'polish'
-	},
-	'polish/raw-ref-id-needs-wrap': {
-		id: 'polish/raw-ref-id-needs-wrap',
-		message:
-			'Reference ID "{match}" can break mid-token. Wrap in <RefId> from @dryui/primitives for nowrap + tabular-nums.',
-		severity: 'suggestion',
-		suggestedFix: 'Wrap in <RefId>{value}</RefId>',
-		category: 'polish'
 	}
 } as const satisfies Record<string, RuleCatalogEntry>;
 

@@ -97,7 +97,7 @@
 </script>
 
 <svelte:head>
-	<title>Getting Started — DryUI</title>
+	<title>Getting Started · DryUI</title>
 </svelte:head>
 
 <Container>
@@ -140,7 +140,7 @@
 		<section id="install-plugin">
 			<div class="stack-lg">
 				<Heading level={2}>Install the DryUI integration</Heading>
-				<Text size="lg" color="secondary">
+				<Text size="lg" color="secondary" maxMeasure="default">
 					Once <code>dryui</code> is installed, wire DryUI into your editor or agent of choice.
 					Depending on the tool, that means a plugin, an extension, or a native skill + MCP setup.
 					Each path exposes the DryUI skill plus the <code>dryui</code> and
@@ -161,7 +161,7 @@
 					{#each featuredAgentSetups as setup (setup.id)}
 						<Tabs.Content value={setup.id}>
 							<div class="agent-setup-card">
-								<Text color="secondary">{setup.description}</Text>
+								<Text color="secondary" maxMeasure="default">{setup.description}</Text>
 
 								{#if setup.installSteps && setup.installSteps.length > 0}
 									<Timeline.Root>
@@ -169,7 +169,7 @@
 											<Timeline.Item>
 												<Timeline.Icon>{index + 1}</Timeline.Icon>
 												<Timeline.Content>
-													<Timeline.Title level={4}>{step.title}</Timeline.Title>
+													<Timeline.Title level={3}>{step.title}</Timeline.Title>
 													{#if step.description}
 														<Timeline.Description>{step.description}</Timeline.Description>
 													{/if}
@@ -183,12 +183,12 @@
 								{:else if setup.skill}
 									<div class="stack-sm">
 										<Text size="sm" color="muted">{setup.skill.title}</Text>
-										<Text size="sm" color="secondary">{setup.skill.note}</Text>
+										<Text size="sm" color="secondary" maxMeasure="default">{setup.skill.note}</Text>
 										<CodeBlock language="bash" code={setup.skill.code} />
 									</div>
 								{/if}
 
-								<Text size="sm" color="secondary">{setup.followUp}</Text>
+								<Text size="sm" color="secondary" maxMeasure="default">{setup.followUp}</Text>
 							</div>
 						</Tabs.Content>
 					{/each}
@@ -237,7 +237,7 @@
 		<section>
 			<div class="stack-lg">
 				<Heading level={2}>Theme setup</Heading>
-				<Text size="lg" color="secondary">
+				<Text size="lg" color="secondary" maxMeasure="default">
 					Import the theme CSS and set <code>class="theme-auto"</code> on <code>&lt;html&gt;</code> for
 					automatic light/dark switching.
 				</Text>
@@ -267,8 +267,8 @@
 				<CodeBlock language="svelte" code={buttonCode} linkResolver={componentLinkResolver} />
 
 				<Heading level={3}>Card</Heading>
-				<Text size="sm" color="muted"
-					>Most components use compound syntax — <code>Card.Root</code>, <code>Card.Header</code>,
+				<Text size="sm" color="muted" maxMeasure="default"
+					>Most components use compound syntax: <code>Card.Root</code>, <code>Card.Header</code>,
 					<code>Card.Content</code>.</Text
 				>
 				<CodeBlock language="svelte" code={cardCode} linkResolver={componentLinkResolver} />
@@ -280,30 +280,25 @@
 		<section>
 			<div class="stack-lg">
 				<Heading level={2}>Agent workflow</Heading>
-				<Text size="lg" color="secondary">
+				<Text size="lg" color="secondary" maxMeasure="default">
 					Start with <code>dryui</code>. Outside the DryUI monorepo it asks which editor or agent
 					you want to wire, whether to install the Claude hook, and whether to open feedback. After
 					that, use
 					<code>dryui init</code> for new apps, <code>dryui install</code> /
 					<code>dryui detect</code>
-					for existing ones, then move through the UI pipeline: user brief, optional
-					<code>DESIGN.md</code> identity, DryUI lookup/plan, explicit
-					<code>make-interfaces-feel-better</code> polish intent, implementation, deterministic check,
-					visual review, and repair loop.
+					for existing ones, then <code>ask</code> before writing and <code>check</code> after.
 				</Text>
 
 				<Alert variant="info">
-					{#snippet title()}Intent first, tools second{/snippet}
+					{#snippet title()}Design guidance lives in impeccable{/snippet}
 					{#snippet description()}
-						User intent wins, followed by local <code>DESIGN.md</code>, DryUI
-						contracts/accessibility/tokens, Svelte MCP guidance, and the feel-better polish rubric.
-						Use the <Link href={withBase('/docs/design-brief')} underline="always"
-							>Design Brief Pipeline</Link
-						>
-						for the full loop and the <Link href={withBase('/docs/polish-pass')} underline="always"
-							>Visual Polish Pass</Link
-						>
-						for the polish checklist.
+						DryUI is components + tokens + contracts. For design guidance (brief, critique, polish,
+						visual review), install
+						<Link href="https://impeccable.style" underline="always">impeccable</Link>
+						alongside DryUI with <code>npx impeccable skills install</code>. Use
+						<code>/impeccable teach</code>, <code>/impeccable polish</code>,
+						<code>/impeccable critique</code>, etc. from your AI harness. Anti-pattern detection:
+						<code>npx impeccable detect &lt;path-or-url&gt;</code>.
 					{/snippet}
 				</Alert>
 			</div>
@@ -315,7 +310,7 @@
 		<section id="full-editor-setup">
 			<div class="stack-lg">
 				<Heading level={2}>Full editor setup</Heading>
-				<Text size="lg" color="secondary">
+				<Text size="lg" color="secondary" maxMeasure="default">
 					Use the full matrix below if you want the complete per-editor setup, including native
 					skill paths and manual MCP config where a marketplace plugin is not available. The
 					snippets are the same shared setup data that backs the CLI and docs.
@@ -333,7 +328,7 @@
 					{#each aiAgentSetups as setup (setup.id)}
 						<Tabs.Content value={setup.id}>
 							<div class="stack-md">
-								<Text color="secondary">{setup.description}</Text>
+								<Text color="secondary" maxMeasure="default">{setup.description}</Text>
 
 								{#if setup.quickSetup}
 									<div class="stack-sm">
@@ -345,21 +340,23 @@
 								{#if setup.skill}
 									<div class="stack-sm">
 										<Text size="sm" color="muted">{setup.skill.title}</Text>
-										<Text size="sm" color="secondary">{setup.skill.note}</Text>
+										<Text size="sm" color="secondary" maxMeasure="default">{setup.skill.note}</Text>
 										<CodeBlock language="bash" code={setup.skill.code} />
 									</div>
 								{/if}
 
 								<div class="stack-sm">
 									<Text size="sm" color="muted">Manual MCP config</Text>
-									<Text size="sm" color="secondary">{setup.mcp.note}</Text>
+									<Text size="sm" color="secondary" maxMeasure="default">{setup.mcp.note}</Text>
 									<CodeBlock language={setup.mcp.language} code={setup.mcp.code} />
 								</div>
 
 								{#if setup.companionMcp}
 									<div class="stack-sm">
 										<Text size="sm" color="muted">{setup.companionMcp.title}</Text>
-										<Text size="sm" color="secondary">{setup.companionMcp.note}</Text>
+										<Text size="sm" color="secondary" maxMeasure="default"
+											>{setup.companionMcp.note}</Text
+										>
 										<CodeBlock
 											language={setup.companionMcp.language}
 											code={setup.companionMcp.code}
@@ -394,7 +391,7 @@
 		<section>
 			<div class="stack-lg">
 				<Heading level={2}>Theming</Heading>
-				<Text size="lg" color="secondary">
+				<Text size="lg" color="secondary" maxMeasure="default">
 					Every visual property is a CSS variable. Override globally or per-component.
 				</Text>
 
@@ -403,7 +400,7 @@
 				<CodeBlock language="html" code={forcedThemeCode} />
 
 				<div class="stack-sm">
-					<Text size="sm" color="muted">
+					<Text size="sm" color="muted" maxMeasure="default">
 						Use the <Link href={withBase('/theme-wizard')} underline="always">Theme Wizard</Link> to generate
 						a full theme from a single brand colour.
 					</Text>
@@ -417,14 +414,16 @@
 		<section>
 			<div class="stack-lg">
 				<Heading level={2}>Architecture</Heading>
-				<Text size="lg" color="secondary">Three independent layers — adopt at any level.</Text>
+				<Text size="lg" color="secondary" maxMeasure="default">
+					Three independent layers. Adopt at any level.
+				</Text>
 
 				<div class="stack-md">
 					<Card.Root>
 						<Card.Content>
 							<div class="arch-layer">
 								<Badge variant="outline" color="blue">@dryui/primitives</Badge>
-								<Text size="sm" color="secondary"
+								<Text size="sm" color="secondary" maxMeasure="default"
 									>Headless, unstyled components. Zero dependencies.</Text
 								>
 							</div>
@@ -435,7 +434,7 @@
 						<Card.Content>
 							<div class="arch-layer">
 								<Badge variant="outline" color="purple">@dryui/ui</Badge>
-								<Text size="sm" color="secondary"
+								<Text size="sm" color="secondary" maxMeasure="default"
 									>Styled components with CSS-variable theming. Built on primitives.</Text
 								>
 							</div>
@@ -449,7 +448,7 @@
 									<Badge variant="outline" color="blue">@dryui/cli</Badge>
 									<Badge variant="outline" color="green">@dryui/mcp</Badge>
 								</div>
-								<Text size="sm" color="secondary"
+								<Text size="sm" color="secondary" maxMeasure="default"
 									>CLI-first tooling for setup, lookup, and validation. MCP mirrors
 									<code>ask</code> / <code>check</code> inside supported editors.</Text
 								>
@@ -508,6 +507,7 @@
 		--dry-timeline-content-line-height: 1.75rem;
 		--dry-timeline-gap: var(--dry-space-6);
 		--dry-timeline-content-gap: var(--dry-space-2);
+		--dry-timeline-dot-color: var(--dry-color-fill-accent-active);
 	}
 
 	.agent-tab-label,

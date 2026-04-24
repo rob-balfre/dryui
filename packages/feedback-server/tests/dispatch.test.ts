@@ -22,16 +22,11 @@ describe('feedback prompts', () => {
 		expect(prompt).toContain('Use the dryui-feedback MCP server:');
 		expect(prompt).toContain('1. Call feedback_get_submissions');
 		expect(prompt).toContain('2. Read the screenshot at screenshotPath.png');
-		expect(prompt).toContain('Read the local DESIGN.md if present');
-		expect(prompt).toContain('make-interfaces-feel-better polish pass');
+		expect(prompt).toContain('If PRODUCT.md or DESIGN.md exists at the project root');
 		expect(prompt).toContain('Run the relevant project linter/check command');
-		expect(prompt).toContain('run dryui check --visual');
 		expect(prompt).toContain('Call feedback_resolve_submission with id "sub-123"');
 		expect(prompt.indexOf('Run the relevant project linter/check command')).toBeLessThan(
 			prompt.indexOf('Call feedback_resolve_submission')
-		);
-		expect(prompt.indexOf('make-interfaces-feel-better polish pass')).toBeLessThan(
-			prompt.indexOf('Run the relevant project linter/check command')
 		);
 	});
 

@@ -4,21 +4,21 @@
   "workspaces": {
     "": {
       "devDependencies": {
-        "@arethetypeswrong/cli": "0.18.2",
-        "@changesets/changelog-github": "^0.6.0",
-        "@changesets/cli": "^2.31.0",
-        "@playwright/test": "^1.59.1",
-        "@sveltejs/vite-plugin-svelte": "^7.0.0",
-        "@vitest/browser-playwright": "^4.1.5",
-        "@vitest/coverage-v8": "^4.1.5",
-        "happy-dom": "^20.9.0",
-        "npm-check-updates": "21.0.3",
-        "playwright": "1.59.1",
-        "prettier": "^3.8.3",
-        "prettier-plugin-svelte": "^3.5.1",
-        "publint": "0.3.18",
-        "svelte": "^5.55.4",
-        "vitest": "^4.1.5",
+        "@arethetypeswrong/cli": "latest",
+        "@changesets/changelog-github": "latest",
+        "@changesets/cli": "latest",
+        "@playwright/test": "latest",
+        "@sveltejs/vite-plugin-svelte": "latest",
+        "@vitest/browser-playwright": "latest",
+        "@vitest/coverage-v8": "latest",
+        "happy-dom": "latest",
+        "npm-check-updates": "latest",
+        "playwright": "latest",
+        "prettier": "latest",
+        "prettier-plugin-svelte": "latest",
+        "publint": "latest",
+        "svelte": "latest",
+        "vitest": "latest",
       },
     },
     "apps/docs": {
@@ -50,8 +50,8 @@
         "dryui": "./dist/index.js",
       },
       "dependencies": {
-        "@dryui/feedback-server": "^0.8.2",
-        "@dryui/mcp": "^2.7.1",
+        "@dryui/feedback-server": "^0.8.3",
+        "@dryui/mcp": "^2.7.2",
         "playwright": "^1.59.1",
       },
       "devDependencies": {
@@ -63,8 +63,8 @@
       "name": "@dryui/feedback",
       "version": "0.5.2",
       "dependencies": {
-        "@dryui/primitives": "^2.0.0",
-        "@dryui/ui": "^2.0.0",
+        "@dryui/primitives": "^2.0.2",
+        "@dryui/ui": "^2.0.2",
       },
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
@@ -117,7 +117,6 @@
       "dependencies": {
         "@dryui/lint": "workspace:*",
         "@modelcontextprotocol/sdk": "^1.29.0",
-        "playwright": "^1.59.1",
         "zod": "^4.3.6",
       },
       "devDependencies": {
@@ -1079,7 +1078,7 @@
 
     "supports-hyperlinks": ["supports-hyperlinks@3.2.0", "", { "dependencies": { "has-flag": "^4.0.0", "supports-color": "^7.0.0" } }, "sha512-zFObLMyZeEwzAoKCyu1B91U79K2t7ApXuQfo8OuxwXLDgcKxuwM+YvcbIhm6QWqz7mHUH1TVytR1PwVVjEuMig=="],
 
-    "svelte": ["svelte@5.55.4", "", { "dependencies": { "@jridgewell/remapping": "^2.3.4", "@jridgewell/sourcemap-codec": "^1.5.0", "@sveltejs/acorn-typescript": "^1.0.5", "@types/estree": "^1.0.5", "@types/trusted-types": "^2.0.7", "acorn": "^8.12.1", "aria-query": "5.3.1", "axobject-query": "^4.1.0", "clsx": "^2.1.1", "devalue": "^5.6.4", "esm-env": "^1.2.1", "esrap": "^2.2.4", "is-reference": "^3.0.3", "locate-character": "^3.0.0", "magic-string": "^0.30.11", "zimmerframe": "^1.1.2" } }, "sha512-q8DFohk6vUswSng95IZb9nzWJnbINZsK7OiM1snAa3qCjJBL0ZQpvMyAaVXjUukdM75J/m8UE8xwqat8Ors/zQ=="],
+    "svelte": ["svelte@5.55.5", "", { "dependencies": { "@jridgewell/remapping": "^2.3.4", "@jridgewell/sourcemap-codec": "^1.5.0", "@sveltejs/acorn-typescript": "^1.0.5", "@types/estree": "^1.0.5", "@types/trusted-types": "^2.0.7", "acorn": "^8.12.1", "aria-query": "5.3.1", "axobject-query": "^4.1.0", "clsx": "^2.1.1", "devalue": "^5.6.4", "esm-env": "^1.2.1", "esrap": "^2.2.4", "is-reference": "^3.0.3", "locate-character": "^3.0.0", "magic-string": "^0.30.11", "zimmerframe": "^1.1.2" } }, "sha512-2uCs/LZ9us+AktdzYJM8OcxQ8qnPS1kpaO7syGT/MgO+6Qr1Ybl+TqPq+97u7PHqmmMlye5ZkoyXONy5mjjAbw=="],
 
     "svelte-check": ["svelte-check@4.4.6", "", { "dependencies": { "@jridgewell/trace-mapping": "^0.3.25", "chokidar": "^4.0.1", "fdir": "^6.2.0", "picocolors": "^1.0.0", "sade": "^1.7.4" }, "peerDependencies": { "svelte": "^4.0.0 || ^5.0.0-next.0", "typescript": ">=5.0.0" }, "bin": { "svelte-check": "bin/svelte-check" } }, "sha512-kP1zG81EWaFe9ZyTv4ZXv44Csi6Pkdpb7S3oj6m+K2ec/IcDg/a8LsFsnVLqm2nxtkSwsd5xPj/qFkTBgXHXjg=="],
 

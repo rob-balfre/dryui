@@ -42,6 +42,7 @@ interface InitOptions {
 	packageManager: DryuiPackageManager;
 	noLaunch: boolean;
 	noFeedback: boolean;
+	skipImpeccable: boolean;
 	devTarballsDir: string | null;
 }
 
@@ -53,6 +54,8 @@ interface InitRuntime {
 	findViteConfig?: (root: string) => string | null;
 	isInteractiveTTY?: () => boolean;
 	promptLaunch?: () => Promise<boolean>;
+	promptInstallImpeccable?: () => Promise<boolean>;
+	installImpeccable?: (cwd: string) => boolean;
 	promptKillPortHolder?: (holder: PortHolder, port: number) => Promise<boolean>;
 	runLauncher?: (
 		cwd: string,
@@ -74,15 +77,18 @@ function isPackageManager(value: string): value is ConcretePackageManager {
 }
 
 function printInitHelp(exitCode = 0): never {
-	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
+	console.log(
+		'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback] [--skip-impeccable]'
+	);
 	console.log('');
 	console.log('Bootstrap a SvelteKit + DryUI project.');
 	console.log('');
 	console.log('Options:');
-	console.log('  [path]           Target directory (default: current directory)');
-	console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
-	console.log('  --no-launch      Skip the feedback-mode launch prompt after scaffold');
-	console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
+	console.log('  [path]             Target directory (default: current directory)');
+	console.log('  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)');
+	console.log('  --no-launch        Skip the feedback-mode launch prompt after scaffold');
+	console.log('  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />');
+	console.log('  --skip-impeccable  Skip installing impeccable design skills after scaffold');
 	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
 	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
 	process.exit(exitCode);
@@ -99,6 +105,7 @@ function parseInitArgs(args: string[]): InitOptions {
 	let packageManager: DryuiPackageManager | null = null;
 	let noLaunch = false;
 	let noFeedback = false;
+	let skipImpeccable = false;
 	let devTarballsDir: string | null = null;
 
 	for (let i = 0; i < args.length; i++) {
@@ -117,6 +124,8 @@ function parseInitArgs(args: string[]): InitOptions {
 			noLaunch = true;
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
+		} else if (arg === '--skip-impeccable') {
+			skipImpeccable = true;
 		} else if (arg === '--dev-tarballs') {
 			if (!next || next.startsWith('-')) {
 				failInitArgs('--dev-tarballs requires a directory');
@@ -137,6 +146,7 @@ function parseInitArgs(args: string[]): InitOptions {
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
 		noLaunch,
 		noFeedback,
+		skipImpeccable,
 		devTarballsDir
 	};
 }
@@ -370,7 +380,22 @@ function setupFeedback(
 	return true;
 }
 
-async function promptLaunchFeedbackDefault(): Promise<boolean> {
+const IMPECCABLE_INSTALL_TIMEOUT_MS = 60_000;
+const IMPECCABLE_RETRY_HINT = 'Install later with: npx impeccable skills install';
+
+function installImpeccableSkillsDefault(cwd: string): boolean {
+	const result = spawnSync('npx', ['-y', 'impeccable', 'skills', 'install'], {
+		cwd,
+		stdio: 'inherit',
+		shell: false,
+		timeout: IMPECCABLE_INSTALL_TIMEOUT_MS
+	});
+	if (result.error) return false;
+	if (result.signal) return false;
+	return result.status === 0;
+}
+
+async function confirmPrompt(question: string, defaultYes: boolean): Promise<boolean> {
 	const previousRawMode = Boolean(input.isRaw);
 	if (typeof input.setRawMode === 'function') {
 		input.setRawMode(false);
@@ -379,10 +404,8 @@ async function promptLaunchFeedbackDefault(): Promise<boolean> {
 
 	const rl = createInterface({ input, output });
 	try {
-		const answer = (await rl.question('  Run this project in feedback mode now? (Y/n) '))
-			.trim()
-			.toLowerCase();
-		if (!answer) return true;
+		const answer = (await rl.question(question)).trim().toLowerCase();
+		if (!answer) return defaultYes;
 		return answer === 'y' || answer === 'yes';
 	} finally {
 		rl.close();
@@ -392,31 +415,20 @@ async function promptLaunchFeedbackDefault(): Promise<boolean> {
 	}
 }
 
+function promptInstallImpeccableDefault(): Promise<boolean> {
+	return confirmPrompt('  Install impeccable design skills? (Y/n) ', true);
+}
+
+function promptLaunchFeedbackDefault(): Promise<boolean> {
+	return confirmPrompt('  Run this project in feedback mode now? (Y/n) ', true);
+}
+
 async function promptKillPortHolderDefault(holder: PortHolder, port: number): Promise<boolean> {
 	if (!isInteractiveTTY()) return false;
-
-	const previousRawMode = Boolean(input.isRaw);
-	if (typeof input.setRawMode === 'function') {
-		input.setRawMode(false);
-	}
-	input.resume();
-
-	const rl = createInterface({ input, output });
-	try {
-		const answer = (
-			await rl.question(
-				`  Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Stop it and start this project? (y/N) `
-			)
-		)
-			.trim()
-			.toLowerCase();
-		return answer === 'y' || answer === 'yes';
-	} finally {
-		rl.close();
-		if (typeof input.setRawMode === 'function') {
-			input.setRawMode(previousRawMode);
-		}
-	}
+	return confirmPrompt(
+		`  Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Stop it and start this project? (y/N) `,
+		false
+	);
 }
 
 async function runLauncherDefault(
@@ -454,8 +466,15 @@ export async function runInit(
 		printInitHelp(0);
 	}
 
-	const { targetPath, userPath, packageManager, noLaunch, noFeedback, devTarballsDir } =
-		parseInitArgs(args);
+	const {
+		targetPath,
+		userPath,
+		packageManager,
+		noLaunch,
+		noFeedback,
+		skipImpeccable,
+		devTarballsDir
+	} = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runProcessCommand;
 
 	const devTarballsManifest: DevTarballsManifest | null = devTarballsDir
@@ -539,6 +558,27 @@ export async function runInit(
 	}
 
 	const tty = (runtime.isInteractiveTTY ?? isInteractiveTTY)();
+
+	if (isScaffold && installsSucceeded && !skipImpeccable) {
+		// In interactive mode we ask once (default yes). Non-TTY runs (CI, pipes,
+		// `--yes`-style flows) default to yes and proceed silently. `--skip-impeccable`
+		// bypasses both paths. On failure we warn but never abort init.
+		const shouldInstall = tty
+			? await (runtime.promptInstallImpeccable ?? promptInstallImpeccableDefault)()
+			: true;
+		if (shouldInstall) {
+			log('');
+			log('  Installing impeccable design skills...');
+			const install = runtime.installImpeccable ?? installImpeccableSkillsDefault;
+			const ok = install(targetPath);
+			if (!ok) {
+				warn(`  Warning: impeccable install did not complete. ${IMPECCABLE_RETRY_HINT}`);
+			}
+		} else {
+			log(`  Skipped impeccable. ${IMPECCABLE_RETRY_HINT}`);
+		}
+	}
+
 	if (isScaffold && feedbackReady && !noLaunch && tty) {
 		log('');
 		const shouldLaunch = await (runtime.promptLaunch ?? promptLaunchFeedbackDefault)();
