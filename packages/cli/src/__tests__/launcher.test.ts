@@ -307,6 +307,7 @@ describe('runUserProjectLauncher', () => {
 				runtime: buildRuntime({
 					detectProject: () => readyDetection(root),
 					urlResponds: async () => true,
+					findPortHolder: () => ({ pid: 12345, command: 'node', cwd: root }),
 					killPortHolder: () => {
 						killed = true;
 						return true;
@@ -330,6 +331,45 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).toContain(
 			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
 		);
+	});
+
+	test('prompts to kill when port 5173 responds for a different project', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const otherRoot = createTempTree({ 'package.json': '{}' });
+		const killedPids: number[] = [];
+		let spawned = false;
+		const promptCalls: PortHolder[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runUserProjectLauncher(['--no-open'], {
+				cwd: root,
+				spec: STUB_SPEC,
+				runtime: buildRuntime({
+					detectProject: () => readyDetection(root),
+					urlResponds: async () => true,
+					findPortHolder: () => ({ pid: 12345, command: 'node', cwd: otherRoot }),
+					promptKillPortHolder: async (holder) => {
+						promptCalls.push(holder);
+						return true;
+					},
+					killPortHolder: (pid) => {
+						killedPids.push(pid);
+						return true;
+					},
+					spawnProjectDevServer: () => {
+						spawned = true;
+						return null;
+					},
+					waitForUrlDetailed: async () => ({ ok: true, status: 200 })
+				})
+			})
+		);
+
+		expect(promptCalls).toEqual([{ pid: 12345, command: 'node', cwd: otherRoot }]);
+		expect(killedPids).toEqual([12345]);
+		expect(spawned).toBe(true);
+		expect(result.logs[0]).toContain('Project dev: started in the background');
+		expect(result.logs[0]).not.toContain('Project dev: already running');
 	});
 
 	test('spawns the dev server when port 5173 is free', async () => {

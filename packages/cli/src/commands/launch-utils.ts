@@ -220,6 +220,20 @@ export function extractDevServerErrorSummary(body: string): string | undefined {
 export interface PortHolder {
 	pid: number;
 	command: string;
+	cwd?: string;
+}
+
+function readProcessCwd(pid: number): string | undefined {
+	try {
+		const output = execFileSync('lsof', ['-a', '-p', String(pid), '-d', 'cwd', '-Fn'], {
+			stdio: ['ignore', 'pipe', 'ignore'],
+			encoding: 'utf8'
+		});
+		const cwdLine = output.split('\n').find((line) => line.startsWith('n') && line.length > 1);
+		return cwdLine ? cwdLine.slice(1) : undefined;
+	} catch {
+		return undefined;
+	}
 }
 
 export function findPortHolder(port: number): PortHolder | null {
@@ -253,7 +267,8 @@ export function findPortHolder(port: number): PortHolder | null {
 		}
 	} catch {}
 
-	return { pid, command };
+	const cwd = readProcessCwd(pid);
+	return { pid, command, ...(cwd ? { cwd } : {}) };
 }
 
 export function killPortHolder(pid: number): boolean {

@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
+import { dirname, resolve, sep } from 'node:path';
 import {
 	DEFAULT_FEEDBACK_HOST,
 	DEFAULT_FEEDBACK_PORT,
@@ -452,15 +452,26 @@ interface DevServerExecutionResult {
 
 async function planUserProjectDevServer(
 	runtime: UserProjectLauncherRuntime,
-	options: { host: string; port: number }
+	options: { host: string; port: number; root: string }
 ): Promise<DevServerPlan> {
 	const url = `http://${options.host}:${options.port}`;
+	const holder = runtime.findPortHolder(options.port);
 
 	if (await runtime.urlResponds(url)) {
-		return { kind: 'keep', url };
+		if (!holder || portHolderMatchesProject(holder, options.root)) {
+			return { kind: 'keep', url };
+		}
+		const kill = await runtime.promptKillPortHolder(holder, options.port);
+		if (kill) {
+			return { kind: 'spawn', url, killPid: holder.pid };
+		}
+		return {
+			kind: 'skip',
+			url,
+			reason: `port ${options.port} busy (PID ${holder.pid} ${holder.command})`
+		};
 	}
 
-	const holder = runtime.findPortHolder(options.port);
 	if (!holder) {
 		return { kind: 'spawn', url };
 	}
@@ -475,6 +486,13 @@ async function planUserProjectDevServer(
 	}
 
 	return { kind: 'spawn', url, killPid: holder.pid };
+}
+
+function portHolderMatchesProject(holder: PortHolder, root: string): boolean {
+	if (!holder.cwd) return false;
+	const holderCwd = resolve(holder.cwd);
+	const projectRoot = resolve(root);
+	return holderCwd === projectRoot || holderCwd.startsWith(`${projectRoot}${sep}`);
 }
 
 function formatProbeFailureMessage(probe: UrlProbeResult, timeoutSec: number): string {
@@ -702,7 +720,11 @@ export async function runUserProjectLauncher(
 	const devPort = DEFAULT_PROJECT_DEV_PORT;
 
 	try {
-		const plan = await planUserProjectDevServer(runtime, { host: devHost, port: devPort });
+		const plan = await planUserProjectDevServer(runtime, {
+			host: devHost,
+			port: devPort,
+			root: detection.root
+		});
 		const setupNotes = await planAndApplyFeedbackSetup(detection, packageManager, runtime);
 
 		runtime.onProgress({ cwd, noOpen, projectRoot: detection.root });
