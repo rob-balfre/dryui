@@ -1,7 +1,7 @@
 {
   "name": "@dryui/lint",
   "description": "Svelte preprocessor that enforces DryUI layout, markup, and CSS rules.",
-  "version": "0.7.1",
+  "version": "1.0.0",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {

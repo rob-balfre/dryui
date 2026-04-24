@@ -1,6 +1,6 @@
 {
   "name": "@dryui/ui",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Zero-dependency styled Svelte 5 components with scoped styles and --dry-* CSS variable theming.",
   "author": "Rob Balfre",
   "license": "MIT",
@@ -1606,7 +1606,7 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^2.0.2"
+    "@dryui/primitives": "^3.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.5"
