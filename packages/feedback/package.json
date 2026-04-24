@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -47,8 +47,8 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^2.0.0",
-    "@dryui/ui": "^2.0.0"
+    "@dryui/primitives": "^2.0.2",
+    "@dryui/ui": "^2.0.2"
   },
   "peerDependencies": {
     "svelte": "^5.55.4",

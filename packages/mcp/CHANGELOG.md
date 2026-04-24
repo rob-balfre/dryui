@@ -1,5 +1,14 @@
 # @dryui/mcp
 
+## 2.7.2
+
+### Patch Changes
+
+- [#30](https://github.com/rob-balfre/dryui/pull/30) [`b0d3b1e`](https://github.com/rob-balfre/dryui/commit/b0d3b1e8200d5a2e0cad10c5dafdcbf7f510eaf6) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Introduce the DESIGN.md brief pipeline: `check-vision` auto-discovers the nearest `DESIGN.md` and threads it into the visual rubric, `check` diagnoses brief structure, and the dryui/plugin/ui skills document a user-brief → DESIGN.md → component-lookup → polish → check loop so design identity stays visible instead of implicit in agent taste.
+
+- Updated dependencies [[`b0d3b1e`](https://github.com/rob-balfre/dryui/commit/b0d3b1e8200d5a2e0cad10c5dafdcbf7f510eaf6)]:
+  - @dryui/lint@0.7.1
+
 ## 2.7.1
 
 ### Patch Changes

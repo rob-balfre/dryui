@@ -45,7 +45,7 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.19.1",
+      "version": "0.19.2",
       "bin": {
         "dryui": "./dist/index.js",
       },
@@ -61,7 +61,7 @@
     },
     "packages/feedback": {
       "name": "@dryui/feedback",
-      "version": "0.5.1",
+      "version": "0.5.2",
       "dependencies": {
         "@dryui/primitives": "^2.0.0",
         "@dryui/ui": "^2.0.0",
@@ -79,7 +79,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "0.8.2",
+      "version": "0.8.3",
       "bin": {
         "dryui-feedback-mcp": "./dist/mcp.js",
       },
@@ -102,7 +102,7 @@
     },
     "packages/lint": {
       "name": "@dryui/lint",
-      "version": "0.7.0",
+      "version": "0.7.1",
       "devDependencies": {
         "svelte": "^5.55.4",
         "typescript": "^6.0.3",
@@ -110,7 +110,7 @@
     },
     "packages/mcp": {
       "name": "@dryui/mcp",
-      "version": "2.7.1",
+      "version": "2.7.2",
       "bin": {
         "dryui-mcp": "./dist/index.js",
       },
@@ -131,7 +131,7 @@
     },
     "packages/primitives": {
       "name": "@dryui/primitives",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
         "svelte": "^5.55.4",
@@ -164,9 +164,9 @@
     },
     "packages/ui": {
       "name": "@dryui/ui",
-      "version": "2.0.1",
+      "version": "2.0.2",
       "dependencies": {
-        "@dryui/primitives": "^2.0.1",
+        "@dryui/primitives": "^2.0.2",
       },
       "devDependencies": {
         "@dryui/lint": "workspace:*",
