@@ -4,57 +4,86 @@
 	let target = $state<HTMLDivElement | undefined>();
 
 	$effect(() => {
-		if (target) {
-			target.scrollTop = 160;
-		}
+		if (target) target.scrollTop = 160;
 	});
 </script>
 
-<div class="preview-frame">
-	<div class="preview-scroll" bind:this={target}>
-		<div class="preview-copy">
-			<p>Scroll the trip brief to reveal the floating return action.</p>
+<div class="frame">
+	<div class="scroll" bind:this={target}>
+		<div class="inner">
+			<p class="eyebrow">Changelog / 1.4.0</p>
 			<p>
-				DryUI keeps viewport-level affordances lean, but docs demos need a contained surface so they
-				do not bleed into the rest of the page.
+				Shipped DataGrid sorting, a new MarkdownRenderer, and tighter keyboard paths across
+				Pagination, Tree, and Accordion.
 			</p>
-			<p>This preview starts scrolled so the button is visible immediately.</p>
-			<p>Use the local scroll container to verify the threshold and smooth return behavior.</p>
+			<p>
+				Bug fixes: AlertDialog focus trap no longer leaks past close, DatePicker parses
+				<code>YYYY-MM-DD</code> reliably on Safari 17, Tooltip respects
+				<code>prefers-reduced-motion</code>.
+			</p>
+			<p>
+				Breaking: <code>Card.Root</code>'s <code>raised</code> prop removed. Use
+				<code>variant="elevated"</code>. <code>--dry-color-accent</code> removed. Map to
+				<code>--dry-color-primary</code>. <code>Tree.Root</code>'s <code>expanded</code> is now
+				<code>defaultExpanded</code>.
+			</p>
+			<p>
+				Scroll threshold: 120px. The return button fades in once you scroll past it and hops back to
+				the top with smooth behavior. Respects <code>prefers-reduced-motion</code> for an instant jump.
+			</p>
+			<p>
+				DryUI treats ScrollToTop as an affordance, not a viewport garnish. It attaches to any
+				scrollable container via the <code>target</code> prop and stays out of view until you need it.
+			</p>
 		</div>
 	</div>
 
 	{#if target}
-		<ScrollToTop {target} threshold={80} />
+		<ScrollToTop {target} threshold={120} position="bottom-right" />
 	{/if}
 </div>
 
 <style>
-	.preview-frame {
+	.frame {
 		position: relative;
 		contain: paint;
-		height: 14rem;
+		block-size: 16rem;
 		overflow: hidden;
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
-		border: 1px solid var(--dry-color-stroke-weak);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
 		border-radius: var(--dry-radius-lg);
-		background: var(--dry-color-bg-overlay);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 40%, transparent);
 	}
 
-	.preview-scroll {
-		height: 100%;
+	.scroll {
+		block-size: 100%;
 		overflow: auto;
-		padding: var(--dry-space-4);
+		padding: var(--dry-space-5);
 	}
 
-	.preview-copy {
+	.inner {
 		display: grid;
 		gap: var(--dry-space-3);
-		min-height: 24rem;
+		min-block-size: 38rem;
 		padding-right: var(--dry-space-10);
+	}
+
+	.eyebrow {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
 	}
 
 	p {
 		margin: 0;
 		line-height: 1.6;
+		color: var(--dry-color-text-strong);
+	}
+
+	code {
+		font-family: var(--dry-font-mono);
+		font-size: 0.92em;
 	}
 </style>

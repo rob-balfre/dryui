@@ -238,7 +238,6 @@
 		--dry-tree-item-hover-bg: var(--dry-color-fill);
 		--dry-tree-item-selected-bg: var(--dry-color-fill-brand-weak);
 		--dry-tree-item-selected-color: var(--dry-color-text-brand);
-		--dry-tree-item-selected-indicator: var(--dry-color-stroke-selected);
 		--dry-tree-icon-size: 1rem;
 	}
 </style>

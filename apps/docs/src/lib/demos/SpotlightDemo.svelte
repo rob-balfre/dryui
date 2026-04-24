@@ -1,146 +1,112 @@
 <script lang="ts">
-	import { Spotlight, Text } from '@dryui/ui';
+	import { Badge, Button, Spotlight } from '@dryui/ui';
 </script>
 
-<div class="demo">
-	<div class="surface">
-		<Spotlight radius={320} intensity={38} color="rgba(96, 165, 250, 0.32)">
-			<div class="content">
-				<div class="intro">
-					<p class="eyebrow">Pointer tracking</p>
-					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
-					<h3>Move across the panel to pull the light toward the cursor.</h3>
-					<Text color="secondary">
-						This is the point of Spotlight: a hover signal that pulls attention toward the active
-						area without adding a shader runtime.
-					</Text>
-				</div>
-
-				<div class="matrix" aria-label="Interactive spotlight summary">
-					<div class="tile">
-						<p class="label">Radius</p>
-						<p class="value">320px</p>
-					</div>
-					<div class="tile">
-						<p class="label">Blend</p>
-						<p class="value">Soft focus over dark glass</p>
-					</div>
-					<div class="tile">
-						<p class="label">Motion</p>
-						<p class="value">Pointer-following highlight</p>
-					</div>
-					<div class="tile">
-						<p class="label">Fallback</p>
-						<p class="value">Still reads when motion is reduced</p>
-					</div>
-				</div>
+<div class="grid">
+	<Spotlight radius={340} intensity={34} color="rgba(96, 165, 250, 0.28)">
+		<article class="card card-hero">
+			<div class="head">
+				<Badge variant="solid" color="blue" size="sm">new</Badge>
+				<p class="eyebrow">Changelog 0.35</p>
 			</div>
-		</Spotlight>
-	</div>
-
-	<div class="surface">
-		<Spotlight radius={240} intensity={52} color="rgba(244, 114, 182, 0.26)" followPointer={false}>
-			<div class="content">
-				<div class="intro">
-					<p class="eyebrow">Static focus</p>
-					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
-					<h3>A centered glow that stays visible without pointer movement.</h3>
-					<Text color="secondary">
-						Use the static variant when a card needs built-in focal contrast before the user even
-						hovers it.
-					</Text>
-				</div>
-
-				<div class="matrix matrix-tight" aria-label="Static spotlight summary">
-					<div class="tile">
-						<p class="label">Intensity</p>
-						<p class="value">52%</p>
-					</div>
-					<div class="tile">
-						<p class="label">Color</p>
-						<p class="value">Warm editorial pink</p>
-					</div>
-					<div class="tile">
-						<p class="label">Purpose</p>
-						<p class="value">Demo that reads instantly in screenshots</p>
-					</div>
-				</div>
+			<p class="title">Drag-and-drop groups</p>
+			<p class="body">
+				Move items across multiple lists without writing the store code. Groups share a single
+				dragover context, so the kanban scenario becomes five lines.
+			</p>
+			<div class="row">
+				<Button variant="solid" size="sm">Read the release</Button>
+				<Button variant="ghost" size="sm">Open the demo</Button>
 			</div>
-		</Spotlight>
-	</div>
+		</article>
+	</Spotlight>
+
+	<Spotlight radius={240} intensity={28} color="rgba(244, 114, 182, 0.22)">
+		<article class="card">
+			<p class="eyebrow">Also shipped</p>
+			<p class="title">Anchor-positioned popovers</p>
+			<p class="body">
+				Popover, DropdownMenu, and HoverCard now use <code>position-try</code> fallbacks before JavaScript
+				measurement.
+			</p>
+		</article>
+	</Spotlight>
+
+	<Spotlight radius={240} intensity={28} color="rgba(163, 230, 53, 0.22)">
+		<article class="card">
+			<p class="eyebrow">Also shipped</p>
+			<p class="title">Static validator for tokens</p>
+			<p class="body">
+				<code>dryui check</code> now flags raw hex, non-grid layout, and inline-size without running a
+				browser.
+			</p>
+		</article>
+	</Spotlight>
 </div>
 
 <style>
-	.demo {
+	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+		grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr) minmax(0, 1fr);
 		gap: var(--dry-space-4);
 	}
 
-	.surface {
-		border-radius: var(--dry-radius-lg);
-		border: 1px solid var(--dry-color-stroke-weak);
-		background:
-			radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 28%),
-			linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
-			var(--dry-color-bg-raised);
-		min-block-size: 20rem;
+	.card {
+		display: grid;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-5);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		border-radius: var(--dry-radius-xl);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 42%, transparent);
+		min-block-size: 14rem;
 	}
 
-	.content {
-		display: grid;
-		gap: var(--dry-space-4);
-		padding: var(--dry-space-6);
+	.card-hero {
+		min-block-size: 18rem;
 	}
 
-	.intro {
+	.head,
+	.row {
 		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
 		gap: var(--dry-space-2);
 	}
 
-	.eyebrow,
-	.label,
-	.value,
-	h3 {
+	.eyebrow {
 		margin: 0;
-	}
-
-	.eyebrow,
-	.label {
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
 		text-transform: uppercase;
-		letter-spacing: 0.12em;
-		font-size: 0.72rem;
 		color: var(--dry-color-text-weak);
 	}
 
-	h3 {
-		font-size: clamp(1.4rem, 2.8vw, 1.85rem);
-		line-height: 1.02;
+	.title {
+		margin: 0;
+		font-size: var(--dry-text-lg-size);
+		font-weight: 600;
+		letter-spacing: -0.01em;
 		color: var(--dry-color-text-strong);
 	}
 
-	.matrix {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
-		gap: var(--dry-space-3);
+	.body {
+		margin: 0;
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-weak);
+		line-height: 1.55;
 	}
 
-	.matrix-tight {
-		grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-	}
-
-	.tile {
-		display: grid;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-4);
-		border-radius: var(--dry-radius-md);
-		border: 1px solid rgba(255, 255, 255, 0.08);
-		background:
-			linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-			color-mix(in srgb, var(--dry-color-bg-raised) 82%, transparent);
-	}
-
-	.value {
+	code {
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-sm-size);
 		color: var(--dry-color-text-strong);
+	}
+
+	@container (max-width: 52rem) {
+		.grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 </style>

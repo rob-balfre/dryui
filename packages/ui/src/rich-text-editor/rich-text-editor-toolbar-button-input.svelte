@@ -516,7 +516,6 @@
 		gap: var(--dry-space-2);
 		padding: var(--dry-space-2);
 		background: var(--dry-color-bg-overlay);
-		/* dryui-allow solid-border-on-raised: inline link editor is a small popover that needs a distinct edge. */
 		border: 1px solid var(--dry-rte-border);
 		border-radius: var(--dry-radius-md);
 		box-shadow: var(--dry-shadow-md);

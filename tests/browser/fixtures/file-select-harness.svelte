@@ -5,6 +5,8 @@
 	let requestCount = $state(0);
 	let disabled = $state(false);
 	let mockResult = $state<string | null>('/Users/test/project');
+	let { useRequest = true, directory = true }: { useRequest?: boolean; directory?: boolean } =
+		$props();
 
 	async function onrequest(): Promise<string | null> {
 		requestCount++;
@@ -13,7 +15,7 @@
 </script>
 
 <div>
-	<FileSelect.Root bind:value {onrequest} {disabled}>
+	<FileSelect.Root bind:value onrequest={useRequest ? onrequest : undefined} {disabled} {directory}>
 		<FileSelect.Trigger data-testid="trigger">Choose folder</FileSelect.Trigger>
 		<FileSelect.Value data-testid="value" placeholder="No folder selected" />
 		<FileSelect.Clear data-testid="clear" />

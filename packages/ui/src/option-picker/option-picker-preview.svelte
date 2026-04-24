@@ -87,6 +87,7 @@
 			var(--_preset-color) 58%,
 			color-mix(in srgb, black 12%, var(--_preset-color) 88%) 100%
 		);
+		/* dryui-allow inset-shadow: 1px top highlight + 1px bottom shadow give the preset color swatch a beveled material look. */
 		box-shadow:
 			inset 0 1px 0 color-mix(in srgb, white 22%, transparent),
 			inset 0 -1px 0 color-mix(in srgb, black 10%, transparent);

@@ -160,7 +160,7 @@
 
 	.playground-copy {
 		margin: 0;
-		color: var(--dry-color-text-secondary);
+		color: var(--dry-color-text-weak);
 		font-size: var(--dry-text-sm-size, 0.875rem);
 		line-height: 1.6;
 	}
@@ -169,7 +169,7 @@
 	.playground-preview {
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg-raised) 92%, var(--dry-color-text) 8%);
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 92%, var(--dry-color-text-strong) 8%);
 	}
 
 	.playground-controls {
@@ -188,7 +188,7 @@
 	.control-label {
 		font-size: var(--dry-text-sm-size, 0.875rem);
 		line-height: 1.4;
-		color: var(--dry-color-text-secondary);
+		color: var(--dry-color-text-weak);
 	}
 
 	.playground-preview:focus-visible {
@@ -216,7 +216,7 @@
 				color-mix(in srgb, var(--dry-color-fill-brand) 10%, transparent),
 				transparent 42%
 			),
-			color-mix(in srgb, var(--dry-color-bg-base) 96%, var(--dry-color-text) 4%);
+			color-mix(in srgb, var(--dry-color-bg-base) 96%, var(--dry-color-text-strong) 4%);
 	}
 
 	.playground-preview:hover {
@@ -248,6 +248,7 @@
 		);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-strong) 58%, transparent);
 		box-shadow:
+			/* dryui-allow inset-shadow: intentional top highlight rail on preview card. */
 			inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
 			0 1.5rem 3rem color-mix(in srgb, black 14%, transparent);
 	}
@@ -266,7 +267,7 @@
 
 	.preview-text {
 		margin: 0;
-		color: color-mix(in srgb, var(--dry-color-text-secondary) 86%, var(--dry-color-text) 14%);
+		color: color-mix(in srgb, var(--dry-color-text-weak) 86%, var(--dry-color-text-strong) 14%);
 		font-size: 0.8125rem;
 		line-height: 1.2308;
 	}

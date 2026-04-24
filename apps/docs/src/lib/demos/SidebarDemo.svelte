@@ -57,7 +57,6 @@
 		height: 420px;
 		border-radius: var(--dry-radius-lg);
 		overflow: hidden;
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 	}
 
@@ -81,7 +80,6 @@
 		place-items: center;
 		aspect-ratio: 1;
 		height: var(--dry-space-10);
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);

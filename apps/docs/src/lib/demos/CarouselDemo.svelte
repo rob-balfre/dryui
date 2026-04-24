@@ -1,185 +1,117 @@
 <script lang="ts">
-	import { Carousel } from '@dryui/ui';
+	import { Badge, Carousel } from '@dryui/ui';
 
-	const slides = [
+	const releases = [
 		{
-			id: 'launch',
-			eyebrow: 'Launch Week',
-			title: 'Turn feature updates into a guided story',
-			description:
-				'Use the carousel for release notes, onboarding, or changelog callouts when a single surface needs more narrative structure.',
-			points: [
-				'Snap-scrolling keeps the sequence legible',
-				'Arrow controls work for touch, mouse, and keyboard'
-			],
-			stats: [
-				{ label: 'Mode', value: 'Looping' },
-				{ label: 'Best for', value: 'Tours' },
-				{ label: 'Input', value: 'Touch + keys' },
-				{ label: 'Density', value: 'Editorial' }
-			]
+			id: 'v035',
+			tag: '0.35.0',
+			date: '24 Apr 2026',
+			title: 'Drag-and-drop groups',
+			body: 'Move items across multiple lists from one shared context. The kanban scenario becomes five lines of props.',
+			highlights: ['Group onMove handler', 'Per-list bind:items', 'Zero new dependencies']
 		},
 		{
-			id: 'editorial',
-			eyebrow: 'Content Rail',
-			title: 'Mix copy, metrics, and visual hierarchy per slide',
-			description:
-				'Each panel can carry a different emphasis without changing the API, which makes the component useful for docs, showcases, and media rails.',
-			points: [
-				'Slides can hold short-form promos or richer summaries',
-				'The layout stays stable while content emphasis changes'
-			],
-			stats: [
-				{ label: 'Surface', value: 'Docs' },
-				{ label: 'Pattern', value: 'Highlights' },
-				{ label: 'Focus', value: 'Context' },
-				{ label: 'Rhythm', value: 'Paced' }
-			]
+			id: 'v034',
+			tag: '0.34.0',
+			date: '17 Apr 2026',
+			title: 'Anchor-positioned popovers',
+			body: 'Popover, DropdownMenu, and HoverCard now use position-try fallbacks before JavaScript measurement.',
+			highlights: ['Native anchor positioning', 'CSS-first placement', 'Smaller runtime']
 		},
 		{
-			id: 'commerce',
-			eyebrow: 'Merchandising',
-			title: 'Fill wide layouts with useful decisions, not dead space',
-			description:
-				'Wide carousels benefit from summary blocks and strong typography so the active slide still feels purposeful on large screens.',
-			points: [
-				'Support comparison-style content inside the slide body',
-				'Add compact stats to anchor the next action'
-			],
-			stats: [
-				{ label: 'Format', value: 'Panels' },
-				{ label: 'Signal', value: 'Strong' },
-				{ label: 'Scale', value: 'Responsive' },
-				{ label: 'Use case', value: 'Featured sets' }
-			]
+			id: 'v033',
+			tag: '0.33.0',
+			date: '10 Apr 2026',
+			title: 'Static token validator',
+			body: 'dryui check flags raw hex, non-grid layout, and inline-size without spinning up a browser.',
+			highlights: ['MCP-compatible output', 'No render pass', 'Fails the preprocessor']
 		}
 	];
 </script>
 
-<div class="demo">
-	<Carousel.Root loop>
-		<Carousel.Viewport>
-			{#each slides as slide (slide.id)}
-				<Carousel.Slide>
-					<article class="panel" data-slide={slide.id}>
-						<div class="copy">
-							<span class="eyebrow">{slide.eyebrow}</span>
-							<div class="headline">
-								<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
-								<h3>{slide.title}</h3>
-								<p>{slide.description}</p>
-							</div>
-							<ul class="points" aria-label={`${slide.eyebrow} highlights`}>
-								{#each slide.points as point (point)}
-									<li>{point}</li>
-								{/each}
-							</ul>
-						</div>
+<Carousel.Root loop>
+	<Carousel.Viewport>
+		{#each releases as release (release.id)}
+			<Carousel.Slide>
+				<article class="slide">
+					<div class="head">
+						<Badge variant="soft" size="sm">{release.tag}</Badge>
+						<p class="date">{release.date}</p>
+					</div>
 
-						<div class="summary">
-							<span class="summary-label">At a glance</span>
-							<div class="stats">
-								{#each slide.stats as stat (stat.label)}
-									<div class="stat">
-										<span>{stat.label}</span>
-										<strong>{stat.value}</strong>
-									</div>
-								{/each}
-							</div>
-						</div>
-					</article>
-				</Carousel.Slide>
-			{/each}
-		</Carousel.Viewport>
+					<div class="copy">
+						<p class="title">{release.title}</p>
+						<p class="body">{release.body}</p>
+					</div>
 
-		<div class="controls">
-			<div class="nav">
-				<Carousel.Prev />
-				<Carousel.Next />
-			</div>
-			<Carousel.Dots />
+					<ul class="highlights" aria-label="Release highlights">
+						{#each release.highlights as item (item)}
+							<li>{item}</li>
+						{/each}
+					</ul>
+				</article>
+			</Carousel.Slide>
+		{/each}
+	</Carousel.Viewport>
+
+	<div class="controls">
+		<div class="nav">
+			<Carousel.Prev />
+			<Carousel.Next />
 		</div>
-	</Carousel.Root>
-</div>
+		<Carousel.Dots />
+	</div>
+</Carousel.Root>
 
 <style>
-	.demo {
-		container-type: inline-size;
-		--dry-carousel-gap: var(--dry-space-3);
+	.slide {
 		display: grid;
 		gap: var(--dry-space-4);
+		padding: var(--dry-space-5) var(--dry-space-6);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		border-radius: var(--dry-radius-xl);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 42%, transparent);
+		min-block-size: 14rem;
+		align-content: start;
 	}
 
-	.panel {
-		--panel-accent: var(--dry-color-fill-brand);
-
+	.head {
 		display: grid;
-		grid-template-columns: minmax(0, 7fr) minmax(0, 4fr);
-		gap: var(--dry-space-5);
-		padding: var(--dry-space-5);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: calc(var(--dry-radius-xl) + var(--dry-space-1));
-		background:
-			radial-gradient(
-				circle at top right,
-				color-mix(in srgb, var(--panel-accent) 22%, transparent),
-				transparent 42%
-			),
-			linear-gradient(
-				180deg,
-				color-mix(in srgb, var(--dry-color-bg-raised) 94%, var(--panel-accent) 6%),
-				var(--dry-color-bg)
-			);
+		grid-template-columns: max-content minmax(0, 1fr);
+		align-items: center;
+		gap: var(--dry-space-3);
 	}
 
-	.panel[data-slide='editorial'] {
-		--panel-accent: var(--dry-color-fill-hover);
-	}
-
-	.panel[data-slide='commerce'] {
-		--panel-accent: var(--dry-color-fill);
+	.date {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
 	}
 
 	.copy {
 		display: grid;
-		gap: var(--dry-space-4);
-		align-content: start;
-	}
-
-	.eyebrow {
-		display: inline-grid;
-		justify-self: start;
-		padding: var(--dry-space-1_5) var(--dry-space-2_5);
-		border: 1px solid color-mix(in srgb, var(--panel-accent) 44%, var(--dry-color-stroke-weak));
-		border-radius: 9999px;
-		background: color-mix(in srgb, var(--panel-accent) 16%, transparent);
-		color: var(--dry-color-text-strong);
-		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-	}
-
-	.headline {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
-	h3 {
+	.title {
 		margin: 0;
-		font-size: clamp(1.5rem, 2vw, 2rem);
-		line-height: 1.05;
-		letter-spacing: -0.03em;
+		font-size: var(--dry-text-xl-size);
+		font-weight: 600;
+		letter-spacing: -0.02em;
+		color: var(--dry-color-text-strong);
 	}
 
-	p {
+	.body {
 		margin: 0;
+		font-size: var(--dry-text-sm-size);
 		color: var(--dry-color-text-weak);
-		font-size: var(--dry-type-body-size, var(--dry-text-md-size));
-		line-height: 1.6;
+		line-height: 1.55;
 	}
 
-	.points {
+	.highlights {
 		display: grid;
 		gap: var(--dry-space-2);
 		margin: 0;
@@ -187,86 +119,34 @@
 		list-style: none;
 	}
 
-	.points li {
+	.highlights li {
 		display: grid;
-		grid-template-columns: auto 1fr;
+		grid-template-columns: max-content minmax(0, 1fr);
 		gap: var(--dry-space-2);
-		align-items: start;
-		color: var(--dry-color-text);
-		line-height: 1.5;
-	}
-
-	.points li::before {
-		content: '';
-		display: inline-grid;
-		height: var(--dry-space-2);
-		aspect-ratio: 1;
-		margin-top: 0.45em;
-		border-radius: 9999px;
-		background: var(--panel-accent);
-	}
-
-	.summary {
-		display: grid;
-		gap: var(--dry-space-3);
-		align-content: end;
-		padding: var(--dry-space-4);
-		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 86%, var(--panel-accent) 14%);
-		border-radius: var(--dry-radius-xl);
-		background: color-mix(in srgb, var(--dry-color-bg-raised) 88%, var(--panel-accent) 12%);
-	}
-
-	.summary-label {
-		color: var(--dry-color-text-weak);
-		font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-	}
-
-	.stats {
-		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: var(--dry-space-2);
-	}
-
-	.stat {
-		display: grid;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-3);
-		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 82%, var(--panel-accent) 18%);
-		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg) 76%, var(--panel-accent) 24%);
-	}
-
-	.stat span {
-		color: var(--dry-color-text-weak);
-		font-size: var(--dry-text-xs-size, 0.75rem);
-		line-height: 1.2;
-		text-transform: uppercase;
-	}
-
-	.stat strong {
+		font-size: var(--dry-text-sm-size);
 		color: var(--dry-color-text-strong);
-		font-size: var(--dry-type-body-size, var(--dry-text-md-size));
-		line-height: 1.2;
+	}
+
+	.highlights li::before {
+		content: '';
+		margin-block-start: 0.55em;
+		block-size: 0.35em;
+		aspect-ratio: 1;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 80%, transparent);
 	}
 
 	.controls {
 		display: grid;
-		gap: var(--dry-space-2);
 		justify-items: center;
+		gap: var(--dry-space-2);
+		margin-block-start: var(--dry-space-4);
 	}
 
 	.nav {
 		display: grid;
 		grid-auto-flow: column;
+		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
-	}
-
-	@container (max-width: 840px) {
-		.panel {
-			grid-template-columns: minmax(0, 1fr);
-		}
 	}
 </style>

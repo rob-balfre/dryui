@@ -179,6 +179,7 @@
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-on-accent));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
 		--_dry-btn-radius: var(--dry-btn-radius, var(--dry-radius-md));
+		--_dry-btn-active-transform: var(--dry-btn-active-transform, scale(0.98));
 		--_dry-btn-padding-x: var(--dry-btn-padding-x, var(--dry-space-4));
 		--_dry-btn-padding-y: var(--dry-btn-padding-y, var(--dry-space-2_5));
 		--_dry-btn-font-size: var(
@@ -236,7 +237,7 @@
 		}
 
 		&:active:not([data-disabled]) {
-			transform: scale(0.98);
+			transform: var(--_dry-btn-active-transform);
 		}
 
 		&[data-disabled] {

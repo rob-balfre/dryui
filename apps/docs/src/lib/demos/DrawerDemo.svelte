@@ -1,171 +1,152 @@
-<script>
-	import { Badge, Button, Card, Drawer, Separator, Text, Toggle } from '@dryui/ui';
-
-	let drawerOpen = $state(false);
-	let releaseUpdates = $state(true);
-	let weeklyDigest = $state(false);
-	let privacyMode = $state(true);
+<script lang="ts">
+	import { Button, Drawer } from '@dryui/ui';
 </script>
 
-<Drawer.Root bind:open={drawerOpen} side="right">
-	<Drawer.Trigger><Button>Open Drawer</Button></Drawer.Trigger>
-	<Drawer.Content>
-		<Drawer.Header>
-			<div class="header-stack">
-				<div class="header-row">
-					<Text as="span" size="sm" color="muted">Workspace settings</Text>
-					<Badge variant="outline" color="gray">Live</Badge>
+<div class="stage">
+	<div class="scene">
+		<p class="eyebrow">dryui-studio</p>
+		<p class="scene-title">Workspace overview</p>
+		<p class="note">Drawer slides in from the edge while the page stays visible beneath.</p>
+		<Drawer.Root side="right">
+			<Drawer.Trigger>
+				<Button variant="outline">Open settings</Button>
+			</Drawer.Trigger>
+			<Drawer.Content>
+				<Drawer.Header>Workspace settings</Drawer.Header>
+			</Drawer.Content>
+		</Drawer.Root>
+	</div>
+
+	<section class="preview" aria-label="Drawer preview">
+		<header class="head">
+			<p class="eyebrow">Drawer</p>
+			<p class="preview-title">Workspace settings</p>
+		</header>
+
+		<div class="group">
+			<p class="group-head">Alerts and activity</p>
+			<div class="setting">
+				<div class="copy">
+					<p class="setting-title">Release updates</p>
+					<p class="setting-note">Ship notes to the team channel.</p>
 				</div>
-
-				<div class="title-stack">
-					<Text as="p" size="lg" weight="semibold">Settings</Text>
-					<Text as="p" size="sm" color="secondary">
-						Keep notifications, review flow, and privacy defaults aligned for the whole workspace.
-					</Text>
+				<span class="pill on">On</span>
+			</div>
+			<div class="setting">
+				<div class="copy">
+					<p class="setting-title">Weekly digest</p>
+					<p class="setting-note">Monday summary of approvals.</p>
 				</div>
+				<span class="pill">Off</span>
 			</div>
-		</Drawer.Header>
+		</div>
 
-		<Drawer.Body>
-			<div class="panel-stack">
-				<Card.Root variant="elevated" size="sm">
-					<Card.Content>
-						<div class="card-stack">
-							<div class="summary-row">
-								<div class="title-stack">
-									<Text as="span" variant="label" size="sm">DryUI Studio</Text>
-									<Text as="p" size="sm" color="secondary">
-										Team workspace with shared review notifications.
-									</Text>
-								</div>
-								<Badge variant="soft">Team plan</Badge>
-							</div>
-
-							<Separator />
-
-							<div class="summary-grid">
-								<div class="summary-cell">
-									<Text as="span" size="sm" color="muted">Owners</Text>
-									<Text as="p" weight="semibold">4 active</Text>
-								</div>
-								<div class="summary-cell">
-									<Text as="span" size="sm" color="muted">Digest window</Text>
-									<Text as="p" weight="semibold">09:00 daily</Text>
-								</div>
-							</div>
-						</div>
-					</Card.Content>
-				</Card.Root>
-
-				<Card.Root size="sm">
-					<Card.Header>
-						<div class="title-stack">
-							<Text as="p" weight="semibold">Alerts and activity</Text>
-							<Text as="p" size="sm" color="secondary">
-								Choose what gets pushed into inboxes and shared channels.
-							</Text>
-						</div>
-					</Card.Header>
-
-					<Card.Content>
-						<div class="card-stack">
-							<div class="setting-row">
-								<div class="setting-copy">
-									<Text as="p" weight="medium">Release updates</Text>
-									<Text as="p" size="sm" color="secondary">
-										Send shipping notes, fixes, and rollout changes to the team.
-									</Text>
-								</div>
-								<Toggle bind:pressed={releaseUpdates} size="sm">
-									{releaseUpdates ? 'On' : 'Off'}
-								</Toggle>
-							</div>
-
-							<Separator />
-
-							<div class="setting-row">
-								<div class="setting-copy">
-									<Text as="p" weight="medium">Weekly digest</Text>
-									<Text as="p" size="sm" color="secondary">
-										Bundle approvals and unread updates into a single summary.
-									</Text>
-								</div>
-								<Toggle bind:pressed={weeklyDigest} size="sm">
-									{weeklyDigest ? 'On' : 'Off'}
-								</Toggle>
-							</div>
-
-							<Separator />
-
-							<div class="setting-row">
-								<div class="setting-copy">
-									<Text as="p" weight="medium">Privacy mode</Text>
-									<Text as="p" size="sm" color="secondary">
-										Hide collaborator emails in mentions and audit snapshots.
-									</Text>
-								</div>
-								<Toggle bind:pressed={privacyMode} size="sm">
-									{privacyMode ? 'On' : 'Off'}
-								</Toggle>
-							</div>
-						</div>
-					</Card.Content>
-				</Card.Root>
+		<div class="group">
+			<p class="group-head">Privacy</p>
+			<div class="setting">
+				<div class="copy">
+					<p class="setting-title">Hide collaborator emails</p>
+					<p class="setting-note">Mask emails in mentions.</p>
+				</div>
+				<span class="pill on">On</span>
 			</div>
-		</Drawer.Body>
-
-		<Drawer.Footer>
-			<Button variant="secondary" onclick={() => (drawerOpen = false)}>Cancel</Button>
-			<Button variant="solid" onclick={() => (drawerOpen = false)}>Save changes</Button>
-		</Drawer.Footer>
-	</Drawer.Content>
-</Drawer.Root>
+			<div class="setting">
+				<div class="copy">
+					<p class="setting-title">Public profile</p>
+					<p class="setting-note">Show your workspace handle.</p>
+				</div>
+				<span class="pill">Off</span>
+			</div>
+		</div>
+	</section>
+</div>
 
 <style>
-	.header-stack,
-	.title-stack,
-	.panel-stack,
-	.card-stack,
-	.summary-cell,
-	.setting-copy {
+	.stage {
 		display: grid;
-	}
-
-	.header-stack,
-	.panel-stack,
-	.card-stack {
-		gap: var(--dry-space-4);
-	}
-
-	.title-stack {
-		gap: var(--dry-space-2);
-	}
-
-	.summary-cell,
-	.setting-copy {
-		gap: var(--dry-space-1);
-	}
-
-	.header-row,
-	.summary-row,
-	.setting-row {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) max-content;
-		gap: var(--dry-space-3);
-	}
-
-	.header-row,
-	.summary-row {
-		align-items: center;
-	}
-
-	.setting-row {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: var(--dry-space-5);
 		align-items: start;
 	}
 
-	.summary-grid {
+	.scene {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: var(--dry-space-3);
+		padding: var(--dry-space-4);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 45%, transparent);
+		justify-items: start;
+	}
+
+	.eyebrow,
+	.group-head {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
+	}
+
+	.scene-title,
+	.preview-title,
+	.setting-title {
+		margin: 0;
+		font-size: var(--dry-text-base-size);
+		font-weight: 600;
+		color: var(--dry-color-text-strong);
+	}
+
+	.note,
+	.setting-note {
+		margin: 0;
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-weak);
+		line-height: 1.5;
+	}
+
+	.preview {
+		display: grid;
+		gap: var(--dry-space-4);
+		padding: var(--dry-space-4);
+		border-radius: var(--dry-radius-lg);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 70%, transparent);
+		box-shadow: 0 18px 40px color-mix(in srgb, var(--dry-color-shadow) 35%, transparent);
+	}
+
+	.head {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+	.group {
+		display: grid;
+		gap: var(--dry-space-3);
+	}
+	.copy {
+		display: grid;
+		gap: 2px;
+	}
+
+	.setting {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
+		align-items: center;
+		gap: var(--dry-space-3);
+	}
+
+	.pill {
+		padding: 2px var(--dry-space-2);
+		border-radius: 999px;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		color: var(--dry-color-text-weak);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 55%, transparent);
+	}
+
+	.pill.on {
+		color: var(--dry-color-text-strong);
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 22%, transparent);
+		border-color: color-mix(in srgb, var(--dry-color-fill-brand) 45%, transparent);
 	}
 </style>

@@ -1,13 +1,37 @@
 <script lang="ts">
 	import { MarkdownRenderer } from '@dryui/ui';
 
-	const content = `## Release notes
+	const changelog = `# DryUI 1.4.0
 
-**Bold** and *italic* text with a [link](https://example.com).
+Released **April 24, 2026**
 
-- First item
-- Second item
-- Third item`;
+## Highlights
+
+- New \`DataGrid\` sorting API with \`sortable\` on any column
+- \`MarkdownRenderer\` now handles GFM tables and task lists
+- \`Pagination\` ships with keyboard-first navigation
+
+## Breaking
+
+1. \`Card.Root\` no longer accepts the \`raised\` prop. Use \`variant="elevated"\`.
+2. \`--dry-color-accent\` removed. Map to \`--dry-color-primary\`.
+3. \`Tree.Root\`'s \`expanded\` prop is now \`defaultExpanded\`.
+
+## Fixes
+
+- \`AlertDialog\` focus trap no longer leaks past the close button
+- \`DatePicker\` parses \`YYYY-MM-DD\` reliably on Safari 17
+- \`Tooltip\` respects \`prefers-reduced-motion\` when opening
+
+## Example
+
+\`\`\`svelte
+<Pagination.Root bind:page totalPages={12}>
+  <Pagination.Content>...</Pagination.Content>
+</Pagination.Root>
+\`\`\`
+
+See the [migration guide](https://dryui.dev/migrate/1.4) for the full diff.`;
 </script>
 
-<MarkdownRenderer {content} />
+<MarkdownRenderer content={changelog} />

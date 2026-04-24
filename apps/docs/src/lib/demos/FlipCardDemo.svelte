@@ -1,287 +1,173 @@
 <script lang="ts">
-	import { Badge, FlipCard, Heading, Kbd, Text } from '@dryui/ui';
+	import { Badge, FlipCard } from '@dryui/ui';
 </script>
 
-<div class="demo-shell">
-	<div class="flip-card">
-		<FlipCard.Root trigger="hover">
-			<FlipCard.Front>
-				<div class="face-card face-front">
-					<div class="face-hero face-hero-front">
-						<div class="face-topline">
-							<Badge variant="soft">Front face</Badge>
-							<Text as="span" size="sm" color="secondary">Member pass preview</Text>
-						</div>
-
-						<div class="face-copy">
-							<Heading level={4}>Studio Pass</Heading>
-							<Text color="secondary">
-								A proper front face with hierarchy, metadata, and a visible card surface.
-							</Text>
-						</div>
-
-						<div class="hero-panel">
-							<Text as="span" size="xs" color="secondary" variant="label">Tier</Text>
-							<Heading level={4}>Gold</Heading>
-							<Text as="span" size="sm" color="secondary">Renews on 28 Apr</Text>
-						</div>
-					</div>
-
-					<div class="face-content face-content-front">
-						<div class="stat-grid">
-							<div class="stat stat-highlight">
-								<Text as="span" size="xs" color="secondary" variant="label">Status</Text>
-								<Text as="span" weight="semibold">Active</Text>
-							</div>
-
-							<div class="stat">
-								<Text as="span" size="xs" color="secondary" variant="label">Visits</Text>
-								<Text as="span" weight="semibold">24 available</Text>
-							</div>
-
-							<div class="stat">
-								<Text as="span" size="xs" color="secondary" variant="label">Bonus</Text>
-								<Text as="span" weight="semibold">Guest pass</Text>
-							</div>
-						</div>
-
-						<div class="summary-row">
-							<div class="summary-chip">
-								<Text as="span" size="xs" color="secondary" variant="label">Entry</Text>
-								<Text as="span" weight="medium">Priority check-in</Text>
-							</div>
-
-							<div class="summary-chip">
-								<Text as="span" size="xs" color="secondary" variant="label">Access</Text>
-								<Text as="span" weight="medium">All studio classes</Text>
-							</div>
-						</div>
-					</div>
-
-					<div class="face-footer">
-						<div class="footer-row">
-							<Text as="span" size="sm" color="secondary">Flip trigger</Text>
-							<Kbd>Hover</Kbd>
-						</div>
-					</div>
+<div class="card">
+	<FlipCard.Root trigger="hover">
+		<FlipCard.Front>
+			<div class="face face-front">
+				<div class="head">
+					<Badge variant="soft" size="sm">Feature</Badge>
+					<p class="eyebrow">Hover to flip</p>
 				</div>
-			</FlipCard.Front>
-
-			<FlipCard.Back>
-				<div class="face-card face-back">
-					<div class="face-hero">
-						<div class="face-topline">
-							<Badge variant="soft">Back face</Badge>
-							<Text as="span" size="sm" color="secondary">Hidden details</Text>
-						</div>
-
-						<div class="face-copy">
-							<Heading level={4}>Included Perks</Heading>
-							<Text color="secondary">
-								The reverse side now reads like the back of a real card instead of a text row.
-							</Text>
-						</div>
-					</div>
-
-					<div class="face-content">
-						<div class="detail-list">
-							<div class="detail-item">
-								<Text as="span" size="xs" color="secondary" variant="label">Access</Text>
-								<Text as="span" weight="medium">Priority studio check-in</Text>
-							</div>
-
-							<div class="detail-item">
-								<Text as="span" size="xs" color="secondary" variant="label">Bonus</Text>
-								<Text as="span" weight="medium">One guest pass each month</Text>
-							</div>
-
-							<div class="detail-item">
-								<Text as="span" size="xs" color="secondary" variant="label">Support</Text>
-								<Text as="span" weight="medium">Concierge setup on arrival</Text>
-							</div>
-
-							<div class="detail-item detail-item-wide">
-								<Text as="span" size="xs" color="secondary" variant="label">Notes</Text>
-								<Text as="span" weight="medium">
-									Bring one guest each month and skip the standby queue during peak sessions.
-								</Text>
-							</div>
-						</div>
-					</div>
-
-					<div class="face-footer">
-						<div class="footer-row">
-							<Text as="span" size="sm" color="secondary">Direction</Text>
-							<Text as="span" weight="semibold">Horizontal flip</Text>
-						</div>
-					</div>
+				<div class="copy">
+					<p class="title">Live feedback annotations</p>
+					<p class="body">
+						Draw on your running app. Each marker lands back in the agent as a submission with
+						screenshot, selector, and URL.
+					</p>
 				</div>
-			</FlipCard.Back>
-		</FlipCard.Root>
-	</div>
+				<div class="meta">
+					<span class="meta-item">3 modes</span>
+					<span class="meta-item">Zero config</span>
+					<span class="meta-item">Works headless</span>
+				</div>
+			</div>
+		</FlipCard.Front>
+
+		<FlipCard.Back>
+			<div class="face face-back">
+				<div class="head">
+					<Badge variant="solid" color="blue" size="sm">How it works</Badge>
+					<p class="eyebrow">Backside</p>
+				</div>
+				<ol class="steps">
+					<li>
+						<span class="step-n">1</span>
+						<span class="step-body">Reload your dev server after <code>dryui init</code>.</span>
+					</li>
+					<li>
+						<span class="step-n">2</span>
+						<span class="step-body">
+							Press <code>Cmd+I</code> to mark a region or record a quick clip.
+						</span>
+					</li>
+					<li>
+						<span class="step-n">3</span>
+						<span class="step-body">
+							The agent picks it up through <code>feedback_get_pending</code>.
+						</span>
+					</li>
+				</ol>
+			</div>
+		</FlipCard.Back>
+	</FlipCard.Root>
 </div>
 
 <style>
-	.demo-shell {
+	.card {
 		display: grid;
-		grid-template-columns: minmax(0, 40rem);
+		grid-template-columns: minmax(0, 28rem);
 	}
 
-	.flip-card {
-		--dry-flip-card-duration: 700ms;
-
-		min-block-size: 22rem;
-	}
-
-	.face-card {
-		--demo-panel-bg: var(--dry-color-fill);
-		--demo-panel-border: var(--dry-color-stroke-weak);
-
+	.face {
 		display: grid;
-		container-type: inline-size;
-		min-block-size: 22rem;
 		grid-template-rows: auto 1fr auto;
-		gap: var(--dry-space-5);
-		padding: var(--dry-space-6);
-		background: var(--dry-card-bg, var(--dry-color-bg-overlay));
-		border: 1px solid var(--dry-card-border, var(--dry-color-stroke-weak));
-		border-radius: var(--dry-radius-2xl);
-		box-shadow: var(--dry-shadow-raised);
-	}
-
-	.face-front {
-		--dry-card-bg: var(--dry-color-bg-overlay);
-		--dry-card-border: var(--dry-color-stroke-weak);
+		gap: var(--dry-space-4);
+		padding: var(--dry-space-5);
+		min-block-size: 18rem;
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		border-radius: var(--dry-radius-xl);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 42%, transparent);
 	}
 
 	.face-back {
-		--dry-card-bg: var(--dry-color-fill-brand-weak);
-		--dry-card-border: var(--dry-color-stroke-brand-weak);
-		--demo-panel-bg: var(--dry-color-bg-base);
-		--demo-panel-border: var(--dry-color-stroke-brand-weak);
+		background: linear-gradient(
+			180deg,
+			color-mix(in srgb, var(--dry-color-fill-brand) 14%, var(--dry-color-bg-overlay)),
+			color-mix(in srgb, var(--dry-color-bg-overlay) 70%, transparent)
+		);
 	}
 
-	.face-hero {
+	.head {
 		display: grid;
-		gap: var(--dry-space-4);
-	}
-
-	.face-hero-front {
-		align-items: start;
-	}
-
-	.face-topline {
-		display: grid;
-		grid-template-columns: max-content 1fr;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
 		align-items: center;
-		gap: var(--dry-space-3);
-	}
-
-	.face-copy {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
-	.face-content,
-	.face-footer {
-		display: grid;
+	.eyebrow {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
 	}
 
-	.hero-panel {
+	.copy {
 		display: grid;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-4);
-		background: var(--dry-color-fill);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-xl);
+		gap: var(--dry-space-2);
+		align-self: center;
 	}
 
-	.face-content-front {
-		gap: var(--dry-space-4);
+	.title {
+		margin: 0;
+		font-size: var(--dry-text-lg-size);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		color: var(--dry-color-text-strong);
 	}
 
-	.stat-grid {
+	.body {
+		margin: 0;
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-weak);
+		line-height: 1.55;
+	}
+
+	.meta {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-3);
+	}
+
+	.meta-item {
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		color: var(--dry-color-text-weak);
+	}
+
+	.steps {
+		display: grid;
+		gap: var(--dry-space-3);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		align-self: center;
+	}
+
+	.steps li {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
 		gap: var(--dry-space-3);
 		align-items: start;
 	}
 
-	.detail-list {
+	.step-n {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--dry-space-3);
+		place-items: center;
+		block-size: 1.6em;
+		aspect-ratio: 1;
+		border-radius: 999px;
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 22%, var(--dry-color-bg-overlay));
+		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		font-weight: 600;
 	}
 
-	.stat,
-	.detail-item {
-		display: grid;
-		gap: var(--dry-space-1);
-		padding: var(--dry-space-3);
-		background: var(--demo-panel-bg);
-		border: 1px solid var(--demo-panel-border);
-		border-radius: var(--dry-radius-xl);
+	.step-body {
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-strong);
+		line-height: 1.5;
 	}
 
-	.stat-highlight {
-		background: var(--dry-color-fill-brand-weak);
-		border-color: var(--dry-color-stroke-brand-weak);
-	}
-
-	.summary-row {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: var(--dry-space-3);
-	}
-
-	.summary-chip {
-		display: grid;
-		gap: var(--dry-space-1);
-		padding-block: var(--dry-space-3);
-		padding-inline: var(--dry-space-4);
-		background: var(--dry-color-fill-weaker);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-xl);
-	}
-
-	.footer-row {
-		display: grid;
-		grid-template-columns: 1fr max-content;
-		align-items: center;
-		gap: var(--dry-space-3);
-	}
-
-	@container (min-width: 30rem) {
-		.face-hero-front {
-			grid-template-columns: minmax(0, 1.6fr) minmax(0, 0.9fr);
-			align-items: start;
-		}
-
-		.face-hero-front .face-topline,
-		.face-hero-front .face-copy {
-			grid-column: 1;
-		}
-
-		.face-hero-front .hero-panel {
-			grid-column: 2;
-			grid-row: 1 / span 2;
-			align-self: start;
-		}
-
-		.stat-grid {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
-		}
-
-		.summary-row {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.detail-list {
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-		}
-
-		.detail-item-wide {
-			grid-column: 1 / -1;
-		}
+	code {
+		font-family: var(--dry-font-mono);
+		font-size: 0.9em;
+		color: var(--dry-color-text-strong);
 	}
 </style>

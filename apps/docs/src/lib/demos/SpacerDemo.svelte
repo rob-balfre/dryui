@@ -1,46 +1,53 @@
 <script lang="ts">
-	import { Spacer, Text } from '@dryui/ui';
+	import { Spacer } from '@dryui/ui';
+
+	const sizes = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'] as const;
 </script>
 
 <div class="demo">
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="xs" />
-	<div class="label"><Text size="xs" color="secondary">xs</Text></div>
-
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="sm" />
-	<div class="label"><Text size="xs" color="secondary">sm</Text></div>
-
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="md" />
-	<div class="label"><Text size="xs" color="secondary">md</Text></div>
-
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="lg" />
-	<div class="label"><Text size="xs" color="secondary">lg</Text></div>
-
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="xl" />
-	<div class="label"><Text size="xs" color="secondary">xl</Text></div>
-
-	<div class="block"><Text size="sm" color="secondary">Content above</Text></div>
-	<Spacer size="2xl" />
-	<div class="label"><Text size="xs" color="secondary">2xl</Text></div>
+	{#each sizes as size (size)}
+		<div class="row">
+			<div class="block">Content above</div>
+			<Spacer {size} />
+			<div class="block">Content below</div>
+			<div class="label">
+				<code>size="{size}"</code>
+			</div>
+		</div>
+	{/each}
 </div>
 
 <style>
 	.demo {
 		display: grid;
-		gap: 0;
+		gap: var(--dry-space-4);
+	}
+
+	.row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
+		column-gap: var(--dry-space-4);
+		align-items: center;
 	}
 
 	.block {
-		background: var(--dry-color-bg-raised);
-		padding: var(--dry-space-3) var(--dry-space-4);
+		grid-column: 1;
+		padding: var(--dry-space-2) var(--dry-space-3);
 		border-radius: var(--dry-radius-sm);
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 80%, transparent);
+		color: var(--dry-color-text-strong);
+		font-size: var(--dry-text-sm-size);
 	}
 
 	.label {
-		text-align: right;
+		grid-column: 2;
+		grid-row: 1 / span 3;
+		align-self: center;
+	}
+
+	.label code {
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		color: var(--dry-color-text-weak);
 	}
 </style>

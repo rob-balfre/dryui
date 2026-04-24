@@ -59,7 +59,9 @@
 					{#if def.acceptedValues?.length}
 						<div class="accepted-values">
 							{#each def.acceptedValues as value (value)}
-								<Badge variant="outline" color="gray" size="sm">{value}</Badge>
+								<span class="accepted-chip">
+									<Badge variant="outline" color="gray" size="sm">{value}</Badge>
+								</span>
 							{/each}
 						</div>
 					{:else}
@@ -182,12 +184,9 @@
 		gap: var(--dry-space-1);
 	}
 
-	.accepted-values {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		justify-content: start;
-		gap: var(--dry-space-1);
+	.accepted-chip {
+		display: inline-block;
+		margin: 0 var(--dry-space-1) var(--dry-space-1) 0;
 	}
 
 	.part-header-row td {

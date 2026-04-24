@@ -6,6 +6,8 @@ export { getFileSelectCtx, setFileSelectCtx } from './context.svelte.js';
 
 export interface FileSelectRootProps {
 	value?: string | null;
+	accept?: string | undefined;
+	directory?: boolean | undefined;
 	onrequest?: (() => Promise<string | null>) | undefined;
 	onchange?: ((value: string | null) => void) | undefined;
 	disabled?: boolean | undefined;

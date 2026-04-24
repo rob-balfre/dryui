@@ -45,7 +45,7 @@
 		font-size: var(--dry-kbd-font-size);
 		font-weight: 600;
 		line-height: 1;
-		box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--dry-color-text-strong) 10%, transparent);
+		box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--dry-color-text-strong) 10%, transparent);
 		user-select: none;
 		white-space: nowrap;
 	}

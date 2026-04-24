@@ -82,7 +82,6 @@
 		gap: var(--dry-space-1);
 		padding: var(--dry-space-1);
 		background: var(--dry-color-bg-overlay);
-		/* dryui-allow solid-border-on-raised: menubar root presents a persistent command strip boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 	}

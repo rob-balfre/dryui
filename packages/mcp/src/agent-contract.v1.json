@@ -6779,6 +6779,18 @@
               ],
               "description": "Current controlled or bindable value."
             },
+            "accept": {
+              "signature": "accept: string | default:''",
+              "required": false,
+              "bindable": false,
+              "default": "''"
+            },
+            "directory": {
+              "signature": "directory: boolean | default:true",
+              "required": false,
+              "bindable": false,
+              "default": "true"
+            },
             "onrequest": {
               "signature": "onrequest: (() => Promise<string | null>)",
               "required": false,

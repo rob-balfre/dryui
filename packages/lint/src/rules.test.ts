@@ -189,6 +189,14 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('allows raw input in file-select internals', () => {
+		const violations = checkMarkup(
+			'<input type="file" />',
+			'src/file-select/file-select-root.svelte'
+		);
+		expect(violations).toHaveLength(0);
+	});
+
 	test('flags raw button in non-canonical directories even if input-like', () => {
 		const violations = checkMarkup(
 			'<button type="button">−</button>',
@@ -649,6 +657,64 @@ describe('checkStyle', () => {
 			'.foo:focus-visible { outline: var(--dry-focus-ring); outline-offset: 2px; }'
 		);
 		expect(violations).toHaveLength(0);
+	});
+
+	test('flags box-shadow: inset 2px 0 0 <color> (left rail)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 2px 0 0 blue; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-partial-inset-shadow');
+	});
+
+	test('flags box-shadow: inset 0 -1px 0 <color> (bottom rail)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 0 -1px 0 red; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-partial-inset-shadow');
+	});
+
+	test('flags box-shadow: inset -2px 0 0 <color> (right rail)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset -2px 0 0 blue; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-partial-inset-shadow');
+	});
+
+	test('flags directional inset with blur omitted (inset 2px 0 <color>)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 2px 0 blue; }');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-partial-inset-shadow');
+	});
+
+	test('allows uniform inset ring (inset 0 0 0 1px)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 0 0 0 1px blue; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows diagonal inset shadow with blur (inset 2px 2px 4px)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 2px 2px 4px rgba(0,0,0,0.2); }');
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
+	});
+
+	test('allows soft inner glow with blur only (inset 0 0 4px)', () => {
+		const violations = checkStyle('.foo { box-shadow: inset 0 0 4px red; }');
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows non-inset drop shadow (0 1px 0 red)', () => {
+		const violations = checkStyle('.foo { box-shadow: 0 1px 0 red; }');
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
+	});
+
+	test('allows partial inset with dryui-allow inset-shadow comment', () => {
+		const violations = checkStyle(
+			'/* dryui-allow inset-shadow */\n.foo { box-shadow: inset 2px 0 0 blue; }'
+		);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
+	});
+
+	test('flags inset rail with color-mix color value', () => {
+		const violations = checkStyle(
+			'.foo { box-shadow: inset 0 -1px 0 color-mix(in srgb, black 10%, transparent); }'
+		);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
 	});
 });
 

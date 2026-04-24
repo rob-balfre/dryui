@@ -590,7 +590,7 @@
 
 		<section class="showcase">
 			<div class="showcase-head">
-				<span class="section-label"><span class="section-num">01</span> What's inside</span>
+				<span class="section-label"><span class="section-num">01</span> Inventory</span>
 				<span class="section-icon"><PackageOpen size={20} aria-hidden="true" /></span>
 				<Heading level={2}>What's inside</Heading>
 				<Text color="secondary">Components, tokens, and a live feedback loop to your agent.</Text>
@@ -656,7 +656,7 @@
 
 		<section class="compare">
 			<div class="compare-head">
-				<span class="section-label"><span class="section-num">02</span> How DryUI compares</span>
+				<span class="section-label"><span class="section-num">02</span> Comparison</span>
 				<span class="section-icon"><GitCompare size={20} aria-hidden="true" /></span>
 				<Heading level={2}>How DryUI compares</Heading>
 				<Text color="secondary">
@@ -724,7 +724,7 @@
 
 	<section class="workflow">
 		<div class="workflow-head">
-			<span class="section-label"><span class="section-num">03</span> How DryUI works</span>
+			<span class="section-label"><span class="section-num">03</span> Workflow</span>
 			<span class="section-icon"><Workflow size={20} aria-hidden="true" /></span>
 			<Heading level={2}>How DryUI works</Heading>
 			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
@@ -742,7 +742,7 @@
 
 	<section class="hood">
 		<div class="hood-head">
-			<span class="section-label"><span class="section-num">04</span> Under the hood</span>
+			<span class="section-label"><span class="section-num">04</span> Stack</span>
 			<span class="section-icon"><Wrench size={20} aria-hidden="true" /></span>
 			<Heading level={2}>Under the hood</Heading>
 			<Text color="secondary">Why we built DryUI on Svelte 5 and SvelteKit, not React.</Text>
@@ -832,7 +832,7 @@
 	</section>
 
 	<section class="cta">
-		<span class="section-label"><span class="section-num">05</span> Still here?</span>
+		<span class="section-label"><span class="section-num">05</span> Next</span>
 		<span class="section-icon"><Hand size={20} aria-hidden="true" /></span>
 		<Heading level={2}>Still here?</Heading>
 		<Text color="secondary">Install the plugin, wire it to your agent, and start building.</Text>

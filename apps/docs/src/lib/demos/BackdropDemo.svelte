@@ -1,70 +1,154 @@
 <script lang="ts">
-	import { Backdrop, Button, Card, Text } from '@dryui/ui';
-	import DocsDemo from '$lib/components/DocsDemo.svelte';
+	import { Backdrop, Badge, Button } from '@dryui/ui';
 
-	let open = $state(false);
+	let open = $state(true);
 
-	function closeBackdrop() {
+	function close() {
 		open = false;
 	}
 
-	function handleBackdropKeyDown(event: KeyboardEvent) {
-		if (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Escape') return;
+	function handleBackdropKey(event: KeyboardEvent) {
+		if (event.key !== 'Escape') return;
 		event.preventDefault();
-		closeBackdrop();
+		close();
 	}
 </script>
 
-<DocsDemo gap="sm">
-	<div class="backdrop-trigger">
-		<Button variant="outline" onclick={() => (open = true)}>Show Backdrop</Button>
-		<Text color="secondary">Open the preview to verify the backdrop blur and dismissal.</Text>
+<div class="stage">
+	<div class="dashboard" aria-hidden={open}>
+		<header class="head">
+			<p class="eyebrow">Deploys</p>
+			<p class="title">dryui-studio / production</p>
+		</header>
+		<ul class="rows">
+			<li>
+				<span class="row-name">api-gateway</span><Badge variant="soft" size="sm">Passing</Badge>
+			</li>
+			<li>
+				<span class="row-name">billing-edge</span><Badge variant="soft" size="sm">Passing</Badge>
+			</li>
+			<li>
+				<span class="row-name">scratchpad-web</span><Badge variant="outline" size="sm">Queued</Badge
+				>
+			</li>
+		</ul>
+		<Button variant="outline" onclick={() => (open = true)}>Show backdrop</Button>
 	</div>
-</DocsDemo>
 
-<Backdrop
-	{open}
-	role="button"
-	tabindex={0}
-	aria-label="Dismiss backdrop preview"
-	onclick={closeBackdrop}
-	onkeydown={handleBackdropKeyDown}
->
-	<div
-		class="backdrop-dialog"
-		role="dialog"
-		aria-modal="true"
-		tabindex={-1}
-		onclick={(event) => event.stopPropagation()}
-		onkeydown={(event) => event.stopPropagation()}
+	<Backdrop
+		{open}
+		role="button"
+		tabindex={0}
+		aria-label="Dismiss backdrop"
+		onclick={close}
+		onkeydown={handleBackdropKey}
 	>
-		<Card.Root>
-			<Card.Content>
-				<div class="backdrop-card-copy">
-					<Text>Content rendered over a backdrop overlay layer.</Text>
-					<Button onclick={closeBackdrop}>Close preview</Button>
-				</div>
-			</Card.Content>
-		</Card.Root>
-	</div>
-</Backdrop>
+		<div
+			class="modal"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="backdrop-title"
+			tabindex={-1}
+			onclick={(event) => event.stopPropagation()}
+			onkeydown={(event) => event.stopPropagation()}
+		>
+			<p class="eyebrow">Confirm</p>
+			<p id="backdrop-title" class="modal-title">Cancel the queued deploy?</p>
+			<p class="note">The scratchpad-web build will stop. In-flight work continues.</p>
+			<div class="actions">
+				<Button variant="ghost" onclick={close}>Keep it running</Button>
+				<Button variant="solid" color="danger" onclick={close}>Cancel deploy</Button>
+			</div>
+		</div>
+	</Backdrop>
+</div>
 
 <style>
-	.backdrop-trigger {
+	.stage {
+		position: relative;
 		display: grid;
-		justify-items: start;
-		gap: var(--dry-space-3);
+		min-block-size: 18em;
 	}
 
-	.backdrop-dialog {
+	.dashboard {
 		display: grid;
-		grid-template-columns: min(28rem, 100%);
-		justify-content: center;
-	}
-
-	.backdrop-card-copy {
-		display: grid;
-		justify-items: start;
 		gap: var(--dry-space-4);
+		padding: var(--dry-space-4);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 55%, transparent);
+	}
+
+	.head {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.rows {
+		display: grid;
+		gap: var(--dry-space-2);
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.rows li {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
+		align-items: center;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-2) var(--dry-space-3);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 55%, transparent);
+		border-radius: var(--dry-radius-md);
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-strong);
+	}
+
+	.modal {
+		display: grid;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-5);
+		border-radius: var(--dry-radius-lg);
+		background: var(--dry-color-bg-base);
+		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
+		max-inline-size: 28em;
+		margin-inline: auto;
+		box-shadow: 0 20px 60px -20px rgba(0, 0, 0, 0.6);
+	}
+
+	.eyebrow {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--dry-color-text-weak);
+	}
+
+	.title,
+	.modal-title {
+		margin: 0;
+		font-size: var(--dry-text-base-size);
+		font-weight: 600;
+		color: var(--dry-color-text-strong);
+	}
+
+	.note {
+		margin: 0;
+		font-size: var(--dry-text-sm-size);
+		color: var(--dry-color-text-weak);
+		line-height: 1.5;
+	}
+
+	.actions {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: end;
+		gap: var(--dry-space-2);
+	}
+
+	.row-name {
+		color: var(--dry-color-text-strong);
 	}
 </style>

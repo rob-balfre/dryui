@@ -283,6 +283,7 @@
 				color-mix(in srgb, var(--dry-color-bg-base) 94%, var(--tile-surface))
 			),
 			var(--dry-color-bg-base);
+		/* dryui-allow inset-shadow: intentional top highlight rail on demo tile. */
 		box-shadow: inset 0 1px 0 color-mix(in srgb, var(--dry-color-text-inverse) 10%, transparent);
 	}
 

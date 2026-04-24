@@ -82,11 +82,16 @@
 	}
 
 	function selectValue(itemValue: string) {
-		if (disabled || value.includes(itemValue) || !canSelectValue(itemValue)) {
+		if (disabled || !canSelectValue(itemValue)) {
 			return false;
 		}
 
-		setSelectedValues([...value, itemValue]);
+		if (value.includes(itemValue)) {
+			setSelectedValues(value.filter((entry) => entry !== itemValue));
+		} else {
+			setSelectedValues([...value, itemValue]);
+		}
+
 		setQueryValue('');
 		activeItemId = '';
 		focusInput();
@@ -251,7 +256,6 @@
 		justify-content: start;
 		gap: var(--dry-space-1_5);
 		padding: var(--dry-space-2);
-		/* dryui-allow solid-border-on-raised: composite input needs a persistent field edge plus raised fill for token contrast. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);

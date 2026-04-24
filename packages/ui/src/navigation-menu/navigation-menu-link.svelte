@@ -39,7 +39,6 @@
 	[data-nav-menu-link][data-active] {
 		background: var(--dry-color-fill-brand-weak);
 		color: var(--dry-color-text-brand);
-		box-shadow: inset 2px 0 0 var(--dry-color-stroke-selected);
 		font-weight: 600;
 	}
 

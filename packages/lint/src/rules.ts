@@ -77,6 +77,19 @@ const ALLOWED_MEDIA_RE = /prefers-reduced-motion|prefers-color-scheme/;
 
 const FOCUS_RING_LITERAL_RE = /outline\s*:\s*2px\s+solid\s+var\(--dry-color-focus-ring\)/g;
 
+// Directional "rail" inset shadows (exactly one of offset-x/offset-y non-zero,
+// blur zero) clip against border-radius and render as a curved bracket.
+// Flagged:
+//   inset 2px 0 0 <color>   — left rail
+//   inset 0 -1px 0 <color>  — bottom rail
+//   inset -2px 0 <color>    — right rail (blur omitted, defaults to 0)
+// Allowed:
+//   inset 0 0 0 1px <color>  — uniform ring (hugs radius)
+//   inset 2px 2px 4px <color> — diagonal drop-like shadow with blur
+//   inset 0 0 4px <color>     — soft inner glow
+const INSET_SHADOW_RE =
+	/\binset\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?(?:\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?)?/g;
+
 const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
@@ -117,6 +130,7 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 			'tags-input',
 			'transfer',
 			'file-upload',
+			'file-select',
 			'input-group',
 			'command-palette'
 		]),
@@ -767,6 +781,25 @@ export function checkStyle(
 				message: ruleMessage('dryui/prefer-focus-ring-token'),
 				line: lineOf(match.index)
 			});
+		}
+	}
+
+	if (allowed('dryui/no-partial-inset-shadow') && scan.includes('inset')) {
+		for (const match of scan.matchAll(INSET_SHADOW_RE)) {
+			if (hasAllowComment(file, match.index, 'inset-shadow')) continue;
+			const x = parseFloat(match[1]!);
+			const y = parseFloat(match[2]!);
+			const blur = match[3] !== undefined ? parseFloat(match[3]) : 0;
+			if (blur !== 0) continue;
+			const xNonZero = x !== 0;
+			const yNonZero = y !== 0;
+			if (xNonZero !== yNonZero) {
+				violations.push({
+					rule: 'dryui/no-partial-inset-shadow',
+					message: ruleMessage('dryui/no-partial-inset-shadow'),
+					line: lineOf(match.index)
+				});
+			}
 		}
 	}
 

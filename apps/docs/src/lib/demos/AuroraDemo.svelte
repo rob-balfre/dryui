@@ -257,8 +257,8 @@
 	}
 
 	.preview-toggle[data-pressed='true'] {
-		background: color-mix(in srgb, var(--dry-color-primary) 18%, var(--dry-color-bg-overlay));
-		border-color: color-mix(in srgb, var(--dry-color-primary) 40%, transparent);
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 18%, var(--dry-color-bg-overlay));
+		border-color: color-mix(in srgb, var(--dry-color-fill-brand) 40%, transparent);
 	}
 
 	.feature-grid {

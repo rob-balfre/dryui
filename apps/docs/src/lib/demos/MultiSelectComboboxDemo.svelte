@@ -1,45 +1,54 @@
 <script lang="ts">
-	import { MultiSelectCombobox } from '@dryui/ui';
+	import { MultiSelectCombobox, Field, Label } from '@dryui/ui';
 
-	const frameworks = [
-		{ value: 'svelte', label: 'Svelte' },
-		{ value: 'react', label: 'React' },
-		{ value: 'vue', label: 'Vue' },
-		{ value: 'angular', label: 'Angular' },
-		{ value: 'solid', label: 'SolidJS' }
-	] as const;
+	const events = [
+		'deployment.created',
+		'deployment.succeeded',
+		'deployment.failed',
+		'build.started',
+		'build.canceled',
+		'incident.opened',
+		'incident.resolved'
+	];
 
-	let selectedFrameworks = $state<string[]>([]);
-	let frameworkQuery = $state('');
-
-	function getFrameworkLabel(value: string) {
-		return frameworks.find((framework) => framework.value === value)?.label ?? value;
-	}
+	let selected = $state<string[]>(['deployment.failed', 'incident.opened']);
+	let query = $state('');
 </script>
 
-<MultiSelectCombobox.Root
-	bind:value={selectedFrameworks}
-	bind:query={frameworkQuery}
-	name="frameworks"
->
-	<MultiSelectCombobox.SelectionList>
-		{#each selectedFrameworks as framework (framework)}
-			<MultiSelectCombobox.SelectionItem value={framework}>
-				{getFrameworkLabel(framework)}
-				<MultiSelectCombobox.SelectionRemove
-					value={framework}
-					label={getFrameworkLabel(framework)}
-				/>
-			</MultiSelectCombobox.SelectionItem>
-		{/each}
-	</MultiSelectCombobox.SelectionList>
+<div class="panel">
+	<Field.Root>
+		<Label>Webhook events</Label>
+		<MultiSelectCombobox.Root bind:value={selected} bind:query name="events">
+			<MultiSelectCombobox.SelectionList>
+				{#each selected as item (item)}
+					<MultiSelectCombobox.SelectionItem value={item}>
+						{item}
+						<MultiSelectCombobox.SelectionRemove value={item} label={item} />
+					</MultiSelectCombobox.SelectionItem>
+				{/each}
+			</MultiSelectCombobox.SelectionList>
 
-	<MultiSelectCombobox.Input placeholder="Search frameworks..." />
-	<MultiSelectCombobox.Content>
-		{#each frameworks as framework (framework.value)}
-			<MultiSelectCombobox.Item value={framework.value}>
-				{framework.label}
-			</MultiSelectCombobox.Item>
-		{/each}
-	</MultiSelectCombobox.Content>
-</MultiSelectCombobox.Root>
+			<MultiSelectCombobox.Input placeholder="Filter events..." />
+			<MultiSelectCombobox.Content>
+				{#each events as event (event)}
+					<MultiSelectCombobox.Item value={event}>{event}</MultiSelectCombobox.Item>
+				{/each}
+			</MultiSelectCombobox.Content>
+		</MultiSelectCombobox.Root>
+		<Field.Description>
+			Delivers {selected.length} event types to <code>https://hooks.dryui.dev/zapier</code>.
+		</Field.Description>
+	</Field.Root>
+</div>
+
+<style>
+	.panel {
+		display: grid;
+	}
+
+	code {
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		color: var(--dry-color-text-strong);
+	}
+</style>

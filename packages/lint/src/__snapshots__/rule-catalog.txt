@@ -13,6 +13,7 @@ dryui/no-important	error	Avoid !important — fix specificity at the source. Use
 dryui/no-global	error	Do not use :global(). Use scoped styles, data-* attributes, CSS variables, or component props instead.	Convert the selector to scoped CSS or use a component API.
 dryui/no-media-sizing	error	Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.	Replace the sizing media query with a container query.
 dryui/prefer-focus-ring-token	error	Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).	Use outline: var(--dry-focus-ring) plus the correct outline-offset.
+dryui/no-partial-inset-shadow	error	Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.	Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	

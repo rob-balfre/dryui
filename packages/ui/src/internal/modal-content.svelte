@@ -106,9 +106,9 @@
 	/* ---------- Dialog (center) ---------- */
 
 	[data-modal-content][data-variant='dialog'] {
-		/* dryui-allow width */
+		/* dryui-allow width: resets native <dialog> sizing so the outer grid track owns the centered panel width. */
 		width: 100vw;
-		/* dryui-allow width */
+		/* dryui-allow width: paired with the width reset above. */
 		max-width: none;
 		display: grid;
 		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));
@@ -172,9 +172,9 @@
 	/* ---------- AlertDialog (center) ---------- */
 
 	[data-modal-content][data-variant='alert-dialog'] {
-		/* dryui-allow width */
+		/* dryui-allow width: resets native <dialog> sizing so the outer grid track owns the centered panel width. */
 		width: 100vw;
-		/* dryui-allow width */
+		/* dryui-allow width: paired with the width reset above. */
 		max-width: none;
 		display: grid;
 		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));
@@ -319,7 +319,6 @@
 
 	[data-modal-content][data-variant='drawer'][data-side='top'] [data-modal-panel] {
 		--_drawer-rest-transform: translateY(0);
-		/* dryui-allow symmetric-exit-animation: this is the off-canvas enter position for a top drawer, not the exit animation. */
 		--_drawer-enter-transform: translateY(-100%);
 		grid-row: 1;
 		height: var(--dry-drawer-size);
@@ -328,7 +327,6 @@
 
 	[data-modal-content][data-variant='drawer'][data-side='bottom'] [data-modal-panel] {
 		--_drawer-rest-transform: translateY(0);
-		/* dryui-allow symmetric-exit-animation: this is the off-canvas enter position for a bottom drawer, not the exit animation. */
 		--_drawer-enter-transform: translateY(100%);
 		grid-row: 2;
 		height: var(--dry-drawer-size);

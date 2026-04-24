@@ -19,6 +19,7 @@
 	type="button"
 	--dry-btn-justify="space-between"
 	--dry-btn-radius="0"
+	--dry-btn-active-transform="none"
 	aria-expanded={itemCtx.open}
 	aria-controls={itemCtx.contentId}
 	data-state={itemCtx.open ? 'open' : 'closed'}

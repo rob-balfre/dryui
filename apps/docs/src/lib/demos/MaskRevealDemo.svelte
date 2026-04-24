@@ -97,7 +97,6 @@
 		display: grid;
 		gap: var(--dry-space-4);
 		padding: var(--dry-space-4);
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-2xl);
 		background:
@@ -146,12 +145,12 @@
 		display: grid;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-5);
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-xl);
 		background:
 			linear-gradient(145deg, var(--dry-color-fill-brand-weak), transparent 45%),
 			linear-gradient(180deg, var(--dry-color-bg-floating), var(--dry-color-bg-raised));
+		/* dryui-allow inset-shadow: intentional top highlight rail on hero surface. */
 		box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
 	}
 
@@ -181,7 +180,6 @@
 		display: grid;
 		gap: var(--dry-space-1_5);
 		padding: var(--dry-space-4);
-		/* dryui-allow solid-border-on-raised: docs demo keeps an explicit sample boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-floating);

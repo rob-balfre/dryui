@@ -94,7 +94,6 @@
 			max-content
 		);
 		background: var(--dry-color-bg-overlay);
-		/* dryui-allow solid-border-on-raised: popover listbox keeps a crisp edge for option scanning. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		box-shadow: var(--dry-shadow-lg);

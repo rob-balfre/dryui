@@ -139,7 +139,7 @@
 	}
 
 	.adjusted-card {
-		border-color: color-mix(in srgb, var(--dry-color-primary) 20%, var(--dry-color-stroke-weak));
+		border-color: color-mix(in srgb, var(--dry-color-fill-brand) 20%, var(--dry-color-stroke-weak));
 	}
 
 	.preset-strip {
@@ -217,6 +217,7 @@
 		min-block-size: 8rem;
 		border-radius: calc(var(--dry-radius-lg) * 0.95);
 		box-shadow:
+			/* dryui-allow inset-shadow: intentional top highlight rail on chip surface. */
 			inset 0 1px 0 color-mix(in srgb, white 24%, transparent),
 			0 10px 24px color-mix(in srgb, black 14%, transparent);
 	}

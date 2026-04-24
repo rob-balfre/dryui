@@ -82,7 +82,6 @@
 		margin: 0;
 		display: inline-grid;
 		padding: var(--dry-space-3);
-		/* dryui-allow solid-border-on-raised: date picker popovers need a clear calendar boundary. */
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg);
 		background: var(--dry-color-bg-overlay);

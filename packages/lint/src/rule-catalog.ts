@@ -116,6 +116,14 @@ export const RULE_CATALOG = {
 			'Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).',
 		suggestedFix: 'Use outline: var(--dry-focus-ring) plus the correct outline-offset.'
 	},
+	'dryui/no-partial-inset-shadow': {
+		id: 'dryui/no-partial-inset-shadow',
+		severity: 'error',
+		message:
+			'Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.',
+		suggestedFix:
+			'Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.'
+	},
 	'bare-compound': {
 		id: 'bare-compound',
 		severity: 'error',

@@ -4,6 +4,8 @@
 
 	interface Props {
 		value?: string | null;
+		accept?: string | undefined;
+		directory?: boolean | undefined;
 		onrequest?: (() => Promise<string | null>) | undefined;
 		onchange?: ((value: string | null) => void) | undefined;
 		disabled?: boolean | undefined;
@@ -12,6 +14,8 @@
 
 	let {
 		value = $bindable(null),
+		accept = '',
+		directory = true,
 		onrequest,
 		onchange,
 		disabled = false,
@@ -19,20 +23,56 @@
 	}: Props = $props();
 
 	let loading = $state(false);
+	let fallbackInputEl: HTMLInputElement | null = null;
+
+	function commitValue(nextValue: string | null) {
+		if (nextValue === null) return;
+
+		value = nextValue;
+		onchange?.(nextValue);
+	}
+
+	function getFallbackInputValue(files: FileList | null): string | null {
+		const file = files?.[0];
+		if (!file) return null;
+
+		const directoryName = file.webkitRelativePath.split('/').find(Boolean);
+		return directory && directoryName ? directoryName : file.name;
+	}
+
+	function openFallbackInput() {
+		if (!fallbackInputEl) return;
+
+		fallbackInputEl.value = '';
+		fallbackInputEl.click();
+	}
+
+	function attachFallbackInput(node: HTMLInputElement) {
+		fallbackInputEl = node;
+		return () => {
+			if (fallbackInputEl === node) {
+				fallbackInputEl = null;
+			}
+		};
+	}
 
 	async function defaultRequest(): Promise<string | null> {
 		if (typeof window === 'undefined') return null;
-		if (!('showDirectoryPicker' in window)) return null;
-		try {
-			const handle = await (
-				window as unknown as {
-					showDirectoryPicker: (opts: { mode: string }) => Promise<{ name: string }>;
-				}
-			).showDirectoryPicker({ mode: 'read' });
-			return handle.name;
-		} catch {
-			return null;
+		if (directory && 'showDirectoryPicker' in window) {
+			try {
+				const handle = await (
+					window as unknown as {
+						showDirectoryPicker: (opts: { mode: string }) => Promise<{ name: string }>;
+					}
+				).showDirectoryPicker({ mode: 'read' });
+				return handle.name;
+			} catch (error) {
+				if (error instanceof DOMException && error.name === 'AbortError') return null;
+			}
 		}
+
+		openFallbackInput();
+		return null;
 	}
 
 	async function request() {
@@ -41,13 +81,15 @@
 		try {
 			const pick = onrequest ?? defaultRequest;
 			const result = await pick();
-			if (result !== null) {
-				value = result;
-				onchange?.(result);
-			}
+			commitValue(result);
 		} finally {
 			loading = false;
 		}
+	}
+
+	function handleFallbackInputChange(event: Event & { currentTarget: HTMLInputElement }) {
+		commitValue(getFallbackInputValue(event.currentTarget.files));
+		event.currentTarget.value = '';
 	}
 
 	function clear() {
@@ -72,10 +114,29 @@
 </script>
 
 <div data-file-select data-disabled={disabled || undefined}>
+	<input
+		{@attach attachFallbackInput}
+		type="file"
+		{accept}
+		webkitdirectory={directory}
+		disabled={disabled || undefined}
+		aria-hidden="true"
+		tabindex="-1"
+		class="file-select-hidden-input"
+		onchange={handleFallbackInputChange}
+	/>
+
 	{@render children()}
 </div>
 
 <style>
+	.file-select-hidden-input {
+		display: none;
+		position: absolute;
+		height: 0;
+		overflow: hidden;
+	}
+
 	[data-file-select] {
 		container-type: inline-size;
 		display: grid;
@@ -85,7 +146,6 @@
 		padding: var(--dry-space-2) var(--dry-space-3);
 		font-family: var(--dry-font-sans);
 		background: var(--dry-color-bg-raised);
-		/* dryui-allow solid-border-on-raised: file select is a form control and needs a persistent field edge. */
 		border: 1px solid var(--dry-color-stroke-strong);
 		border-radius: var(--dry-radius-md);
 		transition:

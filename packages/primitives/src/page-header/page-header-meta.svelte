@@ -31,9 +31,9 @@
 
 <style>
 	[data-page-header-meta] {
-		/* dryui-allow flex */
+		/* dryui-allow flex: metadata items have variable counts and widths; flex-wrap matches that cadence more cleanly than grid tracks. */
 		display: flex;
-		/* dryui-allow flex */
+		/* dryui-allow flex: paired with the display above. */
 		flex-wrap: wrap;
 		align-items: center;
 		gap: var(--dry-space-2);

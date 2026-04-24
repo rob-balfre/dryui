@@ -81,11 +81,16 @@
 	}
 
 	function selectValue(itemValue: string) {
-		if (disabled || value.includes(itemValue) || !canSelectValue(itemValue)) {
+		if (disabled || !canSelectValue(itemValue)) {
 			return false;
 		}
 
-		setSelectedValues([...value, itemValue]);
+		if (value.includes(itemValue)) {
+			setSelectedValues(value.filter((entry) => entry !== itemValue));
+		} else {
+			setSelectedValues([...value, itemValue]);
+		}
+
 		setQueryValue('');
 		activeItemId = '';
 		focusInput();

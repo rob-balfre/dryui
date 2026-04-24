@@ -51,8 +51,6 @@
 	[data-part='label'][data-selected] {
 		background: var(--dry-tree-item-selected-bg, var(--dry-color-fill-brand-weak));
 		color: var(--dry-tree-item-selected-color, var(--dry-color-text-brand));
-		box-shadow: inset 2px 0 0
-			var(--dry-tree-item-selected-indicator, var(--dry-color-stroke-selected));
 		font-weight: 600;
 	}
 </style>

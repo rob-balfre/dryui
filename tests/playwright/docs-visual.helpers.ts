@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, type ConsoleMessage, type Locator, type Page } from '@playwright/test';
 import { allComponentNames, toSlug } from '../../apps/docs/src/lib/nav.ts';
 
 export type DocsVisualRouteKind = 'component' | 'smoke';
@@ -9,6 +9,12 @@ export interface DocsVisualRoute {
 	path: string;
 	selector: string;
 	headingText?: string;
+}
+
+interface RuntimeErrorMessage {
+	source: 'console.error' | 'pageerror';
+	text: string;
+	url?: string;
 }
 
 export const docsVisualRoutes: DocsVisualRoute[] = allComponentNames().map((name) => ({
@@ -66,10 +72,10 @@ export async function expectDocsRoute(page: Page, route: DocsVisualRoute): Promi
 	}
 
 	runtimeErrors.dispose();
-	expect(
-		runtimeErrors.messages,
-		formatRuntimeErrorMessage(route.path, runtimeErrors.messages)
-	).toEqual([]);
+	const unexpectedMessages = runtimeErrors.messages.filter(
+		(message) => !isExpectedRuntimeMessage(route, message)
+	);
+	expect(unexpectedMessages, formatRuntimeErrorMessage(route.path, unexpectedMessages)).toEqual([]);
 	return target;
 }
 
@@ -102,13 +108,14 @@ async function waitForHydration(page: Page): Promise<void> {
 }
 
 function watchRouteErrors(page: Page) {
-	const messages: string[] = [];
+	const messages: RuntimeErrorMessage[] = [];
 	const onPageError = (error: Error) => {
-		messages.push(`pageerror: ${error.message}`);
+		messages.push({ source: 'pageerror', text: error.message });
 	};
-	const onConsole = (message: { type(): string; text(): string }) => {
+	const onConsole = (message: ConsoleMessage) => {
 		if (message.type() === 'error') {
-			messages.push(`console.error: ${message.text()}`);
+			const location = message.location();
+			messages.push({ source: 'console.error', text: message.text(), url: location.url });
 		}
 	};
 
@@ -124,9 +131,23 @@ function watchRouteErrors(page: Page) {
 	};
 }
 
-function formatRuntimeErrorMessage(path: string, messages: string[]) {
+function isExpectedRuntimeMessage(route: DocsVisualRoute, message: RuntimeErrorMessage): boolean {
+	return (
+		route.path === '/components/image' &&
+		message.source === 'console.error' &&
+		message.text ===
+			'Failed to load resource: the server responded with a status of 404 (Not Found)'
+	);
+}
+
+function formatRuntimeErrorMessage(path: string, messages: RuntimeErrorMessage[]) {
 	if (messages.length === 0) return undefined;
-	return `${path} logged runtime errors:\n${messages.join('\n')}`;
+	return `${path} logged runtime errors:\n${messages
+		.map((message) => {
+			const location = message.url ? ` (${message.url})` : '';
+			return `${message.source}: ${message.text}${location}`;
+		})
+		.join('\n')}`;
 }
 
 async function assertComponentHealth(page: Page, route: DocsVisualRoute): Promise<void> {

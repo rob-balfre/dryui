@@ -1609,11 +1609,11 @@
     "@dryui/primitives": "^2.0.2"
   },
   "peerDependencies": {
-    "svelte": "^5.55.4"
+    "svelte": "^5.55.5"
   },
   "devDependencies": {
     "@dryui/lint": "workspace:*",
-    "svelte": "^5.55.4",
+    "svelte": "^5.55.5",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",
     "typescript": "^6.0.3"

@@ -162,6 +162,7 @@
           "--dry-btn-accent-hover": "Accent Hover",
           "--dry-btn-accent-stroke": "Accent Stroke",
           "--dry-btn-accent-weak": "Accent Weak",
+          "--dry-btn-active-transform": "Active Transform",
           "--dry-btn-bg": "Background color",
           "--dry-btn-border": "Border color",
           "--dry-btn-color": "Text color",
@@ -14799,6 +14800,16 @@
                 "description": "Current controlled or bindable value.",
                 "default": "null"
               },
+              "accept": {
+                "type": "string",
+                "required": false,
+                "default": "''"
+              },
+              "directory": {
+                "type": "boolean",
+                "required": false,
+                "default": "true"
+              },
               "onrequest": {
                 "type": "(() => Promise<string | null>)",
                 "required": false
@@ -20405,8 +20416,7 @@
           "--dry-tree-item-padding": "Item Padding",
           "--dry-tree-item-radius": "Item Radius",
           "--dry-tree-item-selected-bg": "Item Selected Bg",
-          "--dry-tree-item-selected-color": "Item Selected Color",
-          "--dry-tree-item-selected-indicator": "Item Selected Indicator"
+          "--dry-tree-item-selected-color": "Item Selected Color"
         },
         "dataAttributes": [
           {

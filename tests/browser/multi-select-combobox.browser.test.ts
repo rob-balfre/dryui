@@ -115,13 +115,18 @@ describe('MultiSelectCombobox', () => {
 		expect(document.querySelectorAll('input[type="hidden"][name="assignees"]')).toHaveLength(2);
 	});
 
-	it('prevents duplicates and removes the last selection with Backspace', () => {
+	it('deselects a selected option from the dropdown and removes the last selection with Backspace', () => {
 		const input = renderHarness();
 
 		clickOption('Maya Chen');
-		clickOption('Maya Chen');
 
 		expect(getHiddenValues()).toEqual(['maya']);
+
+		clickOption('Maya Chen');
+
+		expect(getHiddenValues()).toEqual([]);
+
+		clickOption('Maya Chen');
 
 		fireKey(input, 'Backspace');
 

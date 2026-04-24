@@ -50,16 +50,21 @@ test('backdrop demo opens the overlay preview and dismisses cleanly', async ({ p
 	await openComponentRoute(page, 'backdrop');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Show Backdrop' });
+	const trigger = surface.getByRole('button', { name: 'Show backdrop' });
 	const backdrop = page.locator('[data-backdrop]');
 
-	await trigger.click();
-
 	await expect(backdrop).toBeVisible();
-	await expect(backdrop.getByText('Content rendered over a backdrop overlay layer.')).toBeVisible();
+	await expect(backdrop.getByText('Cancel the queued deploy?')).toBeVisible();
 	await expect(backdrop).toHaveScreenshot('docs-overlay-backdrop-open.png');
 
 	await backdrop.click({ position: { x: 16, y: 16 } });
+	await expect(backdrop).toBeHidden();
+
+	await trigger.click();
+	await expect(backdrop).toBeVisible();
+
+	await backdrop.focus();
+	await page.keyboard.press('Escape');
 	await expect(backdrop).toBeHidden();
 });
 
@@ -67,17 +72,16 @@ test('alert dialog demo opens and restores focus on cancel', async ({ page }) =>
 	await openComponentRoute(page, 'alert-dialog');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Delete item' });
+	const trigger = surface.getByRole('button', { name: 'Delete project' });
 	const dialog = page.locator('[data-alert-dialog-content][open]');
 
-	await expect.poll(async () => trigger.getAttribute('aria-expanded')).toBe('false');
 	await trigger.click();
 
 	await expect(dialog).toBeVisible();
-	await expect(page.getByRole('button', { name: 'Cancel' })).toBeFocused();
+	await expect(page.getByRole('button', { name: 'Keep project' })).toBeFocused();
 	await expect(dialog).toHaveScreenshot('docs-overlay-alert-dialog-open.png');
 
-	await page.getByRole('button', { name: 'Cancel' }).click();
+	await page.getByRole('button', { name: 'Keep project' }).click();
 
 	await expect(dialog).toBeHidden();
 	await expect(trigger).toBeFocused();
@@ -87,11 +91,10 @@ test('dialog demo opens, renders the content panel, and closes with escape', asy
 	await openComponentRoute(page, 'dialog');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Edit policy' });
+	const trigger = surface.getByRole('button', { name: 'Invite teammate' });
 	const dialog = page.locator('[data-dialog-content][open]');
 	const panel = dialog.locator('[data-dialog-panel]');
 
-	await expect.poll(async () => trigger.getAttribute('aria-expanded')).toBe('false');
 	await trigger.click();
 
 	await expect(panel).toBeVisible();
@@ -107,11 +110,10 @@ test('drawer demo opens on the right edge and closes with escape', async ({ page
 	await openComponentRoute(page, 'drawer');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Open Drawer' });
+	const trigger = surface.getByRole('button', { name: 'Open settings' });
 	const drawer = page.locator('[data-drawer-content][open][data-side="right"]');
 	const panel = drawer.locator('[data-drawer-panel]');
 
-	await expect.poll(async () => trigger.getAttribute('aria-expanded')).toBe('false');
 	await trigger.click();
 
 	await expect(panel).toBeVisible();
@@ -140,10 +142,10 @@ test('command palette demo filters visible options', async ({ page }) => {
 	await openComponentRoute(page, 'command-palette');
 
 	const surface = page.locator('.demo-surface').first();
-	await surface.getByRole('button', { name: 'Open Command Palette' }).click();
+	await surface.getByRole('button', { name: 'Open command palette' }).click();
 
 	const palette = page.locator('[data-command-palette-root][open]');
-	const input = palette.getByPlaceholder('Type a command...');
+	const input = palette.getByPlaceholder('Jump to action, file, or setting...');
 
 	await expect(palette).toBeVisible();
 	await expect(input).toBeFocused();
@@ -163,17 +165,18 @@ test('context menu demo opens on right click and supports keyboard focus movemen
 }) => {
 	await openComponentRoute(page, 'context-menu');
 
-	const trigger = page.getByText('Right-click here');
-	const menu = page.locator('[data-context-menu-content]');
+	const surface = page.locator('.demo-surface').first();
+	const trigger = surface.locator('[id^="context-menu-trigger-"]').first();
+	const menu = page.locator('[data-context-menu-content][data-state="open"]');
 
 	await trigger.click({ button: 'right' });
 
 	await expect(menu).toBeVisible();
-	await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeFocused();
+	await expect(menu.getByRole('menuitem', { name: 'Open in console' })).toBeFocused();
 	await expect(menu).toHaveScreenshot('docs-overlay-context-menu-open.png');
 
 	await page.keyboard.press('ArrowDown');
-	await expect(page.getByRole('menuitem', { name: 'Duplicate' })).toBeFocused();
+	await expect(menu.getByRole('menuitem', { name: 'Copy service URL' })).toBeFocused();
 
 	await page.keyboard.press('Escape');
 	await expect(menu).toBeHidden();
@@ -185,13 +188,13 @@ test('dropdown menu demo opens below the trigger and supports keyboard focus mov
 	await openComponentRoute(page, 'dropdown-menu');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Menu' });
+	const trigger = surface.getByRole('button', { name: 'Actions for Martina Alves' });
 	const menu = page.locator('[data-dropdown-menu-content]');
 
 	await trigger.click();
 
 	await expect(menu).toBeVisible();
-	await expect(page.getByRole('menuitem', { name: 'Edit' })).toBeFocused();
+	await expect(page.getByRole('menuitem', { name: 'View profile' })).toBeFocused();
 	await expect(menu).toHaveScreenshot('docs-overlay-dropdown-menu-open.png');
 
 	const triggerBox = await getBox(trigger, 'expected the dropdown trigger to have a visible box');
@@ -202,7 +205,7 @@ test('dropdown menu demo opens below the trigger and supports keyboard focus mov
 	);
 
 	await page.keyboard.press('ArrowDown');
-	await expect(page.getByRole('menuitem', { name: 'Duplicate' })).toBeFocused();
+	await expect(page.getByRole('menuitem', { name: 'Change role' })).toBeFocused();
 
 	await page.keyboard.press('Escape');
 	await expect(menu).toBeHidden();
@@ -212,7 +215,7 @@ test('hover card demo opens on hover and closes after pointer exit', async ({ pa
 	await openComponentRoute(page, 'hover-card');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByText('Hover over me');
+	const trigger = surface.getByRole('button', { name: '@jules' });
 	const card = page.locator('[data-hover-card-content]');
 
 	await trigger.hover();
@@ -228,7 +231,7 @@ test('notification center demo opens the panel without hydration issues', async 
 	await openComponentRoute(page, 'notification-center');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Notifications (2)' });
+	const trigger = surface.getByRole('button', { name: /Inbox/ });
 	const panel = page.locator('[data-notification-center-panel]');
 
 	await trigger.click();
@@ -236,7 +239,7 @@ test('notification center demo opens the panel without hydration issues', async 
 	await expect(panel).toBeVisible();
 	await expect(panel).toHaveScreenshot('docs-overlay-notification-center-open.png');
 	await expect(page.locator('[data-notification-center-item][data-state=\"unread\"]')).toHaveCount(
-		2
+		3
 	);
 
 	await page.keyboard.press('Escape');
@@ -247,7 +250,7 @@ test('popover demo opens below the trigger and closes on outside click', async (
 	await openComponentRoute(page, 'popover');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Info' });
+	const trigger = surface.getByRole('button', { name: 'Columns' });
 	const content = page.locator('[data-popover-content]');
 
 	await trigger.click();
@@ -270,7 +273,7 @@ test('tooltip demo opens above the trigger and closes after pointer exit', async
 	await openComponentRoute(page, 'tooltip');
 
 	const surface = page.locator('.demo-surface').first();
-	const trigger = surface.getByRole('button', { name: 'Hover me' });
+	const trigger = surface.getByRole('button', { name: 'What goes here?' });
 	const content = page.locator('[data-tooltip-content]');
 
 	await trigger.hover();
@@ -294,7 +297,7 @@ test('tour demo supports next, previous, and finish across both steps', async ({
 	await openComponentRoute(page, 'tour');
 
 	const surface = page.locator('.demo-surface').first();
-	const start = surface.getByRole('button', { name: 'Start Tour' });
+	const start = surface.getByRole('button', { name: 'Start onboarding' });
 	const tooltip = page.locator('[data-tour-tooltip]');
 	const spotlight = page.locator('[data-tour-spotlight]');
 
@@ -302,23 +305,26 @@ test('tour demo supports next, previous, and finish across both steps', async ({
 
 	await expect(spotlight).toBeVisible();
 	await expect(tooltip).toBeVisible();
-	await expect(tooltip).toContainText('Plan review');
-	await expect(tooltip).toContainText('1 of 2');
+	await expect(tooltip).toContainText('Pick a starting environment');
+	await expect(tooltip).toContainText('1 of 3');
 	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-1.png');
 
 	await page.getByRole('button', { name: 'Next' }).click();
 
-	await expect(tooltip).toContainText('Launch checklist');
-	await expect(tooltip).toContainText('2 of 2');
+	await expect(tooltip).toContainText('Grab your first API key');
+	await expect(tooltip).toContainText('2 of 3');
 	await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
-	await expect(tooltip).toHaveAttribute('data-placement', 'left');
+	await expect(tooltip).toHaveAttribute('data-placement', 'top');
 	await page.mouse.move(24, 24);
 	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-2.png', { maxDiffPixels: 200 });
 
 	await page.getByRole('button', { name: 'Previous' }).click();
-	await expect(tooltip).toContainText('Plan review');
+	await expect(tooltip).toContainText('Pick a starting environment');
 
 	await page.getByRole('button', { name: 'Next' }).click();
+	await page.getByRole('button', { name: 'Next' }).click();
+	await expect(tooltip).toContainText('Ship the starter app');
+	await expect(tooltip).toHaveAttribute('data-placement', 'left');
 	await page.getByRole('button', { name: 'Finish' }).click();
 
 	await expect(tooltip).toBeHidden();
