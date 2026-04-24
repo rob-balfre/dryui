@@ -127,7 +127,7 @@ describe('runInit', () => {
 			'Options:',
 			'  [path]           Target directory (default: current directory)',
 			'  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)',
-			'  --no-launch      Skip the feedback dashboard launch prompt after scaffold',
+			'  --no-launch      Skip the feedback-mode launch prompt after scaffold',
 			'  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />'
 		]);
 		expect(result.errors).toEqual([]);
@@ -418,9 +418,9 @@ describe('runInit', () => {
 		expect(writtenPackageJson.overrides['@dryui/lint']).toBe(`file:${lintTarball}`);
 	});
 
-	test('scaffold launches feedback dashboard when the user confirms the prompt', async () => {
+	test('scaffold launches project feedback mode when the user confirms the prompt', async () => {
 		const { root, target, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
-		const launcherCalls: Array<{ cwd: string }> = [];
+		const launcherCalls: Array<{ cwd: string; portPromptResult: boolean }> = [];
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
@@ -428,16 +428,24 @@ describe('runInit', () => {
 					runCommand: () => true,
 					...feedback.stubs,
 					promptLaunch: async () => true,
-					runLauncher: async (cwd) => {
-						launcherCalls.push({ cwd });
+					promptKillPortHolder: async (holder, port) =>
+						holder.pid === 12345 && holder.command === 'node' && port === 5173,
+					runLauncher: async (cwd, _spec, launcherRuntime) => {
+						launcherCalls.push({
+							cwd,
+							portPromptResult: await launcherRuntime.promptKillPortHolder(
+								{ pid: 12345, command: 'node' },
+								5173
+							)
+						});
 					}
 				})
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(launcherCalls).toEqual([{ cwd: target }]);
-		expect(result.logs).toContain('  Launching feedback dashboard...');
+		expect(launcherCalls).toEqual([{ cwd: target, portPromptResult: true }]);
+		expect(result.logs).toContain('  Launching project in feedback mode...');
 		// The "Next steps:" block is skipped when the launcher runs.
 		expect(result.logs.some((line) => line.includes('Next steps:'))).toBe(false);
 	});
@@ -463,7 +471,9 @@ describe('runInit', () => {
 		expect(launcherCalls).toEqual([]);
 		expect(result.logs).toContain('    cd projects/smoke');
 		expect(result.logs).toContain('    bun run dev');
-		expect(result.logs.some((line) => line.includes('Tip: run `bunx @dryui/cli`'))).toBe(true);
+		expect(result.logs).toContain(
+			'  Tip: run `bunx @dryui/cli` in the project to start feedback mode alongside dev.'
+		);
 	});
 
 	test('--no-launch skips the launch prompt even in a TTY', async () => {

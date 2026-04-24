@@ -22,7 +22,8 @@ import {
 	mountFeedbackInLayout,
 	patchViteConfigFeedbackNoExternal,
 	type InstallPackageOptions,
-	type MountFeedbackOptions
+	type MountFeedbackOptions,
+	type PortHolder
 } from './launch-utils.js';
 import { runUserProjectLauncher } from './launcher.js';
 import {
@@ -52,7 +53,12 @@ interface InitRuntime {
 	findViteConfig?: (root: string) => string | null;
 	isInteractiveTTY?: () => boolean;
 	promptLaunch?: () => Promise<boolean>;
-	runLauncher?: (cwd: string, spec: Spec) => Promise<void>;
+	promptKillPortHolder?: (holder: PortHolder, port: number) => Promise<boolean>;
+	runLauncher?: (
+		cwd: string,
+		spec: Spec,
+		runtime: { promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean> }
+	) => Promise<void>;
 }
 
 interface ParsedInstallCommand {
@@ -75,7 +81,7 @@ function printInitHelp(exitCode = 0): never {
 	console.log('Options:');
 	console.log('  [path]           Target directory (default: current directory)');
 	console.log('  --pm <manager>   Package manager: bun, npm, pnpm, yarn (auto-detected)');
-	console.log('  --no-launch      Skip the feedback dashboard launch prompt after scaffold');
+	console.log('  --no-launch      Skip the feedback-mode launch prompt after scaffold');
 	console.log('  --no-feedback    Skip installing @dryui/feedback and mounting <Feedback />');
 	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
 	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
@@ -373,7 +379,7 @@ async function promptLaunchFeedbackDefault(): Promise<boolean> {
 
 	const rl = createInterface({ input, output });
 	try {
-		const answer = (await rl.question('  Launch feedback dashboard now? (Y/n) '))
+		const answer = (await rl.question('  Run this project in feedback mode now? (Y/n) '))
 			.trim()
 			.toLowerCase();
 		if (!answer) return true;
@@ -386,8 +392,45 @@ async function promptLaunchFeedbackDefault(): Promise<boolean> {
 	}
 }
 
-async function runLauncherDefault(cwd: string, spec: Spec): Promise<void> {
-	await runUserProjectLauncher([], { cwd, spec });
+async function promptKillPortHolderDefault(holder: PortHolder, port: number): Promise<boolean> {
+	if (!isInteractiveTTY()) return false;
+
+	const previousRawMode = Boolean(input.isRaw);
+	if (typeof input.setRawMode === 'function') {
+		input.setRawMode(false);
+	}
+	input.resume();
+
+	const rl = createInterface({ input, output });
+	try {
+		const answer = (
+			await rl.question(
+				`  Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Stop it and start this project? (y/N) `
+			)
+		)
+			.trim()
+			.toLowerCase();
+		return answer === 'y' || answer === 'yes';
+	} finally {
+		rl.close();
+		if (typeof input.setRawMode === 'function') {
+			input.setRawMode(previousRawMode);
+		}
+	}
+}
+
+async function runLauncherDefault(
+	cwd: string,
+	spec: Spec,
+	runtime: Pick<InitRuntime, 'promptKillPortHolder'> = {}
+): Promise<void> {
+	await runUserProjectLauncher([], {
+		cwd,
+		spec,
+		runtime: {
+			promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
+		}
+	});
 }
 
 function applyDevTarballsToSteps(
@@ -501,9 +544,16 @@ export async function runInit(
 		const shouldLaunch = await (runtime.promptLaunch ?? promptLaunchFeedbackDefault)();
 		if (shouldLaunch) {
 			log('');
-			log('  Launching feedback dashboard...');
+			log('  Launching project in feedback mode...');
 			log('');
-			await (runtime.runLauncher ?? runLauncherDefault)(targetPath, spec);
+			const launcherRuntime = {
+				promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
+			};
+			if (runtime.runLauncher) {
+				await runtime.runLauncher(targetPath, spec, launcherRuntime);
+			} else {
+				await runLauncherDefault(targetPath, spec, launcherRuntime);
+			}
 			return;
 		}
 	}
@@ -529,9 +579,7 @@ export async function runInit(
 	log(`    ${devCommand}`);
 	if (isScaffold && feedbackReady) {
 		log('');
-		log(
-			'  Tip: run `bunx @dryui/cli` in the project to open the feedback dashboard alongside dev.'
-		);
+		log('  Tip: run `bunx @dryui/cli` in the project to start feedback mode alongside dev.');
 	}
 	log('');
 }
