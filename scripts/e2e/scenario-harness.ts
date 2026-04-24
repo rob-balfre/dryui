@@ -21,11 +21,7 @@ import { createServer } from 'node:net';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import {
-	killOwnedProcess,
-	urlResponds,
-	waitForUrl
-} from '../../packages/cli/src/commands/launch-utils.ts';
+import { killOwnedProcess, waitForUrl } from '../../packages/cli/src/commands/launch-utils.ts';
 import { runCodexExec, summarizeCodexRun, type CodexRunResult } from './codex-runner.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
@@ -40,6 +36,9 @@ const defaultTarballsDir = resolve(repoRoot, 'reports/e2e-tarballs');
 const BLANK_PNG_BASE64 =
 	'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 const BLANK_WEBP_BASE64 = 'UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==';
+const FEEDBACK_FETCH_TIMEOUT_MS = 10_000;
+const CODEX_HEARTBEAT_MS = 30_000;
+const CODEX_STDIN_NOTICE = 'Reading additional input from stdin...';
 
 export interface ScenarioDefinition {
 	readonly name: string;
@@ -86,6 +85,11 @@ export interface RunScenarioOptions {
 	readonly tarballsDir?: string;
 	readonly keepProject?: boolean;
 	readonly verbose?: boolean;
+	readonly streamCodex?: boolean;
+	readonly codexStreamRaw?: boolean;
+	readonly useUserCodexConfig?: boolean;
+	readonly useLocalDryuiPlugin?: boolean;
+	readonly codexTimeoutMs?: number;
 }
 
 const RESULT_SCHEMA_VERSION = 1;
@@ -226,7 +230,8 @@ async function postSyntheticFeedback(port: number, prompt: string): Promise<{ id
 	const response = await fetch(`http://127.0.0.1:${port}/submissions`, {
 		method: 'POST',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(body)
+		body: JSON.stringify(body),
+		signal: AbortSignal.timeout(FEEDBACK_FETCH_TIMEOUT_MS)
 	});
 	if (!response.ok) {
 		throw new Error(`submissions POST ${response.status}: ${await response.text()}`);
@@ -236,7 +241,9 @@ async function postSyntheticFeedback(port: number, prompt: string): Promise<{ id
 }
 
 async function assertPendingSubmission(port: number, submissionId: string): Promise<void> {
-	const response = await fetch(`http://127.0.0.1:${port}/submissions?status=pending`);
+	const response = await fetch(`http://127.0.0.1:${port}/submissions?status=pending`, {
+		signal: AbortSignal.timeout(FEEDBACK_FETCH_TIMEOUT_MS)
+	});
 	if (!response.ok) throw new Error(`submissions GET ${response.status}`);
 	const data = (await response.json()) as { count: number; submissions: Array<{ id: string }> };
 	if (!data.submissions.some((s) => s.id === submissionId)) {
@@ -379,6 +386,115 @@ function killChild(child: ChildProcess | null): void {
 	if (child?.pid) killOwnedProcess(child.pid);
 }
 
+function describeCodexLine(line: string): string | null {
+	const trimmed = line.trim();
+	if (!trimmed) return null;
+	try {
+		const event = JSON.parse(trimmed) as {
+			type?: string;
+			item?: { type?: string; title?: string; status?: string; text?: string };
+		};
+		if (!event.type) return null;
+		if (event.type === 'turn.started' || event.type === 'turn.completed') return event.type;
+		if (event.type === 'item.started' || event.type === 'item.completed') {
+			const itemType = event.item?.type ? ` ${event.item.type}` : '';
+			const status = event.item?.status ? ` ${event.item.status}` : '';
+			const title = event.item?.title ? `: ${event.item.title}` : '';
+			return `${event.type}${itemType}${status}${title}`;
+		}
+		if (event.type === 'error') return 'error';
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+	return value && typeof value === 'object' && !Array.isArray(value)
+		? (value as Record<string, unknown>)
+		: null;
+}
+
+function stringValue(value: unknown): string | null {
+	return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function compactText(value: string, max = 600): string {
+	const oneLine = value.replace(/\s+/g, ' ').trim();
+	return oneLine.length > max ? `${oneLine.slice(0, max - 1)}…` : oneLine;
+}
+
+function firstString(record: Record<string, unknown>, keys: readonly string[]): string | null {
+	for (const key of keys) {
+		const value = stringValue(record[key]);
+		if (value) return value;
+	}
+	return null;
+}
+
+function contentText(value: unknown): string | null {
+	const direct = stringValue(value);
+	if (direct) return direct;
+	if (Array.isArray(value)) {
+		const parts = value
+			.map((part) => {
+				const record = asRecord(part);
+				return record
+					? firstString(record, ['text', 'message', 'content', 'delta'])
+					: stringValue(part);
+			})
+			.filter((part): part is string => part !== null);
+		return parts.length > 0 ? parts.join(' ') : null;
+	}
+	const record = asRecord(value);
+	if (!record) return null;
+	return (
+		firstString(record, ['text', 'message', 'content', 'delta', 'output', 'error']) ??
+		contentText(record.content)
+	);
+}
+
+function formatCodexStreamLine(line: string): string | null {
+	const trimmed = line.trim();
+	if (!trimmed) return null;
+	try {
+		const event = JSON.parse(trimmed) as Record<string, unknown>;
+		const type = stringValue(event.type) ?? 'event';
+		const item = asRecord(event.item);
+		if (type === 'thread.started') {
+			const threadId = stringValue(event.thread_id);
+			return threadId ? `thread started ${threadId}` : 'thread started';
+		}
+		if (type === 'turn.started') return 'turn started';
+		if (type === 'turn.completed') {
+			const usage = asRecord(event.usage);
+			if (!usage) return 'turn completed';
+			const input = usage.input_tokens ?? '?';
+			const cached = usage.cached_input_tokens ?? '?';
+			const output = usage.output_tokens ?? '?';
+			return `turn completed tokens in=${input} cached=${cached} out=${output}`;
+		}
+		if (type === 'item.started' || type === 'item.completed' || type === 'item.updated') {
+			const itemType = item ? firstString(item, ['type']) : null;
+			const status = item ? firstString(item, ['status']) : null;
+			const title = item ? firstString(item, ['title', 'path', 'command']) : null;
+			const text = item
+				? (contentText(item.content) ??
+					firstString(item, ['text', 'message', 'delta', 'output', 'error']))
+				: null;
+			const details = [itemType, status, title].filter((part): part is string => part !== null);
+			const suffix = text ? `: ${compactText(text)}` : '';
+			return `${type}${details.length > 0 ? ` ${details.join(' ')}` : ''}${suffix}`;
+		}
+		const text =
+			contentText(event.content) ??
+			firstString(event, ['text', 'message', 'delta', 'output', 'error', 'error_message']);
+		return text ? `${type}: ${compactText(text)}` : type;
+	} catch {
+		return compactText(trimmed);
+	}
+}
+
 export async function runScenario(
 	scenario: ScenarioDefinition,
 	options: RunScenarioOptions = {}
@@ -404,6 +520,17 @@ export async function runScenario(
 	const log = (msg: string) => {
 		if (options.verbose) console.log(`[${scenario.name}] ${msg}`);
 	};
+	const progress = (msg: string) => {
+		console.log(`[${scenario.name}] ${msg}`);
+	};
+	const runPhase = async <T>(p: ScenarioPhase, fn: () => Promise<T>): Promise<T | null> => {
+		progress(`${p.name}…`);
+		const result = await time(p, fn);
+		const duration = `${(p.durationMs / 1000).toFixed(1)}s`;
+		const note = p.note ? ` (${p.note})` : '';
+		progress(`${p.ok ? '✓' : '✗'} ${p.name} ${duration}${note}`);
+		return result;
+	};
 
 	try {
 		log(`project dir: ${projectDir}`);
@@ -411,21 +538,21 @@ export async function runScenario(
 
 		const pScaffold = phase('scaffold');
 		phases.push(pScaffold);
-		await time(pScaffold, async () => {
+		await runPhase(pScaffold, async () => {
 			scaffold(projectDir, tarballsDir, logDir);
 		});
 		if (!pScaffold.ok) return finalize(false);
 
 		const pFeedbackUp = phase('feedback-up');
 		phases.push(pFeedbackUp);
-		feedbackChild = await time(pFeedbackUp, async () => {
+		feedbackChild = await runPhase(pFeedbackUp, async () => {
 			return await startFeedbackServer(projectDir, logDir, feedbackPort);
 		});
 		if (!pFeedbackUp.ok) return finalize(false);
 
 		const pSubmission = phase('feedback-submission');
 		phases.push(pSubmission);
-		await time(pSubmission, async () => {
+		await runPhase(pSubmission, async () => {
 			const submission = await postSyntheticFeedback(feedbackPort, scenario.prompt);
 			await assertPendingSubmission(feedbackPort, submission.id);
 			pSubmission.note = `id=${submission.id}`;
@@ -437,38 +564,82 @@ export async function runScenario(
 
 		const pCodex = phase('codex');
 		phases.push(pCodex);
-		codex = await time(pCodex, async () => {
-			const result = await runCodexExec({
-				projectDir,
-				prompt: scenario.prompt,
-				logDir,
-				timeoutMs: scenario.codexTimeoutMs,
-				...(scenario.codexModel ? { model: scenario.codexModel } : {})
-			});
-			if (!result.ok) {
-				throw new Error(`codex exec failed\n${summarizeCodexRun(result)}`);
+		codex = await runPhase(pCodex, async () => {
+			let lastCodexEvent = 'starting';
+			const started = Date.now();
+			const codexTimeoutMs = options.codexTimeoutMs ?? scenario.codexTimeoutMs;
+			const streamCodex = options.streamCodex === true;
+			const streamRawCodex = options.codexStreamRaw === true || options.verbose === true;
+			if (options.useUserCodexConfig === true) {
+				progress('codex config: user ~/.codex');
+			} else if (options.useLocalDryuiPlugin !== false) {
+				progress('codex config: local packages/plugin');
+			} else {
+				progress('codex config: isolated without plugins');
 			}
-			return result;
+			const heartbeat = setInterval(() => {
+				progress(
+					`codex still running (${((Date.now() - started) / 1000).toFixed(0)}s): ${lastCodexEvent}`
+				);
+			}, CODEX_HEARTBEAT_MS);
+			heartbeat.unref();
+			try {
+				const result = await runCodexExec({
+					projectDir,
+					prompt: scenario.prompt,
+					logDir,
+					...(scenario.codexModel ? { model: scenario.codexModel } : {}),
+					...(codexTimeoutMs !== undefined ? { timeoutMs: codexTimeoutMs } : {}),
+					useUserConfig: options.useUserCodexConfig === true,
+					useLocalDryuiPlugin: options.useLocalDryuiPlugin !== false,
+					onStdoutLine: (line) => {
+						const description = describeCodexLine(line);
+						if (description) lastCodexEvent = description;
+						if (streamRawCodex) {
+							console.log(`[${scenario.name}] codex json: ${line}`);
+						} else if (streamCodex) {
+							const formatted = formatCodexStreamLine(line);
+							if (formatted) console.log(`[${scenario.name}] codex ${formatted}`);
+						}
+					},
+					onStderrLine: (line) => {
+						lastCodexEvent = line;
+						if (line.trim() === CODEX_STDIN_NOTICE) {
+							if (streamCodex || streamRawCodex || options.verbose) {
+								console.log(`[${scenario.name}] codex info: ${line}`);
+							}
+							return;
+						}
+						console.error(`[${scenario.name}] codex stderr: ${line}`);
+					}
+				});
+				if (!result.ok) {
+					throw new Error(`codex exec failed\n${summarizeCodexRun(result)}`);
+				}
+				return result;
+			} finally {
+				clearInterval(heartbeat);
+			}
 		});
 		if (!pCodex.ok) return finalize(false);
 
 		const pBuild = phase('build');
 		phases.push(pBuild);
-		await time(pBuild, async () => {
+		await runPhase(pBuild, async () => {
 			await runProjectBuild(projectDir, logDir);
 		});
 		if (!pBuild.ok) return finalize(false);
 
 		const pDevUp = phase('dev-up');
 		phases.push(pDevUp);
-		devChild = await time(pDevUp, async () => {
+		devChild = await runPhase(pDevUp, async () => {
 			return await startDevServer(projectDir, logDir, devPort, options.keepProject === true);
 		});
 		if (!pDevUp.ok) return finalize(false);
 
 		const pAsserts = phase('assertions');
 		phases.push(pAsserts);
-		await time(pAsserts, async () => {
+		await runPhase(pAsserts, async () => {
 			const result = await runAssertions(
 				projectDir,
 				logDir,

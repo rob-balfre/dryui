@@ -89,6 +89,19 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 		keywords: ['cli', 'install', 'commands', 'init', 'detect', 'tokens', 'feedback']
 	},
 	{
+		path: '/docs/design-brief',
+		label: 'Design brief',
+		description: 'Write DESIGN.md briefs that steer DryUI generation and rendered checks',
+		keywords: ['design', 'brief', 'DESIGN.md', 'pipeline', 'rendered checks']
+	},
+	{
+		path: '/docs/polish-pass',
+		label: 'Polish pass',
+		description:
+			'Apply the feel-better polish rubric with DryUI primitives, lint rules, and visual checks',
+		keywords: ['polish', 'feel-better', 'visual checks', 'rubric']
+	},
+	{
 		path: '/how-it-works',
 		label: 'How it works',
 		description: 'Architecture and mental model for DryUI-backed apps'

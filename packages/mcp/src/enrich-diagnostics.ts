@@ -196,6 +196,36 @@ const HINTS: Record<string, HintBuilder> = {
 	'vision/parse-error': () => ({
 		hint: 'The vision model returned content that did not parse as JSON. Inspect the raw response in the `evidence` field (usually a transient model hiccup); rerun the check.',
 		docsRef: `${DOCS_BASE}/concepts/troubleshooting#vision-parse-errors`
+	}),
+
+	// -- design brief ----------------------------------------------------------
+	'design/missing-frontmatter': () => ({
+		hint: 'Start DESIGN.md with YAML frontmatter. At minimum include `name:` and `overview:` so MCP and CLI checks can pass identity into visual review.',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/missing-name': () => ({
+		hint: 'Add a concrete product, surface, or interface name in `name:` or the first H1. This gives visual review a stable identity to preserve.',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/missing-overview': () => ({
+		hint: 'Add a short overview that names the target user, job, and interface intent. Avoid generic phrases like "modern app".',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/missing-colors': () => ({
+		hint: 'Describe the color direction: palette intent, contrast expectations, and any surface/accent rules the visual reviewer should enforce.',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/missing-typography': () => ({
+		hint: 'Describe typography direction: hierarchy, density, tone, and whether the UI should feel editorial, operational, playful, or restrained.',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/missing-do-donts': () => ({
+		hint: "Add Do and Don't bullets that capture hard guardrails, such as density, imagery, motion, and anti-patterns to avoid.",
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
+	}),
+	'design/too-vague': () => ({
+		hint: 'Replace generic identity language with concrete domain nouns, user goals, and interface qualities that can be seen in a screenshot.',
+		docsRef: `${DOCS_BASE}/concepts/design-briefs`
 	})
 };
 

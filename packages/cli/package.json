@@ -24,6 +24,8 @@
   },
   "scripts": {
     "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node --external playwright",
+    "check": "bun run --filter '@dryui/mcp' build && tsc -p tsconfig.json --noEmit",
+    "test": "bun run --filter '@dryui/mcp' generate-spec && bun test src",
     "check:publint": "publint",
     "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"

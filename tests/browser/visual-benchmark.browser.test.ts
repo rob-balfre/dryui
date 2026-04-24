@@ -44,9 +44,18 @@ test('visual benchmark theme helper forces light tokens and restores the previou
 test.skipIf(import.meta.env.DRYUI_CI)('visual benchmark scene stays stable', async () => {
 	const { root } = renderScene();
 
-	await expect(root).toMatchScreenshot('visual-benchmark-scene', {
-		screenshotOptions: {
-			animations: 'disabled'
+	try {
+		await expect(root).toMatchScreenshot('visual-benchmark-scene', {
+			screenshotOptions: {
+				animations: 'disabled'
+			}
+		});
+	} catch (err) {
+		// First local run writes the baseline and throws; treat that as a pass
+		// so a fresh checkout doesn't fail. Real drift on subsequent runs surfaces as a mismatch.
+		if (err instanceof Error && /No existing reference screenshot found/.test(err.message)) {
+			return;
 		}
-	});
+		throw err;
+	}
 });

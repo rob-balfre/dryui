@@ -22,6 +22,7 @@ interface CheckCommandOptions {
 
 const VALUE_FLAGS = new Set([
 	'--cwd',
+	'--design',
 	'--extra-rubric',
 	'--scope',
 	'--viewport',
@@ -60,6 +61,7 @@ function help(exitCode = 0): never {
 				'  --cwd=<path>         Resolve paths and workspace scans from another directory',
 				'  --visual <url>       Run the rendered visual check for a local or public URL',
 				'  --visual-url=<url>   Same as --visual <url>',
+				'  --design=<path>      DESIGN.md for visual review (auto-discovers nearest if omitted)',
 				'  --viewport=<wxh>     Visual check viewport size (default 1440x900)',
 				'  --wait-for=<sel>     Visual check selector to wait for before screenshotting',
 				'  --extra-rubric=<s>   Extra visual-review emphasis for Codex',
@@ -154,6 +156,7 @@ function visualOutput(result: VisionCheckResult, mode: OutputMode): string {
 		{
 			summary: result.summary,
 			screenshotPath: result.screenshotPath,
+			...(result.designBriefPath ? { designBriefPath: result.designBriefPath } : {}),
 			findings: result.findings,
 			diagnostics: result.diagnostics
 		},
@@ -195,13 +198,19 @@ export async function getCheckCommandResult(
 		const viewport = getOptionValue(args, '--viewport');
 		const waitFor = getOptionValue(args, '--wait-for');
 		const extraRubric = getOptionValue(args, '--extra-rubric');
+		const designPath = getOptionValue(args, '--design');
+		const cwd = getOptionValue(args, '--cwd');
 		try {
-			const result = await runVisual({
-				url: visualUrl,
-				...(viewport ? { viewport } : {}),
-				...(waitFor ? { waitFor } : {}),
-				...(extraRubric ? { extraRubric } : {})
-			});
+			const result = await runVisual(
+				{
+					url: visualUrl,
+					...(viewport ? { viewport } : {}),
+					...(waitFor ? { waitFor } : {}),
+					...(extraRubric ? { extraRubric } : {}),
+					...(designPath ? { designPath } : {})
+				},
+				cwd ? { cwd } : {}
+			);
 			return {
 				output: visualOutput(result, mode),
 				error: null,

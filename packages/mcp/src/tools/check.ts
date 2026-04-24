@@ -1,13 +1,15 @@
 import { readFileSync, statSync, type Stats } from 'node:fs';
-import { relative, resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import { checkTheme } from '@dryui/lint/rules';
 import { RULE_CATALOG, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { checkComponent } from '../component-checker.js';
+import { analyzeDesignBrief, DESIGN_BRIEF_FILENAME } from '../design-brief.js';
 import { diagnoseTheme } from '../theme-checker.js';
 import { scanWorkspace, type WorkspaceReport } from '../workspace-audit.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import type { Spec } from '../spec-types.js';
 import { enrichDiagnostic } from '../enrich-diagnostics.js';
+import { displayPath } from '../utils.js';
 import type {
 	DryUiRepairIssue,
 	DryUiRepairIssueSeverity,
@@ -80,11 +82,6 @@ export interface CheckResult {
 
 function cap(value: string, max = FIELD_CAP): string {
 	return truncateField(value, max)[0];
-}
-
-function displayPath(absPath: string): string {
-	const rel = relative(process.cwd(), absPath);
-	return rel && !rel.startsWith('..') ? rel : absPath;
 }
 
 /**
@@ -313,6 +310,48 @@ function renderComponent(
 	return { text, diagnostics, summary };
 }
 
+function renderDesign(absPath: string, cwd?: string): CheckResult {
+	const brief = analyzeDesignBrief(absPath, cwd);
+	const issues: CheckIssue[] = brief.issues.map((issue) => ({
+		file: brief.displayPath,
+		line: issue.line,
+		rule: issue.code,
+		severity: issue.severity,
+		message: issue.message,
+		suggestedFix: issue.suggestedFix
+	}));
+	const diagnostics = dedupeDiagnostics(
+		brief.issues.map((issue) =>
+			enrichDiagnostic({
+				source: 'design',
+				code: issue.code,
+				severity: issue.severity,
+				message: issue.message,
+				file: brief.displayPath,
+				...(issue.line !== null ? { line: issue.line } : {})
+			})
+		)
+	);
+	const summary = deriveDiagnosticSummary(diagnostics);
+	const identity = brief.name
+		? `identity: ${brief.name}${brief.overview ? ` | overview: ${brief.overview}` : ''}`
+		: null;
+
+	const text = renderCheckReport({
+		kind: 'design',
+		targetLine: `target: ${brief.displayPath}`,
+		issues,
+		diagnosticSummary: summary,
+		summaryLine: brief.summary,
+		extraBlocks: identity ? [identity] : [],
+		nextHints: [
+			'check --visual <url> -- run a rendered review with this DESIGN.md context',
+			'check <file.svelte> -- run the static checker on the implementation'
+		]
+	});
+	return { text, diagnostics, summary };
+}
+
 function renderWorkspace(result: WorkspaceReport): CheckResult {
 	const issues: CheckIssue[] = result.findings.map((finding) => ({
 		file: finding.file,
@@ -441,10 +480,14 @@ export function runCheckStructured(
 		return renderTheme(spec, absPath, categoryFilter);
 	}
 
+	if (basename(absPath) === DESIGN_BRIEF_FILENAME) {
+		return renderDesign(absPath, options.cwd);
+	}
+
 	throw new StructuredToolError(
 		'unsupported-path',
 		`Unsupported path type: ${displayPath(absPath)}`,
-		['check', 'check <file.svelte>', 'check <theme.css>', 'check <directory>']
+		['check', 'check <file.svelte>', 'check <theme.css>', 'check DESIGN.md', 'check <directory>']
 	);
 }
 

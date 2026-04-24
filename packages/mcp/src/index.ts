@@ -113,8 +113,9 @@ const CHECK_DESC = [
 	'- no path: workspace scan\n',
 	'- `.svelte` file: component review\n',
 	'- `.css` file: theme diagnosis\n',
+	'- `DESIGN.md`: design brief diagnosis\n',
 	'- directory: workspace scan scoped to that directory\n',
-	'- `visualUrl`: render a URL in headless Chromium and critique the screenshot with Codex CLI\n\n',
+	'- `visualUrl`: render a URL in headless Chromium and critique the screenshot with Codex CLI; auto-discovers nearest DESIGN.md unless `designPath` is provided\n\n',
 	'Scope filter (maps to `--polish` / `--no-polish` CLI flags):\n',
 	'- `scope: "polish"`: only polish-category rules (raw headings, tabular nums, enter/exit timing, etc.)\n',
 	'- `scope: "no-polish"`: everything except polish (default correctness + a11y pass)\n',
@@ -127,6 +128,7 @@ function visionToolResponse(result: Awaited<ReturnType<typeof runVisionCheck>>) 
 		{
 			summary: result.summary,
 			screenshotPath: result.screenshotPath,
+			...(result.designBriefPath ? { designBriefPath: result.designBriefPath } : {}),
 			findings: result.findings,
 			diagnostics: result.diagnostics
 		},
@@ -178,18 +180,28 @@ server.tool(
 		waitFor: z
 			.string()
 			.optional()
-			.describe('Optional CSS selector to wait for before visualUrl screenshotting.')
+			.describe('Optional CSS selector to wait for before visualUrl screenshotting.'),
+		designPath: z
+			.string()
+			.optional()
+			.describe(
+				'Optional DESIGN.md path for visualUrl. If omitted, the tool auto-discovers the nearest DESIGN.md from cwd and uses it when present.'
+			)
 	},
-	async ({ path, cwd, scope, visualUrl, viewport, extraRubric, waitFor }) => {
+	async ({ path, cwd, scope, visualUrl, viewport, extraRubric, waitFor, designPath }) => {
 		try {
 			if (visualUrl) {
 				return visionToolResponse(
-					await runVisionCheck({
-						url: visualUrl,
-						...(viewport ? { viewport } : {}),
-						...(extraRubric ? { extraRubric } : {}),
-						...(waitFor ? { waitFor } : {})
-					})
+					await runVisionCheck(
+						{
+							url: visualUrl,
+							...(viewport ? { viewport } : {}),
+							...(extraRubric ? { extraRubric } : {}),
+							...(waitFor ? { waitFor } : {}),
+							...(designPath ? { designPath } : {})
+						},
+						cwd ? { cwd } : {}
+					)
 				);
 			}
 
@@ -247,16 +259,23 @@ server.tool(
 		waitFor: z
 			.string()
 			.optional()
-			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).')
+			.describe('Optional CSS selector to wait for before screenshotting (e.g. `.demo-surface`).'),
+		designPath: z
+			.string()
+			.optional()
+			.describe(
+				'Optional DESIGN.md path. If omitted, check-vision auto-discovers the nearest DESIGN.md from the current working directory and uses it when present.'
+			)
 	},
-	async ({ url, viewport, extraRubric, waitFor }) => {
+	async ({ url, viewport, extraRubric, waitFor, designPath }) => {
 		try {
 			return visionToolResponse(
 				await runVisionCheck({
 					url,
 					...(viewport ? { viewport } : {}),
 					...(extraRubric ? { extraRubric } : {}),
-					...(waitFor ? { waitFor } : {})
+					...(waitFor ? { waitFor } : {}),
+					...(designPath ? { designPath } : {})
 				})
 			);
 		} catch (error) {

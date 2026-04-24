@@ -203,4 +203,61 @@ describe('runCheck', () => {
 		const expectedErrorCount = result.diagnostics.filter((d) => d.severity === 'error').length;
 		expect(result.summary.counts.error).toBe(expectedErrorCount);
 	});
+
+	test('a DESIGN.md path triggers design brief validation', () => {
+		const root = createProject({
+			'DESIGN.md': [
+				'---',
+				'name: LedgerFlow',
+				'overview: Quiet finance operations workspace for analysts.',
+				'colors: Neutral surfaces, restrained blue accent, severity status colors.',
+				'typography: Compact hierarchy with tabular numbers and strong table legibility.',
+				"do-donts: Do prioritize tables and filters. Don't use marketing heroes or nested cards.",
+				'---',
+				'',
+				'# LedgerFlow',
+				'',
+				'## Principles',
+				'',
+				'- Work-focused, compact, and scannable.',
+				'- Neutral surfaces with one restrained brand accent.',
+				'- Tables, filters, and exception states take priority.',
+				'',
+				'## Feel Better Polish',
+				'',
+				'- Page headers should feel connected with deliberate vertical rhythm.',
+				'- Controls should keep stable dimensions while users scan or hover.',
+				'- Rows should align badges, amounts, and timestamps on shared baselines.',
+				'',
+				'## Avoid',
+				'',
+				'- Oversized hero sections.',
+				'- Nested cards.'
+			].join('\n')
+		});
+
+		const result = runCheckStructured(spec, { path: 'DESIGN.md' }, { cwd: root });
+
+		expect(result.text).toContain('kind: design');
+		expect(result.text).toContain('LedgerFlow');
+		expect(result.summary.hasBlockers).toBe(false);
+		expect(result.diagnostics).toHaveLength(0);
+	});
+
+	test('invalid DESIGN.md diagnostics are surfaced through check', () => {
+		const root = createProject({
+			'DESIGN.md': ['# nice ui', '', '## Principles', '', '- Keep it modern.'].join('\n')
+		});
+
+		const result = runCheckStructured(spec, { path: 'DESIGN.md' }, { cwd: root });
+
+		expect(result.text).toContain('kind: design');
+		expect(result.diagnostics.length).toBeGreaterThan(0);
+		expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+			'design/missing-frontmatter'
+		);
+		expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toContain(
+			'design/missing-overview'
+		);
+	});
 });

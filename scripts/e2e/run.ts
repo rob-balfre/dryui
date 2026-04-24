@@ -6,6 +6,10 @@
  *   bun run scripts/e2e/run.ts                    # run every scenario
  *   bun run scripts/e2e/run.ts --only dashboard   # just one
  *   bun run scripts/e2e/run.ts --verbose          # stream phase updates
+ *   bun run scripts/e2e/run.ts --stream-codex     # stream decoded Codex events
+ *   bun run scripts/e2e/run.ts --codex-stream-raw # stream raw Codex JSONL
+ *   bun run scripts/e2e/run.ts --no-codex-plugin  # no DryUI plugin, no user config
+ *   bun run scripts/e2e/run.ts --codex-user-config # inherit ~/.codex/config.toml instead
  *   bun run scripts/e2e/run.ts --keep-project     # leave dev server running, print URL
  *   bun run scripts/e2e/run.ts --tarballs <dir>   # override tarball source
  *   bun run scripts/e2e/run.ts --skip-pack        # trust existing tarballs
@@ -33,43 +37,91 @@ interface CliFlags {
 	tarballsDir: string;
 	keepProject: boolean;
 	verbose: boolean;
+	streamCodex: boolean;
+	codexStreamRaw: boolean;
+	useUserCodexConfig: boolean;
+	useLocalDryuiPlugin: boolean;
 	skipPack: boolean;
 	open: boolean;
+	codexTimeoutMs: number | null;
+}
+
+function printUsage(): void {
+	console.log(
+		`Usage: bun run scripts/e2e/run.ts [--only <name>] [--tarballs <dir>]\n` +
+			`                                   [--keep-project] [--verbose] [--stream-codex]\n` +
+			`                                   [--codex-stream-raw] [--codex-user-config]\n` +
+			`                                   [--no-codex-plugin] [--skip-pack] [--open]\n` +
+			`                                   [--codex-timeout-ms <ms>]\n\n` +
+			`Scenarios: ${SCENARIOS.map((s) => s.name).join(', ')}`
+	);
 }
 
 function parseArgs(argv: string[]): CliFlags {
+	if (argv.includes('--help') || argv.includes('-h')) {
+		printUsage();
+		process.exit(0);
+	}
+
 	const flags: CliFlags = {
 		only: null,
 		tarballsDir: resolve(repoRoot, 'reports/e2e-tarballs'),
 		keepProject: false,
 		verbose: false,
+		streamCodex: false,
+		codexStreamRaw: false,
+		useUserCodexConfig: false,
+		useLocalDryuiPlugin: true,
 		skipPack: false,
-		open: false
+		open: false,
+		codexTimeoutMs: null
 	};
 	for (let i = 0; i < argv.length; i++) {
 		const arg = argv[i]!;
 		const next = argv[i + 1];
-		if (arg === '--only' && next) {
+		if (arg === '--only') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing scenario name after --only');
+				printUsage();
+				process.exit(2);
+			}
 			flags.only = next;
 			i++;
 		} else if (arg === '--tarballs' && next) {
 			flags.tarballsDir = resolve(next);
 			i++;
+		} else if (arg === '--codex-timeout-ms') {
+			if (!next || next.startsWith('-')) {
+				console.error('[e2e] missing millisecond value after --codex-timeout-ms');
+				printUsage();
+				process.exit(2);
+			}
+			const timeoutMs = Number(next);
+			if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+				console.error(`[e2e] invalid --codex-timeout-ms value: ${next}`);
+				process.exit(2);
+			}
+			flags.codexTimeoutMs = Math.floor(timeoutMs);
+			i++;
 		} else if (arg === '--keep-project') {
 			flags.keepProject = true;
 		} else if (arg === '--verbose') {
 			flags.verbose = true;
+		} else if (arg === '--stream-codex') {
+			flags.streamCodex = true;
+		} else if (arg === '--codex-stream-raw') {
+			flags.codexStreamRaw = true;
+		} else if (arg === '--codex-user-config') {
+			flags.useUserCodexConfig = true;
+			flags.useLocalDryuiPlugin = false;
+		} else if (arg === '--no-codex-plugin') {
+			flags.useLocalDryuiPlugin = false;
 		} else if (arg === '--skip-pack') {
 			flags.skipPack = true;
 		} else if (arg === '--open') {
 			flags.open = true;
-		} else if (arg === '--help' || arg === '-h') {
-			console.log(
-				`Usage: bun run scripts/e2e/run.ts [--only <name>] [--tarballs <dir>]\n` +
-					`                                   [--keep-project] [--verbose] [--skip-pack] [--open]\n\n` +
-					`Scenarios: ${SCENARIOS.map((s) => s.name).join(', ')}`
-			);
-			process.exit(0);
+		} else if (!arg.startsWith('-') && flags.only === null) {
+			flags.only = arg;
 		} else {
 			console.error(`Unknown flag: ${arg}`);
 			process.exit(2);
@@ -140,7 +192,12 @@ async function main(): Promise<void> {
 		const result = await runScenario(scenario, {
 			tarballsDir: flags.tarballsDir,
 			keepProject: flags.keepProject,
-			verbose: flags.verbose
+			verbose: flags.verbose,
+			streamCodex: flags.streamCodex,
+			codexStreamRaw: flags.codexStreamRaw,
+			useUserCodexConfig: flags.useUserCodexConfig,
+			useLocalDryuiPlugin: flags.useLocalDryuiPlugin,
+			...(flags.codexTimeoutMs !== null ? { codexTimeoutMs: flags.codexTimeoutMs } : {})
 		});
 		results.push(result);
 		console.log(formatScenarioResult(result));

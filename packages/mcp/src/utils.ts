@@ -1,4 +1,9 @@
-// Shared utility functions for DryUI MCP tools
+import { relative } from 'node:path';
+
+export function displayPath(absPath: string, cwd: string = process.cwd()): string {
+	const rel = relative(cwd, absPath);
+	return rel && !rel.startsWith('..') ? rel : absPath;
+}
 
 export function buildLineOffsets(text: string): number[] {
 	const offsets: number[] = [0];

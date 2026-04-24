@@ -102,7 +102,7 @@ const vmScript = [
 	'mkdir -p /app /vmshare/cmd.d',
 	'cd /app',
 	'echo "=== dryui init ==="',
-	'bunx -y @dryui/cli init . --pm bun',
+	'bunx @dryui/cli init . --pm bun',
 	'echo "=== installing @dryui/cli for vm:exec ==="',
 	'bun add -d @dryui/cli@latest',
 	'echo "=== cmd sidecar ==="',
