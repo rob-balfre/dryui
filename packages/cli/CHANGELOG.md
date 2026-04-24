@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.19.4
+
+### Patch Changes
+
+- [`22d46ce`](https://github.com/rob-balfre/dryui/commit/22d46ce1ace8e72a311568f2bef8a241c61b0afb) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Verify that an existing dev server on port 5173 belongs to the target project before reusing it. If another project's Vite server is holding the port during `dryui init` feedback launch, the CLI now prompts to stop it and starts the newly scaffolded project instead of opening feedback mode against the wrong app.
+
 ## 0.19.3
 
 ### Patch Changes

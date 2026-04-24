@@ -45,7 +45,7 @@
     },
     "packages/cli": {
       "name": "@dryui/cli",
-      "version": "0.19.3",
+      "version": "0.19.4",
       "bin": {
         "dryui": "./dist/index.js",
       },
