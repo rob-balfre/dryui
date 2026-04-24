@@ -603,6 +603,13 @@ interface FileContext {
 	content: string;
 	lines: string[];
 	lineStarts: number[];
+	/**
+	 * Optional comment-stripped lines used for terminator detection so trailing
+	 * `/* ... *\/` comments don't hide the `;`/`{`/`}` that would otherwise gate
+	 * an allow comment from a previous declaration. CSS callers populate this;
+	 * markup callers leave it undefined and fall back to `lines`.
+	 */
+	codeLines?: string[];
 }
 
 function hasAllowComment(file: FileContext, matchIndex: number, keyword: string): boolean {
@@ -610,9 +617,33 @@ function hasAllowComment(file: FileContext, matchIndex: number, keyword: string)
 	let idx = matchIndex;
 	while (idx < file.content.length && /[^a-zA-Z]/.test(file.content[idx]!)) idx++;
 	const declLine = lookupLine(file.lineStarts, idx);
+	if (declLine < 1) return false;
+
+	const allowMarker = `dryui-allow ${keyword}`;
+
+	// Same line, before the match: catches inline patterns like
+	// `box-shadow: 0 1px 0 black, /* dryui-allow inset-shadow */ inset 0 1px 0 white;`
+	// where the author wants to allow one specific value within a multi-value
+	// declaration.
+	const sameLineStart = file.lineStarts[declLine - 1] ?? 0;
+	if (file.content.slice(sameLineStart, idx).includes(allowMarker)) return true;
+
 	if (declLine <= 1) return false;
-	const prevLine = file.lines[declLine - 2] ?? '';
-	return prevLine.includes(`dryui-allow ${keyword}`);
+
+	// Walk back from the line above the match. The allow comment may sit above
+	// a multi-line declaration (e.g. `box-shadow:` with each value on its own
+	// line), so we step through continuation lines until we either find the
+	// marker or hit a `;`, `{`, or `}` that proves the comment belongs to a
+	// different declaration. `codeLines` (when provided) has CSS comments
+	// blanked out so trailing `/* ... */` can't hide a real terminator.
+	const codeLines = file.codeLines ?? file.lines;
+	for (let i = declLine - 2; i >= 0; i--) {
+		const markerLine = file.lines[i] ?? '';
+		if (markerLine.includes(allowMarker)) return true;
+		const codeLine = (codeLines[i] ?? markerLine).trimEnd();
+		if (/[;{}]$/.test(codeLine)) return false;
+	}
+	return false;
 }
 
 export interface StyleContext {
@@ -677,7 +708,8 @@ export function checkStyle(
 	const file: FileContext = {
 		content,
 		lines: content.split('\n'),
-		lineStarts: buildLineIndex(content)
+		lineStarts: buildLineIndex(content),
+		codeLines: scan.split('\n')
 	};
 	const lineOf = (i: number) => lookupLine(file.lineStarts, i);
 	const exemptClasses = context.chipGroupExemptClasses ?? new Set<string>();

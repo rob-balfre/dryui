@@ -22,7 +22,12 @@ const config = {
 			bundleStrategy: 'split'
 		},
 		prerender: {
-			entries: isDevCommand ? [] : ['*']
+			entries: isDevCommand ? [] : ['*'],
+			// Demos use placeholder hash hrefs (e.g. `#overview`, `#deploys`) to
+			// stand in for real navigation targets. The docs themselves don't rely
+			// on anchor IDs for navigation, so warn rather than fail when those
+			// fragments don't resolve to an element on the page.
+			handleMissingId: 'warn'
 		}
 	},
 	compilerOptions: {

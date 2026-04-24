@@ -5,21 +5,19 @@
 <Breadcrumb.Root>
 	<Breadcrumb.List>
 		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/orgs/acme">acme</Breadcrumb.Link>
+			<Breadcrumb.Link href="#acme">acme</Breadcrumb.Link>
 		</Breadcrumb.Item>
 		<Breadcrumb.Separator />
 		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/orgs/acme/projects/atlas">atlas</Breadcrumb.Link>
+			<Breadcrumb.Link href="#atlas">atlas</Breadcrumb.Link>
 		</Breadcrumb.Item>
 		<Breadcrumb.Separator />
 		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/orgs/acme/projects/atlas/env/production">production</Breadcrumb.Link>
+			<Breadcrumb.Link href="#production">production</Breadcrumb.Link>
 		</Breadcrumb.Item>
 		<Breadcrumb.Separator />
 		<Breadcrumb.Item>
-			<Breadcrumb.Link href="/orgs/acme/projects/atlas/env/production/deploys"
-				>Deploys</Breadcrumb.Link
-			>
+			<Breadcrumb.Link href="#deploys">Deploys</Breadcrumb.Link>
 		</Breadcrumb.Item>
 		<Breadcrumb.Separator />
 		<Breadcrumb.Item>

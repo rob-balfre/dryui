@@ -710,6 +710,80 @@ describe('checkStyle', () => {
 		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
 	});
 
+	test('allows partial inset when comment sits above a multi-line box-shadow', () => {
+		const code = [
+			'.foo {',
+			'\t/* dryui-allow inset-shadow */',
+			'\tbox-shadow:',
+			'\t\tinset 0 1px 0 white,',
+			'\t\tinset 0 -1px 0 black;',
+			'}'
+		].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
+	});
+
+	test('rejects allow comment that is gated by an intervening declaration terminator', () => {
+		const code = [
+			'.foo {',
+			'\t/* dryui-allow inset-shadow */',
+			'\tcolor: red;',
+			'\tbox-shadow: inset 2px 0 0 blue;',
+			'}'
+		].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
+	});
+
+	test('rejects allow comment that sits outside the rule block', () => {
+		const code = [
+			'/* dryui-allow inset-shadow */',
+			'.foo {',
+			'\tbox-shadow: inset 2px 0 0 blue;',
+			'}'
+		].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
+	});
+
+	test('does not let a trailing CSS comment hide a previous declaration terminator', () => {
+		const code = [
+			'.foo {',
+			'\t/* dryui-allow inset-shadow */',
+			'\tcolor: red; /* primary brand */',
+			'\tbox-shadow: inset 2px 0 0 blue;',
+			'}'
+		].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
+	});
+
+	test('allows multi-line flex declaration with comment above the property', () => {
+		const code = ['.foo {', '\t/* dryui-allow flex */', '\tdisplay:', '\t\tflex;', '}'].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
+	});
+
+	test('allows partial inset with inline allow comment on the same line as the violation', () => {
+		const code = [
+			'.foo {',
+			'\tbox-shadow:',
+			'\t\t0 22px 48px black,',
+			'\t\t/* dryui-allow inset-shadow */ inset 0 1px 0 white;',
+			'}'
+		].join('\n');
+		const violations = checkStyle(code);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
+	});
+
+	test('inline allow comment only covers the value that follows it', () => {
+		const code =
+			'.foo { box-shadow: inset 2px 0 0 red, /* dryui-allow inset-shadow */ inset 0 -1px 0 black; }';
+		const violations = checkStyle(code);
+		// The first inset has no allow before it; the second one does.
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
+	});
+
 	test('flags inset rail with color-mix color value', () => {
 		const violations = checkStyle(
 			'.foo { box-shadow: inset 0 -1px 0 color-mix(in srgb, black 10%, transparent); }'

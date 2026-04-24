@@ -39,7 +39,11 @@
 
 		<figure class="card">
 			<div class="frame">
-				<Image src="/does-not-exist.png" alt="Broken source example" fallback="Missing asset" />
+				<Image
+					src="https://images.example.invalid/missing.png"
+					alt="Broken source example"
+					fallback="Missing asset"
+				/>
 			</div>
 			<figcaption class="caption">
 				<p class="caption-title">
