@@ -1,5 +1,11 @@
 # @dryui/cli
 
+## 0.19.5
+
+### Patch Changes
+
+- [`1727800`](https://github.com/rob-balfre/dryui/commit/1727800722d2256ffaf6d432c40e4eeef9e5c725) Thanks [@rob-balfre](https://github.com/rob-balfre)! - Keep the feedback launcher process alive while it owns started dev or feedback servers. The foreground wait now uses an explicit keep-alive handle, so `dryui init` no longer returns to the shell immediately after printing "press Ctrl-C to stop servers and exit".
+
 ## 0.19.4
 
 ### Patch Changes
