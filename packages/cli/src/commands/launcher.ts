@@ -212,10 +212,12 @@ async function waitForShutdownSignal(options: ShutdownWaitOptions): Promise<void
 	if (options.ownedPids.length === 0) return;
 
 	await new Promise<void>((resolve) => {
+		const keepAlive = setInterval(() => {}, 60_000);
 		const handler = (): void => {
 			process.off('SIGINT', handler);
 			process.off('SIGTERM', handler);
 			process.off('SIGHUP', handler);
+			clearInterval(keepAlive);
 			console.log('');
 			console.log('Stopping servers...');
 			for (const pid of options.ownedPids) {
