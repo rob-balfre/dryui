@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import { homedir } from 'node:os';
-import { dirname, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { findNearestDesignBrief } from './design-brief.js';
 
 export type DryuiFramework = 'sveltekit' | 'svelte' | 'unknown';
 export type DryuiPackageManager = 'bun' | 'pnpm' | 'npm' | 'yarn' | 'unknown';
@@ -34,6 +35,10 @@ export interface ProjectDetection {
 	readonly framework: DryuiFramework;
 	readonly packageManager: DryuiPackageManager;
 	readonly status: DryuiProjectStatus;
+	readonly design: {
+		readonly path: string | null;
+		readonly present: boolean;
+	};
 	readonly dependencies: {
 		readonly ui: boolean;
 		readonly primitives: boolean;
@@ -158,6 +163,11 @@ function findUpAny(start: string, fileNames: readonly string[]): string | null {
 		if (parent === current) return null;
 		current = parent;
 	}
+}
+
+function isWithinOrEqual(path: string, root: string): boolean {
+	const relativePath = relative(resolve(root), resolve(path));
+	return relativePath === '' || (!relativePath.startsWith('..') && !isAbsolute(relativePath));
 }
 
 function detectPackageManager(root: string | null): DryuiPackageManager {
@@ -503,6 +513,9 @@ export function detectProject(
 	const appCss = appCssPath && existsSync(appCssPath) ? appCssPath : null;
 	const rootLayout = rootLayoutPath && existsSync(rootLayoutPath) ? rootLayoutPath : null;
 	const rootPage = rootPagePath && existsSync(rootPagePath) ? rootPagePath : null;
+	const designSearchStart = root && isWithinOrEqual(start, root) ? start : root;
+	const designPath =
+		root && designSearchStart ? findNearestDesignBrief(designSearchStart, root) : null;
 	const themeImportFiles =
 		rootLayout && importsAppCss(rootLayout) ? [rootLayout, appCss] : [rootLayout];
 	const defaultImported = hasAnyImport(themeImportFiles, spec.themeImports.default);
@@ -536,6 +549,10 @@ export function detectProject(
 		framework,
 		packageManager: detectPackageManager(root),
 		status: buildStatus(framework, Boolean(packageJsonPath), stepsNeeded),
+		design: {
+			path: designPath,
+			present: Boolean(designPath)
+		},
 		dependencies: {
 			ui: dependencyNames.has('@dryui/ui'),
 			primitives: dependencyNames.has('@dryui/primitives'),

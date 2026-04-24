@@ -24,7 +24,7 @@ For a local release, run:
 bun run release
 ```
 
-That runs `release:gate`, versions packages, and publishes with Changesets. Local release and CI release now use the same validation gate before versioning or publish. The `prepack` / `postpack` hooks handle export swapping for `@dryui/primitives`, `@dryui/ui`, and `@dryui/mcp`.
+That runs `release:gate`, versions packages, and publishes with Changesets. Local release and CI release use the same no-test validation gate before versioning or publish. `release:gate` skips publish hygiene because `publish:packages` reruns the package build, applies the publish export swap, and runs publish hygiene against the exact package shape npm receives. The `prepack` / `postpack` hooks handle export swapping for `@dryui/primitives`, `@dryui/ui`, and `@dryui/mcp` during one-off package commands.
 
 For one-off package publishing, use:
 

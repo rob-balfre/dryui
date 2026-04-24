@@ -58,6 +58,35 @@ describe('check command', () => {
 		expect(result.output).toContain('http://localhost:5173/dashboard');
 	});
 
+	test('routes --design to the visual checker as a design brief path', async () => {
+		const root = createTempTree({ 'DESIGN.md': '# DESIGN.md\n' });
+		const calls: unknown[] = [];
+
+		const result = await getCheckCommandResult(
+			['--visual', 'http://localhost:5173/dashboard', '--cwd', root, '--design', 'DESIGN.md'],
+			spec,
+			'toon',
+			{
+				runVisual: async (input) => {
+					calls.push(input);
+					return {
+						text: `kind: vision\ntarget: ${input.url}`,
+						findings: [],
+						diagnostics: [],
+						screenshotPath: '/tmp/dryui-vision-test.png',
+						summary: { hasBlockers: false, counts: { error: 0, warning: 0, suggestion: 0 } }
+					};
+				}
+			}
+		);
+
+		expect(result.exitCode).toBe(0);
+		expect(calls[0]).toMatchObject({
+			url: 'http://localhost:5173/dashboard',
+			designPath: 'DESIGN.md'
+		});
+	});
+
 	test('requires a visual URL when --visual is present', async () => {
 		const result = await getCheckCommandResult(['--visual'], spec, 'toon');
 

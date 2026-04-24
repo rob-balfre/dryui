@@ -332,8 +332,8 @@ function buildLlmsText(spec: Spec): string {
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server with ask/check/check-vision tools for discovery, setup guidance, static validation, and rendered-page critique
-- @dryui/cli: CLI for setup, check, detect, install, project-aware add, lookup, composition guidance, tokens, visual checks, and feedback tooling
+- @dryui/mcp: MCP server with ask/check/check-vision tools for discovery, setup guidance, static validation, DESIGN.md-aware rendered checks, and feel-better polish critique
+- @dryui/cli: CLI for setup, check, detect, install, project-aware add, lookup, composition guidance, tokens, DESIGN.md-aware visual checks, and feedback tooling
 
 ## AI Surface
 
@@ -394,7 +394,7 @@ All components support CSS variable theming. Override at the :root level or comp
 
 ## CLI
 
-The CLI is the default entry point for working with DryUI. Start with bare \`dryui\` for editor integration and feedback onboarding, then use it for project bootstrapping, deterministic project detection, install planning, project-aware add planning, source retrieval, composition guidance, and validation.
+The CLI is the default entry point for working with DryUI. Start with bare \`dryui\` for editor integration and feedback onboarding, then use it for project bootstrapping, deterministic project detection, DESIGN.md-aware install/add planning, source retrieval, composition guidance, and validation.
 
 Install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
 
@@ -412,6 +412,7 @@ dryui compose "date input"
 dryui tokens --category color
 dryui check src/routes/+page.svelte
 dryui check --visual http://localhost:5173
+dryui check --polish src/routes/+page.svelte
 dryui ambient
 dryui install-hook --dry-run
 dryui feedback init

@@ -1,5 +1,9 @@
 import { describe, expect, test } from 'bun:test';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { runVisionCheck, type VisionRenderer, type VisionReviewer } from './check-vision.js';
+
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 
 const FAKE_PNG = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
@@ -192,5 +196,53 @@ describe('runVisionCheck', () => {
 		expect(params.rubricPrompt).toContain('random top padding');
 		expect(params.userText).toContain('focus on the hero');
 		expect(params.screenshotPath).toBe('/tmp/dryui-vision-test.png');
+	});
+
+	test('includes explicit DESIGN.md identity and feel-better polish in the reviewer prompt', async () => {
+		const { reviewer, reviewCalls } = stubReviewer('{ "findings": [] }');
+		const designPath = resolve(repoRoot, 'tests/fixtures/design-rubric/golden/DESIGN.md');
+
+		await runVisionCheck(
+			{
+				url: 'https://example.com',
+				designPath
+			},
+			{
+				reviewer,
+				renderer: FAKE_RENDERER
+			}
+		);
+
+		const params = reviewCalls[0] as {
+			rubricPrompt: string;
+			userText: string;
+		};
+		const prompt = `${params.rubricPrompt}\n${params.userText}`;
+		expect(prompt).toContain('Design brief');
+		expect(prompt).toContain(designPath);
+		expect(prompt).toContain('Identity: Northstar Clinic');
+		expect(prompt).toContain('calm patient scheduling tool');
+		expect(prompt).toContain('Make-interfaces-feel-better rubric');
+	});
+
+	test('fails when an explicit DESIGN.md path is missing', async () => {
+		const { reviewer } = stubReviewer('{ "findings": [] }');
+
+		await expect(
+			runVisionCheck(
+				{
+					url: 'https://example.com',
+					designPath: 'missing/DESIGN.md'
+				},
+				{
+					cwd: resolve(repoRoot, 'tests/fixtures/design-rubric'),
+					reviewer,
+					renderer: FAKE_RENDERER
+				}
+			)
+		).rejects.toMatchObject({
+			name: 'StructuredToolError',
+			code: 'not-found'
+		});
 	});
 });

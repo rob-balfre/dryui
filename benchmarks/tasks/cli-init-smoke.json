@@ -1,7 +1,7 @@
 {
 	"id": "cli-init-smoke",
 	"claim": "`dryui init` produces a buildable SvelteKit project wired to @dryui/ui themes and app-shell recipe.",
-	"prompt": "Run `bunx -y @dryui/cli init .` against an empty directory. Then ensure the resulting app builds and the default app-shell renders.",
+	"prompt": "Run `bunx @dryui/cli init . --pm bun` against an empty directory. Then ensure the resulting app builds and the default app-shell renders.",
 	"target_components": ["Container"],
 	"allowed_tools": ["read", "write", "grep"],
 	"acceptance_checks": [

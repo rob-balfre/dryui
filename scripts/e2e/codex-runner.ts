@@ -21,8 +21,19 @@
  */
 
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import {
+	cpSync,
+	existsSync,
+	readFileSync,
+	writeFileSync,
+	mkdirSync,
+	mkdtempSync,
+	rmSync,
+	symlinkSync
+} from 'node:fs';
+import { homedir, tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 export interface CodexEvent {
 	readonly type: string;
@@ -35,6 +46,8 @@ export interface CodexRunOptions {
 	readonly model?: string;
 	readonly timeoutMs?: number;
 	readonly logDir?: string;
+	readonly useUserConfig?: boolean;
+	readonly useLocalDryuiPlugin?: boolean;
 	readonly onStdoutLine?: (line: string) => void;
 	readonly onStderrLine?: (line: string) => void;
 }
@@ -52,6 +65,105 @@ export interface CodexRunResult {
 }
 
 const DEFAULT_TIMEOUT_MS = 12 * 60 * 1_000;
+const TIMEOUT_KILL_GRACE_MS = 5_000;
+const scriptDir = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(scriptDir, '..', '..');
+const localDryuiPluginDir = resolve(repoRoot, 'packages/plugin');
+
+interface CodexPluginManifest {
+	readonly name?: string;
+	readonly version?: string;
+}
+
+function tomlString(value: string): string {
+	return JSON.stringify(value);
+}
+
+function getCodexHomeSource(): string {
+	return process.env.CODEX_HOME ? resolve(process.env.CODEX_HOME) : resolve(homedir(), '.codex');
+}
+
+function readLocalDryuiPluginManifest(): Required<CodexPluginManifest> {
+	const manifestPath = resolve(localDryuiPluginDir, '.codex-plugin/plugin.json');
+	const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as CodexPluginManifest;
+	return {
+		name: manifest.name ?? 'dryui',
+		version: manifest.version ?? '0.0.0'
+	};
+}
+
+function writeLocalDryuiMcpConfig(pluginDir: string): void {
+	const configPath = resolve(pluginDir, '.mcp.json');
+	writeFileSync(
+		configPath,
+		JSON.stringify(
+			{
+				mcpServers: {
+					dryui: {
+						type: 'stdio',
+						command: 'sh',
+						args: ['-c', `cd ${JSON.stringify(repoRoot)} && exec bun packages/mcp/src/index.ts`]
+					},
+					'dryui-feedback': {
+						type: 'stdio',
+						command: 'sh',
+						args: [
+							'-c',
+							`cd ${JSON.stringify(repoRoot)} && exec bun packages/feedback-server/src/mcp.ts`
+						]
+					}
+				}
+			},
+			null,
+			2
+		) + '\n'
+	);
+}
+
+function prepareLocalDryuiCodexHome(): string {
+	const sourceCodexHome = getCodexHomeSource();
+	const sourceAuthPath = resolve(sourceCodexHome, 'auth.json');
+	if (!existsSync(sourceAuthPath)) {
+		throw new Error(`Codex auth missing at ${sourceAuthPath} — run \`codex login\` first`);
+	}
+	if (!existsSync(localDryuiPluginDir)) {
+		throw new Error(`local DryUI plugin source missing at ${localDryuiPluginDir}`);
+	}
+
+	const manifest = readLocalDryuiPluginManifest();
+	const codexHome = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-codex-home-'));
+	const pluginDir = resolve(codexHome, 'plugins/cache/dryui', manifest.name, manifest.version);
+	mkdirSync(pluginDir, { recursive: true });
+	cpSync(localDryuiPluginDir, pluginDir, { recursive: true });
+	writeLocalDryuiMcpConfig(pluginDir);
+	symlinkSync(sourceAuthPath, resolve(codexHome, 'auth.json'));
+	writeFileSync(
+		resolve(codexHome, 'config.toml'),
+		[
+			`[plugins."${manifest.name}@dryui"]`,
+			'enabled = true',
+			'',
+			'[marketplaces.dryui]',
+			'source_type = "local"',
+			`source = ${tomlString(localDryuiPluginDir)}`,
+			''
+		].join('\n')
+	);
+	return codexHome;
+}
+
+function killProcessGroup(child: ReturnType<typeof spawn>, signal: NodeJS.Signals): void {
+	if (!child.pid) return;
+	try {
+		process.kill(-child.pid, signal);
+	} catch {
+		try {
+			child.kill(signal);
+		} catch {
+			/* already exited */
+		}
+	}
+}
 
 function splitLines(buffer: string): { lines: string[]; rest: string } {
 	const parts = buffer.split('\n');
@@ -94,6 +206,9 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 
 	const logDir = options.logDir ? resolve(options.logDir) : null;
 	if (logDir) mkdirSync(logDir, { recursive: true });
+	const useLocalDryuiPlugin =
+		options.useUserConfig !== true && options.useLocalDryuiPlugin !== false;
+	const isolatedCodexHome = useLocalDryuiPlugin ? prepareLocalDryuiCodexHome() : null;
 	const transcriptPath = logDir ? resolve(logDir, 'codex-transcript.jsonl') : null;
 	const lastMessagePath = logDir ? resolve(logDir, 'codex-last-message.txt') : null;
 	const effectiveLastMessagePath =
@@ -113,6 +228,9 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 		'--color',
 		'never'
 	];
+	if (options.useUserConfig !== true && !useLocalDryuiPlugin) {
+		args.push('--ignore-user-config');
+	}
 	if (options.model) {
 		args.push('--model', options.model);
 	}
@@ -126,13 +244,24 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 		const child = spawn('codex', args, {
 			cwd: options.projectDir,
 			stdio: ['ignore', 'pipe', 'pipe'],
-			env: { ...process.env, FORCE_COLOR: '0' }
+			env: {
+				...process.env,
+				FORCE_COLOR: '0',
+				...(isolatedCodexHome ? { CODEX_HOME: isolatedCodexHome } : {})
+			},
+			detached: true
 		});
 
+		let timedOut = false;
+		let forceKillTimer: ReturnType<typeof setTimeout> | null = null;
 		const timer = setTimeout(() => {
-			try {
-				child.kill('SIGTERM');
-			} catch {}
+			timedOut = true;
+			options.onStderrLine?.(`codex exec timed out after ${(timeoutMs / 1000).toFixed(0)}s`);
+			killProcessGroup(child, 'SIGTERM');
+			forceKillTimer = setTimeout(() => {
+				killProcessGroup(child, 'SIGKILL');
+			}, TIMEOUT_KILL_GRACE_MS);
+			forceKillTimer.unref();
 		}, timeoutMs);
 
 		let stdoutBuf = '';
@@ -168,6 +297,8 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 
 		child.on('close', (code, signal) => {
 			clearTimeout(timer);
+			if (forceKillTimer) clearTimeout(forceKillTimer);
+			killProcessGroup(child, 'SIGTERM');
 			// Flush trailing partial line (no terminating \n).
 			if (stdoutBuf.trim()) {
 				const tail = safeParse(stdoutBuf);
@@ -189,9 +320,14 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 					writeFileSync(transcriptPath, events.map((e) => JSON.stringify(e)).join('\n') + '\n');
 				} catch {}
 			}
+			if (isolatedCodexHome) {
+				try {
+					rmSync(isolatedCodexHome, { recursive: true, force: true });
+				} catch {}
+			}
 
 			resolvePromise({
-				ok: code === 0,
+				ok: code === 0 && !timedOut,
 				exitCode: code,
 				signal,
 				durationMs: Date.now() - startedAt,

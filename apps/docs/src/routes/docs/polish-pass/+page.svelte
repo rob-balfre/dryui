@@ -27,7 +27,7 @@
 	<div class="page-stack">
 		<DocsPageHeader
 			title="Visual Polish Pass"
-			description="Jakub Krehel's essay on details that make interfaces feel better lists 11 small moves that separate a rough build from a polished one. DryUI bakes those moves into tokens, primitives, and the check tool so you never have to remember them by hand."
+			description="Jakub Krehel's essay on details that make interfaces feel better lists 11 small moves that separate a rough build from a polished one. In the DryUI pipeline, this is an explicit planning and visual review step."
 		/>
 
 		<div class="stack-lg">
@@ -39,6 +39,11 @@
 				>. Each section below maps one principle to the concrete DryUI surface that enforces it,
 				plus a small sample you can paste into a route.
 			</Text>
+			<DocsCallout title="Use this twice" variant="info">
+				Run this rubric before implementation as a polish intent pass, then again during visual
+				review with <code>dryui check --visual</code> or MCP <code>check</code> with
+				<code>visualUrl</code>.
+			</DocsCallout>
 		</div>
 
 		<Separator />
@@ -472,6 +477,10 @@ dryui check --visual http://localhost:5173/dashboard`,
 				<code>--polish</code> narrows <code>check</code> output to the 11 rules mapped from this
 				page. Without the flag, <code>check</code> still reports polish suggestions as
 				<code>info</code> diagnostics, alongside the rest.
+			</DocsCallout>
+			<DocsCallout title="Keep intent visible" variant="info">
+				In the full UI loop, polish follows the user brief, local <code>DESIGN.md</code>, and
+				DryUI/Svelte contracts. It should sharpen the intended interface, not override it.
 			</DocsCallout>
 		</div>
 	</div>

@@ -45,6 +45,7 @@ These are on-demand tools, not part of `bun run validate`:
 - `bun run coverage:summary` re-reads existing coverage artifacts and refreshes `coverage/summary/coverage-summary.json` plus `coverage-summary.md`.
 - `bun run coverage:matrix` regenerates `reports/component-coverage-matrix.json` and `.md` from the public component spec plus matching tests and docs surfaces.
 - `bun run test:docs-visual` is the slower docs regression suite for docs shell, representative component pages, and theming or layout changes. It runs locally only; run it before merging docs, theming, or layout changes.
+- `bun run bump-deps` uses the repo-pinned `npm-check-updates` binary to update all workspace dependency ranges to latest, then refreshes the Bun install. Treat the resulting diff as a deliberate dependency-upgrade PR, not a drive-by cleanup.
 
 If `bun run coverage:summary` reports missing artifacts, re-run the matching producer command first: `bun run test:coverage:unit` for `coverage/unit/lcov.info` and `bun run test:coverage:browser` for `coverage/browser/coverage-summary.json` plus `coverage/browser/index.html`.
 

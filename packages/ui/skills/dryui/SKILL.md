@@ -9,6 +9,27 @@ Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a th
 
 **Tradeoff:** These rules bias toward correctness over speed. For throwaway prototypes, use judgment.
 
+## UI Creation Pipeline
+
+DryUI work is explicit. Do the design thinking where the user can see it, then validate the result.
+
+1. **User brief** — capture audience, job-to-be-done, product/domain, constraints, and any existing design direction.
+2. **DESIGN.md identity** — read or create the local design identity before choosing components. Google-style `DESIGN.md` is a supported optional format, not a required dependency.
+3. **DryUI lookup/plan** — use `dryui info`, `dryui compose`, or MCP `ask` to confirm component contracts, tokens, layout rules, and recipes.
+4. **make-interfaces-feel-better polish intent pass** — state which polish details matter for this screen before implementation. This is an explicit planning step, not hidden taste.
+5. **Implementation** — build with DryUI components, Svelte 5, grid layout, tokens, and accessible composition.
+6. **Deterministic check** — run `dryui check [path]` or MCP `check` to catch contracts, accessibility, tokens, and CSS discipline.
+7. **Visual review** — run `dryui check --visual <url>` or MCP `check` with `visualUrl`; include the make-interfaces-feel-better rubric in the review intent.
+8. **Repair loop** — fix the highest-signal issues, then repeat deterministic check and visual review until the UI matches the brief.
+
+Precedence when guidance conflicts:
+
+1. User intent and task constraints.
+2. Local `DESIGN.md` identity.
+3. DryUI component contracts, accessibility rules, and token/theming discipline.
+4. Official Svelte MCP guidance for Svelte and SvelteKit syntax/framework questions.
+5. make-interfaces-feel-better polish rubric.
+
 ## 1. Look Up Before You Write
 
 **Never guess a component API. Always verify first.**
@@ -226,10 +247,12 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### Recommended workflow
 
-1. `dryui info <Component>` or `dryui compose "<query>"` before writing so you confirm kind, required parts, bindables, and canonical usage. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
-2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, and accessibility regressions. Use `dryui check --visual <url>` or MCP `check` with `visualUrl` when rendered pixels need review.
-4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
+1. Start from the user brief and local `DESIGN.md` identity, then resolve any component or recipe uncertainty with `dryui info <Component>` or `dryui compose "<query>"`. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
+2. Before writing code, make an explicit make-interfaces-feel-better polish intent pass: text wrapping, radius, icon motion, numbers, transitions, entrances/exits, shadows, icon alignment, image edges, and token consistency.
+3. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
+4. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, accessibility regressions, and token drift.
+5. Run `dryui check --visual <url>` or MCP `check` with `visualUrl` for rendered review, then repair and repeat until the UI satisfies the brief.
+6. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
 ### CLI (default entry point)
 
@@ -276,6 +299,7 @@ Read these when you need deeper guidance:
 - **`rules/accessibility.md`** — Field.Root, ARIA, focus management, pre-ship checklist
 - **`rules/svelte.md`** — Runes, snippets, native browser APIs, styling rules
 - **`rules/design.md`** — Minimal code, no premature abstraction, naming conventions
+- **`rules/design-brief.md`** — User brief, DESIGN.md identity, precedence, and polish review pipeline
 - **`rules/visual-effects-performance.md`** — Tiered budgets and implementation rules for shader, blur, glass, and pointer-reactive effects
 - **`rules/native-web-transitions.md`** — View Transition API, scroll animations, reduced-motion
 

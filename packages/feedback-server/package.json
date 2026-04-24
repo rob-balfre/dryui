@@ -44,9 +44,9 @@
     "access": "public"
   },
   "scripts": {
-    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts src/config-probe.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && bunx tsc -p tsconfig.build.json && bunx vite build --config ui/vite.config.ts",
-    "check": "bunx svelte-check --tsconfig ./ui/tsconfig.json && bunx tsc -p tsconfig.json --noEmit",
-    "test": "bun test tests/**/*.test.ts",
+    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts src/config-probe.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && tsc -p tsconfig.build.json && vite build --config ui/vite.config.ts",
+    "check": "svelte-check --tsconfig ./ui/tsconfig.json && tsc -p tsconfig.json --noEmit",
+    "test": "bun test tests",
     "check:publint": "publint",
     "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
@@ -63,6 +63,7 @@
     "bun-types": "^1.3.13",
     "lucide-svelte": ">=1.0.1",
     "svelte": "^5.55.4",
+    "svelte-check": "^4.4.6",
     "typescript": "^6.0.3",
     "vite": "^8.0.9"
   }

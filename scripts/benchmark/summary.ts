@@ -23,7 +23,11 @@ function loadReport(): Report {
 	if (existsSync(latestPath)) {
 		return JSON.parse(readFileSync(latestPath, 'utf8')) as Report;
 	}
-	const stdin = readFileSync(0, 'utf8');
+	const stdin = readFileSync(0, 'utf8').trim();
+	if (!stdin) {
+		console.error('benchmark summary: no latest run found; run `bun run bench:smoke` first.');
+		process.exit(1);
+	}
 	return JSON.parse(stdin) as Report;
 }
 

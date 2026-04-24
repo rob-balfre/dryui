@@ -36,6 +36,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test src",
     "check:publint": "publint",
     "check:attw": "attw --pack . --ignore-rules no-resolution cjs-resolves-to-esm internal-resolution-error",
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"

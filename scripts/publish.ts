@@ -26,7 +26,7 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { swapExportsForPublish, restoreExports } from './lib/export-swap.ts';
 import { verifyPackageDist, formatIssues } from './lib/verify-dist.ts';
@@ -80,12 +80,12 @@ try {
 	}
 	console.log('  post-swap dist verification passed');
 
-	const otpFlag = otp ? `--otp=${otp}` : '';
-	const dryRunFlag = dryRun ? '--dry-run' : '';
-	const cmd = `npm publish --access public ${otpFlag} ${dryRunFlag}`.trim();
+	const publishArgs = ['publish', '--access', 'public'];
+	if (otp) publishArgs.push(`--otp=${otp}`);
+	if (dryRun) publishArgs.push('--dry-run');
 
-	console.log(`  Running: ${cmd}`);
-	execSync(cmd, { cwd: resolve(packageDir), stdio: 'inherit' });
+	console.log(`  Running: npm ${publishArgs.join(' ')}`);
+	execFileSync('npm', publishArgs, { cwd: resolve(packageDir), stdio: 'inherit' });
 
 	console.log(`\n  Published ${name}@${version}`);
 } finally {

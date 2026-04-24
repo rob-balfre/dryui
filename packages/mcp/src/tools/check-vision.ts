@@ -3,6 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { chromium, type Browser, type Page } from 'playwright';
+import { DesignBriefNotFoundError, loadDesignBrief, type DesignBrief } from '../design-brief.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
 import { enrichDiagnostic } from '../enrich-diagnostics.js';
 import type { DryUiRepairIssue } from '../repair-types.js';
@@ -39,10 +40,12 @@ export interface VisionCheckInput {
 	readonly viewport?: string;
 	readonly extraRubric?: string;
 	readonly waitFor?: string;
+	readonly designPath?: string;
 }
 
 export interface VisionCheckOptions {
 	readonly model?: string;
+	readonly cwd?: string;
 	/** Override the Codex reviewer. Used by tests to stub the CLI. */
 	readonly reviewer?: VisionReviewer;
 	/** Override the screenshot pipeline. Tests inject deterministic bytes. */
@@ -54,6 +57,7 @@ export interface VisionCheckResult {
 	readonly findings: readonly VisionFinding[];
 	readonly diagnostics: readonly DryUiRepairIssue[];
 	readonly screenshotPath: string;
+	readonly designBriefPath?: string;
 	readonly summary: { hasBlockers: boolean; counts: Record<string, number> };
 }
 
@@ -616,6 +620,18 @@ function findingsToDiagnostics(findings: readonly VisionFinding[]): readonly Dry
 	);
 }
 
+function buildRubricPrompt(designBrief: DesignBrief | null): string {
+	if (!designBrief) return RUBRIC_PROMPT;
+	return [
+		RUBRIC_PROMPT,
+		'',
+		'DESIGN.md context:',
+		designBrief.promptContext,
+		'',
+		'Use the design brief only for visible identity and polish alignment. Do not invent requirements outside the screenshot.'
+	].join('\n');
+}
+
 function deriveSummary(findings: readonly VisionFinding[]): {
 	hasBlockers: boolean;
 	counts: Record<string, number>;
@@ -638,16 +654,19 @@ function renderText(args: {
 	viewport: { width: number; height: number };
 	model: string;
 	screenshotPath: string;
+	designBriefPath?: string;
 	findings: readonly VisionFinding[];
 	summary: { hasBlockers: boolean; counts: Record<string, number> };
 	parseError: { message: string; raw: string } | null;
 }): string {
-	const { url, viewport, model, screenshotPath, findings, summary, parseError } = args;
+	const { url, viewport, model, screenshotPath, designBriefPath, findings, summary, parseError } =
+		args;
 	const lines: string[] = [
 		'kind: vision',
 		`target: ${url} | viewport: ${viewport.width}x${viewport.height}`,
 		`model: ${model}`,
 		`screenshot: ${screenshotPath}`,
+		...(designBriefPath ? [`design: ${designBriefPath}`] : []),
 		`hasBlockers: ${summary.hasBlockers} | findings: ${findings.length}`,
 		`severityCounts: error=${summary.counts.error ?? 0} | warning=${summary.counts.warning ?? 0} | suggestion=${summary.counts.suggestion ?? 0}`,
 		''
@@ -688,6 +707,15 @@ export async function runVisionCheck(
 	const viewport = parseViewport(input.viewport);
 	const renderer = options.renderer ?? defaultRenderer;
 	const reviewer = options.reviewer ?? defaultReviewer;
+	let designBrief: DesignBrief | null;
+	try {
+		designBrief = loadDesignBrief(input.designPath, options.cwd ?? process.cwd());
+	} catch (error) {
+		if (error instanceof DesignBriefNotFoundError) {
+			throw new StructuredToolError(error.code, error.message, error.suggestions);
+		}
+		throw error;
+	}
 
 	const {
 		bytes,
@@ -710,7 +738,7 @@ export async function runVisionCheck(
 	const review = await reviewer({
 		screenshotPath,
 		userText,
-		rubricPrompt: RUBRIC_PROMPT,
+		rubricPrompt: buildRubricPrompt(designBrief),
 		...(options.model ? { model: options.model } : {})
 	});
 	const rawText = review.rawText;
@@ -739,6 +767,7 @@ export async function runVisionCheck(
 		viewport,
 		model,
 		screenshotPath,
+		...(designBrief ? { designBriefPath: designBrief.displayPath } : {}),
 		findings,
 		summary,
 		parseError
@@ -749,6 +778,7 @@ export async function runVisionCheck(
 		findings,
 		diagnostics: enrichedDiagnostics,
 		screenshotPath,
+		...(designBrief ? { designBriefPath: designBrief.displayPath } : {}),
 		summary
 	};
 }

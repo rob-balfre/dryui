@@ -33,7 +33,21 @@ The CLI is idempotent — it detects what's already done and only applies missin
 ## After init
 
 1. Tell the user init is complete and show the CLI output.
-2. Suggest next steps: start the dev server, then run `ask --scope recipe "app shell"` to get the root layout template.
+2. Establish the UI creation pipeline before building screens: user brief, optional `DESIGN.md` identity, DryUI lookup/plan, explicit make-interfaces-feel-better polish intent pass, implementation, deterministic check, visual review, and repair loop.
+3. Suggest next steps: start the dev server, then run `ask --scope recipe "app shell"` to get the root layout template.
+
+## UI pipeline after setup
+
+Use this order for the first real interface:
+
+1. Capture the user's brief: audience, job, domain, density, constraints, and success criteria.
+2. Read `DESIGN.md` if present, or draft identity notes when durable design direction matters. Google-style `DESIGN.md` is an optional supported format, not a hard dependency.
+3. Use `dryui info`, `dryui compose`, or MCP `ask` to confirm components, recipes, contracts, accessibility, and tokens.
+4. Make the make-interfaces-feel-better polish intent pass explicit before implementation.
+5. Build with DryUI + Svelte 5, then run `dryui check [path]` or MCP `check`.
+6. Run `dryui check --visual <url>` or MCP `check` with `visualUrl`, repair issues, and repeat.
+
+Precedence: user intent, `DESIGN.md`, DryUI contracts/accessibility/tokens, Svelte MCP, then the feel-better rubric.
 
 ## MCP fallback (no CLI available)
 

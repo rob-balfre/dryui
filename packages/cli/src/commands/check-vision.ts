@@ -26,7 +26,8 @@ function isStructuredToolError(
 function help(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage: 'dryui check-vision <url> [--viewport=<wxh>] [--wait-for=<selector>]',
+			usage:
+				'dryui check-vision <url> [--design=<path>] [--viewport=<wxh>] [--wait-for=<selector>]',
 			description: [
 				'Render <url> in headless Chromium and have Codex CLI critique the screenshot',
 				'against the DryUI taste rubric (chip wrap, plural mismatch, variant mix,',
@@ -38,6 +39,7 @@ function help(exitCode = 0): never {
 			],
 			options: [
 				'  --viewport=<wxh>     Viewport size (default 1440x900)',
+				'  --design=<path>      DESIGN.md for visual review (auto-discovers nearest if omitted)',
 				'  --wait-for=<sel>     CSS selector to wait for before screenshotting',
 				'  --extra-rubric=<s>   Extra emphasis appended to the user message',
 				'  --text               Plain text output (default is TOON)',
@@ -73,13 +75,15 @@ export async function runCheckVision(args: string[]): Promise<void> {
 	const viewport = getFlag(args, '--viewport');
 	const waitFor = getFlag(args, '--wait-for');
 	const extraRubric = getFlag(args, '--extra-rubric');
+	const designPath = getFlag(args, '--design');
 
 	try {
 		const result = await runVisionCheck({
 			url,
 			...(viewport ? { viewport } : {}),
 			...(waitFor ? { waitFor } : {}),
-			...(extraRubric ? { extraRubric } : {})
+			...(extraRubric ? { extraRubric } : {}),
+			...(designPath ? { designPath } : {})
 		});
 
 		const exitCode = result.summary.hasBlockers ? 1 : 0;
@@ -89,6 +93,7 @@ export async function runCheckVision(args: string[]): Promise<void> {
 						{
 							summary: result.summary,
 							screenshotPath: result.screenshotPath,
+							...(result.designBriefPath ? { designBriefPath: result.designBriefPath } : {}),
 							findings: result.findings,
 							diagnostics: result.diagnostics
 						},

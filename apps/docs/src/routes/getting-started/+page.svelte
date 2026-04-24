@@ -286,20 +286,24 @@
 					that, use
 					<code>dryui init</code> for new apps, <code>dryui install</code> /
 					<code>dryui detect</code>
-					for existing ones, and <code>dryui info</code> / <code>dryui compose</code> before writing
-					component code. After implementation, use DryUI MCP <code>check</code> if it is available, then
-					run the app's normal build and test commands.
+					for existing ones, then move through the UI pipeline: user brief, optional
+					<code>DESIGN.md</code> identity, DryUI lookup/plan, explicit
+					<code>make-interfaces-feel-better</code> polish intent, implementation, deterministic check,
+					visual review, and repair loop.
 				</Text>
 
 				<Alert variant="info">
-					{#snippet title()}CLI first, MCP second{/snippet}
+					{#snippet title()}Intent first, tools second{/snippet}
 					{#snippet description()}
-						Use the <Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI setup
-						and command details. If your editor supports MCP, <code>ask</code> and
-						<code>check</code>
-						mirror the same lookup and validation loop in-editor. Use the
-						<Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link> for the
-						route-level workflow and state-heavy planner pattern.
+						User intent wins, followed by local <code>DESIGN.md</code>, DryUI
+						contracts/accessibility/tokens, Svelte MCP guidance, and the feel-better polish rubric.
+						Use the <Link href={withBase('/docs/design-brief')} underline="always"
+							>Design Brief Pipeline</Link
+						>
+						for the full loop and the <Link href={withBase('/docs/polish-pass')} underline="always"
+							>Visual Polish Pass</Link
+						>
+						for the polish checklist.
 					{/snippet}
 				</Alert>
 			</div>

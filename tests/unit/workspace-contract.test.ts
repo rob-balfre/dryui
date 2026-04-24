@@ -93,7 +93,7 @@ test('release scripts require validation before publish', () => {
 	expect(packageJson.scripts['check:architecture']).toBe(
 		"bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-architecture\" packages/mcp/src/spec.json packages/mcp/src/architecture.json"
 	);
-	expect(packageJson.scripts.build).toBe('bun run build:packages && bun run build:docs');
+	expect(packageJson.scripts.build).toBe('bun run build:docs');
 	const buildPackages = packageJson.scripts['build:packages'];
 	expect(buildPackages).toContain('bun run clean:package-src-declarations');
 	const requiredPackages = [
@@ -110,7 +110,9 @@ test('release scripts require validation before publish', () => {
 		expect(buildPackages).toContain(`--filter '${pkg}' build`);
 	}
 	expect(packageJson.scripts.validate).toBe('bun run ./scripts/validate.ts');
-	expect(packageJson.scripts['release:gate']).toBe('bun run validate --no-test');
+	expect(packageJson.scripts['release:gate']).toBe(
+		'bun run validate --no-test --skip-publish-hygiene'
+	);
 	expect(validateScript).toContain("run('check:lint:violations', 'bun run check:lint:violations')");
 	expect(validateScript).toContain("await run('check:architecture', 'bun run check:architecture')");
 	expect(validateScript).toContain(
