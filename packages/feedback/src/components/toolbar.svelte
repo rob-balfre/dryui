@@ -24,7 +24,7 @@
 		COMPONENT_NAMES,
 		type ComponentCategory
 	} from './component-names.js';
-	import { COMPONENT_SCHEMAS, type SchemaField } from './component-schemas.js';
+	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'layout';
 
@@ -164,8 +164,22 @@
 	let propsValues = $state<Record<string, unknown>>({});
 	let propsLabelEl = $state<HTMLInputElement | undefined>();
 
+	let schemas = $state<Record<string, SchemaField[]> | null>(null);
+
+	$effect(() => {
+		if (!propsPanelOpen || schemas) return;
+		let cancelled = false;
+		import('./component-schemas.js').then((mod) => {
+			if (cancelled) return;
+			schemas = mod.COMPONENT_SCHEMAS;
+		});
+		return () => {
+			cancelled = true;
+		};
+	});
+
 	const propsSchema = $derived<SchemaField[]>(
-		addedKind ? (COMPONENT_SCHEMAS[addedKind] ?? []) : []
+		addedKind && schemas ? (schemas[addedKind] ?? []) : []
 	);
 
 	const formFields = $derived(propsSchema.filter((field) => field.type.kind !== 'snippet'));

@@ -1,14 +1,16 @@
 #!/usr/bin/env bun
-// Generates packages/feedback/src/components/component-schemas.ts from the
-// Props interfaces in @dryui/ui's *.svelte.d.ts files. The feedback widget's
-// "Edit props" panel renders typed form controls based on this schema.
+// Generates packages/feedback/src/components/component-schemas.ts from
+// @dryui/mcp's spec.json (which already parses every component's typed Props
+// interface). The feedback widget's "Edit props" panel consumes this slim
+// schema to render form controls — keep spec.json in sync first if it's
+// stale (`bun packages/mcp/src/generate-spec.ts`).
 //
 // Run: bun scripts/extract-feedback-schemas.ts
 
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-const UI_SRC = join(import.meta.dir, '..', 'packages', 'ui', 'src');
+const SPEC_PATH = join(import.meta.dir, '..', 'packages', 'mcp', 'src', 'spec.json');
 const OUT = join(
 	import.meta.dir,
 	'..',
@@ -19,18 +21,34 @@ const OUT = join(
 	'component-schemas.ts'
 );
 
-type FieldType =
+type SchemaFieldType =
 	| { kind: 'enum'; options: string[] }
 	| { kind: 'boolean' }
 	| { kind: 'number' }
 	| { kind: 'string' }
 	| { kind: 'snippet' };
 
-type Field = {
+type SchemaField = {
 	name: string;
 	optional: boolean;
-	type: FieldType;
+	type: SchemaFieldType;
 };
+
+interface PropDef {
+	type: string;
+	required: boolean;
+	acceptedValues?: string[];
+}
+
+interface ComponentDef {
+	props?: Record<string, PropDef>;
+	compound?: boolean;
+	parts?: Record<string, { props?: Record<string, PropDef> }>;
+}
+
+interface Spec {
+	components?: Record<string, ComponentDef>;
+}
 
 const SKIP_PROPS = new Set(['ref', 'class', 'className', 'children', 'style']);
 const PROP_PRIORITY: Record<string, number> = {
@@ -44,147 +62,53 @@ const PROP_PRIORITY: Record<string, number> = {
 	open: 7
 };
 
-function stripComments(input: string): string {
-	let out = '';
-	let i = 0;
-	while (i < input.length) {
-		const c = input[i];
-		if (c === '/' && input[i + 1] === '*') {
-			const end = input.indexOf('*/', i + 2);
-			i = end === -1 ? input.length : end + 2;
-			continue;
-		}
-		if (c === '/' && input[i + 1] === '/') {
-			const end = input.indexOf('\n', i + 2);
-			i = end === -1 ? input.length : end + 1;
-			out += '\n';
-			continue;
-		}
-		out += c;
-		i++;
+function classifyProp(prop: PropDef): SchemaFieldType | null {
+	const cleanType = prop.type.replace(/\s*\|\s*(undefined|null)\b/g, '').trim();
+	if (/\bSnippet\b/.test(cleanType)) return { kind: 'snippet' };
+	if (prop.acceptedValues && prop.acceptedValues.length > 0) {
+		const options = prop.acceptedValues.filter((v) => v !== 'null' && v !== 'undefined');
+		if (options.length > 0) return { kind: 'enum', options };
 	}
-	return out;
-}
-
-function extractPropsBody(source: string): string | null {
-	const cleaned = stripComments(source);
-	const decl = cleaned.match(/interface\s+Props\b[^{]*{/);
-	if (!decl) return null;
-	const start = decl.index! + decl[0].length;
-	let depth = 1;
-	let i = start;
-	while (i < cleaned.length && depth > 0) {
-		const c = cleaned[i];
-		if (c === '{') depth++;
-		else if (c === '}') depth--;
-		i++;
-	}
-	if (depth !== 0) return null;
-	return cleaned.slice(start, i - 1);
-}
-
-function parseTypeString(raw: string): FieldType | null {
-	const value = raw.trim().replace(/\s*\|\s*(undefined|null)\b/g, '');
-	if (/\bSnippet\b/.test(value)) return { kind: 'snippet' };
-	if (/^boolean$/.test(value)) return { kind: 'boolean' };
-	if (/^number$/.test(value)) return { kind: 'number' };
-	if (/^string$/.test(value)) return { kind: 'string' };
-	const literalUnion = value.match(/^(?:'[^']+')(?:\s*\|\s*'[^']+')+$/);
-	if (literalUnion) {
-		const options = value.split(/\s*\|\s*/).map((token) => token.replace(/^'|'$/g, ''));
-		return { kind: 'enum', options };
-	}
-	const single = value.match(/^'([^']+)'$/);
-	if (single) return { kind: 'enum', options: [single[1]] };
-	if (/string\s*&\s*\{\s*\}/.test(value)) return { kind: 'string' };
-	if (value.includes("'") && value.includes('|')) {
-		const tokens = value
-			.split(/\s*\|\s*/)
-			.map((t) => t.trim())
-			.filter((t) => /^'[^']+'$/.test(t))
-			.map((t) => t.replace(/^'|'$/g, ''));
-		if (tokens.length > 0) return { kind: 'enum', options: tokens };
+	if (/^boolean$/.test(cleanType)) return { kind: 'boolean' };
+	if (/^number$/.test(cleanType)) return { kind: 'number' };
+	if (/^string$/.test(cleanType) || /string\s*&\s*\{\s*\}/.test(cleanType)) {
+		return { kind: 'string' };
 	}
 	return null;
 }
 
-function splitFields(body: string): string[] {
-	const parts: string[] = [];
-	let depth = 0;
-	let buf = '';
-	for (const ch of body) {
-		if (ch === '<' || ch === '(' || ch === '[' || ch === '{') depth++;
-		else if (ch === '>' || ch === ')' || ch === ']' || ch === '}') depth--;
-		if (ch === ';' && depth === 0) {
-			if (buf.trim()) parts.push(buf);
-			buf = '';
-			continue;
-		}
-		buf += ch;
-	}
-	if (buf.trim()) parts.push(buf);
-	return parts;
+function fieldOrder(a: SchemaField, b: SchemaField): number {
+	const pa = PROP_PRIORITY[a.name] ?? 999;
+	const pb = PROP_PRIORITY[b.name] ?? 999;
+	if (pa !== pb) return pa - pb;
+	return a.name.localeCompare(b.name);
 }
 
-function parseFields(body: string): Field[] {
-	const out: Field[] = [];
-	for (const part of splitFields(body)) {
-		const trimmed = part.trim();
-		if (!trimmed || trimmed.startsWith('readonly ')) continue;
-		const match = trimmed.match(/^(\w+)(\?)?\s*:\s*([\s\S]+)$/);
-		if (!match) continue;
-		const [, name, optional, typeStr] = match;
-		if (SKIP_PROPS.has(name)) continue;
-		const type = parseTypeString(typeStr);
+const spec: Spec = JSON.parse(readFileSync(SPEC_PATH, 'utf8'));
+const schemas: Record<string, SchemaField[]> = {};
+
+function propsFor(component: ComponentDef): Record<string, PropDef> {
+	if (!component.compound) return component.props ?? {};
+	return component.parts?.Root?.props ?? {};
+}
+
+for (const [name, component] of Object.entries(spec.components ?? {})) {
+	const fields: SchemaField[] = [];
+	for (const [propName, prop] of Object.entries(propsFor(component))) {
+		if (SKIP_PROPS.has(propName)) continue;
+		const type = classifyProp(prop);
 		if (!type) continue;
-		out.push({ name, optional: !!optional, type });
+		fields.push({ name: propName, optional: !prop.required, type });
 	}
-	return out;
-}
-
-function findComponentName(source: string): string | null {
-	const cleaned = stripComments(source);
-	const match = cleaned.match(/declare\s+const\s+(\w+)\s*:\s*import\(['"]svelte['"]\)\.Component/);
-	return match ? match[1] : null;
-}
-
-function sortFields(fields: Field[]): Field[] {
-	return [...fields].sort((a, b) => {
-		const pa = PROP_PRIORITY[a.name] ?? 999;
-		const pb = PROP_PRIORITY[b.name] ?? 999;
-		if (pa !== pb) return pa - pb;
-		return a.name.localeCompare(b.name);
-	});
-}
-
-const schemas: Record<string, Field[]> = {};
-
-for (const dirent of readdirSync(UI_SRC, { withFileTypes: true })) {
-	if (!dirent.isDirectory()) continue;
-	const dirPath = join(UI_SRC, dirent.name);
-	for (const file of readdirSync(dirPath)) {
-		if (!file.endsWith('.svelte.d.ts')) continue;
-		const filePath = join(dirPath, file);
-		try {
-			if (!statSync(filePath).isFile()) continue;
-		} catch {
-			continue;
-		}
-		const source = readFileSync(filePath, 'utf8');
-		const name = findComponentName(source);
-		if (!name) continue;
-		const body = extractPropsBody(source);
-		if (!body) continue;
-		const fields = sortFields(parseFields(body));
-		if (fields.length === 0) continue;
-		schemas[name] = fields;
-	}
+	if (fields.length === 0) continue;
+	fields.sort(fieldOrder);
+	schemas[name] = fields;
 }
 
 const sortedNames = Object.keys(schemas).sort();
 const lines: string[] = [];
 lines.push('// AUTO-GENERATED by scripts/extract-feedback-schemas.ts');
-lines.push('// Re-run that script when DryUI component prop signatures change.');
+lines.push('// Source: packages/mcp/src/spec.json. Re-run the script when that changes.');
 lines.push('');
 lines.push('export type SchemaFieldType =');
 lines.push("\t| { kind: 'enum'; options: string[] }");
