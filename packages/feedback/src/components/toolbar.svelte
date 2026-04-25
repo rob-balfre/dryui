@@ -26,15 +26,15 @@
 		submitStatus: SubmitStatus;
 		sent: boolean;
 		hasSelection?: boolean;
-		canUndoLayout?: boolean;
-		canRedoLayout?: boolean;
+		canUndo?: boolean;
+		canRedo?: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
 		onlayoutreset?: () => void;
-		onlayoutundo?: () => void;
-		onlayoutredo?: () => void;
+		onundo?: () => void;
+		onredo?: () => void;
 		ondeselect?: () => void;
 	}
 
@@ -46,22 +46,22 @@
 		submitStatus,
 		sent,
 		hasSelection = false,
-		canUndoLayout = false,
-		canRedoLayout = false,
+		canUndo = false,
+		canRedo = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
 		onmodechange,
 		onlayoutreset,
-		onlayoutundo,
-		onlayoutredo,
+		onundo,
+		onredo,
 		ondeselect
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'layout');
-	const showLayoutOptions = $derived(inspecting && hasSelection);
 	const showAnnotationTools = $derived(mode === 'annotate');
-	const showToolPill = $derived(showAnnotationTools || showLayoutOptions);
+	const showLayoutTools = $derived(mode === 'layout' && hasSelection);
+	const showToolPill = $derived(showAnnotationTools || showLayoutTools);
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
 		idle: { label: 'Send feedback', aria: 'Send feedback' },
@@ -179,51 +179,81 @@
 	aria-hidden={hidden}
 	aria-label="Feedback toolbar"
 >
-	<div class="mode-pill" role="tablist" aria-label="Feedback mode">
-		<button
-			class="mode-btn"
-			type="button"
-			role="tab"
-			aria-selected={mode === 'annotate'}
-			data-active={mode === 'annotate' || undefined}
-			onclick={() => onmodechange('annotate')}
-		>
-			<Pencil size={12} aria-hidden="true" />
-			<span>Annotate</span>
-		</button>
+	<div class="toolbar-row">
+		<div class="history-pill" role="group" aria-label="History">
+			{@render historyButtons()}
+		</div>
 
-		<button
-			class="mode-btn"
-			type="button"
-			role="tab"
-			aria-selected={mode === 'layout'}
-			data-active={mode === 'layout' || undefined}
-			onclick={() => onmodechange('layout')}
-		>
-			<LayoutTemplate size={12} aria-hidden="true" />
-			<span>Layout</span>
-		</button>
+		<div class="mode-pill" role="tablist" aria-label="Feedback mode">
+			<button
+				class="mode-btn"
+				type="button"
+				role="tab"
+				aria-selected={mode === 'annotate'}
+				data-active={mode === 'annotate' || undefined}
+				onclick={() => onmodechange('annotate')}
+			>
+				<Pencil size={12} aria-hidden="true" />
+				<span>Annotate</span>
+			</button>
 
-		<button
-			class="drag-handle"
-			type="button"
-			aria-label="Drag toolbar"
-			onpointerdown={handleHandlePointerDown}
-			onpointermove={handleHandlePointerMove}
-			onpointerup={handleHandlePointerUp}
-			onpointercancel={handleHandlePointerUp}
-		>
-			<GripVertical size={14} aria-hidden="true" />
-		</button>
+			<button
+				class="mode-btn"
+				type="button"
+				role="tab"
+				aria-selected={mode === 'layout'}
+				data-active={mode === 'layout' || undefined}
+				onclick={() => onmodechange('layout')}
+			>
+				<LayoutTemplate size={12} aria-hidden="true" />
+				<span>Layout</span>
+			</button>
+
+			<button
+				class="drag-handle"
+				type="button"
+				aria-label="Drag toolbar"
+				onpointerdown={handleHandlePointerDown}
+				onpointermove={handleHandlePointerMove}
+				onpointerup={handleHandlePointerUp}
+				onpointercancel={handleHandlePointerUp}
+			>
+				<GripVertical size={14} aria-hidden="true" />
+			</button>
+		</div>
 	</div>
+
+	{#snippet historyButtons()}
+		<button
+			class="tool-btn history-btn"
+			type="button"
+			data-tooltip="Undo"
+			disabled={!canUndo}
+			onclick={() => onundo?.()}
+			aria-label="Undo last change"
+		>
+			<Undo2 size={14} />
+		</button>
+
+		<button
+			class="tool-btn history-btn"
+			type="button"
+			data-tooltip="Redo"
+			disabled={!canRedo}
+			onclick={() => onredo?.()}
+			aria-label="Redo last change"
+		>
+			<Redo2 size={14} />
+		</button>
+	{/snippet}
 
 	{#if showToolPill}
 		<div
 			class="tool-pill"
 			role="group"
-			aria-label={showLayoutOptions ? 'Layout tools' : 'Annotation tools'}
+			aria-label={showLayoutTools ? 'Layout tools' : 'Annotation tools'}
 		>
-			{#if showLayoutOptions}
+			{#if showLayoutTools}
 				<button
 					class="tool-btn"
 					type="button"
@@ -232,28 +262,6 @@
 					aria-label="Back to inspector"
 				>
 					<ArrowLeft size={18} />
-				</button>
-
-				<button
-					class="tool-btn"
-					type="button"
-					data-tooltip="Undo"
-					disabled={!canUndoLayout}
-					onclick={() => onlayoutundo?.()}
-					aria-label="Undo last change"
-				>
-					<Undo2 size={18} />
-				</button>
-
-				<button
-					class="tool-btn"
-					type="button"
-					data-tooltip="Redo"
-					disabled={!canRedoLayout}
-					onclick={() => onlayoutredo?.()}
-					aria-label="Redo last change"
-				>
-					<Redo2 size={18} />
 				</button>
 
 				<button
@@ -362,6 +370,13 @@
 		touch-action: none;
 	}
 
+	.toolbar-row {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 6px;
+	}
+
 	.tool-pill {
 		grid-row: 2;
 		align-self: end;
@@ -377,7 +392,8 @@
 	}
 
 	.mode-pill,
-	.tool-pill {
+	.tool-pill,
+	.history-pill {
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
@@ -388,7 +404,8 @@
 		box-shadow: var(--pill-shadow);
 	}
 
-	.mode-pill {
+	.mode-pill,
+	.history-pill {
 		padding: 3px;
 	}
 
@@ -592,6 +609,13 @@
 	.tool-btn[data-active]:hover {
 		background: hsl(25 100% 62%);
 		color: black;
+	}
+
+	.history-pill .history-btn {
+		padding: 0;
+		border-width: 1px;
+		inline-size: 25px;
+		block-size: 25px;
 	}
 
 	.submit-btn {
