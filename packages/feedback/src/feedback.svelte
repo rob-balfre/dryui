@@ -111,11 +111,11 @@
 		addedId: 'dryuiAddedId'
 	} as const;
 
+	type AddedRecord = { el: HTMLElement; kind: string; initialSnap: LayoutSnapshot };
+
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
-	const addedClones = new SvelteMap<string, HTMLElement>();
-	const addedKinds = new SvelteMap<string, string>();
-	const addedInitialSnaps = new SvelteMap<string, LayoutSnapshot>();
+	const addedComponents = new Map<string, AddedRecord>();
 
 	let placingComponent = $state<string | null>(null);
 
@@ -181,7 +181,7 @@
 
 	function destroyAllLayoutClones() {
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
-		for (const id of [...addedClones.keys()]) destroyAddedClone(id);
+		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
 	}
 
 	function makeAddedElement(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
@@ -218,28 +218,27 @@
 	}
 
 	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
-		const existing = addedClones.get(id);
+		const existing = addedComponents.get(id);
 		if (existing) {
-			applyLayoutSnapshot(existing, snap);
-			addedKinds.set(id, kind);
-			return existing;
+			applyLayoutSnapshot(existing.el, snap);
+			if (existing.kind !== kind) {
+				existing.kind = kind;
+				existing.el.textContent = kind;
+			}
+			return existing.el;
 		}
 		const el = makeAddedElement(id, kind, snap);
 		document.body.appendChild(el);
-		addedClones.set(id, el);
-		addedKinds.set(id, kind);
-		if (!addedInitialSnaps.has(id)) addedInitialSnaps.set(id, snap);
+		addedComponents.set(id, { el, kind, initialSnap: snap });
 		return el;
 	}
 
 	function destroyAddedClone(id: string) {
-		const el = addedClones.get(id);
-		if (!el) return;
-		if (selectedLayoutEl === el) selectedLayoutEl = null;
-		el.remove();
-		addedClones.delete(id);
-		addedKinds.delete(id);
-		addedInitialSnaps.delete(id);
+		const record = addedComponents.get(id);
+		if (!record) return;
+		if (selectedLayoutEl === record.el) selectedLayoutEl = null;
+		record.el.remove();
+		addedComponents.delete(id);
 	}
 
 	function snapshotAllClones(): Map<HTMLElement, LayoutSnapshot> {
@@ -250,9 +249,7 @@
 
 	function snapshotAllAdded(): AddedSnapshot[] {
 		const result: AddedSnapshot[] = [];
-		for (const [id, el] of addedClones) {
-			const kind = addedKinds.get(id);
-			if (!kind) continue;
+		for (const [id, { el, kind }] of addedComponents) {
 			result.push({ id, kind, snap: snapshotClone(el) });
 		}
 		return result;
@@ -280,7 +277,7 @@
 			}
 		}
 		const wantedIds = new Set(frame.added.map((a) => a.id));
-		for (const id of [...addedClones.keys()]) {
+		for (const id of [...addedComponents.keys()]) {
 			if (!wantedIds.has(id)) {
 				destroyAddedClone(id);
 				layoutChanged = true;
@@ -333,7 +330,7 @@
 	$effect(() => {
 		const original = selectedLayoutEl;
 		if (!inspectingLayout || !original) return;
-		if (original.dataset?.[LAYOUT_DATASET.addedId]) return;
+		if (original.dataset[LAYOUT_DATASET.addedId]) return;
 		ensureLayoutClone(original);
 	});
 
@@ -358,15 +355,13 @@
 			notifyLayoutChange();
 			return;
 		}
-		const addedId = original.dataset?.[LAYOUT_DATASET.addedId];
-		if (addedId) {
-			const addedInitial = addedInitialSnaps.get(addedId);
-			if (addedInitial) {
-				applyLayoutSnapshot(original, addedInitial);
-				commitHistory();
-				notifyLayoutChange();
-			}
-		}
+		const addedId = original.dataset[LAYOUT_DATASET.addedId];
+		if (!addedId) return;
+		const record = addedComponents.get(addedId);
+		if (!record) return;
+		applyLayoutSnapshot(original, record.initialSnap);
+		commitHistory();
+		notifyLayoutChange();
 	}
 
 	function startPlacingComponent(kind: string) {
@@ -406,7 +401,7 @@
 	function resolveInspectorClone(el: HTMLElement): HTMLElement | null {
 		const clone = layoutClones.get(el);
 		if (clone) return clone;
-		if (el.dataset?.[LAYOUT_DATASET.addedId]) return el;
+		if (el.dataset[LAYOUT_DATASET.addedId]) return el;
 		return null;
 	}
 	let drawings: Drawing[] = $state([]);
