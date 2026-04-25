@@ -70,11 +70,49 @@
 	const showLayoutTools = $derived(mode === 'layout');
 	const showToolPill = $derived(showAnnotationTools || showLayoutTools);
 
-	const COMPONENT_PRESETS = ['Button', 'Input', 'Card', 'Heading', 'Text', 'Container'] as const;
+	const COMPONENT_PRESETS = [
+		'Button',
+		'Input',
+		'Card',
+		'Heading',
+		'Text',
+		'Container',
+		'Avatar',
+		'Badge',
+		'Checkbox',
+		'Dialog',
+		'Divider',
+		'Dropdown',
+		'Icon',
+		'Label',
+		'Link',
+		'List',
+		'Menu',
+		'Modal',
+		'Popover',
+		'Radio',
+		'Select',
+		'Sidebar',
+		'Slider',
+		'Spinner',
+		'Switch',
+		'Tab',
+		'Table',
+		'Textarea',
+		'Tooltip'
+	] as const;
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
 	let pickerInputEl = $state<HTMLInputElement | undefined>();
+
+	const filteredPresets = $derived.by(() => {
+		const query = pickerName.trim().toLowerCase();
+		if (!query) return COMPONENT_PRESETS;
+		return COMPONENT_PRESETS.filter((preset) => preset.toLowerCase().includes(query));
+	});
+
+	const submitLabel = $derived(pickerName.trim() || filteredPresets[0] || '');
 
 	function openPicker() {
 		if (placing) {
@@ -100,7 +138,7 @@
 	function handlePickerKey(e: KeyboardEvent) {
 		if (e.key === 'Enter') {
 			e.preventDefault();
-			pick(pickerName);
+			pick(submitLabel);
 		} else if (e.key === 'Escape') {
 			e.preventDefault();
 			closePicker();
@@ -326,22 +364,32 @@
 							<input
 								class="component-picker-input"
 								type="text"
-								placeholder="Component name"
+								placeholder="Search or type a name"
 								bind:this={pickerInputEl}
 								bind:value={pickerName}
 								onkeydown={handlePickerKey}
 							/>
-							<div class="component-picker-presets">
-								{#each COMPONENT_PRESETS as preset}
-									<button
-										class="component-picker-preset"
-										type="button"
-										onclick={() => pick(preset)}
-									>
-										{preset}
-									</button>
-								{/each}
-							</div>
+							{#if filteredPresets.length > 0}
+								<div class="component-picker-presets">
+									{#each filteredPresets as preset (preset)}
+										<button
+											class="component-picker-preset"
+											type="button"
+											onclick={() => pick(preset)}
+										>
+											{preset}
+										</button>
+									{/each}
+								</div>
+							{:else if pickerName.trim()}
+								<button
+									class="component-picker-preset component-picker-create"
+									type="button"
+									onclick={() => pick(pickerName)}
+								>
+									Add "{pickerName.trim()}"
+								</button>
+							{/if}
 						</div>
 					{/if}
 				</div>
@@ -725,7 +773,8 @@
 		right: 0;
 		display: grid;
 		gap: 8px;
-		min-inline-size: 220px;
+		min-inline-size: 240px;
+		max-inline-size: 280px;
 		padding: 10px;
 		border-radius: 12px;
 		background: var(--pill-bg);
@@ -761,6 +810,14 @@
 		display: grid;
 		grid-template-columns: repeat(2, 1fr);
 		gap: 4px;
+		max-block-size: 220px;
+		overflow-y: auto;
+	}
+
+	.component-picker-create {
+		grid-column: 1 / -1;
+		border-style: dashed;
+		color: hsl(25 100% 80%);
 	}
 
 	.component-picker-preset {
