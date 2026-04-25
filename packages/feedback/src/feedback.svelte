@@ -3,7 +3,14 @@
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import { Check } from 'lucide-svelte';
-	import { onDestroy, onMount, untrack } from 'svelte';
+	import {
+		createRawSnippet,
+		mount as mountComponent,
+		onDestroy,
+		onMount,
+		unmount as unmountComponent,
+		untrack
+	} from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		type Arrow,
@@ -111,7 +118,12 @@
 		addedId: 'dryuiAddedId'
 	} as const;
 
-	type AddedRecord = { el: HTMLElement; kind: string; initialSnap: LayoutSnapshot };
+	type AddedRecord = {
+		el: HTMLElement;
+		kind: string;
+		initialSnap: LayoutSnapshot;
+		mounted?: ReturnType<typeof mountComponent> | null;
+	};
 
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
@@ -187,7 +199,6 @@
 	function makeAddedElement(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
 		const el = document.createElement('div');
 		el.dataset[LAYOUT_DATASET.addedId] = id;
-		el.textContent = kind;
 		Object.assign(el.style, {
 			position: 'fixed',
 			left: snap.left,
@@ -213,8 +224,70 @@
 			pointerEvents: 'none',
 			transform: snap.transform
 		});
+		const content = document.createElement('div');
+		content.dataset.dryuiAddedContent = '';
+		content.style.cssText = 'display: contents;';
+		const fallback = document.createElement('span');
+		fallback.dataset.dryuiAddedFallback = '';
+		fallback.textContent = kind;
+		el.appendChild(content);
+		el.appendChild(fallback);
 		if (snap.rotation !== undefined) el.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
 		return el;
+	}
+
+	async function tryRenderInto(record: AddedRecord) {
+		try {
+			const ui = await import('@dryui/ui');
+			const Component = (ui as Record<string, unknown>)[record.kind];
+			if (typeof Component !== 'function') return;
+			if (!record.el.isConnected) return;
+			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
+			if (!target) return;
+			target.style.cssText = 'display: contents;';
+			const labelSnippet = createRawSnippet(() => ({
+				render: () => `<span>${escapeHtml(record.kind)}</span>`
+			}));
+			const instance = mountComponent(Component as Parameters<typeof mountComponent>[0], {
+				target,
+				props: { children: labelSnippet }
+			});
+			record.mounted = instance;
+			record.el.dataset.dryuiAddedRendered = '';
+			record.el.style.background = 'transparent';
+			record.el.style.borderColor = 'hsl(25 100% 55% / 0.6)';
+			const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+			if (fallback) fallback.style.display = 'none';
+		} catch (err) {
+			console.warn('[feedback] failed to render', record.kind, err);
+		}
+	}
+
+	function unmountAdded(record: AddedRecord) {
+		if (!record.mounted) return;
+		try {
+			unmountComponent(record.mounted);
+		} catch {
+			// component may already be torn down; ignore
+		}
+		record.mounted = null;
+	}
+
+	function escapeHtml(value: string): string {
+		return value.replace(/[&<>"']/g, (ch) => {
+			switch (ch) {
+				case '&':
+					return '&amp;';
+				case '<':
+					return '&lt;';
+				case '>':
+					return '&gt;';
+				case '"':
+					return '&quot;';
+				default:
+					return '&#39;';
+			}
+		});
 	}
 
 	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
@@ -222,14 +295,25 @@
 		if (existing) {
 			applyLayoutSnapshot(existing.el, snap);
 			if (existing.kind !== kind) {
+				unmountAdded(existing);
 				existing.kind = kind;
-				existing.el.textContent = kind;
+				const fallback = existing.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+				if (fallback) {
+					fallback.textContent = kind;
+					fallback.style.display = '';
+				}
+				delete existing.el.dataset.dryuiAddedRendered;
+				existing.el.style.background = 'hsl(25 100% 55% / 0.16)';
+				existing.el.style.borderColor = 'hsl(25 100% 55%)';
+				void tryRenderInto(existing);
 			}
 			return existing.el;
 		}
 		const el = makeAddedElement(id, kind, snap);
 		document.body.appendChild(el);
-		addedComponents.set(id, { el, kind, initialSnap: snap });
+		const record: AddedRecord = { el, kind, initialSnap: snap, mounted: null };
+		addedComponents.set(id, record);
+		void tryRenderInto(record);
 		return el;
 	}
 
@@ -237,6 +321,7 @@
 		const record = addedComponents.get(id);
 		if (!record) return;
 		if (selectedLayoutEl === record.el) selectedLayoutEl = null;
+		unmountAdded(record);
 		record.el.remove();
 		addedComponents.delete(id);
 	}
