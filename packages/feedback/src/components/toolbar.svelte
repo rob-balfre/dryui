@@ -3,6 +3,7 @@
 		Check,
 		Pencil,
 		Eraser,
+		GripVertical,
 		MoveUpRight,
 		Type,
 		FilePlus,
@@ -11,7 +12,7 @@
 		PanelTop,
 		Send
 	} from 'lucide-svelte';
-	import { Button, Dialog, Heading, OptionPicker } from '@dryui/ui';
+	import { Dialog } from '@dryui/ui';
 	import { type SubmitStatus, type Tool } from '../types.js';
 
 	interface Props {
@@ -51,41 +52,52 @@
 
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
+	let pendingDrag = $state<{ id: number; x: number; y: number } | null>(null);
 	let layoutDialogOpen = $state(false);
-	let layoutChoice = $state('');
+
+	const DRAG_THRESHOLD_PX = 4;
 	const submitting = $derived(submitStatus !== 'idle');
 	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
 	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
 	const showSubmitButton = $derived(hasDrawings || submitting || sent);
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
-	function handlePointerDown(e: PointerEvent) {
-		if ((e.target as HTMLElement).closest('button, [role="menu"], [role="menuitem"]')) return;
-		const toolbar = e.currentTarget as HTMLDivElement;
-		dragging = true;
-		const rect = toolbar.getBoundingClientRect();
-		dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-		toolbar.setPointerCapture(e.pointerId);
+	let toolbarEl = $state<HTMLDivElement | null>(null);
+
+	function handleHandlePointerDown(e: PointerEvent) {
+		pendingDrag = { id: e.pointerId, x: e.clientX, y: e.clientY };
 	}
 
-	function handlePointerMove(e: PointerEvent) {
-		if (!dragging) return;
-		const toolbar = e.currentTarget as HTMLDivElement;
+	function handleHandlePointerMove(e: PointerEvent) {
+		if (!pendingDrag || !toolbarEl) return;
+		const handle = e.currentTarget as HTMLButtonElement;
+
+		if (!dragging) {
+			const dx = e.clientX - pendingDrag.x;
+			const dy = e.clientY - pendingDrag.y;
+			if (Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
+			const rect = toolbarEl.getBoundingClientRect();
+			dragOffset = { x: pendingDrag.x - rect.left, y: pendingDrag.y - rect.top };
+			handle.setPointerCapture(pendingDrag.id);
+			dragging = true;
+		}
+
 		const x = Math.max(
 			0,
-			Math.min(window.innerWidth - toolbar.offsetWidth, e.clientX - dragOffset.x)
+			Math.min(window.innerWidth - toolbarEl.offsetWidth, e.clientX - dragOffset.x)
 		);
 		const y = Math.max(
 			0,
-			Math.min(window.innerHeight - toolbar.offsetHeight, e.clientY - dragOffset.y)
+			Math.min(window.innerHeight - toolbarEl.offsetHeight, e.clientY - dragOffset.y)
 		);
-		toolbar.style.left = `${x}px`;
-		toolbar.style.top = `${y}px`;
-		toolbar.style.right = 'auto';
-		toolbar.style.bottom = 'auto';
+		toolbarEl.style.left = `${x}px`;
+		toolbarEl.style.top = `${y}px`;
+		toolbarEl.style.right = 'auto';
+		toolbarEl.style.bottom = 'auto';
 	}
 
-	function handlePointerUp() {
+	function handleHandlePointerUp() {
+		pendingDrag = null;
 		dragging = false;
 	}
 
@@ -98,27 +110,16 @@
 		}
 	}
 
-	function handleLayoutClick() {
-		ontoolchange('layout');
-	}
-
-	function closeLayoutDialog() {
+	function handleLayoutChoice(_choice: 'update-current-page' | 'add-new-page') {
 		layoutDialogOpen = false;
-	}
-
-	function handleLayoutChoice(nextChoice: string) {
-		layoutChoice = nextChoice;
-		closeLayoutDialog();
-		layoutChoice = '';
 	}
 </script>
 
 <div
+	bind:this={toolbarEl}
 	class="toolbar"
 	data-hidden={hidden || undefined}
-	onpointerdown={handlePointerDown}
-	onpointermove={handlePointerMove}
-	onpointerup={handlePointerUp}
+	data-dragging={dragging || undefined}
 	role="toolbar"
 	tabindex="-1"
 	aria-hidden={hidden}
@@ -153,49 +154,44 @@
 
 	<Dialog.Root bind:open={layoutDialogOpen}>
 		<Dialog.Trigger>
-			<Button
-				variant="bare"
-				class="tool-btn"
-				onclick={handleLayoutClick}
-				aria-label="Build page layouts"
-			>
+			<button class="tool-btn" type="button" aria-label="Build page layouts">
 				<LayoutTemplate size={18} />
-			</Button>
+			</button>
 		</Dialog.Trigger>
 
 		<div class="layout-dialog-scope">
 			<Dialog.Content>
 				<Dialog.Header>
-					<div class="layout-dialog-header">
-						<div class="layout-dialog-icon" aria-hidden="true">
-							<LayoutTemplate size={18} />
-						</div>
-						<Heading level={2}>Layouts</Heading>
-						<Dialog.Close aria-label="Close layout dialog">
-							<span aria-hidden="true">&times;</span>
-						</Dialog.Close>
-					</div>
+					<h2 class="layout-dialog-title">
+						<LayoutTemplate size={12} aria-hidden="true" />
+						Layouts
+					</h2>
 				</Dialog.Header>
 
 				<Dialog.Body>
-					<OptionPicker.Root
-						bind:value={() => layoutChoice, handleLayoutChoice}
-						orientation="vertical"
-					>
-						<OptionPicker.Item value="update-current-page" size="compact">
-							<OptionPicker.Preview>
-								<PanelTop size={18} />
-							</OptionPicker.Preview>
-							<OptionPicker.Label>Update current page layout</OptionPicker.Label>
-						</OptionPicker.Item>
+					<div class="layout-actions" role="menu" aria-label="Layout actions">
+						<button
+							class="layout-action"
+							type="button"
+							role="menuitem"
+							onclick={() => handleLayoutChoice('update-current-page')}
+						>
+							<PanelTop size={16} aria-hidden="true" />
+							<span class="layout-action-label">Update current page</span>
+							<span class="layout-action-hint">Apply changes to this route</span>
+						</button>
 
-						<OptionPicker.Item value="add-new-page" size="compact">
-							<OptionPicker.Preview>
-								<FilePlus size={18} />
-							</OptionPicker.Preview>
-							<OptionPicker.Label>Add new page</OptionPicker.Label>
-						</OptionPicker.Item>
-					</OptionPicker.Root>
+						<button
+							class="layout-action"
+							type="button"
+							role="menuitem"
+							onclick={() => handleLayoutChoice('add-new-page')}
+						>
+							<FilePlus size={16} aria-hidden="true" />
+							<span class="layout-action-label">Add new page</span>
+							<span class="layout-action-hint">Pick a layout, create a route</span>
+						</button>
+					</div>
 				</Dialog.Body>
 			</Dialog.Content>
 		</div>
@@ -239,6 +235,18 @@
 			<span class="submit-label">{submitCopy.label}</span>
 		</button>
 	{/if}
+
+	<button
+		class="drag-handle"
+		type="button"
+		aria-label="Drag toolbar"
+		onpointerdown={handleHandlePointerDown}
+		onpointermove={handleHandlePointerMove}
+		onpointerup={handleHandlePointerUp}
+		onpointercancel={handleHandlePointerUp}
+	>
+		<GripVertical size={14} aria-hidden="true" />
+	</button>
 </div>
 
 <style>
@@ -257,18 +265,52 @@
 		background: hsl(225 15% 15% / 0.95);
 		backdrop-filter: blur(8px);
 		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
-		cursor: grab;
 		user-select: none;
 		touch-action: none;
 	}
 
-	.toolbar:active {
+	.toolbar[data-dragging] {
 		cursor: grabbing;
 	}
 
 	.toolbar[data-hidden] {
 		visibility: hidden;
 		pointer-events: none;
+	}
+
+	.toolbar :global([data-dialog-trigger='true']) {
+		display: contents;
+	}
+
+	.drag-handle {
+		display: grid;
+		place-items: center;
+		padding: 8px 4px;
+		margin-inline-start: 2px;
+		border: none;
+		border-radius: 6px;
+		background: transparent;
+		color: hsl(220 10% 45%);
+		cursor: grab;
+		touch-action: none;
+		transition:
+			background 0.15s,
+			color 0.15s;
+	}
+
+	.drag-handle:hover {
+		background: hsl(225 15% 22%);
+		color: hsl(220 10% 80%);
+	}
+
+	.drag-handle:focus-visible {
+		outline: 2px solid hsl(25 100% 55%);
+		outline-offset: 1px;
+	}
+
+	.toolbar[data-dragging] .drag-handle {
+		cursor: grabbing;
+		color: hsl(25 100% 67%);
 	}
 
 	.tool-btn {
@@ -337,25 +379,87 @@
 		white-space: nowrap;
 	}
 
-	.layout-dialog-header {
-		display: grid;
-		grid-template-columns: auto 1fr auto;
-		align-items: center;
-		gap: 10px;
+	.layout-dialog-scope {
+		--dry-dialog-max-width: 19rem;
+		display: contents;
 	}
 
-	.layout-dialog-icon {
-		display: grid;
-		place-items: center;
-		aspect-ratio: 1;
-		padding: 8px;
-		border-radius: 8px;
-		background: hsl(25 100% 55% / 0.16);
+	.layout-dialog-title {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 8px;
+		margin: 0;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
 		color: hsl(25 100% 67%);
 	}
 
-	.layout-dialog-scope {
-		--dry-dialog-max-width: 20rem;
-		display: contents;
+	.layout-actions {
+		display: grid;
+		gap: 2px;
+	}
+
+	.layout-action {
+		display: grid;
+		grid-template-columns: 16px 1fr;
+		column-gap: 12px;
+		row-gap: 2px;
+		align-items: center;
+		padding: 10px 12px;
+		border: 1px solid transparent;
+		border-radius: 8px;
+		background: transparent;
+		color: var(--dry-color-text-strong, hsl(220 10% 92%));
+		cursor: pointer;
+		text-align: start;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			color 0.15s;
+	}
+
+	.layout-action :global(svg) {
+		grid-row: 1 / span 2;
+		color: hsl(25 100% 67%);
+	}
+
+	.layout-action-label {
+		grid-column: 2;
+		grid-row: 1;
+		font-size: 13px;
+		font-weight: 600;
+		line-height: 1.2;
+	}
+
+	.layout-action-hint {
+		grid-column: 2;
+		grid-row: 2;
+		font-size: 11px;
+		font-weight: 400;
+		line-height: 1.3;
+		color: var(--dry-color-text-weak, hsl(220 10% 58%));
+	}
+
+	.layout-action:hover,
+	.layout-action:focus-visible {
+		background: hsl(25 100% 55% / 0.08);
+		border-color: hsl(25 100% 55% / 0.35);
+		outline: none;
+	}
+
+	.layout-action:active {
+		background: hsl(25 100% 55% / 0.18);
+		border-color: hsl(25 100% 55%);
 	}
 </style>
