@@ -1,49 +1,62 @@
 <script lang="ts">
 	import {
+		AlignVerticalJustifyCenter,
+		ArrowLeft,
 		Check,
-		Pencil,
 		Eraser,
 		GripVertical,
-		MoveUpRight,
-		Type,
-		FilePlus,
 		LayoutTemplate,
+		Maximize,
 		Move,
-		PanelTop,
-		Send
+		MoveUpRight,
+		Pencil,
+		RotateCcw,
+		Send,
+		Type
 	} from 'lucide-svelte';
-	import { Dialog } from '@dryui/ui';
 	import { type SubmitStatus, type Tool } from '../types.js';
 
-	export type LayoutAction = 'update-current-page' | 'add-new-page';
+	export type LayoutTransform = 'fill' | 'center' | 'reset';
+	export type Mode = 'annotate' | 'layout';
 
 	interface Props {
 		active: boolean;
 		tool: Tool;
+		mode: Mode;
 		hasDrawings: boolean;
 		hidden: boolean;
 		submitStatus: SubmitStatus;
 		sent: boolean;
-		inspectingLayout?: boolean;
+		hasSelection?: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
-		onlayoutaction?: (action: LayoutAction) => void;
+		onmodechange: (mode: Mode) => void;
+		onlayouttransform?: (transform: LayoutTransform) => void;
+		ondeselect?: () => void;
 	}
 
 	let {
 		active,
 		tool,
+		mode,
 		hasDrawings,
 		hidden,
 		submitStatus,
 		sent,
-		inspectingLayout = false,
+		hasSelection = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
-		onlayoutaction
+		onmodechange,
+		onlayouttransform,
+		ondeselect
 	}: Props = $props();
+
+	const inspecting = $derived(mode === 'layout');
+	const showLayoutOptions = $derived(inspecting && hasSelection);
+	const showAnnotationTools = $derived(mode === 'annotate');
+	const showToolPill = $derived(showAnnotationTools || showLayoutOptions);
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
 		idle: { label: 'Send feedback', aria: 'Send feedback' },
@@ -59,7 +72,6 @@
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
 	let pendingDrag = $state<{ id: number; x: number; y: number } | null>(null);
-	let layoutDialogOpen = $state(false);
 
 	const DRAG_THRESHOLD_PX = 4;
 	const submitting = $derived(submitStatus !== 'idle');
@@ -75,17 +87,28 @@
 	function updatePillPosition() {
 		if (!toolbarEl) return;
 		const rect = toolbarEl.getBoundingClientRect();
-		pillPosition = rect.top < PILL_CLEARANCE ? 'below' : 'above';
+		const next = rect.top < PILL_CLEARANCE ? 'below' : 'above';
+		if (next !== pillPosition) pillPosition = next;
+	}
+
+	let pillFrame = 0;
+	function schedulePillUpdate() {
+		if (pillFrame) return;
+		pillFrame = requestAnimationFrame(() => {
+			pillFrame = 0;
+			updatePillPosition();
+		});
 	}
 
 	$effect(() => {
-		if (!inspectingLayout) return;
+		if (!inspecting) return;
 		updatePillPosition();
-		window.addEventListener('resize', updatePillPosition);
-		window.addEventListener('scroll', updatePillPosition, true);
+		window.addEventListener('resize', schedulePillUpdate);
+		window.addEventListener('scroll', schedulePillUpdate, true);
 		return () => {
-			window.removeEventListener('resize', updatePillPosition);
-			window.removeEventListener('scroll', updatePillPosition, true);
+			if (pillFrame) cancelAnimationFrame(pillFrame);
+			window.removeEventListener('resize', schedulePillUpdate);
+			window.removeEventListener('scroll', schedulePillUpdate, true);
 		};
 	});
 
@@ -119,7 +142,7 @@
 		toolbarEl.style.top = `${y}px`;
 		toolbarEl.style.right = 'auto';
 		toolbarEl.style.bottom = 'auto';
-		if (inspectingLayout) updatePillPosition();
+		if (inspecting) updatePillPosition();
 	}
 
 	function handleHandlePointerUp() {
@@ -135,11 +158,6 @@
 			ontoggle();
 		}
 	}
-
-	function handleLayoutChoice(choice: LayoutAction) {
-		layoutDialogOpen = false;
-		onlayoutaction?.(choice);
-	}
 </script>
 
 <div
@@ -150,132 +168,159 @@
 	role="toolbar"
 	tabindex="-1"
 	aria-hidden={hidden}
-	aria-label="Feedback drawing tools"
+	aria-label="Feedback toolbar"
 >
-	<button
-		class="tool-btn"
-		data-active={(active && tool === 'pencil') || undefined}
-		onclick={() => handleToolClick('pencil')}
-		aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
-	>
-		<Pencil size={18} />
-	</button>
-
-	<button
-		class="tool-btn"
-		data-active={(active && tool === 'arrow') || undefined}
-		onclick={() => handleToolClick('arrow')}
-		aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
-	>
-		<MoveUpRight size={18} />
-	</button>
-
-	<button
-		class="tool-btn"
-		data-active={(active && tool === 'text') || undefined}
-		onclick={() => handleToolClick('text')}
-		aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
-	>
-		<Type size={18} />
-	</button>
-
-	<Dialog.Root bind:open={layoutDialogOpen}>
-		<Dialog.Trigger>
-			<button class="tool-btn" type="button" aria-label="Build page layouts">
-				<LayoutTemplate size={18} />
-			</button>
-		</Dialog.Trigger>
-
-		<div class="layout-dialog-scope">
-			<Dialog.Content>
-				<Dialog.Header>
-					<h2 class="layout-dialog-title">
-						<LayoutTemplate size={12} aria-hidden="true" />
-						Layouts
-					</h2>
-				</Dialog.Header>
-
-				<Dialog.Body>
-					<div class="layout-actions" role="menu" aria-label="Layout actions">
-						<button
-							class="layout-action"
-							type="button"
-							role="menuitem"
-							onclick={() => handleLayoutChoice('update-current-page')}
-						>
-							<PanelTop size={16} aria-hidden="true" />
-							<span class="layout-action-label">Update current page</span>
-							<span class="layout-action-hint">Apply changes to this route</span>
-						</button>
-
-						<button
-							class="layout-action"
-							type="button"
-							role="menuitem"
-							onclick={() => handleLayoutChoice('add-new-page')}
-						>
-							<FilePlus size={16} aria-hidden="true" />
-							<span class="layout-action-label">Add new page</span>
-							<span class="layout-action-hint">Pick a layout, create a route</span>
-						</button>
-					</div>
-				</Dialog.Body>
-			</Dialog.Content>
-		</div>
-	</Dialog.Root>
-
-	{#if showMoveTool}
+	<div class="mode-pill" role="tablist" aria-label="Feedback mode">
 		<button
-			class="tool-btn"
-			data-active={(active && tool === 'move') || undefined}
-			onclick={() => handleToolClick('move')}
-			aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
+			class="mode-btn"
+			type="button"
+			role="tab"
+			aria-selected={mode === 'annotate'}
+			data-active={mode === 'annotate' || undefined}
+			onclick={() => onmodechange('annotate')}
 		>
-			<Move size={18} />
+			<Pencil size={12} aria-hidden="true" />
+			<span>Annotate</span>
 		</button>
-	{/if}
 
-	{#if showEraserTool}
 		<button
-			class="tool-btn"
-			data-active={(active && tool === 'eraser') || undefined}
-			onclick={() => handleToolClick('eraser')}
-			aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
+			class="mode-btn"
+			type="button"
+			role="tab"
+			aria-selected={mode === 'layout'}
+			data-active={mode === 'layout' || undefined}
+			onclick={() => onmodechange('layout')}
 		>
-			<Eraser size={18} />
+			<LayoutTemplate size={12} aria-hidden="true" />
+			<span>Layout</span>
 		</button>
-	{/if}
 
-	{#if showSubmitButton}
 		<button
-			class="tool-btn submit-btn"
-			data-submitting={submitting || undefined}
-			data-sent={sent || undefined}
-			onclick={onsubmit}
-			aria-label={submitCopy.aria}
+			class="drag-handle"
+			type="button"
+			aria-label="Drag toolbar"
+			onpointerdown={handleHandlePointerDown}
+			onpointermove={handleHandlePointerMove}
+			onpointerup={handleHandlePointerUp}
+			onpointercancel={handleHandlePointerUp}
 		>
-			{#if sent}
-				<Check size={16} />
+			<GripVertical size={14} aria-hidden="true" />
+		</button>
+	</div>
+
+	{#if showToolPill}
+		<div
+			class="tool-pill"
+			role="group"
+			aria-label={showLayoutOptions ? 'Layout tools' : 'Annotation tools'}
+		>
+			{#if showLayoutOptions}
+				<button
+					class="tool-btn"
+					type="button"
+					onclick={() => ondeselect?.()}
+					aria-label="Back to inspector"
+				>
+					<ArrowLeft size={18} />
+				</button>
+
+				<button
+					class="tool-btn"
+					type="button"
+					onclick={() => onlayouttransform?.('fill')}
+					aria-label="Fill available space"
+				>
+					<Maximize size={18} />
+				</button>
+
+				<button
+					class="tool-btn"
+					type="button"
+					onclick={() => onlayouttransform?.('center')}
+					aria-label="Center content"
+				>
+					<AlignVerticalJustifyCenter size={18} />
+				</button>
+
+				<button
+					class="tool-btn"
+					type="button"
+					onclick={() => onlayouttransform?.('reset')}
+					aria-label="Reset layout overrides"
+				>
+					<RotateCcw size={18} />
+				</button>
 			{:else}
-				<Send size={16} />
+				<button
+					class="tool-btn"
+					data-active={(active && tool === 'pencil') || undefined}
+					onclick={() => handleToolClick('pencil')}
+					aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
+				>
+					<Pencil size={18} />
+				</button>
+
+				<button
+					class="tool-btn"
+					data-active={(active && tool === 'arrow') || undefined}
+					onclick={() => handleToolClick('arrow')}
+					aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
+				>
+					<MoveUpRight size={18} />
+				</button>
+
+				<button
+					class="tool-btn"
+					data-active={(active && tool === 'text') || undefined}
+					onclick={() => handleToolClick('text')}
+					aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
+				>
+					<Type size={18} />
+				</button>
+
+				{#if showMoveTool}
+					<button
+						class="tool-btn"
+						data-active={(active && tool === 'move') || undefined}
+						onclick={() => handleToolClick('move')}
+						aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
+					>
+						<Move size={18} />
+					</button>
+				{/if}
+
+				{#if showEraserTool}
+					<button
+						class="tool-btn"
+						data-active={(active && tool === 'eraser') || undefined}
+						onclick={() => handleToolClick('eraser')}
+						aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
+					>
+						<Eraser size={18} />
+					</button>
+				{/if}
+
+				{#if showSubmitButton}
+					<button
+						class="tool-btn submit-btn"
+						data-submitting={submitting || undefined}
+						data-sent={sent || undefined}
+						onclick={onsubmit}
+						aria-label={submitCopy.aria}
+					>
+						{#if sent}
+							<Check size={16} />
+						{:else}
+							<Send size={16} />
+						{/if}
+						<span class="submit-label">{submitCopy.label}</span>
+					</button>
+				{/if}
 			{/if}
-			<span class="submit-label">{submitCopy.label}</span>
-		</button>
+		</div>
 	{/if}
 
-	<button
-		class="drag-handle"
-		type="button"
-		aria-label="Drag toolbar"
-		onpointerdown={handleHandlePointerDown}
-		onpointermove={handleHandlePointerMove}
-		onpointerup={handleHandlePointerUp}
-		onpointercancel={handleHandlePointerUp}
-	>
-		<GripVertical size={14} aria-hidden="true" />
-	</button>
-
-	{#if inspectingLayout}
+	{#if inspecting}
 		<div class="inspect-pill" data-position={pillPosition} role="status">
 			<span class="inspect-pill-dot" aria-hidden="true"></span>
 			<span class="inspect-pill-label">Inspecting layout</span>
@@ -287,21 +332,25 @@
 <style>
 	.toolbar {
 		--accent: hsl(25 100% 55%);
+		--pill-bg: hsl(225 15% 15% / 0.95);
+		--pill-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		--tool-slot-height: 46px;
 
 		position: absolute;
 		right: 24px;
 		bottom: 24px;
 		z-index: 10000;
 		display: grid;
-		grid-auto-flow: column;
-		gap: 2px;
-		padding: 4px;
-		border-radius: 12px;
-		background: hsl(225 15% 15% / 0.95);
-		backdrop-filter: blur(8px);
-		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		grid-template-rows: auto var(--tool-slot-height);
+		justify-items: end;
+		gap: 6px;
 		user-select: none;
 		touch-action: none;
+	}
+
+	.tool-pill {
+		grid-row: 2;
+		align-self: end;
 	}
 
 	.toolbar[data-dragging] {
@@ -313,14 +362,67 @@
 		pointer-events: none;
 	}
 
-	.toolbar :global([data-dialog-trigger='true']) {
-		display: contents;
+	.mode-pill,
+	.tool-pill {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 2px;
+		border-radius: 12px;
+		background: var(--pill-bg);
+		backdrop-filter: blur(8px);
+		box-shadow: var(--pill-shadow);
+	}
+
+	.mode-pill {
+		padding: 3px;
+	}
+
+	.tool-pill {
+		padding: 4px;
+	}
+
+	.mode-btn {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 10px;
+		border: none;
+		border-radius: 8px;
+		background: transparent;
+		color: hsl(220 10% 60%);
+		cursor: pointer;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		transition:
+			background 0.15s,
+			color 0.15s;
+	}
+
+	.mode-btn:hover:not([data-active]) {
+		color: hsl(220 10% 88%);
+	}
+
+	.mode-btn[data-active] {
+		background: hsl(25 100% 55% / 0.18);
+		color: hsl(25 100% 80%);
+	}
+
+	.mode-btn:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 1px;
 	}
 
 	.drag-handle {
 		display: grid;
 		place-items: center;
-		padding: 8px 4px;
+		padding: 6px 4px;
 		margin-inline-start: 2px;
 		border: none;
 		border-radius: 6px;
@@ -339,7 +441,7 @@
 	}
 
 	.drag-handle:focus-visible {
-		outline: 2px solid hsl(25 100% 55%);
+		outline: 2px solid var(--accent);
 		outline-offset: 1px;
 	}
 
@@ -350,15 +452,14 @@
 
 	.inspect-pill {
 		position: absolute;
-		inset-inline-start: 50%;
-		transform: translateX(-50%);
+		inset-inline-end: 0;
 		display: inline-grid;
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 8px;
 		padding: 6px 10px;
 		border-radius: 8px;
-		background: hsl(225 15% 15% / 0.95);
+		background: var(--pill-bg);
 		backdrop-filter: blur(8px);
 		color: hsl(220 10% 92%);
 		font-family:
@@ -368,7 +469,7 @@
 		font-size: 11px;
 		font-weight: 500;
 		letter-spacing: 0.04em;
-		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		box-shadow: var(--pill-shadow);
 		white-space: nowrap;
 		pointer-events: none;
 	}
@@ -464,94 +565,5 @@
 			-apple-system,
 			sans-serif;
 		white-space: nowrap;
-	}
-
-	.layout-dialog-scope {
-		--dry-dialog-max-width: 19rem;
-		display: contents;
-	}
-
-	.layout-dialog-scope :global([data-dialog-header]),
-	.layout-dialog-scope :global([data-dialog-body]) {
-		--dry-section-padding: 14px 16px;
-	}
-
-	.layout-dialog-title {
-		display: inline-grid;
-		grid-auto-flow: column;
-		align-items: center;
-		gap: 8px;
-		margin: 0;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.14em;
-		text-transform: uppercase;
-		color: hsl(25 100% 67%);
-	}
-
-	.layout-actions {
-		display: grid;
-		gap: 2px;
-	}
-
-	.layout-action {
-		display: grid;
-		grid-template-columns: 16px 1fr;
-		column-gap: 12px;
-		row-gap: 2px;
-		align-items: center;
-		padding: 10px 12px;
-		border: 1px solid transparent;
-		border-radius: 8px;
-		background: transparent;
-		color: var(--dry-color-text-strong, hsl(220 10% 92%));
-		cursor: pointer;
-		text-align: start;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		transition:
-			background 0.15s,
-			border-color 0.15s,
-			color 0.15s;
-	}
-
-	.layout-action :global(svg) {
-		grid-row: 1 / span 2;
-		color: hsl(25 100% 67%);
-	}
-
-	.layout-action-label {
-		grid-column: 2;
-		grid-row: 1;
-		font-size: 13px;
-		font-weight: 600;
-		line-height: 1.2;
-	}
-
-	.layout-action-hint {
-		grid-column: 2;
-		grid-row: 2;
-		font-size: 11px;
-		font-weight: 400;
-		line-height: 1.3;
-		color: var(--dry-color-text-weak, hsl(220 10% 58%));
-	}
-
-	.layout-action:hover,
-	.layout-action:focus-visible {
-		background: hsl(25 100% 55% / 0.08);
-		border-color: hsl(25 100% 55% / 0.35);
-		outline: none;
-	}
-
-	.layout-action:active {
-		background: hsl(25 100% 55% / 0.18);
-		border-color: hsl(25 100% 55%);
 	}
 </style>
