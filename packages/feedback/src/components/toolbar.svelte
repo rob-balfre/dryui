@@ -777,20 +777,18 @@
 
 	.component-picker-presets {
 		display: grid;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 4px;
 		max-block-size: 240px;
 		overflow-y: auto;
 	}
 
 	.component-picker-create {
-		grid-column: 1 / -1;
 		border-style: dashed;
 		color: hsl(25 100% 80%);
 	}
 
 	.component-picker-preset {
-		padding: 6px 8px;
+		padding: 6px 10px;
 		border: 1px solid hsl(220 10% 25%);
 		border-radius: 6px;
 		background: transparent;
@@ -799,14 +797,11 @@
 			system-ui,
 			-apple-system,
 			sans-serif;
-		font-size: 11px;
+		font-size: 12px;
 		font-weight: 600;
 		letter-spacing: 0.02em;
+		text-align: start;
 		cursor: pointer;
-		min-inline-size: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
 		transition:
 			background 0.15s,
 			border-color 0.15s,
