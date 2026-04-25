@@ -15,7 +15,7 @@
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
-	import Toolbar, { type LayoutAction } from './components/toolbar.svelte';
+	import Toolbar, { type LayoutTransform, type Mode } from './components/toolbar.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
@@ -69,15 +69,78 @@
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
 	let inspectingLayout = $state(false);
+	let selectedLayoutEl = $state<HTMLElement | null>(null);
+	const mode = $derived<Mode>(inspectingLayout ? 'layout' : 'annotate');
 
-	function handleLayoutAction(action: LayoutAction) {
-		if (action === 'update-current-page') {
-			inspectingLayout = true;
-		}
+	function setMode(next: Mode) {
+		inspectingLayout = next === 'layout';
+		selectedLayoutEl = null;
 	}
 
 	function stopInspectingLayout() {
 		inspectingLayout = false;
+		selectedLayoutEl = null;
+	}
+
+	function selectLayoutElement(el: HTMLElement | null) {
+		selectedLayoutEl = el;
+	}
+
+	function applyLayoutTransform(transform: LayoutTransform) {
+		const el = selectedLayoutEl;
+		if (!el) return;
+
+		switch (transform) {
+			case 'fill': {
+				el.style.width = '100%';
+
+				const parent = el.parentElement;
+				const parentRect = parent?.getBoundingClientRect();
+				const viewportH = window.innerHeight;
+
+				// If the parent already spans nearly the viewport, we can fill it with
+				// height: 100%. If the parent is shrink-wrapped to content (much shorter
+				// than the viewport), escalate to dvh so the element actually fills.
+				if (parentRect && parentRect.height >= viewportH * 0.9) {
+					el.style.height = '100%';
+					el.style.minHeight = '';
+				} else {
+					el.style.minHeight = '100dvh';
+					el.style.height = '';
+				}
+
+				if (parent) {
+					const parentCS = getComputedStyle(parent);
+					if (parentCS.display === 'grid' || parentCS.display === 'inline-grid') {
+						el.style.alignSelf = 'stretch';
+						el.style.justifySelf = 'stretch';
+					}
+				}
+				break;
+			}
+			case 'center': {
+				el.style.placeContent = 'center';
+				el.style.placeItems = 'center';
+				break;
+			}
+			case 'reset': {
+				el.style.width = '';
+				el.style.height = '';
+				el.style.minHeight = '';
+				el.style.placeContent = '';
+				el.style.placeItems = '';
+				el.style.justifyItems = '';
+				el.style.alignItems = '';
+				el.style.justifySelf = '';
+				el.style.alignSelf = '';
+				el.style.gridTemplateColumns = '';
+				el.style.gridTemplateRows = '';
+				el.style.gap = '';
+				break;
+			}
+		}
+
+		requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
 	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
@@ -1330,19 +1393,26 @@
 			<Toolbar
 				{active}
 				{tool}
+				{mode}
 				hasDrawings={hasDrawings || sent}
 				hidden={toolbarHiddenForCapture}
 				{submitStatus}
 				{sent}
-				{inspectingLayout}
+				hasSelection={selectedLayoutEl !== null}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
-				onlayoutaction={handleLayoutAction}
+				onmodechange={setMode}
+				onlayouttransform={applyLayoutTransform}
+				ondeselect={() => selectLayoutElement(null)}
 			/>
 
 			{#if inspectingLayout}
-				<LayoutInspector onclose={stopInspectingLayout} />
+				<LayoutInspector
+					selectedElement={selectedLayoutEl}
+					onselect={selectLayoutElement}
+					onclose={stopInspectingLayout}
+				/>
 			{/if}
 		</div>
 
