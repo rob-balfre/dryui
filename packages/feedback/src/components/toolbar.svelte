@@ -12,6 +12,7 @@
 		Redo2,
 		RotateCcw,
 		Send,
+		Settings,
 		Type,
 		Undo2
 	} from 'lucide-svelte';
@@ -37,6 +38,9 @@
 		placing?: string | null;
 		canUndo?: boolean;
 		canRedo?: boolean;
+		addedKind?: string | null;
+		addedLabel?: string;
+		addedPropsJson?: string;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
@@ -47,6 +51,7 @@
 		ondeselect?: () => void;
 		onaddcomponent?: (kind: string) => void;
 		oncancelplacement?: () => void;
+		onapplyprops?: (label: string, propsJson: string) => void;
 	}
 
 	let {
@@ -58,6 +63,9 @@
 		sent,
 		hasSelection = false,
 		placing = null,
+		addedKind = null,
+		addedLabel = '',
+		addedPropsJson = '',
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
@@ -69,7 +77,8 @@
 		onredo,
 		ondeselect,
 		onaddcomponent,
-		oncancelplacement
+		oncancelplacement,
+		onapplyprops
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'layout');
@@ -148,6 +157,68 @@
 	$effect(() => {
 		if (placing) pickerOpen = false;
 	});
+
+	let propsPanelOpen = $state(false);
+	let propsLabelInput = $state('');
+	let propsJsonInput = $state('');
+	let propsLabelEl = $state<HTMLInputElement | undefined>();
+	let propsJsonError = $state<string | null>(null);
+
+	function syncPropsPanel() {
+		propsLabelInput = addedLabel ?? '';
+		propsJsonInput = addedPropsJson ?? '';
+		propsJsonError = null;
+	}
+
+	$effect(() => {
+		void addedKind;
+		syncPropsPanel();
+	});
+
+	$effect(() => {
+		if (!addedKind) propsPanelOpen = false;
+	});
+
+	$effect(() => {
+		if (!propsPanelOpen || !propsLabelEl) return;
+		const id = requestAnimationFrame(() => propsLabelEl?.focus());
+		return () => cancelAnimationFrame(id);
+	});
+
+	function togglePropsPanel() {
+		if (!addedKind) return;
+		propsPanelOpen = !propsPanelOpen;
+		if (propsPanelOpen) syncPropsPanel();
+	}
+
+	function applyProps() {
+		const trimmedJson = propsJsonInput.trim();
+		if (trimmedJson) {
+			try {
+				const parsed = JSON.parse(trimmedJson);
+				if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+					propsJsonError = 'Props must be a JSON object';
+					return;
+				}
+			} catch (err) {
+				propsJsonError = err instanceof Error ? err.message : 'Invalid JSON';
+				return;
+			}
+		}
+		propsJsonError = null;
+		onapplyprops?.(propsLabelInput, propsJsonInput);
+		propsPanelOpen = false;
+	}
+
+	function handlePropsKey(e: KeyboardEvent) {
+		if (e.key === 'Enter' && !e.shiftKey && !(e.target instanceof HTMLTextAreaElement)) {
+			e.preventDefault();
+			applyProps();
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			propsPanelOpen = false;
+		}
+	}
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
 		idle: { label: 'Send feedback', aria: 'Send feedback' },
@@ -340,6 +411,68 @@
 			aria-label={showLayoutTools ? 'Layout tools' : 'Annotation tools'}
 		>
 			{#if showLayoutTools}
+				{#if addedKind}
+					<div class="add-wrap">
+						<button
+							class="tool-btn"
+							type="button"
+							data-tooltip="Edit props"
+							data-active={propsPanelOpen || undefined}
+							onclick={togglePropsPanel}
+							aria-label={`Edit ${addedKind} props`}
+							aria-expanded={propsPanelOpen}
+						>
+							<Settings size={18} />
+						</button>
+
+						{#if propsPanelOpen}
+							<div class="props-panel" role="dialog" aria-label={`${addedKind} props`}>
+								<div class="props-panel-title">{addedKind} props</div>
+								<label class="props-panel-field">
+									<span class="props-panel-label">Label</span>
+									<input
+										class="props-panel-input"
+										type="text"
+										bind:this={propsLabelEl}
+										bind:value={propsLabelInput}
+										placeholder={addedKind}
+										onkeydown={handlePropsKey}
+									/>
+								</label>
+								<label class="props-panel-field">
+									<span class="props-panel-label">Props (JSON)</span>
+									<textarea
+										class="props-panel-textarea"
+										rows="4"
+										bind:value={propsJsonInput}
+										placeholder={'{\n  "variant": "outline",\n  "size": "lg"\n}'}
+										onkeydown={handlePropsKey}
+									></textarea>
+								</label>
+								{#if propsJsonError}
+									<div class="props-panel-error" role="alert">{propsJsonError}</div>
+								{/if}
+								<div class="props-panel-actions">
+									<button
+										class="props-panel-btn"
+										type="button"
+										onclick={() => (propsPanelOpen = false)}
+									>
+										Cancel
+									</button>
+									<button
+										class="props-panel-btn props-panel-btn-primary"
+										type="button"
+										onclick={applyProps}
+									>
+										Apply
+									</button>
+								</div>
+							</div>
+						{/if}
+					</div>
+				{/if}
+
 				<div class="add-wrap">
 					<button
 						class="tool-btn"
@@ -830,6 +963,135 @@
 	.component-picker-create {
 		border-style: dashed;
 		color: hsl(25 100% 80%);
+	}
+
+	.props-panel {
+		position: absolute;
+		bottom: calc(100% + 10px);
+		right: 0;
+		display: grid;
+		gap: 8px;
+		min-inline-size: 260px;
+		max-inline-size: 320px;
+		padding: 12px;
+		border-radius: 12px;
+		background: var(--pill-bg);
+		backdrop-filter: blur(8px);
+		box-shadow: var(--pill-shadow);
+		z-index: 10001;
+	}
+
+	.props-panel-title {
+		color: hsl(25 100% 80%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 700;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+	}
+
+	.props-panel-field {
+		display: grid;
+		gap: 4px;
+	}
+
+	.props-panel-label {
+		color: hsl(220 10% 60%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 10px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.props-panel-input,
+	.props-panel-textarea {
+		padding: 6px 10px;
+		border: 1px solid hsl(220 10% 30%);
+		border-radius: 6px;
+		background: hsl(225 15% 10% / 0.6);
+		color: hsl(220 10% 92%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 12px;
+		font-weight: 500;
+		outline: none;
+		resize: none;
+	}
+
+	.props-panel-textarea {
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 11px;
+		line-height: 1.5;
+	}
+
+	.props-panel-input:focus-visible,
+	.props-panel-textarea:focus-visible {
+		border-color: var(--accent);
+	}
+
+	.props-panel-error {
+		padding: 6px 8px;
+		border-radius: 6px;
+		background: hsl(6 60% 20%);
+		color: hsl(6 80% 80%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+	}
+
+	.props-panel-actions {
+		display: grid;
+		grid-auto-flow: column;
+		justify-content: end;
+		gap: 6px;
+	}
+
+	.props-panel-btn {
+		padding: 6px 12px;
+		border: 1px solid hsl(220 10% 25%);
+		border-radius: 6px;
+		background: transparent;
+		color: hsl(220 10% 88%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		cursor: pointer;
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			color 0.15s;
+	}
+
+	.props-panel-btn:hover {
+		background: hsl(225 15% 22%);
+		border-color: hsl(220 10% 35%);
+	}
+
+	.props-panel-btn-primary {
+		background: hsl(25 100% 55%);
+		border-color: hsl(25 100% 55%);
+		color: black;
+	}
+
+	.props-panel-btn-primary:hover {
+		background: hsl(25 100% 62%);
+		border-color: hsl(25 100% 62%);
+		color: black;
 	}
 
 	.component-picker-preset {

@@ -103,7 +103,13 @@
 		rotation: string | undefined;
 	};
 
-	type AddedSnapshot = { id: string; kind: string; snap: LayoutSnapshot };
+	type AddedSnapshot = {
+		id: string;
+		kind: string;
+		snap: LayoutSnapshot;
+		label?: string;
+		propsJson?: string;
+	};
 
 	type HistoryFrame = {
 		drawings: Drawing[];
@@ -122,6 +128,8 @@
 		el: HTMLElement;
 		kind: string;
 		initialSnap: LayoutSnapshot;
+		label?: string;
+		propsJson?: string;
 		mounted?: ReturnType<typeof mountComponent> | null;
 	};
 
@@ -236,6 +244,19 @@
 		return el;
 	}
 
+	function parsePropsJson(json: string | undefined): Record<string, unknown> {
+		if (!json?.trim()) return {};
+		try {
+			const parsed = JSON.parse(json);
+			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+				return parsed as Record<string, unknown>;
+			}
+		} catch {
+			// fall through to empty props on invalid JSON
+		}
+		return {};
+	}
+
 	async function tryRenderInto(record: AddedRecord) {
 		try {
 			const ui = await import('@dryui/ui');
@@ -245,12 +266,14 @@
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
 			target.style.cssText = 'display: contents;';
+			const labelText = record.label?.trim() || record.kind;
 			const labelSnippet = createRawSnippet(() => ({
-				render: () => `<span>${escapeHtml(record.kind)}</span>`
+				render: () => `<span>${escapeHtml(labelText)}</span>`
 			}));
+			const extraProps = parsePropsJson(record.propsJson);
 			const instance = mountComponent(Component as Parameters<typeof mountComponent>[0], {
 				target,
-				props: { children: labelSnippet }
+				props: { children: labelSnippet, ...extraProps }
 			});
 			record.mounted = instance;
 			record.el.dataset.dryuiAddedRendered = '';
@@ -293,13 +316,22 @@
 		});
 	}
 
-	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
+	function createAddedClone(
+		id: string,
+		kind: string,
+		snap: LayoutSnapshot,
+		options?: { label?: string; propsJson?: string }
+	): HTMLElement {
 		const existing = addedComponents.get(id);
 		if (existing) {
 			applyLayoutSnapshot(existing.el, snap);
-			if (existing.kind !== kind) {
+			const propsChanged =
+				existing.label !== options?.label || existing.propsJson !== options?.propsJson;
+			if (existing.kind !== kind || propsChanged) {
 				unmountAdded(existing);
 				existing.kind = kind;
+				existing.label = options?.label;
+				existing.propsJson = options?.propsJson;
 				const fallback = existing.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 				if (fallback) {
 					fallback.textContent = kind;
@@ -317,7 +349,14 @@
 		}
 		const el = makeAddedElement(id, kind, snap);
 		document.body.appendChild(el);
-		const record: AddedRecord = { el, kind, initialSnap: snap, mounted: null };
+		const record: AddedRecord = {
+			el,
+			kind,
+			initialSnap: snap,
+			label: options?.label,
+			propsJson: options?.propsJson,
+			mounted: null
+		};
 		addedComponents.set(id, record);
 		void tryRenderInto(record);
 		return el;
@@ -340,8 +379,14 @@
 
 	function snapshotAllAdded(): AddedSnapshot[] {
 		const result: AddedSnapshot[] = [];
-		for (const [id, { el, kind }] of addedComponents) {
-			result.push({ id, kind, snap: snapshotClone(el) });
+		for (const [id, record] of addedComponents) {
+			result.push({
+				id,
+				kind: record.kind,
+				snap: snapshotClone(record.el),
+				label: record.label,
+				propsJson: record.propsJson
+			});
 		}
 		return result;
 	}
@@ -374,8 +419,11 @@
 				layoutChanged = true;
 			}
 		}
-		for (const { id, kind, snap } of frame.added) {
-			createAddedClone(id, kind, snap);
+		for (const entry of frame.added) {
+			createAddedClone(entry.id, entry.kind, entry.snap, {
+				label: entry.label,
+				propsJson: entry.propsJson
+			});
 			layoutChanged = true;
 		}
 		if (layoutChanged) notifyLayoutChange();
@@ -494,6 +542,42 @@
 		if (clone) return clone;
 		if (el.dataset[LAYOUT_DATASET.addedId]) return el;
 		return null;
+	}
+
+	const selectedAddedRecord = $derived.by(() => {
+		const el = selectedLayoutEl;
+		if (!el) return null;
+		const id = el.dataset[LAYOUT_DATASET.addedId];
+		if (!id) return null;
+		return addedComponents.get(id) ?? null;
+	});
+
+	function applyAddedProps(label: string, propsJson: string) {
+		const el = selectedLayoutEl;
+		if (!el) return;
+		const id = el.dataset[LAYOUT_DATASET.addedId];
+		if (!id) return;
+		const record = addedComponents.get(id);
+		if (!record) return;
+		const nextLabel = label.trim() || undefined;
+		const nextProps = propsJson.trim() || undefined;
+		if (record.label === nextLabel && record.propsJson === nextProps) return;
+		record.label = nextLabel;
+		record.propsJson = nextProps;
+		unmountAdded(record);
+		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+		if (fallback) {
+			fallback.textContent = nextLabel || record.kind;
+			fallback.style.display = '';
+		}
+		delete record.el.dataset.dryuiAddedRendered;
+		record.el.style.background = 'hsl(25 100% 55% / 0.16)';
+		record.el.style.border = '2px dashed hsl(25 100% 55%)';
+		record.el.style.padding = '4px 8px';
+		record.el.style.borderRadius = '8px';
+		record.el.style.placeItems = 'center';
+		void tryRenderInto(record);
+		commitHistory();
 	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
@@ -1814,6 +1898,9 @@
 				{sent}
 				hasSelection={selectedLayoutEl !== null}
 				placing={placingComponent}
+				addedKind={selectedAddedRecord?.kind ?? null}
+				addedLabel={selectedAddedRecord?.label ?? ''}
+				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
 				{canUndo}
 				{canRedo}
 				ontoggle={toggle}
@@ -1826,6 +1913,7 @@
 				ondeselect={() => selectLayoutElement(null)}
 				onaddcomponent={startPlacingComponent}
 				oncancelplacement={cancelPlacingComponent}
+				onapplyprops={applyAddedProps}
 			/>
 
 			{#if inspectingLayout}
