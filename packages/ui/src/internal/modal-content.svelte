@@ -93,6 +93,7 @@
 		height: 100vh;
 		height: 100dvh;
 		max-height: none;
+		margin: 0;
 		border: none;
 		background: transparent;
 		color: var(--dry-color-text-strong);
