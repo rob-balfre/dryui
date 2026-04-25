@@ -11,6 +11,7 @@
 		unmount as unmountComponent,
 		untrack
 	} from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		type Arrow,
@@ -204,6 +205,17 @@
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
 	}
 
+	function layoutStageTarget(): HTMLElement {
+		return layoutStageEl ?? document.body;
+	}
+
+	const captureLayoutStage: Attachment<HTMLDivElement> = (node) => {
+		layoutStageEl = node;
+		return () => {
+			if (layoutStageEl === node) layoutStageEl = undefined;
+		};
+	};
+
 	function makeAddedElement(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
 		const el = document.createElement('div');
 		el.dataset[LAYOUT_DATASET.addedId] = id;
@@ -214,7 +226,7 @@
 			width: snap.width,
 			height: snap.height,
 			margin: '0',
-			zIndex: '9998',
+			zIndex: '0',
 			display: 'grid',
 			placeItems: 'center',
 			background: 'hsl(25 100% 55% / 0.16)',
@@ -257,11 +269,20 @@
 		return {};
 	}
 
+	function resolveMountable(value: unknown): unknown {
+		if (typeof value === 'function') return value;
+		if (value && typeof value === 'object') {
+			const root = (value as Record<string, unknown>).Root;
+			if (typeof root === 'function') return root;
+		}
+		return null;
+	}
+
 	async function tryRenderInto(record: AddedRecord) {
 		try {
 			const ui = await import('@dryui/ui');
-			const Component = (ui as Record<string, unknown>)[record.kind];
-			if (typeof Component !== 'function') return;
+			const Component = resolveMountable((ui as Record<string, unknown>)[record.kind]);
+			if (!Component) return;
 			if (!record.el.isConnected) return;
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
@@ -348,7 +369,7 @@
 			return existing.el;
 		}
 		const el = makeAddedElement(id, kind, snap);
-		document.body.appendChild(el);
+		layoutStageTarget().appendChild(el);
 		const record: AddedRecord = {
 			el,
 			kind,
@@ -457,12 +478,12 @@
 			width: `${rect.width}px`,
 			height: `${rect.height}px`,
 			margin: '0',
-			zIndex: '9998',
+			zIndex: '0',
 			pointerEvents: 'none',
 			transform: '',
 			transformOrigin: '50% 50%'
 		});
-		document.body.appendChild(clone);
+		layoutStageTarget().appendChild(clone);
 		return clone;
 	}
 
@@ -594,6 +615,7 @@
 	let sent = $state(false);
 	let toasts: FeedbackToast[] = $state([]);
 	let toastLayerEl: HTMLDivElement | undefined = $state();
+	let layoutStageEl: HTMLDivElement | undefined = $state();
 	let toolbarHiddenForCapture = $state(false);
 	let scrollRootEl: HTMLElement | null = $state(null);
 	let viewportLeft = $state(0);
@@ -1700,6 +1722,8 @@
 			data-layer-hosted={layerHostEl ? '' : undefined}
 			style={feedbackRootStyle()}
 		>
+			<div {@attach captureLayoutStage} class="layout-stage" aria-hidden="true"></div>
+
 			{#if showOverlay}
 				<svg
 					class="drawing-canvas {cursorClass}"
@@ -1982,10 +2006,22 @@
 		inset: auto;
 	}
 
+	.layout-stage {
+		position: fixed;
+		inset: 0;
+		z-index: 9998;
+		pointer-events: none;
+	}
+
 	[data-dryui-feedback] :global {
 		* {
 			pointer-events: auto;
 		}
+	}
+
+	.feedback-root .layout-stage,
+	.feedback-root .layout-stage :global(*) {
+		pointer-events: none;
 	}
 
 	.drawing-canvas {
