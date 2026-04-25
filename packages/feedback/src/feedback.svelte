@@ -454,7 +454,7 @@
 				existing.propsJson = options?.propsJson;
 				const fallback = existing.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 				if (fallback) {
-					fallback.textContent = kind;
+					fallback.textContent = options?.label?.trim() || kind;
 					fallback.style.display = '';
 				}
 				delete existing.el.dataset.dryuiAddedRendered;
@@ -598,6 +598,13 @@
 		untrack(() => {
 			destroyAllLayoutClones();
 			resetHistory(drawings);
+		});
+	});
+
+	$effect(() => {
+		if (inspectingLayout) return;
+		untrack(() => {
+			for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		});
 	});
 
@@ -1509,6 +1516,7 @@
 		currentPageUrl = nextPageUrl;
 		drawings = [];
 		lastSavedVersion = saveVersion;
+		destroyAllLayoutClones();
 		resetHistory(drawings);
 	}
 
