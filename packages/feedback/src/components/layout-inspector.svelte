@@ -54,13 +54,13 @@
 		const next: Box[] = [];
 		let key = 0;
 		for (const el of all) {
-			if (isInsideFeedback(el)) continue;
+			const added = isAddedPlaceholder(el);
+			if (!added && isInsideFeedback(el)) continue;
 			if (isClone(el)) continue;
 			const cs = getComputedStyle(el);
 			if (cs.display === 'none') continue;
 			if (cs.visibility === 'hidden' && !getClone(el)) continue;
 
-			const added = isAddedPlaceholder(el);
 			const isGrid = isGridContainer(cs);
 			const parent = el.parentElement;
 			const parentIsGrid =
