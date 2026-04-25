@@ -15,7 +15,8 @@
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
-	import Toolbar from './components/toolbar.svelte';
+	import Toolbar, { type LayoutAction } from './components/toolbar.svelte';
+	import LayoutInspector from './components/layout-inspector.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
 	// omit the widget entirely. Useful for CI, screenshot jobs, or
@@ -67,6 +68,17 @@
 
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
+	let inspectingLayout = $state(false);
+
+	function handleLayoutAction(action: LayoutAction) {
+		if (action === 'update-current-page') {
+			inspectingLayout = true;
+		}
+	}
+
+	function stopInspectingLayout() {
+		inspectingLayout = false;
+	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
@@ -1322,10 +1334,16 @@
 				hidden={toolbarHiddenForCapture}
 				{submitStatus}
 				{sent}
+				{inspectingLayout}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
+				onlayoutaction={handleLayoutAction}
 			/>
+
+			{#if inspectingLayout}
+				<LayoutInspector onclose={stopInspectingLayout} />
+			{/if}
 		</div>
 
 		<div
