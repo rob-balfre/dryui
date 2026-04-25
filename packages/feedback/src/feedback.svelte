@@ -255,7 +255,10 @@
 			record.mounted = instance;
 			record.el.dataset.dryuiAddedRendered = '';
 			record.el.style.background = 'transparent';
-			record.el.style.borderColor = 'hsl(25 100% 55% / 0.6)';
+			record.el.style.border = '0';
+			record.el.style.padding = '0';
+			record.el.style.borderRadius = '0';
+			record.el.style.placeItems = 'start';
 			const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 			if (fallback) fallback.style.display = 'none';
 		} catch (err) {
@@ -304,7 +307,10 @@
 				}
 				delete existing.el.dataset.dryuiAddedRendered;
 				existing.el.style.background = 'hsl(25 100% 55% / 0.16)';
-				existing.el.style.borderColor = 'hsl(25 100% 55%)';
+				existing.el.style.border = '2px dashed hsl(25 100% 55%)';
+				existing.el.style.padding = '4px 8px';
+				existing.el.style.borderRadius = '8px';
+				existing.el.style.placeItems = 'center';
 				void tryRenderInto(existing);
 			}
 			return existing.el;
