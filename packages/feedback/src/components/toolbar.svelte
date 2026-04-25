@@ -1,22 +1,21 @@
 <script lang="ts">
 	import {
-		AlignVerticalJustifyCenter,
 		ArrowLeft,
 		Check,
 		Eraser,
 		GripVertical,
 		LayoutTemplate,
-		Maximize,
 		Move,
 		MoveUpRight,
 		Pencil,
+		Redo2,
 		RotateCcw,
 		Send,
-		Type
+		Type,
+		Undo2
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
 
-	export type LayoutTransform = 'fill' | 'center' | 'reset';
 	export type Mode = 'annotate' | 'layout';
 
 	interface Props {
@@ -27,11 +26,15 @@
 		submitStatus: SubmitStatus;
 		sent: boolean;
 		hasSelection?: boolean;
+		canUndoLayout?: boolean;
+		canRedoLayout?: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
-		onlayouttransform?: (transform: LayoutTransform) => void;
+		onlayoutreset?: () => void;
+		onlayoutundo?: () => void;
+		onlayoutredo?: () => void;
 		ondeselect?: () => void;
 	}
 
@@ -43,11 +46,15 @@
 		submitStatus,
 		sent,
 		hasSelection = false,
+		canUndoLayout = false,
+		canRedoLayout = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
 		onmodechange,
-		onlayouttransform,
+		onlayoutreset,
+		onlayoutundo,
+		onlayoutredo,
 		ondeselect
 	}: Props = $props();
 
@@ -142,6 +149,13 @@
 
 	function handleHandlePointerUp() {
 		pendingDrag = null;
+		if (dragging && toolbarEl) {
+			const rect = toolbarEl.getBoundingClientRect();
+			toolbarEl.style.right = `${window.innerWidth - rect.right}px`;
+			toolbarEl.style.bottom = `${window.innerHeight - rect.bottom}px`;
+			toolbarEl.style.left = 'auto';
+			toolbarEl.style.top = 'auto';
+		}
 		dragging = false;
 	}
 
@@ -213,6 +227,7 @@
 				<button
 					class="tool-btn"
 					type="button"
+					data-tooltip="Back"
 					onclick={() => ondeselect?.()}
 					aria-label="Back to inspector"
 				>
@@ -222,25 +237,30 @@
 				<button
 					class="tool-btn"
 					type="button"
-					onclick={() => onlayouttransform?.('fill')}
-					aria-label="Fill available space"
+					data-tooltip="Undo"
+					disabled={!canUndoLayout}
+					onclick={() => onlayoutundo?.()}
+					aria-label="Undo last change"
 				>
-					<Maximize size={18} />
+					<Undo2 size={18} />
 				</button>
 
 				<button
 					class="tool-btn"
 					type="button"
-					onclick={() => onlayouttransform?.('center')}
-					aria-label="Center content"
+					data-tooltip="Redo"
+					disabled={!canRedoLayout}
+					onclick={() => onlayoutredo?.()}
+					aria-label="Redo last change"
 				>
-					<AlignVerticalJustifyCenter size={18} />
+					<Redo2 size={18} />
 				</button>
 
 				<button
 					class="tool-btn"
 					type="button"
-					onclick={() => onlayouttransform?.('reset')}
+					data-tooltip="Reset"
+					onclick={() => onlayoutreset?.()}
 					aria-label="Reset layout overrides"
 				>
 					<RotateCcw size={18} />
@@ -248,6 +268,7 @@
 			{:else}
 				<button
 					class="tool-btn"
+					data-tooltip="Draw"
 					data-active={(active && tool === 'pencil') || undefined}
 					onclick={() => handleToolClick('pencil')}
 					aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
@@ -257,6 +278,7 @@
 
 				<button
 					class="tool-btn"
+					data-tooltip="Arrow"
 					data-active={(active && tool === 'arrow') || undefined}
 					onclick={() => handleToolClick('arrow')}
 					aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
@@ -266,6 +288,7 @@
 
 				<button
 					class="tool-btn"
+					data-tooltip="Text"
 					data-active={(active && tool === 'text') || undefined}
 					onclick={() => handleToolClick('text')}
 					aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
@@ -275,6 +298,7 @@
 
 				<button
 					class="tool-btn"
+					data-tooltip="Move"
 					data-active={(active && tool === 'move') || undefined}
 					onclick={() => handleToolClick('move')}
 					aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
@@ -284,6 +308,7 @@
 
 				<button
 					class="tool-btn"
+					data-tooltip="Erase"
 					data-active={(active && tool === 'eraser') || undefined}
 					onclick={() => handleToolClick('eraser')}
 					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
@@ -491,6 +516,7 @@
 	}
 
 	.tool-btn {
+		position: relative;
 		display: grid;
 		place-items: center;
 		padding: 8px;
@@ -506,9 +532,52 @@
 			color 0.15s;
 	}
 
-	.tool-btn:hover {
+	.tool-btn[data-tooltip]::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: calc(100% + 8px);
+		left: 50%;
+		transform: translateX(-50%) translateY(4px);
+		z-index: 1;
+		pointer-events: none;
+		white-space: nowrap;
+		padding: 4px 8px;
+		border-radius: 6px;
+		background: var(--pill-bg);
+		backdrop-filter: blur(8px);
+		color: hsl(220 10% 92%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		box-shadow: var(--pill-shadow);
+		opacity: 0;
+		transition:
+			opacity 0.12s ease-out,
+			transform 0.12s ease-out;
+	}
+
+	.tool-btn[data-tooltip]:hover::after,
+	.tool-btn[data-tooltip]:focus-visible::after {
+		opacity: 1;
+		transform: translateX(-50%) translateY(0);
+	}
+
+	.tool-btn:hover:not(:disabled) {
 		background: hsl(225 15% 22%);
 		color: hsl(220 10% 90%);
+	}
+
+	.tool-btn:disabled {
+		opacity: 0.35;
+		cursor: not-allowed;
+	}
+
+	.tool-btn:disabled::after {
+		display: none;
 	}
 
 	.tool-btn[data-active] {

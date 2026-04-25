@@ -3,7 +3,8 @@
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import { Check } from 'lucide-svelte';
-	import { onMount, untrack } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
+	import { SvelteMap } from 'svelte/reactivity';
 	import {
 		type Arrow,
 		type Drawing,
@@ -15,7 +16,7 @@
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
-	import Toolbar, { type LayoutTransform, type Mode } from './components/toolbar.svelte';
+	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
@@ -86,61 +87,160 @@
 		selectedLayoutEl = el;
 	}
 
-	function applyLayoutTransform(transform: LayoutTransform) {
-		const el = selectedLayoutEl;
-		if (!el) return;
+	type LayoutSnapshot = {
+		left: string;
+		top: string;
+		width: string;
+		height: string;
+		transform: string;
+		rotation: string | undefined;
+	};
 
-		switch (transform) {
-			case 'fill': {
-				el.style.width = '100%';
+	type LayoutHistoryEntry = { history: LayoutSnapshot[]; index: number };
 
-				const parent = el.parentElement;
-				const parentRect = parent?.getBoundingClientRect();
-				const viewportH = window.innerHeight;
+	const LAYOUT_DATASET = {
+		clone: 'dryuiLayoutClone',
+		prevVis: 'dryuiLayoutPrevVis',
+		rotation: 'dryuiLayoutRotation'
+	} as const;
 
-				// If the parent already spans nearly the viewport, we can fill it with
-				// height: 100%. If the parent is shrink-wrapped to content (much shorter
-				// than the viewport), escalate to dvh so the element actually fills.
-				if (parentRect && parentRect.height >= viewportH * 0.9) {
-					el.style.height = '100%';
-					el.style.minHeight = '';
-				} else {
-					el.style.minHeight = '100dvh';
-					el.style.height = '';
-				}
+	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
+	const layoutHistories = new SvelteMap<HTMLElement, LayoutHistoryEntry>();
 
-				if (parent) {
-					const parentCS = getComputedStyle(parent);
-					if (parentCS.display === 'grid' || parentCS.display === 'inline-grid') {
-						el.style.alignSelf = 'stretch';
-						el.style.justifySelf = 'stretch';
-					}
-				}
-				break;
-			}
-			case 'center': {
-				el.style.placeContent = 'center';
-				el.style.placeItems = 'center';
-				break;
-			}
-			case 'reset': {
-				el.style.width = '';
-				el.style.height = '';
-				el.style.minHeight = '';
-				el.style.placeContent = '';
-				el.style.placeItems = '';
-				el.style.justifyItems = '';
-				el.style.alignItems = '';
-				el.style.justifySelf = '';
-				el.style.alignSelf = '';
-				el.style.gridTemplateColumns = '';
-				el.style.gridTemplateRows = '';
-				el.style.gap = '';
-				break;
-			}
-		}
+	const cloneLayoutEl = $derived(
+		selectedLayoutEl ? (layoutClones.get(selectedLayoutEl) ?? null) : null
+	);
+	const layoutHistoryEntry = $derived(
+		selectedLayoutEl ? (layoutHistories.get(selectedLayoutEl) ?? null) : null
+	);
+	const canUndoLayout = $derived((layoutHistoryEntry?.index ?? 0) > 0);
+	const canRedoLayout = $derived(
+		layoutHistoryEntry !== null && layoutHistoryEntry.index < layoutHistoryEntry.history.length - 1
+	);
 
+	function snapshotClone(clone: HTMLElement): LayoutSnapshot {
+		return {
+			left: clone.style.left,
+			top: clone.style.top,
+			width: clone.style.width,
+			height: clone.style.height,
+			transform: clone.style.transform,
+			rotation: clone.dataset[LAYOUT_DATASET.rotation]
+		};
+	}
+
+	function applyLayoutSnapshot(clone: HTMLElement, snap: LayoutSnapshot) {
+		clone.style.left = snap.left;
+		clone.style.top = snap.top;
+		clone.style.width = snap.width;
+		clone.style.height = snap.height;
+		clone.style.transform = snap.transform;
+		if (snap.rotation === undefined) delete clone.dataset[LAYOUT_DATASET.rotation];
+		else clone.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
+	}
+
+	function notifyLayoutChange() {
 		requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+	}
+
+	function ensureLayoutClone(original: HTMLElement): HTMLElement {
+		const existing = layoutClones.get(original);
+		if (existing) return existing;
+		const clone = makeLayoutClone(original);
+		layoutClones.set(original, clone);
+		original.dataset[LAYOUT_DATASET.prevVis] = original.style.visibility ?? '';
+		original.style.visibility = 'hidden';
+		layoutHistories.set(original, { history: [snapshotClone(clone)], index: 0 });
+		return clone;
+	}
+
+	function destroyLayoutClone(original: HTMLElement) {
+		const clone = layoutClones.get(original);
+		if (!clone) return;
+		clone.remove();
+		layoutClones.delete(original);
+		layoutHistories.delete(original);
+		const prevVis = original.dataset[LAYOUT_DATASET.prevVis];
+		if (prevVis !== undefined) {
+			original.style.visibility = prevVis;
+			delete original.dataset[LAYOUT_DATASET.prevVis];
+		}
+	}
+
+	function destroyAllLayoutClones() {
+		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
+	}
+
+	function commitLayoutHistory() {
+		const original = selectedLayoutEl;
+		if (!original) return;
+		const clone = layoutClones.get(original);
+		const entry = layoutHistories.get(original);
+		if (!clone || !entry) return;
+		const snap = snapshotClone(clone);
+		const history = [...entry.history.slice(0, entry.index + 1), snap];
+		layoutHistories.set(original, { history, index: history.length - 1 });
+	}
+
+	function stepLayoutHistory(direction: -1 | 1) {
+		if (direction === -1 ? !canUndoLayout : !canRedoLayout) return;
+		const original = selectedLayoutEl;
+		if (!original) return;
+		const clone = layoutClones.get(original);
+		const entry = layoutHistories.get(original);
+		if (!clone || !entry) return;
+		const nextIndex = entry.index + direction;
+		applyLayoutSnapshot(clone, entry.history[nextIndex]!);
+		layoutHistories.set(original, { ...entry, index: nextIndex });
+		notifyLayoutChange();
+	}
+
+	const undoLayout = () => stepLayoutHistory(-1);
+	const redoLayout = () => stepLayoutHistory(1);
+
+	function makeLayoutClone(original: HTMLElement): HTMLElement {
+		const rect = original.getBoundingClientRect();
+		const clone = original.cloneNode(true) as HTMLElement;
+		if (clone.id) clone.id = '';
+		for (const inner of clone.querySelectorAll('[id]')) inner.removeAttribute('id');
+		clone.dataset[LAYOUT_DATASET.clone] = '';
+		Object.assign(clone.style, {
+			position: 'fixed',
+			left: `${rect.left}px`,
+			top: `${rect.top}px`,
+			width: `${rect.width}px`,
+			height: `${rect.height}px`,
+			margin: '0',
+			zIndex: '9998',
+			pointerEvents: 'none',
+			transform: '',
+			transformOrigin: '50% 50%'
+		});
+		document.body.appendChild(clone);
+		return clone;
+	}
+
+	$effect(() => {
+		const original = selectedLayoutEl;
+		if (inspectingLayout && original) ensureLayoutClone(original);
+	});
+
+	$effect(() => {
+		if (!inspectingLayout) destroyAllLayoutClones();
+	});
+
+	onDestroy(destroyAllLayoutClones);
+
+	function resetSelectedLayout() {
+		const original = selectedLayoutEl;
+		if (!original) return;
+		const clone = layoutClones.get(original);
+		const entry = layoutHistories.get(original);
+		if (!clone || !entry) return;
+		const initial = entry.history[0];
+		if (initial) applyLayoutSnapshot(clone, initial);
+		commitLayoutHistory();
+		notifyLayoutChange();
 	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
@@ -1192,6 +1292,22 @@
 	onMount(() => {
 		if (shouldAutoActivate() && !active) active = true;
 	});
+
+	function handleLayoutHistoryKey(e: KeyboardEvent) {
+		if (!inspectingLayout || !cloneLayoutEl) return;
+		const meta = e.metaKey || e.ctrlKey;
+		if (!meta || e.key.toLowerCase() !== 'z') return;
+		e.preventDefault();
+		e.stopPropagation();
+		if (e.shiftKey) redoLayout();
+		else undoLayout();
+	}
+
+	$effect(() => {
+		if (!inspectingLayout) return;
+		window.addEventListener('keydown', handleLayoutHistoryKey, true);
+		return () => window.removeEventListener('keydown', handleLayoutHistoryKey, true);
+	});
 </script>
 
 {#if !feedbackDisabled}
@@ -1402,19 +1518,25 @@
 				{submitStatus}
 				{sent}
 				hasSelection={selectedLayoutEl !== null}
+				{canUndoLayout}
+				{canRedoLayout}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
-				onlayouttransform={applyLayoutTransform}
+				onlayoutreset={resetSelectedLayout}
+				onlayoutundo={undoLayout}
+				onlayoutredo={redoLayout}
 				ondeselect={() => selectLayoutElement(null)}
 			/>
 
 			{#if inspectingLayout}
 				<LayoutInspector
 					selectedElement={selectedLayoutEl}
+					getClone={(el) => layoutClones.get(el) ?? null}
 					onselect={selectLayoutElement}
 					onclose={stopInspectingLayout}
+					oncommit={commitLayoutHistory}
 				/>
 			{/if}
 		</div>
