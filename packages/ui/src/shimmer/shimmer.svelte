@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import { observeInViewport, observePageVisibility } from '@dryui/primitives/internal/motion';
+	import { observeInViewport, observePageVisibility } from '@dryui/primitives';
 
 	interface Props extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
 		color?: string;

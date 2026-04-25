@@ -2,10 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
-	import {
-		getReducedMotionPreference,
-		observeReducedMotionPreference
-	} from '@dryui/primitives/internal/motion';
+	import { getReducedMotionPreference, observeReducedMotionPreference } from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		shape?: 'circle' | 'linear' | 'diagonal' | 'diamond';

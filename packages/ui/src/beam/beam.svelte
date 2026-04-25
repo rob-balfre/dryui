@@ -2,7 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { BlendMode } from '@dryui/primitives/beam';
-	import { observeOffscreenState } from '@dryui/primitives/internal/motion';
+	import { observeOffscreenState } from '@dryui/primitives';
 
 	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
 		color?: string;

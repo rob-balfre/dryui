@@ -10,7 +10,7 @@
 		observeReducedMotionPreference,
 		registerPropertyOnce,
 		supportsPropertyRegistration
-	} from '@dryui/primitives/internal/motion';
+	} from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		palette?: 'sunrise' | 'ocean' | 'forest' | 'cosmic' | readonly [string, string, string];
