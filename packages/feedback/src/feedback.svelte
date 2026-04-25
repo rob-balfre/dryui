@@ -241,7 +241,7 @@
 			padding: '4px 8px',
 			boxSizing: 'border-box',
 			transformOrigin: '50% 50%',
-			pointerEvents: 'none',
+			pointerEvents: inspectingLayout ? 'none' : 'auto',
 			transform: snap.transform
 		});
 		const content = document.createElement('div');
@@ -336,6 +336,13 @@
 			}
 		});
 	}
+
+	$effect(() => {
+		const value = inspectingLayout ? 'none' : 'auto';
+		for (const record of addedComponents.values()) {
+			record.el.style.pointerEvents = value;
+		}
+	});
 
 	function createAddedClone(
 		id: string,
