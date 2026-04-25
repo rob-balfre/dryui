@@ -6,7 +6,7 @@
 		observeInViewport,
 		observePageVisibility,
 		observeReducedMotionPreference
-	} from '@dryui/primitives/internal/motion';
+	} from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		offset?: number;

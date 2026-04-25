@@ -3,11 +3,14 @@ export {
 	getReducedMotionPreference,
 	observeReducedMotionPreference,
 	supportsIntersectionObservers,
+	observeInViewport,
+	observePageVisibility,
+	observeOffscreenState,
 	supportsPointerTracking,
 	supportsPropertyRegistration,
 	registerPropertyOnce,
 	supportsWebGL2
-} from '@dryui/primitives/internal/motion';
+} from '@dryui/primitives';
 
 // UI-only motion utilities
 

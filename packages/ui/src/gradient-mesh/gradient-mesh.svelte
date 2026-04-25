@@ -10,7 +10,7 @@
 		registerPropertyOnce,
 		supportsPropertyRegistration,
 		supportsPointerTracking
-	} from '@dryui/primitives/internal/motion';
+	} from '@dryui/primitives';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		colors?: readonly [string, string, string, string];

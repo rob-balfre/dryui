@@ -6,7 +6,7 @@
 		getReducedMotionPreference,
 		observeReducedMotionPreference,
 		supportsIntersectionObservers
-	} from '@dryui/primitives/internal/motion';
+	} from '@dryui/primitives';
 	import type { BlendMode } from '@dryui/primitives/reveal';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {

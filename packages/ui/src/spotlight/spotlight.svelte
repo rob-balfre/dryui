@@ -6,7 +6,7 @@
 		observeReducedMotionPreference,
 		supportsPointerTracking,
 		registerPropertyOnce
-	} from '@dryui/primitives/internal/motion';
+	} from '@dryui/primitives';
 	import type { BlendMode } from '@dryui/primitives/spotlight';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
