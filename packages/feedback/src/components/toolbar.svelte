@@ -497,7 +497,7 @@
 							aria-label={`Edit ${addedKind} props`}
 							aria-expanded={propsPanelOpen}
 						>
-							<Settings size={18} />
+							<Settings size={16} />
 						</button>
 
 						{#if propsPanelOpen}
@@ -613,7 +613,7 @@
 						aria-label={placing ? `Cancel placing ${placing}` : 'Add component'}
 						aria-expanded={pickerOpen}
 					>
-						<Plus size={18} />
+						<Plus size={16} />
 					</button>
 
 					{#if pickerOpen}
@@ -667,7 +667,7 @@
 						onclick={() => ondeselect?.()}
 						aria-label="Back to inspector"
 					>
-						<ArrowLeft size={18} />
+						<ArrowLeft size={16} />
 					</button>
 
 					<button
@@ -677,7 +677,7 @@
 						onclick={() => onlayoutreset?.()}
 						aria-label="Reset layout overrides"
 					>
-						<RotateCcw size={18} />
+						<RotateCcw size={16} />
 					</button>
 				{/if}
 			{:else}
@@ -688,7 +688,7 @@
 					onclick={() => handleToolClick('pencil')}
 					aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
 				>
-					<Pencil size={18} />
+					<Pencil size={16} />
 				</button>
 
 				<button
@@ -698,7 +698,7 @@
 					onclick={() => handleToolClick('arrow')}
 					aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
 				>
-					<MoveUpRight size={18} />
+					<MoveUpRight size={16} />
 				</button>
 
 				<button
@@ -708,7 +708,7 @@
 					onclick={() => handleToolClick('text')}
 					aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
 				>
-					<Type size={18} />
+					<Type size={16} />
 				</button>
 
 				<button
@@ -718,7 +718,7 @@
 					onclick={() => handleToolClick('move')}
 					aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
 				>
-					<Move size={18} />
+					<Move size={16} />
 				</button>
 
 				<button
@@ -728,7 +728,7 @@
 					onclick={() => handleToolClick('eraser')}
 					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
 				>
-					<Eraser size={18} />
+					<Eraser size={16} />
 				</button>
 			{/if}
 		</div>
@@ -765,7 +765,7 @@
 	.toolbar-row {
 		display: grid;
 		grid-auto-flow: column;
-		align-items: center;
+		align-items: stretch;
 		gap: 6px;
 	}
 
@@ -792,19 +792,11 @@
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 2px;
+		padding: 3px;
 		border-radius: 12px;
 		background: var(--pill-bg);
 		backdrop-filter: blur(8px);
 		box-shadow: var(--pill-shadow);
-	}
-
-	.mode-pill,
-	.history-pill {
-		padding: 3px;
-	}
-
-	.tool-pill {
-		padding: 4px;
 	}
 
 	.mode-btn {
@@ -847,12 +839,12 @@
 	.drag-handle {
 		display: grid;
 		place-items: center;
-		padding: 6px 4px;
+		padding: 4px 3px;
 		margin-inline-start: 2px;
 		border: none;
 		border-radius: 6px;
 		background: transparent;
-		color: hsl(220 10% 45%);
+		color: hsl(220 10% 38%);
 		cursor: grab;
 		touch-action: none;
 		transition:
@@ -862,7 +854,7 @@
 
 	.drag-handle:hover {
 		background: hsl(225 15% 22%);
-		color: hsl(220 10% 80%);
+		color: hsl(220 10% 70%);
 	}
 
 	.drag-handle:focus-visible {
@@ -930,12 +922,15 @@
 		position: relative;
 		display: grid;
 		place-items: center;
-		padding: 8px;
-		border: 2px solid transparent;
-		border-radius: 8px;
+		padding: 0;
+		inline-size: 26px;
+		block-size: 26px;
+		border: 1px solid transparent;
+		border-radius: 7px;
 		background: transparent;
 		color: hsl(220 10% 70%);
 		cursor: pointer;
+		box-sizing: border-box;
 		transition:
 			background 0.15s,
 			border-color 0.15s,
@@ -1006,10 +1001,8 @@
 	}
 
 	.history-pill .history-btn {
-		padding: 0;
-		border-width: 1px;
-		inline-size: 25px;
-		block-size: 25px;
+		inline-size: 26px;
+		block-size: 26px;
 	}
 
 	.add-wrap {
@@ -1323,11 +1316,12 @@
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 6px;
-		padding: 6px 12px;
-		border: 1px solid transparent;
+		padding: 0 12px;
+		block-size: 32px;
+		border: 1px solid hsl(145 40% 26%);
 		border-radius: 12px;
-		background: hsl(145 65% 22%);
-		color: hsl(145 70% 78%);
+		background: hsl(145 50% 12% / 0.7);
+		color: hsl(145 60% 70%);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1338,17 +1332,17 @@
 		transition:
 			background 0.15s,
 			border-color 0.15s,
-			color 0.15s,
-			transform 0.15s;
+			color 0.15s;
 	}
 
 	.submit-pill:hover:not([data-submitting]) {
-		background: hsl(145 65% 28%);
+		background: hsl(145 55% 18%);
+		border-color: hsl(145 55% 40%);
 		color: hsl(145 70% 88%);
 	}
 
 	.submit-pill:focus-visible {
-		outline: 2px solid hsl(145 70% 60%);
+		outline: 2px solid hsl(145 60% 50%);
 		outline-offset: 1px;
 	}
 
@@ -1358,14 +1352,15 @@
 	}
 
 	.submit-pill[data-sent] {
-		background: hsl(145 70% 38%);
-		color: hsl(145 70% 96%);
+		background: hsl(145 65% 22%);
+		border-color: hsl(145 65% 36%);
+		color: hsl(145 70% 92%);
 	}
 
 	.submit-label {
 		font-size: 11px;
 		font-weight: 600;
-		letter-spacing: 0.02em;
+		letter-spacing: 0.04em;
 		white-space: nowrap;
 	}
 </style>
