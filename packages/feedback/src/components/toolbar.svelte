@@ -16,7 +16,13 @@
 		Undo2
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
-	import { COMPONENT_NAMES } from './component-names.js';
+	import {
+		CATEGORY_LABELS,
+		CATEGORY_ORDER,
+		COMPONENT_CATEGORIES,
+		COMPONENT_NAMES,
+		type ComponentCategory
+	} from './component-names.js';
 
 	export type Mode = 'annotate' | 'layout';
 
@@ -79,6 +85,25 @@
 		const query = pickerName.trim().toLowerCase();
 		if (!query) return COMPONENT_NAMES;
 		return COMPONENT_NAMES.filter((name) => name.toLowerCase().includes(query));
+	});
+
+	const groupedPresets = $derived.by(() => {
+		const groups = new Map<ComponentCategory, string[]>();
+		for (const name of filteredPresets) {
+			const category = COMPONENT_CATEGORIES[name];
+			if (!category) continue;
+			let bucket = groups.get(category);
+			if (!bucket) {
+				bucket = [];
+				groups.set(category, bucket);
+			}
+			bucket.push(name);
+		}
+		return CATEGORY_ORDER.filter((c) => groups.has(c)).map((category) => ({
+			category,
+			label: CATEGORY_LABELS[category],
+			names: groups.get(category)!
+		}));
 	});
 
 	const submitLabel = $derived(pickerName.trim() || filteredPresets[0] || '');
@@ -338,16 +363,19 @@
 								bind:value={pickerName}
 								onkeydown={handlePickerKey}
 							/>
-							{#if filteredPresets.length > 0}
+							{#if groupedPresets.length > 0}
 								<div class="component-picker-presets">
-									{#each filteredPresets as preset (preset)}
-										<button
-											class="component-picker-preset"
-											type="button"
-											onclick={() => pick(preset)}
-										>
-											{preset}
-										</button>
+									{#each groupedPresets as group (group.category)}
+										<div class="component-picker-group-label">{group.label}</div>
+										{#each group.names as preset (preset)}
+											<button
+												class="component-picker-preset"
+												type="button"
+												onclick={() => pick(preset)}
+											>
+												{preset}
+											</button>
+										{/each}
 									{/each}
 								</div>
 							{:else if pickerName.trim()}
@@ -777,9 +805,26 @@
 
 	.component-picker-presets {
 		display: grid;
-		gap: 4px;
-		max-block-size: 240px;
+		gap: 2px;
+		max-block-size: 320px;
 		overflow-y: auto;
+	}
+
+	.component-picker-group-label {
+		padding: 8px 4px 4px;
+		color: hsl(220 10% 50%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	.component-picker-group-label:first-child {
+		padding-block-start: 0;
 	}
 
 	.component-picker-create {
