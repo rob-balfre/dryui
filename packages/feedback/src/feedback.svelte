@@ -80,8 +80,18 @@
 	let inspectingLayout = $state(false);
 	let selectedLayoutEl = $state<HTMLElement | null>(null);
 	const mode = $derived<Mode>(inspectingLayout ? 'layout' : 'annotate');
+	const annotationActive = $derived(active && !inspectingLayout);
 
 	function setMode(next: Mode) {
+		if (next === 'layout') {
+			currentStroke = null;
+			currentArrow = null;
+			if (textInput) commitText();
+			erasing = false;
+			moving = null;
+			movedDuringDrag = false;
+			erasedDuringDrag = false;
+		}
 		inspectingLayout = next === 'layout';
 		selectedLayoutEl = null;
 	}
@@ -137,6 +147,7 @@
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
 	const addedComponents = new Map<string, AddedRecord>();
+	let layoutVersion = $state(0);
 
 	let placingComponent = $state<string | null>(null);
 
@@ -172,6 +183,25 @@
 		else clone.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
 	}
 
+	function sameLayoutSnapshot(a: LayoutSnapshot, b: LayoutSnapshot): boolean {
+		return (
+			a.left === b.left &&
+			a.top === b.top &&
+			a.width === b.width &&
+			a.height === b.height &&
+			a.transform === b.transform &&
+			a.rotation === b.rotation
+		);
+	}
+
+	function hasModifiedLayoutClone(): boolean {
+		for (const [original, clone] of layoutClones) {
+			const initial = cloneInitialSnaps.get(original);
+			if (!initial || !sameLayoutSnapshot(snapshotClone(clone), initial)) return true;
+		}
+		return false;
+	}
+
 	function notifyLayoutChange() {
 		requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
 	}
@@ -203,6 +233,7 @@
 	function destroyAllLayoutClones() {
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
+		layoutVersion++;
 	}
 
 	function layoutStageTarget(): HTMLElement {
@@ -520,6 +551,7 @@
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
 		frameIndex = next.length - 1;
+		layoutVersion++;
 	}
 
 	function applyHistoryFrame(frame: HistoryFrame) {
@@ -547,6 +579,7 @@
 			layoutChanged = true;
 		}
 		if (layoutChanged) notifyLayoutChange();
+		layoutVersion++;
 		saveVersion++;
 	}
 
@@ -559,10 +592,18 @@
 	function resetHistory(initialDrawings: Drawing[]) {
 		historyFrames = [{ drawings: [...initialDrawings], cloneSnapshots: new Map(), added: [] }];
 		frameIndex = 0;
+		layoutVersion++;
 	}
 
 	const undo = () => stepHistory(-1);
 	const redo = () => stepHistory(1);
+
+	const hasLayoutFeedback = $derived.by(() => {
+		void layoutVersion;
+		void frameIndex;
+		void historyFrames.length;
+		return addedComponents.size > 0 || hasModifiedLayoutClone();
+	});
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
 		const rect = original.getBoundingClientRect();
@@ -595,6 +636,7 @@
 
 	$effect(() => {
 		if (active) return;
+		if (untrack(() => hasFeedback)) return;
 		untrack(() => {
 			destroyAllLayoutClones();
 			resetHistory(drawings);
@@ -603,6 +645,7 @@
 
 	$effect(() => {
 		if (inspectingLayout) return;
+		if (untrack(() => hasLayoutFeedback)) return;
 		untrack(() => {
 			for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		});
@@ -1161,7 +1204,7 @@
 	// --- Pointer handlers ---
 
 	function handlePointerDown(e: PointerEvent) {
-		if (!active) return;
+		if (!annotationActive) return;
 		const space = resolvePointerSpace(e);
 		const point = pointFromPointer(e, space);
 
@@ -1289,9 +1332,10 @@
 	}
 
 	const hasDrawings = $derived(drawings.length > 0);
-	const showOverlay = $derived(active || hasDrawings);
+	const hasFeedback = $derived(hasDrawings || hasLayoutFeedback);
+	const showOverlay = $derived(annotationActive || hasDrawings);
 	const cursorClass = $derived(
-		active
+		annotationActive
 			? tool === 'eraser'
 				? 'eraser-cursor'
 				: tool === 'arrow'
@@ -1522,8 +1566,8 @@
 
 	async function handleSubmit() {
 		if (!serverUrl || submitStatus !== 'idle' || sent) return;
-		if (drawings.length === 0) {
-			showToast('error', 'No feedback', 'Annotate something first.', ERROR_TOAST_DURATION_MS);
+		if (!hasFeedback) {
+			showToast('error', 'No feedback', 'Add feedback first.', ERROR_TOAST_DURATION_MS);
 			return;
 		}
 		try {
@@ -1568,6 +1612,9 @@
 				drawings = [];
 				saveVersion++;
 				active = false;
+				inspectingLayout = false;
+				selectedLayoutEl = null;
+				destroyAllLayoutClones();
 				resetHistory([]);
 			}, 1500);
 		} catch (e) {
@@ -1784,7 +1831,6 @@
 	});
 
 	function handleHistoryKey(e: KeyboardEvent) {
-		if (!active) return;
 		if (textInput) return;
 		const target = e.target;
 		if (target instanceof HTMLElement) {
@@ -1793,14 +1839,16 @@
 		}
 		const meta = e.metaKey || e.ctrlKey;
 		if (!meta || e.key.toLowerCase() !== 'z') return;
+		const wantsRedo = e.shiftKey;
+		if (wantsRedo ? !canRedo : !canUndo) return;
 		e.preventDefault();
 		e.stopPropagation();
-		if (e.shiftKey) redo();
+		if (wantsRedo) redo();
 		else undo();
 	}
 
 	$effect(() => {
-		if (!active) return;
+		if (!canUndo && !canRedo) return;
 		window.addEventListener('keydown', handleHistoryKey, true);
 		return () => window.removeEventListener('keydown', handleHistoryKey, true);
 	});
@@ -1834,7 +1882,7 @@
 			{#if showOverlay}
 				<svg
 					class="drawing-canvas {cursorClass}"
-					data-active={active || undefined}
+					data-active={annotationActive || undefined}
 					role="application"
 					aria-label="Feedback drawing canvas"
 					onpointerdown={handlePointerDown}
