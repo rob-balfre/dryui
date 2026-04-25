@@ -24,6 +24,7 @@
 		COMPONENT_NAMES,
 		type ComponentCategory
 	} from './component-names.js';
+	import { COMPONENT_SCHEMAS, type SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'layout';
 
@@ -160,14 +161,42 @@
 
 	let propsPanelOpen = $state(false);
 	let propsLabelInput = $state('');
-	let propsJsonInput = $state('');
+	let propsValues = $state<Record<string, unknown>>({});
 	let propsLabelEl = $state<HTMLInputElement | undefined>();
-	let propsJsonError = $state<string | null>(null);
+
+	const propsSchema = $derived<SchemaField[]>(
+		addedKind ? (COMPONENT_SCHEMAS[addedKind] ?? []) : []
+	);
+
+	const formFields = $derived(propsSchema.filter((field) => field.type.kind !== 'snippet'));
 
 	function syncPropsPanel() {
 		propsLabelInput = addedLabel ?? '';
-		propsJsonInput = addedPropsJson ?? '';
-		propsJsonError = null;
+		propsValues = parsePropsJson(addedPropsJson ?? '');
+	}
+
+	function parsePropsJson(raw: string): Record<string, unknown> {
+		const trimmed = raw.trim();
+		if (!trimmed) return {};
+		try {
+			const parsed = JSON.parse(trimmed);
+			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+				return parsed as Record<string, unknown>;
+			}
+		} catch {
+			// fall through to empty on invalid JSON
+		}
+		return {};
+	}
+
+	function serializePropsValues(values: Record<string, unknown>): string {
+		const trimmed: Record<string, unknown> = {};
+		for (const [key, value] of Object.entries(values)) {
+			if (value === undefined || value === null || value === '') continue;
+			trimmed[key] = value;
+		}
+		if (Object.keys(trimmed).length === 0) return '';
+		return JSON.stringify(trimmed);
 	}
 
 	$effect(() => {
@@ -192,32 +221,47 @@
 	}
 
 	function applyProps() {
-		const trimmedJson = propsJsonInput.trim();
-		if (trimmedJson) {
-			try {
-				const parsed = JSON.parse(trimmedJson);
-				if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-					propsJsonError = 'Props must be a JSON object';
-					return;
-				}
-			} catch (err) {
-				propsJsonError = err instanceof Error ? err.message : 'Invalid JSON';
-				return;
-			}
-		}
-		propsJsonError = null;
-		onapplyprops?.(propsLabelInput, propsJsonInput);
+		onapplyprops?.(propsLabelInput, serializePropsValues(propsValues));
 		propsPanelOpen = false;
 	}
 
+	function setFieldValue(field: SchemaField, value: unknown) {
+		propsValues = { ...propsValues, [field.name]: value };
+	}
+
+	function clearFieldValue(field: SchemaField) {
+		const next = { ...propsValues };
+		delete next[field.name];
+		propsValues = next;
+	}
+
 	function handlePropsKey(e: KeyboardEvent) {
-		if (e.key === 'Enter' && !e.shiftKey && !(e.target instanceof HTMLTextAreaElement)) {
+		if (e.key === 'Enter' && !(e.target instanceof HTMLTextAreaElement)) {
 			e.preventDefault();
 			applyProps();
 		} else if (e.key === 'Escape') {
 			e.preventDefault();
 			propsPanelOpen = false;
 		}
+	}
+
+	function readEnumValue(field: SchemaField): string {
+		const value = propsValues[field.name];
+		return typeof value === 'string' ? value : '';
+	}
+
+	function readBooleanValue(field: SchemaField): boolean {
+		return propsValues[field.name] === true;
+	}
+
+	function readNumberValue(field: SchemaField): string {
+		const value = propsValues[field.name];
+		return typeof value === 'number' ? String(value) : '';
+	}
+
+	function readStringValue(field: SchemaField): string {
+		const value = propsValues[field.name];
+		return typeof value === 'string' ? value : '';
 	}
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
@@ -439,19 +483,74 @@
 										onkeydown={handlePropsKey}
 									/>
 								</label>
-								<label class="props-panel-field">
-									<span class="props-panel-label">Props (JSON)</span>
-									<textarea
-										class="props-panel-textarea"
-										rows="4"
-										bind:value={propsJsonInput}
-										placeholder={'{\n  "variant": "outline",\n  "size": "lg"\n}'}
-										onkeydown={handlePropsKey}
-									></textarea>
-								</label>
-								{#if propsJsonError}
-									<div class="props-panel-error" role="alert">{propsJsonError}</div>
-								{/if}
+								{#each formFields as field (field.name)}
+									{#if field.type.kind === 'enum'}
+										<label class="props-panel-field">
+											<span class="props-panel-label">{field.name}</span>
+											<select
+												class="props-panel-input"
+												value={readEnumValue(field)}
+												onchange={(e) => {
+													const next = (e.currentTarget as HTMLSelectElement).value;
+													if (!next) clearFieldValue(field);
+													else setFieldValue(field, next);
+												}}
+											>
+												<option value="">Default</option>
+												{#each field.type.options as option}
+													<option value={option}>{option}</option>
+												{/each}
+											</select>
+										</label>
+									{:else if field.type.kind === 'boolean'}
+										<label class="props-panel-checkbox">
+											<input
+												type="checkbox"
+												checked={readBooleanValue(field)}
+												onchange={(e) => {
+													const next = (e.currentTarget as HTMLInputElement).checked;
+													if (next) setFieldValue(field, true);
+													else clearFieldValue(field);
+												}}
+											/>
+											<span>{field.name}</span>
+										</label>
+									{:else if field.type.kind === 'number'}
+										<label class="props-panel-field">
+											<span class="props-panel-label">{field.name}</span>
+											<input
+												class="props-panel-input"
+												type="number"
+												value={readNumberValue(field)}
+												onkeydown={handlePropsKey}
+												oninput={(e) => {
+													const raw = (e.currentTarget as HTMLInputElement).value;
+													if (raw === '') {
+														clearFieldValue(field);
+														return;
+													}
+													const num = Number(raw);
+													if (Number.isFinite(num)) setFieldValue(field, num);
+												}}
+											/>
+										</label>
+									{:else}
+										<label class="props-panel-field">
+											<span class="props-panel-label">{field.name}</span>
+											<input
+												class="props-panel-input"
+												type="text"
+												value={readStringValue(field)}
+												onkeydown={handlePropsKey}
+												oninput={(e) => {
+													const raw = (e.currentTarget as HTMLInputElement).value;
+													if (raw === '') clearFieldValue(field);
+													else setFieldValue(field, raw);
+												}}
+											/>
+										</label>
+									{/if}
+								{/each}
 								<div class="props-panel-actions">
 									<button
 										class="props-panel-btn"
@@ -998,6 +1097,25 @@
 		gap: 4px;
 	}
 
+	.props-panel-checkbox {
+		display: grid;
+		grid-auto-flow: column;
+		justify-content: start;
+		align-items: center;
+		gap: 8px;
+		color: hsl(220 10% 88%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 12px;
+		font-weight: 500;
+	}
+
+	.props-panel-checkbox input {
+		accent-color: hsl(25 100% 55%);
+	}
+
 	.props-panel-label {
 		color: hsl(220 10% 60%);
 		font-family:
@@ -1010,8 +1128,7 @@
 		text-transform: uppercase;
 	}
 
-	.props-panel-input,
-	.props-panel-textarea {
+	.props-panel-input {
 		padding: 6px 10px;
 		border: 1px solid hsl(220 10% 30%);
 		border-radius: 6px;
@@ -1024,30 +1141,10 @@
 		font-size: 12px;
 		font-weight: 500;
 		outline: none;
-		resize: none;
 	}
 
-	.props-panel-textarea {
-		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
-		font-size: 11px;
-		line-height: 1.5;
-	}
-
-	.props-panel-input:focus-visible,
-	.props-panel-textarea:focus-visible {
+	.props-panel-input:focus-visible {
 		border-color: var(--accent);
-	}
-
-	.props-panel-error {
-		padding: 6px 8px;
-		border-radius: 6px;
-		background: hsl(6 60% 20%);
-		color: hsl(6 80% 80%);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 11px;
 	}
 
 	.props-panel-actions {
