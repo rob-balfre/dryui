@@ -1,5 +1,17 @@
 <script lang="ts">
-	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
+	import {
+		Check,
+		Pencil,
+		Eraser,
+		MoveUpRight,
+		Type,
+		FilePlus,
+		LayoutTemplate,
+		Move,
+		PanelTop,
+		Send
+	} from 'lucide-svelte';
+	import { Button, Dialog, Heading, OptionPicker } from '@dryui/ui';
 	import { type SubmitStatus, type Tool } from '../types.js';
 
 	interface Props {
@@ -39,6 +51,8 @@
 
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
+	let layoutDialogOpen = $state(false);
+	let layoutChoice = $state('');
 	const submitting = $derived(submitStatus !== 'idle');
 	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
 	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
@@ -83,6 +97,20 @@
 			ontoggle();
 		}
 	}
+
+	function handleLayoutClick() {
+		ontoolchange('layout');
+	}
+
+	function closeLayoutDialog() {
+		layoutDialogOpen = false;
+	}
+
+	function handleLayoutChoice(nextChoice: string) {
+		layoutChoice = nextChoice;
+		closeLayoutDialog();
+		layoutChoice = '';
+	}
 </script>
 
 <div
@@ -122,6 +150,56 @@
 	>
 		<Type size={18} />
 	</button>
+
+	<Dialog.Root bind:open={layoutDialogOpen}>
+		<Dialog.Trigger>
+			<Button
+				variant="bare"
+				class="tool-btn"
+				onclick={handleLayoutClick}
+				aria-label="Build page layouts"
+			>
+				<LayoutTemplate size={18} />
+			</Button>
+		</Dialog.Trigger>
+
+		<div class="layout-dialog-scope">
+			<Dialog.Content>
+				<Dialog.Header>
+					<div class="layout-dialog-header">
+						<div class="layout-dialog-icon" aria-hidden="true">
+							<LayoutTemplate size={18} />
+						</div>
+						<Heading level={2}>Layouts</Heading>
+						<Dialog.Close aria-label="Close layout dialog">
+							<span aria-hidden="true">&times;</span>
+						</Dialog.Close>
+					</div>
+				</Dialog.Header>
+
+				<Dialog.Body>
+					<OptionPicker.Root
+						bind:value={() => layoutChoice, handleLayoutChoice}
+						orientation="vertical"
+					>
+						<OptionPicker.Item value="update-current-page" size="compact">
+							<OptionPicker.Preview>
+								<PanelTop size={18} />
+							</OptionPicker.Preview>
+							<OptionPicker.Label>Update current page layout</OptionPicker.Label>
+						</OptionPicker.Item>
+
+						<OptionPicker.Item value="add-new-page" size="compact">
+							<OptionPicker.Preview>
+								<FilePlus size={18} />
+							</OptionPicker.Preview>
+							<OptionPicker.Label>Add new page</OptionPicker.Label>
+						</OptionPicker.Item>
+					</OptionPicker.Root>
+				</Dialog.Body>
+			</Dialog.Content>
+		</div>
+	</Dialog.Root>
 
 	{#if showMoveTool}
 		<button
@@ -257,5 +335,27 @@
 			-apple-system,
 			sans-serif;
 		white-space: nowrap;
+	}
+
+	.layout-dialog-header {
+		display: grid;
+		grid-template-columns: auto 1fr auto;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.layout-dialog-icon {
+		display: grid;
+		place-items: center;
+		aspect-ratio: 1;
+		padding: 8px;
+		border-radius: 8px;
+		background: hsl(25 100% 55% / 0.16);
+		color: hsl(25 100% 67%);
+	}
+
+	.layout-dialog-scope {
+		--dry-dialog-max-width: 20rem;
+		display: contents;
 	}
 </style>

@@ -124,14 +124,23 @@
 		return drawing.space ?? 'scroll';
 	}
 
-	function isLayerHost(node: Element | null): node is HTMLElement {
+	function isLayerHost(node: Element | null): node is HTMLDialogElement {
 		return node instanceof HTMLDialogElement && node.open;
 	}
 
-	function resolveLayerHost(preferred?: HTMLElement | null): HTMLElement | null {
-		if (isLayerHost(preferred ?? null)) return preferred ?? null;
+	function isFeedbackDialog(node: HTMLDialogElement): boolean {
+		return node.closest('[data-dryui-feedback]') !== null;
+	}
 
-		const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]'));
+	function resolveLayerHost(preferred?: HTMLElement | null): HTMLElement | null {
+		const preferredHost = preferred ?? null;
+		if (isLayerHost(preferredHost) && !isFeedbackDialog(preferredHost)) {
+			return preferredHost;
+		}
+
+		const dialogs = Array.from(document.querySelectorAll<HTMLDialogElement>('dialog[open]')).filter(
+			(dialog) => !isFeedbackDialog(dialog)
+		);
 		if (dialogs.length > 0) return dialogs.at(-1) ?? null;
 
 		return null;
