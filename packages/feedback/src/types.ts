@@ -33,7 +33,7 @@ export interface TextLabel extends DrawingBase {
 
 export type Drawing = Stroke | Arrow | TextLabel;
 
-export type Tool = 'pencil' | 'arrow' | 'text' | 'layout' | 'move' | 'eraser';
+export type Tool = 'pencil' | 'arrow' | 'text' | 'move' | 'eraser';
 
 export type SubmitStatus = 'idle' | 'waiting-for-capture' | 'capturing' | 'uploading';
 
