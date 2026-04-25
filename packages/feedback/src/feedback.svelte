@@ -96,7 +96,10 @@
 		rotation: string | undefined;
 	};
 
-	type LayoutHistoryEntry = { history: LayoutSnapshot[]; index: number };
+	type HistoryFrame = {
+		drawings: Drawing[];
+		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
+	};
 
 	const LAYOUT_DATASET = {
 		clone: 'dryuiLayoutClone',
@@ -105,18 +108,16 @@
 	} as const;
 
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
-	const layoutHistories = new SvelteMap<HTMLElement, LayoutHistoryEntry>();
+	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
+
+	let historyFrames = $state<HistoryFrame[]>([{ drawings: [], cloneSnapshots: new Map() }]);
+	let frameIndex = $state(0);
 
 	const cloneLayoutEl = $derived(
 		selectedLayoutEl ? (layoutClones.get(selectedLayoutEl) ?? null) : null
 	);
-	const layoutHistoryEntry = $derived(
-		selectedLayoutEl ? (layoutHistories.get(selectedLayoutEl) ?? null) : null
-	);
-	const canUndoLayout = $derived((layoutHistoryEntry?.index ?? 0) > 0);
-	const canRedoLayout = $derived(
-		layoutHistoryEntry !== null && layoutHistoryEntry.index < layoutHistoryEntry.history.length - 1
-	);
+	const canUndo = $derived(frameIndex > 0);
+	const canRedo = $derived(frameIndex < historyFrames.length - 1);
 
 	function snapshotClone(clone: HTMLElement): LayoutSnapshot {
 		return {
@@ -148,9 +149,9 @@
 		if (existing) return existing;
 		const clone = makeLayoutClone(original);
 		layoutClones.set(original, clone);
+		cloneInitialSnaps.set(original, snapshotClone(clone));
 		original.dataset[LAYOUT_DATASET.prevVis] = original.style.visibility ?? '';
 		original.style.visibility = 'hidden';
-		layoutHistories.set(original, { history: [snapshotClone(clone)], index: 0 });
 		return clone;
 	}
 
@@ -159,7 +160,7 @@
 		if (!clone) return;
 		clone.remove();
 		layoutClones.delete(original);
-		layoutHistories.delete(original);
+		cloneInitialSnaps.delete(original);
 		const prevVis = original.dataset[LAYOUT_DATASET.prevVis];
 		if (prevVis !== undefined) {
 			original.style.visibility = prevVis;
@@ -171,32 +172,49 @@
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 	}
 
-	function commitLayoutHistory() {
-		const original = selectedLayoutEl;
-		if (!original) return;
-		const clone = layoutClones.get(original);
-		const entry = layoutHistories.get(original);
-		if (!clone || !entry) return;
-		const snap = snapshotClone(clone);
-		const history = [...entry.history.slice(0, entry.index + 1), snap];
-		layoutHistories.set(original, { history, index: history.length - 1 });
+	function snapshotAllClones(): Map<HTMLElement, LayoutSnapshot> {
+		const map = new Map<HTMLElement, LayoutSnapshot>();
+		for (const [el, clone] of layoutClones) map.set(el, snapshotClone(clone));
+		return map;
 	}
 
-	function stepLayoutHistory(direction: -1 | 1) {
-		if (direction === -1 ? !canUndoLayout : !canRedoLayout) return;
-		const original = selectedLayoutEl;
-		if (!original) return;
-		const clone = layoutClones.get(original);
-		const entry = layoutHistories.get(original);
-		if (!clone || !entry) return;
-		const nextIndex = entry.index + direction;
-		applyLayoutSnapshot(clone, entry.history[nextIndex]!);
-		layoutHistories.set(original, { ...entry, index: nextIndex });
-		notifyLayoutChange();
+	function commitHistory() {
+		const frame: HistoryFrame = {
+			drawings: [...drawings],
+			cloneSnapshots: snapshotAllClones()
+		};
+		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
+		historyFrames = next;
+		frameIndex = next.length - 1;
 	}
 
-	const undoLayout = () => stepLayoutHistory(-1);
-	const redoLayout = () => stepLayoutHistory(1);
+	function applyHistoryFrame(frame: HistoryFrame) {
+		drawings = [...frame.drawings];
+		let layoutChanged = false;
+		for (const [el, clone] of layoutClones) {
+			const snap = frame.cloneSnapshots.get(el) ?? cloneInitialSnaps.get(el);
+			if (snap) {
+				applyLayoutSnapshot(clone, snap);
+				layoutChanged = true;
+			}
+		}
+		if (layoutChanged) notifyLayoutChange();
+		saveVersion++;
+	}
+
+	function stepHistory(direction: -1 | 1) {
+		if (direction === -1 ? !canUndo : !canRedo) return;
+		frameIndex = frameIndex + direction;
+		applyHistoryFrame(historyFrames[frameIndex]!);
+	}
+
+	function resetHistory(initialDrawings: Drawing[]) {
+		historyFrames = [{ drawings: [...initialDrawings], cloneSnapshots: new Map() }];
+		frameIndex = 0;
+	}
+
+	const undo = () => stepHistory(-1);
+	const redo = () => stepHistory(1);
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
 		const rect = original.getBoundingClientRect();
@@ -226,7 +244,9 @@
 	});
 
 	$effect(() => {
-		if (!inspectingLayout) destroyAllLayoutClones();
+		if (active) return;
+		destroyAllLayoutClones();
+		resetHistory(untrack(() => drawings));
 	});
 
 	onDestroy(destroyAllLayoutClones);
@@ -235,11 +255,10 @@
 		const original = selectedLayoutEl;
 		if (!original) return;
 		const clone = layoutClones.get(original);
-		const entry = layoutHistories.get(original);
-		if (!clone || !entry) return;
-		const initial = entry.history[0];
-		if (initial) applyLayoutSnapshot(clone, initial);
-		commitLayoutHistory();
+		const initial = cloneInitialSnaps.get(original);
+		if (!clone || !initial) return;
+		applyLayoutSnapshot(clone, initial);
+		commitHistory();
 		notifyLayoutChange();
 	}
 	let drawings: Drawing[] = $state([]);
@@ -250,6 +269,8 @@
 	let erasing = $state(false);
 	let moving: { drawingId: string; lastPoint: Point; space: DrawingSpace } | null = $state(null);
 	let justCommitted = false;
+	let movedDuringDrag = false;
+	let erasedDuringDrag = false;
 	let saveVersion = $state(0);
 	let submitStatus: SubmitStatus = $state('idle');
 	let sent = $state(false);
@@ -360,7 +381,8 @@
 	// --- Text ---
 
 	function commitText() {
-		if (textInput && textInput.value.trim()) {
+		const willAddText = !!(textInput && textInput.value.trim());
+		if (textInput && willAddText) {
 			drawings = [
 				...drawings,
 				{
@@ -378,6 +400,7 @@
 		justCommitted = true;
 		saveVersion++;
 		setTimeout(() => (justCommitted = false), 0);
+		if (willAddText) commitHistory();
 	}
 
 	function handleTextKeyDown(e: KeyboardEvent) {
@@ -740,7 +763,6 @@
 				space,
 				width: strokeWidth
 			};
-			// start stays anchored to the initial click; drag updates the arrowhead (end)
 		} else if (tool === 'move') {
 			const hit = findDrawingAt(e.clientX, e.clientY);
 			if (hit) {
@@ -750,10 +772,14 @@
 					lastPoint: pointFromPointer(e, moveSpace),
 					space: moveSpace
 				};
+				movedDuringDrag = false;
 			}
 		} else {
 			erasing = true;
+			erasedDuringDrag = false;
+			const beforeLen = drawings.length;
 			eraseAt(e.clientX, e.clientY);
+			if (drawings.length !== beforeLen) erasedDuringDrag = true;
 		}
 	}
 
@@ -771,19 +797,25 @@
 			const point = pointFromPointer(e, moving.space);
 			const dx = point.x - moving.lastPoint.x;
 			const dy = point.y - moving.lastPoint.y;
+			if (dx === 0 && dy === 0) return;
 			drawings = drawings.map((d) => (d.id === moving!.drawingId ? offsetDrawing(d, dx, dy) : d));
 			moving.lastPoint = point;
+			movedDuringDrag = true;
 		} else if (tool === 'eraser' && erasing) {
 			e.preventDefault();
+			const beforeLen = drawings.length;
 			eraseAt(e.clientX, e.clientY);
+			if (drawings.length !== beforeLen) erasedDuringDrag = true;
 		}
 	}
 
 	function handlePointerUp() {
+		let touched = false;
 		if (tool === 'pencil' && currentStroke) {
 			if (currentStroke.points.length > 1) {
 				drawings = [...drawings, currentStroke];
 				saveVersion++;
+				touched = true;
 			}
 			currentStroke = null;
 		} else if (tool === 'arrow' && currentArrow) {
@@ -792,14 +824,22 @@
 			if (Math.hypot(dx, dy) > 5) {
 				drawings = [...drawings, currentArrow];
 				saveVersion++;
+				touched = true;
 			}
 			currentArrow = null;
 		} else if (tool === 'move' && moving) {
 			moving = null;
-			saveVersion++;
+			if (movedDuringDrag) {
+				saveVersion++;
+				touched = true;
+			}
+			movedDuringDrag = false;
 		} else if (tool === 'eraser') {
 			erasing = false;
+			if (erasedDuringDrag) touched = true;
+			erasedDuringDrag = false;
 		}
+		if (touched) commitHistory();
 	}
 
 	const hasDrawings = $derived(drawings.length > 0);
@@ -1030,6 +1070,7 @@
 		currentPageUrl = nextPageUrl;
 		drawings = [];
 		lastSavedVersion = saveVersion;
+		resetHistory(drawings);
 	}
 
 	async function handleSubmit() {
@@ -1080,6 +1121,7 @@
 				drawings = [];
 				saveVersion++;
 				active = false;
+				resetHistory([]);
 			}, 1500);
 		} catch (e) {
 			console.error('Failed to submit feedback:', e);
@@ -1222,6 +1264,7 @@
 				if (saveVersion !== versionAtRequest) return;
 				drawings = Array.isArray(data) ? data.map(normalizeDrawing) : [];
 				lastSavedVersion = saveVersion;
+				resetHistory(drawings);
 			})
 			.catch((error) => {
 				if (error?.name === 'AbortError') return;
@@ -1293,20 +1336,26 @@
 		if (shouldAutoActivate() && !active) active = true;
 	});
 
-	function handleLayoutHistoryKey(e: KeyboardEvent) {
-		if (!inspectingLayout || !cloneLayoutEl) return;
+	function handleHistoryKey(e: KeyboardEvent) {
+		if (!active) return;
+		if (textInput) return;
+		const target = e.target;
+		if (target instanceof HTMLElement) {
+			const tag = target.tagName;
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || target.isContentEditable) return;
+		}
 		const meta = e.metaKey || e.ctrlKey;
 		if (!meta || e.key.toLowerCase() !== 'z') return;
 		e.preventDefault();
 		e.stopPropagation();
-		if (e.shiftKey) redoLayout();
-		else undoLayout();
+		if (e.shiftKey) redo();
+		else undo();
 	}
 
 	$effect(() => {
-		if (!inspectingLayout) return;
-		window.addEventListener('keydown', handleLayoutHistoryKey, true);
-		return () => window.removeEventListener('keydown', handleLayoutHistoryKey, true);
+		if (!active) return;
+		window.addEventListener('keydown', handleHistoryKey, true);
+		return () => window.removeEventListener('keydown', handleHistoryKey, true);
 	});
 </script>
 
@@ -1518,15 +1567,15 @@
 				{submitStatus}
 				{sent}
 				hasSelection={selectedLayoutEl !== null}
-				{canUndoLayout}
-				{canRedoLayout}
+				{canUndo}
+				{canRedo}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
 				onlayoutreset={resetSelectedLayout}
-				onlayoutundo={undoLayout}
-				onlayoutredo={redoLayout}
+				onundo={undo}
+				onredo={redo}
 				ondeselect={() => selectLayoutElement(null)}
 			/>
 
@@ -1536,7 +1585,7 @@
 					getClone={(el) => layoutClones.get(el) ?? null}
 					onselect={selectLayoutElement}
 					onclose={stopInspectingLayout}
-					oncommit={commitLayoutHistory}
+					oncommit={commitHistory}
 				/>
 			{/if}
 		</div>
