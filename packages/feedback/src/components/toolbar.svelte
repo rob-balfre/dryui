@@ -16,6 +16,7 @@
 		Undo2
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
+	import { COMPONENT_NAMES } from './component-names.js';
 
 	export type Mode = 'annotate' | 'layout';
 
@@ -70,46 +71,14 @@
 	const showLayoutTools = $derived(mode === 'layout');
 	const showToolPill = $derived(showAnnotationTools || showLayoutTools);
 
-	const COMPONENT_PRESETS = [
-		'Button',
-		'Input',
-		'Card',
-		'Heading',
-		'Text',
-		'Container',
-		'Avatar',
-		'Badge',
-		'Checkbox',
-		'Dialog',
-		'Divider',
-		'Dropdown',
-		'Icon',
-		'Label',
-		'Link',
-		'List',
-		'Menu',
-		'Modal',
-		'Popover',
-		'Radio',
-		'Select',
-		'Sidebar',
-		'Slider',
-		'Spinner',
-		'Switch',
-		'Tab',
-		'Table',
-		'Textarea',
-		'Tooltip'
-	] as const;
-
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
 	let pickerInputEl = $state<HTMLInputElement | undefined>();
 
 	const filteredPresets = $derived.by(() => {
 		const query = pickerName.trim().toLowerCase();
-		if (!query) return COMPONENT_PRESETS;
-		return COMPONENT_PRESETS.filter((preset) => preset.toLowerCase().includes(query));
+		if (!query) return COMPONENT_NAMES;
+		return COMPONENT_NAMES.filter((name) => name.toLowerCase().includes(query));
 	});
 
 	const submitLabel = $derived(pickerName.trim() || filteredPresets[0] || '');
@@ -808,9 +777,9 @@
 
 	.component-picker-presets {
 		display: grid;
-		grid-template-columns: repeat(2, 1fr);
+		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 4px;
-		max-block-size: 220px;
+		max-block-size: 240px;
 		overflow-y: auto;
 	}
 
@@ -834,6 +803,10 @@
 		font-weight: 600;
 		letter-spacing: 0.02em;
 		cursor: pointer;
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		transition:
 			background 0.15s,
 			border-color 0.15s,
