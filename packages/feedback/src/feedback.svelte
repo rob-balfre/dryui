@@ -278,11 +278,49 @@
 		return null;
 	}
 
+	const COMPONENT_DEFAULTS: Record<string, () => Promise<{ default: unknown }>> = {
+		Accordion: () => import('./components/component-defaults/accordion.svelte'),
+		Breadcrumb: () => import('./components/component-defaults/breadcrumb.svelte'),
+		Calendar: () => import('./components/component-defaults/calendar.svelte'),
+		Card: () => import('./components/component-defaults/card.svelte'),
+		Combobox: () => import('./components/component-defaults/combobox.svelte'),
+		DateField: () => import('./components/component-defaults/date-field.svelte'),
+		DatePicker: () => import('./components/component-defaults/date-picker.svelte'),
+		Field: () => import('./components/component-defaults/field.svelte'),
+		Fieldset: () => import('./components/component-defaults/fieldset.svelte'),
+		Pagination: () => import('./components/component-defaults/pagination.svelte'),
+		PinInput: () => import('./components/component-defaults/pin-input.svelte'),
+		RadioGroup: () => import('./components/component-defaults/radio-group.svelte'),
+		SegmentedControl: () => import('./components/component-defaults/segmented-control.svelte'),
+		Select: () => import('./components/component-defaults/select.svelte'),
+		Sidebar: () => import('./components/component-defaults/sidebar.svelte'),
+		Stepper: () => import('./components/component-defaults/stepper.svelte'),
+		Tabs: () => import('./components/component-defaults/tabs.svelte'),
+		TagsInput: () => import('./components/component-defaults/tags-input.svelte'),
+		ToggleGroup: () => import('./components/component-defaults/toggle-group.svelte'),
+		Tree: () => import('./components/component-defaults/tree.svelte')
+	};
+
+	async function loadDefaultTemplate(kind: string): Promise<unknown | null> {
+		const factory = COMPONENT_DEFAULTS[kind];
+		if (!factory) return null;
+		try {
+			const mod = await factory();
+			return typeof mod.default === 'function' ? mod.default : null;
+		} catch {
+			return null;
+		}
+	}
+
 	async function tryRenderInto(record: AddedRecord) {
 		try {
-			const ui = await import('@dryui/ui');
-			const Component = resolveMountable((ui as Record<string, unknown>)[record.kind]);
-			if (!Component) return;
+			let Component: unknown = await loadDefaultTemplate(record.kind);
+			const usingDefault = !!Component;
+			if (!Component) {
+				const ui = await import('@dryui/ui');
+				Component = resolveMountable((ui as Record<string, unknown>)[record.kind]);
+			}
+			if (typeof Component !== 'function') return;
 			if (!record.el.isConnected) return;
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
@@ -292,9 +330,10 @@
 				render: () => `<span>${escapeHtml(labelText)}</span>`
 			}));
 			const extraProps = parsePropsJson(record.propsJson);
+			const props = usingDefault ? extraProps : { children: labelSnippet, ...extraProps };
 			const instance = mountComponent(Component as Parameters<typeof mountComponent>[0], {
 				target,
-				props: { children: labelSnippet, ...extraProps }
+				props
 			});
 			record.mounted = instance;
 			record.el.dataset.dryuiAddedRendered = '';
