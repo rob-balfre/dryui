@@ -37,6 +37,10 @@
 		return !!el.closest('[data-dryui-layout-clone]');
 	}
 
+	function isAddedPlaceholder(el: HTMLElement): boolean {
+		return el.dataset.dryuiAddedId !== undefined;
+	}
+
 	function isGridContainer(cs: CSSStyleDeclaration): boolean {
 		return cs.display === 'grid' || cs.display === 'inline-grid';
 	}
@@ -56,12 +60,13 @@
 			if (cs.display === 'none') continue;
 			if (cs.visibility === 'hidden' && !getClone(el)) continue;
 
+			const added = isAddedPlaceholder(el);
 			const isGrid = isGridContainer(cs);
 			const parent = el.parentElement;
 			const parentIsGrid =
 				parent && !isInsideFeedback(parent) && isGridContainer(getComputedStyle(parent));
 
-			if (!isGrid && !parentIsGrid) continue;
+			if (!added && !isGrid && !parentIsGrid) continue;
 
 			const rect = rectFor(el);
 			if (rect.width < 4 || rect.height < 4) continue;
@@ -73,7 +78,7 @@
 				y: rect.top,
 				w: rect.width,
 				h: rect.height,
-				role: isGrid ? 'container' : 'cell'
+				role: added ? 'cell' : isGrid ? 'container' : 'cell'
 			});
 		}
 
