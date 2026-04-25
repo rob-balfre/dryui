@@ -752,7 +752,7 @@
 		position: absolute;
 		right: 24px;
 		bottom: 24px;
-		z-index: 10000;
+		z-index: 10002;
 		display: grid;
 		grid-template-rows: auto var(--tool-slot-height);
 		justify-items: end;
