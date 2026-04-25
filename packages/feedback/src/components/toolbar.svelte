@@ -1,6 +1,7 @@
 <script lang="ts">
-	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send } from 'lucide-svelte';
+	import { Check, Pencil, Eraser, MoveUpRight, Type, Move, Send, LayoutGrid } from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
+	import LayoutsMenu from './layouts-menu.svelte';
 
 	interface Props {
 		active: boolean;
@@ -39,14 +40,31 @@
 
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
+	let layoutsOpen = $state(false);
+	let toolbarEl: HTMLDivElement | undefined = $state();
 	const submitting = $derived(submitStatus !== 'idle');
 	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
 	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
 	const showSubmitButton = $derived(hasDrawings || submitting || sent);
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
+	$effect(() => {
+		if (!layoutsOpen) return;
+		function handleDocPointer(e: PointerEvent) {
+			if (toolbarEl && !toolbarEl.contains(e.target as Node)) {
+				layoutsOpen = false;
+			}
+		}
+		document.addEventListener('pointerdown', handleDocPointer, true);
+		return () => document.removeEventListener('pointerdown', handleDocPointer, true);
+	});
+
 	function handlePointerDown(e: PointerEvent) {
-		if ((e.target as HTMLElement).closest('button, [role="menu"], [role="menuitem"]')) return;
+		if (
+			(e.target as HTMLElement).closest('button, [role="menu"], [role="menuitem"], [role="dialog"]')
+		) {
+			return;
+		}
 		const toolbar = e.currentTarget as HTMLDivElement;
 		dragging = true;
 		const rect = toolbar.getBoundingClientRect();
@@ -76,6 +94,7 @@
 	}
 
 	function handleToolClick(t: Tool) {
+		layoutsOpen = false;
 		if (!active || tool !== t) {
 			ontoolchange(t);
 			if (!active) ontoggle();
@@ -83,9 +102,14 @@
 			ontoggle();
 		}
 	}
+
+	function toggleLayouts() {
+		layoutsOpen = !layoutsOpen;
+	}
 </script>
 
 <div
+	bind:this={toolbarEl}
 	class="toolbar"
 	data-hidden={hidden || undefined}
 	onpointerdown={handlePointerDown}
@@ -121,6 +145,17 @@
 		aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
 	>
 		<Type size={18} />
+	</button>
+
+	<button
+		class="tool-btn"
+		data-active={layoutsOpen || undefined}
+		onclick={toggleLayouts}
+		aria-label={layoutsOpen ? 'Hide layout options' : 'Show layout options'}
+		aria-haspopup="dialog"
+		aria-expanded={layoutsOpen}
+	>
+		<LayoutGrid size={18} />
 	</button>
 
 	{#if showMoveTool}
@@ -161,6 +196,8 @@
 			<span class="submit-label">{submitCopy.label}</span>
 		</button>
 	{/if}
+
+	<LayoutsMenu open={layoutsOpen} onclose={() => (layoutsOpen = false)} />
 </div>
 
 <style>

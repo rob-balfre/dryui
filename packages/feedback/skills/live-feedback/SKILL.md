@@ -61,7 +61,7 @@ Use the browser tools available in your environment:
 
 Say:
 
-> Draw your feedback on the page using the toolbar in the bottom-right corner. Available tools: pencil, arrow, text, move, and eraser. The toolbar can be dragged to reposition it. You can also toggle drawing mode with Cmd+M (or Ctrl+M).
+> Draw your feedback on the page using the toolbar in the bottom-right corner. Available tools: pencil, arrow, text, move, and eraser. The layouts button opens a popover that lists DryUI's layout components and badges any detected on the current page. The toolbar can be dragged to reposition it. You can also toggle drawing mode with Cmd+M (or Ctrl+M).
 >
 > When you are done annotating, let me know and I will review your drawings.
 
