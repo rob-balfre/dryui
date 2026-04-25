@@ -8,6 +8,7 @@
 		Move,
 		MoveUpRight,
 		Pencil,
+		Plus,
 		Redo2,
 		RotateCcw,
 		Send,
@@ -26,6 +27,7 @@
 		submitStatus: SubmitStatus;
 		sent: boolean;
 		hasSelection?: boolean;
+		placing?: string | null;
 		canUndo?: boolean;
 		canRedo?: boolean;
 		ontoggle: () => void;
@@ -36,6 +38,8 @@
 		onundo?: () => void;
 		onredo?: () => void;
 		ondeselect?: () => void;
+		onaddcomponent?: (kind: string) => void;
+		oncancelplacement?: () => void;
 	}
 
 	let {
@@ -46,6 +50,7 @@
 		submitStatus,
 		sent,
 		hasSelection = false,
+		placing = null,
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
@@ -55,13 +60,62 @@
 		onlayoutreset,
 		onundo,
 		onredo,
-		ondeselect
+		ondeselect,
+		onaddcomponent,
+		oncancelplacement
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'layout');
 	const showAnnotationTools = $derived(mode === 'annotate');
-	const showLayoutTools = $derived(mode === 'layout' && hasSelection);
+	const showLayoutTools = $derived(mode === 'layout');
 	const showToolPill = $derived(showAnnotationTools || showLayoutTools);
+
+	const COMPONENT_PRESETS = ['Button', 'Input', 'Card', 'Heading', 'Text', 'Container'] as const;
+
+	let pickerOpen = $state(false);
+	let pickerName = $state('');
+	let pickerInputEl = $state<HTMLInputElement | undefined>();
+
+	function openPicker() {
+		if (placing) {
+			oncancelplacement?.();
+			return;
+		}
+		pickerOpen = !pickerOpen;
+		if (pickerOpen) pickerName = '';
+	}
+
+	function closePicker() {
+		pickerOpen = false;
+	}
+
+	function pick(kind: string) {
+		const trimmed = kind.trim();
+		if (!trimmed) return;
+		onaddcomponent?.(trimmed);
+		pickerOpen = false;
+		pickerName = '';
+	}
+
+	function handlePickerKey(e: KeyboardEvent) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			pick(pickerName);
+		} else if (e.key === 'Escape') {
+			e.preventDefault();
+			closePicker();
+		}
+	}
+
+	$effect(() => {
+		if (!pickerOpen || !pickerInputEl) return;
+		const id = requestAnimationFrame(() => pickerInputEl?.focus());
+		return () => cancelAnimationFrame(id);
+	});
+
+	$effect(() => {
+		if (placing) pickerOpen = false;
+	});
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
 		idle: { label: 'Send feedback', aria: 'Send feedback' },
@@ -254,25 +308,65 @@
 			aria-label={showLayoutTools ? 'Layout tools' : 'Annotation tools'}
 		>
 			{#if showLayoutTools}
-				<button
-					class="tool-btn"
-					type="button"
-					data-tooltip="Back"
-					onclick={() => ondeselect?.()}
-					aria-label="Back to inspector"
-				>
-					<ArrowLeft size={18} />
-				</button>
+				<div class="add-wrap">
+					<button
+						class="tool-btn"
+						type="button"
+						data-tooltip={placing ? 'Cancel placement' : 'Add component'}
+						data-active={pickerOpen || placing || undefined}
+						onclick={openPicker}
+						aria-label={placing ? `Cancel placing ${placing}` : 'Add component'}
+						aria-expanded={pickerOpen}
+					>
+						<Plus size={18} />
+					</button>
 
-				<button
-					class="tool-btn"
-					type="button"
-					data-tooltip="Reset"
-					onclick={() => onlayoutreset?.()}
-					aria-label="Reset layout overrides"
-				>
-					<RotateCcw size={18} />
-				</button>
+					{#if pickerOpen}
+						<div class="component-picker" role="dialog" aria-label="Pick component">
+							<input
+								class="component-picker-input"
+								type="text"
+								placeholder="Component name"
+								bind:this={pickerInputEl}
+								bind:value={pickerName}
+								onkeydown={handlePickerKey}
+							/>
+							<div class="component-picker-presets">
+								{#each COMPONENT_PRESETS as preset}
+									<button
+										class="component-picker-preset"
+										type="button"
+										onclick={() => pick(preset)}
+									>
+										{preset}
+									</button>
+								{/each}
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				{#if hasSelection}
+					<button
+						class="tool-btn"
+						type="button"
+						data-tooltip="Back"
+						onclick={() => ondeselect?.()}
+						aria-label="Back to inspector"
+					>
+						<ArrowLeft size={18} />
+					</button>
+
+					<button
+						class="tool-btn"
+						type="button"
+						data-tooltip="Reset"
+						onclick={() => onlayoutreset?.()}
+						aria-label="Reset layout overrides"
+					>
+						<RotateCcw size={18} />
+					</button>
+				{/if}
 			{:else}
 				<button
 					class="tool-btn"
@@ -380,6 +474,8 @@
 	.tool-pill {
 		grid-row: 2;
 		align-self: end;
+		position: relative;
+		z-index: 1;
 	}
 
 	.toolbar[data-dragging] {
@@ -616,6 +712,86 @@
 		border-width: 1px;
 		inline-size: 25px;
 		block-size: 25px;
+	}
+
+	.add-wrap {
+		position: relative;
+		display: grid;
+	}
+
+	.component-picker {
+		position: absolute;
+		bottom: calc(100% + 10px);
+		right: 0;
+		display: grid;
+		gap: 8px;
+		min-inline-size: 220px;
+		padding: 10px;
+		border-radius: 12px;
+		background: var(--pill-bg);
+		backdrop-filter: blur(8px);
+		box-shadow: var(--pill-shadow);
+		z-index: 10001;
+	}
+
+	.component-picker-input {
+		padding: 6px 10px;
+		border: 1px solid hsl(220 10% 30%);
+		border-radius: 6px;
+		background: hsl(225 15% 10% / 0.6);
+		color: hsl(220 10% 92%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 12px;
+		font-weight: 500;
+		outline: none;
+	}
+
+	.component-picker-input:focus-visible {
+		border-color: var(--accent);
+	}
+
+	.component-picker-input::placeholder {
+		color: hsl(220 10% 50%);
+	}
+
+	.component-picker-presets {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 4px;
+	}
+
+	.component-picker-preset {
+		padding: 6px 8px;
+		border: 1px solid hsl(220 10% 25%);
+		border-radius: 6px;
+		background: transparent;
+		color: hsl(220 10% 88%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		cursor: pointer;
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			color 0.15s;
+	}
+
+	.component-picker-preset:hover {
+		background: hsl(25 100% 55% / 0.18);
+		border-color: var(--accent);
+		color: hsl(25 100% 80%);
+	}
+
+	.component-picker-preset:focus-visible {
+		outline: 2px solid var(--accent);
+		outline-offset: 1px;
 	}
 
 	.submit-btn {

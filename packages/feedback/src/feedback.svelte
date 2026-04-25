@@ -96,21 +96,32 @@
 		rotation: string | undefined;
 	};
 
+	type AddedSnapshot = { id: string; kind: string; snap: LayoutSnapshot };
+
 	type HistoryFrame = {
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
+		added: AddedSnapshot[];
 	};
 
 	const LAYOUT_DATASET = {
 		clone: 'dryuiLayoutClone',
 		prevVis: 'dryuiLayoutPrevVis',
-		rotation: 'dryuiLayoutRotation'
+		rotation: 'dryuiLayoutRotation',
+		addedId: 'dryuiAddedId'
 	} as const;
 
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
+	const addedClones = new SvelteMap<string, HTMLElement>();
+	const addedKinds = new SvelteMap<string, string>();
+	const addedInitialSnaps = new SvelteMap<string, LayoutSnapshot>();
 
-	let historyFrames = $state<HistoryFrame[]>([{ drawings: [], cloneSnapshots: new Map() }]);
+	let placingComponent = $state<string | null>(null);
+
+	let historyFrames = $state<HistoryFrame[]>([
+		{ drawings: [], cloneSnapshots: new Map(), added: [] }
+	]);
 	let frameIndex = $state(0);
 
 	const cloneLayoutEl = $derived(
@@ -170,6 +181,65 @@
 
 	function destroyAllLayoutClones() {
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
+		for (const id of [...addedClones.keys()]) destroyAddedClone(id);
+	}
+
+	function makeAddedElement(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
+		const el = document.createElement('div');
+		el.dataset[LAYOUT_DATASET.addedId] = id;
+		el.textContent = kind;
+		Object.assign(el.style, {
+			position: 'fixed',
+			left: snap.left,
+			top: snap.top,
+			width: snap.width,
+			height: snap.height,
+			margin: '0',
+			zIndex: '9998',
+			display: 'grid',
+			placeItems: 'center',
+			background: 'hsl(25 100% 55% / 0.16)',
+			border: '2px dashed hsl(25 100% 55%)',
+			borderRadius: '8px',
+			color: 'hsl(25 100% 88%)',
+			fontFamily: 'system-ui, -apple-system, sans-serif',
+			fontSize: '13px',
+			fontWeight: '600',
+			letterSpacing: '0.02em',
+			textAlign: 'center',
+			padding: '4px 8px',
+			boxSizing: 'border-box',
+			transformOrigin: '50% 50%',
+			pointerEvents: 'none',
+			transform: snap.transform
+		});
+		if (snap.rotation !== undefined) el.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
+		return el;
+	}
+
+	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
+		const existing = addedClones.get(id);
+		if (existing) {
+			applyLayoutSnapshot(existing, snap);
+			addedKinds.set(id, kind);
+			return existing;
+		}
+		const el = makeAddedElement(id, kind, snap);
+		document.body.appendChild(el);
+		addedClones.set(id, el);
+		addedKinds.set(id, kind);
+		if (!addedInitialSnaps.has(id)) addedInitialSnaps.set(id, snap);
+		return el;
+	}
+
+	function destroyAddedClone(id: string) {
+		const el = addedClones.get(id);
+		if (!el) return;
+		if (selectedLayoutEl === el) selectedLayoutEl = null;
+		el.remove();
+		addedClones.delete(id);
+		addedKinds.delete(id);
+		addedInitialSnaps.delete(id);
 	}
 
 	function snapshotAllClones(): Map<HTMLElement, LayoutSnapshot> {
@@ -178,10 +248,21 @@
 		return map;
 	}
 
+	function snapshotAllAdded(): AddedSnapshot[] {
+		const result: AddedSnapshot[] = [];
+		for (const [id, el] of addedClones) {
+			const kind = addedKinds.get(id);
+			if (!kind) continue;
+			result.push({ id, kind, snap: snapshotClone(el) });
+		}
+		return result;
+	}
+
 	function commitHistory() {
 		const frame: HistoryFrame = {
 			drawings: [...drawings],
-			cloneSnapshots: snapshotAllClones()
+			cloneSnapshots: snapshotAllClones(),
+			added: snapshotAllAdded()
 		};
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
@@ -198,6 +279,17 @@
 				layoutChanged = true;
 			}
 		}
+		const wantedIds = new Set(frame.added.map((a) => a.id));
+		for (const id of [...addedClones.keys()]) {
+			if (!wantedIds.has(id)) {
+				destroyAddedClone(id);
+				layoutChanged = true;
+			}
+		}
+		for (const { id, kind, snap } of frame.added) {
+			createAddedClone(id, kind, snap);
+			layoutChanged = true;
+		}
 		if (layoutChanged) notifyLayoutChange();
 		saveVersion++;
 	}
@@ -209,7 +301,7 @@
 	}
 
 	function resetHistory(initialDrawings: Drawing[]) {
-		historyFrames = [{ drawings: [...initialDrawings], cloneSnapshots: new Map() }];
+		historyFrames = [{ drawings: [...initialDrawings], cloneSnapshots: new Map(), added: [] }];
 		frameIndex = 0;
 	}
 
@@ -240,13 +332,17 @@
 
 	$effect(() => {
 		const original = selectedLayoutEl;
-		if (inspectingLayout && original) ensureLayoutClone(original);
+		if (!inspectingLayout || !original) return;
+		if (original.dataset?.[LAYOUT_DATASET.addedId]) return;
+		ensureLayoutClone(original);
 	});
 
 	$effect(() => {
 		if (active) return;
-		destroyAllLayoutClones();
-		resetHistory(untrack(() => drawings));
+		untrack(() => {
+			destroyAllLayoutClones();
+			resetHistory(drawings);
+		});
 	});
 
 	onDestroy(destroyAllLayoutClones);
@@ -256,10 +352,62 @@
 		if (!original) return;
 		const clone = layoutClones.get(original);
 		const initial = cloneInitialSnaps.get(original);
-		if (!clone || !initial) return;
-		applyLayoutSnapshot(clone, initial);
+		if (clone && initial) {
+			applyLayoutSnapshot(clone, initial);
+			commitHistory();
+			notifyLayoutChange();
+			return;
+		}
+		const addedId = original.dataset?.[LAYOUT_DATASET.addedId];
+		if (addedId) {
+			const addedInitial = addedInitialSnaps.get(addedId);
+			if (addedInitial) {
+				applyLayoutSnapshot(original, addedInitial);
+				commitHistory();
+				notifyLayoutChange();
+			}
+		}
+	}
+
+	function startPlacingComponent(kind: string) {
+		const trimmed = kind.trim();
+		if (!trimmed) return;
+		placingComponent = trimmed;
+		if (selectedLayoutEl) selectedLayoutEl = null;
+	}
+
+	function cancelPlacingComponent() {
+		placingComponent = null;
+	}
+
+	function placeComponentAt(x: number, y: number) {
+		const kind = placingComponent;
+		if (!kind) return;
+		const id = crypto.randomUUID();
+		const width = 200;
+		const height = 80;
+		const left = Math.max(0, Math.min(window.innerWidth - width, x - width / 2));
+		const top = Math.max(0, Math.min(window.innerHeight - height, y - height / 2));
+		const snap: LayoutSnapshot = {
+			left: `${left}px`,
+			top: `${top}px`,
+			width: `${width}px`,
+			height: `${height}px`,
+			transform: '',
+			rotation: undefined
+		};
+		const el = createAddedClone(id, kind, snap);
+		placingComponent = null;
+		selectedLayoutEl = el;
 		commitHistory();
 		notifyLayoutChange();
+	}
+
+	function resolveInspectorClone(el: HTMLElement): HTMLElement | null {
+		const clone = layoutClones.get(el);
+		if (clone) return clone;
+		if (el.dataset?.[LAYOUT_DATASET.addedId]) return el;
+		return null;
 	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
@@ -1357,6 +1505,18 @@
 		window.addEventListener('keydown', handleHistoryKey, true);
 		return () => window.removeEventListener('keydown', handleHistoryKey, true);
 	});
+
+	$effect(() => {
+		if (!placingComponent) return;
+		function handleKey(e: KeyboardEvent) {
+			if (e.key !== 'Escape') return;
+			e.preventDefault();
+			e.stopPropagation();
+			cancelPlacingComponent();
+		}
+		window.addEventListener('keydown', handleKey, true);
+		return () => window.removeEventListener('keydown', handleKey, true);
+	});
 </script>
 
 {#if !feedbackDisabled}
@@ -1567,6 +1727,7 @@
 				{submitStatus}
 				{sent}
 				hasSelection={selectedLayoutEl !== null}
+				placing={placingComponent}
 				{canUndo}
 				{canRedo}
 				ontoggle={toggle}
@@ -1577,16 +1738,32 @@
 				onundo={undo}
 				onredo={redo}
 				ondeselect={() => selectLayoutElement(null)}
+				onaddcomponent={startPlacingComponent}
+				oncancelplacement={cancelPlacingComponent}
 			/>
 
 			{#if inspectingLayout}
 				<LayoutInspector
 					selectedElement={selectedLayoutEl}
-					getClone={(el) => layoutClones.get(el) ?? null}
+					getClone={resolveInspectorClone}
 					onselect={selectLayoutElement}
 					onclose={stopInspectingLayout}
 					oncommit={commitHistory}
 				/>
+			{/if}
+
+			{#if placingComponent}
+				<div
+					class="placement-overlay"
+					role="presentation"
+					onpointerdown={(e) => placeComponentAt(e.clientX, e.clientY)}
+				>
+					<span class="placement-hint">
+						<span class="placement-hint-dot" aria-hidden="true"></span>
+						<span>Click to place</span>
+						<strong>{placingComponent}</strong>
+					</span>
+				</div>
 			{/if}
 		</div>
 
@@ -1721,6 +1898,52 @@
 
 	.text-confirm-btn:hover {
 		background: hsl(25 100% 62%);
+	}
+
+	.placement-overlay {
+		position: fixed;
+		inset: 0;
+		z-index: 10001;
+		display: grid;
+		place-items: start center;
+		padding-block-start: 24vh;
+		background: hsl(25 100% 55% / 0.04);
+		cursor: crosshair;
+		pointer-events: auto;
+	}
+
+	.placement-hint {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 14px;
+		border-radius: 999px;
+		background: hsl(225 15% 15% / 0.95);
+		backdrop-filter: blur(8px);
+		color: hsl(220 10% 92%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 12px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+	}
+
+	.placement-hint strong {
+		color: hsl(25 100% 80%);
+		font-weight: 700;
+	}
+
+	.placement-hint-dot {
+		display: inline-block;
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: hsl(25 100% 55%);
+		box-shadow: 0 0 8px hsl(25 100% 55% / 0.6);
 	}
 
 	.feedback-toast-provider {
