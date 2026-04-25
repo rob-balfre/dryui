@@ -23,7 +23,6 @@
 		active: boolean;
 		tool: Tool;
 		mode: Mode;
-		hasDrawings: boolean;
 		hidden: boolean;
 		submitStatus: SubmitStatus;
 		sent: boolean;
@@ -40,7 +39,6 @@
 		active,
 		tool,
 		mode,
-		hasDrawings,
 		hidden,
 		submitStatus,
 		sent,
@@ -75,9 +73,6 @@
 
 	const DRAG_THRESHOLD_PX = 4;
 	const submitting = $derived(submitStatus !== 'idle');
-	const showMoveTool = $derived(hasDrawings || (active && tool === 'move'));
-	const showEraserTool = $derived(hasDrawings || (active && tool === 'eraser'));
-	const showSubmitButton = $derived(hasDrawings || submitting || sent);
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
 	let toolbarEl = $state<HTMLDivElement | null>(null);
@@ -278,44 +273,38 @@
 					<Type size={18} />
 				</button>
 
-				{#if showMoveTool}
-					<button
-						class="tool-btn"
-						data-active={(active && tool === 'move') || undefined}
-						onclick={() => handleToolClick('move')}
-						aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
-					>
-						<Move size={18} />
-					</button>
-				{/if}
+				<button
+					class="tool-btn"
+					data-active={(active && tool === 'move') || undefined}
+					onclick={() => handleToolClick('move')}
+					aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
+				>
+					<Move size={18} />
+				</button>
 
-				{#if showEraserTool}
-					<button
-						class="tool-btn"
-						data-active={(active && tool === 'eraser') || undefined}
-						onclick={() => handleToolClick('eraser')}
-						aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
-					>
-						<Eraser size={18} />
-					</button>
-				{/if}
+				<button
+					class="tool-btn"
+					data-active={(active && tool === 'eraser') || undefined}
+					onclick={() => handleToolClick('eraser')}
+					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
+				>
+					<Eraser size={18} />
+				</button>
 
-				{#if showSubmitButton}
-					<button
-						class="tool-btn submit-btn"
-						data-submitting={submitting || undefined}
-						data-sent={sent || undefined}
-						onclick={onsubmit}
-						aria-label={submitCopy.aria}
-					>
-						{#if sent}
-							<Check size={16} />
-						{:else}
-							<Send size={16} />
-						{/if}
-						<span class="submit-label">{submitCopy.label}</span>
-					</button>
-				{/if}
+				<button
+					class="tool-btn submit-btn"
+					data-submitting={submitting || undefined}
+					data-sent={sent || undefined}
+					onclick={onsubmit}
+					aria-label={submitCopy.aria}
+				>
+					{#if sent}
+						<Check size={16} />
+					{:else}
+						<Send size={16} />
+					{/if}
+					<span class="submit-label">{submitCopy.label}</span>
+				</button>
 			{/if}
 		</div>
 	{/if}
