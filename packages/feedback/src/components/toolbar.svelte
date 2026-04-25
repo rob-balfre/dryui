@@ -11,6 +11,7 @@
 		Plus,
 		Redo2,
 		RotateCcw,
+		Search,
 		Send,
 		Settings,
 		Type,
@@ -601,14 +602,19 @@
 
 					{#if pickerOpen}
 						<div class="component-picker" role="dialog" aria-label="Pick component">
-							<input
-								class="component-picker-input"
-								type="text"
-								placeholder="Search or type a name"
-								bind:this={pickerInputEl}
-								bind:value={pickerName}
-								onkeydown={handlePickerKey}
-							/>
+							<div class="component-picker-search">
+								<span class="component-picker-search-icon" aria-hidden="true">
+									<Search size={13} />
+								</span>
+								<input
+									class="component-picker-input"
+									type="text"
+									placeholder="Search components"
+									bind:this={pickerInputEl}
+									bind:value={pickerName}
+									onkeydown={handlePickerKey}
+								/>
+							</div>
 							{#if groupedPresets.length > 0}
 								<div class="component-picker-presets">
 									{#each groupedPresets as group (group.category)}
@@ -1015,10 +1021,11 @@
 		bottom: calc(100% + 10px);
 		right: 0;
 		display: grid;
+		grid-template-rows: auto 1fr;
 		gap: 8px;
-		min-inline-size: 240px;
-		max-inline-size: 280px;
-		padding: 10px;
+		inline-size: 260px;
+		max-block-size: 380px;
+		padding: 8px;
 		border-radius: 12px;
 		background: var(--pill-bg);
 		backdrop-filter: blur(8px);
@@ -1026,11 +1033,26 @@
 		z-index: 10001;
 	}
 
+	.component-picker-search {
+		position: relative;
+		display: grid;
+	}
+
+	.component-picker-search-icon {
+		position: absolute;
+		inset-block: 0;
+		inset-inline-start: 10px;
+		display: grid;
+		place-items: center;
+		color: hsl(220 10% 45%);
+		pointer-events: none;
+	}
+
 	.component-picker-input {
-		padding: 6px 10px;
-		border: 1px solid hsl(220 10% 30%);
-		border-radius: 6px;
-		background: hsl(225 15% 10% / 0.6);
+		padding: 7px 10px 7px 30px;
+		border: 1px solid hsl(220 10% 22%);
+		border-radius: 8px;
+		background: hsl(225 15% 10% / 0.5);
 		color: hsl(220 10% 92%);
 		font-family:
 			system-ui,
@@ -1039,42 +1061,88 @@
 		font-size: 12px;
 		font-weight: 500;
 		outline: none;
+		transition:
+			border-color 0.15s,
+			background 0.15s;
 	}
 
 	.component-picker-input:focus-visible {
-		border-color: var(--accent);
+		border-color: hsl(25 100% 55% / 0.5);
+		background: hsl(225 15% 10% / 0.7);
+	}
+
+	.component-picker-search:focus-within .component-picker-search-icon {
+		color: var(--accent);
 	}
 
 	.component-picker-input::placeholder {
-		color: hsl(220 10% 50%);
+		color: hsl(220 10% 45%);
 	}
 
 	.component-picker-presets {
 		display: grid;
-		gap: 2px;
-		max-block-size: 320px;
+		gap: 0;
+		min-block-size: 0;
 		overflow-y: auto;
+		scrollbar-width: thin;
+		scrollbar-color: hsl(220 10% 28%) transparent;
+		mask-image: linear-gradient(
+			180deg,
+			transparent 0,
+			black 8px,
+			black calc(100% - 8px),
+			transparent 100%
+		);
+	}
+
+	.component-picker-presets::-webkit-scrollbar {
+		inline-size: 6px;
+	}
+
+	.component-picker-presets::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.component-picker-presets::-webkit-scrollbar-thumb {
+		background: hsl(220 10% 28%);
+		border-radius: 999px;
+	}
+
+	.component-picker-presets::-webkit-scrollbar-thumb:hover {
+		background: hsl(220 10% 38%);
 	}
 
 	.component-picker-group-label {
-		padding: 8px 4px 4px;
-		color: hsl(220 10% 50%);
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		padding: 10px 6px 4px;
+		background: linear-gradient(
+			180deg,
+			var(--pill-bg) 0%,
+			var(--pill-bg) 70%,
+			hsl(225 15% 15% / 0) 100%
+		);
+		color: hsl(25 100% 70%);
 		font-family:
 			system-ui,
 			-apple-system,
 			sans-serif;
-		font-size: 10px;
+		font-size: 9px;
 		font-weight: 700;
-		letter-spacing: 0.08em;
+		letter-spacing: 0.12em;
 		text-transform: uppercase;
 	}
 
 	.component-picker-group-label:first-child {
-		padding-block-start: 0;
+		padding-block-start: 4px;
 	}
 
 	.component-picker-create {
-		border-style: dashed;
+		margin-block-start: 6px;
+		padding: 8px 10px;
+		border: 1px dashed hsl(25 100% 55% / 0.45);
+		border-radius: 8px;
 		color: hsl(25 100% 80%);
 	}
 
@@ -1206,35 +1274,47 @@
 	}
 
 	.component-picker-preset {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		align-items: center;
+		gap: 8px;
 		padding: 6px 10px;
-		border: 1px solid hsl(220 10% 25%);
+		border: none;
 		border-radius: 6px;
 		background: transparent;
-		color: hsl(220 10% 88%);
+		color: hsl(220 10% 80%);
 		font-family:
 			system-ui,
 			-apple-system,
 			sans-serif;
 		font-size: 12px;
-		font-weight: 600;
-		letter-spacing: 0.02em;
+		font-weight: 500;
+		letter-spacing: 0;
 		text-align: start;
 		cursor: pointer;
 		transition:
-			background 0.15s,
-			border-color 0.15s,
-			color 0.15s;
+			background 0.12s ease-out,
+			color 0.12s ease-out;
 	}
 
-	.component-picker-preset:hover {
-		background: hsl(25 100% 55% / 0.18);
-		border-color: var(--accent);
-		color: hsl(25 100% 80%);
+	.component-picker-preset::after {
+		content: '';
+		inline-size: 12px;
+		block-size: 1px;
+		background: hsl(25 100% 55% / 0);
+		transition: background 0.12s ease-out;
 	}
 
+	.component-picker-preset:hover,
 	.component-picker-preset:focus-visible {
-		outline: 2px solid var(--accent);
-		outline-offset: 1px;
+		background: hsl(25 100% 55% / 0.1);
+		color: hsl(25 100% 92%);
+		outline: none;
+	}
+
+	.component-picker-preset:hover::after,
+	.component-picker-preset:focus-visible::after {
+		background: hsl(25 100% 55%);
 	}
 
 	.submit-btn {
