@@ -15,6 +15,8 @@
 	import { Dialog } from '@dryui/ui';
 	import { type SubmitStatus, type Tool } from '../types.js';
 
+	export type LayoutAction = 'update-current-page' | 'add-new-page';
+
 	interface Props {
 		active: boolean;
 		tool: Tool;
@@ -22,9 +24,11 @@
 		hidden: boolean;
 		submitStatus: SubmitStatus;
 		sent: boolean;
+		inspectingLayout?: boolean;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
+		onlayoutaction?: (action: LayoutAction) => void;
 	}
 
 	let {
@@ -34,9 +38,11 @@
 		hidden,
 		submitStatus,
 		sent,
+		inspectingLayout = false,
 		ontoggle,
 		ontoolchange,
-		onsubmit
+		onsubmit,
+		onlayoutaction
 	}: Props = $props();
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
@@ -63,6 +69,25 @@
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
 	let toolbarEl = $state<HTMLDivElement | null>(null);
+	let pillPosition = $state<'above' | 'below'>('above');
+	const PILL_CLEARANCE = 56;
+
+	function updatePillPosition() {
+		if (!toolbarEl) return;
+		const rect = toolbarEl.getBoundingClientRect();
+		pillPosition = rect.top < PILL_CLEARANCE ? 'below' : 'above';
+	}
+
+	$effect(() => {
+		if (!inspectingLayout) return;
+		updatePillPosition();
+		window.addEventListener('resize', updatePillPosition);
+		window.addEventListener('scroll', updatePillPosition, true);
+		return () => {
+			window.removeEventListener('resize', updatePillPosition);
+			window.removeEventListener('scroll', updatePillPosition, true);
+		};
+	});
 
 	function handleHandlePointerDown(e: PointerEvent) {
 		pendingDrag = { id: e.pointerId, x: e.clientX, y: e.clientY };
@@ -94,6 +119,7 @@
 		toolbarEl.style.top = `${y}px`;
 		toolbarEl.style.right = 'auto';
 		toolbarEl.style.bottom = 'auto';
+		if (inspectingLayout) updatePillPosition();
 	}
 
 	function handleHandlePointerUp() {
@@ -110,8 +136,9 @@
 		}
 	}
 
-	function handleLayoutChoice(_choice: 'update-current-page' | 'add-new-page') {
+	function handleLayoutChoice(choice: LayoutAction) {
 		layoutDialogOpen = false;
+		onlayoutaction?.(choice);
 	}
 </script>
 
@@ -247,6 +274,14 @@
 	>
 		<GripVertical size={14} aria-hidden="true" />
 	</button>
+
+	{#if inspectingLayout}
+		<div class="inspect-pill" data-position={pillPosition} role="status">
+			<span class="inspect-pill-dot" aria-hidden="true"></span>
+			<span class="inspect-pill-label">Inspecting layout</span>
+			<kbd class="inspect-pill-kbd">ESC</kbd>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -311,6 +346,58 @@
 	.toolbar[data-dragging] .drag-handle {
 		cursor: grabbing;
 		color: hsl(25 100% 67%);
+	}
+
+	.inspect-pill {
+		position: absolute;
+		inset-inline-start: 50%;
+		transform: translateX(-50%);
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 10px;
+		border-radius: 8px;
+		background: hsl(225 15% 15% / 0.95);
+		backdrop-filter: blur(8px);
+		color: hsl(220 10% 92%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.04em;
+		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		white-space: nowrap;
+		pointer-events: none;
+	}
+
+	.inspect-pill[data-position='above'] {
+		inset-block-end: calc(100% + 8px);
+	}
+
+	.inspect-pill[data-position='below'] {
+		inset-block-start: calc(100% + 8px);
+	}
+
+	.inspect-pill-dot {
+		display: inline-block;
+		width: 6px;
+		height: 6px;
+		border-radius: 999px;
+		background: hsl(25 100% 55%);
+		box-shadow: 0 0 8px hsl(25 100% 55% / 0.6);
+	}
+
+	.inspect-pill-kbd {
+		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+		font-size: 10px;
+		font-weight: 600;
+		padding: 2px 6px;
+		border-radius: 4px;
+		background: hsl(225 15% 22%);
+		color: hsl(220 10% 80%);
 	}
 
 	.tool-btn {
@@ -382,6 +469,11 @@
 	.layout-dialog-scope {
 		--dry-dialog-max-width: 19rem;
 		display: contents;
+	}
+
+	.layout-dialog-scope :global([data-dialog-header]),
+	.layout-dialog-scope :global([data-dialog-body]) {
+		--dry-section-padding: 14px 16px;
 	}
 
 	.layout-dialog-title {
