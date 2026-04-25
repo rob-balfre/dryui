@@ -934,6 +934,10 @@
 
 	async function handleSubmit() {
 		if (!serverUrl || submitStatus !== 'idle' || sent) return;
+		if (drawings.length === 0) {
+			showToast('error', 'No feedback', 'Annotate something first.', ERROR_TOAST_DURATION_MS);
+			return;
+		}
 		try {
 			const image = await captureScreenshot();
 			submitStatus = 'uploading';
@@ -1394,7 +1398,6 @@
 				{active}
 				{tool}
 				{mode}
-				hasDrawings={hasDrawings || sent}
 				hidden={toolbarHiddenForCapture}
 				{submitStatus}
 				{sent}
