@@ -437,6 +437,22 @@
 				<GripVertical size={14} aria-hidden="true" />
 			</button>
 		</div>
+
+		<button
+			class="submit-pill"
+			type="button"
+			data-submitting={submitting || undefined}
+			data-sent={sent || undefined}
+			onclick={onsubmit}
+			aria-label={submitCopy.aria}
+		>
+			{#if sent}
+				<Check size={14} />
+			{:else}
+				<Send size={14} />
+			{/if}
+			<span class="submit-label">{submitCopy.label}</span>
+		</button>
 	</div>
 
 	{#snippet historyButtons()}
@@ -713,21 +729,6 @@
 					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
 				>
 					<Eraser size={18} />
-				</button>
-
-				<button
-					class="tool-btn submit-btn"
-					data-submitting={submitting || undefined}
-					data-sent={sent || undefined}
-					onclick={onsubmit}
-					aria-label={submitCopy.aria}
-				>
-					{#if sent}
-						<Check size={16} />
-					{:else}
-						<Send size={16} />
-					{/if}
-					<span class="submit-label">{submitCopy.label}</span>
 				</button>
 			{/if}
 		</div>
@@ -1317,34 +1318,54 @@
 		background: hsl(25 100% 55%);
 	}
 
-	.submit-btn {
-		grid-template-columns: auto auto;
-		gap: 4px;
-		padding-inline-end: 10px;
-		color: hsl(145 70% 50%);
-	}
-
-	.submit-btn:hover {
-		background: hsl(145 70% 25%);
-		color: hsl(145 70% 70%);
-	}
-
-	.submit-btn[data-submitting] {
-		opacity: 0.5;
-	}
-
-	.submit-btn[data-sent] {
-		background: hsl(145 70% 25%);
-		color: hsl(145 70% 70%);
-	}
-
-	.submit-label {
-		font-size: 12px;
-		font-weight: 600;
+	.submit-pill {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 6px;
+		padding: 6px 12px;
+		border: 1px solid transparent;
+		border-radius: 12px;
+		background: hsl(145 65% 22%);
+		color: hsl(145 70% 78%);
 		font-family:
 			system-ui,
 			-apple-system,
 			sans-serif;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+		box-shadow: var(--pill-shadow);
+		transition:
+			background 0.15s,
+			border-color 0.15s,
+			color 0.15s,
+			transform 0.15s;
+	}
+
+	.submit-pill:hover:not([data-submitting]) {
+		background: hsl(145 65% 28%);
+		color: hsl(145 70% 88%);
+	}
+
+	.submit-pill:focus-visible {
+		outline: 2px solid hsl(145 70% 60%);
+		outline-offset: 1px;
+	}
+
+	.submit-pill[data-submitting] {
+		opacity: 0.6;
+		cursor: progress;
+	}
+
+	.submit-pill[data-sent] {
+		background: hsl(145 70% 38%);
+		color: hsl(145 70% 96%);
+	}
+
+	.submit-label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
 		white-space: nowrap;
 	}
 </style>
