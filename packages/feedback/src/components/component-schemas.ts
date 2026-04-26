@@ -62,6 +62,19 @@ export const COMPONENT_SCHEMAS: Record<string, SchemaField[]> = {
 		{ name: 'min', optional: true, type: { kind: 'number' } },
 		{ name: 'step', optional: true, type: { kind: 'number' } }
 	],
+	AreaGrid: [
+		{
+			name: 'gap',
+			optional: true,
+			type: { kind: 'enum', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] }
+		},
+		{
+			name: 'padding',
+			optional: true,
+			type: { kind: 'enum', options: ['none', 'xs', 'sm', 'md', 'lg', 'xl'] }
+		},
+		{ name: 'debug', optional: true, type: { kind: 'boolean' } }
+	],
 	AppFrame: [
 		{ name: 'actions', optional: true, type: { kind: 'snippet' } },
 		{ name: 'title', optional: true, type: { kind: 'string' } }

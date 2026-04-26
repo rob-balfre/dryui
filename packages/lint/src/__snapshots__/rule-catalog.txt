@@ -14,6 +14,10 @@ dryui/no-global	error	Do not use :global(). Use scoped styles, data-* attributes
 dryui/no-media-sizing	error	Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.	Replace the sizing media query with a container query.
 dryui/prefer-focus-ring-token	error	Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).	Use outline: var(--dry-focus-ring) plus the correct outline-offset.
 dryui/no-partial-inset-shadow	error	Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.	Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.
+dryui/area-grid-required-var	error	<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and area names on Area with CSS custom properties.	Add the required AreaGrid CSS custom property explicitly.
+dryui/area-grid-invalid-var	error	{variable} is not supported on <{component}>. Use {target}.	Use the documented AreaGrid CSS custom property names.
+dryui/area-grid-invalid-template	error	{variable} on <{component}> must be static and valid for AreaGrid: {reason}	Use quoted rows on AreaGrid.Root, or a literal area name on AreaGrid.Area.
+dryui/area-grid-missing-area	error	<AreaGrid.Area> uses {area}, but {variable} on its Root does not contain that area name.	Add the area name to every AreaGrid.Root template or update --dry-area-grid-area.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	

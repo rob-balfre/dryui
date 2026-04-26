@@ -85,6 +85,98 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('allows AreaGrid when Root and Area custom properties match', () => {
+		const code = `<AreaGrid.Root
+  --dry-area-grid-template-areas="'masthead' 'nav' 'content'"
+  --dry-area-grid-template-areas-wide="'masthead masthead' 'nav content'"
+>
+  <AreaGrid.Area --dry-area-grid-area="masthead">Header</AreaGrid.Area>
+  <AreaGrid.Area --dry-area-grid-area="nav">Nav</AreaGrid.Area>
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('requires AreaGrid.Root template custom property', () => {
+		const code = `<AreaGrid.Root>
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-required-var');
+		expect(violations[0]!.message).toContain('--dry-area-grid-template-areas');
+	});
+
+	test('requires AreaGrid.Area area custom property', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <AreaGrid.Area>Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-required-var');
+		expect(violations[0]!.message).toContain('--dry-area-grid-area');
+	});
+
+	test('flags AreaGrid.Area names that are missing from a supplied Root template', () => {
+		const code = `<AreaGrid.Root
+  --dry-area-grid-template-areas="'masthead' 'content'"
+  --dry-area-grid-template-areas-wide="'masthead'"
+>
+  <AreaGrid.Area --dry-area-grid-area="masthead">Header</AreaGrid.Area>
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-missing-area');
+		expect(violations[0]!.message).toContain('--dry-area-grid-template-areas-wide');
+	});
+
+	test('rejects legacy AreaGrid custom property aliases', () => {
+		const code = `<AreaGrid.Root
+  --dry-area-grid-template-areas="'content'"
+  --dry-area-grid-columns-wide="1fr"
+>
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-var');
+		expect(violations[0]!.message).toContain('--dry-area-grid-template-columns-wide');
+	});
+
+	test('rejects unknown AreaGrid custom properties', () => {
+		const code = `<AreaGrid.Root
+  --dry-area-grid-template-areas="'content'"
+  --dry-area-grid-template-area="'content'"
+>
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-var');
+		expect(violations[0]!.message).toContain('--dry-area-grid-template-area');
+	});
+
+	test('rejects invalid AreaGrid template area geometry', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'a a' 'a b'">
+  <AreaGrid.Area --dry-area-grid-area="a">A</AreaGrid.Area>
+  <AreaGrid.Area --dry-area-grid-area="b">B</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-template');
+		expect(violations[0]!.message).toContain('must form a rectangle');
+	});
+
+	test('allows intentional AreaGrid template holes without matching Area components', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content' 'reserved'">
+  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
 	test('flags class= on a compound component', () => {
 		const violations = checkMarkup('<Card.Root class="custom">content</Card.Root>');
 		expect(violations).toHaveLength(1);

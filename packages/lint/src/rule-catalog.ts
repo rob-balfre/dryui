@@ -124,6 +124,33 @@ export const RULE_CATALOG = {
 		suggestedFix:
 			'Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.'
 	},
+	'dryui/area-grid-required-var': {
+		id: 'dryui/area-grid-required-var',
+		severity: 'error',
+		message:
+			'<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and area names on Area with CSS custom properties.',
+		suggestedFix: 'Add the required AreaGrid CSS custom property explicitly.'
+	},
+	'dryui/area-grid-invalid-var': {
+		id: 'dryui/area-grid-invalid-var',
+		severity: 'error',
+		message: '{variable} is not supported on <{component}>. Use {target}.',
+		suggestedFix: 'Use the documented AreaGrid CSS custom property names.'
+	},
+	'dryui/area-grid-invalid-template': {
+		id: 'dryui/area-grid-invalid-template',
+		severity: 'error',
+		message: '{variable} on <{component}> must be static and valid for AreaGrid: {reason}',
+		suggestedFix: 'Use quoted rows on AreaGrid.Root, or a literal area name on AreaGrid.Area.'
+	},
+	'dryui/area-grid-missing-area': {
+		id: 'dryui/area-grid-missing-area',
+		severity: 'error',
+		message:
+			'<AreaGrid.Area> uses {area}, but {variable} on its Root does not contain that area name.',
+		suggestedFix:
+			'Add the area name to every AreaGrid.Root template or update --dry-area-grid-area.'
+	},
 	'bare-compound': {
 		id: 'bare-compound',
 		severity: 'error',

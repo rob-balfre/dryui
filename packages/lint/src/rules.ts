@@ -280,6 +280,449 @@ function anchorHasHref(tagText: string): boolean {
 	return /\{href\}/.test(tagText) || /(?<![\w:-])href\s*=/.test(tagText);
 }
 
+type AttributeValueKind = 'literal' | 'expression' | 'boolean';
+
+interface ParsedAttribute {
+	readonly name: string;
+	readonly value: string | null;
+	readonly kind: AttributeValueKind;
+}
+
+const AREA_GRID_ROOT_REQUIRED_TEMPLATE = '--dry-area-grid-template-areas';
+const AREA_GRID_AREA_REQUIRED_VAR = '--dry-area-grid-area';
+
+const AREA_GRID_TEMPLATE_VARS: ReadonlySet<string> = new Set([
+	'--dry-area-grid-template-areas',
+	'--dry-area-grid-template-areas-wide',
+	'--dry-area-grid-template-areas-xl'
+]);
+
+const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
+	...AREA_GRID_TEMPLATE_VARS,
+	'--dry-area-grid-template-columns',
+	'--dry-area-grid-template-columns-wide',
+	'--dry-area-grid-template-columns-xl',
+	'--dry-area-grid-template-rows',
+	'--dry-area-grid-template-rows-wide',
+	'--dry-area-grid-template-rows-xl',
+	'--dry-area-grid-auto-flow',
+	'--dry-area-grid-auto-rows',
+	'--dry-area-grid-align-items',
+	'--dry-area-grid-justify-items',
+	'--dry-area-grid-area-display',
+	'--dry-area-grid-area-gap',
+	'--dry-area-grid-area-padding',
+	'--dry-area-grid-area-border',
+	'--dry-area-grid-area-radius',
+	'--dry-area-grid-area-bg',
+	'--dry-area-grid-area-color'
+]);
+
+const AREA_GRID_AREA_CSS_VARS: ReadonlySet<string> = new Set([
+	'--dry-area-grid-area',
+	'--dry-area-grid-area-display',
+	'--dry-area-grid-area-gap',
+	'--dry-area-grid-area-padding',
+	'--dry-area-grid-area-border',
+	'--dry-area-grid-area-radius',
+	'--dry-area-grid-area-bg',
+	'--dry-area-grid-area-color'
+]);
+
+const AREA_GRID_LEGACY_VAR_REPLACEMENTS: ReadonlyMap<string, string> = new Map([
+	['--dry-area-grid-template', '--dry-area-grid-template-areas'],
+	['--dry-area-grid-template-wide', '--dry-area-grid-template-areas-wide'],
+	['--dry-area-grid-template-xl', '--dry-area-grid-template-areas-xl'],
+	['--dry-area-grid-columns', '--dry-area-grid-template-columns'],
+	['--dry-area-grid-columns-wide', '--dry-area-grid-template-columns-wide'],
+	['--dry-area-grid-columns-xl', '--dry-area-grid-template-columns-xl'],
+	['--dry-area-grid-rows', '--dry-area-grid-template-rows'],
+	['--dry-area-grid-rows-wide', '--dry-area-grid-template-rows-wide'],
+	['--dry-area-grid-rows-xl', '--dry-area-grid-template-rows-xl'],
+	['--dry-area-grid-gap', 'gap="sm|md|lg|xl"'],
+	['--dry-area-grid-padding', 'padding="sm|md|lg|xl"']
+]);
+
+function isAreaGridCssVar(name: string): boolean {
+	return name.startsWith('--dry-area-grid-');
+}
+
+function skipBalancedExpression(input: string, start: number): number {
+	let cursor = start;
+	let depth = 0;
+	let quote: '"' | "'" | '`' | null = null;
+
+	while (cursor < input.length) {
+		const char = input[cursor]!;
+
+		if (quote) {
+			if (char === quote && input[cursor - 1] !== '\\') quote = null;
+			cursor += 1;
+			continue;
+		}
+
+		if (char === '"' || char === "'" || char === '`') {
+			quote = char;
+			cursor += 1;
+			continue;
+		}
+
+		if (char === '{') {
+			depth += 1;
+			cursor += 1;
+			continue;
+		}
+
+		if (char === '}') {
+			depth -= 1;
+			cursor += 1;
+			if (depth <= 0) return cursor;
+			continue;
+		}
+
+		cursor += 1;
+	}
+
+	return cursor;
+}
+
+function parseOpeningTagAttributes(tagText: string, tagName: string): ParsedAttribute[] {
+	let attrs = tagText.trim();
+	const prefix = `<${tagName}`;
+	if (attrs.startsWith(prefix)) attrs = attrs.slice(prefix.length);
+	attrs = attrs.replace(/\/?>\s*$/, '');
+
+	const parsed: ParsedAttribute[] = [];
+	let cursor = 0;
+
+	while (cursor < attrs.length) {
+		while (cursor < attrs.length && /\s/.test(attrs[cursor]!)) cursor += 1;
+		if (cursor >= attrs.length) break;
+
+		if (attrs.startsWith('{...', cursor) || attrs[cursor] === '{') {
+			cursor = skipBalancedExpression(attrs, cursor);
+			continue;
+		}
+
+		const nameStart = cursor;
+		while (cursor < attrs.length && !/[\s=>/]/.test(attrs[cursor]!)) cursor += 1;
+		const name = attrs.slice(nameStart, cursor);
+		if (!name) {
+			cursor += 1;
+			continue;
+		}
+
+		while (cursor < attrs.length && /\s/.test(attrs[cursor]!)) cursor += 1;
+		if (attrs[cursor] !== '=') {
+			parsed.push({ name, value: null, kind: 'boolean' });
+			continue;
+		}
+
+		cursor += 1;
+		while (cursor < attrs.length && /\s/.test(attrs[cursor]!)) cursor += 1;
+
+		const valueStart = cursor;
+		const quote = attrs[cursor];
+		if (quote === '"' || quote === "'") {
+			cursor += 1;
+			const literalStart = cursor;
+			while (cursor < attrs.length && attrs[cursor] !== quote) cursor += 1;
+			parsed.push({
+				name,
+				value: attrs.slice(literalStart, cursor),
+				kind: 'literal'
+			});
+			if (cursor < attrs.length) cursor += 1;
+			continue;
+		}
+
+		if (attrs[cursor] === '{') {
+			cursor = skipBalancedExpression(attrs, cursor);
+			parsed.push({
+				name,
+				value: attrs.slice(valueStart, cursor),
+				kind: 'expression'
+			});
+			continue;
+		}
+
+		while (cursor < attrs.length && !/\s/.test(attrs[cursor]!)) cursor += 1;
+		parsed.push({
+			name,
+			value: attrs.slice(valueStart, cursor),
+			kind: 'literal'
+		});
+	}
+
+	return parsed;
+}
+
+function attributeByName(attrs: readonly ParsedAttribute[], name: string): ParsedAttribute | null {
+	return attrs.find((attr) => attr.name === name) ?? null;
+}
+
+function isValidAreaGridName(value: string): boolean {
+	return /^-?[_a-zA-Z][-_a-zA-Z0-9]*$/.test(value) && value !== 'auto' && value !== 'span';
+}
+
+interface ParsedAreaGridTemplate {
+	readonly names: ReadonlySet<string>;
+	readonly error: string | null;
+}
+
+function parseAreaGridTemplate(value: string): ParsedAreaGridTemplate {
+	const rows: string[] = [];
+	const rowRe = /(["'])(.*?)\1/g;
+	for (const match of value.matchAll(rowRe)) {
+		rows.push(match[2] ?? '');
+	}
+
+	if (rows.length === 0) {
+		return { names: new Set(), error: 'expected one or more quoted template rows' };
+	}
+
+	const grid = rows.map((row) => row.trim().split(/\s+/).filter(Boolean));
+	if (grid.some((row) => row.length === 0)) {
+		return { names: new Set(), error: 'template rows cannot be empty' };
+	}
+
+	const width = grid[0]?.length ?? 0;
+	if (grid.some((row) => row.length !== width)) {
+		return { names: new Set(), error: 'every template row must have the same number of cells' };
+	}
+
+	const names = new Set<string>();
+	const cellsByName = new Map<string, Array<readonly [number, number]>>();
+
+	for (let rowIndex = 0; rowIndex < grid.length; rowIndex += 1) {
+		const row = grid[rowIndex]!;
+		for (let columnIndex = 0; columnIndex < row.length; columnIndex += 1) {
+			const cell = row[columnIndex]!;
+			if (/^\.+$/.test(cell)) continue;
+			if (!isValidAreaGridName(cell)) {
+				return {
+					names: new Set(),
+					error: `"${cell}" is not a valid static area name`
+				};
+			}
+			names.add(cell);
+			const cells = cellsByName.get(cell) ?? [];
+			cells.push([rowIndex, columnIndex]);
+			cellsByName.set(cell, cells);
+		}
+	}
+
+	for (const [name, cells] of cellsByName) {
+		const rowIndexes = cells.map((cell) => cell[0]);
+		const columnIndexes = cells.map((cell) => cell[1]);
+		const minRow = Math.min(...rowIndexes);
+		const maxRow = Math.max(...rowIndexes);
+		const minColumn = Math.min(...columnIndexes);
+		const maxColumn = Math.max(...columnIndexes);
+
+		for (let row = minRow; row <= maxRow; row += 1) {
+			for (let column = minColumn; column <= maxColumn; column += 1) {
+				if (grid[row]?.[column] !== name) {
+					return {
+						names: new Set(),
+						error: `"${name}" must form a rectangle in the template`
+					};
+				}
+			}
+		}
+	}
+
+	return { names, error: null };
+}
+
+interface AreaGridRootBlock {
+	readonly opening: TagMatch;
+	readonly closeStart: number;
+	readonly attrs: ParsedAttribute[];
+	readonly templates: Map<string, ParsedAreaGridTemplate>;
+}
+
+function findAreaGridRootBlocks(markup: string): AreaGridRootBlock[] {
+	const roots: AreaGridRootBlock[] = [];
+	const closeTag = '</AreaGrid.Root>';
+
+	for (const opening of findOpeningTags(markup, 'AreaGrid.Root')) {
+		const openingEnd = opening.index + opening.text.length;
+		const selfClosing = /\/\s*>$/.test(opening.text);
+		const closeStart = selfClosing ? openingEnd : markup.indexOf(closeTag, openingEnd);
+		const attrs = parseOpeningTagAttributes(opening.text, 'AreaGrid.Root');
+		roots.push({
+			opening,
+			closeStart: closeStart === -1 ? openingEnd : closeStart,
+			attrs,
+			templates: new Map()
+		});
+	}
+
+	return roots;
+}
+
+function findContainingAreaGridRoot(
+	roots: readonly AreaGridRootBlock[],
+	index: number
+): AreaGridRootBlock | null {
+	let containing: AreaGridRootBlock | null = null;
+	for (const root of roots) {
+		if (index <= root.opening.index || index >= root.closeStart) continue;
+		if (!containing || root.opening.index > containing.opening.index) {
+			containing = root;
+		}
+	}
+	return containing;
+}
+
+function areaGridInvalidVarMessage(component: string, variable: string): string {
+	const replacement = AREA_GRID_LEGACY_VAR_REPLACEMENTS.get(variable);
+	return ruleMessage('dryui/area-grid-invalid-var', {
+		component,
+		variable,
+		target: replacement ?? 'one of the documented AreaGrid CSS custom properties'
+	});
+}
+
+function checkAreaGridCssVars(
+	component: string,
+	attrs: readonly ParsedAttribute[],
+	allowedVars: ReadonlySet<string>,
+	line: number
+): Violation[] {
+	const violations: Violation[] = [];
+	for (const attr of attrs) {
+		if (!isAreaGridCssVar(attr.name)) continue;
+		if (allowedVars.has(attr.name)) continue;
+		violations.push({
+			rule: 'dryui/area-grid-invalid-var',
+			message: areaGridInvalidVarMessage(component, attr.name),
+			line
+		});
+	}
+	return violations;
+}
+
+function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): Violation[] {
+	const violations: Violation[] = [];
+	const roots = findAreaGridRootBlocks(markup);
+
+	for (const root of roots) {
+		const line = lineOf(root.opening.index);
+		violations.push(
+			...checkAreaGridCssVars('AreaGrid.Root', root.attrs, AREA_GRID_ROOT_CSS_VARS, line)
+		);
+
+		if (!attributeByName(root.attrs, AREA_GRID_ROOT_REQUIRED_TEMPLATE)) {
+			violations.push({
+				rule: 'dryui/area-grid-required-var',
+				message: ruleMessage('dryui/area-grid-required-var', {
+					component: 'AreaGrid.Root',
+					variable: AREA_GRID_ROOT_REQUIRED_TEMPLATE,
+					example: "'header' 'content'"
+				}),
+				line
+			});
+		}
+
+		for (const attr of root.attrs) {
+			if (!AREA_GRID_TEMPLATE_VARS.has(attr.name)) continue;
+			if (attr.kind !== 'literal' || attr.value === null) {
+				violations.push({
+					rule: 'dryui/area-grid-invalid-template',
+					message: ruleMessage('dryui/area-grid-invalid-template', {
+						component: 'AreaGrid.Root',
+						variable: attr.name,
+						reason: 'template custom properties must be string literals'
+					}),
+					line
+				});
+				continue;
+			}
+
+			const parsed = parseAreaGridTemplate(attr.value);
+			root.templates.set(attr.name, parsed);
+			if (parsed.error) {
+				violations.push({
+					rule: 'dryui/area-grid-invalid-template',
+					message: ruleMessage('dryui/area-grid-invalid-template', {
+						component: 'AreaGrid.Root',
+						variable: attr.name,
+						reason: parsed.error
+					}),
+					line
+				});
+			}
+		}
+	}
+
+	for (const area of findOpeningTags(markup, 'AreaGrid.Area')) {
+		const line = lineOf(area.index);
+		const attrs = parseOpeningTagAttributes(area.text, 'AreaGrid.Area');
+		violations.push(...checkAreaGridCssVars('AreaGrid.Area', attrs, AREA_GRID_AREA_CSS_VARS, line));
+
+		const areaAttr = attributeByName(attrs, AREA_GRID_AREA_REQUIRED_VAR);
+		if (!areaAttr) {
+			violations.push({
+				rule: 'dryui/area-grid-required-var',
+				message: ruleMessage('dryui/area-grid-required-var', {
+					component: 'AreaGrid.Area',
+					variable: AREA_GRID_AREA_REQUIRED_VAR,
+					example: 'content'
+				}),
+				line
+			});
+			continue;
+		}
+
+		if (areaAttr.kind !== 'literal' || areaAttr.value === null) {
+			violations.push({
+				rule: 'dryui/area-grid-invalid-template',
+				message: ruleMessage('dryui/area-grid-invalid-template', {
+					component: 'AreaGrid.Area',
+					variable: AREA_GRID_AREA_REQUIRED_VAR,
+					reason: 'area names must be static string literals'
+				}),
+				line
+			});
+			continue;
+		}
+
+		const areaName = areaAttr.value.trim();
+		if (!isValidAreaGridName(areaName)) {
+			violations.push({
+				rule: 'dryui/area-grid-invalid-template',
+				message: ruleMessage('dryui/area-grid-invalid-template', {
+					component: 'AreaGrid.Area',
+					variable: AREA_GRID_AREA_REQUIRED_VAR,
+					reason: `"${areaName}" is not a valid static area name`
+				}),
+				line
+			});
+			continue;
+		}
+
+		const root = findContainingAreaGridRoot(roots, area.index);
+		if (!root) continue;
+
+		for (const [variable, template] of root.templates) {
+			if (template.error) continue;
+			if (template.names.has(areaName)) continue;
+			violations.push({
+				rule: 'dryui/area-grid-missing-area',
+				message: ruleMessage('dryui/area-grid-missing-area', {
+					area: areaName,
+					variable
+				}),
+				line
+			});
+		}
+	}
+
+	return violations;
+}
+
 export function checkScript(content: string): Violation[] {
 	const violations: Violation[] = [];
 	const lineStarts = buildLineIndex(content);
@@ -595,6 +1038,8 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 			}
 		}
 	}
+
+	violations.push(...checkAreaGridUsage(markup, lineOf));
 
 	return violations;
 }
