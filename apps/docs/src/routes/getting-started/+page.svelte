@@ -4,7 +4,6 @@
 		Card,
 		Tabs,
 		CodeBlock,
-		Badge,
 		Separator,
 		Alert,
 		Heading,
@@ -407,57 +406,6 @@
 				</div>
 			</div>
 		</section>
-
-		<Separator />
-
-		<!-- 6. Architecture -->
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>Architecture</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Three independent layers. Adopt at any level.
-				</Text>
-
-				<div class="stack-md">
-					<Card.Root>
-						<Card.Content>
-							<div class="arch-layer">
-								<Badge variant="outline" color="blue">@dryui/primitives</Badge>
-								<Text size="sm" color="secondary" maxMeasure="default"
-									>Headless, unstyled components. Zero dependencies.</Text
-								>
-							</div>
-						</Card.Content>
-					</Card.Root>
-
-					<Card.Root>
-						<Card.Content>
-							<div class="arch-layer">
-								<Badge variant="outline" color="purple">@dryui/ui</Badge>
-								<Text size="sm" color="secondary" maxMeasure="default"
-									>Styled components with CSS-variable theming. Built on primitives.</Text
-								>
-							</div>
-						</Card.Content>
-					</Card.Root>
-
-					<Card.Root>
-						<Card.Content>
-							<div class="arch-layer">
-								<div class="badge-row">
-									<Badge variant="outline" color="blue">@dryui/cli</Badge>
-									<Badge variant="outline" color="green">@dryui/mcp</Badge>
-								</div>
-								<Text size="sm" color="secondary" maxMeasure="default"
-									>CLI-first tooling for setup, lookup, and validation. MCP mirrors
-									<code>ask</code> / <code>check</code> inside supported editors.</Text
-								>
-							</div>
-						</Card.Content>
-					</Card.Root>
-				</div>
-			</div>
-		</section>
 	</div>
 </Container>
 
@@ -493,12 +441,6 @@
 		}
 	}
 
-	.arch-layer {
-		display: grid;
-		gap: var(--dry-space-2);
-		justify-items: start;
-	}
-
 	.agent-setup-card {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -516,12 +458,5 @@
 		grid-template-columns: auto auto;
 		gap: var(--dry-space-2);
 		align-items: center;
-	}
-
-	.badge-row {
-		display: grid;
-		grid-template-columns: auto auto;
-		gap: var(--dry-space-2);
-		justify-content: start;
 	}
 </style>

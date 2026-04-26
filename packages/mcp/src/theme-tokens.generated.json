@@ -162,7 +162,7 @@
     "--dry-radius-popover": "var(--dry-radius-xl)",
     "--dry-radius-sheet": "var(--dry-radius-2xl)",
     "--dry-radius-toast": "var(--dry-radius-lg)",
-    "--dry-radius-tooltip": "var(--dry-radius-md)",
+    "--dry-radius-tooltip": "calc(var(--dry-radius-md) - var(--dry-radius-xs))",
     "--dry-padding-card": "var(--dry-space-8)",
     "--dry-padding-dialog": "var(--dry-space-6)",
     "--dry-padding-popover": "var(--dry-space-2)",
