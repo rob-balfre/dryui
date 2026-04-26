@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 167 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 168 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -1457,6 +1457,39 @@ Example:
 <Container>
   <p>Centered content</p>
 </Container>
+```
+
+## AreaGrid
+Package: @dryui/ui
+Category: layout
+Tags: layout, grid, areas, template, compound
+Kind: compound
+Root import: import { AreaGrid } from '@dryui/ui'
+Subpath import: import { AreaGrid } from '@dryui/ui/area-grid'
+Parts:
+- AreaGrid.Root
+  Props: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'md' | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'none' | debug (boolean), default false | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+- AreaGrid.Area
+  Props: as (| 'section'
+	| 'header'
+	| 'main'
+	| 'nav'
+	| 'aside'
+	| 'article'
+	| 'footer'), Underlying HTML element to render for the component., accepted section, header, main, nav, aside, article, footer, default 'section' | children (Snippet), Content rendered inside the component., required
+  Native props: Forwards <element> attributes via rest props.
+Structure:
+  AreaGrid.Root
+    AreaGrid.Area
+CSS variables: --dry-area-grid-align-items, --dry-area-grid-area, --dry-area-grid-area-bg, --dry-area-grid-area-border, --dry-area-grid-area-color, --dry-area-grid-area-display, --dry-area-grid-area-gap, --dry-area-grid-area-padding, --dry-area-grid-area-radius, --dry-area-grid-auto-flow, --dry-area-grid-auto-rows, --dry-area-grid-gap, --dry-area-grid-justify-items, --dry-area-grid-padding, --dry-area-grid-template-areas, --dry-area-grid-template-areas-wide, --dry-area-grid-template-areas-xl, --dry-area-grid-template-columns, --dry-area-grid-template-columns-wide, --dry-area-grid-template-columns-xl, --dry-area-grid-template-rows, --dry-area-grid-template-rows-wide, --dry-area-grid-template-rows-xl
+Data attributes: data-area-grid | data-area-grid-area | data-area-grid-shell | data-debug | data-gap | data-padding
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
+Example:
+```svelte
+<AreaGrid.Root>
+  <AreaGrid.Area>...</AreaGrid.Area>
+</AreaGrid.Root>
 ```
 
 ## Separator

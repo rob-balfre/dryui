@@ -55,7 +55,8 @@
 		SlidersHorizontal,
 		RotateCcw,
 		ChevronUp,
-		Info
+		Info,
+		Shuffle
 	} from 'lucide-svelte';
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import Logo from '$lib/components/Logo.svelte';
@@ -72,7 +73,20 @@
 	let presetOpen = $state(false);
 	let fontOpen = $state(false);
 	let shapeOpen = $state(false);
+	let accentDetailOpen = $state(false);
+	let baseDetailOpen = $state(false);
 	let advancedOpen = $state(false);
+
+	const ACCENT_SWATCHES = [
+		'#ec4899', // pink
+		'#a78bfa', // violet
+		'#ef4444', // red
+		'#f97316', // orange
+		'#eab308', // amber
+		'#10b981', // emerald
+		'#3b82f6', // blue
+		'#52525b' // zinc
+	] as const;
 
 	function decodeBrowserRecipe() {
 		if (!browser) return data;
@@ -135,6 +149,17 @@
 	function cssVar(name: string, value: string) {
 		return (node: HTMLElement) => {
 			node.style.setProperty(name, value);
+			return () => {
+				node.style.removeProperty(name);
+			};
+		};
+	}
+
+	function reactiveCssVar(name: string, read: () => string) {
+		return (node: HTMLElement) => {
+			$effect(() => {
+				node.style.setProperty(name, read());
+			});
 			return () => {
 				node.style.removeProperty(name);
 			};
@@ -206,6 +231,22 @@
 		} catch {
 			// Ignore malformed hex strings emitted mid-drag.
 		}
+	}
+
+	function shuffleAccent() {
+		const current = getAccentHex().toLowerCase();
+		const candidates = ACCENT_SWATCHES.filter((c) => c.toLowerCase() !== current);
+		const pick = candidates[Math.floor(Math.random() * candidates.length)] ?? ACCENT_SWATCHES[0]!;
+		setAccentHex(pick);
+	}
+
+	function shuffleBase() {
+		const currentHue = wizardState.baseHue;
+		const hues = ACCENT_SWATCHES.map((hex) => Math.round(hexToHsl(hex).h)).filter(
+			(h) => h !== currentHue
+		);
+		const pick = hues[Math.floor(Math.random() * hues.length)];
+		if (pick !== undefined) setBaseHue(pick);
 	}
 
 	function resetAdjust() {
@@ -511,9 +552,69 @@
 								<Info size={13} aria-hidden="true" />
 							</span>
 							<div class="rail-color rail-color-accent">
-								<ColorPicker.Root bind:value={getAccentHex, setAccentHex}>
+								<ColorPicker.Root
+									--dry-color-picker-area-width="100%"
+									bind:value={getAccentHex, setAccentHex}
+								>
 									<ColorPicker.HueSlider />
 								</ColorPicker.Root>
+								<Popover.Root bind:open={accentDetailOpen}>
+									<Popover.Trigger>
+										<Button
+											class="rail-color-trigger"
+											variant="bare"
+											aria-label="Open accent color picker"
+											--dry-btn-bg="transparent"
+											--dry-btn-border="transparent"
+											--dry-btn-padding-x="0"
+											--dry-btn-padding-y="0"
+											--dry-btn-min-height="0"
+											--dry-btn-radius="9999px"
+										>
+											<span
+												class="rail-color-disc"
+												aria-hidden="true"
+												{@attach reactiveCssVar('--_swatch', getAccentHex)}
+											></span>
+										</Button>
+									</Popover.Trigger>
+									<Popover.Content
+										placement="top-end"
+										offset={12}
+										--dry-popover-padding="0"
+										--dry-popover-radius="var(--dry-radius-2xl)"
+										--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
+										--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
+										--dry-popover-shadow="var(--dry-shadow-overlay)"
+									>
+										<ColorPicker.Root bind:value={getAccentHex, setAccentHex}>
+											<div class="color-detail-panel">
+												<div class="color-detail-presets">
+													{#each ACCENT_SWATCHES as hex (hex)}
+														<ColorPicker.Swatch color={hex} />
+													{/each}
+												</div>
+												<ColorPicker.Area width={272} height={184} />
+												<div class="color-detail-hue-row">
+													<ColorPicker.HueSlider />
+													<Button
+														variant="ghost"
+														size="sm"
+														aria-label="Random accent color"
+														onclick={shuffleAccent}
+														--dry-btn-padding-x="var(--dry-space-1_5)"
+														--dry-btn-padding-y="var(--dry-space-1_5)"
+														--dry-btn-min-height="0"
+														--dry-btn-radius="9999px"
+													>
+														<Shuffle size={14} aria-hidden="true" />
+													</Button>
+												</div>
+												<ColorPicker.Input format="hex" />
+											</div>
+										</ColorPicker.Root>
+									</Popover.Content>
+								</Popover.Root>
 							</div>
 						</div>
 
@@ -523,9 +624,68 @@
 								<Info size={13} aria-hidden="true" />
 							</span>
 							<div class="rail-color rail-color-base">
-								<ColorPicker.Root bind:value={getBaseHex, setBaseHex}>
+								<ColorPicker.Root
+									--dry-color-picker-area-width="100%"
+									bind:value={getBaseHex, setBaseHex}
+								>
 									<ColorPicker.HueSlider />
 								</ColorPicker.Root>
+								<Popover.Root bind:open={baseDetailOpen}>
+									<Popover.Trigger>
+										<Button
+											class="rail-color-trigger"
+											variant="bare"
+											aria-label="Open base color picker"
+											--dry-btn-bg="transparent"
+											--dry-btn-border="transparent"
+											--dry-btn-padding-x="0"
+											--dry-btn-padding-y="0"
+											--dry-btn-min-height="0"
+											--dry-btn-radius="9999px"
+										>
+											<span
+												class="rail-color-disc"
+												aria-hidden="true"
+												{@attach reactiveCssVar('--_swatch', getBaseHex)}
+											></span>
+										</Button>
+									</Popover.Trigger>
+									<Popover.Content
+										placement="top-end"
+										offset={12}
+										--dry-popover-padding="0"
+										--dry-popover-radius="var(--dry-radius-2xl)"
+										--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
+										--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
+										--dry-popover-shadow="var(--dry-shadow-overlay)"
+									>
+										<ColorPicker.Root bind:value={getBaseHex, setBaseHex}>
+											<div class="color-detail-panel color-detail-panel--base">
+												<div class="color-detail-presets">
+													{#each ACCENT_SWATCHES as hex (hex)}
+														<ColorPicker.Swatch color={hex} />
+													{/each}
+												</div>
+												<div class="color-detail-hue-row">
+													<ColorPicker.HueSlider />
+													<Button
+														variant="ghost"
+														size="sm"
+														aria-label="Random base hue"
+														onclick={shuffleBase}
+														--dry-btn-padding-x="var(--dry-space-1_5)"
+														--dry-btn-padding-y="var(--dry-space-1_5)"
+														--dry-btn-min-height="0"
+														--dry-btn-radius="9999px"
+													>
+														<Shuffle size={14} aria-hidden="true" />
+													</Button>
+												</div>
+												<ColorPicker.Input format="hex" />
+											</div>
+										</ColorPicker.Root>
+									</Popover.Content>
+								</Popover.Root>
 							</div>
 						</div>
 
@@ -1093,12 +1253,73 @@
 		background: currentColor;
 	}
 
+	.rail-color,
+	.color-detail-panel {
+		--dry-color-picker-slider-track-bg: linear-gradient(
+			to right,
+			oklch(0.62 0.195 0),
+			oklch(0.62 0.195 24),
+			oklch(0.62 0.195 48),
+			oklch(0.62 0.195 72),
+			oklch(0.62 0.195 96),
+			oklch(0.62 0.195 120),
+			oklch(0.62 0.195 144),
+			oklch(0.62 0.195 168),
+			oklch(0.62 0.195 192),
+			oklch(0.62 0.195 216),
+			oklch(0.62 0.195 240),
+			oklch(0.62 0.195 264),
+			oklch(0.62 0.195 288),
+			oklch(0.62 0.195 312),
+			oklch(0.62 0.195 336),
+			oklch(0.62 0.195 360)
+		);
+	}
+
 	.rail-color {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
 		grid-template-rows: var(--rail-h);
 		align-items: center;
+		gap: var(--dry-space-2);
 		--dry-color-picker-slider-track-height: 1.25rem;
 		--dry-color-picker-slider-thumb-size: 1.125rem;
+	}
+
+	.rail-color-disc {
+		display: grid;
+		grid-template-columns: 1.5rem;
+		grid-template-rows: 1.5rem;
+		border-radius: 50%;
+		background: var(--_swatch, var(--dry-color-fill-brand));
+		border: 1px solid color-mix(in srgb, var(--dry-color-text-strong) 24%, transparent 76%);
+		box-shadow: inset 0 1px 1px
+			color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%);
+	}
+
+	.color-detail-panel {
+		display: grid;
+		gap: var(--dry-space-3);
+		padding: var(--dry-space-3);
+		grid-template-columns: minmax(0, min(18rem, calc(100vw - var(--dry-space-6))));
+		--dry-color-picker-swatch-size: 1.5rem;
+		--dry-color-picker-area-width: 100%;
+		--dry-color-picker-area-height: 11.5rem;
+	}
+
+	.color-detail-presets {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
+		gap: var(--dry-space-2);
+		justify-items: center;
+	}
+
+	.color-detail-hue-row {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		align-items: center;
+		gap: var(--dry-space-2);
 	}
 
 	.rail-depth-segmented {

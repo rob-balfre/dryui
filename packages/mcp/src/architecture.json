@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "3.0.0",
   "summary": {
-    "componentNodes": 299,
-    "partNodes": 656,
+    "componentNodes": 300,
+    "partNodes": 658,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 146,
-    "uiComponents": 153,
+    "uiComponents": 154,
     "uiWrappers": 131,
-    "uiComposites": 22,
-    "rootBarrelComponents": 299,
+    "uiComposites": 23,
+    "rootBarrelComponents": 300,
     "subpathOnlyComponents": 0,
-    "compoundComponents": 133,
+    "compoundComponents": 134,
     "wrapEdges": 131,
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 297,
+    "mismatches": 298,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -8745,6 +8745,60 @@
       "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
+    },
+    {
+      "id": "ui:AreaGrid",
+      "name": "AreaGrid",
+      "label": "AreaGrid",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-composite",
+      "category": "layout",
+      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "visibility": "root",
+      "sourcePath": "packages/ui/src/area-grid/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "layout",
+        "grid",
+        "areas",
+        "template",
+        "compound"
+      ],
+      "compound": true,
+      "parts": [
+        "Root",
+        "Area"
+      ],
+      "sourceFileCount": 4,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
+      "id": "ui:AreaGrid.Area",
+      "name": "AreaGrid.Area",
+      "label": "Area",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "layout",
+      "description": "Area part for AreaGrid.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:AreaGrid.Root",
+      "name": "AreaGrid.Root",
+      "label": "Root",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "layout",
+      "description": "Root part for AreaGrid.",
+      "tags": [],
+      "compound": false,
+      "parts": []
     },
     {
       "id": "ui:AspectRatio",
@@ -19308,6 +19362,20 @@
       "label": "Trigger"
     },
     {
+      "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Area:Area",
+      "type": "compound_part",
+      "from": "ui:AreaGrid",
+      "to": "ui:AreaGrid.Area",
+      "label": "Area"
+    },
+    {
+      "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Root:Root",
+      "type": "compound_part",
+      "from": "ui:AreaGrid",
+      "to": "ui:AreaGrid.Root",
+      "label": "Root"
+    },
+    {
       "id": "compound_part:ui:Breadcrumb:ui:Breadcrumb.Item:Item",
       "type": "compound_part",
       "from": "ui:Breadcrumb",
@@ -25468,6 +25536,13 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
+      "component": "AreaGrid",
+      "detail": "Root barrel export is missing a matching package subpath export.",
+      "sourcePath": "packages/ui/src/area-grid/index.ts"
+    },
+    {
+      "kind": "missing-subpath-export",
+      "package": "ui",
       "component": "AspectRatio",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/aspect-ratio/index.ts"
@@ -26552,7 +26627,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 23\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

@@ -62,15 +62,18 @@
 		padding: 0;
 		border: none;
 		outline: none;
-		background: linear-gradient(
-			to right,
-			hsl(0 100% 50%),
-			hsl(60 100% 50%),
-			hsl(120 100% 50%),
-			hsl(180 100% 50%),
-			hsl(240 100% 50%),
-			hsl(300 100% 50%),
-			hsl(360 100% 50%)
+		background: var(
+			--dry-color-picker-slider-track-bg,
+			linear-gradient(
+				to right,
+				hsl(0 100% 50%),
+				hsl(60 100% 50%),
+				hsl(120 100% 50%),
+				hsl(180 100% 50%),
+				hsl(240 100% 50%),
+				hsl(300 100% 50%),
+				hsl(360 100% 50%)
+			)
 		);
 	}
 

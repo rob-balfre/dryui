@@ -1,6 +1,6 @@
 # DryUI
 
-> 167 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 168 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -561,6 +561,22 @@ Props: size ('sm' | 'md' | 'lg' | 'xl' | 'full'), Size preset affecting density,
 Data attributes: data-padding | data-size
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <Container>
+
+### AreaGrid
+Compound grid-template-areas layout with CSS variable-driven area names.
+Import: @dryui/ui
+Subpath import: @dryui/ui/area-grid
+Parts: Root, Area
+Props: Root: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'md' | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'none' | debug (boolean), default false | children (Snippet), Content rendered inside the component., required | Area: as (| 'section'
+	| 'header'
+	| 'main'
+	| 'nav'
+	| 'aside'
+	| 'article'
+	| 'footer'), Underlying HTML element to render for the component., accepted section, header, main, nav, aside, article, footer, default 'section' | children (Snippet), Content rendered inside the component., required
+Data attributes: data-area-grid | data-area-grid-area | data-area-grid-shell | data-debug | data-gap | data-padding
+Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
+Example: <AreaGrid.Root>
 
 ### Separator
 Visual divider between content.
