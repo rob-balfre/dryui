@@ -152,7 +152,7 @@ Structure:
   FloatButton.Root
     FloatButton.Trigger
     FloatButton.Action
-CSS variables: --dry-fab-gap, --dry-fab-offset, --dry-fab-position, --dry-fab-z-index
+CSS variables: --dry-btn-min-height, --dry-fab-action-origin, --dry-fab-action-scale-closed, --dry-fab-gap, --dry-fab-offset, --dry-fab-position, --dry-fab-z-index
 Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-state
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:

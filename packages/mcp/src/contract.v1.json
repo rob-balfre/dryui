@@ -13508,6 +13508,9 @@
         "Use button semantics for in-place actions and link semantics for navigation."
       ],
       "cssVars": {
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-fab-action-origin": "Action Origin",
+        "--dry-fab-action-scale-closed": "Action Scale Closed",
         "--dry-fab-gap": "Gap spacing",
         "--dry-fab-offset": "Offset",
         "--dry-fab-position": "Position",
