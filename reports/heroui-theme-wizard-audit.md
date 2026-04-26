@@ -41,34 +41,34 @@ Before polish work, the current route also needs contract and hydration cleanup.
 
 Measured in Chrome at `1440 x 1000`.
 
-| Area | HeroUI measurement | Why it helps |
-| --- | ---: | --- |
-| Page side padding | `24px` | Keeps the app surface close to viewport edges without feeling cramped. |
-| Top nav | `56px` high | Navigation is present but does not compete with the work surface. |
-| Preview shell | `1392 x 816`, starts at `y=72` | The first viewport is mostly preview. |
-| Outer shell radius | `24px` | Gives the preview a clear app-frame affordance. |
-| Inner preview viewport | about `1376 x 770`, radius `16px` | Creates hierarchy without nested cards. |
-| Preview canvas padding | about `32px` vertical, `16px` horizontal | Leaves room for components without wasting the frame. |
-| Component grid | about `1020px` wide | The preview composition is intentionally narrower than the frame. |
-| Grid columns | about `256 / 360 / 340` | Unequal columns feel composed rather than generic. |
-| Component grid gap | `32px` | Dense but scannable. |
-| Bottom controls | about `1072 x 112` | Primary controls stay near the preview. |
-| Control modules | usually `160px` wide | Every setting has a predictable footprint. |
-| Labels | about `14px / 20px`, weight `500` | Product-scale type, not hero-scale type. |
-| Inputs/selects | `36px` high, `12px` radius | Dense, familiar controls. |
-| Sliders | about `160 x 24` | Compact direct manipulation. |
-| Buttons | `32px` or `36px` high | Strong density without feeling tiny. |
+| Area                   |                       HeroUI measurement | Why it helps                                                           |
+| ---------------------- | ---------------------------------------: | ---------------------------------------------------------------------- |
+| Page side padding      |                                   `24px` | Keeps the app surface close to viewport edges without feeling cramped. |
+| Top nav                |                              `56px` high | Navigation is present but does not compete with the work surface.      |
+| Preview shell          |           `1392 x 816`, starts at `y=72` | The first viewport is mostly preview.                                  |
+| Outer shell radius     |                                   `24px` | Gives the preview a clear app-frame affordance.                        |
+| Inner preview viewport |        about `1376 x 770`, radius `16px` | Creates hierarchy without nested cards.                                |
+| Preview canvas padding | about `32px` vertical, `16px` horizontal | Leaves room for components without wasting the frame.                  |
+| Component grid         |                      about `1020px` wide | The preview composition is intentionally narrower than the frame.      |
+| Grid columns           |                  about `256 / 360 / 340` | Unequal columns feel composed rather than generic.                     |
+| Component grid gap     |                                   `32px` | Dense but scannable.                                                   |
+| Bottom controls        |                       about `1072 x 112` | Primary controls stay near the preview.                                |
+| Control modules        |                     usually `160px` wide | Every setting has a predictable footprint.                             |
+| Labels                 |        about `14px / 20px`, weight `500` | Product-scale type, not hero-scale type.                               |
+| Inputs/selects         |               `36px` high, `12px` radius | Dense, familiar controls.                                              |
+| Sliders                |                         about `160 x 24` | Compact direct manipulation.                                           |
+| Buttons                |                    `32px` or `36px` high | Strong density without feeling tiny.                                   |
 
 ### Measured Mobile Structure
 
 Measured at `390 x 844`.
 
-| Area | HeroUI behavior | Why it helps |
-| --- | --- | --- |
-| Preview shell | about `358 x 696` | The preview remains the dominant object. |
-| Bottom rail | about `69px` high | Controls do not push the preview down. |
-| Theme selector | about `286 x 40` | Primary choice remains large enough to touch. |
-| Icon action | `40 x 40` | Common action stays accessible without labels. |
+| Area            | HeroUI behavior                     | Why it helps                                     |
+| --------------- | ----------------------------------- | ------------------------------------------------ |
+| Preview shell   | about `358 x 696`                   | The preview remains the dominant object.         |
+| Bottom rail     | about `69px` high                   | Controls do not push the preview down.           |
+| Theme selector  | about `286 x 40`                    | Primary choice remains large enough to touch.    |
+| Icon action     | `40 x 40`                           | Common action stays accessible without labels.   |
 | Preview content | vertically scrolls inside the frame | Mobile is still a tool, not a stacked docs page. |
 
 ### Design Patterns Worth Borrowing
@@ -155,9 +155,9 @@ Recommended direction:
 
 ```css
 .preview-mosaic {
-  grid-template-columns: minmax(14rem, 16rem) minmax(20rem, 24rem) minmax(18rem, 22rem);
-  gap: var(--dry-space-4);
-  justify-content: center;
+	grid-template-columns: minmax(14rem, 16rem) minmax(20rem, 24rem) minmax(18rem, 22rem);
+	gap: var(--dry-space-4);
+	justify-content: center;
 }
 ```
 
