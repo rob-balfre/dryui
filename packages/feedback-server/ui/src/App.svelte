@@ -6,10 +6,13 @@
 		Badge,
 		BorderBeam,
 		Button,
+		ButtonGroup,
 		Card,
 		Container,
 		DropdownMenu,
 		Input,
+		Link,
+		RelativeTime,
 		Tabs,
 		Text
 	} from '@dryui/ui';
@@ -68,39 +71,40 @@
 	let refreshing = $state(false);
 	let search = $state('');
 	let searchOpen = $state(false);
-	let searchContainer = $state<HTMLDivElement | null>(null);
+	let searchContainerNode: HTMLDivElement | undefined;
 
-	$effect(() => {
-		if (searchOpen && searchContainer) {
-			searchContainer.querySelector('input')?.focus();
-		}
-	});
+	function focusSearchInput(): void {
+		queueMicrotask(() => searchContainerNode?.querySelector('input')?.focus());
+	}
 
-	$effect(() => {
-		if (!searchOpen) return;
-		const handler = (event: MouseEvent) => {
-			if (!searchContainer) return;
-			if (searchContainer.contains(event.target as Node)) return;
-			if (!search.trim()) searchOpen = false;
+	function handleSearchMouseDown(event: MouseEvent): void {
+		if (!searchOpen || !searchContainerNode) return;
+		if (searchContainerNode.contains(event.target as Node)) return;
+		if (!search.trim()) searchOpen = false;
+	}
+
+	function handleSearchKeydown(event: KeyboardEvent): void {
+		if (event.key !== 'Escape') return;
+		if (!searchOpen || !searchContainerNode?.contains(event.target as Node)) return;
+		event.preventDefault();
+		closeSearch();
+	}
+
+	function attachSearchControls(node: HTMLDivElement): () => void {
+		searchContainerNode = node;
+		document.addEventListener('mousedown', handleSearchMouseDown);
+		document.addEventListener('keydown', handleSearchKeydown);
+
+		return () => {
+			if (searchContainerNode === node) searchContainerNode = undefined;
+			document.removeEventListener('mousedown', handleSearchMouseDown);
+			document.removeEventListener('keydown', handleSearchKeydown);
 		};
-		document.addEventListener('mousedown', handler);
-		return () => document.removeEventListener('mousedown', handler);
-	});
-
-	$effect(() => {
-		if (!searchOpen) return;
-		const handler = (event: KeyboardEvent) => {
-			if (event.key !== 'Escape') return;
-			if (!searchContainer?.contains(event.target as Node)) return;
-			event.preventDefault();
-			closeSearch();
-		};
-		document.addEventListener('keydown', handler);
-		return () => document.removeEventListener('keydown', handler);
-	});
+	}
 
 	function openSearch(): void {
 		searchOpen = true;
+		focusSearchInput();
 	}
 
 	function closeSearch(): void {
@@ -207,20 +211,6 @@
 	}
 
 	const devUrl = readDevUrl();
-
-	function formatRelativeTime(value: string): string {
-		const deltaMs = Date.now() - new Date(value).getTime();
-		const deltaMinutes = Math.round(deltaMs / 60_000);
-
-		if (Math.abs(deltaMinutes) < 1) return 'just now';
-		if (Math.abs(deltaMinutes) < 60) return `${deltaMinutes}m ago`;
-
-		const deltaHours = Math.round(deltaMinutes / 60);
-		if (Math.abs(deltaHours) < 24) return `${deltaHours}h ago`;
-
-		const deltaDays = Math.round(deltaHours / 24);
-		return `${deltaDays}d ago`;
-	}
 
 	function normalizeSearchTokens(query: string): string[] {
 		return query
@@ -379,45 +369,55 @@
 	<section class="dashboard">
 		<PageHeader.Root>
 			<PageHeader.Content>
-				<a class="brand" href="https://dryui.dev" target="_blank" rel="noreferrer">
-					<span class="wordmark" aria-label="DryUI">
-						DRY<span class="wordmark-badge">ui</span>
-					</span>
-					<span class="brand-divider" aria-hidden="true"></span>
-					<span class="brand-title">Feedback</span>
-				</a>
+				<span class="brand-link">
+					<Link href="https://dryui.dev" external underline="none">
+						<span class="brand">
+							<span class="wordmark" aria-label="DryUI">
+								DRY<span class="wordmark-badge">ui</span>
+							</span>
+							<span class="brand-divider" aria-hidden="true"></span>
+							<span class="brand-title">Feedback</span>
+						</span>
+					</Link>
+				</span>
 			</PageHeader.Content>
 			<PageHeader.Actions>
 				<span class="hero-status">
 					<Text as="span" size="xs" color="secondary">
-						{lastLoadedAt ? `Updated ${formatRelativeTime(lastLoadedAt)}` : 'Not refreshed yet'}
+						{#if lastLoadedAt}
+							Updated <RelativeTime date={lastLoadedAt} />
+						{:else}
+							Not refreshed yet
+						{/if}
 					</Text>
 				</span>
-				{#if devUrl}
+				<ButtonGroup size="sm">
+					{#if devUrl}
+						<Button
+							href={devUrl}
+							target="_blank"
+							rel="noreferrer"
+							variant="soft"
+							size="sm"
+							aria-label="Open dev app"
+						>
+							<ExternalLink size={14} aria-hidden="true" />
+							Open dev app
+						</Button>
+					{/if}
 					<Button
-						href={devUrl}
-						target="_blank"
-						rel="noreferrer"
-						variant="soft"
+						variant="outline"
 						size="sm"
-						aria-label="Open dev app"
+						onclick={() => void loadSubmissions('refresh')}
+						disabled={refreshing}
+						aria-label="Refresh submissions"
 					>
-						<ExternalLink size={14} aria-hidden="true" />
-						Open dev app
+						<span class="refresh-icon" data-spinning={refreshing || undefined}>
+							<RefreshCw size={14} aria-hidden="true" />
+						</span>
+						{refreshing ? 'Refreshing' : 'Refresh'}
 					</Button>
-				{/if}
-				<Button
-					variant="outline"
-					size="sm"
-					onclick={() => void loadSubmissions('refresh')}
-					disabled={refreshing}
-					aria-label="Refresh submissions"
-				>
-					<span class="refresh-icon" data-spinning={refreshing || undefined}>
-						<RefreshCw size={14} aria-hidden="true" />
-					</span>
-					{refreshing ? 'Refreshing' : 'Refresh'}
-				</Button>
+				</ButtonGroup>
 			</PageHeader.Actions>
 		</PageHeader.Root>
 
@@ -432,7 +432,7 @@
 						<div
 							class="filter-search"
 							class:is-open={searchOpen || hasActiveSearch}
-							bind:this={searchContainer}
+							{@attach attachSearchControls}
 							role="search"
 						>
 							{#if searchOpen || hasActiveSearch}
@@ -619,6 +619,11 @@
 		color: inherit;
 		text-decoration: none;
 		border-radius: var(--dry-radius-md);
+	}
+
+	.brand-link {
+		--dry-link-color: inherit;
+		--dry-link-hover-color: inherit;
 	}
 
 	.brand:focus-visible {

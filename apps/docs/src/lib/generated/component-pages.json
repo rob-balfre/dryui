@@ -17647,6 +17647,10 @@
                 "description": "Horizontal or vertical layout direction.",
                 "default": "'vertical'"
               },
+              "listId": {
+                "type": "string",
+                "required": false
+              },
               "children": {
                 "type": "Snippet",
                 "required": true,
@@ -17720,7 +17724,17 @@
             }
           },
           "Group": {
-            "props": {}
+            "props": {
+              "onMove": {
+                "type": "(fromListId: string, fromIndex: number, toListId: string, toIndex: number) => void",
+                "required": true
+              },
+              "children": {
+                "type": "Snippet",
+                "required": true,
+                "description": "Content rendered inside the component."
+              }
+            }
           }
         },
         "structure": {
@@ -23715,6 +23729,43 @@
       },
       "related": null
     },
+    "TokenScope": {
+      "component": {
+        "import": "@dryui/ui",
+        "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
+        "category": "theme",
+        "tags": [
+          "theme",
+          "tokens",
+          "css-variables",
+          "scope"
+        ],
+        "compound": false,
+        "props": {
+          "tokens": {
+            "type": "Record<string, string>",
+            "required": true
+          },
+          "children": {
+            "type": "Snippet",
+            "required": true,
+            "description": "Content rendered inside the component."
+          }
+        },
+        "a11y": [
+          "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+          "Keep heading, reading, and focus order aligned with the surrounding content."
+        ],
+        "cssVars": {},
+        "dataAttributes": [
+          {
+            "name": "data-dry-token-scope"
+          }
+        ],
+        "example": "<TokenScope>Content</TokenScope>"
+      },
+      "related": null
+    },
     "Diagram": {
       "component": {
         "import": "@dryui/ui",
@@ -24872,6 +24923,31 @@
           }
         ],
         "example": "<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
+      },
+      "related": null
+    },
+    "Motion": {
+      "component": {
+        "import": "@dryui/primitives",
+        "description": "Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens.",
+        "category": "display",
+        "tags": [
+          "motion",
+          "animation",
+          "enter",
+          "exit",
+          "stagger",
+          "polish"
+        ],
+        "compound": false,
+        "props": {},
+        "a11y": [
+          "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+          "Keep heading, reading, and focus order aligned with the surrounding content."
+        ],
+        "cssVars": {},
+        "dataAttributes": [],
+        "example": "<Motion>Content</Motion>"
       },
       "related": null
     },

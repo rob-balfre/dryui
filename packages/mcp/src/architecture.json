@@ -2,24 +2,24 @@
   "schema": "DolphinGraph",
   "packageVersion": "2.0.2",
   "summary": {
-    "componentNodes": 298,
+    "componentNodes": 299,
     "partNodes": 656,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 146,
-    "uiComponents": 152,
-    "uiWrappers": 130,
+    "uiComponents": 153,
+    "uiWrappers": 131,
     "uiComposites": 22,
-    "rootBarrelComponents": 298,
+    "rootBarrelComponents": 299,
     "subpathOnlyComponents": 0,
     "compoundComponents": 133,
-    "wrapEdges": 130,
+    "wrapEdges": 131,
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 307,
     "mismatches": 297,
     "primitivePartComponents": 0,
-    "thinWrappers": 60
+    "thinWrappers": 61
   },
   "nodes": [
     {
@@ -7823,12 +7823,17 @@
       "kind": "component",
       "package": "primitives",
       "layer": "primitive",
-      "category": "uncategorized",
-      "description": "TokenScope is exported publicly but is missing generated spec metadata.",
+      "category": "theme",
+      "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
       "visibility": "root",
       "sourcePath": "packages/primitives/src/token-scope/index.ts",
       "publicImport": "@dryui/primitives",
-      "tags": [],
+      "tags": [
+        "theme",
+        "tokens",
+        "css-variables",
+        "scope"
+      ],
       "compound": false,
       "parts": [],
       "sourceFileCount": 2,
@@ -16191,6 +16196,30 @@
       "parts": []
     },
     {
+      "id": "ui:TokenScope",
+      "name": "TokenScope",
+      "label": "TokenScope",
+      "kind": "component",
+      "package": "ui",
+      "layer": "ui-wrapper",
+      "category": "theme",
+      "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
+      "visibility": "root+subpath",
+      "sourcePath": "packages/ui/src/token-scope/index.ts",
+      "publicImport": "@dryui/ui",
+      "tags": [
+        "theme",
+        "tokens",
+        "css-variables",
+        "scope"
+      ],
+      "compound": false,
+      "parts": [],
+      "sourceFileCount": 2,
+      "primitivePartUsageCount": 0,
+      "componentImportCount": 0
+    },
+    {
       "id": "ui:Toolbar",
       "name": "Toolbar",
       "label": "Toolbar",
@@ -24303,6 +24332,12 @@
       "to": "primitives:ToggleGroup"
     },
     {
+      "id": "wraps:ui:TokenScope:primitives:TokenScope:",
+      "type": "wraps",
+      "from": "ui:TokenScope",
+      "to": "primitives:TokenScope"
+    },
+    {
       "id": "wraps:ui:Toolbar:primitives:Toolbar:",
       "type": "wraps",
       "from": "ui:Toolbar",
@@ -24359,6 +24394,13 @@
   ],
   "clusters": [],
   "mismatches": [
+    {
+      "kind": "docs-nav-missing",
+      "package": "docs",
+      "component": "TokenScope",
+      "detail": "Public UI export is missing from the docs component navigation.",
+      "sourcePath": "packages/ui/src/token-scope/index.ts"
+    },
     {
       "kind": "missing-subpath-export",
       "package": "primitives",
@@ -26430,13 +26472,6 @@
       "component": "RefId",
       "detail": "Public export exists without generated spec metadata.",
       "sourcePath": "packages/primitives/src/ref-id/index.ts"
-    },
-    {
-      "kind": "spec-missing",
-      "package": "primitives",
-      "component": "TokenScope",
-      "detail": "Public export exists without generated spec metadata.",
-      "sourcePath": "packages/primitives/src/token-scope/index.ts"
     }
   ],
   "signals": {
@@ -26499,6 +26534,7 @@
       "Svg",
       "Textarea",
       "Toggle",
+      "TokenScope",
       "VideoEmbed",
       "VirtualList",
       "VisuallyHidden"
@@ -26508,14 +26544,15 @@
     "specMissingUi": [],
     "specMissingPrimitives": [
       "Pluralize",
-      "RefId",
+      "RefId"
+    ],
+    "docsNavMissing": [
       "TokenScope"
     ],
-    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

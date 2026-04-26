@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 165 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 167 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -4229,6 +4229,21 @@ Example:
 </LogoCloud.Root>
 ```
 
+## Motion
+Package: @dryui/primitives
+Category: display
+Tags: motion, animation, enter, exit, stagger, polish
+Kind: simple
+Root import: import { Motion } from '@dryui/primitives'
+Props: none
+CSS variables: none
+Data attributes: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<Motion>Content</Motion>
+```
+
 ## StatCard
 Package: @dryui/primitives
 Category: display
@@ -4433,7 +4448,7 @@ Root import: import { DragAndDrop } from '@dryui/ui'
 Subpath import: import { DragAndDrop } from '@dryui/ui/drag-and-drop'
 Parts:
 - DragAndDrop.Root
-  Props: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | children (Snippet), Content rendered inside the component., required
+  Props: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | listId (string) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DragAndDrop.Item
   Props: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required
@@ -4442,7 +4457,7 @@ Parts:
   Props: index (number), required | children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - DragAndDrop.Group
-  Props: none
+  Props: onMove ((fromListId: string, fromIndex: number, toListId: string, toIndex: number) => void), required | children (Snippet), Content rendered inside the component., required
 Structure:
   DragAndDrop.Root
     DragAndDrop.Item
@@ -4803,4 +4818,22 @@ Accessibility: Treat the effect as decorative and keep underlying content unders
 Example:
 ```svelte
 <WaveDivider>Content</WaveDivider>
+```
+
+### theme
+
+## TokenScope
+Package: @dryui/ui
+Category: theme
+Tags: theme, tokens, css-variables, scope
+Kind: simple
+Root import: import { TokenScope } from '@dryui/ui'
+Subpath import: import { TokenScope } from '@dryui/ui/token-scope'
+Props: tokens (Record<string, string>), required | children (Snippet), Content rendered inside the component., required
+CSS variables: none
+Data attributes: data-dry-token-scope
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example:
+```svelte
+<TokenScope>Content</TokenScope>
 ```

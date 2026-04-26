@@ -237,6 +237,7 @@
 			bind:value={hexInputValue}
 			size="sm"
 			placeholder="#000000"
+			aria-label="Hex color"
 			oninput={() => handleHexInput(hexInputValue)}
 		/>
 	</div>

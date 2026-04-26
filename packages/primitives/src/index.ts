@@ -50,7 +50,8 @@ export {
 	supportsPropertyRegistration,
 	registerPropertyOnce,
 	supportsWebGL2
-} from './internal/motion.js';
+} from './motion/index.js';
+export type { RegisteredPropertyDefinition } from './motion/index.js';
 export {
 	hexToRgb,
 	rgbToHex,

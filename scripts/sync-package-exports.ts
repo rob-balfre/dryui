@@ -130,9 +130,11 @@ async function syncPackageExports(config: PackageConfig): Promise<boolean> {
 
 	packageJson.exports = buildExports(publicDirs, sourceExtras, false);
 	packageJson.svelte = sourceRootExport.svelte;
+	packageJson.types = sourceRootExport.types;
 	packageJson.publishConfig = {
 		...packageJson.publishConfig,
 		svelte: distRootExport.svelte,
+		types: distRootExport.types,
 		exports: buildExports(publicDirs, distExtras, true)
 	};
 

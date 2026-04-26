@@ -415,7 +415,9 @@
 									bind:value={assistantPrompt}
 									placeholder="Ask, search, or make anything..."
 								>
-									<RichTextEditor.Toolbar />
+									<RichTextEditor.Toolbar>
+										{#snippet children()}{/snippet}
+									</RichTextEditor.Toolbar>
 									<RichTextEditor.Content />
 								</RichTextEditor.Root>
 							</div>
@@ -438,35 +440,27 @@
 				</Card.Header>
 				<Card.Content>
 					<div class="panel-stack">
-						<div class="choice-stack">
-							<Card.Root size="sm" variant="interactive" selected>
-								<Card.Content>
-									<div class="choice-card">
-										<span class="choice-radio" data-selected aria-hidden="true"></span>
-										<div class="choice-card-copy">
-											<div class="choice-card-head">
-												<Text as="span" weight="semibold">Kubernetes</Text>
-												<Badge color="gray" size="sm">Default</Badge>
-											</div>
-											<Text color="muted">Run GPU workloads on a K8s configured cluster.</Text>
-										</div>
+						<div class="choice-rows">
+							<label class="choice-row" data-selected>
+								<span class="choice-radio" data-selected aria-hidden="true"></span>
+								<div class="choice-row-copy">
+									<div class="choice-row-head">
+										<Text as="span" weight="semibold">Kubernetes</Text>
+										<Badge color="gray" size="sm">Default</Badge>
 									</div>
-								</Card.Content>
-							</Card.Root>
-							<Card.Root size="sm">
-								<Card.Content>
-									<div class="choice-card">
-										<span class="choice-radio" aria-hidden="true"></span>
-										<div class="choice-card-copy">
-											<div class="choice-card-head">
-												<Text as="span" weight="semibold">Virtual Machine</Text>
-												<Badge color="gray" size="sm">Soon</Badge>
-											</div>
-											<Text color="muted">Access a VM configured cluster to run workloads.</Text>
-										</div>
+									<Text color="muted">Run GPU workloads on a K8s configured cluster.</Text>
+								</div>
+							</label>
+							<label class="choice-row">
+								<span class="choice-radio" aria-hidden="true"></span>
+								<div class="choice-row-copy">
+									<div class="choice-row-head">
+										<Text as="span" weight="semibold">Virtual Machine</Text>
+										<Badge color="gray" size="sm">Soon</Badge>
 									</div>
-								</Card.Content>
-							</Card.Root>
+									<Text color="muted">Access a VM configured cluster to run workloads.</Text>
+								</div>
+							</label>
 						</div>
 
 						<div class="panel-divider"></div>
@@ -531,7 +525,6 @@
 	}
 
 	.panel-stack,
-	.choice-stack,
 	.processing-panel,
 	.empty-state {
 		display: grid;
@@ -539,7 +532,6 @@
 	}
 
 	.panel-copy,
-	.choice-card-copy,
 	.usage-meter {
 		display: grid;
 		gap: var(--dry-space-1);
@@ -574,52 +566,8 @@
 	}
 
 	.activity-pill {
-		--_activity-radius: var(--dry-control-radius, var(--dry-radius-md));
-		--_activity-fill: var(--dry-color-fill-brand);
-		--_activity-fill-weak: var(--dry-color-fill-brand-weak);
-		--_activity-stroke: var(--dry-color-stroke-brand);
-		--_activity-text: var(--dry-color-text-brand);
-		--dry-badge-radius: var(--_activity-radius);
-		--dry-badge-bg: color-mix(in srgb, var(--_activity-fill-weak) 88%, var(--dry-color-bg-raised));
-		--dry-badge-color: var(--_activity-text);
-		--dry-badge-border: color-mix(
-			in srgb,
-			var(--_activity-stroke) 38%,
-			var(--dry-color-stroke-weak)
-		);
 		display: inline-grid;
 		align-items: center;
-		padding: 1px;
-		border-radius: var(--_activity-radius);
-		background: linear-gradient(
-			135deg,
-			color-mix(in srgb, var(--_activity-fill) 26%, transparent),
-			color-mix(in srgb, var(--_activity-stroke) 78%, var(--dry-color-stroke-weak))
-		);
-		box-shadow:
-			inset 0 0 0 1px color-mix(in srgb, var(--_activity-stroke) 24%, transparent),
-			0 0 1rem color-mix(in srgb, var(--_activity-fill) 18%, transparent);
-	}
-
-	.activity-pill[data-tone='info'] {
-		--_activity-fill: var(--dry-color-fill-info);
-		--_activity-fill-weak: var(--dry-color-fill-info-weak);
-		--_activity-stroke: var(--dry-color-stroke-info-strong);
-		--_activity-text: var(--dry-color-text-info);
-	}
-
-	.activity-pill[data-tone='success'] {
-		--_activity-fill: var(--dry-color-fill-success);
-		--_activity-fill-weak: var(--dry-color-fill-success-weak);
-		--_activity-stroke: var(--dry-color-stroke-success-strong);
-		--_activity-text: var(--dry-color-text-success);
-	}
-
-	.activity-pill[data-tone='warning'] {
-		--_activity-fill: var(--dry-color-fill-warning);
-		--_activity-fill-weak: var(--dry-color-fill-warning-weak);
-		--_activity-stroke: var(--dry-color-stroke-warning-strong);
-		--_activity-text: var(--dry-color-text-warning);
 	}
 
 	.badge-strip {
@@ -838,19 +786,45 @@
 		--dry-btn-color: var(--dry-form-control-color);
 	}
 
-	.checkbox-row,
-	.choice-card {
+	.checkbox-row {
 		display: grid;
 		grid-template-columns: max-content minmax(0, 1fr);
 		align-items: center;
 		gap: var(--dry-space-3);
 	}
 
-	.choice-card-head {
+	.choice-rows {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) max-content;
-		align-items: center;
+		gap: var(--dry-space-2);
+	}
+
+	.choice-row {
+		display: grid;
+		grid-template-columns: max-content minmax(0, 1fr);
+		align-items: start;
 		gap: var(--dry-space-3);
+		padding: var(--dry-space-2_5) var(--dry-space-3);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		cursor: pointer;
+	}
+
+	.choice-row[data-selected] {
+		border-color: var(--dry-color-stroke-selected, var(--dry-color-fill-brand));
+		background: color-mix(in srgb, var(--dry-color-fill-brand) 8%, transparent);
+	}
+
+	.choice-row-copy {
+		display: grid;
+		gap: var(--dry-space-1);
+	}
+
+	.choice-row-head {
+		display: grid;
+		grid-template-columns: max-content max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+		justify-content: start;
 	}
 
 	.choice-radio {

@@ -47,8 +47,8 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^2.0.2",
-    "@dryui/ui": "^2.0.2"
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.55.5",

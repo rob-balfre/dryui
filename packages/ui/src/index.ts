@@ -830,8 +830,8 @@ export type { StarRatingRootProps } from './star-rating/index.js';
 export { Tag } from './tag/index.js';
 export type { TagProps, TagColor } from './tag/index.js';
 
-export { TokenScope } from './themes/token-scope.js';
-export type { TokenScopeProps } from './themes/token-scope.js';
+export { TokenScope } from './token-scope/index.js';
+export type { TokenScopeProps } from './token-scope/index.js';
 
 export { Diagram } from './diagram/index.js';
 export type {

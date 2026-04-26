@@ -1,3 +1,10 @@
+<!--
+  Step-by-step onboarding shell. Used by the CLI/init flow and any host that
+  walks a user through `Personality → BrandColor → Typography → Shape → PreviewExport`.
+  The full-bleed live editor in `apps/docs/src/routes/theme-wizard/+page.svelte`
+  uses a workbench layout instead, not this shell. Keep both intact: the shell
+  belongs to onboarding paths, the workbench belongs to the docs reference editor.
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { TokenScope } from '@dryui/primitives/token-scope';

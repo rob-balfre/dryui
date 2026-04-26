@@ -16,7 +16,7 @@
   "type": "module",
   "sideEffects": false,
   "svelte": "./src/index.ts",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -427,6 +427,11 @@
       "types": "./src/menubar/index.ts",
       "svelte": "./src/menubar/index.ts",
       "default": "./src/menubar/index.ts"
+    },
+    "./motion": {
+      "types": "./src/motion/index.ts",
+      "svelte": "./src/motion/index.ts",
+      "default": "./src/motion/index.ts"
     },
     "./multi-select-combobox": {
       "types": "./src/multi-select-combobox/index.ts",
@@ -1189,6 +1194,11 @@
         "types": "./dist/menubar/index.d.ts",
         "svelte": "./dist/menubar/index.js",
         "default": "./dist/menubar/index.js"
+      },
+      "./motion": {
+        "types": "./dist/motion/index.d.ts",
+        "svelte": "./dist/motion/index.js",
+        "default": "./dist/motion/index.js"
       },
       "./multi-select-combobox": {
         "types": "./dist/multi-select-combobox/index.d.ts",

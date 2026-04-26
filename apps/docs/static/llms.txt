@@ -1,6 +1,6 @@
 # DryUI
 
-> 165 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 167 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -1476,6 +1476,13 @@ Data attributes: data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <LogoCloud.Root>
 
+### Motion
+Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens..
+Import: @dryui/primitives
+Data attributes: none
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <Motion>Content</Motion>
+
 ### StatCard
 Compact KPI card with label, value, and trend.
 Import: @dryui/primitives
@@ -1562,7 +1569,7 @@ Reorderable list with drag and keyboard support.
 Import: @dryui/ui
 Subpath import: @dryui/ui/drag-and-drop
 Parts: Root, Item, Handle, Group
-Props: Root: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | children (Snippet), Content rendered inside the component., required | Item: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required | Handle: index (number), required | children (Snippet), Content rendered inside the component.
+Props: Root: items (T[]), required | onReorder ((items: T[]) => void), required | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal, default 'vertical' | listId (string) | children (Snippet), Content rendered inside the component., required | Item: index (number), required | children (Snippet<[{ isDragging: boolean; isOver: boolean }]>), Content rendered inside the component., required | Handle: index (number), required | children (Snippet), Content rendered inside the component. | Group: onMove ((fromListId: string, fromIndex: number, toListId: string, toIndex: number) => void), required | children (Snippet), Content rendered inside the component., required
 Data attributes: data-dnd-grip | data-dnd-handle | data-dnd-instructions | data-dnd-item | data-dnd-live-region | data-dnd-preview | data-dnd-root | data-drag-active | data-dragging | data-handle | data-index | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-over | data-over-end
 Accessibility: Provide a clear accessible name for every interactive target and keep the action model consistent. | Match keyboard behavior to the established widget pattern rather than inventing a custom key map.
 Example: <DragAndDrop.Root>
@@ -1753,6 +1760,17 @@ Props: shape ('wave' | 'curve' | 'angle' | 'zigzag'), accepted wave, curve, angl
 Data attributes: none
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <WaveDivider>Content</WaveDivider>
+
+### Category: Theme
+
+### TokenScope
+Render a wrapper that injects scoped CSS custom properties for its subtree.
+Import: @dryui/ui
+Subpath import: @dryui/ui/token-scope
+Props: tokens (Record<string, string>), required | children (Snippet), Content rendered inside the component., required
+Data attributes: data-dry-token-scope
+Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
+Example: <TokenScope>Content</TokenScope>
 
 ## CSS Variables
 
