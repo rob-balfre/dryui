@@ -58,6 +58,8 @@ function formatAnnotation(annotation: Annotation): string {
 function enrichSubmissionForResponse(submission: Submission): Record<string, unknown> {
 	const drawings = submission.drawings ?? [];
 	const hints = submission.hints ?? [];
+	const components = submission.components ?? [];
+	const removed = submission.removed ?? [];
 	const kindCounts: Record<string, number> = {};
 	for (const drawing of drawings) {
 		const kind = drawing.kind ?? 'unknown';
@@ -67,6 +69,11 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 	const cornerCounts: Record<string, number> = {};
 	for (const hint of hints) {
 		cornerCounts[hint.corner] = (cornerCounts[hint.corner] ?? 0) + 1;
+	}
+
+	const componentKindCounts: Record<string, number> = {};
+	for (const component of components) {
+		componentKindCounts[component.kind] = (componentKindCounts[component.kind] ?? 0) + 1;
 	}
 
 	return {
@@ -80,11 +87,17 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 		scroll: submission.scroll ?? null,
 		drawings,
 		hints,
+		...(components.length > 0 ? { components } : {}),
+		...(removed.length > 0 ? { removed } : {}),
 		summary: {
 			drawingCount: drawings.length,
 			hintCount: hints.length,
 			drawingKinds: kindCounts,
-			corners: cornerCounts
+			corners: cornerCounts,
+			...(components.length > 0
+				? { componentCount: components.length, componentKinds: componentKindCounts }
+				: {}),
+			...(removed.length > 0 ? { removedCount: removed.length } : {})
 		}
 	};
 }

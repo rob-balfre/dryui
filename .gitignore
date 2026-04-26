@@ -19,6 +19,7 @@ graphify-out/
 .vitest-attachments/
 tests/playwright/snapshots/
 tests/playwright/test-results/
+tests/playwright/feedback-bounds-results/
 .playwright-cli/
 coverage/
 output/

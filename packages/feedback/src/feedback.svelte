@@ -126,6 +126,13 @@
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
 		added: AddedSnapshot[];
+		removed: HTMLElement[];
+	};
+
+	type RemovedRecord = {
+		prevDisplay: string;
+		rect: { x: number; y: number; width: number; height: number };
+		descriptor: ReturnType<typeof describeElement>;
 	};
 
 	const LAYOUT_DATASET = {
@@ -147,12 +154,13 @@
 	const layoutClones = new SvelteMap<HTMLElement, HTMLElement>();
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
 	const addedComponents = new Map<string, AddedRecord>();
+	const removedElements = new SvelteMap<HTMLElement, RemovedRecord>();
 	let layoutVersion = $state(0);
 
 	let placingComponent = $state<string | null>(null);
 
 	let historyFrames = $state<HistoryFrame[]>([
-		{ drawings: [], cloneSnapshots: new Map(), added: [] }
+		{ drawings: [], cloneSnapshots: new Map(), added: [], removed: [] }
 	]);
 	let frameIndex = $state(0);
 
@@ -233,7 +241,29 @@
 	function destroyAllLayoutClones() {
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
+		for (const original of [...removedElements.keys()]) restoreLayoutElement(original);
 		layoutVersion++;
+	}
+
+	function removeLayoutElement(original: HTMLElement) {
+		if (removedElements.has(original)) return;
+		const rect = original.getBoundingClientRect();
+		destroyLayoutClone(original);
+		const prevDisplay = original.style.display;
+		original.style.display = 'none';
+		removedElements.set(original, {
+			prevDisplay,
+			rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height },
+			descriptor: describeElement(original)
+		});
+		if (selectedLayoutEl === original) selectedLayoutEl = null;
+	}
+
+	function restoreLayoutElement(original: HTMLElement) {
+		const record = removedElements.get(original);
+		if (!record) return;
+		original.style.display = record.prevDisplay;
+		removedElements.delete(original);
 	}
 
 	function layoutStageTarget(): HTMLElement {
@@ -329,11 +359,21 @@
 		DatePicker: () => import('./components/component-defaults/date-picker.svelte'),
 		DateRangePicker: () => import('./components/component-defaults/date-range-picker.svelte'),
 		DescriptionList: () => import('./components/component-defaults/description-list.svelte'),
+		Diagram: () => import('./components/component-defaults/diagram.svelte'),
 		Dialog: () => import('./components/component-defaults/dialog.svelte'),
 		DragAndDrop: () => import('./components/component-defaults/drag-and-drop.svelte'),
 		Drawer: () => import('./components/component-defaults/drawer.svelte'),
 		DropdownMenu: () => import('./components/component-defaults/dropdown-menu.svelte'),
 		EmptyState: () => import('./components/component-defaults/empty-state.svelte'),
+		FormatBytes: () => import('./components/component-defaults/format-bytes.svelte'),
+		FormatDate: () => import('./components/component-defaults/format-date.svelte'),
+		ImageComparison: () => import('./components/component-defaults/image-comparison.svelte'),
+		MarkdownRenderer: () => import('./components/component-defaults/markdown-renderer.svelte'),
+		Motion: () => import('./components/component-defaults/motion.svelte'),
+		RelativeTime: () => import('./components/component-defaults/relative-time.svelte'),
+		Sparkline: () => import('./components/component-defaults/sparkline.svelte'),
+		VideoEmbed: () => import('./components/component-defaults/video-embed.svelte'),
+		VirtualList: () => import('./components/component-defaults/virtual-list.svelte'),
 		Field: () => import('./components/component-defaults/field.svelte'),
 		Fieldset: () => import('./components/component-defaults/fieldset.svelte'),
 		FileSelect: () => import('./components/component-defaults/file-select.svelte'),
@@ -428,6 +468,20 @@
 			record.el.style.placeItems = 'start';
 			const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 			if (fallback) fallback.style.display = 'none';
+			// Component mount shrink-wraps the placeholder to its real content size,
+			// so the inspector needs to rebuild its bounding boxes for the new rect.
+			notifyLayoutChange();
+			// If the rendered component collapsed (typically because its content uses
+			// width: 100% inside our shrink-to-fit parent, or it portals out), fall
+			// back to a visible drag-target so the user can still interact with the
+			// placeholder. Skip when the component already laid out at a usable size
+			// so chips/buttons/etc. keep their natural bounds.
+			await waitForNextPaint();
+			if (!record.el.isConnected) return;
+			const rect = record.el.getBoundingClientRect();
+			if (rect.width < 40) record.el.style.minWidth = '200px';
+			if (rect.height < 20) record.el.style.minHeight = '40px';
+			if (rect.width < 40 || rect.height < 20) notifyLayoutChange();
 		} catch (err) {
 			console.warn('[feedback] failed to render', record.kind, err);
 		}
@@ -546,7 +600,8 @@
 		const frame: HistoryFrame = {
 			drawings: [...drawings],
 			cloneSnapshots: snapshotAllClones(),
-			added: snapshotAllAdded()
+			added: snapshotAllAdded(),
+			removed: [...removedElements.keys()]
 		};
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
@@ -578,6 +633,19 @@
 			});
 			layoutChanged = true;
 		}
+		const wantedRemoved = new Set(frame.removed);
+		for (const el of [...removedElements.keys()]) {
+			if (!wantedRemoved.has(el)) {
+				restoreLayoutElement(el);
+				layoutChanged = true;
+			}
+		}
+		for (const el of frame.removed) {
+			if (!removedElements.has(el)) {
+				removeLayoutElement(el);
+				layoutChanged = true;
+			}
+		}
 		if (layoutChanged) notifyLayoutChange();
 		layoutVersion++;
 		saveVersion++;
@@ -590,7 +658,9 @@
 	}
 
 	function resetHistory(initialDrawings: Drawing[]) {
-		historyFrames = [{ drawings: [...initialDrawings], cloneSnapshots: new Map(), added: [] }];
+		historyFrames = [
+			{ drawings: [...initialDrawings], cloneSnapshots: new Map(), added: [], removed: [] }
+		];
 		frameIndex = 0;
 		layoutVersion++;
 	}
@@ -602,7 +672,7 @@
 		void layoutVersion;
 		void frameIndex;
 		void historyFrames.length;
-		return addedComponents.size > 0 || hasModifiedLayoutClone();
+		return addedComponents.size > 0 || removedElements.size > 0 || hasModifiedLayoutClone();
 	});
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
@@ -688,15 +758,19 @@
 		const kind = placingComponent;
 		if (!kind) return;
 		const id = crypto.randomUUID();
-		const width = 200;
-		const height = 80;
-		const left = Math.max(0, Math.min(window.innerWidth - width, x - width / 2));
-		const top = Math.max(0, Math.min(window.innerHeight - height, y - height / 2));
+		// Position is anchored on a fallback bbox to keep the click point inside the
+		// viewport. Width/height start empty so the placeholder (and its rendered
+		// content) shrink-wrap their natural size; user drag-resize later sets
+		// explicit pixel values that override.
+		const anchorWidth = 200;
+		const anchorHeight = 80;
+		const left = Math.max(0, Math.min(window.innerWidth - anchorWidth, x - anchorWidth / 2));
+		const top = Math.max(0, Math.min(window.innerHeight - anchorHeight, y - anchorHeight / 2));
 		const snap: LayoutSnapshot = {
 			left: `${left}px`,
 			top: `${top}px`,
-			width: `${width}px`,
-			height: `${height}px`,
+			width: '',
+			height: '',
 			transform: '',
 			rotation: undefined
 		};
@@ -721,6 +795,19 @@
 		if (!id) return null;
 		return addedComponents.get(id) ?? null;
 	});
+
+	function removeSelectedElement() {
+		const el = selectedLayoutEl;
+		if (!el) return;
+		const id = el.dataset[LAYOUT_DATASET.addedId];
+		if (id) {
+			destroyAddedClone(id);
+		} else {
+			removeLayoutElement(el);
+		}
+		commitHistory();
+		notifyLayoutChange();
+	}
 
 	function applyAddedProps(label: string, propsJson: string) {
 		const el = selectedLayoutEl;
@@ -1360,9 +1447,187 @@
 		return comma === -1 ? dataUrl : dataUrl.slice(comma + 1);
 	}
 
-	async function captureScreenshot(): Promise<Screenshots> {
+	interface AddedComponentSnapshot {
+		id: string;
+		kind: string;
+		label?: string;
+		props?: Record<string, unknown>;
+		rect: { x: number; y: number; width: number; height: number };
+	}
+
+	interface RemovedElementSnapshot {
+		tag: string;
+		id?: string;
+		selector?: string;
+		rect: { x: number; y: number; width: number; height: number };
+	}
+
+	function snapshotAddedComponents(): AddedComponentSnapshot[] {
+		const out: AddedComponentSnapshot[] = [];
+		for (const [id, record] of addedComponents) {
+			const rect = record.el.getBoundingClientRect();
+			if (rect.width < 1 || rect.height < 1) continue;
+			const props = parsePropsJson(record.propsJson);
+			out.push({
+				id,
+				kind: record.kind,
+				label: record.label?.trim() || undefined,
+				props: Object.keys(props).length > 0 ? props : undefined,
+				rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
+			});
+		}
+		return out;
+	}
+
+	function snapshotRemovedElements(): RemovedElementSnapshot[] {
+		const out: RemovedElementSnapshot[] = [];
+		for (const record of removedElements.values()) {
+			const descriptor = record.descriptor ?? { tag: 'unknown' };
+			out.push({
+				tag: descriptor.tag,
+				...(descriptor.id ? { id: descriptor.id } : {}),
+				...(descriptor.selector ? { selector: descriptor.selector } : {}),
+				rect: record.rect
+			});
+		}
+		return out;
+	}
+
+	function formatPropsForChip(props: Record<string, unknown>): string {
+		const pairs = Object.entries(props)
+			.filter(([, v]) => v !== undefined && v !== null && v !== '')
+			.map(([k, v]) => {
+				if (typeof v === 'string') return `${k}="${v}"`;
+				if (typeof v === 'boolean' || typeof v === 'number') return `${k}={${v}}`;
+				return `${k}={${JSON.stringify(v)}}`;
+			});
+		return pairs.length ? ' · ' + pairs.join(' ') : '';
+	}
+
+	function mountCaptureAnnotations(): () => void {
+		const nodes: HTMLElement[] = [];
+		const accent = 'hsl(25 100% 55%)';
+		const danger = 'hsl(0 75% 55%)';
+
+		for (const record of removedElements.values()) {
+			const { rect } = record;
+			if (rect.width < 1 || rect.height < 1) continue;
+			const outline = document.createElement('div');
+			outline.dataset.dryuiCaptureAnnotation = 'removed-outline';
+			Object.assign(outline.style, {
+				position: 'fixed',
+				left: `${rect.x}px`,
+				top: `${rect.y}px`,
+				width: `${rect.width}px`,
+				height: `${rect.height}px`,
+				border: `2px dashed ${danger}`,
+				borderRadius: '4px',
+				background: 'hsl(0 75% 55% / 0.08)',
+				pointerEvents: 'none',
+				zIndex: '2147483646',
+				boxSizing: 'border-box'
+			});
+			document.body.appendChild(outline);
+			nodes.push(outline);
+
+			const chipText = `removed: ${record.descriptor?.selector || record.descriptor?.tag || 'element'}`;
+			const chip = document.createElement('div');
+			chip.dataset.dryuiCaptureAnnotation = 'removed-chip';
+			chip.textContent = chipText;
+			const fitsAbove = rect.y >= 24;
+			Object.assign(chip.style, {
+				position: 'fixed',
+				left: `${Math.max(4, rect.x)}px`,
+				top: fitsAbove ? `${rect.y - 22}px` : `${rect.y + rect.height + 4}px`,
+				maxWidth: `${Math.max(180, Math.min(window.innerWidth - rect.x - 8, rect.width + 80))}px`,
+				padding: '3px 7px',
+				borderRadius: '4px',
+				background: danger,
+				color: 'white',
+				fontFamily: 'system-ui, -apple-system, sans-serif',
+				fontSize: '11px',
+				fontWeight: '700',
+				lineHeight: '16px',
+				letterSpacing: '0.01em',
+				whiteSpace: 'nowrap',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				pointerEvents: 'none',
+				zIndex: '2147483647',
+				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
+			});
+			document.body.appendChild(chip);
+			nodes.push(chip);
+		}
+
+		for (const record of addedComponents.values()) {
+			const rect = record.el.getBoundingClientRect();
+			if (rect.width < 1 || rect.height < 1) continue;
+
+			const outline = document.createElement('div');
+			outline.dataset.dryuiCaptureAnnotation = 'outline';
+			Object.assign(outline.style, {
+				position: 'fixed',
+				left: `${rect.left}px`,
+				top: `${rect.top}px`,
+				width: `${rect.width}px`,
+				height: `${rect.height}px`,
+				border: `2px solid ${accent}`,
+				borderRadius: '4px',
+				pointerEvents: 'none',
+				zIndex: '2147483646',
+				boxSizing: 'border-box'
+			});
+			document.body.appendChild(outline);
+			nodes.push(outline);
+
+			const props = parsePropsJson(record.propsJson);
+			const labelText = record.label?.trim() || record.kind;
+			const propsText = formatPropsForChip(props);
+			const chip = document.createElement('div');
+			chip.dataset.dryuiCaptureAnnotation = 'chip';
+			chip.textContent = `<${labelText}>${propsText}`;
+
+			const fitsAbove = rect.top >= 24;
+			Object.assign(chip.style, {
+				position: 'fixed',
+				left: `${Math.max(4, rect.left)}px`,
+				top: fitsAbove ? `${rect.top - 22}px` : `${rect.bottom + 4}px`,
+				maxWidth: `${Math.max(180, Math.min(window.innerWidth - rect.left - 8, rect.width + 80))}px`,
+				padding: '3px 7px',
+				borderRadius: '4px',
+				background: accent,
+				color: 'black',
+				fontFamily: 'system-ui, -apple-system, sans-serif',
+				fontSize: '11px',
+				fontWeight: '700',
+				lineHeight: '16px',
+				letterSpacing: '0.01em',
+				whiteSpace: 'nowrap',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				pointerEvents: 'none',
+				zIndex: '2147483647',
+				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
+			});
+			document.body.appendChild(chip);
+			nodes.push(chip);
+		}
+		return () => {
+			for (const n of nodes) n.remove();
+		};
+	}
+
+	async function captureScreenshot(): Promise<{
+		images: Screenshots;
+		components: AddedComponentSnapshot[];
+		removed: RemovedElementSnapshot[];
+	}> {
 		let stream: MediaStream | null = null;
 		const video = document.createElement('video');
+		let cleanupAnnotations: (() => void) | null = null;
+		const components = snapshotAddedComponents();
+		const removed = snapshotRemovedElements();
 
 		const w = window.innerWidth;
 		const h = window.innerHeight;
@@ -1375,6 +1640,7 @@
 			// Capture the current tab via Screen Capture API
 			submitStatus = 'waiting-for-capture';
 			toolbarHiddenForCapture = true;
+			cleanupAnnotations = mountCaptureAnnotations();
 			await waitForNextPaint();
 			await waitForNextPaint();
 
@@ -1407,10 +1673,11 @@
 			const png = stripDataUrlPrefix(canvas.toDataURL('image/png'));
 			canvas.width = 0;
 			canvas.height = 0;
-			return { webp, png };
+			return { images: { webp, png }, components, removed };
 		} finally {
 			stream?.getTracks().forEach((track) => track.stop());
 			video.srcObject = null;
+			cleanupAnnotations?.();
 			toolbarHiddenForCapture = false;
 		}
 	}
@@ -1571,7 +1838,7 @@
 			return;
 		}
 		try {
-			const image = await captureScreenshot();
+			const { images, components, removed } = await captureScreenshot();
 			submitStatus = 'uploading';
 			// Snapshot viewport + scroll after capture so the numbers line up with
 			// the frame agents will read. buildDrawingHints reads the same window
@@ -1584,11 +1851,13 @@
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({
 					url: currentPageUrl,
-					image,
+					image: images,
 					drawings,
 					hints,
 					viewport,
-					scroll
+					scroll,
+					...(components.length > 0 ? { components } : {}),
+					...(removed.length > 0 ? { removed } : {})
 				})
 			});
 
@@ -2093,6 +2362,7 @@
 				onaddcomponent={startPlacingComponent}
 				oncancelplacement={cancelPlacingComponent}
 				onapplyprops={applyAddedProps}
+				onremoveselected={removeSelectedElement}
 			/>
 
 			{#if inspectingLayout}
