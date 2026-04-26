@@ -16,15 +16,28 @@
 	const btnSize = $derived(size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon');
 </script>
 
-<Button
-	variant="solid"
-	size={btnSize}
-	type="button"
-	aria-expanded={ctx.open}
-	data-state={ctx.open ? 'open' : 'closed'}
-	data-float-button-trigger
-	onclick={() => ctx.toggle()}
-	{...rest}
->
-	{@render children()}
-</Button>
+<div class="trigger-slot">
+	<Button
+		variant="solid"
+		size={btnSize}
+		type="button"
+		aria-expanded={ctx.open}
+		aria-controls={ctx.menuId}
+		data-state={ctx.open ? 'open' : 'closed'}
+		data-float-button-trigger
+		onclick={() => ctx.toggle()}
+		{...rest}
+	>
+		{@render children()}
+	</Button>
+</div>
+
+<style>
+	.trigger-slot {
+		display: grid;
+		/* `order` lets the trigger sit visually last (closest to the anchored
+		   corner) while keeping it first in the DOM for keyboard focus order.
+		   Auto-flow places the actions in rows 1..n above it. */
+		order: 1;
+	}
+</style>

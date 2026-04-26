@@ -11,8 +11,8 @@
 		</p>
 	</div>
 
-	<FloatButton.Root>
-		<FloatButton.Trigger>+</FloatButton.Trigger>
+	<FloatButton.Root open>
+		<FloatButton.Trigger aria-label="Compose">+</FloatButton.Trigger>
 		<FloatButton.Action>New thread</FloatButton.Action>
 		<FloatButton.Action>Invite teammate</FloatButton.Action>
 		<FloatButton.Action>Schedule message</FloatButton.Action>
