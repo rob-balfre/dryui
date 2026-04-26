@@ -8,6 +8,7 @@
 		AppFrame,
 		Badge,
 		Button,
+		ColorPicker,
 		Container,
 		OptionPicker,
 		Popover,
@@ -20,6 +21,7 @@
 	import {
 		wizardState,
 		setBrandHsb,
+		setBaseHue,
 		setPersonality,
 		setFontPreset,
 		setTypeScale,
@@ -30,12 +32,13 @@
 		applyRecipe,
 		decodeRecipe,
 		hsbToHsl,
+		hslToHsb,
+		hexToHsl,
 		hslToHex,
 		resetToDefaults,
 		downloadCss,
 		copyCss,
 		contrastBetweenCssColors,
-		PRESETS,
 		RECIPE_PRESETS,
 		FONT_STACKS,
 		type BrandInput,
@@ -52,8 +55,7 @@
 		SlidersHorizontal,
 		RotateCcw,
 		ChevronUp,
-		Info,
-		Shuffle
+		Info
 	} from 'lucide-svelte';
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import Logo from '$lib/components/Logo.svelte';
@@ -174,62 +176,35 @@
 		}
 	}
 
-	function getSelectedBrandPresetName(): string {
-		return (
-			PRESETS.find((preset) => isSameBrand(wizardState.brandHsb, preset.brandInput))?.name ?? ''
-		);
+	function getAccentHex(): string {
+		const { h, s, b } = wizardState.brandHsb;
+		const hsl = hsbToHsl(h, s / 100, b / 100);
+		return hslToHex(hsl.h, hsl.s, hsl.l);
 	}
 
-	function applyBrandPresetName(name: string) {
-		const preset = PRESETS.find((candidate) => candidate.name === name);
-		if (preset) {
-			setBrandHsb(preset.brandInput.h, preset.brandInput.s, preset.brandInput.b);
+	function setAccentHex(hex: string): void {
+		try {
+			const hsl = hexToHsl(hex);
+			const hsb = hslToHsb(hsl.h, hsl.s, hsl.l);
+			setBrandHsb(Math.round(hsb.h), Math.round(hsb.s * 100), Math.round(hsb.b * 100));
+		} catch {
+			// Ignore malformed hex strings emitted mid-drag.
 		}
 	}
 
-	function applyRandomBrandPreset() {
-		const current = getSelectedBrandPresetName();
-		const candidates = PRESETS.filter((preset) => preset.name !== current);
-		const preset = candidates[Math.floor(Math.random() * candidates.length)] ?? PRESETS[0];
-		if (preset) {
-			applyBrandPresetName(preset.name);
-		}
+	const BASE_DISPLAY_S = 0.55;
+	const BASE_DISPLAY_L = 0.55;
+
+	function getBaseHex(): string {
+		return hslToHex(wizardState.baseHue, BASE_DISPLAY_S, BASE_DISPLAY_L);
 	}
 
-	function focusBrandPreset(name: string) {
-		if (!browser) return;
-
-		requestAnimationFrame(() => {
-			document
-				.querySelector<HTMLButtonElement>(`[data-accent-preset="${thumbSlug(name)}"]`)
-				?.focus();
-		});
-	}
-
-	function moveBrandPresetFocus(index: number, delta: number) {
-		const next = PRESETS[(index + delta + PRESETS.length) % PRESETS.length];
-		if (!next) return;
-
-		applyBrandPresetName(next.name);
-		focusBrandPreset(next.name);
-	}
-
-	function handleBrandPresetKeydown(event: KeyboardEvent, index: number) {
-		if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-			event.preventDefault();
-			moveBrandPresetFocus(index, 1);
-		}
-		if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-			event.preventDefault();
-			moveBrandPresetFocus(index, -1);
-		}
-		if (event.key === 'Home') {
-			event.preventDefault();
-			moveBrandPresetFocus(0, 0);
-		}
-		if (event.key === 'End') {
-			event.preventDefault();
-			moveBrandPresetFocus(PRESETS.length - 1, 0);
+	function setBaseHex(hex: string): void {
+		try {
+			const hsl = hexToHsl(hex);
+			setBaseHue(Math.round(hsl.h));
+		} catch {
+			// Ignore malformed hex strings emitted mid-drag.
 		}
 	}
 
@@ -393,7 +368,6 @@
 		fontOpen = false;
 	}
 
-	let activeAccentName = $derived(getSelectedBrandPresetName());
 	let activeFontName = $derived(wizardState.typography.fontPreset);
 	let activeRadius = $derived(wizardState.shape.radiusPreset);
 	let activeDensity = $derived(wizardState.shape.density);
@@ -536,67 +510,31 @@
 								<span>Accent</span>
 								<Info size={13} aria-hidden="true" />
 							</span>
-							<div class="rail-accent">
-								<div class="rail-accent-track" role="radiogroup" aria-label="Accent presets">
-									{#each PRESETS as preset, i (preset.name)}
-										{@const presetHex = brandHex(preset.brandInput)}
-										{@const isActivePreset = activeAccentName === preset.name}
-										<span
-											class="rail-accent-swatch"
-											data-selected={isActivePreset ? '' : undefined}
-										>
-											<Button
-												variant="bare"
-												role="radio"
-												aria-checked={isActivePreset}
-												aria-label={preset.name}
-												title={preset.name}
-												tabindex={isActivePreset || (!activeAccentName && i === 0) ? 0 : -1}
-												data-accent-preset={thumbSlug(preset.name)}
-												onclick={() => applyBrandPresetName(preset.name)}
-												onkeydown={(event) => handleBrandPresetKeydown(event, i)}
-												--dry-btn-bg="transparent"
-												--dry-btn-border="transparent"
-												--dry-btn-color="inherit"
-												--dry-btn-padding-x="0"
-												--dry-btn-padding-y="0"
-												--dry-btn-min-height="0"
-												--dry-btn-radius="9999px"
-												--dry-btn-active-transform="none"
-												--dry-focus-ring="none"
-											>
-												<span
-													class="rail-accent-dot"
-													aria-hidden="true"
-													{@attach cssVar('--_swatch', presetHex)}
-												></span>
-											</Button>
-										</span>
-									{/each}
-								</div>
-								<span class="rail-accent-shuffle">
-									<Button
-										variant="ghost"
-										size="sm"
-										aria-label="Random accent preset"
-										onclick={applyRandomBrandPreset}
-										--dry-btn-padding-x="var(--dry-space-1)"
-										--dry-btn-padding-y="var(--dry-space-1)"
-										--dry-btn-min-height="0"
-										--dry-btn-radius="9999px"
-									>
-										<Shuffle size={14} aria-hidden="true" />
-									</Button>
-								</span>
+							<div class="rail-color rail-color-accent">
+								<ColorPicker.Root bind:value={getAccentHex, setAccentHex}>
+									<ColorPicker.HueSlider />
+								</ColorPicker.Root>
 							</div>
 						</div>
 
 						<div class="rail-module">
-							<span class="rail-label" id="rail-base-label">
+							<span class="rail-label">
 								<span>Base</span>
 								<Info size={13} aria-hidden="true" />
 							</span>
-							<div class="wizard-option-scope rail-segmented rail-base-segmented">
+							<div class="rail-color rail-color-base">
+								<ColorPicker.Root bind:value={getBaseHex, setBaseHex}>
+									<ColorPicker.HueSlider />
+								</ColorPicker.Root>
+							</div>
+						</div>
+
+						<div class="rail-module">
+							<span class="rail-label" id="rail-depth-label">
+								<span>Depth</span>
+								<Info size={13} aria-hidden="true" />
+							</span>
+							<div class="wizard-option-scope rail-segmented rail-depth-segmented">
 								<OptionPicker.Root
 									columns={4}
 									bind:value={() => wizardState.personality, setBasePanelValue}
@@ -609,7 +547,7 @@
 											aria-label={opt.label}
 											title={opt.hint}
 										>
-											<span class="rail-base-letter" aria-hidden="true">{opt.label[0]}</span>
+											<span class="rail-depth-letter" aria-hidden="true">{opt.label[0]}</span>
 											<VisuallyHidden>{opt.label}</VisuallyHidden>
 										</OptionPicker.Item>
 									{/each}
@@ -1032,12 +970,11 @@
 
 	.rail-modules {
 		display: grid;
-		grid-template-columns: minmax(13rem, 19rem) minmax(9rem, 12rem) minmax(11rem, 15rem) minmax(
-				10rem,
-				13rem
-			);
+		grid-template-columns:
+			minmax(10rem, 14rem) minmax(10rem, 14rem) minmax(8rem, 11rem) minmax(10rem, 13rem)
+			minmax(9rem, 12rem);
 		align-items: end;
-		gap: var(--dry-space-4);
+		gap: var(--dry-space-3);
 	}
 
 	.rail-module {
@@ -1156,86 +1093,19 @@
 		background: currentColor;
 	}
 
-	.rail-accent {
+	.rail-color {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
 		grid-template-rows: var(--rail-h);
 		align-items: center;
-		gap: var(--dry-space-2);
-		padding-inline: var(--dry-space-3);
-		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg-raised) 84%, var(--dry-color-bg-base) 16%);
-		border: 1px solid
-			color-mix(in srgb, var(--dry-color-stroke-strong) 72%, var(--dry-color-stroke-weak) 28%);
+		--dry-color-picker-slider-track-height: 1.25rem;
+		--dry-color-picker-slider-thumb-size: 1.125rem;
 	}
 
-	.rail-accent-track {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: minmax(0, 1fr);
-		align-items: center;
-		justify-items: center;
-		gap: var(--dry-space-1);
-	}
-
-	.rail-accent-swatch {
-		display: inline-grid;
-		grid-template-columns: 1.75rem;
-		grid-template-rows: 1.75rem;
-		place-items: center;
-		isolation: isolate;
-		transition: transform var(--dry-duration-fast, 100ms) ease;
-	}
-
-	.rail-accent-swatch:hover,
-	.rail-accent-swatch:focus-within {
-		transform: translateY(-1px);
-	}
-
-	.rail-accent-dot {
-		display: grid;
-		grid-template-columns: 1.25rem;
-		grid-template-rows: 1.25rem;
-		border-radius: 50%;
-		background: var(--_swatch, var(--dry-color-fill-brand));
-		box-shadow:
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
-			0 0 0 0 transparent;
-		transition: box-shadow var(--dry-duration-fast, 100ms) ease;
-	}
-
-	.rail-accent-swatch:hover .rail-accent-dot,
-	.rail-accent-swatch:focus-within .rail-accent-dot {
-		box-shadow:
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
-			0 0 0 2px color-mix(in srgb, var(--dry-color-text-strong) 28%, transparent 72%);
-	}
-
-	.rail-accent-swatch[data-selected] .rail-accent-dot {
-		box-shadow:
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
-			0 0 0 2px var(--dry-color-bg-raised),
-			0 0 0 4px color-mix(in srgb, var(--dry-color-text-strong) 70%, transparent 30%);
-	}
-
-	.rail-accent-shuffle {
-		display: inline-grid;
-		place-items: center;
-		color: var(--dry-color-text-weak);
-		opacity: 0.7;
-		transition: opacity var(--dry-duration-fast, 100ms) ease;
-	}
-
-	.rail-accent-shuffle:hover,
-	.rail-accent-shuffle:focus-within {
-		opacity: 1;
-	}
-
-	.rail-base-segmented {
+	.rail-depth-segmented {
 		--dry-option-picker-padding-x: var(--dry-space-1);
 	}
 
-	.rail-base-letter {
+	.rail-depth-letter {
 		display: inline-grid;
 		font-size: 0.875rem;
 		font-weight: 650;

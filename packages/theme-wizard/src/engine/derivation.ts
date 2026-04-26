@@ -27,6 +27,11 @@ export interface BrandInput {
 
 export interface ThemeOptions {
 	neutralMode?: 'monochromatic' | 'neutral';
+	/**
+	 * Hue used to tint neutrals when neutralMode is 'monochromatic'.
+	 * Defaults to the brand hue, so existing themes are unchanged.
+	 */
+	neutralHue?: number;
 	brandCandidates?: BrandInput[];
 	statusHues?: {
 		error?: number;
@@ -1093,6 +1098,7 @@ function buildLiteralTransparentPrimitiveLadders(
 ): LiteralTransparentPrimitiveLadders {
 	const neutralMode = options?.neutralMode ?? 'monochromatic';
 	const interactiveBrand = brandPolicy.interactive.resolvedInput;
+	const neutralHue = normalizeHue(options?.neutralHue ?? interactiveBrand.h);
 	const statusHues = {
 		error: options?.statusHues?.error ?? 0,
 		warning: options?.statusHues?.warning ?? 40,
@@ -1112,8 +1118,8 @@ function buildLiteralTransparentPrimitiveLadders(
 
 	return {
 		neutral: {
-			light: buildLiteralNeutralSteps(interactiveBrand.h, neutralMode, 'light'),
-			dark: buildLiteralNeutralSteps(interactiveBrand.h, neutralMode, 'dark')
+			light: buildLiteralNeutralSteps(neutralHue, neutralMode, 'light'),
+			dark: buildLiteralNeutralSteps(neutralHue, neutralMode, 'dark')
 		},
 		brand: {
 			light: buildLiteralToneSteps(brandLight),
@@ -1870,8 +1876,9 @@ export function generateThemeModel(brand: BrandInput, options?: ThemeOptions): T
 		brandPolicy,
 		options
 	);
+	const neutralHue = normalizeHue(options?.neutralHue ?? brandPolicy.interactive.resolvedInput.h);
 	const solidPrimitives = buildSolidPrimitiveLadders(
-		brandPolicy.interactive.resolvedInput.h,
+		neutralHue,
 		options?.neutralMode ?? 'monochromatic'
 	);
 	const interactionStates = buildInteractionStateRecipes(tokens);
@@ -1931,6 +1938,8 @@ export function generateTheme(brand: BrandInput, options?: ThemeOptions): ThemeT
 	const L = brandHsl.l;
 	const darkBrandBase = deriveDarkModeAccent(normH, normS, normB);
 	const neutralMode = options?.neutralMode ?? 'monochromatic';
+	// Hue used to tint neutrals — falls back to brand hue when not set.
+	const neutralH = normalizeHue(options?.neutralHue ?? interactiveBrand.h);
 
 	const light: Record<string, string> = {};
 	const dark: Record<string, string> = {};
@@ -1952,7 +1961,7 @@ export function generateTheme(brand: BrandInput, options?: ThemeOptions): ThemeT
 
 	for (const [name, alphas] of Object.entries(neutralAlphas)) {
 		const lightness = name === 'text-strong' ? 0.15 : 0.2;
-		const lightHue = neutralMode === 'neutral' ? 0 : H;
+		const lightHue = neutralMode === 'neutral' ? 0 : neutralH;
 		const lightSaturation = neutralMode === 'neutral' ? 0 : 1.0;
 		light[`--dry-color-${name}`] = hsla(lightHue, lightSaturation, lightness, alphas.light);
 		dark[`--dry-color-${name}`] = hsla(0, 0, 1.0, alphas.dark);
@@ -2089,21 +2098,23 @@ export function generateTheme(brand: BrandInput, options?: ThemeOptions): ThemeT
 	if (options?.darkBg?.base) {
 		dark['--dry-color-bg-base'] = options.darkBg.base;
 	} else {
-		dark['--dry-color-bg-base'] = neutralMode === 'neutral' ? hsl(0, 0, 0.1) : hsl(H, 0.3, 0.1);
+		dark['--dry-color-bg-base'] =
+			neutralMode === 'neutral' ? hsl(0, 0, 0.1) : hsl(neutralH, 0.3, 0.1);
 	}
 	if (options?.darkBg?.raised) {
 		dark['--dry-color-bg-raised'] = options.darkBg.raised;
 	} else {
 		dark['--dry-color-bg-raised'] =
-			neutralMode === 'neutral' ? hsl(0, 0, 0.15) : hsl(H, 0.25, 0.15);
+			neutralMode === 'neutral' ? hsl(0, 0, 0.15) : hsl(neutralH, 0.25, 0.15);
 	}
 	if (options?.darkBg?.overlay) {
 		dark['--dry-color-bg-overlay'] = options.darkBg.overlay;
 	} else {
-		dark['--dry-color-bg-overlay'] = neutralMode === 'neutral' ? hsl(0, 0, 0.2) : hsl(H, 0.2, 0.2);
+		dark['--dry-color-bg-overlay'] =
+			neutralMode === 'neutral' ? hsl(0, 0, 0.2) : hsl(neutralH, 0.2, 0.2);
 	}
 
-	const solidPrimitives = buildSolidPrimitiveLadders(interactiveBrand.h, neutralMode);
+	const solidPrimitives = buildSolidPrimitiveLadders(neutralH, neutralMode);
 	const lightTextStrong = requireLayerValue(light, '--dry-color-text-strong');
 	const lightTextWeak = requireLayerValue(light, '--dry-color-text-weak');
 	const lightStrokeStrong = requireLayerValue(light, '--dry-color-stroke-strong');

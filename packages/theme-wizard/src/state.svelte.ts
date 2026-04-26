@@ -36,6 +36,8 @@ const DEFAULTS = {
 	currentStep: 1,
 	personality: 'structured' as Personality,
 	brandHsb: { h: 230, s: 65, b: 85 } as BrandInput,
+	/** Hue used to tint neutrals when neutralMode is 'monochromatic'. Defaults to brand hue. */
+	baseHue: 230,
 	neutralMode: 'monochromatic' as NeutralMode,
 	statusHues: { error: 0, warning: 40, success: 145, info: 210 } as {
 		error: number;
@@ -90,6 +92,7 @@ function persistState(): void {
 				const {
 					personality,
 					brandHsb,
+					baseHue,
 					neutralMode,
 					statusHues,
 					darkBgOverrides,
@@ -107,6 +110,7 @@ function persistState(): void {
 					JSON.stringify({
 						personality,
 						brandHsb,
+						baseHue,
 						neutralMode,
 						statusHues,
 						darkBgOverrides,
@@ -130,6 +134,7 @@ export const wizardState = $state({
 	currentStep: initial.currentStep,
 	personality: initial.personality,
 	brandHsb: initial.brandHsb,
+	baseHue: initial.baseHue,
 	neutralMode: initial.neutralMode,
 	statusHues: initial.statusHues,
 	darkBgOverrides: initial.darkBgOverrides,
@@ -146,6 +151,7 @@ const derivedTheme: { value: ThemeTokens } = $derived.by(() => {
 	return {
 		value: generateTheme(wizardState.brandHsb, {
 			neutralMode: wizardState.neutralMode,
+			neutralHue: wizardState.baseHue,
 			statusHues: wizardState.statusHues,
 			darkBg: wizardState.darkBgOverrides
 		})
@@ -161,6 +167,12 @@ export function getDerivedTheme(): ThemeTokens {
 /** Update the brand color (h: 0-360, s/b: 0-100). */
 export function setBrandHsb(h: number, s: number, b: number): void {
 	wizardState.brandHsb = { h, s, b };
+	persistState();
+}
+
+/** Update the base hue used to tint neutrals (0-360). */
+export function setBaseHue(h: number): void {
+	wizardState.baseHue = h;
 	persistState();
 }
 
@@ -247,6 +259,7 @@ export function applyPreset(name: string): void {
 		throw new Error(`Unknown preset: "${name}"`);
 	}
 	wizardState.brandHsb = { ...preset.brandInput };
+	wizardState.baseHue = preset.brandInput.h;
 	persistState();
 }
 
@@ -279,6 +292,7 @@ export function resetToDefaults(): void {
 	wizardState.currentStep = DEFAULTS.currentStep;
 	wizardState.personality = DEFAULTS.personality;
 	wizardState.brandHsb = { ...DEFAULTS.brandHsb };
+	wizardState.baseHue = DEFAULTS.baseHue;
 	resetStyleStateToDefaults();
 	wizardState.fastTrack = DEFAULTS.fastTrack;
 	if (typeof sessionStorage !== 'undefined') {
@@ -290,6 +304,7 @@ export function resetToDefaults(): void {
 export function applyRecipe(recipe: WizardRecipe): void {
 	wizardState.currentStep = DEFAULTS.currentStep;
 	wizardState.brandHsb = { ...recipe.brand };
+	wizardState.baseHue = recipe.brand.h;
 	resetStyleStateToDefaults();
 	wizardState.neutralMode = recipe.neutralMode ?? DEFAULTS.neutralMode;
 	wizardState.statusHues = { ...DEFAULTS.statusHues, ...recipe.statusHues };

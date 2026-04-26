@@ -9,6 +9,7 @@ export {
 	wizardState,
 	getDerivedTheme,
 	setBrandHsb,
+	setBaseHue,
 	setStep,
 	goNextStep,
 	goPrevStep,
