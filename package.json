@@ -19,6 +19,7 @@
     "test:browser": "vitest --browser --run tests/browser",
     "test:docs-visual": "bun --bun playwright test -c playwright.docs.config.ts",
     "test:docs-visual:update": "bun --bun playwright test -c playwright.docs.config.ts --update-snapshots",
+    "test:feedback-bounds": "bun --bun playwright test -c playwright.feedback.config.ts",
     "test": "bun run test:unit && bun run test:browser",
     "test:coverage:unit": "bun run ./scripts/test-unit.ts --coverage --coverage-reporter=text --coverage-reporter=lcov --coverage-dir=coverage/unit",
     "test:coverage:browser": "vitest --browser --run --coverage --coverage.provider=v8 --coverage.reportsDirectory=coverage/browser --coverage.reporter=text --coverage.reporter=html --coverage.reporter=json-summary tests/browser",

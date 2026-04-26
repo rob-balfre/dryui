@@ -14,10 +14,12 @@ import type {
 	SessionStatus,
 	SessionWithAnnotations,
 	Submission,
+	SubmissionAddedComponent,
 	SubmissionAgent,
 	SubmissionDrawing,
 	SubmissionDrawingHint,
 	SubmissionQueryStatus,
+	SubmissionRemovedElement,
 	SubmissionScrollOffset,
 	SubmissionStatus,
 	ThreadMessage,
@@ -87,6 +89,8 @@ interface SubmissionRow {
 	screenshot_png_path: string | null;
 	drawings: string;
 	hints: string | null;
+	components: string | null;
+	removed: string | null;
 	viewport: string | null;
 	scroll: string | null;
 	status: SubmissionStatus;
@@ -179,6 +183,8 @@ function toAnnotation(row: AnnotationRow): Annotation {
 function toSubmission(row: SubmissionRow): Submission {
 	const agent = normalizeAgent(row.agent);
 	const hints = parseJson<SubmissionDrawingHint[]>(row.hints);
+	const components = parseJson<SubmissionAddedComponent[]>(row.components);
+	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
 	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
 	return {
 		id: row.id,
@@ -191,6 +197,8 @@ function toSubmission(row: SubmissionRow): Submission {
 		},
 		drawings: parseJson<SubmissionDrawing[]>(row.drawings) ?? [],
 		...(hints ? { hints } : {}),
+		...(components && components.length > 0 ? { components } : {}),
+		...(removed && removed.length > 0 ? { removed } : {}),
 		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
 		...(scroll !== undefined ? { scroll } : {}),
 		status: row.status as SubmissionStatus,
@@ -292,6 +300,8 @@ export class FeedbackStore {
         screenshot_png_path TEXT,
         drawings TEXT NOT NULL DEFAULT '[]',
         hints TEXT,
+        components TEXT,
+        removed TEXT,
         viewport TEXT,
         scroll TEXT,
         status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
@@ -315,6 +325,8 @@ export class FeedbackStore {
 		// submissions populate all four.
 		ensureColumn(this.db, 'submissions', 'screenshot_png_path', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'components', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'removed', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
 
@@ -595,12 +607,14 @@ export class FeedbackStore {
 		const now = createTimestamp();
 		const agent = normalizeAgent(input.agent);
 		const hints = input.hints ?? [];
+		const components = input.components ?? [];
+		const removed = input.removed ?? [];
 		const workspace = context.workspace ?? null;
 		this.db
 			.query(
 				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, viewport, scroll, status, created_at, agent, workspace
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
+					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, viewport, scroll, status, created_at, agent, workspace
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
 			)
 			.run(
 				id,
@@ -609,6 +623,8 @@ export class FeedbackStore {
 				pngPath,
 				JSON.stringify(input.drawings),
 				hints.length > 0 ? JSON.stringify(hints) : null,
+				components.length > 0 ? JSON.stringify(components) : null,
+				removed.length > 0 ? JSON.stringify(removed) : null,
 				input.viewport ? JSON.stringify(input.viewport) : null,
 				input.scroll ? JSON.stringify(input.scroll) : null,
 				now,
@@ -622,6 +638,8 @@ export class FeedbackStore {
 			screenshotPath: { webp: webpPath, png: pngPath },
 			drawings: input.drawings,
 			...(hints.length > 0 ? { hints } : {}),
+			...(components.length > 0 ? { components } : {}),
+			...(removed.length > 0 ? { removed } : {}),
 			viewport: input.viewport ?? null,
 			...(input.scroll ? { scroll: input.scroll } : {}),
 			status: 'pending',

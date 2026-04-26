@@ -41,6 +41,22 @@
 		return el.dataset.dryuiAddedId !== undefined;
 	}
 
+	function tooltipLabelFor(el: HTMLElement): string {
+		if (isAddedPlaceholder(el)) {
+			const fallback = el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+			const kind = fallback?.textContent?.trim();
+			if (kind) return kind;
+		}
+		const tag = el.tagName.toLowerCase();
+		if (el.id) return `${tag}#${el.id}`;
+		// Skip framework-scoped class hashes (Svelte: svelte-xxxxxx, CSS modules: _foo_xxxxx).
+		const cls = Array.from(el.classList).find(
+			(c) => !c.startsWith('svelte-') && !c.startsWith('_')
+		);
+		if (cls) return `${tag}.${cls}`;
+		return tag;
+	}
+
 	function isGridContainer(cs: CSSStyleDeclaration): boolean {
 		return cs.display === 'grid' || cs.display === 'inline-grid';
 	}
@@ -289,6 +305,7 @@
 			<div
 				class="layout-box layout-box-selected"
 				data-role={box.role}
+				data-tooltip={tooltipLabelFor(box.el)}
 				style:left="{box.x}px"
 				style:top="{box.y}px"
 				style:width="{box.w}px"
@@ -322,6 +339,7 @@
 				class="layout-box"
 				type="button"
 				data-role={box.role}
+				data-tooltip={tooltipLabelFor(box.el)}
 				style:left="{box.x}px"
 				style:top="{box.y}px"
 				style:width="{box.w}px"
@@ -370,6 +388,44 @@
 
 	.layout-box:hover {
 		background: hsl(25 100% 55% / 0.1);
+	}
+
+	.layout-box[data-tooltip]::after,
+	.layout-box-selected[data-tooltip]::after {
+		content: attr(data-tooltip);
+		position: absolute;
+		top: -22px;
+		left: 0;
+		z-index: 2;
+		max-inline-size: 240px;
+		padding: 3px 6px;
+		border-radius: 4px;
+		background: hsl(25 100% 55%);
+		color: black;
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 10px;
+		font-weight: 700;
+		letter-spacing: 0.02em;
+		line-height: 14px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		pointer-events: none;
+		box-shadow: 0 2px 6px hsl(0 0% 0% / 0.4);
+		opacity: 0;
+		transform: translateY(2px);
+		transition:
+			opacity 0.12s ease-out,
+			transform 0.12s ease-out;
+	}
+
+	.layout-box[data-tooltip]:hover::after,
+	.layout-box-selected[data-tooltip]::after {
+		opacity: 1;
+		transform: translateY(0);
 	}
 
 	.layout-box-selected {

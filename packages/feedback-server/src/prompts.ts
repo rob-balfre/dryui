@@ -28,10 +28,12 @@ Use the dryui-feedback MCP server:
 1. Call feedback_get_submissions to fetch the latest submission details
 2. Read the screenshot at screenshotPath.png (fallback to screenshotPath.webp) to see what the user annotated
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. ${FEEDBACK_PIPELINE_PROMPT_STEP}
-5. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-6. ${FEEDBACK_LINTER_PROMPT_STEP}
-7. Call feedback_resolve_submission with id "${s.id}" once resolved${notes}`;
+4. If the submission has a components array, treat each entry as a placement intent: kind is the DryUI component to add at rect (viewport coords), label/props capture the user's chosen configuration. Outline + chip overlays in the screenshot mark these placements
+5. If the submission has a removed array, treat each entry as a removal intent: tag/selector identify the page element the user wants gone. Dashed red outlines in the screenshot mark these removals
+6. ${FEEDBACK_PIPELINE_PROMPT_STEP}
+7. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
+8. ${FEEDBACK_LINTER_PROMPT_STEP}
+9. Call feedback_resolve_submission with id "${s.id}" once resolved${notes}`;
 }
 
 export function buildFeedbackBulkPrompt(): string {
@@ -41,8 +43,10 @@ Use the dryui-feedback MCP server:
 1. Call feedback_get_submissions to list pending submissions
 2. For each submission, read the screenshot at screenshotPath.png (fallback to screenshotPath.webp)
 3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. ${FEEDBACK_PIPELINE_PROMPT_STEP}
-5. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-6. ${FEEDBACK_LINTER_PROMPT_STEP}
-7. Call feedback_resolve_submission with the submission id after each fix is complete`;
+4. If the submission has a components array, treat each entry as a placement intent: kind is the DryUI component to add at rect (viewport coords), label/props capture the user's chosen configuration. Outline + chip overlays in the screenshot mark these placements
+5. If the submission has a removed array, treat each entry as a removal intent: tag/selector identify the page element the user wants gone. Dashed red outlines in the screenshot mark these removals
+6. ${FEEDBACK_PIPELINE_PROMPT_STEP}
+7. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
+8. ${FEEDBACK_LINTER_PROMPT_STEP}
+9. Call feedback_resolve_submission with the submission id after each fix is complete`;
 }

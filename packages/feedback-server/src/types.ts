@@ -206,6 +206,21 @@ export interface SubmissionScreenshotPaths {
 	png: string;
 }
 
+export interface SubmissionAddedComponent {
+	id: string;
+	kind: string;
+	label?: string;
+	props?: Record<string, unknown>;
+	rect: { x: number; y: number; width: number; height: number };
+}
+
+export interface SubmissionRemovedElement {
+	tag: string;
+	id?: string;
+	selector?: string;
+	rect: { x: number; y: number; width: number; height: number };
+}
+
 /**
  * New submissions always carry both WebP and PNG paths. Legacy rows that only
  * have a WebP file populate `webp` with the existing path and leave `png` as an
@@ -217,6 +232,8 @@ export interface Submission {
 	screenshotPath: SubmissionScreenshotPaths;
 	drawings: SubmissionDrawing[];
 	hints?: SubmissionDrawingHint[];
+	components?: SubmissionAddedComponent[];
+	removed?: SubmissionRemovedElement[];
 	viewport: { width: number; height: number } | null;
 	scroll?: SubmissionScrollOffset | null;
 	status: SubmissionStatus;
@@ -236,6 +253,8 @@ export interface CreateSubmissionInput {
 	image: CreateSubmissionImageInput;
 	drawings: SubmissionDrawing[];
 	hints?: SubmissionDrawingHint[];
+	components?: SubmissionAddedComponent[];
+	removed?: SubmissionRemovedElement[];
 	viewport?: { width: number; height: number };
 	scroll?: SubmissionScrollOffset;
 	agent?: SubmissionAgent;

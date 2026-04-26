@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { AlertDialog } from '@dryui/ui';
 	import {
 		ArrowLeft,
 		Check,
@@ -14,6 +15,7 @@
 		Search,
 		Send,
 		Settings,
+		Trash2,
 		Type,
 		Undo2
 	} from 'lucide-svelte';
@@ -54,6 +56,7 @@
 		onaddcomponent?: (kind: string) => void;
 		oncancelplacement?: () => void;
 		onapplyprops?: (label: string, propsJson: string) => void;
+		onremoveselected?: () => void;
 	}
 
 	let {
@@ -80,7 +83,8 @@
 		ondeselect,
 		onaddcomponent,
 		oncancelplacement,
-		onapplyprops
+		onapplyprops,
+		onremoveselected
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'layout');
@@ -159,6 +163,19 @@
 	$effect(() => {
 		if (placing) pickerOpen = false;
 	});
+
+	let removeConfirmOpen = $state(false);
+
+	$effect(() => {
+		if (!hasSelection) removeConfirmOpen = false;
+	});
+
+	const removeLabel = $derived(addedKind ? `this ${addedKind}` : 'this element');
+
+	function confirmRemove() {
+		removeConfirmOpen = false;
+		onremoveselected?.();
+	}
 
 	let propsPanelOpen = $state(false);
 	let propsLabelInput = $state('');
@@ -317,6 +334,41 @@
 			updatePillPosition();
 		});
 	}
+
+	let popoverPlacement = $state<'top' | 'bottom'>('top');
+	const POPOVER_HEIGHT = 380;
+	const POPOVER_GAP = 16;
+
+	function updatePopoverPlacement() {
+		if (!toolbarEl) return;
+		const rect = toolbarEl.getBoundingClientRect();
+		const spaceAbove = rect.top - POPOVER_GAP;
+		const spaceBelow = window.innerHeight - rect.bottom - POPOVER_GAP;
+		const next: 'top' | 'bottom' =
+			spaceAbove < POPOVER_HEIGHT && spaceBelow > spaceAbove ? 'bottom' : 'top';
+		if (next !== popoverPlacement) popoverPlacement = next;
+	}
+
+	let popoverFrame = 0;
+	function schedulePopoverUpdate() {
+		if (popoverFrame) return;
+		popoverFrame = requestAnimationFrame(() => {
+			popoverFrame = 0;
+			updatePopoverPlacement();
+		});
+	}
+
+	$effect(() => {
+		if (!pickerOpen && !propsPanelOpen) return;
+		updatePopoverPlacement();
+		window.addEventListener('resize', schedulePopoverUpdate);
+		window.addEventListener('scroll', schedulePopoverUpdate, true);
+		return () => {
+			if (popoverFrame) cancelAnimationFrame(popoverFrame);
+			window.removeEventListener('resize', schedulePopoverUpdate);
+			window.removeEventListener('scroll', schedulePopoverUpdate, true);
+		};
+	});
 
 	$effect(() => {
 		if (!inspecting) return;
@@ -487,7 +539,7 @@
 		>
 			{#if showLayoutTools}
 				{#if addedKind}
-					<div class="add-wrap">
+					<div class="add-wrap" data-placement={popoverPlacement}>
 						<button
 							class="tool-btn"
 							type="button"
@@ -603,7 +655,7 @@
 					</div>
 				{/if}
 
-				<div class="add-wrap">
+				<div class="add-wrap" data-placement={popoverPlacement}>
 					<button
 						class="tool-btn"
 						type="button"
@@ -660,6 +712,32 @@
 				</div>
 
 				{#if hasSelection}
+					<AlertDialog.Root bind:open={removeConfirmOpen}>
+						<AlertDialog.Trigger>
+							<button
+								class="tool-btn"
+								type="button"
+								data-tooltip="Remove"
+								aria-label={addedKind ? `Remove ${addedKind}` : 'Remove element'}
+							>
+								<Trash2 size={16} />
+							</button>
+						</AlertDialog.Trigger>
+						<AlertDialog.Overlay />
+						<AlertDialog.Content>
+							<AlertDialog.Header>Remove {removeLabel}?</AlertDialog.Header>
+							<AlertDialog.Body>
+								{addedKind
+									? 'The placement disappears from the layout. Undo restores it.'
+									: 'The element is hidden from this view and the captured screenshot. Undo restores it.'}
+							</AlertDialog.Body>
+							<AlertDialog.Footer>
+								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+								<AlertDialog.Action onclick={confirmRemove}>Remove</AlertDialog.Action>
+							</AlertDialog.Footer>
+						</AlertDialog.Content>
+					</AlertDialog.Root>
+
 					<button
 						class="tool-btn"
 						type="button"
@@ -1025,6 +1103,12 @@
 		backdrop-filter: blur(8px);
 		box-shadow: var(--pill-shadow);
 		z-index: 10001;
+	}
+
+	.add-wrap[data-placement='bottom'] .component-picker,
+	.add-wrap[data-placement='bottom'] .props-panel {
+		top: calc(100% + 10px);
+		bottom: auto;
 	}
 
 	.component-picker-search {
