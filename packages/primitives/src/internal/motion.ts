@@ -1,7 +1,7 @@
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const registeredProperties = new Set<string>();
 
-interface RegisteredPropertyDefinition {
+export interface RegisteredPropertyDefinition {
 	name: string;
 	syntax: string;
 	inherits: boolean;

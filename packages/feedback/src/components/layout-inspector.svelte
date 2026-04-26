@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Button } from '@dryui/ui';
 	import { onMount } from 'svelte';
 
 	interface Props {
@@ -120,6 +121,10 @@
 		return true;
 	}
 
+	function boxStyle(box: Pick<Box, 'x' | 'y' | 'w' | 'h'>): string {
+		return `left: ${box.x}px; top: ${box.y}px; width: ${box.w}px; height: ${box.h}px;`;
+	}
+
 	let rebuildFrame = 0;
 	function scheduleRebuild() {
 		if (rebuildFrame) return;
@@ -162,11 +167,6 @@
 	};
 
 	let manipulating: ManipulationStart | null = null;
-
-	$effect(() => {
-		void cloneElement;
-		scheduleRebuild();
-	});
 
 	function parseStyle(value: string, fallback: number): number {
 		const parsed = parseFloat(value);
@@ -311,42 +311,59 @@
 				style:width="{box.w}px"
 				style:height="{box.h}px"
 			>
-				<button
+				<Button
 					class="layout-handle layout-handle-body"
+					variant="bare"
+					size="sm"
+					color={null}
 					type="button"
 					aria-label="Move element"
 					onpointerdown={(e) => startGesture(e, { kind: 'move' })}
-				></button>
-				{#each EDGES as edge}
-					<button
+				>
+					<span hidden>Move element</span>
+				</Button>
+				{#each EDGES as edge (edge)}
+					<Button
 						class="layout-handle layout-handle-edge layout-handle-edge-{edge}"
+						variant="bare"
+						size="sm"
+						color={null}
 						type="button"
 						aria-label="Resize {edge} edge"
 						onpointerdown={(e) => startGesture(e, { kind: 'resize', edge })}
-					></button>
+					>
+						<span hidden>Resize {edge} edge</span>
+					</Button>
 				{/each}
-				{#each CORNERS as corner}
-					<button
+				{#each CORNERS as corner (corner)}
+					<Button
 						class="layout-handle layout-handle-corner layout-handle-corner-{corner}"
+						variant="bare"
+						size="sm"
+						color={null}
 						type="button"
 						aria-label="Rotate from {corner} corner"
 						onpointerdown={(e) => startGesture(e, { kind: 'rotate' })}
-					></button>
+					>
+						<span hidden>Rotate from {corner} corner</span>
+					</Button>
 				{/each}
 			</div>
 		{:else}
-			<button
+			<Button
 				class="layout-box"
+				variant="bare"
+				size="sm"
+				color={null}
 				type="button"
 				data-role={box.role}
 				data-tooltip={tooltipLabelFor(box.el)}
-				style:left="{box.x}px"
-				style:top="{box.y}px"
-				style:width="{box.w}px"
-				style:height="{box.h}px"
+				style={boxStyle(box)}
 				aria-label={`Select ${box.role} ${box.el.tagName.toLowerCase()}`}
 				onclick={(e) => handleSelect(e, box)}
-			></button>
+			>
+				<span hidden>Select {box.role} {box.el.tagName.toLowerCase()}</span>
+			</Button>
 		{/if}
 	{/each}
 </div>
@@ -363,7 +380,16 @@
 		pointer-events: auto;
 	}
 
-	.layout-box {
+	.layout-box,
+	.layout-inspector :global(.layout-box[data-dry-button]) {
+		--dry-btn-active-transform: none;
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: inherit;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 0;
+		--dry-btn-padding-y: 0;
+		--dry-btn-radius: 0;
 		position: fixed;
 		padding: 0;
 		margin: 0;
@@ -373,25 +399,32 @@
 		cursor: pointer;
 		font: inherit;
 		color: inherit;
+		min-height: 0;
+		box-shadow: none;
+		text-decoration: none;
 	}
 
-	.layout-box[data-role='container'] {
+	.layout-box[data-role='container'],
+	.layout-inspector :global(.layout-box[data-role='container']) {
 		outline: 2px solid hsl(25 100% 55%);
 		outline-offset: -1px;
 		background: hsl(25 100% 55% / 0.04);
 	}
 
-	.layout-box[data-role='cell'] {
+	.layout-box[data-role='cell'],
+	.layout-inspector :global(.layout-box[data-role='cell']) {
 		outline: 1px dashed hsl(25 100% 55% / 0.5);
 		outline-offset: -0.5px;
 	}
 
-	.layout-box:hover {
+	.layout-box:hover,
+	.layout-inspector :global(.layout-box:hover) {
 		background: hsl(25 100% 55% / 0.1);
 	}
 
 	.layout-box[data-tooltip]::after,
-	.layout-box-selected[data-tooltip]::after {
+	.layout-box-selected[data-tooltip]::after,
+	.layout-inspector :global(.layout-box[data-tooltip])::after {
 		content: attr(data-tooltip);
 		position: absolute;
 		top: -22px;
@@ -423,7 +456,8 @@
 	}
 
 	.layout-box[data-tooltip]:hover::after,
-	.layout-box-selected[data-tooltip]::after {
+	.layout-box-selected[data-tooltip]::after,
+	.layout-inspector :global(.layout-box[data-tooltip]:hover)::after {
 		opacity: 1;
 		transform: translateY(0);
 	}
@@ -439,17 +473,27 @@
 		outline-style: solid;
 	}
 
-	.layout-inspector[data-has-selection] .layout-box:not(.layout-box-selected) {
+	.layout-inspector[data-has-selection] .layout-box:not(.layout-box-selected),
+	.layout-inspector[data-has-selection] :global(.layout-box[data-dry-button]) {
 		outline: none;
 		background: transparent;
 		pointer-events: none;
 	}
 
-	.layout-box:focus-visible {
+	.layout-box:focus-visible,
+	.layout-inspector :global(.layout-box:focus-visible) {
 		outline-color: hsl(25 100% 67%);
 	}
 
-	.layout-handle {
+	.layout-inspector :global(.layout-handle) {
+		--dry-btn-active-transform: none;
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: inherit;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 0;
+		--dry-btn-padding-y: 0;
+		--dry-btn-radius: 0;
 		position: absolute;
 		padding: 0;
 		margin: 0;
@@ -457,18 +501,33 @@
 		background: transparent;
 		font: inherit;
 		color: inherit;
+		min-height: 0;
+		box-shadow: none;
+		text-decoration: none;
 	}
 
-	.layout-handle-body {
+	.layout-inspector
+		:global(.layout-box[data-dry-button][data-variant='bare']:hover:not([data-disabled])),
+	.layout-inspector
+		:global(.layout-box[data-dry-button][data-variant='bare']:active:not([data-disabled])),
+	.layout-inspector
+		:global(.layout-handle[data-dry-button][data-variant='bare']:hover:not([data-disabled])),
+	.layout-inspector
+		:global(.layout-handle[data-dry-button][data-variant='bare']:active:not([data-disabled])) {
+		opacity: 1;
+		transform: none;
+	}
+
+	.layout-inspector :global(.layout-handle-body) {
 		inset: 0;
 		cursor: move;
 	}
 
-	.layout-handle-edge {
+	.layout-inspector :global(.layout-handle-edge) {
 		background: transparent;
 	}
 
-	.layout-handle-edge-top {
+	.layout-inspector :global(.layout-handle-edge-top) {
 		top: -4px;
 		left: 8px;
 		right: 8px;
@@ -476,7 +535,7 @@
 		cursor: ns-resize;
 	}
 
-	.layout-handle-edge-bottom {
+	.layout-inspector :global(.layout-handle-edge-bottom) {
 		bottom: -4px;
 		left: 8px;
 		right: 8px;
@@ -484,7 +543,7 @@
 		cursor: ns-resize;
 	}
 
-	.layout-handle-edge-left {
+	.layout-inspector :global(.layout-handle-edge-left) {
 		left: -4px;
 		top: 8px;
 		bottom: 8px;
@@ -492,7 +551,7 @@
 		cursor: ew-resize;
 	}
 
-	.layout-handle-edge-right {
+	.layout-inspector :global(.layout-handle-edge-right) {
 		right: -4px;
 		top: 8px;
 		bottom: 8px;
@@ -500,7 +559,7 @@
 		cursor: ew-resize;
 	}
 
-	.layout-handle-corner {
+	.layout-inspector :global(.layout-handle-corner) {
 		width: 12px;
 		height: 12px;
 		border-radius: 2px;
@@ -511,22 +570,22 @@
 		cursor: alias;
 	}
 
-	.layout-handle-corner-nw {
+	.layout-inspector :global(.layout-handle-corner-nw) {
 		top: -6px;
 		left: -6px;
 	}
 
-	.layout-handle-corner-ne {
+	.layout-inspector :global(.layout-handle-corner-ne) {
 		top: -6px;
 		right: -6px;
 	}
 
-	.layout-handle-corner-se {
+	.layout-inspector :global(.layout-handle-corner-se) {
 		bottom: -6px;
 		right: -6px;
 	}
 
-	.layout-handle-corner-sw {
+	.layout-inspector :global(.layout-handle-corner-sw) {
 		bottom: -6px;
 		left: -6px;
 	}

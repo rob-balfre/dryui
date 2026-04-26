@@ -5887,6 +5887,11 @@
               ],
               "description": "Horizontal or vertical layout direction."
             },
+            "listId": {
+              "signature": "listId: string",
+              "required": false,
+              "bindable": false
+            },
             "children": {
               "signature": "children: Snippet | required",
               "required": true,
@@ -5929,7 +5934,19 @@
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Group": {
-          "props": {}
+          "props": {
+            "onMove": {
+              "signature": "onMove: (fromListId: string, fromIndex: number, toListId: string, toIndex: number) => void | required",
+              "required": true,
+              "bindable": false
+            },
+            "children": {
+              "signature": "children: Snippet | required",
+              "required": true,
+              "bindable": false,
+              "description": "Content rendered inside the component."
+            }
+          }
         }
       },
       "structure": [
@@ -10861,6 +10878,42 @@
         "  Menubar.Item",
         "  Menubar.Separator",
         "  Menubar.Label"
+      ]
+    },
+    "Motion": {
+      "name": "Motion",
+      "description": "Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens.",
+      "category": "display",
+      "tags": [
+        "motion",
+        "animation",
+        "enter",
+        "exit",
+        "stagger",
+        "polish"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/primitives",
+        "statement": "import { Motion } from '@dryui/primitives'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<Motion>Content</Motion>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import Motion from @dryui/primitives.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component Motion",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
     "MultiSelectCombobox": {
@@ -17437,6 +17490,54 @@
         "ToggleGroup.Root",
         "  ToggleGroup.Item"
       ]
+    },
+    "TokenScope": {
+      "name": "TokenScope",
+      "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
+      "category": "theme",
+      "tags": [
+        "theme",
+        "tokens",
+        "css-variables",
+        "scope"
+      ],
+      "kind": "simple",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { TokenScope } from '@dryui/ui'",
+        "subpathStatement": "import { TokenScope } from '@dryui/ui/token-scope'"
+      },
+      "requiredParts": [],
+      "bindableProps": [],
+      "usage": "<TokenScope>Content</TokenScope>",
+      "accessibility": [
+        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
+        "Keep heading, reading, and focus order aligned with the surrounding content."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import TokenScope from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component TokenScope",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ],
+      "props": {
+        "tokens": {
+          "signature": "tokens: Record<string, string> | required",
+          "required": true,
+          "bindable": false
+        },
+        "children": {
+          "signature": "children: Snippet | required",
+          "required": true,
+          "bindable": false,
+          "description": "Content rendered inside the component."
+        }
+      }
     },
     "Toolbar": {
       "name": "Toolbar",

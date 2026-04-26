@@ -12,7 +12,7 @@
         "@vitest/browser-playwright": "^4.1.5",
         "@vitest/coverage-v8": "^4.1.5",
         "happy-dom": "^20.9.0",
-        "npm-check-updates": "21.0.3",
+        "npm-check-updates": "22.0.1",
         "playwright": "1.59.1",
         "prettier": "^3.8.3",
         "prettier-plugin-svelte": "^3.5.1",
@@ -50,8 +50,8 @@
         "dryui": "./dist/index.js",
       },
       "dependencies": {
-        "@dryui/feedback-server": "^0.8.3",
-        "@dryui/mcp": "^2.7.2",
+        "@dryui/feedback-server": "workspace:*",
+        "@dryui/mcp": "workspace:*",
         "playwright": "^1.59.1",
       },
       "devDependencies": {
@@ -63,8 +63,8 @@
       "name": "@dryui/feedback",
       "version": "1.0.0",
       "dependencies": {
-        "@dryui/primitives": "^2.0.2",
-        "@dryui/ui": "^2.0.2",
+        "@dryui/primitives": "workspace:*",
+        "@dryui/ui": "workspace:*",
       },
       "devDependencies": {
         "@sveltejs/package": "^2.5.7",
@@ -145,9 +145,9 @@
       "name": "@dryui/theme-wizard",
       "version": "17.0.0",
       "devDependencies": {
-        "@dryui/lint": "^1.0.0",
-        "@dryui/primitives": "^3.0.0",
-        "@dryui/ui": "^3.0.0",
+        "@dryui/lint": "workspace:*",
+        "@dryui/primitives": "workspace:*",
+        "@dryui/ui": "workspace:*",
         "@sveltejs/package": "^2.5.7",
         "bun-types": "^1.3.13",
         "svelte": "^5.55.5",
@@ -165,7 +165,7 @@
       "name": "@dryui/ui",
       "version": "3.0.0",
       "dependencies": {
-        "@dryui/primitives": "^3.0.0",
+        "@dryui/primitives": "workspace:*",
       },
       "devDependencies": {
         "@dryui/lint": "workspace:*",
@@ -904,7 +904,7 @@
 
     "node-fetch": ["node-fetch@2.7.0", "", { "dependencies": { "whatwg-url": "^5.0.0" }, "peerDependencies": { "encoding": "^0.1.0" }, "optionalPeers": ["encoding"] }, "sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A=="],
 
-    "npm-check-updates": ["npm-check-updates@21.0.3", "", { "bin": { "npm-check-updates": "build/cli.js", "ncu": "build/cli.js" } }, "sha512-8y0fqtxdo5JhwzxcS9rZd969tvPbSZ3MzQoG5Fj8eqL42t1Jsg5tjZCz8CYuXLE8LNbbyV+1xxR/f/T4AdPmdg=="],
+    "npm-check-updates": ["npm-check-updates@22.0.1", "", { "bin": { "npm-check-updates": "build/cli.js", "ncu": "build/cli.js" } }, "sha512-K8PDu7l9v7UKIwDSxLnqA9LHT76Mu4eCjGjp0JwSeSsyKWmX/YZY+AoBxw4oVdKwQLthWbzg1g+OKysHYGQCjQ=="],
 
     "object-assign": ["object-assign@4.1.1", "", {}, "sha512-rJgTQnkUnH1sFw8yT6VSU3zD3sWmu6sZhIseY8VX+GRu3P6F7Fu+JNDoXfklElbLJSnc3FUQHVe4cU5hj+BcUg=="],
 

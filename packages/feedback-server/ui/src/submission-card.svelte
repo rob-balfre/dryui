@@ -4,12 +4,16 @@
 		Badge,
 		BorderBeam,
 		Button,
+		ButtonGroup,
 		Card,
+		ChipGroup,
 		CodeBlock,
 		Dialog,
 		DropdownMenu,
+		FormatDate,
 		Heading,
 		Image,
+		Link,
 		Text
 	} from '@dryui/ui';
 	import {
@@ -103,13 +107,6 @@
 		return status === 'resolved' ? 'Resolved' : 'Pending';
 	}
 
-	function formatAbsoluteTime(value: string): string {
-		return new Intl.DateTimeFormat(undefined, {
-			dateStyle: 'medium',
-			timeStyle: 'short'
-		}).format(new Date(value));
-	}
-
 	function formatViewport(viewport: Submission['viewport']): string {
 		if (!viewport) return 'Unknown';
 		return `${viewport.width} x ${viewport.height}`;
@@ -153,25 +150,21 @@
 					<Badge variant="soft" color={statusColor(submission.status)} size="sm">
 						{statusLabel(submission.status)}
 					</Badge>
-					<a
-						class="url"
-						href={submission.url}
-						target="_blank"
-						rel="noreferrer"
-						title={submission.url}
-					>
-						{submission.url}
-					</a>
+					<span class="url">
+						<Link href={submission.url} external underline="hover" title={submission.url}>
+							{submission.url}
+						</Link>
+					</span>
 				</div>
 				<div class="header-meta">
 					<span class="id">#{shortenId(submission.id)}</span>
 					<span class="dot" aria-hidden="true">·</span>
-					<span>{formatAbsoluteTime(submission.createdAt)}</span>
+					<FormatDate date={submission.createdAt} dateStyle="medium" timeStyle="short" />
 					<span class="dot" aria-hidden="true">·</span>
 					<span>{formatViewport(submission.viewport)}</span>
 				</div>
 			</div>
-			<div class="actions">
+			<ButtonGroup size="sm">
 				<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
 					<ExternalLink size={14} aria-hidden="true" />
 					Open page
@@ -197,35 +190,39 @@
 						Reopen
 					</Button>
 				{/if}
-			</div>
+			</ButtonGroup>
 		</div>
 	</Card.Header>
 
 	<Card.Content>
 		<div class="body">
 			<div class="media">
-				<div class="screenshot-trigger">
+				<div class="screenshot-trigger feedback-screenshot-dialog">
 					<Dialog.Root>
 						<Dialog.Trigger>
 							<Button variant="bare" aria-label={`Open full screenshot for ${submission.url}`}>
-								<Image
-									class="feedback-screenshot-thumb"
-									src={screenshotUrl(submission.id)}
-									alt={`Feedback screenshot for ${submission.url}`}
-									fallback="Screenshot unavailable"
-								/>
+								<span class="feedback-screenshot-thumb">
+									<Image
+										src={screenshotUrl(submission.id)}
+										alt={`Feedback screenshot for ${submission.url}`}
+										fallback="Screenshot unavailable"
+									/>
+								</span>
 							</Button>
 						</Dialog.Trigger>
 
-						<Dialog.Content class="feedback-screenshot-dialog">
+						<Dialog.Content>
 							<Dialog.Header>
 								<div class="dialog-head">
 									<div class="dialog-head-info">
 										<Heading level={3}>Captured screenshot</Heading>
 										<Text as="span" size="sm" color="secondary">
-											{formatAbsoluteTime(submission.createdAt)} / {formatViewport(
-												submission.viewport
-											)}
+											<FormatDate
+												date={submission.createdAt}
+												dateStyle="medium"
+												timeStyle="short"
+											/>
+											/ {formatViewport(submission.viewport)}
 										</Text>
 									</div>
 									<Dialog.Close aria-label="Close screenshot dialog">
@@ -233,14 +230,15 @@
 									</Dialog.Close>
 								</div>
 							</Dialog.Header>
-							<Dialog.Body class="screenshot-dialog-body">
+							<Dialog.Body>
 								<div class="dialog-image">
-									<Image
-										class="feedback-screenshot-full"
-										src={screenshotUrl(submission.id)}
-										alt={`Feedback screenshot for ${submission.url}`}
-										fallback="Screenshot unavailable"
-									/>
+									<span class="feedback-screenshot-full">
+										<Image
+											src={screenshotUrl(submission.id)}
+											alt={`Feedback screenshot for ${submission.url}`}
+											fallback="Screenshot unavailable"
+										/>
+									</span>
 								</div>
 							</Dialog.Body>
 							<Dialog.Footer>
@@ -257,13 +255,14 @@
 					<header class="notes-head">
 						<Heading level={4}>Notes</Heading>
 						{#if drawingCounts.length > 0}
-							<div class="annotation-pills">
+							<ChipGroup.Root gap="sm" aria-label="Annotation counts">
+								<ChipGroup.Label hidden>Annotation counts</ChipGroup.Label>
 								{#each drawingCounts as entry (entry.label)}
 									<Badge variant="outline" color="gray" size="sm">
 										{entry.label}: {entry.count}
 									</Badge>
 								{/each}
-							</div>
+							</ChipGroup.Root>
 						{/if}
 					</header>
 
@@ -397,19 +396,19 @@
 	}
 
 	.url {
+		--dry-link-color: var(--dry-color-text-strong);
+		--dry-link-hover-color: var(--dry-color-fill-brand);
+
 		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
 		font-size: var(--dry-font-size-sm, 0.875rem);
 		font-weight: 500;
-		color: var(--dry-color-text-strong);
-		text-decoration: none;
 	}
 
 	.url:hover {
-		color: var(--dry-color-fill-brand);
-		text-decoration: underline;
+		--dry-link-color: var(--dry-color-fill-brand);
 	}
 
 	.header-meta {
@@ -429,15 +428,6 @@
 
 	.dot {
 		opacity: 0.5;
-	}
-
-	.actions {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		gap: var(--dry-space-2);
-		justify-content: start;
-		align-items: center;
 	}
 
 	.body {
@@ -529,14 +519,6 @@
 		grid-template-columns: auto minmax(0, 1fr);
 		gap: var(--dry-space-3);
 		align-items: center;
-	}
-
-	.annotation-pills {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		gap: var(--dry-space-1_5);
-		justify-content: start;
 	}
 
 	.notes-stack {

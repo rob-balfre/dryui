@@ -114,6 +114,15 @@ function extractPropsFromAttrs(attrsStr: string): string[] {
 	const props: string[] = [];
 	if (!attrsStr.trim()) return props;
 
+	// Svelte shorthand props: {tokens} is equivalent to tokens={tokens}.
+	const shorthandRegex = /(?:^|\s)\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}/g;
+	for (const m of attrsStr.matchAll(shorthandRegex)) {
+		const propName = m[1];
+		if (propName && !props.includes(propName)) {
+			props.push(propName);
+		}
+	}
+
 	// Strip quoted strings and brace expressions to avoid matching values as prop names.
 	const stripped = stripBraceExpressions(
 		attrsStr.replace(/"[^"]*"/g, '""').replace(/'[^']*'/g, "''")

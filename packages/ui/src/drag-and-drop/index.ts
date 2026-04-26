@@ -1,8 +1,20 @@
-export type {
-	DragAndDropRootProps,
-	DragAndDropItemProps,
-	DragAndDropHandleProps
-} from '@dryui/primitives';
+import type { Snippet } from 'svelte';
+import type { HTMLAttributes } from 'svelte/elements';
+
+export type { DragAndDropItemProps, DragAndDropHandleProps } from '@dryui/primitives';
+
+export interface DragAndDropRootProps<T = unknown> extends HTMLAttributes<HTMLDivElement> {
+	items: T[];
+	onReorder: (items: T[]) => void;
+	orientation?: 'vertical' | 'horizontal';
+	listId?: string;
+	children: Snippet;
+}
+
+export interface DragAndDropGroupProps {
+	onMove: (fromListId: string, fromIndex: number, toListId: string, toIndex: number) => void;
+	children: Snippet;
+}
 
 import DragAndDropRoot from './drag-and-drop-root.svelte';
 import DragAndDropItem from './drag-and-drop-item.svelte';

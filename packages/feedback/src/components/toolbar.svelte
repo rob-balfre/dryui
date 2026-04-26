@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AlertDialog } from '@dryui/ui';
+	import { AlertDialog, Button, Checkbox, Field, Input, Kbd, Label, Select } from '@dryui/ui';
 	import {
 		ArrowLeft,
 		Check,
@@ -94,7 +94,7 @@
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
-	let pickerInputEl = $state<HTMLInputElement | undefined>();
+	let pickerPanelEl = $state<HTMLDivElement | undefined>();
 
 	const filteredPresets = $derived.by(() => {
 		const query = pickerName.trim().toLowerCase();
@@ -155,8 +155,10 @@
 	}
 
 	$effect(() => {
-		if (!pickerOpen || !pickerInputEl) return;
-		const id = requestAnimationFrame(() => pickerInputEl?.focus());
+		if (!pickerOpen || !pickerPanelEl) return;
+		const id = requestAnimationFrame(() => {
+			pickerPanelEl?.querySelector<HTMLInputElement>('[data-component-picker-input]')?.focus();
+		});
 		return () => cancelAnimationFrame(id);
 	});
 
@@ -180,7 +182,7 @@
 	let propsPanelOpen = $state(false);
 	let propsLabelInput = $state('');
 	let propsValues = $state<Record<string, unknown>>({});
-	let propsLabelEl = $state<HTMLInputElement | undefined>();
+	let propsPanelEl = $state<HTMLDivElement | undefined>();
 
 	let schemas = $state<Record<string, SchemaField[]> | null>(null);
 
@@ -241,8 +243,10 @@
 	});
 
 	$effect(() => {
-		if (!propsPanelOpen || !propsLabelEl) return;
-		const id = requestAnimationFrame(() => propsLabelEl?.focus());
+		if (!propsPanelOpen || !propsPanelEl) return;
+		const id = requestAnimationFrame(() => {
+			propsPanelEl?.querySelector<HTMLInputElement>('[data-props-label-input]')?.focus();
+		});
 		return () => cancelAnimationFrame(id);
 	});
 
@@ -282,8 +286,18 @@
 		return typeof value === 'string' ? value : '';
 	}
 
+	function setEnumValue(field: SchemaField, value: string) {
+		if (!value) clearFieldValue(field);
+		else setFieldValue(field, value);
+	}
+
 	function readBooleanValue(field: SchemaField): boolean {
 		return propsValues[field.name] === true;
+	}
+
+	function setBooleanValue(field: SchemaField, value: boolean) {
+		if (value) setFieldValue(field, true);
+		else clearFieldValue(field);
 	}
 
 	function readNumberValue(field: SchemaField): string {
@@ -291,9 +305,25 @@
 		return typeof value === 'number' ? String(value) : '';
 	}
 
+	function setNumberValue(field: SchemaField, value: string | number | undefined) {
+		const raw = value == null ? '' : String(value);
+		if (raw === '') {
+			clearFieldValue(field);
+			return;
+		}
+		const num = Number(raw);
+		if (Number.isFinite(num)) setFieldValue(field, num);
+	}
+
 	function readStringValue(field: SchemaField): string {
 		const value = propsValues[field.name];
 		return typeof value === 'string' ? value : '';
+	}
+
+	function setStringValue(field: SchemaField, value: string | number | undefined) {
+		const raw = value == null ? '' : String(value);
+		if (raw === '') clearFieldValue(field);
+		else setFieldValue(field, raw);
 	}
 
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
@@ -453,7 +483,9 @@
 		</div>
 
 		<div class="mode-pill" role="tablist" aria-label="Feedback mode">
-			<button
+			<Button
+				variant="trigger"
+				size="sm"
 				class="mode-btn"
 				type="button"
 				role="tab"
@@ -463,9 +495,11 @@
 			>
 				<Pencil size={12} aria-hidden="true" />
 				<span>Annotate</span>
-			</button>
+			</Button>
 
-			<button
+			<Button
+				variant="trigger"
+				size="sm"
 				class="mode-btn"
 				type="button"
 				role="tab"
@@ -475,9 +509,11 @@
 			>
 				<LayoutTemplate size={12} aria-hidden="true" />
 				<span>Layout</span>
-			</button>
+			</Button>
 
-			<button
+			<Button
+				variant="trigger"
+				size="sm"
 				class="drag-handle"
 				type="button"
 				aria-label="Drag toolbar"
@@ -487,10 +523,12 @@
 				onpointercancel={handleHandlePointerUp}
 			>
 				<GripVertical size={14} aria-hidden="true" />
-			</button>
+			</Button>
 		</div>
 
-		<button
+		<Button
+			variant="solid"
+			size="sm"
 			class="submit-pill"
 			type="button"
 			data-submitting={submitting || undefined}
@@ -504,11 +542,13 @@
 				<Send size={14} />
 			{/if}
 			<span class="submit-label">{submitCopy.label}</span>
-		</button>
+		</Button>
 	</div>
 
 	{#snippet historyButtons()}
-		<button
+		<Button
+			variant="trigger"
+			size="sm"
 			class="tool-btn history-btn"
 			type="button"
 			data-tooltip="Undo"
@@ -517,9 +557,11 @@
 			aria-label="Undo last change"
 		>
 			<Undo2 size={14} />
-		</button>
+		</Button>
 
-		<button
+		<Button
+			variant="trigger"
+			size="sm"
 			class="tool-btn history-btn"
 			type="button"
 			data-tooltip="Redo"
@@ -528,7 +570,7 @@
 			aria-label="Redo last change"
 		>
 			<Redo2 size={14} />
-		</button>
+		</Button>
 	{/snippet}
 
 	{#if showToolPill}
@@ -540,7 +582,9 @@
 			{#if showLayoutTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
-						<button
+						<Button
+							variant="trigger"
+							size="sm"
 							class="tool-btn"
 							type="button"
 							data-tooltip="Edit props"
@@ -550,105 +594,108 @@
 							aria-expanded={propsPanelOpen}
 						>
 							<Settings size={16} />
-						</button>
+						</Button>
 
 						{#if propsPanelOpen}
-							<div class="props-panel" role="dialog" aria-label={`${addedKind} props`}>
+							<div
+								bind:this={propsPanelEl}
+								class="props-panel"
+								role="dialog"
+								aria-label={`${addedKind} props`}
+							>
 								<div class="props-panel-title">{addedKind} props</div>
-								<label class="props-panel-field">
-									<span class="props-panel-label">Label</span>
-									<input
-										class="props-panel-input"
+								<Field.Root data-props-panel-field>
+									<Label size="sm" data-props-panel-label>Label</Label>
+									<Input
+										size="sm"
 										type="text"
-										bind:this={propsLabelEl}
 										bind:value={propsLabelInput}
 										placeholder={addedKind}
+										data-props-panel-input
+										data-props-label-input
 										onkeydown={handlePropsKey}
 									/>
-								</label>
+								</Field.Root>
 								{#each formFields as field (field.name)}
 									{#if field.type.kind === 'enum'}
-										<label class="props-panel-field">
-											<span class="props-panel-label">{field.name}</span>
-											<select
-												class="props-panel-input"
-												value={readEnumValue(field)}
-												onchange={(e) => {
-													const next = (e.currentTarget as HTMLSelectElement).value;
-													if (!next) clearFieldValue(field);
-													else setFieldValue(field, next);
-												}}
-											>
-												<option value="">Default</option>
-												{#each field.type.options as option}
-													<option value={option}>{option}</option>
-												{/each}
-											</select>
-										</label>
-									{:else if field.type.kind === 'boolean'}
-										<label class="props-panel-checkbox">
-											<input
-												type="checkbox"
-												checked={readBooleanValue(field)}
-												onchange={(e) => {
-													const next = (e.currentTarget as HTMLInputElement).checked;
-													if (next) setFieldValue(field, true);
-													else clearFieldValue(field);
-												}}
-											/>
-											<span>{field.name}</span>
-										</label>
-									{:else if field.type.kind === 'number'}
-										<label class="props-panel-field">
-											<span class="props-panel-label">{field.name}</span>
-											<input
-												class="props-panel-input"
-												type="number"
-												value={readNumberValue(field)}
-												onkeydown={handlePropsKey}
-												oninput={(e) => {
-													const raw = (e.currentTarget as HTMLInputElement).value;
-													if (raw === '') {
-														clearFieldValue(field);
-														return;
+										<Field.Root data-props-panel-field>
+											<Label size="sm" data-props-panel-label>{field.name}</Label>
+											<div data-props-panel-select>
+												<Select.Root
+													bind:value={
+														() => readEnumValue(field), (next) => setEnumValue(field, next)
 													}
-													const num = Number(raw);
-													if (Number.isFinite(num)) setFieldValue(field, num);
-												}}
-											/>
-										</label>
-									{:else}
-										<label class="props-panel-field">
-											<span class="props-panel-label">{field.name}</span>
-											<input
-												class="props-panel-input"
-												type="text"
-												value={readStringValue(field)}
+												>
+													<Select.Trigger size="sm" data-props-panel-input>
+														<Select.Value placeholder={readEnumValue(field) || 'Default'} />
+													</Select.Trigger>
+													<Select.Content>
+														<Select.Item value="">Default</Select.Item>
+														{#each field.type.options as option (option)}
+															<Select.Item value={option}>{option}</Select.Item>
+														{/each}
+													</Select.Content>
+												</Select.Root>
+											</div>
+										</Field.Root>
+									{:else if field.type.kind === 'boolean'}
+										<Field.Root data-props-panel-checkbox-field>
+											<Checkbox
+												size="sm"
+												bind:checked={
+													() => readBooleanValue(field), (next) => setBooleanValue(field, next)
+												}
+											>
+												{field.name}
+											</Checkbox>
+										</Field.Root>
+									{:else if field.type.kind === 'number'}
+										<Field.Root data-props-panel-field>
+											<Label size="sm" data-props-panel-label>{field.name}</Label>
+											<Input
+												size="sm"
+												type="number"
+												data-props-panel-input
+												bind:value={
+													() => readNumberValue(field), (next) => setNumberValue(field, next)
+												}
 												onkeydown={handlePropsKey}
-												oninput={(e) => {
-													const raw = (e.currentTarget as HTMLInputElement).value;
-													if (raw === '') clearFieldValue(field);
-													else setFieldValue(field, raw);
-												}}
 											/>
-										</label>
+										</Field.Root>
+									{:else}
+										<Field.Root data-props-panel-field>
+											<Label size="sm" data-props-panel-label>{field.name}</Label>
+											<Input
+												size="sm"
+												type="text"
+												data-props-panel-input
+												bind:value={
+													() => readStringValue(field), (next) => setStringValue(field, next)
+												}
+												onkeydown={handlePropsKey}
+											/>
+										</Field.Root>
 									{/if}
 								{/each}
 								<div class="props-panel-actions">
-									<button
+									<Button
+										variant="outline"
+										size="sm"
 										class="props-panel-btn"
 										type="button"
 										onclick={() => (propsPanelOpen = false)}
 									>
 										Cancel
-									</button>
-									<button
+									</Button>
+									<Button
+										variant="solid"
+										size="sm"
 										class="props-panel-btn props-panel-btn-primary"
 										type="button"
 										onclick={applyProps}
 									>
 										Apply
-									</button>
+									</Button>
 								</div>
 							</div>
 						{/if}
@@ -656,7 +703,9 @@
 				{/if}
 
 				<div class="add-wrap" data-placement={popoverPlacement}>
-					<button
+					<Button
+						variant="trigger"
+						size="sm"
 						class="tool-btn"
 						type="button"
 						data-tooltip={placing ? 'Cancel placement' : 'Add component'}
@@ -666,46 +715,56 @@
 						aria-expanded={pickerOpen}
 					>
 						<Plus size={16} />
-					</button>
+					</Button>
 
 					{#if pickerOpen}
-						<div class="component-picker" role="dialog" aria-label="Pick component">
-							<div class="component-picker-search">
+						<div
+							bind:this={pickerPanelEl}
+							class="component-picker"
+							role="dialog"
+							aria-label="Pick component"
+						>
+							<Field.Root data-component-picker-search>
+								<Label size="sm" data-sr-only>Search components</Label>
 								<span class="component-picker-search-icon" aria-hidden="true">
 									<Search size={13} />
 								</span>
-								<input
-									class="component-picker-input"
+								<Input
+									size="sm"
 									type="text"
 									placeholder="Search components"
-									bind:this={pickerInputEl}
 									bind:value={pickerName}
+									data-component-picker-input
 									onkeydown={handlePickerKey}
 								/>
-							</div>
+							</Field.Root>
 							{#if groupedPresets.length > 0}
 								<div class="component-picker-presets">
 									{#each groupedPresets as group (group.category)}
 										<div class="component-picker-group-label">{group.label}</div>
 										{#each group.names as preset (preset)}
-											<button
+											<Button
+												variant="bare"
+												size="sm"
 												class="component-picker-preset"
 												type="button"
 												onclick={() => pick(preset)}
 											>
 												{preset}
-											</button>
+											</Button>
 										{/each}
 									{/each}
 								</div>
 							{:else if pickerName.trim()}
-								<button
+								<Button
+									variant="bare"
+									size="sm"
 									class="component-picker-preset component-picker-create"
 									type="button"
 									onclick={() => pick(pickerName)}
 								>
 									Add "{pickerName.trim()}"
-								</button>
+								</Button>
 							{/if}
 						</div>
 					{/if}
@@ -714,14 +773,16 @@
 				{#if hasSelection}
 					<AlertDialog.Root bind:open={removeConfirmOpen}>
 						<AlertDialog.Trigger>
-							<button
+							<Button
+								variant="trigger"
+								size="sm"
 								class="tool-btn"
 								type="button"
 								data-tooltip="Remove"
 								aria-label={addedKind ? `Remove ${addedKind}` : 'Remove element'}
 							>
 								<Trash2 size={16} />
-							</button>
+							</Button>
 						</AlertDialog.Trigger>
 						<AlertDialog.Overlay />
 						<AlertDialog.Content>
@@ -738,7 +799,9 @@
 						</AlertDialog.Content>
 					</AlertDialog.Root>
 
-					<button
+					<Button
+						variant="trigger"
+						size="sm"
 						class="tool-btn"
 						type="button"
 						data-tooltip="Back"
@@ -746,9 +809,11 @@
 						aria-label="Back to inspector"
 					>
 						<ArrowLeft size={16} />
-					</button>
+					</Button>
 
-					<button
+					<Button
+						variant="trigger"
+						size="sm"
 						class="tool-btn"
 						type="button"
 						data-tooltip="Reset"
@@ -756,10 +821,12 @@
 						aria-label="Reset layout overrides"
 					>
 						<RotateCcw size={16} />
-					</button>
+					</Button>
 				{/if}
 			{:else}
-				<button
+				<Button
+					variant="trigger"
+					size="sm"
 					class="tool-btn"
 					data-tooltip="Draw"
 					data-active={(active && tool === 'pencil') || undefined}
@@ -767,9 +834,11 @@
 					aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
 				>
 					<Pencil size={16} />
-				</button>
+				</Button>
 
-				<button
+				<Button
+					variant="trigger"
+					size="sm"
 					class="tool-btn"
 					data-tooltip="Arrow"
 					data-active={(active && tool === 'arrow') || undefined}
@@ -777,9 +846,11 @@
 					aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
 				>
 					<MoveUpRight size={16} />
-				</button>
+				</Button>
 
-				<button
+				<Button
+					variant="trigger"
+					size="sm"
 					class="tool-btn"
 					data-tooltip="Text"
 					data-active={(active && tool === 'text') || undefined}
@@ -787,9 +858,11 @@
 					aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
 				>
 					<Type size={16} />
-				</button>
+				</Button>
 
-				<button
+				<Button
+					variant="trigger"
+					size="sm"
 					class="tool-btn"
 					data-tooltip="Move"
 					data-active={(active && tool === 'move') || undefined}
@@ -797,9 +870,11 @@
 					aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
 				>
 					<Move size={16} />
-				</button>
+				</Button>
 
-				<button
+				<Button
+					variant="trigger"
+					size="sm"
 					class="tool-btn"
 					data-tooltip="Erase"
 					data-active={(active && tool === 'eraser') || undefined}
@@ -807,7 +882,7 @@
 					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
 				>
 					<Eraser size={16} />
-				</button>
+				</Button>
 			{/if}
 		</div>
 	{/if}
@@ -816,7 +891,7 @@
 		<div class="inspect-pill" data-position={pillPosition} role="status">
 			<span class="inspect-pill-dot" aria-hidden="true"></span>
 			<span class="inspect-pill-label">Inspecting layout</span>
-			<kbd class="inspect-pill-kbd">ESC</kbd>
+			<Kbd data-inspect-pill-kbd>ESC</Kbd>
 		</div>
 	{/if}
 </div>
@@ -877,12 +952,22 @@
 		box-shadow: var(--pill-shadow);
 	}
 
-	.mode-btn {
+	:global(.mode-btn) {
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: hsl(220 10% 60%);
+		--dry-btn-font-size: 11px;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 10px;
+		--dry-btn-padding-y: 6px;
+		--dry-btn-radius: 8px;
+
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 6px;
 		padding: 6px 10px;
+		min-block-size: 0;
 		border: none;
 		border-radius: 8px;
 		background: transparent;
@@ -900,24 +985,38 @@
 			color 0.15s;
 	}
 
-	.mode-btn:hover:not([data-active]) {
+	:global(.mode-btn:hover:not([data-active])) {
+		--dry-btn-color: hsl(220 10% 88%);
+
 		color: hsl(220 10% 88%);
 	}
 
-	.mode-btn[data-active] {
+	:global(.mode-btn[data-active]) {
+		--dry-btn-bg: hsl(25 100% 55% / 0.18);
+		--dry-btn-color: hsl(25 100% 80%);
+
 		background: hsl(25 100% 55% / 0.18);
 		color: hsl(25 100% 80%);
 	}
 
-	.mode-btn:focus-visible {
+	:global(.mode-btn:focus-visible) {
 		outline: 2px solid var(--accent);
 		outline-offset: 1px;
 	}
 
-	.drag-handle {
+	:global(.drag-handle) {
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: hsl(220 10% 38%);
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 3px;
+		--dry-btn-padding-y: 4px;
+		--dry-btn-radius: 6px;
+
 		display: grid;
 		place-items: center;
 		padding: 4px 3px;
+		min-block-size: 0;
 		margin-inline-start: 2px;
 		border: none;
 		border-radius: 6px;
@@ -930,17 +1029,22 @@
 			color 0.15s;
 	}
 
-	.drag-handle:hover {
+	:global(.drag-handle:hover) {
+		--dry-btn-bg: hsl(225 15% 22%);
+		--dry-btn-color: hsl(220 10% 70%);
+
 		background: hsl(225 15% 22%);
 		color: hsl(220 10% 70%);
 	}
 
-	.drag-handle:focus-visible {
+	:global(.drag-handle:focus-visible) {
 		outline: 2px solid var(--accent);
 		outline-offset: 1px;
 	}
 
-	.toolbar[data-dragging] .drag-handle {
+	.toolbar[data-dragging] :global(.drag-handle) {
+		--dry-btn-color: hsl(25 100% 67%);
+
 		cursor: grabbing;
 		color: hsl(25 100% 67%);
 	}
@@ -986,7 +1090,7 @@
 		box-shadow: 0 0 8px hsl(25 100% 55% / 0.6);
 	}
 
-	.inspect-pill-kbd {
+	:global([data-inspect-pill-kbd]) {
 		font-family: ui-monospace, 'SF Mono', Menlo, monospace;
 		font-size: 10px;
 		font-weight: 600;
@@ -996,13 +1100,24 @@
 		color: hsl(220 10% 80%);
 	}
 
-	.tool-btn {
+	:global(.tool-btn) {
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: hsl(220 10% 70%);
+		--dry-btn-font-size: 12px;
+		--dry-btn-min-height: 26px;
+		--dry-btn-padding-x: 0;
+		--dry-btn-padding-y: 0;
+		--dry-btn-radius: 7px;
+
 		position: relative;
 		display: grid;
 		place-items: center;
 		padding: 0;
 		inline-size: 26px;
 		block-size: 26px;
+		min-inline-size: 0;
+		min-block-size: 0;
 		border: 1px solid transparent;
 		border-radius: 7px;
 		background: transparent;
@@ -1016,7 +1131,7 @@
 			color 0.15s;
 	}
 
-	.tool-btn[data-tooltip]::after {
+	:global(.tool-btn[data-tooltip])::after {
 		content: attr(data-tooltip);
 		position: absolute;
 		bottom: calc(100% + 8px);
@@ -1044,27 +1159,34 @@
 			transform 0.12s ease-out;
 	}
 
-	.tool-btn[data-tooltip]:hover::after,
-	.tool-btn[data-tooltip]:focus-visible::after {
+	:global(.tool-btn[data-tooltip]:hover)::after,
+	:global(.tool-btn[data-tooltip]:focus-visible)::after {
 		opacity: 1;
 		transform: translateX(-50%) translateY(0);
 	}
 
-	.tool-btn:hover:not(:disabled) {
+	:global(.tool-btn:hover:not(:disabled)) {
+		--dry-btn-bg: hsl(225 15% 22%);
+		--dry-btn-color: hsl(220 10% 90%);
+
 		background: hsl(225 15% 22%);
 		color: hsl(220 10% 90%);
 	}
 
-	.tool-btn:disabled {
+	:global(.tool-btn:disabled) {
 		opacity: 0.35;
 		cursor: not-allowed;
 	}
 
-	.tool-btn:disabled::after {
+	:global(.tool-btn:disabled)::after {
 		display: none;
 	}
 
-	.tool-btn[data-active] {
+	:global(.tool-btn[data-active]) {
+		--dry-btn-bg: var(--accent);
+		--dry-btn-border: white;
+		--dry-btn-color: black;
+
 		background: var(--accent);
 		border-color: white;
 		color: black;
@@ -1073,12 +1195,15 @@
 			0 4px 12px hsl(0 0% 0% / 0.35);
 	}
 
-	.tool-btn[data-active]:hover {
+	:global(.tool-btn[data-active]:hover) {
+		--dry-btn-bg: hsl(25 100% 62%);
+		--dry-btn-color: black;
+
 		background: hsl(25 100% 62%);
 		color: black;
 	}
 
-	.history-pill .history-btn {
+	.history-pill :global(.history-btn) {
 		inline-size: 26px;
 		block-size: 26px;
 	}
@@ -1086,6 +1211,18 @@
 	.add-wrap {
 		position: relative;
 		display: grid;
+	}
+
+	:global([data-sr-only]) {
+		position: absolute;
+		inline-size: 1px;
+		block-size: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip: rect(0, 0, 0, 0);
+		white-space: nowrap;
+		border: 0;
 	}
 
 	.component-picker {
@@ -1111,7 +1248,7 @@
 		bottom: auto;
 	}
 
-	.component-picker-search {
+	:global([data-component-picker-search]) {
 		position: relative;
 		display: grid;
 	}
@@ -1126,7 +1263,15 @@
 		pointer-events: none;
 	}
 
-	.component-picker-input {
+	:global([data-component-picker-input]) {
+		--dry-input-bg: hsl(225 15% 10% / 0.5);
+		--dry-input-border: hsl(220 10% 22%);
+		--dry-input-color: hsl(220 10% 92%);
+		--dry-input-font-size: 12px;
+		--dry-input-padding-x: 10px;
+		--dry-input-padding-y: 7px;
+		--dry-input-radius: 8px;
+
 		padding: 7px 10px 7px 30px;
 		border: 1px solid hsl(220 10% 22%);
 		border-radius: 8px;
@@ -1144,16 +1289,19 @@
 			background 0.15s;
 	}
 
-	.component-picker-input:focus-visible {
+	:global([data-component-picker-input]:focus-visible) {
+		--dry-input-bg: hsl(225 15% 10% / 0.7);
+		--dry-input-border: hsl(25 100% 55% / 0.5);
+
 		border-color: hsl(25 100% 55% / 0.5);
 		background: hsl(225 15% 10% / 0.7);
 	}
 
-	.component-picker-search:focus-within .component-picker-search-icon {
+	:global([data-component-picker-search]:focus-within) .component-picker-search-icon {
 		color: var(--accent);
 	}
 
-	.component-picker-input::placeholder {
+	:global([data-component-picker-input])::placeholder {
 		color: hsl(220 10% 45%);
 	}
 
@@ -1216,7 +1364,10 @@
 		padding-block-start: 4px;
 	}
 
-	.component-picker-create {
+	:global(.component-picker-create) {
+		--dry-btn-border: hsl(25 100% 55% / 0.45);
+		--dry-btn-color: hsl(25 100% 80%);
+
 		margin-block-start: 6px;
 		padding: 8px 10px;
 		border: 1px dashed hsl(25 100% 55% / 0.45);
@@ -1252,17 +1403,14 @@
 		text-transform: uppercase;
 	}
 
-	.props-panel-field {
+	:global([data-props-panel-field]) {
 		display: grid;
 		gap: 4px;
 	}
 
-	.props-panel-checkbox {
+	:global([data-props-panel-checkbox-field]) {
 		display: grid;
-		grid-auto-flow: column;
 		justify-content: start;
-		align-items: center;
-		gap: 8px;
 		color: hsl(220 10% 88%);
 		font-family:
 			system-ui,
@@ -1272,11 +1420,7 @@
 		font-weight: 500;
 	}
 
-	.props-panel-checkbox input {
-		accent-color: hsl(25 100% 55%);
-	}
-
-	.props-panel-label {
+	:global([data-props-panel-label]) {
 		color: hsl(220 10% 60%);
 		font-family:
 			system-ui,
@@ -1288,7 +1432,23 @@
 		text-transform: uppercase;
 	}
 
-	.props-panel-input {
+	:global([data-props-panel-input]) {
+		--dry-btn-bg: hsl(225 15% 10% / 0.6);
+		--dry-btn-border: hsl(220 10% 30%);
+		--dry-btn-color: hsl(220 10% 92%);
+		--dry-btn-font-size: 12px;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 10px;
+		--dry-btn-padding-y: 6px;
+		--dry-btn-radius: 6px;
+		--dry-input-bg: hsl(225 15% 10% / 0.6);
+		--dry-input-border: hsl(220 10% 30%);
+		--dry-input-color: hsl(220 10% 92%);
+		--dry-input-font-size: 12px;
+		--dry-input-padding-x: 10px;
+		--dry-input-padding-y: 6px;
+		--dry-input-radius: 6px;
+
 		padding: 6px 10px;
 		border: 1px solid hsl(220 10% 30%);
 		border-radius: 6px;
@@ -1303,8 +1463,14 @@
 		outline: none;
 	}
 
-	.props-panel-input:focus-visible {
+	:global([data-props-panel-input]:focus-visible) {
+		--dry-input-border: var(--accent);
+
 		border-color: var(--accent);
+	}
+
+	:global([data-props-panel-select]) {
+		display: grid;
 	}
 
 	.props-panel-actions {
@@ -1314,7 +1480,16 @@
 		gap: 6px;
 	}
 
-	.props-panel-btn {
+	:global(.props-panel-btn) {
+		--dry-btn-bg: transparent;
+		--dry-btn-border: hsl(220 10% 25%);
+		--dry-btn-color: hsl(220 10% 88%);
+		--dry-btn-font-size: 11px;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 12px;
+		--dry-btn-padding-y: 6px;
+		--dry-btn-radius: 6px;
+
 		padding: 6px 12px;
 		border: 1px solid hsl(220 10% 25%);
 		border-radius: 6px;
@@ -1334,24 +1509,45 @@
 			color 0.15s;
 	}
 
-	.props-panel-btn:hover {
+	:global(.props-panel-btn:hover) {
+		--dry-btn-bg: hsl(225 15% 22%);
+		--dry-btn-border: hsl(220 10% 35%);
+		--dry-btn-color: hsl(220 10% 88%);
+
 		background: hsl(225 15% 22%);
 		border-color: hsl(220 10% 35%);
 	}
 
-	.props-panel-btn-primary {
+	:global(.props-panel-btn-primary) {
+		--dry-btn-bg: hsl(25 100% 55%);
+		--dry-btn-border: hsl(25 100% 55%);
+		--dry-btn-color: black;
+
 		background: hsl(25 100% 55%);
 		border-color: hsl(25 100% 55%);
 		color: black;
 	}
 
-	.props-panel-btn-primary:hover {
+	:global(.props-panel-btn-primary:hover) {
+		--dry-btn-bg: hsl(25 100% 62%);
+		--dry-btn-border: hsl(25 100% 62%);
+		--dry-btn-color: black;
+
 		background: hsl(25 100% 62%);
 		border-color: hsl(25 100% 62%);
 		color: black;
 	}
 
-	.component-picker-preset {
+	:global(.component-picker-preset) {
+		--dry-btn-bg: transparent;
+		--dry-btn-border: transparent;
+		--dry-btn-color: hsl(220 10% 80%);
+		--dry-btn-font-size: 12px;
+		--dry-btn-min-height: 0;
+		--dry-btn-padding-x: 10px;
+		--dry-btn-padding-y: 6px;
+		--dry-btn-radius: 6px;
+
 		display: grid;
 		grid-template-columns: 1fr auto;
 		align-items: center;
@@ -1375,7 +1571,7 @@
 			color 0.12s ease-out;
 	}
 
-	.component-picker-preset::after {
+	:global(.component-picker-preset)::after {
 		content: '';
 		inline-size: 12px;
 		block-size: 1px;
@@ -1383,19 +1579,31 @@
 		transition: background 0.12s ease-out;
 	}
 
-	.component-picker-preset:hover,
-	.component-picker-preset:focus-visible {
+	:global(.component-picker-preset:hover),
+	:global(.component-picker-preset:focus-visible) {
+		--dry-btn-bg: hsl(25 100% 55% / 0.1);
+		--dry-btn-color: hsl(25 100% 92%);
+
 		background: hsl(25 100% 55% / 0.1);
 		color: hsl(25 100% 92%);
 		outline: none;
 	}
 
-	.component-picker-preset:hover::after,
-	.component-picker-preset:focus-visible::after {
+	:global(.component-picker-preset:hover)::after,
+	:global(.component-picker-preset:focus-visible)::after {
 		background: hsl(25 100% 55%);
 	}
 
-	.submit-pill {
+	:global(.submit-pill) {
+		--dry-btn-bg: hsl(145 50% 12% / 0.7);
+		--dry-btn-border: hsl(145 40% 26%);
+		--dry-btn-color: hsl(145 60% 70%);
+		--dry-btn-font-size: 11px;
+		--dry-btn-min-height: 32px;
+		--dry-btn-padding-x: 12px;
+		--dry-btn-padding-y: 0;
+		--dry-btn-radius: 12px;
+
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
@@ -1419,23 +1627,31 @@
 			color 0.15s;
 	}
 
-	.submit-pill:hover:not([data-submitting]) {
+	:global(.submit-pill:hover:not([data-submitting])) {
+		--dry-btn-bg: hsl(145 55% 18%);
+		--dry-btn-border: hsl(145 55% 40%);
+		--dry-btn-color: hsl(145 70% 88%);
+
 		background: hsl(145 55% 18%);
 		border-color: hsl(145 55% 40%);
 		color: hsl(145 70% 88%);
 	}
 
-	.submit-pill:focus-visible {
+	:global(.submit-pill:focus-visible) {
 		outline: 2px solid hsl(145 60% 50%);
 		outline-offset: 1px;
 	}
 
-	.submit-pill[data-submitting] {
+	:global(.submit-pill[data-submitting]) {
 		opacity: 0.6;
 		cursor: progress;
 	}
 
-	.submit-pill[data-sent] {
+	:global(.submit-pill[data-sent]) {
+		--dry-btn-bg: hsl(145 65% 22%);
+		--dry-btn-border: hsl(145 65% 36%);
+		--dry-btn-color: hsl(145 70% 92%);
+
 		background: hsl(145 65% 22%);
 		border-color: hsl(145 65% 36%);
 		color: hsl(145 70% 92%);

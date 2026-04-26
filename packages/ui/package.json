@@ -18,7 +18,7 @@
     "**/*.css"
   ],
   "svelte": "./src/index.ts",
-  "types": "./dist/index.d.ts",
+  "types": "./src/index.ts",
   "exports": {
     ".": {
       "types": "./src/index.ts",
@@ -739,6 +739,11 @@
       "types": "./src/toggle-group/index.ts",
       "svelte": "./src/toggle-group/index.ts",
       "default": "./src/toggle-group/index.ts"
+    },
+    "./token-scope": {
+      "types": "./src/token-scope/index.ts",
+      "svelte": "./src/token-scope/index.ts",
+      "default": "./src/token-scope/index.ts"
     },
     "./toolbar": {
       "types": "./src/toolbar/index.ts",
@@ -1528,6 +1533,11 @@
         "svelte": "./dist/toggle-group/index.js",
         "default": "./dist/toggle-group/index.js"
       },
+      "./token-scope": {
+        "types": "./dist/token-scope/index.d.ts",
+        "svelte": "./dist/token-scope/index.js",
+        "default": "./dist/token-scope/index.js"
+      },
       "./toolbar": {
         "types": "./dist/toolbar/index.d.ts",
         "svelte": "./dist/toolbar/index.js",
@@ -1606,7 +1616,7 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^3.0.0"
+    "@dryui/primitives": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.55.5"

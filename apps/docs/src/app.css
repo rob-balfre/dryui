@@ -158,3 +158,21 @@ code {
 	display: grid;
 	gap: var(--dry-space-2);
 }
+
+.workbench [data-adjust] {
+	display: grid;
+	min-block-size: 0;
+}
+
+.wizard-preset-list [data-option-picker-item] {
+	--dry-btn-min-height: 6rem;
+	min-block-size: 6rem;
+}
+
+.wizard-preset-list .preset-option-description {
+	min-block-size: 2.5em;
+}
+
+.wizard-color-options [data-color-thumb] {
+	--dry-option-picker-preview-size: 1.5rem;
+}

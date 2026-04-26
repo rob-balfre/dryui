@@ -210,6 +210,16 @@ describe('Spec Compliance (errors)', () => {
 		).toBe(true);
 	});
 
+	test('accepts Svelte shorthand for required props', () => {
+		const code = `<script>
+  import { Avatar } from '@dryui/ui';
+  const src = '/avatar.png';
+</script>
+<Avatar {src} fallback="JD" />`;
+		const result = reviewComponent(code, mockSpec);
+		expect(result.issues.some((i) => i.code === 'missing-required-prop')).toBe(false);
+	});
+
 	test('spread suppresses missing required prop check', () => {
 		const code = `<script>
   import { Avatar } from '@dryui/ui';

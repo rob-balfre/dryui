@@ -62,9 +62,9 @@
     "svelte": "^5.55.5"
   },
   "devDependencies": {
-    "@dryui/lint": "^1.0.0",
-    "@dryui/primitives": "^3.0.0",
-    "@dryui/ui": "^3.0.0",
+    "@dryui/lint": "workspace:*",
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*",
     "svelte": "^5.55.5",
     "@sveltejs/package": "^2.5.7",
     "svelte-check": "^4.4.6",

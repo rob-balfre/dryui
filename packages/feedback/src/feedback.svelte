@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Portal, Toast } from '@dryui/ui';
+	import { Button, Input, Portal, Toast } from '@dryui/ui';
 	import { Hotkey } from '@dryui/primitives/hotkey';
 	import { tryShowPopover, tryHidePopover } from '@dryui/primitives';
 	import { Check } from 'lucide-svelte';
@@ -274,6 +274,17 @@
 		layoutStageEl = node;
 		return () => {
 			if (layoutStageEl === node) layoutStageEl = undefined;
+		};
+	};
+
+	const captureTextInputWrap: Attachment<HTMLDivElement> = (node) => {
+		textInputWrapEl = node;
+		const frame = requestAnimationFrame(() => {
+			node.querySelector<HTMLInputElement>('[data-feedback-text-input]')?.focus();
+		});
+		return () => {
+			cancelAnimationFrame(frame);
+			if (textInputWrapEl === node) textInputWrapEl = undefined;
 		};
 	};
 
@@ -840,7 +851,7 @@
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
 	let textInput: { position: Point; value: string; space: DrawingSpace } | null = $state(null);
-	let textInputEl: HTMLInputElement | undefined = $state();
+	let textInputWrapEl: HTMLDivElement | undefined;
 	let erasing = $state(false);
 	let moving: { drawingId: string; lastPoint: Point; space: DrawingSpace } | null = $state(null);
 	let justCommitted = false;
@@ -2051,13 +2062,6 @@
 	});
 
 	$effect(() => {
-		if (!textInput || !textInputEl) return;
-
-		const frame = requestAnimationFrame(() => textInputEl?.focus());
-		return () => cancelAnimationFrame(frame);
-	});
-
-	$effect(() => {
 		const node = toastLayerEl;
 		if (!node) return;
 
@@ -2319,21 +2323,28 @@
 			{#if textInput}
 				<div
 					class="text-input-wrap"
+					{@attach captureTextInputWrap}
 					style={textInputStyle(textInput.position, textInput.space)}
 					onfocusout={handleTextInputFocusOut}
 				>
-					<input
-						class="text-input"
+					<Input
 						type="text"
+						size="sm"
 						data-feedback-text-input
-						bind:this={textInputEl}
+						aria-label="Annotation text"
 						bind:value={textInput.value}
 						onkeydown={handleTextKeyDown}
 						placeholder="Type annotation..."
 					/>
-					<button class="text-confirm-btn" onclick={commitText} aria-label="Confirm annotation">
+					<Button
+						variant="solid"
+						size="sm"
+						color={null}
+						onclick={commitText}
+						aria-label="Confirm annotation"
+					>
 						<Check size={14} />
-					</button>
+					</Button>
 				</div>
 			{/if}
 
@@ -2487,52 +2498,42 @@
 	}
 
 	.text-input-wrap {
+		--dry-btn-accent: hsl(25 100% 55%);
+		--dry-btn-accent-active: hsl(25 100% 50%);
+		--dry-btn-accent-hover: hsl(25 100% 62%);
+		--dry-btn-active-transform: none;
+		--dry-btn-border: transparent;
+		--dry-btn-color: black;
+		--dry-btn-min-height: 0;
+		--dry-btn-on-accent: black;
+		--dry-btn-padding-x: 8px;
+		--dry-btn-padding-y: 0;
+		--dry-btn-radius: 0;
+		--dry-form-control-border-hover: transparent;
+		--dry-form-control-color-placeholder: hsl(0 0% 20%);
+		--dry-input-bg: hsl(25 100% 55%);
+		--dry-input-border: transparent;
+		--dry-input-color: black;
+		--dry-input-font-size: 16px;
+		--dry-input-padding-x: 8px;
+		--dry-input-padding-y: 4px;
+		--dry-input-radius: 0;
+		--dry-shadow-raised: none;
+		--dry-shadow-sm: none;
 		position: absolute;
 		z-index: 10001;
 		display: grid;
 		grid-template-columns: 1fr auto;
+		column-gap: 2px;
 		border: 2px solid white;
 		border-radius: 6px;
-		background: hsl(25 100% 55%);
+		background: white;
+		font-weight: 600;
 		box-shadow:
 			0 0 0 1px black,
 			0 8px 20px hsl(0 0% 0% / 0.3);
 		backdrop-filter: blur(4px);
 		overflow: hidden;
-	}
-
-	.text-input {
-		padding: 4px 8px;
-		border: none;
-		background: transparent;
-		color: black;
-		font-size: 16px;
-		font-weight: 600;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		outline: none;
-	}
-
-	.text-input::placeholder {
-		color: hsl(0 0% 20%);
-		font-weight: 400;
-	}
-
-	.text-confirm-btn {
-		display: grid;
-		place-items: center;
-		padding: 0 8px;
-		border: none;
-		border-left: 2px solid white;
-		background: hsl(25 100% 55%);
-		color: black;
-		cursor: pointer;
-	}
-
-	.text-confirm-btn:hover {
-		background: hsl(25 100% 62%);
 	}
 
 	.placement-overlay {
