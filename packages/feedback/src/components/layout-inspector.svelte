@@ -29,6 +29,8 @@
 	type Gesture = { kind: 'move' } | { kind: 'resize'; edge: Edge } | { kind: 'rotate' };
 
 	let boxes = $state<Box[]>([]);
+	let coarsePointer = $state(false);
+	const COARSE_POINTER_QUERY = '(pointer: coarse), (hover: none)';
 
 	function isInsideFeedback(el: Element): boolean {
 		return !!el.closest('[data-dryui-feedback]');
@@ -266,6 +268,12 @@
 
 	onMount(() => {
 		rebuild();
+		const pointerQuery = window.matchMedia(COARSE_POINTER_QUERY);
+		const syncPointerMode = () => {
+			coarsePointer = pointerQuery.matches;
+		};
+		syncPointerMode();
+		pointerQuery.addEventListener('change', syncPointerMode);
 		const ro = new ResizeObserver(scheduleRebuild);
 		ro.observe(document.body);
 		window.addEventListener('scroll', scheduleRebuild, true);
@@ -274,6 +282,7 @@
 
 		return () => {
 			if (rebuildFrame) cancelAnimationFrame(rebuildFrame);
+			pointerQuery.removeEventListener('change', syncPointerMode);
 			ro.disconnect();
 			window.removeEventListener('scroll', scheduleRebuild, true);
 			window.removeEventListener('resize', scheduleRebuild);
@@ -292,6 +301,7 @@
 <div
 	class="layout-inspector"
 	data-has-selection={selectedElement ? '' : undefined}
+	data-coarse-pointer={coarsePointer || undefined}
 	onclick={(e) => {
 		if (e.target === e.currentTarget && selectedElement) {
 			onselect(null);
@@ -396,6 +406,7 @@
 		border: none;
 		background: transparent;
 		pointer-events: auto;
+		touch-action: manipulation;
 		cursor: pointer;
 		font: inherit;
 		color: inherit;
@@ -504,6 +515,7 @@
 		min-height: 0;
 		box-shadow: none;
 		text-decoration: none;
+		touch-action: none;
 	}
 
 	.layout-inspector
@@ -588,5 +600,67 @@
 	.layout-inspector :global(.layout-handle-corner-sw) {
 		bottom: -6px;
 		left: -6px;
+	}
+
+	@container dryui-feedback-root (max-width: 36rem) {
+		.layout-box[data-tooltip]::after,
+		.layout-box-selected[data-tooltip]::after,
+		.layout-inspector :global(.layout-box[data-tooltip])::after {
+			max-inline-size: min(240px, calc(100vw - 24px));
+		}
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-edge-top) {
+		top: -12px;
+		left: 18px;
+		right: 18px;
+		height: 24px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-edge-bottom) {
+		bottom: -12px;
+		left: 18px;
+		right: 18px;
+		height: 24px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-edge-left) {
+		left: -12px;
+		top: 18px;
+		bottom: 18px;
+		width: 24px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-edge-right) {
+		right: -12px;
+		top: 18px;
+		bottom: 18px;
+		width: 24px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-corner) {
+		width: 28px;
+		height: 28px;
+		border-radius: 6px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-corner-nw) {
+		top: -14px;
+		left: -14px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-corner-ne) {
+		top: -14px;
+		right: -14px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-corner-se) {
+		bottom: -14px;
+		right: -14px;
+	}
+
+	.layout-inspector[data-coarse-pointer] :global(.layout-handle-corner-sw) {
+		bottom: -14px;
+		left: -14px;
 	}
 </style>

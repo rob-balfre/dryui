@@ -62,7 +62,7 @@
 	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
 	const STROKE_OUTLINE_WIDTH = 4;
 	const TEXT_OUTLINE_RATIO = 0.22;
-	const ACTIVATION_QUERY_PARAM = 'dryui-feedback';
+	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
 	const DASHBOARD_TAB_NAME = 'dryui-feedback-list';
 	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
 
@@ -1810,7 +1810,7 @@
 	function canonicalPageUrl(): string {
 		if (typeof window === 'undefined') return '/';
 		const url = new URL(window.location.href);
-		url.searchParams.delete(ACTIVATION_QUERY_PARAM);
+		url.searchParams.delete(FEEDBACK_QUERY_PARAM);
 		url.hash = '';
 		return url.toString();
 	}
@@ -2088,19 +2088,6 @@
 			for (const timer of Object.values(toastTimers)) clearTimeout(timer);
 			for (const id of Object.keys(toastTimers)) delete toastTimers[id];
 		};
-	});
-
-	function shouldAutoActivate(): boolean {
-		if (typeof window === 'undefined') return false;
-		try {
-			return new URL(window.location.href).searchParams.get(ACTIVATION_QUERY_PARAM) === '1';
-		} catch {
-			return false;
-		}
-	}
-
-	onMount(() => {
-		if (shouldAutoActivate() && !active) active = true;
 	});
 
 	function handleHistoryKey(e: KeyboardEvent) {
@@ -2425,6 +2412,10 @@
 
 <style>
 	.feedback-root {
+		--dry-feedback-edge-block: max(24px, env(safe-area-inset-bottom));
+		--dry-feedback-edge-inline: max(24px, env(safe-area-inset-right));
+
+		container: dryui-feedback-root / inline-size;
 		position: fixed;
 		inset: 0;
 		inline-size: 100vw;
@@ -2546,6 +2537,7 @@
 		background: hsl(25 100% 55% / 0.04);
 		cursor: crosshair;
 		pointer-events: auto;
+		touch-action: none;
 	}
 
 	.placement-hint {
@@ -2635,5 +2627,26 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		gap: 4px;
+	}
+
+	@container dryui-feedback-root (max-width: 36rem) {
+		.placement-overlay {
+			place-items: start stretch;
+			padding-inline: var(--dry-space-3);
+		}
+
+		.placement-hint {
+			grid-auto-flow: row;
+			justify-items: center;
+			text-align: center;
+			border-radius: var(--dry-radius-lg);
+		}
+
+		.feedback-toast-provider {
+			inset: max(var(--dry-space-2), env(safe-area-inset-top))
+				max(var(--dry-space-2), env(safe-area-inset-right)) auto
+				max(var(--dry-space-2), env(safe-area-inset-left));
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 </style>
