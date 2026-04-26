@@ -55,6 +55,11 @@
       "svelte": "./src/app-frame/index.ts",
       "default": "./src/app-frame/index.ts"
     },
+    "./area-grid": {
+      "types": "./src/area-grid/index.ts",
+      "svelte": "./src/area-grid/index.ts",
+      "default": "./src/area-grid/index.ts"
+    },
     "./aspect-ratio": {
       "types": "./src/aspect-ratio/index.ts",
       "svelte": "./src/aspect-ratio/index.ts",
@@ -847,6 +852,11 @@
         "types": "./dist/app-frame/index.d.ts",
         "svelte": "./dist/app-frame/index.js",
         "default": "./dist/app-frame/index.js"
+      },
+      "./area-grid": {
+        "types": "./dist/area-grid/index.d.ts",
+        "svelte": "./dist/area-grid/index.js",
+        "default": "./dist/area-grid/index.js"
       },
       "./aspect-ratio": {
         "types": "./dist/aspect-ratio/index.d.ts",
