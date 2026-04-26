@@ -47,13 +47,13 @@
 		Sparkles,
 		Moon,
 		Sun,
-		Monitor,
 		Download,
 		ClipboardCopy,
 		SlidersHorizontal,
 		RotateCcw,
 		ChevronUp,
-		Info
+		Info,
+		Shuffle
 	} from 'lucide-svelte';
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import Logo from '$lib/components/Logo.svelte';
@@ -68,9 +68,8 @@
 	let lastAppliedRecipe: string | null = null;
 	let previewMode = $state<'overview' | 'forms' | 'dashboard' | 'cards'>('overview');
 	let presetOpen = $state(false);
-	let accentOpen = $state(false);
-	let baseOpen = $state(false);
 	let fontOpen = $state(false);
+	let shapeOpen = $state(false);
 	let advancedOpen = $state(false);
 
 	function decodeBrowserRecipe() {
@@ -117,11 +116,6 @@
 			// Ignore malformed recipe URLs and leave the current in-memory state alone.
 		}
 	});
-
-	function brandHsbToHex(brand: { h: number; s: number; b: number }): string {
-		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
-		return hslToHex(hsl.h, hsl.s, hsl.l);
-	}
 
 	function thumbSlug(name: string): string {
 		return name.toLowerCase().replace(/\s+/g, '-');
@@ -386,28 +380,10 @@
 		hint: FONT_META[value].hint
 	}));
 
-	const THEME_OPTIONS = [
-		{ value: 'system' as const, label: 'Auto', icon: Monitor },
-		{ value: 'light' as const, label: 'Light', icon: Sun },
-		{ value: 'dark' as const, label: 'Dark', icon: Moon }
-	];
-
-	function setThemeMode(value: string) {
-		if (value === 'system' || value === 'light' || value === 'dark') {
-			docsTheme.setMode(value);
+	function setBasePanelValue(value: string) {
+		if (PERSONALITY_OPTIONS.some((o) => o.value === value)) {
+			setPersonality(value as Personality);
 		}
-	}
-
-	function getThemeMode(): string {
-		return docsTheme.mode;
-	}
-
-	function setPersonalityPanelValue(value: string) {
-		const option = PERSONALITY_OPTIONS.find((candidate) => candidate.value === value);
-		if (!option) return;
-
-		setPersonality(option.value as Personality);
-		baseOpen = false;
 	}
 
 	function setFontPanelValue(value: string) {
@@ -421,10 +397,13 @@
 	let activeFontName = $derived(wizardState.typography.fontPreset);
 	let activeRadius = $derived(wizardState.shape.radiusPreset);
 	let activeDensity = $derived(wizardState.shape.density);
-	let activePersonalityLabel = $derived(
-		PERSONALITY_OPTIONS.find((o) => o.value === wizardState.personality)?.label ?? 'Base'
+	let activeRadiusLabel = $derived(
+		RADIUS_OPTIONS.find((o) => o.value === activeRadius)?.label ?? 'Soft'
 	);
-	let accentSwatchHex = $derived(brandHsbToHex(wizardState.brandHsb));
+	let activeDensityLabel = $derived(
+		DENSITY_OPTIONS.find((o) => o.value === activeDensity)?.label ?? 'Default'
+	);
+	let activeShapeLabel = $derived(`${activeRadiusLabel} · ${activeDensityLabel}`);
 	let previewFrameTitle = $derived(`preview.${previewMode}`);
 </script>
 
@@ -557,84 +536,59 @@
 								<span>Accent</span>
 								<Info size={13} aria-hidden="true" />
 							</span>
-							<Popover.Root bind:open={accentOpen}>
-								<Popover.Trigger>
-									<Button
-										class="rail-select-trigger"
-										variant="secondary"
-										size="sm"
-										aria-label="Edit accent color"
-									>
-										<span class="rail-color-swatch" {@attach cssVar('--_swatch', accentSwatchHex)}
-										></span>
-										<span class="rail-color-name">{activeAccentName || 'Custom'}</span>
-										<ChevronUp size={15} aria-hidden="true" />
-									</Button>
-								</Popover.Trigger>
-								<Popover.Content
-									placement="top-start"
-									--dry-popover-padding="0"
-									--dry-popover-radius="var(--dry-radius-2xl, 1.5rem)"
-									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 86%, var(--dry-color-bg-base) 14%)"
-									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 78%, transparent 22%)"
-								>
-									<div class="accent-panel">
-										<div class="accent-preset-list" role="radiogroup" aria-label="Accent presets">
-											{#each PRESETS as preset, i (preset.name)}
-												{@const presetHex = brandHex(preset.brandInput)}
-												{@const isActivePreset = activeAccentName === preset.name}
-												<span class="accent-preset" data-selected={isActivePreset ? '' : undefined}>
-													<Button
-														variant="bare"
-														size="md"
-														role="radio"
-														aria-checked={isActivePreset}
-														aria-label={preset.name}
-														tabindex={isActivePreset || (!activeAccentName && i === 0) ? 0 : -1}
-														data-accent-preset={thumbSlug(preset.name)}
-														onclick={() => applyBrandPresetName(preset.name)}
-														onkeydown={(event) => handleBrandPresetKeydown(event, i)}
-														optical="off"
-														--dry-focus-ring="none"
-														--dry-btn-bg="transparent"
-														--dry-btn-border="transparent"
-														--dry-btn-color="inherit"
-														--dry-btn-padding-x="0"
-														--dry-btn-padding-y="0"
-														--dry-btn-radius="var(--dry-radius-xl)"
-														--dry-btn-font-size="inherit"
-														--dry-btn-active-transform="none"
-													>
-														<span class="accent-preset-content">
-															<span
-																class="accent-swatch"
-																data-color-thumb={thumbSlug(preset.name)}
-																aria-hidden="true"
-																{@attach cssVar('--_preset-color', presetHex)}
-															></span>
-															<span class="accent-preset-label">{preset.name}</span>
-														</span>
-													</Button>
-												</span>
-											{/each}
-										</div>
-										<div class="accent-random-action">
+							<div class="rail-accent">
+								<div class="rail-accent-track" role="radiogroup" aria-label="Accent presets">
+									{#each PRESETS as preset, i (preset.name)}
+										{@const presetHex = brandHex(preset.brandInput)}
+										{@const isActivePreset = activeAccentName === preset.name}
+										<span
+											class="rail-accent-swatch"
+											data-selected={isActivePreset ? '' : undefined}
+										>
 											<Button
-												variant="link"
-												size="sm"
-												onclick={applyRandomBrandPreset}
-												--dry-btn-font-size="0.875rem"
-												--dry-btn-color="var(--dry-color-text-link, var(--wizard-accent-text))"
+												variant="bare"
+												role="radio"
+												aria-checked={isActivePreset}
+												aria-label={preset.name}
+												title={preset.name}
+												tabindex={isActivePreset || (!activeAccentName && i === 0) ? 0 : -1}
+												data-accent-preset={thumbSlug(preset.name)}
+												onclick={() => applyBrandPresetName(preset.name)}
+												onkeydown={(event) => handleBrandPresetKeydown(event, i)}
+												--dry-btn-bg="transparent"
+												--dry-btn-border="transparent"
+												--dry-btn-color="inherit"
 												--dry-btn-padding-x="0"
 												--dry-btn-padding-y="0"
-												--dry-focus-ring="var(--dry-focus-ring)"
+												--dry-btn-min-height="0"
+												--dry-btn-radius="9999px"
+												--dry-btn-active-transform="none"
+												--dry-focus-ring="none"
 											>
-												Random preset
+												<span
+													class="rail-accent-dot"
+													aria-hidden="true"
+													{@attach cssVar('--_swatch', presetHex)}
+												></span>
 											</Button>
-										</div>
-									</div>
-								</Popover.Content>
-							</Popover.Root>
+										</span>
+									{/each}
+								</div>
+								<span class="rail-accent-shuffle">
+									<Button
+										variant="ghost"
+										size="sm"
+										aria-label="Random accent preset"
+										onclick={applyRandomBrandPreset}
+										--dry-btn-padding-x="var(--dry-space-1)"
+										--dry-btn-padding-y="var(--dry-space-1)"
+										--dry-btn-min-height="0"
+										--dry-btn-radius="9999px"
+									>
+										<Shuffle size={14} aria-hidden="true" />
+									</Button>
+								</span>
+							</div>
 						</div>
 
 						<div class="rail-module">
@@ -642,43 +596,25 @@
 								<span>Base</span>
 								<Info size={13} aria-hidden="true" />
 							</span>
-							<Popover.Root bind:open={baseOpen}>
-								<Popover.Trigger>
-									<Button variant="secondary" size="sm" aria-labelledby="rail-base-label">
-										<span class="rail-trigger-glyph">B</span>
-										<span class="rail-trigger-value">{activePersonalityLabel}</span>
-										<ChevronUp size={15} aria-hidden="true" />
-									</Button>
-								</Popover.Trigger>
-								<Popover.Content
-									placement="top-start"
-									offset={12}
-									--dry-popover-padding="0"
-									--dry-popover-radius="var(--dry-radius-2xl)"
-									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
-									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
-									--dry-popover-shadow="var(--dry-shadow-overlay)"
+							<div class="wizard-option-scope rail-segmented rail-base-segmented">
+								<OptionPicker.Root
+									columns={4}
+									bind:value={() => wizardState.personality, setBasePanelValue}
 								>
-									<div class="base-panel">
-										<header class="option-panel-header">
-											<span>Base</span>
-										</header>
-										<div class="wizard-option-scope base-picker">
-											<OptionPicker.Root
-												columns={2}
-												bind:value={() => wizardState.personality, setPersonalityPanelValue}
-											>
-												{#each PERSONALITY_OPTIONS as opt (opt.value)}
-													<OptionPicker.Item value={opt.value} size="compact">
-														<OptionPicker.Label>{opt.label}</OptionPicker.Label>
-														<OptionPicker.Description>{opt.hint}</OptionPicker.Description>
-													</OptionPicker.Item>
-												{/each}
-											</OptionPicker.Root>
-										</div>
-									</div>
-								</Popover.Content>
-							</Popover.Root>
+									{#each PERSONALITY_OPTIONS as opt (opt.value)}
+										<OptionPicker.Item
+											value={opt.value}
+											size="compact"
+											layout="stacked"
+											aria-label={opt.label}
+											title={opt.hint}
+										>
+											<span class="rail-base-letter" aria-hidden="true">{opt.label[0]}</span>
+											<VisuallyHidden>{opt.label}</VisuallyHidden>
+										</OptionPicker.Item>
+									{/each}
+								</OptionPicker.Root>
+							</div>
 						</div>
 
 						<div class="rail-module">
@@ -735,60 +671,77 @@
 						</div>
 
 						<div class="rail-module">
-							<span class="rail-label">Radius</span>
-							<div class="wizard-option-scope rail-segmented">
-								<OptionPicker.Root columns={4} bind:value={() => activeRadius, setRadiusPreset}>
-									{#each RADIUS_OPTIONS as opt (opt.value)}
-										<OptionPicker.Item value={opt.value} size="compact" layout="stacked">
-											<OptionPicker.Preview variant="shape" data-shape={opt.value} />
-											<VisuallyHidden>{opt.label}</VisuallyHidden>
-										</OptionPicker.Item>
-									{/each}
-								</OptionPicker.Root>
-							</div>
-						</div>
-
-						<div class="rail-module">
-							<span class="rail-label">Density</span>
-							<div class="wizard-option-scope rail-segmented">
-								<OptionPicker.Root columns={3} bind:value={() => activeDensity, setDensity}>
-									{#each DENSITY_OPTIONS as opt (opt.value)}
-										<OptionPicker.Item
-											value={opt.value}
-											size="compact"
-											layout="stacked"
-											aria-label={opt.label}
-										>
-											<span class="density-dots" data-density={opt.value} aria-hidden="true">
-												<span class="density-dot"></span>
-												<span class="density-dot"></span>
-												<span class="density-dot"></span>
-											</span>
-											<VisuallyHidden>{opt.label}</VisuallyHidden>
-										</OptionPicker.Item>
-									{/each}
-								</OptionPicker.Root>
-							</div>
-						</div>
-
-						<div class="rail-module">
-							<span class="rail-label">Theme</span>
-							<div class="wizard-option-scope rail-segmented">
-								<OptionPicker.Root columns={3} bind:value={getThemeMode, setThemeMode}>
-									{#each THEME_OPTIONS as opt (opt.value)}
-										{@const ThemeIcon = opt.icon}
-										<OptionPicker.Item
-											value={opt.value}
-											size="compact"
-											layout="stacked"
-											aria-label={opt.label}
-										>
-											<ThemeIcon size={14} aria-hidden="true" />
-											<VisuallyHidden>{opt.label}</VisuallyHidden>
-										</OptionPicker.Item>
-									{/each}
-								</OptionPicker.Root>
-							</div>
+							<span class="rail-label" id="rail-shape-label">Shape</span>
+							<Popover.Root bind:open={shapeOpen}>
+								<Popover.Trigger>
+									<Button variant="secondary" size="sm" aria-labelledby="rail-shape-label">
+										<span class="rail-trigger-value">{activeShapeLabel}</span>
+										<ChevronUp size={15} aria-hidden="true" />
+									</Button>
+								</Popover.Trigger>
+								<Popover.Content
+									placement="top-start"
+									offset={12}
+									--dry-popover-padding="0"
+									--dry-popover-radius="var(--dry-radius-2xl)"
+									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
+									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
+									--dry-popover-shadow="var(--dry-shadow-overlay)"
+								>
+									<div class="shape-panel">
+										<header class="option-panel-header">
+											<span>Shape</span>
+										</header>
+										<div class="shape-panel-row">
+											<span class="popover-section-label">Radius</span>
+											<div class="wizard-option-scope rail-segmented shape-radius-picker">
+												<OptionPicker.Root
+													columns={4}
+													bind:value={() => activeRadius, setRadiusPreset}
+												>
+													{#each RADIUS_OPTIONS as opt (opt.value)}
+														<OptionPicker.Item
+															value={opt.value}
+															size="compact"
+															layout="stacked"
+															aria-label={opt.label}
+														>
+															<OptionPicker.Preview variant="shape" data-shape={opt.value} />
+															<VisuallyHidden>{opt.label}</VisuallyHidden>
+														</OptionPicker.Item>
+													{/each}
+												</OptionPicker.Root>
+											</div>
+										</div>
+										<div class="shape-panel-row">
+											<span class="popover-section-label">Density</span>
+											<div class="wizard-option-scope rail-segmented shape-density-picker">
+												<OptionPicker.Root columns={3} bind:value={() => activeDensity, setDensity}>
+													{#each DENSITY_OPTIONS as opt (opt.value)}
+														<OptionPicker.Item
+															value={opt.value}
+															size="compact"
+															layout="stacked"
+															aria-label={opt.label}
+														>
+															<span
+																class="density-dots"
+																data-density={opt.value}
+																aria-hidden="true"
+															>
+																<span class="density-dot"></span>
+																<span class="density-dot"></span>
+																<span class="density-dot"></span>
+															</span>
+															<VisuallyHidden>{opt.label}</VisuallyHidden>
+														</OptionPicker.Item>
+													{/each}
+												</OptionPicker.Root>
+											</div>
+										</div>
+									</div>
+								</Popover.Content>
+							</Popover.Root>
 						</div>
 					</div>
 
@@ -1079,9 +1032,10 @@
 
 	.rail-modules {
 		display: grid;
-		grid-template-columns:
-			minmax(10rem, 17rem) minmax(9rem, 13rem) minmax(11rem, 15rem) minmax(11rem, 14rem)
-			minmax(8rem, 10rem) minmax(8rem, 10rem);
+		grid-template-columns: minmax(13rem, 19rem) minmax(9rem, 12rem) minmax(11rem, 15rem) minmax(
+				10rem,
+				13rem
+			);
 		align-items: end;
 		gap: var(--dry-space-4);
 	}
@@ -1202,36 +1156,118 @@
 		background: currentColor;
 	}
 
-	.rail-color-swatch {
+	.rail-accent {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) auto;
+		grid-template-rows: var(--rail-h);
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding-inline: var(--dry-space-3);
+		border-radius: var(--dry-radius-lg);
+		background: color-mix(in srgb, var(--dry-color-bg-raised) 84%, var(--dry-color-bg-base) 16%);
+		border: 1px solid
+			color-mix(in srgb, var(--dry-color-stroke-strong) 72%, var(--dry-color-stroke-weak) 28%);
+	}
+
+	.rail-accent-track {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
+		align-items: center;
+		justify-items: center;
+		gap: var(--dry-space-1);
+	}
+
+	.rail-accent-swatch {
 		display: inline-grid;
-		grid-template-columns: 1.35rem;
-		grid-template-rows: 1.35rem;
+		grid-template-columns: 1.75rem;
+		grid-template-rows: 1.75rem;
+		place-items: center;
+		isolation: isolate;
+		transition: transform var(--dry-duration-fast, 100ms) ease;
+	}
+
+	.rail-accent-swatch:hover,
+	.rail-accent-swatch:focus-within {
+		transform: translateY(-1px);
+	}
+
+	.rail-accent-dot {
+		display: grid;
+		grid-template-columns: 1.25rem;
+		grid-template-rows: 1.25rem;
 		border-radius: 50%;
 		background: var(--_swatch, var(--dry-color-fill-brand));
-		border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+		box-shadow:
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
+			0 0 0 0 transparent;
+		transition: box-shadow var(--dry-duration-fast, 100ms) ease;
 	}
 
-	.rail-color-name {
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-		justify-self: start;
+	.rail-accent-swatch:hover .rail-accent-dot,
+	.rail-accent-swatch:focus-within .rail-accent-dot {
+		box-shadow:
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
+			0 0 0 2px color-mix(in srgb, var(--dry-color-text-strong) 28%, transparent 72%);
 	}
 
-	.base-panel,
-	.font-panel {
+	.rail-accent-swatch[data-selected] .rail-accent-dot {
+		box-shadow:
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 18%, transparent 82%),
+			0 0 0 2px var(--dry-color-bg-raised),
+			0 0 0 4px color-mix(in srgb, var(--dry-color-text-strong) 70%, transparent 30%);
+	}
+
+	.rail-accent-shuffle {
+		display: inline-grid;
+		place-items: center;
+		color: var(--dry-color-text-weak);
+		opacity: 0.7;
+		transition: opacity var(--dry-duration-fast, 100ms) ease;
+	}
+
+	.rail-accent-shuffle:hover,
+	.rail-accent-shuffle:focus-within {
+		opacity: 1;
+	}
+
+	.rail-base-segmented {
+		--dry-option-picker-padding-x: var(--dry-space-1);
+	}
+
+	.rail-base-letter {
+		display: inline-grid;
+		font-size: 0.875rem;
+		font-weight: 650;
+		line-height: 1;
+		color: inherit;
+	}
+
+	.font-panel,
+	.shape-panel {
 		display: grid;
 		gap: var(--dry-space-4);
 		padding: var(--dry-space-4);
 	}
 
-	.base-panel {
-		grid-template-columns: minmax(0, min(28rem, calc(100vw - var(--dry-space-6))));
-	}
-
 	.font-panel {
 		grid-template-columns: minmax(0, min(39rem, calc(100vw - var(--dry-space-6))));
 		grid-template-rows: auto minmax(0, min(27rem, calc(100dvh - 12rem)));
+	}
+
+	.shape-panel {
+		grid-template-columns: minmax(0, min(22rem, calc(100vw - var(--dry-space-6))));
+	}
+
+	.shape-panel-row {
+		display: grid;
+		gap: var(--dry-space-1_5);
+	}
+
+	.shape-radius-picker,
+	.shape-density-picker {
+		--dry-option-picker-min-block-size: 2.75rem;
+		--dry-option-picker-compact-min-block-size: 2.75rem;
 	}
 
 	.option-panel-header {
@@ -1245,27 +1281,6 @@
 		line-height: 1.1;
 		color: var(--dry-color-text-strong);
 		letter-spacing: 0;
-	}
-
-	.base-picker {
-		--dry-option-picker-gap: var(--dry-space-3);
-		--dry-option-picker-padding-y: var(--dry-space-3);
-		--dry-option-picker-padding-x: var(--dry-space-3);
-		--dry-option-picker-compact-min-block-size: 5.75rem;
-		--dry-option-picker-radius: var(--dry-radius-xl);
-		--dry-option-picker-bg: color-mix(
-			in srgb,
-			var(--dry-color-bg-base) 46%,
-			var(--dry-color-bg-raised) 54%
-		);
-		--dry-option-picker-bg-hover: color-mix(
-			in srgb,
-			var(--dry-color-bg-raised) 76%,
-			var(--dry-color-fill-brand) 24%
-		);
-		--dry-option-picker-border: var(--dry-color-stroke-weak);
-		--dry-option-picker-label-size: 0.9375rem;
-		--dry-option-picker-description-size: 0.8125rem;
 	}
 
 	.font-picker {
@@ -1384,90 +1399,6 @@
 		font-weight: 600;
 		line-height: 1;
 		color: var(--dry-color-on-brand);
-	}
-
-	.accent-panel {
-		display: grid;
-		grid-template-columns: minmax(20rem, 24rem);
-		gap: var(--dry-space-6);
-		padding: var(--dry-space-6);
-	}
-
-	.accent-preset-list {
-		display: grid;
-		grid-template-columns: repeat(4, minmax(0, 1fr));
-		column-gap: var(--dry-space-5);
-		row-gap: var(--dry-space-6);
-	}
-
-	.accent-preset {
-		display: grid;
-		border-radius: var(--dry-radius-xl);
-	}
-
-	.accent-preset-content {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		justify-items: center;
-		align-content: start;
-		gap: var(--dry-space-2);
-	}
-
-	.accent-swatch {
-		display: grid;
-		place-items: center;
-		block-size: 3.75rem;
-		aspect-ratio: 1;
-		border-radius: 9999px;
-		background: radial-gradient(
-			circle at 30% 22%,
-			color-mix(in srgb, var(--_preset-color) 18%, var(--dry-color-text-strong) 82%) 0 12%,
-			color-mix(in srgb, var(--_preset-color) 78%, var(--dry-color-text-strong) 22%) 36%,
-			var(--_preset-color) 62%,
-			color-mix(in srgb, var(--_preset-color) 64%, var(--dry-color-bg-base) 36%) 100%
-		);
-		border: 1px solid color-mix(in srgb, var(--dry-color-text-strong) 10%, transparent 90%);
-		box-shadow:
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%),
-			0 0 0 0 transparent;
-		transition:
-			box-shadow var(--dry-duration-fast, 100ms) ease,
-			transform var(--dry-duration-fast, 100ms) ease;
-	}
-
-	.accent-preset:hover .accent-swatch,
-	.accent-preset:focus-within .accent-swatch {
-		transform: translateY(-1px);
-		box-shadow:
-			0 0 0 2px color-mix(in srgb, var(--wizard-accent-border) 46%, transparent),
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%);
-	}
-
-	.accent-preset[data-selected] .accent-swatch {
-		box-shadow:
-			0 0 0 2px var(--dry-color-bg-raised),
-			0 0 0 4px var(--wizard-accent-border),
-			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%);
-	}
-
-	.accent-preset-label {
-		display: block;
-		max-width: 6em;
-		font-size: 0.875rem;
-		font-weight: 600;
-		line-height: 1.15;
-		color: var(--dry-color-text-muted, var(--dry-color-text-weak));
-		text-align: center;
-		overflow-wrap: anywhere;
-	}
-
-	.accent-preset[data-selected] .accent-preset-label {
-		color: var(--dry-color-text-strong);
-	}
-
-	.accent-random-action {
-		display: grid;
-		justify-self: start;
 	}
 
 	.advanced-panel {
