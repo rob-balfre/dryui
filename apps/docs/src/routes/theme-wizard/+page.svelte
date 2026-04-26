@@ -5,12 +5,12 @@
 	import type { PageProps } from './$types';
 	import {
 		Adjust,
+		AppFrame,
 		Badge,
 		Button,
-		ColorPicker,
+		Container,
 		OptionPicker,
 		Popover,
-		Select,
 		Slider,
 		Tabs,
 		Text,
@@ -31,8 +31,6 @@
 		decodeRecipe,
 		hsbToHsl,
 		hslToHex,
-		hexToHsl,
-		hslToHsb,
 		resetToDefaults,
 		downloadCss,
 		copyCss,
@@ -41,19 +39,21 @@
 		RECIPE_PRESETS,
 		FONT_STACKS,
 		type BrandInput,
+		type FontPreset,
+		type Personality,
 		type RecipePreset
 	} from '@dryui/theme-wizard';
 	import {
 		Sparkles,
-		ShieldCheck,
-		ShieldAlert,
 		Moon,
 		Sun,
 		Monitor,
 		Download,
 		ClipboardCopy,
 		SlidersHorizontal,
-		RotateCcw
+		RotateCcw,
+		ChevronUp,
+		Info
 	} from 'lucide-svelte';
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import Logo from '$lib/components/Logo.svelte';
@@ -69,6 +69,8 @@
 	let previewMode = $state<'overview' | 'forms' | 'dashboard' | 'cards'>('overview');
 	let presetOpen = $state(false);
 	let accentOpen = $state(false);
+	let baseOpen = $state(false);
+	let fontOpen = $state(false);
 	let advancedOpen = $state(false);
 
 	function decodeBrowserRecipe() {
@@ -119,19 +121,6 @@
 	function brandHsbToHex(brand: { h: number; s: number; b: number }): string {
 		const hsl = hsbToHsl(brand.h, brand.s / 100, brand.b / 100);
 		return hslToHex(hsl.h, hsl.s, hsl.l);
-	}
-
-	function setBrandFromHex(value: string) {
-		const hsl = hexToHsl(value);
-		const hsb = hslToHsb(hsl.h, hsl.s, hsl.l);
-		const current = wizardState.brandHsb;
-		if (
-			Math.round(hsb.h) !== Math.round(current.h) ||
-			Math.round(hsb.s * 100) !== Math.round(current.s) ||
-			Math.round(hsb.b * 100) !== Math.round(current.b)
-		) {
-			setBrandHsb(hsb.h, Math.round(hsb.s * 100), Math.round(hsb.b * 100));
-		}
 	}
 
 	function thumbSlug(name: string): string {
@@ -201,6 +190,52 @@
 		const preset = PRESETS.find((candidate) => candidate.name === name);
 		if (preset) {
 			setBrandHsb(preset.brandInput.h, preset.brandInput.s, preset.brandInput.b);
+		}
+	}
+
+	function applyRandomBrandPreset() {
+		const current = getSelectedBrandPresetName();
+		const candidates = PRESETS.filter((preset) => preset.name !== current);
+		const preset = candidates[Math.floor(Math.random() * candidates.length)] ?? PRESETS[0];
+		if (preset) {
+			applyBrandPresetName(preset.name);
+		}
+	}
+
+	function focusBrandPreset(name: string) {
+		if (!browser) return;
+
+		requestAnimationFrame(() => {
+			document
+				.querySelector<HTMLButtonElement>(`[data-accent-preset="${thumbSlug(name)}"]`)
+				?.focus();
+		});
+	}
+
+	function moveBrandPresetFocus(index: number, delta: number) {
+		const next = PRESETS[(index + delta + PRESETS.length) % PRESETS.length];
+		if (!next) return;
+
+		applyBrandPresetName(next.name);
+		focusBrandPreset(next.name);
+	}
+
+	function handleBrandPresetKeydown(event: KeyboardEvent, index: number) {
+		if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+			event.preventDefault();
+			moveBrandPresetFocus(index, 1);
+		}
+		if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+			event.preventDefault();
+			moveBrandPresetFocus(index, -1);
+		}
+		if (event.key === 'Home') {
+			event.preventDefault();
+			moveBrandPresetFocus(0, 0);
+		}
+		if (event.key === 'End') {
+			event.preventDefault();
+			moveBrandPresetFocus(PRESETS.length - 1, 0);
 		}
 	}
 
@@ -276,9 +311,19 @@
 
 	let lightContrast = $derived(getContrastResults('light'));
 	let darkContrast = $derived(getContrastResults('dark'));
-	let allContrastPass = $derived(
-		lightContrast.every((c) => c.passes) && darkContrast.every((c) => c.passes)
+	let mergedContrast = $derived(
+		lightContrast.map((light, i) => {
+			const dark = darkContrast[i]!;
+			return {
+				label: light.label,
+				light,
+				dark,
+				passes: light.passes && dark.passes
+			};
+		})
 	);
+	let failingContrastCount = $derived(mergedContrast.filter((c) => !c.passes).length);
+	let allContrastPass = $derived(failingContrastCount === 0);
 
 	let copyFeedback = $state('');
 
@@ -304,11 +349,19 @@
 	const editorialPresets = RECIPE_PRESETS.filter((p) => ['Editorial', 'Playful'].includes(p.name));
 
 	const PERSONALITY_OPTIONS = [
-		{ value: 'minimal', label: 'Minimal' },
-		{ value: 'clean', label: 'Clean' },
-		{ value: 'structured', label: 'Structured' },
-		{ value: 'rich', label: 'Rich' }
+		{ value: 'minimal', label: 'Minimal', hint: 'Quietest surfaces, lightest borders' },
+		{ value: 'clean', label: 'Clean', hint: 'Soft surfaces, restrained shadows' },
+		{ value: 'structured', label: 'Structured', hint: 'Defined borders, clear separation' },
+		{ value: 'rich', label: 'Rich', hint: 'Layered surfaces, deeper shadows' }
 	] as const;
+	const FONT_META: Record<FontPreset, { hint: string }> = {
+		System: { hint: 'Native interface stack' },
+		Humanist: { hint: 'Warm product UI' },
+		Geometric: { hint: 'Precise dashboard tone' },
+		Classical: { hint: 'Measured enterprise feel' },
+		Serif: { hint: 'Editorial contrast' },
+		Mono: { hint: 'Technical workspaces' }
+	};
 	const RADIUS_OPTIONS = [
 		{ value: 'sharp', label: 'Sharp' },
 		{ value: 'soft', label: 'Soft' },
@@ -326,7 +379,12 @@
 		{ value: 'spacious', label: 'Spacious' }
 	] as const;
 
-	const FONT_OPTIONS = Object.keys(FONT_STACKS) as Array<keyof typeof FONT_STACKS>;
+	const FONT_OPTIONS = Object.keys(FONT_STACKS) as FontPreset[];
+	const FONT_PANEL_OPTIONS = FONT_OPTIONS.map((value) => ({
+		value,
+		label: value,
+		hint: FONT_META[value].hint
+	}));
 
 	const THEME_OPTIONS = [
 		{ value: 'system' as const, label: 'Auto', icon: Monitor },
@@ -344,6 +402,21 @@
 		return docsTheme.mode;
 	}
 
+	function setPersonalityPanelValue(value: string) {
+		const option = PERSONALITY_OPTIONS.find((candidate) => candidate.value === value);
+		if (!option) return;
+
+		setPersonality(option.value as Personality);
+		baseOpen = false;
+	}
+
+	function setFontPanelValue(value: string) {
+		if (!FONT_OPTIONS.includes(value as FontPreset)) return;
+
+		setFontPreset(value as FontPreset);
+		fontOpen = false;
+	}
+
 	let activeAccentName = $derived(getSelectedBrandPresetName());
 	let activeFontName = $derived(wizardState.typography.fontPreset);
 	let activeRadius = $derived(wizardState.shape.radiusPreset);
@@ -352,6 +425,7 @@
 		PERSONALITY_OPTIONS.find((o) => o.value === wizardState.personality)?.label ?? 'Base'
 	);
 	let accentSwatchHex = $derived(brandHsbToHex(wizardState.brandHsb));
+	let previewFrameTitle = $derived(`preview.${previewMode}`);
 </script>
 
 <svelte:head>
@@ -359,386 +433,513 @@
 </svelte:head>
 
 <Tabs.Root bind:value={previewMode} activationMode="manual">
-	<div class="workbench" data-mode={themeMode}>
-		<header class="bar">
-			<div class="bar-brand">
-				<span class="bar-logo">
-					<Logo />
-				</span>
-				<span class="bar-title">Theme Wizard</span>
-			</div>
+	<Container size="xl">
+		<div class="workbench" data-mode={themeMode}>
+			<header class="bar">
+				<div class="bar-brand">
+					<span class="bar-logo">
+						<Logo />
+					</span>
+					<span class="bar-title">Theme Wizard</span>
+				</div>
 
-			<nav class="bar-tabs" aria-label="Preview mode">
-				<Tabs.List>
-					<Tabs.Trigger value="overview" size="sm">Overview</Tabs.Trigger>
-					<Tabs.Trigger value="forms" size="sm">Forms</Tabs.Trigger>
-					<Tabs.Trigger value="dashboard" size="sm">Dashboard</Tabs.Trigger>
-					<Tabs.Trigger value="cards" size="sm">Cards</Tabs.Trigger>
-				</Tabs.List>
-			</nav>
+				<nav class="bar-tabs" aria-label="Preview mode">
+					<Tabs.List>
+						<Tabs.Trigger value="overview" size="sm">Overview</Tabs.Trigger>
+						<Tabs.Trigger value="forms" size="sm">Forms</Tabs.Trigger>
+						<Tabs.Trigger value="dashboard" size="sm">Dashboard</Tabs.Trigger>
+						<Tabs.Trigger value="cards" size="sm">Cards</Tabs.Trigger>
+					</Tabs.List>
+				</nav>
 
-			<div class="bar-actions">
-				<Popover.Root bind:open={presetOpen}>
-					<Popover.Trigger>
-						<Button variant="ghost" size="sm">
-							<Sparkles size={14} aria-hidden="true" />
-							<span class="bar-action-label">Preset</span>
-						</Button>
-					</Popover.Trigger>
-					<Popover.Content placement="bottom-end">
-						<div class="preset-panel">
-							{#each [['Starting points', startingPresets], ['Technical', technicalPresets], ['Editorial', editorialPresets]] as const as [title, group] (title)}
-								<div class="preset-group">
-									<div class="preset-group-label">{title}</div>
-									<div class="wizard-option-scope wizard-preset-list">
-										<OptionPicker.Root
-											columns={1}
-											bind:value={getSelectedRecipePresetName, applyRecipePresetName}
-										>
-											{#each group as preset (preset.name)}
-												<OptionPicker.Item value={preset.name} size="compact">
-													<OptionPicker.Preview
-														variant="preset"
-														data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
-														data-preset-thumb={thumbSlug(preset.name)}
-														{@attach cssVar('--_preset-color', recipeBrandHex(preset))}
-													>
-														<span class="preset-thumb-text">Ag</span>
-													</OptionPicker.Preview>
-													<OptionPicker.Label>
-														<span class="preset-option-label">{preset.name}</span>
-													</OptionPicker.Label>
-													<OptionPicker.Description>
-														<span class="preset-option-description">{preset.description}</span>
-													</OptionPicker.Description>
-												</OptionPicker.Item>
-											{/each}
-										</OptionPicker.Root>
-									</div>
-								</div>
-							{/each}
-						</div>
-					</Popover.Content>
-				</Popover.Root>
-
-				<Button
-					variant="ghost"
-					size="sm"
-					onclick={() => docsTheme.cycle()}
-					aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-				>
-					{#if docsTheme.isDark}
-						<Sun size={14} aria-hidden="true" />
-					{:else}
-						<Moon size={14} aria-hidden="true" />
-					{/if}
-				</Button>
-
-				<Button variant="ghost" size="sm" onclick={handleCopyCss}>
-					<ClipboardCopy size={14} aria-hidden="true" />
-					<span class="bar-action-label">{copyFeedback || 'Copy'}</span>
-				</Button>
-
-				<Button variant="solid" size="sm" onclick={handleDownload}>
-					<Download size={14} aria-hidden="true" />
-					<span class="bar-action-label">Download</span>
-				</Button>
-			</div>
-		</header>
-
-		<Adjust
-			brightness={wizardState.adjust.brightness}
-			contrast={wizardState.adjust.contrast}
-			saturate={wizardState.adjust.saturate}
-			hueRotate={wizardState.adjust.hueRotate}
-		>
-			<TokenScope {tokens}>
-				<main class="frame">
-					<div class="viewport">
-						<Tabs.Content value="overview">
-							<OverviewPreview />
-						</Tabs.Content>
-						<Tabs.Content value="forms">
-							<FormsPreview />
-						</Tabs.Content>
-						<Tabs.Content value="dashboard">
-							<DashboardPreview />
-						</Tabs.Content>
-						<Tabs.Content value="cards">
-							<CardsPreview />
-						</Tabs.Content>
-					</div>
-				</main>
-			</TokenScope>
-		</Adjust>
-
-		<footer class="rail">
-			<div class="rail-modules">
-				<div class="rail-module">
-					<span class="rail-label">Accent</span>
-					<Popover.Root bind:open={accentOpen}>
+				<div class="bar-actions">
+					<Popover.Root bind:open={presetOpen}>
 						<Popover.Trigger>
-							<Button variant="secondary" size="sm" aria-label="Edit accent color">
-								<span class="rail-color-swatch" {@attach cssVar('--_swatch', accentSwatchHex)}
-								></span>
-								<span class="rail-color-name">{activeAccentName || 'Custom'}</span>
+							<Button variant="ghost" size="sm">
+								<Sparkles size={14} aria-hidden="true" />
+								<span class="bar-action-label">Preset</span>
 							</Button>
 						</Popover.Trigger>
-						<Popover.Content placement="top-start">
-							<div class="accent-panel">
-								<div class="accent-panel-section">
-									<div class="accent-panel-label">Picker</div>
-									<ColorPicker.Root
-										bind:value={() => brandHsbToHex(wizardState.brandHsb), setBrandFromHex}
-										areaHeight={160}
-									>
-										<ColorPicker.Area />
-										<ColorPicker.HueSlider />
-										<ColorPicker.Input format="hex" />
-									</ColorPicker.Root>
-								</div>
-								<div class="accent-panel-section">
-									<div class="accent-panel-label">Brand presets</div>
-									<div class="wizard-option-scope wizard-color-options">
-										<OptionPicker.Root
-											columns={3}
-											bind:value={getSelectedBrandPresetName, applyBrandPresetName}
-										>
-											{#each PRESETS as preset (preset.name)}
-												<OptionPicker.Item
-													value={preset.name}
-													size="compact"
-													layout="stacked"
-													title={preset.name}
-													aria-label={preset.name}
-												>
-													<OptionPicker.Preview
-														shape="circle"
-														color={brandHex(preset.brandInput)}
-														data-color-thumb={thumbSlug(preset.name)}
-													/>
-													<VisuallyHidden>{preset.name}</VisuallyHidden>
-												</OptionPicker.Item>
-											{/each}
-										</OptionPicker.Root>
+						<Popover.Content placement="bottom-end">
+							<div class="preset-panel">
+								{#each [['Starting points', startingPresets], ['Technical', technicalPresets], ['Editorial', editorialPresets]] as const as [title, group] (title)}
+									<div class="preset-group">
+										<div class="preset-group-label">{title}</div>
+										<div class="wizard-option-scope wizard-preset-list">
+											<OptionPicker.Root
+												columns={1}
+												bind:value={getSelectedRecipePresetName, applyRecipePresetName}
+											>
+												{#each group as preset (preset.name)}
+													<OptionPicker.Item value={preset.name} size="compact">
+														<OptionPicker.Preview
+															variant="preset"
+															data-shape={preset.recipe.shape?.radiusPreset ?? 'soft'}
+															data-preset-thumb={thumbSlug(preset.name)}
+															{@attach cssVar('--_preset-color', recipeBrandHex(preset))}
+														>
+															<span class="preset-thumb-text">Ag</span>
+														</OptionPicker.Preview>
+														<OptionPicker.Label>
+															<span class="preset-option-label">{preset.name}</span>
+														</OptionPicker.Label>
+														<OptionPicker.Description>
+															<span class="preset-option-description">{preset.description}</span>
+														</OptionPicker.Description>
+													</OptionPicker.Item>
+												{/each}
+											</OptionPicker.Root>
+										</div>
 									</div>
-								</div>
+								{/each}
 							</div>
 						</Popover.Content>
 					</Popover.Root>
-				</div>
 
-				<div class="rail-module">
-					<span class="rail-label" id="rail-base-label">Base</span>
-					<Select.Root name="base" bind:value={wizardState.personality}>
-						<Select.Trigger aria-labelledby="rail-base-label">
-							<Select.Value placeholder={activePersonalityLabel} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each PERSONALITY_OPTIONS as opt (opt.value)}
-								<Select.Item value={opt.value}>{opt.label}</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				</div>
+					<Button
+						variant="ghost"
+						size="sm"
+						onclick={() => docsTheme.cycle()}
+						aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+					>
+						{#if docsTheme.isDark}
+							<Sun size={14} aria-hidden="true" />
+						{:else}
+							<Moon size={14} aria-hidden="true" />
+						{/if}
+					</Button>
 
-				<div class="rail-module">
-					<span class="rail-label" id="rail-font-label">Font</span>
-					<Select.Root name="font" bind:value={wizardState.typography.fontPreset}>
-						<Select.Trigger aria-labelledby="rail-font-label">
-							<Select.Value placeholder={activeFontName} />
-						</Select.Trigger>
-						<Select.Content>
-							{#each FONT_OPTIONS as name (name)}
-								<Select.Item value={name}>
-									<span
-										class="rail-font-label"
-										{@attach cssVar('--_preset-font', FONT_STACKS[name])}>{name}</span
-									>
-								</Select.Item>
-							{/each}
-						</Select.Content>
-					</Select.Root>
-				</div>
+					<Button variant="ghost" size="sm" onclick={handleCopyCss}>
+						<ClipboardCopy size={14} aria-hidden="true" />
+						<span class="bar-action-label">{copyFeedback || 'Copy'}</span>
+					</Button>
 
-				<div class="rail-module">
-					<span class="rail-label">Radius</span>
-					<div class="wizard-option-scope rail-segmented">
-						<OptionPicker.Root columns={4} bind:value={() => activeRadius, setRadiusPreset}>
-							{#each RADIUS_OPTIONS as opt (opt.value)}
-								<OptionPicker.Item value={opt.value} size="compact" layout="stacked">
-									<OptionPicker.Preview variant="shape" data-shape={opt.value} />
-									<VisuallyHidden>{opt.label}</VisuallyHidden>
-								</OptionPicker.Item>
-							{/each}
-						</OptionPicker.Root>
-					</div>
+					<Button variant="solid" size="sm" onclick={handleDownload}>
+						<Download size={14} aria-hidden="true" />
+						<span class="bar-action-label">Download</span>
+					</Button>
 				</div>
+			</header>
 
-				<div class="rail-module">
-					<span class="rail-label">Density</span>
-					<div class="wizard-option-scope rail-segmented">
-						<OptionPicker.Root columns={3} bind:value={() => activeDensity, setDensity}>
-							{#each DENSITY_OPTIONS as opt (opt.value)}
-								<OptionPicker.Item
-									value={opt.value}
-									size="compact"
-									layout="stacked"
-									aria-label={opt.label}
-								>
-									<span class="density-dots" data-density={opt.value} aria-hidden="true">
-										<span class="density-dot"></span>
-										<span class="density-dot"></span>
-										<span class="density-dot"></span>
-									</span>
-									<VisuallyHidden>{opt.label}</VisuallyHidden>
-								</OptionPicker.Item>
-							{/each}
-						</OptionPicker.Root>
-					</div>
-				</div>
-
-				<div class="rail-module">
-					<span class="rail-label">Theme</span>
-					<div class="wizard-option-scope rail-segmented">
-						<OptionPicker.Root columns={3} bind:value={getThemeMode, setThemeMode}>
-							{#each THEME_OPTIONS as opt (opt.value)}
-								{@const ThemeIcon = opt.icon}
-								<OptionPicker.Item
-									value={opt.value}
-									size="compact"
-									layout="stacked"
-									aria-label={opt.label}
-								>
-									<ThemeIcon size={14} aria-hidden="true" />
-									<VisuallyHidden>{opt.label}</VisuallyHidden>
-								</OptionPicker.Item>
-							{/each}
-						</OptionPicker.Root>
-					</div>
-				</div>
-			</div>
-
-			<div class="rail-aux">
-				<Popover.Root bind:open={advancedOpen}>
-					<Popover.Trigger>
-						<Button variant="ghost" size="sm" aria-label="Open advanced controls">
-							<SlidersHorizontal size={14} aria-hidden="true" />
-							{#if !allContrastPass}
-								<ShieldAlert size={14} aria-hidden="true" />
-							{:else}
-								<ShieldCheck size={14} aria-hidden="true" />
-							{/if}
-							<span class="bar-action-label">Advanced</span>
-						</Button>
-					</Popover.Trigger>
-					<Popover.Content placement="top-end">
-						<div class="advanced-panel">
-							<div class="advanced-panel-section">
-								<div class="advanced-panel-label">Type scale</div>
-								<div class="wizard-option-scope rail-segmented">
-									<OptionPicker.Root
-										columns={3}
-										bind:value={() => wizardState.typography.scale, setTypeScale}
-									>
-										{#each TYPE_SCALE_OPTIONS as opt (opt.value)}
-											<OptionPicker.Item value={opt.value} size="compact">
-												<OptionPicker.Label>{opt.label}</OptionPicker.Label>
-											</OptionPicker.Item>
-										{/each}
-									</OptionPicker.Root>
-								</div>
+			<Adjust
+				brightness={wizardState.adjust.brightness}
+				contrast={wizardState.adjust.contrast}
+				saturate={wizardState.adjust.saturate}
+				hueRotate={wizardState.adjust.hueRotate}
+			>
+				<TokenScope {tokens}>
+					<main class="frame">
+						<AppFrame title={previewFrameTitle}>
+							<div class="viewport">
+								<Tabs.Content value="overview">
+									<OverviewPreview />
+								</Tabs.Content>
+								<Tabs.Content value="forms">
+									<FormsPreview />
+								</Tabs.Content>
+								<Tabs.Content value="dashboard">
+									<DashboardPreview />
+								</Tabs.Content>
+								<Tabs.Content value="cards">
+									<CardsPreview />
+								</Tabs.Content>
 							</div>
+						</AppFrame>
+					</main>
+				</TokenScope>
+			</Adjust>
 
-							<div class="advanced-panel-section">
-								<div class="advanced-panel-label">Filters</div>
-								<div class="adjust-rows">
-									<div class="adjust-row">
-										<Text size="sm">Brightness</Text>
-										<Slider
-											bind:value={wizardState.adjust.brightness}
-											min={50}
-											max={150}
-											size="sm"
-										/>
-										<Text size="xs" color="muted">{wizardState.adjust.brightness}%</Text>
+			<footer class="rail">
+				<div class="rail-inner">
+					<div class="rail-modules">
+						<div class="rail-module">
+							<span class="rail-label">
+								<span>Accent</span>
+								<Info size={13} aria-hidden="true" />
+							</span>
+							<Popover.Root bind:open={accentOpen}>
+								<Popover.Trigger>
+									<Button
+										class="rail-select-trigger"
+										variant="secondary"
+										size="sm"
+										aria-label="Edit accent color"
+									>
+										<span class="rail-color-swatch" {@attach cssVar('--_swatch', accentSwatchHex)}
+										></span>
+										<span class="rail-color-name">{activeAccentName || 'Custom'}</span>
+										<ChevronUp size={15} aria-hidden="true" />
+									</Button>
+								</Popover.Trigger>
+								<Popover.Content
+									placement="top-start"
+									--dry-popover-padding="0"
+									--dry-popover-radius="var(--dry-radius-2xl, 1.5rem)"
+									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 86%, var(--dry-color-bg-base) 14%)"
+									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 78%, transparent 22%)"
+								>
+									<div class="accent-panel">
+										<div class="accent-preset-list" role="radiogroup" aria-label="Accent presets">
+											{#each PRESETS as preset, i (preset.name)}
+												{@const presetHex = brandHex(preset.brandInput)}
+												{@const isActivePreset = activeAccentName === preset.name}
+												<span class="accent-preset" data-selected={isActivePreset ? '' : undefined}>
+													<Button
+														variant="bare"
+														size="md"
+														role="radio"
+														aria-checked={isActivePreset}
+														aria-label={preset.name}
+														tabindex={isActivePreset || (!activeAccentName && i === 0) ? 0 : -1}
+														data-accent-preset={thumbSlug(preset.name)}
+														onclick={() => applyBrandPresetName(preset.name)}
+														onkeydown={(event) => handleBrandPresetKeydown(event, i)}
+														optical="off"
+														--dry-focus-ring="none"
+														--dry-btn-bg="transparent"
+														--dry-btn-border="transparent"
+														--dry-btn-color="inherit"
+														--dry-btn-padding-x="0"
+														--dry-btn-padding-y="0"
+														--dry-btn-radius="var(--dry-radius-xl)"
+														--dry-btn-font-size="inherit"
+														--dry-btn-active-transform="none"
+													>
+														<span class="accent-preset-content">
+															<span
+																class="accent-swatch"
+																data-color-thumb={thumbSlug(preset.name)}
+																aria-hidden="true"
+																{@attach cssVar('--_preset-color', presetHex)}
+															></span>
+															<span class="accent-preset-label">{preset.name}</span>
+														</span>
+													</Button>
+												</span>
+											{/each}
+										</div>
+										<div class="accent-random-action">
+											<Button
+												variant="link"
+												size="sm"
+												onclick={applyRandomBrandPreset}
+												--dry-btn-font-size="0.875rem"
+												--dry-btn-color="var(--dry-color-text-link, var(--wizard-accent-text))"
+												--dry-btn-padding-x="0"
+												--dry-btn-padding-y="0"
+												--dry-focus-ring="var(--dry-focus-ring)"
+											>
+												Random preset
+											</Button>
+										</div>
 									</div>
-									<div class="adjust-row">
-										<Text size="sm">Contrast</Text>
-										<Slider bind:value={wizardState.adjust.contrast} min={50} max={150} size="sm" />
-										<Text size="xs" color="muted">{wizardState.adjust.contrast}%</Text>
-									</div>
-									<div class="adjust-row">
-										<Text size="sm">Saturation</Text>
-										<Slider bind:value={wizardState.adjust.saturate} min={0} max={200} size="sm" />
-										<Text size="xs" color="muted">{wizardState.adjust.saturate}%</Text>
-									</div>
-									<div class="adjust-row">
-										<Text size="sm">Hue</Text>
-										<Slider
-											bind:value={wizardState.adjust.hueRotate}
-											min={-180}
-											max={180}
-											size="sm"
-										/>
-										<Text size="xs" color="muted">{wizardState.adjust.hueRotate}°</Text>
-									</div>
-								</div>
-								{#if hasAdjustments}
-									<div class="advanced-panel-actions">
-										<Button variant="secondary" size="sm" onclick={resetAdjust}>
-											Reset filters
-										</Button>
-									</div>
-								{/if}
-							</div>
+								</Popover.Content>
+							</Popover.Root>
+						</div>
 
-							<div class="advanced-panel-section">
-								<div class="advanced-panel-label">Contrast</div>
-								<div class="contrast-grid">
-									<div class="contrast-column">
-										<div class="contrast-column-label">Light</div>
-										{#each lightContrast as check (check.label)}
-											<div class="contrast-row">
-												<span class="contrast-row-label">{check.label}</span>
-												<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
-													{check.ratioLabel}
-												</Badge>
-											</div>
-										{/each}
+						<div class="rail-module">
+							<span class="rail-label" id="rail-base-label">
+								<span>Base</span>
+								<Info size={13} aria-hidden="true" />
+							</span>
+							<Popover.Root bind:open={baseOpen}>
+								<Popover.Trigger>
+									<Button variant="secondary" size="sm" aria-labelledby="rail-base-label">
+										<span class="rail-trigger-glyph">B</span>
+										<span class="rail-trigger-value">{activePersonalityLabel}</span>
+										<ChevronUp size={15} aria-hidden="true" />
+									</Button>
+								</Popover.Trigger>
+								<Popover.Content
+									placement="top-start"
+									offset={12}
+									--dry-popover-padding="0"
+									--dry-popover-radius="var(--dry-radius-2xl)"
+									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
+									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
+									--dry-popover-shadow="var(--dry-shadow-overlay)"
+								>
+									<div class="base-panel">
+										<header class="option-panel-header">
+											<span>Base</span>
+										</header>
+										<div class="wizard-option-scope base-picker">
+											<OptionPicker.Root
+												columns={2}
+												bind:value={() => wizardState.personality, setPersonalityPanelValue}
+											>
+												{#each PERSONALITY_OPTIONS as opt (opt.value)}
+													<OptionPicker.Item value={opt.value} size="compact">
+														<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+														<OptionPicker.Description>{opt.hint}</OptionPicker.Description>
+													</OptionPicker.Item>
+												{/each}
+											</OptionPicker.Root>
+										</div>
 									</div>
-									<div class="contrast-column">
-										<div class="contrast-column-label">Dark</div>
-										{#each darkContrast as check (check.label)}
-											<div class="contrast-row">
-												<span class="contrast-row-label">{check.label}</span>
-												<Badge variant="soft" color={check.passes ? 'success' : 'danger'} size="sm">
-													{check.ratioLabel}
-												</Badge>
-											</div>
-										{/each}
+								</Popover.Content>
+							</Popover.Root>
+						</div>
+
+						<div class="rail-module">
+							<span class="rail-label" id="rail-font-label">Font Family</span>
+							<Popover.Root bind:open={fontOpen}>
+								<Popover.Trigger>
+									<Button variant="secondary" size="sm" aria-labelledby="rail-font-label">
+										<span class="rail-trigger-glyph">Aa</span>
+										<span class="rail-trigger-value">{activeFontName}</span>
+										<ChevronUp size={15} aria-hidden="true" />
+									</Button>
+								</Popover.Trigger>
+								<Popover.Content
+									placement="top-start"
+									offset={12}
+									--dry-popover-padding="0"
+									--dry-popover-radius="var(--dry-radius-2xl)"
+									--dry-popover-bg="color-mix(in srgb, var(--dry-color-bg-raised) 90%, var(--dry-color-bg-base) 10%)"
+									--dry-popover-border="color-mix(in srgb, var(--dry-color-stroke-weak) 82%, transparent 18%)"
+									--dry-popover-shadow="var(--dry-shadow-overlay)"
+								>
+									<div class="font-panel">
+										<header class="option-panel-header font-panel-header">
+											<span>Suggested</span>
+										</header>
+										<div class="wizard-option-scope font-picker">
+											<OptionPicker.Root
+												columns={3}
+												bind:value={() => wizardState.typography.fontPreset, setFontPanelValue}
+											>
+												{#each FONT_PANEL_OPTIONS as font (font.value)}
+													<OptionPicker.Item value={font.value} size="visual" layout="stacked">
+														<span
+															class="font-sample"
+															{@attach cssVar('--_preset-font', FONT_STACKS[font.value])}>Ag</span
+														>
+														<OptionPicker.Label>
+															<span
+																class="font-option-name"
+																{@attach cssVar('--_preset-font', FONT_STACKS[font.value])}
+																>{font.label}</span
+															>
+														</OptionPicker.Label>
+														<OptionPicker.Description>
+															<VisuallyHidden>{font.hint}</VisuallyHidden>
+														</OptionPicker.Description>
+													</OptionPicker.Item>
+												{/each}
+											</OptionPicker.Root>
+										</div>
 									</div>
-								</div>
+								</Popover.Content>
+							</Popover.Root>
+						</div>
+
+						<div class="rail-module">
+							<span class="rail-label">Radius</span>
+							<div class="wizard-option-scope rail-segmented">
+								<OptionPicker.Root columns={4} bind:value={() => activeRadius, setRadiusPreset}>
+									{#each RADIUS_OPTIONS as opt (opt.value)}
+										<OptionPicker.Item value={opt.value} size="compact" layout="stacked">
+											<OptionPicker.Preview variant="shape" data-shape={opt.value} />
+											<VisuallyHidden>{opt.label}</VisuallyHidden>
+										</OptionPicker.Item>
+									{/each}
+								</OptionPicker.Root>
 							</div>
 						</div>
-					</Popover.Content>
-				</Popover.Root>
 
-				<Button variant="ghost" size="sm" onclick={resetAll} aria-label="Reset all">
-					<RotateCcw size={14} aria-hidden="true" />
-					<span class="bar-action-label">Reset</span>
-				</Button>
-			</div>
-		</footer>
-	</div>
+						<div class="rail-module">
+							<span class="rail-label">Density</span>
+							<div class="wizard-option-scope rail-segmented">
+								<OptionPicker.Root columns={3} bind:value={() => activeDensity, setDensity}>
+									{#each DENSITY_OPTIONS as opt (opt.value)}
+										<OptionPicker.Item
+											value={opt.value}
+											size="compact"
+											layout="stacked"
+											aria-label={opt.label}
+										>
+											<span class="density-dots" data-density={opt.value} aria-hidden="true">
+												<span class="density-dot"></span>
+												<span class="density-dot"></span>
+												<span class="density-dot"></span>
+											</span>
+											<VisuallyHidden>{opt.label}</VisuallyHidden>
+										</OptionPicker.Item>
+									{/each}
+								</OptionPicker.Root>
+							</div>
+						</div>
+
+						<div class="rail-module">
+							<span class="rail-label">Theme</span>
+							<div class="wizard-option-scope rail-segmented">
+								<OptionPicker.Root columns={3} bind:value={getThemeMode, setThemeMode}>
+									{#each THEME_OPTIONS as opt (opt.value)}
+										{@const ThemeIcon = opt.icon}
+										<OptionPicker.Item
+											value={opt.value}
+											size="compact"
+											layout="stacked"
+											aria-label={opt.label}
+										>
+											<ThemeIcon size={14} aria-hidden="true" />
+											<VisuallyHidden>{opt.label}</VisuallyHidden>
+										</OptionPicker.Item>
+									{/each}
+								</OptionPicker.Root>
+							</div>
+						</div>
+					</div>
+
+					<div class="rail-aux">
+						<Popover.Root bind:open={advancedOpen}>
+							<Popover.Trigger>
+								<Button variant="outline" size="sm" aria-label="Open advanced controls">
+									<span class="rail-aux-icon">
+										<SlidersHorizontal size={14} aria-hidden="true" />
+										<span
+											class="rail-aux-dot"
+											data-rail-status={allContrastPass ? 'ok' : 'warn'}
+											aria-hidden="true"
+										></span>
+									</span>
+									<span class="bar-action-label">Advanced</span>
+								</Button>
+							</Popover.Trigger>
+							<Popover.Content placement="top-end">
+								<div class="advanced-panel">
+									<header class="popover-header">
+										<span class="popover-title">Advanced</span>
+										<Badge variant="soft" color={allContrastPass ? 'success' : 'danger'} size="sm">
+											{allContrastPass
+												? 'Contrast OK'
+												: `${failingContrastCount} contrast issue${failingContrastCount === 1 ? '' : 's'}`}
+										</Badge>
+									</header>
+
+									<div class="advanced-panel-section">
+										<div class="popover-section-label">Type scale</div>
+										<div class="wizard-option-scope rail-segmented">
+											<OptionPicker.Root
+												columns={3}
+												bind:value={() => wizardState.typography.scale, setTypeScale}
+											>
+												{#each TYPE_SCALE_OPTIONS as opt (opt.value)}
+													<OptionPicker.Item value={opt.value} size="compact">
+														<OptionPicker.Label>{opt.label}</OptionPicker.Label>
+													</OptionPicker.Item>
+												{/each}
+											</OptionPicker.Root>
+										</div>
+									</div>
+
+									<div class="advanced-panel-section">
+										<div class="popover-section-label">Filters</div>
+										<div class="adjust-rows">
+											<div class="adjust-row">
+												<Text size="sm">Brightness</Text>
+												<Slider
+													bind:value={wizardState.adjust.brightness}
+													min={50}
+													max={150}
+													size="sm"
+												/>
+												<Text size="xs" color="muted">{wizardState.adjust.brightness}%</Text>
+											</div>
+											<div class="adjust-row">
+												<Text size="sm">Contrast</Text>
+												<Slider
+													bind:value={wizardState.adjust.contrast}
+													min={50}
+													max={150}
+													size="sm"
+												/>
+												<Text size="xs" color="muted">{wizardState.adjust.contrast}%</Text>
+											</div>
+											<div class="adjust-row">
+												<Text size="sm">Saturation</Text>
+												<Slider
+													bind:value={wizardState.adjust.saturate}
+													min={0}
+													max={200}
+													size="sm"
+												/>
+												<Text size="xs" color="muted">{wizardState.adjust.saturate}%</Text>
+											</div>
+											<div class="adjust-row">
+												<Text size="sm">Hue</Text>
+												<Slider
+													bind:value={wizardState.adjust.hueRotate}
+													min={-180}
+													max={180}
+													size="sm"
+												/>
+												<Text size="xs" color="muted">{wizardState.adjust.hueRotate}°</Text>
+											</div>
+										</div>
+										{#if hasAdjustments}
+											<div class="advanced-panel-actions">
+												<Button variant="secondary" size="sm" onclick={resetAdjust}>
+													Reset filters
+												</Button>
+											</div>
+										{/if}
+									</div>
+
+									<div class="advanced-panel-section">
+										<div class="popover-section-label">
+											<span>Contrast</span>
+											<span class="contrast-key">
+												<span>Light</span>
+												<span aria-hidden="true">·</span>
+												<span>Dark</span>
+											</span>
+										</div>
+										<div class="contrast-strip">
+											{#each mergedContrast as check (check.label)}
+												<div class="contrast-strip-row" data-passes={check.passes}>
+													<span class="contrast-strip-label">{check.label}</span>
+													<span
+														class="contrast-strip-ratio"
+														data-passes={check.light.passes}
+														aria-label="Light {check.light.ratioLabel}"
+													>
+														{check.light.ratioLabel}
+													</span>
+													<span class="contrast-strip-sep" aria-hidden="true">·</span>
+													<span
+														class="contrast-strip-ratio"
+														data-passes={check.dark.passes}
+														aria-label="Dark {check.dark.ratioLabel}"
+													>
+														{check.dark.ratioLabel}
+													</span>
+												</div>
+											{/each}
+										</div>
+									</div>
+								</div>
+							</Popover.Content>
+						</Popover.Root>
+
+						<Button variant="ghost" size="sm" onclick={resetAll} aria-label="Reset all">
+							<RotateCcw size={14} aria-hidden="true" />
+							<span class="bar-action-label">Reset</span>
+						</Button>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</Container>
 </Tabs.Root>
 
 <style>
 	.workbench {
 		--workbench-bar-h: 3.5rem;
 		--workbench-rail-min-h: 5rem;
-		--workbench-frame-radius: var(--dry-radius-2xl, 1.5rem);
-		--workbench-viewport-radius: var(--dry-radius-xl, 1rem);
+		--_status-success: var(--dry-color-fill-success, oklch(72% 0.15 150));
+		--_status-danger: var(--dry-color-fill-danger, oklch(68% 0.18 25));
 		--wizard-accent-bg: color-mix(
 			in srgb,
 			var(--dry-color-fill-brand) 38%,
@@ -770,7 +971,7 @@
 		container-type: inline-size;
 		block-size: 100dvh;
 		overflow: hidden;
-		background: color-mix(in srgb, var(--dry-color-bg-base) 96%, var(--dry-color-fill-brand) 4%);
+		background: var(--workbench-bg);
 	}
 
 	.bar {
@@ -779,8 +980,6 @@
 		align-items: center;
 		gap: var(--dry-space-3);
 		padding-inline: var(--dry-space-4);
-		border-block-end: 1px solid var(--dry-color-stroke-weak);
-		background: var(--dry-color-bg-raised);
 	}
 
 	.bar-brand {
@@ -800,7 +999,7 @@
 	.bar-title {
 		font-size: 0.875rem;
 		font-weight: 650;
-		letter-spacing: -0.01em;
+		letter-spacing: 0;
 		color: var(--dry-color-text-strong);
 	}
 
@@ -832,7 +1031,8 @@
 
 	.frame {
 		display: grid;
-		padding: var(--dry-space-4);
+		grid-template-rows: minmax(0, 1fr);
+		padding: var(--dry-space-3) var(--dry-space-4) var(--dry-space-2);
 		min-height: 0;
 	}
 
@@ -840,76 +1040,141 @@
 		display: grid;
 		min-height: 0;
 		padding: var(--dry-space-5) var(--dry-space-4);
-		border-radius: var(--workbench-viewport-radius);
-		background: var(--dry-color-bg-base);
-		border: 1px solid var(--dry-color-stroke-weak);
 		overflow: auto;
 	}
 
 	@container (min-width: 64rem) {
 		.frame {
-			padding: var(--dry-space-5) var(--dry-space-6) var(--dry-space-4);
+			padding: var(--dry-space-3) var(--dry-space-4) var(--dry-space-2);
 		}
 		.viewport {
 			padding: var(--dry-space-6) var(--dry-space-5);
-			border-radius: var(--workbench-frame-radius);
 		}
 	}
 
 	.rail {
+		--rail-h: 3rem;
+		--dry-btn-min-height: var(--rail-h);
+		--dry-btn-bg: color-mix(in srgb, var(--dry-color-bg-raised) 84%, var(--dry-color-bg-base) 16%);
+		--dry-btn-border: color-mix(
+			in srgb,
+			var(--dry-color-stroke-strong) 72%,
+			var(--dry-color-stroke-weak) 28%
+		);
+		--dry-btn-color: var(--dry-color-text-strong);
+		--dry-btn-radius: var(--dry-radius-lg);
+		--dry-btn-padding-x: var(--dry-space-3);
+		--dry-btn-padding-y: 0;
+		--dry-btn-justify: stretch;
+		--dry-btn-active-transform: none;
+		padding-block: var(--dry-space-3) var(--dry-space-4);
+	}
+
+	.rail-inner {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, max-content);
-		align-items: center;
-		gap: var(--dry-space-3);
-		padding: var(--dry-space-3) var(--dry-space-4);
-		border-block-start: 1px solid var(--dry-color-stroke-weak);
-		background: var(--dry-color-bg-raised);
+		align-items: end;
+		gap: var(--dry-space-4);
 	}
 
 	.rail-modules {
 		display: grid;
 		grid-template-columns:
-			minmax(7rem, 9rem) minmax(6rem, 9rem) minmax(6rem, 9rem) minmax(9rem, 11rem)
-			minmax(7rem, 9rem) minmax(6rem, 8rem);
-		align-items: stretch;
-		gap: var(--dry-space-3);
+			minmax(10rem, 17rem) minmax(9rem, 13rem) minmax(11rem, 15rem) minmax(11rem, 14rem)
+			minmax(8rem, 10rem) minmax(8rem, 10rem);
+		align-items: end;
+		gap: var(--dry-space-4);
 	}
 
 	.rail-module {
 		display: grid;
-		grid-template-rows: auto 2.5rem;
+		grid-template-rows: auto var(--rail-h);
 		align-content: end;
 		gap: var(--dry-space-1_5);
 		justify-items: stretch;
 	}
 
 	.rail-label {
-		font-size: 0.6875rem;
+		display: inline-grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-1);
+		font-size: 0.875rem;
 		font-weight: 500;
 		line-height: 1;
 		color: var(--dry-color-text-weak);
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+		letter-spacing: 0;
 	}
 
 	.rail-segmented {
 		display: grid;
 		--dry-option-picker-gap: 2px;
 		--dry-option-picker-padding-x: var(--dry-space-1);
-		--dry-option-picker-padding-y: var(--dry-space-0_5);
-		--dry-option-picker-min-block-size: 2.5rem;
-		--dry-option-picker-compact-min-block-size: 2.5rem;
-		--dry-option-picker-radius: var(--dry-radius-md);
+		--dry-option-picker-padding-y: 0;
+		--dry-option-picker-min-block-size: calc(var(--rail-h) - 4px);
+		--dry-option-picker-compact-min-block-size: calc(var(--rail-h) - 4px);
+		--dry-option-picker-radius: var(--dry-radius-lg);
 		--dry-option-picker-content-align: center;
+		--dry-option-picker-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 84%,
+			var(--dry-color-bg-base) 16%
+		);
+		--dry-option-picker-bg-hover: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 72%,
+			var(--dry-color-fill-brand) 28%
+		);
+		--dry-option-picker-border: color-mix(
+			in srgb,
+			var(--dry-color-stroke-strong) 72%,
+			var(--dry-color-stroke-weak) 28%
+		);
+	}
+
+	.rail-trigger-glyph {
+		font-size: 0.875rem;
+		font-weight: 650;
+		color: var(--dry-color-text-weak);
+	}
+
+	.rail-trigger-value {
+		justify-self: start;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.rail-aux {
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
-		align-items: center;
+		align-items: end;
 		gap: var(--dry-space-1);
 		justify-self: end;
+	}
+
+	.rail-aux-icon {
+		position: relative;
+		display: inline-grid;
+		place-items: center;
+	}
+
+	.rail-aux-dot {
+		position: absolute;
+		inset-block-end: -2px;
+		inset-inline-end: -3px;
+		display: grid;
+		grid-template-columns: 6px;
+		grid-template-rows: 6px;
+		border-radius: 50%;
+		background: var(--_status-success);
+		box-shadow: 0 0 0 1.5px var(--workbench-bg);
+	}
+
+	.rail-aux-dot[data-rail-status='warn'] {
+		background: var(--_status-danger);
 	}
 
 	.density-dots {
@@ -939,8 +1204,8 @@
 
 	.rail-color-swatch {
 		display: inline-grid;
-		grid-template-columns: 1.125rem;
-		grid-template-rows: 1.125rem;
+		grid-template-columns: 1.35rem;
+		grid-template-rows: 1.35rem;
 		border-radius: 50%;
 		background: var(--_swatch, var(--dry-color-fill-brand));
 		border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
@@ -953,9 +1218,100 @@
 		justify-self: start;
 	}
 
-	.rail-font-label {
+	.base-panel,
+	.font-panel {
+		display: grid;
+		gap: var(--dry-space-4);
+		padding: var(--dry-space-4);
+	}
+
+	.base-panel {
+		grid-template-columns: minmax(0, min(28rem, calc(100vw - var(--dry-space-6))));
+	}
+
+	.font-panel {
+		grid-template-columns: minmax(0, min(39rem, calc(100vw - var(--dry-space-6))));
+		grid-template-rows: auto minmax(0, min(27rem, calc(100dvh - 12rem)));
+	}
+
+	.option-panel-header {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 1.125rem;
+		font-weight: 650;
+		line-height: 1.1;
+		color: var(--dry-color-text-strong);
+		letter-spacing: 0;
+	}
+
+	.base-picker {
+		--dry-option-picker-gap: var(--dry-space-3);
+		--dry-option-picker-padding-y: var(--dry-space-3);
+		--dry-option-picker-padding-x: var(--dry-space-3);
+		--dry-option-picker-compact-min-block-size: 5.75rem;
+		--dry-option-picker-radius: var(--dry-radius-xl);
+		--dry-option-picker-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-base) 46%,
+			var(--dry-color-bg-raised) 54%
+		);
+		--dry-option-picker-bg-hover: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 76%,
+			var(--dry-color-fill-brand) 24%
+		);
+		--dry-option-picker-border: var(--dry-color-stroke-weak);
+		--dry-option-picker-label-size: 0.9375rem;
+		--dry-option-picker-description-size: 0.8125rem;
+	}
+
+	.font-picker {
+		overflow: auto;
+		--dry-option-picker-gap: var(--dry-space-3);
+		--dry-option-picker-padding-y: var(--dry-space-4);
+		--dry-option-picker-padding-x: var(--dry-space-3);
+		--dry-option-picker-visual-min-block-size: 8.5rem;
+		--dry-option-picker-radius: var(--dry-radius-xl);
+		--dry-option-picker-content-align: center;
+		--dry-option-picker-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-base) 50%,
+			var(--dry-color-bg-raised) 50%
+		);
+		--dry-option-picker-bg-hover: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 82%,
+			var(--dry-color-fill-brand) 18%
+		);
+		--dry-option-picker-border: color-mix(
+			in srgb,
+			var(--dry-color-stroke-weak) 76%,
+			transparent 24%
+		);
+		--dry-option-picker-selected-border: var(--dry-color-text-strong);
+		--dry-option-picker-selected-bg: color-mix(
+			in srgb,
+			var(--dry-color-bg-raised) 82%,
+			var(--dry-color-fill-brand) 18%
+		);
+		--dry-option-picker-label-size: 0.9375rem;
+		--dry-option-picker-description-size: 0;
+	}
+
+	.font-sample {
 		font-family: var(--_preset-font, inherit);
-		font-size: 0.8125rem;
+		font-size: 2rem;
+		font-weight: 650;
+		line-height: 1;
+		color: var(--dry-color-text-strong);
+	}
+
+	.font-option-name {
+		font-family: var(--_preset-font, inherit);
+		color: var(--dry-color-text-weak);
 	}
 
 	.preset-panel {
@@ -972,12 +1328,35 @@
 		gap: var(--dry-space-2);
 	}
 
-	.preset-group-label {
-		font-size: 0.75rem;
-		font-weight: 500;
+	.preset-group-label,
+	.popover-section-label {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		justify-content: space-between;
+		align-items: baseline;
+		font-size: 0.6875rem;
+		font-weight: 600;
 		color: var(--dry-color-text-weak);
 		text-transform: uppercase;
-		letter-spacing: 0.04em;
+		letter-spacing: 0;
+		line-height: 1;
+	}
+
+	.popover-header {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
+		padding-block-end: var(--dry-space-2);
+		border-block-end: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.popover-title {
+		font-size: 0.875rem;
+		font-weight: 600;
+		color: var(--dry-color-text-strong);
+		letter-spacing: 0;
 	}
 
 	.wizard-preset-list {
@@ -1004,38 +1383,91 @@
 		font-size: 0.75rem;
 		font-weight: 600;
 		line-height: 1;
-		color: var(--dry-color-on-brand, #ffffff);
+		color: var(--dry-color-on-brand);
 	}
 
 	.accent-panel {
 		display: grid;
-		grid-template-columns: minmax(18rem, 22rem);
-		gap: var(--dry-space-4);
-		padding: var(--dry-space-3);
+		grid-template-columns: minmax(20rem, 24rem);
+		gap: var(--dry-space-6);
+		padding: var(--dry-space-6);
 	}
 
-	.accent-panel-section {
+	.accent-preset-list {
 		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		column-gap: var(--dry-space-5);
+		row-gap: var(--dry-space-6);
+	}
+
+	.accent-preset {
+		display: grid;
+		border-radius: var(--dry-radius-xl);
+	}
+
+	.accent-preset-content {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		justify-items: center;
+		align-content: start;
 		gap: var(--dry-space-2);
 	}
 
-	.accent-panel-label,
-	.advanced-panel-label {
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--dry-color-text-weak);
-		text-transform: uppercase;
-		letter-spacing: 0.04em;
+	.accent-swatch {
+		display: grid;
+		place-items: center;
+		block-size: 3.75rem;
+		aspect-ratio: 1;
+		border-radius: 9999px;
+		background: radial-gradient(
+			circle at 30% 22%,
+			color-mix(in srgb, var(--_preset-color) 18%, var(--dry-color-text-strong) 82%) 0 12%,
+			color-mix(in srgb, var(--_preset-color) 78%, var(--dry-color-text-strong) 22%) 36%,
+			var(--_preset-color) 62%,
+			color-mix(in srgb, var(--_preset-color) 64%, var(--dry-color-bg-base) 36%) 100%
+		);
+		border: 1px solid color-mix(in srgb, var(--dry-color-text-strong) 10%, transparent 90%);
+		box-shadow:
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%),
+			0 0 0 0 transparent;
+		transition:
+			box-shadow var(--dry-duration-fast, 100ms) ease,
+			transform var(--dry-duration-fast, 100ms) ease;
 	}
 
-	.wizard-color-options {
-		--dry-option-picker-gap: var(--dry-space-2);
-		--dry-option-picker-padding-x: var(--dry-space-1);
-		--dry-option-picker-padding-y: var(--dry-space-1);
-		--dry-option-picker-min-block-size: 0;
-		--dry-option-picker-radius: var(--dry-radius-full);
-		--dry-option-picker-preview-size: 1.5rem;
-		--dry-option-picker-preview-radius: 9999px;
+	.accent-preset:hover .accent-swatch,
+	.accent-preset:focus-within .accent-swatch {
+		transform: translateY(-1px);
+		box-shadow:
+			0 0 0 2px color-mix(in srgb, var(--wizard-accent-border) 46%, transparent),
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%);
+	}
+
+	.accent-preset[data-selected] .accent-swatch {
+		box-shadow:
+			0 0 0 2px var(--dry-color-bg-raised),
+			0 0 0 4px var(--wizard-accent-border),
+			inset 0 1px 1px color-mix(in srgb, var(--dry-color-text-strong) 20%, transparent 80%);
+	}
+
+	.accent-preset-label {
+		display: block;
+		max-width: 6em;
+		font-size: 0.875rem;
+		font-weight: 600;
+		line-height: 1.15;
+		color: var(--dry-color-text-muted, var(--dry-color-text-weak));
+		text-align: center;
+		overflow-wrap: anywhere;
+	}
+
+	.accent-preset[data-selected] .accent-preset-label {
+		color: var(--dry-color-text-strong);
+	}
+
+	.accent-random-action {
+		display: grid;
+		justify-self: start;
 	}
 
 	.advanced-panel {
@@ -1067,36 +1499,57 @@
 		gap: var(--dry-space-2_5);
 	}
 
-	.contrast-grid {
+	.contrast-key {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: var(--dry-space-3);
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: 0.4em;
+		font-size: 0.625rem;
+		letter-spacing: 0;
 	}
 
-	.contrast-column {
+	.contrast-strip {
 		display: grid;
-		gap: var(--dry-space-1_5);
+		gap: var(--dry-space-1);
+		font-variant-numeric: tabular-nums;
 	}
 
-	.contrast-column-label {
-		font-size: 0.75rem;
-		font-weight: 500;
-		color: var(--dry-color-text-weak);
-	}
-
-	.contrast-row {
+	.contrast-strip-row {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) max-content;
-		align-items: center;
-		gap: var(--dry-space-2);
+		grid-template-columns: minmax(0, 1fr) max-content max-content max-content;
+		align-items: baseline;
+		column-gap: var(--dry-space-2);
+		padding-block: var(--dry-space-1);
+		padding-inline: var(--dry-space-2);
+		border-radius: var(--dry-radius-sm);
+		background: color-mix(in srgb, var(--dry-color-bg-base) 35%, transparent 65%);
 	}
 
-	.contrast-row-label {
+	.contrast-strip-row[data-passes='false'] {
+		background: color-mix(in srgb, var(--_status-danger) 14%, transparent 86%);
+	}
+
+	.contrast-strip-label {
 		font-size: 0.8125rem;
 		color: var(--dry-color-text-strong);
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.contrast-strip-ratio {
+		font-size: 0.75rem;
+		color: var(--dry-color-text-strong);
+	}
+
+	.contrast-strip-ratio[data-passes='false'] {
+		color: var(--_status-danger);
+		font-weight: 600;
+	}
+
+	.contrast-strip-sep {
+		font-size: 0.75rem;
+		color: var(--dry-color-text-weak);
 	}
 
 	.wizard-option-scope {
@@ -1166,8 +1619,12 @@
 		}
 
 		.rail {
+			padding-block: var(--dry-space-3);
+		}
+
+		.rail-inner {
 			grid-template-columns: minmax(0, 1fr);
-			padding: var(--dry-space-3);
+			gap: var(--dry-space-2);
 		}
 
 		.rail-modules {
