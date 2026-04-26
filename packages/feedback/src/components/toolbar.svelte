@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { AlertDialog, Button, Checkbox, Field, Input, Kbd, Label, Select } from '@dryui/ui';
+	import { onMount } from 'svelte';
+	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
 		Check,
@@ -96,6 +98,13 @@
 	let pickerName = $state('');
 	let pickerPanelEl = $state<HTMLDivElement | undefined>();
 
+	const capturePickerPanel: Attachment<HTMLDivElement> = (node) => {
+		pickerPanelEl = node;
+		return () => {
+			if (pickerPanelEl === node) pickerPanelEl = undefined;
+		};
+	};
+
 	const filteredPresets = $derived.by(() => {
 		const query = pickerName.trim().toLowerCase();
 		if (!query) return COMPONENT_NAMES;
@@ -183,6 +192,13 @@
 	let propsLabelInput = $state('');
 	let propsValues = $state<Record<string, unknown>>({});
 	let propsPanelEl = $state<HTMLDivElement | undefined>();
+
+	const capturePropsPanel: Attachment<HTMLDivElement> = (node) => {
+		propsPanelEl = node;
+		return () => {
+			if (propsPanelEl === node) propsPanelEl = undefined;
+		};
+	};
 
 	let schemas = $state<Record<string, SchemaField[]> | null>(null);
 
@@ -340,14 +356,25 @@
 	let dragging = $state(false);
 	let dragOffset = $state({ x: 0, y: 0 });
 	let pendingDrag = $state<{ id: number; x: number; y: number } | null>(null);
+	let customPositioned = $state(false);
+	let coarsePointer = $state(false);
 
 	const DRAG_THRESHOLD_PX = 4;
+	const VIEWPORT_EDGE_PX = 12;
+	const COARSE_POINTER_QUERY = '(pointer: coarse), (hover: none)';
 	const submitting = $derived(submitStatus !== 'idle');
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
 	let toolbarEl = $state<HTMLDivElement | null>(null);
 	let pillPosition = $state<'above' | 'below'>('above');
 	const PILL_CLEARANCE = 56;
+
+	const captureToolbar: Attachment<HTMLDivElement> = (node) => {
+		toolbarEl = node;
+		return () => {
+			if (toolbarEl === node) toolbarEl = null;
+		};
+	};
 
 	function updatePillPosition() {
 		if (!toolbarEl) return;
@@ -453,9 +480,52 @@
 			toolbarEl.style.bottom = `${window.innerHeight - rect.bottom}px`;
 			toolbarEl.style.left = 'auto';
 			toolbarEl.style.top = 'auto';
+			customPositioned = true;
 		}
 		dragging = false;
 	}
+
+	let clampFrame = 0;
+	function clampCustomPosition() {
+		if (!customPositioned || !toolbarEl) return;
+		const rect = toolbarEl.getBoundingClientRect();
+		const maxX = Math.max(VIEWPORT_EDGE_PX, window.innerWidth - rect.width - VIEWPORT_EDGE_PX);
+		const maxY = Math.max(VIEWPORT_EDGE_PX, window.innerHeight - rect.height - VIEWPORT_EDGE_PX);
+		const x = Math.max(VIEWPORT_EDGE_PX, Math.min(maxX, rect.left));
+		const y = Math.max(VIEWPORT_EDGE_PX, Math.min(maxY, rect.top));
+		toolbarEl.style.right = `${Math.max(VIEWPORT_EDGE_PX, window.innerWidth - x - rect.width)}px`;
+		toolbarEl.style.bottom = `${Math.max(VIEWPORT_EDGE_PX, window.innerHeight - y - rect.height)}px`;
+		toolbarEl.style.left = 'auto';
+		toolbarEl.style.top = 'auto';
+		if (inspecting) updatePillPosition();
+	}
+
+	function scheduleClamp() {
+		if (clampFrame) return;
+		clampFrame = requestAnimationFrame(() => {
+			clampFrame = 0;
+			clampCustomPosition();
+		});
+	}
+
+	onMount(() => {
+		const pointerQuery = window.matchMedia(COARSE_POINTER_QUERY);
+		const syncPointerMode = () => {
+			coarsePointer = pointerQuery.matches;
+		};
+
+		syncPointerMode();
+		pointerQuery.addEventListener('change', syncPointerMode);
+		window.addEventListener('resize', scheduleClamp);
+		window.addEventListener('orientationchange', scheduleClamp);
+
+		return () => {
+			if (clampFrame) cancelAnimationFrame(clampFrame);
+			pointerQuery.removeEventListener('change', syncPointerMode);
+			window.removeEventListener('resize', scheduleClamp);
+			window.removeEventListener('orientationchange', scheduleClamp);
+		};
+	});
 
 	function handleToolClick(t: Tool) {
 		if (!active || tool !== t) {
@@ -468,10 +538,12 @@
 </script>
 
 <div
-	bind:this={toolbarEl}
 	class="toolbar"
+	{@attach captureToolbar}
 	data-hidden={hidden || undefined}
 	data-dragging={dragging || undefined}
+	data-custom-position={customPositioned || undefined}
+	data-coarse-pointer={coarsePointer || undefined}
 	role="toolbar"
 	tabindex="-1"
 	aria-hidden={hidden}
@@ -598,8 +670,8 @@
 
 						{#if propsPanelOpen}
 							<div
-								bind:this={propsPanelEl}
 								class="props-panel"
+								{@attach capturePropsPanel}
 								role="dialog"
 								aria-label={`${addedKind} props`}
 							>
@@ -719,8 +791,8 @@
 
 					{#if pickerOpen}
 						<div
-							bind:this={pickerPanelEl}
 							class="component-picker"
+							{@attach capturePickerPanel}
 							role="dialog"
 							aria-label="Pick component"
 						>
@@ -902,10 +974,13 @@
 		--pill-bg: hsl(225 15% 15% / 0.95);
 		--pill-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
 		--tool-slot-height: 46px;
+		--tool-button-size: 26px;
+		--toolbar-edge-block: 24px;
+		--toolbar-edge-inline: 24px;
 
 		position: absolute;
-		right: 24px;
-		bottom: 24px;
+		right: var(--toolbar-edge-inline);
+		bottom: var(--toolbar-edge-block);
 		z-index: 10002;
 		display: grid;
 		grid-template-rows: auto var(--tool-slot-height);
@@ -1114,8 +1189,8 @@
 		display: grid;
 		place-items: center;
 		padding: 0;
-		inline-size: 26px;
-		block-size: 26px;
+		inline-size: var(--tool-button-size);
+		block-size: var(--tool-button-size);
 		min-inline-size: 0;
 		min-block-size: 0;
 		border: 1px solid transparent;
@@ -1204,8 +1279,8 @@
 	}
 
 	.history-pill :global(.history-btn) {
-		inline-size: 26px;
-		block-size: 26px;
+		inline-size: var(--tool-button-size);
+		block-size: var(--tool-button-size);
 	}
 
 	.add-wrap {
@@ -1662,5 +1737,123 @@
 		font-weight: 600;
 		letter-spacing: 0.04em;
 		white-space: nowrap;
+	}
+
+	@container dryui-feedback-root (max-width: 36rem) {
+		.toolbar {
+			--tool-button-size: 36px;
+			--tool-slot-height: auto;
+			--toolbar-edge-block: max(12px, env(safe-area-inset-bottom));
+			--toolbar-edge-inline: max(12px, env(safe-area-inset-right));
+
+			gap: 8px;
+			justify-items: stretch;
+		}
+
+		.toolbar:not([data-custom-position]) {
+			inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+			bottom: var(--toolbar-edge-block);
+		}
+
+		.toolbar-row {
+			grid-auto-flow: row;
+			grid-auto-columns: initial;
+			grid-template-columns: auto minmax(0, 1fr);
+			align-items: stretch;
+			justify-items: stretch;
+		}
+
+		.history-pill {
+			justify-self: start;
+		}
+
+		.mode-pill {
+			justify-content: stretch;
+		}
+
+		.tool-pill {
+			grid-row: auto;
+			justify-self: stretch;
+			grid-auto-flow: row;
+			grid-template-columns: repeat(auto-fit, minmax(var(--tool-button-size), 1fr));
+			justify-content: stretch;
+		}
+
+		:global(.mode-btn) {
+			--dry-btn-min-height: 36px;
+
+			justify-content: center;
+			min-block-size: 36px;
+		}
+
+		:global(.submit-pill) {
+			--dry-btn-min-height: 38px;
+
+			grid-column: 1 / -1;
+			justify-content: center;
+			block-size: 38px;
+		}
+
+		.component-picker,
+		.props-panel {
+			position: fixed;
+			inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
+			bottom: calc(max(12px, env(safe-area-inset-bottom)) + 112px);
+			inline-size: auto;
+			min-inline-size: 0;
+			max-inline-size: none;
+			max-block-size: min(56dvh, 380px);
+		}
+
+		.add-wrap[data-placement='bottom'] .component-picker,
+		.add-wrap[data-placement='bottom'] .props-panel {
+			top: max(12px, env(safe-area-inset-top));
+			bottom: auto;
+		}
+	}
+
+	@container dryui-feedback-root (max-width: 24rem) {
+		:global(.mode-btn span) {
+			display: none;
+		}
+
+		:global(.mode-btn) {
+			--dry-btn-padding-x: 8px;
+		}
+
+		:global(.submit-pill) {
+			--dry-btn-padding-x: 10px;
+		}
+	}
+
+	.toolbar[data-coarse-pointer] {
+		--tool-button-size: 42px;
+		--tool-slot-height: 54px;
+		gap: 8px;
+	}
+
+	.toolbar[data-coarse-pointer] :global(.tool-btn) {
+		touch-action: manipulation;
+	}
+
+	.toolbar[data-coarse-pointer] :global(.mode-btn) {
+		--dry-btn-min-height: 40px;
+		--dry-btn-padding-x: 12px;
+		--dry-btn-padding-y: 9px;
+
+		min-block-size: 40px;
+		touch-action: manipulation;
+	}
+
+	.toolbar[data-coarse-pointer] :global(.drag-handle) {
+		padding: 8px 6px;
+		touch-action: none;
+	}
+
+	.toolbar[data-coarse-pointer] :global(.submit-pill) {
+		--dry-btn-min-height: 44px;
+
+		block-size: 44px;
+		touch-action: manipulation;
 	}
 </style>

@@ -142,242 +142,248 @@
 	}
 </script>
 
-<Card.Root variant="elevated" size="sm">
-	<Card.Header>
-		<div class="header">
-			<div class="header-info">
-				<div class="header-top">
-					<Badge variant="soft" color={statusColor(submission.status)} size="sm">
-						{statusLabel(submission.status)}
-					</Badge>
-					<span class="url">
-						<Link href={submission.url} external underline="hover" title={submission.url}>
-							{submission.url}
-						</Link>
-					</span>
+<article class="submission-card">
+	<Card.Root variant="elevated" size="sm">
+		<Card.Header>
+			<div class="header">
+				<div class="header-info">
+					<div class="header-top">
+						<Badge variant="soft" color={statusColor(submission.status)} size="sm">
+							{statusLabel(submission.status)}
+						</Badge>
+						<span class="url">
+							<Link href={submission.url} external underline="hover" title={submission.url}>
+								{submission.url}
+							</Link>
+						</span>
+					</div>
+					<div class="header-meta">
+						<span class="id">#{shortenId(submission.id)}</span>
+						<span class="dot" aria-hidden="true">·</span>
+						<FormatDate date={submission.createdAt} dateStyle="medium" timeStyle="short" />
+						<span class="dot" aria-hidden="true">·</span>
+						<span>{formatViewport(submission.viewport)}</span>
+					</div>
 				</div>
-				<div class="header-meta">
-					<span class="id">#{shortenId(submission.id)}</span>
-					<span class="dot" aria-hidden="true">·</span>
-					<FormatDate date={submission.createdAt} dateStyle="medium" timeStyle="short" />
-					<span class="dot" aria-hidden="true">·</span>
-					<span>{formatViewport(submission.viewport)}</span>
-				</div>
+				<ButtonGroup size="sm">
+					<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
+						<ExternalLink size={14} aria-hidden="true" />
+						Open page
+					</Button>
+
+					{#if submission.status === 'pending'}
+						<Button
+							variant="solid"
+							size="sm"
+							onclick={() => void onSetStatus(submission.id, 'resolved')}
+							disabled={refreshing}
+						>
+							<Check size={14} aria-hidden="true" />
+							Mark resolved
+						</Button>
+					{:else}
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => void onSetStatus(submission.id, 'pending')}
+							disabled={refreshing}
+						>
+							Reopen
+						</Button>
+					{/if}
+				</ButtonGroup>
 			</div>
-			<ButtonGroup size="sm">
-				<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
-					<ExternalLink size={14} aria-hidden="true" />
-					Open page
-				</Button>
+		</Card.Header>
 
-				{#if submission.status === 'pending'}
-					<Button
-						variant="solid"
-						size="sm"
-						onclick={() => void onSetStatus(submission.id, 'resolved')}
-						disabled={refreshing}
-					>
-						<Check size={14} aria-hidden="true" />
-						Mark resolved
-					</Button>
-				{:else}
-					<Button
-						variant="outline"
-						size="sm"
-						onclick={() => void onSetStatus(submission.id, 'pending')}
-						disabled={refreshing}
-					>
-						Reopen
-					</Button>
-				{/if}
-			</ButtonGroup>
-		</div>
-	</Card.Header>
-
-	<Card.Content>
-		<div class="body">
-			<div class="media">
-				<div class="screenshot-trigger feedback-screenshot-dialog">
-					<Dialog.Root>
-						<Dialog.Trigger>
-							<Button variant="bare" aria-label={`Open full screenshot for ${submission.url}`}>
-								<span class="feedback-screenshot-thumb">
-									<Image
-										src={screenshotUrl(submission.id)}
-										alt={`Feedback screenshot for ${submission.url}`}
-										fallback="Screenshot unavailable"
-									/>
-								</span>
-							</Button>
-						</Dialog.Trigger>
-
-						<Dialog.Content>
-							<Dialog.Header>
-								<div class="dialog-head">
-									<div class="dialog-head-info">
-										<Heading level={3}>Captured screenshot</Heading>
-										<Text as="span" size="sm" color="secondary">
-											<FormatDate
-												date={submission.createdAt}
-												dateStyle="medium"
-												timeStyle="short"
-											/>
-											/ {formatViewport(submission.viewport)}
-										</Text>
-									</div>
-									<Dialog.Close aria-label="Close screenshot dialog">
-										<span aria-hidden="true">&times;</span>
-									</Dialog.Close>
-								</div>
-							</Dialog.Header>
-							<Dialog.Body>
-								<div class="dialog-image">
-									<span class="feedback-screenshot-full">
+		<Card.Content>
+			<div class="body">
+				<div class="media">
+					<div class="screenshot-trigger feedback-screenshot-dialog">
+						<Dialog.Root>
+							<Dialog.Trigger>
+								<Button variant="bare" aria-label={`Open full screenshot for ${submission.url}`}>
+									<span class="feedback-screenshot-thumb">
 										<Image
 											src={screenshotUrl(submission.id)}
 											alt={`Feedback screenshot for ${submission.url}`}
 											fallback="Screenshot unavailable"
 										/>
 									</span>
-								</div>
-							</Dialog.Body>
-							<Dialog.Footer>
-								<Dialog.Close>Close</Dialog.Close>
-								<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost">
-									Open page
 								</Button>
-							</Dialog.Footer>
-						</Dialog.Content>
-					</Dialog.Root>
-				</div>
+							</Dialog.Trigger>
 
-				<section class="notes">
-					<header class="notes-head">
-						<Heading level={4}>Notes</Heading>
-						{#if drawingCounts.length > 0}
-							<ChipGroup.Root gap="sm" aria-label="Annotation counts">
-								<ChipGroup.Label hidden>Annotation counts</ChipGroup.Label>
-								{#each drawingCounts as entry (entry.label)}
-									<Badge variant="outline" color="gray" size="sm">
-										{entry.label}: {entry.count}
-									</Badge>
-								{/each}
-							</ChipGroup.Root>
-						{/if}
-					</header>
-
-					{#if textNotes.length > 0}
-						<div class="notes-stack">
-							{#each textNotes as note, index (`${submission.id}-${index}`)}
-								<div class="note-card">
-									<div class="note-card-head">
-										<MessageSquare size={12} aria-hidden="true" />
-										<Text as="span" size="xs" color="secondary">Note {index + 1}</Text>
+							<Dialog.Content>
+								<Dialog.Header>
+									<div class="dialog-head">
+										<div class="dialog-head-info">
+											<Heading level={3}>Captured screenshot</Heading>
+											<Text as="span" size="sm" color="secondary">
+												<FormatDate
+													date={submission.createdAt}
+													dateStyle="medium"
+													timeStyle="short"
+												/>
+												/ {formatViewport(submission.viewport)}
+											</Text>
+										</div>
+										<Dialog.Close aria-label="Close screenshot dialog">
+											<span aria-hidden="true">&times;</span>
+										</Dialog.Close>
 									</div>
-									<Text as="p" size="sm">{note}</Text>
-								</div>
-							{/each}
-						</div>
-					{:else if drawingCounts.length > 0}
-						<Text as="p" size="sm" color="secondary">
-							This submission only uses visual arrows or freehand marks.
-						</Text>
-					{:else}
-						<Text as="p" size="sm" color="secondary">No annotations attached.</Text>
-					{/if}
-				</section>
-			</div>
-
-			<div class="prompt">
-				<CodeBlock code={promptText} language="text" showCopyButton={false} />
-				<div class="prompt-actions">
-					{#if dispatchTargets.length > 0 && targetAgent}
-						<div class="launch-group">
-							<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
-								<Button
-									variant="solid"
-									size="sm"
-									onclick={launch}
-									disabled={launching}
-									aria-label={launched
-										? 'Agent launched'
-										: `Launch ${AGENT_INFO[targetAgent].label}`}
-								>
-									{#if launched}
-										<Check size={14} aria-hidden="true" />
-										Launched
-									{:else if launching}
-										<Rocket size={14} aria-hidden="true" />
-										Launching...
-									{:else}
-										<Rocket size={14} aria-hidden="true" />
-										Launch {AGENT_INFO[targetAgent].shortLabel}
-									{/if}
-								</Button>
-							</BorderBeam>
-							<DropdownMenu.Root>
-								<DropdownMenu.Trigger>
-									<Button variant="soft" size="sm" aria-label="Choose dispatch target">
-										<AgentIcon agent={targetAgent} size={14} />
-										<ChevronDown size={12} aria-hidden="true" />
+								</Dialog.Header>
+								<Dialog.Body>
+									<div class="dialog-image">
+										<span class="feedback-screenshot-full">
+											<Image
+												src={screenshotUrl(submission.id)}
+												alt={`Feedback screenshot for ${submission.url}`}
+												fallback="Screenshot unavailable"
+											/>
+										</span>
+									</div>
+								</Dialog.Body>
+								<Dialog.Footer>
+									<Dialog.Close>Close</Dialog.Close>
+									<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost">
+										Open page
 									</Button>
-								</DropdownMenu.Trigger>
-								<DropdownMenu.Content placement="top-end" offset={8}>
-									<DropdownMenu.Label>Dispatch target</DropdownMenu.Label>
-									{#each dispatchTargets as agent (agent)}
-										<DropdownMenu.Item
-											onclick={() => onChooseAgent(agent)}
-											data-active={agent === targetAgent || undefined}
-										>
-											<AgentIcon {agent} size={16} />
-											<span class="agent-menu-label">
-												{AGENT_INFO[agent].label}
-											</span>
-											{#if agent === targetAgent}
-												<Check size={12} aria-hidden="true" />
-											{/if}
-										</DropdownMenu.Item>
+								</Dialog.Footer>
+							</Dialog.Content>
+						</Dialog.Root>
+					</div>
+
+					<section class="notes">
+						<header class="notes-head">
+							<Heading level={4}>Notes</Heading>
+							{#if drawingCounts.length > 0}
+								<ChipGroup.Root gap="sm" aria-label="Annotation counts">
+									<ChipGroup.Label hidden>Annotation counts</ChipGroup.Label>
+									{#each drawingCounts as entry (entry.label)}
+										<Badge variant="outline" color="gray" size="sm">
+											{entry.label}: {entry.count}
+										</Badge>
 									{/each}
-								</DropdownMenu.Content>
-							</DropdownMenu.Root>
-						</div>
-					{/if}
-					<Button
-						variant="soft"
-						size="sm"
-						onclick={copyPrompt}
-						aria-label={copied ? 'Copied prompt' : 'Copy prompt'}
-					>
-						{#if copied}
-							<Check size={14} aria-hidden="true" />
-							Copied
+								</ChipGroup.Root>
+							{/if}
+						</header>
+
+						{#if textNotes.length > 0}
+							<div class="notes-stack">
+								{#each textNotes as note, index (`${submission.id}-${index}`)}
+									<div class="note-card">
+										<div class="note-card-head">
+											<MessageSquare size={12} aria-hidden="true" />
+											<Text as="span" size="xs" color="secondary">Note {index + 1}</Text>
+										</div>
+										<Text as="p" size="sm">{note}</Text>
+									</div>
+								{/each}
+							</div>
+						{:else if drawingCounts.length > 0}
+							<Text as="p" size="sm" color="secondary">
+								This submission only uses visual arrows or freehand marks.
+							</Text>
 						{:else}
-							<Copy size={14} aria-hidden="true" />
-							Copy
+							<Text as="p" size="sm" color="secondary">No annotations attached.</Text>
 						{/if}
-					</Button>
+					</section>
 				</div>
-				{#if launchError}
-					<Alert variant="error">{launchError}</Alert>
-				{/if}
-				<div class="prompt-caption">
-					<CornerLeftUp size={14} aria-hidden="true" />
-					<Text as="span" size="xs" color="secondary">
+
+				<div class="prompt">
+					<CodeBlock code={promptText} language="text" showCopyButton={false} />
+					<div class="prompt-actions">
 						{#if dispatchTargets.length > 0 && targetAgent}
-							Launch the agent with this prompt, or copy to paste elsewhere
-						{:else}
-							Copy this prompt to work on this submission
+							<div class="launch-group">
+								<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
+									<Button
+										variant="solid"
+										size="sm"
+										onclick={launch}
+										disabled={launching}
+										aria-label={launched
+											? 'Agent launched'
+											: `Launch ${AGENT_INFO[targetAgent].label}`}
+									>
+										{#if launched}
+											<Check size={14} aria-hidden="true" />
+											Launched
+										{:else if launching}
+											<Rocket size={14} aria-hidden="true" />
+											Launching...
+										{:else}
+											<Rocket size={14} aria-hidden="true" />
+											Launch {AGENT_INFO[targetAgent].shortLabel}
+										{/if}
+									</Button>
+								</BorderBeam>
+								<DropdownMenu.Root>
+									<DropdownMenu.Trigger>
+										<Button variant="soft" size="sm" aria-label="Choose dispatch target">
+											<AgentIcon agent={targetAgent} size={14} />
+											<ChevronDown size={12} aria-hidden="true" />
+										</Button>
+									</DropdownMenu.Trigger>
+									<DropdownMenu.Content placement="top-end" offset={8}>
+										<DropdownMenu.Label>Dispatch target</DropdownMenu.Label>
+										{#each dispatchTargets as agent (agent)}
+											<DropdownMenu.Item
+												onclick={() => onChooseAgent(agent)}
+												data-active={agent === targetAgent || undefined}
+											>
+												<AgentIcon {agent} size={16} />
+												<span class="agent-menu-label">
+													{AGENT_INFO[agent].label}
+												</span>
+												{#if agent === targetAgent}
+													<Check size={12} aria-hidden="true" />
+												{/if}
+											</DropdownMenu.Item>
+										{/each}
+									</DropdownMenu.Content>
+								</DropdownMenu.Root>
+							</div>
 						{/if}
-					</Text>
+						<Button
+							variant="soft"
+							size="sm"
+							onclick={copyPrompt}
+							aria-label={copied ? 'Copied prompt' : 'Copy prompt'}
+						>
+							{#if copied}
+								<Check size={14} aria-hidden="true" />
+								Copied
+							{:else}
+								<Copy size={14} aria-hidden="true" />
+								Copy
+							{/if}
+						</Button>
+					</div>
+					{#if launchError}
+						<Alert variant="error">{launchError}</Alert>
+					{/if}
+					<div class="prompt-caption">
+						<CornerLeftUp size={14} aria-hidden="true" />
+						<Text as="span" size="xs" color="secondary">
+							{#if dispatchTargets.length > 0 && targetAgent}
+								Launch the agent with this prompt, or copy to paste elsewhere
+							{:else}
+								Copy this prompt to work on this submission
+							{/if}
+						</Text>
+					</div>
 				</div>
 			</div>
-		</div>
-	</Card.Content>
-</Card.Root>
+		</Card.Content>
+	</Card.Root>
+</article>
 
 <style>
+	.submission-card {
+		container: feedback-submission / inline-size;
+		display: grid;
+	}
+
 	.header {
-		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-3);
 		align-items: center;
@@ -390,7 +396,6 @@
 
 	.header-top {
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
@@ -413,10 +418,8 @@
 
 	.header-meta {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		gap: var(--dry-space-2);
-		align-items: center;
+		gap: var(--dry-space-1);
+		align-items: start;
 		font-size: var(--dry-font-size-xs, 0.75rem);
 		color: var(--dry-color-text-weak);
 		font-variant-numeric: tabular-nums;
@@ -427,11 +430,11 @@
 	}
 
 	.dot {
+		display: none;
 		opacity: 0.5;
 	}
 
 	.body {
-		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-3);
 		align-items: start;
@@ -484,8 +487,6 @@
 
 	.prompt-actions {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		justify-content: start;
 		align-items: center;
 		gap: var(--dry-space-2);
@@ -516,9 +517,8 @@
 
 	.notes-head {
 		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
 		gap: var(--dry-space-3);
-		align-items: center;
+		align-items: start;
 	}
 
 	.notes-stack {
@@ -544,7 +544,34 @@
 		color: var(--dry-color-text-weak);
 	}
 
-	@container (min-width: 42rem) {
+	@container feedback-submission (min-width: 30rem) {
+		.header-top {
+			grid-template-columns: auto minmax(0, 1fr);
+		}
+
+		.header-meta {
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+			gap: var(--dry-space-2);
+			align-items: center;
+		}
+
+		.dot {
+			display: inline;
+		}
+
+		.prompt-actions {
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+		}
+
+		.notes-head {
+			grid-template-columns: auto minmax(0, 1fr);
+			align-items: center;
+		}
+	}
+
+	@container feedback-submission (min-width: 42rem) {
 		.header {
 			grid-template-columns: minmax(0, 1fr) auto;
 		}

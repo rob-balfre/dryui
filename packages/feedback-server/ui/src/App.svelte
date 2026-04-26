@@ -366,244 +366,255 @@
 </script>
 
 <Container size="xl" padding={false}>
-	<section class="dashboard">
-		<PageHeader.Root>
-			<PageHeader.Content>
-				<span class="brand-link">
-					<Link href="https://dryui.dev" external underline="none">
-						<span class="brand">
-							<span class="wordmark" aria-label="DryUI">
-								DRY<span class="wordmark-badge">ui</span>
+	<div class="dashboard-shell">
+		<section class="dashboard">
+			<PageHeader.Root>
+				<PageHeader.Content>
+					<span class="brand-link">
+						<Link href="https://dryui.dev" external underline="none">
+							<span class="brand">
+								<span class="wordmark" aria-label="DryUI">
+									DRY<span class="wordmark-badge">ui</span>
+								</span>
+								<span class="brand-divider" aria-hidden="true"></span>
+								<span class="brand-title">Feedback</span>
 							</span>
-							<span class="brand-divider" aria-hidden="true"></span>
-							<span class="brand-title">Feedback</span>
-						</span>
-					</Link>
-				</span>
-			</PageHeader.Content>
-			<PageHeader.Actions>
-				<span class="hero-status">
-					<Text as="span" size="xs" color="secondary">
-						{#if lastLoadedAt}
-							Updated <RelativeTime date={lastLoadedAt} />
-						{:else}
-							Not refreshed yet
-						{/if}
-					</Text>
-				</span>
-				<ButtonGroup size="sm">
-					{#if devUrl}
-						<Button
-							href={devUrl}
-							target="_blank"
-							rel="noreferrer"
-							variant="soft"
-							size="sm"
-							aria-label="Open dev app"
-						>
-							<ExternalLink size={14} aria-hidden="true" />
-							Open dev app
-						</Button>
-					{/if}
-					<Button
-						variant="outline"
-						size="sm"
-						onclick={() => void loadSubmissions('refresh')}
-						disabled={refreshing}
-						aria-label="Refresh submissions"
-					>
-						<span class="refresh-icon" data-spinning={refreshing || undefined}>
-							<RefreshCw size={14} aria-hidden="true" />
-						</span>
-						{refreshing ? 'Refreshing' : 'Refresh'}
-					</Button>
-				</ButtonGroup>
-			</PageHeader.Actions>
-		</PageHeader.Root>
-
-		{#if error}
-			<Alert variant="error">{error}</Alert>
-		{/if}
-
-		<Tabs.Root bind:value={activeTab}>
-			<Card.Root variant="elevated" size="sm">
-				<Card.Content>
-					<div class="filter-bar">
-						<div
-							class="filter-search"
-							class:is-open={searchOpen || hasActiveSearch}
-							{@attach attachSearchControls}
-							role="search"
-						>
-							{#if searchOpen || hasActiveSearch}
-								<Input
-									bind:value={search}
-									size="sm"
-									placeholder="Search URL, submission id, or note text"
-									aria-label="Search submissions"
-								/>
-								<Tabs.List>
-									<Tabs.Trigger value="pending">
-										<span class="tab-trigger">
-											<span>Pending</span>
-											<Badge variant="outline" color="gray" size="sm">
-												{hasActiveSearch ? `${visiblePendingCount}/${pendingCount}` : pendingCount}
-											</Badge>
-										</span>
-									</Tabs.Trigger>
-									<Tabs.Trigger value="resolved">
-										<span class="tab-trigger">
-											<span>Complete</span>
-											<Badge variant="outline" color="gray" size="sm">
-												{hasActiveSearch
-													? `${visibleResolvedCount}/${resolvedCount}`
-													: resolvedCount}
-											</Badge>
-										</span>
-									</Tabs.Trigger>
-								</Tabs.List>
-								<Button variant="soft" size="sm" onclick={closeSearch} aria-label="Close filter">
-									<X size={14} aria-hidden="true" />
-								</Button>
+						</Link>
+					</span>
+				</PageHeader.Content>
+				<PageHeader.Actions>
+					<span class="hero-status">
+						<Text as="span" size="xs" color="secondary">
+							{#if lastLoadedAt}
+								Updated <RelativeTime date={lastLoadedAt} />
 							{:else}
-								<Button
-									variant="soft"
-									size="sm"
-									onclick={openSearch}
-									aria-label="Filter submissions"
-								>
-									<Filter size={14} aria-hidden="true" />
-								</Button>
+								Not refreshed yet
+							{/if}
+						</Text>
+					</span>
+					<ButtonGroup size="sm">
+						{#if devUrl}
+							<Button
+								href={devUrl}
+								target="_blank"
+								rel="noreferrer"
+								variant="soft"
+								size="sm"
+								aria-label="Open dev app"
+							>
+								<ExternalLink size={14} aria-hidden="true" />
+								Open dev app
+							</Button>
+						{/if}
+						<Button
+							variant="outline"
+							size="sm"
+							onclick={() => void loadSubmissions('refresh')}
+							disabled={refreshing}
+							aria-label="Refresh submissions"
+						>
+							<span class="refresh-icon" data-spinning={refreshing || undefined}>
+								<RefreshCw size={14} aria-hidden="true" />
+							</span>
+							{refreshing ? 'Refreshing' : 'Refresh'}
+						</Button>
+					</ButtonGroup>
+				</PageHeader.Actions>
+			</PageHeader.Root>
+
+			{#if error}
+				<Alert variant="error">{error}</Alert>
+			{/if}
+
+			<Tabs.Root bind:value={activeTab}>
+				<Card.Root variant="elevated" size="sm">
+					<Card.Content>
+						<div class="filter-bar">
+							<div
+								class="filter-search"
+								class:is-open={searchOpen || hasActiveSearch}
+								{@attach attachSearchControls}
+								role="search"
+							>
+								{#if searchOpen || hasActiveSearch}
+									<Input
+										bind:value={search}
+										size="sm"
+										placeholder="Search URL, submission id, or note text"
+										aria-label="Search submissions"
+									/>
+									<span class="filter-tabs">
+										<Tabs.List>
+											<Tabs.Trigger value="pending">
+												<span class="tab-trigger">
+													<span>Pending</span>
+													<Badge variant="outline" color="gray" size="sm">
+														{hasActiveSearch
+															? `${visiblePendingCount}/${pendingCount}`
+															: pendingCount}
+													</Badge>
+												</span>
+											</Tabs.Trigger>
+											<Tabs.Trigger value="resolved">
+												<span class="tab-trigger">
+													<span>Complete</span>
+													<Badge variant="outline" color="gray" size="sm">
+														{hasActiveSearch
+															? `${visibleResolvedCount}/${resolvedCount}`
+															: resolvedCount}
+													</Badge>
+												</span>
+											</Tabs.Trigger>
+										</Tabs.List>
+									</span>
+									<Button variant="soft" size="sm" onclick={closeSearch} aria-label="Close filter">
+										<X size={14} aria-hidden="true" />
+									</Button>
+								{:else}
+									<Button
+										variant="soft"
+										size="sm"
+										onclick={openSearch}
+										aria-label="Filter submissions"
+									>
+										<Filter size={14} aria-hidden="true" />
+									</Button>
+								{/if}
+							</div>
+
+							{#if showBulkLaunch && targetAgent}
+								<div class="filter-bulk">
+									<div class="launch-group">
+										<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
+											<Button
+												variant="solid"
+												size="sm"
+												onclick={launchBulk}
+												disabled={bulkLaunching || pendingCount === 0}
+												aria-label={bulkLaunched
+													? 'Agent launched'
+													: `Work through all pending with ${AGENT_INFO[targetAgent].label}`}
+											>
+												{#if bulkLaunched}
+													<Check size={14} aria-hidden="true" />
+													Launched
+												{:else if bulkLaunching}
+													<Rocket size={14} aria-hidden="true" />
+													Launching...
+												{:else}
+													<Rocket size={14} aria-hidden="true" />
+													Work through all
+												{/if}
+											</Button>
+										</BorderBeam>
+										<DropdownMenu.Root>
+											<DropdownMenu.Trigger>
+												<Button variant="soft" size="sm" aria-label="Choose dispatch target">
+													<AgentIcon agent={targetAgent} size={14} />
+													<ChevronDown size={12} aria-hidden="true" />
+												</Button>
+											</DropdownMenu.Trigger>
+											<DropdownMenu.Content placement="bottom-end" offset={8}>
+												<DropdownMenu.Label>Dispatch target</DropdownMenu.Label>
+												{#each dispatchTargets as agent (agent)}
+													<DropdownMenu.Item
+														onclick={() => chooseTargetAgent(agent)}
+														data-active={agent === targetAgent || undefined}
+													>
+														<AgentIcon {agent} size={16} />
+														<span class="agent-menu-label">
+															{AGENT_INFO[agent].label}
+														</span>
+														{#if agent === targetAgent}
+															<Check size={12} aria-hidden="true" />
+														{/if}
+													</DropdownMenu.Item>
+												{/each}
+											</DropdownMenu.Content>
+										</DropdownMenu.Root>
+									</div>
+									<Button
+										variant="soft"
+										size="sm"
+										onclick={copyBulk}
+										aria-label={bulkCopied ? 'Copied bulk prompt' : 'Copy bulk prompt'}
+									>
+										{#if bulkCopied}
+											<Check size={14} aria-hidden="true" />
+											Copied
+										{:else}
+											<Copy size={14} aria-hidden="true" />
+											Copy prompt
+										{/if}
+									</Button>
+								</div>
 							{/if}
 						</div>
 
-						{#if showBulkLaunch && targetAgent}
-							<div class="filter-bulk">
-								<div class="launch-group">
-									<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
-										<Button
-											variant="solid"
-											size="sm"
-											onclick={launchBulk}
-											disabled={bulkLaunching || pendingCount === 0}
-											aria-label={bulkLaunched
-												? 'Agent launched'
-												: `Work through all pending with ${AGENT_INFO[targetAgent].label}`}
-										>
-											{#if bulkLaunched}
-												<Check size={14} aria-hidden="true" />
-												Launched
-											{:else if bulkLaunching}
-												<Rocket size={14} aria-hidden="true" />
-												Launching...
-											{:else}
-												<Rocket size={14} aria-hidden="true" />
-												Work through all
-											{/if}
-										</Button>
-									</BorderBeam>
-									<DropdownMenu.Root>
-										<DropdownMenu.Trigger>
-											<Button variant="soft" size="sm" aria-label="Choose dispatch target">
-												<AgentIcon agent={targetAgent} size={14} />
-												<ChevronDown size={12} aria-hidden="true" />
-											</Button>
-										</DropdownMenu.Trigger>
-										<DropdownMenu.Content placement="bottom-end" offset={8}>
-											<DropdownMenu.Label>Dispatch target</DropdownMenu.Label>
-											{#each dispatchTargets as agent (agent)}
-												<DropdownMenu.Item
-													onclick={() => chooseTargetAgent(agent)}
-													data-active={agent === targetAgent || undefined}
-												>
-													<AgentIcon {agent} size={16} />
-													<span class="agent-menu-label">
-														{AGENT_INFO[agent].label}
-													</span>
-													{#if agent === targetAgent}
-														<Check size={12} aria-hidden="true" />
-													{/if}
-												</DropdownMenu.Item>
-											{/each}
-										</DropdownMenu.Content>
-									</DropdownMenu.Root>
-								</div>
-								<Button
-									variant="soft"
-									size="sm"
-									onclick={copyBulk}
-									aria-label={bulkCopied ? 'Copied bulk prompt' : 'Copy bulk prompt'}
-								>
-									{#if bulkCopied}
-										<Check size={14} aria-hidden="true" />
-										Copied
-									{:else}
-										<Copy size={14} aria-hidden="true" />
-										Copy prompt
-									{/if}
-								</Button>
-							</div>
+						{#if bulkLaunchError}
+							<Alert variant="error">{bulkLaunchError}</Alert>
 						{/if}
-					</div>
+					</Card.Content>
+				</Card.Root>
 
-					{#if bulkLaunchError}
-						<Alert variant="error">{bulkLaunchError}</Alert>
+				<Tabs.Content value="pending">
+					{#if loading && pendingCount === 0}
+						<Alert variant="info">Loading queued submissions...</Alert>
+					{:else if visiblePendingSubmissions.length === 0}
+						<Alert variant="info">No pending submissions match the current filter.</Alert>
+					{:else}
+						<div class="feed">
+							{#each visiblePendingSubmissions as submission (submission.id)}
+								<div class="feed-item" data-submission-id={submission.id}>
+									<SubmissionCard
+										{submission}
+										{dispatchTargets}
+										{targetAgent}
+										{refreshing}
+										onChooseAgent={chooseTargetAgent}
+										onSetStatus={setSubmissionStatus}
+										onLaunch={dispatchAgent}
+									/>
+								</div>
+							{/each}
+						</div>
 					{/if}
-				</Card.Content>
-			</Card.Root>
+				</Tabs.Content>
 
-			<Tabs.Content value="pending">
-				{#if loading && pendingCount === 0}
-					<Alert variant="info">Loading queued submissions...</Alert>
-				{:else if visiblePendingSubmissions.length === 0}
-					<Alert variant="info">No pending submissions match the current filter.</Alert>
-				{:else}
-					<div class="feed">
-						{#each visiblePendingSubmissions as submission (submission.id)}
-							<div class="feed-item" data-submission-id={submission.id}>
-								<SubmissionCard
-									{submission}
-									{dispatchTargets}
-									{targetAgent}
-									{refreshing}
-									onChooseAgent={chooseTargetAgent}
-									onSetStatus={setSubmissionStatus}
-									onLaunch={dispatchAgent}
-								/>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</Tabs.Content>
-
-			<Tabs.Content value="resolved">
-				{#if loading && resolvedCount === 0}
-					<Alert variant="info">Loading resolved history...</Alert>
-				{:else if visibleResolvedSubmissions.length === 0}
-					<Alert variant="info">No resolved submissions match the current filter.</Alert>
-				{:else}
-					<div class="feed">
-						{#each visibleResolvedSubmissions as submission (submission.id)}
-							<div class="feed-item" data-submission-id={submission.id}>
-								<SubmissionCard
-									{submission}
-									{dispatchTargets}
-									{targetAgent}
-									{refreshing}
-									onChooseAgent={chooseTargetAgent}
-									onSetStatus={setSubmissionStatus}
-									onLaunch={dispatchAgent}
-								/>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</Tabs.Content>
-		</Tabs.Root>
-	</section>
+				<Tabs.Content value="resolved">
+					{#if loading && resolvedCount === 0}
+						<Alert variant="info">Loading resolved history...</Alert>
+					{:else if visibleResolvedSubmissions.length === 0}
+						<Alert variant="info">No resolved submissions match the current filter.</Alert>
+					{:else}
+						<div class="feed">
+							{#each visibleResolvedSubmissions as submission (submission.id)}
+								<div class="feed-item" data-submission-id={submission.id}>
+									<SubmissionCard
+										{submission}
+										{dispatchTargets}
+										{targetAgent}
+										{refreshing}
+										onChooseAgent={chooseTargetAgent}
+										onSetStatus={setSubmissionStatus}
+										onLaunch={dispatchAgent}
+									/>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</Tabs.Content>
+			</Tabs.Root>
+		</section>
+	</div>
 </Container>
 
 <style>
+	.dashboard-shell {
+		container: feedback-dashboard / inline-size;
+		display: grid;
+	}
+
 	.dashboard {
 		container-type: inline-size;
 		display: grid;
@@ -688,6 +699,7 @@
 	}
 
 	.filter-bar {
+		container: feedback-filters / inline-size;
 		display: grid;
 		gap: var(--dry-space-3);
 		align-items: center;
@@ -703,14 +715,20 @@
 	}
 
 	.filter-search.is-open {
-		grid-template-columns: minmax(0, 1fr) auto auto;
+		grid-auto-flow: row;
+		grid-auto-columns: initial;
+		grid-template-columns: minmax(0, 1fr) auto;
 		justify-self: stretch;
+	}
+
+	.filter-tabs {
+		display: grid;
+		grid-column: 1 / -1;
 	}
 
 	.filter-bulk {
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
+		grid-template-columns: minmax(0, 1fr);
 		justify-content: start;
 		align-items: center;
 		gap: var(--dry-space-2);
@@ -747,7 +765,30 @@
 		scroll-margin-block-start: var(--dry-space-3);
 	}
 
-	@container (min-width: 48rem) {
+	@container feedback-dashboard (max-width: 36rem) {
+		.dashboard {
+			gap: var(--dry-space-2);
+			padding: var(--dry-space-2);
+		}
+	}
+
+	@container feedback-filters (min-width: 42rem) {
+		.filter-search.is-open {
+			grid-template-columns: minmax(0, 1fr) auto auto;
+		}
+
+		.filter-tabs {
+			grid-column: auto;
+		}
+
+		.filter-bulk {
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+			grid-template-columns: none;
+		}
+	}
+
+	@container feedback-dashboard (min-width: 48rem) {
 		.filter-bar {
 			grid-template-columns: minmax(0, 1fr) auto;
 			align-items: center;
