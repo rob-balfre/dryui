@@ -6,7 +6,7 @@
     "version": "2.0.2"
   },
   "counts": {
-    "components": 167,
+    "components": 168,
     "compositionComponents": 130,
     "compositionRecipes": 48,
     "tools": 2,
@@ -4959,6 +4959,169 @@
         }
       ],
       "example": "<Container>\n  <p>Centered content</p>\n</Container>"
+    },
+    "AreaGrid": {
+      "import": "@dryui/ui",
+      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "category": "layout",
+      "tags": [
+        "layout",
+        "grid",
+        "areas",
+        "template",
+        "compound"
+      ],
+      "compound": true,
+      "parts": {
+        "Root": {
+          "props": {
+            "gap": {
+              "type": "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'",
+              "required": false,
+              "acceptedValues": [
+                "none",
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ],
+              "default": "'md'"
+            },
+            "padding": {
+              "type": "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'",
+              "required": false,
+              "acceptedValues": [
+                "none",
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ],
+              "default": "'none'"
+            },
+            "debug": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'children'>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "omitted": [
+              "children"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        },
+        "Area": {
+          "props": {
+            "as": {
+              "type": "| 'section'\n\t| 'header'\n\t| 'main'\n\t| 'nav'\n\t| 'aside'\n\t| 'article'\n\t| 'footer'",
+              "required": false,
+              "acceptedValues": [
+                "section",
+                "header",
+                "main",
+                "nav",
+                "aside",
+                "article",
+                "footer"
+              ],
+              "description": "Underlying HTML element to render for the component.",
+              "default": "'section'"
+            },
+            "children": {
+              "type": "Snippet",
+              "required": true,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwardedProps": {
+            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'children'>",
+            "via": "rest",
+            "element": "element",
+            "examples": [
+              "id",
+              "class",
+              "aria-label"
+            ],
+            "omitted": [
+              "children"
+            ],
+            "note": "Forwards <element> attributes via rest props."
+          }
+        }
+      },
+      "structure": {
+        "tree": [
+          "AreaGrid.Root",
+          "  AreaGrid.Area"
+        ]
+      },
+      "a11y": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
+      "cssVars": {
+        "--dry-area-grid-align-items": "Grid Align Items",
+        "--dry-area-grid-area": "Grid Area",
+        "--dry-area-grid-area-bg": "Grid Area Bg",
+        "--dry-area-grid-area-border": "Grid Area Border",
+        "--dry-area-grid-area-color": "Grid Area Color",
+        "--dry-area-grid-area-display": "Grid Area Display",
+        "--dry-area-grid-area-gap": "Grid Area Gap",
+        "--dry-area-grid-area-padding": "Grid Area Padding",
+        "--dry-area-grid-area-radius": "Grid Area Radius",
+        "--dry-area-grid-auto-flow": "Grid Auto Flow",
+        "--dry-area-grid-auto-rows": "Grid Auto Rows",
+        "--dry-area-grid-gap": "Grid Gap",
+        "--dry-area-grid-justify-items": "Grid Justify Items",
+        "--dry-area-grid-padding": "Grid Padding",
+        "--dry-area-grid-template-areas": "Grid Template Areas",
+        "--dry-area-grid-template-areas-wide": "Grid Template Areas Wide",
+        "--dry-area-grid-template-areas-xl": "Grid Template Areas Xl",
+        "--dry-area-grid-template-columns": "Grid Template Columns",
+        "--dry-area-grid-template-columns-wide": "Grid Template Columns Wide",
+        "--dry-area-grid-template-columns-xl": "Grid Template Columns Xl",
+        "--dry-area-grid-template-rows": "Grid Template Rows",
+        "--dry-area-grid-template-rows-wide": "Grid Template Rows Wide",
+        "--dry-area-grid-template-rows-xl": "Grid Template Rows Xl"
+      },
+      "dataAttributes": [
+        {
+          "name": "data-area-grid"
+        },
+        {
+          "name": "data-area-grid-area"
+        },
+        {
+          "name": "data-area-grid-shell"
+        },
+        {
+          "name": "data-debug"
+        },
+        {
+          "name": "data-gap"
+        },
+        {
+          "name": "data-padding"
+        }
+      ],
+      "example": "<AreaGrid.Root>\n  <AreaGrid.Area>...</AreaGrid.Area>\n</AreaGrid.Root>"
     },
     "Separator": {
       "import": "@dryui/ui",

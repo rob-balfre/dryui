@@ -955,6 +955,125 @@
         }
       }
     },
+    "AreaGrid": {
+      "name": "AreaGrid",
+      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "category": "layout",
+      "tags": [
+        "layout",
+        "grid",
+        "areas",
+        "template",
+        "compound"
+      ],
+      "kind": "compound",
+      "import": {
+        "package": "@dryui/ui",
+        "statement": "import { AreaGrid } from '@dryui/ui'",
+        "subpathStatement": "import { AreaGrid } from '@dryui/ui/area-grid'"
+      },
+      "requiredParts": [
+        "Root",
+        "Area"
+      ],
+      "bindableProps": [],
+      "usage": "<AreaGrid.Root>\n  <AreaGrid.Area>...</AreaGrid.Area>\n</AreaGrid.Root>",
+      "accessibility": [
+        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
+        "Only add landmark or region semantics when the section has a unique, meaningful label."
+      ],
+      "antiPatterns": [],
+      "rules": [
+        "Import AreaGrid from @dryui/ui.",
+        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
+        "Use AreaGrid compound parts; do not render <AreaGrid> as a standalone element.",
+        "Include required parts: AreaGrid.Root, AreaGrid.Area.",
+        "Preserve the accessibility notes in this contract."
+      ],
+      "checks": [
+        "dryui prompt --component AreaGrid",
+        "dryui check <file.svelte>",
+        "Svelte MCP svelte-autofixer on edited Svelte code"
+      ],
+      "parts": {
+        "Root": {
+          "props": {
+            "gap": {
+              "signature": "gap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | default:'md' | values:none|xs|sm|md|lg|xl",
+              "required": false,
+              "bindable": false,
+              "default": "'md'",
+              "values": [
+                "none",
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ]
+            },
+            "padding": {
+              "signature": "padding: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | default:'none' | values:none|xs|sm|md|lg|xl",
+              "required": false,
+              "bindable": false,
+              "default": "'none'",
+              "values": [
+                "none",
+                "xs",
+                "sm",
+                "md",
+                "lg",
+                "xl"
+              ]
+            },
+            "debug": {
+              "signature": "debug: boolean | default:false",
+              "required": false,
+              "bindable": false,
+              "default": "false"
+            },
+            "children": {
+              "signature": "children: Snippet | required",
+              "required": true,
+              "bindable": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwards": "Forwards <element> attributes via rest props. Examples: id, class, aria-label."
+        },
+        "Area": {
+          "props": {
+            "as": {
+              "signature": "as: | 'section'\n\t| 'header'\n\t| 'main'\n\t| 'nav'\n\t| 'aside'\n\t| 'article'\n\t| 'footer' | default:'section' | values:section|header|main|nav|aside|article|footer",
+              "required": false,
+              "bindable": false,
+              "default": "'section'",
+              "values": [
+                "section",
+                "header",
+                "main",
+                "nav",
+                "aside",
+                "article",
+                "footer"
+              ],
+              "description": "Underlying HTML element to render for the component."
+            },
+            "children": {
+              "signature": "children: Snippet | required",
+              "required": true,
+              "bindable": false,
+              "description": "Content rendered inside the component."
+            }
+          },
+          "forwards": "Forwards <element> attributes via rest props. Examples: id, class, aria-label."
+        }
+      },
+      "structure": [
+        "AreaGrid.Root",
+        "  AreaGrid.Area"
+      ]
+    },
     "AspectRatio": {
       "name": "AspectRatio",
       "description": "Constrains child content to a specific aspect ratio",
