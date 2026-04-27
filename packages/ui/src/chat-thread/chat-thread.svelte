@@ -126,6 +126,19 @@
 		}
 	});
 
+	$effect(() => {
+		void visibleCount;
+		const children = viewport?.children;
+		if (!children) return;
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i] as HTMLElement;
+			const name = child.dataset.viewTransitionName;
+			if (name && child.style.getPropertyValue('view-transition-name') !== name) {
+				child.style.setProperty('view-transition-name', name);
+			}
+		}
+	});
+
 	onMount(() => {
 		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
 		prefersReducedMotion = mql.matches;
@@ -151,12 +164,7 @@
 	>
 		{#each Array.from({ length: visibleCount }, (_, index) => index) as index (index)}
 			{@const viewTransitionName = `chat-message-${index}`}
-			<div
-				{@attach (node) => {
-					node.style.setProperty('view-transition-name', viewTransitionName);
-				}}
-				data-chat-thread-message
-			>
+			<div data-chat-thread-message data-view-transition-name={viewTransitionName}>
 				{@render children({
 					index,
 					viewTransitionName,

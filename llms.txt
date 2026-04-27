@@ -24,7 +24,6 @@
 - [How it works](https://dryui.dev/how-it-works): Architecture and mental model for DryUI-backed apps
 - [How we work](https://dryui.dev/how-we-work): Per-module architecture diagrams and internal workflow
 - [Grid rules](https://dryui.dev/grid-rules): The DryUI layout discipline: grid-first, container queries, token-based spacing
-- [Migration guide](https://dryui.dev/migration-guide): Move from Tailwind, shadcn, or ad-hoc component libraries onto DryUI
 
 ## Installation
 
@@ -434,7 +433,7 @@ Props: Root: open (boolean), Controls whether the select menu is currently expan
 	| 'right'
 	| 'right-start'
 	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Item: value (string), Current controlled or bindable value., required | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Value: placeholder (string), Hint text shown when no value is selected or entered., default ''
-Data attributes: data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
+Data attributes: data-content | data-disabled (Present when the component or part is disabled.) | data-dry-stagger | data-indicator | data-placeholder | data-select-content | data-select-item | data-select-trigger | data-select-value | data-select-wrapper | data-size | data-state (Reflects whether the select surface is expanded or whether an option is active, depending on the part., values open, closed, checked, unchecked) | data-value
 Accessibility: Provide surrounding field context and a name when the selected value needs to submit with a form.
 Example: <Select.Root bind:value={selected} bind:open={selectOpen} name="selection">
 
@@ -537,7 +536,7 @@ Import: @dryui/ui
 Subpath import: @dryui/ui/date-range-picker
 Parts: Root, Trigger, Content, Calendar, Preset
 Props: Root: open (boolean), Whether the overlay or disclosure is currently open., default false, bindable | startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required | Trigger: placeholder (string), Hint text shown when no value is selected or entered. | children (Snippet), Content rendered inside the component. | Content: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required | Preset: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
-Data attributes: data-calendar-day | data-disabled (Present when the component or part is disabled.) | data-in-range | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-state | data-today
+Data attributes: data-calendar-day | data-content | data-date-range-trigger | data-disabled (Present when the component or part is disabled.) | data-in-range | data-indicator | data-outside-month | data-placeholder | data-range-end | data-range-start | data-selected (Present when the current item is selected.) | data-size | data-state | data-today
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example: <DateRangePicker.Root>
 
@@ -1083,7 +1082,7 @@ Conversation thread container with restart action and auto-scroll behavior.
 Import: @dryui/ui
 Subpath import: @dryui/ui/chat-thread
 Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >), Content rendered inside the component., required
-Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport
+Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport | data-view-transition-name
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <ChatThread messageCount={messages.length}>
 

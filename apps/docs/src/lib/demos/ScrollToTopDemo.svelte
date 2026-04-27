@@ -1,21 +1,16 @@
 <script lang="ts">
-	import type { Attachment } from 'svelte/attachments';
 	import { ScrollToTop } from '@dryui/ui';
 
-	let target = $state<HTMLDivElement | undefined>();
+	let target = $state<HTMLDivElement>();
 
-	const captureTarget: Attachment<HTMLDivElement> = (node) => {
-		target = node;
-		node.scrollTop = 160;
-
-		return () => {
-			if (target === node) target = undefined;
-		};
-	};
+	$effect(() => {
+		if (!target) return;
+		target.scrollTop = 160;
+	});
 </script>
 
 <div class="frame">
-	<div class="scroll" {@attach captureTarget}>
+	<div bind:this={target} class="scroll">
 		<div class="inner">
 			<p class="eyebrow">Changelog / 1.4.0</p>
 			<p>

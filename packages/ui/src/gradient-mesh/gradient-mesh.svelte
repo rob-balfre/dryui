@@ -29,7 +29,7 @@
 		...rest
 	}: Props = $props();
 
-	let element = $state<HTMLDivElement | null>(null);
+	let element = $state<HTMLDivElement>();
 	let prefersReducedMotion = $state(false);
 	let animated = $state(false);
 	let onScreen = $state(true);
@@ -40,15 +40,6 @@
 	let pointerFrame = $state<number | null>(null);
 	let pendingPointerX = '50%';
 	let pendingPointerY = '50%';
-
-	function captureElement(node: HTMLDivElement) {
-		element = node;
-		return {
-			destroy() {
-				if (element === node) element = null;
-			}
-		};
-	}
 
 	const speedDuration = $derived.by(() => {
 		if (typeof speed === 'number' && Number.isFinite(speed) && speed > 0) {
@@ -159,23 +150,21 @@
 		};
 	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-mesh-color-1', colors[0]);
-			node.style.setProperty('--dry-mesh-color-2', colors[1]);
-			node.style.setProperty('--dry-mesh-color-3', colors[2]);
-			node.style.setProperty('--dry-mesh-color-4', colors[3]);
-			node.style.setProperty('--dry-mesh-duration', speedDuration);
-			node.style.setProperty('--dry-mesh-pointer-x', pointerX);
-			node.style.setProperty('--dry-mesh-pointer-y', pointerY);
-		});
-	}
+	$effect(() => {
+		if (!element) return;
+		element.style.cssText = style || '';
+		element.style.setProperty('--dry-mesh-color-1', colors[0]);
+		element.style.setProperty('--dry-mesh-color-2', colors[1]);
+		element.style.setProperty('--dry-mesh-color-3', colors[2]);
+		element.style.setProperty('--dry-mesh-color-4', colors[3]);
+		element.style.setProperty('--dry-mesh-duration', speedDuration);
+		element.style.setProperty('--dry-mesh-pointer-x', pointerX);
+		element.style.setProperty('--dry-mesh-pointer-y', pointerY);
+	});
 </script>
 
 <div
-	{@attach captureElement}
-	{@attach applyStyles}
+	bind:this={element}
 	class={className}
 	data-gradient-mesh
 	data-animated={animated || undefined}

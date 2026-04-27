@@ -50,13 +50,17 @@
 		if (onkeydown) (onkeydown as (e: KeyboardEvent & { currentTarget: HTMLDivElement }) => void)(e);
 	}
 
-	function keepHighlightedItemVisible(node: HTMLDivElement) {
-		node.scrollIntoView({ block: 'nearest' });
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (isHighlighted && el) {
+			el.scrollIntoView({ block: 'nearest' });
+		}
+	});
 </script>
 
 <div
-	{@attach isHighlighted && keepHighlightedItemVisible}
+	bind:this={el}
 	role="option"
 	id={`${ctx.contentId}-item-${index}`}
 	tabindex={disabled ? undefined : -1}

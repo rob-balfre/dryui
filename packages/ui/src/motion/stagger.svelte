@@ -16,14 +16,15 @@
 		return 'var(--dry-enter-stagger-section)';
 	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('--dry-stagger-step', stepValue);
-		});
-	}
+	let el = $state<HTMLElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--dry-stagger-step', stepValue);
+	});
 </script>
 
 <!-- dryui-allow svelte-element -->
-<svelte:element this={as} data-dry-stagger {@attach applyStyles}>
+<svelte:element this={as} bind:this={el} data-dry-stagger>
 	{@render children?.()}
 </svelte:element>

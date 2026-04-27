@@ -1,0 +1,29 @@
+kind: component
+target: packages/ui/skills/dryui-workspace/iteration-1/eval-2-stat-card-grid/with_skill/outputs/+page.svelte
+hasBlockers: false | autoFixable: 0
+severityCounts: error=0 | warning=0 | suggestion=0 | info=0
+
+issues[0]: clean
+
+summary: No issues found
+
+next[2]:
+  ask --scope component "<Component>" -- inspect the relevant component API before fixing
+  ask --scope recipe "<pattern>" -- look up a better DryUI pattern if the current markup is off
+
+```json dryui-diagnostics
+{
+  "summary": {
+    "hasBlockers": false,
+    "autoFixable": 0,
+    "counts": {
+      "error": 0,
+      "warning": 0,
+      "suggestion": 0,
+      "info": 0,
+      "total": 0
+    }
+  },
+  "diagnostics": []
+}
+```

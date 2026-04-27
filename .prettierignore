@@ -5,3 +5,4 @@ build
 package
 *.json
 *.d.ts
+packages/ui/skills/dryui-workspace/

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {
@@ -12,23 +11,20 @@
 
 	let { color, shape = 'rounded', variant = 'default', children, ...rest }: Props = $props();
 
-	function applyColor(value?: string): Attachment<HTMLSpanElement> {
-		return (node) => {
-			if (value) {
-				node.style.setProperty('--dry-option-picker-preview-bg', value);
-			} else {
-				node.style.removeProperty('--dry-option-picker-preview-bg');
-			}
+	let el = $state<HTMLSpanElement>();
 
-			return () => {
-				node.style.removeProperty('--dry-option-picker-preview-bg');
-			};
-		};
-	}
+	$effect(() => {
+		if (!el) return;
+		if (color) {
+			el.style.setProperty('--dry-option-picker-preview-bg', color);
+		} else {
+			el.style.removeProperty('--dry-option-picker-preview-bg');
+		}
+	});
 </script>
 
 <span
-	{@attach applyColor(color)}
+	bind:this={el}
 	data-option-picker-preview
 	data-option-picker-preview-shape={shape}
 	data-variant={variant !== 'default' ? variant : undefined}

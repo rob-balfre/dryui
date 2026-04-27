@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
@@ -24,17 +23,7 @@
 
 	const ctx = getSelectCtx();
 
-	let el = $state<HTMLDivElement | null>(null);
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
+	let el = $state<HTMLDivElement>();
 
 	function getOptionItems(container: HTMLElement): HTMLElement[] {
 		return Array.from(container.querySelectorAll<HTMLElement>(OPTION_SELECTOR));
@@ -116,8 +105,8 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach fromAction(popover.applyPosition, () => style)}
+	bind:this={el}
+	use:popover.applyPosition={style}
 	popover="auto"
 	role="listbox"
 	id={ctx.contentId}

@@ -26,18 +26,20 @@
 
 	let dataState = $derived(indeterminate ? 'indeterminate' : checked ? 'checked' : 'unchecked');
 
-	function applyIndeterminate(node: HTMLInputElement) {
-		$effect(() => {
-			node.indeterminate = indeterminate;
-		});
-	}
+	let labeledInputEl = $state<HTMLInputElement>();
+	let bareInputEl = $state<HTMLInputElement>();
+
+	$effect(() => {
+		if (labeledInputEl) labeledInputEl.indeterminate = indeterminate;
+		if (bareInputEl) bareInputEl.indeterminate = indeterminate;
+	});
 </script>
 
 {#if children}
 	<label class="checkbox-label" data-disabled={isDisabled || undefined} data-size={size}>
 		<span class="wrapper">
 			<input
-				{@attach applyIndeterminate}
+				bind:this={labeledInputEl}
 				type="checkbox"
 				bind:checked
 				id={ctx?.id}
@@ -58,7 +60,7 @@
 {:else}
 	<span class="wrapper">
 		<input
-			{@attach applyIndeterminate}
+			bind:this={bareInputEl}
 			type="checkbox"
 			bind:checked
 			id={ctx?.id}

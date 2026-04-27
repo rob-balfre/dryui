@@ -12,6 +12,7 @@ import {
 	DISPATCH_AGENTS,
 	TERMINAL_APPS,
 	type DispatchAgent,
+	type DefaultDispatchAgent,
 	type TerminalApp
 } from './dispatch.js';
 import { EventBus } from './events.js';
@@ -31,8 +32,12 @@ function toNumber(value: string | undefined, fallback: number): number {
 	return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
 }
 
-function parseDispatchAgent(raw: string | undefined, fallback: DispatchAgent): DispatchAgent {
+function parseDispatchAgent(
+	raw: string | undefined,
+	fallback: DefaultDispatchAgent
+): DefaultDispatchAgent {
 	if (!raw) return fallback;
+	if (raw === 'off') return 'off';
 	return DISPATCH_AGENTS.includes(raw as DispatchAgent) ? (raw as DispatchAgent) : fallback;
 }
 
@@ -101,7 +106,7 @@ function main(): void {
 	const dispatchEnabled = !process.argv.includes('--no-dispatch');
 	const defaultAgent = parseDispatchAgent(
 		readFlag('--default-agent') ?? process.env['DRYUI_DISPATCH_AGENT'],
-		'codex'
+		'off'
 	);
 	const terminalApp = parseTerminalApp(
 		readFlag('--terminal-app') ?? process.env['DRYUI_DISPATCH_TERMINAL_APP'],

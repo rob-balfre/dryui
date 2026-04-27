@@ -30,17 +30,18 @@
 			.join(' ')
 	);
 
-	function applyGridTemplate(node: HTMLElement) {
-		$effect(() => {
-			if (orientation === 'vertical') {
-				node.style.removeProperty('--_splitter-columns');
-				node.style.setProperty('--_splitter-rows', trackTemplate);
-			} else {
-				node.style.removeProperty('--_splitter-rows');
-				node.style.setProperty('--_splitter-columns', trackTemplate);
-			}
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		if (orientation === 'vertical') {
+			el.style.removeProperty('--_splitter-columns');
+			el.style.setProperty('--_splitter-rows', trackTemplate);
+		} else {
+			el.style.removeProperty('--_splitter-rows');
+			el.style.setProperty('--_splitter-columns', trackTemplate);
+		}
+	});
 
 	function startResize(index: number, event: PointerEvent) {
 		resizingIndex = index;
@@ -98,7 +99,7 @@
 </script>
 
 <div
-	{@attach applyGridTemplate}
+	bind:this={el}
 	data-part="root"
 	data-orientation={orientation}
 	class={className}

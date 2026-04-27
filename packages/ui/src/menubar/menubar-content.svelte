@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
 	import { getMenubarCtx, getMenubarMenuCtx } from './context.svelte.js';
@@ -23,21 +22,11 @@
 	const ctx = getMenubarCtx();
 	const menuCtx = getMenubarMenuCtx();
 
-	let el = $state<HTMLDivElement | null>(null);
+	let el = $state<HTMLDivElement>();
 	const triggerEl = $derived(
 		ctx.rootElement?.querySelector<HTMLElement>(`[data-menubar-trigger="${menuCtx.menuId}"]`) ??
 			null
 	);
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
 
 	const popover = createAnchoredPopover({
 		triggerEl: () => triggerEl,
@@ -92,8 +81,8 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach fromAction(popover.applyPosition, () => style)}
+	bind:this={el}
+	use:popover.applyPosition={style}
 	popover="auto"
 	role="menu"
 	tabindex="-1"

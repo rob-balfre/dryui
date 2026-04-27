@@ -2514,7 +2514,7 @@
 		position: absolute;
 		z-index: 10001;
 		display: grid;
-		grid-template-columns: 1fr auto;
+		grid-template-columns: minmax(180px, 1fr) auto;
 		column-gap: 2px;
 		border: 2px solid white;
 		border-radius: 6px;

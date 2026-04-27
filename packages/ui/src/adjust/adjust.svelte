@@ -45,16 +45,17 @@
 		return parts.length ? parts.join(' ') : undefined;
 	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--_filter', filterString ?? 'none');
-			node.style.setProperty('--_blend', blendMode ?? 'normal');
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.cssText = style || '';
+		el.style.setProperty('--_filter', filterString ?? 'none');
+		el.style.setProperty('--_blend', blendMode ?? 'normal');
+	});
 </script>
 
-<div {@attach applyStyles} data-adjust class={className} {...rest}>
+<div bind:this={el} data-adjust class={className} {...rest}>
 	{@render children()}
 </div>
 

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createPositionedPopover } from '@dryui/primitives';
 	import { getMegaMenuCtx, getMegaMenuItemCtx } from './context.svelte.js';
@@ -23,7 +22,7 @@
 	const ctx = getMegaMenuCtx();
 	const itemCtx = getMegaMenuItemCtx();
 
-	let panelEl = $state<HTMLDivElement | null>(null);
+	let panelEl = $state<HTMLDivElement>();
 	let layout = $state<'columns' | 'stacked'>('columns');
 	const STACK_THRESHOLD = 32 * 16;
 
@@ -38,7 +37,7 @@
 		offset: () => 4
 	});
 
-	function watchLayout(node: HTMLDivElement) {
+	$effect(() => {
 		const update = () => {
 			const next = window.innerWidth < STACK_THRESHOLD ? 'stacked' : 'columns';
 			if (next !== layout) layout = next;
@@ -46,7 +45,17 @@
 		update();
 		window.addEventListener('resize', update);
 		return () => window.removeEventListener('resize', update);
-	}
+	});
+
+	$effect(() => {
+		const node = panelEl;
+		if (!node) return;
+		if (itemCtx.open && !node.matches(':popover-open')) {
+			popover.showPopover(node);
+		} else if (!itemCtx.open && node.matches(':popover-open')) {
+			popover.hidePopover(node);
+		}
+	});
 
 	function handlePointerEnter() {
 		ctx.openItem(itemCtx.itemId, itemCtx.triggerId);
@@ -55,34 +64,12 @@
 	function handlePointerLeave() {
 		ctx.closeItem();
 	}
-
-	function attachPanel(node: HTMLDivElement) {
-		panelEl = node;
-
-		return () => {
-			if (panelEl === node) {
-				panelEl = null;
-			}
-		};
-	}
-
-	function syncPopover(isOpen: boolean) {
-		return (node: HTMLDivElement) => {
-			if (isOpen && !node.matches(':popover-open')) {
-				popover.showPopover(node);
-			} else if (!isOpen && node.matches(':popover-open')) {
-				popover.hidePopover(node);
-			}
-		};
-	}
 </script>
 
 {#if itemCtx.open}
 	<div
-		{@attach attachPanel}
-		{@attach syncPopover(itemCtx.open)}
-		{@attach fromAction(popover.applyPosition, () => style)}
-		{@attach watchLayout}
+		bind:this={panelEl}
+		use:popover.applyPosition={style}
 		id={itemCtx.panelId}
 		role="group"
 		popover="manual"

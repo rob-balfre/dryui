@@ -24,28 +24,19 @@
 		...rest
 	}: Props = $props();
 
-	let element = $state<HTMLDivElement | null>(null);
+	let element = $state<HTMLDivElement>();
+	let durationEl = $state<HTMLDivElement>();
 	let revealed = $state(false);
 	let prefersReducedMotion = $state(false);
 
-	function captureElement(node: HTMLDivElement) {
-		element = node;
-		return {
-			destroy() {
-				if (element === node) element = null;
-			}
-		};
-	}
-
-	function applyDuration(node: HTMLDivElement) {
-		$effect(() => {
-			if (typeof duration === 'number') {
-				node.style.setProperty('--dry-mask-reveal-duration', `${Math.max(0, duration)}ms`);
-			} else {
-				node.style.removeProperty('--dry-mask-reveal-duration');
-			}
-		});
-	}
+	$effect(() => {
+		if (!durationEl) return;
+		if (typeof duration === 'number') {
+			durationEl.style.setProperty('--dry-mask-reveal-duration', `${Math.max(0, duration)}ms`);
+		} else {
+			durationEl.style.removeProperty('--dry-mask-reveal-duration');
+		}
+	});
 
 	onMount(() => {
 		const stopMotionObserver = observeReducedMotionPreference((matches) => {
@@ -93,9 +84,9 @@
 	});
 </script>
 
-<div {@attach captureElement} class={className} data-mask-reveal-root {...rest}>
+<div bind:this={element} class={className} data-mask-reveal-root {...rest}>
 	<div
-		{@attach applyDuration}
+		bind:this={durationEl}
 		data-mask-reveal
 		data-shape={shape}
 		data-direction={direction}

@@ -13,16 +13,6 @@
 	let menuIds: string[] = [];
 	let rootEl = $state<HTMLDivElement>();
 
-	function setRootElement(element: HTMLDivElement) {
-		rootEl = element;
-
-		return () => {
-			if (rootEl === element) {
-				rootEl = undefined;
-			}
-		};
-	}
-
 	setMenubarCtx({
 		get activeMenu() {
 			return activeMenu;
@@ -69,7 +59,7 @@
 	});
 </script>
 
-<div role="menubar" data-menubar-root class={className} {@attach setRootElement} {...rest}>
+<div bind:this={rootEl} role="menubar" data-menubar-root class={className} {...rest}>
 	{@render children()}
 </div>
 

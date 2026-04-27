@@ -11,23 +11,19 @@
 
 	const ctx = getFormControlCtx();
 
-	function registerError() {
+	let el = $state<HTMLParagraphElement>();
+
+	$effect(() => {
+		if (!el) return;
 		ctx?.registerError(true);
 		return () => {
 			ctx?.registerError(false);
 		};
-	}
+	});
 </script>
 
 {#if ctx?.hasError}
-	<p
-		{@attach registerError}
-		id={ctx.errorId}
-		role="alert"
-		data-field-error
-		class={className}
-		{...rest}
-	>
+	<p bind:this={el} id={ctx.errorId} role="alert" data-field-error class={className} {...rest}>
 		{@render children()}
 	</p>
 {/if}

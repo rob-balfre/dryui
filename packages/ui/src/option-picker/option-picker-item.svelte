@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { Attachment } from 'svelte/attachments';
 	import type { HTMLButtonAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
 	import { getOptionPickerCtx } from './context.svelte.js';
@@ -66,7 +65,12 @@
 		}
 	}
 
-	const singleLabelLayout: Attachment<HTMLSpanElement> = (node) => {
+	let contentEl = $state<HTMLSpanElement>();
+
+	$effect(() => {
+		if (!contentEl) return;
+		const node = contentEl;
+
 		const updateLayout = () => {
 			const directChildren = Array.from(node.children);
 			hasSingleLabelChild =
@@ -80,7 +84,7 @@
 		observer.observe(node, { childList: true });
 
 		return () => observer.disconnect();
-	};
+	});
 </script>
 
 <span
@@ -110,7 +114,7 @@
 		}}
 		onkeydown={handleKeydown}
 	>
-		<span class="content" class:single-label={hasSingleLabelChild} {@attach singleLabelLayout}>
+		<span bind:this={contentEl} class="content" class:single-label={hasSingleLabelChild}>
 			{@render children()}
 		</span>
 	</Button>

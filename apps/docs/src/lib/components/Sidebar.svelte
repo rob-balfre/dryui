@@ -34,29 +34,27 @@
 		);
 	}
 
-	function keepActiveItemVisible(path: string) {
-		return (node: HTMLDivElement) => {
-			if (!path) return;
+	let scrollRootEl = $state<HTMLDivElement>();
 
-			const frame = requestAnimationFrame(() => {
-				const active = node.querySelector('[data-active]');
-				if (active instanceof HTMLElement) {
-					active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-				}
-			});
-
-			return () => {
-				cancelAnimationFrame(frame);
-			};
+	$effect(() => {
+		if (!scrollRootEl || !currentPath) return;
+		const node = scrollRootEl;
+		const frame = requestAnimationFrame(() => {
+			const active = node.querySelector('[data-active]');
+			if (active instanceof HTMLElement) {
+				active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
+			}
+		});
+		return () => {
+			cancelAnimationFrame(frame);
 		};
-	}
+	});
 
 	const staticLinks: { label: string; href: string; icon: typeof House }[] = [
 		{ label: 'Home', href: withBase('/'), icon: House },
 		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
 		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
 		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
-		{ label: 'Migration Guide', href: withBase('/migration-guide'), icon: GitCompareArrows },
 		{ label: 'How We Work', href: withBase('/how-we-work'), icon: Workflow }
 	];
 </script>
@@ -69,7 +67,7 @@
 		--dry-sidebar-width="100%"
 	>
 		<Sidebar.Content --dry-sidebar-content-scrollbar-gutter="stable">
-			<div class="scroll-root" {@attach keepActiveItemVisible(currentPath)}>
+			<div bind:this={scrollRootEl} class="scroll-root">
 				<Sidebar.Group>
 					{#each staticLinks as link (link.href)}
 						<Sidebar.Item

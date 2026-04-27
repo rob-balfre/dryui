@@ -14,18 +14,19 @@
 		return `${digits * 0.6}em`;
 	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			if (minWidth) {
-				node.style.setProperty('min-width', minWidth);
-			} else {
-				node.style.removeProperty('min-width');
-			}
-		});
-	}
+	let el = $state<HTMLSpanElement>();
+
+	$effect(() => {
+		if (!el) return;
+		if (minWidth) {
+			el.style.setProperty('min-width', minWidth);
+		} else {
+			el.style.removeProperty('min-width');
+		}
+	});
 </script>
 
-<span class="dry-numeric dry-tabular-nums" data-align={align} {@attach applyStyles}>
+<span bind:this={el} class="dry-numeric dry-tabular-nums" data-align={align}>
 	{value}
 </span>
 

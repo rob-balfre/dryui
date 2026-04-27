@@ -1,5 +1,3 @@
-import type { HTMLAttributes } from 'svelte/elements';
-import { fromAction } from 'svelte/attachments';
 import { createAnchoredPopover, type Placement } from '@dryui/primitives';
 
 interface AnchoredOverlayContentContext {
@@ -10,39 +8,35 @@ interface AnchoredOverlayContentContext {
 
 interface AnchoredOverlayContentOptions {
 	ctx: AnchoredOverlayContentContext;
+	contentEl: () => HTMLElement | null;
 	placement: () => Placement;
 	offset: () => number;
-	style: () => HTMLAttributes<HTMLDivElement>['style'];
-	onContentChange?: (contentEl: HTMLDivElement | null) => void;
+	onContentChange?: (contentEl: HTMLElement | null) => void;
 }
 
+/**
+ * Wires an overlay content element to its trigger via createAnchoredPopover.
+ * Consumers own the content element (`bind:this={contentEl}`) and pass a
+ * getter; this helper returns the `applyPosition` action which is used as
+ * `use:overlay.applyPosition={style}` on the same element.
+ */
 export function createAnchoredOverlayContent(options: AnchoredOverlayContentOptions) {
-	let contentEl = $state<HTMLDivElement>();
-
 	const popover = createAnchoredPopover({
 		triggerEl: () => options.ctx.triggerEl,
-		contentEl: () => contentEl ?? null,
+		contentEl: options.contentEl,
 		open: () => options.ctx.open,
 		placement: options.placement,
 		offset: options.offset
 	});
-	const position = fromAction(popover.applyPosition, options.style);
 
-	function bindContent(node: HTMLDivElement) {
-		contentEl = node;
-		options.onContentChange?.(node);
-
-		return () => {
-			if (contentEl === node) {
-				contentEl = undefined;
-			}
-			options.onContentChange?.(null);
-		};
+	if (options.onContentChange) {
+		$effect(() => {
+			options.onContentChange?.(options.contentEl());
+		});
 	}
 
 	return {
-		bindContent,
-		contentEl: () => contentEl ?? null,
-		position
+		applyPosition: popover.applyPosition,
+		contentEl: options.contentEl
 	};
 }

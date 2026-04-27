@@ -26,7 +26,7 @@
 	}: Props = $props();
 
 	const filterId = `dry-displacement-${Math.random().toString(36).slice(2, 8)}`;
-	let element = $state<HTMLElement | null>(null);
+	let element = $state<HTMLDivElement>();
 	let seed = $state(1);
 	let prefersReducedMotion = $state(false);
 	let documentVisible = $state(true);
@@ -42,15 +42,6 @@
 	const shouldAnimate = $derived(
 		animated && !prefersReducedMotion && documentVisible && inViewport
 	);
-
-	function captureElement(node: HTMLElement) {
-		element = node;
-		return {
-			destroy() {
-				if (element === node) element = null;
-			}
-		};
-	}
 
 	onMount(() => {
 		const stopMotion = observeReducedMotionPreference((matches) => {
@@ -100,13 +91,12 @@
 
 	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),
 	// so no CSS default is possible — the ID isn't known until mount. The SVG <filter> element
-	// is in the same template, so the @attach sets it immediately on first paint.
-	function applyFilterStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('filter', `url(#${filterId})`);
-		});
-	}
+	// is in the same template, so the $effect sets it immediately on first paint.
+	$effect(() => {
+		if (!element) return;
+		element.style.cssText = style || '';
+		element.style.setProperty('filter', `url(#${filterId})`);
+	});
 </script>
 
 <svg data-displacement-svg width="0" height="0" aria-hidden="true">
@@ -125,8 +115,7 @@
 </svg>
 
 <div
-	{@attach captureElement}
-	{@attach applyFilterStyles}
+	bind:this={element}
 	data-displacement
 	class={className}
 	data-turbulence={turbulence}

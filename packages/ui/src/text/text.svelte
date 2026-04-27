@@ -57,7 +57,7 @@
 	span,
 	div {
 		margin: 0;
-		color: var(--dry-typography-text-color, var(--dry-color-text-strong));
+		color: var(--dry-typography-text-color, inherit);
 		font-family: var(--dry-font-sans);
 		line-height: 1.7;
 		text-wrap: pretty;

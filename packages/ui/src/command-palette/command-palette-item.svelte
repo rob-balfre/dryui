@@ -22,15 +22,18 @@
 		return value.toLowerCase().includes(q);
 	});
 
-	function attachItem(node: HTMLDivElement) {
-		ctx.registerItem(id, node);
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		ctx.registerItem(id, el);
 		return () => ctx.unregisterItem(id);
-	}
+	});
 </script>
 
 {#if visible}
 	<div
-		{@attach attachItem}
+		bind:this={el}
 		{id}
 		role="option"
 		data-command-palette-item

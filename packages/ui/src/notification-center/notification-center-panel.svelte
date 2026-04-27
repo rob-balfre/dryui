@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover } from '@dryui/primitives';
 	import { getNotificationCenterCtx } from './context.svelte.js';
@@ -34,18 +33,8 @@
 
 	const ctx = getNotificationCenterCtx();
 
-	let panelEl = $state<HTMLDivElement | null>(null);
+	let panelEl = $state<HTMLDivElement>();
 	const triggerEl = $derived(document.getElementById(ctx.triggerId) as HTMLElement | null);
-
-	function attachPanel(node: HTMLDivElement) {
-		panelEl = node;
-
-		return () => {
-			if (panelEl === node) {
-				panelEl = null;
-			}
-		};
-	}
 
 	function focusTrigger() {
 		if (triggerEl instanceof HTMLElement) {
@@ -94,8 +83,8 @@
 </script>
 
 <div
-	{@attach attachPanel}
-	{@attach fromAction(popover.applyPosition, () => style)}
+	bind:this={panelEl}
+	use:popover.applyPosition={style}
 	id={ctx.panelId}
 	popover="auto"
 	role="region"

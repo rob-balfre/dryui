@@ -12,15 +12,9 @@
 
 	const ctx = getColorPickerCtx();
 
-	let canvasEl = $state<HTMLCanvasElement | null>(null);
+	let canvasEl = $state<HTMLCanvasElement>();
+	let rootEl = $state<HTMLDivElement>();
 	let isDragging = $state(false);
-
-	function setCanvas(node: HTMLCanvasElement) {
-		canvasEl = node;
-		return () => {
-			if (canvasEl === node) canvasEl = null;
-		};
-	}
 
 	$effect(() => {
 		const node = canvasEl;
@@ -64,12 +58,15 @@
 		`Saturation ${Math.round(ctx.hsv.s)}%, Brightness ${Math.round(ctx.hsv.v)}%`
 	);
 
-	function pointerInteraction(node: HTMLElement) {
+	$effect(() => {
+		const node = rootEl;
+		if (!node) return;
+
 		function handlePointerDown(e: PointerEvent) {
 			if (ctx.disabled) return;
 			e.preventDefault();
 			isDragging = true;
-			node.setPointerCapture(e.pointerId);
+			node!.setPointerCapture(e.pointerId);
 			const { s, v } = getPositionFromEvent(e);
 			ctx.setSaturationValue(s, v);
 		}
@@ -82,7 +79,7 @@
 
 		function handlePointerUp(e: PointerEvent) {
 			isDragging = false;
-			node.releasePointerCapture(e.pointerId);
+			node!.releasePointerCapture(e.pointerId);
 		}
 
 		function handleKeydown(e: KeyboardEvent) {
@@ -104,22 +101,21 @@
 			node.removeEventListener('pointerup', handlePointerUp);
 			node.removeEventListener('keydown', handleKeydown);
 		};
-	}
+	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--_area-w', `${width}px`);
-			node.style.setProperty('--_area-h', `${height}px`);
-			node.style.setProperty('--_ind-left', `${indicatorX}px`);
-			node.style.setProperty('--_ind-top', `${indicatorY}px`);
-			node.style.setProperty('--_ind-color', ctx.hex);
-		});
-	}
+	$effect(() => {
+		if (!rootEl) return;
+		rootEl.style.cssText = style || '';
+		rootEl.style.setProperty('--_area-w', `${width}px`);
+		rootEl.style.setProperty('--_area-h', `${height}px`);
+		rootEl.style.setProperty('--_ind-left', `${indicatorX}px`);
+		rootEl.style.setProperty('--_ind-top', `${indicatorY}px`);
+		rootEl.style.setProperty('--_ind-color', ctx.hex);
+	});
 </script>
 
 <div
-	{@attach pointerInteraction}
+	bind:this={rootEl}
 	role="slider"
 	aria-label="Color saturation and brightness"
 	aria-valuetext={valueText}
@@ -129,9 +125,8 @@
 	data-disabled={ctx.disabled || undefined}
 	class={className}
 	{...rest}
-	use:applyStyles
 >
-	<canvas {@attach setCanvas} {width} {height} data-cp-area-canvas aria-hidden="true"></canvas>
+	<canvas bind:this={canvasEl} {width} {height} data-cp-area-canvas aria-hidden="true"></canvas>
 	<div aria-hidden="true" data-cp-area-indicator></div>
 </div>
 

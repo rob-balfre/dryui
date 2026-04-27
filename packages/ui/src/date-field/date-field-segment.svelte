@@ -26,7 +26,7 @@
 	);
 
 	let inputBuffer = '';
-	let segmentEl: HTMLSpanElement | undefined;
+	let segmentEl = $state<HTMLSpanElement>();
 	let bufferTimeout: ReturnType<typeof setTimeout> | undefined;
 
 	function clearBufferTimeout() {
@@ -42,19 +42,17 @@
 
 	onDestroy(resetInputBuffer);
 
-	function registerSegment(node: HTMLSpanElement) {
-		segmentEl = node;
+	$effect(() => {
+		const node = segmentEl;
+		if (!node) return;
 		ctx.registerSegment(type, node);
 		node.addEventListener('blur', resetInputBuffer);
-		return {
-			destroy() {
-				node.removeEventListener('blur', resetInputBuffer);
-				resetInputBuffer();
-				if (segmentEl === node) segmentEl = undefined;
-				ctx.unregisterSegment(type);
-			}
+		return () => {
+			node.removeEventListener('blur', resetInputBuffer);
+			resetInputBuffer();
+			ctx.unregisterSegment(type);
 		};
-	}
+	});
 
 	function increment() {
 		const current = segmentData?.value ?? minValue - 1;
@@ -134,7 +132,7 @@
 </script>
 
 <span
-	{@attach registerSegment}
+	bind:this={segmentEl}
 	role="spinbutton"
 	tabindex={ctx.disabled ? undefined : 0}
 	aria-label={type}

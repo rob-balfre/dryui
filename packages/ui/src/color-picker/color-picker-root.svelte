@@ -114,26 +114,27 @@
 		}
 	});
 
-	function setPickerDimensions(node: HTMLElement) {
-		$effect(() => {
-			if (width !== undefined) {
-				node.style.setProperty('--dry-color-picker-width', `${width}px`);
-				node.style.setProperty('--dry-color-picker-area-width', `${width}px`);
-			} else {
-				node.style.removeProperty('--dry-color-picker-width');
-				node.style.removeProperty('--dry-color-picker-area-width');
-			}
-			if (areaHeight !== undefined) {
-				node.style.setProperty('--dry-color-picker-area-height', `${areaHeight}px`);
-			} else {
-				node.style.removeProperty('--dry-color-picker-area-height');
-			}
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		if (width !== undefined) {
+			el.style.setProperty('--dry-color-picker-width', `${width}px`);
+			el.style.setProperty('--dry-color-picker-area-width', `${width}px`);
+		} else {
+			el.style.removeProperty('--dry-color-picker-width');
+			el.style.removeProperty('--dry-color-picker-area-width');
+		}
+		if (areaHeight !== undefined) {
+			el.style.setProperty('--dry-color-picker-area-height', `${areaHeight}px`);
+		} else {
+			el.style.removeProperty('--dry-color-picker-area-height');
+		}
+	});
 </script>
 
 <div
-	{@attach setPickerDimensions}
+	bind:this={el}
 	data-color-picker
 	data-disabled={disabled || undefined}
 	class={className}

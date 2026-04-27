@@ -46,15 +46,8 @@
 		...rest
 	}: Props = $props();
 
-	let containerEl = $state<HTMLDivElement | null>(null);
+	let containerEl = $state<HTMLDivElement>();
 	let themeUniforms = $state<Record<string, number[]>>({});
-
-	function captureContainer(node: HTMLDivElement) {
-		containerEl = node;
-		return () => {
-			if (containerEl === node) containerEl = null;
-		};
-	}
 
 	const resolvedShader = $derived.by((): string => {
 		if (fragmentShader) return fragmentShader;
@@ -68,15 +61,14 @@
 	const mergedUniforms = $derived({ ...themeUniforms, ...uniforms });
 	const effectiveFps = $derived(fps ?? 30);
 
-	function setAspectRatio(node: HTMLDivElement) {
-		$effect(() => {
-			if (aspectRatio) {
-				node.style.setProperty('--_ratio', aspectRatio);
-			} else {
-				node.style.removeProperty('--_ratio');
-			}
-		});
-	}
+	$effect(() => {
+		if (!containerEl) return;
+		if (aspectRatio) {
+			containerEl.style.setProperty('--_ratio', aspectRatio);
+		} else {
+			containerEl.style.removeProperty('--_ratio');
+		}
+	});
 
 	onMount(() => {
 		if (themeColors && containerEl) {
@@ -94,7 +86,7 @@
 	});
 </script>
 
-<div {@attach captureContainer} {@attach setAspectRatio} data-shader-canvas-root class={className}>
+<div bind:this={containerEl} data-shader-canvas-root class={className}>
 	<ShaderCanvasPrimitive
 		fragmentShader={resolvedShader}
 		{autoUniforms}

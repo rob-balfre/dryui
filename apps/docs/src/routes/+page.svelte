@@ -337,7 +337,11 @@
 		]
 	};
 
-	function clipEntryToCluster(node: HTMLElement) {
+	let workflowCanvasEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!workflowCanvasEl) return;
+		const node = workflowCanvasEl;
 		const apply = () => {
 			const svg = node.querySelector('svg');
 			if (!svg) return;
@@ -372,7 +376,7 @@
 			attributeFilter: ['d']
 		});
 		return () => observer.disconnect();
-	}
+	});
 </script>
 
 <svelte:head>
@@ -729,7 +733,7 @@
 			<Heading level={2}>How DryUI works</Heading>
 			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
 		</div>
-		<div class="workflow-canvas" {@attach clipEntryToCluster}>
+		<div bind:this={workflowCanvasEl} class="workflow-canvas">
 			<Diagram config={workflowDiagram} />
 		</div>
 		<Text size="xs" color="secondary">

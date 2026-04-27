@@ -87,14 +87,17 @@
 		}
 	});
 
-	function initializeTree(node: HTMLElement) {
+	let rootEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!rootEl) return;
 		if (focusedItem !== null) return;
-		const itemId = node.querySelector<HTMLElement>('[role="treeitem"]')?.dataset.itemId;
+		const itemId = rootEl.querySelector<HTMLElement>('[role="treeitem"]')?.dataset.itemId;
 
 		if (itemId) {
 			focusedItem = itemId;
 		}
-	}
+	});
 
 	function getVisibleItems(tree: HTMLElement) {
 		const items = Array.from(tree.querySelectorAll('[role="treeitem"]')) as HTMLElement[];
@@ -216,12 +219,12 @@
 </script>
 
 <div
+	bind:this={rootEl}
 	role="tree"
 	data-part="root"
 	class={className}
 	onfocusin={handleFocusIn}
 	onkeydown={handleKeydown}
-	{@attach initializeTree}
 	{...rest}
 >
 	{@render children()}

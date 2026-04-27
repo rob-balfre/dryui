@@ -1,0 +1,16 @@
+{
+  "eval_id": 1,
+  "eval_name": "settings-form",
+  "prompt": "Build me a settings page at src/routes/settings/+page.svelte. Three fields stacked vertically: display name (text), email (text), notifications enabled (toggle). A primary submit button at the bottom. The form should look polished and theme through (light + dark). Just give me the +page.svelte file.",
+  "assertions": [
+    "uses Field.Root + Label for each input (rule 8)",
+    "uses DryUI Button (not raw <button>) (rule 5)",
+    "uses bind:checked on the toggle, not bind:value (rule 1)",
+    "no inline style= attribute (rule 3)",
+    "no display: flex (rule 2)",
+    "no width / max-width on layout (rule 2)",
+    "no class= passed to DryUI components (rule 4)",
+    "no hardcoded colors / hex values (rule 6)",
+    "dryui check passes with zero errors"
+  ]
+}

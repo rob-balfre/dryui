@@ -22,17 +22,19 @@
 
 	const ctx = getTooltipCtx();
 
+	let contentEl = $state<HTMLDivElement>();
+
 	const overlay = createAnchoredOverlayContent({
 		ctx,
+		contentEl: () => contentEl ?? null,
 		placement: () => placement,
-		offset: () => offset,
-		style: () => style
+		offset: () => offset
 	});
 </script>
 
 <div
-	{@attach overlay.bindContent}
-	{@attach overlay.position}
+	bind:this={contentEl}
+	use:overlay.applyPosition={style}
 	id={ctx.contentId}
 	role="tooltip"
 	popover="manual"

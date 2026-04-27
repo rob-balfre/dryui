@@ -35,7 +35,10 @@
 	const width = $derived(widthProp ?? observedWidth);
 	const height = $derived(heightProp ?? observedHeight);
 
-	function observeSize(node: HTMLDivElement) {
+	let containerEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!containerEl) return;
 		const ro = new ResizeObserver((entries) => {
 			for (const entry of entries) {
 				const cr = entry.contentRect;
@@ -44,9 +47,9 @@
 			}
 		});
 
-		ro.observe(node);
+		ro.observe(containerEl);
 		return () => ro.disconnect();
-	}
+	});
 
 	const padding = $derived({
 		top: paddingProp?.top ?? 20,
@@ -145,7 +148,7 @@
 	</div>
 
 	{#if widthProp === undefined || heightProp === undefined}
-		<div data-chart-container {@attach observeSize}>
+		<div bind:this={containerEl} data-chart-container>
 			<svg
 				viewBox="0 0 {width} {height}"
 				{width}

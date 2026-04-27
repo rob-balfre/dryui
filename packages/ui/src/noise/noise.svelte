@@ -48,26 +48,29 @@
 	const shouldAnimate = $derived(animated && !prefersReducedMotion);
 	const paused = $derived(!onScreen || !tabVisible);
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-noise-opacity', normalizedOpacity);
-			node.style.setProperty('--dry-noise-blend', blend);
-		});
+	let el = $state<HTMLDivElement>();
 
-		$effect(() =>
-			observeInViewport(
-				node,
-				(inView) => {
-					onScreen = inView;
-				},
-				{ rootMargin: '200px' }
-			)
+	$effect(() => {
+		if (!el) return;
+		el.style.cssText = style || '';
+		el.style.setProperty('--dry-noise-opacity', normalizedOpacity);
+		el.style.setProperty('--dry-noise-blend', blend);
+	});
+
+	$effect(() => {
+		if (!el) return;
+		return observeInViewport(
+			el,
+			(inView) => {
+				onScreen = inView;
+			},
+			{ rootMargin: '200px' }
 		);
-	}
+	});
 </script>
 
 <div
+	bind:this={el}
 	class={className}
 	data-noise
 	data-animated={shouldAnimate || undefined}
@@ -75,7 +78,6 @@
 	data-paused={paused || undefined}
 	data-grain={grain}
 	{...rest}
-	{@attach applyStyles}
 >
 	<span data-noise-texture aria-hidden="true"></span>
 

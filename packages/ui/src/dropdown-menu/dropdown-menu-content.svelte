@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { fromAction } from 'svelte/attachments';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, createMenuNavigation } from '@dryui/primitives';
 	import type { Placement } from '@dryui/primitives';
@@ -23,17 +22,7 @@
 
 	const ctx = getDropdownMenuCtx();
 
-	let el = $state<HTMLDivElement | null>(null);
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
+	let el = $state<HTMLDivElement>();
 
 	const popover = createAnchoredPopover({
 		triggerEl: () => ctx.triggerEl,
@@ -50,8 +39,8 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach fromAction(popover.applyPosition, () => style)}
+	bind:this={el}
+	use:popover.applyPosition={style}
 	popover="auto"
 	role="menu"
 	tabindex="-1"
