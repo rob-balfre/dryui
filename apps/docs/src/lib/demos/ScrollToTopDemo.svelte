@@ -1,15 +1,21 @@
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
 	import { ScrollToTop } from '@dryui/ui';
 
 	let target = $state<HTMLDivElement | undefined>();
 
-	$effect(() => {
-		if (target) target.scrollTop = 160;
-	});
+	const captureTarget: Attachment<HTMLDivElement> = (node) => {
+		target = node;
+		node.scrollTop = 160;
+
+		return () => {
+			if (target === node) target = undefined;
+		};
+	};
 </script>
 
 <div class="frame">
-	<div class="scroll" bind:this={target}>
+	<div class="scroll" {@attach captureTarget}>
 		<div class="inner">
 			<p class="eyebrow">Changelog / 1.4.0</p>
 			<p>
@@ -24,7 +30,7 @@
 			<p>
 				Breaking: <code>Card.Root</code>'s <code>raised</code> prop removed. Use
 				<code>variant="elevated"</code>. <code>--dry-color-accent</code> removed. Map to
-				<code>--dry-color-primary</code>. <code>Tree.Root</code>'s <code>expanded</code> is now
+				<code>--dry-color-fill-brand</code>. <code>Tree.Root</code>'s <code>expanded</code> is now
 				<code>defaultExpanded</code>.
 			</p>
 			<p>

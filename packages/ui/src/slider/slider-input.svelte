@@ -36,13 +36,11 @@
 	let isPill = $derived(variant === 'pill');
 
 	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('--dry-slider-progress', `${progress}%`);
-		});
+		node.style.setProperty('--dry-slider-progress', `${progress}%`);
 	}
 </script>
 
-<span class="wrapper" {...variantAttrs({ variant, size })} use:applyStyles>
+<span class="wrapper" {...variantAttrs({ variant, size })} {@attach applyStyles}>
 	<input
 		type="range"
 		bind:value
@@ -250,7 +248,7 @@
 		font-size: var(--dry-text-sm-size, 0.875rem);
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
-		color: var(--dry-color-text);
+		color: var(--dry-color-text-strong);
 		clip-path: inset(
 			0 calc(100% - var(--dry-slider-progress, 50%)) 0 0 round var(--dry-radius-full)
 		);

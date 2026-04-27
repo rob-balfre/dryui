@@ -87,7 +87,7 @@
 		border-radius: var(--dry-radius-lg);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
 		background: color-mix(in srgb, var(--dry-color-bg-overlay) 72%, transparent);
-		box-shadow: 0 22px 44px color-mix(in srgb, var(--dry-color-shadow) 38%, transparent);
+		box-shadow: 0 22px 44px color-mix(in srgb, var(--dry-color-text-strong) 38%, transparent);
 	}
 
 	.input {

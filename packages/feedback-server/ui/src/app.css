@@ -6,8 +6,8 @@ html,
 body {
 	margin: 0;
 	padding: 0;
-	background: var(--dry-color-bg);
-	color: var(--dry-color-text);
+	background: var(--dry-color-bg-base);
+	color: var(--dry-color-text-strong);
 }
 
 body {

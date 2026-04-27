@@ -51,7 +51,7 @@
 			<Timeline.Title>1.3.5</Timeline.Title>
 			<Timeline.Description>
 				Token surface consolidation. Deprecate `--dry-color-accent` in favor of
-				`--dry-color-primary`.
+				`--dry-color-fill-brand`.
 			</Timeline.Description>
 			<Timeline.Time datetime="2026-04-09">Apr 9</Timeline.Time>
 		</Timeline.Content>

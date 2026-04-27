@@ -278,8 +278,8 @@
 
 			/* ─── Semantic parity extensions ──────────────────────────────── */
 			--dry-color-text-disabled: var(--dry-color-stroke-weak);
-			--dry-color-text-inverse: hsla(230, 100%, 7%, 0.9);
-			--dry-color-text-inverse-weak: hsla(230, 100%, 10%, 0.65);
+			--dry-color-text-inverse: hsla(230, 100%, 15%, 0.9);
+			--dry-color-text-inverse-weak: hsla(230, 100%, 20%, 0.65);
 			--dry-color-text-inverse-disabled: hsla(230, 100%, 20%, 0.1);
 
 			--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
@@ -292,7 +292,7 @@
 			--dry-color-stroke-focus: var(--dry-color-brand);
 			--dry-color-stroke-selected: var(--dry-color-brand);
 			--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
-			--dry-color-stroke-inverse: hsla(230, 100%, 15%, 0.45);
+			--dry-color-stroke-inverse: hsla(230, 100%, 20%, 0.45);
 			--dry-color-stroke-inverse-weak: hsla(230, 100%, 20%, 0.1);
 
 			--dry-color-fill-strong: var(--dry-color-text-strong);

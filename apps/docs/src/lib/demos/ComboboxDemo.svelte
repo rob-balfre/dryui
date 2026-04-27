@@ -65,7 +65,7 @@
 		border-radius: var(--dry-radius-md);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
 		background: color-mix(in srgb, var(--dry-color-bg-overlay) 70%, transparent);
-		box-shadow: 0 18px 40px color-mix(in srgb, var(--dry-color-shadow) 35%, transparent);
+		box-shadow: 0 18px 40px color-mix(in srgb, var(--dry-color-text-strong) 35%, transparent);
 	}
 
 	.eyebrow {

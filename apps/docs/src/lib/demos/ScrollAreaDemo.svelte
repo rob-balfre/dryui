@@ -24,7 +24,7 @@
 			version: '1.3.5',
 			date: 'Apr 9',
 			tag: 'patch',
-			notes: 'Deprecate --dry-color-accent in favor of --dry-color-primary.'
+			notes: 'Deprecate --dry-color-accent in favor of --dry-color-fill-brand.'
 		},
 		{
 			version: '1.3.4',

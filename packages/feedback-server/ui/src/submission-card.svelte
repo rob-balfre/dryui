@@ -470,7 +470,7 @@
 		grid-template-rows: minmax(0, min(64dvh, 44rem));
 		place-items: center;
 		padding: var(--dry-space-2);
-		background: var(--dry-color-surface);
+		background: var(--dry-color-bg-overlay);
 		overflow: hidden;
 	}
 
@@ -532,7 +532,7 @@
 		padding: var(--dry-space-2) var(--dry-space-2_5);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
-		background: var(--dry-color-surface);
+		background: var(--dry-color-bg-raised);
 	}
 
 	.note-card-head {

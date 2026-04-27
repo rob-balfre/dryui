@@ -14,7 +14,8 @@ Raw design values. Not typically overridden.
 --dry-space-4          /* 1rem */
 --dry-radius-lg        /* 0.5rem */
 --dry-shadow-md
---dry-font-size-sm
+--dry-type-small-size
+--dry-text-sm-size
 ```
 
 ### Tier 2: Semantic tokens
@@ -22,19 +23,19 @@ Raw design values. Not typically overridden.
 Map intent to primitive values. Override these to customize the palette.
 
 ```css
---dry-color-primary        /* Main brand color */
---dry-color-primary-hover  /* Primary on hover */
---dry-color-danger          /* Destructive actions */
---dry-color-success         /* Success states */
---dry-color-warning         /* Warning states */
---dry-color-surface         /* Card/panel background */
---dry-color-surface-raised  /* Elevated surfaces */
---dry-color-bg              /* Page background */
---dry-color-text            /* Primary text */
---dry-color-text-secondary  /* Secondary text */
---dry-color-muted           /* Disabled/placeholder text */
---dry-color-border          /* Default border */
---dry-color-border-hover    /* Border on hover */
+--dry-color-fill-brand        /* Main brand fill */
+--dry-color-fill-brand-hover  /* Brand fill on hover */
+--dry-color-fill-error        /* Destructive actions */
+--dry-color-fill-success      /* Success states */
+--dry-color-fill-warning      /* Warning states */
+--dry-color-bg-base           /* Page background */
+--dry-color-bg-raised         /* Cards and panels */
+--dry-color-bg-overlay        /* Popovers, dialogs, menus */
+--dry-color-text-strong       /* Primary text */
+--dry-color-text-weak         /* Secondary/helper text */
+--dry-color-text-disabled     /* Disabled/placeholder text */
+--dry-color-stroke-weak       /* Default subtle border */
+--dry-color-stroke-strong     /* Strong or hover border */
 ```
 
 ### Tier 3: Component tokens
@@ -42,7 +43,7 @@ Map intent to primitive values. Override these to customize the palette.
 Per-component overrides. Reference semantic tokens by default.
 
 ```css
---dry-card-bg              /* defaults to var(--dry-color-surface) */
+--dry-card-bg              /* defaults to var(--dry-color-bg-raised) */
 --dry-card-radius
 --dry-btn-bg
 --dry-btn-radius
@@ -92,16 +93,18 @@ Override semantic tokens in your global CSS to match your brand:
 
 ```css
 :root {
-	--dry-color-primary: #2563eb;
-	--dry-color-primary-hover: #1d4ed8;
-	--dry-color-danger: #dc2626;
-	--dry-color-success: #16a34a;
-	--dry-color-surface: #ffffff;
-	--dry-color-surface-raised: #f8fafc;
-	--dry-color-bg: #f1f5f9;
-	--dry-color-text: #0f172a;
-	--dry-color-text-secondary: #475569;
-	--dry-color-border: #e2e8f0;
+	--dry-color-fill-brand: #2563eb;
+	--dry-color-fill-brand-hover: #1d4ed8;
+	--dry-color-fill-brand-active: #1e40af;
+	--dry-color-fill-error: #dc2626;
+	--dry-color-fill-success: #16a34a;
+	--dry-color-bg-base: #f1f5f9;
+	--dry-color-bg-raised: #ffffff;
+	--dry-color-bg-overlay: #f8fafc;
+	--dry-color-text-strong: #0f172a;
+	--dry-color-text-weak: #475569;
+	--dry-color-stroke-weak: #e2e8f0;
+	--dry-color-stroke-strong: #cbd5e1;
 }
 ```
 
@@ -116,8 +119,8 @@ Override semantic tokens in your global CSS to match your brand:
 
 /* Correct: override tokens, let components inherit */
 :root {
-	--dry-color-surface: #1e293b;
-	--dry-color-border: #334155;
+	--dry-color-bg-raised: #1e293b;
+	--dry-color-stroke-weak: #334155;
 }
 ```
 
@@ -131,9 +134,9 @@ Override semantic tokens in your global CSS to match your brand:
 
 /* Correct: override semantic tokens; component tokens inherit */
 :root {
-	--dry-color-surface: #1e293b;
-	--dry-color-primary: #2563eb;
-	--dry-color-bg: #0f172a;
+	--dry-color-bg-raised: #1e293b;
+	--dry-color-fill-brand: #2563eb;
+	--dry-color-bg-base: #0f172a;
 }
 ```
 
@@ -202,12 +205,12 @@ Import default theme, then override tokens for dark mode:
 ```css
 @media (prefers-color-scheme: dark) {
 	:root {
-		--dry-color-bg: #0f172a;
-		--dry-color-surface: #1e293b;
-		--dry-color-surface-raised: #334155;
-		--dry-color-text: #f1f5f9;
-		--dry-color-text-secondary: #94a3b8;
-		--dry-color-border: #334155;
+		--dry-color-bg-base: #0f172a;
+		--dry-color-bg-raised: #1e293b;
+		--dry-color-bg-overlay: #334155;
+		--dry-color-text-strong: #f1f5f9;
+		--dry-color-text-weak: #94a3b8;
+		--dry-color-stroke-weak: #334155;
 	}
 }
 ```
@@ -216,9 +219,9 @@ Import default theme, then override tokens for dark mode:
 
 ```css
 .dark {
-	--dry-color-bg: #0f172a;
-	--dry-color-surface: #1e293b;
-	--dry-color-text: #f1f5f9;
+	--dry-color-bg-base: #0f172a;
+	--dry-color-bg-raised: #1e293b;
+	--dry-color-text-strong: #f1f5f9;
 	/* ... remaining tokens */
 }
 ```
@@ -242,29 +245,30 @@ Surfaces with low alpha values make cards and panels invisible or washed out.
 ```css
 /* Incorrect: transparent surface */
 :root {
-	--dry-color-surface-raised: rgba(217, 158, 100, 0.07);
+	--dry-color-bg-raised: rgba(217, 158, 100, 0.07);
 }
 
 /* Correct: solid surface color */
 :root {
-	--dry-color-surface-raised: #2d2520;
+	--dry-color-bg-raised: #2d2520;
 }
 ```
 
 ### Missing color pairings
 
-When defining a primary color, always define its hover state too.
+When defining a brand fill color, define its hover and active states too.
 
 ```css
-/* Incorrect: primary without hover */
+/* Incorrect: brand fill without interaction states */
 :root {
-	--dry-color-primary: #2563eb;
+	--dry-color-fill-brand: #2563eb;
 }
 
-/* Correct: primary with hover pair */
+/* Correct: brand fill with interaction states */
 :root {
-	--dry-color-primary: #2563eb;
-	--dry-color-primary-hover: #1d4ed8;
+	--dry-color-fill-brand: #2563eb;
+	--dry-color-fill-brand-hover: #1d4ed8;
+	--dry-color-fill-brand-active: #1e40af;
 }
 ```
 
@@ -275,14 +279,14 @@ Ensure sufficient contrast between text and background.
 ```css
 /* Incorrect: text too close to background */
 :root {
-	--dry-color-bg: #1a1a2e;
-	--dry-color-text: #2a2a3e; /* barely visible */
+	--dry-color-bg-base: #1a1a2e;
+	--dry-color-text-strong: #2a2a3e; /* barely visible */
 }
 
 /* Correct: high contrast */
 :root {
-	--dry-color-bg: #1a1a2e;
-	--dry-color-text: #e2e8f0;
+	--dry-color-bg-base: #1a1a2e;
+	--dry-color-text-strong: #e2e8f0;
 }
 ```
 
@@ -296,10 +300,10 @@ dryui check src/styles/global.css
 
 Common diagnostic codes:
 
-| Code                  | Meaning                                    | Fix                                        |
-| --------------------- | ------------------------------------------ | ------------------------------------------ |
-| `missing-token`       | Required semantic token not defined        | Add the token                              |
-| `transparent-surface` | Surface has low opacity                    | Use a solid color                          |
-| `low-contrast-text`   | Text too close to background               | Increase brightness difference             |
-| `no-elevation`        | surface and surface-raised are too similar | Make surface-raised lighter/darker         |
-| `missing-pairing`     | Color without contrast pair                | Add the missing pair (e.g., primary-hover) |
+| Code                  | Meaning                               | Fix                                           |
+| --------------------- | ------------------------------------- | --------------------------------------------- |
+| `missing-token`       | Required semantic token not defined   | Add the token                                 |
+| `transparent-surface` | Surface has low opacity               | Use a solid color                             |
+| `low-contrast-text`   | Text too close to background          | Increase brightness difference                |
+| `no-elevation`        | bg-base and bg-raised are too similar | Make bg-raised lighter/darker                 |
+| `missing-pairing`     | Color without contrast pair           | Add the missing pair (e.g., fill-brand-hover) |

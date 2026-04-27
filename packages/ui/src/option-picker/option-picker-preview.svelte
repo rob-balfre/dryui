@@ -74,18 +74,22 @@
 	}
 
 	[data-option-picker-preview][data-variant='preset'] {
+		--_preset-color-resolved: var(
+			--_preset-color,
+			var(--dry-option-picker-preview-bg, var(--dry-color-fill-selected))
+		);
 		--dry-option-picker-preview-color: white;
 		--dry-option-picker-preview-border: color-mix(
 			in srgb,
-			var(--_preset-color) 46%,
+			var(--_preset-color-resolved) 46%,
 			var(--dry-color-stroke-weak) 54%
 		);
 		--dry-option-picker-preview-size: var(--dry-option-picker-preview-preset-size, 2.75rem);
 		background: linear-gradient(
 			155deg,
-			color-mix(in srgb, white 18%, var(--_preset-color) 82%) 0%,
-			var(--_preset-color) 58%,
-			color-mix(in srgb, black 12%, var(--_preset-color) 88%) 100%
+			color-mix(in srgb, white 18%, var(--_preset-color-resolved) 82%) 0%,
+			var(--_preset-color-resolved) 58%,
+			color-mix(in srgb, black 12%, var(--_preset-color-resolved) 88%) 100%
 		);
 		/* dryui-allow inset-shadow: 1px top highlight + 1px bottom shadow give the preset color swatch a beveled material look. */
 		box-shadow:

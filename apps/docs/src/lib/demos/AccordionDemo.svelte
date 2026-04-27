@@ -20,8 +20,8 @@
 		<Accordion.Content>
 			<p>
 				Yes. Redeclare the tier-two semantic tokens in your own stylesheet (for example
-				<code>--dry-color-primary</code> or <code>--dry-color-bg-base</code>). Do not override tier
-				three component tokens unless you need per-component control.
+				<code>--dry-color-fill-brand</code> or <code>--dry-color-bg-base</code>). Do not override
+				tier three component tokens unless you need per-component control.
 			</p>
 		</Accordion.Content>
 	</Accordion.Item>
