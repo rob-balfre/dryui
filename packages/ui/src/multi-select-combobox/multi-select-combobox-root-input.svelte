@@ -34,7 +34,7 @@
 	const inputId = `multi-select-combobox-input-${uid}`;
 	const contentId = `multi-select-combobox-content-${uid}`;
 
-	let rootEl = $state<HTMLDivElement | null>(null);
+	let rootEl = $state<HTMLDivElement>();
 	let inputEl = $state<HTMLInputElement | null>(null);
 	let activeItemId = $state('');
 	let itemIds = $state<string[]>([]);
@@ -113,8 +113,9 @@
 		}
 	}
 
-	function attachRoot(node: HTMLDivElement) {
-		rootEl = node;
+	$effect(() => {
+		const node = rootEl;
+		if (!node) return;
 
 		function handlePointerDown(event: PointerEvent) {
 			if (event.button !== 0) {
@@ -138,11 +139,8 @@
 		node.addEventListener('pointerdown', handlePointerDown);
 		return () => {
 			node.removeEventListener('pointerdown', handlePointerDown);
-			if (rootEl === node) {
-				rootEl = null;
-			}
 		};
-	}
+	});
 
 	setMultiSelectComboboxCtx({
 		get open() {
@@ -220,7 +218,7 @@
 
 <div data-multi-select-wrapper>
 	<div
-		{@attach attachRoot}
+		bind:this={rootEl}
 		role="group"
 		data-multi-select-root
 		data-state={open ? 'open' : 'closed'}

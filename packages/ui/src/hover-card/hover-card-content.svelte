@@ -22,13 +22,15 @@
 
 	const ctx = getHoverCardCtx();
 
+	let contentEl = $state<HTMLDivElement>();
+
 	const overlay = createAnchoredOverlayContent({
 		ctx,
+		contentEl: () => contentEl ?? null,
 		placement: () => placement,
 		offset: () => offset,
-		style: () => style,
-		onContentChange: (contentEl) => {
-			ctx.contentEl = contentEl;
+		onContentChange: (next) => {
+			ctx.contentEl = next;
 		}
 	});
 
@@ -63,8 +65,8 @@
 </script>
 
 <div
-	{@attach overlay.bindContent}
-	{@attach overlay.position}
+	bind:this={contentEl}
+	use:overlay.applyPosition={style}
 	id={ctx.contentId}
 	popover="manual"
 	role="dialog"

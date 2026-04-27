@@ -146,6 +146,15 @@ function requestAccess(
 	}
 
 	if (!tokenAuthorized && request.headers.get('sec-fetch-site')?.toLowerCase() === 'cross-site') {
+		// Cross-site fetch/script requests stay blocked — that's the CSRF surface.
+		// User-initiated top-level document navigation (clicking a link from one
+		// local-dev origin to another) is safe: there's no ambient credentials and
+		// the destination just renders the dashboard. Allow it.
+		const mode = request.headers.get('sec-fetch-mode')?.toLowerCase();
+		const dest = request.headers.get('sec-fetch-dest')?.toLowerCase();
+		if (request.method === 'GET' && mode === 'navigate' && dest === 'document') {
+			return { allowed: true, headers: CORS_HEADERS };
+		}
 		return { allowed: false, headers: CORS_HEADERS };
 	}
 

@@ -33,11 +33,12 @@
 		}
 	});
 
-	function applyProgressStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('--progress-width', `${progress}%`);
-		});
-	}
+	let progressEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!progressEl) return;
+		progressEl.style.setProperty('--progress-width', `${progress}%`);
+	});
 </script>
 
 <div
@@ -52,7 +53,7 @@
 >
 	{@render children()}
 	{#if progress !== undefined}
-		<div data-part="progress" {@attach applyProgressStyles}></div>
+		<div bind:this={progressEl} data-part="progress"></div>
 	{/if}
 </div>
 

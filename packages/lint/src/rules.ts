@@ -93,7 +93,17 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
 		component: 'Button',
-		allowedDirs: new Set(['button', 'card', 'mega-menu', 'tree']),
+		allowedDirs: new Set([
+			'button',
+			'card',
+			'mega-menu',
+			'tree',
+			// Form-control triggers — render as raw <button> styled with the
+			// --dry-form-control-* token family so they stay visually consistent
+			// with <Input>/<Textarea> (and immune to ambient --dry-btn-* nesting).
+			'select',
+			'date-range-picker'
+		]),
 		re: /<button(\s|>|\/)/g
 	},
 	{

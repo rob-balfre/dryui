@@ -168,7 +168,6 @@
         "--dry-btn-border": "Border color",
         "--dry-btn-color": "Text color",
         "--dry-btn-font-size": "Font size",
-        "--dry-btn-ghost-underline": "Ghost Underline",
         "--dry-btn-on-accent": "On Accent",
         "--dry-btn-padding-x": "Horizontal padding",
         "--dry-btn-padding-y": "Vertical padding",
@@ -3381,11 +3380,18 @@
         "Provide surrounding field context and a name when the selected value needs to submit with a form."
       ],
       "cssVars": {
-        "--dry-btn-align": "Align",
-        "--dry-btn-justify": "Justify",
-        "--dry-select-item-radius": "Item Radius"
+        "--dry-select-item-radius": "Item Radius",
+        "--dry-select-trigger-bg": "Trigger Bg",
+        "--dry-select-trigger-border": "Trigger Border",
+        "--dry-select-trigger-color": "Trigger Color",
+        "--dry-select-trigger-font-size": "Trigger Font Size",
+        "--dry-select-trigger-padding-x": "Trigger Padding X",
+        "--dry-select-trigger-padding-y": "Trigger Padding Y"
       },
       "dataAttributes": [
+        {
+          "name": "data-content"
+        },
         {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
@@ -3413,6 +3419,9 @@
         },
         {
           "name": "data-select-wrapper"
+        },
+        {
+          "name": "data-size"
         },
         {
           "name": "data-state",
@@ -7868,6 +7877,9 @@
         },
         {
           "name": "data-chat-thread-viewport"
+        },
+        {
+          "name": "data-view-transition-name"
         }
       ],
       "example": "<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>"
@@ -10902,10 +10914,23 @@
         "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
         "Provide native name, autocomplete, and value wiring when the component participates in form submission."
       ],
-      "cssVars": {},
+      "cssVars": {
+        "--dry-date-range-trigger-bg": "Range Trigger Bg",
+        "--dry-date-range-trigger-border": "Range Trigger Border",
+        "--dry-date-range-trigger-color": "Range Trigger Color",
+        "--dry-date-range-trigger-font-size": "Range Trigger Font Size",
+        "--dry-date-range-trigger-padding-x": "Range Trigger Padding X",
+        "--dry-date-range-trigger-padding-y": "Range Trigger Padding Y"
+      },
       "dataAttributes": [
         {
           "name": "data-calendar-day"
+        },
+        {
+          "name": "data-content"
+        },
+        {
+          "name": "data-date-range-trigger"
         },
         {
           "name": "data-disabled",
@@ -10913,6 +10938,9 @@
         },
         {
           "name": "data-in-range"
+        },
+        {
+          "name": "data-indicator"
         },
         {
           "name": "data-outside-month"
@@ -10929,6 +10957,9 @@
         {
           "name": "data-selected",
           "description": "Present when the current item is selected."
+        },
+        {
+          "name": "data-size"
         },
         {
           "name": "data-state"

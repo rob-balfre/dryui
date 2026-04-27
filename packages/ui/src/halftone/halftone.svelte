@@ -39,24 +39,19 @@
 	const normalizedOpacity = $derived(`${Math.max(0, Math.min(1, opacity))}`);
 	const angleValue = $derived(`${angle}deg`);
 
-	function setHalftoneVars(node: HTMLDivElement) {
-		$effect(() => {
-			node.style.setProperty('--dry-halftone-pattern-size', patternSize);
-			node.style.setProperty('--dry-halftone-dot-radius', dotRadius);
-			node.style.setProperty('--dry-halftone-color', color);
-			node.style.setProperty('--dry-halftone-opacity', normalizedOpacity);
-			node.style.setProperty('--dry-halftone-angle', angleValue);
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--dry-halftone-pattern-size', patternSize);
+		el.style.setProperty('--dry-halftone-dot-radius', dotRadius);
+		el.style.setProperty('--dry-halftone-color', color);
+		el.style.setProperty('--dry-halftone-opacity', normalizedOpacity);
+		el.style.setProperty('--dry-halftone-angle', angleValue);
+	});
 </script>
 
-<div
-	{@attach setHalftoneVars}
-	class={className}
-	data-halftone
-	data-dot-size={dotSizeName}
-	{...rest}
->
+<div bind:this={el} class={className} data-halftone data-dot-size={dotSizeName} {...rest}>
 	{#if children}
 		<div data-halftone-content>
 			{@render children()}

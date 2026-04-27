@@ -23,11 +23,13 @@
 
 	const ctx = getPopoverCtx();
 
+	let contentEl = $state<HTMLDivElement>();
+
 	const overlay = createAnchoredOverlayContent({
 		ctx,
+		contentEl: () => contentEl ?? null,
 		placement: () => placement,
-		offset: () => offset,
-		style: () => style
+		offset: () => offset
 	});
 
 	createDismiss({
@@ -41,8 +43,8 @@
 </script>
 
 <div
-	{@attach overlay.bindContent}
-	{@attach overlay.position}
+	bind:this={contentEl}
+	use:overlay.applyPosition={style}
 	id={ctx.contentId}
 	popover="manual"
 	data-popover-content

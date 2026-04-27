@@ -17,24 +17,16 @@
 
 	const ctx = getContextMenuCtx();
 
-	let el = $state<HTMLDivElement | null>(null);
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
+	let el = $state<HTMLDivElement>();
 
 	const menu = createMenuNavigation({
 		container: () => el ?? null,
 		orientation: 'vertical'
 	});
 
-	function syncPopover(node: HTMLDivElement) {
+	$effect(() => {
+		const node = el;
+		if (!node) return;
 		if (ctx.open) {
 			node.style.position = 'fixed';
 			node.style.left = `${ctx.position.x}px`;
@@ -45,7 +37,7 @@
 		} else {
 			tryHidePopover(node);
 		}
-	}
+	});
 
 	createDismiss({
 		enabled: () => ctx.open,
@@ -56,8 +48,7 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach syncPopover}
+	bind:this={el}
 	popover="manual"
 	role="menu"
 	tabindex="-1"

@@ -30,48 +30,41 @@
 	const isUnavailable = $derived(disabled || !ctx.canSelect(value));
 	const isHighlighted = $derived(ctx.activeItemId === id);
 
-	function attachItem(node: HTMLDivElement) {
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
 		ctx.registerItem(id);
+		return () => ctx.unregisterItem(id);
+	});
 
-		function handlePointerEnter(event: PointerEvent) {
-			if (!isUnavailable) {
-				ctx.setActiveItem(id);
-			}
-
-			if (onpointerenter) {
-				(onpointerenter as (event: PointerEvent & { currentTarget: HTMLDivElement }) => void)(
-					event as PointerEvent & { currentTarget: HTMLDivElement }
-				);
-			}
+	$effect(() => {
+		if (isHighlighted && el) {
+			el.scrollIntoView({ block: 'nearest' });
 		}
+	});
 
-		function handleClick() {
-			if (isUnavailable) {
-				ctx.focusInput();
-				return;
-			}
-
-			ctx.selectValue(value);
+	function handlePointerEnter(event: PointerEvent & { currentTarget: HTMLDivElement }) {
+		if (!isUnavailable) {
+			ctx.setActiveItem(id);
 		}
-
-		node.addEventListener('pointerenter', handlePointerEnter);
-		node.addEventListener('click', handleClick);
-
-		return () => {
-			node.removeEventListener('pointerenter', handlePointerEnter);
-			node.removeEventListener('click', handleClick);
-			ctx.unregisterItem(id);
-		};
+		if (onpointerenter) {
+			(onpointerenter as (event: PointerEvent & { currentTarget: HTMLDivElement }) => void)(event);
+		}
 	}
 
-	function keepHighlightedItemVisible(node: HTMLDivElement) {
-		node.scrollIntoView({ block: 'nearest' });
+	function handleClick() {
+		if (isUnavailable) {
+			ctx.focusInput();
+			return;
+		}
+		ctx.selectValue(value);
 	}
 </script>
 
 <div
-	{@attach attachItem}
-	{@attach isHighlighted && keepHighlightedItemVisible}
+	bind:this={el}
+	onpointerenter={handlePointerEnter}
+	onclick={handleClick}
 	role="option"
 	{id}
 	tabindex={-1}

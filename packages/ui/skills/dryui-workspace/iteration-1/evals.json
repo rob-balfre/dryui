@@ -1,0 +1,21 @@
+{
+  "skill_name": "dryui",
+  "iteration": 1,
+  "evals": [
+    {
+      "id": 1,
+      "name": "settings-form",
+      "prompt": "I'm in a SvelteKit project that already has DryUI set up (package @dryui/ui, theme imported, lint preprocessor wired). Build me a settings page at `src/routes/settings/+page.svelte`. Three fields stacked vertically: display name (text), email (text), notifications enabled (toggle). A primary submit button at the bottom. The form should look polished and theme through (light + dark). Just give me the +page.svelte file."
+    },
+    {
+      "id": 2,
+      "name": "stat-card-grid",
+      "prompt": "Build me a dashboard route at `src/routes/(app)/dashboard/+page.svelte`. Show three stat cards in a row on wide viewports (Active Users 1,284, Revenue $42,580, Conversion 3.2%) and a single column on narrow viewports. Each card has a small label, a big number, and a smaller delta line below (e.g. \"+12% vs last week\"). The page should be centered with a max content width. SvelteKit + DryUI already wired."
+    },
+    {
+      "id": 3,
+      "name": "delete-confirm",
+      "prompt": "On my user list page each row has a 'Remove' action. I need a reusable confirmation component at `src/lib/components/ConfirmRemoveDialog.svelte`. Props: `userName: string`, `open: boolean` (bindable), `onConfirm: () => void`. When the user confirms it should call onConfirm; when they cancel it should just close. Title 'Remove user?', body 'This will remove {userName} from the workspace. This action cannot be undone.', primary action 'Remove' (destructive), secondary 'Cancel'. The component should be accessible to keyboard and screen readers."
+    }
+  ]
+}

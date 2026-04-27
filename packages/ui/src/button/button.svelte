@@ -92,7 +92,12 @@
 		node.toggleAttribute('data-icon-end', lastChild?.hasAttribute('data-dry-icon') === true);
 	}
 
-	function attachButton(node: HTMLButtonElement | HTMLAnchorElement) {
+	let buttonEl = $state<HTMLButtonElement | HTMLAnchorElement>();
+
+	$effect(() => {
+		const node = buttonEl;
+		if (!node) return;
+
 		ref?.(node);
 		syncIconEdgeAttrs(node);
 
@@ -108,12 +113,13 @@
 			observer.disconnect();
 			ref?.(null);
 		};
-	}
+	});
 </script>
 
 {#snippet element()}
 	{#if href !== undefined}
 		<a
+			bind:this={buttonEl}
 			{...rest as AnchorRest}
 			href={disabled ? undefined : href}
 			{rel}
@@ -129,12 +135,12 @@
 			{...variantAttrs({ variant, size, color })}
 			class={className}
 			onclick={handleLinkClick}
-			{@attach attachButton}
 		>
 			{@render children()}
 		</a>
 	{:else}
 		<button
+			bind:this={buttonEl}
 			{type}
 			{disabled}
 			data-disabled={disabled || undefined}
@@ -146,7 +152,6 @@
 			class={className}
 			{onclick}
 			{...rest}
-			{@attach attachButton}
 		>
 			{@render children()}
 		</button>
@@ -197,10 +202,6 @@
 		--_dry-btn-soft-active-bg: var(
 			--dry-btn-soft-active-bg,
 			color-mix(in srgb, var(--_dry-btn-accent) 28%, transparent)
-		);
-		--_dry-btn-ghost-underline: var(
-			--dry-btn-ghost-underline,
-			color-mix(in srgb, var(--_dry-btn-accent) 65%, transparent)
 		);
 
 		display: inline-grid;
@@ -307,20 +308,14 @@
 		--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
 		--_dry-btn-border: var(--dry-btn-border, transparent);
 
-		text-decoration: underline;
-		text-decoration-color: color-mix(in srgb, var(--_dry-btn-accent-stroke) 70%, transparent);
-		text-underline-offset: 2px;
-
 		&:hover:not([data-disabled]) {
 			--_dry-btn-bg: var(--dry-btn-bg, var(--_dry-btn-accent-weak));
 			--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-accent-fg));
-			text-decoration-color: color-mix(in srgb, var(--_dry-btn-accent-stroke) 70%, transparent);
 		}
 
 		&:active:not([data-disabled]) {
 			--_dry-btn-bg: var(--dry-btn-bg, var(--_dry-btn-accent));
 			--_dry-btn-color: var(--dry-btn-color, var(--_dry-btn-on-accent));
-			text-decoration-color: transparent;
 		}
 	}
 

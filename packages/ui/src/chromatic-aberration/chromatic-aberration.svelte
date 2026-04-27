@@ -18,11 +18,14 @@
 
 	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),
 	// so no CSS default is possible — the ID isn't known until mount. The SVG <filter> element
-	// is in the same template, so the @attach sets it immediately on first paint.
-	function applyFilterStyles(node: HTMLElement) {
-		node.style.cssText = style || '';
-		node.style.setProperty('filter', `url(#${filterId})`);
-	}
+	// is in the same template, so the $effect runs synchronously after first paint.
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.cssText = style || '';
+		el.style.setProperty('filter', `url(#${filterId})`);
+	});
 </script>
 
 <svg data-chromatic-aberration-svg width="0" height="0" aria-hidden="true">
@@ -53,7 +56,7 @@
 		</filter>
 	</defs>
 </svg>
-<div data-chromatic-aberration class={className} {@attach applyFilterStyles} {...rest}>
+<div bind:this={el} data-chromatic-aberration class={className} {...rest}>
 	{@render children()}
 </div>
 

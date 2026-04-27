@@ -102,11 +102,6 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 		path: '/grid-rules',
 		label: 'Grid rules',
 		description: 'The DryUI layout discipline: grid-first, container queries, token-based spacing'
-	},
-	{
-		path: '/migration-guide',
-		label: 'Migration guide',
-		description: 'Move from Tailwind, shadcn, or ad-hoc component libraries onto DryUI'
 	}
 ];
 

@@ -17,7 +17,17 @@
 		...rest
 	}: Props = $props();
 
-	function setup(node: HTMLSpanElement) {
+	let el = $state<HTMLSpanElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--dry-shimmer-color', color);
+		el.style.setProperty('--dry-shimmer-duration', `${duration}s`);
+	});
+
+	$effect(() => {
+		if (!el) return;
+		const node = el;
 		let onScreen = true;
 		let tabVisible = true;
 
@@ -26,33 +36,26 @@
 			else delete node.dataset.active;
 		};
 
-		$effect(() => {
-			node.style.setProperty('--dry-shimmer-color', color);
-			node.style.setProperty('--dry-shimmer-duration', `${duration}s`);
-		});
-
-		$effect(() => {
-			const unsubscribeViewport = observeInViewport(
-				node,
-				(inView) => {
-					onScreen = inView;
-					apply();
-				},
-				{ rootMargin: '100px' }
-			);
-			const unsubscribeVisibility = observePageVisibility((visible) => {
-				tabVisible = visible;
+		const unsubscribeViewport = observeInViewport(
+			node,
+			(inView) => {
+				onScreen = inView;
 				apply();
-			});
-			return () => {
-				unsubscribeViewport();
-				unsubscribeVisibility();
-			};
+			},
+			{ rootMargin: '100px' }
+		);
+		const unsubscribeVisibility = observePageVisibility((visible) => {
+			tabVisible = visible;
+			apply();
 		});
-	}
+		return () => {
+			unsubscribeViewport();
+			unsubscribeVisibility();
+		};
+	});
 </script>
 
-<span data-shimmer class={className} {...rest} {@attach setup}>
+<span bind:this={el} data-shimmer class={className} {...rest}>
 	<span data-shimmer-base>
 		{@render children()}
 	</span>

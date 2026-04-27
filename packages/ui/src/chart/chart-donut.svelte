@@ -51,16 +51,6 @@
 		onclick?.({ label: seg.point.label, value: seg.point.value, index: seg.index });
 	}
 
-	function attachSegmentClick(seg: (typeof segments)[number]) {
-		if (!onclick) return undefined;
-
-		return (node: SVGCircleElement) => {
-			const handleNodeClick = () => handleClick(seg);
-			node.addEventListener('click', handleNodeClick);
-			return () => node.removeEventListener('click', handleNodeClick);
-		};
-	}
-
 	const registeredHandler = $derived(
 		onclick
 			? (index: number) => {
@@ -88,7 +78,7 @@
 			transform="rotate(-90 {cx} {cy})"
 			data-part="donut-segment"
 			data-clickable={onclick ? '' : undefined}
-			{@attach attachSegmentClick(seg)}
+			onclick={onclick ? () => handleClick(seg) : undefined}
 		/>
 	{/each}
 	{#if label}

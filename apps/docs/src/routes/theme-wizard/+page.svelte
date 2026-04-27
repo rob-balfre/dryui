@@ -9,8 +9,8 @@
 		AppFrame,
 		Button,
 		Container,
+		SegmentedControl,
 		Slider,
-		Tabs,
 		Text,
 		TokenScope
 	} from '@dryui/ui';
@@ -196,169 +196,169 @@
 	<title>Theme Wizard - DryUI</title>
 </svelte:head>
 
-<Tabs.Root bind:value={previewMode} activationMode="manual">
-	<Container size="full" padding={false}>
-		<AreaGrid.Root
-			gap="md"
-			padding="md"
-			--dry-area-grid-template-areas="'brand brand' 'tabs tabs' 'mode reset' 'copy download' 'preview preview' 'accentLabel baseLabel' 'accent base' 'depthLabel fontLabel' 'depth font' 'radiusLabel densityLabel' 'radius density'"
-			--dry-area-grid-template-columns="minmax(0, 1fr) minmax(0, 1fr)"
-			--dry-area-grid-template-rows="auto auto auto auto minmax(20rem, calc(100dvh - 25rem)) auto auto auto auto auto auto"
-			--dry-area-grid-template-areas-wide="'brand brand tabs tabs tabs tabs mode copy download download reset reset' 'preview preview preview preview preview preview preview preview preview preview preview preview' 'accentLabel accentLabel baseLabel baseLabel depthLabel depthLabel depthLabel depthLabel fontLabel radiusLabel densityLabel densityLabel' 'accent accent base base depth depth depth depth font radius density density'"
-			--dry-area-grid-template-columns-wide="repeat(12, minmax(0, 1fr))"
-			--dry-area-grid-template-rows-wide="auto minmax(0, calc(100dvh - 12rem)) auto auto"
-			--dry-area-grid-align-items="center"
-			data-mode={themeMode}
+<Container size="xl" padding={false}>
+	<AreaGrid.Root
+		gap="md"
+		padding="md"
+		--dry-area-grid-template-areas="'brand brand' 'tabs tabs' 'mode reset' 'copy download' 'preview preview' 'accentLabel baseLabel' 'accent base' 'depthLabel fontLabel' 'depth font' 'radiusLabel densityLabel' 'radius density'"
+		--dry-area-grid-template-columns="minmax(0, 1fr) minmax(0, 1fr)"
+		--dry-area-grid-template-rows="auto auto auto auto minmax(20rem, calc(100dvh - 25rem)) auto auto auto auto auto auto"
+		--dry-area-grid-template-areas-wide="'brand brand tabs tabs tabs tabs mode copy download download reset reset' 'preview preview preview preview preview preview preview preview preview preview preview preview' 'accentLabel accentLabel baseLabel baseLabel depthLabel depthLabel depthLabel depthLabel fontLabel radiusLabel densityLabel densityLabel' 'accent accent base base depth depth depth depth font radius density density'"
+		--dry-area-grid-template-columns-wide="repeat(12, minmax(0, 1fr))"
+		--dry-area-grid-template-rows-wide="auto minmax(0, calc(100dvh - 12rem)) auto auto"
+		--dry-area-grid-align-items="center"
+		data-mode={themeMode}
+	>
+		<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
+			<Logo />
+			<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
+		</Text>
+
+		<SegmentedControl.Root
+			--dry-grid-area-name="tabs"
+			bind:value={previewMode}
+			aria-label="Preview mode"
 		>
-			<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
-				<Logo />
-				<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
-			</Text>
+			<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
+			<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
+			<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
+			<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
+		</SegmentedControl.Root>
 
-			<Tabs.List --dry-grid-area-name="tabs" aria-label="Preview mode">
-				<Tabs.Trigger value="overview" size="sm">Overview</Tabs.Trigger>
-				<Tabs.Trigger value="forms" size="sm">Forms</Tabs.Trigger>
-				<Tabs.Trigger value="dashboard" size="sm">Dashboard</Tabs.Trigger>
-				<Tabs.Trigger value="cards" size="sm">Cards</Tabs.Trigger>
-			</Tabs.List>
+		<Button
+			--dry-grid-area-name="mode"
+			variant="ghost"
+			size="icon-sm"
+			onclick={() => docsTheme.cycle()}
+			aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+		>
+			{#if docsTheme.isDark}
+				<Sun size={14} aria-hidden="true" />
+			{:else}
+				<Moon size={14} aria-hidden="true" />
+			{/if}
+		</Button>
 
-			<Button
-				--dry-grid-area-name="mode"
-				variant="ghost"
-				size="icon-sm"
-				onclick={() => docsTheme.cycle()}
-				aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-			>
-				{#if docsTheme.isDark}
-					<Sun size={14} aria-hidden="true" />
-				{:else}
-					<Moon size={14} aria-hidden="true" />
-				{/if}
-			</Button>
+		<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
+			<ClipboardCopy size={14} aria-hidden="true" />
+			{copyFeedback || 'Copy'}
+		</Button>
 
-			<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
-				<ClipboardCopy size={14} aria-hidden="true" />
-				<Text as="span">{copyFeedback || 'Copy'}</Text>
-			</Button>
+		<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
+			<Download size={14} aria-hidden="true" />
+			Download
+		</Button>
 
-			<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
-				<Download size={14} aria-hidden="true" />
-				<Text as="span">Download</Text>
-			</Button>
+		<Button
+			--dry-grid-area-name="reset"
+			variant="ghost"
+			size="sm"
+			onclick={resetAll}
+			aria-label="Reset all"
+		>
+			<RotateCcw size={14} aria-hidden="true" />
+			Reset
+		</Button>
 
-			<Button
-				--dry-grid-area-name="reset"
-				variant="ghost"
-				size="sm"
-				onclick={resetAll}
-				aria-label="Reset all"
-			>
-				<RotateCcw size={14} aria-hidden="true" />
-				<Text as="span">Reset</Text>
-			</Button>
+		<Adjust
+			--dry-grid-area-name="preview"
+			--dry-adjust-block-size="100%"
+			--dry-adjust-min-block-size="0"
+			--dry-adjust-overflow="hidden"
+			brightness={wizardState.adjust.brightness}
+			contrast={wizardState.adjust.contrast}
+			saturate={wizardState.adjust.saturate}
+			hueRotate={wizardState.adjust.hueRotate}
+		>
+			<TokenScope {tokens}>
+				<AppFrame
+					title={previewFrameTitle}
+					--dry-app-frame-block-size="100%"
+					--dry-app-frame-min-block-size="0"
+					--dry-app-frame-content-overflow="auto"
+					--dry-app-frame-content-padding="var(--dry-space-3)"
+				>
+					{#if previewMode === 'overview'}
+						<OverviewPreview />
+					{:else if previewMode === 'forms'}
+						<FormsPreview />
+					{:else if previewMode === 'dashboard'}
+						<DashboardPreview />
+					{:else if previewMode === 'cards'}
+						<CardsPreview />
+					{/if}
+				</AppFrame>
+			</TokenScope>
+		</Adjust>
 
-			<Adjust
-				--dry-grid-area-name="preview"
-				--dry-adjust-block-size="100%"
-				--dry-adjust-min-block-size="0"
-				--dry-adjust-overflow="hidden"
-				brightness={wizardState.adjust.brightness}
-				contrast={wizardState.adjust.contrast}
-				saturate={wizardState.adjust.saturate}
-				hueRotate={wizardState.adjust.hueRotate}
-			>
-				<TokenScope {tokens}>
-					<AppFrame
-						title={previewFrameTitle}
-						--dry-app-frame-block-size="100%"
-						--dry-app-frame-min-block-size="0"
-						--dry-app-frame-content-overflow="auto"
-					>
-						<Tabs.Content value="overview">
-							<OverviewPreview />
-						</Tabs.Content>
-						<Tabs.Content value="forms">
-							<FormsPreview />
-						</Tabs.Content>
-						<Tabs.Content value="dashboard">
-							<DashboardPreview />
-						</Tabs.Content>
-						<Tabs.Content value="cards">
-							<CardsPreview />
-						</Tabs.Content>
-					</AppFrame>
-				</TokenScope>
-			</Adjust>
+		<Text --dry-grid-area-name="accentLabel" as="span" variant="label" size="xs">
+			Accent {Math.round(wizardState.brandHsb.h)} degrees
+		</Text>
+		<Slider
+			--dry-grid-area-name="accent"
+			bind:value={getAccentHue, setAccentHue}
+			min={0}
+			max={360}
+			step={1}
+			size="sm"
+			aria-label="Accent hue"
+		/>
 
-			<Text --dry-grid-area-name="accentLabel" as="span" variant="label" size="xs">
-				Accent {Math.round(wizardState.brandHsb.h)} degrees
-			</Text>
-			<Slider
-				--dry-grid-area-name="accent"
-				bind:value={getAccentHue, setAccentHue}
-				min={0}
-				max={360}
-				step={1}
-				size="sm"
-				aria-label="Accent hue"
-			/>
+		<Text --dry-grid-area-name="baseLabel" as="span" variant="label" size="xs">
+			Base {Math.round(wizardState.baseHue)} degrees
+		</Text>
+		<Slider
+			--dry-grid-area-name="base"
+			bind:value={getBaseHue, setBaseHueValue}
+			min={0}
+			max={360}
+			step={1}
+			size="sm"
+			aria-label="Base hue"
+		/>
 
-			<Text --dry-grid-area-name="baseLabel" as="span" variant="label" size="xs">
-				Base {Math.round(wizardState.baseHue)} degrees
-			</Text>
-			<Slider
-				--dry-grid-area-name="base"
-				bind:value={getBaseHue, setBaseHueValue}
-				min={0}
-				max={360}
-				step={1}
-				size="sm"
-				aria-label="Base hue"
-			/>
+		<Text --dry-grid-area-name="depthLabel" as="span" variant="label" size="xs">Depth</Text>
+		<Button
+			--dry-grid-area-name="depth"
+			variant="secondary"
+			size="sm"
+			onclick={cyclePersonality}
+			aria-label={`Depth ${activePersonalityLabel}`}
+		>
+			{activePersonalityLabel}
+		</Button>
 
-			<Text --dry-grid-area-name="depthLabel" as="span" variant="label" size="xs">Depth</Text>
-			<Button
-				--dry-grid-area-name="depth"
-				variant="secondary"
-				size="sm"
-				onclick={cyclePersonality}
-				aria-label={`Depth ${activePersonalityLabel}`}
-			>
-				{activePersonalityLabel}
-			</Button>
+		<Text --dry-grid-area-name="fontLabel" as="span" variant="label" size="xs">Font</Text>
+		<Button
+			--dry-grid-area-name="font"
+			variant="secondary"
+			size="sm"
+			onclick={cycleFont}
+			aria-label={`Font ${wizardState.typography.fontPreset}`}
+		>
+			{wizardState.typography.fontPreset}
+		</Button>
 
-			<Text --dry-grid-area-name="fontLabel" as="span" variant="label" size="xs">Font</Text>
-			<Button
-				--dry-grid-area-name="font"
-				variant="secondary"
-				size="sm"
-				onclick={cycleFont}
-				aria-label={`Font ${wizardState.typography.fontPreset}`}
-			>
-				{wizardState.typography.fontPreset}
-			</Button>
+		<Text --dry-grid-area-name="radiusLabel" as="span" variant="label" size="xs">Radius</Text>
+		<Button
+			--dry-grid-area-name="radius"
+			variant="secondary"
+			size="sm"
+			onclick={cycleRadius}
+			aria-label={`Radius ${activeRadiusLabel}`}
+		>
+			{activeRadiusLabel}
+		</Button>
 
-			<Text --dry-grid-area-name="radiusLabel" as="span" variant="label" size="xs">Radius</Text>
-			<Button
-				--dry-grid-area-name="radius"
-				variant="secondary"
-				size="sm"
-				onclick={cycleRadius}
-				aria-label={`Radius ${activeRadiusLabel}`}
-			>
-				{activeRadiusLabel}
-			</Button>
-
-			<Text --dry-grid-area-name="densityLabel" as="span" variant="label" size="xs">Density</Text>
-			<Button
-				--dry-grid-area-name="density"
-				variant="secondary"
-				size="sm"
-				onclick={cycleDensity}
-				aria-label={`Density ${activeDensityLabel}`}
-			>
-				{activeDensityLabel}
-			</Button>
-		</AreaGrid.Root>
-	</Container>
-</Tabs.Root>
+		<Text --dry-grid-area-name="densityLabel" as="span" variant="label" size="xs">Density</Text>
+		<Button
+			--dry-grid-area-name="density"
+			variant="secondary"
+			size="sm"
+			onclick={cycleDensity}
+			aria-label={`Density ${activeDensityLabel}`}
+		>
+			{activeDensityLabel}
+		</Button>
+	</AreaGrid.Root>
+</Container>

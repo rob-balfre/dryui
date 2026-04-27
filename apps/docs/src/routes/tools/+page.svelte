@@ -97,8 +97,7 @@ npx -y @dryui/cli`;
 
 			<Text size="sm" color="muted">
 				Need optional editor integration, theme wiring, or migration help? Continue with
-				<Link href={withBase('/getting-started')} underline="always">Getting Started</Link> and
-				<Link href={withBase('/migration-guide')} underline="always">Migration Guide</Link>.
+				<Link href={withBase('/getting-started')} underline="always">Getting Started</Link>.
 			</Text>
 		</div>
 	</div>

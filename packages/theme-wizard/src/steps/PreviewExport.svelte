@@ -19,19 +19,21 @@
 	let copyFeedback = $state('');
 	const tokens = $derived(getAllTokens(mode));
 
-	function attachThemeTokens(tokens: Record<string, string>) {
-		return (node: HTMLElement) => {
-			for (const [name, value] of Object.entries(tokens)) {
-				node.style.setProperty(name, value);
-			}
+	let sceneEl = $state<HTMLDivElement>();
 
-			return () => {
-				for (const name of Object.keys(tokens)) {
-					node.style.removeProperty(name);
-				}
-			};
+	$effect(() => {
+		if (!sceneEl) return;
+		const node = sceneEl;
+		const applied = Object.entries(tokens);
+		for (const [name, value] of applied) {
+			node.style.setProperty(name, value);
+		}
+		return () => {
+			for (const [name] of applied) {
+				node.style.removeProperty(name);
+			}
 		};
-	}
+	});
 
 	function handleDownload() {
 		downloadCss(getDerivedTheme());
@@ -63,7 +65,7 @@
 		</div>
 	</div>
 
-	<div class="preview-scene" data-mode={mode} {@attach attachThemeTokens(tokens)}>
+	<div bind:this={sceneEl} class="preview-scene" data-mode={mode}>
 		{#if preview}
 			{@render preview()}
 		{:else}

@@ -30,23 +30,28 @@
 	const clampedIntensity = $derived(`${Math.max(0, Math.min(100, intensity))}`);
 	const speedValue = $derived(`${Math.max(0, speed)}s`);
 
-	function applyRootStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-beam-color', color);
-			node.style.setProperty('--dry-beam-angle', `${angle}deg`);
-			node.style.setProperty('--dry-beam-speed', speedValue);
-			node.style.setProperty('--dry-beam-intensity', clampedIntensity);
-			node.style.setProperty('--dry-beam-width', `${width}px`);
-			if (blendMode) node.style.setProperty('--dry-beam-blend', blendMode);
-			else node.style.removeProperty('--dry-beam-blend');
-		});
+	let el = $state<HTMLDivElement>();
 
-		$effect(() => observeOffscreenState(node, { rootMargin: '200px' }));
-	}
+	$effect(() => {
+		if (!el) return;
+		const node = el;
+		node.style.cssText = style || '';
+		node.style.setProperty('--dry-beam-color', color);
+		node.style.setProperty('--dry-beam-angle', `${angle}deg`);
+		node.style.setProperty('--dry-beam-speed', speedValue);
+		node.style.setProperty('--dry-beam-intensity', clampedIntensity);
+		node.style.setProperty('--dry-beam-width', `${width}px`);
+		if (blendMode) node.style.setProperty('--dry-beam-blend', blendMode);
+		else node.style.removeProperty('--dry-beam-blend');
+	});
+
+	$effect(() => {
+		if (!el) return;
+		return observeOffscreenState(el, { rootMargin: '200px' });
+	});
 </script>
 
-<div data-beam class={className} {...rest} {@attach applyRootStyles}>
+<div bind:this={el} data-beam class={className} {...rest}>
 	<div data-beam-layer></div>
 	{#if children}
 		{@render children()}

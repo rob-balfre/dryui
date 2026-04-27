@@ -58,19 +58,20 @@
 		activated = true;
 	}
 
-	function applyAspectRatio(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('--_ratio', aspectRatio);
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--_ratio', aspectRatio);
+	});
 </script>
 
 <div
+	bind:this={el}
 	data-video-embed
 	data-provider={detectedProvider}
 	data-activated={activated || autoplay ? '' : undefined}
 	class={className}
-	{@attach applyAspectRatio}
 	{...rest}
 >
 	{#if activated || autoplay}

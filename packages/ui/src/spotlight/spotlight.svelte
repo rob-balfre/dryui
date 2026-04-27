@@ -30,7 +30,7 @@
 		...rest
 	}: Props = $props();
 
-	let element = $state<HTMLDivElement | null>(null);
+	let element = $state<HTMLDivElement>();
 	let x = $state('50%');
 	let y = $state('50%');
 	let active = $state(false);
@@ -38,15 +38,6 @@
 	let pointerFrame = $state<number | null>(null);
 	let pendingX = '50%';
 	let pendingY = '50%';
-
-	function captureElement(node: HTMLDivElement) {
-		element = node;
-		return {
-			destroy() {
-				if (element === node) element = null;
-			}
-		};
-	}
 
 	function centerSpotlight() {
 		cancelQueuedPointerPosition();
@@ -154,23 +145,21 @@
 		}
 	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-spotlight-radius', radiusValue);
-			node.style.setProperty('--dry-spotlight-intensity', intensityValue);
-			node.style.setProperty('--dry-spotlight-color', color);
-			node.style.setProperty('--dry-spotlight-x', x);
-			node.style.setProperty('--dry-spotlight-y', y);
-			if (blendMode) node.style.setProperty('--dry-spotlight-blend', blendMode);
-			else node.style.removeProperty('--dry-spotlight-blend');
-		});
-	}
+	$effect(() => {
+		if (!element) return;
+		element.style.cssText = style || '';
+		element.style.setProperty('--dry-spotlight-radius', radiusValue);
+		element.style.setProperty('--dry-spotlight-intensity', intensityValue);
+		element.style.setProperty('--dry-spotlight-color', color);
+		element.style.setProperty('--dry-spotlight-x', x);
+		element.style.setProperty('--dry-spotlight-y', y);
+		if (blendMode) element.style.setProperty('--dry-spotlight-blend', blendMode);
+		else element.style.removeProperty('--dry-spotlight-blend');
+	});
 </script>
 
 <div
-	{@attach captureElement}
-	{@attach applyStyles}
+	bind:this={element}
 	class={className}
 	data-spotlight
 	data-active={active || undefined}

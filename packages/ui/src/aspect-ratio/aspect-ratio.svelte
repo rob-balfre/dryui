@@ -9,14 +9,15 @@
 
 	let { ratio = 16 / 9, class: className, children, ...rest }: Props = $props();
 
-	function applyRatio(node: HTMLElement) {
-		$effect(() => {
-			node.style.setProperty('--_ratio', String(ratio));
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--_ratio', String(ratio));
+	});
 </script>
 
-<div {@attach applyRatio} class={className} {...rest}>
+<div bind:this={el} class={className} {...rest}>
 	{@render children()}
 </div>
 

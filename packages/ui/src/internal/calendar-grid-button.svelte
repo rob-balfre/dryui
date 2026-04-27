@@ -48,13 +48,6 @@
 
 	let containerEl = $state<HTMLDivElement>();
 
-	function bindContainer(node: HTMLDivElement) {
-		containerEl = node;
-		return () => {
-			if (containerEl === node) containerEl = undefined;
-		};
-	}
-
 	const weekdayLabels = $derived(generateWeekdayLabels(adapter.locale, adapter.weekStartDay));
 	const calendarDays = $derived(
 		getCalendarDays(adapter.viewYear, adapter.viewMonth, adapter.weekStartDay)
@@ -89,7 +82,7 @@
 	}
 </script>
 
-<div {@attach bindContainer} class={className} {...rest} data-calendar-grid>
+<div bind:this={containerEl} class={className} {...rest} data-calendar-grid>
 	<div role="group" aria-label={monthYearLabel} data-calendar-panel>
 		{#if !hideHeader}
 			<div data-calendar-header>

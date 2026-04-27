@@ -34,18 +34,9 @@
 		...rest
 	}: Props = $props();
 
-	let element = $state<HTMLDivElement | null>(null);
+	let element = $state<HTMLDivElement>();
 	let visible = $state(false);
 	let prefersReducedMotion = $state(false);
-
-	function captureElement(node: HTMLDivElement) {
-		element = node;
-		return {
-			destroy() {
-				if (element === node) element = null;
-			}
-		};
-	}
 
 	function toDuration(value: number | undefined): string | undefined {
 		return typeof value === 'number' ? `${Math.max(0, value)}ms` : undefined;
@@ -60,15 +51,14 @@
 	const durationValue = $derived(toDuration(duration));
 	const distanceValue = $derived(toDistance(distance));
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			if (delayValue) node.style.setProperty('--dry-reveal-delay', delayValue);
-			if (durationValue) node.style.setProperty('--dry-reveal-duration', durationValue);
-			if (distanceValue) node.style.setProperty('--dry-reveal-distance', distanceValue);
-			node.style.setProperty('--_blend-mode', blendMode ?? 'normal');
-		});
-	}
+	$effect(() => {
+		if (!element) return;
+		element.style.cssText = style || '';
+		if (delayValue) element.style.setProperty('--dry-reveal-delay', delayValue);
+		if (durationValue) element.style.setProperty('--dry-reveal-duration', durationValue);
+		if (distanceValue) element.style.setProperty('--dry-reveal-distance', distanceValue);
+		element.style.setProperty('--_blend-mode', blendMode ?? 'normal');
+	});
 
 	onMount(() => {
 		const stopMotionObserver = observeReducedMotionPreference((matches) => {
@@ -113,8 +103,7 @@
 </script>
 
 <div
-	{@attach captureElement}
-	{@attach applyStyles}
+	bind:this={element}
 	class={className}
 	data-reveal
 	data-variant={variant}

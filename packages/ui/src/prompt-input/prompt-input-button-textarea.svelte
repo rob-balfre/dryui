@@ -28,7 +28,7 @@
 		...rest
 	}: Props = $props();
 
-	let textareaEl: HTMLTextAreaElement | undefined;
+	let textareaEl = $state<HTMLTextAreaElement>();
 
 	function handleKeydown(e: KeyboardEvent) {
 		if (e.key === 'Enter' && !e.shiftKey) {
@@ -53,14 +53,6 @@
 		textareaEl.style.height = `${textareaEl.scrollHeight}px`;
 	}
 
-	function attachTextarea(node: HTMLTextAreaElement) {
-		textareaEl = node;
-		autoResize();
-		return () => {
-			if (textareaEl === node) textareaEl = undefined;
-		};
-	}
-
 	$effect(() => {
 		void value;
 		if (!textareaEl) return;
@@ -71,7 +63,7 @@
 
 <div class={className} data-prompt-input data-disabled={disabled || undefined} {...rest}>
 	<textarea
-		{@attach attachTextarea}
+		bind:this={textareaEl}
 		bind:value
 		{placeholder}
 		{disabled}

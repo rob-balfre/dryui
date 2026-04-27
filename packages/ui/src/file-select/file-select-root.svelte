@@ -23,7 +23,7 @@
 	}: Props = $props();
 
 	let loading = $state(false);
-	let fallbackInputEl: HTMLInputElement | null = null;
+	let fallbackInputEl = $state<HTMLInputElement>();
 
 	function commitValue(nextValue: string | null) {
 		if (nextValue === null) return;
@@ -45,15 +45,6 @@
 
 		fallbackInputEl.value = '';
 		fallbackInputEl.click();
-	}
-
-	function attachFallbackInput(node: HTMLInputElement) {
-		fallbackInputEl = node;
-		return () => {
-			if (fallbackInputEl === node) {
-				fallbackInputEl = null;
-			}
-		};
 	}
 
 	async function defaultRequest(): Promise<string | null> {
@@ -115,7 +106,7 @@
 
 <div data-file-select data-disabled={disabled || undefined}>
 	<input
-		{@attach attachFallbackInput}
+		bind:this={fallbackInputEl}
 		type="file"
 		{accept}
 		webkitdirectory={directory}

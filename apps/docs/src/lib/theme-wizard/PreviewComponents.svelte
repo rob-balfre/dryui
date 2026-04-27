@@ -781,9 +781,6 @@
 
 	.form-select {
 		display: grid;
-		--dry-btn-bg: var(--dry-form-control-bg);
-		--dry-btn-border: var(--dry-form-control-border);
-		--dry-btn-color: var(--dry-form-control-color);
 	}
 
 	.checkbox-row {

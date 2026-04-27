@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, type Placement } from '@dryui/primitives';
@@ -26,22 +25,12 @@
 		...rest
 	}: Props = $props();
 
-	let el = $state<HTMLDivElement | null>(null);
+	let el = $state<HTMLDivElement>();
 
 	const markerAttrs = $derived.by<Record<string, string>>(() => ({
 		'data-picker-popover-content': '',
 		[dataAttribute]: ''
 	}));
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
 
 	const popover = createAnchoredPopover({
 		triggerEl: () => controller.triggerEl,
@@ -53,8 +42,8 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach fromAction(popover.applyPosition, () => contentStyle)}
+	bind:this={el}
+	use:popover.applyPosition={contentStyle}
 	popover="auto"
 	role="dialog"
 	id={controller.contentId}

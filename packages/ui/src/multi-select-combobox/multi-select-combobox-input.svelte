@@ -17,15 +17,16 @@
 
 	const ctx = getMultiSelectComboboxCtx();
 
-	function attachInput(node: HTMLInputElement) {
-		ctx.inputEl = node;
+	let inputEl = $state<HTMLInputElement>();
 
+	$effect(() => {
+		ctx.inputEl = inputEl ?? null;
 		return () => {
-			if (ctx.inputEl === node) {
+			if (ctx.inputEl === inputEl) {
 				ctx.inputEl = null;
 			}
 		};
-	}
+	});
 
 	function handleInput(event: Event & { currentTarget: HTMLInputElement }) {
 		const nextQuery = event.currentTarget.value;
@@ -116,7 +117,7 @@
 </script>
 
 <input
-	{@attach attachInput}
+	bind:this={inputEl}
 	id={ctx.inputId}
 	type="text"
 	role="combobox"

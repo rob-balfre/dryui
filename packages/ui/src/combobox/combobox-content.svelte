@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fromAction } from 'svelte/attachments';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createAnchoredPopover, createDismiss, type Placement } from '@dryui/primitives';
@@ -27,17 +26,7 @@
 	const ctx = getComboboxCtx();
 	const getTriggerEl = () => ctx.triggerEl ?? ctx.inputEl;
 
-	let el = $state<HTMLDivElement | null>(null);
-
-	function attachContent(node: HTMLDivElement) {
-		el = node;
-
-		return () => {
-			if (el === node) {
-				el = null;
-			}
-		};
-	}
+	let el = $state<HTMLDivElement>();
 
 	const popover = createAnchoredPopover({
 		triggerEl: getTriggerEl,
@@ -57,8 +46,8 @@
 </script>
 
 <div
-	{@attach attachContent}
-	{@attach fromAction(popover.applyPosition, () => style)}
+	bind:this={el}
+	use:popover.applyPosition={style}
 	popover="manual"
 	role="listbox"
 	id={ctx.contentId}

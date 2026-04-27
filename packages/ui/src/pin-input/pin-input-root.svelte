@@ -47,7 +47,7 @@
 	const isDisabled = $derived(disabled || formCtx?.disabled || false);
 	const hasError = $derived(formCtx?.hasError || false);
 
-	let inputEl: HTMLInputElement | undefined;
+	let inputEl = $state<HTMLInputElement>();
 	let isFocused = $state(false);
 	let mirrorSelectionStart = $state<number | null>(null);
 	let mirrorSelectionEnd = $state<number | null>(null);
@@ -95,15 +95,6 @@
 		if (!inputEl) return;
 		mirrorSelectionStart = inputEl.selectionStart;
 		mirrorSelectionEnd = inputEl.selectionEnd;
-	}
-
-	function captureInput(node: HTMLInputElement) {
-		inputEl = node;
-		return () => {
-			if (inputEl === node) {
-				inputEl = undefined;
-			}
-		};
 	}
 
 	function maybeFireComplete(previousValue: string, nextValue: string) {
@@ -218,7 +209,7 @@
 	{...rest}
 >
 	<input
-		{@attach captureInput}
+		bind:this={inputEl}
 		type="text"
 		inputmode={type === 'numeric' ? 'numeric' : 'text'}
 		autocomplete="one-time-code"

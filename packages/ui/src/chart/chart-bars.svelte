@@ -32,16 +32,6 @@
 		onclick?.({ label: bar.point.label, value: bar.point.value, index: bar.index });
 	}
 
-	function attachBarClick(bar: (typeof bars)[number]) {
-		if (!onclick) return undefined;
-
-		return (node: SVGRectElement) => {
-			const handleNodeClick = () => handleClick(bar);
-			node.addEventListener('click', handleNodeClick);
-			return () => node.removeEventListener('click', handleNodeClick);
-		};
-	}
-
 	const registeredHandler = $derived(
 		onclick
 			? (index: number) => {
@@ -66,7 +56,7 @@
 			fill={bar.point.color ?? 'currentColor'}
 			data-part="bar"
 			data-clickable={onclick ? '' : undefined}
-			{@attach attachBarClick(bar)}
+			onclick={onclick ? () => handleClick(bar) : undefined}
 		/>
 	{/each}
 </g>

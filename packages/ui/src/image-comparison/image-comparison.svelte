@@ -22,13 +22,13 @@
 	}: Props = $props();
 
 	let dragging = $state(false);
+	let el = $state<HTMLDivElement>();
 
-	function syncStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--dry-image-comparison-position', `${position}%`);
-		});
-	}
+	$effect(() => {
+		if (!el) return;
+		el.style.cssText = style || '';
+		el.style.setProperty('--dry-image-comparison-position', `${position}%`);
+	});
 
 	function updatePosition(clientX: number, clientY: number, containerEl: HTMLElement) {
 		const rect = containerEl.getBoundingClientRect();
@@ -84,7 +84,7 @@
 {/snippet}
 
 <div
-	{@attach syncStyles}
+	bind:this={el}
 	class={className}
 	data-image-comparison
 	data-orientation={orientation}

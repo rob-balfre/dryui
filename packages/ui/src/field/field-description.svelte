@@ -11,21 +11,18 @@
 
 	const ctx = getFormControlCtx();
 
-	function registerDescription() {
+	let el = $state<HTMLParagraphElement>();
+
+	$effect(() => {
+		if (!el) return;
 		ctx?.registerDescription(true);
 		return () => {
 			ctx?.registerDescription(false);
 		};
-	}
+	});
 </script>
 
-<p
-	{@attach registerDescription}
-	id={ctx?.descriptionId}
-	data-field-description
-	class={className}
-	{...rest}
->
+<p bind:this={el} id={ctx?.descriptionId} data-field-description class={className} {...rest}>
 	{@render children()}
 </p>
 

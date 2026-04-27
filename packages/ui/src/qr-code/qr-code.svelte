@@ -62,15 +62,16 @@
 		}
 	});
 
-	function setQrVars(node: HTMLDivElement) {
-		$effect(() => {
-			node.style.setProperty('--dry-qr-size', `${size}px`);
-			node.style.setProperty('--dry-qr-bg', bgColor);
-		});
-	}
+	let wrapperEl = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!wrapperEl) return;
+		wrapperEl.style.setProperty('--dry-qr-size', `${size}px`);
+		wrapperEl.style.setProperty('--dry-qr-bg', bgColor);
+	});
 </script>
 
-<div {@attach setQrVars} class={className} data-qr-wrapper>
+<div bind:this={wrapperEl} class={className} data-qr-wrapper>
 	<canvas
 		bind:this={canvasEl}
 		width={size}

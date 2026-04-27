@@ -13,7 +13,12 @@
 	const displayColor = $derived(color ?? ctx.hex);
 	const displayAlpha = $derived(color ? 1 : ctx.alpha);
 
-	function interactive(node: HTMLElement) {
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		const node = el;
+		if (!node) return;
+
 		function handleClick() {
 			if (color && !ctx.disabled) ctx.setFromHex(color);
 		}
@@ -25,26 +30,23 @@
 		}
 		node.addEventListener('click', handleClick);
 		node.addEventListener('keydown', handleKeydown);
-		return {
-			destroy() {
-				node.removeEventListener('click', handleClick);
-				node.removeEventListener('keydown', handleKeydown);
-			}
+		return () => {
+			node.removeEventListener('click', handleClick);
+			node.removeEventListener('keydown', handleKeydown);
 		};
-	}
+	});
 
-	function applyStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			node.style.setProperty('--_swatch-color', displayColor);
-			node.style.setProperty('--_swatch-opacity', String(displayAlpha));
-		});
-	}
+	$effect(() => {
+		if (!el) return;
+		el.style.cssText = style || '';
+		el.style.setProperty('--_swatch-color', displayColor);
+		el.style.setProperty('--_swatch-opacity', String(displayAlpha));
+	});
 </script>
 
 <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
 <div
-	{@attach interactive}
+	bind:this={el}
 	role={color ? 'button' : 'img'}
 	tabindex={color && !ctx.disabled ? 0 : undefined}
 	aria-label={color ? `Select color ${color}` : 'Current color'}
@@ -53,7 +55,6 @@
 	data-disabled={ctx.disabled || undefined}
 	class={className}
 	{...rest}
-	use:applyStyles
 ></div>
 
 <style>

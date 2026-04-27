@@ -9,29 +9,24 @@
 
 	let { variant = 'text', width, height, class: className, ...rest }: Props = $props();
 
-	function setDimensions(node: HTMLElement) {
-		$effect(() => {
-			if (width) {
-				node.style.setProperty('width', width);
-			} else {
-				node.style.removeProperty('width');
-			}
-			if (height) {
-				node.style.setProperty('--_h', height);
-			} else {
-				node.style.removeProperty('--_h');
-			}
-		});
-	}
+	let el = $state<HTMLDivElement>();
+
+	$effect(() => {
+		if (!el) return;
+		if (width) {
+			el.style.setProperty('width', width);
+		} else {
+			el.style.removeProperty('width');
+		}
+		if (height) {
+			el.style.setProperty('--_h', height);
+		} else {
+			el.style.removeProperty('--_h');
+		}
+	});
 </script>
 
-<div
-	aria-hidden="true"
-	data-variant={variant}
-	{@attach setDimensions}
-	class={className}
-	{...rest}
-></div>
+<div bind:this={el} aria-hidden="true" data-variant={variant} class={className} {...rest}></div>
 
 <style>
 	div {
@@ -59,8 +54,8 @@
 		background-size: 200% 100%;
 		animation: skeleton-shimmer 1.5s ease-in-out infinite;
 		border-radius: var(--dry-skeleton-radius);
-		/* width set via @attach inline style (lint bans width in CSS);
-		   --_h set by @attach when height prop is provided,
+		/* width set via $effect inline style (lint bans width in CSS);
+		   --_h set by $effect when height prop is provided,
 		   overriding variant defaults via the var() fallback chain */
 	}
 

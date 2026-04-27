@@ -9,6 +9,7 @@ import { buildFeedbackDispatchPrompt } from './prompts.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
+export type DefaultDispatchAgent = DispatchAgent | 'off';
 export const DISPATCH_AGENTS: readonly DispatchAgent[] = [
 	'claude',
 	'codex',
@@ -49,12 +50,12 @@ const CODEX_PLUGIN_CHIP = '[@dryui](plugin://dryui@dryui) ';
 
 export interface DispatcherOptions {
 	workspace: string;
-	defaultAgent: DispatchAgent;
+	defaultAgent: DefaultDispatchAgent;
 	terminalApp?: TerminalApp;
 }
 
 interface DispatchTargetsSnapshot {
-	defaultAgent: DispatchAgent;
+	defaultAgent: DefaultDispatchAgent;
 	configuredAgents: DispatchAgent[];
 }
 
@@ -302,7 +303,7 @@ export function getDispatchTargetsSnapshot(options: DispatcherOptions): Dispatch
 	};
 }
 
-function resolveAgent(submission: Submission, defaultAgent: DispatchAgent): SubmissionAgent {
+function resolveAgent(submission: Submission, defaultAgent: DefaultDispatchAgent): SubmissionAgent {
 	const choice = submission.agent;
 	if (choice === 'off' || (choice && DISPATCH_AGENTS.includes(choice))) return choice;
 	return defaultAgent;

@@ -124,12 +124,17 @@
 
 	function pickTargetAgent(
 		stored: DispatchAgent | null,
-		fallback: DispatchAgent | undefined,
+		fallback: DispatchAgent | 'off' | undefined,
 		available: DispatchAgent[]
 	): DispatchAgent | null {
+		// Honor the user's last explicit choice. Never auto-pick: the user must
+		// consciously select an agent each time, otherwise the server stays in
+		// 'off' mode and no terminal opens behind their back.
 		if (stored && available.includes(stored)) return stored;
-		if (fallback && available.includes(fallback)) return fallback;
-		return available[0] ?? null;
+		if (fallback && fallback !== 'off' && available.includes(fallback as DispatchAgent)) {
+			return fallback as DispatchAgent;
+		}
+		return null;
 	}
 
 	async function loadDispatchTargets(): Promise<void> {
@@ -137,7 +142,7 @@
 			const response = await fetch('/dispatch-targets');
 			if (!response.ok) return;
 			const body = (await response.json()) as {
-				defaultAgent?: DispatchAgent;
+				defaultAgent?: DispatchAgent | 'off';
 				configuredAgents?: DispatchAgent[];
 			};
 			dispatchTargets = body.configuredAgents ?? [];

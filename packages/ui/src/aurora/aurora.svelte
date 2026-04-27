@@ -108,47 +108,36 @@
 		};
 	});
 
-	function applyRootStyles(node: HTMLElement) {
-		$effect(() => {
-			node.style.cssText = style || '';
-			if (customPalette?.[0]) node.style.setProperty('--dry-aurora-color-1', customPalette[0]);
-			else node.style.removeProperty('--dry-aurora-color-1');
-			if (customPalette?.[1]) node.style.setProperty('--dry-aurora-color-2', customPalette[1]);
-			else node.style.removeProperty('--dry-aurora-color-2');
-			if (customPalette?.[2]) node.style.setProperty('--dry-aurora-color-3', customPalette[2]);
-			else node.style.removeProperty('--dry-aurora-color-3');
-			node.style.setProperty('--dry-aurora-duration', speedDuration);
-			node.style.setProperty(
-				'--dry-aurora-intensity',
-				String(Math.max(0, Math.min(100, intensity)))
-			);
-			node.style.setProperty('--dry-aurora-waviness', String(Math.max(0, Math.min(100, waviness))));
-		});
-	}
+	let backdropEl = $state<HTMLDivElement>();
 
-	function captureRoot(node: HTMLElement) {
-		rootNode = node;
-		return () => {
-			if (rootNode === node) {
-				rootNode = null;
-			}
-		};
-	}
+	$effect(() => {
+		if (!rootNode) return;
+		const node = rootNode;
+		node.style.cssText = style || '';
+		if (customPalette?.[0]) node.style.setProperty('--dry-aurora-color-1', customPalette[0]);
+		else node.style.removeProperty('--dry-aurora-color-1');
+		if (customPalette?.[1]) node.style.setProperty('--dry-aurora-color-2', customPalette[1]);
+		else node.style.removeProperty('--dry-aurora-color-2');
+		if (customPalette?.[2]) node.style.setProperty('--dry-aurora-color-3', customPalette[2]);
+		else node.style.removeProperty('--dry-aurora-color-3');
+		node.style.setProperty('--dry-aurora-duration', speedDuration);
+		node.style.setProperty('--dry-aurora-intensity', String(Math.max(0, Math.min(100, intensity))));
+		node.style.setProperty('--dry-aurora-waviness', String(Math.max(0, Math.min(100, waviness))));
+	});
 
-	function applyBackdropStyles(node: HTMLElement) {
-		$effect(() => {
-			if (blendMode) node.style.setProperty('--_aurora-backdrop-blend', blendMode);
-			else node.style.removeProperty('--_aurora-backdrop-blend');
-			if (layerOpacity != null)
-				node.style.setProperty('--_aurora-backdrop-opacity', String(layerOpacity));
-			else node.style.removeProperty('--_aurora-backdrop-opacity');
-		});
-	}
+	$effect(() => {
+		if (!backdropEl) return;
+		const node = backdropEl;
+		if (blendMode) node.style.setProperty('--_aurora-backdrop-blend', blendMode);
+		else node.style.removeProperty('--_aurora-backdrop-blend');
+		if (layerOpacity != null)
+			node.style.setProperty('--_aurora-backdrop-opacity', String(layerOpacity));
+		else node.style.removeProperty('--_aurora-backdrop-opacity');
+	});
 </script>
 
 <div
-	{@attach captureRoot}
-	{@attach applyRootStyles}
+	bind:this={rootNode}
 	data-aurora
 	class={className}
 	data-palette={paletteName}
@@ -157,7 +146,7 @@
 	data-color-space={colorSpace}
 	{...rest}
 >
-	<div {@attach applyBackdropStyles} data-aurora-backdrop aria-hidden="true">
+	<div bind:this={backdropEl} data-aurora-backdrop aria-hidden="true">
 		<span data-aurora-layer data-layer="one"></span>
 		<span data-aurora-layer data-layer="two"></span>
 		<span data-aurora-layer data-layer="three"></span>

@@ -38,23 +38,26 @@
 		return value != null && value !== false && value !== 'false';
 	}
 
-	function attachInput(node: HTMLInputElement) {
-		ctx.inputEl = node;
+	let inputEl = $state<HTMLInputElement>();
+	let triggerEl = $state<HTMLLabelElement>();
+
+	$effect(() => {
+		ctx.inputEl = inputEl ?? null;
 		return () => {
-			if (ctx.inputEl === node) {
+			if (ctx.inputEl === inputEl) {
 				ctx.inputEl = null;
 			}
 		};
-	}
+	});
 
-	function attachTrigger(node: HTMLElement) {
-		ctx.triggerEl = node;
+	$effect(() => {
+		ctx.triggerEl = triggerEl ?? null;
 		return () => {
-			if (ctx.triggerEl === node) {
+			if (ctx.triggerEl === triggerEl) {
 				ctx.triggerEl = null;
 			}
 		};
-	}
+	});
 
 	function getOptionItems(contentEl: HTMLElement | null): HTMLElement[] {
 		if (!contentEl) return [];
@@ -154,7 +157,7 @@
 </script>
 
 <label
-	{@attach attachTrigger}
+	bind:this={triggerEl}
 	data-combobox-input
 	data-size={size}
 	data-state={ctx.open ? 'open' : 'closed'}
@@ -170,7 +173,7 @@
 	{/if}
 
 	<input
-		{@attach attachInput}
+		bind:this={inputEl}
 		id={ctx.inputId}
 		type="text"
 		role="combobox"

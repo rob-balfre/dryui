@@ -35,12 +35,15 @@
 	let progress = $derived(((value - min) / (max - min)) * 100);
 	let isPill = $derived(variant === 'pill');
 
-	function applyStyles(node: HTMLElement) {
-		node.style.setProperty('--dry-slider-progress', `${progress}%`);
-	}
+	let el = $state<HTMLSpanElement>();
+
+	$effect(() => {
+		if (!el) return;
+		el.style.setProperty('--dry-slider-progress', `${progress}%`);
+	});
 </script>
 
-<span class="wrapper" {...variantAttrs({ variant, size })} {@attach applyStyles}>
+<span class="wrapper" bind:this={el} {...variantAttrs({ variant, size })}>
 	<input
 		type="range"
 		bind:value

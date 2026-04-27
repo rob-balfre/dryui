@@ -29,23 +29,24 @@
 		onchange?.(value);
 	}
 
-	function setTrackBg(node: HTMLDivElement) {
-		$effect(() => {
-			node.style.setProperty('--_track-bg', `linear-gradient(to right, transparent, ${color})`);
-		});
-	}
+	let trackEl = $state<HTMLDivElement>();
+	let swatchEl = $state<HTMLDivElement>();
 
-	function setSwatchBg(node: HTMLDivElement) {
-		$effect(() => {
-			node.style.setProperty('--_swatch-bg', swatchColor);
-		});
-	}
+	$effect(() => {
+		if (!trackEl) return;
+		trackEl.style.setProperty('--_track-bg', `linear-gradient(to right, transparent, ${color})`);
+	});
+
+	$effect(() => {
+		if (!swatchEl) return;
+		swatchEl.style.setProperty('--_swatch-bg', swatchColor);
+	});
 </script>
 
 <div data-alpha-slider class={className} {...rest}>
 	<div data-alpha-slider-track-wrapper>
 		<div data-alpha-slider-checkerboard></div>
-		<div {@attach setTrackBg} data-alpha-slider-color-track></div>
+		<div bind:this={trackEl} data-alpha-slider-color-track></div>
 		<input
 			type="range"
 			data-alpha-slider-input
@@ -63,7 +64,7 @@
 	<div data-alpha-slider-meta>
 		<div data-alpha-slider-swatch-wrapper>
 			<div data-alpha-slider-checkerboard></div>
-			<div {@attach setSwatchBg} data-alpha-slider-swatch></div>
+			<div bind:this={swatchEl} data-alpha-slider-swatch></div>
 		</div>
 		<span data-alpha-slider-value-label>{value}%</span>
 	</div>
