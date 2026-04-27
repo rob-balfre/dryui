@@ -369,7 +369,7 @@
 	}
 
 	.project-dot[data-status='blocked'] {
-		background: var(--dry-color-fill-danger);
+		background: var(--dry-color-fill-error);
 	}
 
 	.owner-cell {
@@ -391,7 +391,7 @@
 	}
 
 	.change-cell[data-direction='down'] {
-		color: var(--dry-color-text-danger);
+		color: var(--dry-color-text-error);
 	}
 
 	.bottom-row {

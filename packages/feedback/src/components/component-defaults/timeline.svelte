@@ -38,7 +38,7 @@
 		<Timeline.Content>
 			<Timeline.Title>Token consolidation 1.3.5</Timeline.Title>
 			<Timeline.Description>
-				Deprecate --dry-color-accent in favor of --dry-color-primary.
+				Deprecate --dry-color-accent in favor of --dry-color-fill-brand.
 			</Timeline.Description>
 			<Timeline.Time datetime="2026-04-09">Apr 9</Timeline.Time>
 		</Timeline.Content>

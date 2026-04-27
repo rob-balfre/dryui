@@ -22542,7 +22542,7 @@
             "rank": 1,
             "component": "Spotlight",
             "useWhen": "Radial highlight or pointer-follow accent on interactive surfaces",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-primary)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
           },
           {
             "rank": 2,
@@ -25305,13 +25305,13 @@
             "rank": 1,
             "component": "Glow",
             "useWhen": "Static luminous accent on cards, buttons, or hero elements",
-            "snippet": "<Glow color=\"var(--dry-color-primary)\" intensity={0.6} radius={80}>\n  <Card.Root>\n    <Card.Content>Glowing card</Card.Content>\n  </Card.Root>\n</Glow>"
+            "snippet": "<Glow color=\"var(--dry-color-fill-brand)\" intensity={0.6} radius={80}>\n  <Card.Root>\n    <Card.Content>Glowing card</Card.Content>\n  </Card.Root>\n</Glow>"
           },
           {
             "rank": 2,
             "component": "Spotlight",
             "useWhen": "Pointer-reactive lighting instead of a static glow",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-primary)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
           }
         ],
         "antiPatterns": [
@@ -25710,7 +25710,7 @@
           "Card",
           "Text"
         ],
-        "snippet": "<script>\n  import { Spotlight, Reveal, Card, Text } from '@dryui/ui';\n\n  const features = [\n    { title: 'Fast', copy: 'Keeps motion browser-native.' },\n    { title: 'Readable', copy: 'Preserves contrast and hierarchy.' },\n    { title: 'Adaptive', copy: 'Falls back when motion is reduced.' },\n  ];\n</script>\n\n<div class=\"feature-grid\">\n  {#each features as feature, index (feature.title)}\n    <Reveal variant=\"fade\" delay={index * 80}>\n      <Spotlight radius={160} intensity={0.6} color=\"var(--dry-color-primary)\">\n        <Card.Root>\n          <Card.Content>\n            <Text weight=\"bold\">{feature.title}</Text>\n            <Text as=\"p\">{feature.copy}</Text>\n          </Card.Content>\n        </Card.Root>\n      </Spotlight>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-6); }\n</style>"
+        "snippet": "<script>\n  import { Spotlight, Reveal, Card, Text } from '@dryui/ui';\n\n  const features = [\n    { title: 'Fast', copy: 'Keeps motion browser-native.' },\n    { title: 'Readable', copy: 'Preserves contrast and hierarchy.' },\n    { title: 'Adaptive', copy: 'Falls back when motion is reduced.' },\n  ];\n</script>\n\n<div class=\"feature-grid\">\n  {#each features as feature, index (feature.title)}\n    <Reveal variant=\"fade\" delay={index * 80}>\n      <Spotlight radius={160} intensity={0.6} color=\"var(--dry-color-fill-brand)\">\n        <Card.Root>\n          <Card.Content>\n            <Text weight=\"bold\">{feature.title}</Text>\n            <Text as=\"p\">{feature.copy}</Text>\n          </Card.Content>\n        </Card.Root>\n      </Spotlight>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-6); }\n</style>"
       },
       "animated-stats-strip": {
         "name": "animated-stats-strip",

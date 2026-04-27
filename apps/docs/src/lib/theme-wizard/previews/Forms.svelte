@@ -253,8 +253,8 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
-		--dry-typography-text-color: var(--dry-color-text-danger);
-		color: var(--dry-color-text-danger);
+		--dry-typography-text-color: var(--dry-color-text-error);
+		color: var(--dry-color-text-error);
 	}
 
 	.step-list {

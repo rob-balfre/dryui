@@ -91,7 +91,7 @@
 
 	.checkbox-text {
 		font-size: var(--dry-text-sm-size);
-		line-height: var(--dry-text-sm-line);
+		line-height: var(--dry-text-sm-leading);
 		color: var(--dry-color-text-strong);
 		user-select: none;
 	}

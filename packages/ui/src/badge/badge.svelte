@@ -232,7 +232,7 @@
 	[data-variant='soft'][data-color='red'] {
 		--_badge-bg-default: var(--dry-color-fill-error-weak);
 		--_badge-color-default: var(--dry-color-text-error);
-		--_badge-border-default: var(--dry-color-stroke-error-weak);
+		--_badge-border-default: var(--dry-color-stroke-error);
 	}
 
 	[data-variant='soft'][data-color='green'] {

@@ -1233,7 +1233,7 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 1,
 				component: 'Spotlight',
 				useWhen: 'Radial highlight or pointer-follow accent on interactive surfaces',
-				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-primary)">
+				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-fill-brand)">
   <Card.Root>
     <Card.Content>Spotlight card</Card.Content>
   </Card.Root>
@@ -4283,7 +4283,7 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 1,
 				component: 'Glow',
 				useWhen: 'Static luminous accent on cards, buttons, or hero elements',
-				snippet: `<Glow color="var(--dry-color-primary)" intensity={0.6} radius={80}>
+				snippet: `<Glow color="var(--dry-color-fill-brand)" intensity={0.6} radius={80}>
   <Card.Root>
     <Card.Content>Glowing card</Card.Content>
   </Card.Root>
@@ -4293,7 +4293,7 @@ export const componentCompositions: ComponentComposition[] = [
 				rank: 2,
 				component: 'Spotlight',
 				useWhen: 'Pointer-reactive lighting instead of a static glow',
-				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-primary)">
+				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-fill-brand)">
   <Card.Root>
     <Card.Content>Spotlight card</Card.Content>
   </Card.Root>
@@ -4963,7 +4963,7 @@ body {
 <div class="feature-grid">
   {#each features as feature, index (feature.title)}
     <Reveal variant="fade" delay={index * 80}>
-      <Spotlight radius={160} intensity={0.6} color="var(--dry-color-primary)">
+      <Spotlight radius={160} intensity={0.6} color="var(--dry-color-fill-brand)">
         <Card.Root>
           <Card.Content>
             <Text weight="bold">{feature.title}</Text>

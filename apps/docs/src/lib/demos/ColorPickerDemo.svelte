@@ -9,7 +9,7 @@
 		<p class="eyebrow">Theme tokens</p>
 		<p class="title">Brand accent</p>
 		<p class="note">
-			Drives <code>--dry-color-primary</code> across buttons, focus rings, and active states.
+			Drives <code>--dry-color-fill-brand</code> across buttons, focus rings, and active states.
 			Current value: <strong>{brand.toUpperCase()}</strong>.
 		</p>
 	</div>
