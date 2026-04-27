@@ -51,6 +51,32 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.rule).toBe('dryui/no-style-directive');
 	});
 
+	test('flags style area-name directive', () => {
+		const violations = checkMarkup('<Widget style:--dry-grid-area-name="content" />');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-style-directive');
+	});
+
+	test('flags @attach tags', () => {
+		const violations = checkMarkup('<Text {@attach applyClassName}>hello</Text>');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-attach');
+	});
+
+	test('flags multiline @attach tags', () => {
+		const code = `<Text
+  {@attach applyClassName}
+>hello</Text>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-attach');
+	});
+
+	test('does not flag @attach inside comments', () => {
+		const violations = checkMarkup('<!-- <Text {@attach applyClassName}>hello</Text> -->');
+		expect(violations).toHaveLength(0);
+	});
+
 	test('flags <Grid component', () => {
 		const violations = checkMarkup('<Grid columns={3}><div>child</div></Grid>');
 		expect(violations).toHaveLength(1);
@@ -85,22 +111,64 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
-	test('allows AreaGrid when Root and Area custom properties match', () => {
+	test('component-only mode flags raw div and span elements', () => {
+		const violations = checkMarkup(
+			'<div class="grid"><span>text</span></div>',
+			'src/routes/+page.svelte',
+			{ componentsOnly: true }
+		);
+		expect(violations).toHaveLength(2);
+		expect(violations.map((violation) => violation.rule)).toEqual([
+			'dryui/no-raw-element',
+			'dryui/no-raw-element'
+		]);
+		expect(violations[0]!.message).toContain('<div>');
+		expect(violations[1]!.message).toContain('<span>');
+	});
+
+	test('component-only mode allows Svelte components and Svelte special elements', () => {
+		const code = `<svelte:head>
+  <title>Docs</title>
+  <meta name="description" content="DryUI docs" />
+</svelte:head>
+<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <Card.Root --dry-grid-area-name="content">
+    <Button>Save</Button>
+    <slot />
+  </Card.Root>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
+		expect(violations).toHaveLength(0);
+	});
+
+	test('allows AreaGrid when Root templates and component area names match', () => {
 		const code = `<AreaGrid.Root
   --dry-area-grid-template-areas="'masthead' 'nav' 'content'"
   --dry-area-grid-template-areas-wide="'masthead masthead' 'nav content'"
 >
-  <AreaGrid.Area --dry-area-grid-area="masthead">Header</AreaGrid.Area>
-  <AreaGrid.Area --dry-area-grid-area="nav">Nav</AreaGrid.Area>
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="masthead">Header</Widget>
+  <Button --dry-grid-area-name="nav">Nav</Button>
+  <Card.Root --dry-grid-area-name="content">Content</Card.Root>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags native semantic elements with style area names', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'masthead' 'content'">
+  <header style:--dry-grid-area-name="masthead">Header</header>
+  <main style:--dry-grid-area-name="content">Content</main>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(2);
+		expect(violations.every((violation) => violation.rule === 'dryui/no-style-directive')).toBe(
+			true
+		);
+	});
+
 	test('requires AreaGrid.Root template custom property', () => {
 		const code = `<AreaGrid.Root>
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="content">Content</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
@@ -108,23 +176,23 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.message).toContain('--dry-area-grid-template-areas');
 	});
 
-	test('requires AreaGrid.Area area custom property', () => {
+	test('rejects AreaGrid.Area part usage', () => {
 		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
   <AreaGrid.Area>Content</AreaGrid.Area>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
-		expect(violations[0]!.rule).toBe('dryui/area-grid-required-var');
-		expect(violations[0]!.message).toContain('--dry-area-grid-area');
+		expect(violations[0]!.rule).toBe('dryui/area-grid-no-area-part');
+		expect(violations[0]!.message).toContain('--dry-grid-area-name');
 	});
 
-	test('flags AreaGrid.Area names that are missing from a supplied Root template', () => {
+	test('flags child area names that are missing from a supplied Root template', () => {
 		const code = `<AreaGrid.Root
   --dry-area-grid-template-areas="'masthead' 'content'"
   --dry-area-grid-template-areas-wide="'masthead'"
 >
-  <AreaGrid.Area --dry-area-grid-area="masthead">Header</AreaGrid.Area>
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="masthead">Header</Widget>
+  <Widget --dry-grid-area-name="content">Content</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
@@ -132,12 +200,70 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.message).toContain('--dry-area-grid-template-areas-wide');
 	});
 
+	test('rejects more than one AreaGrid.Root per file', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'bar' 'preview'">
+  <AreaGrid.Root --dry-grid-area-name="bar" --dry-area-grid-template-areas="'logo title'">
+    <Widget --dry-grid-area-name="logo">Logo</Widget>
+    <Widget --dry-grid-area-name="title">Title</Widget>
+  </AreaGrid.Root>
+  <Widget --dry-grid-area-name="preview">Preview</Widget>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-single-root');
+		expect(violations[0]!.line).toBe(2);
+	});
+
+	test('ignores commented AreaGrid.Root when enforcing one root per file', () => {
+		const code = `<!-- <AreaGrid.Root --dry-area-grid-template-areas="'ghost'"></AreaGrid.Root> -->
+<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <Widget --dry-grid-area-name="content">Content</Widget>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('requires --dry-grid-area-name to live under AreaGrid.Root', () => {
+		const violations = checkMarkup('<Widget --dry-grid-area-name="content">Content</Widget>');
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-missing-root');
+	});
+
+	test('rejects --dry-grid-area-name on native elements', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <main --dry-grid-area-name="content">Content</main>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-var');
+		expect(violations[0]!.message).toContain('a DryUI/Svelte component');
+	});
+
+	test('rejects style area directives on components through the global style directive ban', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <Widget style:--dry-grid-area-name="content" />
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-style-directive');
+	});
+
+	test('rejects dynamic AreaGrid child area names', () => {
+		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
+  <Widget --dry-grid-area-name={area}>Content</Widget>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-template');
+		expect(violations[0]!.message).toContain('static string literals');
+	});
+
 	test('rejects legacy AreaGrid custom property aliases', () => {
 		const code = `<AreaGrid.Root
   --dry-area-grid-template-areas="'content'"
   --dry-area-grid-columns-wide="1fr"
 >
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="content">Content</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
@@ -150,7 +276,7 @@ describe('checkMarkup', () => {
   --dry-area-grid-template-areas="'content'"
   --dry-area-grid-template-area="'content'"
 >
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="content">Content</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
@@ -160,8 +286,8 @@ describe('checkMarkup', () => {
 
 	test('rejects invalid AreaGrid template area geometry', () => {
 		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'a a' 'a b'">
-  <AreaGrid.Area --dry-area-grid-area="a">A</AreaGrid.Area>
-  <AreaGrid.Area --dry-area-grid-area="b">B</AreaGrid.Area>
+  <Widget --dry-grid-area-name="a">A</Widget>
+  <Widget --dry-grid-area-name="b">B</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(1);
@@ -171,7 +297,7 @@ describe('checkMarkup', () => {
 
 	test('allows intentional AreaGrid template holes without matching Area components', () => {
 		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content' 'reserved'">
-  <AreaGrid.Area --dry-area-grid-area="content">Content</AreaGrid.Area>
+  <Widget --dry-grid-area-name="content">Content</Widget>
 </AreaGrid.Root>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(0);
@@ -196,26 +322,30 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.rule).toBe('dryui/no-component-class');
 	});
 
-	test('does not flag class= on Button (officially supported)', () => {
+	test('flags class= on Button', () => {
 		const violations = checkMarkup('<Button class="my-btn" color="ink">click</Button>');
-		expect(violations).toHaveLength(0);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-component-class');
 	});
 
-	test('does not flag class= on Heading/Text (officially supported)', () => {
+	test('flags class= on Heading/Text', () => {
 		const violations = checkMarkup('<Heading class="hero">Title</Heading>');
-		expect(violations).toHaveLength(0);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-component-class');
 		const violationsText = checkMarkup('<Text class="lede">Body copy</Text>');
-		expect(violationsText).toHaveLength(0);
+		expect(violationsText).toHaveLength(1);
+		expect(violationsText[0]!.rule).toBe('dryui/no-component-class');
 	});
 
-	test('does not flag class= on multi-line Button tag', () => {
+	test('flags class= on multi-line Button tag', () => {
 		const code = `<Button
   variant="solid"
   color="ink"
   class="extra"
 >click</Button>`;
 		const violations = checkMarkup(code);
-		expect(violations).toHaveLength(0);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-component-class');
 	});
 
 	test('does not flag class= on HTML elements', () => {
@@ -724,6 +854,67 @@ describe('checkStyle', () => {
 	test('allows @container queries', () => {
 		const violations = checkStyle('@container (max-width: 36rem) { .foo { --columns: 1fr; } }');
 		expect(violations).toHaveLength(0);
+	});
+
+	test('flags raw grid when the AreaGrid migration rule is enabled', () => {
+		const violations = checkStyle(
+			'.foo { display: grid; grid-template-columns: minmax(0, 1fr) auto; }',
+			{ forbidRawGrid: true },
+			'src/routes/+page.svelte'
+		);
+		expect(violations).toHaveLength(2);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-grid');
+		expect(violations[0]!.message).toContain('display: grid');
+		expect(violations[1]!.message).toContain('grid-template-columns');
+	});
+
+	test('does not allow raw grid with dryui-allow grid comment in migration mode', () => {
+		const violations = checkStyle(
+			'/* dryui-allow grid */\n.foo { display: grid; grid-template-columns: 1fr; }',
+			{ forbidRawGrid: true },
+			'src/routes/+page.svelte'
+		);
+		expect(violations).toHaveLength(2);
+		expect(violations.every((violation) => violation.rule === 'dryui/no-raw-grid')).toBe(true);
+	});
+
+	test('allows AreaGrid internals in raw-grid migration mode', () => {
+		const violations = checkStyle(
+			'[data-area-grid] { display: grid; grid-template-areas: var(--template); }',
+			{ forbidRawGrid: true },
+			'packages/ui/src/area-grid/area-grid-root.svelte'
+		);
+		expect(violations).toHaveLength(0);
+	});
+
+	test('checkSvelteFile can opt into the raw-grid migration rule', () => {
+		const code = `<div class="layout">content</div>
+
+<style>
+  .layout {
+    display: grid;
+  }
+</style>`;
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', { forbidRawGrid: true });
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-grid');
+		expect(violations[0]!.line).toBe(5);
+	});
+
+	test('checkSvelteFile can opt into component-only markup', () => {
+		const code = `<div class="layout">content</div>
+
+<style>
+  .layout {
+    display: block;
+  }
+</style>`;
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', {
+			componentsOnly: true
+		});
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/no-raw-element');
+		expect(violations[0]!.line).toBe(1);
 	});
 
 	test('allows display: flex with dryui-allow flex comment', () => {

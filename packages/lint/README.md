@@ -57,6 +57,10 @@ Options:
   When `true`, violations throw and fail the build. When `false`, violations are logged as warnings.
 - `exclude?: string[]`
   Substring patterns used to skip matching filenames.
+- `forbidRawGrid?: boolean`
+  Experimental migration mode. Flags raw CSS grid declarations so layout moves through `AreaGrid.Root`.
+- `componentsOnly?: boolean`
+  Experimental migration mode. Flags raw native markup tags such as `<div>` and `<span>` so app markup goes through DryUI/Svelte components.
 
 ## Notes
 

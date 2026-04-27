@@ -31,7 +31,23 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-style-directive',
 		severity: 'error',
 		message: 'No style: directives. Use scoped CSS with custom properties.',
-		suggestedFix: 'Move the directive styles into the component <style> block.'
+		suggestedFix:
+			'Move style directives into component props, --dry-* CSS custom properties, or the component <style> block.'
+	},
+	'dryui/no-attach': {
+		id: 'dryui/no-attach',
+		severity: 'error',
+		message:
+			'Do not use {@attach ...}. Use component props, CSS custom properties, or explicit component APIs.',
+		suggestedFix:
+			'Remove the attachment and expose the needed behavior through a component prop or CSS custom property.'
+	},
+	'dryui/no-raw-element': {
+		id: 'dryui/no-raw-element',
+		severity: 'error',
+		message:
+			'Raw <{tag}> is not allowed in component-only mode. Use a DryUI/Svelte component instead.',
+		suggestedFix: 'Replace raw markup with a DryUI component or a dedicated Svelte component.'
 	},
 	'dryui/no-component-class': {
 		id: 'dryui/no-component-class',
@@ -124,11 +140,18 @@ export const RULE_CATALOG = {
 		suggestedFix:
 			'Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.'
 	},
+	'dryui/no-raw-grid': {
+		id: 'dryui/no-raw-grid',
+		severity: 'error',
+		message:
+			'Do not use raw CSS grid ({value}). Use AreaGrid.Root and pass layout through AreaGrid CSS custom properties.',
+		suggestedFix: '<AreaGrid.Root> with --dry-area-grid-* custom properties'
+	},
 	'dryui/area-grid-required-var': {
 		id: 'dryui/area-grid-required-var',
 		severity: 'error',
 		message:
-			'<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and area names on Area with CSS custom properties.',
+			'<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and placed component children use --dry-grid-area-name.',
 		suggestedFix: 'Add the required AreaGrid CSS custom property explicitly.'
 	},
 	'dryui/area-grid-invalid-var': {
@@ -141,15 +164,34 @@ export const RULE_CATALOG = {
 		id: 'dryui/area-grid-invalid-template',
 		severity: 'error',
 		message: '{variable} on <{component}> must be static and valid for AreaGrid: {reason}',
-		suggestedFix: 'Use quoted rows on AreaGrid.Root, or a literal area name on AreaGrid.Area.'
+		suggestedFix:
+			'Use quoted rows on AreaGrid.Root and literal --dry-grid-area-name on a component.'
 	},
 	'dryui/area-grid-missing-area': {
 		id: 'dryui/area-grid-missing-area',
 		severity: 'error',
+		message: 'AreaGrid child area {area} is not present in {variable} on its Root.',
+		suggestedFix: 'Add the area name to every AreaGrid.Root template or update the child area name.'
+	},
+	'dryui/area-grid-missing-root': {
+		id: 'dryui/area-grid-missing-root',
+		severity: 'error',
+		message: '{variable}="{area}" must be used on a child element inside <AreaGrid.Root>.',
+		suggestedFix: 'Move the placed element inside <AreaGrid.Root>.'
+	},
+	'dryui/area-grid-no-area-part': {
+		id: 'dryui/area-grid-no-area-part',
+		severity: 'error',
 		message:
-			'<AreaGrid.Area> uses {area}, but {variable} on its Root does not contain that area name.',
+			'Do not use <AreaGrid.Area>. Place a Svelte component with --dry-grid-area-name="..." instead.',
+		suggestedFix: 'Use --dry-grid-area-name on the placed component.'
+	},
+	'dryui/area-grid-single-root': {
+		id: 'dryui/area-grid-single-root',
+		severity: 'error',
+		message: 'Only one <AreaGrid.Root> is allowed per .svelte file.',
 		suggestedFix:
-			'Add the area name to every AreaGrid.Root template or update --dry-area-grid-area.'
+			'Use one AreaGrid.Root per file and place child components with --dry-grid-area-name.'
 	},
 	'bare-compound': {
 		id: 'bare-compound',

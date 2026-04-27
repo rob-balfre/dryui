@@ -4822,14 +4822,13 @@
     },
     "AreaGrid": {
       "import": "@dryui/ui",
-      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "description": "grid-template-areas layout with component CSS variable-driven child area names",
       "category": "layout",
       "tags": [
         "layout",
         "grid",
         "areas",
-        "template",
-        "compound"
+        "template"
       ],
       "compound": true,
       "parts": {
@@ -4861,6 +4860,11 @@
               ],
               "default": "'none'"
             },
+            "fill": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
             "debug": {
               "type": "boolean",
               "required": false,
@@ -4886,50 +4890,11 @@
             ],
             "note": "Forwards <element> attributes via rest props."
           }
-        },
-        "Area": {
-          "props": {
-            "as": {
-              "type": "| 'section'\n\t| 'header'\n\t| 'main'\n\t| 'nav'\n\t| 'aside'\n\t| 'article'\n\t| 'footer'",
-              "required": false,
-              "acceptedValues": [
-                "section",
-                "header",
-                "main",
-                "nav",
-                "aside",
-                "article",
-                "footer"
-              ],
-              "description": "Underlying HTML element to render for the component.",
-              "default": "'section'"
-            },
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'children'>",
-            "via": "rest",
-            "element": "element",
-            "examples": [
-              "id",
-              "class",
-              "aria-label"
-            ],
-            "omitted": [
-              "children"
-            ],
-            "note": "Forwards <element> attributes via rest props."
-          }
         }
       },
       "structure": {
         "tree": [
-          "AreaGrid.Root",
-          "  AreaGrid.Area"
+          "AreaGrid.Root"
         ]
       },
       "a11y": [
@@ -4938,7 +4903,6 @@
       ],
       "cssVars": {
         "--dry-area-grid-align-items": "Grid Align Items",
-        "--dry-area-grid-area": "Grid Area",
         "--dry-area-grid-area-bg": "Grid Area Bg",
         "--dry-area-grid-area-border": "Grid Area Border",
         "--dry-area-grid-area-color": "Grid Area Color",
@@ -4959,14 +4923,12 @@
         "--dry-area-grid-template-columns-xl": "Grid Template Columns Xl",
         "--dry-area-grid-template-rows": "Grid Template Rows",
         "--dry-area-grid-template-rows-wide": "Grid Template Rows Wide",
-        "--dry-area-grid-template-rows-xl": "Grid Template Rows Xl"
+        "--dry-area-grid-template-rows-xl": "Grid Template Rows Xl",
+        "--dry-grid-area-name": "Area Name"
       },
       "dataAttributes": [
         {
           "name": "data-area-grid"
-        },
-        {
-          "name": "data-area-grid-area"
         },
         {
           "name": "data-area-grid-shell"
@@ -4975,13 +4937,16 @@
           "name": "data-debug"
         },
         {
+          "name": "data-fill"
+        },
+        {
           "name": "data-gap"
         },
         {
           "name": "data-padding"
         }
       ],
-      "example": "<AreaGrid.Root>\n  <AreaGrid.Area>...</AreaGrid.Area>\n</AreaGrid.Root>"
+      "example": "<AreaGrid.Root\n  --dry-area-grid-template-areas=\"'header' 'content'\"\n>\n  <Card.Root --dry-grid-area-name=\"header\">\n    <Card.Header>Header</Card.Header>\n  </Card.Root>\n  <Card.Root --dry-grid-area-name=\"content\">\n    <Card.Content>Content</Card.Content>\n  </Card.Root>\n</AreaGrid.Root>"
     },
     "Separator": {
       "import": "@dryui/ui",
@@ -8840,13 +8805,9 @@
               "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
               "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch."
             },
-            "className": {
-              "type": "HTMLAttributes<HTMLElement>['class']",
-              "required": false
-            },
             "children": {
               "type": "Snippet",
-              "required": true,
+              "required": false,
               "description": "Content rendered inside the component."
             },
             "color": {
@@ -8873,13 +8834,16 @@
             }
           },
           "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLElement>",
+            "baseType": "Omit<HTMLAttributes<HTMLElement>, 'class'>",
             "via": "rest",
             "element": "element",
             "examples": [
               "id",
               "class",
               "aria-label"
+            ],
+            "omitted": [
+              "class"
             ],
             "note": "Forwards <element> attributes via rest props."
           }
@@ -9119,24 +9083,23 @@
           "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure.",
           "default": "false"
         },
-        "className": {
-          "type": "HTMLAttributes<HTMLElement>['class']",
-          "required": false
-        },
         "children": {
           "type": "Snippet",
-          "required": true,
+          "required": false,
           "description": "Content rendered inside the component."
         }
       },
       "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLElement>",
+        "baseType": "Omit<HTMLAttributes<HTMLElement>, 'class'>",
         "via": "rest",
         "element": "element",
         "examples": [
           "id",
           "class",
           "aria-label"
+        ],
+        "omitted": [
+          "class"
         ],
         "note": "Forwards <element> attributes via rest props."
       },
@@ -15186,7 +15149,17 @@
         "Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.",
         "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content."
       ],
-      "cssVars": {},
+      "cssVars": {
+        "--dry-tour-arrow-size": "Arrow Size",
+        "--dry-tour-overlay-color": "Overlay Color",
+        "--dry-tour-spotlight-padding": "Spotlight Padding",
+        "--dry-tour-spotlight-radius": "Spotlight Radius",
+        "--dry-tour-spotlight-ring": "Spotlight Ring",
+        "--dry-tour-tooltip-bg": "Tooltip Bg",
+        "--dry-tour-tooltip-max-width": "Tooltip Max Width",
+        "--dry-tour-tooltip-radius": "Tooltip Radius",
+        "--dry-tour-tooltip-shadow": "Tooltip Shadow"
+      },
       "dataAttributes": [
         {
           "name": "data-part"
@@ -21398,26 +21371,45 @@
       ],
       "compound": false,
       "props": {
+        "as": {
+          "type": "'div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section'",
+          "required": false,
+          "acceptedValues": [
+            "div",
+            "span",
+            "header",
+            "nav",
+            "main",
+            "footer",
+            "section"
+          ],
+          "description": "Underlying HTML element to render for the component.",
+          "default": "'div'"
+        },
         "background": {
           "type": "string",
           "required": false
         },
+        "className": {
+          "type": "HTMLAttributes<HTMLElement>['class']",
+          "required": false
+        },
         "children": {
           "type": "Snippet",
-          "required": true,
+          "required": false,
           "description": "Content rendered inside the component."
         }
       },
       "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLDivElement>",
+        "baseType": "HTMLAttributes<HTMLElement>",
         "via": "rest",
-        "element": "div",
+        "element": "element",
         "examples": [
           "id",
-          "style",
-          "role"
+          "class",
+          "aria-label"
         ],
-        "note": "Forwards <div> attributes via rest props."
+        "note": "Forwards <element> attributes via rest props."
       },
       "a11y": [
         "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",

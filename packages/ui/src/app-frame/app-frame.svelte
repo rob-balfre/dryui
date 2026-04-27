@@ -32,12 +32,14 @@
 
 <style>
 	[data-app-frame] {
+		block-size: var(--dry-app-frame-block-size, auto);
 		display: grid;
 		grid-template-rows: auto minmax(0, 1fr);
+		min-block-size: var(--dry-app-frame-min-block-size, 0);
 		border: 1px solid var(--dry-app-frame-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-app-frame-radius, var(--dry-radius-xl));
 		background: var(--dry-app-frame-bg, var(--dry-color-bg-base));
-		overflow: clip;
+		overflow: var(--dry-app-frame-overflow, clip);
 		transition:
 			background-color var(--dry-app-frame-transition, 0s) ease,
 			border-color var(--dry-app-frame-transition, 0s) ease;
@@ -126,6 +128,7 @@
 		display: grid;
 		padding: var(--dry-app-frame-content-padding, 0);
 		min-block-size: 0;
+		overflow: var(--dry-app-frame-content-overflow, visible);
 	}
 
 	@media (prefers-reduced-motion: reduce) {

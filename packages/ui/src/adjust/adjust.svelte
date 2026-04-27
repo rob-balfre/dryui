@@ -60,8 +60,11 @@
 
 <style>
 	[data-adjust] {
+		block-size: var(--dry-adjust-block-size, auto);
 		border-radius: inherit;
 		filter: var(--_filter, none);
+		min-block-size: var(--dry-adjust-min-block-size, 0);
 		mix-blend-mode: var(--_blend, normal);
+		overflow: var(--dry-adjust-overflow, visible);
 	}
 </style>

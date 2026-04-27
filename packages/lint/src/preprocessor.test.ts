@@ -82,6 +82,36 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
+	test('style hook can opt into raw grid warnings', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
+		const pp = dryuiLint({ forbidRawGrid: true });
+		pp.style!({
+			content: '.foo { display: grid; }',
+			attributes: {},
+			markup: '',
+			filename: 'test.svelte'
+		});
+		expect(spy).toHaveBeenCalled();
+		const msg = spy.mock.calls[0]![0] as string;
+		expect(msg).toContain('dryui/no-raw-grid');
+		spy.mockRestore();
+	});
+
+	test('markup hook can opt into component-only warnings', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
+		const pp = dryuiLint({ componentsOnly: true });
+		pp.markup!({
+			content: '<div><span>content</span></div>',
+			filename: 'test.svelte'
+		});
+		expect(spy).toHaveBeenCalledTimes(2);
+		const messages = spy.mock.calls.map((call) => call[0] as string);
+		expect(messages[0]).toContain('dryui/no-raw-element');
+		expect(messages[0]).toContain('<div>');
+		expect(messages[1]).toContain('<span>');
+		spy.mockRestore();
+	});
+
 	test('strict mode throws on violation', () => {
 		const pp = dryuiLint({ strict: true });
 		expect(() => {
@@ -198,5 +228,15 @@ describe('dryuiLint preprocessor', () => {
 				filename: 'mega-menu-trigger.svelte'
 			});
 		}).toThrow('dryui/no-raw-native-element');
+	});
+
+	test('strict component-only mode throws on raw elements', () => {
+		const pp = dryuiLint({ strict: true, componentsOnly: true });
+		expect(() => {
+			pp.markup!({
+				content: '<div>content</div>',
+				filename: 'test.svelte'
+			});
+		}).toThrow('dryui/no-raw-element');
 	});
 });

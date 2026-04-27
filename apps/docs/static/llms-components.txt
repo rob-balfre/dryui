@@ -1462,33 +1462,30 @@ Example:
 ## AreaGrid
 Package: @dryui/ui
 Category: layout
-Tags: layout, grid, areas, template, compound
+Tags: layout, grid, areas, template
 Kind: compound
 Root import: import { AreaGrid } from '@dryui/ui'
 Subpath import: import { AreaGrid } from '@dryui/ui/area-grid'
 Parts:
 - AreaGrid.Root
-  Props: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'md' | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'none' | debug (boolean), default false | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <element> attributes via rest props.
-- AreaGrid.Area
-  Props: as (| 'section'
-	| 'header'
-	| 'main'
-	| 'nav'
-	| 'aside'
-	| 'article'
-	| 'footer'), Underlying HTML element to render for the component., accepted section, header, main, nav, aside, article, footer, default 'section' | children (Snippet), Content rendered inside the component., required
+  Props: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'md' | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'none' | fill (boolean), default false | debug (boolean), default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <element> attributes via rest props.
 Structure:
   AreaGrid.Root
-    AreaGrid.Area
-CSS variables: --dry-area-grid-align-items, --dry-area-grid-area, --dry-area-grid-area-bg, --dry-area-grid-area-border, --dry-area-grid-area-color, --dry-area-grid-area-display, --dry-area-grid-area-gap, --dry-area-grid-area-padding, --dry-area-grid-area-radius, --dry-area-grid-auto-flow, --dry-area-grid-auto-rows, --dry-area-grid-gap, --dry-area-grid-justify-items, --dry-area-grid-padding, --dry-area-grid-template-areas, --dry-area-grid-template-areas-wide, --dry-area-grid-template-areas-xl, --dry-area-grid-template-columns, --dry-area-grid-template-columns-wide, --dry-area-grid-template-columns-xl, --dry-area-grid-template-rows, --dry-area-grid-template-rows-wide, --dry-area-grid-template-rows-xl
-Data attributes: data-area-grid | data-area-grid-area | data-area-grid-shell | data-debug | data-gap | data-padding
+CSS variables: --dry-area-grid-align-items, --dry-area-grid-area-bg, --dry-area-grid-area-border, --dry-area-grid-area-color, --dry-area-grid-area-display, --dry-area-grid-area-gap, --dry-area-grid-area-padding, --dry-area-grid-area-radius, --dry-area-grid-auto-flow, --dry-area-grid-auto-rows, --dry-area-grid-gap, --dry-area-grid-justify-items, --dry-area-grid-padding, --dry-area-grid-template-areas, --dry-area-grid-template-areas-wide, --dry-area-grid-template-areas-xl, --dry-area-grid-template-columns, --dry-area-grid-template-columns-wide, --dry-area-grid-template-columns-xl, --dry-area-grid-template-rows, --dry-area-grid-template-rows-wide, --dry-area-grid-template-rows-xl, --dry-grid-area-name
+Data attributes: data-area-grid | data-area-grid-shell | data-debug | data-fill | data-gap | data-padding
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
-<AreaGrid.Root>
-  <AreaGrid.Area>...</AreaGrid.Area>
+<AreaGrid.Root
+  --dry-area-grid-template-areas="'header' 'content'"
+>
+  <Card.Root --dry-grid-area-name="header">
+    <Card.Header>Header</Card.Header>
+  </Card.Root>
+  <Card.Root --dry-grid-area-name="content">
+    <Card.Content>Content</Card.Content>
+  </Card.Root>
 </AreaGrid.Root>
 ```
 
@@ -1829,8 +1826,8 @@ Category: layout
 Tags: surface, background, container, panel
 Kind: simple
 Root import: import { Surface } from '@dryui/primitives'
-Props: background (string) | children (Snippet), Content rendered inside the component., required
-Native props: Forwards <div> attributes via rest props.
+Props: as ('div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section'), Underlying HTML element to render for the component., accepted div, span, header, nav, main, footer, section, default 'div' | background (string) | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component.
+Native props: Forwards <element> attributes via rest props.
 CSS variables: none
 Data attributes: none
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
@@ -2797,7 +2794,7 @@ Parts:
 Structure:
   Tour.Root
     Tour.Tooltip
-CSS variables: none
+CSS variables: --dry-tour-arrow-size, --dry-tour-overlay-color, --dry-tour-spotlight-padding, --dry-tour-spotlight-radius, --dry-tour-spotlight-ring, --dry-tour-tooltip-bg, --dry-tour-tooltip-max-width, --dry-tour-tooltip-radius, --dry-tour-tooltip-shadow
 Data attributes: data-part | data-placement | data-tour-next | data-tour-overlay | data-tour-prev | data-tour-root | data-tour-skip | data-tour-spotlight | data-tour-tooltip | data-tour-tooltip-actions | data-tour-tooltip-content | data-tour-tooltip-counter | data-tour-tooltip-default | data-tour-tooltip-footer | data-tour-tooltip-title
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.
 Example:
@@ -3397,7 +3394,7 @@ Parts:
   Props: level (1 | 2 | 3 | 4 | 5 | 6), Heading level used to render semantic h1 through h6 output., accepted 1, 2, 3, 4, 5, 6 | variant ('default' | 'display'), Visual style preset for the component., accepted default, display, variant='display' uses --dry-font-display, which defaults to --dry-font-sans. Override --dry-font-display on body or a scoped wrapper (not :root) for a distinct display typeface. | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. | className (HTMLAttributes<HTMLHeadingElement>['class']) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <h*> attributes via rest props.
 - Typography.Text
-  Props: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label
+  Props: as ('p' | 'span' | 'div'), Text element to render for inline, block, or paragraph copy., accepted p, span, div | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. | children (Snippet), Content rendered inside the component. | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, Use muted or secondary for supporting copy without reaching for inline color styles. | variant ('default' | 'muted' | 'secondary' | 'label'), Visual style preset for the component., accepted default, muted, secondary, label
   Native props: Forwards <element> attributes via rest props.
 - Typography.Code
   Props: children (Snippet), Content rendered inside the component., required
@@ -3438,7 +3435,7 @@ Tags: text, copy, paragraph, typography
 Kind: simple
 Root import: import { Text } from '@dryui/ui'
 Subpath import: import { Text } from '@dryui/ui/text'
-Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, default false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure. | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component., required
+Props: as ('p' | 'span' | 'div'), Underlying HTML element to render for the component., accepted p, span, div, default 'p' | color ('default' | 'muted' | 'secondary'), Semantic color or tone applied to the component., accepted default, muted, secondary, default 'default', Use muted or secondary for supporting copy without reaching for inline color styles. | size ('xs' | 'sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, default 'md', Applies DryUI text scale tokens for compact or emphasized body copy. | font ('sans' | 'mono'), accepted sans, mono, default 'sans' | weight ('normal' | 'medium' | 'semibold' | 'bold'), accepted normal, medium, semibold, bold | variant ('default' | 'label'), Visual style preset for the component., accepted default, label, default 'default' | maxMeasure ('narrow' | 'default' | 'wide' | false), Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out., accepted narrow, default, wide, false, default false, Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <element> attributes via rest props.
 CSS variables: --dry-typography-text-color
 Data attributes: data-color | data-font | data-measure | data-size | data-variant | data-weight

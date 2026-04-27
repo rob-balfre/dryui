@@ -3,7 +3,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { variantAttrs } from '@dryui/primitives';
 
-	interface Props extends HTMLAttributes<HTMLElement> {
+	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'class'> {
 		as?: 'p' | 'span' | 'div';
 		color?: 'default' | 'muted' | 'secondary';
 		size?: 'xs' | 'sm' | 'md' | 'lg';
@@ -11,8 +11,7 @@
 		weight?: 'normal' | 'medium' | 'semibold' | 'bold';
 		variant?: 'default' | 'label';
 		maxMeasure?: 'narrow' | 'default' | 'wide' | false;
-		className?: HTMLAttributes<HTMLElement>['class'];
-		children: Snippet;
+		children?: Snippet;
 	}
 
 	let {
@@ -23,8 +22,6 @@
 		weight,
 		variant = 'default',
 		maxMeasure = false,
-		class: classAttr,
-		className = classAttr,
 		children,
 		...rest
 	}: Props = $props();
@@ -36,25 +33,22 @@
 
 {#if as === 'span'}
 	<span
-		class={className}
 		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
-		{...rest}>{@render children()}</span
+		{...rest}>{@render children?.()}</span
 	>
 {:else if as === 'div'}
 	<div
-		class={className}
 		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
 		{...rest}
 	>
-		{@render children()}
+		{@render children?.()}
 	</div>
 {:else}
 	<p
-		class={className}
 		{...variantAttrs({ color, size, font, weight: weight || undefined, variant, measure })}
 		{...rest}
 	>
-		{@render children()}
+		{@render children?.()}
 	</p>
 {/if}
 

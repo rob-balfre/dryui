@@ -5,6 +5,17 @@ import { RULE_CATALOG, type RuleSeverity } from './rule-catalog.js';
 export interface DryuiLintOptions {
 	strict?: boolean;
 	exclude?: string[];
+	/**
+	 * Experimental migration rule. When enabled, raw CSS grid declarations are
+	 * flagged so app/layout code can move through AreaGrid.Root instead.
+	 */
+	forbidRawGrid?: boolean;
+	/**
+	 * Experimental migration rule. When enabled, markup may only use Svelte/DryUI
+	 * component tags and Svelte special elements; raw native tags such as <div>
+	 * and <span> are flagged.
+	 */
+	componentsOnly?: boolean;
 }
 
 function formatViolation(filename: string, v: Violation): string {
@@ -48,6 +59,8 @@ function isExcluded(filename: string, patterns: string[]): boolean {
 export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 	const strict = options?.strict ?? false;
 	const exclude = options?.exclude ?? [];
+	const forbidRawGrid = options?.forbidRawGrid ?? false;
+	const componentsOnly = options?.componentsOnly ?? false;
 
 	return {
 		name: 'dryui-lint',
@@ -62,14 +75,14 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 		markup({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, exclude)) return;
-			const violations = checkMarkup(content, f);
+			const violations = checkMarkup(content, f, { componentsOnly });
 			report(f, violations, strict);
 		},
 
 		style({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, exclude)) return;
-			const violations = checkStyle(content);
+			const violations = checkStyle(content, { forbidRawGrid }, f);
 			report(f, violations, strict);
 		}
 	};

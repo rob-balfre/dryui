@@ -1,4 +1,6 @@
 <script lang="ts">
+	import './area-grid-root.css';
+
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
@@ -7,6 +9,7 @@
 	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 		gap?: AreaGridSpace;
 		padding?: AreaGridSpace;
+		fill?: boolean;
 		debug?: boolean;
 		children: Snippet;
 	}
@@ -14,6 +17,7 @@
 	let {
 		gap = 'md',
 		padding = 'none',
+		fill = false,
 		debug = false,
 		children,
 		class: className,
@@ -21,7 +25,14 @@
 	}: Props = $props();
 </script>
 
-<section data-area-grid-shell data-gap={gap} data-padding={padding} class={className} {...rest}>
+<section
+	data-area-grid-shell
+	data-gap={gap}
+	data-padding={padding}
+	data-fill={fill || undefined}
+	class={className}
+	{...rest}
+>
 	<section data-area-grid data-debug={debug || undefined}>
 		{@render children()}
 	</section>
@@ -37,7 +48,14 @@
 		padding: var(--dry-area-grid-padding);
 	}
 
+	[data-area-grid-shell][data-fill],
+	[data-area-grid-shell][data-fill] > [data-area-grid] {
+		block-size: 100%;
+		min-block-size: 0;
+	}
+
 	[data-area-grid] {
+		--dry-grid-area-name: auto;
 		--_dry-area-grid-columns: var(
 			--dry-area-grid-template-columns,
 			var(--dry-area-grid-columns, minmax(0, 1fr))

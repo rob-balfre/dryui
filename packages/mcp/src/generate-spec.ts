@@ -1390,6 +1390,16 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	Separator: '<Separator />',
 	Spacer: '<Spacer size="lg" />',
 	Container: '<Container>\n  <p>Centered content</p>\n</Container>',
+	AreaGrid: `<AreaGrid.Root
+  --dry-area-grid-template-areas="'header' 'content'"
+>
+  <Card.Root --dry-grid-area-name="header">
+    <Card.Header>Header</Card.Header>
+  </Card.Root>
+  <Card.Root --dry-grid-area-name="content">
+    <Card.Content>Content</Card.Content>
+  </Card.Root>
+</AreaGrid.Root>`,
 	Avatar: '<Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />',
 	ChatThread:
 		'<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>',
@@ -1688,6 +1698,10 @@ async function main(): Promise<void> {
 		const dataAttributes = new Set<string>();
 		const entries = await readdir(dirPath, { withFileTypes: true });
 
+		function isStyleSurfaceFile(name: string): boolean {
+			return name.endsWith('.svelte') || name.endsWith('.css');
+		}
+
 		async function scanForStyleSurface(
 			filePath: string,
 			filters?: { cssVarPrefixes?: string[]; dataAttrPrefixes?: string[] }
@@ -1725,7 +1739,7 @@ async function main(): Promise<void> {
 
 		for (const entry of entries) {
 			if (!entry.isFile()) continue;
-			if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
+			if (!isStyleSurfaceFile(entry.name)) continue;
 			await scanForStyleSurface(join(dirPath, entry.name));
 		}
 
@@ -1774,7 +1788,7 @@ async function main(): Promise<void> {
 			const primEntries = await readdir(primDirPath, { withFileTypes: true });
 			for (const entry of primEntries) {
 				if (!entry.isFile()) continue;
-				if (!entry.name.endsWith('.module.css') && !entry.name.endsWith('.svelte')) continue;
+				if (!isStyleSurfaceFile(entry.name)) continue;
 				const source = await readText(join(primDirPath, entry.name));
 
 				for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {

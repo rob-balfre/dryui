@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
 	import { Card, Container, Diagram } from '@dryui/ui';
 	import type { DiagramConfig } from '@dryui/ui';
 	import {
@@ -70,6 +71,14 @@
 	function getDiagramWidth(config: DiagramConfig): number {
 		const cols = getDiagramColumns(config);
 		return cols * NODE_WIDTH + (cols - 1) * sharedSpacing.nodeGap + DIAGRAM_MARGIN * 2;
+	}
+
+	function diagramWidth(config: DiagramConfig): Attachment<HTMLDivElement> {
+		const width = `${getDiagramWidth(config)}px`;
+		return (node) => {
+			node.style.setProperty('--diagram-width', width);
+			return () => node.style.removeProperty('--diagram-width');
+		};
 	}
 
 	const primitivesDiagram: DiagramConfig = {
@@ -806,7 +815,7 @@
 				<DocsSectionIntro id={mod.id} title={mod.title} description={mod.description} />
 				<Card.Root>
 					<Card.Content>
-						<div class="diagram-shell" style:--diagram-width="{getDiagramWidth(mod.diagram)}px">
+						<div class="diagram-shell" {@attach diagramWidth(mod.diagram)}>
 							<Diagram config={mod.diagram} />
 						</div>
 					</Card.Content>

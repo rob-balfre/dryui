@@ -3,7 +3,7 @@
   "packageVersion": "3.0.0",
   "summary": {
     "componentNodes": 300,
-    "partNodes": 658,
+    "partNodes": 657,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 146,
@@ -8754,7 +8754,7 @@
       "package": "ui",
       "layer": "ui-composite",
       "category": "layout",
-      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "description": "grid-template-areas layout with component CSS variable-driven child area names",
       "visibility": "root",
       "sourcePath": "packages/ui/src/area-grid/index.ts",
       "publicImport": "@dryui/ui",
@@ -8762,30 +8762,15 @@
         "layout",
         "grid",
         "areas",
-        "template",
-        "compound"
+        "template"
       ],
       "compound": true,
       "parts": [
-        "Root",
-        "Area"
+        "Root"
       ],
-      "sourceFileCount": 4,
+      "sourceFileCount": 3,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
-    },
-    {
-      "id": "ui:AreaGrid.Area",
-      "name": "AreaGrid.Area",
-      "label": "Area",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "layout",
-      "description": "Area part for AreaGrid.",
-      "tags": [],
-      "compound": false,
-      "parts": []
     },
     {
       "id": "ui:AreaGrid.Root",
@@ -19360,13 +19345,6 @@
       "from": "ui:AlertDialog",
       "to": "ui:AlertDialog.Trigger",
       "label": "Trigger"
-    },
-    {
-      "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Area:Area",
-      "type": "compound_part",
-      "from": "ui:AreaGrid",
-      "to": "ui:AreaGrid.Area",
-      "label": "Area"
     },
     {
       "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Root:Root",
