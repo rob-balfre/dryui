@@ -1,7 +1,7 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 
-export interface TextProps extends HTMLAttributes<HTMLElement> {
+export interface TextProps extends Omit<HTMLAttributes<HTMLElement>, 'class'> {
 	as?: 'p' | 'span' | 'div';
 	color?: 'default' | 'muted' | 'secondary';
 	size?: 'xs' | 'sm' | 'md' | 'lg';
@@ -14,8 +14,7 @@ export interface TextProps extends HTMLAttributes<HTMLElement> {
 	 * `narrow` ≈ 48ch, `default` ≈ 65ch, `wide` ≈ 80ch.
 	 */
 	maxMeasure?: 'narrow' | 'default' | 'wide' | false;
-	className?: HTMLAttributes<HTMLElement>['class'];
-	children: Snippet;
+	children?: Snippet;
 }
 
 export { default as Text } from './text.svelte';

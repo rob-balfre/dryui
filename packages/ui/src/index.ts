@@ -214,12 +214,7 @@ export { Container } from './container/index.js';
 export type { ContainerProps } from './container/index.js';
 
 export { AreaGrid } from './area-grid/index.js';
-export type {
-	AreaGridAreaElement,
-	AreaGridAreaProps,
-	AreaGridRootProps,
-	AreaGridSpace
-} from './area-grid/index.js';
+export type { AreaGridRootProps, AreaGridSpace } from './area-grid/index.js';
 
 export { Separator } from './separator/index.js';
 export type { SeparatorProps } from './separator/index.js';

@@ -6,10 +6,10 @@
 		children: Snippet;
 	}
 
-	let { class: className, children, ...rest }: Props = $props();
+	let { class: classAttr, children, ...rest }: Props = $props();
 </script>
 
-<code class={className} {...rest}>{@render children()}</code>
+<code class={classAttr} {...rest}>{@render children()}</code>
 
 <style>
 	code {

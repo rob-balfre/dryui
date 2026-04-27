@@ -1,6 +1,8 @@
 dryui/no-layout-component	error	Do not {action} {target}. Use {guidance}.	Use raw CSS grid with custom properties instead.
 dryui/no-inline-style	error	No inline style attributes. Use scoped CSS with custom properties.	Move the inline styles into the component <style> block.
-dryui/no-style-directive	error	No style: directives. Use scoped CSS with custom properties.	Move the directive styles into the component <style> block.
+dryui/no-style-directive	error	No style: directives. Use scoped CSS with custom properties.	Move style directives into component props, --dry-* CSS custom properties, or the component <style> block.
+dryui/no-attach	error	Do not use {@attach ...}. Use component props, CSS custom properties, or explicit component APIs.	Remove the attachment and expose the needed behavior through a component prop or CSS custom property.
+dryui/no-raw-element	error	Raw <{tag}> is not allowed in component-only mode. Use a DryUI/Svelte component instead.	Replace raw markup with a DryUI component or a dedicated Svelte component.
 dryui/no-component-class	error	Do not pass class= to <{component}>. Svelte components ignore class attributes. Use --dry-* CSS custom properties for styling overrides.	Replace class= overrides with component props or --dry-* CSS custom properties.
 dryui/no-css-ignore	error	Do not use <!-- svelte-ignore css_unused_selector -->. Fix the underlying CSS issue instead of suppressing the warning.	Remove the ignore comment and fix the unused selector.
 dryui/no-svelte-element	error	Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).	Replace <svelte:element> with explicit markup branches.
@@ -14,10 +16,14 @@ dryui/no-global	error	Do not use :global(). Use scoped styles, data-* attributes
 dryui/no-media-sizing	error	Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.	Replace the sizing media query with a container query.
 dryui/prefer-focus-ring-token	error	Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).	Use outline: var(--dry-focus-ring) plus the correct outline-offset.
 dryui/no-partial-inset-shadow	error	Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.	Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.
-dryui/area-grid-required-var	error	<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and area names on Area with CSS custom properties.	Add the required AreaGrid CSS custom property explicitly.
+dryui/no-raw-grid	error	Do not use raw CSS grid ({value}). Use AreaGrid.Root and pass layout through AreaGrid CSS custom properties.	<AreaGrid.Root> with --dry-area-grid-* custom properties
+dryui/area-grid-required-var	error	<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and placed component children use --dry-grid-area-name.	Add the required AreaGrid CSS custom property explicitly.
 dryui/area-grid-invalid-var	error	{variable} is not supported on <{component}>. Use {target}.	Use the documented AreaGrid CSS custom property names.
-dryui/area-grid-invalid-template	error	{variable} on <{component}> must be static and valid for AreaGrid: {reason}	Use quoted rows on AreaGrid.Root, or a literal area name on AreaGrid.Area.
-dryui/area-grid-missing-area	error	<AreaGrid.Area> uses {area}, but {variable} on its Root does not contain that area name.	Add the area name to every AreaGrid.Root template or update --dry-area-grid-area.
+dryui/area-grid-invalid-template	error	{variable} on <{component}> must be static and valid for AreaGrid: {reason}	Use quoted rows on AreaGrid.Root and literal --dry-grid-area-name on a component.
+dryui/area-grid-missing-area	error	AreaGrid child area {area} is not present in {variable} on its Root.	Add the area name to every AreaGrid.Root template or update the child area name.
+dryui/area-grid-missing-root	error	{variable}="{area}" must be used on a child element inside <AreaGrid.Root>.	Move the placed element inside <AreaGrid.Root>.
+dryui/area-grid-no-area-part	error	Do not use <AreaGrid.Area>. Place a Svelte component with --dry-grid-area-name="..." instead.	Use --dry-grid-area-name on the placed component.
+dryui/area-grid-single-root	error	Only one <AreaGrid.Root> is allowed per .svelte file.	Use one AreaGrid.Root per file and place child components with --dry-grid-area-name.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	

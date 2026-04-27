@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Attachment } from 'svelte/attachments';
 	import { Card } from '@dryui/ui/card';
 	import { SegmentedControl } from '@dryui/ui/segmented-control';
 	import { Text } from '@dryui/ui/text';
@@ -24,6 +25,13 @@
 		stack: FONT_STACKS[name],
 		sample: FONT_SAMPLES[name]
 	}));
+
+	function fontStack(stack: string): Attachment<HTMLElement> {
+		return (node) => {
+			node.style.setProperty('--_stack', stack);
+			return () => node.style.removeProperty('--_stack');
+		};
+	}
 </script>
 
 <section class="typography-section">
@@ -37,7 +45,7 @@
 				onclick={() => setFontPreset(preset.name)}
 			>
 				<Card.Content>
-					<div class="font-option" style:--_stack={preset.stack}>
+					<div class="font-option" {@attach fontStack(preset.stack)}>
 						<span class="font-display">Ag</span>
 						<div class="font-meta">
 							<Text as="span" size="sm" weight="semibold">{preset.name}</Text>

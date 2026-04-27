@@ -10,7 +10,6 @@ export interface TextProps extends Omit<SharedTextProps, 'color' | 'variant'> {
 	size?: SharedTextProps['size'];
 	font?: SharedTextProps['font'];
 	weight?: SharedTextProps['weight'];
-	className?: SharedTextProps['className'];
 }
 
 import TypographyHeading from './heading.svelte';

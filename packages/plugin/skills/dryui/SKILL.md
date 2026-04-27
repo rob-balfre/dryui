@@ -1,213 +1,72 @@
 ---
 name: dryui
-description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, and accessibility. Use the CLI as the default entry point; MCP mirrors the same workflow when available.'
+description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, accessibility, and the CSS / lint discipline. Prefer MCP `ask` / `check`; CLI `dryui ask` / `dryui check` mirror the same surface.'
 ---
 
 # DryUI
 
-Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a theme CSS import. Svelte 5 runes only.
+Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Theme CSS import required. Svelte 5 runes only.
 
-**Tradeoff:** These rules bias toward correctness over speed. For throwaway prototypes, use judgment.
+**Tradeoff:** these rules bias toward correctness over speed. For throwaway prototypes, use judgment.
 
-## UI Creation Pipeline
+## The 8 rules
 
-DryUI work is explicit. Confirm contracts, build, then validate.
+The lint catalog (~50 rules in `@dryui/lint`) is enforcement of these eight pairs. Every diff that follows them passes `check`.
 
-1. **User brief** — one line capturing what you are building and for whom.
-2. **DryUI lookup/plan** — use `dryui ask` or MCP `ask` to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
-3. **Implementation** — build with DryUI components, Svelte 5 runes, grid layout, `--dry-*` tokens, and accessible composition.
-4. **Deterministic check** — run `dryui check [path]` or MCP `check` to catch contract drift, accessibility regressions, token drift, and CSS discipline violations.
+**1. Look up before you write.** Run `ask --scope component "<X>"` (or recipe) before first use. Component APIs vary, and bind targets are not interchangeable (`bind:value` vs `bind:checked` vs `bind:open` vs `bind:pressed` vs `bind:active`). Most components are compound: use `<X.Root>`, never bare `<X>`. Don't guess from memory.
 
-## Design guidance, critique, polish
+**2. Grid for layout, not flex.** Scoped `display: grid` with `--dry-space-*` gaps. `Container` for constrained width. `@container` queries (not `@media`) for responsive sizing. `AreaGrid.Root` with `--dry-grid-area-name` on placed children for named-area page templates. Banned: `display: flex`, any `width` / `min-width` / `max-width` / `inline-size` (typographic `ch` / `ex` / `em` measure is the only carve-out), `@media` for sizing.
 
-DryUI is zero-dependency components + tokens + contracts. It deliberately does NOT ship design opinion. For design-quality flows like brief, critique, polish, visual review, or anti-pattern detection, use [impeccable](https://impeccable.style), which is installed alongside DryUI by `dryui init` or via `npx impeccable skills install`.
+**3. No CSS escape hatches.** No `:global()`, `!important`, `all: unset`, `<svelte:element>`, `<!-- svelte-ignore ... -->`, `style=`, `style:` directives, or directional `inset` box-shadow (it clips against `border-radius`). When a rule pushes you toward one of these, the structure is wrong. Restructure the markup: add a wrapper, split into `{#if}` branches, move sizing onto parent grid tracks, or promote the pattern into the component that owns the underlying element.
 
-Invoke from your AI harness:
+**4. Don't pass `class=` to DryUI components.** Their `class` is silently ignored. Style overrides go through `--dry-*` custom properties on a wrapper, component props, or `data-*` attributes.
 
-- `/impeccable teach` — one-time: scaffold `PRODUCT.md` + `DESIGN.md`
-- `/impeccable craft` — design-then-build a feature
-- `/impeccable shape` — plan UX/UI before writing code
-- `/impeccable critique <target>` — UX design review
-- `/impeccable audit <target>` — a11y, performance, responsive checks
-- `/impeccable polish <target>` — final pass before shipping
-- Full catalog: https://impeccable.style/cheatsheet
+**5. DryUI components over native HTML.** `Button` (not `<button>`), `Field.Root` + `Label` (not raw `<label>` + `<input>`), `Container` (not max-width centering), `Separator` (not `<hr>`), `Select.Root` (not `<select>`), `Dialog.Root` / `AlertDialog.Root` (not `<dialog>`), `DatePicker` (not `<input type="date">`). Raw native elements are only allowed inside their canonical component directory. `<a>` always needs `href`; for actions, use `<Button>`.
 
-`PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned. DryUI tools do not read or write them. Anti-pattern detection: `npx impeccable detect <path-or-url>`.
+**6. Tokens, not values.** Always `var(--dry-color-*)` and `var(--dry-space-*)`; never hex, `rgb()`, or hardcoded spacing. Override Tier-2 semantic tokens (`--dry-color-bg-base`, `--dry-color-bg-raised`, `--dry-color-text-strong`, `--dry-color-fill-brand`, `--dry-color-stroke-weak`...), never Tier-3 component tokens (`--dry-card-bg`, `--dry-btn-bg`, etc). Surfaces are solid (no low-alpha rgba on `--dry-color-bg-*`). Color pairs travel together: define `-hover` whenever you define the base. Default custom properties via `var(--name, fallback)` on consumption, never `--name: default` on `:root` (so a component's Svelte `--prop` inheritance still wins).
 
-## 1. Look Up Before You Write
+**7. Theme setup is ordered.** `<html class="theme-auto">` by default; `data-theme="light|dark"` only for explicit overrides. Import `@dryui/ui/themes/default.css` (and `dark.css`) **before** any local CSS that overrides `--dry-*`. Full themes go in `*.theme.css` (or with `/* @dryui-theme */` at the top); a few site-wide token tweaks scope under `body` / page selectors; per-route tweaks live in a component `<style>`.
 
-**Never guess a component API. Always verify first.**
+**8. Accessibility is non-negotiable.** Every input lives in `Field.Root` with a `Label`. `Avatar` has `alt` + `fallback`. Icon-only buttons have `aria-label`. Use the focus token (`outline: var(--dry-focus-ring)` plus `outline-offset: 2px` outset or `-1px` inset), not a hand-rolled `2px solid var(--dry-color-focus-ring)`. Use `AlertDialog` (not `Dialog`) for destructive confirmations. Use `type="submit"` on primary form buttons.
 
-- Call `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"` before using any component for the first time. MCP `ask` is the equivalent surface.
-- Component APIs vary. `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable.
-- Compound vs simple, required parts, available props — all differ per component.
-- If you skip the lookup, you'll write plausible-looking code that silently breaks.
+The lint enforces all eight. If `check` is clean and every component traces to a lookup, you're done.
 
-The test: can you point to a `dryui ask` or MCP `ask` call for every component or pattern in your output?
+## Workflow
 
-## 2. Everything is Compound Until Proven Otherwise
+`ask` → build → `check`. Confirm contracts before writing, then validate after. Prefer MCP when registered; CLI mirrors the same surface.
 
-**Use `.Root`. Always check.**
-
-Most DryUI components are compound. They require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound, verify with `ask --scope component`.
-
-```svelte
-<!-- Wrong -->
-<Card>content</Card>
-<!-- Right -->
-<Card.Root>content</Card.Root>
-```
-
-Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
-
-The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
-
-## 3. Let the Theme Do Its Job
-
-**Import it. Use its tokens. Don't fight it.**
-
-- Import `@dryui/ui/themes/default.css` (and `dark.css`) before any component use.
-- Use `--dry-color-*` and `--dry-space-*` tokens. Never hardcode colors or spacing.
-- Don't add decorative CSS (gradients, shadows, colored borders). The theme handles appearance.
-- Override semantic tokens (Tier 2) in `:root`, not component tokens (Tier 3).
-- Prefer `<html class="theme-auto">`. Use `data-theme="light|dark"` only for explicit overrides.
-
-```css
-/* Wrong */
-.card {
-	background: #6366f1;
-	color: white;
-}
-
-/* Right */
-.card {
-	background: var(--dry-color-fill-brand);
-	color: var(--dry-color-text-strong);
-}
-```
-
-The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero inline styles?
-
-Theming precedence beats design opinion. If impeccable guidance conflicts with DryUI theme contracts, tokens, or accessibility rules, DryUI wins.
-
-## 4. Grid for Layout. Container for Width. @container for Responsive.
-
-**Nothing else.**
-
-- All layout is `display: grid` with `--dry-space-*` tokens in scoped `<style>`.
-- `Container` (simple component, no `.Root`) for constrained content width.
-- Use `@container` queries for responsive sizing. Never `@media` for layout breakpoints.
-- No flexbox. No inline styles. No `width`/`min-width`/`max-width` properties.
-
-```svelte
-<div class="layout">...</div>
-
-<style>
-	.layout {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-</style>
-```
-
-The test: grep your output for `display: flex`, `style=`, `@media`. All should return nothing.
-
-## 4A. Escape Hatches Mean Stop.
-
-**If lint or the compiler pushes you toward an escape hatch, the structure is usually wrong.**
-
-- Never add `:global()`, `!important`, `all: unset`, `<svelte:element>`, or `<!-- svelte-ignore ... -->` just to make a selector or warning go away.
-- Never add `width`, `min-width`, `max-width`, `inline-size`, `min-inline-size`, or `max-inline-size` to solve layout pressure.
-- Never use raw native elements outside their canonical DryUI component directories just because composition feels inconvenient.
-- Never pass `class=` to DryUI components expecting it to style their internals. Use wrapper elements, component props, `data-*` attributes, or `--dry-*` tokens instead.
-- When blocked, restructure the markup instead: add a local wrapper, split explicit `{#if}` branches, move sizing to parent grid tracks, or promote the pattern into the canonical component where the raw element belongs.
-- Treat `dryui/no-global`, `dryui/no-important`, `dryui/no-width`, `dryui/no-raw-native-element`, `dryui/no-css-ignore`, and `dryui/no-svelte-element` as design feedback, not obstacles to suppress.
-
-The test: grep your output for `:global(`, `!important`, `all: unset`, `svelte-ignore`, `svelte:element`, raw `<button`, raw `<input`, raw `<select`, raw `<dialog`, raw `<hr`, raw `<table`, and `width:`. All should return nothing unless you are editing the canonical component that owns that native element.
-
-## 5. Every Input Gets a Field.Root
-
-**Accessibility isn't optional.**
-
-- Wrap every form input in `Field.Root` with a `Label`.
-- Use `AlertDialog` (not `Dialog`) for destructive confirmations.
-- Add `aria-label` to every icon-only button.
-- Use `type="submit"` on primary form action buttons.
-
-```svelte
-<!-- Wrong -->
-<label>Email</label>
-<Input bind:value={email} />
-
-<!-- Right -->
-<Field.Root>
-	<Label>Email</Label>
-	<Input bind:value={email} />
-</Field.Root>
-```
-
-The test: every `<Input>`, `<Select.Root>`, `<Textarea>` is inside a `Field.Root` with a `Label` sibling.
-
-## 6. Prefer DryUI Over Native HTML
-
-**If a DryUI component exists for it, use it.**
-
-`DatePicker` not `<input type="date">`. `Select.Root` not `<select>`. `Dialog.Root` not `<dialog>`. `Separator` not `<hr>`. `Button` not `<button>`. DryUI components handle theming and accessibility automatically. Native elements don't.
-
-The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>`, `<hr>`, `<table>`. Each should be a DryUI component instead.
-
-## 7. Ask the Svelte MCP for Svelte Questions
-
-**DryUI owns components. `@sveltejs/mcp` owns the framework.**
-
-For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, `+page.server.ts` shape, form actions, and anything Svelte-syntax adjacent: call the official `svelte-autofixer` and `get-documentation` tools from `@sveltejs/mcp` before guessing from memory.
-
-- `dryui setup --install` registers `@sveltejs/mcp` by default. Pass `--no-svelte-mcp` to skip.
-- If it's not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
-- Scope split: DryUI `ask`/`check` cover component APIs, theming, composition, and validation. Svelte MCP covers the runtime, compiler, and framework idioms.
-
-The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either (a) call `svelte-autofixer` / `get-documentation`, or (b) confirm the pattern is already covered by a DryUI recipe via `ask --scope recipe`?
+1. Brief: one line of intent.
+2. Lookup: `ask` for components, recipes, tokens, setup.
+3. Build: DryUI components, runes, scoped grid, `--dry-*` tokens.
+4. Check: `check [path]` after the edit. Fix every reported violation; do not suppress.
 
 ## Quick Start
 
-**1. Install the CLI** so every subsequent command is short and fast:
-
 ```bash
-bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
-```
-
-**2. Start with bare `dryui`** when you want editor integration and feedback:
-
-```bash
-dryui
-```
-
-**3. Bootstrap or inspect the project** with the CLI:
-
-```bash
-dryui init             # existing project
-dryui init my-app      # new project, scaffolds SvelteKit + DryUI in one step
+bun install -g @dryui/cli@latest        # global, fastest
+dryui init                              # existing project
+dryui init my-app                       # scaffold SvelteKit + DryUI in one step
 cd my-app && bun run dev
 ```
 
-This works for greenfield (empty directory), brownfield (existing non-SvelteKit project), and existing SvelteKit projects. On existing projects, `dryui install` prints the ordered plan and `dryui detect` verifies that setup is complete.
+Without a global install, `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` both work (slower, re-fetches each time).
 
-> **No global install?** `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` work anywhere without installing. Same commands, just slower (re-fetches on each call).
+Editor integrations (run after the CLI is wired):
 
-**4. Add the editor integration layer** after the CLI is working:
+- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui`
+- Codex (0.121+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, install `DryUI`
+- OpenCode: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui` plus the `dryui` and `dryui-feedback` MCP servers in `opencode.json`
+- Copilot / Cursor / Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` plus MCP config (https://dryui.dev/tools)
 
-- Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin is the canonical Claude skill install path)
-- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
-- OpenCode: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui` + add the `dryui` and `dryui-feedback` local MCP servers in `opencode.json` (OpenCode also loads `.agents/skills/dryui` and reads `AGENTS.md`)
-- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
+`dryui setup --install` registers `@sveltejs/mcp` automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code: `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
 
-**5. Register the Svelte MCP companion.** `dryui setup --install` does this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
+## Manual setup
 
-### Manual setup
+`dryui init` does all of this. Use only if you can't run it.
 
 1. `bun add @dryui/ui`
-2. `bun add -d @dryui/lint`. Enforces grid-only layout, bans flexbox/inline-style/width at build time. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
-3. Wire the lint preprocessor in `svelte.config.js` (add `dryuiLint` as the **first** item in the `preprocess` array):
+2. `bun add -d @dryui/lint`
+3. Wire `dryuiLint` as the **first** entry in `preprocess` in `svelte.config.js`:
 
    ```js
    import { dryuiLint } from '@dryui/lint';
@@ -215,10 +74,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
    /** @type {import('@sveltejs/kit').Config} */
    const config = {
    	preprocess: [
-   		dryuiLint({
-   			strict: true,
-   			exclude: ['.svelte-kit/', '/dist/']
-   		})
+   		dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] })
    		// keep any existing preprocessors after this
    	]
    };
@@ -227,80 +83,53 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
    ```
 
 4. Add `class="theme-auto"` to `<html>` in `src/app.html`.
-5. In root layout (`src/routes/+layout.svelte`), import themes:
-   ```svelte
-   <script>
-   	import '@dryui/ui/themes/default.css';
-   	import '@dryui/ui/themes/dark.css';
-   </script>
-   ```
-6. Import `app.css` AFTER theme CSS if you have custom styles.
+5. In `src/routes/+layout.svelte`, import `@dryui/ui/themes/default.css` and `dark.css` **before** any local `app.css`.
 
-> `dryui init` applies all six steps automatically. Prefer it over manual setup when you can.
+Without `@dryui/lint` wired, the CSS-discipline rules are not enforced at build time; only post-write `check` catches them.
 
-## Bindable Props, Common Confusion
-
-Always verify with `ask --scope component`, but these are the most common mistakes:
-
-- `bind:value` (Input, Select, Tabs...) vs `bind:checked` (Checkbox, Switch) vs `bind:pressed` (Toggle) vs `bind:open` (Dialog, Popover, Drawer...)
-- Select and Combobox support both `bind:value` and `bind:open`.
-- ColorPicker also exposes `bind:alpha`. Transfer uses `bind:sourceItems` / `bind:targetItems`.
-- Tour uses `bind:active`, not `bind:open`.
+Optional: `dryuiLint({ forbidRawGrid: true })` requires every grid layout to flow through `AreaGrid.Root`. The default keeps raw scoped grid available for component-internal layout.
 
 ## Tools
 
-Use these to look up APIs, discover components, plan setup, and validate code.
+| Workflow             | MCP                                                               | CLI                                              |
+| -------------------- | ----------------------------------------------------------------- | ------------------------------------------------ |
+| Project setup        | `ask --scope setup ""`                                            | `dryui setup` / `dryui detect` / `dryui install` |
+| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` | `dryui ask <scope> "<query>"` / `dryui list`     |
+| Tokens               | `ask --scope list --kind token`                                   | `dryui tokens --category color`                  |
+| Validation           | `check <file.svelte>`, `check <theme.css>`                        | `dryui check [path]`                             |
 
-### Recommended workflow
+CLI output is TOON by default; pass `--text` for plain text, `--json` where supported, `--full` to disable truncation.
 
-1. Resolve any component or recipe uncertainty with `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"`. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
-2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
-3. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, accessibility regressions, and token drift.
-4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
+Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility.
 
-### CLI (default entry point)
+## Bindable props (common confusion)
 
-Install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`), then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
+Always verify with `ask --scope component`. The most-missed shapes:
 
-```bash
-dryui                           # default onboarding entry point
-dryui setup                     # explicit onboarding subcommand
-dryui init [path] [--pm bun]    # Bootstrap SvelteKit + DryUI project
-dryui ask <scope> "<query>"     # Look up components, recipes, tokens, setup
-dryui detect [path]             # Check project setup
-dryui install [path]            # Print install plan
-dryui check [path]              # Validate file, theme, directory, or workspace
-dryui list                      # List components
-dryui tokens --category color   # Browse design tokens
-dryui ambient                   # SessionStart context
-dryui install-hook --dry-run    # Preview Claude hook wiring
-dryui feedback init             # Feedback tooling setup
-```
+- `bind:value` for Input, Select, Tabs, Combobox, ColorPicker...
+- `bind:checked` for Checkbox, Switch
+- `bind:pressed` for Toggle
+- `bind:open` for Dialog, Popover, Drawer (also Select / Combobox in addition to `bind:value`)
+- `bind:alpha` for ColorPicker (in addition to `bind:value`)
+- `bind:sourceItems` / `bind:targetItems` for Transfer
+- `bind:active` for Tour (not `bind:open`)
 
-Without a global install, prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …`. Same behaviour, just slower (re-fetches on each call).
+## Companion tools
 
-### MCP tools (same workflow in-editor)
+DryUI deliberately scopes itself to components, theming, composition, and validation. Hand off when you cross a boundary.
 
-| Workflow             | Tools                                                             |
-| -------------------- | ----------------------------------------------------------------- |
-| Project setup        | `ask --scope setup ""`                                            |
-| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
-| Validation           | `check <file.svelte>`, `check <theme.css>`                        |
-| Audit                | `check`, `check <directory>`                                      |
+- **Svelte MCP** owns runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, form actions, and compiler issues. Call `svelte-autofixer` and `get-documentation` from `@sveltejs/mcp` before guessing from memory.
+- **Impeccable** owns design taste: brief, critique, polish, visual review, anti-pattern detection. Installed alongside DryUI by `dryui init` or `npx impeccable skills install`. Invoke as `/impeccable critique <target>`, `/impeccable audit <target>`, `/impeccable polish <target>`. Full catalog at https://impeccable.style/cheatsheet. If impeccable guidance ever conflicts with DryUI tokens, contracts, or accessibility, DryUI wins.
 
-Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
+`PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
 
-## Rule Files
+## Rule files
 
-Read these when you need deeper guidance:
+The eight rules above are the contract. Read these for depth.
 
-- **`rules/compound-components.md`** — Parts lists, component selection table, common mistakes
-- **`rules/theming.md`** — Three-tier token system, dark mode, palette customization
-- **`rules/composition.md`** — Form patterns, page layouts, composition recipes
-- **`rules/accessibility.md`** — Field.Root, ARIA, focus management, pre-ship checklist
-- **`rules/svelte.md`** — Runes, snippets, native browser APIs, styling rules
-- **`rules/native-web-transitions.md`** — View Transition API, scroll animations, reduced-motion
-
----
-
-**These rules are working if:** every component traces to a lookup, diffs contain zero hardcoded colors, and `dryui check` finds nothing.
+- `rules/compound-components.md` — parts lists, selection table, common mistakes
+- `rules/theming.md` — three-tier tokens, dark mode options, palette customization
+- `rules/composition.md` — form patterns, page layouts, recipes
+- `rules/accessibility.md` — Field.Root, ARIA, focus management, pre-ship checklist
+- `rules/svelte.md` — runes, snippets, native browser APIs, styling
+- `rules/native-web-transitions.md` — View Transition API, scroll animations, reduced-motion

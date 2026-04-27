@@ -957,14 +957,13 @@
     },
     "AreaGrid": {
       "name": "AreaGrid",
-      "description": "Compound grid-template-areas layout with CSS variable-driven area names",
+      "description": "grid-template-areas layout with component CSS variable-driven child area names",
       "category": "layout",
       "tags": [
         "layout",
         "grid",
         "areas",
-        "template",
-        "compound"
+        "template"
       ],
       "kind": "compound",
       "import": {
@@ -973,11 +972,10 @@
         "subpathStatement": "import { AreaGrid } from '@dryui/ui/area-grid'"
       },
       "requiredParts": [
-        "Root",
-        "Area"
+        "Root"
       ],
       "bindableProps": [],
-      "usage": "<AreaGrid.Root>\n  <AreaGrid.Area>...</AreaGrid.Area>\n</AreaGrid.Root>",
+      "usage": "<AreaGrid.Root\n  --dry-area-grid-template-areas=\"'header' 'content'\"\n>\n  <Card.Root --dry-grid-area-name=\"header\">\n    <Card.Header>Header</Card.Header>\n  </Card.Root>\n  <Card.Root --dry-grid-area-name=\"content\">\n    <Card.Content>Content</Card.Content>\n  </Card.Root>\n</AreaGrid.Root>",
       "accessibility": [
         "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
         "Only add landmark or region semantics when the section has a unique, meaningful label."
@@ -987,7 +985,7 @@
         "Import AreaGrid from @dryui/ui.",
         "Use documented props and DryUI CSS variables before custom markup or inline styles.",
         "Use AreaGrid compound parts; do not render <AreaGrid> as a standalone element.",
-        "Include required parts: AreaGrid.Root, AreaGrid.Area.",
+        "Include required parts: AreaGrid.Root.",
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
@@ -1026,6 +1024,12 @@
                 "xl"
               ]
             },
+            "fill": {
+              "signature": "fill: boolean | default:false",
+              "required": false,
+              "bindable": false,
+              "default": "false"
+            },
             "debug": {
               "signature": "debug: boolean | default:false",
               "required": false,
@@ -1040,38 +1044,10 @@
             }
           },
           "forwards": "Forwards <element> attributes via rest props. Examples: id, class, aria-label."
-        },
-        "Area": {
-          "props": {
-            "as": {
-              "signature": "as: | 'section'\n\t| 'header'\n\t| 'main'\n\t| 'nav'\n\t| 'aside'\n\t| 'article'\n\t| 'footer' | default:'section' | values:section|header|main|nav|aside|article|footer",
-              "required": false,
-              "bindable": false,
-              "default": "'section'",
-              "values": [
-                "section",
-                "header",
-                "main",
-                "nav",
-                "aside",
-                "article",
-                "footer"
-              ],
-              "description": "Underlying HTML element to render for the component."
-            },
-            "children": {
-              "signature": "children: Snippet | required",
-              "required": true,
-              "bindable": false,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwards": "Forwards <element> attributes via rest props. Examples: id, class, aria-label."
         }
       },
       "structure": [
-        "AreaGrid.Root",
-        "  AreaGrid.Area"
+        "AreaGrid.Root"
       ]
     },
     "AspectRatio": {
@@ -15869,14 +15845,35 @@
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
+        "as": {
+          "signature": "as: 'div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section' | default:'div' | values:div|span|header|nav|main|footer|section",
+          "required": false,
+          "bindable": false,
+          "default": "'div'",
+          "values": [
+            "div",
+            "span",
+            "header",
+            "nav",
+            "main",
+            "footer",
+            "section"
+          ],
+          "description": "Underlying HTML element to render for the component."
+        },
         "background": {
           "signature": "background: string",
           "required": false,
           "bindable": false
         },
+        "className": {
+          "signature": "className: HTMLAttributes<HTMLElement>['class']",
+          "required": false,
+          "bindable": false
+        },
         "children": {
-          "signature": "children: Snippet | required",
-          "required": true,
+          "signature": "children: Snippet",
+          "required": false,
           "bindable": false,
           "description": "Content rendered inside the component."
         }
@@ -16770,14 +16767,9 @@
           "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
           "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure."
         },
-        "className": {
-          "signature": "className: HTMLAttributes<HTMLElement>['class']",
-          "required": false,
-          "bindable": false
-        },
         "children": {
-          "signature": "children: Snippet | required",
-          "required": true,
+          "signature": "children: Snippet",
+          "required": false,
           "bindable": false,
           "description": "Content rendered inside the component."
         }
@@ -18491,14 +18483,9 @@
               "description": "Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.",
               "note": "Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch."
             },
-            "className": {
-              "signature": "className: HTMLAttributes<HTMLElement>['class']",
-              "required": false,
-              "bindable": false
-            },
             "children": {
-              "signature": "children: Snippet | required",
-              "required": true,
+              "signature": "children: Snippet",
+              "required": false,
               "bindable": false,
               "description": "Content rendered inside the component."
             },

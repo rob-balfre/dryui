@@ -6,10 +6,10 @@
 		children: Snippet;
 	}
 
-	let { class: className, children, ...rest }: Props = $props();
+	let { class: classAttr, children, ...rest }: Props = $props();
 </script>
 
-<blockquote class={className} {...rest}>{@render children()}</blockquote>
+<blockquote class={classAttr} {...rest}>{@render children()}</blockquote>
 
 <style>
 	blockquote {

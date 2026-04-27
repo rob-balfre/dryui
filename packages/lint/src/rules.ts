@@ -8,6 +8,7 @@ export interface Violation {
 
 const SCRIPT_BLOCK_RE = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
 const STYLE_BLOCK_RE = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
+const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
 
 interface NativeElementRule {
 	tag: string;
@@ -32,9 +33,13 @@ const BANNED_COMPONENT_WORD_RES: ReadonlyArray<readonly [string, RegExp]> = BANN
 	(comp) => [comp, new RegExp(`\\b${comp}\\b`)] as const
 );
 
+const AREA_GRID_AREA_NAME_VAR = '--dry-grid-area-name';
+
 const INLINE_STYLE_RE = /\bstyle\s*=/g;
 
-const STYLE_DIRECTIVE_RE = /\bstyle:\w+/g;
+const STYLE_DIRECTIVE_RE = /\bstyle:(?:--[-_a-zA-Z0-9]+|[-_a-zA-Z][-_a-zA-Z0-9]*)/g;
+
+const ATTACH_RE = /\{@attach\b/g;
 
 const FLEX_DISPLAY_RE = /display\s*:\s*flex(?![a-z-])/g;
 
@@ -42,17 +47,6 @@ const FLEX_PROPS_RE =
 	/(?:^|[;\s{])(?:flex-direction|flex-wrap|flex-grow|flex-shrink|flex-basis|flex)\s*:/gm;
 
 const COMPONENT_CLASS_RE = /<([A-Z][a-zA-Z0-9.]*)[^>]*?\bclass\s*=/gs;
-
-// Components that officially accept a `class` prop and forward it to the root
-// element. These are opt-in exceptions to the `dryui/no-component-class` rule:
-// passing class= here is supported and documented, so we do not flag it.
-const COMPONENTS_ACCEPTING_CLASS: ReadonlySet<string> = new Set([
-	'Button',
-	'Heading',
-	'Text',
-	'Typography.Heading',
-	'Typography.Text'
-]);
 
 const CSS_IGNORE_RE = /<!--\s*svelte-ignore\s+css_unused_selector\s*-->/g;
 
@@ -76,6 +70,11 @@ const MEDIA_QUERY_RE = /@media\s+[^{]+\{/g;
 const ALLOWED_MEDIA_RE = /prefers-reduced-motion|prefers-color-scheme/;
 
 const FOCUS_RING_LITERAL_RE = /outline\s*:\s*2px\s+solid\s+var\(--dry-color-focus-ring\)/g;
+
+const RAW_GRID_DISPLAY_RE = /display\s*:\s*(?:inline-)?grid(?![a-z-])/g;
+
+const RAW_GRID_PROPS_RE =
+	/(?:^|[;\s{])(?:grid|grid-template(?:-(?:columns|rows|areas))?|grid-auto-(?:flow|columns|rows)|grid-(?:column|row|area)(?:-(?:start|end))?)\s*:/gm;
 
 // Directional "rail" inset shadows (exactly one of offset-x/offset-y non-zero,
 // blur zero) clip against border-radius and render as a curved bracket.
@@ -222,7 +221,7 @@ function findOpeningTags(content: string, tagName: string): TagMatch[] {
 		}
 
 		const boundary = content[tagIndex + needle.length];
-		if (boundary && /[A-Za-z0-9:-]/.test(boundary)) {
+		if (boundary && /[A-Za-z0-9.:-]/.test(boundary)) {
 			index = tagIndex + needle.length;
 			continue;
 		}
@@ -289,7 +288,6 @@ interface ParsedAttribute {
 }
 
 const AREA_GRID_ROOT_REQUIRED_TEMPLATE = '--dry-area-grid-template-areas';
-const AREA_GRID_AREA_REQUIRED_VAR = '--dry-area-grid-area';
 
 const AREA_GRID_TEMPLATE_VARS: ReadonlySet<string> = new Set([
 	'--dry-area-grid-template-areas',
@@ -299,6 +297,7 @@ const AREA_GRID_TEMPLATE_VARS: ReadonlySet<string> = new Set([
 
 const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
 	...AREA_GRID_TEMPLATE_VARS,
+	AREA_GRID_AREA_NAME_VAR,
 	'--dry-area-grid-template-columns',
 	'--dry-area-grid-template-columns-wide',
 	'--dry-area-grid-template-columns-xl',
@@ -318,18 +317,8 @@ const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
 	'--dry-area-grid-area-color'
 ]);
 
-const AREA_GRID_AREA_CSS_VARS: ReadonlySet<string> = new Set([
-	'--dry-area-grid-area',
-	'--dry-area-grid-area-display',
-	'--dry-area-grid-area-gap',
-	'--dry-area-grid-area-padding',
-	'--dry-area-grid-area-border',
-	'--dry-area-grid-area-radius',
-	'--dry-area-grid-area-bg',
-	'--dry-area-grid-area-color'
-]);
-
 const AREA_GRID_LEGACY_VAR_REPLACEMENTS: ReadonlyMap<string, string> = new Map([
+	['--dry-area-grid-area', AREA_GRID_AREA_NAME_VAR],
 	['--dry-area-grid-template', '--dry-area-grid-template-areas'],
 	['--dry-area-grid-template-wide', '--dry-area-grid-template-areas-wide'],
 	['--dry-area-grid-template-xl', '--dry-area-grid-template-areas-xl'],
@@ -344,7 +333,7 @@ const AREA_GRID_LEGACY_VAR_REPLACEMENTS: ReadonlyMap<string, string> = new Map([
 ]);
 
 function isAreaGridCssVar(name: string): boolean {
-	return name.startsWith('--dry-area-grid-');
+	return name.startsWith('--dry-area-grid-') || name === AREA_GRID_AREA_NAME_VAR;
 }
 
 function skipBalancedExpression(input: string, start: number): number {
@@ -461,6 +450,110 @@ function attributeByName(attrs: readonly ParsedAttribute[], name: string): Parse
 	return attrs.find((attr) => attr.name === name) ?? null;
 }
 
+function isSvelteComponentTag(tagName: string): boolean {
+	return /^[A-Z]/.test(tagName) || tagName.includes('.');
+}
+
+const COMPONENT_ONLY_ALLOWED_TAGS: ReadonlySet<string> = new Set(['slot']);
+
+function isComponentOnlyAllowedTag(tagName: string): boolean {
+	return (
+		isSvelteComponentTag(tagName) ||
+		tagName.startsWith('svelte:') ||
+		COMPONENT_ONLY_ALLOWED_TAGS.has(tagName)
+	);
+}
+
+interface AttributedTagMatch extends TagMatch {
+	readonly tagName: string;
+	readonly attrs: ParsedAttribute[];
+}
+
+function findAllOpeningTags(content: string): AttributedTagMatch[] {
+	const matches: AttributedTagMatch[] = [];
+	let index = 0;
+
+	while (index < content.length) {
+		const tagIndex = content.indexOf('<', index);
+		if (tagIndex === -1) break;
+
+		if (content.startsWith('<!--', tagIndex)) {
+			const commentEnd = content.indexOf('-->', tagIndex + 4);
+			index = commentEnd === -1 ? content.length : commentEnd + 3;
+			continue;
+		}
+
+		const next = content[tagIndex + 1];
+		if (!next || next === '/' || next === '!' || next === '?') {
+			index = tagIndex + 1;
+			continue;
+		}
+
+		const tagNameMatch = /^<([A-Za-z][A-Za-z0-9.:-]*)/.exec(content.slice(tagIndex));
+		const tagName = tagNameMatch?.[1];
+		if (!tagName) {
+			index = tagIndex + 1;
+			continue;
+		}
+
+		let cursor = tagIndex + tagName.length + 1;
+		let quote: '"' | "'" | null = null;
+		let expressionDepth = 0;
+
+		while (cursor < content.length) {
+			const char = content[cursor]!;
+
+			if (quote) {
+				if (char === quote && content[cursor - 1] !== '\\') quote = null;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '"' || char === "'") {
+				quote = char;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '{') {
+				expressionDepth += 1;
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '}') {
+				expressionDepth = Math.max(0, expressionDepth - 1);
+				cursor += 1;
+				continue;
+			}
+
+			if (char === '>' && expressionDepth === 0) {
+				cursor += 1;
+				break;
+			}
+
+			cursor += 1;
+		}
+
+		const text = content.slice(tagIndex, cursor);
+		const attrs = parseOpeningTagAttributes(text, tagName);
+		matches.push({
+			index: tagIndex,
+			text,
+			tagName,
+			attrs
+		});
+
+		index = cursor;
+	}
+
+	return matches;
+}
+
+function findOpeningTagsWithAttribute(content: string, attrName: string): AttributedTagMatch[] {
+	return findAllOpeningTags(content).filter((tag) => attributeByName(tag.attrs, attrName));
+}
+
 function isValidAreaGridName(value: string): boolean {
 	return /^-?[_a-zA-Z][-_a-zA-Z0-9]*$/.test(value) && value !== 'auto' && value !== 'span';
 }
@@ -542,19 +635,84 @@ interface AreaGridRootBlock {
 	readonly templates: Map<string, ParsedAreaGridTemplate>;
 }
 
+function findClosingTags(content: string, tagName: string): TagMatch[] {
+	const matches: TagMatch[] = [];
+	const needle = `</${tagName}>`;
+	let index = 0;
+
+	while (index < content.length) {
+		const commentIndex = content.indexOf('<!--', index);
+		const tagIndex = content.indexOf(needle, index);
+
+		if (tagIndex === -1) break;
+
+		if (commentIndex !== -1 && commentIndex < tagIndex) {
+			const commentEnd = content.indexOf('-->', commentIndex + 4);
+			index = commentEnd === -1 ? content.length : commentEnd + 3;
+			continue;
+		}
+
+		matches.push({
+			index: tagIndex,
+			text: needle
+		});
+		index = tagIndex + needle.length;
+	}
+
+	return matches;
+}
+
 function findAreaGridRootBlocks(markup: string): AreaGridRootBlock[] {
 	const roots: AreaGridRootBlock[] = [];
-	const closeTag = '</AreaGrid.Root>';
+	const stack: Array<{
+		opening: TagMatch;
+		attrs: ParsedAttribute[];
+	}> = [];
 
-	for (const opening of findOpeningTags(markup, 'AreaGrid.Root')) {
-		const openingEnd = opening.index + opening.text.length;
-		const selfClosing = /\/\s*>$/.test(opening.text);
-		const closeStart = selfClosing ? openingEnd : markup.indexOf(closeTag, openingEnd);
-		const attrs = parseOpeningTagAttributes(opening.text, 'AreaGrid.Root');
+	const openings = findOpeningTags(markup, 'AreaGrid.Root').map((opening) => ({
+		type: 'open' as const,
+		index: opening.index,
+		match: opening
+	}));
+	const closings = findClosingTags(markup, 'AreaGrid.Root').map((closing) => ({
+		type: 'close' as const,
+		index: closing.index,
+		match: closing
+	}));
+	const events = [...openings, ...closings].sort((a, b) => a.index - b.index);
+
+	for (const event of events) {
+		if (event.type === 'open') {
+			const attrs = parseOpeningTagAttributes(event.match.text, 'AreaGrid.Root');
+			const openingEnd = event.match.index + event.match.text.length;
+			if (/\/\s*>$/.test(event.match.text)) {
+				roots.push({
+					opening: event.match,
+					closeStart: openingEnd,
+					attrs,
+					templates: new Map()
+				});
+				continue;
+			}
+			stack.push({ opening: event.match, attrs });
+			continue;
+		}
+
+		const open = stack.pop();
+		if (!open) continue;
 		roots.push({
-			opening,
-			closeStart: closeStart === -1 ? openingEnd : closeStart,
-			attrs,
+			opening: open.opening,
+			closeStart: event.match.index,
+			attrs: open.attrs,
+			templates: new Map()
+		});
+	}
+
+	for (const open of stack) {
+		roots.push({
+			opening: open.opening,
+			closeStart: open.opening.index + open.opening.text.length,
+			attrs: open.attrs,
 			templates: new Map()
 		});
 	}
@@ -606,7 +764,15 @@ function checkAreaGridCssVars(
 
 function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): Violation[] {
 	const violations: Violation[] = [];
-	const roots = findAreaGridRootBlocks(markup);
+	const roots = findAreaGridRootBlocks(markup).sort((a, b) => a.opening.index - b.opening.index);
+
+	for (const root of roots.slice(1)) {
+		violations.push({
+			rule: 'dryui/area-grid-single-root',
+			message: ruleMessage('dryui/area-grid-single-root'),
+			line: lineOf(root.opening.index)
+		});
+	}
 
 	for (const root of roots) {
 		const line = lineOf(root.opening.index);
@@ -658,18 +824,33 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 	}
 
 	for (const area of findOpeningTags(markup, 'AreaGrid.Area')) {
-		const line = lineOf(area.index);
-		const attrs = parseOpeningTagAttributes(area.text, 'AreaGrid.Area');
-		violations.push(...checkAreaGridCssVars('AreaGrid.Area', attrs, AREA_GRID_AREA_CSS_VARS, line));
+		violations.push({
+			rule: 'dryui/area-grid-no-area-part',
+			message: ruleMessage('dryui/area-grid-no-area-part'),
+			line: lineOf(area.index)
+		});
+	}
 
-		const areaAttr = attributeByName(attrs, AREA_GRID_AREA_REQUIRED_VAR);
-		if (!areaAttr) {
+	const areaPlacements = findOpeningTagsWithAttribute(markup, AREA_GRID_AREA_NAME_VAR).map(
+		(tag) => ({
+			tag,
+			attrName: AREA_GRID_AREA_NAME_VAR
+		})
+	);
+
+	for (const { tag: area, attrName } of areaPlacements) {
+		const line = lineOf(area.index);
+		const areaAttr = attributeByName(area.attrs, attrName);
+		if (!areaAttr) continue;
+
+		const isComponent = isSvelteComponentTag(area.tagName);
+		if (attrName === AREA_GRID_AREA_NAME_VAR && !isComponent) {
 			violations.push({
-				rule: 'dryui/area-grid-required-var',
-				message: ruleMessage('dryui/area-grid-required-var', {
-					component: 'AreaGrid.Area',
-					variable: AREA_GRID_AREA_REQUIRED_VAR,
-					example: 'content'
+				rule: 'dryui/area-grid-invalid-var',
+				message: ruleMessage('dryui/area-grid-invalid-var', {
+					component: area.tagName,
+					variable: AREA_GRID_AREA_NAME_VAR,
+					target: `a DryUI/Svelte component with ${AREA_GRID_AREA_NAME_VAR}`
 				}),
 				line
 			});
@@ -680,8 +861,8 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 			violations.push({
 				rule: 'dryui/area-grid-invalid-template',
 				message: ruleMessage('dryui/area-grid-invalid-template', {
-					component: 'AreaGrid.Area',
-					variable: AREA_GRID_AREA_REQUIRED_VAR,
+					component: area.tagName,
+					variable: attrName,
 					reason: 'area names must be static string literals'
 				}),
 				line
@@ -694,8 +875,8 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 			violations.push({
 				rule: 'dryui/area-grid-invalid-template',
 				message: ruleMessage('dryui/area-grid-invalid-template', {
-					component: 'AreaGrid.Area',
-					variable: AREA_GRID_AREA_REQUIRED_VAR,
+					component: area.tagName,
+					variable: attrName,
 					reason: `"${areaName}" is not a valid static area name`
 				}),
 				line
@@ -704,7 +885,17 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 		}
 
 		const root = findContainingAreaGridRoot(roots, area.index);
-		if (!root) continue;
+		if (!root) {
+			violations.push({
+				rule: 'dryui/area-grid-missing-root',
+				message: ruleMessage('dryui/area-grid-missing-root', {
+					area: areaName,
+					variable: attrName
+				}),
+				line
+			});
+			continue;
+		}
 
 		for (const [variable, template] of root.templates) {
 			if (template.error) continue;
@@ -891,6 +1082,15 @@ export function fixThemeImportOrder(content: string): string {
 }
 
 const SCRIPT_OR_STYLE_BLOCK_RE = /<(?:script|style)[\s>][\s\S]*?<\/(?:script|style)>/gi;
+const SVELTE_HEAD_BLOCK_RE = /<svelte:head\b[^>]*>[\s\S]*?<\/svelte:head>/gi;
+
+function blankPreservingLayout(content: string): string {
+	let out = '';
+	for (let i = 0; i < content.length; i++) {
+		out += content.charCodeAt(i) === 10 /* \n */ ? '\n' : ' ';
+	}
+	return out;
+}
 
 export function stripBlocks(content: string): string {
 	return content.replace(SCRIPT_OR_STYLE_BLOCK_RE, (m) => {
@@ -900,6 +1100,14 @@ export function stripBlocks(content: string): string {
 		}
 		return '\n'.repeat(count);
 	});
+}
+
+function stripSvelteHeadBlocks(content: string): string {
+	return content.replace(SVELTE_HEAD_BLOCK_RE, blankPreservingLayout);
+}
+
+function stripHtmlComments(content: string): string {
+	return content.replace(HTML_COMMENT_RE, blankPreservingLayout);
 }
 
 function stripCssComments(content: string): string {
@@ -933,9 +1141,23 @@ function createNativeElementMessage(rule: NativeElementRule): string {
 	});
 }
 
-export function checkMarkup(content: string, filename?: string): Violation[] {
+export interface MarkupContext {
+	/**
+	 * Experimental migration mode for app/consumer markup. When enabled, native
+	 * element tags such as <div>, <span>, <header>, and <main> are rejected so
+	 * layout and styling have to flow through Svelte/DryUI component surfaces.
+	 */
+	readonly componentsOnly?: boolean;
+}
+
+export function checkMarkup(
+	content: string,
+	filename?: string,
+	context: MarkupContext = {}
+): Violation[] {
 	const violations: Violation[] = [];
 	const markup = stripBlocks(content);
+	const executableMarkup = stripHtmlComments(markup);
 	const parentDir = getParentDir(filename);
 	const lineStarts = buildLineIndex(markup);
 	const lineOf = (i: number) => lookupLine(lineStarts, i);
@@ -966,6 +1188,28 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		}
 	}
 
+	if (allowed('dryui/no-attach')) {
+		for (const match of executableMarkup.matchAll(ATTACH_RE)) {
+			violations.push({
+				rule: 'dryui/no-attach',
+				message: ruleMessage('dryui/no-attach'),
+				line: lineOf(match.index)
+			});
+		}
+	}
+
+	if (context.componentsOnly && allowed('dryui/no-raw-element')) {
+		const componentOnlyMarkup = stripSvelteHeadBlocks(markup);
+		for (const tag of findAllOpeningTags(componentOnlyMarkup)) {
+			if (isComponentOnlyAllowedTag(tag.tagName)) continue;
+			violations.push({
+				rule: 'dryui/no-raw-element',
+				message: ruleMessage('dryui/no-raw-element', { tag: tag.tagName }),
+				line: lineOf(tag.index)
+			});
+		}
+	}
+
 	if (allowed('dryui/no-layout-component')) {
 		for (const match of markup.matchAll(BANNED_COMPONENT_USAGE_RE)) {
 			const comp = match[1];
@@ -984,7 +1228,6 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	if (allowed('dryui/no-component-class')) {
 		for (const match of markup.matchAll(COMPONENT_CLASS_RE)) {
 			const comp = match[1] ?? 'Component';
-			if (COMPONENTS_ACCEPTING_CLASS.has(comp)) continue;
 			violations.push({
 				rule: 'dryui/no-component-class',
 				message: ruleMessage('dryui/no-component-class', { component: comp }),
@@ -1014,7 +1257,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		}
 	}
 
-	if (allowed('dryui/no-anchor-without-href')) {
+	if (!context.componentsOnly && allowed('dryui/no-anchor-without-href')) {
 		for (const tag of findOpeningTags(markup, 'a')) {
 			if (anchorHasHref(tag.text)) continue;
 			violations.push({
@@ -1025,7 +1268,7 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 		}
 	}
 
-	if (allowed('dryui/no-raw-native-element')) {
+	if (!context.componentsOnly && allowed('dryui/no-raw-native-element')) {
 		for (const rule of NATIVE_ELEMENT_RULES) {
 			if (rule.allowedDirs.has(parentDir)) continue;
 
@@ -1093,6 +1336,7 @@ function hasAllowComment(file: FileContext, matchIndex: number, keyword: string)
 
 export interface StyleContext {
 	readonly chipGroupExemptClasses?: ReadonlySet<string>;
+	readonly forbidRawGrid?: boolean;
 }
 
 /**
@@ -1141,7 +1385,7 @@ function selectorIsChipGroupExempt(selector: string, exemptClasses: ReadonlySet<
 export function checkStyle(
 	content: string,
 	context: StyleContext = {},
-	_filename?: string
+	filename?: string
 ): Violation[] {
 	const violations: Violation[] = [];
 	// `scan` has comments blanked out (length-preserving) so rule regexes don't
@@ -1160,7 +1404,27 @@ export function checkStyle(
 	const exemptClasses = context.chipGroupExemptClasses ?? new Set<string>();
 	const inChipGroupScope = (idx: number): boolean =>
 		selectorIsChipGroupExempt(selectorAtOffset(scan, idx), exemptClasses);
+	const isAreaGridInternal = filename?.replace(/\\/g, '/').includes('/area-grid/') ?? false;
 	const allowed = (_ruleId: string) => true;
+
+	if (context.forbidRawGrid && allowed('dryui/no-raw-grid') && !isAreaGridInternal) {
+		for (const match of scan.matchAll(RAW_GRID_DISPLAY_RE)) {
+			violations.push({
+				rule: 'dryui/no-raw-grid',
+				message: ruleMessage('dryui/no-raw-grid', { value: match[0].trim() }),
+				line: lineOf(match.index)
+			});
+		}
+
+		for (const match of scan.matchAll(RAW_GRID_PROPS_RE)) {
+			const prop = match[0].trim().replace(/;$/, '').split(':')[0]!.trim();
+			violations.push({
+				rule: 'dryui/no-raw-grid',
+				message: ruleMessage('dryui/no-raw-grid', { value: prop }),
+				line: lineOf(match.index)
+			});
+		}
+	}
 
 	if (allowed('dryui/no-flex')) {
 		for (const match of scan.matchAll(FLEX_DISPLAY_RE)) {
@@ -1317,6 +1581,11 @@ function collectChipGroupClasses(content: string): Set<string> {
 	return exempt;
 }
 
+export interface SvelteFileCheckOptions {
+	readonly forbidRawGrid?: boolean;
+	readonly componentsOnly?: boolean;
+}
+
 function extractClassNames(attrsStr: string): string[] {
 	const out: string[] = [];
 	// class="foo bar baz" — ignore expressions, only capture literal tokens.
@@ -1399,9 +1668,15 @@ function collectDirectChildClasses(
 	}
 }
 
-export function checkSvelteFile(content: string, filename?: string): Violation[] {
+export function checkSvelteFile(
+	content: string,
+	filename?: string,
+	options: SvelteFileCheckOptions = {}
+): Violation[] {
 	const lineStarts = buildLineIndex(content);
-	const violations: Violation[] = [...checkMarkup(content, filename)];
+	const violations: Violation[] = [
+		...checkMarkup(content, filename, { componentsOnly: options.componentsOnly ?? false })
+	];
 	const chipGroupExemptClasses = collectChipGroupClasses(content);
 
 	for (const match of content.matchAll(SCRIPT_BLOCK_RE)) {
@@ -1414,7 +1689,14 @@ export function checkSvelteFile(content: string, filename?: string): Violation[]
 		const style = match[1] ?? '';
 		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
 		violations.push(
-			...offsetViolations(checkStyle(style, { chipGroupExemptClasses }, filename), startLine)
+			...offsetViolations(
+				checkStyle(
+					style,
+					{ chipGroupExemptClasses, forbidRawGrid: options.forbidRawGrid ?? false },
+					filename
+				),
+				startLine
+			)
 		);
 	}
 
