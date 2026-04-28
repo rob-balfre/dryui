@@ -1,17 +1,28 @@
 <script lang="ts">
-	import { AlertDialog, Button, Checkbox, Field, Input, Kbd, Label, Select } from '@dryui/ui';
+	import {
+		AlertDialog,
+		Button,
+		Checkbox,
+		Field,
+		Input,
+		Kbd,
+		Label,
+		SegmentedControl,
+		Select
+	} from '@dryui/ui';
 	import { onMount } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
 		ArrowLeftRight,
+		BetweenHorizontalEnd,
+		BetweenVerticalEnd,
 		Boxes,
 		Check,
 		Columns3,
 		Eraser,
 		GripVertical,
 		LayoutTemplate,
-		Minus,
 		Move,
 		MoveUpRight,
 		Pencil,
@@ -698,7 +709,7 @@
 					aria-label="Insert column"
 					aria-pressed={layoutTool === 'insert-col'}
 				>
-					<Columns3 size={16} />
+					<BetweenVerticalEnd size={16} />
 				</Button>
 
 				<Button
@@ -712,7 +723,7 @@
 					aria-label="Insert row"
 					aria-pressed={layoutTool === 'insert-row'}
 				>
-					<Rows3 size={16} />
+					<BetweenHorizontalEnd size={16} />
 				</Button>
 
 				<Button
@@ -727,7 +738,6 @@
 					aria-pressed={layoutTool === 'remove-col'}
 				>
 					<Columns3 size={16} />
-					<Minus size={10} />
 				</Button>
 
 				<Button
@@ -742,7 +752,6 @@
 					aria-pressed={layoutTool === 'remove-row'}
 				>
 					<Rows3 size={16} />
-					<Minus size={10} />
 				</Button>
 
 				<Button
@@ -761,20 +770,15 @@
 
 				<div class="tool-divider" aria-hidden="true"></div>
 
-				<div class="layout-bp-segmented" role="group" aria-label="Editing breakpoint">
+				<SegmentedControl.Root
+					bind:value={() => layoutBreakpoint, (v) => onlayoutbreakpoint?.(v as LayoutBreakpoint)}
+					aria-label="Editing breakpoint"
+					class="layout-bp-segmented"
+				>
 					{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
-						<button
-							class="layout-bp-btn"
-							type="button"
-							data-active={layoutBreakpoint === bp || undefined}
-							onclick={() => onlayoutbreakpoint?.(bp)}
-							aria-label="Edit {bp} breakpoint"
-							aria-pressed={layoutBreakpoint === bp}
-						>
-							{bp}
-						</button>
+						<SegmentedControl.Item value={bp} size="sm">{bp}</SegmentedControl.Item>
 					{/each}
-				</div>
+				</SegmentedControl.Root>
 			{:else if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
@@ -1133,45 +1137,6 @@
 		block-size: 18px;
 		margin-inline: 4px;
 		background: hsl(220 10% 70% / 0.25);
-	}
-
-	.layout-bp-segmented {
-		display: grid;
-		grid-auto-flow: column;
-		align-items: center;
-		gap: 1px;
-		padding: 0;
-	}
-
-	.layout-bp-btn {
-		min-block-size: 22px;
-		padding: 0 8px;
-		margin: 0;
-		border: none;
-		border-radius: 6px;
-		background: transparent;
-		color: hsl(220 10% 70%);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 11px;
-		font-weight: 500;
-		letter-spacing: 0.02em;
-		text-transform: lowercase;
-		cursor: pointer;
-		transition:
-			background 0.12s ease-out,
-			color 0.12s ease-out;
-	}
-
-	.layout-bp-btn:hover {
-		color: hsl(220 10% 92%);
-	}
-
-	.layout-bp-btn[data-active] {
-		background: hsl(25 100% 55%);
-		color: hsl(225 15% 8%);
 	}
 
 	.toolbar[data-dragging] {
