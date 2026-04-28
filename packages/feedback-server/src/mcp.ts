@@ -60,6 +60,7 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 	const hints = submission.hints ?? [];
 	const components = submission.components ?? [];
 	const removed = submission.removed ?? [];
+	const moved = submission.moved ?? [];
 	const kindCounts: Record<string, number> = {};
 	for (const drawing of drawings) {
 		const kind = drawing.kind ?? 'unknown';
@@ -89,6 +90,7 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 		hints,
 		...(components.length > 0 ? { components } : {}),
 		...(removed.length > 0 ? { removed } : {}),
+		...(moved.length > 0 ? { moved } : {}),
 		summary: {
 			drawingCount: drawings.length,
 			hintCount: hints.length,
@@ -97,7 +99,8 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 			...(components.length > 0
 				? { componentCount: components.length, componentKinds: componentKindCounts }
 				: {}),
-			...(removed.length > 0 ? { removedCount: removed.length } : {})
+			...(removed.length > 0 ? { removedCount: removed.length } : {}),
+			...(moved.length > 0 ? { movedCount: moved.length } : {})
 		}
 	};
 }

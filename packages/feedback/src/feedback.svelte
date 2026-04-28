@@ -1650,6 +1650,14 @@
 		rect: { x: number; y: number; width: number; height: number };
 	}
 
+	interface MovedElementSnapshot {
+		tag: string;
+		id?: string;
+		selector?: string;
+		originalRect: { x: number; y: number; width: number; height: number };
+		currentRect: { x: number; y: number; width: number; height: number };
+	}
+
 	function snapshotAddedComponents(): AddedComponentSnapshot[] {
 		const out: AddedComponentSnapshot[] = [];
 		for (const [id, record] of addedComponents) {
@@ -1681,6 +1689,37 @@
 		return out;
 	}
 
+	function snapshotMovedElements(): MovedElementSnapshot[] {
+		const out: MovedElementSnapshot[] = [];
+		for (const [original, clone] of layoutClones) {
+			const initial = cloneInitialSnaps.get(original);
+			if (!initial) continue;
+			if (sameLayoutSnapshot(snapshotClone(clone), initial)) continue;
+			const originalRect = original.getBoundingClientRect();
+			const currentRect = clone.getBoundingClientRect();
+			if (currentRect.width < 1 || currentRect.height < 1) continue;
+			const descriptor = describeElement(original) ?? { tag: 'unknown' };
+			out.push({
+				tag: descriptor.tag,
+				...(descriptor.id ? { id: descriptor.id } : {}),
+				...(descriptor.selector ? { selector: descriptor.selector } : {}),
+				originalRect: {
+					x: originalRect.left,
+					y: originalRect.top,
+					width: originalRect.width,
+					height: originalRect.height
+				},
+				currentRect: {
+					x: currentRect.left,
+					y: currentRect.top,
+					width: currentRect.width,
+					height: currentRect.height
+				}
+			});
+		}
+		return out;
+	}
+
 	function formatPropsForChip(props: Record<string, unknown>): string {
 		const pairs = Object.entries(props)
 			.filter(([, v]) => v !== undefined && v !== null && v !== '')
@@ -1696,6 +1735,7 @@
 		const nodes: HTMLElement[] = [];
 		const accent = 'hsl(25 100% 55%)';
 		const danger = 'hsl(0 75% 55%)';
+		const info = 'hsl(210 90% 55%)';
 
 		for (const record of removedElements.values()) {
 			const { rect } = record;
@@ -1801,6 +1841,86 @@
 			document.body.appendChild(chip);
 			nodes.push(chip);
 		}
+
+		for (const [original, clone] of layoutClones) {
+			const initial = cloneInitialSnaps.get(original);
+			if (!initial) continue;
+			if (sameLayoutSnapshot(snapshotClone(clone), initial)) continue;
+			const originalRect = original.getBoundingClientRect();
+			const currentRect = clone.getBoundingClientRect();
+			if (currentRect.width < 1 || currentRect.height < 1) continue;
+
+			if (originalRect.width >= 1 && originalRect.height >= 1) {
+				const ghost = document.createElement('div');
+				ghost.dataset.dryuiCaptureAnnotation = 'moved-ghost';
+				Object.assign(ghost.style, {
+					position: 'fixed',
+					left: `${originalRect.left}px`,
+					top: `${originalRect.top}px`,
+					width: `${originalRect.width}px`,
+					height: `${originalRect.height}px`,
+					border: `2px dashed ${info}`,
+					borderRadius: '4px',
+					background: 'hsl(210 90% 55% / 0.05)',
+					pointerEvents: 'none',
+					zIndex: '2147483645',
+					boxSizing: 'border-box'
+				});
+				document.body.appendChild(ghost);
+				nodes.push(ghost);
+			}
+
+			const outline = document.createElement('div');
+			outline.dataset.dryuiCaptureAnnotation = 'moved-outline';
+			Object.assign(outline.style, {
+				position: 'fixed',
+				left: `${currentRect.left}px`,
+				top: `${currentRect.top}px`,
+				width: `${currentRect.width}px`,
+				height: `${currentRect.height}px`,
+				border: `2px solid ${info}`,
+				borderRadius: '4px',
+				background: 'hsl(210 90% 55% / 0.08)',
+				pointerEvents: 'none',
+				zIndex: '2147483646',
+				boxSizing: 'border-box'
+			});
+			document.body.appendChild(outline);
+			nodes.push(outline);
+
+			const descriptor = describeElement(original);
+			const chipLabel = descriptor?.selector || descriptor?.tag || 'element';
+			const chip = document.createElement('div');
+			chip.dataset.dryuiCaptureAnnotation = 'moved-chip';
+			chip.textContent = `moved: ${chipLabel}`;
+			const fitsAbove = currentRect.top >= 24;
+			Object.assign(chip.style, {
+				position: 'fixed',
+				left: `${Math.max(4, currentRect.left)}px`,
+				top: fitsAbove
+					? `${currentRect.top - 22}px`
+					: `${currentRect.top + currentRect.height + 4}px`,
+				maxWidth: `${Math.max(180, Math.min(window.innerWidth - currentRect.left - 8, currentRect.width + 80))}px`,
+				padding: '3px 7px',
+				borderRadius: '4px',
+				background: info,
+				color: 'white',
+				fontFamily: 'system-ui, -apple-system, sans-serif',
+				fontSize: '11px',
+				fontWeight: '700',
+				lineHeight: '16px',
+				letterSpacing: '0.01em',
+				whiteSpace: 'nowrap',
+				overflow: 'hidden',
+				textOverflow: 'ellipsis',
+				pointerEvents: 'none',
+				zIndex: '2147483647',
+				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
+			});
+			document.body.appendChild(chip);
+			nodes.push(chip);
+		}
+
 		return () => {
 			for (const n of nodes) n.remove();
 		};
@@ -1810,12 +1930,14 @@
 		images: Screenshots;
 		components: AddedComponentSnapshot[];
 		removed: RemovedElementSnapshot[];
+		moved: MovedElementSnapshot[];
 	}> {
 		let stream: MediaStream | null = null;
 		const video = document.createElement('video');
 		let cleanupAnnotations: (() => void) | null = null;
 		const components = snapshotAddedComponents();
 		const removed = snapshotRemovedElements();
+		const moved = snapshotMovedElements();
 
 		const w = window.innerWidth;
 		const h = window.innerHeight;
@@ -1861,7 +1983,7 @@
 			const png = stripDataUrlPrefix(canvas.toDataURL('image/png'));
 			canvas.width = 0;
 			canvas.height = 0;
-			return { images: { webp, png }, components, removed };
+			return { images: { webp, png }, components, removed, moved };
 		} finally {
 			stream?.getTracks().forEach((track) => track.stop());
 			video.srcObject = null;
@@ -2026,7 +2148,7 @@
 			return;
 		}
 		try {
-			const { images, components, removed } = await captureScreenshot();
+			const { images, components, removed, moved } = await captureScreenshot();
 			submitStatus = 'uploading';
 			// Snapshot viewport + scroll after capture so the numbers line up with
 			// the frame agents will read. buildDrawingHints reads the same window
@@ -2054,6 +2176,7 @@
 					scroll,
 					...(components.length > 0 ? { components } : {}),
 					...(removed.length > 0 ? { removed } : {}),
+					...(moved.length > 0 ? { moved } : {}),
 					...(layoutBoxesPayload.length > 0 ? { layoutBoxes: layoutBoxesPayload } : {})
 				})
 			});

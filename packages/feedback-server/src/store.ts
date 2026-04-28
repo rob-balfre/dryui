@@ -19,6 +19,7 @@ import type {
 	SubmissionDrawing,
 	SubmissionDrawingHint,
 	SubmissionLayoutBox,
+	SubmissionMovedElement,
 	SubmissionQueryStatus,
 	SubmissionRemovedElement,
 	SubmissionScrollOffset,
@@ -92,6 +93,7 @@ interface SubmissionRow {
 	hints: string | null;
 	components: string | null;
 	removed: string | null;
+	moved: string | null;
 	layout_boxes: string | null;
 	viewport: string | null;
 	scroll: string | null;
@@ -187,6 +189,7 @@ function toSubmission(row: SubmissionRow): Submission {
 	const hints = parseJson<SubmissionDrawingHint[]>(row.hints);
 	const components = parseJson<SubmissionAddedComponent[]>(row.components);
 	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
+	const moved = parseJson<SubmissionMovedElement[]>(row.moved);
 	const layoutBoxes = parseJson<SubmissionLayoutBox[]>(row.layout_boxes);
 	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
 	return {
@@ -202,6 +205,7 @@ function toSubmission(row: SubmissionRow): Submission {
 		...(hints ? { hints } : {}),
 		...(components && components.length > 0 ? { components } : {}),
 		...(removed && removed.length > 0 ? { removed } : {}),
+		...(moved && moved.length > 0 ? { moved } : {}),
 		...(layoutBoxes && layoutBoxes.length > 0 ? { layoutBoxes } : {}),
 		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
 		...(scroll !== undefined ? { scroll } : {}),
@@ -306,6 +310,7 @@ export class FeedbackStore {
         hints TEXT,
         components TEXT,
         removed TEXT,
+        moved TEXT,
         layout_boxes TEXT,
         viewport TEXT,
         scroll TEXT,
@@ -332,6 +337,7 @@ export class FeedbackStore {
 		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'components', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'removed', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'moved', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'layout_boxes', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
 		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
@@ -615,13 +621,14 @@ export class FeedbackStore {
 		const hints = input.hints ?? [];
 		const components = input.components ?? [];
 		const removed = input.removed ?? [];
+		const moved = input.moved ?? [];
 		const layoutBoxes = input.layoutBoxes ?? [];
 		const workspace = context.workspace ?? null;
 		this.db
 			.query(
 				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, layout_boxes, viewport, scroll, status, created_at, agent, workspace
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
+					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, layout_boxes, viewport, scroll, status, created_at, agent, workspace
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
 			)
 			.run(
 				id,
@@ -632,6 +639,7 @@ export class FeedbackStore {
 				hints.length > 0 ? JSON.stringify(hints) : null,
 				components.length > 0 ? JSON.stringify(components) : null,
 				removed.length > 0 ? JSON.stringify(removed) : null,
+				moved.length > 0 ? JSON.stringify(moved) : null,
 				layoutBoxes.length > 0 ? JSON.stringify(layoutBoxes) : null,
 				input.viewport ? JSON.stringify(input.viewport) : null,
 				input.scroll ? JSON.stringify(input.scroll) : null,
@@ -648,6 +656,7 @@ export class FeedbackStore {
 			...(hints.length > 0 ? { hints } : {}),
 			...(components.length > 0 ? { components } : {}),
 			...(removed.length > 0 ? { removed } : {}),
+			...(moved.length > 0 ? { moved } : {}),
 			...(layoutBoxes.length > 0 ? { layoutBoxes } : {}),
 			viewport: input.viewport ?? null,
 			...(input.scroll ? { scroll: input.scroll } : {}),

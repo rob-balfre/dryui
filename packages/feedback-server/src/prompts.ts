@@ -24,7 +24,7 @@ export function buildFeedbackDispatchPrompt(
 			: '';
 	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 
-Read your canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` first — it has the submission shape, the four intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
+Read your canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` first — it has the submission shape, the five intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
 
 ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 }

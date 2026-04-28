@@ -222,6 +222,19 @@ export interface SubmissionRemovedElement {
 }
 
 /**
+ * Captured when the user moved a component in layout mode. `originalRect` is
+ * where the element sat in the page flow at submit time (still occupied via
+ * `visibility: hidden`); `currentRect` is where the user dragged the clone to.
+ */
+export interface SubmissionMovedElement {
+	tag: string;
+	id?: string;
+	selector?: string;
+	originalRect: { x: number; y: number; width: number; height: number };
+	currentRect: { x: number; y: number; width: number; height: number };
+}
+
+/**
  * A free-drawn rectangle the user sketches on top of the page in Layout mode
  * to communicate a new region (intent only — no CSS mutation). Coordinates are
  * page-relative pixels at submit time.
@@ -248,6 +261,7 @@ export interface Submission {
 	hints?: SubmissionDrawingHint[];
 	components?: SubmissionAddedComponent[];
 	removed?: SubmissionRemovedElement[];
+	moved?: SubmissionMovedElement[];
 	layoutBoxes?: SubmissionLayoutBox[];
 	viewport: { width: number; height: number } | null;
 	scroll?: SubmissionScrollOffset | null;
@@ -270,6 +284,7 @@ export interface CreateSubmissionInput {
 	hints?: SubmissionDrawingHint[];
 	components?: SubmissionAddedComponent[];
 	removed?: SubmissionRemovedElement[];
+	moved?: SubmissionMovedElement[];
 	layoutBoxes?: SubmissionLayoutBox[];
 	viewport?: { width: number; height: number };
 	scroll?: SubmissionScrollOffset;
