@@ -644,62 +644,90 @@
 		return '--dry-area-grid-template-areas';
 	}
 
-	function insertTrack(grid: HTMLElement, shell: HTMLElement, axis: Axis, atIndex: number) {
-		oncapture?.(shell);
-		const cs = getComputedStyle(grid);
-		const tracks = parseTrackTokens(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
-		tracks.splice(Math.max(0, Math.min(tracks.length, atIndex)), 0, '1fr');
-		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
-		if (areaRows.length > 0) {
-			if (axis === 'col') {
-				for (const row of areaRows) {
-					const at = Math.max(0, Math.min(row.length, atIndex));
-					const before = at > 0 ? row[at - 1] : undefined;
-					const after = at < row.length ? row[at] : undefined;
-					// If we'd be splitting a multi-cell named area, extend it into the
-					// new column so the area stays rectangular. Otherwise, '.'.
-					const fill =
-						before !== undefined && after !== undefined && before === after && before !== '.'
-							? before
-							: '.';
-					row.splice(at, 0, fill);
-				}
-			} else {
-				const colCount = areaRows[0]?.length ?? 1;
-				const at = Math.max(0, Math.min(areaRows.length, atIndex));
-				const above = at > 0 ? areaRows[at - 1] : undefined;
-				const below = at < areaRows.length ? areaRows[at] : undefined;
-				const newRow: string[] = [];
-				for (let c = 0; c < colCount; c++) {
-					const a = above?.[c];
-					const b = below?.[c];
-					newRow.push(a !== undefined && b !== undefined && a === b && a !== '.' ? a : '.');
-				}
-				areaRows.splice(at, 0, newRow);
-			}
-		}
-		const bp = effectiveBreakpoint(shell);
-		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
-		shell.style.setProperty(trackProp, tracks.join(' '));
-		if (areaRows.length > 0) {
-			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
-		}
-		scheduleRebuild();
-		oncommit?.();
-	}
-
 	function insertCenterTrack(axis: Axis) {
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
+		let mutated = false;
 		for (const grid of grids) {
 			if (isInsideFeedback(grid)) continue;
 			const shell = grid.closest<HTMLElement>('[data-area-grid-shell]');
 			if (!shell) continue;
 			const cs = getComputedStyle(grid);
-			const tracks = parseTrackTokens(
-				axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows
-			);
-			const center = Math.max(1, Math.floor(tracks.length / 2));
-			insertTrack(grid, shell, axis, center);
+			const trackStr = axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows;
+			const tracks = parseTrackList(trackStr);
+			if (tracks.length === 0) continue;
+
+			oncapture?.(shell);
+
+			// Pick the seam closest to the grid's visual midpoint instead of the
+			// midpoint by track count, so repeated inserts on grids with uneven
+			// tracks don't pile up at the same x.
+			const total = tracks.reduce((a, b) => a + b, 0);
+			const target = total / 2;
+			let cumulative = 0;
+			let bestIdx = 1;
+			let bestDist = Infinity;
+			for (let i = 1; i < tracks.length; i++) {
+				cumulative += tracks[i - 1]!;
+				const dist = Math.abs(cumulative - target);
+				if (dist < bestDist) {
+					bestDist = dist;
+					bestIdx = i;
+				}
+			}
+			if (tracks.length === 1) bestIdx = 1; // append after the only track
+
+			// Carve room for the new track out of the largest existing one so the
+			// new column/row is actually visible (otherwise a 1fr in a fully
+			// fixed-px grid resolves to 0).
+			let largestIdx = 0;
+			for (let i = 1; i < tracks.length; i++) {
+				if (tracks[i]! > tracks[largestIdx]!) largestIdx = i;
+			}
+			const newSize = Math.min(240, Math.max(96, tracks[largestIdx]! / 3));
+			if (tracks[largestIdx]! > newSize + 64) {
+				tracks[largestIdx] = tracks[largestIdx]! - newSize;
+			}
+			tracks.splice(bestIdx, 0, newSize);
+
+			const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
+			if (areaRows.length > 0) {
+				if (axis === 'col') {
+					for (const row of areaRows) {
+						const at = Math.max(0, Math.min(row.length, bestIdx));
+						const before = at > 0 ? row[at - 1] : undefined;
+						const after = at < row.length ? row[at] : undefined;
+						const fill =
+							before !== undefined && after !== undefined && before === after && before !== '.'
+								? before
+								: '.';
+						row.splice(at, 0, fill);
+					}
+				} else {
+					const colCount = areaRows[0]?.length ?? 1;
+					const at = Math.max(0, Math.min(areaRows.length, bestIdx));
+					const above = at > 0 ? areaRows[at - 1] : undefined;
+					const below = at < areaRows.length ? areaRows[at] : undefined;
+					const newRow: string[] = [];
+					for (let c = 0; c < colCount; c++) {
+						const a = above?.[c];
+						const b = below?.[c];
+						newRow.push(a !== undefined && b !== undefined && a === b && a !== '.' ? a : '.');
+					}
+					areaRows.splice(at, 0, newRow);
+				}
+			}
+
+			const bp = effectiveBreakpoint(shell);
+			const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
+			shell.style.setProperty(trackProp, tracks.map((n) => `${Math.round(n)}px`).join(' '));
+			if (areaRows.length > 0) {
+				shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
+			}
+			mutated = true;
+		}
+		if (mutated) {
+			scheduleRebuild();
+			oncommit?.();
 		}
 	}
 
