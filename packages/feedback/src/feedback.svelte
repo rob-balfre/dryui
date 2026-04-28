@@ -27,6 +27,7 @@
 	import Toolbar, { type LayoutTool, type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
+	import LayoutBoxesOverlay from './components/layout-boxes-overlay.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
 	// omit the widget entirely. Useful for CI, screenshot jobs, or
@@ -2575,6 +2576,8 @@
 					onboxesapply={(next) => applyLayoutBoxes(next, false)}
 					onboxescommit={(next) => applyLayoutBoxes(next, true)}
 				/>
+			{:else if layoutBoxes.length > 0}
+				<LayoutBoxesOverlay boxes={layoutBoxes} />
 			{/if}
 
 			{#if placingComponent}
