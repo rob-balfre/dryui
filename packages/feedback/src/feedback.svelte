@@ -24,7 +24,11 @@
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
-	import Toolbar, { type Mode } from './components/toolbar.svelte';
+	import Toolbar, {
+		type LayoutBreakpoint,
+		type LayoutTool,
+		type Mode
+	} from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
 
@@ -80,6 +84,8 @@
 	let tool = $state<Tool>('pencil');
 	let inspectingComponents = $state(false);
 	let inspectingLayout = $state(false);
+	let layoutTool = $state<LayoutTool | null>(null);
+	let layoutBreakpoint = $state<LayoutBreakpoint>('auto');
 	let selectedComponentEl = $state<HTMLElement | null>(null);
 	const mode = $derived<Mode>(
 		inspectingLayout ? 'layout' : inspectingComponents ? 'components' : 'annotate'
@@ -108,6 +114,15 @@
 
 	function stopInspectingLayout() {
 		inspectingLayout = false;
+		layoutTool = null;
+	}
+
+	function setLayoutTool(next: LayoutTool | null) {
+		layoutTool = next;
+	}
+
+	function setLayoutBreakpoint(next: LayoutBreakpoint) {
+		layoutBreakpoint = next;
 	}
 
 	function selectComponent(el: HTMLElement | null) {
@@ -2496,12 +2511,16 @@
 				addedKind={selectedAddedRecord?.kind ?? null}
 				addedLabel={selectedAddedRecord?.label ?? ''}
 				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
+				{layoutTool}
+				{layoutBreakpoint}
 				{canUndo}
 				{canRedo}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
+				onlayouttool={setLayoutTool}
+				onlayoutbreakpoint={setLayoutBreakpoint}
 				oncomponentsreset={resetSelectedComponent}
 				onundo={undo}
 				onredo={redo}
@@ -2524,7 +2543,10 @@
 
 			{#if inspectingLayout}
 				<LayoutInspector
+					tool={layoutTool}
+					breakpoint={layoutBreakpoint}
 					onclose={stopInspectingLayout}
+					ontool={setLayoutTool}
 					oncommit={commitHistory}
 					oncapture={ensureGridInitialSnapshot}
 					oncapturelabel={ensureLabelInitialSnapshot}

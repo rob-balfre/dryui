@@ -34,6 +34,8 @@
 		atIndex: number;
 		x: number;
 		y: number;
+		w: number;
+		h: number;
 	};
 
 	type TrackRemove = {
@@ -42,22 +44,36 @@
 		shell: HTMLElement;
 		axis: Axis;
 		index: number;
-		x: number;
-		y: number;
+		zoneX: number;
+		zoneY: number;
+		zoneW: number;
+		zoneH: number;
 	};
 
+	type LayoutTool = 'insert-col' | 'insert-row' | 'remove' | 'swap';
+	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
+
 	interface Props {
+		tool?: LayoutTool | null;
+		breakpoint?: EditingBp;
 		onclose: () => void;
+		ontool?: (next: LayoutTool | null) => void;
 		oncommit?: () => void;
 		oncapture?: (el: HTMLElement) => void;
 		oncapturelabel?: (el: HTMLElement) => void;
 	}
 
-	let { onclose, oncommit, oncapture, oncapturelabel }: Props = $props();
+	let {
+		tool = null,
+		breakpoint = 'auto',
+		onclose,
+		ontool,
+		oncommit,
+		oncapture,
+		oncapturelabel
+	}: Props = $props();
 
-	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
-
-	let editingBreakpoint = $state<EditingBp>('auto');
+	const editingBreakpoint = $derived(breakpoint);
 	let handles = $state<Handle[]>([]);
 	let areas = $state<Area[]>([]);
 	let trackInserts = $state<TrackInsert[]>([]);
@@ -340,10 +356,10 @@
 				}
 			}
 
-			// Track add/remove controls. Column controls strip along the top edge
-			// (just inside the grid); row controls along the left edge.
-			const TRACK_GUTTER = 14;
-			const colStripY = rect.top + 4;
+			// Track add/remove zones. Inserts: thin perpendicular ribbon at every
+			// insertion point (rendered when insert tools are active). Removes:
+			// full-track click zone the user can hit anywhere in the column/row.
+			const INSERT_ZONE = 16;
 			let cx = rect.left;
 			for (let i = 0; i <= cols.length; i++) {
 				nextInserts.push({
@@ -352,8 +368,10 @@
 					shell,
 					axis: 'col',
 					atIndex: i,
-					x: cx,
-					y: colStripY
+					x: cx - INSERT_ZONE / 2,
+					y: rect.top,
+					w: INSERT_ZONE,
+					h: rect.height
 				});
 				if (i < cols.length) {
 					const w = cols[i]!;
@@ -364,14 +382,15 @@
 							shell,
 							axis: 'col',
 							index: i,
-							x: cx + w / 2,
-							y: colStripY
+							zoneX: cx,
+							zoneY: rect.top,
+							zoneW: w,
+							zoneH: rect.height
 						});
 					}
 					cx += w;
 				}
 			}
-			const rowStripX = rect.left + 4;
 			let cy = rect.top;
 			for (let i = 0; i <= rows.length; i++) {
 				nextInserts.push({
@@ -380,8 +399,10 @@
 					shell,
 					axis: 'row',
 					atIndex: i,
-					x: rowStripX,
-					y: cy
+					x: rect.left,
+					y: cy - INSERT_ZONE / 2,
+					w: rect.width,
+					h: INSERT_ZONE
 				});
 				if (i < rows.length) {
 					const h = rows[i]!;
@@ -392,14 +413,15 @@
 							shell,
 							axis: 'row',
 							index: i,
-							x: rowStripX,
-							y: cy + h / 2
+							zoneX: rect.left,
+							zoneY: cy,
+							zoneW: rect.width,
+							zoneH: h
 						});
 					}
 					cy += h;
 				}
 			}
-			void TRACK_GUTTER;
 
 			const seen = new Set<string>();
 			for (const child of Array.from(grid.children)) {
@@ -470,6 +492,10 @@
 	function handleKey(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			e.stopPropagation();
+			if (tool) {
+				ontool?.(null);
+				return;
+			}
 			onclose();
 		}
 	}
@@ -784,23 +810,12 @@
 	});
 </script>
 
-<div class="layout-inspector" data-dragging={dragging ? '' : undefined} role="presentation">
-	<div class="layout-bp-toggle" role="group" aria-label="Editing breakpoint">
-		{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
-			<button
-				class="layout-bp-btn"
-				type="button"
-				data-active={editingBreakpoint === bp || undefined}
-				aria-pressed={editingBreakpoint === bp}
-				onclick={() => {
-					editingBreakpoint = bp;
-				}}
-			>
-				{bp}
-			</button>
-		{/each}
-	</div>
-
+<div
+	class="layout-inspector"
+	data-dragging={dragging ? '' : undefined}
+	data-tool={tool ?? undefined}
+	role="presentation"
+>
 	{#each handles as h (h.key)}
 		<button
 			class="layout-handle"
@@ -848,35 +863,35 @@
 	{/each}
 
 	{#each trackInserts as t (t.key)}
-		<button
-			class="layout-track-btn layout-track-insert"
-			data-axis={t.axis}
-			type="button"
-			aria-label="Insert {t.axis === 'col' ? 'column' : 'row'} at position {t.atIndex + 1}"
-			style="left: {t.x}px; top: {t.y}px;"
-			onclick={(e) => {
-				e.stopPropagation();
-				insertTrack(t.root, t.shell, t.axis, t.atIndex);
-			}}
-		>
-			+
-		</button>
+		{#if (tool === 'insert-col' && t.axis === 'col') || (tool === 'insert-row' && t.axis === 'row')}
+			<button
+				class="layout-track-zone layout-track-insert-zone"
+				data-axis={t.axis}
+				type="button"
+				aria-label="Insert {t.axis === 'col' ? 'column' : 'row'} at position {t.atIndex + 1}"
+				style="left: {t.x}px; top: {t.y}px; width: {t.w}px; height: {t.h}px;"
+				onclick={(e) => {
+					e.stopPropagation();
+					insertTrack(t.root, t.shell, t.axis, t.atIndex);
+				}}
+			></button>
+		{/if}
 	{/each}
 
 	{#each trackRemoves as t (t.key)}
-		<button
-			class="layout-track-btn layout-track-remove"
-			data-axis={t.axis}
-			type="button"
-			aria-label="Remove {t.axis === 'col' ? 'column' : 'row'} {t.index + 1}"
-			style="left: {t.x}px; top: {t.y}px;"
-			onclick={(e) => {
-				e.stopPropagation();
-				removeTrack(t.root, t.shell, t.axis, t.index);
-			}}
-		>
-			×
-		</button>
+		{#if tool === 'remove'}
+			<button
+				class="layout-track-zone layout-track-remove-zone"
+				data-axis={t.axis}
+				type="button"
+				aria-label="Remove {t.axis === 'col' ? 'column' : 'row'} {t.index + 1}"
+				style="left: {t.zoneX}px; top: {t.zoneY}px; width: {t.zoneW}px; height: {t.zoneH}px;"
+				onclick={(e) => {
+					e.stopPropagation();
+					removeTrack(t.root, t.shell, t.axis, t.index);
+				}}
+			></button>
+		{/if}
 	{/each}
 
 	{#if areaDragGhost}
@@ -973,87 +988,36 @@
 		outline-offset: 0;
 	}
 
-	.layout-track-btn {
+	.layout-track-zone {
 		position: fixed;
 		z-index: 1;
-		inline-size: 18px;
-		block-size: 18px;
-		display: grid;
-		place-items: center;
 		margin: 0;
 		padding: 0;
-		border: 1px solid hsl(25 100% 55% / 0.6);
-		border-radius: 50%;
-		background: hsl(225 15% 10%);
-		color: hsl(25 100% 70%);
-		font-family: var(--dry-font-sans, system-ui, sans-serif);
-		font-size: 14px;
-		font-weight: 600;
-		line-height: 1;
+		border: 1px dashed hsl(25 100% 55% / 0);
+		background: hsl(25 100% 55% / 0);
 		cursor: pointer;
-		transform: translate(-50%, -50%);
-		opacity: 0.55;
-		transition:
-			opacity 0.12s ease-out,
-			background 0.12s ease-out,
-			color 0.12s ease-out;
 		pointer-events: auto;
+		transition:
+			background 0.12s ease-out,
+			border-color 0.12s ease-out;
 	}
 
-	.layout-track-btn:hover,
-	.layout-track-btn:focus-visible {
-		opacity: 1;
-		background: hsl(25 100% 55%);
-		color: hsl(225 15% 8%);
+	.layout-track-insert-zone {
+		border-style: dashed;
+	}
+
+	.layout-track-insert-zone:hover,
+	.layout-track-insert-zone:focus-visible {
+		background: hsl(140 60% 45% / 0.2);
+		border-color: hsl(140 60% 50%);
 		outline: none;
 	}
 
-	.layout-track-insert {
-		font-size: 13px;
-	}
-
-	.layout-bp-toggle {
-		position: fixed;
-		top: 16px;
-		left: 50%;
-		transform: translateX(-50%);
-		z-index: 1;
-		display: grid;
-		grid-auto-flow: column;
-		gap: 2px;
-		padding: 3px;
-		border-radius: 999px;
-		background: hsl(225 15% 15% / 0.95);
-		backdrop-filter: blur(8px);
-		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
-		pointer-events: auto;
-	}
-
-	.layout-bp-btn {
-		margin: 0;
-		padding: 4px 12px;
-		border: none;
-		border-radius: 999px;
-		background: transparent;
-		color: hsl(220 10% 60%);
-		font-family: var(--dry-font-sans, system-ui, sans-serif);
-		font-size: 11px;
-		font-weight: 500;
-		letter-spacing: 0.02em;
-		text-transform: lowercase;
-		cursor: pointer;
-		transition:
-			background 0.12s ease-out,
-			color 0.12s ease-out;
-	}
-
-	.layout-bp-btn:hover {
-		color: hsl(220 10% 90%);
-	}
-
-	.layout-bp-btn[data-active] {
-		background: hsl(25 100% 55%);
-		color: hsl(225 15% 8%);
+	.layout-track-remove-zone:hover,
+	.layout-track-remove-zone:focus-visible {
+		background: hsl(0 75% 55% / 0.18);
+		border-color: hsl(0 75% 60%);
+		outline: none;
 	}
 
 	.layout-area-ghost {

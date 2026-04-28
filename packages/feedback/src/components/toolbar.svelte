@@ -4,17 +4,21 @@
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
+		ArrowLeftRight,
 		Boxes,
 		Check,
+		Columns3,
 		Eraser,
 		GripVertical,
 		LayoutTemplate,
+		Minus,
 		Move,
 		MoveUpRight,
 		Pencil,
 		Plus,
 		Redo2,
 		RotateCcw,
+		Rows3,
 		Search,
 		Send,
 		Settings,
@@ -33,6 +37,8 @@
 	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components' | 'layout';
+	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove' | 'swap';
+	export type LayoutBreakpoint = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
 		active: boolean;
@@ -48,10 +54,14 @@
 		addedKind?: string | null;
 		addedLabel?: string;
 		addedPropsJson?: string;
+		layoutTool?: LayoutTool | null;
+		layoutBreakpoint?: LayoutBreakpoint;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
+		onlayouttool?: (tool: LayoutTool | null) => void;
+		onlayoutbreakpoint?: (bp: LayoutBreakpoint) => void;
 		oncomponentsreset?: () => void;
 		onundo?: () => void;
 		onredo?: () => void;
@@ -74,12 +84,16 @@
 		addedKind = null,
 		addedLabel = '',
 		addedPropsJson = '',
+		layoutTool = null,
+		layoutBreakpoint = 'auto',
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
 		onmodechange,
+		onlayouttool,
+		onlayoutbreakpoint,
 		oncomponentsreset,
 		onundo,
 		onredo,
@@ -94,7 +108,7 @@
 	const showAnnotationTools = $derived(mode === 'annotate');
 	const showComponentsTools = $derived(mode === 'components');
 	const showLayoutTools = $derived(mode === 'layout');
-	const showToolPill = $derived(showAnnotationTools || showComponentsTools);
+	const showToolPill = $derived(showAnnotationTools || showComponentsTools || showLayoutTools);
 	const inspectingLabel = $derived(showLayoutTools ? 'Adjusting layout' : 'Inspecting components');
 
 	let pickerOpen = $state(false);
@@ -666,9 +680,87 @@
 		<div
 			class="tool-pill"
 			role="group"
-			aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
+			aria-label={showLayoutTools
+				? 'Layout tools'
+				: showComponentsTools
+					? 'Components tools'
+					: 'Annotation tools'}
 		>
-			{#if showComponentsTools}
+			{#if showLayoutTools}
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn"
+					type="button"
+					data-tooltip="Insert column"
+					data-active={layoutTool === 'insert-col' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'insert-col' ? null : 'insert-col')}
+					aria-label="Insert column"
+					aria-pressed={layoutTool === 'insert-col'}
+				>
+					<Columns3 size={16} />
+				</Button>
+
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn"
+					type="button"
+					data-tooltip="Insert row"
+					data-active={layoutTool === 'insert-row' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'insert-row' ? null : 'insert-row')}
+					aria-label="Insert row"
+					aria-pressed={layoutTool === 'insert-row'}
+				>
+					<Rows3 size={16} />
+				</Button>
+
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn"
+					type="button"
+					data-tooltip="Remove track"
+					data-active={layoutTool === 'remove' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'remove' ? null : 'remove')}
+					aria-label="Remove column or row"
+					aria-pressed={layoutTool === 'remove'}
+				>
+					<Minus size={16} />
+				</Button>
+
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn"
+					type="button"
+					data-tooltip="Swap areas"
+					data-active={layoutTool === 'swap' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'swap' ? null : 'swap')}
+					aria-label="Swap areas"
+					aria-pressed={layoutTool === 'swap'}
+				>
+					<ArrowLeftRight size={16} />
+				</Button>
+
+				<div class="layout-bp-segmented" role="group" aria-label="Editing breakpoint">
+					{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
+						<Button
+							variant="trigger"
+							size="sm"
+							class="tool-btn layout-bp-btn"
+							type="button"
+							data-tooltip="Edit {bp} breakpoint"
+							data-active={layoutBreakpoint === bp || undefined}
+							onclick={() => onlayoutbreakpoint?.(bp)}
+							aria-label="Edit {bp} breakpoint"
+							aria-pressed={layoutBreakpoint === bp}
+						>
+							<span class="layout-bp-label">{bp}</span>
+						</Button>
+					{/each}
+				</div>
+			{:else if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
 						<Button
