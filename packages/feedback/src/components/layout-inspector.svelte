@@ -30,9 +30,10 @@
 		onclose: () => void;
 		oncommit?: () => void;
 		oncapture?: (el: HTMLElement) => void;
+		oncapturelabel?: (el: HTMLElement) => void;
 	}
 
-	let { onclose, oncommit, oncapture }: Props = $props();
+	let { onclose, oncommit, oncapture, oncapturelabel }: Props = $props();
 
 	let handles = $state<Handle[]>([]);
 	let areas = $state<Area[]>([]);
@@ -367,13 +368,19 @@
 			if (rewritten !== current) area.shell.style.setProperty(prop, rewritten);
 		}
 
-		// Update every wrapper in this grid that names the renamed area.
+		// Update every wrapper in this grid that names the renamed area, plus any
+		// placeholder label inside it so the new name persists when leaving Layout mode.
 		for (const child of Array.from(area.root.children)) {
 			if (!(child instanceof HTMLElement)) continue;
 			const name = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
 			if (name !== oldName) continue;
 			oncapture?.(child);
 			child.style.setProperty('--dry-grid-area-name', next);
+			const span = child.querySelector<HTMLElement>('[data-area-grid-placeholder] > span');
+			if (span && span.textContent === oldName) {
+				oncapturelabel?.(span);
+				span.textContent = next;
+			}
 		}
 
 		scheduleRebuild();

@@ -139,6 +139,7 @@
 		added: AddedSnapshot[];
 		removed: HTMLElement[];
 		gridOverrides: Map<HTMLElement, GridOverrideMap>;
+		labelTexts: Map<HTMLElement, string>;
 	};
 
 	const GRID_TEMPLATE_PROPS = [
@@ -181,6 +182,7 @@
 	const addedComponents = new Map<string, AddedRecord>();
 	const removedElements = new SvelteMap<HTMLElement, RemovedRecord>();
 	const gridOverrideInitialSnaps = new SvelteMap<HTMLElement, GridOverrideMap>();
+	const labelTextInitialSnaps = new SvelteMap<HTMLElement, string>();
 	let layoutVersion = $state(0);
 
 	let placingComponent = $state<string | null>(null);
@@ -191,7 +193,8 @@
 			cloneSnapshots: new Map(),
 			added: [],
 			removed: [],
-			gridOverrides: new Map()
+			gridOverrides: new Map(),
+			labelTexts: new Map()
 		};
 	}
 
@@ -702,6 +705,30 @@
 			applyGridOverrides(shell, initial);
 		}
 		gridOverrideInitialSnaps.clear();
+		for (const [el, text] of labelTextInitialSnaps) {
+			el.textContent = text;
+		}
+		labelTextInitialSnaps.clear();
+	}
+
+	function ensureLabelInitialSnapshot(el: HTMLElement) {
+		if (labelTextInitialSnaps.has(el)) return;
+		labelTextInitialSnaps.set(el, el.textContent ?? '');
+	}
+
+	function snapshotAllLabelTexts(): Map<HTMLElement, string> {
+		const map = new Map<HTMLElement, string>();
+		for (const el of labelTextInitialSnaps.keys()) {
+			map.set(el, el.textContent ?? '');
+		}
+		return map;
+	}
+
+	function hasModifiedLabelTexts(): boolean {
+		for (const [el, initial] of labelTextInitialSnaps) {
+			if ((el.textContent ?? '') !== initial) return true;
+		}
+		return false;
 	}
 
 	function commitHistory() {
@@ -711,7 +738,8 @@
 			cloneSnapshots: snapshotAllClones(),
 			added: snapshotAllAdded(),
 			removed: [...removedElements.keys()],
-			gridOverrides: snapshotAllGridOverrides()
+			gridOverrides: snapshotAllGridOverrides(),
+			labelTexts: snapshotAllLabelTexts()
 		};
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
@@ -761,6 +789,11 @@
 			applyGridOverrides(shell, target);
 			layoutChanged = true;
 		}
+		for (const [el, initial] of labelTextInitialSnaps) {
+			const target = frame.labelTexts.get(el) ?? initial;
+			if ((el.textContent ?? '') !== target) el.textContent = target;
+			layoutChanged = true;
+		}
 		if (layoutChanged) notifyLayoutChange();
 		layoutVersion++;
 		saveVersion++;
@@ -789,7 +822,8 @@
 			addedComponents.size > 0 ||
 			removedElements.size > 0 ||
 			hasModifiedLayoutClone() ||
-			hasModifiedGridOverrides()
+			hasModifiedGridOverrides() ||
+			hasModifiedLabelTexts()
 		);
 	});
 
@@ -2493,6 +2527,7 @@
 					onclose={stopInspectingLayout}
 					oncommit={commitHistory}
 					oncapture={ensureGridInitialSnapshot}
+					oncapturelabel={ensureLabelInitialSnapshot}
 				/>
 			{/if}
 
