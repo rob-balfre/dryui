@@ -38,7 +38,7 @@
 		zoneH: number;
 	};
 
-	type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row' | 'swap';
+	type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row';
 	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -67,14 +67,6 @@
 	let trackRemoves = $state<TrackRemove[]>([]);
 	let editing = $state<{ area: Area; value: string } | null>(null);
 	let editingInputEl = $state<HTMLInputElement | null>(null);
-	let areaDragGhost = $state<{ name: string; x: number; y: number } | null>(null);
-	let areaPointer: {
-		area: Area;
-		pointerId: number;
-		startX: number;
-		startY: number;
-		dragging: boolean;
-	} | null = null;
 	const hiddenLabels = new Map<HTMLElement, string>();
 
 	function hideLabel(span: HTMLElement) {
@@ -602,52 +594,9 @@
 
 	const VALID_AREA_NAME = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 
-	const AREA_DRAG_THRESHOLD = 4;
-
-	function startAreaPointer(e: PointerEvent, area: Area) {
+	function startRename(e: MouseEvent, area: Area) {
 		e.stopPropagation();
-		areaPointer = {
-			area,
-			pointerId: e.pointerId,
-			startX: e.clientX,
-			startY: e.clientY,
-			dragging: false
-		};
-		window.addEventListener('pointermove', onAreaMove);
-		window.addEventListener('pointerup', endAreaPointer);
-		window.addEventListener('pointercancel', endAreaPointer);
-	}
-
-	function onAreaMove(e: PointerEvent) {
-		if (!areaPointer || areaPointer.pointerId !== e.pointerId) return;
-		const dx = e.clientX - areaPointer.startX;
-		const dy = e.clientY - areaPointer.startY;
-		if (!areaPointer.dragging) {
-			if (Math.hypot(dx, dy) < AREA_DRAG_THRESHOLD) return;
-			areaPointer.dragging = true;
-		}
-		areaDragGhost = { name: areaPointer.area.name, x: e.clientX + 12, y: e.clientY + 12 };
-	}
-
-	function endAreaPointer(e: PointerEvent) {
-		if (!areaPointer || areaPointer.pointerId !== e.pointerId) return;
-		const wasDragging = areaPointer.dragging;
-		const startedFrom = areaPointer.area;
-		areaPointer = null;
-		areaDragGhost = null;
-		window.removeEventListener('pointermove', onAreaMove);
-		window.removeEventListener('pointerup', endAreaPointer);
-		window.removeEventListener('pointercancel', endAreaPointer);
-		if (!wasDragging) {
-			editing = { area: startedFrom, value: startedFrom.name };
-			return;
-		}
-		const dropEl = document.elementFromPoint(e.clientX, e.clientY);
-		const dropBadge = dropEl?.closest<HTMLButtonElement>('.layout-area-badge');
-		if (!dropBadge) return;
-		const dropName = dropBadge.textContent?.trim();
-		if (!dropName || dropName === startedFrom.name) return;
-		swapAreas(startedFrom.root, startedFrom.shell, startedFrom.name, dropName);
+		editing = { area, value: area.name };
 	}
 
 	function cancelRename() {
@@ -836,46 +785,6 @@
 		oncommit?.();
 	}
 
-	function swapAreas(grid: HTMLElement, shell: HTMLElement, name1: string, name2: string) {
-		if (name1 === name2) return;
-		oncapture?.(shell);
-		const cs = getComputedStyle(shell);
-		for (const prop of TEMPLATE_AREAS_PROPS) {
-			const current = cs.getPropertyValue(prop).trim();
-			if (!current || current === 'none') continue;
-			const swapped = current.replace(/'([^']*)'/g, (_match, row) => {
-				const tokens = row
-					.split(/\s+/)
-					.filter(Boolean)
-					.map((t: string) => {
-						if (t === name1) return name2;
-						if (t === name2) return name1;
-						return t;
-					})
-					.join(' ');
-				return `'${tokens}'`;
-			});
-			if (swapped !== current) shell.style.setProperty(prop, swapped);
-		}
-		for (const child of Array.from(grid.children)) {
-			if (!(child instanceof HTMLElement)) continue;
-			const name = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
-			if (name !== name1 && name !== name2) continue;
-			oncapture?.(child);
-			child.style.setProperty('--dry-grid-area-name', name === name1 ? name2 : name1);
-			const span = child.querySelector<HTMLElement>('[data-area-grid-placeholder] > span');
-			if (span) {
-				const txt = span.textContent ?? '';
-				if (txt === name1 || txt === name2) {
-					oncapturelabel?.(span);
-					span.textContent = txt === name1 ? name2 : name1;
-				}
-			}
-		}
-		scheduleRebuild();
-		oncommit?.();
-	}
-
 	onMount(() => {
 		rebuild();
 		const ro = new ResizeObserver(scheduleRebuild);
@@ -895,9 +804,6 @@
 			window.removeEventListener('pointermove', onMove);
 			window.removeEventListener('pointerup', endDrag);
 			window.removeEventListener('pointercancel', endDrag);
-			window.removeEventListener('pointermove', onAreaMove);
-			window.removeEventListener('pointerup', endAreaPointer);
-			window.removeEventListener('pointercancel', endAreaPointer);
 			scrollLockRestore?.();
 			scrollLockRestore = null;
 			restoreLabels();
@@ -951,7 +857,7 @@
 				data-anchor={a.anchor}
 				aria-label="Rename area {a.name}"
 				style="left: {a.x}px; top: {a.y}px;"
-				onpointerdown={(e) => startAreaPointer(e, a)}
+				onclick={(e) => startRename(e, a)}
 			>
 				{a.name}
 			</button>
@@ -973,12 +879,6 @@
 			></button>
 		{/if}
 	{/each}
-
-	{#if areaDragGhost}
-		<div class="layout-area-ghost" style="left: {areaDragGhost.x}px; top: {areaDragGhost.y}px;">
-			{areaDragGhost.name}
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -1087,20 +987,5 @@
 		background: hsl(0 75% 55% / 0.18);
 		border-color: hsl(0 75% 60%);
 		outline: none;
-	}
-
-	.layout-area-ghost {
-		position: fixed;
-		z-index: 2;
-		padding: 2px 10px;
-		border: 1px solid hsl(25 100% 55%);
-		border-radius: 4px;
-		background: hsl(25 100% 55% / 0.9);
-		color: hsl(225 15% 8%);
-		font-family: var(--dry-font-sans, system-ui, sans-serif);
-		font-size: 0.875rem;
-		font-weight: 500;
-		text-transform: lowercase;
-		pointer-events: none;
 	}
 </style>

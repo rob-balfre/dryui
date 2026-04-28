@@ -14,7 +14,6 @@
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
-		ArrowLeftRight,
 		BetweenHorizontalEnd,
 		BetweenVerticalEnd,
 		Boxes,
@@ -48,7 +47,7 @@
 	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components' | 'layout';
-	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row' | 'swap';
+	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row';
 	export type LayoutBreakpoint = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -748,20 +747,6 @@
 					aria-pressed={layoutTool === 'remove-row'}
 				>
 					<Rows3 size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					type="button"
-					data-tooltip="Swap areas"
-					data-active={layoutTool === 'swap' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'swap' ? null : 'swap')}
-					aria-label="Swap areas"
-					aria-pressed={layoutTool === 'swap'}
-				>
-					<ArrowLeftRight size={16} />
 				</Button>
 
 				<div class="tool-divider" aria-hidden="true"></div>
