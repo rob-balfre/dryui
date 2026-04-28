@@ -441,46 +441,133 @@
 				cy += h;
 			}
 
-			const seen = new Set<string>();
-			for (const child of Array.from(grid.children)) {
-				if (!(child instanceof HTMLElement) && !(child instanceof Element)) continue;
-				const wrapper = child as HTMLElement;
-				const name = getComputedStyle(wrapper).getPropertyValue('--dry-grid-area-name').trim();
-				if (!name || name === 'auto' || name === '.') continue;
-				if (seen.has(name)) continue;
-				seen.add(name);
-				const placeholderLabel = wrapper.querySelector<HTMLElement>(
-					'[data-area-grid-placeholder] > span'
-				);
-				if (placeholderLabel) {
-					const lr = placeholderLabel.getBoundingClientRect();
-					if (lr.width < 4 || lr.height < 4) continue;
-					hideLabel(placeholderLabel);
+			if (hasAreas) {
+				const colStarts: number[] = [rect.left];
+				{
+					let cx = rect.left;
+					for (const w of cols) {
+						cx += w;
+						colStarts.push(cx);
+					}
+				}
+				const rowStarts: number[] = [rect.top];
+				{
+					let cy = rect.top;
+					for (const h of rows) {
+						cy += h;
+						rowStarts.push(cy);
+					}
+				}
+				const wrappersByName = new Map<string, HTMLElement>();
+				for (const child of Array.from(grid.children)) {
+					if (!(child instanceof HTMLElement)) continue;
+					const cname = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
+					if (!cname || cname === 'auto' || cname === '.') continue;
+					if (!wrappersByName.has(cname)) wrappersByName.set(cname, child);
+				}
+				const areaBoxes = new Map<
+					string,
+					{ cMin: number; cMax: number; rMin: number; rMax: number }
+				>();
+				for (let r = 0; r < areaGrid.length; r++) {
+					const row = areaGrid[r]!;
+					for (let c = 0; c < row.length; c++) {
+						const name = row[c]!;
+						if (!name || name === '.') continue;
+						const box = areaBoxes.get(name);
+						if (!box) {
+							areaBoxes.set(name, { cMin: c, cMax: c, rMin: r, rMax: r });
+						} else {
+							if (c < box.cMin) box.cMin = c;
+							if (c > box.cMax) box.cMax = c;
+							if (r < box.rMin) box.rMin = r;
+							if (r > box.rMax) box.rMax = r;
+						}
+					}
+				}
+				for (const [name, box] of areaBoxes) {
+					const wrapper = wrappersByName.get(name);
+					const placeholderLabel = wrapper
+						? wrapper.querySelector<HTMLElement>('[data-area-grid-placeholder] > span')
+						: null;
+					let bx: number;
+					let by: number;
+					let anchor: 'center' | 'topLeft';
+					if (placeholderLabel) {
+						const lr = placeholderLabel.getBoundingClientRect();
+						if (lr.width < 4 || lr.height < 4) continue;
+						hideLabel(placeholderLabel);
+						bx = lr.left + lr.width / 2;
+						by = lr.top + lr.height / 2;
+						anchor = 'center';
+					} else if (wrapper) {
+						const measure = wrapper.firstElementChild as HTMLElement | null;
+						const target = measure ?? wrapper;
+						const cr = target.getBoundingClientRect();
+						if (cr.width < 4 || cr.height < 4) continue;
+						bx = cr.left + 8;
+						by = cr.top + 8;
+						anchor = 'topLeft';
+					} else {
+						const cMaxIdx = Math.min(box.cMax + 1, colStarts.length - 1);
+						const rMaxIdx = Math.min(box.rMax + 1, rowStarts.length - 1);
+						bx = (colStarts[box.cMin]! + colStarts[cMaxIdx]!) / 2;
+						by = (rowStarts[box.rMin]! + rowStarts[rMaxIdx]!) / 2;
+						anchor = 'center';
+					}
 					nextAreas.push({
 						key: `${gridId}-area-${name}`,
 						root: grid,
 						shell,
-						wrapper,
+						wrapper: wrapper ?? grid,
 						name,
-						x: lr.left + lr.width / 2,
-						y: lr.top + lr.height / 2,
-						anchor: 'center'
+						x: bx,
+						y: by,
+						anchor
 					});
-				} else {
-					const measure = wrapper.firstElementChild as HTMLElement | null;
-					const target = measure ?? wrapper;
-					const cr = target.getBoundingClientRect();
-					if (cr.width < 4 || cr.height < 4) continue;
-					nextAreas.push({
-						key: `${gridId}-area-${name}`,
-						root: grid,
-						shell,
-						wrapper,
-						name,
-						x: cr.left + 8,
-						y: cr.top + 8,
-						anchor: 'topLeft'
-					});
+				}
+			} else {
+				const seen = new Set<string>();
+				for (const child of Array.from(grid.children)) {
+					if (!(child instanceof HTMLElement) && !(child instanceof Element)) continue;
+					const wrapper = child as HTMLElement;
+					const name = getComputedStyle(wrapper).getPropertyValue('--dry-grid-area-name').trim();
+					if (!name || name === 'auto' || name === '.') continue;
+					if (seen.has(name)) continue;
+					seen.add(name);
+					const placeholderLabel = wrapper.querySelector<HTMLElement>(
+						'[data-area-grid-placeholder] > span'
+					);
+					if (placeholderLabel) {
+						const lr = placeholderLabel.getBoundingClientRect();
+						if (lr.width < 4 || lr.height < 4) continue;
+						hideLabel(placeholderLabel);
+						nextAreas.push({
+							key: `${gridId}-area-${name}`,
+							root: grid,
+							shell,
+							wrapper,
+							name,
+							x: lr.left + lr.width / 2,
+							y: lr.top + lr.height / 2,
+							anchor: 'center'
+						});
+					} else {
+						const measure = wrapper.firstElementChild as HTMLElement | null;
+						const target = measure ?? wrapper;
+						const cr = target.getBoundingClientRect();
+						if (cr.width < 4 || cr.height < 4) continue;
+						nextAreas.push({
+							key: `${gridId}-area-${name}`,
+							root: grid,
+							shell,
+							wrapper,
+							name,
+							x: cr.left + 8,
+							y: cr.top + 8,
+							anchor: 'topLeft'
+						});
+					}
 				}
 			}
 		}
@@ -663,6 +750,12 @@
 		return '--dry-area-grid-template-areas';
 	}
 
+	function uniqueAreaName(existing: Set<string>, prefix: string, startFrom: number): string {
+		let i = startFrom;
+		while (existing.has(`${prefix}-${i}`)) i++;
+		return `${prefix}-${i}`;
+	}
+
 	function insertCenterTrack(axis: Axis) {
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
 		let mutated = false;
@@ -710,29 +803,67 @@
 
 			const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
 			if (areaRows.length > 0) {
+				const allNames = new Set<string>();
+				for (const prop of TEMPLATE_AREAS_PROPS) {
+					const v = cs.getPropertyValue(prop).trim();
+					if (!v || v === 'none') continue;
+					for (const r of parseTemplateAreas(v)) for (const c of r) if (c !== '.') allNames.add(c);
+				}
+				for (const r of areaRows) for (const c of r) if (c !== '.') allNames.add(c);
+				const newName = uniqueAreaName(allNames, 'area', 1);
+				allNames.add(newName);
+
 				if (axis === 'col') {
+					const splitNames = new Set<string>();
 					for (const row of areaRows) {
-						const at = Math.max(0, Math.min(row.length, bestIdx));
-						const before = at > 0 ? row[at - 1] : undefined;
-						const after = at < row.length ? row[at] : undefined;
-						const fill =
-							before !== undefined && after !== undefined && before === after && before !== '.'
-								? before
-								: '.';
-						row.splice(at, 0, fill);
+						const before = bestIdx > 0 ? row[bestIdx - 1] : undefined;
+						const after = bestIdx < row.length ? row[bestIdx] : undefined;
+						if (before !== undefined && after !== undefined && before === after && before !== '.') {
+							splitNames.add(before);
+						}
+					}
+					const renameMap = new Map<string, string>();
+					for (const sn of splitNames) {
+						const renamed = uniqueAreaName(allNames, sn, 2);
+						renameMap.set(sn, renamed);
+						allNames.add(renamed);
+					}
+					for (const row of areaRows) {
+						for (let c = bestIdx; c < row.length; c++) {
+							const cur = row[c]!;
+							if (renameMap.has(cur)) row[c] = renameMap.get(cur)!;
+						}
+						row.splice(bestIdx, 0, newName);
 					}
 				} else {
 					const colCount = areaRows[0]?.length ?? 1;
-					const at = Math.max(0, Math.min(areaRows.length, bestIdx));
-					const above = at > 0 ? areaRows[at - 1] : undefined;
-					const below = at < areaRows.length ? areaRows[at] : undefined;
-					const newRow: string[] = [];
-					for (let c = 0; c < colCount; c++) {
-						const a = above?.[c];
-						const b = below?.[c];
-						newRow.push(a !== undefined && b !== undefined && a === b && a !== '.' ? a : '.');
+					const splitNames = new Set<string>();
+					if (bestIdx > 0 && bestIdx < areaRows.length) {
+						const above = areaRows[bestIdx - 1]!;
+						const below = areaRows[bestIdx]!;
+						for (let c = 0; c < colCount; c++) {
+							const a = above[c];
+							const b = below[c];
+							if (a !== undefined && b !== undefined && a === b && a !== '.') {
+								splitNames.add(a);
+							}
+						}
 					}
-					areaRows.splice(at, 0, newRow);
+					const renameMap = new Map<string, string>();
+					for (const sn of splitNames) {
+						const renamed = uniqueAreaName(allNames, sn, 2);
+						renameMap.set(sn, renamed);
+						allNames.add(renamed);
+					}
+					for (let r = bestIdx; r < areaRows.length; r++) {
+						const row = areaRows[r]!;
+						for (let c = 0; c < row.length; c++) {
+							const cur = row[c]!;
+							if (renameMap.has(cur)) row[c] = renameMap.get(cur)!;
+						}
+					}
+					const newRow: string[] = new Array(colCount).fill(newName);
+					areaRows.splice(bestIdx, 0, newRow);
 				}
 			}
 
