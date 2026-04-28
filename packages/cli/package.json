@@ -14,7 +14,8 @@
   },
   "type": "module",
   "files": [
-    "dist"
+    "dist",
+    "agents"
   ],
   "publishConfig": {
     "access": "public"

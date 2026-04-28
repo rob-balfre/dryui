@@ -38,7 +38,8 @@
   },
   "files": [
     "dist",
-    "hooks"
+    "hooks",
+    "skills"
   ],
   "publishConfig": {
     "access": "public"

@@ -1,7 +1,15 @@
 // dryui init — Bootstrap a SvelteKit + DryUI project
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	readdirSync,
+	writeFileSync
+} from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
@@ -382,6 +390,54 @@ function setupFeedback(
 	return true;
 }
 
+/**
+ * Drop the bundled Claude Code subagents (feedback, dryui-layout) into
+ * `<project>/.claude/agents/` so the dispatched agent can spawn them. The
+ * source dir lives at `<cli-pkg>/agents` (shipped via the cli tarball's
+ * `files` array). Resolved relative to the runtime entry rather than CWD so
+ * it works whether the cli is invoked from a workspace, a global install, or
+ * a tarball.
+ */
+function setupClaudeAgents(targetPath: string): boolean {
+	const cliBin = fileURLToPath(import.meta.url);
+	// At runtime the bundled entry is `<cli-pkg>/dist/index.js`; agents live
+	// at `<cli-pkg>/agents`. Walk up two levels to reach the package root,
+	// then over to the agents dir.
+	const sourceDir = resolve(dirname(cliBin), '..', 'agents');
+	if (!existsSync(sourceDir)) return false;
+
+	let entries: string[];
+	try {
+		entries = readdirSync(sourceDir).filter((name) => name.endsWith('.md'));
+	} catch {
+		return false;
+	}
+	if (entries.length === 0) return false;
+
+	const targetDir = resolve(targetPath, '.claude', 'agents');
+	mkdirSync(targetDir, { recursive: true });
+
+	const written: string[] = [];
+	for (const name of entries) {
+		const src = resolve(sourceDir, name);
+		const dest = resolve(targetDir, name);
+		// Don't clobber a project's own customised version of an agent. If a
+		// user has edited their `.claude/agents/feedback.md`, leave it alone.
+		if (existsSync(dest)) continue;
+		try {
+			copyFileSync(src, dest);
+			written.push(name);
+		} catch {
+			// Best-effort: if a single file fails, keep going with the rest.
+		}
+	}
+
+	if (written.length > 0) {
+		log(`  + .claude/agents/ (${written.join(', ')})`);
+	}
+	return true;
+}
+
 const IMPECCABLE_INSTALL_TIMEOUT_MS = 60_000;
 const IMPECCABLE_RETRY_HINT = 'Install later with: npx impeccable skills install';
 
@@ -587,6 +643,14 @@ export async function runInit(
 			patchViteConfig: runtime.patchViteConfig ?? patchViteConfigFeedbackNoExternal,
 			findViteConfig: runtime.findViteConfig ?? findViteConfig
 		});
+	}
+
+	if (isScaffold && installsSucceeded) {
+		// Drop the feedback + dryui-layout subagents into the project's
+		// .claude/agents/ so the dispatched session can spawn them. Skipped
+		// silently if the source agents dir is missing or empty (e.g., during
+		// dev when the cli runs unbuilt).
+		setupClaudeAgents(targetPath);
 	}
 
 	const tty = (runtime.isInteractiveTTY ?? isInteractiveTTY)();

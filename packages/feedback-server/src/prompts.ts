@@ -22,33 +22,21 @@ export function buildFeedbackDispatchPrompt(
 		textNotes.length > 0
 			? `\n\nText notes from the annotation:\n${textNotes.map((note) => `- ${note}`).join('\n')}`
 			: '';
-	return `Work on DryUI feedback submission ${s.id} from ${s.url}.
+	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 
-Use the dryui-feedback MCP server:
-1. Call feedback_get_submissions to fetch the latest submission details
-2. Read the screenshot at screenshotPath.png (fallback to screenshotPath.webp) to see what the user annotated
-3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. If the submission has a components array, treat each entry as a placement intent: kind is the DryUI component to add at rect (viewport coords), label/props capture the user's chosen configuration. Outline + chip overlays in the screenshot mark these placements
-5. If the submission has a removed array, treat each entry as a removal intent: tag/selector identify the page element the user wants gone. Dashed red outlines in the screenshot mark these removals
-6. If the submission has a layoutBoxes array, treat each entry as a layout-region intent: label is the user's name for a new region, pageX/pageY/width/height locate it in page coordinates (subtract scroll to get viewport coords). Cyan rectangles in the screenshot mark these regions. Decide where each box belongs in the existing AreaGrid (or propose a new template) and add a corresponding named area + content
-7. ${FEEDBACK_PIPELINE_PROMPT_STEP}
-8. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-9. ${FEEDBACK_LINTER_PROMPT_STEP}
-10. Call feedback_resolve_submission with id "${s.id}" once resolved${notes}`;
+Spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns this entire workflow: fetching the submission, reading the screenshot, decoding the four intent kinds (drawings / components / removed / layoutBoxes), making the smallest source edit that satisfies them, running \`dryui check\`, and calling \`feedback_resolve_submission\`.
+
+Pass the submission id "${s.id}" through. The agent will read its canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` for the full rules — including the AreaGrid no-gap / use-padding rule, the lint trip-wires that crash the dev server, and when to hand off to \`dryui-layout\` instead of editing template-areas directly.
+
+${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 }
 
 export function buildFeedbackBulkPrompt(): string {
-	return `Work on pending DryUI feedback submissions.
+	return `Process pending DryUI feedback submissions.
 
-Use the dryui-feedback MCP server:
-1. Call feedback_get_submissions to list pending submissions
-2. For each submission, read the screenshot at screenshotPath.png (fallback to screenshotPath.webp)
-3. Review the drawings and the parallel hints array (corner, percentX/percentY, element) to locate each mark in the viewport
-4. If the submission has a components array, treat each entry as a placement intent: kind is the DryUI component to add at rect (viewport coords), label/props capture the user's chosen configuration. Outline + chip overlays in the screenshot mark these placements
-5. If the submission has a removed array, treat each entry as a removal intent: tag/selector identify the page element the user wants gone. Dashed red outlines in the screenshot mark these removals
-6. If the submission has a layoutBoxes array, treat each entry as a layout-region intent: label names a new region the user wants, pageX/pageY/width/height locate it in page coordinates. Cyan rectangles in the screenshot mark these regions. Decide where each box belongs in the existing AreaGrid (or propose a new template) and add a corresponding named area + content
-7. ${FEEDBACK_PIPELINE_PROMPT_STEP}
-8. Apply the fixes following DryUI conventions (CSS grid layout, --dry-* tokens, component usage)
-9. ${FEEDBACK_LINTER_PROMPT_STEP}
-10. Call feedback_resolve_submission with the submission id after each fix is complete`;
+For each submission, spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns the full per-submission workflow: fetching, reading the screenshot, decoding intents, editing source, running \`dryui check\`, and calling \`feedback_resolve_submission\`. Its canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` carries all the rules — AreaGrid no-gap, lint trip-wires, hand-off boundaries.
+
+Call \`feedback_get_submissions\` once at the start to enumerate pending ids, then dispatch one feedback subagent per submission.
+
+${FEEDBACK_PIPELINE_PROMPT_STEP}`;
 }
