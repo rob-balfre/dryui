@@ -23,6 +23,7 @@
 		name: string;
 		x: number;
 		y: number;
+		anchor: 'center' | 'topLeft';
 	};
 
 	interface Props {
@@ -180,19 +181,38 @@
 				if (!name || name === 'auto' || name === '.') continue;
 				if (seen.has(name)) continue;
 				seen.add(name);
-				const measure = wrapper.firstElementChild as HTMLElement | null;
-				const target = measure ?? wrapper;
-				const cr = target.getBoundingClientRect();
-				if (cr.width < 4 || cr.height < 4) continue;
-				nextAreas.push({
-					key: `${gridId}-area-${name}`,
-					root: grid,
-					shell,
-					wrapper,
-					name,
-					x: cr.left,
-					y: cr.top
-				});
+				const placeholderLabel = wrapper.querySelector<HTMLElement>(
+					'[data-area-grid-placeholder] > span'
+				);
+				if (placeholderLabel) {
+					const lr = placeholderLabel.getBoundingClientRect();
+					if (lr.width < 4 || lr.height < 4) continue;
+					nextAreas.push({
+						key: `${gridId}-area-${name}`,
+						root: grid,
+						shell,
+						wrapper,
+						name,
+						x: lr.left + lr.width / 2,
+						y: lr.top + lr.height / 2,
+						anchor: 'center'
+					});
+				} else {
+					const measure = wrapper.firstElementChild as HTMLElement | null;
+					const target = measure ?? wrapper;
+					const cr = target.getBoundingClientRect();
+					if (cr.width < 4 || cr.height < 4) continue;
+					nextAreas.push({
+						key: `${gridId}-area-${name}`,
+						root: grid,
+						shell,
+						wrapper,
+						name,
+						x: cr.left + 8,
+						y: cr.top + 8,
+						anchor: 'topLeft'
+					});
+				}
 			}
 		}
 		handles = nextHandles;
@@ -398,10 +418,11 @@
 			<input
 				class="layout-area-input"
 				type="text"
+				data-anchor={a.anchor}
 				aria-label="Rename area {a.name}"
 				bind:value={editing.value}
 				bind:this={editingInputEl}
-				style="left: {a.x + 8}px; top: {a.y + 8}px;"
+				style="left: {a.x}px; top: {a.y}px;"
 				onkeydown={(e) => {
 					if (e.key === 'Enter') {
 						e.preventDefault();
@@ -417,8 +438,9 @@
 			<button
 				class="layout-area-badge"
 				type="button"
+				data-anchor={a.anchor}
 				aria-label="Rename area {a.name}"
-				style="left: {a.x + 8}px; top: {a.y + 8}px;"
+				style="left: {a.x}px; top: {a.y}px;"
 				onclick={(e) => startRename(a, e)}
 			>
 				{a.name}
@@ -473,36 +495,42 @@
 	.layout-area-input {
 		position: fixed;
 		z-index: 1;
-		padding: 2px 8px;
+		margin: 0;
+		padding: 2px 10px;
 		border: 1px solid hsl(25 100% 55%);
 		border-radius: 4px;
-		background: hsl(25 100% 55% / 0.18);
+		background: hsl(225 15% 8%);
 		color: hsl(25 100% 90%);
 		font-family: var(--dry-font-sans, system-ui, sans-serif);
-		font-size: 11px;
-		font-weight: 600;
+		font-size: 0.875rem;
+		font-weight: 500;
 		letter-spacing: 0.02em;
-		line-height: 16px;
+		line-height: 1.25;
+		text-transform: lowercase;
 		pointer-events: auto;
 		cursor: text;
 	}
 
+	.layout-area-badge[data-anchor='center'],
+	.layout-area-input[data-anchor='center'] {
+		transform: translate(-50%, -50%);
+	}
+
 	.layout-area-badge {
-		margin: 0;
 		font: inherit;
+		text-transform: lowercase;
 	}
 
 	.layout-area-badge:hover,
 	.layout-area-badge:focus-visible {
-		background: hsl(25 100% 55% / 0.4);
+		background: hsl(25 100% 55% / 0.9);
+		color: hsl(225 15% 8%);
 		outline: none;
 	}
 
 	.layout-area-input {
 		min-inline-size: 6ch;
 		max-inline-size: 18ch;
-		background: hsl(225 15% 12%);
-		color: hsl(25 100% 92%);
 		caret-color: hsl(25 100% 70%);
 		outline: 2px solid hsl(25 100% 55%);
 		outline-offset: 0;
