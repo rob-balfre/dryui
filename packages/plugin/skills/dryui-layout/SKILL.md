@@ -20,10 +20,11 @@ If you want a behavior these rules forbid, the layout is wrong, not the rules. R
 
 Props (real, from the component source):
 
-- `gap`: `'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'` — defaults `md`. Maps to `--dry-space-{0,1,2,4,6,8}`.
-- `padding`: same scale — defaults `none`.
+- `maxWidth`: `'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'` — defaults `xl` (80rem / 1280px). The grid sits in a centered column that caps at the chosen size; outer breathing on narrower viewports comes from `min(100% - 2rem, …)`. Pick `'full'` only for app shells where chrome (topbar, sidebar) genuinely needs viewport bleed (Jira, Linear, mail clients, IDE-style apps). Sizes: sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem.
 - `fill`: `boolean` — when `true`, the grid stretches to at least viewport height (`min-block-size: 100dvh`). **Always pass `fill` for page-level layouts** (anything in `+page.svelte`); without it the grid collapses to content height and the rest of the viewport sits dark below. Omit only when the AreaGrid is a section inside a larger layout.
 - `debug`: `boolean` — visualizes area boxes during development. Strip before commit.
+
+There is no `gap` and no `padding`. AreaGrid lays out structure only; spacing between regions is each region's surface concern (border, padding, background). If you reach for inner spacing, the boundary is wrong, not the rules. Lint: `dryui/area-grid-no-gap`, `dryui/area-grid-no-padding`.
 
 The Root sets `container-type: inline-size` on itself, so every child can use container queries against the grid's own width.
 
@@ -57,7 +58,6 @@ When you don't yet know which component will fill an area (Layout's job is struc
 </script>
 
 <AreaGrid.Root
-	gap="md"
 	--dry-area-grid-template-areas="'masthead' 'nav' 'main' 'aside' 'foot'"
 	--dry-area-grid-template-areas-wide="'masthead masthead masthead' 'nav main aside' 'foot foot foot'"
 	--dry-area-grid-template-columns-wide="12rem minmax(0, 1fr) 16rem"
@@ -149,6 +149,9 @@ Run `dryui check <file>` (or MCP `check`). The layout-relevant rules to satisfy:
 - `dryui/area-grid-invalid-template`
 - `dryui/area-grid-invalid-var`
 - `dryui/area-grid-no-area-part`
+- `dryui/area-grid-no-gap`
+- `dryui/area-grid-no-padding`
+- `dryui/no-global`
 - `dryui/no-raw-grid`
 - `dryui/no-raw-element`
 - `dryui/no-component-class`
@@ -177,7 +180,7 @@ End every Layout response with this block so the next agent has clean inputs:
 ```
 LAYOUT DONE
 - file: <path>
-- root: AreaGrid.Root, gap=<>, padding=<>
+- root: AreaGrid.Root, maxWidth=<>
 - areas: <list of names>
 - breakpoints: base, wide@720, xl@1024 (+ any custom @container rules added)
 - placeholders:
