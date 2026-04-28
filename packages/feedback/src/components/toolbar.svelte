@@ -704,10 +704,8 @@
 					class="tool-btn"
 					type="button"
 					data-tooltip="Insert column"
-					data-active={layoutTool === 'insert-col' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'insert-col' ? null : 'insert-col')}
+					onclick={() => onlayouttool?.('insert-col')}
 					aria-label="Insert column"
-					aria-pressed={layoutTool === 'insert-col'}
 				>
 					<BetweenVerticalEnd size={16} />
 				</Button>
@@ -718,10 +716,8 @@
 					class="tool-btn"
 					type="button"
 					data-tooltip="Insert row"
-					data-active={layoutTool === 'insert-row' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'insert-row' ? null : 'insert-row')}
+					onclick={() => onlayouttool?.('insert-row')}
 					aria-label="Insert row"
-					aria-pressed={layoutTool === 'insert-row'}
 				>
 					<BetweenHorizontalEnd size={16} />
 				</Button>
@@ -776,7 +772,7 @@
 					class="layout-bp-segmented"
 				>
 					{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
-						<SegmentedControl.Item value={bp} size="sm">{bp}</SegmentedControl.Item>
+						<SegmentedControl.Item value={bp}>{bp}</SegmentedControl.Item>
 					{/each}
 				</SegmentedControl.Root>
 			{:else if showComponentsTools}

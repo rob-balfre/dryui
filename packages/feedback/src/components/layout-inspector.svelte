@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	type Axis = 'col' | 'row';
 
@@ -24,18 +24,6 @@
 		x: number;
 		y: number;
 		anchor: 'center' | 'topLeft';
-	};
-
-	type TrackInsert = {
-		key: string;
-		root: HTMLElement;
-		shell: HTMLElement;
-		axis: Axis;
-		atIndex: number;
-		x: number;
-		y: number;
-		w: number;
-		h: number;
 	};
 
 	type TrackRemove = {
@@ -76,7 +64,6 @@
 	const editingBreakpoint = $derived(breakpoint);
 	let handles = $state<Handle[]>([]);
 	let areas = $state<Area[]>([]);
-	let trackInserts = $state<TrackInsert[]>([]);
 	let trackRemoves = $state<TrackRemove[]>([]);
 	let editing = $state<{ area: Area; value: string } | null>(null);
 	let editingInputEl = $state<HTMLInputElement | null>(null);
@@ -290,7 +277,6 @@
 	function rebuild() {
 		const nextHandles: Handle[] = [];
 		const nextAreas: Area[] = [];
-		const nextInserts: TrackInsert[] = [];
 		const nextRemoves: TrackRemove[] = [];
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
 		for (const grid of grids) {
@@ -356,71 +342,42 @@
 				}
 			}
 
-			// Track add/remove zones. Inserts: thin perpendicular ribbon at every
-			// insertion point (rendered when insert tools are active). Removes:
-			// full-track click zone the user can hit anywhere in the column/row.
-			const INSERT_ZONE = 16;
+			// Remove zones: full-track click area covering the column / row.
 			let cx = rect.left;
-			for (let i = 0; i <= cols.length; i++) {
-				nextInserts.push({
-					key: `${gridId}-ins-col-${i}`,
-					root: grid,
-					shell,
-					axis: 'col',
-					atIndex: i,
-					x: cx - INSERT_ZONE / 2,
-					y: rect.top,
-					w: INSERT_ZONE,
-					h: rect.height
-				});
-				if (i < cols.length) {
-					const w = cols[i]!;
-					if (cols.length > 1) {
-						nextRemoves.push({
-							key: `${gridId}-rm-col-${i}`,
-							root: grid,
-							shell,
-							axis: 'col',
-							index: i,
-							zoneX: cx,
-							zoneY: rect.top,
-							zoneW: w,
-							zoneH: rect.height
-						});
-					}
-					cx += w;
+			for (let i = 0; i < cols.length; i++) {
+				const w = cols[i]!;
+				if (cols.length > 1) {
+					nextRemoves.push({
+						key: `${gridId}-rm-col-${i}`,
+						root: grid,
+						shell,
+						axis: 'col',
+						index: i,
+						zoneX: cx,
+						zoneY: rect.top,
+						zoneW: w,
+						zoneH: rect.height
+					});
 				}
+				cx += w;
 			}
 			let cy = rect.top;
-			for (let i = 0; i <= rows.length; i++) {
-				nextInserts.push({
-					key: `${gridId}-ins-row-${i}`,
-					root: grid,
-					shell,
-					axis: 'row',
-					atIndex: i,
-					x: rect.left,
-					y: cy - INSERT_ZONE / 2,
-					w: rect.width,
-					h: INSERT_ZONE
-				});
-				if (i < rows.length) {
-					const h = rows[i]!;
-					if (rows.length > 1) {
-						nextRemoves.push({
-							key: `${gridId}-rm-row-${i}`,
-							root: grid,
-							shell,
-							axis: 'row',
-							index: i,
-							zoneX: rect.left,
-							zoneY: cy,
-							zoneW: rect.width,
-							zoneH: h
-						});
-					}
-					cy += h;
+			for (let i = 0; i < rows.length; i++) {
+				const h = rows[i]!;
+				if (rows.length > 1) {
+					nextRemoves.push({
+						key: `${gridId}-rm-row-${i}`,
+						root: grid,
+						shell,
+						axis: 'row',
+						index: i,
+						zoneX: rect.left,
+						zoneY: cy,
+						zoneW: rect.width,
+						zoneH: h
+					});
 				}
+				cy += h;
 			}
 
 			const seen = new Set<string>();
@@ -468,7 +425,6 @@
 		}
 		handles = nextHandles;
 		areas = nextAreas;
-		trackInserts = nextInserts;
 		trackRemoves = nextRemoves;
 	}
 
@@ -732,6 +688,30 @@
 		oncommit?.();
 	}
 
+	function insertCenterTrack(axis: Axis) {
+		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
+		for (const grid of grids) {
+			if (isInsideFeedback(grid)) continue;
+			const shell = grid.closest<HTMLElement>('[data-area-grid-shell]');
+			if (!shell) continue;
+			const cs = getComputedStyle(grid);
+			const tracks = parseTrackTokens(
+				axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows
+			);
+			const center = Math.max(1, Math.floor(tracks.length / 2));
+			insertTrack(grid, shell, axis, center);
+		}
+	}
+
+	$effect(() => {
+		const t = tool;
+		if (t !== 'insert-col' && t !== 'insert-row') return;
+		untrack(() => {
+			insertCenterTrack(t === 'insert-col' ? 'col' : 'row');
+			ontool?.(null);
+		});
+	});
+
 	function removeTrack(grid: HTMLElement, shell: HTMLElement, axis: Axis, index: number) {
 		oncapture?.(shell);
 		const cs = getComputedStyle(grid);
@@ -879,22 +859,6 @@
 		{/if}
 	{/each}
 
-	{#each trackInserts as t (t.key)}
-		{#if (tool === 'insert-col' && t.axis === 'col') || (tool === 'insert-row' && t.axis === 'row')}
-			<button
-				class="layout-track-zone layout-track-insert-zone"
-				data-axis={t.axis}
-				type="button"
-				aria-label="Insert {t.axis === 'col' ? 'column' : 'row'} at position {t.atIndex + 1}"
-				style="left: {t.x}px; top: {t.y}px; width: {t.w}px; height: {t.h}px;"
-				onclick={(e) => {
-					e.stopPropagation();
-					insertTrack(t.root, t.shell, t.axis, t.atIndex);
-				}}
-			></button>
-		{/if}
-	{/each}
-
 	{#each trackRemoves as t (t.key)}
 		{#if (tool === 'remove-col' && t.axis === 'col') || (tool === 'remove-row' && t.axis === 'row')}
 			<button
@@ -1017,17 +981,6 @@
 		transition:
 			background 0.12s ease-out,
 			border-color 0.12s ease-out;
-	}
-
-	.layout-track-insert-zone {
-		border-style: dashed;
-	}
-
-	.layout-track-insert-zone:hover,
-	.layout-track-insert-zone:focus-visible {
-		background: hsl(140 60% 45% / 0.2);
-		border-color: hsl(140 60% 50%);
-		outline: none;
 	}
 
 	.layout-track-remove-zone:hover,
