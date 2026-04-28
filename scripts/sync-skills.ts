@@ -3,7 +3,7 @@ import { readdir, exists, rm, realpath, lstat } from 'node:fs/promises';
 import { join, basename, relative } from 'node:path';
 
 const root = join(import.meta.dir, '..');
-const dryuiSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui');
+const layoutSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui-layout');
 const feedbackSkillSource = join(root, 'packages', 'feedback', 'skills', 'live-feedback');
 const initSkillSource = join(root, 'packages', 'cli', 'skills', 'init');
 const pluginSkills = join(root, 'packages', 'plugin', 'skills');
@@ -209,20 +209,22 @@ async function verifySyncedTree(src: string, dest: string, mismatches: Mismatch[
 // 1. Sync source skills into the plugin bundle and generate Cursor rules.
 const syncedTargets: Array<{ src: string; dest: string; label: string }> = [];
 
-if (await exists(dryuiSkillSource)) {
-	const pluginDryuiDest = join(pluginSkills, 'dryui');
+if (await exists(layoutSkillSource)) {
+	const pluginLayoutDest = join(pluginSkills, 'dryui-layout');
 
-	await removeStale(dryuiSkillSource, pluginDryuiDest);
-	await copyDir(dryuiSkillSource, pluginDryuiDest);
-	await syncSkillToCursor(dryuiSkillSource, 'dryui', cursorRules);
+	await removeStale(layoutSkillSource, pluginLayoutDest);
+	await copyDir(layoutSkillSource, pluginLayoutDest);
+	await syncSkillToCursor(layoutSkillSource, 'dryui-layout', cursorRules);
 
 	syncedTargets.push({
-		src: dryuiSkillSource,
-		dest: pluginDryuiDest,
-		label: 'packages/plugin/skills/dryui'
+		src: layoutSkillSource,
+		dest: pluginLayoutDest,
+		label: 'packages/plugin/skills/dryui-layout'
 	});
 
-	console.log('synced packages/ui/skills/dryui → packages/plugin/skills/dryui + .cursor/rules/');
+	console.log(
+		'synced packages/ui/skills/dryui-layout → packages/plugin/skills/dryui-layout + .cursor/rules/'
+	);
 }
 
 if (await exists(feedbackSkillSource)) {
