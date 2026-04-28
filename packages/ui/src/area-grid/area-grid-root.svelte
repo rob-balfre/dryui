@@ -4,19 +4,17 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
-	export type AreaGridSpace = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+	export type AreaGridMaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
-		gap?: AreaGridSpace;
-		padding?: AreaGridSpace;
+		maxWidth?: AreaGridMaxWidth;
 		fill?: boolean;
 		debug?: boolean;
 		children: Snippet;
 	}
 
 	let {
-		gap = 'md',
-		padding = 'none',
+		maxWidth = 'xl',
 		fill = false,
 		debug = false,
 		children,
@@ -27,8 +25,7 @@
 
 <section
 	data-area-grid-shell
-	data-gap={gap}
-	data-padding={padding}
+	data-max-width={maxWidth}
 	data-fill={fill || undefined}
 	class={className}
 	{...rest}
@@ -40,18 +37,44 @@
 
 <style>
 	[data-area-grid-shell] {
-		--dry-area-grid-gap: var(--dry-space-4);
-		--dry-area-grid-padding: 0;
+		--_dry-area-grid-max-inline-size: 80rem;
 
 		container-type: inline-size;
 		display: grid;
-		padding: var(--dry-area-grid-padding);
+		inline-size: min(100% - 2rem, var(--_dry-area-grid-max-inline-size));
+		margin-inline: auto;
 	}
 
-	[data-area-grid-shell][data-fill],
+	[data-area-grid-shell][data-max-width='sm'] {
+		--_dry-area-grid-max-inline-size: 40rem;
+	}
+
+	[data-area-grid-shell][data-max-width='md'] {
+		--_dry-area-grid-max-inline-size: 48rem;
+	}
+
+	[data-area-grid-shell][data-max-width='lg'] {
+		--_dry-area-grid-max-inline-size: 64rem;
+	}
+
+	[data-area-grid-shell][data-max-width='xl'] {
+		--_dry-area-grid-max-inline-size: 80rem;
+	}
+
+	[data-area-grid-shell][data-max-width='2xl'] {
+		--_dry-area-grid-max-inline-size: 96rem;
+	}
+
+	[data-area-grid-shell][data-max-width='full'] {
+		inline-size: 100%;
+	}
+
+	[data-area-grid-shell][data-fill] {
+		min-block-size: 100dvh;
+	}
+
 	[data-area-grid-shell][data-fill] > [data-area-grid] {
-		block-size: 100%;
-		min-block-size: 0;
+		min-block-size: 100%;
 	}
 
 	[data-area-grid] {
@@ -71,6 +94,7 @@
 		--_dry-area-grid-justify-items: var(--dry-area-grid-justify-items, stretch);
 
 		display: grid;
+		box-sizing: border-box;
 		grid-template-columns: var(--_dry-area-grid-columns);
 		grid-template-rows: var(--_dry-area-grid-rows);
 		grid-template-areas: var(--_dry-area-grid-template);
@@ -78,7 +102,6 @@
 		grid-auto-rows: var(--_dry-area-grid-auto-rows);
 		align-items: var(--_dry-area-grid-align-items);
 		justify-items: var(--_dry-area-grid-justify-items);
-		gap: var(--dry-area-grid-gap);
 	}
 
 	[data-area-grid][data-debug] {
@@ -89,50 +112,6 @@
 		--dry-area-grid-area-radius: var(--dry-radius-lg);
 		--dry-area-grid-area-bg: var(--dry-color-bg-raised);
 		--dry-area-grid-area-color: var(--dry-color-text-strong);
-	}
-
-	[data-area-grid-shell][data-gap='none'] {
-		--dry-area-grid-gap: 0;
-	}
-
-	[data-area-grid-shell][data-gap='xs'] {
-		--dry-area-grid-gap: var(--dry-space-1);
-	}
-
-	[data-area-grid-shell][data-gap='sm'] {
-		--dry-area-grid-gap: var(--dry-space-2);
-	}
-
-	[data-area-grid-shell][data-gap='md'] {
-		--dry-area-grid-gap: var(--dry-space-4);
-	}
-
-	[data-area-grid-shell][data-gap='lg'] {
-		--dry-area-grid-gap: var(--dry-space-6);
-	}
-
-	[data-area-grid-shell][data-gap='xl'] {
-		--dry-area-grid-gap: var(--dry-space-8);
-	}
-
-	[data-area-grid-shell][data-padding='xs'] {
-		--dry-area-grid-padding: var(--dry-space-1);
-	}
-
-	[data-area-grid-shell][data-padding='sm'] {
-		--dry-area-grid-padding: var(--dry-space-2);
-	}
-
-	[data-area-grid-shell][data-padding='md'] {
-		--dry-area-grid-padding: var(--dry-space-4);
-	}
-
-	[data-area-grid-shell][data-padding='lg'] {
-		--dry-area-grid-padding: var(--dry-space-6);
-	}
-
-	[data-area-grid-shell][data-padding='xl'] {
-		--dry-area-grid-padding: var(--dry-space-8);
 	}
 
 	@container (min-width: 720px) {

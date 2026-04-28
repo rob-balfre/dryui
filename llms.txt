@@ -1,6 +1,6 @@
 # DryUI
 
-> 168 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> 167 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
 
 ## Packages
 
@@ -565,9 +565,9 @@ Example: <Container>
 grid-template-areas layout with component CSS variable-driven child area names.
 Import: @dryui/ui
 Subpath import: @dryui/ui/area-grid
-Parts: Root
-Props: Root: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'md' | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl, default 'none' | fill (boolean), default false | debug (boolean), default false | children (Snippet), Content rendered inside the component., required
-Data attributes: data-area-grid | data-area-grid-shell | data-debug | data-fill | data-gap | data-padding
+Parts: Root, Placeholder
+Props: Root: gap ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl | padding ('none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'), accepted none, xs, sm, md, lg, xl | fill (boolean), default false | debug (boolean), default false | children (Snippet), Content rendered inside the component., required | Placeholder: area (string), required
+Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-shell | data-debug | data-fill | data-max-width
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <AreaGrid.Root
 
@@ -690,14 +690,6 @@ Props: Root: children (Snippet), Content rendered inside the component., require
 Data attributes: data-level | data-page-header | data-page-header-actions | data-page-header-content | data-page-header-description | data-page-header-eyebrow | data-page-header-meta | data-page-header-title
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <PageHeader.Root>
-
-### Surface
-Simple surface wrapper for background treatment.
-Import: @dryui/primitives
-Props: as ('div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section'), Underlying HTML element to render for the component., accepted div, span, header, nav, main, footer, section, default 'div' | background (string) | className (HTMLAttributes<HTMLElement>['class']) | children (Snippet), Content rendered inside the component.
-Data attributes: none
-Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
-Example: <Surface>Content</Surface>
 
 ### Category: Navigation
 

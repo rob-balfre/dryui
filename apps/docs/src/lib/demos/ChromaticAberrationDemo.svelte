@@ -20,7 +20,6 @@
 	</div>
 
 	<ChromaticAberration offset={3} angle={18}>
-		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="title">Checkout API unreachable</h3>
 	</ChromaticAberration>
 

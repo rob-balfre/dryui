@@ -22,7 +22,6 @@
 		<section class="poster">
 			<div class="header">
 				<div class="eyebrow">Halftone print surface</div>
-				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h3>Make the dots compete with tonal range.</h3>
 				<p>
 					Put the overlay over a bright poster, a lit paper card, and a few saturated blocks so the
@@ -48,7 +47,6 @@
 			<div class="notes">
 				{#each callouts as note (note.label)}
 					<article class="note">
-						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h4>{note.label}</h4>
 						<p>{note.body}</p>
 					</article>

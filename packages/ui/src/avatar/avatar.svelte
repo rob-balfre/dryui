@@ -66,7 +66,6 @@
 			{...rest}
 		>
 			{#if showImage}
-				<!-- dryui-allow raw-img: Avatar owns the intrinsic image primitive and fallback/error lifecycle. -->
 				<img {src} {alt} onerror={handleError} />
 			{:else if children}
 				{@render children()}
@@ -91,7 +90,6 @@
 		{...rest}
 	>
 		{#if showImage}
-			<!-- dryui-allow raw-img: Avatar owns the intrinsic image primitive and fallback/error lifecycle. -->
 			<img {src} {alt} onerror={handleError} />
 		{:else if children}
 			{@render children()}

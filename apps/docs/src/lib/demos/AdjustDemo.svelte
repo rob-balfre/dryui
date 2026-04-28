@@ -17,7 +17,6 @@
 			</div>
 
 			<div class="sample-copy">
-				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h3 class="sample-title">Unfiltered card</h3>
 				<Text color="secondary">
 					This is the same composition with no filter adjustment applied.
@@ -39,7 +38,6 @@
 				</div>
 
 				<div class="sample-copy">
-					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3 class="sample-title">Hue-shifted output</h3>
 					<Text color="secondary">
 						This one should read instantly: hue rotation remaps the palette while brightness,
@@ -217,7 +215,6 @@
 		min-block-size: 8rem;
 		border-radius: calc(var(--dry-radius-lg) * 0.95);
 		box-shadow:
-			/* dryui-allow inset-shadow: intentional top highlight rail on chip surface. */
 			inset 0 1px 0 color-mix(in srgb, white 24%, transparent),
 			0 10px 24px color-mix(in srgb, black 14%, transparent);
 	}

@@ -545,11 +545,15 @@ describe('checkMarkup', () => {
 		expect(violations[1]!.rule).toBe('dryui/no-svelte-element');
 	});
 
-	test('allows <svelte:element> with dryui-allow comment', () => {
-		const code = `<!-- dryui-allow svelte-element: h1–h6 share UA styles -->
-<svelte:element this={tag}>heading</svelte:element>`;
-		const violations = checkMarkup(code);
-		expect(violations).toHaveLength(0);
+	test('allows <svelte:element> in owner directories', () => {
+		const code = `<svelte:element this={tag}>heading</svelte:element>`;
+		expect(checkMarkup(code, '/abs/packages/ui/src/motion/enter.svelte')).toHaveLength(0);
+		expect(checkMarkup(code, '/abs/packages/primitives/src/page-header/page-header-title.svelte')).toHaveLength(0);
+	});
+
+	test('flags <svelte:element> outside owner directories', () => {
+		const code = `<svelte:element this={tag}>heading</svelte:element>`;
+		expect(checkMarkup(code, '/abs/some/other/file.svelte')).toHaveLength(1);
 	});
 
 	test('does not flag <svelte:element> inside script string', () => {
@@ -769,9 +773,10 @@ describe('checkStyle', () => {
 		expect(violations[0]!.line).toBe(2);
 	});
 
-	test('allows !important with dryui-allow important comment', () => {
-		const violations = checkStyle('/* dryui-allow important */\n.foo { color: red !important; }');
-		expect(violations).toHaveLength(0);
+	test('flags !important everywhere (no owner carve-out)', () => {
+		const code = '.foo { color: red !important; }';
+		expect(checkStyle(code)).toHaveLength(1);
+		expect(checkStyle(code, {}, '/abs/packages/ui/src/motion/enter.svelte')).toHaveLength(1);
 	});
 
 	test('flags multiple !important occurrences', () => {
@@ -868,9 +873,9 @@ describe('checkStyle', () => {
 		expect(violations[1]!.message).toContain('grid-template-columns');
 	});
 
-	test('does not allow raw grid with dryui-allow grid comment in migration mode', () => {
+	test('raw grid in migration mode flags inside non-AreaGrid files', () => {
 		const violations = checkStyle(
-			'/* dryui-allow grid */\n.foo { display: grid; grid-template-columns: 1fr; }',
+			'.foo { display: grid; grid-template-columns: 1fr; }',
 			{ forbidRawGrid: true },
 			'src/routes/+page.svelte'
 		);
@@ -917,14 +922,30 @@ describe('checkStyle', () => {
 		expect(violations[0]!.line).toBe(1);
 	});
 
-	test('allows display: flex with dryui-allow flex comment', () => {
-		const violations = checkStyle('/* dryui-allow flex */\n.foo { display: flex; }');
-		expect(violations).toHaveLength(0);
+	test('allows display: flex inside owner directories', () => {
+		expect(
+			checkStyle(
+				'.foo { display: flex; }',
+				{},
+				'/abs/packages/primitives/src/page-header/page-header-meta.svelte'
+			)
+		).toHaveLength(0);
 	});
 
-	test('allows flex-direction with dryui-allow flex comment', () => {
-		const violations = checkStyle('/* dryui-allow flex */\nflex-direction: row;');
-		expect(violations).toHaveLength(0);
+	test('allows flex-direction inside owner directories', () => {
+		expect(
+			checkStyle(
+				'flex-direction: row;',
+				{},
+				'/abs/packages/primitives/src/page-header/page-header-meta.svelte'
+			)
+		).toHaveLength(0);
+	});
+
+	test('flags display: flex outside owner directories', () => {
+		expect(
+			checkStyle('.foo { display: flex; }', {}, '/abs/packages/ui/src/area-grid/area-grid-root.svelte')
+		).toHaveLength(1);
 	});
 
 	test('flags outline: 2px solid var(--dry-color-focus-ring) literal', () => {
@@ -986,84 +1007,21 @@ describe('checkStyle', () => {
 		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
 	});
 
-	test('allows partial inset with dryui-allow inset-shadow comment', () => {
+	test('allows partial inset inside owner directories', () => {
 		const violations = checkStyle(
-			'/* dryui-allow inset-shadow */\n.foo { box-shadow: inset 2px 0 0 blue; }'
+			'.foo { box-shadow: inset 2px 0 0 blue; }',
+			{},
+			'/abs/packages/ui/src/option-picker/option-picker-preview.svelte'
 		);
 		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
 	});
 
-	test('allows partial inset when comment sits above a multi-line box-shadow', () => {
-		const code = [
-			'.foo {',
-			'\t/* dryui-allow inset-shadow */',
-			'\tbox-shadow:',
-			'\t\tinset 0 1px 0 white,',
-			'\t\tinset 0 -1px 0 black;',
-			'}'
-		].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
-	});
-
-	test('rejects allow comment that is gated by an intervening declaration terminator', () => {
-		const code = [
-			'.foo {',
-			'\t/* dryui-allow inset-shadow */',
-			'\tcolor: red;',
-			'\tbox-shadow: inset 2px 0 0 blue;',
-			'}'
-		].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
-	});
-
-	test('rejects allow comment that sits outside the rule block', () => {
-		const code = [
-			'/* dryui-allow inset-shadow */',
-			'.foo {',
-			'\tbox-shadow: inset 2px 0 0 blue;',
-			'}'
-		].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
-	});
-
-	test('does not let a trailing CSS comment hide a previous declaration terminator', () => {
-		const code = [
-			'.foo {',
-			'\t/* dryui-allow inset-shadow */',
-			'\tcolor: red; /* primary brand */',
-			'\tbox-shadow: inset 2px 0 0 blue;',
-			'}'
-		].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
-	});
-
-	test('allows multi-line flex declaration with comment above the property', () => {
-		const code = ['.foo {', '\t/* dryui-allow flex */', '\tdisplay:', '\t\tflex;', '}'].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
-	});
-
-	test('allows partial inset with inline allow comment on the same line as the violation', () => {
-		const code = [
-			'.foo {',
-			'\tbox-shadow:',
-			'\t\t0 22px 48px black,',
-			'\t\t/* dryui-allow inset-shadow */ inset 0 1px 0 white;',
-			'}'
-		].join('\n');
-		const violations = checkStyle(code);
-		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
-	});
-
-	test('inline allow comment only covers the value that follows it', () => {
-		const code =
-			'.foo { box-shadow: inset 2px 0 0 red, /* dryui-allow inset-shadow */ inset 0 -1px 0 black; }';
-		const violations = checkStyle(code);
-		// The first inset has no allow before it; the second one does.
+	test('flags partial inset outside owner directories', () => {
+		const violations = checkStyle(
+			'.foo { box-shadow: inset 2px 0 0 blue; }',
+			{},
+			'/abs/packages/ui/src/area-grid/area-grid-root.svelte'
+		);
 		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(1);
 	});
 

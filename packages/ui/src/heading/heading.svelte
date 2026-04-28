@@ -27,32 +27,26 @@
 </script>
 
 {#if level === 1}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h1 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h1>
 {:else if level === 2}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h2 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h2>
 {:else if level === 3}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h3 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h3>
 {:else if level === 4}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h4 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h4>
 {:else if level === 5}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h5 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h5>
 {:else}
-	<!-- dryui-allow raw-heading: Heading is the canonical component that renders semantic h1-h6 output. -->
 	<h6 class={className} {...variantAttrs({ level, variant, measure })} {...rest}>
 		{@render children()}
 	</h6>

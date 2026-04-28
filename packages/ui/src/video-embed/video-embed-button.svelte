@@ -102,7 +102,6 @@
 		{/if}
 	{:else}
 		{#if poster}
-			<!-- dryui-allow raw-img: VideoEmbed owns the poster media element inside the play overlay surface. -->
 			<img data-part="poster" src={poster} alt="" />
 		{/if}
 		<span class="play-btn-slot">

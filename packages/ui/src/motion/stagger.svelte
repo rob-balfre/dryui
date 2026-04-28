@@ -24,7 +24,6 @@
 	});
 </script>
 
-<!-- dryui-allow svelte-element -->
 <svelte:element this={as} bind:this={el} data-dry-stagger>
 	{@render children?.()}
 </svelte:element>

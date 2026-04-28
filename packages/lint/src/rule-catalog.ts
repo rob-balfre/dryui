@@ -193,6 +193,20 @@ export const RULE_CATALOG = {
 		suggestedFix:
 			'Use one AreaGrid.Root per file and place child components with --dry-grid-area-name.'
 	},
+	'dryui/area-grid-no-gap': {
+		id: 'dryui/area-grid-no-gap',
+		severity: 'error',
+		message:
+			"AreaGrid.Root has no gap. Spacing between regions is each region's surface concern (border, padding, background).",
+		suggestedFix: 'Remove the gap attribute.'
+	},
+	'dryui/area-grid-no-padding': {
+		id: 'dryui/area-grid-no-padding',
+		severity: 'error',
+		message:
+			'AreaGrid.Root has no padding. Outer breathing comes from the centered max-width container; inner spacing belongs to the regions themselves.',
+		suggestedFix: 'Remove the padding attribute.'
+	},
 	'bare-compound': {
 		id: 'bare-compound',
 		severity: 'error',

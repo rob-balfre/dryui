@@ -107,9 +107,7 @@
 	/* ---------- Dialog (center) ---------- */
 
 	[data-modal-content][data-variant='dialog'] {
-		/* dryui-allow width: resets native <dialog> sizing so the outer grid track owns the centered panel width. */
 		width: 100vw;
-		/* dryui-allow width: paired with the width reset above. */
 		max-width: none;
 		display: grid;
 		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));
@@ -173,9 +171,7 @@
 	/* ---------- AlertDialog (center) ---------- */
 
 	[data-modal-content][data-variant='alert-dialog'] {
-		/* dryui-allow width: resets native <dialog> sizing so the outer grid track owns the centered panel width. */
 		width: 100vw;
-		/* dryui-allow width: paired with the width reset above. */
 		max-width: none;
 		display: grid;
 		grid-template-columns: min(90vw, var(--dry-dialog-max-width, 32rem));

@@ -16,7 +16,6 @@
 
 				<div class="hero">
 					<p class="eyebrow">Ambient light system</p>
-					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3>A clear source, a dark surface, and enough content to catch the beams.</h3>
 					<Text color="secondary">
 						The demo shows what GodRays is for: soft editorial lighting that frames a panel instead

@@ -43,7 +43,6 @@
 	<section class="mask-demo">
 		<header class="mask-header">
 			<div class="mask-kicker">Mask Reveal</div>
-			<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 			<h3>Open the surface from the center so the transition is unmistakable.</h3>
 			<p>
 				The demo uses a dense poster-style layout instead of a single line, which makes the clip
@@ -54,7 +53,6 @@
 		<div class="mask-grid">
 			<article class="mask-hero">
 				<p class="mask-eyebrow">Entrance moment</p>
-				<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 				<h4>Reveal content with a strong silhouette and clear interior structure.</h4>
 				<p>
 					The brighter center panel, hard edges, and layered chips give the mask something to shape
@@ -65,7 +63,6 @@
 			<div class="mask-cards">
 				{#each cards as card (card.title)}
 					<article class="mask-card">
-						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h4>{card.title}</h4>
 						<p>{card.body}</p>
 					</article>
@@ -150,7 +147,6 @@
 		background:
 			linear-gradient(145deg, var(--dry-color-fill-brand-weak), transparent 45%),
 			linear-gradient(180deg, var(--dry-color-bg-floating), var(--dry-color-bg-raised));
-		/* dryui-allow inset-shadow: intentional top highlight rail on hero surface. */
 		box-shadow: inset 0 1px 0 hsla(0, 0%, 100%, 0.08);
 	}
 

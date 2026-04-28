@@ -997,10 +997,9 @@
         "Root": {
           "props": {
             "gap": {
-              "signature": "gap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | default:'md' | values:none|xs|sm|md|lg|xl",
+              "signature": "gap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | values:none|xs|sm|md|lg|xl",
               "required": false,
               "bindable": false,
-              "default": "'md'",
               "values": [
                 "none",
                 "xs",
@@ -1011,10 +1010,9 @@
               ]
             },
             "padding": {
-              "signature": "padding: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | default:'none' | values:none|xs|sm|md|lg|xl",
+              "signature": "padding: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | values:none|xs|sm|md|lg|xl",
               "required": false,
               "bindable": false,
-              "default": "'none'",
               "values": [
                 "none",
                 "xs",
@@ -1044,6 +1042,15 @@
             }
           },
           "forwards": "Forwards <element> attributes via rest props. Examples: id, class, aria-label."
+        },
+        "Placeholder": {
+          "props": {
+            "area": {
+              "signature": "area: string | required",
+              "required": true,
+              "bindable": false
+            }
+          }
         }
       },
       "structure": [
@@ -15810,74 +15817,6 @@
         "    Stepper.Step",
         "    Stepper.Separator"
       ]
-    },
-    "Surface": {
-      "name": "Surface",
-      "description": "Simple surface wrapper for background treatment",
-      "category": "layout",
-      "tags": [
-        "surface",
-        "background",
-        "container",
-        "panel"
-      ],
-      "kind": "simple",
-      "import": {
-        "package": "@dryui/primitives",
-        "statement": "import { Surface } from '@dryui/primitives'"
-      },
-      "requiredParts": [],
-      "bindableProps": [],
-      "usage": "<Surface>Content</Surface>",
-      "accessibility": [
-        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
-        "Only add landmark or region semantics when the section has a unique, meaningful label."
-      ],
-      "antiPatterns": [],
-      "rules": [
-        "Import Surface from @dryui/primitives.",
-        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
-        "Preserve the accessibility notes in this contract."
-      ],
-      "checks": [
-        "dryui prompt --component Surface",
-        "dryui check <file.svelte>",
-        "Svelte MCP svelte-autofixer on edited Svelte code"
-      ],
-      "props": {
-        "as": {
-          "signature": "as: 'div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section' | default:'div' | values:div|span|header|nav|main|footer|section",
-          "required": false,
-          "bindable": false,
-          "default": "'div'",
-          "values": [
-            "div",
-            "span",
-            "header",
-            "nav",
-            "main",
-            "footer",
-            "section"
-          ],
-          "description": "Underlying HTML element to render for the component."
-        },
-        "background": {
-          "signature": "background: string",
-          "required": false,
-          "bindable": false
-        },
-        "className": {
-          "signature": "className: HTMLAttributes<HTMLElement>['class']",
-          "required": false,
-          "bindable": false
-        },
-        "children": {
-          "signature": "children: Snippet",
-          "required": false,
-          "bindable": false,
-          "description": "Content rendered inside the component."
-        }
-      }
     },
     "Svg": {
       "name": "Svg",

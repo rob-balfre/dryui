@@ -5,7 +5,6 @@
 <div class="stage">
 	<div class="head">
 		<p class="eyebrow">Deploy route</p>
-		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="title">Replicating edge to region</h3>
 		<Text color="secondary" size="sm">
 			Beam draws a moving highlight across a surface. Use it to hint at an active path without

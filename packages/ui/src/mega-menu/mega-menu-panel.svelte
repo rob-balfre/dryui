@@ -104,7 +104,6 @@
 		border-radius: var(--dry-radius-lg, 0.5rem);
 		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
 		padding: var(--dry-space-4, 1rem);
-		/* dryui-allow width: viewport cap for the anchored floating panel, not a child-layout sizing rule. */
 		max-inline-size: var(--dry-mega-menu-panel-max-width, min(92vw, 60rem));
 		display: grid;
 		grid-auto-flow: column;

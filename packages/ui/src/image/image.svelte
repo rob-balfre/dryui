@@ -37,10 +37,8 @@
 {#if status === 'error' && fallbackSnippet}
 	{@render fallbackSnippet()}
 {:else if status === 'error' && fallback}
-	<!-- dryui-allow raw-img: Image is the canonical component that renders the underlying img element. -->
 	<img class={className} src={fallback} {alt} data-state="fallback" {...rest} />
 {:else}
-	<!-- dryui-allow raw-img: Image is the canonical component that renders the underlying img element. -->
 	<img
 		class={className}
 		{src}

@@ -101,11 +101,8 @@
 	onkeydown={handleKeydown}
 	{...rest}
 >
-	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h1>.</h1>
-	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h2>.</h2>
-	<!-- dryui-allow raw-heading: hidden seed nodes make Svelte retain scoped styles for sanitized contenteditable HTML. -->
 	<h3>.</h3>
 	<p></p>
 	<ul><li></li></ul>

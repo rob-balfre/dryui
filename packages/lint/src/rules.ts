@@ -297,6 +297,30 @@ interface ParsedAttribute {
 	readonly kind: AttributeValueKind;
 }
 
+/**
+ * Filename-substring carve-outs for rules that have legitimate primitive owners.
+ * The component or directory listed here is the canonical place where the
+ * underlying mechanism is implemented, so the rule does not apply inside it.
+ *
+ * To add a new owner: list the path here and review in PR. Inline `dryui-allow`
+ * comments are not supported — exemptions live in this map only.
+ */
+const RULE_OWNERS: Record<string, readonly string[]> = {
+	'dryui/no-svelte-element': ['/motion/', '/page-header/'],
+	'dryui/no-flex': ['/page-header/'],
+	'dryui/no-width': ['/area-grid/', '/mega-menu/', '/internal/'],
+	'dryui/no-important': [],
+	'dryui/no-partial-inset-shadow': ['/option-picker/', '/lib/demos/']
+};
+
+function isRuleOwner(filename: string | undefined, ruleId: string): boolean {
+	if (!filename) return false;
+	const owners = RULE_OWNERS[ruleId];
+	if (!owners || owners.length === 0) return false;
+	const normalized = filename.replace(/\\/g, '/');
+	return owners.some((path) => normalized.includes(path));
+}
+
 const AREA_GRID_ROOT_REQUIRED_TEMPLATE = '--dry-area-grid-template-areas';
 
 const AREA_GRID_TEMPLATE_VARS: ReadonlySet<string> = new Set([
@@ -772,8 +796,13 @@ function checkAreaGridCssVars(
 	return violations;
 }
 
-function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): Violation[] {
+function checkAreaGridUsage(
+	markup: string,
+	lineOf: (index: number) => number,
+	filename?: string
+): Violation[] {
 	const violations: Violation[] = [];
+	const isAreaGridInternal = filename?.replace(/\\/g, '/').includes('/area-grid/') ?? false;
 	const roots = findAreaGridRootBlocks(markup).sort((a, b) => a.opening.index - b.opening.index);
 
 	for (const root of roots.slice(1)) {
@@ -789,6 +818,22 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 		violations.push(
 			...checkAreaGridCssVars('AreaGrid.Root', root.attrs, AREA_GRID_ROOT_CSS_VARS, line)
 		);
+
+		if (attributeByName(root.attrs, 'gap')) {
+			violations.push({
+				rule: 'dryui/area-grid-no-gap',
+				message: ruleMessage('dryui/area-grid-no-gap'),
+				line
+			});
+		}
+
+		if (attributeByName(root.attrs, 'padding')) {
+			violations.push({
+				rule: 'dryui/area-grid-no-padding',
+				message: ruleMessage('dryui/area-grid-no-padding'),
+				line
+			});
+		}
 
 		if (!attributeByName(root.attrs, AREA_GRID_ROOT_REQUIRED_TEMPLATE)) {
 			violations.push({
@@ -868,6 +913,7 @@ function checkAreaGridUsage(markup: string, lineOf: (index: number) => number): 
 		}
 
 		if (areaAttr.kind !== 'literal' || areaAttr.value === null) {
+			if (isAreaGridInternal) continue;
 			violations.push({
 				rule: 'dryui/area-grid-invalid-template',
 				message: ruleMessage('dryui/area-grid-invalid-template', {
@@ -1171,11 +1217,6 @@ export function checkMarkup(
 	const parentDir = getParentDir(filename);
 	const lineStarts = buildLineIndex(markup);
 	const lineOf = (i: number) => lookupLine(lineStarts, i);
-	const file: FileContext = {
-		content: markup,
-		lines: markup.split('\n'),
-		lineStarts
-	};
 	const allowed = (_ruleId: string) => true;
 
 	if (allowed('dryui/no-inline-style')) {
@@ -1256,9 +1297,8 @@ export function checkMarkup(
 		}
 	}
 
-	if (allowed('dryui/no-svelte-element')) {
+	if (allowed('dryui/no-svelte-element') && !isRuleOwner(filename, 'dryui/no-svelte-element')) {
 		for (const match of markup.matchAll(SVELTE_ELEMENT_RE)) {
-			if (hasAllowComment(file, match.index, 'svelte-element')) continue;
 			violations.push({
 				rule: 'dryui/no-svelte-element',
 				message: ruleMessage('dryui/no-svelte-element'),
@@ -1292,56 +1332,9 @@ export function checkMarkup(
 		}
 	}
 
-	violations.push(...checkAreaGridUsage(markup, lineOf));
+	violations.push(...checkAreaGridUsage(markup, lineOf, filename));
 
 	return violations;
-}
-
-interface FileContext {
-	content: string;
-	lines: string[];
-	lineStarts: number[];
-	/**
-	 * Optional comment-stripped lines used for terminator detection so trailing
-	 * `/* ... *\/` comments don't hide the `;`/`{`/`}` that would otherwise gate
-	 * an allow comment from a previous declaration. CSS callers populate this;
-	 * markup callers leave it undefined and fall back to `lines`.
-	 */
-	codeLines?: string[];
-}
-
-function hasAllowComment(file: FileContext, matchIndex: number, keyword: string): boolean {
-	// Skip leading non-alpha chars (regex may capture a delimiter on the prior line)
-	let idx = matchIndex;
-	while (idx < file.content.length && /[^a-zA-Z]/.test(file.content[idx]!)) idx++;
-	const declLine = lookupLine(file.lineStarts, idx);
-	if (declLine < 1) return false;
-
-	const allowMarker = `dryui-allow ${keyword}`;
-
-	// Same line, before the match: catches inline patterns like
-	// `box-shadow: 0 1px 0 black, /* dryui-allow inset-shadow */ inset 0 1px 0 white;`
-	// where the author wants to allow one specific value within a multi-value
-	// declaration.
-	const sameLineStart = file.lineStarts[declLine - 1] ?? 0;
-	if (file.content.slice(sameLineStart, idx).includes(allowMarker)) return true;
-
-	if (declLine <= 1) return false;
-
-	// Walk back from the line above the match. The allow comment may sit above
-	// a multi-line declaration (e.g. `box-shadow:` with each value on its own
-	// line), so we step through continuation lines until we either find the
-	// marker or hit a `;`, `{`, or `}` that proves the comment belongs to a
-	// different declaration. `codeLines` (when provided) has CSS comments
-	// blanked out so trailing `/* ... */` can't hide a real terminator.
-	const codeLines = file.codeLines ?? file.lines;
-	for (let i = declLine - 2; i >= 0; i--) {
-		const markerLine = file.lines[i] ?? '';
-		if (markerLine.includes(allowMarker)) return true;
-		const codeLine = (codeLines[i] ?? markerLine).trimEnd();
-		if (/[;{}]$/.test(codeLine)) return false;
-	}
-	return false;
 }
 
 export interface StyleContext {
@@ -1400,17 +1393,10 @@ export function checkStyle(
 	const violations: Violation[] = [];
 	// `scan` has comments blanked out (length-preserving) so rule regexes don't
 	// flag property names that appear in prose comments like
-	// `/* flex-wrap is the sanctioned primitive */`. `file` keeps the original
-	// content so `hasAllowComment` can still see `/* dryui-allow flex */` on the
-	// preceding line.
+	// `/* flex-wrap is the sanctioned primitive */`.
 	const scan = stripCssComments(content);
-	const file: FileContext = {
-		content,
-		lines: content.split('\n'),
-		lineStarts: buildLineIndex(content),
-		codeLines: scan.split('\n')
-	};
-	const lineOf = (i: number) => lookupLine(file.lineStarts, i);
+	const lineStarts = buildLineIndex(content);
+	const lineOf = (i: number) => lookupLine(lineStarts, i);
 	const exemptClasses = context.chipGroupExemptClasses ?? new Set<string>();
 	const inChipGroupScope = (idx: number): boolean =>
 		selectorIsChipGroupExempt(selectorAtOffset(scan, idx), exemptClasses);
@@ -1436,9 +1422,8 @@ export function checkStyle(
 		}
 	}
 
-	if (allowed('dryui/no-flex')) {
+	if (allowed('dryui/no-flex') && !isRuleOwner(filename, 'dryui/no-flex')) {
 		for (const match of scan.matchAll(FLEX_DISPLAY_RE)) {
-			if (hasAllowComment(file, match.index, 'flex')) continue;
 			if (inChipGroupScope(match.index)) continue;
 			violations.push({
 				rule: 'dryui/no-flex',
@@ -1451,7 +1436,6 @@ export function checkStyle(
 		}
 
 		for (const match of scan.matchAll(FLEX_PROPS_RE)) {
-			if (hasAllowComment(file, match.index, 'flex')) continue;
 			if (inChipGroupScope(match.index)) continue;
 			const prop = match[0].trim().replace(/;/, '').split(':')[0]!.trim();
 			violations.push({
@@ -1465,9 +1449,8 @@ export function checkStyle(
 		}
 	}
 
-	if (allowed('dryui/no-width')) {
+	if (allowed('dryui/no-width') && !isRuleOwner(filename, 'dryui/no-width')) {
 		for (const match of scan.matchAll(WIDTH_RE)) {
-			if (hasAllowComment(file, match.index, 'width')) continue;
 			const rawValue = (match[1] ?? '').trim();
 			// Allow typographic measure units (ch, ex, em) — they track text content,
 			// not viewport layout. e.g. `max-width: 55ch` constrains text columns.
@@ -1491,9 +1474,8 @@ export function checkStyle(
 		}
 	}
 
-	if (allowed('dryui/no-important')) {
+	if (allowed('dryui/no-important') && !isRuleOwner(filename, 'dryui/no-important')) {
 		for (const match of scan.matchAll(IMPORTANT_RE)) {
-			if (hasAllowComment(file, match.index, 'important')) continue;
 			violations.push({
 				rule: 'dryui/no-important',
 				message: ruleMessage('dryui/no-important'),
@@ -1535,9 +1517,12 @@ export function checkStyle(
 		}
 	}
 
-	if (allowed('dryui/no-partial-inset-shadow') && scan.includes('inset')) {
+	if (
+		allowed('dryui/no-partial-inset-shadow') &&
+		!isRuleOwner(filename, 'dryui/no-partial-inset-shadow') &&
+		scan.includes('inset')
+	) {
 		for (const match of scan.matchAll(INSET_SHADOW_RE)) {
-			if (hasAllowComment(file, match.index, 'inset-shadow')) continue;
 			const x = parseFloat(match[1]!);
 			const y = parseFloat(match[2]!);
 			const blur = match[3] !== undefined ? parseFloat(match[3]) : 0;

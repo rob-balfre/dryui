@@ -8,7 +8,6 @@
 			<Badge variant="soft" color="purple">Product demo</Badge>
 			<span class="meta-time">3:42</span>
 		</div>
-		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="title">Scaffold a DryUI app in 90 seconds</h3>
 		<Text color="secondary" size="sm">
 			VideoEmbed lazy-loads the player on click. Poster art, aspect ratio, and provider handling are

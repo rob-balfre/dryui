@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "3.0.0",
   "summary": {
-    "componentNodes": 300,
-    "partNodes": 657,
+    "componentNodes": 299,
+    "partNodes": 658,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 146,
+    "primitiveComponents": 145,
     "uiComponents": 154,
     "uiWrappers": 131,
     "uiComposites": 23,
-    "rootBarrelComponents": 300,
+    "rootBarrelComponents": 299,
     "subpathOnlyComponents": 0,
     "compoundComponents": 134,
     "wrapEdges": 131,
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 298,
+    "mismatches": 297,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -7002,30 +7002,6 @@
       "parts": []
     },
     {
-      "id": "primitives:Surface",
-      "name": "Surface",
-      "label": "Surface",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "layout",
-      "description": "Simple surface wrapper for background treatment",
-      "visibility": "root",
-      "sourcePath": "packages/primitives/src/surface/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [
-        "surface",
-        "background",
-        "container",
-        "panel"
-      ],
-      "compound": false,
-      "parts": [],
-      "sourceFileCount": 3,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
       "id": "primitives:Svg",
       "name": "Svg",
       "label": "Svg",
@@ -8766,11 +8742,25 @@
       ],
       "compound": true,
       "parts": [
-        "Root"
+        "Root",
+        "Placeholder"
       ],
-      "sourceFileCount": 3,
+      "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
+    },
+    {
+      "id": "ui:AreaGrid.Placeholder",
+      "name": "AreaGrid.Placeholder",
+      "label": "Placeholder",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "layout",
+      "description": "Placeholder part for AreaGrid.",
+      "tags": [],
+      "compound": false,
+      "parts": []
     },
     {
       "id": "ui:AreaGrid.Root",
@@ -19347,6 +19337,13 @@
       "label": "Trigger"
     },
     {
+      "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Placeholder:Placeholder",
+      "type": "compound_part",
+      "from": "ui:AreaGrid",
+      "to": "ui:AreaGrid.Placeholder",
+      "label": "Placeholder"
+    },
+    {
       "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Root:Root",
       "type": "compound_part",
       "from": "ui:AreaGrid",
@@ -25297,13 +25294,6 @@
     {
       "kind": "missing-subpath-export",
       "package": "primitives",
-      "component": "Surface",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/surface/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
       "component": "Svg",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/svg/index.ts"
@@ -26605,7 +26595,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 146\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 23\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 23\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

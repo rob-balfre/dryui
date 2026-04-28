@@ -11,10 +11,17 @@ export interface AreaGridRootProps extends Omit<HTMLAttributes<HTMLElement>, 'ch
 	children: Snippet;
 }
 
+export interface AreaGridPlaceholderProps {
+	area: string;
+}
+
 import AreaGridRoot from './area-grid-root.svelte';
+import AreaGridPlaceholder from './area-grid-placeholder.svelte';
 
 export const AreaGrid: {
 	Root: typeof AreaGridRoot;
+	Placeholder: typeof AreaGridPlaceholder;
 } = {
-	Root: AreaGridRoot
+	Root: AreaGridRoot,
+	Placeholder: AreaGridPlaceholder
 };

@@ -18,7 +18,6 @@
 			<Enter>
 				<article class="banner">
 					<Badge variant="soft" color="success">Released</Badge>
-					<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 					<h3 class="title">DryUI 1.4 shipped</h3>
 					<Text color="secondary" size="sm">
 						Container queries land across layouts, Field.Root gets async validators, and the CLI

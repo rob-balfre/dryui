@@ -23,7 +23,6 @@
 	});
 </script>
 
-<!-- dryui-allow svelte-element -->
 <svelte:element this={as} bind:this={el} class="dry-enter">
 	{@render children?.()}
 </svelte:element>

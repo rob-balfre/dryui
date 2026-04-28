@@ -55,7 +55,6 @@
 
 <section class="playground" aria-label="Interactive Border Beam playground">
 	<div class="playground-header">
-		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="playground-title">Playground</h3>
 		<p class="playground-copy">
 			The docs theme toggle drives the preview, so the same controls show both dark and light mode.
@@ -248,7 +247,6 @@
 		);
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-strong) 58%, transparent);
 		box-shadow:
-			/* dryui-allow inset-shadow: intentional top highlight rail on preview card. */
 			inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
 			0 1.5rem 3rem color-mix(in srgb, black 14%, transparent);
 	}

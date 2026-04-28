@@ -13,7 +13,6 @@
 					</div>
 
 					<div class="glass-copy">
-						<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 						<h3 class="glass-title">Frosted glass effect</h3>
 						<Text color="secondary">
 							Blur, tint, and saturation only read clearly when the surface sits over layered color
@@ -84,7 +83,7 @@
 		border: 1px solid color-mix(in srgb, white 16%, transparent);
 		box-shadow:
 			0 22px 48px color-mix(in srgb, black 26%, transparent),
-			/* dryui-allow inset-shadow: intentional top highlight rail on glass card. */ inset 0 1px 0
+			 inset 0 1px 0
 				color-mix(in srgb, white 22%, transparent);
 	}
 

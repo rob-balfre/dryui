@@ -5,7 +5,6 @@
 <div class="svg-demo">
 	<div class="svg-intro">
 		<p class="svg-eyebrow">More than a single circle</p>
-		<!-- dryui-allow raw-heading: docs demo content intentionally renders native headings. -->
 		<h3 class="svg-title">
 			Use <code>Svg</code> for layered marks, badges, and tiny data visuals.
 		</h3>
@@ -283,7 +282,6 @@
 				color-mix(in srgb, var(--dry-color-bg-base) 94%, var(--tile-surface))
 			),
 			var(--dry-color-bg-base);
-		/* dryui-allow inset-shadow: intentional top highlight rail on demo tile. */
 		box-shadow: inset 0 1px 0 color-mix(in srgb, var(--dry-color-text-inverse) 10%, transparent);
 	}
 

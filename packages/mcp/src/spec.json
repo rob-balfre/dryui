@@ -4853,8 +4853,7 @@
                 "md",
                 "lg",
                 "xl"
-              ],
-              "default": "'md'"
+              ]
             },
             "padding": {
               "type": "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'",
@@ -4866,8 +4865,7 @@
                 "md",
                 "lg",
                 "xl"
-              ],
-              "default": "'none'"
+              ]
             },
             "fill": {
               "type": "boolean",
@@ -4899,6 +4897,14 @@
             ],
             "note": "Forwards <element> attributes via rest props."
           }
+        },
+        "Placeholder": {
+          "props": {
+            "area": {
+              "type": "string",
+              "required": true
+            }
+          }
         }
       },
       "structure": {
@@ -4921,9 +4927,7 @@
         "--dry-area-grid-area-radius": "Grid Area Radius",
         "--dry-area-grid-auto-flow": "Grid Auto Flow",
         "--dry-area-grid-auto-rows": "Grid Auto Rows",
-        "--dry-area-grid-gap": "Grid Gap",
         "--dry-area-grid-justify-items": "Grid Justify Items",
-        "--dry-area-grid-padding": "Grid Padding",
         "--dry-area-grid-template-areas": "Grid Template Areas",
         "--dry-area-grid-template-areas-wide": "Grid Template Areas Wide",
         "--dry-area-grid-template-areas-xl": "Grid Template Areas Xl",
@@ -4940,6 +4944,9 @@
           "name": "data-area-grid"
         },
         {
+          "name": "data-area-grid-placeholder"
+        },
+        {
           "name": "data-area-grid-shell"
         },
         {
@@ -4949,10 +4956,7 @@
           "name": "data-fill"
         },
         {
-          "name": "data-gap"
-        },
-        {
-          "name": "data-padding"
+          "name": "data-max-width"
         }
       ],
       "example": "<AreaGrid.Root\n  --dry-area-grid-template-areas=\"'header' 'content'\"\n>\n  <Card.Root --dry-grid-area-name=\"header\">\n    <Card.Header>Header</Card.Header>\n  </Card.Root>\n  <Card.Root --dry-grid-area-name=\"content\">\n    <Card.Content>Content</Card.Content>\n  </Card.Root>\n</AreaGrid.Root>"
@@ -21389,66 +21393,6 @@
         }
       ],
       "example": "<StatCard.Root>\n  <StatCard.Label>...</StatCard.Label>\n  <StatCard.Value>...</StatCard.Value>\n  <StatCard.Trend>...</StatCard.Trend>\n</StatCard.Root>"
-    },
-    "Surface": {
-      "import": "@dryui/primitives",
-      "description": "Simple surface wrapper for background treatment",
-      "category": "layout",
-      "tags": [
-        "surface",
-        "background",
-        "container",
-        "panel"
-      ],
-      "compound": false,
-      "props": {
-        "as": {
-          "type": "'div' | 'span' | 'header' | 'nav' | 'main' | 'footer' | 'section'",
-          "required": false,
-          "acceptedValues": [
-            "div",
-            "span",
-            "header",
-            "nav",
-            "main",
-            "footer",
-            "section"
-          ],
-          "description": "Underlying HTML element to render for the component.",
-          "default": "'div'"
-        },
-        "background": {
-          "type": "string",
-          "required": false
-        },
-        "className": {
-          "type": "HTMLAttributes<HTMLElement>['class']",
-          "required": false
-        },
-        "children": {
-          "type": "Snippet",
-          "required": false,
-          "description": "Content rendered inside the component."
-        }
-      },
-      "forwardedProps": {
-        "baseType": "HTMLAttributes<HTMLElement>",
-        "via": "rest",
-        "element": "element",
-        "examples": [
-          "id",
-          "class",
-          "aria-label"
-        ],
-        "note": "Forwards <element> attributes via rest props."
-      },
-      "a11y": [
-        "This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.",
-        "Only add landmark or region semantics when the section has a unique, meaningful label."
-      ],
-      "cssVars": {},
-      "dataAttributes": [],
-      "example": "<Surface>Content</Surface>"
     },
     "User": {
       "import": "@dryui/primitives",
