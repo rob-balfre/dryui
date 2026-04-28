@@ -633,11 +633,6 @@
       "svelte": "./src/stepper/index.ts",
       "default": "./src/stepper/index.ts"
     },
-    "./surface": {
-      "types": "./src/surface/index.ts",
-      "svelte": "./src/surface/index.ts",
-      "default": "./src/surface/index.ts"
-    },
     "./svg": {
       "types": "./src/svg/index.ts",
       "svelte": "./src/svg/index.ts",
@@ -1399,11 +1394,6 @@
         "types": "./dist/stepper/index.d.ts",
         "svelte": "./dist/stepper/index.js",
         "default": "./dist/stepper/index.js"
-      },
-      "./surface": {
-        "types": "./dist/surface/index.d.ts",
-        "svelte": "./dist/surface/index.js",
-        "default": "./dist/surface/index.js"
       },
       "./svg": {
         "types": "./dist/svg/index.d.ts",

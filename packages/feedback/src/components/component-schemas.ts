@@ -991,7 +991,6 @@ export const COMPONENT_SCHEMAS: Record<string, SchemaField[]> = {
 			type: { kind: 'enum', options: ['horizontal', 'vertical'] }
 		}
 	],
-	Surface: [{ name: 'background', optional: true, type: { kind: 'string' } }],
 	Svg: [{ name: 'viewBox', optional: true, type: { kind: 'string' } }],
 	TableOfContents: [
 		{ name: 'autoId', optional: true, type: { kind: 'boolean' } },

@@ -845,9 +845,6 @@ export type { GlowProps } from './glow/index.js';
 export { Adjust } from './adjust/index.js';
 export type { AdjustProps } from './adjust/index.js';
 
-export { Surface } from './surface/index.js';
-export type { SurfaceProps } from './surface/index.js';
-
 export { Beam } from './beam/index.js';
 export type { BeamProps } from './beam/index.js';
 

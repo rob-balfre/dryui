@@ -99,15 +99,6 @@
 			aria-label="DryUI QR code preview"
 		/>
 	</div>
-{:else if name === 'Surface'}
-	<div class="surface">
-		<div class="stage surface-stage">
-			<div class="effect-card">
-				<Badge variant="soft" size="sm">Stacking context</Badge>
-				<Heading level={3}>Surface</Heading>
-			</div>
-		</div>
-	</div>
 {:else}
 	<div class="stage stage-soft">
 		<div class="effect-card">
