@@ -222,6 +222,20 @@ export interface SubmissionRemovedElement {
 }
 
 /**
+ * A free-drawn rectangle the user sketches on top of the page in Layout mode
+ * to communicate a new region (intent only — no CSS mutation). Coordinates are
+ * page-relative pixels at submit time.
+ */
+export interface SubmissionLayoutBox {
+	id: string;
+	label: string;
+	pageX: number;
+	pageY: number;
+	width: number;
+	height: number;
+}
+
+/**
  * New submissions always carry both WebP and PNG paths. Legacy rows that only
  * have a WebP file populate `webp` with the existing path and leave `png` as an
  * empty string; callers check truthiness before reading.
@@ -234,6 +248,7 @@ export interface Submission {
 	hints?: SubmissionDrawingHint[];
 	components?: SubmissionAddedComponent[];
 	removed?: SubmissionRemovedElement[];
+	layoutBoxes?: SubmissionLayoutBox[];
 	viewport: { width: number; height: number } | null;
 	scroll?: SubmissionScrollOffset | null;
 	status: SubmissionStatus;
@@ -255,6 +270,7 @@ export interface CreateSubmissionInput {
 	hints?: SubmissionDrawingHint[];
 	components?: SubmissionAddedComponent[];
 	removed?: SubmissionRemovedElement[];
+	layoutBoxes?: SubmissionLayoutBox[];
 	viewport?: { width: number; height: number };
 	scroll?: SubmissionScrollOffset;
 	agent?: SubmissionAgent;

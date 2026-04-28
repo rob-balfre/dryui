@@ -5045,6 +5045,9 @@
               "required": true
             }
           }
+        },
+        "Shell": {
+          "props": {}
         }
       },
       "structure": {

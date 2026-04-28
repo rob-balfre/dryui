@@ -17,11 +17,14 @@ export interface AreaGridPlaceholderProps {
 
 import AreaGridRoot from './area-grid-root.svelte';
 import AreaGridPlaceholder from './area-grid-placeholder.svelte';
+import AreaGridShell from './area-grid-shell.svelte';
 
 export const AreaGrid: {
 	Root: typeof AreaGridRoot;
 	Placeholder: typeof AreaGridPlaceholder;
+	Shell: typeof AreaGridShell;
 } = {
 	Root: AreaGridRoot,
-	Placeholder: AreaGridPlaceholder
+	Placeholder: AreaGridPlaceholder,
+	Shell: AreaGridShell
 };

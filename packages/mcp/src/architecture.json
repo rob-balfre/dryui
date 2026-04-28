@@ -3,7 +3,7 @@
   "packageVersion": "3.0.0",
   "summary": {
     "componentNodes": 299,
-    "partNodes": 658,
+    "partNodes": 659,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 145,
@@ -8743,7 +8743,8 @@
       "compound": true,
       "parts": [
         "Root",
-        "Placeholder"
+        "Placeholder",
+        "Shell"
       ],
       "sourceFileCount": 5,
       "primitivePartUsageCount": 0,
@@ -8771,6 +8772,19 @@
       "layer": "part",
       "category": "layout",
       "description": "Root part for AreaGrid.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:AreaGrid.Shell",
+      "name": "AreaGrid.Shell",
+      "label": "Shell",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "layout",
+      "description": "Shell part for AreaGrid.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -19349,6 +19363,13 @@
       "from": "ui:AreaGrid",
       "to": "ui:AreaGrid.Root",
       "label": "Root"
+    },
+    {
+      "id": "compound_part:ui:AreaGrid:ui:AreaGrid.Shell:Shell",
+      "type": "compound_part",
+      "from": "ui:AreaGrid",
+      "to": "ui:AreaGrid.Shell",
+      "label": "Shell"
     },
     {
       "id": "compound_part:ui:Breadcrumb:ui:Breadcrumb.Item:Item",
