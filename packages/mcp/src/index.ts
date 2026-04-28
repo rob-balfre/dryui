@@ -28,37 +28,7 @@ function getSpec(): RuntimeSpec {
 	return cachedSpec;
 }
 
-const SERVER_INSTRUCTIONS = [
-	'DryUI is a zero-dependency Svelte 5 component library. Follow these rules:',
-	'',
-	'OUTPUT FORMAT: All tool responses use TOON (token-optimized) format.',
-	'',
-	'1. ASK BEFORE WRITING: Use `ask --scope recipe "<pattern>"` for layouts and workflows, or',
-	'   `ask --scope component "<Component>"` for exact APIs, anti-patterns, and adoption context.',
-	'',
-	'2. SET UP THE APP SHELL FIRST: Start with `ask --scope recipe "app shell"` so the root layout',
-	'   imports the theme CSS and `app.html` carries `<html class="theme-auto">`.',
-	'',
-	'3. PAGE LAYOUT: Use CSS grid for layout, not flexbox. Use Container for constrained content',
-	'   width. Prefer `@container` queries for responsive sizing.',
-	'',
-	'4. CORRECT CSS TOKENS: Background is --dry-color-bg-base. Text is --dry-color-text-strong.',
-	'   Use `ask --scope list --kind token` to browse the token surface when needed.',
-	'',
-	'5. CHECK AFTER WRITING: Run `check` on the file, theme, or workspace after edits to validate',
-	'   the component contract, a11y, tokens, and CSS discipline.',
-	'',
-	'6. USE DRYUI COMPONENTS FOR UI ELEMENTS: Prefer Field.Root + Label for fields, Button instead',
-	'   of raw `<button>`, and Separator instead of `<hr>`. Let `ask` confirm component coverage',
-	'   before reaching for raw HTML.'
-].join('\n');
-
-const server = new McpServer(
-	{ name: '@dryui/mcp', version },
-	{
-		instructions: SERVER_INSTRUCTIONS
-	}
-);
+const server = new McpServer({ name: '@dryui/mcp', version }, { instructions: '' });
 
 const ASK_SCOPES = ['component', 'recipe', 'list', 'setup'] as const satisfies readonly AskScope[];
 const ASK_KINDS = ['component', 'token'] as const satisfies readonly AskListKind[];
