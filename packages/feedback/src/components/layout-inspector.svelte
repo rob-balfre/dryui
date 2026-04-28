@@ -26,6 +26,26 @@
 		anchor: 'center' | 'topLeft';
 	};
 
+	type TrackInsert = {
+		key: string;
+		root: HTMLElement;
+		shell: HTMLElement;
+		axis: Axis;
+		atIndex: number;
+		x: number;
+		y: number;
+	};
+
+	type TrackRemove = {
+		key: string;
+		root: HTMLElement;
+		shell: HTMLElement;
+		axis: Axis;
+		index: number;
+		x: number;
+		y: number;
+	};
+
 	interface Props {
 		onclose: () => void;
 		oncommit?: () => void;
@@ -35,10 +55,23 @@
 
 	let { onclose, oncommit, oncapture, oncapturelabel }: Props = $props();
 
+	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
+
+	let editingBreakpoint = $state<EditingBp>('auto');
 	let handles = $state<Handle[]>([]);
 	let areas = $state<Area[]>([]);
+	let trackInserts = $state<TrackInsert[]>([]);
+	let trackRemoves = $state<TrackRemove[]>([]);
 	let editing = $state<{ area: Area; value: string } | null>(null);
 	let editingInputEl = $state<HTMLInputElement | null>(null);
+	let areaDragGhost = $state<{ name: string; x: number; y: number } | null>(null);
+	let areaPointer: {
+		area: Area;
+		pointerId: number;
+		startX: number;
+		startY: number;
+		dragging: boolean;
+	} | null = null;
 	const hiddenLabels = new Map<HTMLElement, string>();
 
 	function hideLabel(span: HTMLElement) {
@@ -108,6 +141,32 @@
 		return rows;
 	}
 
+	function parseTrackTokens(value: string): string[] {
+		const trimmed = value.trim();
+		if (!trimmed || trimmed === 'none') return [];
+		const tokens: string[] = [];
+		let depth = 0;
+		let buf = '';
+		for (const ch of trimmed) {
+			if (ch === '(') depth++;
+			else if (ch === ')') depth--;
+			if ((ch === ' ' || ch === '\t') && depth === 0) {
+				if (buf) {
+					tokens.push(buf);
+					buf = '';
+				}
+				continue;
+			}
+			buf += ch;
+		}
+		if (buf) tokens.push(buf);
+		return tokens;
+	}
+
+	function serializeAreas(rows: string[][]): string {
+		return rows.map((r) => `'${r.join(' ')}'`).join(' ');
+	}
+
 	function parseTrackList(value: string): number[] {
 		const trimmed = value.trim();
 		if (!trimmed || trimmed === 'none') return [];
@@ -139,6 +198,10 @@
 		if (width >= 1024) return 'xl';
 		if (width >= 720) return 'wide';
 		return 'base';
+	}
+
+	function effectiveBreakpoint(shell: HTMLElement): 'base' | 'wide' | 'xl' {
+		return editingBreakpoint === 'auto' ? activeBreakpoint(shell) : editingBreakpoint;
 	}
 
 	function columnsVar(bp: 'base' | 'wide' | 'xl'): string {
@@ -211,6 +274,8 @@
 	function rebuild() {
 		const nextHandles: Handle[] = [];
 		const nextAreas: Area[] = [];
+		const nextInserts: TrackInsert[] = [];
+		const nextRemoves: TrackRemove[] = [];
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
 		for (const grid of grids) {
 			if (isInsideFeedback(grid)) continue;
@@ -275,6 +340,67 @@
 				}
 			}
 
+			// Track add/remove controls. Column controls strip along the top edge
+			// (just inside the grid); row controls along the left edge.
+			const TRACK_GUTTER = 14;
+			const colStripY = rect.top + 4;
+			let cx = rect.left;
+			for (let i = 0; i <= cols.length; i++) {
+				nextInserts.push({
+					key: `${gridId}-ins-col-${i}`,
+					root: grid,
+					shell,
+					axis: 'col',
+					atIndex: i,
+					x: cx,
+					y: colStripY
+				});
+				if (i < cols.length) {
+					const w = cols[i]!;
+					if (cols.length > 1) {
+						nextRemoves.push({
+							key: `${gridId}-rm-col-${i}`,
+							root: grid,
+							shell,
+							axis: 'col',
+							index: i,
+							x: cx + w / 2,
+							y: colStripY
+						});
+					}
+					cx += w;
+				}
+			}
+			const rowStripX = rect.left + 4;
+			let cy = rect.top;
+			for (let i = 0; i <= rows.length; i++) {
+				nextInserts.push({
+					key: `${gridId}-ins-row-${i}`,
+					root: grid,
+					shell,
+					axis: 'row',
+					atIndex: i,
+					x: rowStripX,
+					y: cy
+				});
+				if (i < rows.length) {
+					const h = rows[i]!;
+					if (rows.length > 1) {
+						nextRemoves.push({
+							key: `${gridId}-rm-row-${i}`,
+							root: grid,
+							shell,
+							axis: 'row',
+							index: i,
+							x: rowStripX,
+							y: cy + h / 2
+						});
+					}
+					cy += h;
+				}
+			}
+			void TRACK_GUTTER;
+
 			const seen = new Set<string>();
 			for (const child of Array.from(grid.children)) {
 				if (!(child instanceof HTMLElement) && !(child instanceof Element)) continue;
@@ -320,6 +446,8 @@
 		}
 		handles = nextHandles;
 		areas = nextAreas;
+		trackInserts = nextInserts;
+		trackRemoves = nextRemoves;
 	}
 
 	function cryptoId(): string {
@@ -369,7 +497,7 @@
 			index: h.index,
 			startPointerCoord: h.axis === 'col' ? e.clientX : e.clientY,
 			startSizes: sizes,
-			breakpoint: activeBreakpoint(h.shell),
+			breakpoint: effectiveBreakpoint(h.shell),
 			minBefore: -(before - MIN_TRACK),
 			maxBefore: after - MIN_TRACK
 		};
@@ -422,9 +550,52 @@
 
 	const VALID_AREA_NAME = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
 
-	function startRename(area: Area, e: MouseEvent) {
+	const AREA_DRAG_THRESHOLD = 4;
+
+	function startAreaPointer(e: PointerEvent, area: Area) {
 		e.stopPropagation();
-		editing = { area, value: area.name };
+		areaPointer = {
+			area,
+			pointerId: e.pointerId,
+			startX: e.clientX,
+			startY: e.clientY,
+			dragging: false
+		};
+		window.addEventListener('pointermove', onAreaMove);
+		window.addEventListener('pointerup', endAreaPointer);
+		window.addEventListener('pointercancel', endAreaPointer);
+	}
+
+	function onAreaMove(e: PointerEvent) {
+		if (!areaPointer || areaPointer.pointerId !== e.pointerId) return;
+		const dx = e.clientX - areaPointer.startX;
+		const dy = e.clientY - areaPointer.startY;
+		if (!areaPointer.dragging) {
+			if (Math.hypot(dx, dy) < AREA_DRAG_THRESHOLD) return;
+			areaPointer.dragging = true;
+		}
+		areaDragGhost = { name: areaPointer.area.name, x: e.clientX + 12, y: e.clientY + 12 };
+	}
+
+	function endAreaPointer(e: PointerEvent) {
+		if (!areaPointer || areaPointer.pointerId !== e.pointerId) return;
+		const wasDragging = areaPointer.dragging;
+		const startedFrom = areaPointer.area;
+		areaPointer = null;
+		areaDragGhost = null;
+		window.removeEventListener('pointermove', onAreaMove);
+		window.removeEventListener('pointerup', endAreaPointer);
+		window.removeEventListener('pointercancel', endAreaPointer);
+		if (!wasDragging) {
+			editing = { area: startedFrom, value: startedFrom.name };
+			return;
+		}
+		const dropEl = document.elementFromPoint(e.clientX, e.clientY);
+		const dropBadge = dropEl?.closest<HTMLButtonElement>('.layout-area-badge');
+		if (!dropBadge) return;
+		const dropName = dropBadge.textContent?.trim();
+		if (!dropName || dropName === startedFrom.name) return;
+		swapAreas(startedFrom.root, startedFrom.shell, startedFrom.name, dropName);
 	}
 
 	function cancelRename() {
@@ -485,6 +656,105 @@
 		});
 	}
 
+	function areasVar(bp: 'base' | 'wide' | 'xl'): string {
+		if (bp === 'xl') return '--dry-area-grid-template-areas-xl';
+		if (bp === 'wide') return '--dry-area-grid-template-areas-wide';
+		return '--dry-area-grid-template-areas';
+	}
+
+	function insertTrack(grid: HTMLElement, shell: HTMLElement, axis: Axis, atIndex: number) {
+		oncapture?.(shell);
+		const cs = getComputedStyle(grid);
+		const tracks = parseTrackTokens(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
+		tracks.splice(Math.max(0, Math.min(tracks.length, atIndex)), 0, '1fr');
+		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
+		if (areaRows.length > 0) {
+			if (axis === 'col') {
+				for (const row of areaRows) {
+					row.splice(Math.max(0, Math.min(row.length, atIndex)), 0, '.');
+				}
+			} else {
+				const colCount = areaRows[0]?.length ?? 1;
+				const newRow = Array<string>(colCount).fill('.');
+				areaRows.splice(Math.max(0, Math.min(areaRows.length, atIndex)), 0, newRow);
+			}
+		}
+		const bp = effectiveBreakpoint(shell);
+		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
+		shell.style.setProperty(trackProp, tracks.join(' '));
+		if (areaRows.length > 0) {
+			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
+		}
+		scheduleRebuild();
+		oncommit?.();
+	}
+
+	function removeTrack(grid: HTMLElement, shell: HTMLElement, axis: Axis, index: number) {
+		oncapture?.(shell);
+		const cs = getComputedStyle(grid);
+		const tracks = parseTrackTokens(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
+		if (index < 0 || index >= tracks.length || tracks.length <= 1) return;
+		tracks.splice(index, 1);
+		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
+		if (areaRows.length > 0) {
+			if (axis === 'col') {
+				for (const row of areaRows) {
+					if (index < row.length) row.splice(index, 1);
+				}
+			} else if (index < areaRows.length) {
+				areaRows.splice(index, 1);
+			}
+		}
+		const bp = effectiveBreakpoint(shell);
+		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
+		shell.style.setProperty(trackProp, tracks.join(' '));
+		if (areaRows.length > 0) {
+			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
+		}
+		scheduleRebuild();
+		oncommit?.();
+	}
+
+	function swapAreas(grid: HTMLElement, shell: HTMLElement, name1: string, name2: string) {
+		if (name1 === name2) return;
+		oncapture?.(shell);
+		const cs = getComputedStyle(shell);
+		for (const prop of TEMPLATE_AREAS_PROPS) {
+			const current = cs.getPropertyValue(prop).trim();
+			if (!current || current === 'none') continue;
+			const swapped = current.replace(/'([^']*)'/g, (_match, row) => {
+				const tokens = row
+					.split(/\s+/)
+					.filter(Boolean)
+					.map((t: string) => {
+						if (t === name1) return name2;
+						if (t === name2) return name1;
+						return t;
+					})
+					.join(' ');
+				return `'${tokens}'`;
+			});
+			if (swapped !== current) shell.style.setProperty(prop, swapped);
+		}
+		for (const child of Array.from(grid.children)) {
+			if (!(child instanceof HTMLElement)) continue;
+			const name = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
+			if (name !== name1 && name !== name2) continue;
+			oncapture?.(child);
+			child.style.setProperty('--dry-grid-area-name', name === name1 ? name2 : name1);
+			const span = child.querySelector<HTMLElement>('[data-area-grid-placeholder] > span');
+			if (span) {
+				const txt = span.textContent ?? '';
+				if (txt === name1 || txt === name2) {
+					oncapturelabel?.(span);
+					span.textContent = txt === name1 ? name2 : name1;
+				}
+			}
+		}
+		scheduleRebuild();
+		oncommit?.();
+	}
+
 	onMount(() => {
 		rebuild();
 		const ro = new ResizeObserver(scheduleRebuild);
@@ -504,6 +774,9 @@
 			window.removeEventListener('pointermove', onMove);
 			window.removeEventListener('pointerup', endDrag);
 			window.removeEventListener('pointercancel', endDrag);
+			window.removeEventListener('pointermove', onAreaMove);
+			window.removeEventListener('pointerup', endAreaPointer);
+			window.removeEventListener('pointercancel', endAreaPointer);
 			scrollLockRestore?.();
 			scrollLockRestore = null;
 			restoreLabels();
@@ -512,6 +785,22 @@
 </script>
 
 <div class="layout-inspector" data-dragging={dragging ? '' : undefined} role="presentation">
+	<div class="layout-bp-toggle" role="group" aria-label="Editing breakpoint">
+		{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
+			<button
+				class="layout-bp-btn"
+				type="button"
+				data-active={editingBreakpoint === bp || undefined}
+				aria-pressed={editingBreakpoint === bp}
+				onclick={() => {
+					editingBreakpoint = bp;
+				}}
+			>
+				{bp}
+			</button>
+		{/each}
+	</div>
+
 	{#each handles as h (h.key)}
 		<button
 			class="layout-handle"
@@ -551,12 +840,50 @@
 				data-anchor={a.anchor}
 				aria-label="Rename area {a.name}"
 				style="left: {a.x}px; top: {a.y}px;"
-				onclick={(e) => startRename(a, e)}
+				onpointerdown={(e) => startAreaPointer(e, a)}
 			>
 				{a.name}
 			</button>
 		{/if}
 	{/each}
+
+	{#each trackInserts as t (t.key)}
+		<button
+			class="layout-track-btn layout-track-insert"
+			data-axis={t.axis}
+			type="button"
+			aria-label="Insert {t.axis === 'col' ? 'column' : 'row'} at position {t.atIndex + 1}"
+			style="left: {t.x}px; top: {t.y}px;"
+			onclick={(e) => {
+				e.stopPropagation();
+				insertTrack(t.root, t.shell, t.axis, t.atIndex);
+			}}
+		>
+			+
+		</button>
+	{/each}
+
+	{#each trackRemoves as t (t.key)}
+		<button
+			class="layout-track-btn layout-track-remove"
+			data-axis={t.axis}
+			type="button"
+			aria-label="Remove {t.axis === 'col' ? 'column' : 'row'} {t.index + 1}"
+			style="left: {t.x}px; top: {t.y}px;"
+			onclick={(e) => {
+				e.stopPropagation();
+				removeTrack(t.root, t.shell, t.axis, t.index);
+			}}
+		>
+			×
+		</button>
+	{/each}
+
+	{#if areaDragGhost}
+		<div class="layout-area-ghost" style="left: {areaDragGhost.x}px; top: {areaDragGhost.y}px;">
+			{areaDragGhost.name}
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -644,5 +971,103 @@
 		caret-color: hsl(25 100% 70%);
 		outline: 2px solid hsl(25 100% 55%);
 		outline-offset: 0;
+	}
+
+	.layout-track-btn {
+		position: fixed;
+		z-index: 1;
+		inline-size: 18px;
+		block-size: 18px;
+		display: grid;
+		place-items: center;
+		margin: 0;
+		padding: 0;
+		border: 1px solid hsl(25 100% 55% / 0.6);
+		border-radius: 50%;
+		background: hsl(225 15% 10%);
+		color: hsl(25 100% 70%);
+		font-family: var(--dry-font-sans, system-ui, sans-serif);
+		font-size: 14px;
+		font-weight: 600;
+		line-height: 1;
+		cursor: pointer;
+		transform: translate(-50%, -50%);
+		opacity: 0.55;
+		transition:
+			opacity 0.12s ease-out,
+			background 0.12s ease-out,
+			color 0.12s ease-out;
+		pointer-events: auto;
+	}
+
+	.layout-track-btn:hover,
+	.layout-track-btn:focus-visible {
+		opacity: 1;
+		background: hsl(25 100% 55%);
+		color: hsl(225 15% 8%);
+		outline: none;
+	}
+
+	.layout-track-insert {
+		font-size: 13px;
+	}
+
+	.layout-bp-toggle {
+		position: fixed;
+		top: 16px;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 1;
+		display: grid;
+		grid-auto-flow: column;
+		gap: 2px;
+		padding: 3px;
+		border-radius: 999px;
+		background: hsl(225 15% 15% / 0.95);
+		backdrop-filter: blur(8px);
+		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		pointer-events: auto;
+	}
+
+	.layout-bp-btn {
+		margin: 0;
+		padding: 4px 12px;
+		border: none;
+		border-radius: 999px;
+		background: transparent;
+		color: hsl(220 10% 60%);
+		font-family: var(--dry-font-sans, system-ui, sans-serif);
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		text-transform: lowercase;
+		cursor: pointer;
+		transition:
+			background 0.12s ease-out,
+			color 0.12s ease-out;
+	}
+
+	.layout-bp-btn:hover {
+		color: hsl(220 10% 90%);
+	}
+
+	.layout-bp-btn[data-active] {
+		background: hsl(25 100% 55%);
+		color: hsl(225 15% 8%);
+	}
+
+	.layout-area-ghost {
+		position: fixed;
+		z-index: 2;
+		padding: 2px 10px;
+		border: 1px solid hsl(25 100% 55%);
+		border-radius: 4px;
+		background: hsl(25 100% 55% / 0.9);
+		color: hsl(225 15% 8%);
+		font-family: var(--dry-font-sans, system-ui, sans-serif);
+		font-size: 0.875rem;
+		font-weight: 500;
+		text-transform: lowercase;
+		pointer-events: none;
 	}
 </style>
