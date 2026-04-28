@@ -38,6 +38,20 @@
 	let areas = $state<Area[]>([]);
 	let editing = $state<{ area: Area; value: string } | null>(null);
 	let editingInputEl = $state<HTMLInputElement | null>(null);
+	const hiddenLabels = new Map<HTMLElement, string>();
+
+	function hideLabel(span: HTMLElement) {
+		if (hiddenLabels.has(span)) return;
+		hiddenLabels.set(span, span.style.visibility);
+		span.style.visibility = 'hidden';
+	}
+
+	function restoreLabels() {
+		for (const [span, prev] of hiddenLabels) {
+			span.style.visibility = prev;
+		}
+		hiddenLabels.clear();
+	}
 
 	$effect(() => {
 		if (editingInputEl) {
@@ -187,6 +201,7 @@
 				if (placeholderLabel) {
 					const lr = placeholderLabel.getBoundingClientRect();
 					if (lr.width < 4 || lr.height < 4) continue;
+					hideLabel(placeholderLabel);
 					nextAreas.push({
 						key: `${gridId}-area-${name}`,
 						root: grid,
@@ -397,6 +412,7 @@
 			window.removeEventListener('pointercancel', endDrag);
 			scrollLockRestore?.();
 			scrollLockRestore = null;
+			restoreLabels();
 		};
 	});
 </script>
