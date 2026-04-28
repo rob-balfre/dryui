@@ -96,6 +96,18 @@
 		return !!el.closest('[data-dryui-feedback]');
 	}
 
+	function parseTemplateAreas(value: string): string[][] {
+		const trimmed = value.trim();
+		if (!trimmed || trimmed === 'none') return [];
+		const rows: string[][] = [];
+		const re = /"([^"]*)"/g;
+		let m: RegExpExecArray | null;
+		while ((m = re.exec(trimmed)) !== null) {
+			rows.push(m[1]!.trim().split(/\s+/));
+		}
+		return rows;
+	}
+
 	function parseTrackList(value: string): number[] {
 		const trimmed = value.trim();
 		if (!trimmed || trimmed === 'none') return [];
@@ -141,6 +153,61 @@
 		return '--dry-area-grid-template-rows';
 	}
 
+	function colSeamSegments(
+		areaGrid: string[][],
+		rowSizes: number[],
+		seamCol: number,
+		gridTop: number
+	): { y: number; h: number }[] {
+		const segments: { y: number; h: number }[] = [];
+		let segStart: number | null = null;
+		let cursorY = gridTop;
+		for (let r = 0; r < areaGrid.length; r++) {
+			const row = areaGrid[r]!;
+			const rowH = rowSizes[r] ?? 0;
+			const left = row[seamCol];
+			const right = row[seamCol + 1];
+			const seamReal = left !== right;
+			if (seamReal && segStart === null) segStart = cursorY;
+			if (!seamReal && segStart !== null) {
+				segments.push({ y: segStart, h: cursorY - segStart });
+				segStart = null;
+			}
+			cursorY += rowH;
+		}
+		if (segStart !== null) segments.push({ y: segStart, h: cursorY - segStart });
+		return segments;
+	}
+
+	function rowSeamSegments(
+		areaGrid: string[][],
+		colSizes: number[],
+		seamRow: number,
+		gridLeft: number
+	): { x: number; w: number }[] {
+		const segments: { x: number; w: number }[] = [];
+		const above = areaGrid[seamRow];
+		const below = areaGrid[seamRow + 1];
+		if (!above || !below) return segments;
+		let segStart: number | null = null;
+		let cursorX = gridLeft;
+		const cols = Math.max(above.length, below.length);
+		for (let c = 0; c < cols; c++) {
+			const colW = colSizes[c] ?? 0;
+			const top = above[c];
+			const bottom = below[c];
+			const seamReal = top !== bottom;
+			if (seamReal && segStart === null) segStart = cursorX;
+			if (!seamReal && segStart !== null) {
+				segments.push({ x: segStart, w: cursorX - segStart });
+				segStart = null;
+			}
+			cursorX += colW;
+		}
+		if (segStart !== null) segments.push({ x: segStart, w: cursorX - segStart });
+		return segments;
+	}
+
 	function rebuild() {
 		const nextHandles: Handle[] = [];
 		const nextAreas: Area[] = [];
@@ -152,40 +219,60 @@
 			const cs = getComputedStyle(grid);
 			const cols = parseTrackList(cs.gridTemplateColumns);
 			const rows = parseTrackList(cs.gridTemplateRows);
+			const areaGrid = parseTemplateAreas(cs.gridTemplateAreas);
 			const rect = grid.getBoundingClientRect();
 			if (rect.width < 4 || rect.height < 4) continue;
 
 			const gridId = (grid.dataset.dryuiFeedbackGridId ??= cryptoId());
+			const hasAreas = areaGrid.length > 0;
 
+			// Column seams: only render where the template-areas row to either side
+			// of the seam names a different area. If the grid has no areas at all,
+			// fall back to one full-height segment per seam.
 			let cursorX = rect.left;
 			for (let i = 0; i < cols.length - 1; i++) {
 				cursorX += cols[i]!;
-				nextHandles.push({
-					key: `${gridId}-col-${i}`,
-					root: grid,
-					shell,
-					axis: 'col',
-					index: i,
-					x: cursorX - HANDLE_THICKNESS / 2,
-					y: rect.top,
-					w: HANDLE_THICKNESS,
-					h: rect.height
-				});
+				const seamX = cursorX;
+				const segments = hasAreas
+					? colSeamSegments(areaGrid, rows, i, rect.top)
+					: [{ y: rect.top, h: rect.height }];
+				for (let s = 0; s < segments.length; s++) {
+					const seg = segments[s]!;
+					nextHandles.push({
+						key: `${gridId}-col-${i}-${s}`,
+						root: grid,
+						shell,
+						axis: 'col',
+						index: i,
+						x: seamX - HANDLE_THICKNESS / 2,
+						y: seg.y,
+						w: HANDLE_THICKNESS,
+						h: seg.h
+					});
+				}
 			}
+
 			let cursorY = rect.top;
 			for (let i = 0; i < rows.length - 1; i++) {
 				cursorY += rows[i]!;
-				nextHandles.push({
-					key: `${gridId}-row-${i}`,
-					root: grid,
-					shell,
-					axis: 'row',
-					index: i,
-					x: rect.left,
-					y: cursorY - HANDLE_THICKNESS / 2,
-					w: rect.width,
-					h: HANDLE_THICKNESS
-				});
+				const seamY = cursorY;
+				const segments = hasAreas
+					? rowSeamSegments(areaGrid, cols, i, rect.left)
+					: [{ x: rect.left, w: rect.width }];
+				for (let s = 0; s < segments.length; s++) {
+					const seg = segments[s]!;
+					nextHandles.push({
+						key: `${gridId}-row-${i}-${s}`,
+						root: grid,
+						shell,
+						axis: 'row',
+						index: i,
+						x: seg.x,
+						y: seamY - HANDLE_THICKNESS / 2,
+						w: seg.w,
+						h: HANDLE_THICKNESS
+					});
+				}
 			}
 
 			const seen = new Set<string>();
