@@ -102,8 +102,22 @@
 		maxBefore: number;
 	} | null>(null);
 
+	let removeDrag = $state<{
+		pointerId: number;
+		captureTarget: HTMLElement;
+		grid: HTMLElement;
+		shell: HTMLElement;
+		axis: Axis;
+		sourceIdx: number;
+		startX: number;
+		startY: number;
+		moved: boolean;
+		targetIdx: number | null;
+	} | null>(null);
+
 	const MIN_TRACK = 32;
 	const HANDLE_THICKNESS = 12;
+	const REMOVE_DRAG_THRESHOLD = 4;
 
 	let scrollLockRestore: (() => void) | null = null;
 
@@ -916,6 +930,119 @@
 		oncommit?.();
 	}
 
+	function collapseTrack(
+		grid: HTMLElement,
+		shell: HTMLElement,
+		axis: Axis,
+		sourceIdx: number,
+		targetIdx: number
+	) {
+		if (sourceIdx === targetIdx) return;
+		oncapture?.(shell);
+		const cs = getComputedStyle(grid);
+		const tracks = parseTrackList(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
+		if (tracks.length <= 1) return;
+		if (sourceIdx < 0 || sourceIdx >= tracks.length) return;
+		if (targetIdx < 0 || targetIdx >= tracks.length) return;
+		// Hand the dragged track's size to the drop target, then drop the source.
+		tracks[targetIdx] = tracks[targetIdx]! + tracks[sourceIdx]!;
+		tracks.splice(sourceIdx, 1);
+		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
+		if (areaRows.length > 0) {
+			if (axis === 'col') {
+				for (const row of areaRows) {
+					if (sourceIdx < row.length) row.splice(sourceIdx, 1);
+				}
+			} else if (sourceIdx < areaRows.length) {
+				areaRows.splice(sourceIdx, 1);
+			}
+		}
+		const bp = effectiveBreakpoint(shell);
+		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
+		shell.style.setProperty(trackProp, tracks.map((n) => `${Math.round(n)}px`).join(' '));
+		if (areaRows.length > 0) {
+			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
+		}
+		scheduleRebuild();
+		oncommit?.();
+	}
+
+	function findTrackZoneAt(x: number, y: number): TrackRemove | null {
+		for (const t of trackRemoves) {
+			if (x >= t.zoneX && x <= t.zoneX + t.zoneW && y >= t.zoneY && y <= t.zoneY + t.zoneH) {
+				return t;
+			}
+		}
+		return null;
+	}
+
+	function startRemovePointer(e: PointerEvent, t: TrackRemove) {
+		if (e.button !== 0) return;
+		e.stopPropagation();
+		const target = e.currentTarget as HTMLElement;
+		removeDrag = {
+			pointerId: e.pointerId,
+			captureTarget: target,
+			grid: t.root,
+			shell: t.shell,
+			axis: t.axis,
+			sourceIdx: t.index,
+			startX: e.clientX,
+			startY: e.clientY,
+			moved: false,
+			targetIdx: null
+		};
+		try {
+			target.setPointerCapture(e.pointerId);
+		} catch {
+			// pointer might not be capturable
+		}
+		window.addEventListener('pointermove', onRemoveMove);
+		window.addEventListener('pointerup', endRemovePointer);
+		window.addEventListener('pointercancel', endRemovePointer);
+	}
+
+	function onRemoveMove(e: PointerEvent) {
+		if (!removeDrag || removeDrag.pointerId !== e.pointerId) return;
+		if (!removeDrag.moved) {
+			const dx = e.clientX - removeDrag.startX;
+			const dy = e.clientY - removeDrag.startY;
+			if (Math.hypot(dx, dy) < REMOVE_DRAG_THRESHOLD) return;
+			removeDrag.moved = true;
+			scrollLockRestore = lockPageScroll();
+		}
+		const zone = findTrackZoneAt(e.clientX, e.clientY);
+		const valid =
+			zone &&
+			zone.root === removeDrag.grid &&
+			zone.axis === removeDrag.axis &&
+			zone.index !== removeDrag.sourceIdx;
+		removeDrag.targetIdx = valid ? zone.index : null;
+	}
+
+	function endRemovePointer(e: PointerEvent) {
+		if (!removeDrag || removeDrag.pointerId !== e.pointerId) return;
+		const state = removeDrag;
+		removeDrag = null;
+		try {
+			state.captureTarget.releasePointerCapture?.(e.pointerId);
+		} catch {
+			// already released
+		}
+		window.removeEventListener('pointermove', onRemoveMove);
+		window.removeEventListener('pointerup', endRemovePointer);
+		window.removeEventListener('pointercancel', endRemovePointer);
+		if (state.moved) {
+			scrollLockRestore?.();
+			scrollLockRestore = null;
+		}
+		if (state.moved && state.targetIdx !== null) {
+			collapseTrack(state.grid, state.shell, state.axis, state.sourceIdx, state.targetIdx);
+		} else if (!state.moved) {
+			removeTrack(state.grid, state.shell, state.axis, state.sourceIdx);
+		}
+	}
+
 	onMount(() => {
 		rebuild();
 		const ro = new ResizeObserver(scheduleRebuild);
@@ -935,6 +1062,9 @@
 			window.removeEventListener('pointermove', onMove);
 			window.removeEventListener('pointerup', endDrag);
 			window.removeEventListener('pointercancel', endDrag);
+			window.removeEventListener('pointermove', onRemoveMove);
+			window.removeEventListener('pointerup', endRemovePointer);
+			window.removeEventListener('pointercancel', endRemovePointer);
 			scrollLockRestore?.();
 			scrollLockRestore = null;
 			restoreLabels();
@@ -946,6 +1076,7 @@
 <div
 	class="layout-inspector"
 	data-dragging={dragging ? '' : undefined}
+	data-collapse-dragging={removeDrag?.moved ? '' : undefined}
 	data-tool={tool ?? undefined}
 	role="presentation"
 >
@@ -997,13 +1128,27 @@
 
 	{#each trackRemoves as t (t.key)}
 		{#if (tool === 'remove-col' && t.axis === 'col') || (tool === 'remove-row' && t.axis === 'row')}
+			{@const isSource =
+				removeDrag?.moved &&
+				removeDrag.grid === t.root &&
+				removeDrag.axis === t.axis &&
+				removeDrag.sourceIdx === t.index}
+			{@const isTarget =
+				removeDrag?.moved &&
+				removeDrag.grid === t.root &&
+				removeDrag.axis === t.axis &&
+				removeDrag.targetIdx === t.index}
 			<button
 				class="layout-track-zone layout-track-remove-zone"
 				data-axis={t.axis}
+				data-source={isSource || undefined}
+				data-target={isTarget || undefined}
 				type="button"
 				aria-label="Remove {t.axis === 'col' ? 'column' : 'row'} {t.index + 1}"
 				style="left: {t.zoneX}px; top: {t.zoneY}px; width: {t.zoneW}px; height: {t.zoneH}px;"
+				onpointerdown={(e) => startRemovePointer(e, t)}
 				onclick={(e) => {
+					if (e.detail !== 0) return;
 					e.stopPropagation();
 					removeTrack(t.root, t.shell, t.axis, t.index);
 				}}
@@ -1113,10 +1258,29 @@
 			border-color 0.12s ease-out;
 	}
 
-	.layout-track-remove-zone:hover,
-	.layout-track-remove-zone:focus-visible {
+	.layout-inspector:not([data-collapse-dragging]) .layout-track-remove-zone:hover,
+	.layout-inspector:not([data-collapse-dragging]) .layout-track-remove-zone:focus-visible {
 		background: hsl(0 75% 55% / 0.18);
 		border-color: hsl(0 75% 60%);
 		outline: none;
+	}
+
+	.layout-inspector[data-collapse-dragging] .layout-track-remove-zone {
+		background: hsl(25 100% 55% / 0.06);
+		border-color: hsl(25 100% 55% / 0.45);
+		border-style: dashed;
+	}
+
+	.layout-track-remove-zone[data-source] {
+		background: hsl(25 100% 55% / 0.32) !important;
+		border-color: hsl(25 100% 55%) !important;
+		border-style: solid !important;
+		cursor: grabbing;
+	}
+
+	.layout-track-remove-zone[data-target] {
+		background: hsl(145 60% 50% / 0.22) !important;
+		border-color: hsl(145 65% 55%) !important;
+		border-style: solid !important;
 	}
 </style>

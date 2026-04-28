@@ -726,10 +726,10 @@
 					size="sm"
 					class="tool-btn"
 					type="button"
-					data-tooltip="Remove column"
+					data-tooltip="Remove column · drag to merge"
 					data-active={layoutTool === 'remove-col' || undefined}
 					onclick={() => onlayouttool?.(layoutTool === 'remove-col' ? null : 'remove-col')}
-					aria-label="Remove column"
+					aria-label="Remove column or drag to merge into another column"
 					aria-pressed={layoutTool === 'remove-col'}
 				>
 					<Columns3 size={16} />
@@ -740,10 +740,10 @@
 					size="sm"
 					class="tool-btn"
 					type="button"
-					data-tooltip="Remove row"
+					data-tooltip="Remove row · drag to merge"
 					data-active={layoutTool === 'remove-row' || undefined}
 					onclick={() => onlayouttool?.(layoutTool === 'remove-row' ? null : 'remove-row')}
-					aria-label="Remove row"
+					aria-label="Remove row or drag to merge into another row"
 					aria-pressed={layoutTool === 'remove-row'}
 				>
 					<Rows3 size={16} />
