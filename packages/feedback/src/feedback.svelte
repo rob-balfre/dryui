@@ -148,6 +148,15 @@
 
 	type GridOverrideMap = Map<string, string>;
 
+	type LayoutBox = {
+		id: string;
+		label: string;
+		pageX: number;
+		pageY: number;
+		width: number;
+		height: number;
+	};
+
 	type HistoryFrame = {
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
@@ -155,6 +164,7 @@
 		removed: HTMLElement[];
 		gridOverrides: Map<HTMLElement, GridOverrideMap>;
 		labelTexts: Map<HTMLElement, string>;
+		boxes: LayoutBox[];
 	};
 
 	const GRID_TEMPLATE_PROPS = [
@@ -199,6 +209,7 @@
 	const gridOverrideInitialSnaps = new SvelteMap<HTMLElement, GridOverrideMap>();
 	const labelTextInitialSnaps = new SvelteMap<HTMLElement, string>();
 	let layoutVersion = $state(0);
+	let layoutBoxes = $state<LayoutBox[]>([]);
 
 	let placingComponent = $state<string | null>(null);
 
@@ -209,7 +220,8 @@
 			added: [],
 			removed: [],
 			gridOverrides: new Map(),
-			labelTexts: new Map()
+			labelTexts: new Map(),
+			boxes: []
 		};
 	}
 
@@ -295,6 +307,7 @@
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
 		for (const original of [...removedElements.keys()]) restoreLayoutElement(original);
 		resetAllGridOverrides();
+		layoutBoxes = [];
 		layoutVersion++;
 	}
 
@@ -754,7 +767,8 @@
 			added: snapshotAllAdded(),
 			removed: [...removedElements.keys()],
 			gridOverrides: snapshotAllGridOverrides(),
-			labelTexts: snapshotAllLabelTexts()
+			labelTexts: snapshotAllLabelTexts(),
+			boxes: layoutBoxes.map((b) => ({ ...b }))
 		};
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
@@ -809,6 +823,7 @@
 			if ((el.textContent ?? '') !== target) el.textContent = target;
 			layoutChanged = true;
 		}
+		layoutBoxes = frame.boxes.map((b) => ({ ...b }));
 		if (layoutChanged) notifyLayoutChange();
 		layoutVersion++;
 		saveVersion++;
@@ -838,9 +853,16 @@
 			removedElements.size > 0 ||
 			hasModifiedLayoutClone() ||
 			hasModifiedGridOverrides() ||
-			hasModifiedLabelTexts()
+			hasModifiedLabelTexts() ||
+			layoutBoxes.length > 0
 		);
 	});
+
+	function applyLayoutBoxes(next: LayoutBox[], commit: boolean) {
+		layoutBoxes = next;
+		if (commit) commitHistory();
+		else layoutVersion++;
+	}
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
 		const rect = original.getBoundingClientRect();
@@ -2020,6 +2042,14 @@
 			const viewport = { width: window.innerWidth, height: window.innerHeight };
 			const scroll = { x: scrollX, y: scrollY };
 			const hints = buildDrawingHints(drawings);
+			const layoutBoxesPayload = layoutBoxes.map((b) => ({
+				id: b.id,
+				label: b.label,
+				pageX: Math.round(b.pageX),
+				pageY: Math.round(b.pageY),
+				width: Math.round(b.width),
+				height: Math.round(b.height)
+			}));
 			const response = await fetch(`${serverUrl}/submissions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -2031,7 +2061,8 @@
 					viewport,
 					scroll,
 					...(components.length > 0 ? { components } : {}),
-					...(removed.length > 0 ? { removed } : {})
+					...(removed.length > 0 ? { removed } : {}),
+					...(layoutBoxesPayload.length > 0 ? { layoutBoxes: layoutBoxesPayload } : {})
 				})
 			});
 
@@ -2058,6 +2089,7 @@
 				inspectingComponents = false;
 				inspectingLayout = false;
 				selectedComponentEl = null;
+				layoutBoxes = [];
 				destroyAllLayoutClones();
 				resetHistory([]);
 			}, 1500);
@@ -2545,11 +2577,15 @@
 				<LayoutInspector
 					tool={layoutTool}
 					breakpoint={layoutBreakpoint}
+					boxes={layoutBoxes}
+					capturing={toolbarHiddenForCapture}
 					onclose={stopInspectingLayout}
 					ontool={setLayoutTool}
 					oncommit={commitHistory}
 					oncapture={ensureGridInitialSnapshot}
 					oncapturelabel={ensureLabelInitialSnapshot}
+					onboxesapply={(next) => applyLayoutBoxes(next, false)}
+					onboxescommit={(next) => applyLayoutBoxes(next, true)}
 				/>
 			{/if}
 
