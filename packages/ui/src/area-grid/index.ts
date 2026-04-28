@@ -1,11 +1,10 @@
 import type { Snippet } from 'svelte';
 import type { HTMLAttributes } from 'svelte/elements';
 
-export type AreaGridSpace = 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type AreaGridMaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
 export interface AreaGridRootProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
-	gap?: AreaGridSpace;
-	padding?: AreaGridSpace;
+	maxWidth?: AreaGridMaxWidth;
 	fill?: boolean;
 	debug?: boolean;
 	children: Snippet;

@@ -24,6 +24,8 @@ dryui/area-grid-missing-area	error	AreaGrid child area {area} is not present in 
 dryui/area-grid-missing-root	error	{variable}="{area}" must be used on a child element inside <AreaGrid.Root>.	Move the placed element inside <AreaGrid.Root>.
 dryui/area-grid-no-area-part	error	Do not use <AreaGrid.Area>. Place a Svelte component with --dry-grid-area-name="..." instead.	Use --dry-grid-area-name on the placed component.
 dryui/area-grid-single-root	error	Only one <AreaGrid.Root> is allowed per .svelte file.	Use one AreaGrid.Root per file and place child components with --dry-grid-area-name.
+dryui/area-grid-no-gap	error	AreaGrid.Root has no gap. Spacing between regions is each region's surface concern (border, padding, background).	Remove the gap attribute.
+dryui/area-grid-no-padding	error	AreaGrid.Root has no `padding` shorthand attribute. For shell or grid padding, set --dry-area-grid-shell-padding[-block|-inline] (gutter inside the max-width cap) or --dry-area-grid-padding[-block|-inline] (inset around the tracks). Inter-region spacing still belongs to the regions themselves.	Replace the padding attribute with --dry-area-grid-padding or --dry-area-grid-shell-padding.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	

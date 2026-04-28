@@ -996,30 +996,18 @@
       "parts": {
         "Root": {
           "props": {
-            "gap": {
-              "signature": "gap: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | values:none|xs|sm|md|lg|xl",
+            "maxWidth": {
+              "signature": "maxWidth: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full' | default:'xl' | values:sm|md|lg|xl|2xl|full",
               "required": false,
               "bindable": false,
+              "default": "'xl'",
               "values": [
-                "none",
-                "xs",
                 "sm",
                 "md",
                 "lg",
-                "xl"
-              ]
-            },
-            "padding": {
-              "signature": "padding: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | values:none|xs|sm|md|lg|xl",
-              "required": false,
-              "bindable": false,
-              "values": [
-                "none",
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl"
+                "xl",
+                "2xl",
+                "full"
               ]
             },
             "fill": {

@@ -25,6 +25,7 @@ You receive one of three inputs:
 - Styling input is CSS custom properties via Svelte `--prop` syntax. No `class=`, no `style=`, no `style:` directives.
 - Grid only through `AreaGrid.Root`. No raw `display: grid` anywhere.
 - `@container` for responsive sizing. Never `@media`.
+- No `gap=` or `padding=` shorthand attributes on `AreaGrid.Root` (lint blocks them). For whitespace inside the grid, use the namespaced custom properties: `--dry-area-grid-shell-padding[-block|-inline]` for the gutter inside the max-width cap, and `--dry-area-grid-padding[-block|-inline]` for the inset around the tracks. Both default off — only opt in when the layout actually needs it. Inter-region gutters are still each region's surface concern.
 
 If a request would force you outside these rules, stop and explain which agent owns the missing piece.
 
@@ -46,7 +47,8 @@ Always end with:
 ```
 LAYOUT DONE
 - file: <path>
-- root: AreaGrid.Root, gap=<>, padding=<>
+- root: AreaGrid.Root, maxWidth=<>, fill=<true|false>
+- padding: shell=<value|none>, grid=<value|none>
 - areas: <comma-separated names>
 - breakpoints: base, wide@720, xl@1024 (+ any custom @container rules added)
 - placeholders:

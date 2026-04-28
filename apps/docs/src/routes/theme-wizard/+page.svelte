@@ -198,8 +198,7 @@
 
 <Container size="xl" padding={false}>
 	<AreaGrid.Root
-		gap="md"
-		padding="md"
+		--dry-area-grid-padding="var(--dry-space-4)"
 		--dry-area-grid-template-areas="'brand brand' 'tabs tabs' 'mode reset' 'copy download' 'preview preview' 'accentLabel baseLabel' 'accent base' 'depthLabel fontLabel' 'depth font' 'radiusLabel densityLabel' 'radius density'"
 		--dry-area-grid-template-columns="minmax(0, 1fr) minmax(0, 1fr)"
 		--dry-area-grid-template-rows="auto auto auto auto minmax(20rem, calc(100dvh - 25rem)) auto auto auto auto auto auto"

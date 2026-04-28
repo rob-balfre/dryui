@@ -342,6 +342,12 @@ const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
 	'--dry-area-grid-auto-rows',
 	'--dry-area-grid-align-items',
 	'--dry-area-grid-justify-items',
+	'--dry-area-grid-padding',
+	'--dry-area-grid-padding-block',
+	'--dry-area-grid-padding-inline',
+	'--dry-area-grid-shell-padding',
+	'--dry-area-grid-shell-padding-block',
+	'--dry-area-grid-shell-padding-inline',
 	'--dry-area-grid-area-display',
 	'--dry-area-grid-area-gap',
 	'--dry-area-grid-area-padding',
@@ -349,21 +355,6 @@ const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
 	'--dry-area-grid-area-radius',
 	'--dry-area-grid-area-bg',
 	'--dry-area-grid-area-color'
-]);
-
-const AREA_GRID_LEGACY_VAR_REPLACEMENTS: ReadonlyMap<string, string> = new Map([
-	['--dry-area-grid-area', AREA_GRID_AREA_NAME_VAR],
-	['--dry-area-grid-template', '--dry-area-grid-template-areas'],
-	['--dry-area-grid-template-wide', '--dry-area-grid-template-areas-wide'],
-	['--dry-area-grid-template-xl', '--dry-area-grid-template-areas-xl'],
-	['--dry-area-grid-columns', '--dry-area-grid-template-columns'],
-	['--dry-area-grid-columns-wide', '--dry-area-grid-template-columns-wide'],
-	['--dry-area-grid-columns-xl', '--dry-area-grid-template-columns-xl'],
-	['--dry-area-grid-rows', '--dry-area-grid-template-rows'],
-	['--dry-area-grid-rows-wide', '--dry-area-grid-template-rows-wide'],
-	['--dry-area-grid-rows-xl', '--dry-area-grid-template-rows-xl'],
-	['--dry-area-grid-gap', 'gap="sm|md|lg|xl"'],
-	['--dry-area-grid-padding', 'padding="sm|md|lg|xl"']
 ]);
 
 function isAreaGridCssVar(name: string): boolean {
@@ -769,11 +760,10 @@ function findContainingAreaGridRoot(
 }
 
 function areaGridInvalidVarMessage(component: string, variable: string): string {
-	const replacement = AREA_GRID_LEGACY_VAR_REPLACEMENTS.get(variable);
 	return ruleMessage('dryui/area-grid-invalid-var', {
 		component,
 		variable,
-		target: replacement ?? 'one of the documented AreaGrid CSS custom properties'
+		target: 'one of the documented AreaGrid CSS custom properties'
 	});
 }
 

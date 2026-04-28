@@ -46,7 +46,7 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 		violations.push(...checkMarkup(content, filePath));
 
 		for (const match of content.matchAll(styleRe)) {
-			violations.push(...checkStyle(match[1]));
+			violations.push(...checkStyle(match[1], {}, filePath));
 		}
 
 		const filtered = ruleAllowlist

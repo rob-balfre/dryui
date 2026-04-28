@@ -24,7 +24,14 @@ Props (real, from the component source):
 - `fill`: `boolean` — when `true`, the grid stretches to at least viewport height (`min-block-size: 100dvh`). **Always pass `fill` for page-level layouts** (anything in `+page.svelte`); without it the grid collapses to content height and the rest of the viewport sits dark below. Omit only when the AreaGrid is a section inside a larger layout.
 - `debug`: `boolean` — visualizes area boxes during development. Strip before commit.
 
-There is no `gap` and no `padding`. AreaGrid lays out structure only; spacing between regions is each region's surface concern (border, padding, background). If you reach for inner spacing, the boundary is wrong, not the rules. Lint: `dryui/area-grid-no-gap`, `dryui/area-grid-no-padding`.
+There is no `gap` and no `padding` _attribute_ — those are footguns and stay banned. Lint: `dryui/area-grid-no-gap`, `dryui/area-grid-no-padding`.
+
+What AreaGrid does expose for whitespace is two layers of _namespaced_ padding, set via Svelte `--prop` syntax:
+
+- **Shell padding** (`--dry-area-grid-shell-padding[-block|-inline]`): inset between the centered max-width cap and the grid tracks. Use this when the page needs vertical air around the grid (top/bottom strip on a hero, breathing room above an app shell), or extra horizontal breathing inside the cap on top of the default `100% - 2rem` gutter.
+- **Grid padding** (`--dry-area-grid-padding[-block|-inline]`): inset between the grid's own box and its tracks. Use this when every region should be inset from the grid edge by the same amount — e.g., a card-shell-style frame.
+
+Inter-region spacing (between two areas) is still each region's surface concern (border, padding, background). If you want gutters between tracks, that's `gap`, which AreaGrid does not yet expose; restructure or push the spacing into the regions.
 
 The Root sets `container-type: inline-size` on itself, so every child can use container queries against the grid's own width.
 
@@ -45,6 +52,19 @@ Set the template via Svelte `--prop` syntax on `AreaGrid.Root`. Each variant has
 | `--dry-area-grid-template-rows-xl`      | …rows at ≥1024px.                                  |
 
 The base template is required. Lint: `dryui/area-grid-required-var`.
+
+### Padding (optional)
+
+| Property                               | Purpose                                             |
+| -------------------------------------- | --------------------------------------------------- |
+| `--dry-area-grid-shell-padding`        | Both axes of shell padding (inside the max-width).  |
+| `--dry-area-grid-shell-padding-block`  | Vertical-only override (top/bottom of the shell).   |
+| `--dry-area-grid-shell-padding-inline` | Horizontal-only override (left/right of the shell). |
+| `--dry-area-grid-padding`              | Both axes of grid padding (around the tracks).      |
+| `--dry-area-grid-padding-block`        | Vertical-only override (top/bottom of the grid).    |
+| `--dry-area-grid-padding-inline`       | Horizontal-only override (left/right of the grid).  |
+
+Each axis-specific var falls back to the shorthand, then to `0`. Both layers are off by default; opt in only when the layout actually needs it. Track sizes are computed inside the grid's content area, so seam rendering stays correct under grid padding without any extra wiring.
 
 ## Placement
 
@@ -180,7 +200,8 @@ End every Layout response with this block so the next agent has clean inputs:
 ```
 LAYOUT DONE
 - file: <path>
-- root: AreaGrid.Root, maxWidth=<>
+- root: AreaGrid.Root, maxWidth=<>, fill=<true|false>
+- padding: shell=<value|none>, grid=<value|none>
 - areas: <list of names>
 - breakpoints: base, wide@720, xl@1024 (+ any custom @container rules added)
 - placeholders:

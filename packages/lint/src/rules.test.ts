@@ -258,19 +258,6 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.message).toContain('static string literals');
 	});
 
-	test('rejects legacy AreaGrid custom property aliases', () => {
-		const code = `<AreaGrid.Root
-  --dry-area-grid-template-areas="'content'"
-  --dry-area-grid-columns-wide="1fr"
->
-  <Widget --dry-grid-area-name="content">Content</Widget>
-</AreaGrid.Root>`;
-		const violations = checkMarkup(code);
-		expect(violations).toHaveLength(1);
-		expect(violations[0]!.rule).toBe('dryui/area-grid-invalid-var');
-		expect(violations[0]!.message).toContain('--dry-area-grid-template-columns-wide');
-	});
-
 	test('rejects unknown AreaGrid custom properties', () => {
 		const code = `<AreaGrid.Root
   --dry-area-grid-template-areas="'content'"

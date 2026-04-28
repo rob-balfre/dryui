@@ -4843,29 +4843,18 @@
       "parts": {
         "Root": {
           "props": {
-            "gap": {
-              "type": "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'",
+            "maxWidth": {
+              "type": "'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'",
               "required": false,
               "acceptedValues": [
-                "none",
-                "xs",
                 "sm",
                 "md",
                 "lg",
-                "xl"
-              ]
-            },
-            "padding": {
-              "type": "'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'",
-              "required": false,
-              "acceptedValues": [
-                "none",
-                "xs",
-                "sm",
-                "md",
-                "lg",
-                "xl"
-              ]
+                "xl",
+                "2xl",
+                "full"
+              ],
+              "default": "'xl'"
             },
             "fill": {
               "type": "boolean",
@@ -4931,6 +4920,12 @@
         "--dry-area-grid-auto-flow": "Grid Auto Flow",
         "--dry-area-grid-auto-rows": "Grid Auto Rows",
         "--dry-area-grid-justify-items": "Grid Justify Items",
+        "--dry-area-grid-padding": "Grid Padding",
+        "--dry-area-grid-padding-block": "Grid Padding Block",
+        "--dry-area-grid-padding-inline": "Grid Padding Inline",
+        "--dry-area-grid-shell-padding": "Grid Shell Padding",
+        "--dry-area-grid-shell-padding-block": "Grid Shell Padding Block",
+        "--dry-area-grid-shell-padding-inline": "Grid Shell Padding Inline",
         "--dry-area-grid-template-areas": "Grid Template Areas",
         "--dry-area-grid-template-areas-wide": "Grid Template Areas Wide",
         "--dry-area-grid-template-areas-xl": "Grid Template Areas Xl",

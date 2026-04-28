@@ -1723,12 +1723,28 @@ async function main(): Promise<void> {
 				cssVars[varName] = cssVarDescription(varName);
 			}
 			// Private-alias fallback pattern `--_dry-btn-bg: var(--dry-btn-bg, <fallback>)`
-			// — the first var() argument is the consumer-facing override point.
-			for (const match of source.matchAll(/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)/gm)) {
-				const varName = match[1];
-				if (!varName) continue;
-				if (cssVarPrefixes && !cssVarPrefixes.some((p) => varName.startsWith(p))) continue;
-				cssVars[varName] = cssVarDescription(varName);
+			// — the first `var()` argument is the consumer-facing override point.
+			// Also follow nested same-family shorthand fallbacks: when the value
+			// is `var(--dry-x-block, var(--dry-x, 0))`, both `--dry-x-block` and
+			// `--dry-x` are user override points. We restrict nested pickup to
+			// fallbacks whose name is a *prefix* of the primary, which keeps
+			// global-token fallbacks (e.g. `var(--dry-btn-bg, var(--dry-color-fill-brand))`)
+			// out of the spec — those don't share the primary's prefix.
+			for (const match of source.matchAll(
+				/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)([^;]*);/gm
+			)) {
+				const primary = match[1];
+				const rest = match[2] ?? '';
+				if (!primary) continue;
+				if (cssVarPrefixes && !cssVarPrefixes.some((p) => primary.startsWith(p))) continue;
+				cssVars[primary] = cssVarDescription(primary);
+				for (const inner of rest.matchAll(/var\(\s*(--dry-[\w-]+)/g)) {
+					const fallback = inner[1];
+					if (!fallback) continue;
+					if (!primary.startsWith(fallback)) continue;
+					if (cssVarPrefixes && !cssVarPrefixes.some((p) => fallback.startsWith(p))) continue;
+					cssVars[fallback] = cssVarDescription(fallback);
+				}
 			}
 
 			for (const attr of collectDataAttributes(source)) {
@@ -1795,9 +1811,22 @@ async function main(): Promise<void> {
 					const varName = match[1];
 					if (varName) cssVars[varName] = cssVarDescription(varName);
 				}
-				for (const match of source.matchAll(/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)/gm)) {
-					const varName = match[1];
-					if (varName) cssVars[varName] = cssVarDescription(varName);
+				// Same nested-shorthand handling as the UI scan above. See the
+				// matching comment there for why we restrict nested-fallback
+				// pickup to prefix-shared shorthands only.
+				for (const match of source.matchAll(
+					/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)([^;]*);/gm
+				)) {
+					const primary = match[1];
+					const rest = match[2] ?? '';
+					if (!primary) continue;
+					cssVars[primary] = cssVarDescription(primary);
+					for (const inner of rest.matchAll(/var\(\s*(--dry-[\w-]+)/g)) {
+						const fallback = inner[1];
+						if (!fallback) continue;
+						if (!primary.startsWith(fallback)) continue;
+						cssVars[fallback] = cssVarDescription(fallback);
+					}
 				}
 
 				for (const attr of collectDataAttributes(source)) {

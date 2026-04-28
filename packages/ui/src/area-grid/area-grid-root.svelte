@@ -190,11 +190,22 @@
 <style>
 	[data-area-grid-shell] {
 		--_dry-area-grid-max-inline-size: 80rem;
+		--_dry-area-grid-shell-padding-block: var(
+			--dry-area-grid-shell-padding-block,
+			var(--dry-area-grid-shell-padding, 0)
+		);
+		--_dry-area-grid-shell-padding-inline: var(
+			--dry-area-grid-shell-padding-inline,
+			var(--dry-area-grid-shell-padding, 0)
+		);
 
+		box-sizing: border-box;
 		container-type: inline-size;
 		display: grid;
 		inline-size: min(100% - 2rem, var(--_dry-area-grid-max-inline-size));
 		margin-inline: auto;
+		padding-block: var(--_dry-area-grid-shell-padding-block);
+		padding-inline: var(--_dry-area-grid-shell-padding-inline);
 	}
 
 	[data-area-grid-shell][data-max-width='sm'] {
@@ -231,19 +242,21 @@
 
 	[data-area-grid] {
 		--dry-grid-area-name: auto;
-		--_dry-area-grid-columns: var(
-			--dry-area-grid-template-columns,
-			var(--dry-area-grid-columns, minmax(0, 1fr))
-		);
-		--_dry-area-grid-rows: var(--dry-area-grid-template-rows, var(--dry-area-grid-rows, none));
-		--_dry-area-grid-template: var(
-			--dry-area-grid-template-areas,
-			var(--dry-area-grid-template, none)
-		);
+		--_dry-area-grid-columns: var(--dry-area-grid-template-columns, minmax(0, 1fr));
+		--_dry-area-grid-rows: var(--dry-area-grid-template-rows, none);
+		--_dry-area-grid-template: var(--dry-area-grid-template-areas, none);
 		--_dry-area-grid-auto-flow: var(--dry-area-grid-auto-flow, row);
 		--_dry-area-grid-auto-rows: var(--dry-area-grid-auto-rows, auto);
 		--_dry-area-grid-align-items: var(--dry-area-grid-align-items, stretch);
 		--_dry-area-grid-justify-items: var(--dry-area-grid-justify-items, stretch);
+		--_dry-area-grid-padding-block: var(
+			--dry-area-grid-padding-block,
+			var(--dry-area-grid-padding, 0)
+		);
+		--_dry-area-grid-padding-inline: var(
+			--dry-area-grid-padding-inline,
+			var(--dry-area-grid-padding, 0)
+		);
 
 		position: relative;
 		display: grid;
@@ -255,6 +268,8 @@
 		grid-auto-rows: var(--_dry-area-grid-auto-rows);
 		align-items: var(--_dry-area-grid-align-items);
 		justify-items: var(--_dry-area-grid-justify-items);
+		padding-block: var(--_dry-area-grid-padding-block);
+		padding-inline: var(--_dry-area-grid-padding-inline);
 	}
 
 	[data-area-grid-seam-layer] {
@@ -278,15 +293,15 @@
 		[data-area-grid] {
 			--_dry-area-grid-columns-wide: var(
 				--dry-area-grid-template-columns-wide,
-				var(--dry-area-grid-columns-wide, var(--_dry-area-grid-columns))
+				var(--_dry-area-grid-columns)
 			);
 			--_dry-area-grid-rows-wide: var(
 				--dry-area-grid-template-rows-wide,
-				var(--dry-area-grid-rows-wide, var(--_dry-area-grid-rows))
+				var(--_dry-area-grid-rows)
 			);
 			--_dry-area-grid-template-wide: var(
 				--dry-area-grid-template-areas-wide,
-				var(--dry-area-grid-template-wide, var(--_dry-area-grid-template))
+				var(--_dry-area-grid-template)
 			);
 
 			grid-template-columns: var(--_dry-area-grid-columns-wide);
@@ -299,15 +314,15 @@
 		[data-area-grid] {
 			--_dry-area-grid-columns-xl: var(
 				--dry-area-grid-template-columns-xl,
-				var(--dry-area-grid-columns-xl, var(--_dry-area-grid-columns-wide))
+				var(--_dry-area-grid-columns-wide)
 			);
 			--_dry-area-grid-rows-xl: var(
 				--dry-area-grid-template-rows-xl,
-				var(--dry-area-grid-rows-xl, var(--_dry-area-grid-rows-wide))
+				var(--_dry-area-grid-rows-wide)
 			);
 			--_dry-area-grid-template-xl: var(
 				--dry-area-grid-template-areas-xl,
-				var(--dry-area-grid-template-xl, var(--_dry-area-grid-template-wide))
+				var(--_dry-area-grid-template-wide)
 			);
 
 			grid-template-columns: var(--_dry-area-grid-columns-xl);

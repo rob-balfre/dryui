@@ -204,8 +204,9 @@ export const RULE_CATALOG = {
 		id: 'dryui/area-grid-no-padding',
 		severity: 'error',
 		message:
-			'AreaGrid.Root has no padding. Outer breathing comes from the centered max-width container; inner spacing belongs to the regions themselves.',
-		suggestedFix: 'Remove the padding attribute.'
+			'AreaGrid.Root has no `padding` shorthand attribute. For shell or grid padding, set --dry-area-grid-shell-padding[-block|-inline] (gutter inside the max-width cap) or --dry-area-grid-padding[-block|-inline] (inset around the tracks). Inter-region spacing still belongs to the regions themselves.',
+		suggestedFix:
+			'Replace the padding attribute with --dry-area-grid-padding or --dry-area-grid-shell-padding.'
 	},
 	'bare-compound': {
 		id: 'bare-compound',
