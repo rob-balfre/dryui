@@ -536,7 +536,10 @@ export async function runInit(
 	const runCommand = runtime.runCommand ?? runProcessCommand;
 
 	let devTarballsDir = explicitDevTarballsDir;
-	if (devTarballsDir === null) {
+	const skipWorkspaceDetect =
+		process.env['DRYUI_SKIP_WORKSPACE_DETECT'] === '1' ||
+		process.env['DRYUI_SKIP_WORKSPACE_DETECT'] === 'true';
+	if (devTarballsDir === null && !skipWorkspaceDetect) {
 		const workspace = detectDryuiWorkspace(import.meta.url);
 		if (workspace) {
 			const freshness = checkManifestFreshness(workspace);
@@ -675,6 +678,7 @@ export async function runInit(
 		}
 	}
 
+	let launcherRan = false;
 	if (isScaffold && feedbackReady && !noLaunch && tty) {
 		log('');
 		const shouldLaunch = await (runtime.promptLaunch ?? promptLaunchFeedbackDefault)();
@@ -690,7 +694,7 @@ export async function runInit(
 			} else {
 				await runLauncherDefault(targetPath, spec, launcherRuntime);
 			}
-			return;
+			launcherRan = true;
 		}
 	}
 
@@ -704,18 +708,28 @@ export async function runInit(
 					? 'yarn dev'
 					: 'npm run dev';
 
+	// A child process cannot chdir its parent shell, so print the path the user
+	// needs to step into. Show it both in the launcher-skipped path AND after
+	// the launcher returns (the launcher's spawned dev/feedback servers don't
+	// follow the user's shell home when they exit).
 	log('');
-	log('  Done! Your DryUI project is ready.');
+	log(
+		launcherRan
+			? '  Project ready. To keep working in this project:'
+			: '  Done! Your DryUI project is ready.'
+	);
 	log('');
 	log('  Next steps:');
 	if (!cwdIsTarget) {
 		// Preserve the user-typed path verbatim so absolute inputs aren't sliced.
 		log(`    cd ${userPath ?? targetPath}`);
 	}
-	log(`    ${devCommand}`);
-	if (isScaffold && feedbackReady) {
-		log('');
-		log('  Tip: run `bunx @dryui/cli` in the project to start feedback mode alongside dev.');
+	if (!launcherRan) {
+		log(`    ${devCommand}`);
+		if (isScaffold && feedbackReady) {
+			log('');
+			log('  Tip: run `dryui` in the project to start feedback mode alongside dev.');
+		}
 	}
 	log('');
 }

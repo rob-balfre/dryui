@@ -1,10 +1,22 @@
-import { afterEach, describe, expect, test } from 'bun:test';
+import { afterAll, afterEach, beforeAll, describe, expect, test } from 'bun:test';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { runInit } from '../commands/init.js';
 import { captureAsyncCommandIO, cleanupTempDirs, createTempTree, withCwd } from './helpers.js';
 
 afterEach(cleanupTempDirs);
+
+// Tests run inside the DryUI workspace, so runInit's auto-detect sees the
+// repo's manifest.json and tries to inject local tarballs into the scaffolded
+// project. Suppress that here so tests exercise the published-versions path.
+const originalSkipDetect = process.env['DRYUI_SKIP_WORKSPACE_DETECT'];
+beforeAll(() => {
+	process.env['DRYUI_SKIP_WORKSPACE_DETECT'] = '1';
+});
+afterAll(() => {
+	if (originalSkipDetect === undefined) delete process.env['DRYUI_SKIP_WORKSPACE_DETECT'];
+	else process.env['DRYUI_SKIP_WORKSPACE_DETECT'] = originalSkipDetect;
+});
 
 interface FeedbackRuntimeStubs {
 	installPackage: (options: {
@@ -439,8 +451,11 @@ describe('runInit', () => {
 		]);
 
 		const writtenPackageJson = JSON.parse(readFileSync(join(target, 'package.json'), 'utf8'));
-		expect(writtenPackageJson.overrides['@dryui/ui']).toBe(`file:${uiTarball}`);
-		expect(writtenPackageJson.overrides['@dryui/lint']).toBe(`file:${lintTarball}`);
+		// Bare absolute paths (not file: URLs) so the override matches whatever
+		// `bun add /abs/path.tgz` writes to dependencies; npm 11 EOVERRIDE only
+		// passes when the strings are byte-identical.
+		expect(writtenPackageJson.overrides['@dryui/ui']).toBe(uiTarball);
+		expect(writtenPackageJson.overrides['@dryui/lint']).toBe(lintTarball);
 	});
 
 	test('scaffold launches project feedback mode when the user confirms the prompt', async () => {
@@ -471,8 +486,13 @@ describe('runInit', () => {
 		expect(result.errors).toEqual([]);
 		expect(launcherCalls).toEqual([{ cwd: target, portPromptResult: true }]);
 		expect(result.logs).toContain('  Launching project in feedback mode...');
-		// The "Next steps:" block is skipped when the launcher runs.
-		expect(result.logs.some((line) => line.includes('Next steps:'))).toBe(false);
+		// After the launcher returns, init still prints the cd hint so the user
+		// knows where to go: a child process can't chdir its parent shell.
+		expect(result.logs).toContain('  Project ready. To keep working in this project:');
+		expect(result.logs).toContain('  Next steps:');
+		expect(result.logs).toContain('    cd projects/smoke');
+		// The dev command tip is omitted when the launcher already ran.
+		expect(result.logs.some((line) => line.includes('bun run dev'))).toBe(false);
 	});
 
 	test('scaffold falls back to next steps when the user declines the prompt', async () => {
@@ -497,7 +517,7 @@ describe('runInit', () => {
 		expect(result.logs).toContain('    cd projects/smoke');
 		expect(result.logs).toContain('    bun run dev');
 		expect(result.logs).toContain(
-			'  Tip: run `bunx @dryui/cli` in the project to start feedback mode alongside dev.'
+			'  Tip: run `dryui` in the project to start feedback mode alongside dev.'
 		);
 	});
 

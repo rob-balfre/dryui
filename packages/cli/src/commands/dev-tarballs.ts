@@ -2,7 +2,7 @@
 // E2E harness to install worktree tarballs instead of the npm-published
 // @dryui/* packages. The manifest is produced by scripts/e2e/pack-dev-versions.ts.
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { InstallPackageOptions } from './launch-utils.js';
@@ -41,6 +41,12 @@ export function rewriteInstallCommandArgs(
 	return args.map((arg) => rewritePackageName(arg, manifest));
 }
 
+// Both `dependencies` and `overrides` must point at the SAME string for npm 11
+// to accept the manifest (otherwise it fails with EOVERRIDE: "Override for X
+// conflicts with direct dependency"). After `bun add /abs/path.tgz` runs, bun
+// writes the dep entry as the bare absolute path (no `file:` prefix), so we
+// use that same shape for overrides too. Bun and npm both accept bare absolute
+// paths in overrides; bun additionally rejects `file:` in `bun add` args.
 export function injectOverridesIntoPackageJson(
 	content: string,
 	manifest: DevTarballsManifest
@@ -50,8 +56,19 @@ export function injectOverridesIntoPackageJson(
 		...((pkg.overrides as Record<string, string> | undefined) ?? {})
 	};
 	for (const [name, info] of Object.entries(manifest.packages)) {
-		overrides[name] = `file:${info.tarball}`;
+		overrides[name] = info.tarball;
 	}
+
+	const depFields = ['dependencies', 'devDependencies', 'peerDependencies'] as const;
+	for (const field of depFields) {
+		const deps = pkg[field] as Record<string, string> | undefined;
+		if (!deps) continue;
+		for (const name of Object.keys(deps)) {
+			const override = overrides[name];
+			if (override) deps[name] = override;
+		}
+	}
+
 	pkg.overrides = overrides;
 	// `resolutions` for yarn/pnpm compatibility; bun honours both keys.
 	pkg.resolutions = {
@@ -84,9 +101,9 @@ function maxMtimeUnder(rootDir: string): number {
 	const stack: string[] = [rootDir];
 	while (stack.length > 0) {
 		const dir = stack.pop()!;
-		let entries: ReturnType<typeof readdirSync>;
+		let entries: Dirent<string>[];
 		try {
-			entries = readdirSync(dir, { withFileTypes: true });
+			entries = readdirSync(dir, { withFileTypes: true, encoding: 'utf8' });
 		} catch {
 			continue;
 		}
