@@ -14,11 +14,8 @@
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
-		BetweenHorizontalEnd,
-		BetweenVerticalEnd,
 		Boxes,
 		Check,
-		Columns3,
 		Eraser,
 		GripVertical,
 		LayoutTemplate,
@@ -27,8 +24,8 @@
 		Pencil,
 		Plus,
 		Redo2,
+		RectangleHorizontal,
 		RotateCcw,
-		Rows3,
 		Search,
 		Send,
 		Settings,
@@ -47,7 +44,7 @@
 	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components' | 'layout';
-	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row';
+	export type LayoutTool = 'box';
 	export type LayoutBreakpoint = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -702,51 +699,13 @@
 					size="sm"
 					class="tool-btn"
 					type="button"
-					data-tooltip="Insert column"
-					onclick={() => onlayouttool?.('insert-col')}
-					aria-label="Insert column"
+					data-tooltip="Draw a labelled box for the AI"
+					data-active={layoutTool === 'box' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'box' ? null : 'box')}
+					aria-label={layoutTool === 'box' ? 'Stop drawing boxes' : 'Draw box'}
+					aria-pressed={layoutTool === 'box'}
 				>
-					<BetweenVerticalEnd size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					type="button"
-					data-tooltip="Insert row"
-					onclick={() => onlayouttool?.('insert-row')}
-					aria-label="Insert row"
-				>
-					<BetweenHorizontalEnd size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					type="button"
-					data-tooltip="Remove column · drag to merge"
-					data-active={layoutTool === 'remove-col' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'remove-col' ? null : 'remove-col')}
-					aria-label="Remove column or drag to merge into another column"
-					aria-pressed={layoutTool === 'remove-col'}
-				>
-					<Columns3 size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					type="button"
-					data-tooltip="Remove row · drag to merge"
-					data-active={layoutTool === 'remove-row' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'remove-row' ? null : 'remove-row')}
-					aria-label="Remove row or drag to merge into another row"
-					aria-pressed={layoutTool === 'remove-row'}
-				>
-					<Rows3 size={16} />
+					<RectangleHorizontal size={16} />
 				</Button>
 
 				<div class="tool-divider" aria-hidden="true"></div>

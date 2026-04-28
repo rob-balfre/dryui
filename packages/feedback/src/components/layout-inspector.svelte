@@ -26,19 +26,7 @@
 		anchor: 'center' | 'topLeft';
 	};
 
-	type TrackRemove = {
-		key: string;
-		root: HTMLElement;
-		shell: HTMLElement;
-		axis: Axis;
-		index: number;
-		zoneX: number;
-		zoneY: number;
-		zoneW: number;
-		zoneH: number;
-	};
-
-	type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row';
+	type LayoutTool = 'box';
 	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -64,7 +52,6 @@
 	const editingBreakpoint = $derived(breakpoint);
 	let handles = $state<Handle[]>([]);
 	let areas = $state<Area[]>([]);
-	let trackRemoves = $state<TrackRemove[]>([]);
 	let editing = $state<{ area: Area; value: string } | null>(null);
 	let editingInputEl = $state<HTMLInputElement | null>(null);
 	const hiddenLabels = new Map<HTMLElement, string>();
@@ -88,6 +75,7 @@
 			editingInputEl.select();
 		}
 	});
+
 	let dragging = $state<{
 		handle: Handle;
 		pointerId: number;
@@ -102,22 +90,8 @@
 		maxBefore: number;
 	} | null>(null);
 
-	let removeDrag = $state<{
-		pointerId: number;
-		captureTarget: HTMLElement;
-		grid: HTMLElement;
-		shell: HTMLElement;
-		axis: Axis;
-		sourceIdx: number;
-		startX: number;
-		startY: number;
-		moved: boolean;
-		targetIdx: number | null;
-	} | null>(null);
-
 	const MIN_TRACK = 32;
 	const HANDLE_THICKNESS = 12;
-	const REMOVE_DRAG_THRESHOLD = 4;
 
 	let scrollLockRestore: (() => void) | null = null;
 
@@ -148,32 +122,6 @@
 			rows.push(m[1]!.trim().split(/\s+/));
 		}
 		return rows;
-	}
-
-	function parseTrackTokens(value: string): string[] {
-		const trimmed = value.trim();
-		if (!trimmed || trimmed === 'none') return [];
-		const tokens: string[] = [];
-		let depth = 0;
-		let buf = '';
-		for (const ch of trimmed) {
-			if (ch === '(') depth++;
-			else if (ch === ')') depth--;
-			if ((ch === ' ' || ch === '\t') && depth === 0) {
-				if (buf) {
-					tokens.push(buf);
-					buf = '';
-				}
-				continue;
-			}
-			buf += ch;
-		}
-		if (buf) tokens.push(buf);
-		return tokens;
-	}
-
-	function serializeAreas(rows: string[][]): string {
-		return rows.map((r) => `'${r.join(' ')}'`).join(' ');
 	}
 
 	function parseTrackList(value: string): number[] {
@@ -294,6 +242,12 @@
 		return '--dry-area-grid-template-rows';
 	}
 
+	function areasVar(bp: 'base' | 'wide' | 'xl'): string {
+		if (bp === 'xl') return '--dry-area-grid-template-areas-xl';
+		if (bp === 'wide') return '--dry-area-grid-template-areas-wide';
+		return '--dry-area-grid-template-areas';
+	}
+
 	function colSeamSegments(
 		areaGrid: string[][],
 		rowSizes: number[],
@@ -352,7 +306,6 @@
 	function rebuild() {
 		const nextHandles: Handle[] = [];
 		const nextAreas: Area[] = [];
-		const nextRemoves: TrackRemove[] = [];
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
 		for (const grid of grids) {
 			if (isInsideFeedback(grid)) continue;
@@ -368,9 +321,6 @@
 			const gridId = (grid.dataset.dryuiFeedbackGridId ??= cryptoId());
 			const hasAreas = areaGrid.length > 0;
 
-			// Column seams: only render where the template-areas row to either side
-			// of the seam names a different area. If the grid has no areas at all,
-			// fall back to one full-height segment per seam.
 			let cursorX = rect.left;
 			for (let i = 0; i < cols.length - 1; i++) {
 				cursorX += cols[i]!;
@@ -415,44 +365,6 @@
 						h: HANDLE_THICKNESS
 					});
 				}
-			}
-
-			// Remove zones: full-track click area covering the column / row.
-			let cx = rect.left;
-			for (let i = 0; i < cols.length; i++) {
-				const w = cols[i]!;
-				if (cols.length > 1) {
-					nextRemoves.push({
-						key: `${gridId}-rm-col-${i}`,
-						root: grid,
-						shell,
-						axis: 'col',
-						index: i,
-						zoneX: cx,
-						zoneY: rect.top,
-						zoneW: w,
-						zoneH: rect.height
-					});
-				}
-				cx += w;
-			}
-			let cy = rect.top;
-			for (let i = 0; i < rows.length; i++) {
-				const h = rows[i]!;
-				if (rows.length > 1) {
-					nextRemoves.push({
-						key: `${gridId}-rm-row-${i}`,
-						root: grid,
-						shell,
-						axis: 'row',
-						index: i,
-						zoneX: rect.left,
-						zoneY: cy,
-						zoneW: rect.width,
-						zoneH: h
-					});
-				}
-				cy += h;
 			}
 
 			if (hasAreas) {
@@ -587,7 +499,6 @@
 		}
 		handles = nextHandles;
 		areas = nextAreas;
-		trackRemoves = nextRemoves;
 	}
 
 	function cryptoId(): string {
@@ -718,8 +629,6 @@
 		const oldName = area.name;
 		oncapture?.(area.shell);
 
-		// Update template-areas vars on the shell. Read effective value via cascade,
-		// rewrite, then set inline on the shell.
 		const cs = getComputedStyle(area.shell);
 		for (const prop of TEMPLATE_AREAS_PROPS) {
 			const current = cs.getPropertyValue(prop).trim();
@@ -728,8 +637,6 @@
 			if (rewritten !== current) area.shell.style.setProperty(prop, rewritten);
 		}
 
-		// Update every wrapper in this grid that names the renamed area, plus any
-		// placeholder label inside it so the new name persists when leaving Layout mode.
 		for (const child of Array.from(area.root.children)) {
 			if (!(child instanceof HTMLElement)) continue;
 			const name = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
@@ -758,291 +665,6 @@
 		});
 	}
 
-	function areasVar(bp: 'base' | 'wide' | 'xl'): string {
-		if (bp === 'xl') return '--dry-area-grid-template-areas-xl';
-		if (bp === 'wide') return '--dry-area-grid-template-areas-wide';
-		return '--dry-area-grid-template-areas';
-	}
-
-	function uniqueAreaName(existing: Set<string>, prefix: string, startFrom: number): string {
-		let i = startFrom;
-		while (existing.has(`${prefix}-${i}`)) i++;
-		return `${prefix}-${i}`;
-	}
-
-	function insertCenterTrack(axis: Axis) {
-		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
-		let mutated = false;
-		for (const grid of grids) {
-			if (isInsideFeedback(grid)) continue;
-			const shell = grid.closest<HTMLElement>('[data-area-grid-shell]');
-			if (!shell) continue;
-			const cs = getComputedStyle(grid);
-			const trackStr = axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows;
-			const tracks = parseTrackList(trackStr);
-			if (tracks.length === 0) continue;
-
-			oncapture?.(shell);
-
-			// Pick the seam closest to the grid's visual midpoint instead of the
-			// midpoint by track count, so repeated inserts on grids with uneven
-			// tracks don't pile up at the same x.
-			const total = tracks.reduce((a, b) => a + b, 0);
-			const target = total / 2;
-			let cumulative = 0;
-			let bestIdx = 1;
-			let bestDist = Infinity;
-			for (let i = 1; i < tracks.length; i++) {
-				cumulative += tracks[i - 1]!;
-				const dist = Math.abs(cumulative - target);
-				if (dist < bestDist) {
-					bestDist = dist;
-					bestIdx = i;
-				}
-			}
-			if (tracks.length === 1) bestIdx = 1; // append after the only track
-
-			// Carve room for the new track out of the largest existing one so the
-			// new column/row is actually visible (otherwise a 1fr in a fully
-			// fixed-px grid resolves to 0).
-			let largestIdx = 0;
-			for (let i = 1; i < tracks.length; i++) {
-				if (tracks[i]! > tracks[largestIdx]!) largestIdx = i;
-			}
-			const newSize = Math.min(240, Math.max(96, tracks[largestIdx]! / 3));
-			if (tracks[largestIdx]! > newSize + 64) {
-				tracks[largestIdx] = tracks[largestIdx]! - newSize;
-			}
-			tracks.splice(bestIdx, 0, newSize);
-
-			const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
-			if (areaRows.length > 0) {
-				const allNames = new Set<string>();
-				for (const prop of TEMPLATE_AREAS_PROPS) {
-					const v = cs.getPropertyValue(prop).trim();
-					if (!v || v === 'none') continue;
-					for (const r of parseTemplateAreas(v)) for (const c of r) if (c !== '.') allNames.add(c);
-				}
-				for (const r of areaRows) for (const c of r) if (c !== '.') allNames.add(c);
-				const newName = uniqueAreaName(allNames, 'area', 1);
-				allNames.add(newName);
-
-				if (axis === 'col') {
-					const splitNames = new Set<string>();
-					for (const row of areaRows) {
-						const before = bestIdx > 0 ? row[bestIdx - 1] : undefined;
-						const after = bestIdx < row.length ? row[bestIdx] : undefined;
-						if (before !== undefined && after !== undefined && before === after && before !== '.') {
-							splitNames.add(before);
-						}
-					}
-					const renameMap = new Map<string, string>();
-					for (const sn of splitNames) {
-						const renamed = uniqueAreaName(allNames, sn, 2);
-						renameMap.set(sn, renamed);
-						allNames.add(renamed);
-					}
-					for (const row of areaRows) {
-						for (let c = bestIdx; c < row.length; c++) {
-							const cur = row[c]!;
-							if (renameMap.has(cur)) row[c] = renameMap.get(cur)!;
-						}
-						row.splice(bestIdx, 0, newName);
-					}
-				} else {
-					const colCount = areaRows[0]?.length ?? 1;
-					const splitNames = new Set<string>();
-					if (bestIdx > 0 && bestIdx < areaRows.length) {
-						const above = areaRows[bestIdx - 1]!;
-						const below = areaRows[bestIdx]!;
-						for (let c = 0; c < colCount; c++) {
-							const a = above[c];
-							const b = below[c];
-							if (a !== undefined && b !== undefined && a === b && a !== '.') {
-								splitNames.add(a);
-							}
-						}
-					}
-					const renameMap = new Map<string, string>();
-					for (const sn of splitNames) {
-						const renamed = uniqueAreaName(allNames, sn, 2);
-						renameMap.set(sn, renamed);
-						allNames.add(renamed);
-					}
-					for (let r = bestIdx; r < areaRows.length; r++) {
-						const row = areaRows[r]!;
-						for (let c = 0; c < row.length; c++) {
-							const cur = row[c]!;
-							if (renameMap.has(cur)) row[c] = renameMap.get(cur)!;
-						}
-					}
-					const newRow: string[] = new Array(colCount).fill(newName);
-					areaRows.splice(bestIdx, 0, newRow);
-				}
-			}
-
-			const bp = effectiveBreakpoint(shell);
-			const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
-			shell.style.setProperty(trackProp, tracks.map((n) => `${Math.round(n)}px`).join(' '));
-			if (areaRows.length > 0) {
-				shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
-			}
-			mutated = true;
-		}
-		if (mutated) {
-			scheduleRebuild();
-			oncommit?.();
-		}
-	}
-
-	$effect(() => {
-		const t = tool;
-		if (t !== 'insert-col' && t !== 'insert-row') return;
-		untrack(() => {
-			insertCenterTrack(t === 'insert-col' ? 'col' : 'row');
-			ontool?.(null);
-		});
-	});
-
-	function removeTrack(grid: HTMLElement, shell: HTMLElement, axis: Axis, index: number) {
-		oncapture?.(shell);
-		const cs = getComputedStyle(grid);
-		const tracks = parseTrackTokens(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
-		if (index < 0 || index >= tracks.length || tracks.length <= 1) return;
-		tracks.splice(index, 1);
-		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
-		if (areaRows.length > 0) {
-			if (axis === 'col') {
-				for (const row of areaRows) {
-					if (index < row.length) row.splice(index, 1);
-				}
-			} else if (index < areaRows.length) {
-				areaRows.splice(index, 1);
-			}
-		}
-		const bp = effectiveBreakpoint(shell);
-		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
-		shell.style.setProperty(trackProp, tracks.join(' '));
-		if (areaRows.length > 0) {
-			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
-		}
-		scheduleRebuild();
-		oncommit?.();
-	}
-
-	function collapseTrack(
-		grid: HTMLElement,
-		shell: HTMLElement,
-		axis: Axis,
-		sourceIdx: number,
-		targetIdx: number
-	) {
-		if (sourceIdx === targetIdx) return;
-		oncapture?.(shell);
-		const cs = getComputedStyle(grid);
-		const tracks = parseTrackList(axis === 'col' ? cs.gridTemplateColumns : cs.gridTemplateRows);
-		if (tracks.length <= 1) return;
-		if (sourceIdx < 0 || sourceIdx >= tracks.length) return;
-		if (targetIdx < 0 || targetIdx >= tracks.length) return;
-		// Hand the dragged track's size to the drop target, then drop the source.
-		tracks[targetIdx] = tracks[targetIdx]! + tracks[sourceIdx]!;
-		tracks.splice(sourceIdx, 1);
-		const areaRows = parseTemplateAreas(cs.gridTemplateAreas);
-		if (areaRows.length > 0) {
-			if (axis === 'col') {
-				for (const row of areaRows) {
-					if (sourceIdx < row.length) row.splice(sourceIdx, 1);
-				}
-			} else if (sourceIdx < areaRows.length) {
-				areaRows.splice(sourceIdx, 1);
-			}
-		}
-		const bp = effectiveBreakpoint(shell);
-		const trackProp = axis === 'col' ? columnsVar(bp) : rowsVar(bp);
-		shell.style.setProperty(trackProp, tracks.map((n) => `${Math.round(n)}px`).join(' '));
-		if (areaRows.length > 0) {
-			shell.style.setProperty(areasVar(bp), serializeAreas(areaRows));
-		}
-		scheduleRebuild();
-		oncommit?.();
-	}
-
-	function findTrackZoneAt(x: number, y: number): TrackRemove | null {
-		for (const t of trackRemoves) {
-			if (x >= t.zoneX && x <= t.zoneX + t.zoneW && y >= t.zoneY && y <= t.zoneY + t.zoneH) {
-				return t;
-			}
-		}
-		return null;
-	}
-
-	function startRemovePointer(e: PointerEvent, t: TrackRemove) {
-		if (e.button !== 0) return;
-		e.stopPropagation();
-		const target = e.currentTarget as HTMLElement;
-		removeDrag = {
-			pointerId: e.pointerId,
-			captureTarget: target,
-			grid: t.root,
-			shell: t.shell,
-			axis: t.axis,
-			sourceIdx: t.index,
-			startX: e.clientX,
-			startY: e.clientY,
-			moved: false,
-			targetIdx: null
-		};
-		try {
-			target.setPointerCapture(e.pointerId);
-		} catch {
-			// pointer might not be capturable
-		}
-		window.addEventListener('pointermove', onRemoveMove);
-		window.addEventListener('pointerup', endRemovePointer);
-		window.addEventListener('pointercancel', endRemovePointer);
-	}
-
-	function onRemoveMove(e: PointerEvent) {
-		if (!removeDrag || removeDrag.pointerId !== e.pointerId) return;
-		if (!removeDrag.moved) {
-			const dx = e.clientX - removeDrag.startX;
-			const dy = e.clientY - removeDrag.startY;
-			if (Math.hypot(dx, dy) < REMOVE_DRAG_THRESHOLD) return;
-			removeDrag.moved = true;
-			scrollLockRestore = lockPageScroll();
-		}
-		const zone = findTrackZoneAt(e.clientX, e.clientY);
-		const valid =
-			zone &&
-			zone.root === removeDrag.grid &&
-			zone.axis === removeDrag.axis &&
-			zone.index !== removeDrag.sourceIdx;
-		removeDrag.targetIdx = valid ? zone.index : null;
-	}
-
-	function endRemovePointer(e: PointerEvent) {
-		if (!removeDrag || removeDrag.pointerId !== e.pointerId) return;
-		const state = removeDrag;
-		removeDrag = null;
-		try {
-			state.captureTarget.releasePointerCapture?.(e.pointerId);
-		} catch {
-			// already released
-		}
-		window.removeEventListener('pointermove', onRemoveMove);
-		window.removeEventListener('pointerup', endRemovePointer);
-		window.removeEventListener('pointercancel', endRemovePointer);
-		if (state.moved) {
-			scrollLockRestore?.();
-			scrollLockRestore = null;
-		}
-		if (state.moved && state.targetIdx !== null) {
-			collapseTrack(state.grid, state.shell, state.axis, state.sourceIdx, state.targetIdx);
-		} else if (!state.moved) {
-			removeTrack(state.grid, state.shell, state.axis, state.sourceIdx);
-		}
-	}
-
 	onMount(() => {
 		rebuild();
 		const ro = new ResizeObserver(scheduleRebuild);
@@ -1062,9 +684,6 @@
 			window.removeEventListener('pointermove', onMove);
 			window.removeEventListener('pointerup', endDrag);
 			window.removeEventListener('pointercancel', endDrag);
-			window.removeEventListener('pointermove', onRemoveMove);
-			window.removeEventListener('pointerup', endRemovePointer);
-			window.removeEventListener('pointercancel', endRemovePointer);
 			scrollLockRestore?.();
 			scrollLockRestore = null;
 			restoreLabels();
@@ -1076,7 +695,6 @@
 <div
 	class="layout-inspector"
 	data-dragging={dragging ? '' : undefined}
-	data-collapse-dragging={removeDrag?.moved ? '' : undefined}
 	data-tool={tool ?? undefined}
 	role="presentation"
 >
@@ -1123,36 +741,6 @@
 			>
 				{a.name}
 			</button>
-		{/if}
-	{/each}
-
-	{#each trackRemoves as t (t.key)}
-		{#if (tool === 'remove-col' && t.axis === 'col') || (tool === 'remove-row' && t.axis === 'row')}
-			{@const isSource =
-				removeDrag?.moved &&
-				removeDrag.grid === t.root &&
-				removeDrag.axis === t.axis &&
-				removeDrag.sourceIdx === t.index}
-			{@const isTarget =
-				removeDrag?.moved &&
-				removeDrag.grid === t.root &&
-				removeDrag.axis === t.axis &&
-				removeDrag.targetIdx === t.index}
-			<button
-				class="layout-track-zone layout-track-remove-zone"
-				data-axis={t.axis}
-				data-source={isSource || undefined}
-				data-target={isTarget || undefined}
-				type="button"
-				aria-label="Remove {t.axis === 'col' ? 'column' : 'row'} {t.index + 1}"
-				style="left: {t.zoneX}px; top: {t.zoneY}px; width: {t.zoneW}px; height: {t.zoneH}px;"
-				onpointerdown={(e) => startRemovePointer(e, t)}
-				onclick={(e) => {
-					if (e.detail !== 0) return;
-					e.stopPropagation();
-					removeTrack(t.root, t.shell, t.axis, t.index);
-				}}
-			></button>
 		{/if}
 	{/each}
 </div>
@@ -1242,45 +830,5 @@
 		caret-color: hsl(25 100% 70%);
 		outline: 2px solid hsl(25 100% 55%);
 		outline-offset: 0;
-	}
-
-	.layout-track-zone {
-		position: fixed;
-		z-index: 1;
-		margin: 0;
-		padding: 0;
-		border: 1px dashed hsl(25 100% 55% / 0);
-		background: hsl(25 100% 55% / 0);
-		cursor: pointer;
-		pointer-events: auto;
-		transition:
-			background 0.12s ease-out,
-			border-color 0.12s ease-out;
-	}
-
-	.layout-inspector:not([data-collapse-dragging]) .layout-track-remove-zone:hover,
-	.layout-inspector:not([data-collapse-dragging]) .layout-track-remove-zone:focus-visible {
-		background: hsl(0 75% 55% / 0.18);
-		border-color: hsl(0 75% 60%);
-		outline: none;
-	}
-
-	.layout-inspector[data-collapse-dragging] .layout-track-remove-zone {
-		background: hsl(25 100% 55% / 0.06);
-		border-color: hsl(25 100% 55% / 0.45);
-		border-style: dashed;
-	}
-
-	.layout-track-remove-zone[data-source] {
-		background: hsl(25 100% 55% / 0.32) !important;
-		border-color: hsl(25 100% 55%) !important;
-		border-style: solid !important;
-		cursor: grabbing;
-	}
-
-	.layout-track-remove-zone[data-target] {
-		background: hsl(145 60% 50% / 0.22) !important;
-		border-color: hsl(145 65% 55%) !important;
-		border-style: solid !important;
 	}
 </style>
