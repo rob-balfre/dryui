@@ -955,7 +955,7 @@
 	.layout-area-badge,
 	.layout-area-input {
 		position: fixed;
-		z-index: 1;
+		z-index: 2;
 		margin: 0;
 		padding: 2px 10px;
 		border: 1px solid hsl(25 100% 55%);
