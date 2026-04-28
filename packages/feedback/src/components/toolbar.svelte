@@ -4,6 +4,7 @@
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
+		Boxes,
 		Check,
 		Eraser,
 		GripVertical,
@@ -31,7 +32,7 @@
 	} from './component-names.js';
 	import type { SchemaField } from './component-schemas.js';
 
-	export type Mode = 'annotate' | 'layout';
+	export type Mode = 'annotate' | 'components' | 'layout';
 
 	interface Props {
 		active: boolean;
@@ -51,7 +52,7 @@
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
-		onlayoutreset?: () => void;
+		oncomponentsreset?: () => void;
 		onundo?: () => void;
 		onredo?: () => void;
 		ondeselect?: () => void;
@@ -79,7 +80,7 @@
 		ontoolchange,
 		onsubmit,
 		onmodechange,
-		onlayoutreset,
+		oncomponentsreset,
 		onundo,
 		onredo,
 		ondeselect,
@@ -89,10 +90,12 @@
 		onremoveselected
 	}: Props = $props();
 
-	const inspecting = $derived(mode === 'layout');
+	const inspecting = $derived(mode === 'components' || mode === 'layout');
 	const showAnnotationTools = $derived(mode === 'annotate');
+	const showComponentsTools = $derived(mode === 'components');
 	const showLayoutTools = $derived(mode === 'layout');
-	const showToolPill = $derived(showAnnotationTools || showLayoutTools);
+	const showToolPill = $derived(showAnnotationTools || showComponentsTools);
+	const inspectingLabel = $derived(showLayoutTools ? 'Adjusting layout' : 'Inspecting components');
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
@@ -575,6 +578,20 @@
 				class="mode-btn"
 				type="button"
 				role="tab"
+				aria-selected={mode === 'components'}
+				data-active={mode === 'components' || undefined}
+				onclick={() => onmodechange('components')}
+			>
+				<Boxes size={12} aria-hidden="true" />
+				<span>Components</span>
+			</Button>
+
+			<Button
+				variant="trigger"
+				size="sm"
+				class="mode-btn"
+				type="button"
+				role="tab"
 				aria-selected={mode === 'layout'}
 				data-active={mode === 'layout' || undefined}
 				onclick={() => onmodechange('layout')}
@@ -649,9 +666,9 @@
 		<div
 			class="tool-pill"
 			role="group"
-			aria-label={showLayoutTools ? 'Layout tools' : 'Annotation tools'}
+			aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
 		>
-			{#if showLayoutTools}
+			{#if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
 						<Button
@@ -861,7 +878,7 @@
 							<AlertDialog.Header>Remove {removeLabel}?</AlertDialog.Header>
 							<AlertDialog.Body>
 								{addedKind
-									? 'The placement disappears from the layout. Undo restores it.'
+									? 'The placement disappears from the page. Undo restores it.'
 									: 'The element is hidden from this view and the captured screenshot. Undo restores it.'}
 							</AlertDialog.Body>
 							<AlertDialog.Footer>
@@ -889,8 +906,8 @@
 						class="tool-btn"
 						type="button"
 						data-tooltip="Reset"
-						onclick={() => onlayoutreset?.()}
-						aria-label="Reset layout overrides"
+						onclick={() => oncomponentsreset?.()}
+						aria-label="Reset component overrides"
 					>
 						<RotateCcw size={16} />
 					</Button>
@@ -962,7 +979,7 @@
 	{#if inspecting}
 		<div class="inspect-pill" data-position={pillPosition} role="status">
 			<span class="inspect-pill-dot" aria-hidden="true"></span>
-			<span class="inspect-pill-label">Inspecting layout</span>
+			<span class="inspect-pill-label">{inspectingLabel}</span>
 			<Kbd data-inspect-pill-kbd>ESC</Kbd>
 		</div>
 	{/if}

@@ -25,6 +25,7 @@
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
+	import ComponentsInspector from './components/components-inspector.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
@@ -77,13 +78,16 @@
 
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
+	let inspectingComponents = $state(false);
 	let inspectingLayout = $state(false);
-	let selectedLayoutEl = $state<HTMLElement | null>(null);
-	const mode = $derived<Mode>(inspectingLayout ? 'layout' : 'annotate');
-	const annotationActive = $derived(active && !inspectingLayout);
+	let selectedComponentEl = $state<HTMLElement | null>(null);
+	const mode = $derived<Mode>(
+		inspectingLayout ? 'layout' : inspectingComponents ? 'components' : 'annotate'
+	);
+	const annotationActive = $derived(active && !inspectingComponents && !inspectingLayout);
 
 	function setMode(next: Mode) {
-		if (next === 'layout') {
+		if (next !== 'annotate') {
 			currentStroke = null;
 			currentArrow = null;
 			if (textInput) commitText();
@@ -92,17 +96,22 @@
 			movedDuringDrag = false;
 			erasedDuringDrag = false;
 		}
+		inspectingComponents = next === 'components';
 		inspectingLayout = next === 'layout';
-		selectedLayoutEl = null;
+		selectedComponentEl = null;
+	}
+
+	function stopInspectingComponents() {
+		inspectingComponents = false;
+		selectedComponentEl = null;
 	}
 
 	function stopInspectingLayout() {
 		inspectingLayout = false;
-		selectedLayoutEl = null;
 	}
 
-	function selectLayoutElement(el: HTMLElement | null) {
-		selectedLayoutEl = el;
+	function selectComponent(el: HTMLElement | null) {
+		selectedComponentEl = el;
 	}
 
 	type LayoutSnapshot = {
@@ -122,12 +131,24 @@
 		propsJson?: string;
 	};
 
+	type GridOverrideMap = Map<string, string>;
+
 	type HistoryFrame = {
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
 		added: AddedSnapshot[];
 		removed: HTMLElement[];
+		gridOverrides: Map<HTMLElement, GridOverrideMap>;
 	};
+
+	const GRID_TEMPLATE_PROPS = [
+		'--dry-area-grid-template-columns',
+		'--dry-area-grid-template-columns-wide',
+		'--dry-area-grid-template-columns-xl',
+		'--dry-area-grid-template-rows',
+		'--dry-area-grid-template-rows-wide',
+		'--dry-area-grid-template-rows-xl'
+	] as const;
 
 	type RemovedRecord = {
 		prevDisplay: string;
@@ -155,17 +176,26 @@
 	const cloneInitialSnaps = new SvelteMap<HTMLElement, LayoutSnapshot>();
 	const addedComponents = new Map<string, AddedRecord>();
 	const removedElements = new SvelteMap<HTMLElement, RemovedRecord>();
+	const gridOverrideInitialSnaps = new SvelteMap<HTMLElement, GridOverrideMap>();
 	let layoutVersion = $state(0);
 
 	let placingComponent = $state<string | null>(null);
 
-	let historyFrames = $state<HistoryFrame[]>([
-		{ drawings: [], cloneSnapshots: new Map(), added: [], removed: [] }
-	]);
+	function emptyHistoryFrame(initialDrawings: Drawing[] = []): HistoryFrame {
+		return {
+			drawings: [...initialDrawings],
+			cloneSnapshots: new Map(),
+			added: [],
+			removed: [],
+			gridOverrides: new Map()
+		};
+	}
+
+	let historyFrames = $state<HistoryFrame[]>([emptyHistoryFrame()]);
 	let frameIndex = $state(0);
 
-	const cloneLayoutEl = $derived(
-		selectedLayoutEl ? (layoutClones.get(selectedLayoutEl) ?? null) : null
+	const cloneSelectedComponent = $derived(
+		selectedComponentEl ? (layoutClones.get(selectedComponentEl) ?? null) : null
 	);
 	const canUndo = $derived(frameIndex > 0);
 	const canRedo = $derived(frameIndex < historyFrames.length - 1);
@@ -242,6 +272,7 @@
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
 		for (const original of [...removedElements.keys()]) restoreLayoutElement(original);
+		resetAllGridOverrides();
 		layoutVersion++;
 	}
 
@@ -256,7 +287,7 @@
 			rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height },
 			descriptor: describeElement(original)
 		});
-		if (selectedLayoutEl === original) selectedLayoutEl = null;
+		if (selectedComponentEl === original) selectedComponentEl = null;
 	}
 
 	function restoreLayoutElement(original: HTMLElement) {
@@ -313,7 +344,7 @@
 			padding: '4px 8px',
 			boxSizing: 'border-box',
 			transformOrigin: '50% 50%',
-			pointerEvents: inspectingLayout ? 'none' : 'auto',
+			pointerEvents: inspectingComponents ? 'none' : 'auto',
 			transform: snap.transform
 		});
 		const content = document.createElement('div');
@@ -526,7 +557,7 @@
 	}
 
 	$effect(() => {
-		const value = inspectingLayout ? 'none' : 'auto';
+		const value = inspectingComponents ? 'none' : 'auto';
 		for (const record of addedComponents.values()) {
 			record.el.style.pointerEvents = value;
 		}
@@ -581,7 +612,7 @@
 	function destroyAddedClone(id: string) {
 		const record = addedComponents.get(id);
 		if (!record) return;
-		if (selectedLayoutEl === record.el) selectedLayoutEl = null;
+		if (selectedComponentEl === record.el) selectedComponentEl = null;
 		unmountAdded(record);
 		record.el.remove();
 		addedComponents.delete(id);
@@ -607,12 +638,76 @@
 		return result;
 	}
 
+	function findGridShells(): HTMLElement[] {
+		return Array.from(document.querySelectorAll<HTMLElement>('[data-area-grid-shell]')).filter(
+			(el) => !el.closest('[data-dryui-feedback]')
+		);
+	}
+
+	function readGridOverrides(shell: HTMLElement): GridOverrideMap {
+		const map: GridOverrideMap = new Map();
+		for (const prop of GRID_TEMPLATE_PROPS) {
+			const value = shell.style.getPropertyValue(prop);
+			if (value) map.set(prop, value);
+		}
+		return map;
+	}
+
+	function applyGridOverrides(shell: HTMLElement, overrides: GridOverrideMap) {
+		for (const prop of GRID_TEMPLATE_PROPS) {
+			const next = overrides.get(prop);
+			if (next === undefined) shell.style.removeProperty(prop);
+			else shell.style.setProperty(prop, next);
+		}
+	}
+
+	function ensureGridInitialSnapshot(shell: HTMLElement) {
+		if (gridOverrideInitialSnaps.has(shell)) return;
+		gridOverrideInitialSnaps.set(shell, readGridOverrides(shell));
+	}
+
+	function snapshotAllGridOverrides(): Map<HTMLElement, GridOverrideMap> {
+		const map = new Map<HTMLElement, GridOverrideMap>();
+		for (const shell of gridOverrideInitialSnaps.keys()) {
+			map.set(shell, readGridOverrides(shell));
+		}
+		return map;
+	}
+
+	function captureGridOverridesIfChanged() {
+		for (const shell of findGridShells()) {
+			ensureGridInitialSnapshot(shell);
+		}
+	}
+
+	function gridOverridesEqual(a: GridOverrideMap, b: GridOverrideMap): boolean {
+		if (a.size !== b.size) return false;
+		for (const [key, value] of a) if (b.get(key) !== value) return false;
+		return true;
+	}
+
+	function hasModifiedGridOverrides(): boolean {
+		for (const [shell, initial] of gridOverrideInitialSnaps) {
+			if (!gridOverridesEqual(initial, readGridOverrides(shell))) return true;
+		}
+		return false;
+	}
+
+	function resetAllGridOverrides() {
+		for (const [shell, initial] of gridOverrideInitialSnaps) {
+			applyGridOverrides(shell, initial);
+		}
+		gridOverrideInitialSnaps.clear();
+	}
+
 	function commitHistory() {
+		captureGridOverridesIfChanged();
 		const frame: HistoryFrame = {
 			drawings: [...drawings],
 			cloneSnapshots: snapshotAllClones(),
 			added: snapshotAllAdded(),
-			removed: [...removedElements.keys()]
+			removed: [...removedElements.keys()],
+			gridOverrides: snapshotAllGridOverrides()
 		};
 		const next = [...historyFrames.slice(0, frameIndex + 1), frame];
 		historyFrames = next;
@@ -657,6 +752,11 @@
 				layoutChanged = true;
 			}
 		}
+		for (const shell of gridOverrideInitialSnaps.keys()) {
+			const target = frame.gridOverrides.get(shell) ?? gridOverrideInitialSnaps.get(shell)!;
+			applyGridOverrides(shell, target);
+			layoutChanged = true;
+		}
 		if (layoutChanged) notifyLayoutChange();
 		layoutVersion++;
 		saveVersion++;
@@ -669,9 +769,7 @@
 	}
 
 	function resetHistory(initialDrawings: Drawing[]) {
-		historyFrames = [
-			{ drawings: [...initialDrawings], cloneSnapshots: new Map(), added: [], removed: [] }
-		];
+		historyFrames = [emptyHistoryFrame(initialDrawings)];
 		frameIndex = 0;
 		layoutVersion++;
 	}
@@ -683,7 +781,12 @@
 		void layoutVersion;
 		void frameIndex;
 		void historyFrames.length;
-		return addedComponents.size > 0 || removedElements.size > 0 || hasModifiedLayoutClone();
+		return (
+			addedComponents.size > 0 ||
+			removedElements.size > 0 ||
+			hasModifiedLayoutClone() ||
+			hasModifiedGridOverrides()
+		);
 	});
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
@@ -709,8 +812,8 @@
 	}
 
 	$effect(() => {
-		const original = selectedLayoutEl;
-		if (!inspectingLayout || !original) return;
+		const original = selectedComponentEl;
+		if (!inspectingComponents || !original) return;
 		if (original.dataset[LAYOUT_DATASET.addedId]) return;
 		ensureLayoutClone(original);
 	});
@@ -725,17 +828,24 @@
 	});
 
 	$effect(() => {
-		if (inspectingLayout) return;
+		if (inspectingComponents) return;
 		if (untrack(() => hasLayoutFeedback)) return;
 		untrack(() => {
 			for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		});
 	});
 
+	$effect(() => {
+		if (!inspectingLayout) return;
+		untrack(() => {
+			for (const shell of findGridShells()) ensureGridInitialSnapshot(shell);
+		});
+	});
+
 	onDestroy(destroyAllLayoutClones);
 
-	function resetSelectedLayout() {
-		const original = selectedLayoutEl;
+	function resetSelectedComponent() {
+		const original = selectedComponentEl;
 		if (!original) return;
 		const clone = layoutClones.get(original);
 		const initial = cloneInitialSnaps.get(original);
@@ -758,7 +868,7 @@
 		const trimmed = kind.trim();
 		if (!trimmed) return;
 		placingComponent = trimmed;
-		if (selectedLayoutEl) selectedLayoutEl = null;
+		if (selectedComponentEl) selectedComponentEl = null;
 	}
 
 	function cancelPlacingComponent() {
@@ -787,7 +897,7 @@
 		};
 		const el = createAddedClone(id, kind, snap);
 		placingComponent = null;
-		selectedLayoutEl = el;
+		selectedComponentEl = el;
 		commitHistory();
 		notifyLayoutChange();
 	}
@@ -800,7 +910,7 @@
 	}
 
 	const selectedAddedRecord = $derived.by(() => {
-		const el = selectedLayoutEl;
+		const el = selectedComponentEl;
 		if (!el) return null;
 		const id = el.dataset[LAYOUT_DATASET.addedId];
 		if (!id) return null;
@@ -808,7 +918,7 @@
 	});
 
 	function removeSelectedElement() {
-		const el = selectedLayoutEl;
+		const el = selectedComponentEl;
 		if (!el) return;
 		const id = el.dataset[LAYOUT_DATASET.addedId];
 		if (id) {
@@ -821,7 +931,7 @@
 	}
 
 	function applyAddedProps(label: string, propsJson: string) {
-		const el = selectedLayoutEl;
+		const el = selectedComponentEl;
 		if (!el) return;
 		const id = el.dataset[LAYOUT_DATASET.addedId];
 		if (!id) return;
@@ -1892,8 +2002,9 @@
 				drawings = [];
 				saveVersion++;
 				active = false;
+				inspectingComponents = false;
 				inspectingLayout = false;
-				selectedLayoutEl = null;
+				selectedComponentEl = null;
 				destroyAllLayoutClones();
 				resetHistory([]);
 			}, 1500);
@@ -2342,7 +2453,7 @@
 				hidden={toolbarHiddenForCapture}
 				{submitStatus}
 				{sent}
-				hasSelection={selectedLayoutEl !== null}
+				hasSelection={selectedComponentEl !== null}
 				placing={placingComponent}
 				addedKind={selectedAddedRecord?.kind ?? null}
 				addedLabel={selectedAddedRecord?.label ?? ''}
@@ -2353,23 +2464,31 @@
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
-				onlayoutreset={resetSelectedLayout}
+				oncomponentsreset={resetSelectedComponent}
 				onundo={undo}
 				onredo={redo}
-				ondeselect={() => selectLayoutElement(null)}
+				ondeselect={() => selectComponent(null)}
 				onaddcomponent={startPlacingComponent}
 				oncancelplacement={cancelPlacingComponent}
 				onapplyprops={applyAddedProps}
 				onremoveselected={removeSelectedElement}
 			/>
 
+			{#if inspectingComponents}
+				<ComponentsInspector
+					selectedElement={selectedComponentEl}
+					getClone={resolveInspectorClone}
+					onselect={selectComponent}
+					onclose={stopInspectingComponents}
+					oncommit={commitHistory}
+				/>
+			{/if}
+
 			{#if inspectingLayout}
 				<LayoutInspector
-					selectedElement={selectedLayoutEl}
-					getClone={resolveInspectorClone}
-					onselect={selectLayoutElement}
 					onclose={stopInspectingLayout}
 					oncommit={commitHistory}
+					oncapture={ensureGridInitialSnapshot}
 				/>
 			{/if}
 
