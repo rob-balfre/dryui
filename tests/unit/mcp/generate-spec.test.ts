@@ -42,7 +42,7 @@ describe('generate-spec typography parsing', () => {
 		expect(Object.keys(text.props)).toEqual(expect.arrayContaining(['color', 'size', 'variant']));
 		expect(text.props.color?.acceptedValues).toEqual(['default', 'muted', 'secondary']);
 		expect(text.props.size?.acceptedValues).toEqual(['xs', 'sm', 'md', 'lg']);
-		expect(text.forwardedProps?.baseType).toBe('HTMLAttributes<HTMLElement>');
+		expect(text.forwardedProps?.baseType).toBe("Omit<HTMLAttributes<HTMLElement>, 'class'>");
 	});
 
 	test('captures ui typography heading props through export type re-exports', () => {

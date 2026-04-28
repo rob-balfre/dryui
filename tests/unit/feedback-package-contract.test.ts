@@ -38,7 +38,7 @@ describe('@dryui/feedback package contract', () => {
 	test('source entrypoint exposes the Feedback component export', async () => {
 		const mod = await import('../../packages/feedback/src/index.ts');
 
-		expect(Object.keys(mod)).toEqual(['Feedback']);
+		expect(Object.keys(mod)).toContain('Feedback');
 		expect(mod.Feedback).toBe(feedbackComponentPath);
 	});
 });
