@@ -37,7 +37,7 @@
 	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components' | 'layout';
-	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove' | 'swap';
+	export type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row' | 'swap';
 	export type LayoutBreakpoint = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -720,13 +720,29 @@
 					size="sm"
 					class="tool-btn"
 					type="button"
-					data-tooltip="Remove track"
-					data-active={layoutTool === 'remove' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'remove' ? null : 'remove')}
-					aria-label="Remove column or row"
-					aria-pressed={layoutTool === 'remove'}
+					data-tooltip="Remove column"
+					data-active={layoutTool === 'remove-col' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'remove-col' ? null : 'remove-col')}
+					aria-label="Remove column"
+					aria-pressed={layoutTool === 'remove-col'}
 				>
-					<Minus size={16} />
+					<Columns3 size={16} />
+					<Minus size={10} />
+				</Button>
+
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn"
+					type="button"
+					data-tooltip="Remove row"
+					data-active={layoutTool === 'remove-row' || undefined}
+					onclick={() => onlayouttool?.(layoutTool === 'remove-row' ? null : 'remove-row')}
+					aria-label="Remove row"
+					aria-pressed={layoutTool === 'remove-row'}
+				>
+					<Rows3 size={16} />
+					<Minus size={10} />
 				</Button>
 
 				<Button
@@ -743,21 +759,20 @@
 					<ArrowLeftRight size={16} />
 				</Button>
 
+				<div class="tool-divider" aria-hidden="true"></div>
+
 				<div class="layout-bp-segmented" role="group" aria-label="Editing breakpoint">
 					{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
-						<Button
-							variant="trigger"
-							size="sm"
-							class="tool-btn layout-bp-btn"
+						<button
+							class="layout-bp-btn"
 							type="button"
-							data-tooltip="Edit {bp} breakpoint"
 							data-active={layoutBreakpoint === bp || undefined}
 							onclick={() => onlayoutbreakpoint?.(bp)}
 							aria-label="Edit {bp} breakpoint"
 							aria-pressed={layoutBreakpoint === bp}
 						>
-							<span class="layout-bp-label">{bp}</span>
-						</Button>
+							{bp}
+						</button>
 					{/each}
 				</div>
 			{:else if showComponentsTools}
@@ -1111,6 +1126,52 @@
 		align-self: end;
 		position: relative;
 		z-index: 1;
+	}
+
+	.tool-divider {
+		inline-size: 1px;
+		block-size: 18px;
+		margin-inline: 4px;
+		background: hsl(220 10% 70% / 0.25);
+	}
+
+	.layout-bp-segmented {
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: 1px;
+		padding: 0;
+	}
+
+	.layout-bp-btn {
+		min-block-size: 22px;
+		padding: 0 8px;
+		margin: 0;
+		border: none;
+		border-radius: 6px;
+		background: transparent;
+		color: hsl(220 10% 70%);
+		font-family:
+			system-ui,
+			-apple-system,
+			sans-serif;
+		font-size: 11px;
+		font-weight: 500;
+		letter-spacing: 0.02em;
+		text-transform: lowercase;
+		cursor: pointer;
+		transition:
+			background 0.12s ease-out,
+			color 0.12s ease-out;
+	}
+
+	.layout-bp-btn:hover {
+		color: hsl(220 10% 92%);
+	}
+
+	.layout-bp-btn[data-active] {
+		background: hsl(25 100% 55%);
+		color: hsl(225 15% 8%);
 	}
 
 	.toolbar[data-dragging] {

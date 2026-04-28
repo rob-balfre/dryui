@@ -50,7 +50,7 @@
 		zoneH: number;
 	};
 
-	type LayoutTool = 'insert-col' | 'insert-row' | 'remove' | 'swap';
+	type LayoutTool = 'insert-col' | 'insert-row' | 'remove-col' | 'remove-row' | 'swap';
 	type EditingBp = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
@@ -697,12 +697,29 @@
 		if (areaRows.length > 0) {
 			if (axis === 'col') {
 				for (const row of areaRows) {
-					row.splice(Math.max(0, Math.min(row.length, atIndex)), 0, '.');
+					const at = Math.max(0, Math.min(row.length, atIndex));
+					const before = at > 0 ? row[at - 1] : undefined;
+					const after = at < row.length ? row[at] : undefined;
+					// If we'd be splitting a multi-cell named area, extend it into the
+					// new column so the area stays rectangular. Otherwise, '.'.
+					const fill =
+						before !== undefined && after !== undefined && before === after && before !== '.'
+							? before
+							: '.';
+					row.splice(at, 0, fill);
 				}
 			} else {
 				const colCount = areaRows[0]?.length ?? 1;
-				const newRow = Array<string>(colCount).fill('.');
-				areaRows.splice(Math.max(0, Math.min(areaRows.length, atIndex)), 0, newRow);
+				const at = Math.max(0, Math.min(areaRows.length, atIndex));
+				const above = at > 0 ? areaRows[at - 1] : undefined;
+				const below = at < areaRows.length ? areaRows[at] : undefined;
+				const newRow: string[] = [];
+				for (let c = 0; c < colCount; c++) {
+					const a = above?.[c];
+					const b = below?.[c];
+					newRow.push(a !== undefined && b !== undefined && a === b && a !== '.' ? a : '.');
+				}
+				areaRows.splice(at, 0, newRow);
 			}
 		}
 		const bp = effectiveBreakpoint(shell);
@@ -879,7 +896,7 @@
 	{/each}
 
 	{#each trackRemoves as t (t.key)}
-		{#if tool === 'remove'}
+		{#if (tool === 'remove-col' && t.axis === 'col') || (tool === 'remove-row' && t.axis === 'row')}
 			<button
 				class="layout-track-zone layout-track-remove-zone"
 				data-axis={t.axis}
