@@ -21,6 +21,157 @@
 		class: className,
 		...rest
 	}: Props = $props();
+
+	let gridEl = $state<HTMLElement | undefined>();
+	let seamLayer = $state<HTMLDivElement | undefined>();
+
+	function parseTracks(value: string): number[] {
+		const trimmed = value.trim();
+		if (!trimmed || trimmed === 'none') return [];
+		const tracks: number[] = [];
+		let depth = 0;
+		let buf = '';
+		for (const ch of trimmed) {
+			if (ch === '(') depth++;
+			else if (ch === ')') depth--;
+			if ((ch === ' ' || ch === '\t') && depth === 0) {
+				if (buf) {
+					const n = parseFloat(buf);
+					if (Number.isFinite(n)) tracks.push(n);
+					buf = '';
+				}
+				continue;
+			}
+			buf += ch;
+		}
+		if (buf) {
+			const n = parseFloat(buf);
+			if (Number.isFinite(n)) tracks.push(n);
+		}
+		return tracks;
+	}
+
+	function parseAreas(value: string): string[][] {
+		const trimmed = value.trim();
+		if (!trimmed || trimmed === 'none') return [];
+		const rows: string[][] = [];
+		const re = /"([^"]*)"/g;
+		let m: RegExpExecArray | null;
+		while ((m = re.exec(trimmed)) !== null) {
+			rows.push(m[1]!.trim().split(/\s+/));
+		}
+		return rows;
+	}
+
+	type Seam = { axis: 'col' | 'row'; x: number; y: number; w: number; h: number };
+
+	function computeSeams(grid: HTMLElement): Seam[] {
+		const cs = getComputedStyle(grid);
+		const cols = parseTracks(cs.gridTemplateColumns);
+		const rows = parseTracks(cs.gridTemplateRows);
+		const areas = parseAreas(cs.gridTemplateAreas);
+		const out: Seam[] = [];
+		const fullHeight = rows.reduce((a, b) => a + b, 0);
+		const fullWidth = cols.reduce((a, b) => a + b, 0);
+
+		let cursorX = 0;
+		for (let i = 0; i < cols.length - 1; i++) {
+			cursorX += cols[i]!;
+			const seamX = cursorX;
+			if (areas.length === 0) {
+				out.push({ axis: 'col', x: seamX, y: 0, w: 1, h: fullHeight });
+				continue;
+			}
+			let segStart: number | null = null;
+			let cursorY = 0;
+			for (let r = 0; r < areas.length; r++) {
+				const seamReal = areas[r]![i] !== areas[r]![i + 1];
+				if (seamReal && segStart === null) segStart = cursorY;
+				if (!seamReal && segStart !== null) {
+					out.push({ axis: 'col', x: seamX, y: segStart, w: 1, h: cursorY - segStart });
+					segStart = null;
+				}
+				cursorY += rows[r] ?? 0;
+			}
+			if (segStart !== null) {
+				out.push({ axis: 'col', x: seamX, y: segStart, w: 1, h: cursorY - segStart });
+			}
+		}
+
+		let cursorY = 0;
+		for (let i = 0; i < rows.length - 1; i++) {
+			cursorY += rows[i]!;
+			const seamY = cursorY;
+			if (areas.length === 0) {
+				out.push({ axis: 'row', x: 0, y: seamY, w: fullWidth, h: 1 });
+				continue;
+			}
+			const above = areas[i];
+			const below = areas[i + 1];
+			if (!above || !below) continue;
+			let segStart: number | null = null;
+			let cursorX2 = 0;
+			const cc = Math.max(above.length, below.length);
+			for (let c = 0; c < cc; c++) {
+				const seamReal = above[c] !== below[c];
+				if (seamReal && segStart === null) segStart = cursorX2;
+				if (!seamReal && segStart !== null) {
+					out.push({ axis: 'row', x: segStart, y: seamY, w: cursorX2 - segStart, h: 1 });
+					segStart = null;
+				}
+				cursorX2 += cols[c] ?? 0;
+			}
+			if (segStart !== null) {
+				out.push({ axis: 'row', x: segStart, y: seamY, w: cursorX2 - segStart, h: 1 });
+			}
+		}
+
+		return out;
+	}
+
+	function syncSeams() {
+		if (!gridEl || !seamLayer) return;
+		const segs = computeSeams(gridEl);
+		seamLayer.replaceChildren();
+		for (const s of segs) {
+			const el = document.createElement('div');
+			el.dataset.areaGridSeam = '';
+			el.dataset.axis = s.axis;
+			el.style.setProperty('position', 'absolute');
+			el.style.setProperty('left', `${s.x}px`);
+			el.style.setProperty('top', `${s.y}px`);
+			el.style.setProperty('width', `${s.w}px`);
+			el.style.setProperty('height', `${s.h}px`);
+			el.style.setProperty(
+				'background',
+				'var(--dry-area-grid-seam-color, var(--dry-color-stroke-weak))'
+			);
+			seamLayer.appendChild(el);
+		}
+	}
+
+	let raf = 0;
+	function scheduleSync() {
+		if (raf) return;
+		raf = requestAnimationFrame(() => {
+			raf = 0;
+			syncSeams();
+		});
+	}
+
+	$effect(() => {
+		if (!gridEl || !seamLayer) return;
+		syncSeams();
+		const ro = new ResizeObserver(scheduleSync);
+		const mo = new MutationObserver(scheduleSync);
+		ro.observe(gridEl);
+		mo.observe(gridEl, { attributes: true, childList: true, subtree: true });
+		return () => {
+			if (raf) cancelAnimationFrame(raf);
+			ro.disconnect();
+			mo.disconnect();
+		};
+	});
 </script>
 
 <section
@@ -30,8 +181,9 @@
 	class={className}
 	{...rest}
 >
-	<section data-area-grid data-debug={debug || undefined}>
+	<section data-area-grid data-debug={debug || undefined} bind:this={gridEl}>
 		{@render children()}
+		<div data-area-grid-seam-layer bind:this={seamLayer} aria-hidden="true"></div>
 	</section>
 </section>
 
@@ -93,6 +245,7 @@
 		--_dry-area-grid-align-items: var(--dry-area-grid-align-items, stretch);
 		--_dry-area-grid-justify-items: var(--dry-area-grid-justify-items, stretch);
 
+		position: relative;
 		display: grid;
 		box-sizing: border-box;
 		grid-template-columns: var(--_dry-area-grid-columns);
@@ -102,6 +255,13 @@
 		grid-auto-rows: var(--_dry-area-grid-auto-rows);
 		align-items: var(--_dry-area-grid-align-items);
 		justify-items: var(--_dry-area-grid-justify-items);
+	}
+
+	[data-area-grid-seam-layer] {
+		position: absolute;
+		inset: 0;
+		grid-area: 1 / 1 / -1 / -1;
+		pointer-events: none;
 	}
 
 	[data-area-grid][data-debug] {

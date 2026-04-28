@@ -4947,6 +4947,9 @@
           "name": "data-area-grid-placeholder"
         },
         {
+          "name": "data-area-grid-seam-layer"
+        },
+        {
           "name": "data-area-grid-shell"
         },
         {

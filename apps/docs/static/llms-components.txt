@@ -1475,7 +1475,7 @@ Parts:
 Structure:
   AreaGrid.Root
 CSS variables: --dry-area-grid-align-items, --dry-area-grid-area-bg, --dry-area-grid-area-border, --dry-area-grid-area-color, --dry-area-grid-area-display, --dry-area-grid-area-gap, --dry-area-grid-area-padding, --dry-area-grid-area-radius, --dry-area-grid-auto-flow, --dry-area-grid-auto-rows, --dry-area-grid-justify-items, --dry-area-grid-template-areas, --dry-area-grid-template-areas-wide, --dry-area-grid-template-areas-xl, --dry-area-grid-template-columns, --dry-area-grid-template-columns-wide, --dry-area-grid-template-columns-xl, --dry-area-grid-template-rows, --dry-area-grid-template-rows-wide, --dry-area-grid-template-rows-xl, --dry-grid-area-name
-Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-shell | data-debug | data-fill | data-max-width
+Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-seam-layer | data-area-grid-shell | data-debug | data-fill | data-max-width
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte
