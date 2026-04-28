@@ -2,8 +2,9 @@
 // E2E harness to install worktree tarballs instead of the npm-published
 // @dryui/* packages. The manifest is produced by scripts/e2e/pack-dev-versions.ts.
 
-import { existsSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { InstallPackageOptions } from './launch-utils.js';
 
 export interface DevTarballsManifest {
@@ -69,4 +70,101 @@ export function wrapInstallPackage(
 			...options,
 			packageNames: options.packageNames.map((n) => rewritePackageName(n, manifest))
 		});
+}
+
+export interface AutoDetectedWorkspace {
+	readonly root: string;
+	readonly tarballsDir: string;
+	readonly manifestExists: boolean;
+}
+
+function maxMtimeUnder(rootDir: string): number {
+	if (!existsSync(rootDir)) return 0;
+	let max = 0;
+	const stack: string[] = [rootDir];
+	while (stack.length > 0) {
+		const dir = stack.pop()!;
+		let entries: ReturnType<typeof readdirSync>;
+		try {
+			entries = readdirSync(dir, { withFileTypes: true });
+		} catch {
+			continue;
+		}
+		for (const entry of entries) {
+			const full = resolve(dir, entry.name);
+			if (entry.isDirectory()) {
+				stack.push(full);
+			} else if (entry.isFile()) {
+				try {
+					const mt = statSync(full).mtimeMs;
+					if (mt > max) max = mt;
+				} catch {
+					// ignore unreadable files
+				}
+			}
+		}
+	}
+	return max;
+}
+
+function maxDistMtime(workspaceRoot: string): number {
+	const packagesDir = resolve(workspaceRoot, 'packages');
+	if (!existsSync(packagesDir)) return 0;
+	let max = 0;
+	for (const entry of readdirSync(packagesDir, { withFileTypes: true })) {
+		if (!entry.isDirectory()) continue;
+		const dist = resolve(packagesDir, entry.name, 'dist');
+		const mt = maxMtimeUnder(dist);
+		if (mt > max) max = mt;
+	}
+	return max;
+}
+
+export type ManifestFreshness = 'fresh' | 'stale' | 'missing';
+
+export function checkManifestFreshness(workspace: AutoDetectedWorkspace): ManifestFreshness {
+	const manifestPath = resolve(workspace.tarballsDir, 'manifest.json');
+	if (!existsSync(manifestPath)) return 'missing';
+	let manifestMtime = 0;
+	try {
+		manifestMtime = statSync(manifestPath).mtimeMs;
+	} catch {
+		return 'missing';
+	}
+	const distMtime = maxDistMtime(workspace.root);
+	return distMtime > manifestMtime ? 'stale' : 'fresh';
+}
+
+export function detectDryuiWorkspace(cliBinUrl: string): AutoDetectedWorkspace | null {
+	let startDir: string;
+	try {
+		startDir = dirname(fileURLToPath(cliBinUrl));
+	} catch {
+		return null;
+	}
+
+	let dir = startDir;
+	for (let i = 0; i < 8; i++) {
+		const uiPkgJson = resolve(dir, 'packages', 'ui', 'package.json');
+		if (existsSync(uiPkgJson)) {
+			try {
+				const pkg = JSON.parse(readFileSync(uiPkgJson, 'utf8')) as { name?: string };
+				if (pkg.name === '@dryui/ui') {
+					const tarballsDir = resolve(dir, 'reports', 'e2e-tarballs');
+					return {
+						root: dir,
+						tarballsDir,
+						manifestExists: existsSync(resolve(tarballsDir, 'manifest.json'))
+					};
+				}
+			} catch {
+				// fall through and keep walking
+			}
+		}
+		const parent = dirname(dir);
+		if (parent === dir) break;
+		dir = parent;
+	}
+
+	return null;
 }

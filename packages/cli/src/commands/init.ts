@@ -27,6 +27,8 @@ import {
 } from './launch-utils.js';
 import { runUserProjectLauncher } from './launcher.js';
 import {
+	checkManifestFreshness,
+	detectDryuiWorkspace,
 	injectOverridesIntoPackageJson,
 	loadDevTarballsManifest,
 	rewriteInstallCommandArgs,
@@ -473,9 +475,39 @@ export async function runInit(
 		noLaunch,
 		noFeedback,
 		skipImpeccable,
-		devTarballsDir
+		devTarballsDir: explicitDevTarballsDir
 	} = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runProcessCommand;
+
+	let devTarballsDir = explicitDevTarballsDir;
+	if (devTarballsDir === null) {
+		const workspace = detectDryuiWorkspace(import.meta.url);
+		if (workspace) {
+			const freshness = checkManifestFreshness(workspace);
+			if (freshness === 'missing') {
+				log('  Detected DryUI workspace; tarballs missing, running `bun run e2e:pack`...');
+				const ok = runCommand('bun', ['run', 'e2e:pack'], workspace.root);
+				if (!ok) {
+					log('  e2e:pack failed; falling back to npm versions.');
+				}
+			} else if (freshness === 'stale') {
+				log(
+					'  Detected DryUI workspace; dist is newer than tarballs, running `bun run e2e:pack --skip-build`...'
+				);
+				const ok = runCommand('bun', ['run', 'e2e:pack', '--skip-build'], workspace.root);
+				if (!ok) {
+					log('  e2e:pack --skip-build failed; using stale tarballs.');
+				}
+			} else {
+				log(`  Detected DryUI workspace; using local tarballs at ${workspace.tarballsDir}`);
+			}
+
+			// Use the manifest if it now exists (either pre-existing fresh, or just packed).
+			if (existsSync(resolve(workspace.tarballsDir, 'manifest.json'))) {
+				devTarballsDir = workspace.tarballsDir;
+			}
+		}
+	}
 
 	const devTarballsManifest: DevTarballsManifest | null = devTarballsDir
 		? loadDevTarballsManifest(devTarballsDir)
