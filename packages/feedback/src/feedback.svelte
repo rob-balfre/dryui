@@ -142,12 +142,16 @@
 	};
 
 	const GRID_TEMPLATE_PROPS = [
+		'--dry-area-grid-template-areas',
+		'--dry-area-grid-template-areas-wide',
+		'--dry-area-grid-template-areas-xl',
 		'--dry-area-grid-template-columns',
 		'--dry-area-grid-template-columns-wide',
 		'--dry-area-grid-template-columns-xl',
 		'--dry-area-grid-template-rows',
 		'--dry-area-grid-template-rows-wide',
-		'--dry-area-grid-template-rows-xl'
+		'--dry-area-grid-template-rows-xl',
+		'--dry-grid-area-name'
 	] as const;
 
 	type RemovedRecord = {

@@ -15,15 +15,35 @@
 		h: number;
 	};
 
+	type Area = {
+		key: string;
+		root: HTMLElement;
+		shell: HTMLElement;
+		wrapper: HTMLElement;
+		name: string;
+		x: number;
+		y: number;
+	};
+
 	interface Props {
 		onclose: () => void;
 		oncommit?: () => void;
-		oncapture?: (shell: HTMLElement) => void;
+		oncapture?: (el: HTMLElement) => void;
 	}
 
 	let { onclose, oncommit, oncapture }: Props = $props();
 
 	let handles = $state<Handle[]>([]);
+	let areas = $state<Area[]>([]);
+	let editing = $state<{ area: Area; value: string } | null>(null);
+	let editingInputEl = $state<HTMLInputElement | null>(null);
+
+	$effect(() => {
+		if (editingInputEl) {
+			editingInputEl.focus();
+			editingInputEl.select();
+		}
+	});
 	let dragging = $state<{
 		handle: Handle;
 		pointerId: number;
@@ -106,7 +126,8 @@
 	}
 
 	function rebuild() {
-		const next: Handle[] = [];
+		const nextHandles: Handle[] = [];
+		const nextAreas: Area[] = [];
 		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
 		for (const grid of grids) {
 			if (isInsideFeedback(grid)) continue;
@@ -118,11 +139,13 @@
 			const rect = grid.getBoundingClientRect();
 			if (rect.width < 4 || rect.height < 4) continue;
 
+			const gridId = (grid.dataset.dryuiFeedbackGridId ??= cryptoId());
+
 			let cursorX = rect.left;
 			for (let i = 0; i < cols.length - 1; i++) {
 				cursorX += cols[i]!;
-				next.push({
-					key: `${(grid.dataset.dryuiFeedbackGridId ??= cryptoId())}-col-${i}`,
+				nextHandles.push({
+					key: `${gridId}-col-${i}`,
 					root: grid,
 					shell,
 					axis: 'col',
@@ -136,8 +159,8 @@
 			let cursorY = rect.top;
 			for (let i = 0; i < rows.length - 1; i++) {
 				cursorY += rows[i]!;
-				next.push({
-					key: `${(grid.dataset.dryuiFeedbackGridId ??= cryptoId())}-row-${i}`,
+				nextHandles.push({
+					key: `${gridId}-row-${i}`,
 					root: grid,
 					shell,
 					axis: 'row',
@@ -148,8 +171,32 @@
 					h: HANDLE_THICKNESS
 				});
 			}
+
+			const seen = new Set<string>();
+			for (const child of Array.from(grid.children)) {
+				if (!(child instanceof HTMLElement) && !(child instanceof Element)) continue;
+				const wrapper = child as HTMLElement;
+				const name = getComputedStyle(wrapper).getPropertyValue('--dry-grid-area-name').trim();
+				if (!name || name === 'auto' || name === '.') continue;
+				if (seen.has(name)) continue;
+				seen.add(name);
+				const measure = wrapper.firstElementChild as HTMLElement | null;
+				const target = measure ?? wrapper;
+				const cr = target.getBoundingClientRect();
+				if (cr.width < 4 || cr.height < 4) continue;
+				nextAreas.push({
+					key: `${gridId}-area-${name}`,
+					root: grid,
+					shell,
+					wrapper,
+					name,
+					x: cr.left,
+					y: cr.top
+				});
+			}
 		}
-		handles = next;
+		handles = nextHandles;
+		areas = nextAreas;
 	}
 
 	function cryptoId(): string {
@@ -244,6 +291,71 @@
 		oncommit?.();
 	}
 
+	const TEMPLATE_AREAS_PROPS = [
+		'--dry-area-grid-template-areas',
+		'--dry-area-grid-template-areas-wide',
+		'--dry-area-grid-template-areas-xl'
+	] as const;
+
+	const VALID_AREA_NAME = /^[a-zA-Z][a-zA-Z0-9_-]*$/;
+
+	function startRename(area: Area, e: MouseEvent) {
+		e.stopPropagation();
+		editing = { area, value: area.name };
+	}
+
+	function cancelRename() {
+		editing = null;
+	}
+
+	function commitRename() {
+		const current = editing;
+		if (!current) return;
+		editing = null;
+		const next = current.value.trim();
+		if (!next || next === current.area.name) return;
+		if (!VALID_AREA_NAME.test(next)) return;
+		applyRename(current.area, next);
+	}
+
+	function applyRename(area: Area, next: string) {
+		const oldName = area.name;
+		oncapture?.(area.shell);
+
+		// Update template-areas vars on the shell. Read effective value via cascade,
+		// rewrite, then set inline on the shell.
+		const cs = getComputedStyle(area.shell);
+		for (const prop of TEMPLATE_AREAS_PROPS) {
+			const current = cs.getPropertyValue(prop).trim();
+			if (!current || current === 'none') continue;
+			const rewritten = renameInTemplate(current, oldName, next);
+			if (rewritten !== current) area.shell.style.setProperty(prop, rewritten);
+		}
+
+		// Update every wrapper in this grid that names the renamed area.
+		for (const child of Array.from(area.root.children)) {
+			if (!(child instanceof HTMLElement)) continue;
+			const name = getComputedStyle(child).getPropertyValue('--dry-grid-area-name').trim();
+			if (name !== oldName) continue;
+			oncapture?.(child);
+			child.style.setProperty('--dry-grid-area-name', next);
+		}
+
+		scheduleRebuild();
+		oncommit?.();
+	}
+
+	function renameInTemplate(template: string, oldName: string, newName: string): string {
+		return template.replace(/'([^']*)'/g, (_match, row) => {
+			const tokens = row
+				.split(/\s+/)
+				.filter(Boolean)
+				.map((t: string) => (t === oldName ? newName : t))
+				.join(' ');
+			return `'${tokens}'`;
+		});
+	}
+
 	onMount(() => {
 		rebuild();
 		const ro = new ResizeObserver(scheduleRebuild);
@@ -279,6 +391,39 @@
 			style={handleStyle(h)}
 			onpointerdown={(e) => startDrag(e, h)}
 		></button>
+	{/each}
+
+	{#each areas as a (a.key)}
+		{#if editing && editing.area.key === a.key}
+			<input
+				class="layout-area-input"
+				type="text"
+				aria-label="Rename area {a.name}"
+				bind:value={editing.value}
+				bind:this={editingInputEl}
+				style="left: {a.x + 8}px; top: {a.y + 8}px;"
+				onkeydown={(e) => {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						commitRename();
+					} else if (e.key === 'Escape') {
+						e.preventDefault();
+						cancelRename();
+					}
+				}}
+				onblur={commitRename}
+			/>
+		{:else}
+			<button
+				class="layout-area-badge"
+				type="button"
+				aria-label="Rename area {a.name}"
+				style="left: {a.x + 8}px; top: {a.y + 8}px;"
+				onclick={(e) => startRename(a, e)}
+			>
+				{a.name}
+			</button>
+		{/if}
 	{/each}
 </div>
 
@@ -322,5 +467,44 @@
 	.layout-inspector[data-dragging] .layout-handle {
 		background: hsl(25 100% 55% / 0.5);
 		outline-color: hsl(25 100% 55%);
+	}
+
+	.layout-area-badge,
+	.layout-area-input {
+		position: fixed;
+		z-index: 1;
+		padding: 2px 8px;
+		border: 1px solid hsl(25 100% 55%);
+		border-radius: 4px;
+		background: hsl(25 100% 55% / 0.18);
+		color: hsl(25 100% 90%);
+		font-family: var(--dry-font-sans, system-ui, sans-serif);
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		line-height: 16px;
+		pointer-events: auto;
+		cursor: text;
+	}
+
+	.layout-area-badge {
+		margin: 0;
+		font: inherit;
+	}
+
+	.layout-area-badge:hover,
+	.layout-area-badge:focus-visible {
+		background: hsl(25 100% 55% / 0.4);
+		outline: none;
+	}
+
+	.layout-area-input {
+		min-inline-size: 6ch;
+		max-inline-size: 18ch;
+		background: hsl(225 15% 12%);
+		color: hsl(25 100% 92%);
+		caret-color: hsl(25 100% 70%);
+		outline: 2px solid hsl(25 100% 55%);
+		outline-offset: 0;
 	}
 </style>
