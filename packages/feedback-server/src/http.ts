@@ -593,6 +593,15 @@ export function startFeedbackHttpServer(
 				}
 
 				const submissionMatch = pathname.match(/^\/submissions\/([^/]+)$/);
+				if (submissionMatch && request.method === 'GET') {
+					// Single-submission lookup. The dryui-feedback skill points the
+					// dispatched agent at this URL as the curl fallback when MCP
+					// `feedback_get_submissions` is unavailable.
+					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
+					const submission = store.getSubmission(submissionId);
+					if (!submission) return errorResponse(404, 'Not found');
+					return json(submission);
+				}
 				if (submissionMatch && request.method === 'PATCH') {
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
 					try {

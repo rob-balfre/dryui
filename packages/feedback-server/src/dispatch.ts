@@ -26,7 +26,11 @@ export type TerminalApp = 'terminal' | 'ghostty';
 export const TERMINAL_APPS: readonly TerminalApp[] = ['terminal', 'ghostty'];
 
 const TERMINAL_CLI: Record<'claude' | 'gemini' | 'opencode' | 'copilot', readonly string[]> = {
-	claude: ['claude'],
+	// Pin every dispatched claude session to the `feedback` subagent. The agent
+	// reads its canonical skill at startup, so the AreaGrid no-gap rule and the
+	// lint trip-wires are loaded before the first edit instead of being learned
+	// by lint failure.
+	claude: ['claude', '--agent', 'feedback'],
 	gemini: ['gemini'],
 	opencode: ['opencode'],
 	copilot: ['copilot', '-i']

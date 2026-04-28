@@ -24,9 +24,7 @@ export function buildFeedbackDispatchPrompt(
 			: '';
 	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 
-Spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns this entire workflow: fetching the submission, reading the screenshot, decoding the four intent kinds (drawings / components / removed / layoutBoxes), making the smallest source edit that satisfies them, running \`dryui check\`, and calling \`feedback_resolve_submission\`.
-
-Pass the submission id "${s.id}" through. The agent will read its canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` for the full rules — including the AreaGrid no-gap / use-padding rule, the lint trip-wires that crash the dev server, and when to hand off to \`dryui-layout\` instead of editing template-areas directly.
+Read your canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` first — it has the submission shape, the four intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
 
 ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 }
