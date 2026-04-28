@@ -64,6 +64,10 @@
 		return cs.display === 'grid' || cs.display === 'inline-grid';
 	}
 
+	function isInsideAreaGrid(el: Element): boolean {
+		return !!el.closest('[data-area-grid-shell]');
+	}
+
 	function rectFor(el: HTMLElement): DOMRect {
 		return (getClone(el) ?? el).getBoundingClientRect();
 	}
@@ -76,6 +80,8 @@
 			const added = isAddedPlaceholder(el);
 			if (!added && isInsideFeedback(el)) continue;
 			if (isClone(el)) continue;
+			// AreaGrid territory belongs to Layout mode; skip anything at or inside a grid shell.
+			if (!added && isInsideAreaGrid(el)) continue;
 			const cs = getComputedStyle(el);
 			if (cs.display === 'none') continue;
 			if (cs.visibility === 'hidden' && !getClone(el)) continue;
