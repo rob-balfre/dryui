@@ -24,11 +24,7 @@
 		type Tool
 	} from './types.js';
 	import { describeElement, describePosition, type DrawingHint } from './position-hints.js';
-	import Toolbar, {
-		type LayoutBreakpoint,
-		type LayoutTool,
-		type Mode
-	} from './components/toolbar.svelte';
+	import Toolbar, { type LayoutTool, type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 	import LayoutInspector from './components/layout-inspector.svelte';
 
@@ -85,7 +81,6 @@
 	let inspectingComponents = $state(false);
 	let inspectingLayout = $state(false);
 	let layoutTool = $state<LayoutTool | null>(null);
-	let layoutBreakpoint = $state<LayoutBreakpoint>('auto');
 	let selectedComponentEl = $state<HTMLElement | null>(null);
 	const mode = $derived<Mode>(
 		inspectingLayout ? 'layout' : inspectingComponents ? 'components' : 'annotate'
@@ -119,10 +114,6 @@
 
 	function setLayoutTool(next: LayoutTool | null) {
 		layoutTool = next;
-	}
-
-	function setLayoutBreakpoint(next: LayoutBreakpoint) {
-		layoutBreakpoint = next;
 	}
 
 	function selectComponent(el: HTMLElement | null) {
@@ -2544,7 +2535,6 @@
 				addedLabel={selectedAddedRecord?.label ?? ''}
 				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
 				{layoutTool}
-				{layoutBreakpoint}
 				{canUndo}
 				{canRedo}
 				ontoggle={toggle}
@@ -2552,7 +2542,6 @@
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
 				onlayouttool={setLayoutTool}
-				onlayoutbreakpoint={setLayoutBreakpoint}
 				oncomponentsreset={resetSelectedComponent}
 				onundo={undo}
 				onredo={redo}
@@ -2576,7 +2565,6 @@
 			{#if inspectingLayout}
 				<LayoutInspector
 					tool={layoutTool}
-					breakpoint={layoutBreakpoint}
 					boxes={layoutBoxes}
 					capturing={toolbarHiddenForCapture}
 					onclose={stopInspectingLayout}

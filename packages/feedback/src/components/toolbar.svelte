@@ -1,15 +1,5 @@
 <script lang="ts">
-	import {
-		AlertDialog,
-		Button,
-		Checkbox,
-		Field,
-		Input,
-		Kbd,
-		Label,
-		SegmentedControl,
-		Select
-	} from '@dryui/ui';
+	import { AlertDialog, Button, Checkbox, Field, Input, Kbd, Label, Select } from '@dryui/ui';
 	import { onMount } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import {
@@ -45,7 +35,6 @@
 
 	export type Mode = 'annotate' | 'components' | 'layout';
 	export type LayoutTool = 'box';
-	export type LayoutBreakpoint = 'auto' | 'base' | 'wide' | 'xl';
 
 	interface Props {
 		active: boolean;
@@ -62,13 +51,11 @@
 		addedLabel?: string;
 		addedPropsJson?: string;
 		layoutTool?: LayoutTool | null;
-		layoutBreakpoint?: LayoutBreakpoint;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
 		onlayouttool?: (tool: LayoutTool | null) => void;
-		onlayoutbreakpoint?: (bp: LayoutBreakpoint) => void;
 		oncomponentsreset?: () => void;
 		onundo?: () => void;
 		onredo?: () => void;
@@ -92,7 +79,6 @@
 		addedLabel = '',
 		addedPropsJson = '',
 		layoutTool = null,
-		layoutBreakpoint = 'auto',
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
@@ -100,7 +86,6 @@
 		onsubmit,
 		onmodechange,
 		onlayouttool,
-		onlayoutbreakpoint,
 		oncomponentsreset,
 		onundo,
 		onredo,
@@ -707,18 +692,6 @@
 				>
 					<RectangleHorizontal size={16} />
 				</Button>
-
-				<div class="tool-divider" aria-hidden="true"></div>
-
-				<SegmentedControl.Root
-					bind:value={() => layoutBreakpoint, (v) => onlayoutbreakpoint?.(v as LayoutBreakpoint)}
-					aria-label="Editing breakpoint"
-					class="layout-bp-segmented"
-				>
-					{#each ['auto', 'base', 'wide', 'xl'] as const as bp (bp)}
-						<SegmentedControl.Item value={bp}>{bp}</SegmentedControl.Item>
-					{/each}
-				</SegmentedControl.Root>
 			{:else if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
@@ -1070,13 +1043,6 @@
 		align-self: end;
 		position: relative;
 		z-index: 1;
-	}
-
-	.tool-divider {
-		inline-size: 1px;
-		block-size: 18px;
-		margin-inline: 4px;
-		background: hsl(220 10% 70% / 0.25);
 	}
 
 	.toolbar[data-dragging] {
