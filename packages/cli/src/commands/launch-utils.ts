@@ -16,6 +16,11 @@ export interface FeedbackServerEntryOptions {
 	preferPackaged?: boolean;
 }
 
+export function isDryuiDevMode(): boolean {
+	const flag = process.env['DRYUI_DEV'];
+	return flag === '1' || flag === 'true';
+}
+
 export function resolveFeedbackServerEntry(options: FeedbackServerEntryOptions = {}): string {
 	const { workspaceRoot, preferPackaged = false } = options;
 	const workspaceDistPath = workspaceRoot
@@ -24,6 +29,14 @@ export function resolveFeedbackServerEntry(options: FeedbackServerEntryOptions =
 	const workspaceSrcPath = workspaceRoot
 		? resolve(workspaceRoot, 'packages/feedback-server/src/server.ts')
 		: null;
+
+	// DRYUI_DEV=1 forces source-of-truth from packages/feedback-server/src so the
+	// CLI spawns the live TypeScript entry instead of whatever dist/ is currently
+	// on disk. Falls through if src isn't reachable (e.g. running from a published
+	// install that doesn't ship src).
+	if (isDryuiDevMode() && workspaceSrcPath && existsSync(workspaceSrcPath)) {
+		return workspaceSrcPath;
+	}
 
 	if (preferPackaged) {
 		try {

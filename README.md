@@ -86,6 +86,43 @@ bun run docs
 bun run validate
 ```
 
+### Source Mode (DRYUI_DEV)
+
+Run `dryui`, `dryui-mcp`, and `dryui-feedback-mcp` against the live `packages/*/src/` TypeScript instead of `dist/`, without publishing or pointing tools at build folders.
+
+One-time setup:
+
+```bash
+bun run build:packages   # populates dist/ as the no-flag fallback
+bun run dev:link         # registers the three bins globally via `bun link`
+```
+
+Per shell:
+
+```bash
+export DRYUI_DEV=1
+dryui list               # runs packages/cli/src/index.ts
+dryui-mcp                # MCP server straight from src
+dryui feedback server    # spawns packages/feedback-server/src/server.ts
+```
+
+Edits in `packages/cli/src/`, `packages/mcp/src/`, or `packages/feedback-server/src/` show up on the next invocation. Without `DRYUI_DEV` the same bins import `dist/`, matching the published behaviour.
+
+For editor MCP entries, point at the linked bin and pass the env flag:
+
+```jsonc
+{
+	"mcpServers": {
+		"dryui": { "command": "dryui-mcp", "env": { "DRYUI_DEV": "1" } },
+		"dryui-feedback": { "command": "dryui-feedback-mcp", "env": { "DRYUI_DEV": "1" } }
+	}
+}
+```
+
+The `<Feedback />` widget and `@dryui/ui` components already resolve to source for any workspace consumer (the docs app, tests, etc.) via the `bun`/`svelte` export conditionals, so `bun run docs` HMR picks up Svelte edits with no extra setup. For live rebuilds of the dashboard UI bundle, run `bun run dev:ui:watch` in a sidecar; override the served path with `DRYUI_FEEDBACK_UI_DIR` if needed.
+
+Tear down with `bun run dev:unlink`.
+
 ### Testing In A Clean VM
 
 To exercise the published install flow end-to-end without touching your host, use [smolvm](https://github.com/smol-machines/smolvm). Two wrappers are in the root `package.json`:

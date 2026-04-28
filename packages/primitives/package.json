@@ -752,6 +752,11 @@
       "types": "./src/wave-divider/index.ts",
       "svelte": "./src/wave-divider/index.ts",
       "default": "./src/wave-divider/index.ts"
+    },
+    "./internal/motion": {
+      "types": "./src/internal/motion.ts",
+      "svelte": "./src/internal/motion.ts",
+      "default": "./src/internal/motion.ts"
     }
   },
   "files": [
@@ -1514,6 +1519,10 @@
         "types": "./dist/wave-divider/index.d.ts",
         "svelte": "./dist/wave-divider/index.js",
         "default": "./dist/wave-divider/index.js"
+      },
+      "./internal/motion": {
+        "types": "./dist/internal/motion.d.ts",
+        "default": "./dist/internal/motion.js"
       }
     }
   }

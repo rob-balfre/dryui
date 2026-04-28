@@ -1,4 +1,7 @@
-// Re-export shared motion utilities from primitives (single source of truth)
+// Re-export shared motion utilities from primitives (single source of truth).
+// Imported from the dedicated motion module rather than the package barrel so
+// `bun test` can load it without evaluating other primitives modules that use
+// Svelte runes (.svelte.ts) which require preprocessing.
 export {
 	getReducedMotionPreference,
 	observeReducedMotionPreference,
@@ -10,7 +13,7 @@ export {
 	supportsPropertyRegistration,
 	registerPropertyOnce,
 	supportsWebGL2
-} from '@dryui/primitives';
+} from '@dryui/primitives/internal/motion';
 
 // UI-only motion utilities
 

@@ -112,7 +112,7 @@
       "name": "@dryui/mcp",
       "version": "3.0.0",
       "bin": {
-        "dryui-mcp": "./dist/index.js",
+        "dryui-mcp": "./bin/dryui-mcp.mjs",
       },
       "dependencies": {
         "@dryui/lint": "workspace:*",

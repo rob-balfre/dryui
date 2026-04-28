@@ -16,14 +16,16 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "dryui-feedback-mcp": "./dist/mcp.js"
+    "dryui-feedback-mcp": "./bin/dryui-feedback-mcp.mjs"
   },
   "exports": {
     ".": {
+      "bun": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./mcp": {
+      "bun": "./src/mcp.ts",
       "types": "./dist/mcp.d.ts",
       "default": "./dist/mcp.js"
     },
@@ -32,6 +34,7 @@
       "default": "./dist/server.js"
     },
     "./internals/probe": {
+      "bun": "./src/config-probe.ts",
       "types": "./dist/config-probe.d.ts",
       "default": "./dist/config-probe.js"
     }
@@ -39,10 +42,29 @@
   "files": [
     "dist",
     "hooks",
-    "skills"
+    "skills",
+    "bin"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./mcp": {
+        "types": "./dist/mcp.d.ts",
+        "default": "./dist/mcp.js"
+      },
+      "./server": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "./internals/probe": {
+        "types": "./dist/config-probe.d.ts",
+        "default": "./dist/config-probe.js"
+      }
+    }
   },
   "scripts": {
     "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts src/config-probe.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && tsc -p tsconfig.build.json && vite build --config ui/vite.config.ts",

@@ -1,0 +1,69 @@
+/**
+ * dev-link.ts — make the workspace's cli/mcp/feedback-server bins globally
+ * available via `bun link`, so `dryui`, `dryui-mcp`, and `dryui-feedback-mcp`
+ * resolve to the local repo. Combined with `DRYUI_DEV=1` in the consuming
+ * shell or editor MCP config, those bins forward to the live TypeScript
+ * source instead of dist/, giving "latest code on every invocation" without
+ * rebuilds or npm publish.
+ *
+ * Usage:
+ *   bun run dev:link        # link all three
+ *   bun run dev:link --check
+ *   bun run dev:unlink      # remove the global symlinks
+ */
+
+import { spawnSync } from 'node:child_process';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+
+const LINK_TARGETS = [
+	{ pkg: '@dryui/cli', dir: 'packages/cli', bin: 'dryui' },
+	{ pkg: '@dryui/mcp', dir: 'packages/mcp', bin: 'dryui-mcp' },
+	{ pkg: '@dryui/feedback-server', dir: 'packages/feedback-server', bin: 'dryui-feedback-mcp' }
+] as const;
+
+function bunLink(cwd: string, args: readonly string[] = []): boolean {
+	const result = spawnSync('bun', ['link', ...args], { cwd, stdio: 'inherit' });
+	return result.status === 0;
+}
+
+function bunUnlink(cwd: string): boolean {
+	const result = spawnSync('bun', ['unlink'], { cwd, stdio: 'inherit' });
+	return result.status === 0;
+}
+
+function unlink(): void {
+	console.log('dev-link: removing global symlinks');
+	for (const target of LINK_TARGETS) {
+		const cwd = resolve(REPO_ROOT, target.dir);
+		const ok = bunUnlink(cwd);
+		console.log(`  ${ok ? '✓' : '✗'} ${target.pkg}`);
+	}
+}
+
+function link(): void {
+	console.log('dev-link: registering workspace bins globally');
+	for (const target of LINK_TARGETS) {
+		const cwd = resolve(REPO_ROOT, target.dir);
+		const registered = bunLink(cwd);
+		console.log(`  ${registered ? '✓' : '✗'} ${target.pkg} → ${target.bin}`);
+	}
+	console.log('');
+	console.log('Each bin is now on PATH via ~/.bun/install/global/node_modules/.bin.');
+	console.log('Set DRYUI_DEV=1 in your shell or editor MCP config to run from src.');
+	console.log('Without DRYUI_DEV the bins still load dist/ (matches published behaviour).');
+	console.log('');
+	console.log('To consume a workspace package in another local project, run from there:');
+	for (const target of LINK_TARGETS) {
+		console.log(`  bun link ${target.pkg}`);
+	}
+}
+
+const mode = process.argv[2];
+if (mode === '--unlink' || process.env['npm_lifecycle_event'] === 'dev:unlink') {
+	unlink();
+} else {
+	link();
+}

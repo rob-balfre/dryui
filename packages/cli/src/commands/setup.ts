@@ -92,8 +92,22 @@ const ANSI = {
 	slate: '\x1b[38;5;110m',
 	white: '\x1b[97m',
 	black: '\x1b[30m',
-	bgCyan: '\x1b[48;5;45m'
+	bgCyan: '\x1b[48;5;45m',
+	bgGold: '\x1b[48;5;221m'
 } as const;
+
+function isDryuiDevMode(): boolean {
+	const flag = process.env['DRYUI_DEV'];
+	return flag === '1' || flag === 'true';
+}
+
+function devModeBannerLines(): string[] {
+	if (!isDryuiDevMode()) return [];
+	return [
+		paint(' ⚠  DRYUI_DEV=1 — LOCAL SOURCE MODE ', ANSI.bold, ANSI.black, ANSI.bgGold),
+		paint('Running from packages/*/src/, not dist/. Unset DRYUI_DEV to match published.', ANSI.gold)
+	];
+}
 
 const MAIN_MENU_OPTIONS: readonly SelectOption<MainMenuValue>[] = [
 	{
@@ -431,9 +445,11 @@ function formatOptionText<T extends string>(option: SelectOption<T>): string {
 }
 
 export function formatPromptFrameLines(question: string, config: SelectPromptOptions): string[] {
+	const devLines = devModeBannerLines();
 	const lines = [
 		paint('◈ DryUI', ANSI.bold, ANSI.cyan),
 		paint('Interactive command menu', ANSI.dim, ANSI.sky),
+		...(devLines.length > 0 ? ['', ...devLines] : []),
 		paint(divider(), ANSI.dim, ANSI.slate),
 		''
 	];
@@ -562,6 +578,11 @@ function renderDetectView(spec: Spec): void {
 	console.clear();
 	console.log(paint('◈ DryUI', ANSI.bold, ANSI.cyan));
 	console.log(paint('Detected project setup', ANSI.dim, ANSI.sky));
+	const devLines = devModeBannerLines();
+	if (devLines.length > 0) {
+		console.log('');
+		for (const line of devLines) console.log(line);
+	}
 	console.log(paint(divider(), ANSI.dim, ANSI.slate));
 	console.log('');
 	for (const line of formatContextBlockLines(mainContext)) {

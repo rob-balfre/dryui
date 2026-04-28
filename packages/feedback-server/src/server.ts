@@ -137,6 +137,12 @@ function main(): void {
 	});
 
 	console.error(`DryUI feedback server listening on ${baseUrl} for ${paths.root}`);
+	const devFlag = process.env['DRYUI_DEV'];
+	if (devFlag === '1' || devFlag === 'true') {
+		const RESET = '\x1b[0m';
+		const BG = '\x1b[1m\x1b[30m\x1b[48;5;221m';
+		console.error(`${BG} ⚠  DRYUI_DEV=1 — feedback-server running from src/ ${RESET}`);
+	}
 }
 
 if (import.meta.main) {

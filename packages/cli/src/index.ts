@@ -31,11 +31,29 @@ function resolveExePath(): string {
 	return homeRelative(rawExe);
 }
 
+function isDryuiDevMode(): boolean {
+	const flag = process.env['DRYUI_DEV'];
+	return flag === '1' || flag === 'true';
+}
+
+function printDevModeBanner(): void {
+	if (!isDryuiDevMode()) return;
+	const RESET = '\x1b[0m';
+	const BG = '\x1b[1m\x1b[30m\x1b[48;5;221m';
+	const FG = '\x1b[38;5;221m';
+	console.log(`${BG} ⚠  DRYUI_DEV=1 — LOCAL SOURCE MODE ${RESET}`);
+	console.log(
+		`${FG}Running from packages/*/src/, not dist/. Unset DRYUI_DEV to match published.${RESET}`
+	);
+	console.log('');
+}
+
 function printBanner(): void {
 	console.log(`dryui: v${VERSION}`);
 	console.log(`exe: ${resolveExePath()}`);
 	console.log(`about: ${DESCRIPTION}`);
 	console.log('');
+	printDevModeBanner();
 }
 
 function emitNotADryuiProject(): void {
@@ -96,10 +114,12 @@ async function main(): Promise<void> {
 
 	if (command === '--version' || command === '-v') {
 		console.log(VERSION);
+		printDevModeBanner();
 		process.exit(0);
 	}
 
 	if (command === '--help' || command === '-h') {
+		printDevModeBanner();
 		console.log(USAGE);
 		process.exit(0);
 	}

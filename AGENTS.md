@@ -42,6 +42,10 @@ dryui
 - While `bun vm` is running, use `bun vm:exec <cmd>` in any other tab to run commands inside the live VM (e.g. `bun vm:exec dryui list`). It relays via a shared-volume request/response loop; see [`scripts/vm-exec.ts`](./scripts/vm-exec.ts). `smolvm machine exec` itself does not work against ephemerals.
 - Install smolvm via `curl -sSL https://smolmachines.com/install.sh | /bin/bash` (use `/bin/bash` explicitly; a Homebrew Intel `bash` first on PATH reports the wrong arch). Ensure the extracted `agent-rootfs` lives at `~/Library/Application Support/smolvm/agent-rootfs`.
 
+## Local Source Mode
+
+- For iterating on `@dryui/cli`, `@dryui/mcp`, or `@dryui/feedback-server` against live source instead of `dist/`, run `bun run dev:link` once then set `DRYUI_DEV=1` in the consuming shell or editor MCP config. Wrappers, env contract, and dashboard UI watch flow are documented under "Source Mode (DRYUI_DEV)" in [`README.md`](./README.md). Tear down with `bun run dev:unlink`.
+
 ## Verification
 
 - After editing `.svelte` files in `packages/ui/`, run `bun run --filter '@dryui/ui' build`.

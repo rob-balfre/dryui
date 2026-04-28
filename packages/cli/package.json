@@ -15,13 +15,14 @@
   "type": "module",
   "files": [
     "dist",
-    "agents"
+    "agents",
+    "bin"
   ],
   "publishConfig": {
     "access": "public"
   },
   "bin": {
-    "dryui": "./dist/index.js"
+    "dryui": "./bin/dryui.mjs"
   },
   "scripts": {
     "build": "bun run --filter '@dryui/mcp' generate-spec && bun build src/index.ts --outdir dist --target node --external playwright",

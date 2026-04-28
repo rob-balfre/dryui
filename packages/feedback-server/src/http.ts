@@ -30,7 +30,12 @@ const CORS_HEADERS: Record<string, string> = {
 	'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-DryUI-Feedback-Token'
 };
-const UI_DIST_DIR = resolve(fileURLToPath(new URL('../dist/ui', import.meta.url)));
+// In dev, set DRYUI_FEEDBACK_UI_DIR to a path that `vite build --watch` is writing
+// into so dashboard edits show up without rebuilding the whole package. Falls back
+// to ../dist/ui (the bundled UI shipped with the package).
+const UI_DIST_DIR = process.env['DRYUI_FEEDBACK_UI_DIR']
+	? resolve(process.cwd(), process.env['DRYUI_FEEDBACK_UI_DIR'])
+	: resolve(fileURLToPath(new URL('../dist/ui', import.meta.url)));
 
 export interface FeedbackHttpSecurityOptions {
 	allowedOrigins?: string[];
