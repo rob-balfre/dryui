@@ -17,16 +17,14 @@ describe('feedback prompts', () => {
 		});
 
 		expect(prompt).toContain(
-			'Work on DryUI feedback submission sub-123 from https://example.com/page'
+			'Apply DryUI feedback submission sub-123 (from https://example.com/page)'
 		);
-		expect(prompt).toContain('Use the dryui-feedback MCP server:');
-		expect(prompt).toContain('1. Call feedback_get_submissions');
-		expect(prompt).toContain('2. Read the screenshot at screenshotPath.png');
+		expect(prompt).toContain('node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md');
+		expect(prompt).toContain('run `dryui check`');
+		expect(prompt).toContain('call `feedback_resolve_submission`');
 		expect(prompt).toContain('If PRODUCT.md or DESIGN.md exists at the project root');
-		expect(prompt).toContain('Run the relevant project linter/check command');
-		expect(prompt).toContain('Call feedback_resolve_submission with id "sub-123"');
-		expect(prompt.indexOf('Run the relevant project linter/check command')).toBeLessThan(
-			prompt.indexOf('Call feedback_resolve_submission')
+		expect(prompt.indexOf('run `dryui check`')).toBeLessThan(
+			prompt.indexOf('call `feedback_resolve_submission`')
 		);
 	});
 

@@ -684,7 +684,7 @@
 					size="sm"
 					class="tool-btn"
 					type="button"
-					data-tooltip="Draw a labelled box for the AI"
+					data-tooltip="Draw a box"
 					data-active={layoutTool === 'box' || undefined}
 					onclick={() => onlayouttool?.(layoutTool === 'box' ? null : 'box')}
 					aria-label={layoutTool === 'box' ? 'Stop drawing boxes' : 'Draw box'}
