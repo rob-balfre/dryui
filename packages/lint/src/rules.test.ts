@@ -548,7 +548,9 @@ describe('checkMarkup', () => {
 	test('allows <svelte:element> in owner directories', () => {
 		const code = `<svelte:element this={tag}>heading</svelte:element>`;
 		expect(checkMarkup(code, '/abs/packages/ui/src/motion/enter.svelte')).toHaveLength(0);
-		expect(checkMarkup(code, '/abs/packages/primitives/src/page-header/page-header-title.svelte')).toHaveLength(0);
+		expect(
+			checkMarkup(code, '/abs/packages/primitives/src/page-header/page-header-title.svelte')
+		).toHaveLength(0);
 	});
 
 	test('flags <svelte:element> outside owner directories', () => {
@@ -944,7 +946,11 @@ describe('checkStyle', () => {
 
 	test('flags display: flex outside owner directories', () => {
 		expect(
-			checkStyle('.foo { display: flex; }', {}, '/abs/packages/ui/src/area-grid/area-grid-root.svelte')
+			checkStyle(
+				'.foo { display: flex; }',
+				{},
+				'/abs/packages/ui/src/area-grid/area-grid-root.svelte'
+			)
 		).toHaveLength(1);
 	});
 

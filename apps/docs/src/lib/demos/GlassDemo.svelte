@@ -83,8 +83,7 @@
 		border: 1px solid color-mix(in srgb, white 16%, transparent);
 		box-shadow:
 			0 22px 48px color-mix(in srgb, black 26%, transparent),
-			 inset 0 1px 0
-				color-mix(in srgb, white 22%, transparent);
+			inset 0 1px 0 color-mix(in srgb, white 22%, transparent);
 	}
 
 	.glass-content,
