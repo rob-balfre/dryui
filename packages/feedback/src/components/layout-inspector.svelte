@@ -207,6 +207,75 @@
 		return editingBreakpoint === 'auto' ? activeBreakpoint(shell) : editingBreakpoint;
 	}
 
+	type Bp = 'base' | 'wide' | 'xl';
+	type BpSnapshot = { containerBp: Bp; values: Map<string, string> };
+
+	const bpPreviewSnapshots = new Map<HTMLElement, BpSnapshot>();
+
+	function bpVarsFor(bp: Bp): string[] {
+		return [columnsVar(bp), rowsVar(bp), areasVar(bp)];
+	}
+
+	function captureBpSnapshot(shell: HTMLElement, containerBp: Bp) {
+		const values = new Map<string, string>();
+		for (const v of bpVarsFor(containerBp)) {
+			values.set(v, shell.style.getPropertyValue(v));
+		}
+		bpPreviewSnapshots.set(shell, { containerBp, values });
+	}
+
+	function restoreBpSnapshot(shell: HTMLElement) {
+		const snap = bpPreviewSnapshots.get(shell);
+		if (!snap) return;
+		for (const [v, val] of snap.values) {
+			if (val) shell.style.setProperty(v, val);
+			else shell.style.removeProperty(v);
+		}
+		bpPreviewSnapshots.delete(shell);
+	}
+
+	function applyBpPreview(shell: HTMLElement) {
+		const containerBp = activeBreakpoint(shell);
+		const editing = editingBreakpoint;
+		const noOverride = editing === 'auto' || editing === containerBp;
+		if (noOverride) {
+			restoreBpSnapshot(shell);
+			return;
+		}
+		const existing = bpPreviewSnapshots.get(shell);
+		if (existing && existing.containerBp !== containerBp) {
+			restoreBpSnapshot(shell);
+		}
+		if (!bpPreviewSnapshots.has(shell)) {
+			captureBpSnapshot(shell, containerBp);
+		}
+		const cs = getComputedStyle(shell);
+		const sources = bpVarsFor(editing);
+		const targets = bpVarsFor(containerBp);
+		for (let i = 0; i < sources.length; i++) {
+			const sv = sources[i]!;
+			const tv = targets[i]!;
+			if (sv === tv) continue;
+			const value = cs.getPropertyValue(sv).trim();
+			if (value) shell.style.setProperty(tv, value);
+			else shell.style.removeProperty(tv);
+		}
+	}
+
+	function refreshBpPreview() {
+		const grids = document.querySelectorAll<HTMLElement>('[data-area-grid]');
+		for (const grid of grids) {
+			if (isInsideFeedback(grid)) continue;
+			const shell = grid.closest<HTMLElement>('[data-area-grid-shell]');
+			if (shell) applyBpPreview(shell);
+		}
+	}
+
+	$effect(() => {
+		void editingBreakpoint;
+		untrack(refreshBpPreview);
+	});
+
 	function columnsVar(bp: 'base' | 'wide' | 'xl'): string {
 		if (bp === 'xl') return '--dry-area-grid-template-columns-xl';
 		if (bp === 'wide') return '--dry-area-grid-template-columns-wide';
@@ -441,6 +510,7 @@
 		if (rebuildFrame) return;
 		rebuildFrame = requestAnimationFrame(() => {
 			rebuildFrame = 0;
+			refreshBpPreview();
 			rebuild();
 		});
 	}
@@ -831,6 +901,7 @@
 			scrollLockRestore?.();
 			scrollLockRestore = null;
 			restoreLabels();
+			for (const shell of [...bpPreviewSnapshots.keys()]) restoreBpSnapshot(shell);
 		};
 	});
 </script>
