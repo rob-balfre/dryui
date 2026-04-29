@@ -1303,7 +1303,7 @@ Parts:
 	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end | offset (number) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DatePicker.Calendar
-  Props: none
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 Structure:
   DatePicker.Root
@@ -1326,7 +1326,7 @@ Example:
 ## Calendar
 Package: @dryui/ui
 Category: form
-Tags: date, calendar, picker, month, locale
+Tags: date, calendar, picker, month, locale, events, itinerary
 Kind: compound
 Root import: import { Calendar } from '@dryui/ui'
 Subpath import: import { Calendar } from '@dryui/ui/calendar'
@@ -1338,7 +1338,7 @@ Parts:
   Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - Calendar.Grid
-  Props: none
+  Props: events (readonly CalendarEventItem[]) | eventDisplay ('dots' | 'bars'), accepted dots, bars | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 - Calendar.Prev
   Props: children (Snippet), Content rendered inside the component.
@@ -1387,7 +1387,7 @@ Parts:
   Props: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DateRangePicker.Calendar
-  Props: none
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 - DateRangePicker.Preset
   Props: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
@@ -1423,7 +1423,7 @@ Parts:
   Props: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - RangeCalendar.Grid
-  Props: none
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 Structure:
   RangeCalendar.Root

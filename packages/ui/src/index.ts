@@ -480,6 +480,11 @@ export type {
 
 export { Calendar } from './calendar/index.js';
 export type {
+	CalendarEventDisplay,
+	CalendarEventItem,
+	CalendarEventPosition,
+	CalendarEventRenderContext,
+	CalendarEventTone,
 	CalendarRootProps,
 	CalendarHeaderProps,
 	CalendarGridProps,

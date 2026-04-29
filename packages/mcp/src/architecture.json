@@ -768,7 +768,7 @@
       "package": "primitives",
       "layer": "primitive",
       "category": "form",
-      "description": "Interactive calendar grid for date navigation",
+      "description": "Interactive calendar grid for date navigation and event overlays",
       "visibility": "root",
       "sourcePath": "packages/primitives/src/calendar/index.ts",
       "publicImport": "@dryui/primitives",
@@ -777,7 +777,9 @@
         "calendar",
         "picker",
         "month",
-        "locale"
+        "locale",
+        "events",
+        "itinerary"
       ],
       "compound": true,
       "parts": [
@@ -9116,7 +9118,7 @@
       "package": "ui",
       "layer": "ui-wrapper",
       "category": "form",
-      "description": "Interactive calendar grid for date navigation",
+      "description": "Interactive calendar grid for date navigation and event overlays",
       "visibility": "root",
       "sourcePath": "packages/ui/src/calendar/index.ts",
       "publicImport": "@dryui/ui",
@@ -9125,7 +9127,9 @@
         "calendar",
         "picker",
         "month",
-        "locale"
+        "locale",
+        "events",
+        "itinerary"
       ],
       "compound": true,
       "parts": [

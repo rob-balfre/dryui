@@ -22,7 +22,6 @@
 </script>
 
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
 	import {
 		getCalendarDays,
@@ -38,13 +37,29 @@
 		handleCalendarKeydown,
 		focusCalendarDay
 	} from './calendar-grid-utils.js';
+	import {
+		layoutCalendarEvents,
+		type CalendarEventDisplay,
+		type CalendarEventGridProps,
+		type CalendarEventPiece,
+		type CalendarEventRenderContext
+	} from './calendar-event-layout.js';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {
+	interface Props extends CalendarEventGridProps {
 		adapter: CalendarGridAdapter;
 		hideHeader?: boolean;
 	}
 
-	let { adapter, hideHeader = false, class: className, ...rest }: Props = $props();
+	let {
+		adapter,
+		hideHeader = false,
+		events = [],
+		eventDisplay = 'dots',
+		maxEventLanes = 3,
+		eventContent,
+		class: className,
+		...rest
+	}: Props = $props();
 
 	const weekdayLabels = $derived(generateWeekdayLabels(adapter.locale, adapter.weekStartDay));
 	const calendarDays = $derived(
@@ -57,6 +72,7 @@
 		})
 	);
 	const weeks = $derived(splitIntoWeeks(calendarDays));
+	const eventLayout = $derived(layoutCalendarEvents({ days: calendarDays, events, maxEventLanes }));
 
 	function handleDayClick(day: Date) {
 		if (!isDateInRange(day, adapter.min, adapter.max)) return;
@@ -81,6 +97,33 @@
 					: undefined;
 			requestAnimationFrame(() => focusCalendarDay(container, result.newDate));
 		}
+	}
+
+	function getDayLabel(day: Date, eventSummary: string): string {
+		const label = formatDate(day, adapter.locale, {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		});
+		return eventSummary ? `${label}, ${eventSummary}` : label;
+	}
+
+	function getEventPieces(pieces: Array<CalendarEventPiece | null>): CalendarEventPiece[] {
+		return pieces.filter((piece): piece is CalendarEventPiece => piece != null);
+	}
+
+	function getEventContext(
+		piece: CalendarEventPiece,
+		display: CalendarEventDisplay
+	): CalendarEventRenderContext {
+		return {
+			event: piece.event,
+			date: piece.date,
+			isoDate: piece.isoDate,
+			display,
+			position: piece.position,
+			lane: piece.lane
+		};
 	}
 </script>
 
@@ -140,6 +183,7 @@
 						{@const inRange = adapter.isInRange(day)}
 						{@const rangeStart = adapter.isRangeStart(day)}
 						{@const rangeEnd = adapter.isRangeEnd(day)}
+						{@const dayEvents = eventLayout.get(isoStr)}
 						<div
 							role="gridcell"
 							data-calendar-cell
@@ -149,17 +193,14 @@
 							data-in-range={inRange ? '' : undefined}
 							data-range-start={rangeStart ? '' : undefined}
 							data-range-end={rangeEnd ? '' : undefined}
+							data-has-events={dayEvents && dayEvents.events.length > 0 ? '' : undefined}
 						>
 							<Button
 								variant="trigger"
 								size="icon-sm"
 								type="button"
 								tabindex={focused ? 0 : -1}
-								aria-label={formatDate(day, adapter.locale, {
-									year: 'numeric',
-									month: 'long',
-									day: 'numeric'
-								})}
+								aria-label={getDayLabel(day, dayEvents?.summary ?? '')}
 								aria-pressed={selected}
 								aria-disabled={disabled}
 								data-calendar-day={isoStr}
@@ -171,6 +212,50 @@
 							>
 								{day.getDate()}
 							</Button>
+							{#if dayEvents && dayEvents.events.length > 0}
+								<div
+									data-calendar-events
+									data-calendar-events-display={eventDisplay}
+									aria-hidden="true"
+								>
+									{#if eventDisplay === 'dots'}
+										{#each getEventPieces(dayEvents.piecesByLane) as piece (piece.event.id)}
+											<span
+												data-calendar-event
+												data-calendar-event-kind={piece.event.kind}
+												data-calendar-event-tone={piece.event.tone ?? 'neutral'}
+												data-calendar-event-position={piece.position}
+											>
+												{#if eventContent}
+													{@render eventContent(getEventContext(piece, eventDisplay))}
+												{/if}
+											</span>
+										{/each}
+									{:else}
+										{#each dayEvents.piecesByLane as piece, lane (lane)}
+											{#if piece}
+												<span
+													data-calendar-event
+													data-calendar-event-kind={piece.event.kind}
+													data-calendar-event-tone={piece.event.tone ?? 'neutral'}
+													data-calendar-event-position={piece.position}
+												>
+													{#if eventContent}
+														{@render eventContent(getEventContext(piece, eventDisplay))}
+													{:else}
+														<span data-calendar-event-label>{piece.event.title}</span>
+													{/if}
+												</span>
+											{:else}
+												<span data-calendar-event-slot data-calendar-event-empty></span>
+											{/if}
+										{/each}
+									{/if}
+									{#if dayEvents.overflowCount > 0}
+										<span data-calendar-event-overflow>+{dayEvents.overflowCount}</span>
+									{/if}
+								</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -181,6 +266,14 @@
 
 <style>
 	[data-calendar-grid] {
+		--dry-calendar-event-bg: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
+		--dry-calendar-event-color: var(--dry-color-text-brand);
+		--dry-calendar-event-radius: var(--dry-radius-sm);
+		--dry-calendar-event-size: var(--dry-space-1_5);
+		--dry-calendar-event-height: var(--dry-space-4);
+		--dry-calendar-event-gap: var(--dry-space-0_5);
+		--dry-calendar-event-overflow-color: var(--dry-color-text-weak);
+
 		display: grid;
 		gap: var(--dry-space-2);
 		user-select: none;
@@ -236,7 +329,9 @@
 
 	[data-calendar-grid] [data-calendar-cell] {
 		display: grid;
-		place-items: center;
+		align-content: start;
+		justify-items: center;
+		gap: var(--dry-calendar-event-gap);
 	}
 
 	[data-calendar-grid] [data-calendar-cell][data-in-range] {
@@ -266,5 +361,113 @@
 
 	[data-calendar-grid] [data-calendar-cell][data-outside-month] {
 		opacity: 0.4;
+	}
+
+	[data-calendar-grid] [data-calendar-events] {
+		display: grid;
+		justify-self: stretch;
+		gap: var(--dry-calendar-event-gap);
+		pointer-events: none;
+	}
+
+	[data-calendar-grid] [data-calendar-events][data-calendar-events-display='dots'] {
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		justify-content: center;
+		min-block-size: var(--dry-calendar-event-size);
+	}
+
+	[data-calendar-grid] [data-calendar-events][data-calendar-events-display='bars'] {
+		grid-auto-rows: var(--dry-calendar-event-height);
+	}
+
+	[data-calendar-grid] [data-calendar-event] {
+		display: grid;
+		align-items: center;
+		min-block-size: var(--dry-calendar-event-height);
+		padding-inline: var(--dry-space-1);
+		overflow: hidden;
+		border-radius: var(--dry-calendar-event-radius);
+		background: var(--dry-calendar-event-bg);
+		color: var(--dry-calendar-event-color);
+		font-size: var(--dry-type-tiny-size);
+		font-weight: 500;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	[data-calendar-grid]
+		[data-calendar-events][data-calendar-events-display='dots']
+		[data-calendar-event] {
+		min-block-size: var(--dry-calendar-event-size);
+		block-size: var(--dry-calendar-event-size);
+		inline-size: var(--dry-calendar-event-size);
+		padding-inline: 0;
+		border-radius: var(--dry-radius-full);
+	}
+
+	[data-calendar-grid] [data-calendar-event-label] {
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	[data-calendar-grid] [data-calendar-event-slot] {
+		min-block-size: var(--dry-calendar-event-height);
+	}
+
+	[data-calendar-grid] [data-calendar-event-overflow] {
+		display: grid;
+		place-items: center;
+		min-block-size: var(--dry-calendar-event-height);
+		color: var(--dry-calendar-event-overflow-color);
+		font-size: var(--dry-type-tiny-size);
+		font-weight: 500;
+		line-height: 1;
+	}
+
+	[data-calendar-grid]
+		[data-calendar-events][data-calendar-events-display='dots']
+		[data-calendar-event-overflow] {
+		min-block-size: var(--dry-calendar-event-size);
+	}
+
+	[data-calendar-grid] [data-calendar-event-position='start'] {
+		border-start-end-radius: 0;
+		border-end-end-radius: 0;
+	}
+
+	[data-calendar-grid] [data-calendar-event-position='middle'] {
+		border-radius: 0;
+	}
+
+	[data-calendar-grid] [data-calendar-event-position='end'] {
+		border-start-start-radius: 0;
+		border-end-start-radius: 0;
+	}
+
+	[data-calendar-grid] [data-calendar-event-tone='brand'] {
+		--dry-calendar-event-bg: color-mix(in srgb, var(--dry-color-fill-brand) 16%, transparent);
+		--dry-calendar-event-color: var(--dry-color-text-brand);
+	}
+
+	[data-calendar-grid] [data-calendar-event-tone='info'] {
+		--dry-calendar-event-bg: var(--dry-color-fill-info-weak);
+		--dry-calendar-event-color: var(--dry-color-text-info);
+	}
+
+	[data-calendar-grid] [data-calendar-event-tone='success'] {
+		--dry-calendar-event-bg: var(--dry-color-fill-success-weak);
+		--dry-calendar-event-color: var(--dry-color-text-success);
+	}
+
+	[data-calendar-grid] [data-calendar-event-tone='warning'] {
+		--dry-calendar-event-bg: var(--dry-color-fill-warning-weak);
+		--dry-calendar-event-color: var(--dry-color-text-warning);
+	}
+
+	[data-calendar-grid] [data-calendar-event-tone='danger'] {
+		--dry-calendar-event-bg: var(--dry-color-fill-error-weak);
+		--dry-calendar-event-color: var(--dry-color-text-error);
 	}
 </style>

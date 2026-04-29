@@ -1,12 +1,12 @@
 <script lang="ts">
-	import type { HTMLAttributes } from 'svelte/elements';
 	import { isSameDay } from '@dryui/primitives';
 	import { getRangeCalendarCtx } from './context.svelte.js';
 	import CalendarGridButton, {
 		type CalendarGridAdapter
 	} from '../internal/calendar-grid-button.svelte';
+	import type { CalendarEventGridProps } from '../internal/calendar-event-layout.js';
 
-	interface Props extends HTMLAttributes<HTMLDivElement> {}
+	interface Props extends CalendarEventGridProps {}
 
 	let props: Props = $props();
 

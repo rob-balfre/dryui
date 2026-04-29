@@ -1,10 +1,13 @@
+import type { CalendarEventGridProps } from '../internal/calendar-event-layout.js';
+
 export type {
 	DateRangePickerRootProps,
 	DateRangePickerTriggerProps,
 	DateRangePickerContentProps,
-	DateRangePickerCalendarProps,
 	DateRangePickerPresetProps
 } from '@dryui/primitives';
+
+export interface DateRangePickerCalendarProps extends CalendarEventGridProps {}
 
 import DateRangePickerRoot from './date-range-picker-root.svelte';
 import DateRangePickerTrigger from './date-range-picker-button-trigger.svelte';

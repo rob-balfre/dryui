@@ -10466,7 +10466,24 @@
           }
         },
         "Calendar": {
-          "props": {},
+          "props": {
+            "events": {
+              "type": "readonly CalendarEventItem[]",
+              "required": false
+            },
+            "eventDisplay": {
+              "type": "CalendarEventDisplay",
+              "required": false
+            },
+            "maxEventLanes": {
+              "type": "number",
+              "required": false
+            },
+            "eventContent": {
+              "type": "Snippet<[CalendarEventRenderContext]>",
+              "required": false
+            }
+          },
           "forwardedProps": {
             "baseType": "HTMLAttributes<HTMLDivElement>",
             "via": "rest",
@@ -10523,14 +10540,16 @@
     },
     "Calendar": {
       "import": "@dryui/ui",
-      "description": "Interactive calendar grid for date navigation",
+      "description": "Interactive calendar grid for date navigation and event overlays",
       "category": "form",
       "tags": [
         "date",
         "calendar",
         "picker",
         "month",
-        "locale"
+        "locale",
+        "events",
+        "itinerary"
       ],
       "compound": true,
       "parts": {
@@ -10605,7 +10624,28 @@
           }
         },
         "Grid": {
-          "props": {},
+          "props": {
+            "events": {
+              "type": "readonly CalendarEventItem[]",
+              "required": false
+            },
+            "eventDisplay": {
+              "type": "'dots' | 'bars'",
+              "required": false,
+              "acceptedValues": [
+                "dots",
+                "bars"
+              ]
+            },
+            "maxEventLanes": {
+              "type": "number",
+              "required": false
+            },
+            "eventContent": {
+              "type": "Snippet<[CalendarEventRenderContext]>",
+              "required": false
+            }
+          },
           "forwardedProps": {
             "baseType": "HTMLAttributes<HTMLDivElement>",
             "via": "rest",
@@ -10866,7 +10906,24 @@
           }
         },
         "Calendar": {
-          "props": {},
+          "props": {
+            "events": {
+              "type": "readonly CalendarEventItem[]",
+              "required": false
+            },
+            "eventDisplay": {
+              "type": "CalendarEventDisplay",
+              "required": false
+            },
+            "maxEventLanes": {
+              "type": "number",
+              "required": false
+            },
+            "eventContent": {
+              "type": "Snippet<[CalendarEventRenderContext]>",
+              "required": false
+            }
+          },
           "forwardedProps": {
             "baseType": "HTMLAttributes<HTMLDivElement>",
             "via": "rest",
@@ -11552,7 +11609,24 @@
           }
         },
         "Grid": {
-          "props": {},
+          "props": {
+            "events": {
+              "type": "readonly CalendarEventItem[]",
+              "required": false
+            },
+            "eventDisplay": {
+              "type": "CalendarEventDisplay",
+              "required": false
+            },
+            "maxEventLanes": {
+              "type": "number",
+              "required": false
+            },
+            "eventContent": {
+              "type": "Snippet<[CalendarEventRenderContext]>",
+              "required": false
+            }
+          },
           "forwardedProps": {
             "baseType": "HTMLAttributes<HTMLDivElement>",
             "via": "rest",

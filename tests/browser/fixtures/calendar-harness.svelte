@@ -1,6 +1,10 @@
 <script lang="ts">
 	import '../../../packages/ui/src/themes/default.css';
 	import '../../../packages/ui/src/themes/dark.css';
+	import type {
+		CalendarEventDisplay,
+		CalendarEventItem
+	} from '../../../packages/ui/src/calendar/index.js';
 	import { Calendar } from '../../../packages/ui/src/calendar/index.js';
 
 	interface Props {
@@ -8,13 +12,19 @@
 		min?: Date | null;
 		max?: Date | null;
 		disabled?: boolean;
+		events?: CalendarEventItem[];
+		eventDisplay?: CalendarEventDisplay;
+		maxEventLanes?: number;
 	}
 
 	let {
 		value = $bindable<Date | null>(new Date(2026, 3, 18)),
 		min = new Date(2026, 3, 10),
 		max = new Date(2026, 3, 24),
-		disabled = false
+		disabled = false,
+		events = [],
+		eventDisplay = 'dots',
+		maxEventLanes = 3
 	}: Props = $props();
 
 	function formatValue(date: Date | null) {
@@ -34,7 +44,7 @@
 		<Calendar.Heading data-testid="calendar-heading" />
 		<Calendar.Next data-testid="calendar-next" />
 	</Calendar.Header>
-	<Calendar.Grid data-testid="calendar-grid" />
+	<Calendar.Grid {events} {eventDisplay} {maxEventLanes} data-testid="calendar-grid" />
 </Calendar.Root>
 
 <output data-testid="calendar-value">{formatValue(value)}</output>

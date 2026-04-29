@@ -1,11 +1,20 @@
 export type {
 	CalendarRootProps,
 	CalendarHeaderProps,
-	CalendarGridProps,
 	CalendarPrevProps,
 	CalendarNextProps,
 	CalendarHeadingProps
 } from '@dryui/primitives';
+import type { CalendarEventGridProps } from '../internal/calendar-event-layout.js';
+export type {
+	CalendarEventDisplay,
+	CalendarEventItem,
+	CalendarEventPosition,
+	CalendarEventRenderContext,
+	CalendarEventTone
+} from '../internal/calendar-event-layout.js';
+
+export interface CalendarGridProps extends CalendarEventGridProps {}
 
 import CalendarRoot from './calendar-root.svelte';
 import CalendarHeader from './calendar-header.svelte';

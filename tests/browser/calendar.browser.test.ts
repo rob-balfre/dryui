@@ -45,6 +45,10 @@ function getValueOutput(): HTMLOutputElement {
 	return output;
 }
 
+function getCalendarEvents(isoDate: string): NodeListOf<HTMLElement> {
+	return getCell(isoDate).querySelectorAll<HTMLElement>('[data-calendar-event]');
+}
+
 async function pressKey(
 	target: HTMLElement,
 	key: string,
@@ -117,5 +121,66 @@ describe('Calendar', () => {
 
 		expect(getValueOutput().textContent).toBe('2026-04-18');
 		expect(getCell('2026-04-09').hasAttribute('data-selected')).toBe(false);
+	});
+
+	it('renders event dots and includes event summaries in day labels', () => {
+		render(CalendarHarness, {
+			maxEventLanes: 1,
+			events: [
+				{
+					id: 'flight',
+					title: 'Flight to Paris',
+					start: new Date(2026, 3, 18),
+					kind: 'flight',
+					tone: 'info',
+					priority: 10
+				},
+				{
+					id: 'hotel',
+					title: 'Hotel check-in',
+					start: new Date(2026, 3, 18),
+					kind: 'hotel',
+					tone: 'success'
+				}
+			]
+		});
+
+		const events = getCalendarEvents('2026-04-18');
+		const overflow = getCell('2026-04-18').querySelector<HTMLElement>(
+			'[data-calendar-event-overflow]'
+		);
+
+		expect(events).toHaveLength(1);
+		expect(events[0]?.getAttribute('data-calendar-event-kind')).toBe('flight');
+		expect(events[0]?.getAttribute('data-calendar-event-tone')).toBe('info');
+		expect(overflow?.textContent).toBe('+1');
+		expect(getDay('2026-04-18').getAttribute('aria-label')).toContain(
+			'2 events: Flight to Paris, Hotel check-in'
+		);
+	});
+
+	it('renders multi-day events as bar segments', () => {
+		render(CalendarHarness, {
+			eventDisplay: 'bars',
+			events: [
+				{
+					id: 'hotel',
+					title: 'Hotel stay',
+					start: new Date(2026, 3, 18),
+					end: new Date(2026, 3, 20),
+					kind: 'hotel',
+					tone: 'success'
+				}
+			]
+		});
+
+		const start = getCalendarEvents('2026-04-18')[0];
+		const middle = getCalendarEvents('2026-04-19')[0];
+		const end = getCalendarEvents('2026-04-20')[0];
+
+		expect(start?.getAttribute('data-calendar-event-position')).toBe('start');
+		expect(middle?.getAttribute('data-calendar-event-position')).toBe('middle');
+		expect(end?.getAttribute('data-calendar-event-position')).toBe('end');
+		expect(start?.textContent).toBe('Hotel stay');
 	});
 });

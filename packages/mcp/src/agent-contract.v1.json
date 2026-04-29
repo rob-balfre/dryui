@@ -2171,14 +2171,16 @@
     },
     "Calendar": {
       "name": "Calendar",
-      "description": "Interactive calendar grid for date navigation",
+      "description": "Interactive calendar grid for date navigation and event overlays",
       "category": "form",
       "tags": [
         "date",
         "calendar",
         "picker",
         "month",
-        "locale"
+        "locale",
+        "events",
+        "itinerary"
       ],
       "kind": "compound",
       "import": {
@@ -2273,7 +2275,32 @@
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Grid": {
-          "props": {},
+          "props": {
+            "events": {
+              "signature": "events: readonly CalendarEventItem[]",
+              "required": false,
+              "bindable": false
+            },
+            "eventDisplay": {
+              "signature": "eventDisplay: 'dots' | 'bars' | values:dots|bars",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "dots",
+                "bars"
+              ]
+            },
+            "maxEventLanes": {
+              "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "eventContent": {
+              "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
+              "required": false,
+              "bindable": false
+            }
+          },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Prev": {
@@ -5235,7 +5262,28 @@
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Calendar": {
-          "props": {},
+          "props": {
+            "events": {
+              "signature": "events: readonly CalendarEventItem[]",
+              "required": false,
+              "bindable": false
+            },
+            "eventDisplay": {
+              "signature": "eventDisplay: CalendarEventDisplay",
+              "required": false,
+              "bindable": false
+            },
+            "maxEventLanes": {
+              "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "eventContent": {
+              "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
+              "required": false,
+              "bindable": false
+            }
+          },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         }
       },
@@ -5405,7 +5453,28 @@
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Calendar": {
-          "props": {},
+          "props": {
+            "events": {
+              "signature": "events: readonly CalendarEventItem[]",
+              "required": false,
+              "bindable": false
+            },
+            "eventDisplay": {
+              "signature": "eventDisplay: CalendarEventDisplay",
+              "required": false,
+              "bindable": false
+            },
+            "maxEventLanes": {
+              "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "eventContent": {
+              "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
+              "required": false,
+              "bindable": false
+            }
+          },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Preset": {
@@ -13402,7 +13471,28 @@
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
         "Grid": {
-          "props": {},
+          "props": {
+            "events": {
+              "signature": "events: readonly CalendarEventItem[]",
+              "required": false,
+              "bindable": false
+            },
+            "eventDisplay": {
+              "signature": "eventDisplay: CalendarEventDisplay",
+              "required": false,
+              "bindable": false
+            },
+            "maxEventLanes": {
+              "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "eventContent": {
+              "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
+              "required": false,
+              "bindable": false
+            }
+          },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         }
       },
