@@ -32,7 +32,20 @@ const feedbackComponentPath = new URL(
 describe('@dryui/feedback package contract', () => {
 	test('publishes only the top-level package entrypoint', () => {
 		expect(Object.keys(feedbackPackageJson.exports)).toEqual(['.']);
-		expect(feedbackPackageJson.files).toEqual(['dist', 'skills']);
+		expect(feedbackPackageJson.files).toEqual(['dist', 'src', 'skills']);
+	});
+
+	test('exposes a development conditional pointing at src for live HMR', () => {
+		const dot = (feedbackPackageJson.exports as Record<string, unknown>)['.'];
+		expect(dot).toMatchObject({
+			development: {
+				types: './src/index.ts',
+				svelte: './src/index.ts',
+				default: './src/index.ts'
+			},
+			svelte: './dist/index.js',
+			default: './dist/index.js'
+		});
 	});
 
 	test('source entrypoint exposes the Feedback component export', async () => {

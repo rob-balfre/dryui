@@ -21,7 +21,9 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const LINK_TARGETS = [
 	{ pkg: '@dryui/cli', dir: 'packages/cli', bin: 'dryui' },
 	{ pkg: '@dryui/mcp', dir: 'packages/mcp', bin: 'dryui-mcp' },
-	{ pkg: '@dryui/feedback-server', dir: 'packages/feedback-server', bin: 'dryui-feedback-mcp' }
+	{ pkg: '@dryui/feedback-server', dir: 'packages/feedback-server', bin: 'dryui-feedback-mcp' },
+	{ pkg: '@dryui/feedback', dir: 'packages/feedback', bin: null },
+	{ pkg: '@dryui/lint', dir: 'packages/lint', bin: null }
 ] as const;
 
 function bunLink(cwd: string, args: readonly string[] = []): boolean {
@@ -44,16 +46,22 @@ function unlink(): void {
 }
 
 function link(): void {
-	console.log('dev-link: registering workspace bins globally');
+	console.log('dev-link: registering workspace packages globally');
 	for (const target of LINK_TARGETS) {
 		const cwd = resolve(REPO_ROOT, target.dir);
 		const registered = bunLink(cwd);
-		console.log(`  ${registered ? '✓' : '✗'} ${target.pkg} → ${target.bin}`);
+		const arrow = target.bin ? ` → ${target.bin}` : '';
+		console.log(`  ${registered ? '✓' : '✗'} ${target.pkg}${arrow}`);
 	}
 	console.log('');
-	console.log('Each bin is now on PATH via ~/.bun/install/global/node_modules/.bin.');
+	console.log(
+		'Bins (cli/mcp/feedback-mcp) are now on PATH via ~/.bun/install/global/node_modules/.bin.'
+	);
 	console.log('Set DRYUI_DEV=1 in your shell or editor MCP config to run from src.');
 	console.log('Without DRYUI_DEV the bins still load dist/ (matches published behaviour).');
+	console.log('');
+	console.log('@dryui/feedback uses the package.json "development" exports condition,');
+	console.log('so Vite/SvelteKit dev servers automatically resolve it from src/.');
 	console.log('');
 	console.log('To consume a workspace package in another local project, run from there:');
 	for (const target of LINK_TARGETS) {

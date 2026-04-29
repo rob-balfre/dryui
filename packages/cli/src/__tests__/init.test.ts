@@ -139,7 +139,7 @@ const readySvelteConfig = [
 	"import { dryuiLint } from '@dryui/lint';",
 	'',
 	'export default {',
-	"\tpreprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] }), vitePreprocess()]",
+	"\tpreprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] }), vitePreprocess()]",
 	'};'
 ].join('\n');
 
@@ -262,7 +262,7 @@ describe('runInit', () => {
 		expect(appHtml).toContain('class="shell theme-auto"');
 		expect(svelteConfig).toContain("import { dryuiLint } from '@dryui/lint';");
 		expect(svelteConfig).toContain(
-			"preprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] }), vitePreprocess()]"
+			"preprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] }), vitePreprocess()]"
 		);
 		// In-place edits never trigger feedback setup.
 		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
@@ -733,7 +733,7 @@ describe('runInit', () => {
 
 		expect(result.logs).toContain('  Setting up DryUI...');
 		expect(result.errors).toEqual([
-			`  ? Skipped edit: Wire dryuiLint into svelte.config (manual action needed — unrecognised preprocess shape in ${join(root, 'svelte.config.js')}; add dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] }) to the preprocess array manually)`
+			`  ? Skipped edit: Wire dryuiLint into svelte.config (manual action needed — unrecognised preprocess shape in ${join(root, 'svelte.config.js')}; add dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] }) to the preprocess array manually)`
 		]);
 		expect(svelteConfig).toBe(weirdConfig);
 	});

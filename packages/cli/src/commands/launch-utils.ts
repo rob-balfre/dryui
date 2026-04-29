@@ -393,6 +393,24 @@ export function installPackage(options: InstallPackageOptions): boolean {
 	return result.status === 0;
 }
 
+export interface LinkPackageOptions {
+	cwd: string;
+	packageManager: Exclude<DryuiPackageManager, 'unknown'>;
+	packageNames: string[];
+}
+
+export function linkPackage(options: LinkPackageOptions): boolean {
+	if (options.packageNames.length === 0) return true;
+	for (const name of options.packageNames) {
+		const result = spawnSync(options.packageManager, ['link', name], {
+			cwd: options.cwd,
+			stdio: 'inherit'
+		});
+		if (result.status !== 0) return false;
+	}
+	return true;
+}
+
 export interface MountFeedbackOptions {
 	layoutPath: string;
 	serverUrl: string;

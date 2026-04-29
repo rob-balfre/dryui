@@ -33,6 +33,7 @@ import {
 	isHealthyProbeStatus,
 	killOwnedProcess as killOwnedProcessDefault,
 	killPortHolder as killPortHolderDefault,
+	linkPackage as linkPackageDefault,
 	mountFeedbackInLayout as mountFeedbackInLayoutDefault,
 	openBrowser,
 	patchViteConfigFeedbackNoExternal as patchViteConfigFeedbackNoExternalDefault,
@@ -422,6 +423,11 @@ export interface UserProjectLauncherRuntime {
 		packageManager: Exclude<DryuiPackageManager, 'unknown'>,
 		packageNames: string[]
 	) => boolean;
+	linkPackage: (
+		cwd: string,
+		packageManager: Exclude<DryuiPackageManager, 'unknown'>,
+		packageNames: string[]
+	) => boolean;
 	mountFeedbackInLayout: (layoutPath: string, serverUrl: string) => boolean;
 	findViteConfig: (root: string) => string | null;
 	viteConfigHasFeedbackNoExternal: (configPath: string) => boolean;
@@ -594,6 +600,8 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	projectHasDependency: projectHasDependencyDefault,
 	installPackage: (cwd, packageManager, packageNames) =>
 		installPackageDefault({ cwd, packageManager, packageNames }),
+	linkPackage: (cwd, packageManager, packageNames) =>
+		linkPackageDefault({ cwd, packageManager, packageNames }),
 	mountFeedbackInLayout: (layoutPath, serverUrl) =>
 		mountFeedbackInLayoutDefault({ layoutPath, serverUrl }),
 	findViteConfig: findViteConfigDefault,
@@ -650,8 +658,10 @@ async function planAndApplyFeedbackSetup(
 
 	const notes: LabelledMessage[] = [];
 
+	const devMode = process.env['DRYUI_DEV'] === '1' || process.env['DRYUI_DEV'] === 'true';
+
 	const packagesToInstall: string[] = [];
-	if (needsInstall) packagesToInstall.push('@dryui/feedback');
+	if (needsInstall && !devMode) packagesToInstall.push('@dryui/feedback');
 	if (needsLucideInstall) packagesToInstall.push('lucide-svelte');
 
 	if (packagesToInstall.length > 0) {
@@ -669,6 +679,22 @@ async function planAndApplyFeedbackSetup(
 				message: 'installed lucide-svelte (peer dependency of @dryui/feedback)'
 			});
 		}
+	}
+
+	if (needsInstall && devMode) {
+		const linked = runtime.linkPackage(detection.root!, packageManager, ['@dryui/feedback']);
+		if (!linked) {
+			notes.push({
+				label: 'Feedback widget',
+				message: `link failed: run \`${packageManager} link @dryui/feedback\` manually (and \`bun run dev:link\` from the dryui workspace first)`
+			});
+			return notes;
+		}
+		notes.push({
+			label: 'Feedback widget',
+			message:
+				'linked from workspace (DRYUI_DEV=1) — edits to packages/feedback/src reflect via Vite HMR'
+		});
 	}
 
 	if (needsMount && layoutPath) {

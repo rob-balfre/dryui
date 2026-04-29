@@ -53,6 +53,7 @@ function report(filename: string, violations: Violation[], strict: boolean): voi
 }
 
 function isExcluded(filename: string, patterns: string[]): boolean {
+	if (filename.includes('/node_modules/')) return true;
 	return patterns.some((p) => filename.includes(p));
 }
 

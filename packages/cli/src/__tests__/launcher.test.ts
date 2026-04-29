@@ -251,6 +251,7 @@ function buildRuntime(
 		promptFeedbackSetup: async () => false,
 		projectHasDependency: () => true,
 		installPackage: () => true,
+		linkPackage: () => true,
 		mountFeedbackInLayout: () => true,
 		findViteConfig: () => null,
 		viteConfigHasFeedbackNoExternal: () => true,
@@ -568,6 +569,54 @@ describe('runUserProjectLauncher', () => {
 		expect(result.logs[0]).toContain(
 			`Vite config: added @dryui/feedback and lucide-svelte to ssr.noExternal in ${viteConfigPath}`
 		);
+	});
+
+	test('under DRYUI_DEV, links @dryui/feedback from the workspace instead of installing it', async () => {
+		const root = createTempTree({ 'package.json': '{}' });
+		const viteConfigPath = resolve(root, 'vite.config.ts');
+		const detection: ProjectDetection = {
+			...readyDetection(root),
+			dependencies: { ui: true, primitives: true, lint: true, feedback: false },
+			feedback: { layoutPath: null }
+		};
+		const installCalls: Array<{ pm: string; pkgs: string[] }> = [];
+		const linkCalls: Array<{ pm: string; pkgs: string[] }> = [];
+
+		const previousDev = process.env['DRYUI_DEV'];
+		process.env['DRYUI_DEV'] = '1';
+		let result;
+		try {
+			result = await captureAsyncCommandIO(() =>
+				runUserProjectLauncher(['--no-open'], {
+					cwd: root,
+					spec: STUB_SPEC,
+					runtime: buildRuntime({
+						detectProject: () => detection,
+						urlResponds: async () => true,
+						findViteConfig: () => viteConfigPath,
+						viteConfigHasFeedbackNoExternal: () => true,
+						projectHasDependency: () => true,
+						promptFeedbackSetup: async () => true,
+						installPackage: (_cwd, pm, pkgs) => {
+							installCalls.push({ pm, pkgs });
+							return true;
+						},
+						linkPackage: (_cwd, pm, pkgs) => {
+							linkCalls.push({ pm, pkgs });
+							return true;
+						},
+						mountFeedbackInLayout: () => true
+					})
+				})
+			);
+		} finally {
+			if (previousDev === undefined) delete process.env['DRYUI_DEV'];
+			else process.env['DRYUI_DEV'] = previousDev;
+		}
+
+		expect(installCalls).toEqual([]);
+		expect(linkCalls).toEqual([{ pm: 'bun', pkgs: ['@dryui/feedback'] }]);
+		expect(result.logs[0]).toContain('Feedback widget: linked from workspace (DRYUI_DEV=1)');
 	});
 
 	test('installs the lucide peer even when @dryui/feedback is already present', async () => {

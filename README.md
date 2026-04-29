@@ -108,6 +108,8 @@ dryui feedback server    # spawns packages/feedback-server/src/server.ts
 
 Edits in `packages/cli/src/`, `packages/mcp/src/`, or `packages/feedback-server/src/` show up on the next invocation. Without `DRYUI_DEV` the same bins import `dist/`, matching the published behaviour.
 
+For the `@dryui/feedback` widget (consumed at build/SSR time, not per-invocation), `dev:link` also registers the package and the launcher swaps `bun add` for `bun link @dryui/feedback` when `DRYUI_DEV=1`. The package's `exports` map carries a `"development"` condition pointing at `src/`, so once linked, `vite dev` in `~/yourproject` resolves through source and picks up edits via HMR — no rebuild needed. Production builds fall through to `dist/`.
+
 For editor MCP entries, point at the linked bin and pass the env flag:
 
 ```jsonc

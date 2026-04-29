@@ -14,14 +14,14 @@
 		Pencil,
 		Plus,
 		Redo2,
-		RectangleHorizontal,
 		RotateCcw,
 		Search,
 		Send,
 		Settings,
 		Trash2,
 		Type,
-		Undo2
+		Undo2,
+		VectorSquare
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
 	import {
@@ -690,7 +690,7 @@
 					aria-label={layoutTool === 'box' ? 'Stop drawing boxes' : 'Draw box'}
 					aria-pressed={layoutTool === 'box'}
 				>
-					<RectangleHorizontal size={16} />
+					<VectorSquare size={16} />
 				</Button>
 			{:else if showComponentsTools}
 				{#if addedKind}

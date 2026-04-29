@@ -292,7 +292,8 @@ function executeEditFile(step: ProjectPlanStep): void {
 		if (content.includes('dryuiLint')) return;
 
 		const importLine = "import { dryuiLint } from '@dryui/lint';";
-		const lintEntry = "dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/'] })";
+		const lintEntry =
+			"dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] })";
 
 		let updated = content;
 

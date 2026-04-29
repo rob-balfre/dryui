@@ -239,4 +239,14 @@ describe('dryuiLint preprocessor', () => {
 			});
 		}).toThrow('dryui/no-raw-element');
 	});
+
+	test('auto-skips files inside node_modules even in strict mode', () => {
+		const pp = dryuiLint({ strict: true });
+		expect(() => {
+			pp.markup!({
+				content: '<div style="color: red">{@attach foo}</div>',
+				filename: '/Users/jane/proj/node_modules/@dryui/feedback/src/feedback.svelte'
+			});
+		}).not.toThrow();
+	});
 });

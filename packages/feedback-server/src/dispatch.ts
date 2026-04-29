@@ -2,7 +2,8 @@ import { which } from 'bun';
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { createProbeCache, hasJsonEntry, type ProbeCache } from './config-probe.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
@@ -35,6 +36,84 @@ const TERMINAL_CLI: Record<'claude' | 'gemini' | 'opencode' | 'copilot', readonl
 	opencode: ['opencode'],
 	copilot: ['copilot', '-i']
 };
+
+// When this server runs from a dryui workspace checkout, prefer the live
+// plugin source over whatever `/plugin install dryui@dryui` cached. Claude
+// Code's `--plugin-dir <path>` flag loads a plugin directly from a local
+// tree and takes precedence over the marketplace install with the same
+// name (https://code.claude.com/docs/en/plugins.md#test-your-plugins-locally),
+// so plugin authors get the same hot-reload story as `dev:link` gives the
+// CLI bins. Override path with DRYUI_PLUGIN_DIR for ad-hoc testing.
+function resolveLocalPluginDir(): string | null {
+	const explicit = process.env['DRYUI_PLUGIN_DIR'];
+	if (explicit) {
+		return existsSync(join(explicit, '.claude-plugin', 'plugin.json')) ? explicit : null;
+	}
+	let dir: string;
+	try {
+		dir = dirname(fileURLToPath(import.meta.url));
+	} catch {
+		return null;
+	}
+	for (let i = 0; i < 8; i++) {
+		const pluginDir = join(dir, 'packages', 'plugin');
+		if (
+			existsSync(join(pluginDir, '.claude-plugin', 'plugin.json')) &&
+			existsSync(join(dir, 'packages', 'ui', 'package.json'))
+		) {
+			return pluginDir;
+		}
+		const parent = dirname(dir);
+		if (parent === dir) break;
+		dir = parent;
+	}
+	return null;
+}
+
+// Default the dispatched claude session to Sonnet + auto permission mode.
+// Feedback work is small, surgical edits — Opus is overkill and noticeably
+// slower for this loop, and auto mode means the agent doesn't stall on
+// per-edit prompts for a workflow the user already opted into by clicking
+// "send feedback". Both are overridable via env so a session that genuinely
+// needs more horsepower or stricter prompting can switch without a code edit.
+const DEFAULT_CLAUDE_MODEL = 'sonnet';
+const DEFAULT_CLAUDE_PERMISSION_MODE = 'auto';
+
+function resolveClaudeModel(): string {
+	const override = process.env['DRYUI_FEEDBACK_MODEL']?.trim();
+	return override && override.length > 0 ? override : DEFAULT_CLAUDE_MODEL;
+}
+
+function resolveClaudePermissionMode(): string {
+	const override = process.env['DRYUI_FEEDBACK_PERMISSION_MODE']?.trim();
+	return override && override.length > 0 ? override : DEFAULT_CLAUDE_PERMISSION_MODE;
+}
+
+// Memoize: feedback-server is long-lived and the plugin path doesn't change
+// during a process lifetime. Avoid walking the filesystem on every dispatch.
+let claudeCliArgsCache: readonly string[] | null = null;
+
+function getCliArgs(target: keyof typeof TERMINAL_CLI): readonly string[] {
+	if (target !== 'claude') return TERMINAL_CLI[target];
+	if (claudeCliArgsCache) return claudeCliArgsCache;
+	const model = resolveClaudeModel();
+	const permissionMode = resolveClaudePermissionMode();
+	const localPlugin = resolveLocalPluginDir();
+	const args: string[] = [
+		...TERMINAL_CLI.claude,
+		'--model',
+		model,
+		'--permission-mode',
+		permissionMode
+	];
+	if (localPlugin) {
+		console.error(`[dispatch] using local plugin: ${localPlugin}`);
+		args.push('--plugin-dir', localPlugin);
+	}
+	console.error(`[dispatch] claude model: ${model}, permission-mode: ${permissionMode}`);
+	claudeCliArgsCache = args;
+	return claudeCliArgsCache;
+}
 
 const APP_COMMANDS: Record<'cursor' | 'windsurf' | 'zed', readonly [string, ...string[]]> = {
 	cursor: ['cursor'],
@@ -343,7 +422,7 @@ function buildCliInvocation(
 		return `${shellQuote('opencode')} ${shellQuote(workspace)} --prompt ${shellQuote(prompt)}`;
 	}
 
-	const cli = TERMINAL_CLI[target];
+	const cli = getCliArgs(target);
 	const cliArgs = cli.map((entry) => shellQuote(entry)).join(' ');
 	return `${cliArgs} ${shellQuote(prompt)}`;
 }
@@ -612,7 +691,7 @@ export function dispatchPrompt(
 		const wtArgs =
 			target === 'opencode'
 				? ['-d', options.workspace, '--', 'opencode', options.workspace, '--prompt', fullPrompt]
-				: ['-d', options.workspace, '--', ...TERMINAL_CLI[target], fullPrompt];
+				: ['-d', options.workspace, '--', ...getCliArgs(target), fullPrompt];
 		spawnDetached('wt.exe', wtArgs);
 		return;
 	}
