@@ -176,6 +176,16 @@ describe('checkMarkup', () => {
 		expect(violations[0]!.message).toContain('--dry-area-grid-template-areas');
 	});
 
+	test('accepts AreaGrid.Root with a template preset and no template-areas var', () => {
+		const code = `<AreaGrid.Root template="stack">
+  <Widget --dry-grid-area-name="masthead">Header</Widget>
+  <Widget --dry-grid-area-name="main">Body</Widget>
+  <Widget --dry-grid-area-name="foot">Footer</Widget>
+</AreaGrid.Root>`;
+		const violations = checkMarkup(code);
+		expect(violations).toHaveLength(0);
+	});
+
 	test('rejects AreaGrid.Area part usage', () => {
 		const code = `<AreaGrid.Root --dry-area-grid-template-areas="'content'">
   <AreaGrid.Area>Content</AreaGrid.Area>

@@ -354,7 +354,10 @@ const AREA_GRID_ROOT_CSS_VARS: ReadonlySet<string> = new Set([
 	'--dry-area-grid-area-border',
 	'--dry-area-grid-area-radius',
 	'--dry-area-grid-area-bg',
-	'--dry-area-grid-area-color'
+	'--dry-area-grid-area-color',
+	'--dry-area-grid-sidebar-min',
+	'--dry-area-grid-sidebar-max',
+	'--dry-area-grid-min-track'
 ]);
 
 function isAreaGridCssVar(name: string): boolean {
@@ -825,7 +828,8 @@ function checkAreaGridUsage(
 			});
 		}
 
-		if (!attributeByName(root.attrs, AREA_GRID_ROOT_REQUIRED_TEMPLATE)) {
+		const hasTemplatePreset = attributeByName(root.attrs, 'template') !== null;
+		if (!hasTemplatePreset && !attributeByName(root.attrs, AREA_GRID_ROOT_REQUIRED_TEMPLATE)) {
 			violations.push({
 				rule: 'dryui/area-grid-required-var',
 				message: ruleMessage('dryui/area-grid-required-var', {

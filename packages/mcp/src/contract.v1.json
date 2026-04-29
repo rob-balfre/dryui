@@ -5011,6 +5011,18 @@
               "required": false,
               "default": "false"
             },
+            "template": {
+              "type": "| 'centered'\n\t| 'sidebar'\n\t| 'stack'\n\t| 'holy-grail'\n\t| '12-span'\n\t| 'card-grid'",
+              "required": false,
+              "acceptedValues": [
+                "centered",
+                "sidebar",
+                "stack",
+                "holy-grail",
+                "12-span",
+                "card-grid"
+              ]
+            },
             "children": {
               "type": "Snippet",
               "required": true,
@@ -5036,7 +5048,12 @@
           "props": {
             "area": {
               "type": "string",
-              "required": true
+              "required": false
+            },
+            "label": {
+              "type": "string",
+              "required": false,
+              "description": "Visible label text shown for the control or item."
             }
           }
         },
@@ -5103,6 +5120,9 @@
         },
         {
           "name": "data-max-width"
+        },
+        {
+          "name": "data-template"
         }
       ],
       "example": "<AreaGrid.Root\n  --dry-area-grid-template-areas=\"'header' 'content'\"\n>\n  <Card.Root --dry-grid-area-name=\"header\">\n    <Card.Header>Header</Card.Header>\n  </Card.Root>\n  <Card.Root --dry-grid-area-name=\"content\">\n    <Card.Content>Content</Card.Content>\n  </Card.Root>\n</AreaGrid.Root>"
@@ -10619,6 +10639,10 @@
               "type": "number",
               "required": false
             },
+            "visibleMonths": {
+              "type": "CalendarVisibleMonths",
+              "required": false
+            },
             "eventContent": {
               "type": "Snippet<[CalendarEventRenderContext]>",
               "required": false
@@ -10780,6 +10804,14 @@
             "maxEventLanes": {
               "type": "number",
               "required": false
+            },
+            "visibleMonths": {
+              "type": "1 | 2",
+              "required": false,
+              "acceptedValues": [
+                "1",
+                "2"
+              ]
             },
             "eventContent": {
               "type": "Snippet<[CalendarEventRenderContext]>",
@@ -11057,6 +11089,10 @@
             },
             "maxEventLanes": {
               "type": "number",
+              "required": false
+            },
+            "visibleMonths": {
+              "type": "CalendarVisibleMonths",
               "required": false
             },
             "eventContent": {
@@ -11760,6 +11796,10 @@
             },
             "maxEventLanes": {
               "type": "number",
+              "required": false
+            },
+            "visibleMonths": {
+              "type": "CalendarVisibleMonths",
               "required": false
             },
             "eventContent": {

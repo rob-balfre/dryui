@@ -3,7 +3,8 @@
 	import '../../../packages/ui/src/themes/dark.css';
 	import type {
 		CalendarEventDisplay,
-		CalendarEventItem
+		CalendarEventItem,
+		CalendarVisibleMonths
 	} from '../../../packages/ui/src/calendar/index.js';
 	import { RangeCalendar } from '../../../packages/ui/src/range-calendar/index.js';
 
@@ -16,6 +17,7 @@
 		events?: CalendarEventItem[];
 		eventDisplay?: CalendarEventDisplay;
 		maxEventLanes?: number;
+		visibleMonths?: CalendarVisibleMonths;
 	}
 
 	let {
@@ -26,7 +28,8 @@
 		disabled = false,
 		events = [],
 		eventDisplay = 'dots',
-		maxEventLanes = 3
+		maxEventLanes = 3,
+		visibleMonths = 1
 	}: Props = $props();
 
 	function formatValue(date: Date | null) {
@@ -48,7 +51,13 @@
 	{disabled}
 	data-testid="range-calendar-root"
 >
-	<RangeCalendar.Grid {events} {eventDisplay} {maxEventLanes} data-testid="range-calendar-grid" />
+	<RangeCalendar.Grid
+		{events}
+		{eventDisplay}
+		{maxEventLanes}
+		{visibleMonths}
+		data-testid="range-calendar-grid"
+	/>
 </RangeCalendar.Root>
 
 <output data-testid="range-calendar-start">{formatValue(startDate)}</output>

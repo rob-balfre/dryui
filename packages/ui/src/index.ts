@@ -485,6 +485,7 @@ export type {
 	CalendarEventPosition,
 	CalendarEventRenderContext,
 	CalendarEventTone,
+	CalendarVisibleMonths,
 	CalendarRootProps,
 	CalendarHeaderProps,
 	CalendarGridProps,

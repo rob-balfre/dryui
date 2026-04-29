@@ -1,4 +1,9 @@
 import { createContext } from '@dryui/primitives';
+import type { CalendarVisibleMonths } from '../internal/calendar-event-layout.js';
+
+export interface CalendarMonthViewState {
+	visibleMonths: CalendarVisibleMonths;
+}
 
 export interface CalendarContext {
 	readonly value: Date | null;
@@ -6,6 +11,8 @@ export interface CalendarContext {
 	readonly viewMonth: number;
 	readonly viewYear: number;
 	readonly locale: string;
+	readonly visibleMonths: CalendarVisibleMonths;
+	readonly monthView: CalendarMonthViewState;
 	readonly min: Date | null;
 	readonly max: Date | null;
 	readonly disabled: boolean;

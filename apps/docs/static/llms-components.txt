@@ -1303,7 +1303,7 @@ Parts:
 	| 'right-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, left, left-start, left-end, right, right-start, right-end | offset (number) | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DatePicker.Calendar
-  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | visibleMonths (CalendarVisibleMonths) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 Structure:
   DatePicker.Root
@@ -1338,7 +1338,7 @@ Parts:
   Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <div> attributes via rest props.
 - Calendar.Grid
-  Props: events (readonly CalendarEventItem[]) | eventDisplay ('dots' | 'bars'), accepted dots, bars | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
+  Props: events (readonly CalendarEventItem[]) | eventDisplay ('dots' | 'bars'), accepted dots, bars | maxEventLanes (number) | visibleMonths (1 | 2), accepted 1, 2 | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 - Calendar.Prev
   Props: children (Snippet), Content rendered inside the component.
@@ -1387,7 +1387,7 @@ Parts:
   Props: placement ('top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end'), accepted top, top-start, top-end, bottom, bottom-start, bottom-end, default 'bottom-start' | offset (number), default 8 | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - DateRangePicker.Calendar
-  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | visibleMonths (CalendarVisibleMonths) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 - DateRangePicker.Preset
   Props: startDate (Date), required | endDate (Date), required | children (Snippet), Content rendered inside the component., required
@@ -1423,7 +1423,7 @@ Parts:
   Props: startDate (Date | null), default $bindable<Date | null>(null), bindable | endDate (Date | null), default $bindable<Date | null>(null), bindable | locale (string), default 'en-US' | min (Date | null), Minimum allowed value., default null | max (Date | null), Maximum allowed value., default null | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <div> attributes via rest props.
 - RangeCalendar.Grid
-  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | eventContent (Snippet<[CalendarEventRenderContext]>)
+  Props: events (readonly CalendarEventItem[]) | eventDisplay (CalendarEventDisplay) | maxEventLanes (number) | visibleMonths (CalendarVisibleMonths) | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
 Structure:
   RangeCalendar.Root
@@ -1468,16 +1468,21 @@ Root import: import { AreaGrid } from '@dryui/ui'
 Subpath import: import { AreaGrid } from '@dryui/ui/area-grid'
 Parts:
 - AreaGrid.Root
-  Props: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | seams (boolean), default false | children (Snippet), Content rendered inside the component., required
+  Props: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | seams (boolean), default false | template (| 'centered'
+	| 'sidebar'
+	| 'stack'
+	| 'holy-grail'
+	| '12-span'
+	| 'card-grid'), accepted centered, sidebar, stack, holy-grail, 12-span, card-grid | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <element> attributes via rest props.
 - AreaGrid.Placeholder
-  Props: area (string), required
+  Props: area (string) | label (string), Visible label text shown for the control or item.
 - AreaGrid.Shell
   Props: none
 Structure:
   AreaGrid.Root
 CSS variables: --dry-area-grid-align-items, --dry-area-grid-area-bg, --dry-area-grid-area-border, --dry-area-grid-area-color, --dry-area-grid-area-display, --dry-area-grid-area-gap, --dry-area-grid-area-padding, --dry-area-grid-area-radius, --dry-area-grid-auto-flow, --dry-area-grid-auto-rows, --dry-area-grid-justify-items, --dry-area-grid-padding, --dry-area-grid-padding-block, --dry-area-grid-padding-inline, --dry-area-grid-shell-padding, --dry-area-grid-shell-padding-block, --dry-area-grid-shell-padding-inline, --dry-area-grid-template-areas, --dry-area-grid-template-areas-wide, --dry-area-grid-template-areas-xl, --dry-area-grid-template-columns, --dry-area-grid-template-columns-wide, --dry-area-grid-template-columns-xl, --dry-area-grid-template-rows, --dry-area-grid-template-rows-wide, --dry-area-grid-template-rows-xl, --dry-grid-area-name
-Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-seam-layer | data-area-grid-shell | data-debug | data-fill | data-max-width
+Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-seam-layer | data-area-grid-shell | data-debug | data-fill | data-max-width | data-template
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
 ```svelte

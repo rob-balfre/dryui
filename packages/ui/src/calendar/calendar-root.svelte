@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { createDateViewController } from '../internal/date-family-controller.svelte.js';
+	import type { CalendarVisibleMonths } from '../internal/calendar-event-layout.js';
 	import { setCalendarCtx } from './context.svelte.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -28,6 +29,9 @@
 		initialDate: value,
 		locale: () => locale
 	});
+	const monthView = $state({
+		visibleMonths: 1 as CalendarVisibleMonths
+	});
 
 	setCalendarCtx({
 		get value() {
@@ -44,6 +48,12 @@
 		},
 		get locale() {
 			return locale;
+		},
+		get visibleMonths() {
+			return monthView.visibleMonths;
+		},
+		get monthView() {
+			return monthView;
 		},
 		get min() {
 			return min;

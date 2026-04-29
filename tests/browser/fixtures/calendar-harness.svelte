@@ -3,7 +3,8 @@
 	import '../../../packages/ui/src/themes/dark.css';
 	import type {
 		CalendarEventDisplay,
-		CalendarEventItem
+		CalendarEventItem,
+		CalendarVisibleMonths
 	} from '../../../packages/ui/src/calendar/index.js';
 	import { Calendar } from '../../../packages/ui/src/calendar/index.js';
 
@@ -15,6 +16,7 @@
 		events?: CalendarEventItem[];
 		eventDisplay?: CalendarEventDisplay;
 		maxEventLanes?: number;
+		visibleMonths?: CalendarVisibleMonths;
 	}
 
 	let {
@@ -24,7 +26,8 @@
 		disabled = false,
 		events = [],
 		eventDisplay = 'dots',
-		maxEventLanes = 3
+		maxEventLanes = 3,
+		visibleMonths = 1
 	}: Props = $props();
 
 	function formatValue(date: Date | null) {
@@ -44,7 +47,13 @@
 		<Calendar.Heading data-testid="calendar-heading" />
 		<Calendar.Next data-testid="calendar-next" />
 	</Calendar.Header>
-	<Calendar.Grid {events} {eventDisplay} {maxEventLanes} data-testid="calendar-grid" />
+	<Calendar.Grid
+		{events}
+		{eventDisplay}
+		{maxEventLanes}
+		{visibleMonths}
+		data-testid="calendar-grid"
+	/>
 </Calendar.Root>
 
 <output data-testid="calendar-value">{formatValue(value)}</output>

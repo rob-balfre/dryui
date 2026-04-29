@@ -1028,6 +1028,19 @@
               "bindable": false,
               "default": "false"
             },
+            "template": {
+              "signature": "template: | 'centered'\n\t| 'sidebar'\n\t| 'stack'\n\t| 'holy-grail'\n\t| '12-span'\n\t| 'card-grid' | values:centered|sidebar|stack|holy-grail|12-span|card-grid",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "centered",
+                "sidebar",
+                "stack",
+                "holy-grail",
+                "12-span",
+                "card-grid"
+              ]
+            },
             "children": {
               "signature": "children: Snippet | required",
               "required": true,
@@ -1040,9 +1053,15 @@
         "Placeholder": {
           "props": {
             "area": {
-              "signature": "area: string | required",
-              "required": true,
+              "signature": "area: string",
+              "required": false,
               "bindable": false
+            },
+            "label": {
+              "signature": "label: string",
+              "required": false,
+              "bindable": false,
+              "description": "Visible label text shown for the control or item."
             }
           }
         },
@@ -2294,6 +2313,15 @@
               "signature": "maxEventLanes: number",
               "required": false,
               "bindable": false
+            },
+            "visibleMonths": {
+              "signature": "visibleMonths: 1 | 2 | values:1|2",
+              "required": false,
+              "bindable": false,
+              "values": [
+                "1",
+                "2"
+              ]
             },
             "eventContent": {
               "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
@@ -5278,6 +5306,11 @@
               "required": false,
               "bindable": false
             },
+            "visibleMonths": {
+              "signature": "visibleMonths: CalendarVisibleMonths",
+              "required": false,
+              "bindable": false
+            },
             "eventContent": {
               "signature": "eventContent: Snippet<[CalendarEventRenderContext]>",
               "required": false,
@@ -5466,6 +5499,11 @@
             },
             "maxEventLanes": {
               "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "visibleMonths": {
+              "signature": "visibleMonths: CalendarVisibleMonths",
               "required": false,
               "bindable": false
             },
@@ -13484,6 +13522,11 @@
             },
             "maxEventLanes": {
               "signature": "maxEventLanes: number",
+              "required": false,
+              "bindable": false
+            },
+            "visibleMonths": {
+              "signature": "visibleMonths: CalendarVisibleMonths",
               "required": false,
               "bindable": false
             },

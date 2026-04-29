@@ -1,3 +1,6 @@
+import { formatDate } from '@dryui/primitives';
+import type { CalendarVisibleMonths } from './calendar-event-layout.js';
+
 interface CalendarKeydownOptions {
 	onSelect: (date: Date) => void;
 	onEscape: () => void;
@@ -8,6 +11,41 @@ interface CalendarKeydownOptions {
 }
 
 type CalendarKeydownResult = { type: 'navigate'; newDate: Date } | null;
+
+export function normalizeVisibleMonths(
+	value: CalendarVisibleMonths | undefined
+): CalendarVisibleMonths {
+	return value === 2 ? 2 : 1;
+}
+
+export function formatVisibleMonthRangeLabel(
+	year: number,
+	month: number,
+	locale: string,
+	visibleMonths: CalendarVisibleMonths = 1
+): string {
+	const monthCount = normalizeVisibleMonths(visibleMonths);
+	const firstDate = new Date(year, month, 1);
+	const firstLabel = formatDate(firstDate, locale, {
+		month: 'long',
+		year: 'numeric'
+	});
+
+	if (monthCount === 1) return firstLabel;
+
+	const lastDate = new Date(year, month + monthCount - 1, 1);
+	const lastLabel = formatDate(lastDate, locale, {
+		month: 'long',
+		year: 'numeric'
+	});
+
+	if (firstDate.getFullYear() !== lastDate.getFullYear()) {
+		return `${firstLabel} - ${lastLabel}`;
+	}
+
+	const firstMonthLabel = formatDate(firstDate, locale, { month: 'long' });
+	return `${firstMonthLabel} - ${lastLabel}`;
+}
 
 export function generateWeekdayLabels(locale: string, weekStartDay: number): string[] {
 	const formatter = new Intl.DateTimeFormat(locale, { weekday: 'narrow' });

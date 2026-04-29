@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { getCalendarCtx } from './context.svelte.js';
-	import { formatDate } from '@dryui/primitives';
+	import { formatVisibleMonthRangeLabel } from '../internal/calendar-grid-utils.js';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {}
 
@@ -10,10 +10,7 @@
 	const ctx = getCalendarCtx();
 
 	const monthYearLabel = $derived(
-		formatDate(new Date(ctx.viewYear, ctx.viewMonth, 1), ctx.locale, {
-			month: 'long',
-			year: 'numeric'
-		})
+		formatVisibleMonthRangeLabel(ctx.viewYear, ctx.viewMonth, ctx.locale, ctx.visibleMonths)
 	);
 </script>
 

@@ -2,17 +2,27 @@
 	import AreaGridShell from './area-grid-shell.svelte';
 
 	export type AreaGridPlaceholderProps = {
-		area: string;
+		area?: string;
+		label?: string;
 	};
 
-	let { area }: AreaGridPlaceholderProps = $props();
+	let { area, label }: AreaGridPlaceholderProps = $props();
+	const display = label ?? area ?? '';
 </script>
 
-<AreaGridShell --dry-grid-area-name={area}>
-	<div data-area-grid-placeholder>
-		<span>{area}</span>
-	</div>
-</AreaGridShell>
+{#if area}
+	<AreaGridShell --dry-grid-area-name={area}>
+		<div data-area-grid-placeholder>
+			<span>{display}</span>
+		</div>
+	</AreaGridShell>
+{:else}
+	<AreaGridShell>
+		<div data-area-grid-placeholder>
+			<span>{display}</span>
+		</div>
+	</AreaGridShell>
+{/if}
 
 <style>
 	[data-area-grid-placeholder] {

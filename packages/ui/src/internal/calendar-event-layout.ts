@@ -7,6 +7,8 @@ export type CalendarEventDisplay = 'dots' | 'bars';
 
 export type CalendarEventPosition = 'single' | 'start' | 'middle' | 'end';
 
+export type CalendarVisibleMonths = 1 | 2;
+
 export interface CalendarEventItem {
 	id: string;
 	title: string;
@@ -48,6 +50,7 @@ export interface CalendarEventGridProps extends HTMLAttributes<HTMLDivElement> {
 	events?: readonly CalendarEventItem[];
 	eventDisplay?: CalendarEventDisplay;
 	maxEventLanes?: number;
+	visibleMonths?: CalendarVisibleMonths;
 	eventContent?: Snippet<[CalendarEventRenderContext]>;
 }
 

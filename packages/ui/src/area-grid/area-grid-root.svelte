@@ -6,11 +6,20 @@
 
 	export type AreaGridMaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
+	export type AreaGridTemplate =
+		| 'centered'
+		| 'sidebar'
+		| 'stack'
+		| 'holy-grail'
+		| '12-span'
+		| 'card-grid';
+
 	interface Props extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 		maxWidth?: AreaGridMaxWidth;
 		fill?: boolean;
 		debug?: boolean;
 		seams?: boolean;
+		template?: AreaGridTemplate;
 		children: Snippet;
 	}
 
@@ -19,6 +28,7 @@
 		fill = false,
 		debug = false,
 		seams = false,
+		template,
 		children,
 		class: className,
 		...rest
@@ -183,7 +193,12 @@
 	class={className}
 	{...rest}
 >
-	<section data-area-grid data-debug={debug || undefined} bind:this={gridEl}>
+	<section
+		data-area-grid
+		data-debug={debug || undefined}
+		data-template={template || undefined}
+		bind:this={gridEl}
+	>
 		{@render children()}
 		{#if seams}
 			<div data-area-grid-seam-layer bind:this={seamLayer} aria-hidden="true"></div>
@@ -274,6 +289,44 @@
 		justify-items: var(--_dry-area-grid-justify-items);
 		padding-block: var(--_dry-area-grid-padding-block);
 		padding-inline: var(--_dry-area-grid-padding-inline);
+	}
+
+	[data-area-grid][data-template='centered'] {
+		--dry-area-grid-template-areas: 'content';
+		--dry-area-grid-template-rows: minmax(0, 1fr);
+		--dry-area-grid-align-items: center;
+		--dry-area-grid-justify-items: center;
+	}
+
+	[data-area-grid][data-template='sidebar'] {
+		--dry-area-grid-template-areas: 'aside main';
+		--dry-area-grid-template-columns: minmax(
+				var(--dry-area-grid-sidebar-min, 150px),
+				var(--dry-area-grid-sidebar-max, 25%)
+			)
+			1fr;
+	}
+
+	[data-area-grid][data-template='stack'] {
+		--dry-area-grid-template-areas: 'masthead' 'main' 'foot';
+		--dry-area-grid-template-rows: auto 1fr auto;
+	}
+
+	[data-area-grid][data-template='holy-grail'] {
+		--dry-area-grid-template-areas: 'masthead masthead masthead' 'nav main aside' 'foot foot foot';
+		--dry-area-grid-template-columns: auto 1fr auto;
+		--dry-area-grid-template-rows: auto 1fr auto;
+	}
+
+	[data-area-grid][data-template='12-span'] {
+		--dry-area-grid-template-columns: repeat(12, minmax(0, 1fr));
+	}
+
+	[data-area-grid][data-template='card-grid'] {
+		--dry-area-grid-template-columns: repeat(
+			auto-fit,
+			minmax(var(--dry-area-grid-min-track, 16rem), 1fr)
+		);
 	}
 
 	[data-area-grid-seam-layer] {

@@ -97,6 +97,40 @@ describe('Calendar', () => {
 		expect(getHeading().textContent).toBe('May 2026');
 	});
 
+	it('can render two visible months without duplicate date targets', async () => {
+		render(CalendarHarness, {
+			max: new Date(2026, 4, 31),
+			visibleMonths: 2,
+			eventDisplay: 'bars',
+			events: [
+				{
+					id: 'may-event',
+					title: 'May event',
+					start: new Date(2026, 4, 1),
+					kind: 'trip',
+					tone: 'info'
+				}
+			]
+		});
+		flushSync();
+
+		expect(getGrid().getAttribute('data-visible-months')).toBe('2');
+		expect(getGrid().querySelectorAll('[data-calendar-month-panel]')).toHaveLength(2);
+		expect(getGrid().querySelectorAll('[data-calendar-month-heading]')).toHaveLength(0);
+		expect(getHeading().textContent).toBe('April - May 2026');
+		expect(getGrid().textContent).not.toContain('April 2026');
+		expect(getGrid().textContent).not.toContain('May 2026');
+		expect(document.querySelectorAll('[data-calendar-day="2026-05-01"]')).toHaveLength(1);
+		expect(getCell('2026-05-01').hasAttribute('data-outside-month')).toBe(false);
+		expect(getCalendarEvents('2026-05-01')).toHaveLength(1);
+
+		const april30 = getDay('2026-04-30');
+		april30.focus();
+
+		await pressKey(april30, 'ArrowRight');
+		expect(document.activeElement).toBe(getDay('2026-05-01'));
+	});
+
 	it('updates the bound value when an available day is clicked', () => {
 		render(CalendarHarness);
 

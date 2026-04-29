@@ -5,12 +5,18 @@
 		type CalendarGridAdapter
 	} from '../internal/calendar-grid-button.svelte';
 	import type { CalendarEventGridProps } from '../internal/calendar-event-layout.js';
+	import { normalizeVisibleMonths } from '../internal/calendar-grid-utils.js';
 
 	interface Props extends CalendarEventGridProps {}
 
 	let props: Props = $props();
 
 	const ctx = getCalendarCtx();
+	const visibleMonthCount = $derived(normalizeVisibleMonths(props.visibleMonths));
+
+	$effect.pre(() => {
+		ctx.monthView.visibleMonths = visibleMonthCount;
+	});
 
 	const adapter: CalendarGridAdapter = {
 		get viewYear() {

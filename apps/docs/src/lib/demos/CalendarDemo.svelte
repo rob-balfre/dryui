@@ -53,7 +53,7 @@
 			<Calendar.Heading />
 			<Calendar.Next />
 		</Calendar.Header>
-		<Calendar.Grid events={tripEvents} eventDisplay="bars" maxEventLanes={3} />
+		<Calendar.Grid events={tripEvents} eventDisplay="bars" maxEventLanes={3} visibleMonths={2} />
 	</Calendar.Root>
 </div>
 
@@ -94,7 +94,7 @@
 
 	:global(.trip-calendar) {
 		justify-self: center;
-		inline-size: min(100%, 44rem);
+		inline-size: min(100%, 68rem);
 	}
 
 	:global(

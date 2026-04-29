@@ -3,16 +3,26 @@ import type { HTMLAttributes } from 'svelte/elements';
 
 export type AreaGridMaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full';
 
+export type AreaGridTemplate =
+	| 'centered'
+	| 'sidebar'
+	| 'stack'
+	| 'holy-grail'
+	| '12-span'
+	| 'card-grid';
+
 export interface AreaGridRootProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
 	maxWidth?: AreaGridMaxWidth;
 	fill?: boolean;
 	debug?: boolean;
 	seams?: boolean;
+	template?: AreaGridTemplate;
 	children: Snippet;
 }
 
 export interface AreaGridPlaceholderProps {
-	area: string;
+	area?: string;
+	label?: string;
 }
 
 import AreaGridRoot from './area-grid-root.svelte';

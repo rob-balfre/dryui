@@ -11,7 +11,8 @@ export type {
 	CalendarEventItem,
 	CalendarEventPosition,
 	CalendarEventRenderContext,
-	CalendarEventTone
+	CalendarEventTone,
+	CalendarVisibleMonths
 } from '../internal/calendar-event-layout.js';
 
 export interface CalendarGridProps extends CalendarEventGridProps {}

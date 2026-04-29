@@ -35,7 +35,9 @@
 		splitIntoWeeks,
 		getDayISOString,
 		handleCalendarKeydown,
-		focusCalendarDay
+		focusCalendarDay,
+		normalizeVisibleMonths,
+		formatVisibleMonthRangeLabel
 	} from './calendar-grid-utils.js';
 	import {
 		layoutCalendarEvents,
@@ -50,29 +52,64 @@
 		hideHeader?: boolean;
 	}
 
+	interface CalendarMonthPanel {
+		index: number;
+		year: number;
+		month: number;
+		label: string;
+		days: Date[];
+		weeks: Date[][];
+	}
+
 	let {
 		adapter,
 		hideHeader = false,
 		events = [],
 		eventDisplay = 'dots',
 		maxEventLanes = 3,
+		visibleMonths = 1,
 		eventContent,
 		class: className,
 		...rest
 	}: Props = $props();
 
 	const weekdayLabels = $derived(generateWeekdayLabels(adapter.locale, adapter.weekStartDay));
-	const calendarDays = $derived(
-		getCalendarDays(adapter.viewYear, adapter.viewMonth, adapter.weekStartDay)
+	const monthCount = $derived(normalizeVisibleMonths(visibleMonths));
+	const monthPanels = $derived.by(() =>
+		Array.from({ length: monthCount }, (_, index) => getMonthPanel(index))
+	);
+	const calendarDays = $derived.by(() =>
+		monthPanels.flatMap((panel) =>
+			monthCount === 1 ? panel.days : panel.days.filter((day) => isInPanelMonth(day, panel))
+		)
 	);
 	const monthYearLabel = $derived(
-		formatDate(new Date(adapter.viewYear, adapter.viewMonth, 1), adapter.locale, {
-			month: 'long',
-			year: 'numeric'
-		})
+		formatVisibleMonthRangeLabel(adapter.viewYear, adapter.viewMonth, adapter.locale, monthCount)
 	);
-	const weeks = $derived(splitIntoWeeks(calendarDays));
 	const eventLayout = $derived(layoutCalendarEvents({ days: calendarDays, events, maxEventLanes }));
+
+	function getMonthPanel(index: number): CalendarMonthPanel {
+		const monthDate = new Date(adapter.viewYear, adapter.viewMonth + index, 1);
+		const year = monthDate.getFullYear();
+		const month = monthDate.getMonth();
+		const days = getCalendarDays(year, month, adapter.weekStartDay);
+
+		return {
+			index,
+			year,
+			month,
+			label: formatDate(monthDate, adapter.locale, {
+				month: 'long',
+				year: 'numeric'
+			}),
+			days,
+			weeks: splitIntoWeeks(days)
+		};
+	}
+
+	function isInPanelMonth(day: Date, panel: CalendarMonthPanel): boolean {
+		return day.getFullYear() === panel.year && day.getMonth() === panel.month;
+	}
 
 	function handleDayClick(day: Date) {
 		if (!isDateInRange(day, adapter.min, adapter.max)) return;
@@ -132,6 +169,7 @@
 	{...rest}
 	data-calendar-grid
 	data-calendar-grid-headerless={hideHeader ? '' : undefined}
+	data-visible-months={monthCount}
 >
 	<div role="group" aria-label={monthYearLabel} data-calendar-panel>
 		{#if !hideHeader}
@@ -162,102 +200,113 @@
 			</div>
 		{/if}
 
-		<div role="grid" aria-label={monthYearLabel}>
-			<div role="row" data-calendar-row>
-				{#each weekdayLabels as label, i (i)}
-					<div role="columnheader" aria-label={label} data-calendar-columnheader>
-						<span aria-hidden="true">{label}</span>
-					</div>
-				{/each}
-			</div>
-
-			{#each weeks as week, weekIndex (weekIndex)}
-				<div role="row" data-calendar-row>
-					{#each week as day (getDayISOString(day))}
-						{@const isCurrent = day.getMonth() === adapter.viewMonth}
-						{@const selected = adapter.isSelected(day)}
-						{@const today = isToday(day)}
-						{@const disabled = !isDateInRange(day, adapter.min, adapter.max)}
-						{@const focused = isSameDay(day, adapter.focusedDate)}
-						{@const isoStr = getDayISOString(day)}
-						{@const inRange = adapter.isInRange(day)}
-						{@const rangeStart = adapter.isRangeStart(day)}
-						{@const rangeEnd = adapter.isRangeEnd(day)}
-						{@const dayEvents = eventLayout.get(isoStr)}
-						<div
-							role="gridcell"
-							data-calendar-cell
-							data-selected={selected ? '' : undefined}
-							data-today={today ? '' : undefined}
-							data-outside-month={!isCurrent ? '' : undefined}
-							data-in-range={inRange ? '' : undefined}
-							data-range-start={rangeStart ? '' : undefined}
-							data-range-end={rangeEnd ? '' : undefined}
-							data-has-events={dayEvents && dayEvents.events.length > 0 ? '' : undefined}
-						>
-							<Button
-								variant="trigger"
-								size="icon-sm"
-								type="button"
-								tabindex={focused ? 0 : -1}
-								aria-label={getDayLabel(day, dayEvents?.summary ?? '')}
-								aria-pressed={selected}
-								aria-disabled={disabled}
-								data-calendar-day={isoStr}
-								{disabled}
-								onclick={() => handleDayClick(day)}
-								onkeydown={(e) => handleDayKeydown(e, day)}
-								onmouseenter={() => adapter.onHover?.(day)}
-								onmouseleave={() => adapter.onHover?.(null)}
-							>
-								{day.getDate()}
-							</Button>
-							{#if dayEvents && dayEvents.events.length > 0}
-								<div
-									data-calendar-events
-									data-calendar-events-display={eventDisplay}
-									aria-hidden="true"
-								>
-									{#if eventDisplay === 'dots'}
-										{#each getEventPieces(dayEvents.piecesByLane) as piece (piece.event.id)}
-											<span
-												data-calendar-event
-												data-calendar-event-kind={piece.event.kind}
-												data-calendar-event-tone={piece.event.tone ?? 'neutral'}
-												data-calendar-event-position={piece.position}
-											>
-												{#if eventContent}
-													{@render eventContent(getEventContext(piece, eventDisplay))}
-												{/if}
-											</span>
-										{/each}
-									{:else}
-										{#each dayEvents.piecesByLane as piece, lane (lane)}
-											{#if piece}
-												<span
-													data-calendar-event
-													data-calendar-event-kind={piece.event.kind}
-													data-calendar-event-tone={piece.event.tone ?? 'neutral'}
-													data-calendar-event-position={piece.position}
-												>
-													{#if eventContent}
-														{@render eventContent(getEventContext(piece, eventDisplay))}
-													{:else}
-														<span data-calendar-event-label>{piece.event.title}</span>
-													{/if}
-												</span>
-											{:else}
-												<span data-calendar-event-slot data-calendar-event-empty></span>
-											{/if}
-										{/each}
-									{/if}
-									{#if dayEvents.overflowCount > 0}
-										<span data-calendar-event-overflow>+{dayEvents.overflowCount}</span>
-									{/if}
+		<div data-calendar-panels>
+			{#each monthPanels as panel (`${panel.year}-${panel.month}`)}
+				<div role="group" aria-label={panel.label} data-calendar-month-panel>
+					<div role="grid" aria-label={panel.label}>
+						<div role="row" data-calendar-row>
+							{#each weekdayLabels as label, i (i)}
+								<div role="columnheader" aria-label={label} data-calendar-columnheader>
+									<span aria-hidden="true">{label}</span>
 								</div>
-							{/if}
+							{/each}
 						</div>
-					{/each}
+
+						{#each panel.weeks as week, weekIndex (weekIndex)}
+							<div role="row" data-calendar-row>
+								{#each week as day (`${panel.year}-${panel.month}-${getDayISOString(day)}`)}
+									{@const isCurrent = isInPanelMonth(day, panel)}
+									{@const isInteractive = monthCount === 1 || isCurrent}
+									{@const selected = isInteractive && adapter.isSelected(day)}
+									{@const today = isToday(day)}
+									{@const disabled = !isDateInRange(day, adapter.min, adapter.max)}
+									{@const focused = isInteractive && isSameDay(day, adapter.focusedDate)}
+									{@const isoStr = getDayISOString(day)}
+									{@const inRange = isInteractive && adapter.isInRange(day)}
+									{@const rangeStart = isInteractive && adapter.isRangeStart(day)}
+									{@const rangeEnd = isInteractive && adapter.isRangeEnd(day)}
+									{@const dayEvents = isInteractive ? eventLayout.get(isoStr) : undefined}
+									<div
+										role="gridcell"
+										data-calendar-cell
+										data-selected={selected ? '' : undefined}
+										data-today={today ? '' : undefined}
+										data-outside-month={!isCurrent ? '' : undefined}
+										data-in-range={inRange ? '' : undefined}
+										data-range-start={rangeStart ? '' : undefined}
+										data-range-end={rangeEnd ? '' : undefined}
+										data-has-events={dayEvents && dayEvents.events.length > 0 ? '' : undefined}
+									>
+										{#if isInteractive}
+											<Button
+												variant="trigger"
+												size="icon-sm"
+												type="button"
+												tabindex={focused ? 0 : -1}
+												aria-label={getDayLabel(day, dayEvents?.summary ?? '')}
+												aria-pressed={selected}
+												aria-disabled={disabled}
+												data-calendar-day={isoStr}
+												{disabled}
+												onclick={() => handleDayClick(day)}
+												onkeydown={(e) => handleDayKeydown(e, day)}
+												onmouseenter={() => adapter.onHover?.(day)}
+												onmouseleave={() => adapter.onHover?.(null)}
+											>
+												{day.getDate()}
+											</Button>
+										{:else}
+											<span data-calendar-day-placeholder aria-hidden="true">{day.getDate()}</span>
+										{/if}
+										{#if dayEvents && dayEvents.events.length > 0}
+											<div
+												data-calendar-events
+												data-calendar-events-display={eventDisplay}
+												aria-hidden="true"
+											>
+												{#if eventDisplay === 'dots'}
+													{#each getEventPieces(dayEvents.piecesByLane) as piece (piece.event.id)}
+														<span
+															data-calendar-event
+															data-calendar-event-kind={piece.event.kind}
+															data-calendar-event-tone={piece.event.tone ?? 'neutral'}
+															data-calendar-event-position={piece.position}
+														>
+															{#if eventContent}
+																{@render eventContent(getEventContext(piece, eventDisplay))}
+															{/if}
+														</span>
+													{/each}
+												{:else}
+													{#each dayEvents.piecesByLane as piece, lane (lane)}
+														{#if piece}
+															<span
+																data-calendar-event
+																data-calendar-event-kind={piece.event.kind}
+																data-calendar-event-tone={piece.event.tone ?? 'neutral'}
+																data-calendar-event-position={piece.position}
+															>
+																{#if eventContent}
+																	{@render eventContent(getEventContext(piece, eventDisplay))}
+																{:else}
+																	<span data-calendar-event-label>{piece.event.title}</span>
+																{/if}
+															</span>
+														{:else}
+															<span data-calendar-event-slot data-calendar-event-empty></span>
+														{/if}
+													{/each}
+												{/if}
+												{#if dayEvents.overflowCount > 0}
+													<span data-calendar-event-overflow>+{dayEvents.overflowCount}</span>
+												{/if}
+											</div>
+										{/if}
+									</div>
+								{/each}
+							</div>
+						{/each}
+					</div>
 				</div>
 			{/each}
 		</div>
@@ -276,6 +325,7 @@
 
 		display: grid;
 		gap: var(--dry-space-2);
+		container-type: inline-size;
 		user-select: none;
 		color: var(--dry-color-text-strong);
 		font-family: var(--dry-font-sans);
@@ -289,6 +339,23 @@
 
 	[data-calendar-grid][data-calendar-grid-headerless] [data-calendar-panel] {
 		grid-template-rows: minmax(0, 1fr);
+	}
+
+	[data-calendar-grid] [data-calendar-panels] {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-4);
+	}
+
+	[data-calendar-grid][data-visible-months='2'] [data-calendar-panels] {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	[data-calendar-grid] [data-calendar-month-panel] {
+		display: grid;
+		align-content: start;
+		gap: var(--dry-space-2);
+		min-inline-size: 0;
 	}
 
 	[data-calendar-grid] [data-calendar-header] {
@@ -361,6 +428,16 @@
 
 	[data-calendar-grid] [data-calendar-cell][data-outside-month] {
 		opacity: 0.4;
+	}
+
+	[data-calendar-grid] [data-calendar-day-placeholder] {
+		display: grid;
+		place-items: center;
+		inline-size: var(--dry-space-10);
+		block-size: var(--dry-space-10);
+		color: var(--dry-color-text-weak);
+		font-size: var(--dry-type-small-size);
+		line-height: 1;
 	}
 
 	[data-calendar-grid] [data-calendar-events] {
@@ -469,5 +546,11 @@
 	[data-calendar-grid] [data-calendar-event-tone='danger'] {
 		--dry-calendar-event-bg: var(--dry-color-fill-error-weak);
 		--dry-calendar-event-color: var(--dry-color-text-error);
+	}
+
+	@container (max-width: 48rem) {
+		[data-calendar-grid][data-visible-months='2'] [data-calendar-panels] {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 </style>

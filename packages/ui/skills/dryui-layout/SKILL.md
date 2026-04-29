@@ -36,6 +36,44 @@ Inter-region spacing (between two areas) is still each region's surface concern 
 
 The Root sets `container-type: inline-size` on itself, so every child can use container queries against the grid's own width.
 
+## Templates (presets)
+
+Six named templates encode the most common layouts so you don't author template-areas strings unless you need a custom shape. Set via the `template` prop. Each preset corresponds to a layout from [1linelayouts.com](https://1linelayouts.com/), translated into named areas where applicable.
+
+| `template`   | Areas                                                                                | When to use                                                                      |
+| ------------ | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| `centered`   | `content` (single area, both axes centered via `place-items`)                        | Auth screen, splash, error page, single-card empty state.                        |
+| `sidebar`    | `aside`, `main`                                                                      | Docs, settings, two-pane app shell. Sidebar is `minmax(150px, 25%)`, main `1fr`. |
+| `stack`      | `masthead`, `main`, `foot`                                                           | Page with fixed header/footer and flexible main (Pancake Stack).                 |
+| `holy-grail` | `masthead`, `nav`, `main`, `aside`, `foot`                                           | Classic three-column page with full-width header and footer.                     |
+| `12-span`    | none (children flow into 12 numbered columns)                                        | Marketing or dashboard sections that compose from a 12-column rhythm.            |
+| `card-grid`  | none (children flow with `repeat(auto-fit, minmax(--dry-area-grid-min-track, 1fr))`) | Card lists, gallery, RAM-style auto-responsive grids.                            |
+
+When `template` is set, you do **not** need to pass `--dry-area-grid-template-areas` (the lint relaxes `area-grid-required-var`). Each preset still composes with `-wide` and `-xl` overrides if you want to swap shapes at breakpoints.
+
+Optional knobs (Svelte `--prop` syntax):
+
+| Property                      | Used by     | Default |
+| ----------------------------- | ----------- | ------- |
+| `--dry-area-grid-sidebar-min` | `sidebar`   | `150px` |
+| `--dry-area-grid-sidebar-max` | `sidebar`   | `25%`   |
+| `--dry-area-grid-min-track`   | `card-grid` | `16rem` |
+
+```svelte
+<AreaGrid.Root template="sidebar" --dry-area-grid-sidebar-min="14rem">
+	<Nav --dry-grid-area-name="aside" />
+	<Article --dry-grid-area-name="main" />
+</AreaGrid.Root>
+
+<AreaGrid.Root template="card-grid" --dry-area-grid-min-track="14rem">
+	<Card.Root>…</Card.Root>
+	<Card.Root>…</Card.Root>
+	<Card.Root>…</Card.Root>
+</AreaGrid.Root>
+```
+
+Reach for hand-authored template-areas (next section) only when no preset fits: bespoke dashboards, asymmetric splits, or layouts that swap structure at breakpoints in ways the preset table can't express.
+
 ## Template areas family
 
 Set the template via Svelte `--prop` syntax on `AreaGrid.Root`. Each variant has a `-wide` (≥720px container) and `-xl` (≥1024px container) override.
