@@ -21,7 +21,7 @@ import {
 } from '../run.js';
 import { getDetect } from './detect.js';
 import { getFeedbackUiResult } from './feedback.js';
-import { runInit } from './init.js';
+import { resolveInitTargetPath, runInit } from './init.js';
 import { getInstallHookResult, getInstallHookStatus } from './install-hook.js';
 import { getInstall } from './install.js';
 import { runLauncher, runUserProjectLauncher } from './launcher.js';
@@ -926,7 +926,7 @@ async function runFeedbackSession(
 }
 
 export function getInitTargetStatus(projectPath: string): InitTargetStatus | null {
-	const targetPath = resolve(process.cwd(), projectPath);
+	const targetPath = resolveInitTargetPath(projectPath);
 	const targetExists = existsSync(targetPath);
 	const targetIsDirectory = targetExists ? statSync(targetPath).isDirectory() : false;
 
@@ -1136,7 +1136,7 @@ async function runInteractiveInit(spec: Spec): Promise<void> {
 	if (targetStatus?.kind === 'confirm') {
 		const confirmed = await promptConfirm(targetStatus.message, false, {
 			contextLines: [
-				`target: ${homeRelative(resolve(process.cwd(), projectPath))}`,
+				`target: ${homeRelative(resolveInitTargetPath(projectPath))}`,
 				`package-manager: ${packageManager}`
 			]
 		});

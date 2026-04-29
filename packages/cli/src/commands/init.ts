@@ -8,6 +8,7 @@ import {
 	readdirSync,
 	writeFileSync
 } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
@@ -53,7 +54,6 @@ interface InitOptions {
 	packageManager: DryuiPackageManager;
 	noLaunch: boolean;
 	noFeedback: boolean;
-	skipImpeccable: boolean;
 	devTarballsDir: string | null;
 }
 
@@ -88,18 +88,15 @@ function isPackageManager(value: string): value is ConcretePackageManager {
 }
 
 function printInitHelp(exitCode = 0): never {
-	console.log(
-		'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback] [--skip-impeccable]'
-	);
+	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
 	console.log('');
 	console.log('Bootstrap a SvelteKit + DryUI project.');
 	console.log('');
 	console.log('Options:');
 	console.log('  [path]             Target directory (default: current directory)');
 	console.log('  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)');
-	console.log('  --no-launch        Skip the feedback-mode launch prompt after scaffold');
+	console.log('  --no-launch        Skip launching feedback mode after scaffold');
 	console.log('  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />');
-	console.log('  --skip-impeccable  Skip installing impeccable design skills after scaffold');
 	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
 	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
 	process.exit(exitCode);
@@ -110,13 +107,25 @@ function failInitArgs(message: string): never {
 	process.exit(1);
 }
 
+function expandHomePath(path: string): string {
+	const home = process.env['HOME'] || homedir();
+	if (path === '~') return home;
+	if (path.startsWith('~/') || path.startsWith('~\\')) {
+		return resolve(home, path.slice(2));
+	}
+	return path;
+}
+
+export function resolveInitTargetPath(path: string): string {
+	return resolve(process.cwd(), expandHomePath(path));
+}
+
 function parseInitArgs(args: string[]): InitOptions {
 	let targetPath = process.cwd();
 	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
 	let noLaunch = false;
 	let noFeedback = false;
-	let skipImpeccable = false;
 	let devTarballsDir: string | null = null;
 
 	for (let i = 0; i < args.length; i++) {
@@ -136,7 +145,7 @@ function parseInitArgs(args: string[]): InitOptions {
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
 		} else if (arg === '--skip-impeccable') {
-			skipImpeccable = true;
+			// Deprecated no-op: init no longer installs impeccable by default.
 		} else if (arg === '--dev-tarballs') {
 			if (!next || next.startsWith('-')) {
 				failInitArgs('--dev-tarballs requires a directory');
@@ -146,7 +155,7 @@ function parseInitArgs(args: string[]): InitOptions {
 		} else if (arg.startsWith('-')) {
 			failInitArgs(`unknown option: ${arg}`);
 		} else if (!arg.startsWith('-')) {
-			targetPath = resolve(process.cwd(), arg);
+			targetPath = resolveInitTargetPath(arg);
 			userPath = arg;
 		}
 	}
@@ -157,7 +166,6 @@ function parseInitArgs(args: string[]): InitOptions {
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
 		noLaunch,
 		noFeedback,
-		skipImpeccable,
 		devTarballsDir
 	};
 }
@@ -400,21 +408,6 @@ function setupClaudeAgents(targetPath: string): boolean {
 	return result.sourceFound;
 }
 
-const IMPECCABLE_INSTALL_TIMEOUT_MS = 60_000;
-const IMPECCABLE_RETRY_HINT = 'Install later with: npx impeccable skills install';
-
-function installImpeccableSkillsDefault(cwd: string): boolean {
-	const result = spawnSync('npx', ['-y', 'impeccable', 'skills', 'install'], {
-		cwd,
-		stdio: 'inherit',
-		shell: false,
-		timeout: IMPECCABLE_INSTALL_TIMEOUT_MS
-	});
-	if (result.error) return false;
-	if (result.signal) return false;
-	return result.status === 0;
-}
-
 async function confirmPrompt(question: string, defaultYes: boolean): Promise<boolean> {
 	const previousRawMode = Boolean(input.isRaw);
 	if (typeof input.setRawMode === 'function') {
@@ -433,14 +426,6 @@ async function confirmPrompt(question: string, defaultYes: boolean): Promise<boo
 			input.setRawMode(previousRawMode);
 		}
 	}
-}
-
-function promptInstallImpeccableDefault(): Promise<boolean> {
-	return confirmPrompt('  Install impeccable design skills? (Y/n) ', true);
-}
-
-function promptLaunchFeedbackDefault(): Promise<boolean> {
-	return confirmPrompt('  Run this project in feedback mode now? (Y/n) ', true);
 }
 
 async function promptKillPortHolderDefault(holder: PortHolder, port: number): Promise<boolean> {
@@ -492,7 +477,6 @@ export async function runInit(
 		packageManager,
 		noLaunch,
 		noFeedback,
-		skipImpeccable,
 		devTarballsDir: explicitDevTarballsDir
 	} = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runProcessCommand;
@@ -620,44 +604,20 @@ export async function runInit(
 
 	const tty = (runtime.isInteractiveTTY ?? isInteractiveTTY)();
 
-	if (isScaffold && installsSucceeded && !skipImpeccable) {
-		// In interactive mode we ask once (default yes). Non-TTY runs (CI, pipes,
-		// `--yes`-style flows) default to yes and proceed silently. `--skip-impeccable`
-		// bypasses both paths. On failure we warn but never abort init.
-		const shouldInstall = tty
-			? await (runtime.promptInstallImpeccable ?? promptInstallImpeccableDefault)()
-			: true;
-		if (shouldInstall) {
-			log('');
-			log('  Installing impeccable design skills...');
-			const install = runtime.installImpeccable ?? installImpeccableSkillsDefault;
-			const ok = install(targetPath);
-			if (!ok) {
-				warn(`  Warning: impeccable install did not complete. ${IMPECCABLE_RETRY_HINT}`);
-			}
-		} else {
-			log(`  Skipped impeccable. ${IMPECCABLE_RETRY_HINT}`);
-		}
-	}
-
 	let launcherRan = false;
 	if (isScaffold && feedbackReady && !noLaunch && tty) {
 		log('');
-		const shouldLaunch = await (runtime.promptLaunch ?? promptLaunchFeedbackDefault)();
-		if (shouldLaunch) {
-			log('');
-			log('  Launching project in feedback mode...');
-			log('');
-			const launcherRuntime = {
-				promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
-			};
-			if (runtime.runLauncher) {
-				await runtime.runLauncher(targetPath, spec, launcherRuntime);
-			} else {
-				await runLauncherDefault(targetPath, spec, launcherRuntime);
-			}
-			launcherRan = true;
+		log('  Launching project in feedback mode...');
+		log('');
+		const launcherRuntime = {
+			promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
+		};
+		if (runtime.runLauncher) {
+			await runtime.runLauncher(targetPath, spec, launcherRuntime);
+		} else {
+			await runLauncherDefault(targetPath, spec, launcherRuntime);
 		}
+		launcherRan = true;
 	}
 
 	const cwdIsTarget = resolve(process.cwd()) === resolve(targetPath);

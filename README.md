@@ -68,7 +68,7 @@ Use `dryui check [path]` for static validation of component contracts, a11y, tok
 
 DryUI is components + tokens + contracts. It deliberately does not ship design opinion. For design-quality flows (brief, critique, polish, visual review, anti-pattern detection) DryUI delegates to [impeccable](https://impeccable.style), an Apache-2.0 licensed design skill + CLI authored by Paul Bakaus.
 
-`dryui init` offers to install impeccable alongside DryUI, or install later with:
+Install impeccable separately when you want design guidance:
 
 ```bash
 npx impeccable skills install
