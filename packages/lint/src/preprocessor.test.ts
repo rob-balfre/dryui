@@ -249,4 +249,33 @@ describe('dryuiLint preprocessor', () => {
 			});
 		}).not.toThrow();
 	});
+
+	test('auto-skips workspace-linked @dryui/* package source by package.json name', async () => {
+		const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+		const { tmpdir } = await import('node:os');
+		const { resolve } = await import('node:path');
+
+		// Simulate a `link:@dryui/feedback` resolution: the file lives at the
+		// real path of an `@dryui/feedback` package, NOT under node_modules.
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-lint-link-'));
+		const pkgDir = resolve(root, 'packages/feedback');
+		mkdirSync(resolve(pkgDir, 'src'), { recursive: true });
+		writeFileSync(
+			resolve(pkgDir, 'package.json'),
+			JSON.stringify({ name: '@dryui/feedback', version: '0.0.0' })
+		);
+		const filePath = resolve(pkgDir, 'src/feedback.svelte');
+
+		try {
+			const pp = dryuiLint({ strict: true, componentsOnly: true });
+			expect(() => {
+				pp.markup!({
+					content: '<div style="color: red">{@attach foo}</div>',
+					filename: filePath
+				});
+			}).not.toThrow();
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
 });

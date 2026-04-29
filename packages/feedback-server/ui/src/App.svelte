@@ -114,13 +114,16 @@
 	let submissions = $state<Submission[]>([]);
 	let dispatchTargets = $state<DispatchAgent[]>([]);
 	let targetAgent = $state<DispatchAgent | null>(null);
+	let dispatchSkillPath = $state<string | null>(null);
 	let bulkLaunching = $state(false);
 	let bulkLaunched = $state(false);
 	let bulkLaunchError = $state('');
 	let bulkLaunchTimer: ReturnType<typeof setTimeout> | undefined;
 	let focusApplied = false;
 
-	const bulkPrompt = buildFeedbackBulkPrompt();
+	const bulkPrompt = $derived(
+		buildFeedbackBulkPrompt(dispatchSkillPath ? { skillPath: dispatchSkillPath } : undefined)
+	);
 
 	function pickTargetAgent(
 		stored: DispatchAgent | null,
@@ -144,8 +147,10 @@
 			const body = (await response.json()) as {
 				defaultAgent?: DispatchAgent | 'off';
 				configuredAgents?: DispatchAgent[];
+				skillPath?: string | null;
 			};
 			dispatchTargets = body.configuredAgents ?? [];
+			dispatchSkillPath = body.skillPath ?? null;
 			const stored =
 				typeof window !== 'undefined'
 					? (window.localStorage.getItem(AGENT_STORAGE_KEY) as DispatchAgent | null)
@@ -576,6 +581,7 @@
 										{dispatchTargets}
 										{targetAgent}
 										{refreshing}
+										skillPath={dispatchSkillPath}
 										onChooseAgent={chooseTargetAgent}
 										onSetStatus={setSubmissionStatus}
 										onLaunch={dispatchAgent}
@@ -600,6 +606,7 @@
 										{dispatchTargets}
 										{targetAgent}
 										{refreshing}
+										skillPath={dispatchSkillPath}
 										onChooseAgent={chooseTargetAgent}
 										onSetStatus={setSubmissionStatus}
 										onLaunch={dispatchAgent}

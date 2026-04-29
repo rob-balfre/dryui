@@ -10,6 +10,7 @@
 		maxWidth?: AreaGridMaxWidth;
 		fill?: boolean;
 		debug?: boolean;
+		seams?: boolean;
 		children: Snippet;
 	}
 
@@ -17,6 +18,7 @@
 		maxWidth = 'xl',
 		fill = false,
 		debug = false,
+		seams = false,
 		children,
 		class: className,
 		...rest
@@ -160,7 +162,7 @@
 	}
 
 	$effect(() => {
-		if (!gridEl || !seamLayer) return;
+		if (!seams || !gridEl || !seamLayer) return;
 		syncSeams();
 		const ro = new ResizeObserver(scheduleSync);
 		const mo = new MutationObserver(scheduleSync);
@@ -183,7 +185,9 @@
 >
 	<section data-area-grid data-debug={debug || undefined} bind:this={gridEl}>
 		{@render children()}
-		<div data-area-grid-seam-layer bind:this={seamLayer} aria-hidden="true"></div>
+		{#if seams}
+			<div data-area-grid-seam-layer bind:this={seamLayer} aria-hidden="true"></div>
+		{/if}
 	</section>
 </section>
 

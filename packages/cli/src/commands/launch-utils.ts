@@ -1,7 +1,18 @@
 import { createHash } from 'node:crypto';
 import { execFileSync, spawn, spawnSync } from 'node:child_process';
-import { closeSync, existsSync, mkdirSync, openSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	closeSync,
+	copyFileSync,
+	existsSync,
+	mkdirSync,
+	openSync,
+	readFileSync,
+	readdirSync,
+	statSync,
+	writeFileSync
+} from 'node:fs';
 import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT } from '@dryui/feedback-server';
@@ -20,6 +31,99 @@ export function isDryuiDevMode(): boolean {
 	const flag = process.env['DRYUI_DEV'];
 	return flag === '1' || flag === 'true';
 }
+
+const DRYUI_DEV_LINKABLE_PACKAGES = [
+	'@dryui/ui',
+	'@dryui/primitives',
+	'@dryui/feedback',
+	'@dryui/lint'
+] as const;
+
+export interface SwapTarballOverridesResult {
+	readonly swapped: readonly string[];
+	readonly already: readonly string[];
+}
+
+const TARBALL_OVERRIDE_RE = /\.tgz$/i;
+
+function isTarballSpecifier(value: unknown): value is string {
+	return typeof value === 'string' && TARBALL_OVERRIDE_RE.test(value);
+}
+
+function rewriteOverrideMap(
+	map: Record<string, unknown> | undefined,
+	packages: readonly string[],
+	out: { swapped: Set<string>; already: Set<string> }
+): boolean {
+	if (!map) return false;
+	let mutated = false;
+	for (const name of packages) {
+		const value = map[name];
+		if (value === undefined) continue;
+		const linkSpec = `link:${name}`;
+		if (value === linkSpec) {
+			out.already.add(name);
+			continue;
+		}
+		if (!isTarballSpecifier(value)) continue;
+		map[name] = linkSpec;
+		out.swapped.add(name);
+		mutated = true;
+	}
+	return mutated;
+}
+
+/**
+ * In `DRYUI_DEV=1` flows, the consumer's package.json may pin DryUI packages
+ * to a local tarball (`/path/dryui-ui-2.0.2.tgz`) under `overrides`/
+ * `resolutions`/`pnpm.overrides`. The override wins over `bun link`, so the
+ * project keeps installing a frozen tarball even after the workspace has
+ * registered the package. Rewriting these specifiers to `link:<pkg>` lets the
+ * package manager pull the workspace symlink for live source iteration.
+ *
+ * Returns the packages whose specifier changed (so the caller can run a
+ * single `bun install` afterward) plus the ones that were already linked.
+ */
+export function swapDryuiTarballOverridesToLinks(
+	cwd: string,
+	packages: readonly string[] = DRYUI_DEV_LINKABLE_PACKAGES
+): SwapTarballOverridesResult {
+	const pkgPath = resolve(cwd, 'package.json');
+	let raw: string;
+	try {
+		raw = readFileSync(pkgPath, 'utf-8');
+	} catch {
+		return { swapped: [], already: [] };
+	}
+
+	let pkg: Record<string, unknown>;
+	try {
+		pkg = JSON.parse(raw) as Record<string, unknown>;
+	} catch {
+		return { swapped: [], already: [] };
+	}
+
+	const tracker = { swapped: new Set<string>(), already: new Set<string>() };
+	let mutated = false;
+	mutated =
+		rewriteOverrideMap(pkg['overrides'] as Record<string, unknown>, packages, tracker) || mutated;
+	mutated =
+		rewriteOverrideMap(pkg['resolutions'] as Record<string, unknown>, packages, tracker) || mutated;
+	const pnpm = pkg['pnpm'] as { overrides?: Record<string, unknown> } | undefined;
+	mutated = rewriteOverrideMap(pnpm?.overrides, packages, tracker) || mutated;
+
+	if (mutated) {
+		const trailing = raw.endsWith('\n') ? '\n' : '';
+		writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}${trailing}`, 'utf-8');
+	}
+
+	return {
+		swapped: [...tracker.swapped],
+		already: [...tracker.already]
+	};
+}
+
+export const DRYUI_DEV_LINKABLE_PACKAGE_NAMES = DRYUI_DEV_LINKABLE_PACKAGES;
 
 export function resolveFeedbackServerEntry(options: FeedbackServerEntryOptions = {}): string {
 	const { workspaceRoot, preferPackaged = false } = options;
@@ -393,6 +497,20 @@ export function installPackage(options: InstallPackageOptions): boolean {
 	return result.status === 0;
 }
 
+export interface RunPackageManagerInstallOptions {
+	cwd: string;
+	packageManager: Exclude<DryuiPackageManager, 'unknown'>;
+}
+
+/** Runs a no-arg `<pm> install` so package.json edits (overrides, deps) are applied. */
+export function runPackageManagerInstall(options: RunPackageManagerInstallOptions): boolean {
+	const result = spawnSync(options.packageManager, ['install'], {
+		cwd: options.cwd,
+		stdio: 'inherit'
+	});
+	return result.status === 0;
+}
+
 export interface LinkPackageOptions {
 	cwd: string;
 	packageManager: Exclude<DryuiPackageManager, 'unknown'>;
@@ -468,7 +586,17 @@ export function findViteConfig(root: string): string | null {
 	return null;
 }
 
-export const FEEDBACK_SSR_NO_EXTERNAL = ['@dryui/feedback', 'lucide-svelte'] as const;
+// Always wired into the consumer's `ssr.noExternal`. `@dryui/ui` and
+// `@dryui/primitives` go in so Vite's plugin pipeline processes them and the
+// "development" exports condition resolves to `src/` during `vite dev`. Without
+// this, Vite pre-bundles them once and never re-checks, so workspace edits
+// don't reflect until you blow the dep cache.
+export const FEEDBACK_SSR_NO_EXTERNAL = [
+	'@dryui/ui',
+	'@dryui/primitives',
+	'@dryui/feedback',
+	'lucide-svelte'
+] as const;
 
 export function escapeRegExp(input: string): string {
 	return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -576,4 +704,77 @@ export function patchViteConfigFeedbackNoExternal(configPath: string): boolean {
 	} catch {
 		return false;
 	}
+}
+
+export interface EnsureClaudeAgentsResult {
+	readonly sourceFound: boolean;
+	readonly copied: readonly string[];
+	readonly updated: readonly string[];
+}
+
+/**
+ * Mirror the bundled Claude Code subagents (`feedback`, `dryui-layout`) from
+ * `<cli-pkg>/agents/` into `<project>/.claude/agents/`. Idempotent: copies
+ * missing files and refreshes ones whose source is newer than the project
+ * copy. Existing customised copies (older than the source mtime) are
+ * preserved so users who edited their `.claude/agents/feedback.md` aren't
+ * silently clobbered — they can `rm` the file to take a re-copy.
+ *
+ * Why this lives outside `init`: when `--agent feedback` runs in a project
+ * that has no `.claude/agents/feedback.md`, the agent's frontmatter
+ * (including `permissionMode: auto`) never loads — and the parent CLI's
+ * `--permission-mode auto` is silently ignored when `--agent` is set. The
+ * launcher calls this on every run so existing projects (where init never
+ * had this step) catch up without needing a manual reinit.
+ */
+export function ensureClaudeAgents(projectRoot: string): EnsureClaudeAgentsResult {
+	let here: string;
+	try {
+		here = fileURLToPath(import.meta.url);
+	} catch {
+		return { sourceFound: false, copied: [], updated: [] };
+	}
+
+	// `here` resolves to either `<cli-pkg>/dist/index.js` (bundled) or
+	// `<cli-pkg>/src/commands/launch-utils.ts` (source mode). Walk up to the
+	// package root in both shapes.
+	const distAgents = resolve(dirname(here), '..', 'agents');
+	const srcAgents = resolve(dirname(here), '..', '..', 'agents');
+	const sourceDir = existsSync(distAgents) ? distAgents : existsSync(srcAgents) ? srcAgents : null;
+	if (!sourceDir) return { sourceFound: false, copied: [], updated: [] };
+
+	let entries: string[];
+	try {
+		entries = readdirSync(sourceDir).filter((name) => name.endsWith('.md'));
+	} catch {
+		return { sourceFound: false, copied: [], updated: [] };
+	}
+	if (entries.length === 0) return { sourceFound: true, copied: [], updated: [] };
+
+	const targetDir = resolve(projectRoot, '.claude', 'agents');
+	mkdirSync(targetDir, { recursive: true });
+
+	const copied: string[] = [];
+	const updated: string[] = [];
+	for (const name of entries) {
+		const src = resolve(sourceDir, name);
+		const dest = resolve(targetDir, name);
+		try {
+			if (!existsSync(dest)) {
+				copyFileSync(src, dest);
+				copied.push(name);
+				continue;
+			}
+			const srcStat = statSync(src);
+			const destStat = statSync(dest);
+			if (srcStat.mtimeMs > destStat.mtimeMs) {
+				copyFileSync(src, dest);
+				updated.push(name);
+			}
+		} catch {
+			// Best-effort: keep going if a single file copy fails.
+		}
+	}
+
+	return { sourceFound: true, copied, updated };
 }

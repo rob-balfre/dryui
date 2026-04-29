@@ -7,6 +7,7 @@ export interface AreaGridRootProps extends Omit<HTMLAttributes<HTMLElement>, 'ch
 	maxWidth?: AreaGridMaxWidth;
 	fill?: boolean;
 	debug?: boolean;
+	seams?: boolean;
 	children: Snippet;
 }
 

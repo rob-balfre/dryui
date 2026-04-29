@@ -9,6 +9,7 @@ import {
 	type DispatchAgent,
 	type DispatcherOptions
 } from './dispatch.js';
+import { resolveDispatchSkillPath } from './skill-path.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
 import type {
@@ -383,7 +384,8 @@ export function startFeedbackHttpServer(
 					if (!options.dispatcher) {
 						return json({
 							defaultAgent: 'codex',
-							configuredAgents: []
+							configuredAgents: [],
+							skillPath: resolveDispatchSkillPath()
 						});
 					}
 

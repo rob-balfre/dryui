@@ -43,7 +43,7 @@ function printDevModeBanner(): void {
 	const FG = '\x1b[38;5;221m';
 	console.log(`${BG} ⚠  DRYUI_DEV=1 — LOCAL SOURCE MODE ${RESET}`);
 	console.log(
-		`${FG}Running from packages/*/src/, not dist/. Unset DRYUI_DEV to match published.${RESET}`
+		`${FG}Running from packages/*/src/, not dist/. Set DRYUI_DEV=0 to force the published path.${RESET}`
 	);
 	console.log('');
 }

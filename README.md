@@ -93,35 +93,34 @@ Run `dryui`, `dryui-mcp`, and `dryui-feedback-mcp` against the live `packages/*/
 One-time setup:
 
 ```bash
-bun run build:packages   # populates dist/ as the no-flag fallback
-bun run dev:link         # registers the three bins globally via `bun link`
+bun run build:packages   # populates dist/ as the DRYUI_DEV=0 fallback
+bun run dev:link         # registers each workspace package globally via `bun link`
 ```
 
-Per shell:
+That's it. The bins ship with workspace auto-detect: when invoked through the `bun link` symlink they spot the surrounding `packages/<name>/package.json` and `.git`, switch to source mode, and propagate `DRYUI_DEV=1` to their child process. So:
 
 ```bash
-export DRYUI_DEV=1
-dryui list               # runs packages/cli/src/index.ts
+dryui list               # auto-runs packages/cli/src/index.ts
 dryui-mcp                # MCP server straight from src
-dryui feedback server    # spawns packages/feedback-server/src/server.ts
+dryui-feedback-mcp       # feedback MCP server from src
 ```
 
-Edits in `packages/cli/src/`, `packages/mcp/src/`, or `packages/feedback-server/src/` show up on the next invocation. Without `DRYUI_DEV` the same bins import `dist/`, matching the published behaviour.
+Each invocation prints a one-line `DRYUI_DEV=1 — LOCAL SOURCE MODE` banner so you can tell at a glance which path you're on. Edits in `packages/*/src/` show up on the next invocation — no rebuild required. To force the published path (e.g. to test the dist artifact), set `DRYUI_DEV=0` before running.
 
-For the `@dryui/feedback` widget (consumed at build/SSR time, not per-invocation), `dev:link` also registers the package and the launcher swaps `bun add` for `bun link @dryui/feedback` when `DRYUI_DEV=1`. The package's `exports` map carries a `"development"` condition pointing at `src/`, so once linked, `vite dev` in `~/yourproject` resolves through source and picks up edits via HMR — no rebuild needed. Production builds fall through to `dist/`.
+Workspace packages registered by `dev:link` (`@dryui/ui`, `@dryui/primitives`, `@dryui/feedback`, `@dryui/lint`) all carry a `"development"` exports condition pointing at `src/` and ship `src/` in their tarballs. Combined with the launcher's `DRYUI_DEV` flow — which rewrites tarball overrides in your project's `package.json` to `link:<pkg>` and adds the packages to `ssr.noExternal` — `vite dev` in `~/yourproject` resolves through workspace source and picks up Svelte edits via HMR. Production builds fall through to `dist/` automatically.
 
-For editor MCP entries, point at the linked bin and pass the env flag:
+For editor MCP entries, point at the linked bin. Auto-detect handles the rest, but the explicit env flag is fine to keep:
 
 ```jsonc
 {
 	"mcpServers": {
-		"dryui": { "command": "dryui-mcp", "env": { "DRYUI_DEV": "1" } },
-		"dryui-feedback": { "command": "dryui-feedback-mcp", "env": { "DRYUI_DEV": "1" } }
+		"dryui": { "command": "dryui-mcp" },
+		"dryui-feedback": { "command": "dryui-feedback-mcp" }
 	}
 }
 ```
 
-The `<Feedback />` widget and `@dryui/ui` components already resolve to source for any workspace consumer (the docs app, tests, etc.) via the `bun`/`svelte` export conditionals, so `bun run docs` HMR picks up Svelte edits with no extra setup. For live rebuilds of the dashboard UI bundle, run `bun run dev:ui:watch` in a sidecar; override the served path with `DRYUI_FEEDBACK_UI_DIR` if needed.
+The `<Feedback />` widget and `@dryui/ui` components already resolve to source for any in-repo consumer (the docs app, tests, etc.) via the `bun`/`svelte` export conditionals, so `bun run docs` HMR picks up Svelte edits with no extra setup. For live rebuilds of the dashboard UI bundle, run `bun run dev:ui:watch` in a sidecar; override the served path with `DRYUI_FEEDBACK_UI_DIR` if needed.
 
 Tear down with `bun run dev:unlink`.
 

@@ -64,8 +64,16 @@
 		return cs.display === 'grid' || cs.display === 'inline-grid';
 	}
 
-	function isInsideAreaGrid(el: Element): boolean {
-		return !!el.closest('[data-area-grid-shell]');
+	function isContainerElement(el: HTMLElement, cs: CSSStyleDeclaration): boolean {
+		if (isGridContainer(cs)) return true;
+		if (el.children.length > 0) return true;
+		return ['article', 'aside', 'footer', 'form', 'header', 'main', 'nav', 'section'].includes(
+			el.tagName.toLowerCase()
+		);
+	}
+
+	function isAreaGridStructure(el: Element): boolean {
+		return el.matches('[data-area-grid-shell], [data-area-grid]');
 	}
 
 	function rectFor(el: HTMLElement): DOMRect {
@@ -80,21 +88,16 @@
 			const added = isAddedPlaceholder(el);
 			if (!added && isInsideFeedback(el)) continue;
 			if (isClone(el)) continue;
-			// AreaGrid territory belongs to Layout mode; skip anything at or inside a grid shell.
-			if (!added && isInsideAreaGrid(el)) continue;
+			// AreaGrid wrappers belong to Layout mode, but their child content should
+			// still be selectable and movable from Components mode.
+			if (!added && isAreaGridStructure(el)) continue;
 			const cs = getComputedStyle(el);
 			if (cs.display === 'none') continue;
 			if (cs.visibility === 'hidden' && !getClone(el)) continue;
 
-			const isGrid = isGridContainer(cs);
-			const parent = el.parentElement;
-			const parentIsGrid =
-				parent && !isInsideFeedback(parent) && isGridContainer(getComputedStyle(parent));
-
-			if (!added && !isGrid && !parentIsGrid) continue;
-
 			const rect = rectFor(el);
 			if (rect.width < 4 || rect.height < 4) continue;
+			const role = added || !isContainerElement(el, cs) ? 'cell' : 'container';
 
 			next.push({
 				key: key++,
@@ -103,7 +106,7 @@
 				y: rect.top,
 				w: rect.width,
 				h: rect.height,
-				role: added ? 'cell' : isGrid ? 'container' : 'cell'
+				role
 			});
 		}
 

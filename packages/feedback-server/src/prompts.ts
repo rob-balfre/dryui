@@ -5,6 +5,19 @@ export const FEEDBACK_LINTER_PROMPT_STEP =
 export const FEEDBACK_PIPELINE_PROMPT_STEP =
 	'If PRODUCT.md or DESIGN.md exists at the project root (these are impeccable-owned), read them for context; treat this feedback as the highest-priority user intent, then preserve the durable product/design identity unless the feedback clearly overrides it.';
 
+// Backwards-compatible default. Caller should pass the resolved absolute path
+// (see `skill-path.ts#resolveDispatchSkillPath`); falling back to this string
+// is only useful when the consumer happens to have `@dryui/feedback-server`
+// installed as a direct dep, which isn't the common case (the server usually
+// runs through a globally linked bin).
+export const DEFAULT_FEEDBACK_SKILL_REFERENCE =
+	'node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md';
+
+export interface FeedbackPromptOptions {
+	/** Absolute filesystem path to the canonical SKILL.md. */
+	skillPath?: string;
+}
+
 export function getTextNotes(drawings: readonly SubmissionDrawing[] | undefined): string[] {
 	if (!drawings) return [];
 	return drawings.flatMap((drawing) =>
@@ -14,8 +27,13 @@ export function getTextNotes(drawings: readonly SubmissionDrawing[] | undefined)
 	);
 }
 
+function skillReference(options: FeedbackPromptOptions | undefined): string {
+	return options?.skillPath ?? DEFAULT_FEEDBACK_SKILL_REFERENCE;
+}
+
 export function buildFeedbackDispatchPrompt(
-	s: Pick<Submission, 'id' | 'url' | 'drawings'>
+	s: Pick<Submission, 'id' | 'url' | 'drawings'>,
+	options?: FeedbackPromptOptions
 ): string {
 	const textNotes = getTextNotes(s.drawings);
 	const notes =
@@ -24,15 +42,15 @@ export function buildFeedbackDispatchPrompt(
 			: '';
 	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 
-Read your canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` first — it has the submission shape, the five intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
+Read your canonical skill at \`${skillReference(options)}\` first — it has the submission shape, the five intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
 
 ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 }
 
-export function buildFeedbackBulkPrompt(): string {
+export function buildFeedbackBulkPrompt(options?: FeedbackPromptOptions): string {
 	return `Process pending DryUI feedback submissions.
 
-For each submission, spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns the full per-submission workflow: fetching, reading the screenshot, decoding intents, editing source, running \`dryui check\`, and calling \`feedback_resolve_submission\`. Its canonical skill at \`node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md\` carries all the rules — AreaGrid no-gap, lint trip-wires, hand-off boundaries.
+For each submission, spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns the full per-submission workflow: fetching, reading the screenshot, decoding intents, editing source, running \`dryui check\`, and calling \`feedback_resolve_submission\`. Its canonical skill at \`${skillReference(options)}\` carries all the rules — AreaGrid no-gap, lint trip-wires, hand-off boundaries.
 
 Call \`feedback_get_submissions\` once at the start to enumerate pending ids, then dispatch one feedback subagent per submission.
 

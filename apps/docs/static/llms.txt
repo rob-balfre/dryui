@@ -566,7 +566,7 @@ grid-template-areas layout with component CSS variable-driven child area names.
 Import: @dryui/ui
 Subpath import: @dryui/ui/area-grid
 Parts: Root, Placeholder, Shell
-Props: Root: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | children (Snippet), Content rendered inside the component., required | Placeholder: area (string), required
+Props: Root: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | seams (boolean), default false | children (Snippet), Content rendered inside the component., required | Placeholder: area (string), required
 Data attributes: data-area-grid | data-area-grid-placeholder | data-area-grid-seam-layer | data-area-grid-shell | data-debug | data-fill | data-max-width
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example: <AreaGrid.Root

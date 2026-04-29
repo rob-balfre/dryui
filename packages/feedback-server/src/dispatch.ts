@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { createProbeCache, hasJsonEntry, type ProbeCache } from './config-probe.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
+import { ensureProjectSkillCopy, resolveDispatchSkillPath } from './skill-path.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
@@ -70,14 +71,24 @@ function resolveLocalPluginDir(): string | null {
 	return null;
 }
 
-// Default the dispatched claude session to Sonnet + auto permission mode.
-// Feedback work is small, surgical edits — Opus is overkill and noticeably
-// slower for this loop, and auto mode means the agent doesn't stall on
-// per-edit prompts for a workflow the user already opted into by clicking
-// "send feedback". Both are overridable via env so a session that genuinely
-// needs more horsepower or stricter prompting can switch without a code edit.
-const DEFAULT_CLAUDE_MODEL = 'sonnet';
+// Default the dispatched claude session to Opus + auto permission mode +
+// auto effort. Auto permission mode is gated by model+plan: on Max plans
+// only Opus 4.7 carries it, so we pin Opus (Sonnet 4.6 on Max says "auto
+// mode unavailable for this model"). Power users on Team/Enterprise/API
+// plans who want Sonnet+auto can set `DRYUI_FEEDBACK_MODEL=sonnet`.
+//
+// Effort=auto is the "model default" effort. Claude Code's `--effort` CLI
+// flag does NOT accept `auto` — only the named levels low/medium/high/
+// xhigh/max — but the `CLAUDE_CODE_EFFORT_LEVEL` env var does. We export it
+// in the spawned shell so the dispatched session boots with auto effort
+// without needing a `/effort auto` slash command. Pin a level via
+// `DRYUI_FEEDBACK_EFFORT` (low/medium/high/xhigh/max/auto). See:
+// https://code.claude.com/docs/en/model-config.md#set-the-effort-level
+// https://code.claude.com/docs/en/permission-modes.md#eliminate-prompts-with-auto-mode
+const DEFAULT_CLAUDE_MODEL = 'opus';
 const DEFAULT_CLAUDE_PERMISSION_MODE = 'auto';
+const DEFAULT_CLAUDE_EFFORT = 'auto';
+const VALID_CLAUDE_EFFORT_VALUES = new Set(['low', 'medium', 'high', 'xhigh', 'max', 'auto']);
 
 function resolveClaudeModel(): string {
 	const override = process.env['DRYUI_FEEDBACK_MODEL']?.trim();
@@ -89,15 +100,29 @@ function resolveClaudePermissionMode(): string {
 	return override && override.length > 0 ? override : DEFAULT_CLAUDE_PERMISSION_MODE;
 }
 
+function resolveClaudeEffort(): string {
+	const override = process.env['DRYUI_FEEDBACK_EFFORT']?.trim();
+	if (!override) return DEFAULT_CLAUDE_EFFORT;
+	if (!VALID_CLAUDE_EFFORT_VALUES.has(override)) {
+		console.error(
+			`[dispatch] DRYUI_FEEDBACK_EFFORT=${override} is not a valid level (${[...VALID_CLAUDE_EFFORT_VALUES].join(', ')}); falling back to ${DEFAULT_CLAUDE_EFFORT}.`
+		);
+		return DEFAULT_CLAUDE_EFFORT;
+	}
+	return override;
+}
+
 // Memoize: feedback-server is long-lived and the plugin path doesn't change
 // during a process lifetime. Avoid walking the filesystem on every dispatch.
 let claudeCliArgsCache: readonly string[] | null = null;
+let claudeCliEnvPrefixCache: string | null = null;
 
 function getCliArgs(target: keyof typeof TERMINAL_CLI): readonly string[] {
 	if (target !== 'claude') return TERMINAL_CLI[target];
 	if (claudeCliArgsCache) return claudeCliArgsCache;
 	const model = resolveClaudeModel();
 	const permissionMode = resolveClaudePermissionMode();
+	const effort = resolveClaudeEffort();
 	const localPlugin = resolveLocalPluginDir();
 	const args: string[] = [
 		...TERMINAL_CLI.claude,
@@ -106,13 +131,37 @@ function getCliArgs(target: keyof typeof TERMINAL_CLI): readonly string[] {
 		'--permission-mode',
 		permissionMode
 	];
+	// Only pass --effort for named levels; `auto` is set via env so it
+	// reaches the session default without a CLI flag rejection.
+	if (effort !== 'auto') {
+		args.push('--effort', effort);
+	}
 	if (localPlugin) {
 		console.error(`[dispatch] using local plugin: ${localPlugin}`);
 		args.push('--plugin-dir', localPlugin);
 	}
-	console.error(`[dispatch] claude model: ${model}, permission-mode: ${permissionMode}`);
+	console.error(
+		`[dispatch] claude model: ${model}, permission-mode: ${permissionMode}, effort: ${effort}`
+	);
 	claudeCliArgsCache = args;
 	return claudeCliArgsCache;
+}
+
+/** Shell-prefix env vars for the dispatched claude session, e.g. `CLAUDE_CODE_EFFORT_LEVEL='auto' `. */
+function getCliEnvPrefix(target: keyof typeof TERMINAL_CLI): string {
+	if (target !== 'claude') return '';
+	if (claudeCliEnvPrefixCache !== null) return claudeCliEnvPrefixCache;
+	const effort = resolveClaudeEffort();
+	const exports: Array<[string, string]> = [];
+	if (effort === 'auto') {
+		// `--effort auto` isn't accepted by the CLI; the env var is.
+		exports.push(['CLAUDE_CODE_EFFORT_LEVEL', effort]);
+	}
+	claudeCliEnvPrefixCache =
+		exports.length === 0
+			? ''
+			: exports.map(([key, value]) => `${key}=${shellQuote(value)}`).join(' ') + ' ';
+	return claudeCliEnvPrefixCache;
 }
 
 const APP_COMMANDS: Record<'cursor' | 'windsurf' | 'zed', readonly [string, ...string[]]> = {
@@ -140,6 +189,14 @@ export interface DispatcherOptions {
 interface DispatchTargetsSnapshot {
 	defaultAgent: DefaultDispatchAgent;
 	configuredAgents: DispatchAgent[];
+	/**
+	 * Absolute path to the canonical SKILL.md, resolved from the running
+	 * server's own package. The UI uses this when building the copy-paste
+	 * prompt so users don't paste a `node_modules/...` reference that won't
+	 * resolve in their project (the server is usually globally linked, not
+	 * a direct project dep).
+	 */
+	skillPath: string | null;
 }
 
 function shellQuote(s: string): string {
@@ -380,9 +437,14 @@ function isConfiguredAgent(
 
 export function getDispatchTargetsSnapshot(options: DispatcherOptions): DispatchTargetsSnapshot {
 	const cache = createProbeCache();
+	// Mirror the skill into the project once per snapshot so the UI's copy-paste
+	// prompt points at a path that's inside the project boundary (same rationale
+	// as the auto-dispatch path).
+	const skillPath = ensureProjectSkillCopy(options.workspace) ?? resolveDispatchSkillPath();
 	return {
 		defaultAgent: options.defaultAgent,
-		configuredAgents: DISPATCH_AGENTS.filter((agent) => isConfiguredAgent(agent, options, cache))
+		configuredAgents: DISPATCH_AGENTS.filter((agent) => isConfiguredAgent(agent, options, cache)),
+		skillPath
 	};
 }
 
@@ -424,7 +486,8 @@ function buildCliInvocation(
 
 	const cli = getCliArgs(target);
 	const cliArgs = cli.map((entry) => shellQuote(entry)).join(' ');
-	return `${cliArgs} ${shellQuote(prompt)}`;
+	const envPrefix = getCliEnvPrefix(target);
+	return `${envPrefix}${cliArgs} ${shellQuote(prompt)}`;
 }
 
 export function buildVsCodeChatArgs(prompt: string): string[] {
@@ -708,11 +771,16 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 		return;
 	}
 
-	const prompt = buildFeedbackDispatchPrompt(submission);
+	const dispatchWorkspace = submission.workspace ?? options.workspace;
+	// Mirror the skill into the project so the agent's Read stays inside the
+	// project root — `auto` permission mode still prompts on out-of-project
+	// reads, which is what was breaking the dispatched session.
+	const skillPath = ensureProjectSkillCopy(dispatchWorkspace);
+	const prompt = buildFeedbackDispatchPrompt(submission, skillPath ? { skillPath } : undefined);
 	console.error(`[dispatch] submission ${submission.id}`);
 	dispatchPrompt(target, prompt, {
 		...options,
-		workspace: submission.workspace ?? options.workspace
+		workspace: dispatchWorkspace
 	});
 }
 

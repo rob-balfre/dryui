@@ -2776,6 +2776,12 @@
 		}
 	}
 
+	[data-dryui-feedback] :global(.components-inspector:not([data-has-selection])),
+	[data-dryui-feedback] :global(.layout-inspector),
+	[data-dryui-feedback] :global(.layout-boxes-overlay) {
+		pointer-events: none;
+	}
+
 	.feedback-root .layout-stage,
 	.feedback-root .layout-stage :global(*) {
 		pointer-events: none;

@@ -35,6 +35,12 @@
 		dispatchTargets: DispatchAgent[];
 		targetAgent: DispatchAgent | null;
 		refreshing: boolean;
+		/**
+		 * Absolute path to the canonical SKILL.md, supplied by `/dispatch-targets`.
+		 * Falls back to the relative `node_modules/...` reference when the server
+		 * couldn't resolve it.
+		 */
+		skillPath?: string | null;
 		onChooseAgent: (agent: DispatchAgent) => void;
 		onSetStatus: (id: string, status: SubmissionStatus) => void | Promise<void>;
 		onLaunch: (prompt: string, submissionId: string) => Promise<void>;
@@ -50,6 +56,7 @@
 		dispatchTargets,
 		targetAgent,
 		refreshing,
+		skillPath = null,
 		onChooseAgent,
 		onSetStatus,
 		onLaunch
@@ -62,7 +69,9 @@
 	let launchError = $state('');
 	let launchTimer: ReturnType<typeof setTimeout> | undefined;
 
-	let promptText = $derived(buildFeedbackDispatchPrompt(submission));
+	let promptText = $derived(
+		buildFeedbackDispatchPrompt(submission, skillPath ? { skillPath } : undefined)
+	);
 	let drawingCounts = $derived.by(() => getDrawingCounts(submission.drawings));
 	let textNotes = $derived(getTextNotes(submission.drawings));
 

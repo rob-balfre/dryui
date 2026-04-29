@@ -4866,6 +4866,11 @@
               "required": false,
               "default": "false"
             },
+            "seams": {
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
             "children": {
               "type": "Snippet",
               "required": true,

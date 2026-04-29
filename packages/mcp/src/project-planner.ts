@@ -584,6 +584,8 @@ export default {
   preprocess: [
     dryuiLint({
       strict: true,
+      forbidRawGrid: true,
+      componentsOnly: true,
       exclude: ['.svelte-kit/', '/dist/']
     })
   ],
@@ -597,6 +599,11 @@ const SCAFFOLD_VITE_CONFIG = `import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
+  ssr: {
+    // Process DryUI packages through Vite's plugin pipeline so the
+    // "development" exports condition resolves to src/ during \`vite dev\`.
+    noExternal: ['@dryui/ui', '@dryui/primitives']
+  },
   plugins: [sveltekit()],
 });
 `;
@@ -659,27 +666,24 @@ function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>)
 }
 
 const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
-\timport { Container, Heading, Text } from '@dryui/ui';
+\timport { AreaGrid, Heading, Text } from '@dryui/ui';
 </script>
 
 <svelte:head>
 \t<title>My App</title>
 </svelte:head>
 
-<div class="starter">
-\t<Container size="md">
-\t\t<Heading level={1}>Hello, World</Heading>
-\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
-\t</Container>
-</div>
-
-<style>
-\t.starter {
-\t\tpadding-block: var(--dry-space-16);
-\t\tdisplay: grid;
-\t\tgap: var(--dry-space-4);
-\t}
-</style>
+<AreaGrid.Root
+\tfill
+\tmaxWidth="md"
+\t--dry-area-grid-template-areas="'.' 'heading' '.' 'tagline' '.'"
+\t--dry-area-grid-template-rows="minmax(0, 1fr) auto var(--dry-space-3) auto minmax(0, 1fr)"
+>
+\t<Heading --dry-grid-area-name="heading" level={1} variant="display">Hello, World</Heading>
+\t<Text --dry-grid-area-name="tagline" size="lg" color="muted">
+\t\tYour DryUI project is ready. Start building.
+\t</Text>
+</AreaGrid.Root>
 `;
 
 const SCAFFOLD_FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">

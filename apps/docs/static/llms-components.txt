@@ -1468,7 +1468,7 @@ Root import: import { AreaGrid } from '@dryui/ui'
 Subpath import: import { AreaGrid } from '@dryui/ui/area-grid'
 Parts:
 - AreaGrid.Root
-  Props: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | children (Snippet), Content rendered inside the component., required
+  Props: maxWidth ('sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'), accepted sm, md, lg, xl, 2xl, full, default 'xl' | fill (boolean), default false | debug (boolean), default false | seams (boolean), default false | children (Snippet), Content rendered inside the component., required
   Native props: Forwards <element> attributes via rest props.
 - AreaGrid.Placeholder
   Props: area (string), required

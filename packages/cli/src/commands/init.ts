@@ -24,6 +24,7 @@ import {
 } from '@dryui/mcp/project-planner';
 import { isInteractiveTTY } from '../run.js';
 import {
+	ensureClaudeAgents,
 	FEEDBACK_SERVER_URL,
 	findViteConfig,
 	installPackage,
@@ -391,52 +392,12 @@ function setupFeedback(
 	return true;
 }
 
-/**
- * Drop the bundled Claude Code subagents (feedback, dryui-layout) into
- * `<project>/.claude/agents/` so the dispatched agent can spawn them. The
- * source dir lives at `<cli-pkg>/agents` (shipped via the cli tarball's
- * `files` array). Resolved relative to the runtime entry rather than CWD so
- * it works whether the cli is invoked from a workspace, a global install, or
- * a tarball.
- */
 function setupClaudeAgents(targetPath: string): boolean {
-	const cliBin = fileURLToPath(import.meta.url);
-	// At runtime the bundled entry is `<cli-pkg>/dist/index.js`; agents live
-	// at `<cli-pkg>/agents`. Walk up two levels to reach the package root,
-	// then over to the agents dir.
-	const sourceDir = resolve(dirname(cliBin), '..', 'agents');
-	if (!existsSync(sourceDir)) return false;
-
-	let entries: string[];
-	try {
-		entries = readdirSync(sourceDir).filter((name) => name.endsWith('.md'));
-	} catch {
-		return false;
+	const result = ensureClaudeAgents(targetPath);
+	if (result.copied.length > 0) {
+		log(`  + .claude/agents/ (${result.copied.join(', ')})`);
 	}
-	if (entries.length === 0) return false;
-
-	const targetDir = resolve(targetPath, '.claude', 'agents');
-	mkdirSync(targetDir, { recursive: true });
-
-	const written: string[] = [];
-	for (const name of entries) {
-		const src = resolve(sourceDir, name);
-		const dest = resolve(targetDir, name);
-		// Don't clobber a project's own customised version of an agent. If a
-		// user has edited their `.claude/agents/feedback.md`, leave it alone.
-		if (existsSync(dest)) continue;
-		try {
-			copyFileSync(src, dest);
-			written.push(name);
-		} catch {
-			// Best-effort: if a single file fails, keep going with the rest.
-		}
-	}
-
-	if (written.length > 0) {
-		log(`  + .claude/agents/ (${written.join(', ')})`);
-	}
-	return true;
+	return result.sourceFound;
 }
 
 const IMPECCABLE_INSTALL_TIMEOUT_MS = 60_000;

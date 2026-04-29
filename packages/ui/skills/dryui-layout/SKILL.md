@@ -23,6 +23,7 @@ Props (real, from the component source):
 - `maxWidth`: `'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'` — defaults `xl` (80rem / 1280px). The grid sits in a centered column that caps at the chosen size; outer breathing on narrower viewports comes from `min(100% - 2rem, …)`. Pick `'full'` only for app shells where chrome (topbar, sidebar) genuinely needs viewport bleed (Jira, Linear, mail clients, IDE-style apps). Sizes: sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem.
 - `fill`: `boolean` — when `true`, the grid stretches to at least viewport height (`min-block-size: 100dvh`). **Always pass `fill` for page-level layouts** (anything in `+page.svelte`); without it the grid collapses to content height and the rest of the viewport sits dark below. Omit only when the AreaGrid is a section inside a larger layout.
 - `debug`: `boolean` — visualizes area boxes during development. Strip before commit.
+- `seams`: `boolean` — draws 1px seam lines between grid tracks for development. Off by default; opt in only when laying out the grid. Strip before commit.
 
 There is no `gap` and no `padding` _attribute_ — those are footguns and stay banned. Lint: `dryui/area-grid-no-gap`, `dryui/area-grid-no-padding`.
 

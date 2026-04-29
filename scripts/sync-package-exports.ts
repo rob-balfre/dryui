@@ -1,11 +1,21 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-type ExportTarget = null | {
+type ExportLeaf = {
 	types?: string;
 	svelte?: string;
 	default?: string;
 };
+
+type ExportTarget =
+	| null
+	| ExportLeaf
+	| {
+			development?: ExportLeaf;
+			types?: string;
+			svelte?: string;
+			default?: string;
+	  };
 
 type PackageJson = {
 	svelte?: string;
@@ -50,15 +60,7 @@ function parsePublicDirs(source: string): string[] {
 	return [...dirs].sort((left, right) => left.localeCompare(right));
 }
 
-function createRootExport(dist: boolean): ExportTarget {
-	if (dist) {
-		return {
-			types: './dist/index.d.ts',
-			svelte: './dist/index.js',
-			default: './dist/index.js'
-		};
-	}
-
+function createRootSrc(): ExportLeaf {
 	return {
 		types: './src/index.ts',
 		svelte: './src/index.ts',
@@ -66,20 +68,40 @@ function createRootExport(dist: boolean): ExportTarget {
 	};
 }
 
-function createSubpathExport(dir: string, dist: boolean): ExportTarget {
-	if (dist) {
-		return {
-			types: `./dist/${dir}/index.d.ts`,
-			svelte: `./dist/${dir}/index.js`,
-			default: `./dist/${dir}/index.js`
-		};
-	}
+function createRootDist(): ExportLeaf {
+	return {
+		types: './dist/index.d.ts',
+		svelte: './dist/index.js',
+		default: './dist/index.js'
+	};
+}
 
+function createSubpathSrc(dir: string): ExportLeaf {
 	return {
 		types: `./src/${dir}/index.ts`,
 		svelte: `./src/${dir}/index.ts`,
 		default: `./src/${dir}/index.ts`
 	};
+}
+
+function createSubpathDist(dir: string): ExportLeaf {
+	return {
+		types: `./dist/${dir}/index.d.ts`,
+		svelte: `./dist/${dir}/index.js`,
+		default: `./dist/${dir}/index.js`
+	};
+}
+
+function createRootExport(target: 'src' | 'dist' | 'dual'): ExportTarget {
+	if (target === 'src') return createRootSrc();
+	if (target === 'dist') return createRootDist();
+	return { development: createRootSrc(), ...createRootDist() };
+}
+
+function createSubpathExport(dir: string, target: 'src' | 'dist' | 'dual'): ExportTarget {
+	if (target === 'src') return createSubpathSrc(dir);
+	if (target === 'dist') return createSubpathDist(dir);
+	return { development: createSubpathSrc(dir), ...createSubpathDist(dir) };
 }
 
 function collectExtraExports(
@@ -101,12 +123,12 @@ function collectExtraExports(
 function buildExports(
 	dirs: string[],
 	extras: Record<string, ExportTarget>,
-	dist: boolean
+	target: 'src' | 'dist' | 'dual'
 ): Record<string, ExportTarget> {
-	const entries: Array<[string, ExportTarget]> = [['.', createRootExport(dist)]];
+	const entries: Array<[string, ExportTarget]> = [['.', createRootExport(target)]];
 
 	for (const dir of dirs) {
-		entries.push([`./${dir}`, createSubpathExport(dir, dist)]);
+		entries.push([`./${dir}`, createSubpathExport(dir, target)]);
 	}
 
 	for (const [key, value] of Object.entries(extras)) {
@@ -125,17 +147,17 @@ async function syncPackageExports(config: PackageConfig): Promise<boolean> {
 	const sourceExtras = collectExtraExports(packageJson.exports);
 	const distExtras = collectExtraExports(packageJson.publishConfig?.exports);
 	const publicDirs = parsePublicDirs(barrelSource);
-	const sourceRootExport = createRootExport(false);
-	const distRootExport = createRootExport(true);
+	const sourceRootExport = createRootSrc();
+	const distRootExport = createRootDist();
 
-	packageJson.exports = buildExports(publicDirs, sourceExtras, false);
+	packageJson.exports = buildExports(publicDirs, sourceExtras, 'src');
 	packageJson.svelte = sourceRootExport.svelte;
 	packageJson.types = sourceRootExport.types;
 	packageJson.publishConfig = {
 		...packageJson.publishConfig,
 		svelte: distRootExport.svelte,
 		types: distRootExport.types,
-		exports: buildExports(publicDirs, distExtras, true)
+		exports: buildExports(publicDirs, distExtras, 'dual')
 	};
 
 	const nextRaw = `${JSON.stringify(packageJson, null, 2)}\n`;

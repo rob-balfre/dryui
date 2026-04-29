@@ -23,7 +23,9 @@ const LINK_TARGETS = [
 	{ pkg: '@dryui/mcp', dir: 'packages/mcp', bin: 'dryui-mcp' },
 	{ pkg: '@dryui/feedback-server', dir: 'packages/feedback-server', bin: 'dryui-feedback-mcp' },
 	{ pkg: '@dryui/feedback', dir: 'packages/feedback', bin: null },
-	{ pkg: '@dryui/lint', dir: 'packages/lint', bin: null }
+	{ pkg: '@dryui/lint', dir: 'packages/lint', bin: null },
+	{ pkg: '@dryui/ui', dir: 'packages/ui', bin: null },
+	{ pkg: '@dryui/primitives', dir: 'packages/primitives', bin: null }
 ] as const;
 
 function bunLink(cwd: string, args: readonly string[] = []): boolean {

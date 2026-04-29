@@ -181,6 +181,80 @@ function setupSubmissionEnvironment(options?: {
 }
 
 describe('feedback overlay hosting', () => {
+	it('selects and moves ordinary elements inside layout shells in components mode', async () => {
+		const plainPage = document.createElement('main');
+		plainPage.style.margin = '48px';
+		plainPage.dataset.areaGridShell = 'true';
+		plainPage.innerHTML = `
+			<h1>Plain feedback target</h1>
+			<p>Components mode should discover this non-grid content.</p>
+		`;
+		document.body.append(plainPage);
+		render(Feedback);
+
+		const componentsTab = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+		).find((tab) => tab.textContent?.trim() === 'Components');
+		if (!componentsTab) throw new Error('Expected Components tab');
+
+		componentsTab.click();
+		flushSync();
+		await waitForAsyncWork();
+		flushSync();
+
+		const inspector = document.querySelector<HTMLElement>('.components-inspector');
+		expect(inspector).not.toBeNull();
+		expect(getComputedStyle(inspector!).pointerEvents).toBe('none');
+
+		const headingBox = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('.components-box')
+		).find((box) => box.dataset.tooltip === 'h1');
+		if (!headingBox) throw new Error('Expected selectable heading box');
+
+		headingBox.click();
+		flushSync();
+		await waitForAsyncWork();
+		flushSync();
+
+		const clone = document.querySelector<HTMLElement>('[data-dryui-layout-clone]');
+		const moveHandle = document.querySelector<HTMLButtonElement>('[aria-label="Move element"]');
+		if (!clone || !moveHandle) throw new Error('Expected selected clone and move handle');
+
+		const startLeft = parseFloat(clone.style.left);
+		const startTop = parseFloat(clone.style.top);
+		moveHandle.dispatchEvent(
+			new PointerEvent('pointerdown', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 80,
+				clientY: 80,
+				pointerId: 12
+			})
+		);
+		window.dispatchEvent(
+			new PointerEvent('pointermove', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 112,
+				clientY: 104,
+				pointerId: 12
+			})
+		);
+		window.dispatchEvent(
+			new PointerEvent('pointerup', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 112,
+				clientY: 104,
+				pointerId: 12
+			})
+		);
+		flushSync();
+
+		expectNear(parseFloat(clone.style.left), startLeft + 32);
+		expectNear(parseFloat(clone.style.top), startTop + 24);
+	});
+
 	it.each(['command-palette', 'popover'] as const)(
 		'keeps the feedback overlay aligned to the viewport inside %s',
 		(kind) => {
@@ -197,8 +271,10 @@ describe('feedback overlay hosting', () => {
 			expectNear(canvasRect.top, 0);
 			expectNear(canvasRect.width, window.innerWidth);
 			expectNear(canvasRect.height, window.innerHeight);
-			expectNear(toolbarRect.right, window.innerWidth - 24);
-			expectNear(toolbarRect.bottom, window.innerHeight - 24);
+			const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+			const edge = rootRect.width <= rem * 36 ? 12 : 24;
+			expectNear(toolbarRect.right, window.innerWidth - edge);
+			expectNear(toolbarRect.bottom, window.innerHeight - edge);
 		}
 	);
 

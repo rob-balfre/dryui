@@ -25,11 +25,13 @@ import {
 } from '../run.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
+	ensureClaudeAgents as ensureClaudeAgentsDefault,
 	ensureUrlReady,
 	FEEDBACK_SERVER_URL,
 	findPortHolder as findPortHolderDefault,
 	findViteConfig as findViteConfigDefault,
 	installPackage as installPackageDefault,
+	isDryuiDevMode,
 	isHealthyProbeStatus,
 	killOwnedProcess as killOwnedProcessDefault,
 	killPortHolder as killPortHolderDefault,
@@ -43,10 +45,13 @@ import {
 	readProjectDevLogTail as readProjectDevLogTailDefault,
 	readProjectDevScript as readProjectDevScriptDefault,
 	resolveFeedbackServerEntry,
+	runPackageManagerInstall as runPackageManagerInstallDefault,
 	spawnFeedbackServerInBackground,
 	spawnProjectDevServerInBackground as spawnProjectDevServerDefault,
 	type SpawnedProcess,
 	type SpawnProjectDevServerOptions,
+	swapDryuiTarballOverridesToLinks as swapDryuiTarballOverridesToLinksDefault,
+	type SwapTarballOverridesResult,
 	urlResponds as urlRespondsDefault,
 	type UrlProbeResult,
 	viteConfigHasFeedbackNoExternal as viteConfigHasFeedbackNoExternalDefault,
@@ -432,6 +437,15 @@ export interface UserProjectLauncherRuntime {
 	findViteConfig: (root: string) => string | null;
 	viteConfigHasFeedbackNoExternal: (configPath: string) => boolean;
 	patchViteConfigFeedbackNoExternal: (configPath: string) => boolean;
+	swapDryuiTarballOverridesToLinks: (cwd: string) => SwapTarballOverridesResult;
+	ensureClaudeAgents: (projectRoot: string) => {
+		copied: readonly string[];
+		updated: readonly string[];
+	};
+	runPackageManagerInstall: (
+		cwd: string,
+		packageManager: Exclude<DryuiPackageManager, 'unknown'>
+	) => boolean;
 	sleep: (ms: number) => Promise<void>;
 	now: () => number;
 	openBrowser: (url: string) => boolean;
@@ -607,6 +621,13 @@ const defaultUserProjectRuntime: Omit<UserProjectLauncherRuntime, 'detectProject
 	findViteConfig: findViteConfigDefault,
 	viteConfigHasFeedbackNoExternal: viteConfigHasFeedbackNoExternalDefault,
 	patchViteConfigFeedbackNoExternal: patchViteConfigFeedbackNoExternalDefault,
+	swapDryuiTarballOverridesToLinks: swapDryuiTarballOverridesToLinksDefault,
+	ensureClaudeAgents: (projectRoot) => {
+		const result = ensureClaudeAgentsDefault(projectRoot);
+		return { copied: result.copied, updated: result.updated };
+	},
+	runPackageManagerInstall: (cwd, packageManager) =>
+		runPackageManagerInstallDefault({ cwd, packageManager }),
 	sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
 	now: () => Date.now(),
 	openBrowser,
@@ -742,6 +763,26 @@ export async function runUserProjectLauncher(
 		return true;
 	}
 
+	// In DRYUI_DEV mode, swap any tarball overrides to `link:` so the workspace
+	// symlinks (registered by `bun run dev:link`) win and Vite resolves through
+	// each package's "development" exports condition into src/. Without this,
+	// the launcher would keep installing frozen tarballs and edits in the
+	// dryui workspace would never reach the consumer.
+	const overrideSwap: SwapTarballOverridesResult = isDryuiDevMode()
+		? runtime.swapDryuiTarballOverridesToLinks(detection.root)
+		: { swapped: [], already: [] };
+	if (overrideSwap.swapped.length > 0) {
+		runtime.runPackageManagerInstall(detection.root, packageManager);
+	}
+
+	// Mirror the bundled subagent files into `<project>/.claude/agents/`. The
+	// dispatched session runs `claude --agent feedback`, which silently
+	// ignores `--permission-mode auto` unless the agent's frontmatter sets it.
+	// Re-syncing on every launcher run lets existing projects (where init
+	// predated this step, or where we've shipped new agent frontmatter) pick
+	// up the change without a manual reinit.
+	const claudeAgents = runtime.ensureClaudeAgents(detection.root);
+
 	const noOpen = hasFlag(args, '--no-open');
 	const detach = hasFlag(args, '--detach');
 	const devHost = DEFAULT_PROJECT_DEV_HOST;
@@ -787,6 +828,22 @@ export async function runUserProjectLauncher(
 		const fallbackNote = feedbackWidgetNote(detection);
 		const baseNotes = setupNotes ?? (fallbackNote ? [fallbackNote] : []);
 		const notes: LabelledMessage[] = [...baseNotes, ...(devResult.errorDetails ?? [])];
+		if (overrideSwap.swapped.length > 0) {
+			notes.push({
+				label: 'DryUI dev',
+				message: `swapped tarball overrides → link: for ${overrideSwap.swapped.join(', ')} (DRYUI_DEV=1)`
+			});
+		}
+		const agentChanges = [
+			...claudeAgents.copied.map((name) => `+ ${name}`),
+			...claudeAgents.updated.map((name) => `~ ${name}`)
+		];
+		if (agentChanges.length > 0) {
+			notes.push({
+				label: 'Claude agents',
+				message: `synced .claude/agents/ (${agentChanges.join(', ')})`
+			});
+		}
 		if (waitForeground) {
 			notes.push({ label: 'Tip', message: 'press Ctrl-C to stop servers and exit' });
 		}

@@ -1022,6 +1022,12 @@
               "bindable": false,
               "default": "false"
             },
+            "seams": {
+              "signature": "seams: boolean | default:false",
+              "required": false,
+              "bindable": false,
+              "default": "false"
+            },
             "children": {
               "signature": "children: Snippet | required",
               "required": true,
