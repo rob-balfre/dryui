@@ -25,6 +25,7 @@
 	[data-calendar-heading] {
 		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		letter-spacing: 0;
+		text-align: center;
 	}
 </style>

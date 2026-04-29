@@ -1,5 +1,15 @@
 <script lang="ts">
-	import { AlertDialog, Button, Checkbox, Field, Input, Kbd, Label, Select } from '@dryui/ui';
+	import {
+		AlertDialog,
+		Button,
+		Checkbox,
+		Field,
+		Input,
+		InputGroup,
+		Kbd,
+		Label,
+		Select
+	} from '@dryui/ui';
 	import { onMount } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import {
@@ -102,6 +112,8 @@
 	const showLayoutTools = $derived(mode === 'layout');
 	const showToolPill = $derived(showAnnotationTools || showComponentsTools || showLayoutTools);
 	const inspectingLabel = $derived(showLayoutTools ? 'Adjusting layout' : 'Inspecting components');
+	const toolbarId = $props.id();
+	const pickerSearchId = `${toolbarId}-component-picker-search`;
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
@@ -838,34 +850,38 @@
 							aria-label="Pick component"
 						>
 							<Field.Root data-component-picker-search>
-								<Label size="sm" data-sr-only>Search components</Label>
-								<span class="component-picker-search-icon" aria-hidden="true">
-									<Search size={13} />
-								</span>
-								<Input
-									size="sm"
-									type="text"
-									placeholder="Search components"
-									bind:value={pickerName}
-									data-component-picker-input
-									onkeydown={handlePickerKey}
-								/>
+								<Label size="sm" for={pickerSearchId} data-sr-only>Search components</Label>
+								<InputGroup.Root size="sm" data-component-picker-search-box>
+									<InputGroup.Prefix data-component-picker-search-icon aria-hidden="true">
+										<Search size={13} />
+									</InputGroup.Prefix>
+									<InputGroup.Input
+										id={pickerSearchId}
+										type="text"
+										placeholder="Search components"
+										bind:value={pickerName}
+										data-component-picker-input
+										onkeydown={handlePickerKey}
+									/>
+								</InputGroup.Root>
 							</Field.Root>
 							{#if groupedPresets.length > 0}
 								<div class="component-picker-presets">
 									{#each groupedPresets as group (group.category)}
-										<div class="component-picker-group-label">{group.label}</div>
-										{#each group.names as preset (preset)}
-											<Button
-												variant="bare"
-												size="sm"
-												class="component-picker-preset"
-												type="button"
-												onclick={() => pick(preset)}
-											>
-												{preset}
-											</Button>
-										{/each}
+										<div class="component-picker-group">
+											<div class="component-picker-group-label">{group.label}</div>
+											{#each group.names as preset (preset)}
+												<Button
+													variant="bare"
+													size="sm"
+													class="component-picker-preset"
+													type="button"
+													onclick={() => pick(preset)}
+												>
+													<span class="component-picker-preset-label">{preset}</span>
+												</Button>
+											{/each}
+										</div>
 									{/each}
 								</div>
 							{:else if pickerName.trim()}
@@ -876,7 +892,7 @@
 									type="button"
 									onclick={() => pick(pickerName)}
 								>
-									Add "{pickerName.trim()}"
+									<span class="component-picker-preset-label">Add "{pickerName.trim()}"</span>
 								</Button>
 							{/if}
 						</div>
@@ -1347,10 +1363,10 @@
 		right: 0;
 		display: grid;
 		grid-template-rows: auto 1fr;
-		gap: 8px;
-		inline-size: 260px;
-		max-block-size: 380px;
-		padding: 8px;
+		gap: 10px;
+		inline-size: min(320px, calc(100dvw - 32px));
+		max-block-size: min(70dvh, 440px);
+		padding: 10px;
 		border-radius: 12px;
 		background: var(--pill-bg);
 		backdrop-filter: blur(8px);
@@ -1369,26 +1385,17 @@
 		display: grid;
 	}
 
-	.component-picker-search-icon {
-		position: absolute;
-		inset-block: 0;
-		inset-inline-start: 10px;
-		display: grid;
-		place-items: center;
-		color: hsl(220 10% 45%);
-		pointer-events: none;
-	}
-
-	:global([data-component-picker-input]) {
+	:global([data-component-picker-search-box]) {
 		--dry-input-bg: hsl(225 15% 10% / 0.5);
 		--dry-input-border: hsl(220 10% 22%);
 		--dry-input-color: hsl(220 10% 92%);
 		--dry-input-font-size: 12px;
+		--dry-input-group-border-strong: hsl(25 100% 55% / 0.5);
+		--dry-input-group-muted: hsl(220 10% 48%);
 		--dry-input-padding-x: 10px;
 		--dry-input-padding-y: 7px;
 		--dry-input-radius: 8px;
 
-		padding: 7px 10px 7px 30px;
 		border: 1px solid hsl(220 10% 22%);
 		border-radius: 8px;
 		background: hsl(225 15% 10% / 0.5);
@@ -1402,10 +1409,11 @@
 		outline: none;
 		transition:
 			border-color 0.15s,
-			background 0.15s;
+			background 0.15s,
+			box-shadow 0.15s;
 	}
 
-	:global([data-component-picker-input]:focus-visible) {
+	:global([data-component-picker-search-box]:focus-within) {
 		--dry-input-bg: hsl(225 15% 10% / 0.7);
 		--dry-input-border: hsl(25 100% 55% / 0.5);
 
@@ -1413,7 +1421,11 @@
 		background: hsl(225 15% 10% / 0.7);
 	}
 
-	:global([data-component-picker-search]:focus-within) .component-picker-search-icon {
+	:global([data-component-picker-search-icon]) {
+		color: hsl(220 10% 48%);
+	}
+
+	:global([data-component-picker-search]:focus-within [data-component-picker-search-icon]) {
 		color: var(--accent);
 	}
 
@@ -1423,8 +1435,10 @@
 
 	.component-picker-presets {
 		display: grid;
-		gap: 0;
+		align-content: start;
+		gap: 6px;
 		min-block-size: 0;
+		padding-block: 2px 4px;
 		overflow-y: auto;
 		scrollbar-width: thin;
 		scrollbar-color: hsl(220 10% 28%) transparent;
@@ -1435,6 +1449,11 @@
 			black calc(100% - 8px),
 			transparent 100%
 		);
+	}
+
+	.component-picker-group {
+		display: grid;
+		gap: 2px;
 	}
 
 	.component-picker-presets::-webkit-scrollbar {
@@ -1458,7 +1477,7 @@
 		position: sticky;
 		top: 0;
 		z-index: 1;
-		padding: 10px 6px 4px;
+		padding: 8px 8px 5px;
 		background: linear-gradient(
 			180deg,
 			var(--pill-bg) 0%,
@@ -1476,8 +1495,8 @@
 		text-transform: uppercase;
 	}
 
-	.component-picker-group-label:first-child {
-		padding-block-start: 4px;
+	.component-picker-group:first-child .component-picker-group-label {
+		padding-block-start: 2px;
 	}
 
 	:global(.component-picker-create) {
@@ -1659,16 +1678,20 @@
 		--dry-btn-border: transparent;
 		--dry-btn-color: hsl(220 10% 80%);
 		--dry-btn-font-size: 12px;
-		--dry-btn-min-height: 0;
+		--dry-btn-justify: stretch;
+		--dry-btn-align: center stretch;
+		--dry-btn-min-height: 30px;
 		--dry-btn-padding-x: 10px;
-		--dry-btn-padding-y: 6px;
+		--dry-btn-padding-y: 0;
 		--dry-btn-radius: 6px;
 
 		display: grid;
-		grid-template-columns: 1fr auto;
+		grid-template-columns: minmax(0, 1fr) 12px;
 		align-items: center;
+		justify-items: stretch;
 		gap: 8px;
-		padding: 6px 10px;
+		min-block-size: 30px;
+		padding: 0 10px;
 		border: none;
 		border-radius: 6px;
 		background: transparent;
@@ -1679,12 +1702,20 @@
 			sans-serif;
 		font-size: 12px;
 		font-weight: 500;
+		line-height: 1.25;
 		letter-spacing: 0;
 		text-align: start;
 		cursor: pointer;
 		transition:
 			background 0.12s ease-out,
 			color 0.12s ease-out;
+	}
+
+	.component-picker-preset-label {
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	:global(.component-picker-preset)::after {

@@ -6,6 +6,11 @@ import { RULE_CATALOG, type RuleSeverity } from './rule-catalog.js';
 
 export interface DryuiLintOptions {
 	strict?: boolean;
+	/**
+	 * Substring patterns that opt files into linting. When set, files that do
+	 * not match one of these patterns are skipped before package detection.
+	 */
+	include?: string[];
 	exclude?: string[];
 	/**
 	 * Experimental migration rule. When enabled, raw CSS grid declarations are
@@ -18,6 +23,13 @@ export interface DryuiLintOptions {
 	 * and <span> are flagged.
 	 */
 	componentsOnly?: boolean;
+	/**
+	 * By default, linked @dryui/* package source is skipped so consumer apps do
+	 * not lint upstream packages resolved through DRYUI_DEV or workspace links.
+	 * Set this for first-party @dryui packages that intentionally lint their own
+	 * source during local builds.
+	 */
+	includeDryuiPackages?: boolean;
 }
 
 function formatViolation(filename: string, v: Violation): string {
@@ -91,43 +103,61 @@ function findNearestPackageName(filePath: string): string | null {
 	}
 }
 
-function isExcluded(filename: string, patterns: string[]): boolean {
+function matchesPattern(filename: string, patterns: string[]): boolean {
+	return patterns.some((p) => filename.includes(p));
+}
+
+function isAbsolutePath(filename: string): boolean {
+	return filename.startsWith('/') || /^[A-Za-z]:[\\/]/.test(filename);
+}
+
+function isExcluded(
+	filename: string,
+	include: string[],
+	exclude: string[],
+	includeDryuiPackages: boolean
+): boolean {
+	if (include.length > 0 && !matchesPattern(filename, include)) return true;
 	if (filename.includes('/node_modules/')) return true;
 	// Files belonging to an upstream `@dryui/*` package — for example when a
 	// consumer has linked the workspace under `DRYUI_DEV=1` and the package
 	// resolves to its real path instead of `node_modules/...` — should not be
 	// linted with the consumer's strict rules.
-	const pkgName = findNearestPackageName(filename);
-	if (pkgName !== null && pkgName.startsWith('@dryui/')) return true;
-	return patterns.some((p) => filename.includes(p));
+	if (!includeDryuiPackages && isAbsolutePath(filename)) {
+		const pkgName = findNearestPackageName(filename);
+		if (pkgName !== null && pkgName.startsWith('@dryui/')) return true;
+	}
+	return matchesPattern(filename, exclude);
 }
 
 export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 	const strict = options?.strict ?? false;
+	const include = options?.include ?? [];
 	const exclude = options?.exclude ?? [];
 	const forbidRawGrid = options?.forbidRawGrid ?? false;
 	const componentsOnly = options?.componentsOnly ?? false;
+	const includeDryuiPackages = options?.includeDryuiPackages ?? false;
 
 	return {
 		name: 'dryui-lint',
 
 		script({ content, filename }) {
 			const f = filename ?? 'unknown';
-			if (isExcluded(f, exclude)) return;
+			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkScript(content);
 			report(f, violations, strict);
 		},
 
 		markup({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
-			if (isExcluded(f, exclude)) return;
+			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkMarkup(content, f, { componentsOnly });
 			report(f, violations, strict);
 		},
 
 		style({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
-			if (isExcluded(f, exclude)) return;
+			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
 			const violations = checkStyle(content, { forbidRawGrid }, f);
 			report(f, violations, strict);
 		}

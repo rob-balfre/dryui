@@ -1,53 +1,49 @@
 /**
- * Runs @dryui/lint rules against all .svelte files in the library packages.
+ * Runs @dryui/lint rules against first-party Svelte/CSS surfaces.
  * This catches violations that only surface during Vite preprocessing, making
  * them part of the CI check pipeline.
  *
  * packages/ui/src — full rule set
+ * packages/feedback-server/ui/src — full rule set for the feedback console
  * packages/primitives/src — dryui/no-svelte-element only. Primitives are
  *   headless and legitimately use raw <button>/<input>/etc.; other rules
  *   (flex, width) have pre-existing tolerated violations there.
  */
 import { Glob } from 'bun';
-import {
-	checkScript,
-	checkMarkup,
-	checkStyle,
-	type Violation
-} from '../packages/lint/src/rules.js';
+import { checkStyle, checkSvelteFile, type Violation } from '../packages/lint/src/rules.js';
+import { RULE_CATALOG } from '../packages/lint/src/rule-catalog.js';
 
-const FULL_SCAN_DIR = 'packages/ui/src';
+const FULL_SCAN_DIRS = ['packages/ui/src', 'packages/feedback-server/ui/src'];
 const PRIMITIVES_SCAN_DIR = 'packages/primitives/src';
 
 const PRIMITIVES_ALLOWED_RULES = new Set(['dryui/no-svelte-element']);
 
-const scriptRe = /<script[^>]*>([\s\S]*?)<\/script>/gi;
-const styleRe = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+let totalErrors = 0;
+const svelteGlob = new Glob('**/*.svelte');
+const cssGlob = new Glob('**/*.css');
 
-let totalViolations = 0;
-const glob = new Glob('**/*.svelte');
+function severityOf(rule: string): 'error' | 'warning' | 'suggestion' | 'info' {
+	return RULE_CATALOG[rule]?.severity ?? 'error';
+}
+
+function reportViolation(filePath: string, violation: Violation): void {
+	const severity = severityOf(violation.rule);
+	console.error(
+		`[${severity}] [${violation.rule}] ${filePath}:${violation.line} — ${violation.message}`
+	);
+	if (severity === 'error') totalErrors += 1;
+}
 
 async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
-	const paths: string[] = [];
-	for await (const path of glob.scan(scanDir)) {
-		paths.push(path);
+	const sveltePaths: string[] = [];
+	for await (const path of svelteGlob.scan(scanDir)) {
+		sveltePaths.push(path);
 	}
 
-	for (const path of paths.sort((left, right) => left.localeCompare(right))) {
+	for (const path of sveltePaths.sort((left, right) => left.localeCompare(right))) {
 		const filePath = `${scanDir}/${path}`;
 		const content = await Bun.file(filePath).text();
-
-		const violations: Violation[] = [];
-
-		for (const match of content.matchAll(scriptRe)) {
-			violations.push(...checkScript(match[1]));
-		}
-
-		violations.push(...checkMarkup(content, filePath));
-
-		for (const match of content.matchAll(styleRe)) {
-			violations.push(...checkStyle(match[1], {}, filePath));
-		}
+		const violations = checkSvelteFile(content, filePath);
 
 		const filtered = ruleAllowlist
 			? violations.filter((v) => ruleAllowlist.has(v.rule))
@@ -55,18 +51,38 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 
 		if (filtered.length > 0) {
 			for (const v of filtered) {
-				console.error(`[${v.rule}] ${filePath}:${v.line} — ${v.message}`);
+				reportViolation(filePath, v);
 			}
-			totalViolations += filtered.length;
+		}
+	}
+
+	if (ruleAllowlist) return;
+
+	const cssPaths: string[] = [];
+	for await (const path of cssGlob.scan(scanDir)) {
+		cssPaths.push(path);
+	}
+
+	for (const path of cssPaths.sort((left, right) => left.localeCompare(right))) {
+		const filePath = `${scanDir}/${path}`;
+		const content = await Bun.file(filePath).text();
+		const violations = checkStyle(content, {}, filePath);
+
+		if (violations.length > 0) {
+			for (const v of violations) {
+				reportViolation(filePath, v);
+			}
 		}
 	}
 }
 
-await lintDir(FULL_SCAN_DIR, null);
+for (const scanDir of FULL_SCAN_DIRS) {
+	await lintDir(scanDir, null);
+}
 await lintDir(PRIMITIVES_SCAN_DIR, PRIMITIVES_ALLOWED_RULES);
 
-if (totalViolations > 0) {
-	console.error(`\n${totalViolations} lint violation(s) found.`);
+if (totalErrors > 0) {
+	console.error(`\n${totalErrors} lint error(s) found.`);
 	process.exit(1);
 } else {
 	console.log('No lint violations found.');

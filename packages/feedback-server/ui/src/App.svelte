@@ -71,35 +71,28 @@
 	let refreshing = $state(false);
 	let search = $state('');
 	let searchOpen = $state(false);
-	let searchContainerNode: HTMLDivElement | undefined;
+
+	function isInsideSearch(target: EventTarget | null): boolean {
+		return target instanceof Element && target.closest('[data-feedback-search]') !== null;
+	}
 
 	function focusSearchInput(): void {
-		queueMicrotask(() => searchContainerNode?.querySelector('input')?.focus());
+		queueMicrotask(() =>
+			document.querySelector<HTMLInputElement>('[data-feedback-search] input')?.focus()
+		);
 	}
 
 	function handleSearchMouseDown(event: MouseEvent): void {
-		if (!searchOpen || !searchContainerNode) return;
-		if (searchContainerNode.contains(event.target as Node)) return;
+		if (!searchOpen) return;
+		if (isInsideSearch(event.target)) return;
 		if (!search.trim()) searchOpen = false;
 	}
 
 	function handleSearchKeydown(event: KeyboardEvent): void {
 		if (event.key !== 'Escape') return;
-		if (!searchOpen || !searchContainerNode?.contains(event.target as Node)) return;
+		if (!searchOpen || !isInsideSearch(event.target)) return;
 		event.preventDefault();
 		closeSearch();
-	}
-
-	function attachSearchControls(node: HTMLDivElement): () => void {
-		searchContainerNode = node;
-		document.addEventListener('mousedown', handleSearchMouseDown);
-		document.addEventListener('keydown', handleSearchKeydown);
-
-		return () => {
-			if (searchContainerNode === node) searchContainerNode = undefined;
-			document.removeEventListener('mousedown', handleSearchMouseDown);
-			document.removeEventListener('keydown', handleSearchKeydown);
-		};
 	}
 
 	function openSearch(): void {
@@ -375,6 +368,8 @@
 	});
 </script>
 
+<svelte:document onmousedown={handleSearchMouseDown} onkeydown={handleSearchKeydown} />
+
 <Container size="xl" padding={false}>
 	<div class="dashboard-shell">
 		<section class="dashboard">
@@ -443,7 +438,7 @@
 							<div
 								class="filter-search"
 								class:is-open={searchOpen || hasActiveSearch}
-								{@attach attachSearchControls}
+								data-feedback-search
 								role="search"
 							>
 								{#if searchOpen || hasActiveSearch}

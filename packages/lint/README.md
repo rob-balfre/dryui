@@ -55,12 +55,16 @@ Options:
 
 - `strict?: boolean`
   When `true`, violations throw and fail the build. When `false`, violations are logged as warnings.
+- `include?: string[]`
+  Substring patterns that opt files into linting. When set, non-matching files are skipped.
 - `exclude?: string[]`
   Substring patterns used to skip matching filenames.
 - `forbidRawGrid?: boolean`
   Experimental migration mode. Flags raw CSS grid declarations so layout moves through `AreaGrid.Root`.
 - `componentsOnly?: boolean`
   Experimental migration mode. Flags raw native markup tags such as `<div>` and `<span>` so app markup goes through DryUI/Svelte components.
+- `includeDryuiPackages?: boolean`
+  First-party mode. Lints linked `@dryui/*` package source instead of skipping it as upstream dependency code.
 
 ## Notes
 

@@ -46,8 +46,6 @@
 
 	let { adapter, hideHeader = false, class: className, ...rest }: Props = $props();
 
-	let containerEl = $state<HTMLDivElement>();
-
 	const weekdayLabels = $derived(generateWeekdayLabels(adapter.locale, adapter.weekStartDay));
 	const calendarDays = $derived(
 		getCalendarDays(adapter.viewYear, adapter.viewMonth, adapter.weekStartDay)
@@ -77,12 +75,21 @@
 			max: adapter.max
 		});
 		if (result?.type === 'navigate') {
-			requestAnimationFrame(() => focusCalendarDay(containerEl, result.newDate));
+			const container =
+				e.currentTarget instanceof HTMLElement
+					? (e.currentTarget.closest<HTMLElement>('[data-calendar-grid]') ?? undefined)
+					: undefined;
+			requestAnimationFrame(() => focusCalendarDay(container, result.newDate));
 		}
 	}
 </script>
 
-<div bind:this={containerEl} class={className} {...rest} data-calendar-grid>
+<div
+	class={className}
+	{...rest}
+	data-calendar-grid
+	data-calendar-grid-headerless={hideHeader ? '' : undefined}
+>
 	<div role="group" aria-label={monthYearLabel} data-calendar-panel>
 		{#if !hideHeader}
 			<div data-calendar-header>
@@ -183,20 +190,27 @@
 
 	[data-calendar-grid] [data-calendar-panel] {
 		display: grid;
+		grid-template-rows: max-content minmax(0, 1fr);
 		gap: var(--dry-space-2);
+	}
+
+	[data-calendar-grid][data-calendar-grid-headerless] [data-calendar-panel] {
+		grid-template-rows: minmax(0, 1fr);
 	}
 
 	[data-calendar-grid] [data-calendar-header] {
 		display: grid;
-		grid-template-columns: auto 1fr auto;
+		grid-template-columns: auto max-content auto;
 		align-items: center;
+		align-content: center;
+		justify-content: center;
 		gap: var(--dry-space-2);
 	}
 
 	[data-calendar-grid] [data-calendar-heading] {
 		font-size: var(--dry-type-small-size);
 		font-weight: 600;
-		letter-spacing: -0.01em;
+		letter-spacing: 0;
 		text-align: center;
 	}
 

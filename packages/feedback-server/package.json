@@ -79,6 +79,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@dryui/lint": "workspace:*",
     "@dryui/primitives": "workspace:*",
     "@dryui/ui": "workspace:*",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",

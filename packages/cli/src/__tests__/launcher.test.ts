@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
+import { EventEmitter } from 'node:events';
 import { resolve } from 'node:path';
 import type { ProjectDetection } from '@dryui/mcp/project-planner';
 import {
@@ -7,6 +8,7 @@ import {
 	isHealthyProbeStatus,
 	runLauncher,
 	runUserProjectLauncher,
+	waitForShutdownSignal,
 	type UserProjectLauncherRuntime
 } from '../commands/launcher.js';
 import type { PortHolder } from '../commands/launch-utils.js';
@@ -41,6 +43,56 @@ describe('launcher helpers', () => {
 		expect(isHealthyProbeStatus(401)).toBe(false);
 		expect(isHealthyProbeStatus(404)).toBe(false);
 		expect(isHealthyProbeStatus(500)).toBe(false);
+	});
+
+	test('shutdown wait handles raw Ctrl-C input bytes', async () => {
+		class FakeInput extends EventEmitter {
+			isTTY = true;
+			isRaw = true;
+			paused = true;
+			rawModes: boolean[] = [];
+
+			isPaused(): boolean {
+				return this.paused;
+			}
+
+			setRawMode(mode: boolean): void {
+				this.rawModes.push(mode);
+				this.isRaw = mode;
+			}
+
+			resume(): this {
+				this.paused = false;
+				return this;
+			}
+
+			pause(): this {
+				this.paused = true;
+				return this;
+			}
+		}
+
+		const input = new FakeInput();
+		const killed: number[] = [];
+		const promise = captureAsyncCommandIO(() =>
+			waitForShutdownSignal({
+				ownedPids: [111, 222],
+				killOwnedProcess: (pid) => {
+					killed.push(pid);
+				},
+				input
+			})
+		);
+
+		await new Promise((r) => setTimeout(r, 20));
+		input.emit('data', Buffer.from([3]));
+
+		const result = await promise;
+		expect(input.rawModes).toEqual([false, false]);
+		expect(input.isRaw).toBe(false);
+		expect(input.paused).toBe(true);
+		expect(killed).toEqual([111, 222]);
+		expect(result.logs.join('\n')).toContain('Stopping servers...');
 	});
 });
 

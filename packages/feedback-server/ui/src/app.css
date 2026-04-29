@@ -87,37 +87,26 @@ body {
 .feedback-screenshot-thumb {
 	--dry-image-object-fit: contain;
 	--dry-image-radius: var(--dry-radius-md);
+	--dry-image-block-size: 9rem;
 
 	display: grid;
-	max-inline-size: 100%;
+	grid-template-columns: minmax(0, 1fr);
 	max-block-size: 9rem;
 	border-radius: var(--dry-radius-md);
 	overflow: hidden;
 }
 
-.feedback-screenshot-thumb img {
-	max-inline-size: 100%;
-	max-block-size: 9rem;
-	object-fit: contain;
-}
-
 .feedback-screenshot-full {
 	--dry-image-object-fit: contain;
 	--dry-image-radius: 0;
+	--dry-image-block-size: min(64dvh, 44rem);
 
 	display: grid;
 	place-items: center;
-	max-inline-size: min(92vw, 96rem);
 	max-block-size: min(64dvh, 44rem);
 	background: var(--dry-color-bg-overlay);
 	border-radius: 0;
 	overflow: hidden;
-}
-
-.feedback-screenshot-full img {
-	max-inline-size: min(92vw, 96rem);
-	max-block-size: min(64dvh, 44rem);
-	object-fit: contain;
 }
 
 .url a {

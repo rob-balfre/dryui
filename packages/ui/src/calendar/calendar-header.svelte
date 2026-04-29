@@ -18,8 +18,10 @@
 <style>
 	[data-calendar-header] {
 		display: grid;
-		grid-template-columns: auto 1fr auto;
+		grid-template-columns: auto max-content auto;
 		align-items: center;
+		align-content: center;
+		justify-content: center;
 		gap: var(--dry-space-2);
 		margin-bottom: var(--dry-space-2);
 	}

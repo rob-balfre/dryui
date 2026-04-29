@@ -206,6 +206,25 @@ function emitLauncherError(error: unknown, exitOnComplete: boolean): void {
 interface ShutdownWaitOptions {
 	ownedPids: readonly number[];
 	killOwnedProcess: (pid: number) => void;
+	input?: ShutdownInput;
+}
+
+interface ShutdownInput {
+	isTTY?: boolean;
+	isRaw?: boolean;
+	isPaused?: () => boolean;
+	setRawMode?: (mode: boolean) => unknown;
+	resume?: () => unknown;
+	pause?: () => unknown;
+	on: (event: 'data', listener: (chunk: string | Uint8Array) => void) => unknown;
+	off: (event: 'data', listener: (chunk: string | Uint8Array) => void) => unknown;
+}
+
+function chunkIncludesCtrlC(chunk: string | Uint8Array): boolean {
+	if (typeof chunk === 'string') {
+		return chunk.includes('\x03');
+	}
+	return chunk.includes(3);
 }
 
 /**
@@ -214,15 +233,36 @@ interface ShutdownWaitOptions {
  * foreground alive until the user hits Ctrl-C, so servers get a clean shutdown
  * signal instead of being orphaned when the shell exits.
  */
-async function waitForShutdownSignal(options: ShutdownWaitOptions): Promise<void> {
+export async function waitForShutdownSignal(options: ShutdownWaitOptions): Promise<void> {
 	if (options.ownedPids.length === 0) return;
 
 	await new Promise<void>((resolve) => {
 		const keepAlive = setInterval(() => {}, 60_000);
+		const input = options.input ?? process.stdin;
+		const listenForInput = Boolean(input.isTTY);
+		const pauseAfterCleanup = listenForInput && input.isPaused?.() === true;
+		let settled = false;
+		const setRawModeFalse = (): void => {
+			if (!input.isTTY || typeof input.setRawMode !== 'function') return;
+			try {
+				input.setRawMode(false);
+			} catch {
+				// Best effort: some harnesses expose a TTY-shaped stdin without raw mode support.
+			}
+		};
 		const handler = (): void => {
+			if (settled) return;
+			settled = true;
 			process.off('SIGINT', handler);
 			process.off('SIGTERM', handler);
 			process.off('SIGHUP', handler);
+			if (listenForInput) {
+				input.off('data', onInputData);
+				setRawModeFalse();
+				if (pauseAfterCleanup) {
+					input.pause?.();
+				}
+			}
 			clearInterval(keepAlive);
 			console.log('');
 			console.log('Stopping servers...');
@@ -231,9 +271,19 @@ async function waitForShutdownSignal(options: ShutdownWaitOptions): Promise<void
 			}
 			resolve();
 		};
+		const onInputData = (chunk: string | Uint8Array): void => {
+			if (chunkIncludesCtrlC(chunk)) {
+				handler();
+			}
+		};
 		process.on('SIGINT', handler);
 		process.on('SIGTERM', handler);
 		process.on('SIGHUP', handler);
+		if (listenForInput) {
+			setRawModeFalse();
+			input.on('data', onInputData);
+			input.resume?.();
+		}
 	});
 }
 

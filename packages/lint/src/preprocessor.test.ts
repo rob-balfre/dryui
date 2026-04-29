@@ -278,4 +278,73 @@ describe('dryuiLint preprocessor', () => {
 			rmSync(root, { recursive: true, force: true });
 		}
 	});
+
+	test('can lint first-party @dryui/* package source in strict mode', async () => {
+		const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+		const { tmpdir } = await import('node:os');
+		const { resolve } = await import('node:path');
+
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-lint-first-party-'));
+		const pkgDir = resolve(root, 'packages/feedback-server');
+		mkdirSync(resolve(pkgDir, 'src'), { recursive: true });
+		writeFileSync(
+			resolve(pkgDir, 'package.json'),
+			JSON.stringify({ name: '@dryui/feedback-server', version: '0.0.0' })
+		);
+		const filePath = resolve(pkgDir, 'src/App.svelte');
+
+		try {
+			const pp = dryuiLint({ strict: true, includeDryuiPackages: true });
+			expect(() => {
+				pp.markup!({
+					content: '<div style="color: red">{@attach foo}</div>',
+					filename: filePath
+				});
+			}).toThrow('dryui/no-inline-style');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
+
+	test('can limit linting to included paths', async () => {
+		const { mkdtempSync, mkdirSync, writeFileSync, rmSync } = await import('node:fs');
+		const { tmpdir } = await import('node:os');
+		const { resolve } = await import('node:path');
+
+		const root = mkdtempSync(resolve(tmpdir(), 'dryui-lint-include-'));
+		const appDir = resolve(root, 'packages/feedback-server/ui/src');
+		const primitiveDir = resolve(root, 'packages/primitives/src/button');
+		mkdirSync(appDir, { recursive: true });
+		mkdirSync(primitiveDir, { recursive: true });
+		writeFileSync(
+			resolve(root, 'packages/feedback-server/package.json'),
+			JSON.stringify({ name: '@dryui/feedback-server', version: '0.0.0' })
+		);
+		writeFileSync(
+			resolve(root, 'packages/primitives/package.json'),
+			JSON.stringify({ name: '@dryui/primitives', version: '0.0.0' })
+		);
+
+		try {
+			const pp = dryuiLint({
+				strict: true,
+				includeDryuiPackages: true,
+				include: [appDir]
+			});
+			expect(() => {
+				pp.markup!({
+					content: '<button type="button">Toggle</button>',
+					filename: resolve(primitiveDir, 'button.svelte')
+				});
+			}).not.toThrow();
+			expect(() => {
+				pp.markup!({
+					content: '<div style="color: red">{@attach foo}</div>',
+					filename: resolve(appDir, 'App.svelte')
+				});
+			}).toThrow('dryui/no-inline-style');
+		} finally {
+			rmSync(root, { recursive: true, force: true });
+		}
+	});
 });

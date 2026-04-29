@@ -116,6 +116,7 @@
 		--dry-calendar-outside-color: var(--dry-color-text-weak);
 
 		display: inline-grid;
+		grid-template-rows: max-content minmax(0, 1fr);
 		box-sizing: border-box;
 		padding: var(--dry-calendar-padding);
 		background: var(--dry-calendar-bg);

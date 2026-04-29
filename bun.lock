@@ -81,13 +81,14 @@
       "name": "@dryui/feedback-server",
       "version": "1.0.0",
       "bin": {
-        "dryui-feedback-mcp": "./dist/mcp.js",
+        "dryui-feedback-mcp": "./bin/dryui-feedback-mcp.mjs",
       },
       "dependencies": {
         "@modelcontextprotocol/sdk": "^1.29.0",
         "zod": "^4.3.6",
       },
       "devDependencies": {
+        "@dryui/lint": "workspace:*",
         "@dryui/primitives": "workspace:*",
         "@dryui/ui": "workspace:*",
         "@sveltejs/vite-plugin-svelte": "^7.0.0",
