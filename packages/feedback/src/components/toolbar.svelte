@@ -10,7 +10,6 @@
 		Label,
 		Select
 	} from '@dryui/ui';
-	import { onMount } from 'svelte';
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
@@ -28,12 +27,19 @@
 		Search,
 		Send,
 		Settings,
+		AlignCenterHorizontal,
+		Columns3,
+		Grid3X3,
+		LayoutPanelLeft,
+		PanelsTopLeft,
+		Rows3,
 		Trash2,
 		Type,
 		Undo2,
 		VectorSquare
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
+	import type { LayoutTool as InspectorLayoutTool } from './layout-inspector.svelte';
 	import {
 		CATEGORY_LABELS,
 		CATEGORY_ORDER,
@@ -44,7 +50,7 @@
 	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components' | 'layout';
-	export type LayoutTool = 'box';
+	export type LayoutTool = InspectorLayoutTool;
 
 	interface Props {
 		active: boolean;
@@ -61,6 +67,8 @@
 		addedLabel?: string;
 		addedPropsJson?: string;
 		layoutTool?: LayoutTool | null;
+		layoutPlaced?: boolean;
+		layoutKind?: LayoutTool | null;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
@@ -89,6 +97,8 @@
 		addedLabel = '',
 		addedPropsJson = '',
 		layoutTool = null,
+		layoutPlaced = false,
+		layoutKind = null,
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
@@ -114,6 +124,25 @@
 	const inspectingLabel = $derived(showLayoutTools ? 'Adjusting layout' : 'Inspecting components');
 	const toolbarId = $props.id();
 	const pickerSearchId = `${toolbarId}-component-picker-search`;
+	const layoutTools: LayoutTool[] = [
+		'box',
+		'centered',
+		'stack',
+		'sidebar',
+		'holy-grail',
+		'12-span',
+		'card-grid'
+	];
+	const layoutToolLabels: Record<LayoutTool, string> = {
+		box: 'Box',
+		centered: 'Centered',
+		stack: 'Stack',
+		sidebar: 'Sidebar',
+		'holy-grail': 'Holy grail',
+		'12-span': '12 span',
+		'card-grid': 'Card grid'
+	};
+	const activeLayoutTool = $derived(layoutPlaced ? (layoutKind ?? 'box') : layoutTool);
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
@@ -172,6 +201,28 @@
 		onaddcomponent?.(trimmed);
 		pickerOpen = false;
 		pickerName = '';
+	}
+
+	function toggleLayoutTool(next: LayoutTool) {
+		if (layoutPlaced) {
+			onlayouttool?.(next);
+			return;
+		}
+		onlayouttool?.(layoutTool === next ? null : next);
+	}
+
+	function layoutToolTooltip(next: LayoutTool): string {
+		if (!layoutPlaced) return layoutToolLabels[next];
+		if (activeLayoutTool === next) return `${layoutToolLabels[next]} layout`;
+		return `Update to ${layoutToolLabels[next]}`;
+	}
+
+	function layoutToolAriaLabel(next: LayoutTool): string {
+		const label = layoutToolLabels[next].toLowerCase();
+		if (layoutPlaced) {
+			return activeLayoutTool === next ? `${label} layout selected` : `Update layout to ${label}`;
+		}
+		return layoutTool === next ? `Stop drawing ${label}` : `Draw ${label}`;
 	}
 
 	function handlePickerKey(e: KeyboardEvent) {
@@ -529,7 +580,7 @@
 		});
 	}
 
-	onMount(() => {
+	$effect(() => {
 		const pointerQuery = window.matchMedia(COARSE_POINTER_QUERY);
 		const syncPointerMode = () => {
 			coarsePointer = pointerQuery.matches;
@@ -691,19 +742,36 @@
 					: 'Annotation tools'}
 		>
 			{#if showLayoutTools}
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					type="button"
-					data-tooltip="Draw a box"
-					data-active={layoutTool === 'box' || undefined}
-					onclick={() => onlayouttool?.(layoutTool === 'box' ? null : 'box')}
-					aria-label={layoutTool === 'box' ? 'Stop drawing boxes' : 'Draw box'}
-					aria-pressed={layoutTool === 'box'}
-				>
-					<VectorSquare size={16} />
-				</Button>
+				{#each layoutTools as candidate (candidate)}
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						type="button"
+						data-tooltip={layoutToolTooltip(candidate)}
+						data-active={activeLayoutTool === candidate || undefined}
+						data-layout-tool={candidate}
+						onclick={() => toggleLayoutTool(candidate)}
+						aria-label={layoutToolAriaLabel(candidate)}
+						aria-pressed={activeLayoutTool === candidate}
+					>
+						{#if candidate === 'box'}
+							<VectorSquare size={16} />
+						{:else if candidate === 'centered'}
+							<AlignCenterHorizontal size={16} />
+						{:else if candidate === 'stack'}
+							<Rows3 size={16} />
+						{:else if candidate === 'sidebar'}
+							<LayoutPanelLeft size={16} />
+						{:else if candidate === 'holy-grail'}
+							<PanelsTopLeft size={16} />
+						{:else if candidate === '12-span'}
+							<Columns3 size={16} />
+						{:else}
+							<Grid3X3 size={16} />
+						{/if}
+					</Button>
+				{/each}
 			{:else if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>

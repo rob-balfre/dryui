@@ -199,7 +199,7 @@
 		const centerX = rect.left + rect.width / 2;
 		const centerY = rect.top + rect.height / 2;
 
-		const target = e.currentTarget as HTMLElement;
+		const target = document.documentElement;
 		manipulating = {
 			gesture,
 			pointerId: e.pointerId,

@@ -234,6 +234,15 @@ export interface SubmissionMovedElement {
 	currentRect: { x: number; y: number; width: number; height: number };
 }
 
+export type SubmissionLayoutKind =
+	| 'box'
+	| 'centered'
+	| 'stack'
+	| 'sidebar'
+	| 'holy-grail'
+	| '12-span'
+	| 'card-grid';
+
 /**
  * A free-drawn rectangle the user sketches on top of the page in Layout mode
  * to communicate a new region (intent only — no CSS mutation). Coordinates are
@@ -241,6 +250,7 @@ export interface SubmissionMovedElement {
  */
 export interface SubmissionLayoutBox {
 	id: string;
+	kind?: SubmissionLayoutKind;
 	label: string;
 	pageX: number;
 	pageY: number;

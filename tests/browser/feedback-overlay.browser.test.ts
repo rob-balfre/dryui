@@ -6,9 +6,12 @@ import { render } from './_harness';
 
 type HostKind = 'command-palette' | 'popover';
 
+const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
+
 afterEach(() => {
 	delete document.documentElement.dataset.theme;
 	document.documentElement.classList.remove('theme-auto');
+	window.sessionStorage.removeItem(WIDGET_STATE_STORAGE_KEY);
 });
 
 function mountFeedback(kind: HostKind, options?: { serverUrl?: string }) {
@@ -60,6 +63,104 @@ function canonicalTestPageUrl(): string {
 	url.searchParams.delete('dryui-feedback');
 	url.hash = '';
 	return url.toString();
+}
+
+function clickModeTab(label: 'Annotate' | 'Components' | 'Layout') {
+	const tab = Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(
+		(button) => button.textContent?.trim() === label
+	);
+	if (!tab) throw new Error(`Expected ${label} tab`);
+	tab.click();
+	flushSync();
+	return tab;
+}
+
+function readStoredWidgetDraft(): Record<string, unknown> {
+	const raw = window.sessionStorage.getItem(WIDGET_STATE_STORAGE_KEY);
+	expect(raw).toBeTruthy();
+	const parsed = JSON.parse(raw ?? '{}') as Record<string, Record<string, unknown>>;
+	const draft = parsed[canonicalTestPageUrl()];
+	expect(draft).toBeTruthy();
+	return draft;
+}
+
+function drawSidebarLayoutBox() {
+	clickModeTab('Layout');
+
+	const sidebarTool = document.querySelector<HTMLButtonElement>('[data-layout-tool="sidebar"]');
+	if (!sidebarTool) throw new Error('Expected sidebar layout tool');
+	sidebarTool.click();
+	flushSync();
+
+	const drawLayer = document.querySelector<HTMLElement>('.layout-box-draw-layer');
+	if (!drawLayer) throw new Error('Expected layout draw layer');
+
+	drawLayer.dispatchEvent(
+		new PointerEvent('pointerdown', {
+			bubbles: true,
+			cancelable: true,
+			button: 0,
+			buttons: 1,
+			clientX: 80,
+			clientY: 90,
+			pointerId: 23
+		})
+	);
+	window.dispatchEvent(
+		new PointerEvent('pointermove', {
+			bubbles: true,
+			cancelable: true,
+			buttons: 1,
+			clientX: 220,
+			clientY: 180,
+			pointerId: 23
+		})
+	);
+	window.dispatchEvent(
+		new PointerEvent('pointerup', {
+			bubbles: true,
+			cancelable: true,
+			button: 0,
+			clientX: 220,
+			clientY: 180,
+			pointerId: 23
+		})
+	);
+	flushSync();
+}
+
+async function placeButtonComponent() {
+	clickModeTab('Components');
+
+	const addButton = document.querySelector<HTMLButtonElement>('[aria-label="Add component"]');
+	if (!addButton) throw new Error('Expected add component button');
+	addButton.click();
+	flushSync();
+	await waitForAsyncWork();
+	flushSync();
+
+	const preset = Array.from(
+		document.querySelectorAll<HTMLButtonElement>('.component-picker-preset')
+	).find((button) => button.textContent?.trim() === 'Button');
+	if (!preset) throw new Error('Expected Button preset');
+	preset.click();
+	flushSync();
+
+	const overlay = document.querySelector<HTMLElement>('.placement-overlay');
+	if (!overlay) throw new Error('Expected placement overlay');
+	overlay.dispatchEvent(
+		new PointerEvent('pointerdown', {
+			bubbles: true,
+			cancelable: true,
+			button: 0,
+			clientX: 160,
+			clientY: 150,
+			pointerId: 24
+		})
+	);
+	flushSync();
+	await waitForAsyncWork(50);
+	flushSync();
 }
 
 function setupSubmissionEnvironment(options?: {
@@ -181,6 +282,124 @@ function setupSubmissionEnvironment(options?: {
 }
 
 describe('feedback overlay hosting', () => {
+	it('saves annotation, layout, and placed component draft state to sessionStorage', async () => {
+		render(Feedback);
+
+		const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
+		if (!drawButton) throw new Error('Expected feedback draw button');
+		drawButton.click();
+		flushSync();
+
+		const canvas = document.querySelector<SVGSVGElement>('[aria-label="Feedback drawing canvas"]');
+		if (!canvas) throw new Error('Expected feedback drawing canvas');
+		drawStroke(canvas);
+
+		let draft = readStoredWidgetDraft();
+		expect(draft.active).toBe(true);
+		expect(draft.tool).toBe('pencil');
+		expect(draft.mode).toBe('annotate');
+		expect(draft.drawings).toEqual([expect.objectContaining({ kind: 'freehand' })]);
+
+		drawSidebarLayoutBox();
+
+		draft = readStoredWidgetDraft();
+		expect(draft.mode).toBe('layout');
+		expect(draft.layoutBoxes).toEqual([
+			expect.objectContaining({
+				kind: 'sidebar',
+				pageX: 80,
+				pageY: 90,
+				width: 140,
+				height: 90
+			})
+		]);
+
+		await placeButtonComponent();
+
+		draft = readStoredWidgetDraft();
+		expect(draft.mode).toBe('components');
+		expect(draft.added).toEqual([
+			expect.objectContaining({
+				kind: 'Button',
+				snap: expect.objectContaining({
+					left: '60px',
+					top: '110px'
+				})
+			})
+		]);
+	});
+
+	it('restores annotation, layout, and placed component draft state from sessionStorage', async () => {
+		const pageUrl = canonicalTestPageUrl();
+		window.sessionStorage.setItem(
+			WIDGET_STATE_STORAGE_KEY,
+			JSON.stringify({
+				[pageUrl]: {
+					active: true,
+					tool: 'arrow',
+					mode: 'layout',
+					layoutTool: 'sidebar',
+					drawings: [
+						{
+							id: 'persisted-note',
+							kind: 'text',
+							position: { x: 88, y: 96 },
+							text: 'Persisted note',
+							color: 'hsl(25 100% 55%)',
+							space: 'viewport',
+							fontSize: 16
+						}
+					],
+					layoutBoxes: [
+						{
+							id: 'persisted-layout',
+							kind: 'sidebar',
+							label: 'sidebar-layout-1',
+							pageX: 80,
+							pageY: 90,
+							width: 140,
+							height: 90
+						}
+					],
+					added: [
+						{
+							id: 'persisted-button',
+							kind: 'Button',
+							label: 'Persisted button',
+							snap: {
+								left: '100px',
+								top: '120px',
+								width: '',
+								height: '',
+								transform: ''
+							}
+						}
+					],
+					moved: [],
+					removed: []
+				}
+			})
+		);
+
+		render(Feedback);
+		await waitForAsyncWork(50);
+		flushSync();
+
+		const layoutTab = Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(
+			(tab) => tab.textContent?.trim() === 'Layout'
+		);
+		expect(layoutTab?.getAttribute('aria-selected')).toBe('true');
+		expect(document.querySelector<SVGTextElement>('svg text')?.textContent).toBe('Persisted note');
+		const box = document.querySelector<HTMLElement>('.layout-box, .layout-box-readonly');
+		expect(box?.dataset.layoutKind).toBe('sidebar');
+		expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
+			'sidebar-layout-1'
+		);
+		const added = document.querySelector<HTMLElement>('[data-dryui-added-id="persisted-button"]');
+		expect(added).not.toBeNull();
+		expect(added?.textContent).toContain('Persisted button');
+	});
+
 	it('selects and moves ordinary elements inside layout shells in components mode', async () => {
 		const plainPage = document.createElement('main');
 		plainPage.style.margin = '48px';
@@ -240,19 +459,161 @@ describe('feedback overlay hosting', () => {
 				pointerId: 12
 			})
 		);
+		await waitForAsyncWork();
+		flushSync();
+		window.dispatchEvent(
+			new PointerEvent('pointermove', {
+				bubbles: true,
+				cancelable: true,
+				clientX: 144,
+				clientY: 128,
+				pointerId: 12
+			})
+		);
 		window.dispatchEvent(
 			new PointerEvent('pointerup', {
 				bubbles: true,
 				cancelable: true,
-				clientX: 112,
-				clientY: 104,
+				clientX: 144,
+				clientY: 128,
 				pointerId: 12
 			})
 		);
 		flushSync();
 
-		expectNear(parseFloat(clone.style.left), startLeft + 32);
-		expectNear(parseFloat(clone.style.top), startTop + 24);
+		expectNear(parseFloat(clone.style.left), startLeft + 64);
+		expectNear(parseFloat(clone.style.top), startTop + 48);
+	});
+
+	it('draws typed layout regions from layout tool icons and submits the selected kind', async () => {
+		const env = setupSubmissionEnvironment({
+			onCapture() {
+				expect(document.querySelector('.layout-box, .layout-box-readonly')).not.toBeNull();
+				expect(document.querySelector('.layout-box-preview')).toBeNull();
+				expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
+					'holy-grail-layout-1'
+				);
+			}
+		});
+
+		try {
+			render(Feedback, { serverUrl: 'http://feedback.test' });
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const layoutTab = Array.from(
+				document.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+			).find((tab) => tab.textContent?.trim() === 'Layout');
+			if (!layoutTab) throw new Error('Expected Layout tab');
+
+			layoutTab.click();
+			flushSync();
+
+			const sidebarTool = document.querySelector<HTMLButtonElement>('[data-layout-tool="sidebar"]');
+			if (!sidebarTool) throw new Error('Expected sidebar layout tool');
+
+			sidebarTool.click();
+			flushSync();
+
+			const drawLayer = document.querySelector<HTMLElement>('.layout-box-draw-layer');
+			if (!drawLayer) throw new Error('Expected layout draw layer');
+
+			drawLayer.dispatchEvent(
+				new PointerEvent('pointerdown', {
+					bubbles: true,
+					cancelable: true,
+					button: 0,
+					buttons: 1,
+					clientX: 80,
+					clientY: 90,
+					pointerId: 23
+				})
+			);
+			window.dispatchEvent(
+				new PointerEvent('pointermove', {
+					bubbles: true,
+					cancelable: true,
+					buttons: 1,
+					clientX: 220,
+					clientY: 180,
+					pointerId: 23
+				})
+			);
+			window.dispatchEvent(
+				new PointerEvent('pointerup', {
+					bubbles: true,
+					cancelable: true,
+					button: 0,
+					clientX: 220,
+					clientY: 180,
+					pointerId: 23
+				})
+			);
+			flushSync();
+
+			const box = document.querySelector<HTMLElement>('.layout-box');
+			expect(box?.dataset.layoutKind).toBe('sidebar');
+			expect(document.querySelectorAll('.layout-box')).toHaveLength(1);
+			expect(document.querySelector('.layout-box-preview')?.getAttribute('data-layout-kind')).toBe(
+				'sidebar'
+			);
+			expect(document.querySelector('.layout-box-preview [data-slot="aside"]')).not.toBeNull();
+			expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
+				'sidebar-layout-1'
+			);
+
+			const holyGrailTool = document.querySelector<HTMLButtonElement>(
+				'[data-layout-tool="holy-grail"]'
+			);
+			if (!holyGrailTool) throw new Error('Expected holy-grail layout tool');
+
+			holyGrailTool.click();
+			flushSync();
+
+			expect(document.querySelectorAll('.layout-box')).toHaveLength(1);
+			expect(document.querySelector<HTMLElement>('.layout-box')?.dataset.layoutKind).toBe(
+				'holy-grail'
+			);
+			expect(document.querySelector('.layout-box-draw-layer')).toBeNull();
+			expect(document.querySelector('.layout-box-preview')?.getAttribute('data-layout-kind')).toBe(
+				'holy-grail'
+			);
+			expect(document.querySelector('.layout-box-preview [data-slot="masthead"]')).not.toBeNull();
+			expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
+				'holy-grail-layout-1'
+			);
+			expect(holyGrailTool.getAttribute('data-tooltip')).toBe('Holy grail layout');
+			expect(sidebarTool.getAttribute('data-tooltip')).toBe('Update to Sidebar');
+
+			const submitButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Send feedback"]'
+			);
+			if (!submitButton) throw new Error('Expected feedback submit button');
+
+			submitButton.click();
+			await waitForAsyncWork(50);
+			flushSync();
+
+			const submissionCall = env.fetchSpy.mock.calls.find(
+				([input, init]) =>
+					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
+					init?.method === 'POST'
+			);
+			expect(submissionCall).toBeDefined();
+			const body = JSON.parse(String(submissionCall?.[1]?.body));
+			expect(body.layoutBoxes).toEqual([
+				expect.objectContaining({
+					kind: 'holy-grail',
+					label: 'holy-grail-layout-1',
+					pageX: 80,
+					pageY: 90,
+					width: 140,
+					height: 90
+				})
+			]);
+		} finally {
+			env.restore();
+		}
 	});
 
 	it.each(['command-palette', 'popover'] as const)(
