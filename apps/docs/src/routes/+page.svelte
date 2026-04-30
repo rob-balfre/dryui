@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import {
 		AppFrame,
 		Button,
@@ -54,16 +53,14 @@
 	const userChars = [...userMessage];
 	const assistantChars = [...assistantMessage];
 
-	const CINEMATIC_SEEN_KEY = 'dryui-home-cinematic-seen';
-
 	let userTypedLen = $state(0);
 	let assistantVisible = $state(false);
 	let assistantThinking = $state(false);
 	let assistantTypedLen = $state(0);
 	let chromeRevealed = $state(false);
-	let supportingVisible = $state(false);
+	let cinematicComplete = $state(false);
 	let cinematicSkipped = $state(false);
-	let skipFadeIn = $state(false);
+	let cinematicBypassed = $state(false);
 	let hydrated = $state(false);
 	let cinematicCancelled = false;
 	let cinematicTimers: ReturnType<typeof setTimeout>[] = [];
@@ -74,26 +71,12 @@
 		assistantThinking = false;
 		assistantTypedLen = assistantMessage.length;
 		chromeRevealed = true;
-		supportingVisible = true;
+		cinematicComplete = true;
 	}
 
-	function shouldSkipCinematic(): boolean {
+	function shouldBypassCinematic(): boolean {
 		if (typeof window === 'undefined') return true;
-		if (getReducedMotionPreference()) return true;
-		try {
-			return window.sessionStorage.getItem(CINEMATIC_SEEN_KEY) === '1';
-		} catch {
-			return false;
-		}
-	}
-
-	function markSeen() {
-		if (typeof window === 'undefined') return;
-		try {
-			window.sessionStorage.setItem(CINEMATIC_SEEN_KEY, '1');
-		} catch {
-			/* ignore quota / privacy mode */
-		}
+		return getReducedMotionPreference();
 	}
 
 	function clearCinematicPlayback() {
@@ -102,20 +85,22 @@
 		cinematicTimers = [];
 	}
 
-	const canSkip = $derived(hydrated && !skipFadeIn && !cinematicSkipped && !supportingVisible);
+	const canSkip = $derived(
+		hydrated && !cinematicBypassed && !cinematicSkipped && !cinematicComplete
+	);
+	const animationDisabled = $derived(cinematicBypassed || cinematicSkipped);
 
 	function skipCinematic() {
 		if (!canSkip) return;
 		cinematicSkipped = true;
 		clearCinematicPlayback();
 		jumpToFinal();
-		markSeen();
 	}
 
-	onMount(() => {
-		if (shouldSkipCinematic()) {
+	$effect(() => {
+		if (shouldBypassCinematic()) {
 			jumpToFinal();
-			skipFadeIn = true;
+			cinematicBypassed = true;
 			hydrated = true;
 			return;
 		}
@@ -144,7 +129,10 @@
 			});
 
 		(async () => {
-			await wait(900);
+			await wait(120);
+			if (cinematicCancelled) return;
+			chromeRevealed = true;
+			await wait(520);
 			if (cinematicCancelled) return;
 			await typewriter(userChars.length, 55, (n) => (userTypedLen = n));
 			if (cinematicCancelled) return;
@@ -159,12 +147,8 @@
 			if (cinematicCancelled) return;
 			await wait(500);
 			if (cinematicCancelled) return;
-			chromeRevealed = true;
-			await wait(800);
-			if (cinematicCancelled) return;
-			supportingVisible = true;
+			cinematicComplete = true;
 			cinematicTimers = [];
-			markSeen();
 		})();
 
 		return () => clearCinematicPlayback();
@@ -387,22 +371,12 @@
 
 <div class="page">
 	<div class="page-stack">
-		<section
-			class="hero"
-			class:hero--hydrated={hydrated}
-			class:hero--no-motion={skipFadeIn || cinematicSkipped}
-			class:hero--skip-fade={skipFadeIn}
-		>
+		<section class="hero" class:hero--no-motion={cinematicBypassed || cinematicSkipped}>
 			<div class="hero-main">
 				<VisuallyHidden>
 					<Heading level={1}>DryUI. Don't repeat yourself.</Heading>
 				</VisuallyHidden>
-				<div
-					class="hero-lockup hero-reveal"
-					data-revealed={supportingVisible || undefined}
-					inert={!supportingVisible}
-					aria-hidden="true"
-				>
+				<div class="hero-lockup" aria-hidden="true">
 					<div class="hero-brand">
 						<Logo />
 					</div>
@@ -423,7 +397,7 @@
 						<AppFrame
 							title={chromeRevealed ? 'agent.chat' : ''}
 							--dry-app-frame-content-padding="var(--dry-space-5)"
-							--dry-app-frame-transition={skipFadeIn || cinematicSkipped ? '0s' : '700ms'}
+							--dry-app-frame-transition={animationDisabled ? '0s' : '700ms'}
 							--dry-app-frame-bg={chromeRevealed ? 'var(--dry-color-bg-base)' : 'transparent'}
 							--dry-app-frame-border={chromeRevealed
 								? 'var(--dry-color-stroke-weak)'
@@ -475,19 +449,11 @@
 						</AppFrame>
 					</div>
 
-					<div
-						class="hero-reveal"
-						data-revealed={supportingVisible || undefined}
-						inert={!supportingVisible}
-					>
+					<div>
 						<Text size="xs" color="secondary">100% free & open-source.</Text>
 					</div>
 				</div>
-				<div
-					class="hero-install hero-reveal"
-					data-revealed={supportingVisible || undefined}
-					inert={!supportingVisible}
-				>
+				<div class="hero-install">
 					<div class="hero-tabs">
 						<Tabs.Root value="bun">
 							<div class="hero-tabs-list">
@@ -516,12 +482,7 @@
 					</div>
 				</div>
 
-				<nav
-					aria-label="Homepage links"
-					class="actions hero-reveal"
-					data-revealed={supportingVisible || undefined}
-					inert={!supportingVisible}
-				>
+				<nav aria-label="Homepage links" class="actions">
 					<span class="cta-warm">
 						<Button variant="solid" size="md" href={withBase('/getting-started')}>
 							<Rocket size={16} aria-hidden="true" /> Get Started
@@ -546,11 +507,7 @@
 				{/if}
 			</div>
 
-			<section
-				class="plugins hero-reveal"
-				data-revealed={supportingVisible || undefined}
-				inert={!supportingVisible}
-			>
+			<section class="plugins">
 				<Text size="xs" color="secondary" weight="medium">Supported in</Text>
 				<div class="plugins-grid">
 					<a class="plugin" href={withBase('/getting-started?plugin=claude-code#install-plugin')}>
@@ -885,42 +842,12 @@
 		min-block-size: 100svh;
 		padding-block: clamp(var(--dry-space-6), 4vh, var(--dry-space-12));
 		row-gap: clamp(var(--dry-space-8), 6vh, var(--dry-space-16));
-		opacity: 0;
 	}
 
-	.hero--hydrated {
-		opacity: 1;
-	}
-
-	.hero--skip-fade {
-		animation: hero-skip-fade 800ms ease-out both;
-	}
-
-	.hero--no-motion .hero-reveal,
 	.hero--no-motion .chat-msg,
 	.hero--no-motion .chat-row[data-role='assistant'] {
 		transition: none;
 		animation: none;
-	}
-
-	@keyframes hero-skip-fade {
-		from {
-			opacity: 0;
-			transform: translateY(0.5rem);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.hero {
-			opacity: 1;
-		}
-		.hero--skip-fade {
-			animation: none;
-		}
 	}
 
 	.hero-main {
@@ -1101,18 +1028,8 @@
 		visibility: visible;
 	}
 
-	.hero-reveal {
-		opacity: 0;
-		transition: opacity 700ms ease 80ms;
-	}
-
-	.hero-reveal[data-revealed] {
-		opacity: 1;
-	}
-
 	@media (prefers-reduced-motion: reduce) {
 		.chat-msg,
-		.hero-reveal,
 		.chat-row[data-role='assistant'] {
 			transition: none;
 			animation: none;
