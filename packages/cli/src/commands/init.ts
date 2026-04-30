@@ -12,8 +12,6 @@ import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { createInterface } from 'node:readline/promises';
-import { stdin as input, stdout as output } from 'node:process';
 import type { Spec } from './types.js';
 import {
 	planInstall,
@@ -23,7 +21,6 @@ import {
 	type ProjectPlanStep,
 	type InstallPlan
 } from '@dryui/mcp/project-planner';
-import { isInteractiveTTY } from '../run.js';
 import {
 	ensureClaudeAgents,
 	FEEDBACK_SERVER_URL,
@@ -32,10 +29,8 @@ import {
 	mountFeedbackInLayout,
 	patchViteConfigFeedbackNoExternal,
 	type InstallPackageOptions,
-	type MountFeedbackOptions,
-	type PortHolder
+	type MountFeedbackOptions
 } from './launch-utils.js';
-import { runUserProjectLauncher } from './launcher.js';
 import {
 	checkManifestFreshness,
 	detectDryuiWorkspace,
@@ -52,7 +47,6 @@ interface InitOptions {
 	targetPath: string;
 	userPath: string | null;
 	packageManager: DryuiPackageManager;
-	noLaunch: boolean;
 	noFeedback: boolean;
 	devTarballsDir: string | null;
 }
@@ -63,16 +57,8 @@ interface InitRuntime {
 	mountFeedback?: (options: MountFeedbackOptions) => boolean;
 	patchViteConfig?: (configPath: string) => boolean;
 	findViteConfig?: (root: string) => string | null;
-	isInteractiveTTY?: () => boolean;
-	promptLaunch?: () => Promise<boolean>;
 	promptInstallImpeccable?: () => Promise<boolean>;
 	installImpeccable?: (cwd: string) => boolean;
-	promptKillPortHolder?: (holder: PortHolder, port: number) => Promise<boolean>;
-	runLauncher?: (
-		cwd: string,
-		spec: Spec,
-		runtime: { promptKillPortHolder: (holder: PortHolder, port: number) => Promise<boolean> }
-	) => Promise<void>;
 }
 
 interface ParsedInstallCommand {
@@ -88,14 +74,13 @@ function isPackageManager(value: string): value is ConcretePackageManager {
 }
 
 function printInitHelp(exitCode = 0): never {
-	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]');
+	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]');
 	console.log('');
 	console.log('Bootstrap a SvelteKit + DryUI project.');
 	console.log('');
 	console.log('Options:');
 	console.log('  [path]             Target directory (default: current directory)');
 	console.log('  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)');
-	console.log('  --no-launch        Skip launching feedback mode after scaffold');
 	console.log('  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />');
 	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
 	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
@@ -124,7 +109,6 @@ function parseInitArgs(args: string[]): InitOptions {
 	let targetPath = process.cwd();
 	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
-	let noLaunch = false;
 	let noFeedback = false;
 	let devTarballsDir: string | null = null;
 
@@ -141,7 +125,7 @@ function parseInitArgs(args: string[]): InitOptions {
 			packageManager = next;
 			i++;
 		} else if (arg === '--no-launch') {
-			noLaunch = true;
+			// Legacy no-op. Init no longer launches feedback mode automatically.
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
 		} else if (arg === '--skip-impeccable') {
@@ -164,7 +148,6 @@ function parseInitArgs(args: string[]): InitOptions {
 		targetPath,
 		userPath,
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
-		noLaunch,
 		noFeedback,
 		devTarballsDir
 	};
@@ -408,48 +391,6 @@ function setupClaudeAgents(targetPath: string): boolean {
 	return result.sourceFound;
 }
 
-async function confirmPrompt(question: string, defaultYes: boolean): Promise<boolean> {
-	const previousRawMode = Boolean(input.isRaw);
-	if (typeof input.setRawMode === 'function') {
-		input.setRawMode(false);
-	}
-	input.resume();
-
-	const rl = createInterface({ input, output });
-	try {
-		const answer = (await rl.question(question)).trim().toLowerCase();
-		if (!answer) return defaultYes;
-		return answer === 'y' || answer === 'yes';
-	} finally {
-		rl.close();
-		if (typeof input.setRawMode === 'function') {
-			input.setRawMode(previousRawMode);
-		}
-	}
-}
-
-async function promptKillPortHolderDefault(holder: PortHolder, port: number): Promise<boolean> {
-	if (!isInteractiveTTY()) return false;
-	return confirmPrompt(
-		`  Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Stop it and start this project? (y/N) `,
-		false
-	);
-}
-
-async function runLauncherDefault(
-	cwd: string,
-	spec: Spec,
-	runtime: Pick<InitRuntime, 'promptKillPortHolder'> = {}
-): Promise<void> {
-	await runUserProjectLauncher([], {
-		cwd,
-		spec,
-		runtime: {
-			promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
-		}
-	});
-}
-
 function applyDevTarballsToSteps(
 	steps: InstallPlan['steps'],
 	manifest: DevTarballsManifest
@@ -475,7 +416,6 @@ export async function runInit(
 		targetPath,
 		userPath,
 		packageManager,
-		noLaunch,
 		noFeedback,
 		devTarballsDir: explicitDevTarballsDir
 	} = parseInitArgs(args);
@@ -578,7 +518,6 @@ export async function runInit(
 		}
 	}
 
-	let feedbackReady = false;
 	if (isScaffold && installsSucceeded && !noFeedback) {
 		const concretePm: ConcretePackageManager =
 			packageManager === 'unknown' ? 'npm' : packageManager;
@@ -586,7 +525,7 @@ export async function runInit(
 		const effectiveInstall = devTarballsManifest
 			? wrapInstallPackage(baseInstall, devTarballsManifest)
 			: baseInstall;
-		feedbackReady = setupFeedback(targetPath, concretePm, {
+		setupFeedback(targetPath, concretePm, {
 			installPackage: effectiveInstall,
 			mountFeedback: runtime.mountFeedback ?? mountFeedbackInLayout,
 			patchViteConfig: runtime.patchViteConfig ?? patchViteConfigFeedbackNoExternal,
@@ -602,56 +541,18 @@ export async function runInit(
 		setupClaudeAgents(targetPath);
 	}
 
-	const tty = (runtime.isInteractiveTTY ?? isInteractiveTTY)();
-
-	let launcherRan = false;
-	if (isScaffold && feedbackReady && !noLaunch && tty) {
-		log('');
-		log('  Launching project in feedback mode...');
-		log('');
-		const launcherRuntime = {
-			promptKillPortHolder: runtime.promptKillPortHolder ?? promptKillPortHolderDefault
-		};
-		if (runtime.runLauncher) {
-			await runtime.runLauncher(targetPath, spec, launcherRuntime);
-		} else {
-			await runLauncherDefault(targetPath, spec, launcherRuntime);
-		}
-		launcherRan = true;
-	}
-
 	const cwdIsTarget = resolve(process.cwd()) === resolve(targetPath);
-	const devCommand =
-		packageManager === 'bun'
-			? 'bun run dev'
-			: packageManager === 'pnpm'
-				? 'pnpm run dev'
-				: packageManager === 'yarn'
-					? 'yarn dev'
-					: 'npm run dev';
 
 	// A child process cannot chdir its parent shell, so print the path the user
-	// needs to step into. Show it both in the launcher-skipped path AND after
-	// the launcher returns (the launcher's spawned dev/feedback servers don't
-	// follow the user's shell home when they exit).
+	// needs to step into before starting the DryUI CLI for the new project.
 	log('');
-	log(
-		launcherRan
-			? '  Project ready. To keep working in this project:'
-			: '  Done! Your DryUI project is ready.'
-	);
+	log(isScaffold ? '  Bootstrap completed successfully.' : '  Done! DryUI is set up.');
 	log('');
 	log('  Next steps:');
 	if (!cwdIsTarget) {
 		// Preserve the user-typed path verbatim so absolute inputs aren't sliced.
 		log(`    cd ${userPath ?? targetPath}`);
 	}
-	if (!launcherRan) {
-		log(`    ${devCommand}`);
-		if (isScaffold && feedbackReady) {
-			log('');
-			log('  Tip: run `dryui` in the project to start feedback mode alongside dev.');
-		}
-	}
+	log('    dryui');
 	log('');
 }

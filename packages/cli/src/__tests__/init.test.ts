@@ -165,14 +165,13 @@ describe('runInit', () => {
 		const result = await captureAsyncCommandIO(() => runInit(['--help'], spec));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]',
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]',
 			'',
 			'Bootstrap a SvelteKit + DryUI project.',
 			'',
 			'Options:',
 			'  [path]             Target directory (default: current directory)',
 			'  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)',
-			'  --no-launch        Skip launching feedback mode after scaffold',
 			'  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />'
 		]);
 		expect(result.errors).toEqual([]);
@@ -186,7 +185,7 @@ describe('runInit', () => {
 		expect(shortHelp.exitCode).toBe(0);
 		expect(longHelp.exitCode).toBe(0);
 		expect(shortHelp.logs[0]).toBe(
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-launch] [--no-feedback]'
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]'
 		);
 		expect(longHelp.logs).toEqual(shortHelp.logs);
 		expect(shortHelp.errors).toEqual([]);
@@ -466,140 +465,103 @@ describe('runInit', () => {
 		expect(writtenPackageJson.overrides['@dryui/lint']).toBe(lintTarball);
 	});
 
-	test('scaffold launches project feedback mode without prompting', async () => {
-		const { root, target, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
-		const launcherCalls: Array<{ cwd: string; portPromptResult: boolean }> = [];
-		let promptCalls = 0;
+	test('scaffold prints dryui next steps without launching feedback', async () => {
+		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun'], spec, {
 					runCommand: () => true,
-					...feedback.stubs,
-					promptLaunch: async () => {
-						promptCalls++;
-						return false;
-					},
-					promptKillPortHolder: async (holder, port) =>
-						holder.pid === 12345 && holder.command === 'node' && port === 5173,
-					runLauncher: async (cwd, _spec, launcherRuntime) => {
-						launcherCalls.push({
-							cwd,
-							portPromptResult: await launcherRuntime.promptKillPortHolder(
-								{ pid: 12345, command: 'node' },
-								5173
-							)
-						});
-					}
+					...feedback.stubs
 				})
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(promptCalls).toBe(0);
-		expect(launcherCalls).toEqual([{ cwd: target, portPromptResult: true }]);
-		expect(result.logs).toContain('  Launching project in feedback mode...');
-		// After the launcher returns, init still prints the cd hint so the user
-		// knows where to go: a child process can't chdir its parent shell.
-		expect(result.logs).toContain('  Project ready. To keep working in this project:');
+		expect(result.logs.some((line) => line.includes('Launching project in feedback mode'))).toBe(
+			false
+		);
+		expect(result.logs).toContain('  Bootstrap completed successfully.');
 		expect(result.logs).toContain('  Next steps:');
 		expect(result.logs).toContain('    cd projects/smoke');
-		// The dev command tip is omitted when the launcher already ran.
+		expect(result.logs).toContain('    dryui');
 		expect(result.logs.some((line) => line.includes('bun run dev'))).toBe(false);
 	});
 
-	test('scaffold expands ~/ target paths before launching feedback', async () => {
+	test('scaffold preserves ~/ target paths in dryui next steps', async () => {
 		const home = createTempTree({});
 		const root = createTempTree({ 'package.json': JSON.stringify({ private: true }) });
 		const feedback = buildFeedbackRuntime({ isInteractiveTTY: () => true });
-		const launcherCalls: string[] = [];
 
 		const result = await withHome(home, () =>
 			withCwd(root, () =>
 				captureAsyncCommandIO(() =>
 					runInit(['~/smoke', '--pm', 'bun'], spec, {
 						runCommand: () => true,
-						...feedback.stubs,
-						runLauncher: async (cwd) => {
-							launcherCalls.push(cwd);
-						}
+						...feedback.stubs
 					})
 				)
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(launcherCalls).toEqual([join(home, 'smoke')]);
 		expect(result.logs).toContain('    cd ~/smoke');
+		expect(result.logs).toContain('    dryui');
 		expect(result.logs.some((line) => line.includes('bun run dev'))).toBe(false);
 	});
 
-	test('--no-launch falls back to next steps in a TTY', async () => {
+	test('legacy --no-launch is accepted as a no-op', async () => {
 		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
-		const launcherCalls: string[] = [];
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun', '--no-launch'], spec, {
 					runCommand: () => true,
-					...feedback.stubs,
-					runLauncher: async (cwd) => {
-						launcherCalls.push(cwd);
-					}
+					...feedback.stubs
 				})
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(launcherCalls).toEqual([]);
 		expect(result.logs).toContain('    cd projects/smoke');
-		expect(result.logs).toContain('    bun run dev');
-		expect(result.logs).toContain(
-			'  Tip: run `dryui` in the project to start feedback mode alongside dev.'
+		expect(result.logs).toContain('    dryui');
+		expect(result.logs.some((line) => line.includes('Launching project in feedback mode'))).toBe(
+			false
 		);
 	});
 
-	test('--no-launch skips launch even in a TTY', async () => {
+	test('legacy --no-launch still leaves feedback setup ready', async () => {
 		const { root, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
-		let launcherCalls = 0;
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun', '--no-launch'], spec, {
 					runCommand: () => true,
-					...feedback.stubs,
-					runLauncher: async () => {
-						launcherCalls++;
-					}
+					...feedback.stubs
 				})
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(launcherCalls).toBe(0);
-		expect(result.logs).toContain('    bun run dev');
+		expect(feedback.installCalls).toHaveLength(1);
+		expect(result.logs).toContain('    dryui');
 	});
 
-	test('non-TTY scaffold sets up feedback but does not launch', async () => {
+	test('non-TTY scaffold sets up feedback and prints dryui next steps', async () => {
 		const { root, feedback } = scaffoldTestBed();
-		let launcherCalls = 0;
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun'], spec, {
 					runCommand: () => true,
-					...feedback.stubs,
-					runLauncher: async () => {
-						launcherCalls++;
-					}
+					...feedback.stubs
 				})
 			)
 		);
 
 		expect(result.errors).toEqual([]);
-		expect(launcherCalls).toBe(0);
 		expect(feedback.installCalls).toHaveLength(1);
-		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs).toContain('    dryui');
 	});
 
 	test('feedback setup is skipped when an install step fails', async () => {
@@ -621,16 +583,12 @@ describe('runInit', () => {
 
 	test('--no-feedback skips @dryui/feedback install, mount, and vite patch', async () => {
 		const { root, target, feedback } = scaffoldTestBed({ isInteractiveTTY: () => true });
-		let launcherCalls = 0;
 
 		const result = await withCwd(root, () =>
 			captureAsyncCommandIO(() =>
 				runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
 					runCommand: () => true,
-					...feedback.stubs,
-					runLauncher: async () => {
-						launcherCalls++;
-					}
+					...feedback.stubs
 				})
 			)
 		);
@@ -639,9 +597,8 @@ describe('runInit', () => {
 		expect(feedback.installCalls).toEqual([]);
 		expect(feedback.mountCalls).toEqual([]);
 		expect(feedback.patchCalls).toEqual([]);
-		expect(launcherCalls).toBe(0);
 		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
-		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs).toContain('    dryui');
 		const layout = readFileSync(join(target, 'src/routes/+layout.svelte'), 'utf8');
 		expect(layout).not.toContain('@dryui/feedback');
 		expect(layout).not.toContain('<Feedback');
@@ -697,7 +654,7 @@ describe('runInit', () => {
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs).toContain(`    cd ${target}`);
-		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs).toContain('    dryui');
 	});
 
 	test('next-steps cd line shows the relative path the user typed', async () => {
@@ -715,7 +672,7 @@ describe('runInit', () => {
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs).toContain('    cd myapp');
-		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs).toContain('    dryui');
 	});
 
 	test('next-steps omits the cd line when initializing the current directory', async () => {
@@ -733,7 +690,7 @@ describe('runInit', () => {
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs.some((line) => line.startsWith('    cd '))).toBe(false);
-		expect(result.logs).toContain('    bun run dev');
+		expect(result.logs).toContain('    dryui');
 	});
 
 	test('warns instead of rewriting an unrecognised preprocess shape', async () => {
