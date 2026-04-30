@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -38,7 +37,7 @@
 	const scaleValue = $derived(`${Math.max(0, scale)}`);
 	const shouldAnimate = $derived(animated && !prefersReducedMotion);
 
-	onMount(() => {
+	$effect(() => {
 		const stopMotionObserver = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		});
@@ -47,13 +46,17 @@
 			prefersReducedMotion = true;
 		}
 
+		return stopMotionObserver;
+	});
+
+	$effect(() => {
+		if (!shouldAnimate) return;
+
 		let frameId: number | undefined;
 		let lastTime = 0;
 		const FPS_INTERVAL = 1000 / 12; // 12fps for SVG filter re-rasterization
 
 		function animate(time: number) {
-			if (!shouldAnimate) return;
-
 			if (time - lastTime >= FPS_INTERVAL) {
 				seed = Math.floor(Math.random() * 9999) + 1;
 				lastTime = time;
@@ -62,20 +65,14 @@
 			frameId = requestAnimationFrame(animate);
 		}
 
-		$effect(() => {
-			if (shouldAnimate) {
-				frameId = requestAnimationFrame(animate);
+		frameId = requestAnimationFrame(animate);
+
+		return () => {
+			if (frameId !== undefined) {
+				cancelAnimationFrame(frameId);
+				frameId = undefined;
 			}
-
-			return () => {
-				if (frameId !== undefined) {
-					cancelAnimationFrame(frameId);
-					frameId = undefined;
-				}
-			};
-		});
-
-		return stopMotionObserver;
+		};
 	});
 
 	function applyFilterStyles(node: HTMLElement) {

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { observeReducedMotionPreference } from '../internal/motion.js';
@@ -25,7 +24,7 @@
 
 	let prefersReducedMotion = $state(false);
 
-	onMount(() =>
+	$effect(() =>
 		observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		})

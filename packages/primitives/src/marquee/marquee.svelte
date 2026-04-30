@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { observeReducedMotionPreference } from '../internal/motion.js';
@@ -30,7 +29,7 @@
 	const isVertical = $derived(direction === 'up' || direction === 'down');
 	const duration = $derived(contentSize > 0 && speed > 0 ? contentSize / speed : 0);
 
-	onMount(() =>
+	$effect(() =>
 		observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		})

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -31,7 +30,7 @@
 	let onScreen = $state(true);
 	let tabVisible = $state(true);
 
-	onMount(() => {
+	$effect(() => {
 		const stopMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		});

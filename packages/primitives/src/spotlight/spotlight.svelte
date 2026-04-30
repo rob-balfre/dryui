@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -91,7 +90,7 @@
 		active = prefersReducedMotion || !followPointer;
 	}
 
-	onMount(() => {
+	$effect(() => {
 		registerPropertyOnce({
 			name: '--dry-spotlight-x',
 			syntax: '<length-percentage>',

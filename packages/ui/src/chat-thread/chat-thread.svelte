@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
@@ -139,7 +139,7 @@
 		}
 	});
 
-	onMount(() => {
+	$effect(() => {
 		const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
 		prefersReducedMotion = mql.matches;
 		const handler = (e: MediaQueryListEvent) => {

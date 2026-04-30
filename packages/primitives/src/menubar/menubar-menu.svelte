@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import { getMenubarCtx, setMenubarMenuCtx } from './context.svelte.js';
 
@@ -13,7 +12,7 @@
 	const menuId = `menubar-menu-${uid}`;
 	const ctx = getMenubarCtx();
 
-	onMount(() => {
+	$effect(() => {
 		ctx.registerMenu(menuId);
 		return () => ctx.unregisterMenu(menuId);
 	});

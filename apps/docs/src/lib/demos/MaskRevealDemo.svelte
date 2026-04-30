@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { MaskReveal } from '@dryui/ui';
 
 	const highlights = [
@@ -34,7 +33,7 @@
 
 	let mounted = $state(false);
 
-	onMount(() => {
+	$effect(() => {
 		mounted = true;
 	});
 </script>

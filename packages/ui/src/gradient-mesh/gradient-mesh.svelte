@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -90,7 +89,7 @@
 		pointerY = '50%';
 	}
 
-	onMount(() => {
+	$effect(() => {
 		registerPropertyOnce({
 			name: '--dry-mesh-color-1',
 			syntax: '<color>',

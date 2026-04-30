@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -46,7 +45,7 @@
 
 	const offsetValue = $derived(`${Math.max(0, offset)}px`);
 
-	onMount(() => {
+	$effect(() => {
 		const stopMotionObserver = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		});

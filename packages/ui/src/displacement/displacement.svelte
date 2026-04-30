@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -43,20 +42,26 @@
 		animated && !prefersReducedMotion && documentVisible && inViewport
 	);
 
-	onMount(() => {
+	$effect(() => {
 		const stopMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		});
 		const stopVisibility = observePageVisibility((visible) => {
 			documentVisible = visible;
 		});
+		return () => {
+			stopMotion();
+			stopVisibility();
+		};
+	});
 
+	$effect(() => {
+		if (!shouldAnimate) return;
 		let frameId: number | undefined;
 		let lastTime = 0;
 		const FPS_INTERVAL = 1000 / 12;
 
 		function animate(time: number) {
-			if (!shouldAnimate) return;
 			if (time - lastTime >= FPS_INTERVAL) {
 				seed = Math.floor(Math.random() * 9999) + 1;
 				lastTime = time;
@@ -64,29 +69,19 @@
 			frameId = requestAnimationFrame(animate);
 		}
 
-		$effect(() => {
-			if (shouldAnimate) {
-				frameId = requestAnimationFrame(animate);
-			}
-			return () => {
-				if (frameId !== undefined) {
-					cancelAnimationFrame(frameId);
-					frameId = undefined;
-				}
-			};
-		});
-
-		$effect(() => {
-			if (!element) return;
-			return observeInViewport(element, (inView) => {
-				inViewport = inView;
-			});
-		});
-
+		frameId = requestAnimationFrame(animate);
 		return () => {
-			stopMotion();
-			stopVisibility();
+			if (frameId !== undefined) {
+				cancelAnimationFrame(frameId);
+			}
 		};
+	});
+
+	$effect(() => {
+		if (!element) return;
+		return observeInViewport(element, (inView) => {
+			inViewport = inView;
+		});
 	});
 
 	// Flash-on-load: filter references a runtime-generated SVG filter ID (url(#${filterId})),

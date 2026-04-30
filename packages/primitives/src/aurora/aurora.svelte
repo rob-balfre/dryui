@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -52,7 +51,7 @@
 	const paletteName = $derived(typeof palette === 'string' ? palette : 'custom');
 	const customPalette = $derived(Array.isArray(palette) ? palette : null);
 
-	onMount(() => {
+	$effect(() => {
 		registerPropertyOnce({
 			name: '--dry-aurora-angle',
 			syntax: '<angle>',

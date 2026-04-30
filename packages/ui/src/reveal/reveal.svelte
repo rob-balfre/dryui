@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -60,7 +59,7 @@
 		element.style.setProperty('--_blend-mode', blendMode ?? 'normal');
 	});
 
-	onMount(() => {
+	$effect(() => {
 		const stopMotionObserver = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 			if (matches) visible = true;

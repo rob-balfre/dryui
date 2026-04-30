@@ -1,22 +1,27 @@
 <script lang="ts">
 	import { Card, Link, Map, Text } from '@dryui/ui';
 	import { env } from '$env/dynamic/public';
-	import { onMount } from 'svelte';
 
 	const token = env.PUBLIC_MAPBOX_TOKEN;
 	let ready = $state(false);
 
-	onMount(async () => {
+	$effect(() => {
 		if (!token) return;
-		const [mapboxModule, workerModule] = await Promise.all([
-			import('mapbox-gl'),
-			import('mapbox-gl/dist/mapbox-gl-csp-worker?url')
-		]);
-		const mapboxgl = mapboxModule.default;
-		mapboxgl.workerUrl = workerModule.default;
-		mapboxgl.accessToken = token;
-		(window as unknown as { mapboxgl?: unknown }).mapboxgl = mapboxgl;
-		ready = true;
+		let cancelled = false;
+		(async () => {
+			const [mapboxModule, workerModule] = await Promise.all([
+				import('mapbox-gl'),
+				import('mapbox-gl/dist/mapbox-gl-csp-worker?url')
+			]);
+			const mapboxgl = mapboxModule.default;
+			mapboxgl.workerUrl = workerModule.default;
+			mapboxgl.accessToken = token;
+			(window as unknown as { mapboxgl?: unknown }).mapboxgl = mapboxgl;
+			if (!cancelled) ready = true;
+		})();
+		return () => {
+			cancelled = true;
+		};
 	});
 </script>
 

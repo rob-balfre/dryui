@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -70,7 +69,7 @@
 		}
 	});
 
-	onMount(() => {
+	$effect(() => {
 		if (themeColors && containerEl) {
 			try {
 				const primary = extractThemeColor('--dry-color-fill-brand', containerEl);

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
@@ -39,7 +38,7 @@
 	const duration = $derived(contentSize > 0 && speed > 0 ? contentSize / speed : 0);
 	const paused = $derived(!onScreen || !tabVisible);
 
-	onMount(() => {
+	$effect(() => {
 		const unsubscribeMotion = observeReducedMotionPreference((matches) => {
 			prefersReducedMotion = matches;
 		});
