@@ -78,7 +78,28 @@ function handleReadlineError(error: unknown): never {
 	if (error && typeof error === 'object' && 'code' in error && error.code === 'ABORT_ERR') {
 		process.exit(130);
 	}
+	if (isStdinIoError(error)) {
+		process.exit(130);
+	}
 	throw error;
+}
+
+function isStdinIoError(error: unknown): boolean {
+	if (!error || typeof error !== 'object') return false;
+	const code = (error as { code?: string }).code;
+	const errno = (error as { errno?: number }).errno;
+	return code === 'EIO' || code === 'EBADF' || errno === -5 || errno === 5;
+}
+
+function safeSetRawMode(mode: boolean): boolean {
+	if (typeof input.setRawMode !== 'function') return false;
+	try {
+		input.setRawMode(mode);
+		return true;
+	} catch (error) {
+		if (isStdinIoError(error)) return false;
+		throw error;
+	}
 }
 
 const ANSI = {
@@ -720,14 +741,31 @@ async function promptText(
 	requireTTY();
 
 	const previousRawMode = Boolean(input.isRaw);
-	input.setRawMode(false);
-	input.resume();
+	if (!safeSetRawMode(false)) {
+		process.exit(0);
+	}
+	try {
+		input.resume();
+	} catch (error) {
+		if (isStdinIoError(error)) {
+			process.exit(0);
+		}
+		throw error;
+	}
 
 	renderPromptFrame(question, config);
 	console.log(paint(`Press Enter to use "${defaultValue}".`, ANSI.dim, ANSI.slate));
 	console.log('');
 
-	const rl = createInterface({ input, output });
+	let rl: ReturnType<typeof createInterface>;
+	try {
+		rl = createInterface({ input, output });
+	} catch (error) {
+		if (isStdinIoError(error)) {
+			process.exit(0);
+		}
+		throw error;
+	}
 
 	try {
 		const answer = await rl.question(paint('Project name or path: ', ANSI.bold, ANSI.gold));
@@ -737,7 +775,7 @@ async function promptText(
 		handleReadlineError(error);
 	} finally {
 		rl.close();
-		input.setRawMode(previousRawMode);
+		safeSetRawMode(previousRawMode);
 	}
 }
 
@@ -749,8 +787,19 @@ async function promptAfterAction(
 	}
 
 	const previousRawMode = Boolean(input.isRaw);
-	input.setRawMode(false);
-	input.resume();
+	if (!safeSetRawMode(false)) {
+		// Stdin is unusable (e.g. EIO after Ctrl-C in some terminals). The user
+		// already asked to stop, so exit cleanly instead of crashing on resume().
+		process.exit(0);
+	}
+	try {
+		input.resume();
+	} catch (error) {
+		if (isStdinIoError(error)) {
+			process.exit(0);
+		}
+		throw error;
+	}
 	console.log('');
 
 	const prompt =
@@ -762,7 +811,15 @@ async function promptAfterAction(
 				)
 			: paint('Press Enter to return to the main menu, or type x to exit: ', ANSI.dim, ANSI.sky);
 
-	const rl = createInterface({ input, output });
+	let rl: ReturnType<typeof createInterface>;
+	try {
+		rl = createInterface({ input, output });
+	} catch (error) {
+		if (isStdinIoError(error)) {
+			process.exit(0);
+		}
+		throw error;
+	}
 
 	try {
 		const answer = (await rl.question(prompt)).trim().toLowerCase();
@@ -777,7 +834,7 @@ async function promptAfterAction(
 		handleReadlineError(error);
 	} finally {
 		rl.close();
-		input.setRawMode(previousRawMode);
+		safeSetRawMode(previousRawMode);
 	}
 }
 
@@ -1146,7 +1203,7 @@ async function runInteractiveInit(spec: Spec): Promise<void> {
 	}
 
 	await runInit([projectPath, '--pm', packageManager], spec);
-	await promptAfterAction();
+	process.exit(0);
 }
 
 async function runInteractiveSetup(

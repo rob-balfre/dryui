@@ -924,6 +924,11 @@ export async function runUserProjectLauncher(
 
 		if (waitForeground) {
 			await waitForShutdownSignal({ ownedPids, killOwnedProcess: runtime.killOwnedProcess });
+			// Ctrl-C / SIGINT is the only way out of the foreground wait, and the
+			// printed tip promises "stop servers and exit". Honoring that also
+			// avoids prompting against a stdin that some terminals leave in an
+			// EIO state after the signal.
+			process.exit(0);
 		}
 
 		if (exitOnComplete) {
@@ -1010,6 +1015,8 @@ export async function runLauncher(
 
 		if (waitForeground) {
 			await waitForShutdownSignal({ ownedPids, killOwnedProcess: runtime.killOwnedProcess });
+			// See runUserProjectLauncher: signal-only resolution → always exit.
+			process.exit(0);
 		}
 
 		if (exitOnComplete) {
