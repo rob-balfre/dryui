@@ -49,6 +49,12 @@ function getCalendarEvents(isoDate: string): NodeListOf<HTMLElement> {
 	return getCell(isoDate).querySelectorAll<HTMLElement>('[data-calendar-event]');
 }
 
+function getCalendarEventSegments(eventId: string): NodeListOf<HTMLElement> {
+	return getGrid().querySelectorAll<HTMLElement>(
+		`[data-calendar-event-segment][data-calendar-event-id="${eventId}"]`
+	);
+}
+
 async function pressKey(
 	target: HTMLElement,
 	key: string,
@@ -122,7 +128,7 @@ describe('Calendar', () => {
 		expect(getGrid().textContent).not.toContain('May 2026');
 		expect(document.querySelectorAll('[data-calendar-day="2026-05-01"]')).toHaveLength(1);
 		expect(getCell('2026-05-01').hasAttribute('data-outside-month')).toBe(false);
-		expect(getCalendarEvents('2026-05-01')).toHaveLength(1);
+		expect(getCalendarEventSegments('may-event')).toHaveLength(1);
 
 		const april30 = getDay('2026-04-30');
 		april30.focus();
@@ -200,21 +206,23 @@ describe('Calendar', () => {
 				{
 					id: 'hotel',
 					title: 'Hotel stay',
-					start: new Date(2026, 3, 18),
-					end: new Date(2026, 3, 20),
+					start: new Date(2026, 3, 20),
+					end: new Date(2026, 3, 22),
 					kind: 'hotel',
 					tone: 'success'
 				}
 			]
 		});
 
-		const start = getCalendarEvents('2026-04-18')[0];
-		const middle = getCalendarEvents('2026-04-19')[0];
-		const end = getCalendarEvents('2026-04-20')[0];
+		const segments = getCalendarEventSegments('hotel');
+		const segment = segments[0];
 
-		expect(start?.getAttribute('data-calendar-event-position')).toBe('start');
-		expect(middle?.getAttribute('data-calendar-event-position')).toBe('middle');
-		expect(end?.getAttribute('data-calendar-event-position')).toBe('end');
-		expect(start?.textContent).toBe('Hotel stay');
+		expect(segments).toHaveLength(1);
+		expect(segment?.getAttribute('data-calendar-event-position')).toBe('single');
+		expect(segment?.getAttribute('data-calendar-event-column')).toBe('2');
+		expect(segment?.getAttribute('data-calendar-event-span')).toBe('3');
+		expect(segment?.textContent).toBe('Hotel stay');
+		expect(getCalendarEvents('2026-04-20')).toHaveLength(0);
+		expect(getDay('2026-04-20').getAttribute('aria-label')).toContain('Hotel stay');
 	});
 });

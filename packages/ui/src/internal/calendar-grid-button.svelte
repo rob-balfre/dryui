@@ -44,6 +44,7 @@
 		type CalendarEventDisplay,
 		type CalendarEventGridProps,
 		type CalendarEventPiece,
+		type CalendarEventPosition,
 		type CalendarEventRenderContext
 	} from './calendar-event-layout.js';
 
@@ -59,6 +60,22 @@
 		label: string;
 		days: Date[];
 		weeks: Date[][];
+	}
+
+	interface CalendarEventWeekSegment {
+		event: CalendarEventPiece['event'];
+		date: Date;
+		isoDate: string;
+		lane: number;
+		startColumn: number;
+		span: number;
+		position: CalendarEventPosition;
+	}
+
+	interface CalendarEventOverflowMarker {
+		isoDate: string;
+		column: number;
+		count: number;
 	}
 
 	let {
@@ -111,6 +128,10 @@
 		return day.getFullYear() === panel.year && day.getMonth() === panel.month;
 	}
 
+	function isInteractiveDay(day: Date, panel: CalendarMonthPanel): boolean {
+		return monthCount === 1 || isInPanelMonth(day, panel);
+	}
+
 	function handleDayClick(day: Date) {
 		if (!isDateInRange(day, adapter.min, adapter.max)) return;
 		adapter.selectDate(day);
@@ -149,6 +170,112 @@
 		return pieces.filter((piece): piece is CalendarEventPiece => piece != null);
 	}
 
+	function getWeekEventSegments(
+		week: Date[],
+		panel: CalendarMonthPanel
+	): CalendarEventWeekSegment[] {
+		const segments: CalendarEventWeekSegment[] = [];
+		const laneCount = getWeekLaneCount(week);
+
+		for (let lane = 0; lane < laneCount; lane += 1) {
+			let segment: CalendarEventWeekSegment | null = null;
+
+			for (let index = 0; index < week.length; index += 1) {
+				const day = week[index];
+				const piece =
+					day && isInteractiveDay(day, panel)
+						? eventLayout.get(getDayISOString(day))?.piecesByLane[lane]
+						: null;
+
+				if (!piece) {
+					if (segment) segments.push(segment);
+					segment = null;
+					continue;
+				}
+
+				if (segment && segment.event.id === piece.event.id) {
+					segment.span += 1;
+					segment.position = getSegmentPosition(segment.position, piece.position);
+					continue;
+				}
+
+				if (segment) segments.push(segment);
+				segment = {
+					event: piece.event,
+					date: piece.date,
+					isoDate: piece.isoDate,
+					lane: piece.lane,
+					startColumn: index + 1,
+					span: 1,
+					position: piece.position
+				};
+			}
+
+			if (segment) segments.push(segment);
+		}
+
+		return segments;
+	}
+
+	function getWeekOverflowMarkers(
+		week: Date[],
+		panel: CalendarMonthPanel
+	): CalendarEventOverflowMarker[] {
+		const markers: CalendarEventOverflowMarker[] = [];
+
+		for (let index = 0; index < week.length; index += 1) {
+			const day = week[index];
+			if (!day || !isInteractiveDay(day, panel)) continue;
+
+			const isoDate = getDayISOString(day);
+			const count = eventLayout.get(isoDate)?.overflowCount ?? 0;
+			if (count <= 0) continue;
+
+			markers.push({
+				isoDate,
+				column: index + 1,
+				count
+			});
+		}
+
+		return markers;
+	}
+
+	function getWeekEventLanes(segments: CalendarEventWeekSegment[]): CalendarEventWeekSegment[][] {
+		const lanes: CalendarEventWeekSegment[][] = [];
+
+		for (const segment of segments) {
+			lanes[segment.lane] ??= [];
+			lanes[segment.lane]?.push(segment);
+		}
+
+		for (let index = 0; index < lanes.length; index += 1) {
+			lanes[index] ??= [];
+		}
+
+		return lanes;
+	}
+
+	function getWeekLaneCount(week: Date[]): number {
+		return Math.max(
+			0,
+			...week.map((day) => eventLayout.get(getDayISOString(day))?.piecesByLane.length ?? 0)
+		);
+	}
+
+	function getSegmentPosition(
+		current: CalendarEventPosition,
+		next: CalendarEventPosition
+	): CalendarEventPosition {
+		const starts = current === 'single' || current === 'start';
+		const ends = next === 'single' || next === 'end';
+
+		if (starts && ends) return 'single';
+		if (starts) return 'start';
+		if (ends) return 'end';
+		return 'middle';
+	}
+
 	function getEventContext(
 		piece: CalendarEventPiece,
 		display: CalendarEventDisplay
@@ -160,6 +287,20 @@
 			display,
 			position: piece.position,
 			lane: piece.lane
+		};
+	}
+
+	function getSegmentEventContext(
+		segment: CalendarEventWeekSegment,
+		display: CalendarEventDisplay
+	): CalendarEventRenderContext {
+		return {
+			event: segment.event,
+			date: segment.date,
+			isoDate: segment.isoDate,
+			display,
+			position: segment.position,
+			lane: segment.lane
 		};
 	}
 </script>
@@ -213,10 +354,15 @@
 						</div>
 
 						{#each panel.weeks as week, weekIndex (weekIndex)}
-							<div role="row" data-calendar-row>
+							{@const eventSegments =
+								eventDisplay === 'bars' ? getWeekEventSegments(week, panel) : []}
+							{@const eventLanes = getWeekEventLanes(eventSegments)}
+							{@const overflowMarkers =
+								eventDisplay === 'bars' ? getWeekOverflowMarkers(week, panel) : []}
+							<div role="row" data-calendar-row data-calendar-week-row>
 								{#each week as day (`${panel.year}-${panel.month}-${getDayISOString(day)}`)}
 									{@const isCurrent = isInPanelMonth(day, panel)}
-									{@const isInteractive = monthCount === 1 || isCurrent}
+									{@const isInteractive = isInteractiveDay(day, panel)}
 									{@const selected = isInteractive && adapter.isSelected(day)}
 									{@const today = isToday(day)}
 									{@const disabled = !isDateInRange(day, adapter.min, adapter.max)}
@@ -258,45 +404,24 @@
 										{:else}
 											<span data-calendar-day-placeholder aria-hidden="true">{day.getDate()}</span>
 										{/if}
-										{#if dayEvents && dayEvents.events.length > 0}
+										{#if eventDisplay === 'dots' && dayEvents && dayEvents.events.length > 0}
 											<div
 												data-calendar-events
 												data-calendar-events-display={eventDisplay}
 												aria-hidden="true"
 											>
-												{#if eventDisplay === 'dots'}
-													{#each getEventPieces(dayEvents.piecesByLane) as piece (piece.event.id)}
-														<span
-															data-calendar-event
-															data-calendar-event-kind={piece.event.kind}
-															data-calendar-event-tone={piece.event.tone ?? 'neutral'}
-															data-calendar-event-position={piece.position}
-														>
-															{#if eventContent}
-																{@render eventContent(getEventContext(piece, eventDisplay))}
-															{/if}
-														</span>
-													{/each}
-												{:else}
-													{#each dayEvents.piecesByLane as piece, lane (lane)}
-														{#if piece}
-															<span
-																data-calendar-event
-																data-calendar-event-kind={piece.event.kind}
-																data-calendar-event-tone={piece.event.tone ?? 'neutral'}
-																data-calendar-event-position={piece.position}
-															>
-																{#if eventContent}
-																	{@render eventContent(getEventContext(piece, eventDisplay))}
-																{:else}
-																	<span data-calendar-event-label>{piece.event.title}</span>
-																{/if}
-															</span>
-														{:else}
-															<span data-calendar-event-slot data-calendar-event-empty></span>
+												{#each getEventPieces(dayEvents.piecesByLane) as piece (piece.event.id)}
+													<span
+														data-calendar-event
+														data-calendar-event-kind={piece.event.kind}
+														data-calendar-event-tone={piece.event.tone ?? 'neutral'}
+														data-calendar-event-position={piece.position}
+													>
+														{#if eventContent}
+															{@render eventContent(getEventContext(piece, eventDisplay))}
 														{/if}
-													{/each}
-												{/if}
+													</span>
+												{/each}
 												{#if dayEvents.overflowCount > 0}
 													<span data-calendar-event-overflow>+{dayEvents.overflowCount}</span>
 												{/if}
@@ -304,6 +429,48 @@
 										{/if}
 									</div>
 								{/each}
+								{#if eventDisplay === 'bars' && (eventLanes.length > 0 || overflowMarkers.length > 0)}
+									<div data-calendar-row-events aria-hidden="true">
+										{#each eventLanes as laneSegments, lane (lane)}
+											<div
+												data-calendar-event-lane
+												data-calendar-event-lane-empty={laneSegments.length === 0 ? '' : undefined}
+											>
+												{#each laneSegments as segment (`${segment.event.id}-${segment.isoDate}-${segment.lane}`)}
+													<span
+														data-calendar-event
+														data-calendar-event-segment
+														data-calendar-event-id={segment.event.id}
+														data-calendar-event-kind={segment.event.kind}
+														data-calendar-event-tone={segment.event.tone ?? 'neutral'}
+														data-calendar-event-position={segment.position}
+														data-calendar-event-column={segment.startColumn}
+														data-calendar-event-span={segment.span}
+													>
+														{#if eventContent}
+															{@render eventContent(getSegmentEventContext(segment, eventDisplay))}
+														{:else}
+															<span data-calendar-event-label>{segment.event.title}</span>
+														{/if}
+													</span>
+												{/each}
+											</div>
+										{/each}
+										{#if overflowMarkers.length > 0}
+											<div data-calendar-event-lane>
+												{#each overflowMarkers as marker (marker.isoDate)}
+													<span
+														data-calendar-event-overflow
+														data-calendar-event-column={marker.column}
+														data-calendar-event-span="1"
+													>
+														+{marker.count}
+													</span>
+												{/each}
+											</div>
+										{/if}
+									</div>
+								{/if}
 							</div>
 						{/each}
 					</div>
@@ -394,11 +561,16 @@
 		grid-template-columns: repeat(7, minmax(0, 1fr));
 	}
 
+	[data-calendar-grid] [data-calendar-row][data-calendar-week-row] {
+		row-gap: var(--dry-calendar-event-gap);
+	}
+
 	[data-calendar-grid] [data-calendar-cell] {
 		display: grid;
 		align-content: start;
 		justify-items: center;
 		gap: var(--dry-calendar-event-gap);
+		grid-row: 1;
 	}
 
 	[data-calendar-grid] [data-calendar-cell][data-in-range] {
@@ -455,14 +627,11 @@
 		min-block-size: var(--dry-calendar-event-size);
 	}
 
-	[data-calendar-grid] [data-calendar-events][data-calendar-events-display='bars'] {
-		grid-auto-rows: var(--dry-calendar-event-height);
-	}
-
 	[data-calendar-grid] [data-calendar-event] {
 		display: grid;
 		align-items: center;
 		min-block-size: var(--dry-calendar-event-height);
+		min-inline-size: 0;
 		padding-inline: var(--dry-space-1);
 		overflow: hidden;
 		border-radius: var(--dry-calendar-event-radius);
@@ -472,6 +641,27 @@
 		font-weight: 500;
 		line-height: 1;
 		white-space: nowrap;
+	}
+
+	[data-calendar-grid] [data-calendar-row-events] {
+		display: grid;
+		grid-column: 1 / -1;
+		grid-row: 2;
+		gap: var(--dry-calendar-event-gap);
+		pointer-events: none;
+	}
+
+	[data-calendar-grid] [data-calendar-event-lane] {
+		display: grid;
+		grid-template-columns: repeat(7, minmax(0, 1fr));
+		min-block-size: var(--dry-calendar-event-height);
+	}
+
+	[data-calendar-grid] [data-calendar-event-lane] > [data-calendar-event],
+	[data-calendar-grid] [data-calendar-event-lane] > [data-calendar-event-overflow] {
+		align-self: stretch;
+		justify-self: stretch;
+		margin-inline: var(--dry-space-0_5);
 	}
 
 	[data-calendar-grid]
@@ -489,10 +679,6 @@
 		text-overflow: ellipsis;
 	}
 
-	[data-calendar-grid] [data-calendar-event-slot] {
-		min-block-size: var(--dry-calendar-event-height);
-	}
-
 	[data-calendar-grid] [data-calendar-event-overflow] {
 		display: grid;
 		place-items: center;
@@ -501,6 +687,62 @@
 		font-size: var(--dry-type-tiny-size);
 		font-weight: 500;
 		line-height: 1;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='1'] {
+		grid-column-start: 1;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='2'] {
+		grid-column-start: 2;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='3'] {
+		grid-column-start: 3;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='4'] {
+		grid-column-start: 4;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='5'] {
+		grid-column-start: 5;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='6'] {
+		grid-column-start: 6;
+	}
+
+	[data-calendar-grid] [data-calendar-event-column='7'] {
+		grid-column-start: 7;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='1'] {
+		grid-column-end: span 1;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='2'] {
+		grid-column-end: span 2;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='3'] {
+		grid-column-end: span 3;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='4'] {
+		grid-column-end: span 4;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='5'] {
+		grid-column-end: span 5;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='6'] {
+		grid-column-end: span 6;
+	}
+
+	[data-calendar-grid] [data-calendar-event-span='7'] {
+		grid-column-end: span 7;
 	}
 
 	[data-calendar-grid]
