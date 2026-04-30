@@ -35,13 +35,14 @@
 		type Personality,
 		type RadiusPreset
 	} from '@dryui/theme-wizard';
-	import { Moon, Sun, Download, ClipboardCopy, RotateCcw } from 'lucide-svelte';
+	import { Moon, Sun, Download, ClipboardCopy, RotateCcw, List } from 'lucide-svelte';
 	import { docsTheme, isDarkTheme } from '$lib/theme.svelte.js';
 	import Logo from '$lib/components/Logo.svelte';
 	import OverviewPreview from '$lib/theme-wizard/PreviewComponents.svelte';
 	import FormsPreview from '$lib/theme-wizard/previews/Forms.svelte';
 	import DashboardPreview from '$lib/theme-wizard/previews/Dashboard.svelte';
 	import CardsPreview from '$lib/theme-wizard/previews/Cards.svelte';
+	import { NavigationMenu } from '@dryui/primitives';
 
 	let { data }: PageProps = $props();
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
@@ -208,56 +209,60 @@
 		--dry-area-grid-align-items="center"
 		data-mode={themeMode}
 	>
-		<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
-			<Logo />
-			<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
-		</Text>
+		<NavigationMenu.Root>
+			<NavigationMenu.List>
+				<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
+					<Logo />
+					<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
+				</Text>
 
-		<SegmentedControl.Root
-			--dry-grid-area-name="tabs"
-			bind:value={previewMode}
-			aria-label="Preview mode"
-		>
-			<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
-			<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
-			<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
-			<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
-		</SegmentedControl.Root>
+				<SegmentedControl.Root
+					--dry-grid-area-name="tabs"
+					bind:value={previewMode}
+					aria-label="Preview mode"
+				>
+					<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
+					<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
+					<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
+					<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
+				</SegmentedControl.Root>
 
-		<Button
-			--dry-grid-area-name="mode"
-			variant="ghost"
-			size="icon-sm"
-			onclick={() => docsTheme.cycle()}
-			aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-		>
-			{#if docsTheme.isDark}
-				<Sun size={14} aria-hidden="true" />
-			{:else}
-				<Moon size={14} aria-hidden="true" />
-			{/if}
-		</Button>
+				<Button
+					--dry-grid-area-name="mode"
+					variant="ghost"
+					size="icon-sm"
+					onclick={() => docsTheme.cycle()}
+					aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+				>
+					{#if docsTheme.isDark}
+						<Sun size={14} aria-hidden="true" />
+					{:else}
+						<Moon size={14} aria-hidden="true" />
+					{/if}
+				</Button>
 
-		<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
-			<ClipboardCopy size={14} aria-hidden="true" />
-			{copyFeedback || 'Copy'}
-		</Button>
+				<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
+					<ClipboardCopy size={14} aria-hidden="true" />
+					{copyFeedback || 'Copy'}
+				</Button>
 
-		<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
-			<Download size={14} aria-hidden="true" />
-			Download
-		</Button>
+				<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
+					<Download size={14} aria-hidden="true" />
+					Download
+				</Button>
 
-		<Button
-			--dry-grid-area-name="reset"
-			variant="ghost"
-			size="sm"
-			onclick={resetAll}
-			aria-label="Reset all"
-		>
-			<RotateCcw size={14} aria-hidden="true" />
-			Reset
-		</Button>
+				<Button
+					--dry-grid-area-name="reset"
+					variant="ghost"
+					size="sm"
+					onclick={resetAll}
+					aria-label="Reset all"
+				>
+					<RotateCcw size={14} aria-hidden="true" />
+					Reset
+				</Button>
+			</NavigationMenu.List>
+		</NavigationMenu.Root>
 
 		<Adjust
 			--dry-grid-area-name="preview"
