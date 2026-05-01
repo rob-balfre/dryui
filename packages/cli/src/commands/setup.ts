@@ -698,7 +698,7 @@ function setupHelp(exitCode = 0): never {
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
 				'Without a TTY, use --editor and/or --open-feedback for deterministic output.',
 				'',
-				'For one-shot per-agent install, use `dryui init` (which wires the skill via npx skills + MCP config in one step). The legacy `--install` flag was removed in Phase 6 of the npx skills migration.'
+				'For one-shot per-agent install, use `dryui init` (which wires the skill via npx skills + MCP config in one step).'
 			],
 			options: [
 				'  --editor <id>       Print setup steps for one editor or agent',
@@ -1260,7 +1260,7 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 		}
 		if (hasFlag(args, '--install')) {
 			console.error('');
-			console.error('`dryui setup --install` was removed in Phase 6 of the npx skills migration.');
+			console.error('`dryui setup --install` was removed.');
 			console.error(
 				'Use `dryui init` for one-shot setup (it wires skills via npx skills + MCP config in one step), or run the printed steps above by hand.'
 			);

@@ -9,11 +9,10 @@ import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
-// The dryui-feedback skill is no longer embedded in this package. Users
-// install it via `npx skills add rob-balfre/dryui --skill dryui-feedback`
-// (typically through `dryui init`). At dispatch time we precondition-check
-// that the SKILL.md exists in the consumer's project; if missing we surface
-// a clear install hint instead of dispatching a half-configured agent.
+// The skill must exist in the consumer's project before dispatch. The
+// dispatched agent reads it from inside the project root, which `auto`
+// permission mode pre-approves; reading from outside the project would
+// trigger a permission prompt mid-session.
 const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
 const SKILL_MISSING_HINT =
 	'dryui-feedback skill not installed in this project. ' +
@@ -451,9 +450,6 @@ function isConfiguredAgent(
 
 export function getDispatchTargetsSnapshot(options: DispatcherOptions): DispatchTargetsSnapshot {
 	const cache = createProbeCache();
-	// Skill must already be installed in the consumer project (via npx skills
-	// add or dryui init). When missing we leave skillPath null and the UI
-	// surfaces SKILL_MISSING_HINT to the user.
 	const skillPath = findInstalledSkill(options.workspace);
 	return {
 		defaultAgent: options.defaultAgent,
@@ -786,9 +782,6 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	}
 
 	const dispatchWorkspace = submission.workspace ?? options.workspace;
-	// Mirror the skill into the project so the agent's Read stays inside the
-	// project root — `auto` permission mode still prompts on out-of-project
-	// reads, which is what was breaking the dispatched session.
 	const skillPath = findInstalledSkill(dispatchWorkspace);
 	if (!skillPath) {
 		console.error(`[dispatch] submission ${submission.id} aborted: ${SKILL_MISSING_HINT}`);

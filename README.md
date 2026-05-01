@@ -148,11 +148,11 @@ dryui-feedback-mcp       # feedback MCP server from src
 
 Each invocation prints a one-line `DRYUI_DEV=1 — LOCAL SOURCE MODE` banner so you can tell at a glance which path you're on. Edits in `packages/*/src/` show up on the next invocation — no rebuild required. To force the published path (e.g. to test the dist artifact), set `DRYUI_DEV=0` before running.
 
-#### Skill install via npx skills (default since Phase 5 of the npx skills migration)
+#### Skill install via npx skills
 
-`dryui setup --install` and `dryui init` install the dryui skill via the upstream `npx skills` CLI by default (skills.sh standard). Copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes`, which writes to the upstream-blessed install location for each agent. Zed always uses the legacy degit copy: it is not in the npx skills supported-agents list.
+`dryui setup --install` and `dryui init` install the dryui skill via the upstream `npx skills` CLI (skills.sh standard). Copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes`, which writes to the upstream-blessed install location for each agent. Zed uses the legacy degit copy: it is not in the npx skills supported-agents list.
 
-Set `DRYUI_SKILLS_LEGACY=1` to opt back into the legacy degit copy (one-release escape hatch slated for removal in Phase 6):
+Set `DRYUI_SKILLS_LEGACY=1` to opt back into the legacy degit copy (one-release escape hatch):
 
 ```bash
 DRYUI_SKILLS_LEGACY=1 dryui setup --install --editor cursor
@@ -177,19 +177,17 @@ The `<Feedback />` widget and `@dryui/ui` components already resolve to source f
 
 Tear down with `bun run dev:unlink`.
 
-### Testing In A Clean VM
+### End-To-End Testing
 
-To exercise the published install flow end-to-end without touching your host, use [smolvm](https://github.com/smol-machines/smolvm). Two wrappers are in the root `package.json`:
+To exercise the install flow end-to-end without publishing packages, use the tarball-based E2E harness:
 
 ```bash
-bun vm:test              # ephemeral: bunx @dryui/cli init + bun run build, exits when done
-bun vm                   # ephemeral: init + vite dev (HMR) at http://localhost:<auto-port>
-bun vm:exec dryui list   # run a command inside the live `bun vm` session (any terminal)
+bun run e2e:full                 # pack local packages, then run every scenario
+bun run e2e:one dashboard        # run a single scenario
+bun run e2e:pack                 # build and pack local package tarballs only
 ```
 
-`bun vm` prints `✓ DryUI dev server ready (HMR): http://localhost:<PORT>` once Vite is actually serving; Ctrl+C tears the VM down. `bun vm:exec <args>` runs the given command in the scaffolded VM via a shared-volume relay, so you can drive the CLI (`dryui list`, `dryui info Button`, etc.) against the live project from any other tab. Install smolvm with `curl -sSL https://smolmachines.com/install.sh | /bin/bash` (use `/bin/bash` explicitly so a Homebrew Intel `bash` on your PATH does not request the wrong platform tarball).
-
-Implementation notes and smolvm/Vite gotchas live in [`scripts/vm.ts`](./scripts/vm.ts).
+The E2E runner packs the current workspace packages into `reports/e2e-tarballs/`, scaffolds fresh projects against those tarballs, and writes the HTML run report to `reports/e2e-runs/index.html`.
 
 See the supporting docs for the rest:
 

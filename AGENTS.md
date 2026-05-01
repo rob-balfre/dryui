@@ -16,7 +16,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 - Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
 - Recommended install path for end users: `npx skills add rob-balfre/dryui` (skills.sh standard).
 - `bun run validate:skills` lints every SKILL.md (frontmatter present, name=dirname, description length).
-- `/plugins` in this repo refers to the in-app Claude or Codex install flow (now sunset for DryUI per Phase 6 of the npx skills migration), not a repo directory.
+- `/plugins` in this repo refers to the in-app Claude or Codex install flow (sunset for DryUI; users install via `npx skills add rob-balfre/dryui`), not a repo directory.
 
 ## Repo Rules
 
@@ -50,11 +50,9 @@ dryui
 - Keep root-level Markdown durable. One-off audits, scratch TODOs, and generated reports belong under `docs/`, `reports/`, or ignored local directories, not the repo root.
 - Repo-local editor install output such as `.agents/skills/`, `.github/skills/`, `.opencode/`, and `opencode.json` is not canonical source.
 
-## Isolated Testing
+## End-to-End Testing
 
-- Use `bun vm:test` (one-shot scaffold + build) or `bun vm` (scaffold + Vite dev with HMR) to exercise the public `bunx @dryui/cli` flow in a throwaway [smolvm](https://github.com/smol-machines/smolvm) microVM. Both wrappers live in the root `package.json`; source and gotchas (ephemeral-only, Vite-under-node, stdout buffering, `--host 0.0.0.0`) are in [`scripts/vm.ts`](./scripts/vm.ts).
-- While `bun vm` is running, use `bun vm:exec <cmd>` in any other tab to run commands inside the live VM (e.g. `bun vm:exec dryui list`). It relays via a shared-volume request/response loop; see [`scripts/vm-exec.ts`](./scripts/vm-exec.ts). `smolvm machine exec` itself does not work against ephemerals.
-- Install smolvm via `curl -sSL https://smolmachines.com/install.sh | /bin/bash` (use `/bin/bash` explicitly; a Homebrew Intel `bash` first on PATH reports the wrong arch). Ensure the extracted `agent-rootfs` lives at `~/Library/Application Support/smolvm/agent-rootfs`.
+- Use `bun run e2e:full` to pack local package tarballs and run every scaffold scenario. Use `bun run e2e:one <scenario>` for a focused scenario and `bun run e2e:pack` when only refreshing tarballs is needed.
 
 ## Local Source Mode
 

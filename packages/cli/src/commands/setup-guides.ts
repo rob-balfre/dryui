@@ -235,7 +235,7 @@ ${CODEX_CONFIG}`
 			},
 			{
 				title: 'Add the MCP servers',
-				note: '`dryui init` (or `dryui setup --editor gemini`) merges both servers into `~/.gemini/settings.json` automatically. The Gemini extension flow that previously bundled both pieces was sunset in Phase 6 of the npx skills migration.',
+				note: '`dryui init` (or `dryui setup --editor gemini`) merges both servers into `~/.gemini/settings.json` automatically.',
 				code: GEMINI_CONFIG
 			},
 			SVELTE_SECTION_GEMINI

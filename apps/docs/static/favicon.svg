@@ -1,9 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title>DryUI</title>
-  <rect x="4" y="4" width="56" height="56" rx="14" fill="#e85f2a" />
-  <path
-    d="M20 16h18c8.5 0 14 5.5 14 16s-5.5 16-14 16H20V16Zm10 11v10h8c3.1 0 5-1.9 5-5s-1.9-5-5-5h-8Z"
-    fill="#16201d"
-  />
-  <path d="M14 50h36" fill="none" stroke="#21b8c7" stroke-width="4" stroke-linecap="round" />
+	<title>DryUI</title>
+	<rect x="4" y="4" width="56" height="56" rx="14" fill="#e85f2a" />
+	<path
+		d="M20 16h18c8.5 0 14 5.5 14 16s-5.5 16-14 16H20V16Zm10 11v10h8c3.1 0 5-1.9 5-5s-1.9-5-5-5h-8Z"
+		fill="#16201d"
+	/>
+	<path d="M14 50h36" fill="none" stroke="#21b8c7" stroke-width="4" stroke-linecap="round" />
 </svg>

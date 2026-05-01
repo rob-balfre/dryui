@@ -38,13 +38,42 @@
 	--docs-theme-icon-sun-display: inline-grid;
 	--docs-theme-icon-moon-display: none;
 
-	--dry-color-fill-accent: oklch(72% 0.14 52);
-	--dry-color-fill-accent-hover: oklch(68% 0.16 50);
-	--dry-color-fill-accent-active: oklch(64% 0.17 48);
-	--dry-color-fill-accent-weak: oklch(72% 0.14 52 / 0.18);
-	--dry-color-stroke-accent: oklch(72% 0.14 52 / 0.5);
-	--dry-color-stroke-accent-strong: oklch(72% 0.14 52 / 0.8);
-	--dry-color-stroke-accent-weak: oklch(72% 0.14 52 / 0.2);
+	--dry-color-text-strong: oklch(18% 0.035 185);
+	--dry-color-text-weak: oklch(33% 0.032 185 / 0.72);
+	--dry-color-icon: oklch(30% 0.04 185 / 0.78);
+	--dry-color-stroke-strong: oklch(30% 0.04 185 / 0.38);
+	--dry-color-stroke-weak: oklch(30% 0.04 185 / 0.13);
+	--dry-color-fill: oklch(30% 0.04 185 / 0.045);
+	--dry-color-fill-hover: oklch(30% 0.04 185 / 0.07);
+	--dry-color-fill-active: oklch(30% 0.04 185 / 0.12);
+
+	--dry-color-brand: oklch(65% 0.19 34);
+	--dry-color-text-brand: oklch(48% 0.16 34);
+	--dry-color-fill-brand: oklch(65% 0.19 34);
+	--dry-color-fill-brand-hover: oklch(60% 0.2 34);
+	--dry-color-fill-brand-active: oklch(54% 0.2 34);
+	--dry-color-fill-brand-weak: oklch(65% 0.19 34 / 0.11);
+	--dry-color-stroke-brand: oklch(65% 0.19 34 / 0.5);
+	--dry-color-stroke-brand-strong: oklch(65% 0.19 34 / 0.78);
+	--dry-color-stroke-brand-weak: oklch(65% 0.19 34 / 0.2);
+	--dry-color-on-brand: oklch(18% 0.035 185);
+	--dry-color-focus-ring: oklch(65% 0.19 34 / 0.36);
+
+	--dry-color-bg-base: oklch(97.5% 0.015 168);
+	--dry-color-bg-raised: oklch(94.5% 0.018 168);
+	--dry-color-bg-overlay: oklch(91.5% 0.02 168);
+	--dry-color-bg-sunken: oklch(95.5% 0.017 168);
+
+	--dry-color-fill-accent: oklch(73% 0.14 205);
+	--dry-color-fill-accent-hover: oklch(68% 0.15 205);
+	--dry-color-fill-accent-active: oklch(61% 0.15 205);
+	--dry-color-fill-accent-weak: oklch(73% 0.14 205 / 0.16);
+	--dry-color-stroke-accent: oklch(73% 0.14 205 / 0.5);
+	--dry-color-stroke-accent-strong: oklch(73% 0.14 205 / 0.8);
+	--dry-color-stroke-accent-weak: oklch(73% 0.14 205 / 0.2);
+	--docs-logo-mark-bg: var(--dry-color-fill-brand);
+	--docs-logo-mark-ink: var(--dry-color-on-brand);
+	--docs-logo-mark-signal: var(--dry-color-fill-accent);
 
 	--dry-font-mono:
 		'Monaspace Neon', 'Commit Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
@@ -65,23 +94,73 @@ body::before {
 	--docs-theme-icon-sun-display: none;
 	--docs-theme-icon-moon-display: inline-grid;
 
-	--dry-color-fill-accent: oklch(76% 0.13 55);
-	--dry-color-fill-accent-hover: oklch(80% 0.13 57);
-	--dry-color-fill-accent-active: oklch(82% 0.14 58);
-	--dry-color-fill-accent-weak: oklch(76% 0.13 55 / 0.22);
+	--dry-color-text-strong: oklch(95% 0.012 168);
+	--dry-color-text-weak: oklch(88% 0.012 168 / 0.72);
+	--dry-color-icon: oklch(88% 0.012 168 / 0.78);
+	--dry-color-stroke-strong: oklch(88% 0.012 168 / 0.34);
+	--dry-color-stroke-weak: oklch(88% 0.012 168 / 0.12);
+	--dry-color-fill: oklch(88% 0.012 168 / 0.06);
+	--dry-color-fill-hover: oklch(88% 0.012 168 / 0.1);
+	--dry-color-fill-active: oklch(88% 0.012 168 / 0.15);
+
+	--dry-color-brand: oklch(72% 0.17 34);
+	--dry-color-text-brand: oklch(78% 0.15 34);
+	--dry-color-fill-brand: oklch(72% 0.17 34);
+	--dry-color-fill-brand-hover: oklch(77% 0.16 34);
+	--dry-color-fill-brand-active: oklch(81% 0.15 34);
+	--dry-color-fill-brand-weak: oklch(72% 0.17 34 / 0.14);
+	--dry-color-stroke-brand: oklch(72% 0.17 34 / 0.54);
+	--dry-color-stroke-brand-strong: oklch(72% 0.17 34 / 0.82);
+	--dry-color-stroke-brand-weak: oklch(72% 0.17 34 / 0.24);
+	--dry-color-on-brand: oklch(16% 0.025 185);
+	--dry-color-focus-ring: oklch(72% 0.17 34 / 0.42);
+
+	--dry-color-bg-base: oklch(16% 0.025 185);
+	--dry-color-bg-raised: oklch(20% 0.028 185);
+	--dry-color-bg-overlay: oklch(25% 0.03 185);
+	--dry-color-bg-sunken: oklch(13% 0.022 185);
+
+	--dry-color-fill-accent: oklch(76% 0.13 205);
+	--dry-color-fill-accent-hover: oklch(81% 0.12 205);
+	--dry-color-fill-accent-active: oklch(85% 0.11 205);
+	--dry-color-fill-accent-weak: oklch(76% 0.13 205 / 0.2);
 }
 
-.theme-auto {
-	@media (prefers-color-scheme: dark) {
-		& {
-			--docs-theme-icon-sun-display: none;
-			--docs-theme-icon-moon-display: inline-grid;
+@media (prefers-color-scheme: dark) {
+	.theme-auto:not([data-theme='light']) {
+		--docs-theme-icon-sun-display: none;
+		--docs-theme-icon-moon-display: inline-grid;
 
-			--dry-color-fill-accent: oklch(76% 0.13 55);
-			--dry-color-fill-accent-hover: oklch(80% 0.13 57);
-			--dry-color-fill-accent-active: oklch(82% 0.14 58);
-			--dry-color-fill-accent-weak: oklch(76% 0.13 55 / 0.22);
-		}
+		--dry-color-text-strong: oklch(95% 0.012 168);
+		--dry-color-text-weak: oklch(88% 0.012 168 / 0.72);
+		--dry-color-icon: oklch(88% 0.012 168 / 0.78);
+		--dry-color-stroke-strong: oklch(88% 0.012 168 / 0.34);
+		--dry-color-stroke-weak: oklch(88% 0.012 168 / 0.12);
+		--dry-color-fill: oklch(88% 0.012 168 / 0.06);
+		--dry-color-fill-hover: oklch(88% 0.012 168 / 0.1);
+		--dry-color-fill-active: oklch(88% 0.012 168 / 0.15);
+
+		--dry-color-brand: oklch(72% 0.17 34);
+		--dry-color-text-brand: oklch(78% 0.15 34);
+		--dry-color-fill-brand: oklch(72% 0.17 34);
+		--dry-color-fill-brand-hover: oklch(77% 0.16 34);
+		--dry-color-fill-brand-active: oklch(81% 0.15 34);
+		--dry-color-fill-brand-weak: oklch(72% 0.17 34 / 0.14);
+		--dry-color-stroke-brand: oklch(72% 0.17 34 / 0.54);
+		--dry-color-stroke-brand-strong: oklch(72% 0.17 34 / 0.82);
+		--dry-color-stroke-brand-weak: oklch(72% 0.17 34 / 0.24);
+		--dry-color-on-brand: oklch(16% 0.025 185);
+		--dry-color-focus-ring: oklch(72% 0.17 34 / 0.42);
+
+		--dry-color-bg-base: oklch(16% 0.025 185);
+		--dry-color-bg-raised: oklch(20% 0.028 185);
+		--dry-color-bg-overlay: oklch(25% 0.03 185);
+		--dry-color-bg-sunken: oklch(13% 0.022 185);
+
+		--dry-color-fill-accent: oklch(76% 0.13 205);
+		--dry-color-fill-accent-hover: oklch(81% 0.12 205);
+		--dry-color-fill-accent-active: oklch(85% 0.11 205);
+		--dry-color-fill-accent-weak: oklch(76% 0.13 205 / 0.2);
 	}
 }
 

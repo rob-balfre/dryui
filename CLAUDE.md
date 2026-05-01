@@ -7,7 +7,7 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 ## Claude-specific notes
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
-- Use `bun vm:test` (one-shot scaffold + build) or `bun vm` (scaffold + Vite dev with HMR) to exercise the public `bunx @dryui/cli` flow in a throwaway smolvm microVM. Use `bun vm:exec <cmd>` from another tab to run commands inside the live session (e.g. `bun vm:exec dryui list`). Source and gotchas live in [`scripts/vm.ts`](./scripts/vm.ts) and [`scripts/vm-exec.ts`](./scripts/vm-exec.ts).
+- Use `bun run e2e:full` to pack local package tarballs and run every scaffold scenario. Use `bun run e2e:one <scenario>` for focused coverage.
 - For local-source iteration on the cli/mcp/feedback-server bins, see "Source Mode (DRYUI_DEV)" in [`README.md`](./README.md). `bun run dev:link` then `DRYUI_DEV=1` makes `dryui`, `dryui-mcp`, and `dryui-feedback-mcp` run from `packages/*/src/` instead of `dist/`.
 - Use `dryui check [path]` or MCP `check` for static validation of component contracts, a11y, tokens, and CSS discipline. For design-quality flows (brief, critique, polish, visual review) use [impeccable](https://impeccable.style), installed alongside DryUI by `dryui init` or via `npx impeccable skills install`. Invoke via `/impeccable <command>` in your harness.
 - Use the `dryui-layout` agent/skill for page-level grid structure. It writes a `<div data-layout="<name>">` in the .svelte file plus the matching grid template in root `src/layout.css`.
@@ -19,7 +19,7 @@ dryui install-hook
 ```
 
 - Editor setup snippets, MCP config examples, and plugin install text live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts).
-- The DryUI plugin marketplace bundle was sunset in Phase 6 of the npx skills migration. `/plugins` refers to the in-app Claude or Codex install flow (now sunset for DryUI), not a repo directory.
+- The DryUI plugin marketplace bundle is sunset; users install via `npx skills add rob-balfre/dryui`. `/plugins` refers to the in-app Claude or Codex install flow, not a repo directory.
 - Skill install is via `npx skills add rob-balfre/dryui` (skills.sh standard). Sources live under top-level [`skills/`](./skills/); validate with `bun run validate:skills`.
 
 ## Canonical Links

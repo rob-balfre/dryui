@@ -2,7 +2,6 @@
 	import {
 		AppFrame,
 		Button,
-		Card,
 		CodeBlock,
 		Diagram,
 		Heading,
@@ -46,9 +45,9 @@
 
 	const componentShowcase = allComponentNames();
 
-	const userMessage = 'WHY DO YOU KEEP MAKING THE SAME MISTAKE???!';
+	const userMessage = 'build a polished settings screen in Svelte';
 	const assistantMessage =
-		"You're absolutely right! Why don't you try DryUI? It gives me one obvious path. When I drift, the linter corrects me. Your feedback loop keeps me honest.";
+		'I will use DryUI: ask for the component contract, build with tokens, run check, then wire feedback into the next pass.';
 
 	const userChars = [...userMessage];
 	const assistantChars = [...assistantMessage];
@@ -364,7 +363,7 @@
 </script>
 
 <svelte:head>
-	<title>DryUI - Don't Repeat Yourself.</title>
+	<title>DryUI - UI rails for AI agents</title>
 </svelte:head>
 
 <Hotkey keys="escape" handler={skipCinematic} enabled={canSkip} />
@@ -373,29 +372,53 @@
 	<div class="page-stack">
 		<section class="hero" class:hero--no-motion={cinematicBypassed || cinematicSkipped}>
 			<div class="hero-main">
-				<VisuallyHidden>
-					<Heading level={1}>DryUI. Don't repeat yourself.</Heading>
-				</VisuallyHidden>
-				<div class="hero-lockup" aria-hidden="true">
-					<div class="hero-brand">
-						<Logo />
-					</div>
-					<div class="hero-headline-visual">
-						<span class="hero-headline-text">Don't repeat yourself.</span>
+				<div class="hero-copy">
+					<p class="hero-kicker">AI component rails</p>
+					<VisuallyHidden>
+						<Heading level={1}>DryUI. UI rails for AI agents.</Heading>
+					</VisuallyHidden>
+					<div class="hero-lockup" aria-hidden="true">
+						<div class="hero-brand">
+							<Logo />
+						</div>
+						<div class="hero-headline-visual">
+							<span class="hero-headline-text">UI rails for agents that ship.</span>
+						</div>
 					</div>
 					<Text size="md" color="secondary" weight="medium">
-						<span class="hero-subhead-line">{SITE_DESCRIPTION}</span>
-						<span class="hero-stat-line">
-							<span class="hero-stat-num">160</span> components,
-							<span class="hero-stat-num">0</span> runtime deps,
-							<span class="hero-stat-num">300</span> theme tokens.
-						</span>
+						{SITE_DESCRIPTION}
 					</Text>
+
+					<ul class="hero-proof" aria-label="DryUI workflow proof points">
+						<li>
+							<span class="hero-proof-key">ask</span>
+							<span class="hero-proof-value">component contracts before code</span>
+						</li>
+						<li>
+							<span class="hero-proof-key">check</span>
+							<span class="hero-proof-value">tokens, a11y, and CSS discipline</span>
+						</li>
+						<li>
+							<span class="hero-proof-key">mark up</span>
+							<span class="hero-proof-value">live feedback back into the agent</span>
+						</li>
+					</ul>
+
+					<nav aria-label="Homepage links" class="actions">
+						<span class="cta-warm">
+							<Button variant="solid" size="md" href={withBase('/getting-started')}>
+								<Rocket size={16} aria-hidden="true" /> Get Started
+							</Button>
+						</span>
+						<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
+							<GithubIcon size={16} /> GitHub
+						</Button>
+					</nav>
 				</div>
 				<div class="hero-intro">
 					<div class="hero-intro-frame">
 						<AppFrame
-							title={chromeRevealed ? 'agent.chat' : ''}
+							title={chromeRevealed ? 'dryui.loop' : ''}
 							--dry-app-frame-content-padding="var(--dry-space-5)"
 							--dry-app-frame-transition={animationDisabled ? '0s' : '700ms'}
 							--dry-app-frame-bg={chromeRevealed ? 'var(--dry-color-bg-base)' : 'transparent'}
@@ -446,11 +469,14 @@
 									</div>
 								{/if}
 							</div>
-						</AppFrame>
-					</div>
 
-					<div>
-						<Text size="xs" color="secondary">100% free & open-source.</Text>
+							<div class="hero-loop" aria-hidden="true">
+								<span>ask</span>
+								<span>build</span>
+								<span>check</span>
+								<span>feedback</span>
+							</div>
+						</AppFrame>
 					</div>
 				</div>
 				<div class="hero-install">
@@ -482,16 +508,7 @@
 					</div>
 				</div>
 
-				<nav aria-label="Homepage links" class="actions">
-					<span class="cta-warm">
-						<Button variant="solid" size="md" href={withBase('/getting-started')}>
-							<Rocket size={16} aria-hidden="true" /> Get Started
-						</Button>
-					</span>
-					<Button variant="outline" size="md" href={GITHUB_URL} target="_blank" rel="noreferrer">
-						<GithubIcon size={16} /> GitHub
-					</Button>
-				</nav>
+				<Text size="xs" color="secondary">Free, open source, Svelte native.</Text>
 
 				{#if canSkip}
 					<div class="hero-skip">
@@ -553,8 +570,10 @@
 			<div class="showcase-head">
 				<span class="section-label"><span class="section-num">01</span> Inventory</span>
 				<span class="section-icon"><PackageOpen size={20} aria-hidden="true" /></span>
-				<Heading level={2}>What's inside</Heading>
-				<Text color="secondary">Components, tokens, and a live feedback loop to your agent.</Text>
+				<Heading level={2}>The rails</Heading>
+				<Text color="secondary"
+					>Components, tokens, checks, and feedback in one agent-readable loop.</Text
+				>
 			</div>
 
 			<div class="component-marquee">
@@ -619,7 +638,7 @@
 			<div class="compare-head">
 				<span class="section-label"><span class="section-num">02</span> Comparison</span>
 				<span class="section-icon"><GitCompare size={20} aria-hidden="true" /></span>
-				<Heading level={2}>How DryUI compares</Heading>
+				<Heading level={2}>Systems beat generators</Heading>
 				<Text color="secondary">
 					A zero-dependency library, free and open source, wired to your agent via MCP.
 				</Text>
@@ -687,8 +706,10 @@
 		<div class="workflow-head">
 			<span class="section-label"><span class="section-num">03</span> Workflow</span>
 			<span class="section-icon"><Workflow size={20} aria-hidden="true" /></span>
-			<Heading level={2}>How DryUI works</Heading>
-			<Text color="secondary">Prompt in. UI out. Feedback loops straight back to your agent.</Text>
+			<Heading level={2}>The loop</Heading>
+			<Text color="secondary"
+				>Prompt in. Contract found. UI checked. Feedback returns to the agent.</Text
+			>
 		</div>
 		<div bind:this={workflowCanvasEl} class="workflow-canvas">
 			<Diagram config={workflowDiagram} />
@@ -795,8 +816,10 @@
 	<section class="cta">
 		<span class="section-label"><span class="section-num">05</span> Next</span>
 		<span class="section-icon"><Hand size={20} aria-hidden="true" /></span>
-		<Heading level={2}>Still here?</Heading>
-		<Text color="secondary">Install the plugin, wire it to your agent, and start building.</Text>
+		<Heading level={2}>Give your agent rails.</Heading>
+		<Text color="secondary"
+			>Install the plugin, connect MCP, and start building against contracts.</Text
+		>
 		<nav aria-label="Get started links" class="actions">
 			<span class="cta-warm">
 				<Button variant="solid" size="md" href={withBase('/getting-started')}>
@@ -812,25 +835,27 @@
 
 <style>
 	.page {
+		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
 		gap: clamp(var(--dry-space-20), 14vw, var(--dry-space-32));
 		padding-block: 0 clamp(var(--dry-space-20), 16vw, var(--dry-space-32));
 		padding-inline: var(--dry-space-4);
-		text-align: center;
+		text-align: start;
+		isolation: isolate;
 	}
 
 	.page-stack {
 		container-type: inline-size;
 		display: grid;
-		grid-template-columns: minmax(0, 48rem);
+		grid-template-columns: minmax(0, 72rem);
 		justify-content: center;
 		gap: clamp(var(--dry-space-20), 14vw, var(--dry-space-32));
 		justify-items: center;
-		--dry-type-heading-1-size: clamp(1.5rem, 0.875rem + 2.75cqi, 2.25rem);
+		--dry-type-heading-1-size: 2.25rem;
 		--dry-type-heading-1-leading: 1.15;
-		--dry-type-heading-2-size: clamp(1.375rem, 1rem + 1.75cqi, 1.875rem);
+		--dry-type-heading-2-size: 1.875rem;
 		--dry-type-heading-2-leading: 1.2;
 	}
 
@@ -838,10 +863,10 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		grid-template-rows: 1fr auto;
-		justify-items: center;
-		min-block-size: 100svh;
-		padding-block: clamp(var(--dry-space-6), 4vh, var(--dry-space-12));
-		row-gap: clamp(var(--dry-space-8), 6vh, var(--dry-space-16));
+		justify-items: stretch;
+		min-block-size: min(88svh, 54rem);
+		padding-block: var(--dry-space-8) var(--dry-space-6);
+		row-gap: var(--dry-space-8);
 	}
 
 	.hero--no-motion .chat-msg,
@@ -854,25 +879,43 @@
 		position: relative;
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		justify-items: center;
+		align-items: center;
 		align-content: center;
-		gap: clamp(var(--dry-space-6), 4vh, var(--dry-space-14));
+		gap: var(--dry-space-8);
 		justify-self: stretch;
 		min-block-size: 0;
+	}
+
+	.hero-copy {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-5);
+		align-content: center;
+	}
+
+	.hero-kicker {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: 0.75rem;
+		font-weight: 700;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--dry-color-fill-brand-active);
 	}
 
 	.hero-lockup {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		justify-items: center;
-		gap: var(--dry-space-3);
+		justify-items: start;
+		gap: var(--dry-space-4);
 	}
 
 	.hero-headline-visual {
-		font-size: clamp(1.5rem, 0.875rem + 2.75cqi, 2.25rem);
-		line-height: 1.15;
-		font-weight: 700;
-		letter-spacing: -0.01em;
+		max-inline-size: 10ch;
+		font-size: 4.75rem;
+		line-height: 0.94;
+		font-weight: 850;
+		letter-spacing: 0;
 		color: var(--dry-color-text-strong);
 		text-wrap: balance;
 	}
@@ -880,45 +923,52 @@
 	.hero-headline-text {
 		position: relative;
 		display: inline-block;
-		padding-block-end: 0.18em;
-		background-image: linear-gradient(
-			90deg,
-			var(--dry-color-fill-accent) 0%,
-			color-mix(in oklch, var(--dry-color-fill-accent) 30%, transparent) 100%
-		);
-		background-repeat: no-repeat;
-		background-position: 0 100%;
-		background-size: 100% 0.12em;
-	}
-
-	.hero-subhead-line {
-		display: block;
-	}
-
-	.hero-stat-line {
-		display: block;
-		font-family: var(--dry-font-mono);
-		font-size: 0.8125rem;
-		letter-spacing: 0.02em;
-		color: var(--dry-color-text-weak);
-		padding-block-start: var(--dry-space-1);
-	}
-
-	.hero-stat-num {
-		color: var(--dry-color-fill-accent-active);
-		font-weight: 600;
 	}
 
 	.hero-brand {
 		display: grid;
-		justify-items: center;
-		font-size: clamp(2.5rem, 0.5rem + 9cqi, 4.5rem);
+		justify-items: start;
+		font-size: 2.75rem;
 		color: var(--dry-color-text-strong);
+	}
+
+	.hero-proof {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--dry-space-2);
+		max-inline-size: 62ch;
+	}
+
+	.hero-proof li {
+		display: grid;
+		grid-template-columns: 5.25rem minmax(0, 1fr);
+		align-items: baseline;
+		gap: var(--dry-space-3);
+		padding-block: var(--dry-space-2);
+		border-block-end: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.hero-proof-key {
+		font-family: var(--dry-font-mono);
+		font-size: 0.72rem;
+		font-weight: 700;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--dry-color-fill-accent-active);
+	}
+
+	.hero-proof-value {
+		color: var(--dry-color-text-weak);
+		font-size: var(--dry-type-small-size);
+		line-height: 1.45;
 	}
 
 	.hero-intro {
 		display: grid;
-		grid-template-columns: minmax(0, 36rem);
+		grid-template-columns: minmax(0, 1fr);
 		justify-content: center;
 		justify-self: stretch;
 		gap: var(--dry-space-3);
@@ -926,8 +976,36 @@
 
 	.hero-intro-frame {
 		display: grid;
-		grid-template-columns: minmax(0, 52rem);
-		justify-self: center;
+		grid-template-columns: minmax(0, 1fr);
+		justify-self: stretch;
+	}
+
+	@container (min-width: 58rem) {
+		.hero-main {
+			grid-template-columns: minmax(0, 0.86fr) minmax(24rem, 1fr);
+			column-gap: var(--dry-space-12);
+		}
+
+		.hero-install {
+			grid-column: 1 / -1;
+			justify-self: start;
+		}
+	}
+
+	@container (max-width: 44rem) {
+		.hero {
+			min-block-size: auto;
+			padding-block-start: var(--dry-space-5);
+		}
+
+		.hero-headline-visual {
+			max-inline-size: 12ch;
+			font-size: 2.85rem;
+		}
+
+		.hero-brand {
+			font-size: 2.1rem;
+		}
 	}
 
 	.hero-skip {
@@ -959,17 +1037,11 @@
 		--dry-btn-bg: color-mix(in srgb, var(--dry-color-bg-raised) 92%, transparent);
 	}
 
-	@container (min-width: 48rem) {
-		.hero-intro-frame {
-			margin-inline: -2rem;
-		}
-	}
-
 	.hero-install {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr);
+		grid-template-columns: minmax(0, 46rem);
 		gap: var(--dry-space-4);
-		justify-items: center;
+		justify-items: stretch;
 		justify-self: stretch;
 	}
 
@@ -978,6 +1050,41 @@
 		grid-template-columns: minmax(0, 1fr);
 		gap: var(--dry-space-4);
 		text-align: start;
+	}
+
+	.hero-loop {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: var(--dry-space-2);
+		margin-block-start: var(--dry-space-5);
+		padding-block-start: var(--dry-space-4);
+		border-block-start: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.hero-loop span {
+		display: grid;
+		place-items: center;
+		min-block-size: 2rem;
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-sm);
+		background: color-mix(in srgb, var(--dry-color-fill-accent) 8%, transparent);
+		color: var(--dry-color-text-strong);
+		font-family: var(--dry-font-mono);
+		font-size: 0.68rem;
+		font-weight: 700;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+
+	@container (max-width: 32rem) {
+		.hero-proof li {
+			grid-template-columns: minmax(0, 1fr);
+			gap: var(--dry-space-1);
+		}
+
+		.hero-loop {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
 	}
 
 	.chat-row {
@@ -1281,6 +1388,11 @@
 		justify-content: center;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-6) 0;
+	}
+
+	.hero-copy .actions {
+		justify-content: start;
+		padding-block: var(--dry-space-2) 0;
 	}
 
 	.cta-warm {

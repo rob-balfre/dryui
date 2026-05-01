@@ -1,5 +1,12 @@
 <span class="logo" aria-label="DryUI">
-	<svg class="logo-mark" viewBox="0 0 48 48" aria-hidden="true" focusable="false">
+	<svg
+		class="logo-mark"
+		width="1em"
+		height="1em"
+		viewBox="0 0 48 48"
+		aria-hidden="true"
+		focusable="false"
+	>
 		<rect class="logo-mark-bg" x="4" y="4" width="40" height="40" rx="9" />
 		<path
 			class="logo-mark-body"
@@ -28,22 +35,20 @@
 	}
 
 	.logo-mark {
-		inline-size: var(--_logo-mark-size);
-		block-size: var(--_logo-mark-size);
 		overflow: visible;
 	}
 
 	.logo-mark-bg {
-		fill: var(--dry-logo-mark-bg, var(--dry-color-fill-brand));
+		fill: var(--docs-logo-mark-bg, var(--dry-color-fill-brand));
 	}
 
 	.logo-mark-body {
-		fill: var(--dry-logo-mark-ink, var(--dry-color-on-brand));
+		fill: var(--docs-logo-mark-ink, var(--dry-color-on-brand));
 	}
 
 	.logo-mark-signal {
 		fill: none;
-		stroke: var(--dry-logo-mark-signal, var(--dry-color-fill-accent));
+		stroke: var(--docs-logo-mark-signal, var(--dry-color-fill-accent));
 		stroke-width: 3;
 		stroke-linecap: round;
 	}

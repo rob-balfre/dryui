@@ -33,11 +33,11 @@ jobs:
 
       - uses: ./.github/actions/setup-dryui
 
-      # Phase 6 of the npx skills migration removed the legacy plugin-skills
-      # and Cursor rules sync (sync:skills was deleted). The release pipeline
-      # no longer needs a self-heal step for those generated artifacts. Set a
-      # default-false drift flag so existing if-statements below stay correct.
-      - name: Sync drift flag (no-op post-Phase-6)
+      # No generated-skill mirrors anymore (sync:skills was deleted alongside
+      # packages/plugin/skills/* and .cursor/rules/*). Drift flag stays false
+      # so the gated steps below run unconditionally; kept as an output to
+      # avoid having to retrofit every `if: steps.heal-sync.outputs.drift`.
+      - name: Sync drift flag
         id: heal-sync
         run: echo "drift=false" >> "$GITHUB_OUTPUT"
 

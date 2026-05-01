@@ -6,19 +6,15 @@
 //   3. `name` matches the parent directory name.
 //   4. `description` present, 20..1024 chars (npx skills routing-rule budget).
 //
-// Walks the canonical top-level skills/ layout (post-Phase-2 of the npx
-// skills migration). Legacy candidate roots remain in the list so a
-// rollback to the scattered layout would still validate, but on a clean
-// post-Phase-6 tree only skills/ matches.
-//
 // Exit code: 0 on clean tree, 1 on any validation failure (with per-file
 // diagnostics on stderr).
 
-import { readdir, exists, stat } from 'node:fs/promises';
+import { readdir, exists } from 'node:fs/promises';
 import { join, basename, relative } from 'node:path';
 import { parseFrontmatter } from './_skill-frontmatter';
 
 const root = join(import.meta.dir, '..');
+const skillsRoot = join(root, 'skills');
 
 const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
 const DESC_MIN = 20;
@@ -74,40 +70,22 @@ async function validateSkill(skillMdPath: string) {
 	}
 }
 
-async function findSkillsIn(dir: string): Promise<string[]> {
+async function findSkills(dir: string): Promise<string[]> {
 	if (!(await exists(dir))) return [];
 	const out: string[] = [];
 	const entries = await readdir(dir, { withFileTypes: true });
 	for (const entry of entries) {
 		if (!entry.isDirectory()) continue;
 		const skillMd = join(dir, entry.name, 'SKILL.md');
-		if (await exists(skillMd)) {
-			out.push(skillMd);
-		}
+		if (await exists(skillMd)) out.push(skillMd);
 	}
 	return out;
 }
 
-const candidateRoots = [
-	// Legacy scattered layout (pre-Phase-2)
-	join(root, 'packages', 'ui', 'skills'),
-	join(root, 'packages', 'feedback', 'skills'),
-	join(root, 'packages', 'feedback-server', 'skills'),
-	join(root, 'packages', 'cli', 'skills'),
-	join(root, 'packages', 'plugin', 'skills'),
-	// Post-Phase-2 top-level layout
-	join(root, 'skills')
-];
-
-const allSkills: string[] = [];
-for (const dir of candidateRoots) {
-	allSkills.push(...(await findSkillsIn(dir)));
-}
+const allSkills = await findSkills(skillsRoot);
 
 if (allSkills.length === 0) {
-	console.error('validate-skills: no SKILL.md files found in any candidate root.');
-	console.error('  candidates:');
-	for (const dir of candidateRoots) console.error(`    ${relative(root, dir)}`);
+	console.error(`validate-skills: no SKILL.md files found under ${relative(root, skillsRoot)}/`);
 	process.exit(1);
 }
 

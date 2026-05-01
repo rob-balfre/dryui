@@ -8,7 +8,7 @@
 	import GithubIcon from '$lib/components/GithubIcon.svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 	import Logo from '$lib/components/Logo.svelte';
-	import Sidebar from '$lib/components/Sidebar.svelte';
+	import DocsSidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 	import { BUILD_TIMESTAMP, DRYUI_VERSION, GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
 	import { withBase, withQueryParam } from '$lib/utils';
@@ -155,7 +155,7 @@
 
 										<Drawer.Content --dry-drawer-size="min(22rem, calc(100vw - 2rem))">
 											<Drawer.Body padding={false}>
-												<Sidebar
+												<DocsSidebar
 													currentPath={page.url.pathname}
 													{themeWizardHref}
 													onnavigate={() => (mobileNavOpen = false)}
@@ -188,7 +188,7 @@
 			</header>
 
 			<nav class="docs-nav">
-				<Sidebar currentPath={page.url.pathname} {themeWizardHref} />
+				<DocsSidebar currentPath={page.url.pathname} {themeWizardHref} />
 			</nav>
 
 			<main class="docs-content">
@@ -399,9 +399,7 @@
 		align-items: center;
 		gap: var(--dry-space-3);
 		padding: var(--dry-space-3) var(--dry-space-4);
-		background: color-mix(in srgb, var(--dry-color-bg-base, #0b0b0b) 72%, transparent);
-		backdrop-filter: blur(10px);
-		-webkit-backdrop-filter: blur(10px);
+		background: color-mix(in srgb, var(--dry-color-bg-base) 96%, transparent);
 		border-block-end: 1px solid var(--dry-color-stroke-weak, transparent);
 		opacity: 0;
 		transform: translateY(-6px);

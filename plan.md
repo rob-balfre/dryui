@@ -183,7 +183,7 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 **Work streams (sequential, single owner).**
 
 - **2.A Design the move.** Agent: `Plan`. Brief: "Design the consolidation move from scattered `packages/*/skills/` to top-level `skills/`. Specifically map: (1) every source path → new path. (2) Every reference to update with file:line locations. Search the codebase for: `packages/ui/skills`, `packages/feedback/skills`, `packages/feedback-server/skills`, `packages/cli/skills`, `packages/plugin/skills`, `name: init`, `name: live-feedback`, the strings `live-feedback` and `\binit\b` in skill-related contexts. Known reference sites from the audit: `packages/cli/src/commands/setup-installers.ts:77` (SKILL_SOURCE), `packages/cli/agents/dryui-layout.md`, `packages/cli/agents/feedback.md`, `packages/feedback-server/src/skill-path.ts:resolveDispatchSkillPath()`, `packages/mcp/src/ai-surface.ts`, `packages/mcp/src/spec.json`, `packages/mcp/src/contract.v1.json`, `packages/mcp/src/agent-contract.v1.json`, `scripts/sync-skills.ts`. (3) Frontmatter `name:` field updates for the two renamed skills. (4) DELETE `packages/feedback-server/src/skill-path.ts` entirely (`resolveDispatchSkillPath()` and `ensureProjectSkillCopy()`) per D8. Update `packages/feedback-server/src/dispatch.ts` to precondition-check `<projectRoot>/.claude/skills/dryui-feedback/SKILL.md` exists; if missing, fail the dispatch with a clear error message: `dryui-feedback skill not installed. Run: npx skills add rob-balfre/dryui --skill dryui-feedback (or run: dryui init for full project setup)`. Delete the git-tracked mirror at `packages/feedback-server/.claude/skills/dryui-feedback/`. Output: a single ordered task list (do this, then this) the implementation agent can follow without judgment calls."
-- **2.B Execute the move.** Agent: `general-purpose`. Brief: depends on 2.A output. "Execute the move plan from 2.A in a single PR. Use `git mv` for every file move so history is preserved. Update every reference site identified in 2.A. Update frontmatter `name:` fields for `dryui-init` and `dryui-live-feedback`. Rename their parent dirs to match. Delete `packages/feedback-server/src/skill-path.ts` and the `packages/feedback-server/.claude/skills/` mirror (per D8). Update `packages/feedback-server/src/dispatch.ts` with the precondition-check from 2.A. After all moves: run `bun run validate:skills` (must pass), `bun test` across all packages (must pass), `bun run vm:test` (must produce a working SvelteKit + DryUI install). Verify the published `@dryui/feedback-server` package no longer ships any SKILL.md: `cd packages/feedback-server && bun pack` and inspect the tarball. Do NOT change `dryui init` install behavior in this PR; the legacy `copySkill()` still runs, now reading from `skills/dryui/` after `SKILL_SOURCE` is updated to `rob-balfre/dryui/skills/dryui`. The dispatch precondition-check is the only behavior change. Report diff stats and any test that broke."
+- **2.B Execute the move.** Agent: `general-purpose`. Brief: depends on 2.A output. "Execute the move plan from 2.A in a single PR. Use `git mv` for every file move so history is preserved. Update every reference site identified in 2.A. Update frontmatter `name:` fields for `dryui-init` and `dryui-live-feedback`. Rename their parent dirs to match. Delete `packages/feedback-server/src/skill-path.ts` and the `packages/feedback-server/.claude/skills/` mirror (per D8). Update `packages/feedback-server/src/dispatch.ts` with the precondition-check from 2.A. After all moves: run `bun run validate:skills` (must pass), `bun test` across all packages (must pass), `bun run e2e:full` (must produce a working SvelteKit + DryUI install). Verify the published `@dryui/feedback-server` package no longer ships any SKILL.md: `cd packages/feedback-server && bun pack` and inspect the tarball. Do NOT change `dryui init` install behavior in this PR; the legacy `copySkill()` still runs, now reading from `skills/dryui/` after `SKILL_SOURCE` is updated to `rob-balfre/dryui/skills/dryui`. The dispatch precondition-check is the only behavior change. Report diff stats and any test that broke."
 
 **Dependencies.** 2.B blocked by 2.A.
 
@@ -193,14 +193,14 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 - `dryui-init` and `dryui-live-feedback` named correctly in both dir name and frontmatter.
 - `bun run validate:skills` passes.
 - `bun test` passes across all packages.
-- `bun run vm:test` produces a working install (legacy `copySkill()` flow against the new `SKILL_SOURCE` of `rob-balfre/dryui/skills/dryui`).
-- `feedback-server` dispatch fails cleanly with a clear error (pointing at `npx skills add` / `dryui init`) when the `dryui-feedback` skill is missing from `<projectRoot>/.claude/skills/`. After running `dryui init` in the VM, dispatch succeeds. Verified in VM smoke.
+- `bun run e2e:full` produces a working install (legacy `copySkill()` flow against the new `SKILL_SOURCE` of `rob-balfre/dryui/skills/dryui`).
+- `feedback-server` dispatch fails cleanly with a clear error (pointing at `npx skills add` / `dryui init`) when the `dryui-feedback` skill is missing from `<projectRoot>/.claude/skills/`. After running `dryui init` in an E2E scaffold, dispatch succeeds. Verified in E2E smoke.
 - `packages/feedback-server/src/skill-path.ts` and the git-tracked `.claude/skills/` mirror both deleted. `bun pack` of `@dryui/feedback-server` shows no SKILL.md in the tarball.
 - Git history preserved (verified by `git log --follow skills/dryui/SKILL.md` showing pre-move commits).
 
 **Rollback.** Single revert of the move PR. Atomic.
 
-**GATE 2 → 3.** User runs `bun run vm:test` and verifies the install works post-consolidation. Crucially: legacy install path is the only path active here, so we are testing that the move did not break what already worked.
+**GATE 2 → 3.** User runs `bun run e2e:full` and verifies the install works post-consolidation. Crucially: legacy install path is the only path active here, so we are testing that the move did not break what already worked.
 
 ---
 
@@ -224,7 +224,7 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 **Rollback.** Single revert of the gating commit. Env var defaults to off; no user impact.
 
-**GATE 3 → 4.** User runs `DRYUI_SKILLS_VIA_NPX=1 bun run vm:test` and confirms install lands cleanly in microVM. Without VM verification, do not proceed.
+**GATE 3 → 4.** User runs `DRYUI_SKILLS_VIA_NPX=1 bun run e2e:full` and confirms install lands cleanly. Without E2E verification, do not proceed.
 
 ---
 
@@ -259,7 +259,7 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 - **5.A Flip the gate.** Agent: `general-purpose`. Brief: "In `packages/cli/src/commands/setup-installers.ts`, change gating from `if (process.env.DRYUI_SKILLS_VIA_NPX === '1')` to `if (process.env.DRYUI_SKILLS_LEGACY !== '1')` so npx skills becomes default. Update Vitest specs accordingly. Update `README.md` Source Mode section to reflect the flip and note that `DRYUI_SKILLS_LEGACY=1` is a one-release escape hatch slated for removal in Phase 6."
 - **5.B Release notes.** Agent: `general-purpose`. Brief: "Draft a release-notes entry under `RELEASING.md` (or wherever release notes live; check). Title: 'Skills install via `npx skills`'. Bullet: user-facing change, legacy escape hatch, link to install docs. Under 150 words."
-- **5.C VM smoke test.** Agent: `general-purpose`. Brief: "Run `bun run vm:test` end-to-end. Verify resulting project has dryui skills installed via npx skills (look for `--copy` signature: regular file rather than symlink) in the correct agent dir. Per project memory: do NOT use `bunx @dryui/cli`; use the local workspace build per the smolvm flow. Capture output and report any warnings."
+- **5.C E2E smoke test.** Agent: `general-purpose`. Brief: "Run `bun run e2e:full` end-to-end. Verify resulting project has dryui skills installed via npx skills (look for `--copy` signature: regular file rather than symlink) in the correct agent dir. Use the local workspace tarball flow. Capture output and report any warnings."
 
 **Dependencies.** 5.B and 5.C parallel with 5.A.
 
@@ -267,12 +267,12 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 - Default `dryui init` (no env vars) installs via `npx skills`.
 - `DRYUI_SKILLS_LEGACY=1 dryui init` still works and produces pre-Phase-3 output.
-- VM smoke green.
+- E2E smoke green.
 - Release notes drafted.
 
 **Rollback.** Single revert of the flip commit.
 
-**GATE 5 → 6.** Phase 5 PR merged, VM smoke green. Proceed immediately to Phase 6.
+**GATE 5 → 6.** Phase 5 PR merged, E2E smoke green. Proceed immediately to Phase 6.
 
 ---
 
@@ -282,10 +282,10 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 **Work streams (parallelizable except where noted).**
 
-- **6.A Delete `copySkill()` and `DRYUI_SKILLS_LEGACY` for npx-supported agents only.** Agent: `general-purpose`. Brief: "In `packages/cli/src/commands/setup-installers.ts`: delete the `DRYUI_SKILLS_LEGACY` gate. **KEEP `SKILL_SOURCE`, `copySkill()`, `defaultRunDegit()` because Zed still uses them (per Phase 0.C: Zed is not supported by npx skills).** Update `SKILL_SOURCE` to point at the new `rob-balfre/dryui/skills/dryui` path. Delete only the Vitest specs that tested the legacy path for npx-supported agents; keep the Zed specs. Run `bun test packages/cli` and `bun run vm:test`. Report any regression."
+- **6.A Delete `copySkill()` and `DRYUI_SKILLS_LEGACY` for npx-supported agents only.** Agent: `general-purpose`. Brief: "In `packages/cli/src/commands/setup-installers.ts`: delete the `DRYUI_SKILLS_LEGACY` gate. **KEEP `SKILL_SOURCE`, `copySkill()`, `defaultRunDegit()` because Zed still uses them (per Phase 0.C: Zed is not supported by npx skills).** Update `SKILL_SOURCE` to point at the new `rob-balfre/dryui/skills/dryui` path. Delete only the Vitest specs that tested the legacy path for npx-supported agents; keep the Zed specs. Run `bun test packages/cli` and `bun run e2e:full`. Report any regression."
 - **6.B Delete `packages/plugin/`.** Agent: `general-purpose`. Brief: "Delete `packages/plugin/` directory entirely. Remove plugin from root `package.json` workspaces array, `bun.lock` (will rewrite on `bun install`), any `tsconfig.json` references, any CI matrix entries. Search for `@dryui/plugin` references and remove. Update `skills/dryui/SKILL.md` install table to drop the `claude plugin marketplace add` line and the Codex `/plugins` line (Codex 0.121+ users can use `npx skills` like everyone else). Update `apps/docs/src/lib/ai-setup.ts` to drop plugin marketplace install snippets."
 - **6.C Delete `scripts/sync-skills.ts` and Cursor mirror.** Agent: `general-purpose`. Brief: "Delete `scripts/sync-skills.ts` (no more plugin mirror needed). Delete `bun run sync:skills` script entry from root `package.json`. Delete the `sync:skills` step from `.github/workflows/release.yml`. Keep `validate:skills` and `_skill-frontmatter.ts`. Delete `.cursor/rules/` directory and any `syncSkillToCursor()` references. Run `bun install && bun run validate:skills && bun test` and confirm green."
-- **6.D Delete `dryui setup --install` subcommand (D9).** Agent: `general-purpose`. Brief: "Remove the `dryui setup` subcommand entirely. Delete `packages/cli/src/commands/setup.ts` (or wherever the `setup` command is registered), its tests, and its CLI router registration. The `INSTALLERS` dict at `setup-installers.ts:L537-545` is still consumed by `dryui init`, so keep the dict but delete only the `setup` command wrapper. Update `skills/dryui/SKILL.md` to remove every `dryui setup --install` reference. Update `README.md` and `apps/docs/src/lib/ai-setup.ts` similarly. Run `bun test packages/cli` and `bun run vm:test` to confirm `dryui init` still does everything users need (preflight + per-agent install + MCP wiring)."
+- **6.D Delete `dryui setup --install` subcommand (D9).** Agent: `general-purpose`. Brief: "Remove the `dryui setup` subcommand entirely. Delete `packages/cli/src/commands/setup.ts` (or wherever the `setup` command is registered), its tests, and its CLI router registration. The `INSTALLERS` dict at `setup-installers.ts:L537-545` is still consumed by `dryui init`, so keep the dict but delete only the `setup` command wrapper. Update `skills/dryui/SKILL.md` to remove every `dryui setup --install` reference. Update `README.md` and `apps/docs/src/lib/ai-setup.ts` similarly. Run `bun test packages/cli` and `bun run e2e:full` to confirm `dryui init` still does everything users need (preflight + per-agent install + MCP wiring)."
 - **6.E Doc scrub.** Agent: `general-purpose`. Brief: "After 6.A through 6.D land, scrub all references to `DRYUI_SKILLS_LEGACY`, `DRYUI_SKILLS_VIA_NPX`, the legacy degit install path, plugin marketplace install commands, and `bun run sync:skills` from `README.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `apps/docs/src/lib/ai-setup.ts`, every SKILL.md install section, and any other surface returned by `rg 'DRYUI_SKILLS|degit.*rob-balfre/dryui|plugin marketplace add|sync:skills'`. Make `npx skills add rob-balfre/dryui` the only documented install path."
 
 **Dependencies.** 6.E blocked by 6.A through 6.D. 6.A through 6.D parallelize.
@@ -295,7 +295,7 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 - `rg 'DRYUI_SKILLS|degit.*rob-balfre/dryui|plugin marketplace add|sync:skills|dryui setup'` returns zero hits.
 - `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/` all gone. (`packages/feedback-server/.claude/skills/` and `src/skill-path.ts` were already deleted in Phase 2.)
 - `dryui setup --install` subcommand removed; `dryui init` is the only setup entry point.
-- `bun install && bun run validate:skills && bun test && bun run vm:test` all green.
+- `bun install && bun run validate:skills && bun test && bun run e2e:full` all green.
 - One channel: `npx skills add rob-balfre/dryui` (Zed: still uses degit copySkill until upstream npx skills supports Zed). One source: top-level `skills/`. One setup command: `dryui init`.
 
 **Rollback.** Per work stream: revert. 6.B (plugin deletion) is the highest-blast-radius revert since it touches workspace config; verify on a branch first.
@@ -357,5 +357,5 @@ All resolved 2026-05-02:
 - `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/`, `packages/feedback-server/.claude/skills/`, `packages/feedback-server/src/skill-path.ts` all deleted.
 - Legacy `copySkill()`, `DRYUI_SKILLS_LEGACY`, `DRYUI_SKILLS_VIA_NPX` all gone.
 - `feedback-server` dispatch precondition-checks skill presence and fails with a clear install-hint error if missing.
-- `bun run vm:test` green end-to-end.
+- `bun run e2e:full` green end-to-end.
 - Git history preserved through `git log --follow` for every moved skill.
