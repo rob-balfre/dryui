@@ -1,251 +1,255 @@
 ---
 name: dryui-layout
-description: 'Place DryUI Svelte 5 components inside `AreaGrid.Root` and wire responsive behavior with container queries. Use whenever a `.svelte` file needs page or section structure (named areas, sidebar/main/header layouts, dashboard-style regions, responsive shifts, fluid grids), or when a brief mentions "layout", "grid", "AreaGrid", "wireframe", "page structure", "responsive", or container queries. The agent only does structure: it picks `AreaGrid.Root`, names the areas, sets the template family, and adds `@container` rules. It does not pick non-layout components, write copy, choose tokens, wire forms, or run validation — those hand off.'
+description: Phase 1 (Zones) of DryUI layout. Produce a page-level grid skeleton in a `.svelte` file plus the matching grid template in `src/layout.css`. Named regions, mobile-first base, `@container page (...)` queries for responsive shifts (never `@media`). All grid CSS lives in `src/layout.css`, scoped under `[data-layout="<name>"]`. Phase 1 markup uses plain HTML elements with `data-layout-area="<region>"` placeholders — no DryUI components yet (Phase 2 will place those). Use whenever a `.svelte` file in a DryUI consumer project needs page or section structure: named-area layouts, sidebar/main/header layouts, dashboard regions, responsive area shifts. The skill is satisfied when every rule below is greppable-clean and the layout renders correctly at narrow and wide viewports.
 ---
 
-# DryUI Layout
+# DryUI Layout — Phase 1 (Zones)
 
-Single job: place DryUI components inside `AreaGrid.Root` and handle responsive sizing through container queries. Stop at the structure boundary.
+Produce the page-level grid skeleton: named regions with placeholder content. Phase 2 (components) and Phase 3 (polish) come later. This skill stops at the structural shape.
+
+## Setup (one-time per project)
+
+Verify these before writing any layout. If missing, fix first.
+
+**1. Body is the page container.** In `src/app.css`:
+
+```css
+body {
+	container-type: inline-size;
+	container-name: page;
+}
+```
+
+Without this, every `@container page (...)` rule silently fails. Layouts cannot query their own width directly — the container lives one element above.
+
+**2. `src/layout.css` exists and is imported.** In `src/routes/+layout.svelte`:
+
+```svelte
+<script lang="ts">
+	import '../app.css';
+	import '../layout.css';
+</script>
+
+{@render children?.()}
+```
+
+Create `src/layout.css` empty if not present.
+
+## The pattern
+
+Mark the layout root with `data-layout="<name>"`. Each region is a direct child carrying `data-layout-area="<area>"`. The grid template lives in `src/layout.css`, mobile-first, with `@container page (...)` adding wider breakpoints.
+
+```svelte
+<!-- src/routes/docs/+page.svelte -->
+<div data-layout="docs">
+	<header data-layout-area="masthead">masthead</header>
+	<nav data-layout-area="nav">nav</nav>
+	<main data-layout-area="main">main</main>
+	<aside data-layout-area="aside">aside</aside>
+	<footer data-layout-area="foot">foot</footer>
+</div>
+```
+
+```css
+/* src/layout.css */
+
+[data-layout='docs'] {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-areas:
+		'masthead'
+		'nav'
+		'main'
+		'aside'
+		'foot';
+	gap: 0.75rem;
+	padding: 1rem;
+	min-block-size: 100dvh;
+}
+
+[data-layout='docs'] > [data-layout-area='masthead'] {
+	grid-area: masthead;
+}
+[data-layout='docs'] > [data-layout-area='nav'] {
+	grid-area: nav;
+}
+[data-layout='docs'] > [data-layout-area='main'] {
+	grid-area: main;
+}
+[data-layout='docs'] > [data-layout-area='aside'] {
+	grid-area: aside;
+}
+[data-layout='docs'] > [data-layout-area='foot'] {
+	grid-area: foot;
+}
+
+@container page (min-width: 64rem) {
+	[data-layout='docs'] {
+		grid-template-columns: 14rem minmax(0, 1fr) 22rem;
+		grid-template-rows: auto 1fr auto;
+		grid-template-areas:
+			'masthead masthead masthead'
+			'nav      main     aside'
+			'foot     main     aside';
+	}
+}
+```
 
 ## Hard rules
 
-1. **One `AreaGrid.Root` per file.** No nesting. Lint: `dryui/area-grid-single-root`.
-2. **Children are DryUI components only.** No `<div>`, `<span>`, `<section>`, `<svelte:element>`, or any other raw tag inside the grid. Lint: `dryui/no-raw-element`.
-3. **Styling input is CSS custom properties only.** Use Svelte's `--prop` syntax (`--dry-grid-area-name="header"`). No `class=`, no `style=`, no `style:` directives. Lint: `dryui/no-component-class`, `dryui/no-inline-style`, `dryui/no-style-directive`.
-4. **Grid only through `AreaGrid.Root`.** No raw `display: grid` anywhere. Lint: `dryui/no-raw-grid`.
+**Markup (in the `.svelte` file):**
 
-If you want a behavior these rules forbid, the layout is wrong, not the rules. Restructure: split into sibling AreaGrids, push placement into the parent's template, or hand off to the agent that owns the missing piece.
+- **R1.** Exactly one root element with `data-layout="<kebab-name>"`. The name is unique in the project.
+- **R2.** For each _named_ region (any name appearing in the layout's `grid-template-areas`), the matching direct child of the root carries `data-layout-area="<region-name>"`. Auto-flow grids (no `grid-template-areas`) place children automatically and don't require `data-layout-area` on each child. Use semantic HTML elements (`<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`, `<section>`) where they fit; otherwise `<div>`.
+- **R3.** Phase 1 region content is a short placeholder text label. No real components.
+- **R4.** Nested layouts combine attributes on one element: `<section data-layout="admin-stats" data-layout-area="stats">`. Children of that element use their own `data-layout-area` values matched by the nested grid template.
+- **R5.** No `<style>` block in the file.
+- **R6.** No inline `style=` attributes; no Svelte `style:` directives.
+- **R7.** No `class=` attributes. Phase 1 is zones only; classes belong to later phases.
 
-## `AreaGrid.Root` API
+**CSS (in `src/layout.css`):**
 
-Props (real, from the component source):
+- **R8.** Every rule scoped under `[data-layout='<name>']`. No bare element selectors.
+- **R9.** Base block targets the smallest viewport. When in doubt, mobile = single column (`grid-template-columns: 1fr`).
+- **R10.** Every name in `grid-template-areas` has a matching `[data-layout='<name>'] > [data-layout-area='<area>'] { grid-area: <area>; }` rule. One per area.
+- **R11.** Larger viewports add via `@container page (min-width: <Xrem>) { [data-layout='<name>'] { ... } }`. Never `@media`.
+- **R12.** No `display: flex` anywhere in `src/layout.css`. Grid only.
 
-- `maxWidth`: `'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'full'` — defaults `xl` (80rem / 1280px). The grid sits in a centered column that caps at the chosen size; outer breathing on narrower viewports comes from `min(100% - 2rem, …)`. Pick `'full'` only for app shells where chrome (topbar, sidebar) genuinely needs viewport bleed (Jira, Linear, mail clients, IDE-style apps). Sizes: sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem.
-- `fill`: `boolean` — when `true`, the grid stretches to at least viewport height (`min-block-size: 100dvh`). **Always pass `fill` for page-level layouts** (anything in `+page.svelte`); without it the grid collapses to content height and the rest of the viewport sits dark below. Omit only when the AreaGrid is a section inside a larger layout.
-- `debug`: `boolean` — visualizes area boxes during development. Strip before commit.
-- `seams`: `boolean` — draws 1px seam lines between grid tracks for development. Off by default; opt in only when laying out the grid. Strip before commit.
+**File scope:**
 
-There is no `gap` and no `padding` _attribute_ — those are footguns and stay banned. Lint: `dryui/area-grid-no-gap`, `dryui/area-grid-no-padding`.
+- **R13.** Every byte of layout CSS lives in `src/layout.css`. No grid or flex in component `<style>` blocks, ever.
+- **R14.** No new files beyond the target `.svelte` (if new) and edits to `src/layout.css` and (if needed) `src/app.css` for setup.
 
-What AreaGrid does expose for whitespace is two layers of _namespaced_ padding, set via Svelte `--prop` syntax:
+## Track sizing
 
-- **Shell padding** (`--dry-area-grid-shell-padding[-block|-inline]`): inset between the centered max-width cap and the grid tracks. Use this when the page needs vertical air around the grid (top/bottom strip on a hero, breathing room above an app shell), or extra horizontal breathing inside the cap on top of the default `100% - 2rem` gutter.
-- **Grid padding** (`--dry-area-grid-padding[-block|-inline]`): inset between the grid's own box and its tracks. Use this when every region should be inset from the grid edge by the same amount — e.g., a card-shell-style frame.
+- Content-bearing tracks (main, body, article): `1fr` or `minmax(0, 1fr)`.
+- Sidebars / rails: specific widths like `12rem`, `14rem`, `18rem`, `22rem`.
+- Headers, footers, single-row sections: `auto`.
+- **Never bare `auto` for content tracks** — at narrow widths and with placeholder content, `auto` collapses to label width and the layout looks broken.
 
-Inter-region spacing (between two areas) is still each region's surface concern (border, padding, background). If you want gutters between tracks, that's `gap`, which AreaGrid does not yet expose; restructure or push the spacing into the regions.
+## Pinning a footer to viewport bottom
 
-The Root sets `container-type: inline-size` on itself, so every child can use container queries against the grid's own width.
+Add a `1fr` empty row before the footer in `grid-template-areas`:
 
-## Templates (presets)
-
-Six named templates encode the most common layouts so you don't author template-areas strings unless you need a custom shape. Set via the `template` prop. Each preset corresponds to a layout from [1linelayouts.com](https://1linelayouts.com/), translated into named areas where applicable.
-
-| `template`   | Areas                                                                                | When to use                                                                      |
-| ------------ | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| `centered`   | `content` (single area, both axes centered via `place-items`)                        | Auth screen, splash, error page, single-card empty state.                        |
-| `sidebar`    | `aside`, `main`                                                                      | Docs, settings, two-pane app shell. Sidebar is `minmax(150px, 25%)`, main `1fr`. |
-| `stack`      | `masthead`, `main`, `foot`                                                           | Page with fixed header/footer and flexible main (Pancake Stack).                 |
-| `holy-grail` | `masthead`, `nav`, `main`, `aside`, `foot`                                           | Classic three-column page with full-width header and footer.                     |
-| `12-span`    | none (children flow into 12 numbered columns)                                        | Marketing or dashboard sections that compose from a 12-column rhythm.            |
-| `card-grid`  | none (children flow with `repeat(auto-fit, minmax(--dry-area-grid-min-track, 1fr))`) | Card lists, gallery, RAM-style auto-responsive grids.                            |
-
-When `template` is set, you do **not** need to pass `--dry-area-grid-template-areas` (the lint relaxes `area-grid-required-var`). Each preset still composes with `-wide` and `-xl` overrides if you want to swap shapes at breakpoints.
-
-Optional knobs (Svelte `--prop` syntax):
-
-| Property                      | Used by     | Default |
-| ----------------------------- | ----------- | ------- |
-| `--dry-area-grid-sidebar-min` | `sidebar`   | `150px` |
-| `--dry-area-grid-sidebar-max` | `sidebar`   | `25%`   |
-| `--dry-area-grid-min-track`   | `card-grid` | `16rem` |
-
-```svelte
-<AreaGrid.Root template="sidebar" --dry-area-grid-sidebar-min="14rem">
-	<Nav --dry-grid-area-name="aside" />
-	<Article --dry-grid-area-name="main" />
-</AreaGrid.Root>
-
-<AreaGrid.Root template="card-grid" --dry-area-grid-min-track="14rem">
-	<Card.Root>…</Card.Root>
-	<Card.Root>…</Card.Root>
-	<Card.Root>…</Card.Root>
-</AreaGrid.Root>
+```css
+[data-layout='page'] {
+	grid-template-areas: 'masthead' 'main' '.' 'foot';
+	grid-template-rows: auto auto 1fr auto;
+	min-block-size: 100dvh;
+}
 ```
 
-Reach for hand-authored template-areas (next section) only when no preset fits: bespoke dashboards, asymmetric splits, or layouts that swap structure at breakpoints in ways the preset table can't express.
+The empty `'.'` row absorbs leftover vertical space; the footer sits below it at viewport bottom.
 
-## Template areas family
+## Common shapes (snippets)
 
-Set the template via Svelte `--prop` syntax on `AreaGrid.Root`. Each variant has a `-wide` (≥720px container) and `-xl` (≥1024px container) override.
+### Stacked (header / main / footer)
 
-| Property                                | Purpose                                            |
-| --------------------------------------- | -------------------------------------------------- |
-| `--dry-area-grid-template-areas`        | Required base template.                            |
-| `--dry-area-grid-template-columns`      | Track sizes for columns. Defaults `minmax(0,1fr)`. |
-| `--dry-area-grid-template-rows`         | Track sizes for rows. Defaults `none`.             |
-| `--dry-area-grid-template-areas-wide`   | Override at ≥720px container width.                |
-| `--dry-area-grid-template-columns-wide` | …columns at ≥720px.                                |
-| `--dry-area-grid-template-rows-wide`    | …rows at ≥720px.                                   |
-| `--dry-area-grid-template-areas-xl`     | Override at ≥1024px container width.               |
-| `--dry-area-grid-template-columns-xl`   | …columns at ≥1024px.                               |
-| `--dry-area-grid-template-rows-xl`      | …rows at ≥1024px.                                  |
-
-The base template is required. Lint: `dryui/area-grid-required-var`.
-
-### Padding (optional)
-
-| Property                               | Purpose                                             |
-| -------------------------------------- | --------------------------------------------------- |
-| `--dry-area-grid-shell-padding`        | Both axes of shell padding (inside the max-width).  |
-| `--dry-area-grid-shell-padding-block`  | Vertical-only override (top/bottom of the shell).   |
-| `--dry-area-grid-shell-padding-inline` | Horizontal-only override (left/right of the shell). |
-| `--dry-area-grid-padding`              | Both axes of grid padding (around the tracks).      |
-| `--dry-area-grid-padding-block`        | Vertical-only override (top/bottom of the grid).    |
-| `--dry-area-grid-padding-inline`       | Horizontal-only override (left/right of the grid).  |
-
-Each axis-specific var falls back to the shorthand, then to `0`. Both layers are off by default; opt in only when the layout actually needs it. Track sizes are computed inside the grid's content area, so seam rendering stays correct under grid padding without any extra wiring.
-
-## Placement
-
-Each child carries `--dry-grid-area-name="<name>"` (Svelte `--prop` syntax). The name must appear in the active template, including any `-wide` / `-xl` overrides in use, or the lint flags an orphan.
-
-When you don't yet know which component will fill an area (Layout's job is structure, not content), use `<AreaGrid.Placeholder area="<name>" />`. It renders a deterministic pastel box labelled with the area name so the layout is immediately visible. Hand off and the next agent swaps each placeholder for a real component.
-
-```svelte
-<script>
-	import { AreaGrid } from '@dryui/ui';
-</script>
-
-<AreaGrid.Root
-	--dry-area-grid-template-areas="'masthead' 'nav' 'main' 'aside' 'foot'"
-	--dry-area-grid-template-areas-wide="'masthead masthead masthead' 'nav main aside' 'foot foot foot'"
-	--dry-area-grid-template-columns-wide="12rem minmax(0, 1fr) 16rem"
->
-	<AreaGrid.Placeholder area="masthead" />
-	<AreaGrid.Placeholder area="nav" />
-	<AreaGrid.Placeholder area="main" />
-	<AreaGrid.Placeholder area="aside" />
-	<AreaGrid.Placeholder area="foot" />
-</AreaGrid.Root>
+```css
+[data-layout='stack'] {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-areas: 'masthead' 'main' '.' 'foot';
+	grid-template-rows: auto auto 1fr auto;
+	min-block-size: 100dvh;
+}
 ```
 
-When you do know the component (because the brief named it, or you're editing a file that already has placed children), the same `--dry-grid-area-name` syntax applies on any DryUI component:
+### Sidebar + main
 
-```svelte
-<Card.Root --dry-grid-area-name="masthead">…</Card.Root>
-```
+Mobile single-col → desktop two-col.
 
-Lint guards on placement:
+```css
+[data-layout='settings'] {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-areas: 'masthead' 'nav' 'main';
+}
 
-- `dryui/area-grid-missing-area` — child names a track the template does not declare.
-- `dryui/area-grid-missing-root` — `--dry-grid-area-name` set on a child outside any `AreaGrid.Root`.
-- `dryui/area-grid-no-area-part` — wrong AreaGrid sub-part used.
-- `dryui/area-grid-invalid-template` — malformed template-areas string.
-- `dryui/area-grid-invalid-var` — legacy variable name.
-
-## Sizing tracks well
-
-A layout that passes lint can still render as garbage. The rules below produce layouts that look right when previewed with `<AreaGrid.Placeholder>` content, not just when filled with real components.
-
-**Never use bare `auto` for content-bearing tracks.** With the placeholder (a small label) as the only content, `auto` collapses to label width and the layout looks broken. Reserve `auto` for tracks where you genuinely want intrinsic sizing — typically headers, footers, and a `composer` row (auto height because the input bar's height is what it is).
-
-**Content tracks take `1fr` or a specific size.** A "main content" track that should absorb leftover space uses `1fr` (or `minmax(0, 1fr)` to let it shrink). A sidebar or rail uses a specific width like `14rem` / `18rem`.
-
-**Centered card patterns** (single area centered on an empty page — auth, error, empty state, splash):
-
-- Column tracks: `minmax(0, 1fr) min(28rem, 100% - 2rem) minmax(0, 1fr)` — outer columns absorb space, middle column is a real card width that shrinks gracefully on narrow viewports.
-- Row tracks: `minmax(0, 1fr) minmax(20rem, auto) minmax(0, 1fr)` — outer rows absorb space, middle row has a minimum so the placeholder previews as a card-shaped box, growing to fit real content.
-
-```svelte
-<AreaGrid.Root
-	fill
-	--dry-area-grid-template-areas="'. . .' '. form .' '. . .'"
-	--dry-area-grid-template-columns="minmax(0, 1fr) min(28rem, 100% - 2rem) minmax(0, 1fr)"
-	--dry-area-grid-template-rows="minmax(0, 1fr) minmax(20rem, auto) minmax(0, 1fr)"
->
-	<AreaGrid.Placeholder area="form" />
-</AreaGrid.Root>
-```
-
-**Sidebar + main patterns:** sidebar takes a specific width (`14rem`, `16rem`, `18rem`); main takes `minmax(0, 1fr)`. Never `auto` for either.
-
-**Three-pane patterns** (folders | list | preview): two narrow rails with specific widths, one panel takes `minmax(0, 1fr)` to absorb leftover.
-
-If you find yourself reaching for `auto` on a content track, stop and ask whether the track has a natural size (it doesn't — placeholders don't carry intrinsic dimensions for you).
-
-## Container queries
-
-`AreaGrid.Root` already wires `container-type: inline-size` and ships built-in breakpoints at 720px (wide) and 1024px (xl) for the template family above. Reach for an explicit `@container` query when:
-
-- The breakpoint sits between the built-ins, or higher than 1024px.
-- A specific area needs to reflow internally (e.g., a sidebar that stacks at narrow container width).
-- A placed component needs different behavior than its area's track size implies.
-
-```svelte
-<style>
-	[data-card-shell] {
-		container-type: inline-size;
+@container page (min-width: 56rem) {
+	[data-layout='settings'] {
+		grid-template-columns: 14rem minmax(0, 1fr);
+		grid-template-areas:
+			'masthead masthead'
+			'nav      main';
 	}
-
-	@container (min-width: 480px) {
-		[data-card-shell] {
-			--dry-card-padding: var(--dry-space-6);
-		}
-	}
-</style>
+}
 ```
 
-Use `@container` for any responsive sizing. Never `@media`. Width-by-measure (`ch`, `ex`, `em`) is the only carve-out and is set on the component prop, not in a class.
+### Card grid (auto-flow, no named areas)
 
-## Self-check before handoff
+```css
+[data-layout='gallery'] {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+	gap: 1rem;
+}
+```
 
-Run `dryui check <file>` (or MCP `check`). The layout-relevant rules to satisfy:
+(No `> [data-layout-area=...]` rules needed; cards flow into auto-placed cells.)
 
-- `dryui/area-grid-single-root`
-- `dryui/area-grid-required-var`
-- `dryui/area-grid-missing-area`
-- `dryui/area-grid-missing-root`
-- `dryui/area-grid-invalid-template`
-- `dryui/area-grid-invalid-var`
-- `dryui/area-grid-no-area-part`
-- `dryui/area-grid-no-gap`
-- `dryui/area-grid-no-padding`
-- `dryui/no-global`
-- `dryui/no-raw-grid`
-- `dryui/no-raw-element`
-- `dryui/no-component-class`
-- `dryui/no-inline-style`
-- `dryui/no-style-directive`
-- `dryui/no-layout-component` (Grid, Stack, Flex are banned)
+### Centered (single area)
 
-If the lint flags something this skill does not cover, treat the lint as authoritative and hand off rather than working around it.
+```css
+[data-layout='auth'] {
+	display: grid;
+	place-items: center;
+	min-block-size: 100dvh;
+}
+```
 
-## Out of scope (hand off)
+## Visualization (Phase 1 only)
 
-The Layout skill does not pick which DryUI component goes in each area, choose tokens, wire form a11y, write copy, or run final validation. The placeholders in the grid get filled by other agents.
+Phase 1 zones are placeholder regions, not real components. To make them visible during development, add this rule once to `src/app.css`:
 
-| Boundary                                     | Hand off to            |
-| -------------------------------------------- | ---------------------- |
-| Which component fills `main` / `aside` / …   | **Component agent**    |
-| Token / palette / typography choices         | **Theme agent**        |
-| `Field.Root`, ARIA, focus, keyboard          | **Forms / a11y agent** |
-| Microcopy, headings, body text               | **Content agent**      |
-| Final `dryui check`, fixing every diagnostic | **Validate agent**     |
+```css
+[data-layout-area] {
+	min-block-size: 2.5rem;
+	padding: 0.75rem;
+	border: 1px dashed #aaa;
+	border-radius: 0.5rem;
+	background: #fff;
+	color: #555;
+	font-size: 0.875rem;
+	text-align: center;
+}
+```
 
-## Handoff format
+Plain box + dashed outline + centered text. No `display: grid` (which would violate R13) and no rules for nested layouts (their own `[data-layout='<name>']` block in `layout.css` wins). Phase 2 (components) replaces the placeholders with real DryUI components and these visualization styles drop away naturally.
 
-End every Layout response with this block so the next agent has clean inputs:
+## Verification (greppable per-rule)
+
+Run these after authoring. The skill is satisfied only when every check passes.
+
+| What         | Check                                                                               |
+| ------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------- |
+| Setup #1     | `grep -E 'container-type:\s*inline-size' src/app.css` matches                       |
+| Setup #2     | `grep "import '../layout.css'" src/routes/+layout.svelte` matches                   |
+| R1           | the file contains exactly one `data-layout=` on the root element                    |
+| R5, R6, R7   | the file is clean of `<style>`, `style=`, `style:`, `class=`                        |
+| R10          | every area name in `grid-template-areas` has a matching `> [data-layout-area=` rule |
+| R11          | `grep '@media' src/layout.css` is empty; `@container page` matches                  |
+| R12          | `grep -E 'display:\s*(inline-)?flex' src/layout.css` is empty                       |
+| R13          | `grep -rE 'display:\s\*(grid                                                        | (inline-)?flex)' src/**/\*.svelte src/**/\*.css | grep -v 'src/layout\.css'` is empty |
+| R9           | view at 400px width → single column                                                 |
+| R11 (visual) | view at 1280px width → `@container page` rules apply                                |
+
+## Output gate
+
+When the layout renders correctly at narrow and wide viewports and every rule passes, emit:
 
 ```
-LAYOUT DONE
+LAYOUT (zones) DONE
 - file: <path>
-- root: AreaGrid.Root, maxWidth=<>, fill=<true|false>
-- padding: shell=<value|none>, grid=<value|none>
-- areas: <list of names>
-- breakpoints: base, wide@720, xl@1024 (+ any custom @container rules added)
-- placeholders:
-    <area> → <DryUI component placeholder> (pending: <agent>)
-NEXT: <agent name>
+- root: data-layout='<name>'
+- areas: <comma-separated>
+- breakpoints: base(, page@<Xrem>)
+- src/layout.css: block scoped under [data-layout='<name>']
+- visual: matches brief at narrow and wide
 ```
 
-Do not nominate a specific replacement component for the placeholder — that is the next agent's call. Just say "this area is empty, Component agent owns it."
+NEXT: Phase 2 (Components) — placing real DryUI components in each area. Not yet written.
+
+## Tone
+
+Quiet. One sentence on what you're about to do, then the edits. No design philosophy, no defending the rules. The skill is the rationale; you are the execution.

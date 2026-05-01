@@ -11,7 +11,7 @@
 </script>
 
 <div class={className} data-card-content data-no-padding={noPadding ? '' : undefined} {...rest}>
-	{@render children()}
+	{@render children?.()}
 </div>
 
 <style>

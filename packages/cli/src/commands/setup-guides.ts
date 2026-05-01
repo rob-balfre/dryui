@@ -206,7 +206,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Install the plugin',
 				note: 'Requires Codex 0.121.0 or newer. Run the command below, then start `codex`, run `/plugins`, and install `DryUI`. The plugin bundles the DryUI skill plus the DryUI MCP servers.',
-				code: `codex marketplace add rob-balfre/dryui`
+				code: `codex plugin marketplace add rob-balfre/dryui`
 			},
 			{
 				title: 'Optional MCP-only fallback',

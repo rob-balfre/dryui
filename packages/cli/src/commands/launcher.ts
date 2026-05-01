@@ -815,9 +815,9 @@ export async function runUserProjectLauncher(
 
 	// In DRYUI_DEV mode, swap any tarball overrides to `link:` so the workspace
 	// symlinks (registered by `bun run dev:link`) win and Vite resolves through
-	// each package's "development" exports condition into src/. Without this,
-	// the launcher would keep installing frozen tarballs and edits in the
-	// dryui workspace would never reach the consumer.
+	// each package's top-level `exports` field into src/. Without this, the
+	// launcher would keep installing frozen tarballs and edits in the dryui
+	// workspace would never reach the consumer.
 	const overrideSwap: SwapTarballOverridesResult = isDryuiDevMode()
 		? runtime.swapDryuiTarballOverridesToLinks(detection.root)
 		: { swapped: [], already: [] };

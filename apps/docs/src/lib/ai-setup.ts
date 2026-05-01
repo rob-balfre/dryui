@@ -51,12 +51,18 @@ interface AiAgentSetup {
 	followUp: string;
 }
 
-const CLI_INSTALL_CODE = `bun install -g @dryui/cli@latest
-dryui
+const CLI_INSTALL_CODE = `target="$(readlink ~/.bun/install/global/node_modules/@dryui/cli 2>/dev/null || true)"
+case "$target" in
+  */packages/cli) DRYUI_DEV=1 dryui ;;
+  *) bun install -g @dryui/cli@latest && dryui ;;
+esac
 
 # npm alternative
-npm install -g @dryui/cli@latest
-dryui`;
+target="$(readlink ~/.bun/install/global/node_modules/@dryui/cli 2>/dev/null || true)"
+case "$target" in
+  */packages/cli) DRYUI_DEV=1 dryui ;;
+  *) npm install -g @dryui/cli@latest && dryui ;;
+esac`;
 
 const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	ask: 'orange',
@@ -329,7 +335,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Add the DryUI marketplace',
 				description: 'Requires Codex 0.121.0 or newer.',
-				code: 'codex marketplace add rob-balfre/dryui'
+				code: 'codex plugin marketplace add rob-balfre/dryui'
 			},
 			{
 				title: 'Install DryUI from /plugins',
@@ -339,7 +345,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		skill: {
 			title: '2. Install the plugin',
 			note: 'Requires Codex 0.121.0 or newer. The plugin is the canonical Codex install path for the DryUI skill and MCP servers.',
-			code: `codex marketplace add rob-balfre/dryui
+			code: `codex plugin marketplace add rob-balfre/dryui
 
 # then in Codex:
 # /plugins

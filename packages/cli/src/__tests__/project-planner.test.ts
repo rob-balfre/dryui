@@ -21,6 +21,15 @@ const LINT_WIRED_SVELTE_CONFIG = [
 	'};'
 ].join('\n');
 
+const LAYOUT_PLUGIN_VITE_CONFIG = [
+	"import { sveltekit } from '@sveltejs/kit/vite';",
+	"import { dryuiLayoutCss } from '@dryui/lint';",
+	'',
+	'export default {',
+	'  plugins: [dryuiLayoutCss(), sveltekit()]',
+	'};'
+].join('\n');
+
 const readyProjectFiles = {
 	'package.json': JSON.stringify({
 		dependencies: {
@@ -34,11 +43,14 @@ const readyProjectFiles = {
 	}),
 	'bun.lock': '',
 	'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+	'vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 	'src/app.html': '<html class="theme-auto"></html>',
+	'src/layout.css': '',
 	'src/routes/+layout.svelte': [
 		'<script lang="ts">',
 		"  import '@dryui/ui/themes/default.css';",
 		"  import '@dryui/ui/themes/dark.css';",
+		"  import '../layout.css';",
 		'</script>'
 	].join('\n'),
 	'src/routes/+page.svelte': '<h1>Home</h1>'
@@ -93,11 +105,14 @@ describe('getDetect', () => {
 			}),
 			'hammerfall-dryui/bun.lock': '',
 			'hammerfall-dryui/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'hammerfall-dryui/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'hammerfall-dryui/src/app.html': '<html class="theme-auto"></html>',
+			'hammerfall-dryui/src/layout.css': '',
 			'hammerfall-dryui/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n')
 		});
@@ -130,11 +145,14 @@ describe('getDetect', () => {
 			}),
 			'apps/docs/bun.lock': '',
 			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/layout.css': '',
 			'apps/docs/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n'),
 			'examples/demo/package.json': JSON.stringify({

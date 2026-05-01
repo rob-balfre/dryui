@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import {
 	injectOverridesIntoPackageJson,
+	rewriteInstallCommandArgs,
 	type DevTarballsManifest
 } from '../commands/dev-tarballs.js';
 
@@ -80,5 +81,22 @@ describe('injectOverridesIntoPackageJson', () => {
 		const result = JSON.parse(injectOverridesIntoPackageJson(original, manifest));
 
 		expect(result.dependencies['@some/unrelated']).toBe('^1.0.0');
+	});
+});
+
+describe('rewriteInstallCommandArgs', () => {
+	test('rewrites versioned DryUI package specifiers to local tarballs', () => {
+		expect(
+			rewriteInstallCommandArgs(
+				['add', '@dryui/ui@2.0.2', '-d', '@dryui/lint@0.7.1', '@some/unrelated@1.0.0'],
+				manifest
+			)
+		).toEqual([
+			'add',
+			'/abs/reports/e2e-tarballs/dryui-ui-2.0.2.tgz',
+			'-d',
+			'/abs/reports/e2e-tarballs/dryui-lint-0.7.1.tgz',
+			'@some/unrelated@1.0.0'
+		]);
 	});
 });

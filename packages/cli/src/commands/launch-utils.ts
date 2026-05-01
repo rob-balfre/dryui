@@ -586,11 +586,9 @@ export function findViteConfig(root: string): string | null {
 	return null;
 }
 
-// Always wired into the consumer's `ssr.noExternal`. `@dryui/ui` and
-// `@dryui/primitives` go in so Vite's plugin pipeline processes them and the
-// "development" exports condition resolves to `src/` during `vite dev`. Without
-// this, Vite pre-bundles them once and never re-checks, so workspace edits
-// don't reflect until you blow the dep cache.
+// Always wired into the consumer's `ssr.noExternal`. SvelteKit needs Svelte
+// component packages bundled into the SSR output rather than imported at
+// runtime (the dist code expects to be processed by vite-plugin-svelte).
 export const FEEDBACK_SSR_NO_EXTERNAL = [
 	'@dryui/ui',
 	'@dryui/primitives',

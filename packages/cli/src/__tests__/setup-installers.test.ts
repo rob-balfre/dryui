@@ -39,13 +39,18 @@ describe('isAutoInstallable', () => {
 		expect(isAutoInstallable('zed')).toBe(true);
 	});
 
-	test('returns false for editors that need interactive plugin install', () => {
+	test('returns false only for editors that need interactive plugin install', () => {
+		// claude-code's plugin install needs a `/plugins` step inside Claude.
+		// Codex's plugin install also needs `/plugins` inside Codex, but the
+		// MCP-only fallback is auto-installable via TOML edits, so codex is in
+		// the wired set with the MCP-only path.
 		expect(isAutoInstallable('claude-code')).toBe(false);
-		expect(isAutoInstallable('codex')).toBe(false);
+		expect(isAutoInstallable('codex')).toBe(true);
 	});
 
 	test('autoInstallableEditors lists exactly the wired set', () => {
 		expect([...autoInstallableEditors()].sort()).toEqual([
+			'codex',
 			'copilot',
 			'cursor',
 			'gemini',
@@ -348,7 +353,44 @@ describe('runEditorInstall', () => {
 	test('returns null for editors without an installer', () => {
 		const root = createTempTree({});
 		expect(runEditorInstall('claude-code', { cwd: root })).toBeNull();
-		expect(runEditorInstall('codex', { cwd: root })).toBeNull();
+	});
+
+	test('codex installer writes dryui + dryui-feedback MCP servers to ~/.codex/config.toml', () => {
+		const home = createTempTree({});
+		const result = runEditorInstall('codex', { cwd: home, homeDir: home });
+
+		expect(result?.ok).toBe(true);
+		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).toContain('[mcp_servers."dryui-feedback"]');
+		// Svelte MCP is opt-in via includeSvelteMcp; off by default in this test.
+		expect(config).not.toContain('[mcp_servers.svelte]');
+	});
+
+	test('codex installer adds the svelte MCP block when includeSvelteMcp is true', () => {
+		const home = createTempTree({});
+		const result = runEditorInstall('codex', {
+			cwd: home,
+			homeDir: home,
+			includeSvelteMcp: true
+		});
+
+		expect(result?.ok).toBe(true);
+		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).toContain('[mcp_servers."dryui-feedback"]');
+		expect(config).toContain('[mcp_servers.svelte]');
+	});
+
+	test('codex installer is idempotent on second run', () => {
+		const home = createTempTree({});
+		runEditorInstall('codex', { cwd: home, homeDir: home, includeSvelteMcp: true });
+		const first = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		const result = runEditorInstall('codex', { cwd: home, homeDir: home, includeSvelteMcp: true });
+
+		expect(result?.ok).toBe(true);
+		expect(result?.steps.every((step) => step.status === 'unchanged')).toBe(true);
+		expect(readFileSync(join(home, '.codex/config.toml'), 'utf-8')).toBe(first);
 	});
 
 	test('reports failure when degit fails and surfaces it in the formatted output', () => {

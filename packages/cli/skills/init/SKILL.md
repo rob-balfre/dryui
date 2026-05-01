@@ -9,7 +9,20 @@ Bootstrap DryUI in the current project (or scaffold a new one).
 
 ## Run the CLI
 
-Install the CLI globally first so every subsequent call is short and fast:
+Always check for an existing local DryUI link before installing the CLI globally:
+
+```bash
+readlink ~/.bun/install/global/node_modules/@dryui/cli
+```
+
+If the link points at a local DryUI checkout's `packages/cli`, do not run `bun install -g @dryui/cli@latest` or `npm install -g @dryui/cli@latest`; a global install replaces the local link. In the DryUI monorepo, restore or refresh the link instead:
+
+```bash
+bun run dev:link
+DRYUI_DEV=1 dryui
+```
+
+Only install the published CLI when no local link exists and you are not iterating on DryUI source:
 
 ```bash
 bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest

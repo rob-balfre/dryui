@@ -10,12 +10,18 @@ afterEach(cleanupTempDirs);
 // repo's manifest.json and tries to inject local tarballs into the scaffolded
 // project. Suppress that here so tests exercise the published-versions path.
 const originalSkipDetect = process.env['DRYUI_SKIP_WORKSPACE_DETECT'];
+const originalSkipCodex = process.env['DRYUI_SKIP_CODEX_SETUP'];
 beforeAll(() => {
 	process.env['DRYUI_SKIP_WORKSPACE_DETECT'] = '1';
+	// Keep init tests off the developer's real ~/.codex/config.toml; tests that
+	// exercise codex wiring opt back in by deleting this env var locally.
+	process.env['DRYUI_SKIP_CODEX_SETUP'] = '1';
 });
 afterAll(() => {
 	if (originalSkipDetect === undefined) delete process.env['DRYUI_SKIP_WORKSPACE_DETECT'];
 	else process.env['DRYUI_SKIP_WORKSPACE_DETECT'] = originalSkipDetect;
+	if (originalSkipCodex === undefined) delete process.env['DRYUI_SKIP_CODEX_SETUP'];
+	else process.env['DRYUI_SKIP_CODEX_SETUP'] = originalSkipCodex;
 });
 
 interface FeedbackRuntimeStubs {
@@ -138,6 +144,8 @@ const readyLayout = [
 	'<script lang="ts">',
 	"  import '@dryui/ui/themes/default.css';",
 	"  import '@dryui/ui/themes/dark.css';",
+	"  import '../app.css';",
+	"  import '../layout.css';",
 	'</script>',
 	'',
 	'{@render children()}'
@@ -149,6 +157,15 @@ const readySvelteConfig = [
 	'',
 	'export default {',
 	"\tpreprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] }), vitePreprocess()]",
+	'};'
+].join('\n');
+
+const readyViteConfig = [
+	"import { sveltekit } from '@sveltejs/kit/vite';",
+	"import { dryuiLayoutCss } from '@dryui/lint';",
+	'',
+	'export default {',
+	'\tplugins: [dryuiLayoutCss(), sveltekit()]',
 	'};'
 ].join('\n');
 
@@ -165,14 +182,15 @@ describe('runInit', () => {
 		const result = await captureAsyncCommandIO(() => runInit(['--help'], spec));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]',
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback] [--no-codex]',
 			'',
 			'Bootstrap a SvelteKit + DryUI project.',
 			'',
 			'Options:',
 			'  [path]             Target directory (default: current directory)',
 			'  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)',
-			'  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />'
+			'  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />',
+			'  --no-codex         Skip wiring DryUI MCP servers into ~/.codex/config.toml'
 		]);
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBe(0);
@@ -185,7 +203,7 @@ describe('runInit', () => {
 		expect(shortHelp.exitCode).toBe(0);
 		expect(longHelp.exitCode).toBe(0);
 		expect(shortHelp.logs[0]).toBe(
-			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]'
+			'Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback] [--no-codex]'
 		);
 		expect(longHelp.logs).toEqual(shortHelp.logs);
 		expect(shortHelp.errors).toEqual([]);
@@ -227,7 +245,10 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': readySvelteConfig,
+			'vite.config.ts': readyViteConfig,
 			'src/app.html': '<html lang="en" class="theme-auto"></html>',
+			'src/app.css': '',
+			'src/layout.css': '',
 			'src/routes/+layout.svelte': readyLayout
 		});
 
@@ -243,6 +264,11 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': editableSvelteConfig,
+			'vite.config.ts': [
+				"import { sveltekit } from '@sveltejs/kit/vite';",
+				'',
+				'export default { plugins: [sveltekit()] };'
+			].join('\n'),
 			'src/app.html': '<html lang="en" class="shell"></html>',
 			'src/routes/+layout.svelte': [
 				'<script lang="ts">',
@@ -257,20 +283,28 @@ describe('runInit', () => {
 		const layout = readFileSync(join(root, 'src/routes/+layout.svelte'), 'utf8');
 		const appHtml = readFileSync(join(root, 'src/app.html'), 'utf8');
 		const svelteConfig = readFileSync(join(root, 'svelte.config.js'), 'utf8');
+		const viteConfig = readFileSync(join(root, 'vite.config.ts'), 'utf8');
 
 		expect(result.errors).toEqual([]);
 		expect(result.logs).toContain('  Setting up DryUI...');
 		expect(result.logs).toContain('  ~ Add theme imports to the root layout');
 		expect(result.logs).toContain('  ~ Set html theme mode to auto');
 		expect(result.logs).toContain('  ~ Wire dryuiLint into svelte.config');
+		expect(result.logs).toContain('  ~ Wire dryuiLayoutCss into vite.config');
 		expect(layout.match(/<script/g)).toHaveLength(1);
 		expect(layout).toContain("import '@dryui/ui/themes/default.css';");
 		expect(layout).toContain("import '@dryui/ui/themes/dark.css';");
+		expect(layout).toContain("import '../layout.css';");
+		expect(layout.indexOf("'@dryui/ui/themes/dark.css'")).toBeLessThan(
+			layout.indexOf("'../layout.css'")
+		);
 		expect(appHtml).toContain('class="shell theme-auto"');
 		expect(svelteConfig).toContain("import { dryuiLint } from '@dryui/lint';");
 		expect(svelteConfig).toContain(
 			"preprocess: [dryuiLint({ strict: true, exclude: ['.svelte-kit/', '/dist/', 'node_modules/'] }), vitePreprocess()]"
 		);
+		expect(viteConfig).toContain("import { dryuiLayoutCss } from '@dryui/lint';");
+		expect(viteConfig).toContain('plugins: [dryuiLayoutCss(), sveltekit()]');
 		// In-place edits never trigger feedback setup.
 		expect(result.logs.some((line) => line.includes('Setting up @dryui/feedback'))).toBe(false);
 	});
@@ -280,6 +314,7 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': readySvelteConfig,
+			'vite.config.ts': readyViteConfig,
 			'src/app.html': '<html lang="en" class="theme-auto"></html>',
 			'src/app.css': 'body { color: tomato; }\n',
 			'src/routes/+layout.svelte': [
@@ -305,6 +340,7 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': readySvelteConfig,
+			'vite.config.ts': readyViteConfig,
 			'src/app.html': '<html lang="en" class="theme-auto"></html>'
 		});
 
@@ -621,12 +657,77 @@ describe('runInit', () => {
 		const defaultThemeIdx = layout.indexOf("'@dryui/ui/themes/default.css'");
 		const darkThemeIdx = layout.indexOf("'@dryui/ui/themes/dark.css'");
 		const appCssIdx = layout.indexOf("'../app.css'");
+		const layoutCssIdx = layout.indexOf("'../layout.css'");
 		expect(defaultThemeIdx).toBeGreaterThan(-1);
 		expect(darkThemeIdx).toBeGreaterThan(-1);
 		expect(appCssIdx).toBeGreaterThan(-1);
+		expect(layoutCssIdx).toBeGreaterThan(-1);
 		// Theme imports must precede app.css so :root token overrides in app.css win.
 		expect(defaultThemeIdx).toBeLessThan(appCssIdx);
 		expect(darkThemeIdx).toBeLessThan(appCssIdx);
+		expect(appCssIdx).toBeLessThan(layoutCssIdx);
+		expect(existsSync(join(target, 'src/layout.css'))).toBe(true);
+		const viteConfig = readFileSync(join(target, 'vite.config.ts'), 'utf8');
+		expect(viteConfig).toContain("import { dryuiLayoutCss } from '@dryui/lint';");
+		expect(viteConfig).toContain('plugins: [dryuiLayoutCss(), sveltekit()]');
+	});
+
+	test('scaffold wires the dryui MCP servers into ~/.codex/config.toml by default', async () => {
+		const { root, target, feedback } = scaffoldTestBed();
+		const home = createTempTree({});
+
+		const originalSkip = process.env['DRYUI_SKIP_CODEX_SETUP'];
+		delete process.env['DRYUI_SKIP_CODEX_SETUP'];
+		try {
+			const result = await withHome(home, () =>
+				withCwd(root, () =>
+					captureAsyncCommandIO(() =>
+						runInit(['projects/smoke', '--pm', 'bun', '--no-feedback'], spec, {
+							runCommand: () => true,
+							...feedback.stubs
+						})
+					)
+				)
+			);
+			expect(result.errors).toEqual([]);
+		} finally {
+			if (originalSkip === undefined) delete process.env['DRYUI_SKIP_CODEX_SETUP'];
+			else process.env['DRYUI_SKIP_CODEX_SETUP'] = originalSkip;
+		}
+
+		// Sanity: scaffold ran and wrote project files under target.
+		expect(existsSync(join(target, 'src/layout.css'))).toBe(true);
+		// Codex config landed in the temp HOME, not in the project tree.
+		const codexConfig = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		expect(codexConfig).toContain('[mcp_servers.dryui]');
+		expect(codexConfig).toContain('[mcp_servers."dryui-feedback"]');
+		expect(codexConfig).toContain('[mcp_servers.svelte]');
+	});
+
+	test('--no-codex skips the ~/.codex/config.toml write', async () => {
+		const { root, feedback } = scaffoldTestBed();
+		const home = createTempTree({});
+
+		const originalSkip = process.env['DRYUI_SKIP_CODEX_SETUP'];
+		delete process.env['DRYUI_SKIP_CODEX_SETUP'];
+		try {
+			const result = await withHome(home, () =>
+				withCwd(root, () =>
+					captureAsyncCommandIO(() =>
+						runInit(['projects/smoke', '--pm', 'bun', '--no-feedback', '--no-codex'], spec, {
+							runCommand: () => true,
+							...feedback.stubs
+						})
+					)
+				)
+			);
+			expect(result.errors).toEqual([]);
+		} finally {
+			if (originalSkip === undefined) delete process.env['DRYUI_SKIP_CODEX_SETUP'];
+			else process.env['DRYUI_SKIP_CODEX_SETUP'] = originalSkip;
+		}
+
+		expect(existsSync(join(home, '.codex/config.toml'))).toBe(false);
 	});
 
 	test('next-steps cd line preserves an absolute path verbatim', async () => {
@@ -640,7 +741,10 @@ describe('runInit', () => {
 			'app/package.json': packageJson,
 			'app/bun.lock': '',
 			'app/svelte.config.js': readySvelteConfig,
+			'app/vite.config.ts': readyViteConfig,
 			'app/src/app.html': '<html lang="en" class="shell"></html>',
+			'app/src/app.css': '',
+			'app/src/layout.css': '',
 			'app/src/routes/+layout.svelte': readyLayout
 		});
 		// Resolve through /private on macOS so cwd() matches what startsWith saw.
@@ -662,7 +766,10 @@ describe('runInit', () => {
 			'myapp/package.json': packageJson,
 			'myapp/bun.lock': '',
 			'myapp/svelte.config.js': readySvelteConfig,
+			'myapp/vite.config.ts': readyViteConfig,
 			'myapp/src/app.html': '<html lang="en" class="shell"></html>',
+			'myapp/src/app.css': '',
+			'myapp/src/layout.css': '',
 			'myapp/src/routes/+layout.svelte': readyLayout
 		});
 
@@ -680,7 +787,10 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': readySvelteConfig,
+			'vite.config.ts': readyViteConfig,
 			'src/app.html': '<html lang="en" class="shell"></html>',
+			'src/app.css': '',
+			'src/layout.css': '',
 			'src/routes/+layout.svelte': readyLayout
 		});
 
@@ -705,7 +815,10 @@ describe('runInit', () => {
 			'package.json': packageJson,
 			'bun.lock': '',
 			'svelte.config.js': weirdConfig,
+			'vite.config.ts': readyViteConfig,
 			'src/app.html': '<html lang="en" class="theme-auto"></html>',
+			'src/app.css': '',
+			'src/layout.css': '',
 			'src/routes/+layout.svelte': readyLayout
 		});
 

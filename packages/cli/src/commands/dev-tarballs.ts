@@ -29,9 +29,20 @@ export function loadDevTarballsManifest(dir: string): DevTarballsManifest {
 
 // `bun add <abs-path.tgz>` works; `bun add file:/abs/path.tgz` trips bun's
 // cache-move logic (EINVAL rename). Bare path is cross-manager safe.
-function rewritePackageName(name: string, manifest: DevTarballsManifest): string {
-	const entry = manifest.packages[name];
-	return entry ? entry.tarball : name;
+function packageNameFromSpecifier(specifier: string): string {
+	if (specifier.startsWith('@')) {
+		const slashIndex = specifier.indexOf('/');
+		if (slashIndex === -1) return specifier;
+		const versionIndex = specifier.indexOf('@', slashIndex + 1);
+		return versionIndex === -1 ? specifier : specifier.slice(0, versionIndex);
+	}
+	const versionIndex = specifier.indexOf('@');
+	return versionIndex > 0 ? specifier.slice(0, versionIndex) : specifier;
+}
+
+function rewritePackageName(specifier: string, manifest: DevTarballsManifest): string {
+	const entry = manifest.packages[packageNameFromSpecifier(specifier)];
+	return entry ? entry.tarball : specifier;
 }
 
 export function rewriteInstallCommandArgs(

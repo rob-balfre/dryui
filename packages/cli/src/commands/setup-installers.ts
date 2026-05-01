@@ -492,7 +492,50 @@ function zedInstaller(ctx: InstallContext): InstallResult {
 	return finalize('zed', [config]);
 }
 
+// Codex's plugin install (the canonical skill path) requires an interactive
+// `/plugins` step inside a running Codex session, so it stays manual via
+// `dryui setup --editor codex`. The MCP fallback below is auto-installable
+// because it's purely TOML edits in the user-global `~/.codex/config.toml`,
+// and that's enough to make the dryui + dryui-feedback servers available.
+function codexInstaller(ctx: InstallContext): InstallResult {
+	const home = ctx.homeDir ?? homedir();
+	const path = join(home, '.codex/config.toml');
+	const label = 'Update ~/.codex/config.toml';
+	const steps: InstallStepResult[] = [
+		mergeTomlSection({
+			path,
+			section: 'mcp_servers.dryui',
+			block: `[mcp_servers.dryui]
+command = "npx"
+args = ["-y", "@dryui/mcp"]`,
+			label
+		}),
+		mergeTomlSection({
+			path,
+			section: 'mcp_servers."dryui-feedback"',
+			block: `[mcp_servers."dryui-feedback"]
+command = "npx"
+args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`,
+			label
+		})
+	];
+	if (ctx.includeSvelteMcp) {
+		steps.push(
+			mergeTomlSection({
+				path,
+				section: 'mcp_servers.svelte',
+				block: `[mcp_servers.svelte]
+command = "npx"
+args = ["-y", "@sveltejs/mcp"]`,
+				label
+			})
+		);
+	}
+	return finalize('codex', steps);
+}
+
 const INSTALLERS: Partial<Record<SetupGuideId, (ctx: InstallContext) => InstallResult>> = {
+	codex: codexInstaller,
 	copilot: copilotInstaller,
 	cursor: cursorInstaller,
 	gemini: geminiInstaller,
@@ -644,6 +687,11 @@ export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): read
 	const home = ctx.homeDir ?? homedir();
 	const svelteSuffix = ctx.includeSvelteMcp ? ' + svelte' : '';
 	switch (id) {
+		case 'codex':
+			return [
+				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`,
+				'• Plugin (skill bundle) install still needs `codex plugin marketplace add rob-balfre/dryui` then `/plugins` inside Codex'
+			];
 		case 'copilot':
 			return [
 				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.github/skills/dryui'))}`,

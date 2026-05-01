@@ -7,15 +7,7 @@ type ExportLeaf = {
 	default?: string;
 };
 
-type ExportTarget =
-	| null
-	| ExportLeaf
-	| {
-			development?: ExportLeaf;
-			types?: string;
-			svelte?: string;
-			default?: string;
-	  };
+type ExportTarget = null | ExportLeaf;
 
 type PackageJson = {
 	svelte?: string;
@@ -92,16 +84,12 @@ function createSubpathDist(dir: string): ExportLeaf {
 	};
 }
 
-function createRootExport(target: 'src' | 'dist' | 'dual'): ExportTarget {
-	if (target === 'src') return createRootSrc();
-	if (target === 'dist') return createRootDist();
-	return { development: createRootSrc(), ...createRootDist() };
+function createRootExport(target: 'src' | 'dist'): ExportTarget {
+	return target === 'src' ? createRootSrc() : createRootDist();
 }
 
-function createSubpathExport(dir: string, target: 'src' | 'dist' | 'dual'): ExportTarget {
-	if (target === 'src') return createSubpathSrc(dir);
-	if (target === 'dist') return createSubpathDist(dir);
-	return { development: createSubpathSrc(dir), ...createSubpathDist(dir) };
+function createSubpathExport(dir: string, target: 'src' | 'dist'): ExportTarget {
+	return target === 'src' ? createSubpathSrc(dir) : createSubpathDist(dir);
 }
 
 function collectExtraExports(
@@ -123,7 +111,7 @@ function collectExtraExports(
 function buildExports(
 	dirs: string[],
 	extras: Record<string, ExportTarget>,
-	target: 'src' | 'dist' | 'dual'
+	target: 'src' | 'dist'
 ): Record<string, ExportTarget> {
 	const entries: Array<[string, ExportTarget]> = [['.', createRootExport(target)]];
 
@@ -157,7 +145,7 @@ async function syncPackageExports(config: PackageConfig): Promise<boolean> {
 		...packageJson.publishConfig,
 		svelte: distRootExport.svelte,
 		types: distRootExport.types,
-		exports: buildExports(publicDirs, distExtras, 'dual')
+		exports: buildExports(publicDirs, distExtras, 'dist')
 	};
 
 	const nextRaw = `${JSON.stringify(packageJson, null, 2)}\n`;

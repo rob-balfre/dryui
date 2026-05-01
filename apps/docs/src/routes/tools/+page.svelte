@@ -8,6 +8,24 @@
 	const oneOffUsage = `bunx @dryui/cli
 npx -y @dryui/cli`;
 
+	const installCommands = {
+		bun: `target="$(readlink ~/.bun/install/global/node_modules/@dryui/cli 2>/dev/null || true)"
+case "$target" in
+  */packages/cli) DRYUI_DEV=1 dryui ;;
+  *) bun install -g @dryui/cli@latest && dryui ;;
+esac`,
+		npm: `target="$(readlink ~/.bun/install/global/node_modules/@dryui/cli 2>/dev/null || true)"
+case "$target" in
+  */packages/cli) DRYUI_DEV=1 dryui ;;
+  *) npm install -g @dryui/cli@latest && dryui ;;
+esac`,
+		pnpm: `target="$(readlink ~/.bun/install/global/node_modules/@dryui/cli 2>/dev/null || true)"
+case "$target" in
+  */packages/cli) DRYUI_DEV=1 dryui ;;
+  *) pnpm add -g @dryui/cli@latest && dryui ;;
+esac`
+	} as const;
+
 	const commandReference = 'dryui';
 
 	const commandDocs = [
@@ -43,13 +61,13 @@ npx -y @dryui/cli`;
 					<Tabs.Trigger value="pnpm">pnpm</Tabs.Trigger>
 				</Tabs.List>
 				<Tabs.Content value="bun">
-					<CodeBlock code="bun install -g @dryui/cli@latest" language="bash" />
+					<CodeBlock code={installCommands.bun} language="bash" />
 				</Tabs.Content>
 				<Tabs.Content value="npm">
-					<CodeBlock code="npm install -g @dryui/cli@latest" language="bash" />
+					<CodeBlock code={installCommands.npm} language="bash" />
 				</Tabs.Content>
 				<Tabs.Content value="pnpm">
-					<CodeBlock code="pnpm add -g @dryui/cli@latest" language="bash" />
+					<CodeBlock code={installCommands.pnpm} language="bash" />
 				</Tabs.Content>
 			</Tabs.Root>
 

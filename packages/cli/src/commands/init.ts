@@ -17,6 +17,7 @@ import {
 	planInstall,
 	detectPackageManagerFromEnv,
 	isSvelteConfigPath,
+	VITE_CONFIG_NAMES,
 	type DryuiPackageManager,
 	type ProjectPlanStep,
 	type InstallPlan
@@ -40,6 +41,7 @@ import {
 	wrapInstallPackage,
 	type DevTarballsManifest
 } from './dev-tarballs.js';
+import { runEditorInstall } from './setup-installers.js';
 
 type ConcretePackageManager = Exclude<DryuiPackageManager, 'unknown'>;
 
@@ -48,6 +50,7 @@ interface InitOptions {
 	userPath: string | null;
 	packageManager: DryuiPackageManager;
 	noFeedback: boolean;
+	noCodex: boolean;
 	devTarballsDir: string | null;
 }
 
@@ -74,7 +77,7 @@ function isPackageManager(value: string): value is ConcretePackageManager {
 }
 
 function printInitHelp(exitCode = 0): never {
-	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback]');
+	console.log('Usage: dryui init [path] [--pm bun|npm|pnpm|yarn] [--no-feedback] [--no-codex]');
 	console.log('');
 	console.log('Bootstrap a SvelteKit + DryUI project.');
 	console.log('');
@@ -82,6 +85,7 @@ function printInitHelp(exitCode = 0): never {
 	console.log('  [path]             Target directory (default: current directory)');
 	console.log('  --pm <manager>     Package manager: bun, npm, pnpm, yarn (auto-detected)');
 	console.log('  --no-feedback      Skip installing @dryui/feedback and mounting <Feedback />');
+	console.log('  --no-codex         Skip wiring DryUI MCP servers into ~/.codex/config.toml');
 	// --dev-tarballs <dir> is an internal flag used by the repo's E2E harness; it's not
 	// documented here on purpose. See packages/cli/src/commands/dev-tarballs.ts.
 	process.exit(exitCode);
@@ -110,6 +114,7 @@ function parseInitArgs(args: string[]): InitOptions {
 	let userPath: string | null = null;
 	let packageManager: DryuiPackageManager | null = null;
 	let noFeedback = false;
+	let noCodex = false;
 	let devTarballsDir: string | null = null;
 
 	for (let i = 0; i < args.length; i++) {
@@ -128,6 +133,8 @@ function parseInitArgs(args: string[]): InitOptions {
 			// Legacy no-op. Init no longer launches feedback mode automatically.
 		} else if (arg === '--no-feedback') {
 			noFeedback = true;
+		} else if (arg === '--no-codex') {
+			noCodex = true;
 		} else if (arg === '--skip-impeccable') {
 			// Deprecated no-op: init no longer installs impeccable by default.
 		} else if (arg === '--dev-tarballs') {
@@ -149,6 +156,7 @@ function parseInitArgs(args: string[]): InitOptions {
 		userPath,
 		packageManager: packageManager ?? detectPackageManagerFromEnv(),
 		noFeedback,
+		noCodex,
 		devTarballsDir
 	};
 }
@@ -189,10 +197,8 @@ function parseInstallCommand(
 	};
 }
 
-// The scaffold template from @dryui/mcp/project-planner emits layout imports
-// with app.css BEFORE the theme CSS. That silently overwrites every :root token
-// override in app.css. Correct order is theme CSS first, app.css last — we
-// fix it here at write-time so the scaffold honours its own docs.
+// Keep CSS imports in the root layout in cascade order: DryUI themes first,
+// then app.css token overrides, then layout.css whitespace hooks.
 function fixLayoutImportOrder(snippet: string): string {
 	const match = snippet.match(/<script[^>]*>([\s\S]*?)<\/script>/);
 	if (!match) return snippet;
@@ -201,9 +207,14 @@ function fixLayoutImportOrder(snippet: string): string {
 	const themeImportLines: string[] = [];
 	const otherLines: string[] = [];
 	let appCssLine: string | null = null;
+	let layoutCssLine: string | null = null;
 	for (const rawLine of body.split('\n')) {
 		if (/import\s+['"]@dryui\/ui\/themes\//.test(rawLine)) {
 			themeImportLines.push(rawLine);
+			continue;
+		}
+		if (/import\s+['"][^'"]*layout\.css['"]/.test(rawLine)) {
+			layoutCssLine = rawLine;
 			continue;
 		}
 		if (/import\s+['"][^'"]*app\.css['"]/.test(rawLine)) {
@@ -212,13 +223,66 @@ function fixLayoutImportOrder(snippet: string): string {
 		}
 		otherLines.push(rawLine);
 	}
-	if (themeImportLines.length === 0 || appCssLine === null) return snippet;
+	if (themeImportLines.length === 0) return snippet;
 
 	const reordered = [...otherLines];
 	// Drop any leading blanks otherLines started with so imports sit tight under <script>.
 	while (reordered.length > 0 && reordered[0]!.trim() === '') reordered.shift();
-	const rebuiltBody = ['', ...themeImportLines, appCssLine, ...reordered].join('\n');
+	const cssLines = [appCssLine, layoutCssLine].filter((line): line is string => line !== null);
+	const rebuiltBody = ['', ...themeImportLines, ...cssLines, ...reordered].join('\n');
 	return snippet.replace(match[0], `${scriptOpen}${rebuiltBody}</script>`);
+}
+
+function isViteConfigPath(filePath: string): boolean {
+	return VITE_CONFIG_NAMES.some((name) => filePath.endsWith(name));
+}
+
+function insertLayoutScriptSnippet(content: string, snippet: string): string | null {
+	const imports = snippet
+		.replace(/<\/?script>/g, '')
+		.split('\n')
+		.map((line) => line.trim())
+		.filter(Boolean);
+	const missingImports = imports.filter((line) => !content.includes(line.replace(/^\s+/, '')));
+	if (missingImports.length === 0) return null;
+
+	const scriptMatch = content.match(/<script[^>]*>/);
+	let updated: string;
+	if (scriptMatch) {
+		const insertPos = (scriptMatch.index ?? 0) + scriptMatch[0].length;
+		updated = `${content.slice(0, insertPos)}\n${missingImports.join('\n')}${content.slice(insertPos)}`;
+	} else {
+		updated = `<script>\n${missingImports.join('\n')}\n</script>\n\n${content}`;
+	}
+	return fixLayoutImportOrder(updated);
+}
+
+function insertLayoutCssVitePlugin(content: string): string | null {
+	if (content.includes('dryuiLayoutCss')) return null;
+
+	const importLine = "import { dryuiLayoutCss } from '@dryui/lint';";
+	let updated = content;
+	const importMatches = [...content.matchAll(/^import[^;]*;/gm)];
+	const lastImport = importMatches.at(-1);
+	if (lastImport?.index !== undefined) {
+		const pos = lastImport.index + lastImport[0].length;
+		updated = updated.slice(0, pos) + '\n' + importLine + updated.slice(pos);
+	} else {
+		updated = importLine + '\n' + updated;
+	}
+
+	if (/plugins\s*:\s*\[/.test(updated)) {
+		return updated.replace(/plugins\s*:\s*\[/, 'plugins: [dryuiLayoutCss(), ');
+	}
+
+	if (/(defineConfig\s*\(\s*\{|export\s+default\s*\{|const\s+config\s*=\s*\{)/.test(updated)) {
+		return updated.replace(
+			/(defineConfig\s*\(\s*\{|export\s+default\s*\{|const\s+config\s*=\s*\{)/,
+			'$1\n\tplugins: [dryuiLayoutCss()],'
+		);
+	}
+
+	return null;
 }
 
 function executeCreateFile(step: ProjectPlanStep): void {
@@ -263,6 +327,13 @@ function executeEditFile(step: ProjectPlanStep): void {
 	}
 
 	if (step.path.endsWith('+layout.svelte')) {
+		if (step.snippet.includes('layout.css')) {
+			const updated = insertLayoutScriptSnippet(content, step.snippet);
+			if (!updated) return;
+			writeFileSync(step.path, updated, 'utf-8');
+			log(`  ~ ${step.title}`);
+			return;
+		}
 		if (content.includes('@dryui/ui/themes/default.css')) return;
 		const scriptMatch = content.match(/<script[^>]*>/);
 		if (scriptMatch) {
@@ -272,10 +343,19 @@ function executeEditFile(step: ProjectPlanStep): void {
 				'\n' +
 				step.snippet.replace(/<\/?script>/g, '') +
 				content.slice(insertPos);
-			writeFileSync(step.path, updated, 'utf-8');
+			writeFileSync(step.path, fixLayoutImportOrder(updated), 'utf-8');
 		} else {
-			writeFileSync(step.path, step.snippet + '\n\n' + content, 'utf-8');
+			writeFileSync(step.path, fixLayoutImportOrder(step.snippet + '\n\n' + content), 'utf-8');
 		}
+		log(`  ~ ${step.title}`);
+		return;
+	}
+
+	if (isViteConfigPath(step.path)) {
+		if (!step.snippet.includes('dryuiLayoutCss')) return;
+		const updated = insertLayoutCssVitePlugin(content);
+		if (!updated) return;
+		writeFileSync(step.path, updated, 'utf-8');
 		log(`  ~ ${step.title}`);
 		return;
 	}
@@ -391,6 +471,44 @@ function setupClaudeAgents(targetPath: string): boolean {
 	return result.sourceFound;
 }
 
+// Wire the dryui + dryui-feedback MCP servers into ~/.codex/config.toml so a
+// fresh `codex` session in this project sees them without any manual setup.
+// The bundled DryUI plugin (which ships the dryui skill) still needs the
+// `codex plugin marketplace add` + `/plugins` install flow; init prints a
+// one-liner pointing at it. Skipped with `--no-codex`, or when the test
+// harness sets DRYUI_SKIP_CODEX_SETUP=1 to keep tests off the real ~/.codex.
+function setupCodexMcp(targetPath: string): boolean {
+	if (
+		process.env['DRYUI_SKIP_CODEX_SETUP'] === '1' ||
+		process.env['DRYUI_SKIP_CODEX_SETUP'] === 'true'
+	) {
+		return true;
+	}
+	// Prefer $HOME over `homedir()` so test harnesses that swap HOME (via
+	// `withHome`) land on the temp directory instead of the developer's real
+	// `~/.codex/config.toml`. Real users have $HOME set anyway.
+	const home = process.env['HOME'] || homedir();
+	const result = runEditorInstall('codex', {
+		cwd: targetPath,
+		homeDir: home,
+		includeSvelteMcp: true
+	});
+	if (!result) return false;
+	const writes = result.steps.filter(
+		(step) => step.status === 'created' || step.status === 'merged'
+	);
+	const failures = result.steps.filter((step) => step.status === 'failed');
+	if (writes.length > 0) {
+		log(`  + ~/.codex/config.toml (${writes.length} MCP servers wired)`);
+	}
+	for (const step of failures) {
+		warn(
+			`  Warning: ${step.label} failed (${step.detail}). Run \`dryui setup --editor codex --install\` to retry.`
+		);
+	}
+	return result.ok;
+}
+
 function applyDevTarballsToSteps(
 	steps: InstallPlan['steps'],
 	manifest: DevTarballsManifest
@@ -417,6 +535,7 @@ export async function runInit(
 		userPath,
 		packageManager,
 		noFeedback,
+		noCodex,
 		devTarballsDir: explicitDevTarballsDir
 	} = parseInitArgs(args);
 	const runCommand = runtime.runCommand ?? runProcessCommand;
@@ -539,6 +658,10 @@ export async function runInit(
 		// silently if the source agents dir is missing or empty (e.g., during
 		// dev when the cli runs unbuilt).
 		setupClaudeAgents(targetPath);
+	}
+
+	if (isScaffold && installsSucceeded && !noCodex) {
+		setupCodexMcp(targetPath);
 	}
 
 	const cwdIsTarget = resolve(process.cwd()) === resolve(targetPath);
