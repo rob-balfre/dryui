@@ -65,7 +65,7 @@ function canonicalTestPageUrl(): string {
 	return url.toString();
 }
 
-function clickModeTab(label: 'Annotate' | 'Components' | 'Layout') {
+function clickModeTab(label: 'Annotate' | 'Components') {
 	const tab = Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(
 		(button) => button.textContent?.trim() === label
 	);
@@ -82,51 +82,6 @@ function readStoredWidgetDraft(): Record<string, unknown> {
 	const draft = parsed[canonicalTestPageUrl()];
 	expect(draft).toBeTruthy();
 	return draft;
-}
-
-function drawSidebarLayoutBox() {
-	clickModeTab('Layout');
-
-	const sidebarTool = document.querySelector<HTMLButtonElement>('[data-layout-tool="sidebar"]');
-	if (!sidebarTool) throw new Error('Expected sidebar layout tool');
-	sidebarTool.click();
-	flushSync();
-
-	const drawLayer = document.querySelector<HTMLElement>('.layout-box-draw-layer');
-	if (!drawLayer) throw new Error('Expected layout draw layer');
-
-	drawLayer.dispatchEvent(
-		new PointerEvent('pointerdown', {
-			bubbles: true,
-			cancelable: true,
-			button: 0,
-			buttons: 1,
-			clientX: 80,
-			clientY: 90,
-			pointerId: 23
-		})
-	);
-	window.dispatchEvent(
-		new PointerEvent('pointermove', {
-			bubbles: true,
-			cancelable: true,
-			buttons: 1,
-			clientX: 220,
-			clientY: 180,
-			pointerId: 23
-		})
-	);
-	window.dispatchEvent(
-		new PointerEvent('pointerup', {
-			bubbles: true,
-			cancelable: true,
-			button: 0,
-			clientX: 220,
-			clientY: 180,
-			pointerId: 23
-		})
-	);
-	flushSync();
 }
 
 async function placeButtonComponent() {
@@ -282,7 +237,7 @@ function setupSubmissionEnvironment(options?: {
 }
 
 describe('feedback overlay hosting', () => {
-	it('saves annotation, layout, and placed component draft state to sessionStorage', async () => {
+	it('saves annotation and placed component draft state to sessionStorage', async () => {
 		render(Feedback);
 
 		const drawButton = document.querySelector<HTMLButtonElement>('[aria-label="Draw"]');
@@ -300,21 +255,12 @@ describe('feedback overlay hosting', () => {
 		expect(draft.mode).toBe('annotate');
 		expect(draft.drawings).toEqual([expect.objectContaining({ kind: 'freehand' })]);
 
-		drawSidebarLayoutBox();
-
-		draft = readStoredWidgetDraft();
-		expect(draft.mode).toBe('layout');
-		expect(draft.layoutBoxes).toEqual([
-			expect.objectContaining({
-				kind: 'sidebar',
-				pageX: 80,
-				pageY: 90,
-				width: 140,
-				height: 90
-			})
-		]);
-
 		await placeButtonComponent();
+		const added = document.querySelector<HTMLElement>('[data-dryui-added-id]');
+		if (!added) throw new Error('Expected placed component');
+		const addedRect = added.getBoundingClientRect();
+		expect(addedRect.width).toBeGreaterThan(0);
+		expect(addedRect.height).toBeGreaterThan(0);
 
 		draft = readStoredWidgetDraft();
 		expect(draft.mode).toBe('components');
@@ -329,7 +275,7 @@ describe('feedback overlay hosting', () => {
 		]);
 	});
 
-	it('restores annotation, layout, and placed component draft state from sessionStorage', async () => {
+	it('restores annotation and placed component draft state from sessionStorage', async () => {
 		const pageUrl = canonicalTestPageUrl();
 		window.sessionStorage.setItem(
 			WIDGET_STATE_STORAGE_KEY,
@@ -337,8 +283,7 @@ describe('feedback overlay hosting', () => {
 				[pageUrl]: {
 					active: true,
 					tool: 'arrow',
-					mode: 'layout',
-					layoutTool: 'sidebar',
+					mode: 'components',
 					drawings: [
 						{
 							id: 'persisted-note',
@@ -348,17 +293,6 @@ describe('feedback overlay hosting', () => {
 							color: 'hsl(25 100% 55%)',
 							space: 'viewport',
 							fontSize: 16
-						}
-					],
-					layoutBoxes: [
-						{
-							id: 'persisted-layout',
-							kind: 'sidebar',
-							label: 'sidebar-layout-1',
-							pageX: 80,
-							pageY: 90,
-							width: 140,
-							height: 90
 						}
 					],
 					added: [
@@ -385,19 +319,235 @@ describe('feedback overlay hosting', () => {
 		await waitForAsyncWork(50);
 		flushSync();
 
-		const layoutTab = Array.from(document.querySelectorAll<HTMLButtonElement>('[role="tab"]')).find(
-			(tab) => tab.textContent?.trim() === 'Layout'
-		);
-		expect(layoutTab?.getAttribute('aria-selected')).toBe('true');
+		const componentsTab = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[role="tab"]')
+		).find((tab) => tab.textContent?.trim() === 'Components');
+		expect(componentsTab?.getAttribute('aria-selected')).toBe('true');
 		expect(document.querySelector<SVGTextElement>('svg text')?.textContent).toBe('Persisted note');
-		const box = document.querySelector<HTMLElement>('.layout-box, .layout-box-readonly');
-		expect(box?.dataset.layoutKind).toBe('sidebar');
-		expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
-			'sidebar-layout-1'
-		);
 		const added = document.querySelector<HTMLElement>('[data-dryui-added-id="persisted-button"]');
 		expect(added).not.toBeNull();
 		expect(added?.textContent).toContain('Persisted button');
+	});
+
+	it('activates annotation input from the feedback launch URL on mount', async () => {
+		const originalHref = window.location.href;
+		history.pushState(null, '', '/feedback-launch?dryui-feedback=1');
+
+		try {
+			render(Feedback);
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Draw"], [aria-label="Stop drawing"]'
+			);
+			const canvas = document.querySelector<SVGSVGElement>(
+				'[aria-label="Feedback drawing canvas"]'
+			);
+
+			expect(drawButton?.getAttribute('aria-label')).toBe('Stop drawing');
+			expect(canvas?.hasAttribute('data-active')).toBe(true);
+		} finally {
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('reactivates annotation input from the feedback launch URL with an inactive saved draft', async () => {
+		const originalHref = window.location.href;
+		history.pushState(null, '', '/feedback-refresh?dryui-feedback=1');
+		const pageUrl = canonicalTestPageUrl();
+		window.sessionStorage.setItem(
+			WIDGET_STATE_STORAGE_KEY,
+			JSON.stringify({
+				[pageUrl]: {
+					active: false,
+					tool: 'pencil',
+					mode: 'annotate',
+					drawings: [
+						{
+							id: 'refresh-note',
+							kind: 'text',
+							position: { x: 72, y: 84 },
+							text: 'Refresh note',
+							color: 'hsl(25 100% 55%)',
+							space: 'scroll',
+							fontSize: 16
+						}
+					],
+					added: [],
+					moved: [],
+					removed: []
+				}
+			})
+		);
+
+		try {
+			render(Feedback);
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawButton = document.querySelector<HTMLButtonElement>(
+				'[aria-label="Draw"], [aria-label="Stop drawing"]'
+			);
+			const canvas = document.querySelector<SVGSVGElement>(
+				'[aria-label="Feedback drawing canvas"]'
+			);
+
+			expect(drawButton?.getAttribute('aria-label')).toBe('Stop drawing');
+			expect(canvas?.hasAttribute('data-active')).toBe(true);
+			expect(document.querySelector<SVGTextElement>('svg text')?.textContent).toBe('Refresh note');
+		} finally {
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('repairs a zero-sized drawing canvas after portal mount', async () => {
+		const originalHref = window.location.href;
+		const originalGetRect = SVGSVGElement.prototype.getBoundingClientRect;
+		const originalRemoveChild = Node.prototype.removeChild;
+		let repaired = false;
+		let forceZeroCanvasRect = true;
+
+		vi.spyOn(SVGSVGElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+			this: SVGSVGElement
+		) {
+			if (forceZeroCanvasRect && this.getAttribute('aria-label') === 'Feedback drawing canvas') {
+				return DOMRect.fromRect({ x: 0, y: 0, width: 0, height: 0 });
+			}
+			return originalGetRect.call(this);
+		});
+
+		const removeChildSpy = vi.spyOn(Node.prototype, 'removeChild').mockImplementation(function (
+			this: Node,
+			child: Node
+		) {
+			if (
+				child instanceof SVGSVGElement &&
+				child.getAttribute('aria-label') === 'Feedback drawing canvas'
+			) {
+				repaired = true;
+				forceZeroCanvasRect = false;
+			}
+			return originalRemoveChild.call(this, child) as Node;
+		});
+
+		history.pushState(null, '', '/feedback-zero-canvas?dryui-feedback=1');
+
+		try {
+			render(Feedback);
+			await waitForAsyncWork(80);
+			flushSync();
+
+			const canvas = document.querySelector<SVGSVGElement>(
+				'[aria-label="Feedback drawing canvas"]'
+			);
+
+			expect(repaired).toBe(true);
+			expect(canvas?.hasAttribute('data-active')).toBe(true);
+			expect(canvas?.getBoundingClientRect().width).toBeGreaterThan(0);
+		} finally {
+			removeChildSpy.mockRestore();
+			vi.restoreAllMocks();
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('repairs a zero-sized layout stage so placed components remain visible', async () => {
+		const originalHref = window.location.href;
+		const originalGetRect = HTMLElement.prototype.getBoundingClientRect;
+		const originalRemoveChild = Node.prototype.removeChild;
+		let repaired = false;
+		let forceZeroStageRect = true;
+
+		vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+			this: HTMLElement
+		) {
+			if (forceZeroStageRect && this.classList.contains('layout-stage')) {
+				return DOMRect.fromRect({ x: 0, y: 0, width: 0, height: 0 });
+			}
+			return originalGetRect.call(this);
+		});
+
+		const removeChildSpy = vi.spyOn(Node.prototype, 'removeChild').mockImplementation(function (
+			this: Node,
+			child: Node
+		) {
+			if (child instanceof HTMLElement && child.classList.contains('layout-stage')) {
+				repaired = true;
+				forceZeroStageRect = false;
+			}
+			return originalRemoveChild.call(this, child) as Node;
+		});
+
+		history.pushState(null, '', '/feedback-zero-stage?dryui-feedback=1');
+
+		try {
+			render(Feedback);
+			await waitForAsyncWork(80);
+			flushSync();
+
+			const stage = document.querySelector<HTMLElement>('.layout-stage');
+			expect(repaired).toBe(true);
+			expect(stage?.getBoundingClientRect().width).toBeGreaterThan(0);
+
+			await placeButtonComponent();
+
+			const added = document.querySelector<HTMLElement>('[data-dryui-added-id]');
+			if (!added) throw new Error('Expected placed component');
+			const addedRect = added.getBoundingClientRect();
+
+			expect(addedRect.width).toBeGreaterThan(0);
+			expect(addedRect.height).toBeGreaterThan(0);
+		} finally {
+			removeChildSpy.mockRestore();
+			vi.restoreAllMocks();
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('repairs a zero-sized toolbar after portal mount', async () => {
+		const originalHref = window.location.href;
+		const originalGetRect = HTMLElement.prototype.getBoundingClientRect;
+		const originalRemoveChild = Node.prototype.removeChild;
+		let repaired = false;
+		let forceZeroToolbarRect = true;
+
+		vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+			this: HTMLElement
+		) {
+			if (forceZeroToolbarRect && this.getAttribute('role') === 'toolbar') {
+				return DOMRect.fromRect({ x: 0, y: 0, width: 0, height: 0 });
+			}
+			return originalGetRect.call(this);
+		});
+
+		const removeChildSpy = vi.spyOn(Node.prototype, 'removeChild').mockImplementation(function (
+			this: Node,
+			child: Node
+		) {
+			if (child instanceof HTMLElement && child.getAttribute('role') === 'toolbar') {
+				repaired = true;
+				forceZeroToolbarRect = false;
+			}
+			return originalRemoveChild.call(this, child) as Node;
+		});
+
+		history.pushState(null, '', '/feedback-zero-toolbar?dryui-feedback=1');
+
+		try {
+			render(Feedback);
+			await waitForAsyncWork(80);
+			flushSync();
+
+			const toolbar = document.querySelector<HTMLElement>('[role="toolbar"]');
+			expect(repaired).toBe(true);
+			expect(toolbar?.getBoundingClientRect().width).toBeGreaterThan(0);
+			expect(toolbar?.getBoundingClientRect().height).toBeGreaterThan(0);
+		} finally {
+			removeChildSpy.mockRestore();
+			vi.restoreAllMocks();
+			history.replaceState(null, '', originalHref);
+		}
 	});
 
 	it('selects and moves ordinary elements inside layout shells in components mode', async () => {
@@ -483,137 +633,6 @@ describe('feedback overlay hosting', () => {
 
 		expectNear(parseFloat(clone.style.left), startLeft + 64);
 		expectNear(parseFloat(clone.style.top), startTop + 48);
-	});
-
-	it('draws typed layout regions from layout tool icons and submits the selected kind', async () => {
-		const env = setupSubmissionEnvironment({
-			onCapture() {
-				expect(document.querySelector('.layout-box, .layout-box-readonly')).not.toBeNull();
-				expect(document.querySelector('.layout-box-preview')).toBeNull();
-				expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
-					'holy-grail-layout-1'
-				);
-			}
-		});
-
-		try {
-			render(Feedback, { serverUrl: 'http://feedback.test' });
-			await waitForAsyncWork(20);
-			flushSync();
-
-			const layoutTab = Array.from(
-				document.querySelectorAll<HTMLButtonElement>('[role="tab"]')
-			).find((tab) => tab.textContent?.trim() === 'Layout');
-			if (!layoutTab) throw new Error('Expected Layout tab');
-
-			layoutTab.click();
-			flushSync();
-
-			const sidebarTool = document.querySelector<HTMLButtonElement>('[data-layout-tool="sidebar"]');
-			if (!sidebarTool) throw new Error('Expected sidebar layout tool');
-
-			sidebarTool.click();
-			flushSync();
-
-			const drawLayer = document.querySelector<HTMLElement>('.layout-box-draw-layer');
-			if (!drawLayer) throw new Error('Expected layout draw layer');
-
-			drawLayer.dispatchEvent(
-				new PointerEvent('pointerdown', {
-					bubbles: true,
-					cancelable: true,
-					button: 0,
-					buttons: 1,
-					clientX: 80,
-					clientY: 90,
-					pointerId: 23
-				})
-			);
-			window.dispatchEvent(
-				new PointerEvent('pointermove', {
-					bubbles: true,
-					cancelable: true,
-					buttons: 1,
-					clientX: 220,
-					clientY: 180,
-					pointerId: 23
-				})
-			);
-			window.dispatchEvent(
-				new PointerEvent('pointerup', {
-					bubbles: true,
-					cancelable: true,
-					button: 0,
-					clientX: 220,
-					clientY: 180,
-					pointerId: 23
-				})
-			);
-			flushSync();
-
-			const box = document.querySelector<HTMLElement>('.layout-box');
-			expect(box?.dataset.layoutKind).toBe('sidebar');
-			expect(document.querySelectorAll('.layout-box')).toHaveLength(1);
-			expect(document.querySelector('.layout-box-preview')?.getAttribute('data-layout-kind')).toBe(
-				'sidebar'
-			);
-			expect(document.querySelector('.layout-box-preview [data-slot="aside"]')).not.toBeNull();
-			expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
-				'sidebar-layout-1'
-			);
-
-			const holyGrailTool = document.querySelector<HTMLButtonElement>(
-				'[data-layout-tool="holy-grail"]'
-			);
-			if (!holyGrailTool) throw new Error('Expected holy-grail layout tool');
-
-			holyGrailTool.click();
-			flushSync();
-
-			expect(document.querySelectorAll('.layout-box')).toHaveLength(1);
-			expect(document.querySelector<HTMLElement>('.layout-box')?.dataset.layoutKind).toBe(
-				'holy-grail'
-			);
-			expect(document.querySelector('.layout-box-draw-layer')).toBeNull();
-			expect(document.querySelector('.layout-box-preview')?.getAttribute('data-layout-kind')).toBe(
-				'holy-grail'
-			);
-			expect(document.querySelector('.layout-box-preview [data-slot="masthead"]')).not.toBeNull();
-			expect(document.querySelector<HTMLElement>('.layout-box-label')?.textContent).toBe(
-				'holy-grail-layout-1'
-			);
-			expect(holyGrailTool.getAttribute('data-tooltip')).toBe('Holy grail layout');
-			expect(sidebarTool.getAttribute('data-tooltip')).toBe('Update to Sidebar');
-
-			const submitButton = document.querySelector<HTMLButtonElement>(
-				'[aria-label="Send feedback"]'
-			);
-			if (!submitButton) throw new Error('Expected feedback submit button');
-
-			submitButton.click();
-			await waitForAsyncWork(50);
-			flushSync();
-
-			const submissionCall = env.fetchSpy.mock.calls.find(
-				([input, init]) =>
-					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
-					init?.method === 'POST'
-			);
-			expect(submissionCall).toBeDefined();
-			const body = JSON.parse(String(submissionCall?.[1]?.body));
-			expect(body.layoutBoxes).toEqual([
-				expect.objectContaining({
-					kind: 'holy-grail',
-					label: 'holy-grail-layout-1',
-					pageX: 80,
-					pageY: 90,
-					width: 140,
-					height: 90
-				})
-			]);
-		} finally {
-			env.restore();
-		}
 	});
 
 	it.each(['command-palette', 'popover'] as const)(

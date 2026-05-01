@@ -17,7 +17,6 @@
 		Check,
 		Eraser,
 		GripVertical,
-		LayoutTemplate,
 		Move,
 		MoveUpRight,
 		Pencil,
@@ -27,19 +26,11 @@
 		Search,
 		Send,
 		Settings,
-		AlignCenterHorizontal,
-		Columns3,
-		Grid3X3,
-		LayoutPanelLeft,
-		PanelsTopLeft,
-		Rows3,
 		Trash2,
 		Type,
-		Undo2,
-		VectorSquare
+		Undo2
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
-	import type { LayoutTool as InspectorLayoutTool } from './layout-inspector.svelte';
 	import {
 		CATEGORY_LABELS,
 		CATEGORY_ORDER,
@@ -49,8 +40,7 @@
 	} from './component-names.js';
 	import type { SchemaField } from './component-schemas.js';
 
-	export type Mode = 'annotate' | 'components' | 'layout';
-	export type LayoutTool = InspectorLayoutTool;
+	export type Mode = 'annotate' | 'components';
 
 	interface Props {
 		active: boolean;
@@ -66,14 +56,10 @@
 		addedKind?: string | null;
 		addedLabel?: string;
 		addedPropsJson?: string;
-		layoutTool?: LayoutTool | null;
-		layoutPlaced?: boolean;
-		layoutKind?: LayoutTool | null;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
-		onlayouttool?: (tool: LayoutTool | null) => void;
 		oncomponentsreset?: () => void;
 		onundo?: () => void;
 		onredo?: () => void;
@@ -96,16 +82,12 @@
 		addedKind = null,
 		addedLabel = '',
 		addedPropsJson = '',
-		layoutTool = null,
-		layoutPlaced = false,
-		layoutKind = null,
 		canUndo = false,
 		canRedo = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
 		onmodechange,
-		onlayouttool,
 		oncomponentsreset,
 		onundo,
 		onredo,
@@ -116,33 +98,13 @@
 		onremoveselected
 	}: Props = $props();
 
-	const inspecting = $derived(mode === 'components' || mode === 'layout');
+	const inspecting = $derived(mode === 'components');
 	const showAnnotationTools = $derived(mode === 'annotate');
 	const showComponentsTools = $derived(mode === 'components');
-	const showLayoutTools = $derived(mode === 'layout');
-	const showToolPill = $derived(showAnnotationTools || showComponentsTools || showLayoutTools);
-	const inspectingLabel = $derived(showLayoutTools ? 'Adjusting layout' : 'Inspecting components');
+	const showToolPill = $derived(showAnnotationTools || showComponentsTools);
+	const inspectingLabel = 'Inspecting components';
 	const toolbarId = $props.id();
 	const pickerSearchId = `${toolbarId}-component-picker-search`;
-	const layoutTools: LayoutTool[] = [
-		'box',
-		'centered',
-		'stack',
-		'sidebar',
-		'holy-grail',
-		'12-span',
-		'card-grid'
-	];
-	const layoutToolLabels: Record<LayoutTool, string> = {
-		box: 'Box',
-		centered: 'Centered',
-		stack: 'Stack',
-		sidebar: 'Sidebar',
-		'holy-grail': 'Holy grail',
-		'12-span': '12 span',
-		'card-grid': 'Card grid'
-	};
-	const activeLayoutTool = $derived(layoutPlaced ? (layoutKind ?? 'box') : layoutTool);
 
 	let pickerOpen = $state(false);
 	let pickerName = $state('');
@@ -201,28 +163,6 @@
 		onaddcomponent?.(trimmed);
 		pickerOpen = false;
 		pickerName = '';
-	}
-
-	function toggleLayoutTool(next: LayoutTool) {
-		if (layoutPlaced) {
-			onlayouttool?.(next);
-			return;
-		}
-		onlayouttool?.(layoutTool === next ? null : next);
-	}
-
-	function layoutToolTooltip(next: LayoutTool): string {
-		if (!layoutPlaced) return layoutToolLabels[next];
-		if (activeLayoutTool === next) return `${layoutToolLabels[next]} layout`;
-		return `Update to ${layoutToolLabels[next]}`;
-	}
-
-	function layoutToolAriaLabel(next: LayoutTool): string {
-		const label = layoutToolLabels[next].toLowerCase();
-		if (layoutPlaced) {
-			return activeLayoutTool === next ? `${label} layout selected` : `Update layout to ${label}`;
-		}
-		return layoutTool === next ? `Stop drawing ${label}` : `Draw ${label}`;
 	}
 
 	function handlePickerKey(e: KeyboardEvent) {
@@ -441,9 +381,45 @@
 	let pillPosition = $state<'above' | 'below'>('above');
 	const PILL_CLEARANCE = 56;
 
+	function repairToolbarLayout(node: HTMLDivElement): boolean {
+		if (!node.isConnected) return false;
+		const rect = node.getBoundingClientRect();
+		if (rect.width > 0 && rect.height > 0) return false;
+
+		const parent = node.parentNode;
+		if (!parent) return false;
+		const next = node.nextSibling;
+		parent.removeChild(node);
+		parent.insertBefore(node, next);
+		return true;
+	}
+
+	function syncToolbarLayoutMetrics() {
+		if (inspecting) updatePillPosition();
+		if (pickerOpen || propsPanelOpen) updatePopoverPlacement();
+	}
+
+	function scheduleToolbarLayoutRepair(node: HTMLDivElement): () => void {
+		let secondFrame = 0;
+		const repair = () => {
+			if (repairToolbarLayout(node)) syncToolbarLayoutMetrics();
+		};
+		const firstFrame = requestAnimationFrame(() => {
+			repair();
+			secondFrame = requestAnimationFrame(repair);
+		});
+
+		return () => {
+			cancelAnimationFrame(firstFrame);
+			if (secondFrame) cancelAnimationFrame(secondFrame);
+		};
+	}
+
 	const captureToolbar: Attachment<HTMLDivElement> = (node) => {
 		toolbarEl = node;
+		const cleanupRepair = scheduleToolbarLayoutRepair(node);
 		return () => {
+			cleanupRepair();
 			if (toolbarEl === node) toolbarEl = null;
 		};
 	};
@@ -658,20 +634,6 @@
 			<Button
 				variant="trigger"
 				size="sm"
-				class="mode-btn"
-				type="button"
-				role="tab"
-				aria-selected={mode === 'layout'}
-				data-active={mode === 'layout' || undefined}
-				onclick={() => onmodechange('layout')}
-			>
-				<LayoutTemplate size={12} aria-hidden="true" />
-				<span>Layout</span>
-			</Button>
-
-			<Button
-				variant="trigger"
-				size="sm"
 				class="drag-handle"
 				type="button"
 				aria-label="Drag toolbar"
@@ -735,44 +697,9 @@
 		<div
 			class="tool-pill"
 			role="group"
-			aria-label={showLayoutTools
-				? 'Layout tools'
-				: showComponentsTools
-					? 'Components tools'
-					: 'Annotation tools'}
+			aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
 		>
-			{#if showLayoutTools}
-				{#each layoutTools as candidate (candidate)}
-					<Button
-						variant="trigger"
-						size="sm"
-						class="tool-btn"
-						type="button"
-						data-tooltip={layoutToolTooltip(candidate)}
-						data-active={activeLayoutTool === candidate || undefined}
-						data-layout-tool={candidate}
-						onclick={() => toggleLayoutTool(candidate)}
-						aria-label={layoutToolAriaLabel(candidate)}
-						aria-pressed={activeLayoutTool === candidate}
-					>
-						{#if candidate === 'box'}
-							<VectorSquare size={16} />
-						{:else if candidate === 'centered'}
-							<AlignCenterHorizontal size={16} />
-						{:else if candidate === 'stack'}
-							<Rows3 size={16} />
-						{:else if candidate === 'sidebar'}
-							<LayoutPanelLeft size={16} />
-						{:else if candidate === 'holy-grail'}
-							<PanelsTopLeft size={16} />
-						{:else if candidate === '12-span'}
-							<Columns3 size={16} />
-						{:else}
-							<Grid3X3 size={16} />
-						{/if}
-					</Button>
-				{/each}
-			{:else if showComponentsTools}
+			{#if showComponentsTools}
 				{#if addedKind}
 					<div class="add-wrap" data-placement={popoverPlacement}>
 						<Button

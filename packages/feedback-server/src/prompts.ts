@@ -42,7 +42,7 @@ export function buildFeedbackDispatchPrompt(
 			: '';
 	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 
-Read your canonical skill at \`${skillReference(options)}\` first — it has the submission shape, the five intent kinds, the AreaGrid no-gap rule, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
+Read your canonical skill at \`${skillReference(options)}\` first — it has the submission shape, the intent kinds, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run \`dryui check\`, and call \`feedback_resolve_submission\`.
 
 ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 }
@@ -50,7 +50,7 @@ ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
 export function buildFeedbackBulkPrompt(options?: FeedbackPromptOptions): string {
 	return `Process pending DryUI feedback submissions.
 
-For each submission, spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns the full per-submission workflow: fetching, reading the screenshot, decoding intents, editing source, running \`dryui check\`, and calling \`feedback_resolve_submission\`. Its canonical skill at \`${skillReference(options)}\` carries all the rules — AreaGrid no-gap, lint trip-wires, hand-off boundaries.
+For each submission, spawn the **feedback** subagent (\`.claude/agents/feedback.md\`). It owns the full per-submission workflow: fetching, reading the screenshot, decoding intents, editing source, running \`dryui check\`, and calling \`feedback_resolve_submission\`. Its canonical skill at \`${skillReference(options)}\` carries all the rules — lint trip-wires and hand-off boundaries.
 
 Call \`feedback_get_submissions\` once at the start to enumerate pending ids, then dispatch one feedback subagent per submission.
 

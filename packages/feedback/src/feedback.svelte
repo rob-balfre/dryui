@@ -30,8 +30,6 @@
 	} from './position-hints.js';
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
-	import LayoutInspector, { type LayoutTool } from './components/layout-inspector.svelte';
-	import LayoutBoxesOverlay from './components/layout-boxes-overlay.svelte';
 
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
 	// omit the widget entirely. Useful for CI, screenshot jobs, or
@@ -73,16 +71,7 @@
 	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
 	const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
 	const TOOL_VALUES: readonly Tool[] = ['pencil', 'arrow', 'text', 'move', 'eraser'];
-	const MODE_VALUES: readonly Mode[] = ['annotate', 'components', 'layout'];
-	const LAYOUT_TOOL_VALUES: readonly LayoutTool[] = [
-		'box',
-		'centered',
-		'stack',
-		'sidebar',
-		'holy-grail',
-		'12-span',
-		'card-grid'
-	];
+	const MODE_VALUES: readonly Mode[] = ['annotate', 'components'];
 
 	let {
 		color = ANNOTATION_FILL,
@@ -96,13 +85,9 @@
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
 	let inspectingComponents = $state(false);
-	let inspectingLayout = $state(false);
-	let layoutTool = $state<LayoutTool | null>(null);
 	let selectedComponentEl = $state<HTMLElement | null>(null);
-	const mode = $derived<Mode>(
-		inspectingLayout ? 'layout' : inspectingComponents ? 'components' : 'annotate'
-	);
-	const annotationActive = $derived(active && !inspectingComponents && !inspectingLayout);
+	const mode = $derived<Mode>(inspectingComponents ? 'components' : 'annotate');
+	const annotationActive = $derived(active && !inspectingComponents);
 
 	function setMode(next: Mode) {
 		if (next !== 'annotate') {
@@ -115,7 +100,6 @@
 			erasedDuringDrag = false;
 		}
 		inspectingComponents = next === 'components';
-		inspectingLayout = next === 'layout';
 		selectedComponentEl = null;
 		persistWidgetState();
 	}
@@ -123,52 +107,6 @@
 	function stopInspectingComponents() {
 		inspectingComponents = false;
 		selectedComponentEl = null;
-		persistWidgetState();
-	}
-
-	function stopInspectingLayout() {
-		inspectingLayout = false;
-		layoutTool = null;
-		persistWidgetState();
-	}
-
-	function layoutLabelBase(value: LayoutTool): string {
-		if (value === 'box') return 'box';
-		if (value === '12-span') return '12-span-layout';
-		if (value === 'card-grid') return 'card-grid-layout';
-		if (value === 'holy-grail') return 'holy-grail-layout';
-		return `${value}-layout`;
-	}
-
-	function defaultLayoutLabel(value: LayoutTool): string {
-		return `${layoutLabelBase(value)}-1`;
-	}
-
-	function isGeneratedLayoutLabel(label: string): boolean {
-		return /^(box|centered-layout|stack-layout|sidebar-layout|holy-grail-layout|12-span-layout|card-grid-layout)-\d+$/.test(
-			label
-		);
-	}
-
-	function updatePlacedLayoutKind(next: LayoutTool): boolean {
-		const existing = layoutBoxes[0];
-		if (!existing) return false;
-		layoutTool = null;
-		if ((existing.kind ?? 'box') === next) return true;
-		layoutBoxes = [
-			{
-				...existing,
-				kind: next,
-				label: isGeneratedLayoutLabel(existing.label) ? defaultLayoutLabel(next) : existing.label
-			}
-		];
-		commitHistory();
-		return true;
-	}
-
-	function setLayoutTool(next: LayoutTool | null) {
-		if (next && updatePlacedLayoutKind(next)) return;
-		layoutTool = next;
 		persistWidgetState();
 	}
 
@@ -193,22 +131,11 @@
 		propsJson?: string;
 	};
 
-	type LayoutBox = {
-		id: string;
-		kind?: LayoutTool;
-		label: string;
-		pageX: number;
-		pageY: number;
-		width: number;
-		height: number;
-	};
-
 	type HistoryFrame = {
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
 		added: AddedSnapshot[];
 		removed: HTMLElement[];
-		boxes: LayoutBox[];
 	};
 
 	type RemovedRecord = {
@@ -230,10 +157,8 @@
 		active?: boolean;
 		tool?: Tool;
 		mode?: Mode;
-		layoutTool?: LayoutTool | null;
 		placingComponent?: string | null;
 		drawings?: Drawing[];
-		layoutBoxes?: LayoutBox[];
 		added?: AddedSnapshot[];
 		moved?: StoredMovedElement[];
 		removed?: StoredRemovedElement[];
@@ -260,7 +185,6 @@
 	const addedComponents = new Map<string, AddedRecord>();
 	const removedElements = new SvelteMap<HTMLElement, RemovedRecord>();
 	let layoutVersion = $state(0);
-	let layoutBoxes = $state<LayoutBox[]>([]);
 
 	let placingComponent = $state<string | null>(null);
 
@@ -269,8 +193,7 @@
 			drawings: [...initialDrawings],
 			cloneSnapshots: new Map(),
 			added: [],
-			removed: [],
-			boxes: []
+			removed: []
 		};
 	}
 
@@ -355,7 +278,6 @@
 		for (const original of [...layoutClones.keys()]) destroyLayoutClone(original);
 		for (const id of [...addedComponents.keys()]) destroyAddedClone(id);
 		for (const original of [...removedElements.keys()]) restoreLayoutElement(original);
-		layoutBoxes = [];
 		layoutVersion++;
 	}
 
@@ -386,7 +308,11 @@
 
 	const captureLayoutStage: Attachment<HTMLDivElement> = (node) => {
 		layoutStageEl = node;
+		const cleanupRepair = schedulePortalLayoutRepair(() => {
+			if (repairPortalLayoutBox(node)) notifyLayoutChange();
+		});
 		return () => {
+			cleanupRepair();
 			if (layoutStageEl === node) layoutStageEl = undefined;
 		};
 	};
@@ -726,17 +652,12 @@
 			drawings: [...drawings],
 			cloneSnapshots: snapshotAllClones(),
 			added: snapshotAllAdded(),
-			removed: [...removedElements.keys()],
-			boxes: layoutBoxes.map((b) => ({ ...b }))
+			removed: [...removedElements.keys()]
 		};
 	}
 
 	function isObject(value: unknown): value is Record<string, unknown> {
 		return value !== null && typeof value === 'object';
-	}
-
-	function isFiniteNumber(value: unknown): value is number {
-		return typeof value === 'number' && Number.isFinite(value);
 	}
 
 	function isToolValue(value: unknown): value is Tool {
@@ -745,10 +666,6 @@
 
 	function isModeValue(value: unknown): value is Mode {
 		return typeof value === 'string' && MODE_VALUES.includes(value as Mode);
-	}
-
-	function isLayoutToolValue(value: unknown): value is LayoutTool {
-		return typeof value === 'string' && LAYOUT_TOOL_VALUES.includes(value as LayoutTool);
 	}
 
 	function sanitizeLayoutSnapshot(value: unknown): LayoutSnapshot | null {
@@ -775,29 +692,6 @@
 			snap,
 			...(typeof value.label === 'string' ? { label: value.label } : {}),
 			...(typeof value.propsJson === 'string' ? { propsJson: value.propsJson } : {})
-		};
-	}
-
-	function sanitizeLayoutBox(value: unknown): LayoutBox | null {
-		if (
-			!isObject(value) ||
-			typeof value.id !== 'string' ||
-			typeof value.label !== 'string' ||
-			!isFiniteNumber(value.pageX) ||
-			!isFiniteNumber(value.pageY) ||
-			!isFiniteNumber(value.width) ||
-			!isFiniteNumber(value.height)
-		) {
-			return null;
-		}
-		return {
-			id: value.id,
-			...(isLayoutToolValue(value.kind) ? { kind: value.kind } : {}),
-			label: value.label,
-			pageX: value.pageX,
-			pageY: value.pageY,
-			width: value.width,
-			height: value.height
 		};
 	}
 
@@ -831,16 +725,9 @@
 		if (typeof value.active === 'boolean') state.active = value.active;
 		if (isToolValue(value.tool)) state.tool = value.tool;
 		if (isModeValue(value.mode)) state.mode = value.mode;
-		if (value.layoutTool === null) state.layoutTool = null;
-		else if (isLayoutToolValue(value.layoutTool)) state.layoutTool = value.layoutTool;
 		if (typeof value.placingComponent === 'string') state.placingComponent = value.placingComponent;
 		if (Array.isArray(value.drawings)) {
 			state.drawings = value.drawings.map((drawing) => normalizeDrawing(drawing as Drawing));
-		}
-		if (Array.isArray(value.layoutBoxes)) {
-			state.layoutBoxes = value.layoutBoxes
-				.map(sanitizeLayoutBox)
-				.filter((box): box is LayoutBox => box !== null);
 		}
 		if (Array.isArray(value.added)) {
 			state.added = value.added
@@ -886,10 +773,8 @@
 			active,
 			tool,
 			mode,
-			layoutTool,
 			placingComponent,
 			drawings: drawings.map((drawing) => ({ ...drawing })),
-			layoutBoxes: layoutBoxes.map((box) => ({ ...box })),
 			added: snapshotAllAdded(),
 			moved: snapshotMovedDrafts(),
 			removed: snapshotRemovedDrafts()
@@ -899,7 +784,6 @@
 	function hasStoredFeedbackContent(state: StoredWidgetState): boolean {
 		return (
 			(state.drawings?.length ?? 0) > 0 ||
-			(state.layoutBoxes?.length ?? 0) > 0 ||
 			(state.added?.length ?? 0) > 0 ||
 			(state.moved?.length ?? 0) > 0 ||
 			(state.removed?.length ?? 0) > 0
@@ -911,7 +795,6 @@
 			state.active === true ||
 			(state.tool !== undefined && state.tool !== 'pencil') ||
 			(state.mode !== undefined && state.mode !== 'annotate') ||
-			(state.layoutTool !== undefined && state.layoutTool !== null) ||
 			!!state.placingComponent ||
 			hasStoredFeedbackContent(state)
 		);
@@ -980,7 +863,6 @@
 	function hasCurrentWidgetContent(): boolean {
 		return (
 			drawings.length > 0 ||
-			layoutBoxes.length > 0 ||
 			addedComponents.size > 0 ||
 			removedElements.size > 0 ||
 			hasModifiedLayoutClone()
@@ -1055,13 +937,10 @@
 			active = state.active ?? false;
 			tool = state.tool ?? 'pencil';
 			inspectingComponents = state.mode === 'components';
-			inspectingLayout = state.mode === 'layout';
-			layoutTool = state.layoutTool ?? null;
 			placingComponent = state.placingComponent ?? null;
 			drawings = state.drawings?.map(normalizeDrawing) ?? [];
-			layoutBoxes = state.layoutBoxes?.map((box) => ({ ...box })) ?? [];
 
-			let layoutChanged = layoutBoxes.length > 0;
+			let layoutChanged = false;
 			for (const entry of state.added ?? []) {
 				createAddedClone(entry.id, entry.kind, entry.snap, {
 					label: entry.label,
@@ -1138,7 +1017,6 @@
 				layoutChanged = true;
 			}
 		}
-		layoutBoxes = frame.boxes.map((b) => ({ ...b }));
 		if (layoutChanged) notifyLayoutChange();
 		layoutVersion++;
 		saveVersion++;
@@ -1165,22 +1043,8 @@
 		void layoutVersion;
 		void frameIndex;
 		void historyFrames.length;
-		return (
-			addedComponents.size > 0 ||
-			removedElements.size > 0 ||
-			hasModifiedLayoutClone() ||
-			layoutBoxes.length > 0
-		);
+		return addedComponents.size > 0 || removedElements.size > 0 || hasModifiedLayoutClone();
 	});
-
-	function applyLayoutBoxes(next: LayoutBox[], commit: boolean) {
-		layoutBoxes = next.slice(0, 1);
-		if (commit) commitHistory();
-		else {
-			layoutVersion++;
-			persistWidgetState();
-		}
-	}
 
 	function makeLayoutClone(original: HTMLElement): HTMLElement {
 		const rect = original.getBoundingClientRect();
@@ -1622,6 +1486,38 @@
 		if (!layerHostEl) return undefined;
 		return `left: ${-layerOriginLeft}px; top: ${-layerOriginTop}px;`;
 	}
+
+	function repairPortalLayoutBox(node: Element): boolean {
+		if (!node.isConnected) return false;
+		const rect = node.getBoundingClientRect();
+		if (rect.width > 0 && rect.height > 0) return false;
+
+		const parent = node.parentNode;
+		if (!parent) return false;
+		const next = node.nextSibling;
+		parent.removeChild(node);
+		parent.insertBefore(node, next);
+		return true;
+	}
+
+	function schedulePortalLayoutRepair(repair: () => void): () => void {
+		let secondFrame = 0;
+		const firstFrame = requestAnimationFrame(() => {
+			repair();
+			secondFrame = requestAnimationFrame(repair);
+		});
+
+		return () => {
+			cancelAnimationFrame(firstFrame);
+			if (secondFrame) cancelAnimationFrame(secondFrame);
+		};
+	}
+
+	const captureDrawingCanvas: Attachment<SVGSVGElement> = (node) => {
+		return schedulePortalLayoutRepair(() => {
+			repairPortalLayoutBox(node);
+		});
+	};
 
 	function waitForNextPaint(): Promise<void> {
 		return new Promise((resolve) => requestAnimationFrame(() => resolve()));
@@ -2441,6 +2337,20 @@
 		return url.toString();
 	}
 
+	function hasFeedbackLaunchParam(): boolean {
+		if (typeof window === 'undefined') return false;
+		const url = new URL(window.location.href);
+		return url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1';
+	}
+
+	function activateFromFeedbackLaunchParam(): void {
+		if (!hasFeedbackLaunchParam()) return;
+		untrack(() => {
+			if (mode !== 'annotate') return;
+			if (!active) active = true;
+		});
+	}
+
 	function saveDrawings(pageUrl: string, version: number, drawingSnapshot: Drawing[]): void {
 		if (!serverUrl || !pageUrl) return;
 		lastSavedVersion = version;
@@ -2459,7 +2369,10 @@
 
 	function syncCurrentPageUrl(): void {
 		const nextPageUrl = canonicalPageUrl();
-		if (nextPageUrl === currentPageUrl) return;
+		if (nextPageUrl === currentPageUrl) {
+			activateFromFeedbackLaunchParam();
+			return;
+		}
 		flushPendingDrawings();
 		persistWidgetState(currentPageUrl);
 		currentPageUrl = nextPageUrl;
@@ -2469,6 +2382,7 @@
 			destroyAllLayoutClones();
 			resetHistory(drawings);
 		}
+		activateFromFeedbackLaunchParam();
 	}
 
 	async function handleSubmit() {
@@ -2486,15 +2400,6 @@
 			const viewport = { width: window.innerWidth, height: window.innerHeight };
 			const scroll = { x: scrollX, y: scrollY };
 			const hints = buildDrawingHints(drawings);
-			const layoutBoxesPayload = layoutBoxes.map((b) => ({
-				id: b.id,
-				...(b.kind ? { kind: b.kind } : {}),
-				label: b.label,
-				pageX: Math.round(b.pageX),
-				pageY: Math.round(b.pageY),
-				width: Math.round(b.width),
-				height: Math.round(b.height)
-			}));
 			const response = await fetch(`${serverUrl}/submissions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
@@ -2507,8 +2412,7 @@
 					scroll,
 					...(components.length > 0 ? { components } : {}),
 					...(removed.length > 0 ? { removed } : {}),
-					...(moved.length > 0 ? { moved } : {}),
-					...(layoutBoxesPayload.length > 0 ? { layoutBoxes: layoutBoxesPayload } : {})
+					...(moved.length > 0 ? { moved } : {})
 				})
 			});
 
@@ -2533,9 +2437,7 @@
 				saveVersion++;
 				active = false;
 				inspectingComponents = false;
-				inspectingLayout = false;
 				selectedComponentEl = null;
-				layoutBoxes = [];
 				destroyAllLayoutClones();
 				resetHistory([]);
 				removeStoredWidgetState(currentPageUrl);
@@ -2559,6 +2461,7 @@
 			initialWidgetStateRestored = true;
 			untrack(() => {
 				restoreWidgetState(currentPageUrl);
+				activateFromFeedbackLaunchParam();
 				retryStoredWidgetRestore(currentPageUrl);
 			});
 		}
@@ -2611,10 +2514,8 @@
 		void active;
 		void tool;
 		void mode;
-		void layoutTool;
 		void placingComponent;
 		void drawings;
-		void layoutBoxes;
 		void layoutVersion;
 		void saveVersion;
 		persistWidgetState();
@@ -2824,6 +2725,7 @@
 
 			{#if showOverlay}
 				<svg
+					{@attach captureDrawingCanvas}
 					class="drawing-canvas {cursorClass}"
 					data-active={annotationActive || undefined}
 					role="application"
@@ -3030,16 +2932,12 @@
 				addedKind={selectedAddedRecord?.kind ?? null}
 				addedLabel={selectedAddedRecord?.label ?? ''}
 				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
-				{layoutTool}
-				layoutPlaced={layoutBoxes.length > 0}
-				layoutKind={layoutBoxes[0]?.kind ?? (layoutBoxes.length > 0 ? 'box' : null)}
 				{canUndo}
 				{canRedo}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
-				onlayouttool={setLayoutTool}
 				oncomponentsreset={resetSelectedComponent}
 				onundo={undo}
 				onredo={redo}
@@ -3058,19 +2956,6 @@
 					onclose={stopInspectingComponents}
 					oncommit={commitHistory}
 				/>
-			{/if}
-
-			{#if inspectingLayout}
-				<LayoutInspector
-					tool={layoutTool}
-					boxes={layoutBoxes}
-					capturing={toolbarHiddenForCapture}
-					onclose={stopInspectingLayout}
-					ontool={setLayoutTool}
-					onboxescommit={(next) => applyLayoutBoxes(next, true)}
-				/>
-			{:else if layoutBoxes.length > 0}
-				<LayoutBoxesOverlay boxes={layoutBoxes} capturing={toolbarHiddenForCapture} />
 			{/if}
 
 			{#if placingComponent}
@@ -3146,9 +3031,7 @@
 		}
 	}
 
-	[data-dryui-feedback] :global(.components-inspector:not([data-has-selection])),
-	[data-dryui-feedback] :global(.layout-inspector),
-	[data-dryui-feedback] :global(.layout-boxes-overlay) {
+	[data-dryui-feedback] :global(.components-inspector:not([data-has-selection])) {
 		pointer-events: none;
 	}
 

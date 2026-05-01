@@ -18,7 +18,6 @@ import type {
 	SubmissionAgent,
 	SubmissionDrawing,
 	SubmissionDrawingHint,
-	SubmissionLayoutBox,
 	SubmissionMovedElement,
 	SubmissionQueryStatus,
 	SubmissionRemovedElement,
@@ -94,6 +93,8 @@ interface SubmissionRow {
 	components: string | null;
 	removed: string | null;
 	moved: string | null;
+	// Dormant legacy column. Kept on the schema so existing databases don't need
+	// a destructive migration; the store no longer reads or writes to it.
 	layout_boxes: string | null;
 	viewport: string | null;
 	scroll: string | null;
@@ -190,7 +191,6 @@ function toSubmission(row: SubmissionRow): Submission {
 	const components = parseJson<SubmissionAddedComponent[]>(row.components);
 	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
 	const moved = parseJson<SubmissionMovedElement[]>(row.moved);
-	const layoutBoxes = parseJson<SubmissionLayoutBox[]>(row.layout_boxes);
 	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
 	return {
 		id: row.id,
@@ -206,7 +206,6 @@ function toSubmission(row: SubmissionRow): Submission {
 		...(components && components.length > 0 ? { components } : {}),
 		...(removed && removed.length > 0 ? { removed } : {}),
 		...(moved && moved.length > 0 ? { moved } : {}),
-		...(layoutBoxes && layoutBoxes.length > 0 ? { layoutBoxes } : {}),
 		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
 		...(scroll !== undefined ? { scroll } : {}),
 		status: row.status as SubmissionStatus,
@@ -622,13 +621,12 @@ export class FeedbackStore {
 		const components = input.components ?? [];
 		const removed = input.removed ?? [];
 		const moved = input.moved ?? [];
-		const layoutBoxes = input.layoutBoxes ?? [];
 		const workspace = context.workspace ?? null;
 		this.db
 			.query(
 				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, layout_boxes, viewport, scroll, status, created_at, agent, workspace
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
+					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, viewport, scroll, status, created_at, agent, workspace
+				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
 			)
 			.run(
 				id,
@@ -640,7 +638,6 @@ export class FeedbackStore {
 				components.length > 0 ? JSON.stringify(components) : null,
 				removed.length > 0 ? JSON.stringify(removed) : null,
 				moved.length > 0 ? JSON.stringify(moved) : null,
-				layoutBoxes.length > 0 ? JSON.stringify(layoutBoxes) : null,
 				input.viewport ? JSON.stringify(input.viewport) : null,
 				input.scroll ? JSON.stringify(input.scroll) : null,
 				now,
@@ -657,7 +654,6 @@ export class FeedbackStore {
 			...(components.length > 0 ? { components } : {}),
 			...(removed.length > 0 ? { removed } : {}),
 			...(moved.length > 0 ? { moved } : {}),
-			...(layoutBoxes.length > 0 ? { layoutBoxes } : {}),
 			viewport: input.viewport ?? null,
 			...(input.scroll ? { scroll: input.scroll } : {}),
 			status: 'pending',

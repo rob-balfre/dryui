@@ -50,7 +50,6 @@ export const COMPONENT_CATEGORIES: Record<string, ComponentCategory> = {
 	Alert: 'feedback',
 	AlertDialog: 'overlay',
 	AlphaSlider: 'input',
-	AreaGrid: 'layout',
 	AppFrame: 'layout',
 	AspectRatio: 'layout',
 	Aurora: 'layout',

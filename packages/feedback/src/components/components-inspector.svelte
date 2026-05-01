@@ -72,12 +72,9 @@
 		);
 	}
 
-	function isAreaGridStructure(el: Element): boolean {
-		return el.matches('[data-area-grid-shell], [data-area-grid]');
-	}
-
-	function rectFor(el: HTMLElement): DOMRect {
-		return (getClone(el) ?? el).getBoundingClientRect();
+	function isLayoutStructure(el: Element): boolean {
+		if (el.tagName.toLowerCase() === 'svelte-css-wrapper') return true;
+		return el.matches('[data-layout], [data-layout-area]');
 	}
 
 	function rebuild() {
@@ -88,14 +85,13 @@
 			const added = isAddedPlaceholder(el);
 			if (!added && isInsideFeedback(el)) continue;
 			if (isClone(el)) continue;
-			// AreaGrid wrappers belong to Layout mode, but their child content should
-			// still be selectable and movable from Components mode.
-			if (!added && isAreaGridStructure(el)) continue;
+			if (!added && isLayoutStructure(el)) continue;
 			const cs = getComputedStyle(el);
 			if (cs.display === 'none') continue;
-			if (cs.visibility === 'hidden' && !getClone(el)) continue;
+			const clone = getClone(el);
+			if (cs.visibility === 'hidden' && !clone) continue;
 
-			const rect = rectFor(el);
+			const rect = (clone ?? el).getBoundingClientRect();
 			if (rect.width < 4 || rect.height < 4) continue;
 			const role = added || !isContainerElement(el, cs) ? 'cell' : 'container';
 
@@ -424,21 +420,17 @@
 		text-decoration: none;
 	}
 
-	.components-box[data-role='container'],
-	.components-inspector :global(.components-box[data-role='container']) {
+	.components-box[data-role='container']:hover,
+	.components-inspector :global(.components-box[data-role='container']:hover) {
 		outline: 2px solid hsl(25 100% 55%);
 		outline-offset: -1px;
-		background: hsl(25 100% 55% / 0.04);
+		background: hsl(25 100% 55% / 0.1);
 	}
 
-	.components-box[data-role='cell'],
-	.components-inspector :global(.components-box[data-role='cell']) {
+	.components-box[data-role='cell']:hover,
+	.components-inspector :global(.components-box[data-role='cell']:hover) {
 		outline: 1px dashed hsl(25 100% 55% / 0.5);
 		outline-offset: -0.5px;
-	}
-
-	.components-box:hover,
-	.components-inspector :global(.components-box:hover) {
 		background: hsl(25 100% 55% / 0.1);
 	}
 
@@ -502,7 +494,8 @@
 
 	.components-box:focus-visible,
 	.components-inspector :global(.components-box:focus-visible) {
-		outline-color: hsl(25 100% 67%);
+		outline: 2px solid hsl(25 100% 67%);
+		outline-offset: -1px;
 	}
 
 	.components-inspector :global(.components-handle) {
