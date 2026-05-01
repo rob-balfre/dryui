@@ -208,6 +208,7 @@ describe('runEditorInstall', () => {
 
 		const result = runEditorInstall('copilot', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit(calls)
 		});
 
@@ -235,6 +236,7 @@ describe('runEditorInstall', () => {
 
 		const result = runEditorInstall('opencode', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit(calls)
 		});
 
@@ -260,6 +262,7 @@ describe('runEditorInstall', () => {
 		const result = runEditorInstall('windsurf', {
 			cwd: root,
 			homeDir: home,
+			useNpxSkills: false,
 			runDegit: fakeDegit(calls)
 		});
 
@@ -397,6 +400,7 @@ describe('runEditorInstall', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('copilot', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: () => ({ ok: false, message: 'network down' })
 		});
 
@@ -413,6 +417,7 @@ describe('formatInstallResult', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('cursor', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([])
 		})!;
 		const text = formatInstallResult(result);
@@ -428,6 +433,7 @@ describe('Svelte MCP companion', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('copilot', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -445,6 +451,7 @@ describe('Svelte MCP companion', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('cursor', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -460,6 +467,7 @@ describe('Svelte MCP companion', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('opencode', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -478,6 +486,7 @@ describe('Svelte MCP companion', () => {
 		const result = runEditorInstall('windsurf', {
 			cwd: root,
 			homeDir: home,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -519,6 +528,7 @@ describe('Svelte MCP companion', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('cursor', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([])
 		});
 		expect(result?.ok).toBe(true);
@@ -712,12 +722,14 @@ args = ["-y", "@sveltejs/mcp"]`,
 		const home = createTempTree({});
 		runEditorInstall('cursor', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
 		runEditorInstall('windsurf', {
 			cwd: root,
 			homeDir: home,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -842,6 +854,7 @@ args = ["-y", "@sveltejs/mcp"]
 		});
 		runEditorInstall('cursor', {
 			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit([]),
 			includeSvelteMcp: true
 		});
@@ -1307,13 +1320,29 @@ describe('npx skills install path (DRYUI_SKILLS_VIA_NPX gate)', () => {
 		expect(degitCalls).toEqual([resolve(root, '.github/skills/dryui')]);
 	});
 
-	test('default behavior (useNpxSkills omitted) keeps the legacy degit path', () => {
+	test('default behavior (useNpxSkills omitted, env unset) routes through npx skills (Phase 5 flip)', () => {
 		const root = createTempTree({});
 		const npxCalls: NpxCall[] = [];
 		const degitCalls: string[] = [];
 
 		runEditorInstall('cursor', {
 			cwd: root,
+			runDegit: fakeDegit(degitCalls),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([{ agent: 'cursor', cwd: root }]);
+		expect(degitCalls).toEqual([]);
+	});
+
+	test('useNpxSkills:false explicit override keeps the legacy degit path (escape hatch)', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+		const degitCalls: string[] = [];
+
+		runEditorInstall('cursor', {
+			cwd: root,
+			useNpxSkills: false,
 			runDegit: fakeDegit(degitCalls),
 			runNpxSkills: fakeNpxSkills(npxCalls)
 		});

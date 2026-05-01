@@ -149,15 +149,17 @@ dryui-feedback-mcp       # feedback MCP server from src
 
 Each invocation prints a one-line `DRYUI_DEV=1 — LOCAL SOURCE MODE` banner so you can tell at a glance which path you're on. Edits in `packages/*/src/` show up on the next invocation — no rebuild required. To force the published path (e.g. to test the dist artifact), set `DRYUI_DEV=0` before running.
 
-#### Skill install via npx skills (opt-in, Phase 3 of the npx skills migration)
+#### Skill install via npx skills (default since Phase 5 of the npx skills migration)
 
-`dryui setup --install` and `dryui init` install the dryui skill via the legacy degit copy by default. Set `DRYUI_SKILLS_VIA_NPX=1` to route through the upstream `npx skills` CLI instead:
+`dryui setup --install` and `dryui init` install the dryui skill via the upstream `npx skills` CLI by default (skills.sh standard). Copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes`, which writes to the upstream-blessed install location for each agent. Zed always uses the legacy degit copy: it is not in the npx skills supported-agents list.
+
+Set `DRYUI_SKILLS_LEGACY=1` to opt back into the legacy degit copy (one-release escape hatch slated for removal in Phase 6):
 
 ```bash
-DRYUI_SKILLS_VIA_NPX=1 dryui setup --install --editor cursor
+DRYUI_SKILLS_LEGACY=1 dryui setup --install --editor cursor
 ```
 
-When the env var is set, copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes` (which writes to the upstream-blessed install location for each agent). Zed always uses the legacy degit copy: it is not in the npx skills supported-agents list. Failures (offline, missing npx) fall through to the legacy degit copy with a one-line warning. Phase 5 of the migration flips the default; `DRYUI_SKILLS_LEGACY=1` will then be the escape hatch.
+Failures (offline, missing npx) fall through to the legacy degit copy automatically with a one-line warning, so the default path is safe even on flaky networks.
 
 Workspace packages registered by `dev:link` (`@dryui/ui`, `@dryui/primitives`, `@dryui/feedback`, `@dryui/lint`) all carry a `"development"` exports condition pointing at `src/` and ship `src/` in their tarballs. Combined with the launcher's `DRYUI_DEV` flow — which rewrites tarball overrides in your project's `package.json` to `link:<pkg>` and adds the packages to `ssr.noExternal` — `vite dev` in `~/yourproject` resolves through workspace source and picks up Svelte edits via HMR. Production builds fall through to `dist/` automatically.
 

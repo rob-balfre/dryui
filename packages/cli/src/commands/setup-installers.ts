@@ -198,7 +198,9 @@ function defaultRunNpxSkills(agent: NpxSkillsAgent, ctx: InstallContext): NpxSki
 
 function shouldUseNpxSkills(ctx: InstallContext): boolean {
 	if (ctx.useNpxSkills !== undefined) return ctx.useNpxSkills;
-	return process.env.DRYUI_SKILLS_VIA_NPX === '1';
+	// Phase 5 flipped the default: npx skills is the install path unless the
+	// user opts back into the legacy degit copy via DRYUI_SKILLS_LEGACY=1.
+	return process.env.DRYUI_SKILLS_LEGACY !== '1';
 }
 
 /**
