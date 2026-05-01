@@ -55,11 +55,6 @@
       "svelte": "./src/app-frame/index.ts",
       "default": "./src/app-frame/index.ts"
     },
-    "./area-grid": {
-      "types": "./src/area-grid/index.ts",
-      "svelte": "./src/area-grid/index.ts",
-      "default": "./src/area-grid/index.ts"
-    },
     "./aspect-ratio": {
       "types": "./src/aspect-ratio/index.ts",
       "svelte": "./src/aspect-ratio/index.ts",
@@ -819,1561 +814,776 @@
     "types": "./dist/index.d.ts",
     "exports": {
       ".": {
-        "development": {
-          "types": "./src/index.ts",
-          "svelte": "./src/index.ts",
-          "default": "./src/index.ts"
-        },
         "types": "./dist/index.d.ts",
         "svelte": "./dist/index.js",
         "default": "./dist/index.js"
       },
       "./accordion": {
-        "development": {
-          "types": "./src/accordion/index.ts",
-          "svelte": "./src/accordion/index.ts",
-          "default": "./src/accordion/index.ts"
-        },
         "types": "./dist/accordion/index.d.ts",
         "svelte": "./dist/accordion/index.js",
         "default": "./dist/accordion/index.js"
       },
       "./adjust": {
-        "development": {
-          "types": "./src/adjust/index.ts",
-          "svelte": "./src/adjust/index.ts",
-          "default": "./src/adjust/index.ts"
-        },
         "types": "./dist/adjust/index.d.ts",
         "svelte": "./dist/adjust/index.js",
         "default": "./dist/adjust/index.js"
       },
       "./alert": {
-        "development": {
-          "types": "./src/alert/index.ts",
-          "svelte": "./src/alert/index.ts",
-          "default": "./src/alert/index.ts"
-        },
         "types": "./dist/alert/index.d.ts",
         "svelte": "./dist/alert/index.js",
         "default": "./dist/alert/index.js"
       },
       "./alert-dialog": {
-        "development": {
-          "types": "./src/alert-dialog/index.ts",
-          "svelte": "./src/alert-dialog/index.ts",
-          "default": "./src/alert-dialog/index.ts"
-        },
         "types": "./dist/alert-dialog/index.d.ts",
         "svelte": "./dist/alert-dialog/index.js",
         "default": "./dist/alert-dialog/index.js"
       },
       "./alpha-slider": {
-        "development": {
-          "types": "./src/alpha-slider/index.ts",
-          "svelte": "./src/alpha-slider/index.ts",
-          "default": "./src/alpha-slider/index.ts"
-        },
         "types": "./dist/alpha-slider/index.d.ts",
         "svelte": "./dist/alpha-slider/index.js",
         "default": "./dist/alpha-slider/index.js"
       },
       "./app-frame": {
-        "development": {
-          "types": "./src/app-frame/index.ts",
-          "svelte": "./src/app-frame/index.ts",
-          "default": "./src/app-frame/index.ts"
-        },
         "types": "./dist/app-frame/index.d.ts",
         "svelte": "./dist/app-frame/index.js",
         "default": "./dist/app-frame/index.js"
       },
-      "./area-grid": {
-        "development": {
-          "types": "./src/area-grid/index.ts",
-          "svelte": "./src/area-grid/index.ts",
-          "default": "./src/area-grid/index.ts"
-        },
-        "types": "./dist/area-grid/index.d.ts",
-        "svelte": "./dist/area-grid/index.js",
-        "default": "./dist/area-grid/index.js"
-      },
       "./aspect-ratio": {
-        "development": {
-          "types": "./src/aspect-ratio/index.ts",
-          "svelte": "./src/aspect-ratio/index.ts",
-          "default": "./src/aspect-ratio/index.ts"
-        },
         "types": "./dist/aspect-ratio/index.d.ts",
         "svelte": "./dist/aspect-ratio/index.js",
         "default": "./dist/aspect-ratio/index.js"
       },
       "./aurora": {
-        "development": {
-          "types": "./src/aurora/index.ts",
-          "svelte": "./src/aurora/index.ts",
-          "default": "./src/aurora/index.ts"
-        },
         "types": "./dist/aurora/index.d.ts",
         "svelte": "./dist/aurora/index.js",
         "default": "./dist/aurora/index.js"
       },
       "./avatar": {
-        "development": {
-          "types": "./src/avatar/index.ts",
-          "svelte": "./src/avatar/index.ts",
-          "default": "./src/avatar/index.ts"
-        },
         "types": "./dist/avatar/index.d.ts",
         "svelte": "./dist/avatar/index.js",
         "default": "./dist/avatar/index.js"
       },
       "./backdrop": {
-        "development": {
-          "types": "./src/backdrop/index.ts",
-          "svelte": "./src/backdrop/index.ts",
-          "default": "./src/backdrop/index.ts"
-        },
         "types": "./dist/backdrop/index.d.ts",
         "svelte": "./dist/backdrop/index.js",
         "default": "./dist/backdrop/index.js"
       },
       "./badge": {
-        "development": {
-          "types": "./src/badge/index.ts",
-          "svelte": "./src/badge/index.ts",
-          "default": "./src/badge/index.ts"
-        },
         "types": "./dist/badge/index.d.ts",
         "svelte": "./dist/badge/index.js",
         "default": "./dist/badge/index.js"
       },
       "./beam": {
-        "development": {
-          "types": "./src/beam/index.ts",
-          "svelte": "./src/beam/index.ts",
-          "default": "./src/beam/index.ts"
-        },
         "types": "./dist/beam/index.d.ts",
         "svelte": "./dist/beam/index.js",
         "default": "./dist/beam/index.js"
       },
       "./border-beam": {
-        "development": {
-          "types": "./src/border-beam/index.ts",
-          "svelte": "./src/border-beam/index.ts",
-          "default": "./src/border-beam/index.ts"
-        },
         "types": "./dist/border-beam/index.d.ts",
         "svelte": "./dist/border-beam/index.js",
         "default": "./dist/border-beam/index.js"
       },
       "./breadcrumb": {
-        "development": {
-          "types": "./src/breadcrumb/index.ts",
-          "svelte": "./src/breadcrumb/index.ts",
-          "default": "./src/breadcrumb/index.ts"
-        },
         "types": "./dist/breadcrumb/index.d.ts",
         "svelte": "./dist/breadcrumb/index.js",
         "default": "./dist/breadcrumb/index.js"
       },
       "./button": {
-        "development": {
-          "types": "./src/button/index.ts",
-          "svelte": "./src/button/index.ts",
-          "default": "./src/button/index.ts"
-        },
         "types": "./dist/button/index.d.ts",
         "svelte": "./dist/button/index.js",
         "default": "./dist/button/index.js"
       },
       "./button-group": {
-        "development": {
-          "types": "./src/button-group/index.ts",
-          "svelte": "./src/button-group/index.ts",
-          "default": "./src/button-group/index.ts"
-        },
         "types": "./dist/button-group/index.d.ts",
         "svelte": "./dist/button-group/index.js",
         "default": "./dist/button-group/index.js"
       },
       "./calendar": {
-        "development": {
-          "types": "./src/calendar/index.ts",
-          "svelte": "./src/calendar/index.ts",
-          "default": "./src/calendar/index.ts"
-        },
         "types": "./dist/calendar/index.d.ts",
         "svelte": "./dist/calendar/index.js",
         "default": "./dist/calendar/index.js"
       },
       "./card": {
-        "development": {
-          "types": "./src/card/index.ts",
-          "svelte": "./src/card/index.ts",
-          "default": "./src/card/index.ts"
-        },
         "types": "./dist/card/index.d.ts",
         "svelte": "./dist/card/index.js",
         "default": "./dist/card/index.js"
       },
       "./carousel": {
-        "development": {
-          "types": "./src/carousel/index.ts",
-          "svelte": "./src/carousel/index.ts",
-          "default": "./src/carousel/index.ts"
-        },
         "types": "./dist/carousel/index.d.ts",
         "svelte": "./dist/carousel/index.js",
         "default": "./dist/carousel/index.js"
       },
       "./chart": {
-        "development": {
-          "types": "./src/chart/index.ts",
-          "svelte": "./src/chart/index.ts",
-          "default": "./src/chart/index.ts"
-        },
         "types": "./dist/chart/index.d.ts",
         "svelte": "./dist/chart/index.js",
         "default": "./dist/chart/index.js"
       },
       "./chat-thread": {
-        "development": {
-          "types": "./src/chat-thread/index.ts",
-          "svelte": "./src/chat-thread/index.ts",
-          "default": "./src/chat-thread/index.ts"
-        },
         "types": "./dist/chat-thread/index.d.ts",
         "svelte": "./dist/chat-thread/index.js",
         "default": "./dist/chat-thread/index.js"
       },
       "./checkbox": {
-        "development": {
-          "types": "./src/checkbox/index.ts",
-          "svelte": "./src/checkbox/index.ts",
-          "default": "./src/checkbox/index.ts"
-        },
         "types": "./dist/checkbox/index.d.ts",
         "svelte": "./dist/checkbox/index.js",
         "default": "./dist/checkbox/index.js"
       },
       "./chip": {
-        "development": {
-          "types": "./src/chip/index.ts",
-          "svelte": "./src/chip/index.ts",
-          "default": "./src/chip/index.ts"
-        },
         "types": "./dist/chip/index.d.ts",
         "svelte": "./dist/chip/index.js",
         "default": "./dist/chip/index.js"
       },
       "./chip-group": {
-        "development": {
-          "types": "./src/chip-group/index.ts",
-          "svelte": "./src/chip-group/index.ts",
-          "default": "./src/chip-group/index.ts"
-        },
         "types": "./dist/chip-group/index.d.ts",
         "svelte": "./dist/chip-group/index.js",
         "default": "./dist/chip-group/index.js"
       },
       "./chromatic-aberration": {
-        "development": {
-          "types": "./src/chromatic-aberration/index.ts",
-          "svelte": "./src/chromatic-aberration/index.ts",
-          "default": "./src/chromatic-aberration/index.ts"
-        },
         "types": "./dist/chromatic-aberration/index.d.ts",
         "svelte": "./dist/chromatic-aberration/index.js",
         "default": "./dist/chromatic-aberration/index.js"
       },
       "./chromatic-shift": {
-        "development": {
-          "types": "./src/chromatic-shift/index.ts",
-          "svelte": "./src/chromatic-shift/index.ts",
-          "default": "./src/chromatic-shift/index.ts"
-        },
         "types": "./dist/chromatic-shift/index.d.ts",
         "svelte": "./dist/chromatic-shift/index.js",
         "default": "./dist/chromatic-shift/index.js"
       },
       "./clipboard": {
-        "development": {
-          "types": "./src/clipboard/index.ts",
-          "svelte": "./src/clipboard/index.ts",
-          "default": "./src/clipboard/index.ts"
-        },
         "types": "./dist/clipboard/index.d.ts",
         "svelte": "./dist/clipboard/index.js",
         "default": "./dist/clipboard/index.js"
       },
       "./code-block": {
-        "development": {
-          "types": "./src/code-block/index.ts",
-          "svelte": "./src/code-block/index.ts",
-          "default": "./src/code-block/index.ts"
-        },
         "types": "./dist/code-block/index.d.ts",
         "svelte": "./dist/code-block/index.js",
         "default": "./dist/code-block/index.js"
       },
       "./collapsible": {
-        "development": {
-          "types": "./src/collapsible/index.ts",
-          "svelte": "./src/collapsible/index.ts",
-          "default": "./src/collapsible/index.ts"
-        },
         "types": "./dist/collapsible/index.d.ts",
         "svelte": "./dist/collapsible/index.js",
         "default": "./dist/collapsible/index.js"
       },
       "./color-picker": {
-        "development": {
-          "types": "./src/color-picker/index.ts",
-          "svelte": "./src/color-picker/index.ts",
-          "default": "./src/color-picker/index.ts"
-        },
         "types": "./dist/color-picker/index.d.ts",
         "svelte": "./dist/color-picker/index.js",
         "default": "./dist/color-picker/index.js"
       },
       "./combobox": {
-        "development": {
-          "types": "./src/combobox/index.ts",
-          "svelte": "./src/combobox/index.ts",
-          "default": "./src/combobox/index.ts"
-        },
         "types": "./dist/combobox/index.d.ts",
         "svelte": "./dist/combobox/index.js",
         "default": "./dist/combobox/index.js"
       },
       "./command-palette": {
-        "development": {
-          "types": "./src/command-palette/index.ts",
-          "svelte": "./src/command-palette/index.ts",
-          "default": "./src/command-palette/index.ts"
-        },
         "types": "./dist/command-palette/index.d.ts",
         "svelte": "./dist/command-palette/index.js",
         "default": "./dist/command-palette/index.js"
       },
       "./container": {
-        "development": {
-          "types": "./src/container/index.ts",
-          "svelte": "./src/container/index.ts",
-          "default": "./src/container/index.ts"
-        },
         "types": "./dist/container/index.d.ts",
         "svelte": "./dist/container/index.js",
         "default": "./dist/container/index.js"
       },
       "./context-menu": {
-        "development": {
-          "types": "./src/context-menu/index.ts",
-          "svelte": "./src/context-menu/index.ts",
-          "default": "./src/context-menu/index.ts"
-        },
         "types": "./dist/context-menu/index.d.ts",
         "svelte": "./dist/context-menu/index.js",
         "default": "./dist/context-menu/index.js"
       },
       "./data-grid": {
-        "development": {
-          "types": "./src/data-grid/index.ts",
-          "svelte": "./src/data-grid/index.ts",
-          "default": "./src/data-grid/index.ts"
-        },
         "types": "./dist/data-grid/index.d.ts",
         "svelte": "./dist/data-grid/index.js",
         "default": "./dist/data-grid/index.js"
       },
       "./date-field": {
-        "development": {
-          "types": "./src/date-field/index.ts",
-          "svelte": "./src/date-field/index.ts",
-          "default": "./src/date-field/index.ts"
-        },
         "types": "./dist/date-field/index.d.ts",
         "svelte": "./dist/date-field/index.js",
         "default": "./dist/date-field/index.js"
       },
       "./date-picker": {
-        "development": {
-          "types": "./src/date-picker/index.ts",
-          "svelte": "./src/date-picker/index.ts",
-          "default": "./src/date-picker/index.ts"
-        },
         "types": "./dist/date-picker/index.d.ts",
         "svelte": "./dist/date-picker/index.js",
         "default": "./dist/date-picker/index.js"
       },
       "./date-range-picker": {
-        "development": {
-          "types": "./src/date-range-picker/index.ts",
-          "svelte": "./src/date-range-picker/index.ts",
-          "default": "./src/date-range-picker/index.ts"
-        },
         "types": "./dist/date-range-picker/index.d.ts",
         "svelte": "./dist/date-range-picker/index.js",
         "default": "./dist/date-range-picker/index.js"
       },
       "./date-time-input": {
-        "development": {
-          "types": "./src/date-time-input/index.ts",
-          "svelte": "./src/date-time-input/index.ts",
-          "default": "./src/date-time-input/index.ts"
-        },
         "types": "./dist/date-time-input/index.d.ts",
         "svelte": "./dist/date-time-input/index.js",
         "default": "./dist/date-time-input/index.js"
       },
       "./description-list": {
-        "development": {
-          "types": "./src/description-list/index.ts",
-          "svelte": "./src/description-list/index.ts",
-          "default": "./src/description-list/index.ts"
-        },
         "types": "./dist/description-list/index.d.ts",
         "svelte": "./dist/description-list/index.js",
         "default": "./dist/description-list/index.js"
       },
       "./diagram": {
-        "development": {
-          "types": "./src/diagram/index.ts",
-          "svelte": "./src/diagram/index.ts",
-          "default": "./src/diagram/index.ts"
-        },
         "types": "./dist/diagram/index.d.ts",
         "svelte": "./dist/diagram/index.js",
         "default": "./dist/diagram/index.js"
       },
       "./dialog": {
-        "development": {
-          "types": "./src/dialog/index.ts",
-          "svelte": "./src/dialog/index.ts",
-          "default": "./src/dialog/index.ts"
-        },
         "types": "./dist/dialog/index.d.ts",
         "svelte": "./dist/dialog/index.js",
         "default": "./dist/dialog/index.js"
       },
       "./displacement": {
-        "development": {
-          "types": "./src/displacement/index.ts",
-          "svelte": "./src/displacement/index.ts",
-          "default": "./src/displacement/index.ts"
-        },
         "types": "./dist/displacement/index.d.ts",
         "svelte": "./dist/displacement/index.js",
         "default": "./dist/displacement/index.js"
       },
       "./drag-and-drop": {
-        "development": {
-          "types": "./src/drag-and-drop/index.ts",
-          "svelte": "./src/drag-and-drop/index.ts",
-          "default": "./src/drag-and-drop/index.ts"
-        },
         "types": "./dist/drag-and-drop/index.d.ts",
         "svelte": "./dist/drag-and-drop/index.js",
         "default": "./dist/drag-and-drop/index.js"
       },
       "./drawer": {
-        "development": {
-          "types": "./src/drawer/index.ts",
-          "svelte": "./src/drawer/index.ts",
-          "default": "./src/drawer/index.ts"
-        },
         "types": "./dist/drawer/index.d.ts",
         "svelte": "./dist/drawer/index.js",
         "default": "./dist/drawer/index.js"
       },
       "./drop-zone": {
-        "development": {
-          "types": "./src/drop-zone/index.ts",
-          "svelte": "./src/drop-zone/index.ts",
-          "default": "./src/drop-zone/index.ts"
-        },
         "types": "./dist/drop-zone/index.d.ts",
         "svelte": "./dist/drop-zone/index.js",
         "default": "./dist/drop-zone/index.js"
       },
       "./dropdown-menu": {
-        "development": {
-          "types": "./src/dropdown-menu/index.ts",
-          "svelte": "./src/dropdown-menu/index.ts",
-          "default": "./src/dropdown-menu/index.ts"
-        },
         "types": "./dist/dropdown-menu/index.d.ts",
         "svelte": "./dist/dropdown-menu/index.js",
         "default": "./dist/dropdown-menu/index.js"
       },
       "./enter": {
-        "development": {
-          "types": "./src/enter/index.ts",
-          "svelte": "./src/enter/index.ts",
-          "default": "./src/enter/index.ts"
-        },
         "types": "./dist/enter/index.d.ts",
         "svelte": "./dist/enter/index.js",
         "default": "./dist/enter/index.js"
       },
       "./exit": {
-        "development": {
-          "types": "./src/exit/index.ts",
-          "svelte": "./src/exit/index.ts",
-          "default": "./src/exit/index.ts"
-        },
         "types": "./dist/exit/index.d.ts",
         "svelte": "./dist/exit/index.js",
         "default": "./dist/exit/index.js"
       },
       "./field": {
-        "development": {
-          "types": "./src/field/index.ts",
-          "svelte": "./src/field/index.ts",
-          "default": "./src/field/index.ts"
-        },
         "types": "./dist/field/index.d.ts",
         "svelte": "./dist/field/index.js",
         "default": "./dist/field/index.js"
       },
       "./fieldset": {
-        "development": {
-          "types": "./src/fieldset/index.ts",
-          "svelte": "./src/fieldset/index.ts",
-          "default": "./src/fieldset/index.ts"
-        },
         "types": "./dist/fieldset/index.d.ts",
         "svelte": "./dist/fieldset/index.js",
         "default": "./dist/fieldset/index.js"
       },
       "./file-select": {
-        "development": {
-          "types": "./src/file-select/index.ts",
-          "svelte": "./src/file-select/index.ts",
-          "default": "./src/file-select/index.ts"
-        },
         "types": "./dist/file-select/index.d.ts",
         "svelte": "./dist/file-select/index.js",
         "default": "./dist/file-select/index.js"
       },
       "./file-upload": {
-        "development": {
-          "types": "./src/file-upload/index.ts",
-          "svelte": "./src/file-upload/index.ts",
-          "default": "./src/file-upload/index.ts"
-        },
         "types": "./dist/file-upload/index.d.ts",
         "svelte": "./dist/file-upload/index.js",
         "default": "./dist/file-upload/index.js"
       },
       "./flip-card": {
-        "development": {
-          "types": "./src/flip-card/index.ts",
-          "svelte": "./src/flip-card/index.ts",
-          "default": "./src/flip-card/index.ts"
-        },
         "types": "./dist/flip-card/index.d.ts",
         "svelte": "./dist/flip-card/index.js",
         "default": "./dist/flip-card/index.js"
       },
       "./float-button": {
-        "development": {
-          "types": "./src/float-button/index.ts",
-          "svelte": "./src/float-button/index.ts",
-          "default": "./src/float-button/index.ts"
-        },
         "types": "./dist/float-button/index.d.ts",
         "svelte": "./dist/float-button/index.js",
         "default": "./dist/float-button/index.js"
       },
       "./focus-trap": {
-        "development": {
-          "types": "./src/focus-trap/index.ts",
-          "svelte": "./src/focus-trap/index.ts",
-          "default": "./src/focus-trap/index.ts"
-        },
         "types": "./dist/focus-trap/index.d.ts",
         "svelte": "./dist/focus-trap/index.js",
         "default": "./dist/focus-trap/index.js"
       },
       "./format-bytes": {
-        "development": {
-          "types": "./src/format-bytes/index.ts",
-          "svelte": "./src/format-bytes/index.ts",
-          "default": "./src/format-bytes/index.ts"
-        },
         "types": "./dist/format-bytes/index.d.ts",
         "svelte": "./dist/format-bytes/index.js",
         "default": "./dist/format-bytes/index.js"
       },
       "./format-date": {
-        "development": {
-          "types": "./src/format-date/index.ts",
-          "svelte": "./src/format-date/index.ts",
-          "default": "./src/format-date/index.ts"
-        },
         "types": "./dist/format-date/index.d.ts",
         "svelte": "./dist/format-date/index.js",
         "default": "./dist/format-date/index.js"
       },
       "./format-number": {
-        "development": {
-          "types": "./src/format-number/index.ts",
-          "svelte": "./src/format-number/index.ts",
-          "default": "./src/format-number/index.ts"
-        },
         "types": "./dist/format-number/index.d.ts",
         "svelte": "./dist/format-number/index.js",
         "default": "./dist/format-number/index.js"
       },
       "./gauge": {
-        "development": {
-          "types": "./src/gauge/index.ts",
-          "svelte": "./src/gauge/index.ts",
-          "default": "./src/gauge/index.ts"
-        },
         "types": "./dist/gauge/index.d.ts",
         "svelte": "./dist/gauge/index.js",
         "default": "./dist/gauge/index.js"
       },
       "./glass": {
-        "development": {
-          "types": "./src/glass/index.ts",
-          "svelte": "./src/glass/index.ts",
-          "default": "./src/glass/index.ts"
-        },
         "types": "./dist/glass/index.d.ts",
         "svelte": "./dist/glass/index.js",
         "default": "./dist/glass/index.js"
       },
       "./glow": {
-        "development": {
-          "types": "./src/glow/index.ts",
-          "svelte": "./src/glow/index.ts",
-          "default": "./src/glow/index.ts"
-        },
         "types": "./dist/glow/index.d.ts",
         "svelte": "./dist/glow/index.js",
         "default": "./dist/glow/index.js"
       },
       "./god-rays": {
-        "development": {
-          "types": "./src/god-rays/index.ts",
-          "svelte": "./src/god-rays/index.ts",
-          "default": "./src/god-rays/index.ts"
-        },
         "types": "./dist/god-rays/index.d.ts",
         "svelte": "./dist/god-rays/index.js",
         "default": "./dist/god-rays/index.js"
       },
       "./gradient-mesh": {
-        "development": {
-          "types": "./src/gradient-mesh/index.ts",
-          "svelte": "./src/gradient-mesh/index.ts",
-          "default": "./src/gradient-mesh/index.ts"
-        },
         "types": "./dist/gradient-mesh/index.d.ts",
         "svelte": "./dist/gradient-mesh/index.js",
         "default": "./dist/gradient-mesh/index.js"
       },
       "./halftone": {
-        "development": {
-          "types": "./src/halftone/index.ts",
-          "svelte": "./src/halftone/index.ts",
-          "default": "./src/halftone/index.ts"
-        },
         "types": "./dist/halftone/index.d.ts",
         "svelte": "./dist/halftone/index.js",
         "default": "./dist/halftone/index.js"
       },
       "./heading": {
-        "development": {
-          "types": "./src/heading/index.ts",
-          "svelte": "./src/heading/index.ts",
-          "default": "./src/heading/index.ts"
-        },
         "types": "./dist/heading/index.d.ts",
         "svelte": "./dist/heading/index.js",
         "default": "./dist/heading/index.js"
       },
       "./hotkey": {
-        "development": {
-          "types": "./src/hotkey/index.ts",
-          "svelte": "./src/hotkey/index.ts",
-          "default": "./src/hotkey/index.ts"
-        },
         "types": "./dist/hotkey/index.d.ts",
         "svelte": "./dist/hotkey/index.js",
         "default": "./dist/hotkey/index.js"
       },
       "./hover-card": {
-        "development": {
-          "types": "./src/hover-card/index.ts",
-          "svelte": "./src/hover-card/index.ts",
-          "default": "./src/hover-card/index.ts"
-        },
         "types": "./dist/hover-card/index.d.ts",
         "svelte": "./dist/hover-card/index.js",
         "default": "./dist/hover-card/index.js"
       },
       "./icon": {
-        "development": {
-          "types": "./src/icon/index.ts",
-          "svelte": "./src/icon/index.ts",
-          "default": "./src/icon/index.ts"
-        },
         "types": "./dist/icon/index.d.ts",
         "svelte": "./dist/icon/index.js",
         "default": "./dist/icon/index.js"
       },
       "./icon-swap": {
-        "development": {
-          "types": "./src/icon-swap/index.ts",
-          "svelte": "./src/icon-swap/index.ts",
-          "default": "./src/icon-swap/index.ts"
-        },
         "types": "./dist/icon-swap/index.d.ts",
         "svelte": "./dist/icon-swap/index.js",
         "default": "./dist/icon-swap/index.js"
       },
       "./image": {
-        "development": {
-          "types": "./src/image/index.ts",
-          "svelte": "./src/image/index.ts",
-          "default": "./src/image/index.ts"
-        },
         "types": "./dist/image/index.d.ts",
         "svelte": "./dist/image/index.js",
         "default": "./dist/image/index.js"
       },
       "./image-comparison": {
-        "development": {
-          "types": "./src/image-comparison/index.ts",
-          "svelte": "./src/image-comparison/index.ts",
-          "default": "./src/image-comparison/index.ts"
-        },
         "types": "./dist/image-comparison/index.d.ts",
         "svelte": "./dist/image-comparison/index.js",
         "default": "./dist/image-comparison/index.js"
       },
       "./infinite-scroll": {
-        "development": {
-          "types": "./src/infinite-scroll/index.ts",
-          "svelte": "./src/infinite-scroll/index.ts",
-          "default": "./src/infinite-scroll/index.ts"
-        },
         "types": "./dist/infinite-scroll/index.d.ts",
         "svelte": "./dist/infinite-scroll/index.js",
         "default": "./dist/infinite-scroll/index.js"
       },
       "./input": {
-        "development": {
-          "types": "./src/input/index.ts",
-          "svelte": "./src/input/index.ts",
-          "default": "./src/input/index.ts"
-        },
         "types": "./dist/input/index.d.ts",
         "svelte": "./dist/input/index.js",
         "default": "./dist/input/index.js"
       },
       "./input-group": {
-        "development": {
-          "types": "./src/input-group/index.ts",
-          "svelte": "./src/input-group/index.ts",
-          "default": "./src/input-group/index.ts"
-        },
         "types": "./dist/input-group/index.d.ts",
         "svelte": "./dist/input-group/index.js",
         "default": "./dist/input-group/index.js"
       },
       "./kbd": {
-        "development": {
-          "types": "./src/kbd/index.ts",
-          "svelte": "./src/kbd/index.ts",
-          "default": "./src/kbd/index.ts"
-        },
         "types": "./dist/kbd/index.d.ts",
         "svelte": "./dist/kbd/index.js",
         "default": "./dist/kbd/index.js"
       },
       "./label": {
-        "development": {
-          "types": "./src/label/index.ts",
-          "svelte": "./src/label/index.ts",
-          "default": "./src/label/index.ts"
-        },
         "types": "./dist/label/index.d.ts",
         "svelte": "./dist/label/index.js",
         "default": "./dist/label/index.js"
       },
       "./link": {
-        "development": {
-          "types": "./src/link/index.ts",
-          "svelte": "./src/link/index.ts",
-          "default": "./src/link/index.ts"
-        },
         "types": "./dist/link/index.d.ts",
         "svelte": "./dist/link/index.js",
         "default": "./dist/link/index.js"
       },
       "./link-preview": {
-        "development": {
-          "types": "./src/link-preview/index.ts",
-          "svelte": "./src/link-preview/index.ts",
-          "default": "./src/link-preview/index.ts"
-        },
         "types": "./dist/link-preview/index.d.ts",
         "svelte": "./dist/link-preview/index.js",
         "default": "./dist/link-preview/index.js"
       },
       "./list": {
-        "development": {
-          "types": "./src/list/index.ts",
-          "svelte": "./src/list/index.ts",
-          "default": "./src/list/index.ts"
-        },
         "types": "./dist/list/index.d.ts",
         "svelte": "./dist/list/index.js",
         "default": "./dist/list/index.js"
       },
       "./listbox": {
-        "development": {
-          "types": "./src/listbox/index.ts",
-          "svelte": "./src/listbox/index.ts",
-          "default": "./src/listbox/index.ts"
-        },
         "types": "./dist/listbox/index.d.ts",
         "svelte": "./dist/listbox/index.js",
         "default": "./dist/listbox/index.js"
       },
       "./logo-mark": {
-        "development": {
-          "types": "./src/logo-mark/index.ts",
-          "svelte": "./src/logo-mark/index.ts",
-          "default": "./src/logo-mark/index.ts"
-        },
         "types": "./dist/logo-mark/index.d.ts",
         "svelte": "./dist/logo-mark/index.js",
         "default": "./dist/logo-mark/index.js"
       },
       "./map": {
-        "development": {
-          "types": "./src/map/index.ts",
-          "svelte": "./src/map/index.ts",
-          "default": "./src/map/index.ts"
-        },
         "types": "./dist/map/index.d.ts",
         "svelte": "./dist/map/index.js",
         "default": "./dist/map/index.js"
       },
       "./markdown-renderer": {
-        "development": {
-          "types": "./src/markdown-renderer/index.ts",
-          "svelte": "./src/markdown-renderer/index.ts",
-          "default": "./src/markdown-renderer/index.ts"
-        },
         "types": "./dist/markdown-renderer/index.d.ts",
         "svelte": "./dist/markdown-renderer/index.js",
         "default": "./dist/markdown-renderer/index.js"
       },
       "./marquee": {
-        "development": {
-          "types": "./src/marquee/index.ts",
-          "svelte": "./src/marquee/index.ts",
-          "default": "./src/marquee/index.ts"
-        },
         "types": "./dist/marquee/index.d.ts",
         "svelte": "./dist/marquee/index.js",
         "default": "./dist/marquee/index.js"
       },
       "./mask-reveal": {
-        "development": {
-          "types": "./src/mask-reveal/index.ts",
-          "svelte": "./src/mask-reveal/index.ts",
-          "default": "./src/mask-reveal/index.ts"
-        },
         "types": "./dist/mask-reveal/index.d.ts",
         "svelte": "./dist/mask-reveal/index.js",
         "default": "./dist/mask-reveal/index.js"
       },
       "./mega-menu": {
-        "development": {
-          "types": "./src/mega-menu/index.ts",
-          "svelte": "./src/mega-menu/index.ts",
-          "default": "./src/mega-menu/index.ts"
-        },
         "types": "./dist/mega-menu/index.d.ts",
         "svelte": "./dist/mega-menu/index.js",
         "default": "./dist/mega-menu/index.js"
       },
       "./menubar": {
-        "development": {
-          "types": "./src/menubar/index.ts",
-          "svelte": "./src/menubar/index.ts",
-          "default": "./src/menubar/index.ts"
-        },
         "types": "./dist/menubar/index.d.ts",
         "svelte": "./dist/menubar/index.js",
         "default": "./dist/menubar/index.js"
       },
       "./motion": {
-        "development": {
-          "types": "./src/motion/index.ts",
-          "svelte": "./src/motion/index.ts",
-          "default": "./src/motion/index.ts"
-        },
         "types": "./dist/motion/index.d.ts",
         "svelte": "./dist/motion/index.js",
         "default": "./dist/motion/index.js"
       },
       "./multi-select-combobox": {
-        "development": {
-          "types": "./src/multi-select-combobox/index.ts",
-          "svelte": "./src/multi-select-combobox/index.ts",
-          "default": "./src/multi-select-combobox/index.ts"
-        },
         "types": "./dist/multi-select-combobox/index.d.ts",
         "svelte": "./dist/multi-select-combobox/index.js",
         "default": "./dist/multi-select-combobox/index.js"
       },
       "./navigation-menu": {
-        "development": {
-          "types": "./src/navigation-menu/index.ts",
-          "svelte": "./src/navigation-menu/index.ts",
-          "default": "./src/navigation-menu/index.ts"
-        },
         "types": "./dist/navigation-menu/index.d.ts",
         "svelte": "./dist/navigation-menu/index.js",
         "default": "./dist/navigation-menu/index.js"
       },
       "./noise": {
-        "development": {
-          "types": "./src/noise/index.ts",
-          "svelte": "./src/noise/index.ts",
-          "default": "./src/noise/index.ts"
-        },
         "types": "./dist/noise/index.d.ts",
         "svelte": "./dist/noise/index.js",
         "default": "./dist/noise/index.js"
       },
       "./notification-center": {
-        "development": {
-          "types": "./src/notification-center/index.ts",
-          "svelte": "./src/notification-center/index.ts",
-          "default": "./src/notification-center/index.ts"
-        },
         "types": "./dist/notification-center/index.d.ts",
         "svelte": "./dist/notification-center/index.js",
         "default": "./dist/notification-center/index.js"
       },
       "./number-input": {
-        "development": {
-          "types": "./src/number-input/index.ts",
-          "svelte": "./src/number-input/index.ts",
-          "default": "./src/number-input/index.ts"
-        },
         "types": "./dist/number-input/index.d.ts",
         "svelte": "./dist/number-input/index.js",
         "default": "./dist/number-input/index.js"
       },
       "./numeric": {
-        "development": {
-          "types": "./src/numeric/index.ts",
-          "svelte": "./src/numeric/index.ts",
-          "default": "./src/numeric/index.ts"
-        },
         "types": "./dist/numeric/index.d.ts",
         "svelte": "./dist/numeric/index.js",
         "default": "./dist/numeric/index.js"
       },
       "./option-picker": {
-        "development": {
-          "types": "./src/option-picker/index.ts",
-          "svelte": "./src/option-picker/index.ts",
-          "default": "./src/option-picker/index.ts"
-        },
         "types": "./dist/option-picker/index.d.ts",
         "svelte": "./dist/option-picker/index.js",
         "default": "./dist/option-picker/index.js"
       },
       "./pagination": {
-        "development": {
-          "types": "./src/pagination/index.ts",
-          "svelte": "./src/pagination/index.ts",
-          "default": "./src/pagination/index.ts"
-        },
         "types": "./dist/pagination/index.d.ts",
         "svelte": "./dist/pagination/index.js",
         "default": "./dist/pagination/index.js"
       },
       "./phone-input": {
-        "development": {
-          "types": "./src/phone-input/index.ts",
-          "svelte": "./src/phone-input/index.ts",
-          "default": "./src/phone-input/index.ts"
-        },
         "types": "./dist/phone-input/index.d.ts",
         "svelte": "./dist/phone-input/index.js",
         "default": "./dist/phone-input/index.js"
       },
       "./pin-input": {
-        "development": {
-          "types": "./src/pin-input/index.ts",
-          "svelte": "./src/pin-input/index.ts",
-          "default": "./src/pin-input/index.ts"
-        },
         "types": "./dist/pin-input/index.d.ts",
         "svelte": "./dist/pin-input/index.js",
         "default": "./dist/pin-input/index.js"
       },
       "./popover": {
-        "development": {
-          "types": "./src/popover/index.ts",
-          "svelte": "./src/popover/index.ts",
-          "default": "./src/popover/index.ts"
-        },
         "types": "./dist/popover/index.d.ts",
         "svelte": "./dist/popover/index.js",
         "default": "./dist/popover/index.js"
       },
       "./portal": {
-        "development": {
-          "types": "./src/portal/index.ts",
-          "svelte": "./src/portal/index.ts",
-          "default": "./src/portal/index.ts"
-        },
         "types": "./dist/portal/index.d.ts",
         "svelte": "./dist/portal/index.js",
         "default": "./dist/portal/index.js"
       },
       "./progress": {
-        "development": {
-          "types": "./src/progress/index.ts",
-          "svelte": "./src/progress/index.ts",
-          "default": "./src/progress/index.ts"
-        },
         "types": "./dist/progress/index.d.ts",
         "svelte": "./dist/progress/index.js",
         "default": "./dist/progress/index.js"
       },
       "./progress-ring": {
-        "development": {
-          "types": "./src/progress-ring/index.ts",
-          "svelte": "./src/progress-ring/index.ts",
-          "default": "./src/progress-ring/index.ts"
-        },
         "types": "./dist/progress-ring/index.d.ts",
         "svelte": "./dist/progress-ring/index.js",
         "default": "./dist/progress-ring/index.js"
       },
       "./prompt-input": {
-        "development": {
-          "types": "./src/prompt-input/index.ts",
-          "svelte": "./src/prompt-input/index.ts",
-          "default": "./src/prompt-input/index.ts"
-        },
         "types": "./dist/prompt-input/index.d.ts",
         "svelte": "./dist/prompt-input/index.js",
         "default": "./dist/prompt-input/index.js"
       },
       "./qr-code": {
-        "development": {
-          "types": "./src/qr-code/index.ts",
-          "svelte": "./src/qr-code/index.ts",
-          "default": "./src/qr-code/index.ts"
-        },
         "types": "./dist/qr-code/index.d.ts",
         "svelte": "./dist/qr-code/index.js",
         "default": "./dist/qr-code/index.js"
       },
       "./radio-group": {
-        "development": {
-          "types": "./src/radio-group/index.ts",
-          "svelte": "./src/radio-group/index.ts",
-          "default": "./src/radio-group/index.ts"
-        },
         "types": "./dist/radio-group/index.d.ts",
         "svelte": "./dist/radio-group/index.js",
         "default": "./dist/radio-group/index.js"
       },
       "./range-calendar": {
-        "development": {
-          "types": "./src/range-calendar/index.ts",
-          "svelte": "./src/range-calendar/index.ts",
-          "default": "./src/range-calendar/index.ts"
-        },
         "types": "./dist/range-calendar/index.d.ts",
         "svelte": "./dist/range-calendar/index.js",
         "default": "./dist/range-calendar/index.js"
       },
       "./rating": {
-        "development": {
-          "types": "./src/rating/index.ts",
-          "svelte": "./src/rating/index.ts",
-          "default": "./src/rating/index.ts"
-        },
         "types": "./dist/rating/index.d.ts",
         "svelte": "./dist/rating/index.js",
         "default": "./dist/rating/index.js"
       },
       "./relative-time": {
-        "development": {
-          "types": "./src/relative-time/index.ts",
-          "svelte": "./src/relative-time/index.ts",
-          "default": "./src/relative-time/index.ts"
-        },
         "types": "./dist/relative-time/index.d.ts",
         "svelte": "./dist/relative-time/index.js",
         "default": "./dist/relative-time/index.js"
       },
       "./reveal": {
-        "development": {
-          "types": "./src/reveal/index.ts",
-          "svelte": "./src/reveal/index.ts",
-          "default": "./src/reveal/index.ts"
-        },
         "types": "./dist/reveal/index.d.ts",
         "svelte": "./dist/reveal/index.js",
         "default": "./dist/reveal/index.js"
       },
       "./rich-text-editor": {
-        "development": {
-          "types": "./src/rich-text-editor/index.ts",
-          "svelte": "./src/rich-text-editor/index.ts",
-          "default": "./src/rich-text-editor/index.ts"
-        },
         "types": "./dist/rich-text-editor/index.d.ts",
         "svelte": "./dist/rich-text-editor/index.js",
         "default": "./dist/rich-text-editor/index.js"
       },
       "./scroll-area": {
-        "development": {
-          "types": "./src/scroll-area/index.ts",
-          "svelte": "./src/scroll-area/index.ts",
-          "default": "./src/scroll-area/index.ts"
-        },
         "types": "./dist/scroll-area/index.d.ts",
         "svelte": "./dist/scroll-area/index.js",
         "default": "./dist/scroll-area/index.js"
       },
       "./scroll-to-top": {
-        "development": {
-          "types": "./src/scroll-to-top/index.ts",
-          "svelte": "./src/scroll-to-top/index.ts",
-          "default": "./src/scroll-to-top/index.ts"
-        },
         "types": "./dist/scroll-to-top/index.d.ts",
         "svelte": "./dist/scroll-to-top/index.js",
         "default": "./dist/scroll-to-top/index.js"
       },
       "./segmented-control": {
-        "development": {
-          "types": "./src/segmented-control/index.ts",
-          "svelte": "./src/segmented-control/index.ts",
-          "default": "./src/segmented-control/index.ts"
-        },
         "types": "./dist/segmented-control/index.d.ts",
         "svelte": "./dist/segmented-control/index.js",
         "default": "./dist/segmented-control/index.js"
       },
       "./select": {
-        "development": {
-          "types": "./src/select/index.ts",
-          "svelte": "./src/select/index.ts",
-          "default": "./src/select/index.ts"
-        },
         "types": "./dist/select/index.d.ts",
         "svelte": "./dist/select/index.js",
         "default": "./dist/select/index.js"
       },
       "./separator": {
-        "development": {
-          "types": "./src/separator/index.ts",
-          "svelte": "./src/separator/index.ts",
-          "default": "./src/separator/index.ts"
-        },
         "types": "./dist/separator/index.d.ts",
         "svelte": "./dist/separator/index.js",
         "default": "./dist/separator/index.js"
       },
       "./shader-canvas": {
-        "development": {
-          "types": "./src/shader-canvas/index.ts",
-          "svelte": "./src/shader-canvas/index.ts",
-          "default": "./src/shader-canvas/index.ts"
-        },
         "types": "./dist/shader-canvas/index.d.ts",
         "svelte": "./dist/shader-canvas/index.js",
         "default": "./dist/shader-canvas/index.js"
       },
       "./shimmer": {
-        "development": {
-          "types": "./src/shimmer/index.ts",
-          "svelte": "./src/shimmer/index.ts",
-          "default": "./src/shimmer/index.ts"
-        },
         "types": "./dist/shimmer/index.d.ts",
         "svelte": "./dist/shimmer/index.js",
         "default": "./dist/shimmer/index.js"
       },
       "./sidebar": {
-        "development": {
-          "types": "./src/sidebar/index.ts",
-          "svelte": "./src/sidebar/index.ts",
-          "default": "./src/sidebar/index.ts"
-        },
         "types": "./dist/sidebar/index.d.ts",
         "svelte": "./dist/sidebar/index.js",
         "default": "./dist/sidebar/index.js"
       },
       "./skeleton": {
-        "development": {
-          "types": "./src/skeleton/index.ts",
-          "svelte": "./src/skeleton/index.ts",
-          "default": "./src/skeleton/index.ts"
-        },
         "types": "./dist/skeleton/index.d.ts",
         "svelte": "./dist/skeleton/index.js",
         "default": "./dist/skeleton/index.js"
       },
       "./slider": {
-        "development": {
-          "types": "./src/slider/index.ts",
-          "svelte": "./src/slider/index.ts",
-          "default": "./src/slider/index.ts"
-        },
         "types": "./dist/slider/index.d.ts",
         "svelte": "./dist/slider/index.js",
         "default": "./dist/slider/index.js"
       },
       "./spacer": {
-        "development": {
-          "types": "./src/spacer/index.ts",
-          "svelte": "./src/spacer/index.ts",
-          "default": "./src/spacer/index.ts"
-        },
         "types": "./dist/spacer/index.d.ts",
         "svelte": "./dist/spacer/index.js",
         "default": "./dist/spacer/index.js"
       },
       "./sparkline": {
-        "development": {
-          "types": "./src/sparkline/index.ts",
-          "svelte": "./src/sparkline/index.ts",
-          "default": "./src/sparkline/index.ts"
-        },
         "types": "./dist/sparkline/index.d.ts",
         "svelte": "./dist/sparkline/index.js",
         "default": "./dist/sparkline/index.js"
       },
       "./spinner": {
-        "development": {
-          "types": "./src/spinner/index.ts",
-          "svelte": "./src/spinner/index.ts",
-          "default": "./src/spinner/index.ts"
-        },
         "types": "./dist/spinner/index.d.ts",
         "svelte": "./dist/spinner/index.js",
         "default": "./dist/spinner/index.js"
       },
       "./splitter": {
-        "development": {
-          "types": "./src/splitter/index.ts",
-          "svelte": "./src/splitter/index.ts",
-          "default": "./src/splitter/index.ts"
-        },
         "types": "./dist/splitter/index.d.ts",
         "svelte": "./dist/splitter/index.js",
         "default": "./dist/splitter/index.js"
       },
       "./spotlight": {
-        "development": {
-          "types": "./src/spotlight/index.ts",
-          "svelte": "./src/spotlight/index.ts",
-          "default": "./src/spotlight/index.ts"
-        },
         "types": "./dist/spotlight/index.d.ts",
         "svelte": "./dist/spotlight/index.js",
         "default": "./dist/spotlight/index.js"
       },
       "./stagger": {
-        "development": {
-          "types": "./src/stagger/index.ts",
-          "svelte": "./src/stagger/index.ts",
-          "default": "./src/stagger/index.ts"
-        },
         "types": "./dist/stagger/index.d.ts",
         "svelte": "./dist/stagger/index.js",
         "default": "./dist/stagger/index.js"
       },
       "./star-rating": {
-        "development": {
-          "types": "./src/star-rating/index.ts",
-          "svelte": "./src/star-rating/index.ts",
-          "default": "./src/star-rating/index.ts"
-        },
         "types": "./dist/star-rating/index.d.ts",
         "svelte": "./dist/star-rating/index.js",
         "default": "./dist/star-rating/index.js"
       },
       "./stepper": {
-        "development": {
-          "types": "./src/stepper/index.ts",
-          "svelte": "./src/stepper/index.ts",
-          "default": "./src/stepper/index.ts"
-        },
         "types": "./dist/stepper/index.d.ts",
         "svelte": "./dist/stepper/index.js",
         "default": "./dist/stepper/index.js"
       },
       "./svg": {
-        "development": {
-          "types": "./src/svg/index.ts",
-          "svelte": "./src/svg/index.ts",
-          "default": "./src/svg/index.ts"
-        },
         "types": "./dist/svg/index.d.ts",
         "svelte": "./dist/svg/index.js",
         "default": "./dist/svg/index.js"
       },
       "./table": {
-        "development": {
-          "types": "./src/table/index.ts",
-          "svelte": "./src/table/index.ts",
-          "default": "./src/table/index.ts"
-        },
         "types": "./dist/table/index.d.ts",
         "svelte": "./dist/table/index.js",
         "default": "./dist/table/index.js"
       },
       "./table-of-contents": {
-        "development": {
-          "types": "./src/table-of-contents/index.ts",
-          "svelte": "./src/table-of-contents/index.ts",
-          "default": "./src/table-of-contents/index.ts"
-        },
         "types": "./dist/table-of-contents/index.d.ts",
         "svelte": "./dist/table-of-contents/index.js",
         "default": "./dist/table-of-contents/index.js"
       },
       "./tabs": {
-        "development": {
-          "types": "./src/tabs/index.ts",
-          "svelte": "./src/tabs/index.ts",
-          "default": "./src/tabs/index.ts"
-        },
         "types": "./dist/tabs/index.d.ts",
         "svelte": "./dist/tabs/index.js",
         "default": "./dist/tabs/index.js"
       },
       "./tag": {
-        "development": {
-          "types": "./src/tag/index.ts",
-          "svelte": "./src/tag/index.ts",
-          "default": "./src/tag/index.ts"
-        },
         "types": "./dist/tag/index.d.ts",
         "svelte": "./dist/tag/index.js",
         "default": "./dist/tag/index.js"
       },
       "./tags-input": {
-        "development": {
-          "types": "./src/tags-input/index.ts",
-          "svelte": "./src/tags-input/index.ts",
-          "default": "./src/tags-input/index.ts"
-        },
         "types": "./dist/tags-input/index.d.ts",
         "svelte": "./dist/tags-input/index.js",
         "default": "./dist/tags-input/index.js"
       },
       "./text": {
-        "development": {
-          "types": "./src/text/index.ts",
-          "svelte": "./src/text/index.ts",
-          "default": "./src/text/index.ts"
-        },
         "types": "./dist/text/index.d.ts",
         "svelte": "./dist/text/index.js",
         "default": "./dist/text/index.js"
       },
       "./textarea": {
-        "development": {
-          "types": "./src/textarea/index.ts",
-          "svelte": "./src/textarea/index.ts",
-          "default": "./src/textarea/index.ts"
-        },
         "types": "./dist/textarea/index.d.ts",
         "svelte": "./dist/textarea/index.js",
         "default": "./dist/textarea/index.js"
       },
       "./theme-toggle": {
-        "development": {
-          "types": "./src/theme-toggle/index.ts",
-          "svelte": "./src/theme-toggle/index.ts",
-          "default": "./src/theme-toggle/index.ts"
-        },
         "types": "./dist/theme-toggle/index.d.ts",
         "svelte": "./dist/theme-toggle/index.js",
         "default": "./dist/theme-toggle/index.js"
       },
       "./time-input": {
-        "development": {
-          "types": "./src/time-input/index.ts",
-          "svelte": "./src/time-input/index.ts",
-          "default": "./src/time-input/index.ts"
-        },
         "types": "./dist/time-input/index.d.ts",
         "svelte": "./dist/time-input/index.js",
         "default": "./dist/time-input/index.js"
       },
       "./timeline": {
-        "development": {
-          "types": "./src/timeline/index.ts",
-          "svelte": "./src/timeline/index.ts",
-          "default": "./src/timeline/index.ts"
-        },
         "types": "./dist/timeline/index.d.ts",
         "svelte": "./dist/timeline/index.js",
         "default": "./dist/timeline/index.js"
       },
       "./toast": {
-        "development": {
-          "types": "./src/toast/index.ts",
-          "svelte": "./src/toast/index.ts",
-          "default": "./src/toast/index.ts"
-        },
         "types": "./dist/toast/index.d.ts",
         "svelte": "./dist/toast/index.js",
         "default": "./dist/toast/index.js"
       },
       "./toggle": {
-        "development": {
-          "types": "./src/toggle/index.ts",
-          "svelte": "./src/toggle/index.ts",
-          "default": "./src/toggle/index.ts"
-        },
         "types": "./dist/toggle/index.d.ts",
         "svelte": "./dist/toggle/index.js",
         "default": "./dist/toggle/index.js"
       },
       "./toggle-group": {
-        "development": {
-          "types": "./src/toggle-group/index.ts",
-          "svelte": "./src/toggle-group/index.ts",
-          "default": "./src/toggle-group/index.ts"
-        },
         "types": "./dist/toggle-group/index.d.ts",
         "svelte": "./dist/toggle-group/index.js",
         "default": "./dist/toggle-group/index.js"
       },
       "./token-scope": {
-        "development": {
-          "types": "./src/token-scope/index.ts",
-          "svelte": "./src/token-scope/index.ts",
-          "default": "./src/token-scope/index.ts"
-        },
         "types": "./dist/token-scope/index.d.ts",
         "svelte": "./dist/token-scope/index.js",
         "default": "./dist/token-scope/index.js"
       },
       "./toolbar": {
-        "development": {
-          "types": "./src/toolbar/index.ts",
-          "svelte": "./src/toolbar/index.ts",
-          "default": "./src/toolbar/index.ts"
-        },
         "types": "./dist/toolbar/index.d.ts",
         "svelte": "./dist/toolbar/index.js",
         "default": "./dist/toolbar/index.js"
       },
       "./tooltip": {
-        "development": {
-          "types": "./src/tooltip/index.ts",
-          "svelte": "./src/tooltip/index.ts",
-          "default": "./src/tooltip/index.ts"
-        },
         "types": "./dist/tooltip/index.d.ts",
         "svelte": "./dist/tooltip/index.js",
         "default": "./dist/tooltip/index.js"
       },
       "./tour": {
-        "development": {
-          "types": "./src/tour/index.ts",
-          "svelte": "./src/tour/index.ts",
-          "default": "./src/tour/index.ts"
-        },
         "types": "./dist/tour/index.d.ts",
         "svelte": "./dist/tour/index.js",
         "default": "./dist/tour/index.js"
       },
       "./transfer": {
-        "development": {
-          "types": "./src/transfer/index.ts",
-          "svelte": "./src/transfer/index.ts",
-          "default": "./src/transfer/index.ts"
-        },
         "types": "./dist/transfer/index.d.ts",
         "svelte": "./dist/transfer/index.js",
         "default": "./dist/transfer/index.js"
       },
       "./tree": {
-        "development": {
-          "types": "./src/tree/index.ts",
-          "svelte": "./src/tree/index.ts",
-          "default": "./src/tree/index.ts"
-        },
         "types": "./dist/tree/index.d.ts",
         "svelte": "./dist/tree/index.js",
         "default": "./dist/tree/index.js"
       },
       "./typing-indicator": {
-        "development": {
-          "types": "./src/typing-indicator/index.ts",
-          "svelte": "./src/typing-indicator/index.ts",
-          "default": "./src/typing-indicator/index.ts"
-        },
         "types": "./dist/typing-indicator/index.d.ts",
         "svelte": "./dist/typing-indicator/index.js",
         "default": "./dist/typing-indicator/index.js"
       },
       "./typography": {
-        "development": {
-          "types": "./src/typography/index.ts",
-          "svelte": "./src/typography/index.ts",
-          "default": "./src/typography/index.ts"
-        },
         "types": "./dist/typography/index.d.ts",
         "svelte": "./dist/typography/index.js",
         "default": "./dist/typography/index.js"
       },
       "./video-embed": {
-        "development": {
-          "types": "./src/video-embed/index.ts",
-          "svelte": "./src/video-embed/index.ts",
-          "default": "./src/video-embed/index.ts"
-        },
         "types": "./dist/video-embed/index.d.ts",
         "svelte": "./dist/video-embed/index.js",
         "default": "./dist/video-embed/index.js"
       },
       "./virtual-list": {
-        "development": {
-          "types": "./src/virtual-list/index.ts",
-          "svelte": "./src/virtual-list/index.ts",
-          "default": "./src/virtual-list/index.ts"
-        },
         "types": "./dist/virtual-list/index.d.ts",
         "svelte": "./dist/virtual-list/index.js",
         "default": "./dist/virtual-list/index.js"
       },
       "./visually-hidden": {
-        "development": {
-          "types": "./src/visually-hidden/index.ts",
-          "svelte": "./src/visually-hidden/index.ts",
-          "default": "./src/visually-hidden/index.ts"
-        },
         "types": "./dist/visually-hidden/index.d.ts",
         "svelte": "./dist/visually-hidden/index.js",
         "default": "./dist/visually-hidden/index.js"
