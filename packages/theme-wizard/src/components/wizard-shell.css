@@ -1,0 +1,20 @@
+/* Sibling .css so the cross-component `> svelte-css-wrapper > *` selector
+   survives Svelte's component-scoped CSS pruning. */
+
+[data-layout='wizard-shell'] {
+	box-sizing: border-box;
+	display: grid;
+	grid-template-areas: 'masthead' 'main' 'foot';
+	grid-template-rows: auto 1fr auto;
+	min-block-size: 100dvh;
+}
+
+[data-layout='wizard-shell'] > svelte-css-wrapper {
+	display: contents;
+}
+
+[data-layout='wizard-shell'] > *,
+[data-layout='wizard-shell'] > svelte-css-wrapper > * {
+	grid-area: var(--dry-grid-area-name, auto);
+	min-block-size: 0;
+}
