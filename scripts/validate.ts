@@ -169,7 +169,7 @@ await run('bench:smoke', 'bun run scripts/benchmark/run.ts --smoke');
 
 // ── Phase 8: Generated-skill sync drift ─────────────────────────────────────
 // sync:skills rewrites packages/plugin/skills/** and .cursor/rules/** from
-// packages/ui/skills, etc. Running it here ensures the drift guard below
+// skills, etc. Running it here ensures the drift guard below
 // catches any edit made directly to a generated copy.
 
 console.log('\n── Phase 8: sync:skills drift guard ──');

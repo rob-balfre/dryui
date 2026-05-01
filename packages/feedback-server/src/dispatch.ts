@@ -7,8 +7,23 @@ import { fileURLToPath } from 'node:url';
 import { createProbeCache, hasJsonEntry, type ProbeCache } from './config-probe.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
-import { ensureProjectSkillCopy, resolveDispatchSkillPath } from './skill-path.js';
 import type { Submission, SubmissionAgent } from './types.js';
+
+// The dryui-feedback skill is no longer embedded in this package. Users
+// install it via `npx skills add rob-balfre/dryui --skill dryui-feedback`
+// (typically through `dryui init`). At dispatch time we precondition-check
+// that the SKILL.md exists in the consumer's project; if missing we surface
+// a clear install hint instead of dispatching a half-configured agent.
+const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
+const SKILL_MISSING_HINT =
+	'dryui-feedback skill not installed in this project. ' +
+	'Run `npx skills add rob-balfre/dryui --skill dryui-feedback` ' +
+	'(or `dryui init` for full project setup).';
+
+function findInstalledSkill(workspace: string): string | null {
+	const candidate = join(workspace, PROJECT_SKILL_RELATIVE);
+	return existsSync(candidate) ? candidate : null;
+}
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
 export type DefaultDispatchAgent = DispatchAgent | 'off';
@@ -436,10 +451,10 @@ function isConfiguredAgent(
 
 export function getDispatchTargetsSnapshot(options: DispatcherOptions): DispatchTargetsSnapshot {
 	const cache = createProbeCache();
-	// Mirror the skill into the project once per snapshot so the UI's copy-paste
-	// prompt points at a path that's inside the project boundary (same rationale
-	// as the auto-dispatch path).
-	const skillPath = ensureProjectSkillCopy(options.workspace) ?? resolveDispatchSkillPath();
+	// Skill must already be installed in the consumer project (via npx skills
+	// add or dryui init). When missing we leave skillPath null and the UI
+	// surfaces SKILL_MISSING_HINT to the user.
+	const skillPath = findInstalledSkill(options.workspace);
 	return {
 		defaultAgent: options.defaultAgent,
 		configuredAgents: DISPATCH_AGENTS.filter((agent) => isConfiguredAgent(agent, options, cache)),
@@ -774,8 +789,12 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	// Mirror the skill into the project so the agent's Read stays inside the
 	// project root — `auto` permission mode still prompts on out-of-project
 	// reads, which is what was breaking the dispatched session.
-	const skillPath = ensureProjectSkillCopy(dispatchWorkspace);
-	const prompt = buildFeedbackDispatchPrompt(submission, skillPath ? { skillPath } : undefined);
+	const skillPath = findInstalledSkill(dispatchWorkspace);
+	if (!skillPath) {
+		console.error(`[dispatch] submission ${submission.id} aborted: ${SKILL_MISSING_HINT}`);
+		return;
+	}
+	const prompt = buildFeedbackDispatchPrompt(submission, { skillPath });
 	console.error(`[dispatch] submission ${submission.id}`);
 	dispatchPrompt(target, prompt, {
 		...options,

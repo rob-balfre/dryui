@@ -234,8 +234,8 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 
 - Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin is the canonical Claude skill install path)
 - Codex (0.121.0+): `codex plugin marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
-- OpenCode: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui` + add the `dryui` and `dryui-feedback` local MCP servers in `opencode.json` (OpenCode also loads `.agents/skills/dryui` and reads `AGENTS.md`)
-- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
+- OpenCode: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui` + add the `dryui` and `dryui-feedback` local MCP servers in `opencode.json` (OpenCode also loads `.agents/skills/dryui` and reads `AGENTS.md`)
+- Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
 **5. Register the Svelte MCP companion.** `dryui setup --install` does this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 

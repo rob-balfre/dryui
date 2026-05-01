@@ -426,8 +426,8 @@ After the CLI is working, DryUI also ships an MCP server (live tools) and a skil
 
 - **Claude Code**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui\` (plugin is the canonical Claude skill install path)
 - **Codex** (0.121.0+): \`codex plugin marketplace add rob-balfre/dryui\`, then start \`codex\`, run \`/plugins\`, and install \`DryUI\` (plugin is the canonical Codex skill install path)
-- **OpenCode**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui\` + add local MCP servers in \`opencode.json\`
-- **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui\` + add MCP config
+- **OpenCode**: \`npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui\` + add local MCP servers in \`opencode.json\`
+- **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui\` + add MCP config
 - **Zed**: MCP only (reads AGENTS.md for conventions)
 
 MCP config for tools that need it manually: \`"command": "npx", "args": ["-y", "@dryui/mcp"]\` — root key varies by tool (mcp for OpenCode, mcpServers for Cursor/Windsurf, servers for Copilot, context_servers for Zed).

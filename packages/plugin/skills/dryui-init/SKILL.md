@@ -1,5 +1,5 @@
 ---
-name: init
+name: dryui-init
 description: 'Bootstrap a SvelteKit + DryUI project. Detects project state, installs dependencies, and applies theme/layout setup. Works for new projects, existing SvelteKit apps, and brownfield repos.'
 ---
 

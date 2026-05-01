@@ -74,7 +74,7 @@ export interface ProcessOutcome {
 	message: string;
 }
 
-const SKILL_SOURCE = 'rob-balfre/dryui/packages/ui/skills/dryui';
+const SKILL_SOURCE = 'rob-balfre/dryui/skills/dryui';
 
 const NPX_DRYUI_MCP = { command: 'npx', args: ['-y', '@dryui/mcp'] } as const;
 const NPX_DRYUI_FEEDBACK_MCP = {

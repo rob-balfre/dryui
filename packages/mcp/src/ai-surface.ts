@@ -93,8 +93,8 @@ export const aiSurface: AiSurfaceManifest = {
 				'README.md',
 				'CONTRIBUTING.md',
 				'ACCESSIBILITY.md',
-				'packages/ui/skills/dryui/SKILL.md',
-				'packages/ui/skills/dryui/rules/theming.md',
+				'skills/dryui/SKILL.md',
+				'skills/dryui/rules/theming.md',
 				'packages/mcp/src/spec.json',
 				'packages/mcp/src/agent-contract.v1.json'
 			],

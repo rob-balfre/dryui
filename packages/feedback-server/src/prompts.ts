@@ -5,13 +5,13 @@ export const FEEDBACK_LINTER_PROMPT_STEP =
 export const FEEDBACK_PIPELINE_PROMPT_STEP =
 	'If PRODUCT.md or DESIGN.md exists at the project root (these are impeccable-owned), read them for context; treat this feedback as the highest-priority user intent, then preserve the durable product/design identity unless the feedback clearly overrides it.';
 
-// Backwards-compatible default. Caller should pass the resolved absolute path
-// (see `skill-path.ts#resolveDispatchSkillPath`); falling back to this string
-// is only useful when the consumer happens to have `@dryui/feedback-server`
-// installed as a direct dep, which isn't the common case (the server usually
-// runs through a globally linked bin).
-export const DEFAULT_FEEDBACK_SKILL_REFERENCE =
-	'node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md';
+// Backwards-compatible default. Callers should pass the absolute path to the
+// project-installed skill (`<project>/.claude/skills/dryui-feedback/SKILL.md`)
+// surfaced via dispatch.ts:findInstalledSkill. This fallback string is only
+// useful when no resolved path is available; the dispatched agent will fail
+// to read it unless the user installs the skill via
+// `npx skills add rob-balfre/dryui --skill dryui-feedback` first.
+export const DEFAULT_FEEDBACK_SKILL_REFERENCE = '.claude/skills/dryui-feedback/SKILL.md';
 
 export interface FeedbackPromptOptions {
 	/** Absolute filesystem path to the canonical SKILL.md. */

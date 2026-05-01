@@ -4,9 +4,9 @@ import { join, basename, relative } from 'node:path';
 import { parseFrontmatter } from './_skill-frontmatter';
 
 const root = join(import.meta.dir, '..');
-const layoutSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui-layout');
-const feedbackSkillSource = join(root, 'packages', 'feedback', 'skills', 'live-feedback');
-const initSkillSource = join(root, 'packages', 'cli', 'skills', 'init');
+const layoutSkillSource = join(root, 'skills', 'dryui-layout');
+const feedbackSkillSource = join(root, 'skills', 'dryui-live-feedback');
+const initSkillSource = join(root, 'skills', 'dryui-init');
 const pluginSkills = join(root, 'packages', 'plugin', 'skills');
 const cursorRules = join(root, '.cursor', 'rules');
 
@@ -205,13 +205,11 @@ if (await exists(layoutSkillSource)) {
 		label: 'packages/plugin/skills/dryui-layout'
 	});
 
-	console.log(
-		'synced packages/ui/skills/dryui-layout → packages/plugin/skills/dryui-layout + .cursor/rules/'
-	);
+	console.log('synced skills/dryui-layout -> packages/plugin/skills/dryui-layout + .cursor/rules/');
 }
 
 if (await exists(feedbackSkillSource)) {
-	const pluginFeedbackDest = join(pluginSkills, 'live-feedback');
+	const pluginFeedbackDest = join(pluginSkills, 'dryui-live-feedback');
 
 	await removeStale(feedbackSkillSource, pluginFeedbackDest);
 	await copyDir(feedbackSkillSource, pluginFeedbackDest);
@@ -219,16 +217,14 @@ if (await exists(feedbackSkillSource)) {
 	syncedTargets.push({
 		src: feedbackSkillSource,
 		dest: pluginFeedbackDest,
-		label: 'packages/plugin/skills/live-feedback'
+		label: 'packages/plugin/skills/dryui-live-feedback'
 	});
 
-	console.log(
-		'synced packages/feedback/skills/live-feedback → packages/plugin/skills/live-feedback'
-	);
+	console.log('synced skills/dryui-live-feedback -> packages/plugin/skills/dryui-live-feedback');
 }
 
 if (await exists(initSkillSource)) {
-	const pluginInitDest = join(pluginSkills, 'init');
+	const pluginInitDest = join(pluginSkills, 'dryui-init');
 
 	await removeStale(initSkillSource, pluginInitDest);
 	await copyDir(initSkillSource, pluginInitDest);
@@ -236,10 +232,10 @@ if (await exists(initSkillSource)) {
 	syncedTargets.push({
 		src: initSkillSource,
 		dest: pluginInitDest,
-		label: 'packages/plugin/skills/init'
+		label: 'packages/plugin/skills/dryui-init'
 	});
 
-	console.log('synced packages/cli/skills/init → packages/plugin/skills/init');
+	console.log('synced skills/dryui-init -> packages/plugin/skills/dryui-init');
 }
 
 // 3. Post-sync guard — assert every target is byte-identical to its source.

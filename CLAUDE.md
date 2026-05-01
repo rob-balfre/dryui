@@ -24,8 +24,8 @@ dryui install-hook
 ## Canonical Links
 
 - Repo-wide agent rules: [`AGENTS.md`](./AGENTS.md)
-- Layout skill source: [`packages/ui/skills/dryui-layout/SKILL.md`](./packages/ui/skills/dryui-layout/SKILL.md)
-- CSS discipline and token rules: [`packages/ui/skills/dryui/rules/theming.md`](./packages/ui/skills/dryui/rules/theming.md)
+- Layout skill source: [`skills/dryui-layout/SKILL.md`](./skills/dryui-layout/SKILL.md)
+- CSS discipline and token rules: [`skills/dryui/rules/theming.md`](./skills/dryui/rules/theming.md)
 - Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
 - Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
 - Release flow: [`RELEASING.md`](./RELEASING.md)

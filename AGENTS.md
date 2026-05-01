@@ -6,7 +6,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Public overview: [`README.md`](./README.md)
 - Contributor workflow: [`CONTRIBUTING.md`](./CONTRIBUTING.md)
-- CSS discipline and token rules: [`packages/ui/skills/dryui/rules/theming.md`](./packages/ui/skills/dryui/rules/theming.md)
+- CSS discipline and token rules: [`skills/dryui/rules/theming.md`](./skills/dryui/rules/theming.md)
 - Accessibility policy: [`ACCESSIBILITY.md`](./ACCESSIBILITY.md)
 - Release flow: [`RELEASING.md`](./RELEASING.md)
 
@@ -14,10 +14,10 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Editor install snippets and MCP config examples live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts). Do not duplicate them elsewhere.
 - Skill sources live in:
-  - [`packages/ui/skills/dryui/`](./packages/ui/skills/dryui/)
-  - [`packages/ui/skills/dryui-layout/`](./packages/ui/skills/dryui-layout/)
-  - [`packages/feedback/skills/live-feedback/`](./packages/feedback/skills/live-feedback/)
-  - [`packages/cli/skills/init/`](./packages/cli/skills/init/)
+  - [`skills/dryui/`](./skills/dryui/)
+  - [`skills/dryui-layout/`](./skills/dryui-layout/)
+  - [`skills/dryui-live-feedback/`](./skills/dryui-live-feedback/)
+  - [`skills/dryui-init/`](./skills/dryui-init/)
 - Sync generated skill copies with `bun run sync:skills`. Do not edit `packages/plugin/skills/` or `.cursor/rules/` directly.
 - The local plugin source is [`packages/plugin`](./packages/plugin). `/plugins` refers to the in-app Codex or Claude install flow, not a repo directory.
 

@@ -211,7 +211,7 @@ if (missingFromSkill.size > 0) {
 			sorted(missingFromSkill)
 				.map((name) => `  - ${name}`)
 				.join('\n') +
-			`\n  Update packages/ui/skills/dryui/SKILL.md and packages/mcp/src/component-catalog.ts together.`
+			`\n  Update skills/dryui/SKILL.md and packages/mcp/src/component-catalog.ts together.`
 	);
 }
 
@@ -227,7 +227,7 @@ if (ghostInSkill.size > 0) {
 			sorted(ghostInSkill)
 				.map((name) => `  - ${name}`)
 				.join('\n') +
-			`\n  Remove from packages/ui/skills/dryui/SKILL.md and packages/mcp/src/component-catalog.ts together.`
+			`\n  Remove from skills/dryui/SKILL.md and packages/mcp/src/component-catalog.ts together.`
 	);
 }
 

@@ -1,6 +1,6 @@
 # `@dryui/ui` compound component upgrade
 
-Source: 10-cluster audit of `packages/ui/src/` on 2026-04-30. ~175 files audited (155 component dirs + 6 theme files + internal primitives + token-scope). Standards: `packages/ui/skills/dryui/rules/theming.md` and the `feedback_css_var_defaults` rule (default via `var(--name, fallback)` on consumption, never `--name: default` on the rendered element).
+Source: 10-cluster audit of `packages/ui/src/` on 2026-04-30. ~175 files audited (155 component dirs + 6 theme files + internal primitives + token-scope). Standards: `skills/dryui/rules/theming.md` and the `feedback_css_var_defaults` rule (default via `var(--name, fallback)` on consumption, never `--name: default` on the rendered element).
 
 ## Audit totals
 

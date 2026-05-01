@@ -252,7 +252,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the skill',
 				note: 'Copy to `.opencode/skills/` for the native OpenCode path. `.agents/skills/` also works if you want a shared cross-tool folder.',
-				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui`
+				code: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`
 			},
 			{
 				title: 'Add the MCP servers',
@@ -273,7 +273,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the skill',
 				note: 'Copy to `.github/skills/` for Copilot, or `.agents/skills/` for a cross-tool folder.',
-				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .github/skills/dryui`
+				code: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`
 			},
 			{
 				title: 'Add the MCP servers',
@@ -294,7 +294,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the skill',
 				note: 'Copy to `.cursor/skills/` or `.agents/skills/`.',
-				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui`
+				code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 			},
 			{
 				title: 'Add the MCP server',
@@ -314,7 +314,7 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the skill',
 				note: 'Copy to `.agents/skills/`.',
-				code: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui`
+				code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 			},
 			{
 				title: 'Add the MCP server',

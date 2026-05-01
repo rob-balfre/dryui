@@ -19,7 +19,7 @@ describe('feedback prompts', () => {
 		expect(prompt).toContain(
 			'Apply DryUI feedback submission sub-123 (from https://example.com/page)'
 		);
-		expect(prompt).toContain('node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md');
+		expect(prompt).toContain('.claude/skills/dryui-feedback/SKILL.md');
 		expect(prompt).toContain('run `dryui check`');
 		expect(prompt).toContain('call `feedback_resolve_submission`');
 		expect(prompt).toContain('If PRODUCT.md or DESIGN.md exists at the project root');

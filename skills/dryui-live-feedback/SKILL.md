@@ -1,6 +1,6 @@
 ---
-name: live-feedback
-description: 'Open the app for visual feedback, wait for submissions, and act on them.'
+name: dryui-live-feedback
+description: 'Open the DryUI app for visual feedback, wait for the user to annotate the page, then act on each submission via the dryui-feedback skill. Use when the user asks for live feedback, visual feedback, or to iterate on UI by drawing on it.'
 ---
 
 # Feedback
