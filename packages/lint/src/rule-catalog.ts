@@ -144,69 +144,38 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-raw-grid',
 		severity: 'error',
 		message:
-			'Do not use raw CSS grid ({value}). Use AreaGrid.Root and pass layout through AreaGrid CSS custom properties.',
-		suggestedFix: '<AreaGrid.Root> with --dry-area-grid-* custom properties'
+			'Do not use raw CSS grid ({value}). Move grid layout into a sanctioned layout primitive or scoped layout CSS.',
+		suggestedFix: 'Use a sanctioned layout primitive instead of raw CSS grid declarations.'
 	},
-	'dryui/area-grid-required-var': {
-		id: 'dryui/area-grid-required-var',
+	'dryui/layout-css-at-rule': {
+		id: 'dryui/layout-css-at-rule',
 		severity: 'error',
-		message:
-			'<{component}> requires {variable}. AreaGrid layouts must declare templates on Root and placed component children use --dry-grid-area-name.',
-		suggestedFix: 'Add the required AreaGrid CSS custom property explicitly.'
-	},
-	'dryui/area-grid-invalid-var': {
-		id: 'dryui/area-grid-invalid-var',
-		severity: 'error',
-		message: '{variable} is not supported on <{component}>. Use {target}.',
-		suggestedFix: 'Use the documented AreaGrid CSS custom property names.'
-	},
-	'dryui/area-grid-invalid-template': {
-		id: 'dryui/area-grid-invalid-template',
-		severity: 'error',
-		message: '{variable} on <{component}> must be static and valid for AreaGrid: {reason}',
+		message: 'src/layout.css only allows @container wrappers. Remove {atRule}.',
 		suggestedFix:
-			'Use quoted rows on AreaGrid.Root and literal --dry-grid-area-name on a component.'
+			'Move non-layout CSS out of src/layout.css, or use @container for layout variants.'
 	},
-	'dryui/area-grid-missing-area': {
-		id: 'dryui/area-grid-missing-area',
-		severity: 'error',
-		message: 'AreaGrid child area {area} is not present in {variable} on its Root.',
-		suggestedFix: 'Add the area name to every AreaGrid.Root template or update the child area name.'
-	},
-	'dryui/area-grid-missing-root': {
-		id: 'dryui/area-grid-missing-root',
-		severity: 'error',
-		message: '{variable}="{area}" must be used on a child element inside <AreaGrid.Root>.',
-		suggestedFix: 'Move the placed element inside <AreaGrid.Root>.'
-	},
-	'dryui/area-grid-no-area-part': {
-		id: 'dryui/area-grid-no-area-part',
+	'dryui/layout-css-selector': {
+		id: 'dryui/layout-css-selector',
 		severity: 'error',
 		message:
-			'Do not use <AreaGrid.Area>. Place a Svelte component with --dry-grid-area-name="..." instead.',
-		suggestedFix: 'Use --dry-grid-area-name on the placed component.'
+			'src/layout.css selectors must target [data-layout] or [data-layout-area] hooks. Invalid selector: {selector}',
+		suggestedFix: 'Use a [data-layout] or [data-layout-area] selector.'
 	},
-	'dryui/area-grid-single-root': {
-		id: 'dryui/area-grid-single-root',
+	'dryui/layout-css-property': {
+		id: 'dryui/layout-css-property',
 		severity: 'error',
-		message: 'Only one <AreaGrid.Root> is allowed per .svelte file.',
+		message:
+			'src/layout.css only supports spacing and CSS box-alignment properties. Invalid property: {property}',
 		suggestedFix:
-			'Use one AreaGrid.Root per file and place child components with --dry-grid-area-name.'
+			'Move visual styling, sizing, positioning, typography, and grid templates out of src/layout.css.'
 	},
-	'dryui/area-grid-no-gap': {
-		id: 'dryui/area-grid-no-gap',
+	'dryui/layout-css-value': {
+		id: 'dryui/layout-css-value',
 		severity: 'error',
 		message:
-			"AreaGrid.Root has no gap. Spacing between regions is each region's surface concern (border, padding, background).",
-		suggestedFix: 'Remove the gap attribute.'
-	},
-	'dryui/area-grid-no-padding': {
-		id: 'dryui/area-grid-no-padding',
-		severity: 'error',
-		message:
-			'AreaGrid.Root has no `padding` shorthand attribute. For shell or grid padding, set --dry-area-grid-shell-padding[-block|-inline] (gutter inside the max-width cap) or --dry-area-grid-padding[-block|-inline] (inset around the tracks). Inter-region spacing still belongs to the regions themselves.',
+			'src/layout.css only accepts DryUI spacing tokens, 0, calc() with DryUI spacing tokens, margin auto, and standard box-alignment keywords. Invalid {property}: {value}',
 		suggestedFix:
-			'Replace the padding attribute with --dry-area-grid-padding or --dry-area-grid-shell-padding.'
+			'Use var(--dry-space-*), 0, simple calc() expressions, margin auto, or box-alignment keywords.'
 	},
 	'bare-compound': {
 		id: 'bare-compound',

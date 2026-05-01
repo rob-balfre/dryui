@@ -14,7 +14,8 @@ export interface DryuiLintOptions {
 	exclude?: string[];
 	/**
 	 * Experimental migration rule. When enabled, raw CSS grid declarations are
-	 * flagged so app/layout code can move through AreaGrid.Root instead.
+	 * flagged so layout moves into a sanctioned layout primitive or scoped
+	 * layout CSS.
 	 */
 	forbidRawGrid?: boolean;
 	/**

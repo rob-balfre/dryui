@@ -10,6 +10,13 @@ export {
 	type Violation
 } from './rules.js';
 export {
+	checkLayoutCss,
+	dryuiLayoutCss,
+	type DryuiLayoutCssPluginOptions,
+	type LayoutCssCheckOptions,
+	type VitePluginLike
+} from './layout-css.js';
+export {
 	RULE_CATALOG,
 	formatRuleText,
 	ruleMessage,
