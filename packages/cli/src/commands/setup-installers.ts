@@ -1,14 +1,18 @@
-// dryui setup --install — Run the install steps for an editor's setup guide.
+// Per-editor install steps for `dryui init` and the interactive `dryui setup`
+// menu.
 //
 // Each installer:
-//   1. Pulls the DryUI skill into the editor's expected folder via `npx degit`.
-//   2. Merges the canonical MCP server block into the editor's JSON config,
-//      preserving any other servers and unrelated keys the user has set.
+//   1. Installs the DryUI skill via `npx skills add rob-balfre/dryui --agent
+//      <flag>` (or the legacy `npx degit` copy when DRYUI_SKILLS_LEGACY=1, or
+//      always for Zed since the upstream npx skills CLI does not list it).
+//   2. Merges the canonical MCP server block into the editor's JSON or TOML
+//      config, preserving any other servers and unrelated keys the user has
+//      set.
 //
 // Auto-install is intentionally limited to editors where both steps map onto
-// project-local files plus dedicated MCP config files. claude-code and codex
-// keep their guide-only flow because their canonical install requires an
-// interactive `/plugins` session in the editor itself.
+// project-local files plus dedicated MCP config files. claude-code keeps its
+// guide-only flow because its canonical install requires an interactive
+// `/plugins` session in the editor itself.
 
 import {
 	createProbeCache,
