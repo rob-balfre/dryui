@@ -1,6 +1,7 @@
 import { $ } from 'bun';
 import { readdir, exists, rm, realpath, lstat } from 'node:fs/promises';
 import { join, basename, relative } from 'node:path';
+import { parseFrontmatter } from './_skill-frontmatter';
 
 const root = join(import.meta.dir, '..');
 const layoutSkillSource = join(root, 'packages', 'ui', 'skills', 'dryui-layout');
@@ -71,24 +72,6 @@ async function removeStale(src: string, dest: string) {
 }
 
 // --- Cursor .mdc conversion ---
-
-function parseFrontmatter(content: string): { meta: Record<string, string>; body: string } {
-	const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-	if (!match) return { meta: {}, body: content };
-	const meta: Record<string, string> = {};
-	for (const line of match[1].split('\n')) {
-		const idx = line.indexOf(':');
-		if (idx > 0) {
-			const key = line.slice(0, idx).trim();
-			const val = line
-				.slice(idx + 1)
-				.trim()
-				.replace(/^['"]|['"]$/g, '');
-			meta[key] = val;
-		}
-	}
-	return { meta, body: match[2] };
-}
 
 function toMdc(opts: {
 	description: string;

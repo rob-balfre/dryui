@@ -37,6 +37,15 @@ if echo "$STAGED" | grep -qE '^packages/ui/src/themes/.*\.css$'; then
   git add packages/mcp/src/theme-tokens.generated.json
 fi
 
+# Validate every staged SKILL.md against the npx skills spec
+# (frontmatter present, name=dirname, description length budget).
+# This runs BEFORE sync:skills so a malformed skill cannot poison the
+# generated plugin mirror.
+if echo "$STAGED" | grep -qE '/SKILL\.md$|^skills/'; then
+  echo "[pre-commit] SKILL.md changed — validating frontmatter..."
+  bun run validate:skills || exit 1
+fi
+
 # Resync packages/plugin/skills/* and .cursor/rules/* when a skill source
 # changes. postinstall runs sync:skills too, but only on `bun install`; a
 # raw edit+commit can otherwise ship a stale plugin copy (which dirties CI
