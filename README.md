@@ -10,7 +10,7 @@ Docs and editor setup: <https://dryui.dev/getting-started>
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                |
 | `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                      |
-| `@dryui/lint`            | Svelte preprocessor that enforces DryUI CSS discipline                                                                    |
+| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                     |
 | `@dryui/cli`             | CLI for setup, discovery, install planning, static contract checks, tokens, and feedback tooling                          |
 | `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor component discovery, contract validation, a11y, and token correctness |
 | `@dryui/theme-wizard`    | Optional guided theme generator                                                                                           |
@@ -20,7 +20,20 @@ Docs and editor setup: <https://dryui.dev/getting-started>
 
 ## Quick Start
 
-Start with the CLI:
+Start with the CLI. Always check for a local DryUI link before installing globally:
+
+```bash
+readlink ~/.bun/install/global/node_modules/@dryui/cli
+```
+
+If the link points at this repo's `packages/cli`, keep it and use local source mode:
+
+```bash
+bun run dev:link
+DRYUI_DEV=1 dryui
+```
+
+Only install the published CLI when no local link exists and you are not iterating on DryUI source:
 
 ```bash
 bun install -g @dryui/cli@latest
@@ -63,6 +76,35 @@ The CLI is the default entry point. Once it is working, add the skill and MCP la
 Repo contributors should treat [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts) as the canonical setup source for editor snippets and MCP config examples.
 
 Use `dryui check [path]` for static validation of component contracts, a11y, tokens, and CSS discipline. The MCP `check` tool mirrors this surface.
+
+## Layout CSS Discipline
+
+DryUI ships no layout component. Page and section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. All `display: grid` and `display: flex` declarations in consumer code live there (or in `@container` blocks within it).
+
+`src/layout.css` is imported last from `src/routes/+layout.svelte`, after DryUI theme CSS and `../app.css`. Mobile-first base; use `@container` queries for responsive shifts, never `@media` for layout breakpoints.
+
+Wire both lint surfaces:
+
+```js
+// svelte.config.js
+import { dryuiLint } from '@dryui/lint';
+
+export default {
+	preprocess: [dryuiLint({ strict: true })]
+};
+```
+
+```ts
+// vite.config.ts
+import { sveltekit } from '@sveltejs/kit/vite';
+import { dryuiLayoutCss } from '@dryui/lint';
+
+export default {
+	plugins: [dryuiLayoutCss(), sveltekit()]
+};
+```
+
+`dryuiLayoutCss()` runs during Vite dev startup, HMR updates, and builds. Missing `src/layout.css` logs a warning only; violations throw.
 
 ## Design Guidance
 

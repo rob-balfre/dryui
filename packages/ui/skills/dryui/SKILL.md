@@ -90,27 +90,49 @@ The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero i
 
 Theming precedence beats design opinion. If impeccable guidance conflicts with DryUI theme contracts, tokens, or accessibility rules, DryUI wins.
 
-## 4. Grid for Layout. Container for Width. @container for Responsive.
+## 4. Layout in `src/layout.css`. @container for Responsive.
 
 **Nothing else.**
 
-- All layout is `display: grid` with `--dry-space-*` tokens in scoped `<style>`.
+- DryUI does not ship a layout component. Page and section structure live as plain CSS Grid in `src/layout.css`, scoped under a stable `[data-layout="<name>"]` selector. Use the `dryui-layout` skill.
+- All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Nowhere else: no grid/flex in component `<style>` blocks, no `style=` inline, no `style:` directives.
 - `Container` (simple component, no `.Root`) for constrained content width.
-- Use `@container` queries for responsive sizing. Never `@media` for layout breakpoints.
-- No flexbox. No inline styles. No `width`/`min-width`/`max-width` properties.
+- Use `@container` queries for responsive sizing. Mobile-first base; never `@media` for layout breakpoints.
+- Children opt into a grid area by passing `--dry-grid-area-name="<area>"` (Svelte's `--prop` syntax). The boilerplate selector in `layout.css` translates that into `grid-area`.
 
 ```svelte
-<div class="layout">...</div>
-
-<style>
-	.layout {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-</style>
+<div data-layout="docs-shell">
+	<Nav --dry-grid-area-name="aside" />
+	<Article --dry-grid-area-name="main" />
+</div>
 ```
 
-The test: grep your output for `display: flex`, `style=`, `@media`. All should return nothing.
+```css
+[data-layout='docs-shell'] {
+	container-type: inline-size;
+	container-name: docs-shell;
+	display: grid;
+	grid-template-areas: 'main' 'aside';
+}
+
+[data-layout='docs-shell'] > svelte-css-wrapper {
+	display: contents;
+}
+
+[data-layout='docs-shell'] > *,
+[data-layout='docs-shell'] > svelte-css-wrapper > * {
+	grid-area: var(--dry-grid-area-name, auto);
+}
+
+@container docs-shell (min-width: 720px) {
+	[data-layout='docs-shell'] {
+		grid-template-areas: 'aside main';
+		grid-template-columns: 16rem minmax(0, 1fr);
+	}
+}
+```
+
+The test: grep your component `<style>` blocks for `display: grid`, `display: flex`, `style=`, `@media`. All should return nothing in consumer code; layout lives in `src/layout.css`.
 
 ## 4A. Escape Hatches Mean Stop.
 
@@ -170,7 +192,20 @@ The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either 
 
 ## Quick Start
 
-**1. Install the CLI** so every subsequent command is short and fast:
+**1. Check for a local CLI link before installing.** A global install replaces Bun's local link, so inspect it first:
+
+```bash
+readlink ~/.bun/install/global/node_modules/@dryui/cli
+```
+
+If the link points at a local DryUI checkout's `packages/cli`, do not run `bun install -g @dryui/cli@latest` or `npm install -g @dryui/cli@latest`. In the DryUI monorepo, restore or refresh local source mode instead:
+
+```bash
+bun run dev:link
+DRYUI_DEV=1 dryui
+```
+
+Only install the published CLI when no local link exists and you are not iterating on DryUI source:
 
 ```bash
 bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
@@ -197,7 +232,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 **4. Add the editor integration layer** after the CLI is working:
 
 - Claude Code: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui` (plugin is the canonical Claude skill install path)
-- Codex (0.121.0+): `codex marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
+- Codex (0.121.0+): `codex plugin marketplace add rob-balfre/dryui`, then start `codex`, run `/plugins`, and install `DryUI` (plugin is the canonical Codex skill install path)
 - OpenCode: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui` + add the `dryui` and `dryui-feedback` local MCP servers in `opencode.json` (OpenCode also loads `.agents/skills/dryui` and reads `AGENTS.md`)
 - Copilot/Cursor/Windsurf: `npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui` + add MCP config (see https://dryui.dev/tools)
 
@@ -206,7 +241,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 ### Manual setup
 
 1. `bun add @dryui/ui`
-2. `bun add -d @dryui/lint`. Enforces grid-only layout, bans flexbox/inline-style/width at build time. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
+2. `bun add -d @dryui/lint`. Enforces grid-only layout, bans flexbox/inline-style/width during Svelte preprocessing, and checks `src/layout.css` during Vite dev/HMR and build. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
 3. Wire the lint preprocessor in `svelte.config.js` (add `dryuiLint` as the **first** item in the `preprocess` array):
 
    ```js
@@ -226,17 +261,29 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
    export default config;
    ```
 
-4. Add `class="theme-auto"` to `<html>` in `src/app.html`.
-5. In root layout (`src/routes/+layout.svelte`), import themes:
+4. Wire the layout CSS Vite plugin in `vite.config.ts`:
+
+   ```ts
+   import { dryuiLayoutCss } from '@dryui/lint';
+
+   export default {
+   	plugins: [dryuiLayoutCss()]
+   };
+   ```
+
+   Put `dryuiLayoutCss()` before `sveltekit()` when both are present. It warns if `src/layout.css` is missing and throws on violations during dev startup, HMR, and build.
+
+5. Add `class="theme-auto"` to `<html>` in `src/app.html`.
+6. In root layout (`src/routes/+layout.svelte`), import themes:
    ```svelte
    <script>
    	import '@dryui/ui/themes/default.css';
    	import '@dryui/ui/themes/dark.css';
    </script>
    ```
-6. Import `app.css` AFTER theme CSS if you have custom styles.
+7. Import `app.css` AFTER theme CSS if you have custom styles, then import `../layout.css` last for global layout hooks.
 
-> `dryui init` applies all six steps automatically. Prefer it over manual setup when you can.
+> `dryui init` applies all seven steps automatically. Prefer it over manual setup when you can.
 
 ## Bindable Props, Common Confusion
 
@@ -260,7 +307,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### CLI (default entry point)
 
-Install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`), then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
+Before installing globally, always check `readlink ~/.bun/install/global/node_modules/@dryui/cli`. If it points at a local DryUI checkout's `packages/cli`, keep the link and use `bun run dev:link` plus `DRYUI_DEV=1` instead of reinstalling. Only install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`) when no local link exists and you are not iterating on DryUI source. Then use the short form below. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass `--text` for human-readable plain text, `--json` where supported, or `--full` to disable truncation.
 
 ```bash
 dryui                           # default onboarding entry point
