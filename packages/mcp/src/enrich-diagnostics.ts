@@ -87,6 +87,22 @@ const HINTS: Record<string, HintBuilder> = {
 		hint: 'Unset only the properties you mean to reset (margin, padding, border, background, color, font). `all: unset` nukes user-agent accessibility defaults and breaks forms.',
 		docsRef: `${DOCS_BASE}/concepts/rules#no-all-unset`
 	}),
+	'lint/dryui/layout-css-at-rule': () => ({
+		hint: 'Keep src/layout.css limited to layout hooks and @container wrappers. Move imports, media queries, theme rules, and visual styling to the owning CSS file.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
+	'lint/dryui/layout-css-selector': () => ({
+		hint: 'Select only [data-layout] and [data-layout-area] hooks in src/layout.css. Add the hook to the layout root or placed child instead of targeting classes or component internals.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
+	'lint/dryui/layout-css-property': () => ({
+		hint: 'src/layout.css only owns whitespace and box alignment. Use padding, margin, gap, row-gap, column-gap, align-*, justify-*, or place-*; move other styling elsewhere.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
+	'lint/dryui/layout-css-value': () => ({
+		hint: 'Use DryUI spacing tokens for layout spacing: var(--dry-space-*), 0, token-only calc(), and auto for margins. Alignment values must be standard box-alignment keywords.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
 	'lint/dryui/prefer-focus-ring-token': () => ({
 		hint: 'Use var(--dry-color-stroke-focus) for focus outlines so the ring stays in sync with theme swaps.',
 		docsRef: `${DOCS_BASE}/concepts/theming#focus-ring`
@@ -94,6 +110,26 @@ const HINTS: Record<string, HintBuilder> = {
 	'lint/project/theme-import-order': () => ({
 		hint: 'Import theme.css BEFORE any component CSS (including app.css). Otherwise component defaults lose the token cascade.',
 		docsRef: `${DOCS_BASE}/getting-started#theme-import-order`
+	}),
+	'lint/project/missing-lint-dependency': () => ({
+		hint: 'Install @dryui/lint as a dev dependency. It supplies both dryuiLint for Svelte preprocessing and dryuiLayoutCss for Vite dev/HMR/build checks.',
+		docsRef: `${DOCS_BASE}/getting-started#lint`
+	}),
+	'lint/project/missing-lint-preprocessor': () => ({
+		hint: 'Import dryuiLint from @dryui/lint and put dryuiLint({ strict: true }) first in the svelte.config preprocess array.',
+		docsRef: `${DOCS_BASE}/getting-started#lint`
+	}),
+	'lint/project/missing-layout-css-plugin': () => ({
+		hint: 'Import dryuiLayoutCss from @dryui/lint and add dryuiLayoutCss() before sveltekit() in vite.config so layout.css violations surface in dev and build.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
+	'lint/project/missing-layout-css': () => ({
+		hint: 'Create src/layout.css for agent-authored layout hooks. Keep it limited to [data-layout] / [data-layout-area] selectors, whitespace properties, and box alignment.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
+	}),
+	'lint/project/missing-layout-css-import': () => ({
+		hint: 'Import ../layout.css from src/routes/+layout.svelte after DryUI theme CSS and ../app.css so layout hooks load last.',
+		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 
 	// ── theme-checker codes ───────────────────────────────────────────────────

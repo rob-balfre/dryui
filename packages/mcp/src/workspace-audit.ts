@@ -1,8 +1,9 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, realpathSync, statSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
+import { checkLayoutCss } from '@dryui/lint/layout-css';
 import { checkThemeImportOrder, fixThemeImportOrder } from '@dryui/lint/rules';
-import { ruleSuggestedFix } from '@dryui/lint/rule-catalog';
+import { ruleSuggestedFix, type RuleCatalogId } from '@dryui/lint/rule-catalog';
 import {
 	detectProject,
 	type ProjectDetection,
@@ -225,6 +226,10 @@ function isThemeCssFilename(path: string): boolean {
 	return /\.theme\.css$/i.test(normalizePath(path));
 }
 
+function isLayoutCssPath(path: string): boolean {
+	return normalizePath(path).endsWith('src/layout.css');
+}
+
 function hasDryThemeDirective(content: string): boolean {
 	return DRYUI_THEME_DIRECTIVE_RE.test(content.slice(0, 2000));
 }
@@ -338,6 +343,74 @@ function projectFindings(
 		);
 	}
 
+	if (result.dependencies.ui && !result.dependencies.lint) {
+		findings.push(
+			toFinding(
+				packageFile,
+				null,
+				'project/missing-lint-dependency',
+				'error',
+				'Install @dryui/lint so DryUI CSS discipline runs during dev and build.',
+				'bun add -d @dryui/lint'
+			)
+		);
+	}
+
+	if (result.dependencies.ui && result.dependencies.lint && !result.lint.preprocessorWired) {
+		const targetPath = result.files.svelteConfig ?? packageJsonPath;
+		findings.push(
+			toFinding(
+				normalizePath(relative(root, targetPath)),
+				null,
+				'project/missing-lint-preprocessor',
+				'error',
+				'Wire dryuiLint into svelte.config so component CSS and markup rules run during Svelte preprocessing.',
+				"import { dryuiLint } from '@dryui/lint';"
+			)
+		);
+	}
+
+	if (result.dependencies.ui && result.dependencies.lint && !result.lint.layoutCssPluginWired) {
+		const targetPath = result.files.viteConfig ?? packageJsonPath;
+		findings.push(
+			toFinding(
+				normalizePath(relative(root, targetPath)),
+				null,
+				'project/missing-layout-css-plugin',
+				'error',
+				'Wire dryuiLayoutCss() into vite.config so src/layout.css is checked during Vite dev, HMR, and build.',
+				"import { dryuiLayoutCss } from '@dryui/lint';\nplugins: [dryuiLayoutCss()]"
+			)
+		);
+	}
+
+	if (result.dependencies.ui && !result.files.layoutCss) {
+		findings.push(
+			toFinding(
+				normalizePath(relative(root, resolve(dirname(packageJsonPath), 'src/layout.css'))),
+				null,
+				'project/missing-layout-css',
+				'warning',
+				'Create src/layout.css for DryUI layout-only styles.',
+				'/* Layout-only hooks for data-layout and data-layout-area selectors. */\n'
+			)
+		);
+	}
+
+	if (result.dependencies.ui && result.files.layoutCss && !result.theme.layoutCssImported) {
+		const targetPath = result.files.rootLayout ?? result.files.layoutCss;
+		findings.push(
+			toFinding(
+				normalizePath(relative(root, targetPath)),
+				null,
+				'project/missing-layout-css-import',
+				'warning',
+				'Import src/layout.css from the root layout after theme CSS and app.css.',
+				"import '../layout.css';"
+			)
+		);
+	}
+
 	return { findings, project: result, warnings };
 }
 
@@ -382,6 +455,20 @@ function themeFindings(
 			issue.severity,
 			issue.message,
 			issue.fix
+		)
+	);
+}
+
+function layoutCssFindings(root: string, filePath: string, content: string): WorkspaceFinding[] {
+	const result = checkLayoutCss(content, normalizePath(relative(root, filePath)));
+	return result.map((issue) =>
+		toFinding(
+			normalizePath(relative(root, filePath)),
+			issue.line,
+			issue.rule,
+			'error',
+			issue.message,
+			ruleSuggestedFix(issue.rule as RuleCatalogId)
 		)
 	);
 }
@@ -521,6 +608,11 @@ export function scanWorkspace(
 
 		if (file.endsWith('.svelte')) {
 			findings.push(...reviewFindings(root, absPath, content, spec));
+			continue;
+		}
+
+		if (file.endsWith('.css') && isLayoutCssPath(file)) {
+			findings.push(...layoutCssFindings(root, absPath, content));
 			continue;
 		}
 

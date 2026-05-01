@@ -103,6 +103,19 @@ describe('runCheck', () => {
 		expect(output).toContain('wrong-type');
 	});
 
+	test('src/layout.css runs layout lint instead of theme token diagnosis', () => {
+		const root = createProject({
+			'src/layout.css': '[data-layout] { display: flex; --dry-color-bg-base: 4px; }'
+		});
+
+		const output = runCheck(spec, { path: 'src/layout.css' }, { cwd: root });
+
+		expect(output).toContain('kind: layout-css');
+		expect(output).toContain('dryui/no-flex');
+		expect(output).not.toContain('kind: theme');
+		expect(output).not.toContain('wrong-type');
+	});
+
 	test('runCheckStructured emits enriched diagnostics for component violations', () => {
 		const root = createProject({
 			'Example.svelte': '<div style="color: red">hello</div>'

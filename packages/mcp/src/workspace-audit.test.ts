@@ -197,6 +197,137 @@ describe('scanWorkspace', () => {
 		).toBe(true);
 	});
 
+	test('warns when a DryUI project has no src/layout.css', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				'</script>'
+			].join('\n'),
+			'src/app.css': ':root { --dry-color-bg-base: #111; }'
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const finding = report.findings.find((item) => item.ruleId === 'project/missing-layout-css');
+
+		expect(finding?.severity).toBe('warning');
+		expect(finding?.file).toBe('src/layout.css');
+	});
+
+	test('surfaces layout.css violations without routing the file through theme diagnostics', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': ':root { --dry-color-bg-base: #111; }',
+			'src/layout.css': '[data-layout] { display: flex; --dry-color-fill-brand: 16px; }',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				"  import '../layout.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+
+		expect(report.findings.some((finding) => finding.ruleId === 'dryui/no-flex')).toBe(true);
+		expect(report.findings.some((finding) => finding.ruleId === 'theme/wrong-type')).toBe(false);
+	});
+
+	test('warns when src/layout.css exists but the root layout does not import it', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': ':root { --dry-color-bg-base: #111; }',
+			'src/layout.css': '',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const finding = report.findings.find(
+			(item) => item.ruleId === 'project/missing-layout-css-import'
+		);
+
+		expect(finding?.severity).toBe('warning');
+		expect(finding?.file).toBe('src/routes/+layout.svelte');
+	});
+
+	test('errors when the layout CSS Vite plugin is not wired', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				},
+				devDependencies: {
+					'@dryui/lint': 'workspace:*'
+				}
+			}),
+			'svelte.config.js': [
+				"import { dryuiLint } from '@dryui/lint';",
+				'',
+				'export default {',
+				'  preprocess: [dryuiLint({ strict: true })]',
+				'};'
+			].join('\n'),
+			'vite.config.ts': [
+				"import { sveltekit } from '@sveltejs/kit/vite';",
+				'',
+				'export default { plugins: [sveltekit()] };'
+			].join('\n'),
+			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': ':root { --dry-color-bg-base: #111; }',
+			'src/layout.css': '',
+			'src/routes/+layout.svelte': [
+				'<script lang="ts">',
+				"  import '@dryui/ui/themes/default.css';",
+				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				"  import '../layout.css';",
+				'</script>'
+			].join('\n')
+		});
+
+		const report = scanWorkspace(mockSpec, { cwd: root });
+		const finding = report.findings.find(
+			(item) => item.ruleId === 'project/missing-layout-css-plugin'
+		);
+
+		expect(finding?.severity).toBe('error');
+		expect(finding?.file).toBe('vite.config.ts');
+	});
+
 	test('surfaces theme-import-order in a +layout.svelte with wrong order', () => {
 		const root = createProject({
 			'package.json': JSON.stringify({

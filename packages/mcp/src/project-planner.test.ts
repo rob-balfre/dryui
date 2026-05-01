@@ -44,6 +44,15 @@ const LINT_WIRED_SVELTE_CONFIG = [
 	'};'
 ].join('\n');
 
+const LAYOUT_PLUGIN_VITE_CONFIG = [
+	"import { sveltekit } from '@sveltejs/kit/vite';",
+	"import { dryuiLayoutCss } from '@dryui/lint';",
+	'',
+	'export default {',
+	'  plugins: [dryuiLayoutCss(), sveltekit()]',
+	'};'
+].join('\n');
+
 describe('detectProject', () => {
 	test('detects a configured SvelteKit project', () => {
 		const root = createProject({
@@ -59,11 +68,16 @@ describe('detectProject', () => {
 			}),
 			'bun.lock': '',
 			'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'src/app.html': '<html class="theme-auto"></html>',
+			'src/app.css': '',
+			'src/layout.css': '',
 			'src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../app.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n'),
 			'src/routes/+page.svelte': '<h1>Home</h1>'
@@ -76,10 +90,14 @@ describe('detectProject', () => {
 		expect(result.packageManager).toBe('bun');
 		expect(result.theme.themeAuto).toBe(true);
 		expect(result.theme.defaultImported).toBe(true);
+		expect(result.theme.layoutCssImported).toBe(true);
 		expect(result.dependencies.lint).toBe(true);
 		expect(result.lint.preprocessorWired).toBe(true);
+		expect(result.lint.layoutCssPluginWired).toBe(true);
 		expect(result.files.svelteConfig).toBe(resolve(root, 'svelte.config.js'));
+		expect(result.files.viteConfig).toBe(resolve(root, 'vite.config.ts'));
 		expect(result.files.rootPage).toBe(resolve(root, 'src/routes/+page.svelte'));
+		expect(result.files.layoutCss).toBe(resolve(root, 'src/layout.css'));
 	});
 
 	test('detects @dryui/feedback dependency and a mounted <Feedback /> in the root layout', () => {
@@ -164,7 +182,9 @@ describe('detectProject', () => {
 				}
 			}),
 			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/layout.css': '',
 			'apps/docs/src/app.css': [
 				"@import '@dryui/ui/themes/default.css';",
 				"@import '@dryui/ui/themes/dark.css';"
@@ -172,6 +192,7 @@ describe('detectProject', () => {
 			'apps/docs/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '../app.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n'),
 			'apps/docs/src/routes/+page.svelte': '<h1>Home</h1>'
@@ -208,11 +229,14 @@ describe('detectProject', () => {
 			}),
 			'hammerfall-dryui/bun.lock': '',
 			'hammerfall-dryui/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'hammerfall-dryui/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'hammerfall-dryui/src/app.html': '<html class="theme-auto"></html>',
+			'hammerfall-dryui/src/layout.css': '',
 			'hammerfall-dryui/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n')
 		});
@@ -361,11 +385,14 @@ describe('detectProject', () => {
 			}),
 			'apps/docs/bun.lock': '',
 			'apps/docs/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/docs/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'apps/docs/src/app.html': '<html class="theme-auto"></html>',
+			'apps/docs/src/layout.css': '',
 			'apps/docs/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n'),
 			'examples/demo/package.json': JSON.stringify({
@@ -408,11 +435,14 @@ describe('detectProject', () => {
 			}),
 			'apps/web/bun.lock': '',
 			'apps/web/svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'apps/web/vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'apps/web/src/app.html': '<html class="theme-auto"></html>',
+			'apps/web/src/layout.css': '',
 			'apps/web/src/routes/+layout.svelte': [
 				'<script lang="ts">',
 				"  import '@dryui/ui/themes/default.css';",
 				"  import '@dryui/ui/themes/dark.css';",
+				"  import '../layout.css';",
 				'</script>'
 			].join('\n'),
 			'packages/ui/package.json': JSON.stringify({
@@ -508,6 +538,11 @@ describe('planInstall', () => {
 				'',
 				'export default { kit: { adapter: adapter() } };'
 			].join('\n'),
+			'vite.config.ts': [
+				"import { sveltekit } from '@sveltejs/kit/vite';",
+				'',
+				'export default { plugins: [sveltekit()] };'
+			].join('\n'),
 			'src/app.html': '<html></html>'
 		});
 
@@ -518,12 +553,15 @@ describe('planInstall', () => {
 			'Install @dryui/ui',
 			'Install @dryui/lint',
 			'Create root layout with theme imports',
+			'Create layout stylesheet',
 			'Set html theme mode to auto',
-			'Wire dryuiLint into svelte.config'
+			'Wire dryuiLint into svelte.config',
+			'Wire dryuiLayoutCss into vite.config'
 		]);
 		expect(plan.steps[0]?.command).toBe('npm install @dryui/ui');
 		expect(plan.steps[1]?.command).toBe('npm install -D @dryui/lint');
-		expect(plan.steps.at(-1)?.path).toBe(resolve(root, 'svelte.config.js'));
+		expect(plan.steps.at(-2)?.path).toBe(resolve(root, 'svelte.config.js'));
+		expect(plan.steps.at(-1)?.path).toBe(resolve(root, 'vite.config.ts'));
 	});
 
 	test('edits app.css when the root layout imports it', () => {
@@ -539,6 +577,7 @@ describe('planInstall', () => {
 				}
 			}),
 			'svelte.config.js': LINT_WIRED_SVELTE_CONFIG,
+			'vite.config.ts': LAYOUT_PLUGIN_VITE_CONFIG,
 			'src/app.html': '<html class="theme-auto"></html>',
 			'src/app.css': 'body { margin: 0; }',
 			'src/routes/+layout.svelte': [
@@ -550,8 +589,37 @@ describe('planInstall', () => {
 
 		const plan = planInstall(mockSpec, root);
 
-		expect(plan.steps.map((step) => step.title)).toEqual(['Add theme imports to app.css']);
+		expect(plan.steps.map((step) => step.title)).toEqual([
+			'Add theme imports to app.css',
+			'Create layout stylesheet',
+			'Import layout.css in the root layout'
+		]);
 		expect(plan.steps[0]?.path).toBe(resolve(root, 'src/app.css'));
+	});
+
+	test('scaffold plan creates layout.css and imports it last from the root layout', () => {
+		const root = createProject({});
+		const plan = planInstall(mockSpec, root, { packageManager: 'bun', strictTarget: true });
+		const layoutCssStep = plan.steps.find((step) => step.path === resolve(root, 'src/layout.css'));
+		const layoutStep = plan.steps.find(
+			(step) => step.path === resolve(root, 'src/routes/+layout.svelte')
+		);
+		const pageStep = plan.steps.find(
+			(step) => step.path === resolve(root, 'src/routes/+page.svelte')
+		);
+
+		expect(layoutCssStep?.kind).toBe('create-file');
+		expect(layoutStep?.snippet).toContain("import '../layout.css';");
+		expect(pageStep?.snippet).toContain(
+			"import { Card, Container, Heading, Text } from '@dryui/ui';"
+		);
+		const viteStep = plan.steps.find((step) => step.path === resolve(root, 'vite.config.ts'));
+		expect(viteStep?.snippet).toContain('dryuiLayoutCss()');
+		const layout = layoutStep?.snippet ?? '';
+		expect(layout.indexOf("'@dryui/ui/themes/default.css'")).toBeLessThan(
+			layout.indexOf("'../app.css'")
+		);
+		expect(layout.indexOf("'../app.css'")).toBeLessThan(layout.indexOf("'../layout.css'"));
 	});
 
 	test('emits lint install + wiring steps when both are missing', () => {
@@ -569,6 +637,11 @@ describe('planInstall', () => {
 				'',
 				'export default { kit: { adapter: adapter() } };'
 			].join('\n'),
+			'vite.config.ts': [
+				"import { sveltekit } from '@sveltejs/kit/vite';",
+				'',
+				'export default { plugins: [sveltekit()] };'
+			].join('\n'),
 			'src/app.html': '<html class="theme-auto"></html>',
 			'src/routes/+layout.svelte': [
 				'<script lang="ts">',
@@ -583,6 +656,7 @@ describe('planInstall', () => {
 		const titles = plan.steps.map((step) => step.title);
 		expect(titles).toContain('Install @dryui/lint');
 		expect(titles).toContain('Wire dryuiLint into svelte.config');
+		expect(titles).toContain('Wire dryuiLayoutCss into vite.config');
 
 		const installStep = plan.steps.find((step) => step.title === 'Install @dryui/lint');
 		expect(installStep?.command).toBe('bun add -d @dryui/lint');
@@ -590,6 +664,11 @@ describe('planInstall', () => {
 		const wireStep = plan.steps.find((step) => step.title === 'Wire dryuiLint into svelte.config');
 		expect(wireStep?.kind).toBe('edit-file');
 		expect(wireStep?.path).toBe(resolve(root, 'svelte.config.js'));
+		const viteStep = plan.steps.find(
+			(step) => step.title === 'Wire dryuiLayoutCss into vite.config'
+		);
+		expect(viteStep?.kind).toBe('edit-file');
+		expect(viteStep?.path).toBe(resolve(root, 'vite.config.ts'));
 		expect(wireStep?.snippet).toContain("import { dryuiLint } from '@dryui/lint'");
 	});
 

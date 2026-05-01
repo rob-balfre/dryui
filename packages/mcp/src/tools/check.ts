@@ -1,6 +1,7 @@
 import { readFileSync, statSync, type Stats } from 'node:fs';
 import { resolve } from 'node:path';
 import { checkComponent } from '../component-checker.js';
+import { checkLayoutCss } from '@dryui/lint/layout-css';
 import { diagnoseTheme } from '../theme-checker.js';
 import { scanWorkspace, type WorkspaceReport } from '../workspace-audit.js';
 import { FIELD_CAP, formatHelp, header, row, truncateField } from '../toon.js';
@@ -202,6 +203,46 @@ function renderTheme(spec: Spec, absPath: string): CheckResult {
 	return { text, diagnostics, summary };
 }
 
+function isLayoutCssPath(path: string): boolean {
+	return displayPath(path).replaceAll('\\', '/').endsWith('src/layout.css');
+}
+
+function renderLayoutCss(absPath: string): CheckResult {
+	const css = readFileSync(absPath, 'utf-8');
+	const rel = displayPath(absPath);
+	const result = checkLayoutCss(css, rel);
+	const issues: CheckIssue[] = result.map((issue) => ({
+		file: rel,
+		line: issue.line,
+		rule: issue.rule,
+		severity: 'error',
+		message: issue.message,
+		suggestedFix: null
+	}));
+	const diagnostics = dedupeDiagnostics(
+		result.map((issue) =>
+			enrichDiagnostic({
+				source: 'lint' as const,
+				code: issue.rule,
+				severity: 'error' as const,
+				message: issue.message,
+				file: rel,
+				line: issue.line
+			})
+		)
+	);
+	const summary = deriveDiagnosticSummary(diagnostics);
+	const text = renderCheckReport({
+		kind: 'layout-css',
+		targetLine: `target: ${rel}`,
+		issues,
+		diagnosticSummary: summary,
+		summaryLine: result.length === 0 ? 'clean' : `${result.length} layout CSS issue(s)`,
+		nextHints: ['ask --scope setup "" -- review project bootstrap and layout CSS guidance']
+	});
+	return { text, diagnostics, summary };
+}
+
 function renderComponent(spec: Spec, absPath: string): CheckResult {
 	const code = readFileSync(absPath, 'utf-8');
 	const result = checkComponent(code, spec, absPath);
@@ -274,6 +315,9 @@ function renderWorkspace(result: WorkspaceReport): CheckResult {
 			} else if (finding.ruleId.startsWith('component/')) {
 				source = 'lint';
 				code = finding.ruleId.slice('component/'.length);
+			} else if (finding.ruleId.startsWith('dryui/')) {
+				source = 'lint';
+				code = finding.ruleId;
 			} else {
 				source = 'workspace';
 				code = finding.ruleId;
@@ -358,6 +402,9 @@ export function runCheckStructured(
 	}
 
 	if (absPath.endsWith('.css')) {
+		if (isLayoutCssPath(absPath)) {
+			return renderLayoutCss(absPath);
+		}
 		return renderTheme(spec, absPath);
 	}
 

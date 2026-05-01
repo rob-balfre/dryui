@@ -396,7 +396,7 @@ All components support CSS variable theming. Override at the :root level or comp
 
 The CLI is the default entry point for working with DryUI. Start with bare \`dryui\` for editor integration and feedback onboarding, then use it for project bootstrapping, deterministic project detection, install/add planning, source retrieval, composition guidance, and validation.
 
-Install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`). Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
+Before installing globally, always check \`readlink ~/.bun/install/global/node_modules/@dryui/cli\`. If it points at a local DryUI checkout's \`packages/cli\`, keep the link and use \`bun run dev:link\` plus \`DRYUI_DEV=1\` instead of reinstalling. Only install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`) when no local link exists and you are not iterating on DryUI source. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
 
 Current command surface: ${cliCommands.join(', ')}.
 
@@ -425,7 +425,7 @@ After the CLI is working, DryUI also ships an MCP server (live tools) and a skil
 ### Install
 
 - **Claude Code**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui\` (plugin is the canonical Claude skill install path)
-- **Codex** (0.121.0+): \`codex marketplace add rob-balfre/dryui\`, then start \`codex\`, run \`/plugins\`, and install \`DryUI\` (plugin is the canonical Codex skill install path)
+- **Codex** (0.121.0+): \`codex plugin marketplace add rob-balfre/dryui\`, then start \`codex\`, run \`/plugins\`, and install \`DryUI\` (plugin is the canonical Codex skill install path)
 - **OpenCode**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .opencode/skills/dryui\` + add local MCP servers in \`opencode.json\`
 - **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/packages/ui/skills/dryui .agents/skills/dryui\` + add MCP config
 - **Zed**: MCP only (reads AGENTS.md for conventions)

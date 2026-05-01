@@ -43,17 +43,21 @@ export interface ProjectDetection {
 	readonly files: {
 		readonly appHtml: string | null;
 		readonly appCss: string | null;
+		readonly layoutCss: string | null;
 		readonly rootLayout: string | null;
 		readonly rootPage: string | null;
 		readonly svelteConfig: string | null;
+		readonly viteConfig: string | null;
 	};
 	readonly theme: {
 		readonly defaultImported: boolean;
 		readonly darkImported: boolean;
+		readonly layoutCssImported: boolean;
 		readonly themeAuto: boolean;
 	};
 	readonly lint: {
 		readonly preprocessorWired: boolean;
+		readonly layoutCssPluginWired: boolean;
 	};
 	readonly feedback: {
 		readonly layoutPath: string | null;
@@ -299,6 +303,12 @@ function importsAppCss(rootLayoutPath: string | null): boolean {
 	return content.includes('app.css');
 }
 
+function importsLayoutCss(rootLayoutPath: string | null): boolean {
+	if (!rootLayoutPath) return false;
+	const content = readFileSync(rootLayoutPath, 'utf-8');
+	return content.includes('layout.css');
+}
+
 const FEEDBACK_LAYOUT_SEARCH_MAX_DEPTH = 2;
 const FEEDBACK_IMPORT_PATTERN = /from\s+['"]@dryui\/feedback['"]/;
 
@@ -368,6 +378,13 @@ export const SVELTE_CONFIG_NAMES = [
 	'svelte.config.cjs'
 ] as const;
 
+export const VITE_CONFIG_NAMES = [
+	'vite.config.ts',
+	'vite.config.js',
+	'vite.config.mts',
+	'vite.config.mjs'
+] as const;
+
 export function isSvelteConfigPath(filePath: string): boolean {
 	return SVELTE_CONFIG_NAMES.some((name) => filePath.endsWith(name));
 }
@@ -381,10 +398,25 @@ function findSvelteConfig(root: string | null): string | null {
 	return null;
 }
 
+function findViteConfig(root: string | null): string | null {
+	if (!root) return null;
+	for (const name of VITE_CONFIG_NAMES) {
+		const candidate = resolve(root, name);
+		if (existsSync(candidate)) return candidate;
+	}
+	return null;
+}
+
 function isLintPreprocessorWired(svelteConfigPath: string | null): boolean {
 	if (!svelteConfigPath) return false;
 	const content = readFileSync(svelteConfigPath, 'utf-8');
 	return content.includes('@dryui/lint') && content.includes('dryuiLint');
+}
+
+function isLayoutCssPluginWired(viteConfigPath: string | null): boolean {
+	if (!viteConfigPath) return false;
+	const content = readFileSync(viteConfigPath, 'utf-8');
+	return content.includes('@dryui/lint') && content.includes('dryuiLayoutCss');
 }
 
 function buildLintPreprocessorSnippet(): string {
@@ -405,6 +437,17 @@ function buildLintPreprocessorSnippet(): string {
 	].join('\n');
 }
 
+function buildLayoutCssPluginSnippet(): string {
+	return [
+		"import { dryuiLayoutCss } from '@dryui/lint';",
+		'',
+		'// Merge into your existing Vite config:',
+		'export default defineConfig({',
+		'  plugins: [dryuiLayoutCss(), sveltekit()]',
+		'});'
+	].join('\n');
+}
+
 function buildThemeImportLines(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
 	return `  import '${spec.themeImports.default}';\n  import '${spec.themeImports.dark}';`;
 }
@@ -413,10 +456,22 @@ function buildThemeImportSnippet(spec: Pick<ProjectPlannerSpec, 'themeImports'>)
 	return ['<script>', buildThemeImportLines(spec), '</script>'].join('\n');
 }
 
-function buildRootLayoutSnippet(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
+function buildLayoutCssImportSnippet(): string {
+	return ['<script>', "  import '../layout.css';", '</script>'].join('\n');
+}
+
+function buildRootLayoutSnippet(
+	spec: Pick<ProjectPlannerSpec, 'themeImports'>,
+	options: { readonly includeAppCss?: boolean } = {}
+): string {
+	const imports = [
+		buildThemeImportLines(spec),
+		...(options.includeAppCss ? ["  import '../app.css';"] : []),
+		"  import '../layout.css';"
+	];
 	return [
 		'<script>',
-		buildThemeImportLines(spec),
+		...imports,
 		'',
 		'  let { children } = $props();',
 		'</script>',
@@ -497,28 +552,36 @@ export function detectProject(
 
 	const appHtmlPath = root ? resolve(root, 'src/app.html') : null;
 	const appCssPath = root ? resolve(root, 'src/app.css') : null;
+	const layoutCssPath = root ? resolve(root, 'src/layout.css') : null;
 	const rootLayoutPath = root ? resolve(root, 'src/routes/+layout.svelte') : null;
 	const rootPagePath = root ? resolve(root, 'src/routes/+page.svelte') : null;
 	const appHtml = appHtmlPath && existsSync(appHtmlPath) ? appHtmlPath : null;
 	const appCss = appCssPath && existsSync(appCssPath) ? appCssPath : null;
+	const layoutCss = layoutCssPath && existsSync(layoutCssPath) ? layoutCssPath : null;
 	const rootLayout = rootLayoutPath && existsSync(rootLayoutPath) ? rootLayoutPath : null;
 	const rootPage = rootPagePath && existsSync(rootPagePath) ? rootPagePath : null;
 	const themeImportFiles =
 		rootLayout && importsAppCss(rootLayout) ? [rootLayout, appCss] : [rootLayout];
 	const defaultImported = hasAnyImport(themeImportFiles, spec.themeImports.default);
 	const darkImported = hasAnyImport(themeImportFiles, spec.themeImports.dark);
+	const layoutCssImported = importsLayoutCss(rootLayout);
 	const themeAuto = appHtml ? hasThemeAuto(appHtml) : false;
 	const svelteConfig = findSvelteConfig(root);
+	const viteConfig = findViteConfig(root);
 	const lintInstalled = dependencyNames.has('@dryui/lint');
 	const lintPreprocessorWired = isLintPreprocessorWired(svelteConfig);
+	const layoutCssPluginWired = isLayoutCssPluginWired(viteConfig);
 	const feedbackInstalled = dependencyNames.has('@dryui/feedback');
 	const stepsNeeded =
 		Number(!dependencyNames.has('@dryui/ui')) +
 		Number(!defaultImported) +
 		Number(!darkImported) +
 		Number(!themeAuto) +
+		Number(!layoutCss) +
+		Number(rootLayout && !layoutCssImported) +
 		Number(!lintInstalled) +
-		Number(!lintPreprocessorWired);
+		Number(!lintPreprocessorWired) +
+		Number(!layoutCssPluginWired);
 
 	if (!packageJsonPath)
 		warnings.push(
@@ -545,17 +608,21 @@ export function detectProject(
 		files: {
 			appHtml,
 			appCss,
+			layoutCss,
 			rootLayout,
 			rootPage,
-			svelteConfig
+			svelteConfig,
+			viteConfig
 		},
 		theme: {
 			defaultImported,
 			darkImported,
+			layoutCssImported,
 			themeAuto
 		},
 		lint: {
-			preprocessorWired: lintPreprocessorWired
+			preprocessorWired: lintPreprocessorWired,
+			layoutCssPluginWired
 		},
 		feedback: {
 			layoutPath: feedbackInstalled ? findFeedbackLayout(root) : null
@@ -597,14 +664,15 @@ export default {
 
 const SCAFFOLD_VITE_CONFIG = `import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import { dryuiLayoutCss } from '@dryui/lint';
 
 export default defineConfig({
   ssr: {
-    // Process DryUI packages through Vite's plugin pipeline so the
-    // "development" exports condition resolves to src/ during \`vite dev\`.
+    // SvelteKit needs Svelte component packages bundled into the SSR
+    // output rather than imported at runtime.
     noExternal: ['@dryui/ui', '@dryui/primitives']
   },
-  plugins: [sveltekit()],
+  plugins: [dryuiLayoutCss(), sveltekit()],
 });
 `;
 
@@ -652,11 +720,15 @@ body {
 }
 `;
 
+const SCAFFOLD_LAYOUT_CSS = `/* Layout-only CSS hooks for app-level spacing and alignment. */
+`;
+
 function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
 	return `<script>
-  import '../app.css';
   import '${spec.themeImports.default}';
   import '${spec.themeImports.dark}';
+  import '../app.css';
+  import '../layout.css';
 
   let { children } = $props();
 </script>
@@ -666,24 +738,23 @@ function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>)
 }
 
 const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
-\timport { AreaGrid, Heading, Text } from '@dryui/ui';
+\timport { Card, Container, Heading, Text } from '@dryui/ui';
 </script>
 
 <svelte:head>
 \t<title>My App</title>
 </svelte:head>
 
-<AreaGrid.Root
-\tfill
-\tmaxWidth="md"
-\t--dry-area-grid-template-areas="'.' 'heading' '.' 'tagline' '.'"
-\t--dry-area-grid-template-rows="minmax(0, 1fr) auto var(--dry-space-3) auto minmax(0, 1fr)"
->
-\t<Heading --dry-grid-area-name="heading" level={1} variant="display">Hello, World</Heading>
-\t<Text --dry-grid-area-name="tagline" size="lg" color="muted">
-\t\tYour DryUI project is ready. Start building.
-\t</Text>
-</AreaGrid.Root>
+<Container size="md">
+\t<Card.Root>
+\t\t<Card.Header>
+\t\t\t<Heading level={1} variant="display">Hello, World</Heading>
+\t\t</Card.Header>
+\t\t<Card.Content>
+\t\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
+\t\t</Card.Content>
+\t</Card.Root>
+</Container>
 `;
 
 const SCAFFOLD_FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
@@ -732,6 +803,11 @@ function getScaffoldFiles(spec: Pick<ProjectPlannerSpec, 'themeImports'>): Scaff
 			relativePath: 'src/app.css',
 			content: SCAFFOLD_APP_CSS,
 			description: 'Foundation CSS reset with DryUI tokens'
+		},
+		{
+			relativePath: 'src/layout.css',
+			content: SCAFFOLD_LAYOUT_CSS,
+			description: 'Layout-only CSS hooks'
 		},
 		{
 			relativePath: 'src/routes/+layout.svelte',
@@ -796,7 +872,7 @@ function buildScaffoldSteps(
 		status: 'pending',
 		title: 'Install @dryui/lint',
 		description:
-			'Add the DryUI lint preprocessor as a dev dependency. The scaffolded svelte.config.js already wires dryuiLint — installing this package makes the import resolve.',
+			'Add the DryUI lint package as a dev dependency. The scaffolded svelte.config.js and vite.config.ts already wire dryuiLint and dryuiLayoutCss; installing this package makes those imports resolve.',
 		command: installCommand(packageManager, '@dryui/lint', { dev: true })
 	});
 
@@ -845,7 +921,7 @@ export function planInstall(
 			status: 'pending',
 			title: 'Install @dryui/lint',
 			description:
-				'Add the DryUI lint preprocessor as a dev dependency. It enforces grid-only layout, bans flexbox/inline-style/width-properties, and fails the build on CSS rule violations during Svelte preprocessing.',
+				'Add the DryUI lint package as a dev dependency. It enforces grid-only layout, bans flexbox/inline-style/width-properties during Svelte preprocessing, and checks src/layout.css during Vite dev/HMR and build.',
 			command: installCommand(detection.packageManager, '@dryui/lint', { dev: true })
 		});
 	}
@@ -874,7 +950,7 @@ export function planInstall(
 				description:
 					'Create the file at the path below with the snippet as its full content. The file must include {@render children()} or pages will not render.',
 				...(path ? { path } : {}),
-				snippet: buildRootLayoutSnippet(spec)
+				snippet: buildRootLayoutSnippet(spec, { includeAppCss: Boolean(detection.files.appCss) })
 			});
 		} else {
 			steps.push({
@@ -887,6 +963,31 @@ export function planInstall(
 				snippet: buildThemeImportSnippet(spec)
 			});
 		}
+	}
+
+	if (!detection.files.layoutCss) {
+		const path = detection.root ? resolve(detection.root, 'src/layout.css') : null;
+		steps.push({
+			kind: 'create-file',
+			status: 'pending',
+			title: 'Create layout stylesheet',
+			description:
+				'Create src/layout.css for layout-only selectors such as [data-layout] and [data-layout-area]. Missing layout.css is warning-only, but new DryUI projects should include it.',
+			...(path ? { path } : {}),
+			snippet: SCAFFOLD_LAYOUT_CSS
+		});
+	}
+
+	if (detection.files.rootLayout && !detection.theme.layoutCssImported) {
+		steps.push({
+			kind: 'edit-file',
+			status: 'pending',
+			title: 'Import layout.css in the root layout',
+			description:
+				'Import ../layout.css in src/routes/+layout.svelte after DryUI theme CSS and ../app.css so layout-only rules load last.',
+			path: detection.files.rootLayout,
+			snippet: buildLayoutCssImportSnippet()
+		});
 	}
 
 	if (!detection.files.appHtml) {
@@ -915,7 +1016,7 @@ export function planInstall(
 				status: 'pending',
 				title: 'Wire dryuiLint into svelte.config',
 				description:
-					'Import dryuiLint from @dryui/lint and add it as the FIRST entry in the preprocess array. If the config has no preprocess field, add one. Merge into the existing config object — do NOT create a second config. Without this step, the grid-only layout rules, flex/inline-style/width bans, and other CSS discipline enforced by @dryui/lint will not run.',
+					'Import dryuiLint from @dryui/lint and add it as the FIRST entry in the preprocess array. If the config has no preprocess field, add one. Merge into the existing config object; do NOT create a second config. Without this step, the grid-only layout rules, flex/inline-style/width bans, and other CSS discipline enforced by @dryui/lint will not run.',
 				path: detection.files.svelteConfig,
 				snippet: buildLintPreprocessorSnippet()
 			});
@@ -930,13 +1031,35 @@ export function planInstall(
 		}
 	}
 
+	if (!detection.lint.layoutCssPluginWired) {
+		if (detection.files.viteConfig) {
+			steps.push({
+				kind: 'edit-file',
+				status: 'pending',
+				title: 'Wire dryuiLayoutCss into vite.config',
+				description:
+					'Import dryuiLayoutCss from @dryui/lint and add dryuiLayoutCss() to the Vite plugins array. It runs during vite dev/HMR and vite build, warning only if src/layout.css is missing and throwing on layout.css violations.',
+				path: detection.files.viteConfig,
+				snippet: buildLayoutCssPluginSnippet()
+			});
+		} else {
+			steps.push({
+				kind: 'blocked',
+				status: 'blocked',
+				title: 'vite.config not found',
+				description:
+					'DryUI expects a vite.config.{js,ts,mjs,mts} at the project root so dryuiLayoutCss() can enforce src/layout.css during dev and build.'
+			});
+		}
+	}
+
 	if (steps.length === 0) {
 		steps.push({
 			kind: 'note',
 			status: 'done',
 			title: 'DryUI install plan is complete',
 			description:
-				'The project already has @dryui/ui, @dryui/lint, theme imports, theme-auto, and the lint preprocessor wired into svelte.config.'
+				'The project already has @dryui/ui, @dryui/lint, theme imports, theme-auto, src/layout.css, the lint preprocessor, and the layout CSS Vite plugin wired.'
 		});
 	}
 

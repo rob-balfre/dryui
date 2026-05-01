@@ -1390,16 +1390,6 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	Separator: '<Separator />',
 	Spacer: '<Spacer size="lg" />',
 	Container: '<Container>\n  <p>Centered content</p>\n</Container>',
-	AreaGrid: `<AreaGrid.Root
-  --dry-area-grid-template-areas="'header' 'content'"
->
-  <Card.Root --dry-grid-area-name="header">
-    <Card.Header>Header</Card.Header>
-  </Card.Root>
-  <Card.Root --dry-grid-area-name="content">
-    <Card.Content>Content</Card.Content>
-  </Card.Root>
-</AreaGrid.Root>`,
 	Avatar: '<Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />',
 	ChatThread:
 		'<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>',

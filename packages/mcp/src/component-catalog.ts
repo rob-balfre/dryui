@@ -33,7 +33,7 @@ interface DocsNavCategory {
 export const docsNavCategories: DocsNavCategory[] = [
 	{
 		label: 'Layout',
-		items: ['Container', 'AreaGrid', 'AppFrame', 'Separator', 'ScrollArea', 'Splitter', 'Spacer']
+		items: ['Container', 'AppFrame', 'Separator', 'ScrollArea', 'Splitter', 'Spacer']
 	},
 	{
 		label: 'Nav',
@@ -232,7 +232,6 @@ export const docsNavComponentNames = docsNavCategories.flatMap((category) => cat
 export const skillCompoundComponents = [
 	'Accordion',
 	'AlertDialog',
-	'AreaGrid',
 	'Breadcrumb',
 	'Calendar',
 	'Card',
