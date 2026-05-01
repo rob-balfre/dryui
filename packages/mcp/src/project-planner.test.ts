@@ -610,9 +610,10 @@ describe('planInstall', () => {
 
 		expect(layoutCssStep?.kind).toBe('create-file');
 		expect(layoutStep?.snippet).toContain("import '../layout.css';");
-		expect(pageStep?.snippet).toContain(
-			"import { Card, Container, Heading, Text } from '@dryui/ui';"
-		);
+		expect(pageStep?.snippet).toContain("import { Card, Heading, Text } from '@dryui/ui';");
+		expect(pageStep?.snippet).toContain('data-layout="starter"');
+		expect(layoutCssStep?.snippet).toContain("[data-layout='starter']");
+		expect(layoutCssStep?.snippet).toContain('grid-template-columns');
 		const viteStep = plan.steps.find((step) => step.path === resolve(root, 'vite.config.ts'));
 		expect(viteStep?.snippet).toContain('dryuiLayoutCss()');
 		const layout = layoutStep?.snippet ?? '';

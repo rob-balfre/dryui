@@ -305,7 +305,7 @@ interface ParsedAttribute {
  */
 const RULE_OWNERS: Record<string, readonly string[]> = {
 	'dryui/no-svelte-element': ['/motion/', '/page-header/'],
-	'dryui/no-flex': ['/page-header/'],
+	'dryui/no-flex': ['/page-header/', 'src/layout.css'],
 	'dryui/no-width': ['/mega-menu/', '/internal/'],
 	'dryui/no-important': [],
 	'dryui/no-partial-inset-shadow': ['/option-picker/', '/lib/demos/']
@@ -447,6 +447,13 @@ function isComponentOnlyAllowedTag(tagName: string): boolean {
 	);
 }
 
+function hasLayoutHook(attrs: readonly ParsedAttribute[]): boolean {
+	return (
+		attributeByName(attrs, 'data-layout') !== null ||
+		attributeByName(attrs, 'data-layout-area') !== null
+	);
+}
+
 interface AttributedTagMatch extends TagMatch {
 	readonly tagName: string;
 	readonly attrs: ParsedAttribute[];
@@ -551,7 +558,7 @@ export function checkScript(content: string): Violation[] {
 						message: ruleMessage('dryui/no-layout-component', {
 							action: 'import',
 							target: comp,
-							guidance: 'raw CSS grid with custom properties instead'
+							guidance: 'data-layout hooks with src/layout.css instead'
 						}),
 						line
 					});
@@ -764,7 +771,8 @@ export interface MarkupContext {
 	/**
 	 * Experimental migration mode for app/consumer markup. When enabled, native
 	 * element tags such as <div>, <span>, <header>, and <main> are rejected so
-	 * layout and styling have to flow through Svelte/DryUI component surfaces.
+	 * styling has to flow through Svelte/DryUI component surfaces. Elements with
+	 * `data-layout` or `data-layout-area` remain allowed for page layout shells.
 	 */
 	readonly componentsOnly?: boolean;
 }
@@ -816,6 +824,7 @@ export function checkMarkup(
 		const componentOnlyMarkup = stripSvelteHeadBlocks(markup);
 		for (const tag of findAllOpeningTags(componentOnlyMarkup)) {
 			if (isComponentOnlyAllowedTag(tag.tagName)) continue;
+			if (hasLayoutHook(tag.attrs)) continue;
 			violations.push({
 				rule: 'dryui/no-raw-element',
 				message: ruleMessage('dryui/no-raw-element', { tag: tag.tagName }),
@@ -832,7 +841,7 @@ export function checkMarkup(
 				message: ruleMessage('dryui/no-layout-component', {
 					action: 'use',
 					target: `<${comp}>`,
-					guidance: 'raw CSS grid with custom properties instead'
+					guidance: 'data-layout hooks with src/layout.css instead'
 				}),
 				line: lineOf(match.index)
 			});
@@ -989,7 +998,7 @@ export function checkStyle(
 				rule: 'dryui/no-flex',
 				message: ruleMessage('dryui/no-flex', {
 					value: 'display: flex',
-					guidance: 'display: grid instead'
+					guidance: 'display: grid, or move page-level flex to src/layout.css'
 				}),
 				line: lineOf(match.index)
 			});
@@ -1002,7 +1011,7 @@ export function checkStyle(
 				rule: 'dryui/no-flex',
 				message: ruleMessage('dryui/no-flex', {
 					value: prop,
-					guidance: 'CSS grid equivalents instead'
+					guidance: 'CSS grid equivalents, or move page-level flex to src/layout.css'
 				}),
 				line: lineOf(match.index)
 			});

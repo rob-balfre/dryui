@@ -1,8 +1,8 @@
 <!--
   Step-by-step onboarding shell. Used by the CLI/init flow and any host that
   walks a user through `Personality → BrandColor → Typography → Shape → PreviewExport`.
-  Fills the parent block size; hosts that need a max-width should wrap the
-  shell themselves (e.g. with `<Container size="md">`).
+  Fills the parent block size; hosts that need page width constraints should set
+  them on the parent page track in src/layout.css.
 -->
 <script lang="ts">
 	import './wizard-shell.css';
@@ -43,10 +43,16 @@
 
 <TokenScope {tokens}>
 	<div data-layout="wizard-shell">
-		<WizardMasthead --dry-grid-area-name="masthead" {step} {onstep} />
-		<WizardBody --dry-grid-area-name="main" {title} {subtitle}>
-			{@render children()}
-		</WizardBody>
-		<WizardFooter --dry-grid-area-name="foot" {onback} {onnext} {backLabel} {nextLabel} />
+		<div data-layout-area="masthead">
+			<WizardMasthead {step} {onstep} />
+		</div>
+		<div data-layout-area="main">
+			<WizardBody {title} {subtitle}>
+				{@render children()}
+			</WizardBody>
+		</div>
+		<div data-layout-area="foot">
+			<WizardFooter {onback} {onnext} {backLabel} {nextLabel} />
+		</div>
 	</div>
 </TokenScope>

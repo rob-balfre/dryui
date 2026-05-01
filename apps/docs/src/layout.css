@@ -1,7 +1,19 @@
-/* DryUI consumer layout sheet. Each `[data-layout="<name>"]` block owns its
-   grid template plus the boilerplate that translates child `--dry-grid-area-name`
-   into `grid-area`. Per-layout scoping keeps the rules from leaking onto other
-   components that emit `data-layout` for unrelated reasons. */
+/* DryUI consumer layout sheet. Each `[data-layout="<name>"]` block owns page
+   and tool layout structure, with placed children marked by `data-layout-area`. */
+
+[data-layout='layout-rules-page'] {
+	container-type: inline-size;
+	container-name: layout-rules-page;
+	display: grid;
+	grid-template-columns: minmax(0, 64rem);
+	justify-content: center;
+	padding-inline: var(--dry-space-6);
+}
+
+[data-layout='layout-rules-page'] > [data-layout-area='main'] {
+	display: grid;
+	gap: var(--dry-space-10);
+}
 
 [data-layout='theme-wizard'] {
 	container-type: inline-size;
@@ -27,14 +39,89 @@
 		'radius density';
 }
 
-[data-layout='theme-wizard'] > svelte-css-wrapper {
-	display: contents;
+[data-layout='theme-wizard'] > [data-layout-area] {
+	display: grid;
+	min-block-size: 0;
 }
 
-[data-layout='theme-wizard'] > *,
-[data-layout='theme-wizard'] > svelte-css-wrapper > * {
-	grid-area: var(--dry-grid-area-name, auto);
-	min-block-size: 0;
+[data-layout='theme-wizard'] > [data-layout-area='brand'] {
+	grid-area: brand;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+	align-items: center;
+	gap: var(--dry-space-2);
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='tabs'] {
+	grid-area: tabs;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='mode'] {
+	grid-area: mode;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='copy'] {
+	grid-area: copy;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='download'] {
+	grid-area: download;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='reset'] {
+	grid-area: reset;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='preview'] {
+	grid-area: preview;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='accentLabel'] {
+	grid-area: accentLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='accent'] {
+	grid-area: accent;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='baseLabel'] {
+	grid-area: baseLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='base'] {
+	grid-area: base;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='depthLabel'] {
+	grid-area: depthLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='depth'] {
+	grid-area: depth;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='fontLabel'] {
+	grid-area: fontLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='font'] {
+	grid-area: font;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='radiusLabel'] {
+	grid-area: radiusLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='radius'] {
+	grid-area: radius;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='densityLabel'] {
+	grid-area: densityLabel;
+}
+
+[data-layout='theme-wizard'] > [data-layout-area='density'] {
+	grid-area: density;
 }
 
 @container theme-wizard (min-width: 720px) {

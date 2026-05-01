@@ -5,9 +5,15 @@ import { resolve } from 'node:path';
 import { checkLayoutCss, dryuiLayoutCss } from './layout-css.js';
 
 describe('checkLayoutCss', () => {
-	test('accepts valid layout.css spacing and alignment rules', () => {
+	test('accepts valid layout.css page layout rules', () => {
 		const css = `
 [data-layout='stack'] {
+  display: grid;
+  grid-template-columns: minmax(0, 42rem);
+  grid-template-areas: 'masthead' 'main';
+  min-block-size: 100dvh;
+  container-type: inline-size;
+  container-name: stack;
   gap: var(--dry-space-4);
   padding-block: calc(var(--dry-space-4) + var(--dry-space-2));
   margin-inline: auto;
@@ -17,6 +23,10 @@ describe('checkLayoutCss', () => {
 
 @container (min-width: 40rem) {
   [data-layout-area='aside'] {
+    grid-area: aside;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
     padding-inline: var(--dry-space-6);
     place-items: center stretch;
   }
@@ -38,13 +48,16 @@ describe('checkLayoutCss', () => {
 [data-layout] {
   gap: 1rem;
   justify-items: right-now;
+  display: block;
 }`);
 		expect(violations.map((violation) => violation.rule)).toEqual([
+			'dryui/layout-css-value',
 			'dryui/layout-css-value',
 			'dryui/layout-css-value'
 		]);
 		expect(violations[0]!.message).toContain('gap');
 		expect(violations[1]!.message).toContain('justify-items');
+		expect(violations[2]!.message).toContain('display');
 	});
 
 	test('rejects selectors without layout data hooks', () => {

@@ -112,6 +112,21 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
+	test('markup hook allows data-layout hooks in component-only mode', () => {
+		const spy = spyOn(console, 'warn').mockImplementation(() => {});
+		const pp = dryuiLint({ componentsOnly: true });
+		pp.markup!({
+			content: `<main data-layout="starter">
+  <section data-layout-area="intro">
+    <Card.Root><Card.Content>Ready</Card.Content></Card.Root>
+  </section>
+</main>`,
+			filename: 'src/routes/+page.svelte'
+		});
+		expect(spy).not.toHaveBeenCalled();
+		spy.mockRestore();
+	});
+
 	test('strict mode throws on violation', () => {
 		const pp = dryuiLint({ strict: true });
 		expect(() => {
@@ -238,6 +253,20 @@ describe('dryuiLint preprocessor', () => {
 				filename: 'test.svelte'
 			});
 		}).toThrow('dryui/no-raw-element');
+	});
+
+	test('strict component-only mode allows raw layout hook elements', () => {
+		const pp = dryuiLint({ strict: true, componentsOnly: true });
+		expect(() => {
+			pp.markup!({
+				content: `<main data-layout="starter">
+  <section data-layout-area="intro">
+    <Card.Root><Card.Content>Ready</Card.Content></Card.Root>
+  </section>
+</main>`,
+				filename: 'src/routes/+page.svelte'
+			});
+		}).not.toThrow();
 	});
 
 	test('auto-skips files inside node_modules even in strict mode', () => {

@@ -47,7 +47,7 @@ Each entry: `{ tag, selector?, originalRect, currentRect }`. The user dragged an
 
 ## Layout discipline
 
-DryUI does not ship a layout component. All page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). Nowhere else for page layout.
+DryUI does not ship a layout component. All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Nowhere else.
 
 If feedback proposes a structural layout change — new named region, new responsive shift, different grid template — hand off to `dryui-layout`. The Layout agent owns the `src/layout.css` surface.
 

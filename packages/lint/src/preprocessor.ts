@@ -14,8 +14,8 @@ export interface DryuiLintOptions {
 	exclude?: string[];
 	/**
 	 * Experimental migration rule. When enabled, raw CSS grid declarations are
-	 * flagged so layout moves into a sanctioned layout primitive or scoped
-	 * layout CSS.
+	 * flagged so page layout moves into src/layout.css and component layout is
+	 * reviewed deliberately.
 	 */
 	forbidRawGrid?: boolean;
 	/**

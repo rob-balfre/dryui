@@ -59,6 +59,7 @@ packages/*/src/**/index.d.ts
 packages/*/src/**/*.d.ts
 !packages/ui/src/area-grid/area-grid-root.css.d.ts
 !packages/ui/src/tour/tour-root.css.d.ts
+!packages/theme-wizard/src/components/wizard-shell.css.d.ts
 !packages/lint/src/node-shims.d.ts
 !packages/mcp/src/node-shims.d.ts
 

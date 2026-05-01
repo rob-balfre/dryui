@@ -79,7 +79,7 @@ Use `dryui check [path]` for static validation of component contracts, a11y, tok
 
 ## Layout CSS Discipline
 
-DryUI ships no layout component. Page and section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. All `display: grid` and `display: flex` declarations in consumer code live there (or in `@container` blocks within it).
+DryUI ships no layout component. Page and section structure lives as grid, flex, and container-query CSS in root `src/layout.css`, scoped under `[data-layout="<name>"]`. Page-level `display: grid` and `display: flex` declarations live there (or in `@container` blocks within it).
 
 `src/layout.css` is imported last from `src/routes/+layout.svelte`, after DryUI theme CSS and `../app.css`. Mobile-first base; use `@container` queries for responsive shifts, never `@media` for layout breakpoints.
 

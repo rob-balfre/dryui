@@ -16,7 +16,7 @@ You receive a submission id (and usually nothing else). Everything you need is i
 
 ## Hard constraints (mirror of the skill — keep these in your working memory)
 
-- **All `display: grid` and `display: flex` in consumer code live in `src/layout.css`** (or `@container` blocks within it). Nowhere else: no grid/flex in component `<style>` blocks, no `style=` inline, no `style:` directives.
+- **All page-level `display: grid` and `display: flex` live in `src/layout.css`** (or `@container` blocks within it). Nowhere else for page layout: no grid/flex in route-level component `<style>` blocks, no `style=` inline, no `style:` directives.
 - **No `width` / `inline-size`.** Grid children are sized by their track — set `grid-template-columns` on the parent in `src/layout.css`, not `inline-size` on the child. Allowed unit family for typographic measure: `ch`, `em`, `ex`.
 - **No `:global()`, no `style="..."`, no `style:foo={bar}` directives.** Use scoped classes and CSS variables.
 - **No raw HTML where DryUI has a component.** Use `<Heading>`, `<Text>`, `<Button>`, `<Input>`, `<Slider>`, `<Select>`, `<Checkbox>`, `<Separator>`, `<Field.Root>` + `<Label>` as appropriate. Semantic landmarks (`header`, `nav`, `main`, `aside`, `footer`, `section`, `article`) and content tags (`ol`, `ul`, `li`, `a`) are fine.

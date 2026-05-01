@@ -248,7 +248,9 @@ describe('scanWorkspace', () => {
 
 		const report = scanWorkspace(mockSpec, { cwd: root });
 
-		expect(report.findings.some((finding) => finding.ruleId === 'dryui/no-flex')).toBe(true);
+		expect(report.findings.some((finding) => finding.ruleId === 'dryui/layout-css-property')).toBe(
+			true
+		);
 		expect(report.findings.some((finding) => finding.ruleId === 'theme/wrong-type')).toBe(false);
 	});
 

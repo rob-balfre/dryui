@@ -1,11 +1,11 @@
 ---
 name: dryui-layout
-description: Phase 1 (Zones) of DryUI layout. Produce a page-level grid skeleton in a `.svelte` file plus the matching grid template in `src/layout.css`. Named regions, mobile-first base, `@container page (...)` queries for responsive shifts (never `@media`). All grid CSS lives in `src/layout.css`, scoped under `[data-layout="<name>"]`. Phase 1 markup uses plain HTML elements with `data-layout-area="<region>"` placeholders — no DryUI components yet (Phase 2 will place those). Use whenever a `.svelte` file in a DryUI consumer project needs page or section structure: named-area layouts, sidebar/main/header layouts, dashboard regions, responsive area shifts. The skill is satisfied when every rule below is greppable-clean and the layout renders correctly at narrow and wide viewports.
+description: 'Phase 1 (Zones) of DryUI layout. Produce a page-level layout skeleton in a `.svelte` file plus the matching grid/flex/container CSS in `src/layout.css`. Named regions, mobile-first base, `@container page (...)` queries for responsive shifts (never `@media`). All page layout CSS lives in `src/layout.css`, scoped under `[data-layout="<name>"]`. Phase 1 markup uses plain HTML elements with `data-layout-area="<region>"` placeholders — no DryUI components yet (Phase 2 will place those). Use whenever a `.svelte` file in a DryUI consumer project needs page or section structure: named-area layouts, sidebar/main/header layouts, dashboard regions, responsive area shifts. The skill is satisfied when every rule below is greppable-clean and the layout renders correctly at narrow and wide viewports.'
 ---
 
 # DryUI Layout — Phase 1 (Zones)
 
-Produce the page-level grid skeleton: named regions with placeholder content. Phase 2 (components) and Phase 3 (polish) come later. This skill stops at the structural shape.
+Produce the page-level layout skeleton: named regions with placeholder content. Phase 2 (components) and Phase 3 (polish) come later. This skill stops at the structural shape.
 
 ## Setup (one-time per project)
 
@@ -37,7 +37,7 @@ Create `src/layout.css` empty if not present.
 
 ## The pattern
 
-Mark the layout root with `data-layout="<name>"`. Each region is a direct child carrying `data-layout-area="<area>"`. The grid template lives in `src/layout.css`, mobile-first, with `@container page (...)` adding wider breakpoints.
+Mark the layout root with `data-layout="<name>"`. Each region is a direct child carrying `data-layout-area="<area>"`. Grid, flex, container, and spacing rules live in `src/layout.css`, mobile-first, with `@container page (...)` adding wider breakpoints.
 
 ```svelte
 <!-- src/routes/docs/+page.svelte -->
@@ -62,8 +62,8 @@ Mark the layout root with `data-layout="<name>"`. Each region is a direct child 
 		'main'
 		'aside'
 		'foot';
-	gap: 0.75rem;
-	padding: 1rem;
+	gap: var(--dry-space-3);
+	padding: var(--dry-space-4);
 	min-block-size: 100dvh;
 }
 
@@ -113,11 +113,11 @@ Mark the layout root with `data-layout="<name>"`. Each region is a direct child 
 - **R9.** Base block targets the smallest viewport. When in doubt, mobile = single column (`grid-template-columns: 1fr`).
 - **R10.** Every name in `grid-template-areas` has a matching `[data-layout='<name>'] > [data-layout-area='<area>'] { grid-area: <area>; }` rule. One per area.
 - **R11.** Larger viewports add via `@container page (min-width: <Xrem>) { [data-layout='<name>'] { ... } }`. Never `@media`.
-- **R12.** No `display: flex` anywhere in `src/layout.css`. Grid only.
+- **R12.** Grid and flex are both allowed in `src/layout.css`; prefer grid for named areas and track sizing, and use flex only for one-dimensional page-layout arrangements.
 
 **File scope:**
 
-- **R13.** Every byte of layout CSS lives in `src/layout.css`. No grid or flex in component `<style>` blocks, ever.
+- **R13.** Every byte of page-layout CSS lives in `src/layout.css`. No page-level grid or flex in route component `<style>` blocks.
 - **R14.** No new files beyond the target `.svelte` (if new) and edits to `src/layout.css` and (if needed) `src/app.css` for setup.
 
 ## Track sizing
@@ -182,7 +182,7 @@ Mobile single-col → desktop two-col.
 [data-layout='gallery'] {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-	gap: 1rem;
+	gap: var(--dry-space-4);
 }
 ```
 
@@ -215,22 +215,22 @@ Phase 1 zones are placeholder regions, not real components. To make them visible
 }
 ```
 
-Plain box + dashed outline + centered text. No `display: grid` (which would violate R13) and no rules for nested layouts (their own `[data-layout='<name>']` block in `layout.css` wins). Phase 2 (components) replaces the placeholders with real DryUI components and these visualization styles drop away naturally.
+Plain box + dashed outline + centered text. No grid/flex declarations here; layout mechanics stay in `src/layout.css`. Phase 2 (components) replaces the placeholders with real DryUI components and these visualization styles drop away naturally.
 
 ## Verification (greppable per-rule)
 
 Run these after authoring. The skill is satisfied only when every check passes.
 
 | What         | Check                                                                               |
-| ------------ | ----------------------------------------------------------------------------------- | ----------------------------------------------- | ----------------------------------- |
+| ------------ | ----------------------------------------------------------------------------------- |
 | Setup #1     | `grep -E 'container-type:\s*inline-size' src/app.css` matches                       |
 | Setup #2     | `grep "import '../layout.css'" src/routes/+layout.svelte` matches                   |
 | R1           | the file contains exactly one `data-layout=` on the root element                    |
 | R5, R6, R7   | the file is clean of `<style>`, `style=`, `style:`, `class=`                        |
 | R10          | every area name in `grid-template-areas` has a matching `> [data-layout-area=` rule |
 | R11          | `grep '@media' src/layout.css` is empty; `@container page` matches                  |
-| R12          | `grep -E 'display:\s*(inline-)?flex' src/layout.css` is empty                       |
-| R13          | `grep -rE 'display:\s\*(grid                                                        | (inline-)?flex)' src/**/\*.svelte src/**/\*.css | grep -v 'src/layout\.css'` is empty |
+| R12          | any `display: flex` is in `src/layout.css` only and is scoped under `[data-layout]` |
+| R13          | route-level page layout grid/flex declarations are only in `src/layout.css`         |
 | R9           | view at 400px width → single column                                                 |
 | R11 (visual) | view at 1280px width → `@container page` rules apply                                |
 

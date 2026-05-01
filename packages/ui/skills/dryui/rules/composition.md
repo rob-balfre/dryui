@@ -1,79 +1,86 @@
 # Composition
 
-## Layout with CSS Grid
+## Page Layout in `src/layout.css`
 
-All layout uses raw `display: grid` in scoped `<style>` blocks with `--dry-space-*` tokens. No flexbox, no inline styles, no layout components (Stack, Flex, Grid, Spacer).
+Page and section layout uses `[data-layout]` and `[data-layout-area]` hooks in markup, with grid, flex, container queries, and spacing rules in `src/layout.css`. No page-level grid/flex in component `<style>` blocks, no inline styles, no layout components (Stack, Flex, Grid, Spacer).
 
 ### Vertical stack
 
 ```svelte
-<div class="stack">
+<div data-layout="stack">
 	<p>First</p>
 	<p>Second</p>
 </div>
+```
 
-<style>
-	.stack {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-</style>
+```css
+[data-layout='stack'] {
+	display: grid;
+	gap: var(--dry-space-4);
+}
 ```
 
 ### Horizontal row
 
 ```svelte
-<div class="row">
+<div data-layout="row">
 	<span>Label</span>
 	<Button>Action</Button>
 </div>
+```
 
-<style>
-	.row {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-		gap: var(--dry-space-4);
-	}
-</style>
+```css
+[data-layout='row'] {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: var(--dry-space-4);
+}
 ```
 
 ### Responsive columns with @container
 
 ```svelte
-<div class="grid-container">
-	<div class="grid">
-		<div>A</div>
-		<div>B</div>
-		<div>C</div>
-	</div>
+<div data-layout="grid">
+	<div>A</div>
+	<div>B</div>
+	<div>C</div>
 </div>
+```
 
-<style>
-	.grid-container {
-		container-type: inline-size;
+```css
+[data-layout='grid'] {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--dry-space-6);
+}
+
+@container page (min-width: 40rem) {
+	[data-layout='grid'] {
+		grid-template-columns: repeat(3, 1fr);
 	}
-	.grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: var(--dry-space-6);
-	}
-	@container (min-width: 40rem) {
-		.grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-</style>
+}
 ```
 
 ### Centered max-width content
 
-Use `Container` (simple component, no `.Root`) for constrained content width:
+Use `src/layout.css` grid tracks for page-level width. Use `Container` only inside component recipes that explicitly need constrained content measure:
 
 ```svelte
-<Container>
-	<h1>Page Title</h1>
-</Container>
+<main data-layout="content-page">
+	<section data-layout-area="main">
+		<h1>Page Title</h1>
+	</section>
+</main>
+```
+
+```css
+[data-layout='content-page'] {
+	display: grid;
+	grid-template-columns: minmax(0, 64rem);
+	justify-content: center;
+	padding: var(--dry-space-6);
+}
 ```
 
 ## Form Composition
@@ -198,71 +205,81 @@ Use Field.Error to show validation messages.
 ### Page with sidebar
 
 ```svelte
-<div class="page-with-sidebar">
-	<nav class="sidebar">
+<div data-layout="sidebar-page">
+	<nav data-layout-area="sidebar">
 		<Button variant="ghost">Dashboard</Button>
 		<Button variant="ghost">Settings</Button>
 		<Button variant="ghost">Profile</Button>
 	</nav>
-	<main class="content">
+	<main data-layout-area="main">
 		<h1>Dashboard</h1>
 		<p>Main content here.</p>
 	</main>
 </div>
+```
 
-<style>
-	.page-with-sidebar {
-		display: grid;
-		grid-template-columns: 15rem 1fr;
-		gap: var(--dry-space-6);
+```css
+[data-layout='sidebar-page'] {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas:
+		'sidebar'
+		'main';
+	gap: var(--dry-space-6);
+}
+
+[data-layout='sidebar-page'] > [data-layout-area='sidebar'] {
+	grid-area: sidebar;
+	display: grid;
+	gap: var(--dry-space-2);
+	align-content: start;
+}
+
+[data-layout='sidebar-page'] > [data-layout-area='main'] {
+	grid-area: main;
+	display: grid;
+	gap: var(--dry-space-6);
+	align-content: start;
+}
+
+@container page (min-width: 56rem) {
+	[data-layout='sidebar-page'] {
+		grid-template-columns: 15rem minmax(0, 1fr);
+		grid-template-areas: 'sidebar main';
 	}
-	.sidebar {
-		display: grid;
-		gap: var(--dry-space-2);
-		align-content: start;
-	}
-	.content {
-		display: grid;
-		gap: var(--dry-space-6);
-		align-content: start;
-	}
-</style>
+}
 ```
 
 ### Card grid
 
 ```svelte
-<div class="card-grid-container">
-	<div class="card-grid">
-		{#each items as item (item.id)}
-			<Card.Root>
-				<Card.Header>{item.title}</Card.Header>
-				<Card.Content>
-					<p>{item.description}</p>
-				</Card.Content>
-				<Card.Footer>
-					<Button variant="outline">View details</Button>
-				</Card.Footer>
-			</Card.Root>
-		{/each}
-	</div>
+<div data-layout="card-grid">
+	{#each items as item (item.id)}
+		<Card.Root>
+			<Card.Header>{item.title}</Card.Header>
+			<Card.Content>
+				<p>{item.description}</p>
+			</Card.Content>
+			<Card.Footer>
+				<Button variant="outline">View details</Button>
+			</Card.Footer>
+		</Card.Root>
+	{/each}
 </div>
+```
 
-<style>
-	.card-grid-container {
-		container-type: inline-size;
+```css
+[data-layout='card-grid'] {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: var(--dry-space-6);
+}
+
+@container page (min-width: 40rem) {
+	[data-layout='card-grid'] {
+		grid-template-columns: repeat(3, 1fr);
 	}
-	.card-grid {
-		display: grid;
-		grid-template-columns: 1fr;
-		gap: var(--dry-space-6);
-	}
-	@container (min-width: 40rem) {
-		.card-grid {
-			grid-template-columns: repeat(3, 1fr);
-		}
-	}
-</style>
+}
 ```
 
 ### Settings page with tabs
@@ -273,8 +290,8 @@ Use Field.Error to show validation messages.
 	let displayName = $state('');
 </script>
 
-<Container>
-	<div class="settings-stack">
+<main data-layout="settings-page">
+	<section data-layout-area="main">
 		<h1>Settings</h1>
 		<Tabs.Root bind:value={activeTab}>
 			<Tabs.List>
@@ -299,14 +316,26 @@ Use Field.Error to show validation messages.
 				<!-- Security settings -->
 			</Tabs.Content>
 		</Tabs.Root>
-	</div>
-</Container>
+	</section>
+</main>
+```
 
+```css
+[data-layout='settings-page'] {
+	display: grid;
+	grid-template-columns: minmax(0, 64rem);
+	justify-content: center;
+	padding: var(--dry-space-6);
+}
+
+[data-layout='settings-page'] > [data-layout-area='main'] {
+	display: grid;
+	gap: var(--dry-space-8);
+}
+```
+
+```svelte
 <style>
-	.settings-stack {
-		display: grid;
-		gap: var(--dry-space-8);
-	}
 	.form-stack {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -317,12 +346,12 @@ Use Field.Error to show validation messages.
 ### Data table page
 
 ```svelte
-<Container>
-	<div class="page-stack">
-		<div class="page-header">
+<main data-layout="data-page">
+	<section data-layout-area="main">
+		<header data-layout-area="header">
 			<h1>Users</h1>
 			<Button variant="solid">Add user</Button>
-		</div>
+		</header>
 		<Table.Root>
 			<Table.Header>
 				<Table.Row>
@@ -343,43 +372,52 @@ Use Field.Error to show validation messages.
 				{/each}
 			</Table.Body>
 		</Table.Root>
-	</div>
-</Container>
+	</section>
+</main>
+```
 
-<style>
-	.page-stack {
-		display: grid;
-		gap: var(--dry-space-6);
-	}
-	.page-header {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		align-items: center;
-	}
-</style>
+```css
+[data-layout='data-page'] {
+	display: grid;
+	grid-template-columns: minmax(0, 72rem);
+	justify-content: center;
+	padding: var(--dry-space-6);
+}
+
+[data-layout='data-page'] > [data-layout-area='main'] {
+	display: grid;
+	gap: var(--dry-space-6);
+}
+
+[data-layout='data-page'] [data-layout-area='header'] {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+}
 ```
 
 ## Anti-Patterns
 
-### Using flexbox or inline styles
+### Putting page layout in component styles or inline styles
 
 ```svelte
-<!-- Wrong: flexbox -->
+<!-- Wrong: inline page layout -->
 <div style="display: flex; gap: 1rem;">...</div>
 
 <!-- Wrong: inline styles -->
 <div style="max-width: 1200px; margin: 0 auto;">...</div>
 
-<!-- Right: scoped grid -->
-<div class="layout">...</div>
-<Container>...</Container>
+<!-- Right: layout hook + src/layout.css -->
+<div data-layout="layout">
+	<section data-layout-area="main">...</section>
+</div>
+```
 
-<style>
-	.layout {
-		display: grid;
-		gap: var(--dry-space-4);
-	}
-</style>
+```css
+[data-layout='layout'] {
+	display: grid;
+	gap: var(--dry-space-4);
+}
 ```
 
 ### Forgetting Card.Root in form layouts
@@ -417,7 +455,8 @@ Before using any component, call `dryui ask --scope recipe "<pattern>"` (for lay
 | Progress bar      | `Progress`                             | CSS-only bar                 |
 | Inline chart      | `Sparkline`                            | Manual SVG                   |
 | Full chart        | `Chart.Root`                           | External chart library       |
-| Max-width wrapper | `Container`                            | `max-width` + `margin: auto` |
+| Page width        | `src/layout.css` grid tracks           | `max-width` + `margin: auto` |
+| Content measure   | `Container` in component recipes only  | page-shell wrapper           |
 | Form field        | `Field.Root` + `Label` + Input         | `<label>` + `<input>`        |
 | Status indicator  | `Badge`                                | Colored `<span>`             |
 | Loading state     | `Skeleton` or `Spinner`                | Text "Loading..."            |
@@ -439,10 +478,10 @@ Call `dryui ask --scope recipe "<recipe>"` with any recipe name to get a full wo
 | `data-table-with-actions` | Table with header actions | Table, Badge, Avatar, Button           |
 | `checkout-flow`           | Multi-step checkout       | Stepper, Card, Field, RadioGroup       |
 | `hotel-listing-card`      | Product/listing card      | Card, Image, Badge, Button, Text       |
-| `stat-card-grid`          | KPI dashboard cards       | StatCard, Chart, Sparkline, Container  |
+| `stat-card-grid`          | KPI dashboard cards       | StatCard, Chart, Sparkline             |
 | `settings-page`           | Settings with tabs        | Tabs, Card, Field, Input, Select       |
 | `form-with-validation`    | Form with error handling  | Card, Field, Label, Input, Field.Error |
-| `sidebar-layout`          | Page with sidebar nav     | Sidebar, PageHeader, Container         |
+| `sidebar-layout`          | Page with sidebar nav     | Sidebar, PageHeader                    |
 | `dashboard-page`          | Full dashboard layout     | Sidebar, StatCard, Chart, Table        |
 | `user-profile-card`       | User info card            | Card, Avatar, Text, Badge, Button      |
 | `notification-list`       | Notification feed         | Card, Avatar, Text, Badge              |
@@ -456,7 +495,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
 
 - Normalize route/session state in script before rendering DryUI inputs.
 - Reset dependent `Select.Root` values when their parent choice changes; do not rely on stale child state surviving domain changes.
-- Use raw CSS grid to lay out planner sections, and keep orchestration logic in route-level stores or derived state.
+- Use `data-layout` hooks plus `src/layout.css` for route-level planner sections, and keep orchestration logic in route-level stores or derived state.
 - Run `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"` before introducing a new field shape, then run `dryui check [path]` or MCP `check` after the flow is wired.
 
 ```svelte
@@ -473,7 +512,7 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
   });
 </script>
 
-<div class="planner">
+<div data-layout="planner-fields">
   <Field.Root>
     <Label>Country</Label>
     <Select.Root bind:value={country}>
@@ -490,11 +529,11 @@ DryUI is a presentation and accessibility system, not a workflow engine. For dep
     </Select.Root>
   </Field.Root>
 </div>
+```
 
-<style>
-  .planner {
-    display: grid;
-    gap: var(--dry-space-4);
-  }
-</style>
+```css
+[data-layout='planner-fields'] {
+	display: grid;
+	gap: var(--dry-space-4);
+}
 ```

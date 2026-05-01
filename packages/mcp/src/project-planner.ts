@@ -694,7 +694,7 @@ const SCAFFOLD_APP_HTML = `<!doctype html>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">
-    <div style="display: contents">%sveltekit.body%</div>
+    <div>%sveltekit.body%</div>
   </body>
 </html>
 `;
@@ -717,10 +717,34 @@ html {
 body {
 \tmargin: 0;
 \tmin-height: 100dvh;
+\tcontainer-type: inline-size;
+\tcontainer-name: page;
 }
 `;
 
-const SCAFFOLD_LAYOUT_CSS = `/* Layout-only CSS hooks for app-level spacing and alignment. */
+const SCAFFOLD_LAYOUT_CSS = `/* Page-level layout lives here: grid, flex, container queries, and spacing hooks. */
+
+[data-layout='starter'] {
+\tdisplay: grid;
+\tgrid-template-columns: minmax(0, 42rem);
+\tgrid-template-areas: 'intro';
+\tmin-block-size: 100dvh;
+\tpadding: var(--dry-space-6);
+\talign-content: center;
+\tjustify-content: center;
+}
+
+[data-layout='starter'] > [data-layout-area='intro'] {
+\tgrid-area: intro;
+\tdisplay: grid;
+\tgap: var(--dry-space-4);
+}
+
+@container page (min-width: 56rem) {
+\t[data-layout='starter'] {
+\t\tpadding: var(--dry-space-10);
+\t}
+}
 `;
 
 function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>): string {
@@ -738,23 +762,25 @@ function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>)
 }
 
 const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
-\timport { Card, Container, Heading, Text } from '@dryui/ui';
+\timport { Card, Heading, Text } from '@dryui/ui';
 </script>
 
 <svelte:head>
 \t<title>My App</title>
 </svelte:head>
 
-<Container size="md">
-\t<Card.Root>
-\t\t<Card.Header>
-\t\t\t<Heading level={1} variant="display">Hello, World</Heading>
-\t\t</Card.Header>
-\t\t<Card.Content>
-\t\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
-\t\t</Card.Content>
-\t</Card.Root>
-</Container>
+<main data-layout="starter">
+\t<section data-layout-area="intro">
+\t\t<Card.Root>
+\t\t\t<Card.Header>
+\t\t\t\t<Heading level={1} variant="display">Hello, World</Heading>
+\t\t\t</Card.Header>
+\t\t\t<Card.Content>
+\t\t\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
+\t\t\t</Card.Content>
+\t\t</Card.Root>
+\t</section>
+</main>
 `;
 
 const SCAFFOLD_FAVICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
@@ -807,7 +833,7 @@ function getScaffoldFiles(spec: Pick<ProjectPlannerSpec, 'themeImports'>): Scaff
 		{
 			relativePath: 'src/layout.css',
 			content: SCAFFOLD_LAYOUT_CSS,
-			description: 'Layout-only CSS hooks'
+			description: 'Page-level grid, flex, and container layout rules'
 		},
 		{
 			relativePath: 'src/routes/+layout.svelte',
@@ -921,7 +947,7 @@ export function planInstall(
 			status: 'pending',
 			title: 'Install @dryui/lint',
 			description:
-				'Add the DryUI lint package as a dev dependency. It enforces grid-only layout, bans flexbox/inline-style/width-properties during Svelte preprocessing, and checks src/layout.css during Vite dev/HMR and build.',
+				'Add the DryUI lint package as a dev dependency. It keeps page-level grid/flex/container layout in src/layout.css, bans inline-style/width-properties during Svelte preprocessing, and checks src/layout.css during Vite dev/HMR and build.',
 			command: installCommand(detection.packageManager, '@dryui/lint', { dev: true })
 		});
 	}
@@ -972,7 +998,7 @@ export function planInstall(
 			status: 'pending',
 			title: 'Create layout stylesheet',
 			description:
-				'Create src/layout.css for layout-only selectors such as [data-layout] and [data-layout-area]. Missing layout.css is warning-only, but new DryUI projects should include it.',
+				'Create src/layout.css for page-level selectors such as [data-layout] and [data-layout-area]. Missing layout.css is warning-only, but new DryUI projects should include it.',
 			...(path ? { path } : {}),
 			snippet: SCAFFOLD_LAYOUT_CSS
 		});
@@ -984,7 +1010,7 @@ export function planInstall(
 			status: 'pending',
 			title: 'Import layout.css in the root layout',
 			description:
-				'Import ../layout.css in src/routes/+layout.svelte after DryUI theme CSS and ../app.css so layout-only rules load last.',
+				'Import ../layout.css in src/routes/+layout.svelte after DryUI theme CSS and ../app.css so page-level layout rules load last.',
 			path: detection.files.rootLayout,
 			snippet: buildLayoutCssImportSnippet()
 		});
@@ -1016,7 +1042,7 @@ export function planInstall(
 				status: 'pending',
 				title: 'Wire dryuiLint into svelte.config',
 				description:
-					'Import dryuiLint from @dryui/lint and add it as the FIRST entry in the preprocess array. If the config has no preprocess field, add one. Merge into the existing config object; do NOT create a second config. Without this step, the grid-only layout rules, flex/inline-style/width bans, and other CSS discipline enforced by @dryui/lint will not run.',
+					'Import dryuiLint from @dryui/lint and add it as the FIRST entry in the preprocess array. If the config has no preprocess field, add one. Merge into the existing config object; do NOT create a second config. Without this step, the layout.css discipline, inline-style/width bans, and other CSS discipline enforced by @dryui/lint will not run.',
 				path: detection.files.svelteConfig,
 				snippet: buildLintPreprocessorSnippet()
 			});

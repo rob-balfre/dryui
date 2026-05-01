@@ -32,7 +32,7 @@ interface HintContext {
 const HINTS: Record<string, HintBuilder> = {
 	// ── lint rules ────────────────────────────────────────────────────────────
 	'lint/dryui/no-layout-component': () => ({
-		hint: 'Build layouts with raw CSS grid and --dry-space-* tokens in the component <style> block. DryUI deliberately ships no Stack/Box/Grid wrapper.',
+		hint: 'Build page layout with data-layout hooks and src/layout.css. DryUI deliberately ships no Stack/Box/Grid wrapper.',
 		docsRef: `${DOCS_BASE}/concepts/layout`
 	}),
 	'lint/dryui/no-inline-style': () => ({
@@ -64,11 +64,11 @@ const HINTS: Record<string, HintBuilder> = {
 		docsRef: `${DOCS_BASE}/concepts/rules#no-raw-native-element`
 	}),
 	'lint/dryui/no-flex': () => ({
-		hint: 'DryUI layouts use CSS grid. Replace display:flex with display:grid + grid-template-columns / grid-auto-flow. Grid makes the composition declarative and avoids flex alignment foot-guns.',
+		hint: 'Scoped component styles should not use raw flex. Use CSS grid for component composition, or move page-level flex into src/layout.css under a data-layout selector.',
 		docsRef: `${DOCS_BASE}/concepts/layout#grid-first`
 	}),
 	'lint/dryui/no-width': () => ({
-		hint: 'Drop hard-coded widths. Let grid tracks (`fr`, `min-content`, `minmax()`) or Container sizing decide. For text measure use `ch` units via typography presets.',
+		hint: 'Drop hard-coded widths. Let layout.css grid tracks (`fr`, `min-content`, `minmax()`) decide page sizing. For text measure use `ch` units via typography presets.',
 		docsRef: `${DOCS_BASE}/concepts/layout#sizing`
 	}),
 	'lint/dryui/no-media-sizing': () => ({
@@ -96,11 +96,11 @@ const HINTS: Record<string, HintBuilder> = {
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/dryui/layout-css-property': () => ({
-		hint: 'src/layout.css only owns whitespace and box alignment. Use padding, margin, gap, row-gap, column-gap, align-*, justify-*, or place-*; move other styling elsewhere.',
+		hint: 'src/layout.css owns page-level display, grid, flex, container, spacing, block sizing, and box alignment. Move visual styling, color, borders, typography, and effects elsewhere.',
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/dryui/layout-css-value': () => ({
-		hint: 'Use DryUI spacing tokens for layout spacing: var(--dry-space-*), 0, token-only calc(), and auto for margins. Alignment values must be standard box-alignment keywords.',
+		hint: 'Use layout-safe grid/flex/container syntax. Spacing still uses DryUI spacing tokens, 0, token-only calc(), and auto for margins; alignment values must be standard box-alignment keywords.',
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/dryui/prefer-focus-ring-token': () => ({
@@ -124,7 +124,7 @@ const HINTS: Record<string, HintBuilder> = {
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/project/missing-layout-css': () => ({
-		hint: 'Create src/layout.css for agent-authored layout hooks. Keep it limited to [data-layout] / [data-layout-area] selectors, whitespace properties, and box alignment.',
+		hint: 'Create src/layout.css for agent-authored page layout hooks. Keep it limited to [data-layout] / [data-layout-area] selectors, display, grid, flex, container, spacing, block sizing, and alignment.',
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/project/missing-layout-css-import': () => ({

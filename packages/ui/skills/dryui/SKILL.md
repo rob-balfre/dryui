@@ -94,37 +94,38 @@ Theming precedence beats design opinion. If impeccable guidance conflicts with D
 
 **Nothing else.**
 
-- DryUI does not ship a layout component. Page and section structure live as plain CSS Grid in `src/layout.css`, scoped under a stable `[data-layout="<name>"]` selector. Use the `dryui-layout` skill.
-- All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Nowhere else: no grid/flex in component `<style>` blocks, no `style=` inline, no `style:` directives.
-- `Container` (simple component, no `.Root`) for constrained content width.
+- DryUI does not ship a layout component. Page and section structure live as grid, flex, and container-query CSS in `src/layout.css`, scoped under a stable `[data-layout="<name>"]` selector. Use the `dryui-layout` skill.
+- Page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). Nowhere else for page layout: no grid/flex in route-level component `<style>` blocks, no `style=` inline, no `style:` directives.
+- Constrained page tracks belong in `src/layout.css`; use `Container` only for component-level content measure when a recipe explicitly calls for it.
 - Use `@container` queries for responsive sizing. Mobile-first base; never `@media` for layout breakpoints.
-- Children opt into a grid area by passing `--dry-grid-area-name="<area>"` (Svelte's `--prop` syntax). The boilerplate selector in `layout.css` translates that into `grid-area`.
+- Children opt into a grid area with `data-layout-area="<area>"`.
 
 ```svelte
 <div data-layout="docs-shell">
-	<Nav --dry-grid-area-name="aside" />
-	<Article --dry-grid-area-name="main" />
+	<nav data-layout-area="aside">Docs</nav>
+	<main data-layout-area="main">Content</main>
 </div>
 ```
 
 ```css
 [data-layout='docs-shell'] {
-	container-type: inline-size;
-	container-name: docs-shell;
 	display: grid;
 	grid-template-areas: 'main' 'aside';
+	grid-template-columns: minmax(0, 1fr);
+	gap: var(--dry-space-4);
 }
 
-[data-layout='docs-shell'] > svelte-css-wrapper {
-	display: contents;
+[data-layout='docs-shell'] > [data-layout-area='aside'] {
+	grid-area: aside;
 }
 
-[data-layout='docs-shell'] > *,
-[data-layout='docs-shell'] > svelte-css-wrapper > * {
-	grid-area: var(--dry-grid-area-name, auto);
+[data-layout='docs-shell'] > [data-layout-area='main'] {
+	grid-area: main;
+	display: grid;
+	gap: var(--dry-space-6);
 }
 
-@container docs-shell (min-width: 720px) {
+@container page (min-width: 56rem) {
 	[data-layout='docs-shell'] {
 		grid-template-areas: 'aside main';
 		grid-template-columns: 16rem minmax(0, 1fr);
@@ -132,7 +133,7 @@ Theming precedence beats design opinion. If impeccable guidance conflicts with D
 }
 ```
 
-The test: grep your component `<style>` blocks for `display: grid`, `display: flex`, `style=`, `@media`. All should return nothing in consumer code; layout lives in `src/layout.css`.
+The test: grep route-level component `<style>` blocks for page-layout `display: grid`, `display: flex`, `style=`, `@media`. Page layout lives in `src/layout.css`.
 
 ## 4A. Escape Hatches Mean Stop.
 
@@ -241,7 +242,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 ### Manual setup
 
 1. `bun add @dryui/ui`
-2. `bun add -d @dryui/lint`. Enforces grid-only layout, bans flexbox/inline-style/width during Svelte preprocessing, and checks `src/layout.css` during Vite dev/HMR and build. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
+2. `bun add -d @dryui/lint`. Keeps page-level grid/flex/container layout in `src/layout.css`, bans inline-style/width during Svelte preprocessing, and checks `src/layout.css` during Vite dev/HMR and build. Without this step the CSS discipline rules are not enforced at build time, and only post-write `check` / CLI validation remain.
 3. Wire the lint preprocessor in `svelte.config.js` (add `dryuiLint` as the **first** item in the `preprocess` array):
 
    ```js
@@ -301,7 +302,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 ### Recommended workflow
 
 1. Resolve any component or recipe uncertainty with `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"`. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
-2. Build the route or component with raw CSS grid, `Container` for constrained width, and `@container` for responsive layout.
+2. Build page and section layout with `data-layout` hooks plus `src/layout.css`; keep component-local CSS focused on the component’s own internals.
 3. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, accessibility regressions, and token drift.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 

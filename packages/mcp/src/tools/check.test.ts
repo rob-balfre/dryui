@@ -111,7 +111,7 @@ describe('runCheck', () => {
 		const output = runCheck(spec, { path: 'src/layout.css' }, { cwd: root });
 
 		expect(output).toContain('kind: layout-css');
-		expect(output).toContain('dryui/no-flex');
+		expect(output).toContain('dryui/layout-css-property');
 		expect(output).not.toContain('kind: theme');
 		expect(output).not.toContain('wrong-type');
 	});

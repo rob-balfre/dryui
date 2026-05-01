@@ -666,7 +666,10 @@ describe('runInit', () => {
 		expect(defaultThemeIdx).toBeLessThan(appCssIdx);
 		expect(darkThemeIdx).toBeLessThan(appCssIdx);
 		expect(appCssIdx).toBeLessThan(layoutCssIdx);
-		expect(existsSync(join(target, 'src/layout.css'))).toBe(true);
+		const layoutCss = readFileSync(join(target, 'src/layout.css'), 'utf8');
+		expect(layoutCss).toContain("[data-layout='starter']");
+		expect(layoutCss).toContain('display: grid');
+		expect(layoutCss).toContain('@container page');
 		const viteConfig = readFileSync(join(target, 'vite.config.ts'), 'utf8');
 		expect(viteConfig).toContain("import { dryuiLayoutCss } from '@dryui/lint';");
 		expect(viteConfig).toContain('plugins: [dryuiLayoutCss(), sveltekit()]');

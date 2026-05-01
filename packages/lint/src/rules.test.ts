@@ -120,6 +120,18 @@ describe('checkMarkup', () => {
 		expect(violations[1]!.message).toContain('<span>');
 	});
 
+	test('component-only mode allows raw layout hook elements', () => {
+		const code = `<main data-layout="starter">
+  <section data-layout-area="intro">
+    <Card.Root>
+      <Card.Content>Ready</Card.Content>
+    </Card.Root>
+  </section>
+</main>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
+		expect(violations).toHaveLength(0);
+	});
+
 	test('component-only mode allows Svelte components and Svelte special elements', () => {
 		const code = `<svelte:head>
   <title>Docs</title>
@@ -743,6 +755,20 @@ describe('checkStyle', () => {
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-raw-element');
 		expect(violations[0]!.line).toBe(1);
+	});
+
+	test('checkSvelteFile allows layout hooks in component-only markup', () => {
+		const code = `<main data-layout="starter">
+  <section data-layout-area="intro">
+    <Card.Root>
+      <Card.Content>Ready</Card.Content>
+    </Card.Root>
+  </section>
+</main>`;
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', {
+			componentsOnly: true
+		});
+		expect(violations).toHaveLength(0);
 	});
 
 	test('allows display: flex inside owner directories', () => {

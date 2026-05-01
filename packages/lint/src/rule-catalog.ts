@@ -19,7 +19,7 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-layout-component',
 		severity: 'error',
 		message: 'Do not {action} {target}. Use {guidance}.',
-		suggestedFix: 'Use raw CSS grid with custom properties instead.'
+		suggestedFix: 'Use data-layout hooks and src/layout.css instead.'
 	},
 	'dryui/no-inline-style': {
 		id: 'dryui/no-inline-style',
@@ -89,7 +89,7 @@ export const RULE_CATALOG = {
 		severity: 'error',
 		message:
 			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: ask --scope recipe "chip row").',
-		suggestedFix: 'Use CSS grid instead of flexbox layout primitives.'
+		suggestedFix: 'Use CSS grid, or move page-level flex to src/layout.css.'
 	},
 	'dryui/no-width': {
 		id: 'dryui/no-width',
@@ -144,8 +144,8 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-raw-grid',
 		severity: 'error',
 		message:
-			'Do not use raw CSS grid ({value}). Move grid layout into a sanctioned layout primitive or scoped layout CSS.',
-		suggestedFix: 'Use a sanctioned layout primitive instead of raw CSS grid declarations.'
+			'Do not use raw CSS grid ({value}) here. Move page-level grid layout into src/layout.css, scoped by data-layout hooks.',
+		suggestedFix: 'Move page layout grid declarations to src/layout.css.'
 	},
 	'dryui/layout-css-at-rule': {
 		id: 'dryui/layout-css-at-rule',
@@ -165,17 +165,17 @@ export const RULE_CATALOG = {
 		id: 'dryui/layout-css-property',
 		severity: 'error',
 		message:
-			'src/layout.css only supports spacing and CSS box-alignment properties. Invalid property: {property}',
+			'src/layout.css only supports page layout properties: display, grid, flex, container, spacing, block sizing, and box alignment. Invalid property: {property}',
 		suggestedFix:
-			'Move visual styling, sizing, positioning, typography, and grid templates out of src/layout.css.'
+			'Move visual styling, positioning, typography, color, border, and effects out of src/layout.css.'
 	},
 	'dryui/layout-css-value': {
 		id: 'dryui/layout-css-value',
 		severity: 'error',
 		message:
-			'src/layout.css only accepts DryUI spacing tokens, 0, calc() with DryUI spacing tokens, margin auto, and standard box-alignment keywords. Invalid {property}: {value}',
+			'src/layout.css only accepts layout-safe values for grid, flex, containers, spacing, block sizing, and alignment. Invalid {property}: {value}',
 		suggestedFix:
-			'Use var(--dry-space-*), 0, simple calc() expressions, margin auto, or box-alignment keywords.'
+			'Use grid/flex/container syntax, DryUI spacing tokens for spacing, margin auto, block-size values, or standard box-alignment keywords.'
 	},
 	'bare-compound': {
 		id: 'bare-compound',
@@ -227,8 +227,8 @@ export const RULE_CATALOG = {
 		id: 'prefer-grid-layout',
 		severity: 'error',
 		message:
-			'Use scoped CSS grid instead of flexbox. DryUI layout standard is raw grid with --dry-space-* gaps, Container for constrained width, and @container queries for responsiveness.',
-		suggestedFix: 'display: grid'
+			'Move page layout into src/layout.css with [data-layout] hooks. Use grid for track-based structure and flex only for one-dimensional page layout there.',
+		suggestedFix: 'Move layout CSS to src/layout.css'
 	},
 	'use-field-component': {
 		id: 'use-field-component',
@@ -247,8 +247,8 @@ export const RULE_CATALOG = {
 	'use-container-component': {
 		id: 'use-container-component',
 		severity: 'error',
-		message: "Use DryUI's <Container> component instead of custom max-width + margin centering.",
-		suggestedFix: '<Container>'
+		message: 'Use src/layout.css grid tracks instead of custom max-width + margin centering.',
+		suggestedFix: 'src/layout.css'
 	},
 	'interactive-card-wrapper': {
 		id: 'interactive-card-wrapper',
@@ -266,8 +266,9 @@ export const RULE_CATALOG = {
 	'prefer-container': {
 		id: 'prefer-container',
 		severity: 'suggestion',
-		message: 'Manual centering with max-width + margin auto — consider using <Container> instead',
-		suggestedFix: '<Container>'
+		message:
+			'Manual centering with max-width + margin auto — consider src/layout.css grid tracks instead',
+		suggestedFix: 'src/layout.css'
 	},
 	'theme-in-style': {
 		id: 'theme-in-style',

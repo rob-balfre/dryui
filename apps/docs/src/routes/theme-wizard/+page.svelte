@@ -3,16 +3,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import type { PageProps } from './$types';
-	import {
-		Adjust,
-		AppFrame,
-		Button,
-		Container,
-		SegmentedControl,
-		Slider,
-		Text,
-		TokenScope
-	} from '@dryui/ui';
+	import { Adjust, AppFrame, Button, SegmentedControl, Slider, Text, TokenScope } from '@dryui/ui';
 	import {
 		wizardState,
 		setBrandHsb,
@@ -195,26 +186,25 @@
 	<title>Theme Wizard - DryUI</title>
 </svelte:head>
 
-<Container size="xl" padding={false}>
-	<div data-layout="theme-wizard" data-mode={themeMode}>
-		<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
+<div data-layout="theme-wizard" data-mode={themeMode}>
+	<div data-layout-area="brand">
+		<Text as="span" size="sm" weight="semibold">
 			<Logo />
 			<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
 		</Text>
+	</div>
 
-		<SegmentedControl.Root
-			--dry-grid-area-name="tabs"
-			bind:value={previewMode}
-			aria-label="Preview mode"
-		>
+	<div data-layout-area="tabs">
+		<SegmentedControl.Root bind:value={previewMode} aria-label="Preview mode">
 			<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
 			<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
 			<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
 			<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
 		</SegmentedControl.Root>
+	</div>
 
+	<div data-layout-area="mode">
 		<Button
-			--dry-grid-area-name="mode"
 			variant="ghost"
 			size="icon-sm"
 			onclick={() => docsTheme.cycle()}
@@ -226,30 +216,31 @@
 				<Moon size={14} aria-hidden="true" />
 			{/if}
 		</Button>
+	</div>
 
-		<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
+	<div data-layout-area="copy">
+		<Button variant="ghost" size="sm" onclick={handleCopyCss}>
 			<ClipboardCopy size={14} aria-hidden="true" />
 			{copyFeedback || 'Copy'}
 		</Button>
+	</div>
 
-		<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
+	<div data-layout-area="download">
+		<Button variant="solid" size="sm" onclick={handleDownload}>
 			<Download size={14} aria-hidden="true" />
 			Download
 		</Button>
+	</div>
 
-		<Button
-			--dry-grid-area-name="reset"
-			variant="ghost"
-			size="sm"
-			onclick={resetAll}
-			aria-label="Reset all"
-		>
+	<div data-layout-area="reset">
+		<Button variant="ghost" size="sm" onclick={resetAll} aria-label="Reset all">
 			<RotateCcw size={14} aria-hidden="true" />
 			Reset
 		</Button>
+	</div>
 
+	<div data-layout-area="preview">
 		<Adjust
-			--dry-grid-area-name="preview"
 			--dry-adjust-block-size="100%"
 			--dry-adjust-min-block-size="0"
 			--dry-adjust-overflow="hidden"
@@ -278,12 +269,16 @@
 				</AppFrame>
 			</TokenScope>
 		</Adjust>
+	</div>
 
-		<Text --dry-grid-area-name="accentLabel" as="span" variant="label" size="xs">
+	<div data-layout-area="accentLabel">
+		<Text as="span" variant="label" size="xs">
 			Accent {Math.round(wizardState.brandHsb.h)} degrees
 		</Text>
+	</div>
+
+	<div data-layout-area="accent">
 		<Slider
-			--dry-grid-area-name="accent"
 			bind:value={getAccentHue, setAccentHue}
 			min={0}
 			max={360}
@@ -291,12 +286,16 @@
 			size="sm"
 			aria-label="Accent hue"
 		/>
+	</div>
 
-		<Text --dry-grid-area-name="baseLabel" as="span" variant="label" size="xs">
+	<div data-layout-area="baseLabel">
+		<Text as="span" variant="label" size="xs">
 			Base {Math.round(wizardState.baseHue)} degrees
 		</Text>
+	</div>
+
+	<div data-layout-area="base">
 		<Slider
-			--dry-grid-area-name="base"
 			bind:value={getBaseHue, setBaseHueValue}
 			min={0}
 			max={360}
@@ -304,10 +303,14 @@
 			size="sm"
 			aria-label="Base hue"
 		/>
+	</div>
 
-		<Text --dry-grid-area-name="depthLabel" as="span" variant="label" size="xs">Depth</Text>
+	<div data-layout-area="depthLabel">
+		<Text as="span" variant="label" size="xs">Depth</Text>
+	</div>
+
+	<div data-layout-area="depth">
 		<Button
-			--dry-grid-area-name="depth"
 			variant="secondary"
 			size="sm"
 			onclick={cyclePersonality}
@@ -315,10 +318,14 @@
 		>
 			{activePersonalityLabel}
 		</Button>
+	</div>
 
-		<Text --dry-grid-area-name="fontLabel" as="span" variant="label" size="xs">Font</Text>
+	<div data-layout-area="fontLabel">
+		<Text as="span" variant="label" size="xs">Font</Text>
+	</div>
+
+	<div data-layout-area="font">
 		<Button
-			--dry-grid-area-name="font"
 			variant="secondary"
 			size="sm"
 			onclick={cycleFont}
@@ -326,10 +333,14 @@
 		>
 			{wizardState.typography.fontPreset}
 		</Button>
+	</div>
 
-		<Text --dry-grid-area-name="radiusLabel" as="span" variant="label" size="xs">Radius</Text>
+	<div data-layout-area="radiusLabel">
+		<Text as="span" variant="label" size="xs">Radius</Text>
+	</div>
+
+	<div data-layout-area="radius">
 		<Button
-			--dry-grid-area-name="radius"
 			variant="secondary"
 			size="sm"
 			onclick={cycleRadius}
@@ -337,10 +348,14 @@
 		>
 			{activeRadiusLabel}
 		</Button>
+	</div>
 
-		<Text --dry-grid-area-name="densityLabel" as="span" variant="label" size="xs">Density</Text>
+	<div data-layout-area="densityLabel">
+		<Text as="span" variant="label" size="xs">Density</Text>
+	</div>
+
+	<div data-layout-area="density">
 		<Button
-			--dry-grid-area-name="density"
 			variant="secondary"
 			size="sm"
 			onclick={cycleDensity}
@@ -349,4 +364,4 @@
 			{activeDensityLabel}
 		</Button>
 	</div>
-</Container>
+</div>

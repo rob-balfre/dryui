@@ -46,6 +46,41 @@ const DATA_LAYOUT_ATTR_RE = /\[data-layout(?:\s*[*^$|~]?=\s*(?:"[^"]*"|'[^']*'|[
 const DATA_LAYOUT_AREA_ATTR_RE =
 	/\[data-layout-area(?:\s*[*^$|~]?=\s*(?:"[^"]*"|'[^']*'|[^\]\s]+))?\]/g;
 
+const DISPLAY_VALUES = new Set(['grid', 'inline-grid', 'flex', 'inline-flex', 'contents']);
+
+const GRID_PROPERTIES = new Set([
+	'grid',
+	'grid-area',
+	'grid-auto-columns',
+	'grid-auto-flow',
+	'grid-auto-rows',
+	'grid-column',
+	'grid-column-end',
+	'grid-column-start',
+	'grid-row',
+	'grid-row-end',
+	'grid-row-start',
+	'grid-template',
+	'grid-template-areas',
+	'grid-template-columns',
+	'grid-template-rows'
+]);
+
+const FLEX_PROPERTIES = new Set([
+	'flex',
+	'flex-basis',
+	'flex-direction',
+	'flex-flow',
+	'flex-grow',
+	'flex-shrink',
+	'flex-wrap',
+	'order'
+]);
+
+const CONTAINER_PROPERTIES = new Set(['container', 'container-name', 'container-type']);
+
+const BLOCK_SIZE_PROPERTIES = new Set(['block-size', 'min-block-size', 'max-block-size']);
+
 const SPACING_PROPERTIES = new Set([
 	'gap',
 	'row-gap',
@@ -277,7 +312,15 @@ function declarationEntries(
 }
 
 function isAllowedProperty(property: string): boolean {
-	return SPACING_PROPERTIES.has(property) || ALIGNMENT_PROPERTIES.has(property);
+	return (
+		property === 'display' ||
+		GRID_PROPERTIES.has(property) ||
+		FLEX_PROPERTIES.has(property) ||
+		CONTAINER_PROPERTIES.has(property) ||
+		BLOCK_SIZE_PROPERTIES.has(property) ||
+		SPACING_PROPERTIES.has(property) ||
+		ALIGNMENT_PROPERTIES.has(property)
+	);
 }
 
 function isDrySpaceToken(value: string): boolean {
@@ -325,7 +368,48 @@ function isAllowedAlignmentValue(property: string, value: string): boolean {
 	return values.every((part) => allowed.has(part));
 }
 
+function isSafeLayoutValue(value: string): boolean {
+	const normalized = value.replace(/\s+/g, ' ').trim();
+	if (!normalized) return false;
+	if (/[{};!]/.test(normalized)) return false;
+	if (/\burl\s*\(/i.test(normalized)) return false;
+	return /^[a-zA-Z0-9_\-'"().,%/\s+*]+$/.test(normalized);
+}
+
+function isAllowedDisplayValue(value: string): boolean {
+	return DISPLAY_VALUES.has(value.replace(/\s+/g, ' ').trim());
+}
+
+function isAllowedGridTemplateAreasValue(value: string): boolean {
+	const normalized = value.replace(/\s+/g, ' ').trim();
+	if (normalized === 'none') return true;
+	return /^(?:(['"])[._a-zA-Z0-9 -]+\1\s*)+$/.test(normalized);
+}
+
+function isAllowedGridValue(property: string, value: string): boolean {
+	if (property === 'grid-template-areas') return isAllowedGridTemplateAreasValue(value);
+	return isSafeLayoutValue(value);
+}
+
+function isCssIdentifier(value: string): boolean {
+	return /^-?[_a-zA-Z][_a-zA-Z0-9-]*$/.test(value);
+}
+
+function isAllowedContainerValue(property: string, value: string): boolean {
+	const normalized = value.replace(/\s+/g, ' ').trim();
+	if (property === 'container-type') return ['normal', 'size', 'inline-size'].includes(normalized);
+	if (property === 'container-name') {
+		return normalized === 'none' || normalized.split(/\s+/).every(isCssIdentifier);
+	}
+	return isSafeLayoutValue(normalized);
+}
+
 function isAllowedValue(property: string, value: string): boolean {
+	if (property === 'display') return isAllowedDisplayValue(value);
+	if (GRID_PROPERTIES.has(property)) return isAllowedGridValue(property, value);
+	if (FLEX_PROPERTIES.has(property)) return isSafeLayoutValue(value);
+	if (CONTAINER_PROPERTIES.has(property)) return isAllowedContainerValue(property, value);
+	if (BLOCK_SIZE_PROPERTIES.has(property)) return isSafeLayoutValue(value);
 	if (SPACING_PROPERTIES.has(property)) return isAllowedSpacingValue(property, value);
 	if (ALIGNMENT_PROPERTIES.has(property)) return isAllowedAlignmentValue(property, value);
 	return false;

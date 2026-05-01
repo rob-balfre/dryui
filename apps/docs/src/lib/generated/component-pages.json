@@ -5931,25 +5931,25 @@
       },
       "related": {
         "component": "Container",
-        "useWhen": "Center page content with a max-width constraint",
+        "useWhen": "Component-level content measure when a recipe explicitly calls for a constrained wrapper",
         "alternatives": [
           {
             "rank": 1,
             "component": "Container",
-            "useWhen": "Centered max-width page wrapper",
-            "snippet": "<Container>\n  <h1>Page content</h1>\n</Container>"
+            "useWhen": "Constrained content measure inside component recipes",
+            "snippet": "<Container>\n  <p>Measured content</p>\n</Container>"
           }
         ],
         "antiPatterns": [
           {
-            "pattern": "max-width + margin auto",
-            "reason": "Container handles responsive max-width and padding",
-            "fix": "Container"
+            "pattern": "Container as the app or page shell",
+            "reason": "Page width and page layout belong in src/layout.css grid tracks scoped by data-layout hooks.",
+            "fix": "data-layout + src/layout.css"
           },
           {
             "pattern": "max-width + margin: 0 auto in custom CSS",
-            "reason": "Container handles responsive max-width with size variants and consistent padding.",
-            "fix": "<Container size=\"lg\">"
+            "reason": "Manual page centering bypasses the layout.css contract and scatters page tracks through component styles.",
+            "fix": "grid-template-columns in src/layout.css under [data-layout='<name>']"
           }
         ],
         "combinesWith": []

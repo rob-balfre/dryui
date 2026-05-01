@@ -12,11 +12,11 @@ import { dryuiLint, dryuiLayoutCss } from '@dryui/lint';
 
 ## What It Enforces
 
-- Grid-only layout rules
+- Page layout rules for grid/flex/container CSS
 - No `display: flex` in scoped component styles
 - No inline styles
 - No `width` or `inline-size` layout sizing in scoped styles
-- Strict `src/layout.css` checks for layout-only spacing and box-alignment CSS
+- Strict `src/layout.css` checks for page-level grid, flex, container, spacing, and alignment CSS
 - No `<!-- svelte-ignore css_unused_selector -->`
 - Additional DryUI markup and component usage rules
 
@@ -58,7 +58,7 @@ export default {
 
 `dryuiLayoutCss()` checks the canonical `src/layout.css` file during Vite dev
 startup, HMR updates, and builds. Missing `src/layout.css` logs a warning only.
-Violations throw because this file is reserved for layout-only CSS.
+Violations throw because this file is reserved for page-level layout CSS.
 
 ## API
 
@@ -75,7 +75,7 @@ Options:
 - `exclude?: string[]`
   Substring patterns used to skip matching filenames.
 - `forbidRawGrid?: boolean`
-  Experimental migration mode. Flags raw CSS grid declarations so layout moves into a sanctioned layout primitive or scoped layout CSS.
+  Experimental migration mode. Flags raw CSS grid declarations so page layout moves into `src/layout.css` and component layout is reviewed deliberately.
 - `componentsOnly?: boolean`
   Experimental migration mode. Flags raw native markup tags such as `<div>` and `<span>` so app markup goes through DryUI/Svelte components.
 - `includeDryuiPackages?: boolean`
@@ -83,10 +83,11 @@ Options:
 
 ### `checkLayoutCss(content, filename?, options?)`
 
-Validates canonical layout CSS. Allowed declarations are spacing properties,
-CSS box-alignment properties, `var(--dry-space-*)`, `0`, simple `calc()` values
-based on DryUI spacing tokens, and `auto` for margins. Selectors must target
-`[data-layout]` or `[data-layout-area]` hooks. `@container` wrappers are allowed.
+Validates canonical layout CSS. Allowed declarations cover page-level `display`,
+CSS grid, flexbox, container queries, spacing, block sizing, and box-alignment.
+Spacing declarations still use `var(--dry-space-*)`, `0`, token-only `calc()`
+values, and `auto` for margins. Selectors must target `[data-layout]` or
+`[data-layout-area]` hooks. `@container` wrappers are allowed.
 
 ### `dryuiLayoutCss(options?)`
 

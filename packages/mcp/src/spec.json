@@ -23829,25 +23829,25 @@
       },
       "container": {
         "component": "Container",
-        "useWhen": "Center page content with a max-width constraint",
+        "useWhen": "Component-level content measure when a recipe explicitly calls for a constrained wrapper",
         "alternatives": [
           {
             "rank": 1,
             "component": "Container",
-            "useWhen": "Centered max-width page wrapper",
-            "snippet": "<Container>\n  <h1>Page content</h1>\n</Container>"
+            "useWhen": "Constrained content measure inside component recipes",
+            "snippet": "<Container>\n  <p>Measured content</p>\n</Container>"
           }
         ],
         "antiPatterns": [
           {
-            "pattern": "max-width + margin auto",
-            "reason": "Container handles responsive max-width and padding",
-            "fix": "Container"
+            "pattern": "Container as the app or page shell",
+            "reason": "Page width and page layout belong in src/layout.css grid tracks scoped by data-layout hooks.",
+            "fix": "data-layout + src/layout.css"
           },
           {
             "pattern": "max-width + margin: 0 auto in custom CSS",
-            "reason": "Container handles responsive max-width with size variants and consistent padding.",
-            "fix": "<Container size=\"lg\">"
+            "reason": "Manual page centering bypasses the layout.css contract and scatters page tracks through component styles.",
+            "fix": "grid-template-columns in src/layout.css under [data-layout='<name>']"
           }
         ],
         "combinesWith": []
@@ -25486,7 +25486,7 @@
     "recipes": {
       "app-shell": {
         "name": "app-shell",
-        "description": "SvelteKit app shell setup with theme CSS imports, app.html configuration, global CSS reset using DryUI tokens, and root layout with header and content slot. Start here before building any page.",
+        "description": "SvelteKit app shell setup with theme CSS imports, app.html configuration, global CSS reset using DryUI tokens, and src/layout.css ownership for page-level grid/flex/container layout. Start here before building any page.",
         "tags": [
           "app",
           "shell",
@@ -25497,10 +25497,8 @@
           "theme",
           "getting-started"
         ],
-        "components": [
-          "Container"
-        ],
-        "snippet": "<!-- 1. app.html — add theme-auto class -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — import themes (resets are built in) -->\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\n<!-- 3. src/routes/+layout.svelte — root layout -->\n<script>\n  import '../app.css';\n  import { Container } from '@dryui/ui';\n\n  let { children } = $props();\n</script>\n\n<header>\n  <Container>\n    <div class=\"app-header\">My App</div>\n  </Container>\n</header>\n<main>\n  <Container>\n    <div class=\"page-content\">\n      {@render children()}\n    </div>\n  </Container>\n</main>\n\n<style>\n  .app-header { padding: var(--dry-space-4) 0; font-weight: bold; }\n  .page-content { display: grid; gap: var(--dry-space-6); }\n</style>"
+        "components": [],
+        "snippet": "<!-- 1. app.html — add theme-auto class -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div>%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — global reset and the named page query container -->\nbody {\n  margin: 0;\n  min-height: 100dvh;\n  container-type: inline-size;\n  container-name: page;\n}\n\n<!-- 3. src/routes/+layout.svelte — root layout imports CSS in cascade order -->\n<script>\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import '../app.css';\n  import '../layout.css';\n\n  let { children } = $props();\n</script>\n\n<div data-layout=\"app-shell\">\n  <header data-layout-area=\"masthead\">My App</header>\n  <main data-layout-area=\"main\">\n    {@render children()}\n  </main>\n</div>\n\n<!-- 4. src/layout.css — page-level layout only -->\n[data-layout='app-shell'] {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-template-areas:\n    'masthead'\n    'main';\n  min-block-size: 100dvh;\n}\n\n[data-layout='app-shell'] > [data-layout-area='masthead'] {\n  grid-area: masthead;\n  padding: var(--dry-space-4) var(--dry-space-6);\n}\n\n[data-layout='app-shell'] > [data-layout-area='main'] {\n  grid-area: main;\n  display: grid;\n  grid-template-columns: minmax(0, 72rem);\n  justify-content: center;\n  padding: var(--dry-space-6);\n}\n\n@container page (min-width: 56rem) {\n  [data-layout='app-shell'] > [data-layout-area='main'] {\n    padding: var(--dry-space-10);\n  }\n}"
       },
       "customize-tokens": {
         "name": "customize-tokens",
@@ -25535,11 +25533,11 @@
           "marketing"
         ],
         "components": [],
-        "snippet": "<!-- 1. app.html — keep theme-auto AND pin data-theme=\"light\".\n     - data-theme=\"light\" makes the page render with light tokens on every OS.\n     - theme-auto is still useful: if a user explicitly opts in to dark via a\n       toggle (swapping data-theme to \"dark\"), the media query under the\n       theme-auto class can still drive dark tokens. With data-theme=\"light\"\n       present, the theme-auto block is guarded so dark OS preference cannot\n       silently override your light design. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\" data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — import BOTH theme files.\n     default.css defines light tokens on :root. dark.css contains the\n     [data-theme='dark'] override and the guarded .theme-auto block.\n     You still want dark.css imported so an opt-in dark toggle keeps working. -->\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\n<!-- 3. src/routes/+layout.svelte — nothing special; tokens already resolve light. -->\n<script>\n  import '../app.css';\n  import { Container } from '@dryui/ui';\n\n  let { children } = $props();\n</script>\n\n<main>\n  <Container>{@render children()}</Container>\n</main>\n\n<!-- Gotcha: do NOT drop theme-auto to \"force light\". Leaving theme-auto in\n     place preserves the opt-in dark pathway (user sets data-theme=\"dark\")\n     without making light the default. -->"
+        "snippet": "<!-- 1. app.html — keep theme-auto AND pin data-theme=\"light\".\n     - data-theme=\"light\" makes the page render with light tokens on every OS.\n     - theme-auto is still useful: if a user explicitly opts in to dark via a\n       toggle (swapping data-theme to \"dark\"), the media query under the\n       theme-auto class can still drive dark tokens. With data-theme=\"light\"\n       present, the theme-auto block is guarded so dark OS preference cannot\n       silently override your light design. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\" data-theme=\"light\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div>%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. src/app.css — import BOTH theme files.\n     default.css defines light tokens on :root. dark.css contains the\n     [data-theme='dark'] override and the guarded .theme-auto block.\n     You still want dark.css imported so an opt-in dark toggle keeps working. -->\n@import '@dryui/ui/themes/default.css';\n@import '@dryui/ui/themes/dark.css';\n\n<!-- 3. src/routes/+layout.svelte — nothing special; tokens already resolve light. -->\n<script>\n  import '../app.css';\n\n  let { children } = $props();\n</script>\n\n{@render children()}\n\n<!-- Gotcha: do NOT drop theme-auto to \"force light\". Leaving theme-auto in\n     place preserves the opt-in dark pathway (user sets data-theme=\"dark\")\n     without making light the default. -->"
       },
       "page-shell-simple": {
         "name": "page-shell-simple",
-        "description": "Simple page layout with header and centered content. Use Container for pages without a sidebar.",
+        "description": "Simple page layout with header and centered content. Use data-layout hooks plus src/layout.css for pages without a sidebar.",
         "tags": [
           "page",
           "shell",
@@ -25549,14 +25547,12 @@
           "content",
           "no-sidebar"
         ],
-        "components": [
-          "Container"
-        ],
-        "snippet": "<!-- Use this for simple pages WITHOUT a sidebar.\n     Simple page shell with header and centered content. -->\n<script>\n  import { Container } from '@dryui/ui';\n</script>\n\n<header>\n  <Container>\n    <div class=\"page-header\">App Name</div>\n  </Container>\n</header>\n<main>\n  <Container>\n    <div class=\"page-content\">\n      <!-- Page content: Cards, forms, grids, etc. go here directly. -->\n    </div>\n  </Container>\n</main>\n\n<style>\n  .page-header { padding: var(--dry-space-4) 0; font-weight: bold; }\n  .page-content { display: grid; gap: var(--dry-space-6); }\n</style>"
+        "components": [],
+        "snippet": "<!-- Use this for simple pages WITHOUT a sidebar.\n     Simple page shell with header and centered content. -->\n<div data-layout=\"page-shell\">\n  <header data-layout-area=\"masthead\">App Name</header>\n  <main data-layout-area=\"main\">\n    <!-- Page content: Cards, forms, grids, etc. go here directly. -->\n  </main>\n</div>\n\n<!-- src/layout.css -->\n[data-layout='page-shell'] {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-template-areas:\n    'masthead'\n    'main';\n  min-block-size: 100dvh;\n}\n\n[data-layout='page-shell'] > [data-layout-area='masthead'] {\n  grid-area: masthead;\n  padding: var(--dry-space-4) var(--dry-space-6);\n}\n\n[data-layout='page-shell'] > [data-layout-area='main'] {\n  grid-area: main;\n  display: grid;\n  grid-template-columns: minmax(0, 72rem);\n  justify-content: center;\n  padding: var(--dry-space-6);\n}\n\n@container page (min-width: 56rem) {\n  [data-layout='page-shell'] > [data-layout-area='main'] {\n    padding: var(--dry-space-10);\n  }\n}"
       },
       "centred-page": {
         "name": "centred-page",
-        "description": "Full-viewport centred page layout with zero visual decoration. Use for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.",
+        "description": "Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.",
         "tags": [
           "page",
           "centered",
@@ -25569,11 +25565,11 @@
           "hero"
         ],
         "components": [],
-        "snippet": "<!-- Centred page — no visual chrome, just spatial arrangement.\n     CSS grid centres content both axes, min-height fills the viewport. -->\n<div class=\"centred-page\">\n  <!-- Hero content goes here: headings, inputs, swatches, etc. -->\n  <h1>Title</h1>\n  <p>Subtitle or description</p>\n</div>\n\n<style>\n  .centred-page {\n    display: grid;\n    justify-items: center;\n    align-content: center;\n    gap: var(--dry-space-16);\n    min-height: 100dvh;\n    padding: var(--dry-space-12) var(--dry-space-6);\n  }\n</style>"
+        "snippet": "<!-- Centred page — no visual chrome, just spatial arrangement.\n     src/layout.css centres content both axes and fills the viewport. -->\n<div data-layout=\"centred-page\">\n  <!-- Hero content goes here: headings, inputs, swatches, etc. -->\n  <h1>Title</h1>\n  <p>Subtitle or description</p>\n</div>\n\n<!-- src/layout.css -->\n[data-layout='centred-page'] {\n  display: grid;\n  justify-items: center;\n  align-content: center;\n  gap: var(--dry-space-16);\n  min-block-size: 100dvh;\n  padding: var(--dry-space-12) var(--dry-space-6);\n}"
       },
       "simple-content-page": {
         "name": "simple-content-page",
-        "description": "Clean content page with constrained width and vertical rhythm. Use Container for max-width and CSS grid for vertical spacing. Suitable for blog posts, documentation, settings pages.",
+        "description": "Clean content page with constrained width and vertical rhythm. Use data-layout hooks plus src/layout.css for blog posts, documentation, and settings pages.",
         "tags": [
           "page",
           "content",
@@ -25584,10 +25580,8 @@
           "clean",
           "minimal"
         ],
-        "components": [
-          "Container"
-        ],
-        "snippet": "<!-- Simple content page — Container constrains width, grid provides rhythm -->\n<script>\n  import { Container } from '@dryui/ui';\n</script>\n\n<main class=\"content-main\">\n  <Container size=\"md\">\n    <div class=\"content-body\">\n      <h1>Page Title</h1>\n      <!-- Content blocks go here -->\n    </div>\n  </Container>\n</main>\n\n<style>\n  .content-main { padding: var(--dry-space-12) 0; }\n  .content-body { display: grid; gap: var(--dry-space-8); }\n</style>"
+        "components": [],
+        "snippet": "<!-- Simple content page — layout.css constrains width and provides rhythm. -->\n<main data-layout=\"content-page\">\n  <section data-layout-area=\"main\">\n    <h1>Page Title</h1>\n    <!-- Content blocks go here -->\n  </section>\n</main>\n\n<!-- src/layout.css -->\n[data-layout='content-page'] {\n  display: grid;\n  grid-template-columns: minmax(0, 42rem);\n  justify-content: center;\n  padding: var(--dry-space-12) var(--dry-space-6);\n}\n\n[data-layout='content-page'] > [data-layout-area='main'] {\n  display: grid;\n  gap: var(--dry-space-8);\n}"
       },
       "auth-form": {
         "name": "auth-form",
@@ -25727,7 +25721,6 @@
           "admin"
         ],
         "components": [
-          "Container",
           "Heading",
           "Button",
           "Table",
@@ -25735,7 +25728,7 @@
           "Badge",
           "Text"
         ],
-        "snippet": "<script>\n  import { Container, Heading, Button, Table, Avatar, Badge, Text } from '@dryui/ui';\n\n  const users = [\n    { name: 'Sarah Chen', email: 'sarah@example.com', role: 'Admin', status: 'Active', avatar: '/avatars/sarah.jpg' },\n    { name: 'Marcus Rivera', email: 'marcus@example.com', role: 'Editor', status: 'Active', avatar: '/avatars/marcus.jpg' },\n    { name: 'Emily Watson', email: 'emily@example.com', role: 'Viewer', status: 'Inactive', avatar: '/avatars/emily.jpg' },\n  ];\n</script>\n\n<Container>\n  <div class=\"table-page\">\n    <div class=\"table-header\">\n      <Heading level={1}>Users</Heading>\n      <Button variant=\"solid\">Add User</Button>\n    </div>\n    <Table.Root>\n      <Table.Header>\n        <Table.Row>\n          <Table.Head>User</Table.Head>\n          <Table.Head>Role</Table.Head>\n          <Table.Head>Status</Table.Head>\n        </Table.Row>\n      </Table.Header>\n      <Table.Body>\n        {#each users as user (user.email)}\n          <Table.Row>\n            <Table.Cell>\n              <div class=\"user-cell\">\n                <Avatar src={user.avatar} alt={user.name} fallback={user.name[0]} size=\"sm\" />\n                <div class=\"user-info\">\n                  <Text>{user.name}</Text>\n                  <Text size=\"sm\" color=\"secondary\">{user.email}</Text>\n                </div>\n              </div>\n            </Table.Cell>\n            <Table.Cell>\n              <Badge variant=\"soft\">{user.role}</Badge>\n            </Table.Cell>\n            <Table.Cell>\n              <Badge variant=\"soft\" color={user.status === 'Active' ? 'success' : 'gray'}>{user.status}</Badge>\n            </Table.Cell>\n          </Table.Row>\n        {/each}\n      </Table.Body>\n    </Table.Root>\n  </div>\n</Container>\n\n<style>\n  .table-page { display: grid; gap: var(--dry-space-6); }\n  .table-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n  .user-cell { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; align-items: center; gap: var(--dry-space-2); }\n  .user-info { display: grid; gap: var(--dry-space-1); }\n</style>"
+        "snippet": "<script>\n  import { Heading, Button, Table, Avatar, Badge, Text } from '@dryui/ui';\n\n  const users = [\n    { name: 'Sarah Chen', email: 'sarah@example.com', role: 'Admin', status: 'Active', avatar: '/avatars/sarah.jpg' },\n    { name: 'Marcus Rivera', email: 'marcus@example.com', role: 'Editor', status: 'Active', avatar: '/avatars/marcus.jpg' },\n    { name: 'Emily Watson', email: 'emily@example.com', role: 'Viewer', status: 'Inactive', avatar: '/avatars/emily.jpg' },\n  ];\n</script>\n\n<main data-layout=\"table-page\">\n  <section data-layout-area=\"main\">\n    <header data-layout-area=\"header\">\n      <Heading level={1}>Users</Heading>\n      <Button variant=\"solid\">Add User</Button>\n    </header>\n    <Table.Root>\n      <Table.Header>\n        <Table.Row>\n          <Table.Head>User</Table.Head>\n          <Table.Head>Role</Table.Head>\n          <Table.Head>Status</Table.Head>\n        </Table.Row>\n      </Table.Header>\n      <Table.Body>\n        {#each users as user (user.email)}\n          <Table.Row>\n            <Table.Cell>\n              <div class=\"user-cell\">\n                <Avatar src={user.avatar} alt={user.name} fallback={user.name[0]} size=\"sm\" />\n                <div class=\"user-info\">\n                  <Text>{user.name}</Text>\n                  <Text size=\"sm\" color=\"secondary\">{user.email}</Text>\n                </div>\n              </div>\n            </Table.Cell>\n            <Table.Cell>\n              <Badge variant=\"soft\">{user.role}</Badge>\n            </Table.Cell>\n            <Table.Cell>\n              <Badge variant=\"soft\" color={user.status === 'Active' ? 'success' : 'gray'}>{user.status}</Badge>\n            </Table.Cell>\n          </Table.Row>\n        {/each}\n      </Table.Body>\n    </Table.Root>\n  </section>\n</main>\n\n<!-- src/layout.css -->\n[data-layout='table-page'] {\n  display: grid;\n  grid-template-columns: minmax(0, 72rem);\n  justify-content: center;\n  padding: var(--dry-space-6);\n}\n\n[data-layout='table-page'] > [data-layout-area='main'] {\n  display: grid;\n  gap: var(--dry-space-6);\n}\n\n[data-layout='table-page'] [data-layout-area='header'] {\n  display: grid;\n  grid-template-columns: 1fr auto;\n  align-items: center;\n}\n\n<style>\n  .user-cell { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; align-items: center; gap: var(--dry-space-2); }\n  .user-info { display: grid; gap: var(--dry-space-1); }\n</style>"
       },
       "accordion-faq": {
         "name": "accordion-faq",
@@ -26143,7 +26136,7 @@
         "components": [
           "Heading"
         ],
-        "snippet": "<!-- Serif display heading: override --dry-font-display on a scoped\n     wrapper. variant=\"display\" on Heading reads --dry-font-display and\n     falls back to --dry-font-sans, so without an override you get sans. -->\n\n<!-- 1. app.html: link a serif font. Newsreader is a good editorial default. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n    <link\n      href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap\"\n      rel=\"stylesheet\"\n    />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div style=\"display: contents\">%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. app.css: override --dry-font-display on body (or a .page wrapper).\n     Do NOT put this on :root (that trips the theme-checker\n     full-theme-override rule, which reserves :root for generated theme\n     files). Scoping to body keeps the override local to the app instance\n     and reads every <Heading variant=\"display\"> beneath it. -->\nbody {\n  --dry-font-display: 'Newsreader', Georgia, 'Times New Roman', serif;\n}\n\n<!-- 3. Any page: variant=\"display\" now renders with the serif. -->\n<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<section class=\"hero\">\n  <Heading level={1} variant=\"display\" maxMeasure=\"narrow\">\n    Inference is all you need.\n  </Heading>\n  <Text size=\"lg\" color=\"muted\">Open-weight models, on your laptop.</Text>\n</section>\n\n<style>\n  .hero {\n    display: grid;\n    gap: var(--dry-space-6);\n  }\n</style>\n\n<!-- Gotchas:\n     - Only the Heading variant reads --dry-font-display. Other typography\n       components still use --dry-font-sans or --dry-font-mono.\n     - Override on body or a .page wrapper, NOT on :root. The theme-checker\n       treats :root { --dry-* } blocks as full theme overrides and flags them\n       when they do not ship a complete token set.\n     - If you want the serif scoped to one section (landing page only), move\n       the override onto a wrapper class instead of body. -->"
+        "snippet": "<!-- Serif display heading: override --dry-font-display on a scoped\n     wrapper. variant=\"display\" on Heading reads --dry-font-display and\n     falls back to --dry-font-sans, so without an override you get sans. -->\n\n<!-- 1. app.html: link a serif font. Newsreader is a good editorial default. -->\n<!doctype html>\n<html lang=\"en\" class=\"theme-auto\">\n  <head>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n    <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\" />\n    <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin />\n    <link\n      href=\"https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap\"\n      rel=\"stylesheet\"\n    />\n    %sveltekit.head%\n  </head>\n  <body>\n    <div>%sveltekit.body%</div>\n  </body>\n</html>\n\n<!-- 2. app.css: override --dry-font-display on body (or a .page wrapper).\n     Do NOT put this on :root (that trips the theme-checker\n     full-theme-override rule, which reserves :root for generated theme\n     files). Scoping to body keeps the override local to the app instance\n     and reads every <Heading variant=\"display\"> beneath it. -->\nbody {\n  --dry-font-display: 'Newsreader', Georgia, 'Times New Roman', serif;\n}\n\n<!-- 3. Any page: variant=\"display\" now renders with the serif. -->\n<script>\n  import { Heading, Text } from '@dryui/ui';\n</script>\n\n<section class=\"hero\">\n  <Heading level={1} variant=\"display\" maxMeasure=\"narrow\">\n    Inference is all you need.\n  </Heading>\n  <Text size=\"lg\" color=\"muted\">Open-weight models, on your laptop.</Text>\n</section>\n\n<style>\n  .hero {\n    display: grid;\n    gap: var(--dry-space-6);\n  }\n</style>\n\n<!-- Gotchas:\n     - Only the Heading variant reads --dry-font-display. Other typography\n       components still use --dry-font-sans or --dry-font-mono.\n     - Override on body or a .page wrapper, NOT on :root. The theme-checker\n       treats :root { --dry-* } blocks as full theme overrides and flags them\n       when they do not ship a complete token set.\n     - If you want the serif scoped to one section (landing page only), move\n       the override onto a wrapper class instead of body. -->"
       },
       "chip-row": {
         "name": "chip-row",

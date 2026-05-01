@@ -391,8 +391,8 @@ function projectFindings(
 				null,
 				'project/missing-layout-css',
 				'warning',
-				'Create src/layout.css for DryUI layout-only styles.',
-				'/* Layout-only hooks for data-layout and data-layout-area selectors. */\n'
+				'Create src/layout.css for DryUI page-level layout rules.',
+				'/* Page-level layout hooks for data-layout and data-layout-area selectors. */\n'
 			)
 		);
 	}

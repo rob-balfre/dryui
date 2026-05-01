@@ -2736,27 +2736,30 @@ export const componentCompositions: ComponentComposition[] = [
 
 	{
 		component: 'Container',
-		useWhen: 'Center page content with a max-width constraint',
+		useWhen:
+			'Component-level content measure when a recipe explicitly calls for a constrained wrapper',
 		alternatives: [
 			{
 				rank: 1,
 				component: 'Container',
-				useWhen: 'Centered max-width page wrapper',
+				useWhen: 'Constrained content measure inside component recipes',
 				snippet: `<Container>
-  <h1>Page content</h1>
+  <p>Measured content</p>
 </Container>`
 			}
 		],
 		antiPatterns: [
 			{
-				pattern: 'max-width + margin auto',
-				reason: 'Container handles responsive max-width and padding',
-				fix: 'Container'
+				pattern: 'Container as the app or page shell',
+				reason:
+					'Page width and page layout belong in src/layout.css grid tracks scoped by data-layout hooks.',
+				fix: 'data-layout + src/layout.css'
 			},
 			{
 				pattern: 'max-width + margin: 0 auto in custom CSS',
-				reason: 'Container handles responsive max-width with size variants and consistent padding.',
-				fix: '<Container size="lg">'
+				reason:
+					'Manual page centering bypasses the layout.css contract and scatters page tracks through component styles.',
+				fix: "grid-template-columns in src/layout.css under [data-layout='<name>']"
 			}
 		],
 		combinesWith: []
@@ -4566,9 +4569,9 @@ export const compositionRecipes: CompositionRecipe[] = [
 	{
 		name: 'app-shell',
 		description:
-			'SvelteKit app shell setup with theme CSS imports, app.html configuration, global CSS reset using DryUI tokens, and root layout with header and content slot. Start here before building any page.',
+			'SvelteKit app shell setup with theme CSS imports, app.html configuration, global CSS reset using DryUI tokens, and src/layout.css ownership for page-level grid/flex/container layout. Start here before building any page.',
 		tags: ['app', 'shell', 'setup', 'layout', 'sveltekit', 'root', 'theme', 'getting-started'],
-		components: ['Container'],
+		components: [],
 		snippet: `<!-- 1. app.html — add theme-auto class -->
 <!doctype html>
 <html lang="en" class="theme-auto">
@@ -4578,39 +4581,63 @@ export const compositionRecipes: CompositionRecipe[] = [
     %sveltekit.head%
   </head>
   <body>
-    <div style="display: contents">%sveltekit.body%</div>
+    <div>%sveltekit.body%</div>
   </body>
 </html>
 
-<!-- 2. src/app.css — import themes (resets are built in) -->
-@import '@dryui/ui/themes/default.css';
-@import '@dryui/ui/themes/dark.css';
+<!-- 2. src/app.css — global reset and the named page query container -->
+body {
+  margin: 0;
+  min-height: 100dvh;
+  container-type: inline-size;
+  container-name: page;
+}
 
-<!-- 3. src/routes/+layout.svelte — root layout -->
+<!-- 3. src/routes/+layout.svelte — root layout imports CSS in cascade order -->
 <script>
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
   import '../app.css';
-  import { Container } from '@dryui/ui';
+  import '../layout.css';
 
   let { children } = $props();
 </script>
 
-<header>
-  <Container>
-    <div class="app-header">My App</div>
-  </Container>
-</header>
-<main>
-  <Container>
-    <div class="page-content">
-      {@render children()}
-    </div>
-  </Container>
-</main>
+<div data-layout="app-shell">
+  <header data-layout-area="masthead">My App</header>
+  <main data-layout-area="main">
+    {@render children()}
+  </main>
+</div>
 
-<style>
-  .app-header { padding: var(--dry-space-4) 0; font-weight: bold; }
-  .page-content { display: grid; gap: var(--dry-space-6); }
-</style>`
+<!-- 4. src/layout.css — page-level layout only -->
+[data-layout='app-shell'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'masthead'
+    'main';
+  min-block-size: 100dvh;
+}
+
+[data-layout='app-shell'] > [data-layout-area='masthead'] {
+  grid-area: masthead;
+  padding: var(--dry-space-4) var(--dry-space-6);
+}
+
+[data-layout='app-shell'] > [data-layout-area='main'] {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: minmax(0, 72rem);
+  justify-content: center;
+  padding: var(--dry-space-6);
+}
+
+@container page (min-width: 56rem) {
+  [data-layout='app-shell'] > [data-layout-area='main'] {
+    padding: var(--dry-space-10);
+  }
+}`
 	},
 
 	{
@@ -4739,7 +4766,7 @@ body {
     %sveltekit.head%
   </head>
   <body>
-    <div style="display: contents">%sveltekit.body%</div>
+    <div>%sveltekit.body%</div>
   </body>
 </html>
 
@@ -4753,14 +4780,11 @@ body {
 <!-- 3. src/routes/+layout.svelte — nothing special; tokens already resolve light. -->
 <script>
   import '../app.css';
-  import { Container } from '@dryui/ui';
 
   let { children } = $props();
 </script>
 
-<main>
-  <Container>{@render children()}</Container>
-</main>
+{@render children()}
 
 <!-- Gotcha: do NOT drop theme-auto to "force light". Leaving theme-auto in
      place preserves the opt-in dark pathway (user sets data-theme="dark")
@@ -4770,38 +4794,52 @@ body {
 	{
 		name: 'page-shell-simple',
 		description:
-			'Simple page layout with header and centered content. Use Container for pages without a sidebar.',
+			'Simple page layout with header and centered content. Use data-layout hooks plus src/layout.css for pages without a sidebar.',
 		tags: ['page', 'shell', 'simple', 'layout', 'header', 'content', 'no-sidebar'],
-		components: ['Container'],
+		components: [],
 		snippet: `<!-- Use this for simple pages WITHOUT a sidebar.
      Simple page shell with header and centered content. -->
-<script>
-  import { Container } from '@dryui/ui';
-</script>
+<div data-layout="page-shell">
+  <header data-layout-area="masthead">App Name</header>
+  <main data-layout-area="main">
+    <!-- Page content: Cards, forms, grids, etc. go here directly. -->
+  </main>
+</div>
 
-<header>
-  <Container>
-    <div class="page-header">App Name</div>
-  </Container>
-</header>
-<main>
-  <Container>
-    <div class="page-content">
-      <!-- Page content: Cards, forms, grids, etc. go here directly. -->
-    </div>
-  </Container>
-</main>
+<!-- src/layout.css -->
+[data-layout='page-shell'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'masthead'
+    'main';
+  min-block-size: 100dvh;
+}
 
-<style>
-  .page-header { padding: var(--dry-space-4) 0; font-weight: bold; }
-  .page-content { display: grid; gap: var(--dry-space-6); }
-</style>`
+[data-layout='page-shell'] > [data-layout-area='masthead'] {
+  grid-area: masthead;
+  padding: var(--dry-space-4) var(--dry-space-6);
+}
+
+[data-layout='page-shell'] > [data-layout-area='main'] {
+  grid-area: main;
+  display: grid;
+  grid-template-columns: minmax(0, 72rem);
+  justify-content: center;
+  padding: var(--dry-space-6);
+}
+
+@container page (min-width: 56rem) {
+  [data-layout='page-shell'] > [data-layout-area='main'] {
+    padding: var(--dry-space-10);
+  }
+}`
 	},
 
 	{
 		name: 'centred-page',
 		description:
-			'Full-viewport centred page layout with zero visual decoration. Use for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.',
+			'Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.',
 		tags: [
 			'page',
 			'centered',
@@ -4815,49 +4853,50 @@ body {
 		],
 		components: [],
 		snippet: `<!-- Centred page — no visual chrome, just spatial arrangement.
-     CSS grid centres content both axes, min-height fills the viewport. -->
-<div class="centred-page">
+     src/layout.css centres content both axes and fills the viewport. -->
+<div data-layout="centred-page">
   <!-- Hero content goes here: headings, inputs, swatches, etc. -->
   <h1>Title</h1>
   <p>Subtitle or description</p>
 </div>
 
-<style>
-  .centred-page {
-    display: grid;
-    justify-items: center;
-    align-content: center;
-    gap: var(--dry-space-16);
-    min-height: 100dvh;
-    padding: var(--dry-space-12) var(--dry-space-6);
-  }
-</style>`
+<!-- src/layout.css -->
+[data-layout='centred-page'] {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: var(--dry-space-16);
+  min-block-size: 100dvh;
+  padding: var(--dry-space-12) var(--dry-space-6);
+}`
 	},
 
 	{
 		name: 'simple-content-page',
 		description:
-			'Clean content page with constrained width and vertical rhythm. Use Container for max-width and CSS grid for vertical spacing. Suitable for blog posts, documentation, settings pages.',
+			'Clean content page with constrained width and vertical rhythm. Use data-layout hooks plus src/layout.css for blog posts, documentation, and settings pages.',
 		tags: ['page', 'content', 'simple', 'blog', 'docs', 'article', 'clean', 'minimal'],
-		components: ['Container'],
-		snippet: `<!-- Simple content page — Container constrains width, grid provides rhythm -->
-<script>
-  import { Container } from '@dryui/ui';
-</script>
-
-<main class="content-main">
-  <Container size="md">
-    <div class="content-body">
-      <h1>Page Title</h1>
-      <!-- Content blocks go here -->
-    </div>
-  </Container>
+		components: [],
+		snippet: `<!-- Simple content page — layout.css constrains width and provides rhythm. -->
+<main data-layout="content-page">
+  <section data-layout-area="main">
+    <h1>Page Title</h1>
+    <!-- Content blocks go here -->
+  </section>
 </main>
 
-<style>
-  .content-main { padding: var(--dry-space-12) 0; }
-  .content-body { display: grid; gap: var(--dry-space-8); }
-</style>`
+<!-- src/layout.css -->
+[data-layout='content-page'] {
+  display: grid;
+  grid-template-columns: minmax(0, 42rem);
+  justify-content: center;
+  padding: var(--dry-space-12) var(--dry-space-6);
+}
+
+[data-layout='content-page'] > [data-layout-area='main'] {
+  display: grid;
+  gap: var(--dry-space-8);
+}`
 	},
 
 	{
@@ -5101,9 +5140,9 @@ body {
 		name: 'data-table-with-actions',
 		description: 'Data table with page header, action button, status badges, and user avatars.',
 		tags: ['table', 'data', 'list', 'users', 'admin'],
-		components: ['Container', 'Heading', 'Button', 'Table', 'Avatar', 'Badge', 'Text'],
+		components: ['Heading', 'Button', 'Table', 'Avatar', 'Badge', 'Text'],
 		snippet: `<script>
-  import { Container, Heading, Button, Table, Avatar, Badge, Text } from '@dryui/ui';
+  import { Heading, Button, Table, Avatar, Badge, Text } from '@dryui/ui';
 
   const users = [
     { name: 'Sarah Chen', email: 'sarah@example.com', role: 'Admin', status: 'Active', avatar: '/avatars/sarah.jpg' },
@@ -5112,12 +5151,12 @@ body {
   ];
 </script>
 
-<Container>
-  <div class="table-page">
-    <div class="table-header">
+<main data-layout="table-page">
+  <section data-layout-area="main">
+    <header data-layout-area="header">
       <Heading level={1}>Users</Heading>
       <Button variant="solid">Add User</Button>
-    </div>
+    </header>
     <Table.Root>
       <Table.Header>
         <Table.Row>
@@ -5148,12 +5187,29 @@ body {
         {/each}
       </Table.Body>
     </Table.Root>
-  </div>
-</Container>
+  </section>
+</main>
+
+<!-- src/layout.css -->
+[data-layout='table-page'] {
+  display: grid;
+  grid-template-columns: minmax(0, 72rem);
+  justify-content: center;
+  padding: var(--dry-space-6);
+}
+
+[data-layout='table-page'] > [data-layout-area='main'] {
+  display: grid;
+  gap: var(--dry-space-6);
+}
+
+[data-layout='table-page'] [data-layout-area='header'] {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
 
 <style>
-  .table-page { display: grid; gap: var(--dry-space-6); }
-  .table-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }
   .user-cell { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; align-items: center; gap: var(--dry-space-2); }
   .user-info { display: grid; gap: var(--dry-space-1); }
 </style>`
@@ -6209,7 +6265,7 @@ body {
     %sveltekit.head%
   </head>
   <body>
-    <div style="display: contents">%sveltekit.body%</div>
+    <div>%sveltekit.body%</div>
   </body>
 </html>
 

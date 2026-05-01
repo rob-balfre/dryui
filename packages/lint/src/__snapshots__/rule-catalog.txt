@@ -1,4 +1,4 @@
-dryui/no-layout-component	error	Do not {action} {target}. Use {guidance}.	Use raw CSS grid with custom properties instead.
+dryui/no-layout-component	error	Do not {action} {target}. Use {guidance}.	Use data-layout hooks and src/layout.css instead.
 dryui/no-inline-style	error	No inline style attributes. Use scoped CSS with custom properties.	Move the inline styles into the component <style> block.
 dryui/no-style-directive	error	No style: directives. Use scoped CSS with custom properties.	Move style directives into component props, --dry-* CSS custom properties, or the component <style> block.
 dryui/no-attach	error	Do not use {@attach ...}. Use component props, CSS custom properties, or explicit component APIs.	Remove the attachment and expose the needed behavior through a component prop or CSS custom property.
@@ -8,7 +8,7 @@ dryui/no-css-ignore	error	Do not use <!-- svelte-ignore css_unused_selector -->.
 dryui/no-svelte-element	error	Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).	Replace <svelte:element> with explicit markup branches.
 dryui/no-anchor-without-href	error	Do not use <a> without href. Use <button> for actions, or provide href for navigation.	Add href, or switch to <button> for non-navigation actions.
 dryui/no-raw-native-element	error	Raw <{tag}> is only allowed inside its canonical component directory. Use <{component}{closing}> elsewhere.	Use the matching DryUI component instead of the raw element.
-dryui/no-flex	error	Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: ask --scope recipe "chip row").	Use CSS grid instead of flexbox layout primitives.
+dryui/no-flex	error	Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: ask --scope recipe "chip row").	Use CSS grid, or move page-level flex to src/layout.css.
 dryui/no-width	error	Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead. Allowed units for typographic measure: ch, ex, em (e.g. max-width: 55ch is allowed, since it tracks text content, not viewport layout).	Move sizing to the parent grid tracks, or use ch/ex/em for text measure.
 dryui/no-all-unset	error	Do not use all: unset. Reset only the specific properties you need.	Replace all: unset with targeted property resets.
 dryui/no-important	error	Avoid !important — fix specificity at the source. Use component props, data-* attributes, or restructure the selector.	Remove !important and resolve the underlying specificity conflict.
@@ -16,11 +16,11 @@ dryui/no-global	error	Do not use :global(). Use scoped styles, data-* attributes
 dryui/no-media-sizing	error	Do not use @media for sizing. Use @container queries instead. @media is only allowed for prefers-reduced-motion and prefers-color-scheme.	Replace the sizing media query with a container query.
 dryui/prefer-focus-ring-token	error	Do not inline "2px solid var(--dry-color-focus-ring)". Use the shared token: outline: var(--dry-focus-ring); (followed by outline-offset: 2px for outset or -1px for inset).	Use outline: var(--dry-focus-ring) plus the correct outline-offset.
 dryui/no-partial-inset-shadow	error	Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.	Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.
-dryui/no-raw-grid	error	Do not use raw CSS grid ({value}). Move grid layout into a sanctioned layout primitive or scoped layout CSS.	Use a sanctioned layout primitive instead of raw CSS grid declarations.
+dryui/no-raw-grid	error	Do not use raw CSS grid ({value}) here. Move page-level grid layout into src/layout.css, scoped by data-layout hooks.	Move page layout grid declarations to src/layout.css.
 dryui/layout-css-at-rule	error	src/layout.css only allows @container wrappers. Remove {atRule}.	Move non-layout CSS out of src/layout.css, or use @container for layout variants.
 dryui/layout-css-selector	error	src/layout.css selectors must target [data-layout] or [data-layout-area] hooks. Invalid selector: {selector}	Use a [data-layout] or [data-layout-area] selector.
-dryui/layout-css-property	error	src/layout.css only supports spacing and CSS box-alignment properties. Invalid property: {property}	Move visual styling, sizing, positioning, typography, and grid templates out of src/layout.css.
-dryui/layout-css-value	error	src/layout.css only accepts DryUI spacing tokens, 0, calc() with DryUI spacing tokens, margin auto, and standard box-alignment keywords. Invalid {property}: {value}	Use var(--dry-space-*), 0, simple calc() expressions, margin auto, or box-alignment keywords.
+dryui/layout-css-property	error	src/layout.css only supports page layout properties: display, grid, flex, container, spacing, block sizing, and box alignment. Invalid property: {property}	Move visual styling, positioning, typography, color, border, and effects out of src/layout.css.
+dryui/layout-css-value	error	src/layout.css only accepts layout-safe values for grid, flex, containers, spacing, block sizing, and alignment. Invalid {property}: {value}	Use grid/flex/container syntax, DryUI spacing tokens for spacing, margin auto, block-size values, or standard box-alignment keywords.
 bare-compound	error	<{name}> is a {variant} component — use {target}	{target}
 unknown-component	error	<{name}> is not a known DryUI component	
 invalid-part	error	<{root}.{part}> — "{part}" is not a valid part of {root}. Valid parts: {validParts}	
@@ -29,13 +29,13 @@ missing-required-prop	error	<{name}> is missing required prop "{prop}"	{prop}={.
 orphaned-part	error	<{name}> used without <{root}.Root> in the template	Wrap in <{root}.Root>
 missing-label	error	<{name}> may be missing an accessible label — add aria-label or wrap in <Field.Root> with <Label>	aria-label="..."
 missing-alt	error	<Avatar> is missing "alt" and "fallback" props for accessibility	alt="..."
-prefer-grid-layout	error	Use scoped CSS grid instead of flexbox. DryUI layout standard is raw grid with --dry-space-* gaps, Container for constrained width, and @container queries for responsiveness.	display: grid
+prefer-grid-layout	error	Move page layout into src/layout.css with [data-layout] hooks. Use grid for track-based structure and flex only for one-dimensional page layout there.	Move layout CSS to src/layout.css
 use-field-component	error	Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.	<Field.Root> + <Label>
 use-button-component	error	Use DryUI's <Button> component instead of raw <button> with custom classes. Button provides variants, sizes, loading states, and theme-consistent styling.	<Button>
-use-container-component	error	Use DryUI's <Container> component instead of custom max-width + margin centering.	<Container>
+use-container-component	error	Use src/layout.css grid tracks instead of custom max-width + margin centering.	src/layout.css
 interactive-card-wrapper	warning	Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.	display: grid
 hardcoded-color	suggestion	Hardcoded color value — consider using `--dry-*` CSS custom properties for theming	var(--dry-*)
-prefer-container	suggestion	Manual centering with max-width + margin auto — consider using <Container> instead	<Container>
+prefer-container	suggestion	Manual centering with max-width + margin auto — consider src/layout.css grid tracks instead	src/layout.css
 theme-in-style	suggestion	Custom --dry-* variable declarations detected in <style> — run the `diagnose` tool on your theme CSS for a full health check	Move custom --dry-* declarations to theme CSS
 prefer-separator	error	Raw <hr> element — use <Separator /> for consistent styling	<Separator />
 missing-token	error	Required semantic token {variable} is not defined. Full-theme files must define every semantic token (run: ask --scope recipe "customize tokens").	Add {variable} with a color that fits your theme

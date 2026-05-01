@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, CodeBlock, Container, Heading, Separator, Text } from '@dryui/ui';
+	import { Card, CodeBlock, Heading, Separator, Text } from '@dryui/ui';
 	import { componentLinkResolver } from '$lib/component-links';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import DocsSectionIntro from '$lib/components/DocsSectionIntro.svelte';
@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-	<title>Grid Layout Rules — DryUI</title>
+	<title>Layout CSS Rules — DryUI</title>
 </svelte:head>
 
 {#snippet codeExample(code: string, language: string)}
@@ -24,11 +24,11 @@
 	</Card.Root>
 {/snippet}
 
-<Container>
-	<div class="page-stack">
+<div data-layout="layout-rules-page">
+	<div data-layout-area="main">
 		<DocsPageHeader
-			title="Grid Layout Rules"
-			description="DryUI uses CSS grid for all layout — no flexbox, no layout components. These rules keep layout consistent, responsive, and easy to maintain across your entire application."
+			title="Layout CSS Rules"
+			description="DryUI keeps page layout in src/layout.css with data-layout hooks, CSS grid, flex, and container queries. These rules keep layout consistent, responsive, and easy to maintain across your application."
 		/>
 
 		<div class="stack-lg">
@@ -42,10 +42,11 @@
 				<li class="rule-item">
 					<span class="rule-icon"><CircleCheck size={20} /></span>
 					<div class="rule-body">
-						<Heading level={4}>Grid only</Heading>
+						<Heading level={4}>Layout.css owns layout</Heading>
 						<Text size="sm" color="secondary">
-							Every layout uses <code>display: grid</code>. Never use <code>display: flex</code> or DryUI
-							layout components like Grid, Stack, or Flex.
+							Page-level <code>display: grid</code>, <code>display: flex</code>, container rules,
+							and grid tracks live in <code>src/layout.css</code>, scoped under
+							<code>[data-layout]</code>.
 						</Text>
 					</div>
 				</li>
@@ -86,11 +87,10 @@
 				<li class="rule-item">
 					<span class="rule-icon"><CircleCheck size={20} /></span>
 					<div class="rule-body">
-						<Heading level={4}>Scoped styles only</Heading>
+						<Heading level={4}>No component layout CSS</Heading>
 						<Text size="sm" color="secondary">
-							All layout CSS goes in scoped <code>&lt;style&gt;</code> blocks. No inline styles, no
-							<code>style:</code>
-							directives, no <code>:global()</code>, no
+							Page layout does not go in component <code>&lt;style&gt;</code> blocks. No inline
+							styles, no <code>style:</code> directives, no <code>:global()</code>, no
 							<code>!important</code>.
 						</Text>
 					</div>
@@ -122,11 +122,11 @@
   .grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ✅ Correct — use @container instead */
-.grid-wrapper { container-type: inline-size; }
-
-@container (min-width: 768px) {
-  .grid { grid-template-columns: repeat(3, 1fr); }
+/* ✅ Correct — use @container in src/layout.css */
+@container page (min-width: 48rem) {
+  [data-layout='card-grid'] {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }`,
 				'css'
 			)}
@@ -142,39 +142,30 @@
 			/>
 
 			{@render codeExample(
-				`<div class="cards-wrapper">
-  <div class="cards">
-    <Card.Root>...</Card.Root>
-    <Card.Root>...</Card.Root>
-    <Card.Root>...</Card.Root>
-  </div>
+				`<div data-layout="card-grid">
+  <Card.Root>...</Card.Root>
+  <Card.Root>...</Card.Root>
+  <Card.Root>...</Card.Root>
 </div>
 
-<` +
-					`style>
-  .cards-wrapper {
-    container-type: inline-size;
-  }
+/* src/layout.css */
+[data-layout='card-grid'] {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--dry-space-4);
+}
 
-  .cards {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--dry-space-4);
+@container page (min-width: 30rem) {
+  [data-layout='card-grid'] {
+    grid-template-columns: repeat(2, 1fr);
   }
+}
 
-  @container (min-width: 480px) {
-    .cards {
-      grid-template-columns: repeat(2, 1fr);
-    }
+@container page (min-width: 48rem) {
+  [data-layout='card-grid'] {
+    grid-template-columns: repeat(3, 1fr);
   }
-
-  @container (min-width: 768px) {
-    .cards {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-</` +
-					`style>`,
+}`,
 				'svelte'
 			)}
 		</div>
@@ -189,17 +180,17 @@
 			/>
 
 			{@render codeExample(
-				`.grid {
+				`[data-layout='auto-grid'] {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
   gap: var(--dry-space-4);
 }`,
 				'css'
 			)}
 
-			<DocsCallout title="Why min(240px, 100%)?" variant="info">
+			<DocsCallout title="Why min(15rem, 100%)?" variant="info">
 				The <code>min()</code> function prevents overflow on very narrow containers. Without it, items
-				would overflow when the container is smaller than 240px.
+				would overflow when the container is smaller than the minimum card track.
 			</DocsCallout>
 		</div>
 
@@ -213,15 +204,20 @@
 			/>
 
 			{@render codeExample(
-				`.layout {
+				`[data-layout='docs-shell'] {
   display: grid;
-  grid-template-columns: var(--sidebar-width, 260px) 1fr;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100dvh;
+  grid-template-columns: 16rem minmax(0, 1fr);
+  grid-template-areas:
+    'header header'
+    'sidebar main'
+    'footer footer';
+  min-block-size: 100dvh;
 }
 
-.header { grid-column: 1 / -1; }
-.footer { grid-column: 1 / -1; }`,
+[data-layout='docs-shell'] > [data-layout-area='header'] { grid-area: header; }
+[data-layout='docs-shell'] > [data-layout-area='sidebar'] { grid-area: sidebar; }
+[data-layout='docs-shell'] > [data-layout-area='main'] { grid-area: main; }
+[data-layout='docs-shell'] > [data-layout-area='footer'] { grid-area: footer; }`,
 				'css'
 			)}
 		</div>
@@ -236,16 +232,16 @@
 			/>
 
 			{@render codeExample(
-				`.page {
+				`[data-layout='content-page'] {
   display: grid;
-  grid-template-columns: 1fr min(var(--content-width, 72ch), 100%) 1fr;
+  grid-template-columns: 1fr minmax(0, 72ch) 1fr;
 }
 
-.page > * {
+[data-layout='content-page'] > [data-layout-area='main'] {
   grid-column: 2;
 }
 
-.page > .full-bleed {
+[data-layout='content-page'] > [data-layout-area='bleed'] {
   grid-column: 1 / -1;
 }`,
 				'css'
@@ -258,19 +254,19 @@
 			<DocsSectionIntro
 				id="vertical-stacking"
 				title="Vertical Stacking"
-				description="Replace flexbox column layouts with a single-column grid. Use --dry-space-* tokens for consistent vertical rhythm."
+				description="Put vertical rhythm in src/layout.css. Use grid for track-based stacks and flex only for one-dimensional page-layout arrangements."
 			/>
 
 			{@render codeExample(
-				`/* ❌ Don't use flexbox */
+				`/* ❌ Don't put page layout in component styles */
 .stack {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-/* ✅ Use grid */
-.stack {
+/* ✅ src/layout.css */
+[data-layout='stack'] {
   display: grid;
   gap: var(--dry-space-4);
 }`,
@@ -312,18 +308,15 @@
 			/>
 
 			<DocsCallout title="What gets flagged" variant="warning">
-				The linter warns on display: flex, inline style attributes, style: directives, @media sizing
-				queries, :global(), and !important. Fix violations at the source — don't suppress them.
+				The linter warns on page-layout grid or flex outside <code>src/layout.css</code>, inline
+				style attributes, style: directives, @media sizing queries, :global(), and !important. Fix
+				violations at the source — don't suppress them.
 			</DocsCallout>
 		</div>
 	</div>
-</Container>
+</div>
 
 <style>
-	.page-stack {
-		display: grid;
-		gap: var(--dry-space-10);
-	}
 	.rules-list {
 		display: grid;
 		gap: 0;
