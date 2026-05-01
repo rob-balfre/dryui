@@ -16,13 +16,13 @@ describe('setup guides', () => {
 		expect(companion?.code).toContain('claude mcp add -t stdio -s user svelte');
 	});
 
-	test('returns the Gemini CLI guide with extension and Svelte companion steps', () => {
+	test('returns the Gemini CLI guide with the npx skills install path and Svelte companion steps', () => {
 		const guide = getSetupGuide('gemini');
 
 		expect(guide.label).toBe('Gemini CLI');
 		expect(guide.sections).toHaveLength(3);
-		expect(guide.sections[0]?.title).toBe('Install the extension');
-		expect(guide.sections[0]?.code).toContain('gemini extensions install');
+		expect(guide.sections[0]?.title).toBe('Install the skill');
+		expect(guide.sections[0]?.code).toContain('npx skills add rob-balfre/dryui');
 		expect(guide.sections[1]?.code).toContain('"mcpServers"');
 		expect(guide.sections[1]?.code).toContain('dryui-feedback');
 		expect(guide.sections[2]?.code).toContain('gemini mcp add -t stdio -s user svelte');

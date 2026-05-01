@@ -692,16 +692,16 @@ function renderSvelteCompanionInstallProgress(
 function setupHelp(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--install] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open]`,
+			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open]`,
 			description: [
 				'Interactive action menu for editor setup, feedback, and common project helpers.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
-				'Without a TTY, use --editor and/or --open-feedback for deterministic output.'
+				'Without a TTY, use --editor and/or --open-feedback for deterministic output.',
+				'',
+				'For one-shot per-agent install, use `dryui init` (which wires the skill via npx skills + MCP config in one step). The legacy `--install` flag was removed in Phase 6 of the npx skills migration.'
 			],
 			options: [
 				'  --editor <id>       Print setup steps for one editor or agent',
-				'  --install           After printing the editor steps, run them (skill copy + MCP config merge).',
-				'                      Supported for copilot, cursor, gemini, opencode, windsurf, zed.',
 				'  --no-svelte-mcp     Skip registering the official @sveltejs/mcp server (default: on)',
 				'  --claude-hook       Run `dryui install-hook` after the Claude guide',
 				'  --open-feedback     Open feedback tooling after printing setup steps',
@@ -710,11 +710,10 @@ function setupHelp(exitCode = 0): never {
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
-				'  dryui setup --editor gemini --install',
-				'  dryui setup --editor opencode --install',
-				'  dryui setup --editor cursor --install --no-svelte-mcp',
+				'  dryui setup --editor cursor --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
-				'  dryui setup --open-feedback --no-open'
+				'  dryui setup --open-feedback --no-open',
+				'  dryui init           # one-shot setup for a fresh project (recommended)'
 			]
 		},
 		exitCode
@@ -1260,28 +1259,12 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 			emitCommandResult(getInstallHookResult([], 'text'));
 		}
 		if (hasFlag(args, '--install')) {
-			if (!isAutoInstallable(editor)) {
-				console.error('');
-				console.error(
-					`--install is not supported for ${editor}. Follow the printed steps above instead.`
-				);
-				process.exit(1);
-			}
-			console.log('');
-			console.log(
-				`Installing ${getSetupGuide(editor).label} setup. Please wait while npx resolves packages...`
+			console.error('');
+			console.error('`dryui setup --install` was removed in Phase 6 of the npx skills migration.');
+			console.error(
+				'Use `dryui init` for one-shot setup (it wires skills via npx skills + MCP config in one step), or run the printed steps above by hand.'
 			);
-			const result = runEditorInstall(editor, {
-				cwd: process.cwd(),
-				includeSvelteMcp
-			});
-			if (result) {
-				console.log('');
-				console.log(formatInstallResult(result));
-				if (!result.ok) {
-					process.exit(1);
-				}
-			}
+			process.exit(2);
 		}
 		if (hasFlag(args, '--open-feedback')) {
 			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);

@@ -16,8 +16,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 - Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
 - Recommended install path for end users: `npx skills add rob-balfre/dryui` (skills.sh standard).
 - `bun run validate:skills` lints every SKILL.md (frontmatter present, name=dirname, description length).
-- `bun run sync:skills` regenerates the legacy `packages/plugin/skills/` mirror and `.cursor/rules/` (both slated for removal in Phase 6 of the npx skills migration). Do not edit those generated copies directly.
-- The local plugin source is [`packages/plugin`](./packages/plugin). `/plugins` refers to the in-app Codex or Claude install flow, not a repo directory.
+- `/plugins` in this repo refers to the in-app Claude or Codex install flow (now sunset for DryUI per Phase 6 of the npx skills migration), not a repo directory.
 
 ## Repo Rules
 
@@ -65,4 +64,4 @@ dryui
 
 - After editing `.svelte` files in `packages/ui/`, run `bun run --filter '@dryui/ui' build`.
 - For docs work, prefer the root wrappers so local runs match CI: `bun run docs`, `bun run docs:build`, `bun run docs:check`, and `bun run build:docs`.
-- After changing skill content or setup guidance, run `bun run sync:skills`.
+- After changing skill content, run `bun run validate:skills` (auto-runs in postinstall and the pre-commit hook).

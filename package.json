@@ -2,10 +2,9 @@
   "private": true,
   "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "postinstall": "bun run ./scripts/install-hooks.ts && bun run validate:skills && bun run ./scripts/sync-skills.ts",
+    "postinstall": "bun run ./scripts/install-hooks.ts && bun run validate:skills",
     "setup:hooks": "bun run ./scripts/install-hooks.ts",
     "validate:skills": "bun run ./scripts/validate-skills.ts",
-    "sync:skills": "bun run validate:skills && bun run ./scripts/sync-skills.ts",
     "docs:dev": "bun run --cwd apps/docs dev",
     "docs:build": "bun run --cwd apps/docs build",
     "docs:check": "bun run --cwd apps/docs check",

@@ -226,17 +226,16 @@ ${CODEX_CONFIG}`
 		id: 'gemini',
 		label: 'Gemini CLI',
 		description:
-			'Install the DryUI extension for Gemini. The extension is the canonical Gemini skill path.',
+			'Install the DryUI skill via npx skills (skills.sh standard), then merge the dryui and dryui-feedback MCP servers into Gemini settings.',
 		sections: [
 			{
-				title: 'Install the extension',
-				note: 'Gemini CLI installs extensions from a local path. Clone DryUI, then point Gemini at `packages/plugin/`. The extension bundles GEMINI.md plus the dryui and dryui-feedback MCP servers.',
-				code: `git clone https://github.com/rob-balfre/dryui ~/dryui
-gemini extensions install ~/dryui/packages/plugin`
+				title: 'Install the skill',
+				note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .gemini/skills/dryui`.',
+				code: `npx skills add rob-balfre/dryui --agent gemini-cli`
 			},
 			{
-				title: 'Or use the MCP-only fallback',
-				note: '`dryui setup --editor gemini --install` merges both servers into `~/.gemini/settings.json` for you. Use this if you cannot install the extension (it skips GEMINI.md with the bundled DryUI skill).',
+				title: 'Add the MCP servers',
+				note: '`dryui init` (or `dryui setup --editor gemini`) merges both servers into `~/.gemini/settings.json` automatically. The Gemini extension flow that previously bundled both pieces was sunset in Phase 6 of the npx skills migration.',
 				code: GEMINI_CONFIG
 			},
 			SVELTE_SECTION_GEMINI

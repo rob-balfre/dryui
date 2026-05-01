@@ -18,7 +18,7 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 
 1. Run `bun run validate`.
 2. If you edited `.svelte` files in `packages/ui/`, also run `bun run --filter '@dryui/ui' build`.
-3. If you changed skill content or editor setup guidance, run `bun run sync:skills`.
+3. If you changed skill content, run `bun run validate:skills` (also runs in postinstall and the pre-commit hook for any staged SKILL.md).
 4. If you changed docs-site content, run `bun run docs:check` and `bun run build:docs`.
 
 ## Contributor Checklist
@@ -33,8 +33,7 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 
 Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). Edit these directly.
 
-- `bun run validate:skills` enforces npx skills frontmatter rules (name=dirname, lowercase + hyphens, description 20..1024 chars). Runs in postinstall, the pre-commit hook for any staged SKILL.md, and gates `bun run sync:skills`.
-- `bun run sync:skills` mirrors three skills into `packages/plugin/skills/` and regenerates `.cursor/rules/` (legacy plugin marketplace + Cursor rules path; both removed in Phase 6 of the npx skills migration).
+- `bun run validate:skills` enforces npx skills frontmatter rules (name=dirname, lowercase + hyphens, description 20..1024 chars). Runs in postinstall and the pre-commit hook for any staged SKILL.md.
 - Distribution to end users: `npx skills add rob-balfre/dryui` (skills.sh standard). Per-agent install paths and MCP wiring live in [`packages/cli/src/commands/setup-installers.ts`](./packages/cli/src/commands/setup-installers.ts).
 
 ## Adding Or Changing A Component

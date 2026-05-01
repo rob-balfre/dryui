@@ -1,6 +1,0 @@
-{
-  "name": "@dryui/plugin",
-  "version": "1.0.0",
-  "private": true,
-  "description": "DryUI plugin bundle for Claude Code, Codex, Copilot CLI, and Gemini CLI — ships skills, init, live-feedback, and the dryui + dryui-feedback MCP servers"
-}

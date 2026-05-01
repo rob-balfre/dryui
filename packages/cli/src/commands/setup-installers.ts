@@ -558,10 +558,11 @@ function windsurfInstaller(ctx: InstallContext): InstallResult {
 	return finalize('windsurf', [skill, config]);
 }
 
-// Gemini has a native extension path (`gemini extensions install packages/plugin`)
-// that bundles both MCP servers plus GEMINI.md. This installer is the MCP-only
-// fallback for users who can't run the extension path — it wires both servers
-// into ~/.gemini/settings.json so feedback works without the extension.
+// Gemini installer: skill install via npx skills (handled by selectSkillInstaller
+// elsewhere; Gemini does not currently round-trip through this installer for
+// skills) plus MCP server config in ~/.gemini/settings.json. The previous Gemini
+// extension path that bundled both was sunset in Phase 6 of the npx skills
+// migration.
 function geminiInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('gemini', ctx),

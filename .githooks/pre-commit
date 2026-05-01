@@ -39,21 +39,11 @@ fi
 
 # Validate every staged SKILL.md against the npx skills spec
 # (frontmatter present, name=dirname, description length budget).
-# This runs BEFORE sync:skills so a malformed skill cannot poison the
-# generated plugin mirror.
-if echo "$STAGED" | grep -qE '/SKILL\.md$|^skills/'; then
+# Phase 6 of the npx skills migration removed the legacy sync:skills
+# regeneration; validate:skills is the only check that runs here.
+if echo "$STAGED" | grep -qE '^skills/.*/SKILL\.md$|^skills/[^/]+/'; then
   echo "[pre-commit] SKILL.md changed — validating frontmatter..."
   bun run validate:skills || exit 1
-fi
-
-# Resync packages/plugin/skills/* and .cursor/rules/* when a skill source
-# changes. postinstall runs sync:skills too, but only on `bun install`; a
-# raw edit+commit can otherwise ship a stale plugin copy (which dirties CI
-# after bun install normalizes it → release:ci refuses the worktree).
-if echo "$STAGED" | grep -qE '^packages/(ui/skills/dryui|feedback/skills/live-feedback|cli/skills/init)/'; then
-  echo "[pre-commit] Skill source changed — regenerating plugin/.cursor copies..."
-  bun run ./scripts/sync-skills.ts
-  git add packages/plugin/skills .cursor/rules
 fi
 
 # Check formatting on staged files

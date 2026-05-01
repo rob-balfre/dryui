@@ -6,10 +6,10 @@
 //   3. `name` matches the parent directory name.
 //   4. `description` present, 20..1024 chars (npx skills routing-rule budget).
 //
-// Walks both the legacy scattered layout (packages/{ui,feedback,
-// feedback-server,cli}/skills/*/SKILL.md, packages/plugin/skills/*/SKILL.md)
-// AND the post-Phase-2 top-level layout (skills/*/SKILL.md), so it works
-// throughout the npx-skills migration without flag-juggling.
+// Walks the canonical top-level skills/ layout (post-Phase-2 of the npx
+// skills migration). Legacy candidate roots remain in the list so a
+// rollback to the scattered layout would still validate, but on a clean
+// post-Phase-6 tree only skills/ matches.
 //
 // Exit code: 0 on clean tree, 1 on any validation failure (with per-file
 // diagnostics on stderr).

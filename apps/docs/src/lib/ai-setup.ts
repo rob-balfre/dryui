@@ -377,26 +377,28 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		installSteps: [
 			{
-				title: 'Clone the DryUI repo',
-				description: 'Gemini CLI installs extensions from a local path, not a GitHub URL.',
-				code: 'git clone https://github.com/rob-balfre/dryui ~/dryui'
+				title: 'Install the DryUI skill',
+				description:
+					'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .gemini/skills/dryui`.',
+				code: 'npx skills add rob-balfre/dryui --agent gemini-cli',
+				language: 'bash'
 			},
 			{
-				title: 'Install the extension',
+				title: 'Add the MCP servers',
 				description:
-					'Points Gemini at `packages/plugin/`, which bundles GEMINI.md and the dryui + dryui-feedback MCP servers.',
-				code: 'gemini extensions install ~/dryui/packages/plugin'
+					'`dryui init` (or `dryui setup --editor gemini`) merges both dryui and dryui-feedback MCP servers into `~/.gemini/settings.json` automatically.',
+				code: geminiConfig,
+				language: 'json'
 			}
 		],
 		skill: {
-			title: '2. Install the extension',
-			note: 'Gemini CLI installs extensions from a local path. Clone the repo and point `gemini extensions install` at `packages/plugin/` — the extension bundles GEMINI.md plus the dryui and dryui-feedback MCP servers.',
-			code: `git clone https://github.com/rob-balfre/dryui ~/dryui
-gemini extensions install ~/dryui/packages/plugin`
+			title: '2. Install the skill',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .gemini/skills/dryui`.',
+			code: `npx skills add rob-balfre/dryui --agent gemini-cli`
 		},
 		mcp: {
 			path: '~/.gemini/settings.json',
-			note: '3. Or use the MCP-only fallback: `dryui setup --editor gemini --install` merges both servers into `~/.gemini/settings.json`. Use this if you cannot install the extension (it skips GEMINI.md with the DryUI skill).',
+			note: '3. Add the dryui and dryui-feedback MCP servers. `dryui init` (or `dryui setup --editor gemini`) does this automatically.',
 			code: geminiConfig,
 			language: 'json'
 		},

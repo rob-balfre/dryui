@@ -16,7 +16,6 @@ Docs and editor setup: <https://dryui.dev/getting-started>
 | `@dryui/theme-wizard`    | Optional guided theme generator                                                                                           |
 | `@dryui/feedback`        | Optional feedback annotation UI                                                                                           |
 | `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                 |
-| `@dryui/plugin`          | Plugin bundle for Claude Code, Codex, and Gemini CLI                                                                      |
 
 ## Quick Start
 

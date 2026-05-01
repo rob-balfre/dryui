@@ -167,13 +167,14 @@ if (skipPublishHygiene) {
 console.log('\n── Phase 7: benchmark smoke ──');
 await run('bench:smoke', 'bun run scripts/benchmark/run.ts --smoke');
 
-// ── Phase 8: Generated-skill sync drift ─────────────────────────────────────
-// sync:skills rewrites packages/plugin/skills/** and .cursor/rules/** from
-// skills, etc. Running it here ensures the drift guard below
-// catches any edit made directly to a generated copy.
+// ── Phase 8: Skill frontmatter validation ───────────────────────────────────
+// validate:skills lints every SKILL.md (frontmatter + name=dirname). The
+// legacy sync:skills step that mirrored skills into packages/plugin/skills/
+// and generated .cursor/rules/ was removed in Phase 6 of the npx skills
+// migration; nothing else needs regenerating from skill content.
 
-console.log('\n── Phase 8: sync:skills drift guard ──');
-await run('sync:skills', 'bun run sync:skills');
+console.log('\n── Phase 8: validate:skills ──');
+await run('validate:skills', 'bun run validate:skills');
 
 // ── Drift guard ─────────────────────────────────────────────────────────────
 // Catch files the pipeline regenerated that aren't committed. Release refuses

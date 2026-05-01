@@ -1,6 +1,6 @@
-// Shared YAML frontmatter parser for SKILL.md files.
-// Used by sync-skills.ts (legacy plugin mirror generator) and
-// validate-skills.ts (Phase 1 of the npx skills migration).
+// Shared YAML frontmatter parser for SKILL.md files. Used by
+// validate-skills.ts (Phase 1 of the npx skills migration). The legacy
+// sync-skills.ts consumer was removed in Phase 6.
 
 export type Frontmatter = { meta: Record<string, string>; body: string };
 
