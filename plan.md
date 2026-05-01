@@ -4,25 +4,28 @@ Owner: Rob. Drafted: 2026-05-02. Decisions locked: 2026-05-02. Status: ready for
 
 ## 1. Goal and non-goals
 
-**Goal.** Replace DryUI's hand-rolled per-agent skill copier (degit + hardcoded paths in `packages/cli/src/commands/setup-installers.ts`) with the `npx skills` standard. While doing so: consolidate all skill sources into a single `packages/skills/` directory, rename two generically-named skills, and sunset the parallel plugin marketplace channel (`packages/plugin/`). End state: one source-of-truth tree, one install command, one channel.
+**Goal.** Replace DryUI's hand-rolled per-agent skill copier (degit + hardcoded paths in `packages/cli/src/commands/setup-installers.ts`) with the `npx skills` standard. While doing so: consolidate all skill sources into a single top-level `skills/` directory (the npx skills well-known location), rename two generically-named skills, and sunset the parallel plugin marketplace channel (`packages/plugin/`). End state: one source-of-truth tree, one install command, one channel.
 
 **Non-goals.**
 
 - Replacing MCP server wiring. `dryui init` keeps owning `mergeServersConfig()` and editor-specific MCP JSON merges. `npx skills` does not touch MCP config.
-- Replacing the dispatch-time feedback skill copy in `packages/feedback-server/src/skill-path.ts:ensureProjectSkillCopy()`. Behavior stays. Source path changes (Phase 2). New runtime resolution strategy spelled out in Section 8 Q1.
+- Embedding skill payloads in published packages. `@dryui/feedback-server` no longer ships a SKILL.md and no longer self-heals at dispatch time. Skill source-of-truth is the GitHub repo, install via `npx skills add` (typically through `dryui init`). Dispatch precondition-checks skill presence and fails clearly if missing.
 - Moving away from `dryui ask` and `dryui check`. Those are deterministic validators, not skills, and remain CLI-owned.
+- Keeping `dryui setup --install` as a separate command. Folded into `dryui init`; `dryui init` becomes the only setup entry point.
 
 ## 2. Decisions (locked 2026-05-02)
 
-| ID  | Decision                                          | Resolution                                                              | Notes                                                                                             |
-| --- | ------------------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| D1  | Source-of-truth location                          | **Consolidate to `packages/skills/`**                                   | Phase 2 moves all five skills out of their current package homes.                                 |
-| D2  | Plugin marketplace fate                           | **Sunset `packages/plugin/`**                                           | Removed in Phase 6. Also removes `syncSkillToCursor()` since `npx skills` covers Cursor directly. |
-| D3  | Symlink vs copy when shelling to `npx skills add` | `--copy` for end-user installs, default symlink for `bun run dev:link`  | End-user `node_modules` symlinks fragile across pnpm/bun store layouts and CI caches.             |
-| D4  | Telemetry posture                                 | Anonymous default for users; export `DISABLE_TELEMETRY=1` in our own CI | CI auto-exempted by upstream; env var makes it explicit.                                          |
-| D5  | Repo identity for `npx skills add`                | `rob-balfre/dryui`                                                      | Already what `setup-installers.ts:SKILL_SOURCE` uses.                                             |
-| D6  | Skill naming                                      | `init` → `dryui-init`, `live-feedback` → `dryui-live-feedback`          | Phase 2. Avoids generic-name collisions on skills.sh.                                             |
-| D7  | Phase pacing                                      | No calendar gates between phases                                        | Verify-and-proceed model. Each phase ships when its acceptance criteria pass.                     |
+| ID  | Decision                                          | Resolution                                                              | Notes                                                                                                                                                                                                            |
+| --- | ------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | Source-of-truth location                          | **Consolidate to top-level `skills/`** (per Phase 0.B finding)          | Phase 2 moves all five skills out of their current package homes into the npx skills spec-blessed location.                                                                                                      |
+| D2  | Plugin marketplace fate                           | **Sunset `packages/plugin/`**                                           | Removed in Phase 6. Also removes `syncSkillToCursor()` since `npx skills` covers Cursor directly.                                                                                                                |
+| D3  | Symlink vs copy when shelling to `npx skills add` | `--copy` for end-user installs, default symlink for `bun run dev:link`  | End-user `node_modules` symlinks fragile across pnpm/bun store layouts and CI caches.                                                                                                                            |
+| D4  | Telemetry posture                                 | Anonymous default for users; export `DISABLE_TELEMETRY=1` in our own CI | CI auto-exempted by upstream; env var makes it explicit.                                                                                                                                                         |
+| D5  | Repo identity for `npx skills add`                | `rob-balfre/dryui`                                                      | Already what `setup-installers.ts:SKILL_SOURCE` uses.                                                                                                                                                            |
+| D6  | Skill naming                                      | `init` → `dryui-init`, `live-feedback` → `dryui-live-feedback`          | Phase 2. Avoids generic-name collisions on skills.sh.                                                                                                                                                            |
+| D7  | Phase pacing                                      | No calendar gates between phases                                        | Verify-and-proceed model. Each phase ships when its acceptance criteria pass.                                                                                                                                    |
+| D8  | `feedback-server` runtime skill resolution        | **Delete `ensureProjectSkillCopy()` and `resolveDispatchSkillPath()`**  | Dispatch precondition-checks `<projectRoot>/.claude/skills/dryui-feedback/SKILL.md`. If missing, fail with a clear error pointing at `npx skills add rob-balfre/dryui --skill dryui-feedback` (or `dryui init`). |
+| D9  | `dryui setup --install` fate                      | **Remove the subcommand**                                               | `dryui init` becomes the only setup entry point. Per-editor reinstall (e.g. user added Cursor later) handled by re-running `dryui init` (idempotent) or by `npx skills add` directly.                            |
 
 ## 3. Current state inventory (frozen 2026-05-02)
 
@@ -40,15 +43,15 @@ Owner: Rob. Drafted: 2026-05-02. Decisions locked: 2026-05-02. Status: ready for
 
 - `packages/plugin/skills/{dryui-layout,init,live-feedback}/` written by `scripts/sync-skills.ts`. Goes away in Phase 6.
 - `.cursor/rules/*.mdc` generated by `syncSkillToCursor()`. Goes away in Phase 6 (Cursor goes through `npx skills` like every other agent).
-- `packages/feedback-server/.claude/skills/dryui-feedback/SKILL.md` git-tracked mirror used by `resolveDispatchSkillPath()`. Resolution strategy changes in Phase 2 (see Q1).
+- `packages/feedback-server/.claude/skills/dryui-feedback/SKILL.md` git-tracked mirror used by `resolveDispatchSkillPath()`. Mirror, resolver, and runtime copier all deleted in Phase 2 (D8). Users install the skill via `npx skills add`.
 
 ### 3.3 Distribution channels (pre-migration)
 
-| Channel               | Code path                                                                                | Agents covered                           | Fate                                         |
-| --------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- | -------------------------------------------- |
-| Plugin marketplace    | `packages/plugin/` + `claude plugin marketplace add rob-balfre/dryui`                    | Claude Code, Codex 0.121+, Gemini        | Removed Phase 6.                             |
-| degit copy            | `packages/cli/src/commands/setup-installers.ts` (`SKILL_SOURCE` L77, `copySkill()` L127) | Copilot, Cursor, Windsurf, OpenCode, Zed | Replaced by `npx skills add` Phase 3 onward. |
-| Runtime dispatch copy | `packages/feedback-server/src/skill-path.ts:ensureProjectSkillCopy()`                    | Claude Code only                         | Kept. New source path Phase 2 (Q1).          |
+| Channel               | Code path                                                                                | Agents covered                           | Fate                                                                                                        |
+| --------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Plugin marketplace    | `packages/plugin/` + `claude plugin marketplace add rob-balfre/dryui`                    | Claude Code, Codex 0.121+, Gemini        | Removed Phase 6.                                                                                            |
+| degit copy            | `packages/cli/src/commands/setup-installers.ts` (`SKILL_SOURCE` L77, `copySkill()` L127) | Copilot, Cursor, Windsurf, OpenCode, Zed | Replaced by `npx skills add` Phase 3 onward.                                                                |
+| Runtime dispatch copy | `packages/feedback-server/src/skill-path.ts:ensureProjectSkillCopy()`                    | Claude Code only                         | Removed Phase 2 (D8). Dispatch precondition-checks; user must run `npx skills add` (or `dryui init`) first. |
 
 ### 3.4 Validation today
 
@@ -59,34 +62,37 @@ Owner: Rob. Drafted: 2026-05-02. Decisions locked: 2026-05-02. Status: ready for
 ## 4. Target end state
 
 ```
-packages/
-  skills/                                    NEW. Single source of truth.
-    dryui/
-      SKILL.md
-      agents/openai.yaml
-      rules/{svelte,accessibility,composition,compound-components,native-web-transitions,theming}.md
-    dryui-layout/
-      SKILL.md
-    dryui-feedback/
-      SKILL.md
-    dryui-live-feedback/                     RENAMED from live-feedback
-      SKILL.md
-    dryui-init/                              RENAMED from init
-      SKILL.md
+skills/                                      NEW. Top-level (npx skills standard well-known location).
+  dryui/
+    SKILL.md
+    agents/openai.yaml
+    rules/{accessibility,composition,compound-components,native-web-transitions,svelte,theming}.md   (6 files)
+  dryui-layout/
+    SKILL.md
+  dryui-feedback/
+    SKILL.md
+  dryui-live-feedback/                       RENAMED from live-feedback
+    SKILL.md
+  dryui-init/                                RENAMED from init
+    SKILL.md
 
-  ui/                                        skills/ subdir removed
-  feedback/                                  skills/ subdir removed
+packages/
+  ui/                                        skills/ subdir removed Phase 2
+  feedback/                                  skills/ subdir removed Phase 2
   feedback-server/
-    src/skill-path.ts                        resolves from packages/skills/dryui-feedback/ via package files manifest (Q1)
-    skills/                                  removed
-    .claude/skills/                          removed
+    src/skill-path.ts                        DELETED Phase 2 (no embed, no runtime copy) (D8)
+    src/dispatch.ts                          precondition-checks <projectRoot>/.claude/skills/dryui-feedback/SKILL.md exists; clear error if missing
+    skills/                                  removed Phase 2
+    .claude/skills/                          removed Phase 2 (was the mirror feeding the runtime copier)
   cli/
-    skills/                                  removed
+    skills/                                  removed Phase 2
+    src/commands/setup.ts                    DELETED Phase 6 (D9). dryui init is the only setup entry.
     src/commands/setup-installers.ts
-      SKILL_SOURCE removed
-      copySkill() removed
-      defaultRunDegit() removed
-      installSkillsViaNpx() shells `npx skills@^1.1.1 add rob-balfre/dryui --agent <agent> --copy --yes`
+      SKILL_SOURCE retained for Zed only (npx skills doesn't support Zed; per Phase 0.C)
+      copySkill() retained for Zed only
+      defaultRunDegit() retained for Zed only
+      installSkillsViaNpx() shells `npx skills@^1.1.1 add rob-balfre/dryui --agent <agent> --copy --yes` for all other agents
+      INSTALLERS dict retained (called by dryui init)
       mergeServersConfig() unchanged
   plugin/                                    DELETED Phase 6
 
@@ -98,6 +104,8 @@ scripts/
 .cursor/                                     DELETED Phase 6 (no more .mdc generation)
 .github/workflows/release.yml                sync:skills step removed Phase 6, validate:skills retained
 ```
+
+**Why top-level `skills/` not `packages/skills/`:** Phase 0.B proved that `npx skills add rob-balfre/dryui --list` only finds skills in well-known locations (root `skills/`, `.claude/skills/`, `.agents/skills/`). It does not recurse into `packages/`. Top-level `skills/` is the spec-blessed location and works without any manifest or symlink.
 
 Install flow after migration:
 
@@ -133,6 +141,12 @@ Each phase ends at a **GATE** requiring explicit user approval before the next s
 
 **GATE 0 → 1.** User confirms dry-runs are clean. If 0.B reveals discoverability gaps, Phase 2 design absorbs the fix (e.g., add a `skills/` symlink at repo root pointing at `packages/skills/`).
 
+**Phase 0 STATUS (executed 2026-05-02): COMPLETE. Findings absorbed:**
+
+- **0.A green.** All 5 skills install cleanly via `npx skills@latest add <local-path> --copy --yes -a claude-code`. Frontmatter intact; supporting files (`rules/`, `agents/openai.yaml`) preserved byte-for-byte. Plan rules-count of "7" was a typo: dryui has 6 rules files (accessibility, composition, compound-components, native-web-transitions, svelte, theming). Corrected in §4.
+- **0.B blocker → resolved by moving to top-level `skills/`.** Default `npx skills add rob-balfre/dryui --list` finds only 3 of 5 skills today. The CLI's recursive search prefers well-known top-level locations (`skills/`, `.claude/skills/`, `.agents/skills/`); it does not reliably descend into `packages/`. Phase 2 now consolidates to **top-level `skills/`** instead of `packages/skills/`. This also avoids any need for `.claude-plugin/marketplace.json` or symlinks.
+- **0.C blockers → resolved by Zed carve-out + accept upstream paths.** Zed is NOT in the npx skills supported-agents list. Phase 3.A keeps `installSkillsViaNpx()` for all supported agents, retains `copySkill()` exclusively for Zed. Copilot/Windsurf/OpenCode write to different paths than our current `setup-installers.ts` (npx skills uses `.agents/skills/`, our installers use `.github/skills/`, `.windsurf/skills/`, `.opencode/skills/`). Trust upstream: npx skills tracks current agent conventions actively. Document the path move in Phase 4 release notes; Phase 6 cleanup leaves old-location dirs alone (users can re-run `dryui init` for a fresh install at the new locations).
+
 ---
 
 ### Phase 1. Add frontmatter validation (additive, behavior-neutral)
@@ -141,7 +155,7 @@ Each phase ends at a **GATE** requiring explicit user approval before the next s
 
 **Work streams (sequential).**
 
-- **1.A Validator + shared parser.** Agent: `general-purpose`. Brief: "Create `/Users/robertbalfre/dryui/scripts/_skill-frontmatter.ts` extracting the `parseFrontmatter` helper currently in `scripts/sync-skills.ts` (L75-L91) into a shared module. Update `sync-skills.ts` to import from the new shared module. Then create `/Users/robertbalfre/dryui/scripts/validate-skills.ts` that: (1) walks `packages/*/skills/*/SKILL.md` AND `packages/skills/*/SKILL.md` (so it works during AND after Phase 2), (2) parses frontmatter via the shared module, (3) asserts `name` field is present, lowercase, hyphens only, matches parent directory name, (4) asserts `description` is present and 20-1024 chars (npx skills routing rule guidance), (5) exits 1 with per-file diagnostics if any check fails. Add `bun run validate:skills` to root `package.json`. Wire it as a precondition of `bun run sync:skills` in the same package.json. Use `node:fs` and `node:path`; do not add deps. After landing, run `bun run validate:skills` and confirm current tree passes (it should: every existing skill complies with name=dirname today)."
+- **1.A Validator + shared parser.** Agent: `general-purpose`. Brief: "Create `/Users/robertbalfre/dryui/scripts/_skill-frontmatter.ts` extracting the `parseFrontmatter` helper currently in `scripts/sync-skills.ts` (L75-L91) into a shared module. Update `sync-skills.ts` to import from the new shared module. Then create `/Users/robertbalfre/dryui/scripts/validate-skills.ts` that: (1) walks `packages/*/skills/*/SKILL.md` AND top-level `skills/*/SKILL.md` (so it works during AND after Phase 2), (2) parses frontmatter via the shared module, (3) asserts `name` field is present, lowercase, hyphens only, matches parent directory name, (4) asserts `description` is present and 20-1024 chars (npx skills routing rule guidance), (5) exits 1 with per-file diagnostics if any check fails. Add `bun run validate:skills` to root `package.json`. Wire it as a precondition of `bun run sync:skills` in the same package.json. Use `node:fs` and `node:path`; do not add deps. After landing, run `bun run validate:skills` and confirm current tree passes (it should: every existing skill complies with name=dirname today)."
 - **1.B CI hookup.** Agent: `general-purpose`. Brief: "After 1.A lands, edit `.github/workflows/release.yml` to invoke `bun run validate:skills` before `bun run sync:skills`. Check for pre-commit infra in the repo (`.husky/`, `lefthook.yml`, root `package.json` `simple-git-hooks` block); if present, add `bun run validate:skills` for staged SKILL.md changes. If no pre-commit infra exists, do not add one. Report where the hook landed."
 
 **Dependencies.** 1.B blocked by 1.A.
@@ -160,26 +174,29 @@ Each phase ends at a **GATE** requiring explicit user approval before the next s
 
 ### Phase 2. Consolidate sources + rename + update all references
 
-**Goal.** Move all five skills from their current package homes into `packages/skills/`. Rename `init` → `dryui-init` and `live-feedback` → `dryui-live-feedback`. Update every internal reference. Pure refactor: no install behavior changes.
+**Goal.** Move all five skills from their current package homes into top-level `skills/`. Rename `init` → `dryui-init` and `live-feedback` → `dryui-live-feedback`. Update every internal reference. Pure refactor: no install behavior changes.
+
+**Why top-level `skills/` (not `packages/skills/`):** Phase 0.B proved `npx skills add rob-balfre/dryui` only finds skills in well-known top-level locations. Recursive search does not reliably descend into `packages/`.
 
 This is the highest-risk phase. Single PR, one work stream owning the whole atomic move so reference updates land in the same commit as the file moves.
 
 **Work streams (sequential, single owner).**
 
-- **2.A Design the move.** Agent: `Plan`. Brief: "Design the consolidation move from scattered `packages/*/skills/` to `packages/skills/`. Specifically map: (1) every source path → new path. (2) Every reference to update with file:line locations. Search the codebase for: `packages/ui/skills`, `packages/feedback/skills`, `packages/feedback-server/skills`, `packages/cli/skills`, `packages/plugin/skills`, `name: init`, `name: live-feedback`, the strings `live-feedback` and `\binit\b` in skill-related contexts. Known reference sites from the audit: `packages/cli/src/commands/setup-installers.ts:77` (SKILL_SOURCE), `packages/cli/agents/dryui-layout.md`, `packages/cli/agents/feedback.md`, `packages/feedback-server/src/skill-path.ts:resolveDispatchSkillPath()`, `packages/mcp/src/ai-surface.ts`, `packages/mcp/src/spec.json`, `packages/mcp/src/contract.v1.json`, `packages/mcp/src/agent-contract.v1.json`, `scripts/sync-skills.ts`. (3) Frontmatter `name:` field updates for the two renamed skills. (4) Decide how `packages/feedback-server`'s runtime `ensureProjectSkillCopy()` continues to find the canonical `dryui-feedback` SKILL.md after the move. RECOMMENDED: add `../skills/dryui-feedback` to `packages/feedback-server/package.json` `files` array (relative paths in `files` work via npm pack), so the published package ships the skill at a known resolvable path. Verify this works with bun pack and npm pack. Output: a single ordered task list (do this, then this) the implementation agent can follow without judgment calls."
-- **2.B Execute the move.** Agent: `general-purpose`. Brief: depends on 2.A output. "Execute the move plan from 2.A in a single PR. Use `git mv` for every file move so history is preserved. Update every reference site identified in 2.A. Update frontmatter `name:` fields for `dryui-init` and `dryui-live-feedback`. Rename their parent dirs to match. After all moves: run `bun run validate:skills` (must pass), `bun test` across all packages (must pass), `bun run vm:test` (must produce a working SvelteKit + DryUI install). Verify the published `@dryui/feedback-server` package contains the dryui-feedback skill at the expected resolvable path: `cd packages/feedback-server && bun pack` and inspect the tarball. Do NOT change install behavior in this PR; the legacy `copySkill()` should still work but now reading from `packages/skills/dryui/` after `SKILL_SOURCE` is updated to `rob-balfre/dryui/packages/skills/dryui`. Report the diff stats and any test that broke."
+- **2.A Design the move.** Agent: `Plan`. Brief: "Design the consolidation move from scattered `packages/*/skills/` to top-level `skills/`. Specifically map: (1) every source path → new path. (2) Every reference to update with file:line locations. Search the codebase for: `packages/ui/skills`, `packages/feedback/skills`, `packages/feedback-server/skills`, `packages/cli/skills`, `packages/plugin/skills`, `name: init`, `name: live-feedback`, the strings `live-feedback` and `\binit\b` in skill-related contexts. Known reference sites from the audit: `packages/cli/src/commands/setup-installers.ts:77` (SKILL_SOURCE), `packages/cli/agents/dryui-layout.md`, `packages/cli/agents/feedback.md`, `packages/feedback-server/src/skill-path.ts:resolveDispatchSkillPath()`, `packages/mcp/src/ai-surface.ts`, `packages/mcp/src/spec.json`, `packages/mcp/src/contract.v1.json`, `packages/mcp/src/agent-contract.v1.json`, `scripts/sync-skills.ts`. (3) Frontmatter `name:` field updates for the two renamed skills. (4) DELETE `packages/feedback-server/src/skill-path.ts` entirely (`resolveDispatchSkillPath()` and `ensureProjectSkillCopy()`) per D8. Update `packages/feedback-server/src/dispatch.ts` to precondition-check `<projectRoot>/.claude/skills/dryui-feedback/SKILL.md` exists; if missing, fail the dispatch with a clear error message: `dryui-feedback skill not installed. Run: npx skills add rob-balfre/dryui --skill dryui-feedback (or run: dryui init for full project setup)`. Delete the git-tracked mirror at `packages/feedback-server/.claude/skills/dryui-feedback/`. Output: a single ordered task list (do this, then this) the implementation agent can follow without judgment calls."
+- **2.B Execute the move.** Agent: `general-purpose`. Brief: depends on 2.A output. "Execute the move plan from 2.A in a single PR. Use `git mv` for every file move so history is preserved. Update every reference site identified in 2.A. Update frontmatter `name:` fields for `dryui-init` and `dryui-live-feedback`. Rename their parent dirs to match. Delete `packages/feedback-server/src/skill-path.ts` and the `packages/feedback-server/.claude/skills/` mirror (per D8). Update `packages/feedback-server/src/dispatch.ts` with the precondition-check from 2.A. After all moves: run `bun run validate:skills` (must pass), `bun test` across all packages (must pass), `bun run vm:test` (must produce a working SvelteKit + DryUI install). Verify the published `@dryui/feedback-server` package no longer ships any SKILL.md: `cd packages/feedback-server && bun pack` and inspect the tarball. Do NOT change `dryui init` install behavior in this PR; the legacy `copySkill()` still runs, now reading from `skills/dryui/` after `SKILL_SOURCE` is updated to `rob-balfre/dryui/skills/dryui`. The dispatch precondition-check is the only behavior change. Report diff stats and any test that broke."
 
 **Dependencies.** 2.B blocked by 2.A.
 
 **Acceptance criteria.**
 
-- All source skills live under `packages/skills/`. Old `packages/{ui,feedback,feedback-server,cli}/skills/` directories deleted.
+- All source skills live under top-level `skills/`. Old `packages/{ui,feedback,feedback-server,cli}/skills/` directories deleted.
 - `dryui-init` and `dryui-live-feedback` named correctly in both dir name and frontmatter.
 - `bun run validate:skills` passes.
 - `bun test` passes across all packages.
-- `bun run vm:test` produces a working install (legacy `copySkill()` flow against the new `SKILL_SOURCE`).
-- `feedback-server` runtime dispatch (`ensureProjectSkillCopy()`) resolves the new canonical path. Verified by triggering a feedback dispatch in the VM smoke.
-- Git history preserved (verified by `git log --follow packages/skills/dryui/SKILL.md` showing pre-move commits).
+- `bun run vm:test` produces a working install (legacy `copySkill()` flow against the new `SKILL_SOURCE` of `rob-balfre/dryui/skills/dryui`).
+- `feedback-server` dispatch fails cleanly with a clear error (pointing at `npx skills add` / `dryui init`) when the `dryui-feedback` skill is missing from `<projectRoot>/.claude/skills/`. After running `dryui init` in the VM, dispatch succeeds. Verified in VM smoke.
+- `packages/feedback-server/src/skill-path.ts` and the git-tracked `.claude/skills/` mirror both deleted. `bun pack` of `@dryui/feedback-server` shows no SKILL.md in the tarball.
+- Git history preserved (verified by `git log --follow skills/dryui/SKILL.md` showing pre-move commits).
 
 **Rollback.** Single revert of the move PR. Atomic.
 
@@ -193,7 +210,7 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 **Work streams (sequential within phase).**
 
-- **3.A Design the seam.** Agent: `Plan`. Brief: "Design the integration in `packages/cli/src/commands/setup-installers.ts` where `copySkill()` is currently called per agent (lines 408, 422, 435, 456, 489). Add `installSkillsViaNpx(agentFlag, ctx)` shelling `npx skills@^1.1.1 add rob-balfre/dryui --agent <agentFlag> --copy --yes` via `node:child_process spawn`, capturing stderr, surfacing nonzero exits with the agent name in the error. Map our internal agent identifiers to `npx skills` `--agent` flag values per the Phase 0.C drift table. Pin to `^1.1.1` to avoid surprise breaks. Gate the new code path behind `process.env.DRYUI_SKILLS_VIA_NPX === '1'`; otherwise call the existing `copySkill()`. Spell out fallback behavior on offline failure: log a warning, fall through to legacy `copySkill()`. Output: ordered diff plan (file:line ranges, new function signatures), Vitest spec list under `packages/cli/test/setup-installers-npx.test.ts`."
+- **3.A Design the seam.** Agent: `Plan`. Brief: "Design the integration in `packages/cli/src/commands/setup-installers.ts` where `copySkill()` is currently called per agent (lines 408, 422, 435, 456, 489). Add `installSkillsViaNpx(agentFlag, ctx)` shelling `npx skills@^1.1.1 add rob-balfre/dryui --agent <agentFlag> --copy --yes` via `node:child_process spawn`, capturing stderr, surfacing nonzero exits with the agent name in the error. Map our internal agent identifiers to `npx skills` `--agent` flag values per the Phase 0.C drift table. **Zed carve-out (per Phase 0.C): Zed is NOT supported by npx skills. Always use `copySkill()` for Zed regardless of env var.** Pin npx skills to `^1.1.1` to avoid surprise breaks. Gate the new code path behind `process.env.DRYUI_SKILLS_VIA_NPX === '1'`; otherwise call the existing `copySkill()`. Spell out fallback behavior on offline failure: log a warning, fall through to legacy `copySkill()`. Output: ordered diff plan (file:line ranges, new function signatures), Vitest spec list under `packages/cli/test/setup-installers-npx.test.ts` including a Zed-always-uses-copySkill test."
 - **3.B Implement the seam.** Agent: `general-purpose`. Brief: depends on 3.A. "Apply the diff plan from 3.A. Add Vitest specs under `packages/cli/test/setup-installers-npx.test.ts` mocking `child_process.spawn`, asserting the right `--agent` flag per installer, and verifying env-var gating. Run `bun test packages/cli` and report. Do not break any existing test."
 - **3.C Source Mode docs.** Agent: `general-purpose`. Brief: "Edit `/Users/robertbalfre/dryui/README.md` Source Mode section to document `DRYUI_SKILLS_VIA_NPX=1` as the new opt-in install path. Note this is currently behind a flag pending Phase 5 default flip. Add a `bun run dev:link:npx` script that exports the env var and runs the existing `dev:link` for testing."
 
@@ -217,10 +234,10 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 **Work streams (parallelizable).**
 
-- **4.A Skill bodies.** Agent: `general-purpose`. Brief: "Edit `packages/skills/dryui/SKILL.md` lines around the install table (was L235-L241 pre-consolidation; verify post-Phase-2 location). Add `npx skills add rob-balfre/dryui` as the primary install command for all agents. Move existing degit and plugin-marketplace commands under `### Alternative install paths`. Run `bun run validate:skills` to confirm description-length budget still holds."
+- **4.A Skill bodies.** Agent: `general-purpose`. Brief: "Edit `skills/dryui/SKILL.md` lines around the install table (was L235-L241 pre-consolidation; verify post-Phase-2 location). Add `npx skills add rob-balfre/dryui` as the primary install command for all agents. Move existing degit and plugin-marketplace commands under `### Alternative install paths`. Run `bun run validate:skills` to confirm description-length budget still holds."
 - **4.B `apps/docs/src/lib/ai-setup.ts`.** Agent: `general-purpose`. Brief: "Read `/Users/robertbalfre/dryui/apps/docs/src/lib/ai-setup.ts`. It hosts editor-setup snippets shown on dryui.dev/tools. Add `npx skills add rob-balfre/dryui` as the lead install command for every agent the npx skills CLI supports (per Phase 0.C agent map). Keep MCP server JSON snippets exactly as-is. Verify with `bun --filter docs check`."
-- **4.C `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`.** Agent: `general-purpose`. Brief: "Per the user's terse-pointer-doc style: in `AGENTS.md` and `CLAUDE.md`, add ONE bullet under skills pointing to the new install command. Do not embed snippets. In `CONTRIBUTING.md`, add a 'Skills' subsection: source of truth lives under `packages/skills/`, validation runs via `bun run validate:skills`, distribution via `npx skills add rob-balfre/dryui`."
-- **4.D `packages/cli/agents/*.md`.** Agent: `general-purpose`. Brief: "These two pointer files (`dryui-layout.md`, `feedback.md`) currently say 'Read the canonical skill at packages/...'. Update each to also mention installable via `npx skills add rob-balfre/dryui --skill <name>`. Update the canonical-path pointer to reflect Phase 2 consolidation (`packages/skills/dryui-layout/SKILL.md`, `packages/skills/dryui-feedback/SKILL.md`)."
+- **4.C `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`.** Agent: `general-purpose`. Brief: "Per the user's terse-pointer-doc style: in `AGENTS.md` and `CLAUDE.md`, add ONE bullet under skills pointing to the new install command. Do not embed snippets. In `CONTRIBUTING.md`, add a 'Skills' subsection: source of truth lives under top-level `skills/`, validation runs via `bun run validate:skills`, distribution via `npx skills add rob-balfre/dryui`."
+- **4.D `packages/cli/agents/*.md`.** Agent: `general-purpose`. Brief: "These two pointer files (`dryui-layout.md`, `feedback.md`) currently say 'Read the canonical skill at packages/...'. Update each to also mention installable via `npx skills add rob-balfre/dryui --skill <name>`. Update the canonical-path pointer to reflect Phase 2 consolidation (`skills/dryui-layout/SKILL.md`, `skills/dryui-feedback/SKILL.md`)."
 
 **Acceptance criteria.**
 
@@ -265,20 +282,21 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 **Work streams (parallelizable except where noted).**
 
-- **6.A Delete `copySkill()` and `DRYUI_SKILLS_LEGACY`.** Agent: `general-purpose`. Brief: "In `packages/cli/src/commands/setup-installers.ts`: delete `SKILL_SOURCE` const, `copySkill()`, `defaultRunDegit()`, the `DRYUI_SKILLS_LEGACY` gate. Delete corresponding Vitest specs. Run `bun test packages/cli` and `bun run vm:test`. Report any regression."
-- **6.B Delete `packages/plugin/`.** Agent: `general-purpose`. Brief: "Delete `packages/plugin/` directory entirely. Remove plugin from root `package.json` workspaces array, `bun.lock` (will rewrite on `bun install`), any `tsconfig.json` references, any CI matrix entries. Search for `@dryui/plugin` references and remove. Update `packages/ui/skills/dryui/SKILL.md` install table to drop the `claude plugin marketplace add` line and the Codex `/plugins` line (Codex 0.121+ users can use `npx skills` like everyone else). Update `apps/docs/src/lib/ai-setup.ts` to drop plugin marketplace install snippets."
+- **6.A Delete `copySkill()` and `DRYUI_SKILLS_LEGACY` for npx-supported agents only.** Agent: `general-purpose`. Brief: "In `packages/cli/src/commands/setup-installers.ts`: delete the `DRYUI_SKILLS_LEGACY` gate. **KEEP `SKILL_SOURCE`, `copySkill()`, `defaultRunDegit()` because Zed still uses them (per Phase 0.C: Zed is not supported by npx skills).** Update `SKILL_SOURCE` to point at the new `rob-balfre/dryui/skills/dryui` path. Delete only the Vitest specs that tested the legacy path for npx-supported agents; keep the Zed specs. Run `bun test packages/cli` and `bun run vm:test`. Report any regression."
+- **6.B Delete `packages/plugin/`.** Agent: `general-purpose`. Brief: "Delete `packages/plugin/` directory entirely. Remove plugin from root `package.json` workspaces array, `bun.lock` (will rewrite on `bun install`), any `tsconfig.json` references, any CI matrix entries. Search for `@dryui/plugin` references and remove. Update `skills/dryui/SKILL.md` install table to drop the `claude plugin marketplace add` line and the Codex `/plugins` line (Codex 0.121+ users can use `npx skills` like everyone else). Update `apps/docs/src/lib/ai-setup.ts` to drop plugin marketplace install snippets."
 - **6.C Delete `scripts/sync-skills.ts` and Cursor mirror.** Agent: `general-purpose`. Brief: "Delete `scripts/sync-skills.ts` (no more plugin mirror needed). Delete `bun run sync:skills` script entry from root `package.json`. Delete the `sync:skills` step from `.github/workflows/release.yml`. Keep `validate:skills` and `_skill-frontmatter.ts`. Delete `.cursor/rules/` directory and any `syncSkillToCursor()` references. Run `bun install && bun run validate:skills && bun test` and confirm green."
-- **6.D Delete `packages/feedback-server/.claude/skills/`.** Agent: `general-purpose`. Brief: "After Phase 2 moved the source to `packages/skills/dryui-feedback/` and `resolveDispatchSkillPath()` resolves it via the package files manifest, delete `packages/feedback-server/.claude/skills/` directory. Verify dispatch still works by triggering a feedback flow in `bun run vm:test`."
+- **6.D Delete `dryui setup --install` subcommand (D9).** Agent: `general-purpose`. Brief: "Remove the `dryui setup` subcommand entirely. Delete `packages/cli/src/commands/setup.ts` (or wherever the `setup` command is registered), its tests, and its CLI router registration. The `INSTALLERS` dict at `setup-installers.ts:L537-545` is still consumed by `dryui init`, so keep the dict but delete only the `setup` command wrapper. Update `skills/dryui/SKILL.md` to remove every `dryui setup --install` reference. Update `README.md` and `apps/docs/src/lib/ai-setup.ts` similarly. Run `bun test packages/cli` and `bun run vm:test` to confirm `dryui init` still does everything users need (preflight + per-agent install + MCP wiring)."
 - **6.E Doc scrub.** Agent: `general-purpose`. Brief: "After 6.A through 6.D land, scrub all references to `DRYUI_SKILLS_LEGACY`, `DRYUI_SKILLS_VIA_NPX`, the legacy degit install path, plugin marketplace install commands, and `bun run sync:skills` from `README.md`, `AGENTS.md`, `CLAUDE.md`, `CONTRIBUTING.md`, `apps/docs/src/lib/ai-setup.ts`, every SKILL.md install section, and any other surface returned by `rg 'DRYUI_SKILLS|degit.*rob-balfre/dryui|plugin marketplace add|sync:skills'`. Make `npx skills add rob-balfre/dryui` the only documented install path."
 
 **Dependencies.** 6.E blocked by 6.A through 6.D. 6.A through 6.D parallelize.
 
 **Acceptance criteria.**
 
-- `rg 'DRYUI_SKILLS|degit.*rob-balfre/dryui|plugin marketplace add|sync:skills'` returns zero hits.
-- `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/`, `packages/feedback-server/.claude/skills/` all gone.
+- `rg 'DRYUI_SKILLS|degit.*rob-balfre/dryui|plugin marketplace add|sync:skills|dryui setup'` returns zero hits.
+- `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/` all gone. (`packages/feedback-server/.claude/skills/` and `src/skill-path.ts` were already deleted in Phase 2.)
+- `dryui setup --install` subcommand removed; `dryui init` is the only setup entry point.
 - `bun install && bun run validate:skills && bun test && bun run vm:test` all green.
-- One channel: `npx skills add rob-balfre/dryui`. One source: `packages/skills/`.
+- One channel: `npx skills add rob-balfre/dryui` (Zed: still uses degit copySkill until upstream npx skills supports Zed). One source: top-level `skills/`. One setup command: `dryui init`.
 
 **Rollback.** Per work stream: revert. 6.B (plugin deletion) is the highest-blast-radius revert since it touches workspace config; verify on a branch first.
 
@@ -286,22 +304,23 @@ This is the highest-risk phase. Single PR, one work stream owning the whole atom
 
 ## 6. Risks and mitigations
 
-| Risk                                                                                                                             | Likelihood                        | Mitigation                                                                                                                                                                                                  |
-| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npx skills add rob-balfre/dryui --list` does not discover our scattered layout pre-Phase-2                                      | Medium                            | Phase 0.B catches. If undiscoverable, add a top-level `skills/` symlink during Phase 2 or a `.claude-plugin/marketplace.json` manifest.                                                                     |
-| `npx skills` writes to a different per-agent path than current `copySkill()` (e.g. `.agents/skills/` vs `.agents/skills/dryui/`) | Medium                            | Phase 0.C catches. Document new location in Phase 5 release notes.                                                                                                                                          |
-| Phase 2 consolidation breaks `feedback-server` runtime resolution                                                                | High if Q1 unresolved             | Q1 must be answered before Phase 2.A. Recommended: add `../skills/dryui-feedback` to `packages/feedback-server/package.json` `files` so published package ships the skill at known path.                    |
-| Symlink behavior breaks on Windows (default of `npx skills`)                                                                     | Low for our use (`--copy` always) | We pass `--copy` in `installSkillsViaNpx()`. Windows users get regular files.                                                                                                                               |
-| `npx skills` upstream breaks compat (renames flags, changes paths)                                                               | Low                               | Pin `skills@^1.1.1` in `installSkillsViaNpx()`. Bump deliberately.                                                                                                                                          |
-| Plugin marketplace users break in Phase 6 deletion                                                                               | Medium                            | Phase 5 release notes warn the plugin marketplace is going away. Phase 6 release notes confirm it's gone. Users on plugin marketplace must migrate to `npx skills add rob-balfre/dryui`. Acceptable per D2. |
-| Drift between SKILL.md install instructions and reality                                                                          | High without validation           | Phase 1 validator catches name/dirname drift. Description length cap surfaces over-long install blurbs.                                                                                                     |
-| `git mv` history preservation fails on Phase 2 because of subsequent edits                                                       | Low                               | Single PR with moves and reference updates separate commits inside the PR. `git log --follow` verification in 2.B acceptance.                                                                               |
+| Risk                                                                                                                       | Likelihood                        | Mitigation                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npx skills add rob-balfre/dryui --list` does not discover our scattered layout pre-Phase-2                                | CONFIRMED Phase 0.B               | Resolved by Phase 2 consolidation to **top-level `skills/`** (not `packages/skills/`). Default `npx skills` discovery looks at well-known top-level paths only.                                                                                                           |
+| `npx skills` writes to a different per-agent path than current `copySkill()` (e.g. `.agents/skills/` vs `.github/skills/`) | CONFIRMED Phase 0.C               | Trust upstream paths; document the move in Phase 4 release notes. Old-location dirs left in place; users re-run `dryui init` for fresh install at new locations.                                                                                                          |
+| Zed users lose skill install when `copySkill()` is removed                                                                 | CONFIRMED Phase 0.C               | Zed not supported by npx skills. Phase 3.A keeps `installSkillsViaNpx()` for all other agents but retains `copySkill()` exclusively for Zed. Phase 6.A keeps `SKILL_SOURCE`+`copySkill()`+`defaultRunDegit()` until upstream npx skills adds Zed.                         |
+| Standalone `@dryui/feedback-server` users (no `dryui init`) hit failed dispatch                                            | Medium                            | Dispatch precondition-check shows clear error pointing at `npx skills add rob-balfre/dryui --skill dryui-feedback`. Document the prerequisite in `@dryui/feedback-server` README. Self-contained dispatch deliberately sacrificed for single-source-of-truth purity (D8). |
+| Symlink behavior breaks on Windows (default of `npx skills`)                                                               | Low for our use (`--copy` always) | We pass `--copy` in `installSkillsViaNpx()`. Windows users get regular files.                                                                                                                                                                                             |
+| `npx skills` upstream breaks compat (renames flags, changes paths)                                                         | Low                               | Pin `skills@^1.1.1` in `installSkillsViaNpx()`. Bump deliberately.                                                                                                                                                                                                        |
+| Plugin marketplace users break in Phase 6 deletion                                                                         | Medium                            | Phase 5 release notes warn the plugin marketplace is going away. Phase 6 release notes confirm it's gone. Users on plugin marketplace must migrate to `npx skills add rob-balfre/dryui`. Acceptable per D2.                                                               |
+| Drift between SKILL.md install instructions and reality                                                                    | High without validation           | Phase 1 validator catches name/dirname drift. Description length cap surfaces over-long install blurbs.                                                                                                                                                                   |
+| `git mv` history preservation fails on Phase 2 because of subsequent edits                                                 | Low                               | Single PR with moves and reference updates separate commits inside the PR. `git log --follow` verification in 2.B acceptance.                                                                                                                                             |
 
 ## 7. Rollback plan (per phase)
 
 - Phase 0: nothing to roll back.
 - Phase 1: revert validator commits. No production impact.
-- Phase 2: revert the consolidation PR. Atomic. Verify `feedback-server` runtime dispatch still works post-revert (it should: full revert restores old paths).
+- Phase 2: revert the consolidation PR. Atomic. Restores `skill-path.ts`, the `.claude/skills/` mirror, and the runtime copier; dispatch self-heals as it did before.
 - Phase 3: revert gating commit. Env var defaults to off; no user impact.
 - Phase 4: revert docs commits. Channels still work; only display order changes.
 - Phase 5: revert flip commit. Default returns to legacy.
@@ -311,15 +330,10 @@ Each phase commits as a single squashed PR per work stream so reverts are surgic
 
 ## 8. Open questions
 
-**Q1. `feedback-server` runtime resolution after Phase 2 consolidation.** When `dryui-feedback` moves to `packages/skills/dryui-feedback/`, how does the published `@dryui/feedback-server` package's `resolveDispatchSkillPath()` find it at runtime?
+All resolved 2026-05-02:
 
-Recommended (default if no objection): add `../skills/dryui-feedback` to `packages/feedback-server/package.json` `files` array so npm pack includes the skill in the published tarball at a known relative path. `resolveDispatchSkillPath()` updates to resolve from `import.meta.url` + relative path. Alternative: `@dryui/feedback-server` declares no embedded skill and relies on the user having run `dryui init` (which `npx skills add`s the skill). Cleaner architecturally but breaks self-contained dispatch.
-
-Default: embed via `files`. Confirm or override before Phase 2.A starts.
-
-**Q2. Should Phase 6 also delete the `dryui setup --install` command path?** The audit noted `dryui setup --install` (referenced in `packages/ui/skills/dryui/SKILL.md` L241) is the all-in-one installer. After Phase 5 it's a thin shim that internally calls `installSkillsViaNpx()` for each agent plus `mergeServersConfig()`. Keep the alias for UX (single-command setup) or fold it into `dryui init`?
-
-Default: keep `dryui setup --install` as an alias. UX is better than purity.
+- **Q1 → D8.** `feedback-server` no embed, no self-heal. `skill-path.ts` deleted in Phase 2; `dispatch.ts` precondition-checks skill presence and fails clearly if missing.
+- **Q2 → D9.** `dryui setup --install` removed in Phase 6.D. `dryui init` is the only setup entry point.
 
 ## 9. Agent team roster
 
@@ -333,13 +347,15 @@ Default: keep `dryui setup --install` as an alias. UX is better than purity.
 
 ## 10. Definition of done
 
-- Source of truth: `packages/skills/` only. Five skills: `dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`.
-- Distribution: `npx skills add rob-balfre/dryui` only. No plugin marketplace, no degit fallback.
+- Source of truth: top-level `skills/` only. Five skills: `dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`.
+- Distribution: `npx skills add rob-balfre/dryui` only. No plugin marketplace, no degit fallback, no embedded SKILL.md in `@dryui/feedback-server`.
+- Setup entry point: `dryui init` only. No `dryui setup --install` subcommand.
 - `dryui init` shells `npx skills@^1.1.1 add` for each detected agent, then runs `mergeServersConfig()` for MCP wiring.
 - `bun run validate:skills` exists, runs clean, gates CI.
 - All public docs (SKILL.md install sections, ai-setup.ts, AGENTS.md, CLAUDE.md, dryui.dev/tools) lead with `npx skills add rob-balfre/dryui` exclusively.
 - `rob-balfre/dryui` appears on the skills.sh leaderboard.
-- `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/`, `packages/feedback-server/.claude/skills/` all deleted.
+- `packages/plugin/`, `scripts/sync-skills.ts`, `.cursor/rules/`, `packages/feedback-server/.claude/skills/`, `packages/feedback-server/src/skill-path.ts` all deleted.
 - Legacy `copySkill()`, `DRYUI_SKILLS_LEGACY`, `DRYUI_SKILLS_VIA_NPX` all gone.
+- `feedback-server` dispatch precondition-checks skill presence and fails with a clear install-hint error if missing.
 - `bun run vm:test` green end-to-end.
 - Git history preserved through `git log --follow` for every moved skill.
