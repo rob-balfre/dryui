@@ -37,8 +37,15 @@ export interface InstallContext {
 	cwd: string;
 	homeDir?: string;
 	runDegit?: (target: string) => DegitOutcome;
+	runNpxSkills?: (agent: NpxSkillsAgent, ctx: InstallContext) => NpxSkillsOutcome;
 	runProcess?: (command: string, args: readonly string[]) => ProcessOutcome;
 	includeSvelteMcp?: boolean;
+	/**
+	 * Override the default `process.env.DRYUI_SKILLS_VIA_NPX` gate. Used by
+	 * tests to force-enable or force-disable the npx skills install path
+	 * without manipulating real env vars.
+	 */
+	useNpxSkills?: boolean;
 }
 
 export interface InstallResult {
@@ -69,12 +76,27 @@ export interface DegitOutcome {
 	message: string;
 }
 
+export interface NpxSkillsOutcome {
+	ok: boolean;
+	message: string;
+}
+
+/**
+ * Subset of agent identifiers that the upstream `npx skills` CLI knows how
+ * to install for. Zed is deliberately absent (per Phase 0.C of the npx
+ * skills migration: not in the upstream agent list); Zed always falls
+ * through to the legacy degit copy.
+ */
+export type NpxSkillsAgent = 'github-copilot' | 'cursor' | 'opencode' | 'windsurf';
+
 export interface ProcessOutcome {
 	ok: boolean;
 	message: string;
 }
 
 const SKILL_SOURCE = 'rob-balfre/dryui/skills/dryui';
+const NPX_SKILLS_PIN = 'skills@^1.1.1';
+const NPX_SKILLS_REPO = 'rob-balfre/dryui';
 
 const NPX_DRYUI_MCP = { command: 'npx', args: ['-y', '@dryui/mcp'] } as const;
 const NPX_DRYUI_FEEDBACK_MCP = {
@@ -150,6 +172,79 @@ function copySkill(target: string, runDegit: (target: string) => DegitOutcome): 
 		status: 'created',
 		detail: homeRelative(absolute)
 	};
+}
+
+function defaultRunNpxSkills(agent: NpxSkillsAgent, ctx: InstallContext): NpxSkillsOutcome {
+	const result = spawnSync(
+		'npx',
+		['-y', NPX_SKILLS_PIN, 'add', NPX_SKILLS_REPO, '--agent', agent, '--copy', '--yes'],
+		{
+			cwd: ctx.cwd,
+			stdio: 'pipe',
+			encoding: 'utf-8',
+			env: { ...process.env, DISABLE_TELEMETRY: '1' }
+		}
+	);
+
+	if (result.error) {
+		return { ok: false, message: `unable to spawn npx: ${result.error.message}` };
+	}
+	if (result.status !== 0) {
+		const stderr = result.stderr?.trim() || result.stdout?.trim() || '';
+		return { ok: false, message: stderr || `npx skills exited with code ${result.status}` };
+	}
+	return { ok: true, message: `installed via npx skills (--agent ${agent})` };
+}
+
+function shouldUseNpxSkills(ctx: InstallContext): boolean {
+	if (ctx.useNpxSkills !== undefined) return ctx.useNpxSkills;
+	return process.env.DRYUI_SKILLS_VIA_NPX === '1';
+}
+
+/**
+ * Install the dryui skill for an agent that the upstream npx skills CLI
+ * supports. Falls back to the legacy degit copy on failure (offline,
+ * unsupported agent, missing npx binary). Used by the per-agent installers
+ * for copilot, cursor, opencode, and windsurf when DRYUI_SKILLS_VIA_NPX=1
+ * (or when ctx.useNpxSkills overrides). Zed never reaches this path
+ * because npx skills doesn't list it as a supported agent.
+ */
+function installSkillsViaNpx(
+	agent: NpxSkillsAgent,
+	ctx: InstallContext,
+	fallback: () => InstallStepResult
+): InstallStepResult {
+	const runner = ctx.runNpxSkills ?? defaultRunNpxSkills;
+	const outcome = runner(agent, ctx);
+	if (outcome.ok) {
+		return {
+			label: 'Install DryUI skill (npx skills)',
+			status: 'created',
+			detail: outcome.message
+		};
+	}
+	console.warn(
+		`[dryui setup] npx skills failed for ${agent}: ${outcome.message}. Falling back to legacy degit copy.`
+	);
+	return fallback();
+}
+
+/**
+ * Pick the install path for a given agent: npx skills if gated on AND the
+ * agent is supported, else the legacy degit copy. Pass null for the npx
+ * agent when the agent isn't supported by npx skills (Zed today).
+ */
+function selectSkillInstaller(
+	ctx: InstallContext,
+	npxAgent: NpxSkillsAgent | null,
+	legacyTarget: string
+): InstallStepResult {
+	const runDegit = ctx.runDegit ?? defaultRunDegit;
+	const legacy = () => copySkill(join(ctx.cwd, legacyTarget), runDegit);
+	if (npxAgent && shouldUseNpxSkills(ctx)) {
+		return installSkillsViaNpx(npxAgent, ctx, legacy);
+	}
+	return legacy();
 }
 
 function errorMessage(error: unknown): string {
@@ -404,8 +499,7 @@ function svelteServerEntry(editor: SetupGuideId): Record<string, unknown> | null
 }
 
 function copilotInstaller(ctx: InstallContext): InstallResult {
-	const runDegit = ctx.runDegit ?? defaultRunDegit;
-	const skill = copySkill(join(ctx.cwd, '.github/skills/dryui'), runDegit);
+	const skill = selectSkillInstaller(ctx, 'github-copilot', '.github/skills/dryui');
 	const config = mergeServersConfig({
 		...editorMcpParams('copilot', ctx),
 		servers: {
@@ -418,8 +512,7 @@ function copilotInstaller(ctx: InstallContext): InstallResult {
 }
 
 function cursorInstaller(ctx: InstallContext): InstallResult {
-	const runDegit = ctx.runDegit ?? defaultRunDegit;
-	const skill = copySkill(join(ctx.cwd, '.agents/skills/dryui'), runDegit);
+	const skill = selectSkillInstaller(ctx, 'cursor', '.agents/skills/dryui');
 	const config = mergeServersConfig({
 		...editorMcpParams('cursor', ctx),
 		servers: {
@@ -431,8 +524,7 @@ function cursorInstaller(ctx: InstallContext): InstallResult {
 }
 
 function opencodeInstaller(ctx: InstallContext): InstallResult {
-	const runDegit = ctx.runDegit ?? defaultRunDegit;
-	const skill = copySkill(join(ctx.cwd, '.opencode/skills/dryui'), runDegit);
+	const skill = selectSkillInstaller(ctx, 'opencode', '.opencode/skills/dryui');
 	const config = mergeServersConfig({
 		...editorMcpParams('opencode', ctx),
 		servers: {
@@ -452,8 +544,7 @@ function opencodeInstaller(ctx: InstallContext): InstallResult {
 }
 
 function windsurfInstaller(ctx: InstallContext): InstallResult {
-	const runDegit = ctx.runDegit ?? defaultRunDegit;
-	const skill = copySkill(join(ctx.cwd, '.agents/skills/dryui'), runDegit);
+	const skill = selectSkillInstaller(ctx, 'windsurf', '.agents/skills/dryui');
 	const config = mergeServersConfig({
 		...editorMcpParams('windsurf', ctx),
 		servers: {

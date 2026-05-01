@@ -1218,3 +1218,128 @@ describe('writes are atomic per merge', () => {
 		expect(fixed.status).toBe('merged');
 	});
 });
+
+describe('npx skills install path (DRYUI_SKILLS_VIA_NPX gate)', () => {
+	type NpxCall = { agent: string; cwd: string };
+
+	const fakeNpxSkills =
+		(track: NpxCall[], outcome: { ok: boolean; message: string } = { ok: true, message: 'ok' }) =>
+		(agent: string, ctx: { cwd: string }) => {
+			track.push({ agent, cwd: ctx.cwd });
+			return outcome;
+		};
+
+	test('copilot uses npx skills with --agent github-copilot when gated on', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+		const degitCalls: string[] = [];
+
+		const result = runEditorInstall('copilot', {
+			cwd: root,
+			useNpxSkills: true,
+			runDegit: fakeDegit(degitCalls),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(result?.ok).toBe(true);
+		expect(npxCalls).toEqual([{ agent: 'github-copilot', cwd: root }]);
+		expect(degitCalls).toEqual([]);
+	});
+
+	test('cursor uses npx skills with --agent cursor when gated on', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+
+		runEditorInstall('cursor', {
+			cwd: root,
+			useNpxSkills: true,
+			runDegit: fakeDegit([]),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([{ agent: 'cursor', cwd: root }]);
+	});
+
+	test('opencode uses npx skills with --agent opencode when gated on', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+
+		runEditorInstall('opencode', {
+			cwd: root,
+			useNpxSkills: true,
+			runDegit: fakeDegit([]),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([{ agent: 'opencode', cwd: root }]);
+	});
+
+	test('windsurf uses npx skills with --agent windsurf when gated on', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+
+		runEditorInstall('windsurf', {
+			cwd: root,
+			homeDir: home,
+			useNpxSkills: true,
+			runDegit: fakeDegit([]),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([{ agent: 'windsurf', cwd: root }]);
+	});
+
+	test('falls back to legacy degit when npx skills returns ok:false', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+		const degitCalls: string[] = [];
+
+		const result = runEditorInstall('copilot', {
+			cwd: root,
+			useNpxSkills: true,
+			runDegit: fakeDegit(degitCalls),
+			runNpxSkills: fakeNpxSkills(npxCalls, { ok: false, message: 'offline' })
+		});
+
+		expect(result?.ok).toBe(true);
+		expect(npxCalls).toEqual([{ agent: 'github-copilot', cwd: root }]);
+		expect(degitCalls).toEqual([resolve(root, '.github/skills/dryui')]);
+	});
+
+	test('default behavior (useNpxSkills omitted) keeps the legacy degit path', () => {
+		const root = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+		const degitCalls: string[] = [];
+
+		runEditorInstall('cursor', {
+			cwd: root,
+			runDegit: fakeDegit(degitCalls),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([]);
+		expect(degitCalls).toEqual([resolve(root, '.agents/skills/dryui')]);
+	});
+
+	test('zed never reaches the npx skills path even when gated on (not in upstream agent list)', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const npxCalls: NpxCall[] = [];
+		const degitCalls: string[] = [];
+
+		// Zed installer doesn't write any skill folder today (MCP-only); the
+		// real assertion is that we don't accidentally invoke npx skills with
+		// an unsupported --agent value.
+		runEditorInstall('zed', {
+			cwd: root,
+			homeDir: home,
+			useNpxSkills: true,
+			runDegit: fakeDegit(degitCalls),
+			runNpxSkills: fakeNpxSkills(npxCalls)
+		});
+
+		expect(npxCalls).toEqual([]);
+		expect(degitCalls).toEqual([]);
+	});
+});
