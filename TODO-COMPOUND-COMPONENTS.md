@@ -6,7 +6,6 @@ Source: 10-cluster audit of `packages/ui/src/` on 2026-04-30. ~175 files audited
 
 - 23 block, 49 warn, 13 nit, 90 clean.
 - Most of the library is already disciplined. Fixes concentrate in three systemic patterns plus a small number of one-off color leaks.
-- AreaGrid itself (`packages/ui/src/area-grid/`) is the canonical reference. It passes 100%.
 
 Phases run top to bottom. Theme work in Phase 0 unblocks everything downstream.
 
@@ -84,9 +83,9 @@ Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte 
 - [ ] `packages/ui/src/toggle-group/toggle-group-root.svelte:84-105`: size-scoped overrides at `[data-size='sm|md|lg']`. Wrap in `:where(...)` to drop specificity to zero so consumer overrides win.
 - [ ] `packages/ui/src/beam/beam.svelte:63-67`, `glow/glow.svelte:44-47`, `halftone/halftone.svelte:64-68`: redundant root token blocks. Consumption already uses `var(--name, fallback)`. Drop the blocks for consistency.
 
-## Phase 3. AreaGrid placement seam (warn)
+## Phase 3. Grid placement seam (warn)
 
-`{...rest}` lands on an inner element, so `style="--dry-grid-area-name: …"` from a parent AreaGrid does not reach the outermost layout participant. Fix by either forwarding rest+class+style onto the outer wrapper or eliminating the wrapper.
+`{...rest}` lands on an inner element, so `style="--dry-grid-area-name: …"` from a parent grid does not reach the outermost layout participant. Fix by either forwarding rest+class+style onto the outer wrapper or eliminating the wrapper.
 
 ### Form text inputs
 
@@ -151,7 +150,7 @@ Add `--dry-<component>-*` overrides backed by semantic tokens.
 
 The following components passed all checks. Use them as references when applying fixes elsewhere:
 
-**Layout primitives**: `area-grid` (canonical), `container`, `splitter`, `spacer`, `aspect-ratio`, `scroll-area`, `focus-trap`, `portal`, `visually-hidden`, `sidebar`.
+**Layout primitives**: `container`, `splitter`, `spacer`, `aspect-ratio`, `scroll-area`, `focus-trap`, `portal`, `visually-hidden`, `sidebar`.
 
 **Surfaces**: `alert`, `alert-dialog`, `dialog`, `drawer`, `popover`, `hover-card`, `backdrop`.
 
