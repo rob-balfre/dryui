@@ -29,6 +29,14 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 - Add or update browser coverage for interactive or accessibility-sensitive changes.
 - If browser coverage is not practical for an interactive component change, call out the exemption in the PR and link the follow-up issue.
 
+## Skills
+
+Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). Edit these directly.
+
+- `bun run validate:skills` enforces npx skills frontmatter rules (name=dirname, lowercase + hyphens, description 20..1024 chars). Runs in postinstall, the pre-commit hook for any staged SKILL.md, and gates `bun run sync:skills`.
+- `bun run sync:skills` mirrors three skills into `packages/plugin/skills/` and regenerates `.cursor/rules/` (legacy plugin marketplace + Cursor rules path; both removed in Phase 6 of the npx skills migration).
+- Distribution to end users: `npx skills add rob-balfre/dryui` (skills.sh standard). Per-agent install paths and MCP wiring live in [`packages/cli/src/commands/setup-installers.ts`](./packages/cli/src/commands/setup-installers.ts).
+
 ## Adding Or Changing A Component
 
 1. Implement the primitive and or UI layer in `packages/primitives` and `packages/ui`.

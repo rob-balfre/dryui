@@ -422,8 +422,8 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the DryUI skill',
 				description:
-					'OpenCode loads skills from `.opencode/skills/` and also understands `.agents/skills/` compatibility paths.',
-				code: 'npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui',
+					'Uses the upstream `npx skills` CLI (skills.sh standard) to fan out the install. Falls through to `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui` if you want to pin the install path.',
+				code: 'npx skills add rob-balfre/dryui --agent opencode',
 				language: 'bash'
 			},
 			{
@@ -436,8 +436,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		],
 		skill: {
 			title: '2. Install the skill',
-			note: "Use OpenCode's native skill path. `.agents/skills/dryui` also works if you want one cross-tool skill folder.",
-			code: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`.',
+			code: `npx skills add rob-balfre/dryui --agent opencode`
 		},
 		mcp: {
 			path: 'opencode.json',
@@ -467,8 +467,8 @@ gemini extensions install ~/dryui/packages/plugin`
 			{
 				title: 'Install the DryUI skill',
 				description:
-					'Copy the DryUI skill to `.github/skills/` for Copilot, or `.agents/skills/` if you want a shared cross-tool skill folder.',
-				code: 'npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui',
+					'Uses the upstream `npx skills` CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`.',
+				code: 'npx skills add rob-balfre/dryui --agent github-copilot',
 				language: 'bash'
 			},
 			{
@@ -488,8 +488,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		],
 		skill: {
 			title: '2. Install the skill',
-			note: 'Copy the DryUI skill to .github/skills/ (Copilot standard) or .agents/skills/ (cross-tool).',
-			code: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`.',
+			code: `npx skills add rob-balfre/dryui --agent github-copilot`
 		},
 		mcp: {
 			path: '.mcp.json',
@@ -517,8 +517,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		},
 		skill: {
 			title: '2. Install the skill',
-			note: 'Copy the DryUI skill to .cursor/skills/ or .agents/skills/.',
-			code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+			code: `npx skills add rob-balfre/dryui --agent cursor`
 		},
 		mcp: {
 			path: '.cursor/mcp.json',
@@ -546,8 +546,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		},
 		skill: {
 			title: '2. Install the skill',
-			note: 'Copy the DryUI skill to .agents/skills/.',
-			code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+			code: `npx skills add rob-balfre/dryui --agent windsurf`
 		},
 		mcp: {
 			path: '~/.codeium/windsurf/mcp_config.json',

@@ -20,6 +20,7 @@ dryui install-hook
 
 - Editor setup snippets, MCP config examples, and plugin install text live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts).
 - The local plugin source is [`packages/plugin`](./packages/plugin). `/plugins` refers to the in-app install flow, not a repo directory.
+- Skill install is via `npx skills add rob-balfre/dryui` (skills.sh standard). Sources live under top-level [`skills/`](./skills/); validate with `bun run validate:skills`.
 
 ## Canonical Links
 

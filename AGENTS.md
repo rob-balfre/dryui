@@ -13,12 +13,10 @@ Repo-wide instructions for AI coding agents working in this repository.
 ## Canonical Sources
 
 - Editor install snippets and MCP config examples live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts). Do not duplicate them elsewhere.
-- Skill sources live in:
-  - [`skills/dryui/`](./skills/dryui/)
-  - [`skills/dryui-layout/`](./skills/dryui-layout/)
-  - [`skills/dryui-live-feedback/`](./skills/dryui-live-feedback/)
-  - [`skills/dryui-init/`](./skills/dryui-init/)
-- Sync generated skill copies with `bun run sync:skills`. Do not edit `packages/plugin/skills/` or `.cursor/rules/` directly.
+- Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
+- Recommended install path for end users: `npx skills add rob-balfre/dryui` (skills.sh standard).
+- `bun run validate:skills` lints every SKILL.md (frontmatter present, name=dirname, description length).
+- `bun run sync:skills` regenerates the legacy `packages/plugin/skills/` mirror and `.cursor/rules/` (both slated for removal in Phase 6 of the npx skills migration). Do not edit those generated copies directly.
 - The local plugin source is [`packages/plugin`](./packages/plugin). `/plugins` refers to the in-app Codex or Claude install flow, not a repo directory.
 
 ## Repo Rules

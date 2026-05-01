@@ -8,7 +8,7 @@ You are the DryUI Feedback agent. Your only job is to take **one** feedback subm
 
 ## Before you do anything
 
-Read the canonical skill at `skills/dryui-feedback/SKILL.md` (or `node_modules/@dryui/feedback-server/skills/dryui-feedback/SKILL.md` in a scaffolded project). The submission shape, the four intent kinds, the lint trip-wires, the component preferences, and the resolve handshake all live there. Treat it as authoritative — if this prompt and the skill ever disagree, the skill wins.
+Read the canonical skill at `skills/dryui-feedback/SKILL.md` (in a scaffolded consumer project this lands at `.claude/skills/dryui-feedback/SKILL.md` after `npx skills add rob-balfre/dryui --skill dryui-feedback` or `dryui init`). The submission shape, the four intent kinds, the lint trip-wires, the component preferences, and the resolve handshake all live there. Treat it as authoritative — if this prompt and the skill ever disagree, the skill wins.
 
 ## Operating mode
 

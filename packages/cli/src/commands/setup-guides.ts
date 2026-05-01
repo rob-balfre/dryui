@@ -251,8 +251,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		sections: [
 			{
 				title: 'Install the skill',
-				note: 'Copy to `.opencode/skills/` for the native OpenCode path. `.agents/skills/` also works if you want a shared cross-tool folder.',
-				code: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`
+				note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`.',
+				code: `npx skills add rob-balfre/dryui --agent opencode`
 			},
 			{
 				title: 'Add the MCP servers',
@@ -272,8 +272,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		sections: [
 			{
 				title: 'Install the skill',
-				note: 'Copy to `.github/skills/` for Copilot, or `.agents/skills/` for a cross-tool folder.',
-				code: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`
+				note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`.',
+				code: `npx skills add rob-balfre/dryui --agent github-copilot`
 			},
 			{
 				title: 'Add the MCP servers',
@@ -293,8 +293,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		sections: [
 			{
 				title: 'Install the skill',
-				note: 'Copy to `.cursor/skills/` or `.agents/skills/`.',
-				code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
+				note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+				code: `npx skills add rob-balfre/dryui --agent cursor`
 			},
 			{
 				title: 'Add the MCP server',
@@ -313,8 +313,8 @@ gemini extensions install ~/dryui/packages/plugin`
 		sections: [
 			{
 				title: 'Install the skill',
-				note: 'Copy to `.agents/skills/`.',
-				code: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
+				note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+				code: `npx skills add rob-balfre/dryui --agent windsurf`
 			},
 			{
 				title: 'Add the MCP server',

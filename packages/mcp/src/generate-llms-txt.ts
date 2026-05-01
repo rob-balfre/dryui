@@ -424,11 +424,21 @@ After the CLI is working, DryUI also ships an MCP server (live tools) and a skil
 
 ### Install
 
-- **Claude Code**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui\` (plugin is the canonical Claude skill install path)
-- **Codex** (0.121.0+): \`codex plugin marketplace add rob-balfre/dryui\`, then start \`codex\`, run \`/plugins\`, and install \`DryUI\` (plugin is the canonical Codex skill install path)
-- **OpenCode**: \`npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui\` + add local MCP servers in \`opencode.json\`
-- **Copilot / Cursor / Windsurf**: \`npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui\` + add MCP config
-- **Zed**: MCP only (reads AGENTS.md for conventions)
+The recommended path is the upstream \`npx skills\` CLI (skills.sh standard):
+
+\`\`\`
+npx skills add rob-balfre/dryui
+\`\`\`
+
+That single command installs all five DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it (\`dryui setup --install --editor <agent>\` does this automatically for Copilot, Cursor, OpenCode, Windsurf, Codex, Gemini, and Zed).
+
+#### Alternative install paths
+
+- **Claude Code plugin marketplace**: \`claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui\`
+- **Codex plugin marketplace** (0.121.0+): \`codex plugin marketplace add rob-balfre/dryui\`, then \`/plugins\` inside Codex
+- **OpenCode (manual degit)**: \`npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui\` + add local MCP servers in \`opencode.json\`
+- **Copilot / Cursor / Windsurf (manual degit)**: \`npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui\` + add MCP config
+- **Zed**: MCP only (reads AGENTS.md for conventions; npx skills does not yet support Zed)
 
 MCP config for tools that need it manually: \`"command": "npx", "args": ["-y", "@dryui/mcp"]\` — root key varies by tool (mcp for OpenCode, mcpServers for Cursor/Windsurf, servers for Copilot, context_servers for Zed).
 
