@@ -5,7 +5,6 @@
 	import type { PageProps } from './$types';
 	import {
 		Adjust,
-		AreaGrid,
 		AppFrame,
 		Button,
 		Container,
@@ -42,7 +41,6 @@
 	import FormsPreview from '$lib/theme-wizard/previews/Forms.svelte';
 	import DashboardPreview from '$lib/theme-wizard/previews/Dashboard.svelte';
 	import CardsPreview from '$lib/theme-wizard/previews/Cards.svelte';
-	import { NavigationMenu } from '@dryui/primitives';
 
 	let { data }: PageProps = $props();
 	let themeMode = $derived<'light' | 'dark'>(isDarkTheme() ? 'dark' : 'light');
@@ -198,71 +196,57 @@
 </svelte:head>
 
 <Container size="xl" padding={false}>
-	<AreaGrid.Root
-		--dry-area-grid-padding="var(--dry-space-4)"
-		--dry-area-grid-template-areas="'brand brand' 'tabs tabs' 'mode reset' 'copy download' 'preview preview' 'accentLabel baseLabel' 'accent base' 'depthLabel fontLabel' 'depth font' 'radiusLabel densityLabel' 'radius density'"
-		--dry-area-grid-template-columns="minmax(0, 1fr) minmax(0, 1fr)"
-		--dry-area-grid-template-rows="auto auto auto auto minmax(20rem, calc(100dvh - 25rem)) auto auto auto auto auto auto"
-		--dry-area-grid-template-areas-wide="'brand brand tabs tabs tabs tabs mode copy download download reset reset' 'preview preview preview preview preview preview preview preview preview preview preview preview' 'accentLabel accentLabel baseLabel baseLabel depthLabel depthLabel depthLabel depthLabel fontLabel radiusLabel densityLabel densityLabel' 'accent accent base base depth depth depth depth font radius density density'"
-		--dry-area-grid-template-columns-wide="repeat(12, minmax(0, 1fr))"
-		--dry-area-grid-template-rows-wide="auto minmax(0, calc(100dvh - 12rem)) auto auto"
-		--dry-area-grid-align-items="center"
-		data-mode={themeMode}
-	>
-		<NavigationMenu.Root>
-			<NavigationMenu.List>
-				<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
-					<Logo />
-					<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
-				</Text>
+	<div data-layout="theme-wizard" data-mode={themeMode}>
+		<Text as="span" --dry-grid-area-name="brand" size="sm" weight="semibold">
+			<Logo />
+			<Text as="span" size="sm" weight="semibold">Theme Wizard</Text>
+		</Text>
 
-				<SegmentedControl.Root
-					--dry-grid-area-name="tabs"
-					bind:value={previewMode}
-					aria-label="Preview mode"
-				>
-					<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
-					<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
-					<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
-					<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
-				</SegmentedControl.Root>
+		<SegmentedControl.Root
+			--dry-grid-area-name="tabs"
+			bind:value={previewMode}
+			aria-label="Preview mode"
+		>
+			<SegmentedControl.Item value="overview">Overview</SegmentedControl.Item>
+			<SegmentedControl.Item value="forms">Forms</SegmentedControl.Item>
+			<SegmentedControl.Item value="dashboard">Dashboard</SegmentedControl.Item>
+			<SegmentedControl.Item value="cards">Cards</SegmentedControl.Item>
+		</SegmentedControl.Root>
 
-				<Button
-					--dry-grid-area-name="mode"
-					variant="ghost"
-					size="icon-sm"
-					onclick={() => docsTheme.cycle()}
-					aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-				>
-					{#if docsTheme.isDark}
-						<Sun size={14} aria-hidden="true" />
-					{:else}
-						<Moon size={14} aria-hidden="true" />
-					{/if}
-				</Button>
+		<Button
+			--dry-grid-area-name="mode"
+			variant="ghost"
+			size="icon-sm"
+			onclick={() => docsTheme.cycle()}
+			aria-label={docsTheme.isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+		>
+			{#if docsTheme.isDark}
+				<Sun size={14} aria-hidden="true" />
+			{:else}
+				<Moon size={14} aria-hidden="true" />
+			{/if}
+		</Button>
 
-				<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
-					<ClipboardCopy size={14} aria-hidden="true" />
-					{copyFeedback || 'Copy'}
-				</Button>
+		<Button --dry-grid-area-name="copy" variant="ghost" size="sm" onclick={handleCopyCss}>
+			<ClipboardCopy size={14} aria-hidden="true" />
+			{copyFeedback || 'Copy'}
+		</Button>
 
-				<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
-					<Download size={14} aria-hidden="true" />
-					Download
-				</Button>
+		<Button --dry-grid-area-name="download" variant="solid" size="sm" onclick={handleDownload}>
+			<Download size={14} aria-hidden="true" />
+			Download
+		</Button>
 
-				<Button
-					--dry-grid-area-name="reset"
-					variant="ghost"
-					size="sm"
-					onclick={resetAll}
-					aria-label="Reset all"
-				>
-					<RotateCcw size={14} aria-hidden="true" />
-					Reset
-				</Button>
-			</NavigationMenu.List>
-		</NavigationMenu.Root>
+		<Button
+			--dry-grid-area-name="reset"
+			variant="ghost"
+			size="sm"
+			onclick={resetAll}
+			aria-label="Reset all"
+		>
+			<RotateCcw size={14} aria-hidden="true" />
+			Reset
+		</Button>
 
 		<Adjust
 			--dry-grid-area-name="preview"
@@ -364,5 +348,5 @@
 		>
 			{activeDensityLabel}
 		</Button>
-	</AreaGrid.Root>
+	</div>
 </Container>

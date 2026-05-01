@@ -1,0 +1,50 @@
+/* DryUI consumer layout sheet. Each `[data-layout="<name>"]` block owns its
+   grid template plus the boilerplate that translates child `--dry-grid-area-name`
+   into `grid-area`. Per-layout scoping keeps the rules from leaking onto other
+   components that emit `data-layout` for unrelated reasons. */
+
+[data-layout='theme-wizard'] {
+	container-type: inline-size;
+	container-name: theme-wizard;
+	display: grid;
+	align-items: center;
+	padding: var(--dry-space-4);
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	grid-template-rows:
+		auto auto auto auto minmax(20rem, calc(100dvh - 25rem))
+		auto auto auto auto auto auto;
+	grid-template-areas:
+		'brand brand'
+		'tabs tabs'
+		'mode reset'
+		'copy download'
+		'preview preview'
+		'accentLabel baseLabel'
+		'accent base'
+		'depthLabel fontLabel'
+		'depth font'
+		'radiusLabel densityLabel'
+		'radius density';
+}
+
+[data-layout='theme-wizard'] > svelte-css-wrapper {
+	display: contents;
+}
+
+[data-layout='theme-wizard'] > *,
+[data-layout='theme-wizard'] > svelte-css-wrapper > * {
+	grid-area: var(--dry-grid-area-name, auto);
+	min-block-size: 0;
+}
+
+@container theme-wizard (min-width: 720px) {
+	[data-layout='theme-wizard'] {
+		grid-template-columns: repeat(12, minmax(0, 1fr));
+		grid-template-rows: auto minmax(0, calc(100dvh - 12rem)) auto auto;
+		grid-template-areas:
+			'brand brand tabs tabs tabs tabs mode copy download download reset reset'
+			'preview preview preview preview preview preview preview preview preview preview preview preview'
+			'accentLabel accentLabel baseLabel baseLabel depthLabel depthLabel depthLabel depthLabel fontLabel radiusLabel densityLabel densityLabel'
+			'accent accent base base depth depth depth depth font radius density density';
+	}
+}

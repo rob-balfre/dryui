@@ -7,7 +7,6 @@
 		GitCompareArrows,
 		Grid2x2Check,
 		House,
-		LayoutTemplate,
 		ToolCase,
 		WandSparkles,
 		Workflow
@@ -56,7 +55,6 @@
 		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
 		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
 		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
-		{ label: 'Templates', href: withBase('/templates'), icon: LayoutTemplate },
 		{ label: 'How We Work', href: withBase('/how-we-work'), icon: Workflow }
 	];
 </script>

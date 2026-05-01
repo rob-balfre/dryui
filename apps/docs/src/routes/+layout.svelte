@@ -13,6 +13,7 @@
 	import { BUILD_TIMESTAMP, DRYUI_VERSION, GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
 	import { withBase, withQueryParam } from '$lib/utils';
 	import '../app.css';
+	import '../layout.css';
 
 	let { children: routeChildren } = $props();
 	let mobileNavOpen = $state(false);
