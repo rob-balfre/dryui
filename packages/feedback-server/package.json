@@ -39,12 +39,7 @@
       "default": "./dist/config-probe.js"
     }
   },
-  "files": [
-    "dist",
-    "hooks",
-    "skills",
-    "bin"
-  ],
+  "files": ["dist", "hooks", "bin"],
   "publishConfig": {
     "access": "public",
     "exports": {
