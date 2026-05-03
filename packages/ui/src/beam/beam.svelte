@@ -60,12 +60,6 @@
 
 <style>
 	[data-beam] {
-		--dry-beam-color: var(--dry-color-fill-brand);
-		--dry-beam-angle: 45deg;
-		--dry-beam-speed: 3s;
-		--dry-beam-intensity: 70;
-		--dry-beam-width: 2px;
-
 		position: relative;
 		overflow: hidden;
 		border-radius: inherit;

@@ -78,22 +78,11 @@
 
 <style>
 	[data-part='root'] {
-		/* Component tokens */
-		--dry-toc-bg: var(--dry-color-bg-overlay);
-		--dry-toc-border: var(--dry-color-stroke-weak);
-		--dry-toc-radius: var(--dry-radius-xl);
-		--dry-toc-shadow: var(--dry-shadow-sm);
-		--dry-toc-padding: var(--dry-space-4);
-		--dry-toc-item-padding-x: var(--dry-space-2);
-		--dry-toc-item-padding-y: var(--dry-space-1_5);
-		--dry-toc-indent: var(--dry-space-4);
-		--dry-toc-active-color: var(--dry-color-text-brand);
-		--dry-toc-muted-color: var(--dry-color-text-weak);
-		padding: var(--dry-toc-padding);
-		background: var(--dry-toc-bg);
-		border: 1px solid var(--dry-toc-border);
-		border-radius: var(--dry-toc-radius);
-		box-shadow: var(--dry-toc-shadow);
+		padding: var(--dry-toc-padding, var(--dry-space-4));
+		background: var(--dry-toc-bg, var(--dry-color-bg-overlay));
+		border: 1px solid var(--dry-toc-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-toc-radius, var(--dry-radius-xl));
+		box-shadow: var(--dry-toc-shadow, var(--dry-shadow-sm));
 		font-family: var(--dry-font-sans);
 	}
 </style>

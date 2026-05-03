@@ -53,18 +53,12 @@
 
 <style>
 	img {
-		--dry-image-radius: var(--dry-radius-lg);
-		--dry-image-bg: var(--dry-color-bg-overlay);
-		--dry-image-object-fit: cover;
-		--dry-image-block-size: auto;
-		--dry-image-place-self: auto;
-
 		display: block;
-		block-size: var(--dry-image-block-size);
-		place-self: var(--dry-image-place-self);
-		border-radius: var(--dry-image-radius);
-		background: var(--dry-image-bg);
-		object-fit: var(--dry-image-object-fit);
+		block-size: var(--dry-image-block-size, auto);
+		place-self: var(--dry-image-place-self, auto);
+		border-radius: var(--dry-image-radius, var(--dry-radius-lg));
+		background: var(--dry-image-bg, var(--dry-color-bg-overlay));
+		object-fit: var(--dry-image-object-fit, cover);
 	}
 
 	img[data-state='loaded'],

@@ -79,29 +79,24 @@
 
 <style>
 	[data-float-button] {
-		--dry-fab-offset: var(--dry-space-6);
-		--dry-fab-gap: var(--dry-space-3);
-		--dry-fab-position: fixed;
-		--dry-fab-z-index: var(--dry-layer-overlay);
-
-		position: var(--dry-fab-position);
-		z-index: var(--dry-fab-z-index);
+		position: var(--dry-fab-position, fixed);
+		z-index: var(--dry-fab-z-index, var(--dry-layer-overlay));
 		/* Grid stack with the trigger pinned visually last via `order` (set on
 		   .trigger-slot) so it sits closest to the anchored corner; DOM order
 		   keeps the trigger first for keyboard focus order. */
 		display: grid;
-		gap: var(--dry-fab-gap);
+		gap: var(--dry-fab-gap, var(--dry-space-3));
 	}
 
 	[data-float-button][data-position='bottom-right'] {
-		bottom: var(--dry-fab-offset);
-		right: var(--dry-fab-offset);
+		bottom: var(--dry-fab-offset, var(--dry-space-6));
+		right: var(--dry-fab-offset, var(--dry-space-6));
 		justify-items: end;
 	}
 
 	[data-float-button][data-position='bottom-left'] {
-		bottom: var(--dry-fab-offset);
-		left: var(--dry-fab-offset);
+		bottom: var(--dry-fab-offset, var(--dry-space-6));
+		left: var(--dry-fab-offset, var(--dry-space-6));
 		justify-items: start;
 	}
 </style>

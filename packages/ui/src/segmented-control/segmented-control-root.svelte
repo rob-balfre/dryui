@@ -112,9 +112,6 @@
 	[data-part='root'] {
 		display: inline-grid;
 		gap: 0;
-		--dry-sc-radius: var(--dry-radius-lg);
-		--dry-sc-selected-bg: var(--dry-color-bg-overlay);
-		--dry-sc-selected-border: var(--dry-color-stroke-strong);
 	}
 
 	[data-orientation='horizontal'] {

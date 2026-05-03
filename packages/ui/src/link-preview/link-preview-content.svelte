@@ -50,22 +50,16 @@
 
 <style>
 	[data-link-preview-content] {
-		--dry-link-preview-bg: var(--dry-color-bg-overlay);
-		--dry-link-preview-border: var(--dry-color-stroke-weak);
-		--dry-link-preview-radius: var(--dry-radius-lg);
-		--dry-link-preview-shadow: var(--dry-shadow-lg);
-		--dry-link-preview-padding: var(--dry-space-4);
-
 		inset: unset;
 		margin: 0;
 		display: grid;
 		grid-template-columns: minmax(16rem, 24rem);
-		padding: var(--dry-link-preview-padding);
-		border: 1px solid var(--dry-link-preview-border);
-		border-radius: var(--dry-link-preview-radius);
-		background: var(--dry-link-preview-bg);
+		padding: var(--dry-link-preview-padding, var(--dry-space-4));
+		border: 1px solid var(--dry-link-preview-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-link-preview-radius, var(--dry-radius-lg));
+		background: var(--dry-link-preview-bg, var(--dry-color-bg-overlay));
 		color: var(--dry-color-text-strong);
-		box-shadow: var(--dry-link-preview-shadow);
+		box-shadow: var(--dry-link-preview-shadow, var(--dry-shadow-lg));
 		line-height: 1.55;
 		overflow: hidden;
 		transition:

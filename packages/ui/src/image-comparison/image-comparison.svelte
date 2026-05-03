@@ -121,22 +121,11 @@
 
 <style>
 	[data-image-comparison] {
-		--dry-image-comparison-position: 50%;
-		--dry-image-comparison-handle-width: 2px;
-		--dry-image-comparison-handle-color: var(--dry-color-bg-overlay);
-		--dry-image-comparison-arrow-color: var(--dry-color-text-strong);
-		--dry-image-comparison-arrow-width: 5px;
-		--dry-image-comparison-arrow-width-wide: 6px;
-		--dry-image-comparison-handle-shadow: var(--dry-shadow-md);
-		--dry-image-comparison-radius: var(--dry-radius-lg);
-		--dry-image-comparison-grip-z-index: 1;
-		--dry-image-comparison-handle-z-index: 1;
-
 		position: relative;
 		display: grid;
 		height: 100%;
 		overflow: hidden;
-		border-radius: var(--dry-image-comparison-radius);
+		border-radius: var(--dry-image-comparison-radius, var(--dry-radius-lg));
 		user-select: none;
 		touch-action: none;
 	}
@@ -147,24 +136,24 @@
 	}
 
 	[data-image-comparison][data-orientation='horizontal'] [data-ic-layer-before] {
-		clip-path: inset(0 calc(100% - var(--dry-image-comparison-position)) 0 0);
+		clip-path: inset(0 calc(100% - var(--dry-image-comparison-position, 50%)) 0 0);
 	}
 
 	[data-image-comparison][data-orientation='vertical'] [data-ic-layer-before] {
-		clip-path: inset(0 0 calc(100% - var(--dry-image-comparison-position)) 0);
+		clip-path: inset(0 0 calc(100% - var(--dry-image-comparison-position, 50%)) 0);
 	}
 
 	[data-ic-handle-wrapper] {
 		position: absolute;
 		display: grid;
 		place-items: center;
-		z-index: var(--dry-image-comparison-handle-z-index);
+		z-index: var(--dry-image-comparison-handle-z-index, 1);
 	}
 
 	[data-image-comparison][data-orientation='horizontal'] [data-ic-handle-wrapper] {
 		top: 0;
 		bottom: 0;
-		left: var(--dry-image-comparison-position);
+		left: var(--dry-image-comparison-position, 50%);
 		translate: -50% 0;
 		cursor: ew-resize;
 	}
@@ -172,7 +161,7 @@
 	[data-image-comparison][data-orientation='vertical'] [data-ic-handle-wrapper] {
 		left: 0;
 		right: 0;
-		top: var(--dry-image-comparison-position);
+		top: var(--dry-image-comparison-position, 50%);
 		translate: 0 -50%;
 		cursor: ns-resize;
 	}
@@ -193,19 +182,19 @@
 	/* Handle line */
 	[data-ic-handle-line] {
 		position: absolute;
-		background: var(--dry-image-comparison-handle-color);
-		box-shadow: var(--dry-image-comparison-handle-shadow);
+		background: var(--dry-image-comparison-handle-color, var(--dry-color-bg-overlay));
+		box-shadow: var(--dry-image-comparison-handle-shadow, var(--dry-shadow-md));
 	}
 
 	[data-ic-handle][data-orientation='horizontal'] [data-ic-handle-line] {
-		left: calc(50% - calc(var(--dry-image-comparison-handle-width) / 2));
-		right: calc(50% - calc(var(--dry-image-comparison-handle-width) / 2));
+		left: calc(50% - calc(var(--dry-image-comparison-handle-width, 2px) / 2));
+		right: calc(50% - calc(var(--dry-image-comparison-handle-width, 2px) / 2));
 		top: 0;
 		bottom: 0;
 	}
 
 	[data-ic-handle][data-orientation='vertical'] [data-ic-handle-line] {
-		height: var(--dry-image-comparison-handle-width);
+		height: var(--dry-image-comparison-handle-width, 2px);
 		top: 50%;
 		left: 0;
 		right: 0;
@@ -215,12 +204,12 @@
 	/* Grip indicator */
 	[data-ic-grip] {
 		position: relative;
-		z-index: var(--dry-image-comparison-grip-z-index);
+		z-index: var(--dry-image-comparison-grip-z-index, 1);
 		aspect-ratio: 1;
 		height: var(--dry-space-12);
 		border-radius: var(--dry-radius-full);
-		background: var(--dry-image-comparison-handle-color);
-		box-shadow: var(--dry-image-comparison-handle-shadow);
+		background: var(--dry-image-comparison-handle-color, var(--dry-color-bg-overlay));
+		box-shadow: var(--dry-image-comparison-handle-shadow, var(--dry-shadow-md));
 		display: grid;
 		place-items: center;
 	}
@@ -231,7 +220,7 @@
 		grid-auto-columns: 0;
 		align-items: center;
 		gap: var(--dry-space-2);
-		color: var(--dry-image-comparison-arrow-color);
+		color: var(--dry-image-comparison-arrow-color, var(--dry-color-text-strong));
 	}
 
 	[data-ic-handle][data-orientation='vertical'] [data-ic-grip-arrows] {
@@ -246,28 +235,33 @@
 
 	/* Horizontal arrows (left/right) */
 	[data-ic-handle][data-orientation='horizontal'] [data-ic-grip-arrow-start] {
-		border-width: var(--dry-image-comparison-arrow-width)
-			var(--dry-image-comparison-arrow-width-wide) var(--dry-image-comparison-arrow-width) 0;
-		border-color: transparent var(--dry-image-comparison-arrow-color) transparent transparent;
+		border-width: var(--dry-image-comparison-arrow-width, 5px)
+			var(--dry-image-comparison-arrow-width-wide, 6px) var(--dry-image-comparison-arrow-width, 5px)
+			0;
+		border-color: transparent var(--dry-image-comparison-arrow-color, var(--dry-color-text-strong))
+			transparent transparent;
 	}
 
 	[data-ic-handle][data-orientation='horizontal'] [data-ic-grip-arrow-end] {
-		border-width: var(--dry-image-comparison-arrow-width) 0 var(--dry-image-comparison-arrow-width)
-			var(--dry-image-comparison-arrow-width-wide);
-		border-color: transparent transparent transparent var(--dry-image-comparison-arrow-color);
+		border-width: var(--dry-image-comparison-arrow-width, 5px) 0
+			var(--dry-image-comparison-arrow-width, 5px) var(--dry-image-comparison-arrow-width-wide, 6px);
+		border-color: transparent transparent transparent
+			var(--dry-image-comparison-arrow-color, var(--dry-color-text-strong));
 	}
 
 	/* Vertical arrows (up/down) */
 	[data-ic-handle][data-orientation='vertical'] [data-ic-grip-arrow-start] {
-		border-width: 0 var(--dry-image-comparison-arrow-width)
-			var(--dry-image-comparison-arrow-width-wide) var(--dry-image-comparison-arrow-width);
-		border-color: transparent transparent var(--dry-image-comparison-arrow-color) transparent;
+		border-width: 0 var(--dry-image-comparison-arrow-width, 5px)
+			var(--dry-image-comparison-arrow-width-wide, 6px) var(--dry-image-comparison-arrow-width, 5px);
+		border-color: transparent transparent
+			var(--dry-image-comparison-arrow-color, var(--dry-color-text-strong)) transparent;
 	}
 
 	[data-ic-handle][data-orientation='vertical'] [data-ic-grip-arrow-end] {
-		border-width: var(--dry-image-comparison-arrow-width-wide)
-			var(--dry-image-comparison-arrow-width) 0 var(--dry-image-comparison-arrow-width);
-		border-color: var(--dry-image-comparison-arrow-color) transparent transparent transparent;
+		border-width: var(--dry-image-comparison-arrow-width-wide, 6px)
+			var(--dry-image-comparison-arrow-width, 5px) 0 var(--dry-image-comparison-arrow-width, 5px);
+		border-color: var(--dry-image-comparison-arrow-color, var(--dry-color-text-strong)) transparent
+			transparent transparent;
 	}
 
 	/* Focus */

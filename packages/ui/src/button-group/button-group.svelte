@@ -37,8 +37,7 @@
 
 <style>
 	[data-button-group] {
-		--dry-button-group-radius: var(--dry-radius-md);
-		--dry-button-group-hover-z-index: 1;
+		--_button-group-radius-default: var(--dry-radius-md);
 
 		display: inline-grid;
 		gap: var(--dry-button-group-gap, 0px);
@@ -49,14 +48,14 @@
 	}
 
 	[data-button-group][data-size='sm'] {
-		--dry-button-group-radius: var(--dry-radius-sm);
+		--_button-group-radius-default: var(--dry-radius-sm);
 	}
 
 	[data-button-group][data-size='md'] {
-		--dry-button-group-radius: var(--dry-radius-md);
+		--_button-group-radius-default: var(--dry-radius-md);
 	}
 
 	[data-button-group][data-size='lg'] {
-		--dry-button-group-radius: var(--dry-radius-lg);
+		--_button-group-radius-default: var(--dry-radius-lg);
 	}
 </style>

@@ -51,11 +51,8 @@
 
 <style>
 	[data-format-bytes] {
-		--dry-format-bytes-color: var(--dry-color-text-weak);
-		--dry-format-bytes-font-size: var(--dry-type-small-size);
-
-		color: var(--dry-format-bytes-color);
-		font-size: var(--dry-format-bytes-font-size);
+		color: var(--dry-format-bytes-color, var(--dry-color-text-weak));
+		font-size: var(--dry-format-bytes-font-size, var(--dry-type-small-size));
 		font-family: var(--dry-font-sans);
 		font-variant-numeric: tabular-nums;
 		line-height: var(--dry-type-small-leading);

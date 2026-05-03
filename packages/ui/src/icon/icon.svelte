@@ -35,47 +35,50 @@
 
 <style>
 	span {
+		--_icon-size-default: var(--dry-space-5);
+		--_icon-color-default: currentColor;
+
 		display: inline-grid;
 		place-items: center;
 		aspect-ratio: 1;
-		height: var(--dry-icon-size, var(--dry-space-5));
-		color: var(--dry-icon-color, currentColor);
+		height: var(--dry-icon-size, var(--_icon-size-default));
+		color: var(--dry-icon-color, var(--_icon-color-default));
 		line-height: 0;
 	}
 
 	/* ── Sizes ─────────────────────────────────────────────────────────────────── */
 
 	span[data-size='xs'] {
-		--dry-icon-size: var(--dry-space-3);
+		--_icon-size-default: var(--dry-space-3);
 	}
 
 	span[data-size='sm'] {
-		--dry-icon-size: var(--dry-space-4);
+		--_icon-size-default: var(--dry-space-4);
 	}
 
 	span[data-size='md'] {
-		--dry-icon-size: var(--dry-space-5);
+		--_icon-size-default: var(--dry-space-5);
 	}
 
 	span[data-size='lg'] {
-		--dry-icon-size: var(--dry-space-6);
+		--_icon-size-default: var(--dry-space-6);
 	}
 
 	span[data-size='xl'] {
-		--dry-icon-size: var(--dry-space-8);
+		--_icon-size-default: var(--dry-space-8);
 	}
 
 	/* ── Colors ────────────────────────────────────────────────────────────────── */
 
 	span[data-color='primary'] {
-		--dry-icon-color: var(--dry-color-fill-brand);
+		--_icon-color-default: var(--dry-color-fill-brand);
 	}
 
 	span[data-color='muted'] {
-		--dry-icon-color: var(--dry-color-text-weak);
+		--_icon-color-default: var(--dry-color-text-weak);
 	}
 
 	span[data-color='current'] {
-		--dry-icon-color: currentColor;
+		--_icon-color-default: currentColor;
 	}
 </style>

@@ -152,7 +152,7 @@ Structure:
   FloatButton.Root
     FloatButton.Trigger
     FloatButton.Action
-CSS variables: --dry-btn-min-height, --dry-fab-action-origin, --dry-fab-action-scale-closed, --dry-fab-gap, --dry-fab-offset, --dry-fab-position, --dry-fab-z-index
+CSS variables: --dry-btn-min-height, --dry-fab-action-origin, --dry-fab-action-scale-closed
 Data attributes: data-float-button | data-float-button-action | data-float-button-trigger | data-position | data-state
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
@@ -172,7 +172,7 @@ Root import: import { ButtonGroup } from '@dryui/ui'
 Subpath import: import { ButtonGroup } from '@dryui/ui/button-group'
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-button-group-hover-z-index, --dry-button-group-radius
+CSS variables: none
 Data attributes: data-button-group | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size
 Accessibility: Provide discernible text or an aria-label for controls that do not expose visible text. | Use button semantics for in-place actions and link semantics for navigation.
 Example:
@@ -276,7 +276,7 @@ Root import: import { Checkbox } from '@dryui/ui'
 Subpath import: import { Checkbox } from '@dryui/ui/checkbox'
 Props: size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | checked (boolean), Current checked state for controlled or bindable usage., default false, bindable | indeterminate (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false
 Native props: Forwards <input> attributes via rest props.
-CSS variables: --dry-checkbox-bg, --dry-checkbox-border, --dry-checkbox-check-color, --dry-checkbox-radius, --dry-checkbox-size
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-invalid (Present when the current field value is invalid.) | data-size | data-state
 Accessibility: Pair the checkbox with visible text or an aria-label so its purpose is announced.
 Example:
@@ -434,7 +434,7 @@ Parts:
 Structure:
   Listbox.Root
     Listbox.Item
-CSS variables: --dry-listbox-bg, --dry-listbox-border, --dry-listbox-item-hover-bg, --dry-listbox-item-padding-x, --dry-listbox-item-padding-y, --dry-listbox-item-radius, --dry-listbox-item-selected-bg, --dry-listbox-item-selected-border, --dry-listbox-item-selected-color, --dry-listbox-padding, --dry-listbox-radius
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-listbox-item | data-listbox-root | data-selected (Present when the current item is selected.) | data-value
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
@@ -599,7 +599,7 @@ Structure:
     FileUpload.List
     FileUpload.Item
     FileUpload.ItemDelete
-CSS variables: --dry-fu-bg, --dry-fu-border, --dry-fu-font-size, --dry-fu-min-height, --dry-fu-padding
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-dragging | data-fu-dropzone | data-fu-item | data-fu-item-name | data-fu-item-size | data-fu-list | data-index | data-size
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
@@ -750,7 +750,7 @@ Structure:
     Transfer.List
     Transfer.Item
     Transfer.Actions
-CSS variables: --dry-transfer-actions-gap, --dry-transfer-bg, --dry-transfer-border, --dry-transfer-header-bg, --dry-transfer-item-hover, --dry-transfer-item-selected, --dry-transfer-list-height, --dry-transfer-padding, --dry-transfer-radius
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-part | data-selected (Present when the current item is selected.) | data-transfer-actions | data-transfer-count | data-transfer-item | data-transfer-list | data-transfer-list-content | data-transfer-list-header | data-transfer-move-all-source | data-transfer-move-all-target | data-transfer-move-source | data-transfer-move-target | data-transfer-root | data-transfer-select-all | data-type
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.
 Example:
@@ -1173,7 +1173,7 @@ Parts:
 Structure:
   SegmentedControl.Root
     SegmentedControl.Item
-CSS variables: --dry-sc-radius, --dry-sc-selected-bg, --dry-sc-selected-border
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part | data-segmented-control-item | data-state
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
@@ -1638,7 +1638,7 @@ Parts:
 Structure:
   ChipGroup.Root
     ChipGroup.Label
-CSS variables: --dry-chip-group-font-size, --dry-chip-group-gap, --dry-chip-group-padding-x, --dry-chip-group-padding-y
+CSS variables: --dry-chip-group-font-size, --dry-chip-group-padding-x, --dry-chip-group-padding-y
 Data attributes: data-chip-group | data-chip-group-label | data-disabled (Present when the component or part is disabled.) | data-gap | data-justify | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-size | data-state
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
@@ -2188,7 +2188,7 @@ Structure:
   TableOfContents.Root
     TableOfContents.List
     TableOfContents.Item
-CSS variables: --dry-toc-active-color, --dry-toc-bg, --dry-toc-border, --dry-toc-indent, --dry-toc-item-padding-x, --dry-toc-item-padding-y, --dry-toc-muted-color, --dry-toc-padding, --dry-toc-radius, --dry-toc-shadow
+CSS variables: none
 Data attributes: data-active (Present on the active item or current target within the component.) | data-level | data-part
 Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
@@ -2208,7 +2208,7 @@ Root import: import { Link } from '@dryui/ui'
 Subpath import: import { Link } from '@dryui/ui/link'
 Props: underline ('always' | 'hover' | 'none'), accepted always, hover, none, default 'always' | external (boolean), default false | disabled (boolean), Prevents interaction and applies disabled styling., default false | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <a> attributes via rest props.
-CSS variables: --dry-link-hover-color
+CSS variables: none
 Data attributes: data-disabled (Present when the component or part is disabled.) | data-underline
 Accessibility: Use concise, descriptive labels so navigation items are understandable when announced out of context. | Preserve the expected keyboard model and expose current or selected state where relevant.
 Example:
@@ -2720,7 +2720,7 @@ Structure:
   LinkPreview.Root
     LinkPreview.Trigger
     LinkPreview.Content
-CSS variables: --dry-link-preview-bg, --dry-link-preview-border, --dry-link-preview-color, --dry-link-preview-padding, --dry-link-preview-radius, --dry-link-preview-shadow, --dry-link-preview-underline-offset
+CSS variables: none
 Data attributes: data-link-preview-content | data-link-preview-trigger | data-state
 Accessibility: Ensure the trigger, popup role, and focus return behavior all describe the same interaction model. | Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content. | Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.
 Example:
@@ -3158,7 +3158,7 @@ Root import: import { ChatThread } from '@dryui/ui'
 Subpath import: import { ChatThread } from '@dryui/ui/chat-thread'
 Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >), Content rendered inside the component., required
 Native props: Forwards <element> attributes via rest props.
-CSS variables: --dry-chat-thread-gap, --dry-chat-thread-message-gap
+CSS variables: none
 Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport | data-view-transition-name
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3198,7 +3198,7 @@ Root import: import { Icon } from '@dryui/ui'
 Subpath import: import { Icon } from '@dryui/ui/icon'
 Props: size ('xs' | 'sm' | 'md' | 'lg' | 'xl'), Size preset affecting density, spacing, or typography., accepted xs, sm, md, lg, xl, default 'md' | color ('primary' | 'muted' | 'current'), Semantic color or tone applied to the component., accepted primary, muted, current, default 'current' | label (string), Visible label text shown for the control or item. | class (string) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-icon-color, --dry-icon-size
+CSS variables: none
 Data attributes: data-color | data-dry-icon | data-size
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3215,7 +3215,7 @@ Root import: import { Image } from '@dryui/ui'
 Subpath import: import { Image } from '@dryui/ui/image'
 Props: fallback (string) | fallbackSnippet (Snippet)
 Native props: Forwards native HTML attributes via rest props.
-CSS variables: --dry-image-bg, --dry-image-block-size, --dry-image-object-fit, --dry-image-place-self, --dry-image-radius
+CSS variables: none
 Data attributes: data-state
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3450,7 +3450,7 @@ Root import: import { LogoMark } from '@dryui/ui'
 Subpath import: import { LogoMark } from '@dryui/ui/logo-mark'
 Props: src (string), Source URL for image, video, or other media content. | alt (string), Accessible alternative text announced when the media itself is not visible., default '' | fallback (string) | size ('sm' | 'md' | 'lg'), Size preset affecting density, spacing, or typography., accepted sm, md, lg, default 'md' | shape ('square' | 'rounded' | 'circle'), accepted square, rounded, circle, default 'rounded' | color ('brand' | 'neutral' | 'error' | 'warning' | 'success' | 'info'), Semantic color or tone applied to the component., accepted brand, neutral, error, warning, success, info, default 'neutral'
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-logo-mark-bg, --dry-logo-mark-color, --dry-logo-mark-font-size, --dry-logo-mark-radius, --dry-logo-mark-size
+CSS variables: none
 Data attributes: data-color | data-logo-mark | data-shape | data-size
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3560,7 +3560,7 @@ Root import: import { MarkdownRenderer } from '@dryui/ui'
 Subpath import: import { MarkdownRenderer } from '@dryui/ui/markdown-renderer'
 Props: content (string), required | dangerouslyAllowRawHtml (boolean), default false
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-markdown-blockquote-border, --dry-markdown-blockquote-color, --dry-markdown-code-bg, --dry-markdown-code-border, --dry-markdown-code-color, --dry-markdown-color, --dry-markdown-font-size, --dry-markdown-heading-color, --dry-markdown-hr-color, --dry-markdown-line-height, --dry-markdown-link-color, --dry-markdown-link-hover-color, --dry-markdown-max-width
+CSS variables: none
 Data attributes: data-code-block | data-language | data-markdown-renderer | data-markdown-renderer-root
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3745,7 +3745,7 @@ Root import: import { FormatBytes } from '@dryui/ui'
 Subpath import: import { FormatBytes } from '@dryui/ui/format-bytes'
 Props: value (number), Current controlled or bindable value., required | locale (string), default 'en' | unit ('byte' | 'bit'), accepted byte, bit | display ('short' | 'long' | 'narrow'), accepted short, long, narrow, default 'short'
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-format-bytes-color, --dry-format-bytes-font-size
+CSS variables: none
 Data attributes: data-format-bytes
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3762,7 +3762,7 @@ Root import: import { FormatDate } from '@dryui/ui'
 Subpath import: import { FormatDate } from '@dryui/ui/format-date'
 Props: date (Date | string | number), required | locale (string), default 'en' | weekday ('long' | 'short' | 'narrow'), accepted long, short, narrow | era ('long' | 'short' | 'narrow'), accepted long, short, narrow | year ('numeric' | '2-digit'), accepted numeric, 2-digit | month ('numeric' | '2-digit' | 'long' | 'short' | 'narrow'), accepted numeric, 2-digit, long, short, narrow | day ('numeric' | '2-digit'), accepted numeric, 2-digit | hour ('numeric' | '2-digit'), accepted numeric, 2-digit | minute ('numeric' | '2-digit'), accepted numeric, 2-digit | second ('numeric' | '2-digit'), accepted numeric, 2-digit | timeZoneName ('long' | 'short'), accepted long, short | timeZone (string) | hourCycle ('h11' | 'h12' | 'h23' | 'h24'), accepted h11, h12, h23, h24 | dateStyle ('full' | 'long' | 'medium' | 'short'), accepted full, long, medium, short | timeStyle ('full' | 'long' | 'medium' | 'short'), accepted full, long, medium, short
 Native props: Forwards <time> attributes via rest props.
-CSS variables: --dry-format-date-color, --dry-format-date-font-size
+CSS variables: none
 Data attributes: data-format-date
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3779,7 +3779,7 @@ Root import: import { FormatNumber } from '@dryui/ui'
 Subpath import: import { FormatNumber } from '@dryui/ui/format-number'
 Props: value (number), Current controlled or bindable value., required | locale (string), default 'en' | type ('decimal' | 'currency' | 'percent' | 'unit'), HTML type attribute or component-specific type selector., accepted decimal, currency, percent, unit | currency (string) | unit (string) | notation ('standard' | 'scientific' | 'engineering' | 'compact'), accepted standard, scientific, engineering, compact | minimumFractionDigits (number) | maximumFractionDigits (number) | minimumIntegerDigits (number) | minimumSignificantDigits (number) | maximumSignificantDigits (number)
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-format-number-color, --dry-format-number-font-size
+CSS variables: none
 Data attributes: data-format-number
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3796,7 +3796,7 @@ Root import: import { ImageComparison } from '@dryui/ui'
 Subpath import: import { ImageComparison } from '@dryui/ui/image-comparison'
 Props: position (number), default 50, bindable | orientation ('horizontal' | 'vertical'), Horizontal or vertical layout direction., accepted horizontal, vertical, default 'horizontal' | before (Snippet), required | after (Snippet), required | handle (Snippet)
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-image-comparison-arrow-color, --dry-image-comparison-arrow-width, --dry-image-comparison-arrow-width-wide, --dry-image-comparison-grip-z-index, --dry-image-comparison-handle-color, --dry-image-comparison-handle-shadow, --dry-image-comparison-handle-width, --dry-image-comparison-handle-z-index, --dry-image-comparison-position, --dry-image-comparison-radius
+CSS variables: --dry-image-comparison-handle-color, --dry-image-comparison-handle-shadow, --dry-image-comparison-handle-width, --dry-image-comparison-handle-z-index, --dry-image-comparison-radius
 Data attributes: data-dragging | data-ic-grip | data-ic-grip-arrow | data-ic-grip-arrow-end | data-ic-grip-arrow-start | data-ic-grip-arrows | data-ic-handle | data-ic-handle-line | data-ic-handle-wrapper | data-ic-layer | data-ic-layer-before | data-image-comparison | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.
 Example:
@@ -3813,7 +3813,7 @@ Root import: import { RelativeTime } from '@dryui/ui'
 Subpath import: import { RelativeTime } from '@dryui/ui/relative-time'
 Props: date (Date | string | number), required | locale (string), default 'en' | updateInterval (number), default 60000
 Native props: Forwards <time> attributes via rest props.
-CSS variables: --dry-relative-time-color, --dry-relative-time-font-size
+CSS variables: none
 Data attributes: data-relative-time
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -4009,7 +4009,7 @@ Root import: import { Tag } from '@dryui/ui'
 Subpath import: import { Tag } from '@dryui/ui/tag'
 Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (BadgeColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
 Native props: Forwards <span> attributes via rest props.
-CSS variables: --dry-tag-bg, --dry-tag-border, --dry-tag-color, --dry-tag-font-size, --dry-tag-padding-x, --dry-tag-padding-y
+CSS variables: none
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -4606,7 +4606,7 @@ Root import: import { Glow } from '@dryui/ui'
 Subpath import: import { Glow } from '@dryui/ui/glow'
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | intensity (number), default 50 | radius (number), default 20 | blendMode (BlendMode), default 'screen' | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-glow-blend, --dry-glow-color, --dry-glow-intensity, --dry-glow-radius
+CSS variables: none
 Data attributes: data-glow
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
@@ -4640,7 +4640,7 @@ Root import: import { Beam } from '@dryui/ui'
 Subpath import: import { Beam } from '@dryui/ui/beam'
 Props: color (string), Semantic color or tone applied to the component., default 'var(--dry-color-fill-brand)' | width (number), default 2 | angle (number), default 45 | speed (number), default 3 | intensity (number), default 70 | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-beam-angle, --dry-beam-color, --dry-beam-intensity, --dry-beam-speed, --dry-beam-width
+CSS variables: none
 Data attributes: data-beam | data-beam-layer | data-offscreen
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
@@ -4742,7 +4742,7 @@ Root import: import { Halftone } from '@dryui/ui'
 Subpath import: import { Halftone } from '@dryui/ui/halftone'
 Props: dotSize ('fine' | 'medium' | 'coarse' | number), accepted fine, medium, coarse, default 'medium' | angle (number), default 45 | color (string), Semantic color or tone applied to the component., default 'currentColor' | opacity (number), default 0.3 | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-halftone-angle, --dry-halftone-color, --dry-halftone-dot-radius, --dry-halftone-opacity, --dry-halftone-pattern-size
+CSS variables: none
 Data attributes: data-dot-size | data-halftone | data-halftone-content
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:

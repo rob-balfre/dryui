@@ -71,10 +71,12 @@
 	 * reads naturally without grid hacks.
 	 */
 	[data-chip-group] {
+		--_chip-group-gap-default: var(--dry-space-2);
+
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		gap: var(--dry-chip-group-gap, var(--dry-space-2));
+		gap: var(--dry-chip-group-gap, var(--_chip-group-gap-default));
 	}
 
 	[data-chip-group][data-orientation='vertical'] {
@@ -84,15 +86,15 @@
 
 	/* Gap presets — map onto --dry-space tokens. */
 	[data-chip-group][data-gap='sm'] {
-		--dry-chip-group-gap: var(--dry-space-1);
+		--_chip-group-gap-default: var(--dry-space-1);
 	}
 
 	[data-chip-group][data-gap='md'] {
-		--dry-chip-group-gap: var(--dry-space-2);
+		--_chip-group-gap-default: var(--dry-space-2);
 	}
 
 	[data-chip-group][data-gap='lg'] {
-		--dry-chip-group-gap: var(--dry-space-3);
+		--_chip-group-gap-default: var(--dry-space-3);
 	}
 
 	/* Justify presets. */

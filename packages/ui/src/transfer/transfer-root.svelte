@@ -128,16 +128,6 @@
 
 <style>
 	[data-part='root'] {
-		--dry-transfer-border: var(--dry-color-stroke-weak);
-		--dry-transfer-bg: var(--dry-color-bg-base);
-		--dry-transfer-header-bg: var(--dry-color-bg-raised);
-		--dry-transfer-item-hover: var(--dry-color-fill);
-		--dry-transfer-item-selected: var(--dry-color-fill-brand-weak);
-		--dry-transfer-padding: var(--dry-space-3);
-		--dry-transfer-list-height: 280px;
-		--dry-transfer-radius: var(--dry-radius-lg);
-		--dry-transfer-actions-gap: var(--dry-space-2);
-
 		container-type: inline-size;
 		display: grid;
 		grid-auto-flow: column;

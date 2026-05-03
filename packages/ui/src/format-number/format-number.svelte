@@ -50,12 +50,8 @@
 
 <style>
 	[data-format-number] {
-		/* Component tokens (Tier 3) */
-		--dry-format-number-color: var(--dry-color-text-weak);
-		--dry-format-number-font-size: var(--dry-type-small-size);
-
-		color: var(--dry-format-number-color);
-		font-size: var(--dry-format-number-font-size);
+		color: var(--dry-format-number-color, var(--dry-color-text-weak));
+		font-size: var(--dry-format-number-font-size, var(--dry-type-small-size));
 		font-family: var(--dry-font-sans);
 		font-variant-numeric: tabular-nums;
 		line-height: var(--dry-type-small-leading);

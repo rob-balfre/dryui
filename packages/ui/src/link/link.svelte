@@ -48,9 +48,6 @@
 
 <style>
 	a {
-		/* Component tokens */
-		--dry-link-hover-color: var(--dry-color-fill-brand-hover, var(--dry-color-text-brand));
-
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
@@ -74,7 +71,10 @@
 	}
 
 	a[data-underline='hover']:hover:not([data-disabled]) {
-		color: var(--dry-link-hover-color);
+		color: var(
+			--dry-link-hover-color,
+			var(--dry-color-fill-brand-hover, var(--dry-color-text-brand))
+		);
 		text-decoration-line: underline;
 	}
 
@@ -83,7 +83,10 @@
 	}
 
 	a:hover:not([data-disabled]) {
-		color: var(--dry-link-hover-color);
+		color: var(
+			--dry-link-hover-color,
+			var(--dry-color-fill-brand-hover, var(--dry-color-text-brand))
+		);
 	}
 
 	a:focus-visible {

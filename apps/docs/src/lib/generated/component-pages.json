@@ -3732,13 +3732,7 @@
         "a11y": [
           "Pair the checkbox with visible text or an aria-label so its purpose is announced."
         ],
-        "cssVars": {
-          "--dry-checkbox-bg": "Background color",
-          "--dry-checkbox-border": "Border color",
-          "--dry-checkbox-check-color": "Check Color",
-          "--dry-checkbox-radius": "Border radius",
-          "--dry-checkbox-size": "Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -4783,11 +4777,7 @@
           "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
           "Provide native name, autocomplete, and value wiring when the component participates in form submission."
         ],
-        "cssVars": {
-          "--dry-sc-radius": "Border radius",
-          "--dry-sc-selected-bg": "Selected Bg",
-          "--dry-sc-selected-border": "Selected Border"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -8064,18 +8054,7 @@
           "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
           "Preserve the expected keyboard model and expose current or selected state where relevant."
         ],
-        "cssVars": {
-          "--dry-toc-active-color": "Active Color",
-          "--dry-toc-bg": "Background color",
-          "--dry-toc-border": "Border color",
-          "--dry-toc-indent": "Indent",
-          "--dry-toc-item-padding-x": "Item Padding X",
-          "--dry-toc-item-padding-y": "Item Padding Y",
-          "--dry-toc-muted-color": "Muted Color",
-          "--dry-toc-padding": "Padding",
-          "--dry-toc-radius": "Border radius",
-          "--dry-toc-shadow": "Box shadow"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-active",
@@ -8169,9 +8148,7 @@
           "Use concise, descriptive labels so navigation items are understandable when announced out of context.",
           "Preserve the expected keyboard model and expose current or selected state where relevant."
         ],
-        "cssVars": {
-          "--dry-link-hover-color": "Hover Color"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -9479,10 +9456,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-chat-thread-gap": "Thread Gap",
-          "--dry-chat-thread-message-gap": "Thread Message Gap"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-chat-thread"
@@ -9652,10 +9626,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-icon-color": "Text color",
-          "--dry-icon-size": "Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-color"
@@ -9702,13 +9673,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-image-bg": "Background color",
-          "--dry-image-block-size": "Block Size",
-          "--dry-image-object-fit": "Object Fit",
-          "--dry-image-place-self": "Place Self",
-          "--dry-image-radius": "Border radius"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-state"
@@ -9936,15 +9901,7 @@
           "Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.",
           "Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully."
         ],
-        "cssVars": {
-          "--dry-link-preview-bg": "Preview Bg",
-          "--dry-link-preview-border": "Preview Border",
-          "--dry-link-preview-color": "Preview Color",
-          "--dry-link-preview-padding": "Preview Padding",
-          "--dry-link-preview-radius": "Preview Radius",
-          "--dry-link-preview-shadow": "Preview Shadow",
-          "--dry-link-preview-underline-offset": "Preview Underline Offset"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-link-preview-content"
@@ -13448,19 +13405,7 @@
           "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
           "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
         ],
-        "cssVars": {
-          "--dry-listbox-bg": "Background color",
-          "--dry-listbox-border": "Border color",
-          "--dry-listbox-item-hover-bg": "Item Hover Bg",
-          "--dry-listbox-item-padding-x": "Item Padding X",
-          "--dry-listbox-item-padding-y": "Item Padding Y",
-          "--dry-listbox-item-radius": "Item Radius",
-          "--dry-listbox-item-selected-bg": "Item Selected Bg",
-          "--dry-listbox-item-selected-border": "Item Selected Border",
-          "--dry-listbox-item-selected-color": "Item Selected Color",
-          "--dry-listbox-padding": "Padding",
-          "--dry-listbox-radius": "Border radius"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -13599,13 +13544,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-logo-mark-bg": "Mark Bg",
-          "--dry-logo-mark-color": "Mark Color",
-          "--dry-logo-mark-font-size": "Mark Font Size",
-          "--dry-logo-mark-radius": "Mark Radius",
-          "--dry-logo-mark-size": "Mark Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-color"
@@ -14833,13 +14772,7 @@
           "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
           "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
         ],
-        "cssVars": {
-          "--dry-fu-bg": "Background color",
-          "--dry-fu-border": "Border color",
-          "--dry-fu-font-size": "Font size",
-          "--dry-fu-min-height": "Minimum height",
-          "--dry-fu-padding": "Padding"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -16514,11 +16447,7 @@
         "cssVars": {
           "--dry-btn-min-height": "Minimum height",
           "--dry-fab-action-origin": "Action Origin",
-          "--dry-fab-action-scale-closed": "Action Scale Closed",
-          "--dry-fab-gap": "Gap spacing",
-          "--dry-fab-offset": "Offset",
-          "--dry-fab-position": "Position",
-          "--dry-fab-z-index": "Z Index"
+          "--dry-fab-action-scale-closed": "Action Scale Closed"
         },
         "dataAttributes": [
           {
@@ -16975,21 +16904,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-markdown-blockquote-border": "Blockquote Border",
-          "--dry-markdown-blockquote-color": "Blockquote Color",
-          "--dry-markdown-code-bg": "Code Bg",
-          "--dry-markdown-code-border": "Code Border",
-          "--dry-markdown-code-color": "Code Color",
-          "--dry-markdown-color": "Text color",
-          "--dry-markdown-font-size": "Font size",
-          "--dry-markdown-heading-color": "Heading Color",
-          "--dry-markdown-hr-color": "Hr Color",
-          "--dry-markdown-line-height": "Line Height",
-          "--dry-markdown-link-color": "Link Color",
-          "--dry-markdown-link-hover-color": "Link Hover Color",
-          "--dry-markdown-max-width": "Maximum width"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-code-block"
@@ -18141,17 +18056,7 @@
           "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
           "Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern."
         ],
-        "cssVars": {
-          "--dry-transfer-actions-gap": "Actions Gap",
-          "--dry-transfer-bg": "Background color",
-          "--dry-transfer-border": "Border color",
-          "--dry-transfer-header-bg": "Header Bg",
-          "--dry-transfer-item-hover": "Item Hover",
-          "--dry-transfer-item-selected": "Item Selected",
-          "--dry-transfer-list-height": "List Height",
-          "--dry-transfer-padding": "Padding",
-          "--dry-transfer-radius": "Border radius"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-disabled",
@@ -18722,10 +18627,7 @@
           "Provide discernible text or an aria-label for controls that do not expose visible text.",
           "Use button semantics for in-place actions and link semantics for navigation."
         ],
-        "cssVars": {
-          "--dry-button-group-hover-z-index": "Group Hover Z Index",
-          "--dry-button-group-radius": "Group Radius"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-button-group"
@@ -19103,7 +19005,6 @@
         ],
         "cssVars": {
           "--dry-chip-group-font-size": "Group Font Size",
-          "--dry-chip-group-gap": "Group Gap",
           "--dry-chip-group-padding-x": "Group Padding X",
           "--dry-chip-group-padding-y": "Group Padding Y"
         },
@@ -19534,10 +19435,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-format-bytes-color": "Bytes Color",
-          "--dry-format-bytes-font-size": "Bytes Font Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-format-bytes"
@@ -19720,10 +19618,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-format-date-color": "Date Color",
-          "--dry-format-date-font-size": "Date Font Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-format-date"
@@ -19850,10 +19745,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-format-number-color": "Number Color",
-          "--dry-format-number-font-size": "Number Font Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-format-number"
@@ -19944,15 +19836,10 @@
           "If content auto-advances, provide pause or stop controls and respect reduced-motion preferences."
         ],
         "cssVars": {
-          "--dry-image-comparison-arrow-color": "Comparison Arrow Color",
-          "--dry-image-comparison-arrow-width": "Comparison Arrow Width",
-          "--dry-image-comparison-arrow-width-wide": "Comparison Arrow Width Wide",
-          "--dry-image-comparison-grip-z-index": "Comparison Grip Z Index",
           "--dry-image-comparison-handle-color": "Comparison Handle Color",
           "--dry-image-comparison-handle-shadow": "Comparison Handle Shadow",
           "--dry-image-comparison-handle-width": "Comparison Handle Width",
           "--dry-image-comparison-handle-z-index": "Comparison Handle Z Index",
-          "--dry-image-comparison-position": "Comparison Position",
           "--dry-image-comparison-radius": "Comparison Radius"
         },
         "dataAttributes": [
@@ -20375,10 +20262,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-relative-time-color": "Time Color",
-          "--dry-relative-time-font-size": "Time Font Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-relative-time"
@@ -22471,12 +22355,7 @@
           "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
           "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
         ],
-        "cssVars": {
-          "--dry-glow-blend": "Blend",
-          "--dry-glow-color": "Text color",
-          "--dry-glow-intensity": "Intensity",
-          "--dry-glow-radius": "Border radius"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-glow"
@@ -22786,13 +22665,7 @@
           "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
           "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
         ],
-        "cssVars": {
-          "--dry-beam-angle": "Angle",
-          "--dry-beam-color": "Text color",
-          "--dry-beam-intensity": "Intensity",
-          "--dry-beam-speed": "Speed",
-          "--dry-beam-width": "Width"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-beam"
@@ -23381,13 +23254,7 @@
           "Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.",
           "Respect reduced-motion and contrast requirements when animation or filtering is enabled."
         ],
-        "cssVars": {
-          "--dry-halftone-angle": "Angle",
-          "--dry-halftone-color": "Text color",
-          "--dry-halftone-dot-radius": "Dot Radius",
-          "--dry-halftone-opacity": "Opacity",
-          "--dry-halftone-pattern-size": "Pattern Size"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-dot-size"
@@ -23814,14 +23681,7 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {
-          "--dry-tag-bg": "Background color",
-          "--dry-tag-border": "Border color",
-          "--dry-tag-color": "Text color",
-          "--dry-tag-font-size": "Font size",
-          "--dry-tag-padding-x": "Horizontal padding",
-          "--dry-tag-padding-y": "Vertical padding"
-        },
+        "cssVars": {},
         "dataAttributes": [
           {
             "name": "data-color"

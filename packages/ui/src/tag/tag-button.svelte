@@ -66,20 +66,27 @@
 	}
 
 	[data-tag] {
+		--_tag-bg-default: var(--dry-color-fill);
+		--_tag-color-default: var(--dry-color-text-weak);
+		--_tag-border-default: transparent;
+		--_tag-font-size-default: var(--dry-type-tiny-size);
+		--_tag-padding-x-default: var(--dry-space-2_5);
+		--_tag-padding-y-default: var(--dry-space-1);
+
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
-		padding: var(--dry-tag-padding-y, var(--dry-space-1))
-			var(--dry-tag-padding-x, var(--dry-space-2_5));
-		font-size: var(--dry-tag-font-size, var(--dry-type-tiny-size));
+		padding: var(--dry-tag-padding-y, var(--_tag-padding-y-default))
+			var(--dry-tag-padding-x, var(--_tag-padding-x-default));
+		font-size: var(--dry-tag-font-size, var(--_tag-font-size-default));
 		font-family: var(--dry-font-sans);
 		font-weight: 500;
 		line-height: var(--dry-type-tiny-leading);
-		color: var(--dry-tag-color, var(--dry-color-text-weak));
-		background: var(--dry-tag-bg, var(--dry-color-fill));
-		border: 1px solid var(--dry-tag-border, transparent);
+		color: var(--dry-tag-color, var(--_tag-color-default));
+		background: var(--dry-tag-bg, var(--_tag-bg-default));
+		border: 1px solid var(--dry-tag-border, var(--_tag-border-default));
 		border-radius: var(--dry-tag-radius, var(--dry-radius-2xl));
 		white-space: nowrap;
 		user-select: none;
@@ -89,16 +96,16 @@
 	/* ── Sizes ────────────────────────────────────────────────────────────────── */
 
 	[data-size='sm'] {
-		--dry-tag-font-size: var(--dry-type-tiny-size);
-		--dry-tag-padding-x: var(--dry-space-2_5);
-		--dry-tag-padding-y: var(--dry-space-1);
+		--_tag-font-size-default: var(--dry-type-tiny-size);
+		--_tag-padding-x-default: var(--dry-space-2_5);
+		--_tag-padding-y-default: var(--dry-space-1);
 		min-height: var(--dry-space-6);
 	}
 
 	[data-size='md'] {
-		--dry-tag-font-size: var(--dry-type-small-size);
-		--dry-tag-padding-x: var(--dry-space-3);
-		--dry-tag-padding-y: var(--dry-space-1_5);
+		--_tag-font-size-default: var(--dry-type-small-size);
+		--_tag-padding-x-default: var(--dry-space-3);
+		--_tag-padding-y-default: var(--dry-space-1_5);
 		min-height: var(--dry-space-8);
 		line-height: var(--dry-type-tiny-leading);
 	}
@@ -106,91 +113,91 @@
 	/* ── Variant: solid ───────────────────────────────────────────────────────── */
 
 	[data-variant='solid'] {
-		--dry-tag-border: transparent;
+		--_tag-border-default: transparent;
 	}
 
 	[data-variant='solid'][data-color='gray'] {
-		--dry-tag-bg: var(--dry-color-fill-inverse);
-		--dry-tag-color: var(--dry-color-text-inverse);
+		--_tag-bg-default: var(--dry-color-fill-inverse);
+		--_tag-color-default: var(--dry-color-text-inverse);
 	}
 
 	[data-variant='solid'][data-color='blue'] {
-		--dry-tag-bg: var(--dry-color-fill-brand);
-		--dry-tag-color: var(--dry-color-on-brand);
+		--_tag-bg-default: var(--dry-color-fill-brand);
+		--_tag-color-default: var(--dry-color-on-brand);
 	}
 
 	[data-variant='solid'][data-color='red'] {
-		--dry-tag-bg: var(--dry-color-fill-error);
-		--dry-tag-color: var(--dry-color-on-error);
+		--_tag-bg-default: var(--dry-color-fill-error);
+		--_tag-color-default: var(--dry-color-on-error);
 	}
 
 	[data-variant='solid'][data-color='green'] {
-		--dry-tag-bg: var(--dry-color-fill-success);
-		--dry-tag-color: var(--dry-color-on-success);
+		--_tag-bg-default: var(--dry-color-fill-success);
+		--_tag-color-default: var(--dry-color-on-success);
 	}
 
 	[data-variant='solid'][data-color='yellow'] {
-		--dry-tag-bg: var(--dry-color-fill-yellow);
-		--dry-tag-color: var(--dry-color-on-warning);
+		--_tag-bg-default: var(--dry-color-fill-yellow);
+		--_tag-color-default: var(--dry-color-on-warning);
 	}
 
 	[data-variant='solid'][data-color='purple'] {
-		--dry-tag-bg: var(--dry-color-fill-purple);
-		--dry-tag-color: var(--dry-color-on-purple);
+		--_tag-bg-default: var(--dry-color-fill-purple);
+		--_tag-color-default: var(--dry-color-on-purple);
 	}
 
 	[data-variant='solid'][data-color='orange'] {
-		--dry-tag-bg: color-mix(
+		--_tag-bg-default: color-mix(
 			in srgb,
 			var(--dry-color-fill-warning) 70%,
 			var(--dry-color-fill-error)
 		);
-		--dry-tag-color: var(--dry-color-on-warning);
+		--_tag-color-default: var(--dry-color-on-warning);
 	}
 
 	/* ── Variant: outline ─────────────────────────────────────────────────────── */
 
 	[data-variant='outline'] {
-		--dry-tag-bg: transparent;
+		--_tag-bg-default: transparent;
 	}
 
 	[data-variant='outline'][data-color='gray'] {
-		--dry-tag-color: var(--dry-color-text-weak);
-		--dry-tag-border: var(--dry-color-stroke-weak);
+		--_tag-color-default: var(--dry-color-text-weak);
+		--_tag-border-default: var(--dry-color-stroke-weak);
 	}
 
 	[data-variant='outline'][data-color='blue'] {
-		--dry-tag-color: var(--dry-color-text-brand);
-		--dry-tag-border: var(--dry-color-stroke-brand);
+		--_tag-color-default: var(--dry-color-text-brand);
+		--_tag-border-default: var(--dry-color-stroke-brand);
 	}
 
 	[data-variant='outline'][data-color='red'] {
-		--dry-tag-color: var(--dry-color-text-error);
-		--dry-tag-border: var(--dry-color-stroke-error);
+		--_tag-color-default: var(--dry-color-text-error);
+		--_tag-border-default: var(--dry-color-stroke-error);
 	}
 
 	[data-variant='outline'][data-color='green'] {
-		--dry-tag-color: var(--dry-color-text-success);
-		--dry-tag-border: var(--dry-color-stroke-success);
+		--_tag-color-default: var(--dry-color-text-success);
+		--_tag-border-default: var(--dry-color-stroke-success);
 	}
 
 	[data-variant='outline'][data-color='yellow'] {
-		--dry-tag-color: var(--dry-color-text-warning);
-		--dry-tag-border: var(--dry-color-stroke-warning);
+		--_tag-color-default: var(--dry-color-text-warning);
+		--_tag-border-default: var(--dry-color-stroke-warning);
 	}
 
 	[data-variant='outline'][data-color='purple'] {
-		--dry-tag-color: var(--dry-color-text-purple);
-		--dry-tag-border: var(--dry-color-stroke-purple);
+		--_tag-color-default: var(--dry-color-text-purple);
+		--_tag-border-default: var(--dry-color-stroke-purple);
 	}
 
 	[data-variant='outline'][data-color='orange'] {
-		--dry-tag-color: color-mix(
+		--_tag-color-default: color-mix(
 			in srgb,
 			var(--dry-color-text-warning) 60%,
 			var(--dry-color-text-error)
 		);
-		--dry-tag-border: color-mix(
+		--_tag-border-default: color-mix(
 			in srgb,
 			var(--dry-color-stroke-warning) 60%,
 			var(--dry-color-stroke-error)
@@ -200,46 +207,46 @@
 	/* ── Variant: soft ────────────────────────────────────────────────────────── */
 
 	[data-variant='soft'] {
-		--dry-tag-border: var(--dry-color-stroke-weak);
+		--_tag-border-default: var(--dry-color-stroke-weak);
 	}
 
 	[data-variant='soft'][data-color='gray'] {
-		--dry-tag-bg: var(--dry-color-fill);
-		--dry-tag-color: var(--dry-color-text-weak);
+		--_tag-bg-default: var(--dry-color-fill);
+		--_tag-color-default: var(--dry-color-text-weak);
 	}
 
 	[data-variant='soft'][data-color='blue'] {
-		--dry-tag-bg: var(--dry-color-fill-brand-weak);
-		--dry-tag-color: var(--dry-color-text-brand);
+		--_tag-bg-default: var(--dry-color-fill-brand-weak);
+		--_tag-color-default: var(--dry-color-text-brand);
 	}
 
 	[data-variant='soft'][data-color='red'] {
-		--dry-tag-bg: var(--dry-color-fill-error-weak);
-		--dry-tag-color: var(--dry-color-text-error);
+		--_tag-bg-default: var(--dry-color-fill-error-weak);
+		--_tag-color-default: var(--dry-color-text-error);
 	}
 
 	[data-variant='soft'][data-color='green'] {
-		--dry-tag-bg: var(--dry-color-fill-success-weak);
-		--dry-tag-color: var(--dry-color-text-success);
+		--_tag-bg-default: var(--dry-color-fill-success-weak);
+		--_tag-color-default: var(--dry-color-text-success);
 	}
 
 	[data-variant='soft'][data-color='yellow'] {
-		--dry-tag-bg: var(--dry-color-fill-warning-weak);
-		--dry-tag-color: var(--dry-color-text-warning);
+		--_tag-bg-default: var(--dry-color-fill-warning-weak);
+		--_tag-color-default: var(--dry-color-text-warning);
 	}
 
 	[data-variant='soft'][data-color='purple'] {
-		--dry-tag-bg: var(--dry-color-fill-purple-weak);
-		--dry-tag-color: var(--dry-color-text-purple);
+		--_tag-bg-default: var(--dry-color-fill-purple-weak);
+		--_tag-color-default: var(--dry-color-text-purple);
 	}
 
 	[data-variant='soft'][data-color='orange'] {
-		--dry-tag-bg: color-mix(
+		--_tag-bg-default: color-mix(
 			in srgb,
 			var(--dry-color-fill-warning-weak) 50%,
 			var(--dry-color-fill-error-weak)
 		);
-		--dry-tag-color: color-mix(
+		--_tag-color-default: color-mix(
 			in srgb,
 			var(--dry-color-text-warning) 50%,
 			var(--dry-color-text-error)

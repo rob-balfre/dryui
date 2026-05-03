@@ -42,24 +42,17 @@
 
 <style>
 	[data-listbox-item] {
-		--dry-listbox-item-padding-x: var(--dry-space-3);
-		--dry-listbox-item-padding-y: var(--dry-space-2);
-		--dry-listbox-item-radius: min(
-			var(--dry-control-radius, var(--dry-radius-md)),
-			var(--dry-space-4)
-		);
-		--dry-listbox-item-hover-bg: var(--dry-color-fill-hover);
-		--dry-listbox-item-selected-bg: var(--dry-color-fill-selected);
-		--dry-listbox-item-selected-color: var(--dry-color-on-brand);
-		--dry-listbox-item-selected-border: var(--dry-color-stroke-selected);
-
 		display: grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
-		padding: var(--dry-listbox-item-padding-y) var(--dry-listbox-item-padding-x);
-		border-radius: var(--dry-listbox-item-radius);
+		padding: var(--dry-listbox-item-padding-y, var(--dry-space-2))
+			var(--dry-listbox-item-padding-x, var(--dry-space-3));
+		border-radius: var(
+			--dry-listbox-item-radius,
+			min(var(--dry-control-radius, var(--dry-radius-md)), var(--dry-space-4))
+		);
 		color: var(--dry-color-text-strong);
 		cursor: pointer;
 		user-select: none;
@@ -71,19 +64,20 @@
 
 	[data-listbox-item]:hover:not([data-disabled]),
 	[data-listbox-item]:focus-visible {
-		background: var(--dry-listbox-item-hover-bg);
+		background: var(--dry-listbox-item-hover-bg, var(--dry-color-fill-hover));
 	}
 
 	[data-listbox-item][data-selected] {
-		background: var(--dry-listbox-item-selected-bg);
-		color: var(--dry-listbox-item-selected-color);
+		background: var(--dry-listbox-item-selected-bg, var(--dry-color-fill-selected));
+		color: var(--dry-listbox-item-selected-color, var(--dry-color-on-brand));
 		font-weight: 600;
-		box-shadow: inset 0 0 0 1px var(--dry-listbox-item-selected-border);
+		box-shadow: inset 0 0 0 1px
+			var(--dry-listbox-item-selected-border, var(--dry-color-stroke-selected));
 	}
 
 	[data-listbox-item][data-selected]:hover:not([data-disabled]),
 	[data-listbox-item][data-selected]:focus-visible {
-		background: var(--dry-listbox-item-selected-bg);
+		background: var(--dry-listbox-item-selected-bg, var(--dry-color-fill-selected));
 	}
 
 	[data-listbox-item][data-disabled] {

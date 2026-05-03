@@ -41,11 +41,6 @@
 
 <style>
 	[data-glow] {
-		--dry-glow-color: var(--dry-color-fill-brand);
-		--dry-glow-intensity: 50;
-		--dry-glow-radius: 20px;
-		--dry-glow-blend: screen;
-
 		position: relative;
 		border-radius: inherit;
 	}

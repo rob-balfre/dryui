@@ -155,17 +155,6 @@
 		--dry-btn-justify: stretch;
 		--dry-btn-align: stretch;
 		--dry-btn-min-height: 0;
-
-		--dry-option-picker-preview-size: 2.25rem;
-		--dry-option-picker-preview-radius: var(--dry-radius-md);
-		--dry-option-picker-preview-column: 1;
-		--dry-option-picker-preview-row: 1 / span 3;
-		--dry-option-picker-label-column: 2;
-		--dry-option-picker-label-row: 1;
-		--dry-option-picker-description-column: 2;
-		--dry-option-picker-description-row: 2;
-		--dry-option-picker-meta-column: 2;
-		--dry-option-picker-meta-row: 3;
 	}
 
 	.root:hover:not([data-disabled]) {

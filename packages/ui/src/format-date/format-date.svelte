@@ -71,12 +71,8 @@
 
 <style>
 	[data-format-date] {
-		/* Component tokens (Tier 3) */
-		--dry-format-date-color: var(--dry-color-text-weak);
-		--dry-format-date-font-size: var(--dry-type-small-size);
-
-		color: var(--dry-format-date-color);
-		font-size: var(--dry-format-date-font-size);
+		color: var(--dry-format-date-color, var(--dry-color-text-weak));
+		font-size: var(--dry-format-date-font-size, var(--dry-type-small-size));
 		font-family: var(--dry-font-sans);
 		font-variant-numeric: var(--dry-numeric-variant);
 		line-height: var(--dry-type-small-leading);

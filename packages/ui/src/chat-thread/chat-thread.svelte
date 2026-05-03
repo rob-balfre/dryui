@@ -177,18 +177,15 @@
 
 <style>
 	[data-chat-thread] {
-		--dry-chat-thread-gap: var(--dry-space-4);
-		--dry-chat-thread-message-gap: var(--dry-space-3);
-
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: var(--dry-chat-thread-gap);
+		gap: var(--dry-chat-thread-gap, var(--dry-space-4));
 	}
 
 	[data-chat-thread-viewport] {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: var(--dry-chat-thread-message-gap);
+		gap: var(--dry-chat-thread-message-gap, var(--dry-space-3));
 	}
 
 	@supports not (view-transition-name: chat-message-0) {

@@ -61,12 +61,6 @@
 
 <style>
 	[data-halftone] {
-		--dry-halftone-pattern-size: 12;
-		--dry-halftone-dot-radius: 1.8;
-		--dry-halftone-color: currentColor;
-		--dry-halftone-opacity: 0.3;
-		--dry-halftone-angle: 45deg;
-
 		position: relative;
 		isolation: isolate;
 		border-radius: inherit;
@@ -78,17 +72,17 @@
 		position: absolute;
 		inset: -10%;
 		pointer-events: none;
-		opacity: var(--dry-halftone-opacity);
+		opacity: var(--dry-halftone-opacity, 0.3);
 		mix-blend-mode: multiply;
-		transform: rotate(var(--dry-halftone-angle));
+		transform: rotate(var(--dry-halftone-angle, 45deg));
 		transform-origin: center;
 		background-image: radial-gradient(
 			circle at center,
-			var(--dry-halftone-color) 0 calc(var(--dry-halftone-dot-radius) * 1px),
-			transparent calc((var(--dry-halftone-dot-radius) * 1px) + 0.8px)
+			var(--dry-halftone-color, currentColor) 0 calc(var(--dry-halftone-dot-radius, 1.8) * 1px),
+			transparent calc((var(--dry-halftone-dot-radius, 1.8) * 1px) + 0.8px)
 		);
-		background-size: calc(var(--dry-halftone-pattern-size) * 1px)
-			calc(var(--dry-halftone-pattern-size) * 1px);
+		background-size: calc(var(--dry-halftone-pattern-size, 12) * 1px)
+			calc(var(--dry-halftone-pattern-size, 12) * 1px);
 		background-repeat: repeat;
 	}
 

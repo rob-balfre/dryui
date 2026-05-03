@@ -55,27 +55,12 @@
 
 <style>
 	[data-markdown-renderer-root] {
-		/* Component tokens (Tier 3) — use semantic tokens so dark mode works */
-		--dry-markdown-color: var(--dry-color-text-strong);
-		--dry-markdown-heading-color: var(--dry-color-text-strong);
-		--dry-markdown-link-color: var(--dry-color-fill-brand);
-		--dry-markdown-link-hover-color: var(--dry-color-fill-brand-hover);
-		--dry-markdown-code-bg: var(--dry-color-bg-raised);
-		--dry-markdown-code-color: var(--dry-color-text-weak);
-		--dry-markdown-code-border: var(--dry-color-stroke-weak);
-		--dry-markdown-blockquote-border: var(--dry-color-stroke-weak);
-		--dry-markdown-blockquote-color: var(--dry-color-text-weak);
-		--dry-markdown-hr-color: var(--dry-color-stroke-weak);
-		--dry-markdown-font-size: var(--dry-type-small-size, var(--dry-type-small-size));
-		--dry-markdown-line-height: var(--dry-type-small-leading, var(--dry-type-small-leading));
-		--dry-markdown-max-width: 65ch;
-
 		display: grid;
-		grid-template-columns: minmax(0, var(--dry-markdown-max-width));
+		grid-template-columns: minmax(0, var(--dry-markdown-max-width, 65ch));
 		font-family: var(--dry-font-sans);
-		font-size: var(--dry-markdown-font-size);
-		line-height: var(--dry-markdown-line-height);
-		color: var(--dry-markdown-color);
+		font-size: var(--dry-markdown-font-size, var(--dry-type-small-size));
+		line-height: var(--dry-markdown-line-height, var(--dry-type-small-leading));
+		color: var(--dry-markdown-color, var(--dry-color-text-strong));
 	}
 
 	/* ── Headings ─────────────────────────────────────────────────────────────── */
@@ -86,7 +71,7 @@
 	[data-markdown-renderer-root] :global(h4),
 	[data-markdown-renderer-root] :global(h5),
 	[data-markdown-renderer-root] :global(h6) {
-		color: var(--dry-markdown-heading-color);
+		color: var(--dry-markdown-heading-color, var(--dry-color-text-strong));
 		font-weight: 600;
 		line-height: 1.25;
 		margin-top: 1.5em;
@@ -94,30 +79,30 @@
 	}
 
 	[data-markdown-renderer-root] :global(h1) {
-		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+		font-size: var(--dry-type-heading-2-size);
 		margin-top: 0;
 	}
 
 	[data-markdown-renderer-root] :global(h2) {
-		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+		font-size: var(--dry-type-heading-2-size);
 		padding-bottom: 0.25em;
-		border-bottom: 1px solid var(--dry-markdown-hr-color);
+		border-bottom: 1px solid var(--dry-markdown-hr-color, var(--dry-color-stroke-weak));
 	}
 
 	[data-markdown-renderer-root] :global(h3) {
-		font-size: var(--dry-type-heading-3-size, var(--dry-type-heading-3-size));
+		font-size: var(--dry-type-heading-3-size);
 	}
 
 	[data-markdown-renderer-root] :global(h4) {
-		font-size: var(--dry-type-heading-4-size, var(--dry-type-heading-4-size));
+		font-size: var(--dry-type-heading-4-size);
 	}
 
 	[data-markdown-renderer-root] :global(h5) {
-		font-size: var(--dry-markdown-font-size);
+		font-size: var(--dry-markdown-font-size, var(--dry-type-small-size));
 	}
 
 	[data-markdown-renderer-root] :global(h6) {
-		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
+		font-size: var(--dry-type-small-size);
 		color: var(--dry-color-text-weak);
 	}
 
@@ -131,13 +116,13 @@
 	/* ── Links ────────────────────────────────────────────────────────────────── */
 
 	[data-markdown-renderer-root] :global(a) {
-		color: var(--dry-markdown-link-color);
+		color: var(--dry-markdown-link-color, var(--dry-color-fill-brand));
 		text-decoration: underline;
 		text-underline-offset: 2px;
 	}
 
 	[data-markdown-renderer-root] :global(a:hover) {
-		color: var(--dry-markdown-link-hover-color);
+		color: var(--dry-markdown-link-hover-color, var(--dry-color-fill-brand-hover));
 	}
 
 	/* ── Images ───────────────────────────────────────────────────────────────── */
@@ -175,8 +160,8 @@
 	[data-markdown-renderer-root] :global(blockquote) {
 		margin: 0 0 1em 0;
 		padding: var(--dry-space-2) var(--dry-space-4);
-		border-left: 3px solid var(--dry-markdown-blockquote-border);
-		color: var(--dry-markdown-blockquote-color);
+		border-left: 3px solid var(--dry-markdown-blockquote-border, var(--dry-color-stroke-weak));
+		color: var(--dry-markdown-blockquote-color, var(--dry-color-text-weak));
 	}
 
 	[data-markdown-renderer-root] :global(blockquote p:last-child) {
@@ -189,9 +174,9 @@
 		font-family: var(--dry-font-mono);
 		font-size: 0.875em;
 		padding: 0.125em 0.375em;
-		background: var(--dry-markdown-code-bg);
-		color: var(--dry-markdown-code-color);
-		border: 1px solid var(--dry-markdown-code-border);
+		background: var(--dry-markdown-code-bg, var(--dry-color-bg-raised));
+		color: var(--dry-markdown-code-color, var(--dry-color-text-weak));
+		border: 1px solid var(--dry-markdown-code-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-radius-sm);
 	}
 
@@ -208,7 +193,7 @@
 
 	[data-markdown-renderer-root] :global(strong) {
 		font-weight: 600;
-		color: var(--dry-markdown-heading-color);
+		color: var(--dry-markdown-heading-color, var(--dry-color-text-strong));
 	}
 
 	[data-markdown-renderer-root] :global(em) {

@@ -58,12 +58,8 @@
 
 <style>
 	[data-relative-time] {
-		/* Component tokens (Tier 3) */
-		--dry-relative-time-color: var(--dry-color-text-weak);
-		--dry-relative-time-font-size: var(--dry-type-small-size);
-
-		color: var(--dry-relative-time-color);
-		font-size: var(--dry-relative-time-font-size);
+		color: var(--dry-relative-time-color, var(--dry-color-text-weak));
+		font-size: var(--dry-relative-time-font-size, var(--dry-type-small-size));
 		font-family: var(--dry-font-sans);
 		font-variant-numeric: var(--dry-numeric-variant);
 		line-height: var(--dry-type-small-leading);

@@ -99,17 +99,12 @@
 
 <style>
 	[data-listbox-root] {
-		--dry-listbox-bg: var(--dry-color-bg-overlay);
-		--dry-listbox-border: var(--dry-color-stroke-weak);
-		--dry-listbox-radius: var(--dry-radius-lg);
-		--dry-listbox-padding: var(--dry-space-1);
-
 		display: grid;
 		gap: var(--dry-space-1);
-		padding: var(--dry-listbox-padding);
-		background: var(--dry-listbox-bg);
-		border: 1px solid var(--dry-listbox-border);
-		border-radius: var(--dry-listbox-radius);
+		padding: var(--dry-listbox-padding, var(--dry-space-1));
+		background: var(--dry-listbox-bg, var(--dry-color-bg-overlay));
+		border: 1px solid var(--dry-listbox-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-listbox-radius, var(--dry-radius-lg));
 		font-family: var(--dry-font-sans);
 	}
 

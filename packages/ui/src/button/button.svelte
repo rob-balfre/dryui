@@ -608,14 +608,14 @@
 
 	/* Horizontal: first child gets left radii */
 	.wrapper[data-in-group][data-group-orientation='horizontal']:first-child [data-dry-button] {
-		border-top-left-radius: var(--dry-button-group-radius);
-		border-bottom-left-radius: var(--dry-button-group-radius);
+		border-top-left-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
+		border-bottom-left-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
 	}
 
 	/* Horizontal: last child gets right radii */
 	.wrapper[data-in-group][data-group-orientation='horizontal']:last-child [data-dry-button] {
-		border-top-right-radius: var(--dry-button-group-radius);
-		border-bottom-right-radius: var(--dry-button-group-radius);
+		border-top-right-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
+		border-bottom-right-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
 	}
 
 	/* Horizontal: non-first child removes inline-start border */
@@ -625,14 +625,14 @@
 
 	/* Vertical: first child gets top radii */
 	.wrapper[data-in-group][data-group-orientation='vertical']:first-child [data-dry-button] {
-		border-top-left-radius: var(--dry-button-group-radius);
-		border-top-right-radius: var(--dry-button-group-radius);
+		border-top-left-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
+		border-top-right-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
 	}
 
 	/* Vertical: last child gets bottom radii */
 	.wrapper[data-in-group][data-group-orientation='vertical']:last-child [data-dry-button] {
-		border-bottom-left-radius: var(--dry-button-group-radius);
-		border-bottom-right-radius: var(--dry-button-group-radius);
+		border-bottom-left-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
+		border-bottom-right-radius: var(--dry-button-group-radius, var(--_button-group-radius-default));
 	}
 
 	/* Vertical: non-first child removes block-start border */
@@ -643,7 +643,7 @@
 	/* Hover/focus z-index for grouped buttons */
 	.wrapper[data-in-group]:hover [data-dry-button],
 	.wrapper[data-in-group]:focus-within [data-dry-button] {
-		z-index: var(--dry-button-group-hover-z-index);
+		z-index: var(--dry-button-group-hover-z-index, 1);
 		position: relative;
 	}
 </style>

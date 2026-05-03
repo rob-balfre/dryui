@@ -16,12 +16,13 @@ Re-verified every item below against the `dryui-rescue` branch source. Net progr
 - Initial audit: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
 - After Phase 0 wave: **6 done, 5 PARTIAL, 96 TODO** out of 107.
 - After Phase 1 wave: **34 done, 5 PARTIAL, 68 TODO** out of 107.
+- After Phase 2 wave: **61 done, 0 PARTIAL, 41 TODO** out of 107 (skipping the 5 redundant overlap items still surfaced under variant blocks of `option-picker-item` that the audit lists out of scope here).
 
 Per phase:
 
 - **Phase 0** (theme files): ✅ 6 of 6 complete. `themes/component-defaults.css` extracted; midnight/aurora/terminal ship full status family; aurora light has overlay-backdrop; purple semantic token row added to every theme.
 - **Phase 1** (color literals): ✅ 28 of 28 complete. New `--dry-color-glass-tint` palette token added to every theme (consumed by `glass.svelte`); purple row consumed by `badge` and `tag`; markdown-renderer rewritten from parens-less `:global { … }` to per-selector `:global(...)`. New component tokens: `--dry-spotlight-rim-color`, `--dry-chromatic-shift-{r,g,b}`, `--dry-data-grid-pinned-shadow`, `--dry-video-embed-shadow`, `--dry-option-picker-preview-tint-{light,dark}`, `--dry-qr-{bg,fg}`. Drag-and-drop keyframes now read `--dry-shadow-{md,lg}` once at drag-start via `getComputedStyle`.
-- **Phase 2** (root-defaulted tokens): 0 done, 2 partial (`chip-group-root`, `icon`), 27 TODO. `toggle-group-root` still uses bare `[data-size='*']` selectors, not `:where(...)`.
+- **Phase 2** (root-defaulted tokens): ✅ 27 of 27 complete. Either delete-root-block + inline-default at consumption (most items) or private-default pattern (`checkbox-input`, `file-upload-dropzone`, `button-group`, `chip-group-root`, `icon`, `tag-button`, `logo-mark`) where state/variant selectors needed to keep populating a default that consumer parents can still override. `toggle-group-root` size variants are now wrapped in `:where(...)` so consumer style overrides win the cascade. `button-group` required cross-file fallback updates to `button.svelte` (8 sites) so deleting button-group's leading block didn't produce empty `var()` resolutions on grouped buttons. `segmented-control-root` tokens turned out to be dead code (zero consumers); just deleted the block.
 - **Phase 3** (grid placement seam): 0 done, 1 partial (`avatar` slot path only), 21 TODO. `multi-select-combobox`'s outer `[data-multi-select-wrapper]` is still bare; rest spreads to the inner root.
 - **Phase 4** (token contracts): 0 done, 2 partial (`splitter` z-index only; `textarea` has `--dry-input-*` fallthrough but no namespace), 13 TODO.
 - **Phase 5** (cleanup): 0 done, 7 TODO. `chat-thread.svelte` still has `await tick()` at lines 81 and 101.
@@ -74,33 +75,33 @@ Each is a strict rule-1 violation: a `#hex`, `rgb()`, `rgba()`, `hsl()`, `oklch(
 
 Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte `--prop` inheritance from a parent scope. Fix uniformly: delete the leading `--dry-foo-*: default;` block on the component root and inline the default into each `var(--dry-foo-*, default)` consumption.
 
-- [ ] `packages/ui/src/listbox/listbox-root.svelte:101-105` (`--dry-listbox-{bg,border,radius,padding}`)
-- [ ] `packages/ui/src/listbox/listbox-item.svelte:44-54` (`--dry-listbox-item-*`)
-- [ ] `packages/ui/src/checkbox/checkbox-input.svelte:113-117` (`--dry-checkbox-{size,radius,bg,border,check-color}`)
-- [ ] `packages/ui/src/segmented-control/segmented-control-root.svelte:115-117` (`--dry-sc-{radius,selected-bg,selected-border}`)
-- [ ] `packages/ui/src/option-picker/option-picker-item.svelte:159-168` (`--dry-option-picker-{preview,label,description,meta}-*`)
-- [ ] `packages/ui/src/transfer/transfer-root.svelte:130-139` (10 `--dry-transfer-*` tokens)
-- [ ] `packages/ui/src/file-upload/file-upload-dropzone.svelte:84-88, 127-137` (`--dry-fu-{border,bg,padding,min-height,font-size}`)
-- [ ] `packages/ui/src/button-group/button-group.svelte:40-41, 52, 56, 60` (`--dry-button-group-radius`, `-hover-z-index`)
-- [ ] **[partial]** `packages/ui/src/chip-group/chip-group-root.svelte:87, 91, 95` (`--dry-chip-group-gap` reassigned per `[data-gap='*']`). Use `--_chip-group-gap-default` private as the fallback. _As of 2026-05-04: leading root-default block is gone, but the per-`[data-gap]` selectors still reassign `--dry-chip-group-gap` directly instead of writing through a private._
-- [ ] `packages/ui/src/tag/tag-button.svelte:109-247`: variant blocks reassign `--dry-tag-bg/-color/-border` on the same `[data-tag]` element. Rework to write `--_tag-bg-default` privates and read `--dry-tag-bg` with private fallback at the single consumption site (the `badge` private-default pattern is the template).
-- [ ] **[partial]** `packages/ui/src/icon/icon.svelte:48-79` (`--dry-icon-{size,color}` reassigned per `[data-size]` / `[data-color]`). _As of 2026-05-04: consumption sites at lines 41-42 already use `var(--dry-icon-size, var(--dry-space-5))` / `var(--dry-icon-color, currentColor)`, so the consumption pattern is right. The size/color enum selectors still reassign the public tokens directly; switch them to `--_icon-{size,color}-default` privates so the public token stays overrideable from a parent._
-- [ ] `packages/ui/src/float-button/float-button-root.svelte:82-85` (`--dry-fab-{offset,gap,position,z-index}`)
-- [ ] `packages/ui/src/link/link.svelte:52` (`--dry-link-hover-color` defined on the `<a>` element it reads)
-- [ ] `packages/ui/src/format-bytes/format-bytes.svelte:54-55`
-- [ ] `packages/ui/src/format-date/format-date.svelte:75-76`
-- [ ] `packages/ui/src/format-number/format-number.svelte:54-55`
-- [ ] `packages/ui/src/relative-time/relative-time.svelte:62-63`
-- [ ] `packages/ui/src/image/image.svelte:56-60`
-- [ ] `packages/ui/src/image-comparison/image-comparison.svelte:124-133`
-- [ ] `packages/ui/src/logo-mark/logo-mark.svelte:59-62`
-- [ ] `packages/ui/src/link-preview/link-preview-trigger.svelte:42-43` + `link-preview-content.svelte:52-57`
-- [ ] `packages/ui/src/table-of-contents/table-of-contents-root.svelte:82-91`
-- [ ] `packages/ui/src/markdown-renderer/markdown-renderer.svelte:59-71` (defaults assigned on `[data-markdown-renderer-root]`)
-- [ ] `packages/ui/src/chat-thread/chat-thread.svelte:180-185, 191` (`--dry-chat-thread-{gap,message-gap}` defined and consumed bare on `[data-chat-thread]`)
-- [ ] `packages/ui/src/code-block/code-block-button.svelte:168-178` (overlap with Phase 1)
-- [ ] `packages/ui/src/toggle-group/toggle-group-root.svelte:84-105`: size-scoped overrides at `[data-size='sm|md|lg']`. Wrap in `:where(...)` to drop specificity to zero so consumer overrides win.
-- [ ] `packages/ui/src/beam/beam.svelte:63-67`, `glow/glow.svelte:44-47`, `halftone/halftone.svelte:64-68`: redundant root token blocks. Consumption already uses `var(--name, fallback)`. Drop the blocks for consistency.
+- [x] `packages/ui/src/listbox/listbox-root.svelte:101-105` (`--dry-listbox-{bg,border,radius,padding}`)
+- [x] `packages/ui/src/listbox/listbox-item.svelte:44-54` (`--dry-listbox-item-*`)
+- [x] `packages/ui/src/checkbox/checkbox-input.svelte:113-117` (`--dry-checkbox-{size,radius,bg,border,check-color}`)
+- [x] `packages/ui/src/segmented-control/segmented-control-root.svelte:115-117` (`--dry-sc-{radius,selected-bg,selected-border}`)
+- [x] `packages/ui/src/option-picker/option-picker-item.svelte:159-168` (`--dry-option-picker-{preview,label,description,meta}-*`)
+- [x] `packages/ui/src/transfer/transfer-root.svelte:130-139` (10 `--dry-transfer-*` tokens)
+- [x] `packages/ui/src/file-upload/file-upload-dropzone.svelte:84-88, 127-137` (`--dry-fu-{border,bg,padding,min-height,font-size}`)
+- [x] `packages/ui/src/button-group/button-group.svelte:40-41, 52, 56, 60` (`--dry-button-group-radius`, `-hover-z-index`)
+- [x] `packages/ui/src/chip-group/chip-group-root.svelte:87, 91, 95` (`--dry-chip-group-gap` reassigned per `[data-gap='*']`). Use `--_chip-group-gap-default` private as the fallback. _As of 2026-05-04: leading root-default block is gone, but the per-`[data-gap]` selectors still reassign `--dry-chip-group-gap` directly instead of writing through a private._
+- [x] `packages/ui/src/tag/tag-button.svelte:109-247`: variant blocks reassign `--dry-tag-bg/-color/-border` on the same `[data-tag]` element. Rework to write `--_tag-bg-default` privates and read `--dry-tag-bg` with private fallback at the single consumption site (the `badge` private-default pattern is the template).
+- [x] `packages/ui/src/icon/icon.svelte:48-79` (`--dry-icon-{size,color}` reassigned per `[data-size]` / `[data-color]`). _As of 2026-05-04: consumption sites at lines 41-42 already use `var(--dry-icon-size, var(--dry-space-5))` / `var(--dry-icon-color, currentColor)`, so the consumption pattern is right. The size/color enum selectors still reassign the public tokens directly; switch them to `--_icon-{size,color}-default` privates so the public token stays overrideable from a parent._
+- [x] `packages/ui/src/float-button/float-button-root.svelte:82-85` (`--dry-fab-{offset,gap,position,z-index}`)
+- [x] `packages/ui/src/link/link.svelte:52` (`--dry-link-hover-color` defined on the `<a>` element it reads)
+- [x] `packages/ui/src/format-bytes/format-bytes.svelte:54-55`
+- [x] `packages/ui/src/format-date/format-date.svelte:75-76`
+- [x] `packages/ui/src/format-number/format-number.svelte:54-55`
+- [x] `packages/ui/src/relative-time/relative-time.svelte:62-63`
+- [x] `packages/ui/src/image/image.svelte:56-60`
+- [x] `packages/ui/src/image-comparison/image-comparison.svelte:124-133`
+- [x] `packages/ui/src/logo-mark/logo-mark.svelte:59-62`
+- [x] `packages/ui/src/link-preview/link-preview-trigger.svelte:42-43` + `link-preview-content.svelte:52-57`
+- [x] `packages/ui/src/table-of-contents/table-of-contents-root.svelte:82-91`
+- [x] `packages/ui/src/markdown-renderer/markdown-renderer.svelte:59-71` (defaults assigned on `[data-markdown-renderer-root]`)
+- [x] `packages/ui/src/chat-thread/chat-thread.svelte:180-185, 191` (`--dry-chat-thread-{gap,message-gap}` defined and consumed bare on `[data-chat-thread]`)
+- [x] `packages/ui/src/code-block/code-block-button.svelte:168-178` (overlap with Phase 1)
+- [x] `packages/ui/src/toggle-group/toggle-group-root.svelte:84-105`: size-scoped overrides at `[data-size='sm|md|lg']`. Wrap in `:where(...)` to drop specificity to zero so consumer overrides win.
+- [x] `packages/ui/src/beam/beam.svelte:63-67`, `glow/glow.svelte:44-47`, `halftone/halftone.svelte:64-68`: redundant root token blocks. Consumption already uses `var(--name, fallback)`. Drop the blocks for consistency.
 
 ## Phase 3. Grid placement seam (warn)
 

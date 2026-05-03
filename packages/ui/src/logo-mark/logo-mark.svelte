@@ -56,20 +56,21 @@
 
 <style>
 	[data-logo-mark] {
-		--dry-logo-mark-size: 32px;
-		--dry-logo-mark-radius: var(--dry-radius-md);
-		--dry-logo-mark-bg: var(--dry-color-fill);
-		--dry-logo-mark-color: var(--dry-color-text-weak);
+		--_logo-mark-size-default: 32px;
+		--_logo-mark-radius-default: var(--dry-radius-md);
+		--_logo-mark-bg-default: var(--dry-color-fill);
+		--_logo-mark-color-default: var(--dry-color-text-weak);
+		--_logo-mark-font-size-default: var(--dry-type-small-size, var(--dry-text-sm-size));
 
 		display: inline-grid;
 		place-items: center;
 		aspect-ratio: 1;
-		height: var(--dry-logo-mark-size);
-		border-radius: var(--dry-logo-mark-radius);
-		background: var(--dry-logo-mark-bg);
-		color: var(--dry-logo-mark-color);
+		height: var(--dry-logo-mark-size, var(--_logo-mark-size-default));
+		border-radius: var(--dry-logo-mark-radius, var(--_logo-mark-radius-default));
+		background: var(--dry-logo-mark-bg, var(--_logo-mark-bg-default));
+		color: var(--dry-logo-mark-color, var(--_logo-mark-color-default));
 		font-family: var(--dry-font-sans);
-		font-size: var(--dry-logo-mark-font-size, var(--dry-type-small-size, var(--dry-text-sm-size)));
+		font-size: var(--dry-logo-mark-font-size, var(--_logo-mark-font-size-default));
 		font-weight: 600;
 		line-height: 1;
 		overflow: hidden;
@@ -91,63 +92,63 @@
 	/* -- Shapes ------------------------------------------------------------- */
 
 	[data-shape='square'] {
-		--dry-logo-mark-radius: var(--dry-radius-sm);
+		--_logo-mark-radius-default: var(--dry-radius-sm);
 	}
 
 	[data-shape='rounded'] {
-		--dry-logo-mark-radius: var(--dry-radius-md);
+		--_logo-mark-radius-default: var(--dry-radius-md);
 	}
 
 	[data-shape='circle'] {
-		--dry-logo-mark-radius: var(--dry-radius-full);
+		--_logo-mark-radius-default: var(--dry-radius-full);
 	}
 
 	/* -- Sizes -------------------------------------------------------------- */
 
 	[data-size='sm'] {
-		--dry-logo-mark-size: 24px;
-		--dry-logo-mark-font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
+		--_logo-mark-size-default: 24px;
+		--_logo-mark-font-size-default: var(--dry-type-tiny-size, var(--dry-text-xs-size));
 	}
 
 	[data-size='md'] {
-		--dry-logo-mark-size: 32px;
-		--dry-logo-mark-font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
+		--_logo-mark-size-default: 32px;
+		--_logo-mark-font-size-default: var(--dry-type-small-size, var(--dry-text-sm-size));
 	}
 
 	[data-size='lg'] {
-		--dry-logo-mark-size: 40px;
-		--dry-logo-mark-font-size: var(--dry-type-small-size, var(--dry-text-base-size));
+		--_logo-mark-size-default: 40px;
+		--_logo-mark-font-size-default: var(--dry-type-small-size, var(--dry-text-base-size));
 	}
 
 	/* -- Colors ------------------------------------------------------------- */
 
 	[data-color='neutral'] {
-		--dry-logo-mark-bg: var(--dry-color-fill);
-		--dry-logo-mark-color: var(--dry-color-text-weak);
+		--_logo-mark-bg-default: var(--dry-color-fill);
+		--_logo-mark-color-default: var(--dry-color-text-weak);
 	}
 
 	[data-color='brand'] {
-		--dry-logo-mark-bg: var(--dry-color-fill-brand-weak);
-		--dry-logo-mark-color: var(--dry-color-text-brand);
+		--_logo-mark-bg-default: var(--dry-color-fill-brand-weak);
+		--_logo-mark-color-default: var(--dry-color-text-brand);
 	}
 
 	[data-color='error'] {
-		--dry-logo-mark-bg: var(--dry-color-fill-error-weak);
-		--dry-logo-mark-color: var(--dry-color-text-error);
+		--_logo-mark-bg-default: var(--dry-color-fill-error-weak);
+		--_logo-mark-color-default: var(--dry-color-text-error);
 	}
 
 	[data-color='warning'] {
-		--dry-logo-mark-bg: var(--dry-color-fill-warning-weak);
-		--dry-logo-mark-color: var(--dry-color-text-warning);
+		--_logo-mark-bg-default: var(--dry-color-fill-warning-weak);
+		--_logo-mark-color-default: var(--dry-color-text-warning);
 	}
 
 	[data-color='success'] {
-		--dry-logo-mark-bg: var(--dry-color-fill-success-weak);
-		--dry-logo-mark-color: var(--dry-color-text-success);
+		--_logo-mark-bg-default: var(--dry-color-fill-success-weak);
+		--_logo-mark-color-default: var(--dry-color-text-success);
 	}
 
 	[data-color='info'] {
-		--dry-logo-mark-bg: var(--dry-color-fill-info-weak);
-		--dry-logo-mark-color: var(--dry-color-text-info);
+		--_logo-mark-bg-default: var(--dry-color-fill-info-weak);
+		--_logo-mark-color-default: var(--dry-color-text-info);
 	}
 </style>

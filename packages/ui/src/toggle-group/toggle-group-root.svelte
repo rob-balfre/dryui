@@ -80,7 +80,7 @@
 		grid-auto-flow: row;
 	}
 
-	[data-size='sm'] {
+	:where([data-size='sm']) {
 		--dry-tg-padding-x: var(--dry-space-2);
 		--dry-tg-padding-y: var(--dry-space-1_5);
 		--dry-tg-font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
@@ -88,7 +88,7 @@
 		--dry-tg-radius: var(--dry-radius-sm);
 	}
 
-	[data-size='md'] {
+	:where([data-size='md']) {
 		--dry-tg-padding-x: var(--dry-space-3);
 		--dry-tg-padding-y: var(--dry-space-2);
 		--dry-tg-font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
@@ -96,7 +96,7 @@
 		--dry-tg-radius: var(--dry-radius-md);
 	}
 
-	[data-size='lg'] {
+	:where([data-size='lg']) {
 		--dry-tg-padding-x: var(--dry-space-4);
 		--dry-tg-padding-y: var(--dry-space-2_5);
 		--dry-tg-font-size: var(--dry-type-heading-4-size, var(--dry-text-base-size));

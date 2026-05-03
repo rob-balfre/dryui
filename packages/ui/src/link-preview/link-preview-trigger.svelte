@@ -39,18 +39,15 @@
 
 <style>
 	[data-link-preview-trigger] {
-		--dry-link-preview-color: var(--dry-color-text-brand);
-		--dry-link-preview-underline-offset: 0.18em;
-
 		display: inline-grid;
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: baseline;
 		gap: 0.2em;
-		color: var(--dry-link-preview-color);
+		color: var(--dry-link-preview-color, var(--dry-color-text-brand));
 		text-decoration: underline;
 		text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
-		text-underline-offset: var(--dry-link-preview-underline-offset);
+		text-underline-offset: var(--dry-link-preview-underline-offset, 0.18em);
 		cursor: pointer;
 		transition:
 			color var(--dry-duration-fast) var(--dry-ease-default),
