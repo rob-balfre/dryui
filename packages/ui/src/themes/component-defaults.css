@@ -1,0 +1,52 @@
+/*
+ * Component defaults
+ *
+ * Toggle and beam tokens that are shared across themes. Pulled out of
+ * `default.css` and `dark.css` so theme files only carry semantic tokens
+ * (`--dry-color-*`). Themes that intentionally diverge (midnight, terminal)
+ * keep their own toggle/beam overrides in their own files.
+ *
+ * Auto-imported by `default.css`. Consumers do not need to import this
+ * directly.
+ */
+
+:root {
+	/* ─── Component: Toggle ─────────────────────────────────────────
+	   Derived from semantic tokens so brand overrides (e.g. a consumer
+	   retheming --dry-color-fill-brand) flow through to toggles too.
+	   Thumb bg is intentionally a neutral literal — it's a surface knob,
+	   not a brand-tinted element. */
+	--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
+	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
+	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
+	--dry-toggle-thumb-bg: #ffffff;
+	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-press-bg: var(--dry-color-fill-active);
+	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
+	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
+	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
+	--dry-toggle-label-color: var(--dry-color-text-strong);
+	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
+
+	/* ─── Component: Beam ─────────────────────────────────────────── */
+	--dry-beam-default-blend: multiply;
+}
+
+/* Dark-mode overrides: thumb is a dark surface knob, beam blend is
+   `screen` so the bloom adds rather than subtracts. Aurora-dark inherits
+   here too because it shares the dark surface story. */
+[data-theme='dark'],
+[data-theme='aurora-dark'] {
+	--dry-toggle-thumb-bg: #292b33;
+	--dry-beam-default-blend: screen;
+}
+
+.theme-auto:not([data-theme='light']) {
+	@media (prefers-color-scheme: dark) {
+		& {
+			--dry-toggle-thumb-bg: #292b33;
+			--dry-beam-default-blend: screen;
+		}
+	}
+}

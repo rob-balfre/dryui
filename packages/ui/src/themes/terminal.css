@@ -186,10 +186,45 @@
 	/* ─── Status overrides — more vivid for data-dense UIs ────────── */
 	--dry-color-text-error: hsl(0, 80%, 65%);
 	--dry-color-fill-error: hsl(0, 80%, 55%);
+	--dry-color-fill-error-hover: hsl(0, 80%, 47%);
+	--dry-color-fill-error-weak: hsla(0, 80%, 55%, 0.12);
+	--dry-color-stroke-error: hsl(0, 60%, 55%);
+	--dry-color-stroke-error-strong: hsla(0, 80%, 55%, 0.85);
+	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+	--dry-color-on-error: hsl(0, 30%, 5%);
+
 	--dry-color-text-warning: hsl(45, 90%, 60%);
 	--dry-color-fill-warning: hsl(45, 90%, 55%);
+	--dry-color-fill-warning-hover: hsl(45, 90%, 47%);
+	--dry-color-fill-warning-weak: hsla(45, 90%, 55%, 0.12);
+	--dry-color-stroke-warning: hsl(45, 70%, 55%);
+	--dry-color-stroke-warning-strong: hsla(45, 90%, 55%, 0.85);
+	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+	--dry-color-on-warning: hsl(45, 30%, 5%);
+
 	--dry-color-text-success: hsl(145, 80%, 55%);
 	--dry-color-fill-success: hsl(145, 80%, 50%);
+	--dry-color-fill-success-hover: hsl(145, 80%, 42%);
+	--dry-color-fill-success-weak: hsla(145, 80%, 50%, 0.12);
+	--dry-color-stroke-success: hsl(145, 60%, 50%);
+	--dry-color-stroke-success-strong: hsla(145, 80%, 50%, 0.85);
+	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+	--dry-color-on-success: hsl(145, 30%, 5%);
+
 	--dry-color-text-info: hsl(200, 80%, 65%);
 	--dry-color-fill-info: hsl(200, 80%, 55%);
+	--dry-color-fill-info-hover: hsl(200, 80%, 47%);
+	--dry-color-fill-info-weak: hsla(200, 80%, 55%, 0.12);
+	--dry-color-stroke-info: hsl(200, 60%, 55%);
+	--dry-color-stroke-info-strong: hsla(200, 80%, 55%, 0.85);
+	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+	--dry-color-on-info: hsl(200, 30%, 5%);
+
+	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
+	--dry-color-text-purple: hsl(285, 80%, 70%);
+	--dry-color-fill-purple: hsl(285, 75%, 60%);
+	--dry-color-fill-purple-hover: hsl(285, 75%, 52%);
+	--dry-color-fill-purple-weak: hsla(285, 75%, 60%, 0.12);
+	--dry-color-stroke-purple: hsla(285, 75%, 60%, 0.5);
+	--dry-color-on-purple: hsl(285, 30%, 5%);
 }

@@ -68,28 +68,9 @@
 	/* ─── Image edge ring (dark) ─────────────────────────────────── */
 	--dry-image-edge: rgba(255, 255, 255, 0.1);
 
-	/* ─── Component: Toggle ─────────────────────────────────────────
-	   Derived from semantic tokens so brand overrides (e.g. a consumer
-	   retheming --dry-color-fill-brand) flow through to toggles too.
-	   Thumb bg is intentionally a neutral literal — it's a surface knob,
-	   not a brand-tinted element. */
-	--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
-	--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
-	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
-	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
-	--dry-toggle-thumb-bg: #292b33;
-	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
-	--dry-toggle-press-bg: var(--dry-color-fill-active);
-	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
-	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
-	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
-	--dry-toggle-label-color: var(--dry-color-text-strong);
-	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
-
-	/* ─── Component: Beam ─────────────────────────────────────────
-	   Blend mode is intentionally mode-specific (multiply darkens on
-	   light bg, screen lightens on dark bg) — not brand-derivable. */
-	--dry-beam-default-blend: screen;
+	/* ─── Component: Toggle + Beam ─────────────────────────────────
+	   Dark overrides ship from `component-defaults.css` (thumb-bg =
+	   #292b33, beam blend = screen). */
 
 	/* ─── Status: Error ───────────────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 60%, 70%);
@@ -143,6 +124,14 @@
 	--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
 	--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
 	--dry-color-on-accent: hsl(233, 18%, 9%);
+
+	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
+	--dry-color-text-purple: hsl(280, 75%, 78%);
+	--dry-color-fill-purple: hsl(280, 75%, 70%);
+	--dry-color-fill-purple-hover: hsl(280, 75%, 62%);
+	--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
+	--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
+	--dry-color-on-purple: hsl(233, 18%, 9%);
 
 	/* ─── Extended surface depth ──────────────────────────────────── */
 	--dry-color-bg-elevated: hsl(234, 9%, 22%);
@@ -317,28 +306,8 @@
 			/* ─── Image edge ring (dark) ─────────────────────────────────── */
 			--dry-image-edge: rgba(255, 255, 255, 0.1);
 
-			/* ─── Component: Toggle ─────────────────────────────────────────
-			   Derived from semantic tokens so brand overrides (e.g. a consumer
-			   retheming --dry-color-fill-brand) flow through to toggles too.
-			   Thumb bg is intentionally a neutral literal — it's a surface knob,
-			   not a brand-tinted element. */
-			--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
-			--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
-			--dry-toggle-selected-bg: var(--dry-color-fill-brand);
-			--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
-			--dry-toggle-thumb-bg: #292b33;
-			--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
-			--dry-toggle-press-bg: var(--dry-color-fill-active);
-			--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
-			--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
-			--dry-toggle-focus-ring: var(--dry-color-fill-brand);
-			--dry-toggle-label-color: var(--dry-color-text-strong);
-			--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
-
-			/* ─── Component: Beam ─────────────────────────────────────────
-			   Blend mode is intentionally mode-specific (multiply darkens on
-			   light bg, screen lightens on dark bg) — not brand-derivable. */
-			--dry-beam-default-blend: screen;
+			/* ─── Component: Toggle + Beam ─────────────────────────────────
+			   Dark overrides ship from `component-defaults.css`. */
 
 			/* ─── Status: Error ───────────────────────────────────────────── */
 			--dry-color-text-error: hsl(0, 60%, 70%);
@@ -392,6 +361,14 @@
 			--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
 			--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
 			--dry-color-on-accent: hsl(233, 18%, 9%);
+
+			/* ─── Purple semantic palette (badge / tag purple variants) ───── */
+			--dry-color-text-purple: hsl(280, 75%, 78%);
+			--dry-color-fill-purple: hsl(280, 75%, 70%);
+			--dry-color-fill-purple-hover: hsl(280, 75%, 62%);
+			--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
+			--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
+			--dry-color-on-purple: hsl(233, 18%, 9%);
 
 			/* ─── Extended surface depth ──────────────────────────────────── */
 			--dry-color-bg-elevated: hsl(234, 9%, 22%);

@@ -11,11 +11,14 @@ Phases run top to bottom. Theme work in Phase 0 unblocks everything downstream.
 
 ## Verification (2026-05-04)
 
-Re-verified every item below against the `dryui-rescue` branch source. Net progress since the 2026-04-30 audit: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
+Re-verified every item below against the `dryui-rescue` branch source. Net progress since the 2026-04-30 audit:
+
+- Initial state: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
+- After Phase 0 wave: **6 done, 5 PARTIAL, 96 TODO** out of 107.
 
 Per phase:
 
-- **Phase 0** (theme files): 0 done, 1 partial, 5 TODO. `themes/component-defaults.css` does not exist; midnight/aurora ship 0 of 32 status tokens; terminal ships ~8 of 32 (partial); no purple token row in any theme. Phase 1.12, 1.13, 1.6 are blocked on Phase 0.6.
+- **Phase 0** (theme files): ✅ 6 of 6 complete. `themes/component-defaults.css` extracted; midnight/aurora/terminal ship full status family; aurora light has overlay-backdrop; purple semantic token row added to every theme. Unblocks Phase 1.12, 1.13.
 - **Phase 1** (color literals): 0 done, 27 TODO. The earlier read on `markdown-renderer:81` was wrong — `[data-markdown-renderer-root] :global { ... }` parens-less form is still in place.
 - **Phase 2** (root-defaulted tokens): 0 done, 2 partial (`chip-group-root`, `icon`), 27 TODO. `toggle-group-root` still uses bare `[data-size='*']` selectors, not `:where(...)`.
 - **Phase 3** (grid placement seam): 0 done, 1 partial (`avatar` slot path only), 21 TODO. `multi-select-combobox`'s outer `[data-multi-select-wrapper]` is still bare; rest spreads to the inner root.
@@ -26,12 +29,12 @@ Items annotated `**[partial]**` below have visible movement but do not meet the 
 
 ## Phase 0. Theme files (highest leverage, every component cascades through these)
 
-- [ ] `packages/ui/src/themes/default.css:114-128`: extract `--dry-toggle-{track-bg,track-stroke,selected-bg,selected-stroke,thumb-bg,hover-bg,press-bg,disabled-fill,disabled-stroke,focus-ring,label-color,label-disabled-color}` and `--dry-beam-default-blend` into a new `themes/component-defaults.css` so theme files only carry semantic tokens (`--dry-color-*`).
-- [ ] `packages/ui/src/themes/dark.css:76-92, 325-341`: same extraction. The `[data-theme='dark']` and `.theme-auto:not([data-theme='light'])` blocks duplicate the override; collapse into one CSS layer when extracting.
-- [ ] `packages/ui/src/themes/midnight.css`: ship complete status palette (currently missing the entire error/warning/success/info family across `text/fill/fill-hover/fill-weak/stroke/stroke-strong/icon/on-`). Theme only renders correctly today because default.css cascades fill the gaps.
-- [ ] `packages/ui/src/themes/aurora.css`: same. Both `[data-theme='aurora']` and `[data-theme='aurora-dark']` blocks ship without the status family. Also align `--dry-color-overlay-backdrop` between the two blocks.
-- [ ] **[partial]** `packages/ui/src/themes/terminal.css:177-184`: ship missing status sub-tokens (`stroke`, `icon`, `on-*`, `fill-hover`, `fill-weak`). Today the partial palette inherits default.css values tuned for a light brand, producing visible mismatches in dark terminal mode. _As of 2026-05-04: `text-*` and `fill-*` rows are present at lines 187-194 for error/warning/success/info; the listed sub-tokens are still missing._
-- [ ] Add semantic purple token row to all themes: `--dry-color-fill-purple`, `--dry-color-fill-purple-hover`, `--dry-color-fill-purple-weak`, `--dry-color-text-purple`, `--dry-color-stroke-purple`, `--dry-color-on-purple`. Consumed by `badge` and `tag` purple variants (Phase 2).
+- [x] `packages/ui/src/themes/default.css:114-128`: extract `--dry-toggle-{track-bg,track-stroke,selected-bg,selected-stroke,thumb-bg,hover-bg,press-bg,disabled-fill,disabled-stroke,focus-ring,label-color,label-disabled-color}` and `--dry-beam-default-blend` into a new `themes/component-defaults.css` so theme files only carry semantic tokens (`--dry-color-*`).
+- [x] `packages/ui/src/themes/dark.css:76-92, 325-341`: same extraction. The `[data-theme='dark']` and `.theme-auto:not([data-theme='light'])` blocks duplicate the override; collapse into one CSS layer when extracting.
+- [x] `packages/ui/src/themes/midnight.css`: ship complete status palette (currently missing the entire error/warning/success/info family across `text/fill/fill-hover/fill-weak/stroke/stroke-strong/icon/on-`). Theme only renders correctly today because default.css cascades fill the gaps.
+- [x] `packages/ui/src/themes/aurora.css`: same. Both `[data-theme='aurora']` and `[data-theme='aurora-dark']` blocks ship without the status family. Also align `--dry-color-overlay-backdrop` between the two blocks.
+- [x] `packages/ui/src/themes/terminal.css:177-184`: ship missing status sub-tokens (`stroke`, `icon`, `on-*`, `fill-hover`, `fill-weak`). Today the partial palette inherits default.css values tuned for a light brand, producing visible mismatches in dark terminal mode.
+- [x] Add semantic purple token row to all themes: `--dry-color-fill-purple`, `--dry-color-fill-purple-hover`, `--dry-color-fill-purple-weak`, `--dry-color-text-purple`, `--dry-color-stroke-purple`, `--dry-color-on-purple`. Consumed by `badge` and `tag` purple variants (Phase 2).
 
 ## Phase 1. Hardcoded color literals in component `<style>` (block)
 

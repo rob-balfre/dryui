@@ -36,6 +36,58 @@
 	--dry-color-icon-accent: hsla(38, 92%, 55%, 0.8);
 	--dry-color-on-accent: #1a1410;
 
+	/* ─── Status: Error (warm-shifted hue 8) ──────────────────────── */
+	--dry-color-text-error: hsl(8, 70%, 38%);
+	--dry-color-fill-error: hsl(8, 75%, 52%);
+	--dry-color-fill-error-hover: hsl(8, 75%, 44%);
+	--dry-color-fill-error-weak: hsla(8, 75%, 52%, 0.1);
+	--dry-color-stroke-error: hsl(8, 50%, 70%);
+	--dry-color-stroke-error-strong: hsla(8, 75%, 52%, 0.8);
+	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+	--dry-color-on-error: #ffffff;
+
+	/* ─── Status: Warning ─────────────────────────────────────────── */
+	--dry-color-text-warning: hsl(40, 80%, 32%);
+	--dry-color-fill-warning: hsl(40, 85%, 52%);
+	--dry-color-fill-warning-hover: hsl(40, 85%, 44%);
+	--dry-color-fill-warning-weak: hsla(40, 85%, 52%, 0.1);
+	--dry-color-stroke-warning: hsl(40, 60%, 65%);
+	--dry-color-stroke-warning-strong: hsla(40, 85%, 52%, 0.8);
+	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+	--dry-color-on-warning: hsl(40, 80%, 12%);
+
+	/* ─── Status: Success ─────────────────────────────────────────── */
+	--dry-color-text-success: hsl(140, 60%, 30%);
+	--dry-color-fill-success: hsl(140, 60%, 45%);
+	--dry-color-fill-success-hover: hsl(140, 60%, 37%);
+	--dry-color-fill-success-weak: hsla(140, 60%, 45%, 0.1);
+	--dry-color-stroke-success: hsl(140, 50%, 65%);
+	--dry-color-stroke-success-strong: hsla(140, 60%, 45%, 0.8);
+	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+	--dry-color-on-success: #ffffff;
+
+	/* ─── Status: Info ────────────────────────────────────────────── */
+	--dry-color-text-info: hsl(205, 70%, 35%);
+	--dry-color-fill-info: hsl(205, 70%, 50%);
+	--dry-color-fill-info-hover: hsl(205, 70%, 42%);
+	--dry-color-fill-info-weak: hsla(205, 70%, 50%, 0.1);
+	--dry-color-stroke-info: hsl(205, 50%, 70%);
+	--dry-color-stroke-info-strong: hsla(205, 70%, 50%, 0.8);
+	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+	--dry-color-on-info: #ffffff;
+
+	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
+	--dry-color-text-purple: hsl(290, 55%, 38%);
+	--dry-color-fill-purple: hsl(290, 65%, 55%);
+	--dry-color-fill-purple-hover: hsl(290, 65%, 47%);
+	--dry-color-fill-purple-weak: hsla(290, 65%, 55%, 0.1);
+	--dry-color-stroke-purple: hsla(290, 65%, 55%, 0.5);
+	--dry-color-on-purple: #ffffff;
+
+	/* ─── Overlay backdrops — warm-tinted ─────────────────────────── */
+	--dry-color-overlay-backdrop: hsla(20, 30%, 15%, 0.4);
+	--dry-color-overlay-backdrop-strong: hsla(20, 30%, 15%, 0.6);
+
 	/* ─── Backgrounds — warm cream tint ───────────────────────────── */
 	--dry-color-bg-base: hsl(30, 25%, 98%);
 	--dry-color-bg-raised: hsl(30, 20%, 95%);
@@ -142,6 +194,54 @@
 	--dry-color-stroke-accent-weak: hsla(38, 88%, 68%, 0.2);
 	--dry-color-icon-accent: hsla(38, 88%, 68%, 0.8);
 	--dry-color-on-accent: hsl(38, 30%, 10%);
+
+	/* ─── Status: Error (warm-shifted hue 8) ──────────────────────── */
+	--dry-color-text-error: hsl(8, 75%, 72%);
+	--dry-color-fill-error: hsl(8, 75%, 60%);
+	--dry-color-fill-error-hover: hsl(8, 75%, 52%);
+	--dry-color-fill-error-weak: hsla(8, 75%, 60%, 0.15);
+	--dry-color-stroke-error: hsl(8, 55%, 55%);
+	--dry-color-stroke-error-strong: hsla(8, 75%, 60%, 0.8);
+	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
+	--dry-color-on-error: hsl(8, 30%, 10%);
+
+	/* ─── Status: Warning ─────────────────────────────────────────── */
+	--dry-color-text-warning: hsl(40, 85%, 68%);
+	--dry-color-fill-warning: hsl(40, 80%, 56%);
+	--dry-color-fill-warning-hover: hsl(40, 80%, 48%);
+	--dry-color-fill-warning-weak: hsla(40, 80%, 56%, 0.15);
+	--dry-color-stroke-warning: hsl(40, 60%, 55%);
+	--dry-color-stroke-warning-strong: hsla(40, 80%, 56%, 0.8);
+	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
+	--dry-color-on-warning: hsl(40, 80%, 12%);
+
+	/* ─── Status: Success ─────────────────────────────────────────── */
+	--dry-color-text-success: hsl(140, 55%, 65%);
+	--dry-color-fill-success: hsl(140, 55%, 50%);
+	--dry-color-fill-success-hover: hsl(140, 55%, 42%);
+	--dry-color-fill-success-weak: hsla(140, 55%, 50%, 0.15);
+	--dry-color-stroke-success: hsl(140, 45%, 55%);
+	--dry-color-stroke-success-strong: hsla(140, 55%, 50%, 0.8);
+	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
+	--dry-color-on-success: hsl(140, 30%, 8%);
+
+	/* ─── Status: Info ────────────────────────────────────────────── */
+	--dry-color-text-info: hsl(205, 65%, 70%);
+	--dry-color-fill-info: hsl(205, 65%, 56%);
+	--dry-color-fill-info-hover: hsl(205, 65%, 48%);
+	--dry-color-fill-info-weak: hsla(205, 65%, 56%, 0.15);
+	--dry-color-stroke-info: hsl(205, 45%, 55%);
+	--dry-color-stroke-info-strong: hsla(205, 65%, 56%, 0.8);
+	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
+	--dry-color-on-info: hsl(205, 30%, 8%);
+
+	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
+	--dry-color-text-purple: hsl(290, 75%, 78%);
+	--dry-color-fill-purple: hsl(290, 70%, 70%);
+	--dry-color-fill-purple-hover: hsl(290, 70%, 62%);
+	--dry-color-fill-purple-weak: hsla(290, 70%, 70%, 0.15);
+	--dry-color-stroke-purple: hsla(290, 70%, 70%, 0.5);
+	--dry-color-on-purple: hsl(290, 30%, 8%);
 
 	/* ─── Backgrounds — warm dark ─────────────────────────────────── */
 	--dry-color-bg-base: hsl(20, 18%, 8%);
