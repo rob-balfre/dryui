@@ -43,7 +43,6 @@ test('unit suite includes the stable package-local tests that feed coverage', ()
 	expect(testUnitScript).toContain('packages/feedback-server/tests/**/*.test.ts');
 	expect(testUnitScript).toContain('packages/lint/src/*.test.ts');
 	expect(testUnitScript).toContain('packages/mcp/src/**/*.test.ts');
-	expect(testUnitScript).toContain('packages/theme-wizard/src/engine/*.test.ts');
 });
 
 test('browser test contract is configured for Vitest browser mode', () => {
@@ -101,7 +100,6 @@ test('release scripts require validation before publish', () => {
 		'@dryui/primitives',
 		'@dryui/ui',
 		'@dryui/feedback',
-		'@dryui/theme-wizard',
 		'@dryui/mcp',
 		'@dryui/feedback-server',
 		'@dryui/cli'

@@ -100,17 +100,16 @@ await run('clean:package-src-declarations', 'bun run clean:package-src-declarati
 await run('build:ui', 'bun run build', pkg('ui'));
 
 // ── Phase 3: Builds + checks that only need ui (parallel) ──────────────────
-// MCP, feedback, and theme-wizard depend on ui but not each other.
+// MCP and feedback depend on ui but not each other.
 // svelte-check on primitives + ui can also run here.
 
-console.log('\n── Phase 3: build mcp/feedback/feedback-server/theme-wizard + check packages ──');
+console.log('\n── Phase 3: build mcp/feedback/feedback-server + check packages ──');
 await run('clean:package-src-declarations', 'bun run clean:package-src-declarations');
 
 const phase3Tasks: Promise<TaskResult>[] = [
 	run('build:mcp', 'bun run build', pkg('mcp')),
 	run('build:feedback', 'bun run build', pkg('feedback')),
 	run('build:feedback-server', 'bun run build', pkg('feedback-server')),
-	run('build:theme-wizard', 'bun run build', pkg('theme-wizard')),
 	run('check:primitives', 'bun run check', pkg('primitives')),
 	run('check:ui', 'bun run check', pkg('ui'))
 ];

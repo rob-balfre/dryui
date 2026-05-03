@@ -30,7 +30,6 @@ const TIER_0 = new Set([
 const TIER_1 = new Set([
 	'NotificationCenter',
 	'Feedback',
-	'ThemeWizard',
 	'Tree',
 	'Carousel',
 	'Transfer',

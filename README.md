@@ -17,7 +17,6 @@ DryUI gives engineers and their coding agents a shared UI system: reusable compo
 | `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                     |
 | `@dryui/cli`             | CLI for setup, discovery, install planning, static contract checks, skills, MCP, and feedback tooling                     |
 | `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor component discovery, contract validation, a11y, and token correctness |
-| `@dryui/theme-wizard`    | Experimental theme generator package; not exposed in the trimmed public docs while parked                                 |
 | `@dryui/feedback`        | Optional feedback annotation UI                                                                                           |
 | `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                 |
 

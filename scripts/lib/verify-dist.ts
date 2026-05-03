@@ -4,9 +4,8 @@
  * Given a package.json that has already been swap-published (i.e. publishConfig.exports
  * merged into the top level), walk every path the tarball promises and ensure it
  * exists on disk and is non-empty. Catches the class of failures where a package
- * ships with an empty or stale dist/ — the root cause behind
- * @dryui/feedback-server@0.3.2–0.3.4 and @dryui/theme-wizard@5.0.0–8.0.0 being
- * broken on npm.
+ * ships with an empty or stale dist/ — the root cause behind prior broken npm
+ * releases.
  *
  * Paths collected:
  *   - main, types, svelte (top level)

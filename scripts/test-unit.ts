@@ -8,8 +8,7 @@ const suiteGlobs = [
 	'packages/cli/src/__tests__/*.test.ts',
 	'packages/feedback-server/tests/**/*.test.ts',
 	'packages/lint/src/*.test.ts',
-	'packages/mcp/src/**/*.test.ts',
-	'packages/theme-wizard/src/engine/*.test.ts'
+	'packages/mcp/src/**/*.test.ts'
 ];
 
 await Promise.all([

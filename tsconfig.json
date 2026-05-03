@@ -24,8 +24,6 @@
       "@dryui/mcp/spec-types": ["./packages/mcp/src/spec-types.ts"],
       "@dryui/mcp/spec-formatters": ["./packages/mcp/src/spec-formatters.ts"],
       "@dryui/feedback-server": ["./packages/feedback-server/src/index.ts"],
-      "@dryui/theme-wizard": ["./packages/theme-wizard/src/index.ts"],
-      "@dryui/theme-wizard/engine": ["./packages/theme-wizard/src/engine/index.ts"],
       "@dryui/lint": ["./packages/lint/src/index.ts"]
     }
   },
@@ -36,7 +34,6 @@
     { "path": "./packages/primitives" },
     { "path": "./packages/ui" },
     { "path": "./packages/mcp" },
-    { "path": "./packages/theme-wizard" },
     { "path": "./packages/lint" }
   ]
 }

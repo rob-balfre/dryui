@@ -31,10 +31,6 @@
         "linesPct": 58.79,
         "functionsPct": 67.82
       },
-      "packages/theme-wizard": {
-        "linesPct": 53.4,
-        "functionsPct": 61.18
-      },
       "packages/ui": {
         "linesPct": 52.51,
         "functionsPct": 79.86
