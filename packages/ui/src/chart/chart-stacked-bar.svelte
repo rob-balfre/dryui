@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SVGAttributes } from 'svelte/elements';
 	import { getChartCtx, type ChartStackedDataPoint } from './context.svelte.js';
+	import { chartSeriesColor } from './series-color.js';
 
 	interface Props extends SVGAttributes<SVGGElement> {
 		stackedData: ChartStackedDataPoint[];
@@ -19,13 +20,6 @@
 		Math.max(...stackedData.map((d) => d.segments.reduce((sum, s) => sum + s.value, 0)), 1)
 	);
 
-	const SERIES_SLOTS = 8;
-
-	function seriesFill(index: number): string {
-		const slot = (index % SERIES_SLOTS) + 1;
-		return `var(--dry-chart-series-${slot}, currentColor)`;
-	}
-
 	const barGroups = $derived(
 		stackedData.map((point, i) => {
 			const barWidth = (chartWidth / stackedData.length) * 0.7;
@@ -42,7 +36,7 @@
 					y,
 					width: barWidth,
 					height: Math.max(0, segHeight),
-					color: seg.color ?? seriesFill(segIndex),
+					color: seg.color ?? chartSeriesColor(segIndex),
 					value: seg.value
 				};
 			});

@@ -337,7 +337,8 @@
 	/* ─── Typography — serif display ──────────────────────────────── */
 	--dry-font-display: 'Playfair Display', 'Georgia', 'Times New Roman', ui-serif, serif;
 
-	/* ─── Beam blend ──────────────────────────────────────────────── */
+	/* ─── Component: Toggle (dark thumb) + Beam (`screen` blend) ──── */
+	--dry-toggle-thumb-bg: #292b33;
 	--dry-beam-default-blend: screen;
 
 	/* ─── Overlay backdrops ───────────────────────────────────────── */

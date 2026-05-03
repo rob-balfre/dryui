@@ -152,14 +152,14 @@
 	$effect(() => {
 		if (!element) return;
 		element.style.cssText = style || '';
-		if (colors?.[0]) element.style.setProperty('--dry-mesh-color-1', colors[0]);
-		else element.style.removeProperty('--dry-mesh-color-1');
-		if (colors?.[1]) element.style.setProperty('--dry-mesh-color-2', colors[1]);
-		else element.style.removeProperty('--dry-mesh-color-2');
-		if (colors?.[2]) element.style.setProperty('--dry-mesh-color-3', colors[2]);
-		else element.style.removeProperty('--dry-mesh-color-3');
-		if (colors?.[3]) element.style.setProperty('--dry-mesh-color-4', colors[3]);
-		else element.style.removeProperty('--dry-mesh-color-4');
+		if (colors) {
+			for (let i = 0; i < 4; i++) {
+				const value = colors[i];
+				const prop = `--dry-mesh-color-${i + 1}`;
+				if (value) element.style.setProperty(prop, value);
+				else element.style.removeProperty(prop);
+			}
+		}
 		element.style.setProperty('--dry-mesh-duration', speedDuration);
 		element.style.setProperty('--dry-mesh-pointer-x', pointerX);
 		element.style.setProperty('--dry-mesh-pointer-y', pointerY);

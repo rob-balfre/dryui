@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { SVGAttributes } from 'svelte/elements';
 	import { getChartCtx, registerChartInteractive } from './context.svelte.js';
+	import { chartSeriesColor } from './series-color.js';
 
 	interface Props extends Omit<SVGAttributes<SVGGElement>, 'onclick'> {
 		innerRadius?: number;
@@ -27,13 +28,6 @@
 	const strokeW = $derived(outerRadius - innerRadius);
 	const circumference = $derived(2 * Math.PI * radius);
 
-	const SERIES_SLOTS = 8;
-
-	function seriesStroke(index: number): string {
-		const slot = (index % SERIES_SLOTS) + 1;
-		return `var(--dry-chart-series-${slot}, currentColor)`;
-	}
-
 	const segments = $derived(
 		(() => {
 			const total = ctx.total || 1;
@@ -46,7 +40,7 @@
 				return {
 					dasharray: `${dashLength} ${circumference - dashLength}`,
 					dashoffset: offset,
-					color: point.color ?? seriesStroke(i),
+					color: point.color ?? chartSeriesColor(i),
 					point,
 					index: i
 				};

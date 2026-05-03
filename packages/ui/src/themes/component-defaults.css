@@ -1,13 +1,11 @@
 /*
- * Component defaults
+ * Component defaults — opt-in.
  *
- * Toggle and beam tokens that are shared across themes. Pulled out of
- * `default.css` and `dark.css` so theme files only carry semantic tokens
- * (`--dry-color-*`). Themes that intentionally diverge (midnight, terminal)
- * keep their own toggle/beam overrides in their own files.
- *
- * Auto-imported by `default.css`. Consumers do not need to import this
- * directly.
+ * Mirrors the toggle and beam component tokens that ship inline in
+ * `default.css` / `dark.css` / `aurora.css`. Importing this file directly
+ * is only useful for consumers building a custom theme without
+ * `default.css`; otherwise the rules below are already loaded through the
+ * standard theme files.
  */
 
 :root {

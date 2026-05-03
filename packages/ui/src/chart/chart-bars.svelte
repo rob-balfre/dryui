@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { SVGAttributes } from 'svelte/elements';
 	import { getChartCtx, registerChartInteractive } from './context.svelte.js';
+	import { chartSeriesColor } from './series-color.js';
 
 	interface Props extends Omit<SVGAttributes<SVGGElement>, 'onclick'> {
 		radius?: number;
@@ -15,13 +16,6 @@
 	const chartWidth = $derived(ctx.width - ctx.padding.left - ctx.padding.right);
 	const chartHeight = $derived(ctx.height - ctx.padding.top - ctx.padding.bottom);
 	const valueRange = $derived(ctx.maxValue - ctx.minValue || 1);
-
-	const SERIES_SLOTS = 8;
-
-	function seriesFill(index: number): string {
-		const slot = (index % SERIES_SLOTS) + 1;
-		return `var(--dry-chart-series-${slot}, currentColor)`;
-	}
 
 	const bars = $derived(
 		ctx.data.map((point, i) => {
@@ -60,7 +54,7 @@
 			width={bar.width}
 			height={bar.height}
 			rx={radius}
-			fill={bar.point.color ?? seriesFill(bar.index)}
+			fill={bar.point.color ?? chartSeriesColor(bar.index)}
 			data-part="bar"
 			data-clickable={onclick ? '' : undefined}
 			onclick={onclick ? () => handleClick(bar) : undefined}

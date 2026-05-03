@@ -68,9 +68,13 @@
 	/* ─── Image edge ring (dark) ─────────────────────────────────── */
 	--dry-image-edge: rgba(255, 255, 255, 0.1);
 
-	/* ─── Component: Toggle + Beam ─────────────────────────────────
-	   Dark overrides ship from `component-defaults.css` (thumb-bg =
-	   #292b33, beam blend = screen). */
+	/* ─── Component: Toggle (dark thumb override) ─────────────────── */
+	--dry-toggle-thumb-bg: #292b33;
+
+	/* ─── Component: Beam ─────────────────────────────────────────
+	   `screen` lifts the bloom on dark surfaces; `multiply` (light
+	   default) would darken instead. */
+	--dry-beam-default-blend: screen;
 
 	/* ─── Status: Error ───────────────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 60%, 70%);
@@ -307,8 +311,9 @@
 			/* ─── Image edge ring (dark) ─────────────────────────────────── */
 			--dry-image-edge: rgba(255, 255, 255, 0.1);
 
-			/* ─── Component: Toggle + Beam ─────────────────────────────────
-			   Dark overrides ship from `component-defaults.css`. */
+			/* ─── Component: Toggle (dark thumb) + Beam (`screen` blend) ── */
+			--dry-toggle-thumb-bg: #292b33;
+			--dry-beam-default-blend: screen;
 
 			/* ─── Status: Error ───────────────────────────────────────────── */
 			--dry-color-text-error: hsl(0, 60%, 70%);

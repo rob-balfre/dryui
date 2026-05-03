@@ -1,21 +1,9 @@
 <script lang="ts">
-	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
+	import type { FormControlWrapperAttrs } from '../internal/form-control-wrapper-attrs.js';
 
-	type WrapperAttrs = Omit<
-		HTMLAttributes<HTMLDivElement>,
-		| 'role'
-		| 'oninput'
-		| 'onchange'
-		| 'onfocus'
-		| 'onblur'
-		| 'onkeydown'
-		| 'onkeyup'
-		| 'autofocus'
-		| 'aria-invalid'
-	>;
-
-	interface Props extends WrapperAttrs {
+	interface Props extends Omit<FormControlWrapperAttrs<HTMLDivElement>, 'role'> {
 		value?: number;
 		min?: number;
 		max?: number;

@@ -1,20 +1,9 @@
 <script lang="ts">
-	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLInputAttributes } from 'svelte/elements';
 	import { getFormControlCtx, variantAttrs } from '@dryui/primitives';
+	import type { FormControlWrapperAttrs } from '../internal/form-control-wrapper-attrs.js';
 
-	type WrapperAttrs = Omit<
-		HTMLAttributes<HTMLSpanElement>,
-		| 'oninput'
-		| 'onchange'
-		| 'onfocus'
-		| 'onblur'
-		| 'onkeydown'
-		| 'onkeyup'
-		| 'autofocus'
-		| 'aria-invalid'
-	>;
-
-	interface Props extends WrapperAttrs {
+	interface Props extends FormControlWrapperAttrs<HTMLSpanElement> {
 		value?: string;
 		size?: 'sm' | 'md' | 'lg';
 		variant?: 'default' | 'ghost';

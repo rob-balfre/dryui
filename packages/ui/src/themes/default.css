@@ -1,5 +1,3 @@
-@import './component-defaults.css';
-
 *,
 *::before,
 *::after {
@@ -108,9 +106,27 @@ samp {
 	   imperfections. Hardcoded rgba — not brand-derivable. */
 	--dry-image-edge: rgba(0, 0, 0, 0.1);
 
-	/* ─── Component: Toggle + Beam ─────────────────────────────────
-	   Defined in `component-defaults.css` (auto-imported) so theme files
-	   stay focused on semantic tokens. */
+	/* ─── Component: Toggle ─────────────────────────────────────────
+	   Derived from semantic tokens so brand overrides (e.g. a consumer
+	   retheming --dry-color-fill-brand) flow through to toggles too.
+	   Thumb bg is intentionally a neutral literal — it's a surface knob,
+	   not a brand-tinted element. Mirrored in `component-defaults.css`
+	   for consumers who want to import the component layer alone. */
+	--dry-toggle-track-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-track-stroke: var(--dry-color-stroke-strong);
+	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
+	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
+	--dry-toggle-thumb-bg: #ffffff;
+	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
+	--dry-toggle-press-bg: var(--dry-color-fill-active);
+	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
+	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
+	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
+	--dry-toggle-label-color: var(--dry-color-text-strong);
+	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
+
+	/* ─── Component: Beam ─────────────────────────────────────────── */
+	--dry-beam-default-blend: multiply;
 
 	/* ─── Status: Error (hue 0) ───────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 70%, 35%);
