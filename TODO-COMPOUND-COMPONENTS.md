@@ -9,13 +9,28 @@ Source: 10-cluster audit of `packages/ui/src/` on 2026-04-30. ~175 files audited
 
 Phases run top to bottom. Theme work in Phase 0 unblocks everything downstream.
 
+## Verification (2026-05-04)
+
+Re-verified every item below against the `dryui-rescue` branch source. Net progress since the 2026-04-30 audit: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
+
+Per phase:
+
+- **Phase 0** (theme files): 0 done, 1 partial, 5 TODO. `themes/component-defaults.css` does not exist; midnight/aurora ship 0 of 32 status tokens; terminal ships ~8 of 32 (partial); no purple token row in any theme. Phase 1.12, 1.13, 1.6 are blocked on Phase 0.6.
+- **Phase 1** (color literals): 0 done, 27 TODO. The earlier read on `markdown-renderer:81` was wrong — `[data-markdown-renderer-root] :global { ... }` parens-less form is still in place.
+- **Phase 2** (root-defaulted tokens): 0 done, 2 partial (`chip-group-root`, `icon`), 27 TODO. `toggle-group-root` still uses bare `[data-size='*']` selectors, not `:where(...)`.
+- **Phase 3** (grid placement seam): 0 done, 1 partial (`avatar` slot path only), 21 TODO. `multi-select-combobox`'s outer `[data-multi-select-wrapper]` is still bare; rest spreads to the inner root.
+- **Phase 4** (token contracts): 0 done, 2 partial (`splitter` z-index only; `textarea` has `--dry-input-*` fallthrough but no namespace), 13 TODO.
+- **Phase 5** (cleanup): 0 done, 7 TODO. `chat-thread.svelte` still has `await tick()` at lines 81 and 101.
+
+Items annotated `**[partial]**` below have visible movement but do not meet the full fix criterion.
+
 ## Phase 0. Theme files (highest leverage, every component cascades through these)
 
 - [ ] `packages/ui/src/themes/default.css:114-128`: extract `--dry-toggle-{track-bg,track-stroke,selected-bg,selected-stroke,thumb-bg,hover-bg,press-bg,disabled-fill,disabled-stroke,focus-ring,label-color,label-disabled-color}` and `--dry-beam-default-blend` into a new `themes/component-defaults.css` so theme files only carry semantic tokens (`--dry-color-*`).
 - [ ] `packages/ui/src/themes/dark.css:76-92, 325-341`: same extraction. The `[data-theme='dark']` and `.theme-auto:not([data-theme='light'])` blocks duplicate the override; collapse into one CSS layer when extracting.
 - [ ] `packages/ui/src/themes/midnight.css`: ship complete status palette (currently missing the entire error/warning/success/info family across `text/fill/fill-hover/fill-weak/stroke/stroke-strong/icon/on-`). Theme only renders correctly today because default.css cascades fill the gaps.
 - [ ] `packages/ui/src/themes/aurora.css`: same. Both `[data-theme='aurora']` and `[data-theme='aurora-dark']` blocks ship without the status family. Also align `--dry-color-overlay-backdrop` between the two blocks.
-- [ ] `packages/ui/src/themes/terminal.css:177-184`: ship missing status sub-tokens (`stroke`, `icon`, `on-*`, `fill-hover`, `fill-weak`). Today the partial palette inherits default.css values tuned for a light brand, producing visible mismatches in dark terminal mode.
+- [ ] **[partial]** `packages/ui/src/themes/terminal.css:177-184`: ship missing status sub-tokens (`stroke`, `icon`, `on-*`, `fill-hover`, `fill-weak`). Today the partial palette inherits default.css values tuned for a light brand, producing visible mismatches in dark terminal mode. _As of 2026-05-04: `text-*` and `fill-*` rows are present at lines 187-194 for error/warning/success/info; the listed sub-tokens are still missing._
 - [ ] Add semantic purple token row to all themes: `--dry-color-fill-purple`, `--dry-color-fill-purple-hover`, `--dry-color-fill-purple-weak`, `--dry-color-text-purple`, `--dry-color-stroke-purple`, `--dry-color-on-purple`. Consumed by `badge` and `tag` purple variants (Phase 2).
 
 ## Phase 1. Hardcoded color literals in component `<style>` (block)
@@ -63,9 +78,9 @@ Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte 
 - [ ] `packages/ui/src/transfer/transfer-root.svelte:130-139` (10 `--dry-transfer-*` tokens)
 - [ ] `packages/ui/src/file-upload/file-upload-dropzone.svelte:84-88, 127-137` (`--dry-fu-{border,bg,padding,min-height,font-size}`)
 - [ ] `packages/ui/src/button-group/button-group.svelte:40-41, 52, 56, 60` (`--dry-button-group-radius`, `-hover-z-index`)
-- [ ] `packages/ui/src/chip-group/chip-group-root.svelte:87, 91, 95` (`--dry-chip-group-gap` reassigned per `[data-gap='*']`). Use `--_chip-group-gap-default` private as the fallback.
+- [ ] **[partial]** `packages/ui/src/chip-group/chip-group-root.svelte:87, 91, 95` (`--dry-chip-group-gap` reassigned per `[data-gap='*']`). Use `--_chip-group-gap-default` private as the fallback. _As of 2026-05-04: leading root-default block is gone, but the per-`[data-gap]` selectors still reassign `--dry-chip-group-gap` directly instead of writing through a private._
 - [ ] `packages/ui/src/tag/tag-button.svelte:109-247`: variant blocks reassign `--dry-tag-bg/-color/-border` on the same `[data-tag]` element. Rework to write `--_tag-bg-default` privates and read `--dry-tag-bg` with private fallback at the single consumption site (the `badge` private-default pattern is the template).
-- [ ] `packages/ui/src/icon/icon.svelte:48-79` (`--dry-icon-{size,color}` reassigned per `[data-size]` / `[data-color]`)
+- [ ] **[partial]** `packages/ui/src/icon/icon.svelte:48-79` (`--dry-icon-{size,color}` reassigned per `[data-size]` / `[data-color]`). _As of 2026-05-04: consumption sites at lines 41-42 already use `var(--dry-icon-size, var(--dry-space-5))` / `var(--dry-icon-color, currentColor)`, so the consumption pattern is right. The size/color enum selectors still reassign the public tokens directly; switch them to `--_icon-{size,color}-default` privates so the public token stays overrideable from a parent._
 - [ ] `packages/ui/src/float-button/float-button-root.svelte:82-85` (`--dry-fab-{offset,gap,position,z-index}`)
 - [ ] `packages/ui/src/link/link.svelte:52` (`--dry-link-hover-color` defined on the `<a>` element it reads)
 - [ ] `packages/ui/src/format-bytes/format-bytes.svelte:54-55`
@@ -111,7 +126,7 @@ Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte 
 - [ ] `packages/ui/src/icon/icon.svelte:5-13` (extend `HTMLAttributes<HTMLSpanElement>`)
 - [ ] `packages/ui/src/icon-swap/icon-swap.svelte:4-10`
 - [ ] `packages/ui/src/qr-code/qr-code.svelte:74` (rest on inner `<canvas>`)
-- [ ] `packages/ui/src/avatar/avatar.svelte:59-67` (rest on inner span when status/badge slot is used)
+- [ ] **[partial]** `packages/ui/src/avatar/avatar.svelte:59-67` (rest on inner span when status/badge slot is used). _As of 2026-05-04: the no-slot path forwards rest correctly onto the outer span, but the status/badge slot path still spreads rest onto the inner span and leaves the outer wrapper bare._
 - [ ] `packages/ui/src/chip/chip-button.svelte:50-74` (rest forwarded to inner Button instead of `.chip-wrap`)
 - [ ] `packages/ui/src/tag/tag-button.svelte:31-37` (rest on inner `[data-tag]` span instead of outer wrapper)
 - [ ] `packages/ui/src/motion/{enter,exit,stagger}.svelte`: extend Props with `HTMLAttributes`, spread `{...rest}` on the `<svelte:element>`.
@@ -130,9 +145,9 @@ Add `--dry-<component>-*` overrides backed by semantic tokens.
 - [ ] `pagination`: define a `--dry-pagination-*` surface or document that the component delegates entirely to inherited button tokens.
 - [ ] `toolbar`: expose `--dry-toolbar-{bg,border,radius,padding}`.
 - [ ] `accordion`: expose `--dry-accordion-border` for theming consistency.
-- [ ] `splitter`: expose `--dry-splitter-handle-{line-color,grip-color,grip-color-hover}` overrides backed by existing token defaults.
+- [ ] **[partial]** `splitter`: expose `--dry-splitter-handle-{line-color,grip-color,grip-color-hover}` overrides backed by existing token defaults. _As of 2026-05-04: only `--dry-splitter-handle-z-index` is exposed (in `splitter-handle.svelte:89`); the three color tokens are still missing._
 - [ ] `menubar`: expose `--dry-menubar-{bg,border,radius}` to mirror command-palette and dropdown-menu.
-- [ ] `textarea`: namespace tokens to `--dry-textarea-*` falling through to `--dry-input-*` then `--dry-form-control-*`. Today textarea reuses `--dry-input-*` directly so consumers cannot theme inputs and textareas independently.
+- [ ] **[partial]** `textarea`: namespace tokens to `--dry-textarea-*` falling through to `--dry-input-*` then `--dry-form-control-*`. Today textarea reuses `--dry-input-*` directly so consumers cannot theme inputs and textareas independently. _As of 2026-05-04: the `--dry-input-*` → `--dry-form-control-*` fallthrough is in place, but the outer `--dry-textarea-*` namespace layer has not been added._
 - [ ] `number-input`: same. Add `--dry-number-input-*` falling through to `--dry-input-*`.
 - [ ] `toggle/toggle-button.svelte:69`: add `var(--dry-toggle-thumb-bg, var(--dry-color-bg-raised))` fallback to the SVG `fill` (currently bare `var()` resolves to nothing).
 
