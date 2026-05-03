@@ -213,7 +213,7 @@
 <style>
 	[data-map-root] {
 		--dry-map-radius: var(--dry-radius-lg, 0.5rem);
-		--dry-map-border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
+		--dry-map-border: 1px solid var(--dry-color-stroke-weak);
 
 		display: grid;
 		position: relative;

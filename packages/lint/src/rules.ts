@@ -308,7 +308,8 @@ const RULE_OWNERS: Record<string, readonly string[]> = {
 	'dryui/no-flex': ['/page-header/', 'src/layout.css'],
 	'dryui/no-width': ['/mega-menu/', '/internal/'],
 	'dryui/no-important': [],
-	'dryui/no-partial-inset-shadow': ['/option-picker/', '/lib/demos/']
+	'dryui/no-partial-inset-shadow': ['/option-picker/', '/lib/demos/'],
+	'dryui/no-global': ['/markdown-renderer/']
 };
 
 function isRuleOwner(filename: string | undefined, ruleId: string): boolean {
@@ -1053,7 +1054,7 @@ export function checkStyle(
 		}
 	}
 
-	if (allowed('dryui/no-global')) {
+	if (allowed('dryui/no-global') && !isRuleOwner(filename, 'dryui/no-global')) {
 		for (const match of scan.matchAll(GLOBAL_SELECTOR_RE)) {
 			violations.push({
 				rule: 'dryui/no-global',

@@ -136,15 +136,15 @@
 
 	[data-chromatic-shift][data-channels='rgb'][data-active] {
 		text-shadow:
-			var(--dry-chromatic-offset) 0 rgba(255, 0, 0, 0.3),
-			calc(var(--dry-chromatic-offset) * -1) 0 rgba(0, 0, 255, 0.3),
-			0 var(--dry-chromatic-offset) rgba(0, 255, 0, 0.2);
+			var(--dry-chromatic-offset) 0 var(--dry-chromatic-shift-r, rgba(255, 0, 0, 0.3)),
+			calc(var(--dry-chromatic-offset) * -1) 0 var(--dry-chromatic-shift-b, rgba(0, 0, 255, 0.3)),
+			0 var(--dry-chromatic-offset) var(--dry-chromatic-shift-g, rgba(0, 255, 0, 0.2));
 	}
 
 	[data-chromatic-shift][data-channels='rb'][data-active] {
 		text-shadow:
-			var(--dry-chromatic-offset) 0 rgba(255, 0, 0, 0.3),
-			calc(var(--dry-chromatic-offset) * -1) 0 rgba(0, 0, 255, 0.3);
+			var(--dry-chromatic-offset) 0 var(--dry-chromatic-shift-r, rgba(255, 0, 0, 0.3)),
+			calc(var(--dry-chromatic-offset) * -1) 0 var(--dry-chromatic-shift-b, rgba(0, 0, 255, 0.3));
 	}
 
 	[data-chromatic-shift]:not([data-active])::before,

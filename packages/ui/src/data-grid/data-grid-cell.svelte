@@ -27,7 +27,7 @@
 		left: 0;
 		z-index: 1;
 		background: inherit;
-		box-shadow: 2px 0 4px -2px rgb(15 23 42 / 0.1);
+		box-shadow: var(--dry-data-grid-pinned-shadow, 2px 0 4px -2px rgb(15 23 42 / 0.1));
 	}
 
 	[data-dg-cell][data-type='number'],

@@ -86,7 +86,8 @@
 
 	/* ─── Glass — minimal, tinted dark ────────────────────────────── */
 	--dry-glass-blur: 8px;
-	--dry-glass-tint: hsla(0, 0%, 4%, 0.85);
+	--dry-color-glass-tint: hsla(0, 0%, 4%, 0.85);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 88%;
 	--dry-glass-saturation: 100%;
 	--dry-glass-border: hsla(0, 0%, 100%, 0.08);

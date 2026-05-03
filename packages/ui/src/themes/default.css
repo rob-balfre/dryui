@@ -473,7 +473,8 @@ samp {
 
 	/* ─── Glass surface ───────────────────────────────────────────── */
 	--dry-glass-blur: 12px;
-	--dry-glass-tint: var(--dry-color-bg-raised);
+	--dry-color-glass-tint: var(--dry-color-bg-raised);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 72%;
 	--dry-glass-saturation: 180%;
 	--dry-glass-border: hsla(0, 0%, 100%, 0.08);

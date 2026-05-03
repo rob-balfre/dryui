@@ -20,7 +20,7 @@
 	let {
 		radius = 260,
 		intensity = 26,
-		color = 'rgba(59, 130, 246, 0.28)',
+		color,
 		followPointer = true,
 		blendMode,
 		children,
@@ -149,7 +149,8 @@
 		element.style.cssText = style || '';
 		element.style.setProperty('--dry-spotlight-radius', radiusValue);
 		element.style.setProperty('--dry-spotlight-intensity', intensityValue);
-		element.style.setProperty('--dry-spotlight-color', color);
+		if (color) element.style.setProperty('--dry-spotlight-color', color);
+		else element.style.removeProperty('--dry-spotlight-color');
 		element.style.setProperty('--dry-spotlight-x', x);
 		element.style.setProperty('--dry-spotlight-y', y);
 		if (blendMode) element.style.setProperty('--dry-spotlight-blend', blendMode);
@@ -178,7 +179,6 @@
 	[data-spotlight] {
 		--dry-spotlight-radius: 260px;
 		--dry-spotlight-intensity: 26%;
-		--dry-spotlight-color: rgba(59, 130, 246, 0.28);
 		--dry-spotlight-x: 50%;
 		--dry-spotlight-y: 50%;
 
@@ -231,8 +231,13 @@
 			radial-gradient(
 				circle calc(var(--dry-spotlight-radius, 260px) * 0.3) at var(--dry-spotlight-x, 50%)
 					var(--dry-spotlight-y, 50%),
-				rgba(255, 255, 255, 0.12) 0%,
-				rgba(255, 255, 255, 0.04) 50%,
+				var(--dry-spotlight-rim-color, rgba(255, 255, 255, 0.12)) 0%,
+				color-mix(
+						in srgb,
+						var(--dry-spotlight-rim-color, rgba(255, 255, 255, 0.12)) 33%,
+						transparent
+					)
+					50%,
 				transparent 100%
 			);
 		opacity: 0;

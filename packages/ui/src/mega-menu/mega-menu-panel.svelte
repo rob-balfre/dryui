@@ -99,10 +99,10 @@
 		inset: unset;
 		margin: 0;
 		z-index: var(--dry-layer-overlay, 50);
-		background: var(--dry-mega-menu-panel-bg, var(--dry-color-bg-overlay, white));
-		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
+		background: var(--dry-mega-menu-panel-bg, var(--dry-color-bg-overlay));
+		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg, 0.5rem);
-		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+		box-shadow: var(--dry-shadow-lg);
 		padding: var(--dry-space-4, 1rem);
 		max-inline-size: var(--dry-mega-menu-panel-max-width, min(92vw, 60rem));
 		display: grid;

@@ -136,7 +136,7 @@
 		position: relative;
 		overflow: hidden;
 		border-radius: var(--dry-video-embed-radius);
-		background: var(--dry-color-fill, #0f0f0f);
+		background: var(--dry-color-fill);
 		aspect-ratio: var(--_ratio, 16/9);
 	}
 
@@ -166,7 +166,7 @@
 	[data-video-embed] [data-part='play-icon'] {
 		height: var(--dry-video-embed-play-size);
 		aspect-ratio: 1;
-		filter: drop-shadow(0 2px 8px rgb(15 23 42 / 0.3));
+		filter: drop-shadow(var(--dry-video-embed-shadow, 0 2px 8px rgb(15 23 42 / 0.3)));
 		transform: translateX(1px);
 		transition: transform var(--dry-duration-normal) var(--dry-ease-default);
 	}

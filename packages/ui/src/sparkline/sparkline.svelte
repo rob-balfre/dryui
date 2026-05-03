@@ -91,7 +91,7 @@
 
 <style>
 	[data-sparkline] {
-		--dry-sparkline-color: var(--dry-color-fill-brand, #3b82f6);
+		--dry-sparkline-color: var(--dry-color-fill-brand, currentColor);
 		--dry-sparkline-fill-opacity: 0.1;
 
 		display: inline-block;

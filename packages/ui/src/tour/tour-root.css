@@ -9,7 +9,11 @@
 	--dry-tour-overlay-color: var(--dry-color-overlay-backdrop-strong);
 	--dry-tour-spotlight-padding: 8px;
 	--dry-tour-spotlight-radius: 4px;
-	--dry-tour-spotlight-ring: color-mix(in srgb, var(--dry-color-fill-brand) 35%, white 25%);
+	--dry-tour-spotlight-ring: color-mix(
+		in srgb,
+		var(--dry-color-fill-brand) 35%,
+		var(--dry-color-on-brand) 25%
+	);
 
 	position: fixed;
 	top: var(--dry-tour-spotlight-top);
@@ -123,7 +127,7 @@
 	font-family: var(--dry-font-sans);
 	font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 	color: var(--dry-color-text-strong);
-	background: transparent;
+	background: var(--dry-color-fill-weak, transparent);
 	border: 1px solid var(--dry-color-stroke-weak);
 	padding: var(--dry-space-1) var(--dry-space-3);
 	border-radius: var(--dry-radius-md);

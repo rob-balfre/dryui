@@ -135,8 +135,8 @@
 	}
 
 	[data-variant='solid'][data-color='purple'] {
-		--dry-tag-bg: color-mix(in srgb, var(--dry-color-fill-brand) 80%, hsl(280, 65%, 55%));
-		--dry-tag-color: var(--dry-color-on-brand);
+		--dry-tag-bg: var(--dry-color-fill-purple);
+		--dry-tag-color: var(--dry-color-on-purple);
 	}
 
 	[data-variant='solid'][data-color='orange'] {
@@ -180,8 +180,8 @@
 	}
 
 	[data-variant='outline'][data-color='purple'] {
-		--dry-tag-color: color-mix(in srgb, var(--dry-color-text-brand) 70%, hsl(280, 65%, 40%));
-		--dry-tag-border: color-mix(in srgb, var(--dry-color-stroke-brand) 60%, hsl(280, 50%, 70%));
+		--dry-tag-color: var(--dry-color-text-purple);
+		--dry-tag-border: var(--dry-color-stroke-purple);
 	}
 
 	[data-variant='outline'][data-color='orange'] {
@@ -229,8 +229,8 @@
 	}
 
 	[data-variant='soft'][data-color='purple'] {
-		--dry-tag-bg: color-mix(in srgb, var(--dry-color-fill-brand-weak) 70%, hsl(280, 65%, 55%, 0.1));
-		--dry-tag-color: color-mix(in srgb, var(--dry-color-text-brand) 70%, hsl(280, 65%, 40%));
+		--dry-tag-bg: var(--dry-color-fill-purple-weak);
+		--dry-tag-color: var(--dry-color-text-purple);
 	}
 
 	[data-variant='soft'][data-color='orange'] {

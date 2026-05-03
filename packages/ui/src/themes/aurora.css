@@ -113,7 +113,8 @@
 	--dry-shadow-accent: 0 4px 14px hsla(38, 92%, 55%, 0.2), 0 2px 6px hsla(38, 92%, 55%, 0.12);
 
 	/* ─── Glass — warm frosted ────────────────────────────────────── */
-	--dry-glass-tint: hsla(30, 25%, 98%, 0.8);
+	--dry-color-glass-tint: hsla(30, 25%, 98%, 0.8);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 78%;
 	--dry-glass-saturation: 160%;
 	--dry-glass-border: hsla(20, 20%, 50%, 0.08);
@@ -288,7 +289,8 @@
 		0px 4px 8px -2px hsla(20, 40%, 5%, 0.4);
 
 	/* ─── Glass — dark warm frosted ───────────────────────────────── */
-	--dry-glass-tint: hsla(20, 14%, 12%, 0.7);
+	--dry-color-glass-tint: hsla(20, 14%, 12%, 0.7);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 62%;
 	--dry-glass-saturation: 130%;
 	--dry-glass-border: hsla(30, 20%, 80%, 0.06);

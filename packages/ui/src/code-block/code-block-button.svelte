@@ -204,21 +204,14 @@
 
 <style>
 	[data-code-block] {
-		--dry-code-bg: #0d1117;
-		--dry-code-color: #e6edf3;
-		--dry-code-border: #30363d;
 		--dry-code-font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 		--dry-code-line-height: var(--dry-type-small-leading, var(--dry-text-sm-leading));
 		--dry-code-padding: var(--dry-space-4);
 		--dry-code-radius: var(--dry-radius-lg);
-		--dry-code-header-bg: #161b22;
-		--dry-code-header-color: #8b949e;
-		--dry-code-copy-color: #8b949e;
-		--dry-code-copy-hover-color: #e6edf3;
 
 		position: relative;
-		background: var(--dry-code-bg);
-		border: 1px solid var(--dry-code-border);
+		background: var(--dry-code-bg, #0d1117);
+		border: 1px solid var(--dry-code-border, #30363d);
 		border-radius: var(--dry-code-radius);
 		overflow: hidden;
 	}
@@ -229,14 +222,14 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		padding: var(--dry-space-2) var(--dry-code-padding);
-		background: var(--dry-code-header-bg);
-		border-bottom: 1px solid var(--dry-code-border);
+		background: var(--dry-code-header-bg, #161b22);
+		border-bottom: 1px solid var(--dry-code-border, #30363d);
 	}
 
 	[data-code-block-language] {
 		font-size: var(--dry-type-tiny-size, var(--dry-text-xs-size));
 		font-family: var(--dry-font-sans);
-		color: var(--dry-code-header-color);
+		color: var(--dry-code-header-color, #8b949e);
 		text-transform: lowercase;
 		user-select: none;
 	}
@@ -247,17 +240,17 @@
 		right: var(--dry-space-2);
 		z-index: 1;
 		display: inline-grid;
-		color: var(--dry-code-copy-color);
-		background: var(--dry-code-bg);
+		color: var(--dry-code-copy-color, #8b949e);
+		background: var(--dry-code-bg, #0d1117);
 		border-radius: var(--dry-radius-md);
-		--dry-btn-color: var(--dry-code-copy-color);
+		--dry-btn-color: var(--dry-code-copy-color, #8b949e);
 	}
 
 	[data-code-block]:hover .copy-btn-slot,
 	[data-code-block]:focus-within .copy-btn-slot,
 	[data-code-block][data-copied] .copy-btn-slot {
-		color: var(--dry-code-copy-hover-color);
-		--dry-btn-color: var(--dry-code-copy-hover-color);
+		color: var(--dry-code-copy-hover-color, #e6edf3);
+		--dry-btn-color: var(--dry-code-copy-hover-color, #e6edf3);
 	}
 
 	[data-code-block]:has([data-code-block-header]) .copy-btn-slot {
@@ -304,7 +297,7 @@
 		font-family: var(--dry-font-mono);
 		font-size: var(--dry-code-font-size);
 		line-height: var(--dry-code-line-height);
-		color: var(--dry-code-color);
+		color: var(--dry-code-color, #e6edf3);
 		background: transparent;
 		padding: 0;
 		border-radius: 0;
@@ -319,50 +312,50 @@
 
 	[data-code-block-line-number] {
 		margin-right: var(--dry-space-3);
-		color: #484f58;
+		color: var(--dry-code-token-line-number, #484f58);
 		text-align: right;
 		user-select: none;
 	}
 
 	[data-token-type='comment'] {
-		color: #6e7681;
+		color: var(--dry-code-token-comment, #6e7681);
 		font-style: italic;
 	}
 	[data-token-type='string'] {
-		color: #7ee787;
+		color: var(--dry-code-token-string, #7ee787);
 	}
 	[data-token-type='keyword'] {
-		color: #c084fc;
+		color: var(--dry-code-token-keyword, #c084fc);
 	}
 	[data-token-type='number'] {
-		color: #fb923c;
+		color: var(--dry-code-token-number, #fb923c);
 	}
 	[data-token-type='tag'] {
-		color: #60a5fa;
+		color: var(--dry-code-token-tag, #60a5fa);
 	}
 	[data-token-type='component'] {
-		color: #fde68a;
+		color: var(--dry-code-token-component, #fde68a);
 	}
 	[data-token-type='attribute'] {
-		color: #93c5fd;
+		color: var(--dry-code-token-attribute, #93c5fd);
 	}
 	[data-token-type='svelte-keyword'] {
-		color: #d8b4fe;
+		color: var(--dry-code-token-svelte-keyword, #d8b4fe);
 	}
 	[data-token-type='rune'] {
-		color: #f87171;
+		color: var(--dry-code-token-rune, #f87171);
 	}
 	[data-token-type='function'] {
-		color: #facc15;
+		color: var(--dry-code-token-function, #facc15);
 	}
 	[data-token-type='type'] {
-		color: #86efac;
+		color: var(--dry-code-token-type, #86efac);
 	}
 	[data-token-type='operator'] {
-		color: #8b949e;
+		color: var(--dry-code-token-operator, #8b949e);
 	}
 	[data-token-type='punctuation'] {
-		color: #6e7681;
+		color: var(--dry-code-token-punctuation, #6e7681);
 	}
 
 	[data-code-block-token-link] {

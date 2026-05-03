@@ -93,10 +93,7 @@
 	/* ── Selected state ────────────────────────────────────────────────────── */
 
 	[data-card][data-selected] {
-		--dry-card-selected-ring-color: var(
-			--dry-color-stroke-selected,
-			var(--dry-color-fill-brand, #3b82f6)
-		);
+		--dry-card-selected-ring-color: var(--dry-color-stroke-selected, var(--dry-color-fill-brand));
 
 		outline: 2px solid var(--dry-card-selected-ring-color);
 		outline-offset: -2px;

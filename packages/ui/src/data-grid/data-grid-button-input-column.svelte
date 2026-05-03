@@ -206,7 +206,7 @@
 		left: 0;
 		z-index: 1;
 		background: inherit;
-		box-shadow: 2px 0 4px -2px rgb(15 23 42 / 0.1);
+		box-shadow: var(--dry-data-grid-pinned-shadow, 2px 0 4px -2px rgb(15 23 42 / 0.1));
 	}
 
 	[data-dg-column][data-resizable] {
@@ -258,6 +258,6 @@
 
 	[data-dg-column] [data-part='resize-handle']:hover,
 	[data-dg-column] [data-part='resize-handle'][data-resizing] {
-		background: var(--dry-color-fill-brand, #3b82f6);
+		background: var(--dry-color-fill-brand);
 	}
 </style>

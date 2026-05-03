@@ -28,7 +28,7 @@
 		font-weight: 700;
 		text-transform: uppercase;
 		letter-spacing: 0.05em;
-		color: var(--dry-color-text-weak, #64748b);
+		color: var(--dry-color-text-weak);
 		padding-bottom: var(--dry-space-1, 0.25rem);
 	}
 </style>

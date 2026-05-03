@@ -14,13 +14,14 @@
 		value,
 		size = 200,
 		errorCorrection = 'M',
-		fgColor = '#000',
-		bgColor = '#fff',
+		fgColor,
+		bgColor,
 		class: className,
 		...rest
 	}: Props = $props();
 
 	let canvasEl: HTMLCanvasElement | undefined = $state();
+	let wrapperEl = $state<HTMLDivElement>();
 
 	const matrix = $derived(
 		(() => {
@@ -32,8 +33,14 @@
 		})()
 	);
 
+	function resolveColor(rootEl: HTMLElement, varName: string, override: string | undefined) {
+		if (override) return override;
+		const v = getComputedStyle(rootEl).getPropertyValue(varName).trim();
+		return v || '';
+	}
+
 	$effect(() => {
-		if (!canvasEl || !matrix) return;
+		if (!canvasEl || !wrapperEl || !matrix) return;
 
 		const ctx = canvasEl.getContext('2d');
 		if (!ctx) return;
@@ -44,10 +51,13 @@
 		canvasEl.width = size;
 		canvasEl.height = size;
 
-		ctx.fillStyle = bgColor;
+		const resolvedBg = resolveColor(wrapperEl, '--dry-qr-bg', bgColor);
+		const resolvedFg = resolveColor(wrapperEl, '--dry-qr-fg', fgColor);
+
+		ctx.fillStyle = resolvedBg;
 		ctx.fillRect(0, 0, size, size);
 
-		ctx.fillStyle = fgColor;
+		ctx.fillStyle = resolvedFg;
 		for (let row = 0; row < moduleCount; row++) {
 			for (let col = 0; col < moduleCount; col++) {
 				if (matrix[row]![col]) {
@@ -62,12 +72,13 @@
 		}
 	});
 
-	let wrapperEl = $state<HTMLDivElement>();
-
 	$effect(() => {
 		if (!wrapperEl) return;
 		wrapperEl.style.setProperty('--dry-qr-size', `${size}px`);
-		wrapperEl.style.setProperty('--dry-qr-bg', bgColor);
+		if (bgColor) wrapperEl.style.setProperty('--dry-qr-bg', bgColor);
+		else wrapperEl.style.removeProperty('--dry-qr-bg');
+		if (fgColor) wrapperEl.style.setProperty('--dry-qr-fg', fgColor);
+		else wrapperEl.style.removeProperty('--dry-qr-fg');
 	});
 </script>
 
@@ -90,14 +101,13 @@
 		--dry-qr-padding: var(--dry-space-3);
 		--dry-qr-radius: var(--dry-radius-lg);
 		--dry-qr-border: var(--dry-color-stroke-weak);
-		--dry-qr-bg: #fff;
 		--dry-qr-size: 200px;
 
 		display: inline-grid;
 		grid-template-columns: var(--dry-qr-size);
 		place-items: center;
 		padding: var(--dry-qr-padding);
-		background: var(--dry-qr-bg);
+		background: var(--dry-qr-bg, var(--dry-color-bg-raised));
 		border: 1px solid var(--dry-qr-border);
 		border-radius: var(--dry-qr-radius);
 	}

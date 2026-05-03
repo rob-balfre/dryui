@@ -53,6 +53,7 @@
 		inset: unset;
 		margin: 0;
 
+		/* glass-tooltip recipe: 95% inverse surface + 5% transparent paired with backdrop-filter blur below */
 		background: var(
 			--dry-tooltip-bg,
 			color-mix(in srgb, var(--dry-color-bg-inverse) 95%, transparent)

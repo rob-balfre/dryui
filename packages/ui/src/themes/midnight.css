@@ -135,7 +135,8 @@
 
 	/* ─── Glass — the hero feature of this theme ──────────────────── */
 	--dry-glass-blur: 16px;
-	--dry-glass-tint: hsla(240, 15%, 10%, 0.65);
+	--dry-color-glass-tint: hsla(240, 15%, 10%, 0.65);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 58%;
 	--dry-glass-saturation: 150%;
 	--dry-glass-border: hsla(240, 20%, 90%, 0.06);

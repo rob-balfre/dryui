@@ -177,7 +177,8 @@
 	--dry-scrollbar-thumb-hover: var(--dry-color-stroke-strong);
 
 	/* ─── Glass surface ───────────────────────────────────────────── */
-	--dry-glass-tint: var(--dry-color-bg-raised);
+	--dry-color-glass-tint: var(--dry-color-bg-raised);
+	--dry-glass-tint: var(--dry-color-glass-tint);
 	--dry-glass-opacity: 64%;
 	--dry-glass-saturation: 120%;
 	--dry-glass-border: hsla(0, 0%, 100%, 0.06);
@@ -415,7 +416,8 @@
 			--dry-scrollbar-thumb-hover: var(--dry-color-stroke-strong);
 
 			/* ─── Glass surface ───────────────────────────────────────────── */
-			--dry-glass-tint: var(--dry-color-bg-raised);
+			--dry-color-glass-tint: var(--dry-color-bg-raised);
+			--dry-glass-tint: var(--dry-color-glass-tint);
 			--dry-glass-opacity: 64%;
 			--dry-glass-saturation: 120%;
 			--dry-glass-border: hsla(0, 0%, 100%, 0.06);

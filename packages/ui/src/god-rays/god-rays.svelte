@@ -14,7 +14,7 @@
 	}
 
 	let {
-		color = 'rgba(255, 255, 255, 0.15)',
+		color,
 		rayCount = 12,
 		intensity = 60,
 		center = { x: 0.5, y: 0 },
@@ -38,8 +38,8 @@
 		const stops: string[] = [];
 		for (let i = 0; i < count; i++) {
 			const start = i * sliceDeg;
-			stops.push(`var(--dry-rays-color) ${start}deg`);
-			stops.push(`var(--dry-rays-color) ${start + rayDeg}deg`);
+			stops.push(`var(--dry-rays-color, rgba(255, 255, 255, 0.15)) ${start}deg`);
+			stops.push(`var(--dry-rays-color, rgba(255, 255, 255, 0.15)) ${start + rayDeg}deg`);
 			stops.push(`transparent ${start + rayDeg}deg`);
 			stops.push(`transparent ${start + sliceDeg}deg`);
 		}
@@ -49,7 +49,8 @@
 	function applyRootStyles(node: HTMLElement) {
 		$effect(() => {
 			node.style.cssText = style || '';
-			node.style.setProperty('--dry-rays-color', color);
+			if (color) node.style.setProperty('--dry-rays-color', color);
+			else node.style.removeProperty('--dry-rays-color');
 			node.style.setProperty('--dry-rays-cx', cx);
 			node.style.setProperty('--dry-rays-cy', cy);
 			node.style.setProperty('--dry-rays-intensity', clampedIntensity);
@@ -85,7 +86,6 @@
 
 <style>
 	[data-god-rays] {
-		--dry-rays-color: rgba(255, 255, 255, 0.15);
 		--dry-rays-cx: 50%;
 		--dry-rays-cy: 0%;
 		--dry-rays-intensity: 60;

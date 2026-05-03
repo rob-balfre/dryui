@@ -147,8 +147,8 @@
 	}
 
 	[data-variant='solid'][data-color='purple'] {
-		--_badge-bg-default: color-mix(in srgb, var(--dry-color-fill-brand) 80%, hsl(280, 65%, 55%));
-		--_badge-color-default: var(--dry-color-on-brand);
+		--_badge-bg-default: var(--dry-color-fill-purple);
+		--_badge-color-default: var(--dry-color-on-purple);
 	}
 
 	[data-variant='solid'][data-color='orange'] {
@@ -192,12 +192,8 @@
 	}
 
 	[data-variant='outline'][data-color='purple'] {
-		--_badge-color-default: color-mix(in srgb, var(--dry-color-fill-brand) 80%, hsl(280, 65%, 55%));
-		--_badge-border-default: color-mix(
-			in srgb,
-			var(--dry-color-stroke-brand) 60%,
-			hsl(280, 50%, 70%)
-		);
+		--_badge-color-default: var(--dry-color-text-purple);
+		--_badge-border-default: var(--dry-color-stroke-purple);
 	}
 
 	[data-variant='outline'][data-color='orange'] {
@@ -246,12 +242,8 @@
 	}
 
 	[data-variant='soft'][data-color='purple'] {
-		--_badge-bg-default: color-mix(
-			in srgb,
-			var(--dry-color-fill-brand-weak) 70%,
-			hsl(280, 65%, 55%, 0.1)
-		);
-		--_badge-color-default: color-mix(in srgb, var(--dry-color-text-brand) 70%, hsl(280, 65%, 40%));
+		--_badge-bg-default: var(--dry-color-fill-purple-weak);
+		--_badge-color-default: var(--dry-color-text-purple);
 	}
 
 	[data-variant='soft'][data-color='orange'] {
@@ -295,7 +287,7 @@
 		background-color: var(--dry-color-fill-yellow);
 	}
 	[data-dot][data-color='purple'] {
-		background-color: color-mix(in srgb, var(--dry-color-fill-brand) 70%, hsl(280, 65%, 55%));
+		background-color: var(--dry-color-fill-purple);
 	}
 	[data-dot][data-color='orange'] {
 		background-color: color-mix(

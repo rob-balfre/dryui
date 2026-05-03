@@ -1193,7 +1193,7 @@ Example: <Reveal variant="slide-up" delay={120}>
 Pointer-reactive radial highlight surface for cards, hero blocks, and interactive panels.
 Import: @dryui/ui
 Subpath import: @dryui/ui/spotlight
-Props: radius (number), default 260 | intensity (number), default 26 | color (string), Semantic color or tone applied to the component., default 'rgba(59 | followPointer (boolean), default true | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
+Props: radius (number), default 260 | intensity (number), default 26 | color (string), Semantic color or tone applied to the component. | followPointer (boolean), default true | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
 Data attributes: data-active (Present on the active item or current target within the component.) | data-follow-pointer | data-spotlight | data-static
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Spotlight intensity={32}>
@@ -1211,7 +1211,7 @@ Example: <Marquee>Content</Marquee>
 QR code generator using Canvas 2D API.
 Import: @dryui/ui
 Subpath import: @dryui/ui/qr-code
-Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string), default '#000' | bgColor (string), default '#fff'
+Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string) | bgColor (string)
 Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <QRCode>Content</QRCode>
@@ -1699,7 +1699,7 @@ Example: <Shimmer>Content</Shimmer>
 Translucent glass wrapper with blur, tint, and saturation control.
 Import: @dryui/ui
 Subpath import: @dryui/ui/glass
-Props: blur (number), default 12 | tint (string), default 'rgba(255 | saturation (number), default 120 | children (Snippet), Content rendered inside the component., required
+Props: blur (number), default 12 | tint (string) | saturation (number), default 120 | children (Snippet), Content rendered inside the component., required
 Data attributes: data-glass
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <Glass>Content</Glass>
@@ -1717,7 +1717,7 @@ Example: <GodRays>Content</GodRays>
 Animated multi-color gradient mesh background with optional interactivity.
 Import: @dryui/ui
 Subpath import: @dryui/ui/gradient-mesh
-Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: colors (readonly [string, string, string, string]) | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example: <GradientMesh>Content</GradientMesh>

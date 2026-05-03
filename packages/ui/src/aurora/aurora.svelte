@@ -113,12 +113,12 @@
 		if (!rootNode) return;
 		const node = rootNode;
 		node.style.cssText = style || '';
-		if (customPalette?.[0]) node.style.setProperty('--dry-aurora-color-1', customPalette[0]);
-		else node.style.removeProperty('--dry-aurora-color-1');
-		if (customPalette?.[1]) node.style.setProperty('--dry-aurora-color-2', customPalette[1]);
-		else node.style.removeProperty('--dry-aurora-color-2');
-		if (customPalette?.[2]) node.style.setProperty('--dry-aurora-color-3', customPalette[2]);
-		else node.style.removeProperty('--dry-aurora-color-3');
+		if (customPalette?.[0]) node.style.setProperty('--_aurora-color-1', customPalette[0]);
+		else node.style.removeProperty('--_aurora-color-1');
+		if (customPalette?.[1]) node.style.setProperty('--_aurora-color-2', customPalette[1]);
+		else node.style.removeProperty('--_aurora-color-2');
+		if (customPalette?.[2]) node.style.setProperty('--_aurora-color-3', customPalette[2]);
+		else node.style.removeProperty('--_aurora-color-3');
 		node.style.setProperty('--dry-aurora-duration', speedDuration);
 		node.style.setProperty('--dry-aurora-intensity', String(Math.max(0, Math.min(100, intensity))));
 		node.style.setProperty('--dry-aurora-waviness', String(Math.max(0, Math.min(100, waviness))));
@@ -170,9 +170,6 @@
 			color-mix(in srgb, var(--dry-color-bg-base) 84%, var(--dry-color-bg-overlay)),
 			color-mix(in srgb, var(--dry-color-bg-overlay) 92%, transparent)
 		);
-		--dry-aurora-color-1: rgba(120, 119, 255, 0.58);
-		--dry-aurora-color-2: rgba(56, 189, 248, 0.48);
-		--dry-aurora-color-3: rgba(244, 114, 182, 0.42);
 
 		position: relative;
 		overflow: hidden;
@@ -182,33 +179,27 @@
 	}
 
 	[data-aurora][data-palette='sunrise'] {
-		--dry-aurora-color-1: rgba(251, 146, 60, 0.58);
-		--dry-aurora-color-2: rgba(250, 204, 21, 0.45);
-		--dry-aurora-color-3: rgba(244, 114, 182, 0.42);
+		--_aurora-color-1: rgba(251, 146, 60, 0.58);
+		--_aurora-color-2: rgba(250, 204, 21, 0.45);
+		--_aurora-color-3: rgba(244, 114, 182, 0.42);
 	}
 
 	[data-aurora][data-palette='ocean'] {
-		--dry-aurora-color-1: rgba(34, 197, 94, 0.42);
-		--dry-aurora-color-2: rgba(14, 165, 233, 0.55);
-		--dry-aurora-color-3: rgba(59, 130, 246, 0.48);
+		--_aurora-color-1: rgba(34, 197, 94, 0.42);
+		--_aurora-color-2: rgba(14, 165, 233, 0.55);
+		--_aurora-color-3: rgba(59, 130, 246, 0.48);
 	}
 
 	[data-aurora][data-palette='forest'] {
-		--dry-aurora-color-1: rgba(34, 197, 94, 0.48);
-		--dry-aurora-color-2: rgba(132, 204, 22, 0.42);
-		--dry-aurora-color-3: rgba(16, 185, 129, 0.44);
+		--_aurora-color-1: rgba(34, 197, 94, 0.48);
+		--_aurora-color-2: rgba(132, 204, 22, 0.42);
+		--_aurora-color-3: rgba(16, 185, 129, 0.44);
 	}
 
 	[data-aurora][data-palette='cosmic'] {
-		--dry-aurora-color-1: rgba(167, 139, 250, 0.6);
-		--dry-aurora-color-2: rgba(56, 189, 248, 0.5);
-		--dry-aurora-color-3: rgba(236, 72, 153, 0.42);
-	}
-
-	[data-aurora][data-palette='custom'] {
-		--dry-aurora-color-1: rgba(56, 189, 248, 0.5);
-		--dry-aurora-color-2: rgba(99, 102, 241, 0.48);
-		--dry-aurora-color-3: rgba(20, 184, 166, 0.42);
+		--_aurora-color-1: rgba(167, 139, 250, 0.6);
+		--_aurora-color-2: rgba(56, 189, 248, 0.5);
+		--_aurora-color-3: rgba(236, 72, 153, 0.42);
 	}
 
 	[data-aurora-backdrop] {
@@ -233,22 +224,46 @@
 
 	[data-aurora-layer][data-layer='one'] {
 		background:
-			radial-gradient(ellipse 70% 28% at 20% 35%, var(--dry-aurora-color-1) 0, transparent 62%),
-			radial-gradient(ellipse 50% 40% at 45% 55%, var(--dry-aurora-color-1) 0, transparent 58%);
+			radial-gradient(
+				ellipse 70% 28% at 20% 35%,
+				var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 0,
+				transparent 62%
+			),
+			radial-gradient(
+				ellipse 50% 40% at 45% 55%,
+				var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 0,
+				transparent 58%
+			);
 		filter: blur(calc(40px * (0.5 + var(--dry-aurora-waviness, 50) / 100)));
 	}
 
 	[data-aurora-layer][data-layer='two'] {
 		background:
-			radial-gradient(ellipse 65% 32% at 72% 28%, var(--dry-aurora-color-2) 0, transparent 60%),
-			radial-gradient(ellipse 55% 36% at 38% 68%, var(--dry-aurora-color-2) 0, transparent 56%);
+			radial-gradient(
+				ellipse 65% 32% at 72% 28%,
+				var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 0,
+				transparent 60%
+			),
+			radial-gradient(
+				ellipse 55% 36% at 38% 68%,
+				var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 0,
+				transparent 56%
+			);
 		filter: blur(calc(64px * (0.5 + var(--dry-aurora-waviness, 50) / 100)));
 	}
 
 	[data-aurora-layer][data-layer='three'] {
 		background:
-			radial-gradient(ellipse 60% 30% at 58% 78%, var(--dry-aurora-color-3) 0, transparent 64%),
-			radial-gradient(ellipse 48% 38% at 25% 42%, var(--dry-aurora-color-3) 0, transparent 54%);
+			radial-gradient(
+				ellipse 60% 30% at 58% 78%,
+				var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 0,
+				transparent 64%
+			),
+			radial-gradient(
+				ellipse 48% 38% at 25% 42%,
+				var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 0,
+				transparent 54%
+			);
 		filter: blur(calc(52px * (0.5 + var(--dry-aurora-waviness, 50) / 100)));
 	}
 
@@ -283,7 +298,7 @@
 		pointer-events: none;
 		background: radial-gradient(
 			ellipse 80% 50% at 50% 50%,
-			var(--dry-aurora-color-1) 0,
+			var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 0,
 			transparent 70%
 		);
 		mix-blend-mode: soft-light;
@@ -305,12 +320,22 @@
 		background:
 			radial-gradient(
 				ellipse 70% 28% at 20% 35%,
-				color-mix(in oklch, var(--dry-aurora-color-1) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 100%,
+						transparent
+					)
+					0,
 				transparent 62%
 			),
 			radial-gradient(
 				ellipse 50% 40% at 45% 55%,
-				color-mix(in oklch, var(--dry-aurora-color-1) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 100%,
+						transparent
+					)
+					0,
 				transparent 58%
 			);
 	}
@@ -319,12 +344,22 @@
 		background:
 			radial-gradient(
 				ellipse 65% 32% at 72% 28%,
-				color-mix(in oklch, var(--dry-aurora-color-2) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 100%,
+						transparent
+					)
+					0,
 				transparent 60%
 			),
 			radial-gradient(
 				ellipse 55% 36% at 38% 68%,
-				color-mix(in oklch, var(--dry-aurora-color-2) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 100%,
+						transparent
+					)
+					0,
 				transparent 56%
 			);
 	}
@@ -333,12 +368,22 @@
 		background:
 			radial-gradient(
 				ellipse 60% 30% at 58% 78%,
-				color-mix(in oklch, var(--dry-aurora-color-3) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 100%,
+						transparent
+					)
+					0,
 				transparent 64%
 			),
 			radial-gradient(
 				ellipse 48% 38% at 25% 42%,
-				color-mix(in oklch, var(--dry-aurora-color-3) 100%, transparent) 0,
+				color-mix(
+						in oklch,
+						var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 100%,
+						transparent
+					)
+					0,
 				transparent 54%
 			);
 	}
@@ -348,12 +393,22 @@
 		background:
 			radial-gradient(
 				ellipse 70% 28% at 20% 35%,
-				color-mix(in oklab, var(--dry-aurora-color-1) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 100%,
+						transparent
+					)
+					0,
 				transparent 62%
 			),
 			radial-gradient(
 				ellipse 50% 40% at 45% 55%,
-				color-mix(in oklab, var(--dry-aurora-color-1) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-1, var(--_aurora-color-1, rgba(167, 139, 250, 0.6))) 100%,
+						transparent
+					)
+					0,
 				transparent 58%
 			);
 	}
@@ -362,12 +417,22 @@
 		background:
 			radial-gradient(
 				ellipse 65% 32% at 72% 28%,
-				color-mix(in oklab, var(--dry-aurora-color-2) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 100%,
+						transparent
+					)
+					0,
 				transparent 60%
 			),
 			radial-gradient(
 				ellipse 55% 36% at 38% 68%,
-				color-mix(in oklab, var(--dry-aurora-color-2) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-2, var(--_aurora-color-2, rgba(56, 189, 248, 0.5))) 100%,
+						transparent
+					)
+					0,
 				transparent 56%
 			);
 	}
@@ -376,12 +441,22 @@
 		background:
 			radial-gradient(
 				ellipse 60% 30% at 58% 78%,
-				color-mix(in oklab, var(--dry-aurora-color-3) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 100%,
+						transparent
+					)
+					0,
 				transparent 64%
 			),
 			radial-gradient(
 				ellipse 48% 38% at 25% 42%,
-				color-mix(in oklab, var(--dry-aurora-color-3) 100%, transparent) 0,
+				color-mix(
+						in oklab,
+						var(--dry-aurora-color-3, var(--_aurora-color-3, rgba(236, 72, 153, 0.42))) 100%,
+						transparent
+					)
+					0,
 				transparent 54%
 			);
 	}

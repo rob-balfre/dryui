@@ -74,7 +74,7 @@
 			--_preset-color,
 			var(--dry-option-picker-preview-bg, var(--dry-color-fill-selected))
 		);
-		--dry-option-picker-preview-color: white;
+		--dry-option-picker-preview-color: var(--dry-option-picker-preview-tint-light, white);
 		--dry-option-picker-preview-border: color-mix(
 			in srgb,
 			var(--_preset-color-resolved) 46%,
@@ -83,13 +83,25 @@
 		--dry-option-picker-preview-size: var(--dry-option-picker-preview-preset-size, 2.75rem);
 		background: linear-gradient(
 			155deg,
-			color-mix(in srgb, white 18%, var(--_preset-color-resolved) 82%) 0%,
+			color-mix(
+					in srgb,
+					var(--dry-option-picker-preview-tint-light, white) 18%,
+					var(--_preset-color-resolved) 82%
+				)
+				0%,
 			var(--_preset-color-resolved) 58%,
-			color-mix(in srgb, black 12%, var(--_preset-color-resolved) 88%) 100%
+			color-mix(
+					in srgb,
+					var(--dry-option-picker-preview-tint-dark, black) 12%,
+					var(--_preset-color-resolved) 88%
+				)
+				100%
 		);
 		box-shadow:
-			inset 0 1px 0 color-mix(in srgb, white 22%, transparent),
-			inset 0 -1px 0 color-mix(in srgb, black 10%, transparent);
+			inset 0 1px 0
+				color-mix(in srgb, var(--dry-option-picker-preview-tint-light, white) 22%, transparent),
+			inset 0 -1px 0
+				color-mix(in srgb, var(--dry-option-picker-preview-tint-dark, black) 10%, transparent);
 		transition: border-radius var(--dry-duration-fast) var(--dry-ease-default);
 	}
 

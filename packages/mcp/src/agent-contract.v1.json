@@ -8115,10 +8115,9 @@
           "default": "12"
         },
         "tint": {
-          "signature": "tint: string | default:'rgba(255",
+          "signature": "tint: string",
           "required": false,
-          "bindable": false,
-          "default": "'rgba(255"
+          "bindable": false
         },
         "saturation": {
           "signature": "saturation: number | default:120",
@@ -8339,10 +8338,9 @@
       ],
       "props": {
         "colors": {
-          "signature": "colors: readonly [string, string, string, string] | default:['#7b68ee'",
+          "signature": "colors: readonly [string, string, string, string]",
           "required": false,
-          "bindable": false,
-          "default": "['#7b68ee'"
+          "bindable": false
         },
         "speed": {
           "signature": "speed: 'slow' | 'normal' | 'fast' | number | default:'normal' | values:slow|normal|fast",
@@ -13162,16 +13160,14 @@
           ]
         },
         "fgColor": {
-          "signature": "fgColor: string | default:'#000'",
+          "signature": "fgColor: string",
           "required": false,
-          "bindable": false,
-          "default": "'#000'"
+          "bindable": false
         },
         "bgColor": {
-          "signature": "bgColor: string | default:'#fff'",
+          "signature": "bgColor: string",
           "required": false,
-          "bindable": false,
-          "default": "'#fff'"
+          "bindable": false
         }
       }
     },
@@ -15408,10 +15404,9 @@
           "default": "26"
         },
         "color": {
-          "signature": "color: string | default:'rgba(59",
+          "signature": "color: string",
           "required": false,
           "bindable": false,
-          "default": "'rgba(59",
           "description": "Semantic color or tone applied to the component."
         },
         "followPointer": {

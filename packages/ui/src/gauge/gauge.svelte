@@ -97,8 +97,8 @@
 	[data-gauge] {
 		/* Component tokens (Tier 3) */
 		--dry-gauge-size: 8rem;
-		--dry-gauge-track-color: var(--dry-color-stroke-weak, #e2e8f0);
-		--dry-gauge-fill-color: var(--dry-color-fill-brand, #3b82f6);
+		--dry-gauge-track-color: var(--dry-color-stroke-weak);
+		--dry-gauge-fill-color: var(--dry-color-fill-brand);
 		--dry-gauge-stroke-width: 8;
 
 		aspect-ratio: 1;

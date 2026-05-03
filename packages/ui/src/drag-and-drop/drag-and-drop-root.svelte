@@ -42,6 +42,8 @@
 	let previewEl: HTMLElement | null = null;
 	let rafId: number | null = null;
 	let isAnimating = false;
+	let liftShadow = '';
+	let dropShadow = '';
 
 	// Cross-list state
 	let crossListTarget: string | null = null;
@@ -161,6 +163,14 @@
 		});
 	}
 
+	function readShadowTokens() {
+		const root = document.documentElement;
+		const md = getComputedStyle(root).getPropertyValue('--dry-shadow-md').trim();
+		const lg = getComputedStyle(root).getPropertyValue('--dry-shadow-lg').trim();
+		liftShadow = lg || '0 24px 48px -12px rgba(0,0,0,0.18), 0 12px 24px -8px rgba(0,0,0,0.1)';
+		dropShadow = md || '0 1px 3px rgba(0,0,0,0.1)';
+	}
+
 	function createPreview() {
 		if (!rootElement || draggedIndex === null) return;
 
@@ -168,6 +178,8 @@
 			`[data-dnd-item][data-index="${draggedIndex}"]`
 		);
 		if (!draggedEl) return;
+
+		readShadowTokens();
 
 		const rect = draggedEl.getBoundingClientRect();
 
@@ -197,7 +209,7 @@
 			pointerEvents: 'none',
 			willChange: 'transform',
 			zIndex: '9999',
-			boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18), 0 12px 24px -8px rgba(0,0,0,0.1)',
+			boxShadow: liftShadow,
 			transition: 'none'
 		});
 
@@ -542,11 +554,11 @@
 				[
 					{
 						transform: `translate3d(${currentDx}px, ${currentDy}px, 0) rotate(3deg) scale(1.04)`,
-						boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18), 0 12px 24px -8px rgba(0,0,0,0.1)'
+						boxShadow: liftShadow
 					},
 					{
 						transform: `translate3d(${finalDx}px, ${finalDy}px, 0) rotate(0deg) scale(1)`,
-						boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+						boxShadow: dropShadow
 					}
 				],
 				{ duration: FLIP_DURATION, easing: FLIP_EASING, fill: 'forwards' }
@@ -660,11 +672,11 @@
 				[
 					{
 						transform: `translate3d(${currentDx}px, ${currentDy}px, 0) rotate(3deg) scale(1.04)`,
-						boxShadow: '0 24px 48px -12px rgba(0,0,0,0.18), 0 12px 24px -8px rgba(0,0,0,0.1)'
+						boxShadow: liftShadow
 					},
 					{
 						transform: `translate3d(${finalDx}px, ${finalDy}px, 0) rotate(0deg) scale(1)`,
-						boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+						boxShadow: dropShadow
 					}
 				],
 				{ duration: FLIP_DURATION, easing: FLIP_EASING, fill: 'forwards' }

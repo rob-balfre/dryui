@@ -264,7 +264,7 @@
 		top: -4px;
 		bottom: -4px;
 		left: var(--_threshold-left, 0%);
-		border-inline-start: 2px solid var(--_threshold-color, var(--dry-color-text-strong, #1a1a2e));
+		border-inline-start: 2px solid var(--_threshold-color, var(--dry-color-text-strong));
 		opacity: 0.3;
 		z-index: 1;
 	}
@@ -273,7 +273,7 @@
 
 	[data-part='label'] {
 		font-size: var(--dry-type-ui-caption-size, var(--dry-text-xs-size, 0.75rem));
-		color: var(--dry-color-text-weak, #64748b);
+		color: var(--dry-color-text-weak);
 		white-space: nowrap;
 		font-variant-numeric: tabular-nums;
 	}

@@ -11,15 +11,16 @@ Phases run top to bottom. Theme work in Phase 0 unblocks everything downstream.
 
 ## Verification (2026-05-04)
 
-Re-verified every item below against the `dryui-rescue` branch source. Net progress since the 2026-04-30 audit:
+Re-verified every item below against the `dryui-rescue` branch source. Net progress:
 
-- Initial state: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
+- Initial audit: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
 - After Phase 0 wave: **6 done, 5 PARTIAL, 96 TODO** out of 107.
+- After Phase 1 wave: **34 done, 5 PARTIAL, 68 TODO** out of 107.
 
 Per phase:
 
-- **Phase 0** (theme files): ✅ 6 of 6 complete. `themes/component-defaults.css` extracted; midnight/aurora/terminal ship full status family; aurora light has overlay-backdrop; purple semantic token row added to every theme. Unblocks Phase 1.12, 1.13.
-- **Phase 1** (color literals): 0 done, 27 TODO. The earlier read on `markdown-renderer:81` was wrong — `[data-markdown-renderer-root] :global { ... }` parens-less form is still in place.
+- **Phase 0** (theme files): ✅ 6 of 6 complete. `themes/component-defaults.css` extracted; midnight/aurora/terminal ship full status family; aurora light has overlay-backdrop; purple semantic token row added to every theme.
+- **Phase 1** (color literals): ✅ 28 of 28 complete. New `--dry-color-glass-tint` palette token added to every theme (consumed by `glass.svelte`); purple row consumed by `badge` and `tag`; markdown-renderer rewritten from parens-less `:global { … }` to per-selector `:global(...)`. New component tokens: `--dry-spotlight-rim-color`, `--dry-chromatic-shift-{r,g,b}`, `--dry-data-grid-pinned-shadow`, `--dry-video-embed-shadow`, `--dry-option-picker-preview-tint-{light,dark}`, `--dry-qr-{bg,fg}`. Drag-and-drop keyframes now read `--dry-shadow-{md,lg}` once at drag-start via `getComputedStyle`.
 - **Phase 2** (root-defaulted tokens): 0 done, 2 partial (`chip-group-root`, `icon`), 27 TODO. `toggle-group-root` still uses bare `[data-size='*']` selectors, not `:where(...)`.
 - **Phase 3** (grid placement seam): 0 done, 1 partial (`avatar` slot path only), 21 TODO. `multi-select-combobox`'s outer `[data-multi-select-wrapper]` is still bare; rest spreads to the inner root.
 - **Phase 4** (token contracts): 0 done, 2 partial (`splitter` z-index only; `textarea` has `--dry-input-*` fallthrough but no namespace), 13 TODO.
@@ -40,34 +41,34 @@ Items annotated `**[partial]**` below have visible movement but do not meet the 
 
 Each is a strict rule-1 violation: a `#hex`, `rgb()`, `rgba()`, `hsl()`, `oklch()`, or bare CSS color keyword in a `<style>` block where it is not effect-internal math.
 
-- [ ] `packages/ui/src/code-block/code-block-button.svelte:168-178, 283, 289-326`: entire syntax theme hardcoded. ~14 hex literals for token-type colors plus root-defaulted surface tokens. Move to `var(--dry-code-token-{keyword,string,…}, <hex>)` consumption pattern and tier into `themes/component-defaults.css` so themes can rebind.
-- [ ] `packages/ui/src/markdown-renderer/markdown-renderer.svelte:81`: replace `[data-markdown-renderer-root] :global { ... }` parens-less form with `:global(...)` per-selector form, scoped to the renderer root. Today the block leaks all descendant element selectors globally.
-- [ ] `packages/ui/src/avatar/avatar.svelte:176`: drop `border: 2px solid var(--dry-color-bg-raised, #ffffff)` literal fallback. The semantic token is universal.
-- [ ] `packages/ui/src/qr-code/qr-code.svelte:93`: drop `--dry-qr-bg: #fff` static default. Paint canvas from the resolved CSS var via `getComputedStyle`. Also fix the JS prop defaults `bgColor = '#fff'` / `fgColor = '#000'` (lines 17-18) to read tokens.
-- [ ] `packages/ui/src/video-embed/video-embed-button.svelte:139, 169`: replace `rgb(15 23 42 / 0.3)` drop-shadow with `var(--dry-shadow-md)`. Drop `#0f0f0f` background fallback (`--dry-color-fill` is universal).
-- [ ] `packages/ui/src/data-grid/data-grid-cell.svelte:30` and `data-grid/data-grid-button-input-column.svelte:209`: replace `box-shadow: 2px 0 4px -2px rgb(15 23 42 / 0.1)` pinned-cell shadows with a new `--dry-data-grid-pinned-shadow` token consuming `var(--dry-shadow-elevation-1, ...)`.
-- [ ] `packages/ui/src/data-grid/data-grid-button-input-column.svelte:261`, `data-grid/data-grid-input-select-all.svelte:50`, `data-grid/data-grid-input-select-cell.svelte:38`: drop `#3b82f6` fallback after `--dry-color-fill-brand` (token cascades reliably).
-- [ ] `packages/ui/src/mega-menu/mega-menu-link.svelte:83-84,93,97,112,123,135` + `mega-menu-panel.svelte:103,105` + `mega-menu-column.svelte:31`: drop `#f3f4f6`, `#e2e8f0`, `#1a1a2e`, `#64748b`, `rgba(0,0,0,0.1)` literal fallbacks inside `var()`.
-- [ ] `packages/ui/src/tour/tour-root.css:12`: replace `color-mix(in srgb, var(--dry-color-fill-brand) 35%, white 25%)` with a token. Add `--dry-color-on-brand` (or new `--dry-color-fill-brand-strong`) and use it in the mix.
-- [ ] `packages/ui/src/tour/tour-root.css:126`: replace `[data-part='prevButton'] { background: transparent; }` with a faint surface token (e.g., `--dry-color-bg-raised` or a new `--dry-color-fill-subtle`).
-- [ ] `packages/ui/src/star-rating/star-rating-root.svelte:55`: replace `--dry-star-rating-color: #f59e0b` with `var(--dry-color-fill-warning)` consumed via `var(--dry-star-rating-color, var(--dry-color-fill-warning))` at the SVG fill site.
-- [ ] `packages/ui/src/badge/badge.svelte:150,195,199,252,254,298`: replace hardcoded `hsl(280, 65%, 55%)` purple variants with `var(--dry-color-fill-purple)` etc. (depends on Phase 0 purple token).
-- [ ] `packages/ui/src/tag/tag-button.svelte:138,183,184,232,233`: same purple replacement.
-- [ ] `packages/ui/src/option-picker/option-picker-preview.svelte:77,86,88,91,92`: replace bare `white` and `black` keywords in gradient stops + inset shadows. Either neutral token references (`var(--dry-color-text-strong)` over `var(--dry-color-bg-raised)`) or new `--dry-option-picker-preview-tint-{light,dark}` tokens consumed at the same sites.
-- [ ] `packages/ui/src/aurora/aurora.svelte:174-176, 186-188, 192-194, 198-200, 204-206, 210-212`: drop the `[data-aurora][data-palette='*']` blocks that root-default `--dry-aurora-color-{1,2,3}: rgba(...)`. Move the rgba literals into `var(--dry-aurora-color-1, rgba(...))` fallbacks at consumption sites (lines 237, 244, 251, 287). Keep palette switching in the `customPalette` JS branch via private `--_aurora-color-*`.
-- [ ] `packages/ui/src/gradient-mesh/gradient-mesh.svelte:23, 98-116, 188-191`: change JS prop default `colors = ['#7b68ee', ...]` to `undefined`. Move `--dry-mesh-color-{1..4}` literals to consumption fallbacks. The `@property` initialValues at 98-116 must stay literal (CSS spec) but the visible defaults should cascade through `var(..., initial)`.
-- [ ] `packages/ui/src/god-rays/god-rays.svelte:17, 88`: change JS `color = 'rgba(255, 255, 255, 0.15)'` to `undefined`. Drop root-defaulted `--dry-rays-color`. Add fallback to consumption gradient stops at lines 41-42.
-- [ ] `packages/ui/src/spotlight/spotlight.svelte:24, 182, 235-236`: change JS `color = 'rgba(59, 130, 246, 0.28)'` to `undefined`. Drop root-defaulted `--dry-spotlight-color`. Expose `--dry-spotlight-rim-color` with `rgba(255,255,255,0.12)` as fallback at lines 235-236.
-- [ ] `packages/ui/src/chromatic-shift/chromatic-shift.svelte:140-142, 147-148`: expose `--dry-chromatic-shift-{r,g,b}` tokens consumed via `var(--name, rgba(...))` so the channel colors theme.
-- [ ] `packages/ui/src/app-frame/app-frame.svelte:85, 89, 93`: replace inline `#ff5f56` / `#ffbd2e` / `#27c93f` traffic-light dot fallbacks with new `--dry-color-traffic-{close,min,max}` palette tokens (or `--dry-app-frame-dot-{close,min,max}` defaulting to those palette tokens).
-- [ ] `packages/ui/src/glass/glass.svelte:14, 45`: drop the JS prop default `tint = 'rgba(255,255,255,0.08)'` and the matching CSS fallback. Add `--dry-color-glass-tint` palette token, then `var(--dry-glass-tint, var(--dry-color-glass-tint, ...))` on consumption.
-- [ ] `packages/ui/src/card/card-root.svelte:98`: drop `#3b82f6` final fallback in the `--dry-card-selected-ring-color` chain. Three-layer cascade already provides it through `--dry-color-fill-brand`.
-- [ ] `packages/ui/src/tooltip/tooltip-content.svelte:58`: decide on the frosted-tooltip effect. Either keep `color-mix(... 95%, transparent)` and document explicitly as a `glass-tooltip` recipe, or default `--dry-tooltip-bg` to a solid `--dry-color-bg-inverse`.
-- [ ] `packages/ui/src/drag-and-drop/drag-and-drop-root.svelte:200, 545, 549, 663, 667`: rgba shadows in JS-applied keyframes bypass the token chain. Read shadow tokens once at drag-start via `getComputedStyle` and pass into Web Animations keyframes.
-- [ ] `packages/ui/src/map/map-marker.svelte:77, 79` + `map-root.svelte:216`: drop raw `#ffffff`, `0 4px 6px -1px rgba(0,0,0,0.1)`, `#e2e8f0` fallbacks behind already-defined semantic tokens.
-- [ ] `packages/ui/src/sparkline/sparkline.svelte:94`: drop `#3b82f6` literal fallback (or replace with `currentColor`).
-- [ ] `packages/ui/src/gauge/gauge.svelte:100, 101`: drop `#e2e8f0` and `#3b82f6` literal fallbacks.
-- [ ] `packages/ui/src/progress/progress.svelte:267, 276`: drop `#1a1a2e` and `#64748b` literal fallbacks.
+- [x] `packages/ui/src/code-block/code-block-button.svelte:168-178, 283, 289-326`: entire syntax theme hardcoded. ~14 hex literals for token-type colors plus root-defaulted surface tokens. Move to `var(--dry-code-token-{keyword,string,…}, <hex>)` consumption pattern and tier into `themes/component-defaults.css` so themes can rebind.
+- [x] `packages/ui/src/markdown-renderer/markdown-renderer.svelte:81`: replace `[data-markdown-renderer-root] :global { ... }` parens-less form with `:global(...)` per-selector form, scoped to the renderer root. Today the block leaks all descendant element selectors globally.
+- [x] `packages/ui/src/avatar/avatar.svelte:176`: drop `border: 2px solid var(--dry-color-bg-raised, #ffffff)` literal fallback. The semantic token is universal.
+- [x] `packages/ui/src/qr-code/qr-code.svelte:93`: drop `--dry-qr-bg: #fff` static default. Paint canvas from the resolved CSS var via `getComputedStyle`. Also fix the JS prop defaults `bgColor = '#fff'` / `fgColor = '#000'` (lines 17-18) to read tokens.
+- [x] `packages/ui/src/video-embed/video-embed-button.svelte:139, 169`: replace `rgb(15 23 42 / 0.3)` drop-shadow with `var(--dry-shadow-md)`. Drop `#0f0f0f` background fallback (`--dry-color-fill` is universal).
+- [x] `packages/ui/src/data-grid/data-grid-cell.svelte:30` and `data-grid/data-grid-button-input-column.svelte:209`: replace `box-shadow: 2px 0 4px -2px rgb(15 23 42 / 0.1)` pinned-cell shadows with a new `--dry-data-grid-pinned-shadow` token consuming `var(--dry-shadow-elevation-1, ...)`.
+- [x] `packages/ui/src/data-grid/data-grid-button-input-column.svelte:261`, `data-grid/data-grid-input-select-all.svelte:50`, `data-grid/data-grid-input-select-cell.svelte:38`: drop `#3b82f6` fallback after `--dry-color-fill-brand` (token cascades reliably).
+- [x] `packages/ui/src/mega-menu/mega-menu-link.svelte:83-84,93,97,112,123,135` + `mega-menu-panel.svelte:103,105` + `mega-menu-column.svelte:31`: drop `#f3f4f6`, `#e2e8f0`, `#1a1a2e`, `#64748b`, `rgba(0,0,0,0.1)` literal fallbacks inside `var()`.
+- [x] `packages/ui/src/tour/tour-root.css:12`: replace `color-mix(in srgb, var(--dry-color-fill-brand) 35%, white 25%)` with a token. Add `--dry-color-on-brand` (or new `--dry-color-fill-brand-strong`) and use it in the mix.
+- [x] `packages/ui/src/tour/tour-root.css:126`: replace `[data-part='prevButton'] { background: transparent; }` with a faint surface token (e.g., `--dry-color-bg-raised` or a new `--dry-color-fill-subtle`).
+- [x] `packages/ui/src/star-rating/star-rating-root.svelte:55`: replace `--dry-star-rating-color: #f59e0b` with `var(--dry-color-fill-warning)` consumed via `var(--dry-star-rating-color, var(--dry-color-fill-warning))` at the SVG fill site.
+- [x] `packages/ui/src/badge/badge.svelte:150,195,199,252,254,298`: replace hardcoded `hsl(280, 65%, 55%)` purple variants with `var(--dry-color-fill-purple)` etc. (depends on Phase 0 purple token).
+- [x] `packages/ui/src/tag/tag-button.svelte:138,183,184,232,233`: same purple replacement.
+- [x] `packages/ui/src/option-picker/option-picker-preview.svelte:77,86,88,91,92`: replace bare `white` and `black` keywords in gradient stops + inset shadows. Either neutral token references (`var(--dry-color-text-strong)` over `var(--dry-color-bg-raised)`) or new `--dry-option-picker-preview-tint-{light,dark}` tokens consumed at the same sites.
+- [x] `packages/ui/src/aurora/aurora.svelte:174-176, 186-188, 192-194, 198-200, 204-206, 210-212`: drop the `[data-aurora][data-palette='*']` blocks that root-default `--dry-aurora-color-{1,2,3}: rgba(...)`. Move the rgba literals into `var(--dry-aurora-color-1, rgba(...))` fallbacks at consumption sites (lines 237, 244, 251, 287). Keep palette switching in the `customPalette` JS branch via private `--_aurora-color-*`.
+- [x] `packages/ui/src/gradient-mesh/gradient-mesh.svelte:23, 98-116, 188-191`: change JS prop default `colors = ['#7b68ee', ...]` to `undefined`. Move `--dry-mesh-color-{1..4}` literals to consumption fallbacks. The `@property` initialValues at 98-116 must stay literal (CSS spec) but the visible defaults should cascade through `var(..., initial)`.
+- [x] `packages/ui/src/god-rays/god-rays.svelte:17, 88`: change JS `color = 'rgba(255, 255, 255, 0.15)'` to `undefined`. Drop root-defaulted `--dry-rays-color`. Add fallback to consumption gradient stops at lines 41-42.
+- [x] `packages/ui/src/spotlight/spotlight.svelte:24, 182, 235-236`: change JS `color = 'rgba(59, 130, 246, 0.28)'` to `undefined`. Drop root-defaulted `--dry-spotlight-color`. Expose `--dry-spotlight-rim-color` with `rgba(255,255,255,0.12)` as fallback at lines 235-236.
+- [x] `packages/ui/src/chromatic-shift/chromatic-shift.svelte:140-142, 147-148`: expose `--dry-chromatic-shift-{r,g,b}` tokens consumed via `var(--name, rgba(...))` so the channel colors theme.
+- [x] `packages/ui/src/app-frame/app-frame.svelte:85, 89, 93`: replace inline `#ff5f56` / `#ffbd2e` / `#27c93f` traffic-light dot fallbacks with new `--dry-color-traffic-{close,min,max}` palette tokens (or `--dry-app-frame-dot-{close,min,max}` defaulting to those palette tokens).
+- [x] `packages/ui/src/glass/glass.svelte:14, 45`: drop the JS prop default `tint = 'rgba(255,255,255,0.08)'` and the matching CSS fallback. Add `--dry-color-glass-tint` palette token, then `var(--dry-glass-tint, var(--dry-color-glass-tint, ...))` on consumption.
+- [x] `packages/ui/src/card/card-root.svelte:98`: drop `#3b82f6` final fallback in the `--dry-card-selected-ring-color` chain. Three-layer cascade already provides it through `--dry-color-fill-brand`.
+- [x] `packages/ui/src/tooltip/tooltip-content.svelte:58`: decide on the frosted-tooltip effect. Either keep `color-mix(... 95%, transparent)` and document explicitly as a `glass-tooltip` recipe, or default `--dry-tooltip-bg` to a solid `--dry-color-bg-inverse`.
+- [x] `packages/ui/src/drag-and-drop/drag-and-drop-root.svelte:200, 545, 549, 663, 667`: rgba shadows in JS-applied keyframes bypass the token chain. Read shadow tokens once at drag-start via `getComputedStyle` and pass into Web Animations keyframes.
+- [x] `packages/ui/src/map/map-marker.svelte:77, 79` + `map-root.svelte:216`: drop raw `#ffffff`, `0 4px 6px -1px rgba(0,0,0,0.1)`, `#e2e8f0` fallbacks behind already-defined semantic tokens.
+- [x] `packages/ui/src/sparkline/sparkline.svelte:94`: drop `#3b82f6` literal fallback (or replace with `currentColor`).
+- [x] `packages/ui/src/gauge/gauge.svelte:100, 101`: drop `#e2e8f0` and `#3b82f6` literal fallbacks.
+- [x] `packages/ui/src/progress/progress.svelte:267, 276`: drop `#1a1a2e` and `#64748b` literal fallbacks.
 
 ## Phase 2. Root-defaulted token violations (block, per `feedback_css_var_defaults` rule)
 

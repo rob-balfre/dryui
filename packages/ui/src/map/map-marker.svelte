@@ -74,9 +74,9 @@
 
 <style>
 	[data-part='marker-content'] {
-		background: var(--dry-color-bg-raised, #ffffff);
+		background: var(--dry-color-bg-raised);
 		border-radius: var(--dry-radius-md, 0.375rem);
-		box-shadow: var(--dry-shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+		box-shadow: var(--dry-shadow-md);
 		padding: var(--dry-space-2, 0.5rem);
 		cursor: pointer;
 	}

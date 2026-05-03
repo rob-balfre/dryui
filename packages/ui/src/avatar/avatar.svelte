@@ -173,7 +173,7 @@
 		aspect-ratio: 1;
 		height: var(--dry-avatar-status-size, 0.625rem);
 		border-radius: 50%;
-		border: 2px solid var(--dry-color-bg-raised, #ffffff);
+		border: 2px solid var(--dry-color-bg-raised);
 		z-index: 1;
 	}
 

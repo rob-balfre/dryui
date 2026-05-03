@@ -47,6 +47,6 @@
 		aspect-ratio: 1;
 		height: 1rem;
 		cursor: pointer;
-		accent-color: var(--dry-color-fill-brand, #3b82f6);
+		accent-color: var(--dry-color-fill-brand);
 	}
 </style>

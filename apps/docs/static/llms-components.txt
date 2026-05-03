@@ -1585,7 +1585,7 @@ Root import: import { Aurora } from '@dryui/ui'
 Subpath import: import { Aurora } from '@dryui/ui/aurora'
 Props: palette (AuroraNamedPalette | readonly [string, string, string]), default 'cosmic' | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | motion ('auto' | 'never'), accepted auto, never, default 'auto' | intensity (number), default 80 | waviness (number), default 50 | colorSpace ('srgb' | 'oklch' | 'oklab'), accepted srgb, oklch, oklab, default 'srgb' | blendMode (BlendMode) | layerOpacity (number) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-aurora-angle, --dry-aurora-color-1, --dry-aurora-color-2, --dry-aurora-color-3, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
+CSS variables: --dry-aurora-angle, --dry-aurora-duration, --dry-aurora-intensity, --dry-aurora-shift, --dry-aurora-surface, --dry-aurora-waviness
 Data attributes: data-animated | data-aurora | data-aurora-backdrop | data-aurora-content | data-aurora-layer | data-color-space | data-layer | data-palette | data-reduced-motion
 Accessibility: This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks. | Only add landmark or region semantics when the section has a unique, meaningful label.
 Example:
@@ -3486,9 +3486,9 @@ Tags: spotlight, pointer, hover, surface, motion
 Kind: simple
 Root import: import { Spotlight } from '@dryui/ui'
 Subpath import: import { Spotlight } from '@dryui/ui/spotlight'
-Props: radius (number), default 260 | intensity (number), default 26 | color (string), Semantic color or tone applied to the component., default 'rgba(59 | followPointer (boolean), default true | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
+Props: radius (number), default 260 | intensity (number), default 26 | color (string), Semantic color or tone applied to the component. | followPointer (boolean), default true | blendMode (BlendMode) | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-spotlight-color, --dry-spotlight-intensity, --dry-spotlight-radius, --dry-spotlight-x, --dry-spotlight-y
+CSS variables: --dry-spotlight-intensity, --dry-spotlight-radius, --dry-spotlight-x, --dry-spotlight-y
 Data attributes: data-active (Present on the active item or current target within the component.) | data-follow-pointer | data-spotlight | data-static
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3524,9 +3524,9 @@ Tags: qr, code, barcode, canvas, generate
 Kind: simple
 Root import: import { QRCode } from '@dryui/ui'
 Subpath import: import { QRCode } from '@dryui/ui/qr-code'
-Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string), default '#000' | bgColor (string), default '#fff'
+Props: value (string), Current controlled or bindable value., required | size (number), Size preset affecting density, spacing, or typography., default 200 | errorCorrection ('L' | 'M' | 'Q' | 'H'), accepted L, M, Q, H, default 'M' | fgColor (string) | bgColor (string)
 Native props: Forwards <canvas> attributes via rest props.
-CSS variables: --dry-qr-bg, --dry-qr-border, --dry-qr-padding, --dry-qr-radius, --dry-qr-size
+CSS variables: --dry-qr-border, --dry-qr-padding, --dry-qr-radius, --dry-qr-size
 Data attributes: data-qr-canvas | data-qr-code | data-qr-wrapper | data-value
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3543,7 +3543,7 @@ Root import: import { CodeBlock } from '@dryui/ui'
 Subpath import: import { CodeBlock } from '@dryui/ui/code-block'
 Props: showLineNumbers (boolean), default false | showCopyButton (boolean), default true | linkResolver ((text: string, type: string) => string) | code (string), default '', required | language (string) | shell (Snippet<[CodeBlockShellContext]>) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <element> attributes via rest props.
-CSS variables: --dry-btn-color, --dry-code-bg, --dry-code-border, --dry-code-color, --dry-code-copy-color, --dry-code-copy-hover-color, --dry-code-font-size, --dry-code-header-bg, --dry-code-header-color, --dry-code-line-height, --dry-code-padding, --dry-code-radius
+CSS variables: --dry-btn-color, --dry-code-font-size, --dry-code-line-height, --dry-code-padding, --dry-code-radius
 Data attributes: data-code-block | data-code-block-code | data-code-block-copy | data-code-block-header | data-code-block-language | data-code-block-line-content | data-code-block-line-number | data-code-block-pre | data-code-block-token-link | data-copied | data-language | data-single-line | data-token-type
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -3991,7 +3991,7 @@ Parts:
   Native props: Forwards <div> attributes via rest props.
 Structure:
   StarRating.Root
-CSS variables: --dry-star-rating-color, --dry-star-rating-size
+CSS variables: --dry-star-rating-size
 Data attributes: data-label | data-size | data-star | data-star-rating | data-stars
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
@@ -4689,7 +4689,7 @@ Tags: glass, blur, frosted, surface, translucent
 Kind: simple
 Root import: import { Glass } from '@dryui/ui'
 Subpath import: import { Glass } from '@dryui/ui/glass'
-Props: blur (number), default 12 | tint (string), default 'rgba(255 | saturation (number), default 120 | children (Snippet), Content rendered inside the component., required
+Props: blur (number), default 12 | tint (string) | saturation (number), default 120 | children (Snippet), Content rendered inside the component., required
 Native props: Forwards <div> attributes via rest props.
 CSS variables: none
 Data attributes: data-glass
@@ -4708,7 +4708,7 @@ Root import: import { GodRays } from '@dryui/ui'
 Subpath import: import { GodRays } from '@dryui/ui/god-rays'
 Props: color (string), Semantic color or tone applied to the component. | rayCount (number) | intensity (number) | center ({ x: number; y: number }) | speed (number) | blendMode (BlendMode) | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
-CSS variables: --dry-rays-blend, --dry-rays-color, --dry-rays-cx, --dry-rays-cy, --dry-rays-intensity, --dry-rays-speed
+CSS variables: --dry-rays-blend, --dry-rays-cx, --dry-rays-cy, --dry-rays-intensity, --dry-rays-speed
 Data attributes: data-animated | data-god-rays | data-god-rays-layer | data-offscreen
 Accessibility: Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone. | Respect reduced-motion and contrast requirements when animation or filtering is enabled.
 Example:
@@ -4723,7 +4723,7 @@ Tags: gradient, mesh, background, animation, interactive, color
 Kind: simple
 Root import: import { GradientMesh } from '@dryui/ui'
 Subpath import: import { GradientMesh } from '@dryui/ui/gradient-mesh'
-Props: colors (readonly [string, string, string, string]), default ['#7b68ee' | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
+Props: colors (readonly [string, string, string, string]) | speed ('slow' | 'normal' | 'fast' | number), accepted slow, normal, fast, default 'normal' | interactive (boolean), default false | children (Snippet), Content rendered inside the component.
 Native props: Forwards <div> attributes via rest props.
 CSS variables: --dry-mesh-color-1, --dry-mesh-color-2, --dry-mesh-color-3, --dry-mesh-color-4, --dry-mesh-duration, --dry-mesh-pointer-x, --dry-mesh-pointer-y
 Data attributes: data-animated | data-gradient-mesh | data-gradient-mesh-content | data-interactive | data-paused | data-reduced-motion

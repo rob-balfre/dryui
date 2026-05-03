@@ -78,142 +78,140 @@
 		color: var(--dry-markdown-color);
 	}
 
-	[data-markdown-renderer-root] :global {
-		/* ── Headings ─────────────────────────────────────────────────────────────── */
+	/* ── Headings ─────────────────────────────────────────────────────────────── */
 
-		h1,
-		h2,
-		h3,
-		h4,
-		h5,
-		h6 {
-			color: var(--dry-markdown-heading-color);
-			font-weight: 600;
-			line-height: 1.25;
-			margin-top: 1.5em;
-			margin-bottom: 0.5em;
-		}
+	[data-markdown-renderer-root] :global(h1),
+	[data-markdown-renderer-root] :global(h2),
+	[data-markdown-renderer-root] :global(h3),
+	[data-markdown-renderer-root] :global(h4),
+	[data-markdown-renderer-root] :global(h5),
+	[data-markdown-renderer-root] :global(h6) {
+		color: var(--dry-markdown-heading-color);
+		font-weight: 600;
+		line-height: 1.25;
+		margin-top: 1.5em;
+		margin-bottom: 0.5em;
+	}
 
-		h1 {
-			font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
-			margin-top: 0;
-		}
+	[data-markdown-renderer-root] :global(h1) {
+		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+		margin-top: 0;
+	}
 
-		h2 {
-			font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
-			padding-bottom: 0.25em;
-			border-bottom: 1px solid var(--dry-markdown-hr-color);
-		}
+	[data-markdown-renderer-root] :global(h2) {
+		font-size: var(--dry-type-heading-2-size, var(--dry-type-heading-2-size));
+		padding-bottom: 0.25em;
+		border-bottom: 1px solid var(--dry-markdown-hr-color);
+	}
 
-		h3 {
-			font-size: var(--dry-type-heading-3-size, var(--dry-type-heading-3-size));
-		}
+	[data-markdown-renderer-root] :global(h3) {
+		font-size: var(--dry-type-heading-3-size, var(--dry-type-heading-3-size));
+	}
 
-		h4 {
-			font-size: var(--dry-type-heading-4-size, var(--dry-type-heading-4-size));
-		}
+	[data-markdown-renderer-root] :global(h4) {
+		font-size: var(--dry-type-heading-4-size, var(--dry-type-heading-4-size));
+	}
 
-		h5 {
-			font-size: var(--dry-markdown-font-size);
-		}
+	[data-markdown-renderer-root] :global(h5) {
+		font-size: var(--dry-markdown-font-size);
+	}
 
-		h6 {
-			font-size: var(--dry-type-small-size, var(--dry-type-small-size));
-			color: var(--dry-color-text-weak);
-		}
+	[data-markdown-renderer-root] :global(h6) {
+		font-size: var(--dry-type-small-size, var(--dry-type-small-size));
+		color: var(--dry-color-text-weak);
+	}
 
-		/* ── Paragraph ────────────────────────────────────────────────────────────── */
+	/* ── Paragraph ────────────────────────────────────────────────────────────── */
 
-		p {
-			margin-top: 0;
-			margin-bottom: 1em;
-		}
+	[data-markdown-renderer-root] :global(p) {
+		margin-top: 0;
+		margin-bottom: 1em;
+	}
 
-		/* ── Links ────────────────────────────────────────────────────────────────── */
+	/* ── Links ────────────────────────────────────────────────────────────────── */
 
-		a {
-			color: var(--dry-markdown-link-color);
-			text-decoration: underline;
-			text-underline-offset: 2px;
+	[data-markdown-renderer-root] :global(a) {
+		color: var(--dry-markdown-link-color);
+		text-decoration: underline;
+		text-underline-offset: 2px;
+	}
 
-			&:hover {
-				color: var(--dry-markdown-link-hover-color);
-			}
-		}
+	[data-markdown-renderer-root] :global(a:hover) {
+		color: var(--dry-markdown-link-hover-color);
+	}
 
-		/* ── Images ───────────────────────────────────────────────────────────────── */
+	/* ── Images ───────────────────────────────────────────────────────────────── */
 
-		img {
-			height: auto;
-			border-radius: var(--dry-radius-md);
-			margin-top: 0.5em;
-			margin-bottom: 0.5em;
-		}
+	[data-markdown-renderer-root] :global(img) {
+		height: auto;
+		border-radius: var(--dry-radius-md);
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
+	}
 
-		/* ── Lists ────────────────────────────────────────────────────────────────── */
+	/* ── Lists ────────────────────────────────────────────────────────────────── */
 
-		ul,
-		ol {
-			margin-top: 0;
-			margin-bottom: 1em;
-			padding-left: 1.5em;
-		}
+	[data-markdown-renderer-root] :global(ul),
+	[data-markdown-renderer-root] :global(ol) {
+		margin-top: 0;
+		margin-bottom: 1em;
+		padding-left: 1.5em;
+	}
 
-		li {
-			margin-bottom: 0.25em;
-		}
+	[data-markdown-renderer-root] :global(li) {
+		margin-bottom: 0.25em;
+	}
 
-		ul {
-			list-style-type: disc;
-		}
+	[data-markdown-renderer-root] :global(ul) {
+		list-style-type: disc;
+	}
 
-		ol {
-			list-style-type: decimal;
-		}
+	[data-markdown-renderer-root] :global(ol) {
+		list-style-type: decimal;
+	}
 
-		/* ── Blockquotes ──────────────────────────────────────────────────────────── */
+	/* ── Blockquotes ──────────────────────────────────────────────────────────── */
 
-		blockquote {
-			margin: 0 0 1em 0;
-			padding: var(--dry-space-2) var(--dry-space-4);
-			border-left: 3px solid var(--dry-markdown-blockquote-border);
-			color: var(--dry-markdown-blockquote-color);
-		}
+	[data-markdown-renderer-root] :global(blockquote) {
+		margin: 0 0 1em 0;
+		padding: var(--dry-space-2) var(--dry-space-4);
+		border-left: 3px solid var(--dry-markdown-blockquote-border);
+		color: var(--dry-markdown-blockquote-color);
+	}
 
-		blockquote p:last-child {
-			margin-bottom: 0;
-		}
+	[data-markdown-renderer-root] :global(blockquote p:last-child) {
+		margin-bottom: 0;
+	}
 
-		/* ── Inline code ──────────────────────────────────────────────────────────── */
+	/* ── Inline code ──────────────────────────────────────────────────────────── */
 
-		code {
-			font-family: var(--dry-font-mono);
-			font-size: 0.875em;
-			padding: 0.125em 0.375em;
-			background: var(--dry-markdown-code-bg);
-			color: var(--dry-markdown-code-color);
-			border: 1px solid var(--dry-markdown-code-border);
-			border-radius: var(--dry-radius-sm);
-		}
+	[data-markdown-renderer-root] :global(code) {
+		font-family: var(--dry-font-mono);
+		font-size: 0.875em;
+		padding: 0.125em 0.375em;
+		background: var(--dry-markdown-code-bg);
+		color: var(--dry-markdown-code-color);
+		border: 1px solid var(--dry-markdown-code-border);
+		border-radius: var(--dry-radius-sm);
+	}
 
-		/* Reset inline code styles inside CodeBlock */
-		[data-code-block] code {
-			padding: 0;
-			background: none;
-			color: inherit;
-			border: none;
-			border-radius: 0;
-		}
+	/* Reset inline code styles inside CodeBlock */
+	[data-markdown-renderer-root] :global([data-code-block] code) {
+		padding: 0;
+		background: none;
+		color: inherit;
+		border: none;
+		border-radius: 0;
+	}
 
-		/* ── Strong & Em ──────────────────────────────────────────────────────────── */
+	/* ── Strong & Em ──────────────────────────────────────────────────────────── */
 
-		strong {
-			font-weight: 600;
-			color: var(--dry-markdown-heading-color);
-		}
+	[data-markdown-renderer-root] :global(strong) {
+		font-weight: 600;
+		color: var(--dry-markdown-heading-color);
+	}
 
-		em {
-			font-style: italic;
-		}
+	[data-markdown-renderer-root] :global(em) {
+		font-style: italic;
 	}
 </style>

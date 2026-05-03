@@ -52,7 +52,6 @@
 
 <style>
 	[data-star-rating] {
-		--dry-star-rating-color: #f59e0b;
 		--dry-star-rating-size: 1.25rem;
 
 		display: inline-grid;
@@ -85,8 +84,8 @@
 	}
 
 	[data-star='filled'] {
-		fill: var(--dry-star-rating-color);
-		stroke: var(--dry-star-rating-color);
+		fill: var(--dry-star-rating-color, var(--dry-color-fill-warning));
+		stroke: var(--dry-star-rating-color, var(--dry-color-fill-warning));
 		stroke-width: 1;
 	}
 
@@ -98,7 +97,7 @@
 
 	[data-star='outlined-active'] {
 		fill: none;
-		stroke: var(--dry-star-rating-color);
+		stroke: var(--dry-star-rating-color, var(--dry-color-fill-warning));
 		stroke-width: 1.5;
 	}
 

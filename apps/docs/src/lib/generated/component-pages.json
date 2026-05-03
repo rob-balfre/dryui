@@ -16013,8 +16013,7 @@
           "color": {
             "type": "string",
             "required": false,
-            "description": "Semantic color or tone applied to the component.",
-            "default": "'rgba(59"
+            "description": "Semantic color or tone applied to the component."
           },
           "followPointer": {
             "type": "boolean",
@@ -16047,7 +16046,6 @@
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
         "cssVars": {
-          "--dry-spotlight-color": "Text color",
           "--dry-spotlight-intensity": "Intensity",
           "--dry-spotlight-radius": "Border radius",
           "--dry-spotlight-x": "X",
@@ -16194,9 +16192,6 @@
         ],
         "cssVars": {
           "--dry-aurora-angle": "Angle",
-          "--dry-aurora-color-1": "Color 1",
-          "--dry-aurora-color-2": "Color 2",
-          "--dry-aurora-color-3": "Color 3",
           "--dry-aurora-duration": "Duration",
           "--dry-aurora-intensity": "Intensity",
           "--dry-aurora-shift": "Shift",
@@ -16733,13 +16728,11 @@
           },
           "fgColor": {
             "type": "string",
-            "required": false,
-            "default": "'#000'"
+            "required": false
           },
           "bgColor": {
             "type": "string",
-            "required": false,
-            "default": "'#fff'"
+            "required": false
           }
         },
         "forwardedProps": {
@@ -16758,7 +16751,6 @@
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
         "cssVars": {
-          "--dry-qr-bg": "Background color",
           "--dry-qr-border": "Border color",
           "--dry-qr-padding": "Padding",
           "--dry-qr-radius": "Border radius",
@@ -16867,14 +16859,7 @@
         ],
         "cssVars": {
           "--dry-btn-color": "Text color",
-          "--dry-code-bg": "Background color",
-          "--dry-code-border": "Border color",
-          "--dry-code-color": "Text color",
-          "--dry-code-copy-color": "Copy Color",
-          "--dry-code-copy-hover-color": "Copy Hover Color",
           "--dry-code-font-size": "Font size",
-          "--dry-code-header-bg": "Header Bg",
-          "--dry-code-header-color": "Header Color",
           "--dry-code-line-height": "Line Height",
           "--dry-code-padding": "Padding",
           "--dry-code-radius": "Border radius"
@@ -23090,8 +23075,7 @@
           },
           "tint": {
             "type": "string",
-            "required": false,
-            "default": "'rgba(255"
+            "required": false
           },
           "saturation": {
             "type": "number",
@@ -23191,7 +23175,6 @@
         ],
         "cssVars": {
           "--dry-rays-blend": "Blend",
-          "--dry-rays-color": "Text color",
           "--dry-rays-cx": "Cx",
           "--dry-rays-cy": "Cy",
           "--dry-rays-intensity": "Intensity",
@@ -23265,8 +23248,7 @@
         "props": {
           "colors": {
             "type": "readonly [string, string, string, string]",
-            "required": false,
-            "default": "['#7b68ee'"
+            "required": false
           },
           "speed": {
             "type": "'slow' | 'normal' | 'fast' | number",
@@ -23737,7 +23719,6 @@
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
         "cssVars": {
-          "--dry-star-rating-color": "Rating Color",
           "--dry-star-rating-size": "Rating Size"
         },
         "dataAttributes": [

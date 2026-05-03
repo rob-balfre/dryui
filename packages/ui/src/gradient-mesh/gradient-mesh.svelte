@@ -19,7 +19,7 @@
 	}
 
 	let {
-		colors = ['#7b68ee', '#38bdf8', '#f472b6', '#4ade80'] as const,
+		colors,
 		speed = 'normal',
 		interactive = false,
 		children: childSnippet,
@@ -152,10 +152,14 @@
 	$effect(() => {
 		if (!element) return;
 		element.style.cssText = style || '';
-		element.style.setProperty('--dry-mesh-color-1', colors[0]);
-		element.style.setProperty('--dry-mesh-color-2', colors[1]);
-		element.style.setProperty('--dry-mesh-color-3', colors[2]);
-		element.style.setProperty('--dry-mesh-color-4', colors[3]);
+		if (colors?.[0]) element.style.setProperty('--dry-mesh-color-1', colors[0]);
+		else element.style.removeProperty('--dry-mesh-color-1');
+		if (colors?.[1]) element.style.setProperty('--dry-mesh-color-2', colors[1]);
+		else element.style.removeProperty('--dry-mesh-color-2');
+		if (colors?.[2]) element.style.setProperty('--dry-mesh-color-3', colors[2]);
+		else element.style.removeProperty('--dry-mesh-color-3');
+		if (colors?.[3]) element.style.setProperty('--dry-mesh-color-4', colors[3]);
+		else element.style.removeProperty('--dry-mesh-color-4');
 		element.style.setProperty('--dry-mesh-duration', speedDuration);
 		element.style.setProperty('--dry-mesh-pointer-x', pointerX);
 		element.style.setProperty('--dry-mesh-pointer-y', pointerY);
@@ -184,10 +188,6 @@
 <style>
 	[data-gradient-mesh] {
 		--dry-mesh-duration: 12s;
-		--dry-mesh-color-1: #7b68ee;
-		--dry-mesh-color-2: #38bdf8;
-		--dry-mesh-color-3: #f472b6;
-		--dry-mesh-color-4: #4ade80;
 		--dry-mesh-pointer-x: 50%;
 		--dry-mesh-pointer-y: 50%;
 
@@ -196,10 +196,22 @@
 		overflow: hidden;
 		border-radius: inherit;
 		background:
-			radial-gradient(ellipse 60% 50% at 20% 20%, var(--dry-mesh-color-1), transparent 70%),
-			radial-gradient(ellipse 50% 60% at 80% 20%, var(--dry-mesh-color-2), transparent 70%),
-			radial-gradient(ellipse 55% 55% at 70% 80%, var(--dry-mesh-color-3), transparent 70%),
-			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4), transparent 70%);
+			radial-gradient(
+				ellipse 60% 50% at 20% 20%,
+				var(--dry-mesh-color-1, #7b68ee),
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 50% 60% at 80% 20%,
+				var(--dry-mesh-color-2, #38bdf8),
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 55% 55% at 70% 80%,
+				var(--dry-mesh-color-3, #f472b6),
+				transparent 70%
+			),
+			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4, #4ade80), transparent 70%);
 	}
 
 	/* Static fallback without @property */
@@ -207,10 +219,10 @@
 		[data-gradient-mesh]:not([data-animated]) {
 			background: linear-gradient(
 				135deg,
-				var(--dry-mesh-color-1) 0%,
-				var(--dry-mesh-color-2) 33%,
-				var(--dry-mesh-color-3) 66%,
-				var(--dry-mesh-color-4) 100%
+				var(--dry-mesh-color-1, #7b68ee) 0%,
+				var(--dry-mesh-color-2, #38bdf8) 33%,
+				var(--dry-mesh-color-3, #f472b6) 66%,
+				var(--dry-mesh-color-4, #4ade80) 100%
 			);
 		}
 	}
@@ -227,12 +239,20 @@
 		background:
 			radial-gradient(
 				ellipse 60% 50% at var(--dry-mesh-pointer-x) var(--dry-mesh-pointer-y),
-				var(--dry-mesh-color-1),
+				var(--dry-mesh-color-1, #7b68ee),
 				transparent 70%
 			),
-			radial-gradient(ellipse 50% 60% at 80% 20%, var(--dry-mesh-color-2), transparent 70%),
-			radial-gradient(ellipse 55% 55% at 70% 80%, var(--dry-mesh-color-3), transparent 70%),
-			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4), transparent 70%);
+			radial-gradient(
+				ellipse 50% 60% at 80% 20%,
+				var(--dry-mesh-color-2, #38bdf8),
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 55% 55% at 70% 80%,
+				var(--dry-mesh-color-3, #f472b6),
+				transparent 70%
+			),
+			radial-gradient(ellipse 50% 50% at 25% 75%, var(--dry-mesh-color-4, #4ade80), transparent 70%);
 	}
 
 	[data-gradient-mesh][data-reduced-motion] {
