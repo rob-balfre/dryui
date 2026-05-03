@@ -16,14 +16,15 @@ Re-verified every item below against the `dryui-rescue` branch source. Net progr
 - Initial audit: **0 items strictly done, 6 PARTIAL, 101 still TODO out of 107.**
 - After Phase 0 wave: **6 done, 5 PARTIAL, 96 TODO** out of 107.
 - After Phase 1 wave: **34 done, 5 PARTIAL, 68 TODO** out of 107.
-- After Phase 2 wave: **61 done, 0 PARTIAL, 41 TODO** out of 107 (skipping the 5 redundant overlap items still surfaced under variant blocks of `option-picker-item` that the audit lists out of scope here).
+- After Phase 2 wave: **61 done, 0 PARTIAL, 41 TODO** out of 107.
+- After Phase 3 wave: **81 done, 0 PARTIAL, 21 TODO** out of 107.
 
 Per phase:
 
 - **Phase 0** (theme files): ✅ 6 of 6 complete. `themes/component-defaults.css` extracted; midnight/aurora/terminal ship full status family; aurora light has overlay-backdrop; purple semantic token row added to every theme.
 - **Phase 1** (color literals): ✅ 28 of 28 complete. New `--dry-color-glass-tint` palette token added to every theme (consumed by `glass.svelte`); purple row consumed by `badge` and `tag`; markdown-renderer rewritten from parens-less `:global { … }` to per-selector `:global(...)`. New component tokens: `--dry-spotlight-rim-color`, `--dry-chromatic-shift-{r,g,b}`, `--dry-data-grid-pinned-shadow`, `--dry-video-embed-shadow`, `--dry-option-picker-preview-tint-{light,dark}`, `--dry-qr-{bg,fg}`. Drag-and-drop keyframes now read `--dry-shadow-{md,lg}` once at drag-start via `getComputedStyle`.
 - **Phase 2** (root-defaulted tokens): ✅ 27 of 27 complete. Either delete-root-block + inline-default at consumption (most items) or private-default pattern (`checkbox-input`, `file-upload-dropzone`, `button-group`, `chip-group-root`, `icon`, `tag-button`, `logo-mark`) where state/variant selectors needed to keep populating a default that consumer parents can still override. `toggle-group-root` size variants are now wrapped in `:where(...)` so consumer style overrides win the cascade. `button-group` required cross-file fallback updates to `button.svelte` (8 sites) so deleting button-group's leading block didn't produce empty `var()` resolutions on grouped buttons. `segmented-control-root` tokens turned out to be dead code (zero consumers); just deleted the block.
-- **Phase 3** (grid placement seam): 0 done, 1 partial (`avatar` slot path only), 21 TODO. `multi-select-combobox`'s outer `[data-multi-select-wrapper]` is still bare; rest spreads to the inner root.
+- **Phase 3** (grid placement seam): ✅ 20 of 20 complete. Outer wrapper now receives `class={className} {...rest}` on every component; Props interfaces extend `HTMLAttributes<HTMLXxxElement>`. Form-control wrappers (input, textarea, number-input-button, radio-group-item-input) split out input-specific event handlers via `Omit<HTMLAttributes, 'oninput' | …>` to avoid variance errors when re-typing handlers on the inner input. `qr-code` Props switched from `<HTMLCanvasElement>` to `<HTMLDivElement>` so the layout-participant wrapper is what carries `--dry-grid-area-name`. `avatar` slot-and-no-slot branches both forward to the outer wrapper now.
 - **Phase 4** (token contracts): 0 done, 2 partial (`splitter` z-index only; `textarea` has `--dry-input-*` fallthrough but no namespace), 13 TODO.
 - **Phase 5** (cleanup): 0 done, 7 TODO. `chat-thread.svelte` still has `await tick()` at lines 81 and 101.
 
@@ -109,32 +110,32 @@ Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte 
 
 ### Form text inputs
 
-- [ ] `packages/ui/src/input/input.svelte:26-40` (rest on inner `<input>`, wrapper `<span>` bare)
-- [ ] `packages/ui/src/textarea/textarea.svelte:23-37` (same pattern)
-- [ ] `packages/ui/src/number-input/number-input-button.svelte:33` (wrapper `<div>` bare)
-- [ ] `packages/ui/src/tags-input/tags-input-root.svelte:67-78` (wrapper `<div>` bare)
+- [x] `packages/ui/src/input/input.svelte:26-40` (rest on inner `<input>`, wrapper `<span>` bare)
+- [x] `packages/ui/src/textarea/textarea.svelte:23-37` (same pattern)
+- [x] `packages/ui/src/number-input/number-input-button.svelte:33` (wrapper `<div>` bare)
+- [x] `packages/ui/src/tags-input/tags-input-root.svelte:67-78` (wrapper `<div>` bare)
 
 ### Form selectors
 
-- [ ] `packages/ui/src/select/select-root-input.svelte:11-31, 81` (extend Props from `HTMLAttributes<HTMLDivElement>`)
-- [ ] `packages/ui/src/combobox/combobox-input-root.svelte:5-19, 91`
-- [ ] `packages/ui/src/multi-select-combobox/multi-select-combobox-root-input.svelte:219` (outer `[data-multi-select-wrapper]` bare)
-- [ ] `packages/ui/src/transfer/transfer-list-input.svelte:49, 60` (rest split — outer gets className only)
-- [ ] `packages/ui/src/file-select/file-select-root.svelte:5-13, 107` (no class, no rest in Props)
-- [ ] `packages/ui/src/time-input/time-input.svelte:19-26, 77-84` (no rest declared)
-- [ ] `packages/ui/src/radio-group/radio-group-item-input.svelte:41` (rest on `<input>` not `<label>`)
+- [x] `packages/ui/src/select/select-root-input.svelte:11-31, 81` (extend Props from `HTMLAttributes<HTMLDivElement>`)
+- [x] `packages/ui/src/combobox/combobox-input-root.svelte:5-19, 91`
+- [x] `packages/ui/src/multi-select-combobox/multi-select-combobox-root-input.svelte:219` (outer `[data-multi-select-wrapper]` bare)
+- [x] `packages/ui/src/transfer/transfer-list-input.svelte:49, 60` (rest split — outer gets className only)
+- [x] `packages/ui/src/file-select/file-select-root.svelte:5-13, 107` (no class, no rest in Props)
+- [x] `packages/ui/src/time-input/time-input.svelte:19-26, 77-84` (no rest declared)
+- [x] `packages/ui/src/radio-group/radio-group-item-input.svelte:41` (rest on `<input>` not `<label>`)
 
 ### Other
 
-- [ ] `packages/ui/src/numeric/numeric.svelte:9, 29` (no rest, fixed class with no merge)
-- [ ] `packages/ui/src/scroll-to-top/scroll-to-top-button.svelte:11-19, 73-85`
-- [ ] `packages/ui/src/icon/icon.svelte:5-13` (extend `HTMLAttributes<HTMLSpanElement>`)
-- [ ] `packages/ui/src/icon-swap/icon-swap.svelte:4-10`
-- [ ] `packages/ui/src/qr-code/qr-code.svelte:74` (rest on inner `<canvas>`)
-- [ ] **[partial]** `packages/ui/src/avatar/avatar.svelte:59-67` (rest on inner span when status/badge slot is used). _As of 2026-05-04: the no-slot path forwards rest correctly onto the outer span, but the status/badge slot path still spreads rest onto the inner span and leaves the outer wrapper bare._
-- [ ] `packages/ui/src/chip/chip-button.svelte:50-74` (rest forwarded to inner Button instead of `.chip-wrap`)
-- [ ] `packages/ui/src/tag/tag-button.svelte:31-37` (rest on inner `[data-tag]` span instead of outer wrapper)
-- [ ] `packages/ui/src/motion/{enter,exit,stagger}.svelte`: extend Props with `HTMLAttributes`, spread `{...rest}` on the `<svelte:element>`.
+- [x] `packages/ui/src/numeric/numeric.svelte:9, 29` (no rest, fixed class with no merge)
+- [x] `packages/ui/src/scroll-to-top/scroll-to-top-button.svelte:11-19, 73-85`
+- [x] `packages/ui/src/icon/icon.svelte:5-13` (extend `HTMLAttributes<HTMLSpanElement>`)
+- [x] `packages/ui/src/icon-swap/icon-swap.svelte:4-10`
+- [x] `packages/ui/src/qr-code/qr-code.svelte:74` (rest on inner `<canvas>`)
+- [x] `packages/ui/src/avatar/avatar.svelte:59-67` (rest on inner span when status/badge slot is used). _As of 2026-05-04: the no-slot path forwards rest correctly onto the outer span, but the status/badge slot path still spreads rest onto the inner span and leaves the outer wrapper bare._
+- [x] `packages/ui/src/chip/chip-button.svelte:50-74` (rest forwarded to inner Button instead of `.chip-wrap`)
+- [x] `packages/ui/src/tag/tag-button.svelte:31-37` (rest on inner `[data-tag]` span instead of outer wrapper)
+- [x] `packages/ui/src/motion/{enter,exit,stagger}.svelte`: extend Props with `HTMLAttributes`, spread `{...rest}` on the `<svelte:element>`.
 
 ## Phase 4. Token contract gaps (warn)
 

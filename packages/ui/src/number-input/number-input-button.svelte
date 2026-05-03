@@ -1,14 +1,40 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
 
-	interface Props extends Omit<HTMLInputAttributes, 'size'> {
+	type WrapperAttrs = Omit<
+		HTMLAttributes<HTMLDivElement>,
+		| 'role'
+		| 'oninput'
+		| 'onchange'
+		| 'onfocus'
+		| 'onblur'
+		| 'onkeydown'
+		| 'onkeyup'
+		| 'autofocus'
+		| 'aria-invalid'
+	>;
+
+	interface Props extends WrapperAttrs {
 		value?: number;
 		min?: number;
 		max?: number;
 		step?: number;
 		size?: 'sm' | 'md' | 'lg';
 		disabled?: boolean;
+		name?: HTMLInputAttributes['name'];
+		placeholder?: HTMLInputAttributes['placeholder'];
+		readonly?: HTMLInputAttributes['readonly'];
+		required?: HTMLInputAttributes['required'];
+		autocomplete?: HTMLInputAttributes['autocomplete'];
+		autofocus?: HTMLInputAttributes['autofocus'];
+		oninput?: HTMLInputAttributes['oninput'];
+		onchange?: HTMLInputAttributes['onchange'];
+		onfocus?: HTMLInputAttributes['onfocus'];
+		onblur?: HTMLInputAttributes['onblur'];
+		onkeydown?: HTMLInputAttributes['onkeydown'];
+		onkeyup?: HTMLInputAttributes['onkeyup'];
+		'aria-invalid'?: HTMLInputAttributes['aria-invalid'];
 	}
 
 	let {
@@ -19,6 +45,24 @@
 		size = 'md',
 		disabled = false,
 		class: className,
+		id,
+		name,
+		placeholder,
+		readonly,
+		required,
+		autocomplete,
+		autofocus,
+		oninput,
+		onchange,
+		onfocus,
+		onblur,
+		onkeydown,
+		onkeyup,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		'aria-describedby': ariaDescribedby,
+		'aria-invalid': ariaInvalid,
+		'aria-errormessage': ariaErrormessage,
 		...rest
 	}: Props = $props();
 
@@ -30,7 +74,14 @@
 	}
 </script>
 
-<div role="group" data-number-input-wrapper data-size={size} data-disabled={disabled || undefined}>
+<div
+	role="group"
+	data-number-input-wrapper
+	data-size={size}
+	data-disabled={disabled || undefined}
+	class={className}
+	{...rest}
+>
 	<Button
 		variant="outline"
 		size={size === 'sm' ? 'icon-sm' : size === 'lg' ? 'icon-lg' : 'icon'}
@@ -43,13 +94,29 @@
 	<input
 		type="number"
 		bind:value
-		class={className ?? ''}
 		{min}
 		{max}
 		{step}
 		{disabled}
+		{id}
+		{name}
+		{placeholder}
+		{readonly}
+		{required}
+		{autocomplete}
+		{autofocus}
+		{oninput}
+		{onchange}
+		{onfocus}
+		{onblur}
+		{onkeydown}
+		{onkeyup}
+		aria-label={ariaLabel}
+		aria-labelledby={ariaLabelledby}
+		aria-describedby={ariaDescribedby}
+		aria-invalid={ariaInvalid}
+		aria-errormessage={ariaErrormessage}
 		data-disabled={disabled || undefined}
-		{...rest}
 	/>
 	<Button
 		variant="outline"

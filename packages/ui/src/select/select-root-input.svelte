@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { setSelectCtx } from './context.svelte.js';
 	import SelectTrigger from './select-trigger-button.svelte';
 	import SelectValue from './select-value.svelte';
@@ -8,12 +9,11 @@
 
 	type SelectOption = { value: string; label: string };
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		open?: boolean;
 		value?: string;
 		disabled?: boolean;
 		name?: string;
-		class?: string;
 		options?: Array<string | SelectOption>;
 		placeholder?: string;
 		children?: Snippet;
@@ -27,7 +27,8 @@
 		class: className,
 		options,
 		placeholder,
-		children
+		children,
+		...rest
 	}: Props = $props();
 
 	const normalizedOptions = $derived(
@@ -78,7 +79,7 @@
 	});
 </script>
 
-<div data-select-wrapper class={className}>
+<div data-select-wrapper class={className} {...rest}>
 	{#if normalizedOptions && !children}
 		<SelectTrigger>
 			<SelectValue {placeholder} />

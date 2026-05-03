@@ -40,6 +40,8 @@
 		download,
 		type = 'button',
 		onclick,
+		class: className,
+		style,
 		children,
 		...rest
 	}: Props = $props();
@@ -48,11 +50,13 @@
 </script>
 
 <span
-	class="chip-wrap"
+	class={['chip-wrap', className]}
+	{style}
 	data-chip-variant={variant}
 	data-chip-color={resolvedColor}
 	data-chip-size={size}
 	data-chip-selected={selected || undefined}
+	{...rest}
 >
 	<Button
 		variant="pill"
@@ -66,7 +70,6 @@
 		aria-pressed={selected || undefined}
 		data-disabled={disabled || undefined}
 		data-selected={selected || undefined}
-		{...rest}
 		{onclick}
 	>
 		{@render children()}

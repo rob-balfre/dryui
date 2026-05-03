@@ -56,15 +56,8 @@
 </script>
 
 {#if hasOverlay}
-	<div data-avatar-wrapper>
-		<span
-			role="img"
-			aria-label={alt}
-			data-avatar
-			{...variantAttrs({ size, shape })}
-			class={className}
-			{...rest}
-		>
+	<div data-avatar-wrapper class={className} {...rest}>
+		<span role="img" aria-label={alt} data-avatar {...variantAttrs({ size, shape })}>
 			{#if showImage}
 				<img {src} {alt} onerror={handleError} />
 			{:else if children}

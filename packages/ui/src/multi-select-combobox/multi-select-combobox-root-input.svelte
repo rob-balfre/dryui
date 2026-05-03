@@ -216,15 +216,13 @@
 	});
 </script>
 
-<div data-multi-select-wrapper>
+<div data-multi-select-wrapper class={className} {...rest}>
 	<div
 		bind:this={rootEl}
 		role="group"
 		data-multi-select-root
 		data-state={open ? 'open' : 'closed'}
 		data-disabled={disabled || undefined}
-		class={className}
-		{...rest}
 	>
 		{@render children()}
 

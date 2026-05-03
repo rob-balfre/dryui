@@ -1,19 +1,20 @@
 <script lang="ts">
 	import type { Component, Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		icon: Snippet | Component | unknown;
 		size?: 'sm' | 'md' | 'lg';
 		label?: string;
 	}
 
-	let { icon, size = 'md', label }: Props = $props();
+	let { icon, size = 'md', label, class: className, ...rest }: Props = $props();
 </script>
 
 {#key icon}
 	{@const IconComponent = icon as Component}
 	{@const iconAsSnippet = icon as Snippet}
-	<span class="dry-icon-swap" data-size={size} aria-label={label}>
+	<span class={['dry-icon-swap', className]} data-size={size} aria-label={label} {...rest}>
 		{#if typeof icon === 'function' && (icon as Snippet).length === 0}
 			{@render iconAsSnippet()}
 		{:else}

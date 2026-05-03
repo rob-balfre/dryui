@@ -1,24 +1,52 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
 	import { getRadioGroupCtx } from './context.svelte.js';
 
-	interface Props extends Omit<HTMLInputAttributes, 'children'> {
+	type WrapperAttrs = Omit<
+		HTMLAttributes<HTMLLabelElement>,
+		'children' | 'onchange' | 'onfocus' | 'onblur' | 'autofocus'
+	>;
+
+	interface Props extends WrapperAttrs {
 		value: string;
 		disabled?: boolean;
 		children?: Snippet | undefined;
+		name?: HTMLInputAttributes['name'];
+		required?: HTMLInputAttributes['required'];
+		autofocus?: HTMLInputAttributes['autofocus'];
+		onchange?: HTMLInputAttributes['onchange'];
+		onfocus?: HTMLInputAttributes['onfocus'];
+		onblur?: HTMLInputAttributes['onblur'];
 	}
 
-	let { value, disabled = false, children, class: className, ...rest }: Props = $props();
+	let {
+		value,
+		disabled = false,
+		children,
+		class: className,
+		id,
+		name,
+		required,
+		autofocus,
+		onchange: onchangeProp,
+		onfocus,
+		onblur,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		'aria-describedby': ariaDescribedby,
+		...rest
+	}: Props = $props();
 
 	const ctx = getRadioGroupCtx();
 
 	const isDisabled = $derived(disabled || ctx.disabled);
 	const checked = $derived(ctx.value === value);
 
-	function handleChange() {
+	function handleChange(event: Event & { currentTarget: EventTarget & HTMLInputElement }) {
 		if (isDisabled) return;
 		ctx.select(value);
+		onchangeProp?.(event);
 	}
 </script>
 
@@ -27,18 +55,25 @@
 	data-state={checked ? 'checked' : 'unchecked'}
 	data-disabled={isDisabled || undefined}
 	class={className}
+	{...rest}
 >
 	<input
 		type="radio"
-		name={ctx.name}
+		name={name ?? ctx.name}
 		{value}
 		{checked}
 		disabled={isDisabled}
-		required={ctx.required}
+		required={required ?? ctx.required}
+		{id}
+		{autofocus}
+		{onfocus}
+		{onblur}
+		aria-label={ariaLabel}
+		aria-labelledby={ariaLabelledby}
+		aria-describedby={ariaDescribedby}
 		data-state={checked ? 'checked' : 'unchecked'}
 		data-disabled={isDisabled || undefined}
 		onchange={handleChange}
-		{...rest}
 	/>
 	{#if children}
 		{@render children()}

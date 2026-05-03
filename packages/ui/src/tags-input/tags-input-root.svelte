@@ -64,15 +64,8 @@
 	});
 </script>
 
-<div data-part="wrapper">
-	<div
-		role="group"
-		data-part="root"
-		data-size={size}
-		data-disabled={disabled || undefined}
-		class={className}
-		{...rest}
-	>
+<div data-part="wrapper" class={className} {...rest}>
+	<div role="group" data-part="root" data-size={size} data-disabled={disabled || undefined}>
 		{@render children()}
 	</div>
 </div>

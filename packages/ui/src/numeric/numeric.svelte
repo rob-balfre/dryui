@@ -1,12 +1,21 @@
 <script lang="ts">
-	interface Props {
+	import type { HTMLAttributes } from 'svelte/elements';
+
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		value: number | string;
 		stable?: boolean;
 		align?: 'start' | 'center' | 'end';
 		minDigits?: number;
 	}
 
-	let { value, stable = false, align = 'end', minDigits }: Props = $props();
+	let {
+		value,
+		stable = false,
+		align = 'end',
+		minDigits,
+		class: className,
+		...rest
+	}: Props = $props();
 
 	const minWidth = $derived.by(() => {
 		if (!stable) return undefined;
@@ -26,7 +35,12 @@
 	});
 </script>
 
-<span bind:this={el} class="dry-numeric dry-tabular-nums" data-align={align}>
+<span
+	bind:this={el}
+	class={['dry-numeric dry-tabular-nums', className]}
+	data-align={align}
+	{...rest}
+>
 	{value}
 </span>
 

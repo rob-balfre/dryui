@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { getFormControlCtx } from '@dryui/primitives';
 	import { Select } from '../select/index.js';
 
@@ -7,13 +8,12 @@
 		minute: string;
 	};
 
-	interface Props {
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'role' | 'aria-label'> {
 		value?: string;
 		disabled?: boolean;
 		step?: number;
 		size?: 'sm' | 'md' | 'lg';
 		name?: string;
-		class?: string;
 	}
 
 	let {
@@ -22,7 +22,8 @@
 		step,
 		size = 'md',
 		name,
-		class: className
+		class: className,
+		...rest
 	}: Props = $props();
 
 	const ctx = getFormControlCtx();
@@ -81,6 +82,7 @@
 	data-disabled={isDisabled || undefined}
 	id={ctx?.id}
 	class={className}
+	{...rest}
 >
 	<Select.Root bind:value={() => hourStr, setHour} disabled={isDisabled}>
 		<Select.Trigger

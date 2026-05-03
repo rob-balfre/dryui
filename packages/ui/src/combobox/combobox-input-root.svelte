@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { setComboboxCtx } from './context.svelte.js';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		open?: boolean;
 		value?: string;
 		disabled?: boolean;
@@ -15,7 +16,9 @@
 		value = $bindable(''),
 		disabled = false,
 		name,
-		children
+		class: className,
+		children,
+		...rest
 	}: Props = $props();
 
 	const uid = $props.id();
@@ -88,7 +91,7 @@
 	});
 </script>
 
-<div data-combobox-wrapper>
+<div data-combobox-wrapper class={className} {...rest}>
 	{@render children()}
 
 	{#if name}

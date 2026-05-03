@@ -1,16 +1,23 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { variantAttrs } from '@dryui/primitives';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 		color?: 'primary' | 'muted' | 'current';
 		label?: string;
-		class?: string;
 		children: Snippet;
 	}
 
-	let { size = 'md', color = 'current', label, class: className, children }: Props = $props();
+	let {
+		size = 'md',
+		color = 'current',
+		label,
+		class: className,
+		children,
+		...rest
+	}: Props = $props();
 
 	function sizeSvg(node: HTMLElement) {
 		const svg = node.querySelector('svg');
@@ -28,6 +35,7 @@
 	aria-hidden={label ? undefined : true}
 	{...variantAttrs({ size, color })}
 	class={className}
+	{...rest}
 	use:sizeSvg
 >
 	{@render children()}

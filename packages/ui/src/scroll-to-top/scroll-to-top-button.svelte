@@ -1,13 +1,13 @@
 <script lang="ts">
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { ScrollToTop } from '@dryui/primitives';
 	import Button from '../button/button.svelte';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLSpanElement> {
 		threshold?: number;
 		target?: HTMLElement;
 		behavior?: ScrollBehavior;
 		position?: 'bottom-right' | 'bottom-left' | 'bottom-center';
-		class?: string;
 	}
 
 	let {
@@ -15,7 +15,8 @@
 		target,
 		behavior = 'smooth',
 		position = 'bottom-right',
-		class: className
+		class: className,
+		...rest
 	}: Props = $props();
 </script>
 
@@ -25,6 +26,7 @@
 			class={['scroll-to-top-slot', className]}
 			data-position={position}
 			data-visible={visible || undefined}
+			{...rest}
 		>
 			<Button
 				variant="nav"

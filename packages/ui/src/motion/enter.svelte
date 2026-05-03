@@ -1,14 +1,15 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLElement> {
 		index?: number;
 		duration?: string;
 		as?: string;
 		children?: Snippet;
 	}
 
-	let { index = 0, duration, as = 'div', children }: Props = $props();
+	let { index = 0, duration, as = 'div', class: className, children, ...rest }: Props = $props();
 
 	let el = $state<HTMLElement>();
 
@@ -23,6 +24,6 @@
 	});
 </script>
 
-<svelte:element this={as} bind:this={el} class="dry-enter">
+<svelte:element this={as} bind:this={el} class={['dry-enter', className]} {...rest}>
 	{@render children?.()}
 </svelte:element>

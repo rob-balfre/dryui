@@ -1,12 +1,46 @@
 <script lang="ts">
-	import type { HTMLInputAttributes } from 'svelte/elements';
+	import type { HTMLAttributes, HTMLInputAttributes } from 'svelte/elements';
 	import { getFormControlCtx, variantAttrs } from '@dryui/primitives';
 
-	interface Props extends Omit<HTMLInputAttributes, 'size'> {
+	type WrapperAttrs = Omit<
+		HTMLAttributes<HTMLSpanElement>,
+		| 'oninput'
+		| 'onchange'
+		| 'onfocus'
+		| 'onblur'
+		| 'onkeydown'
+		| 'onkeyup'
+		| 'autofocus'
+		| 'aria-invalid'
+	>;
+
+	interface Props extends WrapperAttrs {
 		value?: string;
 		size?: 'sm' | 'md' | 'lg';
 		variant?: 'default' | 'ghost';
 		disabled?: boolean;
+		type?: HTMLInputAttributes['type'];
+		placeholder?: HTMLInputAttributes['placeholder'];
+		name?: HTMLInputAttributes['name'];
+		readonly?: HTMLInputAttributes['readonly'];
+		required?: HTMLInputAttributes['required'];
+		min?: HTMLInputAttributes['min'];
+		max?: HTMLInputAttributes['max'];
+		minlength?: HTMLInputAttributes['minlength'];
+		maxlength?: HTMLInputAttributes['maxlength'];
+		pattern?: HTMLInputAttributes['pattern'];
+		step?: HTMLInputAttributes['step'];
+		list?: HTMLInputAttributes['list'];
+		autocomplete?: HTMLInputAttributes['autocomplete'];
+		autofocus?: HTMLInputAttributes['autofocus'];
+		inputmode?: HTMLInputAttributes['inputmode'];
+		oninput?: HTMLInputAttributes['oninput'];
+		onchange?: HTMLInputAttributes['onchange'];
+		onfocus?: HTMLInputAttributes['onfocus'];
+		onblur?: HTMLInputAttributes['onblur'];
+		onkeydown?: HTMLInputAttributes['onkeydown'];
+		onkeyup?: HTMLInputAttributes['onkeyup'];
+		'aria-invalid'?: HTMLInputAttributes['aria-invalid'];
 	}
 
 	let {
@@ -15,7 +49,33 @@
 		variant = 'default',
 		class: className,
 		disabled = false,
+		id,
 		type,
+		placeholder,
+		name,
+		readonly,
+		required,
+		min,
+		max,
+		minlength,
+		maxlength,
+		pattern,
+		step,
+		list,
+		autocomplete,
+		autofocus,
+		inputmode,
+		oninput,
+		onchange,
+		onfocus,
+		onblur,
+		onkeydown,
+		onkeyup,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		'aria-describedby': ariaDescribedby,
+		'aria-invalid': ariaInvalid,
+		'aria-errormessage': ariaErrormessage,
 		...rest
 	}: Props = $props();
 
@@ -23,20 +83,39 @@
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
 </script>
 
-<span class="wrapper">
+<span class="wrapper {className ?? ''}" {...rest}>
 	<input
 		{...type != null ? { type } : {}}
 		bind:value
-		id={ctx?.id}
+		id={id ?? ctx?.id}
 		disabled={isDisabled}
-		required={ctx?.required || undefined}
-		aria-describedby={ctx?.describedBy}
-		aria-invalid={ctx?.hasError || undefined}
-		aria-errormessage={ctx?.errorMessageId}
+		required={required ?? ctx?.required ?? undefined}
+		aria-label={ariaLabel}
+		aria-labelledby={ariaLabelledby}
+		aria-describedby={ariaDescribedby ?? ctx?.describedBy}
+		aria-invalid={ariaInvalid ?? ctx?.hasError ?? undefined}
+		aria-errormessage={ariaErrormessage ?? ctx?.errorMessageId}
 		data-disabled={isDisabled || undefined}
 		{...variantAttrs({ size, variant: variant !== 'default' ? variant : undefined })}
-		class={className}
-		{...rest}
+		{placeholder}
+		{name}
+		{readonly}
+		{min}
+		{max}
+		{minlength}
+		{maxlength}
+		{pattern}
+		{step}
+		{list}
+		{autocomplete}
+		{autofocus}
+		{inputmode}
+		{oninput}
+		{onchange}
+		{onfocus}
+		{onblur}
+		{onkeydown}
+		{onkeyup}
 	/>
 </span>
 

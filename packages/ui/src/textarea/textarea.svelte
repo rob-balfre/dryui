@@ -1,11 +1,41 @@
 <script lang="ts">
-	import type { HTMLTextareaAttributes } from 'svelte/elements';
+	import type { HTMLAttributes, HTMLTextareaAttributes } from 'svelte/elements';
 	import { getFormControlCtx } from '@dryui/primitives';
 
-	interface Props extends HTMLTextareaAttributes {
+	type WrapperAttrs = Omit<
+		HTMLAttributes<HTMLSpanElement>,
+		| 'oninput'
+		| 'onchange'
+		| 'onfocus'
+		| 'onblur'
+		| 'onkeydown'
+		| 'onkeyup'
+		| 'autofocus'
+		| 'aria-invalid'
+	>;
+
+	interface Props extends WrapperAttrs {
 		value?: string;
 		size?: 'sm' | 'md' | 'lg';
 		disabled?: boolean;
+		name?: HTMLTextareaAttributes['name'];
+		placeholder?: HTMLTextareaAttributes['placeholder'];
+		readonly?: HTMLTextareaAttributes['readonly'];
+		required?: HTMLTextareaAttributes['required'];
+		minlength?: HTMLTextareaAttributes['minlength'];
+		maxlength?: HTMLTextareaAttributes['maxlength'];
+		rows?: HTMLTextareaAttributes['rows'];
+		cols?: HTMLTextareaAttributes['cols'];
+		wrap?: HTMLTextareaAttributes['wrap'];
+		autocomplete?: HTMLTextareaAttributes['autocomplete'];
+		autofocus?: HTMLTextareaAttributes['autofocus'];
+		oninput?: HTMLTextareaAttributes['oninput'];
+		onchange?: HTMLTextareaAttributes['onchange'];
+		onfocus?: HTMLTextareaAttributes['onfocus'];
+		onblur?: HTMLTextareaAttributes['onblur'];
+		onkeydown?: HTMLTextareaAttributes['onkeydown'];
+		onkeyup?: HTMLTextareaAttributes['onkeyup'];
+		'aria-invalid'?: HTMLTextareaAttributes['aria-invalid'];
 	}
 
 	let {
@@ -13,6 +43,29 @@
 		size = 'md',
 		class: className,
 		disabled = false,
+		id,
+		name,
+		placeholder,
+		readonly,
+		required,
+		minlength,
+		maxlength,
+		rows,
+		cols,
+		wrap,
+		autocomplete,
+		autofocus,
+		oninput,
+		onchange,
+		onfocus,
+		onblur,
+		onkeydown,
+		onkeyup,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
+		'aria-describedby': ariaDescribedby,
+		'aria-invalid': ariaInvalid,
+		'aria-errormessage': ariaErrormessage,
 		...rest
 	}: Props = $props();
 
@@ -20,19 +73,35 @@
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
 </script>
 
-<span class="wrapper">
+<span class="wrapper {className ?? ''}" {...rest}>
 	<textarea
 		bind:value
-		id={ctx?.id}
+		id={id ?? ctx?.id}
 		disabled={isDisabled}
-		required={ctx?.required || undefined}
-		aria-describedby={ctx?.describedBy}
-		aria-invalid={ctx?.hasError || undefined}
-		aria-errormessage={ctx?.errorMessageId}
+		required={required ?? ctx?.required ?? undefined}
+		aria-label={ariaLabel}
+		aria-labelledby={ariaLabelledby}
+		aria-describedby={ariaDescribedby ?? ctx?.describedBy}
+		aria-invalid={ariaInvalid ?? ctx?.hasError ?? undefined}
+		aria-errormessage={ariaErrormessage ?? ctx?.errorMessageId}
 		data-disabled={isDisabled || undefined}
 		data-size={size}
-		class={className}
-		{...rest}
+		{name}
+		{placeholder}
+		{readonly}
+		{minlength}
+		{maxlength}
+		{rows}
+		{cols}
+		{wrap}
+		{autocomplete}
+		{autofocus}
+		{oninput}
+		{onchange}
+		{onfocus}
+		{onblur}
+		{onkeydown}
+		{onkeyup}
 	></textarea>
 </span>
 

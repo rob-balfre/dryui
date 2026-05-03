@@ -1,8 +1,9 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import { setFileSelectCtx } from './context.svelte.js';
 
-	interface Props {
+	interface Props extends Omit<HTMLAttributes<HTMLDivElement>, 'onchange'> {
 		value?: string | null;
 		accept?: string | undefined;
 		directory?: boolean | undefined;
@@ -19,7 +20,9 @@
 		onrequest,
 		onchange,
 		disabled = false,
-		children
+		class: className,
+		children,
+		...rest
 	}: Props = $props();
 
 	let loading = $state(false);
@@ -104,7 +107,7 @@
 	});
 </script>
 
-<div data-file-select data-disabled={disabled || undefined}>
+<div data-file-select data-disabled={disabled || undefined} class={className} {...rest}>
 	<input
 		bind:this={fallbackInputEl}
 		type="file"

@@ -46,7 +46,7 @@
 	}
 </script>
 
-<div data-part="list" class={className}>
+<div data-part="list" class={className} {...rest}>
 	{#if filterable}
 		<input
 			type="text"
@@ -62,7 +62,6 @@
 		aria-label={title ?? (type === 'source' ? 'Available items' : 'Selected items')}
 		data-transfer-list
 		data-type={type}
-		{...rest}
 	>
 		{#if title}
 			<div data-transfer-list-header>

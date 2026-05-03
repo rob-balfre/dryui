@@ -22,19 +22,15 @@
 		dismissible = false,
 		onDismiss,
 		class: className,
+		style,
 		children,
 		...rest
 	}: Props = $props();
 	const resolvedColor = $derived(resolveAlias(color, 'gray'));
 </script>
 
-<span data-wrapper>
-	<span
-		class={className}
-		data-tag
-		{...variantAttrs({ variant, color: resolvedColor, size })}
-		{...rest}
-	>
+<span data-wrapper class={className} {style} {...rest}>
+	<span data-tag {...variantAttrs({ variant, color: resolvedColor, size })}>
 		{@render children()}
 		{#if dismissible}
 			<Button variant="bare" type="button" aria-label="Dismiss" onclick={onDismiss}>

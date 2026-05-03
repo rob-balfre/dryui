@@ -2,7 +2,7 @@
 	import type { HTMLAttributes } from 'svelte/elements';
 	import { encodeQR, type ErrorCorrectionLevel } from '@dryui/primitives/qr-code';
 
-	interface Props extends HTMLAttributes<HTMLCanvasElement> {
+	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value: string;
 		size?: number;
 		errorCorrection?: ErrorCorrectionLevel;
@@ -82,7 +82,7 @@
 	});
 </script>
 
-<div bind:this={wrapperEl} class={className} data-qr-wrapper>
+<div bind:this={wrapperEl} class={className} data-qr-wrapper {...rest}>
 	<canvas
 		bind:this={canvasEl}
 		width={size}
@@ -91,7 +91,6 @@
 		aria-label="QR Code"
 		data-qr-canvas
 		data-value={value}
-		{...rest}
 	></canvas>
 </div>
 

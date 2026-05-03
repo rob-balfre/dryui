@@ -1,13 +1,14 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLAttributes } from 'svelte/elements';
 
-	interface Props {
+	interface Props extends HTMLAttributes<HTMLElement> {
 		step?: 'section' | 'word' | 'letter' | number;
 		as?: string;
 		children?: Snippet;
 	}
 
-	let { step = 'section', as = 'div', children }: Props = $props();
+	let { step = 'section', as = 'div', class: className, children, ...rest }: Props = $props();
 
 	const stepValue = $derived.by(() => {
 		if (typeof step === 'number') return `${step}ms`;
@@ -24,6 +25,6 @@
 	});
 </script>
 
-<svelte:element this={as} bind:this={el} data-dry-stagger>
+<svelte:element this={as} bind:this={el} data-dry-stagger class={className} {...rest}>
 	{@render children?.()}
 </svelte:element>
