@@ -79,13 +79,13 @@
 <style>
 	.chip-wrap {
 		display: inline-grid;
-		--dry-btn-accent: var(--_chip-active-bg);
-		--dry-btn-accent-fg: var(--_chip-color);
-		--dry-btn-accent-stroke: var(--_chip-border);
-		--dry-btn-accent-weak: var(--_chip-bg);
-		--dry-btn-bg: var(--_chip-bg);
-		--dry-btn-color: var(--_chip-color);
-		--dry-btn-border: var(--_chip-border);
+		--dry-btn-accent: var(--dry-chip-active-bg, var(--_chip-active-bg));
+		--dry-btn-accent-fg: var(--dry-chip-color, var(--_chip-color));
+		--dry-btn-accent-stroke: var(--dry-chip-border, var(--_chip-border));
+		--dry-btn-accent-weak: var(--dry-chip-bg, var(--_chip-bg));
+		--dry-btn-bg: var(--dry-chip-bg, var(--_chip-bg));
+		--dry-btn-color: var(--dry-chip-color, var(--_chip-color));
+		--dry-btn-border: var(--dry-chip-border, var(--_chip-border));
 	}
 
 	/* Defaults */

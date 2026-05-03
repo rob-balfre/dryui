@@ -73,7 +73,7 @@
 		height: var(--dry-stepper-indicator-size, 1.25rem);
 		border-radius: 50%;
 		border: var(--dry-stepper-connector-width, 1px) solid var(--dry-color-stroke-weak);
-		background: transparent;
+		background: var(--dry-color-fill-base, transparent);
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
 			background var(--dry-duration-fast) var(--dry-ease-default);
@@ -104,7 +104,7 @@
 
 	[data-part='step'][data-state='error']::before {
 		border-color: var(--dry-color-fill-error);
-		background: transparent;
+		background: var(--dry-color-fill-base, transparent);
 	}
 
 	[data-orientation='vertical'] {

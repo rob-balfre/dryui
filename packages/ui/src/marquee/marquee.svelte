@@ -80,9 +80,9 @@
 
 	function applyRootStyles(node: HTMLElement) {
 		$effect(() => {
-			node.style.setProperty('--marquee-duration', `${duration}s`);
-			node.style.setProperty('--marquee-gap', gap);
-			node.style.setProperty('--marquee-shift', `${contentSize}px`);
+			node.style.setProperty('--_marquee-duration', `${duration}s`);
+			node.style.setProperty('--_marquee-gap', gap);
+			node.style.setProperty('--_marquee-shift', `${contentSize}px`);
 		});
 	}
 
@@ -118,8 +118,8 @@
 <style>
 	[data-marquee] {
 		/* Component tokens (Tier 3) */
-		--dry-marquee-gap: var(--marquee-gap, 1rem);
-		--dry-marquee-speed: var(--marquee-duration, 10s);
+		--dry-marquee-gap: var(--_marquee-gap, 1rem);
+		--dry-marquee-speed: var(--_marquee-duration, 10s);
 
 		overflow: hidden;
 		position: relative;
@@ -142,18 +142,18 @@
 	[data-marquee-content] {
 		display: grid;
 		grid-auto-flow: var(--_flow, column);
-		gap: var(--marquee-gap, 1rem);
+		gap: var(--_marquee-gap, 1rem);
 	}
 
 	/* Trailing padding on content (not gap on track) keeps the keyframe loop seamless. */
 	[data-marquee][data-direction='left'] [data-marquee-content],
 	[data-marquee][data-direction='right'] [data-marquee-content] {
-		padding-inline-end: var(--marquee-gap, 1rem);
+		padding-inline-end: var(--_marquee-gap, 1rem);
 	}
 
 	[data-marquee][data-direction='up'] [data-marquee-content],
 	[data-marquee][data-direction='down'] [data-marquee-content] {
-		padding-block-end: var(--marquee-gap, 1rem);
+		padding-block-end: var(--_marquee-gap, 1rem);
 	}
 
 	[data-marquee][data-direction='left'] [data-marquee-track],
@@ -184,7 +184,7 @@
 			transform: translateX(0);
 		}
 		to {
-			transform: translateX(calc(-1 * var(--marquee-shift, 0px)));
+			transform: translateX(calc(-1 * var(--_marquee-shift, 0px)));
 		}
 	}
 
@@ -193,7 +193,7 @@
 			transform: translateY(0);
 		}
 		to {
-			transform: translateY(calc(-1 * var(--marquee-shift, 0px)));
+			transform: translateY(calc(-1 * var(--_marquee-shift, 0px)));
 		}
 	}
 

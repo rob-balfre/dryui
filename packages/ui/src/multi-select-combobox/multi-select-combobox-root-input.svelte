@@ -250,11 +250,11 @@
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(48px, max-content));
 		justify-content: start;
-		gap: var(--dry-space-1_5);
-		padding: var(--dry-space-2);
-		border: 1px solid var(--dry-color-stroke-strong);
-		border-radius: var(--dry-radius-md);
-		background: var(--dry-color-bg-raised);
+		gap: var(--dry-multi-select-gap, var(--dry-space-1_5));
+		padding: var(--dry-multi-select-padding, var(--dry-space-2));
+		border: 1px solid var(--dry-multi-select-border, var(--dry-color-stroke-strong));
+		border-radius: var(--dry-multi-select-radius, var(--dry-radius-md));
+		background: var(--dry-multi-select-bg, var(--dry-color-bg-raised));
 		min-height: 44px;
 		align-items: center;
 		box-sizing: border-box;

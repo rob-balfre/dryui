@@ -54,7 +54,7 @@
 <style>
 	[data-accordion] {
 		display: grid;
-		border: 1px solid var(--dry-color-stroke-weak);
+		border: 1px solid var(--dry-accordion-border, var(--dry-color-stroke-weak));
 		border-radius: var(--dry-radius-lg);
 		overflow: hidden;
 	}

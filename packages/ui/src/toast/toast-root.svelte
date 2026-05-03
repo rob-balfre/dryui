@@ -152,7 +152,7 @@
 		height: 3px;
 		display: grid;
 		grid-template-columns: var(--progress-width, 0%) 1fr;
-		background: var(--dry-color-stroke-weak, #e2e8f0);
+		background: var(--dry-color-stroke-weak);
 		border-radius: 0 0 var(--dry-radius-toast) var(--dry-radius-toast);
 		overflow: hidden;
 		transition: grid-template-columns var(--dry-duration-normal) var(--dry-ease-default);
@@ -160,10 +160,10 @@
 
 	[data-part='progress']::after {
 		content: '';
-		background: var(--dry-toast-accent, var(--dry-color-fill-brand, #3b82f6));
+		background: var(--dry-toast-accent, var(--dry-color-fill-brand));
 	}
 
 	[data-part='root'][data-persistent] {
-		border-left: 3px solid var(--dry-toast-accent, var(--dry-color-fill-brand, #3b82f6));
+		border-left: 3px solid var(--dry-toast-accent, var(--dry-color-fill-brand));
 	}
 </style>

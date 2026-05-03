@@ -234,6 +234,18 @@
 		--dry-chart-bar-color: var(--dry-color-fill-brand);
 		--dry-chart-line-color: var(--dry-color-fill-brand);
 
+		/* Tonal cascade for multi-series charts. Consumers can override any
+		   slot to retheme the palette. Default order: brand, accent, then a
+		   spread of semantic fills so series stay distinguishable. */
+		--dry-chart-series-1: var(--dry-color-fill-brand);
+		--dry-chart-series-2: var(--dry-color-fill-accent);
+		--dry-chart-series-3: var(--dry-color-fill-purple);
+		--dry-chart-series-4: var(--dry-color-fill-info);
+		--dry-chart-series-5: var(--dry-color-fill-success);
+		--dry-chart-series-6: var(--dry-color-fill-warning);
+		--dry-chart-series-7: var(--dry-color-fill-error);
+		--dry-chart-series-8: var(--dry-color-text-weak);
+
 		display: block;
 		height: auto;
 		overflow: visible;

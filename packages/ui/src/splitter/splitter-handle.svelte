@@ -114,7 +114,7 @@
 	[data-part='handle']::before {
 		content: '';
 		position: absolute;
-		background: var(--dry-color-stroke-weak);
+		background: var(--dry-splitter-handle-line-color, var(--dry-color-stroke-weak));
 		transition: background var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
@@ -148,7 +148,7 @@
 		content: '';
 		display: block;
 		border-radius: var(--dry-radius-full);
-		background: var(--dry-color-text-weak);
+		background: var(--dry-splitter-handle-grip-color, var(--dry-color-text-weak));
 		transition: background var(--dry-duration-fast) var(--dry-ease-default);
 		z-index: 1;
 	}
@@ -166,6 +166,6 @@
 	}
 
 	[data-part='handle']:hover::after {
-		background: var(--dry-color-fill-brand);
+		background: var(--dry-splitter-handle-grip-color-hover, var(--dry-color-fill-brand));
 	}
 </style>

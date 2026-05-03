@@ -89,8 +89,8 @@
 		z-index: 3;
 		display: grid;
 		border-radius: inherit;
-		--dry-btn-bg: transparent;
-		--dry-btn-border: transparent;
+		--dry-btn-bg: var(--dry-flip-card-toggle-overlay-bg, transparent);
+		--dry-btn-border: var(--dry-flip-card-toggle-overlay-border, transparent);
 		--dry-btn-color: inherit;
 		--dry-btn-padding-x: 0;
 		--dry-btn-padding-y: 0;

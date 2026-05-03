@@ -127,11 +127,11 @@
 		);
 		max-height: 28rem;
 		overflow-y: auto;
-		background: var(--dry-color-bg-overlay, #f1f3f5);
+		background: var(--dry-color-bg-overlay);
 		color: var(--dry-color-text-strong);
-		border: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
+		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-lg, 0.5rem);
-		box-shadow: var(--dry-shadow-lg, 0 10px 15px -3px rgba(0, 0, 0, 0.1));
+		box-shadow: var(--dry-shadow-lg);
 		padding: 0;
 
 		&:popover-open {

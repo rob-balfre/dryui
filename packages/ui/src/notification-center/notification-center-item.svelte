@@ -44,7 +44,7 @@
 	[data-notification-center-item] {
 		padding: var(--dry-nc-item-padding, 0.75rem);
 		color: var(--dry-color-text-strong);
-		border-bottom: 1px solid var(--dry-color-stroke-weak, #e2e8f0);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
 		transition: background var(--dry-duration-fast) var(--dry-ease-default);
 	}
 

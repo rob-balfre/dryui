@@ -7687,7 +7687,15 @@
         "--dry-chart-border": "Border color",
         "--dry-chart-grid-color": "Grid Color",
         "--dry-chart-line-color": "Line Color",
-        "--dry-chart-radius": "Border radius"
+        "--dry-chart-radius": "Border radius",
+        "--dry-chart-series-1": "Series 1",
+        "--dry-chart-series-2": "Series 2",
+        "--dry-chart-series-3": "Series 3",
+        "--dry-chart-series-4": "Series 4",
+        "--dry-chart-series-5": "Series 5",
+        "--dry-chart-series-6": "Series 6",
+        "--dry-chart-series-7": "Series 7",
+        "--dry-chart-series-8": "Series 8"
       },
       "dataAttributes": [
         {
@@ -16901,7 +16909,11 @@
         "--dry-gauge-fill-color": "Fill Color",
         "--dry-gauge-size": "Size",
         "--dry-gauge-stroke-width": "Stroke Width",
-        "--dry-gauge-track-color": "Track Color"
+        "--dry-gauge-track-color": "Track Color",
+        "--dry-gauge-zone-1": "Zone 1",
+        "--dry-gauge-zone-2": "Zone 2",
+        "--dry-gauge-zone-3": "Zone 3",
+        "--dry-gauge-zone-4": "Zone 4"
       },
       "dataAttributes": [
         {

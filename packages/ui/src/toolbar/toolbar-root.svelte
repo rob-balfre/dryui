@@ -87,10 +87,10 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
-		padding: var(--dry-space-1);
-		background: var(--dry-color-bg-overlay);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-lg);
+		padding: var(--dry-toolbar-padding, var(--dry-space-1));
+		background: var(--dry-toolbar-bg, var(--dry-color-bg-overlay));
+		border: 1px solid var(--dry-toolbar-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-toolbar-radius, var(--dry-radius-lg));
 	}
 
 	[data-part='root'][data-orientation='vertical'] {

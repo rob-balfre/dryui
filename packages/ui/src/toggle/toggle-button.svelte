@@ -66,7 +66,7 @@
 					cx="16"
 					cy="16"
 					r="15"
-					fill="var(--dry-toggle-thumb-bg)"
+					fill="var(--dry-toggle-thumb-bg, var(--dry-color-bg-raised))"
 					stroke="var(--_thumb-stroke)"
 				/>
 			</svg>

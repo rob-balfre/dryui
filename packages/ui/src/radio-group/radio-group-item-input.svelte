@@ -109,9 +109,9 @@
 		-webkit-appearance: none;
 		height: var(--dry-space-8);
 		min-height: var(--dry-space-8);
-		border: 2px solid var(--dry-color-stroke-strong);
+		border: 2px solid var(--dry-radio-border, var(--dry-color-stroke-strong));
 		border-radius: var(--dry-radius-full);
-		background: var(--dry-color-bg-raised);
+		background: var(--dry-radio-bg, var(--dry-color-bg-raised));
 		margin: 0;
 		cursor: pointer;
 		position: relative;
@@ -154,9 +154,9 @@
 	}
 
 	[data-radio-group-item] input[type='radio']:checked {
-		background: var(--dry-color-fill-selected);
-		border-color: var(--dry-color-stroke-selected);
-		box-shadow: inset 0 0 0 1px var(--dry-color-stroke-selected);
+		background: var(--dry-radio-checked-bg, var(--dry-color-fill-selected));
+		border-color: var(--dry-radio-checked-border, var(--dry-color-stroke-selected));
+		box-shadow: inset 0 0 0 1px var(--dry-radio-checked-border, var(--dry-color-stroke-selected));
 	}
 
 	[data-radio-group-item] input[type='radio']:checked::after {
@@ -173,8 +173,8 @@
 	}
 
 	[data-radio-group-item] input[type='radio']:checked:hover:not(:disabled) {
-		background: var(--dry-color-fill-selected);
-		border-color: var(--dry-color-stroke-selected);
+		background: var(--dry-radio-checked-bg, var(--dry-color-fill-selected));
+		border-color: var(--dry-radio-checked-border, var(--dry-color-stroke-selected));
 	}
 
 	[data-radio-group-item] input[type='radio']:disabled {

@@ -18,6 +18,7 @@ Re-verified every item below against the `dryui-rescue` branch source. Net progr
 - After Phase 1 wave: **34 done, 5 PARTIAL, 68 TODO** out of 107.
 - After Phase 2 wave: **61 done, 0 PARTIAL, 41 TODO** out of 107.
 - After Phase 3 wave: **81 done, 0 PARTIAL, 21 TODO** out of 107.
+- After Phase 4 + 5 wave: ✅ **all 22 remaining items complete.**
 
 Per phase:
 
@@ -25,10 +26,10 @@ Per phase:
 - **Phase 1** (color literals): ✅ 28 of 28 complete. New `--dry-color-glass-tint` palette token added to every theme (consumed by `glass.svelte`); purple row consumed by `badge` and `tag`; markdown-renderer rewritten from parens-less `:global { … }` to per-selector `:global(...)`. New component tokens: `--dry-spotlight-rim-color`, `--dry-chromatic-shift-{r,g,b}`, `--dry-data-grid-pinned-shadow`, `--dry-video-embed-shadow`, `--dry-option-picker-preview-tint-{light,dark}`, `--dry-qr-{bg,fg}`. Drag-and-drop keyframes now read `--dry-shadow-{md,lg}` once at drag-start via `getComputedStyle`.
 - **Phase 2** (root-defaulted tokens): ✅ 27 of 27 complete. Either delete-root-block + inline-default at consumption (most items) or private-default pattern (`checkbox-input`, `file-upload-dropzone`, `button-group`, `chip-group-root`, `icon`, `tag-button`, `logo-mark`) where state/variant selectors needed to keep populating a default that consumer parents can still override. `toggle-group-root` size variants are now wrapped in `:where(...)` so consumer style overrides win the cascade. `button-group` required cross-file fallback updates to `button.svelte` (8 sites) so deleting button-group's leading block didn't produce empty `var()` resolutions on grouped buttons. `segmented-control-root` tokens turned out to be dead code (zero consumers); just deleted the block.
 - **Phase 3** (grid placement seam): ✅ 20 of 20 complete. Outer wrapper now receives `class={className} {...rest}` on every component; Props interfaces extend `HTMLAttributes<HTMLXxxElement>`. Form-control wrappers (input, textarea, number-input-button, radio-group-item-input) split out input-specific event handlers via `Omit<HTMLAttributes, 'oninput' | …>` to avoid variance errors when re-typing handlers on the inner input. `qr-code` Props switched from `<HTMLCanvasElement>` to `<HTMLDivElement>` so the layout-participant wrapper is what carries `--dry-grid-area-name`. `avatar` slot-and-no-slot branches both forward to the outer wrapper now.
-- **Phase 4** (token contracts): 0 done, 2 partial (`splitter` z-index only; `textarea` has `--dry-input-*` fallthrough but no namespace), 13 TODO.
-- **Phase 5** (cleanup): 0 done, 7 TODO. `chat-thread.svelte` still has `await tick()` at lines 81 and 101.
+- **Phase 4** (token contracts): ✅ 15 of 15 complete. New `--dry-<comp>-*` namespaces added to chip, radio-group, multi-select-combobox, file-select, drop-zone, gauge, toolbar, accordion, splitter, menubar, textarea, number-input. Chart now ships an 8-slot palette (`--dry-chart-series-1..8`) defaulting to brand / accent / purple / info / success / warning / error / text-weak with index-modulo selection in chart-bars / chart-donut / chart-stacked-bar (fixes the previously-unpainted multi-series stacked bar at line 64). Pagination intentionally delegates to `--dry-btn-*` and now carries a comment documenting that decision. Toggle SVG fill has the explicit `var(--dry-toggle-thumb-bg, var(--dry-color-bg-raised))` fallback.
+- **Phase 5** (cleanup): ✅ 7 of 7 complete. `chat-thread.svelte` no longer imports or calls `tick`; the two former `await tick()` sites use `requestAnimationFrame` (post-paint scroll + view-transition name application). `220ms` magic numbers replaced with `var(--dry-duration-normal)` + `var(--dry-ease-out)`. file-upload-list / file-upload-item now write `data-fu-list` / `data-fu-item` so the existing CSS selectors actually match real DOM. Marquee internals renamed to `--_marquee-*` privates with public `--dry-marquee-{gap,speed}` kept as the surface. Notification-center, toast, stepper, flip-card finished their respective fallback / token-rename work.
 
-Items annotated `**[partial]**` below have visible movement but do not meet the full fix criterion.
+All items previously annotated `**[partial]**` are now resolved.
 
 ## Phase 0. Theme files (highest leverage, every component cascades through these)
 
@@ -141,31 +142,31 @@ Setting `--dry-<component>-*: <default>` on the rendered element defeats Svelte 
 
 Add `--dry-<component>-*` overrides backed by semantic tokens.
 
-- [ ] `chip` (`packages/ui/src/chip/chip-button.svelte:79-94`): expose `--dry-chip-{bg,color,border,active-bg}` on `.chip-wrap`. Currently only private `--_chip-*` exists; consumers must override `--dry-btn-*` to reach the chip.
-- [ ] `radio-group` (`packages/ui/src/radio-group/radio-group-item-input.svelte:48-150`): introduce `--dry-radio-{bg,border,checked-bg,checked-border}` surface.
-- [ ] `multi-select-combobox`: define `--dry-multi-select-*` surface (none today).
-- [ ] `file-select`: introduce `--dry-fs-{bg,border,radius,padding-x,padding-y}` (or `--dry-file-select-*`) surface.
-- [ ] `drop-zone`: introduce `--dry-drop-zone-{padding,border,radius,active-bg}`.
-- [ ] `chart`: expose `--dry-chart-series-1` through `--dry-chart-series-N` (5–8 tonal cascade against brand + accents). Use index-modulo selection in `chart-bars`/`chart-donut`/`chart-stacked-bar` when `point.color` is unset. Today multi-series charts collapse to a single brand color or render unpainted (`chart-stacked-bar.svelte:64`).
-- [ ] `gauge`: expose `--dry-gauge-zone-1..N` for arc segmentation (optional).
-- [ ] `pagination`: define a `--dry-pagination-*` surface or document that the component delegates entirely to inherited button tokens.
-- [ ] `toolbar`: expose `--dry-toolbar-{bg,border,radius,padding}`.
-- [ ] `accordion`: expose `--dry-accordion-border` for theming consistency.
-- [ ] **[partial]** `splitter`: expose `--dry-splitter-handle-{line-color,grip-color,grip-color-hover}` overrides backed by existing token defaults. _As of 2026-05-04: only `--dry-splitter-handle-z-index` is exposed (in `splitter-handle.svelte:89`); the three color tokens are still missing._
-- [ ] `menubar`: expose `--dry-menubar-{bg,border,radius}` to mirror command-palette and dropdown-menu.
-- [ ] **[partial]** `textarea`: namespace tokens to `--dry-textarea-*` falling through to `--dry-input-*` then `--dry-form-control-*`. Today textarea reuses `--dry-input-*` directly so consumers cannot theme inputs and textareas independently. _As of 2026-05-04: the `--dry-input-*` → `--dry-form-control-*` fallthrough is in place, but the outer `--dry-textarea-*` namespace layer has not been added._
-- [ ] `number-input`: same. Add `--dry-number-input-*` falling through to `--dry-input-*`.
-- [ ] `toggle/toggle-button.svelte:69`: add `var(--dry-toggle-thumb-bg, var(--dry-color-bg-raised))` fallback to the SVG `fill` (currently bare `var()` resolves to nothing).
+- [x] `chip` (`packages/ui/src/chip/chip-button.svelte:79-94`): expose `--dry-chip-{bg,color,border,active-bg}` on `.chip-wrap`. Currently only private `--_chip-*` exists; consumers must override `--dry-btn-*` to reach the chip.
+- [x] `radio-group` (`packages/ui/src/radio-group/radio-group-item-input.svelte:48-150`): introduce `--dry-radio-{bg,border,checked-bg,checked-border}` surface.
+- [x] `multi-select-combobox`: define `--dry-multi-select-*` surface (none today).
+- [x] `file-select`: introduce `--dry-fs-{bg,border,radius,padding-x,padding-y}` (or `--dry-file-select-*`) surface.
+- [x] `drop-zone`: introduce `--dry-drop-zone-{padding,border,radius,active-bg}`.
+- [x] `chart`: expose `--dry-chart-series-1` through `--dry-chart-series-N` (5–8 tonal cascade against brand + accents). Use index-modulo selection in `chart-bars`/`chart-donut`/`chart-stacked-bar` when `point.color` is unset. Today multi-series charts collapse to a single brand color or render unpainted (`chart-stacked-bar.svelte:64`).
+- [x] `gauge`: expose `--dry-gauge-zone-1..N` for arc segmentation (optional).
+- [x] `pagination`: define a `--dry-pagination-*` surface or document that the component delegates entirely to inherited button tokens.
+- [x] `toolbar`: expose `--dry-toolbar-{bg,border,radius,padding}`.
+- [x] `accordion`: expose `--dry-accordion-border` for theming consistency.
+- [x] `splitter`: expose `--dry-splitter-handle-{line-color,grip-color,grip-color-hover}` overrides backed by existing token defaults. _As of 2026-05-04: only `--dry-splitter-handle-z-index` is exposed (in `splitter-handle.svelte:89`); the three color tokens are still missing._
+- [x] `menubar`: expose `--dry-menubar-{bg,border,radius}` to mirror command-palette and dropdown-menu.
+- [x] `textarea`: namespace tokens to `--dry-textarea-*` falling through to `--dry-input-*` then `--dry-form-control-*`. Today textarea reuses `--dry-input-*` directly so consumers cannot theme inputs and textareas independently. _As of 2026-05-04: the `--dry-input-*` → `--dry-form-control-*` fallthrough is in place, but the outer `--dry-textarea-*` namespace layer has not been added._
+- [x] `number-input`: same. Add `--dry-number-input-*` falling through to `--dry-input-*`.
+- [x] `toggle/toggle-button.svelte:69`: add `var(--dry-toggle-thumb-bg, var(--dry-color-bg-raised))` fallback to the SVG `fill` (currently bare `var()` resolves to nothing).
 
 ## Phase 5. Cleanup
 
-- [ ] `packages/ui/src/chat-thread/chat-thread.svelte:2, 81, 102`: replace `await tick()` with `requestAnimationFrame` or a microtask flush. `tick()` is banned per the `feedback_no_tick` rule. Also replace 220ms keyframe magic number with `var(--dry-duration-normal)` + `var(--dry-ease-out)`.
-- [ ] `packages/ui/src/file-upload/file-upload-list.svelte:23-36` and `file-upload-item.svelte:20-62`: dead CSS. Selectors target `[data-fu-list]` / `[data-fu-item]` attributes the rendered DOM never sets. Either add the attributes or delete the style blocks.
-- [ ] `packages/ui/src/marquee/marquee.svelte`: rename internal wiring `--marquee-{duration,gap,shift}` to `--_marquee-*` (or fold into `--dry-marquee-*` namespace) so they collide with neither consumer overrides nor public tokens.
-- [ ] `packages/ui/src/notification-center/notification-center-panel.svelte:130, 132, 134`, `notification-center-item.svelte:47`: drop redundant hex fallbacks inside `var()`. Theme tokens always load.
-- [ ] `packages/ui/src/toast/toast-root.svelte:155, 163, 167`: same.
-- [ ] `packages/ui/src/stepper/stepper-step-button.svelte:76, 107`: token-wrap the indicator-empty fill (`var(--dry-color-fill-base, transparent)` rather than bare `transparent`) so theming docs can explain the convention.
-- [ ] `packages/ui/src/flip-card/flip-card-root.svelte:92-93`: rename `--dry-btn-{bg,border}: transparent` overrides on the toggle-shell to a dedicated `--dry-flip-card-toggle-overlay-*` so the "ghost clickable" pattern reads explicitly.
+- [x] `packages/ui/src/chat-thread/chat-thread.svelte:2, 81, 102`: replace `await tick()` with `requestAnimationFrame` or a microtask flush. `tick()` is banned per the `feedback_no_tick` rule. Also replace 220ms keyframe magic number with `var(--dry-duration-normal)` + `var(--dry-ease-out)`.
+- [x] `packages/ui/src/file-upload/file-upload-list.svelte:23-36` and `file-upload-item.svelte:20-62`: dead CSS. Selectors target `[data-fu-list]` / `[data-fu-item]` attributes the rendered DOM never sets. Either add the attributes or delete the style blocks.
+- [x] `packages/ui/src/marquee/marquee.svelte`: rename internal wiring `--marquee-{duration,gap,shift}` to `--_marquee-*` (or fold into `--dry-marquee-*` namespace) so they collide with neither consumer overrides nor public tokens.
+- [x] `packages/ui/src/notification-center/notification-center-panel.svelte:130, 132, 134`, `notification-center-item.svelte:47`: drop redundant hex fallbacks inside `var()`. Theme tokens always load.
+- [x] `packages/ui/src/toast/toast-root.svelte:155, 163, 167`: same.
+- [x] `packages/ui/src/stepper/stepper-step-button.svelte:76, 107`: token-wrap the indicator-empty fill (`var(--dry-color-fill-base, transparent)` rather than bare `transparent`) so theming docs can explain the convention.
+- [x] `packages/ui/src/flip-card/flip-card-root.svelte:92-93`: rename `--dry-btn-{bg,border}: transparent` overrides on the toggle-shell to a dedicated `--dry-flip-card-toggle-overlay-*` so the "ghost clickable" pattern reads explicitly.
 
 ## Out of scope (already clean, do not touch)
 

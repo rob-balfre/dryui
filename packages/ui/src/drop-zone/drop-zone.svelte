@@ -70,9 +70,9 @@
 
 <style>
 	[data-drop-zone] {
-		padding: var(--dry-space-6) var(--dry-space-8);
-		border: 1px dashed var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-md);
+		padding: var(--dry-drop-zone-padding, var(--dry-space-6) var(--dry-space-8));
+		border: 1px dashed var(--dry-drop-zone-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-drop-zone-radius, var(--dry-radius-md));
 		text-align: center;
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
@@ -82,7 +82,10 @@
 
 	[data-drop-zone][data-active] {
 		border-color: var(--dry-color-stroke-strong);
-		background: color-mix(in srgb, var(--dry-color-fill-brand) 5%, transparent);
+		background: var(
+			--dry-drop-zone-active-bg,
+			color-mix(in srgb, var(--dry-color-fill-brand) 5%, transparent)
+		);
 	}
 
 	[data-drop-zone-text] {

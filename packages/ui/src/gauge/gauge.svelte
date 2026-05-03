@@ -101,6 +101,13 @@
 		--dry-gauge-fill-color: var(--dry-color-fill-brand);
 		--dry-gauge-stroke-width: 8;
 
+		/* Threshold zone palette. Consumers can override any slot to retheme
+		   the arc segmentation. Default order: brand, success, warning, error. */
+		--dry-gauge-zone-1: var(--dry-color-fill-brand);
+		--dry-gauge-zone-2: var(--dry-color-fill-success);
+		--dry-gauge-zone-3: var(--dry-color-fill-warning);
+		--dry-gauge-zone-4: var(--dry-color-fill-error);
+
 		aspect-ratio: 1;
 		height: var(--dry-gauge-size);
 	}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { tick } from 'svelte';
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 
@@ -78,7 +77,7 @@
 	async function scrollToLatest(
 		behavior: ScrollBehavior = prefersReducedMotion ? 'auto' : 'smooth'
 	) {
-		await tick();
+		await new Promise((resolve) => requestAnimationFrame(resolve));
 		viewport?.lastElementChild?.scrollIntoView({ behavior, block: 'end' });
 	}
 
@@ -98,7 +97,7 @@
 
 			const transition = startViewTransition(async () => {
 				renderedCount = nextCount;
-				await tick();
+				await new Promise((resolve) => requestAnimationFrame(resolve));
 				// Keep only previously-visible messages named; new ones get none
 				setTransitionNames(visibleBefore);
 			});
@@ -190,7 +189,7 @@
 
 	@supports not (view-transition-name: chat-message-0) {
 		[data-chat-thread-message] {
-			animation: chat-message-enter 220ms ease-out;
+			animation: chat-message-enter var(--dry-duration-normal) var(--dry-ease-out);
 		}
 	}
 

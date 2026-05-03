@@ -16,6 +16,13 @@
 	const chartHeight = $derived(ctx.height - ctx.padding.top - ctx.padding.bottom);
 	const valueRange = $derived(ctx.maxValue - ctx.minValue || 1);
 
+	const SERIES_SLOTS = 8;
+
+	function seriesFill(index: number): string {
+		const slot = (index % SERIES_SLOTS) + 1;
+		return `var(--dry-chart-series-${slot}, currentColor)`;
+	}
+
 	const bars = $derived(
 		ctx.data.map((point, i) => {
 			const barWidth = (chartWidth / ctx.data.length) * 0.7;
@@ -53,7 +60,7 @@
 			width={bar.width}
 			height={bar.height}
 			rx={radius}
-			fill={bar.point.color ?? 'currentColor'}
+			fill={bar.point.color ?? seriesFill(bar.index)}
 			data-part="bar"
 			data-clickable={onclick ? '' : undefined}
 			onclick={onclick ? () => handleClick(bar) : undefined}

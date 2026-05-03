@@ -137,11 +137,12 @@
 		grid-template-columns: max-content minmax(0, 1fr) max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
-		padding: var(--dry-space-2) var(--dry-space-3);
+		padding: var(--dry-file-select-padding-y, var(--dry-space-2))
+			var(--dry-file-select-padding-x, var(--dry-space-3));
 		font-family: var(--dry-font-sans);
-		background: var(--dry-color-bg-raised);
-		border: 1px solid var(--dry-color-stroke-strong);
-		border-radius: var(--dry-radius-md);
+		background: var(--dry-file-select-bg, var(--dry-color-bg-raised));
+		border: 1px solid var(--dry-file-select-border, var(--dry-color-stroke-strong));
+		border-radius: var(--dry-file-select-radius, var(--dry-radius-md));
 		transition:
 			border-color var(--dry-duration-fast) var(--dry-ease-default),
 			background var(--dry-duration-fast) var(--dry-ease-default);

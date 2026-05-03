@@ -12,7 +12,7 @@
 	let { file, index, children, class: className, size = 'md', ...rest }: Props = $props();
 </script>
 
-<li class={className} data-index={index} {...rest}>
+<li data-fu-item data-size={size} class={className} data-index={index} {...rest}>
 	{@render children()}
 </li>
 

@@ -19,6 +19,13 @@
 		Math.max(...stackedData.map((d) => d.segments.reduce((sum, s) => sum + s.value, 0)), 1)
 	);
 
+	const SERIES_SLOTS = 8;
+
+	function seriesFill(index: number): string {
+		const slot = (index % SERIES_SLOTS) + 1;
+		return `var(--dry-chart-series-${slot}, currentColor)`;
+	}
+
 	const barGroups = $derived(
 		stackedData.map((point, i) => {
 			const barWidth = (chartWidth / stackedData.length) * 0.7;
@@ -26,7 +33,7 @@
 			const x = ctx.padding.left + i * (barWidth + gap) + gap / 2;
 
 			let cumHeight = 0;
-			const rects = point.segments.map((seg) => {
+			const rects = point.segments.map((seg, segIndex) => {
 				const segHeight = (seg.value / maxStackValue) * chartHeight;
 				cumHeight += segHeight;
 				const y = ctx.padding.top + chartHeight - cumHeight;
@@ -35,7 +42,7 @@
 					y,
 					width: barWidth,
 					height: Math.max(0, segHeight),
-					color: seg.color,
+					color: seg.color ?? seriesFill(segIndex),
 					value: seg.value
 				};
 			});

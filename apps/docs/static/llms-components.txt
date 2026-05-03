@@ -3132,7 +3132,7 @@ Structure:
     Chart.HorizontalBar
     Chart.XAxis
     Chart.YAxis
-CSS variables: --dry-chart-axis-color, --dry-chart-bar-color, --dry-chart-bg, --dry-chart-border, --dry-chart-grid-color, --dry-chart-line-color, --dry-chart-radius
+CSS variables: --dry-chart-axis-color, --dry-chart-bar-color, --dry-chart-bg, --dry-chart-border, --dry-chart-grid-color, --dry-chart-line-color, --dry-chart-radius, --dry-chart-series-1, --dry-chart-series-2, --dry-chart-series-3, --dry-chart-series-4, --dry-chart-series-5, --dry-chart-series-6, --dry-chart-series-7, --dry-chart-series-8
 Data attributes: data-chart | data-chart-a11y | data-chart-area | data-chart-axis | data-chart-bars | data-chart-container | data-chart-data-list | data-chart-donut | data-chart-donut-label | data-chart-horizontal-bar | data-chart-line | data-chart-root | data-chart-stacked-bar | data-chart-summary | data-chart-tick-label | data-clickable | data-interactive | data-list | data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content. | Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.
 Example:
@@ -3867,7 +3867,7 @@ Root import: import { Gauge } from '@dryui/ui'
 Subpath import: import { Gauge } from '@dryui/ui/gauge'
 Props: value (number), Current controlled or bindable value., required | min (number), Minimum allowed value., default 0 | max (number), Maximum allowed value., default 100 | startAngle (number), default -135 | endAngle (number), default 135 | thresholds ({ value: number; color: string }[]) | label (Snippet<[{ value: number; percentage: number }]>), Visible label text shown for the control or item. | children (Snippet), Content rendered inside the component.
 Native props: Forwards <svg> attributes via rest props.
-CSS variables: --dry-gauge-fill-color, --dry-gauge-size, --dry-gauge-stroke-width, --dry-gauge-track-color
+CSS variables: --dry-gauge-fill-color, --dry-gauge-size, --dry-gauge-stroke-width, --dry-gauge-track-color, --dry-gauge-zone-1, --dry-gauge-zone-2, --dry-gauge-zone-3, --dry-gauge-zone-4
 Data attributes: data-gauge | data-gauge-label | data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:

@@ -110,10 +110,10 @@
 		inset: unset;
 		margin: 0;
 
-		background: var(--dry-color-bg-overlay);
+		background: var(--dry-menubar-bg, var(--dry-color-bg-overlay));
 		color: var(--dry-color-text-strong);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-popover);
+		border: 1px solid var(--dry-menubar-border, var(--dry-color-stroke-weak));
+		border-radius: var(--dry-menubar-radius, var(--dry-radius-popover));
 		box-shadow: var(--dry-shadow-overlay);
 		padding: var(--dry-space-1);
 

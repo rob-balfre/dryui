@@ -135,13 +135,13 @@
 		grid-template-columns: auto minmax(3ch, max-content) auto;
 		align-items: stretch;
 		gap: var(--dry-space-1);
-		--dry-input-bg: var(--dry-color-bg-raised);
-		--dry-input-border: var(--dry-color-stroke-strong);
-		--dry-input-color: var(--dry-color-text-strong);
-		--dry-input-radius: var(--dry-radius-md);
-		--dry-input-padding-x: var(--dry-space-3);
-		--dry-input-padding-y: var(--dry-space-2);
-		--dry-input-font-size: var(--dry-type-small-size);
+		--dry-input-bg: var(--dry-number-input-bg, var(--dry-color-bg-raised));
+		--dry-input-border: var(--dry-number-input-border, var(--dry-color-stroke-strong));
+		--dry-input-color: var(--dry-number-input-color, var(--dry-color-text-strong));
+		--dry-input-radius: var(--dry-number-input-radius, var(--dry-radius-md));
+		--dry-input-padding-x: var(--dry-number-input-padding-x, var(--dry-space-3));
+		--dry-input-padding-y: var(--dry-number-input-padding-y, var(--dry-space-2));
+		--dry-input-font-size: var(--dry-number-input-font-size, var(--dry-type-small-size));
 	}
 
 	[data-number-input-wrapper] input {

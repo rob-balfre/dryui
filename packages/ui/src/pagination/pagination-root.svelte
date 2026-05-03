@@ -1,3 +1,10 @@
+<!--
+	Pagination intentionally has no `--dry-pagination-*` token surface.
+	The numeric and nav buttons are rendered by the shared Button component, so
+	pagination delegates its visual chrome (bg, border, radius, padding) to the
+	inherited button tokens (`--dry-btn-*`). Override those at the pagination
+	root (or higher) to retheme pagination.
+-->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';

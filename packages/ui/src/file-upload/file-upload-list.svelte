@@ -13,7 +13,7 @@
 	const ctx = getFileUploadCtx();
 </script>
 
-<ul class={className} {...rest}>
+<ul data-fu-list data-size={size} class={className} {...rest}>
 	{#each ctx.files as file, index}
 		{@render children({ file, index })}
 	{/each}
