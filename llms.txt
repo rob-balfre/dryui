@@ -19,11 +19,6 @@
 - [Home](https://dryui.dev/): Landing page for DryUI
 - [Getting Started](https://dryui.dev/getting-started): Install DryUI, import the theme, and bootstrap your app
 - [Components](https://dryui.dev/components): Per-component reference with props, parts, examples, and anti-patterns
-- [Theme Wizard](https://dryui.dev/theme-wizard): Build and export DryUI semantic token themes
-- [Tools](https://dryui.dev/tools): Install and use the DryUI CLI for setup, lookup, tokens, and feedback tooling
-- [How it works](https://dryui.dev/how-it-works): Architecture and mental model for DryUI-backed apps
-- [How we work](https://dryui.dev/how-we-work): Per-module architecture diagrams and internal workflow
-- [Grid rules](https://dryui.dev/grid-rules): The DryUI layout discipline: grid-first, container queries, token-based spacing
 
 ## Installation
 

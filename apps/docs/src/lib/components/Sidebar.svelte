@@ -1,27 +1,16 @@
 <script lang="ts">
-	import { Shimmer, Sidebar } from '@dryui/ui';
-	import {
-		Blocks,
-		BookOpenText,
-		ExternalLink,
-		GitCompareArrows,
-		Grid2x2Check,
-		House,
-		ToolCase,
-		WandSparkles,
-		Workflow
-	} from 'lucide-svelte';
+	import { Sidebar } from '@dryui/ui';
+	import { Blocks, BookOpenText, House } from 'lucide-svelte';
 	import { categories, toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
 	import NavGroup from './NavGroup.svelte';
 
 	interface Props {
 		currentPath: string;
-		themeWizardHref?: string;
 		onnavigate?: () => void;
 	}
 
-	let { currentPath, themeWizardHref = withBase('/theme-wizard'), onnavigate }: Props = $props();
+	let { currentPath, onnavigate }: Props = $props();
 	const totalComponents = categories.reduce((sum, c) => sum + c.items.length, 0);
 
 	function isComponentsActive(): boolean {
@@ -34,28 +23,9 @@
 		);
 	}
 
-	let scrollRootEl = $state<HTMLDivElement>();
-
-	$effect(() => {
-		if (!scrollRootEl || !currentPath) return;
-		const node = scrollRootEl;
-		const frame = requestAnimationFrame(() => {
-			const active = node.querySelector('[data-active]');
-			if (active instanceof HTMLElement) {
-				active.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-			}
-		});
-		return () => {
-			cancelAnimationFrame(frame);
-		};
-	});
-
 	const staticLinks: { label: string; href: string; icon: typeof House }[] = [
 		{ label: 'Home', href: withBase('/'), icon: House },
-		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
-		{ label: 'Tools', href: withBase('/tools'), icon: ToolCase },
-		{ label: 'Grid Rules', href: withBase('/grid-rules'), icon: Grid2x2Check },
-		{ label: 'How We Work', href: withBase('/how-we-work'), icon: Workflow }
+		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText }
 	];
 </script>
 
@@ -67,7 +37,7 @@
 		--dry-sidebar-width="100%"
 	>
 		<Sidebar.Content --dry-sidebar-content-scrollbar-gutter="stable">
-			<div bind:this={scrollRootEl} class="scroll-root">
+			<div class="scroll-root">
 				<Sidebar.Group>
 					{#each staticLinks as link (link.href)}
 						<Sidebar.Item
@@ -106,29 +76,6 @@
 				</Sidebar.Group>
 			</div>
 		</Sidebar.Content>
-		<Sidebar.Footer>
-			<Sidebar.Item
-				href={themeWizardHref}
-				target="_blank"
-				rel="noreferrer"
-				title="Open Theme Wizard in a new tab"
-				onclick={onnavigate}
-			>
-				<Shimmer
-					color="#ffc27a"
-					duration={3.2}
-					--dry-shimmer-column="1 / -1"
-					--dry-shimmer-outer-columns="minmax(0, 1fr)"
-					--dry-shimmer-content-columns="max-content minmax(0, 1fr) max-content"
-					--dry-shimmer-gap="var(--dry-space-3)"
-					--dry-shimmer-justify-self="stretch"
-				>
-					<WandSparkles size={16} aria-hidden="true" />
-					<span>Theme Wizard</span>
-					<ExternalLink size={14} aria-hidden="true" />
-				</Shimmer>
-			</Sidebar.Item>
-		</Sidebar.Footer>
 	</Sidebar.Root>
 </div>
 

@@ -75,33 +75,6 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 		path: '/components',
 		label: 'Components',
 		description: 'Per-component reference with props, parts, examples, and anti-patterns'
-	},
-	{
-		path: '/theme-wizard',
-		label: 'Theme Wizard',
-		description: 'Build and export DryUI semantic token themes',
-		keywords: ['tokens', 'palette', 'theme editor', 'preset themes']
-	},
-	{
-		path: '/tools',
-		label: 'Tools',
-		description: 'Install and use the DryUI CLI for setup, lookup, tokens, and feedback tooling',
-		keywords: ['cli', 'install', 'commands', 'init', 'detect', 'tokens', 'feedback']
-	},
-	{
-		path: '/how-it-works',
-		label: 'How it works',
-		description: 'Architecture and mental model for DryUI-backed apps'
-	},
-	{
-		path: '/how-we-work',
-		label: 'How we work',
-		description: 'Per-module architecture diagrams and internal workflow'
-	},
-	{
-		path: '/grid-rules',
-		label: 'Grid rules',
-		description: 'The DryUI layout discipline: grid-first, container queries, token-based spacing'
 	}
 ];
 

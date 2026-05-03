@@ -1,137 +1,51 @@
 /* DryUI consumer layout sheet. Each `[data-layout="<name>"]` block owns page
    and tool layout structure, with placed children marked by `data-layout-area`. */
 
-[data-layout='layout-rules-page'] {
+[data-layout='home'] {
 	container-type: inline-size;
-	container-name: layout-rules-page;
+	container-name: home;
 	display: grid;
-	grid-template-columns: minmax(0, 64rem);
+	grid-template-columns: minmax(0, 72rem);
 	justify-content: center;
-	padding-inline: var(--dry-space-6);
+	align-content: start;
+	padding: var(--dry-space-5);
 }
 
-[data-layout='layout-rules-page'] > [data-layout-area='main'] {
+[data-layout='home'] > [data-layout-area] {
 	display: grid;
-	gap: var(--dry-space-10);
 }
 
-[data-layout='theme-wizard'] {
-	container-type: inline-size;
-	container-name: theme-wizard;
+[data-layout='home'] [data-layout-area='hero'] {
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas: 'copy';
+	align-content: center;
+	align-items: start;
+	min-block-size: calc(100svh - 7rem);
+}
+
+[data-layout='home'] [data-layout-area='hero-copy'] {
+	grid-area: copy;
 	display: grid;
-	align-items: center;
-	padding: var(--dry-space-4);
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	grid-template-rows:
-		auto auto auto auto minmax(20rem, calc(100dvh - 25rem))
-		auto auto auto auto auto auto;
-	grid-template-areas:
-		'brand brand'
-		'tabs tabs'
-		'mode reset'
-		'copy download'
-		'preview preview'
-		'accentLabel baseLabel'
-		'accent base'
-		'depthLabel fontLabel'
-		'depth font'
-		'radiusLabel densityLabel'
-		'radius density';
+	grid-template-columns: minmax(0, 1fr);
+	align-content: center;
+	justify-items: start;
+	gap: var(--dry-space-6);
 }
 
-[data-layout='theme-wizard'] > [data-layout-area] {
+[data-layout='home'] [data-layout-area='actions'] {
 	display: grid;
-	min-block-size: 0;
+	grid-template-columns: minmax(0, 31rem);
+	align-items: start;
+	gap: var(--dry-space-4);
 }
 
-[data-layout='theme-wizard'] > [data-layout-area='brand'] {
-	grid-area: brand;
-	grid-auto-flow: column;
-	grid-auto-columns: max-content;
-	align-items: center;
+[data-layout='home'] [data-layout-area='install'] {
+	display: grid;
 	gap: var(--dry-space-2);
 }
 
-[data-layout='theme-wizard'] > [data-layout-area='tabs'] {
-	grid-area: tabs;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='mode'] {
-	grid-area: mode;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='copy'] {
-	grid-area: copy;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='download'] {
-	grid-area: download;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='reset'] {
-	grid-area: reset;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='preview'] {
-	grid-area: preview;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='accentLabel'] {
-	grid-area: accentLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='accent'] {
-	grid-area: accent;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='baseLabel'] {
-	grid-area: baseLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='base'] {
-	grid-area: base;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='depthLabel'] {
-	grid-area: depthLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='depth'] {
-	grid-area: depth;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='fontLabel'] {
-	grid-area: fontLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='font'] {
-	grid-area: font;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='radiusLabel'] {
-	grid-area: radiusLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='radius'] {
-	grid-area: radius;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='densityLabel'] {
-	grid-area: densityLabel;
-}
-
-[data-layout='theme-wizard'] > [data-layout-area='density'] {
-	grid-area: density;
-}
-
-@container theme-wizard (min-width: 720px) {
-	[data-layout='theme-wizard'] {
-		grid-template-columns: repeat(12, minmax(0, 1fr));
-		grid-template-rows: auto minmax(0, calc(100dvh - 12rem)) auto auto;
-		grid-template-areas:
-			'brand brand tabs tabs tabs tabs mode copy download download reset reset'
-			'preview preview preview preview preview preview preview preview preview preview preview preview'
-			'accentLabel accentLabel baseLabel baseLabel depthLabel depthLabel depthLabel depthLabel fontLabel radiusLabel densityLabel densityLabel'
-			'accent accent base base depth depth depth depth font radius density density';
+@container home (min-width: 48rem) {
+	[data-layout='home'] {
+		padding: var(--dry-space-8);
 	}
 }

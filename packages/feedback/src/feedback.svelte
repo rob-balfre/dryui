@@ -1182,6 +1182,35 @@
 		notifyLayoutChange();
 	}
 
+	function breakApartSelected() {
+		const original = selectedComponentEl;
+		if (!original) return;
+		if (original.dataset[LAYOUT_DATASET.addedId]) return;
+		const children = Array.from(original.children).filter((c): c is HTMLElement => {
+			if (!(c instanceof HTMLElement)) return false;
+			const rect = c.getBoundingClientRect();
+			return rect.width >= 4 && rect.height >= 4;
+		});
+		if (children.length === 0) return;
+		const parentClone = layoutClones.get(original);
+		if (parentClone) {
+			parentClone.dataset.dryuiLayoutDecomposed = '';
+			parentClone.style.display = 'none';
+		}
+		for (const child of children) ensureLayoutClone(child);
+		selectedComponentEl = children[0] ?? null;
+		commitHistory();
+		notifyLayoutChange();
+	}
+
+	const canBreakApart = $derived.by(() => {
+		const el = selectedComponentEl;
+		if (!el) return false;
+		if (el.dataset[LAYOUT_DATASET.addedId]) return false;
+		void layoutVersion;
+		return el.children.length > 0;
+	});
+
 	function applyAddedProps(label: string, propsJson: string) {
 		const el = selectedComponentEl;
 		if (!el) return;
@@ -2946,6 +2975,8 @@
 				oncancelplacement={cancelPlacingComponent}
 				onapplyprops={applyAddedProps}
 				onremoveselected={removeSelectedElement}
+				{canBreakApart}
+				onbreakapart={breakApartSelected}
 			/>
 
 			{#if inspectingComponents}

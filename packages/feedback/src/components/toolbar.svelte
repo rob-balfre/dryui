@@ -28,7 +28,8 @@
 		Settings,
 		Trash2,
 		Type,
-		Undo2
+		Undo2,
+		Ungroup
 	} from 'lucide-svelte';
 	import { type SubmitStatus, type Tool } from '../types.js';
 	import {
@@ -53,6 +54,7 @@
 		placing?: string | null;
 		canUndo?: boolean;
 		canRedo?: boolean;
+		canBreakApart?: boolean;
 		addedKind?: string | null;
 		addedLabel?: string;
 		addedPropsJson?: string;
@@ -68,6 +70,7 @@
 		oncancelplacement?: () => void;
 		onapplyprops?: (label: string, propsJson: string) => void;
 		onremoveselected?: () => void;
+		onbreakapart?: () => void;
 	}
 
 	let {
@@ -84,6 +87,7 @@
 		addedPropsJson = '',
 		canUndo = false,
 		canRedo = false,
+		canBreakApart = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
@@ -95,7 +99,8 @@
 		onaddcomponent,
 		oncancelplacement,
 		onapplyprops,
-		onremoveselected
+		onremoveselected,
+		onbreakapart
 	}: Props = $props();
 
 	const inspecting = $derived(mode === 'components');
@@ -893,6 +898,20 @@
 						</div>
 					{/if}
 				</div>
+
+				{#if hasSelection && canBreakApart}
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						type="button"
+						data-tooltip="Break apart"
+						onclick={() => onbreakapart?.()}
+						aria-label="Break component apart into its slots"
+					>
+						<Ungroup size={16} />
+					</Button>
+				{/if}
 
 				{#if hasSelection}
 					<AlertDialog.Root bind:open={removeConfirmOpen}>

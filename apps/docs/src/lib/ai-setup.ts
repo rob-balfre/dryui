@@ -64,6 +64,8 @@ case "$target" in
   *) npm install -g @dryui/cli@latest && dryui ;;
 esac`;
 
+export const DRYUI_SKILLS_INSTALL_COMMAND = 'npx skills add rob-balfre/dryui';
+
 const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	ask: 'orange',
 	check: 'blue'

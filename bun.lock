@@ -26,7 +26,6 @@
       "dependencies": {
         "@dryui/feedback": "workspace:*",
         "@dryui/primitives": "workspace:*",
-        "@dryui/theme-wizard": "workspace:*",
         "@dryui/ui": "workspace:*",
         "lucide-svelte": "^1.0.1",
         "mapbox-gl": "^3.22.0",

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Button } from '@dryui/ui';
 	import { onMount } from 'svelte';
+	import { COMPONENT_NAMES } from './component-names.js';
 
 	interface Props {
 		selectedElement: HTMLElement | null;
@@ -11,6 +12,57 @@
 	}
 
 	let { selectedElement, getClone, onselect, onclose, oncommit }: Props = $props();
+
+	function kebab(name: string): string {
+		return name.replace(/([A-Z])/g, (_, c, i) =>
+			i === 0 ? c.toLowerCase() : '-' + c.toLowerCase()
+		);
+	}
+
+	function pascal(kebabStr: string): string {
+		return kebabStr
+			.split('-')
+			.map((w) => (w ? w[0]!.toUpperCase() + w.slice(1) : ''))
+			.join('');
+	}
+
+	const COMPONENT_DATA_KEYS = new Set(COMPONENT_NAMES.map(kebab));
+	const KEBAB_TO_NAME = new Map<string, string>(COMPONENT_NAMES.map((n) => [kebab(n), n]));
+	const SORTED_KEBABS = [...KEBAB_TO_NAME.keys()].sort((a, b) => b.length - a.length);
+
+	const NATIVE_COMPONENT_TAGS = new Set([
+		'input',
+		'textarea',
+		'select',
+		'button',
+		'img',
+		'video',
+		'audio',
+		'svg',
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6'
+	]);
+
+	const NATIVE_TAG_TO_NAME: Record<string, string> = {
+		h1: 'Heading',
+		h2: 'Heading',
+		h3: 'Heading',
+		h4: 'Heading',
+		h5: 'Heading',
+		h6: 'Heading',
+		input: 'Input',
+		textarea: 'Textarea',
+		select: 'Select',
+		button: 'Button',
+		img: 'Image',
+		video: 'VideoEmbed',
+		audio: 'VideoEmbed',
+		svg: 'Icon'
+	};
 
 	const cloneElement = $derived(selectedElement ? getClone(selectedElement) : null);
 
@@ -44,12 +96,31 @@
 		return el.dataset.dryuiAddedId !== undefined;
 	}
 
+	function componentLabelFor(el: HTMLElement): string | null {
+		for (const attr of el.attributes) {
+			if (!attr.name.startsWith('data-')) continue;
+			const stripped = attr.name.slice(5);
+			for (const key of SORTED_KEBABS) {
+				if (stripped === key) return KEBAB_TO_NAME.get(key)!;
+				if (stripped.startsWith(key + '-')) {
+					const slot = stripped.slice(key.length + 1);
+					const name = KEBAB_TO_NAME.get(key)!;
+					return slot === 'root' ? name : `${name}.${pascal(slot)}`;
+				}
+			}
+		}
+		if (el.hasAttribute('data-dry-button')) return 'Button';
+		return NATIVE_TAG_TO_NAME[el.tagName.toLowerCase()] ?? null;
+	}
+
 	function tooltipLabelFor(el: HTMLElement): string {
 		if (isAddedPlaceholder(el)) {
 			const fallback = el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 			const kind = fallback?.textContent?.trim();
 			if (kind) return kind;
 		}
+		const componentName = componentLabelFor(el);
+		if (componentName) return componentName;
 		const tag = el.tagName.toLowerCase();
 		if (el.id) return `${tag}#${el.id}`;
 		// Skip framework-scoped class hashes (Svelte: svelte-xxxxxx, CSS modules: _foo_xxxxx).
@@ -77,6 +148,24 @@
 		return el.matches('[data-layout], [data-layout-area]');
 	}
 
+	function hasComponentDataAttr(el: HTMLElement): boolean {
+		for (const attr of el.attributes) {
+			if (!attr.name.startsWith('data-')) continue;
+			const stripped = attr.name.slice(5);
+			for (const key of COMPONENT_DATA_KEYS) {
+				if (stripped === key || stripped.startsWith(key + '-')) return true;
+			}
+		}
+		return false;
+	}
+
+	function isComponentElement(el: HTMLElement): boolean {
+		if (isAddedPlaceholder(el)) return true;
+		if (el.hasAttribute('data-dry-button')) return true;
+		if (NATIVE_COMPONENT_TAGS.has(el.tagName.toLowerCase())) return true;
+		return hasComponentDataAttr(el);
+	}
+
 	function rebuild() {
 		const all = document.querySelectorAll<HTMLElement>('body *');
 		const next: Box[] = [];
@@ -86,6 +175,7 @@
 			if (!added && isInsideFeedback(el)) continue;
 			if (isClone(el)) continue;
 			if (!added && isLayoutStructure(el)) continue;
+			if (!isComponentElement(el)) continue;
 			const cs = getComputedStyle(el);
 			if (cs.display === 'none') continue;
 			const clone = getClone(el);

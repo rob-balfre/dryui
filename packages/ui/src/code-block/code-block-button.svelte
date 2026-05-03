@@ -35,14 +35,53 @@
 	const isSingleLine = $derived(!code.includes('\n'));
 	const lineBreak = '\n';
 
-	function handleCopy() {
-		navigator.clipboard.writeText(code).then(() => {
-			copied = true;
-			clearTimeout(copyTimer);
-			copyTimer = setTimeout(() => {
-				copied = false;
-			}, 2000);
-		});
+	function showCopiedFeedback() {
+		copied = true;
+		clearTimeout(copyTimer);
+		copyTimer = setTimeout(() => {
+			copied = false;
+		}, 2000);
+	}
+
+	function copyWithTextarea(value: string) {
+		const textarea = document.createElement('textarea');
+		textarea.value = value;
+		textarea.setAttribute('readonly', '');
+		textarea.style.position = 'fixed';
+		textarea.style.inset = '0 auto auto 0';
+		textarea.style.opacity = '0';
+
+		document.body.appendChild(textarea);
+		textarea.select();
+		const copiedToClipboard = document.execCommand('copy');
+		textarea.remove();
+
+		if (!copiedToClipboard) {
+			throw new Error('Unable to copy code block contents');
+		}
+	}
+
+	async function copyText(value: string) {
+		if (navigator.clipboard?.writeText) {
+			try {
+				await navigator.clipboard.writeText(value);
+				return;
+			} catch {
+				copyWithTextarea(value);
+				return;
+			}
+		}
+
+		copyWithTextarea(value);
+	}
+
+	async function handleCopy() {
+		try {
+			await copyText(code);
+			showCopiedFeedback();
+		} catch (error) {
+			console.warn('Failed to copy code block contents', error);
+		}
 	}
 
 	function renderLine(

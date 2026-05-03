@@ -68,7 +68,6 @@
 					r="15"
 					fill="var(--dry-toggle-thumb-bg)"
 					stroke="var(--_thumb-stroke)"
-					stroke-width="2"
 				/>
 			</svg>
 			{#if icon}
@@ -107,6 +106,7 @@
 
 	.root[data-state='on'] {
 		--dry-btn-bg: var(--dry-toggle-selected-bg, var(--dry-color-fill-selected));
+		--dry-btn-border: var(--dry-toggle-selected-stroke, var(--dry-color-stroke-selected));
 	}
 
 	.root[data-disabled]:not([data-state='on']) {
@@ -115,10 +115,11 @@
 
 	.root[data-disabled][data-state='on'] {
 		--dry-btn-bg: var(--dry-toggle-disabled-fill, var(--dry-color-fill-disabled));
+		--dry-btn-border: var(--dry-toggle-disabled-stroke, var(--dry-color-stroke-disabled));
 	}
 
 	.thumb {
-		--_thumb-stroke: var(--dry-toggle-track-stroke, var(--dry-color-stroke-strong));
+		--_thumb-stroke: var(--dry-toggle-thumb-stroke, transparent);
 
 		display: inline-grid;
 		position: relative;
@@ -131,17 +132,27 @@
 	}
 
 	.root[data-state='on'] .thumb {
-		--_thumb-stroke: var(--dry-toggle-selected-stroke, var(--dry-color-stroke-selected));
+		--_thumb-stroke: var(
+			--dry-toggle-thumb-selected-stroke,
+			var(--dry-toggle-thumb-stroke, transparent)
+		);
 		transform: translateX(var(--_thumb-travel));
 	}
 
 	.root[data-disabled] .thumb {
-		--_thumb-stroke: var(--dry-toggle-disabled-stroke, var(--dry-color-stroke-disabled));
+		--_thumb-stroke: var(
+			--dry-toggle-thumb-disabled-stroke,
+			var(--dry-toggle-disabled-stroke, var(--dry-color-stroke-disabled))
+		);
 	}
 
 	.thumb > svg {
 		display: block;
 		height: 100%;
+	}
+
+	.thumb circle {
+		stroke-width: var(--dry-toggle-thumb-stroke-width, 1);
 	}
 
 	.thumb-icon {
@@ -155,7 +166,7 @@
 	}
 
 	.root[data-state='on'] .thumb-icon {
-		color: var(--dry-color-text-brand);
+		color: var(--dry-color-on-brand);
 	}
 
 	.root[data-disabled] .thumb-icon {

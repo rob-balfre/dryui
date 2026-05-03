@@ -17,8 +17,7 @@ const config = {
 			remoteFunctions: true
 		},
 		output: {
-			// `single` currently generates a broken client route dictionary in docs dev,
-			// which makes /theme-wizard hydrate as /components/[slug].
+			// `single` currently generates a broken client route dictionary in docs dev.
 			bundleStrategy: 'split'
 		},
 		prerender: {

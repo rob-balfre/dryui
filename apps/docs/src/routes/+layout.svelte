@@ -3,29 +3,24 @@
 	import { browser, dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { Badge, Button, Container, Drawer, Heading, Link } from '@dryui/ui';
-	import { Menu } from 'lucide-svelte';
+	import { Button, Container, Heading, Link } from '@dryui/ui';
 	import GithubIcon from '$lib/components/GithubIcon.svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 	import Logo from '$lib/components/Logo.svelte';
 	import DocsSidebar from '$lib/components/Sidebar.svelte';
 	import ThemeToggle from '$lib/components/ThemeToggle.svelte';
-	import { BUILD_TIMESTAMP, DRYUI_VERSION, GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
-	import { withBase, withQueryParam } from '$lib/utils';
+	import { BUILD_TIMESTAMP, GITHUB_URL, SITE_DESCRIPTION } from '$lib/site-meta';
+	import { docsTheme } from '$lib/theme.svelte.js';
+	import { withBase } from '$lib/utils';
 	import '../app.css';
 	import '../layout.css';
 
 	let { children: routeChildren } = $props();
-	let mobileNavOpen = $state(false);
 	let feedbackEnabled = $state(false);
 
 	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
 	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
 	const FEEDBACK_SESSION_KEY = 'dryui-feedback-enabled';
-
-	function isThemeWizardPath(pathname: string): boolean {
-		return pathname.startsWith('/theme-wizard') || pathname.startsWith(withBase('/theme-wizard'));
-	}
 
 	function getRelativeTime(iso: string): string {
 		const diff = Date.now() - new Date(iso).getTime();
@@ -52,18 +47,8 @@
 	let isFullWidthRoute = $derived(
 		page.url.pathname.startsWith('/view/') || page.url.pathname.startsWith(withBase('/view/'))
 	);
-	let isThemeWizardRoute = $derived(isThemeWizardPath(page.url.pathname));
 	let isHomeRoute = $derived(page.url.pathname === '/' || page.url.pathname === withBase('/'));
-	let shouldPreserveFeedbackMode = $derived(
-		feedbackEnabled || (browser && page.url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1')
-	);
-	let themeWizardHref = $derived(
-		withQueryParam(
-			withBase('/theme-wizard'),
-			FEEDBACK_QUERY_PARAM,
-			shouldPreserveFeedbackMode ? '1' : null
-		)
-	);
+	let homeTheme = $derived(docsTheme.isDark ? 'dark' : 'light');
 
 	function getHashTarget(hash: string): HTMLElement | null {
 		if (!hash.startsWith('#') || hash.length <= 1) return null;
@@ -108,71 +93,23 @@
 	<meta name="description" content={SITE_DESCRIPTION} />
 </svelte:head>
 
-{#snippet homeMiniNav()}
-	<div class="home-mini-nav" aria-label="Docs navigation">
-		<div class="home-mini-nav-brand">
-			<Link href={withBase('/')}>
-				<Heading level={2}>
-					<Logo />
-				</Heading>
-			</Link>
-		</div>
-		<div class="home-mini-nav-search">
-			<GlobalSearch />
-		</div>
-		<div class="home-mini-nav-actions">
-			<Button variant="ghost" size="sm" href={GITHUB_URL} target="_blank" rel="noreferrer">
-				<GithubIcon size={16} /> GitHub
-			</Button>
-			<span class="home-mini-nav-cta">
-				<Button variant="solid" color="primary" size="sm" href={withBase('/getting-started')}
-					>Get Started</Button
-				>
-			</span>
-			<ThemeToggle />
-		</div>
-	</div>
-{/snippet}
-
 {#snippet docsShell()}
 	<div class="docs-shell-frame">
-		<div class="docs-shell" data-home={isHomeRoute || undefined}>
-			{#if isHomeRoute}
-				{@render homeMiniNav()}
-			{/if}
+		<div
+			class="docs-shell"
+			data-home={isHomeRoute || undefined}
+			data-home-theme={isHomeRoute ? homeTheme : undefined}
+		>
 			<header class="docs-header">
 				<Container size="full" padding={false}>
 					<div class="docs-header-bar">
 						<div class="docs-brand">
 							<div class="docs-brand-row">
-								<div class="mobile-nav">
-									<Drawer.Root bind:open={mobileNavOpen} side="left">
-										<Drawer.Trigger>
-											<Button variant="ghost" size="md" aria-label="Open navigation">
-												<Menu size={18} aria-hidden="true" />
-											</Button>
-										</Drawer.Trigger>
-
-										<Drawer.Content --dry-drawer-size="min(22rem, calc(100vw - 2rem))">
-											<Drawer.Body padding={false}>
-												<DocsSidebar
-													currentPath={page.url.pathname}
-													{themeWizardHref}
-													onnavigate={() => (mobileNavOpen = false)}
-												/>
-											</Drawer.Body>
-										</Drawer.Content>
-									</Drawer.Root>
-								</div>
-
-								<Link href={withBase('/')}>
+								<Link href={withBase('/')} underline="none">
 									<Heading level={2}>
 										<Logo />
 									</Heading>
 								</Link>
-								<span class="docs-version">
-									<Badge variant="outline" color="gray" size="sm">v{DRYUI_VERSION}</Badge>
-								</span>
 							</div>
 						</div>
 
@@ -180,7 +117,18 @@
 							<GlobalSearch compact={false} />
 						</div>
 
-						<div class="docs-theme">
+						<div class="docs-actions">
+							<Button
+								variant="ghost"
+								color="ink"
+								size="sm"
+								href={GITHUB_URL}
+								target="_blank"
+								rel="noreferrer"
+								aria-label="GitHub"
+							>
+								<GithubIcon size={16} />
+							</Button>
 							<ThemeToggle />
 						</div>
 					</div>
@@ -188,7 +136,7 @@
 			</header>
 
 			<nav class="docs-nav">
-				<DocsSidebar currentPath={page.url.pathname} {themeWizardHref} />
+				<DocsSidebar currentPath={page.url.pathname} />
 			</nav>
 
 			<main class="docs-content">
@@ -211,7 +159,7 @@
 	</div>
 {/snippet}
 
-{#if isFullWidthRoute || isThemeWizardRoute}
+{#if isFullWidthRoute}
 	{@render routeChildren?.()}
 {:else}
 	{@render docsShell()}
@@ -248,13 +196,12 @@
 
 	.docs-header-bar {
 		display: grid;
-		grid-template-areas:
-			'brand theme'
-			'search search';
-		grid-template-columns: 1fr auto;
+		grid-template-areas: 'brand search actions';
+		grid-template-columns: max-content minmax(5.5rem, 12rem) max-content;
 		align-items: center;
-		gap: var(--dry-space-3);
-		padding-inline: var(--dry-space-4);
+		justify-content: space-between;
+		gap: var(--dry-space-2);
+		padding-inline: var(--dry-space-3);
 	}
 
 	.docs-brand {
@@ -265,13 +212,17 @@
 		grid-area: search;
 	}
 
-	.docs-theme {
-		grid-area: theme;
+	.docs-actions {
+		grid-area: actions;
+		display: inline-grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		align-items: center;
+		gap: var(--dry-space-2);
 		justify-self: end;
-	}
-
-	.docs-version {
-		display: none;
+		--dry-btn-bg: transparent;
+		--dry-btn-color: var(--dry-color-text-strong);
+		--dry-btn-border: transparent;
 	}
 
 	.docs-brand-row {
@@ -280,11 +231,6 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
-	}
-
-	.mobile-nav {
-		display: inline-grid;
-		place-items: center;
 	}
 
 	.docs-nav {
@@ -297,16 +243,103 @@
 		border-inline-end: 1px solid var(--dry-sidebar-border, transparent);
 	}
 
-	.docs-shell[data-home] .mobile-nav,
-	.docs-shell[data-home] .docs-nav,
-	.docs-shell[data-home] .docs-header {
+	.docs-shell[data-home] .docs-nav {
 		display: none;
 	}
 
 	.docs-shell[data-home] {
-		grid-template-areas: 'content';
+		--dry-color-brand: var(--dry-color-text-strong);
+		--dry-color-text-brand: var(--dry-color-text-strong);
+		--dry-color-fill-brand: var(--dry-color-text-strong);
+		--dry-color-on-brand: var(--dry-color-bg-base);
+		--dry-color-focus-ring: oklch(97% 0 0 / 0.28);
+		--dry-color-fill-accent: var(--dry-color-text-strong);
+		--dry-color-stroke-selected: var(--dry-color-text-strong);
+		--dry-color-fill-weak: var(--dry-color-fill);
+		--dry-color-fill-selected: var(--dry-color-text-strong);
+		--docs-logo-mark-bg: var(--dry-color-text-strong);
+		--docs-logo-mark-ink: var(--dry-color-bg-base);
+		--docs-logo-mark-signal: var(--dry-color-text-strong);
+		position: relative;
+		z-index: 2;
+		grid-template-areas: 'header' 'content';
 		grid-template-columns: minmax(0, 1fr);
-		grid-template-rows: 1fr;
+		grid-template-rows: auto 1fr;
+		background: var(--dry-color-bg-base);
+	}
+
+	.docs-shell[data-home][data-home-theme='dark'] {
+		--dry-color-text-strong: oklch(97% 0 0);
+		--dry-color-text-weak: oklch(97% 0 0 / 0.68);
+		--dry-color-icon: oklch(97% 0 0 / 0.78);
+		--dry-color-stroke-strong: oklch(97% 0 0 / 0.36);
+		--dry-color-stroke-weak: oklch(97% 0 0 / 0.14);
+		--dry-color-fill: oklch(97% 0 0 / 0.06);
+		--dry-color-fill-hover: oklch(97% 0 0 / 0.1);
+		--dry-color-fill-active: oklch(97% 0 0 / 0.15);
+		--dry-color-fill-brand-hover: oklch(88% 0 0);
+		--dry-color-fill-brand-active: oklch(80% 0 0);
+		--dry-color-fill-brand-weak: oklch(97% 0 0 / 0.1);
+		--dry-color-stroke-brand: oklch(97% 0 0 / 0.36);
+		--dry-color-stroke-brand-strong: oklch(97% 0 0 / 0.62);
+		--dry-color-stroke-brand-weak: oklch(97% 0 0 / 0.16);
+		--dry-color-focus-ring: oklch(97% 0 0 / 0.28);
+		--dry-color-fill-accent-hover: oklch(88% 0 0);
+		--dry-color-fill-accent-active: oklch(80% 0 0);
+		--dry-color-fill-accent-weak: oklch(97% 0 0 / 0.1);
+		--dry-color-stroke-accent: oklch(97% 0 0 / 0.36);
+		--dry-color-stroke-accent-strong: oklch(97% 0 0 / 0.62);
+		--dry-color-stroke-accent-weak: oklch(97% 0 0 / 0.16);
+		--dry-color-fill-weaker: oklch(97% 0 0 / 0.03);
+		--dry-color-bg-base: oklch(8% 0 0);
+		--dry-color-bg-raised: oklch(12% 0 0);
+		--dry-color-bg-overlay: oklch(17% 0 0);
+		--dry-color-bg-sunken: oklch(5% 0 0);
+		--dry-theme-toggle-icon: var(--dry-color-bg-base);
+		--dry-toggle-track-bg: oklch(97% 0 0 / 0.08);
+		--dry-toggle-track-stroke: oklch(97% 0 0 / 0.32);
+		--dry-toggle-selected-bg: var(--dry-color-text-strong);
+		--dry-toggle-selected-stroke: var(--dry-color-text-strong);
+		--dry-toggle-thumb-bg: var(--dry-color-text-strong);
+		--dry-toggle-hover-bg: oklch(97% 0 0 / 0.12);
+		--dry-toggle-press-bg: oklch(97% 0 0 / 0.18);
+	}
+
+	.docs-shell[data-home][data-home-theme='light'] {
+		--dry-color-text-strong: oklch(8% 0 0);
+		--dry-color-text-weak: oklch(8% 0 0 / 0.64);
+		--dry-color-icon: oklch(8% 0 0 / 0.76);
+		--dry-color-stroke-strong: oklch(8% 0 0 / 0.36);
+		--dry-color-stroke-weak: oklch(8% 0 0 / 0.14);
+		--dry-color-fill: oklch(8% 0 0 / 0.045);
+		--dry-color-fill-hover: oklch(8% 0 0 / 0.075);
+		--dry-color-fill-active: oklch(8% 0 0 / 0.12);
+		--dry-color-fill-brand-hover: oklch(18% 0 0);
+		--dry-color-fill-brand-active: oklch(27% 0 0);
+		--dry-color-fill-brand-weak: oklch(8% 0 0 / 0.08);
+		--dry-color-stroke-brand: oklch(8% 0 0 / 0.36);
+		--dry-color-stroke-brand-strong: oklch(8% 0 0 / 0.62);
+		--dry-color-stroke-brand-weak: oklch(8% 0 0 / 0.16);
+		--dry-color-focus-ring: oklch(8% 0 0 / 0.26);
+		--dry-color-fill-accent-hover: oklch(18% 0 0);
+		--dry-color-fill-accent-active: oklch(27% 0 0);
+		--dry-color-fill-accent-weak: oklch(8% 0 0 / 0.08);
+		--dry-color-stroke-accent: oklch(8% 0 0 / 0.36);
+		--dry-color-stroke-accent-strong: oklch(8% 0 0 / 0.62);
+		--dry-color-stroke-accent-weak: oklch(8% 0 0 / 0.16);
+		--dry-color-fill-weaker: oklch(8% 0 0 / 0.03);
+		--dry-color-bg-base: oklch(97% 0 0);
+		--dry-color-bg-raised: oklch(94% 0 0);
+		--dry-color-bg-overlay: oklch(91% 0 0);
+		--dry-color-bg-sunken: oklch(95% 0 0);
+		--dry-theme-toggle-icon: var(--dry-color-text-strong);
+		--dry-toggle-track-bg: oklch(8% 0 0 / 0.06);
+		--dry-toggle-track-stroke: oklch(8% 0 0 / 0.28);
+		--dry-toggle-selected-bg: var(--dry-color-text-strong);
+		--dry-toggle-selected-stroke: var(--dry-color-text-strong);
+		--dry-toggle-thumb-bg: var(--dry-color-bg-base);
+		--dry-toggle-hover-bg: oklch(8% 0 0 / 0.1);
+		--dry-toggle-press-bg: oklch(8% 0 0 / 0.14);
 	}
 
 	.docs-content {
@@ -320,23 +353,16 @@
 	}
 
 	@container (min-width: 60rem) {
-		.mobile-nav {
-			display: none;
-		}
-
 		.docs-nav {
 			display: block;
 		}
 
 		.docs-header-bar {
-			grid-template-areas: 'brand . search theme';
-			grid-template-columns: var(--docs-sidebar-width) 1fr minmax(16rem, 22rem) 1fr;
+			grid-template-areas: 'brand search actions';
+			grid-template-columns: var(--docs-sidebar-width) minmax(16rem, 24rem) max-content;
 			gap: var(--dry-space-4);
+			justify-content: space-between;
 			padding-inline: var(--dry-space-6);
-		}
-
-		.docs-version {
-			display: inline-grid;
 		}
 
 		.docs-shell {
@@ -388,79 +414,8 @@
 		margin-inline: 0.25em;
 	}
 
-	.home-mini-nav {
-		position: fixed;
-		inset-block-start: 0;
-		inset-inline: 0;
-		z-index: 10;
-		container-type: inline-size;
-		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(min-content, 22rem) minmax(0, 1fr);
-		align-items: center;
-		gap: var(--dry-space-3);
-		padding: var(--dry-space-3) var(--dry-space-4);
-		background: color-mix(in srgb, var(--dry-color-bg-base) 96%, transparent);
-		border-block-end: 1px solid var(--dry-color-stroke-weak, transparent);
-		opacity: 0;
-		transform: translateY(-6px);
-		animation: home-mini-nav-in 320ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
-	}
-
-	.home-mini-nav-brand {
-		display: inline-grid;
-		place-items: center;
-		justify-self: start;
-	}
-
-	.home-mini-nav-search {
-		justify-self: stretch;
-	}
-
-	.home-mini-nav-actions {
-		display: inline-grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		align-items: center;
-		gap: var(--dry-space-2);
-		justify-self: end;
-	}
-
-	@keyframes home-mini-nav-in {
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.home-mini-nav {
-			animation: none;
-			opacity: 1;
-			transform: none;
-		}
-	}
-
-	@container (max-width: 40rem) {
-		.home-mini-nav {
-			grid-template-columns: auto 1fr auto;
-			padding: var(--dry-space-2) var(--dry-space-3);
-		}
-		.home-mini-nav-search {
-			display: none;
-		}
-		.home-mini-nav-cta {
-			display: none;
-		}
-	}
-
 	.docs-shell[data-home] .docs-content {
-		scroll-padding-block-start: var(--dry-space-14);
-		padding-block-start: var(--dry-space-16);
-	}
-
-	@container (max-width: 40rem) {
-		.docs-shell[data-home] .docs-content {
-			padding-block-start: var(--dry-space-12);
-		}
+		scroll-padding-block-start: var(--dry-space-4);
+		padding-block-start: 0;
 	}
 </style>

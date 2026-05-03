@@ -1,98 +1,36 @@
 <script lang="ts">
-	import {
-		Container,
-		Card,
-		Tabs,
-		CodeBlock,
-		Separator,
-		Alert,
-		Heading,
-		Text,
-		Link,
-		Timeline
-	} from '@dryui/ui';
-	import { page } from '$app/state';
-	import { browser } from '$app/environment';
-	import AgentLogo, { type AgentLogoId } from '$lib/components/AgentLogo.svelte';
-	import PackageManagerLogo from '$lib/components/PackageManagerLogo.svelte';
-	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
+	import { Button, CodeBlock, Container, Heading, Text } from '@dryui/ui';
 	import { componentLinkResolver } from '$lib/component-links';
-	import { aiAgentSetups } from '$lib/ai-setup';
-	import { homeIntroPrompts } from '$lib/home-intro.svelte';
+	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
+	import { DRYUI_SKILLS_INSTALL_COMMAND } from '$lib/ai-setup';
 	import { withBase } from '$lib/utils';
 
-	const FEATURED_AGENT_IDS = [
-		'claude-code',
-		'codex',
-		'gemini',
-		'opencode',
-		'copilot',
-		'cursor',
-		'windsurf',
-		'zed'
-	] as const;
+	const projectSetupCode = `dryui init
+# or, in an existing app
+dryui detect .
+dryui install .`;
 
-	const featuredAgentSetups = aiAgentSetups.filter((setup) =>
-		(FEATURED_AGENT_IDS as readonly string[]).includes(setup.id)
-	);
-
-	const pluginParam = $derived(browser ? page.url.searchParams.get('plugin') : null);
-	const isFeaturedAgent = $derived(
-		pluginParam ? (FEATURED_AGENT_IDS as readonly string[]).includes(pluginParam) : false
-	);
-	const isKnownAgent = $derived(
-		pluginParam ? aiAgentSetups.some((setup) => setup.id === pluginParam) : false
-	);
-	const initialFeaturedTab = $derived(
-		isFeaturedAgent ? (pluginParam as string) : (featuredAgentSetups[0]?.id ?? 'claude-code')
-	);
-	const initialEditorTab = $derived(isKnownAgent ? (pluginParam as string) : 'claude-code');
-
-	const themeImportsCode = `<!-- In your root layout (+layout.svelte) -->
+	const themeSetupCode = `<!-- src/routes/+layout.svelte -->
 <script>
   import '@dryui/ui/themes/default.css';
   import '@dryui/ui/themes/dark.css';
 <\/script>`;
 
-	const appHtmlCode = `<html lang="en" class="theme-auto">
-  <body>
-    %sveltekit.body%
-  </body>
-</html>`;
-
-	const buttonCode = `<script>
-  import { Button } from '@dryui/ui';
-  let saved = false;
-<\/script>
-
-<Button variant="solid" onclick={() => saved = true}>
-  {saved ? 'Saved' : 'Save changes'}
-</Button>`;
-
-	const cardCode = `<script>
-  import { Card, Text } from '@dryui/ui';
+	const firstInterfaceCode = `<script>
+  import { Button, Card } from '@dryui/ui';
 <\/script>
 
 <Card.Root>
   <Card.Header>
-    <h3>My Card</h3>
+    <h2>Project settings</h2>
   </Card.Header>
   <Card.Content>
-    <Text>Card content goes here.</Text>
+    <Button variant="solid">Save changes</Button>
   </Card.Content>
 </Card.Root>`;
 
-	const forcedThemeCode = `<!-- Force dark mode -->
-<html data-theme="dark">
-
-<!-- Force light mode -->
-<html data-theme="light">`;
-
-	const globalOverridesCode = `:root {
-  --dry-color-fill-brand: #8b5cf6;
-  --dry-color-fill-brand-hover: #7c3aed;
-  --dry-radius-md: 12px;
-}`;
+	const checkCode = `dryui ask --scope component Button
+dryui check src/routes/+page.svelte`;
 </script>
 
 <svelte:head>
@@ -100,363 +38,65 @@
 </svelte:head>
 
 <Container>
-	<div class="page-stack">
+	<div class="stack-xl">
 		<DocsPageHeader
 			title="Getting Started"
-			description="Install DryUI and render your first component in under a minute."
+			description="DryUI gives humans and agents a shared way to build web app interfaces with reusable components, themes, route patterns, and checks that keep the work consistent."
 		/>
 
-		<!-- AI prompt -->
-		<section>
-			<div class="stack-lg">
-				<Tabs.Root value="bun">
-					<Tabs.List>
-						<Tabs.Trigger value="bun">
-							<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="npm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="pnpm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
-						</Tabs.Trigger>
-					</Tabs.List>
-					<Tabs.Content value="bun">
-						<CodeBlock code={homeIntroPrompts.bun} language="text" />
-					</Tabs.Content>
-					<Tabs.Content value="npm">
-						<CodeBlock code={homeIntroPrompts.npm} language="text" />
-					</Tabs.Content>
-					<Tabs.Content value="pnpm">
-						<CodeBlock code={homeIntroPrompts.pnpm} language="text" />
-					</Tabs.Content>
-				</Tabs.Root>
-			</div>
+		<section class="stack-md">
+			<Heading level={2}>Install the skill</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				Add DryUI to your coding agent first. The skill gives it the component contracts,
+				accessibility rules, theming model, and feedback workflow it should follow when it edits an
+				app.
+			</Text>
+			<CodeBlock code={DRYUI_SKILLS_INSTALL_COMMAND} language="bash" />
 		</section>
 
-		<Separator />
-
-		<section id="install-plugin">
-			<div class="stack-lg">
-				<Heading level={2}>Install the DryUI integration</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Once <code>dryui</code> is installed, wire DryUI into your editor or agent of choice.
-					Depending on the tool, that means a plugin, an extension, or a native skill + MCP setup.
-					Each path exposes the DryUI skill plus the <code>dryui</code> and
-					<code>dryui-feedback</code> MCP servers.
-				</Text>
-
-				<Tabs.Root value={initialFeaturedTab}>
-					<Tabs.List>
-						{#each featuredAgentSetups as setup (setup.id)}
-							<Tabs.Trigger value={setup.id}>
-								<span class="agent-tab-label">
-									<AgentLogo agent={setup.id as AgentLogoId} size={18} />
-									{setup.label}
-								</span>
-							</Tabs.Trigger>
-						{/each}
-					</Tabs.List>
-					{#each featuredAgentSetups as setup (setup.id)}
-						<Tabs.Content value={setup.id}>
-							<div class="agent-setup-card">
-								<Text color="secondary" maxMeasure="default">{setup.description}</Text>
-
-								{#if setup.installSteps && setup.installSteps.length > 0}
-									<Timeline.Root>
-										{#each setup.installSteps as step, index (step.title)}
-											<Timeline.Item>
-												<Timeline.Icon>{index + 1}</Timeline.Icon>
-												<Timeline.Content>
-													<Timeline.Title level={3}>{step.title}</Timeline.Title>
-													{#if step.description}
-														<Timeline.Description>{step.description}</Timeline.Description>
-													{/if}
-													{#if step.code}
-														<CodeBlock language={step.language ?? 'bash'} code={step.code} />
-													{/if}
-												</Timeline.Content>
-											</Timeline.Item>
-										{/each}
-									</Timeline.Root>
-								{:else if setup.skill}
-									<div class="stack-sm">
-										<Text size="sm" color="muted">{setup.skill.title}</Text>
-										<Text size="sm" color="secondary" maxMeasure="default">{setup.skill.note}</Text>
-										<CodeBlock language="bash" code={setup.skill.code} />
-									</div>
-								{/if}
-
-								<Text size="sm" color="secondary" maxMeasure="default">{setup.followUp}</Text>
-							</div>
-						</Tabs.Content>
-					{/each}
-				</Tabs.Root>
-			</div>
+		<section class="stack-md">
+			<Heading level={2}>Wire the app</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				Use the CLI to create a new DryUI-ready app, or detect and install the pieces needed in an
+				existing project. It sets up the library, theme imports, and validation path.
+			</Text>
+			<CodeBlock code={projectSetupCode} language="bash" />
 		</section>
 
-		<Separator />
-
-		<!-- 1. Installation -->
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>Install</Heading>
-
-				<Tabs.Root value="bun">
-					<Tabs.List>
-						<Tabs.Trigger value="bun">
-							<span class="pm-tab-label"><PackageManagerLogo manager="bun" /> bun</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="npm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="npm" /> npm</span>
-						</Tabs.Trigger>
-						<Tabs.Trigger value="pnpm">
-							<span class="pm-tab-label"><PackageManagerLogo manager="pnpm" /> pnpm</span>
-						</Tabs.Trigger>
-					</Tabs.List>
-					<Tabs.Content value="bun">
-						<CodeBlock code="bun add @dryui/ui" language="bash" />
-					</Tabs.Content>
-					<Tabs.Content value="npm">
-						<CodeBlock code="npm install @dryui/ui" language="bash" />
-					</Tabs.Content>
-					<Tabs.Content value="pnpm">
-						<CodeBlock code="pnpm add @dryui/ui" language="bash" />
-					</Tabs.Content>
-				</Tabs.Root>
-
-				<Text size="sm" color="muted">Headless primitives only (no styles, no dependencies):</Text>
-				<CodeBlock code="bun add @dryui/primitives" language="bash" />
-			</div>
+		<section class="stack-md">
+			<Heading level={2}>Add the theme</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				DryUI components are token-driven. Import the base themes once, then override semantic
+				tokens when your product needs its own look.
+			</Text>
+			<CodeBlock code={themeSetupCode} language="svelte" />
 		</section>
 
-		<Separator />
-
-		<!-- 2. Theme setup -->
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>Theme setup</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Import the theme CSS and set <code>class="theme-auto"</code> on <code>&lt;html&gt;</code> for
-					automatic light/dark switching.
-				</Text>
-
-				<CodeBlock language="svelte" code={themeImportsCode} />
-				<CodeBlock language="html" code={appHtmlCode} />
-
-				<Alert variant="info">
-					{#snippet title()}Why theme-auto?{/snippet}
-					{#snippet description()}
-						<code>theme-auto</code> follows the user's OS preference via
-						<code>prefers-color-scheme</code>. Override with <code>data-theme="light"</code> or
-						<code>data-theme="dark"</code> when the user explicitly picks a mode.
-					{/snippet}
-				</Alert>
-			</div>
+		<section class="stack-md">
+			<Heading level={2}>Build with components</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				Compose real controls and surfaces instead of one-off markup. Ask for the component contract
+				before changing UI, then check the result before it ships.
+			</Text>
+			<CodeBlock language="svelte" code={firstInterfaceCode} linkResolver={componentLinkResolver} />
+			<CodeBlock code={checkCode} language="bash" />
 		</section>
 
-		<Separator />
-
-		<!-- 3. First component -->
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>First component</Heading>
-
-				<Heading level={3}>Button</Heading>
-				<CodeBlock language="svelte" code={buttonCode} linkResolver={componentLinkResolver} />
-
-				<Heading level={3}>Card</Heading>
-				<Text size="sm" color="muted" maxMeasure="default"
-					>Most components use compound syntax: <code>Card.Root</code>, <code>Card.Header</code>,
-					<code>Card.Content</code>.</Text
-				>
-				<CodeBlock language="svelte" code={cardCode} linkResolver={componentLinkResolver} />
-			</div>
-		</section>
-
-		<Separator />
-
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>Agent workflow</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Start with <code>dryui</code>. Outside the DryUI monorepo it asks which editor or agent
-					you want to wire, whether to install the Claude hook, and whether to open feedback. After
-					that, use
-					<code>dryui init</code> for new apps, <code>dryui install</code> /
-					<code>dryui detect</code>
-					for existing ones, then <code>ask</code> before writing and <code>check</code> after.
-				</Text>
-
-				<Alert variant="info">
-					{#snippet title()}Design guidance lives in impeccable{/snippet}
-					{#snippet description()}
-						DryUI is components + tokens + contracts. For design guidance (brief, critique, polish,
-						visual review), install
-						<Link href="https://impeccable.style" underline="always">impeccable</Link>
-						alongside DryUI with <code>npx impeccable skills install</code>. Use
-						<code>/impeccable teach</code>, <code>/impeccable polish</code>,
-						<code>/impeccable critique</code>, etc. from your AI harness. Anti-pattern detection:
-						<code>npx impeccable detect &lt;path-or-url&gt;</code>.
-					{/snippet}
-				</Alert>
-			</div>
-		</section>
-
-		<Separator />
-
-		<!-- 4. Editor integration -->
-		<section id="full-editor-setup">
-			<div class="stack-lg">
-				<Heading level={2}>Full editor setup</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Use the full matrix below if you want the complete per-editor setup, including native
-					skill paths and manual MCP config where a marketplace plugin is not available. The
-					snippets are the same shared setup data that backs the CLI and docs.
-				</Text>
-
-				<CodeBlock language="bash" code="dryui" />
-
-				<Tabs.Root value={initialEditorTab}>
-					<Tabs.List>
-						{#each aiAgentSetups as setup (setup.id)}
-							<Tabs.Trigger value={setup.id}>{setup.label}</Tabs.Trigger>
-						{/each}
-					</Tabs.List>
-
-					{#each aiAgentSetups as setup (setup.id)}
-						<Tabs.Content value={setup.id}>
-							<div class="stack-md">
-								<Text color="secondary" maxMeasure="default">{setup.description}</Text>
-
-								{#if setup.quickSetup}
-									<div class="stack-sm">
-										<Text size="sm" color="muted">{setup.quickSetup.title}</Text>
-										<CodeBlock language="bash" code={setup.quickSetup.code} />
-									</div>
-								{/if}
-
-								{#if setup.skill}
-									<div class="stack-sm">
-										<Text size="sm" color="muted">{setup.skill.title}</Text>
-										<Text size="sm" color="secondary" maxMeasure="default">{setup.skill.note}</Text>
-										<CodeBlock language="bash" code={setup.skill.code} />
-									</div>
-								{/if}
-
-								<div class="stack-sm">
-									<Text size="sm" color="muted">Manual MCP config</Text>
-									<Text size="sm" color="secondary" maxMeasure="default">{setup.mcp.note}</Text>
-									<CodeBlock language={setup.mcp.language} code={setup.mcp.code} />
-								</div>
-
-								{#if setup.companionMcp}
-									<div class="stack-sm">
-										<Text size="sm" color="muted">{setup.companionMcp.title}</Text>
-										<Text size="sm" color="secondary" maxMeasure="default"
-											>{setup.companionMcp.note}</Text
-										>
-										<CodeBlock
-											language={setup.companionMcp.language}
-											code={setup.companionMcp.code}
-										/>
-									</div>
-								{/if}
-
-								<Alert variant="info">
-									{#snippet title()}Follow-up{/snippet}
-									{#snippet description()}{setup.followUp}{/snippet}
-								</Alert>
-							</div>
-						</Tabs.Content>
-					{/each}
-				</Tabs.Root>
-
-				<Alert variant="info">
-					{#snippet title()}CLI first, snippets second{/snippet}
-					{#snippet description()}
-						Use <code>dryui</code> when you want the interactive flow. Use the
-						<Link href={withBase('/tools')} underline="always">Tools</Link> page for CLI commands and
-						terminal workflows. Use <code>dryui setup</code> if you want the explicit subcommand, or the
-						tabs above if you want to wire everything yourself.
-					{/snippet}
-				</Alert>
-			</div>
-		</section>
-
-		<Separator />
-
-		<!-- 5. Theming -->
-		<section>
-			<div class="stack-lg">
-				<Heading level={2}>Theming</Heading>
-				<Text size="lg" color="secondary" maxMeasure="default">
-					Every visual property is a CSS variable. Override globally or per-component.
-				</Text>
-
-				<CodeBlock language="css" code={globalOverridesCode} />
-
-				<CodeBlock language="html" code={forcedThemeCode} />
-
-				<div class="stack-sm">
-					<Text size="sm" color="muted" maxMeasure="default">
-						Use the <Link href={withBase('/theme-wizard')} underline="always">Theme Wizard</Link> to generate
-						a full theme from a single brand colour.
-					</Text>
-				</div>
-			</div>
-		</section>
+		<div class="stack-sm">
+			<Text size="sm" color="muted" maxMeasure="default">
+				Next, start with a concrete component and let DryUI keep the implementation aligned.
+			</Text>
+			<span class="start-component-action">
+				<Button variant="solid" color="ink" size="md" href={withBase('/components/button')}>
+					Start with Button
+				</Button>
+			</span>
+		</div>
 	</div>
 </Container>
 
 <style>
-	.page-stack {
-		display: grid;
-		gap: var(--dry-space-12);
-	}
-
-	section[id] {
-		scroll-margin-block-start: var(--dry-space-6);
-		border-radius: var(--dry-radius-xl);
-	}
-
-	section[id]:target {
-		animation: section-highlight 1.8s ease-out;
-	}
-
-	@keyframes section-highlight {
-		0% {
-			background: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
-			box-shadow: 0 0 0 1px color-mix(in srgb, var(--dry-color-stroke-brand) 60%, transparent);
-		}
-		100% {
-			background: transparent;
-			box-shadow: 0 0 0 1px transparent;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		section[id]:target {
-			animation: none;
-		}
-	}
-
-	.agent-setup-card {
-		display: grid;
-		gap: var(--dry-space-4);
-		--dry-timeline-dot-size: 1.75rem;
-		--dry-timeline-icon-font-size: var(--dry-type-small-size, 0.875rem);
-		--dry-timeline-content-line-height: 1.75rem;
-		--dry-timeline-gap: var(--dry-space-6);
-		--dry-timeline-content-gap: var(--dry-space-2);
-		--dry-timeline-dot-color: var(--dry-color-fill-accent-active);
-	}
-
-	.agent-tab-label,
-	.pm-tab-label {
-		display: inline-grid;
-		grid-template-columns: auto auto;
-		gap: var(--dry-space-2);
-		align-items: center;
+	.start-component-action {
+		justify-self: start;
 	}
 </style>
