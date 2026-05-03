@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {
 		Alert,
+		AlertDialog,
 		Badge,
 		BorderBeam,
 		Button,
@@ -23,7 +24,8 @@
 		CornerLeftUp,
 		ExternalLink,
 		MessageSquare,
-		Rocket
+		Rocket,
+		Trash2
 	} from 'lucide-svelte';
 	import { buildFeedbackDispatchPrompt, getTextNotes } from '../../src/prompts.js';
 	import type { Submission, SubmissionStatus } from '../../src/types.js';
@@ -36,13 +38,13 @@
 		targetAgent: DispatchAgent | null;
 		refreshing: boolean;
 		/**
-		 * Absolute path to the canonical SKILL.md, supplied by `/dispatch-targets`.
-		 * Falls back to the relative `node_modules/...` reference when the server
-		 * couldn't resolve it.
+		 * Target-specific canonical SKILL.md path supplied by `/dispatch-targets`.
+		 * Falls back to the prompt's relative skill reference when unresolved.
 		 */
 		skillPath?: string | null;
 		onChooseAgent: (agent: DispatchAgent) => void;
 		onSetStatus: (id: string, status: SubmissionStatus) => void | Promise<void>;
+		onDelete: (id: string) => void | Promise<void>;
 		onLaunch: (prompt: string, submissionId: string) => Promise<void>;
 	}
 
@@ -59,6 +61,7 @@
 		skillPath = null,
 		onChooseAgent,
 		onSetStatus,
+		onDelete,
 		onLaunch
 	}: Props = $props();
 
@@ -68,6 +71,8 @@
 	let launched = $state(false);
 	let launchError = $state('');
 	let launchTimer: ReturnType<typeof setTimeout> | undefined;
+	let deleting = $state(false);
+	let deleteError = $state('');
 
 	let promptText = $derived(
 		buildFeedbackDispatchPrompt(submission, skillPath ? { skillPath } : undefined)
@@ -149,6 +154,19 @@
 			launching = false;
 		}
 	}
+
+	async function deleteSubmission(): Promise<void> {
+		if (deleting) return;
+		deleting = true;
+		deleteError = '';
+		try {
+			await onDelete(submission.id);
+		} catch (errorValue) {
+			deleteError = errorValue instanceof Error ? errorValue.message : 'Unknown error';
+		} finally {
+			deleting = false;
+		}
+	}
 </script>
 
 <article class="submission-card">
@@ -200,6 +218,42 @@
 							Reopen
 						</Button>
 					{/if}
+
+					<AlertDialog.Root>
+						<AlertDialog.Trigger>
+							<Button
+								variant="outline"
+								color="danger"
+								size="sm"
+								disabled={refreshing || deleting}
+								onclick={() => {
+									deleteError = '';
+								}}
+							>
+								<Trash2 size={14} aria-hidden="true" />
+								Delete
+							</Button>
+						</AlertDialog.Trigger>
+						<AlertDialog.Content>
+							<AlertDialog.Header>Delete feedback submission?</AlertDialog.Header>
+							<AlertDialog.Body>
+								This removes the submission and its captured screenshot from the local feedback
+								store.
+								{#if deleteError}
+									<Alert variant="error">{deleteError}</Alert>
+								{/if}
+							</AlertDialog.Body>
+							<AlertDialog.Footer>
+								<AlertDialog.Cancel disabled={deleting}>Keep submission</AlertDialog.Cancel>
+								<AlertDialog.Action
+									disabled={deleting || refreshing}
+									onclick={() => void deleteSubmission()}
+								>
+									{deleting ? 'Deleting...' : 'Delete submission'}
+								</AlertDialog.Action>
+							</AlertDialog.Footer>
+						</AlertDialog.Content>
+					</AlertDialog.Root>
 				</ButtonGroup>
 			</div>
 		</Card.Header>

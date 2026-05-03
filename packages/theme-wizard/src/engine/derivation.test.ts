@@ -1,4 +1,4 @@
-// apps/docs/src/lib/theme-wizard/derivation.test.ts
+// packages/theme-wizard/src/engine/derivation.test.ts
 import { describe, test, expect } from 'bun:test';
 import {
 	hsbToHsl,

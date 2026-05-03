@@ -17,7 +17,7 @@
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 307,
-    "mismatches": 296,
+    "mismatches": 295,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -24375,13 +24375,6 @@
   "clusters": [],
   "mismatches": [
     {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "TokenScope",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/token-scope/index.ts"
-    },
-    {
       "kind": "missing-subpath-export",
       "package": "primitives",
       "component": "Accordion",
@@ -26519,9 +26512,7 @@
       "Pluralize",
       "RefId"
     ],
-    "docsNavMissing": [
-      "TokenScope"
-    ],
+    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {

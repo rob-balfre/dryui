@@ -41,6 +41,8 @@
 		submissions: Submission[];
 	}
 
+	type DispatchSkillPaths = Partial<Record<DispatchAgent, string>>;
+
 	function readFocusId(): string | null {
 		if (typeof window === 'undefined') return null;
 		try {
@@ -107,15 +109,16 @@
 	let submissions = $state<Submission[]>([]);
 	let dispatchTargets = $state<DispatchAgent[]>([]);
 	let targetAgent = $state<DispatchAgent | null>(null);
-	let dispatchSkillPath = $state<string | null>(null);
+	let dispatchSkillPaths = $state<DispatchSkillPaths>({});
 	let bulkLaunching = $state(false);
 	let bulkLaunched = $state(false);
 	let bulkLaunchError = $state('');
 	let bulkLaunchTimer: ReturnType<typeof setTimeout> | undefined;
 	let focusApplied = false;
 
+	let activeSkillPath = $derived(targetAgent ? (dispatchSkillPaths[targetAgent] ?? null) : null);
 	const bulkPrompt = $derived(
-		buildFeedbackBulkPrompt(dispatchSkillPath ? { skillPath: dispatchSkillPath } : undefined)
+		buildFeedbackBulkPrompt(activeSkillPath ? { skillPath: activeSkillPath } : undefined)
 	);
 
 	function pickTargetAgent(
@@ -133,6 +136,16 @@
 		return null;
 	}
 
+	function normalizeDispatchSkillPaths(
+		skillPaths: DispatchSkillPaths | undefined,
+		fallback: string | null,
+		available: DispatchAgent[]
+	): DispatchSkillPaths {
+		if (skillPaths) return { ...skillPaths };
+		if (!fallback) return {};
+		return Object.fromEntries(available.map((agent) => [agent, fallback])) as DispatchSkillPaths;
+	}
+
 	async function loadDispatchTargets(): Promise<void> {
 		try {
 			const response = await fetch('/dispatch-targets');
@@ -140,10 +153,15 @@
 			const body = (await response.json()) as {
 				defaultAgent?: DispatchAgent | 'off';
 				configuredAgents?: DispatchAgent[];
+				skillPaths?: DispatchSkillPaths;
 				skillPath?: string | null;
 			};
 			dispatchTargets = body.configuredAgents ?? [];
-			dispatchSkillPath = body.skillPath ?? null;
+			dispatchSkillPaths = normalizeDispatchSkillPaths(
+				body.skillPaths,
+				body.skillPath ?? null,
+				dispatchTargets
+			);
 			const stored =
 				typeof window !== 'undefined'
 					? (window.localStorage.getItem(AGENT_STORAGE_KEY) as DispatchAgent | null)
@@ -320,6 +338,27 @@
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ status })
+			});
+
+			if (!response.ok) {
+				const message = await response.text();
+				throw new Error(message || `HTTP ${response.status}`);
+			}
+
+			await loadSubmissions('refresh');
+		} catch (errorValue) {
+			error = extractMessage(errorValue);
+			refreshing = false;
+		}
+	}
+
+	async function deleteSubmission(submissionId: string): Promise<void> {
+		refreshing = true;
+		error = '';
+
+		try {
+			const response = await fetch(`/submissions/${encodeURIComponent(submissionId)}`, {
+				method: 'DELETE'
 			});
 
 			if (!response.ok) {
@@ -576,9 +615,10 @@
 										{dispatchTargets}
 										{targetAgent}
 										{refreshing}
-										skillPath={dispatchSkillPath}
+										skillPath={activeSkillPath}
 										onChooseAgent={chooseTargetAgent}
 										onSetStatus={setSubmissionStatus}
+										onDelete={deleteSubmission}
 										onLaunch={dispatchAgent}
 									/>
 								</div>
@@ -601,9 +641,10 @@
 										{dispatchTargets}
 										{targetAgent}
 										{refreshing}
-										skillPath={dispatchSkillPath}
+										skillPath={activeSkillPath}
 										onChooseAgent={chooseTargetAgent}
 										onSetStatus={setSubmissionStatus}
+										onDelete={deleteSubmission}
 										onLaunch={dispatchAgent}
 									/>
 								</div>

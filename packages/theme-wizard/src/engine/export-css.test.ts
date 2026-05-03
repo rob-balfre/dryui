@@ -1,4 +1,4 @@
-// apps/docs/src/lib/theme-wizard/export-css.test.ts
+// packages/theme-wizard/src/engine/export-css.test.ts
 import { describe, test, expect } from 'bun:test';
 import { generateCss, exportJson } from './export-css.js';
 import { generateTheme } from './derivation.js';

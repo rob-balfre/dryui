@@ -223,7 +223,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 	},
 	{
 		label: 'Utils',
-		items: ['Hotkey', 'FocusTrap', 'Portal', 'Svg', 'VisuallyHidden']
+		items: ['Hotkey', 'FocusTrap', 'Portal', 'Svg', 'TokenScope', 'VisuallyHidden']
 	}
 ];
 

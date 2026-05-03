@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	existsSync,
+	lstatSync,
+	mkdirSync,
+	readFileSync,
+	readlinkSync,
+	readdirSync,
+	writeFileSync
+} from 'node:fs';
 import { join, resolve } from 'node:path';
 import {
 	autoInstallableEditors,
@@ -28,6 +36,25 @@ const fakeDegit = (track: string[]) => (target: string) => {
 	fs.writeFileSync(join(target, 'SKILL.md'), '# fake DryUI skill\n');
 	return { ok: true, message: `pulled (fake) into ${target}` };
 };
+
+const DRYUI_SKILL_NAMES = [
+	'dryui',
+	'dryui-feedback',
+	'dryui-init',
+	'dryui-layout',
+	'dryui-live-feedback'
+] as const;
+
+function createLocalSkillsRoot(): string {
+	const tree: Record<string, string> = {};
+	for (const skill of DRYUI_SKILL_NAMES) {
+		tree[`skills/${skill}/SKILL.md`] =
+			`---\nname: ${skill}\ndescription: Local ${skill} skill for installer tests.\n---\n\n# ${skill}\n`;
+	}
+	tree['skills/dryui/agents/openai.yaml'] = 'agents: []\n';
+	tree['skills/dryui/rules/theming.md'] = '# theming\n';
+	return createTempTree(tree);
+}
 
 describe('isAutoInstallable', () => {
 	test('returns true for the wired editors', () => {
@@ -396,6 +423,91 @@ describe('runEditorInstall', () => {
 		expect(readFileSync(join(home, '.codex/config.toml'), 'utf-8')).toBe(first);
 	});
 
+	test('codex dev installer links local skills and writes local MCP servers', () => {
+		const root = createLocalSkillsRoot();
+		const home = createTempTree({});
+		const result = runEditorInstall('codex', {
+			cwd: root,
+			homeDir: home,
+			dryuiDevMode: true,
+			localSkillsRoot: join(root, 'skills'),
+			includeSvelteMcp: true
+		});
+
+		expect(result?.ok).toBe(true);
+		for (const skill of DRYUI_SKILL_NAMES) {
+			const target = join(home, '.agents/skills', skill);
+			expect(lstatSync(target).isSymbolicLink()).toBe(true);
+			expect(resolve(join(home, '.agents/skills'), readlinkSync(target))).toBe(
+				join(root, 'skills', skill)
+			);
+		}
+
+		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).toContain('command = "env"');
+		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-mcp"]');
+		expect(config).toContain('[mcp_servers."dryui-feedback"]');
+		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-feedback-mcp"]');
+		expect(config).toContain('[mcp_servers.svelte]');
+	});
+
+	test('codex dev installer replaces existing published MCP sections', () => {
+		const root = createLocalSkillsRoot();
+		const home = createTempTree({
+			'.codex/config.toml': `[mcp_servers.dryui]
+command = "npx"
+args = ["-y", "@dryui/mcp"]
+
+[mcp_servers."dryui-feedback"]
+command = "npx"
+args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
+`
+		});
+
+		const result = runEditorInstall('codex', {
+			cwd: root,
+			homeDir: home,
+			dryuiDevMode: true,
+			localSkillsRoot: join(root, 'skills')
+		});
+
+		expect(result?.ok).toBe(true);
+		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
+		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-mcp"]');
+		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-feedback-mcp"]');
+		expect(config).not.toContain('@dryui/mcp');
+		expect(config).not.toContain('@dryui/feedback-server');
+	});
+
+	test('cursor dev installer links local skills and backs up existing copies', () => {
+		const root = createLocalSkillsRoot();
+		mkdirSync(join(root, '.agents/skills/dryui'), { recursive: true });
+		writeFileSync(join(root, '.agents/skills/dryui/SKILL.md'), '# old copy\n');
+
+		const result = runEditorInstall('cursor', {
+			cwd: root,
+			dryuiDevMode: true,
+			localSkillsRoot: join(root, 'skills'),
+			runNpxSkills: () => {
+				throw new Error('npx skills should not run in DRYUI_DEV');
+			}
+		});
+
+		expect(result?.ok).toBe(true);
+		for (const skill of DRYUI_SKILL_NAMES) {
+			expect(lstatSync(join(root, '.agents/skills', skill)).isSymbolicLink()).toBe(true);
+		}
+		expect(
+			readdirSync(join(root, '.agents/skills')).some((name) => name.startsWith('dryui.bak.'))
+		).toBe(true);
+		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
+		expect(config.mcpServers.dryui).toEqual({
+			command: 'env',
+			args: ['DRYUI_DEV=1', 'dryui-mcp']
+		});
+	});
+
 	test('reports failure when degit fails and surfaces it in the formatted output', () => {
 		const root = createTempTree({});
 		const result = runEditorInstall('copilot', {
@@ -540,6 +652,21 @@ describe('Svelte MCP companion', () => {
 		const root = createTempTree({});
 		const lines = installPreviewLines('cursor', { cwd: root, includeSvelteMcp: true });
 		expect(lines.some((line) => line.includes('+ svelte'))).toBe(true);
+	});
+
+	test('preview lines mention local links in dev mode', () => {
+		const root = createTempTree({});
+		const home = createTempTree({});
+		const lines = installPreviewLines('codex', {
+			cwd: root,
+			homeDir: home,
+			dryuiDevMode: true,
+			includeSvelteMcp: true
+		});
+
+		expect(lines.some((line) => line.includes('Link DryUI skills'))).toBe(true);
+		expect(lines.some((line) => line.includes('local dryui + dryui-feedback + svelte'))).toBe(true);
+		expect(lines.some((line) => line.includes('/plugins'))).toBe(false);
 	});
 
 	test('companion preview lines describe the standalone install path', () => {

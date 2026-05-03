@@ -4,7 +4,7 @@
 // Each installer:
 //   1. Installs the DryUI skill via `npx skills add rob-balfre/dryui --agent
 //      <flag>` (or the legacy `npx degit` copy when DRYUI_SKILLS_LEGACY=1, or
-//      always for Zed since the upstream npx skills CLI does not list it).
+//      local symlinks when DRYUI_DEV=1).
 //   2. Merges the canonical MCP server block into the editor's JSON or TOML
 //      config, preserving any other servers and unrelated keys the user has
 //      set.
@@ -23,9 +23,21 @@ import {
 	type ProbeCache
 } from './setup-probe.js';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	existsSync,
+	lstatSync,
+	mkdirSync,
+	readlinkSync,
+	readdirSync,
+	renameSync,
+	readFileSync,
+	symlinkSync,
+	unlinkSync,
+	writeFileSync
+} from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { homeRelative } from '../run.js';
 import type { SetupGuideId } from './setup-guides.js';
 
@@ -40,6 +52,10 @@ export interface InstallStepResult {
 export interface InstallContext {
 	cwd: string;
 	homeDir?: string;
+	/** Override `DRYUI_DEV` detection. Test-only seam. */
+	dryuiDevMode?: boolean;
+	/** Override local skill source lookup. Test-only seam. */
+	localSkillsRoot?: string;
 	runDegit?: (target: string) => DegitOutcome;
 	runNpxSkills?: (agent: NpxSkillsAgent, ctx: InstallContext) => ProcessOutcome;
 	runProcess?: (command: string, args: readonly string[]) => ProcessOutcome;
@@ -98,6 +114,66 @@ const NPX_DRYUI_FEEDBACK_MCP = {
 	args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
 } as const;
 const NPX_SVELTE_MCP = { command: 'npx', args: ['-y', '@sveltejs/mcp'] } as const;
+const LOCAL_DRYUI_MCP = { command: 'env', args: ['DRYUI_DEV=1', 'dryui-mcp'] } as const;
+const LOCAL_DRYUI_FEEDBACK_MCP = {
+	command: 'env',
+	args: ['DRYUI_DEV=1', 'dryui-feedback-mcp']
+} as const;
+
+const DRYUI_SKILL_NAMES = [
+	'dryui',
+	'dryui-feedback',
+	'dryui-init',
+	'dryui-layout',
+	'dryui-live-feedback'
+] as const;
+
+function isDryuiDevMode(ctx: InstallContext): boolean {
+	if (ctx.dryuiDevMode !== undefined) return ctx.dryuiDevMode;
+	const flag = process.env.DRYUI_DEV;
+	return flag === '1' || flag === 'true';
+}
+
+function dryuiMcpEntry(ctx: InstallContext): typeof NPX_DRYUI_MCP | typeof LOCAL_DRYUI_MCP {
+	return isDryuiDevMode(ctx) ? LOCAL_DRYUI_MCP : NPX_DRYUI_MCP;
+}
+
+function dryuiFeedbackMcpEntry(
+	ctx: InstallContext
+): typeof NPX_DRYUI_FEEDBACK_MCP | typeof LOCAL_DRYUI_FEEDBACK_MCP {
+	return isDryuiDevMode(ctx) ? LOCAL_DRYUI_FEEDBACK_MCP : NPX_DRYUI_FEEDBACK_MCP;
+}
+
+function localCommandArray(entry: { command: string; args: readonly string[] }): string[] {
+	return [entry.command, ...entry.args];
+}
+
+function tomlStringArray(values: readonly string[]): string {
+	return `[${values.map((value) => JSON.stringify(value)).join(', ')}]`;
+}
+
+function findUpward(start: string, predicate: (candidate: string) => boolean): string | null {
+	let current = resolve(start);
+	while (true) {
+		if (predicate(current)) return current;
+		const parent = dirname(current);
+		if (parent === current) return null;
+		current = parent;
+	}
+}
+
+function resolveLocalSkillsRoot(ctx: InstallContext): string | null {
+	if (ctx.localSkillsRoot) return resolve(ctx.localSkillsRoot);
+
+	const fromCwd = join(resolve(ctx.cwd), 'skills');
+	if (existsSync(join(fromCwd, 'dryui/SKILL.md'))) return fromCwd;
+
+	const moduleDir = dirname(fileURLToPath(import.meta.url));
+	const repoRoot = findUpward(moduleDir, (candidate) =>
+		existsSync(join(candidate, 'skills/dryui/SKILL.md'))
+	);
+	return repoRoot ? join(repoRoot, 'skills') : null;
+}
 
 function maybeSvelte<T>(
 	ctx: InstallContext,
@@ -178,6 +254,125 @@ function copySkill(target: string, runDegit: (target: string) => DegitOutcome): 
 	};
 }
 
+function backupPathFor(target: string): string {
+	const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+$/, 'Z');
+	let candidate = `${target}.bak.${stamp}`;
+	let index = 1;
+	while (existsSync(candidate)) {
+		candidate = `${target}.bak.${stamp}.${index}`;
+		index += 1;
+	}
+	return candidate;
+}
+
+function lstatIfExists(path: string): ReturnType<typeof lstatSync> | null {
+	try {
+		return lstatSync(path);
+	} catch (error) {
+		const code = error && typeof error === 'object' ? (error as { code?: string }).code : undefined;
+		if (code === 'ENOENT') return null;
+		throw error;
+	}
+}
+
+function linkOneLocalSkill(
+	source: string,
+	target: string
+): { status: 'created' | 'unchanged' | 'replaced'; detail?: string } {
+	const absoluteSource = resolve(source);
+	const absoluteTarget = resolve(target);
+
+	try {
+		mkdirSync(dirname(absoluteTarget), { recursive: true });
+		const stat = lstatIfExists(absoluteTarget);
+		if (stat) {
+			if (stat.isSymbolicLink()) {
+				const current = resolve(dirname(absoluteTarget), readlinkSync(absoluteTarget));
+				if (current === absoluteSource) return { status: 'unchanged' };
+				unlinkSync(absoluteTarget);
+				symlinkSync(absoluteSource, absoluteTarget, 'dir');
+				return { status: 'replaced' };
+			}
+
+			const backup = backupPathFor(absoluteTarget);
+			renameSync(absoluteTarget, backup);
+			symlinkSync(absoluteSource, absoluteTarget, 'dir');
+			return { status: 'replaced', detail: `backed up ${homeRelative(backup)}` };
+		}
+
+		symlinkSync(absoluteSource, absoluteTarget, 'dir');
+		return { status: 'created' };
+	} catch (error) {
+		throw new Error(`${homeRelative(absoluteTarget)}: ${errorMessage(error)}`);
+	}
+}
+
+function linkLocalSkills(targetDir: string, ctx: InstallContext): InstallStepResult {
+	const skillsRoot = resolveLocalSkillsRoot(ctx);
+	const absoluteTargetDir = resolve(targetDir);
+	if (!skillsRoot) {
+		return {
+			label: 'Link DryUI skills',
+			status: 'failed',
+			detail: 'unable to locate local skills/dryui/SKILL.md from this DryUI checkout'
+		};
+	}
+
+	const linked: string[] = [];
+	const unchanged: string[] = [];
+	const replaced: string[] = [];
+	const details: string[] = [];
+
+	for (const skill of DRYUI_SKILL_NAMES) {
+		const source = join(skillsRoot, skill);
+		if (!existsSync(join(source, 'SKILL.md'))) {
+			return {
+				label: 'Link DryUI skills',
+				status: 'failed',
+				detail: `${homeRelative(source)} is missing SKILL.md`
+			};
+		}
+	}
+
+	try {
+		for (const skill of DRYUI_SKILL_NAMES) {
+			const source = join(skillsRoot, skill);
+			const result = linkOneLocalSkill(source, join(absoluteTargetDir, skill));
+			if (result.status === 'unchanged') unchanged.push(skill);
+			else if (result.status === 'replaced') replaced.push(skill);
+			else linked.push(skill);
+			if (result.detail) details.push(result.detail);
+		}
+	} catch (error) {
+		return {
+			label: 'Link DryUI skills',
+			status: 'failed',
+			detail: errorMessage(error)
+		};
+	}
+
+	const summary: string[] = [];
+	if (linked.length > 0) summary.push(`linked ${linked.length}`);
+	if (replaced.length > 0) summary.push(`relinked ${replaced.length}`);
+	if (unchanged.length > 0) summary.push(`${unchanged.length} already linked`);
+	const status =
+		linked.length === 0 && replaced.length === 0
+			? 'unchanged'
+			: replaced.length > 0 || unchanged.length > 0
+				? 'merged'
+				: 'created';
+	const detail = [
+		`${summary.join(', ')} in ${homeRelative(absoluteTargetDir)} from ${homeRelative(skillsRoot)}`,
+		...details
+	].join('\n    ');
+
+	return {
+		label: 'Link DryUI skills',
+		status,
+		detail
+	};
+}
+
 function defaultRunNpxSkills(agent: NpxSkillsAgent, ctx: InstallContext): ProcessOutcome {
 	const outcome = defaultRunProcess(
 		'npx',
@@ -204,6 +399,10 @@ interface SkillTarget {
 function selectSkillInstaller(ctx: InstallContext, target: SkillTarget): InstallStepResult {
 	const runDegit = ctx.runDegit ?? defaultRunDegit;
 	const legacy = () => copySkill(join(ctx.cwd, target.legacyDir), runDegit);
+
+	if (isDryuiDevMode(ctx)) {
+		return linkLocalSkills(dirname(join(ctx.cwd, target.legacyDir)), ctx);
+	}
 
 	if (!target.npxAgent || !shouldUseNpxSkills(ctx)) {
 		return legacy();
@@ -352,18 +551,29 @@ interface MergeTomlSectionOptions {
 	section: string;
 	block: string;
 	label: string;
+	replaceExisting?: boolean;
+}
+
+function escapeRegExp(input: string): string {
+	return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function findTomlSectionRange(raw: string, section: string): { start: number; end: number } | null {
+	const header = new RegExp(`^\\[${escapeRegExp(section)}\\]\\s*$`, 'm');
+	const match = header.exec(raw);
+	if (!match || match.index === undefined) return null;
+
+	const afterHeader = match.index + match[0].length;
+	const nextSection = /^\[[^\]]+\]\s*$/m.exec(raw.slice(afterHeader));
+	return {
+		start: match.index,
+		end: nextSection?.index === undefined ? raw.length : afterHeader + nextSection.index
+	};
 }
 
 export function mergeTomlSection(options: MergeTomlSectionOptions): InstallStepResult {
 	const absolute = resolve(options.path);
 	const existed = existsSync(absolute);
-	if (hasTomlSection(absolute, options.section)) {
-		return {
-			label: options.label,
-			status: 'unchanged',
-			detail: `${homeRelative(absolute)} already includes [${options.section}]`
-		};
-	}
 
 	let existing = '';
 	try {
@@ -376,8 +586,49 @@ export function mergeTomlSection(options: MergeTomlSectionOptions): InstallStepR
 		};
 	}
 
+	const normalizedBlock = `${options.block.trim()}\n`;
+	const existingRange = findTomlSectionRange(existing, options.section);
+	if (existingRange) {
+		if (!options.replaceExisting) {
+			return {
+				label: options.label,
+				status: 'unchanged',
+				detail: `${homeRelative(absolute)} already includes [${options.section}]`
+			};
+		}
+
+		const currentBlock = `${existing.slice(existingRange.start, existingRange.end).trim()}\n`;
+		if (currentBlock === normalizedBlock) {
+			return {
+				label: options.label,
+				status: 'unchanged',
+				detail: `${homeRelative(absolute)} already includes [${options.section}]`
+			};
+		}
+
+		const before = existing.slice(0, existingRange.start);
+		const after = existing.slice(existingRange.end).replace(/^\n+/, '\n\n');
+		const next = `${before}${normalizedBlock}${after}`;
+		try {
+			mkdirSync(dirname(absolute), { recursive: true });
+			writeFileSync(absolute, next);
+		} catch (error) {
+			return {
+				label: options.label,
+				status: 'failed',
+				detail: `${homeRelative(absolute)}: ${errorMessage(error)}`
+			};
+		}
+
+		return {
+			label: options.label,
+			status: 'merged',
+			detail: homeRelative(absolute)
+		};
+	}
+
 	const prefix = existing.trim().length === 0 ? '' : existing.endsWith('\n') ? '\n' : '\n\n';
-	const next = `${existing}${prefix}${options.block.trim()}\n`;
+	const next = `${existing}${prefix}${normalizedBlock}`;
 
 	try {
 		mkdirSync(dirname(absolute), { recursive: true });
@@ -483,8 +734,8 @@ function copilotInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('copilot', ctx),
 		servers: {
-			dryui: { type: 'stdio', ...NPX_DRYUI_MCP },
-			'dryui-feedback': { type: 'stdio', ...NPX_DRYUI_FEEDBACK_MCP },
+			dryui: { type: 'stdio', ...dryuiMcpEntry(ctx) },
+			'dryui-feedback': { type: 'stdio', ...dryuiFeedbackMcpEntry(ctx) },
 			...maybeSvelte(ctx, () => ({ type: 'stdio', ...NPX_SVELTE_MCP }))
 		}
 	});
@@ -499,7 +750,7 @@ function cursorInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('cursor', ctx),
 		servers: {
-			dryui: NPX_DRYUI_MCP,
+			dryui: dryuiMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
 	});
@@ -514,10 +765,10 @@ function opencodeInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('opencode', ctx),
 		servers: {
-			dryui: { type: 'local', command: ['npx', '-y', '@dryui/mcp'] },
+			dryui: { type: 'local', command: localCommandArray(dryuiMcpEntry(ctx)) },
 			'dryui-feedback': {
 				type: 'local',
-				command: ['npx', '-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+				command: localCommandArray(dryuiFeedbackMcpEntry(ctx))
 			},
 			...maybeSvelte(ctx, () => ({
 				type: 'local',
@@ -537,8 +788,8 @@ function windsurfInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('windsurf', ctx),
 		servers: {
-			dryui: NPX_DRYUI_MCP,
-			'dryui-feedback': NPX_DRYUI_FEEDBACK_MCP,
+			dryui: dryuiMcpEntry(ctx),
+			'dryui-feedback': dryuiFeedbackMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
 	});
@@ -552,8 +803,8 @@ function geminiInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('gemini', ctx),
 		servers: {
-			dryui: NPX_DRYUI_MCP,
-			'dryui-feedback': NPX_DRYUI_FEEDBACK_MCP,
+			dryui: dryuiMcpEntry(ctx),
+			'dryui-feedback': dryuiFeedbackMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
 	});
@@ -564,7 +815,12 @@ function zedInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('zed', ctx),
 		servers: {
-			dryui: { command: { path: 'npx', args: ['-y', '@dryui/mcp'] } },
+			dryui: {
+				command: {
+					path: dryuiMcpEntry(ctx).command,
+					args: [...dryuiMcpEntry(ctx).args]
+				}
+			},
 			...maybeSvelte(ctx, () => ({ command: { path: 'npx', args: ['-y', '@sveltejs/mcp'] } }))
 		}
 	});
@@ -575,29 +831,42 @@ function zedInstaller(ctx: InstallContext): InstallResult {
 // `/plugins` step inside a running Codex session, so it stays manual via
 // `dryui setup --editor codex`. The MCP fallback below is auto-installable
 // because it's purely TOML edits in the user-global `~/.codex/config.toml`,
-// and that's enough to make the dryui + dryui-feedback servers available.
+// and that's enough to make the dryui + dryui-feedback servers available. In
+// DRYUI_DEV=1, the same flow also links the top-level skills into Codex's
+// global agent-skill folder so this checkout wins immediately.
 function codexInstaller(ctx: InstallContext): InstallResult {
 	const home = ctx.homeDir ?? homedir();
 	const path = join(home, '.codex/config.toml');
 	const label = 'Update ~/.codex/config.toml';
-	const steps: InstallStepResult[] = [
+	const dryuiEntry = dryuiMcpEntry(ctx);
+	const feedbackEntry = dryuiFeedbackMcpEntry(ctx);
+	const replaceExisting = isDryuiDevMode(ctx);
+	const steps: InstallStepResult[] = [];
+
+	if (isDryuiDevMode(ctx)) {
+		steps.push(linkLocalSkills(join(home, '.agents/skills'), ctx));
+	}
+
+	steps.push(
 		mergeTomlSection({
 			path,
 			section: 'mcp_servers.dryui',
 			block: `[mcp_servers.dryui]
-command = "npx"
-args = ["-y", "@dryui/mcp"]`,
-			label
+command = "${dryuiEntry.command}"
+args = ${tomlStringArray(dryuiEntry.args)}`,
+			label,
+			replaceExisting
 		}),
 		mergeTomlSection({
 			path,
 			section: 'mcp_servers."dryui-feedback"',
 			block: `[mcp_servers."dryui-feedback"]
-command = "npx"
-args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`,
-			label
+command = "${feedbackEntry.command}"
+args = ${tomlStringArray(feedbackEntry.args)}`,
+			label,
+			replaceExisting
 		})
-	];
+	);
 	if (ctx.includeSvelteMcp) {
 		steps.push(
 			mergeTomlSection({
@@ -765,39 +1034,45 @@ args = ["-y", "@sveltejs/mcp"]`,
 export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): readonly string[] {
 	const home = ctx.homeDir ?? homedir();
 	const svelteSuffix = ctx.includeSvelteMcp ? ' + svelte' : '';
+	const localPrefix = isDryuiDevMode(ctx) ? 'local ' : '';
 	switch (id) {
 		case 'codex':
-			return [
-				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`,
-				'• Plugin (skill bundle) install still needs `codex plugin marketplace add rob-balfre/dryui` then `/plugins` inside Codex'
-			];
+			return isDryuiDevMode(ctx)
+				? [
+						`• Link DryUI skills from this checkout into ${homeRelative(join(home, '.agents/skills'))}`,
+						`• Merge local dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`
+					]
+				: [
+						`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`,
+						'• Plugin (skill bundle) install still needs `codex plugin marketplace add rob-balfre/dryui` then `/plugins` inside Codex'
+					];
 		case 'copilot':
 			return [
-				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.github/skills/dryui'))}`,
-				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.mcp.json'))}`
+				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.github/skills' : '.github/skills/dryui'))}`,
+				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.mcp.json'))}`
 			];
 		case 'cursor':
 			return [
-				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.agents/skills/dryui'))}`,
-				`• Merge dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
+				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.agents/skills' : '.agents/skills/dryui'))}`,
+				`• Merge ${localPrefix}dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
 			];
 		case 'opencode':
 			return [
-				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.opencode/skills/dryui'))}`,
-				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
+				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.opencode/skills' : '.opencode/skills/dryui'))}`,
+				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
 			];
 		case 'gemini':
 			return [
-				`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.gemini/settings.json'))}`
+				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.gemini/settings.json'))}`
 			];
 		case 'windsurf':
 			return [
-				`• Copy DryUI skill to ${homeRelative(join(ctx.cwd, '.agents/skills/dryui'))}`,
-				`• Merge dryui + dryui-feedback${svelteSuffix} into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
+				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.agents/skills' : '.agents/skills/dryui'))}`,
+				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
 			];
 		case 'zed':
 			return [
-				`• Merge dryui${svelteSuffix} context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
+				`• Merge ${localPrefix}dryui${svelteSuffix} context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
 			];
 		default:
 			return [];

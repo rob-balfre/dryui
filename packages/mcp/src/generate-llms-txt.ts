@@ -326,7 +326,7 @@ function buildLlmsText(spec: Spec): string {
 
 	sections.push(`# DryUI
 
-> ${totalComponents} zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> Human-led, agent-assisted UI for building web apps with ${totalComponents} reusable components, theme tokens, route patterns, and validation checks.
 
 ## Packages
 
@@ -335,7 +335,11 @@ function buildLlmsText(spec: Spec): string {
 - @dryui/mcp: MCP server with ask/check tools for discovery, setup guidance, and static validation (contract, a11y, tokens, CSS discipline)
 - @dryui/cli: CLI for setup, check, detect, install, project-aware add, lookup, composition guidance, tokens, and feedback tooling
 
-## AI Surface
+## Human-Led Agent-Assisted Workflow
+
+DryUI gives engineers and coding agents a shared UI system: reusable components, themeable defaults, route and interface patterns, and validation before changes ship.
+
+## Agent Support
 
 - MCP tools: ${mcpTools.join(', ')}
 - CLI commands: ${cliCommands.join(', ')}
@@ -345,6 +349,17 @@ function buildLlmsText(spec: Spec): string {
 ${DOCS_ROUTES.map((r) => `- [${r.label}](https://dryui.dev${r.path}): ${r.description}`).join('\n')}
 
 ## Installation
+
+\`\`\`
+npx skills add rob-balfre/dryui
+\`\`\`
+
+\`\`\`
+dryui init
+# or, in an existing app
+dryui detect .
+dryui install .
+\`\`\`
 
 \`\`\`
 bun add @dryui/ui

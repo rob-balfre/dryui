@@ -12,6 +12,9 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 - Use `dryui check [path]` or MCP `check` for static validation of component contracts, a11y, tokens, and CSS discipline. For design-quality flows (brief, critique, polish, visual review) use [impeccable](https://impeccable.style), installed alongside DryUI by `dryui init` or via `npx impeccable skills install`. Invoke via `/impeccable <command>` in your harness.
 - Use the `dryui-layout` agent/skill for page-level grid structure. It writes a `<div data-layout="<name>">` in the .svelte file plus the matching grid template in root `src/layout.css`.
 - Keep `src/layout.css` enforced in dev as well as build: projects should wire `dryuiLayoutCss()` into `vite.config` before `sveltekit()`. Missing `src/layout.css` warns; violations hard-error during Vite dev startup, HMR, and build.
+- Keep docs positioning aligned with the current homepage: DryUI is human-led, agent-assisted UI for reusable components, themes, route patterns, and checks. Do not describe it as a full automation tool, "agent-built apps", or primarily a Svelte cleanup product.
+- The public docs are intentionally trimmed to Home, Getting Started, and individual component pages. Do not recreate removed pages such as `/tools`, `/how-it-works`, `/how-we-work`, `/grid-rules`, `/theme-wizard`, `/components` index pages, or logo exploration pages unless the user explicitly asks.
+- The docs header is a shared shell in `apps/docs/src/routes/+layout.svelte` with logo, search, GitHub, and theme toggle. The logo is the simple `DryUI` wordmark, and `apps/docs/static/favicon.svg` should remain black and white with no underline.
 - The optional Claude SessionStart hook is installed with:
 
 ```bash

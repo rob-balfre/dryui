@@ -24,7 +24,7 @@ import { runSetup } from './commands/setup.js';
 import { runPrompt } from './commands/prompt.js';
 
 const VERSION = pkg.version;
-const DESCRIPTION = 'DryUI — zero-dependency Svelte 5 components + agent-ergonomic CLI.';
+const DESCRIPTION = 'DryUI — human-led, agent-assisted UI for web app teams.';
 
 function resolveExePath(): string {
 	const rawExe = process.argv[1] ?? fileURLToPath(import.meta.url);

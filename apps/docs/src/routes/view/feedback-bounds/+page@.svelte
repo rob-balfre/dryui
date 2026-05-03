@@ -18,6 +18,7 @@
 
 <svelte:head>
 	<title>Feedback Bounds Audit</title>
+	<meta name="robots" content="noindex,nofollow" />
 </svelte:head>
 
 {#if browser}

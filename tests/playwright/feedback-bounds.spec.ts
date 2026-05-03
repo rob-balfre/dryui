@@ -47,7 +47,7 @@ interface BoundsReport {
 }
 
 async function activateLayoutMode(page: Page) {
-	await page.getByRole('tab', { name: 'Layout' }).click();
+	await page.getByRole('tab', { name: 'Components' }).click();
 }
 
 async function placeAndMeasure(page: Page, kind: string): Promise<PlaceResult> {
@@ -110,6 +110,40 @@ async function clearPlaced(page: Page) {
 		for (const el of document.querySelectorAll('[data-dryui-added-id]')) el.remove();
 	});
 }
+
+test('stretches placed component contents when the feedback box is resized', async ({ page }) => {
+	await page.goto('/view/feedback-bounds');
+	await page.waitForFunction(() =>
+		Boolean(
+			(window as Window & { __feedbackBoundsTest?: { COMPONENT_NAMES: readonly string[] } })
+				.__feedbackBoundsTest
+		)
+	);
+
+	await activateLayoutMode(page);
+	await placeAndMeasure(page, 'Calendar');
+
+	const rects = await page.evaluate(async () => {
+		const placed = document.querySelector<HTMLElement>('[data-dryui-added-id]');
+		if (!placed) throw new Error('Expected placed component');
+		placed.style.width = '860px';
+		placed.style.height = '640px';
+
+		await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+
+		const calendar = placed.querySelector<HTMLElement>('[data-calendar]');
+		if (!calendar) throw new Error('Expected rendered calendar');
+		const placeholderRect = placed.getBoundingClientRect();
+		const calendarRect = calendar.getBoundingClientRect();
+		return {
+			placeholder: { width: placeholderRect.width, height: placeholderRect.height },
+			calendar: { width: calendarRect.width, height: calendarRect.height }
+		};
+	});
+
+	expect(rects.calendar.width).toBeGreaterThanOrEqual(rects.placeholder.width - 2);
+	expect(rects.calendar.height).toBeGreaterThanOrEqual(rects.placeholder.height - 2);
+});
 
 test('audit DryUI component bounding boxes', async ({ page }) => {
 	test.setTimeout(600_000);

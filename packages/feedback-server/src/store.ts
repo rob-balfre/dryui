@@ -1,4 +1,4 @@
-import { mkdirSync, existsSync, writeFileSync } from 'node:fs';
+import { mkdirSync, existsSync, rmSync, writeFileSync } from 'node:fs';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
@@ -695,5 +695,23 @@ export class FeedbackStore {
 		if (!existing) return null;
 		this.db.query('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
 		return { ...existing, status };
+	}
+
+	deleteSubmission(id: string): Submission | null {
+		const existing = this.getSubmission(id);
+		if (!existing) return null;
+
+		this.db.query('DELETE FROM submissions WHERE id = ?').run(id);
+
+		for (const screenshotPath of new Set([
+			existing.screenshotPath.webp,
+			existing.screenshotPath.png
+		])) {
+			if (screenshotPath) {
+				rmSync(screenshotPath, { force: true });
+			}
+		}
+
+		return existing;
 	}
 }

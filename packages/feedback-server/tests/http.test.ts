@@ -422,6 +422,25 @@ describe('feedback HTTP server', () => {
 		expect(pngResponse.status).toBe(200);
 		expect(pngResponse.headers.get('content-type')).toContain('image/png');
 		expect((await pngResponse.arrayBuffer()).byteLength).toBeGreaterThan(0);
+
+		const deleteResponse = await fetch(`${baseUrl}/submissions/${pendingOlder.id}`, {
+			method: 'DELETE'
+		});
+		expect(deleteResponse.status).toBe(204);
+		expect(store.getSubmission(pendingOlder.id)).toBeNull();
+
+		const deletedScreenshotResponse = await fetch(
+			`${baseUrl}/submissions/${pendingOlder.id}/screenshot`
+		);
+		expect(deletedScreenshotResponse.status).toBe(404);
+
+		const afterDeleteResponse = await fetch(`${baseUrl}/submissions?status=all`);
+		expect(afterDeleteResponse.status).toBe(200);
+		const afterDeletePayload = await afterDeleteResponse.json();
+		expect(afterDeletePayload.count).toBe(2);
+		expect(
+			afterDeletePayload.submissions.map((submission: Submission) => submission.id)
+		).not.toContain(pendingOlder.id);
 	});
 
 	test('rejects submissions missing paired image fields', async () => {

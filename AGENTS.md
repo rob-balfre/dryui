@@ -13,6 +13,8 @@ Repo-wide instructions for AI coding agents working in this repository.
 ## Canonical Sources
 
 - Editor install snippets and MCP config examples live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts). Do not duplicate them elsewhere.
+- Public docs copy and positioning should match [`apps/docs/src/lib/site-meta.ts`](./apps/docs/src/lib/site-meta.ts) and the docs homepage: human-led, agent-assisted UI for reusable components, themes, and route patterns. Avoid positioning DryUI as a full automation tool, an "agent-built apps" product, or a Svelte-only message.
+- The public docs route surface is intentionally small: `/`, `/getting-started`, and `/components/[slug]`. Do not re-add removed exploration pages (`/tools`, `/how-it-works`, `/how-we-work`, `/grid-rules`, `/theme-wizard`, logo option pages, `/components` index pages, or similar samples) unless explicitly requested.
 - Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
 - Recommended install path for end users: `npx skills add rob-balfre/dryui` (skills.sh standard).
 - `bun run validate:skills` lints every SKILL.md (frontmatter present, name=dirname, description length).
@@ -46,6 +48,8 @@ dryui
 - DryUI ships no layout component. Page/section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. The file is imported last from `src/routes/+layout.svelte` after DryUI theme CSS and `../app.css`.
 - All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Mobile-first; `@container` queries for responsive shifts, never `@media` for layout breakpoints.
 - `@dryui/lint` has two build-time surfaces: `dryuiLint()` in `svelte.config` for component rules, and `dryuiLayoutCss()` in `vite.config` for `src/layout.css`. The Vite plugin must run in `vite dev`/HMR and `vite build`; missing `src/layout.css` is warning-only, violations are hard errors.
+- The docs shell header is centralized in [`apps/docs/src/routes/+layout.svelte`](./apps/docs/src/routes/+layout.svelte): logo, search, GitHub, and theme toggle. Keep route pages focused on content and avoid duplicating header chrome.
+- The docs logo is the simple font-based `DryUI` wordmark in [`apps/docs/src/lib/components/Logo.svelte`](./apps/docs/src/lib/components/Logo.svelte). The favicon lives at [`apps/docs/static/favicon.svg`](./apps/docs/static/favicon.svg) and should stay black and white with no underline.
 - For design-quality work (brief, critique, polish, visual review, anti-pattern detection), DryUI delegates to [impeccable](https://impeccable.style). Install alongside DryUI via `dryui init` or `npx impeccable skills install`, then use `/impeccable <command>` from your AI harness. `PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
 - Keep root-level Markdown durable. One-off audits, scratch TODOs, and generated reports belong under `docs/`, `reports/`, or ignored local directories, not the repo root.
 - Repo-local editor install output such as `.agents/skills/`, `.github/skills/`, `.opencode/`, and `opencode.json` is not canonical source.

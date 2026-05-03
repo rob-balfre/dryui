@@ -9,23 +9,32 @@ import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
-// The skill must exist in the consumer's project before dispatch. The
-// dispatched agent reads it from inside the project root, which `auto`
-// permission mode pre-approves; reading from outside the project would
-// trigger a permission prompt mid-session.
+// Claude still reads project-local skills so auto permission mode stays inside
+// the workspace. Codex reads installed skills from ~/.agents/skills, which is
+// where `dryui` links local source-mode skills for Codex.
 const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
+const CODEX_SKILL_RELATIVE = '.agents/skills/dryui-feedback/SKILL.md';
 const SKILL_MISSING_HINT =
 	'dryui-feedback skill not installed in this project. ' +
 	'Run `npx skills add rob-balfre/dryui --skill dryui-feedback` ' +
 	'(or `dryui init` for full project setup).';
+const CODEX_SKILL_MISSING_HINT =
+	'dryui-feedback skill not installed for Codex. ' +
+	'Run `DRYUI_DEV=1 dryui`, choose "Set up editor or agent", then choose Codex.';
 
-function findInstalledSkill(workspace: string): string | null {
+function findProjectSkill(workspace: string): string | null {
 	const candidate = join(workspace, PROJECT_SKILL_RELATIVE);
+	return existsSync(candidate) ? candidate : null;
+}
+
+function findCodexSkill(homeDir: string): string | null {
+	const candidate = join(homeDir, CODEX_SKILL_RELATIVE);
 	return existsSync(candidate) ? candidate : null;
 }
 
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
 export type DefaultDispatchAgent = DispatchAgent | 'off';
+export type DispatchSkillPaths = Partial<Record<DispatchAgent, string>>;
 export const DISPATCH_AGENTS: readonly DispatchAgent[] = [
 	'claude',
 	'codex',
@@ -197,19 +206,49 @@ export interface DispatcherOptions {
 	workspace: string;
 	defaultAgent: DefaultDispatchAgent;
 	terminalApp?: TerminalApp;
+	homeDir?: string;
 }
 
 interface DispatchTargetsSnapshot {
 	defaultAgent: DefaultDispatchAgent;
 	configuredAgents: DispatchAgent[];
+	skillPaths: DispatchSkillPaths;
 	/**
-	 * Absolute path to the canonical SKILL.md, resolved from the running
-	 * server's own package. The UI uses this when building the copy-paste
-	 * prompt so users don't paste a `node_modules/...` reference that won't
-	 * resolve in their project (the server is usually globally linked, not
-	 * a direct project dep).
+	 * Legacy single-path field for older dashboards. Newer dashboards use
+	 * `skillPaths` so the prompt can follow the selected target agent.
 	 */
 	skillPath: string | null;
+}
+
+export function resolveFeedbackSkillPath(
+	workspace: string,
+	target: DispatchAgent,
+	homeDir = homedir()
+): string | null {
+	const projectSkill = findProjectSkill(workspace);
+	if (target !== 'codex') return projectSkill;
+	return findCodexSkill(homeDir) ?? projectSkill;
+}
+
+export function resolveFeedbackSkillPaths(
+	workspace: string,
+	agents: readonly DispatchAgent[],
+	homeDir = homedir()
+): DispatchSkillPaths {
+	const projectSkill = findProjectSkill(workspace);
+	const codexSkill = findCodexSkill(homeDir);
+	const skillPaths: DispatchSkillPaths = {};
+
+	for (const agent of agents) {
+		const skillPath = agent === 'codex' ? (codexSkill ?? projectSkill) : projectSkill;
+		if (skillPath) skillPaths[agent] = skillPath;
+	}
+
+	return skillPaths;
+}
+
+function missingSkillHint(target: DispatchAgent): string {
+	return target === 'codex' ? CODEX_SKILL_MISSING_HINT : SKILL_MISSING_HINT;
 }
 
 function shellQuote(s: string): string {
@@ -450,10 +489,22 @@ function isConfiguredAgent(
 
 export function getDispatchTargetsSnapshot(options: DispatcherOptions): DispatchTargetsSnapshot {
 	const cache = createProbeCache();
-	const skillPath = findInstalledSkill(options.workspace);
+	const configuredAgents = DISPATCH_AGENTS.filter((agent) =>
+		isConfiguredAgent(agent, options, cache)
+	);
+	const skillPaths = resolveFeedbackSkillPaths(
+		options.workspace,
+		configuredAgents,
+		options.homeDir
+	);
+	const skillPath =
+		options.defaultAgent !== 'off'
+			? (skillPaths[options.defaultAgent] ?? null)
+			: (skillPaths.codex ?? skillPaths.claude ?? null);
 	return {
 		defaultAgent: options.defaultAgent,
-		configuredAgents: DISPATCH_AGENTS.filter((agent) => isConfiguredAgent(agent, options, cache)),
+		configuredAgents,
+		skillPaths,
 		skillPath
 	};
 }
@@ -782,9 +833,9 @@ function dispatch(submission: Submission, options: DispatcherOptions): void {
 	}
 
 	const dispatchWorkspace = submission.workspace ?? options.workspace;
-	const skillPath = findInstalledSkill(dispatchWorkspace);
+	const skillPath = resolveFeedbackSkillPath(dispatchWorkspace, target, options.homeDir);
 	if (!skillPath) {
-		console.error(`[dispatch] submission ${submission.id} aborted: ${SKILL_MISSING_HINT}`);
+		console.error(`[dispatch] submission ${submission.id} aborted: ${missingSkillHint(target)}`);
 		return;
 	}
 	const prompt = buildFeedbackDispatchPrompt(submission, { skillPath });

@@ -1,4 +1,4 @@
-import { mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
@@ -172,6 +172,27 @@ describe('FeedbackStore', () => {
 				.map((submission) => submission.id)
 				.sort()
 		).toEqual([pendingOlder.id, pendingNewer.id, resolved.id].sort());
+	});
+
+	test('deletes submissions and captured screenshots', () => {
+		const submission = store.createSubmission({
+			url: 'https://example.com/delete-me',
+			image: imagePayload('delete-me'),
+			drawings: [drawingText('delete-text', 'Remove this one')]
+		});
+
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+		expect(existsSync(submission.screenshotPath.webp)).toBe(true);
+		expect(existsSync(submission.screenshotPath.png)).toBe(true);
+
+		const deleted = store.deleteSubmission(submission.id);
+
+		expect(deleted).toMatchObject({ id: submission.id });
+		expect(store.getSubmission(submission.id)).toBeNull();
+		expect(store.listSubmissions('all').map((entry) => entry.id)).not.toContain(submission.id);
+		expect(existsSync(submission.screenshotPath.webp)).toBe(false);
+		expect(existsSync(submission.screenshotPath.png)).toBe(false);
+		expect(store.deleteSubmission(submission.id)).toBeNull();
 	});
 
 	test('persists dual screenshot paths, hints, and scroll offset', () => {

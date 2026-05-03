@@ -384,6 +384,7 @@ export function startFeedbackHttpServer(
 						return json({
 							defaultAgent: 'codex',
 							configuredAgents: [],
+							skillPaths: {},
 							skillPath: null
 						});
 					}
@@ -619,6 +620,13 @@ export function startFeedbackHttpServer(
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
+				}
+				if (submissionMatch && request.method === 'DELETE') {
+					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
+					const submission = store.deleteSubmission(submissionId);
+					if (!submission) return errorResponse(404, 'Not found');
+					bus.emit(sessionEvent('submission.deleted', submission.url, submission));
+					return new Response(null, { status: 204, headers: CORS_HEADERS });
 				}
 
 				const annotationMatch = pathname.match(/^\/annotations\/([^/]+)$/);

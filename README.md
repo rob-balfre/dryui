@@ -1,8 +1,12 @@
 # DryUI
 
-160+ components and theme controls, plus a CLI, MCP, and feedback engine to keep AI on track.
+Human-led, agent-assisted UI for building web apps with reusable components, theme tokens, route patterns, and checks that keep interfaces consistent.
 
 Docs and editor setup: <https://dryui.dev/getting-started>
+
+## What DryUI Does
+
+DryUI gives engineers and their coding agents a shared UI system: reusable components, themeable defaults, route and interface patterns, and validation before changes ship.
 
 ## Workspace Packages
 
@@ -11,15 +15,30 @@ Docs and editor setup: <https://dryui.dev/getting-started>
 | `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                |
 | `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                      |
 | `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                     |
-| `@dryui/cli`             | CLI for setup, discovery, install planning, static contract checks, tokens, and feedback tooling                          |
+| `@dryui/cli`             | CLI for setup, discovery, install planning, static contract checks, skills, MCP, and feedback tooling                     |
 | `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor component discovery, contract validation, a11y, and token correctness |
-| `@dryui/theme-wizard`    | Optional guided theme generator                                                                                           |
+| `@dryui/theme-wizard`    | Experimental theme generator package; not exposed in the trimmed public docs while parked                                 |
 | `@dryui/feedback`        | Optional feedback annotation UI                                                                                           |
 | `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                 |
 
 ## Quick Start
 
-Start with the CLI. Always check for a local DryUI link before installing globally:
+Add the DryUI skill to your coding agent first:
+
+```bash
+npx skills add rob-balfre/dryui
+```
+
+Then use the CLI to wire a new or existing app:
+
+```bash
+dryui init
+# or, in an existing app
+dryui detect .
+dryui install .
+```
+
+When working inside this monorepo, always check for a local DryUI link before installing the CLI globally:
 
 ```bash
 readlink ~/.bun/install/global/node_modules/@dryui/cli
@@ -68,13 +87,21 @@ Use it in Svelte:
 
 Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by default. Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides.
 
-## AI And Editor Integration
+## Human-Led Agent-Assisted Workflow
 
-The CLI is the default entry point. Once it is working, add the skill and MCP layer for your editor from <https://dryui.dev/getting-started>.
+DryUI gives humans and agents a shared way to discuss, edit, theme, and validate web app UI without losing consistency.
+
+The skill install is the recommended first step. Once the CLI is working in a project, add the MCP layer for your editor from <https://dryui.dev/getting-started>.
 
 Repo contributors should treat [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts) as the canonical setup source for editor snippets and MCP config examples.
 
 Use `dryui check [path]` for static validation of component contracts, a11y, tokens, and CSS discipline. The MCP `check` tool mirrors this surface.
+
+## Public Docs Surface
+
+The public docs are intentionally focused: Home, Getting Started, and individual component pages. Removed exploration pages such as `/tools`, `/how-it-works`, `/how-we-work`, `/grid-rules`, `/theme-wizard`, and a `/components` index page are not current product surfaces.
+
+The docs brand is deliberately simple for now: a font-based `DryUI` wordmark and a black-and-white favicon with no underline. Keep route pages focused on content; the shared header lives in the docs layout.
 
 ## Layout CSS Discipline
 
@@ -200,6 +227,8 @@ See the supporting docs for the rest:
 
 - Zero-dependency core runtime built on native browser APIs
 - Two-tier architecture: headless primitives plus styled UI components
+- Human-led, agent-assisted workflow
+- Route and interface patterns for coherent web apps
 - Svelte 5 runes only
 - CSS variable theming via `--dry-*`
 - CLI-first workflow with optional MCP and skill integration

@@ -13,6 +13,7 @@
 
 <svelte:head>
 	<title>{title} — DryUI</title>
+	<meta name="robots" content="noindex,nofollow" />
 </svelte:head>
 
 <div class="view-layout">

@@ -1,6 +1,6 @@
 # DryUI
 
-> 166 zero-dependency Svelte 5 components with headless primitives, styled defaults, and an AI surface for scope-driven discovery and path-driven validation.
+> Human-led, agent-assisted UI for building web apps with 166 reusable components, theme tokens, route patterns, and validation checks.
 
 ## Packages
 
@@ -9,18 +9,32 @@
 - @dryui/mcp: MCP server with ask/check tools for discovery, setup guidance, and static validation (contract, a11y, tokens, CSS discipline)
 - @dryui/cli: CLI for setup, check, detect, install, project-aware add, lookup, composition guidance, tokens, and feedback tooling
 
-## AI Surface
+## Human-Led Agent-Assisted Workflow
+
+DryUI gives engineers and coding agents a shared UI system: reusable components, themeable defaults, route and interface patterns, and validation before changes ship.
+
+## Agent Support
 
 - MCP tools: ask, check
 - CLI commands: setup, init, detect, install, add, info, list, compose, tokens, check, ambient, install-hook, feedback, prompt
 
 ## First-party docs
 
-- [Home](https://dryui.dev/): Landing page for DryUI
-- [Getting Started](https://dryui.dev/getting-started): Install DryUI, import the theme, and bootstrap your app
-- [Components](https://dryui.dev/components): Per-component reference with props, parts, examples, and anti-patterns
+- [Home](https://dryui.dev/): Human-led, agent-assisted UI for reusable components, themes, and route patterns
+- [Getting Started](https://dryui.dev/getting-started): Install the DryUI skill, wire the app, add themes, and build with components
 
 ## Installation
+
+```
+npx skills add rob-balfre/dryui
+```
+
+```
+dryui init
+# or, in an existing app
+dryui detect .
+dryui install .
+```
 
 ```
 bun add @dryui/ui

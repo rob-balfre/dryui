@@ -28,13 +28,6 @@ export const docsVisualRoutes: DocsVisualRoute[] = allComponentNames().map((name
 export const docsSmokeRoutes: DocsVisualRoute[] = [
 	{
 		kind: 'smoke',
-		name: 'Theme Wizard Preview',
-		path: '/theme-wizard/preview',
-		selector: '.preview-scene',
-		headingText: 'Theme Wizard'
-	},
-	{
-		kind: 'smoke',
 		name: 'Visual Benchmark',
 		path: '/view/bench/visual',
 		selector: '[data-benchmark-root]',

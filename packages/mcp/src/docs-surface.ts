@@ -2,7 +2,7 @@
  * Canonical manifest of DryUI first-party docs and agent editor support.
  *
  * Keeps one source of truth for:
- *  - the docs IA (`/`, `/getting-started`, `/components`, …) that `search.ts`,
+ *  - the docs IA (`/`, `/getting-started`, …) that `search.ts`,
  *    the llms.txt generator, and the nightly drift checks all consume
  *  - the canonical agent IDs (`claude-code`, `codex`, `gemini`, …) that the
  *    docs site renders setup cards for, and which plugin manifests must not
@@ -48,8 +48,8 @@ export const AGENT_IDS: readonly AgentId[] = [
  * First-party docs routes. Paths are SvelteKit route URLs; the parity test
  * checks that every route has a corresponding apps/docs/src/routes/_/+page.svelte.
  *
- * The dynamic `/components/[slug]` route is represented as `/components`;
- * the component slugs themselves come from spec.json at generate time.
+ * Component detail pages live at `/components/[slug]`; the component slugs
+ * themselves come from spec.json at generate time rather than DOCS_ROUTES.
  */
 export interface DocsRoute {
 	readonly path: string;
@@ -62,19 +62,14 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 	{
 		path: '/',
 		label: 'Home',
-		description: 'Landing page for DryUI',
-		keywords: ['index', 'overview', 'landing']
+		description: 'Human-led, agent-assisted UI for reusable components, themes, and route patterns',
+		keywords: ['index', 'overview', 'landing', 'human-led', 'agent-assisted']
 	},
 	{
 		path: '/getting-started',
 		label: 'Getting Started',
-		description: 'Install DryUI, import the theme, and bootstrap your app',
-		keywords: ['install', 'setup', 'theme', 'quickstart']
-	},
-	{
-		path: '/components',
-		label: 'Components',
-		description: 'Per-component reference with props, parts, examples, and anti-patterns'
+		description: 'Install the DryUI skill, wire the app, add themes, and build with components',
+		keywords: ['install', 'setup', 'skill', 'theme', 'quickstart']
 	}
 ];
 

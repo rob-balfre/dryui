@@ -171,6 +171,14 @@ export class FeedbackHttpClient {
 		);
 	}
 
+	async deleteSubmission(id: string): Promise<void> {
+		await ensureOk(
+			await fetch(`${this.baseUrl}/submissions/${encodeURIComponent(id)}`, {
+				method: 'DELETE'
+			})
+		);
+	}
+
 	async resolveSubmission(id: string): Promise<void> {
 		await this.updateSubmissionStatus(id, 'resolved');
 	}

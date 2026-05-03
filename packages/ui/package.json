@@ -1602,7 +1602,10 @@
       "./themes/terminal.css": "./dist/themes/terminal.css"
     }
   },
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
     "build": "svelte-package -i src",
     "check": "svelte-check --tsconfig ./tsconfig.json",

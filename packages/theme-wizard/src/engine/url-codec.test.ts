@@ -1,4 +1,4 @@
-// apps/docs/src/lib/theme-wizard/url-codec.test.ts
+// packages/theme-wizard/src/engine/url-codec.test.ts
 import { describe, test, expect } from 'bun:test';
 import { encodeTheme, decodeTheme } from './url-codec.js';
 import type { BrandInput, ThemeOptions } from './derivation.js';

@@ -187,6 +187,17 @@
 	let layoutVersion = $state(0);
 
 	let placingComponent = $state<string | null>(null);
+	const ADDED_CONTENT_FALLBACK_STYLE = 'display: contents;';
+	const ADDED_CONTENT_RENDERED_STYLE = [
+		'display: grid',
+		'min-width: 0',
+		'min-height: 0',
+		'inline-size: 100%',
+		'block-size: 100%',
+		'align-self: stretch',
+		'justify-self: stretch',
+		'place-items: stretch'
+	].join('; ');
 
 	function emptyHistoryFrame(initialDrawings: Drawing[] = []): HistoryFrame {
 		return {
@@ -358,7 +369,7 @@
 		});
 		const content = document.createElement('div');
 		content.dataset.dryuiAddedContent = '';
-		content.style.cssText = 'display: contents;';
+		content.style.cssText = ADDED_CONTENT_FALLBACK_STYLE;
 		const fallback = document.createElement('span');
 		fallback.dataset.dryuiAddedFallback = '';
 		fallback.textContent = kind;
@@ -487,6 +498,34 @@
 		}
 	}
 
+	function resetAddedFallback(record: AddedRecord) {
+		const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
+		if (target) target.style.cssText = ADDED_CONTENT_FALLBACK_STYLE;
+		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+		if (fallback) {
+			fallback.textContent = record.label?.trim() || record.kind;
+			fallback.style.display = '';
+		}
+		delete record.el.dataset.dryuiAddedRendered;
+		record.el.style.background = 'hsl(25 100% 55% / 0.16)';
+		record.el.style.border = '2px dashed hsl(25 100% 55%)';
+		record.el.style.padding = '4px 8px';
+		record.el.style.borderRadius = '8px';
+		record.el.style.placeItems = 'center';
+	}
+
+	function applyAddedRenderedShell(record: AddedRecord, target: HTMLElement) {
+		target.style.cssText = ADDED_CONTENT_RENDERED_STYLE;
+		record.el.dataset.dryuiAddedRendered = '';
+		record.el.style.background = 'transparent';
+		record.el.style.border = '0';
+		record.el.style.padding = '0';
+		record.el.style.borderRadius = '0';
+		record.el.style.placeItems = 'stretch';
+		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
+		if (fallback) fallback.style.display = 'none';
+	}
+
 	async function tryRenderInto(record: AddedRecord) {
 		try {
 			let Component: unknown = await loadDefaultTemplate(record.kind);
@@ -499,7 +538,6 @@
 			if (!record.el.isConnected) return;
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
-			target.style.cssText = 'display: contents;';
 			const labelText = record.label?.trim() || record.kind;
 			const labelSnippet = createRawSnippet(() => ({
 				render: () => `<span>${escapeHtml(labelText)}</span>`
@@ -511,14 +549,7 @@
 				props
 			});
 			record.mounted = instance;
-			record.el.dataset.dryuiAddedRendered = '';
-			record.el.style.background = 'transparent';
-			record.el.style.border = '0';
-			record.el.style.padding = '0';
-			record.el.style.borderRadius = '0';
-			record.el.style.placeItems = 'start';
-			const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
-			if (fallback) fallback.style.display = 'none';
+			applyAddedRenderedShell(record, target);
 			// Component mount shrink-wraps the placeholder to its real content size,
 			// so the inspector needs to rebuild its bounding boxes for the new rect.
 			notifyLayoutChange();
@@ -588,17 +619,7 @@
 				existing.kind = kind;
 				existing.label = options?.label;
 				existing.propsJson = options?.propsJson;
-				const fallback = existing.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
-				if (fallback) {
-					fallback.textContent = options?.label?.trim() || kind;
-					fallback.style.display = '';
-				}
-				delete existing.el.dataset.dryuiAddedRendered;
-				existing.el.style.background = 'hsl(25 100% 55% / 0.16)';
-				existing.el.style.border = '2px dashed hsl(25 100% 55%)';
-				existing.el.style.padding = '4px 8px';
-				existing.el.style.borderRadius = '8px';
-				existing.el.style.placeItems = 'center';
+				resetAddedFallback(existing);
 				void tryRenderInto(existing);
 			}
 			return existing.el;
@@ -1224,17 +1245,7 @@
 		record.label = nextLabel;
 		record.propsJson = nextProps;
 		unmountAdded(record);
-		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
-		if (fallback) {
-			fallback.textContent = nextLabel || record.kind;
-			fallback.style.display = '';
-		}
-		delete record.el.dataset.dryuiAddedRendered;
-		record.el.style.background = 'hsl(25 100% 55% / 0.16)';
-		record.el.style.border = '2px dashed hsl(25 100% 55%)';
-		record.el.style.padding = '4px 8px';
-		record.el.style.borderRadius = '8px';
-		record.el.style.placeItems = 'center';
+		resetAddedFallback(record);
 		void tryRenderInto(record);
 		commitHistory();
 	}

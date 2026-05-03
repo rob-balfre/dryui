@@ -18,6 +18,7 @@
 
 <svelte:head>
 	<title>Visual Benchmark — DryUI</title>
+	<meta name="robots" content="noindex,nofollow" />
 	<script>
 		(() => {
 			const root = document.documentElement;

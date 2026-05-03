@@ -1,12 +1,28 @@
 import { describe, expect, test } from 'bun:test';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import {
 	buildWindsurfChatArgs,
 	buildVsCodeChatArgs,
 	buildWorkspaceAppLaunch,
+	resolveFeedbackSkillPath,
+	resolveFeedbackSkillPaths,
 	resolveWindsurfCliWith,
 	resolveVsCodeCliWith
 } from '../src/dispatch.ts';
 import { buildFeedbackDispatchPrompt } from '../src/prompts.ts';
+
+function writeSkillFile(root: string, relativePath: string): string {
+	const path = join(root, relativePath);
+	mkdirSync(dirname(path), { recursive: true });
+	writeFileSync(path, '# DryUI feedback\n');
+	return path;
+}
+
+function tempDir(): string {
+	return mkdtempSync(join(tmpdir(), 'dryui-feedback-dispatch-'));
+}
 
 describe('feedback prompts', () => {
 	test('dispatch prompt walks agents through the full review steps', () => {
@@ -73,6 +89,46 @@ describe('feedback prompts', () => {
 		});
 
 		expect(prompt).not.toContain('Text notes from the annotation:');
+	});
+});
+
+describe('feedback skill path resolution', () => {
+	test('uses the Codex-installed local skill for Codex prompts', () => {
+		const workspace = tempDir();
+		const homeDir = tempDir();
+		const projectSkill = writeSkillFile(workspace, '.claude/skills/dryui-feedback/SKILL.md');
+		const codexSkill = writeSkillFile(homeDir, '.agents/skills/dryui-feedback/SKILL.md');
+
+		expect(resolveFeedbackSkillPath(workspace, 'codex', homeDir)).toBe(codexSkill);
+		expect(resolveFeedbackSkillPath(workspace, 'claude', homeDir)).toBe(projectSkill);
+	});
+
+	test('falls back to the project skill for Codex when no Codex skill is installed', () => {
+		const workspace = tempDir();
+		const homeDir = tempDir();
+		const projectSkill = writeSkillFile(workspace, '.claude/skills/dryui-feedback/SKILL.md');
+
+		expect(resolveFeedbackSkillPath(workspace, 'codex', homeDir)).toBe(projectSkill);
+	});
+
+	test('does not use the Codex global skill for non-Codex agents', () => {
+		const workspace = tempDir();
+		const homeDir = tempDir();
+		writeSkillFile(homeDir, '.agents/skills/dryui-feedback/SKILL.md');
+
+		expect(resolveFeedbackSkillPath(workspace, 'claude', homeDir)).toBeNull();
+	});
+
+	test('returns target-specific skill paths for the dashboard', () => {
+		const workspace = tempDir();
+		const homeDir = tempDir();
+		const projectSkill = writeSkillFile(workspace, '.claude/skills/dryui-feedback/SKILL.md');
+		const codexSkill = writeSkillFile(homeDir, '.agents/skills/dryui-feedback/SKILL.md');
+
+		expect(resolveFeedbackSkillPaths(workspace, ['claude', 'codex'], homeDir)).toEqual({
+			claude: projectSkill,
+			codex: codexSkill
+		});
 	});
 });
 
