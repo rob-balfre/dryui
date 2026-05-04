@@ -93,7 +93,6 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 		component: 'Button',
 		allowedDirs: new Set([
 			'button',
-			'card',
 			'mega-menu',
 			'tree',
 			// Form-control triggers — render as raw <button> styled with the

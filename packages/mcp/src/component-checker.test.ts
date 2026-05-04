@@ -13,7 +13,7 @@ const mockSpec = {
 			},
 			cssVars: {}
 		},
-		Card: {
+		Layout: {
 			compound: true,
 			parts: {
 				Root: {
@@ -123,17 +123,17 @@ const mockSpec = {
 describe('Spec Compliance (errors)', () => {
 	test('flags bare compound component as error', () => {
 		const code = `<script>
-  import { Card } from '@dryui/ui';
+  import { Layout } from '@dryui/ui';
 </script>
-<Card>
-  <Card.Header>Title</Card.Header>
-  <Card.Content><p>Body</p></Card.Content>
-</Card>`;
+<Layout>
+  <Layout.Header>Title</Layout.Header>
+  <Layout.Content><p>Body</p></Layout.Content>
+</Layout>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(
 			result.issues.some(
 				(i) =>
-					i.severity === 'error' && i.message.includes('<Card>') && i.message.includes('compound')
+					i.severity === 'error' && i.message.includes('<Layout>') && i.message.includes('compound')
 			)
 		).toBe(true);
 	});
@@ -172,11 +172,11 @@ describe('Spec Compliance (errors)', () => {
 
 	test('flags invalid part name', () => {
 		const code = `<script>
-  import { Card } from '@dryui/ui';
+  import { Layout } from '@dryui/ui';
 </script>
-<Card.Root>
-  <Card.Body>content</Card.Body>
-</Card.Root>`;
+<Layout.Root>
+  <Layout.Body>content</Layout.Body>
+</Layout.Root>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(
 			result.issues.some(
@@ -304,15 +304,15 @@ describe('Structural (errors)', () => {
 
 	test('flags orphaned compound part', () => {
 		const code = `<script>
-  import { Card } from '@dryui/ui';
+  import { Layout } from '@dryui/ui';
 </script>
-<Card.Header>Title</Card.Header>`;
+<Layout.Header>Title</Layout.Header>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(
 			result.issues.some(
 				(i) =>
 					i.severity === 'error' &&
-					i.message.includes('Card.Header') &&
+					i.message.includes('Layout.Header') &&
 					i.message.includes('without')
 			)
 		).toBe(true);
@@ -415,15 +415,15 @@ describe('Structural (errors)', () => {
 describe('Clean pass', () => {
 	test('returns no issues for clean component', () => {
 		const code = `<script>
-  import { Card, Button } from '@dryui/ui';
+  import { Layout, Button } from '@dryui/ui';
 </script>
-<Card.Root>
-  <Card.Header>Title</Card.Header>
-  <Card.Content>
+<Layout.Root>
+  <Layout.Header>Title</Layout.Header>
+  <Layout.Content>
     <p>Body</p>
     <Button variant="solid">Action</Button>
-  </Card.Content>
-</Card.Root>`;
+  </Layout.Content>
+</Layout.Root>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(result.issues.length).toBe(0);
 		expect(result.summary).toBe('No issues found');
@@ -437,11 +437,11 @@ describe('Clean pass', () => {
 
 	test('summary counts by severity', () => {
 		const code = `<script>
-  import { Card } from '@dryui/ui';
+  import { Layout } from '@dryui/ui';
 </script>
-<Card>
-  <Card.Header>Title</Card.Header>
-</Card>`;
+<Layout>
+  <Layout.Header>Title</Layout.Header>
+</Layout>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(result.summary).toMatch(/\d+ error/);
 		expect(result.summary).toMatch(/0 warnings/);
@@ -464,11 +464,11 @@ describe('Nested brace handling', () => {
 describe('Issue code property', () => {
 	test('every issue has a code property', () => {
 		const code = `<script>
-  import { Card, Input } from '@dryui/ui';
+  import { Layout, Input } from '@dryui/ui';
 </script>
-<Card>
-  <Card.Header>Title</Card.Header>
-</Card>
+<Layout>
+  <Layout.Header>Title</Layout.Header>
+</Layout>
 <Input type="text" />`;
 		const result = reviewComponent(code, mockSpec);
 		expect(result.issues.length).toBeGreaterThan(0);
@@ -480,9 +480,9 @@ describe('Issue code property', () => {
 
 	test('bare compound has code bare-compound', () => {
 		const code = `<script>
-  import { Card } from '@dryui/ui';
+  import { Layout } from '@dryui/ui';
 </script>
-<Card><Card.Header>T</Card.Header></Card>`;
+<Layout><Layout.Header>T</Layout.Header></Layout>`;
 		const result = reviewComponent(code, mockSpec);
 		expect(result.issues.some((i) => i.code === 'bare-compound')).toBe(true);
 	});

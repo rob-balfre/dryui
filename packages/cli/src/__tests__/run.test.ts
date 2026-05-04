@@ -74,7 +74,7 @@ describe('resolveOutputMode', () => {
 
 describe('renderCommandResultByMode', () => {
 	test('renders toon, json, and text output', () => {
-		const value = { name: 'Card' };
+		const value = { name: 'Tabs' };
 
 		expect(
 			renderCommandResultByMode('toon', value, {
@@ -82,7 +82,7 @@ describe('renderCommandResultByMode', () => {
 				json: (item) => `json:${item.name}`,
 				text: (item) => `text:${item.name}`
 			})
-		).toMatchObject({ output: 'toon:Card', error: null, exitCode: 0 });
+		).toMatchObject({ output: 'toon:Tabs', error: null, exitCode: 0 });
 
 		expect(
 			renderCommandResultByMode('json', value, {
@@ -90,7 +90,7 @@ describe('renderCommandResultByMode', () => {
 				json: (item) => `json:${item.name}`,
 				text: (item) => `text:${item.name}`
 			})
-		).toMatchObject({ output: 'json:Card', error: null, exitCode: 0 });
+		).toMatchObject({ output: 'json:Tabs', error: null, exitCode: 0 });
 
 		expect(
 			renderCommandResultByMode('text', value, {
@@ -98,7 +98,7 @@ describe('renderCommandResultByMode', () => {
 				json: (item) => `json:${item.name}`,
 				text: (item) => `text:${item.name}`
 			})
-		).toMatchObject({ output: 'text:Card', error: null, exitCode: 0 });
+		).toMatchObject({ output: 'text:Tabs', error: null, exitCode: 0 });
 	});
 });
 
@@ -244,7 +244,7 @@ describe('runStandardCommand', () => {
 
 	test('executes the command with resolved mode and positionals', () => {
 		const result = captureCommandIO(() =>
-			runStandardCommand(['--text', 'Card'], {
+			runStandardCommand(['--text', 'Tabs'], {
 				help: {
 					usage: 'dryui demo <value>',
 					description: ['Demo command.']
@@ -258,7 +258,7 @@ describe('runStandardCommand', () => {
 			})
 		);
 
-		expect(result.logs).toEqual(['text:Card']);
+		expect(result.logs).toEqual(['text:Tabs']);
 		expect(result.exitCode).toBe(0);
 	});
 
@@ -281,7 +281,7 @@ describe('runStandardCommand', () => {
 		expect(helpResult.exitCode).toBe(0);
 
 		const jsonDisabled = captureCommandIO(() =>
-			runStandardCommand(['--json', 'Card'], {
+			runStandardCommand(['--json', 'Tabs'], {
 				help: {
 					usage: 'dryui demo <value>',
 					description: ['Demo command.']

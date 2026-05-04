@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
-	import { Button, Card, CodeBlock, Container, Heading, Text } from '@dryui/ui';
+	import { Button, CodeBlock, Container, Heading, Text } from '@dryui/ui';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { withBase } from '$lib/utils';
 
@@ -55,39 +55,33 @@ dryui setup --open-feedback --no-open`;
 		</section>
 
 		<section class="feedback-flow">
-			<Card.Root>
-				<Card.Content>
-					<div class="stack-sm">
-						<Heading level={3}>Local by default</Heading>
-						<Text color="secondary">
-							The server uses port 4748 by default and stores queue data under
-							<code>.dryui/feedback</code> in the project.
-						</Text>
-					</div>
-				</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Content>
-					<div class="stack-sm">
-						<Heading level={3}>Agent-readable</Heading>
-						<Text color="secondary">
-							Each submission keeps the screenshot, drawings, page URL, viewport, scroll offset,
-							text notes, and DOM hints together.
-						</Text>
-					</div>
-				</Card.Content>
-			</Card.Root>
-			<Card.Root>
-				<Card.Content>
-					<div class="stack-sm">
-						<Heading level={3}>Resolvable</Heading>
-						<Text color="secondary">
-							The feedback skill fetches one pending submission, applies the smallest matching
-							change, runs <code>dryui check</code>, then marks it resolved.
-						</Text>
-					</div>
-				</Card.Content>
-			</Card.Root>
+			<div class="surface">
+				<div class="stack-sm">
+					<Heading level={3}>Local by default</Heading>
+					<Text color="secondary">
+						The server uses port 4748 by default and stores queue data under
+						<code>.dryui/feedback</code> in the project.
+					</Text>
+				</div>
+			</div>
+			<div class="surface">
+				<div class="stack-sm">
+					<Heading level={3}>Agent-readable</Heading>
+					<Text color="secondary">
+						Each submission keeps the screenshot, drawings, page URL, viewport, scroll offset, text
+						notes, and DOM hints together.
+					</Text>
+				</div>
+			</div>
+			<div class="surface">
+				<div class="stack-sm">
+					<Heading level={3}>Resolvable</Heading>
+					<Text color="secondary">
+						The feedback skill fetches one pending submission, applies the smallest matching change,
+						runs <code>dryui check</code>, then marks it resolved.
+					</Text>
+				</div>
+			</div>
 		</section>
 
 		<section class="stack-md">
@@ -127,6 +121,13 @@ dryui setup --open-feedback --no-open`;
 	.feedback-flow {
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 		gap: var(--dry-space-4);
+	}
+
+	.surface {
+		padding: var(--dry-padding-card);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
 	}
 
 	.feedback-shots {

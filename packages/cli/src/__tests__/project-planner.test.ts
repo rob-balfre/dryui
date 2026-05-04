@@ -6,12 +6,12 @@ import { getInstall, runInstall } from '../commands/install.js';
 import {
 	captureCommandIO,
 	cleanupTempDirs,
-	createCardMockSpec,
+	createTabsMockSpec,
 	createTempTree,
 	withCwd
 } from './helpers.js';
 
-const mockSpec = createCardMockSpec();
+const mockSpec = createTabsMockSpec();
 
 const LINT_WIRED_SVELTE_CONFIG = [
 	"import { dryuiLint } from '@dryui/lint';",
@@ -271,7 +271,7 @@ describe('CLI project planning flow', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const result = captureCommandIO(() => runAdd(['--project', '--text', root, 'Card'], mockSpec));
+		const result = captureCommandIO(() => runAdd(['--project', '--text', root, 'Tabs'], mockSpec));
 
 		expect(result.exitCode).toBe(0);
 		expect(result.errors).toEqual([]);
@@ -302,18 +302,18 @@ describe('getAdd project mode', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text', {
+		const { output, error, exitCode } = getAdd('Tabs', mockSpec, 'text', {
 			project: true,
 			subpath: true,
 			cwd: root,
-			target: 'src/routes/components/card.svelte'
+			target: 'src/routes/components/tabs.svelte'
 		});
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain('DryUI add plan');
-		expect(output).toContain(`Target: ${resolve(root, 'src/routes/components/card.svelte')}`);
-		expect(output).toContain("import { Card } from '@dryui/ui/card';");
+		expect(output).toContain(`Target: ${resolve(root, 'src/routes/components/tabs.svelte')}`);
+		expect(output).toContain("import { Tabs } from '@dryui/ui/tabs';");
 		expect(output).toContain('Insert component into the target file');
 	});
 
@@ -336,7 +336,7 @@ describe('getAdd project mode', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const { output, error, exitCode } = getAdd('Card', mockSpec, 'json', {
+		const { output, error, exitCode } = getAdd('Tabs', mockSpec, 'json', {
 			project: true,
 			cwd: root
 		});
@@ -345,19 +345,19 @@ describe('getAdd project mode', () => {
 		expect(error).toBeNull();
 		expect(JSON.parse(output)).toMatchObject({
 			targetType: 'component',
-			name: 'Card',
-			importStatement: "import { Card } from '@dryui/ui';"
+			name: 'Tabs',
+			importStatement: "import { Tabs } from '@dryui/ui';"
 		});
 	});
 });
 
 describe('getAdd snippet mode', () => {
 	test('prints a standalone component snippet when project mode is not requested', () => {
-		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text');
+		const { output, error, exitCode } = getAdd('Tabs', mockSpec, 'text');
 
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
-		expect(output).toContain("import { Card } from '@dryui/ui';");
-		expect(output).toContain('<Card.Root>');
+		expect(output).toContain("import { Tabs } from '@dryui/ui';");
+		expect(output).toContain('<Tabs.Root');
 	});
 });

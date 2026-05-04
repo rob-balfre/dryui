@@ -17,17 +17,15 @@ dryui install .`;
 <\/script>`;
 
 	const firstInterfaceCode = `<script>
-  import { Button, Card } from '@dryui/ui';
+  import { Button, Field, Input, Label } from '@dryui/ui';
 <\/script>
 
-<Card.Root>
-  <Card.Header>
-    <h2>Project settings</h2>
-  </Card.Header>
-  <Card.Content>
-    <Button variant="solid">Save changes</Button>
-  </Card.Content>
-</Card.Root>`;
+<Field.Root>
+  <Label for="project-name">Project name</Label>
+  <Input id="project-name" value="DryUI Studio" />
+</Field.Root>
+
+<Button variant="solid">Save changes</Button>`;
 
 	const checkCode = `dryui ask --scope component Button
 dryui check src/routes/+page.svelte`;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Badge, Card, Heading, Text } from '@dryui/ui';
+	import { Badge, Heading, Text } from '@dryui/ui';
 	import DashboardPreview from '$lib/previews/DashboardPreview.svelte';
 	import DataTablePreview from '$lib/previews/DataTablePreview.svelte';
 	import FormPreview from '$lib/previews/FormPreview.svelte';
@@ -23,18 +23,16 @@
 				</Text>
 			</div>
 
-			<Card.Root variant="elevated" size="sm">
-				<Card.Content>
-					<div class="meta-grid">
-						{#each surfaces as surface (surface.label)}
-							<div class="meta-item">
-								<Text as="span" color="muted">{surface.label}</Text>
-								<Text as="span" weight="bold">{surface.value}</Text>
-							</div>
-						{/each}
-					</div>
-				</Card.Content>
-			</Card.Root>
+			<div class="surface">
+				<div class="meta-grid">
+					{#each surfaces as surface (surface.label)}
+						<div class="meta-item">
+							<Text as="span" color="muted">{surface.label}</Text>
+							<Text as="span" weight="bold">{surface.value}</Text>
+						</div>
+					{/each}
+				</div>
+			</div>
 		</header>
 
 		<section class="preview-grid" aria-label="Benchmark previews">
@@ -86,6 +84,13 @@
 	.meta-item,
 	.preview-grid {
 		display: grid;
+	}
+
+	.surface {
+		padding: var(--dry-space-4);
+		background: var(--dry-color-bg-overlay);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-md);
 	}
 
 	.scene-copy {

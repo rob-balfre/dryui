@@ -116,25 +116,26 @@ export function cleanupTempDirs(): void {
 	}
 }
 
-export function createCardMockSpec() {
+export function createTabsMockSpec() {
 	return {
 		themeImports: {
 			default: '@dryui/ui/themes/default.css',
 			dark: '@dryui/ui/themes/dark.css'
 		},
 		components: {
-			Card: {
+			Tabs: {
 				import: '@dryui/ui',
-				description: 'Content surface',
-				category: 'display',
-				tags: ['surface'],
+				description: 'Tabbed content panels',
+				category: 'navigation',
+				tags: ['tabs'],
 				compound: true,
 				parts: {
 					Root: { props: {} }
 				},
 				cssVars: {},
 				dataAttributes: [],
-				example: '<Card.Root>\n  <Card.Content>Body</Card.Content>\n</Card.Root>'
+				example:
+					'<Tabs.Root value="one">\n  <Tabs.List>\n    <Tabs.Trigger value="one">One</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value="one">Body</Tabs.Content>\n</Tabs.Root>'
 			}
 		}
 	} as const;

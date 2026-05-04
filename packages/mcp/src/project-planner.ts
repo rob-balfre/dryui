@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync, statSync, type Dirent } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, resolve } from 'node:path';
+import { detectStaleDryuiClaudeAgents } from './agent-drift.js';
 
 export type DryuiFramework = 'sveltekit' | 'svelte' | 'unknown';
 export type DryuiPackageManager = 'bun' | 'pnpm' | 'npm' | 'yarn' | 'unknown';
@@ -591,6 +592,11 @@ export function detectProject(
 		);
 	if (framework === 'unknown')
 		warnings.push('DryUI planning currently targets Svelte and SvelteKit projects.');
+	for (const agent of detectStaleDryuiClaudeAgents(root)) {
+		warnings.push(
+			`Stale DryUI Claude agent detected at ${agent.file}: ${agent.reason}. Run \`dryui setup --sync-agents\` from the project root.`
+		);
+	}
 
 	return {
 		inputPath: start,
@@ -762,7 +768,7 @@ function buildScaffoldRootLayout(spec: Pick<ProjectPlannerSpec, 'themeImports'>)
 }
 
 const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
-\timport { Card, Heading, Text } from '@dryui/ui';
+\timport { Heading, Text } from '@dryui/ui';
 </script>
 
 <svelte:head>
@@ -771,14 +777,8 @@ const SCAFFOLD_STARTER_PAGE = `<script lang="ts">
 
 <main data-layout="starter">
 \t<section data-layout-area="intro">
-\t\t<Card.Root>
-\t\t\t<Card.Header>
-\t\t\t\t<Heading level={1} variant="display">Hello, World</Heading>
-\t\t\t</Card.Header>
-\t\t\t<Card.Content>
-\t\t\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
-\t\t\t</Card.Content>
-\t\t</Card.Root>
+\t\t<Heading level={1} variant="display">Hello, World</Heading>
+\t\t<Text size="lg" color="muted">Your DryUI project is ready. Start building.</Text>
 \t</section>
 </main>
 `;

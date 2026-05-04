@@ -25,7 +25,7 @@ import { resolveInitTargetPath, runInit } from './init.js';
 import { getInstallHookResult, getInstallHookStatus } from './install-hook.js';
 import { getInstall } from './install.js';
 import { runLauncher, runUserProjectLauncher } from './launcher.js';
-import type { PortHolder } from './launch-utils.js';
+import { ensureClaudeAgents, type PortHolder } from './launch-utils.js';
 import {
 	getSetupGuide,
 	setupGuideIds,
@@ -692,7 +692,7 @@ function renderSvelteCompanionInstallProgress(
 function setupHelp(exitCode = 0): never {
 	printCommandHelp(
 		{
-			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open]`,
+			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open] [--sync-agents] [path]`,
 			description: [
 				'Interactive action menu for editor setup, feedback, and common project helpers.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
@@ -705,13 +705,15 @@ function setupHelp(exitCode = 0): never {
 				'  --no-svelte-mcp     Skip registering the official @sveltejs/mcp server (default: on)',
 				'  --claude-hook       Run `dryui install-hook` after the Claude guide',
 				'  --open-feedback     Open feedback tooling after printing setup steps',
-				'  --no-open           When opening feedback, print the URL instead of opening the browser'
+				'  --no-open           When opening feedback, print the URL instead of opening the browser',
+				'  --sync-agents       Refresh bundled .claude/agents files in the project'
 			],
 			examples: [
 				'  dryui setup',
 				'  dryui setup --editor codex',
 				'  dryui setup --editor cursor --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
+				'  dryui setup --sync-agents',
 				'  dryui setup --open-feedback --no-open',
 				'  dryui init           # one-shot setup for a fresh project (recommended)'
 			]
@@ -1241,9 +1243,42 @@ function resolveIncludeSvelteMcp(args: string[]): boolean {
 	return !hasFlag(args, '--no-svelte-mcp');
 }
 
+function syncClaudeAgentsResult(args: string[]): CommandResult {
+	const positionals = args.filter((arg) => !arg.startsWith('--'));
+	const target = resolve(positionals[0] ?? process.cwd());
+	const result = ensureClaudeAgents(target, { force: true });
+
+	if (!result.sourceFound) {
+		return {
+			output: '',
+			error: `Could not find bundled Claude agents in this DryUI install.`,
+			exitCode: 1
+		};
+	}
+
+	const lines = [`claude-agents: synced`, `target: ${target}`];
+	const changes = [
+		...result.copied.map((name) => `+ ${name}`),
+		...result.updated.map((name) => `~ ${name}`)
+	];
+	if (changes.length === 0) {
+		lines.push('changes: none');
+		lines.push('status: up-to-date');
+	} else {
+		lines.push(`changes[${changes.length}]:`);
+		for (const change of changes) lines.push(`  ${change}`);
+	}
+
+	return { output: lines.join('\n'), error: null, exitCode: 0 };
+}
+
 export async function runSetup(args: string[], spec: Spec): Promise<void> {
 	if (hasFlag(args, '--help') || hasFlag(args, '-h')) {
 		setupHelp();
+	}
+
+	if (hasFlag(args, '--sync-agents')) {
+		runCommand(syncClaudeAgentsResult(args), 'text');
 	}
 
 	const includeSvelteMcp = resolveIncludeSvelteMcp(args);

@@ -33,7 +33,7 @@ prefer-grid-layout	error	Move page layout into src/layout.css with [data-layout]
 use-field-component	error	Use <Field.Root> + <Label> instead of custom field markup. Field provides accessible labeling, error states, and consistent spacing.	<Field.Root> + <Label>
 use-button-component	error	Use DryUI's <Button> component instead of raw <button> with custom classes. Button provides variants, sizes, loading states, and theme-consistent styling.	<Button>
 use-container-component	error	Use src/layout.css grid tracks instead of custom max-width + margin centering.	src/layout.css
-interactive-card-wrapper	warning	Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.	display: grid
+interactive-card-wrapper	warning	Wrapper elements around interactive surfaces (raw <button> or <a> styled as cards) should use display: grid or be removed. Plain block wrappers can collapse interactive surfaces to 0px width in grid/list layouts.	display: grid
 hardcoded-color	suggestion	Hardcoded color value — consider using `--dry-*` CSS custom properties for theming	var(--dry-*)
 prefer-container	suggestion	Manual centering with max-width + margin auto — consider src/layout.css grid tracks instead	src/layout.css
 theme-in-style	suggestion	Custom --dry-* variable declarations detected in <style> — run the `diagnose` tool on your theme CSS for a full health check	Move custom --dry-* declarations to theme CSS

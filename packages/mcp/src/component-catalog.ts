@@ -57,7 +57,6 @@ export const docsNavCategories: DocsNavCategory[] = [
 	{
 		label: 'Content',
 		items: [
-			'Card',
 			'Text',
 			'Heading',
 			'List',
@@ -233,7 +232,6 @@ export const skillCompoundComponents = [
 	'AlertDialog',
 	'Breadcrumb',
 	'Calendar',
-	'Card',
 	'Carousel',
 	'Chart',
 	'ChipGroup',

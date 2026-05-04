@@ -91,7 +91,7 @@
 	[data-date-range-trigger] {
 		/* Form-control surface — derives from --dry-form-control-* so it stays
 		   visually consistent with <Input>/<Select.Trigger>, regardless of
-		   ambient --dry-btn-* overrides (e.g. Card's nested radius). */
+		   ambient --dry-btn-* overrides from a surrounding container's nested radius. */
 		--_drt-bg: var(--dry-date-range-trigger-bg, var(--dry-form-control-bg));
 		--_drt-border: var(--dry-date-range-trigger-border, var(--dry-form-control-border));
 		--_drt-color: var(--dry-date-range-trigger-color, var(--dry-form-control-color));

@@ -16,6 +16,7 @@ import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT } from '@dryui/feedback-server';
+import { isStaleDryuiClaudeAgentFile } from '@dryui/mcp/agent-drift';
 import type { DryuiPackageManager } from '@dryui/mcp/project-planner';
 
 export const FEEDBACK_SERVER_URL = `http://${DEFAULT_FEEDBACK_HOST}:${DEFAULT_FEEDBACK_PORT}`;
@@ -710,6 +711,10 @@ export interface EnsureClaudeAgentsResult {
 	readonly updated: readonly string[];
 }
 
+export interface EnsureClaudeAgentsOptions {
+	readonly force?: boolean;
+}
+
 /**
  * Mirror the bundled Claude Code subagents (`feedback`, `dryui-layout`) from
  * `<cli-pkg>/agents/` into `<project>/.claude/agents/`. Idempotent: copies
@@ -725,7 +730,10 @@ export interface EnsureClaudeAgentsResult {
  * launcher calls this on every run so existing projects (where init never
  * had this step) catch up without needing a manual reinit.
  */
-export function ensureClaudeAgents(projectRoot: string): EnsureClaudeAgentsResult {
+export function ensureClaudeAgents(
+	projectRoot: string,
+	options: EnsureClaudeAgentsOptions = {}
+): EnsureClaudeAgentsResult {
 	let here: string;
 	try {
 		here = fileURLToPath(import.meta.url);
@@ -765,7 +773,14 @@ export function ensureClaudeAgents(projectRoot: string): EnsureClaudeAgentsResul
 			}
 			const srcStat = statSync(src);
 			const destStat = statSync(dest);
-			if (srcStat.mtimeMs > destStat.mtimeMs) {
+			const srcContent = readFileSync(src, 'utf8');
+			const destContent = readFileSync(dest, 'utf8');
+			if (destContent === srcContent) continue;
+			if (
+				options.force ||
+				isStaleDryuiClaudeAgentFile(name, destContent) ||
+				srcStat.mtimeMs > destStat.mtimeMs
+			) {
 				copyFileSync(src, dest);
 				updated.push(name);
 			}

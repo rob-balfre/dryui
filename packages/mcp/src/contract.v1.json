@@ -6,8 +6,8 @@
     "version": "3.0.0"
   },
   "counts": {
-    "components": 166,
-    "compositionComponents": 130,
+    "components": 165,
+    "compositionComponents": 129,
     "compositionRecipes": 48,
     "tools": 2,
     "prompts": 2,
@@ -455,219 +455,6 @@
         }
       ],
       "example": "<Input type=\"email\" bind:value={email} placeholder=\"you@example.com\" />"
-    },
-    "Card": {
-      "import": "@dryui/ui",
-      "description": "Contained content surface with header/content/footer sections",
-      "category": "display",
-      "tags": [
-        "surface",
-        "container",
-        "content",
-        "panel"
-      ],
-      "compound": true,
-      "parts": {
-        "Root": {
-          "props": {
-            "as": {
-              "type": "'div' | 'a' | 'button'",
-              "required": false,
-              "acceptedValues": [
-                "div",
-                "a",
-                "button"
-              ],
-              "description": "Underlying HTML element to render for the component.",
-              "default": "'div'"
-            },
-            "selected": {
-              "type": "boolean",
-              "required": false,
-              "description": "Applies selected-state styling for interactive card surfaces."
-            },
-            "disabled": {
-              "type": "boolean",
-              "required": false,
-              "description": "Prevents interaction and applies disabled styling."
-            },
-            "orientation": {
-              "type": "'vertical' | 'horizontal'",
-              "required": false,
-              "acceptedValues": [
-                "vertical",
-                "horizontal"
-              ],
-              "description": "Horizontal or vertical layout direction."
-            },
-            "variant": {
-              "type": "'default' | 'elevated' | 'interactive'",
-              "required": false,
-              "acceptedValues": [
-                "default",
-                "elevated",
-                "interactive"
-              ],
-              "description": "Visual style preset for the component.",
-              "default": "'default'"
-            },
-            "size": {
-              "type": "'default' | 'sm'",
-              "required": false,
-              "acceptedValues": [
-                "default",
-                "sm"
-              ],
-              "description": "Size preset affecting density, spacing, or typography.",
-              "default": "'default'"
-            },
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLElement>",
-            "via": "rest",
-            "element": "element",
-            "examples": [
-              "id",
-              "class",
-              "aria-label"
-            ],
-            "note": "Forwards <element> attributes via rest props."
-          }
-        },
-        "Header": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLDivElement>",
-            "via": "rest",
-            "element": "div",
-            "examples": [
-              "id",
-              "style",
-              "role"
-            ],
-            "note": "Forwards <div> attributes via rest props."
-          }
-        },
-        "Content": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            },
-            "noPadding": {
-              "type": "boolean",
-              "required": false,
-              "default": "false"
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLDivElement>",
-            "via": "rest",
-            "element": "div",
-            "examples": [
-              "id",
-              "style",
-              "role"
-            ],
-            "note": "Forwards <div> attributes via rest props."
-          }
-        },
-        "Footer": {
-          "props": {
-            "children": {
-              "type": "Snippet",
-              "required": true,
-              "description": "Content rendered inside the component."
-            }
-          },
-          "forwardedProps": {
-            "baseType": "HTMLAttributes<HTMLDivElement>",
-            "via": "rest",
-            "element": "div",
-            "examples": [
-              "id",
-              "style",
-              "role"
-            ],
-            "note": "Forwards <div> attributes via rest props."
-          }
-        }
-      },
-      "structure": {
-        "tree": [
-          "Card.Root",
-          "  Card.Header",
-          "  Card.Content",
-          "  Card.Footer"
-        ]
-      },
-      "a11y": [
-        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
-        "Keep heading, reading, and focus order aligned with the surrounding content."
-      ],
-      "cssVars": {
-        "--dry-btn-radius": "Border radius",
-        "--dry-card-bg": "Background color",
-        "--dry-card-padding": "Padding",
-        "--dry-card-radius": "Border radius",
-        "--dry-card-selected-ring-color": "Selected Ring Color",
-        "--dry-card-shadow": "Box shadow"
-      },
-      "dataAttributes": [
-        {
-          "name": "data-bordered"
-        },
-        {
-          "name": "data-card"
-        },
-        {
-          "name": "data-card-content"
-        },
-        {
-          "name": "data-card-footer"
-        },
-        {
-          "name": "data-card-header"
-        },
-        {
-          "name": "data-disabled",
-          "description": "Present when the component or part is disabled."
-        },
-        {
-          "name": "data-no-padding"
-        },
-        {
-          "name": "data-orientation",
-          "description": "Reflects the current horizontal or vertical orientation.",
-          "values": [
-            "horizontal",
-            "vertical"
-          ]
-        },
-        {
-          "name": "data-selected",
-          "description": "Present when the current item is selected."
-        },
-        {
-          "name": "data-size"
-        },
-        {
-          "name": "data-variant"
-        }
-      ],
-      "example": "<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card body content goes here.</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button variant=\"solid\">Action</Button>\n  </Card.Footer>\n</Card.Root>"
     },
     "Dialog": {
       "import": "@dryui/ui",
@@ -7838,7 +7625,7 @@
           "default": "0"
         },
         "children": {
-          "type": "Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >",
+          "type": "Snippet<[{ index: number; isLatest: boolean }]>",
           "required": true,
           "description": "Content rendered inside the component."
         }
@@ -7871,9 +7658,6 @@
         },
         {
           "name": "data-chat-thread-viewport"
-        },
-        {
-          "name": "data-view-transition-name"
         }
       ],
       "example": "<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>"
@@ -13152,7 +12936,7 @@
           "name": "data-visible"
         }
       ],
-      "example": "<Reveal variant=\"slide-up\" delay={120}>\n  <Card.Root>\n    <Card.Content>Stage content as it enters the viewport.</Card.Content>\n  </Card.Root>\n</Reveal>"
+      "example": "<Reveal variant=\"slide-up\" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>"
     },
     "Spotlight": {
       "import": "@dryui/ui",
@@ -13233,7 +13017,7 @@
           "name": "data-static"
         }
       ],
-      "example": "<Spotlight intensity={32}>\n  <Card.Root>\n    <Card.Content>Hover to pull a radial highlight across the surface.</Card.Content>\n  </Card.Root>\n</Spotlight>"
+      "example": "<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>"
     },
     "Aurora": {
       "import": "@dryui/ui",
@@ -13358,7 +13142,7 @@
           "name": "data-reduced-motion"
         }
       ],
-      "example": "<Aurora palette=\"ocean\">\n  <Card.Root>\n    <Card.Content>Ambient backgrounds stay native and no-dependency.</Card.Content>\n  </Card.Root>\n</Aurora>"
+      "example": "<Aurora palette=\"ocean\">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>"
     },
     "Noise": {
       "import": "@dryui/ui",
@@ -13452,7 +13236,7 @@
           "name": "data-reduced-motion"
         }
       ],
-      "example": "<Noise opacity={0.12} blend=\"soft-light\">\n  <Card.Root>\n    <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>\n  </Card.Root>\n</Noise>"
+      "example": "<Noise opacity={0.12} blend=\"soft-light\">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>"
     },
     "FloatButton": {
       "import": "@dryui/ui",
@@ -16395,11 +16179,10 @@
     },
     "HoverCard": {
       "import": "@dryui/ui",
-      "description": "Card popup on hover with delay-based open/close",
+      "description": "Surface popup on hover with delay-based open/close",
       "category": "overlay",
       "tags": [
         "hover",
-        "card",
         "preview",
         "popup"
       ],
@@ -19568,7 +19351,11 @@
         "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
         "Keep heading, reading, and focus order aligned with the surrounding content."
       ],
-      "cssVars": {},
+      "cssVars": {
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding"
+      },
       "dataAttributes": [
         {
           "name": "data-color"
@@ -21509,8 +21296,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "calendar": {
@@ -21531,9 +21317,7 @@
           }
         ],
         "antiPatterns": [],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "timeinput": {
         "component": "TimeInput",
@@ -21618,8 +21402,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "dialog": {
@@ -21812,7 +21595,6 @@
         ],
         "combinesWith": [
           "Text",
-          "Card.Content",
           "Table.Cell"
         ]
       },
@@ -21858,7 +21640,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Button"
         ]
       },
@@ -21915,9 +21696,7 @@
             "fix": "Chart"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "separator": {
         "component": "Separator",
@@ -21942,9 +21721,7 @@
             "fix": "Separator"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "field": {
         "component": "Field",
@@ -21985,8 +21762,7 @@
           "Input",
           "Textarea",
           "Select",
-          "Checkbox",
-          "Card.Content"
+          "Checkbox"
         ]
       },
       "input": {
@@ -22149,7 +21925,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Progress",
           "Button"
         ]
@@ -22186,7 +21961,6 @@
         "combinesWith": [
           "Field.Root",
           "Label",
-          "Card.Content",
           "Button"
         ]
       },
@@ -22280,7 +22054,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Root",
           "Container"
         ]
       },
@@ -22376,9 +22149,7 @@
             "fix": "Alert or Toast"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "badge": {
         "component": "Badge",
@@ -22406,7 +22177,6 @@
         ],
         "combinesWith": [
           "Table.Cell",
-          "Card.Content",
           "Avatar"
         ]
       },
@@ -22435,7 +22205,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Table.Cell"
         ]
       },
@@ -22447,7 +22216,7 @@
             "rank": 1,
             "component": "Reveal",
             "useWhen": "Section reveals, stat rows, or card sequences that should appear as the user scrolls",
-            "snippet": "<Reveal variant=\"fade\" once>\n  <Card.Root>\n    <Card.Content>Visible content</Card.Content>\n  </Card.Root>\n</Reveal>"
+            "snippet": "<Reveal variant=\"fade\" once>\n  <p>Visible content</p>\n</Reveal>"
           },
           {
             "rank": 2,
@@ -22469,7 +22238,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Text"
         ]
       },
@@ -22481,13 +22249,13 @@
             "rank": 1,
             "component": "Spotlight",
             "useWhen": "Radial highlight or pointer-follow accent on interactive surfaces",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <p>Spotlight card</p>\n</Spotlight>"
           },
           {
             "rank": 2,
             "component": "Static accent background",
             "useWhen": "Low-motion surfaces that should remain visually rich without pointer tracking",
-            "snippet": "<Card.Root class=\"accent-surface\">\n  <Card.Content>Static accent</Card.Content>\n</Card.Root>"
+            "snippet": "<div class=\"accent-surface\">Static accent</div>"
           }
         ],
         "antiPatterns": [
@@ -22503,7 +22271,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Reveal"
         ]
       },
@@ -22537,7 +22304,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Container",
           "Reveal",
           "Text"
@@ -22574,7 +22340,6 @@
         ],
         "combinesWith": [
           "Aurora",
-          "Card",
           "Container",
           "Reveal"
         ]
@@ -22614,9 +22379,7 @@
             "fix": "Heading"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "kbd": {
         "component": "Kbd",
@@ -22665,9 +22428,7 @@
             "fix": "CodeBlock"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "button": {
         "component": "Button",
@@ -22720,7 +22481,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Footer",
           "Dialog.Footer"
         ]
       },
@@ -22750,8 +22510,7 @@
         "antiPatterns": [],
         "combinesWith": [
           "Button",
-          "Table.Row",
-          "Card.Content"
+          "Table.Row"
         ]
       },
       "accordion": {
@@ -22778,39 +22537,7 @@
             "fix": "Accordion or Collapsible"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
-      },
-      "card": {
-        "component": "Card",
-        "useWhen": "Group related content in a bordered container",
-        "alternatives": [
-          {
-            "rank": 1,
-            "component": "Card",
-            "useWhen": "Content container with optional header/footer",
-            "snippet": "<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card content</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button>Action</Button>\n  </Card.Footer>\n</Card.Root>"
-          }
-        ],
-        "antiPatterns": [
-          {
-            "pattern": "div with border and padding",
-            "reason": "Card handles elevation, borders, and theme integration",
-            "fix": "Card"
-          },
-          {
-            "pattern": "<Card> without .Root",
-            "reason": "Card is a compound component — use Card.Root",
-            "fix": "Card.Root"
-          }
-        ],
-        "combinesWith": [
-          "Container",
-          "Badge",
-          "Text",
-          "subgrid aligned-card-list"
-        ]
+        "combinesWith": []
       },
       "alertdialog": {
         "component": "AlertDialog",
@@ -22926,7 +22653,6 @@
         ],
         "combinesWith": [
           "Table.Row",
-          "Card.Root",
           "Tree"
         ]
       },
@@ -23138,8 +22864,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "listbox": {
@@ -23209,8 +22934,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "segmentedcontrol": {
@@ -23244,7 +22968,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Header",
           "Toolbar"
         ]
       },
@@ -23359,8 +23082,7 @@
           }
         ],
         "combinesWith": [
-          "Toolbar",
-          "Card.Header"
+          "Toolbar"
         ]
       },
       "transfer": {
@@ -23388,7 +23110,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Field.Root",
           "Label"
         ]
@@ -23412,8 +23133,7 @@
           }
         ],
         "combinesWith": [
-          "List",
-          "Card.Content"
+          "List"
         ]
       },
       "textarea": {
@@ -23541,8 +23261,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "promptinput": {
@@ -23570,8 +23289,7 @@
           }
         ],
         "combinesWith": [
-          "ChatThread",
-          "Card.Content"
+          "ChatThread"
         ]
       },
       "richtexteditor": {
@@ -23606,8 +23324,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "rating": {
@@ -23643,8 +23360,7 @@
         "combinesWith": [
           "Field.Root",
           "Label",
-          "Text",
-          "Card.Content"
+          "Text"
         ]
       },
       "datefield": {
@@ -23708,8 +23424,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "datetimeinput": {
@@ -23765,9 +23480,7 @@
           }
         ],
         "antiPatterns": [],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "fieldset": {
         "component": "Fieldset",
@@ -23787,15 +23500,14 @@
             "fix": "Fieldset"
           },
           {
-            "pattern": "Card.Root to group form fields",
+            "pattern": "<div> wrapper to group form fields",
             "reason": "Fieldset is semantically correct for form grouping with <legend>",
             "fix": "Fieldset"
           }
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       },
       "label": {
@@ -23874,8 +23586,7 @@
         ],
         "combinesWith": [
           "Image",
-          "VideoEmbed",
-          "Card.Content"
+          "VideoEmbed"
         ]
       },
       "scrollarea": {
@@ -23898,7 +23609,6 @@
         ],
         "combinesWith": [
           "List",
-          "Card.Content",
           "Sidebar"
         ]
       },
@@ -23941,7 +23651,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "ScrollArea"
         ]
       },
@@ -23970,8 +23679,7 @@
           }
         ],
         "combinesWith": [
-          "Link",
-          "Card"
+          "Link"
         ]
       },
       "megamenu": {
@@ -24162,8 +23870,7 @@
           }
         ],
         "combinesWith": [
-          "ChipGroup",
-          "Card.Content"
+          "ChipGroup"
         ]
       },
       "chipgroup": {
@@ -24215,8 +23922,7 @@
         "combinesWith": [
           "Badge",
           "Chip",
-          "Tag",
-          "Card.Content"
+          "Tag"
         ]
       },
       "clipboard": {
@@ -24320,7 +24026,6 @@
         ],
         "combinesWith": [
           "AspectRatio",
-          "Card.Content",
           "Carousel"
         ]
       },
@@ -24350,7 +24055,6 @@
         ],
         "combinesWith": [
           "Image",
-          "Card",
           "AspectRatio"
         ]
       },
@@ -24379,7 +24083,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Badge",
           "Avatar",
           "Button",
@@ -24411,7 +24114,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Badge"
         ]
       },
@@ -24440,7 +24142,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "ScrollArea",
           "Avatar"
         ]
@@ -24470,7 +24171,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Avatar",
           "Badge",
           "Text"
@@ -24503,7 +24203,6 @@
         "combinesWith": [
           "Sidebar",
           "ScrollArea",
-          "Card.Content",
           "Checkbox"
         ]
       },
@@ -24537,13 +24236,12 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Button"
         ]
       },
       "flipcard": {
         "component": "FlipCard",
-        "useWhen": "Card with front and back faces that flips on interaction",
+        "useWhen": "Surface with front and back faces that flips on interaction",
         "alternatives": [
           {
             "rank": 1,
@@ -24560,7 +24258,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Image"
         ]
       },
@@ -24582,9 +24279,7 @@
             "fix": "ImageComparison"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "marquee": {
         "component": "Marquee",
@@ -24627,9 +24322,7 @@
             "fix": "QRCode"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "videoembed": {
         "component": "VideoEmbed",
@@ -24650,8 +24343,7 @@
           }
         ],
         "combinesWith": [
-          "AspectRatio",
-          "Card.Content"
+          "AspectRatio"
         ]
       },
       "map": {
@@ -24667,7 +24359,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Popover"
         ]
       },
@@ -24690,8 +24381,7 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Table.Cell",
-          "Card.Content"
+          "Table.Cell"
         ]
       },
       "gauge": {
@@ -24719,7 +24409,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       },
@@ -24807,8 +24496,7 @@
         ],
         "combinesWith": [
           "PromptInput",
-          "TypingIndicator",
-          "Card"
+          "TypingIndicator"
         ]
       },
       "typingindicator": {
@@ -24851,9 +24539,7 @@
             "fix": "MarkdownRenderer"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       },
       "progress": {
         "component": "Progress",
@@ -24891,7 +24577,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       },
@@ -24920,7 +24605,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       },
@@ -24956,7 +24640,6 @@
         ],
         "combinesWith": [
           "Button",
-          "Card.Content",
           "Backdrop"
         ]
       },
@@ -24989,9 +24672,7 @@
             "fix": "<Heading maxMeasure=\"narrow\">…</Heading>"
           }
         ],
-        "combinesWith": [
-          "Card.Header"
-        ]
+        "combinesWith": []
       },
       "typography": {
         "component": "Typography",
@@ -25024,7 +24705,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Container"
         ]
       },
@@ -25244,13 +24924,13 @@
             "rank": 1,
             "component": "Glow",
             "useWhen": "Static luminous accent on cards, buttons, or hero elements",
-            "snippet": "<Glow color=\"var(--dry-color-fill-brand)\" intensity={0.6} radius={80}>\n  <Card.Root>\n    <Card.Content>Glowing card</Card.Content>\n  </Card.Root>\n</Glow>"
+            "snippet": "<Glow color=\"var(--dry-color-fill-brand)\" intensity={0.6} radius={80}>\n  <p>Glowing card</p>\n</Glow>"
           },
           {
             "rank": 2,
             "component": "Spotlight",
             "useWhen": "Pointer-reactive lighting instead of a static glow",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <p>Spotlight card</p>\n</Spotlight>"
           }
         ],
         "antiPatterns": [
@@ -25266,7 +24946,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       },
@@ -25312,7 +24991,7 @@
             "rank": 1,
             "component": "Beam",
             "useWhen": "Single sweeping highlight or shimmer line across a card or hero",
-            "snippet": "<Beam color=\"rgba(255,255,255,0.15)\" angle={-45} duration={2.4}>\n  <Card.Root>\n    <Card.Content>Beam card</Card.Content>\n  </Card.Root>\n</Beam>"
+            "snippet": "<Beam color=\"rgba(255,255,255,0.15)\" angle={-45} duration={2.4}>\n  <p>Beam card</p>\n</Beam>"
           },
           {
             "rank": 2,
@@ -25329,7 +25008,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       },
@@ -25356,9 +25034,7 @@
             "fix": "Limit to headings, images, or decorative surfaces"
           }
         ],
-        "combinesWith": [
-          "Card"
-        ]
+        "combinesWith": []
       },
       "adjust": {
         "component": "Adjust",
@@ -25390,7 +25066,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       },
@@ -25550,11 +25225,11 @@
           "no-sidebar"
         ],
         "components": [],
-        "snippet": "<!-- Use this for simple pages WITHOUT a sidebar.\n     Simple page shell with header and centered content. -->\n<div data-layout=\"page-shell\">\n  <header data-layout-area=\"masthead\">App Name</header>\n  <main data-layout-area=\"main\">\n    <!-- Page content: Cards, forms, grids, etc. go here directly. -->\n  </main>\n</div>\n\n<!-- src/layout.css -->\n[data-layout='page-shell'] {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-template-areas:\n    'masthead'\n    'main';\n  min-block-size: 100dvh;\n}\n\n[data-layout='page-shell'] > [data-layout-area='masthead'] {\n  grid-area: masthead;\n  padding: var(--dry-space-4) var(--dry-space-6);\n}\n\n[data-layout='page-shell'] > [data-layout-area='main'] {\n  grid-area: main;\n  display: grid;\n  grid-template-columns: minmax(0, 72rem);\n  justify-content: center;\n  padding: var(--dry-space-6);\n}\n\n@container page (min-width: 56rem) {\n  [data-layout='page-shell'] > [data-layout-area='main'] {\n    padding: var(--dry-space-10);\n  }\n}"
+        "snippet": "<!-- Use this for simple pages WITHOUT a sidebar.\n     Simple page shell with header and centered content. -->\n<div data-layout=\"page-shell\">\n  <header data-layout-area=\"masthead\">App Name</header>\n  <main data-layout-area=\"main\">\n    <!-- Page content: surfaces, forms, grids, etc. go here directly. -->\n  </main>\n</div>\n\n<!-- src/layout.css -->\n[data-layout='page-shell'] {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-template-areas:\n    'masthead'\n    'main';\n  min-block-size: 100dvh;\n}\n\n[data-layout='page-shell'] > [data-layout-area='masthead'] {\n  grid-area: masthead;\n  padding: var(--dry-space-4) var(--dry-space-6);\n}\n\n[data-layout='page-shell'] > [data-layout-area='main'] {\n  grid-area: main;\n  display: grid;\n  grid-template-columns: minmax(0, 72rem);\n  justify-content: center;\n  padding: var(--dry-space-6);\n}\n\n@container page (min-width: 56rem) {\n  [data-layout='page-shell'] > [data-layout-area='main'] {\n    padding: var(--dry-space-10);\n  }\n}"
       },
       "centred-page": {
         "name": "centred-page",
-        "description": "Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.",
+        "description": "Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no surface chrome, no header, no borders or shadows.",
         "tags": [
           "page",
           "centered",
@@ -25596,7 +25271,6 @@
           "card"
         ],
         "components": [
-          "Card",
           "Field",
           "Label",
           "Input",
@@ -25605,7 +25279,7 @@
           "Text",
           "Heading"
         ],
-        "snippet": "<script>\n  import { Card, Field, Label, Input, Button, Separator, Text, Heading } from '@dryui/ui';\n\n  let email = $state('');\n  let password = $state('');\n</script>\n\n<Card.Root>\n  <Card.Header>\n    <Heading level={2}>Sign in</Heading>\n    <Text color=\"muted\" size=\"sm\">Enter your credentials to continue</Text>\n  </Card.Header>\n  <Card.Content>\n    <div class=\"auth-fields\">\n      <Field.Root>\n        <Label>Email</Label>\n        <Input type=\"email\" bind:value={email} placeholder=\"you@example.com\" />\n      </Field.Root>\n      <Field.Root>\n        <Label>Password</Label>\n        <Input type=\"password\" bind:value={password} />\n      </Field.Root>\n      <Button variant=\"solid\" type=\"submit\">Sign in</Button>\n      <Separator />\n      <Button variant=\"outline\">Continue with SSO</Button>\n      <Text as=\"p\" color=\"muted\" size=\"sm\">\n        <Button variant=\"link\" href=\"/forgot-password\">Forgot password?</Button>\n      </Text>\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .auth-fields { display: grid; gap: var(--dry-space-4); }\n</style>"
+        "snippet": "<script>\n  import { Field, Label, Input, Button, Separator, Text, Heading } from '@dryui/ui';\n\n  let email = $state('');\n  let password = $state('');\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">\n    <Heading level={2}>Sign in</Heading>\n    <Text color=\"muted\" size=\"sm\">Enter your credentials to continue</Text>\n  </header>\n  <div class=\"surface-content\">\n    <div class=\"auth-fields\">\n      <Field.Root>\n        <Label>Email</Label>\n        <Input type=\"email\" bind:value={email} placeholder=\"you@example.com\" />\n      </Field.Root>\n      <Field.Root>\n        <Label>Password</Label>\n        <Input type=\"password\" bind:value={password} />\n      </Field.Root>\n      <Button variant=\"solid\" type=\"submit\">Sign in</Button>\n      <Separator />\n      <Button variant=\"outline\">Continue with SSO</Button>\n      <Text as=\"p\" color=\"muted\" size=\"sm\">\n        <Button variant=\"link\" href=\"/forgot-password\">Forgot password?</Button>\n      </Text>\n    </div>\n  </div>\n</div>\n\n<style>\n  .auth-fields { display: grid; gap: var(--dry-space-4); }\n</style>"
       },
       "hero-background": {
         "name": "hero-background",
@@ -25621,15 +25295,14 @@
           "Aurora",
           "Noise",
           "Reveal",
-          "Card",
           "Container",
           "Button"
         ],
-        "snippet": "<script>\n  import { Aurora, Noise, Reveal, Button, Card, Container, Text, Heading } from '@dryui/ui';\n</script>\n\n<Aurora palette={['#08111f', '#1d4ed8', '#14b8a6']} speed={0.8}>\n  <Noise opacity={0.08} blend=\"soft-light\" animated={false} />\n  <Container>\n    <div class=\"hero-content\">\n      <Reveal variant=\"fade\" once>\n        <Heading level={1}>Ambient motion, no runtime.</Heading>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={80}>\n        <Text as=\"p\">Browser-native surfaces that stay readable, responsive, and reduced-motion aware.</Text>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={140}>\n        <div class=\"hero-actions\">\n          <Button variant=\"solid\">Explore docs</Button>\n          <Button variant=\"outline\">View motion guide</Button>\n        </div>\n      </Reveal>\n      <Reveal variant=\"scale-in\" delay={220}>\n        <Card.Root>\n          <Card.Content>Hero proof card</Card.Content>\n        </Card.Root>\n      </Reveal>\n    </div>\n  </Container>\n</Aurora>\n\n<style>\n  .hero-content { display: grid; gap: var(--dry-space-8); }\n  .hero-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(min-content, max-content)); gap: var(--dry-space-2); }\n</style>"
+        "snippet": "<script>\n  import { Aurora, Noise, Reveal, Button, Container, Text, Heading } from '@dryui/ui';\n</script>\n\n<Aurora palette={['#08111f', '#1d4ed8', '#14b8a6']} speed={0.8}>\n  <Noise opacity={0.08} blend=\"soft-light\" animated={false} />\n  <Container>\n    <div class=\"hero-content\">\n      <Reveal variant=\"fade\" once>\n        <Heading level={1}>Ambient motion, no runtime.</Heading>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={80}>\n        <Text as=\"p\">Browser-native surfaces that stay readable, responsive, and reduced-motion aware.</Text>\n      </Reveal>\n      <Reveal variant=\"slide-up\" delay={140}>\n        <div class=\"hero-actions\">\n          <Button variant=\"solid\">Explore docs</Button>\n          <Button variant=\"outline\">View motion guide</Button>\n        </div>\n      </Reveal>\n      <Reveal variant=\"scale-in\" delay={220}>\n        <div class=\"surface\">\n            Hero proof card\n        </div>\n      </Reveal>\n    </div>\n  </Container>\n</Aurora>\n\n<style>\n  .hero-content { display: grid; gap: var(--dry-space-8); }\n  .hero-actions { display: grid; grid-template-columns: repeat(auto-fill, minmax(min-content, max-content)); gap: var(--dry-space-2); }\n</style>"
       },
       "spotlight-card-grid": {
         "name": "spotlight-card-grid",
-        "description": "Card grid with pointer-reactive highlights and staggered entrance reveals. Use for feature bento layouts that need depth without a graphics dependency.",
+        "description": "Surface grid with pointer-reactive highlights and staggered entrance reveals. Use for feature bento layouts that need depth without a graphics dependency.",
         "tags": [
           "grid",
           "cards",
@@ -25640,10 +25313,9 @@
         "components": [
           "Spotlight",
           "Reveal",
-          "Card",
           "Text"
         ],
-        "snippet": "<script>\n  import { Spotlight, Reveal, Card, Text } from '@dryui/ui';\n\n  const features = [\n    { title: 'Fast', copy: 'Keeps motion browser-native.' },\n    { title: 'Readable', copy: 'Preserves contrast and hierarchy.' },\n    { title: 'Adaptive', copy: 'Falls back when motion is reduced.' },\n  ];\n</script>\n\n<div class=\"feature-grid\">\n  {#each features as feature, index (feature.title)}\n    <Reveal variant=\"fade\" delay={index * 80}>\n      <Spotlight radius={160} intensity={0.6} color=\"var(--dry-color-fill-brand)\">\n        <Card.Root>\n          <Card.Content>\n            <Text weight=\"bold\">{feature.title}</Text>\n            <Text as=\"p\">{feature.copy}</Text>\n          </Card.Content>\n        </Card.Root>\n      </Spotlight>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-6); }\n</style>"
+        "snippet": "<script>\n  import { Spotlight, Reveal, Text } from '@dryui/ui';\n\n  const features = [\n    { title: 'Fast', copy: 'Keeps motion browser-native.' },\n    { title: 'Readable', copy: 'Preserves contrast and hierarchy.' },\n    { title: 'Adaptive', copy: 'Falls back when motion is reduced.' },\n  ];\n</script>\n\n<div class=\"feature-grid\">\n  {#each features as feature, index (feature.title)}\n    <Reveal variant=\"fade\" delay={index * 80}>\n      <Spotlight radius={160} intensity={0.6} color=\"var(--dry-color-fill-brand)\">\n        <div class=\"surface\">\n            <Text weight=\"bold\">{feature.title}</Text>\n            <Text as=\"p\">{feature.copy}</Text>\n        </div>\n      </Spotlight>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-6); }\n</style>"
       },
       "animated-stats-strip": {
         "name": "animated-stats-strip",
@@ -25656,11 +25328,10 @@
         ],
         "components": [
           "Reveal",
-          "Card",
           "Heading",
           "Text"
         ],
-        "snippet": "<script>\n  import { Reveal, Card, Heading, Text } from '@dryui/ui';\n\n  const stats = [\n    { value: '99.9%', label: 'uptime' },\n    { value: '48ms', label: 'median response' },\n    { value: '0 deps', label: 'runtime extras' },\n  ];\n</script>\n\n<div class=\"stats-strip\">\n  {#each stats as stat, index (stat.label)}\n    <Reveal variant=\"slide-up\" delay={index * 90} once>\n      <Card.Root>\n        <Card.Content>\n          <Heading level={3}>{stat.value}</Heading>\n          <Text as=\"p\">{stat.label}</Text>\n        </Card.Content>\n      </Card.Root>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-4); }\n</style>"
+        "snippet": "<script>\n  import { Reveal, Heading, Text } from '@dryui/ui';\n\n  const stats = [\n    { value: '99.9%', label: 'uptime' },\n    { value: '48ms', label: 'median response' },\n    { value: '0 deps', label: 'runtime extras' },\n  ];\n</script>\n\n<div class=\"stats-strip\">\n  {#each stats as stat, index (stat.label)}\n    <Reveal variant=\"slide-up\" delay={index * 90} once>\n      <div class=\"surface\">\n          <Heading level={3}>{stat.value}</Heading>\n          <Text as=\"p\">{stat.label}</Text>\n      </div>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .stats-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--dry-space-4); }\n</style>"
       },
       "narrative-feature-steps": {
         "name": "narrative-feature-steps",
@@ -25673,10 +25344,9 @@
         ],
         "components": [
           "Reveal",
-          "Card",
           "Text"
         ],
-        "snippet": "<script>\n  import { Reveal, Card, Text } from '@dryui/ui';\n\n  const steps = [\n    { title: 'Frame the claim', copy: 'Open with the user outcome.' },\n    { title: 'Show the proof', copy: 'Add metrics or supporting detail.' },\n    { title: 'Close with action', copy: 'End on the next step.' },\n  ];\n</script>\n\n<div class=\"feature-steps\">\n  {#each steps as step, index (step.title)}\n    <Reveal variant=\"mask-up\" delay={index * 100}>\n      <Card.Root>\n        <Card.Content>\n          <Text weight=\"bold\">{step.title}</Text>\n          <Text as=\"p\">{step.copy}</Text>\n        </Card.Content>\n      </Card.Root>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-steps { display: grid; gap: var(--dry-space-6); }\n</style>"
+        "snippet": "<script>\n  import { Reveal, Text } from '@dryui/ui';\n\n  const steps = [\n    { title: 'Frame the claim', copy: 'Open with the user outcome.' },\n    { title: 'Show the proof', copy: 'Add metrics or supporting detail.' },\n    { title: 'Close with action', copy: 'End on the next step.' },\n  ];\n</script>\n\n<div class=\"feature-steps\">\n  {#each steps as step, index (step.title)}\n    <Reveal variant=\"mask-up\" delay={index * 100}>\n      <div class=\"surface\">\n          <Text weight=\"bold\">{step.title}</Text>\n          <Text as=\"p\">{step.copy}</Text>\n      </div>\n    </Reveal>\n  {/each}\n</div>\n\n<style>\n  .feature-steps { display: grid; gap: var(--dry-space-6); }\n</style>"
       },
       "shared-element-detail-transition": {
         "name": "shared-element-detail-transition",
@@ -25688,15 +25358,14 @@
           "view-transition"
         ],
         "components": [
-          "Card",
           "Reveal",
           "Text"
         ],
-        "snippet": "<script>\n  import { Card, Reveal, Text } from '@dryui/ui';\n</script>\n\n<div class=\"detail-content\">\n  <Reveal variant=\"scale-in\" once>\n    <Card.Root>\n      <Card.Content>\n        <Text weight=\"bold\">Shared element header</Text>\n        <Text as=\"p\">Use View Transitions for the page shell, and keep the content surface deterministic.</Text>\n      </Card.Content>\n    </Card.Root>\n  </Reveal>\n</div>\n\n<style>\n  .detail-content { display: grid; gap: var(--dry-space-6); }\n</style>"
+        "snippet": "<script>\n  import { Reveal, Text } from '@dryui/ui';\n</script>\n\n<div class=\"detail-content\">\n  <Reveal variant=\"scale-in\" once>\n    <div class=\"surface\">\n        <Text weight=\"bold\">Shared element header</Text>\n        <Text as=\"p\">Use View Transitions for the page shell, and keep the content surface deterministic.</Text>\n    </div>\n  </Reveal>\n</div>\n\n<style>\n  .detail-content { display: grid; gap: var(--dry-space-6); }\n</style>"
       },
       "search-form": {
         "name": "search-form",
-        "description": "Horizontal search bar pattern: fields in a responsive CSS grid inside a Card. Adjust the column count to match your field count.",
+        "description": "Horizontal search bar pattern: fields in a responsive CSS grid inside a contained surface. Adjust the column count to match your field count.",
         "tags": [
           "search",
           "form",
@@ -25704,13 +25373,12 @@
           "horizontal"
         ],
         "components": [
-          "Card",
           "Field",
           "Label",
           "Input",
           "Button"
         ],
-        "snippet": "<!-- Pattern: horizontal form in a Card. Adjust columns to match field count. -->\n<Card.Root>\n  <Card.Content>\n    <div class=\"search-form\">\n      <Field.Root><Label>Field 1</Label><Input placeholder=\"...\" /></Field.Root>\n      <Field.Root><Label>Field 2</Label><!-- DatePicker, Select, etc. --></Field.Root>\n      <Field.Root><Label>Field 3</Label><!-- any input --></Field.Root>\n      <Button variant=\"solid\">Search</Button>\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .search-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dry-space-4); align-items: end; }\n</style>"
+        "snippet": "<!-- Pattern: horizontal form in a contained surface. Adjust columns to match field count. -->\n<div class=\"surface\">\n    <div class=\"search-form\">\n      <Field.Root><Label>Field 1</Label><Input placeholder=\"...\" /></Field.Root>\n      <Field.Root><Label>Field 2</Label><!-- DatePicker, Select, etc. --></Field.Root>\n      <Field.Root><Label>Field 3</Label><!-- any input --></Field.Root>\n      <Button variant=\"solid\">Search</Button>\n    </div>\n  </div>\n</div>\n\n<style>\n  .search-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dry-space-4); align-items: end; }\n</style>"
       },
       "data-table-with-actions": {
         "name": "data-table-with-actions",
@@ -25761,14 +25429,13 @@
           "error"
         ],
         "components": [
-          "Card",
           "Field",
           "Label",
           "Input",
           "Textarea",
           "Button"
         ],
-        "snippet": "<script>\n  import { Card, Field, Label, Input, Textarea, Button } from '@dryui/ui';\n\n  let name = $state('');\n  let email = $state('');\n  let message = $state('');\n  let submitted = $state(false);\n\n  let nameError = $derived(submitted && !name ? 'Name is required' : '');\n  let emailError = $derived(\n    submitted && !email ? 'Email is required' :\n    submitted && !email.includes('@') ? 'Please enter a valid email' : ''\n  );\n  let messageError = $derived(submitted && !message ? 'Message is required' : '');\n\n  function handleSubmit() {\n    submitted = true;\n    if (name && email.includes('@') && message) {\n      // submit form\n    }\n  }\n</script>\n\n<Card.Root>\n  <Card.Header>Contact us</Card.Header>\n  <Card.Content>\n    <div class=\"contact-form\">\n      <Field.Root>\n        <Label>Name</Label>\n        <Input bind:value={name} />\n        {#if nameError}\n          <Field.Error>{nameError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Field.Root>\n        <Label>Email</Label>\n        <Input type=\"email\" bind:value={email} />\n        {#if emailError}\n          <Field.Error>{emailError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Field.Root>\n        <Label>Message</Label>\n        <Textarea bind:value={message} rows={4} />\n        {#if messageError}\n          <Field.Error>{messageError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Button variant=\"solid\" onclick={handleSubmit}>Send message</Button>\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .contact-form { display: grid; gap: var(--dry-space-4); }\n</style>"
+        "snippet": "<script>\n  import { Field, Label, Input, Textarea, Button } from '@dryui/ui';\n\n  let name = $state('');\n  let email = $state('');\n  let message = $state('');\n  let submitted = $state(false);\n\n  let nameError = $derived(submitted && !name ? 'Name is required' : '');\n  let emailError = $derived(\n    submitted && !email ? 'Email is required' :\n    submitted && !email.includes('@') ? 'Please enter a valid email' : ''\n  );\n  let messageError = $derived(submitted && !message ? 'Message is required' : '');\n\n  function handleSubmit() {\n    submitted = true;\n    if (name && email.includes('@') && message) {\n      // submit form\n    }\n  }\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">Contact us</header>\n  <div class=\"surface-content\">\n    <div class=\"contact-form\">\n      <Field.Root>\n        <Label>Name</Label>\n        <Input bind:value={name} />\n        {#if nameError}\n          <Field.Error>{nameError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Field.Root>\n        <Label>Email</Label>\n        <Input type=\"email\" bind:value={email} />\n        {#if emailError}\n          <Field.Error>{emailError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Field.Root>\n        <Label>Message</Label>\n        <Textarea bind:value={message} rows={4} />\n        {#if messageError}\n          <Field.Error>{messageError}</Field.Error>\n        {/if}\n      </Field.Root>\n      <Button variant=\"solid\" onclick={handleSubmit}>Send message</Button>\n    </div>\n  </div>\n</div>\n\n<style>\n  .contact-form { display: grid; gap: var(--dry-space-4); }\n</style>"
       },
       "modal-edit-form": {
         "name": "modal-edit-form",
@@ -25819,7 +25486,6 @@
           "onboarding"
         ],
         "components": [
-          "Card",
           "Stepper",
           "Field",
           "Label",
@@ -25827,7 +25493,7 @@
           "Button",
           "Text"
         ],
-        "snippet": "<script>\n  import { Card, Stepper, Field, Label, Input, Button, Text } from '@dryui/ui';\n\n  let activeStep = $state(0);\n  const totalSteps = 3;\n</script>\n\n<Card.Root>\n  <Card.Header>\n    <Stepper.Root bind:activeStep>\n      <Stepper.List>\n        <Stepper.Step step={0}>Account</Stepper.Step>\n        <Stepper.Separator step={0} />\n        <Stepper.Step step={1}>Profile</Stepper.Step>\n        <Stepper.Separator step={1} />\n        <Stepper.Step step={2}>Review</Stepper.Step>\n      </Stepper.List>\n    </Stepper.Root>\n  </Card.Header>\n  <Card.Content>\n    <div class=\"step-fields\">\n      {#if activeStep === 0}\n        <Field.Root>\n          <Label>Email</Label>\n          <Input type=\"email\" />\n        </Field.Root>\n        <Field.Root>\n          <Label>Password</Label>\n          <Input type=\"password\" />\n        </Field.Root>\n      {:else if activeStep === 1}\n        <Field.Root>\n          <Label>Full name</Label>\n          <Input />\n        </Field.Root>\n        <Field.Root>\n          <Label>Company</Label>\n          <Input />\n        </Field.Root>\n      {:else if activeStep === 2}\n        <Text>Review your details and submit.</Text>\n      {/if}\n    </div>\n  </Card.Content>\n  <Card.Footer>\n    <div class=\"step-actions\">\n      <Button variant=\"outline\" disabled={activeStep === 0} onclick={() => activeStep--}>Back</Button>\n      {#if activeStep < totalSteps - 1}\n        <Button onclick={() => activeStep++}>Next</Button>\n      {:else}\n        <Button onclick={() => { /* submit */ }}>Submit</Button>\n      {/if}\n    </div>\n  </Card.Footer>\n</Card.Root>\n\n<style>\n  .step-fields { display: grid; gap: var(--dry-space-4); }\n  .step-actions { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n</style>"
+        "snippet": "<script>\n  import { Stepper, Field, Label, Input, Button, Text } from '@dryui/ui';\n\n  let activeStep = $state(0);\n  const totalSteps = 3;\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">\n    <Stepper.Root bind:activeStep>\n      <Stepper.List>\n        <Stepper.Step step={0}>Account</Stepper.Step>\n        <Stepper.Separator step={0} />\n        <Stepper.Step step={1}>Profile</Stepper.Step>\n        <Stepper.Separator step={1} />\n        <Stepper.Step step={2}>Review</Stepper.Step>\n      </Stepper.List>\n    </Stepper.Root>\n  </header>\n  <div class=\"surface-content\">\n    <div class=\"step-fields\">\n      {#if activeStep === 0}\n        <Field.Root>\n          <Label>Email</Label>\n          <Input type=\"email\" />\n        </Field.Root>\n        <Field.Root>\n          <Label>Password</Label>\n          <Input type=\"password\" />\n        </Field.Root>\n      {:else if activeStep === 1}\n        <Field.Root>\n          <Label>Full name</Label>\n          <Input />\n        </Field.Root>\n        <Field.Root>\n          <Label>Company</Label>\n          <Input />\n        </Field.Root>\n      {:else if activeStep === 2}\n        <Text>Review your details and submit.</Text>\n      {/if}\n    </div>\n  </div>\n  <footer class=\"surface-footer\">\n    <div class=\"step-actions\">\n      <Button variant=\"outline\" disabled={activeStep === 0} onclick={() => activeStep--}>Back</Button>\n      {#if activeStep < totalSteps - 1}\n        <Button onclick={() => activeStep++}>Next</Button>\n      {:else}\n        <Button onclick={() => { /* submit */ }}>Submit</Button>\n      {/if}\n    </div>\n  </footer>\n</div>\n\n<style>\n  .step-fields { display: grid; gap: var(--dry-space-4); }\n  .step-actions { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n</style>"
       },
       "drawer-navigation": {
         "name": "drawer-navigation",
@@ -25877,7 +25543,6 @@
           "avatar"
         ],
         "components": [
-          "Card",
           "Avatar",
           "Text",
           "Heading",
@@ -25885,7 +25550,7 @@
           "Button",
           "Separator"
         ],
-        "snippet": "<script>\n  import { Card, Avatar, Text, Heading, Badge, Button, Separator } from '@dryui/ui';\n</script>\n\n<Card.Root>\n  <Card.Content>\n    <div class=\"profile-card\">\n      <Avatar src=\"/photo.jpg\" alt=\"Jane Smith\" fallback=\"JS\" size=\"xl\" />\n      <div class=\"profile-identity\">\n        <Heading level={3}>Jane Smith</Heading>\n        <Text color=\"secondary\">Product Designer</Text>\n        <Badge variant=\"soft\" color=\"success\">Available</Badge>\n      </div>\n      <Separator />\n      <div class=\"profile-stats\">\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">142</Text>\n          <Text size=\"sm\" color=\"secondary\">Projects</Text>\n        </div>\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">1.2k</Text>\n          <Text size=\"sm\" color=\"secondary\">Followers</Text>\n        </div>\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">89</Text>\n          <Text size=\"sm\" color=\"secondary\">Following</Text>\n        </div>\n      </div>\n      <div class=\"profile-actions\">\n        <Button variant=\"solid\">Follow</Button>\n        <Button variant=\"outline\">Message</Button>\n      </div>\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .profile-card { display: grid; justify-items: center; gap: var(--dry-space-4); }\n  .profile-identity { display: grid; justify-items: center; gap: var(--dry-space-1); }\n  .profile-stats { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--dry-space-8); }\n  .stat-item { display: grid; justify-items: center; gap: var(--dry-space-1); }\n  .profile-actions { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--dry-space-2); }\n</style>"
+        "snippet": "<script>\n  import { Avatar, Text, Heading, Badge, Button, Separator } from '@dryui/ui';\n</script>\n\n<div class=\"surface\">\n  <div class=\"surface-content\">\n    <div class=\"profile-card\">\n      <Avatar src=\"/photo.jpg\" alt=\"Jane Smith\" fallback=\"JS\" size=\"xl\" />\n      <div class=\"profile-identity\">\n        <Heading level={3}>Jane Smith</Heading>\n        <Text color=\"secondary\">Product Designer</Text>\n        <Badge variant=\"soft\" color=\"success\">Available</Badge>\n      </div>\n      <Separator />\n      <div class=\"profile-stats\">\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">142</Text>\n          <Text size=\"sm\" color=\"secondary\">Projects</Text>\n        </div>\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">1.2k</Text>\n          <Text size=\"sm\" color=\"secondary\">Followers</Text>\n        </div>\n        <div class=\"stat-item\">\n          <Text weight=\"bold\">89</Text>\n          <Text size=\"sm\" color=\"secondary\">Following</Text>\n        </div>\n      </div>\n      <div class=\"profile-actions\">\n        <Button variant=\"solid\">Follow</Button>\n        <Button variant=\"outline\">Message</Button>\n      </div>\n    </div>\n  </div>\n</div>\n\n<style>\n  .profile-card { display: grid; justify-items: center; gap: var(--dry-space-4); }\n  .profile-identity { display: grid; justify-items: center; gap: var(--dry-space-1); }\n  .profile-stats { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--dry-space-8); }\n  .stat-item { display: grid; justify-items: center; gap: var(--dry-space-1); }\n  .profile-actions { display: grid; grid-auto-flow: column; grid-auto-columns: max-content; gap: var(--dry-space-2); }\n</style>"
       },
       "notification-list": {
         "name": "notification-list",
@@ -25897,13 +25562,12 @@
           "activity"
         ],
         "components": [
-          "Card",
           "Avatar",
           "Text",
           "Badge",
           "Separator"
         ],
-        "snippet": "<script>\n  import { Card, Avatar, Text, Badge, Separator } from '@dryui/ui';\n\n  const notifications = [\n    { user: 'Sarah Chen', avatar: 'SC', action: 'commented on', target: 'Design Review', time: '2 min ago', unread: true },\n    { user: 'Marcus Rivera', avatar: 'MR', action: 'approved', target: 'PR #142', time: '1 hour ago', unread: true },\n    { user: 'Emily Watson', avatar: 'EW', action: 'assigned you to', target: 'Bug Fix #89', time: '3 hours ago', unread: false },\n  ];\n</script>\n\n<Card.Root>\n  <Card.Header>\n    <div class=\"notif-header\">\n      <Text weight=\"bold\">Notifications</Text>\n      <Badge variant=\"soft\">{notifications.filter(n => n.unread).length} new</Badge>\n    </div>\n  </Card.Header>\n  <Card.Content>\n    <div class=\"notif-list\">\n      {#each notifications as notif, i (notif.time)}\n        <div class=\"notif-item\">\n          <Avatar fallback={notif.avatar} size=\"sm\" />\n          <div class=\"notif-body\">\n            <Text>\n              <Text weight=\"bold\">{notif.user}</Text> {notif.action} <Text weight=\"medium\">{notif.target}</Text>\n            </Text>\n            <Text size=\"sm\" color=\"secondary\">{notif.time}</Text>\n          </div>\n          {#if notif.unread}\n            <div class=\"unread-dot\" aria-label=\"Unread\"></div>\n          {/if}\n        </div>\n        {#if i < notifications.length - 1}\n          <Separator />\n        {/if}\n      {/each}\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .notif-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n  .notif-list { display: grid; gap: var(--dry-space-2); }\n  .notif-item { display: grid; grid-template-columns: max-content 1fr max-content; align-items: start; gap: var(--dry-space-2); }\n  .notif-body { display: grid; gap: var(--dry-space-1); }\n  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dry-color-fill-brand); margin-top: var(--dry-space-1); }\n</style>"
+        "snippet": "<script>\n  import { Avatar, Text, Badge, Separator } from '@dryui/ui';\n\n  const notifications = [\n    { user: 'Sarah Chen', avatar: 'SC', action: 'commented on', target: 'Design Review', time: '2 min ago', unread: true },\n    { user: 'Marcus Rivera', avatar: 'MR', action: 'approved', target: 'PR #142', time: '1 hour ago', unread: true },\n    { user: 'Emily Watson', avatar: 'EW', action: 'assigned you to', target: 'Bug Fix #89', time: '3 hours ago', unread: false },\n  ];\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">\n    <div class=\"notif-header\">\n      <Text weight=\"bold\">Notifications</Text>\n      <Badge variant=\"soft\">{notifications.filter(n => n.unread).length} new</Badge>\n    </div>\n  </header>\n  <div class=\"surface-content\">\n    <div class=\"notif-list\">\n      {#each notifications as notif, i (notif.time)}\n        <div class=\"notif-item\">\n          <Avatar fallback={notif.avatar} size=\"sm\" />\n          <div class=\"notif-body\">\n            <Text>\n              <Text weight=\"bold\">{notif.user}</Text> {notif.action} <Text weight=\"medium\">{notif.target}</Text>\n            </Text>\n            <Text size=\"sm\" color=\"secondary\">{notif.time}</Text>\n          </div>\n          {#if notif.unread}\n            <div class=\"unread-dot\" aria-label=\"Unread\"></div>\n          {/if}\n        </div>\n        {#if i < notifications.length - 1}\n          <Separator />\n        {/if}\n      {/each}\n    </div>\n  </div>\n</div>\n\n<style>\n  .notif-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }\n  .notif-list { display: grid; gap: var(--dry-space-2); }\n  .notif-item { display: grid; grid-template-columns: max-content 1fr max-content; align-items: start; gap: var(--dry-space-2); }\n  .notif-body { display: grid; gap: var(--dry-space-1); }\n  .unread-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dry-color-fill-brand); margin-top: var(--dry-space-1); }\n</style>"
       },
       "activity-feed": {
         "name": "activity-feed",
@@ -25917,13 +25581,12 @@
           "history"
         ],
         "components": [
-          "Card",
           "Timeline",
           "Avatar",
           "Text",
           "Badge"
         ],
-        "snippet": "<script>\n  import { Card, Timeline, Avatar, Text, Badge } from '@dryui/ui';\n\n  const activities = [\n    { user: 'Alice Park', initials: 'AP', action: 'deployed', target: 'v2.4.0 to production', time: '2024-09-15T14:32:00Z', timeLabel: '5 min ago', badge: 'success' },\n    { user: 'Carlos Diaz', initials: 'CD', action: 'merged', target: 'PR #217 — Dark mode fixes', time: '2024-09-15T13:10:00Z', timeLabel: '1 hour ago', badge: 'info' },\n    { user: 'Priya Nair', initials: 'PN', action: 'commented on', target: 'Issue #84', time: '2024-09-15T11:45:00Z', timeLabel: '3 hours ago', badge: 'gray' },\n  ];\n</script>\n\n<Card.Root>\n  <Card.Header>Activity</Card.Header>\n  <Card.Content>\n    <Timeline.Root>\n      {#each activities as event (event.time)}\n        <Timeline.Item>\n          <Timeline.Icon>\n            <Avatar fallback={event.initials} size=\"sm\" />\n          </Timeline.Icon>\n          <Timeline.Content>\n            <Timeline.Title level={6}>\n              {event.user} <Badge variant=\"soft\" color={event.badge}>{event.action}</Badge> {event.target}\n            </Timeline.Title>\n            <Timeline.Time datetime={event.time}>{event.timeLabel}</Timeline.Time>\n          </Timeline.Content>\n        </Timeline.Item>\n      {/each}\n    </Timeline.Root>\n  </Card.Content>\n</Card.Root>"
+        "snippet": "<script>\n  import { Timeline, Avatar, Text, Badge } from '@dryui/ui';\n\n  const activities = [\n    { user: 'Alice Park', initials: 'AP', action: 'deployed', target: 'v2.4.0 to production', time: '2024-09-15T14:32:00Z', timeLabel: '5 min ago', badge: 'success' },\n    { user: 'Carlos Diaz', initials: 'CD', action: 'merged', target: 'PR #217 — Dark mode fixes', time: '2024-09-15T13:10:00Z', timeLabel: '1 hour ago', badge: 'info' },\n    { user: 'Priya Nair', initials: 'PN', action: 'commented on', target: 'Issue #84', time: '2024-09-15T11:45:00Z', timeLabel: '3 hours ago', badge: 'gray' },\n  ];\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">Activity</header>\n  <div class=\"surface-content\">\n    <Timeline.Root>\n      {#each activities as event (event.time)}\n        <Timeline.Item>\n          <Timeline.Icon>\n            <Avatar fallback={event.initials} size=\"sm\" />\n          </Timeline.Icon>\n          <Timeline.Content>\n            <Timeline.Title level={6}>\n              {event.user} <Badge variant=\"soft\" color={event.badge}>{event.action}</Badge> {event.target}\n            </Timeline.Title>\n            <Timeline.Time datetime={event.time}>{event.timeLabel}</Timeline.Time>\n          </Timeline.Content>\n        </Timeline.Item>\n      {/each}\n    </Timeline.Root>\n  </div>\n</div>"
       },
       "command-bar": {
         "name": "command-bar",
@@ -25952,13 +25615,12 @@
           "form"
         ],
         "components": [
-          "Card",
           "FileUpload",
           "Progress",
           "Button",
           "Text"
         ],
-        "snippet": "<script>\n  import { Card, FileUpload, Progress, Button, Text } from '@dryui/ui';\n\n  let files = $state([]);\n  let uploadProgress = $state(0);\n  let uploading = $state(false);\n\n  async function handleUpload() {\n    uploading = true;\n    // simulate upload\n    for (let i = 0; i <= 100; i += 10) {\n      uploadProgress = i;\n      await new Promise(r => setTimeout(r, 200));\n    }\n    uploading = false;\n  }\n</script>\n\n<Card.Root>\n  <Card.Header>Upload files</Card.Header>\n  <Card.Content>\n    <div class=\"upload-form\">\n      <FileUpload.Root bind:files accept=\"image/*,.pdf\">\n        <FileUpload.Dropzone>\n          <div class=\"dropzone-hint\">\n            <Text color=\"secondary\">Drag and drop files here, or click to browse</Text>\n            <Text size=\"sm\" color=\"secondary\">PNG, JPG, PDF up to 10MB</Text>\n          </div>\n        </FileUpload.Dropzone>\n        <FileUpload.List />\n      </FileUpload.Root>\n      {#if uploading}\n        <Progress value={uploadProgress} max={100} />\n      {/if}\n      <Button variant=\"solid\" onclick={handleUpload} disabled={!files.length || uploading}>\n        {uploading ? 'Uploading...' : 'Upload files'}\n      </Button>\n    </div>\n  </Card.Content>\n</Card.Root>\n\n<style>\n  .upload-form { display: grid; gap: var(--dry-space-4); }\n  .dropzone-hint { display: grid; justify-items: center; gap: var(--dry-space-2); }\n</style>"
+        "snippet": "<script>\n  import { FileUpload, Progress, Button, Text } from '@dryui/ui';\n\n  let files = $state([]);\n  let uploadProgress = $state(0);\n  let uploading = $state(false);\n\n  async function handleUpload() {\n    uploading = true;\n    // simulate upload\n    for (let i = 0; i <= 100; i += 10) {\n      uploadProgress = i;\n      await new Promise(r => setTimeout(r, 200));\n    }\n    uploading = false;\n  }\n</script>\n\n<div class=\"surface\">\n  <header class=\"surface-header\">Upload files</header>\n  <div class=\"surface-content\">\n    <div class=\"upload-form\">\n      <FileUpload.Root bind:files accept=\"image/*,.pdf\">\n        <FileUpload.Dropzone>\n          <div class=\"dropzone-hint\">\n            <Text color=\"secondary\">Drag and drop files here, or click to browse</Text>\n            <Text size=\"sm\" color=\"secondary\">PNG, JPG, PDF up to 10MB</Text>\n          </div>\n        </FileUpload.Dropzone>\n        <FileUpload.List />\n      </FileUpload.Root>\n      {#if uploading}\n        <Progress value={uploadProgress} max={100} />\n      {/if}\n      <Button variant=\"solid\" onclick={handleUpload} disabled={!files.length || uploading}>\n        {uploading ? 'Uploading...' : 'Upload files'}\n      </Button>\n    </div>\n  </div>\n</div>\n\n<style>\n  .upload-form { display: grid; gap: var(--dry-space-4); }\n  .dropzone-hint { display: grid; justify-items: center; gap: var(--dry-space-2); }\n</style>"
       },
       "data-table-with-toolbar": {
         "name": "data-table-with-toolbar",
@@ -25972,13 +25634,12 @@
         ],
         "components": [
           "Container",
-          "Card",
           "Toolbar",
           "Input",
           "DropdownMenu",
           "DataGrid"
         ],
-        "snippet": "<script>\n  import { Container, Card, Toolbar, Input, DropdownMenu, DataGrid } from '@dryui/ui';\n\n  let search = $state('');\n  let rows = $state([\n    { id: '1', name: 'Alice', status: 'Active' },\n    { id: '2', name: 'Bob', status: 'Inactive' },\n  ]);\n</script>\n\n<Container>\n  <Card.Root>\n    <Card.Header>\n      <Toolbar.Root>\n        <Input bind:value={search} placeholder=\"Search...\" size=\"sm\" />\n        <Toolbar.Separator />\n        <DropdownMenu.Root>\n          <DropdownMenu.Trigger>\n            <Toolbar.Button>Columns</Toolbar.Button>\n          </DropdownMenu.Trigger>\n          <DropdownMenu.Content>\n            <DropdownMenu.Item>Toggle Name</DropdownMenu.Item>\n            <DropdownMenu.Item>Toggle Status</DropdownMenu.Item>\n          </DropdownMenu.Content>\n        </DropdownMenu.Root>\n        <Toolbar.Button>Export</Toolbar.Button>\n      </Toolbar.Root>\n    </Card.Header>\n    <Card.Content>\n      <DataGrid.Root items={rows}>\n        <DataGrid.Table>\n          <DataGrid.Header>\n            <DataGrid.Column key=\"name\">{#snippet children()}Name{/snippet}</DataGrid.Column>\n            <DataGrid.Column key=\"status\">{#snippet children()}Status{/snippet}</DataGrid.Column>\n          </DataGrid.Header>\n          <DataGrid.Body>\n            {#snippet children({ items })}\n              {#each items as row}\n                <DataGrid.Row rowId={row.id}>\n                  <DataGrid.Cell>{row.name}</DataGrid.Cell>\n                  <DataGrid.Cell>{row.status}</DataGrid.Cell>\n                </DataGrid.Row>\n              {/each}\n            {/snippet}\n          </DataGrid.Body>\n        </DataGrid.Table>\n        <DataGrid.Pagination />\n      </DataGrid.Root>\n    </Card.Content>\n  </Card.Root>\n</Container>"
+        "snippet": "<script>\n  import { Container, Toolbar, Input, DropdownMenu, DataGrid } from '@dryui/ui';\n\n  let search = $state('');\n  let rows = $state([\n    { id: '1', name: 'Alice', status: 'Active' },\n    { id: '2', name: 'Bob', status: 'Inactive' },\n  ]);\n</script>\n\n<Container>\n  <div class=\"surface\">\n    <header class=\"surface-header\">\n      <Toolbar.Root>\n        <Input bind:value={search} placeholder=\"Search...\" size=\"sm\" />\n        <Toolbar.Separator />\n        <DropdownMenu.Root>\n          <DropdownMenu.Trigger>\n            <Toolbar.Button>Columns</Toolbar.Button>\n          </DropdownMenu.Trigger>\n          <DropdownMenu.Content>\n            <DropdownMenu.Item>Toggle Name</DropdownMenu.Item>\n            <DropdownMenu.Item>Toggle Status</DropdownMenu.Item>\n          </DropdownMenu.Content>\n        </DropdownMenu.Root>\n        <Toolbar.Button>Export</Toolbar.Button>\n      </Toolbar.Root>\n    </header>\n    <div class=\"surface-content\">\n      <DataGrid.Root items={rows}>\n        <DataGrid.Table>\n          <DataGrid.Header>\n            <DataGrid.Column key=\"name\">{#snippet children()}Name{/snippet}</DataGrid.Column>\n            <DataGrid.Column key=\"status\">{#snippet children()}Status{/snippet}</DataGrid.Column>\n          </DataGrid.Header>\n          <DataGrid.Body>\n            {#snippet children({ items })}\n              {#each items as row}\n                <DataGrid.Row rowId={row.id}>\n                  <DataGrid.Cell>{row.name}</DataGrid.Cell>\n                  <DataGrid.Cell>{row.status}</DataGrid.Cell>\n                </DataGrid.Row>\n              {/each}\n            {/snippet}\n          </DataGrid.Body>\n        </DataGrid.Table>\n        <DataGrid.Pagination />\n      </DataGrid.Root>\n</div>\n</Container>"
       },
       "notification-center": {
         "name": "notification-center",
@@ -26012,10 +25673,9 @@
         "components": [
           "Aurora",
           "Noise",
-          "Glow",
-          "Card"
+          "Glow"
         ],
-        "snippet": "<script>\n  import { Aurora, Noise, Glow, Card } from '@dryui/ui';\n</script>\n\n<Aurora palette=\"cosmic\" intensity={60}>\n  <Noise opacity={0.05} blend=\"soft-light\">\n    <Glow color=\"rgba(139,92,246,0.4)\" intensity={40}>\n      <Card.Root>\n        <Card.Content>Content renders above the effect stack</Card.Content>\n      </Card.Root>\n    </Glow>\n  </Noise>\n</Aurora>"
+        "snippet": "<script>\n  import { Aurora, Noise, Glow } from '@dryui/ui';\n</script>\n\n<Aurora palette=\"cosmic\" intensity={60}>\n  <Noise opacity={0.05} blend=\"soft-light\">\n    <Glow color=\"rgba(139,92,246,0.4)\" intensity={40}>\n      <div class=\"surface\">\n          Content renders above the effect stack\n      </div>\n    </Glow>\n  </Noise>\n</Aurora>"
       },
       "affixed-input-field": {
         "name": "affixed-input-field",
@@ -26072,11 +25732,10 @@
           "pricing"
         ],
         "components": [
-          "Card",
           "Badge",
           "Text"
         ],
-        "snippet": "<!-- Aligned card list — parent grid defines shared columns,\n     each Card.Root uses subgrid to inherit the tracks.\n     Columns stay aligned across all rows without a <table>. -->\n<script>\n  import { Card, Badge, Text } from '@dryui/ui';\n\n  const flights = [\n    { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },\n    { airline: 'Pacific Wings', route: 'SFO → JFK', depart: '10:40', arrive: '21:10', duration: '7h 30m', stops: '1 stop', price: '$194' },\n    { airline: 'Coastal Jet', route: 'SFO → JFK', depart: '14:20', arrive: '22:50', duration: '5h 30m', stops: 'Nonstop', price: '$312' },\n  ];\n</script>\n\n<div class=\"flight-list\">\n  <!-- Column headers share the same grid tracks as rows -->\n  <div class=\"flight-list-header\">\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Airline</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Route</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Depart</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Arrive</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Duration</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Price</Text>\n  </div>\n\n  {#each flights as flight (flight.airline + flight.depart)}\n    <Card.Root variant=\"interactive\">\n      <Card.Content noPadding>\n        <div class=\"flight-row\">\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"medium\">{flight.airline}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" font=\"mono\">{flight.route}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.depart}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"semibold\">{flight.arrive}</Text>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" size=\"sm\" color=\"secondary\">{flight.duration}</Text>\n            <Badge variant=\"soft\" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>\n          </div>\n          <div class=\"flight-cell\">\n            <Text as=\"span\" weight=\"bold\">{flight.price}</Text>\n          </div>\n        </div>\n      </Card.Content>\n    </Card.Root>\n  {/each}\n</div>\n\n<style>\n  /* Parent grid defines the shared column tracks */\n  .flight-list {\n    display: grid;\n    grid-template-columns: 1fr 1fr auto auto 1fr auto;\n    gap: var(--dry-space-2);\n  }\n\n  /* Header spans all columns and inherits tracks via subgrid */\n  .flight-list-header {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    padding: 0 var(--dry-space-4) var(--dry-space-2);\n  }\n\n  /* :global() is required here — subgrid must reach Card's internal\n     elements which live in a child component scope. */\n  .flight-list :global([data-card]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  .flight-list :global([data-card-content]) {\n    grid-column: 1 / -1;\n    display: grid;\n    grid-template-columns: subgrid;\n  }\n\n  /* Row inside the card inherits tracks */\n  .flight-row {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    align-items: center;\n    padding: var(--dry-space-3) var(--dry-space-4);\n  }\n\n  /* Each cell aligns to its parent track */\n  .flight-cell {\n    display: grid;\n    gap: var(--dry-space-1);\n    align-content: center;\n  }\n\n  /* Responsive: collapse to stacked layout on narrow containers */\n  @container (max-width: 640px) {\n    .flight-list {\n      grid-template-columns: 1fr;\n    }\n\n    .flight-list-header {\n      display: none;\n    }\n\n    .flight-row {\n      grid-template-columns: 1fr 1fr;\n      gap: var(--dry-space-2);\n    }\n  }\n</style>"
+        "snippet": "<!-- Aligned card list — parent grid defines shared columns,\n     each surface div uses subgrid to inherit the tracks.\n     Columns stay aligned across all rows without a <table>. -->\n<script>\n  import { Badge, Text } from '@dryui/ui';\n\n  const flights = [\n    { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },\n    { airline: 'Pacific Wings', route: 'SFO → JFK', depart: '10:40', arrive: '21:10', duration: '7h 30m', stops: '1 stop', price: '$194' },\n    { airline: 'Coastal Jet', route: 'SFO → JFK', depart: '14:20', arrive: '22:50', duration: '5h 30m', stops: 'Nonstop', price: '$312' },\n  ];\n</script>\n\n<div class=\"flight-list\">\n  <!-- Column headers share the same grid tracks as rows -->\n  <div class=\"flight-list-header\">\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Airline</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Route</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Depart</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Arrive</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Duration</Text>\n    <Text as=\"span\" size=\"sm\" color=\"muted\">Price</Text>\n  </div>\n\n  {#each flights as flight (flight.airline + flight.depart)}\n    <div class=\"flight-row\">\n      <div class=\"flight-cell\">\n        <Text as=\"span\" weight=\"medium\">{flight.airline}</Text>\n      </div>\n      <div class=\"flight-cell\">\n        <Text as=\"span\" font=\"mono\">{flight.route}</Text>\n      </div>\n      <div class=\"flight-cell\">\n        <Text as=\"span\" weight=\"semibold\">{flight.depart}</Text>\n      </div>\n      <div class=\"flight-cell\">\n        <Text as=\"span\" weight=\"semibold\">{flight.arrive}</Text>\n      </div>\n      <div class=\"flight-cell\">\n        <Text as=\"span\" size=\"sm\" color=\"secondary\">{flight.duration}</Text>\n        <Badge variant=\"soft\" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>\n      </div>\n      <div class=\"flight-cell\">\n        <Text as=\"span\" weight=\"bold\">{flight.price}</Text>\n      </div>\n    </div>\n  {/each}\n</div>\n\n<style>\n  /* Parent grid defines the shared column tracks */\n  .flight-list {\n    display: grid;\n    grid-template-columns: 1fr 1fr auto auto 1fr auto;\n    gap: var(--dry-space-2);\n  }\n\n  /* Header spans all columns and inherits tracks via subgrid */\n  .flight-list-header {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    padding: 0 var(--dry-space-4) var(--dry-space-2);\n  }\n\n  /* Row inherits tracks via subgrid */\n  .flight-row {\n    display: grid;\n    grid-template-columns: subgrid;\n    grid-column: 1 / -1;\n    align-items: center;\n    padding: var(--dry-space-3) var(--dry-space-4);\n  }\n\n  /* Each cell aligns to its parent track */\n  .flight-cell {\n    display: grid;\n    gap: var(--dry-space-1);\n    align-content: center;\n  }\n\n  /* Responsive: collapse to stacked layout on narrow containers */\n  @container (max-width: 640px) {\n    .flight-list {\n      grid-template-columns: 1fr;\n    }\n\n    .flight-list-header {\n      display: none;\n    }\n\n    .flight-row {\n      grid-template-columns: 1fr 1fr;\n      gap: var(--dry-space-2);\n    }\n  }\n</style>"
       },
       "custom-button-color": {
         "name": "custom-button-color",
@@ -26220,21 +25879,19 @@
       },
       "concentric-radius": {
         "name": "concentric-radius",
-        "description": "Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (Card, Dialog, Popover, Toast, Tooltip, Sheet, Field).",
+        "description": "Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (raised surfaces, Dialog, Popover, Toast, Tooltip, Sheet, Field).",
         "tags": [
           "radius",
           "concentric",
-          "card",
           "nesting",
           "polish",
           "corner",
           "rounded"
         ],
         "components": [
-          "Card",
           "Button"
         ],
-        "snippet": "<script>\n  import { Card, Button } from '@dryui/ui';\n</script>\n\n<Card.Root>\n  <Card.Content>\n    <!-- The Button inside this Card inherits --dry-btn-radius: var(--dry-radius-nested-card)\n         automatically, so inner corners sit concentric with the outer 16px. -->\n    <Button>Action</Button>\n  </Card.Content>\n</Card.Root>\n\n<!-- Nested tokens available: nested-card, nested-dialog, nested-popover,\n     nested-sheet, nested-toast, nested-tooltip, nested-field. -->"
+        "snippet": "<script>\n  import { Button } from '@dryui/ui';\n</script>\n\n<div class=\"surface\">\n  <div class=\"surface-content\">\n    <!-- The Button inside this surface inherits --dry-btn-radius: var(--dry-radius-nested-card)\n         automatically, so inner corners sit concentric with the outer 16px. -->\n    <Button>Action</Button>\n  </div>\n</div>\n\n<!-- Nested tokens available: nested-card, nested-dialog, nested-popover,\n     nested-sheet, nested-toast, nested-tooltip, nested-field. -->"
       },
       "icon-swap": {
         "name": "icon-swap",
@@ -26333,10 +25990,8 @@
           "elevation",
           "polish"
         ],
-        "components": [
-          "Card"
-        ],
-        "snippet": "<script>\n  import { Card } from '@dryui/ui';\n</script>\n\n<!-- Default Card: shadow-only (no border) -->\n<Card.Root>\n  <Card.Content>\n    A Card that reads as raised without a solid edge.\n  </Card.Content>\n</Card.Root>\n\n<!-- Bordered escape hatch, when you want the 1px edge back -->\n<Card.Root bordered>\n  <Card.Content>A Card with both shadow and border.</Card.Content>\n</Card.Root>\n\n<!-- Raw pattern. Use the token family directly on any raised surface: -->\n<style>\n  .my-raised-surface {\n    background: var(--dry-color-bg-raised);\n    border-radius: var(--dry-radius-lg);\n    box-shadow: var(--dry-shadow-sm);\n    transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);\n  }\n  .my-raised-surface:hover {\n    box-shadow: var(--dry-shadow-sm-hover);\n  }\n</style>"
+        "components": [],
+        "snippet": "<!-- Use the token family directly on any raised surface element. -->\n<div class=\"raised\">\n  A surface that reads as raised without a solid edge.\n</div>\n\n<style>\n  .raised {\n    background: var(--dry-color-bg-raised);\n    border-radius: var(--dry-radius-lg);\n    box-shadow: var(--dry-shadow-sm);\n    transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);\n  }\n  .raised:hover {\n    box-shadow: var(--dry-shadow-sm-hover);\n  }\n</style>"
       },
       "icon-in-button": {
         "name": "icon-in-button",

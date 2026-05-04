@@ -255,7 +255,6 @@ const PROP_DESCRIPTIONS: Record<string, string> = {
 		"Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets.",
 	'Button.size': 'Button density preset, including icon-only sizing variants.',
 	'Button.variant': 'Button treatment from solid primary actions to ghost and inline link styles.',
-	'Card.Root.selected': 'Applies selected-state styling for interactive card surfaces.',
 	'Dialog.Close.children': 'Label or content rendered inside the dismiss control.',
 	'Dialog.Content.children': 'Main dialog surface content rendered inside the modal.',
 	'Dialog.Root.open': 'Controls whether the dialog is currently shown.',
@@ -1400,7 +1399,6 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 		'<ChipGroup.Root gap="md">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant="soft">Local/MLX</Badge>\n  <Badge variant="soft">OpenAI</Badge>\n  <Badge variant="soft">Anthropic</Badge>\n  <Badge variant="soft">Mistral</Badge>\n</ChipGroup.Root>',
 	Tooltip:
 		'<Tooltip.Root>\n  <Tooltip.Trigger>\n    <Button variant="ghost">Hover me</Button>\n  </Tooltip.Trigger>\n  <Tooltip.Content>Extra information</Tooltip.Content>\n</Tooltip.Root>',
-	Card: '<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card body content goes here.</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button variant="solid">Action</Button>\n  </Card.Footer>\n</Card.Root>',
 	Dialog:
 		'<Dialog.Root bind:open={showDialog}>\n  <Dialog.Trigger>\n    <Button>Open Dialog</Button>\n  </Dialog.Trigger>\n  <Dialog.Content>\n    <Dialog.Header>Confirm</Dialog.Header>\n    <p>Are you sure?</p>\n    <Dialog.Footer>\n      <Button variant="outline" onclick={() => showDialog = false}>Cancel</Button>\n      <Button variant="solid" onclick={handleConfirm}>Confirm</Button>\n    </Dialog.Footer>\n  </Dialog.Content>\n</Dialog.Root>',
 	Tabs: '<Tabs.Root bind:value={activeTab}>\n  <Tabs.List>\n    <Tabs.Trigger value="one">Tab 1</Tabs.Trigger>\n    <Tabs.Trigger value="two">Tab 2</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value="one">First panel</Tabs.Content>\n  <Tabs.Content value="two">Second panel</Tabs.Content>\n</Tabs.Root>',
@@ -1501,7 +1499,7 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	RecentSearches:
 		'<RecentSearches.Root>\n  <RecentSearches.Chip label="NYC → LAX, Mar 15-22" />\n  <RecentSearches.Chip label="Paris Hotels, Apr 1-5" />\n</RecentSearches.Root>',
 	Reveal:
-		'<Reveal variant="slide-up" delay={120}>\n  <Card.Root>\n    <Card.Content>Stage content as it enters the viewport.</Card.Content>\n  </Card.Root>\n</Reveal>',
+		'<Reveal variant="slide-up" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>',
 	ResultCardCar:
 		'<ResultCardCar.Root>\n  <ResultCardCar.Image src="/car.jpg" />\n  <ResultCardCar.Details>\n    <ResultCardCar.Category>SUV</ResultCardCar.Category>\n    <ResultCardCar.Specs items={[{icon: "seats", label: "5"}]} />\n    <ResultCardCar.Price>$65/day</ResultCardCar.Price>\n  </ResultCardCar.Details>\n</ResultCardCar.Root>',
 	ResultCardFlight:
@@ -1519,15 +1517,15 @@ const EXAMPLE_OVERRIDES: Record<string, string> = {
 	SortBar:
 		'<SortBar.Root bind:value={sortBy} bind:direction={sortDir}>\n  <SortBar.Option value="price">Price</SortBar.Option>\n  <SortBar.Option value="duration">Duration</SortBar.Option>\n  <SortBar.Option value="departure">Departure</SortBar.Option>\n</SortBar.Root>',
 	Spotlight:
-		'<Spotlight intensity={32}>\n  <Card.Root>\n    <Card.Content>Hover to pull a radial highlight across the surface.</Card.Content>\n  </Card.Root>\n</Spotlight>',
+		'<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>',
 	TripCard:
 		'<TripCard.Root variant="upcoming">\n  <TripCard.Image src="/paris.jpg" alt="Paris" />\n  <TripCard.Details>\n    <TripCard.Destination>Paris, France</TripCard.Destination>\n    <TripCard.Dates start="Mar 15" end="Mar 22" />\n    <TripCard.Status status="confirmed" />\n  </TripCard.Details>\n</TripCard.Root>',
 	TrustBadges:
 		'<TrustBadges.Root variant="inline">\n  <TrustBadges.Badge icon="shield" label="Secure Checkout" />\n  <TrustBadges.Badge icon="guarantee" label="Money-Back Guarantee" />\n</TrustBadges.Root>',
 	Aurora:
-		'<Aurora palette="ocean">\n  <Card.Root>\n    <Card.Content>Ambient backgrounds stay native and no-dependency.</Card.Content>\n  </Card.Root>\n</Aurora>',
+		'<Aurora palette="ocean">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>',
 	Noise:
-		'<Noise opacity={0.12} blend="soft-light">\n  <Card.Root>\n    <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>\n  </Card.Root>\n</Noise>'
+		'<Noise opacity={0.12} blend="soft-light">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>'
 };
 
 function generateExample(name: string, compound: boolean, parts?: string[]): string {

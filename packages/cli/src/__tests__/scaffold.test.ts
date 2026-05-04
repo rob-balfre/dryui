@@ -1,41 +1,22 @@
 import { describe, expect, test } from 'bun:test';
 import { getAdd } from '../commands/add.js';
+import { createTabsMockSpec } from './helpers.js';
 
-const mockSpec = {
-	themeImports: {
-		default: '@dryui/ui/themes/default.css',
-		dark: '@dryui/ui/themes/dark.css'
-	},
-	components: {
-		Card: {
-			import: '@dryui/ui',
-			description: 'Content surface',
-			category: 'display',
-			tags: ['surface'],
-			compound: true,
-			parts: {
-				Root: { props: {} }
-			},
-			cssVars: {},
-			dataAttributes: [],
-			example: '<Card.Root>\n  <Card.Content>Body</Card.Content>\n</Card.Root>'
-		}
-	}
-} as const;
+const mockSpec = createTabsMockSpec();
 
 describe('getAdd', () => {
 	test('prints a starter snippet with theme imports when requested', () => {
-		const { output, error, exitCode } = getAdd('Card', mockSpec, 'text', { withTheme: true });
+		const { output, error, exitCode } = getAdd('Tabs', mockSpec, 'text', { withTheme: true });
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain("import '@dryui/ui/themes/default.css';");
-		expect(output).toContain("import { Card } from '@dryui/ui';");
-		expect(output).toContain('<Card.Root>');
+		expect(output).toContain("import { Tabs } from '@dryui/ui';");
+		expect(output).toContain('<Tabs.Root');
 	});
 
 	test('supports subpath imports', () => {
-		const { output } = getAdd('Card', mockSpec, 'text', { subpath: true });
-		expect(output).toContain("import { Card } from '@dryui/ui/card';");
+		const { output } = getAdd('Tabs', mockSpec, 'text', { subpath: true });
+		expect(output).toContain("import { Tabs } from '@dryui/ui/tabs';");
 	});
 
 	test('returns error for unknown component', () => {

@@ -75,14 +75,14 @@ const mockSpec = {
 			dataAttributes: [{ name: 'data-disabled' }],
 			example: '<Input type="email" bind:value={email} />'
 		},
-		Card: {
+		Tabs: {
 			import: '@dryui/ui',
-			description: 'Content container with header and footer sections',
-			category: 'display',
-			tags: ['container', 'content', 'surface'],
+			description: 'Tabbed content panels with list, triggers, and bodies',
+			category: 'navigation',
+			tags: ['tabs', 'navigation', 'content'],
 			compound: true,
 			structure: {
-				tree: ['Card.Root', '  Card.Header', '  Card.Content', '  Card.Footer']
+				tree: ['Tabs.Root', '  Tabs.List', '    Tabs.Trigger', '  Tabs.Content']
 			},
 			parts: {
 				Root: {
@@ -95,20 +95,20 @@ const mockSpec = {
 						note: 'Forwards <div> attributes via rest props.'
 					}
 				},
-				Header: { props: {} },
-				Content: { props: {} },
-				Footer: { props: {} }
+				List: { props: {} },
+				Trigger: { props: {} },
+				Content: { props: {} }
 			},
 			cssVars: {
-				'--dry-card-bg': 'Background color',
-				'--dry-card-border': 'Border color',
-				'--dry-card-radius': 'Border radius',
-				'--dry-card-padding': 'Padding',
-				'--dry-card-shadow': 'Box shadow'
+				'--dry-tabs-bg': 'Background color',
+				'--dry-tabs-border': 'Border color',
+				'--dry-tabs-radius': 'Border radius',
+				'--dry-tabs-padding': 'Padding',
+				'--dry-tabs-shadow': 'Box shadow'
 			},
 			dataAttributes: [] as const,
 			example:
-				'<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>Body</Card.Content>\n  <Card.Footer><Button>Save</Button></Card.Footer>\n</Card.Root>'
+				'<Tabs.Root value="one">\n  <Tabs.List>\n    <Tabs.Trigger value="one">One</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value="one">Body</Tabs.Content>\n</Tabs.Root>'
 		},
 		Dialog: {
 			import: '@dryui/ui',
@@ -211,14 +211,14 @@ describe('getInfo — simple component', () => {
 });
 
 describe('getInfo — compound component', () => {
-	test('returns correct output for Card', () => {
-		const { output, error, exitCode } = getInfo('Card', mockSpec, 'text');
+	test('returns correct output for Tabs', () => {
+		const { output, error, exitCode } = getInfo('Tabs', mockSpec, 'text');
 		expect(exitCode).toBe(0);
 		expect(error).toBeNull();
 		expect(output).toContain('Kind: compound');
-		expect(output).toContain('Use Card.Root, not Card');
+		expect(output).toContain('Use Tabs.Root, not Tabs');
 		expect(output).toContain('Required structure:');
-		expect(output).toContain('Card.Footer');
+		expect(output).toContain('Tabs.Content');
 	});
 });
 

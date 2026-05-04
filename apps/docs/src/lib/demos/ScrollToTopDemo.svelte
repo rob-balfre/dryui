@@ -23,10 +23,9 @@
 				<code>prefers-reduced-motion</code>.
 			</p>
 			<p>
-				Breaking: <code>Card.Root</code>'s <code>raised</code> prop removed. Use
-				<code>variant="elevated"</code>. <code>--dry-color-accent</code> removed. Map to
-				<code>--dry-color-fill-brand</code>. <code>Tree.Root</code>'s <code>expanded</code> is now
-				<code>defaultExpanded</code>.
+				Breaking: <code>Alert</code>'s <code>tone</code> prop removed. Use <code>variant</code>.
+				<code>--dry-color-accent</code> removed. Map to <code>--dry-color-fill-brand</code>.
+				<code>Tree.Root</code>'s <code>expanded</code> is now <code>defaultExpanded</code>.
 			</p>
 			<p>
 				Scroll threshold: 120px. The return button fades in once you scroll past it and hops back to

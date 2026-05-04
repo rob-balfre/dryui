@@ -36,7 +36,7 @@ describe('runCheck', () => {
 					'@dryui/ui': 'workspace:*'
 				}
 			}),
-			'src/routes/+page.svelte': '<Card></Card>'
+			'src/routes/+page.svelte': '<Tabs></Tabs>'
 		});
 
 		const output = runCheck(spec, {}, { cwd: root });
@@ -45,15 +45,40 @@ describe('runCheck', () => {
 		expect(output).toContain('project/missing-theme-import');
 	});
 
+	test('workspace scan flags stale copied Claude agents', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'.claude/agents/dryui-layout.md': [
+				'---',
+				'name: dryui-layout',
+				'---',
+				'Use AreaGrid.Root and read packages/ui/skills/dryui-layout/SKILL.md.'
+			].join('\n')
+		});
+
+		const result = runCheckStructured(spec, {}, { cwd: root });
+
+		expect(result.text).toContain('project/stale-claude-agent');
+		expect(result.text).toContain('.claude/agents/dryui-layout.md');
+		const diagnostic = result.diagnostics.find((d) => d.code === 'lint/project/stale-claude-agent');
+		expect(diagnostic?.hint).toContain('dryui setup --sync-agents');
+	});
+
 	test('a .svelte path triggers component review', () => {
 		const root = createProject({
 			'Example.svelte': [
 				'<script>',
-				"  import { Card } from '@dryui/ui';",
+				"  import { Tabs } from '@dryui/ui';",
 				'</script>',
-				'<Card>',
-				'  <Card.Content>Body</Card.Content>',
-				'</Card>'
+				'<Tabs>',
+				'  <Tabs.Content value="one">Body</Tabs.Content>',
+				'</Tabs>'
 			].join('\n')
 		});
 
@@ -155,7 +180,7 @@ describe('runCheck', () => {
 					'@dryui/ui': 'workspace:*'
 				}
 			}),
-			'apps/example/src/routes/+page.svelte': '<Card></Card>'
+			'apps/example/src/routes/+page.svelte': '<Tabs></Tabs>'
 		});
 
 		const output = runCheck(spec, { path: 'apps/example' }, { cwd: root });

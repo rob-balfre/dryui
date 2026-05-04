@@ -420,7 +420,7 @@ dryui
 dryui init my-app
 dryui detect <project-path>
 dryui install <project-path>
-dryui add --project --target <file> Card
+dryui add --project --target <file> Tabs
 dryui info <component>
 dryui list --category layout
 dryui compose "date input"

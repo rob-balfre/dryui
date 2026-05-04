@@ -36,11 +36,11 @@ const mockSpec = {
 			dataAttributes: [],
 			example: ''
 		},
-		Card: {
+		Tabs: {
 			import: '@dryui/ui',
-			description: 'Content container',
+			description: 'Tabbed content panels',
 			category: 'display',
-			tags: ['surface'],
+			tags: ['tabs'],
 			compound: true,
 			parts: { Root: { props: {} } },
 			cssVars: {},
@@ -87,7 +87,7 @@ describe('groupByCategory', () => {
 			expect(first).toBeDefined();
 			expect(second).toBeDefined();
 			if (first) expect(first.name).toBe('Badge');
-			if (second) expect(second.name).toBe('Card');
+			if (second) expect(second.name).toBe('Tabs');
 		}
 	});
 });
@@ -100,7 +100,7 @@ describe('getList — all components', () => {
 		expect(output).toContain('Action:');
 		expect(output).toContain('Button');
 		expect(output).toContain('Display:');
-		expect(output).toContain('Card');
+		expect(output).toContain('Tabs');
 		expect(output).toContain('Badge');
 		expect(output).toContain('Input:');
 		expect(output).toContain('Textarea');
@@ -109,7 +109,7 @@ describe('getList — all components', () => {
 	test('includes descriptions', () => {
 		const { output } = getList(null, mockSpec, 'text');
 		expect(output).toContain('Interactive button');
-		expect(output).toContain('Content container');
+		expect(output).toContain('Tabbed content panels');
 		expect(output).toContain('Text input');
 	});
 
@@ -129,15 +129,15 @@ describe('getList — filtered by category', () => {
 		expect(output).toContain('Input:');
 		expect(output).toContain('Textarea');
 		expect(output).not.toContain('Button');
-		expect(output).not.toContain('Card');
+		expect(output).not.toContain('Tabs');
 	});
 
 	test('single category result contains all members', () => {
 		const { output } = getList('display', mockSpec, 'text');
 		expect(output).toContain('Badge');
-		expect(output).toContain('Card');
+		expect(output).toContain('Tabs');
 		expect(output).toContain('Status indicator');
-		expect(output).toContain('Content container');
+		expect(output).toContain('Tabbed content panels');
 	});
 });
 

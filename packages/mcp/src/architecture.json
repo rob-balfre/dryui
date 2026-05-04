@@ -2,22 +2,22 @@
   "schema": "DolphinGraph",
   "packageVersion": "3.0.0",
   "summary": {
-    "componentNodes": 298,
-    "partNodes": 656,
+    "componentNodes": 296,
+    "partNodes": 648,
     "catalogNodes": 0,
     "clusterNodes": 0,
-    "primitiveComponents": 145,
-    "uiComponents": 153,
-    "uiWrappers": 131,
+    "primitiveComponents": 144,
+    "uiComponents": 152,
+    "uiWrappers": 130,
     "uiComposites": 22,
-    "rootBarrelComponents": 298,
+    "rootBarrelComponents": 296,
     "subpathOnlyComponents": 0,
-    "compoundComponents": 133,
-    "wrapEdges": 131,
+    "compoundComponents": 131,
+    "wrapEdges": 130,
     "composeEdges": 16,
     "docsEdges": 0,
-    "relatedEdges": 307,
-    "mismatches": 296,
+    "relatedEdges": 235,
+    "mismatches": 294,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -868,87 +868,6 @@
       "layer": "part",
       "category": "form",
       "description": "Root part for Calendar.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Card",
-      "name": "Card",
-      "label": "Card",
-      "kind": "component",
-      "package": "primitives",
-      "layer": "primitive",
-      "category": "display",
-      "description": "Contained content surface with header/content/footer sections",
-      "visibility": "root",
-      "sourcePath": "packages/primitives/src/card/index.ts",
-      "publicImport": "@dryui/primitives",
-      "tags": [
-        "surface",
-        "container",
-        "content",
-        "panel"
-      ],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Header",
-        "Content",
-        "Footer"
-      ],
-      "sourceFileCount": 3,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "primitives:Card.Content",
-      "name": "Card.Content",
-      "label": "Content",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "display",
-      "description": "Content part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Card.Footer",
-      "name": "Card.Footer",
-      "label": "Footer",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "display",
-      "description": "Footer part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Card.Header",
-      "name": "Card.Header",
-      "label": "Header",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "display",
-      "description": "Header part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "primitives:Card.Root",
-      "name": "Card.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "primitives",
-      "layer": "part",
-      "category": "display",
-      "description": "Root part for Card.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -3956,13 +3875,12 @@
       "package": "primitives",
       "layer": "primitive",
       "category": "overlay",
-      "description": "Card popup on hover with delay-based open/close",
+      "description": "Surface popup on hover with delay-based open/close",
       "visibility": "root",
       "sourcePath": "packages/primitives/src/hover-card/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
         "hover",
-        "card",
         "preview",
         "popup"
       ],
@@ -9156,87 +9074,6 @@
       "parts": []
     },
     {
-      "id": "ui:Card",
-      "name": "Card",
-      "label": "Card",
-      "kind": "component",
-      "package": "ui",
-      "layer": "ui-wrapper",
-      "category": "display",
-      "description": "Contained content surface with header/content/footer sections",
-      "visibility": "root",
-      "sourcePath": "packages/ui/src/card/index.ts",
-      "publicImport": "@dryui/ui",
-      "tags": [
-        "surface",
-        "container",
-        "content",
-        "panel"
-      ],
-      "compound": true,
-      "parts": [
-        "Root",
-        "Header",
-        "Content",
-        "Footer"
-      ],
-      "sourceFileCount": 6,
-      "primitivePartUsageCount": 0,
-      "componentImportCount": 0
-    },
-    {
-      "id": "ui:Card.Content",
-      "name": "Card.Content",
-      "label": "Content",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "display",
-      "description": "Content part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Card.Footer",
-      "name": "Card.Footer",
-      "label": "Footer",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "display",
-      "description": "Footer part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Card.Header",
-      "name": "Card.Header",
-      "label": "Header",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "display",
-      "description": "Header part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
-      "id": "ui:Card.Root",
-      "name": "Card.Root",
-      "label": "Root",
-      "kind": "part",
-      "package": "ui",
-      "layer": "part",
-      "category": "display",
-      "description": "Root part for Card.",
-      "tags": [],
-      "compound": false,
-      "parts": []
-    },
-    {
       "id": "ui:Carousel",
       "name": "Carousel",
       "label": "Carousel",
@@ -12292,13 +12129,12 @@
       "package": "ui",
       "layer": "ui-wrapper",
       "category": "overlay",
-      "description": "Card popup on hover with delay-based open/close",
+      "description": "Surface popup on hover with delay-based open/close",
       "visibility": "root",
       "sourcePath": "packages/ui/src/hover-card/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
         "hover",
-        "card",
         "preview",
         "popup"
       ],
@@ -17055,34 +16891,6 @@
       "label": "Root"
     },
     {
-      "id": "compound_part:primitives:Card:primitives:Card.Content:Content",
-      "type": "compound_part",
-      "from": "primitives:Card",
-      "to": "primitives:Card.Content",
-      "label": "Content"
-    },
-    {
-      "id": "compound_part:primitives:Card:primitives:Card.Footer:Footer",
-      "type": "compound_part",
-      "from": "primitives:Card",
-      "to": "primitives:Card.Footer",
-      "label": "Footer"
-    },
-    {
-      "id": "compound_part:primitives:Card:primitives:Card.Header:Header",
-      "type": "compound_part",
-      "from": "primitives:Card",
-      "to": "primitives:Card.Header",
-      "label": "Header"
-    },
-    {
-      "id": "compound_part:primitives:Card:primitives:Card.Root:Root",
-      "type": "compound_part",
-      "from": "primitives:Card",
-      "to": "primitives:Card.Root",
-      "label": "Root"
-    },
-    {
       "id": "compound_part:primitives:Carousel:primitives:Carousel.Dots:Dots",
       "type": "compound_part",
       "from": "primitives:Carousel",
@@ -19365,34 +19173,6 @@
       "label": "Root"
     },
     {
-      "id": "compound_part:ui:Card:ui:Card.Content:Content",
-      "type": "compound_part",
-      "from": "ui:Card",
-      "to": "ui:Card.Content",
-      "label": "Content"
-    },
-    {
-      "id": "compound_part:ui:Card:ui:Card.Footer:Footer",
-      "type": "compound_part",
-      "from": "ui:Card",
-      "to": "ui:Card.Footer",
-      "label": "Footer"
-    },
-    {
-      "id": "compound_part:ui:Card:ui:Card.Header:Header",
-      "type": "compound_part",
-      "from": "ui:Card",
-      "to": "ui:Card.Header",
-      "label": "Header"
-    },
-    {
-      "id": "compound_part:ui:Card:ui:Card.Root:Root",
-      "type": "compound_part",
-      "from": "ui:Card",
-      "to": "ui:Card.Root",
-      "label": "Root"
-    },
-    {
       "id": "compound_part:ui:Carousel:ui:Carousel.Dots:Dots",
       "type": "compound_part",
       "from": "ui:Carousel",
@@ -21472,31 +21252,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Accordion:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Accordion",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Adjust:ui:Aurora:combines_with",
       "type": "related",
       "from": "ui:Adjust",
       "to": "ui:Aurora",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Adjust:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Adjust",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Alert:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Alert",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21514,13 +21273,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:AspectRatio:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:AspectRatio",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:AspectRatio:ui:Image:combines_with",
       "type": "related",
       "from": "ui:AspectRatio",
@@ -21532,13 +21284,6 @@
       "type": "related",
       "from": "ui:AspectRatio",
       "to": "ui:VideoEmbed",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Aurora:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Aurora",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21560,13 +21305,6 @@
       "type": "related",
       "from": "ui:Aurora",
       "to": "ui:Text",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Avatar:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Avatar",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21612,13 +21350,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Badge:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Badge",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Badge:ui:Table:combines_with",
       "type": "related",
       "from": "ui:Badge",
@@ -21630,20 +21361,6 @@
       "type": "related",
       "from": "ui:Beam",
       "to": "ui:Aurora",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Beam:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Beam",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Button:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Button",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21661,34 +21378,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Calendar:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Calendar",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Card:ui:Badge:combines_with",
-      "type": "related",
-      "from": "ui:Card",
-      "to": "ui:Badge",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Card:ui:Container:combines_with",
-      "type": "related",
-      "from": "ui:Card",
-      "to": "ui:Container",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Card:ui:Text:combines_with",
-      "type": "related",
-      "from": "ui:Card",
-      "to": "ui:Text",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Carousel:ui:AspectRatio:combines_with",
       "type": "related",
       "from": "ui:Carousel",
@@ -21696,31 +21385,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Carousel:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Carousel",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Carousel:ui:Image:combines_with",
       "type": "related",
       "from": "ui:Carousel",
       "to": "ui:Image",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Chart:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Chart",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ChatThread:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ChatThread",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21752,13 +21420,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Chip:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Chip",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Chip:ui:ChipGroup:combines_with",
       "type": "related",
       "from": "ui:Chip",
@@ -21773,13 +21434,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:ChipGroup:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ChipGroup",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:ChipGroup:ui:Chip:combines_with",
       "type": "related",
       "from": "ui:ChipGroup",
@@ -21791,13 +21445,6 @@
       "type": "related",
       "from": "ui:ChipGroup",
       "to": "ui:Tag",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ChromaticShift:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ChromaticShift",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21829,24 +21476,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:CodeBlock:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:CodeBlock",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Collapsible:ui:Button:combines_with",
       "type": "related",
       "from": "ui:Collapsible",
       "to": "ui:Button",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Collapsible:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Collapsible",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21868,13 +21501,6 @@
       "type": "related",
       "from": "ui:ColorPicker",
       "to": "ui:Popover",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Combobox:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Combobox",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21903,13 +21529,6 @@
       "type": "related",
       "from": "ui:CommandPalette",
       "to": "ui:Hotkey",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ContextMenu:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ContextMenu",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -21948,13 +21567,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:DataGrid:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DataGrid",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:DataGrid:ui:Container:combines_with",
       "type": "related",
       "from": "ui:DataGrid",
@@ -21976,13 +21588,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:DatePicker:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DatePicker",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:DatePicker:ui:Field:combines_with",
       "type": "related",
       "from": "ui:DatePicker",
@@ -21994,13 +21599,6 @@
       "type": "related",
       "from": "ui:DatePicker",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:DateRangePicker:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DateRangePicker",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22039,13 +21637,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:DescriptionList:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DescriptionList",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Dialog:ui:Button:combines_with",
       "type": "related",
       "from": "ui:Dialog",
@@ -22057,13 +21648,6 @@
       "type": "related",
       "from": "ui:Dialog",
       "to": "ui:Field",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:DragAndDrop:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DragAndDrop",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22102,24 +21686,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:DropdownMenu:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:DropdownMenu",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:DropdownMenu:ui:Table:combines_with",
       "type": "related",
       "from": "ui:DropdownMenu",
       "to": "ui:Table",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Field:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Field",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22158,13 +21728,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Fieldset:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Fieldset",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Fieldset:ui:Field:combines_with",
       "type": "related",
       "from": "ui:Fieldset",
@@ -22183,13 +21746,6 @@
       "type": "related",
       "from": "ui:FileSelect",
       "to": "ui:Button",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:FileSelect:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:FileSelect",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22214,24 +21770,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:FileUpload:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:FileUpload",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:FileUpload:ui:Progress:combines_with",
       "type": "related",
       "from": "ui:FileUpload",
       "to": "ui:Progress",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:FlipCard:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:FlipCard",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22312,13 +21854,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Gauge:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Gauge",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Gauge:ui:Text:combines_with",
       "type": "related",
       "from": "ui:Gauge",
@@ -22333,13 +21868,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Glow:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Glow",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:GodRays:ui:Aurora:combines_with",
       "type": "related",
       "from": "ui:GodRays",
@@ -22351,13 +21879,6 @@
       "type": "related",
       "from": "ui:GodRays",
       "to": "ui:Noise",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Heading:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Heading",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22410,24 +21931,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Image:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Image",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Image:ui:Carousel:combines_with",
       "type": "related",
       "from": "ui:Image",
       "to": "ui:Carousel",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ImageComparison:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ImageComparison",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22571,13 +22078,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:List:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:List",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:List:ui:ScrollArea:combines_with",
       "type": "related",
       "from": "ui:List",
@@ -22599,24 +22099,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Map:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Map",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Map:ui:Popover:combines_with",
       "type": "related",
       "from": "ui:Map",
       "to": "ui:Popover",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:MarkdownRenderer:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:MarkdownRenderer",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22690,13 +22176,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:NavigationMenu:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:NavigationMenu",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:NavigationMenu:ui:Link:combines_with",
       "type": "related",
       "from": "ui:NavigationMenu",
@@ -22708,13 +22187,6 @@
       "type": "related",
       "from": "ui:Noise",
       "to": "ui:Aurora",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Noise:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Noise",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22795,13 +22267,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:PinInput:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:PinInput",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:PinInput:ui:Field:combines_with",
       "type": "related",
       "from": "ui:PinInput",
@@ -22844,24 +22309,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Progress:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Progress",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Progress:ui:Text:combines_with",
       "type": "related",
       "from": "ui:Progress",
       "to": "ui:Text",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ProgressRing:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ProgressRing",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22872,31 +22323,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:PromptInput:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:PromptInput",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:PromptInput:ui:ChatThread:combines_with",
       "type": "related",
       "from": "ui:PromptInput",
       "to": "ui:ChatThread",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:QRCode:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:QRCode",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:RadioGroup:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:RadioGroup",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22911,20 +22341,6 @@
       "type": "related",
       "from": "ui:RadioGroup",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:RangeCalendar:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:RangeCalendar",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Rating:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Rating",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22963,24 +22379,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Reveal:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Reveal",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Reveal:ui:Text:combines_with",
       "type": "related",
       "from": "ui:Reveal",
       "to": "ui:Text",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:RichTextEditor:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:RichTextEditor",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -22995,13 +22397,6 @@
       "type": "related",
       "from": "ui:RichTextEditor",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ScrollArea:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ScrollArea",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23026,24 +22421,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:SegmentedControl:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:SegmentedControl",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:SegmentedControl:ui:Toolbar:combines_with",
       "type": "related",
       "from": "ui:SegmentedControl",
       "to": "ui:Toolbar",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Select:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Select",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23058,20 +22439,6 @@
       "type": "related",
       "from": "ui:Select",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Separator:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Separator",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Skeleton:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Skeleton",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23103,13 +22470,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Sparkline:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Sparkline",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Sparkline:ui:Table:combines_with",
       "type": "related",
       "from": "ui:Sparkline",
@@ -23131,31 +22491,10 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Spinner:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Spinner",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Splitter:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Splitter",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Splitter:ui:ScrollArea:combines_with",
       "type": "related",
       "from": "ui:Splitter",
       "to": "ui:ScrollArea",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Spotlight:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Spotlight",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23170,13 +22509,6 @@
       "type": "related",
       "from": "ui:Stepper",
       "to": "ui:Button",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Stepper:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Stepper",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23222,13 +22554,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Tabs:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Tabs",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Tabs:ui:Container:combines_with",
       "type": "related",
       "from": "ui:Tabs",
@@ -23247,13 +22572,6 @@
       "type": "related",
       "from": "ui:TagsInput",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Text:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Text",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23334,13 +22652,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Timeline:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Timeline",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Timeline:ui:Text:combines_with",
       "type": "related",
       "from": "ui:Timeline",
@@ -23387,13 +22698,6 @@
       "type": "related",
       "from": "ui:Toggle",
       "to": "ui:Toolbar",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:ToggleGroup:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:ToggleGroup",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23474,13 +22778,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Transfer:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Transfer",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Transfer:ui:Field:combines_with",
       "type": "related",
       "from": "ui:Transfer",
@@ -23492,13 +22789,6 @@
       "type": "related",
       "from": "ui:Transfer",
       "to": "ui:Label",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:Tree:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Tree",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23530,13 +22820,6 @@
       "label": "combines_with"
     },
     {
-      "id": "related:ui:Typography:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:Typography",
-      "to": "ui:Card",
-      "label": "combines_with"
-    },
-    {
       "id": "related:ui:Typography:ui:Container:combines_with",
       "type": "related",
       "from": "ui:Typography",
@@ -23548,13 +22831,6 @@
       "type": "related",
       "from": "ui:VideoEmbed",
       "to": "ui:AspectRatio",
-      "label": "combines_with"
-    },
-    {
-      "id": "related:ui:VideoEmbed:ui:Card:combines_with",
-      "type": "related",
-      "from": "ui:VideoEmbed",
-      "to": "ui:Card",
       "label": "combines_with"
     },
     {
@@ -23674,12 +22950,6 @@
       "type": "wraps",
       "from": "ui:Calendar",
       "to": "primitives:Calendar"
-    },
-    {
-      "id": "wraps:ui:Card:primitives:Card:",
-      "type": "wraps",
-      "from": "ui:Card",
-      "to": "primitives:Card"
     },
     {
       "id": "wraps:ui:Carousel:primitives:Carousel:",
@@ -24499,13 +23769,6 @@
       "component": "Calendar",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/primitives/src/calendar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Card",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/card/index.ts"
     },
     {
       "kind": "missing-subpath-export",
@@ -25518,13 +24781,6 @@
     {
       "kind": "missing-subpath-export",
       "package": "ui",
-      "component": "Card",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
       "component": "Carousel",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/carousel/index.ts"
@@ -26525,7 +25781,7 @@
     "docsNavOrphan": []
   },
   "mermaid": {
-    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 145\"]\n  u_wrap[\"UI wrappers: 131\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
+    "packageOverview": "flowchart LR\n  p_root[\"Primitives root: 144\"]\n  u_wrap[\"UI wrappers: 130\"]\n  u_comp[\"UI composites: 22\"]\n  audit[\"Audit clusters: 0\"]\n  p_root -->|wraps| u_wrap\n  u_wrap -->|feeds| u_comp\n  audit -->|highlights duplication in| u_comp\n  audit -->|highlights duplication in| u_wrap",
     "clusterOverview": "flowchart TB"
   }
 }

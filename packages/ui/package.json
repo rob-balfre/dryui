@@ -110,11 +110,6 @@
       "svelte": "./src/calendar/index.ts",
       "default": "./src/calendar/index.ts"
     },
-    "./card": {
-      "types": "./src/card/index.ts",
-      "svelte": "./src/card/index.ts",
-      "default": "./src/card/index.ts"
-    },
     "./carousel": {
       "types": "./src/carousel/index.ts",
       "svelte": "./src/carousel/index.ts",
@@ -903,11 +898,6 @@
         "types": "./dist/calendar/index.d.ts",
         "svelte": "./dist/calendar/index.js",
         "default": "./dist/calendar/index.js"
-      },
-      "./card": {
-        "types": "./dist/card/index.d.ts",
-        "svelte": "./dist/card/index.js",
-        "default": "./dist/card/index.js"
       },
       "./carousel": {
         "types": "./dist/carousel/index.d.ts",

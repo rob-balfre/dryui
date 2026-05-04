@@ -4,14 +4,6 @@ export type { ButtonProps } from './button/index.js';
 export { Input } from './input/index.js';
 export type { InputProps } from './input/index.js';
 
-export { Card } from './card/index.js';
-export type {
-	CardRootProps,
-	CardHeaderProps,
-	CardContentProps,
-	CardFooterProps
-} from './card/index.js';
-
 export { Dialog } from './dialog/index.js';
 export type {
 	DialogRootProps,

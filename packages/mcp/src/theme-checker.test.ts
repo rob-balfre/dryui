@@ -4,13 +4,13 @@ import { THEME_TOKEN_NAME_SET } from './theme-tokens.js';
 
 const mockSpec = {
 	components: {
-		Card: {
+		Tabs: {
 			cssVars: {
-				'--dry-card-bg': 'var(--dry-color-bg-raised)',
-				'--dry-card-border': 'var(--dry-color-stroke-weak)',
-				'--dry-card-radius': 'var(--dry-radius-lg)',
-				'--dry-card-shadow': 'var(--dry-shadow-raised)',
-				'--dry-card-padding': 'var(--dry-space-6)'
+				'--dry-tabs-bg': 'var(--dry-color-bg-raised)',
+				'--dry-tabs-border': 'var(--dry-color-stroke-weak)',
+				'--dry-tabs-radius': 'var(--dry-radius-lg)',
+				'--dry-tabs-shadow': 'var(--dry-shadow-raised)',
+				'--dry-tabs-padding': 'var(--dry-space-6)'
 			}
 		},
 		Button: {
@@ -467,39 +467,39 @@ describe('Var with fallback', () => {
 });
 
 describe('Component tokens', () => {
-	test('--dry-card-bg: transparent → warning transparent-component-bg', () => {
-		const css = `:root { --dry-card-bg: transparent; }`;
+	test('--dry-tabs-bg: transparent → warning transparent-component-bg', () => {
+		const css = `:root { --dry-tabs-bg: transparent; }`;
 		const result = diagnoseTheme(css, mockSpec);
 		expect(
 			result.issues.some(
 				(i) =>
 					i.code === 'transparent-component-bg' &&
 					i.severity === 'warning' &&
-					i.variable === '--dry-card-bg'
+					i.variable === '--dry-tabs-bg'
 			)
 		).toBe(true);
 	});
 
-	test('--dry-card-foo: red → warning unknown-component-token', () => {
-		const css = `:root { --dry-card-foo: red; }`;
+	test('--dry-tabs-foo: red → warning unknown-component-token', () => {
+		const css = `:root { --dry-tabs-foo: red; }`;
 		const result = diagnoseTheme(css, mockSpec);
 		expect(
 			result.issues.some(
 				(i) =>
 					i.code === 'unknown-component-token' &&
 					i.severity === 'warning' &&
-					i.variable === '--dry-card-foo'
+					i.variable === '--dry-tabs-foo'
 			)
 		).toBe(true);
 	});
 
-	test('--dry-card-bg: #1e293b → no warning', () => {
-		const css = `:root { --dry-card-bg: #1e293b; }`;
+	test('--dry-tabs-bg: #1e293b → no warning', () => {
+		const css = `:root { --dry-tabs-bg: #1e293b; }`;
 		const result = diagnoseTheme(css, mockSpec);
 		expect(
 			result.issues.some(
 				(i) =>
-					i.variable === '--dry-card-bg' &&
+					i.variable === '--dry-tabs-bg' &&
 					(i.code === 'transparent-component-bg' || i.code === 'unknown-component-token')
 			)
 		).toBe(false);

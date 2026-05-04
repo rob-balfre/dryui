@@ -12,14 +12,14 @@ const mockSpec = {
 		dark: '@dryui/ui/themes/dark.css'
 	},
 	components: {
-		Card: {
+		Tabs: {
 			compound: true,
 			parts: {
-				Root: { props: { as: { type: "'div' | 'button' | 'a'", required: false } } },
+				Root: { props: { value: { type: 'string', required: false } } },
 				Content: { props: {} }
 			},
 			cssVars: {
-				'--dry-card-bg': 'Card background'
+				'--dry-tabs-bg': 'Tabs background'
 			}
 		},
 		Avatar: {
@@ -67,12 +67,12 @@ describe('scanWorkspace', () => {
 			].join('\n'),
 			'src/routes/+page.svelte': [
 				'<script lang="ts">',
-				"  import { Card } from '@dryui/ui';",
+				"  import { Tabs } from '@dryui/ui';",
 				'</script>',
 				'',
-				'<Card>',
-				'  <Card.Content>Body</Card.Content>',
-				'</Card>'
+				'<Tabs>',
+				'  <Tabs.Content value="one">Body</Tabs.Content>',
+				'</Tabs>'
 			].join('\n'),
 			'src/app.css': ':root { --dry-color-bg-base: 4px; }'
 		});

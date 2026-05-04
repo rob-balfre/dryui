@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { untrack, type Snippet } from 'svelte';
-	import { Card, Checkbox, Heading, Input, Select, Text } from '@dryui/ui';
+	import { Checkbox, Heading, Input, Select, Text } from '@dryui/ui';
 	import { componentLinkResolver } from '$lib/component-links';
 	import {
 		createConfiguratorState,
@@ -31,113 +31,111 @@
 </script>
 
 <div class="configurator-card">
-	<Card.Root>
-		<Card.Header>
-			<div class="header-stack">
-				<Heading level={3}>{title}</Heading>
-				<Text color="secondary">{description}</Text>
-			</div>
-		</Card.Header>
+	<header class="configurator-header">
+		<div class="header-stack">
+			<Heading level={3}>{title}</Heading>
+			<Text color="secondary">{description}</Text>
+		</div>
+	</header>
 
-		<Card.Content>
-			<div class="configurator-grid">
-				<aside class="controls-panel" aria-label={`${title} controls`}>
-					<div class="controls-stack">
-						{#each controls as control (control.key)}
-							{#if control.type === 'boolean'}
-								<div class="control-group">
-									<Checkbox
-										size="sm"
-										bind:checked={
-											() => Boolean(values[control.key]), (next) => updateValue(control.key, next)
+	<div class="configurator-body">
+		<div class="configurator-grid">
+			<aside class="controls-panel" aria-label={`${title} controls`}>
+				<div class="controls-stack">
+					{#each controls as control (control.key)}
+						{#if control.type === 'boolean'}
+							<div class="control-group">
+								<Checkbox
+									size="sm"
+									bind:checked={
+										() => Boolean(values[control.key]), (next) => updateValue(control.key, next)
+									}
+								>
+									{control.label}
+								</Checkbox>
+								{#if control.description}
+									<div class="control-description">
+										<Text size="sm" color="secondary">{control.description}</Text>
+									</div>
+								{/if}
+							</div>
+						{:else}
+							<div class="control-group">
+								<span class="control-label">{control.label}</span>
+								{#if control.description}
+									<div class="control-description">
+										<Text size="sm" color="secondary">{control.description}</Text>
+									</div>
+								{/if}
+
+								{#if control.type === 'select'}
+									<Select.Root
+										bind:value={
+											() => String(values[control.key]), (next) => updateValue(control.key, next)
 										}
+										name={control.key}
 									>
-										{control.label}
-									</Checkbox>
-									{#if control.description}
-										<div class="control-description">
-											<Text size="sm" color="secondary">{control.description}</Text>
-										</div>
-									{/if}
-								</div>
-							{:else}
-								<div class="control-group">
-									<span class="control-label">{control.label}</span>
-									{#if control.description}
-										<div class="control-description">
-											<Text size="sm" color="secondary">{control.description}</Text>
-										</div>
-									{/if}
+										<Select.Trigger size="sm" aria-label={control.label}>
+											<Select.Value />
+										</Select.Trigger>
+										<Select.Content>
+											{#each control.options as option (option.value)}
+												<Select.Item value={option.value}>{option.label}</Select.Item>
+											{/each}
+										</Select.Content>
+									</Select.Root>
+								{:else if control.type === 'number'}
+									<Input
+										size="sm"
+										type="number"
+										min={control.min}
+										max={control.max}
+										step={control.step ?? 1}
+										aria-label={control.label}
+										bind:value={
+											() => String(values[control.key]),
+											(next) =>
+												updateValue(
+													control.key,
+													Number.isNaN(typeof next === 'number' ? next : Number(next))
+														? 0
+														: typeof next === 'number'
+															? next
+															: Number(next)
+												)
+										}
+									/>
+								{:else}
+									<Input
+										size="sm"
+										type="text"
+										placeholder={control.placeholder}
+										aria-label={control.label}
+										bind:value={
+											() => String(values[control.key]), (next) => updateValue(control.key, next)
+										}
+									/>
+								{/if}
+							</div>
+						{/if}
+					{/each}
+				</div>
+			</aside>
 
-									{#if control.type === 'select'}
-										<Select.Root
-											bind:value={
-												() => String(values[control.key]), (next) => updateValue(control.key, next)
-											}
-											name={control.key}
-										>
-											<Select.Trigger size="sm" aria-label={control.label}>
-												<Select.Value />
-											</Select.Trigger>
-											<Select.Content>
-												{#each control.options as option (option.value)}
-													<Select.Item value={option.value}>{option.label}</Select.Item>
-												{/each}
-											</Select.Content>
-										</Select.Root>
-									{:else if control.type === 'number'}
-										<Input
-											size="sm"
-											type="number"
-											min={control.min}
-											max={control.max}
-											step={control.step ?? 1}
-											aria-label={control.label}
-											bind:value={
-												() => String(values[control.key]),
-												(next) =>
-													updateValue(
-														control.key,
-														Number.isNaN(typeof next === 'number' ? next : Number(next))
-															? 0
-															: typeof next === 'number'
-																? next
-																: Number(next)
-													)
-											}
-										/>
-									{:else}
-										<Input
-											size="sm"
-											type="text"
-											placeholder={control.placeholder}
-											aria-label={control.label}
-											bind:value={
-												() => String(values[control.key]), (next) => updateValue(control.key, next)
-											}
-										/>
-									{/if}
-								</div>
-							{/if}
-						{/each}
-					</div>
-				</aside>
+			<DocsPreviewFrame padding="none">
+				<div class="preview-panel">
+					{@render preview(values)}
+				</div>
+			</DocsPreviewFrame>
+		</div>
 
-				<DocsPreviewFrame padding="none">
-					<div class="preview-panel">
-						{@render preview(values)}
-					</div>
-				</DocsPreviewFrame>
-			</div>
-
-			<DocsCodeDisclosure
-				code={generatedCode}
-				language="svelte"
-				label="Show generated code"
-				linkResolver={componentLinkResolver}
-			/>
-		</Card.Content>
-	</Card.Root>
+		<DocsCodeDisclosure
+			code={generatedCode}
+			language="svelte"
+			label="Show generated code"
+			linkResolver={componentLinkResolver}
+		/>
+	</div>
 </div>
 
 <style>
@@ -173,6 +171,18 @@
 
 	.configurator-card {
 		overflow: hidden;
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
+	}
+
+	.configurator-header {
+		padding: var(--dry-padding-card);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.configurator-body {
+		padding: var(--dry-padding-card);
 	}
 
 	.controls-panel {

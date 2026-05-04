@@ -63,7 +63,7 @@
 	[data-select-trigger] {
 		/* Form-control surface. Derives from the shared --dry-form-control-*
 		   family so the trigger always matches a sibling <Input>, regardless
-		   of ambient --dry-btn-* overrides (e.g. Card's nested radius). */
+		   of ambient --dry-btn-* overrides from a surrounding container's nested radius. */
 		--_st-bg: var(--dry-select-trigger-bg, var(--dry-form-control-bg));
 		--_st-border: var(--dry-select-trigger-border, var(--dry-form-control-border));
 		--_st-color: var(--dry-select-trigger-color, var(--dry-form-control-color));

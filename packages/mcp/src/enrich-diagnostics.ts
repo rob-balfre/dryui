@@ -131,6 +131,10 @@ const HINTS: Record<string, HintBuilder> = {
 		hint: 'Import ../layout.css from src/routes/+layout.svelte after DryUI theme CSS and ../app.css so layout hooks load last.',
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
+	'lint/project/stale-claude-agent': () => ({
+		hint: 'Refresh copied Claude subagents from the current DryUI source by running `dryui setup --sync-agents` from the project root, then rerun check. Stale prompts can make agents use removed APIs such as AreaGrid.',
+		docsRef: `${DOCS_BASE}/getting-started#agent-setup`
+	}),
 
 	// ── theme-checker codes ───────────────────────────────────────────────────
 	'theme/missing-token': (ctx) => ({

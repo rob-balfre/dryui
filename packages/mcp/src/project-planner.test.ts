@@ -12,9 +12,10 @@ const mockSpec: ProjectPlannerSpec = {
 		dark: '@dryui/ui/themes/dark.css'
 	},
 	components: {
-		Card: {
+		Tabs: {
 			import: '@dryui/ui',
-			example: '<Card.Root>\n  <Card.Content>Body</Card.Content>\n</Card.Root>'
+			example:
+				'<Tabs.Root value="one">\n  <Tabs.Content value="one">Body</Tabs.Content>\n</Tabs.Root>'
 		}
 	}
 };
@@ -98,6 +99,33 @@ describe('detectProject', () => {
 		expect(result.files.viteConfig).toBe(resolve(root, 'vite.config.ts'));
 		expect(result.files.rootPage).toBe(resolve(root, 'src/routes/+page.svelte'));
 		expect(result.files.layoutCss).toBe(resolve(root, 'src/layout.css'));
+	});
+
+	test('warns when copied Claude agents are stale', () => {
+		const root = createProject({
+			'package.json': JSON.stringify({
+				dependencies: {
+					'@sveltejs/kit': '^2.0.0',
+					svelte: '^5.0.0',
+					'@dryui/ui': 'workspace:*'
+				}
+			}),
+			'.claude/agents/dryui-layout.md': [
+				'---',
+				'name: dryui-layout',
+				'---',
+				'Use AreaGrid.Root and read packages/ui/skills/dryui-layout/SKILL.md.'
+			].join('\n')
+		});
+
+		const result = detectProject(mockSpec, root);
+
+		expect(result.warnings.some((warning) => warning.includes('Stale DryUI Claude agent'))).toBe(
+			true
+		);
+		expect(result.warnings.some((warning) => warning.includes('dryui setup --sync-agents'))).toBe(
+			true
+		);
 	});
 
 	test('detects @dryui/feedback dependency and a mounted <Feedback /> in the root layout', () => {
@@ -610,7 +638,7 @@ describe('planInstall', () => {
 
 		expect(layoutCssStep?.kind).toBe('create-file');
 		expect(layoutStep?.snippet).toContain("import '../layout.css';");
-		expect(pageStep?.snippet).toContain("import { Card, Heading, Text } from '@dryui/ui';");
+		expect(pageStep?.snippet).toContain("import { Heading, Text } from '@dryui/ui';");
 		expect(pageStep?.snippet).toContain('data-layout="starter"');
 		expect(layoutCssStep?.snippet).toContain("[data-layout='starter']");
 		expect(layoutCssStep?.snippet).toContain('grid-template-columns');
@@ -714,10 +742,10 @@ describe('planAdd', () => {
 			'src/routes/+page.svelte': '<h1>Home</h1>'
 		});
 
-		const plan = planAdd(mockSpec, 'Card', { cwd: root, subpath: true });
+		const plan = planAdd(mockSpec, 'Tabs', { cwd: root, subpath: true });
 
 		expect(plan.targetType).toBe('component');
-		expect(plan.importStatement).toBe("import { Card } from '@dryui/ui/card';");
+		expect(plan.importStatement).toBe("import { Tabs } from '@dryui/ui/tabs';");
 		expect(plan.target).toBe(resolve(root, 'src/routes/+page.svelte'));
 		expect(plan.steps.at(-1)?.kind).toBe('edit-file');
 	});

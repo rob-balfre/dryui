@@ -254,7 +254,7 @@ export const RULE_CATALOG = {
 		id: 'interactive-card-wrapper',
 		severity: 'warning',
 		message:
-			'Wrapper elements around <Card.Root as="button"> or <Card.Root as="a"> should use display: grid or be removed. Plain block wrappers can collapse interactive cards to 0px width in grid/list layouts.',
+			'Wrapper elements around interactive surfaces (raw <button> or <a> styled as cards) should use display: grid or be removed. Plain block wrappers can collapse interactive surfaces to 0px width in grid/list layouts.',
 		suggestedFix: 'display: grid'
 	},
 	'hardcoded-color': {

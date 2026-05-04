@@ -118,7 +118,7 @@ describe('dryuiLint preprocessor', () => {
 		pp.markup!({
 			content: `<main data-layout="starter">
   <section data-layout-area="intro">
-    <Card.Root><Card.Content>Ready</Card.Content></Card.Root>
+    <Tabs.Root><Tabs.Content value="one">Ready</Tabs.Content></Tabs.Root>
   </section>
 </main>`,
 			filename: 'src/routes/+page.svelte'
@@ -261,7 +261,7 @@ describe('dryuiLint preprocessor', () => {
 			pp.markup!({
 				content: `<main data-layout="starter">
   <section data-layout-area="intro">
-    <Card.Root><Card.Content>Ready</Card.Content></Card.Root>
+    <Tabs.Root><Tabs.Content value="one">Ready</Tabs.Content></Tabs.Root>
   </section>
 </main>`,
 				filename: 'src/routes/+page.svelte'

@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
 	import { Badge } from '@dryui/ui/badge';
-	import { Card } from '@dryui/ui/card';
 	import { CodeBlock } from '@dryui/ui/code-block';
 	import { Container } from '@dryui/ui/container';
 	import { Heading } from '@dryui/ui/heading';
@@ -46,17 +45,15 @@
 
 				<div class="stack-lg">
 					{#if data.kind === 'primitive'}
-						<Card.Root>
-							<Card.Content>
-								<div class="stack-sm">
-									<Badge variant="outline" color="gray">Primitive</Badge>
-									<Text color="secondary">
-										This page documents the headless layer in <code>@dryui/primitives</code>. Any
-										structural styling shown in examples is docs-only.
-									</Text>
-								</div>
-							</Card.Content>
-						</Card.Root>
+						<aside class="primitive-callout">
+							<div class="stack-sm">
+								<Badge variant="outline" color="gray">Primitive</Badge>
+								<Text color="secondary">
+									This page documents the headless layer in <code>@dryui/primitives</code>. Any
+									structural styling shown in examples is docs-only.
+								</Text>
+							</div>
+						</aside>
 					{/if}
 
 					{#if a11yNotes.length > 0}
@@ -69,8 +66,8 @@
 						</DocsCallout>
 					{/if}
 
-					<Card.Root>
-						<Card.Header>
+					<div class="surface">
+						<header class="surface-header">
 							<div class="stack-sm">
 								<Heading level={3}
 									>{data.kind === 'primitive'
@@ -82,23 +79,23 @@
 									on screen.
 								</Text>
 							</div>
-						</Card.Header>
-						<Card.Content>
+						</header>
+						<div class="surface-content">
 							<CodeBlock
 								code={data.quickStartCode}
 								language="svelte"
 								showCopyButton={true}
 								linkResolver={componentLinkResolver}
 							/>
-						</Card.Content>
-					</Card.Root>
+						</div>
+					</div>
 
 					{#if data.kind === 'ui'}
-						<Card.Root>
-							<Card.Header>
+						<div class="surface">
+							<header class="surface-header">
 								<Heading level={3}>Import options</Heading>
-							</Card.Header>
-							<Card.Content>
+							</header>
+							<div class="surface-content">
 								<div class="stack-md">
 									<div>
 										<p class="import-label">Root package</p>
@@ -111,8 +108,8 @@
 										</div>
 									{/if}
 								</div>
-							</Card.Content>
-						</Card.Root>
+							</div>
+						</div>
 					{/if}
 				</div>
 			</div>
@@ -240,5 +237,28 @@
 		background: var(--dry-color-bg-base);
 		content-visibility: auto;
 		contain-intrinsic-size: 28rem;
+	}
+
+	.surface {
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
+		overflow: hidden;
+	}
+
+	.surface-header {
+		padding: var(--dry-padding-card);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.surface-content {
+		padding: var(--dry-padding-card);
+	}
+
+	.primitive-callout {
+		padding: var(--dry-padding-card);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
 	}
 </style>

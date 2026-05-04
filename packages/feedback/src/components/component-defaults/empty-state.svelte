@@ -1,15 +1,38 @@
 <script lang="ts">
-	import { Card, Button, Heading, Text } from '@dryui/ui';
+	import { Button, Heading, Text } from '@dryui/ui';
 </script>
 
-<Card.Root>
-	<Card.Header>
+<div class="empty-state">
+	<header class="empty-state-header">
 		<Heading level={3}>No projects yet</Heading>
-	</Card.Header>
-	<Card.Content>
+	</header>
+	<div class="empty-state-content">
 		<Text>Create your first project to start collaborating with your team.</Text>
-	</Card.Content>
-	<Card.Footer>
+	</div>
+	<footer class="empty-state-footer">
 		<Button>New project</Button>
-	</Card.Footer>
-</Card.Root>
+	</footer>
+</div>
+
+<style>
+	.empty-state {
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
+		overflow: hidden;
+	}
+
+	.empty-state-header {
+		padding: var(--dry-padding-card);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.empty-state-content {
+		padding: var(--dry-padding-card);
+	}
+
+	.empty-state-footer {
+		padding: var(--dry-padding-card);
+		border-top: 1px solid var(--dry-color-stroke-weak);
+	}
+</style>

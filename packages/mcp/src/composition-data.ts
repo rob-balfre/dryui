@@ -88,7 +88,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'DatePicker'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -109,7 +109,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	{
@@ -212,7 +212,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Select.Item'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	// ── Dialogs / Overlays ───────────────────────────────────────────────────
@@ -458,7 +458,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Image or Avatar'
 			}
 		],
-		combinesWith: ['Text', 'Card.Content', 'Table.Cell']
+		combinesWith: ['Text', 'Table.Cell']
 	},
 
 	// ── Progress / Steps ─────────────────────────────────────────────────────
@@ -514,7 +514,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Progress'
 			}
 		],
-		combinesWith: ['Card.Content', 'Button']
+		combinesWith: ['Button']
 	},
 
 	// ── Charts ───────────────────────────────────────────────────────────────
@@ -590,7 +590,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Chart'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	// ── Layout ───────────────────────────────────────────────────────────────
@@ -610,7 +610,7 @@ export const componentCompositions: ComponentComposition[] = [
 			{ pattern: '<hr>', reason: 'Native hr — no theming', fix: 'Separator' },
 			{ pattern: '<hr />', reason: 'Native hr — no theming', fix: 'Separator' }
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	// ── Forms ────────────────────────────────────────────────────────────────
@@ -672,7 +672,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: '<Field.Root><Label>Name</Label><Input /></Field.Root>'
 			}
 		],
-		combinesWith: ['Label', 'Input', 'Textarea', 'Select', 'Checkbox', 'Card.Content']
+		combinesWith: ['Label', 'Input', 'Textarea', 'Select', 'Checkbox']
 	},
 
 	{
@@ -832,7 +832,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'FileUpload'
 			}
 		],
-		combinesWith: ['Card.Content', 'Progress', 'Button']
+		combinesWith: ['Progress', 'Button']
 	},
 
 	{
@@ -872,7 +872,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'FileSelect'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content', 'Button']
+		combinesWith: ['Field.Root', 'Label', 'Button']
 	},
 
 	{
@@ -998,7 +998,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Tabs'
 			}
 		],
-		combinesWith: ['Card.Root', 'Container']
+		combinesWith: ['Container']
 	},
 
 	{
@@ -1127,7 +1127,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Alert or Toast'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	{
@@ -1154,7 +1154,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Badge'
 			}
 		],
-		combinesWith: ['Table.Cell', 'Card.Content', 'Avatar']
+		combinesWith: ['Table.Cell', 'Avatar']
 	},
 
 	{
@@ -1181,7 +1181,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Skeleton or Spinner'
 			}
 		],
-		combinesWith: ['Card.Content', 'Table.Cell']
+		combinesWith: ['Table.Cell']
 	},
 
 	// ── Motion / Ambient Surfaces ───────────────────────────────────────────
@@ -1197,9 +1197,7 @@ export const componentCompositions: ComponentComposition[] = [
 				useWhen:
 					'Section reveals, stat rows, or card sequences that should appear as the user scrolls',
 				snippet: `<Reveal variant="fade" once>
-  <Card.Root>
-    <Card.Content>Visible content</Card.Content>
-  </Card.Root>
+  <p>Visible content</p>
 </Reveal>`
 			},
 			{
@@ -1221,7 +1219,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Reveal'
 			}
 		],
-		combinesWith: ['Card', 'Text']
+		combinesWith: ['Text']
 	},
 
 	{
@@ -1234,18 +1232,14 @@ export const componentCompositions: ComponentComposition[] = [
 				component: 'Spotlight',
 				useWhen: 'Radial highlight or pointer-follow accent on interactive surfaces',
 				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-fill-brand)">
-  <Card.Root>
-    <Card.Content>Spotlight card</Card.Content>
-  </Card.Root>
+  <p>Spotlight card</p>
 </Spotlight>`
 			},
 			{
 				rank: 2,
 				component: 'Static accent background',
 				useWhen: 'Low-motion surfaces that should remain visually rich without pointer tracking',
-				snippet: `<Card.Root class="accent-surface">
-  <Card.Content>Static accent</Card.Content>
-</Card.Root>`
+				snippet: `<div class="accent-surface">Static accent</div>`
 			}
 		],
 		antiPatterns: [
@@ -1260,7 +1254,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Spotlight'
 			}
 		],
-		combinesWith: ['Card', 'Reveal']
+		combinesWith: ['Reveal']
 	},
 
 	{
@@ -1296,7 +1290,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Aurora'
 			}
 		],
-		combinesWith: ['Card', 'Container', 'Reveal', 'Text']
+		combinesWith: ['Container', 'Reveal', 'Text']
 	},
 
 	{
@@ -1329,7 +1323,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Noise'
 			}
 		],
-		combinesWith: ['Aurora', 'Card', 'Container', 'Reveal']
+		combinesWith: ['Aurora', 'Container', 'Reveal']
 	},
 
 	// ── Text / Typography ────────────────────────────────────────────────────
@@ -1372,7 +1366,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Heading'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	{
@@ -1420,7 +1414,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'CodeBlock'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	// ── Actions ──────────────────────────────────────────────────────────────
@@ -1478,7 +1472,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: '<Button color="ink">Download</Button>'
 			}
 		],
-		combinesWith: ['Card.Footer', 'Dialog.Footer']
+		combinesWith: ['Dialog.Footer']
 	},
 
 	{
@@ -1530,7 +1524,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Button', 'Table.Row', 'Card.Content']
+		combinesWith: ['Button', 'Table.Row']
 	},
 
 	// ── Interaction ──────────────────────────────────────────────────────────
@@ -1571,43 +1565,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Accordion or Collapsible'
 			}
 		],
-		combinesWith: ['Card.Content']
-	},
-
-	// ── Display ──────────────────────────────────────────────────────────────
-
-	{
-		component: 'Card',
-		useWhen: 'Group related content in a bordered container',
-		alternatives: [
-			{
-				rank: 1,
-				component: 'Card',
-				useWhen: 'Content container with optional header/footer',
-				snippet: `<Card.Root>
-  <Card.Header>Title</Card.Header>
-  <Card.Content>
-    <p>Card content</p>
-  </Card.Content>
-  <Card.Footer>
-    <Button>Action</Button>
-  </Card.Footer>
-</Card.Root>`
-			}
-		],
-		antiPatterns: [
-			{
-				pattern: 'div with border and padding',
-				reason: 'Card handles elevation, borders, and theme integration',
-				fix: 'Card'
-			},
-			{
-				pattern: '<Card> without .Root',
-				reason: 'Card is a compound component — use Card.Root',
-				fix: 'Card.Root'
-			}
-		],
-		combinesWith: ['Container', 'Badge', 'Text', 'subgrid aligned-card-list']
+		combinesWith: []
 	},
 
 	// ── Overlay / Dialog (missing) ──────────────────────────────────────────
@@ -1755,7 +1713,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ContextMenu'
 			}
 		],
-		combinesWith: ['Table.Row', 'Card.Root', 'Tree']
+		combinesWith: ['Table.Row', 'Tree']
 	},
 
 	{
@@ -2008,7 +1966,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Combobox'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2095,7 +2053,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'RadioGroup'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2138,7 +2096,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'SegmentedControl'
 			}
 		],
-		combinesWith: ['Card.Header', 'Toolbar']
+		combinesWith: ['Toolbar']
 	},
 
 	{
@@ -2258,7 +2216,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ToggleGroup'
 			}
 		],
-		combinesWith: ['Toolbar', 'Card.Header']
+		combinesWith: ['Toolbar']
 	},
 
 	{
@@ -2294,7 +2252,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Transfer'
 			}
 		],
-		combinesWith: ['Card.Content', 'Field.Root', 'Label']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2319,7 +2277,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'DragAndDrop'
 			}
 		],
-		combinesWith: ['List', 'Card.Content']
+		combinesWith: ['List']
 	},
 
 	// ── Form Inputs (missing) ──────────────────────────────────────────────
@@ -2441,7 +2399,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'PinInput'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2468,7 +2426,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'PromptInput'
 			}
 		],
-		combinesWith: ['ChatThread', 'Card.Content']
+		combinesWith: ['ChatThread']
 	},
 
 	{
@@ -2501,7 +2459,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'RichTextEditor'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2534,7 +2492,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Rating'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Text', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label', 'Text']
 	},
 
 	{
@@ -2605,7 +2563,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'DateRangePicker'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2665,7 +2623,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	// ── Form Structure (missing) ───────────────────────────────────────────
@@ -2704,12 +2662,12 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Fieldset'
 			},
 			{
-				pattern: 'Card.Root to group form fields',
+				pattern: '<div> wrapper to group form fields',
 				reason: 'Fieldset is semantically correct for form grouping with <legend>',
 				fix: 'Fieldset'
 			}
 		],
-		combinesWith: ['Field.Root', 'Label', 'Card.Content']
+		combinesWith: ['Field.Root', 'Label']
 	},
 
 	{
@@ -2785,7 +2743,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'AspectRatio'
 			}
 		],
-		combinesWith: ['Image', 'VideoEmbed', 'Card.Content']
+		combinesWith: ['Image', 'VideoEmbed']
 	},
 
 	{
@@ -2808,7 +2766,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ScrollArea'
 			}
 		],
-		combinesWith: ['List', 'Card.Content', 'Sidebar']
+		combinesWith: ['List', 'Sidebar']
 	},
 
 	{
@@ -2854,7 +2812,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Splitter'
 			}
 		],
-		combinesWith: ['Card.Content', 'ScrollArea']
+		combinesWith: ['ScrollArea']
 	},
 
 	// ── Navigation (missing) ──────────────────────────────────────────────
@@ -2906,7 +2864,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'NavigationMenu'
 			}
 		],
-		combinesWith: ['Link', 'Card']
+		combinesWith: ['Link']
 	},
 
 	{
@@ -3135,7 +3093,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Chip'
 			}
 		],
-		combinesWith: ['ChipGroup', 'Card.Content']
+		combinesWith: ['ChipGroup']
 	},
 
 	{
@@ -3198,7 +3156,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ChipGroup.Root'
 			}
 		],
-		combinesWith: ['Badge', 'Chip', 'Tag', 'Card.Content']
+		combinesWith: ['Badge', 'Chip', 'Tag']
 	},
 
 	{
@@ -3301,7 +3259,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Image'
 			}
 		],
-		combinesWith: ['AspectRatio', 'Card.Content', 'Carousel']
+		combinesWith: ['AspectRatio', 'Carousel']
 	},
 
 	{
@@ -3341,7 +3299,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Carousel'
 			}
 		],
-		combinesWith: ['Image', 'Card', 'AspectRatio']
+		combinesWith: ['Image', 'AspectRatio']
 	},
 
 	{
@@ -3388,7 +3346,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'DataGrid'
 			}
 		],
-		combinesWith: ['Card.Content', 'Badge', 'Avatar', 'Button', 'Container']
+		combinesWith: ['Badge', 'Avatar', 'Button', 'Container']
 	},
 
 	{
@@ -3424,7 +3382,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'DescriptionList'
 			}
 		],
-		combinesWith: ['Card.Content', 'Badge']
+		combinesWith: ['Badge']
 	},
 
 	{
@@ -3459,7 +3417,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'List'
 			}
 		],
-		combinesWith: ['Card.Content', 'ScrollArea', 'Avatar']
+		combinesWith: ['ScrollArea', 'Avatar']
 	},
 
 	{
@@ -3499,7 +3457,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Timeline'
 			}
 		],
-		combinesWith: ['Card.Content', 'Avatar', 'Badge', 'Text']
+		combinesWith: ['Avatar', 'Badge', 'Text']
 	},
 
 	{
@@ -3539,7 +3497,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Tree'
 			}
 		],
-		combinesWith: ['Sidebar', 'ScrollArea', 'Card.Content', 'Checkbox']
+		combinesWith: ['Sidebar', 'ScrollArea', 'Checkbox']
 	},
 
 	{
@@ -3579,12 +3537,12 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Collapsible'
 			}
 		],
-		combinesWith: ['Card.Content', 'Button']
+		combinesWith: ['Button']
 	},
 
 	{
 		component: 'FlipCard',
-		useWhen: 'Card with front and back faces that flips on interaction',
+		useWhen: 'Surface with front and back faces that flips on interaction',
 		alternatives: [
 			{
 				rank: 1,
@@ -3603,7 +3561,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'FlipCard'
 			}
 		],
-		combinesWith: ['Card', 'Image']
+		combinesWith: ['Image']
 	},
 
 	{
@@ -3624,7 +3582,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ImageComparison'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	{
@@ -3668,7 +3626,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'QRCode'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	{
@@ -3689,7 +3647,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'VideoEmbed'
 			}
 		],
-		combinesWith: ['AspectRatio', 'Card.Content']
+		combinesWith: ['AspectRatio']
 	},
 
 	{
@@ -3708,7 +3666,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Card.Content', 'Popover']
+		combinesWith: ['Popover']
 	},
 
 	{
@@ -3733,7 +3691,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Table.Cell', 'Card.Content']
+		combinesWith: ['Table.Cell']
 	},
 
 	{
@@ -3760,7 +3718,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Card.Content', 'Text']
+		combinesWith: ['Text']
 	},
 
 	{
@@ -3863,7 +3821,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'ChatThread'
 			}
 		],
-		combinesWith: ['PromptInput', 'TypingIndicator', 'Card']
+		combinesWith: ['PromptInput', 'TypingIndicator']
 	},
 
 	{
@@ -3905,7 +3863,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'MarkdownRenderer'
 			}
 		],
-		combinesWith: ['Card.Content']
+		combinesWith: []
 	},
 
 	// ── Feedback (missing) ────────────────────────────────────────────────
@@ -3945,7 +3903,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Progress'
 			}
 		],
-		combinesWith: ['Card.Content', 'Text']
+		combinesWith: ['Text']
 	},
 
 	{
@@ -3972,7 +3930,7 @@ export const componentCompositions: ComponentComposition[] = [
 			}
 		],
 		antiPatterns: [],
-		combinesWith: ['Card.Content', 'Text']
+		combinesWith: ['Text']
 	},
 
 	{
@@ -4005,7 +3963,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Spinner'
 			}
 		],
-		combinesWith: ['Button', 'Card.Content', 'Backdrop']
+		combinesWith: ['Button', 'Backdrop']
 	},
 
 	// ── Text / Typography (missing) ───────────────────────────────────────
@@ -4041,7 +3999,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: '<Heading maxMeasure="narrow">…</Heading>'
 			}
 		],
-		combinesWith: ['Card.Header']
+		combinesWith: []
 	},
 
 	{
@@ -4077,7 +4035,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Typography'
 			}
 		],
-		combinesWith: ['Card.Content', 'Container']
+		combinesWith: ['Container']
 	},
 
 	{
@@ -4287,9 +4245,7 @@ export const componentCompositions: ComponentComposition[] = [
 				component: 'Glow',
 				useWhen: 'Static luminous accent on cards, buttons, or hero elements',
 				snippet: `<Glow color="var(--dry-color-fill-brand)" intensity={0.6} radius={80}>
-  <Card.Root>
-    <Card.Content>Glowing card</Card.Content>
-  </Card.Root>
+  <p>Glowing card</p>
 </Glow>`
 			},
 			{
@@ -4297,9 +4253,7 @@ export const componentCompositions: ComponentComposition[] = [
 				component: 'Spotlight',
 				useWhen: 'Pointer-reactive lighting instead of a static glow',
 				snippet: `<Spotlight radius={180} intensity={0.7} color="var(--dry-color-fill-brand)">
-  <Card.Root>
-    <Card.Content>Spotlight card</Card.Content>
-  </Card.Root>
+  <p>Spotlight card</p>
 </Spotlight>`
 			}
 		],
@@ -4315,7 +4269,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Remove overflow: hidden from the parent or restructure the layout'
 			}
 		],
-		combinesWith: ['Card', 'Aurora']
+		combinesWith: ['Aurora']
 	},
 
 	{
@@ -4364,9 +4318,7 @@ export const componentCompositions: ComponentComposition[] = [
 				component: 'Beam',
 				useWhen: 'Single sweeping highlight or shimmer line across a card or hero',
 				snippet: `<Beam color="rgba(255,255,255,0.15)" angle={-45} duration={2.4}>
-  <Card.Root>
-    <Card.Content>Beam card</Card.Content>
-  </Card.Root>
+  <p>Beam card</p>
 </Beam>`
 			},
 			{
@@ -4383,7 +4335,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Use different angles or replace with GodRays for a multi-ray effect'
 			}
 		],
-		combinesWith: ['Card', 'Aurora']
+		combinesWith: ['Aurora']
 	},
 
 	{
@@ -4412,7 +4364,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Limit to headings, images, or decorative surfaces'
 			}
 		],
-		combinesWith: ['Card']
+		combinesWith: []
 	},
 
 	{
@@ -4449,7 +4401,7 @@ export const componentCompositions: ComponentComposition[] = [
 				fix: 'Use Glass for backdrop blur; use Adjust only for brightness/contrast/saturate/hue tweaks'
 			}
 		],
-		combinesWith: ['Card', 'Aurora']
+		combinesWith: ['Aurora']
 	},
 
 	{
@@ -4802,7 +4754,7 @@ body {
 <div data-layout="page-shell">
   <header data-layout-area="masthead">App Name</header>
   <main data-layout-area="main">
-    <!-- Page content: Cards, forms, grids, etc. go here directly. -->
+    <!-- Page content: surfaces, forms, grids, etc. go here directly. -->
   </main>
 </div>
 
@@ -4839,7 +4791,7 @@ body {
 	{
 		name: 'centred-page',
 		description:
-			'Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no Card, no header, no borders or shadows.',
+			'Full-viewport centred page layout with zero visual decoration. Use data-layout hooks plus src/layout.css for landing pages, splash screens, onboarding flows, and error pages where whitespace and alignment communicate structure — no surface chrome, no header, no borders or shadows.',
 		tags: [
 			'page',
 			'centered',
@@ -4904,20 +4856,20 @@ body {
 		description:
 			'Sign-in/sign-up card with email/password fields, social login separator, and forgot-password link. Pattern-focused — show the structure, not hardcoded domain details.',
 		tags: ['auth', 'login', 'signup', 'form', 'card'],
-		components: ['Card', 'Field', 'Label', 'Input', 'Button', 'Separator', 'Text', 'Heading'],
+		components: ['Field', 'Label', 'Input', 'Button', 'Separator', 'Text', 'Heading'],
 		snippet: `<script>
-  import { Card, Field, Label, Input, Button, Separator, Text, Heading } from '@dryui/ui';
+  import { Field, Label, Input, Button, Separator, Text, Heading } from '@dryui/ui';
 
   let email = $state('');
   let password = $state('');
 </script>
 
-<Card.Root>
-  <Card.Header>
+<div class="surface">
+  <header class="surface-header">
     <Heading level={2}>Sign in</Heading>
     <Text color="muted" size="sm">Enter your credentials to continue</Text>
-  </Card.Header>
-  <Card.Content>
+  </header>
+  <div class="surface-content">
     <div class="auth-fields">
       <Field.Root>
         <Label>Email</Label>
@@ -4934,8 +4886,8 @@ body {
         <Button variant="link" href="/forgot-password">Forgot password?</Button>
       </Text>
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .auth-fields { display: grid; gap: var(--dry-space-4); }
@@ -4947,9 +4899,9 @@ body {
 		description:
 			'Zero-dependency hero background built from Aurora, Noise, Reveal, and a card stack. Motion, GSAP, Shaders.com, OGL, Three.js, PixiJS, Rive, and Lenis are reference points only; use this when the page needs atmosphere without installing a shader engine.',
 		tags: ['hero', 'background', 'aurora', 'noise', 'motion'],
-		components: ['Aurora', 'Noise', 'Reveal', 'Card', 'Container', 'Button'],
+		components: ['Aurora', 'Noise', 'Reveal', 'Container', 'Button'],
 		snippet: `<script>
-  import { Aurora, Noise, Reveal, Button, Card, Container, Text, Heading } from '@dryui/ui';
+  import { Aurora, Noise, Reveal, Button, Container, Text, Heading } from '@dryui/ui';
 </script>
 
 <Aurora palette={['#08111f', '#1d4ed8', '#14b8a6']} speed={0.8}>
@@ -4969,9 +4921,9 @@ body {
         </div>
       </Reveal>
       <Reveal variant="scale-in" delay={220}>
-        <Card.Root>
-          <Card.Content>Hero proof card</Card.Content>
-        </Card.Root>
+        <div class="surface">
+            Hero proof card
+        </div>
       </Reveal>
     </div>
   </Container>
@@ -4986,11 +4938,11 @@ body {
 	{
 		name: 'spotlight-card-grid',
 		description:
-			'Card grid with pointer-reactive highlights and staggered entrance reveals. Use for feature bento layouts that need depth without a graphics dependency.',
+			'Surface grid with pointer-reactive highlights and staggered entrance reveals. Use for feature bento layouts that need depth without a graphics dependency.',
 		tags: ['grid', 'cards', 'spotlight', 'motion', 'feature'],
-		components: ['Spotlight', 'Reveal', 'Card', 'Text'],
+		components: ['Spotlight', 'Reveal', 'Text'],
 		snippet: `<script>
-  import { Spotlight, Reveal, Card, Text } from '@dryui/ui';
+  import { Spotlight, Reveal, Text } from '@dryui/ui';
 
   const features = [
     { title: 'Fast', copy: 'Keeps motion browser-native.' },
@@ -5003,12 +4955,10 @@ body {
   {#each features as feature, index (feature.title)}
     <Reveal variant="fade" delay={index * 80}>
       <Spotlight radius={160} intensity={0.6} color="var(--dry-color-fill-brand)">
-        <Card.Root>
-          <Card.Content>
+        <div class="surface">
             <Text weight="bold">{feature.title}</Text>
             <Text as="p">{feature.copy}</Text>
-          </Card.Content>
-        </Card.Root>
+        </div>
       </Spotlight>
     </Reveal>
   {/each}
@@ -5024,9 +4974,9 @@ body {
 		description:
 			'A compact stats row that reveals metrics sequentially and keeps animation lightweight and deterministic.',
 		tags: ['stats', 'metrics', 'motion', 'reveal'],
-		components: ['Reveal', 'Card', 'Heading', 'Text'],
+		components: ['Reveal', 'Heading', 'Text'],
 		snippet: `<script>
-  import { Reveal, Card, Heading, Text } from '@dryui/ui';
+  import { Reveal, Heading, Text } from '@dryui/ui';
 
   const stats = [
     { value: '99.9%', label: 'uptime' },
@@ -5038,12 +4988,10 @@ body {
 <div class="stats-strip">
   {#each stats as stat, index (stat.label)}
     <Reveal variant="slide-up" delay={index * 90} once>
-      <Card.Root>
-        <Card.Content>
+      <div class="surface">
           <Heading level={3}>{stat.value}</Heading>
           <Text as="p">{stat.label}</Text>
-        </Card.Content>
-      </Card.Root>
+      </div>
     </Reveal>
   {/each}
 </div>
@@ -5058,9 +5006,9 @@ body {
 		description:
 			'Step-by-step feature narrative that uses reveals for pacing while staying content-first and dependency-free.',
 		tags: ['steps', 'narrative', 'feature', 'motion'],
-		components: ['Reveal', 'Card', 'Text'],
+		components: ['Reveal', 'Text'],
 		snippet: `<script>
-  import { Reveal, Card, Text } from '@dryui/ui';
+  import { Reveal, Text } from '@dryui/ui';
 
   const steps = [
     { title: 'Frame the claim', copy: 'Open with the user outcome.' },
@@ -5072,12 +5020,10 @@ body {
 <div class="feature-steps">
   {#each steps as step, index (step.title)}
     <Reveal variant="mask-up" delay={index * 100}>
-      <Card.Root>
-        <Card.Content>
+      <div class="surface">
           <Text weight="bold">{step.title}</Text>
           <Text as="p">{step.copy}</Text>
-        </Card.Content>
-      </Card.Root>
+      </div>
     </Reveal>
   {/each}
 </div>
@@ -5092,19 +5038,17 @@ body {
 		description:
 			'Detail-page transition recipe that leans on the browser View Transition API and degrades cleanly when it is unavailable.',
 		tags: ['shared-element', 'transition', 'detail', 'view-transition'],
-		components: ['Card', 'Reveal', 'Text'],
+		components: ['Reveal', 'Text'],
 		snippet: `<script>
-  import { Card, Reveal, Text } from '@dryui/ui';
+  import { Reveal, Text } from '@dryui/ui';
 </script>
 
 <div class="detail-content">
   <Reveal variant="scale-in" once>
-    <Card.Root>
-      <Card.Content>
+    <div class="surface">
         <Text weight="bold">Shared element header</Text>
         <Text as="p">Use View Transitions for the page shell, and keep the content surface deterministic.</Text>
-      </Card.Content>
-    </Card.Root>
+    </div>
   </Reveal>
 </div>
 
@@ -5116,20 +5060,19 @@ body {
 	{
 		name: 'search-form',
 		description:
-			'Horizontal search bar pattern: fields in a responsive CSS grid inside a Card. Adjust the column count to match your field count.',
+			'Horizontal search bar pattern: fields in a responsive CSS grid inside a contained surface. Adjust the column count to match your field count.',
 		tags: ['search', 'form', 'filter', 'horizontal'],
-		components: ['Card', 'Field', 'Label', 'Input', 'Button'],
-		snippet: `<!-- Pattern: horizontal form in a Card. Adjust columns to match field count. -->
-<Card.Root>
-  <Card.Content>
+		components: ['Field', 'Label', 'Input', 'Button'],
+		snippet: `<!-- Pattern: horizontal form in a contained surface. Adjust columns to match field count. -->
+<div class="surface">
     <div class="search-form">
       <Field.Root><Label>Field 1</Label><Input placeholder="..." /></Field.Root>
       <Field.Root><Label>Field 2</Label><!-- DatePicker, Select, etc. --></Field.Root>
       <Field.Root><Label>Field 3</Label><!-- any input --></Field.Root>
       <Button variant="solid">Search</Button>
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .search-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--dry-space-4); align-items: end; }
@@ -5255,9 +5198,9 @@ body {
 		name: 'form-with-validation',
 		description: 'Contact form inside a card with field validation and error messages.',
 		tags: ['form', 'validation', 'contact', 'input', 'error'],
-		components: ['Card', 'Field', 'Label', 'Input', 'Textarea', 'Button'],
+		components: ['Field', 'Label', 'Input', 'Textarea', 'Button'],
 		snippet: `<script>
-  import { Card, Field, Label, Input, Textarea, Button } from '@dryui/ui';
+  import { Field, Label, Input, Textarea, Button } from '@dryui/ui';
 
   let name = $state('');
   let email = $state('');
@@ -5279,9 +5222,9 @@ body {
   }
 </script>
 
-<Card.Root>
-  <Card.Header>Contact us</Card.Header>
-  <Card.Content>
+<div class="surface">
+  <header class="surface-header">Contact us</header>
+  <div class="surface-content">
     <div class="contact-form">
       <Field.Root>
         <Label>Name</Label>
@@ -5306,8 +5249,8 @@ body {
       </Field.Root>
       <Button variant="solid" onclick={handleSubmit}>Send message</Button>
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .contact-form { display: grid; gap: var(--dry-space-4); }
@@ -5400,16 +5343,16 @@ body {
 		description:
 			'Generic multi-step wizard with Stepper navigation, form fields per step, and back/next buttons. Use for onboarding, registration, surveys.',
 		tags: ['wizard', 'stepper', 'multi-step', 'form', 'onboarding'],
-		components: ['Card', 'Stepper', 'Field', 'Label', 'Input', 'Button', 'Text'],
+		components: ['Stepper', 'Field', 'Label', 'Input', 'Button', 'Text'],
 		snippet: `<script>
-  import { Card, Stepper, Field, Label, Input, Button, Text } from '@dryui/ui';
+  import { Stepper, Field, Label, Input, Button, Text } from '@dryui/ui';
 
   let activeStep = $state(0);
   const totalSteps = 3;
 </script>
 
-<Card.Root>
-  <Card.Header>
+<div class="surface">
+  <header class="surface-header">
     <Stepper.Root bind:activeStep>
       <Stepper.List>
         <Stepper.Step step={0}>Account</Stepper.Step>
@@ -5419,8 +5362,8 @@ body {
         <Stepper.Step step={2}>Review</Stepper.Step>
       </Stepper.List>
     </Stepper.Root>
-  </Card.Header>
-  <Card.Content>
+  </header>
+  <div class="surface-content">
     <div class="step-fields">
       {#if activeStep === 0}
         <Field.Root>
@@ -5444,8 +5387,8 @@ body {
         <Text>Review your details and submit.</Text>
       {/if}
     </div>
-  </Card.Content>
-  <Card.Footer>
+  </div>
+  <footer class="surface-footer">
     <div class="step-actions">
       <Button variant="outline" disabled={activeStep === 0} onclick={() => activeStep--}>Back</Button>
       {#if activeStep < totalSteps - 1}
@@ -5454,8 +5397,8 @@ body {
         <Button onclick={() => { /* submit */ }}>Submit</Button>
       {/if}
     </div>
-  </Card.Footer>
-</Card.Root>
+  </footer>
+</div>
 
 <style>
   .step-fields { display: grid; gap: var(--dry-space-4); }
@@ -5558,13 +5501,13 @@ body {
 		name: 'user-profile-card',
 		description: 'User profile card with avatar, name, role, stats, and action buttons.',
 		tags: ['profile', 'user', 'card', 'avatar'],
-		components: ['Card', 'Avatar', 'Text', 'Heading', 'Badge', 'Button', 'Separator'],
+		components: ['Avatar', 'Text', 'Heading', 'Badge', 'Button', 'Separator'],
 		snippet: `<script>
-  import { Card, Avatar, Text, Heading, Badge, Button, Separator } from '@dryui/ui';
+  import { Avatar, Text, Heading, Badge, Button, Separator } from '@dryui/ui';
 </script>
 
-<Card.Root>
-  <Card.Content>
+<div class="surface">
+  <div class="surface-content">
     <div class="profile-card">
       <Avatar src="/photo.jpg" alt="Jane Smith" fallback="JS" size="xl" />
       <div class="profile-identity">
@@ -5592,8 +5535,8 @@ body {
         <Button variant="outline">Message</Button>
       </div>
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .profile-card { display: grid; justify-items: center; gap: var(--dry-space-4); }
@@ -5608,9 +5551,9 @@ body {
 		name: 'notification-list',
 		description: 'Notification feed with avatars, timestamps, and read/unread states.',
 		tags: ['notification', 'feed', 'list', 'activity'],
-		components: ['Card', 'Avatar', 'Text', 'Badge', 'Separator'],
+		components: ['Avatar', 'Text', 'Badge', 'Separator'],
 		snippet: `<script>
-  import { Card, Avatar, Text, Badge, Separator } from '@dryui/ui';
+  import { Avatar, Text, Badge, Separator } from '@dryui/ui';
 
   const notifications = [
     { user: 'Sarah Chen', avatar: 'SC', action: 'commented on', target: 'Design Review', time: '2 min ago', unread: true },
@@ -5619,14 +5562,14 @@ body {
   ];
 </script>
 
-<Card.Root>
-  <Card.Header>
+<div class="surface">
+  <header class="surface-header">
     <div class="notif-header">
       <Text weight="bold">Notifications</Text>
       <Badge variant="soft">{notifications.filter(n => n.unread).length} new</Badge>
     </div>
-  </Card.Header>
-  <Card.Content>
+  </header>
+  <div class="surface-content">
     <div class="notif-list">
       {#each notifications as notif, i (notif.time)}
         <div class="notif-item">
@@ -5646,8 +5589,8 @@ body {
         {/if}
       {/each}
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .notif-header { display: grid; grid-template-columns: 1fr auto; align-items: center; }
@@ -5663,9 +5606,9 @@ body {
 		description:
 			'Activity/audit log feed using Timeline with avatars, relative timestamps, and action badges.',
 		tags: ['activity', 'feed', 'timeline', 'audit', 'log', 'history'],
-		components: ['Card', 'Timeline', 'Avatar', 'Text', 'Badge'],
+		components: ['Timeline', 'Avatar', 'Text', 'Badge'],
 		snippet: `<script>
-  import { Card, Timeline, Avatar, Text, Badge } from '@dryui/ui';
+  import { Timeline, Avatar, Text, Badge } from '@dryui/ui';
 
   const activities = [
     { user: 'Alice Park', initials: 'AP', action: 'deployed', target: 'v2.4.0 to production', time: '2024-09-15T14:32:00Z', timeLabel: '5 min ago', badge: 'success' },
@@ -5674,9 +5617,9 @@ body {
   ];
 </script>
 
-<Card.Root>
-  <Card.Header>Activity</Card.Header>
-  <Card.Content>
+<div class="surface">
+  <header class="surface-header">Activity</header>
+  <div class="surface-content">
     <Timeline.Root>
       {#each activities as event (event.time)}
         <Timeline.Item>
@@ -5692,8 +5635,8 @@ body {
         </Timeline.Item>
       {/each}
     </Timeline.Root>
-  </Card.Content>
-</Card.Root>`
+  </div>
+</div>`
 	},
 
 	{
@@ -5736,9 +5679,9 @@ body {
 		name: 'file-upload-form',
 		description: 'File upload with drag-and-drop zone, progress indicator, and submit button.',
 		tags: ['file', 'upload', 'drag', 'drop', 'form'],
-		components: ['Card', 'FileUpload', 'Progress', 'Button', 'Text'],
+		components: ['FileUpload', 'Progress', 'Button', 'Text'],
 		snippet: `<script>
-  import { Card, FileUpload, Progress, Button, Text } from '@dryui/ui';
+  import { FileUpload, Progress, Button, Text } from '@dryui/ui';
 
   let files = $state([]);
   let uploadProgress = $state(0);
@@ -5755,9 +5698,9 @@ body {
   }
 </script>
 
-<Card.Root>
-  <Card.Header>Upload files</Card.Header>
-  <Card.Content>
+<div class="surface">
+  <header class="surface-header">Upload files</header>
+  <div class="surface-content">
     <div class="upload-form">
       <FileUpload.Root bind:files accept="image/*,.pdf">
         <FileUpload.Dropzone>
@@ -5775,8 +5718,8 @@ body {
         {uploading ? 'Uploading...' : 'Upload files'}
       </Button>
     </div>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <style>
   .upload-form { display: grid; gap: var(--dry-space-4); }
@@ -5789,9 +5732,9 @@ body {
 		description:
 			'Data table with toolbar controls, search input, column toggles, and bulk actions.',
 		tags: ['table', 'toolbar', 'data', 'search', 'admin'],
-		components: ['Container', 'Card', 'Toolbar', 'Input', 'DropdownMenu', 'DataGrid'],
+		components: ['Container', 'Toolbar', 'Input', 'DropdownMenu', 'DataGrid'],
 		snippet: `<script>
-  import { Container, Card, Toolbar, Input, DropdownMenu, DataGrid } from '@dryui/ui';
+  import { Container, Toolbar, Input, DropdownMenu, DataGrid } from '@dryui/ui';
 
   let search = $state('');
   let rows = $state([
@@ -5801,8 +5744,8 @@ body {
 </script>
 
 <Container>
-  <Card.Root>
-    <Card.Header>
+  <div class="surface">
+    <header class="surface-header">
       <Toolbar.Root>
         <Input bind:value={search} placeholder="Search..." size="sm" />
         <Toolbar.Separator />
@@ -5817,8 +5760,8 @@ body {
         </DropdownMenu.Root>
         <Toolbar.Button>Export</Toolbar.Button>
       </Toolbar.Root>
-    </Card.Header>
-    <Card.Content>
+    </header>
+    <div class="surface-content">
       <DataGrid.Root items={rows}>
         <DataGrid.Table>
           <DataGrid.Header>
@@ -5838,8 +5781,7 @@ body {
         </DataGrid.Table>
         <DataGrid.Pagination />
       </DataGrid.Root>
-    </Card.Content>
-  </Card.Root>
+</div>
 </Container>`
 	},
 
@@ -5897,17 +5839,17 @@ body {
 		description:
 			'Layered visual effects (Aurora background, Noise grain, Glow highlight) composed with nesting. Each wrapper adds one effect layer; content sits inside the innermost component.',
 		tags: ['surface', 'aurora', 'noise', 'glow', 'effects', 'layering'],
-		components: ['Aurora', 'Noise', 'Glow', 'Card'],
+		components: ['Aurora', 'Noise', 'Glow'],
 		snippet: `<script>
-  import { Aurora, Noise, Glow, Card } from '@dryui/ui';
+  import { Aurora, Noise, Glow } from '@dryui/ui';
 </script>
 
 <Aurora palette="cosmic" intensity={60}>
   <Noise opacity={0.05} blend="soft-light">
     <Glow color="rgba(139,92,246,0.4)" intensity={40}>
-      <Card.Root>
-        <Card.Content>Content renders above the effect stack</Card.Content>
-      </Card.Root>
+      <div class="surface">
+          Content renders above the effect stack
+      </div>
     </Glow>
   </Noise>
 </Aurora>`
@@ -5978,12 +5920,12 @@ body {
 			'comparison',
 			'pricing'
 		],
-		components: ['Card', 'Badge', 'Text'],
+		components: ['Badge', 'Text'],
 		snippet: `<!-- Aligned card list — parent grid defines shared columns,
-     each Card.Root uses subgrid to inherit the tracks.
+     each surface div uses subgrid to inherit the tracks.
      Columns stay aligned across all rows without a <table>. -->
 <script>
-  import { Card, Badge, Text } from '@dryui/ui';
+  import { Badge, Text } from '@dryui/ui';
 
   const flights = [
     { airline: 'Skyline Air', route: 'SFO → JFK', depart: '08:15', arrive: '16:45', duration: '5h 30m', stops: 'Nonstop', price: '$289' },
@@ -6004,31 +5946,27 @@ body {
   </div>
 
   {#each flights as flight (flight.airline + flight.depart)}
-    <Card.Root variant="interactive">
-      <Card.Content noPadding>
-        <div class="flight-row">
-          <div class="flight-cell">
-            <Text as="span" weight="medium">{flight.airline}</Text>
-          </div>
-          <div class="flight-cell">
-            <Text as="span" font="mono">{flight.route}</Text>
-          </div>
-          <div class="flight-cell">
-            <Text as="span" weight="semibold">{flight.depart}</Text>
-          </div>
-          <div class="flight-cell">
-            <Text as="span" weight="semibold">{flight.arrive}</Text>
-          </div>
-          <div class="flight-cell">
-            <Text as="span" size="sm" color="secondary">{flight.duration}</Text>
-            <Badge variant="soft" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>
-          </div>
-          <div class="flight-cell">
-            <Text as="span" weight="bold">{flight.price}</Text>
-          </div>
-        </div>
-      </Card.Content>
-    </Card.Root>
+    <div class="flight-row">
+      <div class="flight-cell">
+        <Text as="span" weight="medium">{flight.airline}</Text>
+      </div>
+      <div class="flight-cell">
+        <Text as="span" font="mono">{flight.route}</Text>
+      </div>
+      <div class="flight-cell">
+        <Text as="span" weight="semibold">{flight.depart}</Text>
+      </div>
+      <div class="flight-cell">
+        <Text as="span" weight="semibold">{flight.arrive}</Text>
+      </div>
+      <div class="flight-cell">
+        <Text as="span" size="sm" color="secondary">{flight.duration}</Text>
+        <Badge variant="soft" color={flight.stops === 'Nonstop' ? 'green' : 'gray'}>{flight.stops}</Badge>
+      </div>
+      <div class="flight-cell">
+        <Text as="span" weight="bold">{flight.price}</Text>
+      </div>
+    </div>
   {/each}
 </div>
 
@@ -6048,21 +5986,7 @@ body {
     padding: 0 var(--dry-space-4) var(--dry-space-2);
   }
 
-  /* :global() is required here — subgrid must reach Card's internal
-     elements which live in a child component scope. */
-  .flight-list :global([data-card]) {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-  }
-
-  .flight-list :global([data-card-content]) {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: subgrid;
-  }
-
-  /* Row inside the card inherits tracks */
+  /* Row inherits tracks via subgrid */
   .flight-row {
     display: grid;
     grid-template-columns: subgrid;
@@ -6465,20 +6389,20 @@ Stop conditions:
 	{
 		name: 'concentric-radius',
 		description:
-			'Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (Card, Dialog, Popover, Toast, Tooltip, Sheet, Field).',
-		tags: ['radius', 'concentric', 'card', 'nesting', 'polish', 'corner', 'rounded'],
-		components: ['Card', 'Button'],
+			'Radius harmony: outer radius = inner radius + padding. Use the --dry-radius-nested-<container> tokens for any child inside a padded container (raised surfaces, Dialog, Popover, Toast, Tooltip, Sheet, Field).',
+		tags: ['radius', 'concentric', 'nesting', 'polish', 'corner', 'rounded'],
+		components: ['Button'],
 		snippet: `<script>
-  import { Card, Button } from '@dryui/ui';
+  import { Button } from '@dryui/ui';
 </script>
 
-<Card.Root>
-  <Card.Content>
-    <!-- The Button inside this Card inherits --dry-btn-radius: var(--dry-radius-nested-card)
+<div class="surface">
+  <div class="surface-content">
+    <!-- The Button inside this surface inherits --dry-btn-radius: var(--dry-radius-nested-card)
          automatically, so inner corners sit concentric with the outer 16px. -->
     <Button>Action</Button>
-  </Card.Content>
-</Card.Root>
+  </div>
+</div>
 
 <!-- Nested tokens available: nested-card, nested-dialog, nested-popover,
      nested-sheet, nested-toast, nested-tooltip, nested-field. -->`
@@ -6627,32 +6551,20 @@ Stop conditions:
 		description:
 			'Three-layer box-shadow (edge + close contact + ambient) reads cleaner than a solid 1px border. Works over images and mixed backgrounds. No double-edge when combined with drop shadows.',
 		tags: ['shadow', 'border', 'card', 'elevation', 'polish'],
-		components: ['Card'],
-		snippet: `<script>
-  import { Card } from '@dryui/ui';
-</script>
+		components: [],
+		snippet: `<!-- Use the token family directly on any raised surface element. -->
+<div class="raised">
+  A surface that reads as raised without a solid edge.
+</div>
 
-<!-- Default Card: shadow-only (no border) -->
-<Card.Root>
-  <Card.Content>
-    A Card that reads as raised without a solid edge.
-  </Card.Content>
-</Card.Root>
-
-<!-- Bordered escape hatch, when you want the 1px edge back -->
-<Card.Root bordered>
-  <Card.Content>A Card with both shadow and border.</Card.Content>
-</Card.Root>
-
-<!-- Raw pattern. Use the token family directly on any raised surface: -->
 <style>
-  .my-raised-surface {
+  .raised {
     background: var(--dry-color-bg-raised);
     border-radius: var(--dry-radius-lg);
     box-shadow: var(--dry-shadow-sm);
     transition: box-shadow var(--dry-duration-fast) var(--dry-ease-out);
   }
-  .my-raised-surface:hover {
+  .raised:hover {
     box-shadow: var(--dry-shadow-sm-hover);
   }
 </style>`

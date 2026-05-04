@@ -60,7 +60,7 @@ function printPromptHelp(): never {
 			'  --component <name>  Component to generate prompt context for',
 			'  --verbose           Include prop and accessibility reference'
 		],
-		examples: ['  dryui prompt --component Button', '  dryui prompt --component Card --verbose']
+		examples: ['  dryui prompt --component Button', '  dryui prompt --component Tabs --verbose']
 	});
 }
 

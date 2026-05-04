@@ -62,7 +62,6 @@ export const COMPONENT_CATEGORIES: Record<string, ComponentCategory> = {
 	Button: 'action',
 	ButtonGroup: 'action',
 	Calendar: 'form',
-	Card: 'display',
 	Carousel: 'display',
 	Chart: 'display',
 	ChatThread: 'display',

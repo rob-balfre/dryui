@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import type { HTMLAttributes } from 'svelte/elements';
 	import Button from '../button/button.svelte';
 	import { resolveAlias } from '../internal/color-aliases.js';
 	import type { ChipColor } from './index.js';
@@ -20,13 +20,7 @@
 		children: Snippet;
 	}
 
-	type RestProps = Omit<HTMLButtonAttributes, 'type' | 'disabled' | 'onclick' | 'children'> &
-		Omit<
-			HTMLAnchorAttributes,
-			'href' | 'rel' | 'target' | 'download' | 'type' | 'onclick' | 'children'
-		>;
-
-	type Props = SharedProps & RestProps;
+	type Props = SharedProps & Omit<HTMLAttributes<HTMLSpanElement>, 'onclick' | 'children'>;
 
 	let {
 		selected,

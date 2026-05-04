@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Badge, Card, Chart, Heading, Text } from '@dryui/ui';
+	import { Badge, Chart, Heading, Text } from '@dryui/ui';
 
 	const metrics = [
 		{ label: 'Revenue', value: '$128k', detail: '+12.4% this week' },
@@ -30,36 +30,32 @@
 
 		<div class="metrics-grid">
 			{#each metrics as metric (metric.label)}
-				<Card.Root>
-					<Card.Content>
-						<div class="stack-sm">
-							<Text as="span" color="muted">{metric.label}</Text>
-							<Heading level={3}>{metric.value}</Heading>
-							<Text as="p" color="muted">{metric.detail}</Text>
-						</div>
-					</Card.Content>
-				</Card.Root>
+				<div class="surface">
+					<div class="stack-sm">
+						<Text as="span" color="muted">{metric.label}</Text>
+						<Heading level={3}>{metric.value}</Heading>
+						<Text as="p" color="muted">{metric.detail}</Text>
+					</div>
+				</div>
 			{/each}
 		</div>
 
-		<Card.Root>
-			<Card.Content>
-				<div class="stack-md">
-					<div class="chart-header">
-						<div>
-							<Text as="span" color="muted">Weekly traffic</Text>
-							<Heading level={4}>Trend line</Heading>
-						</div>
-						<Badge variant="outline">Live</Badge>
+		<div class="surface">
+			<div class="stack-md">
+				<div class="chart-header">
+					<div>
+						<Text as="span" color="muted">Weekly traffic</Text>
+						<Heading level={4}>Trend line</Heading>
 					</div>
-					<Chart.Root {data} height={220} padding={{ top: 12, right: 12, bottom: 24, left: 24 }}>
-						<Chart.Line strokeWidth={3} showDots color="var(--dry-color-fill-brand)" />
-						<Chart.XAxis />
-						<Chart.YAxis ticks={5} />
-					</Chart.Root>
+					<Badge variant="outline">Live</Badge>
 				</div>
-			</Card.Content>
-		</Card.Root>
+				<Chart.Root {data} height={220} padding={{ top: 12, right: 12, bottom: 24, left: 24 }}>
+					<Chart.Line strokeWidth={3} showDots color="var(--dry-color-fill-brand)" />
+					<Chart.XAxis />
+					<Chart.YAxis ticks={5} />
+				</Chart.Root>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -68,6 +64,13 @@
 		container-type: inline-size;
 		padding: var(--dry-space-5);
 		background: var(--dry-color-bg-raised);
+	}
+
+	.surface {
+		padding: var(--dry-padding-card);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
 	}
 
 	.metrics-grid {

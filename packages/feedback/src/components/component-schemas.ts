@@ -191,22 +191,6 @@ export const COMPONENT_SCHEMAS: Record<string, SchemaField[]> = {
 		{ name: 'disabled', optional: true, type: { kind: 'boolean' } },
 		{ name: 'locale', optional: true, type: { kind: 'string' } }
 	],
-	Card: [
-		{
-			name: 'variant',
-			optional: true,
-			type: { kind: 'enum', options: ['default', 'elevated', 'interactive'] }
-		},
-		{ name: 'size', optional: true, type: { kind: 'enum', options: ['default', 'sm'] } },
-		{ name: 'disabled', optional: true, type: { kind: 'boolean' } },
-		{ name: 'as', optional: true, type: { kind: 'enum', options: ['div', 'a', 'button'] } },
-		{
-			name: 'orientation',
-			optional: true,
-			type: { kind: 'enum', options: ['vertical', 'horizontal'] }
-		},
-		{ name: 'selected', optional: true, type: { kind: 'boolean' } }
-	],
 	Carousel: [
 		{ name: 'autoplay', optional: true, type: { kind: 'enum', options: ['false'] } },
 		{ name: 'loop', optional: true, type: { kind: 'boolean' } },

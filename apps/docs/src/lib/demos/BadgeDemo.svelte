@@ -34,7 +34,10 @@
 			<p class="note">3 reviewers required. Staged against main. Ready for final pass.</p>
 		</div>
 		<div class="badges">
-			<Badge variant="dot" color="orange">Pending</Badge>
+			<span class="dot-status">
+				<Badge variant="dot" color="orange" aria-hidden="true" />
+				<span>Pending</span>
+			</span>
 			<Badge variant="soft" color="gray">42 commits</Badge>
 		</div>
 	</section>
@@ -87,5 +90,18 @@
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
+	}
+
+	.dot-status {
+		display: inline-grid;
+		grid-auto-flow: column;
+		align-items: center;
+		gap: var(--dry-space-1_5);
+		font-family: var(--dry-font-sans);
+		font-size: var(--dry-type-tiny-size);
+		font-weight: 500;
+		line-height: var(--dry-type-tiny-leading);
+		color: var(--dry-color-text-warning);
+		white-space: nowrap;
 	}
 </style>

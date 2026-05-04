@@ -13,7 +13,7 @@ Released **April 24, 2026**
 
 ## Breaking
 
-1. \`Card.Root\` no longer accepts the \`raised\` prop. Use \`variant="elevated"\`.
+1. \`Alert\` no longer accepts the \`tone\` prop. Use \`variant\`.
 2. \`--dry-color-accent\` removed. Map to \`--dry-color-fill-brand\`.
 3. \`Tree.Root\`'s \`expanded\` prop is now \`defaultExpanded\`.
 

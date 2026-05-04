@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { Badge, Card, Text } from '@dryui/ui';
+	import { Badge, Text } from '@dryui/ui';
 	import ViewLayout from '$lib/components/ViewLayout.svelte';
 	import ComponentScreenshotFallback from '$lib/components/ComponentScreenshotFallback.svelte';
 	import { getComponentConfigurator } from '$lib/configurators/index';
@@ -46,18 +46,16 @@
 				</div>
 			{/await}
 		{:else}
-			<Card.Root>
-				<Card.Content>
-					<div
-						class="preview-surface"
-						data-component-preview-root
-						data-component-name={data.name}
-						data-preview-mode={previewMode}
-					>
-						<ComponentScreenshotFallback name={data.name} />
-					</div>
-				</Card.Content>
-			</Card.Root>
+			<div class="surface">
+				<div
+					class="preview-surface"
+					data-component-preview-root
+					data-component-name={data.name}
+					data-preview-mode={previewMode}
+				>
+					<ComponentScreenshotFallback name={data.name} />
+				</div>
+			</div>
 		{/if}
 	</section>
 </ViewLayout>
@@ -86,5 +84,12 @@
 
 	.preview-surface {
 		display: grid;
+	}
+
+	.surface {
+		padding: var(--dry-padding-card);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
 	}
 </style>

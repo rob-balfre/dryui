@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 166 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 165 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -1591,9 +1591,7 @@ Accessibility: This component does not add meaning by itself; ensure child conte
 Example:
 ```svelte
 <Aurora palette="ocean">
-  <Card.Root>
-    <Card.Content>Ambient backgrounds stay native and no-dependency.</Card.Content>
-  </Card.Root>
+  <p>Ambient backgrounds stay native and no-dependency.</p>
 </Aurora>
 ```
 
@@ -1612,9 +1610,7 @@ Accessibility: This component does not add meaning by itself; ensure child conte
 Example:
 ```svelte
 <Noise opacity={0.12} blend="soft-light">
-  <Card.Root>
-    <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>
-  </Card.Root>
+  <p>Grain adds atmosphere without loading an external texture.</p>
 </Noise>
 ```
 
@@ -2778,7 +2774,7 @@ Example:
 ## HoverCard
 Package: @dryui/ui
 Category: overlay
-Tags: hover, card, preview, popup
+Tags: hover, preview, popup
 Kind: compound
 Root import: import { HoverCard } from '@dryui/ui'
 Subpath import: import { HoverCard } from '@dryui/ui/hover-card'
@@ -2876,47 +2872,6 @@ Example:
 ```
 
 ### display
-
-## Card
-Package: @dryui/ui
-Category: display
-Tags: surface, container, content, panel
-Kind: compound
-Root import: import { Card } from '@dryui/ui'
-Subpath import: import { Card } from '@dryui/ui/card'
-Parts:
-- Card.Root
-  Props: as ('div' | 'a' | 'button'), Underlying HTML element to render for the component., accepted div, a, button, default 'div' | selected (boolean), Applies selected-state styling for interactive card surfaces. | disabled (boolean), Prevents interaction and applies disabled styling. | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal | variant ('default' | 'elevated' | 'interactive'), Visual style preset for the component., accepted default, elevated, interactive, default 'default' | size ('default' | 'sm'), Size preset affecting density, spacing, or typography., accepted default, sm, default 'default' | children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <element> attributes via rest props.
-- Card.Header
-  Props: children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <div> attributes via rest props.
-- Card.Content
-  Props: children (Snippet), Content rendered inside the component., required | noPadding (boolean), default false
-  Native props: Forwards <div> attributes via rest props.
-- Card.Footer
-  Props: children (Snippet), Content rendered inside the component., required
-  Native props: Forwards <div> attributes via rest props.
-Structure:
-  Card.Root
-    Card.Header
-    Card.Content
-    Card.Footer
-CSS variables: --dry-btn-radius, --dry-card-bg, --dry-card-padding, --dry-card-radius, --dry-card-selected-ring-color, --dry-card-shadow
-Data attributes: data-bordered | data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
-Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
-Example:
-```svelte
-<Card.Root>
-  <Card.Header>Title</Card.Header>
-  <Card.Content>
-    <p>Card body content goes here.</p>
-  </Card.Content>
-  <Card.Footer>
-    <Button variant="solid">Action</Button>
-  </Card.Footer>
-</Card.Root>
-```
 
 ## Accordion
 Package: @dryui/ui
@@ -3156,10 +3111,10 @@ Tags: chat, thread, conversation, log
 Kind: simple
 Root import: import { ChatThread } from '@dryui/ui'
 Subpath import: import { ChatThread } from '@dryui/ui/chat-thread'
-Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >), Content rendered inside the component., required
+Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet<[{ index: number; isLatest: boolean }]>), Content rendered inside the component., required
 Native props: Forwards <element> attributes via rest props.
 CSS variables: none
-Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport | data-view-transition-name
+Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -3473,9 +3428,7 @@ Accessibility: Treat the component as presentational unless it exposes interacti
 Example:
 ```svelte
 <Reveal variant="slide-up" delay={120}>
-  <Card.Root>
-    <Card.Content>Stage content as it enters the viewport.</Card.Content>
-  </Card.Root>
+  <p>Stage content as it enters the viewport.</p>
 </Reveal>
 ```
 
@@ -3494,9 +3447,7 @@ Accessibility: Treat the component as presentational unless it exposes interacti
 Example:
 ```svelte
 <Spotlight intensity={32}>
-  <Card.Root>
-    <Card.Content>Hover to pull a radial highlight across the surface.</Card.Content>
-  </Card.Root>
+  <p>Hover to pull a radial highlight across the surface.</p>
 </Spotlight>
 ```
 
@@ -4009,7 +3960,7 @@ Root import: import { Tag } from '@dryui/ui'
 Subpath import: import { Tag } from '@dryui/ui/tag'
 Props: variant ('solid' | 'outline' | 'soft'), Visual style preset for the component., accepted solid, outline, soft, default 'soft' | color (BadgeColor), Semantic color or tone applied to the component., default 'gray' | size ('sm' | 'md'), Size preset affecting density, spacing, or typography., accepted sm, md, default 'sm' | children (Snippet), Content rendered inside the component., required | dismissible (boolean), default false | onDismiss (() => void)
 Native props: Forwards <span> attributes via rest props.
-CSS variables: none
+CSS variables: --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y
 Data attributes: data-color | data-size | data-tag | data-variant | data-wrapper
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:

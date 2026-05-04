@@ -11,6 +11,7 @@ import {
 } from './project-planner.js';
 import { checkComponent } from './component-checker.js';
 import { diagnoseTheme } from './theme-checker.js';
+import { detectStaleDryuiClaudeAgents } from './agent-drift.js';
 
 export type WorkspaceSeverity = 'error' | 'warning' | 'info';
 
@@ -299,6 +300,21 @@ function projectFindings(
 
 	if (result.framework === 'unknown') {
 		return { findings, project: result, warnings };
+	}
+
+	if (result.dependencies.ui) {
+		for (const agent of detectStaleDryuiClaudeAgents(result.root)) {
+			findings.push(
+				toFinding(
+					normalizePath(relative(root, agent.file)),
+					1,
+					'project/stale-claude-agent',
+					'warning',
+					`Refresh stale DryUI Claude agent "${agent.agent}": ${agent.reason}.`,
+					null
+				)
+			);
+		}
 	}
 
 	if (!result.dependencies.ui) {

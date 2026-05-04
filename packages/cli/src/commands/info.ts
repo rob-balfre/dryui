@@ -112,8 +112,8 @@ export function runInfo(args: string[], spec: Spec): void {
 			],
 			examples: [
 				'  dryui info Button',
-				'  dryui info card              # case-insensitive',
-				'  dryui info Button,Card,Select # batch lookup',
+				'  dryui info button             # case-insensitive',
+				'  dryui info Button,Tabs,Select # batch lookup',
 				'  dryui info Button --text'
 			]
 		},

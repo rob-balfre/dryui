@@ -4,7 +4,6 @@
 		Badge,
 		Beam,
 		BorderBeam,
-		Card,
 		ChromaticAberration,
 		Glass,
 		Heading,
@@ -22,17 +21,15 @@
 {#if name === 'Adjust'}
 	<div class="stage stage-soft">
 		<Adjust brightness={102} contrast={108} saturate={128}>
-			<Card.Root>
-				<Card.Content>
-					<div class="copy-stack">
-						<Badge variant="soft" color="blue" size="sm">Filter</Badge>
-						<Heading level={3}>Adjust</Heading>
-						<Text size="sm" color="secondary"
-							>Brightness, contrast, and saturation tuned in one pass.</Text
-						>
-					</div>
-				</Card.Content>
-			</Card.Root>
+			<div class="effect-card">
+				<div class="copy-stack">
+					<Badge variant="soft" color="blue" size="sm">Filter</Badge>
+					<Heading level={3}>Adjust</Heading>
+					<Text size="sm" color="secondary"
+						>Brightness, contrast, and saturation tuned in one pass.</Text
+					>
+				</div>
+			</div>
 		</Adjust>
 	</div>
 {:else if name === 'Beam'}
@@ -163,25 +160,6 @@
 	.copy-stack {
 		display: grid;
 		gap: var(--dry-space-3);
-	}
-
-	.surface {
-		position: relative;
-		isolation: isolate;
-		overflow: hidden;
-		border-radius: var(--dry-radius-xl);
-		background: linear-gradient(
-			145deg,
-			color-mix(in srgb, var(--dry-color-fill-brand) 14%, var(--dry-color-bg-base)),
-			var(--dry-color-bg-base)
-		);
-	}
-
-	.surface-stage {
-		min-block-size: 40rem;
-		padding: var(--dry-space-8);
-		display: grid;
-		place-items: center;
 	}
 
 	.qr-stage {

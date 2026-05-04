@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Card, Link, Map, Text } from '@dryui/ui';
+	import { Link, Map, Text } from '@dryui/ui';
 	import { env } from '$env/dynamic/public';
 
 	const token = env.PUBLIC_MAPBOX_TOKEN;
@@ -36,14 +36,14 @@
 	</Map.Root>
 {:else}
 	<div class="map-placeholder" data-map-placeholder>
-		<Card.Root>
-			<Card.Header>
+		<div class="surface">
+			<header class="surface-header">
 				<Text weight="semibold">
 					{token ? 'Loading map…' : 'Map preview unavailable'}
 				</Text>
-			</Card.Header>
+			</header>
 			{#if !token}
-				<Card.Content>
+				<div class="surface-content">
 					<Text color="muted" size="sm">
 						Set <Text as="span" font="mono" size="sm">PUBLIC_MAPBOX_TOKEN</Text> in
 						<Text as="span" font="mono" size="sm">apps/docs/.env</Text> to load the live map. See the
@@ -51,9 +51,9 @@
 							>contributing guide</Link
 						> for details.
 					</Text>
-				</Card.Content>
+				</div>
 			{/if}
-		</Card.Root>
+		</div>
 	</div>
 {/if}
 
@@ -62,5 +62,21 @@
 		display: grid;
 		align-content: center;
 		min-height: 400px;
+	}
+
+	.surface {
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
+		overflow: hidden;
+	}
+
+	.surface-header {
+		padding: var(--dry-padding-card);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.surface-content {
+		padding: var(--dry-padding-card);
 	}
 </style>

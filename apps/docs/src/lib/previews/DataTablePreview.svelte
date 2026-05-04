@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Badge, Button, Card, Combobox, DataGrid, Input, Text } from '@dryui/ui';
+	import { Badge, Button, Combobox, DataGrid, Input, Text } from '@dryui/ui';
 
 	type Row = {
 		id: number;
@@ -38,78 +38,76 @@
 			</Text>
 		</div>
 
-		<Card.Root>
-			<Card.Content>
-				<div class="stack-md">
-					<div class="filters">
-						<Input bind:value={query} placeholder="Search invoices..." />
+		<div class="surface">
+			<div class="stack-md">
+				<div class="filters">
+					<Input bind:value={query} placeholder="Search invoices..." />
 
-						<Combobox.Root bind:value={assignee} name="assignee">
-							<Combobox.Input aria-label="Assignee" placeholder="Filter by owner..." />
-							<Combobox.Content>
-								{#each assignees as person, index (person.value)}
-									<Combobox.Item value={person.value} {index}>
-										{person.label}
-									</Combobox.Item>
-								{/each}
-							</Combobox.Content>
-						</Combobox.Root>
-					</div>
-
-					<DataGrid.Root items={rows} pageSize={4} striped>
-						<DataGrid.Table>
-							<DataGrid.Header>
-								<DataGrid.Row>
-									<DataGrid.Column key="name" sortable>Customer</DataGrid.Column>
-									<DataGrid.Column key="status">Status</DataGrid.Column>
-									<DataGrid.Column key="value" sortable>Value</DataGrid.Column>
-								</DataGrid.Row>
-							</DataGrid.Header>
-
-							<DataGrid.Body>
-								{#snippet children({ items })}
-									{@const currentRows = items as Row[]}
-									{#each currentRows as row (row.id)}
-										<DataGrid.Row>
-											<DataGrid.Cell>{row.name}</DataGrid.Cell>
-											<DataGrid.Cell>
-												<Badge
-													variant={row.status === 'Open' ? 'outline' : 'soft'}
-													color={row.status === 'Paid'
-														? 'green'
-														: row.status === 'Past due'
-															? 'red'
-															: 'blue'}
-												>
-													{row.status}
-												</Badge>
-											</DataGrid.Cell>
-											<DataGrid.Cell>{row.value}</DataGrid.Cell>
-										</DataGrid.Row>
-									{/each}
-								{/snippet}
-							</DataGrid.Body>
-						</DataGrid.Table>
-
-						<DataGrid.Pagination>
-							{#snippet children({ page, totalPages, canPrevious, canNext, previous, next })}
-								<div class="pagination-bar">
-									<Text as="span" color="muted">Page {page} of {totalPages}</Text>
-									<div class="pagination-actions">
-										<Button variant="outline" size="sm" onclick={previous} disabled={!canPrevious}>
-											Prev
-										</Button>
-										<Button variant="outline" size="sm" onclick={next} disabled={!canNext}>
-											Next
-										</Button>
-									</div>
-								</div>
-							{/snippet}
-						</DataGrid.Pagination>
-					</DataGrid.Root>
+					<Combobox.Root bind:value={assignee} name="assignee">
+						<Combobox.Input aria-label="Assignee" placeholder="Filter by owner..." />
+						<Combobox.Content>
+							{#each assignees as person, index (person.value)}
+								<Combobox.Item value={person.value} {index}>
+									{person.label}
+								</Combobox.Item>
+							{/each}
+						</Combobox.Content>
+					</Combobox.Root>
 				</div>
-			</Card.Content>
-		</Card.Root>
+
+				<DataGrid.Root items={rows} pageSize={4} striped>
+					<DataGrid.Table>
+						<DataGrid.Header>
+							<DataGrid.Row>
+								<DataGrid.Column key="name" sortable>Customer</DataGrid.Column>
+								<DataGrid.Column key="status">Status</DataGrid.Column>
+								<DataGrid.Column key="value" sortable>Value</DataGrid.Column>
+							</DataGrid.Row>
+						</DataGrid.Header>
+
+						<DataGrid.Body>
+							{#snippet children({ items })}
+								{@const currentRows = items as Row[]}
+								{#each currentRows as row (row.id)}
+									<DataGrid.Row>
+										<DataGrid.Cell>{row.name}</DataGrid.Cell>
+										<DataGrid.Cell>
+											<Badge
+												variant={row.status === 'Open' ? 'outline' : 'soft'}
+												color={row.status === 'Paid'
+													? 'green'
+													: row.status === 'Past due'
+														? 'red'
+														: 'blue'}
+											>
+												{row.status}
+											</Badge>
+										</DataGrid.Cell>
+										<DataGrid.Cell>{row.value}</DataGrid.Cell>
+									</DataGrid.Row>
+								{/each}
+							{/snippet}
+						</DataGrid.Body>
+					</DataGrid.Table>
+
+					<DataGrid.Pagination>
+						{#snippet children({ page, totalPages, canPrevious, canNext, previous, next })}
+							<div class="pagination-bar">
+								<Text as="span" color="muted">Page {page} of {totalPages}</Text>
+								<div class="pagination-actions">
+									<Button variant="outline" size="sm" onclick={previous} disabled={!canPrevious}>
+										Prev
+									</Button>
+									<Button variant="outline" size="sm" onclick={next} disabled={!canNext}>
+										Next
+									</Button>
+								</div>
+							</div>
+						{/snippet}
+					</DataGrid.Pagination>
+				</DataGrid.Root>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -118,6 +116,13 @@
 		container-type: inline-size;
 		padding: var(--dry-space-5);
 		background: var(--dry-color-bg-raised);
+	}
+
+	.surface {
+		padding: var(--dry-padding-card);
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-card);
+		box-shadow: var(--dry-shadow-sm);
 	}
 
 	.filters {

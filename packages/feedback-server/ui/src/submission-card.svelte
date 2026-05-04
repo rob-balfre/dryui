@@ -5,7 +5,6 @@
 		Badge,
 		BorderBeam,
 		Button,
-		Card,
 		ChipGroup,
 		CodeBlock,
 		Dialog,
@@ -171,8 +170,8 @@
 </script>
 
 <article class="submission-card">
-	<Card.Root size="sm">
-		<Card.Header>
+	<div class="surface">
+		<header class="surface-header">
 			<div class="header">
 				<div class="header-info">
 					<div class="header-top">
@@ -258,9 +257,9 @@
 					</AlertDialog.Root>
 				</div>
 			</div>
-		</Card.Header>
+		</header>
 
-		<Card.Content>
+		<div class="surface-content">
 			<div class="body">
 				<div class="media">
 					<div class="screenshot-trigger feedback-screenshot-dialog">
@@ -442,17 +441,29 @@
 					</div>
 				</div>
 			</div>
-		</Card.Content>
-	</Card.Root>
+		</div>
+	</div>
 </article>
 
 <style>
 	.submission-card {
 		container: feedback-submission / inline-size;
-		--dry-card-radius: var(--dry-radius-md);
-		--dry-card-shadow: none;
-
 		display: grid;
+	}
+
+	.surface {
+		background: var(--dry-color-bg-raised);
+		border-radius: var(--dry-radius-md);
+		overflow: hidden;
+	}
+
+	.surface-header {
+		padding: var(--dry-space-4);
+		border-bottom: 1px solid var(--dry-color-stroke-weak);
+	}
+
+	.surface-content {
+		padding: var(--dry-space-4);
 	}
 
 	.header {

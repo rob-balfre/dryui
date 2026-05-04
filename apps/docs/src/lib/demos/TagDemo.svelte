@@ -1,11 +1,33 @@
 <script lang="ts">
-	import { Tag } from '@dryui/ui';
+	import { Button, Tag, type TagColor } from '@dryui/ui';
 
-	const labelColor = { 'needs-qa': 'orange', backend: 'purple' } as const;
-	let labels = $state(['auth', 'api', 'backend', 'needs-qa']);
+	const availableLabels = [
+		'auth',
+		'api',
+		'backend',
+		'needs-qa',
+		'security',
+		'release',
+		'docs'
+	] as const;
+	type IssueLabel = (typeof availableLabels)[number];
+	const labelColor: Partial<Record<IssueLabel, TagColor>> = {
+		'needs-qa': 'orange',
+		backend: 'purple',
+		security: 'green',
+		release: 'red'
+	};
+	let labels = $state<IssueLabel[]>(['auth', 'api', 'backend', 'needs-qa']);
+	const canAddLabel = $derived(availableLabels.some((label) => !labels.includes(label)));
 
-	function dismiss(value: string) {
+	function dismiss(value: IssueLabel) {
 		labels = labels.filter((l) => l !== value);
+	}
+
+	function addLabel() {
+		const nextLabel = availableLabels.find((label) => !labels.includes(label));
+		if (!nextLabel) return;
+		labels = [...labels, nextLabel];
 	}
 </script>
 
@@ -17,15 +39,15 @@
 
 	<div class="tags">
 		{#each labels as label (label)}
-			<Tag
-				color={labelColor[label as keyof typeof labelColor] ?? 'blue'}
-				dismissible
-				onDismiss={() => dismiss(label)}
-			>
+			<Tag color={labelColor[label] ?? 'blue'} dismissible onDismiss={() => dismiss(label)}>
 				{label}
 			</Tag>
 		{/each}
-		<Tag variant="outline" color="gray">+ add label</Tag>
+		<span class="add-label">
+			<Button variant="outline" size="sm" disabled={!canAddLabel} onclick={addLabel}>
+				+ add label
+			</Button>
+		</span>
 	</div>
 </div>
 
@@ -63,5 +85,15 @@
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
+	}
+
+	.add-label {
+		--dry-btn-accent-fg: var(--dry-color-text-weak);
+		--dry-btn-accent-stroke: var(--dry-color-stroke-weak);
+		--dry-btn-font-size: var(--dry-type-tiny-size);
+		--dry-btn-min-height: var(--dry-space-6);
+		--dry-btn-padding-x: var(--dry-space-2);
+		--dry-btn-padding-y: var(--dry-space-0_5);
+		--dry-btn-radius: var(--dry-radius-2xl);
 	}
 </style>

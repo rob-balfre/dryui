@@ -7,7 +7,6 @@
 		BorderBeam,
 		Button,
 		ButtonGroup,
-		Card,
 		Container,
 		DropdownMenu,
 		Field,
@@ -621,24 +620,22 @@
 						{#if loading && pendingCount === 0}
 							<div class="loading-feed" aria-label="Loading pending submissions">
 								{#each [0, 1] as index (index)}
-									<Card.Root variant="elevated" size="sm">
-										<Card.Content>
-											<div class="submission-skeleton">
-												<div class="skeleton-head">
-													<Skeleton width="5rem" height="1.25rem" />
-													<Skeleton width="min(34rem, 100%)" height="1.25rem" />
-												</div>
-												<div class="skeleton-body">
-													<Skeleton variant="rectangular" height="9rem" />
-													<div class="skeleton-lines">
-														<Skeleton width="70%" height="1rem" />
-														<Skeleton width="48%" height="1rem" />
-														<Skeleton width="88%" height="6rem" variant="rectangular" />
-													</div>
+									<div class="loading-surface">
+										<div class="submission-skeleton">
+											<div class="skeleton-head">
+												<Skeleton width="5rem" height="1.25rem" />
+												<Skeleton width="min(34rem, 100%)" height="1.25rem" />
+											</div>
+											<div class="skeleton-body">
+												<Skeleton variant="rectangular" height="9rem" />
+												<div class="skeleton-lines">
+													<Skeleton width="70%" height="1rem" />
+													<Skeleton width="48%" height="1rem" />
+													<Skeleton width="88%" height="6rem" variant="rectangular" />
 												</div>
 											</div>
-										</Card.Content>
-									</Card.Root>
+										</div>
+									</div>
 								{/each}
 							</div>
 						{:else if visiblePendingSubmissions.length === 0}
@@ -684,24 +681,22 @@
 					{:else if loading && resolvedCount === 0}
 						<div class="loading-feed" aria-label="Loading resolved submissions">
 							{#each [0, 1] as index (index)}
-								<Card.Root variant="elevated" size="sm">
-									<Card.Content>
-										<div class="submission-skeleton">
-											<div class="skeleton-head">
-												<Skeleton width="5rem" height="1.25rem" />
-												<Skeleton width="min(34rem, 100%)" height="1.25rem" />
-											</div>
-											<div class="skeleton-body">
-												<Skeleton variant="rectangular" height="9rem" />
-												<div class="skeleton-lines">
-													<Skeleton width="70%" height="1rem" />
-													<Skeleton width="48%" height="1rem" />
-													<Skeleton width="88%" height="6rem" variant="rectangular" />
-												</div>
+								<div class="loading-surface">
+									<div class="submission-skeleton">
+										<div class="skeleton-head">
+											<Skeleton width="5rem" height="1.25rem" />
+											<Skeleton width="min(34rem, 100%)" height="1.25rem" />
+										</div>
+										<div class="skeleton-body">
+											<Skeleton variant="rectangular" height="9rem" />
+											<div class="skeleton-lines">
+												<Skeleton width="70%" height="1rem" />
+												<Skeleton width="48%" height="1rem" />
+												<Skeleton width="88%" height="6rem" variant="rectangular" />
 											</div>
 										</div>
-									</Card.Content>
-								</Card.Root>
+									</div>
+								</div>
 							{/each}
 						</div>
 					{:else if visibleResolvedSubmissions.length === 0}
@@ -753,8 +748,6 @@
 <style>
 	.dashboard-shell {
 		container: feedback-dashboard / inline-size;
-		--dry-card-radius: var(--dry-radius-md);
-		--dry-card-shadow: none;
 		--dry-btn-radius: var(--dry-radius-md);
 
 		display: grid;
@@ -926,6 +919,13 @@
 	.loading-feed {
 		display: grid;
 		gap: var(--dry-space-3);
+	}
+
+	.loading-surface {
+		padding: var(--dry-space-4);
+		background: var(--dry-color-bg-overlay);
+		border-radius: var(--dry-radius-md);
+		box-shadow: var(--dry-shadow-md);
 	}
 
 	.submission-skeleton,

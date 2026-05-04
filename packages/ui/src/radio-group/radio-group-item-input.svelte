@@ -52,6 +52,7 @@
 </script>
 
 <label
+	{...rest}
 	data-radio-group-item
 	data-state={checked ? 'checked' : 'unchecked'}
 	data-disabled={isDisabled || undefined}
@@ -59,7 +60,6 @@
 	{style}
 >
 	<input
-		{...rest}
 		type="radio"
 		name={name ?? ctx.name}
 		{value}

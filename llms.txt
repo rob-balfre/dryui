@@ -1,6 +1,6 @@
 # DryUI
 
-> Human-led, agent-assisted UI for building web apps with 166 reusable components, theme tokens, route patterns, and validation checks.
+> Human-led, agent-assisted UI for building web apps with 165 reusable components, theme tokens, route patterns, and validation checks.
 
 ## Packages
 
@@ -958,7 +958,7 @@ Accessibility: Ensure the trigger, popup role, and focus return behavior all des
 Example: <Backdrop>Content</Backdrop>
 
 ### HoverCard
-Card popup on hover with delay-based open/close.
+Surface popup on hover with delay-based open/close.
 Import: @dryui/ui
 Subpath import: @dryui/ui/hover-card
 Parts: Root, Trigger, Content
@@ -1000,16 +1000,6 @@ Accessibility: Ensure the trigger, popup role, and focus return behavior all des
 Example: <NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>
 
 ### Category: Display
-
-### Card
-Contained content surface with header/content/footer sections.
-Import: @dryui/ui
-Subpath import: @dryui/ui/card
-Parts: Root, Header, Content, Footer
-Props: Root: as ('div' | 'a' | 'button'), Underlying HTML element to render for the component., accepted div, a, button, default 'div' | selected (boolean), Applies selected-state styling for interactive card surfaces. | disabled (boolean), Prevents interaction and applies disabled styling. | orientation ('vertical' | 'horizontal'), Horizontal or vertical layout direction., accepted vertical, horizontal | variant ('default' | 'elevated' | 'interactive'), Visual style preset for the component., accepted default, elevated, interactive, default 'default' | size ('default' | 'sm'), Size preset affecting density, spacing, or typography., accepted default, sm, default 'default' | children (Snippet), Content rendered inside the component., required | Header: children (Snippet), Content rendered inside the component., required | Content: children (Snippet), Content rendered inside the component., required | noPadding (boolean), default false | Footer: children (Snippet), Content rendered inside the component., required
-Data attributes: data-bordered | data-card | data-card-content | data-card-footer | data-card-header | data-disabled (Present when the component or part is disabled.) | data-no-padding | data-orientation (Reflects the current horizontal or vertical orientation., values horizontal, vertical) | data-selected (Present when the current item is selected.) | data-size | data-variant
-Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
-Example: <Card.Root>
 
 ### Accordion
 Collapsible content sections, single or multiple mode.
@@ -1073,8 +1063,8 @@ Example: <Chart.Root>
 Conversation thread container with restart action and auto-scroll behavior.
 Import: @dryui/ui
 Subpath import: @dryui/ui/chat-thread
-Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >), Content rendered inside the component., required
-Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport | data-view-transition-name
+Props: messageCount (number), required | scrollKey (number), default 0 | children (Snippet<[{ index: number; isLatest: boolean }]>), Content rendered inside the component., required
+Data attributes: data-chat-thread | data-chat-thread-message | data-chat-thread-viewport
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <ChatThread messageCount={messages.length}>
 
@@ -1797,7 +1787,7 @@ dryui
 dryui init my-app
 dryui detect <project-path>
 dryui install <project-path>
-dryui add --project --target <file> Card
+dryui add --project --target <file> Tabs
 dryui info <component>
 dryui list --category layout
 dryui compose "date input"

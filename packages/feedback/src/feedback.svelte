@@ -407,7 +407,6 @@
 		AlertDialog: () => import('./components/component-defaults/alert-dialog.svelte'),
 		Breadcrumb: () => import('./components/component-defaults/breadcrumb.svelte'),
 		Calendar: () => import('./components/component-defaults/calendar.svelte'),
-		Card: () => import('./components/component-defaults/card.svelte'),
 		Carousel: () => import('./components/component-defaults/carousel.svelte'),
 		Chart: () => import('./components/component-defaults/chart.svelte'),
 		ChipGroup: () => import('./components/component-defaults/chip-group.svelte'),

@@ -273,7 +273,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Footer",
           "Dialog.Footer"
         ]
       }
@@ -422,251 +421,6 @@
         "combinesWith": [
           "Field.Root",
           "Label"
-        ]
-      }
-    },
-    "Card": {
-      "component": {
-        "import": "@dryui/ui",
-        "description": "Contained content surface with header/content/footer sections",
-        "category": "display",
-        "tags": [
-          "surface",
-          "container",
-          "content",
-          "panel"
-        ],
-        "compound": true,
-        "parts": {
-          "Root": {
-            "props": {
-              "as": {
-                "type": "'div' | 'a' | 'button'",
-                "required": false,
-                "acceptedValues": [
-                  "div",
-                  "a",
-                  "button"
-                ],
-                "description": "Underlying HTML element to render for the component.",
-                "default": "'div'"
-              },
-              "selected": {
-                "type": "boolean",
-                "required": false,
-                "description": "Applies selected-state styling for interactive card surfaces."
-              },
-              "disabled": {
-                "type": "boolean",
-                "required": false,
-                "description": "Prevents interaction and applies disabled styling."
-              },
-              "orientation": {
-                "type": "'vertical' | 'horizontal'",
-                "required": false,
-                "acceptedValues": [
-                  "vertical",
-                  "horizontal"
-                ],
-                "description": "Horizontal or vertical layout direction."
-              },
-              "variant": {
-                "type": "'default' | 'elevated' | 'interactive'",
-                "required": false,
-                "acceptedValues": [
-                  "default",
-                  "elevated",
-                  "interactive"
-                ],
-                "description": "Visual style preset for the component.",
-                "default": "'default'"
-              },
-              "size": {
-                "type": "'default' | 'sm'",
-                "required": false,
-                "acceptedValues": [
-                  "default",
-                  "sm"
-                ],
-                "description": "Size preset affecting density, spacing, or typography.",
-                "default": "'default'"
-              },
-              "children": {
-                "type": "Snippet",
-                "required": true,
-                "description": "Content rendered inside the component."
-              }
-            },
-            "forwardedProps": {
-              "baseType": "HTMLAttributes<HTMLElement>",
-              "via": "rest",
-              "element": "element",
-              "examples": [
-                "id",
-                "class",
-                "aria-label"
-              ],
-              "note": "Forwards <element> attributes via rest props."
-            }
-          },
-          "Header": {
-            "props": {
-              "children": {
-                "type": "Snippet",
-                "required": true,
-                "description": "Content rendered inside the component."
-              }
-            },
-            "forwardedProps": {
-              "baseType": "HTMLAttributes<HTMLDivElement>",
-              "via": "rest",
-              "element": "div",
-              "examples": [
-                "id",
-                "style",
-                "role"
-              ],
-              "note": "Forwards <div> attributes via rest props."
-            }
-          },
-          "Content": {
-            "props": {
-              "children": {
-                "type": "Snippet",
-                "required": true,
-                "description": "Content rendered inside the component."
-              },
-              "noPadding": {
-                "type": "boolean",
-                "required": false,
-                "default": "false"
-              }
-            },
-            "forwardedProps": {
-              "baseType": "HTMLAttributes<HTMLDivElement>",
-              "via": "rest",
-              "element": "div",
-              "examples": [
-                "id",
-                "style",
-                "role"
-              ],
-              "note": "Forwards <div> attributes via rest props."
-            }
-          },
-          "Footer": {
-            "props": {
-              "children": {
-                "type": "Snippet",
-                "required": true,
-                "description": "Content rendered inside the component."
-              }
-            },
-            "forwardedProps": {
-              "baseType": "HTMLAttributes<HTMLDivElement>",
-              "via": "rest",
-              "element": "div",
-              "examples": [
-                "id",
-                "style",
-                "role"
-              ],
-              "note": "Forwards <div> attributes via rest props."
-            }
-          }
-        },
-        "structure": {
-          "tree": [
-            "Card.Root",
-            "  Card.Header",
-            "  Card.Content",
-            "  Card.Footer"
-          ]
-        },
-        "a11y": [
-          "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
-          "Keep heading, reading, and focus order aligned with the surrounding content."
-        ],
-        "cssVars": {
-          "--dry-btn-radius": "Border radius",
-          "--dry-card-bg": "Background color",
-          "--dry-card-padding": "Padding",
-          "--dry-card-radius": "Border radius",
-          "--dry-card-selected-ring-color": "Selected Ring Color",
-          "--dry-card-shadow": "Box shadow"
-        },
-        "dataAttributes": [
-          {
-            "name": "data-bordered"
-          },
-          {
-            "name": "data-card"
-          },
-          {
-            "name": "data-card-content"
-          },
-          {
-            "name": "data-card-footer"
-          },
-          {
-            "name": "data-card-header"
-          },
-          {
-            "name": "data-disabled",
-            "description": "Present when the component or part is disabled."
-          },
-          {
-            "name": "data-no-padding"
-          },
-          {
-            "name": "data-orientation",
-            "description": "Reflects the current horizontal or vertical orientation.",
-            "values": [
-              "horizontal",
-              "vertical"
-            ]
-          },
-          {
-            "name": "data-selected",
-            "description": "Present when the current item is selected."
-          },
-          {
-            "name": "data-size"
-          },
-          {
-            "name": "data-variant"
-          }
-        ],
-        "example": "<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card body content goes here.</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button variant=\"solid\">Action</Button>\n  </Card.Footer>\n</Card.Root>"
-      },
-      "related": {
-        "component": "Card",
-        "useWhen": "Group related content in a bordered container",
-        "alternatives": [
-          {
-            "rank": 1,
-            "component": "Card",
-            "useWhen": "Content container with optional header/footer",
-            "snippet": "<Card.Root>\n  <Card.Header>Title</Card.Header>\n  <Card.Content>\n    <p>Card content</p>\n  </Card.Content>\n  <Card.Footer>\n    <Button>Action</Button>\n  </Card.Footer>\n</Card.Root>"
-          }
-        ],
-        "antiPatterns": [
-          {
-            "pattern": "div with border and padding",
-            "reason": "Card handles elevation, borders, and theme integration",
-            "fix": "Card"
-          },
-          {
-            "pattern": "<Card> without .Root",
-            "reason": "Card is a compound component — use Card.Root",
-            "fix": "Card.Root"
-          }
-        ],
-        "combinesWith": [
-          "Container",
-          "Badge",
-          "Text",
-          "subgrid aligned-card-list"
         ]
       }
     },
@@ -2035,8 +1789,7 @@
         "antiPatterns": [],
         "combinesWith": [
           "Button",
-          "Table.Row",
-          "Card.Content"
+          "Table.Row"
         ]
       }
     },
@@ -2260,7 +2013,6 @@
         ],
         "combinesWith": [
           "Table.Row",
-          "Card.Root",
           "Tree"
         ]
       }
@@ -2475,9 +2227,7 @@
             "fix": "Accordion or Collapsible"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "Collapsible": {
@@ -2633,7 +2383,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Button"
         ]
       }
@@ -3161,8 +2910,7 @@
           "Input",
           "Textarea",
           "Select",
-          "Checkbox",
-          "Card.Content"
+          "Checkbox"
         ]
       }
     },
@@ -3295,15 +3043,14 @@
             "fix": "Fieldset"
           },
           {
-            "pattern": "Card.Root to group form fields",
+            "pattern": "<div> wrapper to group form fields",
             "reason": "Fieldset is semantically correct for form grouping with <legend>",
             "fix": "Fieldset"
           }
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -3541,8 +3288,7 @@
           }
         ],
         "combinesWith": [
-          "ChatThread",
-          "Card.Content"
+          "ChatThread"
         ]
       }
     },
@@ -3946,8 +3692,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -4245,8 +3990,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -4834,7 +4578,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Header",
           "Toolbar"
         ]
       }
@@ -5298,8 +5041,7 @@
           }
         ],
         "combinesWith": [
-          "Toolbar",
-          "Card.Header"
+          "Toolbar"
         ]
       }
     },
@@ -6042,9 +5784,7 @@
             "fix": "Separator"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "Spacer": {
@@ -6195,8 +5935,7 @@
         ],
         "combinesWith": [
           "Image",
-          "VideoEmbed",
-          "Card.Content"
+          "VideoEmbed"
         ]
       }
     },
@@ -6421,7 +6160,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Root",
           "Container"
         ]
       }
@@ -7035,7 +6773,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Button"
         ]
       }
@@ -7659,8 +7396,7 @@
           }
         ],
         "combinesWith": [
-          "Link",
-          "Card"
+          "Link"
         ]
       }
     },
@@ -8271,7 +8007,6 @@
         ],
         "combinesWith": [
           "List",
-          "Card.Content",
           "Sidebar"
         ]
       }
@@ -8427,7 +8162,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "ScrollArea"
         ]
       }
@@ -8855,7 +8589,6 @@
         ],
         "combinesWith": [
           "Text",
-          "Card.Content",
           "Table.Cell"
         ]
       }
@@ -8982,7 +8715,6 @@
         ],
         "combinesWith": [
           "Table.Cell",
-          "Card.Content",
           "Avatar"
         ]
       }
@@ -9352,9 +9084,7 @@
             "fix": "Chart"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "AppFrame": {
@@ -9441,7 +9171,7 @@
             "default": "0"
           },
           "children": {
-            "type": "Snippet< [ { index: number; viewTransitionName: string; isLatest: boolean; } ] >",
+            "type": "Snippet<[{ index: number; isLatest: boolean }]>",
             "required": true,
             "description": "Content rendered inside the component."
           }
@@ -9474,9 +9204,6 @@
           },
           {
             "name": "data-chat-thread-viewport"
-          },
-          {
-            "name": "data-view-transition-name"
           }
         ],
         "example": "<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>"
@@ -9501,8 +9228,7 @@
         ],
         "combinesWith": [
           "PromptInput",
-          "TypingIndicator",
-          "Card"
+          "TypingIndicator"
         ]
       }
     },
@@ -9715,7 +9441,6 @@
         ],
         "combinesWith": [
           "AspectRatio",
-          "Card.Content",
           "Carousel"
         ]
       }
@@ -10198,7 +9923,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "ScrollArea",
           "Avatar"
         ]
@@ -10457,7 +10181,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Avatar",
           "Badge",
           "Text"
@@ -10721,7 +10444,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Container"
         ]
       }
@@ -10845,9 +10567,7 @@
             "fix": "<Heading maxMeasure=\"narrow\">…</Heading>"
           }
         ],
-        "combinesWith": [
-          "Card.Header"
-        ]
+        "combinesWith": []
       }
     },
     "Text": {
@@ -11025,9 +10745,7 @@
             "fix": "Heading"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "DescriptionList": {
@@ -11178,7 +10896,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Badge"
         ]
       }
@@ -11322,9 +11039,7 @@
             "fix": "Alert or Toast"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "Toast": {
@@ -11727,7 +11442,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       }
@@ -11817,7 +11531,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Table.Cell"
         ]
       }
@@ -11920,7 +11633,6 @@
         ],
         "combinesWith": [
           "Button",
-          "Card.Content",
           "Backdrop"
         ]
       }
@@ -12264,8 +11976,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -12738,8 +12449,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -13007,9 +12717,7 @@
           }
         ],
         "antiPatterns": [],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "DateRangePicker": {
@@ -13311,8 +13019,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -13869,8 +13576,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -14060,9 +13766,7 @@
           }
         ],
         "antiPatterns": [],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "Rating": {
@@ -14195,8 +13899,7 @@
         "combinesWith": [
           "Field.Root",
           "Label",
-          "Text",
-          "Card.Content"
+          "Text"
         ]
       }
     },
@@ -14832,7 +14535,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Progress",
           "Button"
         ]
@@ -15035,7 +14737,6 @@
         "combinesWith": [
           "Field.Root",
           "Label",
-          "Card.Content",
           "Button"
         ]
       }
@@ -15890,7 +15591,7 @@
             "name": "data-visible"
           }
         ],
-        "example": "<Reveal variant=\"slide-up\" delay={120}>\n  <Card.Root>\n    <Card.Content>Stage content as it enters the viewport.</Card.Content>\n  </Card.Root>\n</Reveal>"
+        "example": "<Reveal variant=\"slide-up\" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>"
       },
       "related": {
         "component": "Reveal",
@@ -15900,7 +15601,7 @@
             "rank": 1,
             "component": "Reveal",
             "useWhen": "Section reveals, stat rows, or card sequences that should appear as the user scrolls",
-            "snippet": "<Reveal variant=\"fade\" once>\n  <Card.Root>\n    <Card.Content>Visible content</Card.Content>\n  </Card.Root>\n</Reveal>"
+            "snippet": "<Reveal variant=\"fade\" once>\n  <p>Visible content</p>\n</Reveal>"
           },
           {
             "rank": 2,
@@ -15922,7 +15623,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Text"
         ]
       }
@@ -16007,7 +15707,7 @@
             "name": "data-static"
           }
         ],
-        "example": "<Spotlight intensity={32}>\n  <Card.Root>\n    <Card.Content>Hover to pull a radial highlight across the surface.</Card.Content>\n  </Card.Root>\n</Spotlight>"
+        "example": "<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>"
       },
       "related": {
         "component": "Spotlight",
@@ -16017,13 +15717,13 @@
             "rank": 1,
             "component": "Spotlight",
             "useWhen": "Radial highlight or pointer-follow accent on interactive surfaces",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <p>Spotlight card</p>\n</Spotlight>"
           },
           {
             "rank": 2,
             "component": "Static accent background",
             "useWhen": "Low-motion surfaces that should remain visually rich without pointer tracking",
-            "snippet": "<Card.Root class=\"accent-surface\">\n  <Card.Content>Static accent</Card.Content>\n</Card.Root>"
+            "snippet": "<div class=\"accent-surface\">Static accent</div>"
           }
         ],
         "antiPatterns": [
@@ -16039,7 +15739,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Reveal"
         ]
       }
@@ -16168,7 +15867,7 @@
             "name": "data-reduced-motion"
           }
         ],
-        "example": "<Aurora palette=\"ocean\">\n  <Card.Root>\n    <Card.Content>Ambient backgrounds stay native and no-dependency.</Card.Content>\n  </Card.Root>\n</Aurora>"
+        "example": "<Aurora palette=\"ocean\">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>"
       },
       "related": {
         "component": "Aurora",
@@ -16200,7 +15899,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Container",
           "Reveal",
           "Text"
@@ -16300,7 +15998,7 @@
             "name": "data-reduced-motion"
           }
         ],
-        "example": "<Noise opacity={0.12} blend=\"soft-light\">\n  <Card.Root>\n    <Card.Content>Grain adds atmosphere without loading an external texture.</Card.Content>\n  </Card.Root>\n</Noise>"
+        "example": "<Noise opacity={0.12} blend=\"soft-light\">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>"
       },
       "related": {
         "component": "Noise",
@@ -16333,7 +16031,6 @@
         ],
         "combinesWith": [
           "Aurora",
-          "Card",
           "Container",
           "Reveal"
         ]
@@ -16727,9 +16424,7 @@
             "fix": "QRCode"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "CodeBlock": {
@@ -16868,9 +16563,7 @@
             "fix": "CodeBlock"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "MarkdownRenderer": {
@@ -16953,9 +16646,7 @@
             "fix": "MarkdownRenderer"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "VirtualList": {
@@ -17636,7 +17327,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Badge",
           "Avatar",
           "Button",
@@ -17851,8 +17541,7 @@
           }
         ],
         "combinesWith": [
-          "List",
-          "Card.Content"
+          "List"
         ]
       }
     },
@@ -18144,7 +17833,6 @@
           }
         ],
         "combinesWith": [
-          "Card.Content",
           "Field.Root",
           "Label"
         ]
@@ -18318,8 +18006,7 @@
         ],
         "combinesWith": [
           "Field.Root",
-          "Label",
-          "Card.Content"
+          "Label"
         ]
       }
     },
@@ -18842,8 +18529,7 @@
           }
         ],
         "combinesWith": [
-          "ChipGroup",
-          "Card.Content"
+          "ChipGroup"
         ]
       }
     },
@@ -19099,8 +18785,7 @@
         "combinesWith": [
           "Badge",
           "Chip",
-          "Tag",
-          "Card.Content"
+          "Tag"
         ]
       }
     },
@@ -19381,7 +19066,6 @@
         ],
         "combinesWith": [
           "Image",
-          "Card",
           "AspectRatio"
         ]
       }
@@ -19919,19 +19603,16 @@
             "fix": "ImageComparison"
           }
         ],
-        "combinesWith": [
-          "Card.Content"
-        ]
+        "combinesWith": []
       }
     },
     "HoverCard": {
       "component": {
         "import": "@dryui/ui",
-        "description": "Card popup on hover with delay-based open/close",
+        "description": "Surface popup on hover with delay-based open/close",
         "category": "overlay",
         "tags": [
           "hover",
-          "card",
           "preview",
           "popup"
         ],
@@ -20222,7 +19903,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       }
@@ -20498,7 +20178,6 @@
         "combinesWith": [
           "Sidebar",
           "ScrollArea",
-          "Card.Content",
           "Checkbox"
         ]
       }
@@ -20618,7 +20297,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Text"
         ]
       }
@@ -20721,8 +20399,7 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Table.Cell",
-          "Card.Content"
+          "Table.Cell"
         ]
       }
     },
@@ -20879,7 +20556,7 @@
       },
       "related": {
         "component": "FlipCard",
-        "useWhen": "Card with front and back faces that flips on interaction",
+        "useWhen": "Surface with front and back faces that flips on interaction",
         "alternatives": [
           {
             "rank": 1,
@@ -20896,7 +20573,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Image"
         ]
       }
@@ -21013,8 +20689,7 @@
           }
         ],
         "combinesWith": [
-          "AspectRatio",
-          "Card.Content"
+          "AspectRatio"
         ]
       }
     },
@@ -22050,7 +21725,6 @@
         ],
         "antiPatterns": [],
         "combinesWith": [
-          "Card.Content",
           "Popover"
         ]
       }
@@ -22169,9 +21843,7 @@
             "fix": "Limit to headings, images, or decorative surfaces"
           }
         ],
-        "combinesWith": [
-          "Card"
-        ]
+        "combinesWith": []
       }
     },
     "ChromaticAberration": {
@@ -22383,13 +22055,13 @@
             "rank": 1,
             "component": "Glow",
             "useWhen": "Static luminous accent on cards, buttons, or hero elements",
-            "snippet": "<Glow color=\"var(--dry-color-fill-brand)\" intensity={0.6} radius={80}>\n  <Card.Root>\n    <Card.Content>Glowing card</Card.Content>\n  </Card.Root>\n</Glow>"
+            "snippet": "<Glow color=\"var(--dry-color-fill-brand)\" intensity={0.6} radius={80}>\n  <p>Glowing card</p>\n</Glow>"
           },
           {
             "rank": 2,
             "component": "Spotlight",
             "useWhen": "Pointer-reactive lighting instead of a static glow",
-            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <Card.Root>\n    <Card.Content>Spotlight card</Card.Content>\n  </Card.Root>\n</Spotlight>"
+            "snippet": "<Spotlight radius={180} intensity={0.7} color=\"var(--dry-color-fill-brand)\">\n  <p>Spotlight card</p>\n</Spotlight>"
           }
         ],
         "antiPatterns": [
@@ -22405,7 +22077,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       }
@@ -22519,7 +22190,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       }
@@ -22699,7 +22369,7 @@
             "rank": 1,
             "component": "Beam",
             "useWhen": "Single sweeping highlight or shimmer line across a card or hero",
-            "snippet": "<Beam color=\"rgba(255,255,255,0.15)\" angle={-45} duration={2.4}>\n  <Card.Root>\n    <Card.Content>Beam card</Card.Content>\n  </Card.Root>\n</Beam>"
+            "snippet": "<Beam color=\"rgba(255,255,255,0.15)\" angle={-45} duration={2.4}>\n  <p>Beam card</p>\n</Beam>"
           },
           {
             "rank": 2,
@@ -22716,7 +22386,6 @@
           }
         ],
         "combinesWith": [
-          "Card",
           "Aurora"
         ]
       }
@@ -23693,7 +23362,11 @@
           "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
           "Keep heading, reading, and focus order aligned with the surrounding content."
         ],
-        "cssVars": {},
+        "cssVars": {
+          "--dry-btn-min-height": "Minimum height",
+          "--dry-btn-padding-x": "Horizontal padding",
+          "--dry-btn-padding-y": "Vertical padding"
+        },
         "dataAttributes": [
           {
             "name": "data-color"

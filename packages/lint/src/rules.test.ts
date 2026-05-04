@@ -123,9 +123,9 @@ describe('checkMarkup', () => {
 	test('component-only mode allows raw layout hook elements', () => {
 		const code = `<main data-layout="starter">
   <section data-layout-area="intro">
-    <Card.Root>
-      <Card.Content>Ready</Card.Content>
-    </Card.Root>
+    <Tabs.Root>
+      <Tabs.Content value="one">Ready</Tabs.Content>
+    </Tabs.Root>
   </section>
 </main>`;
 		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
@@ -137,19 +137,19 @@ describe('checkMarkup', () => {
   <title>Docs</title>
   <meta name="description" content="DryUI docs" />
 </svelte:head>
-<Card.Root>
+<Tabs.Root>
   <Button>Save</Button>
   <slot />
-</Card.Root>`;
+</Tabs.Root>`;
 		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
 		expect(violations).toHaveLength(0);
 	});
 
 	test('flags class= on a compound component', () => {
-		const violations = checkMarkup('<Card.Root class="custom">content</Card.Root>');
+		const violations = checkMarkup('<Tabs.Root class="custom">content</Tabs.Root>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-component-class');
-		expect(violations[0]!.message).toContain('Card.Root');
+		expect(violations[0]!.message).toContain('Tabs.Root');
 	});
 
 	test('flags class= with single quotes on a component', () => {
@@ -760,9 +760,9 @@ describe('checkStyle', () => {
 	test('checkSvelteFile allows layout hooks in component-only markup', () => {
 		const code = `<main data-layout="starter">
   <section data-layout-area="intro">
-    <Card.Root>
-      <Card.Content>Ready</Card.Content>
-    </Card.Root>
+    <Tabs.Root>
+      <Tabs.Content value="one">Ready</Tabs.Content>
+    </Tabs.Root>
   </section>
 </main>`;
 		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', {

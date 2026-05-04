@@ -20,7 +20,7 @@
 	<div class="zone">
 		<p class="eyebrow">Default brand</p>
 		<div class="row">
-			<Button variant="primary">Deploy</Button>
+			<Button variant="solid">Deploy</Button>
 			<Badge variant="solid">Live</Badge>
 		</div>
 	</div>
@@ -29,7 +29,7 @@
 		<div class="zone">
 			<p class="eyebrow">Danger scope</p>
 			<div class="row">
-				<Button variant="primary">Delete</Button>
+				<Button variant="solid">Delete</Button>
 				<Badge variant="solid">Critical</Badge>
 			</div>
 		</div>
@@ -39,7 +39,7 @@
 		<div class="zone">
 			<p class="eyebrow">Success scope</p>
 			<div class="row">
-				<Button variant="primary">Approve</Button>
+				<Button variant="solid">Approve</Button>
 				<Badge variant="solid">Verified</Badge>
 			</div>
 		</div>
