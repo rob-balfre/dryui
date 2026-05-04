@@ -1,14 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
-  <title>DryUI</title>
-  <defs>
-    <linearGradient id="dryui-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="100%" stop-color="#2563eb" />
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="16" fill="url(#dryui-gradient)" />
-  <path
-    d="M18 20h14c8.837 0 16 7.163 16 16s-7.163 16-16 16H18V20zm12 24c4.418 0 8-3.582 8-8s-3.582-8-8-8h-4v16h4z"
-    fill="#f8fafc"
-  />
+	<title>DryUI</title>
+	<rect x="4" y="4" width="56" height="56" rx="14" fill="#111111" />
+	<path
+		d="M20 16h18c8.5 0 14 5.5 14 16s-5.5 16-14 16H20V16Zm10 11v10h8c3.1 0 5-1.9 5-5s-1.9-5-5-5h-8Z"
+		fill="#f7f7f7"
+	/>
 </svg>

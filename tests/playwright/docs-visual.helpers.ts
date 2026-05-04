@@ -36,6 +36,7 @@ export const docsSmokeRoutes: DocsVisualRoute[] = [
 ];
 
 export async function openDocsRoute(page: Page, path: string): Promise<Response | null> {
+	await page.emulateMedia({ reducedMotion: 'reduce' });
 	const response = await page.goto(path, { waitUntil: 'domcontentloaded' });
 	await page.waitForLoadState('networkidle');
 	await forceLightTheme(page);

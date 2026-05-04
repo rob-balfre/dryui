@@ -15,7 +15,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 - Editor install snippets and MCP config examples live in [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts). Do not duplicate them elsewhere.
 - Public docs copy and positioning should match [`apps/docs/src/lib/site-meta.ts`](./apps/docs/src/lib/site-meta.ts) and the docs homepage: human-led, agent-assisted UI for reusable components, themes, and route patterns. Avoid positioning DryUI as a full automation tool, an "agent-built apps" product, or a Svelte-only message.
 - The public docs route surface is intentionally small: `/`, `/getting-started`, and `/components/[slug]`. Do not re-add removed exploration pages (`/tools`, `/how-it-works`, `/how-we-work`, `/grid-rules`, `/theme-wizard`, logo option pages, `/components` index pages, or similar samples) unless explicitly requested.
-- Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
+- Skill sources live in top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). One source of truth.
 - Recommended install path for end users: `npx skills add rob-balfre/dryui` (skills.sh standard).
 - `bun run validate:skills` lints every SKILL.md (frontmatter present, name=dirname, description length).
 - `/plugins` in this repo refers to the in-app Claude or Codex install flow (sunset for DryUI; users install via `npx skills add rob-balfre/dryui`), not a repo directory.

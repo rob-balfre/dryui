@@ -1,0 +1,4 @@
+interface:
+  display_name: 'DryUI Layout Polish'
+  short_description: 'Improve DryUI layout rhythm and hierarchy'
+  default_prompt: 'Use $dryui-layout-polish after $dryui-layout to improve layout rhythm, hierarchy, density, and responsive behavior.'

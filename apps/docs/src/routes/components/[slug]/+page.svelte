@@ -1,6 +1,13 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import { Container, Badge, Tabs, Card, CodeBlock, Table, Heading, Text } from '@dryui/ui';
+	import { Badge } from '@dryui/ui/badge';
+	import { Card } from '@dryui/ui/card';
+	import { CodeBlock } from '@dryui/ui/code-block';
+	import { Container } from '@dryui/ui/container';
+	import { Heading } from '@dryui/ui/heading';
+	import { Table } from '@dryui/ui/table';
+	import { Tabs } from '@dryui/ui/tabs';
+	import { Text } from '@dryui/ui/text';
 	import PropsTable from '$lib/components/PropsTable.svelte';
 	import CssVarsTable from '$lib/components/CssVarsTable.svelte';
 	import { componentLinkResolver } from '$lib/component-links';
@@ -11,7 +18,7 @@
 	import { getComponentDemo } from '$lib/demos/index';
 	let { data }: PageProps = $props();
 	let name = $derived(data.name);
-	let DemoComponent = $derived(getComponentDemo(name));
+	let demoComponentPromise = $derived(getComponentDemo(name));
 	let hasRootPart = $derived(data.hasRootPart);
 	let a11yNotes = $derived(data?.a11y ?? []);
 	let parts = $derived(data.parts ? Object.entries(data.parts) : []);
@@ -29,11 +36,13 @@
 			<div class="stack-xl">
 				<DocsPageHeader title={name} description={data.description} />
 
-				{#if DemoComponent}
-					<div class="demo-surface">
-						<DemoComponent />
-					</div>
-				{/if}
+				{#await demoComponentPromise then DemoComponent}
+					{#if DemoComponent}
+						<div class="demo-surface">
+							<DemoComponent />
+						</div>
+					{/if}
+				{/await}
 
 				<div class="stack-lg">
 					{#if data.kind === 'primitive'}

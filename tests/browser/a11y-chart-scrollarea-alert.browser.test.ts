@@ -1,7 +1,7 @@
 import { createRawSnippet } from 'svelte';
 import { describe, expect, it } from 'vitest';
 import DocsCallout from '../../apps/docs/src/lib/components/DocsCallout.svelte';
-import ChartDemo from '../../apps/docs/src/lib/demos/ChartDemo.svelte';
+import ChartHarness from './fixtures/chart-a11y-harness.svelte';
 import ScrollAreaDemo from '../../apps/docs/src/lib/demos/ScrollAreaDemo.svelte';
 import { Alert } from '../../packages/ui/src/alert/index.js';
 import { ScrollArea } from '../../packages/ui/src/scroll-area/index.js';
@@ -15,7 +15,7 @@ function htmlSnippet(html: string) {
 
 describe('chart, scroll area, and alert accessibility', () => {
 	it('adds a text summary and value list alongside the chart SVG', () => {
-		render(ChartDemo);
+		render(ChartHarness);
 
 		const svg = document.querySelector<SVGSVGElement>('[data-chart]');
 		const summary = document.querySelector<HTMLElement>('[data-chart-summary]');

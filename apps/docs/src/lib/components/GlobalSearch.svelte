@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { Button, CommandPalette, Hotkey, Kbd, Text } from '@dryui/ui';
+	import { Button } from '@dryui/ui/button';
+	import { CommandPalette } from '@dryui/ui/command-palette';
+	import { Hotkey } from '@dryui/ui/hotkey';
+	import { Kbd } from '@dryui/ui/kbd';
+	import { Text } from '@dryui/ui/text';
 	import { getSearchSections } from '$lib/search';
 	import { withBase } from '$lib/utils';
 

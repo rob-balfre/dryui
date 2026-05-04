@@ -42,6 +42,7 @@ const DRYUI_SKILL_NAMES = [
 	'dryui-feedback',
 	'dryui-init',
 	'dryui-layout',
+	'dryui-layout-polish',
 	'dryui-live-feedback'
 ] as const;
 

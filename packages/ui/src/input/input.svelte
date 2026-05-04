@@ -37,6 +37,7 @@
 		size = 'md',
 		variant = 'default',
 		class: className,
+		style,
 		disabled = false,
 		id,
 		type,
@@ -72,8 +73,9 @@
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
 </script>
 
-<span class="wrapper {className ?? ''}" {...rest}>
+<span class="wrapper {className ?? ''}" {style}>
 	<input
+		{...rest}
 		{...type != null ? { type } : {}}
 		bind:value
 		id={id ?? ctx?.id}

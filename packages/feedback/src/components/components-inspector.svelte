@@ -47,23 +47,6 @@
 		'h6'
 	]);
 
-	const NATIVE_TAG_TO_NAME: Record<string, string> = {
-		h1: 'Heading',
-		h2: 'Heading',
-		h3: 'Heading',
-		h4: 'Heading',
-		h5: 'Heading',
-		h6: 'Heading',
-		input: 'Input',
-		textarea: 'Textarea',
-		select: 'Select',
-		button: 'Button',
-		img: 'Image',
-		video: 'VideoEmbed',
-		audio: 'VideoEmbed',
-		svg: 'Icon'
-	};
-
 	const cloneElement = $derived(selectedElement ? getClone(selectedElement) : null);
 
 	type Box = {
@@ -110,7 +93,7 @@
 			}
 		}
 		if (el.hasAttribute('data-dry-button')) return 'Button';
-		return NATIVE_TAG_TO_NAME[el.tagName.toLowerCase()] ?? null;
+		return null;
 	}
 
 	function tooltipLabelFor(el: HTMLElement): string {

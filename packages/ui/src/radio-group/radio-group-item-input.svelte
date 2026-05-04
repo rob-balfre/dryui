@@ -25,6 +25,7 @@
 		disabled = false,
 		children,
 		class: className,
+		style,
 		id,
 		name,
 		required,
@@ -55,9 +56,10 @@
 	data-state={checked ? 'checked' : 'unchecked'}
 	data-disabled={isDisabled || undefined}
 	class={className}
-	{...rest}
+	{style}
 >
 	<input
+		{...rest}
 		type="radio"
 		name={name ?? ctx.name}
 		{value}

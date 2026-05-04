@@ -1,4 +1,4 @@
-import { createThemeController, type ThemeController } from '@dryui/ui';
+import { createThemeController, type ThemeController } from '@dryui/ui/theme-toggle';
 
 const STORAGE_KEY = 'dryui-docs-theme';
 

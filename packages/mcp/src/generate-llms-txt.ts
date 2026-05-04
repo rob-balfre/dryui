@@ -445,7 +445,7 @@ The recommended path is the upstream \`npx skills\` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 \`\`\`
 
-That single command installs all five DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it (\`dryui setup --install --editor <agent>\` does this automatically for Copilot, Cursor, OpenCode, Windsurf, Codex, Gemini, and Zed).
+That single command installs all six DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it (\`dryui setup --install --editor <agent>\` does this automatically for Copilot, Cursor, OpenCode, Windsurf, Codex, Gemini, and Zed).
 
 #### Alternative install paths
 

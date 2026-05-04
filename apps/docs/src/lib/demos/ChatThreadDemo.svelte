@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Avatar, Badge, ChatThread } from '@dryui/ui';
+	import { Avatar } from '@dryui/ui/avatar';
+	import { Badge } from '@dryui/ui/badge';
+	import { ChatThread } from '@dryui/ui/chat-thread';
 
 	type Msg = { role: 'customer' | 'support'; name: string; body: string; time: string };
 

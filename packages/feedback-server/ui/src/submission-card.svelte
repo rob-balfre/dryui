@@ -5,7 +5,6 @@
 		Badge,
 		BorderBeam,
 		Button,
-		ButtonGroup,
 		Card,
 		ChipGroup,
 		CodeBlock,
@@ -15,7 +14,8 @@
 		Heading,
 		Image,
 		Link,
-		Text
+		Text,
+		VisuallyHidden
 	} from '@dryui/ui';
 	import {
 		Check,
@@ -24,6 +24,7 @@
 		CornerLeftUp,
 		ExternalLink,
 		MessageSquare,
+		RotateCcw,
 		Rocket,
 		Trash2
 	} from 'lucide-svelte';
@@ -170,7 +171,7 @@
 </script>
 
 <article class="submission-card">
-	<Card.Root variant="elevated" size="sm">
+	<Card.Root size="sm">
 		<Card.Header>
 			<div class="header">
 				<div class="header-info">
@@ -192,7 +193,7 @@
 						<span>{formatViewport(submission.viewport)}</span>
 					</div>
 				</div>
-				<ButtonGroup size="sm">
+				<div class="header-actions" role="group" aria-label="Submission actions">
 					<Button href={submission.url} target="_blank" rel="noreferrer" variant="ghost" size="sm">
 						<ExternalLink size={14} aria-hidden="true" />
 						Open page
@@ -200,7 +201,7 @@
 
 					{#if submission.status === 'pending'}
 						<Button
-							variant="solid"
+							variant="outline"
 							size="sm"
 							onclick={() => void onSetStatus(submission.id, 'resolved')}
 							disabled={refreshing}
@@ -215,6 +216,7 @@
 							onclick={() => void onSetStatus(submission.id, 'pending')}
 							disabled={refreshing}
 						>
+							<RotateCcw size={14} aria-hidden="true" />
 							Reopen
 						</Button>
 					{/if}
@@ -254,7 +256,7 @@
 							</AlertDialog.Footer>
 						</AlertDialog.Content>
 					</AlertDialog.Root>
-				</ButtonGroup>
+				</div>
 			</div>
 		</Card.Header>
 
@@ -314,50 +316,54 @@
 							</Dialog.Content>
 						</Dialog.Root>
 					</div>
-
-					<section class="notes">
-						<header class="notes-head">
-							<Heading level={4}>Notes</Heading>
-							{#if drawingCounts.length > 0}
-								<ChipGroup.Root gap="sm" aria-label="Annotation counts">
-									<ChipGroup.Label hidden>Annotation counts</ChipGroup.Label>
-									{#each drawingCounts as entry (entry.label)}
-										<Badge variant="outline" color="gray" size="sm">
-											{entry.label}: {entry.count}
-										</Badge>
-									{/each}
-								</ChipGroup.Root>
-							{/if}
-						</header>
-
-						{#if textNotes.length > 0}
-							<div class="notes-stack">
-								{#each textNotes as note, index (`${submission.id}-${index}`)}
-									<div class="note-card">
-										<div class="note-card-head">
-											<MessageSquare size={12} aria-hidden="true" />
-											<Text as="span" size="xs" color="secondary">Note {index + 1}</Text>
-										</div>
-										<Text as="p" size="sm">{note}</Text>
-									</div>
-								{/each}
-							</div>
-						{:else if drawingCounts.length > 0}
-							<Text as="p" size="sm" color="secondary">
-								This submission only uses visual arrows or freehand marks.
-							</Text>
-						{:else}
-							<Text as="p" size="sm" color="secondary">No annotations attached.</Text>
-						{/if}
-					</section>
 				</div>
 
+				<section class="notes">
+					<header class="notes-head">
+						<Heading level={6}>Notes</Heading>
+						{#if drawingCounts.length > 0}
+							<ChipGroup.Root gap="sm" aria-label="Annotation counts">
+								<ChipGroup.Label>
+									<VisuallyHidden>Annotation counts</VisuallyHidden>
+								</ChipGroup.Label>
+								{#each drawingCounts as entry (entry.label)}
+									<Badge variant="outline" color="gray" size="sm">
+										{entry.label}: {entry.count}
+									</Badge>
+								{/each}
+							</ChipGroup.Root>
+						{/if}
+					</header>
+
+					{#if textNotes.length > 0}
+						<div class="notes-stack">
+							{#each textNotes as note, index (`${submission.id}-${index}`)}
+								<div class="note-card">
+									<div class="note-card-head">
+										<MessageSquare size={12} aria-hidden="true" />
+										<Text as="span" size="xs" color="secondary">Note {index + 1}</Text>
+									</div>
+									<Text as="p" size="xs">{note}</Text>
+								</div>
+							{/each}
+						</div>
+					{:else if drawingCounts.length > 0}
+						<Text as="p" size="xs" color="secondary">
+							This submission only uses visual arrows or freehand marks.
+						</Text>
+					{:else}
+						<Text as="p" size="xs" color="secondary">No annotations attached.</Text>
+					{/if}
+				</section>
+
 				<div class="prompt">
-					<CodeBlock code={promptText} language="text" showCopyButton={false} />
+					<div class="feedback-prompt-block">
+						<CodeBlock code={promptText} language="text" showCopyButton={false} />
+					</div>
 					<div class="prompt-actions">
 						{#if dispatchTargets.length > 0 && targetAgent}
 							<div class="launch-group">
-								<BorderBeam size="sm" colorVariant="colorful" borderRadius={8}>
+								<BorderBeam size="sm" colorVariant="colorful" borderRadius="var(--dry-radius-md)">
 									<Button
 										variant="solid"
 										size="sm"
@@ -443,12 +449,15 @@
 <style>
 	.submission-card {
 		container: feedback-submission / inline-size;
+		--dry-card-radius: var(--dry-radius-md);
+		--dry-card-shadow: none;
+
 		display: grid;
 	}
 
 	.header {
 		display: grid;
-		gap: var(--dry-space-3);
+		gap: var(--dry-space-2);
 		align-items: center;
 	}
 
@@ -461,6 +470,8 @@
 		display: grid;
 		gap: var(--dry-space-2);
 		align-items: center;
+		font-size: var(--dry-text-sm-size);
+		line-height: var(--dry-text-sm-leading);
 	}
 
 	.url {
@@ -471,8 +482,9 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		font-size: var(--dry-font-size-sm, 0.875rem);
+		font-size: inherit;
 		font-weight: 500;
+		line-height: inherit;
 	}
 
 	.url:hover {
@@ -481,20 +493,32 @@
 
 	.header-meta {
 		display: grid;
-		gap: var(--dry-space-1);
+		gap: var(--dry-space-1_5);
 		align-items: start;
-		font-size: var(--dry-font-size-xs, 0.75rem);
+		font-size: var(--dry-text-xs-size);
+		line-height: var(--dry-text-xs-leading);
 		color: var(--dry-color-text-weak);
 		font-variant-numeric: tabular-nums;
 	}
 
 	.id {
 		font-family: var(--dry-font-mono, ui-monospace, SFMono-Regular, monospace);
+		font-size: inherit;
+		line-height: inherit;
 	}
 
 	.dot {
 		display: none;
 		opacity: 0.5;
+	}
+
+	.header-actions {
+		--dry-btn-radius: var(--dry-radius-md);
+
+		display: grid;
+		gap: var(--dry-space-2);
+		align-items: center;
+		justify-items: start;
 	}
 
 	.body {
@@ -505,7 +529,6 @@
 
 	.media {
 		display: grid;
-		gap: var(--dry-space-3);
 		align-content: start;
 	}
 
@@ -539,7 +562,8 @@
 
 	.notes {
 		display: grid;
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-1_5);
+		align-content: start;
 	}
 
 	.prompt {
@@ -548,7 +572,20 @@
 		align-content: start;
 	}
 
+	.feedback-prompt-block {
+		--dry-code-font-size: var(--dry-type-ui-caption-size, var(--dry-text-xs-size));
+		--dry-code-line-height: var(--dry-type-ui-caption-leading, var(--dry-text-xs-leading));
+		--dry-code-padding: var(--dry-space-2_5);
+		--dry-code-radius: var(--dry-radius-md);
+
+		max-block-size: min(18rem, 42dvh);
+		overflow: auto;
+		border-radius: var(--dry-radius-md);
+	}
+
 	.prompt-actions {
+		--dry-btn-radius: var(--dry-radius-md);
+
 		display: grid;
 		justify-content: start;
 		align-items: center;
@@ -561,7 +598,7 @@
 		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
-		border-radius: 8px;
+		border-radius: var(--dry-radius-md);
 	}
 
 	.agent-menu-label {
@@ -580,7 +617,7 @@
 
 	.notes-head {
 		display: grid;
-		gap: var(--dry-space-3);
+		gap: var(--dry-space-1_5);
 		align-items: start;
 	}
 
@@ -592,7 +629,7 @@
 	.note-card {
 		display: grid;
 		gap: var(--dry-space-1);
-		padding: var(--dry-space-2) var(--dry-space-2_5);
+		padding: var(--dry-space-1_5) var(--dry-space-2);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		background: var(--dry-color-bg-raised);
@@ -628,8 +665,13 @@
 			grid-auto-columns: max-content;
 		}
 
+		.header-actions {
+			grid-auto-flow: column;
+			grid-auto-columns: max-content;
+		}
+
 		.notes-head {
-			grid-template-columns: auto minmax(0, 1fr);
+			grid-template-columns: max-content minmax(0, 1fr);
 			align-items: center;
 		}
 	}
@@ -639,8 +681,35 @@
 			grid-template-columns: minmax(0, 1fr) auto;
 		}
 
+		.header-actions {
+			justify-content: end;
+		}
+
 		.body {
-			grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+		}
+
+		.media,
+		.notes {
+			grid-column: 1;
+		}
+
+		.prompt {
+			grid-column: 2;
+			grid-row: 1 / span 2;
+		}
+	}
+
+	@container feedback-submission (min-width: 60rem) {
+		.body {
+			grid-template-columns: minmax(0, 16rem) minmax(12rem, 14rem) minmax(0, 1fr);
+		}
+
+		.media,
+		.notes,
+		.prompt {
+			grid-column: auto;
+			grid-row: auto;
 		}
 	}
 </style>

@@ -1,6 +1,6 @@
 import { flushSync } from 'svelte';
 import { describe, expect, it } from 'vitest';
-import MenubarDemo from '../../apps/docs/src/lib/demos/MenubarDemo.svelte';
+import MenubarHarness from './fixtures/menubar-a11y-harness.svelte';
 import NotificationCenterA11yHarness from './fixtures/notification-center-a11y-harness.svelte';
 import { render } from './_harness';
 
@@ -35,7 +35,7 @@ function getNotificationPanel() {
 
 describe('menubar and notification center accessibility', () => {
 	it('labels the open menu from the rendered trigger id', async () => {
-		render(MenubarDemo);
+		render(MenubarHarness);
 
 		const [fileTrigger] = getMenubarTriggers();
 		if (!(fileTrigger instanceof HTMLButtonElement)) {
@@ -58,7 +58,7 @@ describe('menubar and notification center accessibility', () => {
 	});
 
 	it('moves focus across top-level triggers without opening, and switches menus when already open', async () => {
-		render(MenubarDemo);
+		render(MenubarHarness);
 
 		const [fileTrigger, editTrigger, viewTrigger] = getMenubarTriggers();
 		if (!fileTrigger || !editTrigger || !viewTrigger) {

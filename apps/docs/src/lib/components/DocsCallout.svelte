@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Alert, type AlertProps, type AlertVariant } from '@dryui/ui';
+	import { Alert, type AlertProps, type AlertVariant } from '@dryui/ui/alert';
 
 	type AlertSnippet = NonNullable<AlertProps['title']>;
 

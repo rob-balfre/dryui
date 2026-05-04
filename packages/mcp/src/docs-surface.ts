@@ -70,6 +70,12 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 		label: 'Getting Started',
 		description: 'Install the DryUI skill, wire the app, add themes, and build with components',
 		keywords: ['install', 'setup', 'skill', 'theme', 'quickstart']
+	},
+	{
+		path: '/feedback-loop',
+		label: 'Feedback loop',
+		description: 'Collect visual annotations from a running app and resolve them with an agent',
+		keywords: ['feedback', 'visual review', 'annotations', 'screenshots', 'agent']
 	}
 ];
 

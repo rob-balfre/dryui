@@ -126,7 +126,7 @@ describe('motion surfaces', () => {
 			throw new Error('Expected aurora surface');
 		}
 
-		expect(aurora.getAttribute('style') ?? '').toContain('--dry-aurora-color-1: #020617');
+		expect(aurora.getAttribute('style') ?? '').toContain('--_aurora-color-1: #020617');
 
 		const noiseTarget = renderSurface('noise');
 		const noise = noiseTarget.querySelector('[data-testid="noise"]');
@@ -228,7 +228,7 @@ describe('motion surfaces', () => {
 
 			// Duration is set as a CSS custom property
 			const style = marquee.getAttribute('style') ?? '';
-			expect(style).toContain('--marquee-duration');
+			expect(style).toContain('--_marquee-duration');
 		});
 
 		it('supports pause-on-hover via data attribute', () => {

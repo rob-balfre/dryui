@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Badge, Table, Text } from '@dryui/ui';
+	import { Badge } from '@dryui/ui/badge';
+	import { Table } from '@dryui/ui/table';
+	import { Text } from '@dryui/ui/text';
 
 	interface Props {
 		vars: Record<string, string>;

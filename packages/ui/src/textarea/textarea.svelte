@@ -31,6 +31,7 @@
 		value = $bindable(''),
 		size = 'md',
 		class: className,
+		style,
 		disabled = false,
 		id,
 		name,
@@ -62,8 +63,9 @@
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
 </script>
 
-<span class="wrapper {className ?? ''}" {...rest}>
+<span class="wrapper {className ?? ''}" {style}>
 	<textarea
+		{...rest}
 		bind:value
 		id={id ?? ctx?.id}
 		disabled={isDisabled}

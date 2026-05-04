@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { Heading, Text } from '@dryui/ui';
+	import { Heading } from '@dryui/ui/heading';
+	import { Text } from '@dryui/ui/text';
 
 	interface Props {
 		title: string;

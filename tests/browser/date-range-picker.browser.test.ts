@@ -107,7 +107,7 @@ describe('DateRangePicker', () => {
 		render(DateRangePickerHarness);
 
 		const trigger = getTrigger();
-		const label = trigger.querySelector('span');
+		const label = trigger.querySelector<HTMLSpanElement>('span[data-placeholder]');
 
 		expect(trigger.getAttribute('aria-haspopup')).toBe('dialog');
 		expect(trigger.getAttribute('aria-expanded')).toBe('false');

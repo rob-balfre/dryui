@@ -248,7 +248,7 @@ LAYOUT (zones) DONE
 - visual: matches brief at narrow and wide
 ```
 
-NEXT: Phase 2 (Components) — placing real DryUI components in each area. Not yet written.
+NEXT: Phase 1.5 (Layout Polish) — run `dryui-layout-polish` to improve spatial rhythm, hierarchy, density, and responsive structure before placing real components.
 
 ## Tone
 

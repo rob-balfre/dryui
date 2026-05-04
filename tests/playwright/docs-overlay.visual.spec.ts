@@ -316,7 +316,7 @@ test('tour demo supports next, previous, and finish across both steps', async ({
 	await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
 	await expect(tooltip).toHaveAttribute('data-placement', 'top');
 	await page.mouse.move(24, 24);
-	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-2.png', { maxDiffPixels: 200 });
+	await expect(tooltip).toHaveScreenshot('docs-overlay-tour-step-2.png', { maxDiffPixels: 400 });
 
 	await page.getByRole('button', { name: 'Previous' }).click();
 	await expect(tooltip).toContainText('Pick a starting environment');

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { createSubscriber } from 'svelte/reactivity';
 	import type { HTMLAttributes } from 'svelte/elements';
 
 	interface Props extends HTMLAttributes<HTMLTimeElement> {
@@ -10,16 +11,19 @@
 	let { date, locale = 'en', updateInterval = 60000, class: className, ...rest }: Props = $props();
 
 	const dateObj = $derived(date instanceof Date ? date : new Date(date));
-	let now = $state(Date.now());
-
-	$effect(() => {
-		const interval = setInterval(() => {
-			now = Date.now();
-		}, updateInterval);
-		return () => clearInterval(interval);
+	const dateTime = $derived(dateObj.getTime());
+	const subscribeToTick = $derived(
+		createSubscriber((update) => {
+			const interval = setInterval(update, updateInterval);
+			return () => clearInterval(interval);
+		})
+	);
+	const now = $derived.by(() => {
+		subscribeToTick();
+		return Date.now();
 	});
-
-	const formatted = $derived(formatRelative(dateObj, now, locale));
+	const effectiveNow = $derived(Math.max(now, dateTime));
+	const formatted = $derived(formatRelative(dateObj, effectiveNow, locale));
 
 	function formatRelative(date: Date, now: number, locale: string): string {
 		const diff = now - date.getTime();

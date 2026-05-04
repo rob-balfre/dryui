@@ -1,6 +1,6 @@
 import { flushSync } from 'svelte';
 import { describe, expect, it } from 'vitest';
-import TreeDemo from '../../apps/docs/src/lib/demos/TreeDemo.svelte';
+import TreeHarness from './fixtures/tree-a11y-harness.svelte';
 import { render } from './_harness';
 
 function getTree(): HTMLElement {
@@ -33,7 +33,7 @@ function press(key: string) {
 
 describe('Tree accessibility', () => {
 	it('keeps focus on the treeitem and removes button semantics from the label', () => {
-		render(TreeDemo);
+		render(TreeHarness);
 
 		const tree = getTree();
 		const documents = getItem('documents');
@@ -54,7 +54,7 @@ describe('Tree accessibility', () => {
 	});
 
 	it('only applies aria-expanded to branch items and does not toggle expansion on selection', () => {
-		render(TreeDemo);
+		render(TreeHarness);
 
 		const documents = getItem('documents');
 		const report = getItem('report');
@@ -79,7 +79,7 @@ describe('Tree accessibility', () => {
 	});
 
 	it('supports up/down/home/end navigation across visible items', () => {
-		render(TreeDemo);
+		render(TreeHarness);
 
 		const documents = getItem('documents');
 		const report = getItem('report');
@@ -105,7 +105,7 @@ describe('Tree accessibility', () => {
 	});
 
 	it('supports APG-style right and left branch navigation', () => {
-		render(TreeDemo);
+		render(TreeHarness);
 
 		const documents = getItem('documents');
 		const report = getItem('report');

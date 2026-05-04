@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import { Button, Container, Heading, Text } from '@dryui/ui';
+	import { Button } from '@dryui/ui/button';
+	import { Container } from '@dryui/ui/container';
+	import { Heading } from '@dryui/ui/heading';
+	import { Text } from '@dryui/ui/text';
 	import { ArrowLeft, Home } from 'lucide-svelte';
 	import { withBase } from '$lib/utils';
 

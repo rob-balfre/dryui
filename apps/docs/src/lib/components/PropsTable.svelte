@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { Table, Badge, Text, Heading } from '@dryui/ui';
+	import { Badge } from '@dryui/ui/badge';
+	import { Heading } from '@dryui/ui/heading';
+	import { Table } from '@dryui/ui/table';
+	import { Text } from '@dryui/ui/text';
 
 	interface PropDef {
 		type: string;

@@ -1,9 +1,11 @@
 <script lang="ts">
-	import { Feedback } from '@dryui/feedback';
 	import { browser, dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
-	import { Button, Container, Heading, Link } from '@dryui/ui';
+	import { Button } from '@dryui/ui/button';
+	import { Container } from '@dryui/ui/container';
+	import { Heading } from '@dryui/ui/heading';
+	import { Link } from '@dryui/ui/link';
 	import GithubIcon from '$lib/components/GithubIcon.svelte';
 	import GlobalSearch from '$lib/components/GlobalSearch.svelte';
 	import Logo from '$lib/components/Logo.svelte';
@@ -17,6 +19,9 @@
 
 	let { children: routeChildren } = $props();
 	let feedbackEnabled = $state(false);
+	let feedbackComponentPromise = $derived(
+		dev && feedbackEnabled ? import('@dryui/feedback').then((mod) => mod.Feedback) : null
+	);
 
 	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
 	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
@@ -165,8 +170,10 @@
 	{@render docsShell()}
 {/if}
 
-{#if dev && feedbackEnabled}
-	<Feedback serverUrl={DEFAULT_FEEDBACK_SERVER_URL} scrollRoot="main.docs-content" />
+{#if dev && feedbackEnabled && feedbackComponentPromise}
+	{#await feedbackComponentPromise then Feedback}
+		<Feedback serverUrl={DEFAULT_FEEDBACK_SERVER_URL} scrollRoot="main.docs-content" />
+	{/await}
 {/if}
 
 <style>

@@ -236,7 +236,7 @@ This works for greenfield (empty directory), brownfield (existing non-SvelteKit 
 npx skills add rob-balfre/dryui
 ```
 
-That single command installs all five DryUI skills (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) into whichever coding agents the CLI auto-detects in your project. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
+That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) into whichever coding agents the CLI auto-detects in your project. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
 
 Then add MCP config so the agent can call `dryui ask` / `dryui check` / feedback dispatch. `dryui setup --install` (or `dryui init`) handles the MCP wiring automatically for Copilot, Cursor, OpenCode, Windsurf, Zed, and Codex (TOML), and the Gemini extension covers Gemini.
 

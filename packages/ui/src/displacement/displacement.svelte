@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import {
+		getReducedMotionPreference,
 		observeInViewport,
 		observePageVisibility,
 		observeReducedMotionPreference
@@ -27,7 +28,7 @@
 	const filterId = `dry-displacement-${Math.random().toString(36).slice(2, 8)}`;
 	let element = $state<HTMLDivElement>();
 	let seed = $state(1);
-	let prefersReducedMotion = $state(false);
+	let prefersReducedMotion = $state(getReducedMotionPreference());
 	let documentVisible = $state(true);
 	let inViewport = $state(true);
 
@@ -62,6 +63,7 @@
 		const FPS_INTERVAL = 1000 / 12;
 
 		function animate(time: number) {
+			if (!shouldAnimate) return;
 			if (time - lastTime >= FPS_INTERVAL) {
 				seed = Math.floor(Math.random() * 9999) + 1;
 				lastTime = time;

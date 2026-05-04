@@ -34,14 +34,8 @@
 	let y = $state('50%');
 	let active = $state(false);
 	let prefersReducedMotion = $state(false);
-	let pointerFrame = $state<number | null>(null);
-	let pendingX = '50%';
-	let pendingY = '50%';
 
 	function centerSpotlight() {
-		cancelQueuedPointerPosition();
-		pendingX = '50%';
-		pendingY = '50%';
 		x = '50%';
 		y = '50%';
 	}
@@ -53,30 +47,8 @@
 	function updateFromClientPoint(clientX: number, clientY: number) {
 		if (!element) return;
 		const rect = element.getBoundingClientRect();
-		queuePointerPosition(`${clientX - rect.left}px`, `${clientY - rect.top}px`);
-	}
-
-	function flushPointerPosition() {
-		pointerFrame = null;
-		x = pendingX;
-		y = pendingY;
-	}
-
-	function queuePointerPosition(nextX: string, nextY: string) {
-		pendingX = nextX;
-		pendingY = nextY;
-
-		if (pointerFrame !== null) return;
-
-		pointerFrame = requestAnimationFrame(() => {
-			flushPointerPosition();
-		});
-	}
-
-	function cancelQueuedPointerPosition() {
-		if (pointerFrame === null) return;
-		cancelAnimationFrame(pointerFrame);
-		pointerFrame = null;
+		x = `${clientX - rect.left}px`;
+		y = `${clientY - rect.top}px`;
 	}
 
 	function handlePointerEnter(event: PointerEvent) {
@@ -126,7 +98,6 @@
 		});
 
 		return () => {
-			cancelQueuedPointerPosition();
 			stopMotionObserver();
 		};
 	});
@@ -151,10 +122,14 @@
 		element.style.setProperty('--dry-spotlight-intensity', intensityValue);
 		if (color) element.style.setProperty('--dry-spotlight-color', color);
 		else element.style.removeProperty('--dry-spotlight-color');
-		element.style.setProperty('--dry-spotlight-x', x);
-		element.style.setProperty('--dry-spotlight-y', y);
 		if (blendMode) element.style.setProperty('--dry-spotlight-blend', blendMode);
 		else element.style.removeProperty('--dry-spotlight-blend');
+	});
+
+	$effect(() => {
+		if (!element) return;
+		element.style.setProperty('--dry-spotlight-x', x);
+		element.style.setProperty('--dry-spotlight-y', y);
 	});
 </script>
 
