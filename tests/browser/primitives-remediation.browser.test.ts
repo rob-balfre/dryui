@@ -51,17 +51,15 @@ describe('primitives remediation', () => {
 	it('removes forced region semantics and maps toast variants to the correct live role', () => {
 		render(PrimitivesRemediationSemanticsHarness);
 
-		const card = document.querySelector<HTMLElement>('[data-testid="card-root"]');
 		const navList = document.querySelector<HTMLElement>('[data-testid="navigation-list"]');
 		const navbarItem = document.querySelector<HTMLElement>('[data-testid="navbar-item"]');
 		const infoToast = document.querySelector<HTMLElement>('[data-testid="toast-info"]');
 		const errorToast = document.querySelector<HTMLElement>('[data-testid="toast-error"]');
 
-		if (!card || !navList || !navbarItem || !infoToast || !errorToast) {
+		if (!navList || !navbarItem || !infoToast || !errorToast) {
 			throw new Error('Expected semantic primitives');
 		}
 
-		expect(card.hasAttribute('role')).toBe(false);
 		expect(navList.hasAttribute('role')).toBe(false);
 		expect(navbarItem.getAttribute('aria-current')).toBe('page');
 		expect(infoToast.getAttribute('role')).toBe('status');

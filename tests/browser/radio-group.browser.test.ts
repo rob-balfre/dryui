@@ -10,8 +10,10 @@ function getRoot(): HTMLElement {
 }
 
 function getInput(value: string): HTMLInputElement {
-	// RadioGroup.Item forwards `...rest` (including data-testid) to the input.
-	const el = document.querySelector<HTMLElement>(`input[data-testid="item-${value}"]`);
+	// RadioGroup.Item forwards `...rest` (including data-testid) to the wrapping label.
+	const label = document.querySelector<HTMLElement>(`label[data-testid="item-${value}"]`);
+	if (!label) throw new Error(`Expected radio label for ${value}`);
+	const el = label.querySelector('input[type="radio"]');
 	if (!(el instanceof HTMLInputElement)) throw new Error(`Expected radio input for ${value}`);
 	return el;
 }

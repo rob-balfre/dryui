@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { Card } from '../../../packages/primitives/src/card/index.js';
 	import { Breadcrumb } from '../../../packages/primitives/src/breadcrumb/index.js';
 	import { Field } from '../../../packages/primitives/src/field/index.js';
 	import { Input } from '../../../packages/primitives/src/input/index.js';
@@ -41,8 +40,6 @@
 		<Field.Error data-testid="field-error">Required field</Field.Error>
 	{/if}
 </Field.Root>
-
-<Card.Root data-testid="card-root">Card content</Card.Root>
 
 <NavigationMenu.Root>
 	<NavigationMenu.List data-testid="navigation-list">
