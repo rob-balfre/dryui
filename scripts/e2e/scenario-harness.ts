@@ -88,7 +88,7 @@ export interface RunScenarioOptions {
 	readonly streamCodex?: boolean;
 	readonly codexStreamRaw?: boolean;
 	readonly useUserCodexConfig?: boolean;
-	readonly useLocalDryuiPlugin?: boolean;
+	readonly useLocalDryuiMcp?: boolean;
 	readonly codexTimeoutMs?: number;
 }
 
@@ -572,10 +572,10 @@ export async function runScenario(
 			const streamRawCodex = options.codexStreamRaw === true || options.verbose === true;
 			if (options.useUserCodexConfig === true) {
 				progress('codex config: user ~/.codex');
-			} else if (options.useLocalDryuiPlugin !== false) {
-				progress('codex config: local packages/plugin');
+			} else if (options.useLocalDryuiMcp !== false) {
+				progress('codex config: local DryUI MCP');
 			} else {
-				progress('codex config: isolated without plugins');
+				progress('codex config: isolated without DryUI MCP');
 			}
 			const heartbeat = setInterval(() => {
 				progress(
@@ -591,7 +591,7 @@ export async function runScenario(
 					...(scenario.codexModel ? { model: scenario.codexModel } : {}),
 					...(codexTimeoutMs !== undefined ? { timeoutMs: codexTimeoutMs } : {}),
 					useUserConfig: options.useUserCodexConfig === true,
-					useLocalDryuiPlugin: options.useLocalDryuiPlugin !== false,
+					useLocalDryuiMcp: options.useLocalDryuiMcp !== false,
 					onStdoutLine: (line) => {
 						const description = describeCodexLine(line);
 						if (description) lastCodexEvent = description;

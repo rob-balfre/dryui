@@ -22,7 +22,6 @@
 
 import { spawn } from 'node:child_process';
 import {
-	cpSync,
 	existsSync,
 	readFileSync,
 	writeFileSync,
@@ -47,7 +46,7 @@ export interface CodexRunOptions {
 	readonly timeoutMs?: number;
 	readonly logDir?: string;
 	readonly useUserConfig?: boolean;
-	readonly useLocalDryuiPlugin?: boolean;
+	readonly useLocalDryuiMcp?: boolean;
 	readonly onStdoutLine?: (line: string) => void;
 	readonly onStderrLine?: (line: string) => void;
 }
@@ -68,56 +67,16 @@ const DEFAULT_TIMEOUT_MS = 12 * 60 * 1_000;
 const TIMEOUT_KILL_GRACE_MS = 5_000;
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..', '..');
-const localDryuiPluginDir = resolve(repoRoot, 'packages/plugin');
-
-interface CodexPluginManifest {
-	readonly name?: string;
-	readonly version?: string;
-}
 
 function tomlString(value: string): string {
+	// JSON.stringify produces a TOML-compatible basic string for the inputs we
+	// pass here (paths and shell snippets — no embedded control chars beyond
+	// `\"` and `\\`, which both grammars escape identically).
 	return JSON.stringify(value);
 }
 
 function getCodexHomeSource(): string {
 	return process.env.CODEX_HOME ? resolve(process.env.CODEX_HOME) : resolve(homedir(), '.codex');
-}
-
-function readLocalDryuiPluginManifest(): Required<CodexPluginManifest> {
-	const manifestPath = resolve(localDryuiPluginDir, '.codex-plugin/plugin.json');
-	const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as CodexPluginManifest;
-	return {
-		name: manifest.name ?? 'dryui',
-		version: manifest.version ?? '0.0.0'
-	};
-}
-
-function writeLocalDryuiMcpConfig(pluginDir: string): void {
-	const configPath = resolve(pluginDir, '.mcp.json');
-	writeFileSync(
-		configPath,
-		JSON.stringify(
-			{
-				mcpServers: {
-					dryui: {
-						type: 'stdio',
-						command: 'sh',
-						args: ['-c', `cd ${JSON.stringify(repoRoot)} && exec bun packages/mcp/src/index.ts`]
-					},
-					'dryui-feedback': {
-						type: 'stdio',
-						command: 'sh',
-						args: [
-							'-c',
-							`cd ${JSON.stringify(repoRoot)} && exec bun packages/feedback-server/src/mcp.ts`
-						]
-					}
-				}
-			},
-			null,
-			2
-		) + '\n'
-	);
 }
 
 function prepareLocalDryuiCodexHome(): string {
@@ -126,26 +85,25 @@ function prepareLocalDryuiCodexHome(): string {
 	if (!existsSync(sourceAuthPath)) {
 		throw new Error(`Codex auth missing at ${sourceAuthPath} — run \`codex login\` first`);
 	}
-	if (!existsSync(localDryuiPluginDir)) {
-		throw new Error(`local DryUI plugin source missing at ${localDryuiPluginDir}`);
-	}
 
-	const manifest = readLocalDryuiPluginManifest();
+	// The plugin marketplace bundle was sunset (users now install via
+	// `npx skills add rob-balfre/dryui`), so we wire DryUI MCP servers directly
+	// instead. Same shape `dryui init` writes to a real ~/.codex/config.toml,
+	// just pointing at the in-tree bun entrypoints rather than published npm.
+	const dryuiCmd = `cd ${tomlString(repoRoot)} && exec bun packages/mcp/src/index.ts`;
+	const feedbackCmd = `cd ${tomlString(repoRoot)} && exec bun packages/feedback-server/src/mcp.ts`;
 	const codexHome = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-codex-home-'));
-	const pluginDir = resolve(codexHome, 'plugins/cache/dryui', manifest.name, manifest.version);
-	mkdirSync(pluginDir, { recursive: true });
-	cpSync(localDryuiPluginDir, pluginDir, { recursive: true });
-	writeLocalDryuiMcpConfig(pluginDir);
 	symlinkSync(sourceAuthPath, resolve(codexHome, 'auth.json'));
 	writeFileSync(
 		resolve(codexHome, 'config.toml'),
 		[
-			`[plugins."${manifest.name}@dryui"]`,
-			'enabled = true',
+			'[mcp_servers.dryui]',
+			'command = "sh"',
+			`args = ["-c", ${tomlString(dryuiCmd)}]`,
 			'',
-			'[marketplaces.dryui]',
-			'source_type = "local"',
-			`source = ${tomlString(localDryuiPluginDir)}`,
+			'[mcp_servers."dryui-feedback"]',
+			'command = "sh"',
+			`args = ["-c", ${tomlString(feedbackCmd)}]`,
 			''
 		].join('\n')
 	);
@@ -206,9 +164,8 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 
 	const logDir = options.logDir ? resolve(options.logDir) : null;
 	if (logDir) mkdirSync(logDir, { recursive: true });
-	const useLocalDryuiPlugin =
-		options.useUserConfig !== true && options.useLocalDryuiPlugin !== false;
-	const isolatedCodexHome = useLocalDryuiPlugin ? prepareLocalDryuiCodexHome() : null;
+	const useLocalDryuiMcp = options.useUserConfig !== true && options.useLocalDryuiMcp !== false;
+	const isolatedCodexHome = useLocalDryuiMcp ? prepareLocalDryuiCodexHome() : null;
 	const transcriptPath = logDir ? resolve(logDir, 'codex-transcript.jsonl') : null;
 	const lastMessagePath = logDir ? resolve(logDir, 'codex-last-message.txt') : null;
 	const effectiveLastMessagePath =
@@ -229,7 +186,7 @@ export async function runCodexExec(options: CodexRunOptions): Promise<CodexRunRe
 		'--color',
 		'never'
 	];
-	if (options.useUserConfig !== true && !useLocalDryuiPlugin) {
+	if (options.useUserConfig !== true && !useLocalDryuiMcp) {
 		args.push('--ignore-user-config');
 	}
 	if (options.model) {

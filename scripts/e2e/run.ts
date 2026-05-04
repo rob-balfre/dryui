@@ -8,7 +8,7 @@
  *   bun run scripts/e2e/run.ts --verbose          # stream phase updates
  *   bun run scripts/e2e/run.ts --stream-codex     # stream decoded Codex events
  *   bun run scripts/e2e/run.ts --codex-stream-raw # stream raw Codex JSONL
- *   bun run scripts/e2e/run.ts --no-codex-plugin  # no DryUI plugin, no user config
+ *   bun run scripts/e2e/run.ts --no-codex-dryui   # no DryUI MCP, no user config
  *   bun run scripts/e2e/run.ts --codex-user-config # inherit ~/.codex/config.toml instead
  *   bun run scripts/e2e/run.ts --keep-project     # leave dev server running, print URL
  *   bun run scripts/e2e/run.ts --tarballs <dir>   # override tarball source
@@ -40,7 +40,7 @@ interface CliFlags {
 	streamCodex: boolean;
 	codexStreamRaw: boolean;
 	useUserCodexConfig: boolean;
-	useLocalDryuiPlugin: boolean;
+	useLocalDryuiMcp: boolean;
 	skipPack: boolean;
 	open: boolean;
 	codexTimeoutMs: number | null;
@@ -51,7 +51,7 @@ function printUsage(): void {
 		`Usage: bun run scripts/e2e/run.ts [--only <name>] [--tarballs <dir>]\n` +
 			`                                   [--keep-project] [--verbose] [--stream-codex]\n` +
 			`                                   [--codex-stream-raw] [--codex-user-config]\n` +
-			`                                   [--no-codex-plugin] [--skip-pack] [--open]\n` +
+			`                                   [--no-codex-dryui] [--skip-pack] [--open]\n` +
 			`                                   [--codex-timeout-ms <ms>]\n\n` +
 			`Scenarios: ${SCENARIOS.map((s) => s.name).join(', ')}`
 	);
@@ -71,7 +71,7 @@ function parseArgs(argv: string[]): CliFlags {
 		streamCodex: false,
 		codexStreamRaw: false,
 		useUserCodexConfig: false,
-		useLocalDryuiPlugin: true,
+		useLocalDryuiMcp: true,
 		skipPack: false,
 		open: false,
 		codexTimeoutMs: null
@@ -113,9 +113,9 @@ function parseArgs(argv: string[]): CliFlags {
 			flags.codexStreamRaw = true;
 		} else if (arg === '--codex-user-config') {
 			flags.useUserCodexConfig = true;
-			flags.useLocalDryuiPlugin = false;
-		} else if (arg === '--no-codex-plugin') {
-			flags.useLocalDryuiPlugin = false;
+			flags.useLocalDryuiMcp = false;
+		} else if (arg === '--no-codex-dryui' || arg === '--no-codex-plugin') {
+			flags.useLocalDryuiMcp = false;
 		} else if (arg === '--skip-pack') {
 			flags.skipPack = true;
 		} else if (arg === '--open') {
@@ -196,7 +196,7 @@ async function main(): Promise<void> {
 			streamCodex: flags.streamCodex,
 			codexStreamRaw: flags.codexStreamRaw,
 			useUserCodexConfig: flags.useUserCodexConfig,
-			useLocalDryuiPlugin: flags.useLocalDryuiPlugin,
+			useLocalDryuiMcp: flags.useLocalDryuiMcp,
 			...(flags.codexTimeoutMs !== null ? { codexTimeoutMs: flags.codexTimeoutMs } : {})
 		});
 		results.push(result);
