@@ -13,18 +13,6 @@ export interface DryuiLintOptions {
 	include?: string[];
 	exclude?: string[];
 	/**
-	 * Experimental migration rule. When enabled, raw CSS grid declarations are
-	 * flagged so page layout moves into src/layout.css and component layout is
-	 * reviewed deliberately.
-	 */
-	forbidRawGrid?: boolean;
-	/**
-	 * Experimental migration rule. When enabled, markup may only use Svelte/DryUI
-	 * component tags and Svelte special elements; raw native tags such as <div>
-	 * and <span> are flagged.
-	 */
-	componentsOnly?: boolean;
-	/**
 	 * By default, linked @dryui/* package source is skipped so consumer apps do
 	 * not lint upstream packages resolved through DRYUI_DEV or workspace links.
 	 * Set this for first-party @dryui packages that intentionally lint their own
@@ -135,8 +123,6 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 	const strict = options?.strict ?? false;
 	const include = options?.include ?? [];
 	const exclude = options?.exclude ?? [];
-	const forbidRawGrid = options?.forbidRawGrid ?? false;
-	const componentsOnly = options?.componentsOnly ?? false;
 	const includeDryuiPackages = options?.includeDryuiPackages ?? false;
 
 	return {
@@ -152,14 +138,14 @@ export function dryuiLint(options?: DryuiLintOptions): PreprocessorGroup {
 		markup({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
-			const violations = checkMarkup(content, f, { componentsOnly });
+			const violations = checkMarkup(content, f);
 			report(f, violations, strict);
 		},
 
 		style({ content, filename }: { content: string; filename?: string }) {
 			const f = filename ?? 'unknown';
 			if (isExcluded(f, include, exclude, includeDryuiPackages)) return;
-			const violations = checkStyle(content, { forbidRawGrid }, f);
+			const violations = checkStyle(content, {}, f);
 			report(f, violations, strict);
 		}
 	};

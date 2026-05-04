@@ -8,6 +8,7 @@ import { detectProject } from '@dryui/mcp/project-planner';
 import { toonProjectDetection } from '@dryui/mcp/toon';
 import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
 import { runAdd } from './commands/add.js';
+import { runAskCommand } from './commands/ask.js';
 import { runCheckCommand } from './commands/check.js';
 import { runDetect } from './commands/detect.js';
 import { runInstall } from './commands/install.js';
@@ -88,6 +89,8 @@ Commands:
   install [--json] [--text] [path]
                                 Print a project install plan
   add <component>               Print a copyable starter snippet for a component
+  ask --scope <scope> "<query>"
+                                Scope-driven component, recipe, list, or setup guidance
   info <component> [--text]     Show component API reference
   list [--category <cat>] [--text]
                                 List all components
@@ -167,6 +170,9 @@ async function main(): Promise<void> {
 			break;
 		case 'add':
 			runAdd(commandArgs, spec);
+			break;
+		case 'ask':
+			runAskCommand(commandArgs, spec);
 			break;
 		case 'info':
 			runInfo(commandArgs, spec);

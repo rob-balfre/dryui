@@ -82,9 +82,9 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
-	test('style hook can opt into raw grid warnings', () => {
+	test('style hook warns on raw grid outside src/layout.css', () => {
 		const spy = spyOn(console, 'warn').mockImplementation(() => {});
-		const pp = dryuiLint({ forbidRawGrid: true });
+		const pp = dryuiLint();
 		pp.style!({
 			content: '.foo { display: grid; }',
 			attributes: {},
@@ -97,9 +97,9 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
-	test('markup hook can opt into component-only warnings', () => {
+	test('markup hook warns on raw native HTML elements', () => {
 		const spy = spyOn(console, 'warn').mockImplementation(() => {});
-		const pp = dryuiLint({ componentsOnly: true });
+		const pp = dryuiLint();
 		pp.markup!({
 			content: '<div><span>content</span></div>',
 			filename: 'test.svelte'
@@ -112,9 +112,9 @@ describe('dryuiLint preprocessor', () => {
 		spy.mockRestore();
 	});
 
-	test('markup hook allows data-layout hooks in component-only mode', () => {
+	test('markup hook allows data-layout hooks', () => {
 		const spy = spyOn(console, 'warn').mockImplementation(() => {});
-		const pp = dryuiLint({ componentsOnly: true });
+		const pp = dryuiLint();
 		pp.markup!({
 			content: `<main data-layout="starter">
   <section data-layout-area="intro">
@@ -161,12 +161,11 @@ describe('dryuiLint preprocessor', () => {
 			filename: 'test.svelte'
 		});
 		pp.markup!({
-			content: '<div class="page-grid"><Button>click</Button></div>',
+			content: '<div data-layout="page"><Button>click</Button></div>',
 			filename: 'test.svelte'
 		});
 		pp.style!({
-			content:
-				'.page-grid { display: grid; gap: var(--dry-space-4); container-type: inline-size; }',
+			content: '.page-grid { gap: var(--dry-space-4); container-type: inline-size; }',
 			attributes: {},
 			markup: '',
 			filename: 'test.svelte'
@@ -179,12 +178,12 @@ describe('dryuiLint preprocessor', () => {
 		const spy = spyOn(console, 'warn').mockImplementation(() => {});
 		const pp = dryuiLint();
 		pp.markup!({
-			content: '<!-- svelte-ignore css_unused_selector -->\n<div>hi</div>',
+			content: '<!-- svelte-ignore css_unused_selector -->\n<div data-layout="x">hi</div>',
 			filename: 'test.svelte'
 		});
 		expect(spy).toHaveBeenCalled();
-		const msg = spy.mock.calls[0]![0] as string;
-		expect(msg).toContain('dryui/no-css-ignore');
+		const messages = spy.mock.calls.map((call) => call[0] as string).join('\n');
+		expect(messages).toContain('dryui/no-css-ignore');
 		spy.mockRestore();
 	});
 
@@ -192,7 +191,7 @@ describe('dryuiLint preprocessor', () => {
 		const pp = dryuiLint({ strict: true });
 		expect(() => {
 			pp.markup!({
-				content: '<!-- svelte-ignore css_unused_selector -->\n<div>hi</div>',
+				content: '<!-- svelte-ignore css_unused_selector -->\n<div data-layout="x">hi</div>',
 				filename: 'test.svelte'
 			});
 		}).toThrow('dryui/no-css-ignore');
@@ -245,8 +244,8 @@ describe('dryuiLint preprocessor', () => {
 		}).toThrow('dryui/no-raw-native-element');
 	});
 
-	test('strict component-only mode throws on raw elements', () => {
-		const pp = dryuiLint({ strict: true, componentsOnly: true });
+	test('strict mode throws on raw HTML elements outside layout hooks', () => {
+		const pp = dryuiLint({ strict: true });
 		expect(() => {
 			pp.markup!({
 				content: '<div>content</div>',
@@ -255,8 +254,8 @@ describe('dryuiLint preprocessor', () => {
 		}).toThrow('dryui/no-raw-element');
 	});
 
-	test('strict component-only mode allows raw layout hook elements', () => {
-		const pp = dryuiLint({ strict: true, componentsOnly: true });
+	test('strict mode allows raw layout hook elements', () => {
+		const pp = dryuiLint({ strict: true });
 		expect(() => {
 			pp.markup!({
 				content: `<main data-layout="starter">
@@ -296,7 +295,7 @@ describe('dryuiLint preprocessor', () => {
 		const filePath = resolve(pkgDir, 'src/feedback.svelte');
 
 		try {
-			const pp = dryuiLint({ strict: true, componentsOnly: true });
+			const pp = dryuiLint({ strict: true });
 			expect(() => {
 				pp.markup!({
 					content: '<div style="color: red">{@attach foo}</div>',

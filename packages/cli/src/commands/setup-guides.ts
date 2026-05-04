@@ -93,7 +93,7 @@ const ZED_CONFIG = `{
 }`;
 
 const SVELTE_MCP_NOTE =
-	'Adds list-sections, get-documentation, svelte-autofixer, and playground-link. `dryui setup --install` registers it automatically (pass `--no-svelte-mcp` to skip).';
+	'Adds list-sections, get-documentation, svelte-autofixer, and playground-link. Use this companion whenever an agent writes Svelte or SvelteKit code.';
 
 const SVELTE_SECTION_CLAUDE: SetupGuideSection = {
 	title: 'Svelte companion (recommended)',
@@ -183,7 +183,7 @@ export const setupGuides: readonly SetupGuide[] = [
 			},
 			{
 				title: 'Add the MCP servers',
-				note: 'Adds dryui ask/check plus visual feedback tools to Claude Code.',
+				note: 'Adds MCP ask/check plus visual feedback tools to Claude Code.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			},
@@ -209,7 +209,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			},
 			{
 				title: 'Add the MCP servers',
-				note: 'Adds dryui ask/check plus visual feedback tools to Codex.',
+				note: 'Adds MCP ask/check plus visual feedback tools to Codex.',
 				code: `codex mcp add dryui -- npx -y @dryui/mcp
 codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
 

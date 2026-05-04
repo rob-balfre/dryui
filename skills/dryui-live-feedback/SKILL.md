@@ -112,7 +112,7 @@ highest-priority user intent for the current repair loop.
 Use the same UI creation pipeline as the DryUI skill while resolving feedback:
 
 1. Read the feedback screenshot and drawings.
-2. Confirm any DryUI component APIs you touch with `dryui ask --scope component` (or MCP `ask`).
+2. Confirm any DryUI component APIs you touch with `dryui ask --scope component "<Component>"` or MCP `ask` with `scope: "component"`.
 3. Apply the requested fix using DryUI components, CSS grid layout, and `--dry-*` tokens.
 4. Run deterministic checks with `dryui check [path]` or MCP `check`.
 

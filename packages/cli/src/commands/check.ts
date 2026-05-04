@@ -5,6 +5,7 @@ import type { Spec } from '@dryui/mcp/spec-types';
 import {
 	commandError,
 	emitCommandResult,
+	formatDryuiCliReferences,
 	hasFlag,
 	printCommandHelp,
 	resolveOutputMode,
@@ -96,7 +97,7 @@ function positionals(args: readonly string[]): string[] {
 }
 
 function staticOutput(result: CheckResult, mode: OutputMode): string {
-	if (mode !== 'json') return result.text;
+	if (mode !== 'json') return formatDryuiCliReferences(result.text);
 	return JSON.stringify({ summary: result.summary, diagnostics: result.diagnostics }, null, 2);
 }
 

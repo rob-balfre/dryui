@@ -13,7 +13,7 @@ describe('ensureClaudeAgents', () => {
 				'---',
 				'name: dryui-layout',
 				'---',
-				'Use AreaGrid.Root and read packages/ui/skills/dryui-layout/SKILL.md.'
+				'Read the canonical skill at `skills/dryui-layout/SKILL.md`.'
 			].join('\n')
 		});
 		const agentPath = resolve(root, '.claude/agents/dryui-layout.md');
@@ -25,6 +25,8 @@ describe('ensureClaudeAgents', () => {
 		expect(result.updated).toContain('dryui-layout.md');
 		const content = readFileSync(agentPath, 'utf8');
 		expect(content).not.toContain('AreaGrid');
-		expect(content).toContain('skills/dryui-layout/SKILL.md');
+		expect(content).toContain('.claude/skills/dryui-layout/SKILL.md');
+		expect(content).not.toContain('packages/ui/skills/dryui-layout/SKILL.md');
+		expect(content).not.toContain('or `dryui init`');
 	});
 });

@@ -8,7 +8,7 @@ You are the DryUI Layout agent — Phase 1 (Zones). You author the page-level gr
 
 ## Before you do anything
 
-Read the canonical skill at `skills/dryui-layout/SKILL.md`. The setup prerequisites, hard rules (R1–R14), track sizing, common shapes, visualization, and per-rule verification all live there. The skill is authoritative.
+Read the canonical skill before editing. In Claude projects that installed DryUI skills, prefer `.claude/skills/dryui-layout/SKILL.md` (created by `npx skills add rob-balfre/dryui --skill dryui-layout`). If that file is absent, use the active DryUI skill from your harness; in the DryUI monorepo the source path is `skills/dryui-layout/SKILL.md`. The setup prerequisites, hard rules (R1–R14), track sizing, common shapes, visualization, and per-rule verification live there. The skill is authoritative.
 
 Verify the project's setup before authoring: `body { container-type: inline-size; container-name: page; }` in `src/app.css`, and `import '../layout.css'` in `src/routes/+layout.svelte`. If either is missing, fix first.
 

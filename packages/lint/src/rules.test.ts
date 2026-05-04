@@ -40,13 +40,13 @@ describe('checkScript', () => {
 
 describe('checkMarkup', () => {
 	test('flags style attribute', () => {
-		const violations = checkMarkup('<div style="color: red">hello</div>');
+		const violations = checkMarkup('<div data-layout="x" style="color: red">hello</div>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-inline-style');
 	});
 
 	test('flags style: directive', () => {
-		const violations = checkMarkup('<div style:color="red">hello</div>');
+		const violations = checkMarkup('<div data-layout="x" style:color="red">hello</div>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-style-directive');
 	});
@@ -72,25 +72,25 @@ describe('checkMarkup', () => {
 	});
 
 	test('flags <Grid component', () => {
-		const violations = checkMarkup('<Grid columns={3}><div>child</div></Grid>');
+		const violations = checkMarkup('<Grid columns={3}>child</Grid>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-layout-component');
 	});
 
 	test('flags <Stack component', () => {
-		const violations = checkMarkup('<Stack gap="md"><div>child</div></Stack>');
+		const violations = checkMarkup('<Stack gap="md">child</Stack>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-layout-component');
 	});
 
 	test('flags <Flex component', () => {
-		const violations = checkMarkup('<Flex><div>child</div></Flex>');
+		const violations = checkMarkup('<Flex>child</Flex>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-layout-component');
 	});
 
 	test('flags compound component usage <Stack.Root', () => {
-		const violations = checkMarkup('<Stack.Root><div>child</div></Stack.Root>');
+		const violations = checkMarkup('<Stack.Root>child</Stack.Root>');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-layout-component');
 	});
@@ -100,16 +100,10 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
-	test('ignores regular HTML elements', () => {
-		const violations = checkMarkup('<div class="grid"><span>text</span></div>');
-		expect(violations).toHaveLength(0);
-	});
-
-	test('component-only mode flags raw div and span elements', () => {
+	test('flags raw div and span elements outside layout hooks', () => {
 		const violations = checkMarkup(
 			'<div class="grid"><span>text</span></div>',
-			'src/routes/+page.svelte',
-			{ componentsOnly: true }
+			'src/routes/+page.svelte'
 		);
 		expect(violations).toHaveLength(2);
 		expect(violations.map((violation) => violation.rule)).toEqual([
@@ -120,7 +114,7 @@ describe('checkMarkup', () => {
 		expect(violations[1]!.message).toContain('<span>');
 	});
 
-	test('component-only mode allows raw layout hook elements', () => {
+	test('allows raw layout hook elements', () => {
 		const code = `<main data-layout="starter">
   <section data-layout-area="intro">
     <Tabs.Root>
@@ -128,11 +122,11 @@ describe('checkMarkup', () => {
     </Tabs.Root>
   </section>
 </main>`;
-		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
 		expect(violations).toHaveLength(0);
 	});
 
-	test('component-only mode allows Svelte components and Svelte special elements', () => {
+	test('allows Svelte components and Svelte special elements', () => {
 		const code = `<svelte:head>
   <title>Docs</title>
   <meta name="description" content="DryUI docs" />
@@ -141,7 +135,7 @@ describe('checkMarkup', () => {
   <Button>Save</Button>
   <slot />
 </Tabs.Root>`;
-		const violations = checkMarkup(code, 'src/routes/+page.svelte', { componentsOnly: true });
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
 		expect(violations).toHaveLength(0);
 	});
 
@@ -191,8 +185,10 @@ describe('checkMarkup', () => {
 	});
 
 	test('does not flag class= on HTML elements', () => {
-		const violations = checkMarkup('<div class="wrapper"><p class="text">hi</p></div>');
-		expect(violations).toHaveLength(0);
+		const violations = checkMarkup(
+			'<div data-layout="x" class="wrapper"><p data-layout-area="y" class="text">hi</p></div>'
+		);
+		expect(violations.some((v) => v.rule === 'dryui/no-component-class')).toBe(false);
 	});
 
 	test('does not flag class= inside script block', () => {
@@ -342,7 +338,7 @@ describe('checkMarkup', () => {
 
 	test('flags multiple svelte-ignore css_unused_selector comments', () => {
 		const code = `<!-- svelte-ignore css_unused_selector -->
-<div>content</div>
+<div data-layout="x">content</div>
 <!-- svelte-ignore css_unused_selector -->`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(2);
@@ -360,7 +356,7 @@ describe('checkMarkup', () => {
   // <!-- svelte-ignore css_unused_selector -->
   const x = '<!-- svelte-ignore css_unused_selector -->';
 </script>
-<div>clean</div>`;
+<div data-layout="x">clean</div>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(0);
 	});
@@ -404,7 +400,7 @@ describe('checkMarkup', () => {
 		const code = `<script>
   const s = '<svelte:element this={x}>';
 </script>
-<div>clean</div>`;
+<div data-layout="x">clean</div>`;
 		const violations = checkMarkup(code);
 		expect(violations).toHaveLength(0);
 	});
@@ -688,14 +684,16 @@ describe('checkStyle', () => {
 		expect(violations).toHaveLength(0);
 	});
 
-	test('allows display: grid', () => {
-		const violations = checkStyle('.foo { display: grid; }');
+	test('allows display: grid inside src/layout.css', () => {
+		const violations = checkStyle('.foo { display: grid; }', {}, 'src/layout.css');
 		expect(violations).toHaveLength(0);
 	});
 
-	test('allows grid properties', () => {
+	test('allows grid properties inside src/layout.css', () => {
 		const violations = checkStyle(
-			'.foo { grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }'
+			'.foo { grid-template-columns: 1fr 1fr; gap: 1rem; align-items: center; }',
+			{},
+			'src/layout.css'
 		);
 		expect(violations).toHaveLength(0);
 	});
@@ -705,10 +703,10 @@ describe('checkStyle', () => {
 		expect(violations).toHaveLength(0);
 	});
 
-	test('flags raw grid when the no-raw-grid migration rule is enabled', () => {
+	test('flags raw grid outside src/layout.css', () => {
 		const violations = checkStyle(
 			'.foo { display: grid; grid-template-columns: minmax(0, 1fr) auto; }',
-			{ forbidRawGrid: true },
+			{},
 			'src/routes/+page.svelte'
 		);
 		expect(violations).toHaveLength(2);
@@ -717,31 +715,31 @@ describe('checkStyle', () => {
 		expect(violations[1]!.message).toContain('grid-template-columns');
 	});
 
-	test('raw grid in migration mode flags every offending file', () => {
+	test('raw grid is flagged on every offending declaration', () => {
 		const violations = checkStyle(
 			'.foo { display: grid; grid-template-columns: 1fr; }',
-			{ forbidRawGrid: true },
+			{},
 			'src/routes/+page.svelte'
 		);
 		expect(violations).toHaveLength(2);
 		expect(violations.every((violation) => violation.rule === 'dryui/no-raw-grid')).toBe(true);
 	});
 
-	test('checkSvelteFile can opt into the raw-grid migration rule', () => {
-		const code = `<div class="layout">content</div>
+	test('checkSvelteFile flags raw grid in component <style> blocks', () => {
+		const code = `<div data-layout="layout">content</div>
 
 <style>
   .layout {
     display: grid;
   }
 </style>`;
-		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', { forbidRawGrid: true });
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-raw-grid');
 		expect(violations[0]!.line).toBe(5);
 	});
 
-	test('checkSvelteFile can opt into component-only markup', () => {
+	test('checkSvelteFile flags raw HTML elements outside layout hooks', () => {
 		const code = `<div class="layout">content</div>
 
 <style>
@@ -749,15 +747,13 @@ describe('checkStyle', () => {
     display: block;
   }
 </style>`;
-		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', {
-			componentsOnly: true
-		});
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-raw-element');
 		expect(violations[0]!.line).toBe(1);
 	});
 
-	test('checkSvelteFile allows layout hooks in component-only markup', () => {
+	test('checkSvelteFile allows layout hooks', () => {
 		const code = `<main data-layout="starter">
   <section data-layout-area="intro">
     <Tabs.Root>
@@ -765,9 +761,7 @@ describe('checkStyle', () => {
     </Tabs.Root>
   </section>
 </main>`;
-		const violations = checkSvelteFile(code, 'src/routes/+page.svelte', {
-			componentsOnly: true
-		});
+		const violations = checkSvelteFile(code, 'src/routes/+page.svelte');
 		expect(violations).toHaveLength(0);
 	});
 
@@ -889,7 +883,7 @@ describe('checkSvelteFile', () => {
 			"\timport { Grid } from '@dryui/ui';",
 			'</script>',
 			'',
-			'<div style="color: red">hello</div>',
+			'<div data-layout="x" style="color: red">hello</div>',
 			'',
 			'<style>',
 			'\t.foo { width: 100%; }',

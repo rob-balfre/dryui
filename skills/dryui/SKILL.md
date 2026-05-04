@@ -14,7 +14,7 @@ Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a th
 DryUI work is explicit. Confirm contracts, build, then validate.
 
 1. **User brief** — one line capturing what you are building and for whom.
-2. **DryUI lookup/plan** — use `dryui ask` or MCP `ask` to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
+2. **DryUI lookup/plan** — use `dryui ask --scope ...` or MCP `ask` with the same scope/query arguments to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
 3. **Implementation** — build with DryUI components, Svelte 5 runes, grid layout, `--dry-*` tokens, and accessible composition.
 4. **Deterministic check** — run `dryui check [path]` or MCP `check` to catch contract drift, accessibility regressions, token drift, and CSS discipline violations.
 
@@ -38,7 +38,7 @@ Invoke from your AI harness:
 
 **Never guess a component API. Always verify first.**
 
-- Call `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"` before using any component for the first time. MCP `ask` is the equivalent surface.
+- Call `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"` before using any component for the first time. MCP `ask` is the equivalent surface; pass the same `scope` and `query` values.
 - Component APIs vary. `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable.
 - Compound vs simple, required parts, available props — all differ per component.
 - If you skip the lookup, you'll write plausible-looking code that silently breaks.
@@ -49,7 +49,7 @@ The test: can you point to a `dryui ask` or MCP `ask` call for every component o
 
 **Use `.Root`. Always check.**
 
-Most DryUI components are compound. They require `<Dialog.Root>`, not `<Dialog>`. The bare name silently fails or renders wrong. Assume compound, verify with `ask --scope component`.
+Most DryUI components are compound. They require `<Dialog.Root>`, not `<Dialog>`. The bare name silently fails or renders wrong. Assume compound, verify with `dryui ask --scope component "<Component>"` or MCP `ask` with `scope: "component"`.
 
 ```svelte
 <!-- Wrong -->
@@ -58,7 +58,7 @@ Most DryUI components are compound. They require `<Dialog.Root>`, not `<Dialog>`
 <Dialog.Root>content</Dialog.Root>
 ```
 
-Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
+Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `dryui ask --scope component "<Component>"` or MCP `ask` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
@@ -185,11 +185,11 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, `+page.server.ts` shape, form actions, and anything Svelte-syntax adjacent: call the official `svelte-autofixer` and `get-documentation` tools from `@sveltejs/mcp` before guessing from memory.
 
-- `dryui setup --install` registers `@sveltejs/mcp` by default. Pass `--no-svelte-mcp` to skip.
+- `dryui init` wires Svelte MCP where DryUI can install editor config automatically; otherwise run `dryui setup --editor <agent>` and follow the printed Svelte MCP companion snippet.
 - If it's not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
 - Scope split: DryUI `ask`/`check` cover component APIs, theming, composition, and validation. Svelte MCP covers the runtime, compiler, and framework idioms.
 
-The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either (a) call `svelte-autofixer` / `get-documentation`, or (b) confirm the pattern is already covered by a DryUI recipe via `ask --scope recipe`?
+The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either (a) call `svelte-autofixer` / `get-documentation`, or (b) confirm the pattern is already covered by a DryUI recipe via `dryui ask --scope recipe "<pattern>"` or MCP `ask`?
 
 ## Quick Start
 
@@ -238,7 +238,7 @@ npx skills add rob-balfre/dryui
 
 That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) into whichever coding agents the CLI auto-detects in your project. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
 
-Then add MCP config so the agent can call `dryui ask` / `dryui check` / feedback dispatch. `dryui setup --install` (or `dryui init`) handles the MCP wiring automatically for Copilot, Cursor, OpenCode, Windsurf, Zed, and Codex (TOML), and the Gemini extension covers Gemini.
+Then add MCP config so the agent can call MCP `ask` / MCP `check` / feedback dispatch. `dryui init` handles supported one-shot wiring when scaffolding; for existing projects, run `dryui setup --editor <agent>` and apply the printed MCP snippet.
 
 ### Manual install path
 
@@ -246,7 +246,7 @@ Kept for users who need to pin to a specific local path; the npx skills command 
 
 - Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 
-**5. Register the Svelte MCP companion.** `dryui setup --install` does this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
+**5. Register the Svelte MCP companion.** Run `dryui setup --editor <agent>` to print the right companion snippet. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 
 ### Manual setup
 
@@ -297,7 +297,7 @@ Kept for users who need to pin to a specific local path; the npx skills command 
 
 ## Bindable Props, Common Confusion
 
-Always verify with `ask --scope component`, but these are the most common mistakes:
+Always verify with `dryui ask --scope component "<Component>"` or MCP `ask`, but these are the most common mistakes:
 
 - `bind:value` (Input, Select, Tabs...) vs `bind:checked` (Checkbox, Switch) vs `bind:pressed` (Toggle) vs `bind:open` (Dialog, Popover, Drawer...)
 - Select and Combobox support both `bind:value` and `bind:open`.
@@ -310,7 +310,7 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### Recommended workflow
 
-1. Resolve any component or recipe uncertainty with `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"`. If MCP is available, `ask --scope component` and `ask --scope recipe` are the equivalent surface.
+1. Resolve any component or recipe uncertainty with `dryui ask --scope component "<Component>"` or `dryui ask --scope recipe "<pattern>"`. If MCP is available, MCP `ask` with `scope: "component"` or `scope: "recipe"` is the equivalent surface.
 2. Build page and section layout with `data-layout` hooks plus `src/layout.css`; keep component-local CSS focused on the component’s own internals.
 3. Run `dryui check [path]` or MCP `check` after implementation to catch composition drift, layout violations, accessibility regressions, and token drift.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
@@ -323,7 +323,7 @@ Before installing globally, always check `readlink ~/.bun/install/global/node_mo
 dryui                           # default onboarding entry point
 dryui setup                     # explicit onboarding subcommand
 dryui init [path] [--pm bun]    # Bootstrap SvelteKit + DryUI project
-dryui ask <scope> "<query>"     # Look up components, recipes, tokens, setup
+dryui ask --scope <scope> "<query>"  # Look up components, recipes, tokens, setup
 dryui detect [path]             # Check project setup
 dryui install [path]            # Print install plan
 dryui check [path]              # Validate file, theme, directory, or workspace
@@ -338,12 +338,12 @@ Without a global install, prefix any command with `bunx @dryui/cli …` or `npx 
 
 ### MCP tools (same workflow in-editor)
 
-| Workflow             | Tools                                                             |
-| -------------------- | ----------------------------------------------------------------- |
-| Project setup        | `ask --scope setup ""`                                            |
-| Lookup & composition | `ask --scope component`, `ask --scope recipe`, `ask --scope list` |
-| Validation           | `check <file.svelte>`, `check <theme.css>`                        |
-| Audit                | `check`, `check <directory>`                                      |
+| Workflow             | Tools                                                        |
+| -------------------- | ------------------------------------------------------------ |
+| Project setup        | MCP `ask` with `scope: "setup"`                              |
+| Lookup & composition | MCP `ask` with `scope: "component"`, `"recipe"`, or `"list"` |
+| Validation           | `check <file.svelte>`, `check <theme.css>`                   |
+| Audit                | `check`, `check <directory>`                                 |
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
 

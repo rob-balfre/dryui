@@ -47,14 +47,14 @@ The CLI is idempotent — it detects what's already done and only applies missin
 
 1. Tell the user init is complete and show the CLI output.
 2. Establish the UI creation pipeline before building screens: user brief, DryUI lookup/plan via `ask`, implementation, deterministic `check`.
-3. Suggest next steps: start the dev server, then run `ask --scope recipe "app shell"` to get the root layout template.
+3. Suggest next steps: start the dev server, then run `dryui ask --scope recipe "app shell"` to get the root layout template, or call MCP `ask` with `scope: "recipe"` and `query: "app shell"`.
 
 ## UI pipeline after setup
 
 Use this order for the first real interface:
 
 1. Capture the user's brief (one line): what you are building, for whom.
-2. Use `dryui ask` or MCP `ask` to confirm components, recipes, contracts, accessibility, and tokens.
+2. Use `dryui ask --scope ...` or MCP `ask` with the same scope/query arguments to confirm components, recipes, contracts, accessibility, and tokens.
 3. Build with DryUI + Svelte 5 runes, grid layout, and `--dry-*` tokens.
 4. Run `dryui check [path]` or MCP `check` to validate contracts, a11y, tokens, and CSS discipline.
 
@@ -64,6 +64,6 @@ For design-quality flows (brief, critique, polish, audit), delegate to [impeccab
 
 If `npx` is not available, use the MCP tools directly:
 
-1. `ask --scope setup ""` — check project state and get the inline install plan. If `project: ready`, stop.
+1. `dryui ask --scope setup ""` — check project state and get the inline install plan. If MCP is available, call MCP `ask` with `scope: "setup"` and an empty `query`. If `project: ready`, stop.
 2. Execute each setup step from the response: run shell commands (confirm with user first), write files using provided snippets, log notes, warn on blocked steps.
 3. `check` — validate the workspace after applying the setup changes.

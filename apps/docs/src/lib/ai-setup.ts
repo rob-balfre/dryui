@@ -77,6 +77,7 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	detect: 'blue',
 	install: 'green',
 	add: 'green',
+	ask: 'blue',
 	info: 'blue',
 	list: 'purple',
 	compose: 'orange',
@@ -93,6 +94,7 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	detect: 'dryui detect .',
 	install: 'dryui install .',
 	add: 'dryui add --project --target src/routes/+page.svelte Button',
+	ask: 'dryui ask --scope component Button',
 	info: 'dryui info button',
 	list: 'dryui list --category layout',
 	compose: 'dryui compose "date input"',
@@ -212,7 +214,7 @@ const zedConfig = `{
 }`;
 
 const companionSvelteNote =
-	'DryUI runs `dryui setup --install` to register this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code, Codex, and Gemini, use the snippet below.';
+	'Run `dryui setup --editor <agent>` to print the recommended Svelte MCP companion snippet for your editor. For Claude Code, Codex, and Gemini, use the snippet below.';
 
 const svelteCompanionClaude = `claude plugin marketplace add sveltejs/ai-tools
 claude plugin install svelte@svelte
@@ -297,7 +299,7 @@ export const aiAgentSetups: AiAgentSetup[] = [
 			},
 			{
 				title: 'Add the MCP servers',
-				description: 'Adds dryui ask/check and the feedback MCP server to Claude Code.',
+				description: 'Adds MCP `ask`/`check` and the feedback MCP server to Claude Code.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			}
@@ -309,7 +311,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Add the MCP servers so Claude can call dryui ask/check and feedback tools.',
+			note: '3. Add the MCP servers so Claude can call MCP `ask`/`check` and feedback tools.',
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
@@ -322,7 +324,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. The skill adds conventions; MCP adds ask/check inside Claude.'
+			'Use the CLI as the default surface. The skill adds conventions; MCP adds `ask`/`check` inside Claude.'
 	},
 	{
 		id: 'codex',
@@ -364,7 +366,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'toml'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so `ask` and `check` are available.'
+			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so MCP `ask` and `check` are available.'
 	},
 	{
 		id: 'gemini',
@@ -409,7 +411,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the extension, restart Gemini so `ask` and `check` are available.'
+			'Use the CLI as the default surface. After installing the extension, restart Gemini so MCP `ask` and `check` are available.'
 	},
 	{
 		id: 'opencode',

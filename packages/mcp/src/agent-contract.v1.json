@@ -53,6 +53,10 @@
         "description": "Print a copyable starter snippet or a project-aware plan"
       },
       {
+        "name": "ask",
+        "description": "Discover components, recipes, setup guidance, and tokens by scope"
+      },
+      {
         "name": "info",
         "description": "Show component API reference"
       },

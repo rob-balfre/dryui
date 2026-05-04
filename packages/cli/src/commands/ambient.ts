@@ -25,8 +25,8 @@ export function emitAmbient(): void {
 			.trimEnd();
 		console.log(summary);
 		console.log('next[2]:');
-		console.log('  ask --scope setup "" -- inspect setup status and install guidance');
-		console.log('  ask --scope component "Button" -- inspect a component before editing');
+		console.log('  dryui ask --scope setup "" -- inspect setup status and install guidance');
+		console.log('  dryui ask --scope component "Button" -- inspect a component before editing');
 	} catch {
 		// Detection failed — silent exit keeps agent sessions noise-free.
 	}

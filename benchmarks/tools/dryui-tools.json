@@ -5,7 +5,7 @@
 			"name": "ask",
 			"mcp": "@dryui/mcp",
 			"description": "Discover DryUI components, recipes, tokens, and setup guidance. Takes { query, scope, kind?, cwd? }. Scope is one of component | recipe | list | setup.",
-			"usage": "ask --scope component \"Button\" to fetch a full component reference; ask --scope recipe \"app shell\" for the setup recipe."
+			"usage": "MCP ask with scope=component and query=\"Button\" to fetch a full component reference; MCP ask with scope=recipe and query=\"app shell\" for the setup recipe. In CLI contexts, use dryui ask --scope component \"Button\" or dryui ask --scope recipe \"app shell\"."
 		},
 		{
 			"name": "check",

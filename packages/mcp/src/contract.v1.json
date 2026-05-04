@@ -11,7 +11,7 @@
     "compositionRecipes": 48,
     "tools": 2,
     "prompts": 2,
-    "cliCommands": 14,
+    "cliCommands": 15,
     "promptBundles": 1
   },
   "themeImports": {
@@ -59,6 +59,10 @@
       {
         "name": "add",
         "description": "Print a copyable starter snippet or a project-aware plan"
+      },
+      {
+        "name": "ask",
+        "description": "Discover components, recipes, setup guidance, and tokens by scope"
       },
       {
         "name": "info",

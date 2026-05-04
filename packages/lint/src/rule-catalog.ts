@@ -46,7 +46,7 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-raw-element',
 		severity: 'error',
 		message:
-			'Raw <{tag}> is not allowed in component-only mode. Use a DryUI/Svelte component instead.',
+			'Raw <{tag}> is not allowed. Use a DryUI/Svelte component, or add data-layout/data-layout-area for layout shell elements.',
 		suggestedFix: 'Replace raw markup with a DryUI component or a dedicated Svelte component.'
 	},
 	'dryui/no-component-class': {
@@ -88,7 +88,7 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-flex',
 		severity: 'error',
 		message:
-			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: ask --scope recipe "chip row").',
+			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root (run: dryui ask --scope recipe "chip row").',
 		suggestedFix: 'Use CSS grid, or move page-level flex to src/layout.css.'
 	},
 	'dryui/no-width': {
@@ -287,14 +287,14 @@ export const RULE_CATALOG = {
 		id: 'missing-token',
 		severity: 'error',
 		message:
-			'Required semantic token {variable} is not defined. Full-theme files must define every semantic token (run: ask --scope recipe "customize tokens").',
+			'Required semantic token {variable} is not defined. Full-theme files must define every semantic token (run: dryui ask --scope recipe "customize tokens").',
 		suggestedFix: 'Add {variable} with a color that fits your theme'
 	},
 	'partial-override': {
 		id: 'partial-override',
 		severity: 'info',
 		message:
-			'{count} --dry-* token override(s) detected in a non-theme file. This is fine for scoped tweaks, but globally overriding a few tokens at :root/html/body often masks contrast problems. For a full custom theme, rename to *.theme.css or add /* @dryui-theme */ at the top. For 1-10 site-wide tweaks, scope them under .page / body selectors. For 1-5 per-route tweaks, put them in a scoped component style (run: ask --scope recipe "customize tokens").',
+			'{count} --dry-* token override(s) detected in a non-theme file. This is fine for scoped tweaks, but globally overriding a few tokens at :root/html/body often masks contrast problems. For a full custom theme, rename to *.theme.css or add /* @dryui-theme */ at the top. For 1-10 site-wide tweaks, scope them under .page / body selectors. For 1-5 per-route tweaks, put them in a scoped component style (run: dryui ask --scope recipe "customize tokens").',
 		suggestedFix:
 			'Either (a) rename to *.theme.css for a full theme, (b) add /* @dryui-theme */ directive, (c) scope under .page / body, or (d) move to a per-route component <style>.'
 	},
@@ -302,7 +302,7 @@ export const RULE_CATALOG = {
 		id: 'theme-import-order',
 		severity: 'error',
 		message:
-			'Import @dryui/ui theme CSS BEFORE local CSS that overrides --dry-* tokens. Local CSS imported first has its overrides clobbered by the theme defaults, so the theme "wins" and overrides appear to have no effect (run: ask --scope recipe "customize tokens").',
+			'Import @dryui/ui theme CSS BEFORE local CSS that overrides --dry-* tokens. Local CSS imported first has its overrides clobbered by the theme defaults, so the theme "wins" and overrides appear to have no effect (run: dryui ask --scope recipe "customize tokens").',
 		suggestedFix:
 			'Reorder: import "@dryui/ui/themes/default.css" and "@dryui/ui/themes/dark.css" BEFORE local "../app.css" (or similar).'
 	},

@@ -87,6 +87,16 @@ const RAW_GRID_PROPS_RE =
 const INSET_SHADOW_RE =
 	/\binset\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?(?:\s+(-?\d+(?:\.\d+)?)(?:px|em|rem)?)?/g;
 
+const NATIVE_ELEMENT_RULE_TAGS: ReadonlySet<string> = new Set([
+	'button',
+	'dialog',
+	'hr',
+	'input',
+	'select',
+	'table',
+	'textarea'
+]);
+
 const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
@@ -308,7 +318,8 @@ const RULE_OWNERS: Record<string, readonly string[]> = {
 	'dryui/no-width': ['/mega-menu/', '/internal/'],
 	'dryui/no-important': [],
 	'dryui/no-partial-inset-shadow': ['/option-picker/', '/lib/demos/'],
-	'dryui/no-global': ['/markdown-renderer/']
+	'dryui/no-global': ['/markdown-renderer/'],
+	'dryui/no-raw-grid': ['src/layout.css']
 };
 
 function isRuleOwner(filename: string | undefined, ruleId: string): boolean {
@@ -767,21 +778,7 @@ function createNativeElementMessage(rule: NativeElementRule): string {
 	});
 }
 
-export interface MarkupContext {
-	/**
-	 * Experimental migration mode for app/consumer markup. When enabled, native
-	 * element tags such as <div>, <span>, <header>, and <main> are rejected so
-	 * styling has to flow through Svelte/DryUI component surfaces. Elements with
-	 * `data-layout` or `data-layout-area` remain allowed for page layout shells.
-	 */
-	readonly componentsOnly?: boolean;
-}
-
-export function checkMarkup(
-	content: string,
-	filename?: string,
-	context: MarkupContext = {}
-): Violation[] {
+export function checkMarkup(content: string, filename?: string): Violation[] {
 	const violations: Violation[] = [];
 	const markup = stripBlocks(content);
 	const executableMarkup = stripHtmlComments(markup);
@@ -820,11 +817,14 @@ export function checkMarkup(
 		}
 	}
 
-	if (context.componentsOnly && allowed('dryui/no-raw-element')) {
+	if (allowed('dryui/no-raw-element')) {
 		const componentOnlyMarkup = stripSvelteHeadBlocks(markup);
 		for (const tag of findAllOpeningTags(componentOnlyMarkup)) {
 			if (isComponentOnlyAllowedTag(tag.tagName)) continue;
 			if (hasLayoutHook(tag.attrs)) continue;
+			// Tags with a more specific rule (anchor, NATIVE_ELEMENT_RULES) get
+			// targeted guidance from those rules instead of a generic ban.
+			if (tag.tagName === 'a' || NATIVE_ELEMENT_RULE_TAGS.has(tag.tagName)) continue;
 			violations.push({
 				rule: 'dryui/no-raw-element',
 				message: ruleMessage('dryui/no-raw-element', { tag: tag.tagName }),
@@ -879,7 +879,7 @@ export function checkMarkup(
 		}
 	}
 
-	if (!context.componentsOnly && allowed('dryui/no-anchor-without-href')) {
+	if (allowed('dryui/no-anchor-without-href')) {
 		for (const tag of findOpeningTags(markup, 'a')) {
 			if (anchorHasHref(tag.text)) continue;
 			violations.push({
@@ -890,7 +890,7 @@ export function checkMarkup(
 		}
 	}
 
-	if (!context.componentsOnly && allowed('dryui/no-raw-native-element')) {
+	if (allowed('dryui/no-raw-native-element')) {
 		for (const rule of NATIVE_ELEMENT_RULES) {
 			if (rule.allowedDirs.has(parentDir)) continue;
 
@@ -909,7 +909,6 @@ export function checkMarkup(
 
 export interface StyleContext {
 	readonly chipGroupExemptClasses?: ReadonlySet<string>;
-	readonly forbidRawGrid?: boolean;
 }
 
 /**
@@ -972,7 +971,7 @@ export function checkStyle(
 		selectorIsChipGroupExempt(selectorAtOffset(scan, idx), exemptClasses);
 	const allowed = (_ruleId: string) => true;
 
-	if (context.forbidRawGrid && allowed('dryui/no-raw-grid')) {
+	if (allowed('dryui/no-raw-grid') && !isRuleOwner(filename, 'dryui/no-raw-grid')) {
 		for (const match of scan.matchAll(RAW_GRID_DISPLAY_RE)) {
 			violations.push({
 				rule: 'dryui/no-raw-grid',
@@ -1145,10 +1144,7 @@ function collectChipGroupClasses(content: string): Set<string> {
 	return exempt;
 }
 
-export interface SvelteFileCheckOptions {
-	readonly forbidRawGrid?: boolean;
-	readonly componentsOnly?: boolean;
-}
+export interface SvelteFileCheckOptions {}
 
 function extractClassNames(attrsStr: string): string[] {
 	const out: string[] = [];
@@ -1235,12 +1231,10 @@ function collectDirectChildClasses(
 export function checkSvelteFile(
 	content: string,
 	filename?: string,
-	options: SvelteFileCheckOptions = {}
+	_options: SvelteFileCheckOptions = {}
 ): Violation[] {
 	const lineStarts = buildLineIndex(content);
-	const violations: Violation[] = [
-		...checkMarkup(content, filename, { componentsOnly: options.componentsOnly ?? false })
-	];
+	const violations: Violation[] = [...checkMarkup(content, filename)];
 	const chipGroupExemptClasses = collectChipGroupClasses(content);
 
 	for (const match of content.matchAll(SCRIPT_BLOCK_RE)) {
@@ -1253,14 +1247,7 @@ export function checkSvelteFile(
 		const style = match[1] ?? '';
 		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
 		violations.push(
-			...offsetViolations(
-				checkStyle(
-					style,
-					{ chipGroupExemptClasses, forbidRawGrid: options.forbidRawGrid ?? false },
-					filename
-				),
-				startLine
-			)
+			...offsetViolations(checkStyle(style, { chipGroupExemptClasses }, filename), startLine)
 		);
 	}
 

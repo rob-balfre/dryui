@@ -175,7 +175,7 @@ both attributes on `<html>`:
   want a dark pathway, and the explicit `data-theme='dark']` rule is enough
   on its own.
 
-Use `ask --scope recipe "light only"` for the full scaffold.
+Use `dryui ask --scope recipe "light only"` for the full scaffold, or call MCP `ask` with `scope: "recipe"` and `query: "light only"`.
 
 ### Option C: Persisted theme toggle
 

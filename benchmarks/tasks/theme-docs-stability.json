@@ -1,7 +1,7 @@
 {
 	"id": "theme-docs-stability",
 	"claim": "Agent edits theme tokens cleanly: overrides land in the right scope (per-route, body, or *.theme.css), not at :root inside app.css.",
-	"prompt": "A stakeholder wants the marketing route (/marketing/*) to use a warmer brand palette without changing the app-wide theme. Implement the override using the pattern ask --scope recipe \"customize-tokens\" recommends. Do not put overrides at :root in app.css.",
+	"prompt": "A stakeholder wants the marketing route (/marketing/*) to use a warmer brand palette without changing the app-wide theme. Implement the override using the pattern MCP ask with scope=recipe and query=\"customize-tokens\" recommends. In CLI contexts, use dryui ask --scope recipe \"customize-tokens\". Do not put overrides at :root in app.css.",
 	"target_components": [],
 	"allowed_tools": ["ask", "check", "read", "write"],
 	"acceptance_checks": [

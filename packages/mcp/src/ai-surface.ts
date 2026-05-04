@@ -56,6 +56,10 @@ export const aiSurface: AiSurfaceManifest = {
 		{ name: 'detect', description: 'Detect DryUI project setup' },
 		{ name: 'install', description: 'Print a project install plan' },
 		{ name: 'add', description: 'Print a copyable starter snippet or a project-aware plan' },
+		{
+			name: 'ask',
+			description: 'Discover components, recipes, setup guidance, and tokens by scope'
+		},
 		{ name: 'info', description: 'Show component API reference' },
 		{ name: 'list', description: 'List all components' },
 		{ name: 'compose', description: 'Look up composition guidance' },

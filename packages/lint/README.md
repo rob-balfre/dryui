@@ -74,12 +74,10 @@ Options:
   Substring patterns that opt files into linting. When set, non-matching files are skipped.
 - `exclude?: string[]`
   Substring patterns used to skip matching filenames.
-- `forbidRawGrid?: boolean`
-  Experimental migration mode. Flags raw CSS grid declarations so page layout moves into `src/layout.css` and component layout is reviewed deliberately.
-- `componentsOnly?: boolean`
-  Experimental migration mode. Flags raw native markup tags such as `<div>` and `<span>` so app markup goes through DryUI/Svelte components.
 - `includeDryuiPackages?: boolean`
   First-party mode. Lints linked `@dryui/*` package source instead of skipping it as upstream dependency code.
+
+Rules are always-on; there is no way to opt out of `dryui/no-raw-element` (raw native HTML tags) or `dryui/no-raw-grid` (raw CSS grid outside `src/layout.css`). Use `[data-layout]`/`[data-layout-area]` hooks for shell elements and route page-layout grid through `src/layout.css`.
 
 ### `checkLayoutCss(content, filename?, options?)`
 

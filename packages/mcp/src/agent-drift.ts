@@ -25,6 +25,10 @@ const STALE_AGENT_RULES: Readonly<Record<DryuiClaudeAgentName, readonly StaleAge
 			reason: 'points at the old canonical dryui-layout skill path'
 		},
 		{
+			pattern: /Read the canonical skill at `skills\/dryui-layout\/SKILL\.md`/,
+			reason: 'assumes scaffolded projects contain a top-level dryui-layout skill'
+		},
+		{
 			pattern: /src\/layout\.css`?\s+is\s+whitespace-only/i,
 			reason: 'uses the old whitespace-only src/layout.css contract'
 		}
@@ -37,6 +41,10 @@ const STALE_AGENT_RULES: Readonly<Record<DryuiClaudeAgentName, readonly StaleAge
 		{
 			pattern: /packages\/feedback-server\/skills\/dryui-feedback\/SKILL\.md/,
 			reason: 'points at the old canonical dryui-feedback skill path'
+		},
+		{
+			pattern: /Read the canonical skill at `skills\/dryui-feedback\/SKILL\.md`/,
+			reason: 'assumes scaffolded projects contain a top-level dryui-feedback skill'
 		},
 		{
 			pattern: /layoutBoxes\[\]/,

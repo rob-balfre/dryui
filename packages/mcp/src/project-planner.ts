@@ -657,8 +657,6 @@ export default {
   preprocess: [
     dryuiLint({
       strict: true,
-      forbidRawGrid: true,
-      componentsOnly: true,
       exclude: ['.svelte-kit/', '/dist/']
     })
   ],

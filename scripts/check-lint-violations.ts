@@ -3,8 +3,10 @@
  * This catches violations that only surface during Vite preprocessing, making
  * them part of the CI check pipeline.
  *
- * packages/ui/src — full rule set
- * packages/feedback-server/ui/src — full rule set for the feedback console
+ * packages/ui/src — full rule set, minus dryui/no-raw-element and dryui/no-raw-grid
+ *   which consumer-only enforcement; component implementations legitimately use
+ *   raw HTML and CSS grid internally.
+ * packages/feedback-server/ui/src — same exemptions as packages/ui/src.
  * packages/primitives/src — dryui/no-svelte-element only. Primitives are
  *   headless and legitimately use raw <button>/<input>/etc.; other rules
  *   (flex, width) have pre-existing tolerated violations there.
@@ -16,6 +18,7 @@ import { RULE_CATALOG } from '../packages/lint/src/rule-catalog.js';
 const FULL_SCAN_DIRS = ['packages/ui/src', 'packages/feedback-server/ui/src'];
 const PRIMITIVES_SCAN_DIR = 'packages/primitives/src';
 
+const FIRST_PARTY_IGNORED_RULES = new Set(['dryui/no-raw-element', 'dryui/no-raw-grid']);
 const PRIMITIVES_ALLOWED_RULES = new Set(['dryui/no-svelte-element']);
 
 let totalErrors = 0;
@@ -47,7 +50,7 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 
 		const filtered = ruleAllowlist
 			? violations.filter((v) => ruleAllowlist.has(v.rule))
-			: violations;
+			: violations.filter((v) => !FIRST_PARTY_IGNORED_RULES.has(v.rule));
 
 		if (filtered.length > 0) {
 			for (const v of filtered) {
@@ -66,7 +69,9 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 	for (const path of cssPaths.sort((left, right) => left.localeCompare(right))) {
 		const filePath = `${scanDir}/${path}`;
 		const content = await Bun.file(filePath).text();
-		const violations = checkStyle(content, {}, filePath);
+		const violations = checkStyle(content, {}, filePath).filter(
+			(v) => !FIRST_PARTY_IGNORED_RULES.has(v.rule)
+		);
 
 		if (violations.length > 0) {
 			for (const v of violations) {
