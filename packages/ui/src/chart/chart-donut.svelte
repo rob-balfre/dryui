@@ -52,6 +52,15 @@
 		onclick?.({ label: seg.point.label, value: seg.point.value, index: seg.index });
 	}
 
+	function handleKeydown(event: KeyboardEvent, seg: (typeof segments)[number]) {
+		if (!onclick || (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar')) {
+			return;
+		}
+
+		event.preventDefault();
+		handleClick(seg);
+	}
+
 	const registeredHandler = $derived(
 		onclick
 			? (index: number) => {
@@ -65,22 +74,49 @@
 	registerChartInteractive(ctx, () => registeredHandler);
 </script>
 
-<g role="list" aria-label="Donut chart data" data-chart-donut class={className} {...rest}>
+<g
+	role={onclick ? 'group' : 'list'}
+	aria-label="Donut chart data"
+	data-chart-donut
+	class={className}
+	{...rest}
+>
 	{#each segments as seg (seg.index)}
-		<circle
-			{cx}
-			{cy}
-			r={radius}
-			fill="none"
-			stroke={seg.color}
-			stroke-width={strokeW}
-			stroke-dasharray={seg.dasharray}
-			stroke-dashoffset={seg.dashoffset}
-			transform="rotate(-90 {cx} {cy})"
-			data-part="donut-segment"
-			data-clickable={onclick ? '' : undefined}
-			onclick={onclick ? () => handleClick(seg) : undefined}
-		/>
+		{#if onclick}
+			<circle
+				role="button"
+				tabindex={0}
+				aria-label={`${seg.point.label}: ${seg.point.value}`}
+				{cx}
+				{cy}
+				r={radius}
+				fill="none"
+				stroke={seg.color}
+				stroke-width={strokeW}
+				stroke-dasharray={seg.dasharray}
+				stroke-dashoffset={seg.dashoffset}
+				transform="rotate(-90 {cx} {cy})"
+				data-part="donut-segment"
+				data-clickable=""
+				onclick={() => handleClick(seg)}
+				onkeydown={(event) => handleKeydown(event, seg)}
+			/>
+		{:else}
+			<circle
+				role="listitem"
+				aria-label={`${seg.point.label}: ${seg.point.value}`}
+				{cx}
+				{cy}
+				r={radius}
+				fill="none"
+				stroke={seg.color}
+				stroke-width={strokeW}
+				stroke-dasharray={seg.dasharray}
+				stroke-dashoffset={seg.dashoffset}
+				transform="rotate(-90 {cx} {cy})"
+				data-part="donut-segment"
+			/>
+		{/if}
 	{/each}
 	{#if label}
 		<foreignObject

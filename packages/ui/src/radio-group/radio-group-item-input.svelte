@@ -49,6 +49,15 @@
 		ctx.select(value);
 		onchangeProp?.(event);
 	}
+
+	function autofocusAction(node: HTMLInputElement, enabled: HTMLInputAttributes['autofocus']) {
+		if (enabled) node.focus();
+		return {
+			update(nextEnabled: HTMLInputAttributes['autofocus']) {
+				if (nextEnabled) node.focus();
+			}
+		};
+	}
 </script>
 
 <label
@@ -61,13 +70,13 @@
 >
 	<input
 		type="radio"
+		use:autofocusAction={autofocus}
 		name={name ?? ctx.name}
 		{value}
 		{checked}
 		disabled={isDisabled}
 		required={required ?? ctx.required}
 		{id}
-		{autofocus}
 		{onfocus}
 		{onblur}
 		aria-label={ariaLabel}

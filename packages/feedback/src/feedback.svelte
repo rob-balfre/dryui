@@ -36,8 +36,8 @@
 	// demo/recreation contexts where editing the root layout is not an option.
 	//
 	// - process.env.DRY_FEEDBACK_DISABLED covers the SSR process (Node).
-	// - import.meta.env.VITE_DRY_FEEDBACK_DISABLED also works and is baked into
-	//   the client bundle by Vite, so it disables the widget on both sides.
+	// - Vite's VITE_DRY_FEEDBACK_DISABLED value is baked into the client
+	//   bundle, so it disables the widget on both sides.
 	//   Prefer the VITE_-prefixed form for consistent SSR + client behavior.
 	const feedbackDisabled = (() => {
 		const maybeProcess = (globalThis as { process?: { env?: Record<string, unknown> } }).process;
@@ -50,14 +50,12 @@
 		} catch {
 			// process is not available in the current runtime; ignore.
 		}
-		try {
-			const metaEnv = (import.meta as { env?: Record<string, unknown> }).env;
-			if (metaEnv) {
-				if (metaEnv.DRY_FEEDBACK_DISABLED) return true;
-				if (metaEnv.VITE_DRY_FEEDBACK_DISABLED) return true;
-			}
-		} catch {
-			// import.meta.env is unavailable outside Vite builds; ignore.
+		const metaEnv = (import.meta as unknown as Record<string, Record<string, unknown> | undefined>)[
+			'env'
+		];
+		if (metaEnv) {
+			if (metaEnv.DRY_FEEDBACK_DISABLED) return true;
+			if (metaEnv.VITE_DRY_FEEDBACK_DISABLED) return true;
 		}
 		return false;
 	})();

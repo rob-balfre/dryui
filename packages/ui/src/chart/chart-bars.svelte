@@ -33,6 +33,15 @@
 		onclick?.({ label: bar.point.label, value: bar.point.value, index: bar.index });
 	}
 
+	function handleKeydown(event: KeyboardEvent, bar: (typeof bars)[number]) {
+		if (!onclick || (event.key !== 'Enter' && event.key !== ' ' && event.key !== 'Spacebar')) {
+			return;
+		}
+
+		event.preventDefault();
+		handleClick(bar);
+	}
+
 	const registeredHandler = $derived(
 		onclick
 			? (index: number) => {
@@ -46,19 +55,43 @@
 	registerChartInteractive(ctx, () => registeredHandler);
 </script>
 
-<g role="list" aria-label="Bar chart data" data-chart-bars class={className} {...rest}>
+<g
+	role={onclick ? 'group' : 'list'}
+	aria-label="Bar chart data"
+	data-chart-bars
+	class={className}
+	{...rest}
+>
 	{#each bars as bar (bar.index)}
-		<rect
-			x={bar.x}
-			y={bar.y}
-			width={bar.width}
-			height={bar.height}
-			rx={radius}
-			fill={bar.point.color ?? chartSeriesColor(bar.index)}
-			data-part="bar"
-			data-clickable={onclick ? '' : undefined}
-			onclick={onclick ? () => handleClick(bar) : undefined}
-		/>
+		{#if onclick}
+			<rect
+				role="button"
+				tabindex={0}
+				aria-label={`${bar.point.label}: ${bar.point.value}`}
+				x={bar.x}
+				y={bar.y}
+				width={bar.width}
+				height={bar.height}
+				rx={radius}
+				fill={bar.point.color ?? chartSeriesColor(bar.index)}
+				data-part="bar"
+				data-clickable=""
+				onclick={() => handleClick(bar)}
+				onkeydown={(event) => handleKeydown(event, bar)}
+			/>
+		{:else}
+			<rect
+				role="listitem"
+				aria-label={`${bar.point.label}: ${bar.point.value}`}
+				x={bar.x}
+				y={bar.y}
+				width={bar.width}
+				height={bar.height}
+				rx={radius}
+				fill={bar.point.color ?? chartSeriesColor(bar.index)}
+				data-part="bar"
+			/>
+		{/if}
 	{/each}
 </g>
 

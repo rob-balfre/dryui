@@ -60,6 +60,15 @@
 		if (max !== undefined && next > max) return;
 		value = next;
 	}
+
+	function autofocusAction(node: HTMLInputElement, enabled: HTMLInputAttributes['autofocus']) {
+		if (enabled) node.focus();
+		return {
+			update(nextEnabled: HTMLInputAttributes['autofocus']) {
+				if (nextEnabled) node.focus();
+			}
+		};
+	}
 </script>
 
 <div
@@ -81,6 +90,7 @@
 	>
 	<input
 		type="number"
+		use:autofocusAction={autofocus}
 		bind:value
 		{min}
 		{max}
@@ -92,7 +102,6 @@
 		{readonly}
 		{required}
 		{autocomplete}
-		{autofocus}
 		{oninput}
 		{onchange}
 		{onfocus}

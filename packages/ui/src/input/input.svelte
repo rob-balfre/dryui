@@ -71,12 +71,22 @@
 
 	const ctx = getFormControlCtx();
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
+
+	function autofocusAction(node: HTMLInputElement, enabled: HTMLInputAttributes['autofocus']) {
+		if (enabled) node.focus();
+		return {
+			update(nextEnabled: HTMLInputAttributes['autofocus']) {
+				if (nextEnabled) node.focus();
+			}
+		};
+	}
 </script>
 
 <span class="wrapper {className ?? ''}" {style}>
 	<input
 		{...rest}
 		{...type != null ? { type } : {}}
+		use:autofocusAction={autofocus}
 		bind:value
 		id={id ?? ctx?.id}
 		disabled={isDisabled}
@@ -99,7 +109,6 @@
 		{step}
 		{list}
 		{autocomplete}
-		{autofocus}
 		{inputmode}
 		{oninput}
 		{onchange}

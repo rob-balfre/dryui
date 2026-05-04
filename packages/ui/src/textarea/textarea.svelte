@@ -61,11 +61,24 @@
 
 	const ctx = getFormControlCtx();
 	const isDisabled = $derived(disabled || ctx?.disabled || false);
+
+	function autofocusAction(
+		node: HTMLTextAreaElement,
+		enabled: HTMLTextareaAttributes['autofocus']
+	) {
+		if (enabled) node.focus();
+		return {
+			update(nextEnabled: HTMLTextareaAttributes['autofocus']) {
+				if (nextEnabled) node.focus();
+			}
+		};
+	}
 </script>
 
 <span class="wrapper {className ?? ''}" {style}>
 	<textarea
 		{...rest}
+		use:autofocusAction={autofocus}
 		bind:value
 		id={id ?? ctx?.id}
 		disabled={isDisabled}
@@ -86,7 +99,6 @@
 		{cols}
 		{wrap}
 		{autocomplete}
-		{autofocus}
 		{oninput}
 		{onchange}
 		{onfocus}

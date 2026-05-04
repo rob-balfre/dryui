@@ -17,11 +17,11 @@
 		fgColor,
 		bgColor,
 		class: className,
+		role,
+		'aria-label': ariaLabel,
+		'aria-labelledby': ariaLabelledby,
 		...rest
 	}: Props = $props();
-
-	let canvasEl: HTMLCanvasElement | undefined = $state();
-	let wrapperEl = $state<HTMLDivElement>();
 
 	const matrix = $derived(
 		(() => {
@@ -33,62 +33,91 @@
 		})()
 	);
 
-	function resolveColor(rootEl: HTMLElement, varName: string, override: string | undefined) {
-		if (override) return override;
-		const v = getComputedStyle(rootEl).getPropertyValue(varName).trim();
-		return v || '';
+	const wrapperRole = $derived(role ?? 'img');
+	const wrapperAriaLabel = $derived(
+		ariaLabel ?? (wrapperRole === 'img' && !ariaLabelledby ? 'QR Code' : undefined)
+	);
+
+	interface DrawQrParams {
+		matrix: typeof matrix;
+		size: number;
+		bgColor: string | undefined;
+		fgColor: string | undefined;
 	}
 
-	$effect(() => {
-		if (!canvasEl || !wrapperEl || !matrix) return;
+	function drawQr(canvas: HTMLCanvasElement, params: DrawQrParams) {
+		function render({
+			matrix: nextMatrix,
+			size: nextSize,
+			bgColor: nextBgColor,
+			fgColor: nextFgColor
+		}: DrawQrParams) {
+			const wrapper = canvas.parentElement;
+			if (wrapper instanceof HTMLElement) {
+				wrapper.style.setProperty('--dry-qr-size', `${nextSize}px`);
+				if (nextBgColor) wrapper.style.setProperty('--dry-qr-bg', nextBgColor);
+				else wrapper.style.removeProperty('--dry-qr-bg');
+				if (nextFgColor) wrapper.style.setProperty('--dry-qr-fg', nextFgColor);
+				else wrapper.style.removeProperty('--dry-qr-fg');
+			}
 
-		const ctx = canvasEl.getContext('2d');
-		if (!ctx) return;
+			if (!nextMatrix) return;
 
-		const moduleCount = matrix.length;
-		const moduleSize = size / moduleCount;
+			if (!(wrapper instanceof HTMLElement)) return;
 
-		canvasEl.width = size;
-		canvasEl.height = size;
+			const ctx = canvas.getContext('2d');
+			if (!ctx) return;
 
-		const resolvedBg = resolveColor(wrapperEl, '--dry-qr-bg', bgColor);
-		const resolvedFg = resolveColor(wrapperEl, '--dry-qr-fg', fgColor);
+			const moduleCount = nextMatrix.length;
+			const moduleSize = nextSize / moduleCount;
 
-		ctx.fillStyle = resolvedBg;
-		ctx.fillRect(0, 0, size, size);
+			canvas.width = nextSize;
+			canvas.height = nextSize;
 
-		ctx.fillStyle = resolvedFg;
-		for (let row = 0; row < moduleCount; row++) {
-			for (let col = 0; col < moduleCount; col++) {
-				if (matrix[row]![col]) {
-					ctx.fillRect(
-						Math.round(col * moduleSize),
-						Math.round(row * moduleSize),
-						Math.ceil(moduleSize),
-						Math.ceil(moduleSize)
-					);
+			const resolvedBg =
+				nextBgColor || getComputedStyle(wrapper).getPropertyValue('--dry-qr-bg').trim();
+			const resolvedFg =
+				nextFgColor || getComputedStyle(wrapper).getPropertyValue('--dry-qr-fg').trim();
+
+			ctx.fillStyle = resolvedBg;
+			ctx.fillRect(0, 0, nextSize, nextSize);
+
+			ctx.fillStyle = resolvedFg;
+			for (let row = 0; row < moduleCount; row++) {
+				for (let col = 0; col < moduleCount; col++) {
+					if (nextMatrix[row]![col]) {
+						ctx.fillRect(
+							Math.round(col * moduleSize),
+							Math.round(row * moduleSize),
+							Math.ceil(moduleSize),
+							Math.ceil(moduleSize)
+						);
+					}
 				}
 			}
 		}
-	});
 
-	$effect(() => {
-		if (!wrapperEl) return;
-		wrapperEl.style.setProperty('--dry-qr-size', `${size}px`);
-		if (bgColor) wrapperEl.style.setProperty('--dry-qr-bg', bgColor);
-		else wrapperEl.style.removeProperty('--dry-qr-bg');
-		if (fgColor) wrapperEl.style.setProperty('--dry-qr-fg', fgColor);
-		else wrapperEl.style.removeProperty('--dry-qr-fg');
-	});
+		render(params);
+
+		return {
+			update: render
+		};
+	}
 </script>
 
-<div bind:this={wrapperEl} class={className} data-qr-wrapper {...rest}>
+<div
+	class={className}
+	data-qr-wrapper
+	role={wrapperRole}
+	aria-label={wrapperAriaLabel}
+	aria-labelledby={ariaLabelledby}
+	{...rest}
+>
 	<canvas
-		bind:this={canvasEl}
+		use:drawQr={{ matrix, size, bgColor, fgColor }}
 		width={size}
 		height={size}
-		role="img"
-		aria-label="QR Code"
+		aria-hidden="true"
 		data-qr-canvas
 		data-value={value}
 	></canvas>
