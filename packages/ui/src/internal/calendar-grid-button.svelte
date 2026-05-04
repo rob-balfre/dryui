@@ -490,6 +490,7 @@
 		--dry-calendar-event-gap: var(--dry-space-0_5);
 		--dry-calendar-event-overflow-color: var(--dry-color-text-weak);
 
+		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-2);
 		min-inline-size: max-content;
@@ -790,7 +791,7 @@
 		--dry-calendar-event-color: var(--dry-color-text-error);
 	}
 
-	@media (max-width: 48rem) {
+	@container (max-width: 48rem) {
 		[data-calendar-grid][data-visible-months='2'] [data-calendar-panels] {
 			grid-template-columns: minmax(0, 1fr);
 		}

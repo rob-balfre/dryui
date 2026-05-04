@@ -87,35 +87,42 @@ Use `src/layout.css` grid tracks for page-level width. Use `Container` only insi
 
 ### Basic form
 
-Wrap each input in Field.Root, stack them with grid, put everything in a Card.
+Wrap each input in Field.Root, stack them with grid, and put everything in a semantic surface.
 
 ```svelte
 <script>
 	import '@dryui/ui/themes/default.css';
-	import { Card, Field, Label, Input, Button } from '@dryui/ui';
+	import { Field, Label, Input, Button } from '@dryui/ui';
 
 	let name = $state('');
 	let email = $state('');
 </script>
 
-<Card.Root>
-	<Card.Header>Contact Info</Card.Header>
-	<Card.Content>
-		<form class="form-stack">
-			<Field.Root>
-				<Label>Name</Label>
-				<Input bind:value={name} />
-			</Field.Root>
-			<Field.Root>
-				<Label>Email</Label>
-				<Input type="email" bind:value={email} />
-			</Field.Root>
-			<Button type="submit" variant="solid">Save contact</Button>
-		</form>
-	</Card.Content>
-</Card.Root>
+<section class="form-surface" aria-labelledby="contact-info-title">
+	<h2 id="contact-info-title">Contact Info</h2>
+	<form class="form-stack">
+		<Field.Root>
+			<Label>Name</Label>
+			<Input bind:value={name} />
+		</Field.Root>
+		<Field.Root>
+			<Label>Email</Label>
+			<Input type="email" bind:value={email} />
+		</Field.Root>
+		<Button type="submit" variant="solid">Save contact</Button>
+	</form>
+</section>
 
 <style>
+	.form-surface {
+		display: grid;
+		gap: var(--dry-space-4);
+		padding: var(--dry-space-6);
+		border: 1px solid var(--dry-color-stroke-weak);
+		border-radius: var(--dry-radius-lg);
+		background: var(--dry-color-bg-raised);
+	}
+
 	.form-stack {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -250,20 +257,16 @@ Use Field.Error to show validation messages.
 }
 ```
 
-### Card grid
+### Panel grid
 
 ```svelte
 <div data-layout="card-grid">
 	{#each items as item (item.id)}
-		<Card.Root>
-			<Card.Header>{item.title}</Card.Header>
-			<Card.Content>
-				<p>{item.description}</p>
-			</Card.Content>
-			<Card.Footer>
-				<Button variant="outline">View details</Button>
-			</Card.Footer>
-		</Card.Root>
+		<article class="panel-card">
+			<h2>{item.title}</h2>
+			<p>{item.description}</p>
+			<Button variant="outline">View details</Button>
+		</article>
 	{/each}
 </div>
 ```
@@ -300,17 +303,13 @@ Use Field.Error to show validation messages.
 				<Tabs.Trigger value="notifications">Notifications</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="general">
-				<Card.Root>
-					<Card.Content>
-						<form class="form-stack">
-							<Field.Root>
-								<Label>Display Name</Label>
-								<Input bind:value={displayName} />
-							</Field.Root>
-							<Button type="submit" variant="solid">Save settings</Button>
-						</form>
-					</Card.Content>
-				</Card.Root>
+				<form class="form-stack settings-panel">
+					<Field.Root>
+						<Label>Display Name</Label>
+						<Input bind:value={displayName} />
+					</Field.Root>
+					<Button type="submit" variant="solid">Save settings</Button>
+				</form>
 			</Tabs.Content>
 			<Tabs.Content value="security">
 				<!-- Security settings -->
@@ -420,18 +419,16 @@ Use Field.Error to show validation messages.
 }
 ```
 
-### Forgetting Card.Root in form layouts
+### Using the removed Card component
 
 ```svelte
-<!-- Wrong: bare Card -->
-<Card>
-	<Card.Content>...</Card.Content>
-</Card>
+<!-- Wrong: Card is no longer exported -->
+<Card.Root>...</Card.Root>
 
-<!-- Right: Card.Root -->
-<Card.Root>
-	<Card.Content>...</Card.Content>
-</Card.Root>
+<!-- Right: semantic surface plus current DryUI controls -->
+<section class="surface">
+	<Button>Continue</Button>
+</section>
 ```
 
 ## Component Selection Quick Reference
@@ -472,22 +469,22 @@ Before using any component, call `dryui ask --scope recipe "<pattern>"` (for lay
 
 Call `dryui ask --scope recipe "<recipe>"` with any recipe name to get a full working snippet.
 
-| Recipe                    | Description               | Key Components                         |
-| ------------------------- | ------------------------- | -------------------------------------- |
-| `search-form`             | Search bar with filters   | Input, DatePicker, Select, Button      |
-| `data-table-with-actions` | Table with header actions | Table, Badge, Avatar, Button           |
-| `checkout-flow`           | Multi-step checkout       | Stepper, Card, Field, RadioGroup       |
-| `hotel-listing-card`      | Product/listing card      | Card, Image, Badge, Button, Text       |
-| `stat-card-grid`          | KPI dashboard cards       | StatCard, Chart, Sparkline             |
-| `settings-page`           | Settings with tabs        | Tabs, Card, Field, Input, Select       |
-| `form-with-validation`    | Form with error handling  | Card, Field, Label, Input, Field.Error |
-| `sidebar-layout`          | Page with sidebar nav     | Sidebar, PageHeader                    |
-| `dashboard-page`          | Full dashboard layout     | Sidebar, StatCard, Chart, Table        |
-| `user-profile-card`       | User info card            | Card, Avatar, Text, Badge, Button      |
-| `notification-list`       | Notification feed         | Card, Avatar, Text, Badge              |
-| `command-bar`             | Command palette trigger   | CommandPalette, Hotkey                 |
-| `file-upload-form`        | File upload with progress | Card, FileUpload, Progress, Button     |
-| `pricing-table`           | Pricing comparison        | Card, Text, Button, Badge              |
+| Recipe                    | Description               | Key Components                    |
+| ------------------------- | ------------------------- | --------------------------------- |
+| `search-form`             | Search bar with filters   | Input, DatePicker, Select, Button |
+| `data-table-with-actions` | Table with header actions | Table, Badge, Avatar, Button      |
+| `checkout-flow`           | Multi-step checkout       | Stepper, Field, RadioGroup        |
+| `hotel-listing-card`      | Product/listing card      | Image, Badge, Button, Text        |
+| `stat-card-grid`          | KPI dashboard cards       | StatCard, Chart, Sparkline        |
+| `settings-page`           | Settings with tabs        | Tabs, Field, Input, Select        |
+| `form-with-validation`    | Form with error handling  | Field, Label, Input, Field.Error  |
+| `sidebar-layout`          | Page with sidebar nav     | Sidebar, PageHeader               |
+| `dashboard-page`          | Full dashboard layout     | Sidebar, StatCard, Chart, Table   |
+| `user-profile-card`       | User info card            | Avatar, Text, Badge, Button       |
+| `notification-list`       | Notification feed         | Avatar, Text, Badge               |
+| `command-bar`             | Command palette trigger   | CommandPalette, Hotkey            |
+| `file-upload-form`        | File upload with progress | FileUpload, Progress, Button      |
+| `pricing-table`           | Pricing comparison        | Text, Button, Badge               |
 
 ## State-heavy form flows
 

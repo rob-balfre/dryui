@@ -92,8 +92,8 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	init: 'dryui init',
 	detect: 'dryui detect .',
 	install: 'dryui install .',
-	add: 'dryui add --project --target src/routes/+page.svelte Card',
-	info: 'dryui info card',
+	add: 'dryui add --project --target src/routes/+page.svelte Button',
+	info: 'dryui info button',
 	list: 'dryui list --category layout',
 	compose: 'dryui compose "date input"',
 	tokens: 'dryui tokens --category color',
@@ -284,32 +284,32 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Start with the DryUI CLI, then add the DryUI plugin so Claude can use the same discovery and validation loop in-editor.',
+			'Start with the DryUI CLI, then install the DryUI skills and add the MCP servers so Claude can use the same discovery and validation loop in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
 		installSteps: [
 			{
-				title: 'Add the DryUI marketplace',
-				description: 'Registers the repo so Claude Code can discover the DryUI plugin.',
-				code: 'claude plugin marketplace add rob-balfre/dryui'
+				title: 'Install the DryUI skills',
+				description: 'Uses the upstream npx skills CLI (skills.sh standard).',
+				code: DRYUI_SKILLS_INSTALL_COMMAND
 			},
 			{
-				title: 'Install the plugin',
-				description: 'Installs the DryUI skill and the dryui + dryui-feedback MCP servers.',
-				code: 'claude plugin install dryui@dryui'
+				title: 'Add the MCP servers',
+				description: 'Adds dryui ask/check and the feedback MCP server to Claude Code.',
+				code: `claude mcp add dryui -- npx -y @dryui/mcp
+claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			}
 		],
 		skill: {
-			title: '2. Install the plugin',
-			note: 'The plugin is the canonical Claude install path for the DryUI skill and MCP servers.',
-			code: `claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@dryui`
+			title: '2. Install the DryUI skills',
+			note: 'The npx skills command is the canonical Claude install path for DryUI skills.',
+			code: DRYUI_SKILLS_INSTALL_COMMAND
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Optional MCP-only fallback: add the servers manually if you cannot use plugins. This does not install the bundled DryUI skill.',
+			note: '3. Add the MCP servers so Claude can call dryui ask/check and feedback tools.',
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
@@ -322,36 +322,34 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. The plugin adds conventions plus ask/check inside Claude.'
+			'Use the CLI as the default surface. The skill adds conventions; MCP adds ask/check inside Claude.'
 	},
 	{
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Start with the DryUI CLI, then add the DryUI plugin marketplace so Codex can use the same discovery and validation loop in-editor.',
+			'Start with the DryUI CLI, then install the DryUI skills and add the MCP servers so Codex can use the same discovery and validation loop in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
 		installSteps: [
 			{
-				title: 'Add the DryUI marketplace',
-				description: 'Requires Codex 0.121.0 or newer.',
-				code: 'codex plugin marketplace add rob-balfre/dryui'
+				title: 'Install the DryUI skills',
+				description: 'Uses the upstream npx skills CLI (skills.sh standard).',
+				code: DRYUI_SKILLS_INSTALL_COMMAND
 			},
 			{
-				title: 'Install DryUI from /plugins',
-				description: 'Start Codex, run `/plugins`, then install DryUI from the list.'
+				title: 'Add the MCP servers',
+				description: 'Append the dryui and dryui-feedback servers to Codex config.',
+				code: codexConfig,
+				language: 'toml'
 			}
 		],
 		skill: {
-			title: '2. Install the plugin',
-			note: 'Requires Codex 0.121.0 or newer. The plugin is the canonical Codex install path for the DryUI skill and MCP servers.',
-			code: `codex plugin marketplace add rob-balfre/dryui
-
-# then in Codex:
-# /plugins
-# install DryUI`
+			title: '2. Install the DryUI skills',
+			note: 'The npx skills command is the canonical Codex install path for DryUI skills.',
+			code: DRYUI_SKILLS_INSTALL_COMMAND
 		},
 		mcp: {
 			path: '.codex/config.toml',

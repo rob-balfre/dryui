@@ -27,7 +27,7 @@ Map intent to primitive values. Override these to customize the palette.
 --dry-color-danger          /* Destructive actions */
 --dry-color-success         /* Success states */
 --dry-color-warning         /* Warning states */
---dry-color-surface         /* Card/panel background */
+--dry-color-surface         /* Panel background */
 --dry-color-surface-raised  /* Elevated surfaces */
 --dry-color-bg              /* Page background */
 --dry-color-text            /* Primary text */
@@ -42,12 +42,11 @@ Map intent to primitive values. Override these to customize the palette.
 Per-component overrides. Reference semantic tokens by default.
 
 ```css
---dry-card-bg              /* defaults to var(--dry-color-surface) */
---dry-card-radius
---dry-btn-bg
---dry-btn-radius
---dry-input-border
---dry-input-bg
+--dry-form-control-bg       /* defaults to an elevated/sunken surface */
+--dry-form-control-border
+--dry-form-control-radius
+--dry-toggle-track-bg
+--dry-toggle-selected-bg
 ```
 
 ## Setting Up Themes
@@ -76,13 +75,13 @@ Use `data-theme="light"` or `data-theme="dark"` only when you need an explicit o
 ```svelte
 <!-- Incorrect: no theme import, components render unstyled -->
 <script>
-  import { Button, Card } from '@dryui/ui';
+  import { Button } from '@dryui/ui';
 </script>
 
 <!-- Correct: theme imported before using components -->
 <script>
   import '@dryui/ui/themes/default.css';
-  import { Button, Card } from '@dryui/ui';
+  import { Button } from '@dryui/ui';
 </script>
 ```
 
@@ -124,9 +123,8 @@ Override semantic tokens in your global CSS to match your brand:
 ```css
 /* Incorrect: overriding component tokens with raw values */
 :root {
-	--dry-card-bg: #1e293b;
-	--dry-btn-bg: #2563eb;
-	--dry-input-bg: #0f172a;
+	--dry-form-control-bg: #0f172a;
+	--dry-toggle-selected-bg: #2563eb;
 }
 
 /* Correct: override semantic tokens; component tokens inherit */

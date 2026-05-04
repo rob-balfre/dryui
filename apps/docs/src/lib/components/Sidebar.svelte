@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Sidebar } from '@dryui/ui/sidebar';
-	import { Blocks, BookOpenText, House, MessageSquareText } from 'lucide-svelte';
+	import { Blocks, BookOpenText, House } from 'lucide-svelte';
 	import { categories, toSlug } from '$lib/nav';
 	import { withBase } from '$lib/utils';
 	import NavGroup from './NavGroup.svelte';
@@ -25,8 +25,7 @@
 
 	const staticLinks: { label: string; href: string; icon: typeof House }[] = [
 		{ label: 'Home', href: withBase('/'), icon: House },
-		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText },
-		{ label: 'Feedback loop', href: withBase('/feedback-loop'), icon: MessageSquareText }
+		{ label: 'Getting Started', href: withBase('/getting-started'), icon: BookOpenText }
 	];
 </script>
 

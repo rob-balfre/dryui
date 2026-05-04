@@ -49,13 +49,13 @@ The test: can you point to a `dryui ask` or MCP `ask` call for every component o
 
 **Use `.Root`. Always check.**
 
-Most DryUI components are compound. They require `<Card.Root>`, not `<Card>`. The bare name silently fails or renders wrong. Assume compound, verify with `ask --scope component`.
+Most DryUI components are compound. They require `<Dialog.Root>`, not `<Dialog>`. The bare name silently fails or renders wrong. Assume compound, verify with `ask --scope component`.
 
 ```svelte
 <!-- Wrong -->
-<Card>content</Card>
+<Dialog>content</Dialog>
 <!-- Right -->
-<Card.Root>content</Card.Root>
+<Dialog.Root>content</Dialog.Root>
 ```
 
 Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts`. Verify with `ask --scope component` before you assume a bare name works, then use `.Root` and wrap the parts inside it.
@@ -240,12 +240,10 @@ That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dry
 
 Then add MCP config so the agent can call `dryui ask` / `dryui check` / feedback dispatch. `dryui setup --install` (or `dryui init`) handles the MCP wiring automatically for Copilot, Cursor, OpenCode, Windsurf, Zed, and Codex (TOML), and the Gemini extension covers Gemini.
 
-### Alternative install paths
+### Manual install path
 
-Kept for users who prefer their existing flow; the npx skills command above is the recommended path.
+Kept for users who need to pin to a specific local path; the npx skills command above is the recommended path.
 
-- Claude Code plugin marketplace: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui`
-- Codex 0.121.0+ plugin marketplace: `codex plugin marketplace add rob-balfre/dryui`, then `/plugins` inside Codex
 - Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 
 **5. Register the Svelte MCP companion.** `dryui setup --install` does this automatically for Copilot, Cursor, OpenCode, Windsurf, and Zed. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.

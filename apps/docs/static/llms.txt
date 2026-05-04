@@ -22,7 +22,6 @@ DryUI gives engineers and coding agents a shared UI system: reusable components,
 
 - [Home](https://dryui.dev/): Human-led, agent-assisted UI for reusable components, themes, and route patterns
 - [Getting Started](https://dryui.dev/getting-started): Install the DryUI skill, wire the app, add themes, and build with components
-- [Feedback loop](https://dryui.dev/feedback-loop): Collect visual annotations from a running app and resolve them with an agent
 
 ## Installation
 

@@ -174,17 +174,16 @@ export const setupGuides: readonly SetupGuide[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Install the DryUI plugin for Claude. The plugin is the canonical Claude skill path.',
+			'Install the DryUI skills via npx skills, then add the dryui and dryui-feedback MCP servers for Claude.',
 		sections: [
 			{
-				title: 'Install the plugin',
-				note: 'The plugin bundles the DryUI skill plus the DryUI MCP servers for Claude.',
-				code: `claude plugin marketplace add rob-balfre/dryui
-claude plugin install dryui@dryui`
+				title: 'Install the DryUI skills',
+				note: 'Uses the upstream npx skills CLI (skills.sh standard).',
+				code: `npx skills add rob-balfre/dryui`
 			},
 			{
-				title: 'Optional MCP-only fallback',
-				note: 'Only use this if you cannot install plugins. It does not install the bundled DryUI skill.',
+				title: 'Add the MCP servers',
+				note: 'Adds dryui ask/check plus visual feedback tools to Claude Code.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			},
@@ -195,22 +194,22 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			},
 			SVELTE_SECTION_CLAUDE
 		],
-		followUp: 'Start a new Claude Code session after wiring the plugin or hook.'
+		followUp: 'Start a new Claude Code session after installing the skills and MCP servers.'
 	},
 	{
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Install the DryUI plugin for Codex. The plugin is the canonical Codex skill path.',
+			'Install the DryUI skills via npx skills, then add the dryui and dryui-feedback MCP servers for Codex.',
 		sections: [
 			{
-				title: 'Install the plugin',
-				note: 'Requires Codex 0.121.0 or newer. Run the command below, then start `codex`, run `/plugins`, and install `DryUI`. The plugin bundles the DryUI skill plus the DryUI MCP servers.',
-				code: `codex plugin marketplace add rob-balfre/dryui`
+				title: 'Install the DryUI skills',
+				note: 'Uses the upstream npx skills CLI (skills.sh standard).',
+				code: `npx skills add rob-balfre/dryui`
 			},
 			{
-				title: 'Optional MCP-only fallback',
-				note: 'Only use this if you cannot install plugins. It does not install the bundled DryUI skill.',
+				title: 'Add the MCP servers',
+				note: 'Adds dryui ask/check plus visual feedback tools to Codex.',
 				code: `codex mcp add dryui -- npx -y @dryui/mcp
 codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
 
@@ -220,7 +219,7 @@ ${CODEX_CONFIG}`
 			SVELTE_SECTION_CODEX
 		],
 		followUp:
-			'After installing the plugin, start a new Codex session so `ask` and `check` are available.'
+			'After installing the skills and MCP servers, start a new Codex session so `ask` and `check` are available.'
 	},
 	{
 		id: 'gemini',

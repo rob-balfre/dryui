@@ -71,17 +71,13 @@ Use it in Svelte:
 <script>
 	import '@dryui/ui/themes/default.css';
 	import '@dryui/ui/themes/dark.css';
-	import { Button, Card } from '@dryui/ui';
+	import { Button } from '@dryui/ui';
 </script>
 
-<Card.Root>
-	<Card.Header>
-		<h2>Hello</h2>
-	</Card.Header>
-	<Card.Content>
-		<Button>Click me</Button>
-	</Card.Content>
-</Card.Root>
+<section>
+	<h2>Hello</h2>
+	<Button>Click me</Button>
+</section>
 ```
 
 Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by default. Use `data-theme="light"` or `data-theme="dark"` only for explicit overrides.

@@ -6,12 +6,10 @@ Every compound component uses `.Root` as the container. Never use the bare name.
 
 ```svelte
 <!-- Incorrect -->
-<Card>...</Card>
 <Dialog>...</Dialog>
 <Tabs>...</Tabs>
 
 <!-- Correct -->
-<Card.Root>...</Card.Root>
 <Dialog.Root>...</Dialog.Root>
 <Tabs.Root>...</Tabs.Root>
 ```
@@ -19,22 +17,6 @@ Every compound component uses `.Root` as the container. Never use the bare name.
 ## Parts Reference
 
 Below are the parts for the most commonly used compound components. Prefer `dryui ask --scope component "<name>"` for the full, up-to-date parts list.
-
-### Card
-
-Parts: Root, Header, Content, Footer
-
-```svelte
-<Card.Root>
-	<Card.Header>Title</Card.Header>
-	<Card.Content>
-		<p>Body content goes here.</p>
-	</Card.Content>
-	<Card.Footer>
-		<Button variant="solid">Action</Button>
-	</Card.Footer>
-</Card.Root>
-```
 
 ### Dialog
 
@@ -281,14 +263,16 @@ Parts: Root, Input, Content, Item, Empty
 
 ```svelte
 <!-- Incorrect: parts without their Root wrapper -->
-<Card.Header>Title</Card.Header>
-<Card.Content>Body</Card.Content>
+<Dialog.Header>Title</Dialog.Header>
+<Dialog.Body>Body</Dialog.Body>
 
 <!-- Correct: parts inside Root -->
-<Card.Root>
-	<Card.Header>Title</Card.Header>
-	<Card.Content>Body</Card.Content>
-</Card.Root>
+<Dialog.Root>
+	<Dialog.Content>
+		<Dialog.Header>Title</Dialog.Header>
+		<Dialog.Body>Body</Dialog.Body>
+	</Dialog.Content>
+</Dialog.Root>
 ```
 
 ### Mixing parts from different components
@@ -309,4 +293,4 @@ Parts: Root, Input, Content, Item, Empty
 
 Run `dryui ask --scope component "<name>"` for any component's complete parts list:
 
-Accordion, AlertDialog, Breadcrumb, Card, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer
+Accordion, AlertDialog, Breadcrumb, Collapsible, ColorPicker, Combobox, CommandPalette, ContextMenu, DataGrid, DatePicker, Dialog, DragAndDrop, Drawer, DropdownMenu, EmptyState, Field, FileUpload, FloatButton, Pagination, Popover, RadioGroup, RichTextEditor, Select, Splitter, Stepper, Table, Tabs, TagsInput, Toast, ToggleGroup, Toolbar, Tooltip, Tour, Transfer

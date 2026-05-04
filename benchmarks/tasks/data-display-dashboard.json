@@ -1,8 +1,8 @@
 {
 	"id": "data-display-dashboard",
-	"claim": "Agent builds an analytics dashboard using Container + CSS grid + Card + Chart + Stat + DataGrid without reaching for layout wrappers.",
+	"claim": "Agent builds an analytics dashboard using Container + CSS grid + Chart + StatCard + DataGrid without reaching for layout wrappers.",
 	"prompt": "Build a Dashboard.svelte with: (1) four stat cards in a responsive grid, (2) a line chart spanning two grid tracks, (3) a DataGrid with 5 columns and 10 rows. Use Container for content width, raw CSS grid in <style>, and @container queries for responsiveness. Do not import Stack/Box/Grid.",
-	"target_components": ["Container", "Card", "StatCard", "Chart", "DataGrid"],
+	"target_components": ["Container", "StatCard", "Chart", "DataGrid"],
 	"allowed_tools": ["ask", "check", "read", "write"],
 	"acceptance_checks": [
 		{

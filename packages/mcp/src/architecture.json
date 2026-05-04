@@ -17,7 +17,7 @@
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 235,
-    "mismatches": 294,
+    "mismatches": 293,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -23645,13 +23645,6 @@
   "clusters": [],
   "mismatches": [
     {
-      "kind": "docs-nav-missing",
-      "package": "docs",
-      "component": "GodRays",
-      "detail": "Public UI export is missing from the docs component navigation.",
-      "sourcePath": "packages/ui/src/god-rays/index.ts"
-    },
-    {
       "kind": "missing-subpath-export",
       "package": "primitives",
       "component": "Accordion",
@@ -25775,9 +25768,7 @@
       "Pluralize",
       "RefId"
     ],
-    "docsNavMissing": [
-      "GodRays"
-    ],
+    "docsNavMissing": [],
     "docsNavOrphan": []
   },
   "mermaid": {

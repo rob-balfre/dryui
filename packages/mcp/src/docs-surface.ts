@@ -5,8 +5,8 @@
  *  - the docs IA (`/`, `/getting-started`, …) that `search.ts`,
  *    the llms.txt generator, and the nightly drift checks all consume
  *  - the canonical agent IDs (`claude-code`, `codex`, `gemini`, …) that the
- *    docs site renders setup cards for, and which plugin manifests must not
- *    drift against
+ *    docs site renders setup cards for, and which agent setup surfaces must
+ *    not drift against
  *  - the docs allowlist agents are told to trust in generated prompt bundles
  *    (re-exported from `ai-surface.ts` for convenience)
  *
@@ -70,12 +70,6 @@ export const DOCS_ROUTES: readonly DocsRoute[] = [
 		label: 'Getting Started',
 		description: 'Install the DryUI skill, wire the app, add themes, and build with components',
 		keywords: ['install', 'setup', 'skill', 'theme', 'quickstart']
-	},
-	{
-		path: '/feedback-loop',
-		label: 'Feedback loop',
-		description: 'Collect visual annotations from a running app and resolve them with an agent',
-		keywords: ['feedback', 'visual review', 'annotations', 'screenshots', 'agent']
 	}
 ];
 

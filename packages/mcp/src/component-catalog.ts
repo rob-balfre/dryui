@@ -206,6 +206,7 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'BorderBeam',
 			'Glass',
 			'Noise',
+			'GodRays',
 			'GradientMesh',
 			'Adjust',
 			'ChromaticAberration',
