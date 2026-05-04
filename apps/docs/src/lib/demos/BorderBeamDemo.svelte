@@ -37,8 +37,18 @@
 		const strengthProp = codeStrength < 1 ? ` strength={${codeStrength}}` : '';
 
 		return `<BorderBeam size="${playgroundSize}" colorVariant="${playgroundColorVariant}" duration={${codeDuration}}${strengthProp}>
-  <Card>Content</Card>
-</BorderBeam>`;
+  <div class="surface">Content</div>
+</BorderBeam>
+
+<style>
+  .surface {
+    padding: var(--dry-padding-card);
+    border-radius: var(--dry-radius-card);
+    border: 1px solid var(--dry-color-stroke-weak);
+    background: var(--dry-color-bg-raised);
+    box-shadow: var(--dry-shadow-sm);
+  }
+</style>`;
 	});
 
 	function togglePreview() {

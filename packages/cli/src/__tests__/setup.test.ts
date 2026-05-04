@@ -100,14 +100,14 @@ describe('setup menu formatting', () => {
 	test('renders a compact guide preview for command-based setup', () => {
 		const lines = formatGuidePreviewLines(getSetupGuide('claude-code'));
 
-		expect(lines).toContain('1. Install the plugin');
-		expect(lines).toContain('   claude plugin marketplace add rob-balfre/dryui');
-		expect(lines).toContain('   claude plugin install dryui@dryui');
+		expect(lines).toContain('1. Install the DryUI skills');
+		expect(lines).toContain('   Uses the upstream npx skills CLI (skills.sh standard).');
+		expect(lines).toContain('   npx skills add rob-balfre/dryui');
 		expect(lines).toContain('Optional');
-		expect(lines).toContain('   2. Optional MCP-only fallback');
+		expect(lines).toContain('   2. Add the MCP servers');
 		expect(lines).toContain('   3. Optional SessionStart hook');
 		expect(lines).toContain('   4. Svelte companion (recommended)');
-		expect(lines.some((line) => line.includes('The plugin bundles the DryUI skill'))).toBe(true);
+		expect(lines.some((line) => line.includes('The plugin bundles the DryUI skill'))).toBe(false);
 		expect(lines.some((line) => line.includes('Only use this if you cannot install plugins'))).toBe(
 			false
 		);

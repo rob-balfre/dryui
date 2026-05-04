@@ -50,12 +50,14 @@
 		} catch {
 			// process is not available in the current runtime; ignore.
 		}
-		const metaEnv = (import.meta as unknown as Record<string, Record<string, unknown> | undefined>)[
-			'env'
-		];
-		if (metaEnv) {
-			if (metaEnv.DRY_FEEDBACK_DISABLED) return true;
-			if (metaEnv.VITE_DRY_FEEDBACK_DISABLED) return true;
+		// Direct, literal access only: Vite's SSR module runner statically
+		// rewrites `import.meta.env.<KEY>` reads but throws on aliased or
+		// bracket access ("Dynamic access of import.meta.env is not supported").
+		try {
+			if (import.meta.env?.DRY_FEEDBACK_DISABLED) return true;
+			if (import.meta.env?.VITE_DRY_FEEDBACK_DISABLED) return true;
+		} catch {
+			// import.meta.env not available in the current runtime; ignore.
 		}
 		return false;
 	})();
@@ -407,7 +409,10 @@
 		Calendar: () => import('./components/component-defaults/calendar.svelte'),
 		Carousel: () => import('./components/component-defaults/carousel.svelte'),
 		Chart: () => import('./components/component-defaults/chart.svelte'),
+		ChatThread: () => import('./components/component-defaults/chat-thread.svelte'),
 		ChipGroup: () => import('./components/component-defaults/chip-group.svelte'),
+		Clipboard: () => import('./components/component-defaults/clipboard.svelte'),
+		CodeBlock: () => import('./components/component-defaults/code-block.svelte'),
 		Collapsible: () => import('./components/component-defaults/collapsible.svelte'),
 		ColorPicker: () => import('./components/component-defaults/color-picker.svelte'),
 		Combobox: () => import('./components/component-defaults/combobox.svelte'),
@@ -426,7 +431,11 @@
 		EmptyState: () => import('./components/component-defaults/empty-state.svelte'),
 		FormatBytes: () => import('./components/component-defaults/format-bytes.svelte'),
 		FormatDate: () => import('./components/component-defaults/format-date.svelte'),
+		FormatNumber: () => import('./components/component-defaults/format-number.svelte'),
+		Gauge: () => import('./components/component-defaults/gauge.svelte'),
+		Hotkey: () => import('./components/component-defaults/hotkey.svelte'),
 		ImageComparison: () => import('./components/component-defaults/image-comparison.svelte'),
+		InfiniteScroll: () => import('./components/component-defaults/infinite-scroll.svelte'),
 		MarkdownRenderer: () => import('./components/component-defaults/markdown-renderer.svelte'),
 		Motion: () => import('./components/component-defaults/motion.svelte'),
 		RelativeTime: () => import('./components/component-defaults/relative-time.svelte'),
@@ -457,6 +466,7 @@
 		Pagination: () => import('./components/component-defaults/pagination.svelte'),
 		PinInput: () => import('./components/component-defaults/pin-input.svelte'),
 		Popover: () => import('./components/component-defaults/popover.svelte'),
+		QRCode: () => import('./components/component-defaults/qr-code.svelte'),
 		RadioGroup: () => import('./components/component-defaults/radio-group.svelte'),
 		RangeCalendar: () => import('./components/component-defaults/range-calendar.svelte'),
 		RichTextEditor: () => import('./components/component-defaults/rich-text-editor.svelte'),
