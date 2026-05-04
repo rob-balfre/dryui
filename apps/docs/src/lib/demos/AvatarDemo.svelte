@@ -2,17 +2,47 @@
 	import { Avatar } from '@dryui/ui';
 
 	const team = [
-		{ initials: 'AM', name: 'Avery Morales', role: 'Reviewing PR #842', status: 'online' as const },
-		{ initials: 'JK', name: 'Jules Kwon', role: 'On-call rotation', status: 'busy' as const },
-		{ initials: 'RT', name: 'Rhea Tanaka', role: 'Focus until 16:00', status: 'away' as const },
-		{ initials: 'DS', name: 'Devon Salehi', role: 'Out of office', status: 'offline' as const }
+		{
+			initials: 'AM',
+			name: 'Avery Morales',
+			role: 'Reviewing PR #842',
+			status: 'online' as const,
+			src: 'https://i.pravatar.cc/160?img=47'
+		},
+		{
+			initials: 'JK',
+			name: 'Jules Kwon',
+			role: 'On-call rotation',
+			status: 'busy' as const,
+			src: 'https://i.pravatar.cc/160?img=68'
+		},
+		{
+			initials: 'RT',
+			name: 'Rhea Tanaka',
+			role: 'Focus until 16:00',
+			status: 'away' as const,
+			src: 'https://i.pravatar.cc/160?img=49'
+		},
+		{
+			initials: 'DS',
+			name: 'Devon Salehi',
+			role: 'Out of office',
+			status: 'offline' as const,
+			src: 'https://i.pravatar.cc/160?img=33'
+		}
 	];
 </script>
 
 <div class="roster">
 	{#each team as member (member.initials)}
 		<article class="member">
-			<Avatar fallback={member.initials} alt={member.name} size="lg" status={member.status} />
+			<Avatar
+				src={member.src}
+				fallback={member.initials}
+				alt={member.name}
+				size="lg"
+				status={member.status}
+			/>
 			<div class="meta">
 				<p class="title">{member.name}</p>
 				<p class="note">{member.role}</p>

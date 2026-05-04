@@ -50,6 +50,6 @@
 		grid-auto-flow: column;
 		grid-auto-columns: max-content;
 		align-items: center;
-		gap: var(--dry-space-3);
+		gap: var(--dry-space-6);
 	}
 </style>

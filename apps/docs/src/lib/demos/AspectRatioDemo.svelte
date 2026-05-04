@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { AspectRatio, Text } from '@dryui/ui';
 	import { Play } from 'lucide-svelte';
+
+	const video =
+		'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=1280&h=720&fit=crop&q=80';
+	const portrait =
+		'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=640&h=800&fit=crop&q=80';
+	const og = 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?w=1200&h=630&fit=crop&q=80';
 </script>
 
 <div class="stage">
@@ -15,7 +21,8 @@
 	<div class="grid">
 		<figure class="frame">
 			<AspectRatio ratio={16 / 9}>
-				<div class="slot slot-video" aria-label="Product demo video, paused">
+				<div class="slot">
+					<img src={video} alt="Product walkthrough thumbnail" loading="lazy" />
 					<div class="play" aria-hidden="true">
 						<Play size={22} strokeWidth={2} />
 					</div>
@@ -27,9 +34,8 @@
 
 		<figure class="frame">
 			<AspectRatio ratio={4 / 5}>
-				<div class="slot slot-image" aria-hidden="true">
-					<div class="ring"></div>
-					<div class="orb"></div>
+				<div class="slot">
+					<img src={portrait} alt="Mountain at dusk" loading="lazy" />
 				</div>
 			</AspectRatio>
 			<figcaption class="caption">4 / 5 · Portrait poster</figcaption>
@@ -37,15 +43,13 @@
 
 		<figure class="frame">
 			<AspectRatio ratio={1200 / 630}>
-				<div class="slot slot-og">
-					<div class="og-head">
-						<span class="og-dot"></span>
-						<span class="og-dot"></span>
-						<span class="og-dot"></span>
+				<div class="slot">
+					<img src={og} alt="Open graph preview" loading="lazy" />
+					<div class="og-overlay">
+						<p class="og-title">DryUI 1.4</p>
+						<p class="og-sub">Composable Svelte 5 primitives, no dependencies.</p>
+						<p class="og-url">dryui.dev</p>
 					</div>
-					<p class="og-title">DryUI 1.4</p>
-					<p class="og-sub">Composable Svelte 5 primitives, no dependencies.</p>
-					<p class="og-url">dryui.dev</p>
 				</div>
 			</AspectRatio>
 			<figcaption class="caption">1200 / 630 · og:image preview</figcaption>
@@ -91,17 +95,21 @@
 		block-size: 100%;
 		border-radius: var(--dry-radius-lg);
 		overflow: hidden;
+		isolation: isolate;
 	}
 
-	.slot-video {
-		place-items: center;
-		background:
-			radial-gradient(circle at 40% 32%, rgba(251, 146, 60, 0.34) 0, transparent 42%),
-			radial-gradient(circle at 78% 70%, rgba(56, 189, 248, 0.26) 0, transparent 48%),
-			color-mix(in srgb, var(--dry-color-bg-base) 88%, black);
+	.slot img {
+		grid-area: 1 / 1;
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+		display: block;
 	}
 
 	.play {
+		grid-area: 1 / 1;
+		align-self: center;
+		justify-self: center;
 		display: grid;
 		place-items: center;
 		block-size: 3.5rem;
@@ -124,58 +132,14 @@
 		color: var(--dry-color-text-inverse);
 	}
 
-	.slot-image {
-		place-items: center;
-		background: linear-gradient(
-			145deg,
-			color-mix(in srgb, var(--dry-color-fill-brand) 28%, var(--dry-color-bg-base)),
-			color-mix(in srgb, var(--dry-color-bg-base) 84%, black)
-		);
-	}
-
-	.ring {
-		position: absolute;
-		inset: 18%;
-		border: 2px solid color-mix(in srgb, white 24%, transparent);
-		border-radius: 50%;
-	}
-
-	.orb {
-		block-size: 40%;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: radial-gradient(
-			circle,
-			rgba(255, 250, 240, 0.92) 0%,
-			rgba(255, 223, 160, 0.5) 42%,
-			transparent 72%
-		);
-		filter: blur(1px);
-	}
-
-	.slot-og {
-		align-content: space-between;
-		padding: var(--dry-space-5);
-		background: linear-gradient(
-			140deg,
-			color-mix(in srgb, var(--dry-color-bg-base) 92%, black),
-			color-mix(in srgb, var(--dry-color-fill-brand) 18%, var(--dry-color-bg-base))
-		);
-	}
-
-	.og-head {
+	.og-overlay {
+		grid-area: 1 / 1;
+		align-self: end;
 		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
-		gap: 0.35rem;
-	}
-
-	.og-dot {
-		display: block;
-		block-size: 0.55rem;
-		aspect-ratio: 1;
-		border-radius: 50%;
-		background: color-mix(in srgb, var(--dry-color-text-strong) 30%, transparent);
+		gap: var(--dry-space-1);
+		padding: var(--dry-space-5);
+		background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0) 70%);
+		color: white;
 	}
 
 	.og-title,
@@ -187,13 +151,12 @@
 	.og-title {
 		font-size: clamp(1.2rem, 2.8cqw, 1.8rem);
 		font-weight: 700;
-		color: var(--dry-color-text-strong);
 		line-height: 1.1;
 	}
 
 	.og-sub {
 		font-size: var(--dry-text-sm-size);
-		color: var(--dry-color-text-weak);
+		color: rgba(255, 255, 255, 0.85);
 		line-height: 1.45;
 	}
 
@@ -201,7 +164,7 @@
 		font-family: var(--dry-font-mono);
 		font-size: var(--dry-text-xs-size);
 		letter-spacing: 0.06em;
-		color: var(--dry-color-text-weak);
+		color: rgba(255, 255, 255, 0.75);
 	}
 
 	.caption {

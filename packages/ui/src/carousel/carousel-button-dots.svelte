@@ -55,14 +55,24 @@
 
 	.dot {
 		display: inline-grid;
-		height: var(--dry-space-2_5);
-		aspect-ratio: 1;
+		height: var(--dry-space-2);
+		inline-size: var(--dry-space-2);
 		border-radius: 9999px;
-		background: currentColor;
-		opacity: 0.4;
+		background: var(--dry-color-text-weak);
+		opacity: 0.55;
+		transition:
+			inline-size var(--dry-duration-fast) var(--dry-ease-default),
+			background-color var(--dry-duration-fast) var(--dry-ease-default),
+			opacity var(--dry-duration-fast) var(--dry-ease-default);
 	}
 
-	[data-active] .dot {
+	[data-carousel-dots] :global(button:hover:not([data-active]) .dot) {
+		opacity: 0.85;
+	}
+
+	[data-carousel-dots] :global([data-active] .dot) {
 		opacity: 1;
+		inline-size: var(--dry-space-6);
+		background: var(--dry-color-fill-brand);
 	}
 </style>

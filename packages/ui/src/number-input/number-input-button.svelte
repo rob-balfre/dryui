@@ -120,7 +120,9 @@
 <style>
 	[data-number-input-wrapper] {
 		display: inline-grid;
-		grid-template-columns: auto minmax(3ch, max-content) auto;
+		grid-template-columns: max-content minmax(3ch, max-content) max-content;
+		justify-self: start;
+		justify-content: start;
 		align-items: stretch;
 		gap: var(--dry-space-1);
 		--dry-input-bg: var(--dry-number-input-bg, var(--dry-color-bg-raised));

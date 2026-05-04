@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Button, Toast } from '@dryui/ui';
+	import { Button, Enter, Toast } from '@dryui/ui';
 	import { toastStore } from '@dryui/primitives';
 
 	const fire = {
@@ -23,7 +23,9 @@
 	<div class="context">
 		<p class="eyebrow">Transient feedback</p>
 		<p class="title">Trigger a toast</p>
-		<p class="note">Each toast auto-dismisses except errors, which stay until closed.</p>
+		<p class="note">
+			Each toast lifts in via the Enter primitive and auto-dismisses (errors stay).
+		</p>
 	</div>
 	<div class="actions">
 		<Button variant="outline" onclick={fire.info}>Info</Button>
@@ -33,14 +35,16 @@
 </div>
 
 <Toast.Provider position="bottom-right">
-	{#each toastStore.toasts as toast (toast.id)}
-		<Toast.Root id={toast.id} variant={toast.variant}>
-			<div class="toast-body">
-				{#if toast.title}<Toast.Title>{toast.title}</Toast.Title>{/if}
-				{#if toast.description}<Toast.Description>{toast.description}</Toast.Description>{/if}
-			</div>
-			<Toast.Close aria-label="Dismiss"><span aria-hidden="true">&times;</span></Toast.Close>
-		</Toast.Root>
+	{#each toastStore.toasts as toast, index (toast.id)}
+		<Enter {index}>
+			<Toast.Root id={toast.id} variant={toast.variant}>
+				<div class="toast-body">
+					{#if toast.title}<Toast.Title>{toast.title}</Toast.Title>{/if}
+					{#if toast.description}<Toast.Description>{toast.description}</Toast.Description>{/if}
+				</div>
+				<Toast.Close aria-label="Dismiss"><span aria-hidden="true">&times;</span></Toast.Close>
+			</Toast.Root>
+		</Enter>
 	{/each}
 </Toast.Provider>
 

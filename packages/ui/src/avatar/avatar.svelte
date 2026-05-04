@@ -56,7 +56,7 @@
 </script>
 
 {#if hasOverlay}
-	<div data-avatar-wrapper class={className} {...rest}>
+	<div data-avatar-wrapper data-shape={shape} class={className} {...rest}>
 		<span role="img" aria-label={alt} data-avatar {...variantAttrs({ size, shape })}>
 			{#if showImage}
 				<img {src} {alt} onerror={handleError} />
@@ -121,6 +121,8 @@
 	}
 
 	[data-avatar] img {
+		inline-size: 100%;
+		block-size: 100%;
 		object-fit: cover;
 		border-radius: inherit;
 	}
@@ -159,15 +161,26 @@
 
 	/* ── Status indicator ─────────────────────────────────────────────────────── */
 
+	/* For circular avatars the corner is empty space; offset the dot inward
+	   by ~6% so its centre lands on the rim near the 4-5 o'clock position. */
 	[data-avatar-status] {
 		position: absolute;
+		bottom: var(--dry-avatar-status-offset, 6%);
+		right: var(--dry-avatar-status-offset, 6%);
+		aspect-ratio: 1;
+		height: var(--dry-avatar-status-size, 28%);
+		max-height: 14px;
+		min-height: 8px;
+		border-radius: 50%;
+		border: 2px solid var(--dry-color-bg-base);
+		box-shadow: 0 0 0 1px color-mix(in srgb, var(--dry-color-stroke-weak) 60%, transparent);
+		z-index: 1;
+	}
+
+	[data-avatar-wrapper][data-shape='square'] [data-avatar-status] {
 		bottom: 0;
 		right: 0;
-		aspect-ratio: 1;
-		height: var(--dry-avatar-status-size, 0.625rem);
-		border-radius: 50%;
-		border: 2px solid var(--dry-color-bg-raised);
-		z-index: 1;
+		transform: translate(25%, 25%);
 	}
 
 	[data-avatar-status][data-status='online'] {

@@ -22,6 +22,7 @@ DryUI gives engineers and coding agents a shared UI system: reusable components,
 
 - [Home](https://dryui.dev/): Human-led, agent-assisted UI for reusable components, themes, and route patterns
 - [Getting Started](https://dryui.dev/getting-started): Install the DryUI skill, wire the app, add themes, and build with components
+- [Feedback loop](https://dryui.dev/feedback-loop): Collect visual annotations from a running app and resolve them with an agent
 
 ## Installation
 
@@ -1422,7 +1423,7 @@ Example: <Numeric>Content</Numeric>
 Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals..
 Import: @dryui/ui
 Subpath import: @dryui/ui/enter
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Enter>Content</Enter>
 
@@ -1430,7 +1431,7 @@ Example: <Enter>Content</Enter>
 Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur)..
 Import: @dryui/ui
 Subpath import: @dryui/ui/exit
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Exit>Content</Exit>
 
@@ -1438,7 +1439,7 @@ Example: <Exit>Content</Exit>
 Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value..
 Import: @dryui/ui
 Subpath import: @dryui/ui/stagger
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <Stagger>Content</Stagger>
 
@@ -1821,7 +1822,7 @@ The recommended path is the upstream `npx skills` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 ```
 
-That single command installs all five DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it (`dryui setup --install --editor <agent>` does this automatically for Copilot, Cursor, OpenCode, Windsurf, Codex, Gemini, and Zed).
+That single command installs all six DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it (`dryui setup --install --editor <agent>` does this automatically for Copilot, Cursor, OpenCode, Windsurf, Codex, Gemini, and Zed).
 
 #### Alternative install paths
 

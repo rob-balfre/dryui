@@ -31,5 +31,6 @@
 	.form {
 		display: grid;
 		gap: var(--dry-space-4);
+		max-inline-size: 24rem;
 	}
 </style>

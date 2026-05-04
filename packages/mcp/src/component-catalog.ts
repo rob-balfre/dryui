@@ -212,7 +212,6 @@ export const docsNavCategories: DocsNavCategory[] = [
 			'ChromaticAberration',
 			'ChromaticShift',
 			'Displacement',
-			'GodRays',
 			'Halftone',
 			'MaskReveal',
 			'ShaderCanvas',

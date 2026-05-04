@@ -10,12 +10,12 @@
 	let { class: className, children, ...rest }: Props = $props();
 </script>
 
-<div out:leave class={className} {...rest}>
+<div out:leave data-dry-exit class={className} {...rest}>
 	{@render children?.()}
 </div>
 
 <style>
-	div {
-		display: contents;
+	[data-dry-exit] {
+		display: grid;
 	}
 </style>

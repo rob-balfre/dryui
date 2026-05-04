@@ -4,7 +4,6 @@ const customPreviewNames = new Set([
 	'BorderBeam',
 	'ChromaticAberration',
 	'Glass',
-	'GodRays',
 	'QRCode'
 ]);
 

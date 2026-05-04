@@ -4075,7 +4075,7 @@ Root import: import { Enter } from '@dryui/ui'
 Subpath import: import { Enter } from '@dryui/ui/enter'
 Props: none
 CSS variables: none
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -4091,7 +4091,7 @@ Root import: import { Exit } from '@dryui/ui'
 Subpath import: import { Exit } from '@dryui/ui/exit'
 Props: none
 CSS variables: none
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte
@@ -4107,7 +4107,7 @@ Root import: import { Stagger } from '@dryui/ui'
 Subpath import: import { Stagger } from '@dryui/ui/stagger'
 Props: none
 CSS variables: none
-Data attributes: data-dry-stagger
+Data attributes: data-dry-exit | data-dry-stagger
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example:
 ```svelte

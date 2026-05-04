@@ -492,7 +492,7 @@
 
 		display: grid;
 		gap: var(--dry-space-2);
-		container-type: inline-size;
+		min-inline-size: max-content;
 		user-select: none;
 		color: var(--dry-color-text-strong);
 		font-family: var(--dry-font-sans);
@@ -558,7 +558,7 @@
 
 	[data-calendar-grid] [data-calendar-row] {
 		display: grid;
-		grid-template-columns: repeat(7, minmax(0, 1fr));
+		grid-template-columns: repeat(7, minmax(var(--dry-space-10), 1fr));
 	}
 
 	[data-calendar-grid] [data-calendar-row][data-calendar-week-row] {
@@ -790,7 +790,7 @@
 		--dry-calendar-event-color: var(--dry-color-text-error);
 	}
 
-	@container (max-width: 48rem) {
+	@media (max-width: 48rem) {
 		[data-calendar-grid][data-visible-months='2'] [data-calendar-panels] {
 			grid-template-columns: minmax(0, 1fr);
 		}

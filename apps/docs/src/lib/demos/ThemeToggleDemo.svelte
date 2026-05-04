@@ -1,18 +1,21 @@
 <script lang="ts">
 	import { ThemeToggle } from '@dryui/ui';
+	import { docsTheme } from '$lib/theme.svelte.js';
 
-	let mode = $state<string>('auto');
+	const mode = $derived(docsTheme.mode);
+	const renderedTheme = $derived(docsTheme.isDark ? 'dark' : 'light');
 </script>
 
 <div class="toggle-demo">
 	<div class="status">
-		<p class="eyebrow">Current mode</p>
+		<p class="eyebrow">Stored preference</p>
 		<p class="value">{mode}</p>
+		<p class="rendered">Renders as {renderedTheme}</p>
 	</div>
-	<ThemeToggle storageKey="dryui-docs-theme" onModeChange={(m) => (mode = m)} />
+	<ThemeToggle controller={docsTheme} />
 	<p class="note">
-		ThemeToggle stores the preference under <code>dryui-docs-theme</code> and falls back to the system
-		preference the first time a visitor loads the page.
+		This toggle shares a controller with the one in the page header, so flipping either swaps the
+		whole page. Alt-click (or press Escape while focused) to reset to the system preference.
 	</p>
 </div>
 
@@ -46,6 +49,13 @@
 		color: var(--dry-color-text-strong);
 	}
 
+	.rendered {
+		margin: 0;
+		font-family: var(--dry-font-mono);
+		font-size: var(--dry-text-xs-size);
+		color: var(--dry-color-text-weak);
+	}
+
 	.note {
 		grid-column: 1 / -1;
 		margin: 0;
@@ -53,10 +63,5 @@
 		color: var(--dry-color-text-weak);
 		line-height: 1.5;
 		max-inline-size: 62ch;
-	}
-
-	.note code {
-		font-family: var(--dry-font-mono);
-		font-size: 0.9em;
 	}
 </style>

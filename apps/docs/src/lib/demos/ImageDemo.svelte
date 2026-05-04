@@ -1,7 +1,11 @@
 <script lang="ts">
-	import { asset } from '$app/paths';
 	import { Image, Text } from '@dryui/ui';
 	import { AlertTriangle } from 'lucide-svelte';
+
+	const ridge =
+		'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&h=500&fit=crop&q=80';
+	const trail =
+		'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=640&h=800&fit=crop&q=80';
 </script>
 
 <div class="stage">
@@ -16,10 +20,7 @@
 	<div class="grid">
 		<figure class="card">
 			<div class="frame">
-				<Image
-					src={asset('/examples/mountain-landscape.svg')}
-					alt="Mountain landscape at sunrise"
-				/>
+				<Image src={ridge} alt="Mountain ridge at sunrise" />
 			</div>
 			<figcaption class="caption">
 				<p class="caption-title">Sunrise ridge</p>
@@ -29,21 +30,24 @@
 
 		<figure class="card">
 			<div class="frame frame-portrait">
-				<Image src={asset('/examples/mountain-landscape.svg')} alt="Second peak from the trail" />
+				<Image src={trail} alt="Hiker on a forest trail" />
 			</div>
 			<figcaption class="caption">
 				<p class="caption-title">Trail crop</p>
-				<p class="caption-note">Same source, 4:5 frame, shared styling.</p>
+				<p class="caption-note">Different source, 4:5 frame, shared styling.</p>
 			</figcaption>
 		</figure>
 
 		<figure class="card">
 			<div class="frame">
-				<Image
-					src="https://images.example.invalid/missing.png"
-					alt="Broken source example"
-					fallback="Missing asset"
-				/>
+				<Image src="https://example.invalid/missing-asset.png" alt="Broken source example">
+					{#snippet fallbackSnippet()}
+						<div class="fallback">
+							<AlertTriangle size={20} strokeWidth={2} aria-hidden="true" />
+							<p>Image unavailable</p>
+						</div>
+					{/snippet}
+				</Image>
 			</div>
 			<figcaption class="caption">
 				<p class="caption-title">
@@ -52,7 +56,7 @@
 					</span>
 					Broken source
 				</p>
-				<p class="caption-note">Fallback text renders when the URL 404s or throws.</p>
+				<p class="caption-note">Fallback snippet renders when the URL 404s or throws.</p>
 			</figcaption>
 		</figure>
 	</div>
@@ -133,5 +137,21 @@
 		border-radius: 999px;
 		background: color-mix(in srgb, var(--dry-color-fill-warning) 26%, var(--dry-color-bg-base));
 		color: var(--dry-color-text-strong);
+	}
+
+	.fallback {
+		display: grid;
+		place-items: center;
+		gap: var(--dry-space-2);
+		block-size: 100%;
+		padding: var(--dry-space-4);
+		background: color-mix(in srgb, var(--dry-color-bg-overlay) 60%, var(--dry-color-bg-base));
+		color: var(--dry-color-text-weak);
+		text-align: center;
+	}
+
+	.fallback p {
+		margin: 0;
+		font-size: var(--dry-text-sm-size);
 	}
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Stagger, Text } from '@dryui/ui';
+	import { Button, Enter, Stagger, Text } from '@dryui/ui';
 
 	const commits = [
 		{
@@ -27,32 +27,41 @@
 			at: '1h ago'
 		}
 	];
+
+	let nonce = $state(0);
 </script>
 
 <div class="stage">
 	<div class="head">
 		<p class="eyebrow">Recent commits</p>
 		<Text color="secondary" size="sm">
-			Stagger applies an nth-child delay so list items lift in with a 100ms offset. Pair with Enter
-			or Reveal when the list appears on its own.
+			Stagger applies an nth-child delay so each entrance lifts in sequence. Replay to watch the
+			cascade.
 		</Text>
 	</div>
 
-	<Stagger step="section">
-		{#each commits as commit (commit.hash)}
-			<article class="commit">
-				<span class="hash">{commit.hash}</span>
-				<span class="message">{commit.message}</span>
-				<span class="meta">{commit.author} · {commit.at}</span>
-			</article>
-		{/each}
-	</Stagger>
+	{#key nonce}
+		<Stagger step="section" class="commits">
+			{#each commits as commit, index (commit.hash)}
+				<Enter {index}>
+					<article class="commit">
+						<span class="hash">{commit.hash}</span>
+						<span class="message">{commit.message}</span>
+						<span class="meta">{commit.author} · {commit.at}</span>
+					</article>
+				</Enter>
+			{/each}
+		</Stagger>
+	{/key}
+
+	<Button variant="outline" size="sm" onclick={() => (nonce += 1)}>Replay stagger</Button>
 </div>
 
 <style>
 	.stage {
 		display: grid;
 		gap: var(--dry-space-4);
+		justify-items: start;
 	}
 
 	.head {
@@ -69,6 +78,12 @@
 		color: var(--dry-color-text-weak);
 	}
 
+	.stage :global(.commits) {
+		display: grid;
+		gap: var(--dry-space-2);
+		inline-size: 100%;
+	}
+
 	.commit {
 		display: grid;
 		grid-template-columns: max-content minmax(0, 1fr) max-content;
@@ -78,10 +93,6 @@
 		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 68%, transparent);
 		border-radius: var(--dry-radius-md);
 		background: color-mix(in srgb, var(--dry-color-bg-overlay) 48%, transparent);
-	}
-
-	.commit + .commit {
-		margin-block-start: var(--dry-space-2);
 	}
 
 	.hash {

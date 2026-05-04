@@ -7,7 +7,6 @@
 		Card,
 		ChromaticAberration,
 		Glass,
-		GodRays,
 		Heading,
 		QRCode,
 		Text
@@ -81,15 +80,6 @@
 				<Heading level={3}>Glass</Heading>
 			</div>
 		</Glass>
-	</div>
-{:else if name === 'GodRays'}
-	<div class="stage stage-dark">
-		<GodRays rayCount={18} intensity={58} speed={0} center={{ x: 0.5, y: 0.3 }}>
-			<div class="effect-card">
-				<Badge variant="soft" color="yellow" size="sm">Volumetric</Badge>
-				<Heading level={3}>God Rays</Heading>
-			</div>
-		</GodRays>
 	</div>
 {:else if name === 'QRCode'}
 	<div class="stage stage-soft qr-stage">

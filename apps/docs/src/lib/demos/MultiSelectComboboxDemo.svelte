@@ -13,6 +13,12 @@
 
 	let selected = $state<string[]>(['deployment.failed', 'incident.opened']);
 	let query = $state('');
+
+	const filteredEvents = $derived.by(() => {
+		const q = query.trim().toLowerCase();
+		if (!q) return events;
+		return events.filter((event) => event.toLowerCase().includes(q));
+	});
 </script>
 
 <div class="panel">
@@ -30,8 +36,10 @@
 
 			<MultiSelectCombobox.Input placeholder="Filter events..." />
 			<MultiSelectCombobox.Content>
-				{#each events as event (event)}
+				{#each filteredEvents as event (event)}
 					<MultiSelectCombobox.Item value={event}>{event}</MultiSelectCombobox.Item>
+				{:else}
+					<MultiSelectCombobox.Empty>No events match "{query}".</MultiSelectCombobox.Empty>
 				{/each}
 			</MultiSelectCombobox.Content>
 		</MultiSelectCombobox.Root>
