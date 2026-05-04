@@ -6,8 +6,8 @@
 	container-name: home;
 	display: grid;
 	grid-template-columns: minmax(0, 72rem);
+	grid-template-rows: minmax(0, 1fr);
 	justify-content: center;
-	align-content: start;
 	padding: var(--dry-space-5);
 }
 
@@ -20,7 +20,6 @@
 	grid-template-areas: 'copy';
 	align-content: center;
 	align-items: start;
-	min-block-size: calc(100svh - 7rem);
 }
 
 [data-layout='home'] [data-layout-area='hero-copy'] {
