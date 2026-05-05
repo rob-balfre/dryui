@@ -9,14 +9,14 @@ interface AiSurfaceCard {
 	readonly example?: string;
 }
 
-interface AiInstallStep {
+export interface AiInstallStep {
 	title: string;
 	description?: string;
 	code?: string;
 	language?: string;
 }
 
-interface AiAgentSetup {
+export interface AiAgentSetup {
 	id: AiAgentId;
 	label: string;
 	description: string;
@@ -30,6 +30,8 @@ interface AiAgentSetup {
 	 * page renders these as a Timeline instead of a single code block.
 	 */
 	installSteps?: AiInstallStep[];
+	/** Extra setup steps rendered by CLI guides, but not promoted on docs cards. */
+	cliOnlySteps?: AiInstallStep[];
 	skill?: {
 		title: string;
 		note: string;
@@ -254,6 +256,14 @@ export const aiAgentSetups: AiAgentSetup[] = [
 				title: 'Add the feedback MCP server',
 				description: 'Adds visual feedback tools. DryUI guidance comes from the installed skills.',
 				code: `claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
+			}
+		],
+		cliOnlySteps: [
+			{
+				title: 'Optional SessionStart hook',
+				description: 'Inject `dryui ambient` into Claude Code sessions.',
+				code: 'dryui install-hook',
+				language: 'bash'
 			}
 		],
 		skill: {

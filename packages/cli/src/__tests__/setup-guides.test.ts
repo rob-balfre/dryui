@@ -21,7 +21,7 @@ describe('setup guides', () => {
 
 		expect(guide.label).toBe('Gemini CLI');
 		expect(guide.sections).toHaveLength(3);
-		expect(guide.sections[0]?.title).toBe('Install the skill');
+		expect(guide.sections[0]?.title).toBe('Install the DryUI skill');
 		expect(guide.sections[0]?.code).toContain('npx skills add rob-balfre/dryui');
 		expect(guide.sections[1]?.code).toContain('"mcpServers"');
 		expect(guide.sections[1]?.code).toContain('dryui-feedback');
