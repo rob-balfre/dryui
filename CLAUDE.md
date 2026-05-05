@@ -8,7 +8,7 @@ Repo-wide rules live in [`AGENTS.md`](./AGENTS.md). If this file and `AGENTS.md`
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - Use `bun run e2e:full` to pack local package tarballs and run every scaffold scenario. Use `bun run e2e:one <scenario>` for focused coverage.
-- For local-source iteration on the cli/mcp/feedback-server bins, see "Source Mode (DRYUI_DEV)" in [`README.md`](./README.md). `bun run dev:link` then `DRYUI_DEV=1` makes `dryui`, `dryui-mcp`, and `dryui-feedback-mcp` run from `packages/*/src/` instead of `dist/`.
+- For local-source iteration on the CLI and feedback-server bins, see "Source Mode (DRYUI_DEV)" in [`README.md`](./README.md). `bun run dev:link` then `DRYUI_DEV=1` makes `dryui` and `dryui-feedback-mcp` run from `packages/*/src/` instead of `dist/`.
 - The DryUI CLI is intentionally limited to skill/editor setup and feedback tooling. Use package-level lint/build/test commands for deterministic validation. For design-quality flows (brief, critique, polish, visual review) use [impeccable](https://impeccable.style), installed via `npx impeccable skills install`. Invoke via `/impeccable <command>` in your harness.
 - Use the `dryui-layout` agent/skill for page-level grid structure. It writes a `<div data-layout="<name>">` in the .svelte file plus the matching grid template in root `src/layout.css`.
 - Keep `src/layout.css` enforced in dev as well as build: projects should wire `dryuiLayoutCss()` into `vite.config` before `sveltekit()`. Missing `src/layout.css` warns; violations hard-error during Vite dev startup, HMR, and build.

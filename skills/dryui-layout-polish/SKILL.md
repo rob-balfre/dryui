@@ -34,7 +34,7 @@ Before diagnosing layout quality, read [references/layout-quality.md](references
 4. **Diagnose layout quality.** Check for monotone spacing, weak hierarchy, unclear grouping, accidental centered stacks, awkward sidebars, cramped tracks, over-wide content, premature breakpoints, and mobile/wide layouts that tell different stories.
 5. **Make the smallest structural improvement.** Prefer `src/layout.css` edits: grid areas, tracks, rows, gaps, padding, alignment, `min-block-size`, and `@container page (...)` rules. Edit markup only when the layout needs a missing or different named area.
 6. **Preserve DryUI discipline.** No route-level `<style>`, no `style=`, no Svelte `style:` directives, no `class=` in phase-zone markup, no `@media` for layout breakpoints, no hardcoded colors, and no width/inline-size escape hatches.
-7. **Verify.** Run `dryui check <target>` or MCP `check`. Also verify the layout at a narrow viewport around 400px and a wide viewport around 1280px when a browser/dev server is available.
+7. **Verify.** Run the relevant project check/build command. Also verify the layout at a narrow viewport around 400px and a wide viewport around 1280px when a browser/dev server is available.
 
 ## Edit Rules
 
@@ -56,7 +56,7 @@ LAYOUT POLISH DONE
 - root: data-layout='<name>'
 - changed: <areas/tracks/gaps/breakpoints>
 - mode: product|expressive
-- checks: dryui check <target> passed
+- checks: <project check/build command> passed
 - visual: narrow and wide layouts have clear hierarchy, grouping, and rhythm
 ```
 

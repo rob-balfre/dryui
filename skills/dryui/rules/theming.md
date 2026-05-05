@@ -175,7 +175,7 @@ both attributes on `<html>`:
   want a dark pathway, and the explicit `data-theme='dark']` rule is enough
   on its own.
 
-Use `dryui ask --scope recipe "light only"` for the full scaffold, or call MCP `ask` with `scope: "recipe"` and `query: "light only"`.
+Use this recipe as the starting point for light-only sites; adapt it in the app shell alongside the standard theme imports.
 
 ### Option C: Persisted theme toggle
 
@@ -286,10 +286,10 @@ Ensure sufficient contrast between text and background.
 
 ## Validating Theme CSS
 
-Use `dryui check <theme.css>` or MCP `check <theme.css>` to catch theme issues. Without either surface, validate by rebuilding the app with `@dryui/lint` wired and checking the resulting diagnostics:
+Validate theme CSS by rebuilding or checking the app with `@dryui/lint` wired and reviewing the resulting diagnostics:
 
 ```bash
-dryui check src/styles/global.css
+bun run check
 ```
 
 Common diagnostic codes:

@@ -4,9 +4,9 @@
 //   1. Installs the DryUI skill via `npx skills add rob-balfre/dryui --agent
 //      <flag>` (or the legacy `npx degit` copy when DRYUI_SKILLS_LEGACY=1, or
 //      local symlinks when DRYUI_DEV=1).
-//   2. Merges the canonical MCP server block into the editor's JSON or TOML
-//      config, preserving any other servers and unrelated keys the user has
-//      set.
+//   2. Merges the feedback and optional companion MCP server blocks into the
+//      editor's JSON or TOML config, preserving any other servers and unrelated
+//      keys the user has set.
 //
 // Auto-install is intentionally limited to editors where both steps map onto
 // project-local files plus dedicated MCP config files. claude-code keeps its
@@ -107,13 +107,11 @@ const REPO = 'rob-balfre/dryui';
 const SKILL_SOURCE = `${REPO}/skills/dryui`;
 const NPX_SKILLS_PIN = 'skills@^1.1.1';
 
-const NPX_DRYUI_MCP = { command: 'npx', args: ['-y', '@dryui/mcp'] } as const;
 const NPX_DRYUI_FEEDBACK_MCP = {
 	command: 'npx',
 	args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
 } as const;
 const NPX_SVELTE_MCP = { command: 'npx', args: ['-y', '@sveltejs/mcp'] } as const;
-const LOCAL_DRYUI_MCP = { command: 'env', args: ['DRYUI_DEV=1', 'dryui-mcp'] } as const;
 const LOCAL_DRYUI_FEEDBACK_MCP = {
 	command: 'env',
 	args: ['DRYUI_DEV=1', 'dryui-feedback-mcp']
@@ -132,10 +130,6 @@ function isDryuiDevMode(ctx: InstallContext): boolean {
 	if (ctx.dryuiDevMode !== undefined) return ctx.dryuiDevMode;
 	const flag = process.env.DRYUI_DEV;
 	return flag === '1' || flag === 'true';
-}
-
-function dryuiMcpEntry(ctx: InstallContext): typeof NPX_DRYUI_MCP | typeof LOCAL_DRYUI_MCP {
-	return isDryuiDevMode(ctx) ? LOCAL_DRYUI_MCP : NPX_DRYUI_MCP;
 }
 
 function dryuiFeedbackMcpEntry(
@@ -734,7 +728,6 @@ function copilotInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('copilot', ctx),
 		servers: {
-			dryui: { type: 'stdio', ...dryuiMcpEntry(ctx) },
 			'dryui-feedback': { type: 'stdio', ...dryuiFeedbackMcpEntry(ctx) },
 			...maybeSvelte(ctx, () => ({ type: 'stdio', ...NPX_SVELTE_MCP }))
 		}
@@ -750,7 +743,7 @@ function cursorInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('cursor', ctx),
 		servers: {
-			dryui: dryuiMcpEntry(ctx),
+			'dryui-feedback': dryuiFeedbackMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
 	});
@@ -765,7 +758,6 @@ function opencodeInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('opencode', ctx),
 		servers: {
-			dryui: { type: 'local', command: localCommandArray(dryuiMcpEntry(ctx)) },
 			'dryui-feedback': {
 				type: 'local',
 				command: localCommandArray(dryuiFeedbackMcpEntry(ctx))
@@ -788,7 +780,6 @@ function windsurfInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('windsurf', ctx),
 		servers: {
-			dryui: dryuiMcpEntry(ctx),
 			'dryui-feedback': dryuiFeedbackMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
@@ -803,7 +794,6 @@ function geminiInstaller(ctx: InstallContext): InstallResult {
 	const config = mergeServersConfig({
 		...editorMcpParams('gemini', ctx),
 		servers: {
-			dryui: dryuiMcpEntry(ctx),
 			'dryui-feedback': dryuiFeedbackMcpEntry(ctx),
 			...maybeSvelte(ctx, () => NPX_SVELTE_MCP)
 		}
@@ -812,13 +802,14 @@ function geminiInstaller(ctx: InstallContext): InstallResult {
 }
 
 function zedInstaller(ctx: InstallContext): InstallResult {
+	const feedbackEntry = dryuiFeedbackMcpEntry(ctx);
 	const config = mergeServersConfig({
 		...editorMcpParams('zed', ctx),
 		servers: {
-			dryui: {
+			'dryui-feedback': {
 				command: {
-					path: dryuiMcpEntry(ctx).command,
-					args: [...dryuiMcpEntry(ctx).args]
+					path: feedbackEntry.command,
+					args: [...feedbackEntry.args]
 				}
 			},
 			...maybeSvelte(ctx, () => ({ command: { path: 'npx', args: ['-y', '@sveltejs/mcp'] } }))
@@ -830,15 +821,14 @@ function zedInstaller(ctx: InstallContext): InstallResult {
 // Codex's plugin install (the canonical skill path) requires an interactive
 // `/plugins` step inside a running Codex session, so it stays manual via
 // `dryui setup --editor codex`. The MCP fallback below is auto-installable
-// because it's purely TOML edits in the user-global `~/.codex/config.toml`,
-// and that's enough to make the dryui + dryui-feedback servers available. In
-// DRYUI_DEV=1, the same flow also links the top-level skills into Codex's
-// global agent-skill folder so this checkout wins immediately.
+// because it's purely TOML edits in the user-global `~/.codex/config.toml`
+// for feedback and optional Svelte companion tooling. In DRYUI_DEV=1, the
+// same flow also links the top-level skills into Codex's global agent-skill
+// folder so this checkout wins immediately.
 function codexInstaller(ctx: InstallContext): InstallResult {
 	const home = ctx.homeDir ?? homedir();
 	const path = join(home, '.codex/config.toml');
 	const label = 'Update ~/.codex/config.toml';
-	const dryuiEntry = dryuiMcpEntry(ctx);
 	const feedbackEntry = dryuiFeedbackMcpEntry(ctx);
 	const replaceExisting = isDryuiDevMode(ctx);
 	const steps: InstallStepResult[] = [];
@@ -848,15 +838,6 @@ function codexInstaller(ctx: InstallContext): InstallResult {
 	}
 
 	steps.push(
-		mergeTomlSection({
-			path,
-			section: 'mcp_servers.dryui',
-			block: `[mcp_servers.dryui]
-command = "${dryuiEntry.command}"
-args = ${tomlStringArray(dryuiEntry.args)}`,
-			label,
-			replaceExisting
-		}),
 		mergeTomlSection({
 			path,
 			section: 'mcp_servers."dryui-feedback"',
@@ -1040,39 +1021,39 @@ export function installPreviewLines(id: SetupGuideId, ctx: InstallContext): read
 			return isDryuiDevMode(ctx)
 				? [
 						`• Link DryUI skills from this checkout into ${homeRelative(join(home, '.agents/skills'))}`,
-						`• Merge local dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`
+						`• Merge local dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`
 					]
 				: [
-						`• Merge dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`,
+						`• Merge dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.codex/config.toml'))}`,
 						'• Plugin (skill bundle) install still needs `codex plugin marketplace add rob-balfre/dryui` then `/plugins` inside Codex'
 					];
 		case 'copilot':
 			return [
 				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.github/skills' : '.github/skills/dryui'))}`,
-				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.mcp.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.mcp.json'))}`
 			];
 		case 'cursor':
 			return [
 				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.agents/skills' : '.agents/skills/dryui'))}`,
-				`• Merge ${localPrefix}dryui${svelteSuffix} server into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, '.cursor/mcp.json'))}`
 			];
 		case 'opencode':
 			return [
 				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.opencode/skills' : '.opencode/skills/dryui'))}`,
-				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} servers into ${homeRelative(join(ctx.cwd, 'opencode.json'))}`
 			];
 		case 'gemini':
 			return [
-				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.gemini/settings.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} servers into ${homeRelative(join(home, '.gemini/settings.json'))}`
 			];
 		case 'windsurf':
 			return [
 				`• ${isDryuiDevMode(ctx) ? 'Link DryUI skills into' : 'Copy DryUI skill to'} ${homeRelative(join(ctx.cwd, isDryuiDevMode(ctx) ? '.agents/skills' : '.agents/skills/dryui'))}`,
-				`• Merge ${localPrefix}dryui + dryui-feedback${svelteSuffix} into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} into ${homeRelative(join(home, '.codeium/windsurf/mcp_config.json'))}`
 			];
 		case 'zed':
 			return [
-				`• Merge ${localPrefix}dryui${svelteSuffix} context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
+				`• Merge ${localPrefix}dryui-feedback${svelteSuffix} context server into ${homeRelative(join(home, '.config/zed/settings.json'))}`
 			];
 		default:
 			return [];

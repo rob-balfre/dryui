@@ -119,10 +119,10 @@ function devModeBannerLines(): string[] {
 
 const MAIN_MENU_OPTIONS: readonly SelectOption<MainMenuValue>[] = [
 	{
-		label: 'Set up editor or agent',
+		label: 'Install skills + feedback',
 		value: 'setup',
 		icon: '⌘',
-		description: 'Choose Claude, Codex, Gemini, OpenCode, Copilot, Cursor, Windsurf, or Zed.'
+		description: 'Wire DryUI skills, feedback MCP, and the optional Svelte companion.'
 	},
 	{
 		label: 'Start feedback session',
@@ -510,7 +510,9 @@ function renderEditorInstallProgress(
 	includeSvelteMcp: boolean
 ): void {
 	renderPromptFrame(`Installing ${editor.label} setup...`, { contextLines });
-	console.log(paint('Copying the DryUI skill and updating the editor MCP config.', ANSI.white));
+	console.log(
+		paint('Installing DryUI skills and updating feedback/editor MCP config.', ANSI.white)
+	);
 	console.log(
 		paint(
 			`Svelte MCP: ${includeSvelteMcp ? 'including @sveltejs/mcp' : 'skipped'}.`,
@@ -545,12 +547,12 @@ function setupHelp(exitCode = 0): never {
 		{
 			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open] [--sync-agents] [path]`,
 			description: [
-				'Interactive action menu for editor, agent, and feedback setup.',
+				'Interactive setup for DryUI skills, feedback tooling, and the Svelte companion.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
 				'Without a TTY, use --editor and/or --open-feedback for deterministic output.'
 			],
 			options: [
-				'  --editor <id>       Print setup steps for one editor or agent',
+				'  --editor <id>       Print skill + feedback setup steps for one editor or agent',
 				'  --no-svelte-mcp     Skip registering the official @sveltejs/mcp server (default: on)',
 				'  --claude-hook       Run `dryui install-hook` after the Claude guide',
 				'  --open-feedback     Open feedback tooling after printing setup steps',

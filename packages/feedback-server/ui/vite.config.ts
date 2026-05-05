@@ -12,13 +12,13 @@ export default defineConfig({
 		svelte({
 			preprocess: [
 				dryuiLint({
-					// The feedback dashboard is a first-party Vite app with bespoke SVG
-					// icons and dense card markup. Keep lint diagnostics visible, but do
-					// not block the package build on consumer-layout rules here.
-					strict: false,
+					// These two internal dashboard files intentionally keep bespoke SVG
+					// icon paths and dense card-local layout until they get a focused
+					// extraction. Keep the rest of the feedback UI strict.
+					strict: true,
 					includeDryuiPackages: true,
 					include: [UI_DIR],
-					exclude: ['/dist/']
+					exclude: ['agent-icon.svelte', 'submission-card.svelte', '/dist/']
 				})
 			]
 		})

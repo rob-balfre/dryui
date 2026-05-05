@@ -10,15 +10,15 @@ DryUI gives engineers and their coding agents a shared UI system: reusable compo
 
 ## Workspace Packages
 
-| Package                  | Description                                                                                                               |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                |
-| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                      |
-| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                     |
-| `@dryui/cli`             | Small CLI for skill/editor setup and feedback tooling                                                                     |
-| `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor component discovery, contract validation, a11y, and token correctness |
-| `@dryui/feedback`        | Optional feedback annotation UI                                                                                           |
-| `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                 |
+| Package                  | Description                                                                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                                          |
+| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                                                |
+| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                                               |
+| `@dryui/cli`             | Small CLI for skill/editor setup and feedback tooling                                                                                               |
+| `@dryui/mcp`             | Lightweight context server for editors that expect a DryUI MCP entry; guidance lives in skills and deterministic validation lives in package checks |
+| `@dryui/feedback`        | Optional feedback annotation UI                                                                                                                     |
+| `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                                           |
 
 ## Quick Start
 
@@ -32,7 +32,7 @@ Then use the CLI only for editor/agent setup and feedback tooling:
 
 ```bash
 dryui setup
-dryui feedback ui
+dryui feedback
 ```
 
 When working inside this monorepo, always check for a local DryUI link before installing the CLI globally:
@@ -149,7 +149,7 @@ bun run validate
 
 ### Source Mode (DRYUI_DEV)
 
-Run `dryui`, `dryui-mcp`, and `dryui-feedback-mcp` against the live `packages/*/src/` TypeScript instead of `dist/`, without publishing or pointing tools at build folders.
+Run `dryui` and `dryui-feedback-mcp` against the live `packages/*/src/` TypeScript instead of `dist/`, without publishing or pointing tools at build folders.
 
 One-time setup:
 
@@ -162,7 +162,6 @@ That's it. The bins ship with workspace auto-detect: when invoked through the `b
 
 ```bash
 dryui setup              # auto-runs packages/cli/src/index.ts
-dryui-mcp                # MCP server straight from src
 dryui-feedback-mcp       # feedback MCP server from src
 ```
 
@@ -182,12 +181,11 @@ Failures (offline, missing npx) fall through to the legacy degit copy automatica
 
 Workspace packages registered by `dev:link` (`@dryui/ui`, `@dryui/primitives`, `@dryui/feedback`, `@dryui/lint`) all carry a `"development"` exports condition pointing at `src/` and ship `src/` in their tarballs. Combined with the launcher's `DRYUI_DEV` flow — which rewrites tarball overrides in your project's `package.json` to `link:<pkg>` and adds the packages to `ssr.noExternal` — `vite dev` in `~/yourproject` resolves through workspace source and picks up Svelte edits via HMR. Production builds fall through to `dist/` automatically.
 
-For editor MCP entries, point at the linked bin. Auto-detect handles the rest, but the explicit env flag is fine to keep:
+For feedback MCP entries, point at the linked bin. Auto-detect handles the rest, but the explicit env flag is fine to keep:
 
 ```jsonc
 {
 	"mcpServers": {
-		"dryui": { "command": "dryui-mcp" },
 		"dryui-feedback": { "command": "dryui-feedback-mcp" }
 	}
 }

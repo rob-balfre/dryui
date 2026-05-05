@@ -230,7 +230,7 @@ describe('mergeServersConfig', () => {
 });
 
 describe('runEditorInstall', () => {
-	test('copilot writes the skill folder and .mcp.json with both DryUI servers', () => {
+	test('copilot writes the skill folder and .mcp.json with feedback MCP', () => {
 		const root = createTempTree({});
 		const calls: string[] = [];
 
@@ -245,12 +245,7 @@ describe('runEditorInstall', () => {
 		expect(existsSync(join(root, '.github/skills/dryui/SKILL.md'))).toBe(true);
 
 		const config = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf-8'));
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
-		expect(config.mcpServers.dryui).toEqual({
-			type: 'stdio',
-			command: 'npx',
-			args: ['-y', '@dryui/mcp']
-		});
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback']);
 		expect(config.mcpServers['dryui-feedback']).toEqual({
 			type: 'stdio',
 			command: 'npx',
@@ -258,7 +253,7 @@ describe('runEditorInstall', () => {
 		});
 	});
 
-	test('opencode writes the schema header and both MCP servers', () => {
+	test('opencode writes the schema header and feedback MCP server', () => {
 		const root = createTempTree({});
 		const calls: string[] = [];
 
@@ -273,7 +268,6 @@ describe('runEditorInstall', () => {
 		expect(config).toEqual({
 			$schema: 'https://opencode.ai/config.json',
 			mcp: {
-				dryui: { type: 'local', command: ['npx', '-y', '@dryui/mcp'] },
 				'dryui-feedback': {
 					type: 'local',
 					command: ['npx', '-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
@@ -298,10 +292,10 @@ describe('runEditorInstall', () => {
 		const config = JSON.parse(
 			readFileSync(join(home, '.codeium/windsurf/mcp_config.json'), 'utf-8')
 		);
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback']);
 	});
 
-	test('gemini merges dryui + dryui-feedback into ~/.gemini/settings.json, preserving other keys', () => {
+	test('gemini merges dryui-feedback into ~/.gemini/settings.json, preserving other keys', () => {
 		const root = createTempTree({});
 		const home = createTempTree({
 			'.gemini/settings.json': JSON.stringify({
@@ -315,11 +309,7 @@ describe('runEditorInstall', () => {
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
 		expect(config.ui).toEqual({ theme: 'keep' });
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['context7', 'dryui', 'dryui-feedback']);
-		expect(config.mcpServers.dryui).toEqual({
-			command: 'npx',
-			args: ['-y', '@dryui/mcp']
-		});
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['context7', 'dryui-feedback']);
 		expect(config.mcpServers['dryui-feedback']).toEqual({
 			command: 'npx',
 			args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
@@ -334,7 +324,7 @@ describe('runEditorInstall', () => {
 
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback']);
 	});
 
 	test('gemini reports unchanged on a second run against the same settings.json', () => {
@@ -376,8 +366,11 @@ describe('runEditorInstall', () => {
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(home, '.config/zed/settings.json'), 'utf-8'));
 		expect(config.ui_font_size).toBe(14);
-		expect(config.context_servers.dryui).toEqual({
-			command: { path: 'npx', args: ['-y', '@dryui/mcp'] }
+		expect(config.context_servers['dryui-feedback']).toEqual({
+			command: {
+				path: 'npx',
+				args: ['-y', '-p', '@dryui/feedback-server', 'dryui-feedback-mcp']
+			}
 		});
 	});
 
@@ -386,13 +379,13 @@ describe('runEditorInstall', () => {
 		expect(runEditorInstall('claude-code', { cwd: root })).toBeNull();
 	});
 
-	test('codex installer writes dryui + dryui-feedback MCP servers to ~/.codex/config.toml', () => {
+	test('codex installer writes dryui-feedback MCP server to ~/.codex/config.toml', () => {
 		const home = createTempTree({});
 		const result = runEditorInstall('codex', { cwd: home, homeDir: home });
 
 		expect(result?.ok).toBe(true);
 		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
-		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).not.toContain('[mcp_servers.dryui]');
 		expect(config).toContain('[mcp_servers."dryui-feedback"]');
 		// Svelte MCP is opt-in via includeSvelteMcp; off by default in this test.
 		expect(config).not.toContain('[mcp_servers.svelte]');
@@ -408,7 +401,7 @@ describe('runEditorInstall', () => {
 
 		expect(result?.ok).toBe(true);
 		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
-		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).not.toContain('[mcp_servers.dryui]');
 		expect(config).toContain('[mcp_servers."dryui-feedback"]');
 		expect(config).toContain('[mcp_servers.svelte]');
 	});
@@ -445,9 +438,7 @@ describe('runEditorInstall', () => {
 		}
 
 		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
-		expect(config).toContain('[mcp_servers.dryui]');
-		expect(config).toContain('command = "env"');
-		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-mcp"]');
+		expect(config).not.toContain('[mcp_servers.dryui]');
 		expect(config).toContain('[mcp_servers."dryui-feedback"]');
 		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-feedback-mcp"]');
 		expect(config).toContain('[mcp_servers.svelte]');
@@ -475,9 +466,9 @@ args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
 
 		expect(result?.ok).toBe(true);
 		const config = readFileSync(join(home, '.codex/config.toml'), 'utf-8');
-		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-mcp"]');
+		expect(config).toContain('[mcp_servers.dryui]');
+		expect(config).toContain('args = ["-y", "@dryui/mcp"]');
 		expect(config).toContain('args = ["DRYUI_DEV=1", "dryui-feedback-mcp"]');
-		expect(config).not.toContain('@dryui/mcp');
 		expect(config).not.toContain('@dryui/feedback-server');
 	});
 
@@ -503,9 +494,9 @@ args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
 			readdirSync(join(root, '.agents/skills')).some((name) => name.startsWith('dryui.bak.'))
 		).toBe(true);
 		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
-		expect(config.mcpServers.dryui).toEqual({
+		expect(config.mcpServers['dryui-feedback']).toEqual({
 			command: 'env',
-			args: ['DRYUI_DEV=1', 'dryui-mcp']
+			args: ['DRYUI_DEV=1', 'dryui-feedback-mcp']
 		});
 	});
 
@@ -552,7 +543,7 @@ describe('Svelte MCP companion', () => {
 		});
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(root, '.mcp.json'), 'utf-8'));
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback', 'svelte']);
 		expect(config.mcpServers.svelte).toEqual({
 			type: 'stdio',
 			command: 'npx',
@@ -586,14 +577,14 @@ describe('Svelte MCP companion', () => {
 		});
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(root, 'opencode.json'), 'utf-8'));
-		expect(Object.keys(config.mcp).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(Object.keys(config.mcp).sort()).toEqual(['dryui-feedback', 'svelte']);
 		expect(config.mcp.svelte).toEqual({
 			type: 'local',
 			command: ['npx', '-y', '@sveltejs/mcp']
 		});
 	});
 
-	test('windsurf installer registers svelte alongside DryUI servers when opted in', () => {
+	test('windsurf installer registers svelte alongside feedback when opted in', () => {
 		const root = createTempTree({});
 		const home = createTempTree({});
 		const result = runEditorInstall('windsurf', {
@@ -607,10 +598,10 @@ describe('Svelte MCP companion', () => {
 		const config = JSON.parse(
 			readFileSync(join(home, '.codeium/windsurf/mcp_config.json'), 'utf-8')
 		);
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback', 'svelte']);
 	});
 
-	test('gemini installer registers svelte alongside DryUI servers when opted in', () => {
+	test('gemini installer registers svelte alongside feedback when opted in', () => {
 		const root = createTempTree({});
 		const home = createTempTree({});
 		const result = runEditorInstall('gemini', {
@@ -620,7 +611,7 @@ describe('Svelte MCP companion', () => {
 		});
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(home, '.gemini/settings.json'), 'utf-8'));
-		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui', 'dryui-feedback', 'svelte']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback', 'svelte']);
 	});
 
 	test('zed installer registers svelte under context_servers when opted in', () => {
@@ -646,7 +637,7 @@ describe('Svelte MCP companion', () => {
 		});
 		expect(result?.ok).toBe(true);
 		const config = JSON.parse(readFileSync(join(root, '.cursor/mcp.json'), 'utf-8'));
-		expect(Object.keys(config.mcpServers)).toEqual(['dryui']);
+		expect(Object.keys(config.mcpServers).sort()).toEqual(['dryui-feedback']);
 	});
 
 	test('preview lines mention the svelte companion when opted in', () => {
@@ -666,7 +657,7 @@ describe('Svelte MCP companion', () => {
 		});
 
 		expect(lines.some((line) => line.includes('Link DryUI skills'))).toBe(true);
-		expect(lines.some((line) => line.includes('local dryui + dryui-feedback + svelte'))).toBe(true);
+		expect(lines.some((line) => line.includes('local dryui-feedback + svelte'))).toBe(true);
 		expect(lines.some((line) => line.includes('/plugins'))).toBe(false);
 	});
 

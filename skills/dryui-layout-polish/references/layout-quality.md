@@ -138,4 +138,4 @@ Before finishing:
 - Related zones are visibly grouped without needing cards.
 - Support zones do not steal attention from primary zones.
 - No layout rule relies on hardcoded colors, arbitrary spacing, inline styles, classes, route-level CSS, or `@media`.
-- `dryui check` passes.
+- The relevant project check/build command passes.

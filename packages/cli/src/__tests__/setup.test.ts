@@ -74,10 +74,10 @@ describe('setup menu formatting', () => {
 			'What would you like to do?',
 			[
 				{
-					label: 'Set up editor or agent',
+					label: 'Install skills + feedback',
 					value: 'setup',
 					icon: '⌘',
-					description: 'Choose Claude, Codex, Gemini, OpenCode, Copilot, Cursor, Windsurf, or Zed.'
+					description: 'Wire DryUI skills, feedback MCP, and the optional Svelte companion.'
 				},
 				{
 					label: 'Exit',
@@ -92,8 +92,8 @@ describe('setup menu formatting', () => {
 		);
 
 		expect(lines).toContain('◈ DryUI');
-		expect(lines.some((line) => line.includes('⌘ Set up editor or agent'))).toBe(true);
-		expect(lines.some((line) => line.includes('↳ Choose Claude, Codex, Gemini'))).toBe(true);
+		expect(lines.some((line) => line.includes('⌘ Install skills + feedback'))).toBe(true);
+		expect(lines.some((line) => line.includes('↳ Wire DryUI skills'))).toBe(true);
 		expect(lines).toContain('↑/↓ move  Enter select  Ctrl+C quit.');
 	});
 
@@ -104,7 +104,7 @@ describe('setup menu formatting', () => {
 		expect(lines).toContain('   Uses the upstream npx skills CLI (skills.sh standard).');
 		expect(lines).toContain('   npx skills add rob-balfre/dryui');
 		expect(lines).toContain('Optional');
-		expect(lines).toContain('   2. Add the MCP servers');
+		expect(lines).toContain('   2. Add the feedback MCP server');
 		expect(lines).toContain('   3. Optional SessionStart hook');
 		expect(lines).toContain('   4. Svelte companion (recommended)');
 		expect(lines.some((line) => line.includes('The plugin bundles the DryUI skill'))).toBe(false);
@@ -116,7 +116,7 @@ describe('setup menu formatting', () => {
 	test('renders a compact guide preview for config-based setup', () => {
 		const lines = formatGuidePreviewLines(getSetupGuide('zed'));
 
-		expect(lines).toContain('1. Add the MCP server');
+		expect(lines).toContain('1. Add the feedback MCP server');
 		expect(lines).toContain('   See `dryui setup --editor zed` for the full snippet.');
 		expect(lines).toContain('Optional');
 		expect(lines).toContain('   2. Svelte MCP (recommended companion)');

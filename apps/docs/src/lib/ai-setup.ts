@@ -1,4 +1,3 @@
-import { aiSurface } from '../../../../packages/mcp/src/ai-surface.js';
 import type { AgentId } from '../../../../packages/mcp/src/docs-surface.js';
 
 type AiAgentId = AgentId;
@@ -66,11 +65,6 @@ esac`;
 
 export const DRYUI_SKILLS_INSTALL_COMMAND = 'npx skills add rob-balfre/dryui';
 
-const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
-	ask: 'orange',
-	check: 'blue'
-};
-
 const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	setup: 'green',
 	ambient: 'gray',
@@ -82,16 +76,17 @@ const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	setup: 'dryui setup',
 	ambient: 'dryui ambient',
 	'install-hook': 'dryui install-hook --dry-run',
-	feedback: 'dryui feedback ui --no-open'
+	feedback: 'dryui feedback --no-open'
 };
 
-const dryuiMcpTools: readonly AiSurfaceCard[] = aiSurface.tools.map((tool) => ({
-	name: tool.name,
-	description: tool.description,
-	color: MCP_TOOL_COLORS[tool.name] ?? 'gray'
-}));
+const CLI_COMMANDS = [
+	{ name: 'setup', description: 'Install DryUI skills, feedback MCP, and companion snippets.' },
+	{ name: 'ambient', description: 'Print compact session context for agent startup hooks.' },
+	{ name: 'install-hook', description: 'Wire or preview the Claude SessionStart hook.' },
+	{ name: 'feedback', description: 'Start the local visual feedback dashboard.' }
+] as const;
 
-export const dryuiCliCommands: readonly AiSurfaceCard[] = aiSurface.cliCommands.map((command) => ({
+export const dryuiCliCommands: readonly AiSurfaceCard[] = CLI_COMMANDS.map((command) => ({
 	name: command.name,
 	description: command.description,
 	color: CLI_COMMAND_COLORS[command.name] ?? 'gray',
@@ -103,18 +98,14 @@ export const dryuiCliCommands: readonly AiSurfaceCard[] = aiSurface.cliCommands.
 // Claude Code, Cursor, and Windsurf all use the same mcpServers JSON format
 const mcpServersConfig = `{
   "mcpServers": {
-    "dryui": {
+    "dryui-feedback": {
       "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
     }
   }
 }`;
 
-const codexConfig = `[mcp_servers.dryui]
-command = "npx"
-args = ["-y", "@dryui/mcp"]
-
-[mcp_servers.dryui-feedback]
+const codexConfig = `[mcp_servers.dryui-feedback]
 command = "npx"
 args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
@@ -126,11 +117,6 @@ args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 // `npx -p <workspace-pkg> <bin>` fails inside Bun workspaces (cwd shadow).
 const copilotCliConfig = `{
   "mcpServers": {
-    "dryui": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "type": "stdio",
       "command": "sh",
@@ -142,11 +128,6 @@ const copilotCliConfig = `{
 // VS Code Copilot (extension) uses the `servers` root key in .vscode/mcp.json.
 const copilotVscodeConfig = `{
   "servers": {
-    "dryui": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "type": "stdio",
       "command": "sh",
@@ -157,10 +138,6 @@ const copilotVscodeConfig = `{
 
 const geminiConfig = `{
   "mcpServers": {
-    "dryui": {
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "command": "npx",
       "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
@@ -171,10 +148,6 @@ const geminiConfig = `{
 const opencodeConfig = `{
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "dryui": {
-      "type": "local",
-      "command": ["npx", "-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "type": "local",
       "command": ["npx", "-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
@@ -184,10 +157,10 @@ const opencodeConfig = `{
 
 const zedConfig = `{
   "context_servers": {
-    "dryui": {
+    "dryui-feedback": {
       "command": {
         "path": "npx",
-        "args": ["-y", "@dryui/mcp"]
+        "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
       }
     }
   }
@@ -266,7 +239,7 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Install the DryUI skills and add the MCP servers so Claude can use skill-led guidance and feedback tools in-editor.',
+			'Install the DryUI skills and add the feedback MCP server so Claude can use skill-led guidance and visual feedback in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -278,10 +251,9 @@ export const aiAgentSetups: AiAgentSetup[] = [
 				code: DRYUI_SKILLS_INSTALL_COMMAND
 			},
 			{
-				title: 'Add the MCP servers',
-				description: 'Adds the DryUI MCP server and the feedback MCP server to Claude Code.',
-				code: `claude mcp add dryui -- npx -y @dryui/mcp
-claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
+				title: 'Add the feedback MCP server',
+				description: 'Adds visual feedback tools. DryUI guidance comes from the installed skills.',
+				code: `claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			}
 		],
 		skill: {
@@ -291,9 +263,8 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Add the MCP servers so Claude can call DryUI and feedback tools.',
+			note: '3. Add the feedback MCP server so Claude can use visual feedback tooling.',
 			code: `# MCP server
-claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
 			language: 'bash'
 		},
@@ -309,7 +280,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Install the DryUI skills and add the MCP servers so Codex can use skill-led guidance and feedback tools in-editor.',
+			'Install the DryUI skills and add the feedback MCP server so Codex can use skill-led guidance and visual feedback in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -321,8 +292,8 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				code: DRYUI_SKILLS_INSTALL_COMMAND
 			},
 			{
-				title: 'Add the MCP servers',
-				description: 'Append the dryui and dryui-feedback servers to Codex config.',
+				title: 'Add the feedback MCP server',
+				description: 'Append the dryui-feedback server to Codex config.',
 				code: codexConfig,
 				language: 'toml'
 			}
@@ -345,13 +316,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'toml'
 		},
 		followUp:
-			'Use skills as the default surface. After setup, start a fresh Codex session so MCP and feedback tools are available.'
+			'Use skills as the default surface. After setup, start a fresh Codex session so feedback tools are available.'
 	},
 	{
 		id: 'gemini',
 		label: 'Gemini CLI',
 		description:
-			'Install the DryUI skill and MCP servers so Gemini can use skill-led guidance and feedback tools in-editor.',
+			'Install the DryUI skill and feedback MCP server so Gemini can use skill-led guidance and visual feedback in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -365,9 +336,9 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				language: 'bash'
 			},
 			{
-				title: 'Add the MCP servers',
+				title: 'Add the feedback MCP server',
 				description:
-					'`dryui setup --editor gemini` prints the dryui and dryui-feedback MCP server config for `~/.gemini/settings.json`.',
+					'`dryui setup --editor gemini` prints the dryui-feedback MCP server config for `~/.gemini/settings.json`.',
 				code: geminiConfig,
 				language: 'json'
 			}
@@ -379,7 +350,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '~/.gemini/settings.json',
-			note: '3. Add the dryui and dryui-feedback MCP servers. `dryui setup --editor gemini` prints the config.',
+			note: '3. Add the dryui-feedback MCP server. `dryui setup --editor gemini` prints the config.',
 			code: geminiConfig,
 			language: 'json'
 		},
@@ -390,13 +361,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use skills as the default surface. After installing the extension, restart Gemini so MCP and feedback tools are available.'
+			'Use skills as the default surface. After installing the extension, restart Gemini so feedback tools are available.'
 	},
 	{
 		id: 'opencode',
 		label: 'OpenCode',
 		description:
-			'Install the DryUI skill and MCP setup so OpenCode can follow DryUI conventions and use feedback tools in-editor.',
+			'Install the DryUI skill and feedback MCP setup so OpenCode can follow DryUI conventions and use visual feedback in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -410,9 +381,9 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				language: 'bash'
 			},
 			{
-				title: 'Add the MCP servers',
+				title: 'Add the feedback MCP server',
 				description:
-					'Put this in `opencode.json` at your project root so OpenCode can start the dryui and dryui-feedback servers locally.',
+					'Put this in `opencode.json` at your project root so OpenCode can start the dryui-feedback server locally.',
 				code: opencodeConfig,
 				language: 'json'
 			}
@@ -424,7 +395,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: 'opencode.json',
-			note: '3. Add the MCP servers to `opencode.json`. OpenCode expects local MCP servers under the `mcp` object with `type: "local"` and command arrays.',
+			note: '3. Add the feedback MCP server to `opencode.json`. OpenCode expects local MCP servers under the `mcp` object with `type: "local"` and command arrays.',
 			code: opencodeConfig,
 			language: 'json'
 		},
@@ -441,7 +412,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		id: 'copilot',
 		label: 'Copilot',
 		description:
-			'Install the DryUI skill and add the MCP servers. Copilot CLI (1.x+) reads `.mcp.json` at the project root with root key `mcpServers` (same shape as Claude Code). `~/.copilot/mcp-config.json` provides user-level defaults. The VS Code Copilot extension still reads `.vscode/mcp.json` with root key `servers` — configure that separately if you use both surfaces.',
+			'Install the DryUI skill and add the feedback MCP server. Copilot CLI (1.x+) reads `.mcp.json` at the project root with root key `mcpServers` (same shape as Claude Code). `~/.copilot/mcp-config.json` provides user-level defaults. The VS Code Copilot extension still reads `.vscode/mcp.json` with root key `servers` — configure that separately if you use both surfaces.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -455,14 +426,14 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				language: 'bash'
 			},
 			{
-				title: 'Add the MCP servers (Copilot CLI)',
+				title: 'Add the feedback MCP server (Copilot CLI)',
 				description:
 					'Copilot CLI reads `.mcp.json` at the project root (workspace) and `~/.copilot/mcp-config.json` (user). Root key is `mcpServers`, same as Claude Code — the two tools share the file. Support for `.vscode/mcp.json` was removed in Copilot CLI 1.x.',
 				code: copilotCliConfig,
 				language: 'json'
 			},
 			{
-				title: 'Add the MCP servers (VS Code Copilot)',
+				title: 'Add the feedback MCP server (VS Code Copilot)',
 				description:
 					'If you also use the VS Code Copilot extension (Agent mode), put this in `.vscode/mcp.json` at the project root. Root key is `servers`, not `mcpServers`.',
 				code: copilotVscodeConfig,
@@ -476,7 +447,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Add the MCP servers for Copilot CLI at `.mcp.json` (project root, shared with Claude Code). Root key is `mcpServers`. For user-level defaults, use `~/.copilot/mcp-config.json` with the same shape. If you also use the VS Code Copilot extension, mirror this into `.vscode/mcp.json` but rename the root key to `servers`.',
+			note: '3. Add the feedback MCP server for Copilot CLI at `.mcp.json` (project root, shared with Claude Code). Root key is `mcpServers`. For user-level defaults, use `~/.copilot/mcp-config.json` with the same shape. If you also use the VS Code Copilot extension, mirror this into `.vscode/mcp.json` but rename the root key to `servers`.',
 			code: copilotCliConfig,
 			language: 'json'
 		},
@@ -487,12 +458,12 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use skills as the default surface. Copilot CLI picks up MCP servers from `.mcp.json` (workspace) and `~/.copilot/mcp-config.json` (user) on launch. In the VS Code extension, MCP tools only work in Agent mode, and the skill loads automatically when relevant.'
+			'Use skills as the default surface. Copilot CLI picks up MCP servers from `.mcp.json` (workspace) and `~/.copilot/mcp-config.json` (user) on launch. In the VS Code extension, feedback tools only work in Agent mode, and the skill loads automatically when relevant.'
 	},
 	{
 		id: 'cursor',
 		label: 'Cursor',
-		description: 'Install the DryUI skill and add the MCP server for in-editor support.',
+		description: 'Install the DryUI skill and add the feedback MCP server.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -504,7 +475,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '.cursor/mcp.json',
-			note: '3. Add the MCP server to `.cursor/mcp.json`.',
+			note: '3. Add the feedback MCP server to `.cursor/mcp.json`.',
 			code: mcpServersConfig,
 			language: 'json'
 		},
@@ -520,7 +491,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 	{
 		id: 'windsurf',
 		label: 'Windsurf',
-		description: 'Install the DryUI skill and add the MCP server for in-editor support.',
+		description: 'Install the DryUI skill and add the feedback MCP server.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -532,7 +503,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '~/.codeium/windsurf/mcp_config.json',
-			note: '3. Add the MCP server to `~/.codeium/windsurf/mcp_config.json`.',
+			note: '3. Add the feedback MCP server to `~/.codeium/windsurf/mcp_config.json`.',
 			code: mcpServersConfig,
 			language: 'json'
 		},
@@ -549,14 +520,14 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		id: 'zed',
 		label: 'Zed',
 		description:
-			'Use AGENTS.md for conventions and add the MCP server for tools. Zed does not yet support Agent Skills.',
+			'Use AGENTS.md for conventions and add the feedback MCP server. Zed does not yet support Agent Skills.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
 		},
 		mcp: {
 			path: '~/.config/zed/settings.json',
-			note: '2. Add the MCP server to `~/.config/zed/settings.json`. AGENTS.md at the repo root provides conventions automatically.',
+			note: '2. Add the feedback MCP server to `~/.config/zed/settings.json`. AGENTS.md at the repo root provides conventions automatically.',
 			code: zedConfig,
 			language: 'json'
 		},

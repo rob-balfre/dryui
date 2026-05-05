@@ -6,7 +6,7 @@
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server for in-editor DryUI and feedback tooling
+- @dryui/mcp: compatibility MCP server with no runtime tools
 - @dryui/cli: small CLI for skill/editor setup and feedback tooling
 
 ## Human-Led Agent-Assisted Workflow
@@ -31,7 +31,7 @@ npx skills add rob-balfre/dryui
 
 ```
 dryui setup
-dryui feedback ui
+dryui feedback
 ```
 
 ```
@@ -1785,15 +1785,15 @@ dryui setup
 dryui setup --editor codex
 dryui ambient
 dryui install-hook --dry-run
-dryui feedback init
-dryui feedback ui
+dryui feedback
+dryui feedback --no-open
 ```
 
 No global install? Prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …` — same behaviour, slower on each call.
 
 ## MCP Server & Skill
 
-After the CLI is working, DryUI also ships an MCP server (live tools) and a skill (conventions) for supported editors. All MCP output uses TOON (token-optimized) format with contextual next-step suggestions.
+DryUI guidance ships as skills. The DryUI MCP server is compatibility-only and exposes no runtime lookup/check tools; visual feedback uses the separate `dryui-feedback` MCP server.
 
 ### Install
 
@@ -1803,16 +1803,7 @@ The recommended path is the upstream `npx skills` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 ```
 
-That single command installs all six DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it: run `dryui setup --editor <agent>` and apply the printed snippet.
-
-#### Alternative install paths
-
-- **Claude Code plugin marketplace**: `claude plugin marketplace add rob-balfre/dryui && claude plugin install dryui@dryui`
-- **Codex plugin marketplace** (0.121.0+): `codex plugin marketplace add rob-balfre/dryui`, then `/plugins` inside Codex
-- **OpenCode (manual degit)**: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui` + add local MCP servers in `opencode.json`
-- **Copilot / Cursor / Windsurf (manual degit)**: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui` + add MCP config
-- **Zed**: MCP only (reads AGENTS.md for conventions; npx skills does not yet support Zed)
-
-MCP config for tools that need it manually: `"command": "npx", "args": ["-y", "@dryui/mcp"]` — root key varies by tool (mcp for OpenCode, mcpServers for Cursor/Windsurf, servers for Copilot, context_servers for Zed).
+That single command installs all six DryUI skills. Then add feedback MCP config for tools that need it: run `dryui setup --editor <agent>` and apply the printed snippet.
 
 Available MCP tools:
+- none

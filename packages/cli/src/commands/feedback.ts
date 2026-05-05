@@ -120,7 +120,7 @@ async function getFeedbackDoctor(args: string[]): Promise<CommandResult> {
 		const message = error instanceof Error ? error.message : String(error);
 		return commandError('toon', 'feedback-unreachable', message, [
 			'dryui feedback server',
-			'dryui feedback ui'
+			'dryui feedback'
 		]);
 	}
 }
@@ -149,10 +149,11 @@ function feedbackUiHelp(): never {
 	printCommandHelp(
 		{
 			usage:
-				'dryui feedback ui [--endpoint <url>] [--no-open] [--host <host>] [--port <port>] [--db <path>]',
+				'dryui feedback [--endpoint <url>] [--no-open] [--host <host>] [--port <port>] [--db <path>]',
 			description: [
 				'Open the feedback dashboard for queue and history review.',
-				'If no feedback server is running at the target endpoint, this command starts one in the background first.'
+				'If no feedback server is running at the target endpoint, this command starts one in the background first.',
+				'`dryui feedback ui` remains as a compatibility alias.'
 			],
 			options: [
 				'  --endpoint <url>  Feedback server base URL',
@@ -162,9 +163,9 @@ function feedbackUiHelp(): never {
 				'  --db <path>       SQLite database path to use when starting the server'
 			],
 			examples: [
-				'  dryui feedback ui',
-				'  dryui feedback ui --endpoint http://127.0.0.1:4748 --no-open',
-				'  dryui feedback ui --port 5757 --db ./.dryui/feedback/preview.db'
+				'  dryui feedback',
+				'  dryui feedback --endpoint http://127.0.0.1:4748 --no-open',
+				'  dryui feedback --port 5757 --db ./.dryui/feedback/preview.db'
 			]
 		},
 		0
@@ -315,11 +316,12 @@ function feedbackDispatcherHelp(): never {
 			'  server    Run the feedback server in the foreground',
 			'  init      Print the recommended feedback setup for this machine',
 			'  doctor    Probe a running feedback server for health + listener stats',
-			'  ui        Open the feedback dashboard in a browser'
+			'  ui        Open the feedback dashboard in a browser (alias for bare `dryui feedback`)'
 		],
 		examples: [
+			'  dryui feedback',
+			'  dryui feedback --no-open',
 			'  dryui feedback server',
-			'  dryui feedback ui --no-open',
 			'  dryui feedback doctor --endpoint http://127.0.0.1:5757'
 		]
 	});
@@ -332,7 +334,7 @@ function getUnknownFeedbackSubcommand(name: string | undefined): CommandResult {
 		: 'Missing feedback subcommand. Run `dryui feedback --help` for the list.';
 	return commandError('toon', code, base, [
 		'dryui feedback --help',
-		'dryui feedback ui',
+		'dryui feedback',
 		'dryui feedback server'
 	]);
 }

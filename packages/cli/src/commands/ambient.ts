@@ -9,6 +9,6 @@ const VERSION = pkg.version;
 export function emitAmbient(): void {
 	console.log(`dryui/ambient v${VERSION} | cwd: ${homeRelative(process.cwd())}`);
 	console.log('next[2]:');
-	console.log('  dryui setup -- open editor and agent setup');
-	console.log('  dryui feedback ui -- open the feedback dashboard');
+	console.log('  dryui setup -- install skills and feedback wiring');
+	console.log('  dryui feedback -- open the feedback dashboard');
 }

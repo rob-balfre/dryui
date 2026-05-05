@@ -47,8 +47,8 @@ function emitNotADryuiProject(): void {
 	console.log(`cwd: ${homeRelative(process.cwd())}`);
 	console.log('');
 	console.log('next[2]{cmd,description}:');
-	console.log('  dryui setup,Open the editor and agent setup flow');
-	console.log('  dryui feedback ui,Open the feedback dashboard');
+	console.log('  dryui setup,Install skills and feedback wiring');
+	console.log('  dryui feedback,Open the feedback dashboard');
 }
 
 const USAGE = `Usage: dryui <command> [options]
@@ -127,7 +127,7 @@ async function main(): Promise<void> {
 					'toon',
 					'unknown-command',
 					`Unknown command: "${command}". Run \`dryui --help\` for the full command list.`,
-					['dryui --help', 'dryui setup', 'dryui feedback ui']
+					['dryui --help', 'dryui setup', 'dryui feedback']
 				),
 				'toon'
 			);

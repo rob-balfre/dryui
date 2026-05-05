@@ -116,9 +116,9 @@ Erring towards "apply directly" is usually right for single-region tweaks. Hand 
 3. **Locate the page in source.** The submission's `url` maps to a route. For `http://localhost:5174/foo` that's `src/routes/foo/+page.svelte`. For the index, `src/routes/+page.svelte`.
 4. **Pair drawings with hints.** For each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
 5. **Apply intents.** In order: `drawings` (text notes are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually hand off to `dryui-layout`). Make the smallest source edit that satisfies each.
-6. **Run lint.** `dryui check <changed-file>` (or `bun --filter @dryui/cli check <path>`). Fix any violations the edit introduced — re-read this skill's lint section if confused.
+6. **Run checks.** Run the project’s focused check/build/test command for the changed file or package. Fix any violations the edit introduced — re-read this skill's lint section if confused.
 7. **Resolve.** Call MCP `feedback_resolve_submission` with the submission id, or `curl -X PATCH http://127.0.0.1:4748/submissions/<id> -H "Content-Type: application/json" -d '{"status":"resolved"}'`. The dashboard depends on this to clear the submission from the queue.
 
 ## Tone
 
-Quiet. State the submission id and what intents it carries. Make the edit. Run check. Resolve. The user already wrote the feedback — don't re-explain it back to them.
+Quiet. State the submission id and what intents it carries. Make the edit. Run the relevant project check. Resolve. The user already wrote the feedback — don't re-explain it back to them.

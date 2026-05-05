@@ -5,10 +5,9 @@
 	import { DRYUI_SKILLS_INSTALL_COMMAND } from '$lib/ai-setup';
 	import { withBase } from '$lib/utils';
 
-	const projectSetupCode = `dryui init
-# or, in an existing app
-dryui detect .
-dryui install .`;
+	const projectSetupCode = `bun add @dryui/ui
+bun add -d @dryui/lint
+dryui setup`;
 
 	const themeSetupCode = `<!-- src/routes/+layout.svelte -->
 <script>
@@ -27,8 +26,8 @@ dryui install .`;
 
 <Button variant="solid">Save changes</Button>`;
 
-	const checkCode = `dryui ask --scope component Button
-dryui check src/routes/+page.svelte`;
+	const checkCode = `bun run check
+bun run build`;
 </script>
 
 <svelte:head>
@@ -55,8 +54,8 @@ dryui check src/routes/+page.svelte`;
 		<section class="stack-md">
 			<Heading level={2}>Wire the app</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Use the CLI to create a new DryUI-ready app, or detect and install the pieces needed in an
-				existing project. It sets up the library, theme imports, and validation path.
+				Add the packages explicitly, then use setup only for editor skills, feedback, and optional
+				Svelte MCP wiring. App bootstrap is skill-led instead of CLI-detected.
 			</Text>
 			<CodeBlock code={projectSetupCode} language="bash" />
 		</section>
@@ -73,8 +72,8 @@ dryui check src/routes/+page.svelte`;
 		<section class="stack-md">
 			<Heading level={2}>Build with components</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Compose real controls and surfaces instead of one-off markup. Ask for the component contract
-				before changing UI, then check the result before it ships.
+				Compose real controls and surfaces instead of one-off markup. Use the installed skills and
+				docs for component contracts, then run the project checks before it ships.
 			</Text>
 			<CodeBlock language="svelte" code={firstInterfaceCode} linkResolver={componentLinkResolver} />
 			<CodeBlock code={checkCode} language="bash" />

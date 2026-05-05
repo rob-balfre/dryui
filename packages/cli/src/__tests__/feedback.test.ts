@@ -33,10 +33,11 @@ describe('feedback command', () => {
 		const result = await captureAsyncCommandIO(() => runFeedback(['ui', '--help']));
 
 		expect(result.logs).toEqual([
-			'Usage: dryui feedback ui [--endpoint <url>] [--no-open] [--host <host>] [--port <port>] [--db <path>]',
+			'Usage: dryui feedback [--endpoint <url>] [--no-open] [--host <host>] [--port <port>] [--db <path>]',
 			'',
 			'Open the feedback dashboard for queue and history review.',
 			'If no feedback server is running at the target endpoint, this command starts one in the background first.',
+			'`dryui feedback ui` remains as a compatibility alias.',
 			'',
 			'Options:',
 			'  --endpoint <url>  Feedback server base URL',
@@ -46,9 +47,9 @@ describe('feedback command', () => {
 			'  --db <path>       SQLite database path to use when starting the server',
 			'',
 			'Examples:',
-			'  dryui feedback ui',
-			'  dryui feedback ui --endpoint http://127.0.0.1:4748 --no-open',
-			'  dryui feedback ui --port 5757 --db ./.dryui/feedback/preview.db'
+			'  dryui feedback',
+			'  dryui feedback --endpoint http://127.0.0.1:4748 --no-open',
+			'  dryui feedback --port 5757 --db ./.dryui/feedback/preview.db'
 		]);
 		expect(result.exitCode).toBe(0);
 	});
@@ -91,7 +92,7 @@ describe('feedback command', () => {
 		expect(result.logs).toHaveLength(1);
 		expect(result.logs[0]).toContain('feedback-unreachable');
 		expect(result.logs[0]).toContain('dryui feedback server');
-		expect(result.logs[0]).toContain('dryui feedback ui');
+		expect(result.logs[0]).toContain('dryui feedback');
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBeNull();
 	});

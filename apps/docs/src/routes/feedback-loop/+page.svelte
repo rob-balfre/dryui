@@ -4,9 +4,9 @@
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { withBase } from '$lib/utils';
 
-	const feedbackCode = `dryui setup --open-feedback
+	const feedbackCode = `dryui feedback
 # agent or CI shell
-dryui setup --open-feedback --no-open`;
+dryui feedback --no-open`;
 
 	const feedbackScreenshots = [
 		{
@@ -78,7 +78,7 @@ dryui setup --open-feedback --no-open`;
 					<Heading level={3}>Resolvable</Heading>
 					<Text color="secondary">
 						The feedback skill fetches one pending submission, applies the smallest matching change,
-						runs <code>dryui check</code>, then marks it resolved.
+						runs the relevant project check, then marks it resolved.
 					</Text>
 				</div>
 			</div>

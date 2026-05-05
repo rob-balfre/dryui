@@ -24,28 +24,19 @@ export interface SetupGuide {
 
 const MCP_SERVERS_CONFIG = `{
   "mcpServers": {
-    "dryui": {
+    "dryui-feedback": {
       "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
+      "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
     }
   }
 }`;
 
-const CODEX_CONFIG = `[mcp_servers.dryui]
-command = "npx"
-args = ["-y", "@dryui/mcp"]
-
-[mcp_servers.dryui-feedback]
+const CODEX_CONFIG = `[mcp_servers.dryui-feedback]
 command = "npx"
 args = ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]`;
 
 const COPILOT_CONFIG = `{
   "mcpServers": {
-    "dryui": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "type": "stdio",
       "command": "npx",
@@ -56,10 +47,6 @@ const COPILOT_CONFIG = `{
 
 const GEMINI_CONFIG = `{
   "mcpServers": {
-    "dryui": {
-      "command": "npx",
-      "args": ["-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "command": "npx",
       "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
@@ -70,10 +57,6 @@ const GEMINI_CONFIG = `{
 const OPENCODE_CONFIG = `{
   "$schema": "https://opencode.ai/config.json",
   "mcp": {
-    "dryui": {
-      "type": "local",
-      "command": ["npx", "-y", "@dryui/mcp"]
-    },
     "dryui-feedback": {
       "type": "local",
       "command": ["npx", "-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
@@ -83,10 +66,10 @@ const OPENCODE_CONFIG = `{
 
 const ZED_CONFIG = `{
   "context_servers": {
-    "dryui": {
+    "dryui-feedback": {
       "command": {
         "path": "npx",
-        "args": ["-y", "@dryui/mcp"]
+        "args": ["-y", "-p", "@dryui/feedback-server", "dryui-feedback-mcp"]
       }
     }
   }
@@ -174,7 +157,7 @@ export const setupGuides: readonly SetupGuide[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Install the DryUI skills via npx skills, then add the dryui and dryui-feedback MCP servers for Claude.',
+			'Install the DryUI skills via npx skills, then add the dryui-feedback MCP server for Claude.',
 		sections: [
 			{
 				title: 'Install the DryUI skills',
@@ -182,10 +165,9 @@ export const setupGuides: readonly SetupGuide[] = [
 				code: `npx skills add rob-balfre/dryui`
 			},
 			{
-				title: 'Add the MCP servers',
-				note: 'Adds DryUI skills context plus visual feedback tools to Claude Code.',
-				code: `claude mcp add dryui -- npx -y @dryui/mcp
-claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
+				title: 'Add the feedback MCP server',
+				note: 'Adds visual feedback tools. DryUI guidance comes from the installed skills.',
+				code: `claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			},
 			{
 				title: 'Optional SessionStart hook',
@@ -200,7 +182,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Install the DryUI skills via npx skills, then add the dryui and dryui-feedback MCP servers for Codex.',
+			'Install the DryUI skills via npx skills, then add the dryui-feedback MCP server for Codex.',
 		sections: [
 			{
 				title: 'Install the DryUI skills',
@@ -208,10 +190,9 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 				code: `npx skills add rob-balfre/dryui`
 			},
 			{
-				title: 'Add the MCP servers',
-				note: 'Adds DryUI skills context plus visual feedback tools to Codex.',
-				code: `codex mcp add dryui -- npx -y @dryui/mcp
-codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
+				title: 'Add the feedback MCP server',
+				note: 'Adds visual feedback tools. DryUI guidance comes from the installed skills.',
+				code: `codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
 
 # .codex/config.toml
 ${CODEX_CONFIG}`
@@ -219,13 +200,13 @@ ${CODEX_CONFIG}`
 			SVELTE_SECTION_CODEX
 		],
 		followUp:
-			'After installing the skills and MCP servers, start a new Codex session so DryUI guidance and feedback tools are available.'
+			'After installing the skills and feedback MCP server, start a new Codex session so DryUI guidance and feedback tools are available.'
 	},
 	{
 		id: 'gemini',
 		label: 'Gemini CLI',
 		description:
-			'Install the DryUI skill via npx skills (skills.sh standard), then merge the dryui and dryui-feedback MCP servers into Gemini settings.',
+			'Install the DryUI skill via npx skills (skills.sh standard), then merge the dryui-feedback MCP server into Gemini settings.',
 		sections: [
 			{
 				title: 'Install the skill',
@@ -233,8 +214,8 @@ ${CODEX_CONFIG}`
 				code: `npx skills add rob-balfre/dryui --agent gemini-cli`
 			},
 			{
-				title: 'Add the MCP servers',
-				note: '`dryui setup --editor gemini` prints the exact server block for `~/.gemini/settings.json`.',
+				title: 'Add the feedback MCP server',
+				note: '`dryui setup --editor gemini` prints the exact feedback server block for `~/.gemini/settings.json`.',
 				code: GEMINI_CONFIG
 			},
 			SVELTE_SECTION_GEMINI
@@ -244,8 +225,7 @@ ${CODEX_CONFIG}`
 	{
 		id: 'opencode',
 		label: 'OpenCode',
-		description:
-			"Use OpenCode's native skill path plus local MCP config so DryUI conventions and tools are available in-editor.",
+		description: "Use OpenCode's native skill path plus local feedback MCP config.",
 		sections: [
 			{
 				title: 'Install the skill',
@@ -253,7 +233,7 @@ ${CODEX_CONFIG}`
 				code: `npx skills add rob-balfre/dryui --agent opencode`
 			},
 			{
-				title: 'Add the MCP servers',
+				title: 'Add the feedback MCP server',
 				note: 'Put this in `opencode.json` at the project root. OpenCode expects local MCP servers under `mcp` with `type: "local"`.',
 				code: OPENCODE_CONFIG
 			},
@@ -266,7 +246,7 @@ ${CODEX_CONFIG}`
 		id: 'copilot',
 		label: 'GitHub Copilot',
 		description:
-			'Copy the DryUI skill into the repo and add the MCP servers for Copilot CLI and VS Code Agent mode.',
+			'Copy the DryUI skill into the repo and add the feedback MCP server for Copilot CLI and VS Code Agent mode.',
 		sections: [
 			{
 				title: 'Install the skill',
@@ -274,20 +254,19 @@ ${CODEX_CONFIG}`
 				code: `npx skills add rob-balfre/dryui --agent github-copilot`
 			},
 			{
-				title: 'Add the MCP servers',
+				title: 'Add the feedback MCP server',
 				note: 'Copilot CLI reads `.mcp.json` at the project root (workspace) and `~/.copilot/mcp-config.json` (user). The schema uses `mcpServers`, same as Claude Code. The VS Code Copilot extension still reads `.vscode/mcp.json` with a `servers` key — if you rely on it there, duplicate the entries into `.vscode/mcp.json` under `servers`.',
 				code: COPILOT_CONFIG
 			},
 			SVELTE_SECTION_COPILOT
 		],
 		followUp:
-			'MCP tools are available in Copilot CLI and VS Code Copilot Agent mode. Start a fresh session after wiring.'
+			'DryUI skill context and feedback tools are available in Copilot CLI and VS Code Copilot Agent mode after a fresh session.'
 	},
 	{
 		id: 'cursor',
 		label: 'Cursor',
-		description:
-			'Copy the DryUI skill into the repo and add the MCP server for in-editor discovery and validation.',
+		description: 'Install the DryUI skills, then add the feedback MCP server for Cursor.',
 		sections: [
 			{
 				title: 'Install the skill',
@@ -295,7 +274,7 @@ ${CODEX_CONFIG}`
 				code: `npx skills add rob-balfre/dryui --agent cursor`
 			},
 			{
-				title: 'Add the MCP server',
+				title: 'Add the feedback MCP server',
 				note: 'Put this in `.cursor/mcp.json`.',
 				code: MCP_SERVERS_CONFIG
 			},
@@ -306,8 +285,7 @@ ${CODEX_CONFIG}`
 	{
 		id: 'windsurf',
 		label: 'Windsurf',
-		description:
-			'Copy the DryUI skill into the repo and add the MCP server for in-editor discovery and validation.',
+		description: 'Install the DryUI skills, then add the feedback MCP server for Windsurf.',
 		sections: [
 			{
 				title: 'Install the skill',
@@ -315,29 +293,28 @@ ${CODEX_CONFIG}`
 				code: `npx skills add rob-balfre/dryui --agent windsurf`
 			},
 			{
-				title: 'Add the MCP server',
+				title: 'Add the feedback MCP server',
 				note: 'Put this in `~/.codeium/windsurf/mcp_config.json`.',
 				code: MCP_SERVERS_CONFIG
 			},
 			SVELTE_SECTION_MCP_SERVERS
 		],
 		followUp:
-			'Windsurf has a 100-tool limit across all MCP servers. DryUI uses 3 and @sveltejs/mcp adds 4.'
+			'Windsurf has a 100-tool limit across all MCP servers. DryUI keeps the runtime surface small; @sveltejs/mcp adds the Svelte-specific tools.'
 	},
 	{
 		id: 'zed',
 		label: 'Zed',
-		description:
-			'Zed reads AGENTS.md automatically, so add the MCP server for the live tools layer.',
+		description: 'Zed reads AGENTS.md automatically, so add the feedback MCP server.',
 		sections: [
 			{
-				title: 'Add the MCP server',
+				title: 'Add the feedback MCP server',
 				note: 'Put this in `~/.config/zed/settings.json`.',
 				code: ZED_CONFIG
 			},
 			SVELTE_SECTION_ZED
 		],
-		followUp: 'Verify the DryUI MCP is active in the Agent Panel (Cmd+Shift+A).'
+		followUp: 'Verify the feedback server is active in the Agent Panel (Cmd+Shift+A).'
 	}
 ] as const;
 
