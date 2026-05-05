@@ -275,7 +275,12 @@
         "combinesWith": [
           "Dialog.Footer"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/button",
+      "rootImport": "import { Button } from '@dryui/ui'",
+      "subpathImport": "import { Button } from '@dryui/ui/button'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Button } from '@dryui/ui';\n</script>\n\n<Button variant=\"solid\" onclick={handleClick}>Save</Button>\n<Button href=\"/getting-started\" variant=\"outline\">Continue</Button>"
     },
     "Input": {
       "component": {
@@ -422,7 +427,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/input",
+      "rootImport": "import { Input } from '@dryui/ui'",
+      "subpathImport": "import { Input } from '@dryui/ui/input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Input } from '@dryui/ui';\n</script>\n\n<Input type=\"email\" bind:value={email} placeholder=\"you@example.com\" />"
     },
     "Dialog": {
       "component": {
@@ -679,7 +689,12 @@
           "Button",
           "Field.Root"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/dialog",
+      "rootImport": "import { Dialog } from '@dryui/ui'",
+      "subpathImport": "import { Dialog } from '@dryui/ui/dialog'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Dialog, Button } from '@dryui/ui';\n</script>\n\n<Dialog.Root bind:open={showDialog}>\n  <Dialog.Trigger>\n    <Button>Open Dialog</Button>\n  </Dialog.Trigger>\n  <Dialog.Content>\n    <Dialog.Header>Confirm</Dialog.Header>\n    <p>Are you sure?</p>\n    <Dialog.Footer>\n      <Button variant=\"outline\" onclick={() => showDialog = false}>Cancel</Button>\n      <Button variant=\"solid\" onclick={handleConfirm}>Confirm</Button>\n    </Dialog.Footer>\n  </Dialog.Content>\n</Dialog.Root>"
     },
     "AlertDialog": {
       "component": {
@@ -947,7 +962,12 @@
           "Button",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/alert-dialog",
+      "rootImport": "import { AlertDialog } from '@dryui/ui'",
+      "subpathImport": "import { AlertDialog } from '@dryui/ui/alert-dialog'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AlertDialog } from '@dryui/ui';\n</script>\n\n<AlertDialog.Root>\n  <AlertDialog.Trigger>...</AlertDialog.Trigger>\n  <AlertDialog.Content>...</AlertDialog.Content>\n  <AlertDialog.Overlay>...</AlertDialog.Overlay>\n  <AlertDialog.Header>...</AlertDialog.Header>\n  <AlertDialog.Body>...</AlertDialog.Body>\n  <AlertDialog.Footer>...</AlertDialog.Footer>\n  <AlertDialog.Action>...</AlertDialog.Action>\n  <AlertDialog.Cancel>...</AlertDialog.Cancel>\n</AlertDialog.Root>"
     },
     "Drawer": {
       "component": {
@@ -1220,7 +1240,12 @@
           "Separator",
           "Field.Root"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/drawer",
+      "rootImport": "import { Drawer } from '@dryui/ui'",
+      "subpathImport": "import { Drawer } from '@dryui/ui/drawer'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Drawer, Button } from '@dryui/ui';\n</script>\n\n<Drawer.Root bind:open={drawerOpen}>\n  <Drawer.Trigger>\n    <Button>Open Drawer</Button>\n  </Drawer.Trigger>\n  <Drawer.Content side=\"right\">\n    <Drawer.Header>Settings</Drawer.Header>\n    <p>Drawer body content.</p>\n  </Drawer.Content>\n</Drawer.Root>"
     },
     "Popover": {
       "component": {
@@ -1387,7 +1412,12 @@
           "Button",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/popover",
+      "rootImport": "import { Popover } from '@dryui/ui'",
+      "subpathImport": "import { Popover } from '@dryui/ui/popover'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Popover, Button } from '@dryui/ui';\n</script>\n\n<Popover.Root bind:open={popoverOpen}>\n  <Popover.Trigger>\n    <Button variant=\"outline\">Info</Button>\n  </Popover.Trigger>\n  <Popover.Content>\n    <p>Popover details here.</p>\n  </Popover.Content>\n</Popover.Root>"
     },
     "Tooltip": {
       "component": {
@@ -1546,7 +1576,12 @@
           "Kbd",
           "Toggle"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tooltip",
+      "rootImport": "import { Tooltip } from '@dryui/ui'",
+      "subpathImport": "import { Tooltip } from '@dryui/ui/tooltip'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Tooltip, Button } from '@dryui/ui';\n</script>\n\n<Tooltip.Root>\n  <Tooltip.Trigger>\n    <Button variant=\"ghost\">Hover me</Button>\n  </Tooltip.Trigger>\n  <Tooltip.Content>Extra information</Tooltip.Content>\n</Tooltip.Root>"
     },
     "DropdownMenu": {
       "component": {
@@ -1791,7 +1826,12 @@
           "Button",
           "Table.Row"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/dropdown-menu",
+      "rootImport": "import { DropdownMenu } from '@dryui/ui'",
+      "subpathImport": "import { DropdownMenu } from '@dryui/ui/dropdown-menu'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DropdownMenu, Button } from '@dryui/ui';\n</script>\n\n<DropdownMenu.Root>\n  <DropdownMenu.Trigger>\n    <Button variant=\"ghost\">Menu</Button>\n  </DropdownMenu.Trigger>\n  <DropdownMenu.Content>\n    <DropdownMenu.Item onclick={handleEdit}>Edit</DropdownMenu.Item>\n    <DropdownMenu.Item onclick={handleDelete}>Delete</DropdownMenu.Item>\n  </DropdownMenu.Content>\n</DropdownMenu.Root>"
     },
     "ContextMenu": {
       "component": {
@@ -2015,7 +2055,12 @@
           "Table.Row",
           "Tree"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/context-menu",
+      "rootImport": "import { ContextMenu } from '@dryui/ui'",
+      "subpathImport": "import { ContextMenu } from '@dryui/ui/context-menu'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ContextMenu } from '@dryui/ui';\n</script>\n\n<ContextMenu.Root>\n  <ContextMenu.Trigger>...</ContextMenu.Trigger>\n  <ContextMenu.Content>...</ContextMenu.Content>\n  <ContextMenu.Item>...</ContextMenu.Item>\n  <ContextMenu.Separator>...</ContextMenu.Separator>\n  <ContextMenu.Group>...</ContextMenu.Group>\n  <ContextMenu.Label>...</ContextMenu.Label>\n</ContextMenu.Root>"
     },
     "Accordion": {
       "component": {
@@ -2228,7 +2273,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/accordion",
+      "rootImport": "import { Accordion } from '@dryui/ui'",
+      "subpathImport": "import { Accordion } from '@dryui/ui/accordion'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Accordion } from '@dryui/ui';\n</script>\n\n<Accordion.Root>\n  <Accordion.Item value=\"a\">\n    <Accordion.Trigger>Section A</Accordion.Trigger>\n    <Accordion.Content>Content for section A.</Accordion.Content>\n  </Accordion.Item>\n  <Accordion.Item value=\"b\">\n    <Accordion.Trigger>Section B</Accordion.Trigger>\n    <Accordion.Content>Content for section B.</Accordion.Content>\n  </Accordion.Item>\n</Accordion.Root>"
     },
     "Collapsible": {
       "component": {
@@ -2385,7 +2435,12 @@
         "combinesWith": [
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/collapsible",
+      "rootImport": "import { Collapsible } from '@dryui/ui'",
+      "subpathImport": "import { Collapsible } from '@dryui/ui/collapsible'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Collapsible } from '@dryui/ui';\n</script>\n\n<Collapsible.Root>\n  <Collapsible.Trigger>...</Collapsible.Trigger>\n  <Collapsible.Content>...</Collapsible.Content>\n</Collapsible.Root>"
     },
     "CommandPalette": {
       "component": {
@@ -2646,7 +2701,12 @@
           "Hotkey",
           "Dialog"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/command-palette",
+      "rootImport": "import { CommandPalette } from '@dryui/ui'",
+      "subpathImport": "import { CommandPalette } from '@dryui/ui/command-palette'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { CommandPalette } from '@dryui/ui';\n</script>\n\n<CommandPalette.Root>\n  <CommandPalette.Input>...</CommandPalette.Input>\n  <CommandPalette.List>...</CommandPalette.List>\n  <CommandPalette.Group>...</CommandPalette.Group>\n  <CommandPalette.Item>...</CommandPalette.Item>\n  <CommandPalette.Empty>...</CommandPalette.Empty>\n  <CommandPalette.Separator>...</CommandPalette.Separator>\n</CommandPalette.Root>"
     },
     "Label": {
       "component": {
@@ -2737,7 +2797,12 @@
           "Checkbox",
           "Toggle"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/label",
+      "rootImport": "import { Label } from '@dryui/ui'",
+      "subpathImport": "import { Label } from '@dryui/ui/label'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Label } from '@dryui/ui';\n</script>\n\n<Label>Content</Label>"
     },
     "Field": {
       "component": {
@@ -2912,7 +2977,12 @@
           "Select",
           "Checkbox"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/field",
+      "rootImport": "import { Field } from '@dryui/ui'",
+      "subpathImport": "import { Field } from '@dryui/ui/field'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Field, Label, Input } from '@dryui/ui';\n</script>\n\n<Field.Root>\n  <Label>Username</Label>\n  <Input bind:value={username} />\n</Field.Root>"
     },
     "Fieldset": {
       "component": {
@@ -3052,7 +3122,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/fieldset",
+      "rootImport": "import { Fieldset } from '@dryui/ui'",
+      "subpathImport": "import { Fieldset } from '@dryui/ui/fieldset'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Fieldset, Checkbox } from '@dryui/ui';\n</script>\n\n<Fieldset.Root>\n  <Fieldset.Legend>Notification preferences</Fieldset.Legend>\n  <Fieldset.Description>Choose how release updates reach your team.</Fieldset.Description>\n  <Fieldset.Content>\n    <Checkbox checked={true}>Email digests</Checkbox>\n    <Checkbox>SMS alerts</Checkbox>\n  </Fieldset.Content>\n</Fieldset.Root>"
     },
     "Textarea": {
       "component": {
@@ -3157,7 +3232,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/textarea",
+      "rootImport": "import { Textarea } from '@dryui/ui'",
+      "subpathImport": "import { Textarea } from '@dryui/ui/textarea'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Textarea } from '@dryui/ui';\n</script>\n\n<Textarea bind:value={message} placeholder=\"Write a message…\" />"
     },
     "PromptInput": {
       "component": {
@@ -3290,7 +3370,12 @@
         "combinesWith": [
           "ChatThread"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/prompt-input",
+      "rootImport": "import { PromptInput } from '@dryui/ui'",
+      "subpathImport": "import { PromptInput } from '@dryui/ui/prompt-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PromptInput } from '@dryui/ui';\n</script>\n\n<PromptInput>Content</PromptInput>"
     },
     "NumberInput": {
       "component": {
@@ -3419,7 +3504,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/number-input",
+      "rootImport": "import { NumberInput } from '@dryui/ui'",
+      "subpathImport": "import { NumberInput } from '@dryui/ui/number-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { NumberInput } from '@dryui/ui';\n</script>\n\n<NumberInput bind:value={quantity} min={0} max={100} step={1} size=\"sm\" />"
     },
     "Checkbox": {
       "component": {
@@ -3525,7 +3615,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/checkbox",
+      "rootImport": "import { Checkbox } from '@dryui/ui'",
+      "subpathImport": "import { Checkbox } from '@dryui/ui/checkbox'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Checkbox } from '@dryui/ui';\n</script>\n\n<Checkbox bind:checked={agreed}>I agree to the terms</Checkbox>"
     },
     "RadioGroup": {
       "component": {
@@ -3694,7 +3789,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/radio-group",
+      "rootImport": "import { RadioGroup } from '@dryui/ui'",
+      "subpathImport": "import { RadioGroup } from '@dryui/ui/radio-group'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RadioGroup } from '@dryui/ui';\n</script>\n\n<RadioGroup.Root>\n  <RadioGroup.Item>...</RadioGroup.Item>\n</RadioGroup.Root>"
     },
     "Select": {
       "component": {
@@ -3992,7 +4092,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/select",
+      "rootImport": "import { Select } from '@dryui/ui'",
+      "subpathImport": "import { Select } from '@dryui/ui/select'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Select } from '@dryui/ui';\n</script>\n\n<Select.Root bind:value={selected} bind:open={selectOpen} name=\"selection\">\n  <Select.Trigger>\n    <Select.Value placeholder=\"Choose…\" />\n  </Select.Trigger>\n  <Select.Content>\n    <Select.Item value=\"a\">Alpha</Select.Item>\n    <Select.Item value=\"b\">Beta</Select.Item>\n  </Select.Content>\n</Select.Root>"
     },
     "MultiSelectCombobox": {
       "component": {
@@ -4420,7 +4525,12 @@
           "Avatar",
           "Badge"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/multi-select-combobox",
+      "rootImport": "import { MultiSelectCombobox } from '@dryui/ui'",
+      "subpathImport": "import { MultiSelectCombobox } from '@dryui/ui/multi-select-combobox'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MultiSelectCombobox } from '@dryui/ui';\n</script>\n\n<MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name=\"frameworks\">\n  <MultiSelectCombobox.SelectionList>\n    {#each selectedFrameworks as framework}\n      <MultiSelectCombobox.SelectionItem value={framework}>\n        {framework}\n        <MultiSelectCombobox.SelectionRemove value={framework} />\n      </MultiSelectCombobox.SelectionItem>\n    {/each}\n  </MultiSelectCombobox.SelectionList>\n  <MultiSelectCombobox.Input placeholder=\"Search frameworks...\" />\n  <MultiSelectCombobox.Content>\n    <MultiSelectCombobox.Item value=\"svelte\">Svelte</MultiSelectCombobox.Item>\n    <MultiSelectCombobox.Item value=\"react\">React</MultiSelectCombobox.Item>\n  </MultiSelectCombobox.Content>\n</MultiSelectCombobox.Root>"
     },
     "SegmentedControl": {
       "component": {
@@ -4580,7 +4690,12 @@
         "combinesWith": [
           "Toolbar"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/segmented-control",
+      "rootImport": "import { SegmentedControl } from '@dryui/ui'",
+      "subpathImport": "import { SegmentedControl } from '@dryui/ui/segmented-control'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { SegmentedControl } from '@dryui/ui';\n</script>\n\n<SegmentedControl.Root bind:value={tripType}>\n  <SegmentedControl.Item value=\"one-way\">One way</SegmentedControl.Item>\n  <SegmentedControl.Item value=\"round-trip\">Round trip</SegmentedControl.Item>\n  <SegmentedControl.Item value=\"multi-city\">Multi-city</SegmentedControl.Item>\n</SegmentedControl.Root>"
     },
     "Slider": {
       "component": {
@@ -4742,7 +4857,12 @@
           "Label",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/slider",
+      "rootImport": "import { Slider } from '@dryui/ui'",
+      "subpathImport": "import { Slider } from '@dryui/ui/slider'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Slider } from '@dryui/ui';\n</script>\n\n<Slider bind:value={volume} min={0} max={100} />"
     },
     "Toggle": {
       "component": {
@@ -4864,7 +4984,12 @@
           "Label",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/toggle",
+      "rootImport": "import { Toggle } from '@dryui/ui'",
+      "subpathImport": "import { Toggle } from '@dryui/ui/toggle'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Toggle } from '@dryui/ui';\n</script>\n\n<Toggle>Content</Toggle>"
     },
     "ToggleGroup": {
       "component": {
@@ -5043,7 +5168,12 @@
         "combinesWith": [
           "Toolbar"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/toggle-group",
+      "rootImport": "import { ToggleGroup } from '@dryui/ui'",
+      "subpathImport": "import { ToggleGroup } from '@dryui/ui/toggle-group'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ToggleGroup } from '@dryui/ui';\n</script>\n\n<ToggleGroup.Root>\n  <ToggleGroup.Item>...</ToggleGroup.Item>\n</ToggleGroup.Root>"
     },
     "ThemeToggle": {
       "component": {
@@ -5174,7 +5304,12 @@
           "Sidebar",
           "Tooltip"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/theme-toggle",
+      "rootImport": "import { ThemeToggle } from '@dryui/ui'",
+      "subpathImport": "import { ThemeToggle } from '@dryui/ui/theme-toggle'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ThemeToggle } from '@dryui/ui';\n</script>\n\n<ThemeToggle storageKey=\"my-app-theme\" />"
     },
     "InputGroup": {
       "component": {
@@ -5370,7 +5505,12 @@
           "Button",
           "Select"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/input-group",
+      "rootImport": "import { InputGroup } from '@dryui/ui'",
+      "subpathImport": "import { InputGroup } from '@dryui/ui/input-group'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { InputGroup } from '@dryui/ui';\n</script>\n\n<InputGroup.Root>\n  <InputGroup.Prefix>...</InputGroup.Prefix>\n  <InputGroup.Input>...</InputGroup.Input>\n  <InputGroup.Suffix>...</InputGroup.Suffix>\n  <InputGroup.Separator>...</InputGroup.Separator>\n  <InputGroup.Action>...</InputGroup.Action>\n  <InputGroup.Select>...</InputGroup.Select>\n</InputGroup.Root>"
     },
     "OptionPicker": {
       "component": {
@@ -5594,7 +5734,12 @@
         ],
         "example": "<OptionPicker.Root>\n  <OptionPicker.Item>...</OptionPicker.Item>\n  <OptionPicker.Preview>...</OptionPicker.Preview>\n  <OptionPicker.Label>...</OptionPicker.Label>\n  <OptionPicker.Description>...</OptionPicker.Description>\n  <OptionPicker.Meta>...</OptionPicker.Meta>\n</OptionPicker.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/option-picker",
+      "rootImport": "import { OptionPicker } from '@dryui/ui'",
+      "subpathImport": "import { OptionPicker } from '@dryui/ui/option-picker'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { OptionPicker } from '@dryui/ui';\n</script>\n\n<OptionPicker.Root>\n  <OptionPicker.Item>...</OptionPicker.Item>\n  <OptionPicker.Preview>...</OptionPicker.Preview>\n  <OptionPicker.Label>...</OptionPicker.Label>\n  <OptionPicker.Description>...</OptionPicker.Description>\n  <OptionPicker.Meta>...</OptionPicker.Meta>\n</OptionPicker.Root>"
     },
     "Container": {
       "component": {
@@ -5685,7 +5830,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/container",
+      "rootImport": "import { Container } from '@dryui/ui'",
+      "subpathImport": "import { Container } from '@dryui/ui/container'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Container } from '@dryui/ui';\n</script>\n\n<Container>\n  <p>Centered content</p>\n</Container>"
     },
     "Separator": {
       "component": {
@@ -5785,7 +5935,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/separator",
+      "rootImport": "import { Separator } from '@dryui/ui'",
+      "subpathImport": "import { Separator } from '@dryui/ui/separator'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Separator } from '@dryui/ui';\n</script>\n\n<Separator />"
     },
     "Spacer": {
       "component": {
@@ -5868,7 +6023,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/spacer",
+      "rootImport": "import { Spacer } from '@dryui/ui'",
+      "subpathImport": "import { Spacer } from '@dryui/ui/spacer'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Spacer } from '@dryui/ui';\n</script>\n\n<Spacer size=\"lg\" />"
     },
     "AspectRatio": {
       "component": {
@@ -5937,7 +6097,12 @@
           "Image",
           "VideoEmbed"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/aspect-ratio",
+      "rootImport": "import { AspectRatio } from '@dryui/ui'",
+      "subpathImport": "import { AspectRatio } from '@dryui/ui/aspect-ratio'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AspectRatio } from '@dryui/ui';\n</script>\n\n<AspectRatio>Content</AspectRatio>"
     },
     "Tabs": {
       "component": {
@@ -6162,7 +6327,12 @@
         "combinesWith": [
           "Container"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tabs",
+      "rootImport": "import { Tabs } from '@dryui/ui'",
+      "subpathImport": "import { Tabs } from '@dryui/ui/tabs'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Tabs } from '@dryui/ui';\n</script>\n\n<Tabs.Root bind:value={activeTab}>\n  <Tabs.List>\n    <Tabs.Trigger value=\"one\">Tab 1</Tabs.Trigger>\n    <Tabs.Trigger value=\"two\">Tab 2</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value=\"one\">First panel</Tabs.Content>\n  <Tabs.Content value=\"two\">Second panel</Tabs.Content>\n</Tabs.Root>"
     },
     "Breadcrumb": {
       "component": {
@@ -6347,7 +6517,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/breadcrumb",
+      "rootImport": "import { Breadcrumb } from '@dryui/ui'",
+      "subpathImport": "import { Breadcrumb } from '@dryui/ui/breadcrumb'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Breadcrumb } from '@dryui/ui';\n</script>\n\n<Breadcrumb.Root>\n  <Breadcrumb.List>\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href=\"/\">Home</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href=\"/docs\">Docs</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link current>Current</Breadcrumb.Link>\n    </Breadcrumb.Item>\n  </Breadcrumb.List>\n</Breadcrumb.Root>"
     },
     "Pagination": {
       "component": {
@@ -6561,7 +6736,12 @@
           "Table",
           "Container"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/pagination",
+      "rootImport": "import { Pagination } from '@dryui/ui'",
+      "subpathImport": "import { Pagination } from '@dryui/ui/pagination'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Pagination } from '@dryui/ui';\n</script>\n\n<Pagination.Root>\n  <Pagination.Content>...</Pagination.Content>\n  <Pagination.Item>...</Pagination.Item>\n  <Pagination.Previous>...</Pagination.Previous>\n  <Pagination.Next>...</Pagination.Next>\n  <Pagination.Link>...</Pagination.Link>\n  <Pagination.Ellipsis>...</Pagination.Ellipsis>\n</Pagination.Root>"
     },
     "Stepper": {
       "component": {
@@ -6775,7 +6955,12 @@
         "combinesWith": [
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/stepper",
+      "rootImport": "import { Stepper } from '@dryui/ui'",
+      "subpathImport": "import { Stepper } from '@dryui/ui/stepper'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Stepper } from '@dryui/ui';\n</script>\n\n<Stepper.Root bind:activeStep={activeStep}>\n  <Stepper.List>\n    <Stepper.Step step={0}>Account</Stepper.Step>\n    <Stepper.Separator step={0} />\n    <Stepper.Step step={1}>Profile</Stepper.Step>\n    <Stepper.Separator step={1} />\n    <Stepper.Step step={2}>Review</Stepper.Step>\n  </Stepper.List>\n</Stepper.Root>"
     },
     "Toolbar": {
       "component": {
@@ -6948,7 +7133,12 @@
           "Separator",
           "RichTextEditor"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/toolbar",
+      "rootImport": "import { Toolbar } from '@dryui/ui'",
+      "subpathImport": "import { Toolbar } from '@dryui/ui/toolbar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Toolbar } from '@dryui/ui';\n</script>\n\n<Toolbar.Root>\n  <Toolbar.Button>...</Toolbar.Button>\n  <Toolbar.Separator>...</Toolbar.Separator>\n  <Toolbar.Link>...</Toolbar.Link>\n</Toolbar.Root>"
     },
     "Menubar": {
       "component": {
@@ -7183,7 +7373,12 @@
           "Kbd",
           "Separator"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/menubar",
+      "rootImport": "import { Menubar } from '@dryui/ui'",
+      "subpathImport": "import { Menubar } from '@dryui/ui/menubar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Menubar } from '@dryui/ui';\n</script>\n\n<Menubar.Root>\n  <Menubar.Menu>...</Menubar.Menu>\n  <Menubar.Trigger>...</Menubar.Trigger>\n  <Menubar.Content>...</Menubar.Content>\n  <Menubar.Item>...</Menubar.Item>\n  <Menubar.Separator>...</Menubar.Separator>\n  <Menubar.Label>...</Menubar.Label>\n</Menubar.Root>"
     },
     "NavigationMenu": {
       "component": {
@@ -7398,7 +7593,12 @@
         "combinesWith": [
           "Link"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/navigation-menu",
+      "rootImport": "import { NavigationMenu } from '@dryui/ui'",
+      "subpathImport": "import { NavigationMenu } from '@dryui/ui/navigation-menu'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { NavigationMenu } from '@dryui/ui';\n</script>\n\n<NavigationMenu.Root>\n  <NavigationMenu.List>...</NavigationMenu.List>\n  <NavigationMenu.Item>...</NavigationMenu.Item>\n  <NavigationMenu.Trigger>...</NavigationMenu.Trigger>\n  <NavigationMenu.Content>...</NavigationMenu.Content>\n  <NavigationMenu.Link>...</NavigationMenu.Link>\n</NavigationMenu.Root>"
     },
     "Sidebar": {
       "component": {
@@ -7682,7 +7882,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/sidebar",
+      "rootImport": "import { Sidebar } from '@dryui/ui'",
+      "subpathImport": "import { Sidebar } from '@dryui/ui/sidebar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Sidebar } from '@dryui/ui';\n</script>\n\n<Sidebar.Root>\n  <Sidebar.Header>...</Sidebar.Header>\n  <Sidebar.Content>...</Sidebar.Content>\n  <Sidebar.Footer>...</Sidebar.Footer>\n  <Sidebar.Group>...</Sidebar.Group>\n  <Sidebar.GroupLabel>...</Sidebar.GroupLabel>\n  <Sidebar.Item>...</Sidebar.Item>\n  <Sidebar.Trigger>...</Sidebar.Trigger>\n</Sidebar.Root>"
     },
     "TableOfContents": {
       "component": {
@@ -7827,7 +8032,12 @@
           "ScrollArea",
           "Sidebar"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/table-of-contents",
+      "rootImport": "import { TableOfContents } from '@dryui/ui'",
+      "subpathImport": "import { TableOfContents } from '@dryui/ui/table-of-contents'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TableOfContents } from '@dryui/ui';\n</script>\n\n<TableOfContents.Root>\n  <TableOfContents.List>...</TableOfContents.List>\n  <TableOfContents.Item>...</TableOfContents.Item>\n</TableOfContents.Root>"
     },
     "Link": {
       "component": {
@@ -7924,7 +8134,12 @@
           "Text",
           "Breadcrumb"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/link",
+      "rootImport": "import { Link } from '@dryui/ui'",
+      "subpathImport": "import { Link } from '@dryui/ui/link'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Link } from '@dryui/ui';\n</script>\n\n<Link>Content</Link>"
     },
     "ScrollArea": {
       "component": {
@@ -8009,7 +8224,12 @@
           "List",
           "Sidebar"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/scroll-area",
+      "rootImport": "import { ScrollArea } from '@dryui/ui'",
+      "subpathImport": "import { ScrollArea } from '@dryui/ui/scroll-area'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ScrollArea } from '@dryui/ui';\n</script>\n\n<ScrollArea>Content</ScrollArea>"
     },
     "Splitter": {
       "component": {
@@ -8164,7 +8384,12 @@
         "combinesWith": [
           "ScrollArea"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/splitter",
+      "rootImport": "import { Splitter } from '@dryui/ui'",
+      "subpathImport": "import { Splitter } from '@dryui/ui/splitter'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Splitter } from '@dryui/ui';\n</script>\n\n<Splitter.Root>\n  <Splitter.Panel>...</Splitter.Panel>\n  <Splitter.Handle>...</Splitter.Handle>\n</Splitter.Root>"
     },
     "Table": {
       "component": {
@@ -8437,7 +8662,12 @@
           "Button",
           "Container"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/table",
+      "rootImport": "import { Table } from '@dryui/ui'",
+      "subpathImport": "import { Table } from '@dryui/ui/table'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Table, Badge } from '@dryui/ui';\n</script>\n\n<Table.Root>\n  <Table.Header>\n    <Table.Row>\n      <Table.Head>Name</Table.Head>\n      <Table.Head>Status</Table.Head>\n    </Table.Row>\n  </Table.Header>\n  <Table.Body>\n    <Table.Row>\n      <Table.Cell>Alice</Table.Cell>\n      <Table.Cell><Badge variant=\"soft\">Active</Badge></Table.Cell>\n    </Table.Row>\n  </Table.Body>\n</Table.Root>"
     },
     "Avatar": {
       "component": {
@@ -8591,7 +8821,12 @@
           "Text",
           "Table.Cell"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/avatar",
+      "rootImport": "import { Avatar } from '@dryui/ui'",
+      "subpathImport": "import { Avatar } from '@dryui/ui/avatar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Avatar } from '@dryui/ui';\n</script>\n\n<Avatar src=\"/avatar.jpg\" alt=\"Jane\" fallback=\"JD\" />"
     },
     "Badge": {
       "component": {
@@ -8717,7 +8952,12 @@
           "Table.Cell",
           "Avatar"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/badge",
+      "rootImport": "import { Badge } from '@dryui/ui'",
+      "subpathImport": "import { Badge } from '@dryui/ui/badge'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Badge } from '@dryui/ui';\n</script>\n\n<Badge variant=\"soft\">Active</Badge>"
     },
     "Chart": {
       "component": {
@@ -9085,7 +9325,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chart",
+      "rootImport": "import { Chart } from '@dryui/ui'",
+      "subpathImport": "import { Chart } from '@dryui/ui/chart'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Chart } from '@dryui/ui';\n</script>\n\n<Chart.Root>\n  <Chart.Bars>...</Chart.Bars>\n  <Chart.Line>...</Chart.Line>\n  <Chart.Area>...</Chart.Area>\n  <Chart.Donut>...</Chart.Donut>\n  <Chart.StackedBar>...</Chart.StackedBar>\n  <Chart.HorizontalBar>...</Chart.HorizontalBar>\n  <Chart.XAxis>...</Chart.XAxis>\n  <Chart.YAxis>...</Chart.YAxis>\n</Chart.Root>"
     },
     "AppFrame": {
       "component": {
@@ -9146,7 +9391,12 @@
         ],
         "example": "<AppFrame>Content</AppFrame>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/app-frame",
+      "rootImport": "import { AppFrame } from '@dryui/ui'",
+      "subpathImport": "import { AppFrame } from '@dryui/ui/app-frame'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AppFrame } from '@dryui/ui';\n</script>\n\n<AppFrame>Content</AppFrame>"
     },
     "ChatThread": {
       "component": {
@@ -9230,7 +9480,12 @@
           "PromptInput",
           "TypingIndicator"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chat-thread",
+      "rootImport": "import { ChatThread } from '@dryui/ui'",
+      "subpathImport": "import { ChatThread } from '@dryui/ui/chat-thread'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ChatThread, ChatMessage } from '@dryui/ui';\n</script>\n\n<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>"
     },
     "TypingIndicator": {
       "component": {
@@ -9290,7 +9545,12 @@
         "combinesWith": [
           "ChatThread"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/typing-indicator",
+      "rootImport": "import { TypingIndicator } from '@dryui/ui'",
+      "subpathImport": "import { TypingIndicator } from '@dryui/ui/typing-indicator'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TypingIndicator } from '@dryui/ui';\n</script>\n\n<TypingIndicator aria-label=\"Assistant is typing\" />"
     },
     "Icon": {
       "component": {
@@ -9374,7 +9634,12 @@
         ],
         "example": "<Icon>Content</Icon>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/icon",
+      "rootImport": "import { Icon } from '@dryui/ui'",
+      "subpathImport": "import { Icon } from '@dryui/ui/icon'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Icon } from '@dryui/ui';\n</script>\n\n<Icon>Content</Icon>"
     },
     "Image": {
       "component": {
@@ -9443,7 +9708,12 @@
           "AspectRatio",
           "Carousel"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/image",
+      "rootImport": "import { Image } from '@dryui/ui'",
+      "subpathImport": "import { Image } from '@dryui/ui/image'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Image } from '@dryui/ui';\n</script>\n\n<Image>Content</Image>"
     },
     "Kbd": {
       "component": {
@@ -9514,7 +9784,12 @@
           "Text",
           "DropdownMenu"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/kbd",
+      "rootImport": "import { Kbd } from '@dryui/ui'",
+      "subpathImport": "import { Kbd } from '@dryui/ui/kbd'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Kbd } from '@dryui/ui';\n</script>\n\n<Kbd>Content</Kbd>"
     },
     "LinkPreview": {
       "component": {
@@ -9670,7 +9945,12 @@
           "Link",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/link-preview",
+      "rootImport": "import { LinkPreview } from '@dryui/ui'",
+      "subpathImport": "import { LinkPreview } from '@dryui/ui/link-preview'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { LinkPreview } from '@dryui/ui';\n</script>\n\n<LinkPreview.Root>\n  <LinkPreview.Trigger>...</LinkPreview.Trigger>\n  <LinkPreview.Content>...</LinkPreview.Content>\n</LinkPreview.Root>"
     },
     "List": {
       "component": {
@@ -9926,7 +10206,12 @@
           "ScrollArea",
           "Avatar"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/list",
+      "rootImport": "import { List } from '@dryui/ui'",
+      "subpathImport": "import { List } from '@dryui/ui/list'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { List } from '@dryui/ui';\n</script>\n\n<List.Root>\n  <List.Item>...</List.Item>\n  <List.ItemIcon>...</List.ItemIcon>\n  <List.ItemText>...</List.ItemText>\n  <List.Subheader>...</List.Subheader>\n</List.Root>"
     },
     "Timeline": {
       "component": {
@@ -10185,7 +10470,12 @@
           "Badge",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/timeline",
+      "rootImport": "import { Timeline } from '@dryui/ui'",
+      "subpathImport": "import { Timeline } from '@dryui/ui/timeline'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Timeline } from '@dryui/ui';\n</script>\n\n<Timeline.Root>\n  <Timeline.Item>\n    <Timeline.Icon />\n    <Timeline.Content>\n      <Timeline.Title>Event title</Timeline.Title>\n      <Timeline.Description>Event description</Timeline.Description>\n      <Timeline.Time>2 hours ago</Timeline.Time>\n    </Timeline.Content>\n  </Timeline.Item>\n</Timeline.Root>"
     },
     "Typography": {
       "component": {
@@ -10446,7 +10736,12 @@
         "combinesWith": [
           "Container"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/typography",
+      "rootImport": "import { Typography } from '@dryui/ui'",
+      "subpathImport": "import { Typography } from '@dryui/ui/typography'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Typography } from '@dryui/ui';\n</script>\n\n<Typography.Heading level={2}>Launch readiness</Typography.Heading>\n<Typography.Text color=\"muted\" size=\"sm\">Use Typography.Text for supporting copy and metadata.</Typography.Text>"
     },
     "Heading": {
       "component": {
@@ -10568,7 +10863,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/heading",
+      "rootImport": "import { Heading } from '@dryui/ui'",
+      "subpathImport": "import { Heading } from '@dryui/ui/heading'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Heading } from '@dryui/ui';\n</script>\n\n<Heading level={2}>Launch readiness</Heading>"
     },
     "Text": {
       "component": {
@@ -10746,7 +11046,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/text",
+      "rootImport": "import { Text } from '@dryui/ui'",
+      "subpathImport": "import { Text } from '@dryui/ui/text'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Text } from '@dryui/ui';\n</script>\n\n<Text as=\"p\" color=\"secondary\" size=\"sm\">Use Text for supporting copy, labels, and starter-kit body content.</Text>"
     },
     "DescriptionList": {
       "component": {
@@ -10898,7 +11203,12 @@
         "combinesWith": [
           "Badge"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/description-list",
+      "rootImport": "import { DescriptionList } from '@dryui/ui'",
+      "subpathImport": "import { DescriptionList } from '@dryui/ui/description-list'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DescriptionList } from '@dryui/ui';\n</script>\n\n<DescriptionList.Root>\n  <DescriptionList.Item>\n    <DescriptionList.Term>Workspace</DescriptionList.Term>\n    <DescriptionList.Description>North America expansion</DescriptionList.Description>\n  </DescriptionList.Item>\n  <DescriptionList.Item>\n    <DescriptionList.Term>Status</DescriptionList.Term>\n    <DescriptionList.Description>Reviewing launch checklist</DescriptionList.Description>\n  </DescriptionList.Item>\n</DescriptionList.Root>"
     },
     "Alert": {
       "component": {
@@ -11040,7 +11350,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/alert",
+      "rootImport": "import { Alert } from '@dryui/ui'",
+      "subpathImport": "import { Alert } from '@dryui/ui/alert'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Alert } from '@dryui/ui';\n</script>\n\n<Alert variant=\"info\">\n  {#snippet description()}Your changes have been saved.{/snippet}\n</Alert>"
     },
     "Toast": {
       "component": {
@@ -11289,7 +11604,12 @@
         "combinesWith": [
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/toast",
+      "rootImport": "import { Toast } from '@dryui/ui'",
+      "subpathImport": "import { Toast } from '@dryui/ui/toast'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Toast } from '@dryui/ui';\n</script>\n\n<Toast.Root>\n  <Toast.Provider>...</Toast.Provider>\n  <Toast.Title>...</Toast.Title>\n  <Toast.Description>...</Toast.Description>\n  <Toast.Close>...</Toast.Close>\n  <Toast.Action>...</Toast.Action>\n</Toast.Root>"
     },
     "Progress": {
       "component": {
@@ -11444,7 +11764,12 @@
         "combinesWith": [
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/progress",
+      "rootImport": "import { Progress } from '@dryui/ui'",
+      "subpathImport": "import { Progress } from '@dryui/ui/progress'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Progress } from '@dryui/ui';\n</script>\n\n<Progress value={65} max={100} />"
     },
     "Skeleton": {
       "component": {
@@ -11533,7 +11858,12 @@
         "combinesWith": [
           "Table.Cell"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/skeleton",
+      "rootImport": "import { Skeleton } from '@dryui/ui'",
+      "subpathImport": "import { Skeleton } from '@dryui/ui/skeleton'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Skeleton } from '@dryui/ui';\n</script>\n\n<Skeleton width=\"200px\" height=\"1rem\" />"
     },
     "Spinner": {
       "component": {
@@ -11635,7 +11965,12 @@
           "Button",
           "Backdrop"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/spinner",
+      "rootImport": "import { Spinner } from '@dryui/ui'",
+      "subpathImport": "import { Spinner } from '@dryui/ui/spinner'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Spinner } from '@dryui/ui';\n</script>\n\n<Spinner size=\"md\" />"
     },
     "Combobox": {
       "component": {
@@ -11978,7 +12313,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/combobox",
+      "rootImport": "import { Combobox } from '@dryui/ui'",
+      "subpathImport": "import { Combobox } from '@dryui/ui/combobox'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Combobox } from '@dryui/ui';\n</script>\n\n<Combobox.Root bind:value={selectedFramework} name=\"framework\">\n  <Combobox.Input placeholder=\"Search frameworks...\" />\n  <Combobox.Content>\n    <Combobox.Item value=\"svelte\" index={0}>Svelte</Combobox.Item>\n    <Combobox.Item value=\"react\" index={1}>React</Combobox.Item>\n  </Combobox.Content>\n</Combobox.Root>"
     },
     "DateField": {
       "component": {
@@ -12186,7 +12526,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/date-field",
+      "rootImport": "import { DateField } from '@dryui/ui'",
+      "subpathImport": "import { DateField } from '@dryui/ui/date-field'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateField } from '@dryui/ui';\n</script>\n\n<DateField.Root bind:value={departureDate} name=\"departureDate\">\n  <DateField.Segment type=\"month\" />\n  <DateField.Separator />\n  <DateField.Segment type=\"day\" />\n  <DateField.Separator />\n  <DateField.Segment type=\"year\" />\n</DateField.Root>"
     },
     "DatePicker": {
       "component": {
@@ -12451,7 +12796,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/date-picker",
+      "rootImport": "import { DatePicker } from '@dryui/ui'",
+      "subpathImport": "import { DatePicker } from '@dryui/ui/date-picker'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DatePicker } from '@dryui/ui';\n</script>\n\n<DatePicker.Root bind:value={departureDate} name=\"departureDate\">\n  <DatePicker.Trigger placeholder=\"Select departure date\" />\n  <DatePicker.Content>\n    <DatePicker.Calendar />\n  </DatePicker.Content>\n</DatePicker.Root>"
     },
     "Calendar": {
       "component": {
@@ -12852,7 +13202,12 @@
         ],
         "antiPatterns": [],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/calendar",
+      "rootImport": "import { Calendar } from '@dryui/ui'",
+      "subpathImport": "import { Calendar } from '@dryui/ui/calendar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Calendar } from '@dryui/ui';\n</script>\n\n<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Week>...</Calendar.Week>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n  <Calendar.EventLegend>...</Calendar.EventLegend>\n</Calendar.Root>"
     },
     "DateRangePicker": {
       "component": {
@@ -13155,7 +13510,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/date-range-picker",
+      "rootImport": "import { DateRangePicker } from '@dryui/ui'",
+      "subpathImport": "import { DateRangePicker } from '@dryui/ui/date-range-picker'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateRangePicker } from '@dryui/ui';\n</script>\n\n<DateRangePicker.Root>\n  <DateRangePicker.Trigger>...</DateRangePicker.Trigger>\n  <DateRangePicker.Content>...</DateRangePicker.Content>\n  <DateRangePicker.Calendar>...</DateRangePicker.Calendar>\n  <DateRangePicker.Preset>...</DateRangePicker.Preset>\n</DateRangePicker.Root>"
     },
     "Listbox": {
       "component": {
@@ -13310,7 +13670,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/listbox",
+      "rootImport": "import { Listbox } from '@dryui/ui'",
+      "subpathImport": "import { Listbox } from '@dryui/ui/listbox'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Listbox } from '@dryui/ui';\n</script>\n\n<Listbox.Root>\n  <Listbox.Item>...</Listbox.Item>\n</Listbox.Root>"
     },
     "LogoMark": {
       "component": {
@@ -13410,7 +13775,12 @@
         ],
         "example": "<LogoMark>Content</LogoMark>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/logo-mark",
+      "rootImport": "import { LogoMark } from '@dryui/ui'",
+      "subpathImport": "import { LogoMark } from '@dryui/ui/logo-mark'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { LogoMark } from '@dryui/ui';\n</script>\n\n<LogoMark>Content</LogoMark>"
     },
     "PinInput": {
       "component": {
@@ -13712,7 +14082,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/pin-input",
+      "rootImport": "import { PinInput } from '@dryui/ui'",
+      "subpathImport": "import { PinInput } from '@dryui/ui/pin-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PinInput } from '@dryui/ui';\n</script>\n\n<PinInput.Root bind:value={pin} length={6} oncomplete={handleVerify}>\n  {#snippet children({ cells })}\n    <PinInput.Group>\n      {#each cells.slice(0, 3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n    <PinInput.Separator />\n    <PinInput.Group>\n      {#each cells.slice(3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n  {/snippet}\n</PinInput.Root>"
     },
     "RangeCalendar": {
       "component": {
@@ -13901,7 +14276,12 @@
         ],
         "antiPatterns": [],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/range-calendar",
+      "rootImport": "import { RangeCalendar } from '@dryui/ui'",
+      "subpathImport": "import { RangeCalendar } from '@dryui/ui/range-calendar'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RangeCalendar } from '@dryui/ui';\n</script>\n\n<RangeCalendar.Root>\n  <RangeCalendar.Grid>...</RangeCalendar.Grid>\n</RangeCalendar.Root>"
     },
     "Rating": {
       "component": {
@@ -14035,7 +14415,12 @@
           "Label",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/rating",
+      "rootImport": "import { Rating } from '@dryui/ui'",
+      "subpathImport": "import { Rating } from '@dryui/ui/rating'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Rating } from '@dryui/ui';\n</script>\n\n<Rating bind:value={score} />"
     },
     "TimeInput": {
       "component": {
@@ -14158,7 +14543,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/time-input",
+      "rootImport": "import { TimeInput } from '@dryui/ui'",
+      "subpathImport": "import { TimeInput } from '@dryui/ui/time-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TimeInput } from '@dryui/ui';\n</script>\n\n<TimeInput>Content</TimeInput>"
     },
     "TagsInput": {
       "component": {
@@ -14386,7 +14776,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tags-input",
+      "rootImport": "import { TagsInput } from '@dryui/ui'",
+      "subpathImport": "import { TagsInput } from '@dryui/ui/tags-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TagsInput } from '@dryui/ui';\n</script>\n\n<TagsInput.Root>\n  <TagsInput.Input>...</TagsInput.Input>\n  <TagsInput.Tag>...</TagsInput.Tag>\n  <TagsInput.TagDelete>...</TagsInput.TagDelete>\n  <TagsInput.List>...</TagsInput.List>\n</TagsInput.Root>"
     },
     "FileUpload": {
       "component": {
@@ -14672,7 +15067,12 @@
           "Progress",
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/file-upload",
+      "rootImport": "import { FileUpload } from '@dryui/ui'",
+      "subpathImport": "import { FileUpload } from '@dryui/ui/file-upload'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileUpload } from '@dryui/ui';\n</script>\n\n<FileUpload.Root>\n  <FileUpload.Dropzone>...</FileUpload.Dropzone>\n  <FileUpload.Trigger>...</FileUpload.Trigger>\n  <FileUpload.List>...</FileUpload.List>\n  <FileUpload.Item>...</FileUpload.Item>\n  <FileUpload.ItemDelete>...</FileUpload.ItemDelete>\n</FileUpload.Root>"
     },
     "FileSelect": {
       "component": {
@@ -14873,7 +15273,12 @@
           "Label",
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/file-select",
+      "rootImport": "import { FileSelect } from '@dryui/ui'",
+      "subpathImport": "import { FileSelect } from '@dryui/ui/file-select'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FileSelect } from '@dryui/ui';\n</script>\n\n<FileSelect.Root>\n  <FileSelect.Trigger>...</FileSelect.Trigger>\n  <FileSelect.Value>...</FileSelect.Value>\n  <FileSelect.Clear>...</FileSelect.Clear>\n</FileSelect.Root>"
     },
     "ColorPicker": {
       "component": {
@@ -15174,7 +15579,12 @@
           "Label",
           "Popover"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/color-picker",
+      "rootImport": "import { ColorPicker } from '@dryui/ui'",
+      "subpathImport": "import { ColorPicker } from '@dryui/ui/color-picker'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ColorPicker } from '@dryui/ui';\n</script>\n\n<ColorPicker.Root>\n  <ColorPicker.Area>...</ColorPicker.Area>\n  <ColorPicker.HueSlider>...</ColorPicker.HueSlider>\n  <ColorPicker.AlphaSlider>...</ColorPicker.AlphaSlider>\n  <ColorPicker.Input>...</ColorPicker.Input>\n  <ColorPicker.Swatch>...</ColorPicker.Swatch>\n  <ColorPicker.EyeDropper>...</ColorPicker.EyeDropper>\n  <ColorPicker.ChannelInput>...</ColorPicker.ChannelInput>\n</ColorPicker.Root>"
     },
     "Portal": {
       "component": {
@@ -15239,7 +15649,12 @@
           "FocusTrap",
           "Backdrop"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/portal",
+      "rootImport": "import { Portal } from '@dryui/ui'",
+      "subpathImport": "import { Portal } from '@dryui/ui/portal'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Portal } from '@dryui/ui';\n</script>\n\n<Portal>Content</Portal>"
     },
     "VisuallyHidden": {
       "component": {
@@ -15306,7 +15721,12 @@
           "Button",
           "Link"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/visually-hidden",
+      "rootImport": "import { VisuallyHidden } from '@dryui/ui'",
+      "subpathImport": "import { VisuallyHidden } from '@dryui/ui/visually-hidden'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { VisuallyHidden } from '@dryui/ui';\n</script>\n\n<VisuallyHidden>Content</VisuallyHidden>"
     },
     "FocusTrap": {
       "component": {
@@ -15389,7 +15809,12 @@
         "combinesWith": [
           "Portal"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/focus-trap",
+      "rootImport": "import { FocusTrap } from '@dryui/ui'",
+      "subpathImport": "import { FocusTrap } from '@dryui/ui/focus-trap'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FocusTrap } from '@dryui/ui';\n</script>\n\n<FocusTrap>Content</FocusTrap>"
     },
     "Clipboard": {
       "component": {
@@ -15473,7 +15898,12 @@
           "Input",
           "Tooltip"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/clipboard",
+      "rootImport": "import { Clipboard } from '@dryui/ui'",
+      "subpathImport": "import { Clipboard } from '@dryui/ui/clipboard'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Clipboard } from '@dryui/ui';\n</script>\n\n<Clipboard>Content</Clipboard>"
     },
     "Hotkey": {
       "component": {
@@ -15536,7 +15966,12 @@
           "Kbd",
           "Dialog"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/hotkey",
+      "rootImport": "import { Hotkey } from '@dryui/ui'",
+      "subpathImport": "import { Hotkey } from '@dryui/ui/hotkey'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Hotkey } from '@dryui/ui';\n</script>\n\n<Hotkey>Content</Hotkey>"
     },
     "ScrollToTop": {
       "component": {
@@ -15623,7 +16058,12 @@
         "combinesWith": [
           "Container"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/scroll-to-top",
+      "rootImport": "import { ScrollToTop } from '@dryui/ui'",
+      "subpathImport": "import { ScrollToTop } from '@dryui/ui/scroll-to-top'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ScrollToTop } from '@dryui/ui';\n</script>\n\n<ScrollToTop>Content</ScrollToTop>"
     },
     "Reveal": {
       "component": {
@@ -15759,7 +16199,12 @@
         "combinesWith": [
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/reveal",
+      "rootImport": "import { Reveal } from '@dryui/ui'",
+      "subpathImport": "import { Reveal } from '@dryui/ui/reveal'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Reveal } from '@dryui/ui';\n</script>\n\n<Reveal variant=\"slide-up\" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>"
     },
     "Spotlight": {
       "component": {
@@ -15875,7 +16320,12 @@
         "combinesWith": [
           "Reveal"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/spotlight",
+      "rootImport": "import { Spotlight } from '@dryui/ui'",
+      "subpathImport": "import { Spotlight } from '@dryui/ui/spotlight'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Spotlight } from '@dryui/ui';\n</script>\n\n<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>"
     },
     "Aurora": {
       "component": {
@@ -16037,7 +16487,12 @@
           "Reveal",
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/aurora",
+      "rootImport": "import { Aurora } from '@dryui/ui'",
+      "subpathImport": "import { Aurora } from '@dryui/ui/aurora'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Aurora } from '@dryui/ui';\n</script>\n\n<Aurora palette=\"ocean\">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>"
     },
     "Noise": {
       "component": {
@@ -16168,7 +16623,12 @@
           "Container",
           "Reveal"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/noise",
+      "rootImport": "import { Noise } from '@dryui/ui'",
+      "subpathImport": "import { Noise } from '@dryui/ui/noise'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Noise } from '@dryui/ui';\n</script>\n\n<Noise opacity={0.12} blend=\"soft-light\">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>"
     },
     "FloatButton": {
       "component": {
@@ -16334,7 +16794,12 @@
         "combinesWith": [
           "Tooltip"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/float-button",
+      "rootImport": "import { FloatButton } from '@dryui/ui'",
+      "subpathImport": "import { FloatButton } from '@dryui/ui/float-button'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FloatButton } from '@dryui/ui';\n</script>\n\n<FloatButton.Root>\n  <FloatButton.Trigger>...</FloatButton.Trigger>\n  <FloatButton.Action>...</FloatButton.Action>\n</FloatButton.Root>"
     },
     "Marquee": {
       "component": {
@@ -16456,7 +16921,12 @@
           "Text",
           "Badge"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/marquee",
+      "rootImport": "import { Marquee } from '@dryui/ui'",
+      "subpathImport": "import { Marquee } from '@dryui/ui/marquee'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Marquee } from '@dryui/ui';\n</script>\n\n<Marquee>Content</Marquee>"
     },
     "QRCode": {
       "component": {
@@ -16559,7 +17029,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/qr-code",
+      "rootImport": "import { QRCode } from '@dryui/ui'",
+      "subpathImport": "import { QRCode } from '@dryui/ui/qr-code'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { QRCode } from '@dryui/ui';\n</script>\n\n<QRCode>Content</QRCode>"
     },
     "CodeBlock": {
       "component": {
@@ -16698,7 +17173,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/code-block",
+      "rootImport": "import { CodeBlock } from '@dryui/ui'",
+      "subpathImport": "import { CodeBlock } from '@dryui/ui/code-block'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { CodeBlock } from '@dryui/ui';\n</script>\n\n<CodeBlock>Content</CodeBlock>"
     },
     "MarkdownRenderer": {
       "component": {
@@ -16781,7 +17261,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/markdown-renderer",
+      "rootImport": "import { MarkdownRenderer } from '@dryui/ui'",
+      "subpathImport": "import { MarkdownRenderer } from '@dryui/ui/markdown-renderer'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MarkdownRenderer } from '@dryui/ui';\n</script>\n\n<MarkdownRenderer>Content</MarkdownRenderer>"
     },
     "VirtualList": {
       "component": {
@@ -16880,7 +17365,12 @@
           "List",
           "ScrollArea"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/virtual-list",
+      "rootImport": "import { VirtualList } from '@dryui/ui'",
+      "subpathImport": "import { VirtualList } from '@dryui/ui/virtual-list'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { VirtualList } from '@dryui/ui';\n</script>\n\n<VirtualList>Content</VirtualList>"
     },
     "InfiniteScroll": {
       "component": {
@@ -17002,7 +17492,12 @@
           "List",
           "Spinner"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/infinite-scroll",
+      "rootImport": "import { InfiniteScroll } from '@dryui/ui'",
+      "subpathImport": "import { InfiniteScroll } from '@dryui/ui/infinite-scroll'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { InfiniteScroll } from '@dryui/ui';\n</script>\n\n<InfiniteScroll>Content</InfiniteScroll>"
     },
     "DataGrid": {
       "component": {
@@ -17466,7 +17961,12 @@
           "Button",
           "Container"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/data-grid",
+      "rootImport": "import { DataGrid } from '@dryui/ui'",
+      "subpathImport": "import { DataGrid } from '@dryui/ui/data-grid'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DataGrid } from '@dryui/ui';\n</script>\n\n<DataGrid.Root items={rows} pageSize={10}>\n  <DataGrid.Table>\n    <DataGrid.Header>\n      <DataGrid.Row>\n        <DataGrid.Column key=\"name\" sortable>Name</DataGrid.Column>\n        <DataGrid.Column key=\"status\">Status</DataGrid.Column>\n      </DataGrid.Row>\n    </DataGrid.Header>\n    <DataGrid.Body>\n      {#snippet children({ items })}\n        {#each items as row (row.id)}\n          <DataGrid.Row rowId={row.id}>\n            <DataGrid.Cell>{row.name}</DataGrid.Cell>\n            <DataGrid.Cell>{row.status}</DataGrid.Cell>\n          </DataGrid.Row>\n        {/each}\n      {/snippet}\n    </DataGrid.Body>\n  </DataGrid.Table>\n  <DataGrid.Pagination />\n</DataGrid.Root>"
     },
     "DragAndDrop": {
       "component": {
@@ -17677,7 +18177,12 @@
         "combinesWith": [
           "List"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/drag-and-drop",
+      "rootImport": "import { DragAndDrop } from '@dryui/ui'",
+      "subpathImport": "import { DragAndDrop } from '@dryui/ui/drag-and-drop'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DragAndDrop } from '@dryui/ui';\n</script>\n\n<DragAndDrop.Root>\n  <DragAndDrop.Item>...</DragAndDrop.Item>\n  <DragAndDrop.Handle>...</DragAndDrop.Handle>\n  <DragAndDrop.Group>...</DragAndDrop.Group>\n</DragAndDrop.Root>"
     },
     "DropZone": {
       "component": {
@@ -17721,7 +18226,12 @@
         ],
         "example": "<DropZone>Content</DropZone>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/drop-zone",
+      "rootImport": "import { DropZone } from '@dryui/ui'",
+      "subpathImport": "import { DropZone } from '@dryui/ui/drop-zone'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DropZone } from '@dryui/ui';\n</script>\n\n<DropZone>Content</DropZone>"
     },
     "Transfer": {
       "component": {
@@ -17970,7 +18480,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/transfer",
+      "rootImport": "import { Transfer } from '@dryui/ui'",
+      "subpathImport": "import { Transfer } from '@dryui/ui/transfer'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Transfer } from '@dryui/ui';\n</script>\n\n<Transfer.Root>\n  <Transfer.List>...</Transfer.List>\n  <Transfer.Item>...</Transfer.Item>\n  <Transfer.Actions>...</Transfer.Actions>\n</Transfer.Root>"
     },
     "RichTextEditor": {
       "component": {
@@ -18142,7 +18657,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/rich-text-editor",
+      "rootImport": "import { RichTextEditor } from '@dryui/ui'",
+      "subpathImport": "import { RichTextEditor } from '@dryui/ui/rich-text-editor'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RichTextEditor } from '@dryui/ui';\n</script>\n\n<RichTextEditor.Root>\n  <RichTextEditor.Toolbar>...</RichTextEditor.Toolbar>\n  <RichTextEditor.Content>...</RichTextEditor.Content>\n</RichTextEditor.Root>"
     },
     "Tour": {
       "component": {
@@ -18313,7 +18833,12 @@
           "Popover",
           "Stepper"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tour",
+      "rootImport": "import { Tour } from '@dryui/ui'",
+      "subpathImport": "import { Tour } from '@dryui/ui/tour'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Tour } from '@dryui/ui';\n</script>\n\n<Tour.Root>\n  <Tour.Tooltip>...</Tour.Tooltip>\n</Tour.Root>"
     },
     "Backdrop": {
       "component": {
@@ -18399,7 +18924,12 @@
           "Drawer",
           "Spinner"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/backdrop",
+      "rootImport": "import { Backdrop } from '@dryui/ui'",
+      "subpathImport": "import { Backdrop } from '@dryui/ui/backdrop'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Backdrop } from '@dryui/ui';\n</script>\n\n<Backdrop>Content</Backdrop>"
     },
     "ButtonGroup": {
       "component": {
@@ -18502,7 +19032,12 @@
         "combinesWith": [
           "Button"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/button-group",
+      "rootImport": "import { ButtonGroup } from '@dryui/ui'",
+      "subpathImport": "import { ButtonGroup } from '@dryui/ui/button-group'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ButtonGroup } from '@dryui/ui';\n</script>\n\n<ButtonGroup>Content</ButtonGroup>"
     },
     "Chip": {
       "component": {
@@ -18665,7 +19200,12 @@
         "combinesWith": [
           "ChipGroup"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chip",
+      "rootImport": "import { Chip } from '@dryui/ui'",
+      "subpathImport": "import { Chip } from '@dryui/ui/chip'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Chip } from '@dryui/ui';\n</script>\n\n<Chip variant=\"soft\" color=\"blue\">Policy friendly</Chip>"
     },
     "ChipGroup": {
       "component": {
@@ -18921,7 +19461,12 @@
           "Chip",
           "Tag"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chip-group",
+      "rootImport": "import { ChipGroup } from '@dryui/ui'",
+      "subpathImport": "import { ChipGroup } from '@dryui/ui/chip-group'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ChipGroup, Badge } from '@dryui/ui';\n</script>\n\n<ChipGroup.Root gap=\"md\">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant=\"soft\">Local/MLX</Badge>\n  <Badge variant=\"soft\">OpenAI</Badge>\n  <Badge variant=\"soft\">Anthropic</Badge>\n  <Badge variant=\"soft\">Mistral</Badge>\n</ChipGroup.Root>"
     },
     "Carousel": {
       "component": {
@@ -19202,7 +19747,12 @@
           "Image",
           "AspectRatio"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/carousel",
+      "rootImport": "import { Carousel } from '@dryui/ui'",
+      "subpathImport": "import { Carousel } from '@dryui/ui/carousel'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Carousel } from '@dryui/ui';\n</script>\n\n<Carousel.Root>\n  <Carousel.Viewport>...</Carousel.Viewport>\n  <Carousel.Slide>...</Carousel.Slide>\n  <Carousel.Prev>...</Carousel.Prev>\n  <Carousel.Next>...</Carousel.Next>\n  <Carousel.Dots>...</Carousel.Dots>\n  <Carousel.Thumbnails>...</Carousel.Thumbnails>\n</Carousel.Root>"
     },
     "FormatBytes": {
       "component": {
@@ -19292,7 +19842,12 @@
           "Table.Cell",
           "FileUpload"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/format-bytes",
+      "rootImport": "import { FormatBytes } from '@dryui/ui'",
+      "subpathImport": "import { FormatBytes } from '@dryui/ui/format-bytes'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FormatBytes } from '@dryui/ui';\n</script>\n\n<FormatBytes>Content</FormatBytes>"
     },
     "FormatDate": {
       "component": {
@@ -19481,7 +20036,12 @@
           "Table.Cell",
           "DescriptionList"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/format-date",
+      "rootImport": "import { FormatDate } from '@dryui/ui'",
+      "subpathImport": "import { FormatDate } from '@dryui/ui/format-date'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FormatDate } from '@dryui/ui';\n</script>\n\n<FormatDate>Content</FormatDate>"
     },
     "FormatNumber": {
       "component": {
@@ -19601,7 +20161,12 @@
           "Text",
           "Table.Cell"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/format-number",
+      "rootImport": "import { FormatNumber } from '@dryui/ui'",
+      "subpathImport": "import { FormatNumber } from '@dryui/ui/format-number'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FormatNumber } from '@dryui/ui';\n</script>\n\n<FormatNumber>Content</FormatNumber>"
     },
     "ImageComparison": {
       "component": {
@@ -19738,7 +20303,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/image-comparison",
+      "rootImport": "import { ImageComparison } from '@dryui/ui'",
+      "subpathImport": "import { ImageComparison } from '@dryui/ui/image-comparison'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ImageComparison } from '@dryui/ui';\n</script>\n\n<ImageComparison>Content</ImageComparison>"
     },
     "HoverCard": {
       "component": {
@@ -19918,7 +20488,12 @@
           "Text",
           "Link"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/hover-card",
+      "rootImport": "import { HoverCard } from '@dryui/ui'",
+      "subpathImport": "import { HoverCard } from '@dryui/ui/hover-card'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { HoverCard } from '@dryui/ui';\n</script>\n\n<HoverCard.Root>\n  <HoverCard.Trigger>...</HoverCard.Trigger>\n  <HoverCard.Content>...</HoverCard.Content>\n</HoverCard.Root>"
     },
     "ProgressRing": {
       "component": {
@@ -20039,7 +20614,12 @@
         "combinesWith": [
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/progress-ring",
+      "rootImport": "import { ProgressRing } from '@dryui/ui'",
+      "subpathImport": "import { ProgressRing } from '@dryui/ui/progress-ring'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ProgressRing } from '@dryui/ui';\n</script>\n\n<ProgressRing>Content</ProgressRing>"
     },
     "RelativeTime": {
       "component": {
@@ -20120,7 +20700,12 @@
           "Text",
           "Timeline"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/relative-time",
+      "rootImport": "import { RelativeTime } from '@dryui/ui'",
+      "subpathImport": "import { RelativeTime } from '@dryui/ui/relative-time'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { RelativeTime } from '@dryui/ui';\n</script>\n\n<RelativeTime>Content</RelativeTime>"
     },
     "Tree": {
       "component": {
@@ -20314,7 +20899,12 @@
           "ScrollArea",
           "Checkbox"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tree",
+      "rootImport": "import { Tree } from '@dryui/ui'",
+      "subpathImport": "import { Tree } from '@dryui/ui/tree'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Tree } from '@dryui/ui';\n</script>\n\n<Tree.Root>\n  <Tree.Item>...</Tree.Item>\n  <Tree.ItemLabel>...</Tree.ItemLabel>\n  <Tree.ItemChildren>...</Tree.ItemChildren>\n</Tree.Root>"
     },
     "Gauge": {
       "component": {
@@ -20433,7 +21023,12 @@
         "combinesWith": [
           "Text"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/gauge",
+      "rootImport": "import { Gauge } from '@dryui/ui'",
+      "subpathImport": "import { Gauge } from '@dryui/ui/gauge'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Gauge } from '@dryui/ui';\n</script>\n\n<Gauge value={72} min={0} max={100} thresholds={[{ value: 30, color: \"red\" }, { value: 70, color: \"orange\" }, { value: 90, color: \"green\" }]} />"
     },
     "Sparkline": {
       "component": {
@@ -20535,7 +21130,12 @@
         "combinesWith": [
           "Table.Cell"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/sparkline",
+      "rootImport": "import { Sparkline } from '@dryui/ui'",
+      "subpathImport": "import { Sparkline } from '@dryui/ui/sparkline'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Sparkline } from '@dryui/ui';\n</script>\n\n<Sparkline data={[5, 10, 3, 8, 12, 7]} width={120} height={30} />"
     },
     "FlipCard": {
       "component": {
@@ -20709,7 +21309,12 @@
         "combinesWith": [
           "Image"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/flip-card",
+      "rootImport": "import { FlipCard } from '@dryui/ui'",
+      "subpathImport": "import { FlipCard } from '@dryui/ui/flip-card'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { FlipCard } from '@dryui/ui';\n</script>\n\n<FlipCard.Root trigger=\"hover\">\n  <FlipCard.Front>Front content</FlipCard.Front>\n  <FlipCard.Back>Back content</FlipCard.Back>\n</FlipCard.Root>"
     },
     "VideoEmbed": {
       "component": {
@@ -20825,7 +21430,12 @@
         "combinesWith": [
           "AspectRatio"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/video-embed",
+      "rootImport": "import { VideoEmbed } from '@dryui/ui'",
+      "subpathImport": "import { VideoEmbed } from '@dryui/ui/video-embed'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { VideoEmbed } from '@dryui/ui';\n</script>\n\n<VideoEmbed src=\"https://youtube.com/watch?v=dQw4w9WgXcQ\" provider=\"youtube\" title=\"Video title\" />"
     },
     "PhoneInput": {
       "component": {
@@ -20978,7 +21588,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/phone-input",
+      "rootImport": "import { PhoneInput } from '@dryui/ui'",
+      "subpathImport": "import { PhoneInput } from '@dryui/ui/phone-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { PhoneInput } from '@dryui/ui';\n</script>\n\n<PhoneInput bind:value={phone} defaultCountry=\"US\" placeholder=\"(555) 123-4567\" />"
     },
     "DateTimeInput": {
       "component": {
@@ -21102,7 +21717,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/date-time-input",
+      "rootImport": "import { DateTimeInput } from '@dryui/ui'",
+      "subpathImport": "import { DateTimeInput } from '@dryui/ui/date-time-input'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { DateTimeInput } from '@dryui/ui';\n</script>\n\n<DateTimeInput bind:value={appointmentDate} name=\"appointment\" />"
     },
     "NotificationCenter": {
       "component": {
@@ -21364,7 +21984,12 @@
           "Avatar",
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/notification-center",
+      "rootImport": "import { NotificationCenter } from '@dryui/ui'",
+      "subpathImport": "import { NotificationCenter } from '@dryui/ui/notification-center'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { NotificationCenter, Button } from '@dryui/ui';\n</script>\n\n<NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>\n  <NotificationCenter.Trigger>\n    {#snippet children({ unreadCount })}\n      <Button>Notifications ({unreadCount})</Button>\n    {/snippet}\n  </NotificationCenter.Trigger>\n  <NotificationCenter.Panel>\n    <NotificationCenter.Group label=\"Today\">\n      <NotificationCenter.Item id=\"1\" variant=\"info\">New deployment complete</NotificationCenter.Item>\n    </NotificationCenter.Group>\n  </NotificationCenter.Panel>\n</NotificationCenter.Root>"
     },
     "MegaMenu": {
       "component": {
@@ -21642,7 +22267,12 @@
           "Link",
           "Image"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/mega-menu",
+      "rootImport": "import { MegaMenu } from '@dryui/ui'",
+      "subpathImport": "import { MegaMenu } from '@dryui/ui/mega-menu'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MegaMenu } from '@dryui/ui';\n</script>\n\n<MegaMenu.Root>\n  <MegaMenu.Trigger>Products</MegaMenu.Trigger>\n  <MegaMenu.Panel>\n    <MegaMenu.Column title=\"Platform\">\n      <MegaMenu.Link href=\"/analytics\">Analytics</MegaMenu.Link>\n      <MegaMenu.Link href=\"/automation\">Automation</MegaMenu.Link>\n    </MegaMenu.Column>\n  </MegaMenu.Panel>\n</MegaMenu.Root>"
     },
     "Map": {
       "component": {
@@ -21861,7 +22491,12 @@
         "combinesWith": [
           "Popover"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/map",
+      "rootImport": "import { Map } from '@dryui/ui'",
+      "subpathImport": "import { Map } from '@dryui/ui/map'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Map } from '@dryui/ui';\n</script>\n\n<Map.Root center={[-122.4, 37.8]} zoom={12}>\n  <Map.Marker position={[-122.4, 37.8]}>\n    <Map.Popup>San Francisco</Map.Popup>\n  </Map.Marker>\n  <Map.Controls navigation fullscreen />\n</Map.Root>"
     },
     "ChromaticShift": {
       "component": {
@@ -21978,7 +22613,12 @@
           }
         ],
         "combinesWith": []
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chromatic-shift",
+      "rootImport": "import { ChromaticShift } from '@dryui/ui'",
+      "subpathImport": "import { ChromaticShift } from '@dryui/ui/chromatic-shift'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ChromaticShift } from '@dryui/ui';\n</script>\n\n<ChromaticShift>Content</ChromaticShift>"
     },
     "ChromaticAberration": {
       "component": {
@@ -22036,7 +22676,12 @@
         ],
         "example": "<ChromaticAberration>Content</ChromaticAberration>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/chromatic-aberration",
+      "rootImport": "import { ChromaticAberration } from '@dryui/ui'",
+      "subpathImport": "import { ChromaticAberration } from '@dryui/ui/chromatic-aberration'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ChromaticAberration } from '@dryui/ui';\n</script>\n\n<ChromaticAberration>Content</ChromaticAberration>"
     },
     "Displacement": {
       "component": {
@@ -22114,7 +22759,12 @@
         ],
         "example": "<Displacement>Content</Displacement>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/displacement",
+      "rootImport": "import { Displacement } from '@dryui/ui'",
+      "subpathImport": "import { Displacement } from '@dryui/ui/displacement'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Displacement } from '@dryui/ui';\n</script>\n\n<Displacement>Content</Displacement>"
     },
     "Glow": {
       "component": {
@@ -22213,7 +22863,12 @@
         "combinesWith": [
           "Aurora"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/glow",
+      "rootImport": "import { Glow } from '@dryui/ui'",
+      "subpathImport": "import { Glow } from '@dryui/ui/glow'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Glow } from '@dryui/ui';\n</script>\n\n<Glow>Content</Glow>"
     },
     "Adjust": {
       "component": {
@@ -22326,7 +22981,12 @@
         "combinesWith": [
           "Aurora"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/adjust",
+      "rootImport": "import { Adjust } from '@dryui/ui'",
+      "subpathImport": "import { Adjust } from '@dryui/ui/adjust'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Adjust } from '@dryui/ui';\n</script>\n\n<Adjust>Content</Adjust>"
     },
     "AlphaSlider": {
       "component": {
@@ -22414,7 +23074,12 @@
         ],
         "example": "<AlphaSlider>Content</AlphaSlider>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/alpha-slider",
+      "rootImport": "import { AlphaSlider } from '@dryui/ui'",
+      "subpathImport": "import { AlphaSlider } from '@dryui/ui/alpha-slider'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { AlphaSlider } from '@dryui/ui';\n</script>\n\n<AlphaSlider>Content</AlphaSlider>"
     },
     "Beam": {
       "component": {
@@ -22522,7 +23187,12 @@
         "combinesWith": [
           "Aurora"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/beam",
+      "rootImport": "import { Beam } from '@dryui/ui'",
+      "subpathImport": "import { Beam } from '@dryui/ui/beam'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Beam } from '@dryui/ui';\n</script>\n\n<Beam>Content</Beam>"
     },
     "BorderBeam": {
       "component": {
@@ -22669,7 +23339,12 @@
         ],
         "example": "<BorderBeam>Content</BorderBeam>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/border-beam",
+      "rootImport": "import { BorderBeam } from '@dryui/ui'",
+      "subpathImport": "import { BorderBeam } from '@dryui/ui/border-beam'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { BorderBeam } from '@dryui/ui';\n</script>\n\n<BorderBeam>Content</BorderBeam>"
     },
     "Shimmer": {
       "component": {
@@ -22740,7 +23415,12 @@
         ],
         "example": "<Shimmer>Content</Shimmer>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/shimmer",
+      "rootImport": "import { Shimmer } from '@dryui/ui'",
+      "subpathImport": "import { Shimmer } from '@dryui/ui/shimmer'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Shimmer } from '@dryui/ui';\n</script>\n\n<Shimmer>Content</Shimmer>"
     },
     "Glass": {
       "component": {
@@ -22799,7 +23479,12 @@
         ],
         "example": "<Glass>Content</Glass>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/glass",
+      "rootImport": "import { Glass } from '@dryui/ui'",
+      "subpathImport": "import { Glass } from '@dryui/ui/glass'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Glass } from '@dryui/ui';\n</script>\n\n<Glass>Content</Glass>"
     },
     "GodRays": {
       "component": {
@@ -22917,7 +23602,12 @@
           "Aurora",
           "Noise"
         ]
-      }
+      },
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/god-rays",
+      "rootImport": "import { GodRays } from '@dryui/ui'",
+      "subpathImport": "import { GodRays } from '@dryui/ui/god-rays'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { GodRays } from '@dryui/ui';\n</script>\n\n<GodRays>Content</GodRays>"
     },
     "GradientMesh": {
       "component": {
@@ -23005,7 +23695,12 @@
         ],
         "example": "<GradientMesh>Content</GradientMesh>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/gradient-mesh",
+      "rootImport": "import { GradientMesh } from '@dryui/ui'",
+      "subpathImport": "import { GradientMesh } from '@dryui/ui/gradient-mesh'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { GradientMesh } from '@dryui/ui';\n</script>\n\n<GradientMesh>Content</GradientMesh>"
     },
     "Halftone": {
       "component": {
@@ -23083,7 +23778,12 @@
         ],
         "example": "<Halftone>Content</Halftone>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/halftone",
+      "rootImport": "import { Halftone } from '@dryui/ui'",
+      "subpathImport": "import { Halftone } from '@dryui/ui/halftone'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Halftone } from '@dryui/ui';\n</script>\n\n<Halftone>Content</Halftone>"
     },
     "MaskReveal": {
       "component": {
@@ -23182,7 +23882,12 @@
         ],
         "example": "<MaskReveal>Content</MaskReveal>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/mask-reveal",
+      "rootImport": "import { MaskReveal } from '@dryui/ui'",
+      "subpathImport": "import { MaskReveal } from '@dryui/ui/mask-reveal'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { MaskReveal } from '@dryui/ui';\n</script>\n\n<MaskReveal>Content</MaskReveal>"
     },
     "ShaderCanvas": {
       "component": {
@@ -23289,7 +23994,12 @@
         ],
         "example": "<ShaderCanvas>Content</ShaderCanvas>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/shader-canvas",
+      "rootImport": "import { ShaderCanvas } from '@dryui/ui'",
+      "subpathImport": "import { ShaderCanvas } from '@dryui/ui/shader-canvas'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { ShaderCanvas } from '@dryui/ui';\n</script>\n\n<ShaderCanvas>Content</ShaderCanvas>"
     },
     "Svg": {
       "component": {
@@ -23329,7 +24039,12 @@
         "dataAttributes": [],
         "example": "<Svg>Content</Svg>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/svg",
+      "rootImport": "import { Svg } from '@dryui/ui'",
+      "subpathImport": "import { Svg } from '@dryui/ui/svg'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Svg } from '@dryui/ui';\n</script>\n\n<Svg>Content</Svg>"
     },
     "StarRating": {
       "component": {
@@ -23422,7 +24137,12 @@
         ],
         "example": "<StarRating.Root>\n</StarRating.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/star-rating",
+      "rootImport": "import { StarRating } from '@dryui/ui'",
+      "subpathImport": "import { StarRating } from '@dryui/ui/star-rating'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { StarRating } from '@dryui/ui';\n</script>\n\n<StarRating.Root>\n</StarRating.Root>"
     },
     "Tag": {
       "component": {
@@ -23520,7 +24240,12 @@
         ],
         "example": "<Tag>Content</Tag>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/tag",
+      "rootImport": "import { Tag } from '@dryui/ui'",
+      "subpathImport": "import { Tag } from '@dryui/ui/tag'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Tag } from '@dryui/ui';\n</script>\n\n<Tag>Content</Tag>"
     },
     "TokenScope": {
       "component": {
@@ -23557,7 +24282,12 @@
         ],
         "example": "<TokenScope>Content</TokenScope>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/token-scope",
+      "rootImport": "import { TokenScope } from '@dryui/ui'",
+      "subpathImport": "import { TokenScope } from '@dryui/ui/token-scope'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { TokenScope } from '@dryui/ui';\n</script>\n\n<TokenScope>Content</TokenScope>"
     },
     "Diagram": {
       "component": {
@@ -23640,7 +24370,12 @@
         ],
         "example": "<Diagram>Content</Diagram>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/diagram",
+      "rootImport": "import { Diagram } from '@dryui/ui'",
+      "subpathImport": "import { Diagram } from '@dryui/ui/diagram'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Diagram } from '@dryui/ui';\n</script>\n\n<Diagram>Content</Diagram>"
     },
     "IconSwap": {
       "component": {
@@ -23668,7 +24403,12 @@
         ],
         "example": "<IconSwap>Content</IconSwap>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/icon-swap",
+      "rootImport": "import { IconSwap } from '@dryui/ui'",
+      "subpathImport": "import { IconSwap } from '@dryui/ui/icon-swap'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { IconSwap } from '@dryui/ui';\n</script>\n\n<IconSwap>Content</IconSwap>"
     },
     "Numeric": {
       "component": {
@@ -23696,7 +24436,12 @@
         ],
         "example": "<Numeric>Content</Numeric>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/numeric",
+      "rootImport": "import { Numeric } from '@dryui/ui'",
+      "subpathImport": "import { Numeric } from '@dryui/ui/numeric'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Numeric } from '@dryui/ui';\n</script>\n\n<Numeric>Content</Numeric>"
     },
     "Enter": {
       "component": {
@@ -23727,7 +24472,12 @@
         ],
         "example": "<Enter>Content</Enter>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/enter",
+      "rootImport": "import { Enter } from '@dryui/ui'",
+      "subpathImport": "import { Enter } from '@dryui/ui/enter'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Enter } from '@dryui/ui';\n</script>\n\n<Enter>Content</Enter>"
     },
     "Exit": {
       "component": {
@@ -23758,7 +24508,12 @@
         ],
         "example": "<Exit>Content</Exit>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/exit",
+      "rootImport": "import { Exit } from '@dryui/ui'",
+      "subpathImport": "import { Exit } from '@dryui/ui/exit'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Exit } from '@dryui/ui';\n</script>\n\n<Exit>Content</Exit>"
     },
     "Stagger": {
       "component": {
@@ -23789,7 +24544,12 @@
         ],
         "example": "<Stagger>Content</Stagger>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/stagger",
+      "rootImport": "import { Stagger } from '@dryui/ui'",
+      "subpathImport": "import { Stagger } from '@dryui/ui/stagger'",
+      "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Stagger } from '@dryui/ui';\n</script>\n\n<Stagger>Content</Stagger>"
     },
     "AffixGroup": {
       "component": {
@@ -24026,7 +24786,12 @@
           "Label",
           "Button"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/affix-group",
+      "rootImport": "import { AffixGroup } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { AffixGroup } from '@dryui/primitives';\n</script>\n\n<AffixGroup.Root>\n  <AffixGroup.Prefix>...</AffixGroup.Prefix>\n  <AffixGroup.Input>...</AffixGroup.Input>\n  <AffixGroup.Suffix>...</AffixGroup.Suffix>\n  <AffixGroup.Separator>...</AffixGroup.Separator>\n  <AffixGroup.Action>...</AffixGroup.Action>\n</AffixGroup.Root>"
     },
     "AvatarGroup": {
       "component": {
@@ -24130,7 +24895,12 @@
         ],
         "example": "<AvatarGroup>Content</AvatarGroup>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/avatar-group",
+      "rootImport": "import { AvatarGroup } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { AvatarGroup } from '@dryui/primitives';\n</script>\n\n<AvatarGroup>Content</AvatarGroup>"
     },
     "ChatMessage": {
       "component": {
@@ -24210,7 +24980,12 @@
         ],
         "example": "<ChatMessage>Content</ChatMessage>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/chat-message",
+      "rootImport": "import { ChatMessage } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { ChatMessage } from '@dryui/primitives';\n</script>\n\n<ChatMessage>Content</ChatMessage>"
     },
     "EmptyState": {
       "component": {
@@ -24344,7 +25119,12 @@
         "dataAttributes": [],
         "example": "<EmptyState.Root>\n  <EmptyState.Icon>...</EmptyState.Icon>\n  <EmptyState.Title>...</EmptyState.Title>\n  <EmptyState.Description>...</EmptyState.Description>\n  <EmptyState.Action>...</EmptyState.Action>\n</EmptyState.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/empty-state",
+      "rootImport": "import { EmptyState } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { EmptyState } from '@dryui/primitives';\n</script>\n\n<EmptyState.Root>\n  <EmptyState.Icon>...</EmptyState.Icon>\n  <EmptyState.Title>...</EmptyState.Title>\n  <EmptyState.Description>...</EmptyState.Description>\n  <EmptyState.Action>...</EmptyState.Action>\n</EmptyState.Root>"
     },
     "Footer": {
       "component": {
@@ -24482,7 +25262,12 @@
         "dataAttributes": [],
         "example": "<Footer.Root>\n  <Footer.Brand>...</Footer.Brand>\n  <Footer.Links>...</Footer.Links>\n  <Footer.LinkGroup>...</Footer.LinkGroup>\n  <Footer.Copyright>...</Footer.Copyright>\n</Footer.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/footer",
+      "rootImport": "import { Footer } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { Footer } from '@dryui/primitives';\n</script>\n\n<Footer.Root>\n  <Footer.Brand>...</Footer.Brand>\n  <Footer.Links>...</Footer.Links>\n  <Footer.LinkGroup>...</Footer.LinkGroup>\n  <Footer.Copyright>...</Footer.Copyright>\n</Footer.Root>"
     },
     "Hero": {
       "component": {
@@ -24622,7 +25407,12 @@
         "dataAttributes": [],
         "example": "<Hero.Root>\n  <Hero.Heading>...</Hero.Heading>\n  <Hero.Subheading>...</Hero.Subheading>\n  <Hero.Actions>...</Hero.Actions>\n</Hero.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/hero",
+      "rootImport": "import { Hero } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { Hero } from '@dryui/primitives';\n</script>\n\n<Hero.Root>\n  <Hero.Heading>...</Hero.Heading>\n  <Hero.Subheading>...</Hero.Subheading>\n  <Hero.Actions>...</Hero.Actions>\n</Hero.Root>"
     },
     "LogoCloud": {
       "component": {
@@ -24726,7 +25516,12 @@
         ],
         "example": "<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/logo-cloud",
+      "rootImport": "import { LogoCloud } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { LogoCloud } from '@dryui/primitives';\n</script>\n\n<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
     },
     "Motion": {
       "component": {
@@ -24751,7 +25546,12 @@
         "dataAttributes": [],
         "example": "<Motion>Content</Motion>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/motion",
+      "rootImport": "import { Motion } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { Motion } from '@dryui/primitives';\n</script>\n\n<Motion>Content</Motion>"
     },
     "PageHeader": {
       "component": {
@@ -25003,7 +25803,12 @@
         ],
         "example": "<PageHeader.Root>\n  <PageHeader.Content>...</PageHeader.Content>\n  <PageHeader.Actions>...</PageHeader.Actions>\n  <PageHeader.Eyebrow>...</PageHeader.Eyebrow>\n  <PageHeader.Title>...</PageHeader.Title>\n  <PageHeader.Description>...</PageHeader.Description>\n  <PageHeader.Meta>...</PageHeader.Meta>\n</PageHeader.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/page-header",
+      "rootImport": "import { PageHeader } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { PageHeader } from '@dryui/primitives';\n</script>\n\n<PageHeader.Root>\n  <PageHeader.Content>...</PageHeader.Content>\n  <PageHeader.Actions>...</PageHeader.Actions>\n  <PageHeader.Eyebrow>...</PageHeader.Eyebrow>\n  <PageHeader.Title>...</PageHeader.Title>\n  <PageHeader.Description>...</PageHeader.Description>\n  <PageHeader.Meta>...</PageHeader.Meta>\n</PageHeader.Root>"
     },
     "SelectableTileGroup": {
       "component": {
@@ -25244,7 +26049,12 @@
           "Field.Root",
           "Label"
         ]
-      }
+      },
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/selectable-tile-group",
+      "rootImport": "import { SelectableTileGroup } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { SelectableTileGroup } from '@dryui/primitives';\n</script>\n\n<SelectableTileGroup.Root>\n  <SelectableTileGroup.Item>...</SelectableTileGroup.Item>\n  <SelectableTileGroup.Indicator>...</SelectableTileGroup.Indicator>\n  <SelectableTileGroup.Label>...</SelectableTileGroup.Label>\n  <SelectableTileGroup.Description>...</SelectableTileGroup.Description>\n  <SelectableTileGroup.Meta>...</SelectableTileGroup.Meta>\n</SelectableTileGroup.Root>"
     },
     "StatCard": {
       "component": {
@@ -25401,7 +26211,12 @@
         ],
         "example": "<StatCard.Root>\n  <StatCard.Label>...</StatCard.Label>\n  <StatCard.Value>...</StatCard.Value>\n  <StatCard.Trend>...</StatCard.Trend>\n</StatCard.Root>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": true,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/stat-card",
+      "rootImport": "import { StatCard } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { StatCard } from '@dryui/primitives';\n</script>\n\n<StatCard.Root>\n  <StatCard.Label>...</StatCard.Label>\n  <StatCard.Value>...</StatCard.Value>\n  <StatCard.Trend>...</StatCard.Trend>\n</StatCard.Root>"
     },
     "User": {
       "component": {
@@ -25455,7 +26270,12 @@
         "dataAttributes": [],
         "example": "<User>Content</User>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/user",
+      "rootImport": "import { User } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { User } from '@dryui/primitives';\n</script>\n\n<User>Content</User>"
     },
     "WaveDivider": {
       "component": {
@@ -25512,7 +26332,12 @@
         "dataAttributes": [],
         "example": "<WaveDivider>Content</WaveDivider>"
       },
-      "related": null
+      "related": null,
+      "hasRootPart": false,
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/wave-divider",
+      "rootImport": "import { WaveDivider } from '@dryui/primitives'",
+      "subpathImport": null,
+      "quickStartCode": "<script lang=\"ts\">\n  import { WaveDivider } from '@dryui/primitives';\n</script>\n\n<WaveDivider>Content</WaveDivider>"
     }
   }
 }

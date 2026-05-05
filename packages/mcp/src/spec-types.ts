@@ -48,6 +48,7 @@ export interface ComponentDef {
 	readonly parts?: Record<string, PartDef>;
 	readonly forwardedProps?: ForwardedPropsDef | null;
 	readonly structure?: StructureDef | null;
+	readonly groups?: readonly { readonly name: string; readonly props: readonly string[] }[];
 	readonly a11y?: string[];
 	readonly cssVars: Record<string, string>;
 	readonly dataAttributes: DataAttributeDef[];

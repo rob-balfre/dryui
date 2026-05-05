@@ -43,6 +43,8 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Spec** — pre-generated JSON snapshot of every component's API (props, slots, styles), produced from `@dryui/ui` + `@dryui/primitives` source merged with composition data. Lives at [`packages/mcp/src/spec.json`](./packages/mcp/src/spec.json).
 
+**Docs component page manifest** — generated docs runtime data derived from the Spec and Composition data. It lives at [`apps/docs/src/lib/generated/component-pages.json`](./apps/docs/src/lib/generated/component-pages.json), is produced by [`packages/mcp/src/docs-component-pages.ts`](./packages/mcp/src/docs-component-pages.ts), and keeps component docs route loaders thin.
+
 **Theme token** — a `--dry-*` CSS variable defined in one of the theme stylesheets under `packages/ui/src/themes/*.css`. Background is `--dry-color-bg-base`, text is `--dry-color-text-strong`, etc. Consumer code uses `var(--name, fallback)` for defaults; never `--name: default` on the root.
 
 ## Layout domain

@@ -8,7 +8,9 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aiSurface } from './ai-surface.js';
+import { buildDocsComponentPagesManifest } from './docs-component-pages.js';
 import { DOCS_ROUTES } from './docs-surface.js';
+import type { ComponentDef, DataAttributeDef, PropDef, Spec } from './spec-types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../../../');
@@ -22,105 +24,7 @@ const docsComponentPagesOutputPath = resolve(
 	'apps/docs/src/lib/generated/component-pages.json'
 );
 
-interface PropDef {
-	readonly type: string;
-	readonly required?: boolean;
-	readonly bindable?: boolean;
-	readonly default?: string;
-	readonly acceptedValues?: string[];
-	readonly description?: string;
-	readonly note?: string;
-}
-
-interface DataAttributeDef {
-	readonly name: string;
-	readonly description?: string;
-	readonly values?: string[];
-}
-
-interface PartDef {
-	readonly props: Record<string, PropDef>;
-	readonly forwardedProps?: ForwardedPropsDef | null;
-}
-
-interface ForwardedPropsDef {
-	readonly baseType: string;
-	readonly via: 'rest';
-	readonly element?: string;
-	readonly examples?: string[];
-	readonly omitted?: string[];
-	readonly note: string;
-}
-
-interface StructureDef {
-	readonly tree: string[];
-	readonly note?: string;
-}
-
-interface ComponentSpec {
-	readonly import: string;
-	readonly description: string;
-	readonly category: string;
-	readonly tags: string[];
-	readonly compound: boolean;
-	readonly props?: Record<string, PropDef>;
-	readonly parts?: Record<string, PartDef>;
-	readonly forwardedProps?: ForwardedPropsDef | null;
-	readonly structure?: StructureDef | null;
-	readonly a11y?: string[];
-	readonly cssVars?: Record<string, string>;
-	readonly dataAttributes?: DataAttributeDef[];
-	readonly example: string;
-}
-
-interface Spec {
-	readonly version: string;
-	readonly package: string;
-	readonly themeImports: {
-		readonly default: string;
-		readonly dark: string;
-	};
-	readonly components: Record<string, ComponentSpec>;
-	readonly ai?: {
-		readonly tools: readonly { readonly name: string; readonly description: string }[];
-		readonly prompts: readonly { readonly name: string; readonly description: string }[];
-		readonly cliCommands: readonly { readonly name: string; readonly description: string }[];
-	};
-	readonly composition?: {
-		readonly components: Record<string, CompositionComponent>;
-	};
-}
-
-interface CompositionAlternative {
-	readonly rank: number;
-	readonly component: string;
-	readonly useWhen: string;
-	readonly snippet: string;
-}
-
-interface CompositionAntiPattern {
-	readonly pattern: string;
-	readonly reason: string;
-	readonly fix: string;
-}
-
-interface CompositionComponent {
-	readonly component: string;
-	readonly useWhen: string;
-	readonly alternatives: readonly CompositionAlternative[];
-	readonly antiPatterns: readonly CompositionAntiPattern[];
-	readonly combinesWith: readonly string[];
-}
-
-interface DocsComponentPageEntry {
-	readonly component: ComponentSpec;
-	readonly related: CompositionComponent | null;
-}
-
-interface DocsComponentPagesManifest {
-	readonly themeImports: Spec['themeImports'];
-	readonly components: Record<string, DocsComponentPageEntry>;
-}
+type ComponentSpec = ComponentDef;
 
 function isSpec(value: unknown): value is Spec {
 	return (
@@ -475,25 +379,6 @@ Theme imports:
 	}
 
 	return sections.join('\n');
-}
-
-function normalizeCompositionKey(name: string): string {
-	return name.toLowerCase().replace(/[^a-z0-9]+/g, '');
-}
-
-function buildDocsComponentPagesManifest(spec: Spec): DocsComponentPagesManifest {
-	return {
-		themeImports: spec.themeImports,
-		components: Object.fromEntries(
-			Object.entries(spec.components).map(([name, component]) => [
-				name,
-				{
-					component,
-					related: spec.composition?.components[normalizeCompositionKey(name)] ?? null
-				}
-			])
-		)
-	};
 }
 
 const llmsText = buildLlmsText(spec);
