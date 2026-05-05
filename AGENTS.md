@@ -24,7 +24,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
-- Use the DryUI CLI as the default entry point. Always check for an existing local link before installing globally:
+- Use DryUI skills as the default entry point. The CLI exists only for skill/editor setup and feedback tooling. Always check for an existing local link before installing globally:
 
 ```bash
 readlink ~/.bun/install/global/node_modules/@dryui/cli
@@ -44,13 +44,14 @@ bun install -g @dryui/cli@latest
 dryui
 ```
 
-- Use `dryui check [path]` or MCP `check` for static validation: component contracts, a11y, tokens, CSS discipline.
+- The DryUI CLI is intentionally limited to skill/editor setup and feedback tooling. Do not re-add project detection, install planning, component lookup, token listing, or broad check commands unless explicitly requested.
+- Use package-level lint/build/test commands for deterministic validation: component contracts, a11y, tokens, CSS discipline.
 - DryUI ships no layout component. Page/section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. The file is imported last from `src/routes/+layout.svelte` after DryUI theme CSS and `../app.css`.
 - All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Mobile-first; `@container` queries for responsive shifts, never `@media` for layout breakpoints.
 - `@dryui/lint` has two build-time surfaces: `dryuiLint()` in `svelte.config` for component rules, and `dryuiLayoutCss()` in `vite.config` for `src/layout.css`. The Vite plugin must run in `vite dev`/HMR and `vite build`; missing `src/layout.css` is warning-only, violations are hard errors.
 - The docs shell header is centralized in [`apps/docs/src/routes/+layout.svelte`](./apps/docs/src/routes/+layout.svelte): logo, search, GitHub, and theme toggle. Keep route pages focused on content and avoid duplicating header chrome.
 - The docs logo is the simple font-based `DryUI` wordmark in [`apps/docs/src/lib/components/Logo.svelte`](./apps/docs/src/lib/components/Logo.svelte). The favicon lives at [`apps/docs/static/favicon.svg`](./apps/docs/static/favicon.svg) and should stay black and white with no underline.
-- For design-quality work (brief, critique, polish, visual review, anti-pattern detection), DryUI delegates to [impeccable](https://impeccable.style). Install alongside DryUI via `dryui init` or `npx impeccable skills install`, then use `/impeccable <command>` from your AI harness. `PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
+- For design-quality work (brief, critique, polish, visual review, anti-pattern detection), DryUI delegates to [impeccable](https://impeccable.style). Install via `npx impeccable skills install`, then use `/impeccable <command>` from your AI harness. `PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned; DryUI tools do not read or write them.
 - Keep root-level Markdown durable. One-off audits, scratch TODOs, and generated reports belong under `docs/`, `reports/`, or ignored local directories, not the repo root.
 - Repo-local editor install output such as `.agents/skills/`, `.github/skills/`, `.opencode/`, and `opencode.json` is not canonical source.
 

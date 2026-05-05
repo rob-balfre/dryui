@@ -27,6 +27,5 @@ describe('ensureClaudeAgents', () => {
 		expect(content).not.toContain('AreaGrid');
 		expect(content).toContain('.claude/skills/dryui-layout/SKILL.md');
 		expect(content).not.toContain('packages/ui/skills/dryui-layout/SKILL.md');
-		expect(content).not.toContain('or `dryui init`');
 	});
 });

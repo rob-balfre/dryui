@@ -332,8 +332,8 @@ function buildLlmsText(spec: Spec): string {
 
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
-- @dryui/mcp: MCP server with ask/check tools for discovery, setup guidance, and static validation (contract, a11y, tokens, CSS discipline)
-- @dryui/cli: CLI for setup, check, detect, install, project-aware add, \`dryui ask --scope ...\` lookup/composition/token guidance, and feedback tooling
+- @dryui/mcp: MCP server for in-editor DryUI and feedback tooling
+- @dryui/cli: small CLI for skill/editor setup and feedback tooling
 
 ## Human-Led Agent-Assisted Workflow
 
@@ -341,7 +341,7 @@ DryUI gives engineers and coding agents a shared UI system: reusable components,
 
 ## Agent Support
 
-- MCP tools: ${mcpTools.join(', ')}
+- MCP tools: ${mcpTools.length > 0 ? mcpTools.join(', ') : 'none'}
 - CLI commands: ${cliCommands.join(', ')}
 
 ## First-party docs
@@ -355,10 +355,8 @@ npx skills add rob-balfre/dryui
 \`\`\`
 
 \`\`\`
-dryui init
-# or, in an existing app
-dryui detect .
-dryui install .
+dryui setup
+dryui feedback ui
 \`\`\`
 
 \`\`\`
@@ -409,27 +407,20 @@ All components support CSS variable theming. Override at the :root level or comp
 
 ## CLI
 
-The CLI is the default entry point for working with DryUI. Start with bare \`dryui\` for editor integration and feedback onboarding, then use it for project bootstrapping, deterministic project detection, install/add planning, \`dryui ask --scope ...\` source retrieval/composition guidance, and validation.
+The CLI is intentionally small. Use skills as the default surface for project inspection and implementation guidance; use \`dryui\` for editor integration and feedback onboarding.
 
-Before installing globally, always check \`readlink ~/.bun/install/global/node_modules/@dryui/cli\`. If it points at a local DryUI checkout's \`packages/cli\`, keep the link and use \`bun run dev:link\` plus \`DRYUI_DEV=1\` instead of reinstalling. Only install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`) when no local link exists and you are not iterating on DryUI source. Every command outputs TOON (token-optimized, agent-friendly) by default. Pass \`--text\` for human-readable plain text, \`--json\` where supported, or \`--full\` to disable truncation.
+Before installing globally, always check \`readlink ~/.bun/install/global/node_modules/@dryui/cli\`. If it points at a local DryUI checkout's \`packages/cli\`, keep the link and use \`bun run dev:link\` plus \`DRYUI_DEV=1\` instead of reinstalling. Only install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`) when no local link exists and you are not iterating on DryUI source. MCP output uses TOON (token-optimized, agent-friendly) by default.
 
 Current command surface: ${cliCommands.join(', ')}.
 
 \`\`\`
 dryui
-dryui init my-app
-dryui ask --scope setup ""
-dryui detect <project-path>
-dryui install <project-path>
-dryui add --project --target <file> Tabs
-dryui ask --scope component "Button"
-dryui ask --scope list "" --kind component
-dryui ask --scope recipe "date input"
-dryui ask --scope list "" --kind token
-dryui check src/routes/+page.svelte
+dryui setup
+dryui setup --editor codex
 dryui ambient
 dryui install-hook --dry-run
 dryui feedback init
+dryui feedback ui
 \`\`\`
 
 No global install? Prefix any command with \`bunx @dryui/cli …\` or \`npx -y @dryui/cli …\` — same behaviour, slower on each call.
@@ -446,7 +437,7 @@ The recommended path is the upstream \`npx skills\` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 \`\`\`
 
-That single command installs all six DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it: run \`dryui setup --editor <agent>\` and apply the printed snippet, or use \`dryui init\` for supported one-shot scaffold wiring.
+That single command installs all six DryUI skills into whichever coding agents are detected. Then add MCP config for tools that need it: run \`dryui setup --editor <agent>\` and apply the printed snippet.
 
 #### Alternative install paths
 

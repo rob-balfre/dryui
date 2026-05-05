@@ -73,16 +73,6 @@ const MCP_TOOL_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 
 const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 	setup: 'green',
-	init: 'blue',
-	detect: 'blue',
-	install: 'green',
-	add: 'green',
-	ask: 'blue',
-	info: 'blue',
-	list: 'purple',
-	compose: 'orange',
-	tokens: 'purple',
-	check: 'blue',
 	ambient: 'gray',
 	'install-hook': 'gray',
 	feedback: 'green'
@@ -90,16 +80,6 @@ const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
 
 const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
 	setup: 'dryui setup',
-	init: 'dryui init',
-	detect: 'dryui detect .',
-	install: 'dryui install .',
-	add: 'dryui add --project --target src/routes/+page.svelte Button',
-	ask: 'dryui ask --scope component Button',
-	info: 'dryui info button',
-	list: 'dryui list --category layout',
-	compose: 'dryui compose "date input"',
-	tokens: 'dryui tokens --category color',
-	check: 'dryui check src/routes/+page.svelte',
 	ambient: 'dryui ambient',
 	'install-hook': 'dryui install-hook --dry-run',
 	feedback: 'dryui feedback ui --no-open'
@@ -286,7 +266,7 @@ export const aiAgentSetups: AiAgentSetup[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		description:
-			'Start with the DryUI CLI, then install the DryUI skills and add the MCP servers so Claude can use the same discovery and validation loop in-editor.',
+			'Install the DryUI skills and add the MCP servers so Claude can use skill-led guidance and feedback tools in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -299,7 +279,7 @@ export const aiAgentSetups: AiAgentSetup[] = [
 			},
 			{
 				title: 'Add the MCP servers',
-				description: 'Adds MCP `ask`/`check` and the feedback MCP server to Claude Code.',
+				description: 'Adds the DryUI MCP server and the feedback MCP server to Claude Code.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			}
@@ -311,7 +291,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '.mcp.json',
-			note: '3. Add the MCP servers so Claude can call MCP `ask`/`check` and feedback tools.',
+			note: '3. Add the MCP servers so Claude can call DryUI and feedback tools.',
 			code: `# MCP server
 claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`,
@@ -323,14 +303,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			code: svelteCompanionClaude,
 			language: 'bash'
 		},
-		followUp:
-			'Use the CLI as the default surface. The skill adds conventions; MCP adds `ask`/`check` inside Claude.'
+		followUp: 'Use skills as the default surface. The CLI only handles setup and feedback tooling.'
 	},
 	{
 		id: 'codex',
 		label: 'Codex',
 		description:
-			'Start with the DryUI CLI, then install the DryUI skills and add the MCP servers so Codex can use the same discovery and validation loop in-editor.',
+			'Install the DryUI skills and add the MCP servers so Codex can use skill-led guidance and feedback tools in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -366,13 +345,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'toml'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the plugin, start a fresh Codex session so MCP `ask` and `check` are available.'
+			'Use skills as the default surface. After setup, start a fresh Codex session so MCP and feedback tools are available.'
 	},
 	{
 		id: 'gemini',
 		label: 'Gemini CLI',
 		description:
-			'Start with the DryUI CLI, then install the DryUI extension so Gemini can use the same discovery and validation loop in-editor.',
+			'Install the DryUI skill and MCP servers so Gemini can use skill-led guidance and feedback tools in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -388,7 +367,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Add the MCP servers',
 				description:
-					'`dryui init` (or `dryui setup --editor gemini`) merges both dryui and dryui-feedback MCP servers into `~/.gemini/settings.json` automatically.',
+					'`dryui setup --editor gemini` prints the dryui and dryui-feedback MCP server config for `~/.gemini/settings.json`.',
 				code: geminiConfig,
 				language: 'json'
 			}
@@ -400,7 +379,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		mcp: {
 			path: '~/.gemini/settings.json',
-			note: '3. Add the dryui and dryui-feedback MCP servers. `dryui init` (or `dryui setup --editor gemini`) does this automatically.',
+			note: '3. Add the dryui and dryui-feedback MCP servers. `dryui setup --editor gemini` prints the config.',
 			code: geminiConfig,
 			language: 'json'
 		},
@@ -411,13 +390,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use the CLI as the default surface. After installing the extension, restart Gemini so MCP `ask` and `check` are available.'
+			'Use skills as the default surface. After installing the extension, restart Gemini so MCP and feedback tools are available.'
 	},
 	{
 		id: 'opencode',
 		label: 'OpenCode',
 		description:
-			"Start with the DryUI CLI, then use OpenCode's native skill and MCP setup so it can follow DryUI conventions and call the same discovery and validation tools in-editor.",
+			'Install the DryUI skill and MCP setup so OpenCode can follow DryUI conventions and use feedback tools in-editor.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -456,13 +435,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths. Restart OpenCode after adding the skill and `opencode.json`.'
+			'Use skills as the default surface. OpenCode also reads `AGENTS.md` and `.agents/skills/` compatibility paths. Restart OpenCode after adding the skill and `opencode.json`.'
 	},
 	{
 		id: 'copilot',
 		label: 'Copilot',
 		description:
-			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP servers. Copilot CLI (1.x+) reads `.mcp.json` at the project root with root key `mcpServers` (same shape as Claude Code). `~/.copilot/mcp-config.json` provides user-level defaults. The VS Code Copilot extension still reads `.vscode/mcp.json` with root key `servers` — configure that separately if you use both surfaces.',
+			'Install the DryUI skill and add the MCP servers. Copilot CLI (1.x+) reads `.mcp.json` at the project root with root key `mcpServers` (same shape as Claude Code). `~/.copilot/mcp-config.json` provides user-level defaults. The VS Code Copilot extension still reads `.vscode/mcp.json` with root key `servers` — configure that separately if you use both surfaces.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -508,13 +487,12 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. Copilot CLI picks up MCP servers from `.mcp.json` (workspace) and `~/.copilot/mcp-config.json` (user) on launch. In the VS Code extension, MCP tools only work in Agent mode, and the skill loads automatically when relevant.'
+			'Use skills as the default surface. Copilot CLI picks up MCP servers from `.mcp.json` (workspace) and `~/.copilot/mcp-config.json` (user) on launch. In the VS Code extension, MCP tools only work in Agent mode, and the skill loads automatically when relevant.'
 	},
 	{
 		id: 'cursor',
 		label: 'Cursor',
-		description:
-			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for in-editor lookup and validation.',
+		description: 'Install the DryUI skill and add the MCP server for in-editor support.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -537,13 +515,12 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. The skill loads automatically when Cursor determines DryUI is relevant to the task.'
+			'Use skills as the default surface. The skill loads automatically when Cursor determines DryUI is relevant to the task.'
 	},
 	{
 		id: 'windsurf',
 		label: 'Windsurf',
-		description:
-			'Start with the DryUI CLI, then copy the DryUI skill into the repo and add the MCP server for in-editor lookup and validation.',
+		description: 'Install the DryUI skill and add the MCP server for in-editor support.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -566,13 +543,13 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. Windsurf has a 100-tool limit across all MCP servers; DryUI uses 3 tools and @sveltejs/mcp adds 4.'
+			'Use skills as the default surface. Windsurf has a 100-tool limit across all MCP servers.'
 	},
 	{
 		id: 'zed',
 		label: 'Zed',
 		description:
-			'Start with the DryUI CLI. Zed does not yet support Agent Skills, so use AGENTS.md for conventions and add the MCP server for tools.',
+			'Use AGENTS.md for conventions and add the MCP server for tools. Zed does not yet support Agent Skills.',
 		quickSetup: {
 			title: '1. Install the CLI',
 			code: CLI_INSTALL_CODE
@@ -590,6 +567,6 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'json'
 		},
 		followUp:
-			'Use the CLI as the default surface. Zed reads AGENTS.md automatically. Verify MCP in the Agent Panel (Cmd+Shift+A) — green indicator means active.'
+			'Use AGENTS.md as the default surface. Zed reads AGENTS.md automatically. Verify MCP in the Agent Panel (Cmd+Shift+A) — green indicator means active.'
 	}
 ];

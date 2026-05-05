@@ -10,8 +10,6 @@ import type {
 } from './spec-types.js';
 import type { ReviewResult } from './component-checker.js';
 import type { DiagnoseResult } from './theme-checker.js';
-import type { WorkspaceReport, WorkspaceFinding } from './workspace-audit.js';
-import type { ProjectDetection, InstallPlan, AddPlan, ProjectPlanStep } from './project-planner.js';
 import type { TokenResult } from './tokens.js';
 import { componentKind, getBindableProps, getRequiredParts } from './spec-formatters.js';
 
@@ -72,8 +70,6 @@ export type HelpCommand =
 	| 'diagnose'
 	| 'doctor'
 	| 'lint'
-	| 'detect'
-	| 'install'
 	| 'tokens';
 
 export type HelpContext = {
@@ -140,22 +136,7 @@ export function buildContextualHelp(ctx: HelpContext): string[] {
 			if (ctx.hasFindings) {
 				hints.push('lint --max-severity error -- focus on errors only');
 				hints.push('review <file.svelte> -- check specific file');
-			} else if (ctx.isEmpty) {
-				hints.push('detect -- verify project setup');
 			}
-			break;
-
-		case 'detect':
-			if (ctx.status === 'partial' || ctx.status === 'unsupported') {
-				hints.push('install -- see step-by-step setup plan');
-			} else if (ctx.status === 'ready') {
-				hints.push('list -- see available components');
-				hints.push('compose "app shell" -- get root layout template');
-			}
-			break;
-
-		case 'install':
-			hints.push('detect -- verify project after completing steps');
 			break;
 
 		case 'tokens':
@@ -540,223 +521,6 @@ export function toonDiagnoseResult(result: DiagnoseResult): string {
 	});
 	if (help.length > 0) {
 		lines.push('', formatHelp(help));
-	}
-
-	return lines.join('\n');
-}
-
-// ── Workspace report (doctor/lint) ─────────────────────────
-
-const MAX_FINDINGS_DEFAULT = 50;
-
-export function toonWorkspaceReport(
-	report: WorkspaceReport,
-	opts?: {
-		title?: string | undefined;
-		command?: 'doctor' | 'lint' | undefined;
-		full?: boolean | undefined;
-	}
-): string {
-	const full = opts?.full ?? false;
-	const title = opts?.title ?? 'workspace';
-	const command: HelpCommand = opts?.command ?? (title.includes('lint') ? 'lint' : 'doctor');
-	const lines: string[] = [];
-
-	const hasBlockers = report.summary.error > 0;
-	const autoFixable = report.findings.filter((f) => f.fixable).length;
-
-	lines.push(`${title} | root: ${report.root}`);
-	lines.push(
-		`scanned: ${report.scannedFiles} files | errors: ${report.summary.error} | warnings: ${report.summary.warning} | info: ${report.summary.info}`
-	);
-	lines.push(`hasBlockers: ${hasBlockers} | autoFixable: ${autoFixable}`);
-
-	if (report.summary.byRule) {
-		let topRule: [string, number] | null = null;
-		for (const entry of Object.entries(report.summary.byRule)) {
-			if (!topRule || entry[1] > topRule[1]) topRule = entry;
-		}
-		if (topRule) {
-			lines.push(`top-rule: ${topRule[0]} (${topRule[1]} occurrences)`);
-		}
-	}
-
-	if (report.findings.length === 0) {
-		lines.push('findings[0]: clean');
-	} else {
-		const findings = full ? report.findings : report.findings.slice(0, MAX_FINDINGS_DEFAULT);
-		const truncated = !full && report.findings.length > MAX_FINDINGS_DEFAULT;
-
-		lines.push(
-			header('findings', findings.length, ['severity', 'rule', 'file', 'line', 'message'])
-		);
-		let anyMessageTruncated = false;
-		for (const f of findings) {
-			const [message, mt] = truncateField(f.message);
-			anyMessageTruncated ||= mt;
-			lines.push(row(f.severity, f.ruleId, f.file, f.line ?? '-', message));
-			for (const fix of f.suggestedFixes) {
-				const [fixDesc, dt] = truncateField(fix.description);
-				anyMessageTruncated ||= dt;
-				let replacementStr = '';
-				if (fix.replacement) {
-					const [rep, rt] = truncateField(fix.replacement);
-					anyMessageTruncated ||= rt;
-					replacementStr = ` -> ${rep}`;
-				}
-				lines.push(`    fix: ${fixDesc}${replacementStr}`);
-			}
-		}
-
-		if (truncated) {
-			lines.push(
-				`  (showing ${MAX_FINDINGS_DEFAULT} of ${report.findings.length} — use --full to see all)`
-			);
-		}
-		if (anyMessageTruncated) {
-			lines.push(`  ${formatTruncationHint(FIELD_CAP, `review <file> or ${command} --full`)}`);
-		}
-	}
-
-	if (report.warnings.length > 0) {
-		lines.push('', header('warnings', report.warnings.length, ['message']));
-		for (const w of report.warnings) {
-			lines.push('  ' + w);
-		}
-	}
-
-	// Contextual help
-	const help = buildContextualHelp({
-		command,
-		hasFindings: report.findings.length > 0,
-		isEmpty: report.findings.length === 0
-	});
-	if (help.length > 0) {
-		lines.push('', formatHelp(help));
-	}
-
-	return lines.join('\n');
-}
-
-// ── Project detection ──────────────────────────────────────
-
-export function toonProjectDetection(
-	detection: ProjectDetection,
-	opts?: { includeHelp?: boolean | undefined }
-): string {
-	const includeHelp = opts?.includeHelp ?? true;
-	const lines: string[] = [];
-
-	lines.push(
-		`project: ${detection.status} | framework: ${detection.framework} | pkg-manager: ${detection.packageManager}`
-	);
-	lines.push(`root: ${detection.root ?? '(not found)'}`);
-	lines.push(
-		`deps: ui=${detection.dependencies.ui}, primitives=${detection.dependencies.primitives}, lint=${detection.dependencies.lint}`
-	);
-	lines.push(
-		`theme: default=${detection.theme.defaultImported}, dark=${detection.theme.darkImported}, auto=${detection.theme.themeAuto}`
-	);
-	lines.push(
-		`lint: wired=${detection.lint.preprocessorWired}, svelte-config=${detection.files.svelteConfig ?? '(not found)'}`
-	);
-
-	if (detection.warnings.length > 0) {
-		lines.push(header('warnings', detection.warnings.length, ['message']));
-		for (const w of detection.warnings) {
-			lines.push('  ' + w);
-		}
-	}
-
-	// Contextual help
-	if (includeHelp) {
-		const help = buildContextualHelp({ command: 'detect', status: detection.status });
-		if (help.length > 0) {
-			lines.push('', formatHelp(help));
-		}
-	}
-
-	return lines.join('\n');
-}
-
-// ── Install plan ───────────────────────────────────────────
-
-function toonStep(step: ProjectPlanStep, index: number, showSnippets = false): string {
-	const parts = [`${index + 1}. [${step.status}] ${step.title}: ${step.description}`];
-	if (step.command) parts.push(`   cmd: ${step.command}`);
-	if (step.path) parts.push(`   file: ${step.path}`);
-	if (showSnippets && step.snippet && step.kind === 'create-file') {
-		parts.push(`   ---\n${step.snippet}   ---`);
-	}
-	return parts.join('\n');
-}
-
-export function toonInstallPlan(
-	plan: InstallPlan,
-	opts?: { includeHelp?: boolean | undefined }
-): string {
-	const includeHelp = opts?.includeHelp ?? true;
-	const lines: string[] = [];
-	const isScaffold =
-		plan.detection.status === 'unsupported' && plan.steps.some((s) => s.kind === 'create-file');
-
-	lines.push(toonProjectDetection(plan.detection, { includeHelp }));
-	lines.push('');
-
-	if (plan.steps.length === 0) {
-		lines.push('steps[0]: none needed');
-	} else {
-		const label = isScaffold ? 'scaffold-steps' : 'steps';
-		lines.push(header(label, plan.steps.length, ['status', 'title', 'description']));
-		for (const [i, step] of plan.steps.entries()) {
-			lines.push(toonStep(step, i, isScaffold));
-		}
-	}
-
-	// Contextual help
-	if (includeHelp) {
-		const help = buildContextualHelp({ command: 'install' });
-		if (help.length > 0) {
-			lines.push('', formatHelp(help));
-		}
-	}
-
-	return lines.join('\n');
-}
-
-// ── Add plan ───────────────────────────────────────────────
-
-export function toonAddPlan(plan: AddPlan): string {
-	const lines: string[] = [];
-
-	lines.push(`add: ${plan.name} | target: ${plan.target ?? '(choose)'}`);
-	if (plan.importStatement) {
-		lines.push(`import: ${plan.importStatement}`);
-	}
-	lines.push('');
-
-	// Install prerequisites
-	if (plan.installPlan.steps.length > 0) {
-		lines.push(header('install-steps', plan.installPlan.steps.length, ['status', 'title']));
-		for (const [i, step] of plan.installPlan.steps.entries()) {
-			lines.push(toonStep(step, i));
-		}
-		lines.push('');
-	}
-
-	// Add steps
-	if (plan.steps.length > 0) {
-		lines.push(header('add-steps', plan.steps.length, ['status', 'title']));
-		for (const [i, step] of plan.steps.entries()) {
-			lines.push(toonStep(step, i));
-		}
-	}
-
-	if (plan.warnings.length > 0) {
-		lines.push('', header('warnings', plan.warnings.length, ['message']));
-		for (const w of plan.warnings) {
-			lines.push('  ' + w);
-		}
 	}
 
 	return lines.join('\n');

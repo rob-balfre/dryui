@@ -17,9 +17,9 @@ import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { DEFAULT_FEEDBACK_HOST, DEFAULT_FEEDBACK_PORT } from '@dryui/feedback-server';
 import { isStaleDryuiClaudeAgentFile } from '@dryui/mcp/agent-drift';
-import type { DryuiPackageManager } from '@dryui/mcp/project-planner';
 
 export const FEEDBACK_SERVER_URL = `http://${DEFAULT_FEEDBACK_HOST}:${DEFAULT_FEEDBACK_PORT}`;
+export type DryuiPackageManager = 'bun' | 'pnpm' | 'npm' | 'yarn' | 'unknown';
 
 const require = createRequire(import.meta.url);
 

@@ -15,7 +15,7 @@ DryUI gives engineers and their coding agents a shared UI system: reusable compo
 | `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                |
 | `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                      |
 | `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                     |
-| `@dryui/cli`             | CLI for setup, discovery, install planning, static contract checks, skills, MCP, and feedback tooling                     |
+| `@dryui/cli`             | Small CLI for skill/editor setup and feedback tooling                                                                     |
 | `@dryui/mcp`             | MCP server exposing `ask` and `check` for in-editor component discovery, contract validation, a11y, and token correctness |
 | `@dryui/feedback`        | Optional feedback annotation UI                                                                                           |
 | `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                 |
@@ -28,13 +28,11 @@ Add the DryUI skill to your coding agent first:
 npx skills add rob-balfre/dryui
 ```
 
-Then use the CLI to wire a new or existing app:
+Then use the CLI only for editor/agent setup and feedback tooling:
 
 ```bash
-dryui init
-# or, in an existing app
-dryui detect .
-dryui install .
+dryui setup
+dryui feedback ui
 ```
 
 When working inside this monorepo, always check for a local DryUI link before installing the CLI globally:
@@ -86,11 +84,11 @@ Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by d
 
 DryUI gives humans and agents a shared way to discuss, edit, theme, and validate web app UI without losing consistency.
 
-The skill install is the recommended first step. Once the CLI is working in a project, add the MCP layer for your editor from <https://dryui.dev/getting-started>.
+The skill install is the recommended first step. Use skills for project inspection and implementation guidance; keep the CLI focused on setup and feedback.
 
 Repo contributors should treat [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts) as the canonical setup source for editor snippets and MCP config examples.
 
-Use `dryui check [path]` for static validation of component contracts, a11y, tokens, and CSS discipline. The MCP `check` tool mirrors this surface.
+Use package-level lint, build, and test commands for deterministic validation. The CLI intentionally does not own project detection, install planning, component lookup, token listing, or broad checking.
 
 ## Public Docs Surface
 
@@ -163,7 +161,7 @@ bun run dev:link         # registers each workspace package globally via `bun li
 That's it. The bins ship with workspace auto-detect: when invoked through the `bun link` symlink they spot the surrounding `packages/<name>/package.json` and `.git`, switch to source mode, and propagate `DRYUI_DEV=1` to their child process. So:
 
 ```bash
-dryui list               # auto-runs packages/cli/src/index.ts
+dryui setup              # auto-runs packages/cli/src/index.ts
 dryui-mcp                # MCP server straight from src
 dryui-feedback-mcp       # feedback MCP server from src
 ```
@@ -172,12 +170,12 @@ Each invocation prints a one-line `DRYUI_DEV=1 — LOCAL SOURCE MODE` banner so 
 
 #### Skill install via npx skills
 
-`dryui setup --install` and `dryui init` install the dryui skill via the upstream `npx skills` CLI (skills.sh standard). Copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes`, which writes to the upstream-blessed install location for each agent. Zed uses the legacy degit copy: it is not in the npx skills supported-agents list.
+`dryui setup` installs the dryui skill via the upstream `npx skills` CLI (skills.sh standard). Copilot/cursor/opencode/windsurf shell out to `npx skills@^1.1.1 add rob-balfre/dryui --agent <flag> --copy --yes`, which writes to the upstream-blessed install location for each agent. Zed uses the legacy degit copy: it is not in the npx skills supported-agents list.
 
 Set `DRYUI_SKILLS_LEGACY=1` to opt back into the legacy degit copy (one-release escape hatch):
 
 ```bash
-DRYUI_SKILLS_LEGACY=1 dryui setup --install --editor cursor
+DRYUI_SKILLS_LEGACY=1 dryui setup --editor cursor
 ```
 
 Failures (offline, missing npx) fall through to the legacy degit copy automatically with a one-line warning, so the default path is safe even on flaky networks.
@@ -226,7 +224,7 @@ See the supporting docs for the rest:
 - Route and interface patterns for coherent web apps
 - Svelte 5 runes only
 - CSS variable theming via `--dry-*`
-- CLI-first workflow with optional MCP and skill integration
+- Skill-first workflow with small setup and feedback tooling
 
 ## License
 

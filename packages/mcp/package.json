@@ -34,16 +34,6 @@
       "types": "./dist/theme-checker.d.ts",
       "default": "./dist/theme-checker.js"
     },
-    "./project-planner": {
-      "bun": "./src/project-planner.ts",
-      "types": "./dist/project-planner.d.ts",
-      "default": "./dist/project-planner.js"
-    },
-    "./workspace-audit": {
-      "bun": "./src/workspace-audit.ts",
-      "types": "./dist/workspace-audit.d.ts",
-      "default": "./dist/workspace-audit.js"
-    },
     "./agent-contract": {
       "bun": "./src/agent-contract.ts",
       "types": "./dist/agent-contract.d.ts",
@@ -135,14 +125,6 @@
         "types": "./dist/theme-checker.d.ts",
         "default": "./dist/theme-checker.js"
       },
-      "./project-planner": {
-        "types": "./dist/project-planner.d.ts",
-        "default": "./dist/project-planner.js"
-      },
-      "./workspace-audit": {
-        "types": "./dist/workspace-audit.d.ts",
-        "default": "./dist/workspace-audit.js"
-      },
       "./agent-contract": {
         "types": "./dist/agent-contract.d.ts",
         "default": "./dist/agent-contract.js"
@@ -209,7 +191,7 @@
     "check": "bun run check:contract && bun run check:agent-contract && bun run check:types",
     "test": "cd ../.. && bun run --filter '@dryui/mcp' generate-spec && bun test packages/mcp/src",
     "postinstall": "node -e \"try{require('fs').chmodSync(require('path').join(__dirname,'dist','index.js'),0o755)}catch{}\"",
-    "build": "bun run generate-spec && (bun run generate-architecture & bun run generate-contract & bun run generate-agent-contract & bun run generate-llms & bun run generate-theme-tokens & wait) && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && cp src/agent-contract.v1.json dist/agent-contract.v1.json && cp src/agent-contract.v1.schema.json dist/agent-contract.v1.schema.json && cp src/theme-tokens.generated.json dist/theme-tokens.generated.json && bun build src/index.ts src/architecture.ts src/agent-contract.ts src/agent-drift.ts src/theme-checker.ts src/utils.ts src/project-planner.ts src/workspace-audit.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts src/tokens.ts src/repair.ts src/define.ts src/docs-surface.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && chmod +x dist/index.js && bunx tsc -p tsconfig.build.json",
+    "build": "bun run generate-spec && (bun run generate-architecture & bun run generate-contract & bun run generate-agent-contract & bun run generate-llms & bun run generate-theme-tokens & wait) && mkdir -p dist && cp src/spec.json dist/spec.json && cp src/architecture.json dist/architecture.json && cp src/contract.v1.json dist/contract.v1.json && cp src/contract.v1.schema.json dist/contract.v1.schema.json && cp src/agent-contract.v1.json dist/agent-contract.v1.json && cp src/agent-contract.v1.schema.json dist/agent-contract.v1.schema.json && cp src/theme-tokens.generated.json dist/theme-tokens.generated.json && bun build src/index.ts src/architecture.ts src/agent-contract.ts src/agent-drift.ts src/theme-checker.ts src/utils.ts src/spec-types.ts src/spec-formatters.ts src/composition-data.ts src/toon.ts src/composition-search.ts src/tokens.ts src/repair.ts src/define.ts src/docs-surface.ts --outdir dist --root src --target node && printf '#!/usr/bin/env node\n' | cat - dist/index.js > dist/index.tmp && mv dist/index.tmp dist/index.js && chmod +x dist/index.js && bunx tsc -p tsconfig.build.json",
     "prepack": "bun ../../scripts/prepack-exports.ts",
     "postpack": "bun ../../scripts/postpack-exports.ts",
     "check:publint": "publint",

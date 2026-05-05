@@ -25838,7 +25838,7 @@
       },
       "self-correction": {
         "name": "self-correction",
-        "description": "The DryUI self-correction loop for agents: write Svelte, run `dryui check`, read the structured `dryui-diagnostics` JSON block, apply the `hint` for each issue, re-run `check`. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.",
+        "description": "The DryUI self-correction loop for agents: write Svelte, run focused package-level validation, apply the generated hints for each issue, then re-run validation. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.",
         "tags": [
           "agent",
           "repair",
@@ -25851,7 +25851,7 @@
           "autofix"
         ],
         "components": [],
-        "snippet": "<!--\n  Agent repair loop for DryUI check output.\n\n  Every 'check' response over MCP carries two content blocks:\n    1. TOON summary (human-readable)\n    2. A JSON block tagged 'dryui-diagnostics' with { diagnostics: [...] }\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. call tool 'check' with { path: 'path/to/file.svelte' }\n3. parse the dryui-diagnostics JSON block from the response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. call 'check' again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
+        "snippet": "<!--\n  Agent repair loop for DryUI validation output.\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. run the focused package-level validation command for the changed file/package\n3. parse the diagnostics from the validation response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. run validation again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
       },
       "typography": {
         "name": "typography",
@@ -26022,70 +26022,12 @@
     }
   },
   "ai": {
-    "tools": [
-      {
-        "name": "ask",
-        "description": "Discover components, recipes, setup guidance, and tokens through an explicit scope"
-      },
-      {
-        "name": "check",
-        "description": "Validate a component, theme file, directory, or workspace against the DryUI contract, a11y, and token rules"
-      }
-    ],
-    "prompts": [
-      {
-        "name": "dryui-ask",
-        "description": "Discover the right DryUI component, recipe, list, or setup guidance"
-      },
-      {
-        "name": "dryui-check",
-        "description": "Validate a DryUI component, theme file, directory, or workspace"
-      }
-    ],
+    "tools": [],
+    "prompts": [],
     "cliCommands": [
       {
         "name": "setup",
         "description": "Interactive onboarding for editor integration and feedback tooling"
-      },
-      {
-        "name": "init",
-        "description": "Bootstrap a SvelteKit + DryUI project"
-      },
-      {
-        "name": "detect",
-        "description": "Detect DryUI project setup"
-      },
-      {
-        "name": "install",
-        "description": "Print a project install plan"
-      },
-      {
-        "name": "add",
-        "description": "Print a copyable starter snippet or a project-aware plan"
-      },
-      {
-        "name": "ask",
-        "description": "Discover components, recipes, setup guidance, and tokens by scope"
-      },
-      {
-        "name": "info",
-        "description": "Show component API reference"
-      },
-      {
-        "name": "list",
-        "description": "List all components"
-      },
-      {
-        "name": "compose",
-        "description": "Look up composition guidance"
-      },
-      {
-        "name": "tokens",
-        "description": "List `--dry-*` design tokens"
-      },
-      {
-        "name": "check",
-        "description": "Validate files, themes, or workspaces against DryUI contract, a11y, and token rules"
       },
       {
         "name": "ambient",
@@ -26098,10 +26040,6 @@
       {
         "name": "feedback",
         "description": "Start feedback tooling, inspect the server, or launch the dashboard"
-      },
-      {
-        "name": "prompt",
-        "description": "Generate task-specific DryUI implementation prompts"
       }
     ],
     "promptBundles": [
@@ -26110,8 +26048,6 @@
         "title": "DryUI component implementation",
         "description": "Task-specific Svelte implementation context for one DryUI component, its contract, and its surrounding rules.",
         "targets": [
-          "cli",
-          "mcp",
           "docs",
           "skill",
           "llms"
@@ -26144,8 +26080,8 @@
           "Preserve accessible names, labels, focus order, and native element semantics."
         ],
         "checks": [
-          "dryui check <file.svelte>",
           "svelte-autofixer <file.svelte>",
+          "bun run --filter @dryui/lint test when changing lint rules",
           "bun run --filter @dryui/ui build when editing packages/ui Svelte sources"
         ],
         "source": "packages/mcp/src/ai-surface.ts"

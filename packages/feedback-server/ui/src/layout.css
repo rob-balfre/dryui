@@ -1,0 +1,107 @@
+[data-layout='feedback-dashboard'] {
+	display: grid;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='dashboard'] {
+	display: grid;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='brand'] {
+	display: inline-grid;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='brand-lockup'] {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='wordmark'],
+[data-layout='feedback-dashboard'] [data-layout-area='refresh-icon'] {
+	display: inline-grid;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='dashboard-actions'] {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='queue'],
+[data-layout='feedback-dashboard'] [data-layout-area='filter-bar'],
+[data-layout='feedback-dashboard'] [data-layout-area='filter-actions'],
+[data-layout='feedback-dashboard'] [data-layout-area='filter-tabs'],
+[data-layout='feedback-dashboard'] [data-layout-area='filter-bulk'],
+[data-layout='feedback-dashboard'] [data-layout-area='tab-trigger'],
+[data-layout='feedback-dashboard'] [data-layout-area='launch-group'],
+[data-layout='feedback-dashboard'] [data-layout-area='feed'],
+[data-layout='feedback-dashboard'] [data-layout-area='feed-panel'],
+[data-layout='feedback-dashboard'] [data-layout-area='loading-feed'],
+[data-layout='feedback-dashboard'] [data-layout-area='submission-skeleton'],
+[data-layout='feedback-dashboard'] [data-layout-area='skeleton-lines'],
+[data-layout='feedback-dashboard'] [data-layout-area='skeleton-head'],
+[data-layout='feedback-dashboard'] [data-layout-area='skeleton-body'],
+[data-layout='feedback-dashboard'] [data-layout-area='feed-item'] {
+	display: grid;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='filter-search'] {
+	display: grid;
+	grid-auto-flow: column;
+	grid-auto-columns: max-content;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='filter-search'].is-open {
+	grid-template-columns: minmax(0, 1fr) auto;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='filter-bulk'] {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='tab-trigger'],
+[data-layout='feedback-dashboard'] [data-layout-area='launch-group'] {
+	grid-auto-flow: column;
+}
+
+[data-layout='feedback-dashboard'] [data-layout-area='launch-group'] {
+	grid-auto-columns: max-content;
+}
+
+@container feedback-dashboard (max-width: 36rem) {
+	[data-layout='feedback-dashboard'] [data-layout-area='brand-lockup'] {
+		grid-auto-flow: row;
+		grid-auto-columns: initial;
+	}
+}
+
+@container feedback-filters (min-width: 42rem) {
+	[data-layout='feedback-dashboard'] [data-layout-area='filter-actions'] {
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+	}
+
+	[data-layout='feedback-dashboard'] [data-layout-area='filter-search'].is-open {
+		grid-template-columns: minmax(18rem, 28rem) auto;
+	}
+
+	[data-layout='feedback-dashboard'] [data-layout-area='filter-bulk'] {
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		grid-template-columns: none;
+	}
+}
+
+@container feedback-dashboard (min-width: 48rem) {
+	[data-layout='feedback-dashboard'] [data-layout-area='filter-bar'] {
+		grid-template-columns: max-content max-content;
+	}
+
+	[data-layout='feedback-dashboard'] [data-layout-area='skeleton-head'] {
+		grid-template-columns: max-content minmax(0, 1fr);
+	}
+
+	[data-layout='feedback-dashboard'] [data-layout-area='skeleton-body'] {
+		grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
+	}
+}

@@ -183,7 +183,7 @@ export const setupGuides: readonly SetupGuide[] = [
 			},
 			{
 				title: 'Add the MCP servers',
-				note: 'Adds MCP ask/check plus visual feedback tools to Claude Code.',
+				note: 'Adds DryUI skills context plus visual feedback tools to Claude Code.',
 				code: `claude mcp add dryui -- npx -y @dryui/mcp
 claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			},
@@ -209,7 +209,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			},
 			{
 				title: 'Add the MCP servers',
-				note: 'Adds MCP ask/check plus visual feedback tools to Codex.',
+				note: 'Adds DryUI skills context plus visual feedback tools to Codex.',
 				code: `codex mcp add dryui -- npx -y @dryui/mcp
 codex mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp
 
@@ -219,7 +219,7 @@ ${CODEX_CONFIG}`
 			SVELTE_SECTION_CODEX
 		],
 		followUp:
-			'After installing the skills and MCP servers, start a new Codex session so `ask` and `check` are available.'
+			'After installing the skills and MCP servers, start a new Codex session so DryUI guidance and feedback tools are available.'
 	},
 	{
 		id: 'gemini',
@@ -234,12 +234,12 @@ ${CODEX_CONFIG}`
 			},
 			{
 				title: 'Add the MCP servers',
-				note: '`dryui init` (or `dryui setup --editor gemini`) merges both servers into `~/.gemini/settings.json` automatically.',
+				note: '`dryui setup --editor gemini` prints the exact server block for `~/.gemini/settings.json`.',
 				code: GEMINI_CONFIG
 			},
 			SVELTE_SECTION_GEMINI
 		],
-		followUp: 'Restart Gemini after installing so `ask` and `check` are available.'
+		followUp: 'Restart Gemini after installing so DryUI guidance and feedback tools are available.'
 	},
 	{
 		id: 'opencode',

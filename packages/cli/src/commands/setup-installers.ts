@@ -1,5 +1,4 @@
-// Per-editor install steps for `dryui init` and the interactive `dryui setup`
-// menu.
+// Per-editor install steps for the interactive `dryui setup` menu.
 //
 // Each installer:
 //   1. Installs the DryUI skill via `npx skills add rob-balfre/dryui --agent

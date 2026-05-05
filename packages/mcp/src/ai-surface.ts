@@ -25,49 +25,12 @@ export interface AiSurfaceManifest {
 }
 
 export const aiSurface: AiSurfaceManifest = {
-	tools: [
-		{
-			name: 'ask',
-			description:
-				'Discover components, recipes, setup guidance, and tokens through an explicit scope'
-		},
-		{
-			name: 'check',
-			description:
-				'Validate a component, theme file, directory, or workspace against the DryUI contract, a11y, and token rules'
-		}
-	],
-	prompts: [
-		{
-			name: 'dryui-ask',
-			description: 'Discover the right DryUI component, recipe, list, or setup guidance'
-		},
-		{
-			name: 'dryui-check',
-			description: 'Validate a DryUI component, theme file, directory, or workspace'
-		}
-	],
+	tools: [],
+	prompts: [],
 	cliCommands: [
 		{
 			name: 'setup',
 			description: 'Interactive onboarding for editor integration and feedback tooling'
-		},
-		{ name: 'init', description: 'Bootstrap a SvelteKit + DryUI project' },
-		{ name: 'detect', description: 'Detect DryUI project setup' },
-		{ name: 'install', description: 'Print a project install plan' },
-		{ name: 'add', description: 'Print a copyable starter snippet or a project-aware plan' },
-		{
-			name: 'ask',
-			description: 'Discover components, recipes, setup guidance, and tokens by scope'
-		},
-		{ name: 'info', description: 'Show component API reference' },
-		{ name: 'list', description: 'List all components' },
-		{ name: 'compose', description: 'Look up composition guidance' },
-		{ name: 'tokens', description: 'List `--dry-*` design tokens' },
-		{
-			name: 'check',
-			description:
-				'Validate files, themes, or workspaces against DryUI contract, a11y, and token rules'
 		},
 		{ name: 'ambient', description: 'Print compact session context for SessionStart hooks' },
 		{
@@ -77,10 +40,6 @@ export const aiSurface: AiSurfaceManifest = {
 		{
 			name: 'feedback',
 			description: 'Start feedback tooling, inspect the server, or launch the dashboard'
-		},
-		{
-			name: 'prompt',
-			description: 'Generate task-specific DryUI implementation prompts'
 		}
 	],
 	promptBundles: [
@@ -89,7 +48,7 @@ export const aiSurface: AiSurfaceManifest = {
 			title: 'DryUI component implementation',
 			description:
 				'Task-specific Svelte implementation context for one DryUI component, its contract, and its surrounding rules.',
-			targets: ['cli', 'mcp', 'docs', 'skill', 'llms'],
+			targets: ['docs', 'skill', 'llms'],
 			dependencies: ['spec.json', 'composition-data.ts', 'theme-tokens.generated.json'],
 			defaultPrompt:
 				'Use real Svelte 5 with @dryui/ui components. Prefer component props, compound parts, DryUI tokens, and generated validation checks over ad hoc markup or inline styling.',
@@ -110,8 +69,8 @@ export const aiSurface: AiSurfaceManifest = {
 				'Preserve accessible names, labels, focus order, and native element semantics.'
 			],
 			checks: [
-				'dryui check <file.svelte>',
 				'svelte-autofixer <file.svelte>',
+				'bun run --filter @dryui/lint test when changing lint rules',
 				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
 			],
 			source: 'packages/mcp/src/ai-surface.ts'

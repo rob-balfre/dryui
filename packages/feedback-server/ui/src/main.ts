@@ -2,6 +2,7 @@ import { mount } from 'svelte';
 import '@dryui/ui/themes/default.css';
 import '@dryui/ui/themes/dark.css';
 import './app.css';
+import './layout.css';
 import App from './App.svelte';
 
 const target = document.querySelector('#app');

@@ -124,11 +124,16 @@ describe('feedback command', () => {
 		expect(result.exitCode).toBe(0);
 	});
 
-	test('reports missing and unknown feedback subcommands as structured errors', async () => {
-		const missing = await captureAsyncCommandIO(() => runFeedback([], { exitOnComplete: false }));
+	test('opens the dashboard by default and reports unknown feedback subcommands', async () => {
+		const missing = await captureAsyncCommandIO(() =>
+			runFeedback(['--host', '127.0.0.1', '--port', String(server.port), '--no-open'], {
+				exitOnComplete: false
+			})
+		);
 		expect(missing.logs).toHaveLength(1);
-		expect(missing.logs[0]).toContain('missing-subcommand');
-		expect(missing.logs[0]).toContain('dryui feedback --help');
+		expect(missing.logs[0]).toContain('DryUI feedback ui');
+		expect(missing.logs[0]).toContain(`Endpoint: ${baseUrl}`);
+		expect(missing.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(missing.errors).toEqual([]);
 		expect(missing.exitCode).toBeNull();
 

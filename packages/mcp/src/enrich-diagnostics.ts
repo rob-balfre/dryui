@@ -1,8 +1,8 @@
 /**
  * Pure enrichment layer for DryUI diagnostics.
  *
- * `check` produces issues from three subsystems (lint, theme-checker,
- * workspace-audit) with stable codes but diagnostic-only messages. Agents
+ * DryUI validation produces issues from package-level lint and theme-checker
+ * with stable codes but diagnostic-only messages. Agents
  * running a repair loop need prescriptive `hint` text ("do X") and a
  * docs anchor, not just "X is wrong".
  *

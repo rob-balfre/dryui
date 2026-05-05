@@ -16,8 +16,7 @@ const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
 const CODEX_SKILL_RELATIVE = '.agents/skills/dryui-feedback/SKILL.md';
 const SKILL_MISSING_HINT =
 	'dryui-feedback skill not installed in this project. ' +
-	'Run `npx skills add rob-balfre/dryui --skill dryui-feedback` ' +
-	'(or `dryui init` for full project setup).';
+	'Run `npx skills add rob-balfre/dryui --skill dryui-feedback`.';
 const CODEX_SKILL_MISSING_HINT =
 	'dryui-feedback skill not installed for Codex. ' +
 	'Run `DRYUI_DEV=1 dryui`, choose "Set up editor or agent", then choose Codex.';

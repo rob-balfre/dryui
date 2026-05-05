@@ -208,8 +208,8 @@ function componentRules(name: string, def: ComponentDef): string[] {
 
 function componentChecks(name: string): string[] {
 	return [
-		`dryui prompt --component ${name}`,
-		'dryui check <file.svelte>',
+		`Use the DryUI skill or generated component contract when ${name} context is needed`,
+		'Run package-level validation for changed files',
 		'Svelte MCP svelte-autofixer on edited Svelte code'
 	];
 }
@@ -295,14 +295,14 @@ function buildAgentContractV1(): AgentContractV1 {
 		themeImports: spec.themeImports,
 		validation: {
 			checks: [
-				'dryui check <file.svelte>',
+				'Run package-level validation for changed files',
 				'Svelte MCP svelte-autofixer on edited Svelte code',
 				'bun run --filter @dryui/ui build when editing packages/ui Svelte sources'
 			],
 			repairLoop: [
-				'Generate task-specific context with dryui prompt or MCP ask.',
+				'Generate task-specific context with the DryUI skill or generated component contract.',
 				'Write real Svelte using @dryui/ui components.',
-				'Run dryui check and Svelte MCP svelte-autofixer.',
+				'Run package-level validation plus Svelte MCP svelte-autofixer.',
 				'Repair diagnostics until generated checks pass.'
 			]
 		},

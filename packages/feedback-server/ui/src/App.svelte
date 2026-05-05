@@ -413,14 +413,14 @@
 <svelte:document onmousedown={handleSearchMouseDown} onkeydown={handleSearchKeydown} />
 
 <Container size="xl" padding={false}>
-	<div class="dashboard-shell">
-		<section class="dashboard">
+	<div class="dashboard-shell" data-layout="feedback-dashboard">
+		<section class="dashboard" data-layout-area="dashboard">
 			<PageHeader.Root>
 				<PageHeader.Content>
-					<div class="brand-lockup">
+					<div class="brand-lockup" data-layout-area="brand-lockup">
 						<Link href="https://dryui.dev" external underline="none" aria-label="DryUI website">
-							<span class="brand">
-								<span class="wordmark">DryUI</span>
+							<span class="brand" data-layout-area="brand">
+								<span class="wordmark" data-layout-area="wordmark">DryUI</span>
 							</span>
 						</Link>
 						<PageHeader.Title level={1}>Feedback</PageHeader.Title>
@@ -430,7 +430,7 @@
 					</PageHeader.Description>
 				</PageHeader.Content>
 				<PageHeader.Actions>
-					<span class="hero-status">
+					<span class="hero-status" data-layout-area="hero-status">
 						<Text as="span" size="sm" color="secondary">
 							{#if lastLoadedAt}
 								Updated <RelativeTime date={lastLoadedAt} />
@@ -439,7 +439,12 @@
 							{/if}
 						</Text>
 					</span>
-					<div class="dashboard-actions" role="group" aria-label="Dashboard actions">
+					<div
+						class="dashboard-actions"
+						data-layout-area="dashboard-actions"
+						role="group"
+						aria-label="Dashboard actions"
+					>
 						{#if devUrl}
 							<Button
 								href={devUrl}
@@ -460,7 +465,11 @@
 							disabled={refreshing}
 							aria-label="Refresh submissions"
 						>
-							<span class="refresh-icon" data-spinning={refreshing || undefined}>
+							<span
+								class="refresh-icon"
+								data-layout-area="refresh-icon"
+								data-spinning={refreshing || undefined}
+							>
 								<RefreshCw size={14} aria-hidden="true" />
 							</span>
 							{refreshing ? 'Refreshing' : 'Refresh'}
@@ -473,10 +482,10 @@
 				<Alert variant="error">{error}</Alert>
 			{/if}
 
-			<div class="queue">
-				<div class="filter-bar">
-					<div class="filter-tabs">
-						<div class="filter-segments">
+			<div class="queue" data-layout-area="queue">
+				<div class="filter-bar" data-layout-area="filter-bar">
+					<div class="filter-tabs" data-layout-area="filter-tabs">
+						<div class="filter-segments" data-layout-area="filter-segments">
 							<ButtonGroup size="sm" aria-label="Submission status">
 								<Button
 									variant="toggle"
@@ -484,8 +493,8 @@
 									aria-pressed={activeTab === 'pending'}
 									onclick={() => (activeTab = 'pending')}
 								>
-									<span class="tab-trigger">
-										<span>Pending</span>
+									<span class="tab-trigger" data-layout-area="tab-trigger">
+										<span data-layout-area="tab-label">Pending</span>
 										<Badge variant="outline" color="gray" size="sm">
 											{hasActiveSearch ? `${visiblePendingCount}/${pendingCount}` : pendingCount}
 										</Badge>
@@ -497,8 +506,8 @@
 									aria-pressed={activeTab === 'resolved'}
 									onclick={() => (activeTab = 'resolved')}
 								>
-									<span class="tab-trigger">
-										<span>Complete</span>
+									<span class="tab-trigger" data-layout-area="tab-trigger">
+										<span data-layout-area="tab-label">Complete</span>
 										<Badge variant="outline" color="gray" size="sm">
 											{hasActiveSearch ? `${visibleResolvedCount}/${resolvedCount}` : resolvedCount}
 										</Badge>
@@ -508,9 +517,10 @@
 						</div>
 					</div>
 
-					<div class="filter-actions">
+					<div class="filter-actions" data-layout-area="filter-actions">
 						<div
 							class="filter-search"
+							data-layout-area="filter-search"
 							class:is-open={searchOpen || hasActiveSearch}
 							data-feedback-search
 							role="search"
@@ -542,8 +552,8 @@
 						</div>
 
 						{#if showBulkLaunch && targetAgent}
-							<div class="filter-bulk">
-								<div class="launch-group">
+							<div class="filter-bulk" data-layout-area="filter-bulk">
+								<div class="launch-group" data-layout-area="launch-group">
 									<BorderBeam size="sm" colorVariant="colorful" borderRadius="var(--dry-radius-md)">
 										<Button
 											variant="solid"
@@ -581,7 +591,7 @@
 													data-active={agent === targetAgent || undefined}
 												>
 													<AgentIcon {agent} size={16} />
-													<span class="agent-menu-label">
+													<span class="agent-menu-label" data-layout-area="agent-menu-label">
 														{AGENT_INFO[agent].label}
 													</span>
 													{#if agent === targetAgent}
@@ -615,20 +625,24 @@
 					<Alert variant="error">{bulkLaunchError}</Alert>
 				{/if}
 
-				<div class="feed-panel">
+				<div class="feed-panel" data-layout-area="feed-panel">
 					{#if activeTab === 'pending'}
 						{#if loading && pendingCount === 0}
-							<div class="loading-feed" aria-label="Loading pending submissions">
+							<div
+								class="loading-feed"
+								data-layout-area="loading-feed"
+								aria-label="Loading pending submissions"
+							>
 								{#each [0, 1] as index (index)}
-									<div class="loading-surface">
-										<div class="submission-skeleton">
-											<div class="skeleton-head">
+									<div class="loading-surface" data-layout-area="loading-surface">
+										<div class="submission-skeleton" data-layout-area="submission-skeleton">
+											<div class="skeleton-head" data-layout-area="skeleton-head">
 												<Skeleton width="5rem" height="1.25rem" />
 												<Skeleton width="min(34rem, 100%)" height="1.25rem" />
 											</div>
-											<div class="skeleton-body">
+											<div class="skeleton-body" data-layout-area="skeleton-body">
 												<Skeleton variant="rectangular" height="9rem" />
-												<div class="skeleton-lines">
+												<div class="skeleton-lines" data-layout-area="skeleton-lines">
 													<Skeleton width="70%" height="1rem" />
 													<Skeleton width="48%" height="1rem" />
 													<Skeleton width="88%" height="6rem" variant="rectangular" />
@@ -639,7 +653,7 @@
 								{/each}
 							</div>
 						{:else if visiblePendingSubmissions.length === 0}
-							<div class="empty-state">
+							<div class="empty-state" data-layout-area="empty-state">
 								<EmptyState.Root>
 									<EmptyState.Icon>
 										<Inbox size={18} aria-hidden="true" />
@@ -660,9 +674,13 @@
 								</EmptyState.Root>
 							</div>
 						{:else}
-							<div class="feed">
+							<div class="feed" data-layout-area="feed">
 								{#each visiblePendingSubmissions as submission (submission.id)}
-									<div class="feed-item" data-submission-id={submission.id}>
+									<div
+										class="feed-item"
+										data-layout-area="feed-item"
+										data-submission-id={submission.id}
+									>
 										<SubmissionCard
 											{submission}
 											{dispatchTargets}
@@ -679,17 +697,21 @@
 							</div>
 						{/if}
 					{:else if loading && resolvedCount === 0}
-						<div class="loading-feed" aria-label="Loading resolved submissions">
+						<div
+							class="loading-feed"
+							data-layout-area="loading-feed"
+							aria-label="Loading resolved submissions"
+						>
 							{#each [0, 1] as index (index)}
-								<div class="loading-surface">
-									<div class="submission-skeleton">
-										<div class="skeleton-head">
+								<div class="loading-surface" data-layout-area="loading-surface">
+									<div class="submission-skeleton" data-layout-area="submission-skeleton">
+										<div class="skeleton-head" data-layout-area="skeleton-head">
 											<Skeleton width="5rem" height="1.25rem" />
 											<Skeleton width="min(34rem, 100%)" height="1.25rem" />
 										</div>
-										<div class="skeleton-body">
+										<div class="skeleton-body" data-layout-area="skeleton-body">
 											<Skeleton variant="rectangular" height="9rem" />
-											<div class="skeleton-lines">
+											<div class="skeleton-lines" data-layout-area="skeleton-lines">
 												<Skeleton width="70%" height="1rem" />
 												<Skeleton width="48%" height="1rem" />
 												<Skeleton width="88%" height="6rem" variant="rectangular" />
@@ -700,7 +722,7 @@
 							{/each}
 						</div>
 					{:else if visibleResolvedSubmissions.length === 0}
-						<div class="empty-state">
+						<div class="empty-state" data-layout-area="empty-state">
 							<EmptyState.Root>
 								<EmptyState.Icon>
 									<CheckCircle2 size={18} aria-hidden="true" />
@@ -721,9 +743,13 @@
 							</EmptyState.Root>
 						</div>
 					{:else}
-						<div class="feed">
+						<div class="feed" data-layout-area="feed">
 							{#each visibleResolvedSubmissions as submission (submission.id)}
-								<div class="feed-item" data-submission-id={submission.id}>
+								<div
+									class="feed-item"
+									data-layout-area="feed-item"
+									data-submission-id={submission.id}
+								>
 									<SubmissionCard
 										{submission}
 										{dispatchTargets}
@@ -749,19 +775,15 @@
 	.dashboard-shell {
 		container: feedback-dashboard / inline-size;
 		--dry-btn-radius: var(--dry-radius-md);
-
-		display: grid;
 	}
 
 	.dashboard {
 		container-type: inline-size;
-		display: grid;
 		gap: var(--dry-space-2);
 		padding: var(--dry-space-3);
 	}
 
 	.brand {
-		display: inline-grid;
 		align-items: center;
 		color: inherit;
 		text-decoration: none;
@@ -771,9 +793,6 @@
 	}
 
 	.brand-lockup {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
@@ -784,7 +803,6 @@
 	}
 
 	.wordmark {
-		display: inline-grid;
 		align-items: center;
 		color: var(--dry-color-text-strong);
 		font-family:
@@ -801,7 +819,6 @@
 	}
 
 	.refresh-icon {
-		display: inline-grid;
 		place-items: center;
 	}
 
@@ -810,9 +827,6 @@
 	}
 
 	.dashboard-actions {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
@@ -830,7 +844,6 @@
 	}
 
 	.queue {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
@@ -838,34 +851,27 @@
 		container: feedback-filters / inline-size;
 		--dry-btn-radius: var(--dry-radius-md);
 
-		display: grid;
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
 
 	.filter-actions {
-		display: grid;
 		gap: var(--dry-space-2);
 		align-items: center;
 		justify-items: start;
 	}
 
 	.filter-search {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-2);
 		justify-self: start;
 	}
 
 	.filter-search.is-open {
-		grid-template-columns: minmax(0, 1fr) auto;
 		justify-self: stretch;
 	}
 
 	.filter-tabs {
-		display: grid;
 		justify-self: start;
 	}
 
@@ -879,24 +885,17 @@
 	}
 
 	.filter-bulk {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
 		justify-content: start;
 		align-items: center;
 		gap: var(--dry-space-2);
 	}
 
 	.tab-trigger {
-		display: grid;
-		grid-auto-flow: column;
 		gap: var(--dry-space-2);
 		align-items: center;
 	}
 
 	.launch-group {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: max-content;
 		align-items: center;
 		gap: var(--dry-space-1);
 		border-radius: var(--dry-radius-md);
@@ -908,16 +907,10 @@
 	}
 
 	.feed {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
-	.feed-panel {
-		display: grid;
-	}
-
 	.loading-feed {
-		display: grid;
 		gap: var(--dry-space-3);
 	}
 
@@ -930,23 +923,19 @@
 
 	.submission-skeleton,
 	.skeleton-lines {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
 	.skeleton-head {
-		display: grid;
 		gap: var(--dry-space-2);
 	}
 
 	.skeleton-body {
-		display: grid;
 		gap: var(--dry-space-3);
 		align-items: start;
 	}
 
 	.feed-item {
-		display: grid;
 		scroll-margin-block-start: var(--dry-space-3);
 	}
 
@@ -957,8 +946,6 @@
 		}
 
 		.brand-lockup {
-			grid-auto-flow: row;
-			grid-auto-columns: initial;
 			gap: var(--dry-space-2);
 			align-items: start;
 		}
@@ -966,35 +953,14 @@
 
 	@container feedback-filters (min-width: 42rem) {
 		.filter-actions {
-			grid-auto-flow: column;
-			grid-auto-columns: max-content;
 			justify-content: start;
-		}
-
-		.filter-search.is-open {
-			grid-template-columns: minmax(18rem, 28rem) auto;
-		}
-
-		.filter-bulk {
-			grid-auto-flow: column;
-			grid-auto-columns: max-content;
-			grid-template-columns: none;
 		}
 	}
 
 	@container feedback-dashboard (min-width: 48rem) {
 		.filter-bar {
-			grid-template-columns: max-content max-content;
 			justify-content: start;
 			align-items: center;
-		}
-
-		.skeleton-head {
-			grid-template-columns: max-content minmax(0, 1fr);
-		}
-
-		.skeleton-body {
-			grid-template-columns: minmax(0, 20rem) minmax(0, 1fr);
 		}
 	}
 </style>

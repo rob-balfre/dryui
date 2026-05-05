@@ -1,14 +1,7 @@
-import { existsSync, readdirSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { emitKeypressEvents } from 'node:readline';
 import { createInterface } from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
-import {
-	detectPackageManagerFromEnv,
-	detectProject,
-	type DryuiPackageManager,
-	type ProjectDetection
-} from '@dryui/mcp/project-planner';
 import {
 	emitCommandResult,
 	getFlag,
@@ -19,13 +12,10 @@ import {
 	runCommand,
 	type CommandResult
 } from '../run.js';
-import { getDetect } from './detect.js';
 import { getFeedbackUiResult } from './feedback.js';
-import { resolveInitTargetPath, runInit } from './init.js';
 import { getInstallHookResult, getInstallHookStatus } from './install-hook.js';
-import { getInstall } from './install.js';
-import { runLauncher, runUserProjectLauncher } from './launcher.js';
-import { ensureClaudeAgents, type PortHolder } from './launch-utils.js';
+import { runLauncher } from './launcher.js';
+import { ensureClaudeAgents } from './launch-utils.js';
 import {
 	getSetupGuide,
 	setupGuideIds,
@@ -43,14 +33,11 @@ import {
 	svelteCompanionPreviewLines,
 	type AgentSetupEntry
 } from './setup-installers.js';
-import type { Spec } from './types.js';
 
-type MainMenuValue = 'setup' | 'feedback' | 'init' | 'install' | 'detect' | 'exit';
+type MainMenuValue = 'setup' | 'feedback' | 'exit';
 type EditorMenuValue = SetupGuideId | 'back' | 'exit';
 type FeedbackMenuValue = 'open' | 'print' | 'back' | 'exit';
-type PackageManagerMenuValue = DryuiPackageManager | 'back' | 'exit';
 type PostGuideValue = 'svelte' | 'again' | 'main' | 'exit';
-type InitTargetStatus = { kind: 'confirm' | 'error'; message: string };
 
 interface SelectOption<T extends string> {
 	label: string;
@@ -144,24 +131,6 @@ const MAIN_MENU_OPTIONS: readonly SelectOption<MainMenuValue>[] = [
 		description: 'Open the feedback dashboard or print its URL.'
 	},
 	{
-		label: 'Bootstrap a new project',
-		value: 'init',
-		icon: '✦',
-		description: 'Choose a project name/path and package manager, then run `dryui init`.'
-	},
-	{
-		label: 'Print install plan for current folder',
-		value: 'install',
-		icon: '≡',
-		description: 'Inspect what DryUI would change before installing.'
-	},
-	{
-		label: 'Detect current project setup',
-		value: 'detect',
-		icon: '⌕',
-		description: 'Inspect the current folder before choosing an action.'
-	},
-	{
 		label: 'Exit',
 		value: 'exit',
 		icon: '⏻'
@@ -180,43 +149,6 @@ const FEEDBACK_MENU_OPTIONS: readonly SelectOption<FeedbackMenuValue>[] = [
 		value: 'print',
 		icon: '⎘',
 		description: 'Start the feedback server if needed, but do not open the browser.'
-	},
-	{
-		label: 'Back to main menu',
-		value: 'back',
-		icon: '←'
-	},
-	{
-		label: 'Exit',
-		value: 'exit',
-		icon: '⏻'
-	}
-];
-
-const PACKAGE_MANAGER_OPTIONS: readonly SelectOption<PackageManagerMenuValue>[] = [
-	{
-		label: 'bun',
-		value: 'bun',
-		icon: '◈',
-		description: 'Fastest path in this repo and the current default.'
-	},
-	{
-		label: 'pnpm',
-		value: 'pnpm',
-		icon: '◌',
-		description: 'Use pnpm workspaces and lockfile conventions.'
-	},
-	{
-		label: 'npm',
-		value: 'npm',
-		icon: '□',
-		description: 'Use the default npm workflow.'
-	},
-	{
-		label: 'yarn',
-		value: 'yarn',
-		icon: '△',
-		description: 'Use the Yarn workflow.'
 	},
 	{
 		label: 'Back to main menu',
@@ -549,73 +481,11 @@ function getEditorMenuIcon(editor: SetupGuideId): string {
 	}
 }
 
-function buildMainContext(spec: Spec): string[] {
-	try {
-		const detection = detectProject(spec, undefined);
-		const cwd = homeRelative(process.cwd());
-		const root = detection.root ? homeRelative(detection.root) : null;
-
-		const lines = [
-			`cwd: ${cwd}`,
-			`project: ${detection.status} · ${detection.framework} · ${detection.packageManager}`
-		];
-
-		if (root && root !== cwd) {
-			lines.push(`root: ${root}`);
-		} else if (!root) {
-			lines.push('root: (not found)');
-		}
-
-		lines.push(
-			`deps: ${formatFlagRow([
-				{ label: 'ui', on: detection.dependencies.ui },
-				{ label: 'primitives', on: detection.dependencies.primitives },
-				{ label: 'lint', on: detection.dependencies.lint }
-			])}`
-		);
-		lines.push(
-			`theme: ${formatFlagRow([
-				{ label: 'default', on: detection.theme.defaultImported },
-				{ label: 'dark', on: detection.theme.darkImported },
-				{ label: 'auto', on: detection.theme.themeAuto }
-			])}`
-		);
-		return lines;
-	} catch {
-		return [`cwd: ${homeRelative(process.cwd())}`, 'project: detection failed'];
-	}
-}
-
 function renderPromptFrame(question: string, config: SelectPromptOptions = {}): void {
 	console.clear();
 	for (const line of formatPromptFrameLines(question, config)) {
 		console.log(line);
 	}
-}
-
-function renderDetectView(spec: Spec): void {
-	const mainContext = buildMainContext(spec);
-	const agentsBlock = buildAgentsBlock(process.cwd());
-	console.clear();
-	console.log(paint('◈ DryUI', ANSI.bold, ANSI.cyan));
-	console.log(paint('Detected project setup', ANSI.dim, ANSI.sky));
-	const devLines = devModeBannerLines();
-	if (devLines.length > 0) {
-		console.log('');
-		for (const line of devLines) console.log(line);
-	}
-	console.log(paint(divider(), ANSI.dim, ANSI.slate));
-	console.log('');
-	for (const line of formatContextBlockLines(mainContext)) {
-		console.log(line);
-	}
-	if (agentsBlock.length) {
-		console.log('');
-		for (const line of agentsBlock) {
-			console.log(line);
-		}
-	}
-	console.log('');
 }
 
 function renderFeedbackLaunchProgress(noOpen: boolean): void {
@@ -632,25 +502,6 @@ function renderFeedbackLaunchProgress(noOpen: boolean): void {
 	);
 	console.log(paint('This can take a few seconds.', ANSI.dim, ANSI.sky));
 	console.log('');
-}
-
-function renderNoProjectFeedbackNotice(detection: ProjectDetection, cwd: string): void {
-	renderPromptFrame(detectionIssueTitle(detection));
-	console.log(
-		paint(
-			'Opening the feedback dashboard only. Run from your Svelte or SvelteKit app directory to also start its dev server.',
-			ANSI.white
-		)
-	);
-	console.log(paint(`cwd: ${homeRelative(cwd)}`, ANSI.dim, ANSI.sky));
-	console.log('');
-}
-
-function detectionIssueTitle(detection: ProjectDetection): string {
-	if (!detection.packageJsonPath) return 'No Svelte or SvelteKit project detected';
-	if (detection.framework === 'unknown') return 'Not a Svelte or SvelteKit project';
-	if (detection.packageManager === 'unknown') return 'Could not detect a package manager';
-	return 'No dev script found in package.json';
 }
 
 function renderEditorInstallProgress(
@@ -694,11 +545,9 @@ function setupHelp(exitCode = 0): never {
 		{
 			usage: `dryui setup [--editor <${setupGuideIds.join('|')}>] [--claude-hook] [--no-svelte-mcp] [--open-feedback] [--no-open] [--sync-agents] [path]`,
 			description: [
-				'Interactive action menu for editor setup, feedback, and common project helpers.',
+				'Interactive action menu for editor, agent, and feedback setup.',
 				'In a TTY, this command uses arrow-key menus for high-friction choices and text prompts only when needed.',
-				'Without a TTY, use --editor and/or --open-feedback for deterministic output.',
-				'',
-				'For one-shot per-agent install, use `dryui init` (which wires the skill via npx skills + MCP config in one step).'
+				'Without a TTY, use --editor and/or --open-feedback for deterministic output.'
 			],
 			options: [
 				'  --editor <id>       Print setup steps for one editor or agent',
@@ -714,8 +563,7 @@ function setupHelp(exitCode = 0): never {
 				'  dryui setup --editor cursor --no-svelte-mcp',
 				'  dryui setup --editor claude-code --claude-hook',
 				'  dryui setup --sync-agents',
-				'  dryui setup --open-feedback --no-open',
-				'  dryui init           # one-shot setup for a fresh project (recommended)'
+				'  dryui setup --open-feedback --no-open'
 			]
 		},
 		exitCode
@@ -731,52 +579,6 @@ function renderSelect<T extends string>(
 	renderPromptFrame(question, config);
 	for (const line of formatSelectBodyLines(options, selectedIndex, config)) {
 		console.log(line);
-	}
-}
-
-async function promptText(
-	question: string,
-	defaultValue: string,
-	config: SelectPromptOptions = {}
-): Promise<string> {
-	requireTTY();
-
-	const previousRawMode = Boolean(input.isRaw);
-	if (!safeSetRawMode(false)) {
-		process.exit(0);
-	}
-	try {
-		input.resume();
-	} catch (error) {
-		if (isStdinIoError(error)) {
-			process.exit(0);
-		}
-		throw error;
-	}
-
-	renderPromptFrame(question, config);
-	console.log(paint(`Press Enter to use "${defaultValue}".`, ANSI.dim, ANSI.slate));
-	console.log('');
-
-	let rl: ReturnType<typeof createInterface>;
-	try {
-		rl = createInterface({ input, output });
-	} catch (error) {
-		if (isStdinIoError(error)) {
-			process.exit(0);
-		}
-		throw error;
-	}
-
-	try {
-		const answer = await rl.question(paint('Project name or path: ', ANSI.bold, ANSI.gold));
-		const trimmed = answer.trim();
-		return trimmed || defaultValue;
-	} catch (error) {
-		handleReadlineError(error);
-	} finally {
-		rl.close();
-		safeSetRawMode(previousRawMode);
 	}
 }
 
@@ -911,35 +713,9 @@ async function promptConfirm(
 	return value === 'yes';
 }
 
-async function promptKillPortHolder(holder: PortHolder, port: number): Promise<boolean> {
-	return await promptConfirm(
-		`Port ${port} is busy (PID ${holder.pid}, command: ${holder.command}). Kill it and start your project dev server?`,
-		false
-	);
-}
-
-async function promptFeedbackSetup(plan: {
-	install: boolean;
-	mount: boolean;
-	layoutPath: string | null;
-	viteConfig: boolean;
-	viteConfigPath: string | null;
-}): Promise<boolean> {
-	const actions: string[] = [];
-	if (plan.install) actions.push('• Install @dryui/feedback');
-	if (plan.mount && plan.layoutPath) actions.push(`• Mount <Feedback /> in ${plan.layoutPath}`);
-	if (plan.viteConfig && plan.viteConfigPath) {
-		actions.push(`• Add @dryui/feedback to ssr.noExternal in ${plan.viteConfigPath}`);
-	}
-	return await promptConfirm('Set up @dryui/feedback for this project?', true, {
-		contextLines: actions
-	});
-}
-
 async function runFeedbackSession(
 	noOpen: boolean,
 	exitOnComplete: boolean,
-	spec: Spec | null,
 	launcherOptions: Omit<
 		NonNullable<Parameters<typeof runLauncher>[1]>,
 		'cwd' | 'exitOnComplete'
@@ -949,74 +725,12 @@ async function runFeedbackSession(
 	const launched = await runLauncher(args, { exitOnComplete, ...launcherOptions });
 	if (launched) return;
 
-	if (spec) {
-		const cwd = process.cwd();
-		const detection = detectProject(spec, cwd);
-		const onProgress = launcherOptions.runtime?.onProgress;
-		const userProjectLaunched = await runUserProjectLauncher(args, {
-			exitOnComplete,
-			spec,
-			runtime: {
-				promptKillPortHolder,
-				promptFeedbackSetup,
-				detectProject: () => detection,
-				...(onProgress
-					? {
-							onProgress: ({ cwd, noOpen: projectNoOpen }) =>
-								onProgress({ workspaceRoot: cwd, noOpen: projectNoOpen })
-						}
-					: {})
-			}
-		});
-		if (userProjectLaunched) return;
-
-		if (!exitOnComplete) {
-			renderNoProjectFeedbackNotice(detection, cwd);
-		}
-	}
-
 	const result = await getFeedbackUiResult(args, exitOnComplete ? 'toon' : 'text');
 	if (exitOnComplete) {
 		runCommand(result, 'toon');
 	} else {
 		emitCommandResult(result);
 	}
-}
-
-export function getInitTargetStatus(projectPath: string): InitTargetStatus | null {
-	const targetPath = resolveInitTargetPath(projectPath);
-	const targetExists = existsSync(targetPath);
-	const targetIsDirectory = targetExists ? statSync(targetPath).isDirectory() : false;
-
-	if (targetPath === resolve(process.cwd())) {
-		if (targetExists && readdirSync(targetPath).length > 0) {
-			return {
-				kind: 'confirm',
-				message:
-					'This will scaffold into the current directory and may modify existing files. Continue?'
-			};
-		}
-		return {
-			kind: 'confirm',
-			message: 'This will scaffold into the current directory. Continue?'
-		};
-	}
-
-	if (targetExists && !targetIsDirectory) {
-		return {
-			kind: 'error',
-			message: `Target ${homeRelative(targetPath)} already exists as a file. Choose a new directory path.`
-		};
-	}
-
-	if (targetExists && readdirSync(targetPath).length > 0) {
-		return {
-			kind: 'confirm',
-			message: `Target ${homeRelative(targetPath)} already exists and is not empty. Continue?`
-		};
-	}
-
-	return null;
 }
 
 async function runInteractiveEditorSetup(args: string[], defaultSvelteMcp: boolean): Promise<void> {
@@ -1144,7 +858,7 @@ async function runInteractiveEditorSetup(args: string[], defaultSvelteMcp: boole
 	}
 }
 
-async function runInteractiveFeedbackSetup(spec: Spec): Promise<void> {
+async function runInteractiveFeedbackSetup(): Promise<void> {
 	const action = await promptSelect('How would you like to start feedback?', FEEDBACK_MENU_OPTIONS);
 
 	if (action === 'back') {
@@ -1155,7 +869,7 @@ async function runInteractiveFeedbackSetup(spec: Spec): Promise<void> {
 		process.exit(0);
 	}
 
-	await runFeedbackSession(action === 'print', false, spec, {
+	await runFeedbackSession(action === 'print', false, {
 		runtime: {
 			onProgress: ({ noOpen }) => renderFeedbackLaunchProgress(noOpen)
 		}
@@ -1163,55 +877,7 @@ async function runInteractiveFeedbackSetup(spec: Spec): Promise<void> {
 	await promptAfterAction();
 }
 
-async function runInteractiveInit(spec: Spec): Promise<void> {
-	const projectPath = await promptText('Where should the new project live?', 'my-app');
-	const detectedPm = detectPackageManagerFromEnv();
-	const initialIndex = PACKAGE_MANAGER_OPTIONS.findIndex((option) => option.value === detectedPm);
-	const packageManager = await promptSelect<PackageManagerMenuValue>(
-		'Which package manager should init use?',
-		PACKAGE_MANAGER_OPTIONS,
-		{
-			contextLines: [`target: ${projectPath}`],
-			initialIndex: initialIndex === -1 ? 0 : initialIndex
-		}
-	);
-
-	if (packageManager === 'back') {
-		return;
-	}
-
-	if (packageManager === 'exit') {
-		process.exit(0);
-	}
-
-	const targetStatus = getInitTargetStatus(projectPath);
-	if (targetStatus?.kind === 'error') {
-		console.error(targetStatus.message);
-		await promptAfterAction();
-		return;
-	}
-
-	if (targetStatus?.kind === 'confirm') {
-		const confirmed = await promptConfirm(targetStatus.message, false, {
-			contextLines: [
-				`target: ${homeRelative(resolveInitTargetPath(projectPath))}`,
-				`package-manager: ${packageManager}`
-			]
-		});
-		if (!confirmed) {
-			return;
-		}
-	}
-
-	await runInit([projectPath, '--pm', packageManager], spec);
-	process.exit(0);
-}
-
-async function runInteractiveSetup(
-	args: string[],
-	spec: Spec,
-	defaultSvelteMcp: boolean
-): Promise<void> {
+async function runInteractiveSetup(args: string[], defaultSvelteMcp: boolean): Promise<void> {
 	while (true) {
 		const action = await promptSelect('What would you like to do?', MAIN_MENU_OPTIONS);
 
@@ -1220,18 +886,7 @@ async function runInteractiveSetup(
 				await runInteractiveEditorSetup(args, defaultSvelteMcp);
 				break;
 			case 'feedback':
-				await runInteractiveFeedbackSetup(spec);
-				break;
-			case 'init':
-				await runInteractiveInit(spec);
-				break;
-			case 'install':
-				emitCommandResult(getInstall('.', spec, 'text'));
-				await promptAfterAction();
-				break;
-			case 'detect':
-				renderDetectView(spec);
-				await promptAfterAction();
+				await runInteractiveFeedbackSetup();
 				break;
 			case 'exit':
 				process.exit(0);
@@ -1272,7 +927,7 @@ function syncClaudeAgentsResult(args: string[]): CommandResult {
 	return { output: lines.join('\n'), error: null, exitCode: 0 };
 }
 
-export async function runSetup(args: string[], spec: Spec): Promise<void> {
+export async function runSetup(args: string[]): Promise<void> {
 	if (hasFlag(args, '--help') || hasFlag(args, '-h')) {
 		setupHelp();
 	}
@@ -1297,12 +952,12 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 			console.error('');
 			console.error('`dryui setup --install` was removed.');
 			console.error(
-				'Use `dryui init` for one-shot setup (it wires skills via npx skills + MCP config in one step), or run the printed steps above by hand.'
+				'Run the printed skill/MCP setup steps above, or use your agent to apply them.'
 			);
 			process.exit(2);
 		}
 		if (hasFlag(args, '--open-feedback')) {
-			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);
+			await runFeedbackSession(hasFlag(args, '--no-open'), true);
 			return;
 		}
 		process.exit(0);
@@ -1310,11 +965,11 @@ export async function runSetup(args: string[], spec: Spec): Promise<void> {
 
 	if (!isInteractiveTTY()) {
 		if (hasFlag(args, '--open-feedback')) {
-			await runFeedbackSession(hasFlag(args, '--no-open'), true, spec);
+			await runFeedbackSession(hasFlag(args, '--no-open'), true);
 			return;
 		}
 		setupHelp();
 	}
 
-	await runInteractiveSetup(args, spec, includeSvelteMcp);
+	await runInteractiveSetup(args, includeSvelteMcp);
 }

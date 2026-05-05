@@ -17,6 +17,18 @@ type FeedbackToolClient = Pick<
 >;
 
 type ToolRegistrar = Pick<McpServer, 'tool'>;
+type RegisterToolCompat = (
+	name: string,
+	description: string,
+	schema: Record<string, unknown>,
+	callback: (args: any) => unknown
+) => unknown;
+
+// The MCP SDK's tool overloads currently type schemas against a Zod v3-shaped
+// interface while this package uses Zod v4. Runtime accepts the same raw shape.
+function inputSchema<T extends Record<string, unknown>>(schema: T): any {
+	return schema;
+}
 
 async function pollUntilReady<T>(
 	fetchOnce: () => Promise<T>,
@@ -106,19 +118,21 @@ function enrichSubmissionForResponse(submission: Submission): Record<string, unk
 }
 
 export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToolClient): void {
-	server.tool('feedback_list_sessions', 'List active feedback sessions.', {}, async () => {
+	const tool = server.tool.bind(server) as RegisterToolCompat;
+
+	tool('feedback_list_sessions', 'List active feedback sessions.', {}, async () => {
 		const sessions = await client.listSessions();
 		return {
 			content: [{ type: 'text', text: JSON.stringify(sessions, null, 2) }]
 		};
 	});
 
-	server.tool(
+	tool(
 		'feedback_get_session',
 		'Get a feedback session and its annotations.',
-		{
+		inputSchema({
 			sessionId: z.string().describe('Feedback session ID')
-		},
+		}),
 		async ({ sessionId }) => {
 			const session = await client.getSession(sessionId);
 			return {
@@ -127,12 +141,12 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_get_pending',
 		'Get pending annotations for a session.',
-		{
+		inputSchema({
 			sessionId: z.string().describe('Feedback session ID')
-		},
+		}),
 		async ({ sessionId }) => {
 			const pending = await client.getPending(sessionId);
 			return {
@@ -141,24 +155,19 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
-		'feedback_get_all_pending',
-		'Get all pending annotations across sessions.',
-		{},
-		async () => {
-			const pending = await client.getAllPending();
-			return {
-				content: [{ type: 'text', text: JSON.stringify(pending, null, 2) }]
-			};
-		}
-	);
+	tool('feedback_get_all_pending', 'Get all pending annotations across sessions.', {}, async () => {
+		const pending = await client.getAllPending();
+		return {
+			content: [{ type: 'text', text: JSON.stringify(pending, null, 2) }]
+		};
+	});
 
-	server.tool(
+	tool(
 		'feedback_acknowledge',
 		'Mark an annotation as acknowledged.',
-		{
+		inputSchema({
 			annotationId: z.string().describe('Annotation ID')
-		},
+		}),
 		async ({ annotationId }) => {
 			const annotation = await client.updateAnnotation(annotationId, { status: 'acknowledged' });
 			return {
@@ -167,13 +176,13 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_resolve',
 		'Mark an annotation as resolved and optionally add a summary.',
-		{
+		inputSchema({
 			annotationId: z.string().describe('Annotation ID'),
 			summary: z.string().optional().describe('Optional resolution summary')
-		},
+		}),
 		async ({ annotationId, summary }) => {
 			const annotation = await client.updateAnnotation(annotationId, {
 				status: 'resolved',
@@ -191,13 +200,13 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_dismiss',
 		'Dismiss an annotation with a reason.',
-		{
+		inputSchema({
 			annotationId: z.string().describe('Annotation ID'),
 			reason: z.string().describe('Dismissal reason')
-		},
+		}),
 		async ({ annotationId, reason }) => {
 			const annotation = await client.updateAnnotation(annotationId, {
 				status: 'dismissed'
@@ -209,13 +218,13 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_reply',
 		'Reply to an annotation thread.',
-		{
+		inputSchema({
 			annotationId: z.string().describe('Annotation ID'),
 			message: z.string().describe('Reply content')
-		},
+		}),
 		async ({ annotationId, message }) => {
 			const annotation = await client.addThreadMessage(annotationId, message, 'agent');
 			return {
@@ -224,10 +233,10 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_get_submissions',
 		'Poll for pending feedback submissions. Returns both WebP and PNG screenshot paths, scroll offset at submit time, per-drawing position hints, and the raw drawings.',
-		{
+		inputSchema({
 			timeoutSeconds: z
 				.number()
 				.int()
@@ -242,7 +251,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 				.max(10)
 				.optional()
 				.describe('Polling interval in seconds (default 3)')
-		},
+		}),
 		async ({ timeoutSeconds = 30, pollIntervalSeconds = 3 }) => {
 			const { timedOut, value } = await pollUntilReady(
 				() => client.getSubmissions('pending'),
@@ -274,12 +283,12 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_resolve_submission',
 		'Mark a feedback submission as resolved after acting on it.',
-		{
+		inputSchema({
 			submissionId: z.string().describe('Submission ID to resolve')
-		},
+		}),
 		async ({ submissionId }) => {
 			await client.resolveSubmission(submissionId);
 			return {
@@ -288,10 +297,10 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 		}
 	);
 
-	server.tool(
+	tool(
 		'feedback_watch_annotations',
 		'Poll pending annotations until something appears or the timeout expires.',
-		{
+		inputSchema({
 			sessionId: z.string().optional().describe('Optional session filter'),
 			pollIntervalSeconds: z
 				.number()
@@ -301,7 +310,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 				.optional()
 				.describe('Polling interval in seconds'),
 			timeoutSeconds: z.number().int().min(1).max(300).optional().describe('Timeout in seconds')
-		},
+		}),
 		async ({ sessionId, pollIntervalSeconds = 3, timeoutSeconds = 120 }) => {
 			const { timedOut, value } = await pollUntilReady(
 				() => (sessionId ? client.getPending(sessionId) : client.getAllPending()),

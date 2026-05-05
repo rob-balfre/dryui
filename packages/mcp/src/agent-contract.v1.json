@@ -11,70 +11,12 @@
     "composition": "packages/mcp/src/composition-data.ts"
   },
   "ai": {
-    "tools": [
-      {
-        "name": "ask",
-        "description": "Discover components, recipes, setup guidance, and tokens through an explicit scope"
-      },
-      {
-        "name": "check",
-        "description": "Validate a component, theme file, directory, or workspace against the DryUI contract, a11y, and token rules"
-      }
-    ],
-    "prompts": [
-      {
-        "name": "dryui-ask",
-        "description": "Discover the right DryUI component, recipe, list, or setup guidance"
-      },
-      {
-        "name": "dryui-check",
-        "description": "Validate a DryUI component, theme file, directory, or workspace"
-      }
-    ],
+    "tools": [],
+    "prompts": [],
     "cliCommands": [
       {
         "name": "setup",
         "description": "Interactive onboarding for editor integration and feedback tooling"
-      },
-      {
-        "name": "init",
-        "description": "Bootstrap a SvelteKit + DryUI project"
-      },
-      {
-        "name": "detect",
-        "description": "Detect DryUI project setup"
-      },
-      {
-        "name": "install",
-        "description": "Print a project install plan"
-      },
-      {
-        "name": "add",
-        "description": "Print a copyable starter snippet or a project-aware plan"
-      },
-      {
-        "name": "ask",
-        "description": "Discover components, recipes, setup guidance, and tokens by scope"
-      },
-      {
-        "name": "info",
-        "description": "Show component API reference"
-      },
-      {
-        "name": "list",
-        "description": "List all components"
-      },
-      {
-        "name": "compose",
-        "description": "Look up composition guidance"
-      },
-      {
-        "name": "tokens",
-        "description": "List `--dry-*` design tokens"
-      },
-      {
-        "name": "check",
-        "description": "Validate files, themes, or workspaces against DryUI contract, a11y, and token rules"
       },
       {
         "name": "ambient",
@@ -87,10 +29,6 @@
       {
         "name": "feedback",
         "description": "Start feedback tooling, inspect the server, or launch the dashboard"
-      },
-      {
-        "name": "prompt",
-        "description": "Generate task-specific DryUI implementation prompts"
       }
     ],
     "promptBundles": [
@@ -99,8 +37,6 @@
         "title": "DryUI component implementation",
         "description": "Task-specific Svelte implementation context for one DryUI component, its contract, and its surrounding rules.",
         "targets": [
-          "cli",
-          "mcp",
           "docs",
           "skill",
           "llms"
@@ -133,8 +69,8 @@
           "Preserve accessible names, labels, focus order, and native element semantics."
         ],
         "checks": [
-          "dryui check <file.svelte>",
           "svelte-autofixer <file.svelte>",
+          "bun run --filter @dryui/lint test when changing lint rules",
           "bun run --filter @dryui/ui build when editing packages/ui Svelte sources"
         ],
         "source": "packages/mcp/src/ai-surface.ts"
@@ -147,14 +83,14 @@
   },
   "validation": {
     "checks": [
-      "dryui check <file.svelte>",
+      "Run package-level validation for changed files",
       "Svelte MCP svelte-autofixer on edited Svelte code",
       "bun run --filter @dryui/ui build when editing packages/ui Svelte sources"
     ],
     "repairLoop": [
-      "Generate task-specific context with dryui prompt or MCP ask.",
+      "Generate task-specific context with the DryUI skill or generated component contract.",
       "Write real Svelte using @dryui/ui components.",
-      "Run dryui check and Svelte MCP svelte-autofixer.",
+      "Run package-level validation plus Svelte MCP svelte-autofixer.",
       "Repair diagnostics until generated checks pass."
     ]
   },
@@ -202,8 +138,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Accordion",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Accordion context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -343,8 +279,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Adjust",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Adjust context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -447,8 +383,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AffixGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AffixGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -600,8 +536,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Alert",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Alert context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -708,8 +644,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AlertDialog",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AlertDialog context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -856,8 +792,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AlphaSlider",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AlphaSlider context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -935,8 +871,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AppFrame",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AppFrame context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -997,8 +933,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AspectRatio",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AspectRatio context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1058,8 +994,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Aurora",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Aurora context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1172,8 +1108,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Avatar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Avatar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1271,8 +1207,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component AvatarGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when AvatarGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1374,8 +1310,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Backdrop",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Backdrop context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1436,8 +1372,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Badge",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Badge context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1524,8 +1460,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Beam",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Beam context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1605,8 +1541,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component BorderBeam",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when BorderBeam context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -1752,8 +1688,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Breadcrumb",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Breadcrumb context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -1891,8 +1827,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Button",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Button context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -2038,8 +1974,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ButtonGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ButtonGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -2120,8 +2056,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Calendar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Calendar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -2318,8 +2254,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Carousel",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Carousel context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -2496,8 +2432,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Chart",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Chart context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -2726,8 +2662,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ChatMessage",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ChatMessage context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -2808,8 +2744,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ChatThread",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ChatThread context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -2869,8 +2805,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Checkbox",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Checkbox context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -2945,8 +2881,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Chip",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Chip context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -3100,8 +3036,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ChipGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ChipGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -3257,8 +3193,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ChromaticAberration",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ChromaticAberration context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -3325,8 +3261,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ChromaticShift",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ChromaticShift context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -3407,8 +3343,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Clipboard",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Clipboard context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -3469,8 +3405,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component CodeBlock",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when CodeBlock context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -3562,8 +3498,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Collapsible",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Collapsible context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -3671,8 +3607,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ColorPicker",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ColorPicker context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -3856,8 +3792,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Combobox",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Combobox context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -4092,8 +4028,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component CommandPalette",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when CommandPalette context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -4247,8 +4183,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Container",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Container context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -4328,8 +4264,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ContextMenu",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ContextMenu context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -4476,8 +4412,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DataGrid",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DataGrid context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -4753,8 +4689,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DateField",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DateField context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -4903,8 +4839,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DatePicker",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DatePicker context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -5110,8 +5046,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DateRangePicker",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DateRangePicker context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -5319,8 +5255,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DateTimeInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DateTimeInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -5419,8 +5355,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DescriptionList",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DescriptionList context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -5510,8 +5446,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Diagram",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Diagram context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -5586,8 +5522,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Dialog",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Dialog context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -5719,8 +5655,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Displacement",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Displacement context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -5799,8 +5735,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DragAndDrop",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DragAndDrop context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -5940,8 +5876,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Drawer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Drawer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6097,8 +6033,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DropdownMenu",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DropdownMenu context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6249,8 +6185,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component DropZone",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when DropZone context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -6304,8 +6240,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component EmptyState",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when EmptyState context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6404,8 +6340,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Enter",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Enter context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -6440,8 +6376,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Exit",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Exit context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -6496,8 +6432,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Field",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Field context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6612,8 +6548,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Fieldset",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Fieldset context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6719,8 +6655,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FileSelect",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FileSelect context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -6874,8 +6810,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FileUpload",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FileUpload context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -7096,8 +7032,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FlipCard",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FlipCard context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -7212,8 +7148,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FloatButton",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FloatButton context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -7329,8 +7265,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FocusTrap",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FocusTrap context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -7395,8 +7331,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Footer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Footer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -7505,8 +7441,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FormatBytes",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FormatBytes context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -7581,8 +7517,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FormatDate",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FormatDate context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -7759,8 +7695,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component FormatNumber",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when FormatNumber context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -7868,8 +7804,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Gauge",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Gauge context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -7955,8 +7891,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Glass",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Glass context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8028,8 +7964,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Glow",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Glow context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8108,8 +8044,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component GodRays",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when GodRays context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8184,8 +8120,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component GradientMesh",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when GradientMesh context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8251,8 +8187,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Halftone",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Halftone context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8335,8 +8271,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Heading",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Heading context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8431,8 +8367,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Hero",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Hero context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -8555,8 +8491,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Hotkey",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Hotkey context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8623,8 +8559,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component HoverCard",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when HoverCard context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -8740,8 +8676,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Icon",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Icon context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8821,8 +8757,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component IconSwap",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when IconSwap context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -8862,8 +8798,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Image",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Image context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8918,8 +8854,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ImageComparison",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ImageComparison context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -8995,8 +8931,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component InfiniteScroll",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when InfiniteScroll context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -9084,8 +9020,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Input",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Input context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -9181,8 +9117,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component InputGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when InputGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -9278,8 +9214,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Kbd",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Kbd context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -9337,8 +9273,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Label",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Label context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -9398,8 +9334,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Link",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Link context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -9476,8 +9412,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component LinkPreview",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when LinkPreview context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -9609,8 +9545,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component List",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when List context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -9756,8 +9692,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Listbox",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Listbox context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -9862,8 +9798,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component LogoCloud",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when LogoCloud context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -9961,8 +9897,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component LogoMark",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when LogoMark context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -10063,8 +9999,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Map",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Map context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -10288,8 +10224,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component MarkdownRenderer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when MarkdownRenderer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -10343,8 +10279,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Marquee",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Marquee context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -10424,8 +10360,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component MaskReveal",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when MaskReveal context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -10523,8 +10459,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component MegaMenu",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when MegaMenu context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -10703,8 +10639,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Menubar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Menubar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -10848,8 +10784,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Motion",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Motion context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -10906,8 +10842,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component MultiSelectCombobox",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when MultiSelectCombobox context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -11190,8 +11126,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component NavigationMenu",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when NavigationMenu context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -11318,8 +11254,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Noise",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Noise context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -11418,8 +11354,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component NotificationCenter",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when NotificationCenter context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -11602,8 +11538,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component NumberInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when NumberInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -11686,8 +11622,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Numeric",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Numeric context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -11732,8 +11668,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component OptionPicker",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when OptionPicker context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -11885,8 +11821,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component PageHeader",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when PageHeader context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -12079,8 +12015,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Pagination",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Pagination context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -12221,8 +12157,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component PhoneInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when PhoneInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -12329,8 +12265,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component PinInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when PinInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -12528,8 +12464,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Popover",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Popover context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -12641,8 +12577,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Portal",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Portal context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -12707,8 +12643,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Progress",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Progress context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -12797,8 +12733,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ProgressRing",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ProgressRing context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -12887,8 +12823,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component PromptInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when PromptInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -12980,8 +12916,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component QRCode",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when QRCode context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13066,8 +13002,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component RadioGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when RadioGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -13182,8 +13118,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component RangeCalendar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when RangeCalendar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -13312,8 +13248,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Rating",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Rating context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13405,8 +13341,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component RelativeTime",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when RelativeTime context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13471,8 +13407,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Reveal",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Reveal context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13576,8 +13512,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component RichTextEditor",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when RichTextEditor context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -13669,8 +13605,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ScrollArea",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ScrollArea context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13731,8 +13667,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ScrollToTop",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ScrollToTop context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -13823,8 +13759,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component SegmentedControl",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when SegmentedControl context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -13946,8 +13882,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Select",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Select context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -14135,8 +14071,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component SelectableTileGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when SelectableTileGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -14295,8 +14231,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Separator",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Separator context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14363,8 +14299,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ShaderCanvas",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ShaderCanvas context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14471,8 +14407,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Shimmer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Shimmer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14546,8 +14482,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Sidebar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Sidebar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -14710,8 +14646,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Skeleton",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Skeleton context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14778,8 +14714,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Slider",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Slider context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14895,8 +14831,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Spacer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Spacer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -14959,8 +14895,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Sparkline",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Sparkline context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -15044,8 +14980,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Spinner",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Spinner context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -15123,8 +15059,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Splitter",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Splitter context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -15237,8 +15173,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Spotlight",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Spotlight context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -15310,8 +15246,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Stagger",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Stagger context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -15350,8 +15286,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component StarRating",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when StarRating context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -15436,8 +15372,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component StatCard",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when StatCard context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -15579,8 +15515,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Stepper",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Stepper context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -15707,8 +15643,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Svg",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Svg context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -15797,8 +15733,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Table",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Table context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -15953,8 +15889,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component TableOfContents",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when TableOfContents context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -16063,8 +15999,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Tabs",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Tabs context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -16209,8 +16145,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Tag",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Tag context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -16305,8 +16241,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component TagsInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when TagsInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -16474,8 +16410,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Text",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Text context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -16610,8 +16546,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Textarea",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Textarea context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -16691,8 +16627,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ThemeToggle",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ThemeToggle context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -16789,8 +16725,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component TimeInput",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when TimeInput context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -16886,8 +16822,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Timeline",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Timeline context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17054,8 +16990,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Toast",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Toast context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17221,8 +17157,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Toggle",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Toggle context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -17306,8 +17242,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component ToggleGroup",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when ToggleGroup context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17429,8 +17365,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component TokenScope",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when TokenScope context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -17490,8 +17426,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Toolbar",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Toolbar context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17612,8 +17548,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Tooltip",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Tooltip context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17738,8 +17674,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Tour",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Tour context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -17839,8 +17775,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Transfer",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Transfer context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -18008,8 +17944,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Tree",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Tree context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -18115,8 +18051,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component TypingIndicator",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when TypingIndicator context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ]
     },
@@ -18162,8 +18098,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component Typography",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when Typography context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "parts": {
@@ -18371,8 +18307,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component User",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when User context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -18434,8 +18370,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component VideoEmbed",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when VideoEmbed context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -18529,8 +18465,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component VirtualList",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when VirtualList context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -18599,8 +18535,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component VisuallyHidden",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when VisuallyHidden context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -18642,8 +18578,8 @@
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
-        "dryui prompt --component WaveDivider",
-        "dryui check <file.svelte>",
+        "Use the DryUI skill or generated component contract when WaveDivider context is needed",
+        "Run package-level validation for changed files",
         "Svelte MCP svelte-autofixer on edited Svelte code"
       ],
       "props": {
@@ -19334,7 +19270,7 @@
     },
     "self-correction": {
       "name": "self-correction",
-      "description": "The DryUI self-correction loop for agents: write Svelte, run `dryui check`, read the structured `dryui-diagnostics` JSON block, apply the `hint` for each issue, re-run `check`. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.",
+      "description": "The DryUI self-correction loop for agents: write Svelte, run focused package-level validation, apply the generated hints for each issue, then re-run validation. Stop when diagnostics are empty. Use `svelte-autofixer` via the Svelte MCP in between for compiler-level fixes.",
       "tags": [
         "agent",
         "repair",
@@ -19347,7 +19283,7 @@
         "autofix"
       ],
       "components": [],
-      "snippet": "<!--\n  Agent repair loop for DryUI check output.\n\n  Every 'check' response over MCP carries two content blocks:\n    1. TOON summary (human-readable)\n    2. A JSON block tagged 'dryui-diagnostics' with { diagnostics: [...] }\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. call tool 'check' with { path: 'path/to/file.svelte' }\n3. parse the dryui-diagnostics JSON block from the response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. call 'check' again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
+      "snippet": "<!--\n  Agent repair loop for DryUI validation output.\n\n  Each diagnostic has { code, severity, file, line?, hint?, docsRef?, fix? }.\n  Prefer 'hint' over 'message'. 'hint' is prescriptive (\"do X\"), 'message'\n  is diagnostic (\"X is wrong\").\n-->\n\n1. write Svelte or theme CSS\n2. run the focused package-level validation command for the changed file/package\n3. parse the diagnostics from the validation response\n4. for each diagnostic with severity = 'error':\n     - if diagnostic.fix exists, apply fix.after and goto step 6\n     - otherwise apply diagnostic.hint to produce a candidate edit\n5. write the edited file\n6. for Svelte-compiler-level issues, call the Svelte MCP\n   'svelte-autofixer' tool on the file\n7. run validation again\n8. loop until diagnostics is empty or no progress is being made\n\nStop conditions:\n  - diagnostics array is empty AND hasBlockers=false -> done\n  - same diagnostic code repeats after 2 attempts -> surface to human\n  - any parse/* diagnostic -> fix the syntax before looping further"
     },
     "serif-display": {
       "name": "serif-display",

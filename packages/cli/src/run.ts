@@ -190,9 +190,7 @@ export function renderCommandResultByMode<T>(
 }
 
 export function formatDryuiCliReferences(output: string): string {
-	return output
-		.replace(/(?<!dryui )\bask --scope/g, 'dryui ask --scope')
-		.replace(/^(\s*)check( |$)/gm, '$1dryui check$2');
+	return output;
 }
 
 /**

@@ -345,8 +345,8 @@ export async function runFeedback(args: string[], options: FeedbackRunOptions = 
 		feedbackDispatcherHelp();
 	}
 
-	if (!command) {
-		emitOrRun(getUnknownFeedbackSubcommand(undefined), 'toon', exitOnComplete);
+	if (!command || command.startsWith('--')) {
+		await runFeedbackUi(args, { exitOnComplete });
 		return;
 	}
 
