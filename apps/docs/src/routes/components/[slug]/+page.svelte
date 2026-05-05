@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
+	import type { PartDef } from '../../../../../../packages/mcp/src/spec-types.js';
 	import { Badge } from '@dryui/ui/badge';
 	import { CodeBlock } from '@dryui/ui/code-block';
 	import { Container } from '@dryui/ui/container';
@@ -18,11 +19,10 @@
 	let { data }: PageProps = $props();
 	let name = $derived(data.name);
 	let DemoComponent = $derived(getComponentDemo(name));
-	let hasRootPart = $derived(data.hasRootPart);
 	let a11yNotes = $derived(data?.a11y ?? []);
-	let parts = $derived(data.parts ? Object.entries(data.parts) : []);
-	let partNames = $derived(data.parts ? Object.keys(data.parts) : []);
-	let nonRootPartNames = $derived(partNames.filter((partName) => partName !== 'Root'));
+	let parts: [string, PartDef][] = $derived(
+		data.parts ? (Object.entries(data.parts) as [string, PartDef][]) : []
+	);
 </script>
 
 <svelte:head>
@@ -42,18 +42,6 @@
 				{/if}
 
 				<div class="stack-lg">
-					{#if data.kind === 'primitive'}
-						<aside class="primitive-callout">
-							<div class="stack-sm">
-								<Badge variant="outline" color="gray">Primitive</Badge>
-								<Text color="secondary">
-									This page documents the headless layer in <code>@dryui/primitives</code>. Any
-									structural styling shown in examples is docs-only.
-								</Text>
-							</div>
-						</aside>
-					{/if}
-
 					{#if a11yNotes.length > 0}
 						<DocsCallout title="Accessibility" variant="info">
 							<ul class="a11y-list">
@@ -67,11 +55,7 @@
 					<div class="surface">
 						<header class="surface-header">
 							<div class="stack-sm">
-								<Heading level={3}
-									>{data.kind === 'primitive'
-										? 'Headless quick start'
-										: 'Styled quick start'}</Heading
-								>
+								<Heading level={3}>Styled quick start</Heading>
 								<Text color="secondary">
 									Copy this entrypoint first. It includes the imports required to get the component
 									on screen.
@@ -88,27 +72,23 @@
 						</div>
 					</div>
 
-					{#if data.kind === 'ui'}
-						<div class="surface">
-							<header class="surface-header">
-								<Heading level={3}>Import options</Heading>
-							</header>
-							<div class="surface-content">
-								<div class="stack-md">
-									<div>
-										<p class="import-label">Root package</p>
-										<CodeBlock code={data.rootImport} language="ts" />
-									</div>
-									{#if data.subpathImport}
-										<div>
-											<p class="import-label">Per-component subpath</p>
-											<CodeBlock code={data.subpathImport} language="ts" />
-										</div>
-									{/if}
+					<div class="surface">
+						<header class="surface-header">
+							<Heading level={3}>Import options</Heading>
+						</header>
+						<div class="surface-content">
+							<div class="stack-md">
+								<div>
+									<p class="import-label">Root package</p>
+									<CodeBlock code={data.rootImport} language="ts" />
+								</div>
+								<div>
+									<p class="import-label">Per-component subpath</p>
+									<CodeBlock code={data.subpathImport} language="ts" />
 								</div>
 							</div>
 						</div>
-					{/if}
+					</div>
 				</div>
 			</div>
 
@@ -251,12 +231,5 @@
 
 	.surface-content {
 		padding: var(--dry-padding-card);
-	}
-
-	.primitive-callout {
-		padding: var(--dry-padding-card);
-		background: var(--dry-color-bg-raised);
-		border-radius: var(--dry-radius-card);
-		box-shadow: var(--dry-shadow-sm);
 	}
 </style>

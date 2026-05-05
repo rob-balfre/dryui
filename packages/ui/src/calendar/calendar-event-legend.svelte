@@ -7,6 +7,13 @@
 	let { class: className, ...rest }: Props = $props();
 
 	const ctx = getCalendarCtx();
+	let legendDotNodes = $state<Record<string, HTMLElement | undefined>>({});
+
+	$effect(() => {
+		for (const category of ctx.categories) {
+			legendDotNodes[category.id]?.style.setProperty('--dry-calendar-legend-color', category.color);
+		}
+	});
 </script>
 
 {#if ctx.categories.length > 0}
@@ -16,7 +23,7 @@
 				<span
 					data-calendar-event-legend-dot
 					aria-hidden="true"
-					style={`--dry-calendar-legend-color: ${category.color};`}
+					bind:this={legendDotNodes[category.id]}
 				></span>
 				<span data-calendar-event-legend-label>{category.label}</span>
 			</div>

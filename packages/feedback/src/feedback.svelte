@@ -25,11 +25,41 @@
 	import {
 		captureBrowserScreenshot,
 		captureBrowserSubmissionPayload,
-		type BrowserScreenshotCapture,
-		type BrowserSubmissionAddedComponent,
-		type BrowserSubmissionMovedElement,
-		type BrowserSubmissionRemovedElement
+		type BrowserScreenshotCapture
 	} from './submission-capture-payload.js';
+	import {
+		applyElementLayoutSnapshot,
+		mountBrowserCaptureAnnotations,
+		parsePropsJson,
+		sameLayoutSnapshot,
+		snapshotBrowserCaptureLayout,
+		snapshotElementLayout,
+		type BrowserCaptureLayoutDraft,
+		type LayoutSnapshot
+	} from './submission-capture-layout.js';
+	import {
+		canonicalFeedbackPageUrl,
+		hasFeedbackLaunchParam,
+		openDashboardTab,
+		postFeedbackSubmission,
+		readFeedbackDrawings,
+		readSubmissionError,
+		readSubmissionId,
+		resolveFeedbackServerUrl,
+		saveFeedbackDrawings,
+		submissionErrorDescription
+	} from './submission-client.js';
+	import {
+		hasPersistableWidgetState,
+		hasStoredFeedbackContent,
+		readStoredWidgetState,
+		removeStoredWidgetState,
+		writeStoredWidgetState,
+		type AddedSnapshot,
+		type StoredMovedElement,
+		type StoredRemovedElement,
+		type StoredWidgetState
+	} from './submission-draft.js';
 	import { describeElement, type ElementDescriptor } from './position-hints.js';
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
@@ -73,14 +103,7 @@
 	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
 	const STROKE_OUTLINE_WIDTH = 4;
 	const TEXT_OUTLINE_RATIO = 0.22;
-	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
-	const FEEDBACK_SERVER_QUERY_PARAM = 'dryui-feedback-server';
-	const FEEDBACK_SERVER_STORAGE_KEY = 'dryui-feedback-server-url';
-	const DASHBOARD_TAB_NAME = 'dryui-feedback-list';
 	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
-	const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
-	const TOOL_VALUES: readonly Tool[] = ['pencil', 'arrow', 'text', 'move', 'eraser'];
-	const MODE_VALUES: readonly Mode[] = ['annotate', 'components'];
 
 	let {
 		color = ANNOTATION_FILL,
@@ -123,23 +146,6 @@
 		selectedComponentEl = el;
 	}
 
-	type LayoutSnapshot = {
-		left: string;
-		top: string;
-		width: string;
-		height: string;
-		transform: string;
-		rotation: string | undefined;
-	};
-
-	type AddedSnapshot = {
-		id: string;
-		kind: string;
-		snap: LayoutSnapshot;
-		label?: string;
-		propsJson?: string;
-	};
-
 	type HistoryFrame = {
 		drawings: Drawing[];
 		cloneSnapshots: Map<HTMLElement, LayoutSnapshot>;
@@ -151,26 +157,6 @@
 		prevDisplay: string;
 		rect: { x: number; y: number; width: number; height: number };
 		descriptor: ReturnType<typeof describeElement>;
-	};
-
-	type StoredMovedElement = {
-		descriptor: ElementDescriptor;
-		snap: LayoutSnapshot;
-	};
-
-	type StoredRemovedElement = {
-		descriptor: ElementDescriptor;
-	};
-
-	type StoredWidgetState = {
-		active?: boolean;
-		tool?: Tool;
-		mode?: Mode;
-		placingComponent?: string | null;
-		drawings?: Drawing[];
-		added?: AddedSnapshot[];
-		moved?: StoredMovedElement[];
-		removed?: StoredRemovedElement[];
 	};
 
 	const LAYOUT_DATASET = {
@@ -226,42 +212,10 @@
 	const canUndo = $derived(frameIndex > 0);
 	const canRedo = $derived(frameIndex < historyFrames.length - 1);
 
-	function snapshotClone(clone: HTMLElement): LayoutSnapshot {
-		return {
-			left: clone.style.left,
-			top: clone.style.top,
-			width: clone.style.width,
-			height: clone.style.height,
-			transform: clone.style.transform,
-			rotation: clone.dataset[LAYOUT_DATASET.rotation]
-		};
-	}
-
-	function applyLayoutSnapshot(clone: HTMLElement, snap: LayoutSnapshot) {
-		clone.style.left = snap.left;
-		clone.style.top = snap.top;
-		clone.style.width = snap.width;
-		clone.style.height = snap.height;
-		clone.style.transform = snap.transform;
-		if (snap.rotation === undefined) delete clone.dataset[LAYOUT_DATASET.rotation];
-		else clone.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
-	}
-
-	function sameLayoutSnapshot(a: LayoutSnapshot, b: LayoutSnapshot): boolean {
-		return (
-			a.left === b.left &&
-			a.top === b.top &&
-			a.width === b.width &&
-			a.height === b.height &&
-			a.transform === b.transform &&
-			a.rotation === b.rotation
-		);
-	}
-
 	function hasModifiedLayoutClone(): boolean {
 		for (const [original, clone] of layoutClones) {
 			const initial = cloneInitialSnaps.get(original);
-			if (!initial || !sameLayoutSnapshot(snapshotClone(clone), initial)) return true;
+			if (!initial || !sameLayoutSnapshot(snapshotElementLayout(clone), initial)) return true;
 		}
 		return false;
 	}
@@ -275,7 +229,7 @@
 		if (existing) return existing;
 		const clone = makeLayoutClone(original);
 		layoutClones.set(original, clone);
-		cloneInitialSnaps.set(original, snapshotClone(clone));
+		cloneInitialSnaps.set(original, snapshotElementLayout(clone));
 		original.dataset[LAYOUT_DATASET.prevVis] = original.style.visibility ?? '';
 		original.style.visibility = 'hidden';
 		return clone;
@@ -386,19 +340,6 @@
 		el.appendChild(fallback);
 		if (snap.rotation !== undefined) el.dataset[LAYOUT_DATASET.rotation] = snap.rotation;
 		return el;
-	}
-
-	function parsePropsJson(json: string | undefined): Record<string, unknown> {
-		if (!json?.trim()) return {};
-		try {
-			const parsed = JSON.parse(json);
-			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-				return parsed as Record<string, unknown>;
-			}
-		} catch {
-			// fall through to empty props on invalid JSON
-		}
-		return {};
 	}
 
 	function resolveMountable(value: unknown): unknown {
@@ -627,7 +568,7 @@
 	): HTMLElement {
 		const existing = addedComponents.get(id);
 		if (existing) {
-			applyLayoutSnapshot(existing.el, snap);
+			applyElementLayoutSnapshot(existing.el, snap);
 			const propsChanged =
 				existing.label !== options?.label || existing.propsJson !== options?.propsJson;
 			if (existing.kind !== kind || propsChanged) {
@@ -666,7 +607,7 @@
 
 	function snapshotAllClones(): Map<HTMLElement, LayoutSnapshot> {
 		const map = new Map<HTMLElement, LayoutSnapshot>();
-		for (const [el, clone] of layoutClones) map.set(el, snapshotClone(clone));
+		for (const [el, clone] of layoutClones) map.set(el, snapshotElementLayout(clone));
 		return map;
 	}
 
@@ -676,7 +617,7 @@
 			result.push({
 				id,
 				kind: record.kind,
-				snap: snapshotClone(record.el),
+				snap: snapshotElementLayout(record.el),
 				label: record.label,
 				propsJson: record.propsJson
 			});
@@ -693,105 +634,14 @@
 		};
 	}
 
-	function isObject(value: unknown): value is Record<string, unknown> {
-		return value !== null && typeof value === 'object';
-	}
-
-	function isToolValue(value: unknown): value is Tool {
-		return typeof value === 'string' && TOOL_VALUES.includes(value as Tool);
-	}
-
-	function isModeValue(value: unknown): value is Mode {
-		return typeof value === 'string' && MODE_VALUES.includes(value as Mode);
-	}
-
-	function sanitizeLayoutSnapshot(value: unknown): LayoutSnapshot | null {
-		if (!isObject(value)) return null;
-		return {
-			left: typeof value.left === 'string' ? value.left : '',
-			top: typeof value.top === 'string' ? value.top : '',
-			width: typeof value.width === 'string' ? value.width : '',
-			height: typeof value.height === 'string' ? value.height : '',
-			transform: typeof value.transform === 'string' ? value.transform : '',
-			rotation: typeof value.rotation === 'string' ? value.rotation : undefined
-		};
-	}
-
-	function sanitizeAddedSnapshot(value: unknown): AddedSnapshot | null {
-		if (!isObject(value) || typeof value.id !== 'string' || typeof value.kind !== 'string') {
-			return null;
-		}
-		const snap = sanitizeLayoutSnapshot(value.snap);
-		if (!snap) return null;
-		return {
-			id: value.id,
-			kind: value.kind,
-			snap,
-			...(typeof value.label === 'string' ? { label: value.label } : {}),
-			...(typeof value.propsJson === 'string' ? { propsJson: value.propsJson } : {})
-		};
-	}
-
-	function sanitizeElementDescriptor(value: unknown): ElementDescriptor | null {
-		if (!isObject(value) || typeof value.tag !== 'string') return null;
-		return {
-			tag: value.tag,
-			...(typeof value.id === 'string' ? { id: value.id } : {}),
-			...(typeof value.selector === 'string' ? { selector: value.selector } : {})
-		};
-	}
-
-	function sanitizeStoredMovedElement(value: unknown): StoredMovedElement | null {
-		if (!isObject(value)) return null;
-		const descriptor = sanitizeElementDescriptor(value.descriptor);
-		const snap = sanitizeLayoutSnapshot(value.snap);
-		if (!descriptor || !snap) return null;
-		return { descriptor, snap };
-	}
-
-	function sanitizeStoredRemovedElement(value: unknown): StoredRemovedElement | null {
-		if (!isObject(value)) return null;
-		const descriptor = sanitizeElementDescriptor(value.descriptor);
-		if (!descriptor) return null;
-		return { descriptor };
-	}
-
-	function sanitizeStoredWidgetState(value: unknown): StoredWidgetState | null {
-		if (!isObject(value)) return null;
-		const state: StoredWidgetState = {};
-		if (typeof value.active === 'boolean') state.active = value.active;
-		if (isToolValue(value.tool)) state.tool = value.tool;
-		if (isModeValue(value.mode)) state.mode = value.mode;
-		if (typeof value.placingComponent === 'string') state.placingComponent = value.placingComponent;
-		if (Array.isArray(value.drawings)) {
-			state.drawings = value.drawings.map((drawing) => normalizeDrawing(drawing as Drawing));
-		}
-		if (Array.isArray(value.added)) {
-			state.added = value.added
-				.map(sanitizeAddedSnapshot)
-				.filter((entry): entry is AddedSnapshot => entry !== null);
-		}
-		if (Array.isArray(value.moved)) {
-			state.moved = value.moved
-				.map(sanitizeStoredMovedElement)
-				.filter((entry): entry is StoredMovedElement => entry !== null);
-		}
-		if (Array.isArray(value.removed)) {
-			state.removed = value.removed
-				.map(sanitizeStoredRemovedElement)
-				.filter((entry): entry is StoredRemovedElement => entry !== null);
-		}
-		return state;
-	}
-
 	function snapshotMovedDrafts(): StoredMovedElement[] {
 		const out: StoredMovedElement[] = [];
 		for (const [original, clone] of layoutClones) {
 			const initial = cloneInitialSnaps.get(original);
-			if (!initial || sameLayoutSnapshot(snapshotClone(clone), initial)) continue;
+			if (!initial || sameLayoutSnapshot(snapshotElementLayout(clone), initial)) continue;
 			const descriptor = describeElement(original);
 			if (!descriptor) continue;
-			out.push({ descriptor, snap: snapshotClone(clone) });
+			out.push({ descriptor, snap: snapshotElementLayout(clone) });
 		}
 		return out;
 	}
@@ -818,82 +668,17 @@
 		};
 	}
 
-	function hasStoredFeedbackContent(state: StoredWidgetState): boolean {
-		return (
-			(state.drawings?.length ?? 0) > 0 ||
-			(state.added?.length ?? 0) > 0 ||
-			(state.moved?.length ?? 0) > 0 ||
-			(state.removed?.length ?? 0) > 0
-		);
-	}
-
-	function hasPersistableWidgetState(state: StoredWidgetState): boolean {
-		return (
-			state.active === true ||
-			(state.tool !== undefined && state.tool !== 'pencil') ||
-			(state.mode !== undefined && state.mode !== 'annotate') ||
-			!!state.placingComponent ||
-			hasStoredFeedbackContent(state)
-		);
-	}
-
-	function readStoredWidgetStateMap(): Record<string, StoredWidgetState> {
-		if (typeof window === 'undefined') return {};
-		try {
-			const raw = window.sessionStorage.getItem(WIDGET_STATE_STORAGE_KEY);
-			if (!raw) return {};
-			const parsed: unknown = JSON.parse(raw);
-			if (!isObject(parsed)) return {};
-			const out: Record<string, StoredWidgetState> = {};
-			for (const [pageUrl, value] of Object.entries(parsed)) {
-				const state = sanitizeStoredWidgetState(value);
-				if (state && hasPersistableWidgetState(state)) out[pageUrl] = state;
-			}
-			return out;
-		} catch {
-			return {};
-		}
-	}
-
-	function readStoredWidgetState(pageUrl: string): StoredWidgetState | null {
-		const map = readStoredWidgetStateMap();
-		return map[pageUrl] ?? null;
-	}
-
-	function writeStoredWidgetState(pageUrl: string, state: StoredWidgetState | null): void {
-		if (typeof window === 'undefined' || !pageUrl) return;
-		try {
-			const map = readStoredWidgetStateMap();
-			if (state && hasPersistableWidgetState(state)) {
-				map[pageUrl] = state;
-			} else {
-				delete map[pageUrl];
-			}
-			if (Object.keys(map).length === 0) {
-				window.sessionStorage.removeItem(WIDGET_STATE_STORAGE_KEY);
-			} else {
-				window.sessionStorage.setItem(WIDGET_STATE_STORAGE_KEY, JSON.stringify(map));
-			}
-		} catch {
-			// Draft persistence is best-effort; quota and private-mode failures should not break feedback.
-		}
-	}
-
-	function removeStoredWidgetState(pageUrl: string): void {
-		writeStoredWidgetState(pageUrl, null);
-	}
-
 	function persistWidgetState(pageUrl = currentPageUrl): void {
 		if (restoringWidgetState) return;
 		const state = buildWidgetState();
-		const stored = readStoredWidgetState(pageUrl);
+		const stored = readStoredWidgetState(pageUrl, { normalizeDrawing });
 		if (!hasPersistableWidgetState(state) && stored && hasStoredFeedbackContent(stored)) return;
 		if (!hasStoredFeedbackContent(state) && stored && hasStoredFeedbackContent(stored)) return;
-		writeStoredWidgetState(pageUrl, state);
+		writeStoredWidgetState(pageUrl, state, { normalizeDrawing });
 	}
 
 	function hasStoredWidgetContent(pageUrl: string): boolean {
-		const state = readStoredWidgetState(pageUrl);
+		const state = readStoredWidgetState(pageUrl, { normalizeDrawing });
 		return !!state && hasStoredFeedbackContent(state);
 	}
 
@@ -907,7 +692,7 @@
 	}
 
 	function shouldRestoreStoredWidgetState(pageUrl: string): boolean {
-		const state = readStoredWidgetState(pageUrl);
+		const state = readStoredWidgetState(pageUrl, { normalizeDrawing });
 		if (!state || !hasPersistableWidgetState(state)) return false;
 		if (hasStoredFeedbackContent(state) && !hasCurrentWidgetContent()) return true;
 		if (state.active === true && !active) return true;
@@ -957,7 +742,7 @@
 	}
 
 	function restoreWidgetState(pageUrl: string): boolean {
-		const state = readStoredWidgetState(pageUrl);
+		const state = readStoredWidgetState(pageUrl, { normalizeDrawing });
 		if (!state) return false;
 		restoringWidgetState = true;
 		try {
@@ -989,7 +774,7 @@
 				const original = resolveStoredElement(entry.descriptor);
 				if (!original) continue;
 				const clone = ensureLayoutClone(original);
-				applyLayoutSnapshot(clone, entry.snap);
+				applyElementLayoutSnapshot(clone, entry.snap);
 				layoutChanged = true;
 			}
 			for (const entry of state.removed ?? []) {
@@ -1023,7 +808,7 @@
 		for (const [el, clone] of layoutClones) {
 			const snap = frame.cloneSnapshots.get(el) ?? cloneInitialSnaps.get(el);
 			if (snap) {
-				applyLayoutSnapshot(clone, snap);
+				applyElementLayoutSnapshot(clone, snap);
 				layoutChanged = true;
 			}
 		}
@@ -1137,7 +922,7 @@
 		const clone = layoutClones.get(original);
 		const initial = cloneInitialSnaps.get(original);
 		if (clone && initial) {
-			applyLayoutSnapshot(clone, initial);
+			applyElementLayoutSnapshot(clone, initial);
 			commitHistory();
 			notifyLayoutChange();
 			return;
@@ -1146,7 +931,7 @@
 		if (!addedId) return;
 		const record = addedComponents.get(addedId);
 		if (!record) return;
-		applyLayoutSnapshot(original, record.initialSnap);
+		applyElementLayoutSnapshot(original, record.initialSnap);
 		commitHistory();
 		notifyLayoutChange();
 	}
@@ -1292,7 +1077,7 @@
 	let layerHostEl: HTMLElement | null = $state(null);
 	let layerOriginLeft = $state(0);
 	let layerOriginTop = $state(0);
-	let currentPageUrl = $state(canonicalPageUrl());
+	let currentPageUrl = $state(canonicalFeedbackPageUrl());
 	let restoringWidgetState = false;
 	let initialWidgetStateRestored = false;
 	const toastTimers: Record<string, ReturnType<typeof setTimeout>> = Object.create(null);
@@ -1904,284 +1689,34 @@
 
 	// --- Screenshot + Submit ---
 
-	function snapshotAddedComponents(): BrowserSubmissionAddedComponent[] {
-		const out: BrowserSubmissionAddedComponent[] = [];
-		for (const [id, record] of addedComponents) {
-			const rect = record.el.getBoundingClientRect();
-			if (rect.width < 1 || rect.height < 1) continue;
-			const props = parsePropsJson(record.propsJson);
-			out.push({
+	function createCaptureLayoutDraft(): BrowserCaptureLayoutDraft {
+		return {
+			added: Array.from(addedComponents, ([id, record]) => ({
 				id,
 				kind: record.kind,
-				label: record.label?.trim() || undefined,
-				props: Object.keys(props).length > 0 ? props : undefined,
-				rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
-			});
-		}
-		return out;
-	}
-
-	function snapshotRemovedElements(): BrowserSubmissionRemovedElement[] {
-		const out: BrowserSubmissionRemovedElement[] = [];
-		for (const record of removedElements.values()) {
-			const descriptor = record.descriptor ?? { tag: 'unknown' };
-			out.push({
-				tag: descriptor.tag,
-				...(descriptor.id ? { id: descriptor.id } : {}),
-				...(descriptor.selector ? { selector: descriptor.selector } : {}),
+				element: record.el,
+				label: record.label,
+				propsJson: record.propsJson
+			})),
+			removed: Array.from(removedElements.values(), (record) => ({
+				descriptor: record.descriptor ?? null,
 				rect: record.rect
-			});
-		}
-		return out;
-	}
-
-	function snapshotMovedElements(): BrowserSubmissionMovedElement[] {
-		const out: BrowserSubmissionMovedElement[] = [];
-		for (const [original, clone] of layoutClones) {
-			const initial = cloneInitialSnaps.get(original);
-			if (!initial) continue;
-			if (sameLayoutSnapshot(snapshotClone(clone), initial)) continue;
-			const originalRect = original.getBoundingClientRect();
-			const currentRect = clone.getBoundingClientRect();
-			if (currentRect.width < 1 || currentRect.height < 1) continue;
-			const descriptor = describeElement(original) ?? { tag: 'unknown' };
-			out.push({
-				tag: descriptor.tag,
-				...(descriptor.id ? { id: descriptor.id } : {}),
-				...(descriptor.selector ? { selector: descriptor.selector } : {}),
-				originalRect: {
-					x: originalRect.left,
-					y: originalRect.top,
-					width: originalRect.width,
-					height: originalRect.height
-				},
-				currentRect: {
-					x: currentRect.left,
-					y: currentRect.top,
-					width: currentRect.width,
-					height: currentRect.height
-				}
-			});
-		}
-		return out;
-	}
-
-	function formatPropsForChip(props: Record<string, unknown>): string {
-		const pairs = Object.entries(props)
-			.filter(([, v]) => v !== undefined && v !== null && v !== '')
-			.map(([k, v]) => {
-				if (typeof v === 'string') return `${k}="${v}"`;
-				if (typeof v === 'boolean' || typeof v === 'number') return `${k}={${v}}`;
-				return `${k}={${JSON.stringify(v)}}`;
-			});
-		return pairs.length ? ' · ' + pairs.join(' ') : '';
-	}
-
-	function mountCaptureAnnotations(): () => void {
-		const nodes: HTMLElement[] = [];
-		const accent = 'hsl(25 100% 55%)';
-		const danger = 'hsl(0 75% 55%)';
-		const info = 'hsl(210 90% 55%)';
-
-		for (const record of removedElements.values()) {
-			const { rect } = record;
-			if (rect.width < 1 || rect.height < 1) continue;
-			const outline = document.createElement('div');
-			outline.dataset.dryuiCaptureAnnotation = 'removed-outline';
-			Object.assign(outline.style, {
-				position: 'fixed',
-				left: `${rect.x}px`,
-				top: `${rect.y}px`,
-				width: `${rect.width}px`,
-				height: `${rect.height}px`,
-				border: `2px dashed ${danger}`,
-				borderRadius: '4px',
-				background: 'hsl(0 75% 55% / 0.08)',
-				pointerEvents: 'none',
-				zIndex: '2147483646',
-				boxSizing: 'border-box'
-			});
-			document.body.appendChild(outline);
-			nodes.push(outline);
-
-			const chipText = `removed: ${record.descriptor?.selector || record.descriptor?.tag || 'element'}`;
-			const chip = document.createElement('div');
-			chip.dataset.dryuiCaptureAnnotation = 'removed-chip';
-			chip.textContent = chipText;
-			const fitsAbove = rect.y >= 24;
-			Object.assign(chip.style, {
-				position: 'fixed',
-				left: `${Math.max(4, rect.x)}px`,
-				top: fitsAbove ? `${rect.y - 22}px` : `${rect.y + rect.height + 4}px`,
-				maxWidth: `${Math.max(180, Math.min(window.innerWidth - rect.x - 8, rect.width + 80))}px`,
-				padding: '3px 7px',
-				borderRadius: '4px',
-				background: danger,
-				color: 'white',
-				fontFamily: 'system-ui, -apple-system, sans-serif',
-				fontSize: '11px',
-				fontWeight: '700',
-				lineHeight: '16px',
-				letterSpacing: '0.01em',
-				whiteSpace: 'nowrap',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				pointerEvents: 'none',
-				zIndex: '2147483647',
-				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
-			});
-			document.body.appendChild(chip);
-			nodes.push(chip);
-		}
-
-		for (const record of addedComponents.values()) {
-			const rect = record.el.getBoundingClientRect();
-			if (rect.width < 1 || rect.height < 1) continue;
-
-			const outline = document.createElement('div');
-			outline.dataset.dryuiCaptureAnnotation = 'outline';
-			Object.assign(outline.style, {
-				position: 'fixed',
-				left: `${rect.left}px`,
-				top: `${rect.top}px`,
-				width: `${rect.width}px`,
-				height: `${rect.height}px`,
-				border: `2px solid ${accent}`,
-				borderRadius: '4px',
-				pointerEvents: 'none',
-				zIndex: '2147483646',
-				boxSizing: 'border-box'
-			});
-			document.body.appendChild(outline);
-			nodes.push(outline);
-
-			const props = parsePropsJson(record.propsJson);
-			const labelText = record.label?.trim() || record.kind;
-			const propsText = formatPropsForChip(props);
-			const chip = document.createElement('div');
-			chip.dataset.dryuiCaptureAnnotation = 'chip';
-			chip.textContent = `<${labelText}>${propsText}`;
-
-			const fitsAbove = rect.top >= 24;
-			Object.assign(chip.style, {
-				position: 'fixed',
-				left: `${Math.max(4, rect.left)}px`,
-				top: fitsAbove ? `${rect.top - 22}px` : `${rect.bottom + 4}px`,
-				maxWidth: `${Math.max(180, Math.min(window.innerWidth - rect.left - 8, rect.width + 80))}px`,
-				padding: '3px 7px',
-				borderRadius: '4px',
-				background: accent,
-				color: 'black',
-				fontFamily: 'system-ui, -apple-system, sans-serif',
-				fontSize: '11px',
-				fontWeight: '700',
-				lineHeight: '16px',
-				letterSpacing: '0.01em',
-				whiteSpace: 'nowrap',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				pointerEvents: 'none',
-				zIndex: '2147483647',
-				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
-			});
-			document.body.appendChild(chip);
-			nodes.push(chip);
-		}
-
-		for (const [original, clone] of layoutClones) {
-			const initial = cloneInitialSnaps.get(original);
-			if (!initial) continue;
-			if (sameLayoutSnapshot(snapshotClone(clone), initial)) continue;
-			const originalRect = original.getBoundingClientRect();
-			const currentRect = clone.getBoundingClientRect();
-			if (currentRect.width < 1 || currentRect.height < 1) continue;
-
-			if (originalRect.width >= 1 && originalRect.height >= 1) {
-				const ghost = document.createElement('div');
-				ghost.dataset.dryuiCaptureAnnotation = 'moved-ghost';
-				Object.assign(ghost.style, {
-					position: 'fixed',
-					left: `${originalRect.left}px`,
-					top: `${originalRect.top}px`,
-					width: `${originalRect.width}px`,
-					height: `${originalRect.height}px`,
-					border: `2px dashed ${info}`,
-					borderRadius: '4px',
-					background: 'hsl(210 90% 55% / 0.05)',
-					pointerEvents: 'none',
-					zIndex: '2147483645',
-					boxSizing: 'border-box'
-				});
-				document.body.appendChild(ghost);
-				nodes.push(ghost);
-			}
-
-			const outline = document.createElement('div');
-			outline.dataset.dryuiCaptureAnnotation = 'moved-outline';
-			Object.assign(outline.style, {
-				position: 'fixed',
-				left: `${currentRect.left}px`,
-				top: `${currentRect.top}px`,
-				width: `${currentRect.width}px`,
-				height: `${currentRect.height}px`,
-				border: `2px solid ${info}`,
-				borderRadius: '4px',
-				background: 'hsl(210 90% 55% / 0.08)',
-				pointerEvents: 'none',
-				zIndex: '2147483646',
-				boxSizing: 'border-box'
-			});
-			document.body.appendChild(outline);
-			nodes.push(outline);
-
-			const descriptor = describeElement(original);
-			const chipLabel = descriptor?.selector || descriptor?.tag || 'element';
-			const chip = document.createElement('div');
-			chip.dataset.dryuiCaptureAnnotation = 'moved-chip';
-			chip.textContent = `moved: ${chipLabel}`;
-			const fitsAbove = currentRect.top >= 24;
-			Object.assign(chip.style, {
-				position: 'fixed',
-				left: `${Math.max(4, currentRect.left)}px`,
-				top: fitsAbove
-					? `${currentRect.top - 22}px`
-					: `${currentRect.top + currentRect.height + 4}px`,
-				maxWidth: `${Math.max(180, Math.min(window.innerWidth - currentRect.left - 8, currentRect.width + 80))}px`,
-				padding: '3px 7px',
-				borderRadius: '4px',
-				background: info,
-				color: 'white',
-				fontFamily: 'system-ui, -apple-system, sans-serif',
-				fontSize: '11px',
-				fontWeight: '700',
-				lineHeight: '16px',
-				letterSpacing: '0.01em',
-				whiteSpace: 'nowrap',
-				overflow: 'hidden',
-				textOverflow: 'ellipsis',
-				pointerEvents: 'none',
-				zIndex: '2147483647',
-				boxShadow: '0 2px 6px hsl(0 0% 0% / 0.4)'
-			});
-			document.body.appendChild(chip);
-			nodes.push(chip);
-		}
-
-		return () => {
-			for (const n of nodes) n.remove();
+			})),
+			moved: Array.from(layoutClones, ([original, clone]) => ({
+				original,
+				clone,
+				initial: cloneInitialSnaps.get(original)
+			}))
 		};
 	}
 
 	function captureScreenshot(): Promise<BrowserScreenshotCapture> {
+		const layoutDraft = createCaptureLayoutDraft();
 		return captureBrowserScreenshot({
 			readCaptureViewport: () => ({ width: window.innerWidth, height: window.innerHeight }),
-			snapshotLayout: () => ({
-				components: snapshotAddedComponents(),
-				removed: snapshotRemovedElements(),
-				moved: snapshotMovedElements()
-			}),
+			snapshotLayout: () => snapshotBrowserCaptureLayout(layoutDraft),
 			waitForNextPaint,
-			mountCaptureAnnotations,
+			mountCaptureAnnotations: () => mountBrowserCaptureAnnotations(layoutDraft),
 			setSubmitStatus: (status) => {
 				submitStatus = status;
 			},
@@ -2189,176 +1724,6 @@
 				toolbarHiddenForCapture = hidden;
 			}
 		});
-	}
-
-	async function readSubmissionId(response: Response): Promise<string | null> {
-		try {
-			const data = await response.json();
-			if (typeof data === 'object' && data && 'id' in data && typeof data.id === 'string') {
-				return data.id;
-			}
-		} catch {
-			// Server didn't return JSON; opening the dashboard without focus is still useful.
-		}
-		return null;
-	}
-
-	function openDashboardTab(submissionId: string | null): void {
-		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
-		if (!serverUrl || typeof window === 'undefined') return;
-		const target = new URL('/ui/', serverUrl);
-		if (submissionId) target.searchParams.set('focus', submissionId);
-		window.open(target.toString(), DASHBOARD_TAB_NAME);
-	}
-
-	async function readSubmissionError(response: Response): Promise<string> {
-		try {
-			const data = await response.json();
-			if (
-				typeof data === 'object' &&
-				data &&
-				'error' in data &&
-				typeof data.error === 'string' &&
-				data.error.trim()
-			) {
-				return data.error.trim();
-			}
-		} catch {
-			// Fall back to the HTTP metadata below when the body is not JSON.
-		}
-
-		if (response.statusText) {
-			return `${response.status} ${response.statusText}`;
-		}
-
-		return `Request failed with status ${response.status}`;
-	}
-
-	function submissionErrorDescription(error: unknown, serverUrl?: string): string {
-		if (error instanceof DOMException) {
-			if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
-				return 'Screen capture was cancelled. Choose this browser tab when prompted to send feedback.';
-			}
-
-			if (error.name === 'NotFoundError') {
-				return 'No capturable browser tab was available. Try again from the tab you want to annotate.';
-			}
-		}
-
-		if (error instanceof TypeError && error.message === 'Failed to fetch' && serverUrl) {
-			return `Could not reach the feedback server at ${serverUrl}.`;
-		}
-
-		if (error instanceof Error && error.message.trim()) return error.message;
-		return 'Please try again.';
-	}
-
-	function canonicalPageUrl(): string {
-		if (typeof window === 'undefined') return '/';
-		const url = new URL(window.location.href);
-		url.searchParams.delete(FEEDBACK_QUERY_PARAM);
-		url.searchParams.delete(FEEDBACK_SERVER_QUERY_PARAM);
-		url.hash = '';
-		return url.toString();
-	}
-
-	function hasFeedbackLaunchParam(): boolean {
-		if (typeof window === 'undefined') return false;
-		const url = new URL(window.location.href);
-		return url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1';
-	}
-
-	function isPrivateOrLoopbackIpv4(hostname: string): boolean {
-		const parts = hostname.split('.').map((part) => Number(part));
-		if (
-			parts.length !== 4 ||
-			parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)
-		) {
-			return false;
-		}
-
-		const [first = -1, second = -1] = parts;
-		return (
-			first === 10 ||
-			first === 127 ||
-			first === 0 ||
-			(first === 172 && second >= 16 && second <= 31) ||
-			(first === 192 && second === 168) ||
-			(first === 169 && second === 254)
-		);
-	}
-
-	function isLocalFeedbackHost(hostname: string): boolean {
-		const normalized =
-			hostname.startsWith('[') && hostname.endsWith(']')
-				? hostname.slice(1, -1)
-				: hostname.toLowerCase();
-		return (
-			normalized === 'localhost' ||
-			normalized.endsWith('.localhost') ||
-			normalized === '::1' ||
-			isPrivateOrLoopbackIpv4(normalized)
-		);
-	}
-
-	function normalizeFeedbackServerUrl(value: string | null | undefined): string | null {
-		if (!value) return null;
-		try {
-			const url = new URL(value);
-			if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
-			if (!isLocalFeedbackHost(url.hostname)) return null;
-			url.pathname = '';
-			url.search = '';
-			url.hash = '';
-			return url.toString().replace(/\/$/, '');
-		} catch {
-			return null;
-		}
-	}
-
-	function storeFeedbackServerUrl(value: string): void {
-		try {
-			window.localStorage.setItem(FEEDBACK_SERVER_STORAGE_KEY, value);
-		} catch {
-			// Storage can be blocked in some browser contexts; the query param still works for this tab.
-		}
-
-		try {
-			window.sessionStorage.setItem(FEEDBACK_SERVER_STORAGE_KEY, value);
-		} catch {
-			// Back-compat only. Ignore when session storage is unavailable.
-		}
-	}
-
-	function readStoredFeedbackServerUrl(): string | null {
-		try {
-			const localValue = normalizeFeedbackServerUrl(
-				window.localStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY)
-			);
-			if (localValue) return localValue;
-		} catch {
-			// Fall through to session storage for older tabs and constrained browsers.
-		}
-
-		try {
-			return normalizeFeedbackServerUrl(window.sessionStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY));
-		} catch {
-			return null;
-		}
-	}
-
-	function resolveFeedbackServerUrl(fallback: string | undefined): string | undefined {
-		if (typeof window === 'undefined') return fallback;
-
-		const queryServerUrl = normalizeFeedbackServerUrl(
-			new URL(window.location.href).searchParams.get(FEEDBACK_SERVER_QUERY_PARAM)
-		);
-		if (queryServerUrl) {
-			storeFeedbackServerUrl(queryServerUrl);
-			return queryServerUrl;
-		}
-
-		return readStoredFeedbackServerUrl() ?? fallback;
 	}
 
 	function activateFromFeedbackLaunchParam(): void {
@@ -2373,11 +1738,7 @@
 		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || !pageUrl) return;
 		lastSavedVersion = version;
-		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl)}`, {
-			method: 'PUT',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(drawingSnapshot)
-		}).catch(() => {});
+		saveFeedbackDrawings({ serverUrl, pageUrl, drawings: drawingSnapshot });
 	}
 
 	function flushPendingDrawings(): void {
@@ -2388,7 +1749,7 @@
 	}
 
 	function syncCurrentPageUrl(): void {
-		const nextPageUrl = canonicalPageUrl();
+		const nextPageUrl = canonicalFeedbackPageUrl();
 		if (nextPageUrl === currentPageUrl) {
 			activateFromFeedbackLaunchParam();
 			return;
@@ -2427,18 +1788,14 @@
 					viewportOffset: { left: viewportLeft, top: viewportTop }
 				})
 			});
-			const response = await fetch(`${serverUrl}/submissions`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(payload)
-			});
+			const response = await postFeedbackSubmission({ serverUrl, payload });
 
 			if (!response.ok) {
 				throw new Error(await readSubmissionError(response));
 			}
 
 			const submissionId = await readSubmissionId(response);
-			openDashboardTab(submissionId);
+			openDashboardTab({ serverUrl, submissionId });
 
 			submitStatus = 'idle';
 			sent = true;
@@ -2457,7 +1814,7 @@
 				selectedComponentEl = null;
 				destroyAllLayoutClones();
 				resetHistory([]);
-				removeStoredWidgetState(currentPageUrl);
+				removeStoredWidgetState(currentPageUrl, { normalizeDrawing });
 			}, 1500);
 		} catch (e) {
 			console.error('Failed to submit feedback:', e);
@@ -2637,11 +1994,8 @@
 		}
 		const versionAtRequest = untrack(() => saveVersion);
 		const controller = new AbortController();
-		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl)}`, {
-			signal: controller.signal
-		})
-			.then((r) => r.json())
-			.then((data: Drawing[]) => {
+		readFeedbackDrawings({ serverUrl, pageUrl, signal: controller.signal })
+			.then((data) => {
 				if (saveVersion !== versionAtRequest) return;
 				drawings = Array.isArray(data) ? data.map(normalizeDrawing) : [];
 				lastSavedVersion = saveVersion;

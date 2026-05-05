@@ -3,7 +3,10 @@ import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 
-import { scaffoldDryuiConsumerProject } from '../../scripts/e2e/scaffold-adapter.ts';
+import {
+	DRYUI_INIT_SKILL_CONTRACT,
+	scaffoldDryuiConsumerProject
+} from '../../scripts/e2e/scaffold-adapter.ts';
 
 const REQUIRED_DRYUI_PACKAGES = [
 	'@dryui/ui',
@@ -13,6 +16,7 @@ const REQUIRED_DRYUI_PACKAGES = [
 ] as const;
 
 const tempDirs = new Set<string>();
+const repoRoot = resolve(import.meta.dir, '../..');
 
 afterEach(() => {
 	for (const dir of tempDirs) {
@@ -49,6 +53,14 @@ function read(projectDir: string, path: string): string {
 }
 
 describe('E2E scaffold Adapter', () => {
+	test('stays anchored to the dryui-init golden consumer setup contract', () => {
+		const skill = readFileSync(resolve(repoRoot, DRYUI_INIT_SKILL_CONTRACT.sourcePath), 'utf8');
+
+		for (const marker of DRYUI_INIT_SKILL_CONTRACT.requiredSkillMarkers) {
+			expect(skill).toContain(marker);
+		}
+	});
+
 	test('creates a minimal SvelteKit + DryUI consumer from the tarball manifest', () => {
 		const projectDir = tempDir('adapter-project');
 		const tarballsDir = tempDir('adapter-tarballs');
@@ -63,9 +75,14 @@ describe('E2E scaffold Adapter', () => {
 		});
 
 		expect(result.installed).toBe(false);
+		expect(result.contractSourcePath).toBe('skills/dryui-init/SKILL.md');
+		expect(result.contractAnchor).toBe('golden-consumer-setup-contract');
 		expect(result.filesWritten).toContain('src/routes/+layout.svelte');
 		expect(result.filesWritten).toContain('src/layout.css');
 		expect(existsSync(logPath)).toBe(true);
+		expect(readFileSync(logPath, 'utf8')).toContain(
+			'contract: skills/dryui-init/SKILL.md#golden-consumer-setup-contract'
+		);
 
 		const packageJson = JSON.parse(read(projectDir, 'package.json')) as {
 			scripts: Record<string, string>;

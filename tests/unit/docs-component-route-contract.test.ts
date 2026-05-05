@@ -1,19 +1,46 @@
 import { describe, expect, it } from 'bun:test';
 import { load } from '../../apps/docs/src/routes/components/[slug]/+page.server';
+import componentPages from '../../apps/docs/src/lib/generated/component-pages.json';
+import { docsNavComponentNames } from '../../packages/mcp/src/component-catalog';
+import type { DocsComponentPagesManifest } from '../../packages/mcp/src/docs-component-pages';
 
 function callLoad(slug: string) {
 	return Promise.resolve(load({ params: { slug } } as Parameters<typeof load>[0]));
 }
 
+const componentPageManifest = componentPages as DocsComponentPagesManifest;
+
 describe('docs component route contract', () => {
+	it('keeps the manifest scoped to routeable docs nav components', () => {
+		expect(Object.keys(componentPageManifest.components).sort()).toEqual(
+			[...docsNavComponentNames].sort()
+		);
+		expect(componentPageManifest.components.AffixGroup).toBeUndefined();
+		expect(Object.values(componentPageManifest.components).every((entry) => entry.slug)).toBe(true);
+		expect(Object.values(componentPageManifest.components).every((entry) => entry.rootImport)).toBe(
+			true
+		);
+		expect(
+			Object.values(componentPageManifest.components).every((entry) => entry.subpathImport)
+		).toBe(true);
+		expect(componentPageManifest.layoutHints.join('\n')).toContain('src/layout.css');
+		expect(componentPageManifest.layoutHints.join('\n')).toContain('data-layout');
+		expect(componentPageManifest.layoutHints.join('\n')).toContain('grid-template-columns');
+		expect('themeImports' in componentPageManifest).toBe(false);
+	});
+
 	it('returns name-based page data for ui components', async () => {
 		const data = await callLoad('button');
 
 		expect(data.name).toBe('Button');
-		expect(data.kind).toBe('ui');
 		expect('componentName' in data).toBe(false);
-		expect(data.sourceUrl).toContain('packages/ui/src/button');
-		expect(data.related?.component).toBe('Button');
+		expect('kind' in data).toBe(false);
+		expect('sourceUrl' in data).toBe(false);
+		expect('related' in data).toBe(false);
+		expect('slug' in data).toBe(false);
+		expect('category' in data).toBe(false);
+		expect(data.rootImport).toBe("import { Button } from '@dryui/ui'");
+		expect(data.subpathImport).toBe("import { Button } from '@dryui/ui/button'");
 		expect(data.a11y.length).toBeGreaterThan(0);
 		expect(data.dataAttributes).toEqual(
 			expect.arrayContaining([
@@ -29,7 +56,6 @@ describe('docs component route contract', () => {
 		const data = await callLoad('dialog');
 
 		expect(data.name).toBe('Dialog');
-		expect(data.kind).toBe('ui');
 		expect(data.dataAttributes.find((attr) => attr.name === 'data-state')?.values).toEqual([
 			'open',
 			'closed'
@@ -40,6 +66,17 @@ describe('docs component route contract', () => {
 		const data = await callLoad('reveal');
 
 		expect(data.name).toBe('Reveal');
-		expect(data.kind).toBe('ui');
+		expect(data.quickStartCode).toContain("import { Reveal } from '@dryui/ui'");
+	});
+
+	it('does not route primitive-only component pages', async () => {
+		await callLoad('affix-group').then(
+			() => {
+				throw new Error('Expected affix-group to 404');
+			},
+			(reason: unknown) => {
+				expect(reason).toMatchObject({ status: 404 });
+			}
+		);
 	});
 });

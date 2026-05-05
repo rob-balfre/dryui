@@ -4,6 +4,21 @@ import {
 	captureBrowserScreenshot,
 	captureBrowserSubmissionPayload
 } from '../../packages/feedback/src/submission-capture-payload.ts';
+import {
+	snapshotBrowserCaptureLayout,
+	type LayoutSnapshot
+} from '../../packages/feedback/src/submission-capture-layout.ts';
+import {
+	canonicalFeedbackPageUrl,
+	normalizeFeedbackServerUrl,
+	resolveFeedbackServerUrl
+} from '../../packages/feedback/src/submission-client.ts';
+import {
+	hasPersistableWidgetState,
+	sanitizeStoredWidgetState,
+	writeStoredWidgetState,
+	readStoredWidgetState
+} from '../../packages/feedback/src/submission-draft.ts';
 import type { Drawing } from '../../packages/feedback/src/types.ts';
 
 function fakeElement(tagName: string, attrs: Record<string, string | null> = {}): Element {
@@ -13,6 +28,65 @@ function fakeElement(tagName: string, attrs: Record<string, string | null> = {})
 			return attrs[name] ?? null;
 		}
 	} as Element;
+}
+
+function fakeLayoutElement(options: {
+	tagName?: string;
+	attrs?: Record<string, string | null>;
+	rect: { left: number; top: number; width: number; height: number };
+	style?: Partial<CSSStyleDeclaration>;
+	dataset?: Record<string, string | undefined>;
+}): HTMLElement {
+	const element = fakeElement(options.tagName ?? 'DIV', options.attrs) as HTMLElement;
+	Object.assign(element, {
+		style: {
+			left: options.style?.left ?? '',
+			top: options.style?.top ?? '',
+			width: options.style?.width ?? '',
+			height: options.style?.height ?? '',
+			transform: options.style?.transform ?? ''
+		},
+		dataset: options.dataset ?? {},
+		getBoundingClientRect: () => ({
+			left: options.rect.left,
+			top: options.rect.top,
+			right: options.rect.left + options.rect.width,
+			bottom: options.rect.top + options.rect.height,
+			x: options.rect.left,
+			y: options.rect.top,
+			width: options.rect.width,
+			height: options.rect.height
+		})
+	});
+	return element;
+}
+
+class MemoryStorage implements Storage {
+	readonly #items = new Map<string, string>();
+
+	get length(): number {
+		return this.#items.size;
+	}
+
+	clear(): void {
+		this.#items.clear();
+	}
+
+	getItem(key: string): string | null {
+		return this.#items.get(key) ?? null;
+	}
+
+	key(index: number): string | null {
+		return Array.from(this.#items.keys())[index] ?? null;
+	}
+
+	removeItem(key: string): void {
+		this.#items.delete(key);
+	}
+
+	setItem(key: string, value: string): void {
+		this.#items.set(key, value);
+	}
 }
 
 describe('buildBrowserDrawingHints', () => {
@@ -205,6 +279,212 @@ describe('captureBrowserSubmissionPayload', () => {
 				currentRect: { x: 20, y: 30, width: 100, height: 100 }
 			}
 		]);
+	});
+});
+
+describe('snapshotBrowserCaptureLayout', () => {
+	test('turns added, removed, and changed moved drafts into submission layout fields', () => {
+		const initial: LayoutSnapshot = {
+			left: '0px',
+			top: '0px',
+			width: '100px',
+			height: '60px',
+			transform: '',
+			rotation: undefined
+		};
+		const added = fakeLayoutElement({
+			rect: { left: 10, top: 20, width: 120, height: 40 }
+		});
+		const original = fakeLayoutElement({
+			tagName: 'SECTION',
+			attrs: { id: 'hero', class: 'target panel' },
+			rect: { left: 0, top: 0, width: 100, height: 60 }
+		});
+		const movedClone = fakeLayoutElement({
+			rect: { left: 30, top: 44, width: 100, height: 60 },
+			style: { ...initial, left: '30px', top: '44px' }
+		});
+		const unchangedClone = fakeLayoutElement({
+			rect: { left: 0, top: 0, width: 100, height: 60 },
+			style: initial
+		});
+
+		const layout = snapshotBrowserCaptureLayout({
+			added: [
+				{
+					id: 'added-1',
+					kind: 'Button',
+					element: added,
+					label: 'Save',
+					propsJson: '{"disabled":true,"count":2}'
+				}
+			],
+			removed: [
+				{
+					descriptor: { tag: 'nav', selector: 'nav.primary' },
+					rect: { x: 1, y: 2, width: 3, height: 4 }
+				}
+			],
+			moved: [
+				{ original, clone: movedClone, initial },
+				{ original, clone: unchangedClone, initial }
+			]
+		});
+
+		expect(layout.components).toEqual([
+			{
+				id: 'added-1',
+				kind: 'Button',
+				label: 'Save',
+				props: { disabled: true, count: 2 },
+				rect: { x: 10, y: 20, width: 120, height: 40 }
+			}
+		]);
+		expect(layout.removed).toEqual([
+			{ tag: 'nav', selector: 'nav.primary', rect: { x: 1, y: 2, width: 3, height: 4 } }
+		]);
+		expect(layout.moved).toEqual([
+			{
+				tag: 'section',
+				id: 'hero',
+				selector: 'section#hero.target.panel',
+				originalRect: { x: 0, y: 0, width: 100, height: 60 },
+				currentRect: { x: 30, y: 44, width: 100, height: 60 }
+			}
+		]);
+	});
+});
+
+describe('stored widget draft capture', () => {
+	test('sanitizes persisted draft shape and filters non-persistable entries', () => {
+		const state = sanitizeStoredWidgetState(
+			{
+				active: false,
+				tool: 'arrow',
+				mode: 'components',
+				placingComponent: 'Button',
+				drawings: [
+					{
+						id: 'note',
+						kind: 'text',
+						position: { x: 1, y: 2 },
+						text: 'Fix',
+						color: 'old',
+						fontSize: 16
+					}
+				],
+				added: [
+					{
+						id: 'component',
+						kind: 'Button',
+						snap: { left: '1px', top: '2px', width: '', height: '', transform: '' }
+					},
+					{ id: 'broken' }
+				],
+				moved: [{ descriptor: { tag: 'main' }, snap: { left: '3px', top: '4px' } }],
+				removed: [{ descriptor: { tag: 'aside', selector: 'aside.panel' } }, { descriptor: {} }]
+			},
+			{ normalizeDrawing: (drawing) => ({ ...drawing, color: 'orange' }) }
+		);
+
+		expect(state).toEqual({
+			active: false,
+			tool: 'arrow',
+			mode: 'components',
+			placingComponent: 'Button',
+			drawings: [
+				expect.objectContaining({
+					id: 'note',
+					color: 'orange'
+				})
+			],
+			added: [
+				{
+					id: 'component',
+					kind: 'Button',
+					snap: {
+						left: '1px',
+						top: '2px',
+						width: '',
+						height: '',
+						transform: '',
+						rotation: undefined
+					}
+				}
+			],
+			moved: [
+				{
+					descriptor: { tag: 'main' },
+					snap: {
+						left: '3px',
+						top: '4px',
+						width: '',
+						height: '',
+						transform: '',
+						rotation: undefined
+					}
+				}
+			],
+			removed: [{ descriptor: { tag: 'aside', selector: 'aside.panel' } }]
+		});
+		expect(hasPersistableWidgetState({ tool: 'pencil', mode: 'annotate' })).toBe(false);
+		expect(hasPersistableWidgetState(state!)).toBe(true);
+	});
+
+	test('writes and removes per-page draft state through a storage adapter', () => {
+		const storage = new MemoryStorage();
+
+		writeStoredWidgetState(
+			'https://example.test/page',
+			{ active: true, tool: 'pencil', mode: 'annotate' },
+			{ storage }
+		);
+
+		expect(readStoredWidgetState('https://example.test/page', { storage })).toEqual({
+			active: true,
+			tool: 'pencil',
+			mode: 'annotate'
+		});
+
+		writeStoredWidgetState('https://example.test/page', null, { storage });
+		expect(readStoredWidgetState('https://example.test/page', { storage })).toBeNull();
+	});
+});
+
+describe('feedback submission client helpers', () => {
+	test('canonicalizes page URLs and restricts feedback server handoff hosts', () => {
+		expect(
+			canonicalFeedbackPageUrl(
+				'https://example.test/work?dryui-feedback=1&dryui-feedback-server=http://127.0.0.1:5888&tab=settings#notes'
+			)
+		).toBe('https://example.test/work?tab=settings');
+		expect(normalizeFeedbackServerUrl('http://127.0.0.1:5888/ui/?focus=one')).toBe(
+			'http://127.0.0.1:5888'
+		);
+		expect(normalizeFeedbackServerUrl('https://feedback.localhost:4748/path')).toBe(
+			'https://feedback.localhost:4748'
+		);
+		expect(normalizeFeedbackServerUrl('https://example.com:4748')).toBeNull();
+	});
+
+	test('query handoff wins over fallback and is stored for later tabs', () => {
+		const localStorage = new MemoryStorage();
+		const sessionStorage = new MemoryStorage();
+		const resolved = resolveFeedbackServerUrl('http://127.0.0.1:4748', {
+			href: 'https://example.test/page?dryui-feedback-server=http%3A%2F%2F127.0.0.1%3A5888',
+			localStorage,
+			sessionStorage
+		});
+
+		expect(resolved).toBe('http://127.0.0.1:5888');
+		expect(localStorage.getItem('dryui-feedback-server-url')).toBe('http://127.0.0.1:5888');
+		expect(
+			resolveFeedbackServerUrl('http://127.0.0.1:4748', {
+				href: 'https://example.test/page',
+				localStorage,
+				sessionStorage
+			})
+		).toBe('http://127.0.0.1:5888');
 	});
 });
 

@@ -2,8 +2,9 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { FeedbackHttpClient } from './client.js';
-import { ensureSubmissionPresentation } from './submission-presentation.js';
-import type { Annotation } from './types.js';
+import { ensureSubmissionPresentationListResponse } from './submission-presentation.js';
+import type { SubmissionPresentationListInput } from './submission-presentation.js';
+import type { Annotation, SubmissionQueryStatus } from './types.js';
 
 type FeedbackToolClient = Pick<
 	FeedbackHttpClient,
@@ -13,9 +14,10 @@ type FeedbackToolClient = Pick<
 	| 'getAllPending'
 	| 'updateAnnotation'
 	| 'addThreadMessage'
-	| 'getSubmissions'
 	| 'resolveSubmission'
->;
+> & {
+	getSubmissions(status?: SubmissionQueryStatus): Promise<SubmissionPresentationListInput>;
+};
 
 type ToolRegistrar = Pick<McpServer, 'tool'>;
 type RegisterToolCompat = (
@@ -206,12 +208,12 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			);
 
 			if (!timedOut && value) {
-				const submissions = value.submissions.map(ensureSubmissionPresentation);
+				const presentation = ensureSubmissionPresentationListResponse(value);
 				return {
 					content: [
 						{
 							type: 'text',
-							text: JSON.stringify({ timedOut: false, count: value.count, submissions }, null, 2)
+							text: JSON.stringify({ timedOut: false, ...presentation }, null, 2)
 						}
 					]
 				};

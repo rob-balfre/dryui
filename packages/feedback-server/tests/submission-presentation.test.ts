@@ -1,6 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import {
 	buildSubmissionPresentation,
+	buildSubmissionPromptPresentation,
+	ensureSubmissionPresentationListResponse,
 	getSubmissionTextNotes
 } from '../src/submission-presentation.ts';
 import type { Submission, SubmissionDrawing } from '../src/types.ts';
@@ -270,5 +272,69 @@ describe('submission presentation', () => {
 			'Add more contrast',
 			'Move this below the chart'
 		]);
+	});
+
+	test('normalizes list responses through the presentation seam', () => {
+		const raw = createSubmission({
+			id: 'raw-submission',
+			drawings: [
+				{
+					id: 'note-1',
+					kind: 'text',
+					color: '#f60',
+					position: { x: 20, y: 20 },
+					text: 'Tighten this copy',
+					fontSize: 14
+				}
+			]
+		});
+		const presented = buildSubmissionPresentation(
+			createSubmission({
+				id: 'presented-submission',
+				drawings: [
+					{
+						id: 'note-2',
+						kind: 'text',
+						color: '#f60',
+						position: { x: 30, y: 30 },
+						text: 'Move this CTA',
+						fontSize: 14
+					}
+				]
+			})
+		);
+
+		const response = ensureSubmissionPresentationListResponse({
+			count: 5,
+			submissions: [raw, presented]
+		});
+
+		expect(response.count).toBe(5);
+		expect(response.submissions[0]?.preferredScreenshotPath).toBe('/tmp/submission-1.png');
+		expect(response.submissions[0]?.textNotes).toEqual(['Tighten this copy']);
+		expect(response.submissions[1]).toBe(presented);
+	});
+
+	test('projects prompt input from a normalized submission presentation', () => {
+		const presentation = buildSubmissionPresentation(
+			createSubmission({
+				drawings: [
+					{
+						id: 'note-1',
+						kind: 'text',
+						color: '#f60',
+						position: { x: 20, y: 20 },
+						text: 'Add stronger affordance',
+						fontSize: 14
+					}
+				]
+			})
+		);
+
+		expect(buildSubmissionPromptPresentation(presentation)).toEqual({
+			id: 'submission-1',
+			url: 'https://example.com/page',
+			textNotes: ['Add stronger affordance']
+		});
 	});
 });

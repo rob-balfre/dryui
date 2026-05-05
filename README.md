@@ -204,6 +204,8 @@ bun run e2e:pack                 # build and pack local package tarballs only
 
 The E2E runner packs the current workspace packages into `reports/e2e-tarballs/`, scaffolds fresh projects against those tarballs, and writes the HTML run report to `reports/e2e-runs/index.html`.
 
+The scaffold step goes through `scripts/e2e/scaffold-adapter.ts`, the concrete Adapter for the `dryui-init` golden consumer setup contract. For separate consumer projects that should run from this checkout directly, use `bun run dev:link` plus `DRYUI_DEV=1`; the E2E tarball flow is the deterministic local-package variant of the same skill-led setup.
+
 See the supporting docs for the rest:
 
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributor workflow

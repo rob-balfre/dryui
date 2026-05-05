@@ -1,12 +1,12 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { componentCompositions, compositionRecipes } from './composition-data';
 import { aiSurface } from './ai-surface.js';
 import { componentImplementationDir } from './component-identity.js';
 import type { ComponentMetaEntry } from './component-catalog.js';
 import { loadComponentMeta } from './load-component-meta.js';
 import {
+	applyPropSourceFacts,
 	collectDataAttributes,
 	findBindableProps,
 	findBindablePropsSimple,
@@ -20,16 +20,31 @@ import {
 	type PartShape,
 	type PropShape
 } from './spec-source-extraction.js';
+import { buildCompositionSpec } from './spec-composition.js';
+import { generateExample } from './spec-examples.js';
+import {
+	deriveStructure,
+	describeDataAttribute,
+	getA11yNotes,
+	propGroupsForComponent,
+	propMetadataResolver,
+	type PropGroupShape,
+	type StructureShape
+} from './spec-prose.js';
+import {
+	addStyleSurfaceSource,
+	createStyleSurfaceAccumulator,
+	finalizeStyleSurface,
+	isStyleSurfaceFile,
+	sharedStyleSurfacesForComponent,
+	type StyleSurfaceFilters
+} from './spec-style-surface.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const uiSrc = resolve(__dirname, '../../ui/src');
 const primSrc = resolve(__dirname, '../../primitives/src');
 const outPath = resolve(__dirname, 'spec.json');
 
-type StructureShape = {
-	tree: string[];
-	note?: string;
-};
 type ComponentShape = {
 	import: string;
 	description: string;
@@ -39,7 +54,7 @@ type ComponentShape = {
 	props?: Record<string, PropShape>;
 	parts?: Record<string, PartShape>;
 	forwardedProps?: ForwardedPropsShape | null;
-	groups?: { name: string; props: string[] }[];
+	groups?: PropGroupShape[];
 	structure?: StructureShape | null;
 	a11y?: string[];
 	cssVars: Record<string, string>;
@@ -53,492 +68,13 @@ type ComponentShape = {
 // rather than silently returning stale data.
 let COMPONENT_META: Record<string, ComponentMetaEntry> = {};
 
-const PROP_NOTES: Record<string, string> = {
-	'Button.href':
-		'When provided, Button renders an anchor instead of a button for link-style actions.',
-	'Combobox.Root.name':
-		'Adds a hidden input so the selected value participates in native form submission.',
-	'Container.size': 'Preset container width, not an arbitrary CSS length.',
-	'DateField.Root.name':
-		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
-	'DatePicker.Root.name':
-		'Adds a hidden input so the selected date participates in native form submission as YYYY-MM-DD.',
-	'Heading.maxMeasure':
-		'Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines. Replaces the grid-wrapper hack that existed while dryui/no-width banned max-width.',
-	'Heading.variant':
-		"variant='display' uses --dry-font-display, which defaults to --dry-font-sans. For a distinct display typeface (e.g., a serif), override --dry-font-display on body or a scoped wrapper, not :root. See recipe: serif-display.",
-	'NumberInput.size':
-		'Adjusts input density and its default maximum width for compact counter-style fields.',
-	'Select.Root.name':
-		'Adds a hidden input so the selected value participates in native form submission.',
-	'Stepper.Root.activeStep': 'Bindable current step index for controlled multi-step flows.',
-	'Text.color':
-		'Use muted or secondary for supporting copy without reaching for inline color styles.',
-	'Text.maxMeasure':
-		'Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch. Defaults are wider than Heading because body copy reads better on a longer measure.',
-	'Text.size': 'Applies DryUI text scale tokens for compact or emphasized body copy.',
-	'Typography.Heading.maxMeasure':
-		'Caps the rendered inline size in ch units: narrow~22ch, default~45ch, wide~65ch. Use narrow for editorial hero headlines.',
-	'Typography.Heading.variant':
-		"variant='display' uses --dry-font-display, which defaults to --dry-font-sans. Override --dry-font-display on body or a scoped wrapper (not :root) for a distinct display typeface.",
-	'Typography.Text.color':
-		'Use muted or secondary for supporting copy without reaching for inline color styles.',
-	'Typography.Text.maxMeasure':
-		'Caps the rendered inline size in ch units: narrow~48ch, default~65ch, wide~80ch.',
-	'Typography.Text.size': 'Applies DryUI text scale tokens for compact or emphasized body copy.'
-};
-
-const GENERIC_PROP_DESCRIPTIONS: Record<string, string> = {
-	activeStep: 'Current step index for a controlled multi-step flow.',
-	align: 'Alignment for child content along the cross axis.',
-	alt: 'Accessible alternative text announced when the media itself is not visible.',
-	as: 'Underlying HTML element to render for the component.',
-	checked: 'Current checked state for controlled or bindable usage.',
-	children: 'Content rendered inside the component.',
-	color: 'Semantic color or tone applied to the component.',
-	defaultValue: 'Initial uncontrolled value before user interaction.',
-	description: 'Supporting copy that explains the current control or section.',
-	disabled: 'Prevents interaction and applies disabled styling.',
-	download: 'Requests download behavior when the component renders as a link.',
-	href: 'Destination URL when the component renders as a link.',
-	id: 'Unique HTML id used for labels, aria relationships, or targeted styling.',
-	label: 'Visible label text shown for the control or item.',
-	level: 'Semantic heading level to render.',
-	max: 'Maximum allowed value.',
-	maxMeasure:
-		'Caps rendered inline size on an ergonomic text measure (ch unit). Pass narrow, default, or wide, or false to opt out.',
-	min: 'Minimum allowed value.',
-	name: 'Field name used during native form submission.',
-	onSelect: 'Callback fired when the item is selected.',
-	open: 'Whether the overlay or disclosure is currently open.',
-	orientation: 'Horizontal or vertical layout direction.',
-	placeholder: 'Hint text shown when no value is selected or entered.',
-	rel: 'Relationship between the current document and the linked resource.',
-	selected: 'Whether the current item is selected.',
-	side: 'Preferred side for overlay placement.',
-	size: 'Size preset affecting density, spacing, or typography.',
-	src: 'Source URL for image, video, or other media content.',
-	step: 'Step interval used when incrementing numeric values.',
-	target: 'Browsing context used for link navigation.',
-	title: 'Primary heading or label text.',
-	type: 'HTML type attribute or component-specific type selector.',
-	value: 'Current controlled or bindable value.',
-	variant: 'Visual style preset for the component.',
-	wrap: 'Controls whether child content can wrap onto multiple lines.'
-};
-
-const PROP_DESCRIPTIONS: Record<string, string> = {
-	'Accordion.Root.type': 'Accordion behavior mode for single or multiple expanded items.',
-	'Badge.color': 'Semantic tone applied to the badge background, border, or text treatment.',
-	'Badge.size': 'Badge density preset for compact metadata or standard labels.',
-	'Badge.variant': 'Badge treatment ranging from filled emphasis to subtle outline styles.',
-	'BorderBeam.active':
-		'Whether the beam is currently glowing. Disabling it plays the fade-out sequence before the effect becomes idle.',
-	'BorderBeam.borderRadius':
-		'Optional border radius override for the beam host. When omitted, the first child radius is detected automatically.',
-	'BorderBeam.colorVariant':
-		'Beam palette preset matching the upstream colorful, mono, ocean, or sunset glow treatments.',
-	'BorderBeam.onActivate': 'Callback fired after the beam fade-in animation completes.',
-	'BorderBeam.onDeactivate': 'Callback fired after the beam fade-out animation completes.',
-	'BorderBeam.size':
-		'Effect mode preset: compact control ring (`sm`), full border glow (`md`), or bottom-edge line trace (`line`).',
-	'BorderBeam.strength': 'Intensity multiplier for the beam stroke, inner glow, and bloom layers.',
-	'BorderBeam.theme':
-		'Color tuning for dark or light surfaces, or system preference when set to `auto`.',
-	'Button.color':
-		"Semantic tone. 'primary' and 'danger' are brand/error. 'ink' renders a solid near-black editorial CTA that auto-inverts in dark theme via --dry-color-bg-inverse/--dry-color-text-inverse. Any other string is passed through as a data-color hook for custom presets.",
-	'Button.size': 'Button density preset, including icon-only sizing variants.',
-	'Button.variant': 'Button treatment from solid primary actions to ghost and inline link styles.',
-	'Dialog.Close.children': 'Label or content rendered inside the dismiss control.',
-	'Dialog.Content.children': 'Main dialog surface content rendered inside the modal.',
-	'Dialog.Root.open': 'Controls whether the dialog is currently shown.',
-	'Dialog.Trigger.children': 'Interactive element that opens the dialog.',
-	'Input.size': 'Input density preset for compact, default, or spacious form layouts.',
-	'Input.type': 'Native input type such as text, email, password, or search.',
-	'Input.value': 'Bindable text value for controlled input usage.',
-	'Select.Root.open': 'Controls whether the select menu is currently expanded.',
-	'Select.Root.value': 'Bindable selected value for the current option set.',
-	'Tabs.Root.value': 'Bindable current tab value for controlled tab interfaces.',
-	'Tabs.Trigger.value': 'Tab identifier that activates the matching content panel.',
-	'Typography.Heading.level': 'Heading level used to render semantic h1 through h6 output.',
-	'Typography.Text.as': 'Text element to render for inline, block, or paragraph copy.'
-};
-
-const A11Y_NOTES: Record<string, string[]> = {
-	Accordion: [
-		'Use descriptive trigger text so the hidden content is understandable before expansion.',
-		'Keep each trigger paired with its matching content so keyboard and screen-reader relationships stay intact.'
-	],
-	Button: [
-		'Provide discernible text or an aria-label for icon-only buttons.',
-		'Use the href prop for navigation so the element keeps link semantics.'
-	],
-	Checkbox: ['Pair the checkbox with visible text or an aria-label so its purpose is announced.'],
-	Dialog: [
-		'Always provide a clear heading so the dialog context is announced when it opens.',
-		'Ensure there is an obvious close path for both keyboard and pointer users.'
-	],
-	Input: [
-		'Pair Input with a visible Label or an aria-label so the field purpose is announced.',
-		'Use native type, autocomplete, and name attributes for expected keyboard and form behavior.'
-	],
-	Popover: [
-		'Avoid placing essential actions in hover-only or transient content; keyboard users must be able to reopen the popover.'
-	],
-	Select: [
-		'Provide surrounding field context and a name when the selected value needs to submit with a form.'
-	],
-	Switch: ['Use switches for immediate on/off settings and pair them with visible labels.'],
-	ThemeToggle: [
-		'Keep the default aria-label or pass a custom one so the purpose of the button is announced.',
-		'The Alt-click and Escape shortcuts return to system mode; do not remove them in custom wrappers so users can opt back into prefers-color-scheme.'
-	],
-	Tabs: [
-		'Give each Tabs.Trigger concise, descriptive text so keyboard and screen-reader users can scan options quickly.',
-		'Keep Tabs.List and Tabs.Content as siblings under Tabs.Root to preserve roving focus and aria wiring.'
-	],
-	Toast: ['Do not rely on toast content as the only place critical workflow information appears.']
-};
-
-const CATEGORY_A11Y_NOTES: Record<string, string[]> = {
-	action: [
-		'Provide discernible text or an aria-label for controls that do not expose visible text.',
-		'Use button semantics for in-place actions and link semantics for navigation.'
-	],
-	display: [
-		'Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.',
-		'Keep heading, reading, and focus order aligned with the surrounding content.'
-	],
-	feedback: [
-		'Do not rely on transient feedback as the only place critical workflow information appears.',
-		'Label dismiss or retry actions explicitly so their purpose is announced.'
-	],
-	form: [
-		'Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.',
-		'Provide native name, autocomplete, and value wiring when the component participates in form submission.'
-	],
-	input: [
-		'Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.',
-		'Preserve expected keyboard entry, selection, and state announcements for the chosen input pattern.'
-	],
-	interaction: [
-		'Provide a clear accessible name for every interactive target and keep the action model consistent.',
-		'Match keyboard behavior to the established widget pattern rather than inventing a custom key map.'
-	],
-	layout: [
-		'This component does not add meaning by itself; ensure child content supplies the required headings, labels, and landmarks.',
-		'Only add landmark or region semantics when the section has a unique, meaningful label.'
-	],
-	navigation: [
-		'Use concise, descriptive labels so navigation items are understandable when announced out of context.',
-		'Preserve the expected keyboard model and expose current or selected state where relevant.'
-	],
-	overlay: [
-		'Ensure the trigger, popup role, and focus return behavior all describe the same interaction model.',
-		'Provide an obvious keyboard dismissal path and avoid putting essential actions in hover-only content.'
-	],
-	visual: [
-		'Treat the effect as decorative and keep underlying content understandable without color, blur, or motion alone.',
-		'Respect reduced-motion and contrast requirements when animation or filtering is enabled.'
-	]
-};
-
-function hasAnyTag(meta: ComponentMetaEntry, tags: string[]): boolean {
-	return tags.some((tag) => meta.tags.includes(tag));
-}
-
-function buildGeneratedA11yNotes(meta: ComponentMetaEntry): string[] {
-	const fallbackNotes = CATEGORY_A11Y_NOTES.display ?? [];
-	const notes = [...(CATEGORY_A11Y_NOTES[meta.category] ?? fallbackNotes)];
-
-	if (hasAnyTag(meta, ['alert', 'message', 'notification', 'toast'])) {
-		notes.push(
-			'Choose live-region urgency carefully and do not make short-lived announcements the only source of important information.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['carousel', 'slideshow', 'slider'])) {
-		notes.push(
-			'If content auto-advances, provide pause or stop controls and respect reduced-motion preferences.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['chart', 'graph', 'data', 'visualization'])) {
-		notes.push(
-			'Expose the essential data in text form, such as a summary, value list, or table, rather than relying on the graphic alone.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['dialog', 'drawer', 'menu', 'menubar', 'modal', 'popover', 'tooltip'])) {
-		notes.push(
-			'Keep the opening control labeled, ensure focus moves predictably on open and close, and expose the popup type truthfully.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['editor', 'formatting', 'rich-text', 'contenteditable'])) {
-		notes.push(
-			'Label editor toolbars and popovers explicitly, and ensure formatting actions remain keyboard-complete.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['scroll', 'overflow', 'scrollbar'])) {
-		notes.push(
-			'Only add region semantics when the scrollable surface has a unique, meaningful label.'
-		);
-	}
-
-	if (hasAnyTag(meta, ['tree', 'hierarchy', 'nested'])) {
-		notes.push(
-			'Keep focus on the treeitem and follow the standard arrow-key tree model for expand, collapse, and traversal.'
-		);
-	}
-
-	return [...new Set(notes)];
-}
-
-function getA11yNotes(name: string, meta: ComponentMetaEntry): string[] {
-	return A11Y_NOTES[name] ?? buildGeneratedA11yNotes(meta);
-}
-
-type DataAttributeMeta = {
-	description: string;
-	values?: string[];
-};
-
-const GENERIC_DATA_ATTRIBUTE_META: Record<string, DataAttributeMeta> = {
-	'data-active': {
-		description: 'Present on the active item or current target within the component.'
-	},
-	'data-disabled': {
-		description: 'Present when the component or part is disabled.'
-	},
-	'data-invalid': {
-		description: 'Present when the current field value is invalid.'
-	},
-	'data-orientation': {
-		description: 'Reflects the current horizontal or vertical orientation.',
-		values: ['horizontal', 'vertical']
-	},
-	'data-selected': {
-		description: 'Present when the current item is selected.'
-	},
-	'data-side': {
-		description: 'Indicates the resolved placement side for the overlay surface.',
-		values: ['top', 'right', 'bottom', 'left']
-	}
-};
-
-const DATA_ATTRIBUTE_META: Record<string, DataAttributeMeta> = {
-	'Accordion.data-state': {
-		description: 'Reflects whether the current accordion item is expanded or collapsed.',
-		values: ['open', 'closed']
-	},
-	'Button.data-color': {
-		description:
-			"Reflects the resolved color preset. 'ink' is a solid near-black editorial CTA that auto-inverts in dark theme.",
-		values: ['primary', 'danger', 'ink']
-	},
-	'Collapsible.data-state': {
-		description: 'Reflects whether the collapsible content is expanded or collapsed.',
-		values: ['open', 'closed']
-	},
-	'CommandPalette.data-state': {
-		description: 'Reflects whether the command palette dialog is open or closed.',
-		values: ['open', 'closed']
-	},
-	'Dialog.data-state': {
-		description: 'Reflects whether the dialog is open or closed.',
-		values: ['open', 'closed']
-	},
-	'BorderBeam.data-active': {
-		description: 'Present while the beam is rendering its active glow and bloom layers.'
-	},
-	'BorderBeam.data-beam': {
-		description: 'Per-instance marker on the beam host used to scope the injected effect styles.'
-	},
-	'BorderBeam.data-beam-bloom': {
-		description: 'Bloom layer element that renders the outer glow spill around the active beam.'
-	},
-	'BorderBeam.data-fading': {
-		description: 'Present while the beam is playing its fade-out sequence.'
-	},
-	'BorderBeam.data-size': {
-		description: 'Reflects the current effect mode preset.',
-		values: ['sm', 'md', 'line']
-	},
-	'Drawer.data-state': {
-		description: 'Reflects whether the drawer is open or closed.',
-		values: ['open', 'closed']
-	},
-	'Popover.data-state': {
-		description: 'Reflects whether the popover is open or closed.',
-		values: ['open', 'closed']
-	},
-	'Select.data-state': {
-		description:
-			'Reflects whether the select surface is expanded or whether an option is active, depending on the part.',
-		values: ['open', 'closed', 'checked', 'unchecked']
-	},
-	'Tabs.data-state': {
-		description: 'Reflects whether the tab trigger or panel is active.',
-		values: ['active', 'inactive']
-	}
-};
-
-const PROP_GROUPS: Record<string, { name: string; props: string[] }[]> = {
-	Button: [
-		{ name: 'Appearance', props: ['variant', 'size', 'color', 'disabled'] },
-		{ name: 'Link / Navigation', props: ['href', 'rel', 'target', 'download'] },
-		{ name: 'Content', props: ['children', 'type'] }
-	]
-};
-
-const STRUCTURE_NOTES: Record<string, string> = {
-	Stepper:
-		'Stepper.List wraps Stepper.Step and Stepper.Separator. Bind activeStep on Root when controlling the current step.',
-	Tabs: 'Tabs.List groups the triggers, while Tabs.Content stays as a sibling of Tabs.List under Tabs.Root.',
-	Typography:
-		'Typography is a namespaced set of standalone text parts. Use Typography.Heading or Typography.Text directly; there is no Typography.Root wrapper.'
-};
-
-function cssVarDescription(varName: string): string {
-	// Full variable name overrides for compound-component-specific tokens
-	const fullMap: Record<string, string> = {
-		'--dry-pin-bg': 'Cell background color',
-		'--dry-pin-border': 'Cell border color',
-		'--dry-pin-font-size': 'Cell font size',
-		'--dry-pin-radius': 'Cell border radius',
-		'--dry-pin-size': 'Cell width and height',
-		'--dry-pin-caret-color': 'Caret color',
-		'--dry-pin-separator-color': 'Separator color',
-		'--dry-separator-color': 'Line color',
-		'--dry-separator-spacing': 'Margin around the line'
-	};
-	if (fullMap[varName]) return fullMap[varName];
-
-	const suffix = varName.replace(/^--dry-\w+-/, '');
-	const map: Record<string, string> = {
-		bg: 'Background color',
-		color: 'Text color',
-		border: 'Border color',
-		radius: 'Border radius',
-		padding: 'Padding',
-		'padding-x': 'Horizontal padding',
-		'padding-y': 'Vertical padding',
-		'font-size': 'Font size',
-		shadow: 'Box shadow',
-		'max-width': 'Maximum width',
-		size: 'Size',
-		height: 'Height',
-		gap: 'Gap spacing',
-		weight: 'Font weight',
-		leading: 'Line height',
-		width: 'Width',
-		track: 'Track color',
-		'track-height': 'Track height',
-		'thumb-size': 'Thumb size',
-		'min-height': 'Minimum height'
-	};
-
-	return (
-		map[suffix] ??
-		suffix
-			.split('-')
-			.map((part) => part.slice(0, 1).toUpperCase() + part.slice(1))
-			.join(' ')
-	);
-}
-
-function noteForProp(
-	componentName: string,
-	propName: string,
-	partName?: string
-): string | undefined {
-	if (partName) {
-		const partKey = `${componentName}.${partName}.${propName}`;
-		if (PROP_NOTES[partKey]) return PROP_NOTES[partKey];
-	}
-
-	return PROP_NOTES[`${componentName}.${propName}`];
-}
-
-function descriptionForProp(
-	componentName: string,
-	propName: string,
-	partName?: string
-): string | undefined {
-	if (partName) {
-		const partKey = `${componentName}.${partName}.${propName}`;
-		if (PROP_DESCRIPTIONS[partKey]) return PROP_DESCRIPTIONS[partKey];
-	}
-
-	return PROP_DESCRIPTIONS[`${componentName}.${propName}`] ?? GENERIC_PROP_DESCRIPTIONS[propName];
-}
-
-function deriveStructure(example: string, name: string): StructureShape | null {
-	const lines: string[] = [];
-	const seen = new Set<string>();
-	const stack: string[] = [];
-	const tagPattern = /<\/?([A-Z][A-Za-z0-9.]*)[^>]*?\/?>/g;
-
-	for (const match of example.matchAll(tagPattern)) {
-		const fullTag = match[0];
-		const tagName = match[1];
-		if (!fullTag || !tagName || !tagName.startsWith(`${name}.`)) continue;
-
-		const isClosing = fullTag.startsWith('</');
-		const isSelfClosing = fullTag.endsWith('/>');
-
-		if (isClosing) {
-			stack.pop();
-			continue;
-		}
-
-		const depth = stack.length;
-		const key = `${stack.join('>')}::${tagName}`;
-		if (!seen.has(key)) {
-			lines.push(`${'  '.repeat(depth)}${tagName}`);
-			seen.add(key);
-		}
-
-		if (!isSelfClosing) {
-			stack.push(tagName);
-		}
-	}
-
-	if (lines.length === 0) return null;
-
-	return {
-		tree: lines,
-		...(STRUCTURE_NOTES[name] ? { note: STRUCTURE_NOTES[name] } : {})
-	};
-}
-
-function describeDataAttribute(componentName: string, attrName: string): DataAttributeShape {
-	const meta =
-		DATA_ATTRIBUTE_META[`${componentName}.${attrName}`] ?? GENERIC_DATA_ATTRIBUTE_META[attrName];
-
-	if (!meta) {
-		return { name: attrName };
-	}
-
-	return {
-		name: attrName,
-		description: meta.description,
-		...(meta.values ? { values: meta.values } : {})
-	};
-}
-
 function parsePropContract(
 	source: string,
 	name: string,
 	componentName: string,
 	partName?: string
 ): { props: Record<string, PropShape>; forwardedProps: ForwardedPropsShape | null } {
-	return parsePropContractFromSource(source, name, componentName, partName, {
-		descriptionForProp,
-		noteForProp
-	});
+	return parsePropContractFromSource(source, name, componentName, partName, propMetadataResolver);
 }
 
 function parsePartContract(
@@ -547,191 +83,13 @@ function parsePartContract(
 	partName: string,
 	sourcePath?: string
 ): { props: Record<string, PropShape>; forwardedProps: ForwardedPropsShape | null } {
-	return parsePartContractFromSource(source, componentName, partName, sourcePath, {
-		descriptionForProp,
-		noteForProp
-	});
-}
-
-/** Per-component example overrides for richer, realistic usage patterns. */
-const EXAMPLE_OVERRIDES: Record<string, string> = {
-	Button:
-		'<Button variant="solid" onclick={handleClick}>Save</Button>\n<Button href="/getting-started" variant="outline">Continue</Button>',
-	Combobox:
-		'<Combobox.Root bind:value={selectedFramework} name="framework">\n  <Combobox.Input placeholder="Search frameworks..." />\n  <Combobox.Content>\n    <Combobox.Item value="svelte" index={0}>Svelte</Combobox.Item>\n    <Combobox.Item value="react" index={1}>React</Combobox.Item>\n  </Combobox.Content>\n</Combobox.Root>',
-	MultiSelectCombobox:
-		'<MultiSelectCombobox.Root bind:value={selectedFrameworks} bind:query={frameworkQuery} name="frameworks">\n  <MultiSelectCombobox.SelectionList>\n    {#each selectedFrameworks as framework}\n      <MultiSelectCombobox.SelectionItem value={framework}>\n        {framework}\n        <MultiSelectCombobox.SelectionRemove value={framework} />\n      </MultiSelectCombobox.SelectionItem>\n    {/each}\n  </MultiSelectCombobox.SelectionList>\n  <MultiSelectCombobox.Input placeholder="Search frameworks..." />\n  <MultiSelectCombobox.Content>\n    <MultiSelectCombobox.Item value="svelte">Svelte</MultiSelectCombobox.Item>\n    <MultiSelectCombobox.Item value="react">React</MultiSelectCombobox.Item>\n  </MultiSelectCombobox.Content>\n</MultiSelectCombobox.Root>',
-	Input: '<Input type="email" bind:value={email} placeholder="you@example.com" />',
-	Textarea: '<Textarea bind:value={message} placeholder="Write a message\u2026" />',
-	NumberInput: '<NumberInput bind:value={quantity} min={0} max={100} step={1} size="sm" />',
-	Checkbox: '<Checkbox bind:checked={agreed}>I agree to the terms</Checkbox>',
-	Switch: '<Switch bind:checked={darkMode}>Dark mode</Switch>',
-	Slider: '<Slider bind:value={volume} min={0} max={100} />',
-	Rating: '<Rating bind:value={score} />',
-	Badge: '<Badge variant="soft">Active</Badge>',
-	Alert:
-		'<Alert variant="info">\n  {#snippet description()}Your changes have been saved.{/snippet}\n</Alert>',
-	Progress: '<Progress value={65} max={100} />',
-	Spinner: '<Spinner size="md" />',
-	Skeleton: '<Skeleton width="200px" height="1rem" />',
-	Separator: '<Separator />',
-	Spacer: '<Spacer size="lg" />',
-	Container: '<Container>\n  <p>Centered content</p>\n</Container>',
-	Avatar: '<Avatar src="/avatar.jpg" alt="Jane" fallback="JD" />',
-	ChatThread:
-		'<ChatThread messageCount={messages.length}>\n  {#snippet children({ index })}\n    <ChatMessage role={messages[index].role} name={messages[index].name}>\n      {messages[index].message}\n    </ChatMessage>\n  {/snippet}\n</ChatThread>',
-	DataGrid:
-		'<DataGrid.Root items={rows} pageSize={10}>\n  <DataGrid.Table>\n    <DataGrid.Header>\n      <DataGrid.Row>\n        <DataGrid.Column key="name" sortable>Name</DataGrid.Column>\n        <DataGrid.Column key="status">Status</DataGrid.Column>\n      </DataGrid.Row>\n    </DataGrid.Header>\n    <DataGrid.Body>\n      {#snippet children({ items })}\n        {#each items as row (row.id)}\n          <DataGrid.Row rowId={row.id}>\n            <DataGrid.Cell>{row.name}</DataGrid.Cell>\n            <DataGrid.Cell>{row.status}</DataGrid.Cell>\n          </DataGrid.Row>\n        {/each}\n      {/snippet}\n    </DataGrid.Body>\n  </DataGrid.Table>\n  <DataGrid.Pagination />\n</DataGrid.Root>',
-	Chip: '<Chip variant="soft" color="blue">Policy friendly</Chip>',
-	ChipGroup:
-		'<ChipGroup.Root gap="md">\n  <ChipGroup.Label>WORKS WITH</ChipGroup.Label>\n  <Badge variant="soft">Local/MLX</Badge>\n  <Badge variant="soft">OpenAI</Badge>\n  <Badge variant="soft">Anthropic</Badge>\n  <Badge variant="soft">Mistral</Badge>\n</ChipGroup.Root>',
-	Tooltip:
-		'<Tooltip.Root>\n  <Tooltip.Trigger>\n    <Button variant="ghost">Hover me</Button>\n  </Tooltip.Trigger>\n  <Tooltip.Content>Extra information</Tooltip.Content>\n</Tooltip.Root>',
-	Dialog:
-		'<Dialog.Root bind:open={showDialog}>\n  <Dialog.Trigger>\n    <Button>Open Dialog</Button>\n  </Dialog.Trigger>\n  <Dialog.Content>\n    <Dialog.Header>Confirm</Dialog.Header>\n    <p>Are you sure?</p>\n    <Dialog.Footer>\n      <Button variant="outline" onclick={() => showDialog = false}>Cancel</Button>\n      <Button variant="solid" onclick={handleConfirm}>Confirm</Button>\n    </Dialog.Footer>\n  </Dialog.Content>\n</Dialog.Root>',
-	Tabs: '<Tabs.Root bind:value={activeTab}>\n  <Tabs.List>\n    <Tabs.Trigger value="one">Tab 1</Tabs.Trigger>\n    <Tabs.Trigger value="two">Tab 2</Tabs.Trigger>\n  </Tabs.List>\n  <Tabs.Content value="one">First panel</Tabs.Content>\n  <Tabs.Content value="two">Second panel</Tabs.Content>\n</Tabs.Root>',
-	Accordion:
-		'<Accordion.Root>\n  <Accordion.Item value="a">\n    <Accordion.Trigger>Section A</Accordion.Trigger>\n    <Accordion.Content>Content for section A.</Accordion.Content>\n  </Accordion.Item>\n  <Accordion.Item value="b">\n    <Accordion.Trigger>Section B</Accordion.Trigger>\n    <Accordion.Content>Content for section B.</Accordion.Content>\n  </Accordion.Item>\n</Accordion.Root>',
-	Select:
-		'<Select.Root bind:value={selected} bind:open={selectOpen} name="selection">\n  <Select.Trigger>\n    <Select.Value placeholder="Choose\u2026" />\n  </Select.Trigger>\n  <Select.Content>\n    <Select.Item value="a">Alpha</Select.Item>\n    <Select.Item value="b">Beta</Select.Item>\n  </Select.Content>\n</Select.Root>',
-	Popover:
-		'<Popover.Root bind:open={popoverOpen}>\n  <Popover.Trigger>\n    <Button variant="outline">Info</Button>\n  </Popover.Trigger>\n  <Popover.Content>\n    <p>Popover details here.</p>\n  </Popover.Content>\n</Popover.Root>',
-	Drawer:
-		'<Drawer.Root bind:open={drawerOpen}>\n  <Drawer.Trigger>\n    <Button>Open Drawer</Button>\n  </Drawer.Trigger>\n  <Drawer.Content side="right">\n    <Drawer.Header>Settings</Drawer.Header>\n    <p>Drawer body content.</p>\n  </Drawer.Content>\n</Drawer.Root>',
-	DropdownMenu:
-		'<DropdownMenu.Root>\n  <DropdownMenu.Trigger>\n    <Button variant="ghost">Menu</Button>\n  </DropdownMenu.Trigger>\n  <DropdownMenu.Content>\n    <DropdownMenu.Item onclick={handleEdit}>Edit</DropdownMenu.Item>\n    <DropdownMenu.Item onclick={handleDelete}>Delete</DropdownMenu.Item>\n  </DropdownMenu.Content>\n</DropdownMenu.Root>',
-	Table:
-		'<Table.Root>\n  <Table.Header>\n    <Table.Row>\n      <Table.Head>Name</Table.Head>\n      <Table.Head>Status</Table.Head>\n    </Table.Row>\n  </Table.Header>\n  <Table.Body>\n    <Table.Row>\n      <Table.Cell>Alice</Table.Cell>\n      <Table.Cell><Badge variant="soft">Active</Badge></Table.Cell>\n    </Table.Row>\n  </Table.Body>\n</Table.Root>',
-	Field:
-		'<Field.Root>\n  <Label>Username</Label>\n  <Input bind:value={username} />\n</Field.Root>',
-	Fieldset:
-		'<Fieldset.Root>\n  <Fieldset.Legend>Notification preferences</Fieldset.Legend>\n  <Fieldset.Description>Choose how release updates reach your team.</Fieldset.Description>\n  <Fieldset.Content>\n    <Checkbox checked={true}>Email digests</Checkbox>\n    <Checkbox>SMS alerts</Checkbox>\n  </Fieldset.Content>\n</Fieldset.Root>',
-	DescriptionList:
-		'<DescriptionList.Root>\n  <DescriptionList.Item>\n    <DescriptionList.Term>Workspace</DescriptionList.Term>\n    <DescriptionList.Description>North America expansion</DescriptionList.Description>\n  </DescriptionList.Item>\n  <DescriptionList.Item>\n    <DescriptionList.Term>Status</DescriptionList.Term>\n    <DescriptionList.Description>Reviewing launch checklist</DescriptionList.Description>\n  </DescriptionList.Item>\n</DescriptionList.Root>',
-	DateField:
-		'<DateField.Root bind:value={departureDate} name="departureDate">\n  <DateField.Segment type="month" />\n  <DateField.Separator />\n  <DateField.Segment type="day" />\n  <DateField.Separator />\n  <DateField.Segment type="year" />\n</DateField.Root>',
-	DatePicker:
-		'<DatePicker.Root bind:value={departureDate} name="departureDate">\n  <DatePicker.Trigger placeholder="Select departure date" />\n  <DatePicker.Content>\n    <DatePicker.Calendar />\n  </DatePicker.Content>\n</DatePicker.Root>',
-	SegmentedControl:
-		'<SegmentedControl.Root bind:value={tripType}>\n  <SegmentedControl.Item value="one-way">One way</SegmentedControl.Item>\n  <SegmentedControl.Item value="round-trip">Round trip</SegmentedControl.Item>\n  <SegmentedControl.Item value="multi-city">Multi-city</SegmentedControl.Item>\n</SegmentedControl.Root>',
-	Heading: '<Heading level={2}>Launch readiness</Heading>',
-	Text: '<Text as="p" color="secondary" size="sm">Use Text for supporting copy, labels, and starter-kit body content.</Text>',
-	ThemeToggle: '<ThemeToggle storageKey="my-app-theme" />',
-	TypingIndicator: '<TypingIndicator aria-label="Assistant is typing" />',
-	Typography:
-		'<Typography.Heading level={2}>Launch readiness</Typography.Heading>\n<Typography.Text color="muted" size="sm">Use Typography.Text for supporting copy and metadata.</Typography.Text>',
-	Breadcrumb:
-		'<Breadcrumb.Root>\n  <Breadcrumb.List>\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href="/">Home</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link href="/docs">Docs</Breadcrumb.Link>\n    </Breadcrumb.Item>\n    <Breadcrumb.Separator />\n    <Breadcrumb.Item>\n      <Breadcrumb.Link current>Current</Breadcrumb.Link>\n    </Breadcrumb.Item>\n  </Breadcrumb.List>\n</Breadcrumb.Root>',
-	Stepper:
-		'<Stepper.Root bind:activeStep={activeStep}>\n  <Stepper.List>\n    <Stepper.Step step={0}>Account</Stepper.Step>\n    <Stepper.Separator step={0} />\n    <Stepper.Step step={1}>Profile</Stepper.Step>\n    <Stepper.Separator step={1} />\n    <Stepper.Step step={2}>Review</Stepper.Step>\n  </Stepper.List>\n</Stepper.Root>',
-	Timeline:
-		'<Timeline.Root>\n  <Timeline.Item>\n    <Timeline.Icon />\n    <Timeline.Content>\n      <Timeline.Title>Event title</Timeline.Title>\n      <Timeline.Description>Event description</Timeline.Description>\n      <Timeline.Time>2 hours ago</Timeline.Time>\n    </Timeline.Content>\n  </Timeline.Item>\n</Timeline.Root>',
-	DateTimeInput: '<DateTimeInput bind:value={appointmentDate} name="appointment" />',
-	FlipCard:
-		'<FlipCard.Root trigger="hover">\n  <FlipCard.Front>Front content</FlipCard.Front>\n  <FlipCard.Back>Back content</FlipCard.Back>\n</FlipCard.Root>',
-	Gauge:
-		'<Gauge value={72} min={0} max={100} thresholds={[{ value: 30, color: "red" }, { value: 70, color: "orange" }, { value: 90, color: "green" }]} />',
-	Map: '<Map.Root center={[-122.4, 37.8]} zoom={12}>\n  <Map.Marker position={[-122.4, 37.8]}>\n    <Map.Popup>San Francisco</Map.Popup>\n  </Map.Marker>\n  <Map.Controls navigation fullscreen />\n</Map.Root>',
-	MegaMenu:
-		'<MegaMenu.Root>\n  <MegaMenu.Trigger>Products</MegaMenu.Trigger>\n  <MegaMenu.Panel>\n    <MegaMenu.Column title="Platform">\n      <MegaMenu.Link href="/analytics">Analytics</MegaMenu.Link>\n      <MegaMenu.Link href="/automation">Automation</MegaMenu.Link>\n    </MegaMenu.Column>\n  </MegaMenu.Panel>\n</MegaMenu.Root>',
-	NotificationCenter:
-		'<NotificationCenter.Root bind:items={notifications} bind:open={panelOpen}>\n  <NotificationCenter.Trigger>\n    {#snippet children({ unreadCount })}\n      <Button>Notifications ({unreadCount})</Button>\n    {/snippet}\n  </NotificationCenter.Trigger>\n  <NotificationCenter.Panel>\n    <NotificationCenter.Group label="Today">\n      <NotificationCenter.Item id="1" variant="info">New deployment complete</NotificationCenter.Item>\n    </NotificationCenter.Group>\n  </NotificationCenter.Panel>\n</NotificationCenter.Root>',
-	PhoneInput: '<PhoneInput bind:value={phone} defaultCountry="US" placeholder="(555) 123-4567" />',
-	PinInput:
-		'<PinInput.Root bind:value={pin} length={6} oncomplete={handleVerify}>\n  {#snippet children({ cells })}\n    <PinInput.Group>\n      {#each cells.slice(0, 3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n    <PinInput.Separator />\n    <PinInput.Group>\n      {#each cells.slice(3) as cell}\n        <PinInput.Cell {cell} />\n      {/each}\n    </PinInput.Group>\n  {/snippet}\n</PinInput.Root>',
-	Sparkline: '<Sparkline data={[5, 10, 3, 8, 12, 7]} width={120} height={30} />',
-	VideoEmbed:
-		'<VideoEmbed src="https://youtube.com/watch?v=dQw4w9WgXcQ" provider="youtube" title="Video title" />',
-	// Travel Booking Components
-	AddOnSelector:
-		'<AddOnSelector.Root bind:selected={addOns}>\n  <AddOnSelector.Item value="baggage" maxQuantity={3}>\n    <AddOnSelector.ItemLabel>Extra Baggage</AddOnSelector.ItemLabel>\n    <AddOnSelector.ItemPrice>$25/bag</AddOnSelector.ItemPrice>\n  </AddOnSelector.Item>\n</AddOnSelector.Root>',
-	AmenityGrid:
-		'<AmenityGrid.Root>\n  <AmenityGrid.Amenity icon="wifi" label="Free WiFi" />\n  <AmenityGrid.Amenity icon="pool" label="Pool" />\n  <AmenityGrid.Amenity icon="parking" label="Parking" />\n</AmenityGrid.Root>',
-	BookingConfirmation:
-		'<BookingConfirmation.Root variant="success">\n  <BookingConfirmation.ConfirmationHeader title="Booking Confirmed!" />\n  <BookingConfirmation.BookingReference reference="ABC123" copyable />\n  <BookingConfirmation.ItinerarySummary>JFK → LAX, Mar 15</BookingConfirmation.ItinerarySummary>\n</BookingConfirmation.Root>',
-	ComparisonTable:
-		'<ComparisonTable.Root columns={["Economy", "Premium", "Business"]} highlightedColumn={1}>\n  <ComparisonTable.Header>\n    <ComparisonTable.HeaderCell>Feature</ComparisonTable.HeaderCell>\n  </ComparisonTable.Header>\n  <ComparisonTable.Body>\n    <ComparisonTable.Row>\n      <ComparisonTable.Cell>Baggage</ComparisonTable.Cell>\n      <ComparisonTable.Cell>1 bag</ComparisonTable.Cell>\n      <ComparisonTable.Cell>2 bags</ComparisonTable.Cell>\n      <ComparisonTable.Cell>3 bags</ComparisonTable.Cell>\n    </ComparisonTable.Row>\n  </ComparisonTable.Body>\n</ComparisonTable.Root>',
-	CurrencySelector: '<CurrencySelector.Root bind:value={currency} />',
-	FareClassPicker:
-		'<FareClassPicker.Root bind:value={fareClass}>\n  <FareClassPicker.Option value="economy" label="Economy" price={199} currency="USD">\n    <FareClassPicker.FeatureList>\n      <FareClassPicker.FeatureItem included>1 carry-on</FareClassPicker.FeatureItem>\n    </FareClassPicker.FeatureList>\n  </FareClassPicker.Option>\n</FareClassPicker.Root>',
-	FilterSidebar:
-		'<FilterSidebar.Root>\n  <FilterSidebar.Group title="Price Range">\n    <FilterSidebar.PriceRange min={0} max={1000} bind:value={priceRange} />\n  </FilterSidebar.Group>\n  <FilterSidebar.Group title="Stops">\n    <FilterSidebar.CheckboxFilter options={stops} bind:selected={selectedStops} />\n  </FilterSidebar.Group>\n</FilterSidebar.Root>',
-	FlexibleDatesGrid:
-		'<FlexibleDatesGrid.Root departDates={departDates} returnDates={returnDates} prices={priceMatrix} bind:selectedDepart bind:selectedReturn />',
-	FlightTimeline:
-		'<FlightTimeline.Root>\n  <FlightTimeline.Segment>\n    <FlightTimeline.Departure time="8:00 AM" airport="JFK" city="New York" />\n    <FlightTimeline.Duration value="5h 30m" />\n    <FlightTimeline.Arrival time="11:30 AM" airport="LAX" city="Los Angeles" />\n    <FlightTimeline.FlightInfo airline="American Airlines" flightNumber="AA 100" />\n  </FlightTimeline.Segment>\n</FlightTimeline.Root>',
-	GuestRoomSelector:
-		'<GuestRoomSelector.Root bind:rooms={rooms}>\n  <GuestRoomSelector.Trigger />\n  <GuestRoomSelector.Content />\n</GuestRoomSelector.Root>',
-	HotelGallery:
-		'<HotelGallery.Root images={hotelImages} bind:lightboxOpen>\n  <HotelGallery.CategoryTabs />\n  <HotelGallery.Grid columns={3} maxVisible={6} />\n  <HotelGallery.Lightbox />\n</HotelGallery.Root>',
-	ItineraryTimeline:
-		'<ItineraryTimeline.Root>\n  <ItineraryTimeline.Day date="March 15" label="Day 1">\n    <ItineraryTimeline.Activity type="flight">\n      <ItineraryTimeline.ActivityTime>8:00 AM</ItineraryTimeline.ActivityTime>\n      <ItineraryTimeline.ActivityTitle>Flight to Paris</ItineraryTimeline.ActivityTitle>\n    </ItineraryTimeline.Activity>\n  </ItineraryTimeline.Day>\n</ItineraryTimeline.Root>',
-	LocationAutocomplete:
-		'<LocationAutocomplete.Root bind:value={airport}>\n  <LocationAutocomplete.Input placeholder="Search airports..." />\n  <LocationAutocomplete.Content>\n    <LocationAutocomplete.Group label="Airports">\n      <LocationAutocomplete.Item value="JFK" index={0} code="JFK">John F. Kennedy International</LocationAutocomplete.Item>\n    </LocationAutocomplete.Group>\n  </LocationAutocomplete.Content>\n</LocationAutocomplete.Root>',
-	LoyaltyPointsDisplay:
-		'<LoyaltyPointsDisplay.Root>\n  <LoyaltyPointsDisplay.Balance points={45000} />\n  <LoyaltyPointsDisplay.Tier tier="gold" />\n  <LoyaltyPointsDisplay.TierProgress current={45000} target={75000} nextTier="Platinum" />\n</LoyaltyPointsDisplay.Root>',
-	MapListToggle:
-		'<MapListToggle.Root bind:view={view} bind:selectedId>\n  <MapListToggle.ToggleBar />\n  <MapListToggle.MapPanel>Map content</MapListToggle.MapPanel>\n  <MapListToggle.ListPanel>List content</MapListToggle.ListPanel>\n</MapListToggle.Root>',
-	MultiCitySearchForm:
-		'<MultiCitySearchForm.Root bind:legs={flightLegs}>\n  {#each flightLegs as leg, i}\n    <MultiCitySearchForm.FlightLeg index={i}>\n      <MultiCitySearchForm.LegNumber index={i} />\n    </MultiCitySearchForm.FlightLeg>\n  {/each}\n  <MultiCitySearchForm.AddLegButton />\n</MultiCitySearchForm.Root>',
-	PassengerClassSelector:
-		'<PassengerClassSelector.Root bind:passengers bind:cabinClass>\n  <PassengerClassSelector.Trigger />\n  <PassengerClassSelector.Content />\n</PassengerClassSelector.Root>',
-	PaymentCardInput:
-		'<PaymentCardInput.Root bind:cardNumber bind:expiry bind:cvv>\n  <PaymentCardInput.CardNumber />\n  <PaymentCardInput.Expiry />\n  <PaymentCardInput.CVV />\n  <PaymentCardInput.CardIcon />\n</PaymentCardInput.Root>',
-	PriceCalendar:
-		'<PriceCalendar.Root bind:value={selectedDate} prices={datePrices}>\n  <PriceCalendar.Header>\n    <PriceCalendar.Prev />\n    <PriceCalendar.Heading />\n    <PriceCalendar.Next />\n  </PriceCalendar.Header>\n  <PriceCalendar.Grid />\n  <PriceCalendar.Legend />\n</PriceCalendar.Root>',
-	PriceSummaryPanel:
-		'<PriceSummaryPanel.Root currency="USD" sticky>\n  <PriceSummaryPanel.LineItem label="Base fare" amount={299} quantity={2} />\n  <PriceSummaryPanel.Discount label="Promo code" amount={50} />\n  <PriceSummaryPanel.Tax amount={87.50} />\n  <PriceSummaryPanel.Total amount={635.50} />\n</PriceSummaryPanel.Root>',
-	PromoCodeInput:
-		'<PromoCodeInput.Root bind:value={promoCode} status="idle" onApply={applyPromo} />',
-	RecentSearches:
-		'<RecentSearches.Root>\n  <RecentSearches.Chip label="NYC → LAX, Mar 15-22" />\n  <RecentSearches.Chip label="Paris Hotels, Apr 1-5" />\n</RecentSearches.Root>',
-	Reveal:
-		'<Reveal variant="slide-up" delay={120}>\n  <p>Stage content as it enters the viewport.</p>\n</Reveal>',
-	ResultCardCar:
-		'<ResultCardCar.Root>\n  <ResultCardCar.Image src="/car.jpg" />\n  <ResultCardCar.Details>\n    <ResultCardCar.Category>SUV</ResultCardCar.Category>\n    <ResultCardCar.Specs items={[{icon: "seats", label: "5"}]} />\n    <ResultCardCar.Price>$65/day</ResultCardCar.Price>\n  </ResultCardCar.Details>\n</ResultCardCar.Root>',
-	ResultCardFlight:
-		'<ResultCardFlight.Root>\n  <ResultCardFlight.Airline>American Airlines</ResultCardFlight.Airline>\n  <ResultCardFlight.Route>\n    <ResultCardFlight.Segment departure="8:00 AM" arrival="11:30 AM" />\n  </ResultCardFlight.Route>\n  <ResultCardFlight.Duration>5h 30m</ResultCardFlight.Duration>\n  <ResultCardFlight.Stops>Direct</ResultCardFlight.Stops>\n  <ResultCardFlight.Price>$299</ResultCardFlight.Price>\n</ResultCardFlight.Root>',
-	ResultCardHotel:
-		'<ResultCardHotel.Root>\n  <ResultCardHotel.Image src="/hotel.jpg" />\n  <ResultCardHotel.Details>\n    <ResultCardHotel.Name>Grand Hotel</ResultCardHotel.Name>\n    <ResultCardHotel.Rating score={8.5} label="Excellent" />\n    <ResultCardHotel.Price>$189/night</ResultCardHotel.Price>\n  </ResultCardHotel.Details>\n</ResultCardHotel.Root>',
-	ReviewCard:
-		'<ReviewCard.Root>\n  <ReviewCard.Reviewer>\n    <ReviewCard.ReviewerAvatar fallback="JD" />\n    <ReviewCard.ReviewerName>Jane Doe</ReviewCard.ReviewerName>\n    <ReviewCard.ReviewDate date="2026-03-01" />\n  </ReviewCard.Reviewer>\n  <ReviewCard.ReviewRating rating={9} scale={10} />\n  <ReviewCard.ReviewText>Excellent hotel with great service!</ReviewCard.ReviewText>\n</ReviewCard.Root>',
-	RoomTypePicker:
-		'<RoomTypePicker.Root bind:value={selectedRoom}>\n  <RoomTypePicker.RoomOption value="standard" label="Standard Room">\n    <RoomTypePicker.RoomPrice>$189/night</RoomTypePicker.RoomPrice>\n  </RoomTypePicker.RoomOption>\n  <RoomTypePicker.RoomOption value="deluxe" label="Deluxe Room">\n    <RoomTypePicker.RoomPrice>$289/night</RoomTypePicker.RoomPrice>\n  </RoomTypePicker.RoomOption>\n</RoomTypePicker.Root>',
-	RouteMap:
-		'<RouteMap.Root>\n  <RouteMap.Origin lat={40.6413} lng={-73.7781} label="JFK" />\n  <RouteMap.Destination lat={33.9425} lng={-118.4081} label="LAX" />\n  <RouteMap.FlightPath />\n</RouteMap.Root>',
-	SearchFormTabs:
-		'<SearchFormTabs.Root bind:value={searchType}>\n  <SearchFormTabs.Tab value="flights" icon="flights" label="Flights" />\n  <SearchFormTabs.Tab value="hotels" icon="hotels" label="Hotels" />\n  <SearchFormTabs.Tab value="cars" icon="cars" label="Cars" />\n  <SearchFormTabs.TabPanel value="flights">Flight search form</SearchFormTabs.TabPanel>\n</SearchFormTabs.Root>',
-	SortBar:
-		'<SortBar.Root bind:value={sortBy} bind:direction={sortDir}>\n  <SortBar.Option value="price">Price</SortBar.Option>\n  <SortBar.Option value="duration">Duration</SortBar.Option>\n  <SortBar.Option value="departure">Departure</SortBar.Option>\n</SortBar.Root>',
-	Spotlight:
-		'<Spotlight intensity={32}>\n  <p>Hover to pull a radial highlight across the surface.</p>\n</Spotlight>',
-	TripCard:
-		'<TripCard.Root variant="upcoming">\n  <TripCard.Image src="/paris.jpg" alt="Paris" />\n  <TripCard.Details>\n    <TripCard.Destination>Paris, France</TripCard.Destination>\n    <TripCard.Dates start="Mar 15" end="Mar 22" />\n    <TripCard.Status status="confirmed" />\n  </TripCard.Details>\n</TripCard.Root>',
-	TrustBadges:
-		'<TrustBadges.Root variant="inline">\n  <TrustBadges.Badge icon="shield" label="Secure Checkout" />\n  <TrustBadges.Badge icon="guarantee" label="Money-Back Guarantee" />\n</TrustBadges.Root>',
-	Aurora:
-		'<Aurora palette="ocean">\n  <p>Ambient backgrounds stay native and no-dependency.</p>\n</Aurora>',
-	Noise:
-		'<Noise opacity={0.12} blend="soft-light">\n  <p>Grain adds atmosphere without loading an external texture.</p>\n</Noise>'
-};
-
-function generateExample(name: string, compound: boolean, parts?: string[]): string {
-	if (EXAMPLE_OVERRIDES[name]) return EXAMPLE_OVERRIDES[name];
-
-	if (!compound) return `<${name}>Content</${name}>`;
-
-	if (parts && !parts.includes('Root')) {
-		return parts.map((part) => `<${name}.${part}>...</${name}.${part}>`).join('\n');
-	}
-
-	const lines = [`<${name}.Root>`];
-	for (const part of parts ?? []) {
-		if (part === 'Root') continue;
-		lines.push(`  <${name}.${part}>...</${name}.${part}>`);
-	}
-	lines.push(`</${name}.Root>`);
-	return lines.join('\n');
+	return parsePartContractFromSource(
+		source,
+		componentName,
+		partName,
+		sourcePath,
+		propMetadataResolver
+	);
 }
 
 async function readText(filePath: string): Promise<string> {
@@ -807,21 +165,14 @@ async function main(): Promise<void> {
 				}
 
 				const bindableProps = findBindableProps(dir, part);
-
 				const partKebab = part.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 				const svelteFile = join(dirPath, `${dir}-${partKebab}.svelte`);
 				try {
-					const defaults = parseDefaults(await readText(svelteFile));
-					for (const [key, val] of Object.entries(defaults)) {
-						if (parsed[key]) parsed[key].default = val;
-					}
+					applyPropSourceFacts(parsed, { defaults: parseDefaults(await readText(svelteFile)) });
 				} catch {
 					/* file may not exist */
 				}
-
-				for (const [key, value] of Object.entries(parsed)) {
-					if (bindableProps.includes(key)) value.bindable = true;
-				}
+				applyPropSourceFacts(parsed, { bindableProps });
 
 				partsObj[part] = {
 					props: parsed,
@@ -846,23 +197,18 @@ async function main(): Promise<void> {
 			}
 
 			const bindableProps = findBindablePropsSimple(dir);
-
 			const entries = await readdir(dirPath, { withFileTypes: true });
 			for (const entry of entries) {
 				if (!entry.isFile() || !entry.name.endsWith('.svelte')) continue;
 				try {
-					const defaults = parseDefaults(await readText(join(dirPath, entry.name)));
-					for (const [key, val] of Object.entries(defaults)) {
-						if (parsed[key]) parsed[key].default = val;
-					}
+					applyPropSourceFacts(parsed, {
+						defaults: parseDefaults(await readText(join(dirPath, entry.name)))
+					});
 				} catch {
 					/* skip */
 				}
 			}
-
-			for (const [key, value] of Object.entries(parsed)) {
-				if (bindableProps.includes(key)) value.bindable = true;
-			}
+			applyPropSourceFacts(parsed, { bindableProps });
 
 			propsOrParts = {
 				props: parsed,
@@ -870,62 +216,17 @@ async function main(): Promise<void> {
 			};
 		}
 
-		const cssVars: Record<string, string> = {};
-		const dataAttributes = new Set<string>();
+		const styleSurface = createStyleSurfaceAccumulator();
 		const entries = await readdir(dirPath, { withFileTypes: true });
-
-		function isStyleSurfaceFile(name: string): boolean {
-			return name.endsWith('.svelte') || name.endsWith('.css');
-		}
 
 		async function scanForStyleSurface(
 			filePath: string,
-			filters?: { cssVarPrefixes?: string[]; dataAttrPrefixes?: string[] }
+			filters?: StyleSurfaceFilters
 		): Promise<void> {
-			let source: string;
 			try {
-				source = await readText(filePath);
+				addStyleSurfaceSource(styleSurface, await readText(filePath), filters);
 			} catch {
-				return;
-			}
-
-			const cssVarPrefixes = filters?.cssVarPrefixes;
-			const dataAttrPrefixes = filters?.dataAttrPrefixes;
-
-			for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
-				const varName = match[1];
-				if (!varName) continue;
-				if (cssVarPrefixes && !cssVarPrefixes.some((p) => varName.startsWith(p))) continue;
-				cssVars[varName] = cssVarDescription(varName);
-			}
-			// Private-alias fallback pattern `--_dry-btn-bg: var(--dry-btn-bg, <fallback>)`
-			// — the first `var()` argument is the consumer-facing override point.
-			// Also follow nested same-family shorthand fallbacks: when the value
-			// is `var(--dry-x-block, var(--dry-x, 0))`, both `--dry-x-block` and
-			// `--dry-x` are user override points. We restrict nested pickup to
-			// fallbacks whose name is a *prefix* of the primary, which keeps
-			// global-token fallbacks (e.g. `var(--dry-btn-bg, var(--dry-color-fill-brand))`)
-			// out of the spec — those don't share the primary's prefix.
-			for (const match of source.matchAll(
-				/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)([^;]*);/gm
-			)) {
-				const primary = match[1];
-				const rest = match[2] ?? '';
-				if (!primary) continue;
-				if (cssVarPrefixes && !cssVarPrefixes.some((p) => primary.startsWith(p))) continue;
-				cssVars[primary] = cssVarDescription(primary);
-				for (const inner of rest.matchAll(/var\(\s*(--dry-[\w-]+)/g)) {
-					const fallback = inner[1];
-					if (!fallback) continue;
-					if (!primary.startsWith(fallback)) continue;
-					if (cssVarPrefixes && !cssVarPrefixes.some((p) => fallback.startsWith(p))) continue;
-					cssVars[fallback] = cssVarDescription(fallback);
-				}
-			}
-
-			for (const attr of collectDataAttributes(source)) {
-				if (dataAttrPrefixes && !dataAttrPrefixes.some((p) => attr.startsWith(p))) continue;
-				dataAttributes.add(attr);
+				/* file may not exist */
 			}
 		}
 
@@ -942,37 +243,8 @@ async function main(): Promise<void> {
 		// prefix so each component advertises only its own data-* surface
 		// (--dry-* filtering is broader since several shared tokens, e.g.
 		// --dry-radius-nested, land inside component-specific scopes).
-		const SHARED_STYLE_SURFACES: Record<
-			string,
-			{ path: string; cssVarPrefixes: string[]; dataAttrPrefixes: string[] }[]
-		> = {
-			Dialog: [
-				{
-					path: 'internal/modal-content.svelte',
-					cssVarPrefixes: ['--dry-dialog-', '--dry-radius-nested', '--dry-overlay-'],
-					dataAttrPrefixes: ['data-dialog-']
-				}
-			],
-			Drawer: [
-				{
-					path: 'internal/modal-content.svelte',
-					cssVarPrefixes: ['--dry-drawer-', '--dry-overlay-'],
-					dataAttrPrefixes: ['data-drawer-', 'data-side']
-				}
-			],
-			AlertDialog: [
-				{
-					path: 'internal/modal-content.svelte',
-					cssVarPrefixes: ['--dry-dialog-', '--dry-overlay-'],
-					dataAttrPrefixes: ['data-alert-dialog-']
-				}
-			]
-		};
-		for (const surface of SHARED_STYLE_SURFACES[name] ?? []) {
-			await scanForStyleSurface(join(uiSrc, surface.path), {
-				cssVarPrefixes: surface.cssVarPrefixes,
-				dataAttrPrefixes: surface.dataAttrPrefixes
-			});
+		for (const surface of sharedStyleSurfacesForComponent(name)) {
+			await scanForStyleSurface(join(uiSrc, surface.path), surface);
 		}
 
 		const primDirPath = join(primSrc, dir);
@@ -981,39 +253,15 @@ async function main(): Promise<void> {
 			for (const entry of primEntries) {
 				if (!entry.isFile()) continue;
 				if (!isStyleSurfaceFile(entry.name)) continue;
-				const source = await readText(join(primDirPath, entry.name));
-
-				for (const match of source.matchAll(/^\s*(--dry-[\w-]+)\s*:/gm)) {
-					const varName = match[1];
-					if (varName) cssVars[varName] = cssVarDescription(varName);
-				}
-				// Same nested-shorthand handling as the UI scan above. See the
-				// matching comment there for why we restrict nested-fallback
-				// pickup to prefix-shared shorthands only.
-				for (const match of source.matchAll(
-					/^\s*--_dry-[\w-]+\s*:\s*var\(\s*(--dry-[\w-]+)([^;]*);/gm
-				)) {
-					const primary = match[1];
-					const rest = match[2] ?? '';
-					if (!primary) continue;
-					cssVars[primary] = cssVarDescription(primary);
-					for (const inner of rest.matchAll(/var\(\s*(--dry-[\w-]+)/g)) {
-						const fallback = inner[1];
-						if (!fallback) continue;
-						if (!primary.startsWith(fallback)) continue;
-						cssVars[fallback] = cssVarDescription(fallback);
-					}
-				}
-
-				for (const attr of collectDataAttributes(source)) {
-					dataAttributes.add(attr);
-				}
+				await scanForStyleSurface(join(primDirPath, entry.name));
 			}
 		} catch {
 			/* no primitive directory fallback */
 		}
 
 		const a11yNotes = getA11yNotes(name, meta);
+		const finalizedStyleSurface = finalizeStyleSurface(styleSurface);
+		const groups = propGroupsForComponent(name);
 
 		components[name] = {
 			import: '@dryui/ui',
@@ -1022,11 +270,13 @@ async function main(): Promise<void> {
 			tags: meta.tags,
 			compound,
 			...propsOrParts,
-			...(PROP_GROUPS[name] ? { groups: PROP_GROUPS[name] } : {}),
+			...(groups ? { groups } : {}),
 			...(compound ? { structure: deriveStructure(example, name) } : {}),
 			a11y: a11yNotes,
-			cssVars: Object.fromEntries(Object.entries(cssVars).sort(([a], [b]) => a.localeCompare(b))),
-			dataAttributes: [...dataAttributes].sort().map((attr) => describeDataAttribute(name, attr)),
+			cssVars: finalizedStyleSurface.cssVars,
+			dataAttributes: finalizedStyleSurface.dataAttributes.map((attr) =>
+				describeDataAttribute(name, attr)
+			),
 			example
 		};
 	}
@@ -1065,17 +315,11 @@ async function main(): Promise<void> {
 				const partKebab = part.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 				const svelteFile = join(dirPath, `${dir}-${partKebab}.svelte`);
 				try {
-					const defaults = parseDefaults(await readText(svelteFile));
-					for (const [key, val] of Object.entries(defaults)) {
-						if (parsed[key]) parsed[key].default = val;
-					}
+					applyPropSourceFacts(parsed, { defaults: parseDefaults(await readText(svelteFile)) });
 				} catch {
 					/* file may not exist */
 				}
-
-				for (const [key, value] of Object.entries(parsed)) {
-					if (bindableProps.includes(key)) value.bindable = true;
-				}
+				applyPropSourceFacts(parsed, { bindableProps });
 
 				partsObj[part] = {
 					props: parsed,
@@ -1092,18 +336,14 @@ async function main(): Promise<void> {
 			for (const entry of entries) {
 				if (!entry.isFile() || !entry.name.endsWith('.svelte')) continue;
 				try {
-					const defaults = parseDefaults(await readText(join(dirPath, entry.name)));
-					for (const [key, val] of Object.entries(defaults)) {
-						if (parsed[key]) parsed[key].default = val;
-					}
+					applyPropSourceFacts(parsed, {
+						defaults: parseDefaults(await readText(join(dirPath, entry.name)))
+					});
 				} catch {
 					/* skip */
 				}
 			}
-
-			for (const [key, value] of Object.entries(parsed)) {
-				if (bindableProps.includes(key)) value.bindable = true;
-			}
+			applyPropSourceFacts(parsed, { bindableProps });
 
 			propsOrParts = {
 				props: parsed,
@@ -1124,6 +364,7 @@ async function main(): Promise<void> {
 		}
 
 		const a11yNotes = getA11yNotes(name, meta);
+		const groups = propGroupsForComponent(name);
 
 		components[name] = {
 			import: '@dryui/primitives',
@@ -1132,7 +373,7 @@ async function main(): Promise<void> {
 			tags: meta.tags,
 			compound,
 			...propsOrParts,
-			...(PROP_GROUPS[name] ? { groups: PROP_GROUPS[name] } : {}),
+			...(groups ? { groups } : {}),
 			...(compound ? { structure: deriveStructure(example, name) } : {}),
 			a11y: a11yNotes,
 			cssVars: {},
@@ -1159,12 +400,7 @@ async function main(): Promise<void> {
 			dark: `${packageJson.name}/themes/dark.css`
 		},
 		components,
-		composition: {
-			components: Object.fromEntries(
-				componentCompositions.map((c) => [c.component.toLowerCase(), c])
-			),
-			recipes: Object.fromEntries(compositionRecipes.map((r) => [r.name, r]))
-		},
+		composition: buildCompositionSpec(),
 		ai: aiSurface
 	};
 

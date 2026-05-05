@@ -2,15 +2,16 @@
 // functions, and a `PlatformContext` is the seam between them. Each test
 // drives a strategy with a stub context, never touching the real OS.
 
-import { describe, expect, test } from 'bun:test';
+import { describe, expect, spyOn, test } from 'bun:test';
 import {
 	AGENT_DISPLAY_INFO,
 	AGENTS,
 	DISPATCH_AGENTS,
 	DISPATCH_DOCS_AGENT_IDS
 } from '../src/dispatch/agents.ts';
-import type { PlatformContext } from '../src/dispatch/platform.ts';
-import { probeAgent } from '../src/dispatch/strategies.ts';
+import type { JsonEntryInspection, PlatformContext } from '../src/dispatch/platform.ts';
+import { launchAgent, probeAgent } from '../src/dispatch/strategies.ts';
+import { AGENT_INFO } from '../ui/src/agent-meta.ts';
 
 interface FakeContextOptions {
 	currentPlatform?: NodeJS.Platform;
@@ -21,9 +22,24 @@ interface FakeContextOptions {
 	resolvableCommands?: ReadonlyMap<string, string>;
 	pathsOnDisk?: ReadonlySet<string>;
 	chatSupporters?: ReadonlySet<string>;
+	inspectJsonEntry?: PlatformContext['inspectJsonEntry'];
 	clipboardSink?: { value: string | null };
 	openedUrls?: string[];
 	spawned?: { command: string; args: readonly string[]; cwd?: string }[];
+}
+
+function jsonEntryInspection(
+	options: FakeContextOptions,
+	path: string,
+	rootKey: string,
+	entryKey: string
+): JsonEntryInspection {
+	if (options.inspectJsonEntry) return options.inspectJsonEntry(path, rootKey, entryKey);
+	const entries = options.jsonEntries?.get(path);
+	if (!entries) return { status: 'missing-file' };
+	return entries.has(`${rootKey}/${entryKey}`)
+		? { status: 'present' }
+		: { status: 'missing-entry' };
 }
 
 function fakeContext(options: FakeContextOptions = {}): PlatformContext {
@@ -37,6 +53,8 @@ function fakeContext(options: FakeContextOptions = {}): PlatformContext {
 		supportsChat: (command) => options.chatSupporters?.has(command) ?? false,
 		hasJsonEntry: (path, rootKey, entryKey) =>
 			options.jsonEntries?.get(path)?.has(`${rootKey}/${entryKey}`) ?? false,
+		inspectJsonEntry: (path, rootKey, entryKey) =>
+			jsonEntryInspection(options, path, rootKey, entryKey),
 		copyPromptToClipboard: (prompt) => {
 			if (options.clipboardSink) options.clipboardSink.value = prompt;
 		},
@@ -47,6 +65,19 @@ function fakeContext(options: FakeContextOptions = {}): PlatformContext {
 			options.spawned?.push({ command, args, cwd });
 		}
 	};
+}
+
+function captureConsoleError(fn: () => void): string[] {
+	const messages: string[] = [];
+	const spy = spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
+		messages.push(args.map(String).join(' '));
+	});
+	try {
+		fn();
+	} finally {
+		spy.mockRestore();
+	}
+	return messages;
 }
 
 describe('agent catalogue', () => {
@@ -83,6 +114,11 @@ describe('agent catalogue', () => {
 			'zed'
 		]);
 	});
+
+	test('dashboard display metadata re-exports the dispatch manifest adapter', () => {
+		expect(AGENT_INFO).toBe(AGENT_DISPLAY_INFO);
+		expect(Object.keys(AGENT_INFO)).toEqual([...DISPATCH_AGENTS]);
+	});
 });
 
 describe('terminal-cli probe', () => {
@@ -103,6 +139,61 @@ describe('terminal-cli probe', () => {
 
 	test('fails when nothing is configured', () => {
 		expect(probeAgent('gemini', '/ws', fakeContext())).toBe(false);
+	});
+});
+
+describe('dispatch config warnings', () => {
+	test('uses PlatformContext inspection for missing config warnings', () => {
+		const inspected: string[] = [];
+		const spawned: { command: string; args: readonly string[]; cwd?: string }[] = [];
+		const ctx = fakeContext({
+			homeDir: '/Users/tester-missing-warning',
+			spawned,
+			inspectJsonEntry: (path, rootKey, entryKey) => {
+				inspected.push(`${path}:${rootKey}/${entryKey}`);
+				return { status: 'missing-file' };
+			}
+		});
+
+		const messages = captureConsoleError(() =>
+			launchAgent('copilot', 'Review this feedback.', { workspace: '/workspace' }, ctx)
+		);
+
+		expect(inspected).toEqual([
+			'/Users/tester-missing-warning/.copilot/mcp-config.json:mcpServers/dryui-feedback'
+		]);
+		expect(messages.join('\n')).toContain(
+			'[dispatch] warning: /Users/tester-missing-warning/.copilot/mcp-config.json not found.'
+		);
+		expect(spawned[0]?.command).toBe('osascript');
+	});
+
+	test('warns when PlatformContext reports a missing dispatch MCP entry', () => {
+		const ctx = fakeContext({
+			homeDir: '/Users/tester-missing-entry-warning',
+			spawned: [],
+			inspectJsonEntry: () => ({ status: 'missing-entry' })
+		});
+
+		const messages = captureConsoleError(() =>
+			launchAgent('copilot', 'Review this feedback.', { workspace: '/workspace' }, ctx)
+		);
+
+		expect(messages.join('\n')).toContain('has no `dryui-feedback` entry under `mcpServers`');
+	});
+
+	test('does not warn when PlatformContext reports the dispatch MCP entry is present', () => {
+		const ctx = fakeContext({
+			homeDir: '/Users/tester-present-warning',
+			spawned: [],
+			inspectJsonEntry: () => ({ status: 'present' })
+		});
+
+		const messages = captureConsoleError(() =>
+			launchAgent('copilot', 'Review this feedback.', { workspace: '/workspace' }, ctx)
+		);
+
+		expect(messages.some((message) => message.includes('[dispatch] warning:'))).toBe(false);
 	});
 });
 

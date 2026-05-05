@@ -854,6 +854,25 @@ export function parseDefaults(svelteSource: string): Record<string, string> {
 	return defaults;
 }
 
+export function applyPropSourceFacts(
+	props: Record<string, PropShape>,
+	facts: {
+		defaults?: Record<string, string>;
+		bindableProps?: readonly string[];
+	}
+): Record<string, PropShape> {
+	for (const [key, val] of Object.entries(facts.defaults ?? {})) {
+		if (props[key]) props[key].default = val;
+	}
+
+	const bindableProps = new Set(facts.bindableProps ?? []);
+	for (const [key, value] of Object.entries(props)) {
+		if (bindableProps.has(key)) value.bindable = true;
+	}
+
+	return props;
+}
+
 export function findBindableProps(dir: string, part: string): string[] {
 	const all: string[] = [];
 	const partKebab = part.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();

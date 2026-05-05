@@ -229,7 +229,6 @@
 		border-radius: var(--dry-map-radius);
 		border: var(--dry-map-border);
 		overflow: hidden;
-		width: 100%;
 		height: 400px;
 	}
 

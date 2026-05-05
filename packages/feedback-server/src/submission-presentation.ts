@@ -47,6 +47,13 @@ export interface SubmissionPresentationListResponse {
 	submissions: SubmissionPresentation[];
 }
 
+export interface SubmissionPresentationListInput {
+	count: number;
+	submissions: Array<Submission | SubmissionPresentation>;
+}
+
+export type SubmissionPromptPresentation = Pick<SubmissionPresentation, 'id' | 'url' | 'textNotes'>;
+
 export function isSubmissionPresentation(
 	submission: Submission | SubmissionPresentation
 ): submission is SubmissionPresentation {
@@ -69,9 +76,29 @@ export function ensureSubmissionPresentation(
 export function buildSubmissionPresentationListResponse(
 	submissions: Submission[]
 ): SubmissionPresentationListResponse {
-	return {
+	return ensureSubmissionPresentationListResponse({
 		count: submissions.length,
-		submissions: submissions.map(buildSubmissionPresentation)
+		submissions
+	});
+}
+
+export function ensureSubmissionPresentationListResponse(
+	response: SubmissionPresentationListInput
+): SubmissionPresentationListResponse {
+	return {
+		count: response.count,
+		submissions: response.submissions.map(ensureSubmissionPresentation)
+	};
+}
+
+export function buildSubmissionPromptPresentation(
+	submission: Submission | SubmissionPresentation
+): SubmissionPromptPresentation {
+	const presentation = ensureSubmissionPresentation(submission);
+	return {
+		id: presentation.id,
+		url: presentation.url,
+		textNotes: presentation.textNotes
 	};
 }
 

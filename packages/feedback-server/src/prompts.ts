@@ -1,6 +1,4 @@
-import { getSubmissionTextNotes } from './submission-presentation.js';
-import type { SubmissionPresentation } from './submission-presentation.js';
-import type { Submission, SubmissionDrawing } from './types.js';
+import type { SubmissionPromptPresentation } from './submission-presentation.js';
 
 export const FEEDBACK_LINTER_PROMPT_STEP =
 	'Run the relevant project linter/check command and fix any violations before resolving.';
@@ -17,12 +15,7 @@ export interface FeedbackPromptOptions {
 	skillPath?: string;
 }
 
-export type FeedbackDispatchPromptSubmission = Pick<Submission, 'id' | 'url' | 'drawings'> &
-	Partial<Pick<SubmissionPresentation, 'textNotes'>>;
-
-export function getTextNotes(drawings: readonly SubmissionDrawing[] | undefined): string[] {
-	return getSubmissionTextNotes(drawings);
-}
+export type FeedbackDispatchPromptSubmission = SubmissionPromptPresentation;
 
 function skillReference(options: FeedbackPromptOptions | undefined): string {
 	return options?.skillPath ?? DEFAULT_FEEDBACK_SKILL_REFERENCE;
@@ -32,10 +25,9 @@ export function buildFeedbackDispatchPrompt(
 	s: FeedbackDispatchPromptSubmission,
 	options?: FeedbackPromptOptions
 ): string {
-	const textNotes = s.textNotes ?? getSubmissionTextNotes(s.drawings);
 	const notes =
-		textNotes.length > 0
-			? `\n\nText notes from the annotation:\n${textNotes.map((note) => `- ${note}`).join('\n')}`
+		s.textNotes.length > 0
+			? `\n\nText notes from the annotation:\n${s.textNotes.map((note) => `- ${note}`).join('\n')}`
 			: '';
 	return `Apply DryUI feedback submission ${s.id} (from ${s.url}).
 

@@ -53,8 +53,8 @@ bun run build`;
 		<section class="stack-md">
 			<Heading level={2}>Wire the app</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Add the packages explicitly, then let the installed skills guide the file edits. App
-				bootstrap is skill-led instead of CLI-detected.
+				Ask the installed dryui-init skill to inspect the project and apply the setup contract. For
+				manual or pinned installs, these are the package edits it will make.
 			</Text>
 			<CodeBlock code={projectSetupCode} language="bash" />
 		</section>

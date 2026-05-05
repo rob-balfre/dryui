@@ -1,8 +1,29 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 type DryuiConsumerPackage = '@dryui/ui' | '@dryui/primitives' | '@dryui/feedback' | '@dryui/lint';
+
+export const DRYUI_INIT_SKILL_CONTRACT = {
+	sourcePath: 'skills/dryui-init/SKILL.md',
+	anchor: 'golden-consumer-setup-contract',
+	adapterRole: 'E2E scaffold Adapter for the dryui-init setup Interface',
+	requiredSkillMarkers: [
+		'## Golden Consumer Setup Contract',
+		'concrete Adapter',
+		'npx skills add rob-balfre/dryui',
+		'DRYUI_DEV=1',
+		'@dryui/ui',
+		'@dryui/lint',
+		'dryuiLint({ strict: true })',
+		'dryuiLayoutCss()',
+		'<html class="theme-auto">',
+		'src/routes/+layout.svelte',
+		'src/layout.css',
+		'No call to `dryui setup`'
+	] as const
+} as const;
 
 interface TarballManifestPackage {
 	readonly version: unknown;
@@ -23,6 +44,8 @@ export interface ScaffoldDryuiConsumerProjectOptions {
 export interface ScaffoldDryuiConsumerProjectResult {
 	readonly projectDir: string;
 	readonly manifestPath: string;
+	readonly contractSourcePath: string;
+	readonly contractAnchor: string;
 	readonly filesWritten: readonly string[];
 	readonly installed: boolean;
 }
@@ -35,6 +58,7 @@ const REQUIRED_DRYUI_PACKAGES: readonly DryuiConsumerPackage[] = [
 ];
 
 const PACKAGE_JSON = 'package.json';
+const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..');
 
 function fileDependency(tarballPath: string): string {
 	return `file:${tarballPath}`;
@@ -65,6 +89,25 @@ function readManifest(tarballsDir: string): {
 	}
 
 	return { manifestPath, packages };
+}
+
+function verifyDryuiInitSkillContract(): void {
+	const skillPath = resolve(repoRoot, DRYUI_INIT_SKILL_CONTRACT.sourcePath);
+	if (!existsSync(skillPath)) {
+		throw new Error(`dryui-init setup contract missing at ${skillPath}`);
+	}
+
+	const skill = readFileSync(skillPath, 'utf8');
+	const missing = DRYUI_INIT_SKILL_CONTRACT.requiredSkillMarkers.filter(
+		(marker) => !skill.includes(marker)
+	);
+	if (missing.length > 0) {
+		throw new Error(
+			`${DRYUI_INIT_SKILL_CONTRACT.adapterRole} drift: ${DRYUI_INIT_SKILL_CONTRACT.sourcePath} is missing ${missing
+				.map((marker) => JSON.stringify(marker))
+				.join(', ')}`
+		);
+	}
 }
 
 function ensureEmptyProjectDir(projectDir: string): void {
@@ -318,6 +361,7 @@ export function scaffoldDryuiConsumerProject(
 	const install = options.install !== false;
 	const filesWritten: string[] = [];
 	const logLines: string[] = [];
+	verifyDryuiInitSkillContract();
 	const { manifestPath, packages } = readManifest(tarballsDir);
 
 	ensureEmptyProjectDir(projectDir);
@@ -332,6 +376,10 @@ export function scaffoldDryuiConsumerProject(
 	writeProjectFile(projectDir, 'src/routes/+layout.svelte', ROOT_LAYOUT, filesWritten);
 	writeProjectFile(projectDir, 'src/routes/+page.svelte', HOME_PAGE, filesWritten);
 
+	logLines.push(
+		`contract: ${DRYUI_INIT_SKILL_CONTRACT.sourcePath}#${DRYUI_INIT_SKILL_CONTRACT.anchor}`
+	);
+	logLines.push(`adapter: ${DRYUI_INIT_SKILL_CONTRACT.adapterRole}`);
 	logLines.push(`manifest: ${manifestPath}`);
 	logLines.push(`project: ${projectDir}`);
 	logLines.push(`files: ${filesWritten.join(', ')}`);
@@ -355,6 +403,8 @@ export function scaffoldDryuiConsumerProject(
 	return {
 		projectDir,
 		manifestPath,
+		contractSourcePath: DRYUI_INIT_SKILL_CONTRACT.sourcePath,
+		contractAnchor: DRYUI_INIT_SKILL_CONTRACT.anchor,
 		filesWritten,
 		installed: install
 	};

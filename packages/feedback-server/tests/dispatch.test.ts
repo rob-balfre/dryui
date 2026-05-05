@@ -12,6 +12,8 @@ import {
 	resolveVsCodeCliWith
 } from '../src/dispatch.ts';
 import { buildFeedbackDispatchPrompt } from '../src/prompts.ts';
+import { buildSubmissionPromptPresentation } from '../src/submission-presentation.ts';
+import type { Submission } from '../src/types.ts';
 
 function writeSkillFile(root: string, relativePath: string): string {
 	const path = join(root, relativePath);
@@ -29,7 +31,7 @@ describe('feedback prompts', () => {
 		const prompt = buildFeedbackDispatchPrompt({
 			id: 'sub-123',
 			url: 'https://example.com/page',
-			drawings: []
+			textNotes: []
 		});
 
 		expect(prompt).toContain(
@@ -44,10 +46,25 @@ describe('feedback prompts', () => {
 		);
 	});
 
-	test('dispatch prompt appends text notes from the annotation when present', () => {
+	test('dispatch prompt appends presentation-normalized text notes when present', () => {
 		const prompt = buildFeedbackDispatchPrompt({
 			id: 'sub-456',
 			url: 'http://localhost:5173/',
+			textNotes: ['Add a header bar']
+		});
+
+		expect(prompt).toContain('Text notes from the annotation:');
+		expect(prompt).toContain('- Add a header bar');
+	});
+
+	test('dispatch prompt gets text notes through the submission presentation seam', () => {
+		const submission: Submission = {
+			id: 'sub-456',
+			url: 'http://localhost:5173/',
+			screenshotPath: {
+				webp: '/tmp/sub-456.webp',
+				png: '/tmp/sub-456.png'
+			},
 			drawings: [
 				{
 					id: 'd1',
@@ -65,27 +82,23 @@ describe('feedback prompts', () => {
 					end: { x: 10, y: 10 },
 					width: 2
 				}
-			]
-		});
+			],
+			viewport: { width: 1280, height: 720 },
+			status: 'pending',
+			createdAt: '2026-05-05T00:00:00.000Z'
+		};
+
+		const prompt = buildFeedbackDispatchPrompt(buildSubmissionPromptPresentation(submission));
 
 		expect(prompt).toContain('Text notes from the annotation:');
 		expect(prompt).toContain('- Add a header bar');
 	});
 
-	test('dispatch prompt omits the notes block when there are no text drawings', () => {
+	test('dispatch prompt omits the notes block when there are no text notes', () => {
 		const prompt = buildFeedbackDispatchPrompt({
 			id: 'sub-789',
 			url: 'http://localhost:5173/',
-			drawings: [
-				{
-					id: 'd1',
-					kind: 'arrow',
-					color: '#fff',
-					start: { x: 0, y: 0 },
-					end: { x: 10, y: 10 },
-					width: 2
-				}
-			]
+			textNotes: []
 		});
 
 		expect(prompt).not.toContain('Text notes from the annotation:');

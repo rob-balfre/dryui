@@ -28,6 +28,8 @@ import {
 import { launchAgent, probeAgent } from './dispatch/strategies.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
+import { buildSubmissionPresentation } from './submission-presentation.js';
+import type { SubmissionPresentation } from './submission-presentation.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
 // ---------------------------------------------------------------------------
@@ -134,7 +136,10 @@ export function dispatchPrompt(
 // Bus subscription
 // ---------------------------------------------------------------------------
 
-function resolveAgent(submission: Submission, defaultAgent: DefaultDispatchAgent): SubmissionAgent {
+function resolveAgent(
+	submission: Pick<SubmissionPresentation, 'agent'>,
+	defaultAgent: DefaultDispatchAgent
+): SubmissionAgent {
 	const choice = submission.agent;
 	if (choice === 'off' || (choice && DISPATCH_AGENTS.includes(choice as DispatchAgent))) {
 		return choice;
@@ -147,13 +152,14 @@ function dispatchSubmission(
 	options: DispatcherOptions,
 	ctx: PlatformContext
 ): void {
-	const target = resolveAgent(submission, options.defaultAgent);
+	const presentation = buildSubmissionPresentation(submission);
+	const target = resolveAgent(presentation, options.defaultAgent);
 	if (target === 'off') {
-		console.error(`[dispatch] skip (off) ${submission.id}`);
+		console.error(`[dispatch] skip (off) ${presentation.id}`);
 		return;
 	}
 
-	const dispatchWorkspace = submission.workspace ?? options.workspace;
+	const dispatchWorkspace = presentation.workspace ?? options.workspace;
 	const skillPath = resolveFeedbackSkillPath(
 		dispatchWorkspace,
 		target as DispatchAgent,
@@ -161,12 +167,12 @@ function dispatchSubmission(
 	);
 	if (!skillPath) {
 		console.error(
-			`[dispatch] submission ${submission.id} aborted: ${missingSkillHint(target as DispatchAgent)}`
+			`[dispatch] submission ${presentation.id} aborted: ${missingSkillHint(target as DispatchAgent)}`
 		);
 		return;
 	}
-	const prompt = buildFeedbackDispatchPrompt(submission, { skillPath });
-	console.error(`[dispatch] submission ${submission.id}`);
+	const prompt = buildFeedbackDispatchPrompt(presentation, { skillPath });
+	console.error(`[dispatch] submission ${presentation.id}`);
 	launchAgent(
 		target as DispatchAgent,
 		prompt,

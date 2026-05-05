@@ -9,6 +9,27 @@ Bootstrap DryUI in the current project, or scaffold a new SvelteKit app when the
 
 The DryUI CLI no longer owns project detection, install planning, or scaffolding. This skill is the setup workflow.
 
+## Install Or Refresh This Skill
+
+The durable install path for DryUI skills is:
+
+```bash
+npx skills add rob-balfre/dryui
+```
+
+In the DryUI monorepo or another local source checkout, check for an existing local CLI link before installing a published CLI:
+
+```bash
+readlink ~/.bun/install/global/node_modules/@dryui/cli
+```
+
+If it points at `packages/cli`, keep the local link and refresh source mode instead:
+
+```bash
+bun run dev:link
+DRYUI_DEV=1 dryui
+```
+
 ## Inspect First
 
 Read the project shape before changing files:
@@ -20,6 +41,20 @@ Read the project shape before changing files:
 5. Check whether `dryuiLint()` and `dryuiLayoutCss()` are wired.
 
 If the user asked for a new app and no app exists, scaffold SvelteKit with the project’s preferred package manager, then apply the setup steps below.
+
+## Golden Consumer Setup Contract
+
+This section is the Interface for a DryUI consumer setup. `scripts/e2e/scaffold-adapter.ts` is the concrete Adapter at this Seam for fresh E2E projects: it may write deterministic files and local tarball overrides, but it must satisfy this contract instead of carrying an independent setup recipe. That keeps setup Locality in this skill while giving tests Leverage through a repeatable Adapter.
+
+A valid DryUI consumer setup has:
+
+- `@dryui/ui` as a runtime dependency and `@dryui/lint` as a dev dependency. E2E may also pin local workspace tarballs for `@dryui/primitives` and `@dryui/feedback` so no published package leaks into the run.
+- `dryuiLint({ strict: true })` as the first Svelte preprocessor, preserving any existing preprocessors after it.
+- `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
+- `<html class="theme-auto">` in `src/app.html`, unless the app already has an explicit theme strategy.
+- `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, then `../layout.css` last.
+- `src/layout.css` present, minimal, and ready for the `dryui-layout` skill to own page/section grid and flex layout.
+- No call to `dryui setup`, project detection, install planning, component lookup, token listing, or broad CLI checks.
 
 ## Apply Setup
 

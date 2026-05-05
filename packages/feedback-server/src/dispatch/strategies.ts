@@ -15,7 +15,6 @@
 // inside the relevant strategy. That keeps the strategy honest about which
 // agents share its shape and which deviate.
 
-import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
 	AGENTS,
@@ -286,49 +285,43 @@ function warnOnce(key: string, message: string): void {
 function checkDispatchWarning(
 	warning: DispatchConfigWarning,
 	workspace: string,
-	homeDir: string
+	ctx: PlatformContext
 ): void {
-	const path = resolveAgentPath(warning.pathTemplate, workspace, homeDir);
-	let raw: string;
-	try {
-		raw = readFileSync(path, 'utf8');
-	} catch (err: unknown) {
-		const code = (err as NodeJS.ErrnoException | null)?.code;
-		if (code === 'ENOENT') {
-			warnOnce(
-				`missing:${path}`,
-				[
-					`[dispatch] warning: ${path} not found.`,
-					`[dispatch] ${warning.readerLabel} reads MCP servers from this file. Without it, the dispatched prompt`,
-					`[dispatch] will run but the \`dryui-feedback\` MCP tools will not be available.`,
-					`[dispatch] To enable them, create the file with:`,
-					...warning.snippet.split('\n').map((line) => `[dispatch]   ${line}`),
-					`[dispatch] Proceeding with launch anyway.`
-				].join('\n')
-			);
-			return;
-		}
+	const path = resolveAgentPath(warning.pathTemplate, workspace, ctx.homeDir);
+	const inspection = ctx.inspectJsonEntry(path, warning.rootKey, warning.entryKey);
+	if (inspection.status === 'present') return;
+	if (inspection.status === 'missing-file') {
 		warnOnce(
-			`read:${path}:${code ?? 'unknown'}`,
-			`[dispatch] warning: could not read ${path} (${code ?? 'unknown error'}). Proceeding with launch anyway.`
+			`missing:${path}`,
+			[
+				`[dispatch] warning: ${path} not found.`,
+				`[dispatch] ${warning.readerLabel} reads MCP servers from this file. Without it, the dispatched prompt`,
+				`[dispatch] will run but the \`dryui-feedback\` MCP tools will not be available.`,
+				`[dispatch] To enable them, create the file with:`,
+				...warning.snippet.split('\n').map((line) => `[dispatch]   ${line}`),
+				`[dispatch] Proceeding with launch anyway.`
+			].join('\n')
 		);
 		return;
 	}
-	let parsed: unknown;
-	try {
-		parsed = JSON.parse(raw);
-	} catch (err: unknown) {
-		const msg = err instanceof Error ? err.message : String(err);
+
+	if (inspection.status === 'read-error') {
+		warnOnce(
+			`read:${path}:${inspection.code ?? 'unknown'}`,
+			`[dispatch] warning: could not read ${path} (${inspection.code ?? 'unknown error'}). Proceeding with launch anyway.`
+		);
+		return;
+	}
+
+	if (inspection.status === 'invalid-json') {
 		warnOnce(
 			`parse:${path}`,
-			`[dispatch] warning: ${path} is not valid JSON (${msg}). Proceeding with launch anyway.`
+			`[dispatch] warning: ${path} is not valid JSON (${inspection.message}). Proceeding with launch anyway.`
 		);
 		return;
 	}
-	const servers = (
-		parsed as { mcpServers?: Record<string, unknown>; servers?: Record<string, unknown> } | null
-	)?.[warning.rootKey as 'mcpServers' | 'servers'];
-	if (!servers || typeof servers !== 'object' || !(warning.entryKey in servers)) {
+
+	if (inspection.status === 'missing-entry') {
 		warnOnce(
 			`missing-entry:${path}`,
 			[
@@ -456,7 +449,7 @@ const terminalCli: LaunchStrategy<TerminalCliAgent> = {
 	},
 	launch(agent, prompt, options, ctx) {
 		if (agent.dispatchWarning) {
-			checkDispatchWarning(agent.dispatchWarning, options.workspace, ctx.homeDir);
+			checkDispatchWarning(agent.dispatchWarning, options.workspace, ctx);
 		}
 
 		if (ctx.currentPlatform === 'win32') {
@@ -513,7 +506,7 @@ const workspaceAppCliChat: LaunchStrategy<WorkspaceAppCliChatAgent> = {
 	},
 	launch(agent, prompt, options, ctx) {
 		if (agent.dispatchWarning) {
-			checkDispatchWarning(agent.dispatchWarning, options.workspace, ctx.homeDir);
+			checkDispatchWarning(agent.dispatchWarning, options.workspace, ctx);
 		}
 
 		// copilot-vscode: try CLI chat first, no clipboard on success.

@@ -1,4 +1,4 @@
-<script lang="ts" module>
+<script module lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAttributes } from 'svelte/elements';
 	import type { CalendarEvent, CalendarEventCategory } from './types.js';
@@ -34,16 +34,66 @@
 	const bandRowCount = $derived(
 		layout.band.length === 0 ? 0 : Math.max(...layout.band.map((b) => b.row)) + 1
 	);
+	let bandNode = $state<HTMLElement>();
+	let bandEventNodes = $state<Record<string, HTMLElement | undefined>>({});
+	let positionedEventNodes = $state<Record<string, HTMLElement | undefined>>({});
 
 	function selectEvent(e: CalendarEvent) {
 		ctx.selectEvent(e);
 	}
 
-	function createStyle(properties: Record<string, string | number>): string {
-		return Object.entries(properties)
-			.map(([property, value]) => `${property}: ${value};`)
-			.join(' ');
+	function setStyleProperties(
+		node: HTMLElement | undefined,
+		properties: Record<string, string | number>
+	) {
+		if (!node) return;
+		for (const [property, value] of Object.entries(properties)) {
+			node.style.setProperty(property, String(value));
+		}
 	}
+
+	function positionedEventKey(dayIndex: number, eventId: string): string {
+		return `${dayIndex}:${eventId}`;
+	}
+
+	$effect(() => {
+		setStyleProperties(bandNode, { '--dry-calendar-band-rows': bandRowCount });
+	});
+
+	$effect(() => {
+		for (const bandEvent of layout.band) {
+			const category = ctx.getCategory(bandEvent.event.category);
+			const color = category?.color ?? 'var(--dry-color-fill-brand)';
+			setStyleProperties(bandEventNodes[bandEvent.event.id], {
+				'--dry-calendar-band-color': color,
+				'--dry-calendar-band-column': `${bandEvent.startDayIndex + 1} / ${bandEvent.endDayIndex + 2}`,
+				'--dry-calendar-band-row': bandEvent.row + 1
+			});
+		}
+	});
+
+	$effect(() => {
+		for (const positioned of layout.positioned) {
+			const category = ctx.getCategory(positioned.event.category);
+			const color = category?.color ?? 'var(--dry-color-fill-brand)';
+			const widthPct = 100 / positioned.columnCount;
+			const leftPct = widthPct * positioned.column;
+			const rightPct = 100 - leftPct - widthPct;
+			const rangeMinutes = Math.max(1, (endHour - startHour) * 60);
+			const topPct = ((positioned.startMinutes - startHour * 60) / rangeMinutes) * 100;
+			const heightPct = ((positioned.endMinutes - positioned.startMinutes) / rangeMinutes) * 100;
+			setStyleProperties(
+				positionedEventNodes[positionedEventKey(positioned.dayIndex, positioned.event.id)],
+				{
+					'--dry-calendar-event-color': color,
+					'--dry-calendar-event-top': `${topPct}%`,
+					'--dry-calendar-event-height': `${heightPct}%`,
+					'--dry-calendar-event-start': `${leftPct}%`,
+					'--dry-calendar-event-end': `${rightPct}%`
+				}
+			);
+		}
+	});
 </script>
 
 <div data-calendar-week class={className} {...rest}>
@@ -81,7 +131,7 @@
 	</div>
 
 	{#if bandRowCount > 0}
-		<div data-calendar-week-band style={createStyle({ '--dry-calendar-band-rows': bandRowCount })}>
+		<div data-calendar-week-band bind:this={bandNode}>
 			<div data-calendar-week-band-label aria-hidden="true">all-day</div>
 			<div data-calendar-week-band-grid>
 				{#each layout.band as bandEvent (bandEvent.event.id)}
@@ -92,11 +142,7 @@
 						data-calendar-week-band-event
 						data-category={bandEvent.event.category ?? undefined}
 						data-selected={selected ? '' : undefined}
-						style={createStyle({
-							'--dry-calendar-band-color': color,
-							'grid-column': `${bandEvent.startDayIndex + 1} / ${bandEvent.endDayIndex + 2}`,
-							'grid-row': bandEvent.row + 1
-						})}
+						bind:this={bandEventNodes[bandEvent.event.id]}
 					>
 						<Button
 							variant="bare"
@@ -146,25 +192,12 @@
 				{#each layout.positioned.filter((p) => p.dayIndex === dayIndex) as positioned (positioned.event.id)}
 					{@const category = ctx.getCategory(positioned.event.category)}
 					{@const selected = ctx.selectedEvent?.id === positioned.event.id}
-					{@const widthPct = 100 / positioned.columnCount}
-					{@const leftPct = widthPct * positioned.column}
-					{@const rightPct = 100 - leftPct - widthPct}
-					{@const rangeMinutes = Math.max(1, (endHour - startHour) * 60)}
-					{@const topPct = ((positioned.startMinutes - startHour * 60) / rangeMinutes) * 100}
-					{@const heightPct =
-						((positioned.endMinutes - positioned.startMinutes) / rangeMinutes) * 100}
 					{@const color = category?.color ?? 'var(--dry-color-fill-brand)'}
 					<div
 						data-calendar-week-event
 						data-category={positioned.event.category ?? undefined}
 						data-selected={selected ? '' : undefined}
-						style={createStyle({
-							'--dry-calendar-event-color': color,
-							'--dry-calendar-event-top': `${topPct}%`,
-							'--dry-calendar-event-height': `${heightPct}%`,
-							'--dry-calendar-event-start': `${leftPct}%`,
-							'--dry-calendar-event-end': `${rightPct}%`
-						})}
+						bind:this={positionedEventNodes[positionedEventKey(dayIndex, positioned.event.id)]}
 					>
 						<Button
 							variant="bare"
@@ -311,6 +344,8 @@
 
 	[data-calendar-week-band-event] {
 		display: grid;
+		grid-column: var(--dry-calendar-band-column);
+		grid-row: var(--dry-calendar-band-row);
 		min-height: 2.5rem;
 		border: 1px solid color-mix(in srgb, var(--dry-calendar-band-color) 35%, transparent);
 		border-radius: var(--dry-calendar-event-radius);
