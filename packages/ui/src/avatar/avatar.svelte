@@ -103,6 +103,7 @@
 		--dry-avatar-radius: var(--dry-radius-full);
 		--dry-avatar-font-size: var(--dry-type-small-size, var(--dry-text-sm-size));
 
+		position: relative;
 		display: inline-grid;
 		place-items: center;
 		aspect-ratio: 1;
@@ -121,6 +122,8 @@
 	}
 
 	[data-avatar] img {
+		position: absolute;
+		inset: 0;
 		block-size: 100%;
 		aspect-ratio: 1;
 		object-fit: cover;
