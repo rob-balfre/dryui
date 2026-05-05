@@ -27,13 +27,14 @@
 		Rocket,
 		Trash2
 	} from 'lucide-svelte';
-	import { buildFeedbackDispatchPrompt, getTextNotes } from '../../src/prompts.js';
-	import type { Submission, SubmissionStatus } from '../../src/types.js';
+	import { buildFeedbackDispatchPrompt } from '../../src/prompts.js';
+	import type { SubmissionPresentation } from '../../src/submission-presentation.js';
+	import type { SubmissionStatus } from '../../src/types.js';
 	import AgentIcon from './agent-icon.svelte';
 	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
 
 	interface Props {
-		submission: Submission;
+		submission: SubmissionPresentation;
 		dispatchTargets: DispatchAgent[];
 		targetAgent: DispatchAgent | null;
 		refreshing: boolean;
@@ -77,22 +78,11 @@
 	let promptText = $derived(
 		buildFeedbackDispatchPrompt(submission, skillPath ? { skillPath } : undefined)
 	);
-	let drawingCounts = $derived.by(() => getDrawingCounts(submission.drawings));
-	let textNotes = $derived(getTextNotes(submission.drawings));
+	let drawingCounts = $derived.by(() => getDrawingCounts(submission.summary));
+	let textNotes = $derived(submission.textNotes);
 
-	function readDrawingKind(value: unknown): string {
-		if (typeof value !== 'object' || value === null) return 'unknown';
-		const kind = Reflect.get(value, 'kind');
-		return typeof kind === 'string' ? kind : 'unknown';
-	}
-
-	function getDrawingCounts(drawings: unknown[]): DrawingCount[] {
-		const counts: Record<string, number> = {};
-		for (const drawing of drawings) {
-			const kind = readDrawingKind(drawing);
-			counts[kind] = (counts[kind] ?? 0) + 1;
-		}
-		return Object.entries(counts).map(([kind, count]) => ({
+	function getDrawingCounts(summary: SubmissionPresentation['summary']): DrawingCount[] {
+		return Object.entries(summary.drawingKinds).map(([kind, count]) => ({
 			label:
 				kind === 'freehand'
 					? 'Freehand'
@@ -121,7 +111,7 @@
 		return status === 'resolved' ? 'Resolved' : 'Pending';
 	}
 
-	function formatViewport(viewport: Submission['viewport']): string {
+	function formatViewport(viewport: SubmissionPresentation['viewport']): string {
 		if (!viewport) return 'Unknown';
 		return `${viewport.width} x ${viewport.height}`;
 	}

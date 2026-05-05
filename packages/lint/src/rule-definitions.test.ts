@@ -11,7 +11,7 @@ describe('lint rule definitions', () => {
 		).toEqual({
 			rule: 'dryui/no-flex',
 			message:
-				'Do not use display: flex. Use display: grid. For chip/tag wrapping, use ChipGroup.Root.',
+				'Do not use display: flex. Use display: grid. For chip/tag wrapping, use ChipGroup.Root for the chip row. Add /* dryui-allow flex */ on the preceding line for intentional cases.',
 			line: 3
 		});
 	});

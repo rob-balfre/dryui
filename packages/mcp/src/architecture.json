@@ -17,7 +17,7 @@
     "composeEdges": 16,
     "docsEdges": 0,
     "relatedEdges": 235,
-    "mismatches": 293,
+    "mismatches": 3,
     "primitivePartComponents": 0,
     "thinWrappers": 61
   },
@@ -31,7 +31,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Collapsible content sections, single or multiple mode",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/accordion/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -112,7 +112,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "CSS filter adjustment wrapper for brightness, contrast, saturation, and hue shifts",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/adjust/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -137,7 +137,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Grouped input shell for prefixes, suffixes, separators, and actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/affix-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -248,7 +248,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Modal dialog requiring user confirmation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/alert-dialog/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -399,7 +399,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/app-frame/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -425,7 +425,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Constrains child content to a specific aspect ratio",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/aspect-ratio/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -451,7 +451,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Ambient gradient surface with browser-native animated color fields and static fallback",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/aurora/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -476,7 +476,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "User profile image with fallback initials",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/avatar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -500,7 +500,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Compact cluster of avatars with overflow and presence status",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/avatar-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -525,7 +525,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Full-screen overlay behind modals and dialogs",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/backdrop/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -549,7 +549,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Small status indicator label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/badge/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -573,7 +573,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Animated linear light streak surface for directional highlights and shimmer accents",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/beam/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -598,7 +598,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/border-beam/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -624,7 +624,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Navigation trail showing page hierarchy",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/breadcrumb/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -719,7 +719,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Interactive button or link-styled action for submissions and calls to action",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/button/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -745,7 +745,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Groups related buttons with shared styling",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/button-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -769,7 +769,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Interactive calendar grid for date navigation and event overlays",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/calendar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -881,7 +881,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Scrollable content carousel with slide navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/carousel/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1005,7 +1005,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "SVG-based chart with bars, lines, and axes",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chart/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1158,7 +1158,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Single chat row with role, avatar, name, and typing state",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chat-message/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1183,7 +1183,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Boolean toggle input with indeterminate state",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/checkbox/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1207,7 +1207,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Interactive pill for filters, selections, and inline state",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chip/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1232,7 +1232,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chip-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1305,7 +1305,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Soft channel-offset wrapper for chromatic distortion on surfaces and media",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chromatic-aberration/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1330,7 +1330,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "RGB channel separation effect with hover and animation triggers",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/chromatic-shift/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1356,7 +1356,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Copy text to clipboard with native Clipboard API",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/clipboard/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1380,7 +1380,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Code display with optional line numbers and copy button",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/code-block/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1405,7 +1405,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Expandable/collapsible content panel",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/collapsible/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1472,7 +1472,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Color selection with area, hue/alpha sliders, and eyedropper",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/color-picker/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1609,7 +1609,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Searchable text input with filterable dropdown suggestions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/combobox/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1721,7 +1721,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Searchable command menu dialog",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/command-palette/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1847,7 +1847,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Centered content container with max-width",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/container/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1870,7 +1870,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Right-click menu with actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/context-menu/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -1993,7 +1993,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Enhanced table with sorting, filtering, and pagination",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/data-grid/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2188,7 +2188,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Form-first locale-aware segmented date input",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/date-field/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2258,7 +2258,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Calendar popup date picker with locale support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/date-picker/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2341,7 +2341,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Date range selection with calendar popup",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/date-range-picker/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2437,7 +2437,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Combined date and time input with locale-aware segments",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/date-time-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2463,7 +2463,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Modal dialog using native dialog element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/dialog/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2600,7 +2600,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "SVG turbulence displacement filter for organic distortion effects",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/displacement/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2626,7 +2626,7 @@
       "layer": "primitive",
       "category": "interaction",
       "description": "Reorderable list with drag and keyboard support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/drag-and-drop/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2694,7 +2694,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Slide-in panel from any edge",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/drawer/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2831,7 +2831,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Trigger-activated dropdown with menu items",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/dropdown-menu/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -2954,7 +2954,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Placeholder state with icon, title, description, and action",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/empty-state/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3050,7 +3050,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Form field wrapper with label, description, and error",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/field/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3118,7 +3118,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Select a file or folder path via external picker",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/file-select/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3201,7 +3201,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "File selection with drag-and-drop dropzone",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/file-upload/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3311,7 +3311,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Flippable card with front and back faces",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/flip-card/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3380,7 +3380,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Floating action button with expandable actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/float-button/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3448,7 +3448,7 @@
       "layer": "primitive",
       "category": "utility",
       "description": "Traps keyboard focus within a container element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/focus-trap/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3473,7 +3473,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Site footer layout with brand, link groups, and copyright",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/footer/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3569,7 +3569,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Formats byte values with Intl.NumberFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/format-bytes/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3593,7 +3593,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Formats dates with Intl.DateTimeFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/format-date/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3618,7 +3618,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Formats numbers with Intl.NumberFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/format-number/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3642,7 +3642,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "SVG gauge indicator with configurable arc, thresholds, and label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/gauge/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3668,7 +3668,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Translucent glass wrapper with blur, tint, and saturation control",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/glass/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3693,7 +3693,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Soft glow effect wrapper with configurable color, intensity, and animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/glow/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3719,7 +3719,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Volumetric radial light rays surface with configurable origin, spread, and intensity",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/god-rays/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3744,7 +3744,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Animated multi-color gradient mesh background with optional interactivity",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/gradient-mesh/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3770,7 +3770,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Hero section wrapper with heading, subheading, and actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/hero/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3852,7 +3852,7 @@
       "layer": "primitive",
       "category": "utility",
       "description": "Keyboard shortcut handler with modifier support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/hotkey/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3876,7 +3876,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Surface popup on hover with delay-based open/close",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/hover-card/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3942,7 +3942,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Sized and colored SVG icon wrapper with accessibility label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/icon/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3967,7 +3967,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Image with loading states and fallback support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/image/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -3991,7 +3991,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Before/after image comparison slider",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/image-comparison/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4015,7 +4015,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Loads more content when user scrolls near bottom",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/infinite-scroll/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4040,7 +4040,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Text input with size variants",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4064,7 +4064,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Keyboard shortcut display element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/kbd/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4088,7 +4088,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Form label with size variants",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/label/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4112,7 +4112,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Styled anchor with external and disabled states",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/link/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4136,7 +4136,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Link preview popup on hover",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/link-preview/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4205,7 +4205,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Structured list with items, icons, and subheaders",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/list/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4300,7 +4300,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Single or multi-select list with keyboard navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/listbox/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4353,7 +4353,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Grid of linked brand logos with responsive alignment",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/logo-cloud/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4407,7 +4407,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Interactive map container with markers, popups, layers, and controls",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/map/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4504,7 +4504,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Renders markdown text as styled HTML",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/markdown-renderer/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4529,7 +4529,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Scrolling text/content ticker with CSS animations",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/marquee/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4553,7 +4553,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Intersection-observer mask transition with circle, diamond, or wipe shapes",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/mask-reveal/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4579,7 +4579,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Horizontal navigation with large dropdown panels and columns",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/mega-menu/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4690,7 +4690,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Horizontal menu bar with dropdown menus",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/menubar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4813,7 +4813,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Searchable multi-select combobox with removable selected tokens",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/multi-select-combobox/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -4966,7 +4966,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Site-level navigation with flyout content panels",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/navigation-menu/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5075,7 +5075,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Texture overlay that adds grain and atmosphere to surfaces without external assets",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/noise/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5100,7 +5100,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Notification panel with trigger, groups, and items",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/notification-center/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5199,7 +5199,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Numeric input with increment/decrement controls",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/number-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5223,7 +5223,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Page-level header with eyebrow, title, description, metadata, and actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/page-header/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5347,7 +5347,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Page navigation with previous/next and page links",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/pagination/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5470,7 +5470,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Phone number input with country code selector",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/phone-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5496,7 +5496,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Segmented input for PIN/OTP codes with single hidden input architecture",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/pin-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5578,7 +5578,7 @@
       "layer": "primitive",
       "category": "uncategorized",
       "description": "Pluralize is exported publicly but is missing generated spec metadata.",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/pluralize/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [],
@@ -5597,7 +5597,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Floating content panel anchored to a trigger",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/popover/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5664,7 +5664,7 @@
       "layer": "primitive",
       "category": "utility",
       "description": "Renders children into a different DOM location",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/portal/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5688,7 +5688,7 @@
       "layer": "primitive",
       "category": "feedback",
       "description": "Progress bar indicator",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/progress/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5712,7 +5712,7 @@
       "layer": "primitive",
       "category": "feedback",
       "description": "Circular progress ring with SVG rendering",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/progress-ring/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5736,7 +5736,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "AI-style prompt input with auto-resize and submit",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/prompt-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5761,7 +5761,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "QR code generator using Canvas 2D API",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/qr-code/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5786,7 +5786,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Single selection from multiple options",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/radio-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5840,7 +5840,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Calendar for selecting date ranges",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/range-calendar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5893,7 +5893,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Star rating input with half-star support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/rating/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5918,7 +5918,7 @@
       "layer": "primitive",
       "category": "uncategorized",
       "description": "RefId is exported publicly but is missing generated spec metadata.",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/ref-id/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [],
@@ -5937,7 +5937,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Displays relative time with auto-updating",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/relative-time/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5961,7 +5961,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/reveal/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -5986,7 +5986,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Basic rich text editor with formatting toolbar",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/rich-text-editor/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6054,7 +6054,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Custom scrollable area with styled scrollbars",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/scroll-area/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6077,7 +6077,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Button that scrolls to top of page or container",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/scroll-to-top/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6101,7 +6101,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Compact segmented switch for mutually exclusive options",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/segmented-control/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6156,7 +6156,7 @@
       "layer": "primitive",
       "category": "form",
       "description": "Closed dropdown select for choosing one option from a fixed list",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/select/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6253,7 +6253,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Selectable tile set for single-choice options with keyboard support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/selectable-tile-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6363,7 +6363,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Visual divider between content",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/separator/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6387,7 +6387,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "WebGL shader canvas with built-in presets and theme color integration",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/shader-canvas/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6414,7 +6414,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Collapsible side navigation panel",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/sidebar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6551,7 +6551,7 @@
       "layer": "primitive",
       "category": "feedback",
       "description": "Loading placeholder animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/skeleton/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6575,7 +6575,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Range input slider with thumb control",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/slider/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6599,7 +6599,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Empty space component for spacing",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/spacer/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6623,7 +6623,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Compact inline SVG sparkline chart",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/sparkline/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6649,7 +6649,7 @@
       "layer": "primitive",
       "category": "feedback",
       "description": "Loading spinner animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/spinner/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6673,7 +6673,7 @@
       "layer": "primitive",
       "category": "layout",
       "description": "Resizable split panels with drag handle",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/splitter/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6740,7 +6740,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Pointer-reactive radial highlight surface for cards, hero blocks, and interactive panels",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/spotlight/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6765,7 +6765,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Compact KPI card with label, value, and trend",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/stat-card/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6847,7 +6847,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Step-by-step progress indicator",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/stepper/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6930,7 +6930,7 @@
       "layer": "primitive",
       "category": "utility",
       "description": "Accessible SVG wrapper with viewBox and aria-label defaults",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/svg/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -6955,7 +6955,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Data table with header, body, footer sections",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/table/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7093,7 +7093,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Auto-generated table of contents from headings",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/table-of-contents/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7160,7 +7160,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Tabbed content navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tabs/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7241,7 +7241,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Small labeled tag element with color and variant support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tag/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7267,7 +7267,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Input for managing a list of tags",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tags-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7363,7 +7363,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Multi-line text input",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/textarea/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7387,7 +7387,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Native time input with form control integration",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/time-input/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7411,7 +7411,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Vertical timeline for activity feeds and history",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/timeline/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7535,7 +7535,7 @@
       "layer": "primitive",
       "category": "feedback",
       "description": "Temporary notification message",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/toast/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7644,7 +7644,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Pressable toggle button",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/toggle/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7668,7 +7668,7 @@
       "layer": "primitive",
       "category": "action",
       "description": "Group of toggle buttons with single/multiple selection",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/toggle-group/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7721,7 +7721,7 @@
       "layer": "primitive",
       "category": "theme",
       "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/token-scope/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7745,7 +7745,7 @@
       "layer": "primitive",
       "category": "navigation",
       "description": "Horizontal button group for actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/toolbar/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7826,7 +7826,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Hover/focus popup with descriptive text",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tooltip/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7893,7 +7893,7 @@
       "layer": "primitive",
       "category": "overlay",
       "description": "Step-by-step guided tour overlay with spotlight",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tour/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -7947,7 +7947,7 @@
       "layer": "primitive",
       "category": "input",
       "description": "Dual-list transfer component for moving items between lists",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/transfer/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8029,7 +8029,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Hierarchical tree view with expand/collapse",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/tree/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8111,7 +8111,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Standalone semantic text exports: heading, text, code, blockquote",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/typography/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8193,7 +8193,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "User identity block with name, description, and optional content",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/user/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8218,7 +8218,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Video player embed for YouTube, Vimeo, and native sources",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/video-embed/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8244,7 +8244,7 @@
       "layer": "primitive",
       "category": "display",
       "description": "Renders only visible items from large lists for performance",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/virtual-list/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8269,7 +8269,7 @@
       "layer": "primitive",
       "category": "utility",
       "description": "Hides content visually but keeps it accessible to screen readers",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/visually-hidden/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8293,7 +8293,7 @@
       "layer": "primitive",
       "category": "visual",
       "description": "Decorative SVG wave divider for section separation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/primitives/src/wave-divider/index.ts",
       "publicImport": "@dryui/primitives",
       "tags": [
@@ -8318,7 +8318,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Collapsible content sections, single or multiple mode",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/accordion/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8399,7 +8399,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "CSS filter adjustment wrapper for brightness, contrast, saturation, and hue shifts",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/adjust/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8449,7 +8449,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Modal dialog requiring user confirmation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/alert-dialog/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8600,7 +8600,7 @@
       "layer": "ui-composite",
       "category": "input",
       "description": "Slider for selecting alpha/opacity values in color pickers",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/alpha-slider/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8625,7 +8625,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/app-frame/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8651,7 +8651,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Constrains child content to a specific aspect ratio",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/aspect-ratio/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8677,7 +8677,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Ambient gradient surface with browser-native animated color fields and static fallback",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/aurora/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8702,7 +8702,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "User profile image with fallback initials",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/avatar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8726,7 +8726,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Full-screen overlay behind modals and dialogs",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/backdrop/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8750,7 +8750,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Small status indicator label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/badge/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8774,7 +8774,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Animated linear light streak surface for directional highlights and shimmer accents",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/beam/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8799,7 +8799,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/border-beam/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8825,7 +8825,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Navigation trail showing page hierarchy",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/breadcrumb/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8920,7 +8920,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Interactive button or link-styled action for submissions and calls to action",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/button/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8946,7 +8946,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Groups related buttons with shared styling",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/button-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -8970,7 +8970,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Interactive calendar grid for date navigation and event overlays",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/calendar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9110,7 +9110,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Scrollable content carousel with slide navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/carousel/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9234,7 +9234,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "SVG-based chart with bars, lines, and axes",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chart/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9387,7 +9387,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Conversation thread container with restart action and auto-scroll behavior",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chat-thread/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9411,7 +9411,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Boolean toggle input with indeterminate state",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/checkbox/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9435,7 +9435,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Interactive pill for filters, selections, and inline state",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chip/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9460,7 +9460,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chip-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9533,7 +9533,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Soft channel-offset wrapper for chromatic distortion on surfaces and media",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chromatic-aberration/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9558,7 +9558,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "RGB channel separation effect with hover and animation triggers",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/chromatic-shift/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9584,7 +9584,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Copy text to clipboard with native Clipboard API",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/clipboard/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9608,7 +9608,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Code display with optional line numbers and copy button",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/code-block/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9633,7 +9633,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Expandable/collapsible content panel",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/collapsible/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9700,7 +9700,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Color selection with area, hue/alpha sliders, and eyedropper",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/color-picker/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9837,7 +9837,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Searchable text input with filterable dropdown suggestions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/combobox/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -9949,7 +9949,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Searchable command menu dialog",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/command-palette/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10075,7 +10075,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Centered content container with max-width",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/container/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10098,7 +10098,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Right-click menu with actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/context-menu/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10221,7 +10221,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Enhanced table with sorting, filtering, and pagination",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/data-grid/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10416,7 +10416,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Form-first locale-aware segmented date input",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/date-field/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10486,7 +10486,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Calendar popup date picker with locale support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/date-picker/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10569,7 +10569,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Date range selection with calendar popup",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/date-range-picker/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10665,7 +10665,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Combined date and time input with locale-aware segments",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/date-time-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10691,7 +10691,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Responsive term and value list for summaries and specs",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/description-list/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10772,7 +10772,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/diagram/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10799,7 +10799,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Modal dialog using native dialog element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/dialog/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10936,7 +10936,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "SVG turbulence displacement filter for organic distortion effects",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/displacement/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -10962,7 +10962,7 @@
       "layer": "ui-wrapper",
       "category": "interaction",
       "description": "Reorderable list with drag and keyboard support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/drag-and-drop/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11044,7 +11044,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Slide-in panel from any edge",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/drawer/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11181,7 +11181,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Trigger-activated dropdown with menu items",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/dropdown-menu/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11304,7 +11304,7 @@
       "layer": "ui-composite",
       "category": "input",
       "description": "Drag-and-drop file drop zone area",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/drop-zone/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11379,7 +11379,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Form field wrapper with label, description, and error",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/field/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11447,7 +11447,7 @@
       "layer": "ui-composite",
       "category": "form",
       "description": "Structured field grouping with legend, description, and content",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/fieldset/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11528,7 +11528,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Select a file or folder path via external picker",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/file-select/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11611,7 +11611,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "File selection with drag-and-drop dropzone",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/file-upload/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11721,7 +11721,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Flippable card with front and back faces",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/flip-card/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11790,7 +11790,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Floating action button with expandable actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/float-button/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11858,7 +11858,7 @@
       "layer": "ui-wrapper",
       "category": "utility",
       "description": "Traps keyboard focus within a container element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/focus-trap/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11883,7 +11883,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Formats byte values with Intl.NumberFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/format-bytes/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11907,7 +11907,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Formats dates with Intl.DateTimeFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/format-date/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11932,7 +11932,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Formats numbers with Intl.NumberFormat",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/format-number/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11956,7 +11956,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "SVG gauge indicator with configurable arc, thresholds, and label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/gauge/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -11982,7 +11982,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Translucent glass wrapper with blur, tint, and saturation control",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/glass/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12007,7 +12007,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Soft glow effect wrapper with configurable color, intensity, and animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/glow/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12033,7 +12033,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Volumetric radial light rays surface with configurable origin, spread, and intensity",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/god-rays/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12058,7 +12058,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Animated multi-color gradient mesh background with optional interactivity",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/gradient-mesh/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12084,7 +12084,7 @@
       "layer": "ui-composite",
       "category": "visual",
       "description": "SVG halftone dot pattern overlay with configurable size, angle, and color",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/halftone/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12110,7 +12110,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Standalone semantic heading export for starter-kit typography",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/heading/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12158,7 +12158,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Surface popup on hover with delay-based open/close",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/hover-card/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12224,7 +12224,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Sized and colored SVG icon wrapper with accessibility label",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/icon/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12249,7 +12249,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/icon-swap/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12274,7 +12274,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Image with loading states and fallback support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/image/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12298,7 +12298,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Before/after image comparison slider",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/image-comparison/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12322,7 +12322,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Loads more content when user scrolls near bottom",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/infinite-scroll/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12347,7 +12347,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Text input with size variants",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12371,7 +12371,7 @@
       "layer": "ui-composite",
       "category": "input",
       "description": "Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/input-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12495,7 +12495,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Keyboard shortcut display element",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/kbd/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12519,7 +12519,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Form label with size variants",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/label/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12543,7 +12543,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Styled anchor with external and disabled states",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/link/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12567,7 +12567,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Link preview popup on hover",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/link-preview/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12636,7 +12636,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Structured list with items, icons, and subheaders",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/list/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12731,7 +12731,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Single or multi-select list with keyboard navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/listbox/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12784,7 +12784,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Brand mark, status indicator, or category badge with image or fallback text",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/logo-mark/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12810,7 +12810,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Interactive map container with markers, popups, layers, and controls",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/map/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12907,7 +12907,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Renders markdown text as styled HTML",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/markdown-renderer/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12932,7 +12932,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Scrolling text/content ticker with CSS animations",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/marquee/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12956,7 +12956,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "Intersection-observer mask transition with circle, diamond, or wipe shapes",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/mask-reveal/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -12982,7 +12982,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Horizontal navigation with large dropdown panels and columns",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/mega-menu/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13093,7 +13093,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Horizontal menu bar with dropdown menus",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/menubar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13216,7 +13216,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Searchable multi-select combobox with removable selected tokens",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/multi-select-combobox/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13369,7 +13369,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Site-level navigation with flyout content panels",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/navigation-menu/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13478,7 +13478,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Texture overlay that adds grain and atmosphere to surfaces without external assets",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/noise/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13503,7 +13503,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Notification panel with trigger, groups, and items",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/notification-center/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13602,7 +13602,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Numeric input with increment/decrement controls",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/number-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13626,7 +13626,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Tabular-nums numeric display with optional stable min-width and alignment",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/numeric/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13651,7 +13651,7 @@
       "layer": "ui-composite",
       "category": "input",
       "description": "Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/option-picker/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13762,7 +13762,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Page navigation with previous/next and page links",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/pagination/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13885,7 +13885,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Phone number input with country code selector",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/phone-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13911,7 +13911,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Segmented input for PIN/OTP codes with single hidden input architecture",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/pin-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -13993,7 +13993,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Floating content panel anchored to a trigger",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/popover/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14060,7 +14060,7 @@
       "layer": "ui-wrapper",
       "category": "utility",
       "description": "Renders children into a different DOM location",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/portal/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14084,7 +14084,7 @@
       "layer": "ui-wrapper",
       "category": "feedback",
       "description": "Progress bar indicator",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/progress/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14108,7 +14108,7 @@
       "layer": "ui-wrapper",
       "category": "feedback",
       "description": "Circular progress ring with SVG rendering",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/progress-ring/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14132,7 +14132,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "AI-style prompt input with auto-resize and submit",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/prompt-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14157,7 +14157,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "QR code generator using Canvas 2D API",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/qr-code/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14182,7 +14182,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Single selection from multiple options",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/radio-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14236,7 +14236,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Calendar for selecting date ranges",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/range-calendar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14289,7 +14289,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Star rating input with half-star support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/rating/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14314,7 +14314,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Displays relative time with auto-updating",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/relative-time/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14338,7 +14338,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/reveal/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14363,7 +14363,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Basic rich text editor with formatting toolbar",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/rich-text-editor/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14431,7 +14431,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Custom scrollable area with styled scrollbars",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/scroll-area/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14454,7 +14454,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Button that scrolls to top of page or container",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/scroll-to-top/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14478,7 +14478,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Compact segmented switch for mutually exclusive options",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/segmented-control/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14533,7 +14533,7 @@
       "layer": "ui-wrapper",
       "category": "form",
       "description": "Closed dropdown select for choosing one option from a fixed list",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/select/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14630,7 +14630,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Visual divider between content",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/separator/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14654,7 +14654,7 @@
       "layer": "ui-wrapper",
       "category": "visual",
       "description": "WebGL shader canvas with built-in presets and theme color integration",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/shader-canvas/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14681,7 +14681,7 @@
       "layer": "ui-composite",
       "category": "visual",
       "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/shimmer/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14708,7 +14708,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Collapsible side navigation panel",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/sidebar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14845,7 +14845,7 @@
       "layer": "ui-wrapper",
       "category": "feedback",
       "description": "Loading placeholder animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/skeleton/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14869,7 +14869,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Range input slider with thumb control",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/slider/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14893,7 +14893,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Empty space component for spacing",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/spacer/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14917,7 +14917,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Compact inline SVG sparkline chart",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/sparkline/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14943,7 +14943,7 @@
       "layer": "ui-wrapper",
       "category": "feedback",
       "description": "Loading spinner animation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/spinner/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -14967,7 +14967,7 @@
       "layer": "ui-wrapper",
       "category": "layout",
       "description": "Resizable split panels with drag handle",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/splitter/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15034,7 +15034,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Pointer-reactive radial highlight surface for cards, hero blocks, and interactive panels",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/spotlight/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15084,7 +15084,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Read-only star rating display with filled and outlined variants",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/star-rating/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15124,7 +15124,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Step-by-step progress indicator",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/stepper/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15207,7 +15207,7 @@
       "layer": "ui-wrapper",
       "category": "utility",
       "description": "Accessible SVG wrapper with viewBox and aria-label defaults",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/svg/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15232,7 +15232,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Data table with header, body, footer sections",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/table/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15370,7 +15370,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Auto-generated table of contents from headings",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/table-of-contents/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15437,7 +15437,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Tabbed content navigation",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tabs/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15518,7 +15518,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Small labeled tag element with color and variant support",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tag/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15544,7 +15544,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Input for managing a list of tags",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tags-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15640,7 +15640,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Standalone body copy export for starter-kit typography",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/text/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15664,7 +15664,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Multi-line text input",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/textarea/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15688,7 +15688,7 @@
       "layer": "ui-composite",
       "category": "action",
       "description": "Persisted light/dark theme switcher with system-preference fallback",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/theme-toggle/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15714,7 +15714,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Native time input with form control integration",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/time-input/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15738,7 +15738,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Vertical timeline for activity feeds and history",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/timeline/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15862,7 +15862,7 @@
       "layer": "ui-wrapper",
       "category": "feedback",
       "description": "Temporary notification message",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/toast/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15971,7 +15971,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Pressable toggle button",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/toggle/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -15995,7 +15995,7 @@
       "layer": "ui-wrapper",
       "category": "action",
       "description": "Group of toggle buttons with single/multiple selection",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/toggle-group/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16072,7 +16072,7 @@
       "layer": "ui-wrapper",
       "category": "navigation",
       "description": "Horizontal button group for actions",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/toolbar/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16153,7 +16153,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Hover/focus popup with descriptive text",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tooltip/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16220,7 +16220,7 @@
       "layer": "ui-wrapper",
       "category": "overlay",
       "description": "Step-by-step guided tour overlay with spotlight",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tour/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16274,7 +16274,7 @@
       "layer": "ui-wrapper",
       "category": "input",
       "description": "Dual-list transfer component for moving items between lists",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/transfer/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16356,7 +16356,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Hierarchical tree view with expand/collapse",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/tree/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16438,7 +16438,7 @@
       "layer": "ui-composite",
       "category": "display",
       "description": "Animated three-dot typing status indicator",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/typing-indicator/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16462,7 +16462,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Standalone semantic text exports: heading, text, code, blockquote",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/typography/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16544,7 +16544,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Video player embed for YouTube, Vimeo, and native sources",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/video-embed/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16570,7 +16570,7 @@
       "layer": "ui-wrapper",
       "category": "display",
       "description": "Renders only visible items from large lists for performance",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/virtual-list/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -16595,7 +16595,7 @@
       "layer": "ui-wrapper",
       "category": "utility",
       "description": "Hides content visually but keeps it accessible to screen readers",
-      "visibility": "root",
+      "visibility": "root+subpath",
       "sourcePath": "packages/ui/src/visually-hidden/index.ts",
       "publicImport": "@dryui/ui",
       "tags": [
@@ -23688,2040 +23688,10 @@
   "mismatches": [
     {
       "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Accordion",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/accordion/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Adjust",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/adjust/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "AffixGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/affix-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "AlertDialog",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/alert-dialog/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "AppFrame",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/app-frame/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "AspectRatio",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/aspect-ratio/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Aurora",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/aurora/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Avatar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/avatar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "AvatarGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/avatar-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Backdrop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/backdrop/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Badge",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/badge/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Beam",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/beam/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "BorderBeam",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/border-beam/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Breadcrumb",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/breadcrumb/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Button",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/button/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ButtonGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/button-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Calendar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/calendar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Carousel",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/carousel/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Chart",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chart/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ChatMessage",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chat-message/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Checkbox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/checkbox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Chip",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chip/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ChipGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chip-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ChromaticAberration",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chromatic-aberration/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ChromaticShift",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/chromatic-shift/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Clipboard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/clipboard/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "CodeBlock",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/code-block/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Collapsible",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/collapsible/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ColorPicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/color-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Combobox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/combobox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "CommandPalette",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/command-palette/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Container",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/container/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ContextMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/context-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DataGrid",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/data-grid/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DateField",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/date-field/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DatePicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/date-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DateRangePicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/date-range-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DateTimeInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/date-time-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Dialog",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/dialog/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Displacement",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/displacement/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DragAndDrop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/drag-and-drop/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Drawer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/drawer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "DropdownMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/dropdown-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "EmptyState",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/empty-state/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Field",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/field/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FileSelect",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/file-select/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FileUpload",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/file-upload/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FlipCard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/flip-card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FloatButton",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/float-button/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FocusTrap",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/focus-trap/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Footer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/footer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FormatBytes",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/format-bytes/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FormatDate",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/format-date/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "FormatNumber",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/format-number/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Gauge",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/gauge/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Glass",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/glass/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Glow",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/glow/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "GodRays",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/god-rays/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "GradientMesh",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/gradient-mesh/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Hero",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/hero/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Hotkey",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/hotkey/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "HoverCard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/hover-card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Icon",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/icon/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Image",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/image/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ImageComparison",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/image-comparison/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "InfiniteScroll",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/infinite-scroll/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Input",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Kbd",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/kbd/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Label",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/label/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Link",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/link/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "LinkPreview",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/link-preview/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "List",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/list/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Listbox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/listbox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "LogoCloud",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/logo-cloud/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Map",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/map/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "MarkdownRenderer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/markdown-renderer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Marquee",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/marquee/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "MaskReveal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/mask-reveal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "MegaMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/mega-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Menubar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/menubar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "MultiSelectCombobox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/multi-select-combobox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "NavigationMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/navigation-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Noise",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/noise/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "NotificationCenter",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/notification-center/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "NumberInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/number-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "PageHeader",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/page-header/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Pagination",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/pagination/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "PhoneInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/phone-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "PinInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/pin-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Pluralize",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/pluralize/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Popover",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/popover/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Portal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/portal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Progress",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/progress/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ProgressRing",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/progress-ring/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "PromptInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/prompt-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "QRCode",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/qr-code/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "RadioGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/radio-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "RangeCalendar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/range-calendar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Rating",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/rating/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "RefId",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/ref-id/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "RelativeTime",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/relative-time/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Reveal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/reveal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "RichTextEditor",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/rich-text-editor/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ScrollArea",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/scroll-area/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ScrollToTop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/scroll-to-top/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "SegmentedControl",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/segmented-control/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Select",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/select/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "SelectableTileGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/selectable-tile-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Separator",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/separator/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ShaderCanvas",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/shader-canvas/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Sidebar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/sidebar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Skeleton",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/skeleton/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Slider",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/slider/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Spacer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/spacer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Sparkline",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/sparkline/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Spinner",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/spinner/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Splitter",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/splitter/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Spotlight",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/spotlight/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "StatCard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/stat-card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Stepper",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/stepper/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Svg",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/svg/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Table",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/table/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "TableOfContents",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/table-of-contents/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Tabs",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tabs/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Tag",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tag/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "TagsInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tags-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Textarea",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/textarea/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "TimeInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/time-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Timeline",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/timeline/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Toast",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/toast/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Toggle",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/toggle/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "ToggleGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/toggle-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "TokenScope",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/token-scope/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Toolbar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/toolbar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Tooltip",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tooltip/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Tour",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tour/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Transfer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/transfer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Tree",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/tree/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "Typography",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/typography/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "User",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/user/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "VideoEmbed",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/video-embed/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "VirtualList",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/virtual-list/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "VisuallyHidden",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/visually-hidden/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "primitives",
-      "component": "WaveDivider",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/primitives/src/wave-divider/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Accordion",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/accordion/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Adjust",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/adjust/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
       "package": "ui",
       "component": "Alert",
       "detail": "Root barrel export is missing a matching package subpath export.",
       "sourcePath": "packages/ui/src/alert/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "AlertDialog",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/alert-dialog/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "AlphaSlider",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/alpha-slider/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "AppFrame",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/app-frame/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "AspectRatio",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/aspect-ratio/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Aurora",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/aurora/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Avatar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/avatar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Backdrop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/backdrop/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Badge",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/badge/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Beam",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/beam/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "BorderBeam",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/border-beam/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Breadcrumb",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/breadcrumb/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Button",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/button/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ButtonGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/button-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Calendar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/calendar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Carousel",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/carousel/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Chart",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chart/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ChatThread",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chat-thread/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Checkbox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/checkbox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Chip",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chip/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ChipGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chip-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ChromaticAberration",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chromatic-aberration/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ChromaticShift",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/chromatic-shift/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Clipboard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/clipboard/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "CodeBlock",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/code-block/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Collapsible",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/collapsible/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ColorPicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/color-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Combobox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/combobox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "CommandPalette",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/command-palette/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Container",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/container/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ContextMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/context-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DataGrid",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/data-grid/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DateField",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/date-field/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DatePicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/date-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DateRangePicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/date-range-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DateTimeInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/date-time-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DescriptionList",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/description-list/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Diagram",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/diagram/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Dialog",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/dialog/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Displacement",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/displacement/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DragAndDrop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/drag-and-drop/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Drawer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/drawer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DropdownMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/dropdown-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "DropZone",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/drop-zone/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Field",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/field/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Fieldset",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/fieldset/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FileSelect",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/file-select/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FileUpload",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/file-upload/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FlipCard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/flip-card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FloatButton",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/float-button/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FocusTrap",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/focus-trap/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FormatBytes",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/format-bytes/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FormatDate",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/format-date/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "FormatNumber",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/format-number/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Gauge",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/gauge/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Glass",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/glass/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Glow",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/glow/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "GodRays",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/god-rays/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "GradientMesh",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/gradient-mesh/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Halftone",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/halftone/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Heading",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/heading/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "HoverCard",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/hover-card/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Icon",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/icon/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "IconSwap",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/icon-swap/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Image",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/image/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ImageComparison",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/image-comparison/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "InfiniteScroll",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/infinite-scroll/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Input",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "InputGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/input-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Kbd",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/kbd/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Label",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/label/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Link",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/link/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "LinkPreview",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/link-preview/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "List",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/list/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Listbox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/listbox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "LogoMark",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/logo-mark/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Map",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/map/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "MarkdownRenderer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/markdown-renderer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Marquee",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/marquee/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "MaskReveal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/mask-reveal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "MegaMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/mega-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Menubar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/menubar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "MultiSelectCombobox",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/multi-select-combobox/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "NavigationMenu",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/navigation-menu/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Noise",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/noise/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "NotificationCenter",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/notification-center/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "NumberInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/number-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Numeric",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/numeric/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "OptionPicker",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/option-picker/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Pagination",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/pagination/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "PhoneInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/phone-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "PinInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/pin-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Popover",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/popover/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Portal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/portal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Progress",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/progress/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ProgressRing",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/progress-ring/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "PromptInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/prompt-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "QRCode",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/qr-code/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "RadioGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/radio-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "RangeCalendar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/range-calendar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Rating",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/rating/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "RelativeTime",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/relative-time/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Reveal",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/reveal/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "RichTextEditor",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/rich-text-editor/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ScrollArea",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/scroll-area/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ScrollToTop",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/scroll-to-top/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "SegmentedControl",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/segmented-control/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Select",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/select/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Separator",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/separator/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ShaderCanvas",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/shader-canvas/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Shimmer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/shimmer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Sidebar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/sidebar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Skeleton",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/skeleton/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Slider",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/slider/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Spacer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/spacer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Sparkline",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/sparkline/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Spinner",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/spinner/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Splitter",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/splitter/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Spotlight",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/spotlight/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "StarRating",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/star-rating/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Stepper",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/stepper/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Svg",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/svg/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Table",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/table/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "TableOfContents",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/table-of-contents/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Tabs",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tabs/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Tag",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tag/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "TagsInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tags-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Text",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/text/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Textarea",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/textarea/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ThemeToggle",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/theme-toggle/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "TimeInput",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/time-input/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Timeline",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/timeline/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Toast",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/toast/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Toggle",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/toggle/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "ToggleGroup",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/toggle-group/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Toolbar",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/toolbar/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Tooltip",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tooltip/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Tour",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tour/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Transfer",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/transfer/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Tree",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/tree/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "TypingIndicator",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/typing-indicator/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "Typography",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/typography/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "VideoEmbed",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/video-embed/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "VirtualList",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/virtual-list/index.ts"
-    },
-    {
-      "kind": "missing-subpath-export",
-      "package": "ui",
-      "component": "VisuallyHidden",
-      "detail": "Root barrel export is missing a matching package subpath export.",
-      "sourcePath": "packages/ui/src/visually-hidden/index.ts"
     },
     {
       "kind": "spec-missing",

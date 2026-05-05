@@ -21,6 +21,10 @@ import {
 	docsNavComponentNames,
 	skillCompoundComponents
 } from '../packages/mcp/src/component-catalog.js';
+import {
+	componentNameFromPublicSubpath,
+	componentPublicSubpath
+} from '../packages/mcp/src/component-identity.js';
 import { loadComponentMeta } from '../packages/mcp/src/load-component-meta.js';
 
 const repoRoot = resolve(import.meta.dir, '..');
@@ -100,17 +104,11 @@ async function getSpecCompounds(): Promise<Set<string>> {
 }
 
 function toKebab(name: string): string {
-	return name
-		.replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-		.replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
-		.toLowerCase();
+	return componentPublicSubpath(name);
 }
 
 function toPascal(name: string): string {
-	return name
-		.split('-')
-		.map((value) => value.charAt(0).toUpperCase() + value.slice(1))
-		.join('');
+	return componentNameFromPublicSubpath(name);
 }
 
 function sorted(values: Set<string>): string[] {

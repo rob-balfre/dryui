@@ -7,7 +7,7 @@
  * in parallel (subject to Codex subscription concurrency).
  */
 
-import { execFileSync, spawn, type ChildProcess } from 'node:child_process';
+import { spawn, type ChildProcess } from 'node:child_process';
 import {
 	closeSync,
 	existsSync,
@@ -23,10 +23,10 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { killOwnedProcess, waitForUrl } from '../../packages/cli/src/commands/launch-utils.ts';
 import { runCodexExec, summarizeCodexRun, type CodexRunResult } from './codex-runner.ts';
+import { scaffoldDryuiConsumerProject } from './scaffold-adapter.ts';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, '..', '..');
-const cliBin = resolve(repoRoot, 'packages/cli/dist/index.js');
 const defaultTarballsDir = resolve(repoRoot, 'reports/e2e-tarballs');
 
 // A 1×1 transparent PNG + WebP. These are the smallest valid images the feedback
@@ -145,23 +145,11 @@ function createProjectDir(name: string): string {
 }
 
 function scaffold(projectDir: string, tarballsDir: string, logDir: string): void {
-	const logPath = resolve(logDir, 'scaffold.log');
-	const args = [
-		cliBin,
-		'init',
+	scaffoldDryuiConsumerProject({
 		projectDir,
-		'--pm',
-		'bun',
-		'--no-launch',
-		'--dev-tarballs',
-		tarballsDir
-	];
-	const output = execFileSync('node', args, {
-		cwd: repoRoot,
-		encoding: 'utf8',
-		stdio: ['ignore', 'pipe', 'pipe']
+		tarballsDir,
+		logPath: resolve(logDir, 'scaffold.log')
 	});
-	writeFileSync(logPath, output);
 }
 
 async function startFeedbackServer(

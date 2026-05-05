@@ -1,4 +1,5 @@
 import { docsNavCategories } from '../../../../packages/mcp/src/component-catalog.js';
+import { componentDocsSlug } from '../../../../packages/mcp/src/component-identity.js';
 
 export type CatalogKind = 'ui' | 'primitive';
 
@@ -29,7 +30,7 @@ for (const category of categories) {
 }
 
 export function toSlug(name: string): string {
-	return name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+	return componentDocsSlug(name);
 }
 
 export function fromSlug(slug: string): NavItem | undefined {

@@ -1,6 +1,13 @@
-import { isRuleOwner, lintViolation, type Violation } from './rule-definitions.js';
+import {
+	createLintPolicy,
+	lintViolation,
+	type LintMessageValues,
+	type LintPolicy,
+	type LintRuleId,
+	type Violation
+} from './lint-policy.js';
 
-export type { Violation } from './rule-definitions.js';
+export type { Violation } from './lint-policy.js';
 
 const SCRIPT_BLOCK_RE = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
 const STYLE_BLOCK_RE = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
@@ -209,6 +216,17 @@ function uniqueViolations(violations: Violation[]): Violation[] {
 		seen.add(key);
 		return true;
 	});
+}
+
+function addPolicyViolation(
+	policy: LintPolicy,
+	violations: Violation[],
+	ruleId: LintRuleId,
+	line: number,
+	values: LintMessageValues = {}
+): void {
+	const violation = policy.violation(ruleId, line, values);
+	if (violation) violations.push(violation);
 }
 
 interface TagMatch {
@@ -525,22 +543,20 @@ export function checkScript(content: string): Violation[] {
 	const violations: Violation[] = [];
 	const lineStarts = buildLineIndex(content);
 	const lines = content.split('\n');
-	const allowed = (_ruleId: string) => true;
+	const policy = createLintPolicy({ target: 'script' });
 
-	if (allowed('dryui/no-layout-component')) {
+	if (policy.isRuleEnabled('dryui/no-layout-component')) {
 		for (const match of content.matchAll(BANNED_COMPONENT_IMPORT_RE)) {
 			const line = lookupLine(lineStarts, match.index);
 			const lineText = lines[line - 1] ?? '';
 			if (!lineText.includes('@dryui/ui')) continue;
 			for (const [comp, re] of BANNED_COMPONENT_WORD_RES) {
 				if (re.test(lineText)) {
-					violations.push(
-						lintViolation('dryui/no-layout-component', line, {
-							action: 'import',
-							target: comp,
-							guidance: 'data-layout hooks with src/layout.css instead'
-						})
-					);
+					addPolicyViolation(policy, violations, 'dryui/no-layout-component', line, {
+						action: 'import',
+						target: comp,
+						guidance: 'data-layout hooks with src/layout.css instead'
+					});
 				}
 			}
 		}
@@ -548,7 +564,7 @@ export function checkScript(content: string): Violation[] {
 
 	// project/theme-import-order is a correctness rule; the `project/` prefix
 	// routes it to the catalog entry `theme-import-order`.
-	if (allowed('project/theme-import-order')) {
+	if (policy.isRuleEnabled('project/theme-import-order')) {
 		violations.push(...checkThemeImportOrder(content, lineStarts));
 	}
 
@@ -733,12 +749,12 @@ function getParentDir(filename?: string): string {
 	return parent.slice(prevSlash + 1).toLowerCase();
 }
 
-function createNativeElementViolation(rule: NativeElementRule, line: number): Violation {
-	return lintViolation('dryui/no-raw-native-element', line, {
+function nativeElementViolationValues(rule: NativeElementRule): LintMessageValues {
+	return {
 		tag: rule.tag,
 		component: rule.component,
 		closing: rule.tag === 'hr' ? ' /' : ''
-	});
+	};
 }
 
 export function checkMarkup(content: string, filename?: string): Violation[] {
@@ -748,27 +764,27 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 	const parentDir = getParentDir(filename);
 	const lineStarts = buildLineIndex(markup);
 	const lineOf = (i: number) => lookupLine(lineStarts, i);
-	const allowed = (_ruleId: string) => true;
+	const policy = createLintPolicy({ target: 'markup', filename, source: markup });
 
-	if (allowed('dryui/no-inline-style')) {
+	if (policy.isRuleEnabled('dryui/no-inline-style')) {
 		for (const match of markup.matchAll(INLINE_STYLE_RE)) {
-			violations.push(lintViolation('dryui/no-inline-style', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-inline-style', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-style-directive')) {
+	if (policy.isRuleEnabled('dryui/no-style-directive')) {
 		for (const match of markup.matchAll(STYLE_DIRECTIVE_RE)) {
-			violations.push(lintViolation('dryui/no-style-directive', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-style-directive', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-attach')) {
+	if (policy.isRuleEnabled('dryui/no-attach')) {
 		for (const match of executableMarkup.matchAll(ATTACH_RE)) {
-			violations.push(lintViolation('dryui/no-attach', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-attach', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-raw-element')) {
+	if (policy.isRuleEnabled('dryui/no-raw-element')) {
 		const componentOnlyMarkup = stripSvelteHeadBlocks(markup);
 		for (const tag of findAllOpeningTags(componentOnlyMarkup)) {
 			if (isComponentOnlyAllowedTag(tag.tagName)) continue;
@@ -776,59 +792,63 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 			// Tags with a more specific rule (anchor, NATIVE_ELEMENT_RULES) get
 			// targeted guidance from those rules instead of a generic ban.
 			if (tag.tagName === 'a' || NATIVE_ELEMENT_RULE_TAGS.has(tag.tagName)) continue;
-			violations.push(
-				lintViolation('dryui/no-raw-element', lineOf(tag.index), { tag: tag.tagName })
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-raw-element', lineOf(tag.index), {
+				tag: tag.tagName
+			});
 		}
 	}
 
-	if (allowed('dryui/no-layout-component')) {
+	if (policy.isRuleEnabled('dryui/no-layout-component')) {
 		for (const match of markup.matchAll(BANNED_COMPONENT_USAGE_RE)) {
 			const comp = match[1];
-			violations.push(
-				lintViolation('dryui/no-layout-component', lineOf(match.index), {
-					action: 'use',
-					target: `<${comp}>`,
-					guidance: 'data-layout hooks with src/layout.css instead'
-				})
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-layout-component', lineOf(match.index), {
+				action: 'use',
+				target: `<${comp}>`,
+				guidance: 'data-layout hooks with src/layout.css instead'
+			});
 		}
 	}
 
-	if (allowed('dryui/no-component-class')) {
+	if (policy.isRuleEnabled('dryui/no-component-class')) {
 		for (const match of markup.matchAll(COMPONENT_CLASS_RE)) {
 			const comp = match[1] ?? 'Component';
-			violations.push(
-				lintViolation('dryui/no-component-class', lineOf(match.index), { component: comp })
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-component-class', lineOf(match.index), {
+				component: comp
+			});
 		}
 	}
 
-	if (allowed('dryui/no-css-ignore')) {
+	if (policy.isRuleEnabled('dryui/no-css-ignore')) {
 		for (const match of markup.matchAll(CSS_IGNORE_RE)) {
-			violations.push(lintViolation('dryui/no-css-ignore', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-css-ignore', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-svelte-element') && !isRuleOwner(filename, 'dryui/no-svelte-element')) {
+	if (policy.isRuleEnabled('dryui/no-svelte-element')) {
 		for (const match of markup.matchAll(SVELTE_ELEMENT_RE)) {
-			violations.push(lintViolation('dryui/no-svelte-element', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-svelte-element', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-anchor-without-href')) {
+	if (policy.isRuleEnabled('dryui/no-anchor-without-href')) {
 		for (const tag of findOpeningTags(markup, 'a')) {
 			if (anchorHasHref(tag.text)) continue;
-			violations.push(lintViolation('dryui/no-anchor-without-href', lineOf(tag.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-anchor-without-href', lineOf(tag.index));
 		}
 	}
 
-	if (allowed('dryui/no-raw-native-element')) {
+	if (policy.isRuleEnabled('dryui/no-raw-native-element')) {
 		for (const rule of NATIVE_ELEMENT_RULES) {
 			if (rule.allowedDirs.has(parentDir)) continue;
 
 			for (const match of markup.matchAll(rule.re)) {
-				violations.push(createNativeElementViolation(rule, lineOf(match.index)));
+				addPolicyViolation(
+					policy,
+					violations,
+					'dryui/no-raw-native-element',
+					lineOf(match.index),
+					nativeElementViolationValues(rule)
+				);
 			}
 		}
 	}
@@ -898,93 +918,87 @@ export function checkStyle(
 	const exemptClasses = context.chipGroupExemptClasses ?? new Set<string>();
 	const inChipGroupScope = (idx: number): boolean =>
 		selectorIsChipGroupExempt(selectorAtOffset(scan, idx), exemptClasses);
-	const allowed = (_ruleId: string) => true;
+	const policy = createLintPolicy({ target: 'style', filename, source: content });
 
-	if (allowed('dryui/no-raw-grid') && !isRuleOwner(filename, 'dryui/no-raw-grid')) {
+	if (policy.isRuleEnabled('dryui/no-raw-grid')) {
 		for (const match of scan.matchAll(RAW_GRID_DISPLAY_RE)) {
-			violations.push(
-				lintViolation('dryui/no-raw-grid', lineOf(match.index), { value: match[0].trim() })
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-raw-grid', lineOf(match.index), {
+				value: match[0].trim()
+			});
 		}
 
 		for (const match of scan.matchAll(RAW_GRID_PROPS_RE)) {
 			const prop = match[0].trim().replace(/;$/, '').split(':')[0]!.trim();
-			violations.push(lintViolation('dryui/no-raw-grid', lineOf(match.index), { value: prop }));
+			addPolicyViolation(policy, violations, 'dryui/no-raw-grid', lineOf(match.index), {
+				value: prop
+			});
 		}
 	}
 
-	if (allowed('dryui/no-flex') && !isRuleOwner(filename, 'dryui/no-flex')) {
+	if (policy.isRuleEnabled('dryui/no-flex')) {
 		for (const match of scan.matchAll(FLEX_DISPLAY_RE)) {
 			if (inChipGroupScope(match.index)) continue;
-			violations.push(
-				lintViolation('dryui/no-flex', lineOf(match.index), {
-					value: 'display: flex',
-					guidance: 'display: grid, or move page-level flex to src/layout.css'
-				})
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-flex', lineOf(match.index), {
+				value: 'display: flex',
+				guidance: 'display: grid, or move page-level flex to src/layout.css'
+			});
 		}
 
 		for (const match of scan.matchAll(FLEX_PROPS_RE)) {
 			if (inChipGroupScope(match.index)) continue;
 			const prop = match[0].trim().replace(/;/, '').split(':')[0]!.trim();
-			violations.push(
-				lintViolation('dryui/no-flex', lineOf(match.index), {
-					value: prop,
-					guidance: 'CSS grid equivalents, or move page-level flex to src/layout.css'
-				})
-			);
+			addPolicyViolation(policy, violations, 'dryui/no-flex', lineOf(match.index), {
+				value: prop,
+				guidance: 'CSS grid equivalents, or move page-level flex to src/layout.css'
+			});
 		}
 	}
 
-	if (allowed('dryui/no-width') && !isRuleOwner(filename, 'dryui/no-width')) {
+	if (policy.isRuleEnabled('dryui/no-width')) {
 		for (const match of scan.matchAll(WIDTH_RE)) {
 			const rawValue = (match[1] ?? '').trim();
 			// Allow typographic measure units (ch, ex, em) — they track text content,
 			// not viewport layout. e.g. `max-width: 55ch` constrains text columns.
 			// Reject if the value also contains pixel/viewport units (mixed calcs stay banned).
 			if (MEASURE_UNIT_RE.test(rawValue) && !PIXEL_UNIT_RE.test(rawValue)) continue;
-			violations.push(lintViolation('dryui/no-width', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-width', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-all-unset')) {
+	if (policy.isRuleEnabled('dryui/no-all-unset')) {
 		for (const match of scan.matchAll(ALL_UNSET_RE)) {
-			violations.push(lintViolation('dryui/no-all-unset', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-all-unset', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-important') && !isRuleOwner(filename, 'dryui/no-important')) {
+	if (policy.isRuleEnabled('dryui/no-important')) {
 		for (const match of scan.matchAll(IMPORTANT_RE)) {
-			violations.push(lintViolation('dryui/no-important', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-important', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-global') && !isRuleOwner(filename, 'dryui/no-global')) {
+	if (policy.isRuleEnabled('dryui/no-global')) {
 		for (const match of scan.matchAll(GLOBAL_SELECTOR_RE)) {
-			violations.push(lintViolation('dryui/no-global', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/no-global', lineOf(match.index));
 		}
 	}
 
-	if (allowed('dryui/no-media-sizing')) {
+	if (policy.isRuleEnabled('dryui/no-media-sizing')) {
 		for (const match of scan.matchAll(MEDIA_QUERY_RE)) {
 			const query = match[0];
 			if (!ALLOWED_MEDIA_RE.test(query)) {
-				violations.push(lintViolation('dryui/no-media-sizing', lineOf(match.index)));
+				addPolicyViolation(policy, violations, 'dryui/no-media-sizing', lineOf(match.index));
 			}
 		}
 	}
 
-	if (allowed('dryui/prefer-focus-ring-token')) {
+	if (policy.isRuleEnabled('dryui/prefer-focus-ring-token')) {
 		for (const match of scan.matchAll(FOCUS_RING_LITERAL_RE)) {
-			violations.push(lintViolation('dryui/prefer-focus-ring-token', lineOf(match.index)));
+			addPolicyViolation(policy, violations, 'dryui/prefer-focus-ring-token', lineOf(match.index));
 		}
 	}
 
-	if (
-		allowed('dryui/no-partial-inset-shadow') &&
-		!isRuleOwner(filename, 'dryui/no-partial-inset-shadow') &&
-		scan.includes('inset')
-	) {
+	if (policy.isRuleEnabled('dryui/no-partial-inset-shadow') && scan.includes('inset')) {
 		for (const match of scan.matchAll(INSET_SHADOW_RE)) {
 			const x = parseFloat(match[1]!);
 			const y = parseFloat(match[2]!);
@@ -993,7 +1007,12 @@ export function checkStyle(
 			const xNonZero = x !== 0;
 			const yNonZero = y !== 0;
 			if (xNonZero !== yNonZero) {
-				violations.push(lintViolation('dryui/no-partial-inset-shadow', lineOf(match.index)));
+				addPolicyViolation(
+					policy,
+					violations,
+					'dryui/no-partial-inset-shadow',
+					lineOf(match.index)
+				);
 			}
 		}
 	}

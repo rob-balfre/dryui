@@ -88,8 +88,8 @@ function prepareLocalDryuiCodexHome(): string {
 
 	// The plugin marketplace bundle was sunset (users now install via
 	// `npx skills add rob-balfre/dryui`), so we wire DryUI MCP servers directly
-	// instead. Same shape `dryui init` writes to a real ~/.codex/config.toml,
-	// just pointing at the in-tree bun entrypoints rather than published npm.
+	// instead. This mirrors the documented Codex MCP config shape, just pointing
+	// at the in-tree bun entrypoints rather than published npm.
 	const dryuiCmd = `cd ${tomlString(repoRoot)} && exec bun packages/mcp/src/index.ts`;
 	const feedbackCmd = `cd ${tomlString(repoRoot)} && exec bun packages/feedback-server/src/mcp.ts`;
 	const codexHome = mkdtempSync(resolve(tmpdir(), 'dryui-e2e-codex-home-'));

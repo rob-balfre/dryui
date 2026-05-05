@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { EventBus } from '../src/events.ts';
 import { startFeedbackHttpServer } from '../src/http.ts';
 import { FeedbackStore } from '../src/store.ts';
+import type { SubmissionPresentation } from '../src/submission-presentation.ts';
 import type { Annotation, Session, Submission } from '../src/types.ts';
 
 const FOREIGN_ORIGIN = 'https://attacker.example';
@@ -388,26 +389,55 @@ describe('feedback HTTP server', () => {
 
 		const queueResponse = await fetch(`${baseUrl}/submissions`);
 		expect(queueResponse.status).toBe(200);
-		expect(await queueResponse.json()).toMatchObject({
-			count: 2,
-			submissions: [
-				expect.objectContaining({ id: pendingOlder.id, status: 'pending' }),
-				expect.objectContaining({ id: pendingNewer.id, status: 'pending' })
-			]
+		const queuePayload = (await queueResponse.json()) as {
+			count: number;
+			submissions: SubmissionPresentation[];
+		};
+		expect(queuePayload.count).toBe(2);
+		expect(queuePayload.submissions.map(({ id, status }) => ({ id, status }))).toEqual([
+			{ id: pendingOlder.id, status: 'pending' },
+			{ id: pendingNewer.id, status: 'pending' }
+		]);
+		const queuedOlder = queuePayload.submissions.find(
+			(submission) => submission.id === pendingOlder.id
+		);
+		expect(queuedOlder?.preferredScreenshotPath).toBe(pendingOlder.screenshotPath.png);
+		expect(queuedOlder?.drawingHints).toHaveLength(1);
+		expect(queuedOlder?.summary).toEqual({
+			drawingCount: 1,
+			hintCount: 1,
+			drawingKinds: { arrow: 1 },
+			corners: { 'top-left': 1 }
 		});
+
+		const singleResponse = await fetch(`${baseUrl}/submissions/${pendingOlder.id}`);
+		expect(singleResponse.status).toBe(200);
+		const singlePayload = (await singleResponse.json()) as SubmissionPresentation;
+		expect(singlePayload.id).toBe(pendingOlder.id);
+		expect(singlePayload.preferredScreenshotPath).toBe(pendingOlder.screenshotPath.png);
+		expect(singlePayload.drawingHints[0]?.drawing.id).toBe('arrow-older');
+		expect(singlePayload.drawingHints[0]?.hint?.corner).toBe('top-left');
 
 		const historyResponse = await fetch(`${baseUrl}/submissions?status=resolved`);
 		expect(historyResponse.status).toBe(200);
-		expect(await historyResponse.json()).toMatchObject({
-			count: 1,
-			submissions: [expect.objectContaining({ id: resolved.id, status: 'resolved' })]
-		});
+		const historyPayload = (await historyResponse.json()) as {
+			count: number;
+			submissions: SubmissionPresentation[];
+		};
+		expect(historyPayload.count).toBe(1);
+		expect(historyPayload.submissions.map(({ id, status }) => ({ id, status }))).toEqual([
+			{ id: resolved.id, status: 'resolved' }
+		]);
+		expect(historyPayload.submissions[0]?.textNotes).toEqual(['Looks good']);
 
 		const allResponse = await fetch(`${baseUrl}/submissions?status=all`);
 		expect(allResponse.status).toBe(200);
-		const allPayload = await allResponse.json();
+		const allPayload = (await allResponse.json()) as {
+			count: number;
+			submissions: SubmissionPresentation[];
+		};
 		expect(allPayload.count).toBe(3);
-		expect(allPayload.submissions.map((submission: Submission) => submission.id).sort()).toEqual(
+		expect(allPayload.submissions.map((submission) => submission.id).sort()).toEqual(
 			[pendingOlder.id, pendingNewer.id, resolved.id].sort()
 		);
 
@@ -436,11 +466,14 @@ describe('feedback HTTP server', () => {
 
 		const afterDeleteResponse = await fetch(`${baseUrl}/submissions?status=all`);
 		expect(afterDeleteResponse.status).toBe(200);
-		const afterDeletePayload = await afterDeleteResponse.json();
+		const afterDeletePayload = (await afterDeleteResponse.json()) as {
+			count: number;
+			submissions: SubmissionPresentation[];
+		};
 		expect(afterDeletePayload.count).toBe(2);
-		expect(
-			afterDeletePayload.submissions.map((submission: Submission) => submission.id)
-		).not.toContain(pendingOlder.id);
+		expect(afterDeletePayload.submissions.map((submission) => submission.id)).not.toContain(
+			pendingOlder.id
+		);
 	});
 
 	test('rejects submissions missing paired image fields', async () => {
@@ -510,7 +543,7 @@ describe('feedback HTTP server', () => {
 
 		// Round-trip via GET to confirm the column persisted, not just the insert return value.
 		const queueResponse = await fetch(`${baseUrl}/submissions`);
-		const payload = (await queueResponse.json()) as { submissions: Submission[] };
+		const payload = (await queueResponse.json()) as { submissions: SubmissionPresentation[] };
 		const persisted = payload.submissions.find((entry) => entry.id === submission.id);
 		expect(persisted?.workspace).toBe(workspace);
 	});

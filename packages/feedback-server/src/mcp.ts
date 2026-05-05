@@ -2,8 +2,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { FeedbackHttpClient } from './client.js';
-import { buildSubmissionPresentation } from './submission-presentation.js';
-import type { Annotation, Submission } from './types.js';
+import { ensureSubmissionPresentation } from './submission-presentation.js';
+import type { Annotation } from './types.js';
 
 type FeedbackToolClient = Pick<
 	FeedbackHttpClient,
@@ -180,7 +180,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 
 	tool(
 		'feedback_get_submissions',
-		'Poll for pending feedback submissions. Returns both WebP and PNG screenshot paths, scroll offset at submit time, per-drawing position hints, and the raw drawings.',
+		'Poll for pending feedback submissions. Returns SubmissionPresentation: preferred screenshot path, scroll offset, drawing hints, text notes, summaries, and preserved raw intent arrays.',
 		inputSchema({
 			timeoutSeconds: z
 				.number()
@@ -206,7 +206,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			);
 
 			if (!timedOut && value) {
-				const submissions = value.submissions.map(buildSubmissionPresentation);
+				const submissions = value.submissions.map(ensureSubmissionPresentation);
 				return {
 					content: [
 						{

@@ -20504,28 +20504,6 @@
       ],
       "example": "<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
     },
-    "Motion": {
-      "import": "@dryui/primitives",
-      "description": "Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens.",
-      "category": "display",
-      "tags": [
-        "motion",
-        "animation",
-        "enter",
-        "exit",
-        "stagger",
-        "polish"
-      ],
-      "compound": false,
-      "props": {},
-      "a11y": [
-        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
-        "Keep heading, reading, and focus order aligned with the surrounding content."
-      ],
-      "cssVars": {},
-      "dataAttributes": [],
-      "example": "<Motion>Content</Motion>"
-    },
     "PageHeader": {
       "import": "@dryui/primitives",
       "description": "Page-level header with eyebrow, title, description, metadata, and actions",

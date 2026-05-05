@@ -1,4 +1,5 @@
-import { buildSubmissionPresentation, getSubmissionTextNotes } from './submission-presentation.js';
+import { getSubmissionTextNotes } from './submission-presentation.js';
+import type { SubmissionPresentation } from './submission-presentation.js';
 import type { Submission, SubmissionDrawing } from './types.js';
 
 export const FEEDBACK_LINTER_PROMPT_STEP =
@@ -16,6 +17,9 @@ export interface FeedbackPromptOptions {
 	skillPath?: string;
 }
 
+export type FeedbackDispatchPromptSubmission = Pick<Submission, 'id' | 'url' | 'drawings'> &
+	Partial<Pick<SubmissionPresentation, 'textNotes'>>;
+
 export function getTextNotes(drawings: readonly SubmissionDrawing[] | undefined): string[] {
 	return getSubmissionTextNotes(drawings);
 }
@@ -25,12 +29,10 @@ function skillReference(options: FeedbackPromptOptions | undefined): string {
 }
 
 export function buildFeedbackDispatchPrompt(
-	s: Pick<Submission, 'id' | 'url' | 'drawings'> | Submission,
+	s: FeedbackDispatchPromptSubmission,
 	options?: FeedbackPromptOptions
 ): string {
-	const textNotes = isCompleteSubmission(s)
-		? buildSubmissionPresentation(s).textNotes
-		: getSubmissionTextNotes(s.drawings);
+	const textNotes = s.textNotes ?? getSubmissionTextNotes(s.drawings);
 	const notes =
 		textNotes.length > 0
 			? `\n\nText notes from the annotation:\n${textNotes.map((note) => `- ${note}`).join('\n')}`
@@ -40,17 +42,6 @@ export function buildFeedbackDispatchPrompt(
 Read your canonical skill at \`${skillReference(options)}\` first — it has the submission shape, the intent kinds, the lint trip-wires, and the resolve handshake. Then fetch the submission, read the screenshot, apply the smallest source edit that satisfies the user's intent, run the relevant project checks, and call \`feedback_resolve_submission\`.
 
 ${FEEDBACK_PIPELINE_PROMPT_STEP}${notes}`;
-}
-
-function isCompleteSubmission(
-	submission: Pick<Submission, 'id' | 'url' | 'drawings'> | Submission
-): submission is Submission {
-	return (
-		'screenshotPath' in submission &&
-		'viewport' in submission &&
-		'status' in submission &&
-		'createdAt' in submission
-	);
 }
 
 export function buildFeedbackBulkPrompt(options?: FeedbackPromptOptions): string {

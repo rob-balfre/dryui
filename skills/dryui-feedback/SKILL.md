@@ -9,19 +9,23 @@ Single job: take **one** feedback submission and apply the smallest change that 
 
 ## The submission shape
 
-A submission is a JSON object (fetch with MCP `feedback_get_submissions` or `curl http://127.0.0.1:4748/submissions`):
+A submission is a presentation JSON object (fetch with MCP `feedback_get_submissions` or `curl http://127.0.0.1:4748/submissions/<id>`):
 
 ```
 id, url, viewport, scroll
-screenshotPath: { png, webp }    ← read png; fall back to webp if png is empty
-drawings[]                       ← annotations the user drew
-hints[]                          ← parallel array: each drawing's nearest element + position
+preferredScreenshotPath          ← read this first
+screenshotPath: { png, webp }    ← raw screenshot paths; png may be empty for legacy rows
+textNotes[]                      ← direct text instructions extracted from drawings
+drawingHints[]                   ← paired { drawing, hint } entries
+summary                          ← counts by intent kind, hint corner, and structured change kind
+drawings[]                       ← raw annotations the user drew
+hints[]                          ← raw parallel array: each drawing's nearest element + position
 components[]                     ← components the user added through the inspector
 removed[]                        ← elements the user removed
 moved[]                          ← elements the user dragged to a new position
 ```
 
-The screenshot is the most direct signal — open it before reading any structured data. Everything else exists to disambiguate what you're seeing.
+The screenshot is the most direct signal — open `preferredScreenshotPath` before reading any structured data. Everything else exists to disambiguate what you're seeing. The raw arrays are preserved as escape hatches when the presentation fields are not enough.
 
 ## Decoding the four intent kinds
 
@@ -29,7 +33,7 @@ Each submission can carry zero or more of these. Treat them as instructions, not
 
 ### `drawings[]` — annotations
 
-Each entry has a `kind` (`freehand` / `arrow` / `text` / `eraser`) and coordinates. Treat **`text` notes as direct user instructions** — they're literal sentences the user typed onto the page (e.g. "more padding here", "make this blue", "remove this"). Pair each text note with the nearest `hints[i]` entry to find which DOM element it points at: `hints[i].element` gives the tag/selector/text content, `hints[i].corner` and `hints[i].percentX/Y` say where on the screenshot the mark sits.
+Each entry has a `kind` (`freehand` / `arrow` / `text` / `eraser`) and coordinates. Treat **`textNotes[]` as direct user instructions** — they're literal sentences the user typed onto the page (e.g. "more padding here", "make this blue", "remove this"). Use `drawingHints[]` to pair each drawing with its nearest DOM hint; the raw `drawings[]` and `hints[]` arrays remain available if you need index-level detail.
 
 Arrows usually point _from_ a label _to_ the thing being modified. Freehand sketches mark a region without naming it — combine with the screenshot to figure out what's circled.
 
@@ -112,10 +116,10 @@ Erring towards "apply directly" is usually right for single-region tweaks. Hand 
 ## Workflow
 
 1. **Get the submission.** Use MCP `feedback_get_submissions` (preferred) or `curl http://127.0.0.1:4748/submissions/<id>`.
-2. **Read the screenshot.** Use the `Read` tool on `screenshotPath.png`. This is the ground truth.
+2. **Read the screenshot.** Use the `Read` tool on `preferredScreenshotPath`. This is the ground truth.
 3. **Locate the page in source.** The submission's `url` maps to a route. For `http://localhost:5174/foo` that's `src/routes/foo/+page.svelte`. For the index, `src/routes/+page.svelte`.
-4. **Pair drawings with hints.** For each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
-5. **Apply intents.** In order: `drawings` (text notes are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually hand off to `dryui-layout`). Make the smallest source edit that satisfies each.
+4. **Pair drawings with hints.** Prefer `drawingHints[]`; each pair has `{ drawing, hint }`. If you need the raw arrays, for each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
+5. **Apply intents.** In order: `drawings` (`textNotes[]` are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually hand off to `dryui-layout`). Make the smallest source edit that satisfies each.
 6. **Run checks.** Run the project’s focused check/build/test command for the changed file or package. Fix any violations the edit introduced — re-read this skill's lint section if confused.
 7. **Resolve.** Call MCP `feedback_resolve_submission` with the submission id, or `curl -X PATCH http://127.0.0.1:4748/submissions/<id> -H "Content-Type: application/json" -d '{"status":"resolved"}'`. The dashboard depends on this to clear the submission from the queue.
 

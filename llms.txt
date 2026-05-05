@@ -1,6 +1,6 @@
 # DryUI
 
-> Human-led, agent-assisted UI for building web apps with 165 reusable components, theme tokens, route patterns, and validation checks.
+> Human-led, agent-assisted UI for building web apps with 164 reusable components, theme tokens, route patterns, and validation checks.
 
 ## Packages
 
@@ -1469,13 +1469,6 @@ Props: Root: columns (number), default 5 | gap (string) | align ('start' | 'cent
 Data attributes: data-part
 Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
 Example: <LogoCloud.Root>
-
-### Motion
-Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens..
-Import: @dryui/primitives
-Data attributes: none
-Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
-Example: <Motion>Content</Motion>
 
 ### StatCard
 Compact KPI card with label, value, and trend.

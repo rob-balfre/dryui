@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname } from 'node:path';
 import type { PreprocessorGroup } from 'svelte/compiler';
 import { checkScript, checkMarkup, checkStyle, type Violation } from './rules.js';
-import { RULE_CATALOG, type RuleSeverity } from './rule-catalog.js';
+import { lintRuleSeverity } from './lint-policy.js';
 
 export interface DryuiLintOptions {
 	strict?: boolean;
@@ -25,19 +25,11 @@ function formatViolation(filename: string, v: Violation): string {
 	return `[${v.rule}] ${filename}:${v.line} — ${v.message}`;
 }
 
-const SEVERITY_BY_ID = RULE_CATALOG as Record<string, { severity: RuleSeverity }>;
-
-function severityOf(rule: string): RuleSeverity {
-	const entry = SEVERITY_BY_ID[rule];
-	if (entry) return entry.severity;
-	return 'error';
-}
-
 function report(filename: string, violations: Violation[], strict: boolean): void {
 	if (violations.length === 0) return;
 
-	const blocking = violations.filter((v) => severityOf(v.rule) === 'error');
-	const nonBlocking = violations.filter((v) => severityOf(v.rule) !== 'error');
+	const blocking = violations.filter((v) => lintRuleSeverity(v.rule) === 'error');
+	const nonBlocking = violations.filter((v) => lintRuleSeverity(v.rule) !== 'error');
 
 	for (const v of nonBlocking) {
 		console.warn(formatViolation(filename, v));

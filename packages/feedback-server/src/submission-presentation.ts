@@ -42,6 +42,39 @@ export interface SubmissionPresentation {
 	};
 }
 
+export interface SubmissionPresentationListResponse {
+	count: number;
+	submissions: SubmissionPresentation[];
+}
+
+export function isSubmissionPresentation(
+	submission: Submission | SubmissionPresentation
+): submission is SubmissionPresentation {
+	return (
+		'preferredScreenshotPath' in submission &&
+		'drawingHints' in submission &&
+		'textNotes' in submission &&
+		'summary' in submission
+	);
+}
+
+export function ensureSubmissionPresentation(
+	submission: Submission | SubmissionPresentation
+): SubmissionPresentation {
+	return isSubmissionPresentation(submission)
+		? submission
+		: buildSubmissionPresentation(submission);
+}
+
+export function buildSubmissionPresentationListResponse(
+	submissions: Submission[]
+): SubmissionPresentationListResponse {
+	return {
+		count: submissions.length,
+		submissions: submissions.map(buildSubmissionPresentation)
+	};
+}
+
 export function getSubmissionTextNotes(
 	input: readonly SubmissionDrawing[] | Pick<Submission, 'drawings'> | undefined
 ): string[] {

@@ -15,6 +15,7 @@ import type {
 	SubmissionQueryStatus,
 	SubmissionStatus
 } from './types.js';
+import type { SubmissionPresentationListResponse } from './submission-presentation.js';
 
 function trimTrailingSlash(value: string): string {
 	return value.replace(/\/$/, '');
@@ -155,8 +156,8 @@ export class FeedbackHttpClient {
 
 	async getSubmissions(
 		status: SubmissionQueryStatus = 'all'
-	): Promise<{ count: number; submissions: Submission[] }> {
-		return parseJson<{ count: number; submissions: Submission[] }>(
+	): Promise<SubmissionPresentationListResponse> {
+		return parseJson<SubmissionPresentationListResponse>(
 			await fetch(`${this.baseUrl}/submissions?status=${encodeURIComponent(status)}`)
 		);
 	}

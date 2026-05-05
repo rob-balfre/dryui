@@ -383,6 +383,12 @@ describe('checkMarkup', () => {
 		expect(violations[1]!.rule).toBe('dryui/no-svelte-element');
 	});
 
+	test('allows <svelte:element> with dryui-allow comment on preceding line', () => {
+		const code = `<!-- dryui-allow svelte-element -->
+<svelte:element this={tag}>heading</svelte:element>`;
+		expect(checkMarkup(code)).toHaveLength(0);
+	});
+
 	test('allows <svelte:element> in owner directories', () => {
 		const code = `<svelte:element this={tag}>heading</svelte:element>`;
 		expect(checkMarkup(code, '/abs/packages/ui/src/motion/enter.svelte')).toHaveLength(0);
@@ -417,6 +423,12 @@ describe('checkStyle', () => {
 		const violations = checkStyle('.foo { display:flex; }');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-flex');
+	});
+
+	test('allows flex with dryui-allow comment on preceding line', () => {
+		const violations = checkStyle(`/* dryui-allow flex */
+.foo { display: flex; flex-wrap: wrap; }`);
+		expect(violations.filter((v) => v.rule === 'dryui/no-flex')).toHaveLength(0);
 	});
 
 	test('allows display: inline-flex', () => {
@@ -474,6 +486,12 @@ describe('checkStyle', () => {
 		const violations = checkStyle('.foo { width: 300px; }');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-width');
+	});
+
+	test('allows width with dryui-allow comment on preceding line', () => {
+		const violations = checkStyle(`/* dryui-allow width */
+.foo { width: 300px; }`);
+		expect(violations.filter((v) => v.rule === 'dryui/no-width')).toHaveLength(0);
 	});
 
 	test('flags width: 100%', () => {
@@ -810,6 +828,12 @@ describe('checkStyle', () => {
 		const violations = checkStyle('.foo { box-shadow: inset 2px 0 0 blue; }');
 		expect(violations).toHaveLength(1);
 		expect(violations[0]!.rule).toBe('dryui/no-partial-inset-shadow');
+	});
+
+	test('allows partial inset shadow with dryui-allow comment on preceding line', () => {
+		const violations = checkStyle(`/* dryui-allow inset-shadow */
+.foo { box-shadow: inset 2px 0 0 blue; }`);
+		expect(violations.filter((v) => v.rule === 'dryui/no-partial-inset-shadow')).toHaveLength(0);
 	});
 
 	test('flags box-shadow: inset 0 -1px 0 <color> (bottom rail)', () => {

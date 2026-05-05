@@ -9,13 +9,10 @@ import type {
 	PropDef,
 	Spec
 } from './spec-types.js';
-
-export const DIR_OVERRIDES: Readonly<Record<string, string>> = {
-	QRCode: 'qr-code'
-};
+import { componentPublicSubpath } from './component-identity.js';
 
 export function componentDir(name: string): string {
-	return DIR_OVERRIDES[name] ?? name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+	return componentPublicSubpath(name);
 }
 
 export function pad(str: string, width: number): string {

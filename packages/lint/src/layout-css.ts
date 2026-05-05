@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { checkStyle, type Violation } from './rules.js';
-import { lintViolation } from './rule-definitions.js';
+import { createLintPolicy, type LintPolicy, type LintRuleId } from './lint-policy.js';
 
 export interface LayoutCssCheckOptions {
 	readonly includeGenericStyleRules?: boolean;
@@ -430,54 +430,57 @@ function scanLayoutCss(
 	content: string,
 	start: number,
 	end: number,
-	lineOf: (index: number) => number
+	lineOf: (index: number) => number,
+	policy: LintPolicy
 ): Violation[] {
 	const violations: Violation[] = [];
+	const addViolation = (
+		ruleId: LintRuleId,
+		line: number,
+		values: Record<string, string | number> = {}
+	) => {
+		const violation = policy.violation(ruleId, line, values);
+		if (violation) violations.push(violation);
+	};
 
 	for (const block of parseBlocks(content, start, end)) {
 		if (block.selector.startsWith('@')) {
 			const atRule = block.selector.split(/\s+/)[0] ?? block.selector;
 			if (atRule === '@container') {
-				violations.push(...scanLayoutCss(content, block.bodyStart, block.bodyEnd, lineOf));
+				violations.push(...scanLayoutCss(content, block.bodyStart, block.bodyEnd, lineOf, policy));
 				continue;
 			}
-			violations.push(
-				lintViolation(
-					'dryui/layout-css-at-rule',
-					lineOf(block.bodyStart - block.selector.length - 1),
-					{ atRule }
-				)
+			addViolation(
+				'dryui/layout-css-at-rule',
+				lineOf(block.bodyStart - block.selector.length - 1),
+				{
+					atRule
+				}
 			);
 			continue;
 		}
 
 		if (!selectorIsLayoutHook(block.selector)) {
-			violations.push(
-				lintViolation(
-					'dryui/layout-css-selector',
-					lineOf(block.bodyStart - block.selector.length - 1),
-					{ selector: block.selector }
-				)
+			addViolation(
+				'dryui/layout-css-selector',
+				lineOf(block.bodyStart - block.selector.length - 1),
+				{ selector: block.selector }
 			);
 		}
 
 		for (const declaration of declarationEntries(content, block.bodyStart, block.bodyEnd)) {
 			if (!isAllowedProperty(declaration.property)) {
-				violations.push(
-					lintViolation('dryui/layout-css-property', lineOf(declaration.index), {
-						property: declaration.property
-					})
-				);
+				addViolation('dryui/layout-css-property', lineOf(declaration.index), {
+					property: declaration.property
+				});
 				continue;
 			}
 
 			if (!isAllowedValue(declaration.property, declaration.value)) {
-				violations.push(
-					lintViolation('dryui/layout-css-value', lineOf(declaration.index), {
-						property: declaration.property,
-						value: declaration.value
-					})
-				);
+				addViolation('dryui/layout-css-value', lineOf(declaration.index), {
+					property: declaration.property,
+					value: declaration.value
+				});
 			}
 		}
 	}
@@ -485,9 +488,7 @@ function scanLayoutCss(
 	const topLevelStatements = content.slice(start, end).matchAll(/@[^{;]+;/g);
 	for (const match of topLevelStatements) {
 		const atRule = (match[0].trim().split(/\s+/)[0] ?? match[0]).replace(/;$/, '');
-		violations.push(
-			lintViolation('dryui/layout-css-at-rule', lineOf(start + (match.index ?? 0)), { atRule })
-		);
+		addViolation('dryui/layout-css-at-rule', lineOf(start + (match.index ?? 0)), { atRule });
 	}
 
 	return violations;
@@ -511,7 +512,8 @@ export function checkLayoutCss(
 	const scan = stripCssComments(content);
 	const lineStarts = buildLineIndex(content);
 	const lineOf = (index: number) => lookupLine(lineStarts, index);
-	const violations = scanLayoutCss(scan, 0, scan.length, lineOf);
+	const policy = createLintPolicy({ target: 'layout-css', filename, source: content });
+	const violations = scanLayoutCss(scan, 0, scan.length, lineOf, policy);
 	if (options.includeGenericStyleRules ?? true) {
 		violations.push(...checkStyle(content, {}, filename));
 	}

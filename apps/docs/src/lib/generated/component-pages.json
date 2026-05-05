@@ -24474,7 +24474,7 @@
       },
       "related": null,
       "hasRootPart": false,
-      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/enter",
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/motion",
       "rootImport": "import { Enter } from '@dryui/ui'",
       "subpathImport": "import { Enter } from '@dryui/ui/enter'",
       "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Enter } from '@dryui/ui';\n</script>\n\n<Enter>Content</Enter>"
@@ -24510,7 +24510,7 @@
       },
       "related": null,
       "hasRootPart": false,
-      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/exit",
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/motion",
       "rootImport": "import { Exit } from '@dryui/ui'",
       "subpathImport": "import { Exit } from '@dryui/ui/exit'",
       "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Exit } from '@dryui/ui';\n</script>\n\n<Exit>Content</Exit>"
@@ -24546,7 +24546,7 @@
       },
       "related": null,
       "hasRootPart": false,
-      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/stagger",
+      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/ui/src/motion",
       "rootImport": "import { Stagger } from '@dryui/ui'",
       "subpathImport": "import { Stagger } from '@dryui/ui/stagger'",
       "quickStartCode": "<script lang=\"ts\">\n  import '@dryui/ui/themes/default.css';\n  import '@dryui/ui/themes/dark.css';\n  import { Stagger } from '@dryui/ui';\n</script>\n\n<Stagger>Content</Stagger>"
@@ -25522,36 +25522,6 @@
       "rootImport": "import { LogoCloud } from '@dryui/primitives'",
       "subpathImport": null,
       "quickStartCode": "<script lang=\"ts\">\n  import { LogoCloud } from '@dryui/primitives';\n</script>\n\n<LogoCloud.Root>\n  <LogoCloud.Item>...</LogoCloud.Item>\n</LogoCloud.Root>"
-    },
-    "Motion": {
-      "component": {
-        "import": "@dryui/primitives",
-        "description": "Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens.",
-        "category": "display",
-        "tags": [
-          "motion",
-          "animation",
-          "enter",
-          "exit",
-          "stagger",
-          "polish"
-        ],
-        "compound": false,
-        "props": {},
-        "a11y": [
-          "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
-          "Keep heading, reading, and focus order aligned with the surrounding content."
-        ],
-        "cssVars": {},
-        "dataAttributes": [],
-        "example": "<Motion>Content</Motion>"
-      },
-      "related": null,
-      "hasRootPart": false,
-      "sourceUrl": "https://github.com/rob-balfre/dryui/tree/main/packages/primitives/src/motion",
-      "rootImport": "import { Motion } from '@dryui/primitives'",
-      "subpathImport": null,
-      "quickStartCode": "<script lang=\"ts\">\n  import { Motion } from '@dryui/primitives';\n</script>\n\n<Motion>Content</Motion>"
     },
     "PageHeader": {
       "component": {

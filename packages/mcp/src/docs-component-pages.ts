@@ -1,4 +1,8 @@
-import { componentDir } from './spec-formatters.js';
+import {
+	componentImplementationDir,
+	componentRootImport,
+	componentSubpathImport
+} from './component-identity.js';
 import type { ComponentDef, CompositionComponentDef, Spec } from './spec-types.js';
 
 const REPO_URL = 'https://github.com/rob-balfre/dryui';
@@ -45,12 +49,12 @@ function sourcePackage(component: ComponentDef): 'ui' | 'primitives' {
 }
 
 function getRootImport(name: string, component: ComponentDef): string {
-	return `import { ${name} } from '${component.import}'`;
+	return componentRootImport(name, component.import);
 }
 
 function getSubpathImport(name: string, component: ComponentDef): string | null {
 	if (component.import !== '@dryui/ui') return null;
-	return `import { ${name} } from '${component.import}/${componentDir(name)}'`;
+	return componentSubpathImport(name, component.import);
 }
 
 function buildQuickStartCode(
@@ -89,7 +93,7 @@ function buildDocsComponentPageEntry(
 		component,
 		related: spec.composition?.components[normalizeCompositionKey(name)] ?? null,
 		hasRootPart: Boolean(component.parts?.Root),
-		sourceUrl: `${REPO_URL}/tree/main/packages/${sourcePackage(component)}/src/${componentDir(name)}`,
+		sourceUrl: `${REPO_URL}/tree/main/packages/${sourcePackage(component)}/src/${componentImplementationDir(name)}`,
 		rootImport: getRootImport(name, component),
 		subpathImport: getSubpathImport(name, component),
 		quickStartCode: buildQuickStartCode(name, component, spec.themeImports)

@@ -32,7 +32,8 @@
 	} from 'lucide-svelte';
 	import { normalizeDevUrl } from '../../src/dev-url.js';
 	import { buildFeedbackBulkPrompt } from '../../src/prompts.js';
-	import type { Submission, SubmissionStatus } from '../../src/types.js';
+	import type { SubmissionPresentation } from '../../src/submission-presentation.js';
+	import type { SubmissionStatus } from '../../src/types.js';
 	import AgentIcon from './agent-icon.svelte';
 	import { AGENT_INFO, type DispatchAgent } from './agent-meta.js';
 	import SubmissionCard from './submission-card.svelte';
@@ -42,7 +43,7 @@
 
 	interface SubmissionResponse {
 		count: number;
-		submissions: Submission[];
+		submissions: SubmissionPresentation[];
 	}
 
 	type DispatchSkillPaths = Partial<Record<DispatchAgent, string>>;
@@ -110,7 +111,7 @@
 		search = '';
 		searchOpen = false;
 	}
-	let submissions = $state<Submission[]>([]);
+	let submissions = $state<SubmissionPresentation[]>([]);
 	let dispatchTargets = $state<DispatchAgent[]>([]);
 	let targetAgent = $state<DispatchAgent | null>(null);
 	let dispatchSkillPaths = $state<DispatchSkillPaths>({});
@@ -244,27 +245,24 @@
 			.filter(Boolean);
 	}
 
-	function searchableText(submission: Submission): string {
-		const textNotes = submission.drawings
-			.flatMap((drawing) =>
-				drawing.kind === 'text' && typeof drawing.text === 'string' && drawing.text.length > 0
-					? [drawing.text]
-					: []
-			)
+	function searchableText(submission: SubmissionPresentation): string {
+		const textNotes = submission.textNotes.join(' ').toLowerCase();
+		const componentText = (submission.components ?? [])
+			.flatMap((component) => [component.kind, component.label ?? ''])
 			.join(' ')
 			.toLowerCase();
 
 		try {
 			const url = new URL(submission.url);
-			return [submission.url, url.hostname, url.pathname, submission.id, textNotes]
+			return [submission.url, url.hostname, url.pathname, submission.id, textNotes, componentText]
 				.join(' ')
 				.toLowerCase();
 		} catch {
-			return [submission.url, submission.id, textNotes].join(' ').toLowerCase();
+			return [submission.url, submission.id, textNotes, componentText].join(' ').toLowerCase();
 		}
 	}
 
-	function matchesSearch(submission: Submission, query: string): boolean {
+	function matchesSearch(submission: SubmissionPresentation, query: string): boolean {
 		const tokens = normalizeSearchTokens(query);
 		if (tokens.length === 0) return true;
 
@@ -272,7 +270,7 @@
 		return tokens.every((token) => haystack.includes(token));
 	}
 
-	function byCreatedAtDesc(a: Submission, b: Submission): number {
+	function byCreatedAtDesc(a: SubmissionPresentation, b: SubmissionPresentation): number {
 		return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 	}
 

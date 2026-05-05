@@ -23,11 +23,14 @@
 		type Tool
 	} from './types.js';
 	import {
-		describeElement,
-		describePosition,
-		type DrawingHint,
-		type ElementDescriptor
-	} from './position-hints.js';
+		captureBrowserScreenshot,
+		captureBrowserSubmissionPayload,
+		type BrowserScreenshotCapture,
+		type BrowserSubmissionAddedComponent,
+		type BrowserSubmissionMovedElement,
+		type BrowserSubmissionRemovedElement
+	} from './submission-capture-payload.js';
+	import { describeElement, type ElementDescriptor } from './position-hints.js';
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 
@@ -1901,41 +1904,8 @@
 
 	// --- Screenshot + Submit ---
 
-	interface Screenshots {
-		webp: string;
-		png: string;
-	}
-
-	function stripDataUrlPrefix(dataUrl: string): string {
-		const comma = dataUrl.indexOf(',');
-		return comma === -1 ? dataUrl : dataUrl.slice(comma + 1);
-	}
-
-	interface AddedComponentSnapshot {
-		id: string;
-		kind: string;
-		label?: string;
-		props?: Record<string, unknown>;
-		rect: { x: number; y: number; width: number; height: number };
-	}
-
-	interface RemovedElementSnapshot {
-		tag: string;
-		id?: string;
-		selector?: string;
-		rect: { x: number; y: number; width: number; height: number };
-	}
-
-	interface MovedElementSnapshot {
-		tag: string;
-		id?: string;
-		selector?: string;
-		originalRect: { x: number; y: number; width: number; height: number };
-		currentRect: { x: number; y: number; width: number; height: number };
-	}
-
-	function snapshotAddedComponents(): AddedComponentSnapshot[] {
-		const out: AddedComponentSnapshot[] = [];
+	function snapshotAddedComponents(): BrowserSubmissionAddedComponent[] {
+		const out: BrowserSubmissionAddedComponent[] = [];
 		for (const [id, record] of addedComponents) {
 			const rect = record.el.getBoundingClientRect();
 			if (rect.width < 1 || rect.height < 1) continue;
@@ -1951,8 +1921,8 @@
 		return out;
 	}
 
-	function snapshotRemovedElements(): RemovedElementSnapshot[] {
-		const out: RemovedElementSnapshot[] = [];
+	function snapshotRemovedElements(): BrowserSubmissionRemovedElement[] {
+		const out: BrowserSubmissionRemovedElement[] = [];
 		for (const record of removedElements.values()) {
 			const descriptor = record.descriptor ?? { tag: 'unknown' };
 			out.push({
@@ -1965,8 +1935,8 @@
 		return out;
 	}
 
-	function snapshotMovedElements(): MovedElementSnapshot[] {
-		const out: MovedElementSnapshot[] = [];
+	function snapshotMovedElements(): BrowserSubmissionMovedElement[] {
+		const out: BrowserSubmissionMovedElement[] = [];
 		for (const [original, clone] of layoutClones) {
 			const initial = cloneInitialSnaps.get(original);
 			if (!initial) continue;
@@ -2202,127 +2172,23 @@
 		};
 	}
 
-	async function captureScreenshot(): Promise<{
-		images: Screenshots;
-		components: AddedComponentSnapshot[];
-		removed: RemovedElementSnapshot[];
-		moved: MovedElementSnapshot[];
-	}> {
-		let stream: MediaStream | null = null;
-		const video = document.createElement('video');
-		let cleanupAnnotations: (() => void) | null = null;
-		const components = snapshotAddedComponents();
-		const removed = snapshotRemovedElements();
-		const moved = snapshotMovedElements();
-
-		const w = window.innerWidth;
-		const h = window.innerHeight;
-
-		try {
-			if (!navigator.mediaDevices?.getDisplayMedia) {
-				throw new Error('Browser screen capture is unavailable in this context.');
+	function captureScreenshot(): Promise<BrowserScreenshotCapture> {
+		return captureBrowserScreenshot({
+			readCaptureViewport: () => ({ width: window.innerWidth, height: window.innerHeight }),
+			snapshotLayout: () => ({
+				components: snapshotAddedComponents(),
+				removed: snapshotRemovedElements(),
+				moved: snapshotMovedElements()
+			}),
+			waitForNextPaint,
+			mountCaptureAnnotations,
+			setSubmitStatus: (status) => {
+				submitStatus = status;
+			},
+			setToolbarHiddenForCapture: (hidden) => {
+				toolbarHiddenForCapture = hidden;
 			}
-
-			// Capture the current tab via Screen Capture API
-			submitStatus = 'waiting-for-capture';
-			toolbarHiddenForCapture = true;
-			cleanupAnnotations = mountCaptureAnnotations();
-			await waitForNextPaint();
-			await waitForNextPaint();
-
-			stream = await navigator.mediaDevices.getDisplayMedia({
-				video: { displaySurface: 'browser' },
-				preferCurrentTab: true
-			} as DisplayMediaStreamOptions);
-
-			submitStatus = 'capturing';
-
-			video.srcObject = stream;
-			video.muted = true;
-			await video.play();
-
-			// Wait one frame for the video to render
-			await waitForNextPaint();
-
-			const canvas = document.createElement('canvas');
-			canvas.width = w;
-			canvas.height = h;
-			const ctx = canvas.getContext('2d');
-			if (!ctx) throw new Error('Could not prepare screenshot capture.');
-
-			// Draw the page capture
-			ctx.drawImage(video, 0, 0, w, h);
-
-			// Emit both WebP (compact, 0.8 quality) and PNG (lossless) so agents
-			// that cannot decode WebP still have a readable copy.
-			const webp = stripDataUrlPrefix(canvas.toDataURL('image/webp', 0.8));
-			const png = stripDataUrlPrefix(canvas.toDataURL('image/png'));
-			canvas.width = 0;
-			canvas.height = 0;
-			return { images: { webp, png }, components, removed, moved };
-		} finally {
-			stream?.getTracks().forEach((track) => track.stop());
-			video.srcObject = null;
-			cleanupAnnotations?.();
-			toolbarHiddenForCapture = false;
-		}
-	}
-
-	function anchorPointFor(drawing: Drawing): Point | null {
-		if (drawing.kind === 'freehand') return drawing.points[0] ?? null;
-		if (drawing.kind === 'arrow') return drawing.end;
-		return drawing.position;
-	}
-
-	function toViewportPoint(point: Point, space: DrawingSpace): Point {
-		if (space === 'viewport') return point;
-		return {
-			x: point.x - scrollX + viewportLeft,
-			y: point.y - scrollY + viewportTop
-		};
-	}
-
-	function buildDrawingHints(items: Drawing[]): DrawingHint[] {
-		const viewportW = window.innerWidth;
-		const viewportH = window.innerHeight;
-
-		// Temporarily disable pointer events on every descendant of the feedback
-		// root so elementFromPoint resolves to the underlying page content instead
-		// of our drawing canvas. The root itself sets pointer-events: none but its
-		// children override that to auto, so we switch each descendant back off.
-		const overlayChildren = Array.from(
-			document.querySelectorAll<HTMLElement | SVGElement>('[data-dryui-feedback] *')
-		);
-		const previousPointerEvents = overlayChildren.map((el) => el.style.pointerEvents);
-		for (const el of overlayChildren) el.style.pointerEvents = 'none';
-
-		try {
-			return items.map((drawing) => {
-				const anchor = anchorPointFor(drawing);
-				const space = drawingSpace(drawing);
-				const viewportPoint = anchor
-					? toViewportPoint(anchor, space)
-					: { x: viewportW / 2, y: viewportH / 2 };
-
-				const position = describePosition(viewportPoint.x, viewportPoint.y, viewportW, viewportH);
-
-				let element: DrawingHint['element'];
-				if (anchor) {
-					const hit = document.elementFromPoint(viewportPoint.x, viewportPoint.y);
-					const descriptor = describeElement(hit);
-					if (descriptor) element = descriptor;
-				}
-
-				return {
-					...position,
-					...(element ? { element } : {})
-				};
-			});
-		} finally {
-			overlayChildren.forEach((el, index) => {
-				el.style.pointerEvents = previousPointerEvents[index] ?? '';
-			});
-		}
+		});
 	}
 
 	async function readSubmissionId(response: Response): Promise<string | null> {
@@ -2547,28 +2413,24 @@
 			return;
 		}
 		try {
-			const { images, components, removed, moved } = await captureScreenshot();
-			submitStatus = 'uploading';
-			// Snapshot viewport + scroll after capture so the numbers line up with
-			// the frame agents will read. buildDrawingHints reads the same window
-			// metrics on purpose.
-			const viewport = { width: window.innerWidth, height: window.innerHeight };
-			const scroll = { x: scrollX, y: scrollY };
-			const hints = buildDrawingHints(drawings);
+			const payload = await captureBrowserSubmissionPayload({
+				url: currentPageUrl,
+				drawings,
+				captureScreenshot: async () => {
+					const capture = await captureScreenshot();
+					submitStatus = 'uploading';
+					return capture;
+				},
+				readGeometry: () => ({
+					viewport: { width: window.innerWidth, height: window.innerHeight },
+					scroll: { x: scrollX, y: scrollY },
+					viewportOffset: { left: viewportLeft, top: viewportTop }
+				})
+			});
 			const response = await fetch(`${serverUrl}/submissions`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					url: currentPageUrl,
-					image: images,
-					drawings,
-					hints,
-					viewport,
-					scroll,
-					...(components.length > 0 ? { components } : {}),
-					...(removed.length > 0 ? { removed } : {}),
-					...(moved.length > 0 ? { moved } : {})
-				})
+				body: JSON.stringify(payload)
 			});
 
 			if (!response.ok) {

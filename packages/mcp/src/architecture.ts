@@ -3,7 +3,8 @@ import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { docsNavComponentNames } from './component-catalog.js';
-import { parseCompoundParts } from './generate-spec.js';
+import { componentNameFromPublicSubpath, componentPublicSubpath } from './component-identity.js';
+import { parseCompoundParts } from './spec-source-extraction.js';
 import { escapeRegExp } from './utils.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,14 +18,6 @@ const architectureJsonPath = resolve(__dirname, 'architecture.json');
 const reportPath = resolve(repoRoot, 'reports/architecture-audit.md');
 
 const ARCHITECTURE_JSON_URL = new URL('./architecture.json', import.meta.url);
-
-const DIR_OVERRIDES: Record<string, string> = {
-	QRCode: 'qr-code'
-};
-
-const NAME_OVERRIDES: Record<string, string> = {
-	'qr-code': 'QRCode'
-};
 
 const PACKAGE_NODE_LABELS = {
 	primitives: 'Primitives',
@@ -222,17 +215,11 @@ function relativeRepoPath(path: string): string {
 }
 
 function pascalFromDir(dir: string): string {
-	return (
-		NAME_OVERRIDES[dir] ??
-		dir
-			.split('-')
-			.map((part) => part[0]!.toUpperCase() + part.slice(1))
-			.join('')
-	);
+	return componentNameFromPublicSubpath(dir);
 }
 
 function componentDir(name: string): string {
-	return DIR_OVERRIDES[name] ?? name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+	return componentPublicSubpath(name);
 }
 
 function visibility(rootBarrel: boolean, subpathExport: boolean): DolphinVisibility {
@@ -370,14 +357,18 @@ function parsePublicComponentNames(source: string): Set<string> {
 		if (!clause) continue;
 
 		for (const rawName of clause.split(',')) {
-			const cleaned = rawName
-				.trim()
-				.split(/\s+as\s+/u)[0]
-				?.trim();
+			const parts = rawName.trim().split(/\s+as\s+/u);
+			const cleaned = (parts[1] ?? parts[0])?.trim();
 			if (!cleaned || !/^[A-Z][A-Za-z0-9]*$/u.test(cleaned)) continue;
 			if (cleaned === cleaned.toUpperCase()) continue;
 			names.add(cleaned);
 		}
+	}
+
+	for (const match of source.matchAll(/export\s+const\s+([A-Z][A-Za-z0-9]*)\b/g)) {
+		const name = match[1];
+		if (!name || name === name.toUpperCase()) continue;
+		names.add(name);
 	}
 
 	return names;
@@ -438,7 +429,9 @@ async function parseSubpathExports(packagePath: string): Promise<Map<string, str
 		}
 
 		for (const exportedName of parsePublicComponentNames(sourceIndex)) {
-			names.set(exportedName, dir);
+			if (componentDir(exportedName) === dir) {
+				names.set(exportedName, dir);
+			}
 		}
 	}
 

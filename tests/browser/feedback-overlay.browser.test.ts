@@ -708,13 +708,28 @@ describe('feedback overlay hosting', () => {
 			expect(document.body.textContent).toContain(
 				'Pick which agent to launch in the dashboard tab.'
 			);
-			expect(
-				env.fetchSpy.mock.calls.some(
-					([input, init]) =>
-						String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
-						init?.method === 'POST'
-				)
-			).toBe(true);
+			const submissionCall = env.fetchSpy.mock.calls.find(
+				([input, init]) =>
+					String(input instanceof Request ? input.url : input).endsWith('/submissions') &&
+					init?.method === 'POST'
+			);
+			expect(submissionCall).toBeDefined();
+			const body = JSON.parse(String(submissionCall?.[1]?.body));
+			expect(Object.keys(body).sort()).toEqual([
+				'drawings',
+				'hints',
+				'image',
+				'scroll',
+				'url',
+				'viewport'
+			]);
+			expect(body.url).toBe(canonicalTestPageUrl());
+			expect(body.image).toEqual({ webp: 'ZmFrZQ==', png: 'ZmFrZQ==' });
+			expect(body.drawings).toEqual([expect.objectContaining({ kind: 'freehand' })]);
+			expect(body.hints).toHaveLength(body.drawings.length);
+			expect(body.viewport).toEqual({ width: window.innerWidth, height: window.innerHeight });
+			expect(body.scroll).toEqual({ x: 0, y: 0 });
+			expect(body.agent).toBeUndefined();
 		} finally {
 			env.restore();
 		}

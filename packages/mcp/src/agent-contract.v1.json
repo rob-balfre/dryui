@@ -10749,42 +10749,6 @@
         "  Menubar.Label"
       ]
     },
-    "Motion": {
-      "name": "Motion",
-      "description": "Motion primitives module exported from @dryui/ui/motion: Enter/Exit/Stagger component wrappers plus `enter` / `leave` Svelte transition functions driven by --dry-enter-* and --dry-exit-* tokens.",
-      "category": "display",
-      "tags": [
-        "motion",
-        "animation",
-        "enter",
-        "exit",
-        "stagger",
-        "polish"
-      ],
-      "kind": "simple",
-      "import": {
-        "package": "@dryui/primitives",
-        "statement": "import { Motion } from '@dryui/primitives'"
-      },
-      "requiredParts": [],
-      "bindableProps": [],
-      "usage": "<Motion>Content</Motion>",
-      "accessibility": [
-        "Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly.",
-        "Keep heading, reading, and focus order aligned with the surrounding content."
-      ],
-      "antiPatterns": [],
-      "rules": [
-        "Import Motion from @dryui/primitives.",
-        "Use documented props and DryUI CSS variables before custom markup or inline styles.",
-        "Preserve the accessibility notes in this contract."
-      ],
-      "checks": [
-        "Use the DryUI skill or generated component contract when Motion context is needed",
-        "Run package-level validation for changed files",
-        "Svelte MCP svelte-autofixer on edited Svelte code"
-      ]
-    },
     "MultiSelectCombobox": {
       "name": "MultiSelectCombobox",
       "description": "Searchable multi-select combobox with removable selected tokens",

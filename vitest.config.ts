@@ -37,14 +37,6 @@ export default defineConfig({
 			},
 			{ find: /^@dryui\/ui$/, replacement: resolve(__dirname, 'packages/ui/src/index.ts') },
 			{
-				find: '@dryui/mcp/project-planner',
-				replacement: resolve(__dirname, 'packages/mcp/src/project-planner.ts')
-			},
-			{
-				find: '@dryui/mcp/reviewer',
-				replacement: resolve(__dirname, 'packages/mcp/src/reviewer.ts')
-			},
-			{
 				find: '@dryui/mcp/theme-checker',
 				replacement: resolve(__dirname, 'packages/mcp/src/theme-checker.ts')
 			},

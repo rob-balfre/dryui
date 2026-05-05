@@ -8,6 +8,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { aiSurface } from './ai-surface.js';
+import { componentPublicSubpath } from './component-identity.js';
 import { buildDocsComponentPagesManifest } from './docs-component-pages.js';
 import { DOCS_ROUTES } from './docs-surface.js';
 import type { ComponentDef, DataAttributeDef, PropDef, Spec } from './spec-types.js';
@@ -59,11 +60,7 @@ function formatProps(props: Record<string, PropDef>): string {
 }
 
 function componentDir(name: string): string {
-	const overrides: Record<string, string> = {
-		QRCode: 'qr-code'
-	};
-
-	return overrides[name] ?? name.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+	return componentPublicSubpath(name);
 }
 
 function subpathImport(name: string, comp: ComponentSpec): string | null {

@@ -3,41 +3,32 @@
  * This catches violations that only surface during Vite preprocessing, making
  * them part of the CI check pipeline.
  *
- * packages/ui/src — full rule set, minus dryui/no-raw-element and dryui/no-raw-grid
- *   which consumer-only enforcement; component implementations legitimately use
- *   raw HTML and CSS grid internally.
- * packages/feedback-server/ui/src — same exemptions as packages/ui/src.
- * packages/primitives/src — dryui/no-svelte-element only. Primitives are
- *   headless and legitimately use raw <button>/<input>/etc.; other rules
- *   (flex, width) have pre-existing tolerated violations there.
+ * First-party scan targets and filtering policy live in
+ * packages/lint/src/lint-policy.ts so this script only handles file discovery
+ * and reporting.
  */
 import { Glob } from 'bun';
 import { checkStyle, checkSvelteFile, type Violation } from '../packages/lint/src/rules.js';
-import { RULE_CATALOG } from '../packages/lint/src/rule-catalog.js';
-
-const FULL_SCAN_DIRS = ['packages/ui/src', 'packages/feedback-server/ui/src'];
-const PRIMITIVES_SCAN_DIR = 'packages/primitives/src';
-
-const FIRST_PARTY_IGNORED_RULES = new Set(['dryui/no-raw-element', 'dryui/no-raw-grid']);
-const PRIMITIVES_ALLOWED_RULES = new Set(['dryui/no-svelte-element']);
+import {
+	FIRST_PARTY_LINT_SCAN_TARGETS,
+	filterFirstPartyViolations,
+	lintRuleSeverity,
+	type FirstPartyLintTarget
+} from '../packages/lint/src/lint-policy.js';
 
 let totalErrors = 0;
 const svelteGlob = new Glob('**/*.svelte');
 const cssGlob = new Glob('**/*.css');
 
-function severityOf(rule: string): 'error' | 'warning' | 'suggestion' | 'info' {
-	return RULE_CATALOG[rule]?.severity ?? 'error';
-}
-
 function reportViolation(filePath: string, violation: Violation): void {
-	const severity = severityOf(violation.rule);
+	const severity = lintRuleSeverity(violation.rule);
 	console.error(
 		`[${severity}] [${violation.rule}] ${filePath}:${violation.line} — ${violation.message}`
 	);
 	if (severity === 'error') totalErrors += 1;
 }
 
-async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
+async function lintDir(scanDir: string, target: FirstPartyLintTarget, includeCss: boolean) {
 	const sveltePaths: string[] = [];
 	for await (const path of svelteGlob.scan(scanDir)) {
 		sveltePaths.push(path);
@@ -48,9 +39,7 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 		const content = await Bun.file(filePath).text();
 		const violations = checkSvelteFile(content, filePath);
 
-		const filtered = ruleAllowlist
-			? violations.filter((v) => ruleAllowlist.has(v.rule))
-			: violations.filter((v) => !FIRST_PARTY_IGNORED_RULES.has(v.rule));
+		const filtered = filterFirstPartyViolations(target, violations);
 
 		if (filtered.length > 0) {
 			for (const v of filtered) {
@@ -59,7 +48,7 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 		}
 	}
 
-	if (ruleAllowlist) return;
+	if (!includeCss) return;
 
 	const cssPaths: string[] = [];
 	for await (const path of cssGlob.scan(scanDir)) {
@@ -69,9 +58,7 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 	for (const path of cssPaths.sort((left, right) => left.localeCompare(right))) {
 		const filePath = `${scanDir}/${path}`;
 		const content = await Bun.file(filePath).text();
-		const violations = checkStyle(content, {}, filePath).filter(
-			(v) => !FIRST_PARTY_IGNORED_RULES.has(v.rule)
-		);
+		const violations = filterFirstPartyViolations(target, checkStyle(content, {}, filePath));
 
 		if (violations.length > 0) {
 			for (const v of violations) {
@@ -81,10 +68,9 @@ async function lintDir(scanDir: string, ruleAllowlist: Set<string> | null) {
 	}
 }
 
-for (const scanDir of FULL_SCAN_DIRS) {
-	await lintDir(scanDir, null);
+for (const scanTarget of FIRST_PARTY_LINT_SCAN_TARGETS) {
+	await lintDir(scanTarget.directory, scanTarget.target, scanTarget.includeCss);
 }
-await lintDir(PRIMITIVES_SCAN_DIR, PRIMITIVES_ALLOWED_RULES);
 
 if (totalErrors > 0) {
 	console.error(`\n${totalErrors} lint error(s) found.`);

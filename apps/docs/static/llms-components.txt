@@ -1,6 +1,6 @@
 # DryUI component reference
 
-> Machine-readable component import, props, styling hook, and example index for 165 DryUI components.
+> Machine-readable component import, props, styling hook, and example index for 164 DryUI components.
 
 Theme imports:
 - @dryui/ui/themes/default.css
@@ -4170,21 +4170,6 @@ Example:
 <LogoCloud.Root>
   <LogoCloud.Item>...</LogoCloud.Item>
 </LogoCloud.Root>
-```
-
-## Motion
-Package: @dryui/primitives
-Category: display
-Tags: motion, animation, enter, exit, stagger, polish
-Kind: simple
-Root import: import { Motion } from '@dryui/primitives'
-Props: none
-CSS variables: none
-Data attributes: none
-Accessibility: Treat the component as presentational unless it exposes interactive affordances, and label any interactive affordances explicitly. | Keep heading, reading, and focus order aligned with the surrounding content.
-Example:
-```svelte
-<Motion>Content</Motion>
 ```
 
 ## StatCard

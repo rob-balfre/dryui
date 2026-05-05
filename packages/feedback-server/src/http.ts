@@ -23,6 +23,10 @@ import {
 	updateSubmissionStatus as updateSubmissionStatusOperation
 } from './operations.js';
 import { FeedbackStore } from './store.js';
+import {
+	buildSubmissionPresentation,
+	buildSubmissionPresentationListResponse
+} from './submission-presentation.js';
 import type {
 	ActionRequest,
 	Annotation,
@@ -555,7 +559,7 @@ export function startFeedbackHttpServer(
 					}
 
 					const submissions = store.listSubmissions(status ?? 'pending');
-					return json({ count: submissions.length, submissions });
+					return json(buildSubmissionPresentationListResponse(submissions));
 				}
 
 				const submissionScreenshotMatch = pathname.match(/^\/submissions\/([^/]+)\/screenshot$/);
@@ -580,7 +584,7 @@ export function startFeedbackHttpServer(
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
 					const submission = store.getSubmission(submissionId);
 					if (!submission) return errorResponse(404, 'Not found');
-					return json(submission);
+					return json(buildSubmissionPresentation(submission));
 				}
 				if (submissionMatch && request.method === 'PATCH') {
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
@@ -593,7 +597,7 @@ export function startFeedbackHttpServer(
 							body.status
 						);
 						if (!submission) return errorResponse(404, 'Not found');
-						return json(submission);
+						return json(buildSubmissionPresentation(submission));
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
