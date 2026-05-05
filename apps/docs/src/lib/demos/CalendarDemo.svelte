@@ -50,7 +50,7 @@
 			title: 'Client kickoff',
 			category: 'meeting',
 			start: d(19, 9),
-			end: d(19, 10),
+			end: d(19, 10, 30),
 			location: 'TechCorp HQ'
 		},
 		{
@@ -74,7 +74,7 @@
 			title: 'Return car',
 			category: 'ground',
 			start: d(21, 17),
-			end: d(21, 18),
+			end: d(21, 18, 30),
 			location: 'JFK rental center'
 		}
 	];

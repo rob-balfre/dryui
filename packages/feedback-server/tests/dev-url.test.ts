@@ -14,6 +14,12 @@ describe('normalizeDevUrl', () => {
 		);
 	});
 
+	test('adds the active feedback server url when provided', () => {
+		expect(normalizeDevUrl('http://127.0.0.1:5173', 'http://127.0.0.1:5888')).toBe(
+			'http://127.0.0.1:5173/?dryui-feedback=1&dryui-feedback-server=http%3A%2F%2F127.0.0.1%3A5888'
+		);
+	});
+
 	test('returns null for missing values', () => {
 		expect(normalizeDevUrl(null)).toBeNull();
 		expect(normalizeDevUrl('   ')).toBeNull();

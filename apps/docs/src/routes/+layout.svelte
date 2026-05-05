@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { browser, dev } from '$app/environment';
+	import { dev } from '$app/environment';
 	import { afterNavigate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { Button } from '@dryui/ui/button';
@@ -17,15 +17,15 @@
 	import '../app.css';
 	import '../layout.css';
 
+	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
+	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
+	const FEEDBACK_SESSION_KEY = 'dryui-feedback-enabled';
+
 	let { children: routeChildren } = $props();
 	let feedbackEnabled = $state(false);
 	let feedbackComponentPromise = $derived(
 		dev && feedbackEnabled ? import('@dryui/feedback').then((mod) => mod.Feedback) : null
 	);
-
-	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
-	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
-	const FEEDBACK_SESSION_KEY = 'dryui-feedback-enabled';
 
 	function getRelativeTime(iso: string): string {
 		const diff = Date.now() - new Date(iso).getTime();

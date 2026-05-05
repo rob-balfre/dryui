@@ -14,6 +14,12 @@ import {
 import type { PortHolder } from '../commands/launch-utils.js';
 import { captureAsyncCommandIO, cleanupTempDirs, createTempTree } from './helpers.js';
 
+const FEEDBACK_BASE_URL = 'http://127.0.0.1:4748';
+const FEEDBACK_DEV_SITE_URL =
+	'http://127.0.0.1:5173/?dryui-feedback=1&dryui-feedback-server=http%3A%2F%2F127.0.0.1%3A4748';
+const FEEDBACK_DASHBOARD_URL =
+	'http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1%26dryui-feedback-server%3Dhttp%253A%252F%252F127.0.0.1%253A4748';
+
 afterEach(cleanupTempDirs);
 
 describe('launcher helpers', () => {
@@ -29,11 +35,9 @@ describe('launcher helpers', () => {
 	});
 
 	test('builds the dashboard url with the dev target encoded as a query param', () => {
-		const dashboardUrl = buildDashboardUrl('http://127.0.0.1:4748', 'http://127.0.0.1:5173', 42);
+		const dashboardUrl = buildDashboardUrl(FEEDBACK_BASE_URL, 'http://127.0.0.1:5173', 42);
 
-		expect(dashboardUrl).toBe(
-			'http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
-		);
+		expect(dashboardUrl).toBe(FEEDBACK_DASHBOARD_URL);
 	});
 
 	test('only treats 2xx probe responses as healthy', () => {
@@ -119,7 +123,7 @@ describe('runLauncher', () => {
 				runtime: {
 					ensureFeedbackUiBuilt: () => null,
 					ensureFeedbackServer: async () => ({
-						baseUrl: 'http://127.0.0.1:4748',
+						baseUrl: FEEDBACK_BASE_URL,
 						message: 'already running',
 						ownedPid: null
 					}),
@@ -135,12 +139,10 @@ describe('runLauncher', () => {
 		expect(result.logs).toHaveLength(1);
 		expect(result.logs[0]).toContain('DryUI feedback');
 		expect(result.logs[0]).toContain(`Workspace: ${root}`);
-		expect(result.logs[0]).toContain('Site: http://127.0.0.1:5173/?dryui-feedback=1');
-		expect(result.logs[0]).toContain(
-			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
-		);
+		expect(result.logs[0]).toContain(`Site: ${FEEDBACK_DEV_SITE_URL}`);
+		expect(result.logs[0]).toContain(`Dashboard: ${FEEDBACK_DASHBOARD_URL}`);
 		expect(result.logs[0]).toContain('Docs: already running');
-		expect(result.logs[0]).toContain('Feedback: already running at http://127.0.0.1:4748');
+		expect(result.logs[0]).toContain(`Feedback: already running at ${FEEDBACK_BASE_URL}`);
 		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
 		expect(result.exitCode).toBe(0);
 	});
@@ -159,7 +161,7 @@ describe('runLauncher', () => {
 				runtime: {
 					ensureFeedbackUiBuilt: () => null,
 					ensureFeedbackServer: async () => ({
-						baseUrl: 'http://127.0.0.1:4748',
+						baseUrl: FEEDBACK_BASE_URL,
 						message: 'already running',
 						ownedPid: null
 					}),
@@ -173,7 +175,7 @@ describe('runLauncher', () => {
 			})
 		);
 
-		expect(openedUrl).toBe('http://127.0.0.1:5173/?dryui-feedback=1');
+		expect(openedUrl).toBe(FEEDBACK_DEV_SITE_URL);
 	});
 
 	test('reports progress before waiting for startup checks', async () => {
@@ -195,7 +197,7 @@ describe('runLauncher', () => {
 					ensureFeedbackServer: async () => {
 						events.push('feedback');
 						return {
-							baseUrl: 'http://127.0.0.1:4748',
+							baseUrl: FEEDBACK_BASE_URL,
 							message: 'already running',
 							ownedPid: null
 						};
@@ -227,7 +229,7 @@ describe('runLauncher', () => {
 				runtime: {
 					ensureFeedbackUiBuilt: () => null,
 					ensureFeedbackServer: async () => ({
-						baseUrl: 'http://127.0.0.1:4748',
+						baseUrl: FEEDBACK_BASE_URL,
 						message: 'started in the background',
 						ownedPid: 12345
 					}),
@@ -286,7 +288,7 @@ function buildRuntime(
 	return {
 		readProjectDevScript: () => 'vite dev',
 		ensureFeedbackServer: async () => ({
-			baseUrl: 'http://127.0.0.1:4748',
+			baseUrl: FEEDBACK_BASE_URL,
 			message: 'already running',
 			ownedPid: null
 		}),
@@ -318,8 +320,8 @@ function buildRuntime(
 
 describe('buildDashboardUrl', () => {
 	test('omits dev param when docsBaseUrl is null', () => {
-		const url = buildDashboardUrl('http://127.0.0.1:4748', null, 42);
-		expect(url).toBe('http://127.0.0.1:4748/ui/?v=42');
+		const url = buildDashboardUrl(FEEDBACK_BASE_URL, null, 42);
+		expect(url).toBe(`${FEEDBACK_BASE_URL}/ui/?v=42`);
 	});
 });
 
@@ -381,9 +383,7 @@ describe('runUserProjectLauncher', () => {
 		expect(spawned).toBe(false);
 		expect(prompted).toBe(false);
 		expect(result.logs[0]).toContain('Project dev: already running at http://127.0.0.1:5173');
-		expect(result.logs[0]).toContain(
-			'Dashboard: http://127.0.0.1:4748/ui/?v=42&dev=http%3A%2F%2F127.0.0.1%3A5173%2F%3Fdryui-feedback%3D1'
-		);
+		expect(result.logs[0]).toContain(`Dashboard: ${FEEDBACK_DASHBOARD_URL}`);
 	});
 
 	test('prompts to kill when port 5173 responds for a different project', async () => {
@@ -916,7 +916,7 @@ describe('runUserProjectLauncher', () => {
 					findPortHolder: () => null,
 					spawnProjectDevServer: () => ({ pid: 91234 }),
 					ensureFeedbackServer: async () => ({
-						baseUrl: 'http://127.0.0.1:4748',
+						baseUrl: FEEDBACK_BASE_URL,
 						message: 'started in the background',
 						ownedPid: 91235
 					}),
@@ -954,7 +954,7 @@ describe('runUserProjectLauncher', () => {
 					findPortHolder: () => null,
 					spawnProjectDevServer: () => ({ pid: 77777 }),
 					ensureFeedbackServer: async () => ({
-						baseUrl: 'http://127.0.0.1:4748',
+						baseUrl: FEEDBACK_BASE_URL,
 						message: 'started in the background',
 						ownedPid: 77778
 					}),

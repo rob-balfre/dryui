@@ -328,9 +328,10 @@ export function buildDashboardUrl(
 	dashboardUrl.searchParams.set('v', String(version));
 
 	if (docsBaseUrl) {
-		const devTarget = new URL(docsBaseUrl);
-		devTarget.searchParams.set('dryui-feedback', '1');
-		dashboardUrl.searchParams.set('dev', devTarget.toString());
+		dashboardUrl.searchParams.set(
+			'dev',
+			normalizeDevUrl(docsBaseUrl, feedbackBaseUrl) ?? docsBaseUrl
+		);
 	}
 
 	return dashboardUrl.toString();
@@ -863,7 +864,7 @@ export async function runUserProjectLauncher(
 			runtime.killOwnedProcess
 		);
 
-		const siteUrl = normalizeDevUrl(devResult.ok ? devResult.url : null);
+		const siteUrl = normalizeDevUrl(devResult.ok ? devResult.url : null, feedbackResult.baseUrl);
 		const dashboardUrl = buildDashboardUrl(
 			feedbackResult.baseUrl,
 			devResult.ok ? devResult.url : null,
@@ -980,7 +981,7 @@ export async function runLauncher(
 			],
 			runtime.killOwnedProcess
 		);
-		const siteUrl = normalizeDevUrl(docsBaseUrl);
+		const siteUrl = normalizeDevUrl(docsBaseUrl, feedbackResult.baseUrl);
 		const dashboardUrl = buildDashboardUrl(feedbackResult.baseUrl, docsBaseUrl, runtime.now());
 		const opened = noOpen ? false : runtime.openBrowser(siteUrl ?? dashboardUrl);
 

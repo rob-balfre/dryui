@@ -84,9 +84,6 @@
 		<div data-calendar-week-band style={createStyle({ '--dry-calendar-band-rows': bandRowCount })}>
 			<div data-calendar-week-band-label aria-hidden="true">all-day</div>
 			<div data-calendar-week-band-grid>
-				{#each weekDays as day, i (i)}
-					<div data-calendar-week-band-cell data-today={isToday(day) ? '' : undefined}></div>
-				{/each}
 				{#each layout.band as bandEvent (bandEvent.event.id)}
 					{@const category = ctx.getCategory(bandEvent.event.category)}
 					{@const selected = ctx.selectedEvent?.id === bandEvent.event.id}
@@ -230,7 +227,7 @@
 
 	[data-calendar-week-time-spacer] {
 		display: grid;
-		place-items: center;
+		place-items: center end;
 		padding: var(--dry-space-2);
 	}
 
@@ -293,12 +290,14 @@
 
 	[data-calendar-week-band-label] {
 		display: grid;
-		place-items: end center;
-		padding: var(--dry-space-2);
+		place-items: center end;
+		padding: 0 var(--dry-space-2);
 		font-size: var(--dry-text-xs-size);
 		color: var(--dry-color-text-weak);
 		text-transform: uppercase;
 		letter-spacing: 0.06em;
+		text-align: end;
+		white-space: nowrap;
 	}
 
 	[data-calendar-week-band-grid] {
@@ -310,20 +309,10 @@
 		position: relative;
 	}
 
-	[data-calendar-week-band-cell] {
-		grid-row: 1 / -1;
-		border-left: 1px solid var(--dry-calendar-week-grid-color);
-	}
-
-	[data-calendar-week-band-cell]:first-child {
-		border-left: none;
-	}
-
 	[data-calendar-week-band-event] {
 		display: grid;
 		min-height: 2.5rem;
 		border: 1px solid color-mix(in srgb, var(--dry-calendar-band-color) 35%, transparent);
-		border-left: 3px solid var(--dry-calendar-band-color);
 		border-radius: var(--dry-calendar-event-radius);
 		background: color-mix(in srgb, var(--dry-calendar-band-color) 16%, var(--dry-color-bg-overlay));
 		text-align: left;
@@ -379,20 +368,17 @@
 
 	[data-calendar-week-time-cell] {
 		position: relative;
-		border-top: 1px solid var(--dry-calendar-week-grid-color);
-		padding: var(--dry-space-1) var(--dry-space-2);
+		padding: 0 var(--dry-space-2);
 		font-size: var(--dry-text-xs-size);
 		color: var(--dry-color-text-weak);
 		min-height: var(--dry-calendar-week-row-height);
 	}
 
-	[data-calendar-week-time-cell]:first-child {
-		border-top: none;
-	}
-
 	[data-calendar-week-time-cell] span {
-		position: relative;
-		top: -0.4rem;
+		position: absolute;
+		inset-block-start: 50%;
+		inset-inline-end: var(--dry-space-2);
+		transform: translateY(-50%);
 	}
 
 	[data-calendar-week-day-col] {
@@ -422,7 +408,6 @@
 		inset-inline-start: calc(var(--dry-calendar-event-start) + 2px);
 		inset-inline-end: calc(var(--dry-calendar-event-end) + 2px);
 		border: 1px solid color-mix(in srgb, var(--dry-calendar-event-color) 35%, transparent);
-		border-left: 3px solid var(--dry-calendar-event-color);
 		border-radius: var(--dry-calendar-event-radius);
 		background: color-mix(
 			in srgb,

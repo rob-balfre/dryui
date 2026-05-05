@@ -7,11 +7,14 @@ import { render } from './_harness';
 type HostKind = 'command-palette' | 'popover';
 
 const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
+const FEEDBACK_SERVER_STORAGE_KEY = 'dryui-feedback-server-url';
 
 afterEach(() => {
 	delete document.documentElement.dataset.theme;
 	document.documentElement.classList.remove('theme-auto');
 	window.sessionStorage.removeItem(WIDGET_STATE_STORAGE_KEY);
+	window.sessionStorage.removeItem(FEEDBACK_SERVER_STORAGE_KEY);
+	window.localStorage.removeItem(FEEDBACK_SERVER_STORAGE_KEY);
 });
 
 function mountFeedback(kind: HostKind, options?: { serverUrl?: string }) {
@@ -61,6 +64,7 @@ function waitForAsyncWork(delay = 20) {
 function canonicalTestPageUrl(): string {
 	const url = new URL(window.location.href);
 	url.searchParams.delete('dryui-feedback');
+	url.searchParams.delete('dryui-feedback-server');
 	url.hash = '';
 	return url.toString();
 }
@@ -718,7 +722,11 @@ describe('feedback overlay hosting', () => {
 
 	it('uses one canonical page URL for saved drawings and submitted feedback', async () => {
 		const originalHref = window.location.href;
-		history.pushState(null, '', '/workspace?dryui-feedback=1&tab=settings#notes');
+		history.pushState(
+			null,
+			'',
+			'/workspace?dryui-feedback=1&dryui-feedback-server=http%3A%2F%2F127.0.0.1%3A5888&tab=settings#notes'
+		);
 		const expectedPageUrl = canonicalTestPageUrl();
 		const env = setupSubmissionEnvironment();
 
@@ -766,6 +774,58 @@ describe('feedback overlay hosting', () => {
 			expect(submissionCall).toBeDefined();
 			const body = JSON.parse(String(submissionCall?.[1]?.body));
 			expect(body.url).toBe(expectedPageUrl);
+		} finally {
+			env.restore();
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('uses the launcher feedback server handoff over a hardcoded prop', async () => {
+		const originalHref = window.location.href;
+		history.pushState(
+			null,
+			'',
+			'/server-override?dryui-feedback=1&dryui-feedback-server=http%3A%2F%2F127.0.0.1%3A5888'
+		);
+		const env = setupSubmissionEnvironment();
+
+		try {
+			render(Feedback, { serverUrl: 'http://127.0.0.1:4748' });
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawingsCall = env.fetchSpy.mock.calls.find(([input, init]) => {
+				const url = String(input instanceof Request ? input.url : input);
+				return url.includes('/drawings?') && (!init?.method || init.method === 'GET');
+			});
+			expect(drawingsCall).toBeDefined();
+			expect(String(drawingsCall?.[0])).toContain('http://127.0.0.1:5888/drawings?');
+			expect(window.localStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY)).toBe(
+				'http://127.0.0.1:5888'
+			);
+		} finally {
+			env.restore();
+			history.replaceState(null, '', originalHref);
+		}
+	});
+
+	it('uses a stored launcher feedback server in an already-open tab', async () => {
+		const originalHref = window.location.href;
+		history.pushState(null, '', '/already-open?dryui-feedback=1');
+		window.localStorage.setItem(FEEDBACK_SERVER_STORAGE_KEY, 'http://127.0.0.1:5888');
+		const env = setupSubmissionEnvironment();
+
+		try {
+			render(Feedback, { serverUrl: 'http://127.0.0.1:4748' });
+			await waitForAsyncWork(20);
+			flushSync();
+
+			const drawingsCall = env.fetchSpy.mock.calls.find(([input, init]) => {
+				const url = String(input instanceof Request ? input.url : input);
+				return url.includes('/drawings?') && (!init?.method || init.method === 'GET');
+			});
+			expect(drawingsCall).toBeDefined();
+			expect(String(drawingsCall?.[0])).toContain('http://127.0.0.1:5888/drawings?');
 		} finally {
 			env.restore();
 			history.replaceState(null, '', originalHref);

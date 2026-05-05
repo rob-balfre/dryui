@@ -31,6 +31,10 @@
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 
+	type ImportMetaWithEnv = ImportMeta & {
+		env?: Record<string, string | boolean | undefined>;
+	};
+
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
 	// omit the widget entirely. Useful for CI, screenshot jobs, or
 	// demo/recreation contexts where editing the root layout is not an option.
@@ -54,8 +58,8 @@
 		// rewrites `import.meta.env.<KEY>` reads but throws on aliased or
 		// bracket access ("Dynamic access of import.meta.env is not supported").
 		try {
-			if (import.meta.env?.DRY_FEEDBACK_DISABLED) return true;
-			if (import.meta.env?.VITE_DRY_FEEDBACK_DISABLED) return true;
+			if ((import.meta as ImportMetaWithEnv).env?.DRY_FEEDBACK_DISABLED) return true;
+			if ((import.meta as ImportMetaWithEnv).env?.VITE_DRY_FEEDBACK_DISABLED) return true;
 		} catch {
 			// import.meta.env not available in the current runtime; ignore.
 		}
@@ -67,6 +71,8 @@
 	const STROKE_OUTLINE_WIDTH = 4;
 	const TEXT_OUTLINE_RATIO = 0.22;
 	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
+	const FEEDBACK_SERVER_QUERY_PARAM = 'dryui-feedback-server';
+	const FEEDBACK_SERVER_STORAGE_KEY = 'dryui-feedback-server-url';
 	const DASHBOARD_TAB_NAME = 'dryui-feedback-list';
 	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
 	const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
@@ -77,7 +83,7 @@
 		color = ANNOTATION_FILL,
 		strokeWidth = 3,
 		shortcut = '$mod+m',
-		serverUrl,
+		serverUrl: configuredServerUrl,
 		scrollRoot,
 		class: className
 	}: FeedbackProps = $props();
@@ -2332,6 +2338,7 @@
 	}
 
 	function openDashboardTab(submissionId: string | null): void {
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || typeof window === 'undefined') return;
 		const target = new URL('/ui/', serverUrl);
 		if (submissionId) target.searchParams.set('focus', submissionId);
@@ -2361,7 +2368,7 @@
 		return `Request failed with status ${response.status}`;
 	}
 
-	function submissionErrorDescription(error: unknown): string {
+	function submissionErrorDescription(error: unknown, serverUrl?: string): string {
 		if (error instanceof DOMException) {
 			if (error.name === 'NotAllowedError' || error.name === 'AbortError') {
 				return 'Screen capture was cancelled. Choose this browser tab when prompted to send feedback.';
@@ -2372,6 +2379,10 @@
 			}
 		}
 
+		if (error instanceof TypeError && error.message === 'Failed to fetch' && serverUrl) {
+			return `Could not reach the feedback server at ${serverUrl}.`;
+		}
+
 		if (error instanceof Error && error.message.trim()) return error.message;
 		return 'Please try again.';
 	}
@@ -2380,6 +2391,7 @@
 		if (typeof window === 'undefined') return '/';
 		const url = new URL(window.location.href);
 		url.searchParams.delete(FEEDBACK_QUERY_PARAM);
+		url.searchParams.delete(FEEDBACK_SERVER_QUERY_PARAM);
 		url.hash = '';
 		return url.toString();
 	}
@@ -2388,6 +2400,99 @@
 		if (typeof window === 'undefined') return false;
 		const url = new URL(window.location.href);
 		return url.searchParams.get(FEEDBACK_QUERY_PARAM) === '1';
+	}
+
+	function isPrivateOrLoopbackIpv4(hostname: string): boolean {
+		const parts = hostname.split('.').map((part) => Number(part));
+		if (
+			parts.length !== 4 ||
+			parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)
+		) {
+			return false;
+		}
+
+		const [first = -1, second = -1] = parts;
+		return (
+			first === 10 ||
+			first === 127 ||
+			first === 0 ||
+			(first === 172 && second >= 16 && second <= 31) ||
+			(first === 192 && second === 168) ||
+			(first === 169 && second === 254)
+		);
+	}
+
+	function isLocalFeedbackHost(hostname: string): boolean {
+		const normalized =
+			hostname.startsWith('[') && hostname.endsWith(']')
+				? hostname.slice(1, -1)
+				: hostname.toLowerCase();
+		return (
+			normalized === 'localhost' ||
+			normalized.endsWith('.localhost') ||
+			normalized === '::1' ||
+			isPrivateOrLoopbackIpv4(normalized)
+		);
+	}
+
+	function normalizeFeedbackServerUrl(value: string | null | undefined): string | null {
+		if (!value) return null;
+		try {
+			const url = new URL(value);
+			if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+			if (!isLocalFeedbackHost(url.hostname)) return null;
+			url.pathname = '';
+			url.search = '';
+			url.hash = '';
+			return url.toString().replace(/\/$/, '');
+		} catch {
+			return null;
+		}
+	}
+
+	function storeFeedbackServerUrl(value: string): void {
+		try {
+			window.localStorage.setItem(FEEDBACK_SERVER_STORAGE_KEY, value);
+		} catch {
+			// Storage can be blocked in some browser contexts; the query param still works for this tab.
+		}
+
+		try {
+			window.sessionStorage.setItem(FEEDBACK_SERVER_STORAGE_KEY, value);
+		} catch {
+			// Back-compat only. Ignore when session storage is unavailable.
+		}
+	}
+
+	function readStoredFeedbackServerUrl(): string | null {
+		try {
+			const localValue = normalizeFeedbackServerUrl(
+				window.localStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY)
+			);
+			if (localValue) return localValue;
+		} catch {
+			// Fall through to session storage for older tabs and constrained browsers.
+		}
+
+		try {
+			return normalizeFeedbackServerUrl(window.sessionStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY));
+		} catch {
+			return null;
+		}
+	}
+
+	function resolveFeedbackServerUrl(fallback: string | undefined): string | undefined {
+		if (typeof window === 'undefined') return fallback;
+
+		const queryServerUrl = normalizeFeedbackServerUrl(
+			new URL(window.location.href).searchParams.get(FEEDBACK_SERVER_QUERY_PARAM)
+		);
+		if (queryServerUrl) {
+			storeFeedbackServerUrl(queryServerUrl);
+			return queryServerUrl;
+		}
+
+		return readStoredFeedbackServerUrl() ?? fallback;
 	}
 
 	function activateFromFeedbackLaunchParam(): void {
@@ -2399,6 +2504,7 @@
 	}
 
 	function saveDrawings(pageUrl: string, version: number, drawingSnapshot: Drawing[]): void {
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || !pageUrl) return;
 		lastSavedVersion = version;
 		fetch(`${serverUrl}/drawings?url=${encodeURIComponent(pageUrl)}`, {
@@ -2409,6 +2515,7 @@
 	}
 
 	function flushPendingDrawings(): void {
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || saveVersion === lastSavedVersion) return;
 		clearTimeout(saveTimer);
 		saveDrawings(currentPageUrl, saveVersion, drawings);
@@ -2433,6 +2540,7 @@
 	}
 
 	async function handleSubmit() {
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || submitStatus !== 'idle' || sent) return;
 		if (!hasFeedback) {
 			showToast('error', 'No feedback', 'Add feedback first.', ERROR_TOAST_DURATION_MS);
@@ -2493,7 +2601,12 @@
 			console.error('Failed to submit feedback:', e);
 			submitStatus = 'idle';
 			sent = false;
-			showToast('error', 'Feedback failed', submissionErrorDescription(e), ERROR_TOAST_DURATION_MS);
+			showToast(
+				'error',
+				'Feedback failed',
+				submissionErrorDescription(e, serverUrl),
+				ERROR_TOAST_DURATION_MS
+			);
 		}
 	}
 
@@ -2654,6 +2767,7 @@
 
 	$effect(() => {
 		const pageUrl = currentPageUrl;
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || !pageUrl) return;
 		if (hasStoredWidgetContent(pageUrl)) {
 			lastSavedVersion = untrack(() => saveVersion);
@@ -2682,6 +2796,7 @@
 		const v = saveVersion;
 		const pageUrl = currentPageUrl;
 		const drawingSnapshot = drawings;
+		const serverUrl = resolveFeedbackServerUrl(configuredServerUrl);
 		if (!serverUrl || !pageUrl || v === lastSavedVersion) return;
 
 		clearTimeout(saveTimer);
