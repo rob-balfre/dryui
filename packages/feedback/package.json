@@ -37,8 +37,8 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "^2.0.2",
-    "@dryui/ui": "^2.0.2"
+    "@dryui/primitives": "^3.0.0",
+    "@dryui/ui": "^3.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.5",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "svelte": "^5.55.5",
     "@sveltejs/package": "^2.5.7",
-    "svelte-check": "^4.4.6",
+    "svelte-check": "^4.4.7",
     "typescript": "^6.0.3"
   }
 }

@@ -162,6 +162,15 @@
 	});
 
 	$effect(() => {
+		if (!containerEl || !mapInstance) return;
+		const observer = new ResizeObserver(() => {
+			mapInstance?.resize?.();
+		});
+		observer.observe(containerEl);
+		return () => observer.disconnect();
+	});
+
+	$effect(() => {
 		if (mapInstance && loaded) {
 			const currentCenter = mapInstance.getCenter?.();
 			if (currentCenter) {
@@ -215,11 +224,12 @@
 		--dry-map-radius: var(--dry-radius-lg, 0.5rem);
 		--dry-map-border: 1px solid var(--dry-color-stroke-weak);
 
-		display: grid;
+		display: block;
 		position: relative;
 		border-radius: var(--dry-map-radius);
 		border: var(--dry-map-border);
 		overflow: hidden;
+		width: 100%;
 		height: 400px;
 	}
 

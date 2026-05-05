@@ -773,7 +773,7 @@
   "devDependencies": {
     "svelte": "^5.55.5",
     "@sveltejs/package": "^2.5.7",
-    "svelte-check": "^4.4.6",
+    "svelte-check": "^4.4.7",
     "typescript": "^6.0.3"
   },
   "publishConfig": {

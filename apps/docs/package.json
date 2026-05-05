@@ -9,21 +9,21 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {
-		"@dryui/feedback": "workspace:*",
-		"@dryui/primitives": "workspace:*",
-		"@dryui/ui": "workspace:*",
+    "@dryui/feedback": "workspace:*",
+    "@dryui/primitives": "workspace:*",
+    "@dryui/ui": "workspace:*",
     "lucide-svelte": "^1.0.1",
-    "mapbox-gl": "^3.22.0"
+    "mapbox-gl": "^3.23.1"
   },
   "devDependencies": {
     "@dryui/lint": "workspace:*",
-    "@sveltejs/adapter-static": "^3.0.10",
-    "@sveltejs/kit": "^2.58.0",
+    "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@sveltejs/kit": "^2.59.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@types/mapbox-gl": "^3.5.0",
     "svelte": "^5.55.5",
-    "svelte-check": "^4.4.6",
+    "svelte-check": "^4.4.7",
     "vite": "^8.0.10",
-    "wrangler": "^4.85.0"
+    "wrangler": "^4.87.0"
   }
 }

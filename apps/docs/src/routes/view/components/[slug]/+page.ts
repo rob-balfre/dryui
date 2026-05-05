@@ -1,1 +1,1 @@
-export { entries, prerender } from '../../../components/[slug]/+page';
+export { entries } from '../../../components/[slug]/+page';

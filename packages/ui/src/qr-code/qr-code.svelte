@@ -74,10 +74,11 @@
 			canvas.width = nextSize;
 			canvas.height = nextSize;
 
+			const computed = getComputedStyle(wrapper);
 			const resolvedBg =
-				nextBgColor || getComputedStyle(wrapper).getPropertyValue('--dry-qr-bg').trim();
+				nextBgColor || computed.getPropertyValue('--dry-qr-bg').trim() || computed.backgroundColor;
 			const resolvedFg =
-				nextFgColor || getComputedStyle(wrapper).getPropertyValue('--dry-qr-fg').trim();
+				nextFgColor || computed.getPropertyValue('--dry-qr-fg').trim() || computed.color;
 
 			ctx.fillStyle = resolvedBg;
 			ctx.fillRect(0, 0, nextSize, nextSize);

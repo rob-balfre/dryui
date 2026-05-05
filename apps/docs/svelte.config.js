@@ -1,7 +1,5 @@
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-cloudflare';
 import { dryuiLint } from '@dryui/lint';
-
-const isDevCommand = process.env.npm_lifecycle_event === 'dev' || process.argv.includes('dev');
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -12,7 +10,7 @@ const config = {
 		})
 	],
 	kit: {
-		adapter: adapter({ pages: 'build', assets: 'build' }),
+		adapter: adapter(),
 		experimental: {
 			remoteFunctions: true
 		},
@@ -21,7 +19,6 @@ const config = {
 			bundleStrategy: 'split'
 		},
 		prerender: {
-			entries: isDevCommand ? [] : ['*'],
 			// Demos use placeholder hash hrefs (e.g. `#overview`, `#deploys`) to
 			// stand in for real navigation targets. The docs themselves don't rely
 			// on anchor IDs for navigation, so warn rather than fail when those

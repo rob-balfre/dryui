@@ -15,6 +15,7 @@ export interface MapInstance {
 	setCenter(center: LngLat): void;
 	getZoom(): number;
 	setZoom(zoom: number): void;
+	resize(): void;
 	flyTo(options: { center: LngLat; zoom?: number }): void;
 	addControl(control: MapControl, position?: ControlPosition): void;
 	removeControl(control: MapControl): void;

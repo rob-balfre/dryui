@@ -33,8 +33,8 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/feedback-server": "workspace:*",
-    "@dryui/mcp": "workspace:*",
+    "@dryui/feedback-server": "^1.0.0",
+    "@dryui/mcp": "^3.0.0",
     "playwright": "^1.59.1"
   },
   "devDependencies": {

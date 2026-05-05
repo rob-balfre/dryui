@@ -12,29 +12,17 @@
 <div class="frame">
 	<div bind:this={target} class="scroll">
 		<div class="inner">
-			<p class="eyebrow">Changelog / 1.4.0</p>
-			<p>
-				Shipped DataGrid sorting, a new MarkdownRenderer, and tighter keyboard paths across
-				Pagination, Tree, and Accordion.
-			</p>
-			<p>
-				Bug fixes: AlertDialog focus trap no longer leaks past close, DatePicker parses
-				<code>YYYY-MM-DD</code> reliably on Safari 17, Tooltip respects
-				<code>prefers-reduced-motion</code>.
-			</p>
-			<p>
-				Breaking: <code>Alert</code>'s <code>tone</code> prop removed. Use <code>variant</code>.
-				<code>--dry-color-accent</code> removed. Map to <code>--dry-color-fill-brand</code>.
-				<code>Tree.Root</code>'s <code>expanded</code> is now <code>defaultExpanded</code>.
-			</p>
-			<p>
-				Scroll threshold: 120px. The return button fades in once you scroll past it and hops back to
-				the top with smooth behavior. Respects <code>prefers-reduced-motion</code> for an instant jump.
-			</p>
-			<p>
-				DryUI treats ScrollToTop as an affordance, not a viewport garnish. It attaches to any
-				scrollable container via the <code>target</code> prop and stays out of view until you need it.
-			</p>
+			<p>Scroll the contents of this frame to reveal the ScrollToTop button.</p>
+			<p>Item 1</p>
+			<p>Item 2</p>
+			<p>Item 3</p>
+			<p>Item 4</p>
+			<p>Item 5</p>
+			<p>Item 6</p>
+			<p>Item 7</p>
+			<p>Item 8</p>
+			<p>Item 9</p>
+			<p>Item 10</p>
 		</div>
 	</div>
 
@@ -49,9 +37,7 @@
 		contain: paint;
 		block-size: 16rem;
 		overflow: hidden;
-		border: 1px solid color-mix(in srgb, var(--dry-color-stroke-weak) 70%, transparent);
 		border-radius: var(--dry-radius-lg);
-		background: color-mix(in srgb, var(--dry-color-bg-overlay) 40%, transparent);
 	}
 
 	.scroll {
@@ -67,23 +53,9 @@
 		padding-right: var(--dry-space-10);
 	}
 
-	.eyebrow {
-		margin: 0;
-		font-family: var(--dry-font-mono);
-		font-size: var(--dry-text-xs-size);
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--dry-color-text-weak);
-	}
-
 	p {
 		margin: 0;
 		line-height: 1.6;
 		color: var(--dry-color-text-strong);
-	}
-
-	code {
-		font-family: var(--dry-font-mono);
-		font-size: 0.92em;
 	}
 </style>

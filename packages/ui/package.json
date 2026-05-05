@@ -1608,7 +1608,7 @@
     "check:publish-hygiene": "bun run check:publint && bun run check:attw"
   },
   "dependencies": {
-    "@dryui/primitives": "workspace:*"
+    "@dryui/primitives": "^3.0.0"
   },
   "peerDependencies": {
     "svelte": "^5.55.5"
@@ -1617,7 +1617,7 @@
     "@dryui/lint": "workspace:*",
     "svelte": "^5.55.5",
     "@sveltejs/package": "^2.5.7",
-    "svelte-check": "^4.4.6",
+    "svelte-check": "^4.4.7",
     "typescript": "^6.0.3"
   }
 }
