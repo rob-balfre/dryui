@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { checkStyle, type Violation } from './rules.js';
-import { ruleMessage } from './rule-catalog.js';
+import { lintViolation } from './rule-definitions.js';
 
 export interface LayoutCssCheckOptions {
 	readonly includeGenericStyleRules?: boolean;
@@ -426,10 +426,6 @@ function selectorIsLayoutHook(selector: string): boolean {
 	});
 }
 
-function layoutViolation(rule: string, message: string, line: number): Violation {
-	return { rule, message, line };
-}
-
 function scanLayoutCss(
 	content: string,
 	start: number,
@@ -446,10 +442,10 @@ function scanLayoutCss(
 				continue;
 			}
 			violations.push(
-				layoutViolation(
+				lintViolation(
 					'dryui/layout-css-at-rule',
-					ruleMessage('dryui/layout-css-at-rule', { atRule }),
-					lineOf(block.bodyStart - block.selector.length - 1)
+					lineOf(block.bodyStart - block.selector.length - 1),
+					{ atRule }
 				)
 			);
 			continue;
@@ -457,10 +453,10 @@ function scanLayoutCss(
 
 		if (!selectorIsLayoutHook(block.selector)) {
 			violations.push(
-				layoutViolation(
+				lintViolation(
 					'dryui/layout-css-selector',
-					ruleMessage('dryui/layout-css-selector', { selector: block.selector }),
-					lineOf(block.bodyStart - block.selector.length - 1)
+					lineOf(block.bodyStart - block.selector.length - 1),
+					{ selector: block.selector }
 				)
 			);
 		}
@@ -468,25 +464,19 @@ function scanLayoutCss(
 		for (const declaration of declarationEntries(content, block.bodyStart, block.bodyEnd)) {
 			if (!isAllowedProperty(declaration.property)) {
 				violations.push(
-					layoutViolation(
-						'dryui/layout-css-property',
-						ruleMessage('dryui/layout-css-property', { property: declaration.property }),
-						lineOf(declaration.index)
-					)
+					lintViolation('dryui/layout-css-property', lineOf(declaration.index), {
+						property: declaration.property
+					})
 				);
 				continue;
 			}
 
 			if (!isAllowedValue(declaration.property, declaration.value)) {
 				violations.push(
-					layoutViolation(
-						'dryui/layout-css-value',
-						ruleMessage('dryui/layout-css-value', {
-							property: declaration.property,
-							value: declaration.value
-						}),
-						lineOf(declaration.index)
-					)
+					lintViolation('dryui/layout-css-value', lineOf(declaration.index), {
+						property: declaration.property,
+						value: declaration.value
+					})
 				);
 			}
 		}
@@ -496,11 +486,7 @@ function scanLayoutCss(
 	for (const match of topLevelStatements) {
 		const atRule = (match[0].trim().split(/\s+/)[0] ?? match[0]).replace(/;$/, '');
 		violations.push(
-			layoutViolation(
-				'dryui/layout-css-at-rule',
-				ruleMessage('dryui/layout-css-at-rule', { atRule }),
-				lineOf(start + (match.index ?? 0))
-			)
+			lintViolation('dryui/layout-css-at-rule', lineOf(start + (match.index ?? 0)), { atRule })
 		);
 	}
 
