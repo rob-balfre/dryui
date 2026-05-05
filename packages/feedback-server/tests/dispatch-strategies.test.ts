@@ -3,7 +3,12 @@
 // drives a strategy with a stub context, never touching the real OS.
 
 import { describe, expect, test } from 'bun:test';
-import { AGENTS, DISPATCH_AGENTS } from '../src/dispatch/agents.ts';
+import {
+	AGENT_DISPLAY_INFO,
+	AGENTS,
+	DISPATCH_AGENTS,
+	DISPATCH_DOCS_AGENT_IDS
+} from '../src/dispatch/agents.ts';
 import type { PlatformContext } from '../src/dispatch/platform.ts';
 import { probeAgent } from '../src/dispatch/strategies.ts';
 
@@ -57,6 +62,26 @@ describe('agent catalogue', () => {
 		expect(strategies).toEqual(
 			new Set(['terminal-cli', 'deeplink', 'workspace-app-cli-chat', 'workspace-app-clipboard'])
 		);
+	});
+
+	test('display and docs ids are derived from the dispatch catalogue', () => {
+		expect(AGENT_DISPLAY_INFO.claude).toEqual({
+			id: 'claude',
+			label: 'Claude Code',
+			shortLabel: 'Claude',
+			docsId: 'claude-code'
+		});
+		expect(AGENT_DISPLAY_INFO['copilot-vscode'].docsId).toBeUndefined();
+		expect(DISPATCH_DOCS_AGENT_IDS).toEqual([
+			'claude-code',
+			'codex',
+			'gemini',
+			'opencode',
+			'copilot',
+			'cursor',
+			'windsurf',
+			'zed'
+		]);
 	});
 });
 

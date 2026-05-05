@@ -12,6 +12,15 @@ import type { SubmissionAgent } from '../types.js';
 export type DispatchAgent = Exclude<SubmissionAgent, 'off'>;
 export type DefaultDispatchAgent = DispatchAgent | 'off';
 export type DispatchSkillPaths = Partial<Record<DispatchAgent, string>>;
+export type DispatchDocsAgentId =
+	| 'claude-code'
+	| 'codex'
+	| 'gemini'
+	| 'opencode'
+	| 'copilot'
+	| 'cursor'
+	| 'windsurf'
+	| 'zed';
 
 /** Strategy tags. Each maps to one launch implementation in ./strategies.ts. */
 export type LaunchStrategyId =
@@ -48,6 +57,10 @@ export interface DispatchConfigWarning {
 
 interface BaseAgent<S extends LaunchStrategyId> {
 	id: DispatchAgent;
+	label: string;
+	shortLabel: string;
+	/** Docs setup card id, when this dispatch row owns a first-party docs surface. */
+	docsId?: DispatchDocsAgentId;
 	strategy: S;
 	/** PATH binary to look up. Optional for agents discovered only via Mac app or bundled CLI. */
 	cliCommand?: string;
@@ -93,6 +106,13 @@ export type AgentConfig =
 	| WorkspaceAppCliChatAgent
 	| WorkspaceAppClipboardAgent;
 
+export interface DispatchAgentDisplayInfo {
+	id: DispatchAgent;
+	label: string;
+	shortLabel: string;
+	docsId?: DispatchDocsAgentId;
+}
+
 const COPILOT_CONFIG_SNIPPET = `{
   "mcpServers": {
     "dryui-feedback": {
@@ -120,6 +140,9 @@ const COPILOT_VSCODE_CONFIG_SNIPPET = `{
 export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	claude: {
 		id: 'claude',
+		label: 'Claude Code',
+		shortLabel: 'Claude',
+		docsId: 'claude-code',
 		strategy: 'terminal-cli',
 		cliCommand: 'claude',
 		// Pin every dispatched claude session to the `feedback` subagent so the
@@ -129,6 +152,9 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	codex: {
 		id: 'codex',
+		label: 'Codex',
+		shortLabel: 'Codex',
+		docsId: 'codex',
 		strategy: 'deeplink',
 		cliCommand: 'codex',
 		macApps: ['Codex'],
@@ -137,12 +163,18 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	gemini: {
 		id: 'gemini',
+		label: 'Gemini CLI',
+		shortLabel: 'Gemini',
+		docsId: 'gemini',
 		strategy: 'terminal-cli',
 		cliCommand: 'gemini',
 		cliArgs: ['gemini']
 	},
 	opencode: {
 		id: 'opencode',
+		label: 'OpenCode',
+		shortLabel: 'OpenCode',
+		docsId: 'opencode',
 		strategy: 'terminal-cli',
 		cliCommand: 'opencode',
 		// opencode takes the workspace as a positional and the prompt via
@@ -155,6 +187,9 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	copilot: {
 		id: 'copilot',
+		label: 'Copilot CLI',
+		shortLabel: 'Copilot CLI',
+		docsId: 'copilot',
 		strategy: 'terminal-cli',
 		cliCommand: 'copilot',
 		cliArgs: ['copilot', '-i'],
@@ -175,6 +210,8 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	'copilot-vscode': {
 		id: 'copilot-vscode',
+		label: 'Copilot VS Code',
+		shortLabel: 'Copilot VS',
 		strategy: 'workspace-app-cli-chat',
 		bundledCli: 'vscode',
 		macApps: ['Visual Studio Code', 'Visual Studio Code - Insiders'],
@@ -200,6 +237,9 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	cursor: {
 		id: 'cursor',
+		label: 'Cursor',
+		shortLabel: 'Cursor',
+		docsId: 'cursor',
 		strategy: 'workspace-app-clipboard',
 		cliCommand: 'cursor',
 		macApps: ['Cursor'],
@@ -213,6 +253,9 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	windsurf: {
 		id: 'windsurf',
+		label: 'Windsurf',
+		shortLabel: 'Windsurf',
+		docsId: 'windsurf',
 		strategy: 'workspace-app-cli-chat',
 		cliCommand: 'windsurf',
 		bundledCli: 'windsurf',
@@ -232,6 +275,9 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 	},
 	zed: {
 		id: 'zed',
+		label: 'Zed',
+		shortLabel: 'Zed',
+		docsId: 'zed',
 		strategy: 'workspace-app-clipboard',
 		cliCommand: 'zed',
 		macApps: ['Zed'],
@@ -246,6 +292,29 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 };
 
 export const DISPATCH_AGENTS: readonly DispatchAgent[] = Object.keys(AGENTS) as DispatchAgent[];
+
+export const AGENT_DISPLAY_INFO: Readonly<Record<DispatchAgent, DispatchAgentDisplayInfo>> =
+	Object.fromEntries(
+		DISPATCH_AGENTS.map((id) => {
+			const agent = AGENTS[id];
+			return [
+				id,
+				{
+					id,
+					label: agent.label,
+					shortLabel: agent.shortLabel,
+					...(agent.docsId ? { docsId: agent.docsId } : {})
+				}
+			];
+		})
+	) as Readonly<Record<DispatchAgent, DispatchAgentDisplayInfo>>;
+
+export const DISPATCH_DOCS_AGENT_IDS: readonly DispatchDocsAgentId[] = DISPATCH_AGENTS.flatMap(
+	(id) => {
+		const docsId = AGENTS[id].docsId;
+		return docsId ? [docsId] : [];
+	}
+);
 
 export type TerminalApp = 'terminal' | 'ghostty';
 export const TERMINAL_APPS: readonly TerminalApp[] = ['terminal', 'ghostty'];

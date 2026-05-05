@@ -1,21 +1,26 @@
 import { describe, expect, test } from 'bun:test';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { DISPATCH_DOCS_AGENT_IDS } from '../../packages/feedback-server/src/dispatch/agents.ts';
 import { AGENT_IDS } from '../../packages/mcp/src/docs-surface.ts';
 
 /**
- * `apps/docs/src/lib/ai-setup.ts` ships per-agent editor-setup cards. The
- * canonical agent ID list lives in `@dryui/mcp/docs-surface`. This parity
- * test fails loudly if ai-setup.ts drops an agent the docs-surface promises,
- * or adds a new agent without updating the shared list.
+ * `apps/docs/src/lib/ai-setup.ts` ships per-agent editor-setup cards. Dispatch
+ * agent docs IDs are feedback-owned; `@dryui/mcp/docs-surface` keeps a package
+ * adapter list for docs/MCP consumers that cannot import the feedback server at
+ * build time. These parity tests fail loudly when either surface drifts.
  */
 
 const aiSetupPath = resolve(import.meta.dir, '../../apps/docs/src/lib/ai-setup.ts');
 const aiSetupSource = readFileSync(aiSetupPath, 'utf8');
 
 describe('ai-setup ↔ docs-surface parity', () => {
+	test('docs-surface AGENT_IDS mirrors the feedback-owned dispatch docs ids', () => {
+		expect(AGENT_IDS).toEqual(DISPATCH_DOCS_AGENT_IDS);
+	});
+
 	test('every canonical AGENT_ID has an aiAgentSetups entry', () => {
-		for (const id of AGENT_IDS) {
+		for (const id of DISPATCH_DOCS_AGENT_IDS) {
 			const marker = `id: '${id}'`;
 			expect(
 				aiSetupSource.includes(marker),
@@ -25,7 +30,7 @@ describe('ai-setup ↔ docs-surface parity', () => {
 	});
 
 	test('ai-setup.ts does not reference agent IDs that are not in docs-surface', () => {
-		const canonicalSet = new Set<string>(AGENT_IDS);
+		const canonicalSet = new Set<string>(DISPATCH_DOCS_AGENT_IDS);
 		const idRegex = /id:\s*'([a-z][a-z0-9-]*)'/g;
 		const unknown = new Set<string>();
 		for (const match of aiSetupSource.matchAll(idRegex)) {

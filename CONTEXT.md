@@ -22,6 +22,8 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Dispatch agent** — one of nine targets the feedback server can send a submission to (`claude`, `codex`, `gemini`, `opencode`, `copilot`, `copilot-vscode`, `cursor`, `windsurf`, `zed`), or `off` to suppress dispatch. Defined in [`packages/feedback-server/src/dispatch/agents.ts`](./packages/feedback-server/src/dispatch/agents.ts).
 
+**Dispatch agent manifest** — the feedback-owned module in [`packages/feedback-server/src/dispatch/agents.ts`](./packages/feedback-server/src/dispatch/agents.ts) that owns Dispatch agent IDs, launch strategy selection, CLI/app probes, warning config, display labels, and docs-facing agent IDs. Docs and dashboard surfaces adapt this manifest instead of naming Dispatch agent facts independently.
+
 **Launch strategy** — how a dispatch agent receives its prompt. Four strategies today, each one a function module under [`packages/feedback-server/src/dispatch/strategies.ts`](./packages/feedback-server/src/dispatch/strategies.ts):
 
 - `terminal-cli` — open a terminal (osascript on macOS, `wt.exe` on Windows) and run the agent's CLI with the prompt. Used by `claude`, `gemini`, `opencode`, `copilot`.

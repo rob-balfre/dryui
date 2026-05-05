@@ -1,6 +1,6 @@
-import type { AgentId } from '../../../../packages/mcp/src/docs-surface.js';
+import type { DispatchDocsAgentId } from '../../../../packages/feedback-server/src/dispatch/agents.js';
 
-type AiAgentId = AgentId;
+type AiAgentId = DispatchDocsAgentId;
 
 interface AiSurfaceCard {
 	readonly name: string;
