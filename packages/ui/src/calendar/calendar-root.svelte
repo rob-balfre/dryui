@@ -4,6 +4,8 @@
 	import { createDateViewController } from '../internal/date-family-controller.svelte.js';
 	import type { CalendarVisibleMonths } from '../internal/calendar-event-layout.js';
 	import { setCalendarCtx } from './context.svelte.js';
+	import { addDays } from './week-utils.js';
+	import type { CalendarEvent, CalendarEventCategory, CalendarView } from './types.js';
 
 	interface Props extends HTMLAttributes<HTMLDivElement> {
 		value?: Date | null;
@@ -11,6 +13,14 @@
 		min?: Date | null;
 		max?: Date | null;
 		disabled?: boolean;
+		view?: CalendarView;
+		events?: CalendarEvent[];
+		categories?: CalendarEventCategory[];
+		selectedEvent?: CalendarEvent | null;
+		weekStartHour?: number;
+		weekEndHour?: number;
+		weekTimeZoneLabel?: string;
+		onEventSelect?: (event: CalendarEvent | null) => void;
 		children: Snippet;
 	}
 
@@ -20,12 +30,20 @@
 		min = null,
 		max = null,
 		disabled = false,
+		view = 'month',
+		events = [],
+		categories = [],
+		selectedEvent = $bindable<CalendarEvent | null>(null),
+		weekStartHour = 6,
+		weekEndHour = 22,
+		weekTimeZoneLabel = 'Local',
+		onEventSelect,
 		class: className,
 		children,
 		...rest
 	}: Props = $props();
 
-	const view = createDateViewController({
+	const viewController = createDateViewController({
 		initialDate: value,
 		locale: () => locale
 	});
@@ -33,18 +51,20 @@
 		visibleMonths: 1 as CalendarVisibleMonths
 	});
 
+	const categoryMap = $derived(new Map(categories.map((c) => [c.id, c])));
+
 	setCalendarCtx({
 		get value() {
 			return value;
 		},
 		get focusedDate() {
-			return view.focusedDate;
+			return viewController.focusedDate;
 		},
 		get viewMonth() {
-			return view.viewMonth;
+			return viewController.viewMonth;
 		},
 		get viewYear() {
-			return view.viewYear;
+			return viewController.viewYear;
 		},
 		get locale() {
 			return locale;
@@ -65,7 +85,7 @@
 			return disabled;
 		},
 		get weekStartDay() {
-			return view.weekStartDay;
+			return viewController.weekStartDay;
 		},
 		get multiple() {
 			return false;
@@ -73,30 +93,71 @@
 		get selectedDates() {
 			return value ? [value] : [];
 		},
+		get view() {
+			return view;
+		},
+		get events() {
+			return events;
+		},
+		get categories() {
+			return categories;
+		},
+		get selectedEvent() {
+			return selectedEvent;
+		},
+		get weekStartHour() {
+			return weekStartHour;
+		},
+		get weekEndHour() {
+			return weekEndHour;
+		},
+		get weekTimeZoneLabel() {
+			return weekTimeZoneLabel;
+		},
 		select(date: Date) {
 			value = date;
-			view.setFocusedDate(date);
+			viewController.setFocusedDate(date);
+		},
+		selectEvent(event: CalendarEvent | null) {
+			selectedEvent = event;
+			onEventSelect?.(event);
+			if (event) viewController.setFocusedDate(event.start);
 		},
 		goToMonth(month: number) {
-			view.goToMonth(month);
+			viewController.goToMonth(month);
 		},
 		goToYear(year: number) {
-			view.goToYear(year);
+			viewController.goToYear(year);
 		},
 		nextMonth() {
-			view.nextMonth();
+			viewController.nextMonth();
 		},
 		prevMonth() {
-			view.prevMonth();
+			viewController.prevMonth();
+		},
+		nextWeek() {
+			viewController.setFocusedDate(addDays(viewController.focusedDate, 7));
+		},
+		prevWeek() {
+			viewController.setFocusedDate(addDays(viewController.focusedDate, -7));
+		},
+		goToToday() {
+			const today = new Date();
+			value = today;
+			viewController.setFocusedDate(today);
 		},
 		setFocusedDate(date: Date) {
-			view.setFocusedDate(date);
+			viewController.setFocusedDate(date);
+		},
+		getCategory(id: string | undefined) {
+			return id ? categoryMap.get(id) : undefined;
 		}
 	});
 </script>
 
 <div
 	data-calendar
+	data-view={view}
 	data-disabled={disabled || undefined}
 	class={className}
 	role="group"
@@ -124,6 +185,13 @@
 		--dry-calendar-range-bg: color-mix(in srgb, var(--dry-color-fill-brand) 15%, transparent);
 		--dry-calendar-today-color: var(--dry-color-fill-brand);
 		--dry-calendar-outside-color: var(--dry-color-text-weak);
+		--dry-calendar-week-row-height: 3.25rem;
+		--dry-calendar-week-time-col: 4rem;
+		--dry-calendar-week-grid-color: var(--dry-color-stroke-weak);
+		--dry-calendar-event-radius: var(--dry-radius-md);
+		--dry-calendar-event-bg: color-mix(in srgb, var(--dry-color-fill-brand) 14%, transparent);
+		--dry-calendar-event-color: var(--dry-color-text-strong);
+		--dry-calendar-event-accent: var(--dry-color-fill-brand);
 
 		display: inline-grid;
 		grid-template-rows: max-content minmax(0, 1fr);
@@ -135,5 +203,9 @@
 		box-shadow: var(--dry-calendar-shadow);
 		color: var(--dry-calendar-header-color);
 		font-family: var(--dry-font-sans);
+	}
+
+	[data-calendar][data-view='week'] {
+		display: grid;
 	}
 </style>

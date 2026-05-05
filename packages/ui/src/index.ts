@@ -476,7 +476,13 @@ export type {
 	CalendarGridProps,
 	CalendarPrevProps,
 	CalendarNextProps,
-	CalendarHeadingProps
+	CalendarHeadingProps,
+	CalendarWeekProps,
+	CalendarEvent,
+	CalendarEventCategory,
+	CalendarView,
+	PositionedEvent,
+	DayBandEvent
 } from './calendar/index.js';
 
 export { DateRangePicker } from './date-range-picker/index.js';

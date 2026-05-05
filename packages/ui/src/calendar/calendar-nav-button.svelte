@@ -12,15 +12,28 @@
 	let { direction, children, ...rest }: Props = $props();
 
 	const ctx = getCalendarCtx();
+
+	const label = $derived.by(() => {
+		const verb = direction === 'prev' ? 'Previous' : 'Next';
+		return `${verb} ${ctx.view === 'week' ? 'week' : 'month'}`;
+	});
+
+	function handleClick() {
+		if (ctx.view === 'week') {
+			direction === 'prev' ? ctx.prevWeek() : ctx.nextWeek();
+		} else {
+			direction === 'prev' ? ctx.prevMonth() : ctx.nextMonth();
+		}
+	}
 </script>
 
 <NavArrowButton
 	{direction}
 	variant="trigger"
 	size="icon-sm"
-	label={direction === 'prev' ? 'Previous month' : 'Next month'}
+	{label}
 	disabled={ctx.disabled}
-	onclick={() => (direction === 'prev' ? ctx.prevMonth() : ctx.nextMonth())}
+	onclick={handleClick}
 	{children}
 	{...rest}
 />

@@ -2097,14 +2097,16 @@
         "Root",
         "Header",
         "Grid",
+        "Week",
         "Prev",
         "Next",
-        "Heading"
+        "Heading",
+        "EventLegend"
       ],
       "bindableProps": [
         "Root.value"
       ],
-      "usage": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n</Calendar.Root>",
+      "usage": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Week>...</Calendar.Week>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n  <Calendar.EventLegend>...</Calendar.EventLegend>\n</Calendar.Root>",
       "accessibility": [
         "Pair the control with a visible label or aria-label and keep helper or error text programmatically associated.",
         "Provide native name, autocomplete, and value wiring when the component participates in form submission."
@@ -2114,7 +2116,7 @@
         "Import Calendar from @dryui/ui.",
         "Use documented props and DryUI CSS variables before custom markup or inline styles.",
         "Use Calendar compound parts; do not render <Calendar> as a standalone element.",
-        "Include required parts: Calendar.Root, Calendar.Header, Calendar.Grid, Calendar.Prev, Calendar.Next, Calendar.Heading.",
+        "Include required parts: Calendar.Root, Calendar.Header, Calendar.Grid, Calendar.Week, Calendar.Prev, Calendar.Next, Calendar.Heading, Calendar.EventLegend.",
         "Preserve the accessibility notes in this contract."
       ],
       "checks": [
@@ -2217,6 +2219,15 @@
           },
           "forwards": "Forwards <div> attributes via rest props. Examples: id, style, role."
         },
+        "Week": {
+          "props": {
+            "event": {
+              "signature": "event: Snippet<[{ event: CalendarEvent; category: CalendarEventCategory | undefined }]>",
+              "required": false,
+              "bindable": false
+            }
+          }
+        },
         "Prev": {
           "props": {
             "children": {
@@ -2242,15 +2253,20 @@
         "Heading": {
           "props": {},
           "forwards": "Forwards <span> attributes via rest props. Examples: id, style, aria-label."
+        },
+        "EventLegend": {
+          "props": {}
         }
       },
       "structure": [
         "Calendar.Root",
         "  Calendar.Header",
         "  Calendar.Grid",
+        "  Calendar.Week",
         "  Calendar.Prev",
         "  Calendar.Next",
-        "  Calendar.Heading"
+        "  Calendar.Heading",
+        "  Calendar.EventLegend"
       ]
     },
     "Carousel": {
