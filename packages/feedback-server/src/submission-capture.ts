@@ -1,4 +1,4 @@
-import { rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { Database } from 'bun:sqlite';
@@ -22,9 +22,128 @@ const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
 	'off'
 ]);
 
+interface TableColumnRow {
+	name: string;
+}
+
+interface NormalizedCreateSubmissionInput {
+	url: string;
+	image: {
+		webp: string;
+		png: string;
+	};
+	drawings: SubmissionDrawing[];
+	hints: SubmissionDrawingHint[];
+	components: SubmissionAddedComponent[];
+	removed: SubmissionRemovedElement[];
+	moved: SubmissionMovedElement[];
+	viewport?: { width: number; height: number };
+	scroll?: SubmissionScrollOffset;
+	agent?: SubmissionAgent;
+}
+
+function ensureDirectory(path: string): void {
+	if (!existsSync(path)) {
+		mkdirSync(path, { recursive: true });
+	}
+}
+
+function ensureColumn(db: Database, table: string, column: string, definition: string): void {
+	const columns = db.query(`PRAGMA table_info(${table})`).all() as TableColumnRow[];
+	if (columns.some((entry) => entry.name === column)) {
+		return;
+	}
+	db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
 function normalizeAgent(value: string | null | undefined): SubmissionAgent | undefined {
 	if (value && VALID_AGENTS.has(value as SubmissionAgent)) return value as SubmissionAgent;
 	return undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isNonEmptyString(value: unknown): value is string {
+	return typeof value === 'string' && value.trim().length > 0;
+}
+
+function readRequiredArray<T>(value: unknown): T[] | null {
+	return Array.isArray(value) ? (value as T[]) : null;
+}
+
+function readOptionalArray<T>(value: unknown): T[] | null {
+	if (value === undefined) return [];
+	return Array.isArray(value) ? (value as T[]) : null;
+}
+
+function readNumericPair<K1 extends string, K2 extends string>(
+	value: unknown,
+	firstKey: K1,
+	secondKey: K2
+): Record<K1 | K2, number> | null | undefined {
+	if (value === undefined) return undefined;
+	if (!isRecord(value)) return null;
+	const first = value[firstKey];
+	const second = value[secondKey];
+	if (typeof first !== 'number' || typeof second !== 'number') return null;
+	if (!Number.isFinite(first) || !Number.isFinite(second)) return null;
+	return { [firstKey]: first, [secondKey]: second } as Record<K1 | K2, number>;
+}
+
+function normalizeCreateInput(
+	input: CreateSubmissionInput
+): NormalizedCreateSubmissionInput | null {
+	const raw: unknown = input;
+	if (!isRecord(raw)) return null;
+
+	const url = raw['url'];
+	if (!isNonEmptyString(url)) return null;
+
+	const image = raw['image'];
+	if (!isRecord(image)) return null;
+	const webp = image['webp'];
+	const png = image['png'];
+	if (!isNonEmptyString(webp) || !isNonEmptyString(png)) return null;
+
+	const drawings = readRequiredArray<SubmissionDrawing>(raw['drawings']);
+	if (!drawings) return null;
+
+	const hints = readOptionalArray<SubmissionDrawingHint>(raw['hints']);
+	const components = readOptionalArray<SubmissionAddedComponent>(raw['components']);
+	const removed = readOptionalArray<SubmissionRemovedElement>(raw['removed']);
+	const moved = readOptionalArray<SubmissionMovedElement>(raw['moved']);
+	if (!hints || !components || !removed || !moved) return null;
+
+	const viewport = readNumericPair(raw['viewport'], 'width', 'height');
+	if (viewport === null) return null;
+
+	const scroll = readNumericPair(raw['scroll'], 'x', 'y');
+	if (scroll === null) return null;
+
+	let agent: SubmissionAgent | undefined;
+	if (raw['agent'] !== undefined) {
+		if (typeof raw['agent'] !== 'string') return null;
+		agent = normalizeAgent(raw['agent']);
+		if (!agent) return null;
+	}
+
+	return {
+		url,
+		image: {
+			webp,
+			png
+		},
+		drawings,
+		hints,
+		components,
+		removed,
+		moved,
+		...(viewport ? { viewport: { width: viewport.width, height: viewport.height } } : {}),
+		...(scroll ? { scroll: { x: scroll.x, y: scroll.y } } : {}),
+		...(agent ? { agent } : {})
+	};
 }
 
 function parseJson<T>(value: string | null): T | undefined {
@@ -105,57 +224,103 @@ export class SubmissionCapture {
 		this.screenshotsDir = options.screenshotsDir;
 	}
 
-	create(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission {
+	initSchema(): void {
+		this.db.exec(`
+			CREATE TABLE IF NOT EXISTS submissions (
+				id TEXT PRIMARY KEY,
+				url TEXT NOT NULL,
+				screenshot_path TEXT NOT NULL,
+				screenshot_png_path TEXT,
+				drawings TEXT NOT NULL DEFAULT '[]',
+				hints TEXT,
+				components TEXT,
+				removed TEXT,
+				moved TEXT,
+				layout_boxes TEXT,
+				viewport TEXT,
+				scroll TEXT,
+				status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
+				created_at TEXT NOT NULL,
+				agent TEXT,
+				workspace TEXT
+			);
+			CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
+		`);
+		ensureColumn(this.db, 'submissions', 'agent', 'TEXT');
+		// Additive migration for pre-dual-emission databases. Existing rows keep
+		// their WebP-only screenshot_path; new columns default to NULL and new
+		// submissions populate both screenshot columns.
+		ensureColumn(this.db, 'submissions', 'screenshot_png_path', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'components', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'removed', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'moved', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'layout_boxes', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
+		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
+		ensureDirectory(this.screenshotsDir);
+	}
+
+	create(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission | null {
+		const normalized = normalizeCreateInput(input);
+		if (!normalized) return null;
+
 		const id = randomUUID();
 		const webpPath = join(this.screenshotsDir, `${id}.webp`);
 		const pngPath = join(this.screenshotsDir, `${id}.png`);
-		writeFileSync(webpPath, Buffer.from(input.image.webp, 'base64'));
-		writeFileSync(pngPath, Buffer.from(input.image.png, 'base64'));
-
 		const now = createTimestamp();
-		const agent = normalizeAgent(input.agent);
-		const hints = input.hints ?? [];
-		const components = input.components ?? [];
-		const removed = input.removed ?? [];
-		const moved = input.moved ?? [];
 		const workspace = context.workspace ?? null;
-		this.db
-			.query(
-				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, viewport, scroll, status, created_at, agent, workspace
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
-			)
-			.run(
-				id,
-				input.url,
-				webpPath,
-				pngPath,
-				JSON.stringify(input.drawings),
-				hints.length > 0 ? JSON.stringify(hints) : null,
-				components.length > 0 ? JSON.stringify(components) : null,
-				removed.length > 0 ? JSON.stringify(removed) : null,
-				moved.length > 0 ? JSON.stringify(moved) : null,
-				input.viewport ? JSON.stringify(input.viewport) : null,
-				input.scroll ? JSON.stringify(input.scroll) : null,
-				now,
-				agent ?? null,
-				workspace
-			);
+		const writtenPaths: string[] = [];
+
+		try {
+			writeFileSync(webpPath, Buffer.from(normalized.image.webp, 'base64'));
+			writtenPaths.push(webpPath);
+			writeFileSync(pngPath, Buffer.from(normalized.image.png, 'base64'));
+			writtenPaths.push(pngPath);
+
+			this.db
+				.query(
+					`INSERT INTO submissions (
+						id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, viewport, scroll, status, created_at, agent, workspace
+					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
+				)
+				.run(
+					id,
+					normalized.url,
+					webpPath,
+					pngPath,
+					JSON.stringify(normalized.drawings),
+					normalized.hints.length > 0 ? JSON.stringify(normalized.hints) : null,
+					normalized.components.length > 0 ? JSON.stringify(normalized.components) : null,
+					normalized.removed.length > 0 ? JSON.stringify(normalized.removed) : null,
+					normalized.moved.length > 0 ? JSON.stringify(normalized.moved) : null,
+					normalized.viewport ? JSON.stringify(normalized.viewport) : null,
+					normalized.scroll ? JSON.stringify(normalized.scroll) : null,
+					now,
+					normalized.agent ?? null,
+					workspace
+				);
+		} catch (error) {
+			for (const path of writtenPaths) {
+				rmSync(path, { force: true });
+			}
+			throw error;
+		}
 
 		return {
 			id,
-			url: input.url,
+			url: normalized.url,
 			screenshotPath: { webp: webpPath, png: pngPath },
-			drawings: input.drawings,
-			...(hints.length > 0 ? { hints } : {}),
-			...(components.length > 0 ? { components } : {}),
-			...(removed.length > 0 ? { removed } : {}),
-			...(moved.length > 0 ? { moved } : {}),
-			viewport: input.viewport ?? null,
-			...(input.scroll ? { scroll: input.scroll } : {}),
+			drawings: normalized.drawings,
+			...(normalized.hints.length > 0 ? { hints: normalized.hints } : {}),
+			...(normalized.components.length > 0 ? { components: normalized.components } : {}),
+			...(normalized.removed.length > 0 ? { removed: normalized.removed } : {}),
+			...(normalized.moved.length > 0 ? { moved: normalized.moved } : {}),
+			viewport: normalized.viewport ?? null,
+			...(normalized.scroll ? { scroll: normalized.scroll } : {}),
 			status: 'pending',
 			createdAt: now,
-			...(agent ? { agent } : {}),
+			...(normalized.agent ? { agent: normalized.agent } : {}),
 			...(workspace ? { workspace } : {})
 		};
 	}

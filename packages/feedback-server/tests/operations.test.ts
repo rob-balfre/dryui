@@ -257,6 +257,8 @@ describe('feedback operations', () => {
 		const { store, bus, events } = setup();
 
 		const created = createSubmission(store, bus, submissionInput(), { workspace: '/workspace' });
+		expect(created).not.toBeNull();
+		if (!created) throw new Error('Expected valid submission input to create a submission');
 		const updated = updateSubmissionStatus(store, bus, created.id, 'resolved');
 		const deleted = deleteSubmission(store, bus, created.id);
 		const missingUpdate = updateSubmissionStatus(store, bus, 'missing-submission', 'resolved');

@@ -27,7 +27,10 @@ export interface FeedbackOperationsStore {
 	): Annotation | null;
 	getPending(sessionId?: string): Annotation[];
 	saveDrawings(url: string, drawings: unknown[]): void;
-	createSubmission(input: CreateSubmissionInput, context?: { workspace?: string }): Submission;
+	createSubmission(
+		input: CreateSubmissionInput,
+		context?: { workspace?: string }
+	): Submission | null;
 	updateSubmissionStatus(id: string, status: SubmissionStatus): Submission | null;
 	deleteSubmission(id: string): Submission | null;
 }
@@ -116,8 +119,9 @@ export function createSubmission(
 	bus: EventBus,
 	input: CreateSubmissionInput,
 	context: FeedbackOperationsContext = {}
-): Submission {
+): Submission | null {
 	const submission = store.createSubmission(input, context);
+	if (!submission) return null;
 	emit(bus, 'submission.created', submission.url, submission);
 	return submission;
 }

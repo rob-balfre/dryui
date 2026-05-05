@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import { FeedbackStore } from '../src/store.ts';
-import type { SubmissionDrawing } from '../src/types.ts';
+import type { CreateSubmissionInput, Submission, SubmissionDrawing } from '../src/types.ts';
 
 function drawingArrow(id = 'a1'): SubmissionDrawing {
 	return {
@@ -32,6 +32,17 @@ function imagePayload(tag: string): { webp: string; png: string } {
 		webp: Buffer.from(`${tag}-webp`).toString('base64'),
 		png: Buffer.from(`${tag}-png`).toString('base64')
 	};
+}
+
+function createStoreSubmission(
+	store: FeedbackStore,
+	input: CreateSubmissionInput,
+	context?: { workspace?: string }
+): Submission {
+	const submission = store.createSubmission(input, context);
+	expect(submission).not.toBeNull();
+	if (!submission) throw new Error('Expected valid submission input to create a submission');
+	return submission;
 }
 
 describe('FeedbackStore', () => {
@@ -133,17 +144,17 @@ describe('FeedbackStore', () => {
 	});
 
 	test('lists submissions across queue and history filters', () => {
-		const pendingOlder = store.createSubmission({
+		const pendingOlder = createStoreSubmission(store, {
 			url: 'https://example.com/queue/older',
 			image: imagePayload('pending'),
 			drawings: [drawingArrow('pending-older')]
 		});
-		const pendingNewer = store.createSubmission({
+		const pendingNewer = createStoreSubmission(store, {
 			url: 'https://example.com/queue/newer',
 			image: imagePayload('pending-newer'),
 			drawings: [drawingArrow('pending-newer')]
 		});
-		const resolved = store.createSubmission({
+		const resolved = createStoreSubmission(store, {
 			url: 'https://example.com/history',
 			image: imagePayload('resolved'),
 			drawings: [drawingText('resolved-text', 'Looks good')]
@@ -175,7 +186,7 @@ describe('FeedbackStore', () => {
 	});
 
 	test('deletes submissions and captured screenshots', () => {
-		const submission = store.createSubmission({
+		const submission = createStoreSubmission(store, {
 			url: 'https://example.com/delete-me',
 			image: imagePayload('delete-me'),
 			drawings: [drawingText('delete-text', 'Remove this one')]
@@ -196,7 +207,7 @@ describe('FeedbackStore', () => {
 	});
 
 	test('persists dual screenshot paths, hints, and scroll offset', () => {
-		const submission = store.createSubmission({
+		const submission = createStoreSubmission(store, {
 			url: 'https://example.com/hints',
 			image: imagePayload('hints'),
 			drawings: [drawingArrow('arrow-1'), drawingText('text-1', 'Fix spacing')],

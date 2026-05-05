@@ -535,24 +535,17 @@ export function startFeedbackHttpServer(
 				}
 
 				if (pathname === '/submissions' && request.method === 'POST') {
+					let body: CreateSubmissionInput;
 					try {
-						const body = await readJson<CreateSubmissionInput>(request);
-						if (!body.url) return errorResponse(400, 'Missing url');
-						if (
-							!body.image ||
-							typeof body.image !== 'object' ||
-							typeof body.image.webp !== 'string' ||
-							typeof body.image.png !== 'string'
-						) {
-							return errorResponse(400, 'Missing image.webp or image.png');
-						}
-						const submission = createSubmissionOperation(store, bus, body, {
-							workspace: options.dispatcher?.workspace
-						});
-						return json(submission, 201);
+						body = await readJson<CreateSubmissionInput>(request);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
+					const submission = createSubmissionOperation(store, bus, body, {
+						workspace: options.dispatcher?.workspace
+					});
+					if (!submission) return errorResponse(400, 'Invalid submission');
+					return json(submission, 201);
 				}
 
 				if (pathname === '/submissions' && request.method === 'GET') {

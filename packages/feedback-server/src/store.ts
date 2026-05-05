@@ -173,11 +173,11 @@ export class FeedbackStore {
 		ensureDirectory(dirname(this.dbPath));
 		this.db = new Database(this.dbPath, { create: true });
 		this.db.exec('PRAGMA journal_mode = WAL');
-		this.init();
 		this.submissionCapture = new SubmissionCapture({
 			db: this.db,
 			screenshotsDir: this.screenshotsDir
 		});
+		this.init();
 	}
 
 	init(): void {
@@ -236,26 +236,6 @@ export class FeedbackStore {
         data TEXT NOT NULL DEFAULT '[]',
         updated_at TEXT NOT NULL
       );
-
-      CREATE TABLE IF NOT EXISTS submissions (
-        id TEXT PRIMARY KEY,
-        url TEXT NOT NULL,
-        screenshot_path TEXT NOT NULL,
-        screenshot_png_path TEXT,
-        drawings TEXT NOT NULL DEFAULT '[]',
-        hints TEXT,
-        components TEXT,
-        removed TEXT,
-        moved TEXT,
-        layout_boxes TEXT,
-        viewport TEXT,
-        scroll TEXT,
-        status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'resolved')),
-        created_at TEXT NOT NULL,
-        agent TEXT,
-        workspace TEXT
-      );
-      CREATE INDEX IF NOT EXISTS idx_submissions_status ON submissions(status);
     `);
 
 		ensureColumn(this.db, 'annotations', 'resolution_note', 'TEXT');
@@ -265,20 +245,7 @@ export class FeedbackStore {
 			'color',
 			"TEXT CHECK(color IN ('brand', 'info', 'success', 'warning', 'error', 'neutral'))"
 		);
-		ensureColumn(this.db, 'submissions', 'agent', 'TEXT');
-		// Additive migration for pre-dual-emission databases. Existing rows keep
-		// their WebP-only screenshot_path; new columns default to NULL and new
-		// submissions populate all four.
-		ensureColumn(this.db, 'submissions', 'screenshot_png_path', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'hints', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'components', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'removed', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'moved', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'layout_boxes', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'scroll', 'TEXT');
-		ensureColumn(this.db, 'submissions', 'workspace', 'TEXT');
-
-		ensureDirectory(this.screenshotsDir);
+		this.submissionCapture.initSchema();
 	}
 
 	close(): void {
@@ -545,7 +512,10 @@ export class FeedbackStore {
 			.run(url, JSON.stringify(drawings), createTimestamp());
 	}
 
-	createSubmission(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission {
+	createSubmission(
+		input: CreateSubmissionInput,
+		context: { workspace?: string } = {}
+	): Submission | null {
 		return this.submissionCapture.create(input, context);
 	}
 
