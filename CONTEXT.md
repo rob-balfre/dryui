@@ -18,6 +18,8 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Submission** — a screenshot + drawings + click hints captured by the feedback widget, addressed to one **dispatch agent**. Distinct from an annotation: an annotation is a comment on an element; a submission is a visual diff request. Stored alongside annotations in the SQLite store.
 
+**Submission capture** — the lifecycle that turns widget input into a stored Submission: writes WebP/PNG screenshot files, persists drawing intent arrays and viewport context, pins the dispatch workspace, lists queue/history entries, resolves status, and deletes the row plus screenshot files together. Screenshot files and the stored row are one lifecycle for architecture purposes.
+
 **Submission presentation** — the agent-facing view of a Submission: normalized screenshot paths, drawing and hint summaries, text notes, drawing-to-hint pairing, structured intent counts, and preserved raw intent arrays for escape hatches. This is distinct from the raw stored Submission row; storage is an adapter concern, while the presentation is the interface agents and prompts should consume.
 
 **Dispatch agent** — one of nine targets the feedback server can send a submission to (`claude`, `codex`, `gemini`, `opencode`, `copilot`, `copilot-vscode`, `cursor`, `windsurf`, `zed`), or `off` to suppress dispatch. Defined in [`packages/feedback-server/src/dispatch/agents.ts`](./packages/feedback-server/src/dispatch/agents.ts).

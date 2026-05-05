@@ -1,8 +1,8 @@
-import { mkdirSync, existsSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, existsSync } from 'node:fs';
 import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
-import { DISPATCH_AGENTS } from './dispatch.js';
+import { SubmissionCapture } from './submission-capture.js';
 import type {
 	Annotation,
 	AnnotationKind,
@@ -14,28 +14,11 @@ import type {
 	SessionStatus,
 	SessionWithAnnotations,
 	Submission,
-	SubmissionAddedComponent,
-	SubmissionAgent,
-	SubmissionDrawing,
-	SubmissionDrawingHint,
-	SubmissionMovedElement,
 	SubmissionQueryStatus,
-	SubmissionRemovedElement,
-	SubmissionScrollOffset,
 	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
-
-const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
-	...DISPATCH_AGENTS,
-	'off'
-]);
-
-function normalizeAgent(value: string | null | undefined): SubmissionAgent | undefined {
-	if (value && VALID_AGENTS.has(value as SubmissionAgent)) return value as SubmissionAgent;
-	return undefined;
-}
 
 interface SessionRow {
 	id: string;
@@ -81,27 +64,6 @@ interface AnnotationRow {
 	kind: AnnotationKind | null;
 	color: Annotation['color'] | null;
 	extra: string | null;
-}
-
-interface SubmissionRow {
-	id: string;
-	url: string;
-	screenshot_path: string;
-	screenshot_png_path: string | null;
-	drawings: string;
-	hints: string | null;
-	components: string | null;
-	removed: string | null;
-	moved: string | null;
-	// Dormant legacy column. Kept on the schema so existing databases don't need
-	// a destructive migration; the store no longer reads or writes to it.
-	layout_boxes: string | null;
-	viewport: string | null;
-	scroll: string | null;
-	status: SubmissionStatus;
-	created_at: string;
-	agent: string | null;
-	workspace: string | null;
 }
 
 interface TableColumnRow {
@@ -185,36 +147,6 @@ function toAnnotation(row: AnnotationRow): Annotation {
 	};
 }
 
-function toSubmission(row: SubmissionRow): Submission {
-	const agent = normalizeAgent(row.agent);
-	const hints = parseJson<SubmissionDrawingHint[]>(row.hints);
-	const components = parseJson<SubmissionAddedComponent[]>(row.components);
-	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
-	const moved = parseJson<SubmissionMovedElement[]>(row.moved);
-	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
-	return {
-		id: row.id,
-		url: row.url,
-		screenshotPath: {
-			webp: row.screenshot_path,
-			// Legacy rows pre-dual-emission only have the WebP file. Expose an
-			// empty PNG path so readers can fall back to WebP explicitly.
-			png: row.screenshot_png_path ?? ''
-		},
-		drawings: parseJson<SubmissionDrawing[]>(row.drawings) ?? [],
-		...(hints ? { hints } : {}),
-		...(components && components.length > 0 ? { components } : {}),
-		...(removed && removed.length > 0 ? { removed } : {}),
-		...(moved && moved.length > 0 ? { moved } : {}),
-		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
-		...(scroll !== undefined ? { scroll } : {}),
-		status: row.status as SubmissionStatus,
-		createdAt: row.created_at,
-		...(agent ? { agent } : {}),
-		...(row.workspace ? { workspace: row.workspace } : {})
-	};
-}
-
 function toDbBoolean(value: boolean | undefined): number | null {
 	if (value === undefined) return null;
 	return value ? 1 : 0;
@@ -233,6 +165,7 @@ export class FeedbackStore {
 	readonly db: Database;
 	readonly dbPath: string;
 	readonly screenshotsDir: string;
+	private readonly submissionCapture: SubmissionCapture;
 
 	constructor(options: FeedbackStoreOptions) {
 		this.dbPath = options.dbPath;
@@ -241,6 +174,10 @@ export class FeedbackStore {
 		this.db = new Database(this.dbPath, { create: true });
 		this.db.exec('PRAGMA journal_mode = WAL');
 		this.init();
+		this.submissionCapture = new SubmissionCapture({
+			db: this.db,
+			screenshotsDir: this.screenshotsDir
+		});
 	}
 
 	init(): void {
@@ -609,109 +546,22 @@ export class FeedbackStore {
 	}
 
 	createSubmission(input: CreateSubmissionInput, context: { workspace?: string } = {}): Submission {
-		const id = randomUUID();
-		const webpPath = join(this.screenshotsDir, `${id}.webp`);
-		const pngPath = join(this.screenshotsDir, `${id}.png`);
-		writeFileSync(webpPath, Buffer.from(input.image.webp, 'base64'));
-		writeFileSync(pngPath, Buffer.from(input.image.png, 'base64'));
-
-		const now = createTimestamp();
-		const agent = normalizeAgent(input.agent);
-		const hints = input.hints ?? [];
-		const components = input.components ?? [];
-		const removed = input.removed ?? [];
-		const moved = input.moved ?? [];
-		const workspace = context.workspace ?? null;
-		this.db
-			.query(
-				`INSERT INTO submissions (
-					id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, viewport, scroll, status, created_at, agent, workspace
-				) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
-			)
-			.run(
-				id,
-				input.url,
-				webpPath,
-				pngPath,
-				JSON.stringify(input.drawings),
-				hints.length > 0 ? JSON.stringify(hints) : null,
-				components.length > 0 ? JSON.stringify(components) : null,
-				removed.length > 0 ? JSON.stringify(removed) : null,
-				moved.length > 0 ? JSON.stringify(moved) : null,
-				input.viewport ? JSON.stringify(input.viewport) : null,
-				input.scroll ? JSON.stringify(input.scroll) : null,
-				now,
-				agent ?? null,
-				workspace
-			);
-
-		return {
-			id,
-			url: input.url,
-			screenshotPath: { webp: webpPath, png: pngPath },
-			drawings: input.drawings,
-			...(hints.length > 0 ? { hints } : {}),
-			...(components.length > 0 ? { components } : {}),
-			...(removed.length > 0 ? { removed } : {}),
-			...(moved.length > 0 ? { moved } : {}),
-			viewport: input.viewport ?? null,
-			...(input.scroll ? { scroll: input.scroll } : {}),
-			status: 'pending',
-			createdAt: now,
-			...(agent ? { agent } : {}),
-			...(workspace ? { workspace } : {})
-		};
+		return this.submissionCapture.create(input, context);
 	}
 
 	getSubmission(id: string): Submission | null {
-		const row = this.db.query<SubmissionRow>('SELECT * FROM submissions WHERE id = ?').get(id);
-		return row ? toSubmission(row) : null;
+		return this.submissionCapture.get(id);
 	}
 
 	listSubmissions(status: SubmissionQueryStatus = 'all'): Submission[] {
-		// Pending uses ASC so it acts like a FIFO queue; history filters use DESC (newest first).
-		if (status === 'pending') {
-			const rows = this.db
-				.query<SubmissionRow>(
-					"SELECT * FROM submissions WHERE status = 'pending' ORDER BY created_at ASC"
-				)
-				.all();
-			return rows.map(toSubmission);
-		}
-
-		const rows =
-			status === 'all'
-				? this.db.query<SubmissionRow>('SELECT * FROM submissions ORDER BY created_at DESC').all()
-				: this.db
-						.query<SubmissionRow>(
-							'SELECT * FROM submissions WHERE status = ? ORDER BY created_at DESC'
-						)
-						.all(status);
-		return rows.map(toSubmission);
+		return this.submissionCapture.list(status);
 	}
 
 	updateSubmissionStatus(id: string, status: SubmissionStatus): Submission | null {
-		const existing = this.getSubmission(id);
-		if (!existing) return null;
-		this.db.query('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
-		return { ...existing, status };
+		return this.submissionCapture.updateStatus(id, status);
 	}
 
 	deleteSubmission(id: string): Submission | null {
-		const existing = this.getSubmission(id);
-		if (!existing) return null;
-
-		this.db.query('DELETE FROM submissions WHERE id = ?').run(id);
-
-		for (const screenshotPath of new Set([
-			existing.screenshotPath.webp,
-			existing.screenshotPath.png
-		])) {
-			if (screenshotPath) {
-				rmSync(screenshotPath, { force: true });
-			}
-		}
-
-		return existing;
+		return this.submissionCapture.delete(id);
 	}
 }
