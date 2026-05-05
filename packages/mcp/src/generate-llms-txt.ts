@@ -377,8 +377,15 @@ bun add @dryui/ui
 
 Use \`data-theme="light"\` or \`data-theme="dark"\` only for explicit overrides. If you build a theme toggle, persist the explicit override and keep system mode as the fallback.
 
-## Components
-`);
+## Layout Rules
+
+DryUI does not ship a layout component. Page and section structure live in \`src/layout.css\`, scoped by \`[data-layout="<name>"]\` and direct children marked with \`data-layout-area="<area>"\`.
+
+Keep page-level \`display: grid\` and \`display: flex\` in \`src/layout.css\` or its \`@container\` blocks. Do not put page layout grid/flex in route-level component \`<style>\` blocks, \`style=\` attributes, or \`style:\` directives.
+
+Use \`@container\` queries for responsive layout shifts; never \`@media\` for layout breakpoints. Wire \`dryuiLayoutCss()\` in Vite so \`src/layout.css\` is checked during dev, HMR, and build.
+
+## Components`);
 
 	for (const category of orderedCategories) {
 		const components = byCategory[category];

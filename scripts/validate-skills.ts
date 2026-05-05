@@ -12,6 +12,7 @@
 import { readdir, exists } from 'node:fs/promises';
 import { join, basename, relative } from 'node:path';
 import { parseFrontmatter } from './_skill-frontmatter';
+import { checkSkillRuleContracts } from './skill-rule-contract';
 
 const root = join(import.meta.dir, '..');
 const skillsRoot = join(root, 'skills');
@@ -91,6 +92,10 @@ if (allSkills.length === 0) {
 
 for (const skill of allSkills) {
 	await validateSkill(skill);
+}
+
+for (const diagnostic of await checkSkillRuleContracts(root)) {
+	diagnostics.push(diagnostic);
 }
 
 if (diagnostics.length > 0) {
