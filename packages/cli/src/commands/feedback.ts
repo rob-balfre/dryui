@@ -36,44 +36,6 @@ function resolveServerEntry(): string {
 	return resolveFeedbackServerEntry({ workspaceRoot: REPO_ROOT, preferPackaged: true });
 }
 
-function feedbackInitHelp(): never {
-	printCommandHelp({
-		usage: 'dryui feedback init',
-		description: [
-			'Print the recommended feedback-server setup for this machine.',
-			'Shows the default URL, SQLite store path, and the ordered steps to run the server, register the MCP, and wire the prompt-submit hook.'
-		],
-		examples: ['  dryui feedback init']
-	});
-}
-
-function getFeedbackInit(): CommandResult {
-	const paths = projectFeedbackPaths(process.cwd());
-	return {
-		output: [
-			'DryUI feedback init',
-			'',
-			`Default server URL: http://127.0.0.1:${DEFAULT_FEEDBACK_PORT} (port increments if taken)`,
-			`Project state: ${paths.dir}`,
-			`  SQLite store: ${paths.dbPath}`,
-			`  Screenshots: ${paths.screenshotsDir}`,
-			`  Server config: ${paths.configPath}`,
-			'Hook script: packages/feedback-server/hooks/check-feedback.sh',
-			'',
-			'Suggested next steps:',
-			'1. Start the server with `dryui feedback server` from this project.',
-			'2. Add a separate feedback MCP entry that points at `packages/feedback-server/dist/mcp.js`.',
-			'3. Register the hook script with your prompt-submit hook if you want pending annotations injected into context.',
-			'',
-			'next[2]{cmd,description}:',
-			'  dryui feedback server,Start the local feedback server in the foreground for this project',
-			'  dryui feedback doctor,Probe a running feedback server for health + listener state'
-		].join('\n'),
-		error: null,
-		exitCode: 0
-	};
-}
-
 function feedbackDoctorHelp(): never {
 	printCommandHelp({
 		usage: 'dryui feedback doctor [--endpoint <url>]',
@@ -153,6 +115,7 @@ function feedbackUiHelp(): never {
 			description: [
 				'Open the feedback dashboard for queue and history review.',
 				'If no feedback server is running at the target endpoint, this command starts one in the background first.',
+				'Run `dryui setup --editor <agent>` to install the feedback MCP wiring for your editor.',
 				'`dryui feedback ui` remains as a compatibility alias.'
 			],
 			options: [
@@ -314,7 +277,6 @@ function feedbackDispatcherHelp(): never {
 		description: ['Start feedback tooling, inspect the server, or launch the dashboard.'],
 		options: [
 			'  server    Run the feedback server in the foreground',
-			'  init      Print the recommended feedback setup for this machine',
 			'  doctor    Probe a running feedback server for health + listener stats',
 			'  ui        Open the feedback dashboard in a browser (alias for bare `dryui feedback`)'
 		],
@@ -354,14 +316,6 @@ export async function runFeedback(args: string[], options: FeedbackRunOptions = 
 
 	if (command === 'server') {
 		runFeedbackServer(args.slice(1));
-		return;
-	}
-
-	if (command === 'init') {
-		if (hasFlag(args.slice(1), '--help')) {
-			feedbackInitHelp();
-		}
-		emitOrRun(getFeedbackInit(), 'toon', exitOnComplete);
 		return;
 	}
 

@@ -14,6 +14,6 @@ DryUI delegates design-quality flows (brief, critique, polish, visual review, an
 - License: Apache 2.0
 - Website: https://impeccable.style
 
-DryUI does not vendor, fork, or redistribute impeccable. The `dryui init` command offers to install impeccable into the scaffolded project via `npx impeccable skills install`, which fetches the skill from impeccable's own distribution. Users can install, update, or remove impeccable independently.
+DryUI does not vendor, fork, or redistribute impeccable. Users who want impeccable install it independently via `npx impeccable skills install`, which fetches the skill from impeccable's own distribution. Users can install, update, or remove impeccable independently.
 
 Impeccable itself builds on [Anthropic's frontend-design skill](https://github.com/anthropics/skills/tree/main/skills/frontend-design); see the upstream [impeccable NOTICE](https://github.com/pbakaus/impeccable/blob/main/NOTICE.md) for that attribution chain.

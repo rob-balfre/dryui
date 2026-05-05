@@ -222,7 +222,7 @@ dryui
 
 For greenfield and brownfield setup, use the `dryui-init` skill instructions. The CLI no longer owns project detection, install planning, or scaffolding.
 
-> **No global install?** `bunx @dryui/cli <cmd>` and `npx -y @dryui/cli <cmd>` work anywhere without installing. Same commands, just slower (re-fetches on each call).
+> **No global install?** Prefix supported CLI commands with `bunx @dryui/cli ...` or `npx -y @dryui/cli ...`. Supported commands are `setup`, `ambient`, `install-hook`, and `feedback`.
 
 **4. Install the DryUI agent skills** with the `npx skills` standard:
 

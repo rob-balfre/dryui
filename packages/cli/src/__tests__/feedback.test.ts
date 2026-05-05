@@ -37,6 +37,7 @@ describe('feedback command', () => {
 			'',
 			'Open the feedback dashboard for queue and history review.',
 			'If no feedback server is running at the target endpoint, this command starts one in the background first.',
+			'Run `dryui setup --editor <agent>` to install the feedback MCP wiring for your editor.',
 			'`dryui feedback ui` remains as a compatibility alias.',
 			'',
 			'Options:',
@@ -54,17 +55,15 @@ describe('feedback command', () => {
 		expect(result.exitCode).toBe(0);
 	});
 
-	test('prints the local setup guide for feedback init', async () => {
+	test('rejects feedback init as a removed setup-like subcommand', async () => {
 		const result = await captureAsyncCommandIO(() =>
 			runFeedback(['init'], { exitOnComplete: false })
 		);
 
 		expect(result.logs).toHaveLength(1);
-		expect(result.logs[0]).toContain('DryUI feedback init');
-		expect(result.logs[0]).toContain('Default server URL: http://127.0.0.1:4748');
-		expect(result.logs[0]).toContain('.dryui/feedback');
-		expect(result.logs[0]).toContain('packages/feedback-server/hooks/check-feedback.sh');
-		expect(result.logs[0]).toContain('dryui feedback doctor');
+		expect(result.logs[0]).toContain('unknown-subcommand');
+		expect(result.logs[0]).toContain('Unknown feedback subcommand: "init"');
+		expect(result.logs[0]).toContain('dryui feedback --help');
 		expect(result.errors).toEqual([]);
 		expect(result.exitCode).toBeNull();
 	});

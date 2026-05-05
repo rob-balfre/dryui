@@ -240,10 +240,21 @@ function formatPreviewCodeLines(guide: SetupGuide, code: string): string[] {
 	return [`   See \`dryui setup --editor ${guide.id}\` for the full snippet.`];
 }
 
-function formatGuide(guide: SetupGuide): string {
+function isSvelteCompanionSection(section: SetupGuide['sections'][number]): boolean {
+	return section.title.toLowerCase().includes('svelte');
+}
+
+export function formatGuide(
+	guide: SetupGuide,
+	options: { includeSvelteMcp?: boolean } = {}
+): string {
+	const includeSvelteMcp = options.includeSvelteMcp ?? true;
+	const sections = includeSvelteMcp
+		? guide.sections
+		: guide.sections.filter((section) => !isSvelteCompanionSection(section));
 	const lines = [guide.label, '', guide.description, ''];
 
-	for (const [index, section] of guide.sections.entries()) {
+	for (const [index, section] of sections.entries()) {
 		lines.push(`${index + 1}. ${section.title}`);
 		if (section.note) {
 			lines.push(`   ${section.note}`);
@@ -946,7 +957,7 @@ export async function runSetup(args: string[]): Promise<void> {
 			console.error(`Unknown editor: ${editor}`);
 			process.exit(1);
 		}
-		console.log(formatGuide(getSetupGuide(editor)));
+		console.log(formatGuide(getSetupGuide(editor), { includeSvelteMcp }));
 		if (editor === 'claude-code' && hasFlag(args, '--claude-hook')) {
 			emitCommandResult(getInstallHookResult([], 'text'));
 		}

@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
 import {
+	formatGuide,
 	formatGuidePreviewLines,
 	formatPromptFrameLines,
 	formatSelectScreenLines
@@ -120,5 +121,14 @@ describe('setup menu formatting', () => {
 		expect(lines).toContain('   See `dryui setup --editor zed` for the full snippet.');
 		expect(lines).toContain('Optional');
 		expect(lines).toContain('   2. Svelte MCP (recommended companion)');
+	});
+
+	test('omits Svelte companion sections when guide rendering opts out', () => {
+		const guide = formatGuide(getSetupGuide('codex'), { includeSvelteMcp: false });
+
+		expect(guide).toContain('1. Install the DryUI skills');
+		expect(guide).toContain('2. Add the feedback MCP server');
+		expect(guide).not.toContain('Svelte MCP');
+		expect(guide).not.toContain('@sveltejs/mcp');
 	});
 });

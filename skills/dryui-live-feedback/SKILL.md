@@ -15,13 +15,13 @@ Check the health endpoint:
 curl -s http://localhost:4748/health
 ```
 
-If it returns `{"status":"ok"}`, the server is already running. Otherwise start it:
+If it returns `{"status":"ok"}`, the server is already running. Otherwise use the supported CLI launcher:
 
 ```bash
-bun run packages/feedback-server/dist/server.js
+dryui feedback --no-open
 ```
 
-If `dist/` does not exist, build first:
+In the DryUI monorepo, if you need a repo-internal fallback and `dist/` does not exist, build first:
 
 ```bash
 cd packages/feedback-server && bun run build
@@ -51,11 +51,11 @@ If the component is not mounted, the user cannot submit feedback. Check layout f
 
 ## 3. Open the App in a Browser
 
-Use the browser tools available in your environment:
+Use the browser tools available in your environment. In this repo, prefer `chrome-devtools-axi` for browser automation.
 
-- **Claude Code with Chrome MCP:** use `navigate` to open the dev server URL
-- **Claude Code with Preview:** use `preview_start` if a launch config exists
-- **Other environments:** tell the user to open the dev server URL manually
+- With Chrome/DevTools automation: open the dev server URL directly.
+- With a preview tool: open the configured preview URL.
+- If no browser tool is available: tell the user to open the dev server URL manually.
 
 ## 4. Tell the User What to Do
 

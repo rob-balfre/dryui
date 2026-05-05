@@ -4674,8 +4674,8 @@ body {
   --dry-color-bg-base: #fff7ed;
   --dry-color-bg-raised: #ffedd5;
   --dry-color-bg-overlay: #fed7aa;
-  /* Brand + the remaining ~35 semantic tokens go here. Run
-     \`check src/lib/brand.theme.css\` to see every token the checker expects. */
+  /* Brand + the remaining ~35 semantic tokens go here. Package checks
+     will report every token the checker expects. */
 }
 
 <!-- Import order matters. In +layout.svelte: theme CSS BEFORE local CSS. -->

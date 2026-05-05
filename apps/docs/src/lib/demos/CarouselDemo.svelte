@@ -22,9 +22,9 @@
 			id: 'v033',
 			tag: '0.33.0',
 			date: '10 Apr 2026',
-			title: 'Static token validator',
-			body: 'dryui check flags raw hex, non-grid layout, and inline-size without spinning up a browser.',
-			highlights: ['MCP-compatible output', 'No render pass', 'Fails the preprocessor']
+			title: 'Lint contracts',
+			body: '@dryui/lint flags raw hex, non-grid layout, and inline-size during package checks.',
+			highlights: ['Svelte preprocessor', 'No render pass', 'Package-owned checks']
 		}
 	];
 </script>
