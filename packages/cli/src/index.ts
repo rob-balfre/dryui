@@ -47,22 +47,21 @@ function emitNotADryuiProject(): void {
 	console.log(`cwd: ${homeRelative(process.cwd())}`);
 	console.log('');
 	console.log('next[2]{cmd,description}:');
-	console.log('  dryui setup,Install skills and feedback wiring');
+	console.log('  npx skills add rob-balfre/dryui,Install DryUI skills');
 	console.log('  dryui feedback,Open the feedback dashboard');
 }
 
 const USAGE = `Usage: dryui <command> [options]
 
 DryUI's CLI is intentionally small. Product guidance and project inspection
-live in skills; the CLI only wires skills/setup and runs feedback tooling.
+live in skills; the CLI only runs feedback tooling.
 
-Running \`dryui\` with no command starts the interactive setup flow in a TTY.
+Running \`dryui\` with no command opens the setup deprecation notice in a TTY.
 Without a TTY, it opens the feedback launcher inside the DryUI monorepo or
 prints setup hints everywhere else. Use \`dryui --help\` to see this message.
 
 Commands:
-  setup [--editor <id>] [--open-feedback]
-                                Interactive editor, agent, and feedback setup
+  setup                         Deprecated; use \`npx skills add rob-balfre/dryui\`
   ambient                       Print compact session context (for SessionStart hooks)
   install-hook [--global] [--dry-run]
                                 Wire \`dryui ambient\` into Claude Code settings.json
@@ -127,7 +126,7 @@ async function main(): Promise<void> {
 					'toon',
 					'unknown-command',
 					`Unknown command: "${command}". Run \`dryui --help\` for the full command list.`,
-					['dryui --help', 'dryui setup', 'dryui feedback']
+					['dryui --help', 'npx skills add rob-balfre/dryui', 'dryui feedback']
 				),
 				'toon'
 			);

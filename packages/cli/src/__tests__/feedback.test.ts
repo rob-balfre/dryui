@@ -37,7 +37,7 @@ describe('feedback command', () => {
 			'',
 			'Open the feedback dashboard for queue and history review.',
 			'If no feedback server is running at the target endpoint, this command starts one in the background first.',
-			'Run `dryui setup --editor <agent>` to install the feedback MCP wiring for your editor.',
+			'Install DryUI skills with `npx skills add rob-balfre/dryui`; add feedback MCP config only when your editor needs the visual feedback tools.',
 			'`dryui feedback ui` remains as a compatibility alias.',
 			'',
 			'Options:',

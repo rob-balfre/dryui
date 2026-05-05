@@ -6,8 +6,7 @@
 	import { withBase } from '$lib/utils';
 
 	const projectSetupCode = `bun add @dryui/ui
-bun add -d @dryui/lint
-dryui setup`;
+bun add -d @dryui/lint`;
 
 	const themeSetupCode = `<!-- src/routes/+layout.svelte -->
 <script>
@@ -54,8 +53,8 @@ bun run build`;
 		<section class="stack-md">
 			<Heading level={2}>Wire the app</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Add the packages explicitly, then use setup only for editor skills, feedback, and optional
-				Svelte MCP wiring. App bootstrap is skill-led instead of CLI-detected.
+				Add the packages explicitly, then let the installed skills guide the file edits. App
+				bootstrap is skill-led instead of CLI-detected.
 			</Text>
 			<CodeBlock code={projectSetupCode} language="bash" />
 		</section>

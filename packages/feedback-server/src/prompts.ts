@@ -7,8 +7,7 @@ export const FEEDBACK_PIPELINE_PROMPT_STEP =
 
 // Fallback path used when callers do not pass a resolved absolute path. The
 // dispatched agent will fail to read it unless the skill is installed in the
-// project (via `npx skills add rob-balfre/dryui --skill dryui-feedback` or
-// `dryui setup`).
+// project via `npx skills add rob-balfre/dryui --skill dryui-feedback`.
 export const DEFAULT_FEEDBACK_SKILL_REFERENCE = '.claude/skills/dryui-feedback/SKILL.md';
 
 export interface FeedbackPromptOptions {

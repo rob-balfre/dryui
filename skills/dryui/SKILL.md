@@ -1,6 +1,6 @@
 ---
 name: dryui
-description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, layout discipline, and accessibility. Use the skill instructions as the default entry point; the CLI is only for editor setup and feedback tooling.'
+description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, layout discipline, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills and the CLI is only for feedback tooling and local helpers.'
 ---
 
 # DryUI
@@ -185,15 +185,23 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, `+page.server.ts` shape, form actions, and anything Svelte-syntax adjacent: call the official `svelte-autofixer` and `get-documentation` tools from `@sveltejs/mcp` before guessing from memory.
 
-- `dryui setup --editor <agent>` prints or installs the Svelte MCP companion snippet where the editor supports it.
-- If it's not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
+- Install DryUI skills with `npx skills add rob-balfre/dryui`. Setup is owned by the upstream skills installer, not the DryUI CLI.
+- If the Svelte MCP is not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
 - Scope split: DryUI skills cover component APIs, theming, composition, and validation expectations. Svelte MCP covers the runtime, compiler, and framework idioms.
 
 The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either call `svelte-autofixer` / `get-documentation`, or confirm the pattern is already covered by these DryUI rules and examples?
 
 ## Quick Start
 
-**1. Check for a local CLI link before installing.** A global install replaces Bun's local link, so inspect it first:
+**1. Install the DryUI agent skills** with the `npx skills` standard:
+
+```bash
+npx skills add rob-balfre/dryui
+```
+
+That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) through the upstream skills installer. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
+
+**2. Check for a local CLI link before installing feedback helpers.** A global install replaces Bun's local link, so inspect it first:
 
 ```bash
 readlink ~/.bun/install/global/node_modules/@dryui/cli
@@ -212,27 +220,17 @@ Only install the published CLI when no local link exists and you are not iterati
 bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
 ```
 
-**2. Start with bare `dryui`** when you want editor integration and feedback:
+**3. Start feedback tooling** when you need visual annotations:
 
 ```bash
-dryui
+dryui feedback
 ```
 
-**3. Bootstrap the app manually or with the `dryui-init` skill.**
+**4. Bootstrap the app manually or with the `dryui-init` skill.**
 
 For greenfield and brownfield setup, use the `dryui-init` skill instructions. The CLI no longer owns project detection, install planning, or scaffolding.
 
-> **No global install?** Prefix supported CLI commands with `bunx @dryui/cli ...` or `npx -y @dryui/cli ...`. Supported commands are `setup`, `ambient`, `install-hook`, and `feedback`.
-
-**4. Install the DryUI agent skills** with the `npx skills` standard:
-
-```bash
-npx skills add rob-balfre/dryui
-```
-
-That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) through the upstream skills installer. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
-
-Then run `dryui setup --editor <agent>` to add the DryUI context server, feedback dispatch server, and optional Svelte companion for the editor you use.
+> **No global install?** Prefix supported CLI commands with `bunx @dryui/cli ...` or `npx -y @dryui/cli ...`. Supported commands are `ambient`, `install-hook`, and `feedback`.
 
 ### Manual install path
 
@@ -240,7 +238,7 @@ Kept for users who need to pin to a specific local path; the npx skills command 
 
 - Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 
-**5. Register the Svelte MCP companion.** Run `dryui setup --editor <agent>` to print the right companion snippet. For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
+**5. Register the Svelte MCP companion.** For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 
 ### Manual setup
 
@@ -311,11 +309,9 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 
 ### CLI
 
-Before installing globally, always check `readlink ~/.bun/install/global/node_modules/@dryui/cli`. If it points at a local DryUI checkout's `packages/cli`, keep the link and use `bun run dev:link` plus `DRYUI_DEV=1` instead of reinstalling. Only install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`) when no local link exists and you are not iterating on DryUI source. The CLI is intentionally small: it sets up editor skills/MCP wiring and starts feedback tooling.
+Before installing globally, always check `readlink ~/.bun/install/global/node_modules/@dryui/cli`. If it points at a local DryUI checkout's `packages/cli`, keep the link and use `bun run dev:link` plus `DRYUI_DEV=1` instead of reinstalling. Only install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`) when no local link exists and you are not iterating on DryUI source. The CLI is intentionally small: it starts feedback tooling and prints local helper context.
 
 ```bash
-dryui                           # default onboarding entry point
-dryui setup                     # install DryUI skills, feedback MCP, and Svelte companion snippets
 dryui ambient                   # SessionStart context
 dryui install-hook --dry-run    # Preview Claude hook wiring
 dryui feedback                  # Start the local feedback dashboard

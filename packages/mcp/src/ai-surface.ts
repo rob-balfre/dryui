@@ -28,10 +28,6 @@ export const aiSurface: AiSurfaceManifest = {
 	tools: [],
 	prompts: [],
 	cliCommands: [
-		{
-			name: 'setup',
-			description: 'Interactive onboarding for editor integration and feedback tooling'
-		},
 		{ name: 'ambient', description: 'Print compact session context for SessionStart hooks' },
 		{
 			name: 'install-hook',

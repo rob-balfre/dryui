@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Accepted, amended by [ADR-0002](./0002-skills-installer-owns-editor-setup.md)
 
 ## Context
 
@@ -14,9 +14,8 @@ The project direction is now that DryUI should primarily be a set of skills. Lar
 
 Keep the DryUI CLI focused on:
 
-- skill/editor setup
 - feedback tooling
-- small setup helpers needed by those flows, such as `ambient` and `install-hook`
+- small local helpers such as `ambient` and `install-hook`
 
 Remove public CLI routing for project detection, install planning, project bootstrapping, component lookup, token listing, prompt generation, and broad checking.
 
@@ -25,6 +24,6 @@ Deterministic validation should live in package-level lint/build/test commands a
 ## Consequences
 
 - Agents should use DryUI skills for project inspection and implementation guidance.
-- The CLI help and interactive menu should present only setup and feedback paths.
+- The CLI help should present only supported local helper and feedback paths.
 - Future architecture work should prefer deleting CLI planning surfaces over deepening them.
 - If a deterministic check is still needed, it should be exposed as a focused package command or library interface rather than a catch-all `dryui` command.

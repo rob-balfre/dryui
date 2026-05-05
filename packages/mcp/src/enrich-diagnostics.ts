@@ -132,7 +132,7 @@ const HINTS: Record<string, HintBuilder> = {
 		docsRef: `${DOCS_BASE}/concepts/layout#layout-css`
 	}),
 	'lint/project/stale-claude-agent': () => ({
-		hint: 'Refresh copied Claude subagents from the current DryUI source by running `dryui setup --sync-agents` from the project root, then rerun check. Stale prompts can make agents use removed APIs such as AreaGrid.',
+		hint: 'Refresh installed DryUI skills from source with `npx skills add rob-balfre/dryui`, then rerun check. Stale prompts can make agents use removed APIs such as AreaGrid.',
 		docsRef: `${DOCS_BASE}/getting-started#agent-setup`
 	}),
 

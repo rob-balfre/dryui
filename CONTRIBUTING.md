@@ -34,7 +34,7 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). Edit these directly.
 
 - `bun run validate:skills` enforces npx skills frontmatter rules (name=dirname, lowercase + hyphens, description 20..1024 chars). Runs in postinstall and the pre-commit hook for any staged SKILL.md.
-- Distribution to end users: `npx skills add rob-balfre/dryui` (skills.sh standard). Per-agent install paths and MCP wiring live in [`packages/cli/src/commands/setup-installers.ts`](./packages/cli/src/commands/setup-installers.ts).
+- Distribution to end users: `npx skills add rob-balfre/dryui` (skills.sh standard). Editor skill setup is owned by the upstream skills installer; DryUI only maintains feedback tooling and DryUI-specific MCP examples.
 
 ## Adding Or Changing A Component
 

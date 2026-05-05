@@ -333,7 +333,7 @@ function buildLlmsText(spec: Spec): string {
 - @dryui/primitives: Headless, unstyled components
 - @dryui/ui: Styled components with CSS variables and theme system
 - @dryui/mcp: compatibility MCP server with no runtime tools
-- @dryui/cli: small CLI for skill/editor setup and feedback tooling
+- @dryui/cli: small CLI for ambient context hooks and feedback tooling
 
 ## Human-Led Agent-Assisted Workflow
 
@@ -355,7 +355,6 @@ npx skills add rob-balfre/dryui
 \`\`\`
 
 \`\`\`
-dryui setup
 dryui feedback
 \`\`\`
 
@@ -407,7 +406,7 @@ All components support CSS variable theming. Override at the :root level or comp
 
 ## CLI
 
-The CLI is intentionally small. Use skills as the default surface for project inspection and implementation guidance; use \`dryui\` for editor integration and feedback onboarding.
+The CLI is intentionally small. Use \`npx skills add rob-balfre/dryui\` for skill and editor setup; use \`dryui\` for ambient context hooks and feedback tooling.
 
 Before installing globally, always check \`readlink ~/.bun/install/global/node_modules/@dryui/cli\`. If it points at a local DryUI checkout's \`packages/cli\`, keep the link and use \`bun run dev:link\` plus \`DRYUI_DEV=1\` instead of reinstalling. Only install once with \`bun install -g @dryui/cli@latest\` (or \`npm install -g @dryui/cli@latest\`) when no local link exists and you are not iterating on DryUI source. MCP output uses TOON (token-optimized, agent-friendly) by default.
 
@@ -415,8 +414,6 @@ Current command surface: ${cliCommands.join(', ')}.
 
 \`\`\`
 dryui
-dryui setup
-dryui setup --editor codex
 dryui ambient
 dryui install-hook --dry-run
 dryui feedback
@@ -437,7 +434,7 @@ The recommended path is the upstream \`npx skills\` CLI (skills.sh standard):
 npx skills add rob-balfre/dryui
 \`\`\`
 
-That single command installs all six DryUI skills. Then add feedback MCP config for tools that need it: run \`dryui setup --editor <agent>\` and apply the printed snippet.
+That single command installs all six DryUI skills. Use \`dryui feedback\` for feedback tooling and MCP guidance when a project needs visual feedback.
 
 Available MCP tools:
 ${ai.tools.length === 0 ? '- none' : ai.tools.map((tool) => `- ${tool.name}: ${tool.description}`).join('\n')}`);

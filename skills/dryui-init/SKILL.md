@@ -53,10 +53,10 @@ For design-quality flows (brief, critique, polish, audit), delegate to [impeccab
 
 ## Editor And Feedback Setup
 
-If the user also wants editor integration or visual feedback tooling, run:
+If the user also wants editor skill setup, use the upstream skills installer:
 
 ```bash
-dryui setup
+npx skills add rob-balfre/dryui
 ```
 
-That command only wires skills, feedback MCP, and optional Svelte MCP snippets. It does not bootstrap the app.
+If the user wants visual feedback tooling, add the dryui-feedback MCP server for their editor and run `dryui feedback` when they need the local dashboard. The DryUI CLI does not bootstrap the app or install skills.

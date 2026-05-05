@@ -11,7 +11,7 @@
     "compositionRecipes": 48,
     "tools": 0,
     "prompts": 0,
-    "cliCommands": 4,
+    "cliCommands": 3,
     "promptBundles": 1
   },
   "themeImports": {
@@ -22,10 +22,6 @@
     "tools": [],
     "prompts": [],
     "cliCommands": [
-      {
-        "name": "setup",
-        "description": "Interactive onboarding for editor integration and feedback tooling"
-      },
       {
         "name": "ambient",
         "description": "Print compact session context for SessionStart hooks"

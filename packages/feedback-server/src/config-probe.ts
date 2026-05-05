@@ -1,8 +1,6 @@
-// Zero-dep JSON/TOML config probes shared by @dryui/feedback-server (dispatch)
-// and @dryui/cli (setup-installers). The CLI imports these via the
-// `@dryui/feedback-server/internals/probe` subpath. The optional ProbeCache
-// lets a caller amortize file reads across many probes against the same file
-// (e.g. 8 editors × 2 entry lookups per editor on the same JSON config).
+// Zero-dep JSON/TOML config probes used by @dryui/feedback-server dispatch.
+// The optional ProbeCache lets a caller amortize file reads across many probes
+// against the same file.
 
 import { readFileSync } from 'node:fs';
 
