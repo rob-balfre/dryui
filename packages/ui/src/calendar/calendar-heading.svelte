@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { HTMLAttributes } from 'svelte/elements';
+	import { formatDate } from '@dryui/primitives';
 	import { getCalendarCtx } from './context.svelte.js';
 	import { formatVisibleMonthRangeLabel } from '../internal/calendar-grid-utils.js';
+	import { getWeekDays } from './week-utils.js';
 
 	interface Props extends HTMLAttributes<HTMLSpanElement> {}
 
@@ -9,13 +11,25 @@
 
 	const ctx = getCalendarCtx();
 
-	const monthYearLabel = $derived(
-		formatVisibleMonthRangeLabel(ctx.viewYear, ctx.viewMonth, ctx.locale, ctx.visibleMonths)
-	);
+	const label = $derived.by(() => {
+		if (ctx.view === 'week') {
+			const days = getWeekDays(ctx.focusedDate, ctx.weekStartDay);
+			const start = days[0]!;
+			const end = days[6]!;
+			const sameMonth = start.getMonth() === end.getMonth();
+			const monthStr = formatDate(start, ctx.locale, { month: 'long' });
+			if (sameMonth) {
+				return `${monthStr} ${start.getDate()}–${end.getDate()}`;
+			}
+			const endMonthStr = formatDate(end, ctx.locale, { month: 'short' });
+			return `${monthStr} ${start.getDate()} - ${endMonthStr} ${end.getDate()}`;
+		}
+		return formatVisibleMonthRangeLabel(ctx.viewYear, ctx.viewMonth, ctx.locale, ctx.visibleMonths);
+	});
 </script>
 
 <span data-calendar-heading aria-live="polite" aria-atomic="true" class={className} {...rest}>
-	{monthYearLabel}
+	{label}
 </span>
 
 <style>

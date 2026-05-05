@@ -1340,6 +1340,8 @@ Parts:
 - Calendar.Grid
   Props: events (readonly CalendarEventItem[]) | eventDisplay ('dots' | 'bars'), accepted dots, bars | maxEventLanes (number) | visibleMonths (1 | 2), accepted 1, 2 | eventContent (Snippet<[CalendarEventRenderContext]>)
   Native props: Forwards <div> attributes via rest props.
+- Calendar.Week
+  Props: event (Snippet<[{ event: CalendarEvent; category: CalendarEventCategory | undefined }]>)
 - Calendar.Prev
   Props: children (Snippet), Content rendered inside the component.
   Native props: Forwards <button> attributes via rest props.
@@ -1349,24 +1351,30 @@ Parts:
 - Calendar.Heading
   Props: none
   Native props: Forwards <span> attributes via rest props.
+- Calendar.EventLegend
+  Props: none
 Structure:
   Calendar.Root
     Calendar.Header
     Calendar.Grid
+    Calendar.Week
     Calendar.Prev
     Calendar.Next
     Calendar.Heading
-CSS variables: --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color
-Data attributes: data-calendar | data-calendar-day | data-calendar-header | data-calendar-heading | data-disabled (Present when the component or part is disabled.) | data-outside-month | data-selected (Present when the current item is selected.) | data-today
+    Calendar.EventLegend
+CSS variables: --dry-btn-align, --dry-btn-bg, --dry-btn-border, --dry-btn-color, --dry-btn-justify, --dry-btn-min-height, --dry-btn-padding-x, --dry-btn-padding-y, --dry-btn-radius, --dry-calendar-bg, --dry-calendar-border, --dry-calendar-day-hover-bg, --dry-calendar-day-radius, --dry-calendar-day-size, --dry-calendar-event-accent, --dry-calendar-event-bg, --dry-calendar-event-color, --dry-calendar-event-radius, --dry-calendar-header-color, --dry-calendar-muted-color, --dry-calendar-outside-color, --dry-calendar-padding, --dry-calendar-radius, --dry-calendar-range-bg, --dry-calendar-selected-bg, --dry-calendar-selected-color, --dry-calendar-selected-hover-bg, --dry-calendar-shadow, --dry-calendar-today-color, --dry-calendar-week-grid-color, --dry-calendar-week-row-height, --dry-calendar-week-time-col
+Data attributes: data-calendar | data-calendar-day | data-calendar-event-legend | data-calendar-event-legend-dot | data-calendar-event-legend-item | data-calendar-event-legend-label | data-calendar-header | data-calendar-heading | data-calendar-week | data-calendar-week-band | data-calendar-week-band-button | data-calendar-week-band-cell | data-calendar-week-band-content | data-calendar-week-band-event | data-calendar-week-band-grid | data-calendar-week-band-label | data-calendar-week-band-meta | data-calendar-week-band-title | data-calendar-week-day-col | data-calendar-week-day-head | data-calendar-week-day-month | data-calendar-week-day-num | data-calendar-week-daynum | data-calendar-week-event | data-calendar-week-event-button | data-calendar-week-event-content | data-calendar-week-event-meta | data-calendar-week-event-time | data-calendar-week-event-title | data-calendar-week-grid | data-calendar-week-header | data-calendar-week-hour-cell | data-calendar-week-time-axis | data-calendar-week-time-cell | data-calendar-week-time-spacer | data-calendar-week-tz | data-calendar-week-weekday | data-category | data-disabled (Present when the component or part is disabled.) | data-focused | data-outside-month | data-selected (Present when the current item is selected.) | data-today | data-view
 Accessibility: Pair the control with a visible label or aria-label and keep helper or error text programmatically associated. | Provide native name, autocomplete, and value wiring when the component participates in form submission.
 Example:
 ```svelte
 <Calendar.Root>
   <Calendar.Header>...</Calendar.Header>
   <Calendar.Grid>...</Calendar.Grid>
+  <Calendar.Week>...</Calendar.Week>
   <Calendar.Prev>...</Calendar.Prev>
   <Calendar.Next>...</Calendar.Next>
   <Calendar.Heading>...</Calendar.Heading>
+  <Calendar.EventLegend>...</Calendar.EventLegend>
 </Calendar.Root>
 ```
 

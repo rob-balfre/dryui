@@ -3,7 +3,7 @@
   "packageVersion": "3.0.0",
   "summary": {
     "componentNodes": 296,
-    "partNodes": 648,
+    "partNodes": 650,
     "catalogNodes": 0,
     "clusterNodes": 0,
     "primitiveComponents": 144,
@@ -8987,13 +8987,28 @@
         "Root",
         "Header",
         "Grid",
+        "Week",
         "Prev",
         "Next",
-        "Heading"
+        "Heading",
+        "EventLegend"
       ],
-      "sourceFileCount": 10,
+      "sourceFileCount": 14,
       "primitivePartUsageCount": 0,
       "componentImportCount": 0
+    },
+    {
+      "id": "ui:Calendar.EventLegend",
+      "name": "Calendar.EventLegend",
+      "label": "EventLegend",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "form",
+      "description": "EventLegend part for Calendar.",
+      "tags": [],
+      "compound": false,
+      "parts": []
     },
     {
       "id": "ui:Calendar.Grid",
@@ -9069,6 +9084,19 @@
       "layer": "part",
       "category": "form",
       "description": "Root part for Calendar.",
+      "tags": [],
+      "compound": false,
+      "parts": []
+    },
+    {
+      "id": "ui:Calendar.Week",
+      "name": "Calendar.Week",
+      "label": "Week",
+      "kind": "part",
+      "package": "ui",
+      "layer": "part",
+      "category": "form",
+      "description": "Week part for Calendar.",
       "tags": [],
       "compound": false,
       "parts": []
@@ -19131,6 +19159,13 @@
       "label": "Separator"
     },
     {
+      "id": "compound_part:ui:Calendar:ui:Calendar.EventLegend:EventLegend",
+      "type": "compound_part",
+      "from": "ui:Calendar",
+      "to": "ui:Calendar.EventLegend",
+      "label": "EventLegend"
+    },
+    {
       "id": "compound_part:ui:Calendar:ui:Calendar.Grid:Grid",
       "type": "compound_part",
       "from": "ui:Calendar",
@@ -19171,6 +19206,13 @@
       "from": "ui:Calendar",
       "to": "ui:Calendar.Root",
       "label": "Root"
+    },
+    {
+      "id": "compound_part:ui:Calendar:ui:Calendar.Week:Week",
+      "type": "compound_part",
+      "from": "ui:Calendar",
+      "to": "ui:Calendar.Week",
+      "label": "Week"
     },
     {
       "id": "compound_part:ui:Carousel:ui:Carousel.Dots:Dots",

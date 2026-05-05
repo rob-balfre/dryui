@@ -10425,6 +10425,14 @@
             "note": "Forwards <div> attributes via rest props."
           }
         },
+        "Week": {
+          "props": {
+            "event": {
+              "type": "Snippet<[{ event: CalendarEvent; category: CalendarEventCategory | undefined }]>",
+              "required": false
+            }
+          }
+        },
         "Prev": {
           "props": {
             "children": {
@@ -10478,6 +10486,9 @@
             ],
             "note": "Forwards <span> attributes via rest props."
           }
+        },
+        "EventLegend": {
+          "props": {}
         }
       },
       "structure": {
@@ -10485,9 +10496,11 @@
           "Calendar.Root",
           "  Calendar.Header",
           "  Calendar.Grid",
+          "  Calendar.Week",
           "  Calendar.Prev",
           "  Calendar.Next",
-          "  Calendar.Heading"
+          "  Calendar.Heading",
+          "  Calendar.EventLegend"
         ]
       },
       "a11y": [
@@ -10495,11 +10508,24 @@
         "Provide native name, autocomplete, and value wiring when the component participates in form submission."
       ],
       "cssVars": {
+        "--dry-btn-align": "Align",
+        "--dry-btn-bg": "Background color",
+        "--dry-btn-border": "Border color",
+        "--dry-btn-color": "Text color",
+        "--dry-btn-justify": "Justify",
+        "--dry-btn-min-height": "Minimum height",
+        "--dry-btn-padding-x": "Horizontal padding",
+        "--dry-btn-padding-y": "Vertical padding",
+        "--dry-btn-radius": "Border radius",
         "--dry-calendar-bg": "Background color",
         "--dry-calendar-border": "Border color",
         "--dry-calendar-day-hover-bg": "Day Hover Bg",
         "--dry-calendar-day-radius": "Day Radius",
         "--dry-calendar-day-size": "Day Size",
+        "--dry-calendar-event-accent": "Event Accent",
+        "--dry-calendar-event-bg": "Event Bg",
+        "--dry-calendar-event-color": "Event Color",
+        "--dry-calendar-event-radius": "Event Radius",
         "--dry-calendar-header-color": "Header Color",
         "--dry-calendar-muted-color": "Muted Color",
         "--dry-calendar-outside-color": "Outside Color",
@@ -10510,7 +10536,10 @@
         "--dry-calendar-selected-color": "Selected Color",
         "--dry-calendar-selected-hover-bg": "Selected Hover Bg",
         "--dry-calendar-shadow": "Box shadow",
-        "--dry-calendar-today-color": "Today Color"
+        "--dry-calendar-today-color": "Today Color",
+        "--dry-calendar-week-grid-color": "Week Grid Color",
+        "--dry-calendar-week-row-height": "Week Row Height",
+        "--dry-calendar-week-time-col": "Week Time Col"
       },
       "dataAttributes": [
         {
@@ -10520,14 +10549,119 @@
           "name": "data-calendar-day"
         },
         {
+          "name": "data-calendar-event-legend"
+        },
+        {
+          "name": "data-calendar-event-legend-dot"
+        },
+        {
+          "name": "data-calendar-event-legend-item"
+        },
+        {
+          "name": "data-calendar-event-legend-label"
+        },
+        {
           "name": "data-calendar-header"
         },
         {
           "name": "data-calendar-heading"
         },
         {
+          "name": "data-calendar-week"
+        },
+        {
+          "name": "data-calendar-week-band"
+        },
+        {
+          "name": "data-calendar-week-band-button"
+        },
+        {
+          "name": "data-calendar-week-band-cell"
+        },
+        {
+          "name": "data-calendar-week-band-content"
+        },
+        {
+          "name": "data-calendar-week-band-event"
+        },
+        {
+          "name": "data-calendar-week-band-grid"
+        },
+        {
+          "name": "data-calendar-week-band-label"
+        },
+        {
+          "name": "data-calendar-week-band-meta"
+        },
+        {
+          "name": "data-calendar-week-band-title"
+        },
+        {
+          "name": "data-calendar-week-day-col"
+        },
+        {
+          "name": "data-calendar-week-day-head"
+        },
+        {
+          "name": "data-calendar-week-day-month"
+        },
+        {
+          "name": "data-calendar-week-day-num"
+        },
+        {
+          "name": "data-calendar-week-daynum"
+        },
+        {
+          "name": "data-calendar-week-event"
+        },
+        {
+          "name": "data-calendar-week-event-button"
+        },
+        {
+          "name": "data-calendar-week-event-content"
+        },
+        {
+          "name": "data-calendar-week-event-meta"
+        },
+        {
+          "name": "data-calendar-week-event-time"
+        },
+        {
+          "name": "data-calendar-week-event-title"
+        },
+        {
+          "name": "data-calendar-week-grid"
+        },
+        {
+          "name": "data-calendar-week-header"
+        },
+        {
+          "name": "data-calendar-week-hour-cell"
+        },
+        {
+          "name": "data-calendar-week-time-axis"
+        },
+        {
+          "name": "data-calendar-week-time-cell"
+        },
+        {
+          "name": "data-calendar-week-time-spacer"
+        },
+        {
+          "name": "data-calendar-week-tz"
+        },
+        {
+          "name": "data-calendar-week-weekday"
+        },
+        {
+          "name": "data-category"
+        },
+        {
           "name": "data-disabled",
           "description": "Present when the component or part is disabled."
+        },
+        {
+          "name": "data-focused"
         },
         {
           "name": "data-outside-month"
@@ -10538,9 +10672,12 @@
         },
         {
           "name": "data-today"
+        },
+        {
+          "name": "data-view"
         }
       ],
-      "example": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n</Calendar.Root>"
+      "example": "<Calendar.Root>\n  <Calendar.Header>...</Calendar.Header>\n  <Calendar.Grid>...</Calendar.Grid>\n  <Calendar.Week>...</Calendar.Week>\n  <Calendar.Prev>...</Calendar.Prev>\n  <Calendar.Next>...</Calendar.Next>\n  <Calendar.Heading>...</Calendar.Heading>\n  <Calendar.EventLegend>...</Calendar.EventLegend>\n</Calendar.Root>"
     },
     "DateRangePicker": {
       "import": "@dryui/ui",
