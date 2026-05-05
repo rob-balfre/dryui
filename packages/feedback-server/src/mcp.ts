@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { FeedbackHttpClient } from './client.js';
+import { buildSubmissionPresentation } from './submission-presentation.js';
 import type { Annotation, Submission } from './types.js';
 
 type FeedbackToolClient = Pick<
@@ -59,62 +60,6 @@ function formatAnnotation(annotation: Annotation): string {
 	if (annotation.svelteComponents) lines.push(`Svelte: ${annotation.svelteComponents}`);
 
 	return lines.join('\n');
-}
-
-/**
- * Shape a submission row for the MCP wire. We surface both screenshot paths,
- * the scroll offset at submit time, per-drawing hints (parallel array), and a
- * small `summary` block so agents can see drawing counts and top-level corners
- * without iterating. Existing fields pass through unchanged.
- */
-function enrichSubmissionForResponse(submission: Submission): Record<string, unknown> {
-	const drawings = submission.drawings ?? [];
-	const hints = submission.hints ?? [];
-	const components = submission.components ?? [];
-	const removed = submission.removed ?? [];
-	const moved = submission.moved ?? [];
-	const kindCounts: Record<string, number> = {};
-	for (const drawing of drawings) {
-		const kind = drawing.kind ?? 'unknown';
-		kindCounts[kind] = (kindCounts[kind] ?? 0) + 1;
-	}
-
-	const cornerCounts: Record<string, number> = {};
-	for (const hint of hints) {
-		cornerCounts[hint.corner] = (cornerCounts[hint.corner] ?? 0) + 1;
-	}
-
-	const componentKindCounts: Record<string, number> = {};
-	for (const component of components) {
-		componentKindCounts[component.kind] = (componentKindCounts[component.kind] ?? 0) + 1;
-	}
-
-	return {
-		id: submission.id,
-		url: submission.url,
-		status: submission.status,
-		createdAt: submission.createdAt,
-		...(submission.agent ? { agent: submission.agent } : {}),
-		screenshotPath: submission.screenshotPath,
-		viewport: submission.viewport,
-		scroll: submission.scroll ?? null,
-		drawings,
-		hints,
-		...(components.length > 0 ? { components } : {}),
-		...(removed.length > 0 ? { removed } : {}),
-		...(moved.length > 0 ? { moved } : {}),
-		summary: {
-			drawingCount: drawings.length,
-			hintCount: hints.length,
-			drawingKinds: kindCounts,
-			corners: cornerCounts,
-			...(components.length > 0
-				? { componentCount: components.length, componentKinds: componentKindCounts }
-				: {}),
-			...(removed.length > 0 ? { removedCount: removed.length } : {}),
-			...(moved.length > 0 ? { movedCount: moved.length } : {})
-		}
-	};
 }
 
 export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToolClient): void {
@@ -261,7 +206,7 @@ export function registerFeedbackTools(server: ToolRegistrar, client: FeedbackToo
 			);
 
 			if (!timedOut && value) {
-				const submissions = value.submissions.map(enrichSubmissionForResponse);
+				const submissions = value.submissions.map(buildSubmissionPresentation);
 				return {
 					content: [
 						{

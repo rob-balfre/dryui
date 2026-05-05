@@ -224,8 +224,11 @@ describe('feedback MCP tools', () => {
 			submissions: Array<{
 				id: string;
 				screenshotPath: { webp: string; png: string };
+				preferredScreenshotPath: string;
 				scroll: { x: number; y: number } | null;
 				hints: Array<{ corner: string; percentX: number; percentY: number }>;
+				drawingHints: Array<{ drawing: unknown; hint: unknown }>;
+				textNotes: string[];
 				summary: {
 					drawingCount: number;
 					hintCount: number;
@@ -241,8 +244,11 @@ describe('feedback MCP tools', () => {
 			webp: '/tmp/sub-1.webp',
 			png: '/tmp/sub-1.png'
 		});
+		expect(payload.submissions[0]?.preferredScreenshotPath).toBe('/tmp/sub-1.png');
 		expect(payload.submissions[0]?.scroll).toEqual({ x: 0, y: 420 });
 		expect(payload.submissions[0]?.hints).toHaveLength(2);
+		expect(payload.submissions[0]?.drawingHints).toHaveLength(2);
+		expect(payload.submissions[0]?.textNotes).toEqual(['Too tight']);
 		expect(payload.submissions[0]?.summary).toEqual({
 			drawingCount: 2,
 			hintCount: 2,

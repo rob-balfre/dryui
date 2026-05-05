@@ -36,10 +36,10 @@ describe('feedback prompts', () => {
 			'Apply DryUI feedback submission sub-123 (from https://example.com/page)'
 		);
 		expect(prompt).toContain('.claude/skills/dryui-feedback/SKILL.md');
-		expect(prompt).toContain('run `dryui check`');
+		expect(prompt).toContain('run the relevant project checks');
 		expect(prompt).toContain('call `feedback_resolve_submission`');
 		expect(prompt).toContain('If PRODUCT.md or DESIGN.md exists at the project root');
-		expect(prompt.indexOf('run `dryui check`')).toBeLessThan(
+		expect(prompt.indexOf('run the relevant project checks')).toBeLessThan(
 			prompt.indexOf('call `feedback_resolve_submission`')
 		);
 	});
