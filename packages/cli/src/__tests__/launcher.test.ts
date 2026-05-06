@@ -1,14 +1,21 @@
-import { afterEach, describe, expect, test } from 'bun:test';
+import { afterEach, beforeAll, describe, expect, test } from 'bun:test';
 import { EventEmitter } from 'node:events';
 import { resolve } from 'node:path';
 import {
 	buildDashboardUrl,
 	findLauncherWorkspaceRoot,
+	hasDryuiDocsMarker,
 	isHealthyProbeStatus,
 	runLauncher,
 	waitForShutdownSignal
 } from '../commands/launcher.js';
+import { setColorEnabled } from '../style.js';
 import { captureAsyncCommandIO, cleanupTempDirs, createTempTree } from './helpers.js';
+
+beforeAll(() => {
+	// Keep dashboard output assertions stable across local and CI terminals.
+	setColorEnabled(false);
+});
 
 const FEEDBACK_BASE_URL = 'http://127.0.0.1:4748';
 const FEEDBACK_DEV_SITE_URL =
@@ -48,6 +55,12 @@ describe('launcher helpers', () => {
 		expect(isHealthyProbeStatus(401)).toBe(false);
 		expect(isHealthyProbeStatus(404)).toBe(false);
 		expect(isHealthyProbeStatus(500)).toBe(false);
+	});
+
+	test('identifies the DryUI docs app marker in rendered html', () => {
+		expect(hasDryuiDocsMarker('<meta name="dryui-docs-app" content="true" />')).toBe(true);
+		expect(hasDryuiDocsMarker("<meta name='dryui-docs-app' content='true'>")).toBe(true);
+		expect(hasDryuiDocsMarker('<title>Other Vite app</title>')).toBe(false);
 	});
 
 	test('shutdown wait handles raw Ctrl-C input bytes', async () => {
@@ -138,13 +151,15 @@ describe('runLauncher', () => {
 		);
 
 		expect(result.logs).toHaveLength(1);
-		expect(result.logs[0]).toContain('DryUI feedback');
-		expect(result.logs[0]).toContain(`Workspace: ${root}`);
-		expect(result.logs[0]).toContain(`Site: ${FEEDBACK_DEV_SITE_URL}`);
-		expect(result.logs[0]).toContain(`Dashboard: ${FEEDBACK_DASHBOARD_URL}`);
-		expect(result.logs[0]).toContain('Docs: already running');
-		expect(result.logs[0]).toContain(`Feedback: already running at ${FEEDBACK_BASE_URL}`);
-		expect(result.logs[0]).toContain('Browser: skipped (--no-open)');
+		expect(result.logs[0]).toContain('DryUI');
+		expect(result.logs[0]).toContain('feedback');
+		expect(result.logs[0]).toContain(root);
+		expect(result.logs[0]).toContain(FEEDBACK_DEV_SITE_URL);
+		expect(result.logs[0]).toContain(FEEDBACK_DASHBOARD_URL);
+		expect(result.logs[0]).toMatch(/Docs\s+✓\s+already running/);
+		expect(result.logs[0]).toMatch(/Feedback\s+✓\s+already running at /);
+		expect(result.logs[0]).toContain(FEEDBACK_BASE_URL);
+		expect(result.logs[0]).toMatch(/Browser\s+·\s+skipped \(--no-open\)/);
 		expect(result.exitCode).toBe(0);
 	});
 
@@ -249,5 +264,44 @@ describe('runLauncher', () => {
 		expect(killed).toEqual([12345]);
 		expect(result.exitCode).toBe(1);
 		expect(result.logs.join('\n')).toContain('docs boom');
+	});
+
+	test('reports occupied docs port instead of opening the wrong app', async () => {
+		const root = createTempTree({
+			'apps/docs/package.json': '{"name":"@dryui/docs"}',
+			'packages/cli/package.json': '{"name":"@dryui/cli"}',
+			'packages/feedback-server/package.json': '{"name":"@dryui/feedback-server"}'
+		});
+		const killed: number[] = [];
+
+		const result = await captureAsyncCommandIO(() =>
+			runLauncher(['--no-open'], {
+				cwd: root,
+				runtime: {
+					ensureFeedbackUiBuilt: () => null,
+					ensureFeedbackServer: async () => ({
+						baseUrl: FEEDBACK_BASE_URL,
+						message: 'already running',
+						ownedPid: null
+					}),
+					ensureDocsServer: async () => {
+						throw new Error(
+							'Port 5173 is already serving a different app. Stop that process or free http://127.0.0.1:5173, then run `dryui` again.'
+						);
+					},
+					killOwnedProcess: (pid) => {
+						killed.push(pid);
+					},
+					now: () => 42,
+					openBrowser: () => {
+						throw new Error('browser should not be opened');
+					}
+				}
+			})
+		);
+
+		expect(killed).toEqual([]);
+		expect(result.exitCode).toBe(1);
+		expect(result.logs.join('\n')).toContain('Port 5173 is already serving a different app');
 	});
 });

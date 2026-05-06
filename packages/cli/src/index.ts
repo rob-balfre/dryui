@@ -3,7 +3,7 @@
 
 import { fileURLToPath } from 'node:url';
 import pkg from '../package.json';
-import { commandError, homeRelative, isInteractiveTTY, runCommand } from './run.js';
+import { commandError, homeRelative, runCommand } from './run.js';
 import { runFeedback } from './commands/feedback.js';
 import { runLauncher } from './commands/launcher.js';
 import { runInstallHook } from './commands/install-hook.js';
@@ -35,30 +35,14 @@ function printDevModeBanner(): void {
 	console.log('');
 }
 
-function printBanner(): void {
-	console.log(`dryui: v${VERSION}`);
-	console.log(`exe: ${resolveExePath()}`);
-	console.log(`about: ${DESCRIPTION}`);
-	console.log('');
-	printDevModeBanner();
-}
-
-function emitNotADryuiProject(): void {
-	console.log(`cwd: ${homeRelative(process.cwd())}`);
-	console.log('');
-	console.log('next[2]{cmd,description}:');
-	console.log('  npx skills add rob-balfre/dryui,Install DryUI skills');
-	console.log('  dryui feedback,Open the feedback dashboard');
-}
-
 const USAGE = `Usage: dryui <command> [options]
 
 DryUI's CLI is intentionally small. Product guidance and project inspection
 live in skills; the CLI only runs feedback tooling.
 
-Running \`dryui\` with no command opens the setup deprecation notice in a TTY.
-Without a TTY, it opens the feedback launcher inside the DryUI monorepo or
-prints setup hints everywhere else. Use \`dryui --help\` to see this message.
+Running \`dryui\` with no command opens feedback tooling. Inside the DryUI
+monorepo it opens the feedback launcher; elsewhere it opens the feedback
+dashboard for the current project. Use \`dryui --help\` to see this message.
 
 Commands:
   setup                         Deprecated; use \`npx skills add rob-balfre/dryui\`
@@ -90,19 +74,13 @@ async function main(): Promise<void> {
 		process.exit(0);
 	}
 
-	if (!command) {
-		if (isInteractiveTTY()) {
-			await runSetup([]);
+	if (!command || command.startsWith('--')) {
+		if (await runLauncher(args)) {
 			return;
 		}
 
-		if (await runLauncher([])) {
-			return;
-		}
-
-		printBanner();
-		emitNotADryuiProject();
-		process.exit(0);
+		await runFeedback(args);
+		return;
 	}
 
 	const commandArgs = args.slice(1);

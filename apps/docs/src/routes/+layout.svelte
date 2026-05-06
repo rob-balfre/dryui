@@ -96,6 +96,7 @@
 
 <svelte:head>
 	<meta name="description" content={SITE_DESCRIPTION} />
+	<meta name="dryui-docs-app" content="true" />
 </svelte:head>
 
 {#snippet docsShell()}

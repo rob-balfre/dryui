@@ -13,13 +13,25 @@ import {
 	emitCommandResult,
 	emitOrRun,
 	hasFlag,
+	homeRelative,
 	isInteractiveTTY,
 	printCommandHelp,
 	type CommandResult
 } from '../run.js';
+import {
+	accent,
+	brand,
+	cyan,
+	dim,
+	gray,
+	green,
+	magenta,
+	padLabel,
+	symbol,
+	yellow
+} from '../style.js';
 import { ensureFeedbackUiBuilt } from './feedback-ui-build.js';
 import {
-	ensureUrlReady,
 	isHealthyProbeStatus,
 	killOwnedProcess as killOwnedProcessDefault,
 	openBrowser,
@@ -117,23 +129,78 @@ interface DashboardOutputSections {
 	notes?: LabelledMessage[];
 }
 
-function renderDashboardOutput(sections: DashboardOutputSections): string {
-	const browser = sections.noOpen
-		? 'skipped (--no-open)'
-		: sections.opened
-			? 'opening default browser'
-			: 'could not auto-open; use the site URL above';
+interface BrowserStatus {
+	icon: string;
+	tone: (text: string) => string;
+	message: string;
+}
 
-	return [
-		'DryUI feedback',
-		'',
-		`${sections.rootLabel}: ${sections.rootValue}`,
-		...(sections.siteUrl ? [`Site: ${sections.siteUrl}`] : []),
-		`Dashboard: ${sections.dashboardUrl}`,
-		...sections.servers.map(({ label, message }) => `${label}: ${message}`),
-		`Browser: ${browser}`,
-		...(sections.notes ?? []).map(({ label, message }) => `${label}: ${message}`)
-	].join('\n');
+function describeBrowserStatus(noOpen: boolean, opened: boolean): BrowserStatus {
+	if (noOpen) return { icon: symbol.dot, tone: gray, message: 'skipped (--no-open)' };
+	if (opened) return { icon: symbol.pointer, tone: magenta, message: 'opening default browser' };
+	return { icon: symbol.dot, tone: yellow, message: 'could not auto-open; use the site URL above' };
+}
+
+interface ServerStatus {
+	icon: string;
+	tone: (text: string) => string;
+	body: string;
+}
+
+function describeServerStatus(message: string): ServerStatus {
+	if (message.startsWith('already running')) {
+		return { icon: symbol.check, tone: green, body: highlightUrls(message) };
+	}
+	if (message.startsWith('started in the background')) {
+		return { icon: symbol.arrow, tone: yellow, body: highlightUrls(message) };
+	}
+	return { icon: symbol.bullet, tone: gray, body: highlightUrls(message) };
+}
+
+const URL_PATTERN = /https?:\/\/\S+/g;
+
+function highlightUrls(text: string): string {
+	return text.replace(URL_PATTERN, (match) => cyan(match));
+}
+
+function renderRow(label: string, value: string, width: number): string {
+	return `  ${dim(padLabel(label, width))}  ${value}`;
+}
+
+function renderHeader(): string {
+	return `${brand('DryUI')} ${dim(symbol.dot)} ${accent('feedback')}`;
+}
+
+function renderDashboardOutput(sections: DashboardOutputSections): string {
+	const labels = ['Workspace', ...(sections.siteUrl ? ['Site'] : []), 'Dashboard'];
+	for (const server of sections.servers) labels.push(server.label);
+	labels.push('Browser');
+	for (const note of sections.notes ?? []) labels.push(note.label);
+	const width = Math.max(...labels.map((label) => label.length));
+
+	const browser = describeBrowserStatus(sections.noOpen, sections.opened);
+
+	const lines: string[] = [];
+	lines.push(renderHeader());
+	lines.push('');
+	lines.push(renderRow(sections.rootLabel, homeRelative(sections.rootValue), width));
+	lines.push('');
+	if (sections.siteUrl) {
+		lines.push(renderRow('Site', cyan(sections.siteUrl), width));
+	}
+	lines.push(renderRow('Dashboard', cyan(sections.dashboardUrl), width));
+	lines.push('');
+	for (const server of sections.servers) {
+		const status = describeServerStatus(server.message);
+		lines.push(renderRow(server.label, `${status.tone(status.icon)}  ${status.body}`, width));
+	}
+	lines.push(renderRow('Browser', `${browser.tone(browser.icon)}  ${browser.message}`, width));
+	for (const note of sections.notes ?? []) {
+		lines.push('');
+		lines.push(`  ${dim(`${note.label}: ${note.message}`)}`);
+	}
+
+	return lines.join('\n');
 }
 
 function emitLauncherError(error: unknown, exitOnComplete: boolean): void {
@@ -217,7 +284,7 @@ export async function waitForShutdownSignal(options: ShutdownWaitOptions): Promi
 			}
 			clearInterval(keepAlive);
 			console.log('');
-			console.log('Stopping servers...');
+			console.log(`${yellow(symbol.arrow)}  ${dim('Stopping servers...')}`);
 			for (const pid of options.ownedPids) {
 				options.killOwnedProcess(pid);
 			}
@@ -287,6 +354,26 @@ export function buildDashboardUrl(
 	}
 
 	return dashboardUrl.toString();
+}
+
+const DRYUI_DOCS_MARKER = 'name="dryui-docs-app" content="true"';
+
+export function hasDryuiDocsMarker(body: string): boolean {
+	return body.includes(DRYUI_DOCS_MARKER) || body.includes("name='dryui-docs-app' content='true'");
+}
+
+async function probeDryuiDocsApp(url: string, timeoutMs = 1_500): Promise<boolean> {
+	try {
+		const response = await fetch(url, {
+			redirect: 'manual',
+			headers: { accept: 'text/html' },
+			signal: AbortSignal.timeout(timeoutMs)
+		});
+		if (!isHealthyProbeStatus(response.status)) return false;
+		return hasDryuiDocsMarker(await response.text());
+	} catch {
+		return false;
+	}
 }
 
 interface EnsureFeedbackServerResult {
@@ -379,11 +466,27 @@ async function ensureDocsServer(
 	workspaceRoot: string,
 	docsBaseUrl: string
 ): Promise<EnsureDocsServerResult> {
-	return ensureUrlReady(
-		docsBaseUrl,
-		() => startDocsServerInBackground(workspaceRoot),
-		`Unable to start the docs app at ${docsBaseUrl}.`
-	);
+	if (await probeDryuiDocsApp(docsBaseUrl)) {
+		return { message: 'already running', ownedPid: null };
+	}
+
+	const occupied = await urlRespondsDefault(docsBaseUrl);
+	if (occupied) {
+		throw new Error(
+			`Port ${DEFAULT_DOCS_PORT} is already serving a different app. Stop that process or free ${docsBaseUrl}, then run \`dryui\` again.`
+		);
+	}
+
+	const spawned = startDocsServerInBackground(workspaceRoot);
+	const startedAt = Date.now();
+	while (Date.now() - startedAt < 15_000) {
+		if (await probeDryuiDocsApp(docsBaseUrl)) {
+			return { message: 'started in the background', ownedPid: spawned?.pid ?? null };
+		}
+		await new Promise((resolve) => setTimeout(resolve, 250));
+	}
+
+	throw new Error(`Unable to start the DryUI docs app at ${docsBaseUrl}.`);
 }
 
 const defaultRuntime: LauncherRuntime = {

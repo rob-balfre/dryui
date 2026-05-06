@@ -31,6 +31,7 @@ npx skills add rob-balfre/dryui
 Then use the CLI only for feedback tooling and local helpers:
 
 ```bash
+dryui
 dryui feedback
 ```
 
@@ -160,7 +161,8 @@ bun run dev:link         # registers each workspace package globally via `bun li
 That's it. The bins ship with workspace auto-detect: when invoked through the `bun link` symlink they spot the surrounding `packages/<name>/package.json` and `.git`, switch to source mode, and propagate `DRYUI_DEV=1` to their child process. So:
 
 ```bash
-dryui feedback           # auto-runs packages/cli/src/index.ts
+dryui                    # auto-runs packages/cli/src/index.ts
+dryui feedback           # explicit feedback dashboard command
 dryui-feedback-mcp       # feedback MCP server from src
 ```
 
