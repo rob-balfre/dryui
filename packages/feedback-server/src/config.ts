@@ -69,8 +69,12 @@ export function writeFeedbackServerConfig(
 	try {
 		ensureParentDirectory(paths.configPath);
 		writeFileSync(paths.configPath, `${JSON.stringify(payload, null, 2)}\n`, 'utf-8');
-	} catch {
-		// Ignore config persistence failures. The server can still run.
+	} catch (error) {
+		// The server can still run, but downstream tools (MCP, hook scripts) won't
+		// find the project via findProjectFeedbackConfig until the file lands.
+		// Surface the failure on stderr so the operator sees stale-config drift.
+		const reason = error instanceof Error ? error.message : String(error);
+		console.error(`[feedback] failed to persist server config to ${paths.configPath}: ${reason}`);
 	}
 }
 

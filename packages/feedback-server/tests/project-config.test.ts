@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { afterEach, beforeEach, describe, expect, test } from 'bun:test';
+import { afterEach, beforeEach, describe, expect, spyOn, test } from 'bun:test';
 import {
 	findProjectFeedbackConfig,
 	projectFeedbackPaths,
@@ -60,6 +60,32 @@ describe('project feedback config', () => {
 		expect(found).not.toBeNull();
 		expect(found?.projectRoot).toBe(resolve(projectRoot));
 		expect(found?.config.port).toBe(4748);
+	});
+
+	test('writeFeedbackServerConfig surfaces persistence failures on stderr', () => {
+		// Plant a regular file where the .dryui/feedback dir would live; mkdirSync
+		// then fails with ENOTDIR / EEXIST and the write can't proceed.
+		const blocker = join(projectRoot, '.dryui');
+		writeFileSync(blocker, 'not a directory', 'utf-8');
+
+		const errorSpy = spyOn(console, 'error').mockImplementation(() => {});
+		try {
+			writeFeedbackServerConfig(projectRoot, {
+				host: '127.0.0.1',
+				port: 4751,
+				baseUrl: 'http://127.0.0.1:4751',
+				dbPath: join(projectRoot, '.dryui/feedback/store.db'),
+				updatedAt: '2026-04-22T00:00:00.000Z'
+			});
+
+			expect(errorSpy).toHaveBeenCalledTimes(1);
+			const message = String(errorSpy.mock.calls[0]?.[0] ?? '');
+			expect(message).toContain('[feedback]');
+			expect(message).toContain('failed to persist server config');
+			expect(message).toContain(projectFeedbackPaths(projectRoot).configPath);
+		} finally {
+			errorSpy.mockRestore();
+		}
 	});
 
 	test('findProjectFeedbackConfig tolerates a corrupt config further down the tree', () => {

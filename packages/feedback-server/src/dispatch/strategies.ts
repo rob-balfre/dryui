@@ -15,7 +15,9 @@
 // inside the relevant strategy. That keeps the strategy honest about which
 // agents share its shape and which deviate.
 
-import { join } from 'node:path';
+import { existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
 	AGENTS,
 	resolveAgentPath,
@@ -30,7 +32,39 @@ import {
 	type WorkspaceAppClipboardAgent
 } from './agents.js';
 import { osaQuote, shellQuote, type PlatformContext } from './platform.js';
-import { resolveLocalPluginDir } from './skills.js';
+
+/**
+ * When the feedback-server runs from a dryui workspace checkout, prefer the
+ * live plugin source over the marketplace install. Claude Code's
+ * `--plugin-dir <path>` flag loads a plugin directly from a local tree and
+ * takes precedence over the install with the same name. Override with
+ * `DRYUI_PLUGIN_DIR` for ad-hoc testing.
+ */
+export function resolveLocalPluginDir(): string | null {
+	const explicit = process.env['DRYUI_PLUGIN_DIR'];
+	if (explicit) {
+		return existsSync(join(explicit, '.claude-plugin', 'plugin.json')) ? explicit : null;
+	}
+	let dir: string;
+	try {
+		dir = dirname(fileURLToPath(import.meta.url));
+	} catch {
+		return null;
+	}
+	for (let i = 0; i < 8; i++) {
+		const pluginDir = join(dir, 'packages', 'plugin');
+		if (
+			existsSync(join(pluginDir, '.claude-plugin', 'plugin.json')) &&
+			existsSync(join(dir, 'packages', 'ui', 'package.json'))
+		) {
+			return pluginDir;
+		}
+		const parent = dirname(dir);
+		if (parent === dir) break;
+		dir = parent;
+	}
+	return null;
+}
 
 export interface DispatchOptions {
 	workspace: string;

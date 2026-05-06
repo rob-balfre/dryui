@@ -23,20 +23,13 @@
 		type Tool
 	} from './types.js';
 	import {
-		captureBrowserScreenshot,
-		captureBrowserSubmissionPayload,
-		type BrowserScreenshotCapture
-	} from './submission-capture-payload.js';
-	import {
 		applyElementLayoutSnapshot,
-		mountBrowserCaptureAnnotations,
 		parsePropsJson,
 		sameLayoutSnapshot,
-		snapshotBrowserCaptureLayout,
 		snapshotElementLayout,
-		type BrowserCaptureLayoutDraft,
 		type LayoutSnapshot
-	} from './submission-capture-layout.js';
+	} from './layout-snapshot.js';
+	import { captureSubmission, type BrowserCaptureLayoutDraft } from './submission-capture.js';
 	import {
 		canonicalFeedbackPageUrl,
 		hasFeedbackLaunchParam,
@@ -1710,22 +1703,6 @@
 		};
 	}
 
-	function captureScreenshot(): Promise<BrowserScreenshotCapture> {
-		const layoutDraft = createCaptureLayoutDraft();
-		return captureBrowserScreenshot({
-			readCaptureViewport: () => ({ width: window.innerWidth, height: window.innerHeight }),
-			snapshotLayout: () => snapshotBrowserCaptureLayout(layoutDraft),
-			waitForNextPaint,
-			mountCaptureAnnotations: () => mountBrowserCaptureAnnotations(layoutDraft),
-			setSubmitStatus: (status) => {
-				submitStatus = status;
-			},
-			setToolbarHiddenForCapture: (hidden) => {
-				toolbarHiddenForCapture = hidden;
-			}
-		});
-	}
-
 	function activateFromFeedbackLaunchParam(): void {
 		if (!hasFeedbackLaunchParam()) return;
 		untrack(() => {
@@ -1774,19 +1751,23 @@
 			return;
 		}
 		try {
-			const payload = await captureBrowserSubmissionPayload({
+			const payload = await captureSubmission({
 				url: currentPageUrl,
 				drawings,
-				captureScreenshot: async () => {
-					const capture = await captureScreenshot();
-					submitStatus = 'uploading';
-					return capture;
-				},
+				layoutDraft: createCaptureLayoutDraft(),
+				readCaptureViewport: () => ({ width: window.innerWidth, height: window.innerHeight }),
 				readGeometry: () => ({
 					viewport: { width: window.innerWidth, height: window.innerHeight },
 					scroll: { x: scrollX, y: scrollY },
 					viewportOffset: { left: viewportLeft, top: viewportTop }
-				})
+				}),
+				waitForNextPaint,
+				setSubmitStatus: (status) => {
+					submitStatus = status;
+				},
+				setToolbarHiddenForCapture: (hidden) => {
+					toolbarHiddenForCapture = hidden;
+				}
 			});
 			const response = await postFeedbackSubmission({ serverUrl, payload });
 

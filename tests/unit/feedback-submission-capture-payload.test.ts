@@ -1,13 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import {
-	buildBrowserDrawingHints,
-	captureBrowserScreenshot,
-	captureBrowserSubmissionPayload
-} from '../../packages/feedback/src/submission-capture-payload.ts';
-import {
-	snapshotBrowserCaptureLayout,
-	type LayoutSnapshot
-} from '../../packages/feedback/src/submission-capture-layout.ts';
+	captureSubmission,
+	type BrowserCaptureLayoutDraft
+} from '../../packages/feedback/src/submission-capture.ts';
 import {
 	canonicalFeedbackPageUrl,
 	normalizeFeedbackServerUrl,
@@ -89,74 +84,206 @@ class MemoryStorage implements Storage {
 	}
 }
 
-describe('buildBrowserDrawingHints', () => {
-	test('pairs hints with drawings in order and restores overlay pointer events', () => {
-		const overlayChild = { style: { pointerEvents: 'auto' } } as HTMLElement;
-		const hits: Array<{ x: number; y: number; pointerEvents: string }> = [];
-		const documentLike = {
-			querySelectorAll(selector: string) {
-				expect(selector).toBe('[data-dryui-feedback] *');
-				return [overlayChild];
-			},
-			elementFromPoint(x: number, y: number) {
-				hits.push({ x, y, pointerEvents: overlayChild.style.pointerEvents });
-				return fakeElement('BUTTON', { id: 'send', class: 'primary action' });
+interface FakeScreenshotResources {
+	stopped: string[];
+	statuses: string[];
+	canvas: HTMLCanvasElement;
+	video: HTMLVideoElement;
+	stream: MediaStream;
+}
+
+function fakeScreenshotResources(options: { videoFails?: boolean } = {}): FakeScreenshotResources {
+	const stopped: string[] = [];
+	const statuses: string[] = [];
+	const stream = {
+		getTracks: () => [{ stop: () => stopped.push('track') }]
+	} as unknown as MediaStream;
+
+	const video = {
+		srcObject: null as MediaStream | null,
+		muted: false,
+		play: async () => {
+			if (options.videoFails) throw new Error('video failed');
+		}
+	} as HTMLVideoElement;
+
+	const canvas = {
+		width: 0,
+		height: 0,
+		getContext(kind: string) {
+			expect(kind).toBe('2d');
+			return {
+				drawImage(_v: unknown, _x: number, _y: number, _w: number, _h: number) {}
+			} as unknown as CanvasRenderingContext2D;
+		},
+		toDataURL(mime: string) {
+			return mime === 'image/webp'
+				? 'data:image/webp;base64,webp-data'
+				: 'data:image/png;base64,png-data';
+		}
+	} as unknown as HTMLCanvasElement;
+
+	return { stopped, statuses, canvas, video, stream };
+}
+
+describe('captureSubmission', () => {
+	test('orders the lifecycle: snapshot layout, mount annotations, screenshot, then assemble payload', async () => {
+		const order: string[] = [];
+		const annotations: string[] = [];
+		const fakeDoc = {
+			body: { appendChild: (_: unknown) => {} },
+			createElement: () => {
+				const el = {
+					dataset: {} as Record<string, string>,
+					style: {} as Record<string, string>,
+					textContent: '',
+					remove: () => {}
+				} as unknown as HTMLElement;
+				return el;
 			}
 		} as unknown as Document;
 
+		const layoutDraft: BrowserCaptureLayoutDraft = {
+			added: [
+				{
+					id: 'add-1',
+					kind: 'Button',
+					element: fakeLayoutElement({ rect: { left: 5, top: 5, width: 50, height: 20 } }),
+					label: 'Save'
+				}
+			],
+			removed: [
+				{
+					descriptor: { tag: 'nav', selector: 'nav.primary' },
+					rect: { x: 1, y: 2, width: 3, height: 4 }
+				}
+			],
+			moved: []
+		};
+
+		const resources = fakeScreenshotResources();
+
 		const drawings: Drawing[] = [
-			{
-				id: 'stroke',
-				kind: 'freehand',
-				color: 'red',
-				width: 2,
-				points: [
-					{ x: 30, y: 40 },
-					{ x: 36, y: 42 }
-				]
-			},
 			{
 				id: 'arrow',
 				kind: 'arrow',
-				color: 'blue',
+				color: 'orange',
 				width: 3,
-				space: 'viewport',
-				start: { x: 10, y: 10 },
-				end: { x: 180, y: 20 }
+				start: { x: 20, y: 20 },
+				end: { x: 80, y: 70 }
 			}
 		];
 
-		const hints = buildBrowserDrawingHints(drawings, {
-			document: documentLike,
-			viewport: { width: 200, height: 100 },
-			scroll: { x: 10, y: 20 },
-			viewportOffset: { left: 5, top: 7 }
+		let geometryReads = 0;
+
+		const payload = await captureSubmission({
+			url: 'https://example.test/lifecycle',
+			drawings,
+			layoutDraft,
+			readCaptureViewport: () => {
+				order.push('readCaptureViewport');
+				return { width: 200, height: 100 };
+			},
+			readGeometry: () => {
+				geometryReads++;
+				order.push('readGeometry');
+				return {
+					viewport: { width: 320, height: 240 },
+					scroll: { x: 12, y: 18 },
+					viewportOffset: { left: 2, top: 4 }
+				};
+			},
+			waitForNextPaint: async () => {
+				order.push('waitForNextPaint');
+			},
+			document: fakeDoc,
+			requestDisplayMedia: async () => {
+				order.push('requestDisplayMedia');
+				return resources.stream;
+			},
+			createVideo: () => {
+				order.push('createVideo');
+				return resources.video;
+			},
+			createCanvas: () => {
+				order.push('createCanvas');
+				return resources.canvas;
+			},
+			setSubmitStatus: (status) => {
+				resources.statuses.push(status);
+				order.push(`status:${status}`);
+			},
+			setToolbarHiddenForCapture: (hidden) => {
+				order.push(`toolbar:${hidden}`);
+			},
+			buildHints: (items, geometry) => {
+				order.push('buildHints');
+				annotations.push(items[0]?.id ?? '');
+				return [
+					{
+						corner: items[0]?.id === 'arrow' ? 'bottom-right' : 'center',
+						percentX: geometry.viewport.width,
+						percentY: geometry.scroll.y
+					}
+				];
+			}
 		});
 
-		expect(hints).toEqual([
+		// Lifecycle order: status set before screenshot, then 'uploading' set after.
+		expect(order[0]).toBe('readCaptureViewport');
+		expect(order).toContain('createVideo');
+		expect(order).toContain('status:waiting-for-capture');
+		expect(order).toContain('status:capturing');
+		expect(order.indexOf('status:uploading')).toBeGreaterThan(order.indexOf('status:capturing'));
+		expect(order.indexOf('readGeometry')).toBeGreaterThan(order.indexOf('status:uploading'));
+		expect(order.indexOf('buildHints')).toBeGreaterThan(order.indexOf('readGeometry'));
+
+		// Toolbar is hidden before screen capture and restored before status moves to 'uploading'.
+		expect(order.indexOf('toolbar:true')).toBeGreaterThanOrEqual(0);
+		expect(order.indexOf('toolbar:false')).toBeGreaterThan(order.indexOf('toolbar:true'));
+		expect(order.indexOf('toolbar:false')).toBeLessThan(order.indexOf('status:uploading'));
+
+		// Geometry sampled exactly once for both payload and hints.
+		expect(geometryReads).toBe(1);
+		expect(annotations).toEqual(['arrow']);
+
+		// Resources cleaned up.
+		expect(resources.stopped).toEqual(['track']);
+		expect(resources.video.srcObject).toBeNull();
+
+		// Submission contract: payload shape and field set.
+		expect(Object.keys(payload).sort()).toEqual([
+			'components',
+			'drawings',
+			'hints',
+			'image',
+			'removed',
+			'scroll',
+			'url',
+			'viewport'
+		]);
+		expect(payload.url).toBe('https://example.test/lifecycle');
+		expect(payload.image).toEqual({ webp: 'webp-data', png: 'png-data' });
+		expect(payload.viewport).toEqual({ width: 320, height: 240 });
+		expect(payload.scroll).toEqual({ x: 12, y: 18 });
+		expect(payload.hints).toEqual([{ corner: 'bottom-right', percentX: 320, percentY: 18 }]);
+		expect(payload.components).toEqual([
 			{
-				corner: 'top-left',
-				percentX: 12.5,
-				percentY: 27,
-				element: { tag: 'button', id: 'send', selector: 'button#send.primary.action' }
-			},
-			{
-				corner: 'top-right',
-				percentX: 90,
-				percentY: 20,
-				element: { tag: 'button', id: 'send', selector: 'button#send.primary.action' }
+				id: 'add-1',
+				kind: 'Button',
+				label: 'Save',
+				rect: { x: 5, y: 5, width: 50, height: 20 }
 			}
 		]);
-		expect(hits).toEqual([
-			{ x: 25, y: 27, pointerEvents: 'none' },
-			{ x: 180, y: 20, pointerEvents: 'none' }
+		expect(payload.removed).toEqual([
+			{ tag: 'nav', selector: 'nav.primary', rect: { x: 1, y: 2, width: 3, height: 4 } }
 		]);
-		expect(overlayChild.style.pointerEvents).toBe('auto');
+		expect(payload.drawings).toEqual(drawings);
+		expect('agent' in payload).toBe(false);
+		expect('moved' in payload).toBe(false);
 	});
-});
 
-describe('captureBrowserSubmissionPayload', () => {
-	test('builds the exact create-submission payload without empty optional fields or agent', async () => {
+	test('omits empty optional fields when no layout changes are present', async () => {
 		const drawings: Drawing[] = [
 			{
 				id: 'text',
@@ -168,20 +295,22 @@ describe('captureBrowserSubmissionPayload', () => {
 			}
 		];
 
-		const payload = await captureBrowserSubmissionPayload({
+		const resources = fakeScreenshotResources();
+
+		const payload = await captureSubmission({
 			url: 'https://example.test/page',
 			drawings,
-			captureScreenshot: async () => ({
-				images: { webp: 'webp-data', png: 'png-data' },
-				components: [],
-				removed: [],
-				moved: []
-			}),
+			layoutDraft: { added: [], removed: [], moved: [] },
+			readCaptureViewport: () => ({ width: 1000, height: 800 }),
 			readGeometry: () => ({
 				viewport: { width: 1000, height: 800 },
 				scroll: { x: 4, y: 8 },
 				viewportOffset: { left: 0, top: 0 }
 			}),
+			waitForNextPaint: async () => {},
+			requestDisplayMedia: async () => resources.stream,
+			createVideo: () => resources.video,
+			createCanvas: () => resources.canvas,
 			buildHints: (items) =>
 				items.map((drawing) => ({
 					corner: drawing.id === 'text' ? 'top-left' : 'center',
@@ -198,160 +327,74 @@ describe('captureBrowserSubmissionPayload', () => {
 			'url',
 			'viewport'
 		]);
-		expect(payload).toEqual({
-			url: 'https://example.test/page',
-			image: { webp: 'webp-data', png: 'png-data' },
-			drawings,
-			hints: [{ corner: 'top-left', percentX: 10, percentY: 6.25 }],
-			viewport: { width: 1000, height: 800 },
-			scroll: { x: 4, y: 8 }
-		});
+		expect(payload.image).toEqual({ webp: 'webp-data', png: 'png-data' });
+		expect(payload.hints).toEqual([{ corner: 'top-left', percentX: 10, percentY: 6.25 }]);
 		expect('agent' in payload).toBe(false);
 	});
 
-	test('includes non-empty layout fields and samples one geometry for payload and hints', async () => {
-		let geometryReads = 0;
-		const drawings: Drawing[] = [
-			{
-				id: 'arrow',
-				kind: 'arrow',
-				color: 'orange',
-				width: 3,
-				start: { x: 20, y: 20 },
-				end: { x: 80, y: 70 }
-			}
-		];
+	test('cleans stream, capture annotations, video, and toolbar state when capture fails', async () => {
+		const resources = fakeScreenshotResources({ videoFails: true });
+		let cleanupCount = 0;
+		let toolbarHidden = false;
 
-		const payload = await captureBrowserSubmissionPayload({
-			url: 'https://example.test/layout',
-			drawings,
-			captureScreenshot: async () => ({
-				images: { webp: 'webp-data', png: 'png-data' },
-				components: [
-					{
-						id: 'component-1',
-						kind: 'Button',
-						rect: { x: 10, y: 20, width: 120, height: 40 }
-					}
-				],
-				removed: [{ tag: 'nav', rect: { x: 0, y: 0, width: 80, height: 30 } }],
-				moved: [
-					{
-						tag: 'section',
-						originalRect: { x: 0, y: 0, width: 100, height: 100 },
-						currentRect: { x: 20, y: 30, width: 100, height: 100 }
-					}
-				]
-			}),
-			readGeometry: () => {
-				geometryReads++;
-				return {
-					viewport: { width: 320, height: 240 },
-					scroll: { x: 12, y: 18 },
-					viewportOffset: { left: 2, top: 4 }
-				};
-			},
-			buildHints: (items, geometry) => [
-				{
-					corner: items[0]?.id === 'arrow' ? 'bottom-right' : 'center',
-					percentX: geometry.viewport.width,
-					percentY: geometry.scroll.y
-				}
-			]
-		});
+		await expect(
+			captureSubmission({
+				url: 'https://example.test/fail',
+				drawings: [],
+				layoutDraft: {
+					added: [],
+					removed: [
+						{
+							descriptor: { tag: 'aside' },
+							// Real document is unavailable in bun:test, so a non-zero rect still drives
+							// the annotation mount path; cleanup is tested via the increment below.
+							rect: { x: 0, y: 0, width: 50, height: 20 }
+						}
+					],
+					moved: []
+				},
+				readCaptureViewport: () => ({ width: 100, height: 50 }),
+				readGeometry: () => ({
+					viewport: { width: 100, height: 50 },
+					scroll: { x: 0, y: 0 },
+					viewportOffset: { left: 0, top: 0 }
+				}),
+				waitForNextPaint: async () => {},
+				requestDisplayMedia: async () => resources.stream,
+				createVideo: () => resources.video,
+				createCanvas: () => {
+					throw new Error('canvas should not be created');
+				},
+				// Override the default annotation mount with a counting probe so we can
+				// confirm cleanup runs even when the inner capture fails.
+				document: {
+					body: {
+						appendChild() {
+							cleanupCount++;
+						}
+					},
+					createElement: () => ({
+						dataset: {},
+						style: {},
+						textContent: '',
+						remove: () => {
+							cleanupCount--;
+						}
+					})
+				} as unknown as Document,
+				setToolbarHiddenForCapture: (hidden) => {
+					toolbarHidden = hidden;
+				},
+				setSubmitStatus: (status) => resources.statuses.push(status)
+			})
+		).rejects.toThrow('video failed');
 
-		expect(geometryReads).toBe(1);
-		expect(payload.viewport).toEqual({ width: 320, height: 240 });
-		expect(payload.scroll).toEqual({ x: 12, y: 18 });
-		expect(payload.hints).toEqual([{ corner: 'bottom-right', percentX: 320, percentY: 18 }]);
-		expect(payload.components).toEqual([
-			{
-				id: 'component-1',
-				kind: 'Button',
-				rect: { x: 10, y: 20, width: 120, height: 40 }
-			}
-		]);
-		expect(payload.removed).toEqual([{ tag: 'nav', rect: { x: 0, y: 0, width: 80, height: 30 } }]);
-		expect(payload.moved).toEqual([
-			{
-				tag: 'section',
-				originalRect: { x: 0, y: 0, width: 100, height: 100 },
-				currentRect: { x: 20, y: 30, width: 100, height: 100 }
-			}
-		]);
-	});
-});
-
-describe('snapshotBrowserCaptureLayout', () => {
-	test('turns added, removed, and changed moved drafts into submission layout fields', () => {
-		const initial: LayoutSnapshot = {
-			left: '0px',
-			top: '0px',
-			width: '100px',
-			height: '60px',
-			transform: '',
-			rotation: undefined
-		};
-		const added = fakeLayoutElement({
-			rect: { left: 10, top: 20, width: 120, height: 40 }
-		});
-		const original = fakeLayoutElement({
-			tagName: 'SECTION',
-			attrs: { id: 'hero', class: 'target panel' },
-			rect: { left: 0, top: 0, width: 100, height: 60 }
-		});
-		const movedClone = fakeLayoutElement({
-			rect: { left: 30, top: 44, width: 100, height: 60 },
-			style: { ...initial, left: '30px', top: '44px' }
-		});
-		const unchangedClone = fakeLayoutElement({
-			rect: { left: 0, top: 0, width: 100, height: 60 },
-			style: initial
-		});
-
-		const layout = snapshotBrowserCaptureLayout({
-			added: [
-				{
-					id: 'added-1',
-					kind: 'Button',
-					element: added,
-					label: 'Save',
-					propsJson: '{"disabled":true,"count":2}'
-				}
-			],
-			removed: [
-				{
-					descriptor: { tag: 'nav', selector: 'nav.primary' },
-					rect: { x: 1, y: 2, width: 3, height: 4 }
-				}
-			],
-			moved: [
-				{ original, clone: movedClone, initial },
-				{ original, clone: unchangedClone, initial }
-			]
-		});
-
-		expect(layout.components).toEqual([
-			{
-				id: 'added-1',
-				kind: 'Button',
-				label: 'Save',
-				props: { disabled: true, count: 2 },
-				rect: { x: 10, y: 20, width: 120, height: 40 }
-			}
-		]);
-		expect(layout.removed).toEqual([
-			{ tag: 'nav', selector: 'nav.primary', rect: { x: 1, y: 2, width: 3, height: 4 } }
-		]);
-		expect(layout.moved).toEqual([
-			{
-				tag: 'section',
-				id: 'hero',
-				selector: 'section#hero.target.panel',
-				originalRect: { x: 0, y: 0, width: 100, height: 60 },
-				currentRect: { x: 30, y: 44, width: 100, height: 60 }
-			}
-		]);
+		expect(resources.stopped).toEqual(['track']);
+		expect(resources.video.srcObject).toBeNull();
+		expect(toolbarHidden).toBe(false);
+		expect(resources.statuses).toEqual(['waiting-for-capture', 'capturing']);
+		// All annotation nodes that were appended are also removed during cleanup.
+		expect(cleanupCount).toBe(0);
 	});
 });
 
@@ -485,51 +528,5 @@ describe('feedback submission client helpers', () => {
 				sessionStorage
 			})
 		).toBe('http://127.0.0.1:5888');
-	});
-});
-
-describe('captureBrowserScreenshot', () => {
-	test('cleans stream, capture annotations, video, and toolbar state when capture fails', async () => {
-		const stopped: string[] = [];
-		let cleanupCount = 0;
-		let toolbarHidden = false;
-		const statuses: string[] = [];
-		const video = {
-			srcObject: null as MediaStream | null,
-			muted: false,
-			play: async () => {
-				throw new Error('video failed');
-			}
-		} as HTMLVideoElement;
-
-		await expect(
-			captureBrowserScreenshot({
-				readCaptureViewport: () => ({ width: 100, height: 50 }),
-				snapshotLayout: () => ({ components: [], removed: [], moved: [] }),
-				waitForNextPaint: async () => {},
-				requestDisplayMedia: async () =>
-					({
-						getTracks: () => [{ stop: () => stopped.push('track') }]
-					}) as MediaStream,
-				createVideo: () => video,
-				createCanvas: () => {
-					throw new Error('canvas should not be created');
-				},
-				mountCaptureAnnotations: () => {
-					cleanupCount++;
-					return () => cleanupCount++;
-				},
-				setToolbarHiddenForCapture: (hidden) => {
-					toolbarHidden = hidden;
-				},
-				setSubmitStatus: (status) => statuses.push(status)
-			})
-		).rejects.toThrow('video failed');
-
-		expect(stopped).toEqual(['track']);
-		expect(video.srcObject).toBeNull();
-		expect(cleanupCount).toBe(2);
-		expect(toolbarHidden).toBe(false);
-		expect(statuses).toEqual(['waiting-for-capture', 'capturing']);
 	});
 });

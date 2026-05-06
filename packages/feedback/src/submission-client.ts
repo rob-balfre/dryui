@@ -1,4 +1,4 @@
-import type { BrowserCreateSubmissionPayload } from './submission-capture-payload.js';
+import type { BrowserCreateSubmissionPayload } from './submission-capture.js';
 import type { Drawing } from './types.js';
 
 export const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
