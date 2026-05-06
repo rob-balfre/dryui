@@ -32,7 +32,7 @@
   "scripts": {
     "generate:names": "bun ../../scripts/extract-feedback-names.ts",
     "generate:schemas": "bun ../../scripts/extract-feedback-schemas.ts",
-    "prebuild": "bun run generate:names",
+    "prebuild": "bun run generate:names && bun run generate:schemas",
     "build": "svelte-package -i src",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:publint": "publint",

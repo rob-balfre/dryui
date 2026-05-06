@@ -33,7 +33,7 @@
     "check:docs": "bun run docs:check",
     "check:docs:demos": "bun run scripts/generate-missing-demos.ts --warn",
     "check:contract": "bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-contract\" packages/mcp/src/spec.json packages/mcp/src/contract.v1.json packages/mcp/src/contract.v1.schema.json",
-    "check:feedback-catalog": "bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/feedback' generate:names\" packages/mcp/src/spec.json packages/feedback/src/components/component-names.ts",
+    "check:feedback-catalog": "bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/feedback' generate:names && bun run --filter '@dryui/feedback' generate:schemas\" packages/mcp/src/spec.json packages/feedback/src/components/component-names.ts packages/feedback/src/components/component-schemas.ts",
     "check:architecture": "bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-architecture\" packages/mcp/src/spec.json packages/mcp/src/architecture.json",
     "generate:agent-contract": "bun run --filter '@dryui/mcp' generate-agent-contract",
     "check:agent-contract": "bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-agent-contract\" packages/mcp/src/spec.json packages/mcp/src/agent-contract.v1.json packages/mcp/src/agent-contract.v1.schema.json",

@@ -352,6 +352,7 @@ export const COMPONENT_SCHEMAS: Record<string, SchemaField[]> = {
 		}
 	],
 	DragAndDrop: [
+		{ name: 'listId', optional: true, type: { kind: 'string' } },
 		{
 			name: 'orientation',
 			optional: true,
