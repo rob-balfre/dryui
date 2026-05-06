@@ -7,10 +7,19 @@
 //
 // Run: bun scripts/extract-feedback-names.ts
 
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const SPEC_PATH = join(import.meta.dir, '..', 'packages', 'mcp', 'src', 'spec.json');
+const COMPONENT_DEFAULTS_DIR = join(
+	import.meta.dir,
+	'..',
+	'packages',
+	'feedback',
+	'src',
+	'components',
+	'component-defaults'
+);
 const OUT = join(
 	import.meta.dir,
 	'..',
@@ -96,15 +105,41 @@ function isCategory(value: string): value is ComponentCategory {
 	return (CATEGORIES as readonly string[]).includes(value);
 }
 
+function pascalFromKebab(kebab: string): string {
+	return kebab
+		.split('-')
+		.map((part) => (part ? part[0]!.toUpperCase() + part.slice(1) : ''))
+		.join('');
+}
+
+// Pre-built component-default templates the widget can drop on the page.
+// Used as the gating signal for `@dryui/primitives` entries: spec exposes
+// many primitives that have no widget template (and `@dryui/ui` doesn't
+// re-export them), so listing them in the picker would silently fail at
+// render time. UI exports ride the `import('@dryui/ui')` fallback in
+// `feedback.svelte`, so they don't need a default to be pickable.
+const COMPONENT_DEFAULT_NAMES = new Set(
+	readdirSync(COMPONENT_DEFAULTS_DIR)
+		.filter((file) => file.endsWith('.svelte'))
+		.map((file) => pascalFromKebab(file.slice(0, -'.svelte'.length)))
+);
+
 const spec: Spec = JSON.parse(readFileSync(SPEC_PATH, 'utf8'));
 const componentCategories: Record<string, ComponentCategory> = {};
 
 for (const [name, component] of Object.entries(spec.components ?? {})) {
-	// The widget picker only places `@dryui/ui` exports — primitives are not
-	// stand-alone UI. This filter matches the historical `component-names.ts`
-	// surface and keeps the generated file aligned with the picker's render
-	// registry in `feedback.svelte`.
-	if (component.import !== '@dryui/ui') continue;
+	// `@dryui/ui` exports are always pickable: the widget falls back to
+	// `import('@dryui/ui')[name]` when no template is registered.
+	// `@dryui/primitives` exports are only pickable when a hand-authored
+	// template exists in `components/component-defaults/`, since UI does not
+	// re-export them.
+	if (component.import === '@dryui/ui') {
+		// always include
+	} else if (component.import === '@dryui/primitives') {
+		if (!COMPONENT_DEFAULT_NAMES.has(name)) continue;
+	} else {
+		continue;
+	}
 	if (!isCategory(component.category)) {
 		throw new Error(
 			`Component "${name}" has unknown category "${component.category}". ` +
