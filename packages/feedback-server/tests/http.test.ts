@@ -6,7 +6,7 @@ import { EventBus } from '../src/events.ts';
 import { startFeedbackHttpServer } from '../src/http.ts';
 import { FeedbackStore } from '../src/store.ts';
 import type { SubmissionPresentation } from '../src/submission-presentation.ts';
-import type { Annotation, Session, Submission } from '../src/types.ts';
+import type { Annotation, SSEEvent, Session, Submission } from '../src/types.ts';
 
 const FOREIGN_ORIGIN = 'https://attacker.example';
 const DEV_ORIGIN = 'http://localhost:5173';
@@ -546,5 +546,250 @@ describe('feedback HTTP server', () => {
 		const payload = (await queueResponse.json()) as { submissions: SubmissionPresentation[] };
 		const persisted = payload.submissions.find((entry) => entry.id === submission.id);
 		expect(persisted?.workspace).toBe(workspace);
+	});
+
+	test('emits session.created when a session is created', async () => {
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const session = await createSession('https://example.com/event-session');
+
+		expect(events).toHaveLength(1);
+		expect(events[0]).toMatchObject({
+			type: 'session.created',
+			sessionId: session.id,
+			payload: session
+		});
+	});
+
+	test('emits annotation.created when an annotation is created on a session', async () => {
+		const session = await createSession('https://example.com/event-annotation');
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const response = await fetch(`${baseUrl}/sessions/${session.id}/annotations`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				x: 5,
+				y: 6,
+				comment: 'Tighten this label.',
+				element: 'label',
+				elementPath: 'main label',
+				timestamp: 7,
+				color: 'brand',
+				isFixed: false
+			})
+		});
+		expect(response.status).toBe(201);
+		const annotation = (await response.json()) as Annotation;
+
+		expect(events).toHaveLength(1);
+		expect(events[0]).toMatchObject({
+			type: 'annotation.created',
+			sessionId: session.id,
+			payload: annotation
+		});
+	});
+
+	test('action request emits action.requested with delivered listener counts and pending count', async () => {
+		const session = await createSession('https://example.com/event-action');
+		const annotationResponse = await fetch(`${baseUrl}/sessions/${session.id}/annotations`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				x: 0,
+				y: 0,
+				comment: 'Tighten copy.',
+				element: 'h1',
+				elementPath: 'main h1',
+				timestamp: 1,
+				color: 'brand',
+				isFixed: false
+			})
+		});
+		expect(annotationResponse.status).toBe(201);
+
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const missing = await fetch(`${baseUrl}/sessions/missing-session/action`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ output: 'Apply fixes.' })
+		});
+		expect(missing.status).toBe(404);
+
+		const response = await fetch(`${baseUrl}/sessions/${session.id}/action`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ output: 'Apply fixes.' })
+		});
+		expect(response.status).toBe(202);
+		expect(await response.json()).toEqual({
+			success: true,
+			annotationCount: 1,
+			delivered: {
+				sseListeners: 1,
+				webhooks: 0,
+				total: 1
+			}
+		});
+
+		expect(events).toHaveLength(1);
+		expect(events[0]).toMatchObject({
+			type: 'action.requested',
+			sessionId: session.id,
+			payload: { output: 'Apply fixes.', sessionId: session.id }
+		});
+	});
+
+	test('saves drawings via PUT and emits drawings.updated with the url as sessionId', async () => {
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const drawingsUrl = 'https://example.com/canvas';
+		const response = await fetch(`${baseUrl}/drawings?url=${encodeURIComponent(drawingsUrl)}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify([{ id: 'draw-1' }])
+		});
+		expect(response.status).toBe(204);
+
+		expect(store.getDrawings(drawingsUrl)).toEqual([{ id: 'draw-1' }]);
+		expect(events).toHaveLength(1);
+		expect(events[0]).toMatchObject({
+			type: 'drawings.updated',
+			sessionId: drawingsUrl,
+			payload: { url: drawingsUrl }
+		});
+	});
+
+	test('emits submission.created, submission.updated, submission.deleted in order keyed by url', async () => {
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const createResponse = await fetch(`${baseUrl}/submissions`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				url: 'https://example.com/event-submission',
+				image: imagePayload('event-submission'),
+				drawings: []
+			})
+		});
+		expect(createResponse.status).toBe(201);
+		const created = (await createResponse.json()) as Submission;
+		screenshotPaths.push(created.screenshotPath.webp, created.screenshotPath.png);
+
+		const updateResponse = await fetch(`${baseUrl}/submissions/${created.id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
+		});
+		expect(updateResponse.status).toBe(200);
+
+		const deleteResponse = await fetch(`${baseUrl}/submissions/${created.id}`, {
+			method: 'DELETE'
+		});
+		expect(deleteResponse.status).toBe(204);
+
+		const missingUpdate = await fetch(`${baseUrl}/submissions/missing-submission`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
+		});
+		expect(missingUpdate.status).toBe(404);
+
+		const missingDelete = await fetch(`${baseUrl}/submissions/missing-submission`, {
+			method: 'DELETE'
+		});
+		expect(missingDelete.status).toBe(404);
+
+		expect(events.map((event) => event.type)).toEqual([
+			'submission.created',
+			'submission.updated',
+			'submission.deleted'
+		]);
+		expect(events.map((event) => event.sessionId)).toEqual([created.url, created.url, created.url]);
+		expect(events[0]?.payload).toMatchObject({ id: created.id, status: 'pending' });
+		expect(events[1]?.payload).toMatchObject({ id: created.id, status: 'resolved' });
+		expect(events[2]?.payload).toMatchObject({ id: created.id });
+	});
+
+	test('emits annotation.updated, thread.message, and annotation.deleted in order keyed by sessionId', async () => {
+		const session = await createSession('https://example.com/event-annotation-lifecycle');
+		const createResponse = await fetch(`${baseUrl}/sessions/${session.id}/annotations`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				x: 10,
+				y: 20,
+				comment: 'Reword this.',
+				element: 'p',
+				elementPath: 'main p',
+				timestamp: 100,
+				color: 'brand',
+				isFixed: false
+			})
+		});
+		expect(createResponse.status).toBe(201);
+		const created = (await createResponse.json()) as Annotation;
+
+		const events: SSEEvent[] = [];
+		bus.subscribe((event) => events.push(event));
+
+		const patchResponse = await fetch(`${baseUrl}/annotations/${created.id}`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
+		});
+		expect(patchResponse.status).toBe(200);
+
+		const threadResponse = await fetch(`${baseUrl}/annotations/${created.id}/thread`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ role: 'agent', content: 'Resolved in the current patch.' })
+		});
+		expect(threadResponse.status).toBe(201);
+
+		const deleteResponse = await fetch(`${baseUrl}/annotations/${created.id}`, {
+			method: 'DELETE'
+		});
+		expect(deleteResponse.status).toBe(204);
+
+		const missingPatch = await fetch(`${baseUrl}/annotations/missing-annotation`, {
+			method: 'PATCH',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ status: 'resolved' })
+		});
+		expect(missingPatch.status).toBe(404);
+
+		const missingThread = await fetch(`${baseUrl}/annotations/missing-annotation/thread`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ role: 'human', content: 'Any update?' })
+		});
+		expect(missingThread.status).toBe(404);
+
+		const missingDelete = await fetch(`${baseUrl}/annotations/missing-annotation`, {
+			method: 'DELETE'
+		});
+		expect(missingDelete.status).toBe(404);
+
+		expect(events.map((event) => event.type)).toEqual([
+			'annotation.updated',
+			'thread.message',
+			'annotation.deleted'
+		]);
+		expect(events.map((event) => event.sessionId)).toEqual([session.id, session.id, session.id]);
+		expect(events[0]?.payload).toMatchObject({ id: created.id, status: 'resolved' });
+		expect(events[1]?.payload).toMatchObject({
+			id: created.id,
+			thread: [
+				expect.objectContaining({ role: 'agent', content: 'Resolved in the current patch.' })
+			]
+		});
+		expect(events[2]?.payload).toMatchObject({ id: created.id });
 	});
 });

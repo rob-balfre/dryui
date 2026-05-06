@@ -3,12 +3,36 @@ import {
 	createLintPolicy,
 	filterFirstPartyViolations,
 	isRuleOwner,
+	lintRuleMessage,
 	lintRuleSeverity,
+	lintViolation,
 	shouldReportFirstPartyViolation,
 	type Violation
 } from './lint-policy.js';
 
 describe('lint policy', () => {
+	test('emits catalog-backed violations with formatted messages', () => {
+		expect(
+			lintViolation('dryui/no-flex', 3, {
+				value: 'display: flex',
+				guidance: 'display: grid'
+			})
+		).toEqual({
+			rule: 'dryui/no-flex',
+			message:
+				'Do not use display: flex. Use display: grid. For chip/tag wrapping, use ChipGroup.Root for the chip row. Add /* dryui-allow flex */ on the preceding line for intentional cases.',
+			line: 3
+		});
+	});
+
+	test('maps project-facing rule ids to catalog messages', () => {
+		expect(lintViolation('project/theme-import-order', 2)).toEqual({
+			rule: 'project/theme-import-order',
+			message: lintRuleMessage('project/theme-import-order'),
+			line: 2
+		});
+	});
+
 	test('keeps owner carve-outs in policy', () => {
 		expect(
 			isRuleOwner(

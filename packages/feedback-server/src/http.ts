@@ -10,18 +10,6 @@ import {
 	type DispatcherOptions
 } from './dispatch.js';
 import { EventBus } from './events.js';
-import {
-	addThreadMessage as addThreadMessageOperation,
-	createAnnotation as createAnnotationOperation,
-	createSession as createSessionOperation,
-	createSubmission as createSubmissionOperation,
-	deleteAnnotation as deleteAnnotationOperation,
-	deleteSubmission as deleteSubmissionOperation,
-	requestSessionAction as requestSessionActionOperation,
-	saveDrawings as saveDrawingsOperation,
-	updateAnnotation as updateAnnotationOperation,
-	updateSubmissionStatus as updateSubmissionStatusOperation
-} from './operations.js';
 import { FeedbackStore } from './store.js';
 import {
 	buildSubmissionPresentation,
@@ -216,6 +204,20 @@ function errorResponse(status: number, error: string): Response {
 
 function sseMessage(event: SSEEvent): string {
 	return `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`;
+}
+
+function emit<TPayload>(
+	bus: EventBus,
+	type: string,
+	sessionId: string,
+	payload: TPayload
+): ReturnType<EventBus['emit']> {
+	return bus.emit({
+		type,
+		timestamp: new Date().toISOString(),
+		sessionId,
+		payload
+	});
 }
 
 async function readJson<T>(request: Request): Promise<T> {
@@ -432,7 +434,8 @@ export function startFeedbackHttpServer(
 					try {
 						const body = await readJson<CreateSessionInput>(request);
 						if (!body.url) return errorResponse(400, 'Missing url');
-						const session = createSessionOperation(store, bus, body);
+						const session = store.createSession(body);
+						emit(bus, 'session.created', session.id, session);
 						return json(session, 201);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
@@ -467,8 +470,8 @@ export function startFeedbackHttpServer(
 
 					try {
 						const body = await readJson<CreateAnnotationInput>(request);
-						const annotation = createAnnotationOperation(store, bus, sessionId, body);
-						if (!annotation) return errorResponse(404, 'Not found');
+						const annotation = store.createAnnotation(sessionId, body);
+						emit(bus, 'annotation.created', annotation.sessionId, annotation);
 						return json(annotation, 201);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
@@ -483,9 +486,22 @@ export function startFeedbackHttpServer(
 
 					try {
 						const body = await readJson<ActionRequest>(request);
-						const response = requestSessionActionOperation(store, bus, sessionId, body);
-						if (!response) return errorResponse(404, 'Not found');
-						return json(response, 202);
+						const delivered = emit(bus, 'action.requested', sessionId, {
+							...body,
+							sessionId
+						});
+						return json(
+							{
+								success: true,
+								annotationCount: store.getPending(sessionId).length,
+								delivered: {
+									sseListeners: delivered.activeListeners,
+									webhooks: 0,
+									total: delivered.activeListeners
+								}
+							},
+							202
+						);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
@@ -531,7 +547,8 @@ export function startFeedbackHttpServer(
 					if (!drawingsUrl) return errorResponse(400, 'Missing url parameter');
 					try {
 						const body = await readJson<unknown[]>(request);
-						saveDrawingsOperation(store, bus, drawingsUrl, body);
+						store.saveDrawings(drawingsUrl, body);
+						emit(bus, 'drawings.updated', drawingsUrl, { url: drawingsUrl });
 						return new Response(null, { status: 204, headers: CORS_HEADERS });
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
@@ -545,10 +562,11 @@ export function startFeedbackHttpServer(
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
-					const submission = createSubmissionOperation(store, bus, body, {
+					const submission = store.createSubmission(body, {
 						workspace: options.dispatcher?.workspace
 					});
 					if (!submission) return errorResponse(400, 'Invalid submission');
+					emit(bus, 'submission.created', submission.url, submission);
 					return json(submission, 201);
 				}
 
@@ -590,13 +608,9 @@ export function startFeedbackHttpServer(
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
 					try {
 						const body = await readJson<{ status: SubmissionStatus }>(request);
-						const submission = updateSubmissionStatusOperation(
-							store,
-							bus,
-							submissionId,
-							body.status
-						);
+						const submission = store.updateSubmissionStatus(submissionId, body.status);
 						if (!submission) return errorResponse(404, 'Not found');
+						emit(bus, 'submission.updated', submission.url, submission);
 						return json(buildSubmissionPresentation(submission));
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
@@ -604,8 +618,9 @@ export function startFeedbackHttpServer(
 				}
 				if (submissionMatch && request.method === 'DELETE') {
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
-					const submission = deleteSubmissionOperation(store, bus, submissionId);
+					const submission = store.deleteSubmission(submissionId);
 					if (!submission) return errorResponse(404, 'Not found');
+					emit(bus, 'submission.deleted', submission.url, submission);
 					return new Response(null, { status: 204, headers: CORS_HEADERS });
 				}
 
@@ -621,8 +636,9 @@ export function startFeedbackHttpServer(
 					const annotationId = decodeURIComponent(annotationMatch[1] ?? '');
 					try {
 						const body = await readJson<UpdateAnnotationInput>(request);
-						const annotation = updateAnnotationOperation(store, bus, annotationId, body);
+						const annotation = store.updateAnnotation(annotationId, body);
 						if (!annotation) return errorResponse(404, 'Not found');
+						emit(bus, 'annotation.updated', annotation.sessionId, annotation);
 						return json(annotation);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
@@ -631,8 +647,9 @@ export function startFeedbackHttpServer(
 
 				if (annotationMatch && request.method === 'DELETE') {
 					const annotationId = decodeURIComponent(annotationMatch[1] ?? '');
-					const annotation = deleteAnnotationOperation(store, bus, annotationId);
+					const annotation = store.deleteAnnotation(annotationId);
 					if (!annotation) return errorResponse(404, 'Not found');
+					emit(bus, 'annotation.deleted', annotation.sessionId, annotation);
 					return new Response(null, { status: 204, headers: CORS_HEADERS });
 				}
 
@@ -642,8 +659,9 @@ export function startFeedbackHttpServer(
 					try {
 						const body = await readJson<Pick<ThreadMessage, 'role' | 'content'>>(request);
 						if (!body.role || !body.content) return errorResponse(400, 'Missing role or content');
-						const annotation = addThreadMessageOperation(store, bus, annotationId, body);
+						const annotation = store.addThreadMessage(annotationId, body);
 						if (!annotation) return errorResponse(404, 'Not found');
+						emit(bus, 'thread.message', annotation.sessionId, annotation);
 						return json(annotation, 201);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');

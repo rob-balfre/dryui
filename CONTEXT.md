@@ -18,6 +18,8 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Submission** — a screenshot + drawings + click hints captured by the feedback widget, addressed to one **dispatch agent**. Distinct from an annotation: an annotation is a comment on an element; a submission is a visual diff request. Stored alongside annotations in the SQLite store.
 
+**Submission contract** — the feedback-local, no-DOM shape and normalization rules for a raw Submission payload and stored raw Submission row. It is not a public reader interface; local feedback modules may change it freely while keeping **Submission presentation** stable for agents and prompts.
+
 **Submission capture** — the lifecycle that turns widget input into a stored Submission: writes WebP/PNG screenshot files, persists drawing intent arrays and viewport context, pins the dispatch workspace, lists queue/history entries, resolves status, and deletes the row plus screenshot files together. Screenshot files and the stored row are one lifecycle for architecture purposes.
 
 **Submission presentation** — the agent-facing view of a Submission: normalized screenshot paths, drawing and hint summaries, text notes, drawing-to-hint pairing, structured intent counts, and preserved raw intent arrays for escape hatches. This is distinct from the raw stored Submission row; storage is an adapter concern, while the presentation is the interface agents and prompts should consume.
@@ -43,7 +45,9 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Spec** — pre-generated JSON snapshot of every component's API (props, slots, styles), produced from `@dryui/ui` + `@dryui/primitives` source merged with composition data. Lives at [`packages/mcp/src/spec.json`](./packages/mcp/src/spec.json).
 
-**Docs component page manifest** — generated docs runtime data derived from the Spec and Composition data. It lives at [`apps/docs/src/lib/generated/component-pages.json`](./apps/docs/src/lib/generated/component-pages.json), is produced by [`packages/mcp/src/docs-component-pages.ts`](./packages/mcp/src/docs-component-pages.ts), and keeps component docs route loaders thin.
+**Docs component page manifest** — generated docs runtime data derived from the Spec and Composition data. It lives at [`apps/docs/src/lib/generated/component-pages.json`](./apps/docs/src/lib/generated/component-pages.json), is produced by [`packages/mcp/src/docs-component-pages.ts`](./packages/mcp/src/docs-component-pages.ts), and keeps component docs route loaders thin. Stable component facts such as category and source package belong in this manifest; public and preview routes adapt the manifest into route-specific return shapes.
+
+**Docs component preview route** — the first-class `/view/components/[slug]` route used for component previews and screenshot capture. It adapts the **Docs component page manifest** through its own route interface instead of reusing the public `/components/[slug]` page interface when preview-only facts are needed.
 
 **Theme token** — a `--dry-*` CSS variable defined in one of the theme stylesheets under `packages/ui/src/themes/*.css`. Background is `--dry-color-bg-base`, text is `--dry-color-text-strong`, etc. Consumer code uses `var(--name, fallback)` for defaults; never `--name: default` on the root.
 
@@ -54,6 +58,8 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 **Layout area** — a named region inside a layout, marked with `data-layout-area="<region>"`. The grid template assigns it a `grid-area`.
 
 **Layout phase** — Phase 1 (zones, grid skeleton) handled by the `dryui-layout` skill; Phase 2 (placement, polish) handled by `dryui-layout-polish`. Phase 1 markup uses plain HTML, no DryUI components.
+
+**Layout contract** — the hard-validation rules for Layout files and hooks: `src/layout.css` owns page/section grid and flex declarations, selectors are scoped through Layout hooks, responsive structure uses named `@container page (...)` queries, and violations fail deterministic checks. `data-layout-area` selectors must be scoped under their owning `[data-layout="<name>"]` selector; bare area selectors are global leakage. This is stricter than advisory prose because LLM-generated layouts otherwise drift into unsupported UI structure.
 
 ## Architecture vocabulary
 

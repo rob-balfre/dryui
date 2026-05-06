@@ -5,11 +5,14 @@
 // module is the runner: it owns the public API consumed by `http.ts` and
 // `server.ts`, plus the snapshot/probe used by the dashboard.
 //
-// The `build*`, `resolve*With`, and `resolveFeedbackSkillPath*` exports below
-// are kept on dispatch.ts so the existing tests keep importing from one
-// place. New tests should pull from the focused submodules directly.
+// Skill-path resolution (`resolveFeedbackSkillPath*`, `missingSkillHint`,
+// `*_SKILL_MISSING_HINT`) lives directly on this module: it's per-agent
+// dispatch knowledge — same shape as the warning hints and display labels
+// already owned here. Tests and external consumers import from this file.
 
+import { existsSync } from 'node:fs';
 import { homedir, platform } from 'node:os';
+import { join } from 'node:path';
 import {
 	AGENTS,
 	DISPATCH_AGENTS,
@@ -20,11 +23,6 @@ import {
 	type TerminalApp
 } from './dispatch/agents.js';
 import { defaultPlatformContext, type PlatformContext } from './dispatch/platform.js';
-import {
-	missingSkillHint,
-	resolveFeedbackSkillPath,
-	resolveFeedbackSkillPaths
-} from './dispatch/skills.js';
 import { launchAgent, probeAgent } from './dispatch/strategies.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
@@ -60,19 +58,77 @@ interface DispatchTargetsSnapshot {
 }
 
 // ---------------------------------------------------------------------------
+// Skill-path resolution
+// ---------------------------------------------------------------------------
+//
+// `dryui-feedback` is the canonical skill the dispatched agent reads first.
+// Claude reads project-local skills (so auto permission mode stays inside the
+// workspace); Codex reads installed skills from `~/.agents/skills`, where
+// `dryui` links local source-mode skills. Other agents follow the project
+// path.
+
+const PROJECT_SKILL_RELATIVE = '.claude/skills/dryui-feedback/SKILL.md';
+const CODEX_SKILL_RELATIVE = '.agents/skills/dryui-feedback/SKILL.md';
+
+export const SKILL_MISSING_HINT =
+	'dryui-feedback skill not installed in this project. ' +
+	'Run `npx skills add rob-balfre/dryui --skill dryui-feedback`.';
+
+export const CODEX_SKILL_MISSING_HINT =
+	'dryui-feedback skill not installed for Codex. ' +
+	'Run `DRYUI_DEV=1 dryui`, choose "Set up editor or agent", then choose Codex.';
+
+function findProjectSkill(workspace: string): string | null {
+	const candidate = join(workspace, PROJECT_SKILL_RELATIVE);
+	return existsSync(candidate) ? candidate : null;
+}
+
+function findCodexSkill(homeDir: string): string | null {
+	const candidate = join(homeDir, CODEX_SKILL_RELATIVE);
+	return existsSync(candidate) ? candidate : null;
+}
+
+export function resolveFeedbackSkillPath(
+	workspace: string,
+	target: DispatchAgent,
+	homeDir = homedir()
+): string | null {
+	const projectSkill = findProjectSkill(workspace);
+	if (target !== 'codex') return projectSkill;
+	return findCodexSkill(homeDir) ?? projectSkill;
+}
+
+export function resolveFeedbackSkillPaths(
+	workspace: string,
+	agents: readonly DispatchAgent[],
+	homeDir = homedir()
+): DispatchSkillPaths {
+	const projectSkill = findProjectSkill(workspace);
+	const codexSkill = findCodexSkill(homeDir);
+	const skillPaths: DispatchSkillPaths = {};
+
+	for (const agent of agents) {
+		const skillPath = agent === 'codex' ? (codexSkill ?? projectSkill) : projectSkill;
+		if (skillPath) skillPaths[agent] = skillPath;
+	}
+
+	return skillPaths;
+}
+
+function missingSkillHint(target: DispatchAgent): string {
+	return target === 'codex' ? CODEX_SKILL_MISSING_HINT : SKILL_MISSING_HINT;
+}
+
+// ---------------------------------------------------------------------------
 // Test seams — re-exported so the existing test suite keeps importing from
 // `dispatch.ts`. New code should import from the submodules directly.
 // ---------------------------------------------------------------------------
 
 export {
-	resolveFeedbackSkillPath,
-	resolveFeedbackSkillPaths,
-	resolveLocalPluginDir
-} from './dispatch/skills.js';
-export {
 	buildVsCodeChatArgs,
 	buildWindsurfChatArgs,
 	buildWorkspaceAppLaunch,
+	resolveLocalPluginDir,
 	resolveVsCodeCliWith,
 	resolveWindsurfCliWith
 } from './dispatch/strategies.js';

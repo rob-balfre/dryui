@@ -1,5 +1,5 @@
+import { sanitizeLayoutSnapshot, type LayoutSnapshot } from './layout-snapshot.js';
 import type { ElementDescriptor } from './position-hints.js';
-import { sanitizeLayoutSnapshot, type LayoutSnapshot } from './submission-capture-layout.js';
 import type { Drawing, Tool } from './types.js';
 
 export const WIDGET_STATE_STORAGE_KEY = 'dryui-feedback-widget-state:v1';
