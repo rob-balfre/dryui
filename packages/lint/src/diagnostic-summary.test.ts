@@ -46,11 +46,7 @@ describe('summarizeDiagnostics', () => {
 	});
 
 	test('sorts line asc as severity tiebreaker', () => {
-		const result = summarizeDiagnostics([
-			diag('error', 30),
-			diag('error', 10),
-			diag('error', 20)
-		]);
+		const result = summarizeDiagnostics([diag('error', 30), diag('error', 10), diag('error', 20)]);
 		expect(result.issues.map((i) => i.line)).toEqual([10, 20, 30]);
 	});
 

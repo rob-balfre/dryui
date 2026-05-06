@@ -16,6 +16,11 @@ export default defineConfig({
 		__BUILD_TIMESTAMP__: JSON.stringify(new Date().toISOString())
 	},
 	build: {
-		chunkSizeWarningLimit: 2000
+		chunkSizeWarningLimit: 2000,
+		rollupOptions: {
+			checks: {
+				pluginTimings: false
+			}
+		}
 	}
 });

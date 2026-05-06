@@ -1101,7 +1101,10 @@ export function checkSvelteFile(
 
 	for (const block of collectSvelteStyleBlocks(content)) {
 		violations.push(
-			...offsetViolations(checkStyle(block.content, { chipGroupExemptClasses }, filename), block.line)
+			...offsetViolations(
+				checkStyle(block.content, { chipGroupExemptClasses }, filename),
+				block.line
+			)
 		);
 	}
 
