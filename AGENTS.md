@@ -24,27 +24,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
-- Use DryUI skills as the default entry point. The CLI exists only for skill/editor setup and feedback tooling. Always check for an existing local link before installing globally:
-
-```bash
-readlink ~/.bun/install/global/node_modules/@dryui/cli
-```
-
-If the link points at this repo's `packages/cli`, do not run a global install; it will replace the local link. Restore or refresh local source mode instead:
-
-```bash
-bun run dev:link
-DRYUI_DEV=1 dryui
-```
-
-Only install the published CLI when no local link exists and you are not iterating on the DryUI monorepo:
-
-```bash
-bun install -g @dryui/cli@latest
-dryui
-```
-
-- The DryUI CLI is intentionally limited to skill/editor setup and feedback tooling. Do not re-add project detection, install planning, component lookup, token listing, or broad check commands unless explicitly requested.
+- Use DryUI skills as the default entry point. Run the local feedback dashboard with `bunx dryui-feedback`.
 - Use package-level lint/build/test commands for deterministic validation: component contracts, a11y, tokens, CSS discipline.
 - DryUI ships no layout component. Page/section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. The file is imported last from `src/routes/+layout.svelte` after DryUI theme CSS and `../app.css`.
 - All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Mobile-first; `@container` queries for responsive shifts, never `@media` for layout breakpoints.
@@ -58,10 +38,6 @@ dryui
 ## End-to-End Testing
 
 - Use `bun run e2e:full` to pack local package tarballs and run every scaffold scenario. Use `bun run e2e:one <scenario>` for a focused scenario and `bun run e2e:pack` when only refreshing tarballs is needed.
-
-## Local Source Mode
-
-- For iterating on `@dryui/cli`, `@dryui/mcp`, or `@dryui/feedback-server` against live source instead of `dist/`, run `bun run dev:link` once then set `DRYUI_DEV=1` in the consuming shell or editor MCP config. Wrappers, env contract, and dashboard UI watch flow are documented under "Source Mode (DRYUI_DEV)" in [`README.md`](./README.md). Tear down with `bun run dev:unlink`.
 
 ## Verification
 

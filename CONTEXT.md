@@ -4,9 +4,11 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 ## Surfaces
 
-**Skill** — the primary entry point a human-led, agent-assisted DryUI workflow runs from. Sources live under top-level [`skills/`](./skills/). Installed into editors via `npx skills add rob-balfre/dryui`. ADR-0001 makes skills the canonical product surface.
+**Skill** — the primary entry point a human-led, agent-assisted DryUI workflow runs from. Sources live under top-level [`skills/`](./skills/). Installed into editors via `npx skills add rob-balfre/dryui`. ADR-0001 makes skills the canonical product surface. All component knowledge (APIs, recipes, accessibility, theming) lives here.
 
-**CLI (`@dryui/cli`)** — the `dryui` binary. Intentionally narrow: feedback launcher, `ambient` (SessionStart hook payload), `install-hook` (idempotent settings.json merger). ADR-0001 forbids growing it back into project detection / setup. ADR-0002 delegates skill install to `vercel-labs/skills`.
+**Consumer packages**: three runtime/dev artifacts a DryUI app pulls in. `@dryui/ui` (styled Svelte 5 components), `@dryui/lint` (build-time CSS discipline via Svelte preprocessor and Vite plugin), `@dryui/feedback` (optional in-app annotation widget).
+
+**Feedback server (`@dryui/feedback-server`)**: the local dashboard and MCP backend, exposed through the `dryui-feedback` bin (`bunx dryui-feedback`). Owns submission storage, dispatch, and the dashboard UI.
 
 **Lint surface** — a build-time enforcement point exposed by `@dryui/lint`. Two surfaces today: `dryuiLint()` (Svelte preprocessor) for component rules; `dryuiLayoutCss()` (Vite plugin) for `src/layout.css`.
 
@@ -40,14 +42,6 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 **Dispatch warning** — a one-shot stderr hint fired during launch when an agent's MCP config is missing the `dryui-feedback` entry. Distinct from probe: probe accepts either `dryui` or `dryui-feedback`, the warning specifically asks for `dryui-feedback`. Today only Copilot CLI and the VS Code Copilot extension carry one.
 
 ## Component domain
-
-**Composition data** — hand-curated guidance for combining DryUI components: which to pick, what to use it with, what to avoid. Single source of truth at [`packages/mcp/src/composition-data.ts`](./packages/mcp/src/composition-data.ts). Consumed by spec generation, MCP tools, and skills.
-
-**Spec** — pre-generated JSON snapshot of every component's API (props, slots, styles), produced from `@dryui/ui` + `@dryui/primitives` source merged with composition data. Lives at [`packages/mcp/src/spec.json`](./packages/mcp/src/spec.json).
-
-**Docs component page manifest** — generated docs runtime data derived from the Spec and Composition data. It lives at [`apps/docs/src/lib/generated/component-pages.json`](./apps/docs/src/lib/generated/component-pages.json), is produced by [`packages/mcp/src/docs-component-pages.ts`](./packages/mcp/src/docs-component-pages.ts), and keeps component docs route loaders thin. Stable component facts such as category and source package belong in this manifest; public and preview routes adapt the manifest into route-specific return shapes.
-
-**Docs component preview route** — the first-class `/view/components/[slug]` route used for component previews and screenshot capture. It adapts the **Docs component page manifest** through its own route interface instead of reusing the public `/components/[slug]` page interface when preview-only facts are needed.
 
 **Theme token** — a `--dry-*` CSS variable defined in one of the theme stylesheets under `packages/ui/src/themes/*.css`. Background is `--dry-color-bg-base`, text is `--dry-color-text-strong`, etc. Consumer code uses `var(--name, fallback)` for defaults; never `--name: default` on the root.
 

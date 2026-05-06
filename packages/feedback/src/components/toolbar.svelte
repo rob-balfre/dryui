@@ -1,15 +1,5 @@
 <script lang="ts">
-	import {
-		AlertDialog,
-		Button,
-		Checkbox,
-		Field,
-		Input,
-		InputGroup,
-		Kbd,
-		Label,
-		Select
-	} from '@dryui/ui';
+	import { AlertDialog, Button, Field, InputGroup, Kbd, Label } from '@dryui/ui';
 	import type { Attachment } from 'svelte/attachments';
 	import {
 		ArrowLeft,
@@ -25,7 +15,6 @@
 		RotateCcw,
 		Search,
 		Send,
-		Settings,
 		Trash2,
 		Type,
 		Undo2,
@@ -39,7 +28,6 @@
 		COMPONENT_NAMES,
 		type ComponentCategory
 	} from './component-names.js';
-	import type { SchemaField } from './component-schemas.js';
 
 	export type Mode = 'annotate' | 'components';
 
@@ -57,8 +45,6 @@
 		canReset?: boolean;
 		canBreakApart?: boolean;
 		addedKind?: string | null;
-		addedLabel?: string;
-		addedPropsJson?: string;
 		ontoggle: () => void;
 		ontoolchange: (tool: Tool) => void;
 		onsubmit: () => void;
@@ -70,7 +56,6 @@
 		ondeselect?: () => void;
 		onaddcomponent?: (kind: string) => void;
 		oncancelplacement?: () => void;
-		onapplyprops?: (label: string, propsJson: string) => void;
 		onremoveselected?: () => void;
 		onbreakapart?: () => void;
 	}
@@ -85,8 +70,6 @@
 		hasSelection = false,
 		placing = null,
 		addedKind = null,
-		addedLabel = '',
-		addedPropsJson = '',
 		canUndo = false,
 		canRedo = false,
 		canReset = false,
@@ -102,7 +85,6 @@
 		ondeselect,
 		onaddcomponent,
 		oncancelplacement,
-		onapplyprops,
 		onremoveselected,
 		onbreakapart
 	}: Props = $props();
@@ -220,160 +202,6 @@
 		onreset?.();
 	}
 
-	let propsPanelOpen = $state(false);
-	let propsLabelInput = $state('');
-	let propsValues = $state<Record<string, unknown>>({});
-	let propsPanelEl = $state<HTMLDivElement | undefined>();
-
-	const capturePropsPanel: Attachment<HTMLDivElement> = (node) => {
-		propsPanelEl = node;
-		return () => {
-			if (propsPanelEl === node) propsPanelEl = undefined;
-		};
-	};
-
-	let schemas = $state<Record<string, SchemaField[]> | null>(null);
-
-	$effect(() => {
-		if (!propsPanelOpen || schemas) return;
-		let cancelled = false;
-		import('./component-schemas.js').then((mod) => {
-			if (cancelled) return;
-			schemas = mod.COMPONENT_SCHEMAS;
-		});
-		return () => {
-			cancelled = true;
-		};
-	});
-
-	const propsSchema = $derived<SchemaField[]>(
-		addedKind && schemas ? (schemas[addedKind] ?? []) : []
-	);
-
-	const formFields = $derived(propsSchema.filter((field) => field.type.kind !== 'snippet'));
-
-	function syncPropsPanel() {
-		propsLabelInput = addedLabel ?? '';
-		propsValues = parsePropsJson(addedPropsJson ?? '');
-	}
-
-	function parsePropsJson(raw: string): Record<string, unknown> {
-		const trimmed = raw.trim();
-		if (!trimmed) return {};
-		try {
-			const parsed = JSON.parse(trimmed);
-			if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-				return parsed as Record<string, unknown>;
-			}
-		} catch {
-			// fall through to empty on invalid JSON
-		}
-		return {};
-	}
-
-	function serializePropsValues(values: Record<string, unknown>): string {
-		const trimmed: Record<string, unknown> = {};
-		for (const [key, value] of Object.entries(values)) {
-			if (value === undefined || value === null || value === '') continue;
-			trimmed[key] = value;
-		}
-		if (Object.keys(trimmed).length === 0) return '';
-		return JSON.stringify(trimmed);
-	}
-
-	$effect(() => {
-		void addedKind;
-		syncPropsPanel();
-	});
-
-	$effect(() => {
-		if (!addedKind) propsPanelOpen = false;
-	});
-
-	$effect(() => {
-		if (!propsPanelOpen || !propsPanelEl) return;
-		const id = requestAnimationFrame(() => {
-			propsPanelEl?.querySelector<HTMLInputElement>('[data-props-label-input]')?.focus();
-		});
-		return () => cancelAnimationFrame(id);
-	});
-
-	function togglePropsPanel() {
-		if (!addedKind) return;
-		propsPanelOpen = !propsPanelOpen;
-		if (propsPanelOpen) syncPropsPanel();
-	}
-
-	function applyProps() {
-		onapplyprops?.(propsLabelInput, serializePropsValues(propsValues));
-		propsPanelOpen = false;
-	}
-
-	function setFieldValue(field: SchemaField, value: unknown) {
-		propsValues = { ...propsValues, [field.name]: value };
-	}
-
-	function clearFieldValue(field: SchemaField) {
-		const next = { ...propsValues };
-		delete next[field.name];
-		propsValues = next;
-	}
-
-	function handlePropsKey(e: KeyboardEvent) {
-		if (e.key === 'Enter' && !(e.target instanceof HTMLTextAreaElement)) {
-			e.preventDefault();
-			applyProps();
-		} else if (e.key === 'Escape') {
-			e.preventDefault();
-			propsPanelOpen = false;
-		}
-	}
-
-	function readEnumValue(field: SchemaField): string {
-		const value = propsValues[field.name];
-		return typeof value === 'string' ? value : '';
-	}
-
-	function setEnumValue(field: SchemaField, value: string) {
-		if (!value) clearFieldValue(field);
-		else setFieldValue(field, value);
-	}
-
-	function readBooleanValue(field: SchemaField): boolean {
-		return propsValues[field.name] === true;
-	}
-
-	function setBooleanValue(field: SchemaField, value: boolean) {
-		if (value) setFieldValue(field, true);
-		else clearFieldValue(field);
-	}
-
-	function readNumberValue(field: SchemaField): string {
-		const value = propsValues[field.name];
-		return typeof value === 'number' ? String(value) : '';
-	}
-
-	function setNumberValue(field: SchemaField, value: string | number | undefined) {
-		const raw = value == null ? '' : String(value);
-		if (raw === '') {
-			clearFieldValue(field);
-			return;
-		}
-		const num = Number(raw);
-		if (Number.isFinite(num)) setFieldValue(field, num);
-	}
-
-	function readStringValue(field: SchemaField): string {
-		const value = propsValues[field.name];
-		return typeof value === 'string' ? value : '';
-	}
-
-	function setStringValue(field: SchemaField, value: string | number | undefined) {
-		const raw = value == null ? '' : String(value);
-		if (raw === '') clearFieldValue(field);
-		else setFieldValue(field, raw);
-	}
-
 	const SUBMIT_COPY: Record<SubmitStatus, { label: string; aria: string }> = {
 		idle: { label: 'Send feedback', aria: 'Send feedback' },
 		'waiting-for-capture': {
@@ -413,7 +241,7 @@
 	}
 
 	function syncToolbarLayoutMetrics() {
-		if (pickerOpen || propsPanelOpen) updatePopoverPlacement();
+		if (pickerOpen) updatePopoverPlacement();
 	}
 
 	function scheduleToolbarLayoutRepair(node: HTMLDivElement): () => void {
@@ -465,7 +293,7 @@
 	}
 
 	$effect(() => {
-		if (!pickerOpen && !propsPanelOpen) return;
+		if (!pickerOpen) return;
 		updatePopoverPlacement();
 		window.addEventListener('resize', schedulePopoverUpdate);
 		window.addEventListener('scroll', schedulePopoverUpdate, true);
@@ -727,128 +555,6 @@
 				aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
 			>
 				{#if showComponentsTools}
-					{#if addedKind}
-						<div class="add-wrap" data-placement={popoverPlacement}>
-							<Button
-								variant="trigger"
-								size="sm"
-								class="tool-btn"
-								type="button"
-								data-tooltip="Edit props"
-								data-active={propsPanelOpen || undefined}
-								onclick={togglePropsPanel}
-								aria-label={`Edit ${addedKind} props`}
-								aria-expanded={propsPanelOpen}
-							>
-								<Settings size={16} />
-							</Button>
-
-							{#if propsPanelOpen}
-								<div
-									class="props-panel"
-									{@attach capturePropsPanel}
-									role="dialog"
-									aria-label={`${addedKind} props`}
-								>
-									<div class="props-panel-title">{addedKind} props</div>
-									<Field.Root data-props-panel-field>
-										<Label size="sm" data-props-panel-label>Label</Label>
-										<Input
-											size="sm"
-											type="text"
-											bind:value={propsLabelInput}
-											placeholder={addedKind}
-											data-props-panel-input
-											data-props-label-input
-											onkeydown={handlePropsKey}
-										/>
-									</Field.Root>
-									{#each formFields as field (field.name)}
-										{#if field.type.kind === 'enum'}
-											<Field.Root data-props-panel-field>
-												<Label size="sm" data-props-panel-label>{field.name}</Label>
-												<div data-props-panel-select>
-													<Select.Root
-														bind:value={
-															() => readEnumValue(field), (next) => setEnumValue(field, next)
-														}
-													>
-														<Select.Trigger size="sm" data-props-panel-input>
-															<Select.Value placeholder={readEnumValue(field) || 'Default'} />
-														</Select.Trigger>
-														<Select.Content>
-															<Select.Item value="">Default</Select.Item>
-															{#each field.type.options as option (option)}
-																<Select.Item value={option}>{option}</Select.Item>
-															{/each}
-														</Select.Content>
-													</Select.Root>
-												</div>
-											</Field.Root>
-										{:else if field.type.kind === 'boolean'}
-											<Field.Root data-props-panel-checkbox-field>
-												<Checkbox
-													size="sm"
-													bind:checked={
-														() => readBooleanValue(field), (next) => setBooleanValue(field, next)
-													}
-												>
-													{field.name}
-												</Checkbox>
-											</Field.Root>
-										{:else if field.type.kind === 'number'}
-											<Field.Root data-props-panel-field>
-												<Label size="sm" data-props-panel-label>{field.name}</Label>
-												<Input
-													size="sm"
-													type="number"
-													data-props-panel-input
-													bind:value={
-														() => readNumberValue(field), (next) => setNumberValue(field, next)
-													}
-													onkeydown={handlePropsKey}
-												/>
-											</Field.Root>
-										{:else}
-											<Field.Root data-props-panel-field>
-												<Label size="sm" data-props-panel-label>{field.name}</Label>
-												<Input
-													size="sm"
-													type="text"
-													data-props-panel-input
-													bind:value={
-														() => readStringValue(field), (next) => setStringValue(field, next)
-													}
-													onkeydown={handlePropsKey}
-												/>
-											</Field.Root>
-										{/if}
-									{/each}
-									<div class="props-panel-actions">
-										<Button
-											variant="outline"
-											size="sm"
-											class="props-panel-btn"
-											type="button"
-											onclick={() => (propsPanelOpen = false)}
-										>
-											Cancel
-										</Button>
-										<Button
-											variant="solid"
-											size="sm"
-											class="props-panel-btn props-panel-btn-primary"
-											type="button"
-											onclick={applyProps}
-										>
-											Apply
-										</Button>
-									</div>
-								</div>
-							{/if}
-						</div>
-					{/if}
-
 					<div class="add-wrap" data-placement={popoverPlacement}>
 						<Button
 							variant="trigger"
@@ -1511,8 +1217,7 @@
 		z-index: 10001;
 	}
 
-	.add-wrap[data-placement='bottom'] .component-picker,
-	.add-wrap[data-placement='bottom'] .props-panel {
+	.add-wrap[data-placement='bottom'] .component-picker {
 		top: calc(100% + 10px);
 		bottom: auto;
 	}
@@ -1645,169 +1350,6 @@
 		border: 1px dashed oklch(73% 0.16 48 / 0.45);
 		border-radius: 8px;
 		color: var(--accent-strong);
-	}
-
-	.props-panel {
-		position: absolute;
-		bottom: calc(100% + 10px);
-		right: 0;
-		display: grid;
-		gap: 8px;
-		min-inline-size: 260px;
-		max-inline-size: 320px;
-		padding: 12px;
-		border: 1px solid var(--feedback-line);
-		border-radius: 12px;
-		background: var(--pill-bg);
-		box-shadow: var(--pill-shadow);
-		z-index: 10001;
-	}
-
-	.props-panel-title {
-		color: var(--accent-strong);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 11px;
-		font-weight: 700;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
-	}
-
-	:global([data-props-panel-field]) {
-		display: grid;
-		gap: 4px;
-	}
-
-	:global([data-props-panel-checkbox-field]) {
-		display: grid;
-		justify-content: start;
-		color: var(--feedback-ink);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 12px;
-		font-weight: 500;
-	}
-
-	:global([data-props-panel-label]) {
-		color: var(--feedback-muted);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 10px;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		text-transform: uppercase;
-	}
-
-	:global([data-props-panel-input]) {
-		--dry-btn-bg: var(--feedback-sunken);
-		--dry-btn-border: var(--feedback-line);
-		--dry-btn-color: var(--feedback-ink);
-		--dry-btn-font-size: 12px;
-		--dry-btn-min-height: 0;
-		--dry-btn-padding-x: 10px;
-		--dry-btn-padding-y: 6px;
-		--dry-btn-radius: 6px;
-		--dry-input-bg: var(--feedback-sunken);
-		--dry-input-border: var(--feedback-line);
-		--dry-input-color: var(--feedback-ink);
-		--dry-input-font-size: 12px;
-		--dry-input-padding-x: 10px;
-		--dry-input-padding-y: 6px;
-		--dry-input-radius: 6px;
-
-		padding: 6px 10px;
-		border: 1px solid var(--feedback-line);
-		border-radius: 6px;
-		background: var(--feedback-sunken);
-		color: var(--feedback-ink);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 12px;
-		font-weight: 500;
-		outline: none;
-	}
-
-	:global([data-props-panel-input]:focus-visible) {
-		--dry-input-border: var(--accent);
-
-		border-color: var(--accent);
-	}
-
-	:global([data-props-panel-select]) {
-		display: grid;
-	}
-
-	.props-panel-actions {
-		display: grid;
-		grid-auto-flow: column;
-		justify-content: end;
-		gap: 6px;
-	}
-
-	:global(.props-panel-btn) {
-		--dry-btn-bg: transparent;
-		--dry-btn-border: var(--feedback-line);
-		--dry-btn-color: var(--feedback-ink);
-		--dry-btn-font-size: 11px;
-		--dry-btn-min-height: 0;
-		--dry-btn-padding-x: 12px;
-		--dry-btn-padding-y: 6px;
-		--dry-btn-radius: 6px;
-
-		padding: 6px 12px;
-		border: 1px solid var(--feedback-line);
-		border-radius: 6px;
-		background: transparent;
-		color: var(--feedback-ink);
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
-		font-size: 11px;
-		font-weight: 600;
-		letter-spacing: 0.02em;
-		cursor: pointer;
-		transition:
-			background 0.15s,
-			border-color 0.15s,
-			color 0.15s;
-	}
-
-	:global(.props-panel-btn:hover) {
-		--dry-btn-bg: var(--feedback-panel-raised);
-		--dry-btn-border: var(--feedback-weak);
-		--dry-btn-color: var(--feedback-ink);
-
-		background: var(--feedback-panel-raised);
-		border-color: var(--feedback-weak);
-	}
-
-	:global(.props-panel-btn-primary) {
-		--dry-btn-bg: var(--accent);
-		--dry-btn-border: var(--accent);
-		--dry-btn-color: oklch(8% 0.005 160);
-
-		background: var(--accent);
-		border-color: var(--accent);
-		color: oklch(8% 0.005 160);
-	}
-
-	:global(.props-panel-btn-primary:hover) {
-		--dry-btn-bg: var(--accent-strong);
-		--dry-btn-border: var(--accent-strong);
-		--dry-btn-color: oklch(8% 0.005 160);
-
-		background: var(--accent-strong);
-		border-color: var(--accent-strong);
-		color: oklch(8% 0.005 160);
 	}
 
 	:global(.component-picker-preset) {
@@ -2007,8 +1549,7 @@
 			block-size: 38px;
 		}
 
-		.component-picker,
-		.props-panel {
+		.component-picker {
 			position: fixed;
 			inset-inline: max(12px, env(safe-area-inset-left)) max(12px, env(safe-area-inset-right));
 			bottom: calc(max(12px, env(safe-area-inset-bottom)) + 112px);
@@ -2018,8 +1559,7 @@
 			max-block-size: min(56dvh, 380px);
 		}
 
-		.add-wrap[data-placement='bottom'] .component-picker,
-		.add-wrap[data-placement='bottom'] .props-panel {
+		.add-wrap[data-placement='bottom'] .component-picker {
 			top: max(12px, env(safe-area-inset-top));
 			bottom: auto;
 		}

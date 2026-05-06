@@ -6,9 +6,9 @@
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { withBase } from '$lib/utils';
 
-	const feedbackCode = `dryui feedback
+	const feedbackCode = `bunx dryui-feedback
 # agent or CI shell
-dryui feedback --no-open`;
+bunx dryui-feedback --no-open`;
 
 	const workflowDiagram: DiagramConfig = {
 		direction: 'TB',

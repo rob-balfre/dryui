@@ -10,15 +10,13 @@ DryUI gives engineers and their coding agents a shared UI system: reusable compo
 
 ## Workspace Packages
 
-| Package                  | Description                                                                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                                                                          |
-| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                                                                |
-| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                                                                               |
-| `@dryui/cli`             | Small CLI for feedback tooling and local helper commands                                                                                            |
-| `@dryui/mcp`             | Lightweight context server for editors that expect a DryUI MCP entry; guidance lives in skills and deterministic validation lives in package checks |
-| `@dryui/feedback`        | Optional feedback annotation UI                                                                                                                     |
-| `@dryui/feedback-server` | Companion feedback server and MCP backend                                                                                                           |
+| Package                  | Description                                                               |
+| ------------------------ | ------------------------------------------------------------------------- |
+| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                |
+| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming      |
+| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline     |
+| `@dryui/feedback`        | Optional feedback annotation UI                                           |
+| `@dryui/feedback-server` | Companion feedback server and MCP backend (run via `bunx dryui-feedback`) |
 
 ## Quick Start
 
@@ -28,34 +26,11 @@ Add the DryUI skill to your coding agent first:
 npx skills add rob-balfre/dryui
 ```
 
-Then use the CLI only for feedback tooling and local helpers:
+Run the local feedback dashboard when you need it:
 
 ```bash
-dryui
-dryui feedback
+bunx dryui-feedback
 ```
-
-When working inside this monorepo, always check for a local DryUI link before installing the CLI globally:
-
-```bash
-readlink ~/.bun/install/global/node_modules/@dryui/cli
-```
-
-If the link points at this repo's `packages/cli`, keep it and use local source mode:
-
-```bash
-bun run dev:link
-DRYUI_DEV=1 dryui
-```
-
-Only install the published CLI when no local link exists and you are not iterating on DryUI source:
-
-```bash
-bun install -g @dryui/cli@latest
-dryui
-```
-
-No global install? Use `bunx @dryui/cli` or `npx -y @dryui/cli`.
 
 Install the UI package:
 
@@ -84,11 +59,11 @@ Prefer `<html class="theme-auto">` so DryUI follows the system color scheme by d
 
 DryUI gives humans and agents a shared way to discuss, edit, theme, and validate web app UI without losing consistency.
 
-The skill install is the recommended first step. Use skills for project inspection, setup guidance, and implementation guidance; keep the CLI focused on feedback and local helpers.
+The skill install is the recommended first step. Use skills for project inspection, setup guidance, and implementation guidance.
 
 Repo contributors should treat [`apps/docs/src/lib/ai-setup.ts`](./apps/docs/src/lib/ai-setup.ts) as the canonical source for skill install snippets and MCP config examples.
 
-Use package-level lint, build, and test commands for deterministic validation. The CLI intentionally does not own project detection, install planning, component lookup, token listing, or broad checking.
+Use package-level lint, build, and test commands for deterministic validation.
 
 ## Public Docs Surface
 
@@ -147,28 +122,7 @@ bun run docs
 bun run validate
 ```
 
-### Source Mode (DRYUI_DEV)
-
-Run `dryui` and `dryui-feedback-mcp` against the live `packages/*/src/` TypeScript instead of `dist/`, without publishing or pointing tools at build folders.
-
-One-time setup:
-
-```bash
-bun run build:packages   # populates dist/ as the DRYUI_DEV=0 fallback
-bun run dev:link         # registers each workspace package globally via `bun link`
-```
-
-That's it. The bins ship with workspace auto-detect: when invoked through the `bun link` symlink they spot the surrounding `packages/<name>/package.json` and `.git`, switch to source mode, and propagate `DRYUI_DEV=1` to their child process. So:
-
-```bash
-dryui                    # auto-runs packages/cli/src/index.ts
-dryui feedback           # explicit feedback dashboard command
-dryui-feedback-mcp       # feedback MCP server from src
-```
-
-Each invocation prints a one-line `DRYUI_DEV=1 — LOCAL SOURCE MODE` banner so you can tell at a glance which path you're on. Edits in `packages/*/src/` show up on the next invocation — no rebuild required. To force the published path (e.g. to test the dist artifact), set `DRYUI_DEV=0` before running.
-
-#### Skill install via npx skills
+### Skill install via npx skills
 
 DryUI setup is owned by the upstream skills installer from `vercel-labs/skills`. Install or refresh the DryUI skills with:
 
@@ -178,21 +132,7 @@ npx skills add rob-balfre/dryui
 
 Use `--agent <flag>` when you want the upstream installer to target one supported agent.
 
-Workspace packages registered by `dev:link` (`@dryui/ui`, `@dryui/primitives`, `@dryui/feedback`, `@dryui/lint`) all carry a `"development"` exports condition pointing at `src/` and ship `src/` in their tarballs. Combined with the launcher's `DRYUI_DEV` flow — which rewrites tarball overrides in your project's `package.json` to `link:<pkg>` and adds the packages to `ssr.noExternal` — `vite dev` in `~/yourproject` resolves through workspace source and picks up Svelte edits via HMR. Production builds fall through to `dist/` automatically.
-
-For feedback MCP entries, point at the linked bin. Auto-detect handles the rest, but the explicit env flag is fine to keep:
-
-```jsonc
-{
-	"mcpServers": {
-		"dryui-feedback": { "command": "dryui-feedback-mcp" }
-	}
-}
-```
-
-The `<Feedback />` widget and `@dryui/ui` components already resolve to source for any in-repo consumer (the docs app, tests, etc.) via the `bun`/`svelte` export conditionals, so `bun run docs` HMR picks up Svelte edits with no extra setup. For live rebuilds of the dashboard UI bundle, run `bun run dev:ui:watch` in a sidecar; override the served path with `DRYUI_FEEDBACK_UI_DIR` if needed.
-
-Tear down with `bun run dev:unlink`.
+The `<Feedback />` widget and `@dryui/ui` components resolve to source for any in-repo consumer (the docs app, tests, etc.) via the `bun`/`svelte` export conditionals, so `bun run docs` HMR picks up Svelte edits with no extra setup. For live rebuilds of the dashboard UI bundle, run `bun run dev:ui:watch` in a sidecar; override the served path with `DRYUI_FEEDBACK_UI_DIR` if needed.
 
 ### End-To-End Testing
 
@@ -206,7 +146,7 @@ bun run e2e:pack                 # build and pack local package tarballs only
 
 The E2E runner packs the current workspace packages into `reports/e2e-tarballs/`, scaffolds fresh projects against those tarballs, and writes the HTML run report to `reports/e2e-runs/index.html`.
 
-The scaffold step goes through `scripts/e2e/scaffold-adapter.ts`, the concrete Adapter for the `dryui-init` golden consumer setup contract. For separate consumer projects that should run from this checkout directly, use `bun run dev:link` plus `DRYUI_DEV=1`; the E2E tarball flow is the deterministic local-package variant of the same skill-led setup.
+The scaffold step goes through `scripts/e2e/scaffold-adapter.ts`, the concrete Adapter for the `dryui-init` golden consumer setup contract.
 
 See the supporting docs for the rest:
 

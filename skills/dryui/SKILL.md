@@ -1,6 +1,6 @@
 ---
 name: dryui
-description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, layout discipline, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills and the CLI is only for feedback tooling and local helpers.'
+description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, layout discipline, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills.'
 ---
 
 # DryUI
@@ -58,7 +58,7 @@ Most DryUI components are compound. They require `<Dialog.Root>`, not `<Dialog>`
 <Dialog.Root>content</Dialog.Root>
 ```
 
-Compound components are tracked in the manifest at `packages/mcp/src/component-catalog.ts` and summarized in `rules/compound-components.md`. Verify there before you assume a bare name works, then use `.Root` and wrap the parts inside it.
+Compound components are summarized in `rules/compound-components.md`. Verify there before you assume a bare name works, then use `.Root` and wrap the parts inside it.
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
@@ -185,7 +185,7 @@ The test: search your markup for raw `<input`, `<select>`, `<dialog>`, `<button>
 
 For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, SvelteKit load fns, `+page.server.ts` shape, form actions, and anything Svelte-syntax adjacent: call the official `svelte-autofixer` and `get-documentation` tools from `@sveltejs/mcp` before guessing from memory.
 
-- Install DryUI skills with `npx skills add rob-balfre/dryui`. Setup is owned by the upstream skills installer, not the DryUI CLI.
+- Install DryUI skills with `npx skills add rob-balfre/dryui`. Setup is owned by the upstream skills installer.
 - If the Svelte MCP is not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
 - Scope split: DryUI skills cover component APIs, theming, composition, and validation expectations. Svelte MCP covers the runtime, compiler, and framework idioms.
 
@@ -201,36 +201,15 @@ npx skills add rob-balfre/dryui
 
 That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) through the upstream skills installer. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
 
-**2. Check for a local CLI link before installing feedback helpers.** A global install replaces Bun's local link, so inspect it first:
+**2. Start feedback tooling** when you need visual annotations:
 
 ```bash
-readlink ~/.bun/install/global/node_modules/@dryui/cli
+bunx dryui-feedback
 ```
 
-If the link points at a local DryUI checkout's `packages/cli`, do not run `bun install -g @dryui/cli@latest` or `npm install -g @dryui/cli@latest`. In the DryUI monorepo, restore or refresh local source mode instead:
+**3. Bootstrap the app manually or with the `dryui-init` skill.**
 
-```bash
-bun run dev:link
-DRYUI_DEV=1 dryui
-```
-
-Only install the published CLI when no local link exists and you are not iterating on DryUI source:
-
-```bash
-bun install -g @dryui/cli@latest   # or: npm install -g @dryui/cli@latest
-```
-
-**3. Start feedback tooling** when you need visual annotations:
-
-```bash
-dryui feedback
-```
-
-**4. Bootstrap the app manually or with the `dryui-init` skill.**
-
-For greenfield and brownfield setup, use the `dryui-init` skill instructions. The CLI no longer owns project detection, install planning, or scaffolding.
-
-> **No global install?** Prefix supported CLI commands with `bunx @dryui/cli ...` or `npx -y @dryui/cli ...`. Supported commands are `ambient`, `install-hook`, and `feedback`.
+For greenfield and brownfield setup, use the `dryui-init` skill instructions.
 
 ### Manual install path
 
@@ -238,7 +217,7 @@ Kept for users who need to pin to a specific local path; the npx skills command 
 
 - Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
 
-**5. Register the Svelte MCP companion.** For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
+**4. Register the Svelte MCP companion.** For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 
 ### Manual setup
 
@@ -307,21 +286,17 @@ Use these to look up APIs, discover components, plan setup, and validate code.
 3. Run the relevant package check/build/test command after implementation to catch composition drift, layout violations, accessibility regressions, and token drift.
 4. Never guess component shape from memory. DryUI is intentionally strict, and the lookup cost is lower than rework.
 
-### CLI
+### Feedback dashboard
 
-Before installing globally, always check `readlink ~/.bun/install/global/node_modules/@dryui/cli`. If it points at a local DryUI checkout's `packages/cli`, keep the link and use `bun run dev:link` plus `DRYUI_DEV=1` instead of reinstalling. Only install once with `bun install -g @dryui/cli@latest` (or `npm install -g @dryui/cli@latest`) when no local link exists and you are not iterating on DryUI source. The CLI is intentionally small: it starts feedback tooling and prints local helper context.
+Start the local feedback dashboard when you need visual annotations:
 
 ```bash
-dryui ambient                   # SessionStart context
-dryui install-hook --dry-run    # Preview Claude hook wiring
-dryui feedback                  # Start the local feedback dashboard
+bunx dryui-feedback
 ```
-
-Without a global install, prefix any command with `bunx @dryui/cli …` or `npx -y @dryui/cli …`. Same behaviour, just slower (re-fetches on each call).
 
 ### MCP
 
-`@dryui/mcp` is a context server for agents that still expect an MCP entry. It no longer exposes runtime `ask`, `check`, detect, or planning tools. Use the installed DryUI skills for guidance, project package commands for deterministic checks, and `dryui-feedback` MCP for visual feedback dispatch.
+Use the installed DryUI skills for guidance, project package commands for deterministic checks, and the `dryui-feedback` MCP server for visual feedback dispatch.
 
 Categories: action, input, form, layout, navigation, overlay, display, feedback, interaction, utility
 

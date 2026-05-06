@@ -1,13 +1,11 @@
 ---
 name: dryui-init
-description: 'Bootstrap a SvelteKit + DryUI project using skill-led inspection and explicit file/package edits. Works for new projects, existing SvelteKit apps, and brownfield repos without relying on DryUI CLI detection or scaffolding commands.'
+description: 'Bootstrap a SvelteKit + DryUI project using skill-led inspection and explicit file/package edits. Works for new projects, existing SvelteKit apps, and brownfield repos.'
 ---
 
 # /dryui:init
 
 Bootstrap DryUI in the current project, or scaffold a new SvelteKit app when the user asks for a new project.
-
-The DryUI CLI no longer owns project detection, install planning, or scaffolding. This skill is the setup workflow.
 
 ## Install Or Refresh This Skill
 
@@ -15,19 +13,6 @@ The durable install path for DryUI skills is:
 
 ```bash
 npx skills add rob-balfre/dryui
-```
-
-In the DryUI monorepo or another local source checkout, check for an existing local CLI link before installing a published CLI:
-
-```bash
-readlink ~/.bun/install/global/node_modules/@dryui/cli
-```
-
-If it points at `packages/cli`, keep the local link and refresh source mode instead:
-
-```bash
-bun run dev:link
-DRYUI_DEV=1 dryui
 ```
 
 ## Inspect First
@@ -54,7 +39,6 @@ A valid DryUI consumer setup has:
 - `<html class="theme-auto">` in `src/app.html`, unless the app already has an explicit theme strategy.
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, then `../layout.css` last.
 - `src/layout.css` present, minimal, and ready for the `dryui-layout` skill to own page/section grid and flex layout.
-- No call to `dryui setup`, project detection, install planning, component lookup, token listing, or broad CLI checks.
 
 ## Apply Setup
 
@@ -94,4 +78,4 @@ If the user also wants editor skill setup, use the upstream skills installer:
 npx skills add rob-balfre/dryui
 ```
 
-If the user wants visual feedback tooling, add the dryui-feedback MCP server for their editor and run `dryui feedback` when they need the local dashboard. The DryUI CLI does not bootstrap the app or install skills.
+If the user wants visual feedback tooling, add the dryui-feedback MCP server for their editor and run `bunx dryui-feedback` when they need the local dashboard.

@@ -6,7 +6,6 @@
 // private helpers below — they are not re-exported.
 
 import {
-	parsePropsJson,
 	sameLayoutSnapshot,
 	snapshotElementLayout,
 	type LayoutSnapshot
@@ -37,7 +36,6 @@ export interface BrowserSubmissionAddedComponent {
 	id: string;
 	kind: string;
 	label?: string;
-	props?: Record<string, unknown>;
 	rect: BrowserSubmissionRect;
 }
 
@@ -88,8 +86,6 @@ export interface BrowserCaptureAddedDraft {
 	id: string;
 	kind: string;
 	element: HTMLElement;
-	label?: string;
-	propsJson?: string;
 }
 
 export interface BrowserCaptureRemovedDraft {
@@ -470,12 +466,10 @@ function snapshotAddedComponents(
 	for (const record of records) {
 		const rect = record.element.getBoundingClientRect();
 		if (rect.width < 1 || rect.height < 1) continue;
-		const props = parsePropsJson(record.propsJson);
 		out.push({
 			id: record.id,
 			kind: record.kind,
-			label: record.label?.trim() || undefined,
-			props: Object.keys(props).length > 0 ? props : undefined,
+			label: record.kind,
 			rect: { x: rect.left, y: rect.top, width: rect.width, height: rect.height }
 		});
 	}
@@ -610,12 +604,9 @@ function mountBrowserCaptureAnnotations(
 		doc.body.appendChild(outline);
 		nodes.push(outline);
 
-		const props = parsePropsJson(record.propsJson);
-		const labelText = record.label?.trim() || record.kind;
-		const propsText = formatPropsForChip(props);
 		const chip = doc.createElement('div');
 		chip.dataset.dryuiCaptureAnnotation = 'chip';
-		chip.textContent = `<${labelText}>${propsText}`;
+		chip.textContent = `<${record.kind}>`;
 
 		const fitsAbove = rect.top >= 24;
 		Object.assign(chip.style, {
@@ -743,17 +734,6 @@ function assembleSubmissionPayload(
 		...(removed ? { removed } : {}),
 		...(moved ? { moved } : {})
 	};
-}
-
-function formatPropsForChip(props: Record<string, unknown>): string {
-	const pairs = Object.entries(props)
-		.filter(([, value]) => value !== undefined && value !== null && value !== '')
-		.map(([key, value]) => {
-			if (typeof value === 'string') return `${key}="${value}"`;
-			if (typeof value === 'boolean' || typeof value === 'number') return `${key}={${value}}`;
-			return `${key}={${JSON.stringify(value)}}`;
-		});
-	return pairs.length ? ' · ' + pairs.join(' ') : '';
 }
 
 function chipMaxWidth(viewportWidth: number, x: number, width: number): number {

@@ -34,15 +34,7 @@ function getChangedFiles(baseSha: string): string[] {
 // or are otherwise build artifacts that shouldn't trigger the changeset gate
 // on their own. A real change always lands alongside a source-code edit that
 // will already trip the gate.
-const GENERATED_FILES = new Set([
-	'packages/mcp/src/spec.json',
-	'packages/mcp/src/architecture.json',
-	'packages/mcp/src/contract.v1.json',
-	'packages/mcp/src/contract.v1.schema.json',
-	'packages/mcp/src/agent-contract.v1.json',
-	'packages/mcp/src/agent-contract.v1.schema.json',
-	'packages/mcp/src/theme-tokens.generated.json'
-]);
+const GENERATED_FILES = new Set<string>([]);
 
 // Paths that live under packages/ but aren't part of the published tarball,
 // so they don't need a changeset on their own. Pure source/test/tooling edits

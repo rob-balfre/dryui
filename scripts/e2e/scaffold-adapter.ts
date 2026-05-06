@@ -13,15 +13,13 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'## Golden Consumer Setup Contract',
 		'concrete Adapter',
 		'npx skills add rob-balfre/dryui',
-		'DRYUI_DEV=1',
 		'@dryui/ui',
 		'@dryui/lint',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
 		'<html class="theme-auto">',
 		'src/routes/+layout.svelte',
-		'src/layout.css',
-		'No call to `dryui setup`'
+		'src/layout.css'
 	] as const
 } as const;
 

@@ -109,44 +109,15 @@ const LAYOUT_RULE_CONTRACT: SkillRuleContract = {
 			]
 		},
 		{
-			file: 'packages/mcp/src/generate-llms-txt.ts',
-			label: 'llms generator layout rule',
+			file: 'skills/dryui-layout/SKILL.md',
+			label: 'layout skill rule',
 			patterns: [
-				/Layout Rules/,
 				/src\/layout\.css/,
 				/data-layout/,
 				/data-layout-area/,
-				/dryuiLayoutCss/,
-				/@container/,
-				/@media/
-			]
-		},
-		{
-			file: 'llms.txt',
-			label: 'repo llms layout rule',
-			patterns: [
-				/Layout Rules/,
-				/src\/layout\.css/,
-				/data-layout/,
-				/data-layout-area/,
+				/grid-template-columns/,
 				/@container/
 			]
-		},
-		{
-			file: 'apps/docs/static/llms.txt',
-			label: 'docs llms layout rule',
-			patterns: [
-				/Layout Rules/,
-				/src\/layout\.css/,
-				/data-layout/,
-				/data-layout-area/,
-				/@container/
-			]
-		},
-		{
-			file: 'apps/docs/src/lib/generated/component-pages.json',
-			label: 'generated component docs layout hints',
-			patterns: [/src\/layout\.css/, /data-layout/, /grid-template-columns/]
 		}
 	]
 };

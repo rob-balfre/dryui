@@ -57,19 +57,6 @@ export function sanitizeLayoutSnapshot(value: unknown): LayoutSnapshot | null {
 	};
 }
 
-export function parsePropsJson(json: string | undefined): Record<string, unknown> {
-	if (!json?.trim()) return {};
-	try {
-		const parsed = JSON.parse(json);
-		if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
-			return parsed as Record<string, unknown>;
-		}
-	} catch {
-		// fall through to empty props on invalid JSON
-	}
-	return {};
-}
-
 function isObject(value: unknown): value is Record<string, unknown> {
 	return value !== null && typeof value === 'object';
 }

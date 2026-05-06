@@ -5,17 +5,17 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const srcEntry = resolve(here, '..', 'src', 'index.ts');
-const distEntry = resolve(here, '..', 'dist', 'index.js');
+const srcEntry = resolve(here, '..', 'src', 'cli', 'index.ts');
+const distEntry = resolve(here, '..', 'dist', 'cli', 'index.js');
 
-// Source-mode auto-detect: see packages/cli/bin/dryui.mjs for rationale.
+// Source-mode auto-detect: see packages/feedback-server/bin/dryui-feedback-mcp.mjs for rationale.
 const flag = process.env.DRYUI_DEV;
 const explicitDev = flag === '1' || flag === 'true';
 const explicitlyOff = flag === '0' || flag === 'false';
 const repoRoot = resolve(here, '..', '..', '..');
 const looksLinkedToWorkspace =
 	existsSync(srcEntry) &&
-	existsSync(resolve(repoRoot, 'packages', 'mcp', 'package.json')) &&
+	existsSync(resolve(repoRoot, 'packages', 'feedback-server', 'package.json')) &&
 	existsSync(resolve(repoRoot, '.git'));
 
 const dev = explicitDev || (!explicitlyOff && looksLinkedToWorkspace);

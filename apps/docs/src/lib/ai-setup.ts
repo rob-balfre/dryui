@@ -2,13 +2,6 @@ import type { DispatchDocsAgentId } from '../../../../packages/feedback-server/s
 
 type AiAgentId = DispatchDocsAgentId;
 
-interface AiSurfaceCard {
-	readonly name: string;
-	readonly description: string;
-	readonly color: 'blue' | 'green' | 'orange' | 'purple' | 'gray';
-	readonly example?: string;
-}
-
 export interface AiInstallStep {
 	title: string;
 	description?: string;
@@ -30,8 +23,6 @@ export interface AiAgentSetup {
 	 * page renders these as a Timeline instead of a single code block.
 	 */
 	installSteps?: AiInstallStep[];
-	/** Extra setup steps retained for detailed docs but not promoted on docs cards. */
-	cliOnlySteps?: AiInstallStep[];
 	skill?: {
 		title: string;
 		note: string;
@@ -53,31 +44,6 @@ export interface AiAgentSetup {
 }
 
 export const DRYUI_SKILLS_INSTALL_COMMAND = 'npx skills add rob-balfre/dryui';
-
-const CLI_COMMAND_COLORS: Readonly<Record<string, AiSurfaceCard['color']>> = {
-	ambient: 'gray',
-	'install-hook': 'gray',
-	feedback: 'green'
-};
-
-const CLI_COMMAND_EXAMPLES: Readonly<Record<string, string>> = {
-	ambient: 'dryui ambient',
-	'install-hook': 'dryui install-hook --dry-run',
-	feedback: 'dryui feedback --no-open'
-};
-
-const CLI_COMMANDS = [
-	{ name: 'ambient', description: 'Print compact session context for agent startup hooks.' },
-	{ name: 'install-hook', description: 'Wire or preview the Claude SessionStart hook.' },
-	{ name: 'feedback', description: 'Start the local visual feedback dashboard.' }
-] as const;
-
-export const dryuiCliCommands: readonly AiSurfaceCard[] = CLI_COMMANDS.map((command) => ({
-	name: command.name,
-	description: command.description,
-	color: CLI_COMMAND_COLORS[command.name] ?? 'gray',
-	...(CLI_COMMAND_EXAMPLES[command.name] ? { example: CLI_COMMAND_EXAMPLES[command.name] } : {})
-}));
 
 // ── MCP config snippets per tool ──
 
@@ -242,14 +208,6 @@ export const aiAgentSetups: AiAgentSetup[] = [
 				code: `claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback-mcp`
 			}
 		],
-		cliOnlySteps: [
-			{
-				title: 'Optional SessionStart hook',
-				description: 'Inject `dryui ambient` into Claude Code sessions.',
-				code: 'dryui install-hook',
-				language: 'bash'
-			}
-		],
 		skill: {
 			title: '2. Install the DryUI skills',
 			note: 'The npx skills command is the canonical Claude install path for DryUI skills.',
@@ -269,7 +227,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			language: 'bash'
 		},
 		followUp:
-			'Use skills as the default surface. The CLI only handles feedback tooling and local helpers.'
+			'Use skills as the default surface. Visual feedback runs through the dryui-feedback MCP server.'
 	},
 	{
 		id: 'codex',

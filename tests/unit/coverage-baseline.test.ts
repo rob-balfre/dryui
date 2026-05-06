@@ -6,7 +6,7 @@ const baseline: CoverageBaseline = {
 		linesPct: 50,
 		functionsPct: 40,
 		packages: {
-			'packages/cli': {
+			'packages/feedback': {
 				linesPct: 20,
 				functionsPct: 10
 			},
@@ -34,7 +34,7 @@ describe('compareCoverage', () => {
 					functions: { total: 10, covered: 5, pct: 50 },
 					packages: [
 						{
-							name: 'packages/cli',
+							name: 'packages/feedback',
 							files: 1,
 							lines: { total: 10, covered: 3, pct: 30 },
 							functions: { total: 10, covered: 2, pct: 20 }
@@ -69,7 +69,7 @@ describe('compareCoverage', () => {
 					functions: { total: 10, covered: 5, pct: 50 },
 					packages: [
 						{
-							name: 'packages/cli',
+							name: 'packages/feedback',
 							files: 1,
 							lines: { total: 10, covered: 1, pct: 10 },
 							functions: { total: 10, covered: 0, pct: 0 }
@@ -90,8 +90,8 @@ describe('compareCoverage', () => {
 			{ label: 'unit lines', expectedPct: 50, actualPct: 40 },
 			{ label: 'browser lines', expectedPct: 25, actualPct: 20 },
 			{ label: 'browser statements', expectedPct: 24, actualPct: 10 },
-			{ label: 'packages/cli lines', expectedPct: 20, actualPct: 10 },
-			{ label: 'packages/cli functions', expectedPct: 10, actualPct: 0 },
+			{ label: 'packages/feedback lines', expectedPct: 20, actualPct: 10 },
+			{ label: 'packages/feedback functions', expectedPct: 10, actualPct: 0 },
 			{ label: 'packages/ui lines', expectedPct: 60, actualPct: null },
 			{ label: 'packages/ui functions', expectedPct: 70, actualPct: null }
 		]);

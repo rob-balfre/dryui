@@ -25,7 +25,7 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 
 - Read the CSS and token rules in [`skills/dryui/rules/theming.md`](./skills/dryui/rules/theming.md).
 - Read the accessibility baseline in [`ACCESSIBILITY.md`](./ACCESSIBILITY.md).
-- When changing exported component behaviour, update composition or spec sources as needed and rebuild `@dryui/mcp`.
+- When changing exported component behaviour, update the relevant skill rule files in [`skills/dryui/rules/`](./skills/dryui/rules/).
 - Add or update browser coverage for interactive or accessibility-sensitive changes.
 - If browser coverage is not practical for an interactive component change, call out the exemption in the PR and link the follow-up issue.
 
@@ -39,10 +39,9 @@ Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-layout`, `dry
 ## Adding Or Changing A Component
 
 1. Implement the primitive and or UI layer in `packages/primitives` and `packages/ui`.
-2. Update composition data in `packages/mcp/src/composition-data.ts` if the public usage story changed.
-3. Rebuild MCP artifacts with `bun run --filter '@dryui/mcp' build`.
-4. Add tests in `tests/unit/` and or `tests/browser/`.
-5. If the change materially affects docs layout, theming, or representative demo states, run `bun run test:docs-visual`.
+2. Update the relevant skill rule files under [`skills/dryui/rules/`](./skills/dryui/rules/) if the public usage story changed.
+3. Add tests in `tests/unit/` and or `tests/browser/`.
+4. If the change materially affects docs layout, theming, or representative demo states, run `bun run test:docs-visual`.
 
 ## Manual Scripts
 
@@ -50,7 +49,6 @@ These are on-demand tools, not part of `bun run validate`:
 
 - `bun run test:coverage` runs the unit and browser coverage commands, then writes the canonical repo summary under `coverage/summary/`.
 - `bun run coverage:summary` re-reads existing coverage artifacts and refreshes `coverage/summary/coverage-summary.json` plus `coverage-summary.md`.
-- `bun run coverage:matrix` regenerates `reports/component-coverage-matrix.json` and `.md` from the public component spec plus matching tests and docs surfaces.
 - `bun run test:docs-visual` is the slower docs regression suite for docs shell, representative component pages, and theming or layout changes. It runs locally only; run it before merging docs, theming, or layout changes.
 - `bun run bump-deps` uses the repo-pinned `npm-check-updates` binary to update all workspace dependency ranges to latest, then refreshes the Bun install. Treat the resulting diff as a deliberate dependency-upgrade PR, not a drive-by cleanup.
 

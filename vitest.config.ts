@@ -37,15 +37,9 @@ export default defineConfig({
 			},
 			{ find: /^@dryui\/ui$/, replacement: resolve(__dirname, 'packages/ui/src/index.ts') },
 			{
-				find: '@dryui/mcp/theme-checker',
-				replacement: resolve(__dirname, 'packages/mcp/src/theme-checker.ts')
-			},
-			{ find: '@dryui/mcp/spec', replacement: resolve(__dirname, 'packages/mcp/src/spec.json') },
-			{
 				find: '@dryui/feedback-server',
 				replacement: resolve(__dirname, 'packages/feedback-server/src/index.ts')
-			},
-			{ find: /^@dryui\/mcp$/, replacement: resolve(__dirname, 'packages/mcp/src/index.ts') }
+			}
 		]
 	},
 	test: {

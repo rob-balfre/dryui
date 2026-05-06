@@ -1,13 +1,12 @@
 /**
- * dev-link.ts — make the workspace's cli/mcp/feedback-server bins globally
- * available via `bun link`, so `dryui`, `dryui-mcp`, and `dryui-feedback-mcp`
- * resolve to the local repo. Combined with `DRYUI_DEV=1` in the consuming
- * shell or editor MCP config, those bins forward to the live TypeScript
- * source instead of dist/, giving "latest code on every invocation" without
- * rebuilds or npm publish.
+ * dev-link.ts — make the workspace's feedback-server bin globally available
+ * via `bun link`, so `dryui-feedback-mcp` resolves to the local repo.
+ * Combined with `DRYUI_DEV=1` in the consuming shell or editor MCP config,
+ * the bin forwards to the live TypeScript source instead of dist/, giving
+ * "latest code on every invocation" without rebuilds or npm publish.
  *
  * Usage:
- *   bun run dev:link        # link all three
+ *   bun run dev:link        # link all packages
  *   bun run dev:link --check
  *   bun run dev:unlink      # remove the global symlinks
  */
@@ -19,8 +18,6 @@ import { fileURLToPath } from 'node:url';
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const LINK_TARGETS = [
-	{ pkg: '@dryui/cli', dir: 'packages/cli', bin: 'dryui' },
-	{ pkg: '@dryui/mcp', dir: 'packages/mcp', bin: 'dryui-mcp' },
 	{ pkg: '@dryui/feedback-server', dir: 'packages/feedback-server', bin: 'dryui-feedback-mcp' },
 	{ pkg: '@dryui/feedback', dir: 'packages/feedback', bin: null },
 	{ pkg: '@dryui/lint', dir: 'packages/lint', bin: null },
@@ -56,11 +53,9 @@ function link(): void {
 		console.log(`  ${registered ? '✓' : '✗'} ${target.pkg}${arrow}`);
 	}
 	console.log('');
-	console.log(
-		'Bins (cli/mcp/feedback-mcp) are now on PATH via ~/.bun/install/global/node_modules/.bin.'
-	);
+	console.log('The feedback-mcp bin is now on PATH via ~/.bun/install/global/node_modules/.bin.');
 	console.log('Set DRYUI_DEV=1 in your shell or editor MCP config to run from src.');
-	console.log('Without DRYUI_DEV the bins still load dist/ (matches published behaviour).');
+	console.log('Without DRYUI_DEV the bin still loads dist/ (matches published behaviour).');
 	console.log('');
 	console.log('@dryui/feedback uses the package.json "development" exports condition,');
 	console.log('so Vite/SvelteKit dev servers automatically resolve it from src/.');

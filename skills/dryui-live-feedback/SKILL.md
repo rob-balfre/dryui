@@ -15,10 +15,10 @@ Check the health endpoint:
 curl -s http://localhost:4748/health
 ```
 
-If it returns `{"status":"ok"}`, the server is already running. Otherwise use the supported CLI launcher:
+If it returns `{"status":"ok"}`, the server is already running. Otherwise launch it:
 
 ```bash
-dryui feedback --no-open
+bunx dryui-feedback --no-open
 ```
 
 In the DryUI monorepo, if you need a repo-internal fallback and `dist/` does not exist, build first:

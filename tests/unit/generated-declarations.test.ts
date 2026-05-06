@@ -34,11 +34,11 @@ describe('package source declaration hygiene', () => {
 		const root = makeRoot();
 		write(root, 'packages/ui/src/button/button.svelte.d.ts');
 		write(root, 'packages/ui/src/button/index.d.ts');
-		write(root, 'packages/mcp/src/node-shims.d.ts');
+		write(root, 'packages/feedback/src/node-shims.d.ts');
 
 		const scan = await collectPackageSrcDeclarations({
 			repoRoot: root,
-			trackedPaths: ['packages/mcp/src/node-shims.d.ts'],
+			trackedPaths: ['packages/feedback/src/node-shims.d.ts'],
 			ignoredPaths: [
 				'packages/ui/src/button/button.svelte.d.ts',
 				'packages/ui/src/button/index.d.ts'
@@ -47,7 +47,7 @@ describe('package source declaration hygiene', () => {
 
 		expect(scan).toEqual({
 			generated: ['packages/ui/src/button/button.svelte.d.ts', 'packages/ui/src/button/index.d.ts'],
-			tracked: ['packages/mcp/src/node-shims.d.ts'],
+			tracked: ['packages/feedback/src/node-shims.d.ts'],
 			unexpected: []
 		});
 	});
@@ -55,17 +55,17 @@ describe('package source declaration hygiene', () => {
 	test('removes ignored generated declarations and preserves tracked declarations', async () => {
 		const root = makeRoot();
 		write(root, 'packages/ui/src/button/button.svelte.d.ts');
-		write(root, 'packages/mcp/src/node-shims.d.ts');
+		write(root, 'packages/feedback/src/node-shims.d.ts');
 
 		const scan = await cleanPackageSrcDeclarations({
 			repoRoot: root,
-			trackedPaths: ['packages/mcp/src/node-shims.d.ts'],
+			trackedPaths: ['packages/feedback/src/node-shims.d.ts'],
 			ignoredPaths: ['packages/ui/src/button/button.svelte.d.ts']
 		});
 
 		expect(scan.generated).toEqual(['packages/ui/src/button/button.svelte.d.ts']);
 		expect(existsSync(join(root, 'packages/ui/src/button/button.svelte.d.ts'))).toBe(false);
-		expect(existsSync(join(root, 'packages/mcp/src/node-shims.d.ts'))).toBe(true);
+		expect(existsSync(join(root, 'packages/feedback/src/node-shims.d.ts'))).toBe(true);
 	});
 
 	test('does not delete unexpected untracked declarations', async () => {

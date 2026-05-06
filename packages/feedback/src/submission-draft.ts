@@ -10,8 +10,6 @@ export interface AddedSnapshot {
 	id: string;
 	kind: string;
 	snap: LayoutSnapshot;
-	label?: string;
-	propsJson?: string;
 }
 
 export interface StoredMovedElement {
@@ -164,9 +162,7 @@ function sanitizeAddedSnapshot(value: unknown): AddedSnapshot | null {
 	return {
 		id: value.id,
 		kind: value.kind,
-		snap,
-		...(typeof value.label === 'string' ? { label: value.label } : {}),
-		...(typeof value.propsJson === 'string' ? { propsJson: value.propsJson } : {})
+		snap
 	};
 }
 

@@ -42,22 +42,6 @@
         "wrangler": "^4.87.0",
       },
     },
-    "packages/cli": {
-      "name": "@dryui/cli",
-      "version": "1.0.0",
-      "bin": {
-        "dryui": "./dist/index.js",
-      },
-      "dependencies": {
-        "@dryui/feedback-server": "workspace:*",
-        "@dryui/mcp": "workspace:*",
-        "playwright": "^1.59.1",
-      },
-      "devDependencies": {
-        "@types/node": "^25.6.0",
-        "typescript": "^6.0.3",
-      },
-    },
     "packages/feedback": {
       "name": "@dryui/feedback",
       "version": "1.0.0",
@@ -78,7 +62,7 @@
     },
     "packages/feedback-server": {
       "name": "@dryui/feedback-server",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "bin": {
         "dryui-feedback-mcp": "./bin/dryui-feedback-mcp.mjs",
       },
@@ -105,22 +89,6 @@
       "version": "1.0.0",
       "devDependencies": {
         "svelte": "^5.55.5",
-        "typescript": "^6.0.3",
-      },
-    },
-    "packages/mcp": {
-      "name": "@dryui/mcp",
-      "version": "3.0.0",
-      "bin": {
-        "dryui-mcp": "./bin/dryui-mcp.mjs",
-      },
-      "dependencies": {
-        "@dryui/lint": "workspace:*",
-        "@modelcontextprotocol/sdk": "^1.29.0",
-        "zod": "^4.4.3",
-      },
-      "devDependencies": {
-        "@types/node": "^25.6.0",
         "typescript": "^6.0.3",
       },
     },
@@ -236,8 +204,6 @@
 
     "@cspotcode/source-map-support": ["@cspotcode/source-map-support@0.8.1", "", { "dependencies": { "@jridgewell/trace-mapping": "0.3.9" } }, "sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw=="],
 
-    "@dryui/cli": ["@dryui/cli@workspace:packages/cli"],
-
     "@dryui/docs": ["@dryui/docs@workspace:apps/docs"],
 
     "@dryui/feedback": ["@dryui/feedback@workspace:packages/feedback"],
@@ -245,8 +211,6 @@
     "@dryui/feedback-server": ["@dryui/feedback-server@workspace:packages/feedback-server"],
 
     "@dryui/lint": ["@dryui/lint@workspace:packages/lint"],
-
-    "@dryui/mcp": ["@dryui/mcp@workspace:packages/mcp"],
 
     "@dryui/primitives": ["@dryui/primitives@workspace:packages/primitives"],
 

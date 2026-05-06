@@ -1,47 +1,33 @@
 #!/usr/bin/env bun
-// Generates packages/feedback/src/components/component-names.ts from
-// @dryui/mcp's spec.json. The widget's "Add component" picker reads the
-// resulting `COMPONENT_NAMES` / `COMPONENT_CATEGORIES` exports — the spec is
-// the canonical name + category source (see CONTEXT.md "Spec"). Re-run
-// `bun packages/mcp/src/generate-spec.ts` first if the spec is stale.
+// Generates packages/feedback/src/components/component-names.ts by walking the
+// per-component `*.meta.ts` files under packages/ui/src and
+// packages/primitives/src. The widget's "Add component" picker reads the
+// resulting `COMPONENT_NAMES` / `COMPONENT_CATEGORIES` exports.
 //
 // Run: bun scripts/extract-feedback-names.ts
 
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { readdirSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const SPEC_PATH = join(import.meta.dir, '..', 'packages', 'mcp', 'src', 'spec.json');
+const repoRoot = join(import.meta.dir, '..');
+const META_ROOTS = [
+	join(repoRoot, 'packages', 'ui', 'src'),
+	join(repoRoot, 'packages', 'primitives', 'src')
+];
 const COMPONENT_DEFAULTS_DIR = join(
-	import.meta.dir,
-	'..',
+	repoRoot,
 	'packages',
 	'feedback',
 	'src',
 	'components',
 	'component-defaults'
 );
-const OUT = join(
-	import.meta.dir,
-	'..',
-	'packages',
-	'feedback',
-	'src',
-	'components',
-	'component-names.ts'
-);
+const OUT = join(repoRoot, 'packages', 'feedback', 'src', 'components', 'component-names.ts');
 
-interface ComponentDef {
-	category: string;
-	import: string;
-}
-
-interface Spec {
-	components?: Record<string, ComponentDef>;
-}
-
-// Categories the widget's picker recognizes. Spec uses these as bare strings;
-// listing them here lets the generated file ship a typed union matching the
-// spec slice we keep (everything imported from `@dryui/ui`).
+// Categories the widget's picker recognizes. Listed here so the generated file
+// ships a typed union, and so a meta file with an unknown category fails the
+// generator instead of leaking through to the picker.
 const CATEGORIES = [
 	'action',
 	'display',
@@ -93,16 +79,16 @@ const CATEGORY_LABELS: Record<ComponentCategory, string> = {
 	utility: 'Utility'
 };
 
-// Widget-only catalog overlay: components the picker exposes that the spec
-// does not. `Motion` is a widget umbrella over `Enter` / `Exit` / `Stagger`
-// that the picker treats as one entry; it has its own component-default in
-// `components/component-defaults/motion.svelte`.
-const WIDGET_OVERLAY: Record<string, ComponentCategory> = {
-	Motion: 'display'
-};
+interface MetaModule {
+	default?: {
+		name?: unknown;
+		category?: unknown;
+		surface?: unknown;
+	};
+}
 
-function isCategory(value: string): value is ComponentCategory {
-	return (CATEGORIES as readonly string[]).includes(value);
+function isCategory(value: unknown): value is ComponentCategory {
+	return typeof value === 'string' && (CATEGORIES as readonly string[]).includes(value);
 }
 
 function pascalFromKebab(kebab: string): string {
@@ -112,60 +98,80 @@ function pascalFromKebab(kebab: string): string {
 		.join('');
 }
 
+function findMetaFiles(root: string): string[] {
+	const out: string[] = [];
+	let entries: string[];
+	try {
+		entries = readdirSync(root);
+	} catch {
+		return out;
+	}
+	for (const entry of entries) {
+		const full = join(root, entry);
+		let stat;
+		try {
+			stat = statSync(full);
+		} catch {
+			continue;
+		}
+		if (stat.isDirectory()) {
+			if (entry === 'node_modules' || entry === '__tests__') continue;
+			out.push(...findMetaFiles(full));
+		} else if (stat.isFile() && entry.endsWith('.meta.ts')) {
+			out.push(full);
+		}
+	}
+	return out;
+}
+
 // Pre-built component-default templates the widget can drop on the page.
-// Used as the gating signal for `@dryui/primitives` entries: spec exposes
-// many primitives that have no widget template (and `@dryui/ui` doesn't
-// re-export them), so listing them in the picker would silently fail at
-// render time. UI exports ride the `import('@dryui/ui')` fallback in
-// `feedback.svelte`, so they don't need a default to be pickable.
+// Used as the gating signal for primitive components: many primitives don't
+// have a widget template and `@dryui/ui` doesn't re-export them, so listing
+// them in the picker would silently fail at render time. UI exports ride the
+// `import('@dryui/ui')[name]` fallback in `feedback.svelte`, so they don't
+// need a default to be pickable.
 const COMPONENT_DEFAULT_NAMES = new Set(
 	readdirSync(COMPONENT_DEFAULTS_DIR)
 		.filter((file) => file.endsWith('.svelte'))
 		.map((file) => pascalFromKebab(file.slice(0, -'.svelte'.length)))
 );
 
-const spec: Spec = JSON.parse(readFileSync(SPEC_PATH, 'utf8'));
 const componentCategories: Record<string, ComponentCategory> = {};
 
-for (const [name, component] of Object.entries(spec.components ?? {})) {
-	// `@dryui/ui` exports are always pickable: the widget falls back to
-	// `import('@dryui/ui')[name]` when no template is registered.
-	// `@dryui/primitives` exports are only pickable when a hand-authored
-	// template exists in `components/component-defaults/`, since UI does not
-	// re-export them.
-	if (component.import === '@dryui/ui') {
-		// always include
-	} else if (component.import === '@dryui/primitives') {
-		if (!COMPONENT_DEFAULT_NAMES.has(name)) continue;
-	} else {
-		continue;
+for (const root of META_ROOTS) {
+	const files = findMetaFiles(root);
+	for (const file of files) {
+		const mod = (await import(pathToFileURL(file).href)) as MetaModule;
+		const meta = mod.default;
+		if (!meta || typeof meta.name !== 'string') {
+			throw new Error(`extract-feedback-names: ${file} has no usable default export`);
+		}
+		const name = meta.name;
+		const isPrimitive = meta.surface === 'primitive';
+		// UI exports always pickable, primitives only when a hand-rolled default
+		// template exists.
+		if (isPrimitive && !COMPONENT_DEFAULT_NAMES.has(name)) continue;
+		if (!isCategory(meta.category)) {
+			throw new Error(
+				`Component "${name}" in ${file} has unknown category "${String(meta.category)}". ` +
+					`Add it to CATEGORIES in scripts/extract-feedback-names.ts or fix the meta file.`
+			);
+		}
+		if (componentCategories[name]) {
+			throw new Error(
+				`Duplicate component "${name}" found in ${file}. Component names must be unique across packages.`
+			);
+		}
+		componentCategories[name] = meta.category;
 	}
-	if (!isCategory(component.category)) {
-		throw new Error(
-			`Component "${name}" has unknown category "${component.category}". ` +
-				`Add it to CATEGORIES in scripts/extract-feedback-names.ts or fix the spec.`
-		);
-	}
-	componentCategories[name] = component.category;
-}
-
-for (const [name, category] of Object.entries(WIDGET_OVERLAY)) {
-	if (componentCategories[name]) {
-		throw new Error(
-			`Overlay collides with spec entry "${name}". Drop it from WIDGET_OVERLAY ` +
-				`in scripts/extract-feedback-names.ts.`
-		);
-	}
-	componentCategories[name] = category;
 }
 
 const sortedNames = Object.keys(componentCategories).sort();
 
 const lines: string[] = [];
 lines.push('// AUTO-GENERATED by scripts/extract-feedback-names.ts');
-lines.push('// Source: packages/mcp/src/spec.json (Spec, see CONTEXT.md). Re-run the script');
-lines.push('// when component metadata changes. Spec entries imported from @dryui/ui plus');
-lines.push('// the widget-only overlay (e.g. Motion umbrella) feed the picker.');
+lines.push('// Source: packages/ui/src and packages/primitives/src `*.meta.ts` files.');
+lines.push('// Re-run the script when component metadata changes.');
 lines.push('');
 lines.push('export type ComponentCategory =');
 for (let index = 0; index < CATEGORIES.length; index++) {

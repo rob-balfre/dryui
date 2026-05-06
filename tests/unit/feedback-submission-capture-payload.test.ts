@@ -148,8 +148,7 @@ describe('captureSubmission', () => {
 				{
 					id: 'add-1',
 					kind: 'Button',
-					element: fakeLayoutElement({ rect: { left: 5, top: 5, width: 50, height: 20 } }),
-					label: 'Save'
+					element: fakeLayoutElement({ rect: { left: 5, top: 5, width: 50, height: 20 } })
 				}
 			],
 			removed: [
@@ -271,7 +270,7 @@ describe('captureSubmission', () => {
 			{
 				id: 'add-1',
 				kind: 'Button',
-				label: 'Save',
+				label: 'Button',
 				rect: { x: 5, y: 5, width: 50, height: 20 }
 			}
 		]);

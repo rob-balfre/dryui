@@ -5,16 +5,11 @@ const bunTestArgs = process.argv.slice(2);
 
 const suiteGlobs = [
 	'tests/unit/**/*.test.ts',
-	'packages/cli/src/__tests__/*.test.ts',
 	'packages/feedback-server/tests/**/*.test.ts',
-	'packages/lint/src/*.test.ts',
-	'packages/mcp/src/**/*.test.ts'
+	'packages/lint/src/*.test.ts'
 ];
 
-await Promise.all([
-	$`bun run --filter '@dryui/mcp' generate-spec`.cwd(root.pathname),
-	$`bunx svelte-kit sync`.cwd(new URL('apps/docs', root).pathname)
-]);
+await $`bunx svelte-kit sync`.cwd(new URL('apps/docs', root).pathname);
 
 const files = new Set<string>();
 const globs = suiteGlobs.map((pattern) => new Bun.Glob(pattern));

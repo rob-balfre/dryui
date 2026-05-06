@@ -39,10 +39,8 @@ test('unit test contract points at the local unit suite', () => {
 
 test('unit suite includes the stable package-local tests that feed coverage', () => {
 	expect(testUnitScript).toContain('tests/unit/**/*.test.ts');
-	expect(testUnitScript).toContain('packages/cli/src/__tests__/*.test.ts');
 	expect(testUnitScript).toContain('packages/feedback-server/tests/**/*.test.ts');
 	expect(testUnitScript).toContain('packages/lint/src/*.test.ts');
-	expect(testUnitScript).toContain('packages/mcp/src/**/*.test.ts');
 });
 
 test('browser test contract is configured for Vitest browser mode', () => {
@@ -68,9 +66,6 @@ test('coverage scripts are available for unit and browser suites', () => {
 	expect(packageJson.scripts['coverage:check']).toBe(
 		'bun run ./scripts/check-coverage-baseline.ts'
 	);
-	expect(packageJson.scripts['coverage:matrix']).toBe(
-		'bun run ./scripts/generate-component-coverage-matrix.ts'
-	);
 	expect(packageJson.scripts['check:interactive-coverage']).toBe(
 		'bun run ./scripts/check-interactive-coverage.ts'
 	);
@@ -85,13 +80,8 @@ test('release scripts require validation before publish', () => {
 	);
 	expect(packageJson.scripts.check).toContain('check:packages');
 	expect(packageJson.scripts.check).toContain('check:docs');
-	expect(packageJson.scripts.check).toContain('check:mcp');
 	expect(packageJson.scripts.check).toContain('check:package-src-declarations');
-	expect(packageJson.scripts.check).toContain('check:architecture');
 	expect(packageJson.scripts.check).toContain('check:lint:violations');
-	expect(packageJson.scripts['check:architecture']).toBe(
-		"bun run scripts/check-generated-files.ts \"bun run --filter '@dryui/mcp' generate-spec && bun run --filter '@dryui/mcp' generate-architecture\" packages/mcp/src/spec.json packages/mcp/src/architecture.json"
-	);
 	expect(packageJson.scripts.build).toBe('bun run build:docs');
 	const buildPackages = packageJson.scripts['build:packages'];
 	expect(buildPackages).toContain('bun run clean:package-src-declarations');
@@ -100,9 +90,7 @@ test('release scripts require validation before publish', () => {
 		'@dryui/primitives',
 		'@dryui/ui',
 		'@dryui/feedback',
-		'@dryui/mcp',
-		'@dryui/feedback-server',
-		'@dryui/cli'
+		'@dryui/feedback-server'
 	];
 	for (const pkg of requiredPackages) {
 		expect(buildPackages).toContain(`--filter '${pkg}' build`);
@@ -112,7 +100,6 @@ test('release scripts require validation before publish', () => {
 		'bun run validate --no-test --skip-publish-hygiene'
 	);
 	expect(validateScript).toContain("run('check:lint:violations', 'bun run check:lint:violations')");
-	expect(validateScript).toContain("await run('check:architecture', 'bun run check:architecture')");
 	expect(validateScript).toContain(
 		"await run('clean:package-src-declarations', 'bun run clean:package-src-declarations')"
 	);
@@ -123,13 +110,10 @@ test('CI workflow runs a dedicated coverage lane and uploads retained artifacts'
 	expect(validateWorkflow).toContain('- run: bun --bun playwright install chromium');
 	expect(validateWorkflow).toContain('- run: bun run test:coverage');
 	expect(validateWorkflow).toContain('- run: bun run coverage:check');
-	expect(validateWorkflow).toContain('- run: bun run coverage:matrix');
 	expect(validateWorkflow).toContain('name: coverage-${{ github.sha }}');
 	expect(validateWorkflow).toContain('coverage/summary');
 	expect(validateWorkflow).toContain('coverage/unit');
 	expect(validateWorkflow).toContain('coverage/browser');
-	expect(validateWorkflow).toContain('reports/component-coverage-matrix.json');
-	expect(validateWorkflow).toContain('reports/component-coverage-matrix.md');
 	expect(validateWorkflow).toContain('DRYUI_BASE_REF: origin/${{ github.base_ref }}');
 	expect(validateWorkflow).toContain('DRYUI_PR_BODY: ${{ github.event.pull_request.body }}');
 	expect(validateWorkflow).toContain('retention-days: 14');

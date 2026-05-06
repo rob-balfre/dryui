@@ -71,7 +71,7 @@
 			<Table.Cell>18s</Table.Cell>
 		</Table.Row>
 		<Table.Row>
-			<Table.Cell>@dryui/mcp</Table.Cell>
+			<Table.Cell>@dryui/feedback-server</Table.Cell>
 			<Table.Cell>passed</Table.Cell>
 			<Table.Cell>11s</Table.Cell>
 		</Table.Row>

@@ -1,6 +1,6 @@
 {
   "name": "@dryui/feedback-server",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Rob Balfre",
   "license": "MIT",
   "repository": {
@@ -16,7 +16,8 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "dryui-feedback-mcp": "./bin/dryui-feedback-mcp.mjs"
+    "dryui-feedback-mcp": "./bin/dryui-feedback-mcp.mjs",
+    "dryui-feedback": "./bin/dryui-feedback.mjs"
   },
   "exports": {
     ".": {
@@ -62,7 +63,7 @@
     }
   },
   "scripts": {
-    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts src/config-probe.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && tsc -p tsconfig.build.json && vite build --config ui/vite.config.ts",
+    "build": "mkdir -p dist && bun build src/index.ts src/mcp.ts src/config-probe.ts src/cli/index.ts --outdir dist --root src --target node && bun build src/server.ts --outdir dist --root src --target bun && printf '#!/usr/bin/env node\n' | cat - dist/mcp.js > dist/mcp.tmp && mv dist/mcp.tmp dist/mcp.js && chmod +x dist/mcp.js && tsc -p tsconfig.build.json && vite build --config ui/vite.config.ts",
     "check": "svelte-check --tsconfig ./ui/tsconfig.json && tsc -p tsconfig.json --noEmit",
     "test": "bun test tests",
     "check:publint": "publint",

@@ -85,10 +85,8 @@ await parallel(
 	),
 	run('check:lint:violations', 'bun run check:lint:violations'),
 	run('check:exports', 'bun run scripts/sync-package-exports.ts --check'),
-	run('check:cli-imports', `! grep -rnE "from ['\\"]\\.\\./\\.\\./\\.\\./mcp" packages/cli/src`),
 	run('check:changeset', 'bun run scripts/check-changeset-required.ts'),
 	run('check:interactive-coverage', 'bun run scripts/check-interactive-coverage.ts'),
-	run('validate:spec', 'bun run scripts/validate-spec-coverage.ts'),
 	run('build:lint', 'bun run build', pkg('lint')),
 	run('build:primitives', 'bun run build', pkg('primitives'))
 );
@@ -100,14 +98,12 @@ await run('clean:package-src-declarations', 'bun run clean:package-src-declarati
 await run('build:ui', 'bun run build', pkg('ui'));
 
 // ── Phase 3: Builds + checks that only need ui (parallel) ──────────────────
-// MCP and feedback depend on ui but not each other.
-// svelte-check on primitives + ui can also run here.
+// feedback depends on ui. svelte-check on primitives + ui can also run here.
 
-console.log('\n── Phase 3: build mcp/feedback/feedback-server + check packages ──');
+console.log('\n── Phase 3: build feedback/feedback-server + check packages ──');
 await run('clean:package-src-declarations', 'bun run clean:package-src-declarations');
 
 const phase3Tasks: Promise<TaskResult>[] = [
-	run('build:mcp', 'bun run build', pkg('mcp')),
 	run('build:feedback', 'bun run build', pkg('feedback')),
 	run('build:feedback-server', 'bun run build', pkg('feedback-server')),
 	run('check:primitives', 'bun run check', pkg('primitives')),
@@ -121,58 +117,38 @@ if (!skipTests) {
 await parallel(...phase3Tasks);
 await run('clean:package-src-declarations', 'bun run clean:package-src-declarations');
 
-// ── Phase 4: Docs build + type checks (parallel) ───────────────────────────
+// ── Phase 4: Docs build + type checks ──────────────────────────────────────
 // docs:check needs .svelte-kit/ types from the docs build, so it runs after.
-// All other checks here only need the package builds from earlier phases.
 
 console.log('\n── Phase 4: docs build + type checks ──');
-await parallel(
-	// docs:build then docs:check sequentially (check needs .svelte-kit/ types)
-	run('build:docs', 'bun run docs:build').then(() => run('check:docs', 'bun run docs:check')),
-	run('build:cli', 'bun run build', pkg('cli')),
-	run('check:mcp', 'bun run check:mcp'),
-	run('check:cli', 'bun run check:cli:types')
-);
+await run('build:docs', 'bun run docs:build');
+await run('check:docs', 'bun run docs:check');
 
-// ── Phase 5: Generated artifact drift checks ───────────────────────────────
-// Keep these serial because they share generated MCP source files such as
-// spec.json. Serial checks make stale architecture/contract/llms drift fail at
-// the specific generated-file gate instead of later in the final worktree guard.
-
-console.log('\n── Phase 5: generated artifact drift checks ──');
-await run('check:architecture', 'bun run check:architecture');
-await run('check:contract', 'bun run check:contract');
-await run('check:agent-contract', 'bun run check:agent-contract');
-await run('check:docs:llms', 'bun run check:docs:llms');
-
-// ── Phase 6: Publish-hygiene gate (publint + attw post-swap) ────────────────
+// ── Phase 5: Publish-hygiene gate (publint + attw post-swap) ────────────────
 // All package builds are done, so we can temporarily apply the prepack swap,
 // run publint + attw against the shape npm will see, and restore. This is the
 // accurate pre-publish gate — the same check publish-packages.ts runs again
 // just before `changeset publish`, but catching it here means contributors
 // never hit it during a release.
 
-console.log('\n── Phase 6: publish-hygiene ──');
+console.log('\n── Phase 5: publish-hygiene ──');
 if (skipPublishHygiene) {
 	console.log('publish-hygiene skipped');
 } else {
 	await run('check:publish-hygiene', 'bun run scripts/check-publish-hygiene.ts --swap');
 }
 
-// ── Phase 7: Benchmark smoke lane ───────────────────────────────────────────
+// ── Phase 6: Benchmark smoke lane ───────────────────────────────────────────
 // No LLM calls — only validates task manifests and runs the deterministic
 // CLI/tool checks. The full live lane runs nightly with DRYUI_BENCHMARK_LIVE=1.
 
-console.log('\n── Phase 7: benchmark smoke ──');
+console.log('\n── Phase 6: benchmark smoke ──');
 await run('bench:smoke', 'bun run scripts/benchmark/run.ts --smoke');
 
-// ── Phase 8: Skill frontmatter validation ───────────────────────────────────
-// validate:skills lints every SKILL.md (frontmatter + name=dirname). The
-// legacy sync:skills step that mirrored skills into packages/plugin/skills/
-// and generated .cursor/rules/ was removed in Phase 6 of the npx skills
-// migration; nothing else needs regenerating from skill content.
+// ── Phase 7: Skill frontmatter validation ───────────────────────────────────
+// validate:skills lints every SKILL.md (frontmatter + name=dirname).
 
-console.log('\n── Phase 8: validate:skills ──');
+console.log('\n── Phase 7: validate:skills ──');
 await run('validate:skills', 'bun run validate:skills');
 
 // ── Drift guard ─────────────────────────────────────────────────────────────

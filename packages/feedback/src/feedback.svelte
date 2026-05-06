@@ -24,7 +24,6 @@
 	} from './types.js';
 	import {
 		applyElementLayoutSnapshot,
-		parsePropsJson,
 		sameLayoutSnapshot,
 		snapshotElementLayout,
 		type LayoutSnapshot
@@ -147,8 +146,6 @@
 		el: HTMLElement;
 		kind: string;
 		initialSnap: LayoutSnapshot;
-		label?: string;
-		propsJson?: string;
 		mounted?: ReturnType<typeof mountComponent> | null;
 	};
 
@@ -446,7 +443,7 @@
 		if (target) target.style.cssText = ADDED_CONTENT_FALLBACK_STYLE;
 		const fallback = record.el.querySelector<HTMLElement>('[data-dryui-added-fallback]');
 		if (fallback) {
-			fallback.textContent = record.label?.trim() || record.kind;
+			fallback.textContent = record.kind;
 			fallback.style.display = '';
 		}
 		delete record.el.dataset.dryuiAddedRendered;
@@ -481,12 +478,10 @@
 			if (!record.el.isConnected) return;
 			const target = record.el.querySelector<HTMLElement>('[data-dryui-added-content]');
 			if (!target) return;
-			const labelText = record.label?.trim() || record.kind;
 			const labelSnippet = createRawSnippet(() => ({
-				render: () => `<span>${escapeHtml(labelText)}</span>`
+				render: () => `<span>${escapeHtml(record.kind)}</span>`
 			}));
-			const extraProps = parsePropsJson(record.propsJson);
-			const props = usingDefault ? extraProps : { children: labelSnippet, ...extraProps };
+			const props = usingDefault ? {} : { children: labelSnippet };
 			const instance = mountComponent(Component as Parameters<typeof mountComponent>[0], {
 				target,
 				props
@@ -546,22 +541,13 @@
 		}
 	});
 
-	function createAddedClone(
-		id: string,
-		kind: string,
-		snap: LayoutSnapshot,
-		options?: { label?: string; propsJson?: string }
-	): HTMLElement {
+	function createAddedClone(id: string, kind: string, snap: LayoutSnapshot): HTMLElement {
 		const existing = addedComponents.get(id);
 		if (existing) {
 			applyElementLayoutSnapshot(existing.el, snap);
-			const propsChanged =
-				existing.label !== options?.label || existing.propsJson !== options?.propsJson;
-			if (existing.kind !== kind || propsChanged) {
+			if (existing.kind !== kind) {
 				unmountAdded(existing);
 				existing.kind = kind;
-				existing.label = options?.label;
-				existing.propsJson = options?.propsJson;
 				resetAddedFallback(existing);
 				void tryRenderInto(existing);
 			}
@@ -573,8 +559,6 @@
 			el,
 			kind,
 			initialSnap: snap,
-			label: options?.label,
-			propsJson: options?.propsJson,
 			mounted: null
 		};
 		addedComponents.set(id, record);
@@ -603,9 +587,7 @@
 			result.push({
 				id,
 				kind: record.kind,
-				snap: snapshotElementLayout(record.el),
-				label: record.label,
-				propsJson: record.propsJson
+				snap: snapshotElementLayout(record.el)
 			});
 		}
 		return result;
@@ -750,10 +732,7 @@
 
 			let layoutChanged = false;
 			for (const entry of state.added ?? []) {
-				createAddedClone(entry.id, entry.kind, entry.snap, {
-					label: entry.label,
-					propsJson: entry.propsJson
-				});
+				createAddedClone(entry.id, entry.kind, entry.snap);
 				layoutChanged = true;
 			}
 			for (const entry of state.moved ?? []) {
@@ -806,10 +785,7 @@
 			}
 		}
 		for (const entry of frame.added) {
-			createAddedClone(entry.id, entry.kind, entry.snap, {
-				label: entry.label,
-				propsJson: entry.propsJson
-			});
+			createAddedClone(entry.id, entry.kind, entry.snap);
 			layoutChanged = true;
 		}
 		const wantedRemoved = new Set(frame.removed);
@@ -1029,23 +1005,6 @@
 		return el.children.length > 0;
 	});
 
-	function applyAddedProps(label: string, propsJson: string) {
-		const el = selectedComponentEl;
-		if (!el) return;
-		const id = el.dataset[LAYOUT_DATASET.addedId];
-		if (!id) return;
-		const record = addedComponents.get(id);
-		if (!record) return;
-		const nextLabel = label.trim() || undefined;
-		const nextProps = propsJson.trim() || undefined;
-		if (record.label === nextLabel && record.propsJson === nextProps) return;
-		record.label = nextLabel;
-		record.propsJson = nextProps;
-		unmountAdded(record);
-		resetAddedFallback(record);
-		void tryRenderInto(record);
-		commitHistory();
-	}
 	let drawings: Drawing[] = $state([]);
 	let currentStroke: Stroke | null = $state(null);
 	let currentArrow: Arrow | null = $state(null);
@@ -1700,9 +1659,7 @@
 			added: Array.from(addedComponents, ([id, record]) => ({
 				id,
 				kind: record.kind,
-				element: record.el,
-				label: record.label,
-				propsJson: record.propsJson
+				element: record.el
 			})),
 			removed: Array.from(removedElements.values(), (record) => ({
 				descriptor: record.descriptor ?? null,
@@ -2304,8 +2261,6 @@
 				hasSelection={selectedComponentEl !== null}
 				placing={placingComponent}
 				addedKind={selectedAddedRecord?.kind ?? null}
-				addedLabel={selectedAddedRecord?.label ?? ''}
-				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
 				{canUndo}
 				{canRedo}
 				{canReset}
@@ -2320,7 +2275,6 @@
 				ondeselect={() => selectComponent(null)}
 				onaddcomponent={startPlacingComponent}
 				oncancelplacement={cancelPlacingComponent}
-				onapplyprops={applyAddedProps}
 				onremoveselected={removeSelectedElement}
 				{canBreakApart}
 				onbreakapart={breakApartSelected}
