@@ -9,6 +9,7 @@
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import prettier from 'prettier';
 
 const SPEC_PATH = join(import.meta.dir, '..', 'packages', 'mcp', 'src', 'spec.json');
 const OUT = join(
@@ -134,5 +135,9 @@ for (const name of sortedNames) {
 lines.push('};');
 lines.push('');
 
-writeFileSync(OUT, lines.join('\n'));
+const raw = lines.join('\n');
+const repoRoot = join(import.meta.dir, '..');
+const config = (await prettier.resolveConfig(repoRoot)) ?? {};
+const formatted = await prettier.format(raw, { ...config, filepath: OUT });
+writeFileSync(OUT, formatted);
 console.log(`Wrote schemas for ${sortedNames.length} components to ${OUT}`);
