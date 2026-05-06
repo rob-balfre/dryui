@@ -25,6 +25,11 @@
       "bun": "./src/rule-catalog.ts",
       "default": "./dist/rule-catalog.js"
     },
+    "./diagnostic-summary": {
+      "types": "./dist/diagnostic-summary.d.ts",
+      "bun": "./src/diagnostic-summary.ts",
+      "default": "./dist/diagnostic-summary.js"
+    },
     "./layout-css": {
       "types": "./dist/layout-css.d.ts",
       "bun": "./src/layout-css.ts",
@@ -34,6 +39,11 @@
       "types": "./dist/rules.d.ts",
       "bun": "./src/rules.ts",
       "default": "./dist/rules.js"
+    },
+    "./svelte-source-facts": {
+      "types": "./dist/svelte-source-facts.d.ts",
+      "bun": "./src/svelte-source-facts.ts",
+      "default": "./dist/svelte-source-facts.js"
     }
   },
   "files": [

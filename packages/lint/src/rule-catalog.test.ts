@@ -10,7 +10,7 @@ describe('rule catalog', () => {
 		for (const [id, entry] of Object.entries(RULE_CATALOG)) {
 			expect(entry.id).toBe(id);
 			expect(entry.message.length).toBeGreaterThan(0);
-			expect(['error', 'warning', 'suggestion', 'info']).toContain(entry.severity);
+			expect(['error', 'warning', 'suggestion']).toContain(entry.severity);
 		}
 	});
 

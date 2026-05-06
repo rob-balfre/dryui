@@ -7,11 +7,15 @@ import {
 	type Violation
 } from './lint-policy.js';
 import { buildLineIndex, lookupLine, stripCssComments } from './css-scan.js';
+import {
+	collectDryUiImports,
+	collectSvelteScriptBlocks,
+	collectSvelteStyleBlocks,
+	stripSvelteScriptAndStyleBlocks
+} from './svelte-source-facts.js';
 
 export type { Violation } from './lint-policy.js';
 
-const SCRIPT_BLOCK_RE = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
-const STYLE_BLOCK_RE = /<style\b[^>]*>([\s\S]*?)<\/style>/gi;
 const HTML_COMMENT_RE = /<!--[\s\S]*?-->/g;
 
 interface NativeElementRule {
@@ -23,19 +27,11 @@ interface NativeElementRule {
 
 const BANNED_COMPONENTS = ['Grid', 'Stack', 'Flex'] as const;
 
-const BANNED_COMPONENT_IMPORT_RE = new RegExp(
-	`\\b(${BANNED_COMPONENTS.join('|')})\\b.*from\\s+['"]@dryui/ui`,
-	'g'
-);
-
 const BANNED_COMPONENT_USAGE_RE = new RegExp(
 	`<(${BANNED_COMPONENTS.join('|')})(\\.|\\s|>|\\/)`,
 	'g'
 );
-
-const BANNED_COMPONENT_WORD_RES: ReadonlyArray<readonly [string, RegExp]> = BANNED_COMPONENTS.map(
-	(comp) => [comp, new RegExp(`\\b${comp}\\b`)] as const
-);
+const BANNED_COMPONENT_SET: ReadonlySet<string> = new Set(BANNED_COMPONENTS);
 
 const INLINE_STYLE_RE = /\bstyle\s*=/g;
 
@@ -174,12 +170,6 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 		re: /<textarea(\s|>|\/)/g
 	}
 ];
-
-function blockStartLine(content: string, lineStarts: number[], blockIndex: number): number {
-	const tagEnd = content.indexOf('>', blockIndex);
-	const contentStart = tagEnd === -1 ? blockIndex : tagEnd + 1;
-	return lookupLine(lineStarts, contentStart);
-}
 
 function offsetViolations(violations: Violation[], lineOffset: number): Violation[] {
 	return violations.map((violation) => ({
@@ -526,19 +516,16 @@ export function checkScript(content: string): Violation[] {
 	const policy = createLintPolicy({ target: 'script' });
 
 	if (policy.isRuleEnabled('dryui/no-layout-component')) {
-		for (const match of content.matchAll(BANNED_COMPONENT_IMPORT_RE)) {
-			const line = lookupLine(lineStarts, match.index);
-			const lineText = lines[line - 1] ?? '';
+		for (const dryImport of collectDryUiImports(content)) {
+			if (dryImport.source !== '@dryui/ui') continue;
+			if (!BANNED_COMPONENT_SET.has(dryImport.name)) continue;
+			const lineText = lines[dryImport.line - 1] ?? '';
 			if (!lineText.includes('@dryui/ui')) continue;
-			for (const [comp, re] of BANNED_COMPONENT_WORD_RES) {
-				if (re.test(lineText)) {
-					addPolicyViolation(policy, violations, 'dryui/no-layout-component', line, {
-						action: 'import',
-						target: comp,
-						guidance: 'data-layout hooks with src/layout.css instead'
-					});
-				}
-			}
+			addPolicyViolation(policy, violations, 'dryui/no-layout-component', dryImport.line, {
+				action: 'import',
+				target: dryImport.name,
+				guidance: 'data-layout hooks with src/layout.css instead'
+			});
 		}
 	}
 
@@ -677,7 +664,6 @@ export function fixThemeImportOrder(content: string): string {
 	return out.slice(0, insertAt) + insertion + out.slice(insertAt);
 }
 
-const SCRIPT_OR_STYLE_BLOCK_RE = /<(?:script|style)[\s>][\s\S]*?<\/(?:script|style)>/gi;
 const SVELTE_HEAD_BLOCK_RE = /<svelte:head\b[^>]*>[\s\S]*?<\/svelte:head>/gi;
 
 function blankPreservingLayout(content: string): string {
@@ -689,13 +675,7 @@ function blankPreservingLayout(content: string): string {
 }
 
 export function stripBlocks(content: string): string {
-	return content.replace(SCRIPT_OR_STYLE_BLOCK_RE, (m) => {
-		let count = 0;
-		for (let i = 0; i < m.length; i++) {
-			if (m.charCodeAt(i) === 10 /* \n */) count++;
-		}
-		return '\n'.repeat(count);
-	});
+	return stripSvelteScriptAndStyleBlocks(content);
 }
 
 function stripSvelteHeadBlocks(content: string): string {
@@ -1112,21 +1092,16 @@ export function checkSvelteFile(
 	filename?: string,
 	_options: SvelteFileCheckOptions = {}
 ): Violation[] {
-	const lineStarts = buildLineIndex(content);
 	const violations: Violation[] = [...checkMarkup(content, filename)];
 	const chipGroupExemptClasses = collectChipGroupClasses(content);
 
-	for (const match of content.matchAll(SCRIPT_BLOCK_RE)) {
-		const script = match[1] ?? '';
-		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
-		violations.push(...offsetViolations(checkScript(script), startLine));
+	for (const block of collectSvelteScriptBlocks(content)) {
+		violations.push(...offsetViolations(checkScript(block.content), block.line));
 	}
 
-	for (const match of content.matchAll(STYLE_BLOCK_RE)) {
-		const style = match[1] ?? '';
-		const startLine = blockStartLine(content, lineStarts, match.index ?? 0);
+	for (const block of collectSvelteStyleBlocks(content)) {
 		violations.push(
-			...offsetViolations(checkStyle(style, { chipGroupExemptClasses }, filename), startLine)
+			...offsetViolations(checkStyle(block.content, { chipGroupExemptClasses }, filename), block.line)
 		);
 	}
 

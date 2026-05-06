@@ -1,4 +1,6 @@
-export type RuleSeverity = 'error' | 'warning' | 'suggestion' | 'info';
+import type { Severity } from './diagnostic-summary.js';
+
+export type RuleSeverity = Severity;
 
 export type RuleCategory = 'correctness' | 'a11y';
 
@@ -292,7 +294,7 @@ export const RULE_CATALOG = {
 	},
 	'partial-override': {
 		id: 'partial-override',
-		severity: 'info',
+		severity: 'suggestion',
 		message:
 			'{count} --dry-* token override(s) detected in a non-theme file. This is fine for scoped tweaks, but globally overriding a few tokens at :root/html/body often masks contrast problems. To customize tokens, use the theme recipe. For a full custom theme, rename to *.theme.css or add /* @dryui-theme */ at the top. For 1-10 site-wide tweaks, scope them under .page / body selectors. For 1-5 per-route tweaks, put them in a scoped component style.',
 		suggestedFix:
@@ -363,7 +365,7 @@ export const RULE_CATALOG = {
 	},
 	'unresolvable-var': {
 		id: 'unresolvable-var',
-		severity: 'info',
+		severity: 'suggestion',
 		message:
 			'{variable} references {reference} which is not defined in this CSS — type and contrast checks skipped'
 	}

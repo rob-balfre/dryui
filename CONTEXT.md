@@ -61,6 +61,12 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 **Layout contract** — the hard-validation rules for Layout files and hooks: `src/layout.css` owns page/section grid and flex declarations, selectors are scoped through Layout hooks, responsive structure uses named `@container page (...)` queries, and violations fail deterministic checks. `data-layout-area` selectors must be scoped under their owning `[data-layout="<name>"]` selector; bare area selectors are global leakage. This is stricter than advisory prose because LLM-generated layouts otherwise drift into unsupported UI structure.
 
+## Lint domain
+
+**Severity** — three-level vocabulary `error | warning | suggestion`, defined by **Diagnostic summary** and re-exported by **Rule catalog** as `RuleSeverity`. There is no `info` level; ambient findings are `suggestion`. The narrowing is intentional: every checker output and every prompt the agent sees uses the same three words.
+
+**Diagnostic summary** — the canonical sort-and-count produced from any checker's output. A small module in `@dryui/lint` ([`packages/lint/src/diagnostic-summary.ts`](./packages/lint/src/diagnostic-summary.ts), subpath `@dryui/lint/diagnostic-summary`) owns the **Severity** vocabulary, the ordering rule (severity desc primary, line asc tiebreaker), and the human-readable count string. Component-checker and theme-checker adapt their domain-specific issue shapes through it; future checkers extend the canonical `Diagnostic` interface and reuse the seam instead of hand-rolling another sort and counter.
+
 ## Architecture vocabulary
 
 For architectural review, the terms in [`.claude/skills/improve-codebase-architecture/LANGUAGE.md`](.claude/skills/improve-codebase-architecture/LANGUAGE.md) are canonical: **module**, **interface**, **implementation**, **depth**, **seam**, **adapter**, **leverage**, **locality**. Don't substitute "service," "boundary," or "API."

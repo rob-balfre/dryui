@@ -2,6 +2,7 @@ import { describe, expect, spyOn, test } from 'bun:test';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
+import { evaluateLayoutContract } from './layout-contract.js';
 import { checkLayoutCss, dryuiLayoutCss } from './layout-css.js';
 
 describe('checkLayoutCss', () => {
@@ -21,8 +22,8 @@ describe('checkLayoutCss', () => {
   justify-content: space-between;
 }
 
-@container (min-width: 40rem) {
-  [data-layout-area='aside'] {
+@container page (min-width: 40rem) {
+  [data-layout='stack'] > [data-layout-area='aside'] {
     grid-area: aside;
     display: flex;
     flex-direction: column;
@@ -72,6 +73,32 @@ describe('checkLayoutCss', () => {
 		expect(violations[0]!.rule).toBe('dryui/layout-css-selector');
 	});
 
+	test('rejects bare area selectors as global leakage', () => {
+		const violations = checkLayoutCss(
+			"[data-layout-area='aside'] { grid-area: aside; gap: var(--dry-space-3); }"
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/layout-css-selector');
+	});
+
+	test('rejects bare area selectors inside @container page', () => {
+		const violations = checkLayoutCss(`
+@container page (min-width: 48rem) {
+  [data-layout-area='aside'] {
+    grid-area: aside;
+  }
+}`);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/layout-css-selector');
+	});
+
+	test('accepts area selectors scoped under a layout hook', () => {
+		const violations = checkLayoutCss(
+			"[data-layout='stack'] > [data-layout-area='main'] { grid-area: main; }"
+		);
+		expect(violations).toHaveLength(0);
+	});
+
 	test('rejects @media wrappers', () => {
 		const violations = checkLayoutCss(
 			'@media (min-width: 48rem) { [data-layout] { gap: var(--dry-space-4); } }'
@@ -79,6 +106,30 @@ describe('checkLayoutCss', () => {
 		expect(violations.some((violation) => violation.rule === 'dryui/layout-css-at-rule')).toBe(
 			true
 		);
+	});
+
+	test('rejects unnamed @container wrappers', () => {
+		const violations = checkLayoutCss(
+			"@container (min-width: 48rem) { [data-layout='stack'] { gap: var(--dry-space-4); } }"
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/layout-css-at-rule');
+	});
+
+	test('rejects non-page named @container wrappers', () => {
+		const violations = checkLayoutCss(
+			"@container shell (min-width: 48rem) { [data-layout='stack'] { gap: var(--dry-space-4); } }"
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/layout-css-at-rule');
+	});
+
+	test('rejects non-container at-rules', () => {
+		const violations = checkLayoutCss(
+			"@supports (display: grid) { [data-layout='stack'] { display: grid; } }"
+		);
+		expect(violations).toHaveLength(1);
+		expect(violations[0]!.rule).toBe('dryui/layout-css-at-rule');
 	});
 
 	test('does not allow text-align as a box-alignment property', () => {
@@ -90,6 +141,21 @@ describe('checkLayoutCss', () => {
 	test('includes existing generic style checks', () => {
 		const violations = checkLayoutCss('[data-layout] { gap: var(--dry-space-2) !important; }');
 		expect(violations.some((violation) => violation.rule === 'dryui/no-important')).toBe(true);
+	});
+});
+
+describe('evaluateLayoutContract', () => {
+	test('preserves declaration property and value facts', () => {
+		const result = evaluateLayoutContract(`
+[data-layout='stack'] {
+  grid-template-columns: minmax(0, 42rem);
+  padding-block: calc(var(--dry-space-4) + var(--dry-space-2));
+}`);
+		expect(result.diagnostics).toHaveLength(0);
+		expect(result.facts.declarations.map(({ property, value }) => [property, value])).toEqual([
+			['grid-template-columns', 'minmax(0, 42rem)'],
+			['padding-block', 'calc(var(--dry-space-4) + var(--dry-space-2))']
+		]);
 	});
 });
 
@@ -124,7 +190,7 @@ describe('dryuiLayoutCss Vite plugin', () => {
 		const root = mkdtempSync(resolve(tmpdir(), 'dryui-layout-css-invalid-'));
 		try {
 			mkdirSync(resolve(root, 'src'), { recursive: true });
-			writeFileSync(resolve(root, 'src/layout.css'), '[data-layout] { width: 100%; }');
+			writeFileSync(resolve(root, 'src/layout.css'), "[data-layout='stack'] { width: 100%; }");
 			const plugin = dryuiLayoutCss({ root });
 			expect(() => plugin.buildStart!()).toThrow('dryui/layout-css-property');
 		} finally {
@@ -137,7 +203,7 @@ describe('dryuiLayoutCss Vite plugin', () => {
 		try {
 			mkdirSync(resolve(root, 'src'), { recursive: true });
 			const file = resolve(root, 'src/layout.css');
-			writeFileSync(file, '[data-layout] { gap: 12px; }');
+			writeFileSync(file, "[data-layout='stack'] { gap: 12px; }");
 			const plugin = dryuiLayoutCss({ root });
 			expect(() => plugin.handleHotUpdate!({ file })).toThrow('dryui/layout-css-value');
 		} finally {
