@@ -552,7 +552,7 @@
 						{#if showBulkLaunch && targetAgent}
 							<div class="filter-bulk" data-layout-area="filter-bulk">
 								<div class="launch-group" data-layout-area="launch-group">
-									<BorderBeam size="sm" colorVariant="colorful" borderRadius="var(--dry-radius-md)">
+									<BorderBeam size="sm" colorVariant="mono" borderRadius="var(--dry-radius-md)">
 										<Button
 											variant="solid"
 											size="sm"
@@ -773,12 +773,15 @@
 	.dashboard-shell {
 		container: feedback-dashboard / inline-size;
 		--dry-btn-radius: var(--dry-radius-md);
+
+		min-block-size: 100dvh;
 	}
 
 	.dashboard {
 		container-type: inline-size;
-		gap: var(--dry-space-2);
-		padding: var(--dry-space-3);
+		gap: var(--dry-space-4);
+		align-content: start;
+		padding: var(--dry-space-5) var(--dry-space-4) var(--dry-space-8);
 	}
 
 	.brand {
@@ -842,21 +845,26 @@
 	}
 
 	.queue {
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-3);
+		align-content: start;
 	}
 
 	.filter-bar {
 		container: feedback-filters / inline-size;
 		--dry-btn-radius: var(--dry-radius-md);
 
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-3);
 		align-items: center;
+		align-content: start;
+		padding-block: var(--dry-space-2);
+		border-block: 1px solid var(--dry-color-stroke-weak);
 	}
 
 	.filter-actions {
 		gap: var(--dry-space-2);
 		align-items: center;
 		justify-items: start;
+		justify-self: start;
 	}
 
 	.filter-search {
@@ -905,7 +913,7 @@
 	}
 
 	.feed {
-		gap: var(--dry-space-2);
+		gap: var(--dry-space-3);
 	}
 
 	.loading-feed {
@@ -913,10 +921,10 @@
 	}
 
 	.loading-surface {
-		padding: var(--dry-space-4);
+		padding: var(--dry-space-3);
 		background: var(--dry-color-bg-overlay);
 		border-radius: var(--dry-radius-md);
-		box-shadow: var(--dry-shadow-md);
+		border: 1px solid var(--dry-color-stroke-weak);
 	}
 
 	.submission-skeleton,
@@ -939,8 +947,8 @@
 
 	@container feedback-dashboard (max-width: 36rem) {
 		.dashboard {
-			gap: var(--dry-space-2);
-			padding: var(--dry-space-2);
+			gap: var(--dry-space-3);
+			padding: var(--dry-space-3) var(--dry-space-2) var(--dry-space-6);
 		}
 
 		.brand-lockup {
@@ -951,13 +959,13 @@
 
 	@container feedback-filters (min-width: 42rem) {
 		.filter-actions {
-			justify-content: start;
+			justify-self: end;
+			justify-content: end;
 		}
 	}
 
 	@container feedback-dashboard (min-width: 48rem) {
 		.filter-bar {
-			justify-content: start;
 			align-items: center;
 		}
 	}

@@ -103,8 +103,8 @@
 		return value.slice(0, 8);
 	}
 
-	function statusColor(status: SubmissionStatus): 'green' | 'yellow' {
-		return status === 'resolved' ? 'green' : 'yellow';
+	function statusColor(_status: SubmissionStatus): 'gray' {
+		return 'gray';
 	}
 
 	function statusLabel(status: SubmissionStatus): string {
@@ -352,7 +352,7 @@
 					<div class="prompt-actions">
 						{#if dispatchTargets.length > 0 && targetAgent}
 							<div class="launch-group">
-								<BorderBeam size="sm" colorVariant="colorful" borderRadius="var(--dry-radius-md)">
+								<BorderBeam size="sm" colorVariant="mono" borderRadius="var(--dry-radius-md)">
 									<Button
 										variant="solid"
 										size="sm"
@@ -443,17 +443,18 @@
 
 	.surface {
 		background: var(--dry-color-bg-raised);
+		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
 		overflow: hidden;
 	}
 
 	.surface-header {
-		padding: var(--dry-space-4);
+		padding: var(--dry-space-3) var(--dry-space-4);
 		border-bottom: 1px solid var(--dry-color-stroke-weak);
 	}
 
 	.surface-content {
-		padding: var(--dry-space-4);
+		padding: var(--dry-space-3) var(--dry-space-4) var(--dry-space-4);
 	}
 
 	.header {
@@ -524,7 +525,7 @@
 
 	.body {
 		display: grid;
-		gap: var(--dry-space-3);
+		gap: var(--dry-space-4);
 		align-items: start;
 	}
 
@@ -579,7 +580,7 @@
 		--dry-code-padding: var(--dry-space-2_5);
 		--dry-code-radius: var(--dry-radius-md);
 
-		max-block-size: min(18rem, 42dvh);
+		max-block-size: min(15rem, 38dvh);
 		overflow: auto;
 		border-radius: var(--dry-radius-md);
 	}
@@ -613,7 +614,7 @@
 		gap: var(--dry-space-1_5);
 		align-items: center;
 		color: var(--dry-color-text-weak);
-		padding-inline-start: var(--dry-space-2);
+		padding-inline-start: var(--dry-space-1);
 	}
 
 	.notes-head {
@@ -630,10 +631,10 @@
 	.note-card {
 		display: grid;
 		gap: var(--dry-space-1);
-		padding: var(--dry-space-1_5) var(--dry-space-2);
+		padding: var(--dry-space-2);
 		border: 1px solid var(--dry-color-stroke-weak);
 		border-radius: var(--dry-radius-md);
-		background: var(--dry-color-bg-raised);
+		background: var(--dry-color-bg-sunken);
 	}
 
 	.note-card-head {
@@ -687,7 +688,7 @@
 		}
 
 		.body {
-			grid-template-columns: minmax(0, 16rem) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
 		}
 
 		.media,
@@ -703,7 +704,7 @@
 
 	@container feedback-submission (min-width: 60rem) {
 		.body {
-			grid-template-columns: minmax(0, 16rem) minmax(12rem, 14rem) minmax(0, 1fr);
+			grid-template-columns: minmax(0, 18rem) minmax(12rem, 15rem) minmax(0, 1fr);
 		}
 
 		.media,

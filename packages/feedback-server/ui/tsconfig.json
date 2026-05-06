@@ -9,7 +9,6 @@
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": false,
     "skipLibCheck": true,
-    "baseUrl": ".",
     "paths": {
       "@dryui/ui": ["../../ui/dist/index.d.ts"]
     },
