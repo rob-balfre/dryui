@@ -1,4 +1,4 @@
-import { mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { Database } from 'bun:sqlite';
@@ -188,5 +188,107 @@ describe('SubmissionCapture', () => {
 			agent: 'off',
 			workspace: '/tmp/workspace'
 		});
+	});
+
+	test('creates presentation responses from captured submissions', () => {
+		capture.initSchema();
+
+		const presentation = capture.createPresentation(
+			submissionInput({
+				drawings: [
+					{
+						id: 'note-1',
+						kind: 'text',
+						color: '#0f766e',
+						position: { x: 20, y: 30 },
+						text: 'Tighten this copy',
+						fontSize: 16
+					}
+				],
+				hints: [{ corner: 'center', percentX: 50, percentY: 30 }]
+			})
+		);
+
+		expect(presentation).toMatchObject({
+			url: 'https://example.com/capture',
+			status: 'pending',
+			preferredScreenshotPath: expect.stringMatching(/\.png$/),
+			textNotes: ['Tighten this copy'],
+			summary: {
+				drawingCount: 1,
+				hintCount: 1,
+				drawingKinds: { text: 1 },
+				corners: { center: 1 }
+			}
+		});
+		expect(presentation?.drawingHints[0]?.hint?.corner).toBe('center');
+	});
+
+	test('orders pending submissions as a queue and history by newest first', async () => {
+		capture.initSchema();
+
+		const pendingOlder = capture.create(submissionInput({ url: 'https://example.com/older' }));
+		await new Promise((resolve) => setTimeout(resolve, 5));
+		const pendingNewer = capture.create(submissionInput({ url: 'https://example.com/newer' }));
+		await new Promise((resolve) => setTimeout(resolve, 5));
+		const resolved = capture.create(submissionInput({ url: 'https://example.com/resolved' }));
+		expect(resolved).not.toBeNull();
+		capture.updateStatus(resolved?.id ?? '', 'resolved');
+
+		expect(capture.listPresentations('pending').submissions.map((entry) => entry.id)).toEqual([
+			pendingOlder?.id,
+			pendingNewer?.id
+		]);
+		expect(capture.listPresentations('resolved').submissions.map((entry) => entry.id)).toEqual([
+			resolved?.id
+		]);
+		expect(capture.listPresentations('all').submissions.map((entry) => entry.id)).toEqual([
+			resolved?.id,
+			pendingNewer?.id,
+			pendingOlder?.id
+		]);
+	});
+
+	test('updates status through presentation lifecycle reads', () => {
+		capture.initSchema();
+		const submission = capture.create(submissionInput());
+		expect(submission).not.toBeNull();
+
+		const presentation = capture.updateStatusPresentation(submission?.id ?? '', 'resolved');
+
+		expect(presentation).toMatchObject({
+			id: submission?.id,
+			status: 'resolved',
+			preferredScreenshotPath: submission?.screenshotPath.png
+		});
+		expect(capture.get(submission?.id ?? '')?.status).toBe('resolved');
+		expect(capture.updateStatusPresentation('missing', 'resolved')).toBeNull();
+	});
+
+	test('selects screenshot paths for HTTP streaming without caller path knowledge', () => {
+		capture.initSchema();
+		const submission = capture.create(submissionInput());
+		expect(submission).not.toBeNull();
+		const id = submission?.id ?? '';
+
+		expect(capture.selectScreenshotPath(id)).toBe(submission?.screenshotPath.webp);
+		expect(capture.selectScreenshotPath(id, 'png')).toBe(submission?.screenshotPath.png);
+		expect(capture.selectScreenshotPath('missing')).toBeNull();
+	});
+
+	test('deletes captured screenshots with the submission lifecycle', () => {
+		capture.initSchema();
+		const submission = capture.create(submissionInput());
+		expect(submission).not.toBeNull();
+		expect(existsSync(submission?.screenshotPath.webp ?? '')).toBe(true);
+		expect(existsSync(submission?.screenshotPath.png ?? '')).toBe(true);
+
+		const deleted = capture.delete(submission?.id ?? '');
+
+		expect(deleted).toMatchObject({ id: submission?.id });
+		expect(capture.get(submission?.id ?? '')).toBeNull();
+		expect(existsSync(submission?.screenshotPath.webp ?? '')).toBe(false);
+		expect(existsSync(submission?.screenshotPath.png ?? '')).toBe(false);
+		expect(capture.delete(submission?.id ?? '')).toBeNull();
 	});
 });

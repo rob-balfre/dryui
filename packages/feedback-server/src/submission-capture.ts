@@ -156,6 +156,8 @@ export interface SubmissionCaptureOptions {
 	screenshotsDir: string;
 }
 
+export type SubmissionScreenshotFormat = 'webp' | 'png' | null;
+
 export class SubmissionCapture {
 	readonly db: Database;
 	readonly screenshotsDir: string;
@@ -267,6 +269,14 @@ export class SubmissionCapture {
 		};
 	}
 
+	createPresentation(
+		input: CreateSubmissionInput,
+		context: { workspace?: string } = {}
+	): SubmissionPresentation | null {
+		const submission = this.create(input, context);
+		return submission ? buildSubmissionPresentation(submission) : null;
+	}
+
 	get(id: string): Submission | null {
 		const row = this.db.query<SubmissionRow>('SELECT * FROM submissions WHERE id = ?').get(id);
 		return row ? toSubmission(row) : null;
@@ -312,7 +322,16 @@ export class SubmissionCapture {
 
 	updateStatusPresentation(id: string, status: SubmissionStatus): SubmissionPresentation | null {
 		const submission = this.updateStatus(id, status);
-		return submission ? buildSubmissionPresentation(submission) : null;
+		return submission ? this.getPresentation(id) : null;
+	}
+
+	selectScreenshotPath(id: string, format: SubmissionScreenshotFormat = null): string | null {
+		const submission = this.get(id);
+		if (!submission) return null;
+		if (format === 'png' && submission.screenshotPath.png) {
+			return submission.screenshotPath.png;
+		}
+		return submission.screenshotPath.webp;
 	}
 
 	delete(id: string): Submission | null {

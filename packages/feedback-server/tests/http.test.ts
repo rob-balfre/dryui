@@ -688,8 +688,9 @@ describe('feedback HTTP server', () => {
 			})
 		});
 		expect(createResponse.status).toBe(201);
-		const created = (await createResponse.json()) as Submission;
+		const created = (await createResponse.json()) as Submission & SubmissionPresentation;
 		screenshotPaths.push(created.screenshotPath.webp, created.screenshotPath.png);
+		expect(created.preferredScreenshotPath).toBe(created.screenshotPath.png);
 
 		const updateResponse = await fetch(`${baseUrl}/submissions/${created.id}`, {
 			method: 'PATCH',
@@ -697,6 +698,12 @@ describe('feedback HTTP server', () => {
 			body: JSON.stringify({ status: 'resolved' })
 		});
 		expect(updateResponse.status).toBe(200);
+		const updated = (await updateResponse.json()) as SubmissionPresentation;
+		expect(updated).toMatchObject({
+			id: created.id,
+			status: 'resolved',
+			preferredScreenshotPath: created.screenshotPath.png
+		});
 
 		const deleteResponse = await fetch(`${baseUrl}/submissions/${created.id}`, {
 			method: 'DELETE'
@@ -721,8 +728,16 @@ describe('feedback HTTP server', () => {
 			'submission.deleted'
 		]);
 		expect(events.map((event) => event.sessionId)).toEqual([created.url, created.url, created.url]);
-		expect(events[0]?.payload).toMatchObject({ id: created.id, status: 'pending' });
-		expect(events[1]?.payload).toMatchObject({ id: created.id, status: 'resolved' });
+		expect(events[0]?.payload).toMatchObject({
+			id: created.id,
+			status: 'pending',
+			preferredScreenshotPath: created.screenshotPath.png
+		});
+		expect(events[1]?.payload).toMatchObject({
+			id: created.id,
+			status: 'resolved',
+			preferredScreenshotPath: created.screenshotPath.png
+		});
 		expect(events[2]?.payload).toMatchObject({ id: created.id });
 	});
 

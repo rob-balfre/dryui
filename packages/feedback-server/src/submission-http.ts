@@ -69,7 +69,7 @@ export async function handleSubmissionHttp(
 			return errorResponse(400, 'Invalid JSON');
 		}
 
-		const submission = store.createSubmission(body, {
+		const submission = store.createSubmissionPresentation(body, {
 			workspace: dispatcherWorkspace
 		});
 		if (!submission) return errorResponse(400, 'Invalid submission');
@@ -89,12 +89,12 @@ export async function handleSubmissionHttp(
 	const submissionScreenshotMatch = pathname.match(/^\/submissions\/([^/]+)\/screenshot$/);
 	if (submissionScreenshotMatch && request.method === 'GET') {
 		const submissionId = decodeURIComponent(submissionScreenshotMatch[1] ?? '');
-		const submission = store.getSubmission(submissionId);
-		if (!submission) return errorResponse(404, 'Not found');
-
 		const requested = url.searchParams.get('format');
-		const pngPath = submission.screenshotPath.png;
-		const targetPath = requested === 'png' && pngPath ? pngPath : submission.screenshotPath.webp;
+		const targetPath = store.selectSubmissionScreenshotPath(
+			submissionId,
+			requested === 'png' ? 'png' : null
+		);
+		if (!targetPath) return errorResponse(404, 'Not found');
 		return (await fileResponse(targetPath)) ?? errorResponse(404, 'Not found');
 	}
 
@@ -110,11 +110,9 @@ export async function handleSubmissionHttp(
 		const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
 		try {
 			const body = await readJson<{ status: SubmissionStatus }>(request);
-			const rawSubmission = store.updateSubmissionStatus(submissionId, body.status);
-			if (!rawSubmission) return errorResponse(404, 'Not found');
-			const submission = store.getSubmissionPresentation(submissionId);
+			const submission = store.updateSubmissionStatusPresentation(submissionId, body.status);
 			if (!submission) return errorResponse(404, 'Not found');
-			emit(bus, 'submission.updated', rawSubmission.url, rawSubmission);
+			emit(bus, 'submission.updated', submission.url, submission);
 			return json(submission);
 		} catch {
 			return errorResponse(400, 'Invalid JSON');

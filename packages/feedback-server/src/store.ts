@@ -3,6 +3,7 @@ import { Database } from 'bun:sqlite';
 import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { SubmissionCapture } from './submission-capture.js';
+import type { SubmissionScreenshotFormat } from './submission-capture.js';
 import type {
 	SubmissionPresentation,
 	SubmissionPresentationListResponse
@@ -523,6 +524,13 @@ export class FeedbackStore {
 		return this.submissionCapture.create(input, context);
 	}
 
+	createSubmissionPresentation(
+		input: CreateSubmissionInput,
+		context: { workspace?: string } = {}
+	): SubmissionPresentation | null {
+		return this.submissionCapture.createPresentation(input, context);
+	}
+
 	getSubmission(id: string): Submission | null {
 		return this.submissionCapture.get(id);
 	}
@@ -550,6 +558,13 @@ export class FeedbackStore {
 		status: SubmissionStatus
 	): SubmissionPresentation | null {
 		return this.submissionCapture.updateStatusPresentation(id, status);
+	}
+
+	selectSubmissionScreenshotPath(
+		id: string,
+		format: SubmissionScreenshotFormat = null
+	): string | null {
+		return this.submissionCapture.selectScreenshotPath(id, format);
 	}
 
 	deleteSubmission(id: string): Submission | null {
