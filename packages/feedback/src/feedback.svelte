@@ -57,19 +57,10 @@
 	import Toolbar, { type Mode } from './components/toolbar.svelte';
 	import ComponentsInspector from './components/components-inspector.svelte';
 
-	type ImportMetaWithEnv = ImportMeta & {
-		env?: Record<string, string | boolean | undefined>;
-	};
-
 	// Runtime opt-out. Set DRY_FEEDBACK_DISABLED=1 (or any truthy value) to
 	// omit the widget entirely. Useful for CI, screenshot jobs, or
 	// demo/recreation contexts where editing the root layout is not an option.
-	//
-	// - process.env.DRY_FEEDBACK_DISABLED covers the SSR process (Node).
-	// - Vite's VITE_DRY_FEEDBACK_DISABLED value is baked into the client
-	//   bundle, so it disables the widget on both sides.
-	//   Prefer the VITE_-prefixed form for consistent SSR + client behavior.
-	const feedbackDisabled = (() => {
+	const feedbackDisabledByProcess = (() => {
 		const maybeProcess = (globalThis as { process?: { env?: Record<string, unknown> } }).process;
 		try {
 			const env = maybeProcess?.env;
@@ -80,32 +71,25 @@
 		} catch {
 			// process is not available in the current runtime; ignore.
 		}
-		// Direct, literal access only: Vite's SSR module runner statically
-		// rewrites `import.meta.env.<KEY>` reads but throws on aliased or
-		// bracket access ("Dynamic access of import.meta.env is not supported").
-		try {
-			if ((import.meta as ImportMetaWithEnv).env?.DRY_FEEDBACK_DISABLED) return true;
-			if ((import.meta as ImportMetaWithEnv).env?.VITE_DRY_FEEDBACK_DISABLED) return true;
-		} catch {
-			// import.meta.env not available in the current runtime; ignore.
-		}
 		return false;
 	})();
 
-	const ANNOTATION_FILL = 'hsl(25 100% 55%)';
-	const ANNOTATION_OUTLINE = 'hsl(0 0% 100%)';
-	const STROKE_OUTLINE_WIDTH = 4;
-	const TEXT_OUTLINE_RATIO = 0.22;
+	const ANNOTATION_FILL = 'oklch(78% 0.13 54)';
+	const ANNOTATION_OUTLINE = 'oklch(8% 0.006 160 / 0.82)';
+	const STROKE_OUTLINE_WIDTH = 2;
+	const TEXT_OUTLINE_RATIO = 0.14;
 	const LOCATION_CHANGE_EVENT = 'dryui-feedback:locationchange';
 
 	let {
 		color = ANNOTATION_FILL,
+		disabled = false,
 		strokeWidth = 3,
 		shortcut = '$mod+m',
 		serverUrl: configuredServerUrl,
 		scrollRoot,
 		class: className
 	}: FeedbackProps = $props();
+	const feedbackDisabled = $derived(disabled || feedbackDisabledByProcess);
 
 	let active = $state(false);
 	let tool = $state<Tool>('pencil');
@@ -204,6 +188,15 @@
 	);
 	const canUndo = $derived(frameIndex > 0);
 	const canRedo = $derived(frameIndex < historyFrames.length - 1);
+	const canReset = $derived.by(() => {
+		void layoutVersion;
+		return (
+			drawings.length > 0 ||
+			addedComponents.size > 0 ||
+			removedElements.size > 0 ||
+			hasModifiedLayoutClone()
+		);
+	});
 
 	function hasModifiedLayoutClone(): boolean {
 		for (const [original, clone] of layoutClones) {
@@ -308,10 +301,10 @@
 			zIndex: '0',
 			display: 'grid',
 			placeItems: 'center',
-			background: 'hsl(25 100% 55% / 0.16)',
-			border: '2px dashed hsl(25 100% 55%)',
+			background: 'oklch(78% 0.13 54 / 0.12)',
+			border: '1px dashed oklch(78% 0.13 54 / 0.72)',
 			borderRadius: '8px',
-			color: 'hsl(25 100% 88%)',
+			color: 'oklch(90% 0.08 54)',
 			fontFamily: 'system-ui, -apple-system, sans-serif',
 			fontSize: '13px',
 			fontWeight: '600',
@@ -457,8 +450,8 @@
 			fallback.style.display = '';
 		}
 		delete record.el.dataset.dryuiAddedRendered;
-		record.el.style.background = 'hsl(25 100% 55% / 0.16)';
-		record.el.style.border = '2px dashed hsl(25 100% 55%)';
+		record.el.style.background = 'oklch(78% 0.13 54 / 0.12)';
+		record.el.style.border = '1px dashed oklch(78% 0.13 54 / 0.72)';
 		record.el.style.padding = '4px 8px';
 		record.el.style.borderRadius = '8px';
 		record.el.style.placeItems = 'center';
@@ -854,6 +847,16 @@
 	const undo = () => stepHistory(-1);
 	const redo = () => stepHistory(1);
 
+	function resetAll() {
+		drawings = [];
+		saveVersion++;
+		selectedComponentEl = null;
+		placingComponent = null;
+		destroyAllLayoutClones();
+		resetHistory([]);
+		removeStoredWidgetState(currentPageUrl, { normalizeDrawing });
+	}
+
 	const hasLayoutFeedback = $derived.by(() => {
 		void layoutVersion;
 		void frameIndex;
@@ -1157,6 +1160,16 @@
 			moving = null;
 		}
 		persistWidgetState();
+	}
+
+	function deactivateAnnotationTool() {
+		if (annotationActive) toggle();
+	}
+
+	function handleAnnotationKeyDown(e: KeyboardEvent) {
+		if (e.key !== 'Escape' || feedbackDisabled || !annotationActive) return;
+		e.preventDefault();
+		deactivateAnnotationTool();
 	}
 
 	function setTool(t: Tool) {
@@ -2069,6 +2082,8 @@
 	});
 </script>
 
+<svelte:window onkeydown={handleAnnotationKeyDown} />
+
 {#if !feedbackDisabled}
 	<Hotkey keys={shortcut} handler={toggle} />
 
@@ -2293,11 +2308,13 @@
 				addedPropsJson={selectedAddedRecord?.propsJson ?? ''}
 				{canUndo}
 				{canRedo}
+				{canReset}
 				ontoggle={toggle}
 				ontoolchange={setTool}
 				onsubmit={handleSubmit}
 				onmodechange={setMode}
 				oncomponentsreset={resetSelectedComponent}
+				onreset={resetAll}
 				onundo={undo}
 				onredo={redo}
 				ondeselect={() => selectComponent(null)}
@@ -2414,7 +2431,7 @@
 		pointer-events: all;
 		touch-action: none;
 		cursor:
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.35' stroke='%23000' stroke-width='5'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='4'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='%23ff7b1a' stroke-width='2.4'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3C/svg%3E")
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.26' stroke='%23000' stroke-width='2.8'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='%23f2f4f3' stroke-width='2.2'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3Cg stroke='%23d99a4b' stroke-width='1.5'%3E%3Cpath d='M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/g%3E%3C/svg%3E")
 				2 30,
 			crosshair;
 	}
@@ -2433,28 +2450,28 @@
 
 	.drawing-canvas.eraser-cursor[data-active] {
 		cursor:
-			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.35' stroke='%23000' stroke-width='5'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='white' stroke-width='4'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='%23ff7b1a' stroke-width='2.4'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3C/svg%3E")
+			url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cg transform='translate(0.6%200.8)' opacity='0.26' stroke='%23000' stroke-width='2.8'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='%23f2f4f3' stroke-width='2.2'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3Cg stroke='%23d99a4b' stroke-width='1.5'%3E%3Cpath d='M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21'/%3E%3Cpath d='m5.082 11.09 8.828 8.828'/%3E%3C/g%3E%3C/svg%3E")
 				4 28,
 			crosshair;
 	}
 
 	.text-input-wrap {
-		--dry-btn-accent: hsl(25 100% 55%);
-		--dry-btn-accent-active: hsl(25 100% 50%);
-		--dry-btn-accent-hover: hsl(25 100% 62%);
+		--dry-btn-accent: oklch(78% 0.13 54);
+		--dry-btn-accent-active: oklch(72% 0.14 54);
+		--dry-btn-accent-hover: oklch(84% 0.11 54);
 		--dry-btn-active-transform: none;
 		--dry-btn-border: transparent;
-		--dry-btn-color: black;
+		--dry-btn-color: oklch(8% 0.006 160);
 		--dry-btn-min-height: 0;
-		--dry-btn-on-accent: black;
+		--dry-btn-on-accent: oklch(8% 0.006 160);
 		--dry-btn-padding-x: 8px;
 		--dry-btn-padding-y: 0;
 		--dry-btn-radius: 0;
 		--dry-form-control-border-hover: transparent;
-		--dry-form-control-color-placeholder: hsl(0 0% 20%);
-		--dry-input-bg: hsl(25 100% 55%);
+		--dry-form-control-color-placeholder: oklch(96% 0.004 160 / 0.48);
+		--dry-input-bg: oklch(12% 0.006 160 / 0.96);
 		--dry-input-border: transparent;
-		--dry-input-color: black;
+		--dry-input-color: oklch(96% 0.004 160);
 		--dry-input-font-size: 16px;
 		--dry-input-padding-x: 8px;
 		--dry-input-padding-y: 4px;
@@ -2466,14 +2483,13 @@
 		display: grid;
 		grid-template-columns: minmax(180px, 1fr) auto;
 		column-gap: 2px;
-		border: 2px solid white;
+		border: 1px solid oklch(96% 0.004 160 / 0.18);
 		border-radius: 6px;
-		background: white;
+		background: oklch(12% 0.006 160 / 0.96);
 		font-weight: 600;
 		box-shadow:
-			0 0 0 1px black,
-			0 8px 20px hsl(0 0% 0% / 0.3);
-		backdrop-filter: blur(4px);
+			0 0 0 1px oklch(0% 0 0 / 0.28),
+			0 12px 28px oklch(0% 0 0 / 0.34);
 		overflow: hidden;
 	}
 
@@ -2484,7 +2500,7 @@
 		display: grid;
 		place-items: start center;
 		padding-block-start: 24vh;
-		background: hsl(25 100% 55% / 0.04);
+		background: oklch(78% 0.13 54 / 0.035);
 		cursor: crosshair;
 		pointer-events: auto;
 		touch-action: none;
@@ -2497,9 +2513,8 @@
 		gap: 8px;
 		padding: 8px 14px;
 		border-radius: 999px;
-		background: hsl(225 15% 15% / 0.95);
-		backdrop-filter: blur(8px);
-		color: hsl(220 10% 92%);
+		background: oklch(12% 0.006 160 / 0.96);
+		color: oklch(96% 0.004 160);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -2507,11 +2522,11 @@
 		font-size: 12px;
 		font-weight: 500;
 		letter-spacing: 0.02em;
-		box-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
+		box-shadow: 0 14px 34px oklch(0% 0 0 / 0.36);
 	}
 
 	.placement-hint strong {
-		color: hsl(25 100% 80%);
+		color: oklch(86% 0.1 54);
 		font-weight: 700;
 	}
 
@@ -2520,8 +2535,8 @@
 		width: 6px;
 		height: 6px;
 		border-radius: 999px;
-		background: hsl(25 100% 55%);
-		box-shadow: 0 0 8px hsl(25 100% 55% / 0.6);
+		background: oklch(78% 0.13 54);
+		box-shadow: 0 0 8px oklch(78% 0.13 54 / 0.35);
 	}
 
 	.feedback-toast-provider {

@@ -39,6 +39,7 @@ export type SubmitStatus = 'idle' | 'waiting-for-capture' | 'capturing' | 'uploa
 
 export interface FeedbackProps {
 	color?: string;
+	disabled?: boolean;
 	strokeWidth?: number;
 	shortcut?: string;
 	serverUrl?: string;

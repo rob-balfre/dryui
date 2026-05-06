@@ -54,6 +54,7 @@
 		placing?: string | null;
 		canUndo?: boolean;
 		canRedo?: boolean;
+		canReset?: boolean;
 		canBreakApart?: boolean;
 		addedKind?: string | null;
 		addedLabel?: string;
@@ -63,6 +64,7 @@
 		onsubmit: () => void;
 		onmodechange: (mode: Mode) => void;
 		oncomponentsreset?: () => void;
+		onreset?: () => void;
 		onundo?: () => void;
 		onredo?: () => void;
 		ondeselect?: () => void;
@@ -87,12 +89,14 @@
 		addedPropsJson = '',
 		canUndo = false,
 		canRedo = false,
+		canReset = false,
 		canBreakApart = false,
 		ontoggle,
 		ontoolchange,
 		onsubmit,
 		onmodechange,
 		oncomponentsreset,
+		onreset,
 		onundo,
 		onredo,
 		ondeselect,
@@ -203,6 +207,17 @@
 	function confirmRemove() {
 		removeConfirmOpen = false;
 		onremoveselected?.();
+	}
+
+	let resetConfirmOpen = $state(false);
+
+	$effect(() => {
+		if (!canReset) resetConfirmOpen = false;
+	});
+
+	function confirmReset() {
+		resetConfirmOpen = false;
+		onreset?.();
 	}
 
 	let propsPanelOpen = $state(false);
@@ -383,8 +398,6 @@
 	const submitCopy = $derived(sent ? SENT_COPY : SUBMIT_COPY[submitStatus]);
 
 	let toolbarEl = $state<HTMLDivElement | null>(null);
-	let pillPosition = $state<'above' | 'below'>('above');
-	const PILL_CLEARANCE = 56;
 
 	function repairToolbarLayout(node: HTMLDivElement): boolean {
 		if (!node.isConnected) return false;
@@ -400,7 +413,6 @@
 	}
 
 	function syncToolbarLayoutMetrics() {
-		if (inspecting) updatePillPosition();
 		if (pickerOpen || propsPanelOpen) updatePopoverPlacement();
 	}
 
@@ -428,22 +440,6 @@
 			if (toolbarEl === node) toolbarEl = null;
 		};
 	};
-
-	function updatePillPosition() {
-		if (!toolbarEl) return;
-		const rect = toolbarEl.getBoundingClientRect();
-		const next = rect.top < PILL_CLEARANCE ? 'below' : 'above';
-		if (next !== pillPosition) pillPosition = next;
-	}
-
-	let pillFrame = 0;
-	function schedulePillUpdate() {
-		if (pillFrame) return;
-		pillFrame = requestAnimationFrame(() => {
-			pillFrame = 0;
-			updatePillPosition();
-		});
-	}
 
 	let popoverPlacement = $state<'top' | 'bottom'>('top');
 	const POPOVER_HEIGHT = 380;
@@ -480,18 +476,6 @@
 		};
 	});
 
-	$effect(() => {
-		if (!inspecting) return;
-		updatePillPosition();
-		window.addEventListener('resize', schedulePillUpdate);
-		window.addEventListener('scroll', schedulePillUpdate, true);
-		return () => {
-			if (pillFrame) cancelAnimationFrame(pillFrame);
-			window.removeEventListener('resize', schedulePillUpdate);
-			window.removeEventListener('scroll', schedulePillUpdate, true);
-		};
-	});
-
 	function handleHandlePointerDown(e: PointerEvent) {
 		pendingDrag = { id: e.pointerId, x: e.clientX, y: e.clientY };
 	}
@@ -522,7 +506,6 @@
 		toolbarEl.style.top = `${y}px`;
 		toolbarEl.style.right = 'auto';
 		toolbarEl.style.bottom = 'auto';
-		if (inspecting) updatePillPosition();
 	}
 
 	function handleHandlePointerUp() {
@@ -550,7 +533,6 @@
 		toolbarEl.style.bottom = `${Math.max(VIEWPORT_EDGE_PX, window.innerHeight - y - rect.height)}px`;
 		toolbarEl.style.left = 'auto';
 		toolbarEl.style.top = 'auto';
-		if (inspecting) updatePillPosition();
 	}
 
 	function scheduleClamp() {
@@ -587,6 +569,10 @@
 		} else {
 			ontoggle();
 		}
+	}
+
+	function deactivateTools() {
+		if (active) ontoggle();
 	}
 </script>
 
@@ -696,356 +682,411 @@
 		>
 			<Redo2 size={14} />
 		</Button>
+
+		<AlertDialog.Root bind:open={resetConfirmOpen}>
+			<AlertDialog.Trigger>
+				<Button
+					variant="trigger"
+					size="sm"
+					class="tool-btn history-btn"
+					type="button"
+					data-tooltip="Reset"
+					disabled={!canReset}
+					aria-label="Clear all annotations and changes"
+				>
+					<RotateCcw size={14} />
+				</Button>
+			</AlertDialog.Trigger>
+			<AlertDialog.Overlay />
+			<AlertDialog.Content>
+				<AlertDialog.Header>Reset feedback?</AlertDialog.Header>
+				<AlertDialog.Body>
+					Drawings, placed components, and layout changes are cleared. This cannot be undone.
+				</AlertDialog.Body>
+				<AlertDialog.Footer>
+					<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+					<AlertDialog.Action onclick={confirmReset}>Reset</AlertDialog.Action>
+				</AlertDialog.Footer>
+			</AlertDialog.Content>
+		</AlertDialog.Root>
 	{/snippet}
 
-	{#if showToolPill}
-		<div
-			class="tool-pill"
-			role="group"
-			aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
-		>
-			{#if showComponentsTools}
-				{#if addedKind}
-					<div class="add-wrap" data-placement={popoverPlacement}>
-						<Button
-							variant="trigger"
-							size="sm"
-							class="tool-btn"
-							type="button"
-							data-tooltip="Edit props"
-							data-active={propsPanelOpen || undefined}
-							onclick={togglePropsPanel}
-							aria-label={`Edit ${addedKind} props`}
-							aria-expanded={propsPanelOpen}
-						>
-							<Settings size={16} />
-						</Button>
+	<div class="tool-row" data-empty={(!showToolPill && !inspecting) || undefined}>
+		{#if inspecting}
+			<div class="inspect-pill" role="status">
+				<span class="inspect-pill-dot" aria-hidden="true"></span>
+				<span class="inspect-pill-label">{inspectingLabel}</span>
+				<Kbd data-inspect-pill-kbd>ESC</Kbd>
+			</div>
+		{/if}
 
-						{#if propsPanelOpen}
-							<div
-								class="props-panel"
-								{@attach capturePropsPanel}
-								role="dialog"
-								aria-label={`${addedKind} props`}
-							>
-								<div class="props-panel-title">{addedKind} props</div>
-								<Field.Root data-props-panel-field>
-									<Label size="sm" data-props-panel-label>Label</Label>
-									<Input
-										size="sm"
-										type="text"
-										bind:value={propsLabelInput}
-										placeholder={addedKind}
-										data-props-panel-input
-										data-props-label-input
-										onkeydown={handlePropsKey}
-									/>
-								</Field.Root>
-								{#each formFields as field (field.name)}
-									{#if field.type.kind === 'enum'}
-										<Field.Root data-props-panel-field>
-											<Label size="sm" data-props-panel-label>{field.name}</Label>
-											<div data-props-panel-select>
-												<Select.Root
-													bind:value={
-														() => readEnumValue(field), (next) => setEnumValue(field, next)
-													}
-												>
-													<Select.Trigger size="sm" data-props-panel-input>
-														<Select.Value placeholder={readEnumValue(field) || 'Default'} />
-													</Select.Trigger>
-													<Select.Content>
-														<Select.Item value="">Default</Select.Item>
-														{#each field.type.options as option (option)}
-															<Select.Item value={option}>{option}</Select.Item>
-														{/each}
-													</Select.Content>
-												</Select.Root>
-											</div>
-										</Field.Root>
-									{:else if field.type.kind === 'boolean'}
-										<Field.Root data-props-panel-checkbox-field>
-											<Checkbox
-												size="sm"
-												bind:checked={
-													() => readBooleanValue(field), (next) => setBooleanValue(field, next)
-												}
-											>
-												{field.name}
-											</Checkbox>
-										</Field.Root>
-									{:else if field.type.kind === 'number'}
-										<Field.Root data-props-panel-field>
-											<Label size="sm" data-props-panel-label>{field.name}</Label>
-											<Input
-												size="sm"
-												type="number"
-												data-props-panel-input
-												bind:value={
-													() => readNumberValue(field), (next) => setNumberValue(field, next)
-												}
-												onkeydown={handlePropsKey}
-											/>
-										</Field.Root>
-									{:else}
-										<Field.Root data-props-panel-field>
-											<Label size="sm" data-props-panel-label>{field.name}</Label>
-											<Input
-												size="sm"
-												type="text"
-												data-props-panel-input
-												bind:value={
-													() => readStringValue(field), (next) => setStringValue(field, next)
-												}
-												onkeydown={handlePropsKey}
-											/>
-										</Field.Root>
-									{/if}
-								{/each}
-								<div class="props-panel-actions">
-									<Button
-										variant="outline"
-										size="sm"
-										class="props-panel-btn"
-										type="button"
-										onclick={() => (propsPanelOpen = false)}
-									>
-										Cancel
-									</Button>
-									<Button
-										variant="solid"
-										size="sm"
-										class="props-panel-btn props-panel-btn-primary"
-										type="button"
-										onclick={applyProps}
-									>
-										Apply
-									</Button>
-								</div>
-							</div>
-						{/if}
-					</div>
-				{/if}
-
-				<div class="add-wrap" data-placement={popoverPlacement}>
-					<Button
-						variant="trigger"
-						size="sm"
-						class="tool-btn"
-						type="button"
-						data-tooltip={placing ? 'Cancel placement' : 'Add component'}
-						data-active={pickerOpen || placing || undefined}
-						onclick={openPicker}
-						aria-label={placing ? `Cancel placing ${placing}` : 'Add component'}
-						aria-expanded={pickerOpen}
-					>
-						<Plus size={16} />
-					</Button>
-
-					{#if pickerOpen}
-						<div
-							class="component-picker"
-							{@attach capturePickerPanel}
-							role="dialog"
-							aria-label="Pick component"
-						>
-							<Field.Root data-component-picker-search>
-								<Label size="sm" for={pickerSearchId} data-sr-only>Search components</Label>
-								<InputGroup.Root size="sm" data-component-picker-search-box>
-									<InputGroup.Prefix data-component-picker-search-icon aria-hidden="true">
-										<Search size={13} />
-									</InputGroup.Prefix>
-									<InputGroup.Input
-										id={pickerSearchId}
-										type="text"
-										placeholder="Search components"
-										bind:value={pickerName}
-										data-component-picker-input
-										onkeydown={handlePickerKey}
-									/>
-								</InputGroup.Root>
-							</Field.Root>
-							{#if groupedPresets.length > 0}
-								<div class="component-picker-presets">
-									{#each groupedPresets as group (group.category)}
-										<div class="component-picker-group">
-											<div class="component-picker-group-label">{group.label}</div>
-											{#each group.names as preset (preset)}
-												<Button
-													variant="bare"
-													size="sm"
-													class="component-picker-preset"
-													type="button"
-													onclick={() => pick(preset)}
-												>
-													<span class="component-picker-preset-label">{preset}</span>
-												</Button>
-											{/each}
-										</div>
-									{/each}
-								</div>
-							{:else if pickerName.trim()}
-								<Button
-									variant="bare"
-									size="sm"
-									class="component-picker-preset component-picker-create"
-									type="button"
-									onclick={() => pick(pickerName)}
-								>
-									<span class="component-picker-preset-label">Add "{pickerName.trim()}"</span>
-								</Button>
-							{/if}
-						</div>
-					{/if}
-				</div>
-
-				{#if hasSelection && canBreakApart}
-					<Button
-						variant="trigger"
-						size="sm"
-						class="tool-btn"
-						type="button"
-						data-tooltip="Break apart"
-						onclick={() => onbreakapart?.()}
-						aria-label="Break component apart into its slots"
-					>
-						<Ungroup size={16} />
-					</Button>
-				{/if}
-
-				{#if hasSelection}
-					<AlertDialog.Root bind:open={removeConfirmOpen}>
-						<AlertDialog.Trigger>
+		{#if showToolPill}
+			<div
+				class="tool-pill"
+				role="group"
+				aria-label={showComponentsTools ? 'Components tools' : 'Annotation tools'}
+			>
+				{#if showComponentsTools}
+					{#if addedKind}
+						<div class="add-wrap" data-placement={popoverPlacement}>
 							<Button
 								variant="trigger"
 								size="sm"
 								class="tool-btn"
 								type="button"
-								data-tooltip="Remove"
-								aria-label={addedKind ? `Remove ${addedKind}` : 'Remove element'}
+								data-tooltip="Edit props"
+								data-active={propsPanelOpen || undefined}
+								onclick={togglePropsPanel}
+								aria-label={`Edit ${addedKind} props`}
+								aria-expanded={propsPanelOpen}
 							>
-								<Trash2 size={16} />
+								<Settings size={16} />
 							</Button>
-						</AlertDialog.Trigger>
-						<AlertDialog.Overlay />
-						<AlertDialog.Content>
-							<AlertDialog.Header>Remove {removeLabel}?</AlertDialog.Header>
-							<AlertDialog.Body>
-								{addedKind
-									? 'The placement disappears from the page. Undo restores it.'
-									: 'The element is hidden from this view and the captured screenshot. Undo restores it.'}
-							</AlertDialog.Body>
-							<AlertDialog.Footer>
-								<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-								<AlertDialog.Action onclick={confirmRemove}>Remove</AlertDialog.Action>
-							</AlertDialog.Footer>
-						</AlertDialog.Content>
-					</AlertDialog.Root>
 
+							{#if propsPanelOpen}
+								<div
+									class="props-panel"
+									{@attach capturePropsPanel}
+									role="dialog"
+									aria-label={`${addedKind} props`}
+								>
+									<div class="props-panel-title">{addedKind} props</div>
+									<Field.Root data-props-panel-field>
+										<Label size="sm" data-props-panel-label>Label</Label>
+										<Input
+											size="sm"
+											type="text"
+											bind:value={propsLabelInput}
+											placeholder={addedKind}
+											data-props-panel-input
+											data-props-label-input
+											onkeydown={handlePropsKey}
+										/>
+									</Field.Root>
+									{#each formFields as field (field.name)}
+										{#if field.type.kind === 'enum'}
+											<Field.Root data-props-panel-field>
+												<Label size="sm" data-props-panel-label>{field.name}</Label>
+												<div data-props-panel-select>
+													<Select.Root
+														bind:value={
+															() => readEnumValue(field), (next) => setEnumValue(field, next)
+														}
+													>
+														<Select.Trigger size="sm" data-props-panel-input>
+															<Select.Value placeholder={readEnumValue(field) || 'Default'} />
+														</Select.Trigger>
+														<Select.Content>
+															<Select.Item value="">Default</Select.Item>
+															{#each field.type.options as option (option)}
+																<Select.Item value={option}>{option}</Select.Item>
+															{/each}
+														</Select.Content>
+													</Select.Root>
+												</div>
+											</Field.Root>
+										{:else if field.type.kind === 'boolean'}
+											<Field.Root data-props-panel-checkbox-field>
+												<Checkbox
+													size="sm"
+													bind:checked={
+														() => readBooleanValue(field), (next) => setBooleanValue(field, next)
+													}
+												>
+													{field.name}
+												</Checkbox>
+											</Field.Root>
+										{:else if field.type.kind === 'number'}
+											<Field.Root data-props-panel-field>
+												<Label size="sm" data-props-panel-label>{field.name}</Label>
+												<Input
+													size="sm"
+													type="number"
+													data-props-panel-input
+													bind:value={
+														() => readNumberValue(field), (next) => setNumberValue(field, next)
+													}
+													onkeydown={handlePropsKey}
+												/>
+											</Field.Root>
+										{:else}
+											<Field.Root data-props-panel-field>
+												<Label size="sm" data-props-panel-label>{field.name}</Label>
+												<Input
+													size="sm"
+													type="text"
+													data-props-panel-input
+													bind:value={
+														() => readStringValue(field), (next) => setStringValue(field, next)
+													}
+													onkeydown={handlePropsKey}
+												/>
+											</Field.Root>
+										{/if}
+									{/each}
+									<div class="props-panel-actions">
+										<Button
+											variant="outline"
+											size="sm"
+											class="props-panel-btn"
+											type="button"
+											onclick={() => (propsPanelOpen = false)}
+										>
+											Cancel
+										</Button>
+										<Button
+											variant="solid"
+											size="sm"
+											class="props-panel-btn props-panel-btn-primary"
+											type="button"
+											onclick={applyProps}
+										>
+											Apply
+										</Button>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/if}
+
+					<div class="add-wrap" data-placement={popoverPlacement}>
+						<Button
+							variant="trigger"
+							size="sm"
+							class="tool-btn add-btn"
+							type="button"
+							data-tooltip={placing ? 'Cancel placement' : 'Add component'}
+							data-active={pickerOpen || placing || undefined}
+							onclick={openPicker}
+							aria-label={placing ? `Cancel placing ${placing}` : 'Add component'}
+							aria-expanded={pickerOpen}
+						>
+							<Plus size={14} aria-hidden="true" />
+							<span class="add-btn-label">{placing ? 'Cancel' : 'Add'}</span>
+						</Button>
+
+						{#if pickerOpen}
+							<div
+								class="component-picker"
+								{@attach capturePickerPanel}
+								role="dialog"
+								aria-label="Pick component"
+							>
+								<Field.Root data-component-picker-search>
+									<Label size="sm" for={pickerSearchId} data-sr-only>Search components</Label>
+									<InputGroup.Root size="sm" data-component-picker-search-box>
+										<InputGroup.Prefix data-component-picker-search-icon aria-hidden="true">
+											<Search size={13} />
+										</InputGroup.Prefix>
+										<InputGroup.Input
+											id={pickerSearchId}
+											type="text"
+											placeholder="Search components"
+											bind:value={pickerName}
+											data-component-picker-input
+											onkeydown={handlePickerKey}
+										/>
+									</InputGroup.Root>
+								</Field.Root>
+								{#if groupedPresets.length > 0}
+									<div class="component-picker-presets">
+										{#each groupedPresets as group (group.category)}
+											<div class="component-picker-group">
+												<div class="component-picker-group-label">{group.label}</div>
+												{#each group.names as preset (preset)}
+													<Button
+														variant="bare"
+														size="sm"
+														class="component-picker-preset"
+														type="button"
+														onclick={() => pick(preset)}
+													>
+														<span class="component-picker-preset-label">{preset}</span>
+													</Button>
+												{/each}
+											</div>
+										{/each}
+									</div>
+								{:else if pickerName.trim()}
+									<Button
+										variant="bare"
+										size="sm"
+										class="component-picker-preset component-picker-create"
+										type="button"
+										onclick={() => pick(pickerName)}
+									>
+										<span class="component-picker-preset-label">Add "{pickerName.trim()}"</span>
+									</Button>
+								{/if}
+							</div>
+						{/if}
+					</div>
+
+					{#if hasSelection && canBreakApart}
+						<Button
+							variant="trigger"
+							size="sm"
+							class="tool-btn"
+							type="button"
+							data-tooltip="Break apart"
+							onclick={() => onbreakapart?.()}
+							aria-label="Break component apart into its slots"
+						>
+							<Ungroup size={16} />
+						</Button>
+					{/if}
+
+					{#if hasSelection}
+						<AlertDialog.Root bind:open={removeConfirmOpen}>
+							<AlertDialog.Trigger>
+								<Button
+									variant="trigger"
+									size="sm"
+									class="tool-btn"
+									type="button"
+									data-tooltip="Remove"
+									aria-label={addedKind ? `Remove ${addedKind}` : 'Remove element'}
+								>
+									<Trash2 size={16} />
+								</Button>
+							</AlertDialog.Trigger>
+							<AlertDialog.Overlay />
+							<AlertDialog.Content>
+								<AlertDialog.Header>Remove {removeLabel}?</AlertDialog.Header>
+								<AlertDialog.Body>
+									{addedKind
+										? 'The placement disappears from the page. Undo restores it.'
+										: 'The element is hidden from this view and the captured screenshot. Undo restores it.'}
+								</AlertDialog.Body>
+								<AlertDialog.Footer>
+									<AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
+									<AlertDialog.Action onclick={confirmRemove}>Remove</AlertDialog.Action>
+								</AlertDialog.Footer>
+							</AlertDialog.Content>
+						</AlertDialog.Root>
+
+						<Button
+							variant="trigger"
+							size="sm"
+							class="tool-btn"
+							type="button"
+							data-tooltip="Back"
+							onclick={() => ondeselect?.()}
+							aria-label="Back to inspector"
+						>
+							<ArrowLeft size={16} />
+						</Button>
+
+						<Button
+							variant="trigger"
+							size="sm"
+							class="tool-btn"
+							type="button"
+							data-tooltip="Reset"
+							onclick={() => oncomponentsreset?.()}
+							aria-label="Reset component overrides"
+						>
+							<RotateCcw size={16} />
+						</Button>
+					{/if}
+				{:else}
 					<Button
 						variant="trigger"
 						size="sm"
-						class="tool-btn"
+						class="tool-btn esc-btn"
 						type="button"
-						data-tooltip="Back"
-						onclick={() => ondeselect?.()}
-						aria-label="Back to inspector"
+						data-tooltip="Stop tool"
+						disabled={!active}
+						onclick={deactivateTools}
+						aria-label="Deactivate drawing tools"
 					>
-						<ArrowLeft size={16} />
+						<Kbd data-esc-tool-kbd aria-hidden="true">ESC</Kbd>
 					</Button>
 
 					<Button
 						variant="trigger"
 						size="sm"
 						class="tool-btn"
-						type="button"
-						data-tooltip="Reset"
-						onclick={() => oncomponentsreset?.()}
-						aria-label="Reset component overrides"
+						data-tooltip="Draw"
+						data-active={(active && tool === 'pencil') || undefined}
+						onclick={() => handleToolClick('pencil')}
+						aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
 					>
-						<RotateCcw size={16} />
+						<Pencil size={16} />
+					</Button>
+
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						data-tooltip="Arrow"
+						data-active={(active && tool === 'arrow') || undefined}
+						onclick={() => handleToolClick('arrow')}
+						aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
+					>
+						<MoveUpRight size={16} />
+					</Button>
+
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						data-tooltip="Text"
+						data-active={(active && tool === 'text') || undefined}
+						onclick={() => handleToolClick('text')}
+						aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
+					>
+						<Type size={16} />
+					</Button>
+
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						data-tooltip="Move"
+						data-active={(active && tool === 'move') || undefined}
+						onclick={() => handleToolClick('move')}
+						aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
+					>
+						<Move size={16} />
+					</Button>
+
+					<Button
+						variant="trigger"
+						size="sm"
+						class="tool-btn"
+						data-tooltip="Erase"
+						data-active={(active && tool === 'eraser') || undefined}
+						onclick={() => handleToolClick('eraser')}
+						aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
+					>
+						<Eraser size={16} />
 					</Button>
 				{/if}
-			{:else}
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					data-tooltip="Draw"
-					data-active={(active && tool === 'pencil') || undefined}
-					onclick={() => handleToolClick('pencil')}
-					aria-label={active && tool === 'pencil' ? 'Stop drawing' : 'Draw'}
-				>
-					<Pencil size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					data-tooltip="Arrow"
-					data-active={(active && tool === 'arrow') || undefined}
-					onclick={() => handleToolClick('arrow')}
-					aria-label={active && tool === 'arrow' ? 'Stop arrows' : 'Arrow'}
-				>
-					<MoveUpRight size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					data-tooltip="Text"
-					data-active={(active && tool === 'text') || undefined}
-					onclick={() => handleToolClick('text')}
-					aria-label={active && tool === 'text' ? 'Stop text' : 'Text'}
-				>
-					<Type size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					data-tooltip="Move"
-					data-active={(active && tool === 'move') || undefined}
-					onclick={() => handleToolClick('move')}
-					aria-label={active && tool === 'move' ? 'Stop moving' : 'Move'}
-				>
-					<Move size={16} />
-				</Button>
-
-				<Button
-					variant="trigger"
-					size="sm"
-					class="tool-btn"
-					data-tooltip="Erase"
-					data-active={(active && tool === 'eraser') || undefined}
-					onclick={() => handleToolClick('eraser')}
-					aria-label={active && tool === 'eraser' ? 'Stop erasing' : 'Erase'}
-				>
-					<Eraser size={16} />
-				</Button>
-			{/if}
-		</div>
-	{/if}
-
-	{#if inspecting}
-		<div class="inspect-pill" data-position={pillPosition} role="status">
-			<span class="inspect-pill-dot" aria-hidden="true"></span>
-			<span class="inspect-pill-label">{inspectingLabel}</span>
-			<Kbd data-inspect-pill-kbd>ESC</Kbd>
-		</div>
-	{/if}
+			</div>
+		{/if}
+	</div>
 </div>
 
 <style>
 	.toolbar {
-		--accent: hsl(25 100% 55%);
-		--pill-bg: hsl(225 15% 15% / 0.95);
-		--pill-shadow: 0 4px 24px hsl(0 0% 0% / 0.4);
-		--tool-slot-height: 46px;
-		--tool-button-size: 26px;
+		--accent: oklch(65% 0.19 34);
+		--accent-weak: oklch(65% 0.19 34 / 0.14);
+		--accent-strong: oklch(76% 0.16 34);
+		--signal: oklch(73% 0.14 205);
+		--signal-weak: oklch(73% 0.14 205 / 0.13);
+		--signal-line: oklch(73% 0.14 205 / 0.32);
+		--feedback-ink: oklch(96% 0.004 160);
+		--feedback-muted: oklch(96% 0.004 160 / 0.62);
+		--feedback-weak: oklch(96% 0.004 160 / 0.38);
+		--feedback-line: oklch(96% 0.004 160 / 0.13);
+		--feedback-panel: oklch(12% 0.006 160 / 0.96);
+		--feedback-panel-raised: oklch(17% 0.008 160 / 0.96);
+		--feedback-sunken: oklch(8% 0.005 160 / 0.94);
+		--pill-bg: var(--feedback-panel);
+		--pill-shadow: 0 12px 28px oklch(0% 0 0 / 0.32), 0 1px 0 var(--feedback-line) inset;
+		--tool-slot-height: 40px;
+		--tool-button-size: 28px;
 		--toolbar-edge-block: 24px;
 		--toolbar-edge-inline: 24px;
 
@@ -1056,7 +1097,7 @@
 		display: grid;
 		grid-template-rows: auto var(--tool-slot-height);
 		justify-items: end;
-		gap: 6px;
+		gap: 4px;
 		user-select: none;
 		touch-action: none;
 	}
@@ -1065,12 +1106,30 @@
 		display: grid;
 		grid-auto-flow: column;
 		align-items: stretch;
-		gap: 6px;
+		gap: 4px;
+		padding: 4px;
+		border: 1px solid var(--feedback-line);
+		border-radius: 10px;
+		background: var(--pill-bg);
+		box-shadow: var(--pill-shadow);
+	}
+
+	.tool-row {
+		grid-row: 2;
+		align-self: end;
+		display: grid;
+		grid-auto-flow: column;
+		align-items: center;
+		justify-items: end;
+		justify-content: end;
+		gap: 8px;
+	}
+
+	.tool-row[data-empty] {
+		display: none;
 	}
 
 	.tool-pill {
-		grid-row: 2;
-		align-self: end;
 		position: relative;
 		z-index: 1;
 	}
@@ -1090,34 +1149,51 @@
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
-		gap: 2px;
-		padding: 3px;
-		border-radius: 12px;
+		gap: 1px;
+		padding: 0;
+		border-radius: 8px;
+		background: transparent;
+	}
+
+	.tool-pill {
+		padding: 4px;
+		border: 1px solid var(--feedback-line);
+		border-radius: 10px;
 		background: var(--pill-bg);
-		backdrop-filter: blur(8px);
 		box-shadow: var(--pill-shadow);
+	}
+
+	.history-pill,
+	.mode-pill {
+		padding-inline: 2px;
+	}
+
+	.history-pill {
+		border-inline-end: 1px solid var(--feedback-line);
+		padding-inline-end: 5px;
 	}
 
 	:global(.mode-btn) {
 		--dry-btn-bg: transparent;
 		--dry-btn-border: transparent;
-		--dry-btn-color: hsl(220 10% 60%);
+		--dry-btn-color: var(--feedback-muted);
 		--dry-btn-font-size: 11px;
-		--dry-btn-min-height: 0;
+		--dry-btn-min-height: 30px;
 		--dry-btn-padding-x: 10px;
-		--dry-btn-padding-y: 6px;
+		--dry-btn-padding-y: 0;
 		--dry-btn-radius: 8px;
 
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 6px;
-		padding: 6px 10px;
-		min-block-size: 0;
+		position: relative;
+		padding: 0 10px;
+		min-block-size: 30px;
 		border: none;
 		border-radius: 8px;
 		background: transparent;
-		color: hsl(220 10% 60%);
+		color: var(--feedback-muted);
 		cursor: pointer;
 		font-family:
 			system-ui,
@@ -1131,18 +1207,27 @@
 			color 0.15s;
 	}
 
-	:global(.mode-btn:hover:not([data-active])) {
-		--dry-btn-color: hsl(220 10% 88%);
+	:global(.mode-btn)::before {
+		display: none;
+	}
 
-		color: hsl(220 10% 88%);
+	:global(.mode-btn:hover:not([data-active])) {
+		--dry-btn-bg: var(--feedback-panel-raised);
+		--dry-btn-color: var(--feedback-ink);
+
+		background: var(--feedback-panel-raised);
+		color: var(--feedback-ink);
 	}
 
 	:global(.mode-btn[data-active]) {
-		--dry-btn-bg: hsl(25 100% 55% / 0.18);
-		--dry-btn-color: hsl(25 100% 80%);
+		--dry-btn-bg: var(--signal-weak);
+		--dry-btn-color: var(--feedback-ink);
 
-		background: hsl(25 100% 55% / 0.18);
-		color: hsl(25 100% 80%);
+		background: var(--signal-weak);
+		color: var(--feedback-ink);
+		box-shadow:
+			0 0 0 1px var(--signal-line) inset,
+			0 1px 0 oklch(96% 0.004 160 / 0.08) inset;
 	}
 
 	:global(.mode-btn:focus-visible) {
@@ -1153,7 +1238,7 @@
 	:global(.drag-handle) {
 		--dry-btn-bg: transparent;
 		--dry-btn-border: transparent;
-		--dry-btn-color: hsl(220 10% 38%);
+		--dry-btn-color: var(--feedback-weak);
 		--dry-btn-min-height: 0;
 		--dry-btn-padding-x: 3px;
 		--dry-btn-padding-y: 4px;
@@ -1167,7 +1252,7 @@
 		border: none;
 		border-radius: 6px;
 		background: transparent;
-		color: hsl(220 10% 38%);
+		color: var(--feedback-weak);
 		cursor: grab;
 		touch-action: none;
 		transition:
@@ -1176,11 +1261,11 @@
 	}
 
 	:global(.drag-handle:hover) {
-		--dry-btn-bg: hsl(225 15% 22%);
-		--dry-btn-color: hsl(220 10% 70%);
+		--dry-btn-bg: var(--feedback-panel-raised);
+		--dry-btn-color: var(--feedback-muted);
 
-		background: hsl(225 15% 22%);
-		color: hsl(220 10% 70%);
+		background: var(--feedback-panel-raised);
+		color: var(--feedback-muted);
 	}
 
 	:global(.drag-handle:focus-visible) {
@@ -1189,24 +1274,22 @@
 	}
 
 	.toolbar[data-dragging] :global(.drag-handle) {
-		--dry-btn-color: hsl(25 100% 67%);
+		--dry-btn-color: var(--accent-strong);
 
 		cursor: grabbing;
-		color: hsl(25 100% 67%);
+		color: var(--accent-strong);
 	}
 
 	.inspect-pill {
-		position: absolute;
-		inset-inline-end: 0;
 		display: inline-grid;
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 8px;
 		padding: 6px 10px;
 		border-radius: 8px;
+		border: 1px solid var(--feedback-line);
 		background: var(--pill-bg);
-		backdrop-filter: blur(8px);
-		color: hsl(220 10% 92%);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1219,21 +1302,13 @@
 		pointer-events: none;
 	}
 
-	.inspect-pill[data-position='above'] {
-		inset-block-end: calc(100% + 8px);
-	}
-
-	.inspect-pill[data-position='below'] {
-		inset-block-start: calc(100% + 8px);
-	}
-
 	.inspect-pill-dot {
 		display: inline-block;
 		width: 6px;
 		height: 6px;
 		border-radius: 999px;
-		background: hsl(25 100% 55%);
-		box-shadow: 0 0 8px hsl(25 100% 55% / 0.6);
+		background: var(--signal);
+		box-shadow: 0 0 8px var(--signal-line);
 	}
 
 	:global([data-inspect-pill-kbd]) {
@@ -1242,14 +1317,15 @@
 		font-weight: 600;
 		padding: 2px 6px;
 		border-radius: 4px;
-		background: hsl(225 15% 22%);
-		color: hsl(220 10% 80%);
+		border: 1px solid var(--feedback-line);
+		background: var(--feedback-sunken);
+		color: var(--feedback-muted);
 	}
 
 	:global(.tool-btn) {
 		--dry-btn-bg: transparent;
 		--dry-btn-border: transparent;
-		--dry-btn-color: hsl(220 10% 70%);
+		--dry-btn-color: var(--feedback-muted);
 		--dry-btn-font-size: 12px;
 		--dry-btn-min-height: 26px;
 		--dry-btn-padding-x: 0;
@@ -1267,7 +1343,7 @@
 		border: 1px solid transparent;
 		border-radius: 7px;
 		background: transparent;
-		color: hsl(220 10% 70%);
+		color: var(--feedback-muted);
 		cursor: pointer;
 		box-sizing: border-box;
 		transition:
@@ -1275,6 +1351,53 @@
 			border-color 0.15s,
 			box-shadow 0.15s,
 			color 0.15s;
+	}
+
+	:global(.tool-btn)::before {
+		display: none;
+	}
+
+	:global(.tool-btn svg) {
+		stroke-width: 1.7;
+	}
+
+	:global(.esc-btn) {
+		--dry-btn-color: var(--feedback-weak);
+
+		inline-size: 34px;
+		margin-inline-start: 4px;
+		margin-inline-end: 8px;
+	}
+
+	:global(.esc-btn:hover:not(:disabled)) {
+		--dry-btn-color: var(--feedback-ink);
+
+		color: var(--feedback-ink);
+	}
+
+	:global([data-esc-tool-kbd]) {
+		padding: 2px 5px;
+		border-radius: 4px;
+		border: 1px solid var(--feedback-line);
+		background: var(--feedback-sunken);
+		color: currentColor;
+		font-size: 10px;
+		font-weight: 650;
+	}
+
+	:global(.add-btn) {
+		--dry-btn-padding-x: 10px;
+
+		grid-auto-flow: column;
+		gap: 6px;
+		inline-size: auto;
+		padding-inline: 10px;
+	}
+
+	.add-btn-label {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.04em;
 	}
 
 	:global(.tool-btn[data-tooltip])::after {
@@ -1289,8 +1412,7 @@
 		padding: 4px 8px;
 		border-radius: 6px;
 		background: var(--pill-bg);
-		backdrop-filter: blur(8px);
-		color: hsl(220 10% 92%);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1312,15 +1434,15 @@
 	}
 
 	:global(.tool-btn:hover:not(:disabled)) {
-		--dry-btn-bg: hsl(225 15% 22%);
-		--dry-btn-color: hsl(220 10% 90%);
+		--dry-btn-bg: var(--feedback-panel-raised);
+		--dry-btn-color: var(--feedback-ink);
 
-		background: hsl(225 15% 22%);
-		color: hsl(220 10% 90%);
+		background: var(--feedback-panel-raised);
+		color: var(--feedback-ink);
 	}
 
 	:global(.tool-btn:disabled) {
-		opacity: 0.35;
+		opacity: 0.46;
 		cursor: not-allowed;
 	}
 
@@ -1329,24 +1451,25 @@
 	}
 
 	:global(.tool-btn[data-active]) {
-		--dry-btn-bg: var(--accent);
-		--dry-btn-border: white;
-		--dry-btn-color: black;
+		--dry-btn-bg: var(--signal-weak);
+		--dry-btn-border: var(--signal-line);
+		--dry-btn-color: var(--feedback-ink);
 
-		background: var(--accent);
-		border-color: white;
-		color: black;
+		background: var(--signal-weak);
+		border-color: var(--signal-line);
+		color: var(--feedback-ink);
 		box-shadow:
-			0 0 0 1px black,
-			0 4px 12px hsl(0 0% 0% / 0.35);
+			0 0 0 1px var(--signal-line) inset,
+			0 1px 0 oklch(96% 0.004 160 / 0.08) inset,
+			0 0 0 1px oklch(0% 0 0 / 0.18);
 	}
 
 	:global(.tool-btn[data-active]:hover) {
-		--dry-btn-bg: hsl(25 100% 62%);
-		--dry-btn-color: black;
+		--dry-btn-bg: var(--feedback-panel-raised);
+		--dry-btn-color: var(--feedback-ink);
 
-		background: hsl(25 100% 62%);
-		color: black;
+		background: var(--feedback-panel-raised);
+		color: var(--feedback-ink);
 	}
 
 	.history-pill :global(.history-btn) {
@@ -1381,9 +1504,9 @@
 		inline-size: min(320px, calc(100dvw - 32px));
 		max-block-size: min(70dvh, 440px);
 		padding: 10px;
+		border: 1px solid var(--feedback-line);
 		border-radius: 12px;
 		background: var(--pill-bg);
-		backdrop-filter: blur(8px);
 		box-shadow: var(--pill-shadow);
 		z-index: 10001;
 	}
@@ -1400,20 +1523,20 @@
 	}
 
 	:global([data-component-picker-search-box]) {
-		--dry-input-bg: hsl(225 15% 10% / 0.5);
-		--dry-input-border: hsl(220 10% 22%);
-		--dry-input-color: hsl(220 10% 92%);
+		--dry-input-bg: var(--feedback-sunken);
+		--dry-input-border: var(--feedback-line);
+		--dry-input-color: var(--feedback-ink);
 		--dry-input-font-size: 12px;
-		--dry-input-group-border-strong: hsl(25 100% 55% / 0.5);
-		--dry-input-group-muted: hsl(220 10% 48%);
+		--dry-input-group-border-strong: oklch(73% 0.16 48 / 0.5);
+		--dry-input-group-muted: var(--feedback-weak);
 		--dry-input-padding-x: 10px;
 		--dry-input-padding-y: 7px;
 		--dry-input-radius: 8px;
 
-		border: 1px solid hsl(220 10% 22%);
+		border: 1px solid var(--feedback-line);
 		border-radius: 8px;
-		background: hsl(225 15% 10% / 0.5);
-		color: hsl(220 10% 92%);
+		background: var(--feedback-sunken);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1428,15 +1551,15 @@
 	}
 
 	:global([data-component-picker-search-box]:focus-within) {
-		--dry-input-bg: hsl(225 15% 10% / 0.7);
-		--dry-input-border: hsl(25 100% 55% / 0.5);
+		--dry-input-bg: var(--feedback-sunken);
+		--dry-input-border: oklch(73% 0.16 48 / 0.5);
 
-		border-color: hsl(25 100% 55% / 0.5);
-		background: hsl(225 15% 10% / 0.7);
+		border-color: oklch(73% 0.16 48 / 0.5);
+		background: var(--feedback-sunken);
 	}
 
 	:global([data-component-picker-search-icon]) {
-		color: hsl(220 10% 48%);
+		color: var(--feedback-weak);
 	}
 
 	:global([data-component-picker-search]:focus-within [data-component-picker-search-icon]) {
@@ -1444,7 +1567,7 @@
 	}
 
 	:global([data-component-picker-input])::placeholder {
-		color: hsl(220 10% 45%);
+		color: var(--feedback-weak);
 	}
 
 	.component-picker-presets {
@@ -1455,7 +1578,7 @@
 		padding-block: 2px 4px;
 		overflow-y: auto;
 		scrollbar-width: thin;
-		scrollbar-color: hsl(220 10% 28%) transparent;
+		scrollbar-color: var(--feedback-line) transparent;
 		mask-image: linear-gradient(
 			180deg,
 			transparent 0,
@@ -1479,12 +1602,12 @@
 	}
 
 	.component-picker-presets::-webkit-scrollbar-thumb {
-		background: hsl(220 10% 28%);
+		background: var(--feedback-line);
 		border-radius: 999px;
 	}
 
 	.component-picker-presets::-webkit-scrollbar-thumb:hover {
-		background: hsl(220 10% 38%);
+		background: var(--feedback-weak);
 	}
 
 	.component-picker-group-label {
@@ -1496,9 +1619,9 @@
 			180deg,
 			var(--pill-bg) 0%,
 			var(--pill-bg) 70%,
-			hsl(225 15% 15% / 0) 100%
+			oklch(12% 0.006 160 / 0) 100%
 		);
-		color: hsl(25 100% 70%);
+		color: var(--accent-strong);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1514,14 +1637,14 @@
 	}
 
 	:global(.component-picker-create) {
-		--dry-btn-border: hsl(25 100% 55% / 0.45);
-		--dry-btn-color: hsl(25 100% 80%);
+		--dry-btn-border: oklch(73% 0.16 48 / 0.45);
+		--dry-btn-color: var(--accent-strong);
 
 		margin-block-start: 6px;
 		padding: 8px 10px;
-		border: 1px dashed hsl(25 100% 55% / 0.45);
+		border: 1px dashed oklch(73% 0.16 48 / 0.45);
 		border-radius: 8px;
-		color: hsl(25 100% 80%);
+		color: var(--accent-strong);
 	}
 
 	.props-panel {
@@ -1533,15 +1656,15 @@
 		min-inline-size: 260px;
 		max-inline-size: 320px;
 		padding: 12px;
+		border: 1px solid var(--feedback-line);
 		border-radius: 12px;
 		background: var(--pill-bg);
-		backdrop-filter: blur(8px);
 		box-shadow: var(--pill-shadow);
 		z-index: 10001;
 	}
 
 	.props-panel-title {
-		color: hsl(25 100% 80%);
+		color: var(--accent-strong);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1560,7 +1683,7 @@
 	:global([data-props-panel-checkbox-field]) {
 		display: grid;
 		justify-content: start;
-		color: hsl(220 10% 88%);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1570,7 +1693,7 @@
 	}
 
 	:global([data-props-panel-label]) {
-		color: hsl(220 10% 60%);
+		color: var(--feedback-muted);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1582,27 +1705,27 @@
 	}
 
 	:global([data-props-panel-input]) {
-		--dry-btn-bg: hsl(225 15% 10% / 0.6);
-		--dry-btn-border: hsl(220 10% 30%);
-		--dry-btn-color: hsl(220 10% 92%);
+		--dry-btn-bg: var(--feedback-sunken);
+		--dry-btn-border: var(--feedback-line);
+		--dry-btn-color: var(--feedback-ink);
 		--dry-btn-font-size: 12px;
 		--dry-btn-min-height: 0;
 		--dry-btn-padding-x: 10px;
 		--dry-btn-padding-y: 6px;
 		--dry-btn-radius: 6px;
-		--dry-input-bg: hsl(225 15% 10% / 0.6);
-		--dry-input-border: hsl(220 10% 30%);
-		--dry-input-color: hsl(220 10% 92%);
+		--dry-input-bg: var(--feedback-sunken);
+		--dry-input-border: var(--feedback-line);
+		--dry-input-color: var(--feedback-ink);
 		--dry-input-font-size: 12px;
 		--dry-input-padding-x: 10px;
 		--dry-input-padding-y: 6px;
 		--dry-input-radius: 6px;
 
 		padding: 6px 10px;
-		border: 1px solid hsl(220 10% 30%);
+		border: 1px solid var(--feedback-line);
 		border-radius: 6px;
-		background: hsl(225 15% 10% / 0.6);
-		color: hsl(220 10% 92%);
+		background: var(--feedback-sunken);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1631,8 +1754,8 @@
 
 	:global(.props-panel-btn) {
 		--dry-btn-bg: transparent;
-		--dry-btn-border: hsl(220 10% 25%);
-		--dry-btn-color: hsl(220 10% 88%);
+		--dry-btn-border: var(--feedback-line);
+		--dry-btn-color: var(--feedback-ink);
 		--dry-btn-font-size: 11px;
 		--dry-btn-min-height: 0;
 		--dry-btn-padding-x: 12px;
@@ -1640,10 +1763,10 @@
 		--dry-btn-radius: 6px;
 
 		padding: 6px 12px;
-		border: 1px solid hsl(220 10% 25%);
+		border: 1px solid var(--feedback-line);
 		border-radius: 6px;
 		background: transparent;
-		color: hsl(220 10% 88%);
+		color: var(--feedback-ink);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1659,38 +1782,38 @@
 	}
 
 	:global(.props-panel-btn:hover) {
-		--dry-btn-bg: hsl(225 15% 22%);
-		--dry-btn-border: hsl(220 10% 35%);
-		--dry-btn-color: hsl(220 10% 88%);
+		--dry-btn-bg: var(--feedback-panel-raised);
+		--dry-btn-border: var(--feedback-weak);
+		--dry-btn-color: var(--feedback-ink);
 
-		background: hsl(225 15% 22%);
-		border-color: hsl(220 10% 35%);
+		background: var(--feedback-panel-raised);
+		border-color: var(--feedback-weak);
 	}
 
 	:global(.props-panel-btn-primary) {
-		--dry-btn-bg: hsl(25 100% 55%);
-		--dry-btn-border: hsl(25 100% 55%);
-		--dry-btn-color: black;
+		--dry-btn-bg: var(--accent);
+		--dry-btn-border: var(--accent);
+		--dry-btn-color: oklch(8% 0.005 160);
 
-		background: hsl(25 100% 55%);
-		border-color: hsl(25 100% 55%);
-		color: black;
+		background: var(--accent);
+		border-color: var(--accent);
+		color: oklch(8% 0.005 160);
 	}
 
 	:global(.props-panel-btn-primary:hover) {
-		--dry-btn-bg: hsl(25 100% 62%);
-		--dry-btn-border: hsl(25 100% 62%);
-		--dry-btn-color: black;
+		--dry-btn-bg: var(--accent-strong);
+		--dry-btn-border: var(--accent-strong);
+		--dry-btn-color: oklch(8% 0.005 160);
 
-		background: hsl(25 100% 62%);
-		border-color: hsl(25 100% 62%);
-		color: black;
+		background: var(--accent-strong);
+		border-color: var(--accent-strong);
+		color: oklch(8% 0.005 160);
 	}
 
 	:global(.component-picker-preset) {
 		--dry-btn-bg: transparent;
 		--dry-btn-border: transparent;
-		--dry-btn-color: hsl(220 10% 80%);
+		--dry-btn-color: var(--feedback-muted);
 		--dry-btn-font-size: 12px;
 		--dry-btn-justify: stretch;
 		--dry-btn-align: center stretch;
@@ -1709,7 +1832,7 @@
 		border: none;
 		border-radius: 6px;
 		background: transparent;
-		color: hsl(220 10% 80%);
+		color: var(--feedback-muted);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1736,52 +1859,50 @@
 		content: '';
 		inline-size: 12px;
 		block-size: 1px;
-		background: hsl(25 100% 55% / 0);
+		background: oklch(73% 0.16 48 / 0);
 		transition: background 0.12s ease-out;
 	}
 
 	:global(.component-picker-preset:hover),
 	:global(.component-picker-preset:focus-visible) {
-		--dry-btn-bg: hsl(25 100% 55% / 0.1);
-		--dry-btn-color: hsl(25 100% 92%);
+		--dry-btn-bg: var(--accent-weak);
+		--dry-btn-color: var(--accent-strong);
 
-		background: hsl(25 100% 55% / 0.1);
-		color: hsl(25 100% 92%);
+		background: var(--accent-weak);
+		color: var(--accent-strong);
 		outline: none;
 	}
 
 	:global(.component-picker-preset:hover)::after,
 	:global(.component-picker-preset:focus-visible)::after {
-		background: hsl(25 100% 55%);
+		background: var(--accent);
 	}
 
 	:global(.submit-pill) {
-		--dry-btn-bg: hsl(145 50% 12% / 0.7);
-		--dry-btn-border: hsl(145 40% 26%);
-		--dry-btn-color: hsl(145 60% 70%);
+		--dry-btn-bg: oklch(18% 0.05 34 / 0.82);
+		--dry-btn-border: oklch(65% 0.19 34 / 0.36);
+		--dry-btn-color: oklch(88% 0.1 34);
 		--dry-btn-font-size: 11px;
-		--dry-btn-min-height: 32px;
+		--dry-btn-min-height: 30px;
 		--dry-btn-padding-x: 12px;
 		--dry-btn-padding-y: 0;
-		--dry-btn-radius: 12px;
+		--dry-btn-radius: 8px;
 
 		display: grid;
 		grid-auto-flow: column;
 		align-items: center;
 		gap: 6px;
 		padding: 0 12px;
-		block-size: 32px;
-		border: 1px solid hsl(145 40% 26%);
-		border-radius: 12px;
-		background: hsl(145 50% 12% / 0.7);
-		color: hsl(145 60% 70%);
+		block-size: 30px;
+		border: 1px solid oklch(65% 0.19 34 / 0.36);
+		border-radius: 8px;
+		background: oklch(18% 0.05 34 / 0.82);
+		color: oklch(88% 0.1 34);
 		font-family:
 			system-ui,
 			-apple-system,
 			sans-serif;
 		cursor: pointer;
-		backdrop-filter: blur(8px);
-		box-shadow: var(--pill-shadow);
 		transition:
 			background 0.15s,
 			border-color 0.15s,
@@ -1789,17 +1910,17 @@
 	}
 
 	:global(.submit-pill:hover:not([data-submitting])) {
-		--dry-btn-bg: hsl(145 55% 18%);
-		--dry-btn-border: hsl(145 55% 40%);
-		--dry-btn-color: hsl(145 70% 88%);
+		--dry-btn-bg: oklch(22% 0.07 34 / 0.92);
+		--dry-btn-border: oklch(76% 0.16 34 / 0.5);
+		--dry-btn-color: oklch(93% 0.07 34);
 
-		background: hsl(145 55% 18%);
-		border-color: hsl(145 55% 40%);
-		color: hsl(145 70% 88%);
+		background: oklch(22% 0.07 34 / 0.92);
+		border-color: oklch(76% 0.16 34 / 0.5);
+		color: oklch(93% 0.07 34);
 	}
 
 	:global(.submit-pill:focus-visible) {
-		outline: 2px solid hsl(145 60% 50%);
+		outline: 2px solid oklch(76% 0.16 34 / 0.9);
 		outline-offset: 1px;
 	}
 
@@ -1809,13 +1930,13 @@
 	}
 
 	:global(.submit-pill[data-sent]) {
-		--dry-btn-bg: hsl(145 65% 22%);
-		--dry-btn-border: hsl(145 65% 36%);
-		--dry-btn-color: hsl(145 70% 92%);
+		--dry-btn-bg: oklch(19% 0.05 205);
+		--dry-btn-border: oklch(73% 0.14 205 / 0.52);
+		--dry-btn-color: oklch(88% 0.08 205);
 
-		background: hsl(145 65% 22%);
-		border-color: hsl(145 65% 36%);
-		color: hsl(145 70% 92%);
+		background: oklch(19% 0.05 205);
+		border-color: oklch(73% 0.14 205 / 0.52);
+		color: oklch(88% 0.08 205);
 	}
 
 	.submit-label {
@@ -1857,9 +1978,15 @@
 			justify-content: stretch;
 		}
 
-		.tool-pill {
+		.tool-row {
 			grid-row: auto;
 			justify-self: stretch;
+			grid-auto-flow: row;
+			justify-content: stretch;
+			justify-items: stretch;
+		}
+
+		.tool-pill {
 			grid-auto-flow: row;
 			grid-template-columns: repeat(auto-fit, minmax(var(--tool-button-size), 1fr));
 			justify-content: stretch;
