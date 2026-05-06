@@ -25,7 +25,11 @@ function expectNoWildcardCors(response: Response): void {
 describe('feedback HTTP server', () => {
 	let store: FeedbackStore;
 	let bus: EventBus;
-	let server: { stop(): void; hostname: string; port: number };
+	let server: {
+		stop(closeActiveConnections?: boolean): Promise<void>;
+		hostname: string;
+		port: number;
+	};
 	let baseUrl: string;
 	let screenshotsDir: string;
 	let screenshotPaths: string[];
@@ -39,11 +43,16 @@ describe('feedback HTTP server', () => {
 		screenshotPaths = [];
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		for (const path of screenshotPaths) {
 			rmSync(path, { force: true });
 		}
-		server.stop();
+		// Bun's server.stop() is async and by default leaves in-flight requests
+		// and SSE keepalive streams running, which could otherwise race with the
+		// next test's beforeEach. Pass `true` to terminate active connections,
+		// and await the promise so the listener is fully released before the
+		// next test allocates a port (port: 0).
+		await server.stop(true);
 		store.close();
 		rmSync(screenshotsDir, { recursive: true, force: true });
 	});
@@ -490,7 +499,7 @@ describe('feedback HTTP server', () => {
 	});
 
 	test('reports dispatch targets for the launcher picker', async () => {
-		server.stop();
+		await server.stop(true);
 		server = startFeedbackHttpServer(store, bus, {
 			host: '127.0.0.1',
 			port: 0,
@@ -511,7 +520,7 @@ describe('feedback HTTP server', () => {
 	});
 
 	test('stamps new submissions with the dispatcher workspace', async () => {
-		server.stop();
+		await server.stop(true);
 		const workspace = '/tmp/dryui-stamp-workspace';
 		server = startFeedbackHttpServer(store, bus, {
 			host: '127.0.0.1',

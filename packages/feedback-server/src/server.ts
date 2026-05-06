@@ -48,7 +48,7 @@ function parseTerminalApp(raw: string | undefined, fallback: TerminalApp): Termi
 }
 
 interface StartedServer {
-	stop(): void;
+	stop(closeActiveConnections?: boolean): Promise<void>;
 	hostname: string;
 	port: number;
 }
