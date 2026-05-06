@@ -136,8 +136,7 @@ lines.push('};');
 lines.push('');
 
 const raw = lines.join('\n');
-const repoRoot = join(import.meta.dir, '..');
-const config = (await prettier.resolveConfig(repoRoot)) ?? {};
+const config = (await prettier.resolveConfig(OUT)) ?? {};
 const formatted = await prettier.format(raw, { ...config, filepath: OUT });
 writeFileSync(OUT, formatted);
 console.log(`Wrote schemas for ${sortedNames.length} components to ${OUT}`);

@@ -164,7 +164,7 @@ describe('Missing tokens', () => {
 });
 
 describe('Partial override (non-theme file)', () => {
-	test('app.css with 5 token overrides → single partial-override info (not 44 errors)', () => {
+	test('app.css with 5 token overrides → single partial-override suggestion (not 44 errors)', () => {
 		// Use brand tokens (fill-brand/on-brand is a pairing, so add both); status
 		// tokens are single so they won't trigger missing-pairing warnings.
 		const css = `:root {
@@ -179,7 +179,7 @@ describe('Partial override (non-theme file)', () => {
 		expect(missing.length).toBe(0);
 		const partial = result.issues.filter((i) => i.code === 'partial-override');
 		expect(partial.length).toBe(1);
-		expect(partial[0]!.severity).toBe('info');
+		expect(partial[0]!.severity).toBe('suggestion');
 		expect(partial[0]!.message).toContain('customize tokens');
 	});
 
@@ -433,13 +433,13 @@ describe('Var resolution', () => {
 		).toBe(true);
 	});
 
-	test('unresolvable var(--external-var) → info unresolvable reference', () => {
+	test('unresolvable var(--external-var) → suggestion unresolvable reference', () => {
 		const css = `:root {
   --dry-color-bg-base: var(--external-var);
 }`;
 		const result = diagnoseTheme(css, mockSpec);
 		expect(
-			result.issues.some((i) => i.severity === 'info' && i.variable === '--dry-color-bg-base')
+			result.issues.some((i) => i.severity === 'suggestion' && i.variable === '--dry-color-bg-base')
 		).toBe(true);
 	});
 });

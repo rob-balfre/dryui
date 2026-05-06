@@ -1,29 +1,25 @@
 // DryUI Component Check Engine.
-// Runs spec-driven structural + a11y checks plus the shared `@dryui/lint`
-// ruleset against a single Svelte file. Pure string/regex parsing - no Svelte
-// compiler required. Design-opinion / polish rules are delegated to impeccable.
+// Runs spec-driven structural + a11y checks against a single Svelte file.
+// Pure string/regex parsing - no Svelte compiler required. Sort + count of
+// issues delegates to `@dryui/lint/diagnostic-summary` so every checker shares
+// one severity vocabulary and ordering rule. Design-opinion / polish rules
+// are delegated to impeccable.
 
 import {
-	RULE_CATALOG,
-	ruleMessage,
-	ruleSuggestedFix,
-	type RuleCatalogId,
-	type RuleSeverity
-} from '@dryui/lint/rule-catalog';
-import { checkSvelteFile, stripBlocks, type Violation } from '@dryui/lint/rules';
-import { buildLineOffsets, lineAtOffset } from './utils.js';
+	summarizeDiagnostics,
+	type Diagnostic,
+	type DiagnosticSummary
+} from '@dryui/lint/diagnostic-summary';
+import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
+import { stripBlocks } from '@dryui/lint/rules';
+import {
+	collectDryUiImports,
+	collectSvelteComponentUsages,
+	extractSvelteScriptBody,
+	type SvelteComponentUsage
+} from '@dryui/lint/svelte-source-facts';
 
-export interface Issue {
-	readonly severity: 'error' | 'warning' | 'suggestion';
-	readonly code: string;
-	readonly line: number;
-	readonly message: string;
-	readonly fix: string | null;
-}
-
-export interface ReviewResult {
-	readonly issues: Issue[];
-	readonly summary: string;
+export interface ReviewResult extends DiagnosticSummary<Diagnostic> {
 	readonly filename?: string;
 }
 
@@ -39,132 +35,10 @@ export interface ComponentDef {
 	readonly cssVars: Record<string, string>;
 }
 
-interface TagInfo {
-	readonly name: string;
-	readonly line: number;
-	readonly props: string[];
-	readonly hasSpread: boolean;
-	readonly selfClosing: boolean;
-}
+type TagInfo = SvelteComponentUsage;
 
 interface ReviewContext {
 	readonly template: string;
-	readonly lineOffsets: number[];
-}
-
-function extractScriptBody(code: string): string {
-	const scriptMatch = code.match(/<script[^>]*>([\s\S]*?)<\/script>/);
-	return scriptMatch?.[1] ?? '';
-}
-
-function extractImports(scriptBody: string): Set<string> {
-	const imports = new Set<string>();
-	if (!scriptBody) return imports;
-
-	const importRegex = /import\s*\{([^}]+)\}\s*from\s*['"]@dryui\/(ui|primitives)['"]/g;
-
-	for (const match of scriptBody.matchAll(importRegex)) {
-		const raw = match[1] ?? '';
-		const names = raw.split(',');
-		for (const name of names) {
-			const trimmed = name.trim();
-			if (trimmed) imports.add(trimmed);
-		}
-	}
-
-	return imports;
-}
-
-function extractTags(ctx: ReviewContext): TagInfo[] {
-	const { template, lineOffsets } = ctx;
-	const tagRegex = /<([A-Z][a-zA-Z0-9]*(?:\.[A-Z][a-zA-Z0-9]*)*)\s*([^>]*?)(\/)?>/g;
-	const tags: TagInfo[] = [];
-
-	for (const match of template.matchAll(tagRegex)) {
-		const name = match[1] ?? '';
-		const attrsStr = match[2] ?? '';
-		const selfClosing = match[3] === '/';
-		const line = lineAtOffset(lineOffsets, match.index ?? 0);
-		const props = extractPropsFromAttrs(attrsStr);
-		const hasSpread = /\{\.\.\./.test(attrsStr);
-
-		tags.push({ name, line, props, hasSpread, selfClosing });
-	}
-
-	return tags;
-}
-
-function stripBraceExpressions(str: string): string {
-	let result = '';
-	let depth = 0;
-	for (let i = 0; i < str.length; i++) {
-		if (str[i] === '{') {
-			if (depth === 0) result += '{}';
-			depth++;
-		} else if (str[i] === '}') {
-			depth--;
-		} else if (depth === 0) {
-			result += str[i];
-		}
-	}
-	return result;
-}
-
-function extractPropsFromAttrs(attrsStr: string): string[] {
-	const props: string[] = [];
-	if (!attrsStr.trim()) return props;
-
-	// Svelte shorthand props: {tokens} is equivalent to tokens={tokens}.
-	const shorthandRegex = /(?:^|\s)\{\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\}/g;
-	for (const m of attrsStr.matchAll(shorthandRegex)) {
-		const propName = m[1];
-		if (propName && !props.includes(propName)) {
-			props.push(propName);
-		}
-	}
-
-	// Strip quoted strings and brace expressions to avoid matching values as prop names.
-	const stripped = stripBraceExpressions(
-		attrsStr.replace(/"[^"]*"/g, '""').replace(/'[^']*'/g, "''")
-	);
-
-	// bind:propName
-	const bindRegex = /\bbind:([a-zA-Z_][a-zA-Z0-9_]*)/g;
-	for (const m of stripped.matchAll(bindRegex)) {
-		const bound = m[1];
-		if (bound) props.push('bind:' + bound);
-	}
-
-	// Svelte component CSS custom properties: --token-name={...} or --token-name="..."
-	const cssCustomPropertyRegex = /(?<![\w-])(--[a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
-	for (const m of stripped.matchAll(cssCustomPropertyRegex)) {
-		const propName = m[1];
-		if (propName && !props.includes(propName)) {
-			props.push(propName);
-		}
-	}
-
-	// propName={ or propName="
-	const namedRegex = /(?<![\w:-])([a-zA-Z_][a-zA-Z0-9_-]*)\s*=/g;
-	for (const m of stripped.matchAll(namedRegex)) {
-		const propName = m[1];
-		if (propName && !props.includes(propName)) {
-			props.push(propName);
-		}
-	}
-
-	// Boolean props: bare identifiers not followed by =
-	const boolRegex = /(?<!\.)(?<![:{-])\b([a-zA-Z_][a-zA-Z0-9_-]*)\b(?!\s*=)/g;
-	for (const m of stripped.matchAll(boolRegex)) {
-		const propName = m[1];
-		if (!propName) continue;
-		if (props.includes(propName) || props.includes('bind:' + propName) || propName === 'bind') {
-			continue;
-		}
-		props.push(propName);
-	}
-
-	return props;
 }
 
 const NATIVE_HTML_ATTRS: ReadonlySet<string> = new Set([
@@ -363,8 +237,8 @@ function isPropAllowed(propName: string): boolean {
 function checkBareCompound(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		if (tag.name.includes('.')) continue;
 		const def = spec.components[tag.name];
@@ -412,8 +286,8 @@ function checkUnknownComponent(
 	tags: TagInfo[],
 	imports: Set<string>,
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		const root = tag.name.split('.')[0] ?? tag.name;
 		if (imports.has(root) && !spec.components[root]) {
@@ -432,8 +306,8 @@ function checkUnknownComponent(
 function checkInvalidPartName(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		if (!tag.name.includes('.')) continue;
 		const parts = tag.name.split('.');
@@ -484,8 +358,8 @@ function resolveSpecPropsForTag(
 function checkInvalidProp(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		const specProps = resolveSpecPropsForTag(tag, spec);
 		if (!specProps) continue;
@@ -514,8 +388,8 @@ function checkInvalidProp(
 function checkMissingRequiredProp(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		if (tag.hasSpread) continue;
 
@@ -550,8 +424,8 @@ function checkMissingRequiredProp(
 function checkOrphanedPart(
 	tags: TagInfo[],
 	spec: { components: Record<string, ComponentDef> }
-): Issue[] {
-	const issues: Issue[] = [];
+): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	const allNames = new Set(tags.map((t) => t.name));
 
 	for (const tag of tags) {
@@ -576,9 +450,9 @@ function checkOrphanedPart(
 	return issues;
 }
 
-function checkMissingLabel(tags: TagInfo[], ctx: ReviewContext): Issue[] {
-	const issues: Issue[] = [];
-	const { template, lineOffsets } = ctx;
+function checkMissingLabel(tags: TagInfo[], ctx: ReviewContext): Diagnostic[] {
+	const issues: Diagnostic[] = [];
+	const { template } = ctx;
 
 	for (const tag of tags) {
 		if (tag.name !== 'Input' && tag.name !== 'Select.Root' && tag.name !== 'Combobox.Input')
@@ -586,12 +460,9 @@ function checkMissingLabel(tags: TagInfo[], ctx: ReviewContext): Issue[] {
 		const hasAriaLabel = tag.props.some((p) => p === 'aria-label');
 		if (hasAriaLabel) continue;
 
-		// Find the offset of this tag in the template to check proximity.
-		const tagOffset = findTagOffset(template, tag.name, tag.line, lineOffsets);
 		const wrappedByField =
-			tagOffset !== -1 &&
-			template.lastIndexOf('<Field.Root', tagOffset) !== -1 &&
-			template.indexOf('</Field.Root>', tagOffset) !== -1;
+			template.lastIndexOf('<Field.Root', tag.index) !== -1 &&
+			template.indexOf('</Field.Root>', tag.index) !== -1;
 
 		if (!wrappedByField) {
 			issues.push({
@@ -606,24 +477,8 @@ function checkMissingLabel(tags: TagInfo[], ctx: ReviewContext): Issue[] {
 	return issues;
 }
 
-/** Find the offset of a tag occurrence at a given line in the template. */
-function findTagOffset(
-	template: string,
-	tagName: string,
-	targetLine: number,
-	lineOffsets: number[]
-): number {
-	const regex = new RegExp(`<${tagName.replace('.', '\\.')}[\\s/>]`, 'g');
-	for (const match of template.matchAll(regex)) {
-		const offset = match.index ?? 0;
-		const line = lineAtOffset(lineOffsets, offset);
-		if (line === targetLine) return offset;
-	}
-	return -1;
-}
-
-function checkImageWithoutAlt(tags: TagInfo[]): Issue[] {
-	const issues: Issue[] = [];
+function checkImageWithoutAlt(tags: TagInfo[]): Diagnostic[] {
+	const issues: Diagnostic[] = [];
 	for (const tag of tags) {
 		if (tag.name !== 'Avatar') continue;
 		const hasAlt = tag.props.includes('alt');
@@ -654,135 +509,26 @@ export function reviewComponent(
 ): ReviewResult {
 	const template = stripBlocks(code);
 	const ctx: ReviewContext = {
-		template,
-		lineOffsets: buildLineOffsets(template)
+		template
 	};
-	const imports = extractImports(extractScriptBody(code));
-	const tags = extractTags(ctx);
-	const issues: Issue[] = [];
-
-	issues.push(...checkBareCompound(tags, spec));
-	issues.push(...checkUnknownComponent(tags, imports, spec));
-	issues.push(...checkInvalidPartName(tags, spec));
-	issues.push(...checkInvalidProp(tags, spec));
-	issues.push(...checkMissingRequiredProp(tags, spec));
-	issues.push(...checkOrphanedPart(tags, spec));
-	issues.push(...checkMissingLabel(tags, ctx));
-	issues.push(...checkImageWithoutAlt(tags));
-
-	issues.sort((a, b) => a.line - b.line);
-
-	return { issues, summary: summarizeIssues(issues), ...(filename ? { filename } : {}) };
-}
-
-interface ComponentIssue {
-	readonly severity: RuleSeverity;
-	readonly code: string;
-	readonly line: number;
-	readonly message: string;
-	readonly fix: string | null;
-}
-
-interface ComponentCheckResult {
-	readonly issues: ComponentIssue[];
-	readonly summary: string;
-	readonly filename?: string;
-}
-
-function isRuleCatalogId(value: string): value is RuleCatalogId {
-	return value in RULE_CATALOG;
-}
-
-// Some violation rule ids use a `project/` prefix to identify findings that
-// straddle files (e.g. `project/theme-import-order`), but their catalog entry
-// is keyed by the short name. Map prefix -> catalog id here.
-const PROJECT_RULE_TO_CATALOG_ID: Record<string, RuleCatalogId> = {
-	'project/theme-import-order': 'theme-import-order'
-};
-
-function lintViolationToIssue(violation: Violation): ComponentIssue {
-	if (isRuleCatalogId(violation.rule)) {
-		return {
-			severity: RULE_CATALOG[violation.rule].severity,
-			code: violation.rule,
-			line: violation.line,
-			message: violation.message,
-			fix: ruleSuggestedFix(violation.rule)
-		};
-	}
-
-	const mapped = PROJECT_RULE_TO_CATALOG_ID[violation.rule];
-	if (mapped) {
-		return {
-			severity: RULE_CATALOG[mapped].severity,
-			code: violation.rule,
-			line: violation.line,
-			message: violation.message,
-			fix: ruleSuggestedFix(mapped)
-		};
-	}
-
-	return {
-		severity: 'error',
-		code: violation.rule,
-		line: violation.line,
-		message: violation.message,
-		fix: null
-	};
-}
-
-function dedupeIssues(issues: ComponentIssue[]): ComponentIssue[] {
-	const seen = new Set<string>();
-	return issues.filter((issue) => {
-		const key = `${issue.code}:${issue.line}:${issue.message}`;
-		if (seen.has(key)) return false;
-		seen.add(key);
-		return true;
-	});
-}
-
-function summarizeIssues(issues: readonly ComponentIssue[]): string {
-	if (issues.length === 0) return 'No issues found';
-
-	let errors = 0;
-	let warnings = 0;
-	let suggestions = 0;
-	let info = 0;
-
-	for (const issue of issues) {
-		if (issue.severity === 'error') errors += 1;
-		else if (issue.severity === 'warning') warnings += 1;
-		else if (issue.severity === 'suggestion') suggestions += 1;
-		else info += 1;
-	}
-
-	let summary = `${errors} error${errors !== 1 ? 's' : ''}, ${warnings} warning${warnings !== 1 ? 's' : ''}, ${suggestions} suggestion${suggestions !== 1 ? 's' : ''}`;
-	if (info > 0) {
-		summary += `, ${info} info`;
-	}
-	return summary;
-}
-
-export function checkComponent(
-	code: string,
-	spec: { components: Record<string, ComponentDef> },
-	filename?: string
-): ComponentCheckResult {
-	const review = reviewComponent(code, spec, filename);
-	const lintIssues = checkSvelteFile(code, filename).map(lintViolationToIssue);
-	const issues = dedupeIssues([...review.issues, ...lintIssues]).sort((left, right) => {
-		if (left.line !== right.line) return left.line - right.line;
-		if (left.severity !== right.severity) {
-			const rank = { error: 3, warning: 2, suggestion: 1, info: 0 } as const;
-			return rank[right.severity] - rank[left.severity];
-		}
-		if (left.code !== right.code) return left.code.localeCompare(right.code);
-		return left.message.localeCompare(right.message);
-	});
-
-	return {
-		issues,
-		summary: summarizeIssues(issues),
-		...(filename ? { filename } : {})
-	};
+	const imports = new Set(
+		collectDryUiImports(extractSvelteScriptBody(code))
+			.filter(
+				(dryImport) =>
+					dryImport.specifier === '@dryui/ui' || dryImport.specifier === '@dryui/primitives'
+			)
+			.map((dryImport) => dryImport.name)
+	);
+	const tags = collectSvelteComponentUsages(template);
+	const issues: Diagnostic[] = [
+		...checkBareCompound(tags, spec),
+		...checkUnknownComponent(tags, imports, spec),
+		...checkInvalidPartName(tags, spec),
+		...checkInvalidProp(tags, spec),
+		...checkMissingRequiredProp(tags, spec),
+		...checkOrphanedPart(tags, spec),
+		...checkMissingLabel(tags, ctx),
+		...checkImageWithoutAlt(tags)
+	];
+	return { ...summarizeDiagnostics(issues), ...(filename ? { filename } : {}) };
 }

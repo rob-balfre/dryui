@@ -1,6 +1,11 @@
 // DryUI Theme Diagnosis Engine
 // Pure functions, no MCP dependency. Same pattern as component-checker.ts.
 
+import {
+	summarizeDiagnostics,
+	type Diagnostic,
+	type DiagnosticSummary
+} from '@dryui/lint/diagnostic-summary';
 import { ruleMessage, ruleSuggestedFix } from '@dryui/lint/rule-catalog';
 import { buildLineOffsets, lineAtOffset } from './utils.js';
 import {
@@ -16,19 +21,13 @@ function capture(match: RegExpMatchArray, index: number): string {
 	return value;
 }
 
-export interface DiagnoseIssue {
-	readonly severity: 'error' | 'warning' | 'info';
-	readonly code: string;
+export interface DiagnoseIssue extends Diagnostic {
 	readonly variable: string;
 	readonly value?: string;
-	readonly message: string;
-	readonly fix: string | null;
 }
 
-export interface DiagnoseResult {
+export interface DiagnoseResult extends DiagnosticSummary<DiagnoseIssue> {
 	readonly variables: { readonly found: number; readonly required: number; readonly extra: number };
-	readonly issues: DiagnoseIssue[];
-	readonly summary: string;
 }
 
 interface VarEntry {
@@ -524,11 +523,17 @@ function checkMissingTokens(vars: Map<string, ResolvedVar>, isFullTheme: boolean
 	if (semanticCount < FULL_THEME_THRESHOLD) return [];
 
 	if (!isFullTheme) {
-		// Partial override: one info, not N errors. Steer the user toward the recipe.
+		// Partial override: one suggestion, not N errors. Steer the user toward the recipe.
+		// Anchor to the first defined --dry-color-* token's line so editors place the marker sensibly.
+		const firstSemanticLine =
+			REQUIRED_TOKENS.map((t) => vars.get(t)?.line).find(
+				(n): n is number => typeof n === 'number'
+			) ?? 1;
 		return [
 			{
-				severity: 'info',
+				severity: 'suggestion',
 				code: 'partial-override',
+				line: firstSemanticLine,
 				variable: '--dry-color-*',
 				message: ruleMessage('partial-override', { count: semanticCount }),
 				fix: ruleSuggestedFix('partial-override')
@@ -542,6 +547,7 @@ function checkMissingTokens(vars: Map<string, ResolvedVar>, isFullTheme: boolean
 			issues.push({
 				severity: 'error',
 				code: 'missing-token',
+				line: 1,
 				variable: token,
 				message: ruleMessage('missing-token', { variable: token }),
 				fix: ruleSuggestedFix('missing-token', { variable: token })
@@ -570,6 +576,7 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 			issues.push({
 				severity: 'error',
 				code: 'wrong-type',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('wrong-type', {
@@ -590,6 +597,7 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 			issues.push({
 				severity: 'error',
 				code: 'wrong-type',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('wrong-type', {
@@ -610,6 +618,7 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 			issues.push({
 				severity: 'error',
 				code: 'wrong-type',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('wrong-type', {
@@ -630,6 +639,7 @@ function checkValueTypes(vars: Map<string, ResolvedVar>): DiagnoseIssue[] {
 			issues.push({
 				severity: 'error',
 				code: 'wrong-type',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('wrong-type', {
@@ -663,6 +673,7 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 			issues.push({
 				severity: 'warning',
 				code: 'transparent-surface',
+				line: entry.line,
 				variable: token,
 				value: entry.original,
 				message: ruleMessage('transparent-surface', { alpha }),
@@ -697,6 +708,7 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 					issues.push({
 						severity: 'warning',
 						code: 'low-contrast-text',
+						line: textEntry.line,
 						variable: tokenName,
 						value: textEntry.original,
 						message: ruleMessage('low-contrast-text', {
@@ -724,6 +736,7 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				issues.push({
 					severity: 'warning',
 					code: 'no-elevation',
+					line: bgRaisedEntry.line,
 					variable: '--dry-color-bg-raised',
 					value: bgRaisedEntry.original,
 					message: ruleMessage('no-elevation', {
@@ -748,6 +761,7 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				issues.push({
 					severity: 'warning',
 					code: 'no-elevation',
+					line: bgOverlayEntry.line,
 					variable: '--dry-color-bg-overlay',
 					value: bgOverlayEntry.original,
 					message: ruleMessage('no-elevation', {
@@ -764,10 +778,13 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 
 	// missing-pairing: on-brand without fill-brand, on-{tone} without fill-{tone}
 	for (const [a, b] of COLOR_PAIRINGS) {
-		if (vars.has(a) && !vars.has(b)) {
+		const aEntry = vars.get(a);
+		const bEntry = vars.get(b);
+		if (aEntry && !bEntry) {
 			issues.push({
 				severity: 'warning',
 				code: 'missing-pairing',
+				line: aEntry.line,
 				variable: b,
 				message: ruleMessage('missing-pairing', {
 					source: a,
@@ -776,10 +793,11 @@ function checkContrastHeuristics(vars: Map<string, ResolvedVar>): DiagnoseIssue[
 				fix: ruleSuggestedFix('missing-pairing', { missing: b })
 			});
 		}
-		if (vars.has(b) && !vars.has(a)) {
+		if (bEntry && !aEntry) {
 			issues.push({
 				severity: 'warning',
 				code: 'missing-pairing',
+				line: bEntry.line,
 				variable: a,
 				message: ruleMessage('missing-pairing', {
 					source: b,
@@ -819,6 +837,7 @@ function checkComponentTokens(
 			issues.push({
 				severity: 'warning',
 				code: 'unknown-component-token',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('unknown-component-token', { variable: name }),
@@ -834,6 +853,7 @@ function checkComponentTokens(
 				issues.push({
 					severity: 'warning',
 					code: 'transparent-component-bg',
+					line: entry.line,
 					variable: name,
 					value: entry.original,
 					message: ruleMessage('transparent-component-bg', {
@@ -848,6 +868,7 @@ function checkComponentTokens(
 					issues.push({
 						severity: 'warning',
 						code: 'transparent-component-bg',
+						line: entry.line,
 						variable: name,
 						value: entry.original,
 						message: ruleMessage('transparent-component-bg', {
@@ -907,6 +928,7 @@ function detectDarkScheme(css: string, allVars: Map<string, string>): DiagnoseIs
 		issues.push({
 			severity: 'warning',
 			code: 'dark-scheme-no-overrides',
+			line: 1,
 			variable: '--dry-color-*',
 			message: ruleMessage('dark-scheme-no-overrides', {
 				signals: signals.join(', ')
@@ -935,16 +957,17 @@ export function diagnoseTheme(
 	// 3. Resolve var references
 	const resolved = resolveVarReferences(dryVars, allVars);
 
-	// Emit info-level notes for unresolvable var() references
-	const infoIssues: DiagnoseIssue[] = [];
+	// Emit suggestion-level notes for unresolvable var() references
+	const suggestionIssues: DiagnoseIssue[] = [];
 	for (const [name, entry] of resolved) {
 		if (/^var\(\s*--/.test(entry.resolved) && entry.resolved === entry.original) {
 			// The value is still a var() reference after resolution — unresolvable
 			const varRefMatch = entry.original.match(/var\(\s*(--[a-zA-Z0-9-]+)/);
 			const refName = varRefMatch?.[1] ?? 'unknown';
-			infoIssues.push({
-				severity: 'info',
+			suggestionIssues.push({
+				severity: 'suggestion',
 				code: 'unresolvable-var',
+				line: entry.line,
 				variable: name,
 				value: entry.original,
 				message: ruleMessage('unresolvable-var', {
@@ -965,23 +988,14 @@ export function diagnoseTheme(
 	// 4b. If no --dry-* overrides found, check for dark scheme mismatch
 	const darkSchemeIssues = dryVars.size === 0 ? detectDarkScheme(css, allVars) : [];
 
-	const allIssues = [...tier1, ...tier2, ...tier3, ...tier4, ...darkSchemeIssues, ...infoIssues];
-
-	const severityOrder: Record<string, number> = { error: 0, warning: 1, info: 2 };
-	allIssues.sort((a, b) => (severityOrder[a.severity] ?? 2) - (severityOrder[b.severity] ?? 2));
-
-	let errors = 0;
-	let warnings = 0;
-	let infos = 0;
-	for (const issue of allIssues) {
-		if (issue.severity === 'error') errors += 1;
-		else if (issue.severity === 'warning') warnings += 1;
-		else infos += 1;
-	}
-	const summary =
-		allIssues.length === 0
-			? 'No issues found'
-			: `${errors} error${errors !== 1 ? 's' : ''}, ${warnings} warning${warnings !== 1 ? 's' : ''}, ${infos} info`;
+	const allIssues = [
+		...tier1,
+		...tier2,
+		...tier3,
+		...tier4,
+		...darkSchemeIssues,
+		...suggestionIssues
+	];
 
 	// 7. Count variables
 	const found = dryVars.size;
@@ -991,7 +1005,6 @@ export function diagnoseTheme(
 
 	return {
 		variables: { found, required: requiredFound, extra },
-		issues: allIssues,
-		summary
+		...summarizeDiagnostics(allIssues)
 	};
 }

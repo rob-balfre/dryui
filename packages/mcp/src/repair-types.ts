@@ -10,7 +10,7 @@
  * `hint` and docs pointer when the `code` is known.
  */
 export type DryUiRepairIssueSource = 'lint' | 'theme' | 'workspace' | 'parse';
-export type DryUiRepairIssueSeverity = 'error' | 'warning' | 'suggestion' | 'info';
+export type DryUiRepairIssueSeverity = 'error' | 'warning' | 'suggestion';
 
 export interface DryUiRepairFix {
 	readonly before: string;
@@ -46,7 +46,6 @@ export interface DryUiRepairReport {
 		readonly error: number;
 		readonly warning: number;
 		readonly suggestion: number;
-		readonly info: number;
 		readonly autoFixable: number;
 	};
 }
