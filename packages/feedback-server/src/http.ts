@@ -11,16 +11,14 @@ import {
 } from './dispatch.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
+import { handleSubmissionHttp } from './submission-http.js';
 import type {
 	ActionRequest,
 	Annotation,
 	CreateAnnotationInput,
 	CreateSessionInput,
-	CreateSubmissionInput,
 	PendingResponse,
 	SSEEvent,
-	SubmissionQueryStatus,
-	SubmissionStatus,
 	ThreadMessage,
 	UpdateAnnotationInput
 } from './types.js';
@@ -285,10 +283,6 @@ async function uiResponse(requestUrl: URL): Promise<Response | null> {
 	return errorResponse(404, 'Not found');
 }
 
-function isSubmissionQueryStatus(value: string | null): value is SubmissionQueryStatus {
-	return value === null || value === 'pending' || value === 'resolved' || value === 'all';
-}
-
 function createEventStream(
 	request: Request,
 	bus: EventBus,
@@ -551,75 +545,17 @@ export function startFeedbackHttpServer(
 					}
 				}
 
-				if (pathname === '/submissions' && request.method === 'POST') {
-					let body: CreateSubmissionInput;
-					try {
-						body = await readJson<CreateSubmissionInput>(request);
-					} catch {
-						return errorResponse(400, 'Invalid JSON');
-					}
-					const submission = store.createSubmission(body, {
-						workspace: options.dispatcher?.workspace
-					});
-					if (!submission) return errorResponse(400, 'Invalid submission');
-					emit(bus, 'submission.created', submission.url, submission);
-					return json(submission, 201);
-				}
-
-				if (pathname === '/submissions' && request.method === 'GET') {
-					const status = url.searchParams.get('status');
-					if (!isSubmissionQueryStatus(status)) {
-						return errorResponse(400, 'Invalid submission status filter');
-					}
-
-					return json(store.listSubmissionPresentations(status ?? 'pending'));
-				}
-
-				const submissionScreenshotMatch = pathname.match(/^\/submissions\/([^/]+)\/screenshot$/);
-				if (submissionScreenshotMatch && request.method === 'GET') {
-					const submissionId = decodeURIComponent(submissionScreenshotMatch[1] ?? '');
-					const submission = store.getSubmission(submissionId);
-					if (!submission) return errorResponse(404, 'Not found');
-					// Format selector: ?format=png or ?format=webp. PNG has an empty
-					// string path for legacy rows, in which case we fall back to WebP.
-					const requested = url.searchParams.get('format');
-					const pngPath = submission.screenshotPath.png;
-					const targetPath =
-						requested === 'png' && pngPath ? pngPath : submission.screenshotPath.webp;
-					return (await fileResponse(targetPath)) ?? errorResponse(404, 'Not found');
-				}
-
-				const submissionMatch = pathname.match(/^\/submissions\/([^/]+)$/);
-				if (submissionMatch && request.method === 'GET') {
-					// Single-submission lookup. The dryui-feedback skill points the
-					// dispatched agent at this URL as the curl fallback when MCP
-					// `feedback_get_submissions` is unavailable.
-					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
-					const submission = store.getSubmissionPresentation(submissionId);
-					if (!submission) return errorResponse(404, 'Not found');
-					return json(submission);
-				}
-				if (submissionMatch && request.method === 'PATCH') {
-					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
-					try {
-						const body = await readJson<{ status: SubmissionStatus }>(request);
-						const rawSubmission = store.updateSubmissionStatus(submissionId, body.status);
-						if (!rawSubmission) return errorResponse(404, 'Not found');
-						const submission = store.getSubmissionPresentation(submissionId);
-						if (!submission) return errorResponse(404, 'Not found');
-						emit(bus, 'submission.updated', rawSubmission.url, rawSubmission);
-						return json(submission);
-					} catch {
-						return errorResponse(400, 'Invalid JSON');
-					}
-				}
-				if (submissionMatch && request.method === 'DELETE') {
-					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
-					const submission = store.deleteSubmission(submissionId);
-					if (!submission) return errorResponse(404, 'Not found');
-					emit(bus, 'submission.deleted', submission.url, submission);
-					return new Response(null, { status: 204, headers: CORS_HEADERS });
-				}
+				const submissionResponse = await handleSubmissionHttp(request, url, {
+					store,
+					bus,
+					dispatcherWorkspace: options.dispatcher?.workspace,
+					corsHeaders: CORS_HEADERS,
+					json,
+					errorResponse,
+					fileResponse,
+					readJson
+				});
+				if (submissionResponse) return submissionResponse;
 
 				const annotationMatch = pathname.match(/^\/annotations\/([^/]+)$/);
 				if (annotationMatch && request.method === 'GET') {

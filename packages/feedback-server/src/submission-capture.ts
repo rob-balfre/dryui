@@ -2,13 +2,18 @@ import { existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { Database } from 'bun:sqlite';
-import { DISPATCH_AGENTS } from './dispatch.js';
 import {
 	buildSubmissionPresentation,
 	buildSubmissionPresentationListResponse,
 	type SubmissionPresentation,
 	type SubmissionPresentationListResponse
 } from './submission-presentation.js';
+import {
+	normalizeSubmissionAgent,
+	serializeSubmissionInsert,
+	toSubmission,
+	type SubmissionRow
+} from './submission-storage-mapper.js';
 import type {
 	CreateSubmissionInput,
 	Submission,
@@ -22,11 +27,6 @@ import type {
 	SubmissionScrollOffset,
 	SubmissionStatus
 } from './types.js';
-
-const VALID_AGENTS: ReadonlySet<SubmissionAgent> = new Set<SubmissionAgent>([
-	...DISPATCH_AGENTS,
-	'off'
-]);
 
 interface TableColumnRow {
 	name: string;
@@ -60,11 +60,6 @@ function ensureColumn(db: Database, table: string, column: string, definition: s
 		return;
 	}
 	db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
-}
-
-function normalizeAgent(value: string | null | undefined): SubmissionAgent | undefined {
-	if (value && VALID_AGENTS.has(value as SubmissionAgent)) return value as SubmissionAgent;
-	return undefined;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -131,7 +126,7 @@ function normalizeCreateInput(
 	let agent: SubmissionAgent | undefined;
 	if (raw['agent'] !== undefined) {
 		if (typeof raw['agent'] !== 'string') return null;
-		agent = normalizeAgent(raw['agent']);
+		agent = normalizeSubmissionAgent(raw['agent']);
 		if (!agent) return null;
 	}
 
@@ -152,68 +147,8 @@ function normalizeCreateInput(
 	};
 }
 
-function parseJson<T>(value: string | null): T | undefined {
-	if (!value) return undefined;
-	try {
-		return JSON.parse(value) as T;
-	} catch {
-		return undefined;
-	}
-}
-
 function createTimestamp(): string {
 	return new Date().toISOString();
-}
-
-interface SubmissionRow {
-	id: string;
-	url: string;
-	screenshot_path: string;
-	screenshot_png_path: string | null;
-	drawings: string;
-	hints: string | null;
-	components: string | null;
-	removed: string | null;
-	moved: string | null;
-	// Dormant legacy column. Kept on the schema so existing databases don't need
-	// a destructive migration; the store no longer reads or writes to it.
-	layout_boxes: string | null;
-	viewport: string | null;
-	scroll: string | null;
-	status: SubmissionStatus;
-	created_at: string;
-	agent: string | null;
-	workspace: string | null;
-}
-
-function toSubmission(row: SubmissionRow): Submission {
-	const agent = normalizeAgent(row.agent);
-	const hints = parseJson<SubmissionDrawingHint[]>(row.hints);
-	const components = parseJson<SubmissionAddedComponent[]>(row.components);
-	const removed = parseJson<SubmissionRemovedElement[]>(row.removed);
-	const moved = parseJson<SubmissionMovedElement[]>(row.moved);
-	const scroll = parseJson<SubmissionScrollOffset>(row.scroll);
-	return {
-		id: row.id,
-		url: row.url,
-		screenshotPath: {
-			webp: row.screenshot_path,
-			// Legacy rows pre-dual-emission only have the WebP file. Expose an
-			// empty PNG path so readers can fall back to WebP explicitly.
-			png: row.screenshot_png_path ?? ''
-		},
-		drawings: parseJson<SubmissionDrawing[]>(row.drawings) ?? [],
-		...(hints ? { hints } : {}),
-		...(components && components.length > 0 ? { components } : {}),
-		...(removed && removed.length > 0 ? { removed } : {}),
-		...(moved && moved.length > 0 ? { moved } : {}),
-		viewport: parseJson<{ width: number; height: number }>(row.viewport) ?? null,
-		...(scroll !== undefined ? { scroll } : {}),
-		status: row.status as SubmissionStatus,
-		createdAt: row.created_at,
-		...(agent ? { agent } : {}),
-		...(row.workspace ? { workspace: row.workspace } : {})
-	};
 }
 
 export interface SubmissionCaptureOptions {
@@ -284,28 +219,29 @@ export class SubmissionCapture {
 			writeFileSync(pngPath, Buffer.from(normalized.image.png, 'base64'));
 			writtenPaths.push(pngPath);
 
+			const insertValues = serializeSubmissionInsert({
+				id,
+				url: normalized.url,
+				screenshotPath: { webp: webpPath, png: pngPath },
+				drawings: normalized.drawings,
+				hints: normalized.hints,
+				components: normalized.components,
+				removed: normalized.removed,
+				moved: normalized.moved,
+				...(normalized.viewport ? { viewport: normalized.viewport } : {}),
+				...(normalized.scroll ? { scroll: normalized.scroll } : {}),
+				createdAt: now,
+				...(normalized.agent ? { agent: normalized.agent } : {}),
+				workspace
+			});
+
 			this.db
 				.query(
 					`INSERT INTO submissions (
 						id, url, screenshot_path, screenshot_png_path, drawings, hints, components, removed, moved, viewport, scroll, status, created_at, agent, workspace
 					) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`
 				)
-				.run(
-					id,
-					normalized.url,
-					webpPath,
-					pngPath,
-					JSON.stringify(normalized.drawings),
-					normalized.hints.length > 0 ? JSON.stringify(normalized.hints) : null,
-					normalized.components.length > 0 ? JSON.stringify(normalized.components) : null,
-					normalized.removed.length > 0 ? JSON.stringify(normalized.removed) : null,
-					normalized.moved.length > 0 ? JSON.stringify(normalized.moved) : null,
-					normalized.viewport ? JSON.stringify(normalized.viewport) : null,
-					normalized.scroll ? JSON.stringify(normalized.scroll) : null,
-					now,
-					normalized.agent ?? null,
-					workspace
-				);
+				.run(...insertValues);
 		} catch (error) {
 			for (const path of writtenPaths) {
 				rmSync(path, { force: true });

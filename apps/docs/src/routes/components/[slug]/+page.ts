@@ -1,5 +1,5 @@
-import { allComponentNames, toSlug } from '$lib/nav';
+import { getComponentPagePrerenderEntries } from '$lib/component-page-manifest';
 
 export function entries() {
-	return allComponentNames().map((name) => ({ slug: toSlug(name) }));
+	return getComponentPagePrerenderEntries();
 }

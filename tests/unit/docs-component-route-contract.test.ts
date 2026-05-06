@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'bun:test';
+import {
+	componentPageManifest,
+	getComponentPagePrerenderEntries,
+	routeableComponentPageEntries,
+	toPreviewComponentPageData,
+	toPublicComponentPageData
+} from '../../apps/docs/src/lib/component-page-manifest';
+import { entries } from '../../apps/docs/src/routes/components/[slug]/+page';
 import { load } from '../../apps/docs/src/routes/components/[slug]/+page.server';
 import { load as loadPreview } from '../../apps/docs/src/routes/view/components/[slug]/+page.server';
-import componentPages from '../../apps/docs/src/lib/generated/component-pages.json';
 import { docsNavComponentNames } from '../../packages/mcp/src/component-catalog';
-import type { DocsComponentPagesManifest } from '../../packages/mcp/src/docs-component-pages';
 
 function callLoad(slug: string) {
 	return Promise.resolve(load({ params: { slug } } as Parameters<typeof load>[0]));
@@ -12,8 +18,6 @@ function callLoad(slug: string) {
 function callPreviewLoad(slug: string) {
 	return Promise.resolve(loadPreview({ params: { slug } } as Parameters<typeof loadPreview>[0]));
 }
-
-const componentPageManifest = componentPages as DocsComponentPagesManifest;
 
 describe('docs component route contract', () => {
 	it('keeps the manifest scoped to routeable docs nav components', () => {
@@ -40,6 +44,15 @@ describe('docs component route contract', () => {
 		expect(componentPageManifest.layoutHints.join('\n')).toContain('data-layout');
 		expect(componentPageManifest.layoutHints.join('\n')).toContain('grid-template-columns');
 		expect('themeImports' in componentPageManifest).toBe(false);
+	});
+
+	it('centralizes routeable component page entries and prerender params', () => {
+		expect(routeableComponentPageEntries.map((entry) => entry.name).sort()).toEqual(
+			[...docsNavComponentNames].sort()
+		);
+		expect(getComponentPagePrerenderEntries()).toEqual(entries());
+		expect(getComponentPagePrerenderEntries()).toContainEqual({ slug: 'button' });
+		expect(getComponentPagePrerenderEntries()).not.toContainEqual({ slug: 'affix-group' });
 	});
 
 	it('returns name-based page data for ui components', async () => {
@@ -81,6 +94,32 @@ describe('docs component route contract', () => {
 
 		expect(data.name).toBe('Reveal');
 		expect(data.quickStartCode).toContain("import { Reveal } from '@dryui/ui'");
+	});
+
+	it('keeps public and preview projections separate from manifest-only fields', () => {
+		const entry = componentPageManifest.components.Button;
+
+		expect(toPublicComponentPageData(entry)).toEqual({
+			name: entry.name,
+			description: entry.description,
+			compound: entry.compound,
+			props: entry.props,
+			parts: entry.parts,
+			forwardedProps: entry.forwardedProps,
+			groups: entry.groups,
+			a11y: entry.a11y,
+			cssVars: entry.cssVars,
+			dataAttributes: entry.dataAttributes,
+			rootImport: entry.rootImport,
+			subpathImport: entry.subpathImport,
+			quickStartCode: entry.quickStartCode
+		});
+		expect(toPreviewComponentPageData(entry)).toEqual({
+			name: entry.name,
+			description: entry.description,
+			category: entry.category,
+			sourcePackage: entry.sourcePackage
+		});
 	});
 
 	it('returns preview-only facts from the preview route adapter', async () => {
