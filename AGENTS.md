@@ -24,7 +24,7 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
-- Use DryUI skills as the default entry point. Run the local feedback dashboard with `bunx dryui-feedback`.
+- Use DryUI skills as the default entry point. Run the local feedback dashboard with `bunx dryui-feedback` (bin shipped from `@dryui/feedback-server`).
 - Use package-level lint/build/test commands for deterministic validation: component contracts, a11y, tokens, CSS discipline.
 - DryUI ships no layout component. Page/section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. The file is imported last from `src/routes/+layout.svelte` after DryUI theme CSS and `../app.css`.
 - All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Mobile-first; `@container` queries for responsive shifts, never `@media` for layout breakpoints.

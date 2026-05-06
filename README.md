@@ -10,13 +10,13 @@ DryUI gives engineers and their coding agents a shared UI system: reusable compo
 
 ## Workspace Packages
 
-| Package                  | Description                                                               |
-| ------------------------ | ------------------------------------------------------------------------- |
-| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                |
-| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming      |
-| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline     |
-| `@dryui/feedback`        | Optional feedback annotation UI                                           |
-| `@dryui/feedback-server` | Companion feedback server and MCP backend (run via `bunx dryui-feedback`) |
+| Package                  | Description                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------- |
+| `@dryui/primitives`      | Headless, unstyled components built on native browser APIs                                          |
+| `@dryui/ui`              | Styled components with scoped Svelte styles and CSS variable theming                                |
+| `@dryui/lint`            | Svelte preprocessor and Vite plugin that enforce DryUI CSS discipline                               |
+| `@dryui/feedback`        | Optional feedback annotation UI                                                                     |
+| `@dryui/feedback-server` | Feedback server, MCP backend (`dryui-feedback-mcp`), and dashboard launcher (`bunx dryui-feedback`) |
 
 ## Quick Start
 
