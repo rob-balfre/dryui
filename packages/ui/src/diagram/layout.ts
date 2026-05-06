@@ -131,9 +131,20 @@ function buildGraph(nodeIds: string[], edges: { from: string; to: string }[]): G
 
 // ── Layer Assignment (longest-path) ────────────────────────
 
-function assignLayers(order: string[], adjacencyOut: Map<string, string[]>): Map<string, number> {
+function assignLayers(
+	order: string[],
+	adjacencyOut: Map<string, string[]>,
+	options?: { sequenceMode?: boolean; inputOrder?: string[] }
+): Map<string, number> {
 	const layer = new Map<string, number>();
-	for (const id of order) layer.set(id, 0);
+	if (options?.sequenceMode && options.inputOrder) {
+		// Inside a directed cluster: array order seeds initial layers, so a
+		// cluster like { direction: 'TB', nodes: [a, b, c] } stacks a→b→c by
+		// array order even when the user provides no internal edges.
+		for (const [i, id] of options.inputOrder.entries()) layer.set(id, i);
+	} else {
+		for (const id of order) layer.set(id, 0);
+	}
 
 	for (const id of order) {
 		const currentLayer = layer.get(id)!;
@@ -724,7 +735,8 @@ function computeLayeredPositions(
 	edges: DiagramEdge[],
 	clusters: DiagramCluster[],
 	direction: DiagramDirection,
-	spacing: LayeredSpacing
+	spacing: LayeredSpacing,
+	sequenceMode = false
 ): LayeredPositions {
 	const nodeIds = nodes.map((n) => n.id);
 	const nodeDims = buildNodeDims(nodes);
@@ -737,7 +749,10 @@ function computeLayeredPositions(
 	}
 
 	const graph = buildGraph(nodeIds, edges);
-	const layerMap = assignLayers(graph.order, graph.adjacencyOut);
+	const layerMap = assignLayers(graph.order, graph.adjacencyOut, {
+		sequenceMode,
+		inputOrder: nodeIds
+	});
 
 	const maxLayer = Math.max(0, ...layerMap.values());
 	const layers: string[][] = Array.from({ length: maxLayer + 1 }, () => []);
@@ -853,9 +868,10 @@ function layoutLayeredPass(
 	clusters: DiagramCluster[],
 	direction: DiagramDirection,
 	spacing: LayeredSpacing,
-	superNodeIds?: Set<string>
+	superNodeIds?: Set<string>,
+	sequenceMode = false
 ): LayeredPassResult {
-	const pos = computeLayeredPositions(nodes, edges, clusters, direction, spacing);
+	const pos = computeLayeredPositions(nodes, edges, clusters, direction, spacing, sequenceMode);
 	return finishLayeredPass(edges, pos, direction, spacing, superNodeIds);
 }
 
@@ -987,7 +1003,8 @@ function layoutNested(
 	edges: DiagramEdge[],
 	allClusters: DiagramCluster[],
 	direction: DiagramDirection,
-	spacing: LayeredSpacing
+	spacing: LayeredSpacing,
+	sequenceMode = false
 ): LayeredPassResult {
 	const nodeIdSet = new Set(nodes.map((n) => n.id));
 	const localClusters = allClusters.filter((c) => c.nodes.every((n) => nodeIdSet.has(n)));
@@ -995,7 +1012,7 @@ function layoutNested(
 
 	if (directedLocal.length === 0) {
 		const flatLocal = localClusters.filter((c) => !c.direction);
-		return layoutLayeredPass(nodes, edges, flatLocal, direction, spacing);
+		return layoutLayeredPass(nodes, edges, flatLocal, direction, spacing, undefined, sequenceMode);
 	}
 
 	// Top-level directed clusters at this scope: not strictly contained in any
@@ -1042,11 +1059,18 @@ function layoutNested(
 			if (cached) {
 				subResult = cached;
 			} else {
-				subResult = layoutNested(subNodes, subEdges, [], cluster.direction!, subSpacing);
+				subResult = layoutNested(subNodes, subEdges, [], cluster.direction!, subSpacing, true);
 				setSubLayoutInCache(key, subResult);
 			}
 		} else {
-			subResult = layoutNested(subNodes, subEdges, nestedClusters, cluster.direction!, subSpacing);
+			subResult = layoutNested(
+				subNodes,
+				subEdges,
+				nestedClusters,
+				cluster.direction!,
+				subSpacing,
+				true
+			);
 		}
 		subLayouts.set(cluster.id, subResult);
 	}
@@ -1112,7 +1136,8 @@ function layoutNested(
 		outerEdges,
 		flatLocal,
 		direction,
-		spacing
+		spacing,
+		sequenceMode
 	);
 
 	const innerExtraPositions = new Map<string, { x: number; y: number }>();
@@ -1135,10 +1160,13 @@ function layoutNested(
 		}
 	}
 
-	// Build back-edge anchor overrides: each cross-boundary edge is keyed by
-	// its outer-pass form (super-node IDs), with the override pointing back at
-	// the original inner node ID. The router applies these only to back edges,
-	// so forward cross-boundary edges keep the super-node anchoring.
+	// Build cross-cluster anchor overrides: each cross-boundary edge is keyed
+	// by its outer-pass form (super-node IDs), with the override pointing back
+	// at the original inner node IDs. The router applies these to back edges
+	// always, and to forward edges when both endpoints sit inside (different)
+	// directed clusters — so the forward arrow points at the specific inner
+	// node rather than the cluster super-node center. When only one endpoint
+	// is inside a cluster, the forward edge keeps super-node anchoring.
 	const backEdgeAnchorOverrides = new Map<string, { source?: string; target?: string }>();
 	for (const edge of edges) {
 		const fromCluster = memberToDirectedCluster.get(edge.from);

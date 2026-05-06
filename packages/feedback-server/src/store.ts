@@ -4,6 +4,10 @@ import { randomUUID } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { SubmissionCapture } from './submission-capture.js';
 import type {
+	SubmissionPresentation,
+	SubmissionPresentationListResponse
+} from './submission-presentation.js';
+import type {
 	Annotation,
 	AnnotationKind,
 	AnnotationStatus,
@@ -523,12 +527,29 @@ export class FeedbackStore {
 		return this.submissionCapture.get(id);
 	}
 
+	getSubmissionPresentation(id: string): SubmissionPresentation | null {
+		return this.submissionCapture.getPresentation(id);
+	}
+
 	listSubmissions(status: SubmissionQueryStatus = 'all'): Submission[] {
 		return this.submissionCapture.list(status);
 	}
 
+	listSubmissionPresentations(
+		status: SubmissionQueryStatus = 'all'
+	): SubmissionPresentationListResponse {
+		return this.submissionCapture.listPresentations(status);
+	}
+
 	updateSubmissionStatus(id: string, status: SubmissionStatus): Submission | null {
 		return this.submissionCapture.updateStatus(id, status);
+	}
+
+	updateSubmissionStatusPresentation(
+		id: string,
+		status: SubmissionStatus
+	): SubmissionPresentation | null {
+		return this.submissionCapture.updateStatusPresentation(id, status);
 	}
 
 	deleteSubmission(id: string): Submission | null {

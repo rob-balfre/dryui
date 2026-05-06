@@ -10,7 +10,7 @@
 	let { data }: PageProps = $props();
 
 	let configuratorPromise = $derived(getComponentConfigurator(data.name));
-	let packageLabel = $derived(data.kind === 'primitive' ? '@dryui/primitives' : '@dryui/ui');
+	let packageLabel = $derived(data.sourcePackage);
 	let hasConfigurator = $derived(configuratorPromise !== null);
 	let previewMode = $derived.by(() => {
 		if (hasConfigurator) return 'live';

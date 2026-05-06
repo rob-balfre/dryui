@@ -122,8 +122,8 @@ export function computeEdgePaths(
 			const midpoint = getMidpointFromCollapsed(collapsed);
 			const labelOffset = side === 'over' ? -10 : side === 'under' ? 14 : 0;
 			out.push({
-				from: edge.from,
-				to: edge.to,
+				from: sourceId,
+				to: targetId,
 				path,
 				label: edge.label,
 				labelX: midpoint.x,
@@ -137,7 +137,18 @@ export function computeEdgePaths(
 			return;
 		}
 
-		const endpoints = getEndpoints(edge, positions, nodeDims, horizontal);
+		// For forward cross-cluster edges where BOTH endpoints sit inside
+		// directed clusters, anchor to the inner nodes so the arrow points at
+		// the specific item rather than the cluster super-node center. If only
+		// one endpoint is inside a cluster, keep super-node anchoring — that
+		// keeps `outer → inner` edges reading as "enter the cluster" instead
+		// of forcing a Z-shape that conflicts with the inner flow.
+		const overrides = backEdgeAnchorOverrides?.get(edgeKey(edge));
+		const useInnerAnchors = !!(overrides?.source && overrides?.target);
+		const routedEdge = useInnerAnchors
+			? { ...edge, from: overrides!.source!, to: overrides!.target! }
+			: edge;
+		const endpoints = getEndpoints(routedEdge, positions, nodeDims, horizontal);
 
 		if (!endpoints) {
 			out.push(emptyEdge(edge));
@@ -145,8 +156,8 @@ export function computeEdgePaths(
 			return;
 		}
 
-		const sourceSiblings = bySource.get(edge.from) || [];
-		const targetSiblings = byTarget.get(edge.to) || [];
+		const sourceSiblings = bySource.get(routedEdge.from) || [];
+		const targetSiblings = byTarget.get(routedEdge.to) || [];
 
 		let points: Point[];
 
@@ -203,8 +214,8 @@ export function computeEdgePaths(
 		const labelPoint = computeLabelAnchor(edge, collapsed, superNodeIds);
 
 		out.push({
-			from: edge.from,
-			to: edge.to,
+			from: routedEdge.from,
+			to: routedEdge.to,
 			path,
 			label: edge.label,
 			labelX: labelPoint.x,

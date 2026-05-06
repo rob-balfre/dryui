@@ -185,6 +185,46 @@ describe('FeedbackStore', () => {
 		).toEqual([pendingOlder.id, pendingNewer.id, resolved.id].sort());
 	});
 
+	test('exposes presentation reads separately from raw submission capture', () => {
+		const submission = createStoreSubmission(store, {
+			url: 'https://example.com/presentation',
+			image: imagePayload('presentation'),
+			drawings: [drawingText('note-1', 'Tighten the heading')],
+			hints: [{ corner: 'center', percentX: 50, percentY: 20 }],
+			scroll: { x: 0, y: 240 }
+		});
+		screenshotPaths.push(submission.screenshotPath.webp, submission.screenshotPath.png);
+
+		const raw = store.getSubmission(submission.id);
+		const presentation = store.getSubmissionPresentation(submission.id);
+		const list = store.listSubmissionPresentations('pending');
+
+		expect(raw).not.toHaveProperty('preferredScreenshotPath');
+		expect(raw).not.toHaveProperty('drawingHints');
+		expect(presentation).toMatchObject({
+			id: submission.id,
+			preferredScreenshotPath: submission.screenshotPath.png,
+			scroll: { x: 0, y: 240 },
+			textNotes: ['Tighten the heading'],
+			summary: {
+				drawingCount: 1,
+				hintCount: 1,
+				drawingKinds: { text: 1 },
+				corners: { center: 1 }
+			}
+		});
+		expect(presentation?.drawingHints[0]?.hint?.corner).toBe('center');
+		expect(list).toMatchObject({
+			count: 1,
+			submissions: [
+				expect.objectContaining({
+					id: submission.id,
+					preferredScreenshotPath: submission.screenshotPath.png
+				})
+			]
+		});
+	});
+
 	test('deletes submissions and captured screenshots', () => {
 		const submission = createStoreSubmission(store, {
 			url: 'https://example.com/delete-me',

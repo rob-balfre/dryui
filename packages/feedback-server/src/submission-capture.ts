@@ -3,6 +3,12 @@ import { randomUUID } from 'node:crypto';
 import { join } from 'node:path';
 import { Database } from 'bun:sqlite';
 import { DISPATCH_AGENTS } from './dispatch.js';
+import {
+	buildSubmissionPresentation,
+	buildSubmissionPresentationListResponse,
+	type SubmissionPresentation,
+	type SubmissionPresentationListResponse
+} from './submission-presentation.js';
 import type {
 	CreateSubmissionInput,
 	Submission,
@@ -330,6 +336,11 @@ export class SubmissionCapture {
 		return row ? toSubmission(row) : null;
 	}
 
+	getPresentation(id: string): SubmissionPresentation | null {
+		const submission = this.get(id);
+		return submission ? buildSubmissionPresentation(submission) : null;
+	}
+
 	list(status: SubmissionQueryStatus = 'all'): Submission[] {
 		// Pending uses ASC so it acts like a FIFO queue; history filters use DESC (newest first).
 		if (status === 'pending') {
@@ -352,11 +363,20 @@ export class SubmissionCapture {
 		return rows.map(toSubmission);
 	}
 
+	listPresentations(status: SubmissionQueryStatus = 'all'): SubmissionPresentationListResponse {
+		return buildSubmissionPresentationListResponse(this.list(status));
+	}
+
 	updateStatus(id: string, status: SubmissionStatus): Submission | null {
 		const existing = this.get(id);
 		if (!existing) return null;
 		this.db.query('UPDATE submissions SET status = ? WHERE id = ?').run(status, id);
 		return { ...existing, status };
+	}
+
+	updateStatusPresentation(id: string, status: SubmissionStatus): SubmissionPresentation | null {
+		const submission = this.updateStatus(id, status);
+		return submission ? buildSubmissionPresentation(submission) : null;
 	}
 
 	delete(id: string): Submission | null {

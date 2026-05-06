@@ -734,6 +734,167 @@ describe('computeLayout', () => {
 		});
 	});
 
+	describe('stacked directed clusters', () => {
+		test('TB cluster with no internal edges stacks its nodes vertically in array order', () => {
+			const result = computeLayout({
+				direction: 'LR',
+				nodes: [
+					{ id: 'br', label: 'bad research' },
+					{ id: 'gr', label: 'good research' },
+					{ id: 'gp1', label: 'good plan' },
+					{ id: 'bp', label: 'bad plan' },
+					{ id: 'gp2', label: 'good plan' },
+					{ id: 'gc1', label: 'good code' },
+					{ id: 'bc', label: 'bad code' },
+					{ id: 'gc2', label: 'good code' }
+				],
+				edges: [
+					{ from: 'br', to: 'bp' },
+					{ from: 'bp', to: 'bc' }
+				],
+				clusters: [
+					{ id: 'c1', label: 'research', direction: 'TB', nodes: ['br', 'gr'] },
+					{ id: 'c2', label: 'plan', direction: 'TB', nodes: ['gp1', 'bp', 'gp2'] },
+					{ id: 'c3', label: 'code', direction: 'TB', nodes: ['gc1', 'bc', 'gc2'] }
+				]
+			});
+
+			const byId = (id: string) => result.nodes.find((n) => n.id === id)!;
+			const br = byId('br');
+			const gr = byId('gr');
+			const gp1 = byId('gp1');
+			const bp = byId('bp');
+			const gp2 = byId('gp2');
+			const gc1 = byId('gc1');
+			const bc = byId('bc');
+			const gc2 = byId('gc2');
+
+			// Within each cluster, array order stacks top-to-bottom.
+			expect(br.y + br.height).toBeLessThanOrEqual(gr.y + 1);
+			expect(gp1.y + gp1.height).toBeLessThanOrEqual(bp.y + 1);
+			expect(bp.y + bp.height).toBeLessThanOrEqual(gp2.y + 1);
+			expect(gc1.y + gc1.height).toBeLessThanOrEqual(bc.y + 1);
+			expect(bc.y + bc.height).toBeLessThanOrEqual(gc2.y + 1);
+
+			// Each cluster's stack shares an x column.
+			expect(Math.abs(br.x - gr.x)).toBeLessThan(20);
+			expect(Math.abs(gp1.x - bp.x)).toBeLessThan(2);
+			expect(Math.abs(bp.x - gp2.x)).toBeLessThan(2);
+			expect(Math.abs(gc1.x - bc.x)).toBeLessThan(2);
+			expect(Math.abs(bc.x - gc2.x)).toBeLessThan(2);
+
+			// Outer LR direction places the three clusters left-to-right.
+			expect(br.x).toBeLessThan(bp.x);
+			expect(bp.x).toBeLessThan(bc.x);
+
+			// Cross-boundary edges br→bp and bp→bc produce non-empty paths.
+			for (const edge of result.edges) {
+				expect(typeof edge.path).toBe('string');
+				expect(edge.path.length).toBeGreaterThan(0);
+			}
+		});
+
+		test('LR cluster with no internal edges places its nodes left-to-right in array order', () => {
+			const result = computeLayout({
+				direction: 'TB',
+				nodes: [
+					{ id: 'a', label: 'A' },
+					{ id: 'b', label: 'B' },
+					{ id: 'c', label: 'C' }
+				],
+				edges: [],
+				clusters: [{ id: 'group', label: 'Group', direction: 'LR', nodes: ['a', 'b', 'c'] }]
+			});
+
+			const a = result.nodes.find((n) => n.id === 'a')!;
+			const b = result.nodes.find((n) => n.id === 'b')!;
+			const c = result.nodes.find((n) => n.id === 'c')!;
+
+			expect(a.x + a.width).toBeLessThanOrEqual(b.x + 1);
+			expect(b.x + b.width).toBeLessThanOrEqual(c.x + 1);
+			// Same row.
+			expect(Math.abs(a.y - b.y)).toBeLessThan(2);
+			expect(Math.abs(b.y - c.y)).toBeLessThan(2);
+		});
+
+		test('forward edge between two directed clusters anchors to inner nodes', () => {
+			// br is in c1 (TB stack, top of column), bp is in c2 (TB stack, middle).
+			// The cross-cluster edge br → bp should originate near br's vertical
+			// center and end near bp's vertical center, not at the cluster-center
+			// midpoints.
+			const result = computeLayout({
+				direction: 'LR',
+				nodes: [
+					{ id: 'br', label: 'bad research' },
+					{ id: 'gr', label: 'good research' },
+					{ id: 'gp1', label: 'good plan' },
+					{ id: 'bp', label: 'bad plan' },
+					{ id: 'gp2', label: 'good plan' }
+				],
+				edges: [{ from: 'br', to: 'bp' }],
+				clusters: [
+					{ id: 'c1', label: 'research', direction: 'TB', nodes: ['br', 'gr'] },
+					{ id: 'c2', label: 'plan', direction: 'TB', nodes: ['gp1', 'bp', 'gp2'] }
+				]
+			});
+
+			const br = result.nodes.find((n) => n.id === 'br')!;
+			const bp = result.nodes.find((n) => n.id === 'bp')!;
+			const c1 = result.clusters.find((c) => c.id === 'c1')!;
+			const c2 = result.clusters.find((c) => c.id === 'c2')!;
+
+			const edge = result.edges.find((e) => e.from === 'br' && e.to === 'bp')!;
+			expect(edge).toBeDefined();
+
+			// Path begins at br's right edge and ends at bp's left edge.
+			const startMatch = edge.path.match(/^M\s+([0-9.\-]+)\s+([0-9.\-]+)/);
+			const lCommands = [...edge.path.matchAll(/L\s+([0-9.\-]+)\s+([0-9.\-]+)/g)];
+			expect(startMatch).not.toBeNull();
+			expect(lCommands.length).toBeGreaterThan(0);
+
+			const startY = parseFloat(startMatch![2]!);
+			const endY = parseFloat(lCommands[lCommands.length - 1]![2]!);
+
+			const brCenterY = br.y + br.height / 2;
+			const bpCenterY = bp.y + bp.height / 2;
+			const c1CenterY = c1.y + c1.height / 2;
+			const c2CenterY = c2.y + c2.height / 2;
+
+			// Anchored at the inner nodes' vertical centers, not the cluster
+			// vertical centers. br is the TOP node in c1 and bp is the MIDDLE
+			// node in c2, so brCenterY and c1CenterY differ.
+			expect(Math.abs(startY - brCenterY)).toBeLessThan(2);
+			expect(Math.abs(endY - bpCenterY)).toBeLessThan(2);
+			// And brCenterY should not equal the cluster center, otherwise the
+			// test isn't actually distinguishing the two anchors.
+			expect(Math.abs(brCenterY - c1CenterY)).toBeGreaterThan(10);
+			// (c2 center vs bp center may be close since bp is the middle node.)
+			expect(c2CenterY).toBeDefined();
+		});
+
+		test('directed cluster with sparse internal edges still respects array order', () => {
+			// Cluster has [a, b, c] with edge a→c only (skips b). Array-order
+			// stacking + edge constraint should produce a above b above c.
+			const result = computeLayout({
+				direction: 'LR',
+				nodes: [
+					{ id: 'a', label: 'A' },
+					{ id: 'b', label: 'B' },
+					{ id: 'c', label: 'C' }
+				],
+				edges: [{ from: 'a', to: 'c' }],
+				clusters: [{ id: 'group', label: 'Group', direction: 'TB', nodes: ['a', 'b', 'c'] }]
+			});
+
+			const a = result.nodes.find((n) => n.id === 'a')!;
+			const b = result.nodes.find((n) => n.id === 'b')!;
+			const c = result.nodes.find((n) => n.id === 'c')!;
+
+			expect(a.y + a.height).toBeLessThanOrEqual(b.y + 1);
+			expect(b.y + b.height).toBeLessThanOrEqual(c.y + 1);
+		});
+	});
+
 	describe('degenerate cases', () => {
 		test('empty diagram returns a valid result with zero nodes and edges', () => {
 			const config: DiagramConfig = { direction: 'TB', nodes: [], edges: [] };

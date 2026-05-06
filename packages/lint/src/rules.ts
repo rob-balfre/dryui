@@ -6,6 +6,7 @@ import {
 	type LintRuleId,
 	type Violation
 } from './lint-policy.js';
+import { buildLineIndex, lookupLine, stripCssComments } from './css-scan.js';
 
 export type { Violation } from './lint-policy.js';
 
@@ -63,7 +64,6 @@ const PIXEL_UNIT_RE =
 	/(?:^|[^a-zA-Z0-9])-?[\d.]+(px|rem|vw|vh|%|vmin|vmax|svw|svh|lvw|lvh|dvw|dvh|pt|pc|cm|mm|in)(?![a-zA-Z0-9])/i;
 const ALL_UNSET_RE = /(?:^|[;\s{])all\s*:\s*unset(?![a-z-])/gm;
 const IMPORTANT_RE = /!important\b/g;
-const CSS_COMMENT_RE = /\/\*[\s\S]*?\*\//g;
 
 const GLOBAL_SELECTOR_RE = /:global\s*\(/g;
 
@@ -174,26 +174,6 @@ const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 		re: /<textarea(\s|>|\/)/g
 	}
 ];
-
-function buildLineIndex(content: string): number[] {
-	const starts = [0];
-	for (let i = 0; i < content.length; i++) {
-		if (content.charCodeAt(i) === 10 /* \n */) starts.push(i + 1);
-	}
-	return starts;
-}
-
-function lookupLine(lineStarts: number[], index: number): number {
-	// binary search for the largest line start <= index
-	let lo = 0;
-	let hi = lineStarts.length - 1;
-	while (lo < hi) {
-		const mid = (lo + hi + 1) >>> 1;
-		if (lineStarts[mid]! <= index) lo = mid;
-		else hi = mid - 1;
-	}
-	return lo + 1;
-}
 
 function blockStartLine(content: string, lineStarts: number[], blockIndex: number): number {
 	const tagEnd = content.indexOf('>', blockIndex);
@@ -724,17 +704,6 @@ function stripSvelteHeadBlocks(content: string): string {
 
 function stripHtmlComments(content: string): string {
 	return content.replace(HTML_COMMENT_RE, blankPreservingLayout);
-}
-
-function stripCssComments(content: string): string {
-	return content.replace(CSS_COMMENT_RE, (m) => {
-		// Preserve length and newlines so match indices and line numbers stay stable.
-		let out = '';
-		for (let i = 0; i < m.length; i++) {
-			out += m.charCodeAt(i) === 10 /* \n */ ? '\n' : ' ';
-		}
-		return out;
-	});
 }
 
 function getParentDir(filename?: string): string {

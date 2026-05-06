@@ -12,7 +12,7 @@ const componentsBySlug = new Map<string, DocsComponentPageEntry>(
 	Object.values(components).map((entry) => [entry.slug, entry])
 );
 
-type ComponentPageData = Omit<DocsComponentPageEntry, 'slug'>;
+type PublicComponentPageData = Omit<DocsComponentPageEntry, 'slug' | 'category' | 'sourcePackage'>;
 
 export const load: PageServerLoad = async ({ params }) => {
 	const entry = componentsBySlug.get(params.slug);
@@ -34,5 +34,5 @@ export const load: PageServerLoad = async ({ params }) => {
 		rootImport: entry.rootImport,
 		subpathImport: entry.subpathImport,
 		quickStartCode: entry.quickStartCode
-	} satisfies ComponentPageData;
+	} satisfies PublicComponentPageData;
 };

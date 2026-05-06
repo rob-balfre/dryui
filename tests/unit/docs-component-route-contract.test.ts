@@ -1,11 +1,16 @@
 import { describe, expect, it } from 'bun:test';
 import { load } from '../../apps/docs/src/routes/components/[slug]/+page.server';
+import { load as loadPreview } from '../../apps/docs/src/routes/view/components/[slug]/+page.server';
 import componentPages from '../../apps/docs/src/lib/generated/component-pages.json';
 import { docsNavComponentNames } from '../../packages/mcp/src/component-catalog';
 import type { DocsComponentPagesManifest } from '../../packages/mcp/src/docs-component-pages';
 
 function callLoad(slug: string) {
 	return Promise.resolve(load({ params: { slug } } as Parameters<typeof load>[0]));
+}
+
+function callPreviewLoad(slug: string) {
+	return Promise.resolve(loadPreview({ params: { slug } } as Parameters<typeof loadPreview>[0]));
 }
 
 const componentPageManifest = componentPages as DocsComponentPagesManifest;
@@ -17,6 +22,14 @@ describe('docs component route contract', () => {
 		);
 		expect(componentPageManifest.components.AffixGroup).toBeUndefined();
 		expect(Object.values(componentPageManifest.components).every((entry) => entry.slug)).toBe(true);
+		expect(Object.values(componentPageManifest.components).every((entry) => entry.category)).toBe(
+			true
+		);
+		expect(
+			Object.values(componentPageManifest.components).every(
+				(entry) => entry.sourcePackage === '@dryui/ui'
+			)
+		).toBe(true);
 		expect(Object.values(componentPageManifest.components).every((entry) => entry.rootImport)).toBe(
 			true
 		);
@@ -39,6 +52,7 @@ describe('docs component route contract', () => {
 		expect('related' in data).toBe(false);
 		expect('slug' in data).toBe(false);
 		expect('category' in data).toBe(false);
+		expect('sourcePackage' in data).toBe(false);
 		expect(data.rootImport).toBe("import { Button } from '@dryui/ui'");
 		expect(data.subpathImport).toBe("import { Button } from '@dryui/ui/button'");
 		expect(data.a11y.length).toBeGreaterThan(0);
@@ -67,6 +81,17 @@ describe('docs component route contract', () => {
 
 		expect(data.name).toBe('Reveal');
 		expect(data.quickStartCode).toContain("import { Reveal } from '@dryui/ui'");
+	});
+
+	it('returns preview-only facts from the preview route adapter', async () => {
+		const data = await callPreviewLoad('button');
+
+		expect(data).toEqual({
+			name: 'Button',
+			description: expect.any(String),
+			category: 'action',
+			sourcePackage: '@dryui/ui'
+		});
 	});
 
 	it('does not route primitive-only component pages', async () => {

@@ -10,6 +10,8 @@ export interface DocsComponentPageEntry {
 	readonly name: string;
 	readonly slug: string;
 	readonly description: string;
+	readonly category: string;
+	readonly sourcePackage: ComponentDef['import'];
 	readonly compound: boolean;
 	readonly props: Record<string, PropDef> | null;
 	readonly parts: Record<string, PartDef> | null;
@@ -104,6 +106,8 @@ function buildDocsComponentPageEntry(
 		name,
 		slug: componentDocsSlug(name),
 		description: component.description,
+		category: component.category,
+		sourcePackage: component.import,
 		compound: component.compound,
 		props: component.props ?? null,
 		parts: component.parts ?? null,

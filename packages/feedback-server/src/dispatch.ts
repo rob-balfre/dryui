@@ -26,7 +26,7 @@ import { defaultPlatformContext, type PlatformContext } from './dispatch/platfor
 import { launchAgent, probeAgent } from './dispatch/strategies.js';
 import type { EventBus } from './events.js';
 import { buildFeedbackDispatchPrompt } from './prompts.js';
-import { buildSubmissionPresentation } from './submission-presentation.js';
+import { ensureSubmissionPresentation } from './submission-presentation.js';
 import type { SubmissionPresentation } from './submission-presentation.js';
 import type { Submission, SubmissionAgent } from './types.js';
 
@@ -204,11 +204,11 @@ function resolveAgent(
 }
 
 function dispatchSubmission(
-	submission: Submission,
+	submission: Submission | SubmissionPresentation,
 	options: DispatcherOptions,
 	ctx: PlatformContext
 ): void {
-	const presentation = buildSubmissionPresentation(submission);
+	const presentation = ensureSubmissionPresentation(submission);
 	const target = resolveAgent(presentation, options.defaultAgent);
 	if (target === 'off') {
 		console.error(`[dispatch] skip (off) ${presentation.id}`);

@@ -9,6 +9,8 @@
       "name": "Button",
       "slug": "button",
       "description": "Interactive button or link-styled action for submissions and calls to action",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -221,6 +223,8 @@
       "name": "Input",
       "slug": "input",
       "description": "Text input with size variants",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -312,6 +316,8 @@
       "name": "Dialog",
       "slug": "dialog",
       "description": "Modal dialog using native dialog element",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -512,6 +518,8 @@
       "name": "AlertDialog",
       "slug": "alert-dialog",
       "description": "Modal dialog requiring user confirmation",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -730,6 +738,8 @@
       "name": "Drawer",
       "slug": "drawer",
       "description": "Slide-in panel from any edge",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -962,6 +972,8 @@
       "name": "Popover",
       "slug": "popover",
       "description": "Floating content panel anchored to a trigger",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1084,6 +1096,8 @@
       "name": "Tooltip",
       "slug": "tooltip",
       "description": "Hover/focus popup with descriptive text",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1198,6 +1212,8 @@
       "name": "DropdownMenu",
       "slug": "dropdown-menu",
       "description": "Trigger-activated dropdown with menu items",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1403,6 +1419,8 @@
       "name": "ContextMenu",
       "slug": "context-menu",
       "description": "Right-click menu with actions",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1584,6 +1602,8 @@
       "name": "Accordion",
       "slug": "accordion",
       "description": "Collapsible content sections, single or multiple mode",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1760,6 +1780,8 @@
       "name": "Collapsible",
       "slug": "collapsible",
       "description": "Expandable/collapsible content panel",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -1874,6 +1896,8 @@
       "name": "CommandPalette",
       "slug": "command-palette",
       "description": "Searchable command menu dialog",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -2101,6 +2125,8 @@
       "name": "Label",
       "slug": "label",
       "description": "Form label with size variants",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -2157,6 +2183,8 @@
       "name": "Field",
       "slug": "field",
       "description": "Form field wrapper with label, description, and error",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -2281,6 +2309,8 @@
       "name": "Fieldset",
       "slug": "fieldset",
       "description": "Structured field grouping with legend, description, and content",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -2382,6 +2412,8 @@
       "name": "Textarea",
       "slug": "textarea",
       "description": "Multi-line text input",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -2448,6 +2480,8 @@
       "name": "PromptInput",
       "slug": "prompt-input",
       "description": "AI-style prompt input with auto-resize and submit",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -2548,6 +2582,8 @@
       "name": "NumberInput",
       "slug": "number-input",
       "description": "Numeric input with increment/decrement controls",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -2638,6 +2674,8 @@
       "name": "Checkbox",
       "slug": "checkbox",
       "description": "Boolean toggle input with indeterminate state",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -2711,6 +2749,8 @@
       "name": "RadioGroup",
       "slug": "radio-group",
       "description": "Single selection from multiple options",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -2835,6 +2875,8 @@
       "name": "Select",
       "slug": "select",
       "description": "Closed dropdown select for choosing one option from a fixed list",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -3067,6 +3109,8 @@
       "name": "MultiSelectCombobox",
       "slug": "multi-select-combobox",
       "description": "Searchable multi-select combobox with removable selected tokens",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -3431,6 +3475,8 @@
       "name": "SegmentedControl",
       "slug": "segmented-control",
       "description": "Compact segmented switch for mutually exclusive options",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -3546,6 +3592,8 @@
       "name": "Slider",
       "slug": "slider",
       "description": "Range input slider with thumb control",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -3668,6 +3716,8 @@
       "name": "Toggle",
       "slug": "toggle",
       "description": "Pressable toggle button",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -3748,6 +3798,8 @@
       "name": "ToggleGroup",
       "slug": "toggle-group",
       "description": "Group of toggle buttons with single/multiple selection",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -3890,6 +3942,8 @@
       "name": "ThemeToggle",
       "slug": "theme-toggle",
       "description": "Persisted light/dark theme switcher with system-preference fallback",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "storageKey": {
@@ -3967,6 +4021,8 @@
       "name": "InputGroup",
       "slug": "input-group",
       "description": "Compound input wrapper that combines prefixes, suffixes, separators, select slots, and actions",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -4117,6 +4173,8 @@
       "name": "OptionPicker",
       "slug": "option-picker",
       "description": "Selectable option tiles with preview, label, and description for presets, fonts, shapes, and other visual choices",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -4325,6 +4383,8 @@
       "name": "Container",
       "slug": "container",
       "description": "Centered content container with max-width",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -4388,6 +4448,8 @@
       "name": "Separator",
       "slug": "separator",
       "description": "Visual divider between content",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "orientation": {
@@ -4459,6 +4521,8 @@
       "name": "Spacer",
       "slug": "spacer",
       "description": "Empty space component for spacing",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -4518,6 +4582,8 @@
       "name": "AspectRatio",
       "slug": "aspect-ratio",
       "description": "Constrains child content to a specific aspect ratio",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "ratio": {
@@ -4558,6 +4624,8 @@
       "name": "Tabs",
       "slug": "tabs",
       "description": "Tabbed content navigation",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -4743,6 +4811,8 @@
       "name": "Breadcrumb",
       "slug": "breadcrumb",
       "description": "Navigation trail showing page hierarchy",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -4896,6 +4966,8 @@
       "name": "Pagination",
       "slug": "pagination",
       "description": "Page navigation with previous/next and page links",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5073,6 +5145,8 @@
       "name": "Stepper",
       "slug": "stepper",
       "description": "Step-by-step progress indicator",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5228,6 +5302,8 @@
       "name": "Toolbar",
       "slug": "toolbar",
       "description": "Horizontal button group for actions",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5359,6 +5435,8 @@
       "name": "Menubar",
       "slug": "menubar",
       "description": "Horizontal menu bar with dropdown menus",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5557,6 +5635,8 @@
       "name": "NavigationMenu",
       "slug": "navigation-menu",
       "description": "Site-level navigation with flyout content panels",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5731,6 +5811,8 @@
       "name": "Sidebar",
       "slug": "sidebar",
       "description": "Collapsible side navigation panel",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -5980,6 +6062,8 @@
       "name": "TableOfContents",
       "slug": "table-of-contents",
       "description": "Auto-generated table of contents from headings",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -6092,6 +6176,8 @@
       "name": "Link",
       "slug": "link",
       "description": "Styled anchor with external and disabled states",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "underline": {
@@ -6156,6 +6242,8 @@
       "name": "ScrollArea",
       "slug": "scroll-area",
       "description": "Custom scrollable area with styled scrollbars",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "orientation": {
@@ -6215,6 +6303,8 @@
       "name": "Splitter",
       "slug": "splitter",
       "description": "Resizable split panels with drag handle",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -6338,6 +6428,8 @@
       "name": "Table",
       "slug": "table",
       "description": "Data table with header, body, footer sections",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -6534,6 +6626,8 @@
       "name": "Avatar",
       "slug": "avatar",
       "description": "User profile image with fallback initials",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "src": {
@@ -6650,6 +6744,8 @@
       "name": "Badge",
       "slug": "badge",
       "description": "Small status indicator label",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -6743,6 +6839,8 @@
       "name": "Chart",
       "slug": "chart",
       "description": "SVG-based chart with bars, lines, and axes",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -7038,6 +7136,8 @@
       "name": "AppFrame",
       "slug": "app-frame",
       "description": "Windowed app chrome with traffic-light dots, title, and actions around a content area",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "title": {
@@ -7092,6 +7192,8 @@
       "name": "ChatThread",
       "slug": "chat-thread",
       "description": "Conversation thread container with restart action and auto-scroll behavior",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "messageCount": {
@@ -7149,6 +7251,8 @@
       "name": "TypingIndicator",
       "slug": "typing-indicator",
       "description": "Animated three-dot typing status indicator",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,
@@ -7189,6 +7293,8 @@
       "name": "Icon",
       "slug": "icon",
       "description": "Sized and colored SVG icon wrapper with accessibility label",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -7267,6 +7373,8 @@
       "name": "Image",
       "slug": "image",
       "description": "Image with loading states and fallback support",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "fallback": {
@@ -7303,6 +7411,8 @@
       "name": "Kbd",
       "slug": "kbd",
       "description": "Keyboard shortcut display element",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "keys": {
@@ -7347,6 +7457,8 @@
       "name": "LinkPreview",
       "slug": "link-preview",
       "description": "Link preview popup on hover",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -7468,6 +7580,8 @@
       "name": "List",
       "slug": "list",
       "description": "Structured list with items, icons, and subheaders",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -7683,6 +7797,8 @@
       "name": "Timeline",
       "slug": "timeline",
       "description": "Vertical timeline for activity feeds and history",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -7897,6 +8013,8 @@
       "name": "Typography",
       "slug": "typography",
       "description": "Standalone semantic text exports: heading, text, code, blockquote",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -8113,6 +8231,8 @@
       "name": "Heading",
       "slug": "heading",
       "description": "Standalone semantic heading export for starter-kit typography",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "level": {
@@ -8200,6 +8320,8 @@
       "name": "Text",
       "slug": "text",
       "description": "Standalone body copy export for starter-kit typography",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "as": {
@@ -8337,6 +8459,8 @@
       "name": "DescriptionList",
       "slug": "description-list",
       "description": "Responsive term and value list for summaries and specs",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -8450,6 +8574,8 @@
       "name": "Alert",
       "slug": "alert",
       "description": "Contextual feedback message with variant styling",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -8556,6 +8682,8 @@
       "name": "Toast",
       "slug": "toast",
       "description": "Temporary notification message",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -8764,6 +8892,8 @@
       "name": "Progress",
       "slug": "progress",
       "description": "Progress bar indicator",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -8876,6 +9006,8 @@
       "name": "Skeleton",
       "slug": "skeleton",
       "description": "Loading placeholder animation",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -8933,6 +9065,8 @@
       "name": "Spinner",
       "slug": "spinner",
       "description": "Loading spinner animation",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -8996,6 +9130,8 @@
       "name": "Combobox",
       "slug": "combobox",
       "description": "Searchable text input with filterable dropdown suggestions",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -9290,6 +9426,8 @@
       "name": "DateField",
       "slug": "date-field",
       "description": "Form-first locale-aware segmented date input",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -9456,6 +9594,8 @@
       "name": "DatePicker",
       "slug": "date-picker",
       "description": "Calendar popup date picker with locale support",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -9662,6 +9802,8 @@
       "name": "Calendar",
       "slug": "calendar",
       "description": "Interactive calendar grid for date navigation and event overlays",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -10025,6 +10167,8 @@
       "name": "DateRangePicker",
       "slug": "date-range-picker",
       "description": "Date range selection with calendar popup",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -10280,6 +10424,8 @@
       "name": "Listbox",
       "slug": "listbox",
       "description": "Single or multi-select list with keyboard navigation",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -10391,6 +10537,8 @@
       "name": "LogoMark",
       "slug": "logo-mark",
       "description": "Brand mark, status indicator, or category badge with image or fallback text",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "src": {
@@ -10484,6 +10632,8 @@
       "name": "PinInput",
       "slug": "pin-input",
       "description": "Segmented input for PIN/OTP codes with single hidden input architecture",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -10745,6 +10895,8 @@
       "name": "RangeCalendar",
       "slug": "range-calendar",
       "description": "Calendar for selecting date ranges",
+      "category": "form",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -10905,6 +11057,8 @@
       "name": "Rating",
       "slug": "rating",
       "description": "Star rating input with half-star support",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -10998,6 +11152,8 @@
       "name": "TimeInput",
       "slug": "time-input",
       "description": "Native time input with form control integration",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -11083,6 +11239,8 @@
       "name": "TagsInput",
       "slug": "tags-input",
       "description": "Input for managing a list of tags",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -11281,6 +11439,8 @@
       "name": "FileUpload",
       "slug": "file-upload",
       "description": "File selection with drag-and-drop dropzone",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -11530,6 +11690,8 @@
       "name": "FileSelect",
       "slug": "file-select",
       "description": "Select a file or folder path via external picker",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -11683,6 +11845,8 @@
       "name": "ColorPicker",
       "slug": "color-picker",
       "description": "Color selection with area, hue/alpha sliders, and eyedropper",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -11945,6 +12109,8 @@
       "name": "Portal",
       "slug": "portal",
       "description": "Renders children into a different DOM location",
+      "category": "utility",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "target": {
@@ -11984,6 +12150,8 @@
       "name": "VisuallyHidden",
       "slug": "visually-hidden",
       "description": "Hides content visually but keeps it accessible to screen readers",
+      "category": "utility",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "children": {
@@ -12019,6 +12187,8 @@
       "name": "FocusTrap",
       "slug": "focus-trap",
       "description": "Traps keyboard focus within a container element",
+      "category": "utility",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "active": {
@@ -12070,6 +12240,8 @@
       "name": "Clipboard",
       "slug": "clipboard",
       "description": "Copy text to clipboard with native Clipboard API",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -12125,6 +12297,8 @@
       "name": "Hotkey",
       "slug": "hotkey",
       "description": "Keyboard shortcut handler with modifier support",
+      "category": "utility",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "keys": {
@@ -12161,6 +12335,8 @@
       "name": "ScrollToTop",
       "slug": "scroll-to-top",
       "description": "Button that scrolls to top of page or container",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "position": {
@@ -12223,6 +12399,8 @@
       "name": "Reveal",
       "slug": "reveal",
       "description": "IntersectionObserver-powered entry transitions with reduced-motion and no-dependency fallbacks",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -12321,6 +12499,8 @@
       "name": "Spotlight",
       "slug": "spotlight",
       "description": "Pointer-reactive radial highlight surface for cards, hero blocks, and interactive panels",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "radius": {
@@ -12399,6 +12579,8 @@
       "name": "Aurora",
       "slug": "aurora",
       "description": "Ambient gradient surface with browser-native animated color fields and static fallback",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "palette": {
@@ -12521,6 +12703,8 @@
       "name": "Noise",
       "slug": "noise",
       "description": "Texture overlay that adds grain and atmosphere to surfaces without external assets",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "opacity": {
@@ -12612,6 +12796,8 @@
       "name": "FloatButton",
       "slug": "float-button",
       "description": "Floating action button with expandable actions",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -12739,6 +12925,8 @@
       "name": "Marquee",
       "slug": "marquee",
       "description": "Scrolling text/content ticker with CSS animations",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "speed": {
@@ -12834,6 +13022,8 @@
       "name": "QRCode",
       "slug": "qrcode",
       "description": "QR code generator using Canvas 2D API",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -12912,6 +13102,8 @@
       "name": "CodeBlock",
       "slug": "code-block",
       "description": "Code display with optional line numbers and copy button",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "showLineNumbers": {
@@ -13020,6 +13212,8 @@
       "name": "MarkdownRenderer",
       "slug": "markdown-renderer",
       "description": "Renders markdown text as styled HTML",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "content": {
@@ -13072,6 +13266,8 @@
       "name": "VirtualList",
       "slug": "virtual-list",
       "description": "Renders only visible items from large lists for performance",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "items": {
@@ -13137,6 +13333,8 @@
       "name": "InfiniteScroll",
       "slug": "infinite-scroll",
       "description": "Loads more content when user scrolls near bottom",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "onLoadMore": {
@@ -13219,6 +13417,8 @@
       "name": "DataGrid",
       "slug": "data-grid",
       "description": "Enhanced table with sorting, filtering, and pagination",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -13634,6 +13834,8 @@
       "name": "DragAndDrop",
       "slug": "drag-and-drop",
       "description": "Reorderable list with drag and keyboard support",
+      "category": "interaction",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -13811,6 +14013,8 @@
       "name": "DropZone",
       "slug": "drop-zone",
       "description": "Drag-and-drop file drop zone area",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "accept": {
@@ -13850,6 +14054,8 @@
       "name": "Transfer",
       "slug": "transfer",
       "description": "Dual-list transfer component for moving items between lists",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -14058,6 +14264,8 @@
       "name": "RichTextEditor",
       "slug": "rich-text-editor",
       "description": "Basic rich text editor with formatting toolbar",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -14184,6 +14392,8 @@
       "name": "Tour",
       "slug": "tour",
       "description": "Step-by-step guided tour overlay with spotlight",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -14321,6 +14531,8 @@
       "name": "Backdrop",
       "slug": "backdrop",
       "description": "Full-screen overlay behind modals and dialogs",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "open": {
@@ -14379,6 +14591,8 @@
       "name": "ButtonGroup",
       "slug": "button-group",
       "description": "Groups related buttons with shared styling",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -14450,6 +14664,8 @@
       "name": "Chip",
       "slug": "chip",
       "description": "Interactive pill for filters, selections, and inline state",
+      "category": "action",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "selected": {
@@ -14580,6 +14796,8 @@
       "name": "ChipGroup",
       "slug": "chip-group",
       "description": "Wrapping cluster for Badge, Chip, and tag children with gap and justify controls; carved out of dryui/no-flex",
+      "category": "layout",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -14769,6 +14987,8 @@
       "name": "Carousel",
       "slug": "carousel",
       "description": "Scrollable content carousel with slide navigation",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -15006,6 +15226,8 @@
       "name": "FormatBytes",
       "slug": "format-bytes",
       "description": "Formats byte values with Intl.NumberFormat",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -15068,6 +15290,8 @@
       "name": "FormatDate",
       "slug": "format-date",
       "description": "Formats dates with Intl.DateTimeFormat",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "date": {
@@ -15222,6 +15446,8 @@
       "name": "FormatNumber",
       "slug": "format-number",
       "description": "Formats numbers with Intl.NumberFormat",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -15315,6 +15541,8 @@
       "name": "ImageComparison",
       "slug": "image-comparison",
       "description": "Before/after image comparison slider",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "position": {
@@ -15428,6 +15656,8 @@
       "name": "HoverCard",
       "slug": "hover-card",
       "description": "Surface popup on hover with delay-based open/close",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -15563,6 +15793,8 @@
       "name": "ProgressRing",
       "slug": "progress-ring",
       "description": "Circular progress ring with SVG rendering",
+      "category": "feedback",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "color": {
@@ -15652,6 +15884,8 @@
       "name": "RelativeTime",
       "slug": "relative-time",
       "description": "Displays relative time with auto-updating",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "date": {
@@ -15700,6 +15934,8 @@
       "name": "Tree",
       "slug": "tree",
       "description": "Hierarchical tree view with expand/collapse",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -15852,6 +16088,8 @@
       "name": "Gauge",
       "slug": "gauge",
       "description": "SVG gauge indicator with configurable arc, thresholds, and label",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -15937,6 +16175,8 @@
       "name": "Sparkline",
       "slug": "sparkline",
       "description": "Compact inline SVG sparkline chart",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "data": {
@@ -16011,6 +16251,8 @@
       "name": "FlipCard",
       "slug": "flip-card",
       "description": "Flippable card with front and back faces",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -16151,6 +16393,8 @@
       "name": "VideoEmbed",
       "slug": "video-embed",
       "description": "Video player embed for YouTube, Vimeo, and native sources",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "src": {
@@ -16239,6 +16483,8 @@
       "name": "PhoneInput",
       "slug": "phone-input",
       "description": "Phone number input with country code selector",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -16357,6 +16603,8 @@
       "name": "DateTimeInput",
       "slug": "date-time-input",
       "description": "Combined date and time input with locale-aware segments",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -16440,6 +16688,8 @@
       "name": "NotificationCenter",
       "slug": "notification-center",
       "description": "Notification panel with trigger, groups, and items",
+      "category": "overlay",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -16656,6 +16906,8 @@
       "name": "MegaMenu",
       "slug": "mega-menu",
       "description": "Horizontal navigation with large dropdown panels and columns",
+      "category": "navigation",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -16891,6 +17143,8 @@
       "name": "Map",
       "slug": "map",
       "description": "Interactive map container with markers, popups, layers, and controls",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -17081,6 +17335,8 @@
       "name": "ChromaticShift",
       "slug": "chromatic-shift",
       "description": "RGB channel separation effect with hover and animation triggers",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "offset": {
@@ -17167,6 +17423,8 @@
       "name": "ChromaticAberration",
       "slug": "chromatic-aberration",
       "description": "Soft channel-offset wrapper for chromatic distortion on surfaces and media",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "offset": {
@@ -17219,6 +17477,8 @@
       "name": "Displacement",
       "slug": "displacement",
       "description": "SVG turbulence displacement filter for organic distortion effects",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "scale": {
@@ -17290,6 +17550,8 @@
       "name": "Glow",
       "slug": "glow",
       "description": "Soft glow effect wrapper with configurable color, intensity, and animation",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "color": {
@@ -17350,6 +17612,8 @@
       "name": "Adjust",
       "slug": "adjust",
       "description": "CSS filter adjustment wrapper for brightness, contrast, saturation, and hue shifts",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "brightness": {
@@ -17425,6 +17689,8 @@
       "name": "AlphaSlider",
       "slug": "alpha-slider",
       "description": "Slider for selecting alpha/opacity values in color pickers",
+      "category": "input",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "value": {
@@ -17508,6 +17774,8 @@
       "name": "Beam",
       "slug": "beam",
       "description": "Animated linear light streak surface for directional highlights and shimmer accents",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "color": {
@@ -17583,6 +17851,8 @@
       "name": "BorderBeam",
       "slug": "border-beam",
       "description": "Animated border-travel beam with masked ring highlights, bloom, and line-trace presets",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "size": {
@@ -17723,6 +17993,8 @@
       "name": "Shimmer",
       "slug": "shimmer",
       "description": "Warm highlight sweep that travels across wrapped text and inline icons together",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "color": {
@@ -17786,6 +18058,8 @@
       "name": "Glass",
       "slug": "glass",
       "description": "Translucent glass wrapper with blur, tint, and saturation control",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "blur": {
@@ -17839,6 +18113,8 @@
       "name": "GodRays",
       "slug": "god-rays",
       "description": "Volumetric radial light rays surface with configurable origin, spread, and intensity",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "color": {
@@ -17918,6 +18194,8 @@
       "name": "GradientMesh",
       "slug": "gradient-mesh",
       "description": "Animated multi-color gradient mesh background with optional interactivity",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "colors": {
@@ -17999,6 +18277,8 @@
       "name": "Halftone",
       "slug": "halftone",
       "description": "SVG halftone dot pattern overlay with configurable size, angle, and color",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "dotSize": {
@@ -18070,6 +18350,8 @@
       "name": "MaskReveal",
       "slug": "mask-reveal",
       "description": "Intersection-observer mask transition with circle, diamond, or wipe shapes",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "shape": {
@@ -18162,6 +18444,8 @@
       "name": "ShaderCanvas",
       "slug": "shader-canvas",
       "description": "WebGL shader canvas with built-in presets and theme color integration",
+      "category": "visual",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "fragmentShader": {
@@ -18261,6 +18545,8 @@
       "name": "Svg",
       "slug": "svg",
       "description": "Accessible SVG wrapper with viewBox and aria-label defaults",
+      "category": "utility",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "children": {
@@ -18295,6 +18581,8 @@
       "name": "StarRating",
       "slug": "star-rating",
       "description": "Read-only star rating display with filled and outlined variants",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": true,
       "props": null,
       "parts": {
@@ -18378,6 +18666,8 @@
       "name": "Tag",
       "slug": "tag",
       "description": "Small labeled tag element with color and variant support",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "variant": {
@@ -18469,6 +18759,8 @@
       "name": "TokenScope",
       "slug": "token-scope",
       "description": "Render a wrapper that injects scoped CSS custom properties for its subtree",
+      "category": "theme",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "tokens": {
@@ -18502,6 +18794,8 @@
       "name": "Diagram",
       "slug": "diagram",
       "description": "Config-driven diagram component with auto-layout, curved edges, clusters, swimlanes, and annotations",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {
         "config": {
@@ -18577,6 +18871,8 @@
       "name": "IconSwap",
       "slug": "icon-swap",
       "description": "Keyed icon crossfade with scale and blur, driven by --dry-icon-swap-* tokens",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,
@@ -18600,6 +18896,8 @@
       "name": "Numeric",
       "slug": "numeric",
       "description": "Tabular-nums numeric display with optional stable min-width and alignment",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,
@@ -18623,6 +18921,8 @@
       "name": "Enter",
       "slug": "enter",
       "description": "Single-child entrance wrapper. Reveals on mount with --dry-enter-* tokens (translate, blur, duration). Accepts an index for staggered reveals.",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,
@@ -18649,6 +18949,8 @@
       "name": "Exit",
       "slug": "exit",
       "description": "Exit wrapper that applies the `leave` Svelte transition. Pairs with {#if} blocks for a subtle dismissal (~12px offset + blur).",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,
@@ -18675,6 +18977,8 @@
       "name": "Stagger",
       "slug": "stagger",
       "description": "Iterates children with auto-assigned nth-child delays. `step` selects section (100ms), word (80ms), letter (40ms), or a custom millisecond value.",
+      "category": "display",
+      "sourcePackage": "@dryui/ui",
       "compound": false,
       "props": {},
       "parts": null,

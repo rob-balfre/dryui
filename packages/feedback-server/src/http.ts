@@ -11,10 +11,6 @@ import {
 } from './dispatch.js';
 import { EventBus } from './events.js';
 import { FeedbackStore } from './store.js';
-import {
-	buildSubmissionPresentation,
-	buildSubmissionPresentationListResponse
-} from './submission-presentation.js';
 import type {
 	ActionRequest,
 	Annotation,
@@ -576,8 +572,7 @@ export function startFeedbackHttpServer(
 						return errorResponse(400, 'Invalid submission status filter');
 					}
 
-					const submissions = store.listSubmissions(status ?? 'pending');
-					return json(buildSubmissionPresentationListResponse(submissions));
+					return json(store.listSubmissionPresentations(status ?? 'pending'));
 				}
 
 				const submissionScreenshotMatch = pathname.match(/^\/submissions\/([^/]+)\/screenshot$/);
@@ -600,18 +595,20 @@ export function startFeedbackHttpServer(
 					// dispatched agent at this URL as the curl fallback when MCP
 					// `feedback_get_submissions` is unavailable.
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
-					const submission = store.getSubmission(submissionId);
+					const submission = store.getSubmissionPresentation(submissionId);
 					if (!submission) return errorResponse(404, 'Not found');
-					return json(buildSubmissionPresentation(submission));
+					return json(submission);
 				}
 				if (submissionMatch && request.method === 'PATCH') {
 					const submissionId = decodeURIComponent(submissionMatch[1] ?? '');
 					try {
 						const body = await readJson<{ status: SubmissionStatus }>(request);
-						const submission = store.updateSubmissionStatus(submissionId, body.status);
+						const rawSubmission = store.updateSubmissionStatus(submissionId, body.status);
+						if (!rawSubmission) return errorResponse(404, 'Not found');
+						const submission = store.getSubmissionPresentation(submissionId);
 						if (!submission) return errorResponse(404, 'Not found');
-						emit(bus, 'submission.updated', submission.url, submission);
-						return json(buildSubmissionPresentation(submission));
+						emit(bus, 'submission.updated', rawSubmission.url, rawSubmission);
+						return json(submission);
 					} catch {
 						return errorResponse(400, 'Invalid JSON');
 					}
