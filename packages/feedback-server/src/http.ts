@@ -346,7 +346,7 @@ export function startFeedbackHttpServer(
 	store: FeedbackStore,
 	bus: EventBus,
 	options: FeedbackHttpServerOptions
-): { stop(): void; hostname: string; port: number } {
+): { stop(closeActiveConnections?: boolean): Promise<void>; hostname: string; port: number } {
 	return Bun.serve({
 		hostname: options.host,
 		port: options.port,

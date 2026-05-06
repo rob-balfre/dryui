@@ -30,7 +30,15 @@ declare const Bun: {
 			server: { timeout(req: Request, seconds: number): void }
 		): Response | Promise<Response>;
 		error?(error: Error): Response;
-	}): { stop(): void; hostname: string; port: number };
+	}): {
+		// Bun's actual signature: stop(closeActiveConnections?: boolean): Promise<void>.
+		// Without `await` and `closeActiveConnections=true`, the listener and any
+		// in-flight requests/SSE streams keep running after stop() returns —
+		// which racing test setUp/tearDown would otherwise pick up.
+		stop(closeActiveConnections?: boolean): Promise<void>;
+		hostname: string;
+		port: number;
+	};
 	sleep(ms: number): Promise<void>;
 	file(path: string): BunFile;
 };
