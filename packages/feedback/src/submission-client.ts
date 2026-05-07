@@ -45,11 +45,11 @@ export function normalizeFeedbackServerUrl(value: string | null | undefined): st
 }
 
 export function resolveFeedbackServerUrl(
-	fallback: string | undefined,
+	configured: string | undefined,
 	options: FeedbackServerUrlOptions = {}
 ): string | undefined {
 	const href = options.href ?? readDefaultHref();
-	if (!href) return fallback;
+	if (!href) return configured;
 
 	const queryServerUrl = normalizeFeedbackServerUrl(
 		new URL(href).searchParams.get(FEEDBACK_SERVER_QUERY_PARAM)
@@ -59,7 +59,7 @@ export function resolveFeedbackServerUrl(
 		return queryServerUrl;
 	}
 
-	return readStoredFeedbackServerUrl(options) ?? fallback;
+	return configured ?? readStoredFeedbackServerUrl(options);
 }
 
 export function saveFeedbackDrawings(options: {

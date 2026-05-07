@@ -509,7 +509,7 @@ describe('feedback submission client helpers', () => {
 		expect(normalizeFeedbackServerUrl('https://example.com:4748')).toBeNull();
 	});
 
-	test('query handoff wins over fallback and is stored for later tabs', () => {
+	test('query handoff wins over a configured server and is stored for later tabs', () => {
 		const localStorage = new MemoryStorage();
 		const sessionStorage = new MemoryStorage();
 		const resolved = resolveFeedbackServerUrl('http://127.0.0.1:4748', {
@@ -520,8 +520,29 @@ describe('feedback submission client helpers', () => {
 
 		expect(resolved).toBe('http://127.0.0.1:5888');
 		expect(localStorage.getItem('dryui-feedback-server-url')).toBe('http://127.0.0.1:5888');
+	});
+
+	test('configured server wins over a stored handoff so an explicit prop is authoritative', () => {
+		const localStorage = new MemoryStorage();
+		const sessionStorage = new MemoryStorage();
+		localStorage.setItem('dryui-feedback-server-url', 'http://127.0.0.1:5888');
+
 		expect(
 			resolveFeedbackServerUrl('http://127.0.0.1:4748', {
+				href: 'https://example.test/page',
+				localStorage,
+				sessionStorage
+			})
+		).toBe('http://127.0.0.1:4748');
+	});
+
+	test('stored handoff is used when no server is configured', () => {
+		const localStorage = new MemoryStorage();
+		const sessionStorage = new MemoryStorage();
+		localStorage.setItem('dryui-feedback-server-url', 'http://127.0.0.1:5888');
+
+		expect(
+			resolveFeedbackServerUrl(undefined, {
 				href: 'https://example.test/page',
 				localStorage,
 				sessionStorage
