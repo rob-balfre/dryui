@@ -1,6 +1,6 @@
 ---
 name: dryui
-description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, layout discipline, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills.'
+description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills.'
 ---
 
 # DryUI
@@ -90,15 +90,16 @@ The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero i
 
 Theming precedence beats design opinion. If impeccable guidance conflicts with DryUI theme contracts, tokens, or accessibility rules, DryUI wins.
 
-## 4. Layout in `src/layout.css`. @container for Responsive.
+## 4. Layout Lives in `src/layout.css`. Use `@container`.
 
-**Nothing else.**
+**The lint enforces this. The AI authors the shape.**
 
-- DryUI does not ship a layout component. Page and section structure live as grid, flex, and container-query CSS in `src/layout.css`, scoped under a stable `[data-layout="<name>"]` selector. Use the `dryui-layout` skill.
-- Page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). Nowhere else for page layout: no grid/flex in route-level component `<style>` blocks, no `style=` inline, no `style:` directives.
-- Constrained page tracks belong in `src/layout.css`; use `Container` only for component-level content measure when a recipe explicitly calls for it.
-- Use `@container` queries for responsive sizing. Mobile-first base; never `@media` for layout breakpoints.
-- Children opt into a grid area with `data-layout-area="<area>"`.
+- DryUI does not ship a layout component. Page and section layout = a `data-layout="<name>"` hook on the markup root plus grid, flex, and container-query CSS in `src/layout.css`, scoped under `[data-layout="<name>"]`. Pick whichever shape fits — auto-flow, named areas, flex rows. The lint blocks the wrong locations, not your choices.
+- Page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). The `dryui/no-raw-grid` and `dryui/no-flex` rules reject them in route-level component `<style>` blocks. No `style=` inline, no `style:` directives.
+- For responsive shifts, use `@container page (min-width: ...)`. Mobile-first base; never `@media` for layout breakpoints. `dryui/no-media-sizing` rejects them.
+- Use `--dry-space-*` for gaps and padding, `--dry-color-*` for any colors.
+- Page layout assumes `body { container-type: inline-size; container-name: page; }` in `src/app.css`. Without it, every `@container page (...)` rule silently fails.
+- For named grid areas, mark each child with `data-layout-area="<area>"`. Auto-flow grids and flex layouts don't need it.
 
 ```svelte
 <div data-layout="docs-shell">
@@ -199,7 +200,7 @@ The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either 
 npx skills add rob-balfre/dryui
 ```
 
-That single command installs all six DryUI skills (`dryui`, `dryui-layout`, `dryui-layout-polish`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) through the upstream skills installer. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-layout`.
+That single command installs all four DryUI skills (`dryui`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`) through the upstream skills installer. To target one agent: `npx skills add rob-balfre/dryui --agent <flag>` (full flag list at https://skills.sh). To install one skill: `npx skills add rob-balfre/dryui --skill dryui-feedback`.
 
 **2. Start feedback tooling** when you need visual annotations:
 

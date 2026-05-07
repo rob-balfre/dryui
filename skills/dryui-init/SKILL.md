@@ -69,7 +69,7 @@ A valid DryUI consumer setup has:
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
 - `<html class="theme-auto">` in `src/app.html`, unless the app already has an explicit theme strategy.
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, then `../layout.css` last.
-- `src/layout.css` present, minimal, and ready for the `dryui-layout` skill to own page/section grid and flex layout.
+- `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
 
 ## Apply Setup
 
@@ -88,7 +88,7 @@ For an existing SvelteKit app:
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
 4. In `src/app.html`, set `<html class="theme-auto">` unless the app already has an explicit theme strategy.
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last.
-6. Create `src/layout.css` if missing. Keep it minimal until `dryui-layout` creates page zones.
+6. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
 
 ## UI Pipeline After Setup
 

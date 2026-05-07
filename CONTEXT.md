@@ -47,11 +47,9 @@ Domain glossary for the DryUI monorepo. Used by `/improve-codebase-architecture`
 
 ## Layout domain
 
-**Layout** — page or section structure for a `.svelte` route. A `<div data-layout="<name>">` in the route file plus a matching grid template in `src/layout.css` scoped under `[data-layout="<name>"]`. No DryUI layout component exists.
+**Layout** — page or section structure for a `.svelte` route. A `<div data-layout="<name>">` in the route file plus a matching grid or flex block in `src/layout.css` scoped under `[data-layout="<name>"]`. No DryUI layout component exists. Authors pick the shape (auto-flow, named areas, flex row); the lint enforces the location.
 
-**Layout area** — a named region inside a layout, marked with `data-layout-area="<region>"`. The grid template assigns it a `grid-area`.
-
-**Layout phase** — Phase 1 (zones, grid skeleton) handled by the `dryui-layout` skill; Phase 2 (placement, polish) handled by `dryui-layout-polish`. Phase 1 markup uses plain HTML, no DryUI components.
+**Layout area** — an optional named region inside a layout, marked with `data-layout-area="<region>"`. Used when the grid template assigns explicit `grid-area` slots. Auto-flow grids and flex layouts don't need it.
 
 **Layout contract** — the hard-validation rules for Layout files and hooks: `src/layout.css` owns page/section grid and flex declarations, selectors are scoped through Layout hooks, responsive structure uses named `@container page (...)` queries, and violations fail deterministic checks. `data-layout-area` selectors must be scoped under their owning `[data-layout="<name>"]` selector; bare area selectors are global leakage. This is stricter than advisory prose because LLM-generated layouts otherwise drift into unsupported UI structure.
 

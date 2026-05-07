@@ -107,17 +107,6 @@ const LAYOUT_RULE_CONTRACT: SkillRuleContract = {
 				/no inline styles/i,
 				/no layout components/i
 			]
-		},
-		{
-			file: 'skills/dryui-layout/SKILL.md',
-			label: 'layout skill rule',
-			patterns: [
-				/src\/layout\.css/,
-				/data-layout/,
-				/data-layout-area/,
-				/grid-template-columns/,
-				/@container/
-			]
 		}
 	]
 };

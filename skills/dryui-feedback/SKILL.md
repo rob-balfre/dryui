@@ -47,15 +47,13 @@ Each entry: `{ tag, selector?, rect }`. The user wants this element gone. Remove
 
 ### `moved[]` — repositions
 
-Each entry: `{ tag, selector?, originalRect, currentRect }`. The user dragged an element from `originalRect` to `currentRect` (viewport coordinates). The screenshot shows a solid blue outline at the new position and a dashed blue ghost at the original position so you can see the displacement at a glance. Treat this as a layout intent — the user wants the element to live where the solid outline sits. Most cases hand off to `dryui-layout` (it usually means a different grid area in `src/layout.css`); apply directly only if the move clearly fits an existing sibling slot.
+Each entry: `{ tag, selector?, originalRect, currentRect }`. The user dragged an element from `originalRect` to `currentRect` (viewport coordinates). The screenshot shows a solid blue outline at the new position and a dashed blue ghost at the original position so you can see the displacement at a glance. Treat this as a layout intent — the user wants the element to live where the solid outline sits. Edit the `data-layout` block in `src/layout.css` (different grid area, reordered template, new track) to match. Apply directly when the move fits an existing sibling slot.
 
 ## Layout discipline
 
 DryUI does not ship a layout component. All page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). Nowhere else for page layout.
 
-If feedback proposes a structural layout change — new named region, new responsive shift, different grid template — hand off to `dryui-layout`. The Layout agent owns the `src/layout.css` surface.
-
-If feedback is region-internal — padding inside a card, gap between sibling chips, surface borders/backgrounds — apply directly. Use the `--dry-space-*` token scale: `--dry-space-2` (8px), `--dry-space-3` (12px), `--dry-space-4` (16px), `--dry-space-6` (24px), `--dry-space-8` (32px). Pick by feel from the screenshot — usually `4` or `6` for body content, `2` or `3` for compact UI, `8` for hero-style breathing room.
+Structural changes (new named region, new responsive shift, different grid template) and region-internal changes (padding inside a card, gap between sibling chips, surface borders/backgrounds) are both yours to apply. For structural edits, work in `src/layout.css` under the existing `[data-layout='<name>']` block — extend the template, add a new `data-layout-area`, or add an `@container page (min-width: ...)` rule. Pick the smallest edit that satisfies the feedback. Use the `--dry-space-*` token scale: `--dry-space-2` (8px), `--dry-space-3` (12px), `--dry-space-4` (16px), `--dry-space-6` (24px), `--dry-space-8` (32px). Pick by feel from the screenshot — usually `4` or `6` for body content, `2` or `3` for compact UI, `8` for hero-style breathing room.
 
 ## Lint trip-wires that will block the dev server
 
@@ -98,20 +96,19 @@ If the feedback is ambiguous, prefer the smaller change. The user can always sen
 
 ## Hand-off table
 
-| Feedback shape                                                                       | Hand off to            |
-| ------------------------------------------------------------------------------------ | ---------------------- |
-| Structural layout change (new region, new responsive breakpoint, different template) | `dryui-layout`         |
-| Pure design tokens / theme decisions                                                 | (theme agent — coming) |
-| Forms wiring / a11y / focus / keyboard                                               | (forms agent — coming) |
-| Microcopy or content-only edits                                                      | apply directly         |
-| Padding / spacing / colour / size on existing element                                | apply directly         |
-| Component swap (e.g., raw `<button>` → `<Button>`)                                   | apply directly         |
-| Adding a component the user explicitly placed via `components[]`                     | apply directly         |
-| Removing an element via `removed[]`                                                  | apply directly         |
-| Moving an element via `moved[]` (different grid area)                                | `dryui-layout`         |
-| Moving an element via `moved[]` (clearly fits an existing sibling slot)              | apply directly         |
+| Feedback shape                                                                       | Hand off to                        |
+| ------------------------------------------------------------------------------------ | ---------------------------------- |
+| Pure design tokens / theme decisions                                                 | (theme agent — coming)             |
+| Forms wiring / a11y / focus / keyboard                                               | (forms agent — coming)             |
+| Microcopy or content-only edits                                                      | apply directly                     |
+| Padding / spacing / colour / size on existing element                                | apply directly                     |
+| Structural layout change (new region, new responsive breakpoint, different template) | apply directly in `src/layout.css` |
+| Component swap (e.g., raw `<button>` → `<Button>`)                                   | apply directly                     |
+| Adding a component the user explicitly placed via `components[]`                     | apply directly                     |
+| Removing an element via `removed[]`                                                  | apply directly                     |
+| Moving an element via `moved[]`                                                      | apply directly                     |
 
-Erring towards "apply directly" is usually right for single-region tweaks. Hand off when the change touches `src/layout.css` or breakpoint logic.
+Default to "apply directly". Layout-shape edits live in `src/layout.css`; component edits live in the route file.
 
 ## Workflow
 
@@ -119,7 +116,7 @@ Erring towards "apply directly" is usually right for single-region tweaks. Hand 
 2. **Read the screenshot.** Use the `Read` tool on `preferredScreenshotPath`. This is the ground truth.
 3. **Locate the page in source.** The submission's `url` maps to a route. For `http://localhost:5174/foo` that's `src/routes/foo/+page.svelte`. For the index, `src/routes/+page.svelte`.
 4. **Pair drawings with hints.** Prefer `drawingHints[]`; each pair has `{ drawing, hint }`. If you need the raw arrays, for each `drawings[i]`, look at `hints[i].element` to find the DOM target, and `hints[i].corner` + `hints[i].percentX/Y` for sub-element placement.
-5. **Apply intents.** In order: `drawings` (`textNotes[]` are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually hand off to `dryui-layout`). Make the smallest source edit that satisfies each.
+5. **Apply intents.** In order: `drawings` (`textNotes[]` are instructions), `components` (additions), `removed` (deletions), `moved` (repositions — usually a `src/layout.css` edit). Make the smallest source edit that satisfies each.
 6. **Run checks.** Run the project’s focused check/build/test command for the changed file or package. Fix any violations the edit introduced — re-read this skill's lint section if confused.
 7. **Resolve.** Call MCP `feedback_resolve_submission` with the submission id, or `curl -X PATCH http://127.0.0.1:4748/submissions/<id> -H "Content-Type: application/json" -d '{"status":"resolved"}'`. The dashboard depends on this to clear the submission from the queue.
 
