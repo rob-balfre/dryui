@@ -493,7 +493,13 @@
 		container-type: inline-size;
 		display: grid;
 		gap: var(--dry-space-2);
-		min-inline-size: max-content;
+		/* `container-type: inline-size` applies `contain: inline-size`, so the
+		   element is opaque to its parent's intrinsic sizing. With `min-inline-size: max-content`
+		   inside an `inline-grid` parent (Calendar.Root, RangeCalendar.Root, DatePicker.Content),
+		   the cycle resolves to 0 and the container collapses to a tall thin pill while day cells
+		   overflow visually. Use a concrete length (matches the `repeat(7, minmax(--dry-space-10, 1fr))`
+		   row template plus its 1px gaps) so the parent has something to size to. */
+		min-inline-size: calc(7 * var(--dry-space-10) + 6px);
 		user-select: none;
 		color: var(--dry-color-text-strong);
 		font-family: var(--dry-font-sans);

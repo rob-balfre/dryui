@@ -1421,9 +1421,9 @@
 	}
 
 	:global(.submit-pill) {
-		--dry-btn-bg: oklch(18% 0.05 34 / 0.82);
-		--dry-btn-border: oklch(65% 0.19 34 / 0.36);
-		--dry-btn-color: oklch(88% 0.1 34);
+		--dry-btn-bg: oklch(18% 0.05 145 / 0.82);
+		--dry-btn-border: oklch(65% 0.19 145 / 0.36);
+		--dry-btn-color: oklch(88% 0.1 145);
 		--dry-btn-font-size: 11px;
 		--dry-btn-min-height: 30px;
 		--dry-btn-padding-x: 12px;
@@ -1436,10 +1436,10 @@
 		gap: 6px;
 		padding: 0 12px;
 		block-size: 30px;
-		border: 1px solid oklch(65% 0.19 34 / 0.36);
+		border: 1px solid oklch(65% 0.19 145 / 0.36);
 		border-radius: 8px;
-		background: oklch(18% 0.05 34 / 0.82);
-		color: oklch(88% 0.1 34);
+		background: oklch(18% 0.05 145 / 0.82);
+		color: oklch(88% 0.1 145);
 		font-family:
 			system-ui,
 			-apple-system,
@@ -1452,17 +1452,17 @@
 	}
 
 	:global(.submit-pill:hover:not([data-submitting])) {
-		--dry-btn-bg: oklch(22% 0.07 34 / 0.92);
-		--dry-btn-border: oklch(76% 0.16 34 / 0.5);
-		--dry-btn-color: oklch(93% 0.07 34);
+		--dry-btn-bg: oklch(22% 0.07 145 / 0.92);
+		--dry-btn-border: oklch(76% 0.16 145 / 0.5);
+		--dry-btn-color: oklch(93% 0.07 145);
 
-		background: oklch(22% 0.07 34 / 0.92);
-		border-color: oklch(76% 0.16 34 / 0.5);
-		color: oklch(93% 0.07 34);
+		background: oklch(22% 0.07 145 / 0.92);
+		border-color: oklch(76% 0.16 145 / 0.5);
+		color: oklch(93% 0.07 145);
 	}
 
 	:global(.submit-pill:focus-visible) {
-		outline: 2px solid oklch(76% 0.16 34 / 0.9);
+		outline: 2px solid oklch(76% 0.16 145 / 0.9);
 		outline-offset: 1px;
 	}
 

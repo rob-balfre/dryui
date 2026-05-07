@@ -83,6 +83,8 @@ Use `src/layout.css` grid tracks for page-level width. Use `Container` only insi
 }
 ```
 
+**Anti-pattern: `justify-items: center` without a sized track.** A page that only declares `display: grid` + `justify-items: center` has an `auto`-sized implicit column. `justify-items: center` then shrinks every child to its min-content width, so any inline-grid component (Calendar, Combobox, intrinsically-sized widgets) renders squashed at its smallest natural size, regardless of viewport width. The fix is always to declare `grid-template-columns: minmax(0, <max-rem>)` and use `justify-content: center` to center the track. Add `justify-items: center` only if you also want item-level centering inside that track.
+
 ### Full-screen app shell
 
 Tool-style app with sidebar, topbar, main, and right panel. The fixed-height columns treatment is wrapped in `@container page (min-width: 56rem)` so narrow viewports stack and scroll the body.
