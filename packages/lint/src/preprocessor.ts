@@ -100,6 +100,10 @@ function isExcluded(
 ): boolean {
 	if (include.length > 0 && !matchesPattern(filename, include)) return true;
 	if (filename.includes('/node_modules/')) return true;
+	// SvelteKit's generated files (root.svelte etc.) live in .svelte-kit/ and
+	// contain framework-authored markup like inline-styled <div>s for the
+	// announcer. They are not consumer code; do not lint them.
+	if (filename.includes('/.svelte-kit/')) return true;
 	// Files belonging to an upstream `@dryui/*` package — for example when a
 	// consumer has linked the workspace under `DRYUI_DEV=1` and the package
 	// resolves to its real path instead of `node_modules/...` — should not be

@@ -15,7 +15,40 @@ The durable install path for DryUI skills is:
 npx skills add rob-balfre/dryui
 ```
 
-## Inspect First
+## Skill Discipline
+
+This is a short, linear flow. Do not create per-step `TaskCreate` items — the bookkeeping costs more than the work it tracks. One intent line up front and one summary line at the end is enough.
+
+**First tool call is always the script.** Do not run an explicit pre-triage `ls`/`[ -f X ]` call — the script self-triages and routes via exit code:
+
+```bash
+bash <skill-base-dir>/scripts/bare-skeleton.sh "$PWD"
+```
+
+- Exit 0 → done. Print one summary line and stop.
+- Exit 2 with `route=existing-sveltekit` → follow **Apply Setup** below.
+- Exit 2 with `route=ambiguous` → ask the user one question (scaffold over / integrate / abort), then act on the answer.
+- Any other non-zero → read the message, fix the specific issue, do not re-run the whole thing manually.
+
+Do not `Read` any file you just copied from `templates/` to verify it — those files are validated by `bun run check` at the end of the script. Do not run `bunx sv@latest create` into a temp dir. Do not overwrite `package.json` with `Write` — the script uses `jq` to merge so user-set keys (especially `overrides`) are preserved.
+
+## What The Script Does
+
+`scripts/bare-skeleton.sh` is the single entry point. It self-triages and either bootstraps a bare skeleton or exits 2 with a routing hint. Steps in order:
+
+1. **Triage** — exits 2 with `route=existing-sveltekit` if `svelte.config.*` is present, or `route=ambiguous` if `src/` exists without a config.
+2. Removes `index.ts` / `index.js` from the `bun init` skeleton.
+3. Copies every file in `templates/` into the project root.
+4. Merges scripts, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides`, `dependencies`, and any other keys.
+5. Appends SvelteKit/Vite ignores to `.gitignore` (idempotent — checks for `/.svelte-kit` first).
+6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui` + `bun add -d @dryui/lint` against npm.
+7. Runs `bun run check` to validate the contract end-to-end.
+
+The smoke-test `+page.svelte` in `templates/` imports `Heading` and `Text` from `@dryui/ui` — both are real exports and both pass `dryui-lint`. Do not invent imports.
+
+For non-bun package managers (`npm`, `pnpm`, `yarn`), open `scripts/bare-skeleton.sh` and translate the install commands. The contract and templates are package-manager-agnostic.
+
+## Inspect First (Existing SvelteKit Or Ambiguous Branches)
 
 Read the project shape before changing files:
 
@@ -24,8 +57,6 @@ Read the project shape before changing files:
 3. Check whether `@dryui/ui` and `@dryui/lint` are already installed.
 4. Check whether root layout imports DryUI themes, app CSS, and layout CSS in the right cascade order.
 5. Check whether `dryuiLint()` and `dryuiLayoutCss()` are wired.
-
-If the user asked for a new app and no app exists, scaffold SvelteKit with the project’s preferred package manager, then apply the setup steps below.
 
 ## Golden Consumer Setup Contract
 
@@ -66,7 +97,7 @@ Use this order for the first real interface:
 1. Capture the user's brief in one line: what you are building, and for whom.
 2. Use the `dryui` skill rule files, component metadata, docs pages, and existing repo usage to confirm components, recipes, contracts, accessibility, and tokens.
 3. Build with DryUI + Svelte 5 runes, grid layout, and `--dry-*` tokens.
-4. Run the project’s check/build/test command to validate contracts, a11y, tokens, and CSS discipline.
+4. Run the project's check/build/test command to validate contracts, a11y, tokens, and CSS discipline.
 
 For design-quality flows (brief, critique, polish, audit), delegate to [impeccable](https://impeccable.style) via `/impeccable teach`, `/impeccable craft`, `/impeccable critique`, `/impeccable audit`, or `/impeccable polish` in your AI harness. DryUI ships no design opinion.
 
