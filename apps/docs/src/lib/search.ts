@@ -1,4 +1,3 @@
-import { DOCS_ROUTES } from '../../../../packages/mcp/src/docs-surface.js';
 import { categories, toSlug } from '$lib/nav';
 
 interface SearchItem {
@@ -12,6 +11,28 @@ interface SearchSection {
 	heading: string;
 	items: SearchItem[];
 }
+
+interface DocsRoute {
+	readonly path: string;
+	readonly label: string;
+	readonly description: string;
+	readonly keywords?: readonly string[];
+}
+
+const DOCS_ROUTES: readonly DocsRoute[] = [
+	{
+		path: '/',
+		label: 'Home',
+		description: 'Human-led, agent-assisted UI for reusable components, themes, and route patterns',
+		keywords: ['index', 'overview', 'landing', 'human-led', 'agent-assisted']
+	},
+	{
+		path: '/getting-started',
+		label: 'Getting Started',
+		description: 'Install the DryUI skill, wire the app, add themes, and build with components',
+		keywords: ['install', 'setup', 'skill', 'theme', 'quickstart']
+	}
+];
 
 // Build-time route discovery — Vite resolves this at compile time so stale
 // entries pointing to deleted routes are automatically filtered out.

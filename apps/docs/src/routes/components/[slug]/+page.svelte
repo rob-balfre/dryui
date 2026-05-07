@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PageProps } from './$types';
-	import type { PartDef } from '../../../../../../packages/mcp/src/spec-types.js';
+	import type { PartDef } from '$lib/component-spec-types';
 	import { Badge } from '@dryui/ui/badge';
 	import { CodeBlock } from '@dryui/ui/code-block';
 	import { Container } from '@dryui/ui/container';

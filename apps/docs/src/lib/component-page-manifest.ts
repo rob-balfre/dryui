@@ -1,8 +1,5 @@
 import componentPages from '$lib/generated/component-pages.json';
-import type {
-	DocsComponentPageEntry,
-	DocsComponentPagesManifest
-} from '../../../../packages/mcp/src/docs-component-pages.js';
+import type { DocsComponentPageEntry, DocsComponentPagesManifest } from '$lib/component-spec-types';
 
 export type ComponentPageGroup = { name: string; props: string[] };
 
