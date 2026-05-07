@@ -92,14 +92,35 @@ Theming precedence beats design opinion. If impeccable guidance conflicts with D
 
 ## 4. Layout Lives in `src/layout.css`. Use `@container`.
 
-**The lint enforces this. The AI authors the shape.**
+**`src/layout.css` is structural-only. The lint enforces this. The AI authors the shape.**
 
-- DryUI does not ship a layout component. Page and section layout = a `data-layout="<name>"` hook on the markup root plus grid, flex, and container-query CSS in `src/layout.css`, scoped under `[data-layout="<name>"]`. Pick whichever shape fits — auto-flow, named areas, flex rows. The lint blocks the wrong locations, not your choices.
-- Page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). The `dryui/no-raw-grid` and `dryui/no-flex` rules reject them in route-level component `<style>` blocks. No `style=` inline, no `style:` directives.
-- For responsive shifts, use `@container page (min-width: ...)`. Mobile-first base; never `@media` for layout breakpoints. `dryui/no-media-sizing` rejects them.
-- Use `--dry-space-*` for gaps and padding, `--dry-color-*` for any colors.
-- Page layout assumes `body { container-type: inline-size; container-name: page; }` in `src/app.css`. Without it, every `@container page (...)` rule silently fails.
+DryUI does not ship a layout component. Page and section structure lives in `src/layout.css`, scoped under `[data-layout="<name>"]`. Visual styling goes to `src/app.css`. Mixing them trips four lint rules and blocks `bun run check`.
+
+What `src/layout.css` allows (`dryui/layout-css-property`):
+
+- `display` (grid, inline-grid, flex, inline-flex, contents only).
+- Grid: `grid`, `grid-area`, `grid-template`, `grid-template-areas`, `grid-template-columns/rows`, `grid-auto-*`, `grid-row`, `grid-column`.
+- Flex: `flex`, `flex-direction`, `flex-wrap`, `flex-flow`, `flex-grow`, `flex-shrink`, `flex-basis`, `order`.
+- Container: `container-type`, `container-name`, `container`.
+- Block sizing: `block-size`, `min-block-size`, `max-block-size` (no `width`, `height`, `inline-size`).
+- Spacing: `gap`, `row-gap`, `column-gap`, `margin*`, `padding*`. Values must be `0`, `auto` (margin only), `var(--dry-space-*)`, or simple `calc()` over those.
+- Alignment: `align-*`, `justify-*`, `place-*` with standard keywords.
+
+What goes to `src/app.css`, never `src/layout.css` (`dryui/layout-css-property`):
+
+- Color, background, border, outline, box-shadow, opacity.
+- Font, line-height, letter-spacing, text-align, text-decoration, color.
+- Position, top/right/bottom/left, z-index, transform, transition, animation, filter.
+- Width / height / inline-size, overflow, cursor, pointer-events.
+
+Other layout.css rules:
+
+- Selectors must be `[data-layout='<name>']` or its `[data-layout-area='<area>']` children, no class or element selectors (`dryui/layout-css-selector`).
+- Only `@container page (...)` wrappers allowed. Mobile-first base, never `@media` for layout breakpoints (`dryui/layout-css-at-rule`, `dryui/no-media-sizing`). No `@supports`, no unnamed or differently named container queries.
+- Spacing values must be DryUI tokens (`dryui/layout-css-value` rejects raw `1rem`, `12px`).
+- Page-level `display: grid`/`display: flex` in route-level `<style>` blocks is rejected by `dryui/no-raw-grid` and `dryui/no-flex`. No inline `style=`, no `style:` directives.
 - For named grid areas, mark each child with `data-layout-area="<area>"`. Auto-flow grids and flex layouts don't need it.
+- Page layout assumes `body { container-type: inline-size; container-name: page; }` lives in `src/app.css`. Without it, every `@container page (...)` rule silently fails.
 
 ```svelte
 <div data-layout="docs-shell">

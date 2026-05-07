@@ -9,10 +9,11 @@
 
 	interface Props extends CalendarEventGridProps {}
 
-	let props: Props = $props();
+	let { events: eventsProp, ...rest }: Props = $props();
 
 	const ctx = getCalendarCtx();
-	const visibleMonthCount = $derived(normalizeVisibleMonths(props.visibleMonths));
+	const visibleMonthCount = $derived(normalizeVisibleMonths(rest.visibleMonths));
+	const events = $derived(eventsProp ?? ctx.events);
 
 	$effect.pre(() => {
 		ctx.monthView.visibleMonths = visibleMonthCount;
@@ -54,4 +55,4 @@
 	};
 </script>
 
-<CalendarGridButton {adapter} hideHeader {...props} />
+<CalendarGridButton {adapter} hideHeader {...rest} {events} />

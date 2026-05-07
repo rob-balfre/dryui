@@ -1,1 +1,9 @@
-/* App-wide CSS lives here. Page/section grid + flex layout belongs in src/layout.css. */
+/* App-wide CSS lives here: visuals (color, background, border, font-*, box-shadow,
+   transition, opacity, z-index, transform). Page/section grid + flex layout
+   belongs in src/layout.css. */
+
+/* Required for `@container page (...)` queries in src/layout.css. */
+body {
+	container-type: inline-size;
+	container-name: page;
+}

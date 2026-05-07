@@ -1,2 +1,7 @@
-/* Page and section grid/flex layout lives here, owned by the dryui-layout skill.
-   Use [data-layout="<name>"] selectors and @container page (...) queries — never @media. */
+/* Structural-only stylesheet enforced by @dryui/lint.
+   Allowed: display, grid-*, flex-*, container-*, gap, margin/padding (--dry-space-* tokens),
+   align-/justify-/place-*, block-size / min-block-size / max-block-size.
+   Banned: color, background, border, font-*, box-shadow, opacity, transition,
+   width/height/inline-size, position. Put those in src/app.css.
+   Selectors must be [data-layout="<name>"] or its [data-layout-area="<area>"] children.
+   Responsive shifts use @container page (min-width: ...), never @media. */

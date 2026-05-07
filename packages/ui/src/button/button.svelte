@@ -11,6 +11,18 @@
 	// are left as HTMLButtonAttributes' own (boolean | null | undefined, etc.) so consumers
 	// spreading `...rest: HTMLButtonAttributes` into Button type-check.
 	interface Props extends Omit<HTMLButtonAttributes, 'color'> {
+		/**
+		 * Button treatment.
+		 * - `solid` | `outline` | `ghost` | `soft` | `secondary` | `link` | `bare`:
+		 *   normal text-button surfaces ordered roughly from dominant to subtle.
+		 * - `trigger`: pairs with disclosure menus, picks up `aria-expanded`.
+		 * - `tab` / `toggle`: expose `aria-selected` / `aria-pressed` states.
+		 * - `pill`: rounded outline-on-hover chip.
+		 * - `nav`: icon-only circular nav-rail button (aspect-ratio 1, fully
+		 *   rounded). Used for carousel arrows, scroll-to-top, and vertical
+		 *   icon rails. NOT a full-width sidebar nav row: reach for `ghost` or
+		 *   `pill` for those. Pair `nav` with `size='icon'`.
+		 */
 		variant?:
 			| 'solid'
 			| 'outline'
@@ -414,6 +426,11 @@
 		}
 	}
 
+	/* `nav` is the icon-only nav-rail variant: circular, aspect-ratio 1, used
+	   for vertical icon-only navigation rails (carousel arrows, scroll-to-top,
+	   sidebar icon rails). It is NOT a full-width sidebar nav row. For
+	   full-width sidebar/menu rows reach for `ghost` or `pill` instead.
+	   Pair `nav` with `size='icon'` so the height matches a square hit-box. */
 	[data-dry-button][data-variant='nav'] {
 		--_dry-btn-bg: var(--dry-btn-bg, var(--dry-color-bg-raised));
 		--_dry-btn-color: var(--dry-btn-color, var(--dry-color-text-strong));

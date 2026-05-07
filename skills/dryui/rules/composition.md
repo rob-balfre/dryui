@@ -83,6 +83,57 @@ Use `src/layout.css` grid tracks for page-level width. Use `Container` only insi
 }
 ```
 
+### Full-screen app shell
+
+Tool-style app with sidebar, topbar, main, and right panel. The fixed-height columns treatment is wrapped in `@container page (min-width: 56rem)` so narrow viewports stack and scroll the body.
+
+WHY: hard-coding `100dvh` plus 3 columns at the root breaks every viewport under the breakpoint (overlap, lost scrolling). The `@container page` gate is the canonical opt-in.
+
+Requires `body { container-type: inline-size; container-name: page; }` in `src/app.css`.
+
+```svelte
+<div data-layout="app-shell">
+	<aside data-layout-area="sidebar">Nav</aside>
+	<header data-layout-area="topbar">Top bar</header>
+	<main data-layout-area="main">Calendar / table / canvas</main>
+	<aside data-layout-area="panel">Right panel</aside>
+</div>
+```
+
+```css
+[data-layout='app-shell'] {
+	display: grid;
+	gap: var(--dry-space-4);
+	padding: var(--dry-space-4);
+}
+
+[data-layout='app-shell'] > [data-layout-area='sidebar'] {
+	grid-area: sidebar;
+}
+[data-layout='app-shell'] > [data-layout-area='topbar'] {
+	grid-area: topbar;
+}
+[data-layout='app-shell'] > [data-layout-area='main'] {
+	grid-area: main;
+	display: grid;
+	min-block-size: 0;
+}
+[data-layout='app-shell'] > [data-layout-area='panel'] {
+	grid-area: panel;
+}
+
+@container page (min-width: 56rem) {
+	[data-layout='app-shell'] {
+		grid-template-columns: 16rem minmax(0, 1fr) 20rem;
+		grid-template-rows: auto minmax(0, 1fr);
+		grid-template-areas:
+			'sidebar topbar topbar'
+			'sidebar main panel';
+		block-size: 100dvh;
+	}
+}
+```
+
 ## Form Composition
 
 ### Basic form
