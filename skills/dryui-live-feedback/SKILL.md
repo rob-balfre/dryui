@@ -29,15 +29,27 @@ cd packages/feedback-server && bun run build
 
 The server binds port 4748 by default (`DEFAULT_FEEDBACK_PORT`) and walks up to the first free port if it's taken. State lives under `<project>/.dryui/feedback/` (store.db, screenshots, server.json), so each project keeps its own queue.
 
-## 2. Find or Start the Dev Server
+## 2. Wire Up the Feedback Component and Dev Server
 
-Check if a dev server is already running on common ports (5173, 5174, 5198, 5199, 5200):
+### 2a. Confirm `@dryui/feedback` actually resolves
+
+A `package.json` `overrides` entry on its own is **not** proof of installation -- bun overrides only apply when the package is also a dep. Verify the package is actually in `node_modules`:
 
 ```bash
-lsof -iTCP:5173 -iTCP:5174 -iTCP:5198 -iTCP:5199 -iTCP:5200 -sTCP:LISTEN -P 2>/dev/null
+test -f node_modules/@dryui/feedback/package.json && echo OK || echo MISSING
 ```
 
-If nothing is listening, look for a `dev` script in the project's `package.json` and start it. The app must have the `<Feedback>` component mounted:
+If `MISSING`, install it. For projects that consume DryUI through a local workspace (check whether `node_modules/@dryui/ui` is a symlink into a sibling `dryui/` repo), edit `package.json`'s `overrides` to add `"@dryui/feedback": "link:@dryui/feedback"` _before_ installing -- otherwise bun pulls the npm-published version instead of the local workspace. Then:
+
+```bash
+bun add @dryui/feedback
+```
+
+Translate to `npm`/`pnpm`/`yarn` if the project uses one of those. Re-run the resolution check and confirm `OK` before continuing. Skipping this step is the most common way the rest of the flow silently breaks: the import below resolves at edit time but vite throws `Cannot find module '@dryui/feedback'` on first request.
+
+`@dryui/feedback` pulls in `lucide-svelte` transitively. lucide-svelte 1.0.x ships internal `./icons/index` imports without a `.js` extension, which Node strict ESM rejects, so vite must bundle it for SSR. The `dryuiLayoutCss()` plugin from `@dryui/lint` injects `ssr.noExternal: ['lucide-svelte']` automatically. If the project's `vite.config.*` doesn't use `dryuiLayoutCss()` (custom setups, ejected configs), add `ssr: { noExternal: ['lucide-svelte'] }` to the vite config manually before starting the dev server -- otherwise the first SSR request crashes with `Cannot find module '.../lucide-svelte/dist/icons/index'`.
+
+### 2b. Mount the component in the root layout
 
 ```svelte
 <script>
@@ -47,7 +59,23 @@ If nothing is listening, look for a `dev` script in the project's `package.json`
 <Feedback serverUrl="http://localhost:4748" />
 ```
 
-If the component is not mounted, the user cannot submit feedback. Check layout files (`+layout.svelte`) for the import.
+Check `src/routes/+layout.svelte` first; if the import is already there, leave it alone. Without the mount, the user cannot submit feedback.
+
+### 2c. Find the right dev server
+
+Check for vite servers on common ports (5173, 5174, 5198, 5199, 5200):
+
+```bash
+lsof -iTCP:5173 -iTCP:5174 -iTCP:5198 -iTCP:5199 -iTCP:5200 -sTCP:LISTEN -P 2>/dev/null
+```
+
+When more than one server is listening (a developer with several SvelteKit projects open will routinely have 5173/5174 taken by unrelated apps), match by the listening process's working directory. For each PID:
+
+```bash
+lsof -p <PID> -a -d cwd -Fn 2>/dev/null | sed -n 's/^n//p'
+```
+
+Pick the URL whose process cwd equals `$PWD`. Do **not** assume the first port returned belongs to this project. If no listening server matches the cwd, look for a `dev` script in this project's `package.json` and start it.
 
 ## 3. Open the App in a Browser
 

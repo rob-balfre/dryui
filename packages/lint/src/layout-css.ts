@@ -22,6 +22,7 @@ export interface DryuiLayoutCssPluginOptions {
 export interface VitePluginLike {
 	readonly name: string;
 	readonly enforce?: 'pre' | 'post';
+	config?(): { ssr?: { noExternal?: ReadonlyArray<string> } } | void;
 	configResolved?(config: { root?: string; logger?: { warn(message: string): void } }): void;
 	configureServer?(server: {
 		watcher?: { add(path: string): void };
@@ -130,6 +131,14 @@ export function dryuiLayoutCss(options: DryuiLayoutCssPluginOptions = {}): ViteP
 	return {
 		name: 'dryui-layout-css',
 		enforce: 'pre',
+		// lucide-svelte 1.0.x ships a dist entry that imports './icons/index' without
+		// a .js extension. Node's strict ESM resolution rejects it, so vite SSR
+		// crashes the moment a consumer (e.g. @dryui/feedback) loads it. vite-plugin-svelte
+		// used to auto-noExternal svelte-field packages but stopped covering this case
+		// in 7.1.x; force it through vite's bundler instead.
+		config() {
+			return { ssr: { noExternal: ['lucide-svelte'] } };
+		},
 		configResolved(config) {
 			root = options.root ?? config.root ?? root;
 			logger = config.logger ?? logger;

@@ -97,19 +97,22 @@ done
 
 if [ -n "$DRYUI_REPO" ]; then
   echo "[dryui-init] found local dryui workspace at $DRYUI_REPO — linking"
+  # Register every workspace package globally so opt-in deps added later
+  # (e.g. @dryui/feedback by the live-feedback skill) resolve to the workspace.
   for pkg in ui lint primitives feedback; do
     if [ -f "$DRYUI_REPO/packages/$pkg/package.json" ]; then
       ( cd "$DRYUI_REPO/packages/$pkg" && bun link >/dev/null 2>&1 )
     fi
   done
 
-  jq --arg repo "$DRYUI_REPO" '
-    .overrides = ((.overrides // {}) + (
-      ["ui","lint","primitives","feedback"]
-      | map(select(. as $p | $repo + "/packages/" + $p + "/package.json" | . as $f | true))
-      | map({key: ("@dryui/" + .), value: ("link:@dryui/" + .)})
-      | from_entries
-    ))
+  # Only override packages that are actual deps; a dead override entry can
+  # mislead callers into thinking the package is installed when bun has not
+  # resolved it (overrides apply only when the package is also a dep).
+  jq '
+    .overrides = ((.overrides // {}) + {
+      "@dryui/ui": "link:@dryui/ui",
+      "@dryui/lint": "link:@dryui/lint"
+    })
     | .dependencies = ((.dependencies // {}) + {"@dryui/ui": "*"})
     | .devDependencies = ((.devDependencies // {}) + {"@dryui/lint": "*"})
   ' package.json > package.json.new && mv package.json.new package.json

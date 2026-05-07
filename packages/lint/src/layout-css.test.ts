@@ -198,6 +198,12 @@ describe('dryuiLayoutCss Vite plugin', () => {
 		}
 	});
 
+	test('forces lucide-svelte through vite SSR bundling', () => {
+		const plugin = dryuiLayoutCss({ root: tmpdir() });
+		const config = plugin.config!();
+		expect(config?.ssr?.noExternal).toEqual(['lucide-svelte']);
+	});
+
 	test('checks layout.css during hot updates', () => {
 		const root = mkdtempSync(resolve(tmpdir(), 'dryui-layout-css-hmr-'));
 		try {
