@@ -44,7 +44,9 @@ function renderCarousel(
 }
 
 function getSlides() {
-	return Array.from(document.querySelectorAll<HTMLElement>('[data-carousel-slide]'));
+	return Array.from(document.querySelectorAll<HTMLElement>('[data-carousel-slide]')).filter(
+		(slide) => !slide.hasAttribute('data-carousel-clone')
+	);
 }
 
 function getActiveSlideIndex() {
@@ -62,6 +64,63 @@ function getRotationControl() {
 }
 
 describe('carousel accessibility', () => {
+	it('inserts clone slides for loop carousels and excludes them from the slide count', () => {
+		renderCarousel({ controlPattern: 'dots' });
+
+		const viewport = document.querySelector<HTMLElement>('[data-carousel-viewport]');
+		const allChildren = Array.from(viewport?.children ?? []) as HTMLElement[];
+
+		// 3 real slides + leading clone-of-last + trailing clone-of-first
+		expect(allChildren).toHaveLength(5);
+		expect(allChildren[0]?.hasAttribute('data-carousel-clone')).toBe(true);
+		expect(allChildren[4]?.hasAttribute('data-carousel-clone')).toBe(true);
+		expect(allChildren[1]?.hasAttribute('data-carousel-clone')).toBe(false);
+		expect(allChildren[3]?.hasAttribute('data-carousel-clone')).toBe(false);
+
+		// Clones should be hidden from assistive tech and inert.
+		expect(allChildren[0]?.getAttribute('aria-hidden')).toBe('true');
+		expect(allChildren[0]?.hasAttribute('inert')).toBe(true);
+		expect(allChildren[4]?.getAttribute('aria-hidden')).toBe('true');
+		expect(allChildren[4]?.hasAttribute('inert')).toBe(true);
+
+		// IDs are stripped so cloned subtrees do not collide with their twins.
+		expect(allChildren[0]?.id).toBe('');
+		expect(allChildren[4]?.id).toBe('');
+
+		// Real slide count stays 3.
+		expect(getSlides()).toHaveLength(3);
+	});
+
+	it('wraps from the last slide to the first when scrolling next past the end', () => {
+		renderCarousel({ controlPattern: 'dots' });
+
+		const buttons = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[data-carousel-dots] button')
+		);
+
+		buttons[2]?.click();
+		flushSync();
+		expect(getActiveSlideIndex()).toBe(2);
+
+		const root = document.querySelector<HTMLElement>('[data-carousel-root]');
+		root?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+		flushSync();
+
+		expect(getActiveSlideIndex()).toBe(0);
+	});
+
+	it('wraps from the first slide to the last when scrolling prev past the start', () => {
+		renderCarousel({ controlPattern: 'dots' });
+
+		expect(getActiveSlideIndex()).toBe(0);
+
+		const root = document.querySelector<HTMLElement>('[data-carousel-root]');
+		root?.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+		flushSync();
+
+		expect(getActiveSlideIndex()).toBe(2);
+	});
+
 	it('uses grouped buttons for dot pickers and keeps inactive slides inert', () => {
 		renderCarousel({ controlPattern: 'dots' });
 

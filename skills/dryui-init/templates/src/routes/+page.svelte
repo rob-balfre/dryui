@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { Button } from '@dryui/ui/button';
 	import { Heading } from '@dryui/ui/heading';
+	import { List } from '@dryui/ui/list';
 	import { Text } from '@dryui/ui/text';
+	import { Typography } from '@dryui/ui/typography';
 </script>
 
 <svelte:head>
@@ -12,26 +15,48 @@
 		<Text as="p" size="xs" font="mono" weight="bold" color="muted">DRYUI</Text>
 		<Heading level={1} variant="display">DryUI is wired up.</Heading>
 		<Text as="p" size="lg" color="muted">
-			Reusable components, theme tokens, route patterns, and a lint preprocessor that keep your UI
-			consistent as you and your agents iterate. Edit src/routes/+page.svelte to start building.
+			You build with DryUI by talking to your coding agent. Three skills cover the loop:
 		</Text>
-		<a class="docs-link" href="https://dryui.dev/getting-started">Read the docs &rarr;</a>
+		<div class="skills" data-layout-area="skills">
+			<List.Root disablePadding>
+				<List.Item>
+					<List.ItemText>
+						<Typography.Code>dryui</Typography.Code>: components, themes, and a11y patterns for
+						building interfaces.
+					</List.ItemText>
+				</List.Item>
+				<List.Item>
+					<List.ItemText>
+						<Typography.Code>dryui-live-feedback</Typography.Code>: draw on the running app and let
+						agents apply each fix.
+					</List.ItemText>
+				</List.Item>
+				<List.Item>
+					<List.ItemText>
+						<Typography.Code>dryui-init</Typography.Code>: bootstrap or refresh DryUI in any
+						SvelteKit project.
+					</List.ItemText>
+				</List.Item>
+			</List.Root>
+		</div>
+		<Button
+			variant="solid"
+			color="ink"
+			href="https://dryui.dev/getting-started"
+			target="_blank"
+			rel="noopener noreferrer"
+		>
+			Read the docs
+		</Button>
 	</section>
 </main>
 
 <style>
-	.docs-link {
-		align-self: start;
-		color: var(--dry-color-text-strong);
-		font-weight: 600;
-		text-decoration: none;
-		border-bottom: 1px solid var(--dry-color-stroke-weak);
-		padding-block-end: 0.15rem;
-		transition: border-color 120ms ease;
-	}
+	.skills {
+		--dry-list-gap: var(--dry-space-1);
+		--dry-list-item-padding: 0;
+		--dry-list-primary-size: 1rem;
 
-	.docs-link:hover,
-	.docs-link:focus-visible {
-		border-bottom-color: var(--dry-color-text-strong);
+		color: var(--dry-color-text-weak);
 	}
 </style>

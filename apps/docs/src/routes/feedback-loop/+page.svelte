@@ -1,14 +1,10 @@
 <script lang="ts">
 	import { asset } from '$app/paths';
-	import { Button, CodeBlock, Container, Diagram, Heading, Text } from '@dryui/ui';
+	import { Button, Carousel, Container, Diagram, Heading, Text } from '@dryui/ui';
 	import type { DiagramConfig } from '@dryui/ui';
 	import { AppWindow, BookOpen, PenLine, ShieldCheck, Sparkles, User } from 'lucide-svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { withBase } from '$lib/utils';
-
-	const feedbackCode = `bunx dryui-feedback
-# agent or CI shell
-bunx dryui-feedback --no-open`;
 
 	const workflowDiagram: DiagramConfig = {
 		direction: 'TB',
@@ -174,11 +170,10 @@ bunx dryui-feedback --no-open`;
 		<section class="stack-md">
 			<Heading level={2}>Start feedback mode</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Feedback mode runs your app and the local feedback server together. Reviewers draw on the
-				actual page, submit a screenshot with structured annotations, and the dashboard keeps the
-				result ready for the feedback resolver.
+				Ask your agent for visual feedback. The <code>dryui-live-feedback</code> skill brings up the feedback
+				server and dashboard alongside your dev server, opens the app, and waits for you to draw on the
+				page. Each submission becomes a structured task the agent picks up automatically.
 			</Text>
-			<CodeBlock code={feedbackCode} language="bash" />
 		</section>
 
 		<section class="feedback-flow">
@@ -213,19 +208,37 @@ bunx dryui-feedback --no-open`;
 
 		<section class="stack-md">
 			<Heading level={2}>Capture and resolve</Heading>
-			<div class="feedback-shots">
-				{#each feedbackScreenshots as shot (shot.src)}
-					<figure class="feedback-shot">
-						<div class="feedback-frame">
-							<img src={asset(shot.src)} alt={shot.alt} loading="lazy" width="1365" height="900" />
-						</div>
-						<figcaption class="stack-sm">
-							<Text as="span" weight="semibold">{shot.title}</Text>
-							<Text as="span" size="sm" color="secondary">{shot.caption}</Text>
-						</figcaption>
-					</figure>
-				{/each}
-			</div>
+			<Carousel.Root loop>
+				<Carousel.Viewport>
+					{#each feedbackScreenshots as shot (shot.src)}
+						<Carousel.Slide>
+							<figure class="feedback-shot">
+								<div class="feedback-frame">
+									<img
+										src={asset(shot.src)}
+										alt={shot.alt}
+										loading="lazy"
+										width="1365"
+										height="900"
+									/>
+								</div>
+								<figcaption class="stack-sm">
+									<Text as="span" weight="semibold">{shot.title}</Text>
+									<Text as="span" size="sm" color="secondary">{shot.caption}</Text>
+								</figcaption>
+							</figure>
+						</Carousel.Slide>
+					{/each}
+				</Carousel.Viewport>
+
+				<div class="carousel-controls">
+					<div class="carousel-nav">
+						<Carousel.Prev />
+						<Carousel.Next />
+					</div>
+					<Carousel.Dots />
+				</div>
+			</Carousel.Root>
 		</section>
 
 		<div class="feedback-action">
@@ -238,7 +251,6 @@ bunx dryui-feedback --no-open`;
 
 <style>
 	.feedback-flow,
-	.feedback-shots,
 	.feedback-shot,
 	.feedback-frame,
 	.feedback-shot figcaption {
@@ -257,13 +269,23 @@ bunx dryui-feedback --no-open`;
 		box-shadow: var(--dry-shadow-sm);
 	}
 
-	.feedback-shots {
-		gap: var(--dry-space-6);
-	}
-
 	.feedback-shot {
 		gap: var(--dry-space-3);
 		margin: 0;
+	}
+
+	.carousel-controls {
+		display: grid;
+		justify-items: center;
+		gap: var(--dry-space-2);
+		margin-block-start: var(--dry-space-4);
+	}
+
+	.carousel-nav {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: max-content;
+		gap: var(--dry-space-2);
 	}
 
 	.feedback-frame {

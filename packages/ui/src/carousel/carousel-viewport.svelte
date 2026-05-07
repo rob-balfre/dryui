@@ -28,7 +28,25 @@
 			);
 
 			for (const child of el.children) observer.observe(child);
-			return () => observer.disconnect();
+
+			// Loop carousels insert clone slides as direct children after this
+			// effect runs. Watch for childList changes so the observer covers them.
+			const mutObserver = new MutationObserver((mutations) => {
+				for (const mutation of mutations) {
+					for (const node of mutation.addedNodes) {
+						if (node instanceof HTMLElement) observer.observe(node);
+					}
+					for (const node of mutation.removedNodes) {
+						if (node instanceof HTMLElement) observer.unobserve(node);
+					}
+				}
+			});
+			mutObserver.observe(el, { childList: true });
+
+			return () => {
+				observer.disconnect();
+				mutObserver.disconnect();
+			};
 		}
 	});
 </script>

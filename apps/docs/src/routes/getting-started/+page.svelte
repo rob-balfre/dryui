@@ -5,16 +5,7 @@
 	import { DRYUI_SKILLS_INSTALL_COMMAND } from '$lib/ai-setup';
 	import { withBase } from '$lib/utils';
 
-	const projectSetupCode = `bun add @dryui/ui
-bun add -d @dryui/lint`;
-
-	const themeSetupCode = `<!-- src/routes/+layout.svelte -->
-<script>
-  import '@dryui/ui/themes/default.css';
-  import '@dryui/ui/themes/dark.css';
-<\/script>`;
-
-	const firstInterfaceCode = `<script>
+	const componentExample = `<script>
   import { Button, Field, Input, Label } from '@dryui/ui';
 <\/script>
 
@@ -25,8 +16,14 @@ bun add -d @dryui/lint`;
 
 <Button variant="solid">Save changes</Button>`;
 
-	const checkCode = `bun run check
-bun run build`;
+	const manualInstallCode = `bun add @dryui/ui @dryui/feedback
+bun add -d @dryui/lint`;
+
+	const themeImportCode = `<!-- src/routes/+layout.svelte -->
+<script>
+  import '@dryui/ui/themes/default.css';
+  import '@dryui/ui/themes/dark.css';
+<\/script>`;
 </script>
 
 <svelte:head>
@@ -37,54 +34,65 @@ bun run build`;
 	<div class="stack-xl">
 		<DocsPageHeader
 			title="Getting Started"
-			description="DryUI gives humans and agents a shared way to build web app interfaces with reusable components, themes, route patterns, and checks that keep the work consistent."
+			description="DryUI is a Svelte 5 component library plus a coding-agent skill set. You drive it by talking to your agent: ask it to scaffold, build, or iterate, and the right skill kicks in."
 		/>
 
 		<section class="stack-md">
-			<Heading level={2}>Install the skill</Heading>
+			<Heading level={2}>Install the skill set</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Add DryUI to your coding agent first. The skill gives it the component contracts,
-				accessibility rules, theming model, and feedback workflow it should follow when it edits an
-				app.
+				One command installs every DryUI skill into your agent. Once installed, the agent picks the
+				right skill from each request without you hunting for slash commands.
 			</Text>
 			<CodeBlock code={DRYUI_SKILLS_INSTALL_COMMAND} language="bash" />
 		</section>
 
 		<section class="stack-md">
-			<Heading level={2}>Wire the app</Heading>
+			<Heading level={2}>dryui-init: scaffold or wire up</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Ask the installed dryui-init skill to inspect the project and apply the setup contract. For
-				manual or pinned installs, these are the package edits it will make.
+				Ask your agent to set up DryUI. The init skill works on new SvelteKit apps, existing apps,
+				and brownfield repos: it installs <code>@dryui/ui</code>, <code>@dryui/lint</code>, and
+				<code>@dryui/feedback</code>, registers the lint preprocessor, sets up themes, and mounts
+				the live-feedback widget so visual iteration is wired from the start.
 			</Text>
-			<CodeBlock code={projectSetupCode} language="bash" />
 		</section>
 
 		<section class="stack-md">
-			<Heading level={2}>Add the theme</Heading>
+			<Heading level={2}>dryui: build with components</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				DryUI components are token-driven. Import the base themes once, then override semantic
-				tokens when your product needs its own look.
+				The core skill. Tell your agent what you want and it composes real
+				<code>@dryui/ui</code> controls, picking up theming, forms, a11y, and keyboard patterns from the
+				skill rules instead of hand-rolling markup.
 			</Text>
-			<CodeBlock code={themeSetupCode} language="svelte" />
+			<CodeBlock language="svelte" code={componentExample} linkResolver={componentLinkResolver} />
 		</section>
 
 		<section class="stack-md">
-			<Heading level={2}>Build with components</Heading>
+			<Heading level={2}>dryui-live-feedback: iterate visually</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Compose real controls and surfaces instead of one-off markup. Use the installed skills and
-				docs for component contracts, then run the project checks before it ships.
+				Iterate on the running app by drawing on it. The skill boots the feedback dashboard, keeps
+				the dev server healthy, and waits for you to annotate. Each drawing, removed marker, or
+				labeled component becomes a structured edit your agent applies, then it loops.
 			</Text>
-			<CodeBlock language="svelte" code={firstInterfaceCode} linkResolver={componentLinkResolver} />
-			<CodeBlock code={checkCode} language="bash" />
+		</section>
+
+		<section class="stack-md">
+			<Heading level={2}>Manual setup</Heading>
+			<Text size="lg" color="secondary" maxMeasure="default">
+				If you would rather wire DryUI by hand, install the packages and import the themes once. The
+				skills do this for you, but the surface area is small enough to set up manually.
+			</Text>
+			<CodeBlock code={manualInstallCode} language="bash" />
+			<CodeBlock code={themeImportCode} language="svelte" />
 		</section>
 
 		<div class="stack-sm">
 			<Text size="sm" color="muted" maxMeasure="default">
-				Next, start with a concrete component and let DryUI keep the implementation aligned.
+				Want to see what the components look like? Each one has a focused page with API, demo, and
+				accessibility notes.
 			</Text>
 			<span class="start-component-action">
 				<Button variant="solid" color="ink" size="md" href={withBase('/components/button')}>
-					Start with Button
+					Browse components
 				</Button>
 			</span>
 		</div>

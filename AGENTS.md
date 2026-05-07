@@ -24,7 +24,8 @@ Repo-wide instructions for AI coding agents working in this repository.
 
 - Use `gh-axi` for GitHub and `chrome-devtools-axi` for browser automation.
 - DryUI is pre-alpha. Prefer the current shape over compatibility shims unless a task explicitly asks for backwards compatibility.
-- Use DryUI skills as the default entry point. Run the local feedback dashboard with `bunx dryui-feedback` (bin shipped from `@dryui/feedback-server`).
+- Use DryUI skills as the default entry point. For any DryUI component, route, template, styling, layout, docs, or feedback task, load the relevant top-level `skills/*/SKILL.md` before planning or editing files. If the task also involves Svelte or SvelteKit, load the DryUI skill first, then use the Svelte MCP docs/autofixer flow.
+- Run the local feedback dashboard with `bunx dryui-feedback` (bin shipped from `@dryui/feedback-server`).
 - Use package-level lint/build/test commands for deterministic validation: component contracts, a11y, tokens, CSS discipline.
 - DryUI ships no layout component. Page/section structure lives as plain CSS Grid in root `src/layout.css`, scoped under `[data-layout="<name>"]`. The file is imported last from `src/routes/+layout.svelte` after DryUI theme CSS and `../app.css`.
 - All `display: grid` and `display: flex` declarations in consumer code live in `src/layout.css` (or `@container` blocks within it). Mobile-first; `@container` queries for responsive shifts, never `@media` for layout breakpoints.
@@ -44,3 +45,4 @@ Repo-wide instructions for AI coding agents working in this repository.
 - After editing `.svelte` files in `packages/ui/`, run `bun run --filter '@dryui/ui' build`.
 - For docs work, prefer the root wrappers so local runs match CI: `bun run docs`, `bun run docs:build`, `bun run docs:check`, and `bun run build:docs`.
 - After changing skill content, run `bun run validate:skills` (auto-runs in postinstall and the pre-commit hook).
+- After editing DryUI skill templates or other non-app `.svelte` files, run the direct lint surface against changed files, for example `checkSvelteFile(...)` from `packages/lint/src/rules.ts`, because app/package wrapper checks may not scan templates.
