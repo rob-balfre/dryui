@@ -1,48 +1,13 @@
 #!/bin/sh
 
-# Auto-regenerate MCP spec/contract files if component sources changed
-# This prevents check:contract from failing due to stale generated files
-
 STAGED=$(git diff --cached --name-only)
-
-# Check if any primitives or ui source files are staged
-if echo "$STAGED" | grep -qE '^packages/(primitives|ui)/src/'; then
-  echo "[pre-commit] Component sources changed — regenerating spec/contract..."
-
-  bun run --filter '@dryui/mcp' generate-spec && \
-  bun run --filter '@dryui/mcp' generate-architecture && \
-  bun run --filter '@dryui/mcp' generate-contract && \
-  bun run --filter '@dryui/mcp' generate-agent-contract && \
-  bun run --filter '@dryui/mcp' generate-llms
-
-  git add packages/mcp/src/spec.json \
-          packages/mcp/src/architecture.json \
-          packages/mcp/src/contract.v1.json \
-          packages/mcp/src/contract.v1.schema.json \
-          packages/mcp/src/agent-contract.v1.json \
-          packages/mcp/src/agent-contract.v1.schema.json \
-          llms.txt \
-          apps/docs/static/llms.txt \
-          apps/docs/static/llms-components.txt \
-          apps/docs/src/lib/generated/component-pages.json
-
-  echo "[pre-commit] Spec/contract/docs files regenerated and staged."
-fi
-
-# Regenerate theme-tokens.generated.json if UI theme CSS changed. The
-# release pipeline will otherwise catch the drift and refuse to run.
-if echo "$STAGED" | grep -qE '^packages/ui/src/themes/.*\.css$'; then
-  echo "[pre-commit] UI theme CSS changed — regenerating theme-tokens..."
-  bun run --filter '@dryui/mcp' generate-theme-tokens
-  git add packages/mcp/src/theme-tokens.generated.json
-fi
 
 # Validate every staged SKILL.md against the npx skills spec
 # (frontmatter present, name=dirname, description length budget).
 # Phase 6 of the npx skills migration removed the legacy sync:skills
 # regeneration; validate:skills is the only check that runs here.
 if echo "$STAGED" | grep -qE '^skills/.*/SKILL\.md$|^skills/[^/]+/'; then
-  echo "[pre-commit] SKILL.md changed — validating frontmatter..."
+  echo "[pre-commit] SKILL.md changed: validating frontmatter..."
   bun run validate:skills || exit 1
 fi
 
