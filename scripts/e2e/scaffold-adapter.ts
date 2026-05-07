@@ -15,6 +15,8 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'npx skills add rob-balfre/dryui',
 		'@dryui/ui',
 		'@dryui/lint',
+		'@dryui/feedback',
+		'<Feedback',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
 		'<html class="theme-auto">',
@@ -305,11 +307,14 @@ const ROOT_LAYOUT = `<script lang="ts">
 \timport '@dryui/ui/themes/dark.css';
 \timport '../app.css';
 \timport '../layout.css';
+\timport { Feedback } from '@dryui/feedback';
 
 \tlet { children } = $props();
 </script>
 
 {@render children?.()}
+
+<Feedback serverUrl="http://localhost:4748" />
 `;
 
 const HOME_PAGE = `<script lang="ts">

@@ -41,10 +41,10 @@ Do not `Read` any file you just copied from `templates/` to verify it — those 
 3. Copies every file in `templates/` into the project root.
 4. Merges scripts, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides`, `dependencies`, and any other keys.
 5. Appends SvelteKit/Vite ignores to `.gitignore` (idempotent — checks for `/.svelte-kit` first).
-6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui` + `bun add -d @dryui/lint` against npm.
+6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui @dryui/feedback` + `bun add -d @dryui/lint` against npm.
 7. Runs `bun run check` to validate the contract end-to-end.
 
-The smoke-test `+page.svelte` in `templates/` imports `Heading` and `Text` from `@dryui/ui` — both are real exports and both pass `dryui-lint`. Do not invent imports.
+`@dryui/feedback` ships in the bootstrap — the smoke-test `+layout.svelte` imports `Feedback` and mounts it with `serverUrl="http://localhost:4748"` so the live-feedback skill has nothing to install on first use. The widget is dormant until the user toggles it (Cmd+M / Ctrl+M) and respects `DRY_FEEDBACK_DISABLED=1` for CI. The smoke-test `+page.svelte` imports `Heading` and `Text` from `@dryui/ui` — both are real exports and both pass `dryui-lint`. Do not invent imports.
 
 For non-bun package managers (`npm`, `pnpm`, `yarn`), open `scripts/bare-skeleton.sh` and translate the install commands. The contract and templates are package-manager-agnostic.
 
@@ -64,30 +64,30 @@ This section is the Interface for a DryUI consumer setup. `scripts/e2e/scaffold-
 
 A valid DryUI consumer setup has:
 
-- `@dryui/ui` as a runtime dependency and `@dryui/lint` as a dev dependency. E2E may also pin local workspace tarballs for `@dryui/primitives` and `@dryui/feedback` so no published package leaks into the run.
+- `@dryui/ui` and `@dryui/feedback` as runtime dependencies, `@dryui/lint` as a dev dependency. E2E may also pin local workspace tarballs for `@dryui/primitives` (transitive of feedback) so no published package leaks into the run.
 - `dryuiLint({ strict: true })` as the first Svelte preprocessor, preserving any existing preprocessors after it.
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
 - `<html class="theme-auto">` in `src/app.html`, unless the app already has an explicit theme strategy.
-- `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, then `../layout.css` last.
+- `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, `../layout.css` (last), and rendering `<Feedback serverUrl="http://localhost:4748" />` after `{@render children()}` so the live-feedback widget is wired from day one.
 - `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
 
 ## Apply Setup
 
 For an existing SvelteKit app:
 
-1. Install runtime and lint packages:
+1. Install runtime, feedback, and lint packages:
 
    ```bash
-   bun add @dryui/ui
+   bun add @dryui/ui @dryui/feedback
    bun add -d @dryui/lint
    ```
 
-   Translate to `npm`, `pnpm`, or `yarn` when the repo already uses one of those.
+   Translate to `npm`, `pnpm`, or `yarn` when the repo already uses one of those. For local-workspace consumers, mirror the package list in `package.json` `overrides` with `link:@dryui/<pkg>` (including `@dryui/primitives`, transitive of feedback) before installing — bun overrides only apply when the package is also a dep.
 
 2. In `svelte.config.*`, add `dryuiLint({ strict: true })` as the first preprocessor while preserving existing preprocessors.
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
 4. In `src/app.html`, set `<html class="theme-auto">` unless the app already has an explicit theme strategy.
-5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last.
+5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Add `import { Feedback } from '@dryui/feedback';` and render `<Feedback serverUrl="http://localhost:4748" />` after `{@render children()}` so the live-feedback widget is mounted from day one.
 6. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
 
 ## UI Pipeline After Setup
@@ -109,4 +109,4 @@ If the user also wants editor skill setup, use the upstream skills installer:
 npx skills add rob-balfre/dryui
 ```
 
-If the user wants visual feedback tooling, add the dryui-feedback MCP server for their editor and run `bunx dryui-feedback` when they need the local dashboard.
+The `<Feedback>` widget and `@dryui/feedback` dep are part of the bootstrap above, so live feedback only needs the dashboard server running. Add the `dryui-feedback` MCP server in the editor and run `bunx dryui-feedback --no-open` (or `bunx dryui-feedback` for the local dashboard) when the user kicks off a feedback session.

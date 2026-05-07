@@ -111,9 +111,11 @@ if [ -n "$DRYUI_REPO" ]; then
   jq '
     .overrides = ((.overrides // {}) + {
       "@dryui/ui": "link:@dryui/ui",
-      "@dryui/lint": "link:@dryui/lint"
+      "@dryui/lint": "link:@dryui/lint",
+      "@dryui/primitives": "link:@dryui/primitives",
+      "@dryui/feedback": "link:@dryui/feedback"
     })
-    | .dependencies = ((.dependencies // {}) + {"@dryui/ui": "*"})
+    | .dependencies = ((.dependencies // {}) + {"@dryui/ui": "*", "@dryui/feedback": "*"})
     | .devDependencies = ((.devDependencies // {}) + {"@dryui/lint": "*"})
   ' package.json > package.json.new && mv package.json.new package.json
 
@@ -121,8 +123,8 @@ if [ -n "$DRYUI_REPO" ]; then
   bun install
 else
   echo "[dryui-init] no local dryui workspace found (set DRYUI_LOCAL to override) — using published packages"
-  echo "[dryui-init] Step 7: bun add @dryui/ui + @dryui/lint from npm"
-  bun add @dryui/ui
+  echo "[dryui-init] Step 7: bun add @dryui/ui + @dryui/feedback + @dryui/lint from npm"
+  bun add @dryui/ui @dryui/feedback
   bun add -d @dryui/lint
 fi
 

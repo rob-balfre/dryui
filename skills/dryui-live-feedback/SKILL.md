@@ -29,39 +29,22 @@ cd packages/feedback-server && bun run build
 
 The server binds port 4748 by default (`DEFAULT_FEEDBACK_PORT`) and walks up to the first free port if it's taken. State lives under `<project>/.dryui/feedback/` (store.db, screenshots, server.json), so each project keeps its own queue.
 
-## 2. Wire Up the Feedback Component and Dev Server
+## 2. Confirm the Widget Is Wired and Find the Dev Server
 
-### 2a. Confirm `@dryui/feedback` actually resolves
+### 2a. Verify `@dryui/feedback` is installed and mounted
 
-A `package.json` `overrides` entry on its own is **not** proof of installation -- bun overrides only apply when the package is also a dep. Verify the package is actually in `node_modules`:
+`dryui-init` bakes both into the bootstrap, so projects scaffolded with the current skill have nothing to do here. For older projects (or ones that ejected the template), confirm both before continuing:
 
 ```bash
 test -f node_modules/@dryui/feedback/package.json && echo OK || echo MISSING
+grep -q "from '@dryui/feedback'" src/routes/+layout.svelte && echo MOUNTED || echo MISSING
 ```
 
-If `MISSING`, install it. For projects that consume DryUI through a local workspace (check whether `node_modules/@dryui/ui` is a symlink into a sibling `dryui/` repo), edit `package.json`'s `overrides` to add `"@dryui/feedback": "link:@dryui/feedback"` _before_ installing -- otherwise bun pulls the npm-published version instead of the local workspace. Then:
-
-```bash
-bun add @dryui/feedback
-```
-
-Translate to `npm`/`pnpm`/`yarn` if the project uses one of those. Re-run the resolution check and confirm `OK` before continuing. Skipping this step is the most common way the rest of the flow silently breaks: the import below resolves at edit time but vite throws `Cannot find module '@dryui/feedback'` on first request.
+If either prints `MISSING`, fall through to the `dryui-init` skill's **Apply Setup → Install Or Refresh** steps for the wiring (package install, optional `link:@dryui/feedback` override for local-workspace consumers, `<Feedback serverUrl="http://localhost:4748" />` mount in `src/routes/+layout.svelte`). A `package.json` `overrides` entry alone is not proof of installation -- bun only applies overrides when the package is also a dep, so the `node_modules` check is the source of truth. Skipping this step is the most common way the rest of the flow silently breaks: the import resolves at edit time but vite throws `Cannot find module '@dryui/feedback'` on first request.
 
 `@dryui/feedback` pulls in `lucide-svelte` transitively. lucide-svelte 1.0.x ships internal `./icons/index` imports without a `.js` extension, which Node strict ESM rejects, so vite must bundle it for SSR. The `dryuiLayoutCss()` plugin from `@dryui/lint` injects `ssr.noExternal: ['lucide-svelte']` automatically. If the project's `vite.config.*` doesn't use `dryuiLayoutCss()` (custom setups, ejected configs), add `ssr: { noExternal: ['lucide-svelte'] }` to the vite config manually before starting the dev server -- otherwise the first SSR request crashes with `Cannot find module '.../lucide-svelte/dist/icons/index'`.
 
-### 2b. Mount the component in the root layout
-
-```svelte
-<script>
-	import { Feedback } from '@dryui/feedback';
-</script>
-
-<Feedback serverUrl="http://localhost:4748" />
-```
-
-Check `src/routes/+layout.svelte` first; if the import is already there, leave it alone. Without the mount, the user cannot submit feedback.
-
-### 2c. Find the right dev server
+### 2b. Find the right dev server
 
 Check for vite servers on common ports (5173, 5174, 5198, 5199, 5200):
 

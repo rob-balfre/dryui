@@ -112,14 +112,17 @@ describe('E2E scaffold Adapter', () => {
 		expect(viteConfig).toContain("import { dryuiLayoutCss } from '@dryui/lint';");
 		expect(viteConfig.indexOf('dryuiLayoutCss()')).toBeLessThan(viteConfig.indexOf('sveltekit()'));
 
-		expect(read(projectDir, 'src/routes/+layout.svelte')).toContain(
+		const rootLayout = read(projectDir, 'src/routes/+layout.svelte');
+		expect(rootLayout).toContain(
 			[
 				"import '@dryui/ui/themes/default.css';",
 				"import '@dryui/ui/themes/dark.css';",
 				"import '../app.css';",
-				"import '../layout.css';"
+				"import '../layout.css';",
+				"import { Feedback } from '@dryui/feedback';"
 			].join('\n\t')
 		);
+		expect(rootLayout).toContain('<Feedback serverUrl="http://localhost:4748" />');
 		expect(read(projectDir, 'src/app.css')).toContain('container-type: inline-size;');
 		expect(read(projectDir, 'src/app.css')).toContain('container-name: page;');
 		expect(read(projectDir, 'src/layout.css')).toContain("[data-layout='home']");
