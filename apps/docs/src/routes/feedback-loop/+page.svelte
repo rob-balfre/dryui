@@ -2,7 +2,7 @@
 	import { asset } from '$app/paths';
 	import { Button, CodeBlock, Container, Diagram, Heading, Text } from '@dryui/ui';
 	import type { DiagramConfig } from '@dryui/ui';
-	import { AppWindow, Boxes, PenLine, ShieldCheck, Sparkles, User } from 'lucide-svelte';
+	import { AppWindow, BookOpen, PenLine, ShieldCheck, Sparkles, User } from 'lucide-svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
 	import { withBase } from '$lib/utils';
 
@@ -24,10 +24,10 @@ bunx dryui-feedback --no-open`;
 				height: 144
 			},
 			{
-				id: 'mcp',
-				label: 'DryUI MCP',
+				id: 'skill',
+				label: 'DryUI Skill',
 				description: 'Look up components',
-				iconComponent: Boxes,
+				iconComponent: BookOpen,
 				width: 236,
 				height: 152
 			},
@@ -49,8 +49,8 @@ bunx dryui-feedback --no-open`;
 			}
 		],
 		edges: [
-			{ from: 'you', to: 'mcp' },
-			{ from: 'mcp', to: 'preprocessor' },
+			{ from: 'you', to: 'skill' },
+			{ from: 'skill', to: 'preprocessor' },
 			{ from: 'preprocessor', to: 'app' },
 			{
 				from: 'app',
@@ -76,7 +76,7 @@ bunx dryui-feedback --no-open`;
 				direction: 'LR',
 				dashed: false,
 				spacing: { nodeGap: 24, clusterPadding: 32 },
-				nodes: ['mcp', 'preprocessor', 'app']
+				nodes: ['skill', 'preprocessor', 'app']
 			}
 		]
 	};
