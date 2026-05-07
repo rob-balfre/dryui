@@ -158,7 +158,6 @@ export const AGENTS: Record<DispatchAgent, AgentConfig> = {
 		strategy: 'deeplink',
 		cliCommand: 'codex',
 		macApps: ['Codex'],
-		promptPrefix: '[@dryui](plugin://dryui@dryui) ',
 		urlTemplate: 'codex://new?prompt={prompt}&path={workspace}'
 	},
 	gemini: {

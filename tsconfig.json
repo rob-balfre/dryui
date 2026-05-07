@@ -14,13 +14,6 @@
       "@dryui/primitives/virtual-list": ["./packages/primitives/src/virtual-list/index.ts"],
       "@dryui/primitives/infinite-scroll": ["./packages/primitives/src/infinite-scroll/index.ts"],
       "@dryui/ui": ["./packages/ui/src/index.ts"],
-      "@dryui/mcp": ["./packages/mcp/src/index.ts"],
-      "@dryui/mcp/agent-contract": ["./packages/mcp/src/agent-contract.ts"],
-      "@dryui/mcp/agent-contract.v1.json": ["./packages/mcp/src/agent-contract.v1.json"],
-      "@dryui/mcp/theme-checker": ["./packages/mcp/src/theme-checker.ts"],
-      "@dryui/mcp/spec": ["./packages/mcp/src/spec.json"],
-      "@dryui/mcp/spec-types": ["./packages/mcp/src/spec-types.ts"],
-      "@dryui/mcp/spec-formatters": ["./packages/mcp/src/spec-formatters.ts"],
       "@dryui/feedback-server": ["./packages/feedback-server/src/index.ts"],
       "@dryui/lint": ["./packages/lint/src/index.ts"]
     }
@@ -28,10 +21,8 @@
   "references": [
     { "path": "./packages/feedback" },
     { "path": "./packages/feedback-server" },
-    { "path": "./packages/cli" },
     { "path": "./packages/primitives" },
     { "path": "./packages/ui" },
-    { "path": "./packages/mcp" },
     { "path": "./packages/lint" }
   ]
 }
