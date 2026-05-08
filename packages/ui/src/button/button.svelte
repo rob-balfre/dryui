@@ -15,6 +15,8 @@
 		 * Button treatment.
 		 * - `solid` | `outline` | `ghost` | `soft` | `secondary` | `link` | `bare`:
 		 *   normal text-button surfaces ordered roughly from dominant to subtle.
+		 *   Override layout via consumer CSS or the `--dry-btn-justify` token
+		 *   (e.g. `--dry-btn-justify: flex-start` for full-width sidebar rows).
 		 * - `trigger`: pairs with disclosure menus, picks up `aria-expanded`.
 		 * - `tab` / `toggle`: expose `aria-selected` / `aria-pressed` states.
 		 * - `pill`: rounded outline-on-hover chip.
@@ -183,7 +185,14 @@
 		display: inline-grid;
 	}
 
-	[data-dry-button] {
+	/* Base rule wrapped in `:where()` so consumer-authored classes (e.g. a
+	   sidebar `.nav-action { justify-content: flex-start }`) can override the
+	   structural defaults without resorting to !important. The variant rules
+	   below stay at their natural specificity so they continue to win against
+	   bare consumer classes — that's intentional, since variants are the
+	   library's contract. Override variant-specific paint via the public
+	   `--dry-btn-*` tokens on the consumer class. */
+	:where([data-dry-button]) {
 		/* Resolve public button tokens without stomping inherited overrides. */
 		--_dry-btn-accent: var(--dry-btn-accent, var(--dry-color-fill-brand));
 		--_dry-btn-accent-fg: var(--dry-btn-accent-fg, var(--dry-color-text-brand));

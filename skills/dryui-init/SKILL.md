@@ -67,7 +67,7 @@ A valid DryUI consumer setup has:
 - `@dryui/ui` as a runtime dependency. `@dryui/lint`, `@dryui/feedback`, and `@dryui/feedback-server` as dev dependencies. The `@dryui/feedback-server` devDep ships the `dryui-feedback` bin into local `node_modules/.bin` so `bunx dryui-feedback` resolves without a registry round-trip. `@dryui/feedback` is dev-only because the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below). E2E may also pin local workspace tarballs for `@dryui/primitives` (transitive of feedback) so no published package leaks into the run.
 - `dryuiLint({ strict: true })` as the first Svelte preprocessor, preserving any existing preprocessors after it.
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
-- `<html class="theme-auto">` in `src/app.html`, unless the app already has an explicit theme strategy.
+- `src/app.html` ships bare `<html lang="en">` — no `class="theme-auto"`, no `data-theme`. Light tokens apply by default. Apps opt into dark or system mode by adding `class="theme-auto"` and/or `data-theme="…"` themselves.
 - `src/routes/+layout.svelte` importing `@dryui/ui/themes/default.css`, `@dryui/ui/themes/dark.css`, `../app.css`, and `../layout.css` (last), then rendering `{@render children()}`. No `<Feedback>` mount by default — opt in per "Live Feedback (Opt-In)".
 - `src/layout.css` present and minimal. Page/section grid and flex layout lands here, scoped under `[data-layout="<name>"]`, with `@container page (...)` for responsive shifts.
 
@@ -86,7 +86,7 @@ For an existing SvelteKit app:
 
 2. In `svelte.config.*`, add `dryuiLint({ strict: true })` as the first preprocessor while preserving existing preprocessors.
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.
-4. In `src/app.html`, set `<html class="theme-auto">` unless the app already has an explicit theme strategy.
+4. In `src/app.html`, leave `<html>` bare. Don't add `class="theme-auto"` or `data-theme` unless the app explicitly wants system-aware or forced dark mode — see `dryui-build` rules/theming.md for the opt-in recipes.
 5. In `src/routes/+layout.svelte`, import in this order: DryUI theme CSS, app CSS, then `../layout.css` last. Render `{@render children()}` and stop — no widget mounts by default.
 6. Create `src/layout.css` if missing. Keep it minimal — page/section grid blocks land here as routes need them.
 

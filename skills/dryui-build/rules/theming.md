@@ -64,13 +64,13 @@ Import the default theme in your root layout or app entry:
 </script>
 ```
 
-Prefer system mode by default:
+Default to a bare `<html>` — light tokens apply, nothing dark fires:
 
 ```html
-<html class="theme-auto"></html>
+<html></html>
 ```
 
-Use `data-theme="light"` or `data-theme="dark"` only when you need an explicit override.
+Opt into the OS preference with `class="theme-auto"`, or pin a theme with `data-theme="light"` or `data-theme="dark"`. See "Dark Mode" below for the full set of recipes.
 
 ### Common mistakes
 
@@ -129,7 +129,17 @@ Most apps need nothing more than primary + primary-hover. Add danger / success /
 
 ## Dark Mode
 
-### Option A: System theme by default
+### Option A: Light-only (default)
+
+Leave `<html>` bare. Light tokens apply, the dark block never fires — even if `dark.css` is imported and the OS prefers dark.
+
+```html
+<html></html>
+```
+
+This is the scaffold default. Reach for it whenever the design is light-only (most marketing / docs / brand sites, and any app that hasn't explicitly designed a dark variant).
+
+### Option B: System theme
 
 Import both theme files and add `class="theme-auto"` to `<html>`.
 
@@ -139,7 +149,7 @@ Import both theme files and add `class="theme-auto"` to `<html>`.
 
 This follows `prefers-color-scheme` automatically.
 
-### Option B: Explicit override with data-theme
+### Option C: Explicit override with data-theme
 
 Force a specific theme:
 
@@ -149,25 +159,18 @@ Force a specific theme:
 
 Use `data-theme="light"` for the inverse.
 
-### Option B.1: Light-only sites
+### Option C.1: System theme with a light fallback
 
-For a site that should always render light (brand / marketing / docs), combine
-both attributes on `<html>`:
+For a site that should follow the OS but stay light when the user has no preference, combine both attributes on `<html>`:
 
 ```html
 <html class="theme-auto" data-theme="light"></html>
 ```
 
-- `data-theme="light"` pins the page to light tokens even on a dark-preferring
-  OS. The `.theme-auto` dark block is guarded with
-  `:not([data-theme='light'])`, so a dark OS cannot silently override your
-  light design.
-- `class="theme-auto"` stays so an opt-in dark toggle (flipping `data-theme`
-  to `"dark"`) keeps working. Drop `theme-auto` entirely only if you never
-  want a dark pathway, and the explicit `data-theme='dark']` rule is enough
-  on its own.
+- `data-theme="light"` pins the page to light tokens even on a dark-preferring OS. The `.theme-auto` dark block is guarded with `:not([data-theme='light'])`, so a dark OS cannot silently override your light design.
+- `class="theme-auto"` stays so an opt-in dark toggle (flipping `data-theme` to `"dark"`) keeps working. Drop `theme-auto` entirely only if you never want a dark pathway, and the explicit `data-theme='dark']` rule is enough on its own.
 
-Use this recipe as the starting point for light-only sites; adapt it in the app shell alongside the standard theme imports.
+Use this recipe when you want explicit user control plus system awareness.
 
 ### Option C: Persisted theme toggle
 

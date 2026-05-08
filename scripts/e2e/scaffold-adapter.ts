@@ -24,7 +24,6 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'@dryui/feedback-server',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
-		'<html class="theme-auto">',
 		'src/routes/+layout.svelte',
 		'src/layout.css'
 	] as const
@@ -237,7 +236,7 @@ const TSCONFIG = `{
 `;
 
 const APP_HTML = `<!doctype html>
-<html lang="en" class="theme-auto">
+<html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />

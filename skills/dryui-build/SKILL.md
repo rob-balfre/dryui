@@ -54,7 +54,7 @@ The test: every compound component in your markup uses `.Root`, and its parts ar
 - When you do reach for tokens in your own CSS, use `--dry-color-*` and `--dry-space-*` instead of hex/rgb/raw px.
 - Don't decorate user-authored wrappers by default (no `border-radius`, `border`, `background`, `box-shadow`, gradient on a `<section>` "because that's how DryUI looks"). DryUI has no default look. If a wrapper needs visual treatment, the host page decides what.
 - Override semantic tokens (Tier 2) in `:root` if you're customizing palette. Component tokens (Tier 3) are component-internal — leave them alone.
-- Prefer `<html class="theme-auto">`. Use `data-theme="light|dark"` only for explicit overrides.
+- Default to a bare `<html>` — light tokens apply automatically. Add `class="theme-auto"` only when the app should follow the OS preference, and `data-theme="light|dark"` only for explicit overrides. Importing `dark.css` without one of those opt-ins is fine; nothing dark fires until the consumer asks for it.
 
 ```css
 /* Wrong: hardcoded color */
@@ -256,7 +256,7 @@ Kept for users who need to pin to a specific local path; the npx skills command 
 
    Put `dryuiLayoutCss()` before `sveltekit()` when both are present. It warns if `src/layout.css` is missing and throws on violations during dev startup, HMR, and build.
 
-5. Add `class="theme-auto"` to `<html>` in `src/app.html`.
+5. Leave `<html>` bare in `src/app.html`. Light tokens apply by default. Add `class="theme-auto"` only if the page should follow the OS preference; add `data-theme="dark"` (or `"light"`) only for an explicit forced theme.
 6. In root layout (`src/routes/+layout.svelte`), import themes:
    ```svelte
    <script>
