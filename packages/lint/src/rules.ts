@@ -96,6 +96,21 @@ const NATIVE_ELEMENT_RULE_TAGS: ReadonlySet<string> = new Set([
 	'textarea'
 ]);
 
+const GENERIC_LAYOUT_NAMES: ReadonlySet<string> = new Set([
+	'ui',
+	'wrapper',
+	'box',
+	'container',
+	'div',
+	'block',
+	'el',
+	'elem',
+	'element',
+	'layout',
+	'inner',
+	'outer'
+]);
+
 const NATIVE_ELEMENT_RULES: NativeElementRule[] = [
 	{
 		tag: 'button',
@@ -743,6 +758,18 @@ export function checkMarkup(content: string, filename?: string): Violation[] {
 			if (tag.tagName === 'a' || NATIVE_ELEMENT_RULE_TAGS.has(tag.tagName)) continue;
 			addPolicyViolation(policy, violations, 'dryui/no-raw-element', lineOf(tag.index), {
 				tag: tag.tagName
+			});
+		}
+	}
+
+	if (policy.isRuleEnabled('dryui/no-generic-layout-name')) {
+		for (const tag of findAllOpeningTags(markup)) {
+			const dataLayout = attributeByName(tag.attrs, 'data-layout');
+			if (!dataLayout || dataLayout.kind !== 'literal' || dataLayout.value === null) continue;
+			const value = dataLayout.value.trim().toLowerCase();
+			if (!value || !GENERIC_LAYOUT_NAMES.has(value)) continue;
+			addPolicyViolation(policy, violations, 'dryui/no-generic-layout-name', lineOf(tag.index), {
+				value
 			});
 		}
 	}

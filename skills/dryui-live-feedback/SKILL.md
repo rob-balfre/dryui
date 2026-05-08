@@ -63,11 +63,16 @@ Pick the URL whose process cwd equals `$PWD`. Do **not** assume the first port r
 
 ## 3. Open the App in a Browser
 
-Use the browser tools available in your environment. In this repo, prefer `chrome-devtools-axi` for browser automation.
+Use the browser tools available in your environment. Probe one, fail fast, fall through — don't wait out 30s + 120s cascading timeouts.
 
-- With Chrome/DevTools automation: open the dev server URL directly.
-- With a preview tool: open the configured preview URL.
-- If no browser tool is available: tell the user to open the dev server URL manually.
+Probe order:
+
+1. `chrome-devtools-mcp` MCP tools (`list_pages`, `new_page`, `navigate_page`, `take_screenshot`). If `list_pages` returns within ~5s, use this tool for the rest of the session.
+2. `chrome-devtools-axi` CLI. Run `chrome-devtools-axi pages` with a short shell-level timeout (e.g. `timeout 5 chrome-devtools-axi pages`). If it returns `BRIDGE_NOT_READY` or hangs, do not retry — the bridge state persists across calls.
+3. Codex `playwright` skill (`$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh open <url>`). Reliable fallback when neither Chrome wrapper boots; uses a fresh Playwright browser per session.
+4. If none are available, tell the user to open the dev server URL manually.
+
+Do not retry a browser tool whose bridge or MCP call has already failed once in this session — pivot to the next.
 
 ## 4. Tell the User What to Do
 

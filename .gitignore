@@ -9,6 +9,7 @@ apps/docs/build
 .claude/*
 .codex/
 .codex*.png
+.audit-*.png
 .codex-artifacts/
 .cursor/
 .env

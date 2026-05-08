@@ -58,6 +58,10 @@ const LINT_RULE_DEFINITIONS = {
 		catalogId: 'dryui/no-raw-element',
 		targets: ['markup']
 	},
+	'dryui/no-generic-layout-name': {
+		catalogId: 'dryui/no-generic-layout-name',
+		targets: ['markup']
+	},
 	'dryui/no-component-class': {
 		catalogId: 'dryui/no-component-class',
 		targets: ['markup']

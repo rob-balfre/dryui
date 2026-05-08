@@ -52,6 +52,14 @@ export const RULE_CATALOG = {
 		suggestedFix:
 			'Replace raw markup with a DryUI component, or add data-layout="<unique-name>" only if you are also declaring that name as a grid in src/layout.css.'
 	},
+	'dryui/no-generic-layout-name': {
+		id: 'dryui/no-generic-layout-name',
+		severity: 'error',
+		message:
+			'data-layout="{value}" is a generic name that defeats the layout contract. Banned values: ui, wrapper, box, container, div, block, el, elem, element, layout, inner, outer. Use a unique name that describes what the grid contains (data-layout="article", data-layout="kpi-strip", data-layout="traveler-row") and declare a matching rule in src/layout.css. If the wrapper has no real layout job, replace it with a DryUI component (Heading, Text, Badge, Avatar) or remove it.',
+		suggestedFix:
+			'Rename to a meaningful data-layout value and declare the matching grid in src/layout.css, or replace the wrapper with a DryUI component.'
+	},
 	'dryui/no-component-class': {
 		id: 'dryui/no-component-class',
 		severity: 'error',

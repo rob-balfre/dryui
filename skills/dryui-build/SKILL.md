@@ -25,6 +25,19 @@ DryUI work is explicit. Confirm contracts, build, then validate.
 
 Before any markup, view the design image and write one paragraph describing: theme (light or dark), palette accents (primary, plus signal colours like red/amber/green), typography rhythm (sizes, weights, monospace vs sans), density (compact vs roomy, gap and padding feel), and signature treatments (e.g. photo avatars not initials, sparklines in KPI tiles, left accent bars on chips, grain or gradient surfaces). Anchor the rest of the build to this paragraph and re-read it during the visual-fidelity loop in §8. Do not start writing markup before the description exists.
 
+**Estimate row and tile heights before writing CSS.** For dense dashboards, eyeball the reference: traveler/list rows usually run 56–72px, KPI tiles 80–104px, calendar week cells 80–120px tall. A first pass that "feels reasonable" without measuring lands ~25% too tall and costs 4–6 visual iterations to compress. Pick a target rhythm in your description paragraph (e.g. "rows ~64px, tiles ~88px, gaps tight") and let `min-block-size` follow it.
+
+## 0A. Lint Trip-Wires (Read Before Writing Markup)
+
+Four things will block `bun run check` if missed. Designing for them up front saves a full repair pass.
+
+1. **Every interior raw element needs a layout hook.** `dryui/no-raw-element` rejects `<div>`, `<span>`, `<strong>`, `<p>`, etc. unless they carry `data-layout="<unique-name>"` (root of a grid you also declare in `src/layout.css`) or `data-layout-area="<area>"` (named area child of an enclosing layout). **`dryui/no-generic-layout-name` enforces this — `data-layout="ui" / "wrapper" / "box" / "container" / "div" / "block" / "el" / "elem" / "element" / "layout" / "inner" / "outer"` are hard-rejected.** Those names defeat the lint and produce unstyled output. If a wrapper has no real layout job, replace it with a DryUI component (Heading, Text, Badge, Avatar) or remove it.
+2. **Components don't forward `class=`.** `dryui/no-component-class` rejects `<Badge class="…">`, `<Heading class="…">`, `<Text class="…">`, `<Avatar class="…">`, `<Input class="…">`. For visual overrides, reach for `--dry-*` CSS custom properties on a wrapper. For spacing/positioning, wrap the component in a `data-layout` element. Only `<Button>` keeps a back-compat `className` alias — do not generalize that to other components.
+3. **No raw `<button>`, `<input>`, `<select>`, `<dialog>`, `<hr>`, `<table>` in route markup.** `dryui/no-raw-native-element` requires the DryUI component. See §6.
+4. **Page-level grid/flex never lives in component `<style>` blocks.** Page structure goes to `src/layout.css` under `[data-layout='<name>']`. Visual style (color, type, shadow) goes to `src/app.css`. See §4.
+
+The test: before your first `apply_patch`, every interior `<div>`/`<span>`/`<strong>` in your planned markup either has `data-layout-area` (when it's a child of a declared layout) or a unique `data-layout="<name>"` whose grid you will write in `src/layout.css` in the same change.
+
 ## 1. Look Up Before You Write
 
 **Never guess a component API. Always verify first.**
@@ -33,6 +46,15 @@ Before any markup, view the design image and write one paragraph describing: the
 - Component APIs vary. `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable.
 - Compound vs simple, required parts, available props - all differ per component.
 - If you skip the lookup, you'll write plausible-looking code that silently breaks.
+
+**Discovery order (cheapest first, stop as soon as you have what you need):**
+
+1. The relevant `rules/*.md` row (compound table, theming tokens, accessibility recipe). Most page builds need only `composition.md` + `theming.md`.
+2. `packages/ui/src/<component>/<component>.meta.ts` (5–10 lines: name, description, category, tags) for unfamiliar component shapes.
+3. The component's `index.ts` re-exports for compound part names.
+4. The `.svelte` source — only when you intend to extend or override its internals. **Do not bulk-read every component's source during planning.** A 30-file `sed` sweep before the first patch is the most common over-discovery pattern; it burns several minutes and rarely informs the markup.
+
+**Editing files that already exist (page.svelte, layout.css, app.css scaffolded by `dryui-init`): use a single `apply_patch \*** Update File`.** Do not split a rewrite into a `Delete File`and a separate`Add File` patch — those round-trips serialize, often run minutes apart, and make every later edit harder to read in the diff.
 
 The test: can you point to the rule file, component metadata, or existing usage that justifies every component or pattern in your output?
 
@@ -198,6 +220,10 @@ For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, Svelte
 - If the Svelte MCP is not registered, the fallback is the remote endpoint `https://mcp.svelte.dev/mcp` or a one-liner like `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`.
 - Scope split: DryUI skills cover component APIs, theming, composition, and validation expectations. Svelte MCP covers the runtime, compiler, and framework idioms.
 
+**Default `get-documentation` batch for an interactive route.** Any non-trivial page needs reactivity sooner or later — bundle these into the first call so you don't pay a second round-trip later: `svelte/svelte-files`, `svelte/basic-markup`, `svelte/each`, `svelte/if`, `svelte/$state`, `svelte/$derived`, `svelte/bind`, `svelte/scoped-styles`, `kit/routing`. Add `svelte/$effect`, `svelte/snippet`, or `svelte/$props` only when the brief actually needs them.
+
+**`svelte-autofixer` takes the source you just wrote — don't `cat` the file back to feed it.** A freshly-written `+page.svelte` can be 1500–2500 lines; re-reading it costs ~50k tokens of context that the autofixer doesn't need. Pass the source from the in-flight patch buffer instead. Same rule applies any time you've just written or patched a file and need to send its content to another tool.
+
 The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either call `svelte-autofixer` / `get-documentation`, or confirm the pattern is already covered by these DryUI rules and examples?
 
 ## 8. Lint Green Is Not Done
@@ -210,6 +236,10 @@ Required when the brief includes a design image. After lint passes:
 2. View the screenshot and the input image side by side. Re-read the description from §0.
 3. Walk these axes and note every deviation: page background, typography scale and weights, section padding and gap, component variants, iconography, colour palette (including signal colours), density, signature treatments (avatars, sparklines, accent bars, gradients, grain).
 4. Iterate markup, tokens, and `src/layout.css` until the screenshot matches the design on each axis. Match the design, not your output.
+
+**Browser-tool fast-fail.** Probe one tool, fail fast, fall to the next — don't sit through a 30s + 120s back-to-back timeout cascade. Order: `chrome-devtools-mcp` (preferred — `list_pages` / `take_screenshot` / `navigate_page`) → `chrome-devtools-axi` CLI (`chrome-devtools-axi pages` with a 5s wrapper timeout) → Codex `playwright` skill (`$CODEX_HOME/skills/playwright/scripts/playwright_cli.sh`). If the first tool hangs more than ~10 seconds on initial probe, kill it and move on; do not retry a tool whose bridge has already failed.
+
+**Compress before iterating.** Most first-pass dashboards land too tall. If your first screenshot looks like the right components in the wrong rhythm, do one batched pass that nudges every container at once — KPI tile `min-block-size`, row `min-block-size`, header heading-2 size, toolbar padding, section gap. Six single-axis iterations cost ~9 minutes; one batched pass plus a confirmation screenshot is 2.
 
 The test: did you screenshot after the last edit, and does every axis above either match or have a noted divergence? A green lint with a wrong-looking page is a failure, not a stopping point.
 

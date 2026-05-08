@@ -126,6 +126,75 @@ describe('checkMarkup', () => {
 		expect(violations).toHaveLength(0);
 	});
 
+	test('flags generic data-layout names that defeat the contract', () => {
+		const code = `<div data-layout="ui">
+  <span data-layout="wrapper">a</span>
+  <p data-layout="box">b</p>
+  <section data-layout="container">c</section>
+  <div data-layout="div">d</div>
+</div>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(5);
+		expect(generic[0]!.message).toContain('data-layout="ui"');
+		expect(generic[1]!.message).toContain('data-layout="wrapper"');
+	});
+
+	test('flags additional generic synonyms', () => {
+		const code = `<div data-layout="block">
+  <div data-layout="el"></div>
+  <div data-layout="elem"></div>
+  <div data-layout="element"></div>
+  <div data-layout="layout"></div>
+  <div data-layout="inner"></div>
+  <div data-layout="outer"></div>
+</div>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(7);
+	});
+
+	test('matches generic names case-insensitively and trims whitespace', () => {
+		const code = `<div data-layout="UI">
+  <div data-layout="  Wrapper  "></div>
+</div>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(2);
+	});
+
+	test('allows meaningful data-layout names', () => {
+		const code = `<main data-layout="app-shell">
+  <section data-layout="kpi-strip"></section>
+  <section data-layout="traveler-row"></section>
+  <article data-layout="article"></article>
+  <div data-layout="my-ui"></div>
+  <div data-layout="container-pane"></div>
+</main>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(0);
+	});
+
+	test('does not flag generic names on data-layout-area', () => {
+		const code = `<main data-layout="app-shell">
+  <aside data-layout-area="ui"></aside>
+  <section data-layout-area="wrapper"></section>
+</main>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(0);
+	});
+
+	test('skips data-layout with expression value (cannot evaluate statically)', () => {
+		const code = `<div data-layout={kind}>
+  <div data-layout={isHero ? "ui" : "hero"}></div>
+</div>`;
+		const violations = checkMarkup(code, 'src/routes/+page.svelte');
+		const generic = violations.filter((v) => v.rule === 'dryui/no-generic-layout-name');
+		expect(generic).toHaveLength(0);
+	});
+
 	test('allows Svelte components and Svelte special elements', () => {
 		const code = `<svelte:head>
   <title>Docs</title>
@@ -744,7 +813,7 @@ describe('checkStyle', () => {
 	});
 
 	test('checkSvelteFile flags raw grid in component <style> blocks', () => {
-		const code = `<div data-layout="layout">content</div>
+		const code = `<div data-layout="docs-shell">content</div>
 
 <style>
   .layout {
