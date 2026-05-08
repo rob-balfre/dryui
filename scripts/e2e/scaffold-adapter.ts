@@ -22,6 +22,7 @@ export const DRYUI_INIT_SKILL_CONTRACT = {
 		'@dryui/lint',
 		'@dryui/feedback',
 		'@dryui/feedback-server',
+		'lucide-svelte',
 		'dryuiLint({ strict: true })',
 		'dryuiLayoutCss()',
 		'src/routes/+layout.svelte',
@@ -163,7 +164,8 @@ function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): st
 					check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json'
 				},
 				dependencies: {
-					'@dryui/ui': packages['@dryui/ui']
+					'@dryui/ui': packages['@dryui/ui'],
+					'lucide-svelte': '^1.0.1'
 				},
 				devDependencies: {
 					'@dryui/feedback': packages['@dryui/feedback'],
@@ -171,7 +173,6 @@ function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): st
 					'@dryui/lint': packages['@dryui/lint'],
 					'@dryui/primitives': packages['@dryui/primitives'],
 					'@types/node': '^25.6.2',
-					'lucide-svelte': '^1.0.1',
 					'@sveltejs/kit': '^2.59.0',
 					'@sveltejs/vite-plugin-svelte': '^7.0.0',
 					svelte: '^5.55.5',

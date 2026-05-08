@@ -39,7 +39,7 @@ Do not `Read` any file you just copied from `templates/` to verify it — those 
 1. **Triage** — exits 2 with `route=existing-sveltekit` if `svelte.config.*` is present, or `route=ambiguous` if `src/` exists without a config.
 2. Removes `index.ts` / `index.js` from the `bun init` skeleton.
 3. Copies every file in `templates/` into the project root.
-4. Merges scripts, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides`, `dependencies`, and any other keys.
+4. Merges scripts, `lucide-svelte` into `dependencies`, devDependencies, and `type: "module"` into `package.json` via `jq`. Preserves existing `overrides` and any other dependency keys.
 5. Appends SvelteKit/Vite ignores to `.gitignore` (idempotent — checks for `/.svelte-kit` first).
 6. Detects a local dryui workspace at `$DRYUI_LOCAL`, `../dryui`, `~/dryui`, `~/src/dryui`, or `~/code/dryui`. If found, runs `bun link` in each `packages/{ui,lint,primitives,feedback,feedback-server}` and writes overrides with `link:@dryui/<pkg>` so the consumer pulls the local workspace. If not found, falls back to `bun add @dryui/ui` + `bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server` against npm.
 7. Runs `bun run check` to validate the contract end-to-end.
@@ -64,7 +64,7 @@ This section is the Interface for a DryUI consumer setup. `scripts/e2e/scaffold-
 
 A valid DryUI consumer setup has:
 
-- `@dryui/ui` as a runtime dependency. `@dryui/lint`, `@dryui/feedback`, `@dryui/feedback-server`, and `@types/node` as dev dependencies. The `@dryui/feedback-server` devDep ships the `dryui-feedback` bin into local `node_modules/.bin` so `bunx dryui-feedback` resolves without a registry round-trip. `@dryui/feedback` is dev-only because the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below). `@types/node` is a devDep because SvelteKit's generated `.svelte-kit/tsconfig.json` references Node types and `bun run check` fails without it. E2E may also pin local workspace tarballs for `@dryui/primitives` (transitive of feedback) so no published package leaks into the run.
+- `@dryui/ui` and `lucide-svelte` as runtime dependencies. `@dryui/lint`, `@dryui/feedback`, `@dryui/feedback-server`, and `@types/node` as dev dependencies. `lucide-svelte` is a runtime dep because it satisfies the `@dryui/feedback` peer dep and apps will routinely import icons from it; the vite SSR `noExternal` workaround in `templates/vite.config.ts` only kicks in when something imports it. The `@dryui/feedback-server` devDep ships the `dryui-feedback` bin into local `node_modules/.bin` so `bunx dryui-feedback` resolves without a registry round-trip. `@dryui/feedback` is dev-only because the live-feedback widget is opt-in (see "Live Feedback (Opt-In)" below). `@types/node` is a devDep because SvelteKit's generated `.svelte-kit/tsconfig.json` references Node types and `bun run check` fails without it. E2E may also pin local workspace tarballs for `@dryui/primitives` (transitive of feedback) so no published package leaks into the run.
 - `dryuiLint({ strict: true })` as the first Svelte preprocessor, preserving any existing preprocessors after it.
 - `dryuiLayoutCss()` before `sveltekit()` in Vite plugins.
 - `src/app.html` ships bare `<html lang="en">` — no `class="theme-auto"`, no `data-theme`. Light tokens apply by default. Apps opt into dark or system mode by adding `class="theme-auto"` and/or `data-theme="…"` themselves.
@@ -78,11 +78,11 @@ For an existing SvelteKit app:
 1. Install runtime + dev packages:
 
    ```bash
-   bun add @dryui/ui
+   bun add @dryui/ui lucide-svelte
    bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server
    ```
 
-   `@dryui/feedback-server` is a devDep so the `dryui-feedback` bin lands in local `node_modules/.bin`; `bunx dryui-feedback` then resolves locally instead of hitting the registry. `@dryui/feedback` is also a devDep — the widget is opt-in, see "Live Feedback (Opt-In)" below. Translate to `npm`, `pnpm`, or `yarn` when the repo already uses one of those. For local-workspace consumers, mirror the package list in `package.json` `overrides` with `link:@dryui/<pkg>` (including `@dryui/primitives`, transitive of feedback) before installing — bun overrides only apply when the package is also a dep.
+   `lucide-svelte` is a runtime dep: it satisfies the `@dryui/feedback` peer and is available for the app's own icon usage. `@dryui/feedback-server` is a devDep so the `dryui-feedback` bin lands in local `node_modules/.bin`; `bunx dryui-feedback` then resolves locally instead of hitting the registry. `@dryui/feedback` is also a devDep — the widget is opt-in, see "Live Feedback (Opt-In)" below. Translate to `npm`, `pnpm`, or `yarn` when the repo already uses one of those. For local-workspace consumers, mirror the package list in `package.json` `overrides` with `link:@dryui/<pkg>` (including `@dryui/primitives`, transitive of feedback) before installing — bun overrides only apply when the package is also a dep.
 
 2. In `svelte.config.*`, add `dryuiLint({ strict: true })` as the first preprocessor while preserving existing preprocessors.
 3. In `vite.config.*`, add `dryuiLayoutCss()` before `sveltekit()`.

@@ -51,6 +51,9 @@ jq '.type = "module"
       "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
       "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
     })
+  | .dependencies = ((.dependencies // {}) + {
+      "lucide-svelte": "^1.0.1"
+    })
   | .devDependencies = ((.devDependencies // {}) + {
       "@sveltejs/adapter-auto": "^7.0.1",
       "@sveltejs/kit": "^2.57.0",
