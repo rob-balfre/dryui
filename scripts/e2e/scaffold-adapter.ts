@@ -170,6 +170,7 @@ function scaffoldPackageJson(packages: Record<DryuiConsumerPackage, string>): st
 					'@dryui/feedback-server': packages['@dryui/feedback-server'],
 					'@dryui/lint': packages['@dryui/lint'],
 					'@dryui/primitives': packages['@dryui/primitives'],
+					'@types/node': '^25.6.2',
 					'lucide-svelte': '^1.0.1',
 					'@sveltejs/kit': '^2.59.0',
 					'@sveltejs/vite-plugin-svelte': '^7.0.0',
@@ -298,7 +299,7 @@ const HOME_PAGE = `<script lang="ts">
 	import { Heading } from '@dryui/ui/heading';
 </script>
 
-<main>
+<main data-layout="home">
 	<Heading level={1}>Hello DryUI</Heading>
 </main>
 `;
