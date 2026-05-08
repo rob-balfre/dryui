@@ -136,11 +136,11 @@ export const RULE_CATALOG = {
 	},
 	'dryui/no-partial-inset-shadow': {
 		id: 'dryui/no-partial-inset-shadow',
-		severity: 'error',
+		severity: 'suggestion',
 		message:
-			'Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Use "inset 0 0 0 Npx <color>" for a uniform ring, or a ::before/::after pseudo-element for a side indicator. Add /* dryui-allow inset-shadow */ on the preceding line for intentional cases.',
+			'Directional inset box-shadow (e.g. "inset 2px 0 0 ...") clips against border-radius and renders as a curved bracket on one side. Verify this is the visual you want; if not, use a uniform inset (inset 0 0 0 Npx) or a pseudo-element. Add /* dryui-allow inset-shadow */ on the preceding line to silence this on intentional cases.',
 		suggestedFix:
-			'Replace with inset 0 0 0 <size> <color> for a uniform ring, or use a positioned pseudo-element for a side-only indicator.'
+			'If the bracket effect is unintentional, switch to a uniform inset or a positioned pseudo-element.'
 	},
 	'dryui/no-raw-grid': {
 		id: 'dryui/no-raw-grid',
@@ -243,7 +243,7 @@ export const RULE_CATALOG = {
 		id: 'use-button-component',
 		severity: 'error',
 		message:
-			"Use DryUI's <Button> component instead of raw <button> with custom classes. Button provides variants, sizes, loading states, and theme-consistent styling.",
+			"Use DryUI's <Button> component instead of raw <button>. Button handles accessible focus, disabled and loading states, and exposes variant/size props.",
 		suggestedFix: '<Button>'
 	},
 	'use-container-component': {
@@ -256,7 +256,7 @@ export const RULE_CATALOG = {
 		id: 'interactive-card-wrapper',
 		severity: 'warning',
 		message:
-			'Wrapper elements around interactive surfaces (raw <button> or <a> styled as cards) should use display: grid or be removed. Plain block wrappers can collapse interactive surfaces to 0px width in grid/list layouts.',
+			'Wrapper element around an interactive surface (raw <button> or <a>). Plain block wrappers can collapse the interactive child to 0px width inside grid/list layouts. Use display: grid on the wrapper or remove the wrapper.',
 		suggestedFix: 'display: grid'
 	},
 	'hardcoded-color': {
@@ -282,7 +282,7 @@ export const RULE_CATALOG = {
 	'prefer-separator': {
 		id: 'prefer-separator',
 		severity: 'error',
-		message: 'Raw <hr> element — use <Separator /> for consistent styling',
+		message: 'Raw <hr> element — use <Separator /> so token overrides apply.',
 		suggestedFix: '<Separator />'
 	},
 	'missing-token': {
@@ -319,8 +319,8 @@ export const RULE_CATALOG = {
 		id: 'transparent-surface',
 		severity: 'warning',
 		message:
-			'Surface color has very low opacity ({alpha}) — cards and elevated elements will be nearly invisible',
-		suggestedFix: 'Use a solid color (e.g., #1e293b for dark themes, #f8fafc for light themes)'
+			'Surface color {variable} has very low opacity ({alpha}) — surfaces using this token will be nearly invisible against the page background.',
+		suggestedFix: 'Use a solid color so the surface is visible against the page background.'
 	},
 	'low-contrast-text': {
 		id: 'low-contrast-text',
@@ -361,7 +361,7 @@ export const RULE_CATALOG = {
 		message:
 			'Project uses a dark color scheme ({signals}) but has no --dry-color-* overrides. DryUI\'s default theme is light — components will have poor contrast on dark backgrounds. Either use theme: "dark" in the generate tool, or add --dry-color-* overrides to map DryUI tokens to your dark palette.',
 		suggestedFix:
-			'Use theme: "dark" in dryui.page(), or override --dry-color-bg-base, --dry-color-bg-raised, --dry-color-text-strong, --dry-color-text-weak, and other semantic tokens with dark-appropriate values'
+			'Use theme: "dark" in dryui.page(), or override the relevant DryUI semantic tokens with dark-appropriate values from your design system.'
 	},
 	'unresolvable-var': {
 		id: 'unresolvable-var',

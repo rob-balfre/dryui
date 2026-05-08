@@ -1,5 +1,5 @@
 ---
-name: dryui
+name: dryui-build
 description: 'Use when building UIs with DryUI (@dryui/ui) Svelte 5 components. Teaches correct patterns for compound components, theming, forms, and accessibility. Use the skill instructions as the default entry point; setup is owned by npx skills.'
 ---
 
@@ -17,22 +17,6 @@ DryUI work is explicit. Confirm contracts, build, then validate.
 2. **DryUI lookup/plan** — use this skill, the rule files below, and the checked-in component metadata/docs to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
 3. **Implementation** — build with DryUI components, Svelte 5 runes, grid layout, `--dry-*` tokens, and accessible composition.
 4. **Deterministic check** — run the project’s package checks, Svelte checks, builds, and `@dryui/lint` diagnostics to catch contract drift, accessibility regressions, token drift, and CSS discipline violations.
-
-## Design guidance, critique, polish
-
-DryUI is zero-dependency components + tokens + contracts. It deliberately does NOT ship design opinion. For design-quality flows like brief, critique, polish, visual review, or anti-pattern detection, use [impeccable](https://impeccable.style), installed via `npx impeccable skills install`.
-
-Invoke from your AI harness:
-
-- `/impeccable teach` — one-time: scaffold `PRODUCT.md` + `DESIGN.md`
-- `/impeccable craft` — design-then-build a feature
-- `/impeccable shape` — plan UX/UI before writing code
-- `/impeccable critique <target>` — UX design review
-- `/impeccable audit <target>` — a11y, performance, responsive checks
-- `/impeccable polish <target>` — final pass before shipping
-- Full catalog: https://impeccable.style/cheatsheet
-
-`PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned. DryUI tools do not read or write them. Anti-pattern detection: `npx impeccable detect <path-or-url>`.
 
 ## 1. Look Up Before You Write
 
@@ -62,33 +46,29 @@ Compound components are summarized in `rules/compound-components.md`. Verify the
 
 The test: every compound component in your markup uses `.Root`, and its parts are wrapped inside it. See `rules/compound-components.md` for the parts reference.
 
-## 3. Let the Theme Do Its Job
+## 3. Theme Tokens Are For Components, Not Decoration
 
-**Import it. Use its tokens. Don't fight it.**
+**Import the theme. Reach for tokens only when you need a value. DryUI ships no default look — the host page owns visual style.**
 
-- Import `@dryui/ui/themes/default.css` (and `dark.css`) before any component use.
-- Use `--dry-color-*` and `--dry-space-*` tokens. Never hardcode colors or spacing.
-- Don't add decorative CSS (gradients, shadows, colored borders). The theme handles appearance.
-- Override semantic tokens (Tier 2) in `:root`, not component tokens (Tier 3).
+- Import `@dryui/ui/themes/default.css` (and `dark.css`) before any component use. Components reach for tokens internally.
+- When you do reach for tokens in your own CSS, use `--dry-color-*` and `--dry-space-*` instead of hex/rgb/raw px.
+- Don't decorate user-authored wrappers by default (no `border-radius`, `border`, `background`, `box-shadow`, gradient on a `<section>` "because that's how DryUI looks"). DryUI has no default look. If a wrapper needs visual treatment, the host page decides what.
+- Override semantic tokens (Tier 2) in `:root` if you're customizing palette. Component tokens (Tier 3) are component-internal — leave them alone.
 - Prefer `<html class="theme-auto">`. Use `data-theme="light|dark"` only for explicit overrides.
 
 ```css
-/* Wrong */
-.card {
+/* Wrong: hardcoded color */
+.brand-button {
 	background: #6366f1;
-	color: white;
 }
 
-/* Right */
-.card {
+/* Right: token reference when you actually need a value */
+.brand-button {
 	background: var(--dry-color-fill-brand);
-	color: var(--dry-color-text-strong);
 }
 ```
 
-The test: does your CSS contain zero hex colors, zero `rgb()` values, and zero inline styles?
-
-Theming precedence beats design opinion. If impeccable guidance conflicts with DryUI theme contracts, tokens, or accessibility rules, DryUI wins.
+The test: does your CSS contain zero hex colors, zero `rgb()` values, zero inline styles, and zero "default" decoration on grouping wrappers?
 
 ## 4. Layout Lives in `src/layout.css`. Use `@container`.
 
@@ -237,7 +217,7 @@ For greenfield and brownfield setup, use the `dryui-init` skill instructions.
 
 Kept for users who need to pin to a specific local path; the npx skills command above is the recommended path.
 
-- Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`
+- Manual degit (Zed, or anyone who needs to pin to a specific path): `npx degit rob-balfre/dryui/skills/dryui-build .agents/skills/dryui-build`
 
 **4. Register the Svelte MCP companion.** For Claude Code run `claude mcp add -t stdio -s user svelte -- npx -y @sveltejs/mcp`. For Codex add `[mcp_servers.svelte] command = "npx", args = ["-y", "@sveltejs/mcp"]` to `~/.codex/config.toml`. See rule 7 above.
 

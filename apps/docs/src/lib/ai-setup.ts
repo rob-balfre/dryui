@@ -284,7 +284,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Install the DryUI skill',
 				description:
-					'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .gemini/skills/dryui`.',
+					'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .gemini/skills/dryui-build`.',
 				code: 'npx skills add rob-balfre/dryui --agent gemini-cli',
 				language: 'bash'
 			},
@@ -297,7 +297,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		],
 		skill: {
 			title: '2. Install the skill',
-			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .gemini/skills/dryui`.',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .gemini/skills/dryui-build`.',
 			code: `npx skills add rob-balfre/dryui --agent gemini-cli`
 		},
 		mcp: {
@@ -328,7 +328,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Install the DryUI skill',
 				description:
-					'Uses the upstream `npx skills` CLI (skills.sh standard) to fan out the install. Falls through to `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui` if you want to pin the install path.',
+					'Uses the upstream `npx skills` CLI (skills.sh standard) to fan out the install. Falls through to `npx degit rob-balfre/dryui/skills/dryui-build .opencode/skills/dryui-build` if you want to pin the install path.',
 				code: 'npx skills add rob-balfre/dryui --agent opencode',
 				language: 'bash'
 			},
@@ -342,7 +342,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		],
 		skill: {
 			title: '2. Install the skill',
-			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .opencode/skills/dryui`.',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .opencode/skills/dryui-build`.',
 			code: `npx skills add rob-balfre/dryui --agent opencode`
 		},
 		mcp: {
@@ -373,7 +373,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 			{
 				title: 'Install the DryUI skill',
 				description:
-					'Uses the upstream `npx skills` CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`.',
+					'Uses the upstream `npx skills` CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .github/skills/dryui-build`.',
 				code: 'npx skills add rob-balfre/dryui --agent github-copilot',
 				language: 'bash'
 			},
@@ -394,7 +394,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		],
 		skill: {
 			title: '2. Install the skill',
-			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .github/skills/dryui`.',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .github/skills/dryui-build`.',
 			code: `npx skills add rob-balfre/dryui --agent github-copilot`
 		},
 		mcp: {
@@ -422,7 +422,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		skill: {
 			title: '2. Install the skill',
-			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .agents/skills/dryui-build`.',
 			code: `npx skills add rob-balfre/dryui --agent cursor`
 		},
 		mcp: {
@@ -450,7 +450,7 @@ claude mcp add dryui-feedback -- npx -y -p @dryui/feedback-server dryui-feedback
 		},
 		skill: {
 			title: '2. Install the skill',
-			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui .agents/skills/dryui`.',
+			note: 'Routed through the upstream npx skills CLI (skills.sh standard). For a pinned manual install: `npx degit rob-balfre/dryui/skills/dryui-build .agents/skills/dryui-build`.',
 			code: `npx skills add rob-balfre/dryui --agent windsurf`
 		},
 		mcp: {

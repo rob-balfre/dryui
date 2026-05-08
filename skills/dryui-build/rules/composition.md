@@ -140,7 +140,7 @@ Requires `body { container-type: inline-size; container-name: page; }` in `src/a
 
 ### Basic form
 
-Wrap each input in Field.Root, stack them with grid, and put everything in a semantic surface.
+Wrap each input in Field.Root and stack them with grid. No styled wrapper — DryUI ships no default form surface, the host page decides whether and how to enclose the form.
 
 ```svelte
 <script>
@@ -151,31 +151,20 @@ Wrap each input in Field.Root, stack them with grid, and put everything in a sem
 	let email = $state('');
 </script>
 
-<section class="form-surface" aria-labelledby="contact-info-title">
+<form class="form-stack" aria-labelledby="contact-info-title">
 	<h2 id="contact-info-title">Contact Info</h2>
-	<form class="form-stack">
-		<Field.Root>
-			<Label>Name</Label>
-			<Input bind:value={name} />
-		</Field.Root>
-		<Field.Root>
-			<Label>Email</Label>
-			<Input type="email" bind:value={email} />
-		</Field.Root>
-		<Button type="submit" variant="solid">Save contact</Button>
-	</form>
-</section>
+	<Field.Root>
+		<Label>Name</Label>
+		<Input bind:value={name} />
+	</Field.Root>
+	<Field.Root>
+		<Label>Email</Label>
+		<Input type="email" bind:value={email} />
+	</Field.Root>
+	<Button type="submit" variant="solid">Save contact</Button>
+</form>
 
 <style>
-	.form-surface {
-		display: grid;
-		gap: var(--dry-space-4);
-		padding: var(--dry-space-6);
-		border: 1px solid var(--dry-color-stroke-weak);
-		border-radius: var(--dry-radius-lg);
-		background: var(--dry-color-bg-raised);
-	}
-
 	.form-stack {
 		display: grid;
 		gap: var(--dry-space-4);
@@ -312,10 +301,12 @@ Use Field.Error to show validation messages.
 
 ### Panel grid
 
+Items are separated by grid `gap`. No wrapper class — the host page decides whether items get borders, surfaces, or none.
+
 ```svelte
-<div data-layout="card-grid">
+<div data-layout="item-grid">
 	{#each items as item (item.id)}
-		<article class="panel-card">
+		<article>
 			<h2>{item.title}</h2>
 			<p>{item.description}</p>
 			<Button variant="outline">View details</Button>
@@ -325,14 +316,14 @@ Use Field.Error to show validation messages.
 ```
 
 ```css
-[data-layout='card-grid'] {
+[data-layout='item-grid'] {
 	display: grid;
 	grid-template-columns: 1fr;
 	gap: var(--dry-space-6);
 }
 
 @container page (min-width: 40rem) {
-	[data-layout='card-grid'] {
+	[data-layout='item-grid'] {
 		grid-template-columns: repeat(3, 1fr);
 	}
 }
@@ -356,7 +347,7 @@ Use Field.Error to show validation messages.
 				<Tabs.Trigger value="notifications">Notifications</Tabs.Trigger>
 			</Tabs.List>
 			<Tabs.Content value="general">
-				<form class="form-stack settings-panel">
+				<form class="form-stack">
 					<Field.Root>
 						<Label>Display Name</Label>
 						<Input bind:value={displayName} />
@@ -474,12 +465,14 @@ Use Field.Error to show validation messages.
 
 ### Using the removed Card component
 
+DryUI ships no Card component because Card is a visual choice, not an accessibility primitive. Use a bare semantic element with current DryUI controls; the host page decides whether to add visual treatment.
+
 ```svelte
 <!-- Wrong: Card is no longer exported -->
 <Card.Root>...</Card.Root>
 
-<!-- Right: semantic surface plus current DryUI controls -->
-<section class="surface">
+<!-- Right: bare semantic element + DryUI controls -->
+<section>
 	<Button>Continue</Button>
 </section>
 ```

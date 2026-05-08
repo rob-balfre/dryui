@@ -97,13 +97,14 @@ done
 
 if [ -n "$DRYUI_REPO" ]; then
   echo "[dryui-init] found local dryui workspace at $DRYUI_REPO — linking"
-  # Register every workspace package globally so opt-in deps added later
-  # (e.g. @dryui/feedback by the live-feedback skill) resolve to the workspace.
-  for pkg in ui lint primitives feedback; do
+  # Link every dryui workspace package; bun overrides only apply when the
+  # package is also resolved, so all five must be registered globally.
+  for pkg in ui lint primitives feedback feedback-server; do
     if [ -f "$DRYUI_REPO/packages/$pkg/package.json" ]; then
-      ( cd "$DRYUI_REPO/packages/$pkg" && bun link >/dev/null 2>&1 )
+      ( cd "$DRYUI_REPO/packages/$pkg" && bun link >/dev/null 2>&1 ) &
     fi
   done
+  wait
 
   # Only override packages that are actual deps; a dead override entry can
   # mislead callers into thinking the package is installed when bun has not
@@ -113,19 +114,21 @@ if [ -n "$DRYUI_REPO" ]; then
       "@dryui/ui": "link:@dryui/ui",
       "@dryui/lint": "link:@dryui/lint",
       "@dryui/primitives": "link:@dryui/primitives",
-      "@dryui/feedback": "link:@dryui/feedback"
+      "@dryui/feedback": "link:@dryui/feedback",
+      "@dryui/feedback-server": "link:@dryui/feedback-server"
     })
-    | .dependencies = ((.dependencies // {}) + {"@dryui/ui": "*", "@dryui/feedback": "*"})
-    | .devDependencies = ((.devDependencies // {}) + {"@dryui/lint": "*"})
+    | .dependencies = ((.dependencies // {}) + {"@dryui/ui": "*"})
+    | .devDependencies = ((.devDependencies // {}) + {"@dryui/lint": "*", "@dryui/feedback": "*", "@dryui/feedback-server": "*"})
   ' package.json > package.json.new && mv package.json.new package.json
 
   echo "[dryui-init] Step 7: bun install with link overrides"
   bun install
 else
   echo "[dryui-init] no local dryui workspace found (set DRYUI_LOCAL to override) — using published packages"
-  echo "[dryui-init] Step 7: bun add @dryui/ui + @dryui/feedback + @dryui/lint from npm"
-  bun add @dryui/ui @dryui/feedback
-  bun add -d @dryui/lint
+  echo "[dryui-init] Step 7: bun add @dryui/ui from npm; @dryui/lint + @dryui/feedback + @dryui/feedback-server as dev"
+  bun add @dryui/ui &
+  bun add -d @dryui/lint @dryui/feedback @dryui/feedback-server &
+  wait
 fi
 
 echo "[dryui-init] Step 8: bun run check"

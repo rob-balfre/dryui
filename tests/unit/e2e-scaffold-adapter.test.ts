@@ -5,15 +5,9 @@ import { resolve } from 'node:path';
 
 import {
 	DRYUI_INIT_SKILL_CONTRACT,
+	REQUIRED_DRYUI_PACKAGES,
 	scaffoldDryuiConsumerProject
 } from '../../scripts/e2e/scaffold-adapter.ts';
-
-const REQUIRED_DRYUI_PACKAGES = [
-	'@dryui/ui',
-	'@dryui/primitives',
-	'@dryui/feedback',
-	'@dryui/lint'
-] as const;
 
 const tempDirs = new Set<string>();
 const repoRoot = resolve(import.meta.dir, '../..');
@@ -96,10 +90,14 @@ describe('E2E scaffold Adapter', () => {
 			check: 'svelte-kit sync && svelte-check --tsconfig ./tsconfig.json'
 		});
 		expect(packageJson.dependencies['@dryui/ui']?.startsWith('file:')).toBe(true);
-		expect(packageJson.dependencies['@dryui/primitives']?.startsWith('file:')).toBe(true);
-		expect(packageJson.dependencies['@dryui/feedback']?.startsWith('file:')).toBe(true);
+		expect(packageJson.devDependencies['@dryui/primitives']?.startsWith('file:')).toBe(true);
+		expect(packageJson.devDependencies['@dryui/feedback']?.startsWith('file:')).toBe(true);
 		expect(packageJson.devDependencies['@dryui/lint']?.startsWith('file:')).toBe(true);
+		expect(packageJson.devDependencies['@dryui/feedback-server']?.startsWith('file:')).toBe(true);
 		expect(packageJson.overrides['@dryui/ui']).toBe(packageJson.dependencies['@dryui/ui']);
+		expect(packageJson.overrides['@dryui/feedback-server']).toBe(
+			packageJson.devDependencies['@dryui/feedback-server']
+		);
 
 		const svelteConfig = read(projectDir, 'svelte.config.js');
 		expect(svelteConfig).toContain("import { dryuiLint } from '@dryui/lint';");
@@ -118,15 +116,14 @@ describe('E2E scaffold Adapter', () => {
 				"import '@dryui/ui/themes/default.css';",
 				"import '@dryui/ui/themes/dark.css';",
 				"import '../app.css';",
-				"import '../layout.css';",
-				"import { Feedback } from '@dryui/feedback';"
+				"import '../layout.css';"
 			].join('\n\t')
 		);
-		expect(rootLayout).toContain('<Feedback serverUrl="http://localhost:4748" />');
+		expect(rootLayout).not.toContain('@dryui/feedback');
+		expect(rootLayout).not.toContain('<Feedback');
 		expect(read(projectDir, 'src/app.css')).toContain('container-type: inline-size;');
 		expect(read(projectDir, 'src/app.css')).toContain('container-name: page;');
-		expect(read(projectDir, 'src/layout.css')).toContain("[data-layout='home']");
-		expect(read(projectDir, 'src/routes/+page.svelte')).toContain('@dryui/ui/button');
+		expect(read(projectDir, 'src/routes/+page.svelte')).toContain('@dryui/ui/heading');
 	});
 
 	test('fails fast when the manifest does not contain every local DryUI package', () => {
@@ -135,7 +132,7 @@ describe('E2E scaffold Adapter', () => {
 		createManifest(tarballsDir, ['@dryui/ui', '@dryui/primitives', '@dryui/feedback']);
 
 		expect(() => scaffoldDryuiConsumerProject({ projectDir, tarballsDir, install: false })).toThrow(
-			'tarballs manifest is missing @dryui/lint'
+			'tarballs manifest is missing @dryui/feedback-server'
 		);
 	});
 

@@ -23,15 +23,15 @@ The docs build works without `PUBLIC_MAPBOX_TOKEN`; map demos fall back to a pla
 
 ## Contributor Checklist
 
-- Read the CSS and token rules in [`skills/dryui/rules/theming.md`](./skills/dryui/rules/theming.md).
+- Read the CSS and token rules in [`skills/dryui-build/rules/theming.md`](./skills/dryui-build/rules/theming.md).
 - Read the accessibility baseline in [`ACCESSIBILITY.md`](./ACCESSIBILITY.md).
-- When changing exported component behaviour, update the relevant skill rule files in [`skills/dryui/rules/`](./skills/dryui/rules/).
+- When changing exported component behaviour, update the relevant skill rule files in [`skills/dryui-build/rules/`](./skills/dryui-build/rules/).
 - Add or update browser coverage for interactive or accessibility-sensitive changes.
 - If browser coverage is not practical for an interactive component change, call out the exemption in the PR and link the follow-up issue.
 
 ## Skills
 
-Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). Edit these directly.
+Source of truth: top-level [`skills/`](./skills/) (`dryui-build`, `dryui-feedback`, `dryui-live-feedback`, `dryui-init`). Edit these directly.
 
 - `bun run validate:skills` enforces npx skills frontmatter rules (name=dirname, lowercase + hyphens, description 20..1024 chars). Runs in postinstall and the pre-commit hook for any staged SKILL.md.
 - Distribution to end users: `npx skills add rob-balfre/dryui` (skills.sh standard). Editor skill setup is owned by the upstream skills installer; DryUI only maintains feedback tooling and DryUI-specific MCP examples.
@@ -39,7 +39,7 @@ Source of truth: top-level [`skills/`](./skills/) (`dryui`, `dryui-feedback`, `d
 ## Adding Or Changing A Component
 
 1. Implement the primitive and or UI layer in `packages/primitives` and `packages/ui`.
-2. Update the relevant skill rule files under [`skills/dryui/rules/`](./skills/dryui/rules/) if the public usage story changed.
+2. Update the relevant skill rule files under [`skills/dryui-build/rules/`](./skills/dryui-build/rules/) if the public usage story changed.
 3. Add tests in `tests/unit/` and or `tests/browser/`.
 4. If the change materially affects docs layout, theming, or representative demo states, run `bun run test:docs-visual`.
 

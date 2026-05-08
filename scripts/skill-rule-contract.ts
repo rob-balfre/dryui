@@ -81,7 +81,7 @@ const LAYOUT_RULE_CONTRACT: SkillRuleContract = {
 	],
 	textClaims: [
 		{
-			file: 'skills/dryui/SKILL.md',
+			file: 'skills/dryui-build/SKILL.md',
 			label: 'primary Skill layout rule',
 			patterns: [
 				/DryUI does not ship a layout component/,
@@ -97,7 +97,7 @@ const LAYOUT_RULE_CONTRACT: SkillRuleContract = {
 			]
 		},
 		{
-			file: 'skills/dryui/rules/composition.md',
+			file: 'skills/dryui-build/rules/composition.md',
 			label: 'composition layout rule',
 			patterns: [
 				/Page Layout in `src\/layout\.css`/,

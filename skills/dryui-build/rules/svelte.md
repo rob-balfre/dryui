@@ -209,13 +209,13 @@ Svelte 5 compiles `onclick` on elements into event delegation. This can fail on 
 ```css
 /* BAD: local declaration blocks parent overrides */
 .root {
-	--sidebar-width: 18rem;
-	width: var(--sidebar-width);
+	--row-gap: var(--dry-space-4);
+	gap: var(--row-gap);
 }
 
 /* GOOD: fallback lets parents override */
 .root {
-	width: var(--sidebar-width, 18rem);
+	gap: var(--row-gap, var(--dry-space-4));
 }
 ```
 

@@ -100,20 +100,6 @@ export default {
 
 `dryuiLayoutCss()` runs during Vite dev startup, HMR updates, and builds. Missing `src/layout.css` logs a warning only; violations throw.
 
-## Design Guidance
-
-DryUI is components + tokens + contracts. It deliberately does not ship design opinion. For design-quality flows (brief, critique, polish, visual review, anti-pattern detection) DryUI delegates to [impeccable](https://impeccable.style), an Apache-2.0 licensed design skill + CLI authored by Paul Bakaus.
-
-Install impeccable separately when you want design guidance:
-
-```bash
-npx impeccable skills install
-```
-
-Then invoke from your AI harness: `/impeccable teach`, `/impeccable craft`, `/impeccable critique`, `/impeccable polish`, `/impeccable audit`. Anti-pattern detection: `npx impeccable detect <path-or-url>`. Full catalog at <https://impeccable.style/cheatsheet>.
-
-`PRODUCT.md` and `DESIGN.md` at the project root are impeccable-owned. DryUI tools do not read or write them.
-
 ## Develop From Source
 
 ```bash
@@ -152,7 +138,7 @@ See the supporting docs for the rest:
 
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) for contributor workflow
 - [`ACCESSIBILITY.md`](./ACCESSIBILITY.md) for the accessibility baseline
-- [`skills/dryui/rules/theming.md`](./skills/dryui/rules/theming.md) for CSS and token rules
+- [`skills/dryui-build/rules/theming.md`](./skills/dryui-build/rules/theming.md) for CSS and token rules
 - [`RELEASING.md`](./RELEASING.md) for release and npm-auth guidance
 
 ## Design Principles

@@ -19,13 +19,45 @@
 
 	const DEFAULT_FEEDBACK_SERVER_URL = 'http://127.0.0.1:4748';
 	const FEEDBACK_QUERY_PARAM = 'dryui-feedback';
+	const FEEDBACK_SERVER_QUERY_PARAM = 'dryui-feedback-server';
 	const FEEDBACK_SESSION_KEY = 'dryui-feedback-enabled';
+	const FEEDBACK_SERVER_STORAGE_KEY = 'dryui-feedback-server-url';
 
 	let { children: routeChildren } = $props();
 	let feedbackEnabled = $state(false);
+	let feedbackServerUrl = $derived.by(() => {
+		const queryValue = normalizeFeedbackServerUrl(
+			page.url.searchParams.get(FEEDBACK_SERVER_QUERY_PARAM)
+		);
+		if (queryValue) return queryValue;
+
+		if (dev && typeof window !== 'undefined') {
+			const storedValue =
+				normalizeFeedbackServerUrl(window.localStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY)) ??
+				normalizeFeedbackServerUrl(window.sessionStorage.getItem(FEEDBACK_SERVER_STORAGE_KEY));
+			if (storedValue) return storedValue;
+		}
+
+		return DEFAULT_FEEDBACK_SERVER_URL;
+	});
 	let feedbackComponentPromise = $derived(
 		dev && feedbackEnabled ? import('@dryui/feedback').then((mod) => mod.Feedback) : null
 	);
+
+	function normalizeFeedbackServerUrl(value: string | null | undefined): string | null {
+		if (!value) return null;
+		try {
+			const url = new URL(value);
+			if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+			if (!['localhost', '127.0.0.1', '::1'].includes(url.hostname)) return null;
+			url.pathname = '';
+			url.search = '';
+			url.hash = '';
+			return url.toString().replace(/\/$/, '');
+		} catch {
+			return null;
+		}
+	}
 
 	function getRelativeTime(iso: string): string {
 		const diff = Date.now() - new Date(iso).getTime();
@@ -173,7 +205,7 @@
 
 {#if dev && feedbackEnabled && feedbackComponentPromise}
 	{#await feedbackComponentPromise then Feedback}
-		<Feedback serverUrl={DEFAULT_FEEDBACK_SERVER_URL} scrollRoot="main.docs-content" />
+		<Feedback serverUrl={feedbackServerUrl} scrollRoot="main.docs-content" />
 	{/await}
 {/if}
 

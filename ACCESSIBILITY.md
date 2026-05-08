@@ -23,7 +23,7 @@ Accessibility regressions should be caught by review and automation together:
 - `tests/browser/a11y-*.browser.test.ts` covers widget-specific semantic and keyboard regressions
 - `bun run test:browser` is part of the pull-request validation workflow
 - `bun run --filter '@dryui/ui' build` remains required after editing `.svelte` files in `packages/ui/`
-- a11y guidance for every exported component surface lives alongside the component rules in [`skills/dryui/rules/accessibility.md`](./skills/dryui/rules/accessibility.md)
+- a11y guidance for every exported component surface lives alongside the component rules in [`skills/dryui-build/rules/accessibility.md`](./skills/dryui-build/rules/accessibility.md)
 
 ## Contributor Checklist
 

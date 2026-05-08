@@ -4,26 +4,5 @@
    Banned: color, background, border, font-*, box-shadow, opacity, transition,
    width/height/inline-size, position. Put those in src/app.css.
    Selectors must be [data-layout="<name>"] or its [data-layout-area="<area>"] children.
-   Responsive shifts use @container page (min-width: ...), never @media. */
-
-[data-layout='home'] {
-	display: grid;
-	min-block-size: 100svh;
-	grid-template-columns: minmax(1.25rem, 1fr) minmax(0, 60ch) minmax(1.25rem, 1fr);
-	align-content: center;
-	padding-block: var(--dry-space-8);
-}
-
-[data-layout='home'] > [data-layout-area='intro'] {
-	grid-column: 2;
-	display: flex;
-	flex-direction: column;
-	gap: var(--dry-space-5);
-	align-items: flex-start;
-}
-
-@container page (min-width: 48rem) {
-	[data-layout='home'] {
-		grid-template-columns: minmax(2rem, 1fr) minmax(0, 64ch) minmax(2rem, 1fr);
-	}
-}
+   Responsive shifts use @container page (min-width: ...), never @media.
+   Add [data-layout="<name>"] blocks here as routes need them. */

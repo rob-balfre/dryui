@@ -1,9 +1,40 @@
 <script lang="ts">
-	import { Button, CodeBlock, Container, Heading, Text } from '@dryui/ui';
+	import { Button, CodeBlock, Container, Heading, Tabs, Text } from '@dryui/ui';
+	import { MessageSquareText } from 'lucide-svelte';
 	import { componentLinkResolver } from '$lib/component-links';
+	import AgentLogo from '$lib/components/AgentLogo.svelte';
 	import DocsPageHeader from '$lib/components/DocsPageHeader.svelte';
-	import { DRYUI_SKILLS_INSTALL_COMMAND } from '$lib/ai-setup';
+	import { DRYUI_SKILLS_INSTALL_COMMAND, aiAgentSetups } from '$lib/ai-setup';
 	import { withBase } from '$lib/utils';
+
+	const featuredAgentSetups = aiAgentSetups.filter((agent) =>
+		['claude-code', 'codex', 'gemini', 'opencode', 'copilot', 'cursor', 'windsurf'].includes(
+			agent.id
+		)
+	);
+	let selectedAgent = $state('claude-code');
+
+	function skillPrompt(agentId: string, skillName: string, task?: string) {
+		const prefix = agentId === 'codex' ? '$' : '/';
+		const command = `${prefix}${skillName}`;
+		return task ? `${command} ${task}` : command;
+	}
+
+	const skillPrompts = [
+		{
+			name: 'dryui-init',
+			description: 'Set up DryUI in a new or existing SvelteKit app.'
+		},
+		{
+			name: 'dryui-build',
+			description: 'Build or edit UI with DryUI components, tokens, and lint rules.',
+			task: 'build dashboard'
+		},
+		{
+			name: 'dryui-live-feedback',
+			description: 'Open the running app, wait for annotations, then apply each visual edit.'
+		}
+	];
 
 	const componentExample = `<script>
   import { Button, Field, Input, Label } from '@dryui/ui';
@@ -46,61 +77,86 @@ bun add -d @dryui/lint`;
 			<CodeBlock code={DRYUI_SKILLS_INSTALL_COMMAND} language="bash" />
 		</section>
 
-		<section class="stack-md">
-			<Heading level={2}>dryui-init: scaffold or wire up</Heading>
+		<section class="stack-md" id="agent-setup">
+			<Heading level={2}>Use it from your agent</Heading>
 			<Text size="lg" color="secondary" maxMeasure="default">
-				Ask your agent to set up DryUI. The init skill works on new SvelteKit apps, existing apps,
-				and brownfield repos: it installs <code>@dryui/ui</code>, <code>@dryui/lint</code>, and
-				<code>@dryui/feedback</code>, registers the lint preprocessor, sets up themes, and mounts
-				the live-feedback widget so visual iteration is wired from the start.
+				Claude Code, Codex, and other coding agents all use the same DryUI skills. Pick your agent
+				for the install command, then ask for the skill by name when you want to be explicit.
 			</Text>
+
+			<Tabs.Root bind:value={selectedAgent}>
+				<Tabs.List>
+					{#each featuredAgentSetups as agent (agent.id)}
+						<Tabs.Trigger value={agent.id}>
+							<span class="agent-tab-label">
+								<AgentLogo agent={agent.id} size={18} />
+								{agent.label}
+							</span>
+						</Tabs.Trigger>
+					{/each}
+				</Tabs.List>
+
+				{#each featuredAgentSetups as agent (agent.id)}
+					<Tabs.Content value={agent.id}>
+						<div class="agent-tab-panel">
+							<div class="stack-md">
+								<div class="stack-sm">
+									<Heading level={4}>Try these prompts</Heading>
+								</div>
+
+								<div class="skill-prompt-list">
+									{#each skillPrompts as skill (skill.name)}
+										<article class="skill-prompt">
+											<CodeBlock
+												code={skillPrompt(agent.id, skill.name, skill.task)}
+												language="text"
+											/>
+											<Text size="sm" color="secondary">{skill.description}</Text>
+										</article>
+									{/each}
+								</div>
+							</div>
+
+							<Text size="sm" color="muted">{agent.followUp}</Text>
+						</div>
+					</Tabs.Content>
+				{/each}
+			</Tabs.Root>
 		</section>
 
-		<section class="stack-md">
-			<Heading level={2}>dryui: build with components</Heading>
-			<Text size="lg" color="secondary" maxMeasure="default">
-				The core skill. Tell your agent what you want and it composes real
-				<code>@dryui/ui</code> controls, picking up theming, forms, a11y, and keyboard patterns from the
-				skill rules instead of hand-rolling markup.
-			</Text>
-			<CodeBlock language="svelte" code={componentExample} linkResolver={componentLinkResolver} />
+		<section class="learn-mode stack-sm">
+			<Heading level={4}>Learn more</Heading>
+			<Button size="md" href={withBase('/feedback-loop')}>
+				<MessageSquareText size={16} aria-hidden="true" />
+				Feedback Loop
+			</Button>
 		</section>
-
-		<section class="stack-md">
-			<Heading level={2}>dryui-live-feedback: iterate visually</Heading>
-			<Text size="lg" color="secondary" maxMeasure="default">
-				Iterate on the running app by drawing on it. The skill boots the feedback dashboard, keeps
-				the dev server healthy, and waits for you to annotate. Each drawing, removed marker, or
-				labeled component becomes a structured edit your agent applies, then it loops.
-			</Text>
-		</section>
-
-		<section class="stack-md">
-			<Heading level={2}>Manual setup</Heading>
-			<Text size="lg" color="secondary" maxMeasure="default">
-				If you would rather wire DryUI by hand, install the packages and import the themes once. The
-				skills do this for you, but the surface area is small enough to set up manually.
-			</Text>
-			<CodeBlock code={manualInstallCode} language="bash" />
-			<CodeBlock code={themeImportCode} language="svelte" />
-		</section>
-
-		<div class="stack-sm">
-			<Text size="sm" color="muted" maxMeasure="default">
-				Want to see what the components look like? Each one has a focused page with API, demo, and
-				accessibility notes.
-			</Text>
-			<span class="start-component-action">
-				<Button variant="solid" color="ink" size="md" href={withBase('/components/button')}>
-					Browse components
-				</Button>
-			</span>
-		</div>
 	</div>
 </Container>
 
 <style>
-	.start-component-action {
+	.agent-tab-label {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--dry-space-2);
+	}
+
+	.skill-prompt {
+		display: grid;
+		gap: var(--dry-space-2);
+	}
+
+	.agent-tab-panel {
+		padding-block-start: var(--dry-space-4);
+	}
+
+	.skill-prompt-list {
+		display: grid;
+		gap: var(--dry-space-4);
+		padding-block-start: var(--dry-space-2);
+	}
+
+	.learn-mode {
 		justify-self: start;
 	}
 </style>

@@ -1,36 +1,9 @@
+/* Tokens + motion utilities components depend on. Host page decides paint. */
 *,
 *::before,
 *::after {
+	/* Components are authored against border-box sizing math. */
 	box-sizing: border-box;
-	margin: 0;
-}
-
-html {
-	font-family: var(--dry-font-sans);
-	color: var(--dry-color-text-strong);
-	background: var(--dry-color-bg-base);
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-rendering: optimizeLegibility;
-}
-
-body {
-	margin: 0;
-	min-height: 100dvh;
-}
-
-:where(h1, h2, h3, h4, h5, h6) {
-	text-wrap: balance;
-}
-:where(p) {
-	text-wrap: pretty;
-}
-
-code,
-pre,
-kbd,
-samp {
-	font-family: var(--dry-font-mono);
 }
 
 :root {
@@ -53,7 +26,6 @@ samp {
 	--dry-color-fill-brand-weak: hsla(230, 100%, 67%, 0.05);
 	--dry-color-stroke-brand: hsla(230, 64%, 57%, 0.5);
 	--dry-color-stroke-brand-strong: hsla(230, 64%, 57%, 0.8);
-	--dry-color-stroke-brand-weak: hsla(230, 64%, 57%, 0.2);
 	--dry-color-on-brand: #ffffff;
 	--dry-color-focus-ring: hsla(230, 64%, 57%, 0.4);
 
@@ -68,36 +40,22 @@ samp {
 	--dry-color-text-inverse-weak: hsla(0, 0%, 100%, 0.78);
 	--dry-color-text-inverse-disabled: hsla(0, 0%, 100%, 0.12);
 
-	--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
-	--dry-color-icon-disabled: var(--dry-color-stroke-weak);
-	--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
-	--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
-	--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
-	--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
-
 	--dry-color-stroke-focus: var(--dry-color-brand);
 	--dry-color-stroke-selected: var(--dry-color-brand);
 	--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
 	--dry-color-stroke-inverse: hsla(0, 0%, 100%, 0.6);
 	--dry-color-stroke-inverse-weak: hsla(0, 0%, 100%, 0.12);
 
-	--dry-color-fill-strong: var(--dry-color-text-strong);
 	--dry-color-fill-weak: var(--dry-color-fill);
 	--dry-color-fill-weaker: hsla(230, 100%, 25%, 0.02);
 	--dry-color-fill-selected: var(--dry-color-fill-brand);
 	--dry-color-fill-disabled: var(--dry-color-stroke-weak);
-	--dry-color-fill-overlay: var(--dry-color-stroke-strong);
 	--dry-color-fill-inverse: var(--dry-color-text-inverse);
 	--dry-color-fill-inverse-weak: hsla(0, 0%, 100%, 0.06);
-	--dry-color-fill-inverse-hover: var(--dry-color-fill-inverse-weak);
-	--dry-color-fill-inverse-active: hsla(0, 0%, 100%, 0.12);
-	--dry-color-fill-inverse-disabled: #ffffff1f;
-	--dry-color-fill-white: #ffffff;
 	--dry-color-fill-yellow: #fec62e;
 
 	--dry-color-bg-sunken: #f5f6fa;
 	--dry-color-bg-alternate: var(--dry-color-bg-sunken);
-	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: hsl(233, 18%, 9%);
 
 	/* ─── Image edge ring ────────────────────────────────────────────
@@ -117,11 +75,8 @@ samp {
 	--dry-toggle-selected-bg: var(--dry-color-fill-brand);
 	--dry-toggle-selected-stroke: var(--dry-color-fill-brand);
 	--dry-toggle-thumb-bg: #ffffff;
-	--dry-toggle-hover-bg: var(--dry-color-fill-brand-weak);
-	--dry-toggle-press-bg: var(--dry-color-fill-active);
 	--dry-toggle-disabled-fill: var(--dry-color-stroke-weak);
 	--dry-toggle-disabled-stroke: var(--dry-color-stroke-weak);
-	--dry-toggle-focus-ring: var(--dry-color-fill-brand);
 	--dry-toggle-label-color: var(--dry-color-text-strong);
 	--dry-toggle-label-disabled-color: var(--dry-color-text-disabled);
 
@@ -135,62 +90,45 @@ samp {
 	--dry-color-fill-error-weak: hsla(0, 70%, 50%, 0.1);
 	--dry-color-stroke-error: hsl(0, 50%, 70%);
 	--dry-color-stroke-error-strong: hsla(0, 70%, 50%, 0.8);
-	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
 	--dry-color-on-error: #ffffff;
 
 	/* ─── Status: Warning (hue 40) ────────────────────────────────── */
 	--dry-color-text-warning: hsl(40, 80%, 30%);
 	--dry-color-fill-warning: hsl(40, 80%, 50%);
-	--dry-color-fill-warning-hover: hsl(40, 80%, 42%);
 	--dry-color-fill-warning-weak: hsla(40, 80%, 50%, 0.1);
 	--dry-color-stroke-warning: hsl(40, 60%, 65%);
 	--dry-color-stroke-warning-strong: hsla(40, 80%, 50%, 0.8);
-	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
 	--dry-color-on-warning: hsl(40, 80%, 15%);
 
 	/* ─── Status: Success (hue 145) ───────────────────────────────── */
 	--dry-color-text-success: hsl(145, 60%, 30%);
 	--dry-color-fill-success: hsl(145, 60%, 45%);
-	--dry-color-fill-success-hover: hsl(145, 60%, 37%);
 	--dry-color-fill-success-weak: hsla(145, 60%, 45%, 0.1);
 	--dry-color-stroke-success: hsl(145, 50%, 65%);
 	--dry-color-stroke-success-strong: hsla(145, 60%, 45%, 0.8);
-	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
 	--dry-color-on-success: #ffffff;
 
 	/* ─── Status: Info (hue 210) ──────────────────────────────────── */
 	--dry-color-text-info: hsl(210, 70%, 35%);
 	--dry-color-fill-info: hsl(210, 70%, 50%);
-	--dry-color-fill-info-hover: hsl(210, 70%, 42%);
 	--dry-color-fill-info-weak: hsla(210, 70%, 50%, 0.1);
 	--dry-color-stroke-info: hsl(210, 50%, 70%);
 	--dry-color-stroke-info-strong: hsla(210, 70%, 50%, 0.8);
-	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
-	--dry-color-on-info: #ffffff;
 
 	/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
-	--dry-color-accent: hsl(25, 90%, 58%);
-	--dry-color-text-accent: hsl(25, 80%, 38%);
 	--dry-color-fill-accent: hsl(25, 90%, 58%);
-	--dry-color-fill-accent-hover: hsl(25, 90%, 50%);
-	--dry-color-fill-accent-active: hsl(25, 90%, 44%);
 	--dry-color-fill-accent-weak: hsla(25, 90%, 58%, 0.08);
 	--dry-color-stroke-accent: hsla(25, 90%, 58%, 0.5);
 	--dry-color-stroke-accent-strong: hsla(25, 90%, 58%, 0.8);
-	--dry-color-stroke-accent-weak: hsla(25, 90%, 58%, 0.2);
-	--dry-color-icon-accent: hsla(25, 90%, 58%, 0.8);
-	--dry-color-on-accent: #ffffff;
 
 	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 	--dry-color-text-purple: hsl(280, 60%, 38%);
 	--dry-color-fill-purple: hsl(280, 65%, 55%);
-	--dry-color-fill-purple-hover: hsl(280, 65%, 47%);
 	--dry-color-fill-purple-weak: hsla(280, 65%, 55%, 0.1);
 	--dry-color-stroke-purple: hsla(280, 65%, 55%, 0.5);
 	--dry-color-on-purple: #ffffff;
 
 	/* ─── Extended surface depth ──────────────────────────────────── */
-	--dry-color-bg-elevated: #eceef2;
 	--dry-color-bg-floating: #ffffff;
 
 	/* ─── Semantic shadows ────────────────────────────────────────── */
@@ -199,8 +137,6 @@ samp {
 	--dry-shadow-sunken: inset 0 1px 4px rgba(0, 0, 0, 0.08);
 
 	/* ─── Tinted shadows ──────────────────────────────────────────── */
-	--dry-shadow-brand: 0 4px 14px hsla(230, 64%, 57%, 0.2), 0 2px 6px hsla(230, 64%, 57%, 0.12);
-	--dry-shadow-accent: 0 4px 14px hsla(25, 90%, 58%, 0.2), 0 2px 6px hsla(25, 90%, 58%, 0.12);
 
 	/* ─── Overlay backdrops ───────────────────────────────────────── */
 	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.4);
@@ -225,20 +161,8 @@ samp {
 	--dry-space-12: 3rem;
 	--dry-space-14: 3.5rem;
 	--dry-space-16: 4rem;
-	--dry-space-20: 5rem;
-	--dry-space-24: 6rem;
-	--dry-space-32: 8rem;
-	--dry-space-40: 2.5rem;
-	--dry-space-56: 3.5rem;
-	--dry-space-64: 4rem;
-	--dry-space-80: 5rem;
-	--dry-space-96: 6rem;
-	--dry-space-128: 8rem;
-	--dry-space-192: 12rem;
-	--dry-space-256: 16rem;
 
 	/* ─── Radius ──────────────────────────────────────────────────── */
-	--dry-radius-none: 0;
 	--dry-radius-xs: 2px;
 	--dry-radius-sm: 4px;
 	--dry-radius-md: 8px;
@@ -267,10 +191,6 @@ samp {
 	--dry-padding-tooltip: var(--dry-space-2);
 	--dry-padding-field: var(--dry-space-4);
 
-	--dry-radius-nested-card: max(
-		var(--dry-radius-sm),
-		calc(var(--dry-radius-card) - var(--dry-padding-card))
-	);
 	--dry-radius-nested-dialog: max(
 		var(--dry-radius-sm),
 		calc(var(--dry-radius-dialog) - var(--dry-padding-dialog))
@@ -278,10 +198,6 @@ samp {
 	--dry-radius-nested-popover: max(
 		var(--dry-radius-xs),
 		calc(var(--dry-radius-popover) - var(--dry-padding-popover))
-	);
-	--dry-radius-nested-sheet: max(
-		var(--dry-radius-sm),
-		calc(var(--dry-radius-sheet) - var(--dry-padding-sheet))
 	);
 	--dry-radius-nested-toast: max(
 		var(--dry-radius-xs),
@@ -306,11 +222,7 @@ samp {
 	--dry-font-display: var(--dry-font-sans);
 
 	/* ─── Font weights ────────────────────────────────────────────── */
-	--dry-font-weight-light: 300;
-	--dry-font-weight-normal: 400;
 	--dry-font-weight-medium: 500;
-	--dry-font-weight-semibold: 600;
-	--dry-font-weight-bold: 700;
 
 	/* Practical UI-style named scale tokens */
 	--dry-type-display-size: 3.5rem;
@@ -328,7 +240,6 @@ samp {
 	--dry-type-tiny-size: 0.875rem;
 	--dry-type-tiny-leading: 1.25rem;
 	--dry-type-xs-size: 0.625rem;
-	--dry-type-2xs-size: 0.5625rem;
 
 	/* Semantic UI typography aliases derived from the Practical UI scale */
 	--dry-type-ui-caption-size: calc(var(--dry-type-tiny-size) * 0.8571428571);
@@ -336,7 +247,6 @@ samp {
 	--dry-type-ui-control-size: var(--dry-type-tiny-size);
 	--dry-type-ui-control-leading: var(--dry-type-tiny-leading);
 	--dry-type-ui-body-size: var(--dry-type-small-size);
-	--dry-type-ui-body-leading: var(--dry-type-small-leading);
 	--dry-type-ui-body-strong-size: calc(
 		(var(--dry-type-small-size) + var(--dry-type-heading-4-size)) / 2
 	);
@@ -365,10 +275,8 @@ samp {
 	/* Legacy text ladder kept as a compatibility bridge onto the named scale */
 	--dry-text-xs-size: var(--dry-type-ui-caption-size);
 	--dry-text-xs-leading: var(--dry-type-ui-caption-leading);
-	--dry-text-xs-tracking: 0.02em;
 	--dry-text-sm-size: var(--dry-type-ui-control-size);
 	--dry-text-sm-leading: var(--dry-type-ui-control-leading);
-	--dry-text-sm-tracking: 0.01em;
 	--dry-text-base-size: var(--dry-type-ui-body-strong-size);
 	--dry-text-base-leading: var(--dry-type-ui-body-strong-leading);
 	--dry-text-lg-size: var(--dry-type-ui-title-size);
@@ -376,12 +284,8 @@ samp {
 	--dry-text-xl-size: var(--dry-type-ui-title-strong-size);
 	--dry-text-xl-leading: var(--dry-type-ui-title-strong-leading);
 	--dry-text-2xl-size: var(--dry-type-ui-section-size);
-	--dry-text-2xl-leading: var(--dry-type-ui-section-leading);
-	--dry-text-2xl-tracking: -0.01em;
 	--dry-text-3xl-size: var(--dry-type-ui-section-strong-size);
-	--dry-text-3xl-leading: var(--dry-type-ui-section-strong-leading);
 	--dry-text-4xl-size: var(--dry-type-ui-display-size);
-	--dry-text-4xl-leading: var(--dry-type-ui-display-leading);
 
 	/* ─── State ───────────────────────────────────────────────────────
 	   Shared shorthands for focus / disabled state. Consumers can
@@ -457,15 +361,6 @@ samp {
 	--dry-enter-stagger-letter: 40ms;
 	--dry-enter-stagger-max: 16;
 
-	/* ─── Exit motion ──────────────────────────────────────────────
-	   Subtle dismissal — small fixed offset, not full container
-	   travel. Consumed by the `leave` Svelte transition and any
-	   overlay primitive using `out:leave`. */
-	--dry-exit-translate: 12px;
-	--dry-exit-blur: 4px;
-	--dry-exit-duration: var(--dry-duration-slow);
-	--dry-exit-ease: var(--dry-ease-out);
-
 	/* ─── Icon swap ────────────────────────────────────────────────
 	   Motion for `<IconSwap>` when one icon replaces another
 	   (copy ↔ check, play ↔ pause). Uses the same retarget-friendly
@@ -491,62 +386,18 @@ samp {
 	--dry-glass-blur: 12px;
 	--dry-color-glass-tint: var(--dry-color-bg-raised);
 	--dry-glass-tint: var(--dry-color-glass-tint);
-	--dry-glass-opacity: 72%;
 	--dry-glass-saturation: 180%;
-	--dry-glass-border: hsla(0, 0%, 100%, 0.08);
-	--dry-glass-border-strong: hsla(0, 0%, 100%, 0.15);
 
 	/* ─── Glow ────────────────────────────────────────────────────── */
 	--dry-glow-color: var(--dry-color-fill-brand);
-	--dry-glow-blur: 24px;
-	--dry-glow-spread: 48px;
-	--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 64%, 57%, 0.25);
-	--dry-glow-ring-accent:
-		0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 90%, 58%, 0.25);
-	--dry-glow-ambient: hsla(230, 64%, 57%, 0.06);
-	--dry-glow-ambient-accent: hsla(25, 90%, 58%, 0.06);
 
 	/* ─── Gradient palette ────────────────────────────────────────── */
-	--dry-gradient-warm: linear-gradient(
-		135deg,
-		hsl(25, 90%, 65%) 0%,
-		hsl(350, 70%, 60%) 50%,
-		hsl(280, 60%, 55%) 100%
-	);
-	--dry-gradient-cool: linear-gradient(
-		135deg,
-		hsl(210, 80%, 60%) 0%,
-		hsl(250, 70%, 55%) 50%,
-		hsl(280, 50%, 50%) 100%
-	);
-	--dry-gradient-sunset: linear-gradient(
-		135deg,
-		hsl(40, 95%, 60%) 0%,
-		hsl(15, 90%, 58%) 40%,
-		hsl(340, 75%, 55%) 100%
-	);
-	--dry-gradient-ocean: linear-gradient(
-		135deg,
-		hsl(195, 80%, 50%) 0%,
-		hsl(220, 85%, 55%) 50%,
-		hsl(250, 70%, 60%) 100%
-	);
-	--dry-gradient-surface: linear-gradient(
-		180deg,
-		var(--dry-color-bg-base) 0%,
-		var(--dry-color-bg-raised) 100%
-	);
 
 	/* ─── Grain / noise texture ───────────────────────────────────── */
 	--dry-grain-opacity: 0.04;
-	--dry-grain-size: 0.65;
-	--dry-grain-blend: overlay;
 
 	/* ─── Typography extras ───────────────────────────────────────── */
-	--dry-tracking-tight: -0.025em;
 	--dry-tracking-normal: 0;
-	--dry-tracking-wide: 0.05em;
-	--dry-tracking-wider: 0.1em;
 
 	/* ─── Utility shadows — three-layer shadow-as-border recipe ──────
 	   Edge + close contact + ambient, so a raised surface reads as
@@ -565,12 +416,6 @@ samp {
 	--dry-shadow-xl:
 		0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 8px 16px -4px rgba(0, 0, 0, 0.1),
 		0px 20px 40px -8px rgba(0, 0, 0, 0.08);
-	--dry-shadow-sm-hover:
-		0px 0px 0px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px -1px rgba(0, 0, 0, 0.08),
-		0px 2px 4px 0px rgba(0, 0, 0, 0.06);
-	--dry-shadow-md-hover:
-		0px 0px 0px 1px rgba(0, 0, 0, 0.09), 0px 2px 4px -1px rgba(0, 0, 0, 0.1),
-		0px 4px 8px -2px rgba(0, 0, 0, 0.06);
 
 	/* ─── Layers ──────────────────────────────────────────────────── */
 	--dry-layer-overlay: 50;
@@ -640,9 +485,6 @@ samp {
 		--dry-enter-stagger-section: 0ms;
 		--dry-enter-stagger-word: 0ms;
 		--dry-enter-stagger-letter: 0ms;
-		--dry-exit-translate: 0px;
-		--dry-exit-blur: 0px;
-		--dry-exit-duration: 1ms;
 		--dry-icon-swap-duration: 0ms;
 		--dry-icon-swap-scale-out: 1;
 		--dry-icon-swap-blur-out: 0px;

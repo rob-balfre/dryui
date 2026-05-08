@@ -18,7 +18,6 @@
 	--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
 	--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
 	--dry-color-stroke-brand-strong: hsla(230, 100%, 82%, 0.8);
-	--dry-color-stroke-brand-weak: hsla(230, 100%, 82%, 0.2);
 	--dry-color-on-brand: hsl(233, 18%, 9%);
 	--dry-color-focus-ring: hsla(230, 100%, 82%, 0.4);
 
@@ -33,36 +32,22 @@
 	--dry-color-text-inverse-weak: hsla(230, 100%, 20%, 0.65);
 	--dry-color-text-inverse-disabled: hsla(230, 100%, 20%, 0.1);
 
-	--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
-	--dry-color-icon-disabled: var(--dry-color-stroke-weak);
-	--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
-	--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
-	--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
-	--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
-
 	--dry-color-stroke-focus: var(--dry-color-brand);
 	--dry-color-stroke-selected: var(--dry-color-brand);
 	--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
 	--dry-color-stroke-inverse: hsla(230, 100%, 20%, 0.45);
 	--dry-color-stroke-inverse-weak: hsla(230, 100%, 20%, 0.1);
 
-	--dry-color-fill-strong: var(--dry-color-text-strong);
 	--dry-color-fill-weak: var(--dry-color-fill);
 	--dry-color-fill-weaker: hsla(0, 0%, 100%, 0.03);
 	--dry-color-fill-selected: var(--dry-color-fill-brand);
 	--dry-color-fill-disabled: var(--dry-color-stroke-weak);
-	--dry-color-fill-overlay: var(--dry-color-stroke-strong);
 	--dry-color-fill-inverse: var(--dry-color-text-inverse);
-	--dry-color-fill-inverse-hover: hsla(230, 100%, 25%, 0.04);
-	--dry-color-fill-inverse-active: hsla(230, 100%, 20%, 0.1);
 	--dry-color-fill-inverse-weak: hsla(230, 100%, 25%, 0.04);
-	--dry-color-fill-inverse-disabled: hsla(230, 100%, 20%, 0.1);
-	--dry-color-fill-white: #ffffff;
 	--dry-color-fill-yellow: #fec62e;
 
 	--dry-color-bg-sunken: #000000;
 	--dry-color-bg-alternate: var(--dry-color-bg-sunken);
-	--dry-color-bg-brand: var(--dry-color-fill-brand);
 	--dry-color-bg-inverse: #ffffff;
 
 	/* ─── Image edge ring (dark) ─────────────────────────────────── */
@@ -83,62 +68,45 @@
 	--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
 	--dry-color-stroke-error: hsl(0, 45%, 55%);
 	--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
-	--dry-color-icon-error: var(--dry-color-stroke-error-strong);
 	--dry-color-on-error: #ffffff;
 
 	/* ─── Status: Warning ─────────────────────────────────────────── */
 	--dry-color-text-warning: hsl(40, 80%, 65%);
 	--dry-color-fill-warning: hsl(40, 75%, 52%);
-	--dry-color-fill-warning-hover: hsl(40, 75%, 45%);
 	--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
 	--dry-color-stroke-warning: hsl(40, 55%, 55%);
 	--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
-	--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
 	--dry-color-on-warning: hsl(40, 80%, 15%);
 
 	/* ─── Status: Success ─────────────────────────────────────────── */
 	--dry-color-text-success: hsl(145, 55%, 65%);
 	--dry-color-fill-success: hsl(145, 55%, 48%);
-	--dry-color-fill-success-hover: hsl(145, 55%, 40%);
 	--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
 	--dry-color-stroke-success: hsl(145, 45%, 55%);
 	--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
-	--dry-color-icon-success: var(--dry-color-stroke-success-strong);
 	--dry-color-on-success: #ffffff;
 
 	/* ─── Status: Info ────────────────────────────────────────────── */
 	--dry-color-text-info: hsl(210, 65%, 70%);
 	--dry-color-fill-info: hsl(210, 65%, 55%);
-	--dry-color-fill-info-hover: hsl(210, 65%, 47%);
 	--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
 	--dry-color-stroke-info: hsl(210, 45%, 55%);
 	--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
-	--dry-color-icon-info: var(--dry-color-stroke-info-strong);
-	--dry-color-on-info: #ffffff;
 
 	/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
-	--dry-color-accent: hsl(25, 85%, 68%);
-	--dry-color-text-accent: hsl(25, 85%, 68%);
 	--dry-color-fill-accent: hsl(25, 85%, 68%);
-	--dry-color-fill-accent-hover: hsl(25, 85%, 60%);
-	--dry-color-fill-accent-active: hsl(25, 85%, 55%);
 	--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
 	--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
 	--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
-	--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
-	--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
-	--dry-color-on-accent: hsl(233, 18%, 9%);
 
 	/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 	--dry-color-text-purple: hsl(280, 75%, 78%);
 	--dry-color-fill-purple: hsl(280, 75%, 70%);
-	--dry-color-fill-purple-hover: hsl(280, 75%, 62%);
 	--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
 	--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
 	--dry-color-on-purple: hsl(233, 18%, 9%);
 
 	/* ─── Extended surface depth ──────────────────────────────────── */
-	--dry-color-bg-elevated: hsl(234, 9%, 22%);
 	--dry-color-bg-floating: hsl(234, 8%, 26%);
 
 	/* ─── Semantic shadows ────────────────────────────────────────── */
@@ -147,8 +115,6 @@
 	--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
 
 	/* ─── Tinted shadows ──────────────────────────────────────────── */
-	--dry-shadow-brand: 0 4px 14px hsla(230, 100%, 82%, 0.15), 0 2px 6px hsla(230, 100%, 82%, 0.1);
-	--dry-shadow-accent: 0 4px 14px hsla(25, 85%, 68%, 0.15), 0 2px 6px hsla(25, 85%, 68%, 0.1);
 
 	/* ─── Utility shadows (dark) — edge reads white, layers stay ink ── */
 	--dry-shadow-sm:
@@ -163,12 +129,6 @@
 	--dry-shadow-xl:
 		0px 0px 0px 1px rgba(255, 255, 255, 0.08), 0px 8px 16px -4px rgba(0, 0, 0, 0.55),
 		0px 20px 40px -8px rgba(0, 0, 0, 0.5);
-	--dry-shadow-sm-hover:
-		0px 0px 0px 1px rgba(255, 255, 255, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.45),
-		0px 2px 4px 0px rgba(0, 0, 0, 0.35);
-	--dry-shadow-md-hover:
-		0px 0px 0px 1px rgba(255, 255, 255, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.5),
-		0px 4px 8px -2px rgba(0, 0, 0, 0.35);
 
 	/* ─── Overlay backdrops ───────────────────────────────────────── */
 	--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
@@ -183,52 +143,14 @@
 	/* ─── Glass surface ───────────────────────────────────────────── */
 	--dry-color-glass-tint: var(--dry-color-bg-raised);
 	--dry-glass-tint: var(--dry-color-glass-tint);
-	--dry-glass-opacity: 64%;
 	--dry-glass-saturation: 120%;
-	--dry-glass-border: hsla(0, 0%, 100%, 0.06);
-	--dry-glass-border-strong: hsla(0, 0%, 100%, 0.12);
 
 	/* ─── Glow extensions ─────────────────────────────────────────── */
-	--dry-glow-ring: 0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 100%, 82%, 0.2);
-	--dry-glow-ring-accent:
-		0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 85%, 68%, 0.2);
-	--dry-glow-ambient: hsla(230, 100%, 82%, 0.04);
-	--dry-glow-ambient-accent: hsla(25, 85%, 68%, 0.04);
 
 	/* ─── Gradient palette ────────────────────────────────────────── */
-	--dry-gradient-warm: linear-gradient(
-		135deg,
-		hsl(25, 85%, 68%) 0%,
-		hsl(350, 65%, 62%) 50%,
-		hsl(280, 55%, 58%) 100%
-	);
-	--dry-gradient-cool: linear-gradient(
-		135deg,
-		hsl(210, 75%, 65%) 0%,
-		hsl(250, 65%, 60%) 50%,
-		hsl(280, 45%, 55%) 100%
-	);
-	--dry-gradient-sunset: linear-gradient(
-		135deg,
-		hsl(40, 90%, 65%) 0%,
-		hsl(15, 85%, 62%) 40%,
-		hsl(340, 70%, 58%) 100%
-	);
-	--dry-gradient-ocean: linear-gradient(
-		135deg,
-		hsl(195, 75%, 55%) 0%,
-		hsl(220, 80%, 60%) 50%,
-		hsl(250, 65%, 62%) 100%
-	);
-	--dry-gradient-surface: linear-gradient(
-		180deg,
-		var(--dry-color-bg-base) 0%,
-		var(--dry-color-bg-raised) 100%
-	);
 
 	/* ─── Grain / noise texture ───────────────────────────────────── */
 	--dry-grain-opacity: 0.06;
-	--dry-grain-blend: soft-light;
 }
 
 /* When `.theme-auto` is combined with `data-theme="light"`, the explicit
@@ -261,7 +183,6 @@
 			--dry-color-fill-brand-weak: hsla(230, 100%, 82%, 0.06);
 			--dry-color-stroke-brand: hsla(230, 100%, 82%, 0.5);
 			--dry-color-stroke-brand-strong: hsla(230, 100%, 82%, 0.8);
-			--dry-color-stroke-brand-weak: hsla(230, 100%, 82%, 0.2);
 			--dry-color-on-brand: hsl(233, 18%, 9%);
 			--dry-color-focus-ring: hsla(230, 100%, 82%, 0.4);
 
@@ -276,36 +197,22 @@
 			--dry-color-text-inverse-weak: hsla(230, 100%, 20%, 0.65);
 			--dry-color-text-inverse-disabled: hsla(230, 100%, 20%, 0.1);
 
-			--dry-color-icon-brand: var(--dry-color-stroke-brand-strong);
-			--dry-color-icon-disabled: var(--dry-color-stroke-weak);
-			--dry-color-icon-inverse: var(--dry-color-stroke-inverse);
-			--dry-color-icon-inverse-strong: var(--dry-color-text-inverse);
-			--dry-color-icon-inverse-weak: var(--dry-color-text-inverse-weak);
-			--dry-color-icon-inverse-disabled: var(--dry-color-text-inverse-disabled);
-
 			--dry-color-stroke-focus: var(--dry-color-brand);
 			--dry-color-stroke-selected: var(--dry-color-brand);
 			--dry-color-stroke-disabled: var(--dry-color-stroke-weak);
 			--dry-color-stroke-inverse: hsla(230, 100%, 20%, 0.45);
 			--dry-color-stroke-inverse-weak: hsla(230, 100%, 20%, 0.1);
 
-			--dry-color-fill-strong: var(--dry-color-text-strong);
 			--dry-color-fill-weak: var(--dry-color-fill);
 			--dry-color-fill-weaker: hsla(0, 0%, 100%, 0.03);
 			--dry-color-fill-selected: var(--dry-color-fill-brand);
 			--dry-color-fill-disabled: var(--dry-color-stroke-weak);
-			--dry-color-fill-overlay: var(--dry-color-stroke-strong);
 			--dry-color-fill-inverse: var(--dry-color-text-inverse);
-			--dry-color-fill-inverse-hover: hsla(230, 100%, 25%, 0.04);
-			--dry-color-fill-inverse-active: hsla(230, 100%, 20%, 0.1);
 			--dry-color-fill-inverse-weak: hsla(230, 100%, 25%, 0.04);
-			--dry-color-fill-inverse-disabled: hsla(230, 100%, 20%, 0.1);
-			--dry-color-fill-white: #ffffff;
 			--dry-color-fill-yellow: #fec62e;
 
 			--dry-color-bg-sunken: #000000;
 			--dry-color-bg-alternate: var(--dry-color-bg-sunken);
-			--dry-color-bg-brand: var(--dry-color-fill-brand);
 			--dry-color-bg-inverse: #ffffff;
 
 			/* ─── Image edge ring (dark) ─────────────────────────────────── */
@@ -322,62 +229,45 @@
 			--dry-color-fill-error-weak: hsla(0, 60%, 60%, 0.15);
 			--dry-color-stroke-error: hsl(0, 45%, 55%);
 			--dry-color-stroke-error-strong: hsla(0, 65%, 55%, 0.8);
-			--dry-color-icon-error: var(--dry-color-stroke-error-strong);
 			--dry-color-on-error: #ffffff;
 
 			/* ─── Status: Warning ─────────────────────────────────────────── */
 			--dry-color-text-warning: hsl(40, 80%, 65%);
 			--dry-color-fill-warning: hsl(40, 75%, 52%);
-			--dry-color-fill-warning-hover: hsl(40, 75%, 45%);
 			--dry-color-fill-warning-weak: hsla(40, 75%, 60%, 0.15);
 			--dry-color-stroke-warning: hsl(40, 55%, 55%);
 			--dry-color-stroke-warning-strong: hsla(40, 75%, 52%, 0.8);
-			--dry-color-icon-warning: var(--dry-color-stroke-warning-strong);
 			--dry-color-on-warning: hsl(40, 80%, 15%);
 
 			/* ─── Status: Success ─────────────────────────────────────────── */
 			--dry-color-text-success: hsl(145, 55%, 65%);
 			--dry-color-fill-success: hsl(145, 55%, 48%);
-			--dry-color-fill-success-hover: hsl(145, 55%, 40%);
 			--dry-color-fill-success-weak: hsla(145, 55%, 60%, 0.15);
 			--dry-color-stroke-success: hsl(145, 45%, 55%);
 			--dry-color-stroke-success-strong: hsla(145, 55%, 48%, 0.8);
-			--dry-color-icon-success: var(--dry-color-stroke-success-strong);
 			--dry-color-on-success: #ffffff;
 
 			/* ─── Status: Info ────────────────────────────────────────────── */
 			--dry-color-text-info: hsl(210, 65%, 70%);
 			--dry-color-fill-info: hsl(210, 65%, 55%);
-			--dry-color-fill-info-hover: hsl(210, 65%, 47%);
 			--dry-color-fill-info-weak: hsla(210, 60%, 65%, 0.15);
 			--dry-color-stroke-info: hsl(210, 45%, 55%);
 			--dry-color-stroke-info-strong: hsla(210, 65%, 55%, 0.8);
-			--dry-color-icon-info: var(--dry-color-stroke-info-strong);
-			--dry-color-on-info: #ffffff;
 
 			/* ─── Accent tone (warm counterpoint to brand) ───────────────── */
-			--dry-color-accent: hsl(25, 85%, 68%);
-			--dry-color-text-accent: hsl(25, 85%, 68%);
 			--dry-color-fill-accent: hsl(25, 85%, 68%);
-			--dry-color-fill-accent-hover: hsl(25, 85%, 60%);
-			--dry-color-fill-accent-active: hsl(25, 85%, 55%);
 			--dry-color-fill-accent-weak: hsla(25, 85%, 68%, 0.1);
 			--dry-color-stroke-accent: hsla(25, 85%, 68%, 0.5);
 			--dry-color-stroke-accent-strong: hsla(25, 85%, 68%, 0.8);
-			--dry-color-stroke-accent-weak: hsla(25, 85%, 68%, 0.2);
-			--dry-color-icon-accent: hsla(25, 85%, 68%, 0.8);
-			--dry-color-on-accent: hsl(233, 18%, 9%);
 
 			/* ─── Purple semantic palette (badge / tag purple variants) ───── */
 			--dry-color-text-purple: hsl(280, 75%, 78%);
 			--dry-color-fill-purple: hsl(280, 75%, 70%);
-			--dry-color-fill-purple-hover: hsl(280, 75%, 62%);
 			--dry-color-fill-purple-weak: hsla(280, 75%, 70%, 0.12);
 			--dry-color-stroke-purple: hsla(280, 75%, 70%, 0.5);
 			--dry-color-on-purple: hsl(233, 18%, 9%);
 
 			/* ─── Extended surface depth ──────────────────────────────────── */
-			--dry-color-bg-elevated: hsl(234, 9%, 22%);
 			--dry-color-bg-floating: hsl(234, 8%, 26%);
 
 			/* ─── Semantic shadows ────────────────────────────────────────── */
@@ -386,9 +276,6 @@
 			--dry-shadow-sunken: inset 0 1px 4px hsla(230, 30%, 5%, 0.3);
 
 			/* ─── Tinted shadows ──────────────────────────────────────────── */
-			--dry-shadow-brand:
-				0 4px 14px hsla(230, 100%, 82%, 0.15), 0 2px 6px hsla(230, 100%, 82%, 0.1);
-			--dry-shadow-accent: 0 4px 14px hsla(25, 85%, 68%, 0.15), 0 2px 6px hsla(25, 85%, 68%, 0.1);
 
 			/* ─── Utility shadows (dark auto) ─────────────────────────────── */
 			--dry-shadow-sm:
@@ -403,12 +290,6 @@
 			--dry-shadow-xl:
 				0px 0px 0px 1px rgba(255, 255, 255, 0.08), 0px 8px 16px -4px rgba(0, 0, 0, 0.55),
 				0px 20px 40px -8px rgba(0, 0, 0, 0.5);
-			--dry-shadow-sm-hover:
-				0px 0px 0px 1px rgba(255, 255, 255, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.45),
-				0px 2px 4px 0px rgba(0, 0, 0, 0.35);
-			--dry-shadow-md-hover:
-				0px 0px 0px 1px rgba(255, 255, 255, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.5),
-				0px 4px 8px -2px rgba(0, 0, 0, 0.35);
 
 			/* ─── Overlay backdrops ───────────────────────────────────────── */
 			--dry-color-overlay-backdrop: hsla(0, 0%, 0%, 0.6);
@@ -423,53 +304,14 @@
 			/* ─── Glass surface ───────────────────────────────────────────── */
 			--dry-color-glass-tint: var(--dry-color-bg-raised);
 			--dry-glass-tint: var(--dry-color-glass-tint);
-			--dry-glass-opacity: 64%;
 			--dry-glass-saturation: 120%;
-			--dry-glass-border: hsla(0, 0%, 100%, 0.06);
-			--dry-glass-border-strong: hsla(0, 0%, 100%, 0.12);
 
 			/* ─── Glow extensions ─────────────────────────────────────────── */
-			--dry-glow-ring:
-				0 0 0 1px var(--dry-color-fill-brand), 0 0 12px 2px hsla(230, 100%, 82%, 0.2);
-			--dry-glow-ring-accent:
-				0 0 0 1px var(--dry-color-fill-accent), 0 0 12px 2px hsla(25, 85%, 68%, 0.2);
-			--dry-glow-ambient: hsla(230, 100%, 82%, 0.04);
-			--dry-glow-ambient-accent: hsla(25, 85%, 68%, 0.04);
 
 			/* ─── Gradient palette ────────────────────────────────────────── */
-			--dry-gradient-warm: linear-gradient(
-				135deg,
-				hsl(25, 85%, 68%) 0%,
-				hsl(350, 65%, 62%) 50%,
-				hsl(280, 55%, 58%) 100%
-			);
-			--dry-gradient-cool: linear-gradient(
-				135deg,
-				hsl(210, 75%, 65%) 0%,
-				hsl(250, 65%, 60%) 50%,
-				hsl(280, 45%, 55%) 100%
-			);
-			--dry-gradient-sunset: linear-gradient(
-				135deg,
-				hsl(40, 90%, 65%) 0%,
-				hsl(15, 85%, 62%) 40%,
-				hsl(340, 70%, 58%) 100%
-			);
-			--dry-gradient-ocean: linear-gradient(
-				135deg,
-				hsl(195, 75%, 55%) 0%,
-				hsl(220, 80%, 60%) 50%,
-				hsl(250, 65%, 62%) 100%
-			);
-			--dry-gradient-surface: linear-gradient(
-				180deg,
-				var(--dry-color-bg-base) 0%,
-				var(--dry-color-bg-raised) 100%
-			);
 
 			/* ─── Grain / noise texture ───────────────────────────────────── */
 			--dry-grain-opacity: 0.06;
-			--dry-grain-blend: soft-light;
 		}
 	}
 }

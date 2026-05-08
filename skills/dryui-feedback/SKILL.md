@@ -53,7 +53,7 @@ Each entry: `{ tag, selector?, originalRect, currentRect }`. The user dragged an
 
 DryUI does not ship a layout component. All page-level `display: grid` and `display: flex` declarations live in `src/layout.css` (or `@container` blocks within it). Nowhere else for page layout.
 
-Structural changes (new named region, new responsive shift, different grid template) and region-internal changes (padding inside a card, gap between sibling chips, surface borders/backgrounds) are both yours to apply. For structural edits, work in `src/layout.css` under the existing `[data-layout='<name>']` block — extend the template, add a new `data-layout-area`, or add an `@container page (min-width: ...)` rule. Pick the smallest edit that satisfies the feedback. Use the `--dry-space-*` token scale: `--dry-space-2` (8px), `--dry-space-3` (12px), `--dry-space-4` (16px), `--dry-space-6` (24px), `--dry-space-8` (32px). Pick by feel from the screenshot — usually `4` or `6` for body content, `2` or `3` for compact UI, `8` for hero-style breathing room.
+Structural changes (new named region, new responsive shift, different grid template) and region-internal changes (padding inside a wrapper, gap between sibling elements, borders or backgrounds the user requested) are both yours to apply. For structural edits, work in `src/layout.css` under the existing `[data-layout='<name>']` block — extend the template, add a new `data-layout-area`, or add an `@container page (min-width: ...)` rule. Pick the smallest edit that satisfies the feedback. Use the `--dry-space-*` token scale (`--dry-space-2` = 8px, `--dry-space-3` = 12px, `--dry-space-4` = 16px, `--dry-space-6` = 24px, `--dry-space-8` = 32px) for spacing values; match nearby usage in the file rather than picking magnitudes by feel.
 
 ## Lint trip-wires that will block the dev server
 
@@ -66,7 +66,7 @@ The DryUI lint runs as a Vite preprocessor — violations crash the dev server w
 - `dryui/no-raw-native-element` — use DryUI components, not raw HTML, for anything DryUI covers.
 - `dryui/no-flex` and `dryui/no-raw-grid` — flex and grid declarations only in `src/layout.css`.
 
-## Component preferences (avoid lint and stay on-brand)
+## Component preferences (avoid lint and a11y regressions)
 
 | Reach for                  | Not                       |
 | -------------------------- | ------------------------- |
