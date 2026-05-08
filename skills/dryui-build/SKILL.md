@@ -13,10 +13,17 @@ Zero-dependency Svelte 5 components. All imports from `@dryui/ui`. Requires a th
 
 DryUI work is explicit. Confirm contracts, build, then validate.
 
-1. **User brief** — one line capturing what you are building and for whom.
-2. **DryUI lookup/plan** — use this skill, the rule files below, and the checked-in component metadata/docs to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
-3. **Implementation** — build with DryUI components, Svelte 5 runes, grid layout, `--dry-*` tokens, and accessible composition.
-4. **Deterministic check** — run the project’s package checks, Svelte checks, builds, and `@dryui/lint` diagnostics to catch contract drift, accessibility regressions, token drift, and CSS discipline violations.
+1. **User brief** - one line capturing what you are building and for whom.
+2. **DryUI lookup/plan** - use this skill, the rule files below, and the checked-in component metadata/docs to confirm component contracts, tokens, recipes, and accessibility notes before choosing components.
+3. **Implementation** - build with DryUI components, Svelte 5 runes, grid layout, `--dry-*` tokens, and accessible composition.
+4. **Deterministic check** - run the project’s package checks, Svelte checks, builds, and `@dryui/lint` diagnostics to catch contract drift, accessibility regressions, token drift, and CSS discipline violations.
+5. **Visual-fidelity check** (when the brief includes an image): see §8.
+
+## 0. Describe the Design Before You Write
+
+**Precondition gate. Only when the brief attaches an image.**
+
+Before any markup, view the design image and write one paragraph describing: theme (light or dark), palette accents (primary, plus signal colours like red/amber/green), typography rhythm (sizes, weights, monospace vs sans), density (compact vs roomy, gap and padding feel), and signature treatments (e.g. photo avatars not initials, sparklines in KPI tiles, left accent bars on chips, grain or gradient surfaces). Anchor the rest of the build to this paragraph and re-read it during the visual-fidelity loop in §8. Do not start writing markup before the description exists.
 
 ## 1. Look Up Before You Write
 
@@ -24,7 +31,7 @@ DryUI work is explicit. Confirm contracts, build, then validate.
 
 - Read the relevant rule file and component metadata before using any component for the first time.
 - Component APIs vary. `bind:value`, `bind:open`, `bind:checked` are NOT interchangeable.
-- Compound vs simple, required parts, available props — all differ per component.
+- Compound vs simple, required parts, available props - all differ per component.
 - If you skip the lookup, you'll write plausible-looking code that silently breaks.
 
 The test: can you point to the rule file, component metadata, or existing usage that justifies every component or pattern in your output?
@@ -48,13 +55,13 @@ The test: every compound component in your markup uses `.Root`, and its parts ar
 
 ## 3. Theme Tokens Are For Components, Not Decoration
 
-**Import the theme. Reach for tokens only when you need a value. DryUI ships no default look — the host page owns visual style.**
+**Import the theme. Reach for tokens only when you need a value. DryUI ships no default look - the host page owns visual style.**
 
 - Import `@dryui/ui/themes/default.css` (and `dark.css`) before any component use. Components reach for tokens internally.
 - When you do reach for tokens in your own CSS, use `--dry-color-*` and `--dry-space-*` instead of hex/rgb/raw px.
 - Don't decorate user-authored wrappers by default (no `border-radius`, `border`, `background`, `box-shadow`, gradient on a `<section>` "because that's how DryUI looks"). DryUI has no default look. If a wrapper needs visual treatment, the host page decides what.
-- Override semantic tokens (Tier 2) in `:root` if you're customizing palette. Component tokens (Tier 3) are component-internal — leave them alone.
-- Default to a bare `<html>` — light tokens apply automatically. Add `class="theme-auto"` only when the app should follow the OS preference, and `data-theme="light|dark"` only for explicit overrides. Importing `dark.css` without one of those opt-ins is fine; nothing dark fires until the consumer asks for it.
+- Override semantic tokens (Tier 2) in `:root` if you're customizing palette. Component tokens (Tier 3) are component-internal - leave them alone.
+- Default to a bare `<html>` - light tokens apply automatically. Add `class="theme-auto"` only when the app should follow the OS preference, and `data-theme="light|dark"` only for explicit overrides. Importing `dark.css` without one of those opt-ins is fine; nothing dark fires until the consumer asks for it.
 
 ```css
 /* Wrong: hardcoded color */
@@ -193,6 +200,19 @@ For Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`), snippets, Svelte
 
 The test: before writing non-trivial Svelte 5 or SvelteKit code, did you either call `svelte-autofixer` / `get-documentation`, or confirm the pattern is already covered by these DryUI rules and examples?
 
+## 8. Lint Green Is Not Done
+
+**`bun run check` cannot evaluate visual fidelity. Run the loop, or you ship the wrong page.**
+
+Required when the brief includes a design image. After lint passes:
+
+1. Screenshot each route at the design’s target viewport with `chrome-devtools-mcp` `take_screenshot`.
+2. View the screenshot and the input image side by side. Re-read the description from §0.
+3. Walk these axes and note every deviation: page background, typography scale and weights, section padding and gap, component variants, iconography, colour palette (including signal colours), density, signature treatments (avatars, sparklines, accent bars, gradients, grain).
+4. Iterate markup, tokens, and `src/layout.css` until the screenshot matches the design on each axis. Match the design, not your output.
+
+The test: did you screenshot after the last edit, and does every axis above either match or have a noted divergence? A green lint with a wrong-looking page is a failure, not a stopping point.
+
 ## Quick Start
 
 **1. Install the DryUI agent skills** with the `npx skills` standard:
@@ -304,14 +324,14 @@ Categories: action, input, form, layout, navigation, overlay, display, feedback,
 
 ## Rule Files
 
-Read these when you need deeper guidance:
+Read top-down. The first two cover the highest-failure-cost decisions and are mandatory before any palette, dark mode, or form work.
 
-- **`rules/compound-components.md`** — Parts lists, component selection table, common mistakes
-- **`rules/theming.md`** — Three-tier token system, dark mode, palette customization
-- **`rules/composition.md`** — Form patterns, page layouts, composition recipes
-- **`rules/accessibility.md`** — Field.Root, ARIA, focus management, pre-ship checklist
-- **`rules/svelte.md`** — Runes, snippets, native browser APIs, styling rules
-- **`rules/native-web-transitions.md`** — View Transition API, scroll animations, reduced-motion
+- **`rules/theming.md`** READ IF: palette, dark mode, contrast, tokens, root font-size, surface treatment, page background, brand colours.
+- **`rules/accessibility.md`** READ IF: form inputs, icon-only buttons, dialogs, alert dialogs, focus, labels, alt text, loading states, anything interactive.
+- **`rules/composition.md`** READ IF: writing markup with raw `<div>`/`<span>`, choosing between a DryUI component and a `data-layout` hook, page shells, sidebars, settings pages, form layouts, panel grids, planner state.
+- **`rules/compound-components.md`** READ IF: building forms, tables, dialogs, drawers, tabs, accordions, dropdowns, comboboxes, popovers, anything multi-part. Has the parts reference and common-mistake table.
+- **`rules/svelte.md`** READ IF: runes (`$state`, `$derived`, `$effect`, `$props`, `$bindable`), snippets, prop forwarding, two-way binding, native browser APIs, SSR safety, scoped style rules.
+- **`rules/native-web-transitions.md`** READ IF: animating route or DOM changes, scroll-driven reveals, view transitions, reduced-motion handling.
 
 ---
 

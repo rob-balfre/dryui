@@ -12,11 +12,19 @@
 
 [data-theme='midnight'],
 .theme-midnight {
+	/* ─── Public aliases (midnight) ───────────────────────────────── */
+	--dry-color-primary: hsl(250, 70%, 75%);
+	--dry-color-primary-hover: hsl(250, 70%, 67%);
+	--dry-color-text: hsla(240, 20%, 98%, 1);
+	--dry-color-text-secondary: hsla(240, 15%, 90%, 0.7);
+	--dry-color-muted: hsla(240, 15%, 80%, 0.1);
+	--dry-color-warning: hsl(38, 75%, 55%);
+	--dry-color-success: hsl(150, 55%, 50%);
+	--dry-color-danger: hsl(355, 70%, 60%);
+	--dry-color-border: hsla(240, 15%, 80%, 0.1);
+	--dry-color-border-hover: hsla(240, 15%, 85%, 0.5);
+
 	/* ─── Brand — soft lavender ───────────────────────────────────── */
-	--dry-color-brand: hsl(250, 70%, 75%);
-	--dry-color-text-brand: hsl(250, 70%, 75%);
-	--dry-color-fill-brand: hsl(250, 70%, 75%);
-	--dry-color-fill-brand-hover: hsl(250, 70%, 67%);
 	--dry-color-fill-brand-active: hsl(250, 70%, 62%);
 	--dry-color-fill-brand-weak: hsla(250, 70%, 75%, 0.08);
 	--dry-color-stroke-brand: hsla(250, 70%, 75%, 0.45);
@@ -32,7 +40,6 @@
 
 	/* ─── Status: Error ───────────────────────────────────────────── */
 	--dry-color-text-error: hsl(355, 70%, 72%);
-	--dry-color-fill-error: hsl(355, 70%, 60%);
 	--dry-color-fill-error-hover: hsl(355, 70%, 52%);
 	--dry-color-fill-error-weak: hsla(355, 70%, 60%, 0.12);
 	--dry-color-stroke-error: hsl(355, 50%, 55%);
@@ -41,7 +48,6 @@
 
 	/* ─── Status: Warning ─────────────────────────────────────────── */
 	--dry-color-text-warning: hsl(38, 80%, 68%);
-	--dry-color-fill-warning: hsl(38, 75%, 55%);
 	--dry-color-fill-warning-weak: hsla(38, 75%, 55%, 0.12);
 	--dry-color-stroke-warning: hsl(38, 55%, 55%);
 	--dry-color-stroke-warning-strong: hsla(38, 75%, 55%, 0.8);
@@ -49,7 +55,6 @@
 
 	/* ─── Status: Success ─────────────────────────────────────────── */
 	--dry-color-text-success: hsl(150, 55%, 68%);
-	--dry-color-fill-success: hsl(150, 55%, 50%);
 	--dry-color-fill-success-weak: hsla(150, 55%, 50%, 0.12);
 	--dry-color-stroke-success: hsl(150, 45%, 55%);
 	--dry-color-stroke-success-strong: hsla(150, 55%, 50%, 0.8);
@@ -78,11 +83,7 @@
 	--dry-color-bg-inverse: hsl(240, 10%, 95%);
 
 	/* ─── Neutrals — cool silver white ────────────────────────────── */
-	--dry-color-text-strong: hsla(240, 20%, 98%, 1);
-	--dry-color-text-weak: hsla(240, 15%, 90%, 0.7);
 	--dry-color-icon: hsla(240, 15%, 88%, 0.78);
-	--dry-color-stroke-strong: hsla(240, 15%, 85%, 0.5);
-	--dry-color-stroke-weak: hsla(240, 15%, 80%, 0.1);
 	--dry-color-fill: hsla(240, 15%, 85%, 0.05);
 	--dry-color-fill-hover: hsla(240, 15%, 85%, 0.08);
 	--dry-color-fill-active: hsla(240, 15%, 85%, 0.13);

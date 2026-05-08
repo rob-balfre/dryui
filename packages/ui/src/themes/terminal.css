@@ -11,11 +11,19 @@
 
 [data-theme='terminal'],
 .theme-terminal {
+	/* ─── Public aliases (terminal) ───────────────────────────────── */
+	--dry-color-primary: hsl(145, 80%, 50%);
+	--dry-color-primary-hover: hsl(145, 80%, 42%);
+	--dry-color-text: hsla(0, 0%, 100%, 0.95);
+	--dry-color-text-secondary: hsla(0, 0%, 100%, 0.55);
+	--dry-color-muted: hsla(0, 0%, 100%, 0.1);
+	--dry-color-warning: hsl(45, 90%, 55%);
+	--dry-color-success: hsl(145, 80%, 50%);
+	--dry-color-danger: hsl(0, 80%, 55%);
+	--dry-color-border: hsla(0, 0%, 100%, 0.1);
+	--dry-color-border-hover: hsla(0, 0%, 100%, 0.4);
+
 	/* ─── Brand — terminal green ──────────────────────────────────── */
-	--dry-color-brand: hsl(145, 80%, 50%);
-	--dry-color-text-brand: hsl(145, 80%, 50%);
-	--dry-color-fill-brand: hsl(145, 80%, 50%);
-	--dry-color-fill-brand-hover: hsl(145, 80%, 42%);
 	--dry-color-fill-brand-active: hsl(145, 80%, 36%);
 	--dry-color-fill-brand-weak: hsla(145, 80%, 50%, 0.08);
 	--dry-color-stroke-brand: hsla(145, 80%, 50%, 0.5);
@@ -38,11 +46,7 @@
 	--dry-color-bg-inverse: hsl(0, 0%, 95%);
 
 	/* ─── Neutrals — pure achromatic ──────────────────────────────── */
-	--dry-color-text-strong: hsla(0, 0%, 100%, 0.95);
-	--dry-color-text-weak: hsla(0, 0%, 100%, 0.55);
 	--dry-color-icon: hsla(0, 0%, 100%, 0.7);
-	--dry-color-stroke-strong: hsla(0, 0%, 100%, 0.4);
-	--dry-color-stroke-weak: hsla(0, 0%, 100%, 0.1);
 	--dry-color-fill: hsla(0, 0%, 100%, 0.04);
 	--dry-color-fill-hover: hsla(0, 0%, 100%, 0.07);
 	--dry-color-fill-active: hsla(0, 0%, 100%, 0.12);
@@ -124,7 +128,6 @@
 
 	/* ─── Status overrides — more vivid for data-dense UIs ────────── */
 	--dry-color-text-error: hsl(0, 80%, 65%);
-	--dry-color-fill-error: hsl(0, 80%, 55%);
 	--dry-color-fill-error-hover: hsl(0, 80%, 47%);
 	--dry-color-fill-error-weak: hsla(0, 80%, 55%, 0.12);
 	--dry-color-stroke-error: hsl(0, 60%, 55%);
@@ -132,14 +135,12 @@
 	--dry-color-on-error: hsl(0, 30%, 5%);
 
 	--dry-color-text-warning: hsl(45, 90%, 60%);
-	--dry-color-fill-warning: hsl(45, 90%, 55%);
 	--dry-color-fill-warning-weak: hsla(45, 90%, 55%, 0.12);
 	--dry-color-stroke-warning: hsl(45, 70%, 55%);
 	--dry-color-stroke-warning-strong: hsla(45, 90%, 55%, 0.85);
 	--dry-color-on-warning: hsl(45, 30%, 5%);
 
 	--dry-color-text-success: hsl(145, 80%, 55%);
-	--dry-color-fill-success: hsl(145, 80%, 50%);
 	--dry-color-fill-success-weak: hsla(145, 80%, 50%, 0.12);
 	--dry-color-stroke-success: hsl(145, 60%, 50%);
 	--dry-color-stroke-success-strong: hsla(145, 80%, 50%, 0.85);

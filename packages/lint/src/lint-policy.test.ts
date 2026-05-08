@@ -20,7 +20,7 @@ describe('lint policy', () => {
 		).toEqual({
 			rule: 'dryui/no-flex',
 			message:
-				'Do not use display: flex. Use display: grid. For chip/tag wrapping, use ChipGroup.Root for the chip row. Add /* dryui-allow flex */ on the preceding line for intentional cases.',
+				'Do not use display: flex. Use display: grid. For chip/tag wrapping, use ChipGroup.Root for the chip row. The preceding-line /* dryui-allow flex */ escape hatch is ONLY for isolated component internals that genuinely need one-dimensional intrinsic layout and cannot be expressed with grid or src/layout.css. Do NOT silence this rule on wrappers, cards, forms, navigation shells, page sections, or bulk layout.',
 			line: 3
 		});
 	});

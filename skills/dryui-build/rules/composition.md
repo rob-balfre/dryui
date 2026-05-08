@@ -463,6 +463,22 @@ Items are separated by grid `gap`. No wrapper class — the host page decides wh
 }
 ```
 
+### Shrinking root font-size to make a layout fit
+
+If a grid track overflows or a heading clips, fix the grid track here in `src/layout.css`, not the root type scale. `html { font-size: 9px }` silently scales every DryUI rem-based token (spacing, type, focus rings, control padding) and breaks the whole interface. See `theming.md` "Never scale `html` or `body` font-size".
+
+```css
+/* Wrong: shrink the root to make 3 columns fit */
+html {
+	font-size: 9px;
+}
+
+/* Right: relax the track */
+[data-layout='app-shell'] {
+	grid-template-columns: 14rem minmax(0, 1fr) 18rem;
+}
+```
+
 ### Using the removed Card component
 
 DryUI ships no Card component because Card is a visual choice, not an accessibility primitive. Use a bare semantic element with current DryUI controls; the host page decides whether to add visual treatment.

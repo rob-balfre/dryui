@@ -48,15 +48,17 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-raw-element',
 		severity: 'error',
 		message:
-			'Raw <{tag}> is not allowed. Use a DryUI/Svelte component, or add data-layout/data-layout-area for layout shell elements.',
-		suggestedFix: 'Replace raw markup with a DryUI component or a dedicated Svelte component.'
+			'Raw <{tag}> is not allowed. Replace with a DryUI component when one exists. The data-layout escape hatch is ONLY for elements that are the root of a layout grid declared in src/layout.css. Use a unique, meaningful name like data-layout="article" or data-layout="dashboard". Do NOT silence this rule by bulk-adding data-layout="ui" / "wrapper" / "box" / "container" / "div": those names defeat the lint and produce unstyled output because no matching grid exists in src/layout.css.',
+		suggestedFix:
+			'Replace raw markup with a DryUI component, or add data-layout="<unique-name>" only if you are also declaring that name as a grid in src/layout.css.'
 	},
 	'dryui/no-component-class': {
 		id: 'dryui/no-component-class',
 		severity: 'error',
 		message:
-			'Do not pass class= to <{component}>. Svelte components ignore class attributes. Use --dry-* CSS custom properties for styling overrides.',
-		suggestedFix: 'Replace class= overrides with component props or --dry-* CSS custom properties.'
+			'<{component}> does not forward class={...} to its rendered element. Prefer --dry-* CSS custom properties for visual overrides, or wrap <{component}> in a data-layout element for spacing and positioning. Note: <Button> exposes a back-compat `className` alias, but most components (<Badge>, <Heading>, <Text>, <Avatar>, <Input>) do not. Use tokens or wrappers instead of renaming class to className.',
+		suggestedFix:
+			'Use --dry-* CSS custom properties, or wrap <{component}> in a data-layout element for layout. Do not just rename class= to className=.'
 	},
 	'dryui/no-css-ignore': {
 		id: 'dryui/no-css-ignore',
@@ -69,8 +71,9 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-svelte-element',
 		severity: 'error',
 		message:
-			'Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. Add <!-- dryui-allow svelte-element --> on the preceding line for legitimate cases (e.g., h1–h6 headings).',
-		suggestedFix: 'Replace <svelte:element> with explicit markup branches.'
+			'Do not use <svelte:element this={x}>. Use explicit {#if}/{:else} branches with concrete tags so element-specific styles and semantics are visible in source. The preceding-line <!-- dryui-allow svelte-element --> escape hatch is ONLY for finite semantic tag sets where explicit branches would obscure the contract, such as h1-h6 heading levels. Do NOT silence this rule for generic wrappers, links, buttons, or elements whose styling or ARIA changes by tag.',
+		suggestedFix:
+			'Replace <svelte:element> with explicit markup branches; reserve the allow comment for finite semantic tag sets like heading levels.'
 	},
 	'dryui/no-anchor-without-href': {
 		id: 'dryui/no-anchor-without-href',
@@ -90,15 +93,17 @@ export const RULE_CATALOG = {
 		id: 'dryui/no-flex',
 		severity: 'error',
 		message:
-			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root for the chip row. Add /* dryui-allow flex */ on the preceding line for intentional cases.',
-		suggestedFix: 'Use CSS grid, or move page-level flex to src/layout.css.'
+			'Do not use {value}. Use {guidance}. For chip/tag wrapping, use ChipGroup.Root for the chip row. The preceding-line /* dryui-allow flex */ escape hatch is ONLY for isolated component internals that genuinely need one-dimensional intrinsic layout and cannot be expressed with grid or src/layout.css. Do NOT silence this rule on wrappers, cards, forms, navigation shells, page sections, or bulk layout.',
+		suggestedFix:
+			'Use CSS grid, ChipGroup.Root for chip rows, or move page-level flex to src/layout.css. Do not blanket-add dryui-allow flex.'
 	},
 	'dryui/no-width': {
 		id: 'dryui/no-width',
 		severity: 'error',
 		message:
-			'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead. Allowed units for typographic measure: ch, ex, em (e.g. max-width: 55ch is allowed, since it tracks text content, not viewport layout). Add /* dryui-allow width */ on the preceding line for intentional cases.',
-		suggestedFix: 'Move sizing to the parent grid tracks, or use ch/ex/em for text measure.'
+			'Do not use width/inline-size (including max-/min- variants). Grid children are sized by their track. Use grid-template-columns or grid-template-rows instead. Allowed units for typographic measure: ch, ex, em (e.g. max-width: 55ch is allowed, since it tracks text content, not viewport layout). The preceding-line /* dryui-allow width */ escape hatch is ONLY for component internals that need measured control geometry or external API compatibility after grid tracks and text measure units cannot express it. Do NOT silence this rule for page constraints, cards, panels, columns, fill-parent sizing, or responsive layout pressure.',
+		suggestedFix:
+			'Move sizing to the parent grid tracks, or use ch/ex/em for text measure. Do not blanket-add dryui-allow width.'
 	},
 	'dryui/no-all-unset': {
 		id: 'dryui/no-all-unset',

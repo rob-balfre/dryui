@@ -23,4 +23,13 @@ describe('rule catalog', () => {
 		const expected = readFileSync(snapshotPath, 'utf-8');
 		expect(`${serializeRuleCatalog()}\n`).toBe(expected);
 	});
+
+	test('high-risk allow-comment messages define the narrow escape hatch', () => {
+		for (const ruleId of ['dryui/no-svelte-element', 'dryui/no-flex', 'dryui/no-width'] as const) {
+			const message = RULE_CATALOG[ruleId].message;
+			expect(message).toContain('escape hatch is ONLY');
+			expect(message).toContain('Do NOT silence this rule');
+			expect(message).not.toContain('intentional cases');
+		}
+	});
 });

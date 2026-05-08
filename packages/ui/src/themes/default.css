@@ -7,21 +7,36 @@
 }
 
 :root {
+	/* ─── Public aliases (Tier 2, documented) ──────────────────────────
+	   Override at `:root` to retheme. Tier 3 tokens below derive via
+	   `var(--alias)` so overrides cascade. See theming.md. */
+	--dry-color-primary: hsl(230, 64%, 57%);
+	--dry-color-primary-hover: hsl(230, 64%, 49%);
+	--dry-color-text: hsla(230, 100%, 7%, 0.9);
+	--dry-color-text-secondary: hsla(230, 100%, 10%, 0.65);
+	--dry-color-foreground: var(--dry-color-text);
+	--dry-color-muted: hsla(230, 100%, 20%, 0.1);
+	--dry-color-warning: hsl(40, 80%, 50%);
+	--dry-color-success: hsl(145, 60%, 45%);
+	--dry-color-danger: hsl(0, 70%, 50%);
+	--dry-color-border: hsla(230, 100%, 20%, 0.1);
+	--dry-color-border-hover: hsla(230, 100%, 15%, 0.45);
+
 	/* ─── Neutral ─────────────────────────────────────────────────── */
-	--dry-color-text-strong: hsla(230, 100%, 7%, 0.9);
-	--dry-color-text-weak: hsla(230, 100%, 10%, 0.65);
+	--dry-color-text-strong: var(--dry-color-text);
+	--dry-color-text-weak: var(--dry-color-text-secondary);
 	--dry-color-icon: hsla(230, 100%, 15%, 0.7);
-	--dry-color-stroke-strong: hsla(230, 100%, 15%, 0.45);
-	--dry-color-stroke-weak: hsla(230, 100%, 20%, 0.1);
+	--dry-color-stroke-strong: var(--dry-color-border-hover);
+	--dry-color-stroke-weak: var(--dry-color-border);
 	--dry-color-fill: hsla(230, 100%, 25%, 0.04);
 	--dry-color-fill-hover: hsla(230, 100%, 25%, 0.04);
 	--dry-color-fill-active: hsla(230, 100%, 25%, 0.12);
 
 	/* ─── Brand (hue 230) ─────────────────────────────────────────── */
-	--dry-color-brand: hsl(230, 64%, 57%);
-	--dry-color-text-brand: hsl(230, 64%, 57%);
-	--dry-color-fill-brand: hsl(230, 64%, 57%);
-	--dry-color-fill-brand-hover: hsl(230, 64%, 49%);
+	--dry-color-brand: var(--dry-color-primary);
+	--dry-color-text-brand: var(--dry-color-primary);
+	--dry-color-fill-brand: var(--dry-color-primary);
+	--dry-color-fill-brand-hover: var(--dry-color-primary-hover);
 	--dry-color-fill-brand-active: hsl(230, 64%, 43%);
 	--dry-color-fill-brand-weak: hsla(230, 100%, 67%, 0.05);
 	--dry-color-stroke-brand: hsla(230, 64%, 57%, 0.5);
@@ -35,7 +50,7 @@
 	--dry-color-bg-overlay: #f1f3f5;
 
 	/* ─── Semantic parity extensions ──────────────────────────────── */
-	--dry-color-text-disabled: var(--dry-color-stroke-weak);
+	--dry-color-text-disabled: var(--dry-color-muted);
 	--dry-color-text-inverse: hsla(0, 0%, 100%, 1);
 	--dry-color-text-inverse-weak: hsla(0, 0%, 100%, 0.78);
 	--dry-color-text-inverse-disabled: hsla(0, 0%, 100%, 0.12);
@@ -57,6 +72,9 @@
 	--dry-color-bg-sunken: #f5f6fa;
 	--dry-color-bg-alternate: var(--dry-color-bg-sunken);
 	--dry-color-bg-inverse: hsl(233, 18%, 9%);
+
+	/* Resolves at use-time so it tracks the active theme. */
+	--dry-color-bg: var(--dry-color-bg-base);
 
 	/* ─── Image edge ring ────────────────────────────────────────────
 	   Subtle 1px outline for image surfaces (avatars, images, image
@@ -85,7 +103,7 @@
 
 	/* ─── Status: Error (hue 0) ───────────────────────────────────── */
 	--dry-color-text-error: hsl(0, 70%, 35%);
-	--dry-color-fill-error: hsl(0, 70%, 50%);
+	--dry-color-fill-error: var(--dry-color-danger);
 	--dry-color-fill-error-hover: hsl(0, 70%, 42%);
 	--dry-color-fill-error-weak: hsla(0, 70%, 50%, 0.1);
 	--dry-color-stroke-error: hsl(0, 50%, 70%);
@@ -94,7 +112,7 @@
 
 	/* ─── Status: Warning (hue 40) ────────────────────────────────── */
 	--dry-color-text-warning: hsl(40, 80%, 30%);
-	--dry-color-fill-warning: hsl(40, 80%, 50%);
+	--dry-color-fill-warning: var(--dry-color-warning);
 	--dry-color-fill-warning-weak: hsla(40, 80%, 50%, 0.1);
 	--dry-color-stroke-warning: hsl(40, 60%, 65%);
 	--dry-color-stroke-warning-strong: hsla(40, 80%, 50%, 0.8);
@@ -102,7 +120,7 @@
 
 	/* ─── Status: Success (hue 145) ───────────────────────────────── */
 	--dry-color-text-success: hsl(145, 60%, 30%);
-	--dry-color-fill-success: hsl(145, 60%, 45%);
+	--dry-color-fill-success: var(--dry-color-success);
 	--dry-color-fill-success-weak: hsla(145, 60%, 45%, 0.1);
 	--dry-color-stroke-success: hsl(145, 50%, 65%);
 	--dry-color-stroke-success-strong: hsla(145, 60%, 45%, 0.8);
@@ -299,7 +317,7 @@
 
 	/* ─── Form control shared tokens ──────────────────────────────────
 	   Consumed by input, textarea, combobox-input, and color-picker-input.
-	   Per-component `--dry-<name>-*` overrides still work — they now
+	   Per-component `--dry-<name>-*` overrides still work; they now
 	   resolve through this shared family by default, so consumers can
 	   restyle all form controls with one change at :root.
 	   Intentionally excluded (pre-existing divergence):
